@@ -201,10 +201,10 @@ test('fixture provenance contract rows counts and field names stay pinned', () =
   assert.match(doc, /collector side-effect rows covered: 12/);
   assert.match(doc, /collector fixture provenance rows covered: 12/);
   assert.match(doc, /collector parity rollout rows covered: 12/);
-  assert.match(doc, /method semantic proof gap files covered: 63/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5473/);
+  assert.match(doc, /method semantic proof gap files covered: 69/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5673/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5673/);
   assert.match(doc, /inline fixture provenance JSON sections covered: 12/);
   assert.match(doc, /inline fixture provenance artifact promotion decision: NO-GO/);
   assert.match(doc, /fixture provenance draft closure rows: 12/);
@@ -218,8 +218,8 @@ test('fixture provenance contract rows counts and field names stay pinned', () =
   assert.match(doc, /metric schema rows linked by fixture closure: 12/);
   assert.match(doc, /metric source-owner rows linked by fixture closure: 12/);
   assert.match(doc, /collector readiness families linked by fixture closure: 5/);
-  assert.match(doc, /method semantic proof gap files linked by fixture closure: 63/);
-  assert.match(doc, /lexical callables linked by fixture closure: 5473/);
+  assert.match(doc, /method semantic proof gap files linked by fixture closure: 69/);
+  assert.match(doc, /lexical callables linked by fixture closure: 5673/);
   assert.match(doc, /runtime fixture provenance closure approvals: 0/);
   assert.match(doc, /implementation-ready fixture provenance closure rows: 0/);
   assert.match(doc, /fixture provenance draft closure: FIXTURE-PROVENANCE-CHAIN-CLOSED/);
@@ -284,7 +284,7 @@ test('fixture provenance contract is backed by current owner sample artifact and
 
   assert.match(sourceOwnerMapContract, /Committed source owner map files: 0/);
   assert.match(sourceOwnerMapContract, /Implementation-ready source owner map contract rows: 0/);
-  assert.match(sourceOwnerMapContract, /method semantic proof gap files covered: 63/);
+  assert.match(sourceOwnerMapContract, /method semantic proof gap files covered: 69/);
   assert.match(metricSampleContract, /Committed metric sample files: 0/);
   assert.match(metricSampleContract, /Implementation-ready metric sample contract rows: 0/);
   assert.match(manifestContract, /Committed packet manifest files: 0/);
@@ -300,10 +300,10 @@ test('fixture provenance contract is backed by current owner sample artifact and
   assert.match(sideEffect, /collector side-effect rows implementation-ready: 0/);
   assert.match(fixtureProvenance, /collector fixture provenance rows implementation-ready: 0/);
   assert.match(parityRollout, /collector parity rollout rows implementation-ready: 0/);
-  assert.match(methodGap, /tracked JS\/JSX\/MJS files: 63/);
-  assert.match(methodGap, /repo-wide lexical callables: 5473/);
+  assert.match(methodGap, /tracked JS\/JSX\/MJS files: 69/);
+  assert.match(methodGap, /repo-wide lexical callables: 5673/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5673/);
 });
 
 test('fixture provenance authority symbols are absent from product runtime source', () => {
@@ -338,10 +338,10 @@ test('fixture provenance contract is linked from audit ledgers and upstream gate
 
   assert.match(runtimeResults, /tests 4457/);
   assert.match(runtimeResults, /pass 4457/);
-  assert.match(runtimeResults, /First optimization fixture provenance contract addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(activeGoal, /First optimization fixture provenance contract addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(objectiveLedger, /First optimization fixture provenance contract addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(trackedIndex, /First optimization fixture provenance contract addendum:[\s\S]*63 method semantic proof gap files covered/);
+  assert.match(runtimeResults, /First optimization fixture provenance contract addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(activeGoal, /First optimization fixture provenance contract addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(objectiveLedger, /First optimization fixture provenance contract addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(trackedIndex, /First optimization fixture provenance contract addendum:[\s\S]*69 method semantic proof gap files covered/);
   assert.match(doc, /close fixture provenance documentation chain now: GO/);
   assert.match(doc, /accept fixture provenance closure as committed artifact approval now: NO-GO/);
   assert.match(doc, /accept fixture provenance closure as artifact root creation approval now: NO-GO/);

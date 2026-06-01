@@ -51,20 +51,20 @@ test('alias ingress preservation doc is audit-only and extends stale alias proof
 test('final alias performance and runtime audit docs carry the method proof gap blocker', () => {
   const methodGap = read(methodGapPath);
 
-  assert.match(methodGap, /tracked JS\/JSX\/MJS files: 63/);
-  assert.match(methodGap, /repo-wide lexical callables: 5473/);
+  assert.match(methodGap, /tracked JS\/JSX\/MJS files: 69/);
+  assert.match(methodGap, /repo-wide lexical callables: 5673/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5673/);
 
   for (const finalDocPath of finalMethodGapDocs) {
     const finalDoc = read(finalDocPath);
 
     assert.ok(finalDoc.includes(methodGapPath), `${finalDocPath} should cite method semantic proof gap index`);
     assert.match(finalDoc, /## Method Semantic Proof Gap Boundary/);
-    assert.match(finalDoc, /method semantic proof gap files covered: 63/);
-    assert.match(finalDoc, /method semantic proof gap lexical callables covered: 5473/);
+    assert.match(finalDoc, /method semantic proof gap files covered: 69/);
+    assert.match(finalDoc, /method semantic proof gap lexical callables covered: 5673/);
     assert.match(finalDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(finalDoc, /lexical callables requiring semantic proof before behavior changes: 5473/);
+    assert.match(finalDoc, /lexical callables requiring semantic proof before behavior changes: 5673/);
     assert.match(finalDoc, /affected callable semantic proof: NO-GO/);
     assert.match(finalDoc, /runtime behavior changed: no/);
     assert.match(finalDoc, /do not approve runtime\s+optimization/);

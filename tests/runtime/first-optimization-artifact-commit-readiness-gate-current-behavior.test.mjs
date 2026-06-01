@@ -354,10 +354,10 @@ test('artifact commit readiness rows counts and field names stay pinned', () => 
   assert.match(doc, /foundation packet rows covered: 12/);
   assert.match(doc, /artifact path boundary rows covered: 10/);
   assert.match(doc, /implementation readiness rows covered: 14/);
-  assert.match(doc, /method semantic proof gap files covered: 63/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5473/);
+  assert.match(doc, /method semantic proof gap files covered: 69/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5673/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5673/);
   assert.match(doc, /expected runtime audit tests: 4457/);
   assert.match(doc, /expected runtime audit pass: 4457/);
   assert.match(doc, /expected runtime audit fail: 0/);
@@ -415,12 +415,12 @@ test('artifact commit readiness is backed by current gates and contract docs', (
   assert.match(contractCoverage, /metric foundation inline draft sections covered: 108/);
   assert.match(contractCoverage, /metric foundation inline draft artifact promotion decisions: 9 NO-GO/);
   assert.match(contractCoverage, /combined metric-foundation inline artifact chain plus coverage gate verifier tests observed: 61/);
-  assert.match(contractCoverage, /method semantic proof gap files covered: 63/);
+  assert.match(contractCoverage, /method semantic proof gap files covered: 69/);
   assert.match(rollbackUnclaimed, /runtime rollback approvals: 0/);
   assert.match(rollbackUnclaimed, /runtime unclaimed-surface approvals: 0/);
-  assert.match(rollbackUnclaimed, /method semantic proof gap files covered: 63/);
-  assert.match(methodGap, /files with lexical accounting: 63/);
-  assert.match(methodGap, /repo-wide lexical callables: 5473/);
+  assert.match(rollbackUnclaimed, /method semantic proof gap files covered: 69/);
+  assert.match(methodGap, /files with lexical accounting: 69/);
+  assert.match(methodGap, /repo-wide lexical callables: 5673/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(verificationOutput, /Committed verification output files: 0/);
   assert.match(parityRollout, /Committed parity rollout files: 0/);
@@ -514,8 +514,8 @@ test('artifact commit readiness gate is linked from audit ledgers and source gat
     assert.ok(artifact.includes(runtimeTestPath));
   }
 
-  assert.match(runtimeResults, /First optimization artifact commit readiness gate addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(activeGoal, /First optimization artifact commit readiness gate addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(objectiveLedger, /First optimization artifact commit readiness gate addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(trackedIndex, /First optimization artifact commit readiness gate addendum:[\s\S]*63 method semantic proof gap files covered/);
+  assert.match(runtimeResults, /First optimization artifact commit readiness gate addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(activeGoal, /First optimization artifact commit readiness gate addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(objectiveLedger, /First optimization artifact commit readiness gate addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(trackedIndex, /First optimization artifact commit readiness gate addendum:[\s\S]*69 method semantic proof gap files covered/);
 });

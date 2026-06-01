@@ -158,10 +158,10 @@ test('collector rollback unclaimed approval rows counts and fields stay pinned',
   assert.match(doc, /collector insertion approval rows covered: 12/);
   assert.match(doc, /collector approval authority rows covered: 12/);
   assert.match(doc, /current parity release verification anchors covered: 68/);
-  assert.match(doc, /method semantic proof gap files covered: 63/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5473/);
+  assert.match(doc, /method semantic proof gap files covered: 69/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5673/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5673/);
   assert.match(doc, /runtime source-owner approvals: 0/);
   assert.match(doc, /runtime metric collector approvals: 0/);
   assert.match(doc, /runtime collector insertion points approved: 0/);
@@ -218,8 +218,8 @@ test('collector rollback unclaimed approval is backed by current NO-GO gates', (
   assert.match(collectorInsertionApproval, /runtime collector insertion approval now: NO-GO/);
   assert.match(collectorApproval, /Rollback and unclaimed-surface approval/);
   assert.match(collectorApproval, /implementation-ready collector approval rows: 0/);
-  assert.match(methodGap, /files with lexical accounting: 63/);
-  assert.match(methodGap, /repo-wide lexical callables: 5473/);
+  assert.match(methodGap, /files with lexical accounting: 69/);
+  assert.match(methodGap, /repo-wide lexical callables: 5673/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(implementationReadiness, /First optimization implementation gate decision: NO-GO/);
   assert.match(runtimeResults, /tests 4457/);
@@ -288,10 +288,10 @@ test('collector rollback unclaimed approval boundary is linked from ledgers and 
 
   assert.ok(read(sourceDocs.runtimeResults).includes('tests 4457'));
   assert.ok(read(sourceDocs.runtimeResults).includes('expected runtime audit tests: 4457'));
-  assert.match(read(sourceDocs.runtimeResults), /First optimization collector rollback\/unclaimed approval boundary addendum:[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
-  assert.match(read(ledgerDocs.objectiveLedger), /First Optimization Collector Rollback Unclaimed Approval Boundary Addendum[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
-  assert.match(read(ledgerDocs.activeGoal), /First Optimization Collector Rollback Unclaimed Approval Boundary Addendum[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
-  assert.match(read(ledgerDocs.trackedIndex), /First Optimization Collector Rollback Unclaimed Approval Boundary Addendum[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(read(sourceDocs.runtimeResults), /First optimization collector rollback\/unclaimed approval boundary addendum:[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(read(ledgerDocs.objectiveLedger), /First Optimization Collector Rollback Unclaimed Approval Boundary Addendum[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(read(ledgerDocs.activeGoal), /First Optimization Collector Rollback Unclaimed Approval Boundary Addendum[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(read(ledgerDocs.trackedIndex), /First Optimization Collector Rollback Unclaimed Approval Boundary Addendum[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
   assert.ok(read(ledgerDocs.objectiveLedger).includes('expected runtime audit tests: 4457'));
   assert.ok(read(ledgerDocs.activeGoal).includes('expected runtime audit tests: 4457'));
   assert.ok(read(ledgerDocs.trackedIndex).includes('expected runtime audit tests: 4457'));

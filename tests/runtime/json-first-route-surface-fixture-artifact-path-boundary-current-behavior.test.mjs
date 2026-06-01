@@ -118,10 +118,10 @@ test('JSON-first route/surface fixture artifact path rows and counts stay pinned
   assert.match(doc, /JSON-first route\/surface fixture artifact path rows: 6/);
   assert.match(doc, /reserved future artifact roots: 1/);
   assert.match(doc, /reserved future artifact files: 5/);
-  assert.match(doc, /method semantic proof gap files covered: 63/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5473/);
+  assert.match(doc, /method semantic proof gap files covered: 69/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5673/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5673/);
   assert.match(doc, /committed route\/surface fixture packet files: 0/);
   assert.match(doc, /runtime JSON-first fixture packet approvals: 0/);
   assert.match(doc, /runtime route\/surface metric artifacts: 0/);
@@ -166,9 +166,9 @@ test('JSON-first route/surface fixture artifact path boundary is backed by curre
   assert.match(collectorFixtureProvenance, /collector fixture provenance rows implementation-ready: 0/);
   assert.match(fixtureProvenanceContract, /Committed fixture provenance files: 0/);
   assert.match(fixtureProvenanceContract, /Implementation-ready fixture provenance contract rows: 0/);
-  assert.match(jsonFirstImplementation, /method semantic proof gap files covered: 63/);
-  assert.match(methodGap, /files with lexical accounting: 63/);
-  assert.match(methodGap, /repo-wide lexical callables: 5473/);
+  assert.match(jsonFirstImplementation, /method semantic proof gap files covered: 69/);
+  assert.match(methodGap, /files with lexical accounting: 69/);
+  assert.match(methodGap, /repo-wide lexical callables: 5673/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(implementationReadiness, /implementation-ready first optimization rows: 0/);
 });
@@ -211,8 +211,8 @@ test('JSON-first route/surface fixture artifact path boundary is linked from led
 
   assert.ok(read(sourceDocs.runtimeResults).includes('tests 4457'));
   assert.ok(read(sourceDocs.runtimeResults).includes('expected runtime audit tests: 4457'));
-  assert.match(read(sourceDocs.runtimeResults), /JSON-first route\/surface fixture artifact path boundary addendum:[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
-  assert.match(read(ledgerDocs.objectiveLedger), /JSON-first route\/surface fixture artifact path boundary addendum[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
-  assert.match(read(ledgerDocs.activeGoal), /JSON-first route\/surface fixture artifact path boundary addendum[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
-  assert.match(read(ledgerDocs.trackedIndex), /JSON-first route\/surface fixture artifact path boundary addendum[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(read(sourceDocs.runtimeResults), /JSON-first route\/surface fixture artifact path boundary addendum:[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(read(ledgerDocs.objectiveLedger), /JSON-first route\/surface fixture artifact path boundary addendum[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(read(ledgerDocs.activeGoal), /JSON-first route\/surface fixture artifact path boundary addendum[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(read(ledgerDocs.trackedIndex), /JSON-first route\/surface fixture artifact path boundary addendum[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
 });

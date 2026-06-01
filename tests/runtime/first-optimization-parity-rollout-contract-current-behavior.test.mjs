@@ -259,10 +259,10 @@ test('parity rollout contract rows counts and field names stay pinned', () => {
   assert.match(doc, /collector parity rollout rows covered: 12/);
   assert.match(doc, /evidence parity rollout rows covered: 2/);
   assert.match(doc, /parity and release boundary source docs covered: 8/);
-  assert.match(doc, /method semantic proof gap files covered: 63/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5473/);
+  assert.match(doc, /method semantic proof gap files covered: 69/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5673/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5673/);
   assert.match(doc, /inline parity rollout JSON sections covered: 12/);
   assert.match(doc, /inline parity rollout artifact promotion decision: NO-GO/);
   assert.match(doc, /parity rollout draft closure rows: 12/);
@@ -282,8 +282,8 @@ test('parity rollout contract rows counts and field names stay pinned', () => {
   assert.match(doc, /collector readiness families linked by parity closure: 5/);
   assert.match(doc, /evidence parity rollout rows linked by parity closure: 2/);
   assert.match(doc, /parity and release boundary source docs linked by parity closure: 8/);
-  assert.match(doc, /method semantic proof gap files linked by parity closure: 63/);
-  assert.match(doc, /lexical callables linked by parity closure: 5473/);
+  assert.match(doc, /method semantic proof gap files linked by parity closure: 69/);
+  assert.match(doc, /lexical callables linked by parity closure: 5673/);
   assert.match(doc, /runtime parity rollout closure approvals: 0/);
   assert.match(doc, /implementation-ready parity rollout closure rows: 0/);
   assert.match(doc, /parity rollout draft closure: PARITY-ROLLOUT-CHAIN-CLOSED/);
@@ -358,11 +358,11 @@ test('parity rollout contract is backed by current artifact collector parity rel
 
   assert.match(diagnosticPrivacyContract, /Committed diagnostic privacy files: 0/);
   assert.match(diagnosticPrivacyContract, /Implementation-ready diagnostic privacy contract rows: 0/);
-  assert.match(diagnosticPrivacyContract, /method semantic proof gap files covered: 63/);
-  assert.match(methodGap, /tracked JS\/JSX\/MJS files: 63/);
-  assert.match(methodGap, /repo-wide lexical callables: 5473/);
+  assert.match(diagnosticPrivacyContract, /method semantic proof gap files covered: 69/);
+  assert.match(methodGap, /tracked JS\/JSX\/MJS files: 69/);
+  assert.match(methodGap, /repo-wide lexical callables: 5673/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5673/);
   assert.match(sideEffectBudgetContract, /Committed side-effect budget files: 0/);
   assert.match(sideEffectBudgetContract, /Implementation-ready side-effect budget contract rows: 0/);
   assert.match(noWorkPreservationContract, /Committed no-work preservation files: 0/);
@@ -427,10 +427,10 @@ test('parity rollout contract is linked from audit ledgers and upstream gates', 
 
   assert.match(runtimeResults, /tests 4457/);
   assert.match(runtimeResults, /pass 4457/);
-  assert.match(runtimeResults, /First optimization parity rollout contract addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(activeGoal, /First optimization parity rollout contract addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(objectiveLedger, /First optimization parity rollout contract addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(trackedIndex, /First optimization parity rollout contract addendum:[\s\S]*63 method semantic proof gap files covered/);
+  assert.match(runtimeResults, /First optimization parity rollout contract addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(activeGoal, /First optimization parity rollout contract addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(objectiveLedger, /First optimization parity rollout contract addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(trackedIndex, /First optimization parity rollout contract addendum:[\s\S]*69 method semantic proof gap files covered/);
   assert.match(doc, /close parity rollout documentation chain now: GO/);
   assert.match(doc, /accept parity rollout closure as committed artifact approval now: NO-GO/);
   assert.match(doc, /accept parity rollout closure as artifact root creation approval now: NO-GO/);

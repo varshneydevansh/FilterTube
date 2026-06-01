@@ -29,10 +29,10 @@ Runtime metric collector approvals: 0
 Runtime collector insertion points approved: 0
 Committed metric foundation artifact files: 0
 Implementation-ready collector source-locus closure rows: 0
-Method semantic proof gap files covered: 63
-Method semantic proof gap lexical callables covered: 5473
+Method semantic proof gap files covered: 69
+Method semantic proof gap lexical callables covered: 5673
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5473
+Lexical callables requiring semantic proof before behavior changes: 5673
 ```
 
 This is a closure boundary, not an approval boundary. It prevents a future
@@ -51,7 +51,7 @@ affected callable semantic proof.
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_COLLECTOR_APPROVAL_AUTHORITY_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves 12 collector approval rows, 0 runtime metric collector approvals, and 0 implementation-ready collector approval rows. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SOURCE_LOCUS_IMPLEMENTATION_AUTHORITY_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves source-locus classifications do not add up to implementation authority. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SOURCE_OWNER_APPROVAL_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves 0 runtime source-owner approvals and 0 implementation-ready source-owner approval rows. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 63 files and 5,473 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,673 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SOURCE_LOCUS_CALLABLE_ANCHOR_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Pins callable source-locus rows while proving 0 implementation-ready callable rows. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SOURCE_LOCUS_TEARDOWN_OWNERSHIP_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Classifies teardown ownership gaps while proving 0 implementation-ready teardown rows. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SOURCE_LOCUS_NO_WORK_OWNERSHIP_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Classifies no-work ownership gaps while proving 0 implementation-ready no-work rows. |
@@ -88,10 +88,10 @@ runtime rollback approvals: 0
 runtime unclaimed-surface approvals: 0
 committed metric foundation artifact files: 0
 implementation-ready collector source-locus closure rows: 0
-method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5473
+method semantic proof gap files covered: 69
+method semantic proof gap lexical callables covered: 5673
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5473
+lexical callables requiring semantic proof before behavior changes: 5673
 expected runtime audit tests: 4457
 expected runtime audit pass: 4457
 expected runtime audit fail: 0
@@ -193,7 +193,7 @@ bind this source-locus closure to the collector insertion approval NO-GO
 without approving collectors. The addendum pins 12 collector insertion
 approval boundary rows, 12 collector source-locus closure rows covered, 12
 collector approval authority rows covered, 12 source-owner approval rows
-covered, 63 method semantic proof gap files covered, 5,473 lexical callables
+covered, 69 method semantic proof gap files covered, 5,673 lexical callables
 still requiring semantic proof, 0 files with complete per-callable semantic
 proof, 0 runtime source-owner approvals, 0 runtime metric collector approvals,
 0 runtime collector insertion points approved, 0 runtime rollback approvals, 0

@@ -82,9 +82,9 @@ optimization readiness.
 The method/callable audit now has an explicit repo-wide semantic gap index:
 
 - `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md`
-  records 63 tracked JS/JSX/MJS files, 5,473 lexical callables, 63 files with
+  records 69 tracked JS/JSX/MJS files, 5,673 lexical callables, 69 files with
   lexical accounting, 0 files with complete per-callable semantic proof, and
-  5,473 lexical callables still requiring semantic proof before behavior
+  5,673 lexical callables still requiring semantic proof before behavior
   changes.
 - `tests/runtime/all-callable-index-current-behavior.test.mjs` proves that the
   gap index matches the current tracked source file list, callable counts,
@@ -845,7 +845,7 @@ flowchart TD
 | Network JSON no-work | `docs/audit/FILTERTUBE_NETWORK_FETCH_XHR_CALLSITE_REGISTER_CURRENT_BEHAVIOR_2026-05-22.md` | 9 | Seed and injector now avoid clone, parse, replay, and queue work when JSON filtering is inactive or empty. | No central network authority, and JSON-first filtering is not promoted to a complete first-class behavior model. |
 | DOM selector hot path | `docs/audit/FILTERTUBE_DOM_SELECTOR_INSTANCE_REGISTER_2026-05-18.md` | 12 | Quick-block overlay/card/sweep selectors, dropdown repair/close selectors, menu activation/discovery selectors, whitelist pending intake, and fallback menu intake are pinned. | No central selector authority, and every selector family still needs surface, route, target, restore, and sibling-visible proof. |
 | Cross-feature hot path | `docs/audit/FILTERTUBE_CROSS_FEATURE_AUTHORITY_MATRIX_2026-05-18.md` | 5 | Visible blocklist refresh, empty blocklist no-JSON work, whitelist pending-hide budget, quick-block/menu mode boundary, and Topic byline identity boundary are pinned together. | No `crossFeatureRuntimeAuthority`, and end-to-end cross-feature records are incomplete outside this release path. |
-| Method semantic triage | `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | 13 | The specific hot-path callables touched by the lag, stale keyword, native menu, quick-block, and Topic byline fixes have owner/trigger/input/side-effect/no-work boundaries recorded. | Repo-wide callable proof remains incomplete: 5,473 lexical callables still require semantic proof before broad behavior changes. |
+| Method semantic triage | `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | 13 | The specific hot-path callables touched by the lag, stale keyword, native menu, quick-block, and Topic byline fixes have owner/trigger/input/side-effect/no-work boundaries recorded. | Repo-wide callable proof remains incomplete: 5,673 lexical callables still require semantic proof before broad behavior changes. |
 
 Behavior-change checkpoint from the current source:
 
@@ -2418,10 +2418,10 @@ is a required source input before this audit completion gap register can
 support runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
-method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5473
+method semantic proof gap files covered: 69
+method semantic proof gap lexical callables covered: 5673
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5473
+lexical callables requiring semantic proof before behavior changes: 5673
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -2728,8 +2728,7 @@ The same sample now closes the metric-sample documentation chain: 12 closure
 rows link all 12 sample rows, 12 inline metric sample JSON sections, 12
 manifest contract rows, 10 artifact path boundary rows, 12 foundation packet
 rows, 12 metric schema rows, 12 metric source-owner rows, 5 collector
-readiness families, 63 method semantic proof gap files, and 5,473 lexical
-callables, while keeping runtime metric sample closure approvals 0,
+readiness families, 69 method semantic proof gap files, and 5,673 lexical callables, while keeping runtime metric sample closure approvals 0,
 implementation-ready metric sample closure rows 0, metric sample draft closure
 `METRIC-SAMPLE-CHAIN-CLOSED`, and metric sample implementation readiness from
 closure `NO-GO`. It keeps committed artifact approval, artifact root creation,
@@ -2755,8 +2754,7 @@ documentation chain: 12 closure rows link all 12 fixture provenance rows, 12
 inline fixture provenance JSON sections, 12 source owner map contract rows, 12
 metric sample contract rows, 12 manifest contract rows, 10 artifact path
 boundary rows, 12 foundation packet rows, 12 metric schema rows, 12 metric
-source-owner rows, 5 collector readiness families, 63 method semantic proof
-gap files, and 5,473 lexical callables, while keeping runtime fixture
+source-owner rows, 5 collector readiness families, 69 method semantic proof gap files, and 5,673 lexical callables, while keeping runtime fixture
 provenance closure approvals 0, implementation-ready fixture provenance
 closure rows 0, fixture provenance draft closure
 `FIXTURE-PROVENANCE-CHAIN-CLOSED`, and fixture provenance implementation
@@ -2784,8 +2782,7 @@ inline no-work preservation JSON sections, 12 fixture provenance contract
 rows, 12 source owner map contract rows, 12 metric sample contract rows, 12
 manifest contract rows, 10 artifact path boundary rows, 12 foundation packet
 rows, 12 metric schema rows, 12 metric source-owner rows, 5 collector
-readiness families, 63 method semantic proof gap files, and 5,473 lexical
-callables, while keeping runtime no-work preservation closure approvals 0,
+readiness families, 69 method semantic proof gap files, and 5,673 lexical callables, while keeping runtime no-work preservation closure approvals 0,
 implementation-ready no-work preservation closure rows 0, no-work preservation
 draft closure `NO-WORK-PRESERVATION-CHAIN-CLOSED`, and no-work preservation
 implementation readiness from closure `NO-GO`. It keeps committed artifact
@@ -2812,8 +2809,7 @@ inline side-effect budget JSON sections, 12 no-work preservation contract
 rows, 12 fixture provenance contract rows, 12 source owner map contract rows,
 12 metric sample contract rows, 12 manifest contract rows, 10 artifact path
 boundary rows, 12 foundation packet rows, 12 metric schema rows, 12 metric
-source-owner rows, 5 collector readiness families, 63 method semantic proof
-gap files, and 5,473 lexical callables, while keeping runtime side-effect
+source-owner rows, 5 collector readiness families, 69 method semantic proof gap files, and 5,673 lexical callables, while keeping runtime side-effect
 budget closure approvals 0, implementation-ready side-effect budget closure
 rows 0, side-effect budget draft closure
 `SIDE-EFFECT-BUDGET-CHAIN-CLOSED`, and side-effect budget implementation
@@ -2845,7 +2841,7 @@ source owner map contract rows, 12 metric sample contract rows, 12 manifest
 contract rows, 10 artifact path boundary rows, 12 foundation packet rows, 12
 metric schema rows, 12 metric source-owner rows, 5 collector readiness
 families, 21 diagnostic logging policy source files, 419 active console
-callsites, 63 method semantic proof gap files, and 5,473 lexical callables,
+callsites, 69 method semantic proof gap files, and 5,673 lexical callables,
 while keeping runtime diagnostic privacy closure approvals 0,
 implementation-ready diagnostic privacy closure rows 0, diagnostic privacy
 draft closure `DIAGNOSTIC-PRIVACY-CHAIN-CLOSED`, and diagnostic privacy
@@ -2876,7 +2872,7 @@ provenance contract rows, 12 source owner map contract rows, 12 metric sample
 contract rows, 12 manifest contract rows, 10 artifact path boundary rows, 12
 foundation packet rows, 12 metric schema rows, 12 metric source-owner rows, 5
 collector readiness families, 2 evidence parity rollout rows, 8 parity and
-release boundary source docs, 63 method semantic proof gap files, and 5,473
+release boundary source docs, 69 method semantic proof gap files, and 5,673
 lexical callables, while keeping runtime parity rollout closure approvals 0,
 implementation-ready parity rollout closure rows 0, parity rollout draft
 closure `PARITY-ROLLOUT-CHAIN-CLOSED`, and parity rollout implementation
@@ -2908,7 +2904,7 @@ no-work preservation contract rows, 12 fixture provenance contract rows, 12
 source owner map contract rows, 12 metric sample contract rows, 12 manifest
 contract rows, 10 artifact path boundary rows, 12 foundation packet rows, 12
 metric schema rows, 12 metric source-owner rows, 5 collector readiness
-families, 63 method semantic proof gap files, 5,473 lexical callables, 4,457
+families, 69 method semantic proof gap files, 5,673 lexical callables, 4,457
 expected runtime audit tests, 4,457 expected runtime audit passes, and 0
 expected runtime audit failures, while keeping runtime verification output
 closure approvals 0, persisted verification output closure approvals 0,
@@ -3297,7 +3293,7 @@ and the existing
 bind the affected whitelist/cache source files to the method semantic proof
 gap index while leaving method proof, optimization approval, and runtime
 unchanged. The continuation pins 8 affected callable semantic gap binding
-rows, 8 affected source files with method-gap rows, 2839 affected lexical
+rows, 8 affected source files with method-gap rows, 2854 affected lexical
 callables requiring semantic proof, 8 affected semantic proof required fields,
 affected files with complete per-callable semantic proof remain 0, runtime
 affected callable semantic approvals remain 0, implementation-ready affected

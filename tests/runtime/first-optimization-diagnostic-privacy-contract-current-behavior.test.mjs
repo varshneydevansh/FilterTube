@@ -238,10 +238,10 @@ test('diagnostic privacy contract rows counts and field names stay pinned', () =
   assert.match(doc, /console\.error callsites covered: 68/);
   assert.match(doc, /console\.debug callsites covered: 24/);
   assert.match(doc, /console\.info callsites covered: 0/);
-  assert.match(doc, /method semantic proof gap files covered: 63/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5473/);
+  assert.match(doc, /method semantic proof gap files covered: 69/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5673/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5673/);
   assert.match(doc, /inline diagnostic privacy JSON sections covered: 12/);
   assert.match(doc, /inline diagnostic privacy artifact promotion decision: NO-GO/);
   assert.match(doc, /diagnostic privacy draft closure rows: 12/);
@@ -260,8 +260,8 @@ test('diagnostic privacy contract rows counts and field names stay pinned', () =
   assert.match(doc, /collector readiness families linked by diagnostic closure: 5/);
   assert.match(doc, /diagnostic logging policy source files linked by diagnostic closure: 21/);
   assert.match(doc, /active console callsites linked by diagnostic closure: 418/);
-  assert.match(doc, /method semantic proof gap files linked by diagnostic closure: 63/);
-  assert.match(doc, /lexical callables linked by diagnostic closure: 5473/);
+  assert.match(doc, /method semantic proof gap files linked by diagnostic closure: 69/);
+  assert.match(doc, /lexical callables linked by diagnostic closure: 5673/);
   assert.match(doc, /runtime diagnostic privacy closure approvals: 0/);
   assert.match(doc, /implementation-ready diagnostic privacy closure rows: 0/);
   assert.match(doc, /diagnostic privacy draft closure: DIAGNOSTIC-PRIVACY-CHAIN-CLOSED/);
@@ -331,7 +331,7 @@ test('diagnostic privacy contract is backed by current side-effect no-work fixtu
 
   assert.match(sideEffectBudgetContract, /Committed side-effect budget files: 0/);
   assert.match(sideEffectBudgetContract, /Implementation-ready side-effect budget contract rows: 0/);
-  assert.match(sideEffectBudgetContract, /method semantic proof gap files covered: 63/);
+  assert.match(sideEffectBudgetContract, /method semantic proof gap files covered: 69/);
   assert.match(noWorkPreservationContract, /Committed no-work preservation files: 0/);
   assert.match(noWorkPreservationContract, /Implementation-ready no-work preservation contract rows: 0/);
   assert.match(fixtureProvenanceContract, /Committed fixture provenance files: 0/);
@@ -357,10 +357,10 @@ test('diagnostic privacy contract is backed by current side-effect no-work fixtu
   assert.match(diagnosticLoggingPolicy, /active console callsites: 419/);
   assert.match(diagnosticLoggingPolicy, /console\.log callsites: 203/);
   assert.match(diagnosticLoggingPolicy, /not completion proof for diagnostic logging policy authority/);
-  assert.match(methodGap, /tracked JS\/JSX\/MJS files: 63/);
-  assert.match(methodGap, /repo-wide lexical callables: 5473/);
+  assert.match(methodGap, /tracked JS\/JSX\/MJS files: 69/);
+  assert.match(methodGap, /repo-wide lexical callables: 5673/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5673/);
 });
 
 test('diagnostic privacy authority symbols are absent from product runtime source', () => {
@@ -395,10 +395,10 @@ test('diagnostic privacy contract is linked from audit ledgers and upstream gate
 
   assert.match(runtimeResults, /tests 4457/);
   assert.match(runtimeResults, /pass 4457/);
-  assert.match(runtimeResults, /First optimization diagnostic privacy contract addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(activeGoal, /First optimization diagnostic privacy contract addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(objectiveLedger, /First optimization diagnostic privacy contract addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(trackedIndex, /First optimization diagnostic privacy contract addendum:[\s\S]*63 method semantic proof gap files covered/);
+  assert.match(runtimeResults, /First optimization diagnostic privacy contract addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(activeGoal, /First optimization diagnostic privacy contract addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(objectiveLedger, /First optimization diagnostic privacy contract addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(trackedIndex, /First optimization diagnostic privacy contract addendum:[\s\S]*69 method semantic proof gap files covered/);
   assert.match(doc, /close diagnostic privacy documentation chain now: GO/);
   assert.match(doc, /accept diagnostic privacy closure as committed artifact approval now: NO-GO/);
   assert.match(doc, /accept diagnostic privacy closure as artifact root creation approval now: NO-GO/);

@@ -906,7 +906,7 @@ test('all-callable index documents semantic method proof boundary', () => {
   assert.match(releaseFixStatusDoc, /Documentation Ledger Confirmation - 2026-05-28/);
   assert.match(releaseFixStatusDoc, /May 28: audit-only continuation for content\/category active-work/);
   assert.match(releaseFixStatusDoc, /Callable Count Reconciliation - 2026-05-28/);
-  assert.match(releaseFixStatusDoc, /current method semantic proof\s+gap index, which records `5,473` lexical callables/);
+  assert.match(releaseFixStatusDoc, /current method semantic proof\s+gap index, which records `5,673` lexical callables/);
   assert.match(releaseFixStatusDoc, /stale older counts in prior ledgers/);
   assert.match(releaseFixStatusDoc, /full runtime verifier after reconciliation: pass, 0 fail/);
 
@@ -916,7 +916,7 @@ test('all-callable index documents semantic method proof boundary', () => {
   );
   assert.match(releaseRegressionDoc, /2026-05-28 Documentation Ledger Confirmation/);
   assert.match(releaseRegressionDoc, /content-filter validity, route\/surface, and value-normalization gaps pinned/);
-  assert.match(releaseRegressionDoc, /callable proof gap ledgers reconciled to 5,473 lexical callables/);
+  assert.match(releaseRegressionDoc, /callable proof gap ledgers reconciled to 5,673 lexical callables/);
   assert.match(releaseRegressionDoc, /Callable proof gap count reconciliation/);
   assert.match(releaseRegressionDoc, /```mermaid\nflowchart TD/);
 });

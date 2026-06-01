@@ -155,10 +155,10 @@ test('JSON-first route/surface fixture approval rows counts and fields stay pinn
   assert.match(doc, /verification output contract rows covered: 12/);
   assert.match(doc, /route\/surface authority rows covered: 12/);
   assert.match(doc, /route\/surface metric obligations covered: 12/);
-  assert.match(doc, /method semantic proof gap files covered: 63/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5473/);
+  assert.match(doc, /method semantic proof gap files covered: 69/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5673/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5673/);
   assert.match(doc, /runtime JSON-first fixture artifact approvals: 0/);
   assert.match(doc, /runtime route\/surface metric artifact approvals: 0/);
   assert.match(doc, /committed route\/surface fixture verification output files: 0/);
@@ -189,9 +189,9 @@ test('JSON-first fixture approval is backed by current contracts and NO-GO gates
   assert.match(contractCoverage, /runtime JSON-first fixture packet approvals: 0/);
   assert.match(routeSurfaceAuthority, /runtime JSON-first route\/surface approvals: 0/);
   assert.match(routeSurfaceMetric, /implementation-ready route\/surface optimization rows: 0/);
-  assert.match(jsonFirstImplementation, /method semantic proof gap files covered: 63/);
-  assert.match(methodGap, /files with lexical accounting: 63/);
-  assert.match(methodGap, /repo-wide lexical callables: 5473/);
+  assert.match(jsonFirstImplementation, /method semantic proof gap files covered: 69/);
+  assert.match(methodGap, /files with lexical accounting: 69/);
+  assert.match(methodGap, /repo-wide lexical callables: 5673/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(implementationReadiness, /runtime first optimization approvals: 0/);
   assert.match(implementationReadiness, /implementation-ready first optimization rows: 0/);
@@ -259,8 +259,8 @@ test('JSON-first route/surface fixture approval boundary is linked from ledgers 
 
   assert.match(runtimeResults, /tests 4457/);
   assert.match(runtimeResults, /pass 4457/);
-  assert.match(runtimeResults, /JSON-first route\/surface fixture approval boundary addendum:[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
-  assert.match(objectiveLedger, /JSON-First Route\/Surface Fixture Approval Boundary Addendum[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
-  assert.match(activeGoal, /JSON-First Route\/Surface Fixture Approval Boundary Addendum[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
-  assert.match(trackedIndex, /JSON-First Route\/Surface Fixture Approval Boundary Addendum[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(runtimeResults, /JSON-first route\/surface fixture approval boundary addendum:[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(objectiveLedger, /JSON-First Route\/Surface Fixture Approval Boundary Addendum[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(activeGoal, /JSON-First Route\/Surface Fixture Approval Boundary Addendum[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(trackedIndex, /JSON-First Route\/Surface Fixture Approval Boundary Addendum[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
 });

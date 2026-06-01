@@ -201,10 +201,10 @@ test('metric sample contract rows counts and field names stay pinned', () => {
   assert.match(doc, /collector side-effect rows covered: 12/);
   assert.match(doc, /collector fixture provenance rows covered: 12/);
   assert.match(doc, /collector parity rollout rows covered: 12/);
-  assert.match(doc, /method semantic proof gap files covered: 63/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5473/);
+  assert.match(doc, /method semantic proof gap files covered: 69/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5673/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5673/);
   assert.match(doc, /inline metric sample JSON sections covered: 12/);
   assert.match(doc, /inline metric sample artifact promotion decision: NO-GO/);
   assert.match(doc, /metric sample draft closure rows: 12/);
@@ -216,8 +216,8 @@ test('metric sample contract rows counts and field names stay pinned', () => {
   assert.match(doc, /metric schema rows linked by sample closure: 12/);
   assert.match(doc, /metric source-owner rows linked by sample closure: 12/);
   assert.match(doc, /collector readiness families linked by sample closure: 5/);
-  assert.match(doc, /method semantic proof gap files linked by sample closure: 63/);
-  assert.match(doc, /lexical callables linked by sample closure: 5473/);
+  assert.match(doc, /method semantic proof gap files linked by sample closure: 69/);
+  assert.match(doc, /lexical callables linked by sample closure: 5673/);
   assert.match(doc, /runtime metric sample closure approvals: 0/);
   assert.match(doc, /implementation-ready metric sample closure rows: 0/);
   assert.match(doc, /metric sample draft closure: METRIC-SAMPLE-CHAIN-CLOSED/);
@@ -342,10 +342,10 @@ test('metric sample contract is backed by current manifest artifact and collecto
   assert.match(sideEffect, /collector side-effect rows implementation-ready: 0/);
   assert.match(fixtureProvenance, /collector fixture provenance rows implementation-ready: 0/);
   assert.match(parityRollout, /collector parity rollout rows implementation-ready: 0/);
-  assert.match(methodGap, /tracked JS\/JSX\/MJS files: 63/);
-  assert.match(methodGap, /repo-wide lexical callables: 5473/);
+  assert.match(methodGap, /tracked JS\/JSX\/MJS files: 69/);
+  assert.match(methodGap, /repo-wide lexical callables: 5673/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5673/);
 });
 
 test('metric sample authority symbols are absent from product runtime source', () => {
@@ -380,10 +380,10 @@ test('metric sample contract is linked from audit ledgers and upstream gates', (
 
   assert.match(runtimeResults, /tests 4457/);
   assert.match(runtimeResults, /pass 4457/);
-  assert.match(runtimeResults, /First optimization metric sample contract addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(activeGoal, /First optimization metric sample contract addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(objectiveLedger, /First optimization metric sample contract addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(trackedIndex, /First optimization metric sample contract addendum:[\s\S]*63 method semantic proof gap files covered/);
+  assert.match(runtimeResults, /First optimization metric sample contract addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(activeGoal, /First optimization metric sample contract addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(objectiveLedger, /First optimization metric sample contract addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(trackedIndex, /First optimization metric sample contract addendum:[\s\S]*69 method semantic proof gap files covered/);
   assert.match(doc, /close metric sample documentation chain now: GO/);
   assert.match(doc, /accept metric sample closure as committed artifact approval now: NO-GO/);
   assert.match(doc, /accept metric sample closure as artifact root creation approval now: NO-GO/);

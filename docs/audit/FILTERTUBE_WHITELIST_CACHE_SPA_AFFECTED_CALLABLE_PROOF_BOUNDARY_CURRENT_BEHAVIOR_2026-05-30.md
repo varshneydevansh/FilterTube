@@ -54,7 +54,7 @@ route/mode callable budget collector approval upstream docs covered: 10
 route/mode callable budget collector approval dependency fields required: 20
 affected callable semantic gap binding rows: 8
 affected source files with method-gap rows: 8
-affected lexical callables requiring semantic proof: 2839
+affected lexical callables requiring semantic proof: 2854
 affected semantic proof required fields: 8
 affected callable semantic required-field closure rows: 8
 affected callable semantic file-field cells required: 64
@@ -978,7 +978,7 @@ approve runtime optimization, insert collectors, or change runtime behavior.
 ```text
 affected callable semantic gap binding rows: 8
 affected source files with method-gap rows: 8
-affected lexical callables requiring semantic proof: 2839
+affected lexical callables requiring semantic proof: 2854
 affected semantic proof required fields: 8
 affected files with complete per-callable semantic proof: 0
 runtime affected callable semantic approvals: 0
@@ -997,8 +997,8 @@ Required future affected-callable semantic gap binding shape:
   "affectedSemanticPromotionDecision": "NO-GO",
   "runtimeBehaviorChanged": false,
   "methodGapTotals": {
-    "filesCovered": 63,
-    "lexicalCallablesCovered": 5473,
+    "filesCovered": 69,
+    "lexicalCallablesCovered": 5673,
     "filesWithCompletePerCallableSemanticProof": 0,
     "requiredSemanticProofFields": 8
   },
@@ -1007,7 +1007,7 @@ Required future affected-callable semantic gap binding shape:
       "id": "FT-WLCACHE-SEMANTIC-GAP-00-filter-logic",
       "file": "js/filter_logic.js",
       "family": "Hot page/background runtime",
-      "lexicalCallables": 298,
+      "lexicalCallables": 313,
       "semanticStatus": "semantic proof incomplete"
     },
     {
@@ -1072,7 +1072,7 @@ Required future affected-callable semantic gap binding shape:
   ],
   "approvalCounts": {
     "affectedFileRows": 8,
-    "affectedLexicalCallablesRequiringSemanticProof": 2839,
+    "affectedLexicalCallablesRequiringSemanticProof": 2854,
     "filesWithCompletePerCallableSemanticProof": 0,
     "implementationReadyAffectedSemanticRows": 0,
     "runtimeAffectedCallableSemanticApprovals": 0
@@ -1106,7 +1106,7 @@ Required future affected-callable semantic gap binding shape:
 
 | Row | Method gap source | Current blocker | Current state |
 | --- | --- | --- | --- |
-| `FT-WLCACHE-SEMANTIC-GAP-00-filter-logic` | `js/filter_logic.js` / Hot page/background runtime / 298 lexical callables | JSON traversal, harvest/map mutation, block decision, recursion, and no-rule budget proof remain incomplete. | Gap-bound only; semantic proof `NO-GO`. |
+| `FT-WLCACHE-SEMANTIC-GAP-00-filter-logic` | `js/filter_logic.js` / Hot page/background runtime / 313 lexical callables | JSON traversal, harvest/map mutation, block decision, recursion, and no-rule budget proof remain incomplete. | Gap-bound only; semantic proof `NO-GO`. |
 | `FT-WLCACHE-SEMANTIC-GAP-01-content-bridge` | `js/content_bridge.js` / Hot page/background runtime / 1198 lexical callables | Content bridge caller graph, menu/quick action authority, lifecycle callback ownership, and identity confidence proof remain incomplete. | Gap-bound only; semantic proof `NO-GO`. |
 | `FT-WLCACHE-SEMANTIC-GAP-02-bridge-settings` | `js/content/bridge_settings.js` / Hot page/background runtime / 65 lexical callables | Settings relay/import/storage listener authority and caller-class proof remain incomplete. | Gap-bound only; semantic proof `NO-GO`. |
 | `FT-WLCACHE-SEMANTIC-GAP-03-background` | `js/background.js` / Hot page/background runtime / 440 lexical callables | Message, mutation, resolver, storage, stats, and script-injection branches still need per-action authority. | Gap-bound only; semantic proof `NO-GO`. |
@@ -1246,7 +1246,7 @@ Required future affected-callable semantic file-field matrix shape:
     {
       "id": "FT-WLCACHE-SEMANTIC-MATRIX-00-filter-logic",
       "file": "js/filter_logic.js",
-      "lexicalCallables": 298,
+      "lexicalCallables": 313,
       "fileFieldCellsRequired": 8,
       "approvedFileFieldCells": 0
     },

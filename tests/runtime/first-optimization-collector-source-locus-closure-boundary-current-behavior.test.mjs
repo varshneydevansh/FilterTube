@@ -171,10 +171,10 @@ test('collector source-locus closure rows counts and fields stay pinned', () => 
   assert.match(doc, /runtime unclaimed-surface approvals: 0/);
   assert.match(doc, /committed metric foundation artifact files: 0/);
   assert.match(doc, /implementation-ready collector source-locus closure rows: 0/);
-  assert.match(doc, /method semantic proof gap files covered: 63/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5473/);
+  assert.match(doc, /method semantic proof gap files covered: 69/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5673/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5673/);
   assert.match(doc, /expected runtime audit tests: 4457/);
   assert.match(doc, /expected runtime audit pass: 4457/);
   assert.match(doc, /expected runtime audit fail: 0/);
@@ -201,12 +201,12 @@ test('collector source-locus closure is backed by source-locus and collector NO-
   const implementationReadiness = read(sourceDocs.implementationReadiness);
 
   assert.match(collectorApproval, /implementation-ready collector approval rows: 0/);
-  assert.match(collectorApproval, /method semantic proof gap files covered: 63/);
+  assert.match(collectorApproval, /method semantic proof gap files covered: 69/);
   assert.match(sourceLocusImplementation, /implementation-ready source-locus implementation rows: 0/);
   assert.match(sourceOwnerApproval, /runtime source-owner approvals: 0/);
-  assert.match(sourceOwnerApproval, /method semantic proof gap files covered: 63/);
-  assert.match(methodGap, /files with lexical accounting: 63/);
-  assert.match(methodGap, /repo-wide lexical callables: 5473/);
+  assert.match(sourceOwnerApproval, /method semantic proof gap files covered: 69/);
+  assert.match(methodGap, /files with lexical accounting: 69/);
+  assert.match(methodGap, /repo-wide lexical callables: 5673/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(sourceLocusCallable, /implementation-ready source-locus callable rows: 0/);
   assert.match(sourceLocusTeardown, /implementation-ready source-locus teardown rows: 0/);
@@ -272,10 +272,10 @@ test('collector source-locus closure boundary is linked from ledgers and adjacen
 
   assert.ok(read(sourceDocs.runtimeResults).includes('tests 4457'));
   assert.ok(read(sourceDocs.runtimeResults).includes('expected runtime audit tests: 4457'));
-  assert.match(read(sourceDocs.runtimeResults), /First optimization collector source-locus closure boundary addendum:[\s\S]*63\s+method semantic proof gap\s+files covered/);
-  assert.match(read(ledgerDocs.objectiveLedger), /First Optimization Collector Source-Locus Closure Boundary Addendum[\s\S]*63\s+method semantic proof gap\s+files covered/);
-  assert.match(read(ledgerDocs.activeGoal), /First Optimization Collector Source-Locus Closure Boundary Addendum[\s\S]*63\s+method semantic proof gap\s+files covered/);
-  assert.match(read(ledgerDocs.trackedIndex), /First Optimization Collector Source-Locus Closure Boundary Addendum[\s\S]*63\s+method semantic proof gap\s+files covered/);
+  assert.match(read(sourceDocs.runtimeResults), /First optimization collector source-locus closure boundary addendum:[\s\S]*69\s+method semantic proof gap\s+files covered/);
+  assert.match(read(ledgerDocs.objectiveLedger), /First Optimization Collector Source-Locus Closure Boundary Addendum[\s\S]*69\s+method semantic proof gap\s+files covered/);
+  assert.match(read(ledgerDocs.activeGoal), /First Optimization Collector Source-Locus Closure Boundary Addendum[\s\S]*69\s+method semantic proof gap\s+files covered/);
+  assert.match(read(ledgerDocs.trackedIndex), /First Optimization Collector Source-Locus Closure Boundary Addendum[\s\S]*69\s+method semantic proof gap\s+files covered/);
   assert.ok(read(ledgerDocs.objectiveLedger).includes('expected runtime audit tests: 4457'));
   assert.ok(read(ledgerDocs.activeGoal).includes('expected runtime audit tests: 4457'));
   assert.ok(read(ledgerDocs.trackedIndex).includes('expected runtime audit tests: 4457'));

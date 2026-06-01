@@ -241,10 +241,10 @@ test('verification output contract rows counts and field names stay pinned', () 
   assert.match(doc, /collector side-effect rows covered: 12/);
   assert.match(doc, /collector fixture provenance rows covered: 12/);
   assert.match(doc, /collector parity rollout rows covered: 12/);
-  assert.match(doc, /method semantic proof gap files covered: 63/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5473/);
+  assert.match(doc, /method semantic proof gap files covered: 69/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5673/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5673/);
   assert.match(doc, /expected runtime audit tests: 4457/);
   assert.match(doc, /expected runtime audit pass: 4457/);
   assert.match(doc, /expected runtime audit fail: 0/);
@@ -266,8 +266,8 @@ test('verification output contract rows counts and field names stay pinned', () 
   assert.match(doc, /metric schema rows linked by verification closure: 12/);
   assert.match(doc, /metric source-owner rows linked by verification closure: 12/);
   assert.match(doc, /collector readiness families linked by verification closure: 5/);
-  assert.match(doc, /method semantic proof gap files linked by verification closure: 63/);
-  assert.match(doc, /lexical callables linked by verification closure: 5473/);
+  assert.match(doc, /method semantic proof gap files linked by verification closure: 69/);
+  assert.match(doc, /lexical callables linked by verification closure: 5673/);
   assert.match(doc, /runtime fixture result count rows linked by verification closure: 3/);
   assert.match(doc, /runtime verification output closure approvals: 0/);
   assert.match(doc, /persisted verification output closure approvals: 0/);
@@ -342,11 +342,11 @@ test('verification output contract is backed by current metric artifact gates', 
 
   assert.match(parityRolloutContract, /Committed parity rollout files: 0/);
   assert.match(parityRolloutContract, /Implementation-ready parity rollout contract rows: 0/);
-  assert.match(parityRolloutContract, /method semantic proof gap files covered: 63/);
-  assert.match(methodGap, /tracked JS\/JSX\/MJS files: 63/);
-  assert.match(methodGap, /repo-wide lexical callables: 5473/);
+  assert.match(parityRolloutContract, /method semantic proof gap files covered: 69/);
+  assert.match(methodGap, /tracked JS\/JSX\/MJS files: 69/);
+  assert.match(methodGap, /repo-wide lexical callables: 5673/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5673/);
   assert.match(diagnosticPrivacyContract, /Committed diagnostic privacy files: 0/);
   assert.match(sideEffectBudgetContract, /Committed side-effect budget files: 0/);
   assert.match(noWorkPreservationContract, /Committed no-work preservation files: 0/);
@@ -403,10 +403,10 @@ test('verification output contract is linked from audit ledgers and upstream gat
 
   assert.match(runtimeResults, /tests 4457/);
   assert.match(runtimeResults, /pass 4457/);
-  assert.match(runtimeResults, /First optimization verification output contract addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(activeGoal, /First optimization verification output contract addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(objectiveLedger, /First optimization verification output contract addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(trackedIndex, /First optimization verification output contract addendum:[\s\S]*63 method semantic proof gap files covered/);
+  assert.match(runtimeResults, /First optimization verification output contract addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(activeGoal, /First optimization verification output contract addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(objectiveLedger, /First optimization verification output contract addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(trackedIndex, /First optimization verification output contract addendum:[\s\S]*69 method semantic proof gap files covered/);
   assert.match(doc, /close verification output documentation chain now: GO/);
   assert.match(doc, /accept verification output closure as persisted verification output approval now: NO-GO/);
   assert.match(doc, /accept verification output closure as committed artifact approval now: NO-GO/);

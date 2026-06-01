@@ -136,7 +136,7 @@ const futureAuthorityTokens = [
 ];
 
 const commitReadinessAddendumPattern = /JSON-[Ff]irst [Rr]oute\/[Ss]urface [Mm]etric [Aa]rtifact [Cc]ommit [Rr]eadiness [Gg]ate [Aa]ddendum/;
-const methodGapAddendumPattern = /JSON-[Ff]irst [Rr]oute\/[Ss]urface [Mm]etric [Aa]rtifact [Cc]ommit [Rr]eadiness [Gg]ate [Aa]ddendum[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files\s+covered/;
+const methodGapAddendumPattern = /JSON-[Ff]irst [Rr]oute\/[Ss]urface [Mm]etric [Aa]rtifact [Cc]ommit [Rr]eadiness [Gg]ate [Aa]ddendum[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files\s+covered/;
 const affectedCallableAddendumPattern = /JSON-[Ff]irst [Rr]oute\/[Ss]urface [Mm]etric [Aa]rtifact [Cc]ommit [Rr]eadiness [Gg]ate [Aa]ddendum[\s\S]*affected\s+callable\s+semantic\s+proof/;
 
 function read(file) {
@@ -185,10 +185,10 @@ test('JSON-first route/surface metric artifact commit readiness gate is audit-on
   assert.match(doc, /This is not an\s+implementation patch, optimization patch/);
   assert.match(doc, /Reserved route\/surface metric artifact root: docs\/audit\/artifacts\/json-first\/route-surface-metric-artifact\//);
   assert.match(doc, /Committed route\/surface metric artifact files: 0/);
-  assert.match(doc, /Method semantic proof gap files covered: 63/);
-  assert.match(doc, /Method semantic proof gap lexical callables covered: 5473/);
+  assert.match(doc, /Method semantic proof gap files covered: 69/);
+  assert.match(doc, /Method semantic proof gap lexical callables covered: 5673/);
   assert.match(doc, /Files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /Lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(doc, /Lexical callables requiring semantic proof before behavior changes: 5673/);
   assert.match(doc, /Runtime route\/surface metric artifact approval exists: no/);
   assert.match(doc, /Runtime metric collector approval exists: no/);
   assert.match(doc, /Runtime JSON-first implementation approval exists: no/);
@@ -211,10 +211,10 @@ test('JSON-first route/surface metric artifact commit rows counts and fields sta
   assert.match(doc, /reserved future metric artifact roots covered: 1/);
   assert.match(doc, /reserved future metric artifact files covered: 5/);
   assert.match(doc, /related first-optimization foundation sample paths covered: 1/);
-  assert.match(doc, /method semantic proof gap files covered: 63/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5473/);
+  assert.match(doc, /method semantic proof gap files covered: 69/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5673/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5673/);
   assert.match(doc, /metric artifact path boundary rows covered: 6/);
   assert.match(doc, /metric artifact approval boundary rows covered: 12/);
   assert.match(doc, /route\/surface metric obligations covered: 12/);
@@ -287,9 +287,9 @@ test('JSON-first route/surface metric artifact commit readiness is backed by cur
   assert.match(collectorNoWork, /runtime collector no-work proofs approved: 0/);
   assert.match(collectorSideEffect, /runtime collector side-effect budgets approved: 0/);
   assert.match(collectorFixture, /runtime collector fixture packets approved: 0/);
-  assert.match(jsonFirstImplementation, /method semantic proof gap files covered: 63/);
-  assert.match(methodGap, /files with lexical accounting: 63/);
-  assert.match(methodGap, /repo-wide lexical callables: 5473/);
+  assert.match(jsonFirstImplementation, /method semantic proof gap files covered: 69/);
+  assert.match(methodGap, /files with lexical accounting: 69/);
+  assert.match(methodGap, /repo-wide lexical callables: 5673/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(implementationReadiness, /implementation-ready first optimization rows: 0/);
   assert.match(stopGo, /Stop-now JSON-first optimization decision: NO-GO/);

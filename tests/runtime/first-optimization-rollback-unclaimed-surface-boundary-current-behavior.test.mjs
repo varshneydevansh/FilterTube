@@ -205,10 +205,10 @@ test('rollback unclaimed surface rows counts and field names stay pinned', () =>
   assert.match(doc, /runtime unclaimed-surface approvals: 0/);
   assert.match(doc, /runtime metric collector approvals: 0/);
   assert.match(doc, /implementation-ready rollback\/unclaimed rows: 0/);
-  assert.match(doc, /method semantic proof gap files covered: 63/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5473/);
+  assert.match(doc, /method semantic proof gap files covered: 69/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5673/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5673/);
   assert.match(doc, /expected runtime audit tests: 4457/);
   assert.match(doc, /expected runtime audit pass: 4457/);
   assert.match(doc, /expected runtime audit fail: 0/);
@@ -242,11 +242,11 @@ test('rollback unclaimed surface boundary is backed by current parity release an
   assert.match(parityRolloutContract, /FT-PARITY-ROLLOUT-11-verification/);
   assert.match(parityRolloutContract, /unclaimedSurfaces/);
   assert.match(diagnosticPrivacyContract, /release package changes, or public\s+claims/);
-  assert.match(metricCoverage, /method semantic proof gap files covered: 63/);
-  assert.match(methodGap, /tracked JS\/JSX\/MJS files: 63/);
-  assert.match(methodGap, /repo-wide lexical callables: 5473/);
+  assert.match(metricCoverage, /method semantic proof gap files covered: 69/);
+  assert.match(methodGap, /tracked JS\/JSX\/MJS files: 69/);
+  assert.match(methodGap, /repo-wide lexical callables: 5673/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5673/);
   assert.match(collectorParityRollout, /runtime collector parity rollout proofs approved: 0/);
   assert.match(jsonDomInventory, /native sync proof, release proof, and public claim proof exist/);
   assert.match(nativeRuntimeSync, /generated assets, native parity, release packages, and public claims/);
@@ -293,10 +293,10 @@ test('rollback unclaimed surface boundary is linked from audit ledgers and sourc
     assert.ok(artifact.includes(runtimeTestPath));
   }
 
-  assert.match(runtimeResults, /First optimization rollback unclaimed surface boundary addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(activeGoal, /First optimization rollback unclaimed surface boundary addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(objectiveLedger, /First optimization rollback unclaimed surface boundary addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(trackedIndex, /First optimization rollback unclaimed surface boundary addendum:[\s\S]*63 method semantic proof gap files covered/);
+  assert.match(runtimeResults, /First optimization rollback unclaimed surface boundary addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(activeGoal, /First optimization rollback unclaimed surface boundary addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(objectiveLedger, /First optimization rollback unclaimed surface boundary addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(trackedIndex, /First optimization rollback unclaimed surface boundary addendum:[\s\S]*69 method semantic proof gap files covered/);
 });
 
 test('rollback unclaimed surface boundary keeps optimization and release behavior blocked', () => {

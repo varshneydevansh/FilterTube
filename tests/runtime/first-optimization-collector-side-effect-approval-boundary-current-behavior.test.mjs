@@ -170,10 +170,10 @@ test('collector side-effect approval rows counts and fields stay pinned', () => 
   assert.match(doc, /runtime collector side-effect budgets approved: 0/);
   assert.match(doc, /committed side-effect budget files: 0/);
   assert.match(doc, /implementation-ready collector side-effect approval rows: 0/);
-  assert.match(doc, /method semantic proof gap files covered: 63/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5473/);
+  assert.match(doc, /method semantic proof gap files covered: 69/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5673/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5673/);
   assert.match(doc, /expected runtime audit tests: 4457/);
   assert.match(doc, /expected runtime audit pass: 4457/);
   assert.match(doc, /expected runtime audit fail: 0/);
@@ -207,12 +207,12 @@ test('collector side-effect approval is backed by current NO-GO gates', () => {
   assert.match(sourceLocusSideEffect, /implementation-ready source-locus side-effect rows: 0/);
   assert.match(sourceLocusSideEffect, /commit side-effect-budget\.json now: NO-GO/);
   assert.match(collectorNoWorkApproval, /runtime collector no-work approval now: NO-GO/);
-  assert.match(collectorNoWorkApproval, /method semantic proof gap files covered: 63/);
+  assert.match(collectorNoWorkApproval, /method semantic proof gap files covered: 69/);
   assert.match(collectorInsertionApproval, /runtime collector insertion approval now: NO-GO/);
-  assert.match(collectorInsertionApproval, /method semantic proof gap files covered: 63/);
+  assert.match(collectorInsertionApproval, /method semantic proof gap files covered: 69/);
   assert.match(collectorApproval, /runtime collector side-effect budgets approved: 0/);
-  assert.match(methodGap, /files with lexical accounting: 63/);
-  assert.match(methodGap, /repo-wide lexical callables: 5473/);
+  assert.match(methodGap, /files with lexical accounting: 69/);
+  assert.match(methodGap, /repo-wide lexical callables: 5673/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(collectorInsertion, /collector rows implementation-ready: 0/);
   assert.match(collectorNoWork, /runtime collector no-work proofs approved: 0/);
@@ -284,10 +284,10 @@ test('collector side-effect approval boundary is linked from ledgers and adjacen
   }
 
   assert.ok(read(sourceDocs.runtimeResults).includes('expected runtime audit tests: 4457'));
-  assert.match(read(sourceDocs.runtimeResults), /First optimization collector side-effect approval boundary addendum:[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
-  assert.match(read(ledgerDocs.objectiveLedger), /First Optimization Collector Side-Effect Approval Boundary Addendum[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
-  assert.match(read(ledgerDocs.activeGoal), /First Optimization Collector Side-Effect Approval Boundary Addendum[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
-  assert.match(read(ledgerDocs.trackedIndex), /First Optimization Collector Side-Effect Approval Boundary Addendum[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(read(sourceDocs.runtimeResults), /First optimization collector side-effect approval boundary addendum:[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(read(ledgerDocs.objectiveLedger), /First Optimization Collector Side-Effect Approval Boundary Addendum[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(read(ledgerDocs.activeGoal), /First Optimization Collector Side-Effect Approval Boundary Addendum[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(read(ledgerDocs.trackedIndex), /First Optimization Collector Side-Effect Approval Boundary Addendum[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
   assert.ok(read(ledgerDocs.objectiveLedger).includes('expected runtime audit tests: 4457'));
   assert.ok(read(ledgerDocs.activeGoal).includes('expected runtime audit tests: 4457'));
   assert.ok(read(ledgerDocs.trackedIndex).includes('expected runtime audit tests: 4457'));

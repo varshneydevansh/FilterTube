@@ -35,8 +35,8 @@ filter implementation surface.
 The repo-wide method semantic proof gap is now part of this gate. A JSON field
 or renderer path cannot become first-class filter authority while its affected
 callables remain only lexically counted. The current callable gap index proves
-63 tracked JS/JSX/MJS files, 5,473 lexical callables, 0 files with complete
-per-callable semantic proof, and 5,473 callables still requiring semantic proof
+69 tracked JS/JSX/MJS files, 5,673 lexical callables, 0 files with complete
+per-callable semantic proof, and 5,673 callables still requiring semantic proof
 before behavior changes.
 
 ## Source Inputs
@@ -54,7 +54,7 @@ before behavior changes.
 | `docs/audit/FILTERTUBE_CANDIDATE_OBLIGATION_BINDING_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 10 candidate-obligation bindings are mapped, but 0 bindings have committed metric artifacts. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SOURCE_LOCUS_IMPLEMENTATION_AUTHORITY_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | 12 first-optimization source-locus implementation authority rows remain NO-GO. |
 | `docs/audit/FILTERTUBE_WHITELIST_OPTIMIZATION_READINESS_GAP_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 10 whitelist readiness gaps keep recent whitelist optimization in audit mode. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | 63 tracked JS/JSX/MJS files, 5,473 lexical callables, 0 files with complete per-callable semantic proof, and 5,473 callables still requiring semantic proof before JSON-first behavior changes. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | 69 tracked JS/JSX/MJS files, 5,673 lexical callables, 0 files with complete per-callable semantic proof, and 5,673 callables still requiring semantic proof before JSON-first behavior changes. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_IMPLEMENTATION_READINESS_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | 14 first-optimization readiness rows remain NO-GO. |
 | `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` | Runtime proof is tracked by the audit harness, not as implementation authority. |
 
@@ -73,8 +73,8 @@ content control JSON-first proof docs covered: 27
 candidate-obligation binding rows covered: 10
 first optimization source-locus implementation rows covered: 12
 whitelist readiness gaps covered: 10
-method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5473
+method semantic proof gap files covered: 69
+method semantic proof gap lexical callables covered: 5673
 complete per-callable semantic proof files covered: 0
 first optimization implementation readiness rows covered: 14
 runtime JSON-first implementation approvals: 0
@@ -456,8 +456,8 @@ current full-suite proof and they do not approve JSON-first promotion.
 ```text
 current-source freshness date: 2026-05-30
 latest full runtime proof: 4663/4663 pass, 0 fail, 83.213s
-current method semantic gap files: 63
-current method semantic gap lexical callables: 5473
+current method semantic gap files: 69
+current method semantic gap lexical callables: 5673
 complete per-callable semantic proof files: 0
 runtime JSON-first implementation approvals: 0
 runtime JSON-first promotion authority rows: 0

@@ -172,10 +172,10 @@ test('content-control JSON-first family docs carry the method semantic proof gap
   const methodGap = read(methodGapPath);
 
   for (const marker of [
-    'tracked JS/JSX/MJS files: 63',
-    'repo-wide lexical callables: 5473',
+    'tracked JS/JSX/MJS files: 69',
+    'repo-wide lexical callables: 5673',
     'files with complete per-callable semantic proof: 0',
-    'lexical callables requiring semantic proof before behavior changes: 5473',
+    'lexical callables requiring semantic proof before behavior changes: 5673',
     'runtime behavior changed: no'
   ]) {
     assert.ok(methodGap.includes(marker), `method gap source missing ${marker}`);
@@ -186,10 +186,10 @@ test('content-control JSON-first family docs carry the method semantic proof gap
     const text = read(file);
     assert.ok(text.includes(methodGapPath), `${file} should cite method gap source`);
     assert.match(text, /## Method Semantic Proof Gap Boundary/);
-    assert.match(text, /method semantic proof gap files covered: 63/);
-    assert.match(text, /method semantic proof gap lexical callables covered: 5473/);
+    assert.match(text, /method semantic proof gap files covered: 69/);
+    assert.match(text, /method semantic proof gap lexical callables covered: 5673/);
     assert.match(text, /files with complete per-callable semantic proof: 0/);
-    assert.match(text, /lexical callables requiring semantic proof before behavior changes: 5473/);
+    assert.match(text, /lexical callables requiring semantic proof before behavior changes: 5673/);
     assert.match(text, /affected callable semantic proof: NO-GO/);
     assert.match(text, /runtime behavior changed: no/);
     assert.match(text, /do not approve runtime\s+optimization/);

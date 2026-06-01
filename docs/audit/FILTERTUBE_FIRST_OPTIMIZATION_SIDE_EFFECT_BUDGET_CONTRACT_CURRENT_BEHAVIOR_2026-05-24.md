@@ -41,7 +41,7 @@ open.
 | Input | Current proof used |
 | --- | --- |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_NO_WORK_PRESERVATION_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `no-work-preservation.json` shape, but proves 0 no-work preservation files and 0 runtime collector approvals exist. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 63 tracked JS/JSX/MJS files and 5,473 lexical callables still lack complete per-callable semantic proof before behavior changes. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 tracked JS/JSX/MJS files and 5,673 lexical callables still lack complete per-callable semantic proof before behavior changes. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_FIXTURE_PROVENANCE_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `fixture-provenance.json` shape, but proves 0 fixture provenance files and 0 runtime collector approvals exist. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SOURCE_OWNER_MAP_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `source-owner-map.json` shape, but proves 0 source owner map files and 0 runtime collector approvals exist. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_SAMPLE_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `metric-sample.json` shape, but proves 0 sample files and 0 runtime collector approvals exist. |
@@ -78,10 +78,10 @@ collector no-work rows covered: 12
 collector side-effect rows covered: 12
 collector fixture provenance rows covered: 12
 collector parity rollout rows covered: 12
-method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5473
+method semantic proof gap files covered: 69
+method semantic proof gap lexical callables covered: 5673
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5473
+lexical callables requiring semantic proof before behavior changes: 5673
 inline side-effect budget JSON sections covered: 12
 inline side-effect budget artifact promotion decision: NO-GO
 side-effect budget draft closure rows: 12
@@ -97,8 +97,8 @@ foundation packet rows linked by side-effect closure: 12
 metric schema rows linked by side-effect closure: 12
 metric source-owner rows linked by side-effect closure: 12
 collector readiness families linked by side-effect closure: 5
-method semantic proof gap files linked by side-effect closure: 63
-lexical callables linked by side-effect closure: 5473
+method semantic proof gap files linked by side-effect closure: 69
+lexical callables linked by side-effect closure: 5673
 runtime side-effect budget closure approvals: 0
 implementation-ready side-effect budget closure rows: 0
 side-effect budget draft closure: SIDE-EFFECT-BUDGET-CHAIN-CLOSED
@@ -404,8 +404,8 @@ approval. The addendum pins 12 collector side-effect approval boundary rows,
 covered, 12 source-locus side-effect rows covered, 0 runtime source-owner
 approvals, 0 runtime metric collector approvals, 0 runtime collector insertion
 points approved, 0 runtime collector no-work proofs approved, 0 runtime
-collector side-effect budgets approved, 63 method semantic proof gap files
-covered, 5,473 lexical callables still requiring semantic proof, 0 files with
+collector side-effect budgets approved, 69 method semantic proof gap files
+covered, 5,673 lexical callables still requiring semantic proof, 0 files with
 complete per-callable semantic proof, 0 committed side-effect budget files, 0
 implementation-ready collector side-effect approval rows, expected runtime audit
 tests: 4457, expected runtime audit pass: 4457, and expected runtime audit fail

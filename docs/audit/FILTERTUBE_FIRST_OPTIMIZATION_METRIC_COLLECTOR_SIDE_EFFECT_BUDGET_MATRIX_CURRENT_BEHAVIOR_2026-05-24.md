@@ -410,8 +410,7 @@ side-effect budget rows covered, 12 side-effect budget contract rows covered,
 insertion approval rows covered, 0 runtime source-owner approvals, 0 runtime
 metric collector approvals, 0 runtime collector insertion points approved, 0
 runtime collector no-work proofs approved, 0 runtime collector side-effect
-budgets approved, 63 method semantic proof gap files covered, 5,473 lexical
-callables still requiring semantic proof, 0 files with complete per-callable
+budgets approved, 69 method semantic proof gap files covered, 5,673 lexical callables still requiring semantic proof, 0 files with complete per-callable
 semantic proof, 0 committed side-effect budget files, 0 implementation-ready
 collector side-effect approval rows, expected runtime audit tests: 4457,
 expected runtime audit pass: 4457, and expected runtime audit fail 0. It keeps

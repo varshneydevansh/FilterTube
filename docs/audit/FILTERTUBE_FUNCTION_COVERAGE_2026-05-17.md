@@ -20,10 +20,10 @@ is a required source input before this audit slice can support runtime
 optimization or JSON-first promotion. Current proof pins:
 
 ```text
-method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5473
+method semantic proof gap files covered: 69
+method semantic proof gap lexical callables covered: 5673
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5473
+lexical callables requiring semantic proof before behavior changes: 5673
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -189,8 +189,8 @@ The repo-wide callable surface has a dedicated index:
 That pass does not prove behavior, but it closes the first accounting gap: every
 tracked JS/JSX/MJS file now has a lexical callable count and family assignment.
 
-- 63 tracked JS/JSX/MJS files accounted for by `git ls-files`.
-- 5,473 lexical callables pinned by
+- 69 tracked JS/JSX/MJS files accounted for by `git ls-files`.
+- 5,673 lexical callables pinned by
   `tests/runtime/all-callable-index-current-behavior.test.mjs`.
 - Family totals: hot runtime 2,930, content helpers 298, UI/settings 1,556,
   generated/quarantined UI 147, vendor bundles 279, build/sync scripts 52,

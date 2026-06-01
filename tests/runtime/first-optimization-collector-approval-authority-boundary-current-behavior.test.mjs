@@ -200,10 +200,10 @@ test('collector approval rows counts and field names stay pinned', () => {
   assert.match(doc, /runtime rollback approvals: 0/);
   assert.match(doc, /runtime unclaimed-surface approvals: 0/);
   assert.match(doc, /implementation-ready collector approval rows: 0/);
-  assert.match(doc, /method semantic proof gap files covered: 63/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5473/);
+  assert.match(doc, /method semantic proof gap files covered: 69/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5673/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5673/);
   assert.match(doc, /expected runtime audit tests: 4457/);
   assert.match(doc, /expected runtime audit pass: 4457/);
   assert.match(doc, /expected runtime audit fail: 0/);
@@ -230,7 +230,7 @@ test('collector approval boundary is backed by current collector and artifact ga
 
   assert.match(artifactCommitReadiness, /runtime metric collector approvals: 0/);
   assert.match(artifactCommitReadiness, /implementation-ready artifact commit rows: 0/);
-  assert.match(artifactCommitReadiness, /method semantic proof gap files covered: 63/);
+  assert.match(artifactCommitReadiness, /method semantic proof gap files covered: 69/);
   assert.match(collectorInsertion, /runtime collector insertion points approved: 0/);
   assert.match(collectorInsertion, /collector rows implementation-ready: 0/);
   assert.match(collectorNoWork, /runtime collector no-work proofs approved: 0/);
@@ -247,9 +247,9 @@ test('collector approval boundary is backed by current collector and artifact ga
   assert.match(verificationOutput, /Implementation-ready verification output contract rows: 0/);
   assert.match(rollbackUnclaimed, /runtime rollback approvals: 0/);
   assert.match(rollbackUnclaimed, /runtime unclaimed-surface approvals: 0/);
-  assert.match(rollbackUnclaimed, /method semantic proof gap files covered: 63/);
-  assert.match(methodGap, /files with lexical accounting: 63/);
-  assert.match(methodGap, /repo-wide lexical callables: 5473/);
+  assert.match(rollbackUnclaimed, /method semantic proof gap files covered: 69/);
+  assert.match(methodGap, /files with lexical accounting: 69/);
+  assert.match(methodGap, /repo-wide lexical callables: 5673/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(implementationReadiness, /runtime first optimization approvals: 0/);
   assert.match(runtimeResults, /tests 4457/);
@@ -320,8 +320,8 @@ test('collector approval boundary is linked from audit ledgers and upstream gate
     assert.ok(artifact.includes(runtimeTestPath));
   }
 
-  assert.match(runtimeResults, /First optimization collector approval authority boundary addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(activeGoal, /First optimization collector approval authority boundary addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(objectiveLedger, /First optimization collector approval authority boundary addendum:[\s\S]*63 method semantic proof gap files covered/);
-  assert.match(trackedIndex, /First optimization collector approval authority boundary addendum:[\s\S]*63 method semantic proof gap files covered/);
+  assert.match(runtimeResults, /First optimization collector approval authority boundary addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(activeGoal, /First optimization collector approval authority boundary addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(objectiveLedger, /First optimization collector approval authority boundary addendum:[\s\S]*69 method semantic proof gap files covered/);
+  assert.match(trackedIndex, /First optimization collector approval authority boundary addendum:[\s\S]*69 method semantic proof gap files covered/);
 });

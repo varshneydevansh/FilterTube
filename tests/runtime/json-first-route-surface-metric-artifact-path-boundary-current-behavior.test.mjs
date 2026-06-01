@@ -69,7 +69,7 @@ const futureAuthorityTokens = [
 ];
 
 const pathAddendumPattern = /JSON-[Ff]irst [Rr]oute\/[Ss]urface [Mm]etric [Aa]rtifact [Pp]ath [Bb]oundary [Aa]ddendum/;
-const methodGapAddendumPattern = /JSON-[Ff]irst [Rr]oute\/[Ss]urface [Mm]etric [Aa]rtifact [Pp]ath [Bb]oundary [Aa]ddendum[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/;
+const methodGapAddendumPattern = /JSON-[Ff]irst [Rr]oute\/[Ss]urface [Mm]etric [Aa]rtifact [Pp]ath [Bb]oundary [Aa]ddendum[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/;
 const affectedCallableAddendumPattern = /JSON-[Ff]irst [Rr]oute\/[Ss]urface [Mm]etric [Aa]rtifact [Pp]ath [Bb]oundary [Aa]ddendum[\s\S]*affected\s+callable\s+semantic\s+proof/;
 
 function read(file) {
@@ -118,10 +118,10 @@ test('JSON-first route/surface metric artifact path boundary is audit-only and s
   assert.match(doc, /This is not an implementation\s+patch, optimization patch/);
   assert.match(doc, /Reserved route\/surface metric artifact root: docs\/audit\/artifacts\/json-first\/route-surface-metric-artifact\//);
   assert.match(doc, /Committed route\/surface metric artifact files: 0/);
-  assert.match(doc, /Method semantic proof gap files covered: 63/);
-  assert.match(doc, /Method semantic proof gap lexical callables covered: 5473/);
+  assert.match(doc, /Method semantic proof gap files covered: 69/);
+  assert.match(doc, /Method semantic proof gap lexical callables covered: 5673/);
   assert.match(doc, /Files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /Lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(doc, /Lexical callables requiring semantic proof before behavior changes: 5673/);
   assert.match(doc, /Runtime route\/surface metric artifact approval exists: no/);
   assert.match(doc, /Runtime metric collector approval exists: no/);
   assert.match(doc, /Implementation-ready route\/surface metric artifact path rows: 0/);
@@ -142,10 +142,10 @@ test('JSON-first route/surface metric artifact path rows and counts stay pinned'
   assert.match(doc, /reserved future metric artifact roots: 1/);
   assert.match(doc, /reserved future metric artifact files: 5/);
   assert.match(doc, /related first-optimization foundation sample paths covered: 1/);
-  assert.match(doc, /method semantic proof gap files covered: 63/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5473/);
+  assert.match(doc, /method semantic proof gap files covered: 69/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5673/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5673/);
   assert.match(doc, /committed route\/surface metric artifact files: 0/);
   assert.match(doc, /committed first-optimization foundation metric sample files: 0/);
   assert.match(doc, /runtime route\/surface metric artifact approvals: 0/);
@@ -207,8 +207,8 @@ test('JSON-first route/surface metric artifact path boundary is backed by curren
   assert.match(collectorNoWork, /runtime collector no-work proofs approved: 0/);
   assert.match(collectorSideEffect, /runtime collector side-effect budgets approved: 0/);
   assert.match(collectorFixture, /runtime collector fixture packets approved: 0/);
-  assert.match(methodGap, /files with lexical accounting: 63/);
-  assert.match(methodGap, /repo-wide lexical callables: 5473/);
+  assert.match(methodGap, /files with lexical accounting: 69/);
+  assert.match(methodGap, /repo-wide lexical callables: 5673/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(implementationReadiness, /implementation-ready first optimization rows: 0/);
   assert.match(stopGo, /Stop-now JSON-first optimization decision: NO-GO/);

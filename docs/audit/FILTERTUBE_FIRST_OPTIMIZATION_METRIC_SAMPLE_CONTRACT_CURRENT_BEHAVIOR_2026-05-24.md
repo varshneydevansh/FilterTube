@@ -41,7 +41,7 @@ collector insertion, or deletion/consolidation of runtime code.
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_PACKET_MANIFEST_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future packet manifest shape, but proves 0 manifest files and 0 runtime collector approvals exist. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_ARTIFACT_PATH_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Reserves `metric-sample.json` under `docs/audit/artifacts/first-optimization/metric-foundation/` but proves 0 artifact files exist. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_ARTIFACT_FOUNDATION_PACKET_CURRENT_BEHAVIOR_2026-05-24.md` | 12 foundation packet rows exist, but 0 committed artifacts and 0 runtime collectors are approved. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | 63 tracked JS/JSX/MJS files and 5,473 lexical callables remain at 0 files with complete per-callable semantic proof. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | 69 tracked JS/JSX/MJS files and 5,673 lexical callables remain at 0 files with complete per-callable semantic proof. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_ARTIFACT_SCHEMA_CURRENT_BEHAVIOR_2026-05-24.md` | 12 metric schema rows define field groups the metric sample must instantiate. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_SOURCE_OWNER_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 12 source-owner rows map runtime owners the sample must attribute before a collector can exist. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_INSERTION_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | 12 insertion rows exist; 0 collector insertion points are approved. |
@@ -68,10 +68,10 @@ collector no-work rows covered: 12
 collector side-effect rows covered: 12
 collector fixture provenance rows covered: 12
 collector parity rollout rows covered: 12
-method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5473
+method semantic proof gap files covered: 69
+method semantic proof gap lexical callables covered: 5673
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5473
+lexical callables requiring semantic proof before behavior changes: 5673
 inline metric sample JSON sections covered: 12
 inline metric sample artifact promotion decision: NO-GO
 metric sample draft closure rows: 12
@@ -83,8 +83,8 @@ foundation packet rows linked by sample closure: 12
 metric schema rows linked by sample closure: 12
 metric source-owner rows linked by sample closure: 12
 collector readiness families linked by sample closure: 5
-method semantic proof gap files linked by sample closure: 63
-lexical callables linked by sample closure: 5473
+method semantic proof gap files linked by sample closure: 69
+lexical callables linked by sample closure: 5673
 runtime metric sample closure approvals: 0
 implementation-ready metric sample closure rows: 0
 metric sample draft closure: METRIC-SAMPLE-CHAIN-CLOSED

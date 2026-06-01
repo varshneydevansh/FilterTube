@@ -799,7 +799,7 @@ const affectedCallableSemanticFiles = [
     id: 'FT-WLCACHE-SEMANTIC-GAP-00-filter-logic',
     file: 'js/filter_logic.js',
     family: 'Hot page/background runtime',
-    lexicalCallables: 298,
+    lexicalCallables: 313,
     semanticStatus: 'semantic proof incomplete'
   },
   {
@@ -1585,7 +1585,7 @@ test('whitelist/cache SPA metric packet gate is audit-only and source-backed', (
   assert.match(affectedDoc, /route\/mode callable budget collector approval dependency fields required: 20/);
   assert.match(affectedDoc, /affected callable semantic gap binding rows: 8/);
   assert.match(affectedDoc, /affected source files with method-gap rows: 8/);
-  assert.match(affectedDoc, /affected lexical callables requiring semantic proof: 2839/);
+  assert.match(affectedDoc, /affected lexical callables requiring semantic proof: 2854/);
   assert.match(affectedDoc, /affected semantic proof required fields: 8/);
   assert.match(affectedDoc, /affected callable semantic required-field closure rows: 8/);
   assert.match(affectedDoc, /affected callable semantic file-field cells required: 64/);
@@ -2098,8 +2098,8 @@ test('packet rows, live smoke rows, and diagrams remain explicit', () => {
   assert.equal(affectedCallableSemanticGapContract.affectedSemanticPromotionDecision, 'NO-GO');
   assert.equal(affectedCallableSemanticGapContract.runtimeBehaviorChanged, false);
   assert.deepEqual(affectedCallableSemanticGapContract.methodGapTotals, {
-    filesCovered: 63,
-    lexicalCallablesCovered: 5473,
+    filesCovered: 69,
+    lexicalCallablesCovered: 5673,
     filesWithCompletePerCallableSemanticProof: 0,
     requiredSemanticProofFields: 8
   });
@@ -2107,7 +2107,7 @@ test('packet rows, live smoke rows, and diagrams remain explicit', () => {
   assert.deepEqual(affectedCallableSemanticGapContract.requiredSemanticFields, affectedCallableSemanticRequiredFields);
   assert.deepEqual(affectedCallableSemanticGapContract.approvalCounts, {
     affectedFileRows: 8,
-    affectedLexicalCallablesRequiringSemanticProof: 2839,
+    affectedLexicalCallablesRequiringSemanticProof: 2854,
     filesWithCompletePerCallableSemanticProof: 0,
     implementationReadyAffectedSemanticRows: 0,
     runtimeAffectedCallableSemanticApprovals: 0
@@ -2412,10 +2412,10 @@ test('packet rows, live smoke rows, and diagrams remain explicit', () => {
   }
 
   const methodGapDoc = read(methodSemanticGapPath);
-  assert.match(methodGapDoc, /method semantic proof gap files covered: 63/);
-  assert.match(methodGapDoc, /method semantic proof gap lexical callables covered: 5473/);
+  assert.match(methodGapDoc, /method semantic proof gap files covered: 69/);
+  assert.match(methodGapDoc, /method semantic proof gap lexical callables covered: 5673/);
   assert.match(methodGapDoc, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGapDoc, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(methodGapDoc, /lexical callables requiring semantic proof before behavior changes: 5673/);
   assert.match(methodGapDoc, /affected callable semantic proof: NO-GO/);
   for (const row of affectedCallableSemanticFiles) {
     const methodGapRow = methodSemanticGapRow(methodGapDoc, row.file);
@@ -2823,7 +2823,7 @@ test('metric packet gate preserves optimization and JSON-first approval absence'
     assert.match(ledgerSource, /2026-05-30 whitelist\/cache affected callable semantic gap binding\s+continuation/);
     assert.match(ledgerSource, /8\s+affected\s+callable\s+semantic\s+gap\s+binding\s+rows/);
     assert.match(ledgerSource, /8\s+affected\s+source\s+files\s+with\s+method-gap\s+rows/);
-    assert.match(ledgerSource, /2839\s+affected\s+lexical\s+callables\s+requiring\s+semantic\s+proof/);
+    assert.match(ledgerSource, /2854\s+affected\s+lexical\s+callables\s+requiring\s+semantic\s+proof/);
     assert.match(ledgerSource, /8\s+affected\s+semantic\s+proof\s+required\s+fields/);
     assert.match(ledgerSource, /affected\s+files\s+with\s+complete\s+per-callable\s+semantic\s+proof\s+(?:remain )?0/i);
     assert.match(ledgerSource, /runtime\s+affected\s+callable\s+semantic\s+approvals\s+(?:remain )?0/i);

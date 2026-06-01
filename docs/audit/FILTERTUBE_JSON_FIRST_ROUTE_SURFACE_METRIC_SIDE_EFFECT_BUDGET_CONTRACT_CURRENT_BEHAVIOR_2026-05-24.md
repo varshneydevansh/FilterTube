@@ -28,10 +28,10 @@ Committed route/surface metric artifact files: 0
 Runtime route/surface metric side-effect budget approval exists: no
 Runtime route/surface metric artifact approval exists: no
 Runtime metric collector approval exists: no
-Method semantic proof gap files covered: 63
-Method semantic proof gap lexical callables covered: 5473
+Method semantic proof gap files covered: 69
+Method semantic proof gap lexical callables covered: 5673
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5473
+Lexical callables requiring semantic proof before behavior changes: 5673
 Implementation-ready JSON-first route/surface metric side-effect budget contract rows: 0
 ```
 
@@ -67,7 +67,7 @@ release/public claim scope.
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_FIXTURE_PROVENANCE_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Maps collector fixture provenance while proving 0 runtime collector fixture packets approved. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SOURCE_LOCUS_SIDE_EFFECT_OWNERSHIP_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Maps side-effect source-locus ownership while proving 0 implementation-ready source-locus side-effect rows. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_COLLECTOR_SIDE_EFFECT_APPROVAL_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves side-effect contracts and matrices are not runtime side-effect approval. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 63 tracked JS/JSX/MJS files still have 5473 lexical callables requiring per-callable semantic proof before behavior changes. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 tracked JS/JSX/MJS files still have 5673 lexical callables requiring per-callable semantic proof before behavior changes. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_IMPLEMENTATION_READINESS_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | Keeps first optimization implementation at NO-GO. |
 | `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` | Runtime proof is tracked in the audit harness, not as a committed route/surface metric side-effect artifact. |
 
@@ -95,10 +95,10 @@ metric collector side-effect rows covered: 12
 metric collector fixture provenance rows covered: 12
 source-locus side-effect rows covered: 12
 collector side-effect approval rows covered: 12
-method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5473
+method semantic proof gap files covered: 69
+method semantic proof gap lexical callables covered: 5673
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5473
+lexical callables requiring semantic proof before behavior changes: 5673
 committed route/surface metric side-effect budget files: 0
 committed route/surface metric artifact files: 0
 committed first-optimization foundation side-effect budget files: 0

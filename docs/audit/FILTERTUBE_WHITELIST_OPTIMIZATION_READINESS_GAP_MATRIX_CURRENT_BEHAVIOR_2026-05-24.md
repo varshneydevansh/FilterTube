@@ -18,10 +18,10 @@ Whitelist optimization has source-backed candidate locations.
 No whitelist optimization row is implementation-ready.
 The first whitelist runtime patch must prove list-mode, identity, route/surface,
 pending-hide, JSON/DOM parity, mutation, lifecycle, and metric authority first.
-Method semantic proof gap files covered: 63
-Method semantic proof gap lexical callables covered: 5473
+Method semantic proof gap files covered: 69
+Method semantic proof gap lexical callables covered: 5673
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5473
+Lexical callables requiring semantic proof before behavior changes: 5673
 ```
 
 ## Source Inputs
@@ -41,7 +41,7 @@ Lexical callables requiring semantic proof before behavior changes: 5473
 | `docs/audit/FILTERTUBE_LIST_MODE_TRANSITION_PERSISTENCE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md` | Mode transition, copy flag, destructive list movement, cache invalidation, backup, and refresh are separate authority paths. |
 | `docs/audit/FILTERTUBE_SETTINGS_MODE_COVERAGE_MATRIX_2026-05-18.md` | Empty whitelist, Kids/Main/YTM surface modes, sync, lock, quick/menu, and route modes remain partial or current gaps. |
 | `docs/audit/FILTERTUBE_P0_OPTIMIZATION_ROUTE_SURFACE_METRIC_FIXTURE_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 12 route/surface metric fixture obligations remain required before optimization. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 63 tracked JS/JSX/MJS files still have 5473 lexical callables requiring per-callable semantic proof before behavior changes. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 tracked JS/JSX/MJS files still have 5673 lexical callables requiring per-callable semantic proof before behavior changes. |
 
 ## Current Counts
 
@@ -52,10 +52,10 @@ readiness rows requiring metric artifacts: 10
 readiness rows requiring false-hide or leak proof: 10
 readiness rows requiring route/surface proof: 10
 required first whitelist patch evidence classes: 12
-method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5473
+method semantic proof gap files covered: 69
+method semantic proof gap lexical callables covered: 5673
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5473
+lexical callables requiring semantic proof before behavior changes: 5673
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 not completion proof for whitelist optimization readiness

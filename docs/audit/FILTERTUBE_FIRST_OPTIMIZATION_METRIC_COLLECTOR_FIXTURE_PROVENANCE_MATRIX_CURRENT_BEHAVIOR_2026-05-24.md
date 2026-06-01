@@ -473,8 +473,8 @@ prove mapped fixture provenance rows are not runtime fixture provenance
 approval. The addendum pins 12 collector fixture provenance approval boundary
 rows, 12 collector fixture provenance rows covered, 12 fixture provenance
 contract rows covered, 12 source-locus fixture provenance rows covered, 12
-side-effect approval rows covered, 63 method semantic proof gap files covered,
-5,473 lexical callables still requiring semantic proof, 0 files with complete
+side-effect approval rows covered, 69 method semantic proof gap files covered,
+5,673 lexical callables still requiring semantic proof, 0 files with complete
 per-callable semantic proof, 0 runtime source-owner approvals, 0 runtime
 metric collector approvals, 0 runtime collector insertion points approved, 0
 runtime collector no-work proofs approved, 0 runtime collector side-effect

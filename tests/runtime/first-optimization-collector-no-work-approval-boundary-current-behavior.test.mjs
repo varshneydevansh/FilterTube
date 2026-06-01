@@ -164,10 +164,10 @@ test('collector no-work approval rows counts and fields stay pinned', () => {
   assert.match(doc, /runtime collector no-work proofs approved: 0/);
   assert.match(doc, /committed no-work preservation files: 0/);
   assert.match(doc, /implementation-ready collector no-work approval rows: 0/);
-  assert.match(doc, /method semantic proof gap files covered: 63/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5473/);
+  assert.match(doc, /method semantic proof gap files covered: 69/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5673/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5673/);
   assert.match(doc, /expected runtime audit tests: 4457/);
   assert.match(doc, /expected runtime audit pass: 4457/);
   assert.match(doc, /expected runtime audit fail: 0/);
@@ -200,10 +200,10 @@ test('collector no-work approval is backed by current NO-GO gates', () => {
   assert.match(sourceLocusNoWork, /implementation-ready source-locus no-work rows: 0/);
   assert.match(sourceLocusNoWork, /commit no-work-preservation\.json now: NO-GO/);
   assert.match(collectorInsertionApproval, /runtime collector insertion approval now: NO-GO/);
-  assert.match(collectorInsertionApproval, /method semantic proof gap files covered: 63/);
+  assert.match(collectorInsertionApproval, /method semantic proof gap files covered: 69/);
   assert.match(collectorApproval, /runtime collector no-work proofs approved: 0/);
-  assert.match(methodGap, /files with lexical accounting: 63/);
-  assert.match(methodGap, /repo-wide lexical callables: 5473/);
+  assert.match(methodGap, /files with lexical accounting: 69/);
+  assert.match(methodGap, /repo-wide lexical callables: 5673/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(collectorInsertion, /collector rows with no-work preservation proof: 0/);
   assert.match(collectorSideEffect, /runtime collector side-effect budgets approved: 0/);
@@ -272,10 +272,10 @@ test('collector no-work approval boundary is linked from ledgers and adjacent ga
   }
 
   assert.ok(read(sourceDocs.runtimeResults).includes('expected runtime audit tests: 4457'));
-  assert.match(read(sourceDocs.runtimeResults), /First optimization collector no-work approval boundary addendum:[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
-  assert.match(read(ledgerDocs.objectiveLedger), /First Optimization Collector No-Work Approval Boundary Addendum[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
-  assert.match(read(ledgerDocs.activeGoal), /First Optimization Collector No-Work Approval Boundary Addendum[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
-  assert.match(read(ledgerDocs.trackedIndex), /First Optimization Collector No-Work Approval Boundary Addendum[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(read(sourceDocs.runtimeResults), /First optimization collector no-work approval boundary addendum:[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(read(ledgerDocs.objectiveLedger), /First Optimization Collector No-Work Approval Boundary Addendum[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(read(ledgerDocs.activeGoal), /First Optimization Collector No-Work Approval Boundary Addendum[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(read(ledgerDocs.trackedIndex), /First Optimization Collector No-Work Approval Boundary Addendum[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
   assert.ok(read(ledgerDocs.objectiveLedger).includes('expected runtime audit tests: 4457'));
   assert.ok(read(ledgerDocs.activeGoal).includes('expected runtime audit tests: 4457'));
   assert.ok(read(ledgerDocs.trackedIndex).includes('expected runtime audit tests: 4457'));

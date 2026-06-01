@@ -108,19 +108,19 @@ test('first optimization candidate selection boundary is audit-only and source-b
     assert.ok(doc.includes(sourceDoc), `missing source doc ${sourceDoc}`);
   }
 
-  assert.match(methodGap, /files with lexical accounting: 63/);
-  assert.match(methodGap, /repo-wide lexical callables: 5473/);
+  assert.match(methodGap, /files with lexical accounting: 69/);
+  assert.match(methodGap, /repo-wide lexical callables: 5673/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5673/);
 
   for (const firstOptimizationDocPath of firstOptimizationMethodGapDocs) {
     const firstOptimizationDoc = read(firstOptimizationDocPath);
     assert.ok(firstOptimizationDoc.includes(methodGapPath), `${firstOptimizationDocPath} missing method gap source path`);
     assert.match(firstOptimizationDoc, /## Method Semantic Proof Gap Boundary/, `${firstOptimizationDocPath} missing method gap section`);
-    assert.match(firstOptimizationDoc, /method semantic proof gap files covered: 63/, `${firstOptimizationDocPath} missing file count`);
-    assert.match(firstOptimizationDoc, /method semantic proof gap lexical callables covered: 5473/, `${firstOptimizationDocPath} missing callable count`);
+    assert.match(firstOptimizationDoc, /method semantic proof gap files covered: 69/, `${firstOptimizationDocPath} missing file count`);
+    assert.match(firstOptimizationDoc, /method semantic proof gap lexical callables covered: 5673/, `${firstOptimizationDocPath} missing callable count`);
     assert.match(firstOptimizationDoc, /files with complete per-callable semantic proof: 0/, `${firstOptimizationDocPath} missing complete proof count`);
-    assert.match(firstOptimizationDoc, /lexical callables requiring semantic proof before behavior changes: 5473/, `${firstOptimizationDocPath} missing required proof count`);
+    assert.match(firstOptimizationDoc, /lexical callables requiring semantic proof before behavior changes: 5673/, `${firstOptimizationDocPath} missing required proof count`);
     assert.match(firstOptimizationDoc, /affected callable semantic proof: NO-GO/, `${firstOptimizationDocPath} missing affected callable NO-GO`);
     assert.match(firstOptimizationDoc, /runtime behavior changed: no/, `${firstOptimizationDocPath} missing runtime unchanged boundary`);
     assert.match(firstOptimizationDoc, /do not approve runtime\s+optimization/, `${firstOptimizationDocPath} missing audit-only approval warning`);

@@ -39,7 +39,7 @@ while the repo-wide method semantic proof gap remains open.
 | Input | Current proof used |
 | --- | --- |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SOURCE_OWNER_MAP_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `source-owner-map.json` shape, but proves 0 source owner map files and 0 runtime collector approvals exist. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 63 tracked JS/JSX/MJS files and 5,473 lexical callables still lack complete per-callable semantic proof before behavior changes. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 tracked JS/JSX/MJS files and 5,673 lexical callables still lack complete per-callable semantic proof before behavior changes. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_SAMPLE_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `metric-sample.json` shape, but proves 0 sample files and 0 runtime collector approvals exist. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_PACKET_MANIFEST_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future packet manifest shape, but proves 0 manifest files and 0 runtime collector approvals exist. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_ARTIFACT_PATH_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Reserves `fixture-provenance.json` under `docs/audit/artifacts/first-optimization/metric-foundation/` but proves 0 artifact files exist. |
@@ -72,10 +72,10 @@ collector no-work rows covered: 12
 collector side-effect rows covered: 12
 collector fixture provenance rows covered: 12
 collector parity rollout rows covered: 12
-method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5473
+method semantic proof gap files covered: 69
+method semantic proof gap lexical callables covered: 5673
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5473
+lexical callables requiring semantic proof before behavior changes: 5673
 inline fixture provenance JSON sections covered: 12
 inline fixture provenance artifact promotion decision: NO-GO
 fixture provenance draft closure rows: 12
@@ -89,8 +89,8 @@ foundation packet rows linked by fixture closure: 12
 metric schema rows linked by fixture closure: 12
 metric source-owner rows linked by fixture closure: 12
 collector readiness families linked by fixture closure: 5
-method semantic proof gap files linked by fixture closure: 63
-lexical callables linked by fixture closure: 5473
+method semantic proof gap files linked by fixture closure: 69
+lexical callables linked by fixture closure: 5673
 runtime fixture provenance closure approvals: 0
 implementation-ready fixture provenance closure rows: 0
 fixture provenance draft closure: FIXTURE-PROVENANCE-CHAIN-CLOSED
@@ -475,7 +475,7 @@ prove the future `fixture-provenance.json` contract is not runtime fixture
 provenance approval. The addendum pins 12 collector fixture provenance
 approval boundary rows, 12 fixture provenance contract rows covered, 12
 collector fixture provenance rows covered, 12 source-locus fixture provenance
-rows covered, 63 method semantic proof gap files covered, 5,473 lexical
+rows covered, 69 method semantic proof gap files covered, 5,673 lexical
 callables still requiring semantic proof, 0 files with complete per-callable
 semantic proof, 0 runtime source-owner approvals, 0 runtime metric collector
 approvals, 0 runtime collector insertion points approved, 0 runtime collector

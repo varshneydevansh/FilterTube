@@ -156,10 +156,10 @@ test('JSON-first route/surface metric artifact approval rows counts and fields s
   assert.match(doc, /metric collector side-effect rows covered: 12/);
   assert.match(doc, /metric collector fixture provenance rows covered: 12/);
   assert.match(doc, /first optimization implementation readiness rows covered: 14/);
-  assert.match(doc, /method semantic proof gap files covered: 63/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5473/);
+  assert.match(doc, /method semantic proof gap files covered: 69/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5673/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5673/);
   assert.match(doc, /runtime route\/surface metric artifact approvals: 0/);
   assert.match(doc, /runtime metric collector approvals: 0/);
   assert.match(doc, /runtime JSON-first implementation approvals: 0/);
@@ -203,9 +203,9 @@ test('JSON-first route/surface metric artifact approval is backed by current NO-
   assert.match(collectorNoWork, /runtime collector no-work proofs approved: 0/);
   assert.match(collectorSideEffect, /runtime collector side-effect budgets approved: 0/);
   assert.match(collectorFixture, /runtime collector fixture packets approved: 0/);
-  assert.match(jsonFirstImplementation, /method semantic proof gap files covered: 63/);
-  assert.match(methodGap, /files with lexical accounting: 63/);
-  assert.match(methodGap, /repo-wide lexical callables: 5473/);
+  assert.match(jsonFirstImplementation, /method semantic proof gap files covered: 69/);
+  assert.match(methodGap, /files with lexical accounting: 69/);
+  assert.match(methodGap, /repo-wide lexical callables: 5673/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(implementationReadiness, /runtime first optimization approvals: 0/);
   assert.match(implementationReadiness, /implementation-ready first optimization rows: 0/);
@@ -277,10 +277,10 @@ test('JSON-first route/surface metric artifact approval boundary is linked from 
 
   assert.match(read(ledgerDocs.runtimeResults), /tests 4457/);
   assert.match(read(ledgerDocs.runtimeResults), /pass 4457/);
-  assert.match(read(ledgerDocs.runtimeResults), /JSON-first route\/surface metric artifact approval boundary addendum:[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
-  assert.match(read(ledgerDocs.objectiveLedger), /JSON-First Route\/Surface Metric Artifact Approval Boundary Addendum[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
-  assert.match(read(ledgerDocs.activeGoal), /JSON-First Route\/Surface Metric Artifact Approval Boundary Addendum[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
-  assert.match(read(ledgerDocs.trackedIndex), /JSON-First Route\/Surface Metric Artifact Approval Boundary Addendum[\s\S]*63\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(read(ledgerDocs.runtimeResults), /JSON-first route\/surface metric artifact approval boundary addendum:[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(read(ledgerDocs.objectiveLedger), /JSON-First Route\/Surface Metric Artifact Approval Boundary Addendum[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(read(ledgerDocs.activeGoal), /JSON-First Route\/Surface Metric Artifact Approval Boundary Addendum[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
+  assert.match(read(ledgerDocs.trackedIndex), /JSON-First Route\/Surface Metric Artifact Approval Boundary Addendum[\s\S]*69\s+method\s+semantic\s+proof\s+gap\s+files covered/);
   assert.ok(read(ledgerDocs.objectiveLedger).includes('expected runtime audit tests: 4457'));
   assert.ok(read(ledgerDocs.activeGoal).includes('expected runtime audit tests: 4457'));
   assert.ok(read(ledgerDocs.trackedIndex).includes('expected runtime audit tests: 4457'));
