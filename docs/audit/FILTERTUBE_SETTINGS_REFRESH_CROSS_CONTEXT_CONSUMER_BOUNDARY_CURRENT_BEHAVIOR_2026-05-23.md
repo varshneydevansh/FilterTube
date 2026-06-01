@@ -50,7 +50,7 @@ settings refresh cross-context consumer source files pinned: 7
 | `injectorProcessQueue` | `js/injector.js:3405` | 3,405 | 60 | 2,108 | `d17bae535755636d9b51d10b3153650b7eed3ff0c0abf99ee988b9d44eb76233` |
 | `seedUpdateSettings` | `js/seed.js:983` | 983 | 98 | 4,640 | `687d0cf2fcec26709486afb3b8c99cae3e79e8003e17c398ccf3cf214af06cf7` |
 | `domFallbackApplyHead` | `js/content/dom_fallback.js:2035` | 2,035 | 63 | 2,188 | `c8f88f62bbd72cd9ed3c70476948919cdcb4aa7a125e26c1d684d3267dd8ee43` |
-| `filterLogicGlobalProcess` | `js/filter_logic.js:3434` | 3,434 | 34 | 1,247 | `2134623c293b2cddc6177a9a1732f6ca45e4014dc4ba3872ebe375c47e96e4d2` |
+| `filterLogicGlobalProcess` | `js/filter_logic.js:3588` | 3,588 | 34 | 1,247 | `2134623c293b2cddc6177a9a1732f6ca45e4014dc4ba3872ebe375c47e96e4d2` |
 
 settings refresh cross-context consumer source/effect blocks pinned: 13
 

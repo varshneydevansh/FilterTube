@@ -76,10 +76,11 @@ test('audit runtime backlog names the broad failure clusters that still require 
   assert.match(doc, /content-control-alias-mutation-boundary` has been refreshed and promoted into `test:settings`/);
   assert.match(
     doc,
-    new RegExp('settings-mode-source-effect` and `source-' +
-      'of-truth-claim-register` have been refreshed and promoted into `test:settings`')
+    new RegExp('settings-mode-source-effect`, `source-' +
+      'of-truth-claim-register`, and `settings-refresh-cross-context-consumer-boundary`')
   );
-  assert.match(doc, /remaining rows are settings refresh cross-context consumer cleanup/);
+  assert.match(doc, /have been refreshed and promoted into `test:settings`/);
+  assert.match(doc, /remaining rows are settings-refresh optimization candidate\/evidence cleanup/);
   assert.match(doc, /direct-hide-writer-register` has been refreshed and promoted into `test:dom`/);
   assert.match(doc, /dom-selector-instance-register` has been refreshed for `js\/content\/dom_state\.js` selector patch sites and promoted into `test:dom`/);
   assert.match(doc, /lifecycle-instance-register` and `repo-lifecycle-primitive-coverage` have been refreshed for website component lifecycle drift and promoted into `test:performance`/);

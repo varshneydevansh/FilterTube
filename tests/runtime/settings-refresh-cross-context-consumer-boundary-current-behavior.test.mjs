@@ -132,7 +132,7 @@ const blockSpecs = {
     file: 'js/filter_logic.js',
     start: "        processData(data, dataName = 'unknown') {",
     end: '    // ============================================================================\n    // GLOBAL INTERFACE',
-    startLine: 3434,
+    startLine: 3588,
     lines: 34,
     bytes: 1247,
     hash: '2134623c293b2cddc6177a9a1732f6ca45e4014dc4ba3872ebe375c47e96e4d2'

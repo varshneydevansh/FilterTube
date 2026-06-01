@@ -231,6 +231,7 @@ export const LANES = Object.freeze({
       'tests/runtime/settings-mode-coverage-matrix-current-behavior.test.mjs',
       'tests/runtime/settings-mode-source-effect-current-behavior.test.mjs',
       'tests/runtime/settings-refresh-fanout-current-behavior.test.mjs',
+      'tests/runtime/settings-refresh-cross-context-consumer-boundary-current-behavior.test.mjs',
       'tests/runtime/settings-refresh-dirty-key-producer-matrix-current-behavior.test.mjs',
       'tests/runtime/settings-refresh-dirty-key-consumer-matrix-current-behavior.test.mjs',
       'tests/runtime/source-of-truth-claim-register-current-behavior.test.mjs',
