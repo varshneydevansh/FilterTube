@@ -2134,7 +2134,7 @@ contract coverage rows, 1 reserved future metric artifact root, 5 reserved
 future metric artifact files, 5 source metric foundation contract docs
 referenced, 5 source metric foundation contract tests referenced, 5
 route/surface-specific per-file metric artifact contract docs covered, 5
-route/surface-specific per-file metric artifact contract tests covered, 63
+route/surface-specific per-file metric artifact contract tests covered, 69
 method semantic proof gap files covered, 5,681 method semantic proof gap
 lexical callables covered, 0 files with complete per-callable semantic proof,
 0 committed route/surface metric artifact files, 0 runtime route/surface metric

@@ -13,23 +13,29 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4690
-fail: 47
-duration_ms: 50190.707666
+pass: 4691
+fail: 46
+duration_ms: 34812.7565
 ```
 
-This refresh reduces the pinned broad-suite failure count from 49 failures to
-47 failures after retiring the stale JSON-first reference doc surface rows: the
-reference proof now points at the current `docs/youtube_renderer_inventory.md`
-newline count, byte count, hash, inline-code count, and dot-index count while
-reference docs remain evidence maps, not runtime authority. The previous refresh
-reduced the suite from 51 failures to 49 failures after retiring the stale
-JSON-first metric artifact gate rows: the metric proof now points at the current
-performance-claim and no-work crosswalk doc hashes plus the current
-`js/filter_logic.js` `processData()` source line while metric artifact authority
-remains absent. The previous refresh reduced the suite from 52 failures to 51
-failures after retiring the stale implementation readiness gate lifecycle count
-row: the readiness proof now points at the current 524 tracked lifecycle
+This refresh reduces the pinned broad-suite failure count from 47 failures to
+46 failures after retiring the stale JSON-first route/surface metric artifact
+contract coverage ledger row: the objective coverage ledger now matches the
+active-goal and tracked-file ledgers at 69 method semantic proof gap files
+covered, while route/surface metric artifacts, runtime metric collectors,
+JSON-first implementation, and whitelist optimization remain NO-GO. The previous
+refresh reduced the suite from 49 failures to 47 failures after retiring the
+stale JSON-first reference doc surface rows: the reference proof now points at
+the current `docs/youtube_renderer_inventory.md` newline count, byte count, hash,
+inline-code count, and dot-index count while reference docs remain evidence maps,
+not runtime authority. The previous refresh reduced the suite from 51 failures
+to 49 failures after retiring the stale JSON-first metric artifact gate rows: the
+metric proof now points at the current performance-claim and no-work crosswalk
+doc hashes plus the current `js/filter_logic.js` `processData()` source line
+while metric artifact authority remains absent. The previous refresh reduced the
+suite from 52 failures to 51 failures after retiring the stale implementation
+readiness gate lifecycle count row: the readiness proof now points at the current
+524 tracked lifecycle
 primitive instances, 469 install-or-schedule rows, and 55 explicit teardown rows
 while runtime cleanup and optimization approval remains at NO-GO. The previous
 refresh reduced the suite from 55 failures to 52 failures after retiring the
@@ -110,14 +116,14 @@ node scripts/audit-proof-drift.mjs --all --report-only
 ## Failure Clusters
 
 Current failing subtests are spread across 36 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-json-first-reference-doc-refresh.tap` gives this
+name-based parse of `/tmp/filtertube-runtime-current-after-json-first-route-surface-metric-contract-coverage-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
 | generated/release/package/docs surfaces | 34 |
-| source-locus/optimization/index contracts | 5 |
-| JSON/video-meta/path/reference | 15 |
+| source-locus/optimization/index contracts | 4 |
+| JSON/video-meta/path/reference | 14 |
 | website/public-doc/source inventory | 14 |
 | settings/content-control/DOM lifecycle | 8 |
 | native/Nanah/Kids/YTM | 8 |
@@ -181,6 +187,11 @@ The previous JSON-first reference doc surface rows are retired: the reference
 proof now pins the current `docs/youtube_renderer_inventory.md` fingerprint and
 syntax counts while keeping reference docs as evidence maps, not runtime
 authority.
+The previous JSON-first route/surface metric artifact contract coverage row is
+retired: the objective coverage ledger now matches the adjacent 69-file method
+semantic proof gap count while route/surface metric artifacts, runtime metric
+collectors, JSON-first implementation, and whitelist optimization remain
+explicitly NO-GO.
 The previous JSON-first metric artifact gate rows are retired: the metric proof
 now pins current performance-claim and no-work crosswalk hashes plus the current
 `js/filter_logic.js` `processData()` anchor while metric artifact authority

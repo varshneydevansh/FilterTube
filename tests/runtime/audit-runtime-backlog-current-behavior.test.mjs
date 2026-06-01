@@ -20,21 +20,25 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
   assert.match(doc, /tests: 4737/);
-  assert.match(doc, /pass: 4690/);
-  assert.match(doc, /fail: 47/);
-  assert.match(doc, /duration_ms: 50190\.707666/);
+  assert.match(doc, /pass: 4691/);
+  assert.match(doc, /fail: 46/);
+  assert.match(doc, /duration_ms: 34812\.7565/);
+  assert.match(doc, /47 failures to\s+46 failures/);
+  assert.match(doc, /JSON-first route\/surface metric artifact\s+contract coverage ledger row/);
+  assert.match(doc, /objective coverage ledger now matches the\s+active-goal and tracked-file ledgers at 69 method semantic proof gap files\s+covered/);
+  assert.match(doc, /route\/surface metric artifacts, runtime metric collectors,\s+JSON-first implementation, and whitelist optimization remain NO-GO/);
   assert.match(doc, /49 failures to\s+47 failures/);
   assert.match(doc, /JSON-first reference doc surface rows/);
-  assert.match(doc, /current `docs\/youtube_renderer_inventory\.md`\s+newline count, byte count, hash, inline-code count, and dot-index count/);
-  assert.match(doc, /reference docs remain evidence maps, not runtime authority/);
-  assert.match(doc, /51 failures to\s+49 failures/);
+  assert.match(doc, /current `docs\/youtube_renderer_inventory\.md`\s+newline count, byte count, hash,\s+inline-code count, and dot-index count/);
+  assert.match(doc, /reference docs remain evidence maps,\s+not runtime authority/);
+  assert.match(doc, /51 failures\s+to\s+49 failures/);
   assert.match(doc, /JSON-first metric artifact gate rows/);
-  assert.match(doc, /current\s+performance-claim and no-work crosswalk doc hashes/);
+  assert.match(doc, /current\s+performance-claim and no-work crosswalk\s+doc hashes/);
   assert.match(doc, /current\s+`js\/filter_logic\.js` `processData\(\)` source line/);
   assert.match(doc, /metric artifact authority\s+remains absent/);
   assert.match(doc, /52 failures to\s+51\s+failures/);
   assert.match(doc, /implementation\s+readiness gate lifecycle\s+count\s+row/);
-  assert.match(doc, /current 524 tracked lifecycle\s+primitive instances, 469 install-or-schedule rows,\s+and 55 explicit teardown rows/);
+  assert.match(doc, /current\s+524 tracked lifecycle\s+primitive instances, 469 install-or-schedule rows,\s+and 55 explicit teardown rows/);
   assert.match(doc, /runtime cleanup and optimization approval\s+remains at NO-GO/);
   assert.match(doc, /55 failures to\s+52\s+failures/);
   assert.match(doc, /generated local output dependency surface\s+rows/);
@@ -181,15 +185,15 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   const doc = read(backlogPath);
   const expectedRows = [
     ['generated/release/package/docs surfaces', '34'],
-    ['source-locus/optimization/index contracts', '5'],
-    ['JSON/video-meta/path/reference', '15'],
+    ['source-locus/optimization/index contracts', '4'],
+    ['JSON/video-meta/path/reference', '14'],
     ['website/public-doc/source inventory', '14'],
     ['settings/content-control/DOM lifecycle', '8'],
     ['native/Nanah/Kids/YTM', '8']
   ];
 
   assert.match(doc, /Current failing subtests are spread across 36 runtime test files/);
-  assert.match(doc, /filtertube-runtime-current-after-json-first-reference-doc-refresh\.tap/);
+  assert.match(doc, /filtertube-runtime-current-after-json-first-route-surface-metric-contract-coverage-refresh\.tap/);
   assert.match(doc, /non-exclusive family snapshot/);
   assert.match(doc, /previous method-proof\/family blocker row is now retired/);
   assert.match(doc, /direct method semantic proof lane passes with 5,681\s+current lexical callables/);
@@ -235,6 +239,9 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   assert.match(doc, /previous JSON-first reference doc surface rows are retired/);
   assert.match(doc, /reference\s+proof now pins the current `docs\/youtube_renderer_inventory\.md` fingerprint and\s+syntax counts/);
   assert.match(doc, /reference docs as evidence maps, not runtime\s+authority/);
+  assert.match(doc, /previous JSON-first route\/surface metric artifact contract coverage row is\s+retired/);
+  assert.match(doc, /objective coverage ledger now matches the adjacent 69-file method\s+semantic proof gap count/);
+  assert.match(doc, /route\/surface metric artifacts, runtime metric\s+collectors, JSON-first implementation, and whitelist optimization remain\s+explicitly NO-GO/);
   assert.match(doc, /previous JSON-first metric artifact gate rows are retired/);
   assert.match(doc, /metric proof\s+now pins current performance-claim and no-work crosswalk hashes/);
   assert.match(doc, /current\s+`js\/filter_logic\.js` `processData\(\)` anchor/);
