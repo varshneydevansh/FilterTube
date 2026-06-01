@@ -29,9 +29,9 @@ Source metric foundation contract tests referenced: 5
 Route/surface-specific per-file metric artifact contract docs covered: 5
 Route/surface-specific per-file metric artifact contract tests covered: 5
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5673
+Method semantic proof gap lexical callables covered: 5681
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5673
+Lexical callables requiring semantic proof before behavior changes: 5681
 Committed route/surface metric artifact files: 0
 Runtime route/surface metric artifact approval exists: no
 Runtime metric collector approval exists: no
@@ -71,7 +71,7 @@ approval.
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_NO_WORK_PRESERVATION_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Maps no-work preservation obligations while proving 0 runtime collector no-work proofs approved. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_SIDE_EFFECT_BUDGET_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Maps collector side-effect budgets while proving 0 runtime collector side-effect budgets approved. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_FIXTURE_PROVENANCE_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Maps collector fixture provenance while proving 0 runtime collector fixture packets approved. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,673 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,681 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_IMPLEMENTATION_READINESS_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | Keeps first optimization implementation at NO-GO. |
 | `docs/audit/FILTERTUBE_OPTIMIZATION_STOP_GO_DECISION_RECORD_CURRENT_BEHAVIOR_2026-05-24.md` | Keeps stop-now JSON-first and whitelist optimization at NO-GO. |
 | `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` | Runtime proof is tracked in the audit harness, not as committed route/surface metric artifact files. |
@@ -128,9 +128,9 @@ source metric foundation contract tests referenced: 5
 route/surface-specific per-file metric artifact contract docs covered: 5
 route/surface-specific per-file metric artifact contract tests covered: 5
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5673
+method semantic proof gap lexical callables covered: 5681
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5673
+lexical callables requiring semantic proof before behavior changes: 5681
 metric artifact path boundary rows covered: 6
 metric artifact commit readiness rows covered: 10
 metric artifact approval boundary rows covered: 12
@@ -263,7 +263,7 @@ coverage into a route/surface-specific metric sample contract without creating
 `metric-sample.json`. The addendum pins 12 JSON-first route/surface metric
 sample contract rows, 1 reserved route/surface metric sample path, 12 source
 metric sample contract rows covered, 10 metric artifact contract coverage rows
-covered, 69 method semantic proof gap files covered, 5,673 method semantic
+covered, 69 method semantic proof gap files covered, 5,681 method semantic
 proof gap lexical callables covered, 0 files with complete per-callable
 semantic proof, 0 committed route/surface metric sample files, 0 committed
 route/surface metric artifact files, 0 runtime route/surface metric sample
@@ -283,7 +283,7 @@ without creating `no-work-budget.json`. The addendum pins 12 JSON-first
 route/surface metric no-work budget contract rows, 1 reserved route/surface
 metric no-work budget path, 12 source no-work preservation contract rows
 covered, 10 metric artifact contract coverage rows covered, 63 method
-semantic proof gap files covered, 5,673 method semantic proof gap lexical
+semantic proof gap files covered, 5,681 method semantic proof gap lexical
 callables covered, 0 files with complete per-callable semantic proof, 0
 committed route/surface metric no-work budget files, 0 committed route/surface
 metric artifact files, 0 runtime route/surface metric no-work budget
@@ -303,7 +303,7 @@ contract without creating `side-effect-budget.json`. The addendum pins 12
 JSON-first route/surface metric side-effect budget contract rows, 1 reserved
 route/surface metric side-effect budget path, 12 source side-effect budget
 contract rows covered, 10 metric artifact contract coverage rows covered, 63
-method semantic proof gap files covered, 5,673 method semantic proof gap
+method semantic proof gap files covered, 5,681 method semantic proof gap
 lexical callables covered, 0 files with complete per-callable semantic proof,
 0 committed route/surface metric side-effect budget files, 0 committed
 route/surface metric artifact files, 0 runtime route/surface metric
@@ -325,7 +325,7 @@ JSON-first route/surface metric fixture provenance contract rows, 1 reserved
 route/surface metric fixture provenance path, 1 related first-optimization
 foundation fixture provenance path, 12 source fixture provenance contract rows
 covered, 10 metric artifact contract coverage rows covered, 63 method
-semantic proof gap files covered, 5,673 method semantic proof gap lexical
+semantic proof gap files covered, 5,681 method semantic proof gap lexical
 callables covered, 0 files with complete per-callable semantic proof, 0
 committed route/surface metric fixture provenance files, 0 committed
 route/surface metric artifact files, 0 runtime route/surface metric fixture
@@ -347,7 +347,7 @@ JSON-first route/surface metric verification output contract rows, 1 reserved
 route/surface metric verification output path, 1 related first-optimization
 foundation verification output path, 12 source verification output contract
 rows covered, 10 metric artifact contract coverage rows covered, 63 method
-semantic proof gap files covered, 5,673 method semantic proof gap lexical
+semantic proof gap files covered, 5,681 method semantic proof gap lexical
 callables covered, 0 files with complete per-callable semantic proof, 0
 committed route/surface metric verification output files, 0 committed
 route/surface metric artifact files, 0 runtime route/surface metric

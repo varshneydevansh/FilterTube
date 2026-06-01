@@ -21,9 +21,9 @@ The current boundary is:
 ```text
 JSON-first route/surface fixture approval boundary rows: 12
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5673
+Method semantic proof gap lexical callables covered: 5681
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5673
+Lexical callables requiring semantic proof before behavior changes: 5681
 Runtime JSON-first fixture packet approvals: 0
 Runtime JSON-first fixture artifact approvals: 0
 Runtime route/surface metric artifact approvals: 0
@@ -53,7 +53,7 @@ sync, release, and public-claim limits.
 | `docs/audit/FILTERTUBE_JSON_FIRST_ROUTE_SURFACE_IMPLEMENTATION_AUTHORITY_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Keeps route/surface implementation approval at NO-GO. |
 | `docs/audit/FILTERTUBE_JSON_FIRST_IMPLEMENTATION_AUTHORITY_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Keeps JSON-first implementation approval at NO-GO. |
 | `docs/audit/FILTERTUBE_P0_OPTIMIZATION_ROUTE_SURFACE_METRIC_FIXTURE_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Defines 12 route/surface metric obligations and 0 implementation-ready route/surface optimization rows. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,673 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,681 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_IMPLEMENTATION_READINESS_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | Keeps first optimization implementation at NO-GO. |
 | `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` | Tracks audit harness counts as current-behavior proof, not route/surface fixture approval. |
 
@@ -73,9 +73,9 @@ verification output contract rows covered: 12
 route/surface authority rows covered: 12
 route/surface metric obligations covered: 12
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5673
+method semantic proof gap lexical callables covered: 5681
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5673
+lexical callables requiring semantic proof before behavior changes: 5681
 runtime JSON-first fixture packet approvals: 0
 runtime JSON-first fixture artifact approvals: 0
 runtime JSON-first fixture manifest approvals: 0

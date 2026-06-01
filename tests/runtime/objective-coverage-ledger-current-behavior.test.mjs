@@ -1414,7 +1414,7 @@ test('objective coverage ledger records source-of-truth claim wording as an auth
   assert.match(doc, /Source-of-truth claim register addendum/);
   assert.match(doc, /docs\/audit\/FILTERTUBE_SOURCE_OF_TRUTH_CLAIM_REGISTER_2026-05-20\.md/);
   assert.match(doc, /tests\/runtime\/source-of-truth-claim-register-current-behavior\.test\.mjs/);
-  assert.match(doc, /all 89 exact `source of truth` \/ `source-of-truth` wording occurrences/);
+  assert.match(doc, /all 95 exact `source of truth` \/ `source-of-truth` wording occurrences/);
   assert.match(doc, /narrow local ownership from historical planning/);
   assert.match(doc, /broad StateManager\/importer wording has been narrowed/);
   assert.match(doc, /historical planning, release-sync ownership, audit-boundary wording/);

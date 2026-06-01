@@ -841,7 +841,7 @@ test('tracked_file_obligation_index_covers_runtime_release_docs_vendor_and_websi
 
   assert.match(doc, /FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25/);
   assert.match(doc, /69 method semantic proof gap files covered/);
-  assert.match(doc, /5,673 method semantic proof gap lexical callables covered/);
+  assert.match(doc, /5,681 method semantic proof gap lexical callables covered/);
   assert.match(doc, /0 files with complete per-callable semantic proof/);
 });
 

@@ -355,7 +355,7 @@ test('all-callable index documents semantic method proof boundary', () => {
   assert.match(methodSemanticGapDoc, /2026-05-30 Current-Source Method Gap Freshness Addendum/);
   assert.match(methodSemanticGapDoc, /tracked JS\/JSX\/MJS files still covered: 69/);
   assert.match(methodSemanticGapDoc, /repo-wide lexical callables still requiring semantic proof: 5681/);
-  assert.match(methodSemanticGapDoc, /latest full runtime proof: broad audit backlog 4731 tests, 4580 pass, 151 fail/);
+  assert.match(methodSemanticGapDoc, /latest full runtime proof: broad audit backlog 4737 tests, 4661 pass, 76 fail/);
   assert.match(methodSemanticGapDoc, /method semantic completion from freshness rerun: NO-GO/);
   assert.match(methodSemanticGapDoc, /JSON-first first-class promotion from method freshness rerun: NO-GO/);
   assert.match(methodSemanticGapDoc, /affected-callable closure packet required fields:/);

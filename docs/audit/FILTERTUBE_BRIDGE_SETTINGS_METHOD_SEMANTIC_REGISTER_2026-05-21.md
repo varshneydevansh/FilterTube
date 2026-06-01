@@ -191,7 +191,7 @@ broad parser currently reports 65 lexical callable matches:
 | Plain function declarations | 13 | yes | The parser captures each top-level `function` declaration in this file. These are the bridge waiters, host normalization, settings fetch, seed relay, runtime observer refresh, and storage refresh helpers listed in the inventory. |
 | Const arrow/IIFE helpers | 10 | yes | The parser captures `finish` twice, `armTimeout`, `safeResolveFailure`, `sendRuntimeMessage`, and the five IIFE result helpers `expectedProfile`, `debugEnabled` twice, `profileType`, and `host`. |
 | Assignment function expression | 1 | yes, outside broad parser | `globalThis.FilterTubeRequestSubscribedChannelsFromMainWorld = function requestSubscribedChannelsFromMainWorld(...)` is a real exported helper, but the broad parser does not count assignment-expression function declarations. The method inventory covers it explicitly. |
-| `if` artifacts | 42 | no | The broad method-shorthand branch misclassifies `if (...) {` control-flow lines as lexical callables. These remain part of the current 5,673 lexical count until the repo-wide proof layer has a callable-kind classifier. |
+| `if` artifacts | 42 | no | The broad method-shorthand branch misclassifies `if (...) {` control-flow lines as lexical callables. These remain part of the current 5,681 lexical count until the repo-wide proof layer has a callable-kind classifier. |
 
 This file-local reconciliation reduces ambiguity for
 `js/content/bridge_settings.js`, but it does not promote the global method
@@ -319,9 +319,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5673
+method semantic proof gap lexical callables covered: 5681
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5673
+lexical callables requiring semantic proof before behavior changes: 5681
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

@@ -242,7 +242,7 @@ P0 manifest/permission addendum: `docs/audit/FILTERTUBE_P0_MANIFEST_PERMISSION_C
 
 Raw capture extraction obligation index addendum: `docs/audit/FILTERTUBE_RAW_CAPTURE_EXTRACTION_OBLIGATION_INDEX_2026-05-20.md` and `tests/runtime/raw-capture-extraction-obligation-index-current-behavior.test.mjs` extend the raw-capture, JSON path, DOM selector, source-boundary, fixture-traceability, false-hide/leak, performance-risk, code-burden, and implementation-change rows without opening the implementation gate. This current-behavior slice pins all 46 unique ignored capture paths as extraction obligations, keeps the 45 present local raw captures and one missing historical path out of release inputs, and requires explicit fixture provenance instead of loose substring matching. It also reinforces source tier rather than source-of-truth wording: raw captures, XHR JSON, `ytInitial*`, learned maps, DOM extraction, and network fallback are evidence layers that still need route, mode, expected-decision, side-effect, negative-sibling, and authority proof before behavior changes.
 
-Source-of-truth claim register addendum: `docs/audit/FILTERTUBE_SOURCE_OF_TRUTH_CLAIM_REGISTER_2026-05-20.md` and `tests/runtime/source-of-truth-claim-register-current-behavior.test.mjs` extend the documentation-claim, tracked-source, source-boundary, identity-waterfall, settings/mutation, release-sync, false-hide/leak, performance-risk, code-burden, and implementation-change rows without opening the implementation gate. This current-behavior slice pins all 89 exact `source of truth` / `source-of-truth` wording occurrences outside the register and its test, separates narrow local ownership from historical planning, release-sync ownership, audit-boundary wording, and misleading identity/effect claims, and requires route, surface, profile, list mode, source tier, confidence, allowed/forbidden effects, positive/negative fixtures, restore proof, no-rule budget, and teardown/pause proof before any such wording can drive behavior changes. The earlier broad StateManager/importer wording has been narrowed so it no longer appears in this exact-phrase register.
+Source-of-truth claim register addendum: `docs/audit/FILTERTUBE_SOURCE_OF_TRUTH_CLAIM_REGISTER_2026-05-20.md` and `tests/runtime/source-of-truth-claim-register-current-behavior.test.mjs` extend the documentation-claim, tracked-source, source-boundary, identity-waterfall, settings/mutation, release-sync, false-hide/leak, performance-risk, code-burden, and implementation-change rows without opening the implementation gate. This current-behavior slice pins all 95 exact `source of truth` / `source-of-truth` wording occurrences outside the register and its test, separates narrow local ownership from historical planning, release-sync ownership, audit-boundary wording, and misleading identity/effect claims, and requires route, surface, profile, list mode, source tier, confidence, allowed/forbidden effects, positive/negative fixtures, restore proof, no-rule budget, and teardown/pause proof before any such wording can drive behavior changes. The earlier broad StateManager/importer wording has been narrowed so it no longer appears in this exact-phrase register.
 
 JSON-first filter readiness gate addendum: `docs/audit/FILTERTUBE_JSON_FIRST_FILTER_READINESS_GATE_CURRENT_BEHAVIOR_2026-05-21.md` and `tests/runtime/json-first-filter-readiness-gate-current-behavior.test.mjs` extend the JSON path, renderer, source/effect, settings-mode, no-work, DOM fallback parity, native parity, performance-risk, false-hide/leak, code-burden, cross-feature interaction, and implementation-change rows without opening the implementation gate. This current-behavior slice converts path and field-effect proof into a blocked first-class JSON filter promotion matrix: 13 blocked gate rows cover normalized path syntax, renderer ownership, field-effect authority, route/surface scope, list-mode semantics, identity confidence, mutation effect, category/network budget, no-rule/no-work budget, fixture provenance, DOM fallback parity, native parity, and optimization budget. It pins that `viewCount` is not a threshold predicate, `videoId` is not channel identity, category filtering can schedule metadata fetch work, harvest can occur before disabled filtering, and whitelist mode bypasses the old no-rule fast path. No `jsonFirstFilterReadinessGate`, `jsonFirstPathSyntaxManifest`, `jsonFirstRendererCoverageDecision`, `jsonFirstFieldEffectDecision`, `jsonFirstRouteSurfaceReport`, `jsonFirstListModeMatrix`, `jsonFirstIdentityConfidenceReport`, `jsonFirstMutationEffectReport`, `jsonFirstCategoryFetchBudget`, `jsonFirstNoWorkBudget`, `jsonFirstFixtureProvenance`, `jsonFirstDomParityReport`, `jsonFirstNativeParityReport`, or `jsonFirstOptimizationBudget` exists in runtime source yet.
 
@@ -1065,7 +1065,7 @@ covered, 12 metric schema rows covered, 12 source-owner rows covered, 12
 collector insertion rows covered, 12 no-work rows covered, 12 side-effect rows
 covered, 12 fixture provenance rows covered, 12 parity rollout rows covered,
 12 route/surface obligations covered, 8 diagnostic logging policy rows
-covered, 69 method semantic proof gap files covered, 5,673 method semantic
+covered, 69 method semantic proof gap files covered, 5,681 method semantic
 proof gap lexical callables covered, 0 files with complete per-callable
 semantic proof, 0 committed foundation metric artifacts, 0 runtime metric
 collectors approved, and 0 implementation-ready foundation packet rows. This does not
@@ -1131,7 +1131,7 @@ manifest contract rows covered, 10 artifact path rows covered, 12 foundation
 packet rows covered, 12 metric schema rows covered, 12 source-owner rows
 covered, 12 collector insertion rows covered, 12 no-work rows covered, 12
 side-effect rows covered, 12 fixture provenance rows covered, 12 parity
-rollout rows covered, 69 method semantic proof gap files covered, 5,673 method
+rollout rows covered, 69 method semantic proof gap files covered, 5,681 method
 semantic proof gap lexical callables covered, and 0 files with complete
 per-callable semantic proof. This does not close implementation-change, JSON-first,
 whitelist, collector, native, release, or public claim objectives; it keeps the
@@ -1224,7 +1224,7 @@ source owner map contract rows covered, 12 metric sample contract rows covered,
 packet rows covered, 12 metric schema rows covered, 12 source-owner rows
 covered, 12 collector insertion rows covered, 12 no-work rows covered, 12
 side-effect rows covered, 12 fixture provenance rows covered, 12 parity rollout
-rows covered, 69 method semantic proof gap files covered, 5,673 method semantic
+rows covered, 69 method semantic proof gap files covered, 5,681 method semantic
 proof gap lexical callables covered, and 0 files with complete per-callable
 semantic proof. This does not close implementation-change, JSON-first,
 whitelist, collector, native, release, or public claim objectives; it keeps
@@ -1338,7 +1338,7 @@ manifest contract rows covered, 10 artifact path rows covered, 12 foundation
 packet rows covered, 12 metric schema rows covered, 12 source-owner rows
 covered, 12 collector insertion rows covered, 12 no-work rows covered, 12
 side-effect rows covered, 12 fixture provenance rows covered, 12 parity rollout
-rows covered, 69 method semantic proof gap files covered, 5,673 method semantic
+rows covered, 69 method semantic proof gap files covered, 5,681 method semantic
 proof gap lexical callables covered, 0 files with complete per-callable
 semantic proof, expected runtime audit tests: 4457, expected runtime audit
 pass: 4457, and expected runtime audit fail 0. This does not close
@@ -1364,7 +1364,7 @@ implementation-ready contract coverage rows, 10 artifact path rows covered, 12
 foundation packet rows covered, 12 metric schema rows covered, 12 source-owner
 rows covered, 12 collector insertion rows covered, 12 no-work rows covered, 12
 side-effect rows covered, 12 fixture provenance rows covered, 12 parity rollout
-rows covered, 69 method semantic proof gap files covered, 5,673 method semantic
+rows covered, 69 method semantic proof gap files covered, 5,681 method semantic
 proof gap lexical callables covered, 0 files with complete per-callable
 semantic proof, expected runtime audit tests: 4457, expected runtime audit
 pass: 4457, and expected runtime audit fail 0. This does not close
@@ -1491,7 +1491,7 @@ runtime source files referenced, 10 owner families referenced, 1 reserved
 source-owner map path covered, 0 committed source-owner map files, 0 runtime
 source-owner approvals, 0 runtime metric collector approvals, 0 runtime
 collector insertion points approved, 0 implementation-ready source-owner
-approval rows, 69 method semantic proof gap files covered, 5,673 method
+approval rows, 69 method semantic proof gap files covered, 5,681 method
 semantic proof gap lexical callables covered, 0 files with complete per-callable
 semantic proof, expected runtime audit tests: 4457, expected runtime audit pass:
 4457, and expected runtime audit fail 0. This does not close
@@ -1792,7 +1792,7 @@ coverage rows covered, 12 manifest contract rows covered, 12 fixture sample
 contract rows covered, 12 provenance artifact contract rows covered, 12 parity
 report contract rows covered, 12 verification output contract rows covered, 12
 route/surface authority rows covered, 12 route/surface metric obligations
-covered, 69 method semantic proof gap files covered, 5,673 method semantic
+covered, 69 method semantic proof gap files covered, 5,681 method semantic
 proof gap lexical callables covered, 0 files with complete per-callable
 semantic proof, 0 runtime JSON-first fixture packet approvals, 0 runtime
 JSON-first fixture artifact approvals, 0 runtime route/surface metric artifact
@@ -1812,7 +1812,7 @@ add collector rollback/unclaimed approval absence proof to the objective
 ledger without claiming implementation readiness. This current-behavior slice
 pins 12 collector rollback/unclaimed approval boundary rows, 12
 rollback/unclaimed rows covered, 12 collector verification output approval
-rows covered, 69 method semantic proof gap files covered, 5,673 method
+rows covered, 69 method semantic proof gap files covered, 5,681 method
 semantic proof gap lexical callables covered, 0 files with complete
 per-callable semantic proof, 0 runtime rollback approvals, 0 runtime
 unclaimed-surface approvals, 0 runtime collector rollback/unclaimed approvals,
@@ -2012,7 +2012,7 @@ rows covered, 0 runtime source-owner approvals, 0 runtime metric collector
 approvals, 0 runtime collector insertion points approved, 0 runtime collector
 side-effect budgets approved, 0 runtime collector fixture packets approved, 0
 committed fixture provenance files, 0 implementation-ready collector fixture
-provenance approval rows, 69 method semantic proof gap files covered, 5,673
+provenance approval rows, 69 method semantic proof gap files covered, 5,681
 lexical callables still requiring semantic proof, 0 files with complete
 per-callable semantic proof, expected runtime audit tests: 4457, expected
 runtime audit pass: 4457, and expected runtime audit fail 0.
@@ -2046,7 +2046,7 @@ without claiming implementation readiness. This current-behavior slice pins 12
 collector parity rollout approval boundary rows, 12 collector parity rollout
 rows covered, 12 parity rollout contract rows covered, 12 source-locus parity
 release verification rows covered, 12 collector diagnostic privacy approval
-rows covered, 69 method semantic proof gap files covered, 5,673 lexical
+rows covered, 69 method semantic proof gap files covered, 5,681 lexical
 callables still requiring semantic proof, 0 files with complete per-callable
 semantic proof, 0 runtime source-owner approvals, 0 runtime metric collector
 approvals, 0 runtime collector parity rollout approvals, 0 committed parity
@@ -2066,7 +2066,7 @@ route/surface metric obligations covered, 12 JSON-first fixture approval rows
 covered, 12 metric artifact schema rows covered, 12 source-owner rows covered,
 12 collector insertion rows covered, 12 collector no-work rows covered, 12
 collector side-effect rows covered, 12 collector fixture provenance rows
-covered, 69 method semantic proof gap files covered, 5,673 method semantic
+covered, 69 method semantic proof gap files covered, 5,681 method semantic
 proof gap lexical callables covered, 0 files with complete per-callable
 semantic proof, 0 runtime route/surface metric artifact approvals, 0 runtime
 metric collector approvals, 0 runtime JSON-first implementation approvals, 0

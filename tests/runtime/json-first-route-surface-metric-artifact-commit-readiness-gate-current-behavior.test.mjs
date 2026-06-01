@@ -186,9 +186,9 @@ test('JSON-first route/surface metric artifact commit readiness gate is audit-on
   assert.match(doc, /Reserved route\/surface metric artifact root: docs\/audit\/artifacts\/json-first\/route-surface-metric-artifact\//);
   assert.match(doc, /Committed route\/surface metric artifact files: 0/);
   assert.match(doc, /Method semantic proof gap files covered: 69/);
-  assert.match(doc, /Method semantic proof gap lexical callables covered: 5673/);
+  assert.match(doc, /Method semantic proof gap lexical callables covered: 5681/);
   assert.match(doc, /Files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /Lexical callables requiring semantic proof before behavior changes: 5673/);
+  assert.match(doc, /Lexical callables requiring semantic proof before behavior changes: 5681/);
   assert.match(doc, /Runtime route\/surface metric artifact approval exists: no/);
   assert.match(doc, /Runtime metric collector approval exists: no/);
   assert.match(doc, /Runtime JSON-first implementation approval exists: no/);
@@ -212,9 +212,9 @@ test('JSON-first route/surface metric artifact commit rows counts and fields sta
   assert.match(doc, /reserved future metric artifact files covered: 5/);
   assert.match(doc, /related first-optimization foundation sample paths covered: 1/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5673/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5681/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5673/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5681/);
   assert.match(doc, /metric artifact path boundary rows covered: 6/);
   assert.match(doc, /metric artifact approval boundary rows covered: 12/);
   assert.match(doc, /route\/surface metric obligations covered: 12/);
@@ -289,7 +289,7 @@ test('JSON-first route/surface metric artifact commit readiness is backed by cur
   assert.match(collectorFixture, /runtime collector fixture packets approved: 0/);
   assert.match(jsonFirstImplementation, /method semantic proof gap files covered: 69/);
   assert.match(methodGap, /files with lexical accounting: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5673/);
+  assert.match(methodGap, /repo-wide lexical callables: 5681/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(implementationReadiness, /implementation-ready first optimization rows: 0/);
   assert.match(stopGo, /Stop-now JSON-first optimization decision: NO-GO/);

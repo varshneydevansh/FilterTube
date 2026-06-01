@@ -12,16 +12,17 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 ## Result
 
 ```text
-tests: 4736
-pass: 4621
-fail: 115
-duration_ms: 72417.493667
+tests: 4737
+pass: 4661
+fail: 76
+duration_ms: 52657.735375
 ```
 
 This refresh reduces the pinned broad-suite failure count from the previous
-151 failures to 115 failures. The broad suite is still not clean enough to be
-used as a release gate, but the current baseline is narrower and more useful
-for retiring backlog slices.
+115 failures to 76 failures after refreshing stale method semantic proof gap
+counts from 5,673 to 5,681 lexical callables. The broad suite is not clean enough
+to be used as a release gate, but the current baseline is narrower and more
+useful for retiring backlog slices.
 
 ## Boundary
 
@@ -38,18 +39,22 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 93 runtime test files. A lightweight
+Current failing subtests are spread across 59 runtime test files. A lightweight
 name-based parse of `/tmp/filtertube-runtime-current.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
-| JSON/video-meta/path/reference | 37 |
-| generated/release/package/docs surfaces | 35 |
-| source-locus/optimization contracts | 23 |
-| method-proof/family blockers | 14 |
-| settings/content-control/DOM lifecycle | 11 |
+| generated/release/package/docs surfaces | 44 |
+| source-locus/optimization/index contracts | 32 |
+| JSON/video-meta/path/reference | 21 |
+| website/public-doc/source inventory | 16 |
+| settings/content-control/DOM lifecycle | 10 |
 | native/Nanah/Kids/YTM | 8 |
+
+The previous method-proof/family blocker row is now retired from the broad
+failure snapshot: the direct method semantic proof lane passes with 5,681
+current lexical callables and 0 complete per-callable semantic proof files.
 
 | Cluster | Examples | Current meaning |
 |---|---|---|
