@@ -13,13 +13,18 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4677
-fail: 60
-duration_ms: 49397.187916
+pass: 4678
+fail: 59
+duration_ms: 55514.073708
 ```
 
-This refresh reduces the pinned broad-suite failure count from 61 failures to
-60 failures after retiring the stale source-locus diagnostic privacy anchor row:
+This refresh reduces the pinned broad-suite failure count from 60 failures to
+59 failures after retiring the stale source-locus fingerprint fixture row: the
+fingerprint proof now pins current bytes, lines, and hashes for
+`js/filter_logic.js`, `build.js`, and the source-owner proof doc/test while
+source-owner approval remains at NO-GO. The previous refresh reduced the suite
+from 61 failures to 60 failures after retiring the stale source-locus diagnostic
+privacy anchor row:
 the source-locus diagnostic privacy proof now points at the current diagnostic
 logging matrix owner-family rows and current `js/filter_logic.js` console line
 anchors while keeping diagnostic privacy approval at NO-GO. The previous refresh
@@ -67,14 +72,14 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 45 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-source-locus-diagnostic-privacy-refresh.tap` gives this
+Current failing subtests are spread across 44 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-source-locus-fingerprint-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
 | generated/release/package/docs surfaces | 38 |
-| source-locus/optimization/index contracts | 10 |
+| source-locus/optimization/index contracts | 9 |
 | JSON/video-meta/path/reference | 19 |
 | website/public-doc/source inventory | 14 |
 | settings/content-control/DOM lifecycle | 8 |
@@ -119,6 +124,10 @@ The previous source-locus diagnostic privacy row is retired: the diagnostic
 privacy ownership proof now uses current diagnostic logging matrix line anchors
 and current `js/filter_logic.js` console anchor lines while diagnostic privacy
 approval remains explicitly absent.
+The previous source-locus fingerprint row is retired: the fingerprint boundary
+now pins current source bytes, line counts, and SHA-256 hashes for the changed
+filter/build/source-owner proof files while source-owner approval remains
+explicitly absent.
 
 | Cluster | Examples | Current meaning |
 |---|---|---|

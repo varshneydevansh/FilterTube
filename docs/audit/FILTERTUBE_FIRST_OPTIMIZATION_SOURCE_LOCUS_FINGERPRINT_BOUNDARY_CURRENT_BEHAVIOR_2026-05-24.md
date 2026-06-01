@@ -105,12 +105,12 @@ are calculated from the exact current file bytes.
 | `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
 | `js/settings_shared.js` | 1181 | 57535 | `9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c` |
 | `js/io_manager.js` | 2030 | 96914 | `d04bfd75d061ee405c1dfa4cab8c9d0fa6a2f072d046add33e4b6782b1f58a21` |
-| `build.js` | 686 | 24689 | `f6778ce29f1d7f520a66ab689f8c1a2999e5887ffa8c53bd5039f4976b2671b6` |
+| `build.js` | 740 | 26978 | `c8485cb2600aad89f44015cd7e49ebe4746ebcc35c91c1ff2bf29aec2f087a04` |
 | `scripts/build-extension-ui.mjs` | 50 | 1188 | `6326362ebf90f448ccdbf68945b3fb522b7b215edaf9b3e28589a4e166239cf3` |
 | `scripts/build-nanah-vendor.mjs` | 65 | 1818 | `dae8d3ef29c4cd44b0bf975090e9d53f3bb05b523355f5038930fc03b27e921c` |
 | `scripts/sync-native-runtime.mjs` | 34 | 1070 | `4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6` |
-| `tests/runtime/first-optimization-source-owner-approval-boundary-current-behavior.test.mjs` | 297 | 12983 | `ffc710941c0c9c5ec079105250f2028e2d0a51a5060c311df9aeebb55fb8e6ae` |
-| `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SOURCE_OWNER_APPROVAL_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | 254 | 16411 | `053dd412a40a7b39e2528977f88415c516555343b397f105173acf2261c8268f` |
+| `tests/runtime/first-optimization-source-owner-approval-boundary-current-behavior.test.mjs` | 297 | 12983 | `528812533c7bc82e720419efefef5fb12e690fe93e95f8d6660887c2bf4ec43e` |
+| `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SOURCE_OWNER_APPROVAL_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | 254 | 16411 | `f98e5794d6a3737b9d8f43525137b27afd4b68fa41be4f6b8fb5dbc38f1fd904` |
 
 ## Current Fingerprint Decision
 

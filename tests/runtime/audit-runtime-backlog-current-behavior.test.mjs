@@ -20,11 +20,15 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
   assert.match(doc, /tests: 4737/);
-  assert.match(doc, /pass: 4677/);
-  assert.match(doc, /fail: 60/);
-  assert.match(doc, /duration_ms: 49397\.187916/);
+  assert.match(doc, /pass: 4678/);
+  assert.match(doc, /fail: 59/);
+  assert.match(doc, /duration_ms: 55514\.073708/);
+  assert.match(doc, /60 failures to\s+59 failures/);
+  assert.match(doc, /source-locus fingerprint fixture row/);
+  assert.match(doc, /current bytes, lines, and hashes/);
+  assert.match(doc, /source-owner approval remains at NO-GO/);
   assert.match(doc, /61 failures to\s+60 failures/);
-  assert.match(doc, /source-locus diagnostic privacy anchor row/);
+  assert.match(doc, /source-locus diagnostic\s+privacy anchor row/);
   assert.match(doc, /current diagnostic\s+logging matrix owner-family rows/);
   assert.match(doc, /current `js\/filter_logic\.js` console line\s+anchors/);
   assert.match(doc, /diagnostic privacy approval at NO-GO/);
@@ -141,15 +145,15 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   const doc = read(backlogPath);
   const expectedRows = [
     ['generated/release/package/docs surfaces', '38'],
-    ['source-locus/optimization/index contracts', '10'],
+    ['source-locus/optimization/index contracts', '9'],
     ['JSON/video-meta/path/reference', '19'],
     ['website/public-doc/source inventory', '14'],
     ['settings/content-control/DOM lifecycle', '8'],
     ['native/Nanah/Kids/YTM', '8']
   ];
 
-  assert.match(doc, /Current failing subtests are spread across 45 runtime test files/);
-  assert.match(doc, /filtertube-runtime-current-after-source-locus-diagnostic-privacy-refresh\.tap/);
+  assert.match(doc, /Current failing subtests are spread across 44 runtime test files/);
+  assert.match(doc, /filtertube-runtime-current-after-source-locus-fingerprint-refresh\.tap/);
   assert.match(doc, /non-exclusive family snapshot/);
   assert.match(doc, /previous method-proof\/family blocker row is now retired/);
   assert.match(doc, /direct method semantic proof lane passes with 5,681\s+current lexical callables/);
@@ -177,6 +181,9 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   assert.match(doc, /previous source-locus diagnostic privacy row is retired/);
   assert.match(doc, /diagnostic\s+privacy ownership proof now uses current diagnostic logging matrix line anchors/);
   assert.match(doc, /current `js\/filter_logic\.js` console anchor lines/);
+  assert.match(doc, /previous source-locus fingerprint row is retired/);
+  assert.match(doc, /fingerprint boundary\s+now pins current source bytes, line counts, and SHA-256 hashes/);
+  assert.match(doc, /source-owner approval remains\s+explicitly absent/);
 
   for (const [family, count] of expectedRows) {
     assert.match(doc, new RegExp(`\\| ${family.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\| ${count} \\|`));

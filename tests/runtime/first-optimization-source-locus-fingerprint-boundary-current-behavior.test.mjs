@@ -70,9 +70,9 @@ const expectedFingerprints = {
     hash: 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'
   },
   'js/filter_logic.js': {
-    lines: 3498,
-    bytes: 165151,
-    hash: '4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641'
+    lines: 3652,
+    bytes: 172174,
+    hash: '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'
   },
   'js/content_bridge.js': {
     lines: 13571,
@@ -115,9 +115,9 @@ const expectedFingerprints = {
     hash: 'd04bfd75d061ee405c1dfa4cab8c9d0fa6a2f072d046add33e4b6782b1f58a21'
   },
   'build.js': {
-    lines: 686,
-    bytes: 24689,
-    hash: 'f6778ce29f1d7f520a66ab689f8c1a2999e5887ffa8c53bd5039f4976b2671b6'
+    lines: 740,
+    bytes: 26978,
+    hash: 'c8485cb2600aad89f44015cd7e49ebe4746ebcc35c91c1ff2bf29aec2f087a04'
   },
   'scripts/build-extension-ui.mjs': {
     lines: 50,
@@ -137,12 +137,12 @@ const expectedFingerprints = {
   'tests/runtime/first-optimization-source-owner-approval-boundary-current-behavior.test.mjs': {
     lines: 297,
     bytes: 12983,
-    hash: 'ffc710941c0c9c5ec079105250f2028e2d0a51a5060c311df9aeebb55fb8e6ae'
+    hash: '528812533c7bc82e720419efefef5fb12e690fe93e95f8d6660887c2bf4ec43e'
   },
   'docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SOURCE_OWNER_APPROVAL_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md': {
     lines: 254,
     bytes: 16411,
-    hash: '053dd412a40a7b39e2528977f88415c516555343b397f105173acf2261c8268f'
+    hash: 'f98e5794d6a3737b9d8f43525137b27afd4b68fa41be4f6b8fb5dbc38f1fd904'
   }
 };
 
