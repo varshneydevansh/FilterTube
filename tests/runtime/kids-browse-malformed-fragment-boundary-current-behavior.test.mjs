@@ -163,9 +163,9 @@ test('Kids browse malformed fragment audit is audit-only and source pinned', () 
   assert.equal(lineCount(raw), 8630);
   assert.equal(Buffer.byteLength(raw), 446776);
   assert.equal(sha256('ytkids_browse?alt=json.json'), 'fdadb983bbb5fa2e19b81c29bde860a0019c4a171bee00b36e42ae25adc3f240');
-  assert.equal(lineCount(filterLogic), 3498);
-  assert.equal(Buffer.byteLength(filterLogic), 165151);
-  assert.equal(sha256('js/filter_logic.js'), '4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641');
+  assert.equal(lineCount(filterLogic), 3652);
+  assert.equal(Buffer.byteLength(filterLogic), 172174);
+  assert.equal(sha256('js/filter_logic.js'), '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5');
   assert.equal(lineCount(fixture), 235);
   assert.equal(Buffer.byteLength(fixture), 9959);
   assert.equal(sha256(fixturePath), '40f84c7de6a385a111bf55aa23179e170f0e1a274cc96ae4cc092203ba8f954f');
@@ -205,7 +205,7 @@ test('Kids browse malformed raw container and fragment counts stay pinned', () =
   assert.equal(countLiteral(filterLogic, 'kidsLibraryRenderer'), 0);
   assert.equal(countLiteral(filterLogic, 'compactVideoRenderer'), 9);
   assert.equal(countLiteral(filterLogic, 'kidsVideoOwnerExtension'), 2);
-  assert.equal(countLiteral(filterLogic, 'videoChannelMap'), 8);
+  assert.equal(countLiteral(filterLogic, 'videoChannelMap'), 10);
 
   for (const phrase of [
     'Kids browse malformed fragment source/fixture files: 3',

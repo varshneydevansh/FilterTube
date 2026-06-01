@@ -20,9 +20,13 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
   assert.match(doc, /tests: 4737/);
-  assert.match(doc, /pass: 4701/);
-  assert.match(doc, /fail: 36/);
-  assert.match(doc, /duration_ms: 40508\.018083/);
+  assert.match(doc, /pass: 4703/);
+  assert.match(doc, /fail: 34/);
+  assert.match(doc, /duration_ms: 40944\.980916/);
+  assert.match(doc, /36\s+failures\s+to\s+34\s+failures/);
+  assert.match(doc, /Kids browse malformed-fragment source\s+fingerprint and token-count rows/);
+  assert.match(doc, /Kids malformed browse proof now expects\s+the current `js\/filter_logic\.js` line count, byte count, hash, and\s+`videoChannelMap` token count/);
+  assert.match(doc, /Kids owner\s+rail policy, malformed-container authority, fragment extraction policy, native\s+parity, metric artifacts, and first-class Kids browse authority explicitly\s+absent/);
   assert.match(doc, /37\s+failures\s+to\s+36\s+failures/);
   assert.match(doc, /JSON path authority and audit-completion\s+source pin rows/);
   assert.match(doc, /JSON path authority proof now expects current\s+`js\/filter_logic\.js` owner-flow line ranges/);
@@ -233,16 +237,16 @@ test('audit runtime backlog names the broad failure clusters that still require 
 test('audit runtime backlog pins the current broad-suite failure family snapshot', () => {
   const doc = read(backlogPath);
   const expectedRows = [
-    ['generated/release/package/docs surfaces', '34'],
-    ['source-locus/optimization/index contracts', '4'],
-    ['JSON/video-meta/path/reference', '4'],
-    ['website/public-doc/source inventory', '14'],
+    ['generated/release/package/docs surfaces', '22'],
+    ['source-locus/optimization/index contracts', '1'],
+    ['JSON/video-meta/path/reference', '2'],
+    ['website/public-doc/source inventory', '10'],
     ['settings/content-control/DOM lifecycle', '8'],
-    ['native/Nanah/Kids/YTM', '8']
+    ['native/Nanah/Kids/YTM', '6']
   ];
 
-  assert.match(doc, /Current failing subtests are spread across 25 runtime test files/);
-  assert.match(doc, /filtertube-runtime-current-after-json-path-authority-and-completion-refresh\.tap/);
+  assert.match(doc, /Current failing subtests are spread across 24 runtime test files/);
+  assert.match(doc, /filtertube-runtime-current-after-kids-browse-malformed-refresh\.tap/);
   assert.match(doc, /non-exclusive family snapshot/);
   assert.match(doc, /previous method-proof\/family blocker row is now retired/);
   assert.match(doc, /direct method semantic proof lane passes with 5,681\s+current lexical callables/);
@@ -330,6 +334,10 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   assert.match(doc, /previous JSON path authority and audit-completion rows are retired/);
   assert.match(doc, /JSON\s+path authority owner-flow proof now matches the current `js\/filter_logic\.js`\s+line ranges/);
   assert.match(doc, /audit-completion register now asserts those same source pins while keeping\s+JSON-first promotion, generated path manifests, unsupported renderer policy,\s+field-effect authority, and JSON-vs-DOM ownership at `NO-GO`/);
+  assert.match(doc, /previous Kids browse malformed-fragment rows are retired/);
+  assert.match(doc, /Kids malformed\s+browse proof now matches the current `js\/filter_logic\.js` fingerprint and\s+`videoChannelMap` token count/);
+  assert.match(doc, /compact video blocklist\/whitelist behavior,\s+owner rail visibility, malformed direct-JSON capture handling, and map side\s+effects remain unchanged/);
+  assert.match(doc, /Kids browse raw-container contracts, fragment\s+extraction policy, native WebView parity, metric artifacts, and first-class Kids\s+browse malformed-fragment authority remain explicitly absent/);
   assert.match(doc, /previous JSON-first metric artifact gate rows are retired/);
   assert.match(doc, /metric proof\s+now pins current performance-claim and no-work crosswalk hashes/);
   assert.match(doc, /current\s+`js\/filter_logic\.js` `processData\(\)` anchor/);

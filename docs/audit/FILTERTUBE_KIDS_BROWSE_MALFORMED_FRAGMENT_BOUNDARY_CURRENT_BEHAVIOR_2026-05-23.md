@@ -53,7 +53,7 @@ filter_logic kidsSlimOwnerRenderer tokens: 0
 filter_logic kidsLibraryRenderer tokens: 0
 filter_logic compactVideoRenderer tokens: 9
 filter_logic kidsVideoOwnerExtension tokens: 2
-filter_logic videoChannelMap tokens: 8
+filter_logic videoChannelMap tokens: 10
 runtime Kids browse malformed fragment fixtures: 7
 runtime behavior changed: no
 not completion proof for Kids browse raw-container authority

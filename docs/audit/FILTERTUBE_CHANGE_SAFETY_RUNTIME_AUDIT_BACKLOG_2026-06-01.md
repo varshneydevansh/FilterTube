@@ -13,13 +13,20 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4701
-fail: 36
-duration_ms: 40508.018083
+pass: 4703
+fail: 34
+duration_ms: 40944.980916
 ```
 
-This refresh reduces the pinned broad-suite failure count from 37 failures to
-36 failures after retiring the stale JSON path authority and audit-completion
+This refresh reduces the pinned broad-suite failure count from 36 failures to
+34 failures after retiring the stale Kids browse malformed-fragment source
+fingerprint and token-count rows: the Kids malformed browse proof now expects
+the current `js/filter_logic.js` line count, byte count, hash, and
+`videoChannelMap` token count already visible in source while keeping Kids owner
+rail policy, malformed-container authority, fragment extraction policy, native
+parity, metric artifacts, and first-class Kids browse authority explicitly
+absent. The previous refresh reduced the suite from 37 failures to 36 failures
+after retiring the stale JSON path authority and audit-completion
 source pin rows: the JSON path authority proof now expects current
 `js/filter_logic.js` owner-flow line ranges, and the audit-completion register
 now asserts those same current ranges while keeping JSON-first promotion at
@@ -176,18 +183,18 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 25 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-json-path-authority-and-completion-refresh.tap` gives this
+Current failing subtests are spread across 24 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-kids-browse-malformed-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
-| generated/release/package/docs surfaces | 34 |
-| source-locus/optimization/index contracts | 4 |
-| JSON/video-meta/path/reference | 4 |
-| website/public-doc/source inventory | 14 |
+| generated/release/package/docs surfaces | 22 |
+| source-locus/optimization/index contracts | 1 |
+| JSON/video-meta/path/reference | 2 |
+| website/public-doc/source inventory | 10 |
 | settings/content-control/DOM lifecycle | 8 |
-| native/Nanah/Kids/YTM | 8 |
+| native/Nanah/Kids/YTM | 6 |
 
 The previous method-proof/family blocker row is now retired from the broad
 failure snapshot: the direct method semantic proof lane passes with 5,681
@@ -307,6 +314,13 @@ content/category effects, learned maps, collaboration identity, and `processData
 the audit-completion register now asserts those same source pins while keeping
 JSON-first promotion, generated path manifests, unsupported renderer policy,
 field-effect authority, and JSON-vs-DOM ownership at `NO-GO`.
+The previous Kids browse malformed-fragment rows are retired: the Kids malformed
+browse proof now matches the current `js/filter_logic.js` fingerprint and
+`videoChannelMap` token count while compact video blocklist/whitelist behavior,
+owner rail visibility, malformed direct-JSON capture handling, and map side
+effects remain unchanged. Kids browse raw-container contracts, fragment
+extraction policy, native WebView parity, metric artifacts, and first-class Kids
+browse malformed-fragment authority remain explicitly absent.
 The previous JSON-first metric artifact gate rows are retired: the metric proof
 now pins current performance-claim and no-work crosswalk hashes plus the current
 `js/filter_logic.js` `processData()` anchor while metric artifact authority
