@@ -13,14 +13,19 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4700
-fail: 37
-duration_ms: 39322.8045
+pass: 4701
+fail: 36
+duration_ms: 40508.018083
 ```
 
-This refresh reduces the pinned broad-suite failure count from 38 failures to
-37 failures after retiring the stale JSON-first video-meta revision boundary
-source pin row: the revision-boundary proof test now expects the current
+This refresh reduces the pinned broad-suite failure count from 37 failures to
+36 failures after retiring the stale JSON path authority and audit-completion
+source pin rows: the JSON path authority proof now expects current
+`js/filter_logic.js` owner-flow line ranges, and the audit-completion register
+now asserts those same current ranges while keeping JSON-first promotion at
+NO-GO. The previous refresh reduced the suite from 38 failures to 37 failures
+after retiring the stale JSON-first video-meta revision boundary source pin row:
+the revision-boundary proof test now expects the current
 `js/filter_logic.js` line count, byte count, and hash already recorded in the
 audit doc while content persistence, filter-logic queueing, background compiled
 cache patching, and unpartitioned metadata-map fixtures remain unchanged and
@@ -171,15 +176,15 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 26 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-video-meta-revision-refresh.tap` gives this
+Current failing subtests are spread across 25 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-json-path-authority-and-completion-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
 | generated/release/package/docs surfaces | 34 |
 | source-locus/optimization/index contracts | 4 |
-| JSON/video-meta/path/reference | 5 |
+| JSON/video-meta/path/reference | 4 |
 | website/public-doc/source inventory | 14 |
 | settings/content-control/DOM lifecycle | 8 |
 | native/Nanah/Kids/YTM | 8 |
@@ -295,6 +300,13 @@ fingerprint already present in the audit doc while content persistence,
 filter-logic queueing, background compiled cache patching, and unpartitioned
 metadata-map fixtures remain unchanged and first-class video-meta revision
 authority remains explicitly absent.
+The previous JSON path authority and audit-completion rows are retired: the JSON
+path authority owner-flow proof now matches the current `js/filter_logic.js`
+line ranges for path syntax, direct rules, candidate extraction, decision effects,
+content/category effects, learned maps, collaboration identity, and `processData`;
+the audit-completion register now asserts those same source pins while keeping
+JSON-first promotion, generated path manifests, unsupported renderer policy,
+field-effect authority, and JSON-vs-DOM ownership at `NO-GO`.
 The previous JSON-first metric artifact gate rows are retired: the metric proof
 now pins current performance-claim and no-work crosswalk hashes plus the current
 `js/filter_logic.js` `processData()` anchor while metric artifact authority

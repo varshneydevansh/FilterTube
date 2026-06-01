@@ -20,9 +20,13 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
   assert.match(doc, /tests: 4737/);
-  assert.match(doc, /pass: 4700/);
-  assert.match(doc, /fail: 37/);
-  assert.match(doc, /duration_ms: 39322\.8045/);
+  assert.match(doc, /pass: 4701/);
+  assert.match(doc, /fail: 36/);
+  assert.match(doc, /duration_ms: 40508\.018083/);
+  assert.match(doc, /37\s+failures\s+to\s+36\s+failures/);
+  assert.match(doc, /JSON path authority and audit-completion\s+source pin rows/);
+  assert.match(doc, /JSON path authority proof now expects current\s+`js\/filter_logic\.js` owner-flow line ranges/);
+  assert.match(doc, /audit-completion register\s+now asserts those same current ranges while keeping JSON-first promotion at\s+NO-GO/);
   assert.match(doc, /38\s+failures\s+to\s+37\s+failures/);
   assert.match(doc, /JSON-first video-meta revision boundary\s+source pin row/);
   assert.match(doc, /revision-boundary proof test now expects the current\s+`js\/filter_logic\.js` line count, byte count, and hash/);
@@ -231,14 +235,14 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   const expectedRows = [
     ['generated/release/package/docs surfaces', '34'],
     ['source-locus/optimization/index contracts', '4'],
-    ['JSON/video-meta/path/reference', '5'],
+    ['JSON/video-meta/path/reference', '4'],
     ['website/public-doc/source inventory', '14'],
     ['settings/content-control/DOM lifecycle', '8'],
     ['native/Nanah/Kids/YTM', '8']
   ];
 
-  assert.match(doc, /Current failing subtests are spread across 26 runtime test files/);
-  assert.match(doc, /filtertube-runtime-current-after-video-meta-revision-refresh\.tap/);
+  assert.match(doc, /Current failing subtests are spread across 25 runtime test files/);
+  assert.match(doc, /filtertube-runtime-current-after-json-path-authority-and-completion-refresh\.tap/);
   assert.match(doc, /non-exclusive family snapshot/);
   assert.match(doc, /previous method-proof\/family blocker row is now retired/);
   assert.match(doc, /direct method semantic proof lane passes with 5,681\s+current lexical callables/);
@@ -323,6 +327,9 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   assert.match(doc, /revision-boundary proof test now matches the current `js\/filter_logic\.js`\s+fingerprint/);
   assert.match(doc, /content persistence,\s+filter-logic queueing, background compiled cache patching, and unpartitioned\s+metadata-map fixtures remain unchanged/);
   assert.match(doc, /first-class video-meta revision\s+authority remains explicitly absent/);
+  assert.match(doc, /previous JSON path authority and audit-completion rows are retired/);
+  assert.match(doc, /JSON\s+path authority owner-flow proof now matches the current `js\/filter_logic\.js`\s+line ranges/);
+  assert.match(doc, /audit-completion register now asserts those same source pins while keeping\s+JSON-first promotion, generated path manifests, unsupported renderer policy,\s+field-effect authority, and JSON-vs-DOM ownership at `NO-GO`/);
   assert.match(doc, /previous JSON-first metric artifact gate rows are retired/);
   assert.match(doc, /metric proof\s+now pins current performance-claim and no-work crosswalk hashes/);
   assert.match(doc, /current\s+`js\/filter_logic\.js` `processData\(\)` anchor/);

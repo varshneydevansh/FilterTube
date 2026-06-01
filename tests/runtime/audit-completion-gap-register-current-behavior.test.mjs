@@ -1440,11 +1440,11 @@ function assertReleaseHotPathProofStackAddendum(source) {
   assert.match(jsonPathAuthorityDoc, /JSON-first promotion approval from path owner flow: NO-GO/);
   assert.match(jsonPathAuthorityDoc, /runtime behavior changed by this addendum: no/);
   assert.match(jsonPathAuthorityDoc, /flowchart TD/);
-  assert.match(jsonPathAuthorityDoc, /\| `json_path_syntax_owner` \| `js\/filter_logic\.js:154-168`; `js\/filter_logic\.js:212-224` \|/);
-  assert.match(jsonPathAuthorityDoc, /\| `json_decision_effect_owner` \| `js\/filter_logic\.js:1825-2112` \|/);
-  assert.match(jsonPathAuthorityDoc, /\| `json_learned_map_owner` \| `js\/filter_logic\.js:49-79`; `js\/filter_logic\.js:82-140`; `js\/filter_logic\.js:1247-1274`; `js\/filter_logic\.js:1281-1315` \|/);
-  assert.match(jsonPathAuthorityDoc, /\| `json_collaboration_identity_owner` \| `js\/filter_logic\.js:2896-3148` \|/);
-  assert.match(jsonPathAuthorityDoc, /\| `json_process_export_owner` \| `js\/filter_logic\.js:3434-3479` \|/);
+  assert.match(jsonPathAuthorityDoc, /\| `json_path_syntax_owner` \| `js\/filter_logic\.js:163-177`; `js\/filter_logic\.js:221-233` \|/);
+  assert.match(jsonPathAuthorityDoc, /\| `json_decision_effect_owner` \| `js\/filter_logic\.js:1957-2249` \|/);
+  assert.match(jsonPathAuthorityDoc, /\| `json_learned_map_owner` \| `js\/filter_logic\.js:58-88`; `js\/filter_logic\.js:91-149`; `js\/filter_logic\.js:1256-1283`; `js\/filter_logic\.js:1290-1324` \|/);
+  assert.match(jsonPathAuthorityDoc, /\| `json_collaboration_identity_owner` \| `js\/filter_logic\.js:3033-3285` \|/);
+  assert.match(jsonPathAuthorityDoc, /\| `json_process_export_owner` \| `js\/filter_logic\.js:3588-3633` \|/);
   assert.match(source, /2026-05-30 JSON path convergence continuation/);
   assert.ok(source.includes('docs/audit/FILTERTUBE_JSON_PATH_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md'));
   assert.ok(source.includes('docs/audit/FILTERTUBE_IMPLEMENTATION_READINESS_GATE_2026-05-18.md'));
