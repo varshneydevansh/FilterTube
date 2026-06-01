@@ -60,6 +60,7 @@ test('release and smoke lanes keep the live YouTube SPA smoke boundary visible',
   assert.match(matrix, /FILTERTUBE_AUTOMATED_PROOF_COMMAND="npm run test:changed"/);
   assert.match(matrix, /FILTERTUBE_AUTOMATED_PROOF_STATUS="passed"/);
   assert.match(matrix, /FILTERTUBE_AUTOMATED_PROOF_SUMMARY="test:changed passed for the classified lanes"/);
+  assert.match(matrix, /FILTERTUBE_AUTOMATED_PROOF_LANES="test:json,test:performance"/);
 });
 
 test('manual smoke handoff covers the release-critical visible behavior set', () => {
@@ -98,6 +99,8 @@ test('live smoke boundary remains explicit that current release smoke is missing
   assert.match(doc, /FILTERTUBE_AUTOMATED_PROOF_COMMAND/);
   assert.match(doc, /FILTERTUBE_AUTOMATED_PROOF_STATUS=passed/);
   assert.match(doc, /FILTERTUBE_AUTOMATED_PROOF_SUMMARY/);
+  assert.match(doc, /FILTERTUBE_AUTOMATED_PROOF_LANES/);
+  assert.match(doc, /does not cover every required lane/);
   assert.match(doc, /template accepted as release proof now: NO-GO/);
   assert.match(doc, /live smoke artifact verifier status: defined/);
   assert.match(doc, /A dated artifact is not release-ready until this verifier returns zero errors/);
@@ -114,7 +117,7 @@ test('live smoke template is non-executed and cannot satisfy release readiness',
   const template = readJson(templatePath);
 
   assert.equal(template.artifactType, 'filtertube-release-live-youtube-spa-smoke');
-  assert.equal(template.schemaVersion, 2);
+  assert.equal(template.schemaVersion, 3);
   assert.equal(template.status, 'template-not-executed');
   assert.equal(template.smokeSliceReadiness, 'NO-GO');
   assert.equal(template.releaseReadiness, 'NO-GO');
@@ -132,6 +135,7 @@ test('live smoke template is non-executed and cannot satisfy release readiness',
   assert.equal(template.completionRules.consoleErrorsMustBeClassified, true);
   assert.equal(template.completionRules.installedByteParityMustPass, true);
   assert.equal(template.completionRules.automatedLaneEvidenceMustPass, true);
+  assert.equal(template.completionRules.automatedLaneEvidenceMustCoverRequiredLanes, true);
   assert.equal(template.completionRules.releaseReadinessWhenTemplate, 'NO-GO');
   assert.equal(template.completionRules.releaseReadinessWhenByteParityMissing, 'NO-GO');
   assert.equal(template.completionRules.releaseReadinessWhenAutomatedLaneEvidenceMissing, 'NO-GO');

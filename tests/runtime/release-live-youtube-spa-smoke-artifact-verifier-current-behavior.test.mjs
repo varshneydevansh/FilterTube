@@ -52,7 +52,7 @@ function validArtifact() {
   const generatedAt = '2026-06-01T00:00:00.000Z';
   return {
     artifactType: 'filtertube-release-live-youtube-spa-smoke',
-    schemaVersion: 2,
+    schemaVersion: 3,
     status: 'executed',
     smokeSliceReadiness: 'GO-FOR-THIS-SMOKE-SLICE',
     releaseReadiness: 'GO-FOR-RELEASE-SMOKE',
@@ -61,11 +61,12 @@ function validArtifact() {
     boundaryDoc: LIVE_SMOKE_BOUNDARY_DOC,
     changeContext: {
       logicalChangeType: 'runtime hot-path change',
-      requiredLanes: ['json', 'dom', 'performance', 'whitelist', 'blocking'],
+      requiredLanes: ['test:json', 'test:dom', 'test:performance', 'test:whitelist', 'test:blocking'],
       automatedLaneEvidence: [{
         command: 'npm run test:changed',
         status: 'passed',
-        summary: 'release and smoke focused lanes passed before live smoke'
+        summary: 'json, dom, performance, whitelist, and blocking lanes passed before live smoke',
+        lanes: ['test:json', 'test:dom', 'test:performance', 'test:whitelist', 'test:blocking']
       }]
     },
     browserNameVersion: 'Chrome/136.0.0.0',
@@ -201,7 +202,8 @@ test('verifier rejects missing or failed automated lane evidence', () => {
   failed.changeContext.automatedLaneEvidence = [{
     command: 'npm run test:changed',
     status: 'failed',
-    summary: 'release lane failed'
+    summary: 'release lane failed',
+    lanes: ['test:json']
   }];
 
   const missingErrors = validateLiveSmokeArtifact(missing);
@@ -210,6 +212,31 @@ test('verifier rejects missing or failed automated lane evidence', () => {
   assert.ok(missingErrors.includes('changeContext.requiredLanes must list required test lanes'));
   assert.ok(missingErrors.includes('changeContext.automatedLaneEvidence must contain at least one passed lane command'));
   assert.ok(failedErrors.includes('changeContext.automatedLaneEvidence[0].status must be passed'));
+});
+
+test('verifier rejects unknown required lanes and uncovered proof lanes', () => {
+  const unknown = validArtifact();
+  unknown.changeContext.requiredLanes = ['json'];
+
+  const missingCoverage = validArtifact();
+  missingCoverage.changeContext.requiredLanes = ['test:json', 'test:performance'];
+  missingCoverage.changeContext.automatedLaneEvidence = [{
+    command: 'npm run test:json',
+    status: 'passed',
+    summary: 'json lane passed only',
+    lanes: ['test:json']
+  }];
+
+  const missingLaneList = validArtifact();
+  missingLaneList.changeContext.automatedLaneEvidence[0].lanes = [];
+
+  const unknownErrors = validateLiveSmokeArtifact(unknown);
+  const coverageErrors = validateLiveSmokeArtifact(missingCoverage);
+  const missingLaneListErrors = validateLiveSmokeArtifact(missingLaneList);
+
+  assert.ok(unknownErrors.includes('changeContext.requiredLanes[0] must be a known test lane'));
+  assert.ok(coverageErrors.includes('changeContext.requiredLanes must be covered by automatedLaneEvidence.lanes: test:performance'));
+  assert.ok(missingLaneListErrors.includes('changeContext.automatedLaneEvidence[0].lanes must list covered test lanes'));
 });
 
 test('verifier CLI exits nonzero for template and zero for complete artifact', () => {

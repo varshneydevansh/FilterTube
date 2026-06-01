@@ -281,6 +281,7 @@ test('release live YouTube SPA smoke remains a separate missing release gate', (
     "releaseReadiness: smokeSliceReadiness === 'GO-FOR-THIS-SMOKE-SLICE' && installedByteParity.verdict === 'GO' && changeContextReady ? 'GO-FOR-RELEASE-SMOKE' : 'NO-GO'",
     'installedByteParityMustPass: true',
     'automatedLaneEvidenceMustPass: true',
+    'automatedLaneEvidenceMustCoverRequiredLanes: true',
     "releaseReadinessWhenByteParityMissing: 'NO-GO'",
     "releaseReadinessWhenAutomatedLaneEvidenceMissing: 'NO-GO'",
     'observedStallOrNoStall: rows.map',
@@ -294,7 +295,7 @@ test('release live YouTube SPA smoke remains a separate missing release gate', (
   }
 
   assert.equal(template.artifactType, 'filtertube-release-live-youtube-spa-smoke');
-  assert.equal(template.schemaVersion, 2);
+  assert.equal(template.schemaVersion, 3);
   assert.equal(template.status, 'template-not-executed');
   assert.equal(template.smokeSliceReadiness, 'NO-GO');
   assert.equal(template.releaseReadiness, 'NO-GO');
@@ -323,6 +324,7 @@ test('release live YouTube SPA smoke remains a separate missing release gate', (
   assert.equal(template.completionRules.consoleErrorsMustBeClassified, true);
   assert.equal(template.completionRules.installedByteParityMustPass, true);
   assert.equal(template.completionRules.automatedLaneEvidenceMustPass, true);
+  assert.equal(template.completionRules.automatedLaneEvidenceMustCoverRequiredLanes, true);
   assert.equal(template.completionRules.releaseReadinessWhenTemplate, 'NO-GO');
   assert.equal(template.completionRules.releaseReadinessWhenByteParityMissing, 'NO-GO');
   assert.equal(template.completionRules.releaseReadinessWhenAutomatedLaneEvidenceMissing, 'NO-GO');

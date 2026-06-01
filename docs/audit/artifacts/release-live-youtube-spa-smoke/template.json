@@ -1,6 +1,6 @@
 {
   "artifactType": "filtertube-release-live-youtube-spa-smoke",
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "status": "template-not-executed",
   "smokeSliceReadiness": "NO-GO",
   "releaseReadiness": "NO-GO",
@@ -108,6 +108,7 @@
     "consoleErrorsMustBeClassified": true,
     "installedByteParityMustPass": true,
     "automatedLaneEvidenceMustPass": true,
+    "automatedLaneEvidenceMustCoverRequiredLanes": true,
     "releaseReadinessWhenTemplate": "NO-GO",
     "releaseReadinessWhenByteParityMissing": "NO-GO",
     "releaseReadinessWhenAutomatedLaneEvidenceMissing": "NO-GO",

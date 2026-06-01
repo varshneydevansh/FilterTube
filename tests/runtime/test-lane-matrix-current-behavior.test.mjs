@@ -133,6 +133,7 @@ test('test lane matrix defines every required lane and npm script', () => {
   assert.match(matrix, /FILTERTUBE_AUTOMATED_PROOF_COMMAND="npm run test:changed"/);
   assert.match(matrix, /FILTERTUBE_AUTOMATED_PROOF_STATUS="passed"/);
   assert.match(matrix, /FILTERTUBE_AUTOMATED_PROOF_SUMMARY="test:changed passed for the classified lanes"/);
+  assert.match(matrix, /FILTERTUBE_AUTOMATED_PROOF_LANES="test:json,test:performance"/);
   assert.match(
     matrix,
     /npm run smoke:youtube:verify -- docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/<artifact>\.json/
@@ -708,7 +709,7 @@ test('classifier output surfaces manual YouTube smoke for user-facing runtime an
   );
   assert.match(runtime.stdout, /template: docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/template\.json/);
   assert.match(runtime.stdout, /verifier: node docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/verify-live-smoke-artifact\.mjs docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/<artifact>\.json/);
-  assert.match(runtime.stdout, /changeContext env: FILTERTUBE_LOGICAL_CHANGE_TYPE, FILTERTUBE_REQUIRED_LANES, FILTERTUBE_AUTOMATED_PROOF_COMMAND, FILTERTUBE_AUTOMATED_PROOF_STATUS=passed, FILTERTUBE_AUTOMATED_PROOF_SUMMARY/);
+  assert.match(runtime.stdout, /changeContext env: FILTERTUBE_LOGICAL_CHANGE_TYPE, FILTERTUBE_REQUIRED_LANES, FILTERTUBE_AUTOMATED_PROOF_COMMAND, FILTERTUBE_AUTOMATED_PROOF_STATUS=passed, FILTERTUBE_AUTOMATED_PROOF_SUMMARY, FILTERTUBE_AUTOMATED_PROOF_LANES/);
   assert.match(runtime.stdout, /FT-LIVE-SPA-00-home-to-search/);
   assert.match(runtime.stdout, /FT-LIVE-SPA-05-cache-repeat-navigation/);
   assert.match(runtime.stdout, /Audit proof update expected before commit:/);

@@ -2617,7 +2617,7 @@ test('live smoke template is still non-executed and no result artifact is presen
   const resultJsonFiles = artifactFiles.filter(file => file.endsWith('.json') && file !== liveSmokeTemplatePath);
 
   assert.equal(template.artifactType, 'filtertube-release-live-youtube-spa-smoke');
-  assert.equal(template.schemaVersion, 2);
+  assert.equal(template.schemaVersion, 3);
   assert.equal(template.status, 'template-not-executed');
   assert.equal(template.smokeSliceReadiness, 'NO-GO');
   assert.equal(template.releaseReadiness, 'NO-GO');
@@ -2633,6 +2633,7 @@ test('live smoke template is still non-executed and no result artifact is presen
   }
   assert.equal(template.completionRules.installedByteParityMustPass, true);
   assert.equal(template.completionRules.automatedLaneEvidenceMustPass, true);
+  assert.equal(template.completionRules.automatedLaneEvidenceMustCoverRequiredLanes, true);
   assert.equal(template.completionRules.releaseReadinessWhenByteParityMissing, 'NO-GO');
   assert.equal(template.completionRules.releaseReadinessWhenAutomatedLaneEvidenceMissing, 'NO-GO');
   assert.deepEqual(template.requiredRows.map(row => row.id), liveSmokeRows);
@@ -2644,7 +2645,7 @@ test('live smoke template is still non-executed and no result artifact is presen
     assert.ok(runner.includes(row), `runner missing ${row}`);
   }
   assert.match(runner, /artifactType: 'filtertube-release-live-youtube-spa-smoke'/);
-  assert.match(runner, /schemaVersion: 2/);
+  assert.match(runner, /schemaVersion: 3/);
   assert.match(runner, /function buildInstalledByteParity/);
   assert.match(runner, /function sourceHashSnapshot/);
   assert.match(runner, /packet_id: 'FT-WLCACHE-SPA-PACKET-01-installed-profile-bytes'/);
@@ -2656,6 +2657,7 @@ test('live smoke template is still non-executed and no result artifact is presen
   assert.match(runner, /releaseReadiness: smokeSliceReadiness === 'GO-FOR-THIS-SMOKE-SLICE' && installedByteParity\.verdict === 'GO' && changeContextReady \? 'GO-FOR-RELEASE-SMOKE' : 'NO-GO'/);
   assert.match(runner, /installedByteParityMustPass: true/);
   assert.match(runner, /automatedLaneEvidenceMustPass: true/);
+  assert.match(runner, /automatedLaneEvidenceMustCoverRequiredLanes: true/);
   assert.match(runner, /releaseReadinessWhenByteParityMissing: 'NO-GO'/);
   assert.match(runner, /releaseReadinessWhenAutomatedLaneEvidenceMissing: 'NO-GO'/);
   assert.match(doc, /The current directory only contains `template\.json`,\s+`run-live-smoke\.mjs`, and\s+`verify-live-smoke-artifact\.mjs`; that is contract\/tooling, not execution\s+proof/);

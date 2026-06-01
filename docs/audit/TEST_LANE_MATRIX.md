@@ -234,15 +234,17 @@ FILTERTUBE_REQUIRED_LANES="test:json,test:performance" \
 FILTERTUBE_AUTOMATED_PROOF_COMMAND="npm run test:changed" \
 FILTERTUBE_AUTOMATED_PROOF_STATUS="passed" \
 FILTERTUBE_AUTOMATED_PROOF_SUMMARY="test:changed passed for the classified lanes" \
+FILTERTUBE_AUTOMATED_PROOF_LANES="test:json,test:performance" \
 npm run smoke:youtube
 npm run smoke:youtube:verify -- docs/audit/artifacts/release-live-youtube-spa-smoke/<artifact>.json
 node docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs docs/audit/artifacts/release-live-youtube-spa-smoke/<artifact>.json
 ```
 
 The verifier requires every live SPA row to pass, a clean console summary, all
-recording fields, `changeContext` with passed automated lane evidence, and
-`installedByteParity.verdict=GO`. The template and any artifact with missing
-byte parity or missing lane evidence remain `NO-GO`.
+recording fields, `changeContext` with passed automated lane evidence whose
+`lanes` cover every `requiredLanes` entry, and `installedByteParity.verdict=GO`.
+The template and any artifact with missing byte parity, missing lane evidence,
+or uncovered required lanes remain `NO-GO`.
 
 ## File-To-Lane Matrix
 

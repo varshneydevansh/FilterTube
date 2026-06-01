@@ -77,7 +77,7 @@ docs/audit/artifacts/release-live-youtube-spa-smoke/template.json
 ```
 
 The template is intentionally `template-not-executed` and keeps
-`smokeSliceReadiness` and `releaseReadiness` at `NO-GO`. Schema version 2
+`smokeSliceReadiness` and `releaseReadiness` at `NO-GO`. Schema version 3
 also carries an `installedByteParity` block for
 `FT-WLCACHE-SPA-PACKET-01-installed-profile-bytes`; the template block is
 `NO-GO` because it has no visible profile, active tab, content-script marker,
@@ -115,8 +115,9 @@ node docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artif
 
 A dated artifact is not release-ready until this verifier returns zero errors.
 The verifier rejects the template, failed/missing route rows, console issues,
-blank recording fields, stale row order, missing automated lane evidence, and
-missing installed byte parity.
+blank recording fields, stale row order, missing automated lane evidence,
+automated lane evidence that does not cover every required lane, and missing
+installed byte parity.
 
 The runner reads the automated lane proof for `changeContext` from these
 environment variables before `npm run smoke:youtube`:
@@ -127,6 +128,7 @@ FILTERTUBE_REQUIRED_LANES
 FILTERTUBE_AUTOMATED_PROOF_COMMAND
 FILTERTUBE_AUTOMATED_PROOF_STATUS=passed
 FILTERTUBE_AUTOMATED_PROOF_SUMMARY
+FILTERTUBE_AUTOMATED_PROOF_LANES
 ```
 
 | Row | Source anchors | Contract meaning | Current release status |
@@ -142,7 +144,7 @@ FILTERTUBE_AUTOMATED_PROOF_SUMMARY
 | `FT-LIVE-RUNNER-08-output-artifact-schema` | `run-live-smoke.mjs:653`, `run-live-smoke.mjs:655`, `run-live-smoke.mjs:657`, `run-live-smoke.mjs:658`, `run-live-smoke.mjs:669`, `run-live-smoke.mjs:670`, `run-live-smoke.mjs:671`, `run-live-smoke.mjs:689`, `run-live-smoke.mjs:693`, `run-live-smoke.mjs:694`, `run-live-smoke.mjs:695` | The runner writes a dated JSON artifact with row statuses, route sequence, stall timing text, false-hide/leak summary, smoke-slice readiness, release readiness, installed-byte-parity verdict, and console summary. | Contract defined; no dated JSON result committed. |
 | `FT-LIVE-RUNNER-09-installed-byte-parity-gate` | `run-live-smoke.mjs:2`, `run-live-smoke.mjs:224`, `run-live-smoke.mjs:232`, `run-live-smoke.mjs:256`, `run-live-smoke.mjs:262`, `run-live-smoke.mjs:266`, `run-live-smoke.mjs:273`, `run-live-smoke.mjs:274`, `run-live-smoke.mjs:275`, `run-live-smoke.mjs:287`, `run-live-smoke.mjs:288`, `run-live-smoke.mjs:652`, `run-live-smoke.mjs:658`, `run-live-smoke.mjs:673`, `run-live-smoke.mjs:681`, `run-live-smoke.mjs:682`, `template.json:26`, `template.json:59`, `template.json:104`, `template.json:106` | The runner now records source hashes and the installed-byte-parity packet fields separately from route smoke. It may report `GO-FOR-THIS-SMOKE-SLICE`, but `releaseReadiness` remains `NO-GO` unless installed byte parity passes. | Contract hardened; installed byte parity remains missing. |
 | `FT-LIVE-RUNNER-10-template-non-evidence-guard` | `template.json:2`, `template.json:3`, `template.json:4`, `template.json:5`, `template.json:6`, `template.json:26`, `template.json:62`, `template.json:100`, `template.json:104`, `template.json:105`, `template.json:106`, `template.json:107`, `template.json:108` | The template is explicitly `template-not-executed`; all required rows are `missing`, installed byte parity is `NO-GO`, and every template/missing/failure/byte-parity-missing path keeps readiness at `NO-GO`. | Contract defined; template is not release evidence. |
-| `FT-LIVE-RUNNER-11-automated-lane-evidence-gate` | `run-live-smoke.mjs:224`, `run-live-smoke.mjs:238`, `run-live-smoke.mjs:674`, `run-live-smoke.mjs:675`, `run-live-smoke.mjs:681`, `run-live-smoke.mjs:697`, `template.json:7`, `template.json:111`, `verify-live-smoke-artifact.mjs:22`, `verify-live-smoke-artifact.mjs:69`, `verify-live-smoke-artifact.mjs:95` | A dated artifact must carry `changeContext.logicalChangeType`, required lanes, and at least one passed automated lane command before manual live smoke can support release readiness. | Contract hardened; automated lane evidence remains missing in the template. |
+| `FT-LIVE-RUNNER-11-automated-lane-evidence-gate` | `run-live-smoke.mjs:224`, `run-live-smoke.mjs:238`, `run-live-smoke.mjs:674`, `run-live-smoke.mjs:675`, `run-live-smoke.mjs:681`, `run-live-smoke.mjs:697`, `template.json:7`, `template.json:111`, `verify-live-smoke-artifact.mjs:22`, `verify-live-smoke-artifact.mjs:69`, `verify-live-smoke-artifact.mjs:95` | A dated artifact must carry `changeContext.logicalChangeType`, known required lanes, and passed automated lane evidence whose `lanes` cover every required lane before manual live smoke can support release readiness. | Contract hardened; automated lane evidence remains missing in the template. |
 
 ## Installed Chrome CDP Preflight - 2026-05-31
 

@@ -771,8 +771,8 @@ The current directory only contains `template.json`, `run-live-smoke.mjs`, and
 `verify-live-smoke-artifact.mjs`; that is contract/tooling, not execution
 proof.
 The dated artifact must also include `changeContext.requiredLanes` and passed
-`changeContext.automatedLaneEvidence`; live route rows alone are still
-nonrelease proof.
+`changeContext.automatedLaneEvidence` whose covered lanes include every
+required lane; live route rows alone are still nonrelease proof.
 
 ## Behavior Invariants To Preserve
 

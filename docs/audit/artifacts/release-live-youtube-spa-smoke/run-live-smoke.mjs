@@ -240,8 +240,9 @@ function buildChangeContext() {
   const command = process.env.FILTERTUBE_AUTOMATED_PROOF_COMMAND || '';
   const status = process.env.FILTERTUBE_AUTOMATED_PROOF_STATUS || '';
   const summary = process.env.FILTERTUBE_AUTOMATED_PROOF_SUMMARY || '';
+  const lanes = envList('FILTERTUBE_AUTOMATED_PROOF_LANES');
   const evidence = command || status || summary
-    ? [{ command, status, summary }]
+    ? [{ command, status, summary, lanes }]
     : [];
 
   return {
@@ -252,12 +253,14 @@ function buildChangeContext() {
 }
 
 function isReleaseReadyChangeContext(changeContext) {
+  const coveredLanes = new Set(changeContext.automatedLaneEvidence.flatMap(evidence => evidence.lanes || []));
   return !!changeContext.logicalChangeType
     && changeContext.requiredLanes.length > 0
     && changeContext.automatedLaneEvidence.length > 0
     && changeContext.automatedLaneEvidence.every(evidence => (
-      evidence.command && evidence.status === 'passed' && evidence.summary
-    ));
+      evidence.command && evidence.status === 'passed' && evidence.summary && evidence.lanes?.length
+    ))
+    && changeContext.requiredLanes.every(lane => coveredLanes.has(lane));
 }
 
 function sourceHashSnapshot() {
@@ -685,7 +688,7 @@ async function main() {
   const changeContextReady = isReleaseReadyChangeContext(changeContext);
   const artifact = {
     artifactType: 'filtertube-release-live-youtube-spa-smoke',
-    schemaVersion: 2,
+    schemaVersion: 3,
     status: allRowsPassed ? 'executed' : 'executed-with-failures',
     smokeSliceReadiness,
     releaseReadiness: smokeSliceReadiness === 'GO-FOR-THIS-SMOKE-SLICE' && installedByteParity.verdict === 'GO' && changeContextReady ? 'GO-FOR-RELEASE-SMOKE' : 'NO-GO',
@@ -714,6 +717,7 @@ async function main() {
       consoleErrorsMustBeClassified: true,
       installedByteParityMustPass: true,
       automatedLaneEvidenceMustPass: true,
+      automatedLaneEvidenceMustCoverRequiredLanes: true,
       releaseReadinessWhenByteParityMissing: 'NO-GO',
       releaseReadinessWhenAutomatedLaneEvidenceMissing: 'NO-GO',
       releaseReadinessWhenAnyRowMissing: 'NO-GO',

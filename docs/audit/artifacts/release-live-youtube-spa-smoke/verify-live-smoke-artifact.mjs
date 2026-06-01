@@ -4,6 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { LANES } from '../../../../scripts/test-lane-config.mjs';
+
 export const LIVE_SMOKE_BOUNDARY_DOC = 'docs/audit/FILTERTUBE_RELEASE_LIVE_YOUTUBE_SPA_SMOKE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-25.md';
 
 export const REQUIRED_LIVE_SMOKE_ROWS = Object.freeze([
@@ -50,6 +52,8 @@ const REQUIRED_LANE_EVIDENCE_FIELDS = Object.freeze([
   'summary'
 ]);
 
+const KNOWN_TEST_LANES = new Set(Object.keys(LANES).map(lane => `test:${lane}`));
+
 function isBlank(value) {
   if (value === null || value === undefined) return true;
   if (typeof value === 'string') return value.trim() === '';
@@ -73,6 +77,25 @@ function addMissingFieldErrors(errors, source, fields, prefix) {
   }
 }
 
+function validateLaneList(errors, lanes, prefix) {
+  const validLanes = [];
+  if (!Array.isArray(lanes) || lanes.length === 0) {
+    errors.push(`${prefix} must list covered test lanes`);
+    return validLanes;
+  }
+
+  lanes.forEach((lane, index) => {
+    if (isBlank(lane)) {
+      errors.push(`${prefix}[${index}] is required`);
+    } else if (!KNOWN_TEST_LANES.has(lane)) {
+      errors.push(`${prefix}[${index}] must be a known test lane`);
+    } else {
+      validLanes.push(lane);
+    }
+  });
+  return validLanes;
+}
+
 function validateChangeContext(errors, changeContext) {
   if (!isPlainObject(changeContext)) {
     errors.push('changeContext must be an object');
@@ -80,12 +103,11 @@ function validateChangeContext(errors, changeContext) {
   }
 
   if (isBlank(changeContext.logicalChangeType)) errors.push('changeContext.logicalChangeType is required');
+  let validRequiredLanes = [];
   if (!Array.isArray(changeContext.requiredLanes) || changeContext.requiredLanes.length === 0) {
     errors.push('changeContext.requiredLanes must list required test lanes');
   } else {
-    changeContext.requiredLanes.forEach((lane, index) => {
-      if (isBlank(lane)) errors.push(`changeContext.requiredLanes[${index}] is required`);
-    });
+    validRequiredLanes = validateLaneList(errors, changeContext.requiredLanes, 'changeContext.requiredLanes');
   }
 
   const evidenceRows = changeContext.automatedLaneEvidence;
@@ -103,7 +125,17 @@ function validateChangeContext(errors, changeContext) {
     if (evidence.status !== 'passed') {
       errors.push(`changeContext.automatedLaneEvidence[${index}].status must be passed`);
     }
+    validateLaneList(errors, evidence.lanes, `changeContext.automatedLaneEvidence[${index}].lanes`);
   });
+
+  const coveredLanes = new Set(evidenceRows.flatMap(evidence => (
+    Array.isArray(evidence?.lanes) ? evidence.lanes.filter(lane => KNOWN_TEST_LANES.has(lane)) : []
+  )));
+  for (const lane of validRequiredLanes) {
+    if (!coveredLanes.has(lane)) {
+      errors.push(`changeContext.requiredLanes must be covered by automatedLaneEvidence.lanes: ${lane}`);
+    }
+  }
 }
 
 export function validateLiveSmokeArtifact(artifact) {
@@ -113,7 +145,7 @@ export function validateLiveSmokeArtifact(artifact) {
   }
 
   if (artifact.artifactType !== 'filtertube-release-live-youtube-spa-smoke') errors.push('artifactType must be filtertube-release-live-youtube-spa-smoke');
-  if (artifact.schemaVersion !== 2) errors.push('schemaVersion must be 2');
+  if (artifact.schemaVersion !== 3) errors.push('schemaVersion must be 3');
   if (artifact.status !== 'executed') errors.push('status must be executed');
   if (artifact.boundaryDoc !== LIVE_SMOKE_BOUNDARY_DOC) errors.push(`boundaryDoc must be ${LIVE_SMOKE_BOUNDARY_DOC}`);
   if (artifact.smokeSliceReadiness !== 'GO-FOR-THIS-SMOKE-SLICE') errors.push('smokeSliceReadiness must be GO-FOR-THIS-SMOKE-SLICE');
