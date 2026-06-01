@@ -13,12 +13,18 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4703
-fail: 34
-duration_ms: 40944.980916
+pass: 4704
+fail: 33
+duration_ms: 37662.8535
 ```
 
-This refresh reduces the pinned broad-suite failure count from 36 failures to
+This refresh reduces the pinned broad-suite failure count from 34 failures to
+33 failures after retiring the stale legacy layout quarantine package manifest
+count rows: the package-boundary proof now expects the current active and dist
+content-script JS reference totals while keeping `js/layout.js` absent from
+active manifest loads, dist manifest loads, web-accessible resources, popup
+HTML, dashboard HTML, and non-doc runtime callers. The previous refresh reduced
+the suite from 36 failures to
 34 failures after retiring the stale Kids browse malformed-fragment source
 fingerprint and token-count rows: the Kids malformed browse proof now expects
 the current `js/filter_logic.js` line count, byte count, hash, and
@@ -183,19 +189,23 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 24 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-kids-browse-malformed-refresh.tap` gives this
+Current failing subtests are spread across 23 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-legacy-layout-quarantine-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
-| generated/release/package/docs surfaces | 22 |
+| generated/release/package/docs surfaces | 21 |
 | source-locus/optimization/index contracts | 1 |
 | JSON/video-meta/path/reference | 2 |
 | website/public-doc/source inventory | 10 |
 | settings/content-control/DOM lifecycle | 8 |
 | native/Nanah/Kids/YTM | 6 |
 
+The previous legacy layout quarantine package row is now retired from the broad
+failure snapshot: the proof lane now matches current manifest content-script JS
+reference totals while preserving the load/exposure invariant that `js/layout.js`
+is packaged but inactive and not web-accessible.
 The previous method-proof/family blocker row is now retired from the broad
 failure snapshot: the direct method semantic proof lane passes with 5,681
 current lexical callables and 0 complete per-callable semantic proof files.
