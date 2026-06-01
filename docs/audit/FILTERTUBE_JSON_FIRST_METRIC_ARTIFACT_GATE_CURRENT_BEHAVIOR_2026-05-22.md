@@ -25,8 +25,8 @@ hide, and restore budgets.
 | `js/background.js` | 6320 | 285103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
 | `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
 | `js/settings_shared.js` | 1181 | 57535 | `9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c` |
-| `docs/audit/FILTERTUBE_PERFORMANCE_CLAIM_EVIDENCE_BOUNDARY_2026-05-20.md` | 116 | 6248 | `f2559ab18d3331b6a5325a767491d8b9848a90b31a07fa0c81256612b0407e00` |
-| `docs/audit/FILTERTUBE_JSON_FIRST_NO_WORK_OPTIMIZATION_CROSSWALK_CURRENT_BEHAVIOR_2026-05-21.md` | 273 | 16005 | `97759360c5310b9931c0efa071652a95469ac26a328912ae91ade87ff0087ba0` |
+| `docs/audit/FILTERTUBE_PERFORMANCE_CLAIM_EVIDENCE_BOUNDARY_2026-05-20.md` | 116 | 6248 | `aaf58bd4057f4477fb2b4f7b9c60a0bc93b88d1ab2831c41cb570f379408838c` |
+| `docs/audit/FILTERTUBE_JSON_FIRST_NO_WORK_OPTIMIZATION_CROSSWALK_CURRENT_BEHAVIOR_2026-05-21.md` | 273 | 16005 | `b4592ebf7e9947d95a97ca0e8c14eb298bcd3a296e24c424b4c350adb2333e86` |
 
 ## Runtime Instrumentation Counts
 
@@ -64,7 +64,7 @@ runtime behavior changed: no
 | Block | File | Start line | Lines | Bytes | Current boundary |
 | --- | --- | ---: | ---: | ---: | --- |
 | `seedEngineDebugTiming` | `js/seed.js` | 437 | 43 | 2292 | Debug-only engine timing uses `Date.now()` and `JSON.stringify(...).length`; it logs size/time only when seed debug is enabled and does not persist a metric artifact. |
-| `filterLogicProcessTiming` | `js/filter_logic.js` | 3434 | 34 | 1239 | `processData()` measures filter elapsed time with `Date.now()` and logs blocked count through `_log`; it does not emit route/surface/sample metadata. |
+| `filterLogicProcessTiming` | `js/filter_logic.js` | 3588 | 34 | 1239 | `processData()` measures filter elapsed time with `Date.now()` and logs blocked count through `_log`; it does not emit route/surface/sample metadata. |
 | `stateManagerEnrichmentTiming` | `js/state_manager.js` | 639 | 58 | 2072 | Channel enrichment logs start, duration, and randomized backoff only when `window.__filtertubeDebug` is true. |
 | `backgroundIdentityBudgetConstants` | `js/background.js` | 926 | 20 | 985 | Identity fetch constants define stream limits, timeout, caches, and pending maps, but not metric output. |
 | `backgroundShortsIdentityFetchBudget` | `js/background.js` | 2879 | 67 | 2543 | Shorts identity fetch uses timeout and partial-stream limits with debug diagnostics, not committed latency or byte artifacts. |
