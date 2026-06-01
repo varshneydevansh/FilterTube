@@ -13,15 +13,21 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4695
-fail: 42
-duration_ms: 37164.02625
+pass: 4696
+fail: 41
+duration_ms: 80183.118792
 ```
 
-This refresh reduces the pinned broad-suite failure count from 43 failures to
-42 failures after retiring the stale JSON-first video-meta fetch policy source
-pin row: the fetch policy proof test now expects the current
+This refresh reduces the pinned broad-suite failure count from 42 failures to
+41 failures after retiring the stale JSON-first video-meta freshness eviction
+source pin row: the freshness-eviction proof test now expects the current
 `js/filter_logic.js` line count, byte count, and hash already recorded in the
+audit doc while persistence, scheduling, background storage, and queue fixtures
+remain unchanged and first-class video-meta freshness eviction authority remains
+absent. The previous refresh reduced the suite from 43 failures to 42 failures
+after retiring the stale JSON-first video-meta fetch policy source pin row: the
+fetch policy proof test now expects the current `js/filter_logic.js` line count,
+byte count, and hash already recorded in the
 audit doc while fetch scheduling and watch-metadata fixture behavior remains
 unchanged and first-class video-meta fetch policy authority remains absent. The
 previous refresh reduced the suite from 44 failures to 43 failures after
@@ -139,15 +145,15 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 31 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-video-meta-fetch-policy-refresh.tap` gives this
+Current failing subtests are spread across 30 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-video-meta-freshness-eviction-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
 | generated/release/package/docs surfaces | 34 |
 | source-locus/optimization/index contracts | 4 |
-| JSON/video-meta/path/reference | 10 |
+| JSON/video-meta/path/reference | 9 |
 | website/public-doc/source inventory | 14 |
 | settings/content-control/DOM lifecycle | 8 |
 | native/Nanah/Kids/YTM | 8 |
@@ -236,6 +242,11 @@ proof test now matches the current `js/filter_logic.js` fingerprint already
 present in the audit doc while fetch scheduling and watch-metadata fixture
 behavior remains unchanged and first-class video-meta fetch policy authority
 remains explicitly absent.
+The previous JSON-first video-meta freshness eviction row is retired: the
+freshness-eviction proof test now matches the current `js/filter_logic.js`
+fingerprint already present in the audit doc while persistence, scheduling,
+background storage, and queue fixtures remain unchanged and first-class
+video-meta freshness eviction authority remains explicitly absent.
 The previous JSON-first metric artifact gate rows are retired: the metric proof
 now pins current performance-claim and no-work crosswalk hashes plus the current
 `js/filter_logic.js` `processData()` anchor while metric artifact authority
