@@ -2084,8 +2084,9 @@ add collector verification output approval absence proof to the objective
 ledger without claiming implementation readiness. This current-behavior slice
 pins 12 collector verification output approval boundary rows, 12 verification
 output contract rows covered, 12 collector parity rollout approval rows
-covered, 12 source-locus parity release verification rows covered, 63 method
-semantic proof gap files covered, 5,681 lexical callables still requiring
+covered, 12 source-locus parity release verification rows covered, 69 method
+semantic proof gap files covered, 5,681 method semantic proof gap lexical
+callables still requiring
 semantic proof, 0 files with complete per-callable semantic proof, 0 runtime
 source-owner approvals, 0 runtime metric collector approvals, 0 runtime
 collector verification output approvals, 0 committed verification output
