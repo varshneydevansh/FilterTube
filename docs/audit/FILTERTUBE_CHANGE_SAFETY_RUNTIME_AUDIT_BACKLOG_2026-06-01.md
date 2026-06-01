@@ -13,9 +13,9 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4731
-pass: 4610
-fail: 121
-duration_ms: 35290.977291
+pass: 4570
+fail: 161
+duration_ms: 41531.622
 ```
 
 ## Boundary
@@ -40,7 +40,7 @@ node scripts/audit-proof-drift.mjs --all --report-only
 | Docs/audit boundary, packaging, and generated artifacts | audit markdown boundary, `compress-video`, design tokens, release notes, external navigation, generated main runtime assets, dist/website generated output | Release and generated-output proof remains useful, but several broad inventory rows need refresh. |
 | Settings and content-control registers | settings mode source/effect, settings refresh cross-context consumer rows, source-of-truth claim register | `compiled-settings-field-register` has been refreshed and promoted into `test:settings`; `content-control-active-work-matrix` has been refreshed and promoted into `test:performance`; `content-control-alias-mutation-boundary` has been refreshed and promoted into `test:settings`; `settings-mode-source-effect`, `source-of-truth-claim-register`, `settings-refresh-cross-context-consumer-boundary`, `settings-refresh-key-parity-register`, `settings-refresh-dirty-key-producer-consumer-join-matrix`, `settings-refresh-optimization-readiness-boundary`, `settings-refresh-optimization-candidate-binding-matrix`, and `settings-refresh-optimization-candidate-evidence-packet-contract` have been refreshed and promoted into `test:settings`; remaining settings rows are older broad-ledger references, not unpromoted settings-refresh lane proof. |
 | DOM selector, hide, and lifecycle registers | JSON content-control DOM hide boundary rows, tab-view lifecycle selector boundary, Shorts overlay owner proof | `direct-hide-writer-register` has been refreshed and promoted into `test:dom`; `dom-selector-instance-register` has been refreshed for `js/content/dom_state.js` selector patch sites and promoted into `test:dom`; `lifecycle-instance-register` and `repo-lifecycle-primitive-coverage` have been refreshed for website component lifecycle drift and promoted into `test:performance`; remaining lifecycle selector rows belong in smaller DOM batches. |
-| JSON comment continuation and provenance registers | comment author/channel provenance, keyword provenance, structural wrapper cleanup, continuation shortcut counts | Comment JSON proof rows need focused JSON/blocking refresh before they can be broad gates. |
+| JSON comment continuation and provenance registers | comment author/channel provenance, keyword provenance, entity payload provenance, structural wrapper cleanup, collection-root/command-shape/sibling continuation parity, continuation shortcut counts | Comment JSON proof rows have been refreshed and promoted into `test:json`; author/channel and keyword provenance are also promoted into `test:blocking`. Remaining broad-ledger failures in this family are older completion/obligation references, not unpromoted focused comment JSON proof. |
 | JSON content-control hide boundary registers | hideAllComments, hideAskButton, hideHomeFeed, hideMixPlaylists, hideVideoInfo, hideWatchPlaylistPanel, and related boundaries | `content-control-json-first-boundary-index` plus the JSON-first content-control hide boundary set have been refreshed and promoted into `test:json`; remaining content-control surfaces are either already owned by whitelist/menu lanes or belong to older broad ledgers outside this hide-control batch. |
 | JSON-first renderer, reference, metric, and video-meta registers | candidate extraction, implementation locus, metric artifact gate, reference docs, renderer traversal, video-meta parity/fetch/merge docs | JSON-first proof is still split across older NO-GO gates and focused lane tests. |
 | YTM and YouTube Music parity slices | YTM showSheet enrichment, YTM injector/filter-logic parity, playlist selected-row parity | `ytm-show-sheet-injector-filter-logic-parity` and `ytm-show-sheet-enrichment-handoff` have been refreshed and promoted into `test:json`; remaining YTM proof slices are still partial and should be refreshed in focused whitelist/JSON/menu batches. |

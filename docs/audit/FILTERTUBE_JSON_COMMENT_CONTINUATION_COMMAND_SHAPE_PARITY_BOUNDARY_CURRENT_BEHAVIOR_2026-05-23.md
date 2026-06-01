@@ -52,8 +52,8 @@ seed fetch comment shortcut lines: 38
 seed fetch comment shortcut bytes: 2269
 seed fetch normal processing lines: 7
 seed fetch normal processing bytes: 395
-filter_logic array recursion lines: 12
-filter_logic array recursion bytes: 404
+filter_logic array recursion lines: 20
+filter_logic array recursion bytes: 726
 filter_logic object renderer removal lines: 11
 filter_logic object renderer removal bytes: 536
 filter_logic comment decision lines: 34
@@ -96,11 +96,11 @@ seedFetchSpreadOriginal: `js/seed.js:715`
 seedFetchReplacementRoot: `js/seed.js:716`
 seedFetchNormalProcessing: `js/seed.js:739`
 seedFetchProcessWithEngine: `js/seed.js:740`
-filterLogicCommentDecision: `js/filter_logic.js:2076`
-filterLogicArrayRecursion: `js/filter_logic.js:3396`
-filterLogicArrayKeepsNonNull: `js/filter_logic.js:3401`
-filterLogicObjectRendererRemoval: `js/filter_logic.js:3408`
-filterLogicRemoveEntireObject: `js/filter_logic.js:3415`
+filterLogicCommentDecision: `js/filter_logic.js:2213`
+filterLogicArrayRecursion: `js/filter_logic.js:3533`
+filterLogicArrayKeepsNonNull: `js/filter_logic.js:3538`
+filterLogicObjectRendererRemoval: `js/filter_logic.js:3553`
+filterLogicRemoveEntireObject: `js/filter_logic.js:3560`
 ```
 
 ## Runtime Fixture Summary
@@ -202,9 +202,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5673
+method semantic proof gap lexical callables covered: 5681
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5673
+lexical callables requiring semantic proof before behavior changes: 5681
 affected callable semantic proof: NO-GO
 runtime behavior changed: yes
 ```

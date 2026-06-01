@@ -53,8 +53,8 @@ filter_logic filterChannels normalization block lines: 17
 filter_logic filterChannels normalization block bytes: 1026
 filter_logic shouldBlock setup block lines: 45
 filter_logic shouldBlock setup block bytes: 2191
-filter_logic whitelist comment bypass block lines: 105
-filter_logic whitelist comment bypass block bytes: 5392
+filter_logic whitelist comment bypass block lines: 110
+filter_logic whitelist comment bypass block bytes: 5535
 filter_logic global channel branch block lines: 17
 filter_logic global channel branch block bytes: 1090
 filter_logic comment branch author block lines: 34
@@ -169,9 +169,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5673
+method semantic proof gap lexical callables covered: 5681
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5673
+lexical callables requiring semantic proof before behavior changes: 5681
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

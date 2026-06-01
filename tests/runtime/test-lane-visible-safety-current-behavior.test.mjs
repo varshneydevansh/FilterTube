@@ -123,7 +123,12 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
     {
       surface: 'keyword/channel blocking',
       lane: 'blocking',
-      tests: [/json-first-keyword-match-boundary/, /json-first-channel-match-boundary/]
+      tests: [
+        /json-first-keyword-match-boundary/,
+        /json-first-channel-match-boundary/,
+        /json-comment-author-channel-provenance-boundary/,
+        /json-comment-keyword-provenance-boundary/
+      ]
     },
     {
       surface: 'Shorts behavior',
@@ -157,6 +162,14 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
         /json-first-response-mutation-contract/,
         /content-control-json-first-boundary-index-current-behavior/,
         /json-first-hide-all-comments-boundary-current-behavior/,
+        /json-first-comment-continuation-shortcut-current-behavior/,
+        /json-comment-author-channel-provenance-boundary-current-behavior/,
+        /json-comment-keyword-provenance-boundary-current-behavior/,
+        /json-comment-entity-payload-provenance-boundary-current-behavior/,
+        /json-comment-structural-wrapper-cleanup-boundary-current-behavior/,
+        /json-comment-continuation-collection-root-parity-boundary-current-behavior/,
+        /json-comment-continuation-command-shape-parity-boundary-current-behavior/,
+        /json-comment-continuation-sibling-preservation-boundary-current-behavior/,
         /json-first-hide-home-feed-boundary-current-behavior/,
         /json-first-hide-mix-playlists-boundary-current-behavior/,
         /json-first-hide-video-info-boundary-current-behavior/,

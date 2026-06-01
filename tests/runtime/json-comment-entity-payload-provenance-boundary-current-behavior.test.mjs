@@ -50,8 +50,8 @@ const blockSpecs = {
     file: 'js/filter_logic.js',
     start: '            // Recursively process all properties',
     end: '            return result;',
-    lines: 9,
-    bytes: 347
+    lines: 18,
+    bytes: 743
   },
   seedFetchShortcut: {
     file: 'js/seed.js',
@@ -224,13 +224,13 @@ test('source blocks fixture anchors and selected product runtime gaps remain cur
   }
 
   const anchors = [
-    [filterLogic, 'commentRenderer: {', 827, 'js/filter_logic.js'],
-    [filterLogic, "commentText: ['contentText.simpleText', 'contentText.runs']", 830, 'js/filter_logic.js'],
-    [filterLogic, 'commentThreadRenderer: {', 832, 'js/filter_logic.js'],
-    [filterLogic, '...this._collectTextFromPaths(item, rules.commentText),', 1729, 'js/filter_logic.js'],
-    [filterLogic, '// Comment filtering', 2076, 'js/filter_logic.js'],
-    [filterLogic, 'const commentText = rules.commentText ? getTextFromPaths(item, Array.isArray(rules.commentText) ? rules.commentText : [rules.commentText]) : \'\';', 2083, 'js/filter_logic.js'],
-    [filterLogic, 'const commentChannelInfo = isCollaboration ? collaborators[0] : channelInfo;', 2101, 'js/filter_logic.js'],
+    [filterLogic, 'commentRenderer: {', 836, 'js/filter_logic.js'],
+    [filterLogic, "commentText: ['contentText.simpleText', 'contentText.runs']", 839, 'js/filter_logic.js'],
+    [filterLogic, 'commentThreadRenderer: {', 841, 'js/filter_logic.js'],
+    [filterLogic, '...this._collectTextFromPaths(item, rules.commentText),', 1738, 'js/filter_logic.js'],
+    [filterLogic, '// Comment filtering', 2213, 'js/filter_logic.js'],
+    [filterLogic, 'const commentText = rules.commentText ? getTextFromPaths(item, Array.isArray(rules.commentText) ? rules.commentText : [rules.commentText]) : \'\';', 2220, 'js/filter_logic.js'],
+    [filterLogic, 'const commentChannelInfo = isCollaboration ? collaborators[0] : channelInfo;', 2238, 'js/filter_logic.js'],
     [seed, "if (urlStr.includes('/youtubei/v1/next') && cachedSettings?.hideAllComments) {", 703, 'js/seed.js'],
     [seed, '...jsonData,', 715, 'js/seed.js'],
     [seed, 'onResponseReceivedEndpoints: [{', 716, 'js/seed.js'],

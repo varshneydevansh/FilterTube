@@ -49,8 +49,8 @@ const blockSpecs = {
     file: 'js/filter_logic.js',
     start: '        _buildCandidate(item, rendererType, wrapperRendererType = null, options = {}) {',
     end: '        _regexMatches(regex, text) {',
-    lines: 95,
-    bytes: 4931
+    lines: 218,
+    bytes: 10724
   },
   filterLogicGlobalCommentKeywordBranch: {
     file: 'js/filter_logic.js',
@@ -264,8 +264,8 @@ test('JSON comment keyword provenance source and effect blocks remain pinned', (
   assert.match(audit, /settings_shared buildCompiledSettings comments block bytes: 170/);
   assert.match(audit, /filter_logic processSettings regex block lines: 29/);
   assert.match(audit, /filter_logic processSettings regex block bytes: 1445/);
-  assert.match(audit, /filter_logic candidate metadata\/search block lines: 95/);
-  assert.match(audit, /filter_logic candidate metadata\/search block bytes: 4931/);
+  assert.match(audit, /filter_logic candidate metadata\/search block lines: 218/);
+  assert.match(audit, /filter_logic candidate metadata\/search block bytes: 10724/);
   assert.match(audit, /filter_logic global\/comment keyword branch block lines: 55/);
   assert.match(audit, /filter_logic global\/comment keyword branch block bytes: 3070/);
   assert.match(audit, /background V4 comment compile block lines: 7/);
@@ -285,7 +285,7 @@ test('JSON comment keyword provenance selected token counts remain pinned', () =
   assert.equal(countLiteral(blocks.sharedBuildCompiledComments, 'filterKeywordsComments'), 1);
   assert.equal(countLiteral(blocks.filterLogicProcessSettingsRegex, 'RegExp'), 5);
   assert.equal(countLiteral(blocks.filterLogicCandidateMetadataSearch, 'commentText'), 1);
-  assert.equal(countLiteral(blocks.filterLogicCandidateMetadataSearch, 'metadataText'), 4);
+  assert.equal(countLiteral(blocks.filterLogicCandidateMetadataSearch, 'metadataText'), 5);
   assert.equal(countLiteral(blocks.filterLogicGlobalCommentKeywordBranch, 'filterKeywords'), 5);
   assert.equal(countLiteral(blocks.filterLogicGlobalCommentKeywordBranch, 'filterKeywordsComments'), 2);
   assert.equal(countLiteral(blocks.filterLogicGlobalCommentKeywordBranch, 'commentText'), 8);
@@ -300,7 +300,7 @@ test('JSON comment keyword provenance selected token counts remain pinned', () =
   assert.match(audit, /settings_shared buildCompiledSettings filterKeywordsComments tokens: 1/);
   assert.match(audit, /filter_logic processSettings RegExp tokens: 5/);
   assert.match(audit, /filter_logic candidate metadata\/search commentText tokens: 1/);
-  assert.match(audit, /filter_logic candidate metadata\/search metadataText tokens: 4/);
+  assert.match(audit, /filter_logic candidate metadata\/search metadataText tokens: 5/);
   assert.match(audit, /filter_logic global\/comment keyword branch filterKeywords tokens: 5/);
   assert.match(audit, /filter_logic global\/comment keyword branch filterKeywordsComments tokens: 2/);
   assert.match(audit, /filter_logic global\/comment keyword branch commentText tokens: 8/);

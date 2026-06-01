@@ -61,8 +61,8 @@ filter_logic comment decision lines: 34
 filter_logic comment decision bytes: 1947
 filter_logic object renderer removal lines: 11
 filter_logic object renderer removal bytes: 536
-filter_logic recursive property copy lines: 9
-filter_logic recursive property copy bytes: 347
+filter_logic recursive property copy lines: 18
+filter_logic recursive property copy bytes: 743
 seed fetch comment shortcut lines: 38
 seed fetch comment shortcut bytes: 2269
 fixture entity payload block lines: 47
@@ -103,13 +103,13 @@ not completion proof for JSON comment entity payload authority
 ## Source Anchors
 
 ```text
-filterLogicCommentRules: `js/filter_logic.js:827`
-filterLogicCommentTextPaths: `js/filter_logic.js:830`
-filterLogicCommentThreadRule: `js/filter_logic.js:832`
-filterLogicCandidateCommentText: `js/filter_logic.js:1729`
-filterLogicCommentDecision: `js/filter_logic.js:2076`
-filterLogicCommentKeywordText: `js/filter_logic.js:2083`
-filterLogicCommentAuthorDecision: `js/filter_logic.js:2101`
+filterLogicCommentRules: `js/filter_logic.js:836`
+filterLogicCommentTextPaths: `js/filter_logic.js:839`
+filterLogicCommentThreadRule: `js/filter_logic.js:841`
+filterLogicCandidateCommentText: `js/filter_logic.js:1738`
+filterLogicCommentDecision: `js/filter_logic.js:2213`
+filterLogicCommentKeywordText: `js/filter_logic.js:2220`
+filterLogicCommentAuthorDecision: `js/filter_logic.js:2238`
 seedFetchShortcutGate: `js/seed.js:703`
 seedFetchShortcutSpread: `js/seed.js:715`
 seedFetchSyntheticEndpoint: `js/seed.js:716`
@@ -231,9 +231,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5673
+method semantic proof gap lexical callables covered: 5681
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5673
+lexical callables requiring semantic proof before behavior changes: 5681
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

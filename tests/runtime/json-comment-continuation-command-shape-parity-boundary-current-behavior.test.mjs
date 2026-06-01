@@ -34,8 +34,8 @@ const blockSpecs = {
     file: 'js/filter_logic.js',
     start: '            // Handle arrays',
     end: '            // Handle objects - check if this object should be filtered',
-    lines: 12,
-    bytes: 404
+    lines: 20,
+    bytes: 726
   },
   filterLogicObjectRendererRemoval: {
     file: 'js/filter_logic.js',
@@ -265,11 +265,11 @@ test('source rows pin append-only shortcut detection against reload and replace 
     [seed, 'onResponseReceivedEndpoints: [{', 716, 'js/seed.js'],
     [seed, '// Normal processing for non-comment or non-hideAllComments requests', 739, 'js/seed.js'],
     [seed, 'const processed = processWithEngine(jsonData, dataName);', 740, 'js/seed.js'],
-    [filterLogic, '// Comment filtering', 2076, 'js/filter_logic.js'],
-    [filterLogic, '// Handle arrays', 3396, 'js/filter_logic.js'],
-    [filterLogic, 'if (item !== null) {', 3401, 'js/filter_logic.js'],
-    [filterLogic, '// Handle objects - check if this object should be filtered', 3408, 'js/filter_logic.js'],
-    [filterLogic, 'return null; // Remove this entire object', 3415, 'js/filter_logic.js']
+    [filterLogic, '// Comment filtering', 2213, 'js/filter_logic.js'],
+    [filterLogic, '// Handle arrays', 3533, 'js/filter_logic.js'],
+    [filterLogic, 'if (item !== null) {', 3538, 'js/filter_logic.js'],
+    [filterLogic, '// Handle objects - check if this object should be filtered', 3553, 'js/filter_logic.js'],
+    [filterLogic, 'return null; // Remove this entire object', 3560, 'js/filter_logic.js']
   ];
 
   for (const [source, needle, expectedLine, file] of anchors) {

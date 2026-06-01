@@ -55,8 +55,8 @@ settings_shared buildCompiledSettings comments block lines: 2
 settings_shared buildCompiledSettings comments block bytes: 170
 filter_logic processSettings regex block lines: 29
 filter_logic processSettings regex block bytes: 1445
-filter_logic candidate metadata/search block lines: 95
-filter_logic candidate metadata/search block bytes: 4931
+filter_logic candidate metadata/search block lines: 218
+filter_logic candidate metadata/search block bytes: 10724
 filter_logic global/comment keyword branch block lines: 55
 filter_logic global/comment keyword branch block bytes: 3070
 background V4 comment compile block lines: 7
@@ -70,7 +70,7 @@ settings_shared syncFilterAllKeywords channelRef tokens: 7
 settings_shared buildCompiledSettings filterKeywordsComments tokens: 1
 filter_logic processSettings RegExp tokens: 5
 filter_logic candidate metadata/search commentText tokens: 1
-filter_logic candidate metadata/search metadataText tokens: 4
+filter_logic candidate metadata/search metadataText tokens: 5
 filter_logic global/comment keyword branch filterKeywords tokens: 5
 filter_logic global/comment keyword branch filterKeywordsComments tokens: 2
 filter_logic global/comment keyword branch commentText tokens: 8
@@ -172,9 +172,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5673
+method semantic proof gap lexical callables covered: 5681
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5673
+lexical callables requiring semantic proof before behavior changes: 5681
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

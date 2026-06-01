@@ -50,12 +50,12 @@ filter_logic comment rules block lines: 9
 filter_logic comment rules block bytes: 380
 filter_logic comment decision block lines: 34
 filter_logic comment decision block bytes: 1947
-filter_logic array recursion block lines: 12
-filter_logic array recursion block bytes: 404
+filter_logic array recursion block lines: 20
+filter_logic array recursion block bytes: 726
 filter_logic object renderer removal block lines: 11
 filter_logic object renderer removal block bytes: 536
-filter_logic recursive property copy block lines: 9
-filter_logic recursive property copy block bytes: 347
+filter_logic recursive property copy block lines: 18
+filter_logic recursive property copy block bytes: 743
 seed engine catch block lines: 5
 seed engine catch block bytes: 220
 seed basic comment hide block lines: 28
@@ -173,9 +173,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5673
+method semantic proof gap lexical callables covered: 5681
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5673
+lexical callables requiring semantic proof before behavior changes: 5681
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

@@ -52,12 +52,12 @@ seed fetch comment shortcut lines: 38
 seed fetch comment shortcut bytes: 2269
 seed fetch normal processing lines: 7
 seed fetch normal processing bytes: 395
-filter_logic array recursion lines: 12
-filter_logic array recursion bytes: 404
+filter_logic array recursion lines: 20
+filter_logic array recursion bytes: 726
 filter_logic object renderer removal lines: 11
 filter_logic object renderer removal bytes: 536
-filter_logic recursive property copy lines: 9
-filter_logic recursive property copy bytes: 347
+filter_logic recursive property copy lines: 18
+filter_logic recursive property copy bytes: 743
 filter_logic comment decision lines: 34
 filter_logic comment decision bytes: 1947
 selected seed/filter_logic commentsHeaderRenderer tokens: 0
@@ -103,13 +103,13 @@ seedFetchSyntheticItem: `js/seed.js:721`
 seedFetchSyntheticEnd: `js/seed.js:723`
 seedFetchNormalProcessing: `js/seed.js:739`
 seedFetchProcessWithEngine: `js/seed.js:740`
-filterLogicArrayRecursion: `js/filter_logic.js:3396`
-filterLogicArrayKeepsNonNull: `js/filter_logic.js:3401`
-filterLogicObjectRendererRemoval: `js/filter_logic.js:3408`
-filterLogicRemoveEntireObject: `js/filter_logic.js:3415`
-filterLogicRecursivePropertyCopy: `js/filter_logic.js:3419`
-filterLogicCopyNonNullChild: `js/filter_logic.js:3423`
-filterLogicCommentDecision: `js/filter_logic.js:2076`
+filterLogicArrayRecursion: `js/filter_logic.js:3533`
+filterLogicArrayKeepsNonNull: `js/filter_logic.js:3538`
+filterLogicObjectRendererRemoval: `js/filter_logic.js:3553`
+filterLogicRemoveEntireObject: `js/filter_logic.js:3560`
+filterLogicRecursivePropertyCopy: `js/filter_logic.js:3564`
+filterLogicCopyNonNullChild: `js/filter_logic.js:3573`
+filterLogicCommentDecision: `js/filter_logic.js:2213`
 ```
 
 ## Runtime Fixture Summary
@@ -210,9 +210,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5673
+method semantic proof gap lexical callables covered: 5681
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5673
+lexical callables requiring semantic proof before behavior changes: 5681
 affected callable semantic proof: NO-GO
 runtime behavior changed: yes
 ```

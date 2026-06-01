@@ -42,8 +42,8 @@ const blockSpecs = {
     file: 'js/filter_logic.js',
     start: '            // Handle arrays',
     end: '            // Handle objects - check if this object should be filtered',
-    lines: 12,
-    bytes: 404
+    lines: 20,
+    bytes: 726
   },
   filterLogicObjectRendererRemoval: {
     file: 'js/filter_logic.js',
@@ -56,8 +56,8 @@ const blockSpecs = {
     file: 'js/filter_logic.js',
     start: '            // Recursively process all properties',
     end: '            return result;',
-    lines: 9,
-    bytes: 347
+    lines: 18,
+    bytes: 743
   },
   seedEngineCatch: {
     file: 'js/seed.js',
@@ -289,12 +289,12 @@ test('JSON comment structural wrapper cleanup source and effect blocks remain pi
   assert.match(audit, /filter_logic comment rules block bytes: 380/);
   assert.match(audit, /filter_logic comment decision block lines: 34/);
   assert.match(audit, /filter_logic comment decision block bytes: 1947/);
-  assert.match(audit, /filter_logic array recursion block lines: 12/);
-  assert.match(audit, /filter_logic array recursion block bytes: 404/);
+  assert.match(audit, /filter_logic array recursion block lines: 20/);
+  assert.match(audit, /filter_logic array recursion block bytes: 726/);
   assert.match(audit, /filter_logic object renderer removal block lines: 11/);
   assert.match(audit, /filter_logic object renderer removal block bytes: 536/);
-  assert.match(audit, /filter_logic recursive property copy block lines: 9/);
-  assert.match(audit, /filter_logic recursive property copy block bytes: 347/);
+  assert.match(audit, /filter_logic recursive property copy block lines: 18/);
+  assert.match(audit, /filter_logic recursive property copy block bytes: 743/);
   assert.match(audit, /seed engine catch block lines: 5/);
   assert.match(audit, /seed engine catch block bytes: 220/);
   assert.match(audit, /seed basic comment hide block lines: 28/);

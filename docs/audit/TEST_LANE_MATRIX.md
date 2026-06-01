@@ -33,8 +33,8 @@ classified before lanes run.
 |---|---|---|
 | release | `npm run test:release` | Build/package/release docs, browser manifests, public claims, and artifact boundaries. |
 | whitelist | `npm run test:whitelist` | Whitelist-only leaks, pending hides, Shorts/watch/end-screen/Kids/YTM allow behavior, and SPA cache boundaries. |
-| blocking | `npm run test:blocking` | Keyword, channel, comment, blocklist, list-target, and hide-decision behavior. |
-| json | `npm run test:json` | JSON-first filtering, network interception, response mutation, endpoint admission, list-mode gates, and content-control hide boundaries. |
+| blocking | `npm run test:blocking` | Keyword, channel, comment provenance, blocklist, list-target, and hide-decision behavior. |
+| json | `npm run test:json` | JSON-first filtering, network interception, response mutation, endpoint admission, list-mode gates, comment provenance/continuation boundaries, and content-control hide boundaries. |
 | dom | `npm run test:dom` | DOM fallback selectors, hide/restore state, cleanup passes, recycled nodes, and route cleanup. |
 | menu | `npm run test:menu` | 3-dot menu, quick-block, collaborator menus, native dropdown close state, and affordance gates. |
 | performance | `npm run test:performance` | Empty/no-rule work budgets, disabled mode, active-rule gates, SPA lag guards, identity work budgets, lifecycle primitive/register proof, and production console logging gates. |
@@ -164,11 +164,11 @@ the surface connected to a focused lane.
 |---|---|
 | blocklist behavior | `test:blocking` keeps `filter-engine-current-behavior` and `main-profile-blocklist-keyword-alias-current-behavior` in lane. |
 | whitelist behavior | `test:whitelist` keeps `json-first-whitelist-decision-identity-boundary` and `content-bridge-whitelist-pending-refresh-boundary` in lane. |
-| keyword/channel blocking | `test:blocking` keeps `json-first-keyword-match-boundary` and `json-first-channel-match-boundary` in lane. |
+| keyword/channel blocking | `test:blocking` keeps `json-first-keyword-match-boundary`, `json-first-channel-match-boundary`, `json-comment-author-channel-provenance-boundary`, and `json-comment-keyword-provenance-boundary` in lane. |
 | Shorts behavior | `test:whitelist` keeps `main-watch-initial-lockup-shorts-json-current-behavior`, `main-watch-initial-shorts-owner-absent-boundary-current-behavior`, `json-first-hide-all-shorts-boundary-current-behavior`, and `shorts-dom-cleanup-boundary-current-behavior` in lane for watch/Shorts allow-mode, owner-absent, Hide Shorts, and DOM cleanup proof. |
 | end screens | `test:whitelist` keeps end-screen videowall, card, autoplay, and player DOM cleanup tests in lane. |
 | quick-block and 3-dot menus | `test:menu` keeps `quick-block-block-menu-affordance-boundary`, `native-dropdown-close-state`, and `content-bridge-collaborator-identity-promotion-handoff` in lane. |
-| JSON-first filtering | `test:json` keeps seed/network, readiness, snapshot, list-mode, response-mutation, content-control JSON-first boundary index, hideAllComments, hideHomeFeed, hideMixPlaylists, hideVideoInfo, hideWatchPlaylistPanel, and YTM showSheet collaborator parity/enrichment tests in lane. |
+| JSON-first filtering | `test:json` keeps seed/network, readiness, snapshot, list-mode, response-mutation, content-control JSON-first boundary index, hideAllComments, comment continuation shortcut, comment author/keyword/entity provenance, comment structural cleanup, continuation collection-root/command-shape/sibling parity, hideHomeFeed, hideMixPlaylists, hideVideoInfo, hideWatchPlaylistPanel, and YTM showSheet collaborator parity/enrichment tests in lane. |
 | DOM fallback | `test:dom` keeps DOM selector instance, DOM fallback selector, CSS hide authority, direct hide writer, quarantined content CSS package boundary, run-state cleanup, virtual-attribute, and route cleanup tests in lane. |
 | direct hide writers | `test:dom` keeps `direct-hide-writer-register-current-behavior` in lane so visual writer/source-order drift stays tied to DOM false-hide proof. |
 | no-rule performance | `test:performance` keeps empty-install, no-work, active-rule, content-control active-work, lifecycle primitive/register proof, diagnostic logging policy, and route-surface budget tests in lane. |

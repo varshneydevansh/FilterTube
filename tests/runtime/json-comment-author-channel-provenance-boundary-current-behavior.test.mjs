@@ -41,8 +41,8 @@ const blockSpecs = {
     file: 'js/filter_logic.js',
     start: "            if (listMode === 'whitelist' && !isCommentRenderer) {",
     end: '            // Channel filtering with comprehensive matching',
-    lines: 105,
-    bytes: 5392
+    lines: 110,
+    bytes: 5535
   },
   filterLogicGlobalChannelBranch: {
     file: 'js/filter_logic.js',
@@ -235,8 +235,8 @@ test('JSON comment author channel provenance source and effect blocks remain pin
   assert.match(audit, /filter_logic filterChannels normalization block bytes: 1026/);
   assert.match(audit, /filter_logic shouldBlock setup block lines: 45/);
   assert.match(audit, /filter_logic shouldBlock setup block bytes: 2191/);
-  assert.match(audit, /filter_logic whitelist comment bypass block lines: 105/);
-  assert.match(audit, /filter_logic whitelist comment bypass block bytes: 5392/);
+  assert.match(audit, /filter_logic whitelist comment bypass block lines: 110/);
+  assert.match(audit, /filter_logic whitelist comment bypass block bytes: 5535/);
   assert.match(audit, /filter_logic global channel branch block lines: 17/);
   assert.match(audit, /filter_logic global channel branch block bytes: 1090/);
   assert.match(audit, /filter_logic comment branch author block lines: 34/);
