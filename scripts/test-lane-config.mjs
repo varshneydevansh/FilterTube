@@ -212,6 +212,8 @@ export const LANES = Object.freeze({
       'tests/runtime/xhr-no-work-boundary-current-behavior.test.mjs',
       'tests/runtime/performance-claim-evidence-boundary-current-behavior.test.mjs',
       'tests/runtime/identity-work-budget-current-behavior.test.mjs',
+      'tests/runtime/lifecycle-instance-register-current-behavior.test.mjs',
+      'tests/runtime/repo-lifecycle-primitive-coverage-current-behavior.test.mjs',
       'tests/runtime/runtime-diagnostic-logging-policy-matrix-current-behavior.test.mjs',
       'tests/runtime/code-burden-declutter-boundary-current-behavior.test.mjs',
       'tests/runtime/test-lane-workflow-large-file-release-current-behavior.test.mjs',

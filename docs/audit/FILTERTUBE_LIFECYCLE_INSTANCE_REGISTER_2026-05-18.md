@@ -29,17 +29,17 @@ family, source family, and owner class.
 
 | Primitive family | Current count | Why it matters |
 | --- | ---: | --- |
-| `addEventListener` | 288 | Listener install surface. |
-| `removeEventListener` | 9 | Explicit listener teardown surface. |
-| `MutationObserver` | 15 | DOM mutation observation surface. |
-| `IntersectionObserver` | 2 | Visibility/identity observation surface. |
+| `addEventListener` | 292 | Listener install surface. |
+| `removeEventListener` | 13 | Explicit listener teardown surface. |
+| `MutationObserver` | 16 | DOM mutation observation surface. |
+| `IntersectionObserver` | 4 | Visibility/identity observation surface. |
 | `setInterval` | 3 | Repeating work surface. |
 | `clearInterval` | 4 | Repeating work teardown surface. |
 | `setTimeout` | 123 | Delayed/debounced/retry work surface. |
 | `clearTimeout` | 34 | Delayed work teardown surface. |
-| `requestAnimationFrame` | 29 | Paint-frame scheduling surface. |
-| `cancelAnimationFrame` | 3 | Paint-frame teardown surface. |
-| **Total lifecycle instances** | **510** | Observer/listener/timer/frame lifecycle surface. |
+| `requestAnimationFrame` | 31 | Paint-frame scheduling surface. |
+| `cancelAnimationFrame` | 4 | Paint-frame teardown surface. |
+| **Total lifecycle instances** | **524** | Observer/listener/timer/frame lifecycle surface. |
 
 This register intentionally does not include direct `fetch`, message,
 display/class, click, or dispatch side effects. Those remain covered by the
@@ -52,7 +52,7 @@ side-effect audits.
 | --- | ---: | --- |
 | `extension-ui-background-js` | 271 | Dashboard, popup, background, StateManager, UI components, and import/export/Nanah lifecycle work. |
 | `content-runtime-js` | 218 | YouTube page-runtime work: seed, bridge, quick/menu, DOM fallback, injector, prompts, and helper listeners. |
-| `website-components` | 9 | Website client lifecycle, mostly theme/scene controls. |
+| `website-components` | 23 | Website client lifecycle, including theme/scene controls plus hero/footer decorative motion. |
 | `vendor-bundles` | 8 | Packaged vendor transport listeners, especially Nanah. |
 | `generated-ui-output` | 4 | Generated shell output; should be freshness-checked, not hand edited. |
 | `build-release-sync-scripts` | 0 | No observer/listener/timer/frame lifecycle instances in this scan. |
@@ -80,7 +80,7 @@ side-effect audits.
 
 | Finding | Evidence | Risk |
 | --- | --- | --- |
-| Lifecycle installs greatly exceed explicit teardown. | 288 listener installs vs 9 listener removals; 123 timeouts vs 34 clears. | Cleanup or route changes cannot rely on teardown being already represented everywhere. |
+| Lifecycle installs greatly exceed explicit teardown. | 292 listener installs vs 13 listener removals; 123 timeouts vs 34 clears. | Cleanup or route changes cannot rely on teardown being already represented everywhere. |
 | UI/background lifecycle is larger than page runtime. | `extension-ui-background-js` has 271 lifecycle instances, while `content-runtime-js` has 218. | YouTube lag fixes still need settings/profile/import/Nanah lifecycle proof because UI can create stale state and broadcasts. |
 | Page runtime has several independent owners. | `js/content_bridge.js`, `js/content/block_channel.js`, `js/content/dom_fallback.js`, `js/injector.js`, prompts, and helpers all own lifecycle instances. | Empty-install, fullscreen, native overlay, and route changes can wake unrelated owners unless one lifecycle budget exists. |
 | Vendor and generated lifecycle instances are packaged but not product source. | `vendor-bundles` has 8; `generated-ui-output` has 4. | These need source/freshness/hash proof, not manual edits. |
@@ -88,15 +88,15 @@ side-effect audits.
 
 ## Install/Teardown Imbalance Addendum - 2026-05-27
 
-This addendum classifies the 510 lifecycle instances by whether they install or
+This addendum classifies the 524 lifecycle instances by whether they install or
 schedule work versus explicitly tear down a primitive covered by this register.
 It is source-derived proof only; it does not approve lifecycle cleanup, route
 teardown, listener removal, observer disconnect changes, or timer rewrites.
 
 | Lifecycle role | Primitive families | Instances | Current interpretation |
 | --- | --- | ---: | --- |
-| `install-or-schedule` | `addEventListener`, `MutationObserver`, `IntersectionObserver`, `setInterval`, `setTimeout`, `requestAnimationFrame` | 460 | Work can be installed, observed, repeated, delayed, or framed. |
-| `explicit-teardown` | `removeEventListener`, `clearInterval`, `clearTimeout`, `cancelAnimationFrame` | 50 | Only the teardown/clear/cancel primitives counted by this register; observer `disconnect()` and owner-specific cleanup still need semantic proof. |
+| `install-or-schedule` | `addEventListener`, `MutationObserver`, `IntersectionObserver`, `setInterval`, `setTimeout`, `requestAnimationFrame` | 469 | Work can be installed, observed, repeated, delayed, or framed. |
+| `explicit-teardown` | `removeEventListener`, `clearInterval`, `clearTimeout`, `cancelAnimationFrame` | 55 | Only the teardown/clear/cancel primitives counted by this register; observer `disconnect()` and owner-specific cleanup still need semantic proof. |
 
 Source-family imbalance:
 
@@ -105,13 +105,13 @@ Source-family imbalance:
 | `extension-ui-background-js` | 257 | 14 | 271 | Dashboard/popup/background/state lifecycle has the largest unmatched install surface. |
 | `content-runtime-js` | 189 | 29 | 218 | YouTube page runtime still has many page-lifetime listeners, observers, timers, and frame callbacks. |
 | `vendor-bundles` | 8 | 0 | 8 | Vendor lifecycle requires source/hash/freshness proof rather than local edits. |
-| `website-components` | 4 | 5 | 9 | Website client code has more explicit teardown primitives than install sites in this scan because cleanup helpers are locally concentrated. |
+| `website-components` | 13 | 10 | 23 | Website client lifecycle grew from hero/footer motion work; it remains outside YouTube page-runtime filtering but still needs website unmount proof. |
 | `generated-ui-output` | 2 | 2 | 4 | Generated shell output needs freshness proof before hand edits. |
 
 ```text
-install-or-schedule lifecycle instances: 460
-explicit-teardown lifecycle instances: 50
-install-to-teardown ratio: 9.2:1
+install-or-schedule lifecycle instances: 469
+explicit-teardown lifecycle instances: 55
+install-to-teardown ratio: 8.5:1
 shared lifecycle registry in product source: absent
 lifecycle cleanup approval from imbalance addendum: NO-GO
 runtime behavior changed by this addendum: no
@@ -119,8 +119,8 @@ runtime behavior changed by this addendum: no
 
 ```mermaid
 flowchart TD
-  A["510 lifecycle instances"] --> B["460 install or schedule work"]
-  A --> C["50 explicit teardown primitives"]
+  A["524 lifecycle instances"] --> B["469 install or schedule work"]
+  A --> C["55 explicit teardown primitives"]
   B --> D["Listeners, observers, timers, frames"]
   C --> E["remove, clear, cancel"]
   D --> F["Cleanup authority remains NO-GO"]
@@ -137,7 +137,7 @@ optimization.
 
 | Listener option shape | Instances | Current risk meaning |
 | --- | ---: | --- |
-| No third argument | 232 | Browser defaults decide capture/passive/once behavior. These are not automatically safe to remove or merge because owner intent is implicit. |
+| No third argument | 236 | Browser defaults decide capture/passive/once behavior. These are not automatically safe to remove or merge because owner intent is implicit. |
 | Boolean `true` capture | 23 | Capture-phase ordering is explicit and can affect native YouTube menu, Kids, playlist, and document-level action behavior. |
 | Object `{ passive: true }` | 16 | Passive scroll/touch/input behavior is explicit and can affect perceived lag, but it is not teardown proof. |
 | Object `{ passive: true, capture: true }` | 6 | Both ordering and passive behavior are explicit; cleanup needs route/action proof. |
@@ -154,14 +154,14 @@ Source-family listener option split:
 | `content-runtime-js` | 74 | Mixed page-runtime listener policy | 21 boolean capture, 16 passive, 6 passive+capture, 5 once, 1 capture object, 1 explicit bubble, 24 no-third-argument |
 | `vendor-bundles` | 8 | Vendor transport defaults | 2 once, 6 no-third-argument |
 | `generated-ui-output` | 2 | Generated expression/identifier options | 2 non-literal option rows |
-| `website-components` | 3 | Website UI defaults | 3 no-third-argument |
+| `website-components` | 7 | Website UI defaults | 7 no-third-argument |
 
 ASCII listener option flow diagram: present
 
 ```text
-288 addEventListener installs
+292 addEventListener installs
         |
-        +--> 232 omitted options
+        +--> 236 omitted options
         +--> 23 boolean capture
         +--> 30 object options
         |       +--> passive / capture / once policy
@@ -178,7 +178,7 @@ Mermaid listener option flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["288 addEventListener installs"] --> B["232 omitted option installs"]
+  A["292 addEventListener installs"] --> B["236 omitted option installs"]
   A --> C["23 boolean capture installs"]
   A --> D["30 object option installs"]
   A --> E["1 explicit bubble false install"]
@@ -192,8 +192,8 @@ flowchart TD
 ```
 
 ```text
-addEventListener option rows: 288
-no-third-argument listener installs: 232
+addEventListener option rows: 292
+no-third-argument listener installs: 236
 boolean true capture listener installs: 23
 object passive true listener installs: 16
 object passive true plus capture true listener installs: 6
@@ -217,7 +217,7 @@ interception changes, teardown changes, or route-scoped cleanup.
 | Listener event type | Instances | Current risk meaning |
 | --- | ---: | --- |
 | `click` | 114 | Dominant UI/menu/action event; delegation or capture changes can alter native YouTube and dashboard behavior. |
-| `change` | 55 | Settings and form controls; needs storage/profile/list-mode mutation proof. |
+| `change` | 57 | Settings, form controls, and website media UI; needs storage/profile/list-mode mutation proof. |
 | `input` | 20 | Live form input; needs debounce, validation, and no-rule UI proof. |
 | `keydown` | 14 | Keyboard shortcuts and command handling; needs focus/native overlay proof. |
 | `DOMContentLoaded` | 8 | Bootstraps page/app state; duplicate or missed boot handling is not proven by the count. |
@@ -228,7 +228,7 @@ interception changes, teardown changes, or route-scoped cleanup.
 | Pointer/mouse hover events | 17 | Quick-block hover/sticky behavior; needs viewport and native overlay proof. |
 | Navigation/route events | 7 | `yt-navigate-finish`, `hashchange`, and `popstate`; needs SPA route ownership proof. |
 | Vendor transport events | 6 | `open`, `error`, and `close`; needs vendor freshness and teardown proof. |
-| `visibilitychange` / `storage` / `resize` / `orientationchange` | 8 | Page/app environment changes; needs shared pause/resume and storage-fanout proof. |
+| `visibilitychange` / `storage` / `resize` / `orientationchange` | 10 | Page/app environment changes; needs shared pause/resume and storage-fanout proof. |
 | `ended` | 1 | Playlist/media coupling; needs engagement side-effect and autoplay proof. |
 | `filterTubeSeedReady` / `toggle` / `pointermove` / `pointerover` | 4 | Local lifecycle edges; needs owner-specific fixture proof. |
 | Non-literal event source | 4 | Runtime expressions (`pointerdown`/`mousedown`, generated shell, website sync event) need expression resolution proof. |
@@ -242,19 +242,19 @@ Source-family listener event split:
 | `content-runtime-js` | 74 | `click` 16, `DOMContentLoaded` 6, `focusin` 5, `mouseleave` 5, `yt-navigate-finish` 5 | 1 |
 | `vendor-bundles` | 8 | `open` 2, `error` 2, `message` 2, `close` 2 | 0 |
 | `generated-ui-output` | 2 | Generated `l2` event dispatch | 2 |
-| `website-components` | 3 | `visibilitychange`, `storage`, and theme sync | 1 |
+| `website-components` | 7 | `visibilitychange`, `change`, `storage`, and theme sync | 1 |
 
 ASCII listener event flow diagram: present
 
 ```text
-288 addEventListener installs
+292 addEventListener installs
         |
         +--> 114 click listeners
-        +--> 55 change listeners
+        +--> 57 change listeners
         +--> 20 input listeners
         +--> 14 keydown listeners
         +--> 8 DOMContentLoaded listeners
-        +--> 72 other literal event listeners
+        +--> 74 other literal event listeners
         +--> 1 ended media listener
         +--> 4 nonliteral event expressions
         +--> 0 missing event arguments
@@ -269,12 +269,12 @@ Mermaid listener event flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["288 addEventListener installs"] --> B["114 click listeners"]
-  A --> C["55 change listeners"]
+  A["292 addEventListener installs"] --> B["114 click listeners"]
+  A --> C["57 change listeners"]
   A --> D["20 input listeners"]
   A --> E["14 keydown listeners"]
   A --> F["8 DOMContentLoaded listeners"]
-  A --> G["72 other literal listeners"]
+  A --> G["74 other literal listeners"]
   A --> H["1 ended media listener"]
   A --> I["4 nonliteral event expressions"]
   B --> J["Listener event cleanup authority remains NO-GO"]
@@ -288,9 +288,9 @@ flowchart TD
 ```
 
 ```text
-addEventListener event rows: 288
+addEventListener event rows: 292
 click listener installs: 114
-change listener installs: 55
+change listener installs: 57
 input listener installs: 20
 keydown listener installs: 14
 DOMContentLoaded listener installs: 8
@@ -311,9 +311,9 @@ generated shell edits.
 
 | Listener target class | Instances | Current risk meaning |
 | --- | ---: | --- |
-| Local element reference | 203 | Dashboard, popup, quick-block, menu, and rendered card listeners dominate the target surface; each still needs owner and teardown proof. |
+| Local element reference | 205 | Dashboard, popup, quick-block, menu, rendered card, and website media listeners dominate the target surface; each still needs owner and teardown proof. |
 | Optional local element reference | 17 | Conditional UI listeners are skipped when elements are absent, but absence tolerance is not lifecycle cleanup proof. |
-| `document` | 39 | Page/global capture and bubble listeners can affect native YouTube menus, SPA route work, and page-level controls. |
+| `document` | 41 | Page/global capture and bubble listeners can affect native YouTube menus, SPA route work, and page-level controls. |
 | `window` | 19 | Page/app lifecycle, message, resize, scroll, and visibility listeners need cross-context and pause/resume proof. |
 | Vendor transport reference | 8 | Vendor session lifecycle listeners require source/hash freshness and close/remove proof before edits. |
 | Generated shell node | 2 | Generated UI shell output owns synthetic node listener dispatch; hand edits need generated-source parity proof. |
@@ -325,17 +325,17 @@ Source-family listener target split:
 | `extension-ui-background-js` | 201 | 13 | 171 local element, 17 optional local element |
 | `content-runtime-js` | 74 | 42 | 32 local element |
 | `vendor-bundles` | 8 | 0 | 8 vendor transport |
-| `website-components` | 3 | 3 | 0 |
+| `website-components` | 7 | 5 | 2 local element |
 | `generated-ui-output` | 2 | 0 | 2 generated shell node |
 
 ASCII listener target flow diagram: present
 
 ```text
-288 addEventListener installs
+292 addEventListener installs
         |
-        +--> 203 local element targets
+        +--> 205 local element targets
         +--> 17 optional local element targets
-        +--> 39 document targets
+        +--> 41 document targets
         +--> 19 window targets
         +--> 8 vendor transport targets
         +--> 2 generated shell targets
@@ -350,9 +350,9 @@ Mermaid listener target flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["288 addEventListener installs"] --> B["203 local element targets"]
+  A["292 addEventListener installs"] --> B["205 local element targets"]
   A --> C["17 optional local element targets"]
-  A --> D["39 document targets"]
+  A --> D["41 document targets"]
   A --> E["19 window targets"]
   A --> F["8 vendor transport targets"]
   A --> G["2 generated shell targets"]
@@ -365,10 +365,10 @@ flowchart TD
 ```
 
 ```text
-addEventListener target rows: 288
-local element listener targets: 203
+addEventListener target rows: 292
+local element listener targets: 205
 optional local element listener targets: 17
-document listener targets: 39
+document listener targets: 41
 window listener targets: 19
 vendor transport listener targets: 8
 generated shell listener targets: 2
@@ -396,7 +396,7 @@ generated edits, or teardown changes.
 | Window scroll/resize/orientation | 9 | Layout, quick-block, and fallback/menu positioning work can add perceived lag. |
 | Window storage/visibility | 1 | Cross-tab/theme sync needs storage-key and no-op proof. |
 | Local element `click` | 104 | Local UI action listeners dominate the count; cleanup requires owner and rendered-node lifecycle proof. |
-| Local element `change`/`input`/`keydown` | 68 | Settings/list-mode/profile mutation events need storage and validation proof before delegation or pruning. |
+| Local element `change`/`input`/`keydown` | 70 | Settings/list-mode/profile/media mutation events need storage and validation proof before delegation or pruning. |
 | Optional local `click` | 0 | Optional local targets currently carry no click listeners; optionality is mostly settings/input control work. |
 | Vendor transport lifecycle | 8 | Vendor open/error/message/close listeners require vendor freshness and session teardown proof. |
 | Generated shell nonliteral | 2 | Generated UI shell listener expressions require source-generation parity before hand edits. |
@@ -409,13 +409,13 @@ Source-family global event-target split:
 | `content-runtime-js:window` | 10 | `message` 4, `scroll` 2, `resize` 1, `orientationchange` 1, `DOMContentLoaded` 1, `filterTubeSeedReady` 1. |
 | `extension-ui-background-js:document` | 6 | `click` 3, `DOMContentLoaded` 2, `keydown` 1. |
 | `extension-ui-background-js:window` | 7 | `resize` 3, `scroll` 2, `hashchange` 1, `popstate` 1. |
-| `website-components:document` | 1 | `visibilitychange` 1. |
+| `website-components:document` | 3 | `visibilitychange` 3. |
 | `website-components:window` | 2 | `storage` 1, nonliteral theme sync 1. |
 
 ASCII listener event-target flow diagram: present
 
 ```text
-288 addEventListener event-target rows
+292 addEventListener event-target rows
         |
         +--> document globals
         |       +--> 10 click
@@ -429,7 +429,7 @@ ASCII listener event-target flow diagram: present
         |       +--> 1 storage/visibility
         +--> local rendered nodes
         |       +--> 104 click
-        |       +--> 68 change/input/keydown
+        |       +--> 70 change/input/keydown
         +--> vendor/generated
                 +--> 8 vendor lifecycle
                 +--> 2 generated nonliteral
@@ -444,9 +444,9 @@ Mermaid listener event-target flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["288 addEventListener event-target rows"] --> B["39 document targets"]
+  A["292 addEventListener event-target rows"] --> B["41 document targets"]
   A --> C["19 window targets"]
-  A --> D["220 local and optional local targets"]
+  A --> D["222 local and optional local targets"]
   A --> E["10 vendor/generated targets"]
   B --> F["10 document click pairs"]
   B --> G["7 document DOMContentLoaded pairs"]
@@ -456,7 +456,7 @@ flowchart TD
   C --> K["2 window route pairs"]
   C --> L["9 window scroll/resize/orientation pairs"]
   D --> M["104 local click pairs"]
-  D --> N["68 local change/input/keydown pairs"]
+  D --> N["70 local change/input/keydown pairs"]
   E --> O["8 vendor lifecycle pairs"]
   E --> P["2 generated nonliteral pairs"]
   F --> Q["Listener event-target cleanup authority remains NO-GO"]
@@ -465,7 +465,7 @@ flowchart TD
 ```
 
 ```text
-addEventListener event-target matrix rows: 288
+addEventListener event-target matrix rows: 292
 document click listener pairs: 10
 document DOMContentLoaded listener pairs: 7
 document keydown listener pairs: 3
@@ -475,7 +475,7 @@ window route listener pairs: 2
 window scroll resize orientation listener pairs: 9
 window storage visibility listener pairs: 1
 local element click listener pairs: 104
-local element change input keydown listener pairs: 68
+local element change input keydown listener pairs: 70
 optional local click listener pairs: 0
 vendor transport lifecycle listener pairs: 8
 generated shell nonliteral listener pairs: 2
@@ -497,7 +497,7 @@ install pruning, generated-shell edits, vendor edits, or listener teardown.
 | Listener callback class | Instances | Current risk meaning |
 | --- | ---: | --- |
 | Inline arrow callback | 252 | Most listeners are anonymous installs; removal or deduping needs owner, closure-capture, and side-effect proof. |
-| Identifier callback reference | 33 | Named references are easier to match to teardown, but still need target, option, route, and active-state proof. |
+| Identifier callback reference | 37 | Named references are easier to match to teardown, but still need target, option, route, and active-state proof. |
 | Member callback reference | 1 | One callback is a member expression; binding/receiver assumptions need explicit owner proof before refactor. |
 | Generated expression callback | 2 | Generated shell output owns two non-local callback expressions; hand edits require source-generation parity proof. |
 
@@ -508,16 +508,16 @@ Source-family listener callback split:
 | `extension-ui-background-js` | 201 | 189 inline arrow callbacks, 12 identifier callbacks. |
 | `content-runtime-js` | 74 | 55 inline arrow callbacks, 18 identifier callbacks, 1 member reference callback. |
 | `vendor-bundles` | 8 | 8 inline arrow callbacks in packaged vendor transport code. |
-| `website-components` | 3 | 3 identifier callbacks. |
+| `website-components` | 7 | 7 identifier callbacks. |
 | `generated-ui-output` | 2 | 2 generated expression callbacks. |
 
 ASCII listener callback flow diagram: present
 
 ```text
-288 addEventListener installs
+292 addEventListener installs
         |
         +--> 252 inline arrow callbacks
-        +--> 33 identifier callback references
+        +--> 37 identifier callback references
         +--> 1 member callback reference
         +--> 2 generated expression callbacks
         +--> 0 missing callback arguments
@@ -533,8 +533,8 @@ Mermaid listener callback flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["288 addEventListener installs"] --> B["252 inline arrow callbacks"]
-  A --> C["33 identifier callback references"]
+  A["292 addEventListener installs"] --> B["252 inline arrow callbacks"]
+  A --> C["37 identifier callback references"]
   A --> D["1 member callback reference"]
   A --> E["2 generated expression callbacks"]
   A --> F["0 missing callback arguments"]
@@ -546,9 +546,9 @@ flowchart TD
 ```
 
 ```text
-addEventListener callback rows: 288
+addEventListener callback rows: 292
 inline arrow listener callbacks: 252
-identifier listener callbacks: 33
+identifier listener callbacks: 37
 member reference listener callbacks: 1
 other generated expression listener callbacks: 2
 missing listener callback arguments: 0
@@ -556,7 +556,7 @@ content runtime listener callbacks: 74
 extension UI background listener callbacks: 201
 generated output listener callbacks: 2
 vendor bundle listener callbacks: 8
-website component listener callbacks: 3
+website component listener callbacks: 7
 listener callback cleanup approval: NO-GO
 runtime behavior changed by this addendum: no
 ```
@@ -571,11 +571,11 @@ edits, inline callback refactors, or route teardown changes.
 
 | Listener add/remove measurement | Instances | Current risk meaning |
 | --- | ---: | --- |
-| `addEventListener` install rows for parity | 288 | Listener install surface remains broad and mostly page-lifetime unless each owner proves teardown or a page-lifetime reason. |
-| `removeEventListener` teardown rows for parity | 9 | Only a small subset has explicit lexical teardown rows. |
+| `addEventListener` install rows for parity | 292 | Listener install surface remains broad and mostly page-lifetime unless each owner proves teardown or a page-lifetime reason. |
+| `removeEventListener` teardown rows for parity | 13 | Only a small subset has explicit lexical teardown rows. |
 | Install-minus-remove delta | 279 | This is not automatically a leak count, but it is the current unproven listener cleanup burden. |
-| Capture-equivalent remove pairs | 9 | Every current remove row has a target/event/callback/capture-compatible add row. |
-| Exact option-shape remove pairs | 8 | One pair is capture-equivalent but not source-identical on the option object. |
+| Capture-equivalent remove pairs | 13 | Every current remove row has a target/event/callback/capture-compatible add row. |
+| Exact option-shape remove pairs | 12 | One pair is capture-equivalent but not source-identical on the option object. |
 | Capture-equivalent option-shape mismatch pairs | 1 | Quick-block pointermove recovery installs with `passive: true, capture: true` and removes with `capture: true`; capture semantics match, option shape does not. |
 | Remove rows without capture-equivalent add pair | 0 | No current remove row is orphaned by source-derived capture matching. |
 | Page-global installs without explicit remove | 51 | `document` and `window` listener installs still need route/page lifetime proof before optimization changes. |
@@ -588,14 +588,15 @@ Source-family add/remove parity:
 | `extension-ui-background-js` | 201 | 0 | 201 |
 | `content-runtime-js` | 74 | 4 | 70 |
 | `vendor-bundles` | 8 | 0 | 8 |
-| `website-components` | 3 | 3 | 0 |
+| `website-components` | 7 | 7 | 0 |
 | `generated-ui-output` | 2 | 2 | 0 |
 
 Remove-row target split:
 
 | Remove target class | Instances |
 | --- | ---: |
-| `document` | 5 |
+| `document` | 7 |
+| `local-element-reference` | 2 |
 | `window` | 2 |
 | `generated-shell-node` | 2 |
 
@@ -608,25 +609,26 @@ Remove-row event split:
 | `keydown` | 1 |
 | `pointermove` | 1 |
 | `storage` | 1 |
-| `visibilitychange` | 1 |
+| `visibilitychange` | 3 |
+| `change` | 2 |
 
 Remove-row callback split:
 
 | Remove callback class | Instances |
 | --- | ---: |
-| Identifier callback reference | 6 |
+| Identifier callback reference | 10 |
 | Member callback reference | 1 |
 | Other/generated callback expression | 2 |
 
 ASCII listener add/remove parity flow diagram: present
 
 ```text
-288 listener installs
+292 listener installs
         |
-        +--> 9 removeEventListener rows
+        +--> 13 removeEventListener rows
         |       |
-        |       +--> 9 capture-equivalent add/remove pairs
-        |       +--> 8 exact option-shape pairs
+        |       +--> 13 capture-equivalent add/remove pairs
+        |       +--> 12 exact option-shape pairs
         |       +--> 1 capture-equivalent option-shape mismatch
         |       +--> 0 orphan remove rows
         |
@@ -662,11 +664,11 @@ flowchart TD
 ```
 
 ```text
-addEventListener install rows for parity: 288
-removeEventListener teardown rows for parity: 9
+addEventListener install rows for parity: 292
+removeEventListener teardown rows for parity: 13
 listener install-minus-remove delta: 279
-capture-equivalent listener remove pairs: 9
-exact option-shape listener remove pairs: 8
+capture-equivalent listener remove pairs: 13
+exact option-shape listener remove pairs: 12
 capture-equivalent option-shape mismatch listener pairs: 1
 listener remove rows without capture-equivalent add pair: 0
 page-global listener installs without explicit remove: 51
@@ -676,7 +678,8 @@ extension UI background listener add/remove delta: 201
 generated UI output listener add/remove delta: 0
 vendor bundle listener add/remove delta: 8
 website component listener add/remove delta: 0
-document listener removes: 5
+document listener removes: 7
+local element listener removes: 2
 window listener removes: 2
 generated shell listener removes: 2
 listener add/remove cleanup approval: NO-GO
@@ -981,11 +984,12 @@ Source-family observer observe target split:
 | --- | ---: | --- |
 | `content-runtime-js` | 16 | 4 card/row, 3 `document.body`, 4 dropdown, 3 generic target, 2 panel/rail |
 | `extension-ui-background-js` | 1 | 1 select element |
+| `website-components` | 4 | 4 other observe targets |
 
 ASCII observer observe target flow diagram: present
 
 ```text
-17 observer observe calls
+21 observer observe calls
         |
         +--> 4 card or row targets
         +--> 3 document.body targets
@@ -993,6 +997,7 @@ ASCII observer observe target flow diagram: present
         +--> 3 generic target expressions
         +--> 2 panel or rail targets
         +--> 1 select target
+        +--> 4 other website targets
         |
         v
 observer target cleanup or optimization authority: NO-GO until each target has
@@ -1005,28 +1010,31 @@ Mermaid observer observe target flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["17 observer observe calls"] --> B["4 card or row targets"]
+  A["21 observer observe calls"] --> B["4 card or row targets"]
   A --> C["3 document.body targets"]
   A --> D["4 dropdown targets"]
   A --> E["3 generic target expressions"]
   A --> F["2 panel or rail targets"]
   A --> G["1 select target"]
+  A --> Z["4 other website targets"]
   B --> H["Observer observe target cleanup authority remains NO-GO"]
   C --> H
   D --> H
   E --> H
   F --> H
   G --> H
+  Z --> H
 ```
 
 ```text
-observer observe rows: 17
+observer observe rows: 21
 document body observe targets: 3
 dropdown observe targets: 4
 generic target observe targets: 3
 card or row observe targets: 4
 panel or rail observe targets: 2
 select observe targets: 1
+other observe targets: 4
 observer observe target cleanup approval: NO-GO
 runtime behavior changed by this addendum: no
 ```
@@ -1042,17 +1050,19 @@ changes, collaborator observer changes, or UI component observer changes.
 
 | Observer observe option class | Instances | Current risk meaning |
 | --- | ---: | --- |
-| Observe option rows | 17 | Every current observer activation is classified by option shape. |
+| Observe option rows | 21 | Every current observer activation is classified by option shape. |
 | `childList + subtree` | 9 | Broad subtree mutation observation can wake on large YouTube SPA changes and needs strict active-work proof. |
 | `childList` only | 1 | Parent-child observation is narrower, but still needs recycled-node and detach proof. |
-| No options | 2 | Current no-option rows are visibility observer activations; they still need target/release proof before cleanup. |
+| No options | 5 | Current no-option rows are visibility/website observer activations; they still need target/release proof before cleanup. |
 | Attribute filters total | 5 | Attribute-only observation is narrower than subtree mutation observation, but native menu and data-marker effects remain sensitive. |
+| Other attribute option | 1 | Website hero/footer observation includes one nonstandard attribute option shape that remains outside extension runtime filtering. |
 | Style/hidden attribute filters | 2 | Native dropdown/menu visibility tracking can affect 3-dot menu reliability and outside-click timing. |
 | `aria-hidden` attribute filter | 1 | Dropdown close detection is native-menu sensitive. |
 | `disabled` attribute filter | 1 | Extension UI select-state observation is outside YouTube page runtime but still lifecycle-owned. |
 | Collaborator identity attribute filter | 1 | Playlist fallback popover refresh depends on FilterTube data markers and can affect collaborator identity state. |
 | Content runtime option rows | 16 | YouTube page runtime owns almost all observer option wakeup surfaces. |
 | Extension UI/background option rows | 1 | One UI component observer tracks a local disabled-state attribute. |
+| Website component option rows | 4 | Website component observer rows are public-site lifecycle, not YouTube page-runtime filtering. |
 
 Source-family observer observe option split:
 
@@ -1060,15 +1070,16 @@ Source-family observer observe option split:
 | --- | ---: | --- |
 | `content-runtime-js` | 16 | 9 childList+subtree, 1 childList-only, 2 no-options, 2 style/hidden filters, 1 aria-hidden filter, 1 collaborator identity filter |
 | `extension-ui-background-js` | 1 | 1 disabled attribute filter |
+| `website-components` | 4 | 3 no-options, 1 other attribute option |
 
 ASCII observer observe option-shape flow diagram: present
 
 ```text
-17 observer observe option rows
+21 observer observe option rows
         |
         +--> 9 childList + subtree observers
         +--> 1 childList-only observer
-        +--> 2 no-option visibility observers
+        +--> 5 no-option visibility/website observers
         +--> 5 attribute-filter observers
               |
               +--> 2 style/hidden filters
@@ -1087,9 +1098,9 @@ Mermaid observer observe option-shape flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["17 observer observe option rows"] --> B["9 childList + subtree observers"]
+  A["21 observer observe option rows"] --> B["9 childList + subtree observers"]
   A --> C["1 childList-only observer"]
-  A --> D["2 no-option visibility observers"]
+  A --> D["5 no-option visibility/website observers"]
   A --> E["5 attribute-filter observers"]
   E --> F["2 style/hidden filters"]
   E --> G["1 aria-hidden filter"]
@@ -1105,10 +1116,10 @@ flowchart TD
 ```
 
 ```text
-observer observe option rows: 17
+observer observe option rows: 21
 observer observe childList subtree option rows: 9
 observer observe childList only option rows: 1
-observer observe no-options rows: 2
+observer observe no-options rows: 5
 observer observe attribute filter rows: 5
 observer observe style hidden attribute filter rows: 2
 observer observe aria-hidden attribute filter rows: 1
@@ -1116,6 +1127,7 @@ observer observe disabled attribute filter rows: 1
 observer observe collaborator identity attribute filter rows: 1
 content runtime observer observe option rows: 16
 extension UI background observer observe option rows: 1
+website component observer observe option rows: 4
 observer observe option-shape cleanup approval: NO-GO
 runtime behavior changed by this addendum: no
 ```
@@ -1131,28 +1143,31 @@ changes.
 
 | Observer disconnect receiver class | Instances | Current risk meaning |
 | --- | ---: | --- |
-| Local `observer` variable | 5 | Local observer teardown appears in several owners; the receiver name alone does not prove route scope or which observed target is being released. |
+| Local `observer` variable | 6 | Local observer teardown appears in several owners; the receiver name alone does not prove route scope or which observed target is being released. |
 | Dropdown close observer | 2 | Menu close/population observers are tied to native dropdown timing and can affect 3-dot menu reliability. |
 | Dropdown discovery observer | 1 | The discovery observer has an explicit stop path, but still needs activation, timeout, and page-lifetime proof. |
 | Collaborator dialog observer | 1 | Collaborator dialog teardown exists behind runtime refresh, but broad listener/dialog lifecycle proof remains open. |
 | Playlist fallback row observer state | 1 | Row observer cleanup is state-owned by the open fallback popover and needs stale-row/recycled-node proof. |
+| Other observer disconnect receiver | 3 | Website hero/footer observer cleanup uses local receiver shapes outside the extension runtime. |
 
 Source-family observer disconnect split:
 
 | Source family | Total disconnect calls | File split |
 | --- | ---: | --- |
 | `content-runtime-js` | 10 | 3 in `js/content/block_channel.js`, 1 in `js/content/collab_dialog.js`, 6 in `js/content_bridge.js` |
+| `website-components` | 4 | 3 in `website/components/footer-signal-art.js`, 1 in `website/components/hero-video.js` |
 
 ASCII observer disconnect flow diagram: present
 
 ```text
-10 observer disconnect calls
+14 observer disconnect calls
         |
-        +--> 5 local observer variable disconnects
+        +--> 6 local observer variable disconnects
         +--> 2 dropdown close observer disconnects
         +--> 1 dropdown discovery observer disconnect
         +--> 1 collaborator dialog observer disconnect
         +--> 1 playlist fallback row observer state disconnect
+        +--> 3 other website observer disconnects
         |
         v
 observer teardown authority: NO-GO until each disconnect call has its matching
@@ -1165,25 +1180,28 @@ Mermaid observer disconnect flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["10 observer disconnect calls"] --> B["5 local observer variable disconnects"]
+  A["14 observer disconnect calls"] --> B["6 local observer variable disconnects"]
   A --> C["2 dropdown close observer disconnects"]
   A --> D["1 dropdown discovery observer disconnect"]
   A --> E["1 collaborator dialog observer disconnect"]
   A --> F["1 playlist fallback row observer state disconnect"]
+  A --> Z["3 other website observer disconnects"]
   B --> G["Observer disconnect cleanup authority remains NO-GO"]
   C --> G
   D --> G
   E --> G
   F --> G
+  Z --> G
 ```
 
 ```text
-observer disconnect rows: 10
-local observer variable disconnect calls: 5
+observer disconnect rows: 14
+local observer variable disconnect calls: 6
 dropdown close observer disconnect calls: 2
 dropdown discovery observer disconnect calls: 1
 collab dialog observer disconnect calls: 1
 popover row observer state disconnect calls: 1
+other observer disconnect receiver calls: 3
 observer disconnect cleanup approval: NO-GO
 runtime behavior changed by this addendum: no
 ```
@@ -1201,16 +1219,17 @@ changes.
 
 | Observer observe/release parity class | Instances | Current risk meaning |
 | --- | ---: | --- |
-| Observe activation rows | 17 | Current runtime/UI code has 17 tracked observer target activations. |
-| Release rows | 11 | Current code has 10 disconnect-style releases and 1 unobserve-style release. |
+| Observe activation rows | 21 | Current runtime/UI code has 21 tracked observer target activations. |
+| Release rows | 15 | Current code has 14 disconnect-style releases and 1 unobserve-style release. |
 | Observe-minus-release delta | 6 | Row-count gap proves that observer cleanup cannot be assumed from constructor counts alone. |
-| Local `observer` observe rows | 10 | Generic local variable names require lexical owner proof before a disconnect can be matched safely. |
+| Local `observer` observe rows | 11 | Generic local variable names require lexical owner proof before a disconnect can be matched safely. |
 | Local `obs` observe rows | 2 | Short local aliases currently have no direct release receiver row. |
-| Exact named observe rows | 5 | Named handles are easier to audit, but still require route/surface/mode proof before cleanup changes. |
-| Exact named observe rows with release | 4 | `dropdownDiscoveryObserver`, `dropdownObserver`, `closeObserver`, and `collabDialogObserver` have direct named release receivers. |
+| Exact named observe rows | 8 | Named handles are easier to audit, but still require route/surface/mode proof before cleanup changes. |
+| Exact named observe rows with release | 7 | Named dropdown, collaborator, and website observer receivers have direct release rows. |
 | Exact named observe rows without release | 1 | `prefetchObserver.observe(card)` has no direct `prefetchObserver.disconnect()` or `prefetchObserver.unobserve(...)` row today. |
 | Content runtime observe/release delta | 5 | YouTube page runtime still owns the meaningful observer cleanup gap. |
 | Extension UI/background observe/release delta | 1 | One dashboard/UI component observer activation lacks a release row. |
+| Website component observe/release delta | 0 | Website observer rows are balanced by release count, but still require hydration/unmount proof. |
 
 Source-family observer observe/release parity split:
 
@@ -1218,20 +1237,21 @@ Source-family observer observe/release parity split:
 | --- | ---: | ---: | ---: |
 | `content-runtime-js` | 16 | 11 | 5 |
 | `extension-ui-background-js` | 1 | 0 | 1 |
+| `website-components` | 4 | 4 | 0 |
 
 ASCII observer observe/release parity flow diagram: present
 
 ```text
-17 observer observe rows
+21 observer observe rows
         |
-        +--> 10 local observer-variable observe rows
+        +--> 11 local observer-variable observe rows
         +--> 2 local obs-variable observe rows
-        +--> 5 exact named observe rows
+        +--> 8 exact named observe rows
                  |
-                 +--> 4 exact named observe rows with release
+                 +--> 7 exact named observe rows with release
                  +--> 1 prefetch observer observe row without release
         |
-        +--> 10 disconnect release rows
+        +--> 14 disconnect release rows
         +--> 1 unobserve release row
         |
         v
@@ -1245,12 +1265,12 @@ Mermaid observer observe/release parity flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["17 observer observe rows"] --> B["10 local observer-variable observe rows"]
+  A["21 observer observe rows"] --> B["11 local observer-variable observe rows"]
   A --> C["2 local obs-variable observe rows"]
-  A --> D["5 exact named observe rows"]
-  D --> E["4 exact named observe rows with release"]
+  A --> D["8 exact named observe rows"]
+  D --> E["7 exact named observe rows with release"]
   D --> F["1 prefetch observer observe row without release"]
-  A --> G["10 disconnect release rows"]
+  A --> G["14 disconnect release rows"]
   A --> H["1 unobserve release row"]
   B --> I["Observer observe/release cleanup authority remains NO-GO"]
   C --> I
@@ -1261,19 +1281,20 @@ flowchart TD
 ```
 
 ```text
-observer observe rows for release parity: 17
-observer release rows for parity: 11
-observer disconnect release rows: 10
+observer observe rows for release parity: 21
+observer release rows for parity: 15
+observer disconnect release rows: 14
 observer unobserve release rows: 1
 observer observe-minus-release delta: 6
-local observer variable observe rows: 10
+local observer variable observe rows: 11
 local obs variable observe rows: 2
-exact named observer observe rows: 5
-exact named observer observe rows with release: 4
+exact named observer observe rows: 8
+exact named observer observe rows with release: 7
 exact named observer observe rows without release: 1
 prefetch observer observe rows without release: 1
 content runtime observer observe/release delta: 5
 extension UI background observer observe/release delta: 1
+website component observer observe/release delta: 0
 observer observe/release cleanup approval: NO-GO
 runtime behavior changed by this addendum: no
 ```
@@ -1289,15 +1310,16 @@ observer changes.
 
 | Observer constructor/observe type parity class | Instances | Current risk meaning |
 | --- | ---: | --- |
-| Observer constructor rows | 17 | `new MutationObserver(...)` and `new IntersectionObserver(...)` constructor count. |
-| `MutationObserver` constructor rows | 15 | Mutation callbacks dominate the observer surface and can wake during large YouTube SPA DOM churn. |
-| `IntersectionObserver` constructor rows | 2 | Visibility observers are fewer but still own card/identity and quick-block viewport work. |
-| Observer observe rows | 17 | `.observe(...)` activation rows match constructor rows by count today. |
-| Mutation observer observe rows | 15 | Current observe target evidence maps to mutation observation for all non-visibility targets. |
+| Observer constructor rows | 20 | `new MutationObserver(...)` and `new IntersectionObserver(...)` constructor count. |
+| `MutationObserver` constructor rows | 16 | Mutation callbacks dominate the observer surface and can wake during large YouTube SPA DOM churn. |
+| `IntersectionObserver` constructor rows | 4 | Visibility observers are fewer but still own card/identity, quick-block viewport work, and website animation state. |
+| Observer observe rows | 21 | `.observe(...)` activation rows now outnumber constructors because website component observe calls include locally shaped observer activation. |
+| Mutation observer observe rows | 19 | Current observe target evidence maps most non-visibility targets and website observe rows to mutation observation by source shape. |
 | Intersection observer observe rows | 2 | Current observe target evidence maps to quick-block host visibility and prefetch card visibility. |
-| Constructor-minus-observe delta | 0 | Count parity exists, but it does not prove each constructor has safe lifetime ownership. |
+| Constructor-minus-observe delta | -1 | Count parity no longer exists repo-wide; source-family proof is required before any observer cleanup. |
 | Content runtime constructor/observe delta | 0 | YouTube page runtime has count parity across 16 constructor and 16 observe rows. |
 | Extension UI/background constructor/observe delta | 0 | Extension UI/background has count parity across 1 constructor and 1 observe row. |
+| Website component constructor/observe delta | -1 | Website observer constructor/observe shapes are balanced by release count but not constructor-count parity. |
 
 Source-family observer constructor/observe type parity split:
 
@@ -1305,23 +1327,24 @@ Source-family observer constructor/observe type parity split:
 | --- | ---: | ---: | ---: | --- |
 | `content-runtime-js` | 16 | 16 | 0 | 14 mutation, 2 intersection |
 | `extension-ui-background-js` | 1 | 1 | 0 | 1 mutation |
+| `website-components` | 3 | 4 | -1 | 1 mutation, 2 intersection constructors; 4 mutation-shaped observe rows |
 
 ASCII observer constructor/observe type parity flow diagram: present
 
 ```text
-17 observer constructor rows
+20 observer constructor rows
         |
-        +--> 15 MutationObserver constructors
-        +--> 2 IntersectionObserver constructors
+        +--> 16 MutationObserver constructors
+        +--> 4 IntersectionObserver constructors
         |
         v
-17 observer observe rows
+21 observer observe rows
         |
-        +--> 15 mutation observer observe rows
+        +--> 19 mutation observer observe rows
         +--> 2 intersection observer observe rows
         |
         v
-constructor/observe count parity exists, but cleanup authority remains NO-GO
+constructor/observe count parity is source-family specific, and cleanup authority remains NO-GO
 until each constructor is tied to owner, callback side effect, observe target,
 route/surface, settings/list-mode predicate, release reason, no-work budget,
 and positive/negative fixtures.
@@ -1331,10 +1354,10 @@ Mermaid observer constructor/observe type parity flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["17 observer constructor rows"] --> B["15 MutationObserver constructors"]
-  A --> C["2 IntersectionObserver constructors"]
-  A --> D["17 observer observe rows"]
-  D --> E["15 mutation observer observe rows"]
+  A["20 observer constructor rows"] --> B["16 MutationObserver constructors"]
+  A --> C["4 IntersectionObserver constructors"]
+  A --> D["21 observer observe rows"]
+  D --> E["19 mutation observer observe rows"]
   D --> F["2 intersection observer observe rows"]
   B --> G["Observer constructor/observe type cleanup authority remains NO-GO"]
   C --> G
@@ -1343,17 +1366,18 @@ flowchart TD
 ```
 
 ```text
-observer constructor rows for type parity: 17
-MutationObserver constructor rows for type parity: 15
-IntersectionObserver constructor rows for type parity: 2
-observer observe rows for type parity: 17
-mutation observer observe rows for type parity: 15
+observer constructor rows for type parity: 20
+MutationObserver constructor rows for type parity: 16
+IntersectionObserver constructor rows for type parity: 4
+observer observe rows for type parity: 21
+mutation observer observe rows for type parity: 19
 intersection observer observe rows for type parity: 2
-observer constructor-minus-observe delta: 0
-mutation observer constructor-minus-observe delta: 0
-intersection observer constructor-minus-observe delta: 0
+observer constructor-minus-observe delta: -1
+mutation observer constructor-minus-observe delta: -3
+intersection observer constructor-minus-observe delta: 2
 content runtime observer constructor/observe delta: 0
 extension UI background observer constructor/observe delta: 0
+website component observer constructor/observe delta: -1
 observer constructor/observe type cleanup approval: NO-GO
 runtime behavior changed by this addendum: no
 ```
@@ -1369,15 +1393,17 @@ changes, or UI component observer changes.
 
 | Observer constructor callback class | Instances | Current risk meaning |
 | --- | ---: | --- |
-| Observer constructor callback rows | 17 | Every current observer constructor has a callback argument. |
-| Inline arrow callbacks | 17 | All observer work is closure-owned today; callback identity alone does not provide a reusable teardown or profiling handle. |
+| Observer constructor callback rows | 20 | Every current observer constructor has a callback argument. |
+| Inline arrow callbacks | 20 | All observer work is closure-owned today; callback identity alone does not provide a reusable teardown or profiling handle. |
 | Identifier callbacks | 0 | No observer constructor currently uses a named callback reference. |
 | Missing callbacks | 0 | There are no syntactically missing callback arguments in tracked JS/JSX/MJS sources. |
 | `mutations` parameter callbacks | 9 | Mutation-list callbacks can scale with YouTube SPA DOM churn and require owner/effect proof before optimization. |
 | `entries` parameter callbacks | 2 | Visibility entry callbacks own quick-block and prefetch behavior and need target/effect proof. |
-| No-parameter callbacks | 6 | These observers react only to change occurrence, not mutation details, and need wake-frequency proof before cleanup decisions. |
+| No-parameter callbacks | 7 | These observers react only to change occurrence, not mutation details, and need wake-frequency proof before cleanup decisions. |
+| Other callback-parameter shape | 2 | Website component callback shapes need local component proof rather than extension runtime assumptions. |
 | Content runtime callbacks | 16 | YouTube page runtime owns nearly all observer callback wakeups. |
 | Extension UI/background callbacks | 1 | One dashboard/UI component observer callback is outside YouTube page runtime but still lifecycle-owned. |
+| Website component callbacks | 3 | Public-site component observers are outside YouTube filtering but still part of package lifecycle. |
 
 Source-family observer constructor callback split:
 
@@ -1385,19 +1411,21 @@ Source-family observer constructor callback split:
 | --- | ---: | --- |
 | `content-runtime-js` | 16 | 16 inline arrow callbacks |
 | `extension-ui-background-js` | 1 | 1 inline arrow callback |
+| `website-components` | 3 | 3 inline arrow callbacks |
 
 ASCII observer constructor callback flow diagram: present
 
 ```text
-17 observer constructor callbacks
+20 observer constructor callbacks
         |
-        +--> 17 inline arrow callbacks
+        +--> 20 inline arrow callbacks
         +--> 0 identifier callbacks
         +--> 0 missing callbacks
         |
         +--> 9 mutations-parameter callbacks
         +--> 2 entries-parameter callbacks
-        +--> 6 no-parameter callbacks
+        +--> 7 no-parameter callbacks
+        +--> 2 other callback-parameter shapes
         |
         v
 observer constructor callback cleanup authority: NO-GO until each callback has
@@ -1410,28 +1438,31 @@ Mermaid observer constructor callback flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["17 observer constructor callbacks"] --> B["17 inline arrow callbacks"]
+  A["20 observer constructor callbacks"] --> B["20 inline arrow callbacks"]
   A --> C["0 identifier callbacks"]
   A --> D["0 missing callbacks"]
   A --> E["9 mutations-parameter callbacks"]
   A --> F["2 entries-parameter callbacks"]
-  A --> G["6 no-parameter callbacks"]
+  A --> G["7 no-parameter callbacks"]
+  A --> Z["2 other callback-parameter shapes"]
   B --> H["Observer constructor callback cleanup authority remains NO-GO"]
   E --> H
   F --> H
   G --> H
+  Z --> H
 ```
 
 ```text
-observer constructor callback rows: 17
-inline arrow observer constructor callbacks: 17
+observer constructor callback rows: 20
+inline arrow observer constructor callbacks: 20
 identifier observer constructor callbacks: 0
 missing observer constructor callbacks: 0
 observer callbacks with mutations parameter: 9
 observer callbacks with entries parameter: 2
-observer callbacks with no parameter: 6
+observer callbacks with no parameter: 7
 content runtime observer constructor callbacks: 16
 extension UI background observer constructor callbacks: 1
+website component observer constructor callbacks: 3
 observer constructor callback cleanup approval: NO-GO
 runtime behavior changed by this addendum: no
 ```
@@ -3357,8 +3388,9 @@ no-rule teardown claims.
 
 | Explicit teardown handle class | Instances | Current risk meaning |
 | --- | ---: | --- |
-| Listener document target | 5 | Document-level removal exists, but event/callback/option parity still needs source-pair proof. |
+| Listener document target | 7 | Document-level removal exists, but event/callback/option parity still needs source-pair proof. |
 | Listener window target | 2 | Website/client window listeners have local cleanup but still need route/unmount proof. |
+| Listener other target | 2 | Website media listeners remove via local element refs and need component unmount proof. |
 | Listener generated shell target | 2 | Generated shell remove calls need source freshness proof, not hand edits. |
 | Timeout local id handle | 12 | Local ids can be cheap, but ownership is block-scoped and needs stale-callback proof. |
 | Timeout named state handle | 14 | Module or closure state handles can survive route/profile changes if ownership is unclear. |
@@ -3368,15 +3400,16 @@ no-rule teardown claims.
 | Interval dashboard rotation handle | 1 | Dashboard UI rotation cleanup is separate from YouTube runtime lag risk. |
 | Frame profile dropdown handle | 2 | Profile dropdown positioning cancels frames, but UI lifecycle proof remains local to dashboard state. |
 | Frame position handle | 1 | Shared UI positioning cancels one frame handle; portal ownership still needs proof. |
+| Frame other handle | 1 | Website decorative animation owns one frame cancel outside extension runtime filtering. |
 
 Primitive-family explicit teardown split:
 
 | Primitive family | Teardown rows |
 | --- | ---: |
-| `removeEventListener` | 9 |
+| `removeEventListener` | 13 |
 | `clearTimeout` | 34 |
 | `clearInterval` | 4 |
-| `cancelAnimationFrame` | 3 |
+| `cancelAnimationFrame` | 4 |
 
 Source-family explicit teardown split:
 
@@ -3384,18 +3417,19 @@ Source-family explicit teardown split:
 | --- | ---: | --- |
 | `content-runtime-js` | 29 | 4 document listener removals, 5 local timeout ids, 9 named timeout handles, 8 property-held timeout handles, 2 engine-check interval clears, 1 warmup interval clear. |
 | `extension-ui-background-js` | 14 | 5 local timeout ids, 5 named timeout handles, 1 dashboard interval clear, 2 profile dropdown frame cancels, 1 generic position frame cancel. |
-| `website-components` | 5 | 2 window listener removals, 1 document listener removal, 2 local timeout clears. |
+| `website-components` | 10 | 3 document listener removals, 2 window listener removals, 2 local listener removals, 2 local timeout clears, 1 frame cancel. |
 | `generated-ui-output` | 2 | 2 generated shell listener removals. |
 
 ASCII explicit teardown flow diagram: present
 
 ```text
-50 explicit teardown handle rows
+55 explicit teardown handle rows
         |
-        +-->  9 removeEventListener rows
-        |       +--> 5 document targets
+        +--> 13 removeEventListener rows
+        |       +--> 7 document targets
         |       +--> 2 window targets
         |       +--> 2 generated shell targets
+        |       +--> 2 other targets
         +--> 34 clearTimeout rows
         |       +--> 12 local id handles
         |       +--> 14 named state handles
@@ -3404,9 +3438,10 @@ ASCII explicit teardown flow diagram: present
         |       +--> 2 engine-check handles
         |       +--> 1 warmup handle
         |       +--> 1 dashboard rotation handle
-        +-->  3 cancelAnimationFrame rows
+        +-->  4 cancelAnimationFrame rows
                 +--> 2 profile dropdown handles
                 +--> 1 position handle
+                +--> 1 other handle
         |
         v
 explicit teardown cleanup authority: NO-GO until every clear/remove/cancel
@@ -3419,13 +3454,14 @@ Mermaid explicit teardown flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["50 explicit teardown handle rows"] --> B["9 removeEventListener rows"]
+  A["55 explicit teardown handle rows"] --> B["13 removeEventListener rows"]
   A --> C["34 clearTimeout rows"]
   A --> D["4 clearInterval rows"]
-  A --> E["3 cancelAnimationFrame rows"]
-  B --> F["5 document targets"]
+  A --> E["4 cancelAnimationFrame rows"]
+  B --> F["7 document targets"]
   B --> G["2 window targets"]
   B --> H["2 generated shell targets"]
+  B --> Z["2 other targets"]
   C --> I["12 local id handles"]
   C --> J["14 named state handles"]
   C --> K["8 property-held handles"]
@@ -3434,6 +3470,7 @@ flowchart TD
   D --> N["1 dashboard rotation handle"]
   E --> O["2 profile dropdown handles"]
   E --> P["1 position handle"]
+  E --> Y["1 other frame handle"]
   F --> Q["Explicit teardown cleanup authority remains NO-GO"]
   G --> Q
   H --> Q
@@ -3445,17 +3482,20 @@ flowchart TD
   N --> Q
   O --> Q
   P --> Q
+  Z --> Q
+  Y --> Q
 ```
 
 ```text
-explicit teardown handle rows: 50
-removeEventListener teardown rows: 9
+explicit teardown handle rows: 55
+removeEventListener teardown rows: 13
 clearTimeout teardown rows: 34
 clearInterval teardown rows: 4
-cancelAnimationFrame teardown rows: 3
-listener document teardown targets: 5
+cancelAnimationFrame teardown rows: 4
+listener document teardown targets: 7
 listener window teardown targets: 2
 listener generated shell teardown targets: 2
+listener other teardown targets: 2
 timeout local id teardown handles: 12
 timeout named state teardown handles: 14
 timeout property held teardown handles: 8
@@ -3464,6 +3504,7 @@ interval warmup teardown handles: 1
 interval dashboard rotation teardown handles: 1
 frame profile dropdown teardown handles: 2
 frame position teardown handles: 1
+frame other teardown handles: 1
 explicit teardown cleanup approval: NO-GO
 runtime behavior changed by this addendum: no
 ```
@@ -3480,7 +3521,7 @@ timing changes, or no-rule frame cleanup.
 | --- | ---: | --- |
 | Assigned positioning frame handle | 2 | A cancelable frame handle exists, but only for positioning flows and only where matching cancel proof is local. |
 | Inline anonymous frame callback | 15 | Anonymous frame callbacks cannot be removed or coalesced without owner, route, and side-effect proof. |
-| Identifier callback frame | 5 | Named callbacks are easier to pair with owners, but still need stale-route and no-work proof. |
+| Identifier callback frame | 7 | Named callbacks are easier to pair with owners, but still need stale-route and no-work proof. |
 | Inline `scrollIntoView` frame | 5 | Dashboard navigation scroll frames are UI-only, but they can still affect perceived app responsiveness. |
 | Inline timeout-hop frame | 2 | Two frames intentionally hand work to `setTimeout`, so both frame and timer budgets matter. |
 
@@ -3490,6 +3531,7 @@ Source-family animation frame schedule split:
 | --- | ---: | --- |
 | `content-runtime-js` | 13 | 4 identifier callbacks, 7 inline anonymous callbacks, 2 timeout-hop callbacks. |
 | `extension-ui-background-js` | 16 | 2 assigned positioning handles, 1 identifier callback, 8 inline anonymous callbacks, 5 scroll-into-view callbacks. |
+| `website-components` | 2 | 2 identifier callback frames for public-site decorative motion. |
 
 Assigned frame handles:
 
@@ -3501,18 +3543,19 @@ Assigned frame handles:
 ASCII animation frame schedule flow diagram: present
 
 ```text
-29 requestAnimationFrame schedule rows
+31 requestAnimationFrame schedule rows
         |
         +-->  2 assigned positioning frame handles
         |       +--> 1 positionRaf
         |       +--> 1 profileDropdownPositionRaf
         +--> 15 inline anonymous frame callbacks
-        +-->  5 identifier callback frames
+        +-->  7 identifier callback frames
         +-->  5 inline scrollIntoView frames
         +-->  2 inline timeout-hop frames
         |
         +--> 13 content-runtime frame schedules
         +--> 16 extension UI/background frame schedules
+        +-->  2 website component frame schedules
         |
         v
 animation frame schedule cleanup authority: NO-GO until every frame schedule
@@ -3525,15 +3568,16 @@ Mermaid animation frame schedule flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["29 requestAnimationFrame schedules"] --> B["2 assigned positioning frame handles"]
+  A["31 requestAnimationFrame schedules"] --> B["2 assigned positioning frame handles"]
   A --> C["15 inline anonymous callbacks"]
-  A --> D["5 identifier callbacks"]
+  A --> D["7 identifier callbacks"]
   A --> E["5 scrollIntoView callbacks"]
   A --> F["2 timeout-hop callbacks"]
   B --> G["1 positionRaf"]
   B --> H["1 profileDropdownPositionRaf"]
   A --> I["13 content-runtime schedules"]
   A --> J["16 extension UI/background schedules"]
+  A --> Z["2 website component schedules"]
   C --> K["Animation frame schedule cleanup authority remains NO-GO"]
   D --> K
   E --> K
@@ -3542,17 +3586,19 @@ flowchart TD
   H --> K
   I --> K
   J --> K
+  Z --> K
 ```
 
 ```text
-requestAnimationFrame schedule rows: 29
+requestAnimationFrame schedule rows: 31
 assigned positioning frame handle schedules: 2
 inline anonymous frame schedules: 15
-identifier callback frame schedules: 5
+identifier callback frame schedules: 7
 inline scrollIntoView frame schedules: 5
 inline timeout hop frame schedules: 2
 content runtime frame schedules: 13
 extension UI background frame schedules: 16
+website component frame schedules: 2
 positionRaf assigned frame schedules: 1
 profileDropdownPositionRaf assigned frame schedules: 1
 animation frame schedule cleanup approval: NO-GO
@@ -3570,13 +3616,13 @@ quick-block/menu timing changes, or no-rule frame cleanup.
 
 | Animation frame schedule/cancel fact | Instances | Current risk meaning |
 | --- | ---: | --- |
-| `requestAnimationFrame` schedule rows | 29 | Paint-frame work is still a meaningful lifecycle surface. |
-| `cancelAnimationFrame` rows | 3 | Only stored frame handles can be cancelled explicitly. |
-| Schedule-minus-cancel delta | 26 | Counts the schedule rows without matching cancel rows; not every one is necessarily a leak, but every one needs owner proof before pruning. |
-| Schedules without assigned handle | 27 | Inline or identifier callbacks cannot be cancelled later because no handle is retained. |
+| `requestAnimationFrame` schedule rows | 31 | Paint-frame work is still a meaningful lifecycle surface. |
+| `cancelAnimationFrame` rows | 4 | Only stored frame handles can be cancelled explicitly. |
+| Schedule-minus-cancel delta | 27 | Counts the schedule rows without matching cancel rows; not every one is necessarily a leak, but every one needs owner proof before pruning. |
+| Schedules without assigned handle | 29 | Inline or identifier callbacks cannot be cancelled later because no handle is retained. |
 | Schedules with assigned handle | 2 | Only `positionRaf` and `profileDropdownPositionRaf` retain frame handles. |
 | Cancel rows with direct schedule handle | 3 | Every cancel row points at a currently scheduled handle name. |
-| Cancel rows without direct schedule handle | 0 | No current cancel call points at an unknown frame handle. |
+| Cancel rows without direct schedule handle | 1 | One website frame cancel is locally valid but outside the direct lexical schedule-handle match used by this generic proof. |
 | Handled schedule rows with cancel handle | 2 | Both retained frame handles have at least one cancel path. |
 | Handled schedule rows without cancel handle | 0 | No retained frame handle is missing a cancel path. |
 | Distinct scheduled frame handles without cancel | 0 | The risk is mostly unretained one-shot frame work, not orphaned retained frame handles. |
@@ -3587,6 +3633,7 @@ Source-family schedule/cancel split:
 | --- | ---: | ---: | ---: | ---: |
 | `content-runtime-js` | 13 | 0 | 13 | 13 |
 | `extension-ui-background-js` | 16 | 3 | 13 | 14 |
+| `website-components` | 2 | 1 | 1 | 2 |
 
 Cancel handle split:
 
@@ -3594,21 +3641,23 @@ Cancel handle split:
 | --- | ---: |
 | `positionRaf` | 1 |
 | `profileDropdownPositionRaf` | 2 |
+| `frameId` | 1 |
 
 ASCII animation frame schedule/cancel parity flow diagram: present
 
 ```text
-29 requestAnimationFrame schedule rows
+31 requestAnimationFrame schedule rows
         |
-        +--> 27 schedules without assigned handle
+        +--> 29 schedules without assigned handle
         |       +--> cannot be cancelled by later cancelAnimationFrame
         +-->  2 schedules with assigned handle
         |       +--> 1 positionRaf schedule
         |       +--> 1 profileDropdownPositionRaf schedule
         |
-        +-->  3 cancelAnimationFrame rows
+        +-->  4 cancelAnimationFrame rows
                 +--> 1 positionRaf cancel row
                 +--> 2 profileDropdownPositionRaf cancel rows
+                +--> 1 frameId cancel row
         |
         v
 animation frame schedule/cancel cleanup authority: NO-GO until every frame has
@@ -3621,32 +3670,36 @@ Mermaid animation frame schedule/cancel parity flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["29 requestAnimationFrame schedules"] --> B["27 schedules without retained handle"]
+  A["31 requestAnimationFrame schedules"] --> B["29 schedules without retained handle"]
   A --> C["2 schedules with retained handle"]
   C --> D["1 positionRaf schedule"]
   C --> E["1 profileDropdownPositionRaf schedule"]
-  F["3 cancelAnimationFrame rows"] --> G["1 positionRaf cancel"]
+  F["4 cancelAnimationFrame rows"] --> G["1 positionRaf cancel"]
   F --> H["2 profileDropdownPositionRaf cancels"]
+  F --> Z["1 frameId cancel"]
   B --> I["Frame schedule/cancel cleanup authority remains NO-GO"]
   D --> I
   E --> I
   G --> I
   H --> I
+  Z --> I
 ```
 
 ```text
-requestAnimationFrame schedule rows for parity: 29
-cancelAnimationFrame rows for parity: 3
-animation frame schedule-minus-cancel delta: 26
-frame schedules without assigned handle: 27
+requestAnimationFrame schedule rows for parity: 31
+cancelAnimationFrame rows for parity: 4
+animation frame schedule-minus-cancel delta: 27
+frame schedules without assigned handle: 29
 frame schedules with assigned handle: 2
 cancelAnimationFrame rows with direct schedule handle: 3
-cancelAnimationFrame rows without direct schedule handle: 0
+cancelAnimationFrame rows without direct schedule handle: 1
 handled frame schedule rows with cancel handle: 2
 handled frame schedule rows without cancel handle: 0
 distinct scheduled frame handles without cancel: 0
 content runtime frame schedule/cancel delta: 13
 extension UI background frame schedule/cancel delta: 13
+website component frame schedule/cancel delta: 1
+frameId cancel rows: 1
 positionRaf cancel rows: 1
 profileDropdownPositionRaf cancel rows: 2
 animation frame schedule/cancel cleanup approval: NO-GO
@@ -3831,6 +3884,7 @@ theme storage changes, scene scheduling changes, or lifecycle pruning.
 
 | Website lifecycle domain | Rows | Install/schedule | Explicit teardown | Current risk meaning |
 | --- | ---: | ---: | ---: | --- |
+| Website other lifecycle | 14 | 9 | 5 | Hero/footer decorative motion adds balanced listeners, observers, and frame cleanup outside extension runtime filtering. |
 | Scene scheduler lifecycle | 5 | 2 | 3 | `SceneController` schedules scene updates and visibility refresh, then clears the timeout from both visibility and unmount paths. |
 | Theme sync lifecycle | 4 | 2 | 2 | `ThemeToggle` listens for cross-tab storage and same-tab custom theme sync, with paired unmount removals. |
 
@@ -3838,22 +3892,30 @@ Website component lifecycle primitive split:
 
 | Primitive family | Rows | Current proof status |
 | --- | ---: | --- |
-| `addEventListener` | 3 | Website listeners are local to scene/theme effects, not extension runtime filtering. |
-| `removeEventListener` | 3 | Listener removals are paired locally but still need route hydration and unmount fixture proof. |
+| `addEventListener` | 7 | Website listeners are local to public-site component effects, not extension runtime filtering. |
+| `removeEventListener` | 7 | Listener removals are paired locally but still need route hydration and unmount fixture proof. |
+| `MutationObserver` | 1 | Website observer work is public-site animation/supporting UI only. |
+| `IntersectionObserver` | 2 | Website visibility observers support public-site animation only. |
 | `setTimeout` | 1 | Scene scheduling is one website timer, separate from YouTube runtime no-work budgets. |
 | `clearTimeout` | 2 | Scene timeout can be cleared from visibility refresh and unmount cleanup. |
+| `requestAnimationFrame` | 2 | Website frame scheduling is outside YouTube page-runtime filtering. |
+| `cancelAnimationFrame` | 1 | Website frame cancellation remains component-local proof, not extension lifecycle authority. |
 
 Website component lifecycle file split:
 
 | File | Rows | Current role |
 | --- | ---: | --- |
+| `website/components/footer-signal-art.js` | 9 | Footer animation and observer cleanup. |
+| `website/components/hero-video.js` | 5 | Hero media/visibility lifecycle. |
 | `website/components/scene-controller.js` | 5 | Scene data-attribute scheduler and visibility lifecycle. |
 | `website/components/theme-toggle.js` | 4 | LocalStorage-backed theme sync listener lifecycle. |
 
 ASCII website component lifecycle boundary flow diagram: present
 
 ```text
-9 website component lifecycle rows
+23 website component lifecycle rows
+  +--> 14 website other lifecycle rows
+  |     +--> hero/footer media, observer, frame, and listener cleanup
   +--> 5 scene scheduler lifecycle rows
   |     +--> 1 setTimeout + 2 clearTimeout + visibility listener add/remove
   +--> 4 theme sync lifecycle rows
@@ -3871,25 +3933,29 @@ Mermaid website component lifecycle boundary flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["9 website component lifecycle rows"] --> B["5 scene scheduler rows"]
+  A["23 website component lifecycle rows"] --> B["5 scene scheduler rows"]
   A --> C["4 theme sync rows"]
+  A --> Z["14 website other rows"]
   B --> D["Scene timeout plus visibility add/remove"]
   C --> E["Storage and custom theme-sync add/remove"]
+  Z --> Y["Hero/footer media, observer, frame, and listener cleanup"]
   D --> F["Needs hydration, unmount, timer, and deploy proof"]
   E --> G["Needs storage, cross-tab, same-tab, and route proof"]
   F --> H["Website lifecycle cleanup authority remains NO-GO"]
   G --> H
+  Y --> H
 ```
 
 ```text
-website component lifecycle rows: 9
-website component install-or-schedule rows: 4
-website component explicit-teardown rows: 5
-website component addEventListener rows: 3
-website component removeEventListener rows: 3
+website component lifecycle rows: 23
+website component install-or-schedule rows: 13
+website component explicit-teardown rows: 10
+website component addEventListener rows: 7
+website component removeEventListener rows: 7
 website component setTimeout rows: 1
 website component clearTimeout rows: 2
-website component lifecycle source files: 2
+website component lifecycle source files: 4
+website other lifecycle rows: 14
 website scene scheduler lifecycle rows: 5
 website theme sync lifecycle rows: 4
 website scene scheduler install-or-schedule rows: 2
@@ -3985,7 +4051,7 @@ serialized pending reruns. It records that no
 ## Release Hot-Path Lifecycle Addendum - 2026-05-27
 
 This addendum records semantic lifecycle ownership for the lag/menu/blocklist
-release path. It does not change the 510-instance source count and does not
+release path. It does not change the 524-instance source count and does not
 claim lifecycle cleanup is generally safe. It narrows the highest-risk
 observer/listener/timer instances that were involved in the empty-install lag,
 quick-cross availability, comment-menu close, whitelist pending-hide, and
@@ -4281,12 +4347,12 @@ Source inputs:
 - `tests/runtime/lifecycle-instance-register-current-behavior.test.mjs`
 
 ```text
-510 tracked lifecycle primitive instances
+524 tracked lifecycle primitive instances
         |
-        +--> 460 install-or-schedule rows
+        +--> 469 install-or-schedule rows
         |       +--> listeners, observers, timers, intervals, frames
         |
-        +--> 50 explicit teardown rows
+        +--> 55 explicit teardown rows
         |       +--> remove, clear, cancel primitives
         |
         +--> local owner gates and partial disconnects
@@ -4301,8 +4367,8 @@ missing shared lifecycle effect/teardown authority
 
 ```mermaid
 flowchart TD
-  A["510 tracked lifecycle primitive instances"] --> B["460 install-or-schedule rows"]
-  A --> C["50 explicit teardown rows"]
+  A["524 tracked lifecycle primitive instances"] --> B["469 install-or-schedule rows"]
+  A --> C["55 explicit teardown rows"]
   B --> D["Listeners, observers, timers, intervals, frames"]
   C --> E["Remove, clear, cancel primitives"]
   D --> F["Local owner gates and partial disconnects"]
@@ -4315,10 +4381,10 @@ flowchart TD
 
 | Row id | Joined proof surface | Current source-backed state | Why implementation remains NO-GO |
 | --- | --- | --- | --- |
-| `lifecycle_convergence_primitive_census` | Repo-wide primitive census | 510 lifecycle primitive instances are tracked: 460 install-or-schedule rows and 50 explicit teardown rows. | A count proves breadth, not owner, trigger, side-effect, route, or teardown safety. |
-| `lifecycle_convergence_listener_surface` | Listener installs, targets, callbacks, and add/remove parity | 288 `addEventListener` rows, 9 `removeEventListener` rows, a 279 install-minus-remove delta, 51 page-global listener installs without explicit remove, and 42 content-runtime document/window listener rows are pinned. | Listener cleanup can change native menu timing, route work, page-message trust, quick-block affordances, and UI mutation behavior. |
-| `lifecycle_convergence_observer_surface` | Observer constructors, observe targets/options, disconnects, and observe/release parity | 17 observer constructor rows, 17 observe activation rows, 11 release rows, 10 disconnect rows, and a 6 observe-minus-release delta are pinned. | Observer cleanup remains split across dropdowns, quick-block, fallback menu, prefetch, DOM fallback, and collaborator dialog owners. |
-| `lifecycle_convergence_timer_frame_surface` | Timer, interval, and animation-frame schedules | 123 lexical `setTimeout` rows, 3 `setInterval` rows, 29 `requestAnimationFrame` rows, 33 YouTube SPA immediate/short hot timer rows, 29 desktop residual rows, and 4 mobile/coarse eager rows are pinned. | Delay or cancellation changes require per-owner no-work, max-rerun, stale-route, and side-effect evidence. |
+| `lifecycle_convergence_primitive_census` | Repo-wide primitive census | 524 lifecycle primitive instances are tracked: 469 install-or-schedule rows and 55 explicit teardown rows. | A count proves breadth, not owner, trigger, side-effect, route, or teardown safety. |
+| `lifecycle_convergence_listener_surface` | Listener installs, targets, callbacks, and add/remove parity | 292 `addEventListener` rows, 13 `removeEventListener` rows, a 279 install-minus-remove delta, 51 page-global listener installs without explicit remove, and 42 content-runtime document/window listener rows are pinned. | Listener cleanup can change native menu timing, route work, page-message trust, quick-block affordances, and UI mutation behavior. |
+| `lifecycle_convergence_observer_surface` | Observer constructors, observe targets/options, disconnects, and observe/release parity | 20 observer constructor rows, 21 observe activation rows, 15 release rows, 14 disconnect rows, and a 6 observe-minus-release delta are pinned. | Observer cleanup remains split across dropdowns, quick-block, fallback menu, prefetch, DOM fallback, collaborator dialog, and website component owners. |
+| `lifecycle_convergence_timer_frame_surface` | Timer, interval, and animation-frame schedules | 123 lexical `setTimeout` rows, 3 `setInterval` rows, 31 `requestAnimationFrame` rows, 33 YouTube SPA immediate/short hot timer rows, 29 desktop residual rows, and 4 mobile/coarse eager rows are pinned. | Delay or cancellation changes require per-owner no-work, max-rerun, stale-route, and side-effect evidence. |
 | `lifecycle_convergence_hot_spa_owners` | High-risk YouTube SPA lifecycle owners | 16 hot YouTube SPA owner rows cover quick-block, native menu, dropdown discovery/visibility, identity prefetch, playlist prefetch, whitelist right rail, DOM fallback, fallback menu, metadata reruns, seed replay, injector readiness, and settings refresh debounce. | Hot owners are locally gated, but no shared lifecycle registry proves route/surface teardown or disabled-mode zero work. |
 | `lifecycle_convergence_mode_surface_budget` | Empty, active, mobile/coarse, whitelist, watch, YTM, and Kids surfaces | Empty desktop observer proof is partial; active blocklist, mobile/coarse, whitelist, watch/YTM/Kids, and DOM fallback active work all remain separate budget classes. | One successful empty-desktop slice cannot authorize active-rule, mobile, whitelist, watch, YTM, or Kids lifecycle pruning. |
 | `lifecycle_convergence_teardown_effect_budget` | Lifecycle effect budget and teardown decision register | Existing docs identify missing shared runtime authority before observers, listeners, timers, frames, and page-global patches can be reduced. | Local gates and local cleanup are not equivalent to a route-scoped lifecycle teardown authority. |
@@ -4331,9 +4397,9 @@ Current lifecycle convergence status:
 ```text
 runtime lifecycle convergence rows: 10
 implementation-ready runtime lifecycle convergence rows: 0
-tracked lifecycle primitive instances: 510
-install-or-schedule lifecycle rows: 460
-explicit teardown lifecycle rows: 50
+tracked lifecycle primitive instances: 524
+install-or-schedule lifecycle rows: 469
+explicit teardown lifecycle rows: 55
 hot YouTube SPA lifecycle owner rows: 16
 YouTube SPA immediate/short hot timer rows: 33
 files with complete per-callable semantic proof: 0

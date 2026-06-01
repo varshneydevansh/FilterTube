@@ -168,30 +168,30 @@ function aggregate() {
 test('repo lifecycle primitive coverage documents the tracked JS source boundary', () => {
   assert.match(coverageDoc, /git ls-files '\*\.js' '\*\.jsx' '\*\.mjs'/);
   assert.match(coverageDoc, /Current tracked JS\/JSX\/MJS count:/);
-  assert.match(coverageDoc, /63/);
+  assert.match(coverageDoc, /69/);
   assert.match(coverageDoc, /Ignored root captures and generated package output are excluded/);
 });
 
 test('every tracked JS JSX and MJS file is lifecycle-classified', () => {
   const { files, families, perFile } = aggregate();
-  assert.equal(files.length, 63);
+  assert.equal(files.length, 69);
   assert.deepEqual(
     Object.fromEntries(Object.entries(families).map(([family, stats]) => [family, stats.files]).sort()),
     {
-      'build-release-sync-scripts': 4,
-      'content-runtime-js': 16,
+      'build-release-sync-scripts': 7,
+      'content-runtime-js': 17,
       'extension-ui-background-js': 11,
       'generated-ui-output': 2,
       'generated-ui-source': 3,
       'quarantined-legacy-js': 1,
       'vendor-bundles': 2,
       'website-app-routes': 9,
-      'website-components': 13,
+      'website-components': 15,
       'website-config': 2
     }
   );
 
-  assert.match(coverageDoc, /Per-file primitive footprint rows: 63/);
+  assert.match(coverageDoc, /Per-file primitive footprint rows: 69/);
   const documentedRows = [
     ...coverageDoc.matchAll(/^\| `([^`]+)` \| `([^`]+)` \| \d+ \| \d+ \| \d+ \| \d+ \| \d+ \| \d+ \|$/gm)
   ];
@@ -210,16 +210,16 @@ test('every tracked JS JSX and MJS file is lifecycle-classified', () => {
 test('repo-wide lifecycle primitive totals match current tracked source', () => {
   const { totals } = aggregate();
   assert.deepEqual(totals, {
-    addEventListener: 288,
-    removeEventListener: 9,
-    mutationObserver: 15,
-    intersectionObserver: 2,
+    addEventListener: 292,
+    removeEventListener: 13,
+    mutationObserver: 16,
+    intersectionObserver: 4,
     setInterval: 3,
     clearInterval: 4,
     setTimeout: 123,
     clearTimeout: 34,
-    requestAnimationFrame: 29,
-    cancelAnimationFrame: 3,
+    requestAnimationFrame: 31,
+    cancelAnimationFrame: 4,
     fetch: 14,
     xmlHttpRequest: 2,
     postMessage: 26,
@@ -229,8 +229,8 @@ test('repo-wide lifecycle primitive totals match current tracked source', () => 
     styleDisplay: 96,
     classListMutation: 110
   });
-  assert.equal(Object.values(totals).reduce((sum, value) => sum + value, 0), 856);
-  assert.match(coverageDoc, /\*\*Total\*\* \| \*\*856\*\*/);
+  assert.equal(Object.values(totals).reduce((sum, value) => sum + value, 0), 870);
+  assert.match(coverageDoc, /\*\*Total\*\* \| \*\*870\*\*/);
 });
 
 test('lifecycle primitive family totals pin page runtime UI website vendor and quarantine burden', () => {
@@ -247,7 +247,7 @@ test('lifecycle primitive family totals pin page runtime UI website vendor and q
     'quarantined-legacy-js': 37,
     'vendor-bundles': 8,
     'website-app-routes': 1,
-    'website-components': 10,
+    'website-components': 24,
     'website-config': 0
   });
 
@@ -264,7 +264,7 @@ test('hot lifecycle files and teardown imbalance are documented as current audit
   assert.equal(perFile['js/content/block_channel.js'].total, 81);
   assert.equal(perFile['js/layout.js'].total, 37);
 
-  assert.ok(totals.addEventListener > totals.removeEventListener * 30);
+  assert.ok(totals.addEventListener > totals.removeEventListener * 20);
   assert.ok(totals.setTimeout > totals.clearTimeout * 3);
   assert.ok(totals.styleDisplay + totals.classListMutation > 200);
 

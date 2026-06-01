@@ -37,7 +37,7 @@ classified before lanes run.
 | json | `npm run test:json` | JSON-first filtering, network interception, response mutation, endpoint admission, and list-mode gates. |
 | dom | `npm run test:dom` | DOM fallback selectors, hide/restore state, cleanup passes, recycled nodes, and route cleanup. |
 | menu | `npm run test:menu` | 3-dot menu, quick-block, collaborator menus, native dropdown close state, and affordance gates. |
-| performance | `npm run test:performance` | Empty/no-rule work budgets, disabled mode, active-rule gates, SPA lag guards, identity work budgets, and production console logging gates. |
+| performance | `npm run test:performance` | Empty/no-rule work budgets, disabled mode, active-rule gates, SPA lag guards, identity work budgets, lifecycle primitive/register proof, and production console logging gates. |
 | settings | `npm run test:settings` | Settings compile, profiles, storage refresh, migrations, import/export, backups, and sync boundaries. |
 | smoke | `npm run test:smoke` | Small release confidence lane for common lag, blocking, menu, and release-surface regressions. |
 
@@ -171,7 +171,7 @@ the surface connected to a focused lane.
 | JSON-first filtering | `test:json` keeps seed/network, readiness, snapshot, list-mode, and response-mutation tests in lane. |
 | DOM fallback | `test:dom` keeps DOM selector instance, DOM fallback selector, CSS hide authority, direct hide writer, quarantined content CSS package boundary, run-state cleanup, virtual-attribute, and route cleanup tests in lane. |
 | direct hide writers | `test:dom` keeps `direct-hide-writer-register-current-behavior` in lane so visual writer/source-order drift stays tied to DOM false-hide proof. |
-| no-rule performance | `test:performance` keeps empty-install, no-work, active-rule, content-control active-work, diagnostic logging policy, and route-surface budget tests in lane. |
+| no-rule performance | `test:performance` keeps empty-install, no-work, active-rule, content-control active-work, lifecycle primitive/register proof, diagnostic logging policy, and route-surface budget tests in lane. |
 | SPA navigation | `test:performance` keeps whitelist-cache SPA metric and route-surface no-work tests in lane; live SPA rows remain in manual smoke. |
 | code-burden growth | `test:performance` keeps the code-burden declutter boundary in lane, including the 1000-line product-owned source guard and near-threshold file list. |
 | settings | `test:settings` keeps settings-mode, compiled-settings field/register proof, content-control alias mutation, refresh fanout, compiled-cache, import/export, and state-manager tests in lane. |

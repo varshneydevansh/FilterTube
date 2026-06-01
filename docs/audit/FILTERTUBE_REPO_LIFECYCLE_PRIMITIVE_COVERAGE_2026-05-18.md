@@ -18,7 +18,7 @@ git ls-files '*.js' '*.jsx' '*.mjs'
 Current tracked JS/JSX/MJS count:
 
 ```text
-63
+69
 ```
 
 Ignored root captures and generated package output are excluded. Vendor bundles
@@ -48,16 +48,16 @@ changing any owner.
 
 | Primitive | Count | Audit meaning |
 | --- | ---: | --- |
-| `addEventListener` | 288 | Listener lifecycle surface. |
-| `removeEventListener` | 9 | Explicit listener teardown surface. |
-| `MutationObserver` | 15 | DOM mutation observation surface. |
-| `IntersectionObserver` | 2 | Visibility/identity prefetch observation surface. |
+| `addEventListener` | 292 | Listener lifecycle surface. |
+| `removeEventListener` | 13 | Explicit listener teardown surface. |
+| `MutationObserver` | 16 | DOM mutation observation surface. |
+| `IntersectionObserver` | 4 | Visibility/identity prefetch observation surface. |
 | `setInterval` | 3 | Repeating work surface. |
 | `clearInterval` | 4 | Repeating work teardown surface. |
 | `setTimeout` | 123 | Delayed/debounced/retry work surface. |
 | `clearTimeout` | 34 | Delayed work teardown surface. |
-| `requestAnimationFrame` | 29 | Paint-frame scheduling surface. |
-| `cancelAnimationFrame` | 3 | Paint-frame teardown surface. |
+| `requestAnimationFrame` | 31 | Paint-frame scheduling surface. |
+| `cancelAnimationFrame` | 4 | Paint-frame teardown surface. |
 | `fetch(` | 14 | Direct network side-effect surface. |
 | `XMLHttpRequest` | 2 | Prototype/network interception surface. |
 | `.postMessage(` | 26 | Page-world message bridge surface. |
@@ -66,26 +66,26 @@ changing any owner.
 | `.click(` | 33 | Synthetic click/navigation surface. |
 | `.style.display =` | 96 | Direct visual hide/show side-effect surface. |
 | `.classList.add/remove/toggle(` | 110 | Class-based visual/state side-effect surface. |
-| **Total** | **856** | Conservative lifecycle/side-effect primitive count. |
+| **Total** | **870** | Conservative lifecycle/side-effect primitive count. |
 
 ## Family Breakdown
 
 | Audit family | Files | Primitive count | Current interpretation |
 | --- | ---: | ---: | --- |
-| `content-runtime-js` | 16 | 373 | Page-resident filtering, JSON interception, DOM fallback, quick/menu surfaces, learned identity, and bridge work. |
+| `content-runtime-js` | 17 | 373 | Page-resident filtering, JSON interception, DOM fallback, quick/menu surfaces, learned identity, and bridge work. |
 | `extension-ui-background-js` | 11 | 417 | Dashboard/popup/background settings, import/export, Nanah, row actions, profile/PIN, and UI state work. |
 | `quarantined-legacy-js` | 1 | 37 | `js/layout.js`; direct style/class mutation risk if ever reactivated. |
-| `website-components` | 13 | 10 | Website client components with limited theme/reveal lifecycle. |
+| `website-components` | 15 | 24 | Website client components with theme/scene and hero/footer lifecycle; separate from extension runtime filtering. |
 | `generated-ui-output` | 2 | 8 | Generated shell output; freshness proof required rather than hand edits. |
 | `vendor-bundles` | 2 | 8 | Packaged vendor/runtime listener surface, especially Nanah transport. |
 | `generated-ui-source` | 3 | 2 | Shell source visual-state writes. |
 | `website-app-routes` | 9 | 1 | Mostly static route surface. |
-| `build-release-sync-scripts` | 4 | 0 | No lifecycle primitives by this scan; still release-authority code. |
+| `build-release-sync-scripts` | 7 | 0 | No lifecycle primitives by this scan; still release-authority code. |
 | `website-config` | 2 | 0 | Build/config files only. |
 
 ## Per-file Primitive Footprint
 
-Per-file primitive footprint rows: 63
+Per-file primitive footprint rows: 69
 
 These grouped counts are computed from the same `git ls-files '*.js' '*.jsx'
 '*.mjs'` source boundary and the same lexical primitive patterns above.
@@ -106,6 +106,7 @@ effects` is dispatch/click/display/class mutation.
 | `js/content/dom_extractors.js` | `content-runtime-js` | 0 | 0 | 0 | 0 | 4 | 4 |
 | `js/content/dom_fallback.js` | `content-runtime-js` | 3 | 0 | 10 | 0 | 12 | 25 |
 | `js/content/dom_helpers.js` | `content-runtime-js` | 0 | 0 | 0 | 0 | 10 | 10 |
+| `js/content/dom_state.js` | `content-runtime-js` | 0 | 0 | 0 | 0 | 0 | 0 |
 | `js/content/first_run_prompt.js` | `content-runtime-js` | 1 | 0 | 2 | 2 | 3 | 8 |
 | `js/content/handle_resolver.js` | `content-runtime-js` | 0 | 0 | 1 | 5 | 0 | 6 |
 | `js/content/menu.js` | `content-runtime-js` | 0 | 0 | 0 | 0 | 0 | 0 |
@@ -130,9 +131,12 @@ effects` is dispatch/click/display/class mutation.
 | `js/ui_components.js` | `extension-ui-background-js` | 17 | 1 | 8 | 0 | 13 | 39 |
 | `js/vendor/nanah.bundle.js` | `vendor-bundles` | 8 | 0 | 0 | 0 | 0 | 8 |
 | `js/vendor/qrcode.bundle.js` | `vendor-bundles` | 0 | 0 | 0 | 0 | 0 | 0 |
+| `scripts/audit-proof-drift.mjs` | `build-release-sync-scripts` | 0 | 0 | 0 | 0 | 0 | 0 |
 | `scripts/build-extension-ui.mjs` | `build-release-sync-scripts` | 0 | 0 | 0 | 0 | 0 | 0 |
 | `scripts/build-nanah-vendor.mjs` | `build-release-sync-scripts` | 0 | 0 | 0 | 0 | 0 | 0 |
+| `scripts/run-test-lane.mjs` | `build-release-sync-scripts` | 0 | 0 | 0 | 0 | 0 | 0 |
 | `scripts/sync-native-runtime.mjs` | `build-release-sync-scripts` | 0 | 0 | 0 | 0 | 0 | 0 |
+| `scripts/test-lane-config.mjs` | `build-release-sync-scripts` | 0 | 0 | 0 | 0 | 0 | 0 |
 | `src/extension-shell/popup.jsx` | `generated-ui-source` | 0 | 0 | 0 | 0 | 0 | 0 |
 | `src/extension-shell/shared/runtime.js` | `generated-ui-source` | 0 | 0 | 0 | 0 | 2 | 2 |
 | `src/extension-shell/tab-view-decor.jsx` | `generated-ui-source` | 0 | 0 | 0 | 0 | 0 | 0 |
@@ -146,6 +150,8 @@ effects` is dispatch/click/display/class mutation.
 | `website/app/sitemap.js` | `website-app-routes` | 0 | 0 | 0 | 0 | 0 | 0 |
 | `website/app/terms/page.js` | `website-app-routes` | 0 | 0 | 0 | 0 | 0 | 0 |
 | `website/components/browser-logo-rail.js` | `website-components` | 0 | 0 | 0 | 0 | 0 | 0 |
+| `website/components/footer-signal-art.js` | `website-components` | 4 | 2 | 3 | 0 | 0 | 9 |
+| `website/components/hero-video.js` | `website-components` | 4 | 1 | 0 | 0 | 0 | 5 |
 | `website/components/marketing-ui.js` | `website-components` | 0 | 0 | 0 | 0 | 0 | 0 |
 | `website/components/reveal.js` | `website-components` | 0 | 0 | 0 | 0 | 0 | 0 |
 | `website/components/route-content.js` | `website-components` | 0 | 0 | 0 | 0 | 0 | 0 |
@@ -179,7 +185,7 @@ effects` is dispatch/click/display/class mutation.
 
 | Finding | Evidence | Risk |
 | --- | --- | --- |
-| Listener teardown is much smaller than listener install surface. | 288 `addEventListener` vs 9 `removeEventListener` lexical hits. | Listeners can become page-lifetime or UI-lifetime by default unless explicitly justified. |
+| Listener teardown is much smaller than listener install surface. | 292 `addEventListener` vs 13 `removeEventListener` lexical hits. | Listeners can become page-lifetime or UI-lifetime by default unless explicitly justified. |
 | Delayed work teardown is smaller than delayed work setup. | 123 `setTimeout` vs 34 `clearTimeout`. | Debounced/retry work can outlive route, profile, or feature state. |
 | Direct visual side effects are broad. | 96 `.style.display =` and 110 class mutations. | False-hide recovery requires a structured hide reason/restore contract. |
 | Page-runtime work is not the only burden. | Extension UI/background files have 417 primitives, more than content runtime's 373. | Settings/profile/import/Nanah/UI work can still create stale or conflicting runtime state. |

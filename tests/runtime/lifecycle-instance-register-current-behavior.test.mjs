@@ -1620,7 +1620,11 @@ function countWebsiteComponentLifecycleByDomain(rows) {
       installOrSchedule: 0,
       explicitTeardown: 0,
       addEventListener: 0,
+      cancelAnimationFrame: 0,
       removeEventListener: 0,
+      intersectionObserver: 0,
+      mutationObserver: 0,
+      requestAnimationFrame: 0,
       setTimeout: 0,
       clearTimeout: 0
     };
@@ -2201,27 +2205,27 @@ test('lifecycle instance register enumerates every current observer listener tim
   const ids = new Set(rows.map(row => row.id));
   const doc = read(registerPath);
 
-  assert.equal(rows.length, 510);
+  assert.equal(rows.length, 524);
   assert.equal(ids.size, rows.length, 'file:line:family lifecycle instance ids must be unique');
   assert.deepEqual(countBy(rows, 'family'), {
-    addEventListener: 288,
-    cancelAnimationFrame: 3,
+    addEventListener: 292,
+    cancelAnimationFrame: 4,
     clearInterval: 4,
     clearTimeout: 34,
-    intersectionObserver: 2,
-    mutationObserver: 15,
-    removeEventListener: 9,
-    requestAnimationFrame: 29,
+    intersectionObserver: 4,
+    mutationObserver: 16,
+    removeEventListener: 13,
+    requestAnimationFrame: 31,
     setInterval: 3,
     setTimeout: 123
   });
 
-  assert.equal(addListenerOptionRows.length, 288);
+  assert.equal(addListenerOptionRows.length, 292);
   assert.deepEqual(countBy(addListenerOptionRows, 'optionKind'), {
     'boolean-false-bubble': 1,
     'boolean-true-capture': 23,
     'expression-or-identifier': 2,
-    'no-third-argument': 232,
+    'no-third-argument': 236,
     'object-capture-true': 1,
     'object-once-true': 7,
     'object-passive-true': 16,
@@ -2253,16 +2257,16 @@ test('lifecycle instance register enumerates every current observer listener tim
       'object-once-true': 2
     },
     'website-components': {
-      total: 3,
-      'no-third-argument': 3
+      total: 7,
+      'no-third-argument': 7
     }
   });
 
-  assert.equal(addListenerEventRows.length, 288);
+  assert.equal(addListenerEventRows.length, 292);
   assert.deepEqual(countBy(addListenerEventRows, 'eventKind'), {
     DOMContentLoaded: 8,
     blur: 1,
-    change: 55,
+    change: 57,
     click: 114,
     close: 2,
     ended: 1,
@@ -2290,7 +2294,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     scroll: 6,
     storage: 1,
     toggle: 1,
-    visibilitychange: 2,
+    visibilitychange: 4,
     'yt-navigate-finish': 5
   });
   assert.deepEqual(countAddEventEventsBySourceFamily(addListenerEventRows), {
@@ -2347,18 +2351,19 @@ test('lifecycle instance register enumerates every current observer listener tim
       open: 2
     },
     'website-components': {
-      total: 3,
+      total: 7,
+      change: 2,
       'nonliteral-event': 1,
       storage: 1,
-      visibilitychange: 1
+      visibilitychange: 3
     }
   });
 
-  assert.equal(addListenerTargetRows.length, 288);
+  assert.equal(addListenerTargetRows.length, 292);
   assert.deepEqual(countBy(addListenerTargetRows, 'targetKind'), {
-    document: 39,
+    document: 41,
     'generated-shell-node': 2,
-    'local-element-reference': 203,
+    'local-element-reference': 205,
     'optional-local-element-reference': 17,
     'vendor-transport-reference': 8,
     window: 19
@@ -2386,16 +2391,17 @@ test('lifecycle instance register enumerates every current observer listener tim
       'vendor-transport-reference': 8
     },
     'website-components': {
-      total: 3,
-      document: 1,
+      total: 7,
+      document: 3,
+      'local-element-reference': 2,
       window: 2
     }
   });
 
-  assert.equal(addListenerEventTargetRows.length, 288);
+  assert.equal(addListenerEventTargetRows.length, 292);
   assert.deepEqual(countAddEventTargetEvents(addListenerEventTargetRows), {
     document: {
-      total: 39,
+      total: 41,
       DOMContentLoaded: 7,
       click: 10,
       ended: 1,
@@ -2409,7 +2415,7 @@ test('lifecycle instance register enumerates every current observer listener tim
       pointermove: 1,
       pointerover: 1,
       scroll: 2,
-      visibilitychange: 2,
+      visibilitychange: 4,
       'yt-navigate-finish': 5
     },
     'generated-shell-node': {
@@ -2417,9 +2423,9 @@ test('lifecycle instance register enumerates every current observer listener tim
       'nonliteral-event': 2
     },
     'local-element-reference': {
-      total: 203,
+      total: 205,
       blur: 1,
-      change: 40,
+      change: 42,
       click: 104,
       focus: 2,
       focusin: 3,
@@ -2501,8 +2507,8 @@ test('lifecycle instance register enumerates every current observer listener tim
       scroll: 2
     },
     'website-components:document': {
-      total: 1,
-      visibilitychange: 1
+      total: 3,
+      visibilitychange: 3
     },
     'website-components:window': {
       total: 2,
@@ -2520,7 +2526,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     windowScrollResizeOrientation: 9,
     windowStorageVisibility: 1,
     localClick: 104,
-    localChangeInputKeydown: 68,
+    localChangeInputKeydown: 70,
     optionalLocalClick: 0,
     vendorTransportLifecycle: 8,
     generatedShellNonliteral: 2
@@ -2781,9 +2787,9 @@ test('lifecycle instance register enumerates every current observer listener tim
     'transient-popover-remove': 1
   });
 
-  assert.equal(addListenerCallbackRows.length, 288);
+  assert.equal(addListenerCallbackRows.length, 292);
   assert.deepEqual(countBy(addListenerCallbackRows, 'callbackKind'), {
-    'identifier-callback-reference': 33,
+    'identifier-callback-reference': 37,
     'inline-arrow-callback': 252,
     'member-callback-reference': 1,
     'other-callback-expression': 2
@@ -2809,40 +2815,42 @@ test('lifecycle instance register enumerates every current observer listener tim
       'inline-arrow-callback': 8
     },
     'website-components': {
-      total: 3,
-      'identifier-callback-reference': 3
+      total: 7,
+      'identifier-callback-reference': 7
     }
   });
 
-  assert.equal(listenerAddRows.length, 288);
-  assert.equal(listenerRemoveRows.length, 9);
+  assert.equal(listenerAddRows.length, 292);
+  assert.equal(listenerRemoveRows.length, 13);
   assert.deepEqual(countBy(listenerRemoveRows, 'targetKind'), {
-    document: 5,
+    document: 7,
     'generated-shell-node': 2,
+    'local-element-reference': 2,
     window: 2
   });
   assert.deepEqual(countBy(listenerRemoveRows, 'eventKind'), {
+    change: 2,
     click: 2,
     keydown: 1,
     'nonliteral-event': 3,
     pointermove: 1,
     storage: 1,
-    visibilitychange: 1
+    visibilitychange: 3
   });
   assert.deepEqual(countBy(listenerRemoveRows, 'callbackKind'), {
-    'identifier-callback-reference': 6,
+    'identifier-callback-reference': 10,
     'member-callback-reference': 1,
     'other-callback-expression': 2
   });
   assert.deepEqual(countBy(listenerRemoveRows, 'optionKind'), {
     'boolean-true-capture': 3,
     'expression-or-identifier': 2,
-    'no-third-argument': 3,
+    'no-third-argument': 7,
     'object-capture-true': 1
   });
   assert.deepEqual(countBy(listenerRemoveRows, 'captureKey'), {
     'capture-expression-or-identifier': 2,
-    'capture-false': 3,
+    'capture-false': 7,
     'capture-true': 4
   });
   assert.deepEqual(countListenerAddRemoveBySourceFamily(listenerAddRows, listenerRemoveRows), {
@@ -2867,25 +2875,25 @@ test('lifecycle instance register enumerates every current observer listener tim
       delta: 8
     },
     'website-components': {
-      add: 3,
-      remove: 3,
+      add: 7,
+      remove: 7,
       delta: 0
     }
   });
   assert.deepEqual(listenerAddRemoveRiskGaps, {
     installMinusRemove: 279,
-    captureEquivalentRemovePairs: 9,
-    exactOptionShapeRemovePairs: 8,
+    captureEquivalentRemovePairs: 13,
+    exactOptionShapeRemovePairs: 12,
     captureEquivalentOptionShapeMismatchPairs: 1,
     unmatchedRemoveRows: 0,
     pageGlobalListenerInstallsWithoutExplicitRemove: 51,
     inlineListenerInstallsWithoutRemoveHandle: 252
   });
 
-  assert.equal(observerConstructorRows.length, 17);
+  assert.equal(observerConstructorRows.length, 20);
   assert.deepEqual(countBy(observerConstructorRows, 'family'), {
-    intersectionObserver: 2,
-    mutationObserver: 15
+    intersectionObserver: 4,
+    mutationObserver: 16
   });
   assert.deepEqual(countObserverConstructorsBySourceFamily(observerConstructorRows), {
     'content-runtime-js': {
@@ -2896,16 +2904,22 @@ test('lifecycle instance register enumerates every current observer listener tim
     'extension-ui-background-js': {
       total: 1,
       mutationObserver: 1
+    },
+    'website-components': {
+      total: 3,
+      intersectionObserver: 2,
+      mutationObserver: 1
     }
   });
-  assert.equal(observerConstructorCallbackRows.length, 17);
+  assert.equal(observerConstructorCallbackRows.length, 20);
   assert.deepEqual(countBy(observerConstructorCallbackRows, 'callbackKind'), {
-    'inline-arrow-callback': 17
+    'inline-arrow-callback': 20
   });
   assert.deepEqual(countBy(observerConstructorCallbackRows, 'callbackParameterKind'), {
     'entries-parameter-arrow': 2,
     'mutations-parameter-arrow': 9,
-    'no-parameter-arrow': 6
+    'no-parameter-arrow': 7,
+    'other-callback-parameter-shape': 2
   });
   assert.deepEqual(countObserverConstructorCallbacksBySourceFamily(observerConstructorCallbackRows), {
     'content-runtime-js': {
@@ -2915,15 +2929,19 @@ test('lifecycle instance register enumerates every current observer listener tim
     'extension-ui-background-js': {
       total: 1,
       'inline-arrow-callback': 1
+    },
+    'website-components': {
+      total: 3,
+      'inline-arrow-callback': 3
     }
   });
 
-  assert.equal(observerObserveRows.length, 17);
+  assert.equal(observerObserveRows.length, 21);
   assert.deepEqual(countBy(observerObserveRows.map(row => ({
     observeFamily: classifyObserverObserveFamily(row)
   })), 'observeFamily'), {
     intersectionObserver: 2,
-    mutationObserver: 15
+    mutationObserver: 19
   });
   assert.deepEqual(countObserverObserveFamiliesBySourceFamily(observerObserveRows), {
     'content-runtime-js': {
@@ -2934,6 +2952,10 @@ test('lifecycle instance register enumerates every current observer listener tim
     'extension-ui-background-js': {
       total: 1,
       mutationObserver: 1
+    },
+    'website-components': {
+      total: 4,
+      mutationObserver: 4
     }
   });
   assert.deepEqual(countBy(observerObserveRows, 'targetKind'), {
@@ -2941,24 +2963,27 @@ test('lifecycle instance register enumerates every current observer listener tim
     'document-body': 3,
     'dropdown-element': 4,
     'generic-target-element': 3,
+    'other-observe-target': 4,
     'panel-or-rail-element': 2,
     'select-element': 1
   });
   assert.deepEqual(countBy(observerObserveRows, 'optionKind'), {
+    'attributes-other': 1,
     'attributes-filter-aria-hidden': 1,
     'attributes-filter-collaborator-identity': 1,
     'attributes-filter-disabled': 1,
     'attributes-filter-style-hidden': 2,
     'child-list-only': 1,
     'child-list-subtree': 9,
-    'no-options': 2
+    'no-options': 5
   });
   assert.deepEqual(countBy(observerObserveRows, 'receiverKind'), {
     'collab-dialog-observer': 1,
     'dropdown-close-observer': 2,
     'dropdown-discovery-observer': 1,
-    'local-observer-variable': 10,
+    'local-observer-variable': 11,
     'local-obs-variable': 2,
+    'other-observer-observe-receiver': 3,
     'prefetch-observer': 1
   });
   assert.deepEqual(countObserverObserveTargetsBySourceFamily(observerObserveRows), {
@@ -2973,6 +2998,10 @@ test('lifecycle instance register enumerates every current observer listener tim
     'extension-ui-background-js': {
       total: 1,
       'select-element': 1
+    },
+    'website-components': {
+      total: 4,
+      'other-observe-target': 4
     }
   });
   assert.deepEqual(countObserverObserveOptionsBySourceFamily(observerObserveRows), {
@@ -2988,6 +3017,11 @@ test('lifecycle instance register enumerates every current observer listener tim
     'extension-ui-background-js': {
       total: 1,
       'attributes-filter-disabled': 1
+    },
+    'website-components': {
+      total: 4,
+      'attributes-other': 1,
+      'no-options': 3
     }
   });
   assert.deepEqual(countObserverObserveReceiversBySourceFamily(observerObserveRows), {
@@ -3003,21 +3037,29 @@ test('lifecycle instance register enumerates every current observer listener tim
     'extension-ui-background-js': {
       total: 1,
       'local-obs-variable': 1
+    },
+    'website-components': {
+      total: 4,
+      'local-observer-variable': 1,
+      'other-observer-observe-receiver': 3
     }
   });
 
-  assert.equal(observerDisconnectRows.length, 10);
+  assert.equal(observerDisconnectRows.length, 14);
   assert.deepEqual(countBy(observerDisconnectRows, 'receiverKind'), {
     'collab-dialog-observer': 1,
     'dropdown-close-observer': 2,
     'dropdown-discovery-observer': 1,
-    'local-observer-variable': 5,
+    'local-observer-variable': 6,
+    'other-observer-disconnect-receiver': 3,
     'popover-row-observer-state': 1
   });
   assert.deepEqual(countBy(observerDisconnectRows, 'file'), {
     'js/content/block_channel.js': 3,
     'js/content/collab_dialog.js': 1,
-    'js/content_bridge.js': 6
+    'js/content_bridge.js': 6,
+    'website/components/footer-signal-art.js': 3,
+    'website/components/hero-video.js': 1
   });
   assert.deepEqual(countObserverDisconnectReceiversBySourceFamily(observerDisconnectRows), {
     'content-runtime-js': {
@@ -3027,6 +3069,11 @@ test('lifecycle instance register enumerates every current observer listener tim
       'dropdown-discovery-observer': 1,
       'local-observer-variable': 5,
       'popover-row-observer-state': 1
+    },
+    'website-components': {
+      total: 4,
+      'local-observer-variable': 1,
+      'other-observer-disconnect-receiver': 3
     }
   });
   assert.equal(observerUnobserveRows.length, 1);
@@ -3038,13 +3085,13 @@ test('lifecycle instance register enumerates every current observer listener tim
   });
   assert.deepEqual(observerObserveReleaseRiskGaps, {
     observeMinusRelease: 6,
-    releaseRows: 11,
-    disconnectReleaseRows: 10,
+    releaseRows: 15,
+    disconnectReleaseRows: 14,
     unobserveReleaseRows: 1,
-    localObserverObserveRows: 10,
+    localObserverObserveRows: 11,
     localObsObserveRows: 2,
-    exactNamedObserveRows: 5,
-    exactNamedObserveRowsWithRelease: 4,
+    exactNamedObserveRows: 8,
+    exactNamedObserveRowsWithRelease: 7,
     exactNamedObserveRowsWithoutRelease: 1,
     prefetchObserveRowsWithoutRelease: 1,
     contentRuntimeObserveReleaseDelta: 5,
@@ -3748,24 +3795,47 @@ test('lifecycle instance register enumerates every current observer listener tim
     assert.equal(fs.existsSync(path.join(repoRoot, absentManifest)), false, `${absentManifest} is not committed today`);
   }
 
-  assert.equal(websiteComponentLifecycleBoundaryRows.length, 9);
+  assert.equal(websiteComponentLifecycleBoundaryRows.length, 23);
   assert.deepEqual(countBy(websiteComponentLifecycleBoundaryRows, 'family'), {
-    addEventListener: 3,
+    addEventListener: 7,
+    cancelAnimationFrame: 1,
     clearTimeout: 2,
-    removeEventListener: 3,
+    intersectionObserver: 2,
+    mutationObserver: 1,
+    removeEventListener: 7,
+    requestAnimationFrame: 2,
     setTimeout: 1
   });
   assert.deepEqual(countBy(websiteComponentLifecycleBoundaryRows, 'file'), {
+    'website/components/footer-signal-art.js': 9,
+    'website/components/hero-video.js': 5,
     'website/components/scene-controller.js': 5,
     'website/components/theme-toggle.js': 4
   });
   assert.deepEqual(countWebsiteComponentLifecycleByDomain(websiteComponentLifecycleBoundaryRows), {
+    'website-other-lifecycle': {
+      total: 14,
+      installOrSchedule: 9,
+      explicitTeardown: 5,
+      addEventListener: 4,
+      removeEventListener: 4,
+      setTimeout: 0,
+      clearTimeout: 0,
+      requestAnimationFrame: 2,
+      cancelAnimationFrame: 1,
+      intersectionObserver: 2,
+      mutationObserver: 1
+    },
     'website-scene-scheduler-lifecycle': {
       total: 5,
       installOrSchedule: 2,
       explicitTeardown: 3,
       addEventListener: 1,
+      cancelAnimationFrame: 0,
+      intersectionObserver: 0,
+      mutationObserver: 0,
       removeEventListener: 1,
+      requestAnimationFrame: 0,
       setTimeout: 1,
       clearTimeout: 2
     },
@@ -3774,27 +3844,33 @@ test('lifecycle instance register enumerates every current observer listener tim
       installOrSchedule: 2,
       explicitTeardown: 2,
       addEventListener: 2,
+      cancelAnimationFrame: 0,
+      intersectionObserver: 0,
+      mutationObserver: 0,
       removeEventListener: 2,
+      requestAnimationFrame: 0,
       setTimeout: 0,
       clearTimeout: 0
     }
   });
 
-  assert.equal(explicitTeardownRows.length, 50);
+  assert.equal(explicitTeardownRows.length, 55);
   assert.deepEqual(countBy(explicitTeardownRows, 'family'), {
-    cancelAnimationFrame: 3,
+    cancelAnimationFrame: 4,
     clearInterval: 4,
     clearTimeout: 34,
-    removeEventListener: 9
+    removeEventListener: 13
   });
   assert.deepEqual(countBy(explicitTeardownRows, 'handleKind'), {
+    'frame-other-handle': 1,
     'frame-position-handle': 1,
     'frame-profile-dropdown-handle': 2,
     'interval-dashboard-rotation-handle': 1,
     'interval-engine-check-handle': 2,
     'interval-warmup-handle': 1,
-    'listener-document-target': 5,
+    'listener-document-target': 7,
     'listener-generated-shell-target': 2,
+    'listener-other-target': 2,
     'listener-window-target': 2,
     'timeout-local-id-handle': 12,
     'timeout-named-state-handle': 14,
@@ -3823,17 +3899,19 @@ test('lifecycle instance register enumerates every current observer listener tim
       'listener-generated-shell-target': 2
     },
     'website-components': {
-      total: 5,
-      'listener-document-target': 1,
+      total: 10,
+      'frame-other-handle': 1,
+      'listener-document-target': 3,
+      'listener-other-target': 2,
       'listener-window-target': 2,
       'timeout-local-id-handle': 2
     }
   });
 
-  assert.equal(animationFrameScheduleRows.length, 29);
+  assert.equal(animationFrameScheduleRows.length, 31);
   assert.deepEqual(countBy(animationFrameScheduleRows, 'frameScheduleKind'), {
     'assigned-positioning-frame-handle': 2,
-    'identifier-callback-frame': 5,
+    'identifier-callback-frame': 7,
     'inline-anonymous-frame': 15,
     'inline-scroll-into-view-frame': 5,
     'inline-timeout-hop-frame': 2
@@ -3843,7 +3921,8 @@ test('lifecycle instance register enumerates every current observer listener tim
     'js/content_bridge.js': 9,
     'js/popup.js': 1,
     'js/tab-view.js': 11,
-    'js/ui_components.js': 4
+    'js/ui_components.js': 4,
+    'website/components/footer-signal-art.js': 2
   });
   assert.deepEqual(countBy(animationFrameScheduleRows.filter(row => row.handleSource), 'handleSource'), {
     positionRaf: 1,
@@ -3862,10 +3941,15 @@ test('lifecycle instance register enumerates every current observer listener tim
       'identifier-callback-frame': 1,
       'inline-anonymous-frame': 8,
       'inline-scroll-into-view-frame': 5
+    },
+    'website-components': {
+      total: 2,
+      'identifier-callback-frame': 2
     }
   });
-  assert.equal(animationFrameCancelRows.length, 3);
+  assert.equal(animationFrameCancelRows.length, 4);
   assert.deepEqual(countBy(animationFrameCancelRows, 'handleSource'), {
+    frameId: 1,
     positionRaf: 1,
     profileDropdownPositionRaf: 2
   });
@@ -3884,14 +3968,20 @@ test('lifecycle instance register enumerates every current observer listener tim
       cancels: 3,
       delta: 13,
       schedulesWithoutHandle: 14
+    },
+    'website-components': {
+      schedules: 2,
+      cancels: 1,
+      delta: 1,
+      schedulesWithoutHandle: 2
     }
   });
   assert.deepEqual(animationFrameScheduleCancelRiskGaps, {
-    frameScheduleMinusCancel: 26,
-    frameSchedulesWithoutHandle: 27,
+    frameScheduleMinusCancel: 27,
+    frameSchedulesWithoutHandle: 29,
     frameSchedulesWithAssignedHandle: 2,
     frameCancelRowsWithScheduleHandle: 3,
-    frameCancelRowsWithoutDirectScheduleHandle: 0,
+    frameCancelRowsWithoutDirectScheduleHandle: 1,
     handledFrameScheduleRowsWithCancelHandle: 2,
     handledFrameScheduleRowsWithoutCancelHandle: 0,
     distinctScheduledFrameHandlesWithoutCancel: 0
@@ -3899,8 +3989,8 @@ test('lifecycle instance register enumerates every current observer listener tim
 
   for (const token of [
     'Event Listener Option Shape Addendum - 2026-05-28',
-    'addEventListener option rows: 288',
-    'no-third-argument listener installs: 232',
+    'addEventListener option rows: 292',
+    'no-third-argument listener installs: 236',
     'boolean true capture listener installs: 23',
     'object passive true listener installs: 16',
     'object passive true plus capture true listener installs: 6',
@@ -3913,9 +4003,9 @@ test('lifecycle instance register enumerates every current observer listener tim
     'ASCII listener option flow diagram: present',
     'Mermaid listener option flow diagram: present',
     'Event Listener Event-Type Addendum - 2026-05-28',
-    'addEventListener event rows: 288',
+    'addEventListener event rows: 292',
     'click listener installs: 114',
-    'change listener installs: 55',
+    'change listener installs: 57',
     'input listener installs: 20',
     'keydown listener installs: 14',
     'DOMContentLoaded listener installs: 8',
@@ -3926,10 +4016,10 @@ test('lifecycle instance register enumerates every current observer listener tim
     'ASCII listener event flow diagram: present',
     'Mermaid listener event flow diagram: present',
     'Event Listener Target Addendum - 2026-05-28',
-    'addEventListener target rows: 288',
-    'local element listener targets: 203',
+    'addEventListener target rows: 292',
+    'local element listener targets: 205',
     'optional local element listener targets: 17',
-    'document listener targets: 39',
+    'document listener targets: 41',
     'window listener targets: 19',
     'vendor transport listener targets: 8',
     'generated shell listener targets: 2',
@@ -3937,7 +4027,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     'ASCII listener target flow diagram: present',
     'Mermaid listener target flow diagram: present',
     'Event Listener Event-Target Matrix Addendum - 2026-05-28',
-    'addEventListener event-target matrix rows: 288',
+    'addEventListener event-target matrix rows: 292',
     'document click listener pairs: 10',
     'document DOMContentLoaded listener pairs: 7',
     'document keydown listener pairs: 3',
@@ -3947,7 +4037,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     'window scroll resize orientation listener pairs: 9',
     'window storage visibility listener pairs: 1',
     'local element click listener pairs: 104',
-    'local element change input keydown listener pairs: 68',
+    'local element change input keydown listener pairs: 70',
     'optional local click listener pairs: 0',
     'vendor transport lifecycle listener pairs: 8',
     'generated shell nonliteral listener pairs: 2',
@@ -3959,9 +4049,9 @@ test('lifecycle instance register enumerates every current observer listener tim
     'ASCII listener event-target flow diagram: present',
     'Mermaid listener event-target flow diagram: present',
     'Event Listener Callback Identity Addendum - 2026-05-28',
-    'addEventListener callback rows: 288',
+    'addEventListener callback rows: 292',
     'inline arrow listener callbacks: 252',
-    'identifier listener callbacks: 33',
+    'identifier listener callbacks: 37',
     'member reference listener callbacks: 1',
     'other generated expression listener callbacks: 2',
     'missing listener callback arguments: 0',
@@ -3969,16 +4059,16 @@ test('lifecycle instance register enumerates every current observer listener tim
     'extension UI background listener callbacks: 201',
     'generated output listener callbacks: 2',
     'vendor bundle listener callbacks: 8',
-    'website component listener callbacks: 3',
+    'website component listener callbacks: 7',
     'listener callback cleanup approval: NO-GO',
     'ASCII listener callback flow diagram: present',
     'Mermaid listener callback flow diagram: present',
     'Event Listener Add/Remove Parity Addendum - 2026-05-28',
-    'addEventListener install rows for parity: 288',
-    'removeEventListener teardown rows for parity: 9',
+    'addEventListener install rows for parity: 292',
+    'removeEventListener teardown rows for parity: 13',
     'listener install-minus-remove delta: 279',
-    'capture-equivalent listener remove pairs: 9',
-    'exact option-shape listener remove pairs: 8',
+    'capture-equivalent listener remove pairs: 13',
+    'exact option-shape listener remove pairs: 12',
     'capture-equivalent option-shape mismatch listener pairs: 1',
     'listener remove rows without capture-equivalent add pair: 0',
     'page-global listener installs without explicit remove: 51',
@@ -3988,7 +4078,8 @@ test('lifecycle instance register enumerates every current observer listener tim
     'generated UI output listener add/remove delta: 0',
     'vendor bundle listener add/remove delta: 8',
     'website component listener add/remove delta: 0',
-    'document listener removes: 5',
+    'document listener removes: 7',
+    'local element listener removes: 2',
     'window listener removes: 2',
     'generated shell listener removes: 2',
     'listener add/remove cleanup approval: NO-GO',
@@ -4045,21 +4136,22 @@ test('lifecycle instance register enumerates every current observer listener tim
     'ASCII content runtime page-global impact fixture flow diagram: present',
     'Mermaid content runtime page-global impact fixture flow diagram: present',
     'Observer Observe Target Addendum - 2026-05-28',
-    'observer observe rows: 17',
+    'observer observe rows: 21',
     'document body observe targets: 3',
     'dropdown observe targets: 4',
     'generic target observe targets: 3',
     'card or row observe targets: 4',
     'panel or rail observe targets: 2',
     'select observe targets: 1',
+    'other observe targets: 4',
     'observer observe target cleanup approval: NO-GO',
     'ASCII observer observe target flow diagram: present',
     'Mermaid observer observe target flow diagram: present',
     'Observer Observe Option Shape Addendum - 2026-05-28',
-    'observer observe option rows: 17',
+    'observer observe option rows: 21',
     'observer observe childList subtree option rows: 9',
     'observer observe childList only option rows: 1',
-    'observer observe no-options rows: 2',
+    'observer observe no-options rows: 5',
     'observer observe attribute filter rows: 5',
     'observer observe style hidden attribute filter rows: 2',
     'observer observe aria-hidden attribute filter rows: 1',
@@ -4067,61 +4159,66 @@ test('lifecycle instance register enumerates every current observer listener tim
     'observer observe collaborator identity attribute filter rows: 1',
     'content runtime observer observe option rows: 16',
     'extension UI background observer observe option rows: 1',
+    'website component observer observe option rows: 4',
     'observer observe option-shape cleanup approval: NO-GO',
     'ASCII observer observe option-shape flow diagram: present',
     'Mermaid observer observe option-shape flow diagram: present',
     'Observer Disconnect Addendum - 2026-05-28',
-    'observer disconnect rows: 10',
-    'local observer variable disconnect calls: 5',
+    'observer disconnect rows: 14',
+    'local observer variable disconnect calls: 6',
     'dropdown close observer disconnect calls: 2',
     'dropdown discovery observer disconnect calls: 1',
     'collab dialog observer disconnect calls: 1',
     'popover row observer state disconnect calls: 1',
+    'other observer disconnect receiver calls: 3',
     'observer disconnect cleanup approval: NO-GO',
     'ASCII observer disconnect flow diagram: present',
     'Mermaid observer disconnect flow diagram: present',
     'Observer Observe/Release Parity Addendum - 2026-05-28',
-    'observer observe rows for release parity: 17',
-    'observer release rows for parity: 11',
-    'observer disconnect release rows: 10',
+    'observer observe rows for release parity: 21',
+    'observer release rows for parity: 15',
+    'observer disconnect release rows: 14',
     'observer unobserve release rows: 1',
     'observer observe-minus-release delta: 6',
-    'local observer variable observe rows: 10',
+    'local observer variable observe rows: 11',
     'local obs variable observe rows: 2',
-    'exact named observer observe rows: 5',
-    'exact named observer observe rows with release: 4',
+    'exact named observer observe rows: 8',
+    'exact named observer observe rows with release: 7',
     'exact named observer observe rows without release: 1',
     'prefetch observer observe rows without release: 1',
     'content runtime observer observe/release delta: 5',
     'extension UI background observer observe/release delta: 1',
+    'website component observer observe/release delta: 0',
     'observer observe/release cleanup approval: NO-GO',
     'ASCII observer observe/release parity flow diagram: present',
     'Mermaid observer observe/release parity flow diagram: present',
     'Observer Constructor/Observe Type Parity Addendum - 2026-05-28',
-    'observer constructor rows for type parity: 17',
-    'MutationObserver constructor rows for type parity: 15',
-    'IntersectionObserver constructor rows for type parity: 2',
-    'observer observe rows for type parity: 17',
-    'mutation observer observe rows for type parity: 15',
+    'observer constructor rows for type parity: 20',
+    'MutationObserver constructor rows for type parity: 16',
+    'IntersectionObserver constructor rows for type parity: 4',
+    'observer observe rows for type parity: 21',
+    'mutation observer observe rows for type parity: 19',
     'intersection observer observe rows for type parity: 2',
-    'observer constructor-minus-observe delta: 0',
-    'mutation observer constructor-minus-observe delta: 0',
-    'intersection observer constructor-minus-observe delta: 0',
+    'observer constructor-minus-observe delta: -1',
+    'mutation observer constructor-minus-observe delta: -3',
+    'intersection observer constructor-minus-observe delta: 2',
     'content runtime observer constructor/observe delta: 0',
     'extension UI background observer constructor/observe delta: 0',
+    'website component observer constructor/observe delta: -1',
     'observer constructor/observe type cleanup approval: NO-GO',
     'ASCII observer constructor/observe type parity flow diagram: present',
     'Mermaid observer constructor/observe type parity flow diagram: present',
     'Observer Constructor Callback Identity Addendum - 2026-05-28',
-    'observer constructor callback rows: 17',
-    'inline arrow observer constructor callbacks: 17',
+    'observer constructor callback rows: 20',
+    'inline arrow observer constructor callbacks: 20',
     'identifier observer constructor callbacks: 0',
     'missing observer constructor callbacks: 0',
     'observer callbacks with mutations parameter: 9',
     'observer callbacks with entries parameter: 2',
-    'observer callbacks with no parameter: 6',
+    'observer callbacks with no parameter: 7',
     'content runtime observer constructor callbacks: 16',
     'extension UI background observer constructor callbacks: 1',
+    'website component observer constructor callbacks: 3',
     'observer constructor callback cleanup approval: NO-GO',
     'ASCII observer constructor callback flow diagram: present',
     'Mermaid observer constructor callback flow diagram: present',
@@ -4441,14 +4538,15 @@ test('lifecycle instance register enumerates every current observer listener tim
     'ASCII generated/vendor lifecycle freshness flow diagram: present',
     'Mermaid generated/vendor lifecycle freshness flow diagram: present',
     'Website Component Lifecycle Boundary Addendum - 2026-05-28',
-    'website component lifecycle rows: 9',
-    'website component install-or-schedule rows: 4',
-    'website component explicit-teardown rows: 5',
-    'website component addEventListener rows: 3',
-    'website component removeEventListener rows: 3',
+    'website component lifecycle rows: 23',
+    'website component install-or-schedule rows: 13',
+    'website component explicit-teardown rows: 10',
+    'website component addEventListener rows: 7',
+    'website component removeEventListener rows: 7',
     'website component setTimeout rows: 1',
     'website component clearTimeout rows: 2',
-    'website component lifecycle source files: 2',
+    'website component lifecycle source files: 4',
+    'website other lifecycle rows: 14',
     'website scene scheduler lifecycle rows: 5',
     'website theme sync lifecycle rows: 4',
     'website scene scheduler install-or-schedule rows: 2',
@@ -4459,14 +4557,15 @@ test('lifecycle instance register enumerates every current observer listener tim
     'ASCII website component lifecycle boundary flow diagram: present',
     'Mermaid website component lifecycle boundary flow diagram: present',
     'Explicit Teardown Handle Addendum - 2026-05-28',
-    'explicit teardown handle rows: 50',
-    'removeEventListener teardown rows: 9',
+    'explicit teardown handle rows: 55',
+    'removeEventListener teardown rows: 13',
     'clearTimeout teardown rows: 34',
     'clearInterval teardown rows: 4',
-    'cancelAnimationFrame teardown rows: 3',
-    'listener document teardown targets: 5',
+    'cancelAnimationFrame teardown rows: 4',
+    'listener document teardown targets: 7',
     'listener window teardown targets: 2',
     'listener generated shell teardown targets: 2',
+    'listener other teardown targets: 2',
     'timeout local id teardown handles: 12',
     'timeout named state teardown handles: 14',
     'timeout property held teardown handles: 8',
@@ -4475,36 +4574,40 @@ test('lifecycle instance register enumerates every current observer listener tim
     'interval dashboard rotation teardown handles: 1',
     'frame profile dropdown teardown handles: 2',
     'frame position teardown handles: 1',
+    'frame other teardown handles: 1',
     'explicit teardown cleanup approval: NO-GO',
     'ASCII explicit teardown flow diagram: present',
     'Mermaid explicit teardown flow diagram: present',
     'Animation Frame Schedule Addendum - 2026-05-28',
-    'requestAnimationFrame schedule rows: 29',
+    'requestAnimationFrame schedule rows: 31',
     'assigned positioning frame handle schedules: 2',
     'inline anonymous frame schedules: 15',
-    'identifier callback frame schedules: 5',
+    'identifier callback frame schedules: 7',
     'inline scrollIntoView frame schedules: 5',
     'inline timeout hop frame schedules: 2',
     'content runtime frame schedules: 13',
     'extension UI background frame schedules: 16',
+    'website component frame schedules: 2',
     'positionRaf assigned frame schedules: 1',
     'profileDropdownPositionRaf assigned frame schedules: 1',
     'animation frame schedule cleanup approval: NO-GO',
     'ASCII animation frame schedule flow diagram: present',
     'Mermaid animation frame schedule flow diagram: present',
     'Animation Frame Schedule/Cancel Parity Addendum - 2026-05-28',
-    'requestAnimationFrame schedule rows for parity: 29',
-    'cancelAnimationFrame rows for parity: 3',
-    'animation frame schedule-minus-cancel delta: 26',
-    'frame schedules without assigned handle: 27',
+    'requestAnimationFrame schedule rows for parity: 31',
+    'cancelAnimationFrame rows for parity: 4',
+    'animation frame schedule-minus-cancel delta: 27',
+    'frame schedules without assigned handle: 29',
     'frame schedules with assigned handle: 2',
     'cancelAnimationFrame rows with direct schedule handle: 3',
-    'cancelAnimationFrame rows without direct schedule handle: 0',
+    'cancelAnimationFrame rows without direct schedule handle: 1',
     'handled frame schedule rows with cancel handle: 2',
     'handled frame schedule rows without cancel handle: 0',
     'distinct scheduled frame handles without cancel: 0',
     'content runtime frame schedule/cancel delta: 13',
     'extension UI background frame schedule/cancel delta: 13',
+    'website component frame schedule/cancel delta: 1',
+    'frameId cancel rows: 1',
     'positionRaf cancel rows: 1',
     'profileDropdownPositionRaf cancel rows: 2',
     'animation frame schedule/cancel cleanup approval: NO-GO',
@@ -4537,16 +4640,16 @@ test('lifecycle instance source-family totals match the current register doc', (
     'extension-ui-background-js': 271,
     'generated-ui-output': 4,
     'vendor-bundles': 8,
-    'website-components': 9
+    'website-components': 23
   });
 
   for (const phrase of [
     '| `extension-ui-background-js` | 271 |',
     '| `content-runtime-js` | 218 |',
-    '| `website-components` | 9 |',
+    '| `website-components` | 23 |',
     '| `vendor-bundles` | 8 |',
     '| `generated-ui-output` | 4 |',
-    '| **Total lifecycle instances** | **510** |'
+    '| **Total lifecycle instances** | **524** |'
   ]) {
     assert.ok(doc.includes(phrase), `missing doc phrase ${phrase}`);
   }
@@ -4578,29 +4681,29 @@ test('lifecycle instance hot files remain pinned before cleanup work', () => {
   assert.match(doc, /`js\/content\/block_channel\.js` \| 71/);
 
   assert.deepEqual(roleCounts, {
-    'explicit-teardown': 50,
-    'install-or-schedule': 460
+    'explicit-teardown': 55,
+    'install-or-schedule': 469
   });
   assert.deepEqual(countInstallTeardownBySourceFamily(rows), {
     'content-runtime-js': { install: 189, teardown: 29, total: 218 },
     'extension-ui-background-js': { install: 257, teardown: 14, total: 271 },
     'generated-ui-output': { install: 2, teardown: 2, total: 4 },
     'vendor-bundles': { install: 8, teardown: 0, total: 8 },
-    'website-components': { install: 4, teardown: 5, total: 9 }
+    'website-components': { install: 13, teardown: 10, total: 23 }
   });
 
   for (const phrase of [
     'Install/Teardown Imbalance Addendum - 2026-05-27',
-    '| `install-or-schedule` | `addEventListener`, `MutationObserver`, `IntersectionObserver`, `setInterval`, `setTimeout`, `requestAnimationFrame` | 460 |',
-    '| `explicit-teardown` | `removeEventListener`, `clearInterval`, `clearTimeout`, `cancelAnimationFrame` | 50 |',
+    '| `install-or-schedule` | `addEventListener`, `MutationObserver`, `IntersectionObserver`, `setInterval`, `setTimeout`, `requestAnimationFrame` | 469 |',
+    '| `explicit-teardown` | `removeEventListener`, `clearInterval`, `clearTimeout`, `cancelAnimationFrame` | 55 |',
     '| `extension-ui-background-js` | 257 | 14 | 271 |',
     '| `content-runtime-js` | 189 | 29 | 218 |',
     '| `vendor-bundles` | 8 | 0 | 8 |',
-    '| `website-components` | 4 | 5 | 9 |',
+    '| `website-components` | 13 | 10 | 23 |',
     '| `generated-ui-output` | 2 | 2 | 4 |',
-    'install-or-schedule lifecycle instances: 460',
-    'explicit-teardown lifecycle instances: 50',
-    'install-to-teardown ratio: 9.2:1',
+    'install-or-schedule lifecycle instances: 469',
+    'explicit-teardown lifecycle instances: 55',
+    'install-to-teardown ratio: 8.5:1',
     'shared lifecycle registry in product source: absent',
     'lifecycle cleanup approval from imbalance addendum: NO-GO',
     'runtime behavior changed by this addendum: no'
@@ -5157,9 +5260,9 @@ function assertRuntimeLifecycleConvergenceBoundary() {
     .join('\n');
 
   assert.match(doc, /Runtime Lifecycle Convergence Boundary - 2026-05-30/);
-  assert.match(doc, /510 tracked lifecycle primitive instances/);
-  assert.match(doc, /460 install-or-schedule rows/);
-  assert.match(doc, /50 explicit teardown rows/);
+  assert.match(doc, /524 tracked lifecycle primitive instances/);
+  assert.match(doc, /469 install-or-schedule rows/);
+  assert.match(doc, /55 explicit teardown rows/);
   assert.match(doc, /missing shared lifecycle effect\/teardown authority/);
   assert.match(doc, /flowchart TD/);
 
@@ -5181,9 +5284,9 @@ function assertRuntimeLifecycleConvergenceBoundary() {
   for (const phrase of [
     /runtime lifecycle convergence rows: 10/,
     /implementation-ready runtime lifecycle convergence rows: 0/,
-    /tracked lifecycle primitive instances: 510/,
-    /install-or-schedule lifecycle rows: 460/,
-    /explicit teardown lifecycle rows: 50/,
+    /tracked lifecycle primitive instances: 524/,
+    /install-or-schedule lifecycle rows: 469/,
+    /explicit teardown lifecycle rows: 55/,
     /hot YouTube SPA lifecycle owner rows: 16/,
     /YouTube SPA immediate\/short hot timer rows: 33/,
     /files with complete per-callable semantic proof: 0/,

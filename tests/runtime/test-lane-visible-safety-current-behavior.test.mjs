@@ -167,6 +167,8 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
       tests: [
         /empty-install-performance-current-behavior/,
         /content-control-active-work-matrix-current-behavior/,
+        /lifecycle-instance-register-current-behavior/,
+        /repo-lifecycle-primitive-coverage-current-behavior/,
         /runtime-diagnostic-logging-policy-matrix-current-behavior/,
         /p0-no-work-current-behavior/
       ]
