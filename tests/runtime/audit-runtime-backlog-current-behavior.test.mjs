@@ -20,11 +20,16 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
   assert.match(doc, /tests: 4737/);
-  assert.match(doc, /pass: 4680/);
-  assert.match(doc, /fail: 57/);
-  assert.match(doc, /duration_ms: 74379\.597834/);
-  assert.match(doc, /58 failures to\s+57 failures/);
-  assert.match(doc, /source-locus parity\/release verification\s+anchor row/);
+  assert.match(doc, /pass: 4681/);
+  assert.match(doc, /fail: 56/);
+  assert.match(doc, /duration_ms: 107030\.44775/);
+  assert.match(doc, /57 failures to\s+56 failures/);
+  assert.match(doc, /source-locus side-effect anchor row/);
+  assert.match(doc, /current `js\/filter_logic\.js` map flush/);
+  assert.match(doc, /current `build\.js`\s+UI-shell and zip artifact lines/);
+  assert.match(doc, /side-effect budget\s+approval remains at\s+NO-GO/);
+  assert.match(doc, /58\s+failures to\s+57 failures/);
+  assert.match(doc, /source-locus parity\/release\s+verification\s+anchor row/);
   assert.match(doc, /current `build\.js`\s+UI-shell, zip artifact, and mobile artifact collection lines/);
   assert.match(doc, /parity,\s+release, and verification approval remains at\s+NO-GO/);
   assert.match(doc, /59 failures to\s+58 failures/);
@@ -154,15 +159,15 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   const doc = read(backlogPath);
   const expectedRows = [
     ['generated/release/package/docs surfaces', '38'],
-    ['source-locus/optimization/index contracts', '7'],
+    ['source-locus/optimization/index contracts', '6'],
     ['JSON/video-meta/path/reference', '19'],
     ['website/public-doc/source inventory', '14'],
     ['settings/content-control/DOM lifecycle', '8'],
     ['native/Nanah/Kids/YTM', '8']
   ];
 
-  assert.match(doc, /Current failing subtests are spread across 42 runtime test files/);
-  assert.match(doc, /filtertube-runtime-current-after-source-locus-parity-release-refresh\.tap/);
+  assert.match(doc, /Current failing subtests are spread across 41 runtime test files/);
+  assert.match(doc, /filtertube-runtime-current-after-source-locus-side-effect-refresh\.tap/);
   assert.match(doc, /non-exclusive family snapshot/);
   assert.match(doc, /previous method-proof\/family blocker row is now retired/);
   assert.match(doc, /direct method semantic proof lane passes with 5,681\s+current lexical callables/);
@@ -199,6 +204,9 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   assert.match(doc, /previous source-locus parity\/release verification row is retired/);
   assert.match(doc, /parity\/release ownership proof\s+now uses current `build\.js` line anchors/);
   assert.match(doc, /parity, release, and verification approval remains\s+explicitly absent/);
+  assert.match(doc, /previous source-locus side-effect row is retired/);
+  assert.match(doc, /side-effect ownership\s+proof now uses current `js\/filter_logic\.js` and `build\.js` line anchors/);
+  assert.match(doc, /side-effect budget approval remains\s+explicitly absent/);
 
   for (const [family, count] of expectedRows) {
     assert.match(doc, new RegExp(`\\| ${family.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\| ${count} \\|`));

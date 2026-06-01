@@ -13,14 +13,19 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4680
-fail: 57
-duration_ms: 74379.597834
+pass: 4681
+fail: 56
+duration_ms: 107030.44775
 ```
 
-This refresh reduces the pinned broad-suite failure count from 58 failures to
-57 failures after retiring the stale source-locus parity/release verification
-anchor row: the parity/release proof now points at the current `build.js`
+This refresh reduces the pinned broad-suite failure count from 57 failures to
+56 failures after retiring the stale source-locus side-effect anchor row: the
+side-effect proof now points at the current `js/filter_logic.js` map flush,
+metadata, JSON whitelist console, category fetch, harvest, and filter lines plus
+the current `build.js` UI-shell and zip artifact lines while side-effect budget
+approval remains at NO-GO. The previous refresh reduced the suite from 58
+failures to 57 failures after retiring the stale source-locus parity/release
+verification anchor row: the parity/release proof now points at the current `build.js`
 UI-shell, zip artifact, and mobile artifact collection lines while parity,
 release, and verification approval remains at NO-GO. The previous refresh
 reduced the suite from 59 failures to 58 failures after retiring the stale
@@ -82,14 +87,14 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 42 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-source-locus-parity-release-refresh.tap` gives this
+Current failing subtests are spread across 41 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-source-locus-side-effect-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
 | generated/release/package/docs surfaces | 38 |
-| source-locus/optimization/index contracts | 7 |
+| source-locus/optimization/index contracts | 6 |
 | JSON/video-meta/path/reference | 19 |
 | website/public-doc/source inventory | 14 |
 | settings/content-control/DOM lifecycle | 8 |
@@ -144,6 +149,9 @@ source-locus no-work approval remains explicitly absent.
 The previous source-locus parity/release verification row is retired: the
 parity/release ownership proof now uses current `build.js` line anchors while
 parity, release, and verification approval remains explicitly absent.
+The previous source-locus side-effect row is retired: the side-effect ownership
+proof now uses current `js/filter_logic.js` and `build.js` line anchors while
+side-effect budget approval remains explicitly absent.
 
 | Cluster | Examples | Current meaning |
 |---|---|---|

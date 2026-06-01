@@ -198,15 +198,15 @@ scripts/sync-native-runtime.mjs
 | `js/seed.js` | 843 | `jsonData = JSON.parse(trimmed)` |
 | `js/seed.js` | 878 | `Object.defineProperty(xhr, 'responseText'` |
 | `js/seed.js` | 899 | `proto.addEventListener = function (type, listener, options)` |
-| `js/filter_logic.js` | 65 | `pendingVideoChannelFlush = setTimeout(() =>` |
-| `js/filter_logic.js` | 71 | `window.postMessage({` |
-| `js/filter_logic.js` | 132 | `window.postMessage({` |
-| `js/filter_logic.js` | 1502 | `window.postMessage({` |
-| `js/filter_logic.js` | 1581 | `console.log('FilterTube Whitelist (JSON):'` |
-| `js/filter_logic.js` | 2168 | `scheduleVideoMetaFetch(videoId, { needDuration: false, needDates: false, needCategory: true })` |
-| `js/filter_logic.js` | 3442 | `this._harvestChannelData(data)` |
-| `js/filter_logic.js` | 3444 | `console.warn('FilterTube: Harvesting failed', e)` |
-| `js/filter_logic.js` | 3459 | `const filtered = this.filter(data)` |
+| `js/filter_logic.js` | 74 | `pendingVideoChannelFlush = setTimeout(() =>` |
+| `js/filter_logic.js` | 80 | `window.postMessage({` |
+| `js/filter_logic.js` | 141 | `window.postMessage({` |
+| `js/filter_logic.js` | 1511 | `window.postMessage({` |
+| `js/filter_logic.js` | 1590 | `console.log('FilterTube Whitelist (JSON):'` |
+| `js/filter_logic.js` | 2305 | `scheduleVideoMetaFetch(videoId, { needDuration: false, needDates: false, needCategory: true })` |
+| `js/filter_logic.js` | 3596 | `this._harvestChannelData(data)` |
+| `js/filter_logic.js` | 3598 | `console.warn('FilterTube: Harvesting failed', e)` |
+| `js/filter_logic.js` | 3613 | `const filtered = this.filter(data)` |
 | `js/content/dom_fallback.js` | 2035 | `async function applyDOMFallback(settings, options = {})` |
 | `js/content/dom_fallback.js` | 2310 | `document.querySelectorAll('[data-filtertube-hidden], .filtertube-hidden, [data-filtertube-pending-category], [data-filtertube-pending-upload-date]')` |
 | `js/content/dom_fallback.js` | 2488 | `scheduleVideoMetaFetch(videoId, { needDuration: false, needDates: false, needCategory: true })` |
@@ -238,8 +238,8 @@ scripts/sync-native-runtime.mjs
 | `js/content_bridge.js` | 6298 | `element.setAttribute('data-filtertube-hidden', 'true')` |
 | `js/content_bridge.js` | 12216 | `prevHiddenAttr: element.getAttribute('data-filtertube-hidden')` |
 | `js/content_bridge.js` | 12229 | `element.classList.add('filtertube-hidden')` |
-| `build.js` | 82 | `execSync('node scripts/build-extension-ui.mjs', { stdio: 'inherit' })` |
-| `build.js` | 184 | `const zipPath = path.join('dist', zipName)` |
+| `build.js` | 84 | `execSync('node scripts/build-extension-ui.mjs', { stdio: 'inherit' })` |
+| `build.js` | 186 | `const zipPath = path.join('dist', zipName)` |
 | `scripts/sync-native-runtime.mjs` | 21 | `const result = spawnSync(process.execPath, [syncScript]` |
 
 ## Current Side-Effect Decision
