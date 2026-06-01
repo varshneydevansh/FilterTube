@@ -313,9 +313,9 @@ test('JSON-first candidate extraction boundary audit is audit-only and source pi
   assert.match(doc, /not completion proof for JSON-first candidate extraction authority/);
 
   const source = read('js/filter_logic.js');
-  assert.equal(lineCount(source), 3498);
-  assert.equal(Buffer.byteLength(source), 165151);
-  assert.equal(sha256('js/filter_logic.js'), '4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641');
+  assert.equal(lineCount(source), 3652);
+  assert.equal(Buffer.byteLength(source), 172174);
+  assert.equal(sha256('js/filter_logic.js'), '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5');
   assert.ok(doc.includes('`js/filter_logic.js`'));
 
   for (const artifact of [
@@ -339,7 +339,7 @@ test('candidate extraction source counts remain pinned', () => {
   const videoIdBlock = sliceBetween(filterLogic, '_extractVideoId(item, rules) {', '        _extractPlaylistId(item) {');
   const playlistIdBlock = sliceBetween(filterLogic, '_extractPlaylistId(item) {', '        _emptyChannelInfo() {');
   const buildBlock = sliceBetween(filterLogic, '_buildCandidate(item, rendererType, wrapperRendererType = null, options = {}) {', '        _candidateSearchText(candidate) {');
-  const searchTextBlock = sliceBetween(filterLogic, '_candidateSearchText(candidate) {', '        _regexMatches(regex, text) {');
+  const searchTextBlock = sliceBetween(filterLogic, '_candidateSearchText(candidate) {', '        _extractAutoplayEndpointVideoId(endpoint) {');
   const titleBlock = sliceBetween(filterLogic, '_extractTitle(item, rules) {', '        /**\n         * Extract description with fallback methods');
   const descriptionBlock = sliceBetween(filterLogic, '_extractDescription(item, rules) {', '        /**\n         * Parse duration string');
   const channelBlock = sliceBetween(filterLogic, '_extractChannelInfo(item, rules) {', '        /**\n         * Check if a channel matches');

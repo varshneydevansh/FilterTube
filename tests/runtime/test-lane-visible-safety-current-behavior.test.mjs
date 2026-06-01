@@ -165,6 +165,7 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
       lane: 'json',
       tests: [
         /seed-network-current-behavior/,
+        /json-first-candidate-extraction-boundary-current-behavior/,
         /json-first-response-mutation-contract/,
         /content-control-json-first-boundary-index-current-behavior/,
         /json-first-hide-all-comments-boundary-current-behavior/,
