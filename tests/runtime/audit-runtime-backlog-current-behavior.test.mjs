@@ -69,6 +69,8 @@ test('audit runtime backlog names the broad failure clusters that still require 
   }
 
   assert.match(doc, /compiled-settings-field-register` has been refreshed and promoted into `test:settings`/);
+  assert.match(doc, /all-callable-index-current-behavior` has been refreshed and promoted into `test:smoke`/);
+  assert.match(doc, /remaining source-locus and route component register rows need regenerated proof/);
   assert.match(doc, /content-control-active-work-matrix` has been refreshed and promoted into `test:performance`/);
   assert.match(doc, /content-control-alias-mutation-boundary` has been refreshed and promoted into `test:settings`/);
   assert.match(doc, /remaining rows are narrower source\/effect and claim-register refreshes/);

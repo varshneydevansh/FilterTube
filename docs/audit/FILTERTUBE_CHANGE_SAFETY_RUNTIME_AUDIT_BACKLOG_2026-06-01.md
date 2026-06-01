@@ -35,7 +35,7 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 | Cluster | Examples | Current meaning |
 |---|---|---|
-| Callable, source-locus, and index drift | all-callable index counts, source-locus anchors, route component callable/render primitive counts | Repo-wide callable/source-locus registers need regenerated proof before they can become broad gates. |
+| Callable, source-locus, and index drift | source-locus anchors, route component callable/render primitive counts | `all-callable-index-current-behavior` has been refreshed and promoted into `test:smoke`; remaining source-locus and route component register rows need regenerated proof before they can become broad gates. |
 | Audit goal and completion ledgers | audit completion gap register, collector verification output, JSON route/surface contract coverage links | Older goal ledgers still point at stale broad-suite counts or prerequisite gates. |
 | Docs/audit boundary, packaging, and generated artifacts | audit markdown boundary, `compress-video`, design tokens, release notes, external navigation, generated main runtime assets, dist/website generated output | Release and generated-output proof remains useful, but several broad inventory rows need refresh. |
 | Settings and content-control registers | settings mode source/effect, settings refresh cross-context consumer rows, source-of-truth claim register | `compiled-settings-field-register` has been refreshed and promoted into `test:settings`; `content-control-active-work-matrix` has been refreshed and promoted into `test:performance`; `content-control-alias-mutation-boundary` has been refreshed and promoted into `test:settings`; remaining rows are narrower source/effect and claim-register refreshes. |
