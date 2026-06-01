@@ -82,7 +82,8 @@ export const LANES = Object.freeze({
       'tests/runtime/bridge-injection-method-semantic-register-current-behavior.test.mjs',
       'tests/runtime/page-message-trust-current-behavior.test.mjs',
       'tests/runtime/startup-injection-readiness-current-behavior.test.mjs',
-      'tests/runtime/test-lane-matrix-current-behavior.test.mjs'
+      'tests/runtime/test-lane-matrix-current-behavior.test.mjs',
+      'tests/runtime/test-lane-workflow-large-file-release-current-behavior.test.mjs'
     ]
   },
   whitelist: {
@@ -210,6 +211,7 @@ export const LANES = Object.freeze({
       'tests/runtime/identity-work-budget-current-behavior.test.mjs',
       'tests/runtime/runtime-diagnostic-logging-policy-matrix-current-behavior.test.mjs',
       'tests/runtime/code-burden-declutter-boundary-current-behavior.test.mjs',
+      'tests/runtime/test-lane-workflow-large-file-release-current-behavior.test.mjs',
       'tests/runtime/p0-no-work-current-behavior.test.mjs'
     ]
   },
@@ -262,7 +264,8 @@ export const LANES = Object.freeze({
       'tests/runtime/release-live-youtube-spa-smoke-boundary-current-behavior.test.mjs',
       'tests/runtime/audit-runtime-backlog-current-behavior.test.mjs',
       'tests/runtime/test-lane-visible-safety-current-behavior.test.mjs',
-      'tests/runtime/test-lane-matrix-current-behavior.test.mjs'
+      'tests/runtime/test-lane-matrix-current-behavior.test.mjs',
+      'tests/runtime/test-lane-workflow-large-file-release-current-behavior.test.mjs'
     ]
   }
 });
