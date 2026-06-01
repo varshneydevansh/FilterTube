@@ -136,8 +136,8 @@ js/io_manager.js
 | `js/seed.js` | 776 | XHR original `removeEventListener` is captured. |
 | `js/seed.js` | 863 | Per-XHR `response` getter override is installed. |
 | `js/seed.js` | 912 | XHR `removeEventListener` is wrapped. |
-| `js/filter_logic.js` | 65 | Video-channel map postMessage flush uses a timer. |
-| `js/filter_logic.js` | 126 | Video-meta map postMessage flush uses a timer. |
+| `js/filter_logic.js` | 74 | Video-channel map postMessage flush uses a timer. |
+| `js/filter_logic.js` | 135 | Video-meta map postMessage flush uses a timer. |
 | `js/content_bridge.js` | 1148 | Card prefetch uses an `IntersectionObserver`. |
 | `js/content_bridge.js` | 1160 | Prefetch pause uses a visibility listener. |
 | `js/content_bridge.js` | 1185 | Playlist panel prefetch uses a captured scroll listener. |

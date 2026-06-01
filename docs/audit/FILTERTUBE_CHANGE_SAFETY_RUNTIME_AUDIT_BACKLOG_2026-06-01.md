@@ -13,13 +13,17 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4681
-fail: 56
-duration_ms: 107030.44775
+pass: 4682
+fail: 55
+duration_ms: 87826.425917
 ```
 
-This refresh reduces the pinned broad-suite failure count from 57 failures to
-56 failures after retiring the stale source-locus side-effect anchor row: the
+This refresh reduces the pinned broad-suite failure count from 56 failures to
+55 failures after retiring the stale source-locus teardown anchor row: the
+teardown proof now points at the current `js/filter_logic.js` video-channel and
+video-meta flush timer lines while source-locus teardown approval remains at
+NO-GO. The previous refresh reduced the suite from 57 failures to 56 failures
+after retiring the stale source-locus side-effect anchor row: the
 side-effect proof now points at the current `js/filter_logic.js` map flush,
 metadata, JSON whitelist console, category fetch, harvest, and filter lines plus
 the current `build.js` UI-shell and zip artifact lines while side-effect budget
@@ -87,14 +91,14 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 41 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-source-locus-side-effect-refresh.tap` gives this
+Current failing subtests are spread across 40 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-source-locus-teardown-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
 | generated/release/package/docs surfaces | 38 |
-| source-locus/optimization/index contracts | 6 |
+| source-locus/optimization/index contracts | 5 |
 | JSON/video-meta/path/reference | 19 |
 | website/public-doc/source inventory | 14 |
 | settings/content-control/DOM lifecycle | 8 |
@@ -152,6 +156,9 @@ parity, release, and verification approval remains explicitly absent.
 The previous source-locus side-effect row is retired: the side-effect ownership
 proof now uses current `js/filter_logic.js` and `build.js` line anchors while
 side-effect budget approval remains explicitly absent.
+The previous source-locus teardown row is retired: the teardown ownership proof
+now uses current `js/filter_logic.js` video-channel and video-meta timer line
+anchors while source-locus teardown approval remains explicitly absent.
 
 | Cluster | Examples | Current meaning |
 |---|---|---|
