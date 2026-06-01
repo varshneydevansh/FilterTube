@@ -168,7 +168,7 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['docs/*.md'], lanes: ['test:release', 'test:smoke'] },
     { files: ['docs/audit/artifacts/release-live-youtube-spa-smoke/*.{json,mjs}'], lanes: ['test:release', 'test:smoke'] },
     { files: ['docs/audit/artifacts/empty-install-idle-probe.mjs'], lanes: ['test:performance', 'test:smoke'] },
-    { files: ['diagnostic, logging, console, no-work, cache, SPA, lag, active-work, or performance audit docs under `docs/audit/`'], lanes: ['test:performance', 'test:smoke'] },
+    { files: ['diagnostic, logging, console, no-work, cache, SPA, lag, active-work, active-rule, disabled-runtime, master-switch, or performance audit docs under `docs/audit/`'], lanes: ['test:performance', 'test:smoke'] },
     { files: ['html/popup.html', 'css/popup.css', 'js/ui-shell/popup-shell.js', 'src/extension-shell/popup.jsx'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
     { files: ['html/tab-view.html'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
     { files: ['css/content.css', 'css/filter.css', 'css/layout.css'], lanes: ['test:release', 'test:dom', 'test:smoke'] },
@@ -220,6 +220,20 @@ test('executable classifier maps high-risk paths to required lanes', () => {
     diagnosticAuditDoc.classifications[0].matched.some(match => match.id === 'audit-performance-proof-doc'),
     true
   );
+
+  const activeRuleAuditDoc = classifyPaths([
+    'docs/audit/FILTERTUBE_ACTIVE_RULE_AUTHORITY_AUDIT_2026-05-18.md',
+    'docs/audit/FILTERTUBE_ENABLED_MASTER_SWITCH_DISABLED_RUNTIME_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md'
+  ]);
+  assert.deepEqual(activeRuleAuditDoc.lanes, ['performance', 'smoke']);
+  assert.deepEqual(activeRuleAuditDoc.unmatched, []);
+  for (const classification of activeRuleAuditDoc.classifications) {
+    assert.equal(
+      classification.matched.some(match => match.id === 'audit-performance-proof-doc'),
+      true,
+      `${classification.file} should be classified as performance proof`
+    );
+  }
 
   const packageSurface = classifyPaths(['package.json', 'website/components/footer-signal-art.js']);
   assert.deepEqual(packageSurface.lanes, ['release', 'smoke']);
