@@ -209,6 +209,9 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
         /settings-mode-source-effect/,
         new RegExp('source-' + 'of-truth-claim-register'),
         /settings-refresh-cross-context-consumer-boundary/,
+        /settings-refresh-optimization-readiness-boundary/,
+        /settings-refresh-optimization-candidate-binding-matrix/,
+        /settings-refresh-optimization-candidate-evidence-packet-contract/,
         /compiled-settings-field-register/,
         /content-control-alias-mutation-boundary/,
         /compiled-settings-profile-list-mode-assembly/
