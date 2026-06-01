@@ -12,9 +12,9 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 ## Result
 
 ```text
-tests: 4704
-pass: 4547
-fail: 157
+tests: 4719
+pass: 4571
+fail: 148
 ```
 
 ## Boundary

@@ -291,7 +291,7 @@ YouTube parity. Missing future work should add or refine lane tests instead of
 expanding manual-only release checks.
 
 The 2026-06-01 full historical runtime audit currently remains backlog evidence:
-`4704` tests ran, `4547` passed, and `157` failed. The failing rows are mostly
+`4719` tests ran, `4571` passed, and `148` failed. The failing rows are mostly
 stale current-boundary snapshots for source fingerprints, generated counters,
 website build artifacts, version/package metadata, and large inventory
 registers outside the focused lane set. The focused lanes and
