@@ -149,7 +149,11 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
     {
       surface: 'JSON-first filtering',
       lane: 'json',
-      tests: [/seed-network-current-behavior/, /json-first-response-mutation-contract/]
+      tests: [
+        /seed-network-current-behavior/,
+        /json-first-response-mutation-contract/,
+        /ytm-show-sheet-injector-filter-logic-parity-current-behavior/
+      ]
     },
     {
       surface: 'DOM fallback',

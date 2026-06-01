@@ -323,9 +323,9 @@ test('YTM showSheet injector/filter-logic parity doc and source facts are pinned
   assert.equal(lineCount(injector), 3593);
   assert.equal(Buffer.byteLength(injector), 155830);
   assert.equal(sha256('js/injector.js'), '634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04');
-  assert.equal(lineCount(filterLogic), 3498);
-  assert.equal(Buffer.byteLength(filterLogic), 165151);
-  assert.equal(sha256('js/filter_logic.js'), '4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641');
+  assert.equal(lineCount(filterLogic), 3652);
+  assert.equal(Buffer.byteLength(filterLogic), 172174);
+  assert.equal(sha256('js/filter_logic.js'), '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5');
   assert.equal(lineCount(fixture), 104);
   assert.equal(Buffer.byteLength(fixture), 3818);
   assert.equal(sha256(fixturePath), 'e23da0992cec33040ce286d767c002a9171543dc07c5f5983cc505265fbaabfc');
