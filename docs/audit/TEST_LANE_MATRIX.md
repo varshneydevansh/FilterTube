@@ -124,9 +124,12 @@ for the affected runtime lanes. This is intentionally phrased as
 fixtures plus a passing lane, while behavior changes should add or update the
 focused fixture/test that proves the new contract.
 The classifier also reports whether changed runtime fixture/test files share
-at least one touched runtime lane. That relevance report is not a hard
+at least one touched runtime lane. Missing fixture edits are not a hard
 `test:changed` failure because a behavior-neutral refactor can be proven by
-existing fixtures, but it makes unrelated fixture churn visible before commit.
+existing fixtures plus passing lanes. However, if a runtime fixture/test file is
+changed and it does not share any touched runtime lane, `npm run test:changed`
+fails before running lanes; unrelated runtime proof must not satisfy a behavior
+change.
 
 ## Auxiliary Guards
 

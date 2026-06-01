@@ -623,6 +623,8 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(runner, /function formatLaneList\(lanes\)/);
   assert.match(runner, /if \(auditProof\.missing\) process\.exit\(3\)/);
   assert.match(runner, /if \(auditProof\.irrelevant\) process\.exit\(4\)/);
+  assert.match(runner, /const runtimeFixture = runtimeFixtureRequirement\(result\)/);
+  assert.match(runner, /if \(runtimeFixture\.irrelevant\) process\.exit\(6\)/);
   assert.match(runner, /function runAuditDrift\(\)/);
   assert.match(runner, /runNode\(\['scripts\/audit-proof-drift\.mjs', '--lane-owned'\]\)/);
   assert.match(runner, /console\.log\('\\n==> Running test:audit-drift'\)/);
@@ -644,6 +646,8 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(matrix, /fails when changed\s+`docs\/audit\/` proof does not share\s+at least one non-smoke lane/);
   assert.match(matrix, /prints a fixture-proof reminder\s+for the affected runtime lanes/);
   assert.match(matrix, /reports whether changed runtime fixture\/test files share\s+at least one touched runtime lane/);
+  assert.match(matrix, /Missing fixture edits are not a hard\s+`test:changed` failure/);
+  assert.match(matrix, /if a runtime fixture\/test file is\s+changed and it does not share any touched runtime lane, `npm run test:changed`\s+fails before running lanes/);
 });
 
 test('changed-lane path collection includes untracked nonignored files', () => {
@@ -765,7 +769,7 @@ test('classifier output surfaces runtime fixture proof lane relevance', () => {
   assert.match(mismatchedProof.stdout, /Runtime fixture\/test proof relevance mismatch:/);
   assert.match(mismatchedProof.stdout, /touched runtime lane\(s\): test:json, test:performance/);
   assert.match(mismatchedProof.stdout, /proof runtime lane\(s\): test:blocking/);
-  assert.match(mismatchedProof.stdout, /behavior changes should update a fixture\/test that shares a touched runtime lane/);
+  assert.match(mismatchedProof.stdout, /test:changed will fail until runtime proof shares a touched runtime lane/);
 });
 
 test('classifier output recognizes changed audit proof files', () => {

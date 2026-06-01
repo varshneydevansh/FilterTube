@@ -332,7 +332,7 @@ function printClassification(result) {
         console.log('  Runtime fixture/test proof relevance mismatch:');
         console.log(`    touched runtime lane(s): ${formatLaneList(runtimeFixture.runtimeRelevantLanes)}`);
         console.log(`    proof runtime lane(s): ${formatLaneList(runtimeFixture.runtimeProofLanes)}`);
-        console.log('    behavior changes should update a fixture/test that shares a touched runtime lane.');
+        console.log('    test:changed will fail until runtime proof shares a touched runtime lane.');
       }
     }
   }
@@ -394,6 +394,8 @@ function main() {
     const auditProof = auditProofRequirement(result);
     if (auditProof.missing) process.exit(3);
     if (auditProof.irrelevant) process.exit(4);
+    const runtimeFixture = runtimeFixtureRequirement(result);
+    if (runtimeFixture.irrelevant) process.exit(6);
     if (!result.lanes.length) {
       console.log('\nNo changed lanes to run.');
       process.exit(0);
