@@ -60,6 +60,17 @@ function gitTrackedProductSource() {
     .join('\n');
 }
 
+function releaseBuildAndWebsiteMediaSource() {
+  return [
+    'package.json',
+    'build.js',
+    'website/package.json',
+    'website/components/route-content.js',
+    'website/assets/videos/README.md',
+    'docs/WEBSITE_APP_RELEASE_SURFACE_CHANGELOG.md'
+  ].map(read).join('\n');
+}
+
 test('compress-video failure-mode boundary is audit-only and source pinned', () => {
   const source = read(scriptPath);
   const text = doc();
@@ -216,14 +227,16 @@ test('compress-video script is not currently wired into package build or website
   const text = doc();
   const packageScripts = Object.values(readJson('package.json').scripts || {}).join('\n');
   const build = read('build.js');
-  const productSource = gitTrackedProductSource();
+  const releaseBuildWebsiteSource = releaseBuildAndWebsiteMediaSource();
+  const laneConfig = read('scripts/test-lane-config.mjs');
   const websiteRouteContent = read('website/components/route-content.js');
   const websiteAssetReadme = read('website/assets/videos/README.md');
   const websiteChangelog = read('docs/WEBSITE_APP_RELEASE_SURFACE_CHANGELOG.md');
 
   assert.doesNotMatch(packageScripts, /compress-video/);
   assert.doesNotMatch(build, /compress-video/);
-  assert.doesNotMatch(productSource, /scripts\/compress-video\.swift|compress-video\.swift|compress-video/);
+  assert.doesNotMatch(releaseBuildWebsiteSource, /scripts\/compress-video\.swift|compress-video\.swift|compress-video/);
+  assert.equal(count(laneConfig, /compress-video/g), 1);
   assert.match(websiteRouteContent, /\/videos\/homepage\/day\/homepage_hero_day\.mp4/);
   assert.match(websiteRouteContent, /\/videos\/ios\/ios_hero_slow_540\.mp4/);
   assert.match(websiteAssetReadme, /website\/public\/videos\/homepage\/day\/homepage_hero_day\.mp4/);
@@ -233,7 +246,8 @@ test('compress-video script is not currently wired into package build or website
   for (const token of [
     'package.json scripts referencing compress-video: 0',
     'build.js compress-video references: 0',
-    'tracked non-doc source callers outside scripts/compress-video.swift: 0'
+    'test-lane classifier references to scripts/compress-video.swift: 1',
+    'release/build/website media callers outside scripts/compress-video.swift: 0'
   ]) {
     assert.ok(text.includes(token), `doc should pin integration token ${token}`);
   }

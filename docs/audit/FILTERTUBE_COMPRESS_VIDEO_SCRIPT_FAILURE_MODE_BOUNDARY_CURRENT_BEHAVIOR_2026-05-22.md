@@ -75,8 +75,13 @@ Current package/build integration is absent:
 ```text
 package.json scripts referencing compress-video: 0
 build.js compress-video references: 0
-tracked non-doc source callers outside scripts/compress-video.swift: 0
+test-lane classifier references to scripts/compress-video.swift: 1
+release/build/website media callers outside scripts/compress-video.swift: 0
 ```
+
+`scripts/test-lane-config.mjs` mentions the helper only to route changes in the
+manual compression script through release and smoke proof lanes. That
+classification is not a build step, package script, or website media manifest.
 
 Current website/media references are also split:
 
