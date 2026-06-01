@@ -46,14 +46,14 @@ Related proof layers:
 ```text
 renderer traversal/mutation boundary source files: 2
 renderer traversal/mutation source/effect blocks: 5
-filter_logic filter block lines: 40
-filter_logic filter block bytes: 1448
+filter_logic filter block lines: 57
+filter_logic filter block bytes: 2166
 filter_logic filter recursive filter call tokens: 4
-filter_logic filter _shouldBlock callsites: 1
+filter_logic filter _shouldBlock callsites: 2
 filter_logic filter Array.isArray callsites: 1
 filter_logic filter filtered.push callsites: 1
 filter_logic filter return filtered callsites: 1
-filter_logic filter return null callsites: 1
+filter_logic filter return null callsites: 3
 filter_logic filter Object.keys callsites: 1
 filter_logic filter Object.entries callsites: 1
 filter_logic filter result[key] assignments: 1
@@ -71,8 +71,8 @@ filter_logic unwrapRendererForFiltering block bytes: 1907
 filter_logic unwrapRendererForFiltering preferredNestedRenderers tokens: 2
 filter_logic unwrapRendererForFiltering wrapperRendererType tokens: 3
 filter_logic unwrapRendererForFiltering ViewModel tokens: 3
-filter_logic _shouldBlock block lines: 301
-filter_logic _shouldBlock block bytes: 15380
+filter_logic _shouldBlock block lines: 306
+filter_logic _shouldBlock block bytes: 15523
 filter_logic _shouldBlock return true tokens: 11
 filter_logic _shouldBlock return false tokens: 11
 filter_logic _shouldBlock whitelist tokens: 20

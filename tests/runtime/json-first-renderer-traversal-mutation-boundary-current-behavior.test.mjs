@@ -130,14 +130,14 @@ test('renderer traversal source counts remain pinned', () => {
   const shouldBlockBlock = sliceBetween(filterLogic, '_shouldBlock(item, rendererType) {', '        _checkCategoryFilters(item, rules, rendererType) {');
   const seedProcessBlock = sliceBetween(seed, 'function processWithEngine(data, dataName) {', 'function setupFetchInterception() {');
 
-  assert.equal(lineCount(filterBlock), 40);
-  assert.equal(Buffer.byteLength(filterBlock), 1448);
+  assert.equal(lineCount(filterBlock), 57);
+  assert.equal(Buffer.byteLength(filterBlock), 2166);
   assert.equal(countLiteral(filterBlock, 'filter('), 4);
-  assert.equal(countLiteral(filterBlock, '_shouldBlock'), 1);
+  assert.equal(countLiteral(filterBlock, '_shouldBlock'), 2);
   assert.equal(countLiteral(filterBlock, 'Array.isArray'), 1);
   assert.equal(countLiteral(filterBlock, 'filtered.push'), 1);
   assert.equal(countLiteral(filterBlock, 'return filtered'), 1);
-  assert.equal(countLiteral(filterBlock, 'return null'), 1);
+  assert.equal(countLiteral(filterBlock, 'return null'), 3);
   assert.equal(countLiteral(filterBlock, 'Object.keys'), 1);
   assert.equal(countLiteral(filterBlock, 'Object.entries'), 1);
   assert.equal(countLiteral(filterBlock, 'result[key]'), 1);
@@ -159,8 +159,8 @@ test('renderer traversal source counts remain pinned', () => {
   assert.equal(countLiteral(unwrapBlock, 'wrapperRendererType'), 3);
   assert.equal(countLiteral(unwrapBlock, 'ViewModel'), 3);
 
-  assert.equal(lineCount(shouldBlockBlock), 301);
-  assert.equal(Buffer.byteLength(shouldBlockBlock), 15380);
+  assert.equal(lineCount(shouldBlockBlock), 306);
+  assert.equal(Buffer.byteLength(shouldBlockBlock), 15523);
   assert.equal(countLiteral(shouldBlockBlock, 'return true'), 11);
   assert.equal(countLiteral(shouldBlockBlock, 'return false'), 11);
   assert.equal(countLiteral(shouldBlockBlock, 'whitelist'), 20);
@@ -178,10 +178,10 @@ test('renderer traversal source counts remain pinned', () => {
 
   for (const phrase of [
     'renderer traversal/mutation source/effect blocks: 5',
-    'filter_logic filter block lines: 40',
+    'filter_logic filter block lines: 57',
     'filter_logic processData block lines: 32',
     'filter_logic unwrapRendererForFiltering block lines: 44',
-    'filter_logic _shouldBlock block lines: 301',
+    'filter_logic _shouldBlock block lines: 306',
     'seed processWithEngine block lines: 284'
   ]) {
     assert.ok(doc.includes(phrase), `missing count phrase ${phrase}`);
