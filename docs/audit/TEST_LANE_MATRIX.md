@@ -41,6 +41,20 @@ classified before lanes run.
 | settings | `npm run test:settings` | Settings compile, profiles, storage refresh, migrations, import/export, backups, and sync boundaries. |
 | smoke | `npm run test:smoke` | Small release confidence lane for common lag, blocking, menu, and release-surface regressions. |
 
+## Change-Type Gate Map
+
+Use this map before the touched file set is fully known. The executable
+classifier remains the source of truth after files are touched, but the change
+type tells us which lane family must not be skipped during design and review.
+
+| Logical change type | Minimum automated gate | Manual proof expectation |
+|---|---|---|
+| Runtime hot-path change | `test:json`, `test:dom`, `test:performance`, `test:whitelist`, `test:blocking` | Exercise empty-rule, blocklist, whitelist, and repeated SPA navigation on live YouTube when user-facing. |
+| Menu / quick-block / YouTube UI change | `test:menu`, plus affected runtime lane | Exercise native 3-dot menus, quick-block controls, outside-click close, comment menus, and collaborator menu labels. |
+| Settings/profile/storage change | `test:settings`, plus affected whitelist/blocking lane | Exercise profile/mode/list edits, already-rendered card reprocessing, import/export, and storage migration. |
+| Release/build/docs change | `test:release`, `test:smoke` | Verify package contents, public claims, release notes, mobile artifact handoff, and installed-extension parity when release-facing. |
+| Broad/shared refactor | all affected focused lanes, `test:smoke`; add `test:release` if manifests/build/docs/package files changed | Run a manual YouTube smoke pass before release because shared refactors can move lag, hide, menu, and settings behavior together. |
+
 ## Resumed Goal Coverage
 
 This matrix is the current executable contract for the resumed

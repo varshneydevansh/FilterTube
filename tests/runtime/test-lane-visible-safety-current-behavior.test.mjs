@@ -20,6 +20,13 @@ function sectionBetween(source, start, end) {
   return source.slice(startIndex, endIndex);
 }
 
+function tableRowContaining(section, text) {
+  const row = section.split('\n').find(line => line.startsWith('|') && line.includes(text));
+
+  assert.ok(row, `missing table row for ${text}`);
+  return row;
+}
+
 test('smoke lane keeps release confidence broad but bounded', () => {
   const smoke = LANES.smoke.tests.join('\n');
 
@@ -55,6 +62,46 @@ test('whitelist lane explicitly owns end-screen boundary proof', () => {
   assert.match(whitelist, /player-endscreen-dom-cleanup-boundary-current-behavior/);
   assert.match(matrix, /Whitelist-only leaks, pending hides, Shorts\/watch\/end-screen\/Kids\/YTM allow behavior/);
   assert.match(matrix, /The whitelist lane explicitly owns end-screen videowall, card, autoplay, and player DOM boundary tests/);
+});
+
+test('change-type gate map keeps logical workflow classification explicit', () => {
+  const matrix = read(matrixPath);
+  const section = sectionBetween(matrix, '## Change-Type Gate Map', '## Resumed Goal Coverage');
+  const rows = [
+    {
+      label: 'Runtime hot-path change',
+      lanes: ['json', 'dom', 'performance', 'whitelist', 'blocking']
+    },
+    {
+      label: 'Menu / quick-block / YouTube UI change',
+      lanes: ['menu']
+    },
+    {
+      label: 'Settings/profile/storage change',
+      lanes: ['settings']
+    },
+    {
+      label: 'Release/build/docs change',
+      lanes: ['release', 'smoke']
+    },
+    {
+      label: 'Broad/shared refactor',
+      lanes: ['smoke']
+    }
+  ];
+
+  assert.match(section, /Use this map before the touched file set is fully known/);
+  assert.match(section, /classifier remains the source of truth/);
+  assert.match(section, /Manual proof expectation/);
+  assert.match(section, /manual YouTube smoke pass before release/);
+
+  for (const { label, lanes } of rows) {
+    const row = tableRowContaining(section, label);
+    for (const lane of lanes) {
+      assert.ok(LANES[lane], `unknown lane ${lane}`);
+      assert.ok(row.includes(`test:${lane}`), `${label} row missing test:${lane}`);
+    }
+  }
 });
 
 test('goal safety surfaces stay bound to focused lane proof tests', () => {
