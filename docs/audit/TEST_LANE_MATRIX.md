@@ -74,6 +74,8 @@ when source, release, asset, or product-doc paths changed without a matching
 `docs/audit/` proof file, fails when changed `docs/audit/` proof does not share
 at least one non-smoke lane with the touched files, runs the lane-owned audit
 proof drift guard, then runs the required lanes sequentially in matrix order.
+After the lanes pass, it fails if focused lane execution leaves additional
+tracked or unignored dirty paths beyond the logical change that was classified.
 Use it when a logical change has already been made and you want the focused
 proof lane set to execute without manually copying commands from
 `lanes:changed`.

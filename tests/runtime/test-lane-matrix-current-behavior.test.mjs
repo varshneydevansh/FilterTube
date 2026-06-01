@@ -10,6 +10,7 @@ import {
   changedPathsFromGit,
   classifyPaths,
   laneNames,
+  newChangedPaths,
   runtimeFixtureRequirement,
   validateLaneFiles
 } from '../../scripts/run-test-lane.mjs';
@@ -334,7 +335,11 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.doesNotMatch(runner, /--diff-filter=ACMRTUXB/);
   assert.match(runner, /if \(result\.signal\) return 1/);
   assert.match(runner, /lane === '--run-changed' \|\| lane === 'run-changed'/);
-  assert.match(runner, /const result = classifyPaths\(changedPathsFromGit\(\)\)/);
+  assert.match(runner, /const initialChangedPaths = changedPathsFromGit\(\)/);
+  assert.match(runner, /const result = classifyPaths\(initialChangedPaths\)/);
+  assert.match(runner, /const extraDirtyPaths = newChangedPaths\(initialChangedPaths, changedPathsFromGit\(\)\)/);
+  assert.match(runner, /test:changed left additional dirty paths/);
+  assert.match(runner, /process\.exit\(5\)/);
   assert.match(runner, /if \(result\.unmatched\.length\) process\.exit\(2\)/);
   assert.match(runner, /MANUAL_YOUTUBE_SMOKE_LANE_REASONS/);
   assert.match(runner, /Manual YouTube smoke required when user-facing/);
@@ -367,6 +372,7 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(matrix, /fails on any unclassified\s+changed path/);
   assert.match(matrix, /runs the\s+lane-owned audit\s+proof drift guard/);
   assert.match(matrix, /runs\s+the required lanes sequentially in\s+matrix order/);
+  assert.match(matrix, /fails if focused lane execution leaves additional\s+tracked or unignored dirty paths/);
   assert.match(matrix, /prints a manual YouTube\s+smoke advisory/);
   assert.match(matrix, /includes the structured live-smoke template, verifier command,\s+and required SPA row ids/);
   assert.match(matrix, /reports whether a changed\s+`docs\/audit\/` proof file is present/);
@@ -398,6 +404,24 @@ test('changed-lane path collection includes untracked nonignored files', () => {
   ]);
   assert.deepEqual(result.lanes, ['json', 'performance', 'smoke']);
   assert.deepEqual(result.unmatched, []);
+});
+
+test('changed-lane dirty path guard reports only additional tracked or unignored paths', () => {
+  const extra = newChangedPaths(
+    ['js/seed.js', './docs/audit/TEST_LANE_MATRIX.md', ''],
+    [
+      'docs/audit/TEST_LANE_MATRIX.md',
+      'js/seed.js',
+      './tests/runtime/test-lane-matrix-current-behavior.test.mjs',
+      'tests/runtime/test-lane-matrix-current-behavior.test.mjs',
+      ' docs/audit/FILTERTUBE_EXTRA_PROOF_2026-06-01.md '
+    ]
+  );
+
+  assert.deepEqual(extra, [
+    'docs/audit/FILTERTUBE_EXTRA_PROOF_2026-06-01.md',
+    'tests/runtime/test-lane-matrix-current-behavior.test.mjs'
+  ]);
 });
 
 test('classifier output surfaces manual YouTube smoke for user-facing runtime lanes', () => {

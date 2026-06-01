@@ -752,6 +752,15 @@ export function changedPathsFromGit(gitLineReader = gitLines) {
   ];
 }
 
+export function newChangedPaths(initialPaths, currentPaths) {
+  const initial = new Set(
+    initialPaths.map(pathName => normalizePath(String(pathName || '').trim())).filter(Boolean)
+  );
+  return [
+    ...new Set(currentPaths.map(pathName => normalizePath(String(pathName || '').trim())).filter(Boolean))
+  ].filter(pathName => !initial.has(pathName)).sort();
+}
+
 function runNode(args) {
   const result = spawnSync(process.execPath, args, {
     cwd: repoRoot,
@@ -927,7 +936,8 @@ function main() {
   }
 
   if (lane === '--run-changed' || lane === 'run-changed') {
-    const result = classifyPaths(changedPathsFromGit());
+    const initialChangedPaths = changedPathsFromGit();
+    const result = classifyPaths(initialChangedPaths);
     printClassification(result);
     if (result.unmatched.length) process.exit(2);
     const auditProof = auditProofRequirement(result);
@@ -946,6 +956,13 @@ function main() {
       console.log(`\n==> Running test:${changedLane}`);
       const status = runLane(changedLane);
       if (status !== 0) process.exit(status);
+    }
+
+    const extraDirtyPaths = newChangedPaths(initialChangedPaths, changedPathsFromGit());
+    if (extraDirtyPaths.length) {
+      console.error('\ntest:changed left additional dirty paths:');
+      for (const file of extraDirtyPaths) console.error(`- ${file}`);
+      process.exit(5);
     }
 
     process.exit(0);
