@@ -13,8 +13,8 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4719
-pass: 4571
-fail: 148
+pass: 4491
+fail: 228
 ```
 
 ## Boundary
@@ -27,11 +27,14 @@ but it is not clean enough to be treated as a release blocker today.
 
 | Cluster | Examples | Current meaning |
 |---|---|---|
-| Source fingerprint drift | `js/filter_logic.js`, `html/tab-view.html`, `manifest.json`, `data/release_notes.json` | Existing proof rows need refresh after recent release and lag-fix work. |
+| Source fingerprint and method-gap drift | `js/filter_logic.js`, `html/tab-view.html`, `manifest.json`, `data/release_notes.json`, older method-gap assertions for `63` files / `5473` callables | Existing proof rows need refresh after recent release, lag-fix, and callable-index work. |
 | Generated/local artifact drift | `dist/*v3.3.1.zip`, `website/.next/BUILD_ID`, native runtime mirrors | Local build output and native/app mirror snapshots are stale relative to the working tree. |
 | Inventory counter drift | callable, lifecycle, selector, network, message-transport, website render graph registers | Repo-wide registers need regenerated proof before they can be used as broad gates. |
 | Website route surface drift | `website/components/footer-signal-art.js`, `website/components/hero-video.js`, downloads page, website client lifecycle counts | Website/dashboard release-copy work changed the route/component surface. |
 | Version/package drift | package/manifests now target `3.3.2` while older tests still pin `3.3.1` boundaries | Release-candidate bump invalidated older staged-version assertions. |
+| Optimization and route-surface gate drift | first optimization collector/contract gates, JSON-first route-surface fixture and metric gates | Older NO-GO proof gates still point at stale upstream counts, source anchors, or artifact prerequisites. |
+| Native/runtime mirror drift | Nanah/native runtime mirror freshness, generated main runtime assets, broad extension source mirror drift | Mirror freshness proof remains useful but is not current enough to serve as a release blocker. |
+| YouTube Music and YTM provenance drift | YouTube Music surface identity, YTM showSheet enrichment, YTM injector/filter-logic parity | YTM proof slices remain partial and several current-source fingerprints need refresh. |
 
 ## Release Lane Decision
 

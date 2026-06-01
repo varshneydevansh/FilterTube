@@ -20,8 +20,8 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
   assert.match(doc, /tests: 4719/);
-  assert.match(doc, /pass: 4571/);
-  assert.match(doc, /fail: 148/);
+  assert.match(doc, /pass: 4491/);
+  assert.match(doc, /fail: 228/);
   assert.match(doc, /The focused release lanes are the per-change proof system/);
   assert.match(doc, /not clean enough to be treated as a release blocker today/);
 
@@ -34,11 +34,14 @@ test('audit runtime backlog remains explicit and outside release-lane completion
 test('audit runtime backlog names the broad failure clusters that still require smaller proof batches', () => {
   const doc = read(backlogPath);
   const requiredClusters = [
-    'Source fingerprint drift',
+    'Source fingerprint and method-gap drift',
     'Generated/local artifact drift',
     'Inventory counter drift',
     'Website route surface drift',
-    'Version/package drift'
+    'Version/package drift',
+    'Optimization and route-surface gate drift',
+    'Native/runtime mirror drift',
+    'YouTube Music and YTM provenance drift'
   ];
   const requiredLanes = [
     'test:release',
