@@ -26,8 +26,8 @@ first-class JSON filter work look safer than the runtime proof actually allows.
 
 ## File Fingerprints
 
-Current tracked root metadata inventory: 7 files, 2,947 newline counts, and
-133,943 bytes.
+Current tracked root metadata inventory: 7 files, 2,949 newline counts, and
+134,162 bytes.
 
 | File | Newline count | Bytes | SHA-256 |
 |---|---:|---:|---|
@@ -36,7 +36,7 @@ Current tracked root metadata inventory: 7 files, 2,947 newline counts, and
 | `LICENSE` | 21 | 1,073 | `d0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d` |
 | `README.md` | 401 | 22,476 | `4559dac6d9b6a2e9d94aed4c1cb10a384c2f7c51ad09f37bab00a983e78605fb` |
 | `channel-identity-watch-mix-collab-recovery-plan.md` | 262 | 16,023 | `01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a` |
-| `package.json` | 58 | 2,134 | `b4cc73d9128bda3643ff15557bdb06d0bda38f6840e63bbf2ea8117e6fc96a0c` |
+| `package.json` | 60 | 2,353 | `da3439cf47be88a13a075a641fe49adb0bf40475c836512f0775521d3fec8f2f` |
 | `package-lock.json` | 1,461 | 49,916 | `f52d6482693be9cd4edacdc1f1491b4d2cda796522bfd0e4dcf86e0c879ad974` |
 
 Any release, package, or optimization claim that uses these files should cite
@@ -47,7 +47,7 @@ the exact current file state or an updated fingerprint.
 `package.json` currently declares package version `3.3.2`, license `MIT`,
 repository `git+https://github.com/varshneydevansh/FilterTube.git`, homepage
 `https://github.com/varshneydevansh/FilterTube`, 2 runtime dependencies, 3
-development dependencies, and 24 scripts.
+development dependencies, and 26 scripts.
 
 Current scripts:
 
@@ -73,6 +73,8 @@ test:smoke -> node scripts/run-test-lane.mjs smoke
 lanes:changed -> node scripts/run-test-lane.mjs --changed
 test:changed -> node scripts/run-test-lane.mjs --run-changed
 test:audit-drift -> node scripts/audit-proof-drift.mjs --lane-owned
+smoke:youtube -> node docs/audit/artifacts/release-live-youtube-spa-smoke/run-live-smoke.mjs
+smoke:youtube:verify -> node docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs
 dev:chrome -> cp manifest.chrome.json manifest.json
 dev:firefox -> cp manifest.firefox.json manifest.json
 dev:opera -> cp manifest.opera.json manifest.json
@@ -82,7 +84,10 @@ Current package metadata does not declare `private`, `engines`,
 `packageManager`, or a conventional `test` script. The audit command exists as
 `audit:runtime`; focused `test:*` lanes now call `scripts/run-test-lane.mjs`.
 `lanes:changed` classifies current dirty paths into required focused lanes,
-and `test:changed` runs those classified lanes sequentially.
+and `test:changed` runs those classified lanes sequentially. The live YouTube
+release smoke handoff is exposed through `smoke:youtube` and
+`smoke:youtube:verify`; those commands still require an installed Chrome/CDP
+session and a dated artifact before they can count as release proof.
 Contributors who run `npm test` still get no conventional project-owned test
 path from this file. The browser dev shortcuts still mutate tracked
 `manifest.json` by copying a browser variant over it.
@@ -92,7 +97,7 @@ Risk classification:
 | Risk | Current behavior | Missing gate |
 |---|---|---|
 | Release drift | `package.json`, `package-lock.json`, README badges, browser manifests, changelog, and release notes currently point at `3.3.2`; app-store/direct APK availability still depends on artifact proof. | `rootReleaseClaimGate` linking package version, manifest versions, changelog section, README badge, release notes row, website copy, and package artifact. |
-| Audit discoverability | `audit:runtime`, focused `test:*` lanes, `lanes:changed`, and `test:changed` exist, but a conventional `test` alias is absent. | `packageScriptExecutionGate` for release and local verification commands. |
+| Audit discoverability | `audit:runtime`, focused `test:*` lanes, `lanes:changed`, `test:changed`, and live-smoke helper scripts exist, but a conventional `test` alias is absent. | `packageScriptExecutionGate` for release and local verification commands. |
 | Dev manifest mutation | `dev:chrome`, `dev:firefox`, and `dev:opera` overwrite tracked `manifest.json`. | Dirty-worktree and manifest-parity gate before release or implementation review. |
 | Native parity | `sync:native-runtime` delegates to a sibling app repo; normal `npm run build` does not invoke it. | Runtime sync freshness and app-boundary proof before claiming extension/app parity. |
 

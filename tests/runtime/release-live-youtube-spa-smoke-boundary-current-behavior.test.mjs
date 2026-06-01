@@ -32,16 +32,21 @@ function readJson(file) {
 
 test('release and smoke lanes keep the live YouTube SPA smoke boundary visible', () => {
   const matrix = read(matrixPath);
+  const pkg = readJson('package.json');
 
   assert.ok(LANES.release.tests.includes(liveSmokeTestPath));
   assert.ok(LANES.smoke.tests.includes(liveSmokeTestPath));
   assert.ok(LANES.release.tests.includes(verifierTestPath));
   assert.ok(LANES.smoke.tests.includes(verifierTestPath));
+  assert.equal(pkg.scripts['smoke:youtube'], `node ${runnerPath}`);
+  assert.equal(pkg.scripts['smoke:youtube:verify'], `node ${verifierPath}`);
 
   assert.ok(matrix.includes(boundaryDocPath));
   assert.ok(matrix.includes(templatePath));
   assert.ok(matrix.includes(runnerPath));
   assert.ok(matrix.includes(verifierPath));
+  assert.ok(matrix.includes('npm run smoke:youtube'));
+  assert.ok(matrix.includes('npm run smoke:youtube:verify -- docs/audit/artifacts/release-live-youtube-spa-smoke/<artifact>.json'));
   assert.ok(matrix.includes(liveSmokeTestPath));
   assert.ok(matrix.includes(verifierTestPath));
   assert.match(matrix, /Manual YouTube Smoke Handoff/);

@@ -210,6 +210,8 @@ When a dated live-smoke artifact is produced, verify it before using it as
 release evidence:
 
 ```bash
+npm run smoke:youtube
+npm run smoke:youtube:verify -- docs/audit/artifacts/release-live-youtube-spa-smoke/<artifact>.json
 node docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs docs/audit/artifacts/release-live-youtube-spa-smoke/<artifact>.json
 ```
 

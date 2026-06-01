@@ -351,7 +351,7 @@ stored extension/service-worker version: 3.3.1
 Default Local Extension Settings directory exists: yes
 Default packed Extensions directory for this id exists: no
 workspace manifest.json sha256: 282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734
-workspace package.json sha256: b4cc73d9128bda3643ff15557bdb06d0bda38f6840e63bbf2ea8117e6fc96a0c
+workspace package.json sha256: da3439cf47be88a13a075a641fe49adb0bf40475c836512f0775521d3fec8f2f
 workspace js/content_bridge.js sha256: 1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3
 workspace content_bridge ampersand Topic fix token present: yes
 ```

@@ -13,7 +13,7 @@ const rootMetadataRows = [
   ['LICENSE', 21, 1073, 'd0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d'],
   ['README.md', 401, 22476, '4559dac6d9b6a2e9d94aed4c1cb10a384c2f7c51ad09f37bab00a983e78605fb'],
   ['channel-identity-watch-mix-collab-recovery-plan.md', 262, 16023, '01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a'],
-  ['package.json', 58, 2134, 'b4cc73d9128bda3643ff15557bdb06d0bda38f6840e63bbf2ea8117e6fc96a0c'],
+  ['package.json', 60, 2353, 'da3439cf47be88a13a075a641fe49adb0bf40475c836512f0775521d3fec8f2f'],
   ['package-lock.json', 1461, 49916, 'f52d6482693be9cd4edacdc1f1491b4d2cda796522bfd0e4dcf86e0c879ad974'],
 ];
 
@@ -91,9 +91,9 @@ test('root package metadata script surface doc is audit-only and fingerprint pin
   assert.match(doc, /optimization, release, dependency, JSON-first, or cleanup implementation work/);
   assert.deepEqual(trackedRootMetadata.sort(), rootMetadataRows.map(([file]) => file).sort());
 
-  assert.equal(rootMetadataRows.reduce((sum, [, lines]) => sum + lines, 0), 2947);
-  assert.equal(rootMetadataRows.reduce((sum, [, , bytes]) => sum + bytes, 0), 133943);
-  assert.match(doc, /7 files, 2,947 newline counts, and\s+133,943 bytes/);
+  assert.equal(rootMetadataRows.reduce((sum, [, lines]) => sum + lines, 0), 2949);
+  assert.equal(rootMetadataRows.reduce((sum, [, , bytes]) => sum + bytes, 0), 134162);
+  assert.match(doc, /7 files, 2,949 newline counts, and\s+134,162 bytes/);
 
   for (const [file, lines, bytes, hash] of rootMetadataRows) {
     assert.equal(newlineCount(file), lines, `${file} newline count drifted`);
@@ -135,17 +135,21 @@ test('package scripts and dependency metadata are pinned before release or optim
     'lanes:changed',
     'test:changed',
     'test:audit-drift',
+    'smoke:youtube',
+    'smoke:youtube:verify',
     'dev:chrome',
     'dev:firefox',
     'dev:opera',
   ]);
-  assert.equal(Object.keys(pkg.scripts).length, 24);
+  assert.equal(Object.keys(pkg.scripts).length, 26);
   assert.equal(pkg.scripts['audit:runtime'], 'node --test tests/runtime/*.test.mjs');
   assert.equal(pkg.scripts['test:release'], 'node scripts/run-test-lane.mjs release');
   assert.equal(pkg.scripts['test:smoke'], 'node scripts/run-test-lane.mjs smoke');
   assert.equal(pkg.scripts['lanes:changed'], 'node scripts/run-test-lane.mjs --changed');
   assert.equal(pkg.scripts['test:changed'], 'node scripts/run-test-lane.mjs --run-changed');
   assert.equal(pkg.scripts['test:audit-drift'], 'node scripts/audit-proof-drift.mjs --lane-owned');
+  assert.equal(pkg.scripts['smoke:youtube'], 'node docs/audit/artifacts/release-live-youtube-spa-smoke/run-live-smoke.mjs');
+  assert.equal(pkg.scripts['smoke:youtube:verify'], 'node docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs');
   assert.equal(pkg.scripts.test, undefined);
   assert.equal(Object.hasOwn(pkg, 'private'), false);
   assert.equal(Object.hasOwn(pkg, 'engines'), false);
@@ -160,12 +164,14 @@ test('package scripts and dependency metadata are pinned before release or optim
     'fs-extra': '^11.1.1',
   });
 
-  assert.match(doc, /24 scripts/);
+  assert.match(doc, /26 scripts/);
   assert.match(doc, /test:release -> node scripts\/run-test-lane\.mjs release/);
   assert.match(doc, /test:smoke -> node scripts\/run-test-lane\.mjs smoke/);
   assert.match(doc, /lanes:changed -> node scripts\/run-test-lane\.mjs --changed/);
   assert.match(doc, /test:changed -> node scripts\/run-test-lane\.mjs --run-changed/);
   assert.match(doc, /test:audit-drift -> node scripts\/audit-proof-drift\.mjs --lane-owned/);
+  assert.match(doc, /smoke:youtube -> node docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/run-live-smoke\.mjs/);
+  assert.match(doc, /smoke:youtube:verify -> node docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/verify-live-smoke-artifact\.mjs/);
   assert.match(doc, /`test:changed` runs those classified lanes sequentially/);
   assert.match(doc, /does not declare `private`, `engines`,\s+`packageManager`, or a conventional `test` script/);
   assert.match(doc, /browser dev shortcuts still mutate tracked\s+`manifest\.json`/);
