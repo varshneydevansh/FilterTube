@@ -113,6 +113,8 @@ Current proof facts:
 - Existing build/dev/browser/native-sync scripts are unchanged.
 - Package version, license, dependencies, devDependencies, repository, homepage,
   browser manifests, and build script behavior are not changed by this diff.
+- Current checkout package version is `3.3.2`; that release bump is a later
+  release-alignment change and not part of the `9816c34` package-script diff.
 - The script improves audit discoverability, but it is not release artifact
   proof and it is not permission to change whitelist or JSON-first runtime
   behavior.

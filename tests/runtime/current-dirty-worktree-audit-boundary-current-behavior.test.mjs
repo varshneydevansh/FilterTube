@@ -158,7 +158,7 @@ test('package script diff only adds the runtime audit command', () => {
   assert.deepEqual(addedLines, ['+    "audit:runtime": "node --test tests/runtime/*.test.mjs",']);
   assert.deepEqual(removedLines, []);
   assert.equal(pkg.scripts['audit:runtime'], 'node --test tests/runtime/*.test.mjs');
-  assert.equal(pkg.version, '3.3.1');
+  assert.equal(pkg.version, '3.3.2');
   assert.equal(pkg.license, 'MIT');
   assert.deepEqual(pkg.dependencies, {
     preact: '^10.29.0',
@@ -172,6 +172,8 @@ test('package script diff only adds the runtime audit command', () => {
 
   assert.match(doc, /`git diff --numstat -- package\.json` is `1 addition \/ 0 deletions`/);
   assert.match(doc, /Existing build\/dev\/browser\/native-sync scripts are unchanged/);
+  assert.match(doc, /Current checkout package version is `3\.3\.2`/);
+  assert.match(doc, /not part of the `9816c34` package-script diff/);
   assert.match(doc, /not release artifact\s+proof/);
 });
 

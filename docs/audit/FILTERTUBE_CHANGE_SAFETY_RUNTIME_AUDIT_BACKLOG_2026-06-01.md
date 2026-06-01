@@ -13,17 +13,20 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4671
-fail: 66
-duration_ms: 57292.777208
+pass: 4672
+fail: 65
+duration_ms: 52951.702959
 ```
 
-This refresh reduces the pinned broad-suite failure count from 67 failures to
-66 failures after retiring the stale content-filter field semantics contract
-dependency on the older compiled/settings field-register row count. The previous
-broad refresh reduced the suite from 69 failures to 67 failures after retiring
-the stale function-coverage source backlog row and the stale `compress-video`
-package/build boundary row. The earlier broad refresh reduced the suite from 76
+This refresh reduces the pinned broad-suite failure count from 66 failures to
+65 failures after retiring the stale current-dirty worktree package-version row:
+the historical `9816c34` package diff still only adds `audit:runtime`, while the
+current checkout package version is `3.3.2`. The previous broad refresh reduced
+the suite from 67 failures to 66 failures after retiring the stale content-filter
+field semantics contract dependency on the older compiled/settings
+field-register row count. Earlier broad refreshes reduced the suite from 69
+failures to 67 failures after retiring the stale function-coverage source
+backlog row and the stale `compress-video` package/build boundary row, from 76
 failures to 69 failures after refreshing release-note/package-version proof for
 the `3.3.2` release alignment, and from 115 failures to 76 failures after
 refreshing stale method semantic proof gap counts from 5,673 to 5,681 lexical
@@ -45,13 +48,13 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 51 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-content-filter-field-semantics-refresh.tap` gives this
+Current failing subtests are spread across 50 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-current-dirty-package-version-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
-| generated/release/package/docs surfaces | 42 |
+| generated/release/package/docs surfaces | 41 |
 | source-locus/optimization/index contracts | 12 |
 | JSON/video-meta/path/reference | 19 |
 | website/public-doc/source inventory | 14 |
@@ -74,6 +77,9 @@ The previous content-filter field semantics contract row is retired: its
 dependency on the compiled/settings field-register source input now tracks the
 current 309 raw compiled/settings field rows instead of the older 296-row
 baseline.
+The previous current-dirty package-script row is retired: the audit now
+separates the `9816c34` one-line `audit:runtime` script diff from the later
+`3.3.2` package version bump.
 
 | Cluster | Examples | Current meaning |
 |---|---|---|

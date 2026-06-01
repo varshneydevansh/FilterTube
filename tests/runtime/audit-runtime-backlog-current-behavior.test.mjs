@@ -20,13 +20,17 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
   assert.match(doc, /tests: 4737/);
-  assert.match(doc, /pass: 4671/);
-  assert.match(doc, /fail: 66/);
-  assert.match(doc, /duration_ms: 57292\.777208/);
-  assert.match(doc, /67 failures to\s+66 failures/);
+  assert.match(doc, /pass: 4672/);
+  assert.match(doc, /fail: 65/);
+  assert.match(doc, /duration_ms: 52951\.702959/);
+  assert.match(doc, /66 failures to\s+65 failures/);
+  assert.match(doc, /current-dirty worktree package-version row/);
+  assert.match(doc, /historical `9816c34` package diff still only adds `audit:runtime`/);
+  assert.match(doc, /current checkout package version is `3\.3\.2`/);
+  assert.match(doc, /67 failures to 66 failures/);
   assert.match(doc, /content-filter field semantics contract/);
-  assert.match(doc, /compiled\/settings field-register row count/);
-  assert.match(doc, /69 failures to 67 failures/);
+  assert.match(doc, /compiled\/settings\s+field-register row count/);
+  assert.match(doc, /69\s+failures to 67 failures/);
   assert.match(doc, /function-coverage source backlog row/);
   assert.match(doc, /stale `compress-video`\s+package\/build boundary row/);
   assert.match(doc, /76\s+failures to 69 failures/);
@@ -118,7 +122,7 @@ test('audit runtime backlog names the broad failure clusters that still require 
 test('audit runtime backlog pins the current broad-suite failure family snapshot', () => {
   const doc = read(backlogPath);
   const expectedRows = [
-    ['generated/release/package/docs surfaces', '42'],
+    ['generated/release/package/docs surfaces', '41'],
     ['source-locus/optimization/index contracts', '12'],
     ['JSON/video-meta/path/reference', '19'],
     ['website/public-doc/source inventory', '14'],
@@ -126,8 +130,8 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
     ['native/Nanah/Kids/YTM', '8']
   ];
 
-  assert.match(doc, /Current failing subtests are spread across 51 runtime test files/);
-  assert.match(doc, /filtertube-runtime-current-after-content-filter-field-semantics-refresh\.tap/);
+  assert.match(doc, /Current failing subtests are spread across 50 runtime test files/);
+  assert.match(doc, /filtertube-runtime-current-after-current-dirty-package-version-refresh\.tap/);
   assert.match(doc, /non-exclusive family snapshot/);
   assert.match(doc, /previous method-proof\/family blocker row is now retired/);
   assert.match(doc, /direct method semantic proof lane passes with 5,681\s+current lexical callables/);
@@ -139,6 +143,8 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   assert.match(doc, /test-lane classifier mention is recognized as workflow\s+classification/);
   assert.match(doc, /previous content-filter field semantics contract row is retired/);
   assert.match(doc, /current 309 raw compiled\/settings field rows/);
+  assert.match(doc, /previous current-dirty package-script row is retired/);
+  assert.match(doc, /`9816c34` one-line `audit:runtime` script diff/);
 
   for (const [family, count] of expectedRows) {
     assert.match(doc, new RegExp(`\\| ${family.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\| ${count} \\|`));
