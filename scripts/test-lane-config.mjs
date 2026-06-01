@@ -472,6 +472,11 @@ export const FILE_LANE_RULES = Object.freeze([
     lanes: ['menu']
   },
   {
+    id: 'audit-identity-proof-doc',
+    patterns: [/^docs\/audit\/.*(?:IDENTITY|RESOLVER|HANDLE|WATERFALL).*\.md$/i],
+    lanes: ['whitelist', 'blocking', 'menu']
+  },
+  {
     id: 'audit-performance-proof-doc',
     patterns: [/^docs\/audit\/.*(?:PERFORMANCE|NO_WORK|CACHE|SPA|LAG|ACTIVE_WORK|ACTIVE_RULE|DISABLED_RUNTIME|MASTER_SWITCH|DIAGNOSTIC|LOGGING|CONSOLE).*\.md$/i],
     lanes: ['performance']

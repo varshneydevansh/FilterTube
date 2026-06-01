@@ -160,6 +160,7 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['js/nanah_sync_adapter.js', 'js/security_manager.js'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
     { files: ['js/layout.js'], lanes: ['test:release', 'test:dom', 'test:smoke'] },
     { files: ['js/shared/identity.js', 'js/content/dom_extractors.js', 'js/content/handle_resolver.js'], lanes: ['test:whitelist', 'test:blocking', 'test:menu'] },
+    { files: ['identity, resolver, handle, or waterfall audit docs under `docs/audit/`'], lanes: ['test:whitelist', 'test:blocking', 'test:menu', 'test:smoke'] },
     { files: ['js/vendor/*.bundle.js'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
     { files: ['scripts/build-extension-ui.mjs', 'scripts/build-nanah-vendor.mjs'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
     { files: ['manifest*.json'], lanes: ['test:release'] },
@@ -232,6 +233,21 @@ test('executable classifier maps high-risk paths to required lanes', () => {
       classification.matched.some(match => match.id === 'audit-performance-proof-doc'),
       true,
       `${classification.file} should be classified as performance proof`
+    );
+  }
+
+  const identityAuditDoc = classifyPaths([
+    'docs/audit/FILTERTUBE_IDENTITY_INFORMATION_WATERFALL_CURRENT_BEHAVIOR_2026-05-19.md',
+    'docs/audit/FILTERTUBE_HANDLE_RESOLVER_METHOD_SEMANTIC_REGISTER_2026-05-21.md',
+    'docs/audit/FILTERTUBE_BACKGROUND_IDENTITY_FETCH_NETWORK_BUDGET_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md'
+  ]);
+  assert.deepEqual(identityAuditDoc.lanes, ['whitelist', 'blocking', 'menu', 'smoke']);
+  assert.deepEqual(identityAuditDoc.unmatched, []);
+  for (const classification of identityAuditDoc.classifications) {
+    assert.equal(
+      classification.matched.some(match => match.id === 'audit-identity-proof-doc'),
+      true,
+      `${classification.file} should be classified as identity proof`
     );
   }
 
