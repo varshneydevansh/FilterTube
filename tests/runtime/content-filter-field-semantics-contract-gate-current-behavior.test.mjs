@@ -186,9 +186,10 @@ test('content-filter field semantics contract remains linked to current NO-GO ga
   assert.match(readiness, /field availability remains separate\s+from effect authority/);
   assert.match(cacheSpaGate, /approve JSON-first as first-class filter authority now: NO-GO/);
   assert.match(cacheSpaGate, /route\/surface metric artifact files required: 5/);
-  assert.match(compiledFields, /raw compiled\/settings field rows: 296/);
+  assert.match(compiledFields, /raw compiled\/settings field rows: 309/);
   assert.match(compiledFields, /compiledSettingsFieldRegisterAuthority/);
   assert.match(compiledFields, /compiledSettingsSchemaManifest/);
+  assert.match(text, /currently pins 309 raw compiled\/settings field rows/);
   assert.match(text, /Route\/surface metric artifact, field-effect manifest, and behavior fixture packet/);
   assert.match(text, /Metric artifact packet, live route\/surface smoke, DOM parity, native parity, and public-claim boundary/);
 });

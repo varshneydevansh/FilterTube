@@ -33,7 +33,7 @@ not completion proof for JSON-first content-filter promotion
 | --- | --- |
 | `docs/audit/FILTERTUBE_JSON_FIRST_VIDEO_META_CONTENT_PARITY_CURRENT_BEHAVIOR_2026-05-22.md` | Proves duration, upload-date, uppercase, and validity semantics are split across JSON, DOM fallback, and active-work gates. |
 | `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Lifts 16 content/category semantic callable rows into the repo-wide semantic proof gate while leaving content/category contract approval at NO-GO. |
-| `docs/audit/FILTERTUBE_COMPILED_SETTINGS_FIELD_REGISTER_CURRENT_BEHAVIOR_2026-05-22.md` | Proves compiled/settings field consumers and keeps first-class settings field authority absent. |
+| `docs/audit/FILTERTUBE_COMPILED_SETTINGS_FIELD_REGISTER_CURRENT_BEHAVIOR_2026-05-22.md` | Proves compiled/settings field consumers, currently pins 309 raw compiled/settings field rows, and keeps first-class settings field authority absent. |
 | `docs/audit/FILTERTUBE_IMPORT_EXPORT_NANAH_AUTHORITY_AUDIT_2026-05-18.md` | Shows import/sync/state ingress can preserve caller-shaped nested content-filter objects. |
 | `docs/audit/FILTERTUBE_JSON_FIRST_ACTIVE_WORK_PREDICATE_REGISTER_CURRENT_BEHAVIOR_2026-05-22.md` | Pins strict `enabled === true` active-work admission for seed, injector, and bridge after the release-lag fixes. |
 | `docs/audit/FILTERTUBE_JSON_FIRST_FILTER_READINESS_GATE_CURRENT_BEHAVIOR_2026-05-21.md` | Keeps JSON-first promotion blocked until normalized path, route/surface, field-effect, no-work, side-effect, and parity proof exist. |
