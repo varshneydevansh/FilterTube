@@ -38,7 +38,7 @@ classified before lanes run.
 | dom | `npm run test:dom` | DOM fallback selectors, hide/restore state, cleanup passes, recycled nodes, and route cleanup. |
 | menu | `npm run test:menu` | 3-dot menu, quick-block, collaborator menus, native dropdown close state, and affordance gates. |
 | performance | `npm run test:performance` | Empty/no-rule work budgets, disabled mode, active-rule gates, SPA lag guards, identity work budgets, lifecycle primitive/register proof, and production console logging gates. |
-| settings | `npm run test:settings` | Settings compile, profiles, storage refresh, migrations, import/export, backups, and sync boundaries. |
+| settings | `npm run test:settings` | Settings compile, profiles, storage refresh, migrations, import/export, backups, claim-register authority, and sync boundaries. |
 | smoke | `npm run test:smoke` | Small release confidence lane for common lag, blocking, menu, and release-surface regressions. |
 
 ## Change-Type Gate Map
@@ -51,7 +51,7 @@ type tells us which lane family must not be skipped during design and review.
 |---|---|---|
 | Runtime hot-path change | `test:json`, `test:dom`, `test:performance`, `test:whitelist`, `test:blocking` | Exercise empty-rule, blocklist, whitelist, and repeated SPA navigation on live YouTube when user-facing. |
 | Menu / quick-block / YouTube UI change | `test:menu`, plus affected runtime lane | Exercise native 3-dot menus, quick-block controls, outside-click close, comment menus, and collaborator menu labels. |
-| Settings/profile/storage change | `test:settings`, plus affected whitelist/blocking lane | Exercise profile/mode/list edits, already-rendered card reprocessing, import/export, and storage migration. |
+| Settings/profile/storage change | `test:settings`, plus affected whitelist/blocking lane | Exercise profile/mode/list edits, source/effect authority, claim-register drift, already-rendered card reprocessing, import/export, and storage migration. |
 | Release/build/docs change | `test:release`, `test:smoke` | Verify package contents, public claims, release notes, mobile artifact handoff, and installed-extension parity when release-facing. |
 | Broad/shared refactor | all affected focused lanes, `test:smoke`; add `test:release` if manifests/build/docs/package files changed | Run a manual YouTube smoke pass before release because shared refactors can move lag, hide, menu, and settings behavior together. |
 
@@ -176,7 +176,7 @@ the surface connected to a focused lane.
 | code-burden growth | `test:performance` keeps the code-burden declutter boundary in lane, including the 1000-line product-owned source guard and near-threshold file list. |
 | source-locus optimization proof | `test:performance` keeps `first-optimization-source-locus-callable-anchor-boundary-current-behavior` in lane, so stale anchors cannot silently approve optimization or metric-collector work. |
 | repo-wide callable/method census | `test:smoke` keeps `all-callable-index-current-behavior` in lane so broad callable count drift, method semantic proof-gap counts, and generated/build/test-lane callable deltas stay visible before release. |
-| settings | `test:settings` keeps settings-mode, compiled-settings field/register proof, content-control alias mutation, refresh fanout, compiled-cache, import/export, and state-manager tests in lane. |
+| settings | `test:settings` keeps settings-mode, settings source/effect, claim-register authority, compiled-settings field/register proof, content-control alias mutation, refresh fanout, compiled-cache, import/export, and state-manager tests in lane. |
 | release packaging | `test:release` keeps package parity, public release surface, audit proof directory boundary, live-smoke boundary, and artifact claim tests in lane. |
 
 ## User-Reported Regression Anchors
@@ -285,7 +285,7 @@ or uncovered required lanes remain `NO-GO`.
 | `js/shared/identity.js`, `js/content/dom_extractors.js`, `js/content/handle_resolver.js` | `test:whitelist`, `test:blocking`, `test:menu` | Covers identity confidence, collaborators, menu labels, channel matching, and stale identity risk. |
 | release-notes JSON version-gate audit docs under `docs/audit/` | `test:release`, `test:smoke` | Release-notes JSON is a packaged data/version surface; it does not require the runtime JSON-first filtering lane unless seed/network/filtering files are touched too. |
 | identity, resolver, handle, or waterfall audit docs under `docs/audit/` | `test:whitelist`, `test:blocking`, `test:menu`, `test:smoke` | Covers audit proof for channel identity, learned identity, resolver escalation, stale identity, and identity waterfall behavior that can affect allow/block decisions and injected/native menu labels. |
-| alias, list-mode, or row-list-mode audit docs under `docs/audit/` | `test:whitelist`, `test:blocking`, `test:settings`, `test:smoke` | Covers proof for visible-list authority, stale aliases, mode transitions, and allow/block state migration that can produce leaks or false hides. |
+| alias, list-mode, settings source/effect, claim-register, or row-list-mode audit docs under `docs/audit/` | `test:whitelist`, `test:blocking`, `test:settings`, `test:smoke` | Covers proof for visible-list authority, stale aliases, mode transitions, settings authority, claim drift, and allow/block state migration that can produce leaks or false hides. |
 | backup or Nanah audit docs under `docs/audit/` | `test:settings`, `test:smoke` | Covers proof for import/export, encrypted backup, trusted-device restore, sync payloads, profile scope, and storage side effects. |
 | renderer, watch, search, Shorts, end-screen, autoplay, playlist, or Kids browse audit docs under `docs/audit/` | `test:whitelist`, `test:blocking`, `test:json`, `test:dom`, `test:smoke` | Covers proof for YouTube renderer authority, JSON-first surface decisions, DOM cleanup/fallback, allow-mode leaks, blocklist false hides, watch playback controls, and end-screen/autoplay behavior. |
 | menu, quick-block, collaborator, or dropdown audit docs under `docs/audit/` | `test:menu`, `test:smoke` | Covers proof for native 3-dot/dropdown close state, quick-block affordances, collaborator identity/menu handoff, and ampersand Topic guard behavior such as `Kully B & Gussy G - Topic`. |

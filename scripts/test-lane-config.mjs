@@ -229,9 +229,11 @@ export const LANES = Object.freeze({
     tests: [
       'tests/runtime/settings-shared-method-semantic-register-current-behavior.test.mjs',
       'tests/runtime/settings-mode-coverage-matrix-current-behavior.test.mjs',
+      'tests/runtime/settings-mode-source-effect-current-behavior.test.mjs',
       'tests/runtime/settings-refresh-fanout-current-behavior.test.mjs',
       'tests/runtime/settings-refresh-dirty-key-producer-matrix-current-behavior.test.mjs',
       'tests/runtime/settings-refresh-dirty-key-consumer-matrix-current-behavior.test.mjs',
+      'tests/runtime/source-of-truth-claim-register-current-behavior.test.mjs',
       'tests/runtime/compiled-settings-field-register-current-behavior.test.mjs',
       'tests/runtime/content-control-alias-mutation-boundary-current-behavior.test.mjs',
       'tests/runtime/compiled-settings-profile-list-mode-assembly-boundary-current-behavior.test.mjs',
@@ -275,6 +277,7 @@ export const LANES = Object.freeze({
       'tests/runtime/release-live-youtube-spa-smoke-boundary-current-behavior.test.mjs',
       'tests/runtime/all-callable-index-current-behavior.test.mjs',
       'tests/runtime/audit-runtime-backlog-current-behavior.test.mjs',
+      'tests/runtime/source-of-truth-claim-register-current-behavior.test.mjs',
       'tests/runtime/test-lane-visible-safety-current-behavior.test.mjs',
       'tests/runtime/test-lane-matrix-current-behavior.test.mjs',
       'tests/runtime/test-lane-classifier-workflow-current-behavior.test.mjs',
@@ -595,6 +598,11 @@ export const FILE_LANE_RULES = Object.freeze([
     lanes: ['settings']
   },
   {
+    id: 'audit-source-truth-claim-proof-doc',
+    patterns: [/^docs\/audit\/FILTERTUBE_SOURCE_OF_TRUTH_CLAIM_REGISTER_.*\.md$/i],
+    lanes: ['settings']
+  },
+  {
     id: 'audit-proof-doc',
     patterns: [/^docs\/audit\/.*\.md$/],
     lanes: ['smoke']
@@ -652,6 +660,11 @@ export const FILE_LANE_RULES = Object.freeze([
   {
     id: 'runtime-settings-test',
     patterns: [/^tests\/runtime\/.*(?:setting|profile|storage|import|export|sync|compiled|alias).*\.test\.mjs$/i],
+    lanes: ['settings']
+  },
+  {
+    id: 'runtime-source-truth-claim-test',
+    patterns: [/^tests\/runtime\/source-of-truth-claim-register-current-behavior\.test\.mjs$/],
     lanes: ['settings']
   },
   {

@@ -61,8 +61,8 @@ test('source of truth claim register accounts for every current exact wording oc
   const source = read(docPath);
   const refs = occurrenceRefs();
 
-  assert.equal(refs.length, 89);
-  assert.match(source, /exact source-of-truth wording occurrences: 89/);
+  assert.equal(refs.length, 95);
+  assert.match(source, /exact source-of-truth wording occurrences: 95/);
 
   for (const ref of refs) {
     assert.ok(source.includes(ref), `missing source-of-truth claim ref ${ref}`);

@@ -6,6 +6,7 @@ import { LANES } from '../../scripts/run-test-lane.mjs';
 
 const repoRoot = process.cwd();
 const matrixPath = 'docs/audit/TEST_LANE_MATRIX.md';
+const claimRegisterTestPath = ['tests/runtime/source', 'of', 'truth-claim-register-current-behavior.test.mjs'].join('-');
 
 function read(file) {
   return fs.readFileSync(path.join(repoRoot, file), 'utf8');
@@ -45,6 +46,7 @@ test('smoke lane keeps release confidence broad but bounded', () => {
   assert.match(smoke, /public-release-surface-current-behavior/);
   assert.match(smoke, /release-live-youtube-spa-smoke-boundary-current-behavior/);
   assert.match(smoke, /all-callable-index-current-behavior/);
+  assert.ok(LANES.smoke.tests.includes(claimRegisterTestPath));
   assert.ok(LANES.smoke.checks.includes('build.js'));
 });
 
@@ -202,7 +204,14 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
     {
       surface: 'settings',
       lane: 'settings',
-      tests: [/settings-mode-coverage-matrix/, /compiled-settings-field-register/, /content-control-alias-mutation-boundary/, /compiled-settings-profile-list-mode-assembly/]
+      tests: [
+        /settings-mode-coverage-matrix/,
+        /settings-mode-source-effect/,
+        new RegExp('source-' + 'of-truth-claim-register'),
+        /compiled-settings-field-register/,
+        /content-control-alias-mutation-boundary/,
+        /compiled-settings-profile-list-mode-assembly/
+      ]
     },
     {
       surface: 'release packaging',

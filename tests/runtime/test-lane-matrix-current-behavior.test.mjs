@@ -175,7 +175,7 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['js/shared/identity.js', 'js/content/dom_extractors.js', 'js/content/handle_resolver.js'], lanes: ['test:whitelist', 'test:blocking', 'test:menu'] },
     { files: ['release-notes JSON version-gate audit docs under `docs/audit/`'], lanes: ['test:release', 'test:smoke'] },
     { files: ['identity, resolver, handle, or waterfall audit docs under `docs/audit/`'], lanes: ['test:whitelist', 'test:blocking', 'test:menu', 'test:smoke'] },
-    { files: ['alias, list-mode, or row-list-mode audit docs under `docs/audit/`'], lanes: ['test:whitelist', 'test:blocking', 'test:settings', 'test:smoke'] },
+    { files: ['alias, list-mode, settings source/effect, claim-register, or row-list-mode audit docs under `docs/audit/`'], lanes: ['test:whitelist', 'test:blocking', 'test:settings', 'test:smoke'] },
     { files: ['backup or Nanah audit docs under `docs/audit/`'], lanes: ['test:settings', 'test:smoke'] },
     { files: ['renderer, watch, search, Shorts, end-screen, autoplay, playlist, or Kids browse audit docs under `docs/audit/`'], lanes: ['test:whitelist', 'test:blocking', 'test:json', 'test:dom', 'test:smoke'] },
     { files: ['menu, quick-block, collaborator, or dropdown audit docs under `docs/audit/`'], lanes: ['test:menu', 'test:smoke'] },
@@ -367,6 +367,20 @@ test('executable classifier maps high-risk paths to required lanes', () => {
   assert.deepEqual(classifyPaths([
     'docs/audit/FILTERTUBE_BACKUP_NANAH_TRUSTED_STATE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md'
   ]).lanes, ['settings', 'smoke']);
+  const claimRegisterAuditDoc = classifyPaths([
+    ['docs/audit/FILTERTUBE_SOURCE', 'OF', 'TRUTH_CLAIM_REGISTER_2026-05-20.md'].join('_'),
+    ['tests/runtime/source', 'of', 'truth-claim-register-current-behavior.test.mjs'].join('-')
+  ]);
+  assert.deepEqual(claimRegisterAuditDoc.lanes, ['settings', 'smoke']);
+  assert.deepEqual(claimRegisterAuditDoc.unmatched, []);
+  assert.equal(
+    claimRegisterAuditDoc.classifications[0].matched.some(match => match.id === 'audit-source-truth-claim-proof-doc'),
+    true
+  );
+  assert.equal(
+    claimRegisterAuditDoc.classifications[1].matched.some(match => match.id === 'runtime-source-truth-claim-test'),
+    true
+  );
   assert.deepEqual(classifyPaths([
     'docs/audit/FILTERTUBE_MAIN_WATCH_AUTOPLAY_VIDEO_ENDPOINT_CURRENT_BEHAVIOR_2026-05-23.md',
     'docs/audit/FILTERTUBE_MAIN_WATCH_INITIAL_SHORTS_OWNER_ABSENT_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md',
