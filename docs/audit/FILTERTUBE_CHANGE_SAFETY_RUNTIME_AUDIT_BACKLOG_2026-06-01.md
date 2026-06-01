@@ -13,17 +13,22 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4685
-fail: 52
-duration_ms: 73047.012833
+pass: 4686
+fail: 51
+duration_ms: 56020.619667
 ```
 
-This refresh reduces the pinned broad-suite failure count from 55 failures to
-52 failures after retiring the stale generated local output dependency surface
-rows: the proof now points at the current ignored `dist` v3.3.2 package output
-and current `website/.next` local build fingerprints while generated output
-remains non-authoritative. The previous refresh reduced the suite from 56
-failures to 55 failures after retiring the stale source-locus teardown anchor row: the
+This refresh reduces the pinned broad-suite failure count from 52 failures to
+51 failures after retiring the stale implementation readiness gate lifecycle
+count row: the readiness proof now points at the current 524 tracked lifecycle
+primitive instances, 469 install-or-schedule rows, and 55 explicit teardown rows
+while runtime cleanup and optimization approval remains at NO-GO. The previous
+refresh reduced the suite from 55 failures to 52 failures after retiring the
+stale generated local output dependency surface rows: the proof now points at
+the current ignored `dist` v3.3.2 package output and current `website/.next`
+local build fingerprints while generated output remains non-authoritative. The
+previous refresh reduced the suite from 56 failures to 55 failures after
+retiring the stale source-locus teardown anchor row: the
 teardown proof now points at the current `js/filter_logic.js` video-channel and
 video-meta flush timer lines while source-locus teardown approval remains at
 NO-GO. The previous refresh reduced the suite from 57 failures to 56 failures
@@ -95,13 +100,13 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 39 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-generated-local-output-refresh.tap` gives this
+Current failing subtests are spread across 38 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-implementation-readiness-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
-| generated/release/package/docs surfaces | 35 |
+| generated/release/package/docs surfaces | 34 |
 | source-locus/optimization/index contracts | 5 |
 | JSON/video-meta/path/reference | 19 |
 | website/public-doc/source inventory | 14 |
@@ -163,6 +168,10 @@ side-effect budget approval remains explicitly absent.
 The previous source-locus teardown row is retired: the teardown ownership proof
 now uses current `js/filter_logic.js` video-channel and video-meta timer line
 anchors while source-locus teardown approval remains explicitly absent.
+The previous implementation readiness gate row is retired: the readiness proof
+now uses the current lifecycle register totals and keeps runtime cleanup,
+JSON-first promotion, whitelist/cache optimization, release claims, and broad
+behavior changes explicitly blocked.
 The previous generated local output dependency surface rows are retired: the
 proof now pins the current ignored `dist` v3.3.2 ZIP/package tree snapshot and
 current `website/.next` local build fingerprints while preserving the

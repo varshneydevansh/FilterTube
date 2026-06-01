@@ -20,9 +20,13 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
   assert.match(doc, /tests: 4737/);
-  assert.match(doc, /pass: 4685/);
-  assert.match(doc, /fail: 52/);
-  assert.match(doc, /duration_ms: 73047\.012833/);
+  assert.match(doc, /pass: 4686/);
+  assert.match(doc, /fail: 51/);
+  assert.match(doc, /duration_ms: 56020\.619667/);
+  assert.match(doc, /52 failures to\s+51 failures/);
+  assert.match(doc, /implementation readiness gate lifecycle\s+count row/);
+  assert.match(doc, /current 524 tracked lifecycle\s+primitive instances, 469 install-or-schedule rows, and 55 explicit teardown rows/);
+  assert.match(doc, /runtime cleanup and optimization approval remains at NO-GO/);
   assert.match(doc, /55 failures to\s+52 failures/);
   assert.match(doc, /generated local output dependency surface\s+rows/);
   assert.match(doc, /current ignored `dist` v3\.3\.2 package output/);
@@ -167,7 +171,7 @@ test('audit runtime backlog names the broad failure clusters that still require 
 test('audit runtime backlog pins the current broad-suite failure family snapshot', () => {
   const doc = read(backlogPath);
   const expectedRows = [
-    ['generated/release/package/docs surfaces', '35'],
+    ['generated/release/package/docs surfaces', '34'],
     ['source-locus/optimization/index contracts', '5'],
     ['JSON/video-meta/path/reference', '19'],
     ['website/public-doc/source inventory', '14'],
@@ -175,8 +179,8 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
     ['native/Nanah/Kids/YTM', '8']
   ];
 
-  assert.match(doc, /Current failing subtests are spread across 39 runtime test files/);
-  assert.match(doc, /filtertube-runtime-current-after-generated-local-output-refresh\.tap/);
+  assert.match(doc, /Current failing subtests are spread across 38 runtime test files/);
+  assert.match(doc, /filtertube-runtime-current-after-implementation-readiness-refresh\.tap/);
   assert.match(doc, /non-exclusive family snapshot/);
   assert.match(doc, /previous method-proof\/family blocker row is now retired/);
   assert.match(doc, /direct method semantic proof lane passes with 5,681\s+current lexical callables/);
@@ -219,6 +223,9 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   assert.match(doc, /previous source-locus teardown row is retired/);
   assert.match(doc, /teardown ownership\s+proof\s+now uses current `js\/filter_logic\.js` video-channel and video-meta timer line\s+anchors/);
   assert.match(doc, /source-locus teardown approval remains\s+explicitly absent/);
+  assert.match(doc, /previous implementation readiness gate row is retired/);
+  assert.match(doc, /readiness proof\s+now uses the current lifecycle register totals/);
+  assert.match(doc, /runtime cleanup,\s+JSON-first promotion, whitelist\/cache optimization, release claims, and broad\s+behavior changes explicitly blocked/);
   assert.match(doc, /previous generated local output dependency surface rows are retired/);
   assert.match(doc, /current ignored `dist` v3\.3\.2 ZIP\/package tree snapshot/);
   assert.match(doc, /current `website\/\.next` local build fingerprints/);
