@@ -473,7 +473,7 @@ export const FILE_LANE_RULES = Object.freeze([
   },
   {
     id: 'audit-performance-proof-doc',
-    patterns: [/^docs\/audit\/.*(?:PERFORMANCE|NO_WORK|CACHE|SPA|LAG|ACTIVE_WORK).*\.md$/i],
+    patterns: [/^docs\/audit\/.*(?:PERFORMANCE|NO_WORK|CACHE|SPA|LAG|ACTIVE_WORK|DIAGNOSTIC|LOGGING|CONSOLE).*\.md$/i],
     lanes: ['performance']
   },
   {
