@@ -22,15 +22,15 @@ be pruned, or that a public performance claim is measurable.
 
 ## File Fingerprints
 
-Current tracked JSON-first reference-doc inventory: 4 files, 6,486 newline
-counts, and 402,371 bytes.
+Current tracked JSON-first reference-doc inventory: 4 files, 6,487 newline
+counts, and 402,624 bytes.
 
 | File | Newline count | Bytes | SHA-256 |
 |---|---:|---:|---|
 | `docs/JSON_FIRST_FILTERING_PLAN.md` | 580 | 16,595 | `726394dc1c8108163228b82103e34c8f726ec96002aa87919b5a69101d47c1bb` |
 | `docs/json_paths_encyclopedia.md` | 5,003 | 314,988 | `4e2cca8b1cac62d685d7597febfb151752158e1f3561de31854b81786c58ca05` |
 | `docs/watch_json_paths.md` | 123 | 7,996 | `b56270d7a17987228e7b0e306d51374ddc64f834b25ab02b29df3ac52fc86f45` |
-| `docs/youtube_renderer_inventory.md` | 780 | 62,792 | `595b00612f4c8e9dd42259239ffdf942f09c654984d68decae5d8f2606a19dc7` |
+| `docs/youtube_renderer_inventory.md` | 781 | 63,045 | `26214a1b0e36d2a2f3da8f3229fe57b39a71382d2289d96564976412fe83799a` |
 
 ## Cross-Doc Token Counts
 
@@ -39,7 +39,7 @@ counts, and 402,371 bytes.
 | `docs/JSON_FIRST_FILTERING_PLAN.md` | 1 | 15 | 23 | 167 | 3 | 64 | 3 | 0 | 0 | 0 |
 | `docs/json_paths_encyclopedia.md` | 12 | 0 | 22 | 637 | 0 | 470 | 0 | 32 | 264 | 54 |
 | `docs/watch_json_paths.md` | 1 | 5 | 4 | 89 | 0 | 13 | 0 | 2 | 14 | 0 |
-| `docs/youtube_renderer_inventory.md` | 1 | 15 | 45 | 566 | 0 | 345 | 0 | 4 | 1 | 29 |
+| `docs/youtube_renderer_inventory.md` | 1 | 15 | 45 | 567 | 0 | 345 | 0 | 4 | 1 | 28 |
 
 The `json_paths_encyclopedia` file is the heaviest reference by far. It mixes
 documented JSON paths, renderer notes, raw excerpts, DOM snippets, path syntax
@@ -120,7 +120,7 @@ This is a mixed JSON/DOM renderer inventory with historical status wording.
 
 Current pinned facts:
 
-- It contains 780 newline counts, 45 H3 headings, 566 inline-code spans, 345
+- It contains 781 newline counts, 45 H3 headings, 567 inline-code spans, 345
   renderer tokens, and 4 `compactAutoplayRenderer` tokens.
 - It includes historical status words such as covered, implemented, partial,
   missing, verify, layout, and DOM-only.

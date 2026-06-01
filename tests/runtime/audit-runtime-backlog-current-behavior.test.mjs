@@ -20,16 +20,20 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
   assert.match(doc, /tests: 4737/);
-  assert.match(doc, /pass: 4688/);
-  assert.match(doc, /fail: 49/);
-  assert.match(doc, /duration_ms: 60215\.091875/);
+  assert.match(doc, /pass: 4690/);
+  assert.match(doc, /fail: 47/);
+  assert.match(doc, /duration_ms: 50190\.707666/);
+  assert.match(doc, /49 failures to\s+47 failures/);
+  assert.match(doc, /JSON-first reference doc surface rows/);
+  assert.match(doc, /current `docs\/youtube_renderer_inventory\.md`\s+newline count, byte count, hash, inline-code count, and dot-index count/);
+  assert.match(doc, /reference docs remain evidence maps, not runtime authority/);
   assert.match(doc, /51 failures to\s+49 failures/);
   assert.match(doc, /JSON-first metric artifact gate rows/);
-  assert.match(doc, /current performance-claim and no-work crosswalk\s+doc hashes/);
-  assert.match(doc, /current `js\/filter_logic\.js` `processData\(\)` source line/);
-  assert.match(doc, /metric artifact authority remains absent/);
-  assert.match(doc, /52 failures to\s+51 failures/);
-  assert.match(doc, /implementation\s+readiness gate lifecycle\s+count row/);
+  assert.match(doc, /current\s+performance-claim and no-work crosswalk doc hashes/);
+  assert.match(doc, /current\s+`js\/filter_logic\.js` `processData\(\)` source line/);
+  assert.match(doc, /metric artifact authority\s+remains absent/);
+  assert.match(doc, /52 failures to\s+51\s+failures/);
+  assert.match(doc, /implementation\s+readiness gate lifecycle\s+count\s+row/);
   assert.match(doc, /current 524 tracked lifecycle\s+primitive instances, 469 install-or-schedule rows,\s+and 55 explicit teardown rows/);
   assert.match(doc, /runtime cleanup and optimization approval\s+remains at NO-GO/);
   assert.match(doc, /55 failures to\s+52\s+failures/);
@@ -178,14 +182,14 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   const expectedRows = [
     ['generated/release/package/docs surfaces', '34'],
     ['source-locus/optimization/index contracts', '5'],
-    ['JSON/video-meta/path/reference', '17'],
+    ['JSON/video-meta/path/reference', '15'],
     ['website/public-doc/source inventory', '14'],
     ['settings/content-control/DOM lifecycle', '8'],
     ['native/Nanah/Kids/YTM', '8']
   ];
 
-  assert.match(doc, /Current failing subtests are spread across 37 runtime test files/);
-  assert.match(doc, /filtertube-runtime-current-after-json-first-metric-artifact-refresh\.tap/);
+  assert.match(doc, /Current failing subtests are spread across 36 runtime test files/);
+  assert.match(doc, /filtertube-runtime-current-after-json-first-reference-doc-refresh\.tap/);
   assert.match(doc, /non-exclusive family snapshot/);
   assert.match(doc, /previous method-proof\/family blocker row is now retired/);
   assert.match(doc, /direct method semantic proof lane passes with 5,681\s+current lexical callables/);
@@ -228,6 +232,9 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   assert.match(doc, /previous source-locus teardown row is retired/);
   assert.match(doc, /teardown ownership\s+proof\s+now uses current `js\/filter_logic\.js` video-channel and video-meta timer line\s+anchors/);
   assert.match(doc, /source-locus teardown approval remains\s+explicitly absent/);
+  assert.match(doc, /previous JSON-first reference doc surface rows are retired/);
+  assert.match(doc, /reference\s+proof now pins the current `docs\/youtube_renderer_inventory\.md` fingerprint and\s+syntax counts/);
+  assert.match(doc, /reference docs as evidence maps, not runtime\s+authority/);
   assert.match(doc, /previous JSON-first metric artifact gate rows are retired/);
   assert.match(doc, /metric proof\s+now pins current performance-claim and no-work crosswalk hashes/);
   assert.match(doc, /current\s+`js\/filter_logic\.js` `processData\(\)` anchor/);

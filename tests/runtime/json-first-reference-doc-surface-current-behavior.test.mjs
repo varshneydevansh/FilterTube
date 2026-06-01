@@ -10,7 +10,7 @@ const referenceRows = [
   ['docs/JSON_FIRST_FILTERING_PLAN.md', 580, 16595, '726394dc1c8108163228b82103e34c8f726ec96002aa87919b5a69101d47c1bb'],
   ['docs/json_paths_encyclopedia.md', 5003, 314988, '4e2cca8b1cac62d685d7597febfb151752158e1f3561de31854b81786c58ca05'],
   ['docs/watch_json_paths.md', 123, 7996, 'b56270d7a17987228e7b0e306d51374ddc64f834b25ab02b29df3ac52fc86f45'],
-  ['docs/youtube_renderer_inventory.md', 780, 62792, '595b00612f4c8e9dd42259239ffdf942f09c654984d68decae5d8f2606a19dc7'],
+  ['docs/youtube_renderer_inventory.md', 781, 63045, '26214a1b0e36d2a2f3da8f3229fe57b39a71382d2289d96564976412fe83799a'],
 ];
 
 function filePath(file) {
@@ -101,10 +101,10 @@ test('JSON-first reference doc surface is audit-only and fingerprint pinned', ()
   assert.match(doc, /Runtime behavior is unchanged/);
   assert.match(doc, /This is not an\s+implementation patch/);
   assert.match(doc, /optimization and first-class JSON filter work/);
-  assert.match(doc, /4 files, 6,486 newline\s+counts, and 402,371 bytes/);
+  assert.match(doc, /4 files, 6,487 newline\s+counts, and 402,624 bytes/);
 
-  assert.equal(referenceRows.reduce((sum, [, lines]) => sum + lines, 0), 6486);
-  assert.equal(referenceRows.reduce((sum, [, , bytes]) => sum + bytes, 0), 402371);
+  assert.equal(referenceRows.reduce((sum, [, lines]) => sum + lines, 0), 6487);
+  assert.equal(referenceRows.reduce((sum, [, , bytes]) => sum + bytes, 0), 402624);
 
   for (const [file, lines, bytes, hash] of referenceRows) {
     assert.equal(newlineCount(file), lines, `${file} newline count drifted`);
@@ -128,7 +128,7 @@ test('JSON-first reference docs keep current heading token and path-syntax count
       h1: 1, h2: 5, h3: 4, inline: 89, jsonFirst: 0, renderer: 13, filterRules: 0, showSheet: 2, bracket: 14, dot: 0,
     },
     'docs/youtube_renderer_inventory.md': {
-      h1: 1, h2: 15, h3: 45, inline: 566, jsonFirst: 0, renderer: 345, filterRules: 0, showSheet: 4, bracket: 1, dot: 29,
+      h1: 1, h2: 15, h3: 45, inline: 567, jsonFirst: 0, renderer: 345, filterRules: 0, showSheet: 4, bracket: 1, dot: 28,
     },
   };
 
