@@ -67,13 +67,13 @@ They are not exempt from the audit; they are the next callable-surface backlog.
 
 | Family | Files | Audit risk |
 | --- | --- | --- |
-| Content runtime helpers | `js/content/bridge_injection.js`, `js/content/collab_dialog.js`, `js/content/dom_extractors.js`, `js/content/dom_helpers.js`, `js/content/first_run_prompt.js`, `js/content/menu.js`, `js/content/release_notes_prompt.js`, `js/shared/identity.js` | Content-page lifecycle, identity extraction, menu/prompt behavior, and shared identity constants still need function-level rows. |
+| Content runtime helpers | `js/content/bridge_injection.js`, `js/content/collab_dialog.js`, `js/content/dom_extractors.js`, `js/content/dom_helpers.js`, `js/content/dom_state.js`, `js/content/first_run_prompt.js`, `js/content/menu.js`, `js/content/release_notes_prompt.js`, `js/shared/identity.js` | Content-page lifecycle, virtual DOM state, identity extraction, menu/prompt behavior, and shared identity constants still need function-level rows. |
 | Extension UI and settings runtime | `js/content_controls_catalog.js`, `js/io_manager.js`, `js/nanah_sync_adapter.js`, `js/popup.js`, `js/render_engine.js`, `js/security_manager.js`, `js/settings_shared.js`, `js/state_manager.js`, `js/tab-view.js`, `js/ui_components.js` | UI mutation, import/export, Nanah sync, settings migration, profile persistence, and dashboard affordances need callable-level proof. |
 | Generated or quarantined UI files | `src/extension-shell/popup.jsx`, `src/extension-shell/tab-view-decor.jsx`, `src/extension-shell/shared/runtime.js`, `js/layout.js`, `js/ui-shell/popup-shell.js`, `js/ui-shell/tab-view-decor.js` | `layout.js` is packaged but quarantined; generated shell source and generated output need freshness/source proof rather than hand-audited behavior assumptions. |
 | Vendor bundles | `js/vendor/nanah.bundle.js`, `js/vendor/qrcode.bundle.js` | Vendor bundles need source-revision and API-boundary proof, not line-by-line product logic ownership. |
-| Build and sync scripts | `scripts/build-extension-ui.mjs`, `scripts/build-nanah-vendor.mjs`, `scripts/sync-native-runtime.mjs` | Release/build/sync automation can change shipped code and native app parity; function-level release gates are still pending. |
+| Build and sync scripts | `scripts/audit-proof-drift.mjs`, `scripts/build-extension-ui.mjs`, `scripts/build-nanah-vendor.mjs`, `scripts/run-test-lane.mjs`, `scripts/sync-native-runtime.mjs`, `scripts/test-lane-config.mjs` | Release/build/sync/test-lane automation can change shipped code, native app parity, or proof requirements; function-level release gates are still pending. |
 | Website app routes | `website/app/[slug]/page.js`, `website/app/downloads/page.js`, `website/app/layout.js`, `website/app/not-found.js`, `website/app/page.js`, `website/app/privacy/page.js`, `website/app/robots.js`, `website/app/sitemap.js`, `website/app/terms/page.js` | Public policy/download/platform claims and metadata generation need callable-level classification for release truth. |
-| Website components | `website/components/browser-logo-rail.js`, `website/components/marketing-ui.js`, `website/components/reveal.js`, `website/components/route-content.js`, `website/components/scene-controller.js`, `website/components/scenic-detail-page.js`, `website/components/scenic-illustration.js`, `website/components/scenic-tones.js`, `website/components/site-data.js`, `website/components/site-footer.js`, `website/components/site-header.js`, `website/components/site-shell-data.js`, `website/components/theme-toggle.js` | Public navigation/copy/theme/animation components need separate website-audited callable proof. |
+| Website components | `website/components/browser-logo-rail.js`, `website/components/footer-signal-art.js`, `website/components/hero-video.js`, `website/components/marketing-ui.js`, `website/components/reveal.js`, `website/components/route-content.js`, `website/components/scene-controller.js`, `website/components/scenic-detail-page.js`, `website/components/scenic-illustration.js`, `website/components/scenic-tones.js`, `website/components/site-data.js`, `website/components/site-footer.js`, `website/components/site-header.js`, `website/components/site-shell-data.js`, `website/components/theme-toggle.js` | Public navigation/copy/theme/media/animation components need separate website-audited callable proof. |
 
 ## UI / Settings Callable Expansion Pass 1
 
@@ -100,8 +100,10 @@ settings saves, and UI listener idempotence.
 The content-helper runtime has a dedicated first-pass callable artifact:
 `docs/audit/FILTERTUBE_CONTENT_HELPER_CALLABLE_AUDIT_2026-05-18.md`.
 
-That pass moves the `Content runtime helpers` backlog from "unclassified" to
-source-counted and public/global-surface classified:
+That pass moved the original `Content runtime helpers` backlog from
+"unclassified" to source-counted and public/global-surface classified.
+`js/content/dom_state.js` was added later as an early isolated-world virtual
+attribute store and remains in the not-yet-expanded callable backlog above.
 
 - 8 content-helper files accounted for.
 - 81 lexical content-helper callables pinned by
@@ -125,8 +127,8 @@ That pass moves the `Build and sync scripts`, `Website app routes`, and
 `Website components` backlog from "unclassified" to source-counted and
 public-surface classified:
 
-- 26 build/website files accounted for.
-- 82 lexical build/website callables pinned by
+- 31 build/website files accounted for.
+- 141 lexical build/website callables pinned by
   `tests/runtime/build-website-callable-current-behavior.test.mjs`.
 - Public/release surfaces pinned: extension packaging, generated UI shell,
   README badge mutation, mobile artifact staging, GitHub release creation,
