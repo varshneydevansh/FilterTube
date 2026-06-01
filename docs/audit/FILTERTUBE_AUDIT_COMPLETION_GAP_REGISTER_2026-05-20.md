@@ -63,7 +63,7 @@ the file and lifecycle rows without changing their completion status:
 - `docs/audit/FILTERTUBE_AUDIT_DOC_LAYOUT_CURRENT_BEHAVIOR_2026-05-24.md`
   and `tests/runtime/audit-doc-layout-current-behavior.test.mjs` prove the
   current audit corpus placement boundary: 0 root-level `FILTERTUBE_*.md`
-  files under plain `docs/`, 549 `docs/audit/FILTERTUBE_*.md` files,
+  files under plain `docs/`, 550 `docs/audit/FILTERTUBE_*.md` files,
   root-level FilterTube audit doc placement `NO-GO`, and new audit artifact
   placement under `docs/audit`.
 - `docs/audit/FILTERTUBE_REPO_LIFECYCLE_PRIMITIVE_COVERAGE_2026-05-18.md`
@@ -510,22 +510,41 @@ unauthorized sender.
 ## Runtime Fixture Index Completeness Addendum
 
 The runtime fixture results ledger now records its own index-completeness gap,
-and a generated companion index provides complete file-level enumeration:
+and the generated companion index remains useful file-level enumeration while
+one current drift row stays open:
 
-- `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` reports 537
-  current top-level `tests/runtime/*.test.mjs` files, 537 exact backticked test-path
-  entries in that ledger, and 0 top-level runtime test files without exact
-  backticked entries there.
+- The current worktree has 538 current top-level `tests/runtime/*.test.mjs`
+  files and 4737 live source top-level test declarations.
+- `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` still has
+  537 exact backticked test-path entries in that ledger, leaving 1 top-level
+  runtime test file without exact backticked entries there:
+  `tests/runtime/change-safety-goal-requirement-audit-current-behavior.test.mjs`.
 - `docs/audit/FILTERTUBE_RUNTIME_TEST_FILE_PROVENANCE_INDEX_CURRENT_BEHAVIOR_2026-05-25.md`
   provides 537 runtime test file rows, 4731 source top-level test declarations,
   537 `yes` rows for exact runtime-results entries, and 0 `no` rows for
-  files missing exact runtime-results entries.
+  indexed files missing exact runtime-results entries.
 - `tests/runtime/audit-completion-gap-register-current-behavior.test.mjs`
   computes those counts from the current worktree and proves the ledger, the
-  generated index, and this register agree.
-- The generated index now has no missing exact runtime-results rows:
-  0 of 537 rows remain `no`, and the missing family priority table records
-  `None remaining` 0. This closes the runtime fixture ledger file-level provenance gap before optimization work.
+  generated index, and this register expose the drift instead of treating the
+  older index as completion proof.
+- The generated index now has no missing exact runtime-results rows among
+  indexed rows: 0 of 537 rows remain `no`. The runtime-results exact-row drift
+  remains open because the change-safety goal requirement test has not been
+  backfilled into the runtime-results ledger or regenerated provenance index.
+  In short: runtime-results exact-row drift remains open.
+  This keeps the runtime fixture ledger file-level provenance gap open before
+  optimization work.
+
+```text
+538 current top-level `tests/runtime/*.test.mjs` files
+4737 live source top-level test declarations
+537 exact backticked test-path entries
+537 runtime test file rows
+4731 source top-level test declarations
+0 `no` rows
+1 top-level runtime test file without exact backticked entries
+```
+
 - The generated index keeps exact-row-complete prefix-family snapshots for
   `tests/runtime/json*.test.mjs` files,
   `tests/runtime/content*.test.mjs` files,
@@ -572,14 +591,14 @@ and a generated companion index provides complete file-level enumeration:
   `tests/runtime/batch*.test.mjs` file,
   `tests/runtime/block*.test.mjs` file, and
   `tests/runtime/browser*.test.mjs` file.
-- JSON-first provenance is now exact-row complete at file level in the
+- JSON-first provenance remains exact-row complete for indexed JSON-family files in the
   narrative ledger. Content-runtime bridge and control provenance is now
   exact-row complete at file level as well. Every prefix-family snapshot and
   the remaining tail snapshot reports 0 missing exact runtime-results rows.
 
 This keeps the audit honest: a green `npm run audit:runtime` result is passing
 assertion proof, the runtime fixture results ledger is a narrative ledger, and
-the generated provenance index plus narrative ledger are complete file-level
+the generated provenance index plus narrative ledger are file-level
 runtime-test provenance only. None of those is complete semantic coverage evidence
 for JSON-first filtering, whitelist optimization, or any implementation patch.
 
@@ -636,6 +655,9 @@ legacy metric contract expected tests: 4457
 current generated runtime test declarations: 4731
 latest historical full runtime pass count observed: 4663
 latest historical full runtime pass freshness: 2026-05-30 full runtime rerun covers 4663 generated declarations before later audit-only declarations expanded the source count
+current live runtime source scan: 538 files, 4737 source top-level test declarations
+latest broad runtime backlog snapshot: 4737 tests, 4661 pass, 76 fail
+generated provenance index remains stale at 537 rows and 4731 declarations
 first-optimization count reconciliation status: BLOCKED
 full codebase audit completion from count reconciliation: NO-GO
 runtime behavior changed by this addendum: no
@@ -667,7 +689,7 @@ excluding this register and its verifier found the following footprint:
 ```text
 census scope: docs/audit markdown plus tests/runtime modules
 census exclusions: this gap register and its verifier
-census files scanned: 1090
+census files scanned: 1092
 legacy runtime-count token 4457 occurrences: 1230
 legacy runtime-count token 4457 files: 167
 current runtime-count token 4660 occurrences: 11
@@ -690,7 +712,7 @@ Interpretation:
 
 | Census item | Current value | Completion effect |
 | --- | ---: | --- |
-| Files scanned outside this self-referential register/verifier | 1090 | Wide enough to quantify audit-surface drift without self-counting this addendum. |
+| Files scanned outside this self-referential register/verifier | 1092 | Wide enough to quantify audit-surface drift without self-counting this addendum. |
 | Legacy `4457` occurrences | 1230 | The stale expected-test count is broad historical contract wording, not current completion proof. |
 | Files containing legacy `4457` | 167 | Future count reconciliation is a multi-document audit cleanup, not a single-row fix. |
 | Current `4660` occurrences | 11 | Recalculated after the fresh 2026-05-30 full runtime rerun matched the current generated declaration count. |

@@ -75,6 +75,24 @@ function runtimeTestProvenanceIndexStats() {
   };
 }
 
+function runtimeTestProvenanceDriftStats() {
+  const index = read(runtimeTestIndexPath);
+  const rows = [...index.matchAll(/^\| (\d+) \| `([^`]+)` \| (\d+) \| `(yes|no)` \| (.*) \|$/gm)];
+  const rowMap = new Map(rows.map(row => [row[2], Number(row[3])]));
+  const sourceStats = currentRuntimeTestSourceStats();
+  const missingFiles = sourceStats.files.filter(file => !rowMap.has(file));
+  const staleRows = rows.map(row => row[2]).filter(file => !sourceStats.files.includes(file));
+  const countMismatches = sourceStats.files
+    .filter(file => rowMap.has(file))
+    .map(file => {
+      const current = (read(file).match(/(?:^|\n)\s*test\s*\(/g) || []).length;
+      return { file, indexed: rowMap.get(file), current };
+    })
+    .filter(row => row.indexed !== row.current);
+
+  return { missingFiles, staleRows, countMismatches };
+}
+
 function currentRuntimeTestSourceStats() {
   const files = fs.readdirSync(path.join(repoRoot, 'tests', 'runtime'))
     .filter(file => file.endsWith('.test.mjs'))
@@ -2490,7 +2508,10 @@ function assertRuntimeCountReconciliationAddendum(source) {
   assert.match(releaseRegression, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs/);
   assert.match(releaseRegression, /stored TAP output: \/private\/tmp\/filtertube-runtime-full-after-lifecycle-convergence\.tap/);
   assert.match(releaseRegression, /full runtime proof result: 4663\/4663 pass, 0 fail, 83\.213s/);
-  assert.equal(sourceStats.declarations, 4731);
+  assert.match(source, /current live runtime source scan: 538 files, 4737 source top-level test declarations/);
+  assert.match(source, /latest broad runtime backlog snapshot: 4737 tests, 4661 pass, 76 fail/);
+  assert.match(source, /generated provenance index remains stale at 537 rows and 4731 declarations/);
+  assert.equal(sourceStats.declarations, 4737);
 
   assert.match(source, /Runtime Count Drift Census Addendum - 2026-05-27/);
   assert.match(source, /census exclusions: this gap register and its verifier/);
@@ -2517,7 +2538,7 @@ function assertRuntimeCountReconciliationAddendum(source) {
   assert.match(runtimeResults, /stored TAP output: \/private\/tmp\/filtertube-runtime-full-after-lifecycle-convergence\.tap/);
   assert.match(runtimeResults, /runtime-results ledger completion authority: NO-GO/);
 
-  assert.equal(driftStats.scannedFiles, 1090);
+  assert.equal(driftStats.scannedFiles, 1092);
   assert.equal(driftStats.legacy.occurrences, 1230);
   assert.equal(driftStats.legacy.fileCount, 167);
   assert.equal(driftStats.current.occurrences, 11);
@@ -4124,6 +4145,7 @@ test('audit_completion_gap_register_lists_required_evidence_classes', () => {
   const stats = runtimeFixtureIndexStats();
   const auditLayoutStats = currentAuditDocLayoutStats();
   const provenanceStats = runtimeTestProvenanceIndexStats();
+  const provenanceDriftStats = runtimeTestProvenanceDriftStats();
   const missingLeadTokenStats = runtimeMissingLeadTokenStats();
   const jsonFamilyStats = runtimeJsonFamilyStats();
   const contentFamilyStats = runtimeContentFamilyStats();
@@ -4195,11 +4217,11 @@ test('audit_completion_gap_register_lists_required_evidence_classes', () => {
     'Runtime Fixture Index Completeness Addendum',
     'FILTERTUBE_RUNTIME_TEST_FILE_PROVENANCE_INDEX_CURRENT_BEHAVIOR_2026-05-25.md',
     'top-level `tests/runtime/*.test.mjs` files',
-    '0 top-level runtime test files without exact',
-    '`None remaining` 0',
+    '1 top-level runtime test file without exact',
+    'tests/runtime/change-safety-goal-requirement-audit-current-behavior.test.mjs',
     'file-level provenance gap',
-    '0 missing exact runtime-results rows',
-    'JSON-first provenance is now exact-row complete at file level',
+    'runtime-results exact-row drift remains open',
+    'JSON-first provenance remains exact-row complete for indexed JSON-family files',
     '`tests/runtime/content*.test.mjs` files',
     'Content-runtime bridge and control provenance is now',
     '`tests/runtime/background*.test.mjs` files',
@@ -4256,25 +4278,36 @@ test('audit_completion_gap_register_lists_required_evidence_classes', () => {
   const sourceTestStats = currentRuntimeTestSourceStats();
   for (const phrase of [
     `${auditLayoutStats.auditFilterTubeDocs} \`docs/audit/FILTERTUBE_*.md\``,
-    `${sourceTestStats.files.length} runtime test file rows`,
-    `${sourceTestStats.declarations} source top-level test declarations`,
-    `${sourceTestStats.files.length} exact backticked test-path`,
-    `0 of ${sourceTestStats.files.length} rows remain \`no\``
+    `${sourceTestStats.files.length} current top-level \`tests/runtime/*.test.mjs\` files`,
+    `${sourceTestStats.declarations} live source top-level test declarations`,
+    `${stats.exactBackticked} exact backticked test-path entries`,
+    `${provenanceStats.rows} runtime test file rows`,
+    `${provenanceStats.declarations} source top-level test declarations`,
+    `${provenanceStats.noRows} \`no\` rows`,
+    `${stats.missingExactBackticked} top-level runtime test file without exact backticked entries`
   ]) {
     assert.match(source, new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   }
   assert.deepEqual(stats, {
     testFiles: sourceTestStats.files.length,
-    exactBackticked: sourceTestStats.files.length,
-    missingExactBackticked: 0
+    exactBackticked: 537,
+    missingExactBackticked: 1
   });
-  assert.deepEqual(provenanceStats, {
-    rows: sourceTestStats.files.length,
-    files: sourceTestStats.files,
-    yesRows: sourceTestStats.files.length,
-    noRows: 0,
-    declarations: sourceTestStats.declarations
-  });
+  assert.equal(provenanceStats.rows, 537);
+  assert.equal(provenanceStats.yesRows, 537);
+  assert.equal(provenanceStats.noRows, 0);
+  assert.equal(provenanceStats.declarations, 4731);
+  assert.deepEqual(provenanceDriftStats.missingFiles, [
+    'tests/runtime/change-safety-goal-requirement-audit-current-behavior.test.mjs'
+  ]);
+  assert.deepEqual(provenanceDriftStats.staleRows, []);
+  assert.deepEqual(provenanceDriftStats.countMismatches, [
+    {
+      file: 'tests/runtime/audit-runtime-backlog-current-behavior.test.mjs',
+      indexed: 3,
+      current: 4
+    }
+  ]);
   assert.deepEqual(missingLeadTokenStats, {
     groupCount: 0,
     top: [],
