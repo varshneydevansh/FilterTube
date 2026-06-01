@@ -338,6 +338,10 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(runner, /if \(result\.unmatched\.length\) process\.exit\(2\)/);
   assert.match(runner, /MANUAL_YOUTUBE_SMOKE_LANE_REASONS/);
   assert.match(runner, /Manual YouTube smoke required when user-facing/);
+  assert.match(runner, /LIVE_SMOKE_ARTIFACT_TEMPLATE/);
+  assert.match(runner, /LIVE_SMOKE_ARTIFACT_VERIFIER/);
+  assert.match(runner, /LIVE_SMOKE_REQUIRED_ROWS/);
+  assert.match(runner, /Live smoke artifact handoff/);
   assert.match(runner, /RUNTIME_FIXTURE_LANE_REASONS/);
   assert.match(runner, /function runtimeFixtureRequirement\(result\)/);
   assert.match(runner, /Runtime fixture\/test proof files in this change/);
@@ -364,6 +368,7 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(matrix, /runs the\s+lane-owned audit\s+proof drift guard/);
   assert.match(matrix, /runs\s+the required lanes sequentially in\s+matrix order/);
   assert.match(matrix, /prints a manual YouTube\s+smoke advisory/);
+  assert.match(matrix, /includes the structured live-smoke template, verifier command,\s+and required SPA row ids/);
   assert.match(matrix, /reports whether a changed\s+`docs\/audit\/` proof file is present/);
   assert.match(matrix, /fails\s+when source, release, asset, or product-doc paths changed without a matching\s+`docs\/audit\/` proof file/);
   assert.match(matrix, /fails when changed\s+`docs\/audit\/` proof does not share\s+at least one non-smoke lane/);
@@ -408,6 +413,11 @@ test('classifier output surfaces manual YouTube smoke for user-facing runtime la
   assert.match(runtime.stdout, /Manual YouTube smoke required when user-facing:/);
   assert.match(runtime.stdout, /test:json: JSON-first filtering/);
   assert.match(runtime.stdout, /test:performance: empty-rule\/no-work/);
+  assert.match(runtime.stdout, /Live smoke artifact handoff:/);
+  assert.match(runtime.stdout, /template: docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/template\.json/);
+  assert.match(runtime.stdout, /verifier: node docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/verify-live-smoke-artifact\.mjs docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/<artifact>\.json/);
+  assert.match(runtime.stdout, /FT-LIVE-SPA-00-home-to-search/);
+  assert.match(runtime.stdout, /FT-LIVE-SPA-05-cache-repeat-navigation/);
   assert.match(runtime.stdout, /Audit proof update expected before commit:/);
   assert.match(runtime.stdout, /Add or update a relevant docs\/audit\/ proof file for:/);
   assert.match(runtime.stdout, /- js\/seed\.js/);

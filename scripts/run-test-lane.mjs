@@ -17,6 +17,18 @@ const MANUAL_YOUTUBE_SMOKE_LANE_REASONS = Object.freeze({
   settings: 'profile/mode/storage changes reprocessing already-rendered cards'
 });
 
+const LIVE_SMOKE_ARTIFACT_TEMPLATE = 'docs/audit/artifacts/release-live-youtube-spa-smoke/template.json';
+const LIVE_SMOKE_ARTIFACT_VERIFIER =
+  'node docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs docs/audit/artifacts/release-live-youtube-spa-smoke/<artifact>.json';
+const LIVE_SMOKE_REQUIRED_ROWS = Object.freeze([
+  'FT-LIVE-SPA-00-home-to-search',
+  'FT-LIVE-SPA-01-search-to-channel',
+  'FT-LIVE-SPA-02-channel-to-watch',
+  'FT-LIVE-SPA-03-watch-to-home',
+  'FT-LIVE-SPA-04-watch-rail-scroll',
+  'FT-LIVE-SPA-05-cache-repeat-navigation'
+]);
+
 const RUNTIME_FIXTURE_LANE_REASONS = Object.freeze({
   whitelist: 'whitelist allow/leak fixtures for touched YouTube surfaces',
   blocking: 'keyword/channel/comment hide-decision fixtures',
@@ -806,6 +818,10 @@ function printClassification(result) {
     for (const [lane, reason] of manualSmokeReasons) {
       console.log(`  test:${lane}: ${reason}`);
     }
+    console.log('  Live smoke artifact handoff:');
+    console.log(`    template: ${LIVE_SMOKE_ARTIFACT_TEMPLATE}`);
+    console.log(`    verifier: ${LIVE_SMOKE_ARTIFACT_VERIFIER}`);
+    console.log(`    required rows: ${LIVE_SMOKE_REQUIRED_ROWS.join(', ')}`);
   }
 
   const {
