@@ -101,6 +101,7 @@ test('live smoke boundary remains explicit that current release smoke is missing
   assert.match(doc, /FILTERTUBE_AUTOMATED_PROOF_SUMMARY/);
   assert.match(doc, /FILTERTUBE_AUTOMATED_PROOF_LANES/);
   assert.match(doc, /does not cover every required lane/);
+  assert.match(doc, /same known `test:\*` lane vocabulary/);
   assert.match(doc, /template accepted as release proof now: NO-GO/);
   assert.match(doc, /live smoke artifact verifier status: defined/);
   assert.match(doc, /A dated artifact is not release-ready until this verifier returns zero errors/);
@@ -152,6 +153,9 @@ test('live smoke runner contract writes a dated artifact but no executed artifac
   assert.match(runner, /boundaryDoc: 'docs\/audit\/FILTERTUBE_RELEASE_LIVE_YOUTUBE_SPA_SMOKE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-25\.md'/);
   assert.match(runner, /const smokeSliceReadiness = allRowsPassed && consoleIssues\.length === 0 \?/);
   assert.match(runner, /const changeContext = buildChangeContext\(\)/);
+  assert.match(runner, /const KNOWN_TEST_LANES = new Set\(Object\.keys\(LANES\)\.map\(lane => `test:\$\{lane\}`\)\)/);
+  assert.match(runner, /function hasOnlyKnownTestLanes\(lanes\)/);
+  assert.match(runner, /hasOnlyKnownTestLanes\(changeContext\.requiredLanes\)/);
   assert.match(runner, /releaseReadiness: smokeSliceReadiness === 'GO-FOR-THIS-SMOKE-SLICE' && installedByteParity\.verdict === 'GO' && changeContextReady \?/);
   assert.match(runner, /const artifactPath = path\.join\(artifactRoot, `\$\{runId\}\.json`\)/);
   assert.match(runner, /fs\.writeFileSync\(artifactPath, `\$\{JSON\.stringify\(artifact, null, 2\)\}\\n`\)/);

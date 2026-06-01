@@ -4,11 +4,14 @@ import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { LANES } from '../../../../scripts/test-lane-config.mjs';
+
 const __filename = fileURLToPath(import.meta.url);
 const artifactRoot = path.dirname(__filename);
 const repoRoot = path.resolve(artifactRoot, '../../../..');
 const cdpBase = process.env.FILTERTUBE_CDP_BASE || 'http://127.0.0.1:9222';
 const extensionPath = process.env.FILTERTUBE_EXTENSION_PATH || repoRoot;
+const KNOWN_TEST_LANES = new Set(Object.keys(LANES).map(lane => `test:${lane}`));
 const smokeChannel = {
   name: 'Google Developers',
   id: 'UC_x5XG1OV2P6uZZ5FSM9Ttw',
@@ -252,13 +255,20 @@ function buildChangeContext() {
   };
 }
 
+function hasOnlyKnownTestLanes(lanes) {
+  return Array.isArray(lanes) && lanes.length > 0 && lanes.every(lane => KNOWN_TEST_LANES.has(lane));
+}
+
 function isReleaseReadyChangeContext(changeContext) {
   const coveredLanes = new Set(changeContext.automatedLaneEvidence.flatMap(evidence => evidence.lanes || []));
   return !!changeContext.logicalChangeType
-    && changeContext.requiredLanes.length > 0
+    && hasOnlyKnownTestLanes(changeContext.requiredLanes)
     && changeContext.automatedLaneEvidence.length > 0
     && changeContext.automatedLaneEvidence.every(evidence => (
-      evidence.command && evidence.status === 'passed' && evidence.summary && evidence.lanes?.length
+      evidence.command
+      && evidence.status === 'passed'
+      && evidence.summary
+      && hasOnlyKnownTestLanes(evidence.lanes)
     ))
     && changeContext.requiredLanes.every(lane => coveredLanes.has(lane));
 }

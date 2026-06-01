@@ -118,6 +118,9 @@ The verifier rejects the template, failed/missing route rows, console issues,
 blank recording fields, stale row order, missing automated lane evidence,
 automated lane evidence that does not cover every required lane, and missing
 installed byte parity.
+The runner uses the same known `test:*` lane vocabulary for its own
+`releaseReadiness` decision, so an artifact cannot self-report release smoke
+readiness from matching but invalid lane names.
 
 The runner reads the automated lane proof for `changeContext` from these
 environment variables before `npm run smoke:youtube`:
