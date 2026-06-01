@@ -276,7 +276,7 @@ post-release audit continuation after settings refresh optimization candidate ev
 post-release audit continuation after browser manifest package reference closure:
 same full audit pass stayed green, audit-only with no product behavior delta;
 four browser manifests reference existing files under copied package roots, with
-23 combined unique referenced paths, 0 unresolved file references, 0 referenced
+24 combined unique referenced paths, 0 unresolved file references, 0 referenced
 roots outside COMMON_DIRS, and 0 manifest content-script CSS refs
 post-release audit continuation after browser manifest permission/resource snapshot:
 same full audit pass stayed green, audit-only with no product behavior delta;

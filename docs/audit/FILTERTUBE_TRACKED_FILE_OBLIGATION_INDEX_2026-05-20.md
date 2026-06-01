@@ -10,7 +10,7 @@ Completion is not proven. Every row remains `obligation-open` until a future fea
 
 ```text
 git ls-files
-150 tracked files
+156 tracked source files outside docs/audit and tests
 ```
 
 Ignored raw captures and generated output remain outside this index. If any path below changes family, starts affecting runtime, or becomes generated/release source, this index and its test must change in the same patch.
@@ -120,10 +120,13 @@ Ignored raw captures and generated output remain outside this index. If any path
 | `manifest.opera.json` | `browser-manifests` | Manifest/content-script order, permissions, host scope, and web-accessible-resource parity proof. | obligation-open |
 | `package-lock.json` | `root-project-metadata` | Release/public claim, package metadata, and policy consistency proof. | obligation-open |
 | `package.json` | `root-project-metadata` | Release/public claim, package metadata, and policy consistency proof. | obligation-open |
+| `scripts/audit-proof-drift.mjs` | `build-release-sync-scripts` | Build artifact, release naming, source-copy, dry-run, and failure-mode proof. | obligation-open |
 | `scripts/build-extension-ui.mjs` | `build-release-sync-scripts` | Build artifact, release naming, source-copy, dry-run, and failure-mode proof. | obligation-open |
 | `scripts/build-nanah-vendor.mjs` | `build-release-sync-scripts` | Build artifact, release naming, source-copy, dry-run, and failure-mode proof. | obligation-open |
 | `scripts/compress-video.swift` | `build-release-sync-scripts` | Build artifact, release naming, source-copy, dry-run, and failure-mode proof. | obligation-open |
+| `scripts/run-test-lane.mjs` | `build-release-sync-scripts` | Build artifact, release naming, source-copy, dry-run, and failure-mode proof. | obligation-open |
 | `scripts/sync-native-runtime.mjs` | `build-release-sync-scripts` | Build artifact, release naming, source-copy, dry-run, and failure-mode proof. | obligation-open |
+| `scripts/test-lane-config.mjs` | `build-release-sync-scripts` | Build artifact, release naming, source-copy, dry-run, and failure-mode proof. | obligation-open |
 | `src/extension-shell/popup.jsx` | `generated-ui-source` | Generated output parity, template contract, and UI regression proof. | obligation-open |
 | `src/extension-shell/shared/runtime.js` | `generated-ui-source` | Generated output parity, template contract, and UI regression proof. | obligation-open |
 | `src/extension-shell/tab-view-decor.jsx` | `generated-ui-source` | Generated output parity, template contract, and UI regression proof. | obligation-open |
@@ -148,6 +151,8 @@ Ignored raw captures and generated output remain outside this index. If any path
 | `website/assets/videos/homepage/sunset/prompt.txt` | `website-assets` | Asset existence, optimization, byte budget, route consumer, and visual proof. | obligation-open |
 | `website/assets/videos/ios/ios.mp4` | `website-assets` | Asset existence, optimization, byte budget, route consumer, and visual proof. | obligation-open |
 | `website/components/browser-logo-rail.js` | `website-components` | Route consumer, responsive behavior, accessibility, animation/no-delay, and visual proof. | obligation-open |
+| `website/components/footer-signal-art.js` | `website-components` | Route consumer, responsive behavior, accessibility, animation/no-delay, and visual proof. | obligation-open |
+| `website/components/hero-video.js` | `website-components` | Route consumer, responsive behavior, accessibility, animation/no-delay, and visual proof. | obligation-open |
 | `website/components/marketing-ui.js` | `website-components` | Route consumer, responsive behavior, accessibility, animation/no-delay, and visual proof. | obligation-open |
 | `website/components/reveal.js` | `website-components` | Route consumer, responsive behavior, accessibility, animation/no-delay, and visual proof. | obligation-open |
 | `website/components/route-content.js` | `website-components` | Route consumer, responsive behavior, accessibility, animation/no-delay, and visual proof. | obligation-open |
@@ -160,6 +165,7 @@ Ignored raw captures and generated output remain outside this index. If any path
 | `website/components/site-header.js` | `website-components` | Route consumer, responsive behavior, accessibility, animation/no-delay, and visual proof. | obligation-open |
 | `website/components/site-shell-data.js` | `website-components` | Route consumer, responsive behavior, accessibility, animation/no-delay, and visual proof. | obligation-open |
 | `website/components/theme-toggle.js` | `website-components` | Route consumer, responsive behavior, accessibility, animation/no-delay, and visual proof. | obligation-open |
+| `website/docs/footer-signal-art-philosophy.md` | `website-config` | Build/deploy/root-directory/env/version compatibility proof. | obligation-open |
 | `website/jsconfig.json` | `website-config` | Build/deploy/root-directory/env/version compatibility proof. | obligation-open |
 | `website/next.config.mjs` | `website-config` | Build/deploy/root-directory/env/version compatibility proof. | obligation-open |
 | `website/package-lock.json` | `website-config` | Build/deploy/root-directory/env/version compatibility proof. | obligation-open |
@@ -2511,11 +2517,11 @@ whitelist/cache optimization readiness, JSON-first promotion readiness,
 release/public-claim limits, and goal-completion authority rows in tracked
 audit docs and runtime tests. It pins the initial full runtime rerun at
 4665/4667 pass with 2 audit freshness failures, focused drift repair proof at
-10/10 pass, fresh full runtime dot rerun exit status 0, 528 runtime test files,
-4671 source top-level test declarations, current full runtime proof for the
-generated 4671 declaration set `GO`, full codebase audit completion from full
-runtime proof `NO-GO`, first optimization implementation approval from full
-runtime proof `NO-GO`, JSON-first first-class promotion from full runtime proof
-`NO-GO`, whitelist/cache optimization from full runtime proof `NO-GO`,
-release/public-claim use from full runtime proof `NO-GO`, and runtime behavior
-changed by this continuation: no.
+10/10 pass, current broad runtime backlog boundary for 534 runtime test files,
+4719 source top-level test declarations, 4491 pass, and 228 fail, current broad
+runtime proof for the generated 4719 declaration set `NO-GO`, full codebase
+audit completion from full runtime proof `NO-GO`, first optimization
+implementation approval from full runtime proof `NO-GO`, JSON-first first-class
+promotion from full runtime proof `NO-GO`, whitelist/cache optimization from
+full runtime proof `NO-GO`, release/public-claim use from full runtime proof
+`NO-GO`, and runtime behavior changed by this continuation: no.

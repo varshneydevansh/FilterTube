@@ -718,7 +718,7 @@ test('objective coverage ledger explicitly refuses to declare audit completion',
 function assertBrowserManifestPackageReferenceClosure(doc) {
   assert.match(doc, /2026-05-27 browser manifest package reference closure/);
   assert.match(doc, /same P0 release-package doc and verifier now pin that all four browser manifests/);
-  assert.match(doc, /23 combined unique referenced paths/);
+  assert.match(doc, /24 combined unique referenced paths/);
   assert.match(doc, /0 unresolved manifest file references/);
   assert.match(doc, /0 manifest referenced roots outside `COMMON_DIRS`/);
   assert.match(doc, /0 manifest content-script CSS references/);
@@ -727,7 +727,7 @@ function assertBrowserManifestPackageReferenceClosure(doc) {
 
   const releasePackageDoc = read('docs/audit/FILTERTUBE_P0_RELEASE_PACKAGE_CURRENT_BEHAVIOR_2026-05-19.md');
   assert.match(releasePackageDoc, /Browser Manifest Package Reference Closure Addendum - 2026-05-27/);
-  assert.match(releasePackageDoc, /combined unique referenced paths across browser manifests: 23/);
+  assert.match(releasePackageDoc, /combined unique referenced paths across browser manifests: 24/);
   assert.match(releasePackageDoc, /unresolved manifest file references: 0/);
   assert.match(releasePackageDoc, /manifest referenced roots outside COMMON_DIRS: 0/);
   assert.match(releasePackageDoc, /manifest content-script CSS references: 0/);
@@ -759,11 +759,11 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
   assert.match(doc, /2026-05-27 current local dist package snapshot/);
   assert.match(doc, /existing ignored `dist\/` tree as local artifact evidence/);
   assert.match(doc, /3 browser staged directories/);
-  assert.match(doc, /58 staged files per browser/);
+  assert.match(doc, /59 staged files per browser/);
   assert.match(doc, /3 ZIP artifacts/);
-  assert.match(doc, /178 total `dist` files including ZIPs/);
-  assert.match(doc, /57 source-backed non-manifest staged files per browser/);
-  assert.match(doc, /57 byte-identical source-backed non-manifest staged files per browser/);
+  assert.match(doc, /180 total `dist` files including ZIPs/);
+  assert.match(doc, /58 source-backed non-manifest staged files per browser/);
+  assert.match(doc, /58 byte-identical source-backed non-manifest staged files per browser/);
   assert.match(doc, /per-browser staged group counts/);
   assert.match(doc, /browser manifest hashes, and local ZIP hashes/);
   assert.match(doc, /release package parity, generated-output, package artifact, manifest\/resource, code-burden, source\/evidence, and implementation-change rows/);
@@ -773,10 +773,10 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
   assert.match(releasePackageDoc, /Current Local Dist Package Snapshot - 2026-05-27/);
   assert.match(releasePackageDoc, /dist snapshot source: existing ignored local dist tree/);
   assert.match(releasePackageDoc, /browser staged directories: 3/);
-  assert.match(releasePackageDoc, /browser staged files per directory: 58/);
-  assert.match(releasePackageDoc, /total dist files including zips: 178/);
-  assert.match(releasePackageDoc, /source-backed staged files per browser excluding manifest: 57/);
-  assert.match(releasePackageDoc, /byte-identical source-backed staged files per browser excluding manifest: 50/);
+  assert.match(releasePackageDoc, /browser staged files per directory: 59/);
+  assert.match(releasePackageDoc, /total dist files including zips: 180/);
+  assert.match(releasePackageDoc, /source-backed staged files per browser excluding manifest: 58/);
+  assert.match(releasePackageDoc, /byte-identical source-backed staged files per browser excluding manifest: 58/);
   assert.match(releasePackageDoc, /zip checksum snapshot: yes/);
   assert.match(releasePackageDoc, /reproducible package build authority: NO-GO/);
   assert.match(releasePackageDoc, /loaded-browser package\/runtime parity authority: NO-GO/);
@@ -11184,9 +11184,9 @@ test('objective coverage ledger records content-filter route surface convergence
   assert.match(doc, /extend objective coverage for runtime proof freshness, audit-document drift\s+repair, native-sync freshness references, truth-claim line-reference\s+freshness/);
   assert.match(doc, /initial full runtime rerun result at 4665\/4667 pass with 2 audit freshness\s+failures/);
   assert.match(doc, /focused drift repair proof at 10\/10 pass/);
-  assert.match(doc, /fresh full runtime dot\s+rerun exit status 0, 528 runtime test files, 4671 source top-level test\s+declarations/);
-  assert.match(doc, /current full runtime proof for the generated 4671 declaration\s+set `GO`/);
-  assert.match(doc, /broad codebase audit completion from full runtime proof `NO-GO`/);
+  assert.match(doc, /current broad\s+runtime backlog boundary for 534 runtime test files and 4719 source top-level\s+test declarations: 4491 pass, 228 fail/);
+  assert.match(doc, /current broad runtime proof for the\s+generated 4719 declaration set `NO-GO`/);
+  assert.match(doc, /broad codebase audit completion from\s+full runtime proof `NO-GO`/);
   assert.match(doc, /first optimization implementation approval from full runtime proof `NO-GO`/);
   assert.match(doc, /JSON-first first-class promotion from full runtime proof `NO-GO`/);
   assert.match(doc, /whitelist\/cache optimization from full runtime proof `NO-GO`/);

@@ -812,7 +812,7 @@ test('tracked_file_obligation_index_represents_every_tracked_file_exactly_once',
   const rows = parseRows(read(docPath));
   const rowPaths = rows.map(row => row.path);
 
-  assert.equal(files.length, 150);
+  assert.equal(files.length, 156);
   assert.equal(rows.length, files.length);
   assert.deepEqual([...rowPaths].sort(), [...files].sort());
   assert.equal(new Set(rowPaths).size, files.length);
@@ -7399,8 +7399,8 @@ test('tracked_file_obligation_index_links_package_lock_script_optional_dependenc
   ]) {
     assert.match(doc, new RegExp(`\`${file.replace(/[/.]/g, '\\$&')}\``));
   }
-  assert.match(doc, /`package\.json` at 46 lines/);
-  assert.match(doc, /1,376 bytes/);
+  assert.match(doc, /`package\.json` at 61 lines/);
+  assert.match(doc, /2,405 bytes/);
   assert.match(doc, /`package-lock\.json` at 1,461 lines/);
   assert.match(doc, /49,916 bytes/);
   assert.match(doc, /`website\/package\.json` at 23 lines/);
@@ -9987,11 +9987,11 @@ test('tracked_file_obligation_index_links_ytm_selected_current_row_side_effect_b
   assert.match(doc, /tracked-file context for current runtime proof freshness and audit-document\s+drift repair without closing any tracked file row/);
   assert.match(doc, /initial full runtime rerun at\s+4665\/4667 pass with 2 audit freshness failures/);
   assert.match(doc, /focused drift repair proof at\s+10\/10 pass/);
-  assert.match(doc, /fresh full runtime dot rerun exit status 0, 528 runtime test files,\s+4671 source top-level test declarations/);
-  assert.match(doc, /current full runtime proof for the\s+generated 4671 declaration set `GO`/);
-  assert.match(doc, /full codebase audit completion from full\s+runtime proof `NO-GO`/);
-  assert.match(doc, /first optimization implementation approval from full\s+runtime proof `NO-GO`/);
-  assert.match(doc, /JSON-first first-class promotion from full runtime proof\s+`NO-GO`/);
-  assert.match(doc, /whitelist\/cache optimization from full runtime proof `NO-GO`/);
-  assert.match(doc, /release\/public-claim use from full runtime proof `NO-GO`/);
+  assert.match(doc, /current broad runtime backlog boundary for 534 runtime test files,\s+4719 source top-level test declarations, 4491 pass, and 228 fail/);
+  assert.match(doc, /current broad\s+runtime proof for the generated 4719 declaration set `NO-GO`/);
+  assert.match(doc, /full codebase\s+audit completion from full\s+runtime proof `NO-GO`/);
+  assert.match(doc, /first optimization\s+implementation approval from full runtime proof `NO-GO`/);
+  assert.match(doc, /JSON-first first-class\s+promotion from full runtime proof `NO-GO`/);
+  assert.match(doc, /whitelist\/cache optimization from\s+full runtime proof `NO-GO`/);
+  assert.match(doc, /release\/public-claim use from full runtime proof\s+`NO-GO`/);
 });

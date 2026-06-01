@@ -4,9 +4,10 @@ Status: audit-only proof. This is not an implementation patch.
 
 Runtime behavior is unchanged.
 
-Completion is not proven. The active audit goal remains open. A green
-`npm run audit:runtime` result proves that current-behavior claims are pinned;
-it does not prove that every feature, file, method, JSON path, DOM selector,
+Completion is not proven. The active audit goal remains open. The current broad
+`npm run audit:runtime` result is a backlog signal for the expanded runtime
+declaration set; focused lanes prove scoped current-behavior claims only, and
+do not prove that every feature, file, method, JSON path, DOM selector,
 lifecycle primitive, settings mode, or cross-feature interaction has complete
 semantic coverage.
 
@@ -62,7 +63,7 @@ the file and lifecycle rows without changing their completion status:
 - `docs/audit/FILTERTUBE_AUDIT_DOC_LAYOUT_CURRENT_BEHAVIOR_2026-05-24.md`
   and `tests/runtime/audit-doc-layout-current-behavior.test.mjs` prove the
   current audit corpus placement boundary: 0 root-level `FILTERTUBE_*.md`
-  files under plain `docs/`, 545 `docs/audit/FILTERTUBE_*.md` files,
+  files under plain `docs/`, 549 `docs/audit/FILTERTUBE_*.md` files,
   root-level FilterTube audit doc placement `NO-GO`, and new audit artifact
   placement under `docs/audit`.
 - `docs/audit/FILTERTUBE_REPO_LIFECYCLE_PRIMITIVE_COVERAGE_2026-05-18.md`
@@ -511,19 +512,19 @@ unauthorized sender.
 The runtime fixture results ledger now records its own index-completeness gap,
 and a generated companion index provides complete file-level enumeration:
 
-- `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` reports 527
-  top-level `tests/runtime/*.test.mjs` files, 528 exact backticked test-path
+- `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` reports 534
+  current top-level `tests/runtime/*.test.mjs` files, 534 exact backticked test-path
   entries in that ledger, and 0 top-level runtime test files without exact
   backticked entries there.
 - `docs/audit/FILTERTUBE_RUNTIME_TEST_FILE_PROVENANCE_INDEX_CURRENT_BEHAVIOR_2026-05-25.md`
-  provides 528 runtime test file rows, 4671 source top-level test declarations,
-  527 `yes` rows for exact runtime-results entries, and 0 `no` rows for
+  provides 534 runtime test file rows, 4719 source top-level test declarations,
+  534 `yes` rows for exact runtime-results entries, and 0 `no` rows for
   files missing exact runtime-results entries.
 - `tests/runtime/audit-completion-gap-register-current-behavior.test.mjs`
   computes those counts from the current worktree and proves the ledger, the
   generated index, and this register agree.
 - The generated index now has no missing exact runtime-results rows:
-  0 of 528 rows remain `no`, and the missing family priority table records
+  0 of 534 rows remain `no`, and the missing family priority table records
   `None remaining` 0. This closes the runtime fixture ledger file-level provenance gap before optimization work.
 - The generated index keeps exact-row-complete prefix-family snapshots for
   `tests/runtime/json*.test.mjs` files,
@@ -588,7 +589,7 @@ The first-optimization metric foundation gate now has a separate runtime-count
 reconciliation blocker. This top-level completion register treats that blocker
 as central audit evidence: old metric contract rows that still say `4457`
 cannot prove current full-suite coverage after the runtime test index moved to
-`4671` source top-level declarations.
+`4719` source top-level declarations.
 
 ```text
 legacy first-optimization metric contract count
@@ -600,7 +601,7 @@ expected runtime audit tests: 4457
 current runtime test provenance index
         |
         v
-source top-level test declarations counted: 4671
+source top-level test declarations counted: 4719
         |
         v
 latest full runtime evidence: stale after current source count changed
@@ -612,7 +613,7 @@ count-reconciled optimization readiness: NO-GO
 ```mermaid
 flowchart TD
   A["Legacy metric contract rows"] --> B["4457 expected tests"]
-  C["Generated runtime test provenance index"] --> D["4671 source test declarations"]
+  C["Generated runtime test provenance index"] --> D["4719 source test declarations"]
   E["Latest full runtime suite"] --> F["stale after current source count changed"]
   B --> G{"Does this prove current completion?"}
   D --> G
@@ -623,8 +624,8 @@ flowchart TD
 | Reconciliation evidence | Artifact | Current count | Completion effect |
 | --- | --- | --- | --- |
 | Legacy first-optimization metric contract rows | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_FOUNDATION_CONTRACT_COVERAGE_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | `4457` expected tests and `4457` expected pass. | Historical snapshot only; not current full-suite proof. |
-| Generated runtime test provenance | `docs/audit/FILTERTUBE_RUNTIME_TEST_FILE_PROVENANCE_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | `4671` source top-level test declarations. | Current file-level runtime-test declaration count. |
-| Latest full runtime evidence | `node --test --test-reporter=tap tests/runtime/*.test.mjs`; recorded in `docs/audit/FILTERTUBE_RELEASE_REGRESSION_LAG_AND_BLOCKLIST_FIX_2026-05-26.md` | Current `4663/4663` pass, `0` fail, `83.213s`. | Latest full-suite assertion proof after the 3 lifecycle-convergence proof tests were added; it predates the 4 later content-filter convergence proof declarations. |
+| Generated runtime test provenance | `docs/audit/FILTERTUBE_RUNTIME_TEST_FILE_PROVENANCE_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | `4719` source top-level test declarations. | Current file-level runtime-test declaration count. |
+| Latest historical full runtime evidence | `node --test --test-reporter=tap tests/runtime/*.test.mjs`; recorded in `docs/audit/FILTERTUBE_RELEASE_REGRESSION_LAG_AND_BLOCKLIST_FIX_2026-05-26.md` | Current `4663/4663` pass, `0` fail, `83.213s`. | Latest historical full-suite assertion proof after the 3 lifecycle-convergence proof tests were added; the current broad 4719-test audit remains `NO-GO`. |
 | Completion decision | This register. | Count reconciliation status: `BLOCKED`. | No first-optimization, JSON-first promotion, whitelist optimization, or broad audit completion approval. |
 
 Current count reconciliation boundary:
@@ -632,9 +633,9 @@ Current count reconciliation boundary:
 ```text
 count-reconciliation proof slices: 3
 legacy metric contract expected tests: 4457
-current generated runtime test declarations: 4671
-latest full runtime pass count observed: 4663
-latest full runtime pass freshness: 2026-05-30 full runtime rerun covers 4663 generated declarations before 4 later audit-only content-filter declarations
+current generated runtime test declarations: 4719
+latest historical full runtime pass count observed: 4663
+latest historical full runtime pass freshness: 2026-05-30 full runtime rerun covers 4663 generated declarations before later audit-only declarations expanded the source count
 first-optimization count reconciliation status: BLOCKED
 full codebase audit completion from count reconciliation: NO-GO
 runtime behavior changed by this addendum: no
@@ -666,7 +667,7 @@ excluding this register and its verifier found the following footprint:
 ```text
 census scope: docs/audit markdown plus tests/runtime modules
 census exclusions: this gap register and its verifier
-census files scanned: 1075
+census files scanned: 1087
 legacy runtime-count token 4457 occurrences: 1230
 legacy runtime-count token 4457 files: 167
 current runtime-count token 4660 occurrences: 11
@@ -689,7 +690,7 @@ Interpretation:
 
 | Census item | Current value | Completion effect |
 | --- | ---: | --- |
-| Files scanned outside this self-referential register/verifier | 1075 | Wide enough to quantify audit-surface drift without self-counting this addendum. |
+| Files scanned outside this self-referential register/verifier | 1087 | Wide enough to quantify audit-surface drift without self-counting this addendum. |
 | Legacy `4457` occurrences | 1230 | The stale expected-test count is broad historical contract wording, not current completion proof. |
 | Files containing legacy `4457` | 167 | Future count reconciliation is a multi-document audit cleanup, not a single-row fix. |
 | Current `4660` occurrences | 11 | Recalculated after the fresh 2026-05-30 full runtime rerun matched the current generated declaration count. |
@@ -1944,8 +1945,8 @@ and runtime behavior changes at `NO-GO`.
 2026-05-30 content-filter convergence proof-test drift:
 
 ```text
-current source top-level test declarations counted: 4671
-current runtime source declaration phrase: 4671 source top-level test declarations
+current source top-level test declarations counted: 4719
+current runtime source declaration phrase: 4719 source top-level test declarations
 new declarations since previous full runtime proof: 4
 latest full runtime proof after lifecycle convergence additions: 4663/4663 pass, 0 fail, 83.213s
 content-filter convergence proof-test freshness: focused rerun required before using this slice
@@ -1956,7 +1957,7 @@ The four added declarations are audit-only proof tests for the content-filter
 route/surface convergence, active-goal continuation, audit-completion gap, and
 objective-coverage ledger rows. They update the generated provenance index to
 the current source count but do not convert the earlier 4663-test full-suite
-proof into current full-suite proof for the larger 4671-test source set.
+proof into current full-suite proof for the larger 4719-test source set.
 
 2026-05-30 full runtime freshness closure after audit-drift repair:
 
@@ -1967,10 +1968,11 @@ failed freshness owners: native runtime sync app HEAD fingerprint; truth-claim r
 drift repair documents: docs/audit/FILTERTUBE_NATIVE_RUNTIME_SYNC_METHOD_SEMANTIC_REGISTER_2026-05-21.md; docs/audit/FILTERTUBE_SOURCE_OF_TRUTH_CLAIM_REGISTER_2026-05-20.md
 focused drift repair proof: 10/10 pass
 fresh full runtime command: node --test --test-reporter=dot tests/runtime/*.test.mjs
-fresh full runtime exit status for current source set: 0
-current runtime test files: 528
-current source top-level test declarations counted: 4671
-current full runtime proof for generated 4671 declaration set: GO
+latest broad runtime audit command: npm run audit:runtime
+latest broad runtime audit result: 4719 tests, 4491 pass, 228 fail
+current runtime test files: 534
+current source top-level test declarations counted: 4719
+current broad runtime proof for generated 4719 declaration set: NO-GO
 full codebase audit completion from full runtime proof: NO-GO
 first optimization implementation approval from full runtime proof: NO-GO
 JSON-first first-class promotion from full runtime proof: NO-GO
@@ -1981,13 +1983,11 @@ runtime behavior changed by this continuation: no
 
 ```mermaid
 flowchart TD
-  A["4671 declaration source set"] --> B["Initial full runtime rerun"]
-  B --> C["2 audit-doc freshness failures"]
-  C --> D["Repair native sync HEAD and truth-claim line refs"]
-  D --> E["Focused drift repair proof: 10/10 pass"]
-  E --> F["Full runtime dot rerun exits 0"]
-  F --> G["Executable current-behavior freshness: GO"]
-  G --> H["Optimization, JSON-first, release, and completion gates stay NO-GO"]
+  A["4719 declaration source set"] --> B["Broad runtime audit rerun"]
+  B --> C["4491 pass / 228 fail"]
+  C --> D["Runtime backlog remains open"]
+  D --> E["Executable broad-audit freshness: NO-GO"]
+  E --> F["Optimization, JSON-first, release, and completion gates stay NO-GO"]
 ```
 
 This closes the stale full-runtime freshness blocker for the current generated
@@ -2296,8 +2296,7 @@ runtime marker, and reload timestamp evidence.
 
 `docs/audit/FILTERTUBE_P0_RELEASE_PACKAGE_CURRENT_BEHAVIOR_2026-05-19.md`
 now carries a browser manifest package reference closure snapshot with ASCII
-and Mermaid flow diagrams. It pins the four browser manifests, 23 combined
-unique manifest-referenced paths, 0 unresolved manifest file references, 0
+and Mermaid flow diagrams. It pins the four browser manifests, 24 combined unique manifest-referenced paths, 0 unresolved manifest file references, 0
 manifest referenced roots outside `COMMON_DIRS`, and 0 manifest content-script
 CSS references.
 
@@ -2332,9 +2331,9 @@ installed-runtime byte parity, and reload/package validation remain at `NO-GO`.
 `docs/audit/FILTERTUBE_P0_RELEASE_PACKAGE_CURRENT_BEHAVIOR_2026-05-19.md`
 now carries a current local `dist/` package snapshot with ASCII and Mermaid
 flow diagrams. It pins the existing ignored `dist/` tree without running a
-build: 3 browser staged directories, 58 staged files per browser, 3 ZIP
-artifacts, 178 total `dist` files including ZIPs, 57 source-backed
-non-manifest staged files per browser, 57 byte-identical source-backed
+build: 3 browser staged directories, 59 staged files per browser, 3 ZIP
+artifacts, 180 total `dist` files including ZIPs, 58 source-backed
+non-manifest staged files per browser, 58 byte-identical source-backed
 non-manifest staged files per browser, browser manifest hashes, and ZIP
 hashes for Chrome, Firefox, and Opera.
 

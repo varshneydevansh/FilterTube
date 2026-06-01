@@ -20,8 +20,9 @@ Completion is not proven. Do not call `update_goal(status='complete')` while any
 objective row below remains incomplete, indirect, source-enumerated only,
 lexical-only, current-behavior-only, or future-proof-missing.
 
-Green `npm run audit:runtime` proves that current-behavior claims are pinned. It
-does not prove that every future implementation change is safe.
+The current broad `npm run audit:runtime` snapshot is a backlog signal, not a
+green completion proof. Passing focused lanes prove scoped current-behavior
+claims only; they do not prove that every future implementation change is safe.
 
 Content bridge selector semantic addendum: `docs/audit/FILTERTUBE_CONTENT_BRIDGE_SELECTOR_SEMANTIC_REGISTER_2026-05-21.md` and `tests/runtime/content-bridge-selector-semantic-register-current-behavior.test.mjs` move the DOM selector objective from source-count only toward semantic proof for the largest selector file. The addendum classifies all 244 current `js/content_bridge.js` selector API sites into 13 source-derived selector/effect groups and separately pins all 36 dynamic/non-literal selectors across 11 dynamic selector families. It records that no `contentBridgeSelectorSemanticAuthority`, `contentBridgeSelectorEffectReport`, `contentBridgeSelectorOwnerContract`, `contentBridgeDynamicSelectorEscapePolicy`, `contentBridgeSelectorNoRuleBudget`, or `contentBridgeSelectorRestoreProof` exists in runtime source yet.
 
@@ -191,7 +192,7 @@ Prompt release overlay boundary addendum: `docs/audit/FILTERTUBE_PROMPT_RELEASE_
 
 Release build artifact claim boundary addendum: `docs/audit/FILTERTUBE_RELEASE_BUILD_ARTIFACT_CLAIM_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md` and `tests/runtime/release-build-artifact-claim-boundary-current-behavior.test.mjs` move the release/package, build artifact, README public-copy, manifest version, mobile artifact, generated UI freshness, public-claim, first-class JSON filter claim, performance direction, reliability, code-burden, source/evidence boundary, and implementation-change objectives from split build-method, package-parity, public-release, root-metadata, prompt-release, and generated-output proof toward a joined artifact-claim boundary. The addendum pins 9 release build artifact boundary source files, 11 source/effect blocks, browser/package version `3.3.1`, staged newest release-note version `3.3.2`, 24 release note data entries, 23 release note version rows, broad package directories, common package files, build script README mutation, browser ZIP checksum absence, public non-draft release creation before asset upload proof, mobile `.sha256` staging, 0 package/public-claim/artifact manifests, and 5 runtime guard fixtures. It confirms codebase inspection is finding future optimization locations and first-class JSON filter blockers before runtime changes. It preserves the non-completion boundary: package manifests, README mutation gates, draft-first release flow, upload rollback, mobile artifact claim gates, ZIP checksum manifests, generated UI freshness, browser manifest parity, public claim fixtures, first-class JSON claim gates, and no `releaseBuildArtifactClaimContract`, `releasePackageManifestAuthority`, `releaseReadmeMutationGate`, `releaseDraftFirstGate`, `releaseAssetUploadRollbackPlan`, `releaseMobileArtifactClaimGate`, `releaseZipChecksumManifest`, `releaseGeneratedUiFreshnessGate`, `releaseBrowserManifestParityReport`, `releasePublicClaimFixtureProvenance`, or `releaseFirstClassJsonClaimGate` exists in product, build, website, or audit runtime source yet.
 
-2026-05-27 release-package and installed-runtime provenance continuation: `docs/audit/FILTERTUBE_P0_RELEASE_PACKAGE_CURRENT_BEHAVIOR_2026-05-19.md`, `tests/runtime/p0-release-package-current-behavior.test.mjs`, and the related release-package rows in `docs/audit/FILTERTUBE_OBJECTIVE_COVERAGE_LEDGER_2026-05-18.md` and `docs/audit/FILTERTUBE_AUDIT_COMPLETION_GAP_REGISTER_2026-05-20.md` now pin the current ignored `dist/` package tree and local Chrome Default profile evidence without opening the release gate. The continuation pins four browser manifest package-reference validation rows with 23 combined unique referenced paths, 0 unresolved manifest file references, 0 manifest referenced roots outside `COMMON_DIRS`, and 0 manifest content-script CSS references; four-manifest permission/resource evidence with 5 exact permissions per manifest, 3 exact host permissions per manifest, active matches limited to `youtube.com` and `youtubekids.com`, 4 host-only `youtube-nocookie.com` gaps, and the current MAIN/ISOLATED content-script world split; local `dist/` evidence with 3 browser staged directories, 58 staged files per browser, 3 ZIP artifacts, 177 total `dist` files, 57 source-backed non-manifest staged files per browser, and 57 byte-identical source-backed non-manifest staged files per browser; Chrome Default unpacked workspace evidence for extension id `gkgjigdfdccckblmglboobikfcpeelio`, workspace root `/Users/devanshvarshney/FilterTube`, stored version `3.3.1`, Local Extension Settings presence, no packed `Default/Extensions/<id>` directory, current `manifest.json`/`package.json`/`js/content_bridge.js` hashes, and the workspace ampersand Topic fix token; Default installed permission parity evidence with active/granted API permissions `activeTab`, `downloads`, `scripting`, `storage`, and `tabs`, explicit hosts `youtube-nocookie.com`, `youtube.com`, and `youtubekids.com`, scriptable hosts `youtube.com` and `youtubekids.com`, the known scriptable `youtube-nocookie.com` gap, no disable reasons, and no withholding permissions; and a live Chrome process attestation boundary that distinguishes visible Default Chrome without remote debugging from a separate automation Chrome profile using `/private/tmp/filtertube-live-spa-chrome-profile` on CDP port 9222. It preserves the non-completion boundary: committed package manifest authority, reproducible package build authority, loaded-browser package/runtime parity authority, active-tab permission use proof, incognito runtime availability, visible YouTube tab content-script byte parity, extension reload timestamp authority, upload proof, public-claim proof, and release publication authority remain `NO-GO`.
+2026-05-27 release-package and installed-runtime provenance continuation: `docs/audit/FILTERTUBE_P0_RELEASE_PACKAGE_CURRENT_BEHAVIOR_2026-05-19.md`, `tests/runtime/p0-release-package-current-behavior.test.mjs`, and the related release-package rows in `docs/audit/FILTERTUBE_OBJECTIVE_COVERAGE_LEDGER_2026-05-18.md` and `docs/audit/FILTERTUBE_AUDIT_COMPLETION_GAP_REGISTER_2026-05-20.md` now pin the current ignored `dist/` package tree and local Chrome Default profile evidence without opening the release gate. The continuation pins four browser manifest package-reference validation rows with 24 combined unique referenced paths, 0 unresolved manifest file references, 0 manifest referenced roots outside `COMMON_DIRS`, and 0 manifest content-script CSS references; four-manifest permission/resource evidence with 5 exact permissions per manifest, 3 exact host permissions per manifest, active matches limited to `youtube.com` and `youtubekids.com`, 4 host-only `youtube-nocookie.com` gaps, and the current MAIN/ISOLATED content-script world split; local `dist/` evidence with 3 browser staged directories, 59 staged files per browser, 3 ZIP artifacts, 180 total `dist` files, 58 source-backed non-manifest staged files per browser, and 58 byte-identical source-backed non-manifest staged files per browser; Chrome Default unpacked workspace evidence for extension id `gkgjigdfdccckblmglboobikfcpeelio`, workspace root `/Users/devanshvarshney/FilterTube`, stored version `3.3.1`, Local Extension Settings presence, no packed `Default/Extensions/<id>` directory, current `manifest.json`/`package.json`/`js/content_bridge.js` hashes, and the workspace ampersand Topic fix token; Default installed permission parity evidence with active/granted API permissions `activeTab`, `downloads`, `scripting`, `storage`, and `tabs`, explicit hosts `youtube-nocookie.com`, `youtube.com`, and `youtubekids.com`, scriptable hosts `youtube.com` and `youtubekids.com`, the known scriptable `youtube-nocookie.com` gap, no disable reasons, and no withholding permissions; and a live Chrome process attestation boundary that distinguishes visible Default Chrome without remote debugging from a separate automation Chrome profile using `/private/tmp/filtertube-live-spa-chrome-profile` on CDP port 9222. It preserves the non-completion boundary: committed package manifest authority, reproducible package build authority, loaded-browser package/runtime parity authority, active-tab permission use proof, incognito runtime availability, visible YouTube tab content-script byte parity, extension reload timestamp authority, upload proof, public-claim proof, and release publication authority remain `NO-GO`.
 
 2026-05-30 manifest incognito static boundary continuation: the same P0 release
 package audit now pins that all four source manifests lack an explicit
@@ -2364,12 +2365,12 @@ this continuation: no; the broad audit remains active.
 and
 `tests/runtime/optimization-candidate-priority-register-current-behavior.test.mjs`
 now bind the optimization work-order register to the latest recorded 4663/4663
-runtime proof, the current 4671 generated declaration count, the later full
-runtime freshness closure, and the May 30 whitelist/cache live-profile blocker
+historical runtime proof, the current 4719 generated declaration count, the
+June 1 broad runtime backlog boundary, and the May 30 whitelist/cache live-profile blocker
 map without changing runtime behavior. The continuation pins latest historical
 4663 full runtime proof: 4663/4663 pass, 0 fail, 83.213s; current generated
-runtime-test declaration count: 4671; current full runtime proof for generated
-4671 declaration set after audit-drift repair: `GO`; affected callable
+runtime-test declaration count: 4719; current broad runtime proof for generated
+4719 declaration set: `NO-GO` (4491/4719 pass, 228 fail); affected callable
 packet rows: 12; affected source files covered: 8; transport no-work source
 evidence rows: 8; live evidence execution blocker rows: 8; connected Chrome
 profile inventory acceptance: `NO-GO`;
@@ -2381,10 +2382,11 @@ after May 30 freshness: `NO-GO`; runtime behavior changed by this continuation:
 no.
 
 This keeps the active goal aligned with the current release-lag and
-whitelist/cache audit path: green runtime tests prove current-behavior
-freshness, not performance readiness; source anchors prove affected-callable
-ownership, not live SPA route/mode budget evidence; and scratch/private or
-disconnected Chrome probes do not prove installed visible-tab byte parity.
+whitelist/cache audit path: the historical green runtime suite proves dated
+current-behavior freshness, not performance readiness; the current broad
+runtime backlog remains open; source anchors prove affected-callable ownership,
+not live SPA route/mode budget evidence; and scratch/private or disconnected
+Chrome probes do not prove installed visible-tab byte parity.
 Optimization approval, JSON-first promotion, release/public-claim use, and
 `update_goal(status='complete')` remain `NO-GO`; the broad audit remains
 active.
@@ -3093,12 +3095,13 @@ the 4671 source declaration set without changing product runtime behavior. The
 initial post-drift full runtime rerun returned 4665/4667 pass, 2 fail; the two
 failures were audit-document freshness failures for the native runtime sync app
 HEAD fingerprint and truth-claim register exact line references. The
-focused drift repair proof passed 10/10 tests, and the fresh full runtime rerun
-`node --test --test-reporter=dot tests/runtime/*.test.mjs` exited 0 for the
-current 528 runtime test files and 4671 source top-level test declarations.
+focused drift repair proof passed 10/10 tests. The later broad runtime audit
+command is `npm run audit:runtime`, and the snapshot records the current 534
+runtime test files and 4719 source top-level test declarations as 4491 pass and
+228 fail.
 
-This makes current full runtime proof for generated 4671 declaration set:
-`GO`. It keeps full codebase audit completion from full runtime proof:
+This makes current broad runtime proof for generated 4719 declaration set:
+`NO-GO`. It keeps full codebase audit completion from full runtime proof:
 `NO-GO`, first optimization implementation approval from full runtime proof:
 `NO-GO`, JSON-first first-class promotion from full runtime proof: `NO-GO`,
 whitelist/cache optimization from full runtime proof: `NO-GO`,
@@ -3118,19 +3121,19 @@ and
 now bind historical first-optimization `4457` expected-test rows to the current
 generated runtime-test provenance count without treating either count as broad
 completion proof. The continuation pins legacy metric contract expected tests:
-4457, current generated runtime test declarations: 4671, latest historical
-4663 full runtime proof result: 4663/4663 pass, 0 fail, 83.213s, current full
-runtime proof for generated 4671 declaration set after audit-drift repair:
-GO, runtime test file rows: 527, runtime results missing exact backticked
+4457, current generated runtime test declarations: 4719, latest historical
+4663 full runtime proof result: 4663/4663 pass, 0 fail, 83.213s, current broad
+runtime proof for generated 4719 declaration set:
+NO-GO, runtime test file rows: 534, runtime results missing exact backticked
 test-path rows: 0, legacy runtime-count token 4457 occurrences: 1230, legacy
 runtime-count token 4457 files: 167, current runtime-count token 4660
 occurrences: 11, current runtime-count token 4660 files: 4, count freshness
-reconciliation status: CURRENT-FULL-PROOF-REFRESHED, runtime count
+reconciliation status: CURRENT-BROAD-BACKLOG-RECORDED, runtime count
 reconciliation as optimization authority: NO-GO, first optimization
 implementation approval from count rows: NO-GO, full codebase audit completion
 from count reconciliation: NO-GO, and runtime behavior changed: no. Old `4457`
-rows remain dated historical contract evidence only; the fresh current 4671 runtime
-pass proves executable current-behavior assertion freshness, not semantic
+rows remain dated historical contract evidence only; the current 4719 broad
+runtime backlog records 4491 pass and 228 fail, so it does not prove semantic
 coverage, JSON-first promotion, whitelist/cache optimization, metric collector
 insertion, artifact commit readiness, release/public-claim use, or
 `update_goal(status='complete')`.
@@ -3159,8 +3162,8 @@ and passed 609/609 tests after refreshing generated runtime-test declaration
 evidence to 4660 at that time. Later lifecycle-convergence proof tests moved
 generated runtime-test declaration evidence to 4663, and the full runtime suite
 was refreshed to current 4663/4663 pass, 0 fail, 83.213s. Later content-filter
-convergence proof tests moved generated runtime-test declaration evidence to 4671; the later full runtime freshness closure repaired audit-document drift
-and reran the current 4671 declaration set to exit status 0. This revalidates source
+convergence proof tests moved generated runtime-test declaration evidence to 4671; the later broad runtime backlog boundary now tracks
+the current 4719 declaration set as 4491 pass and 228 fail. This revalidates source
 boundary/surface/source-of-truth, tracked-file coverage and obligations,
 objective coverage, P0 obligation index/status, function and callable coverage,
 method semantic register, feature source dependencies, candidate obligation

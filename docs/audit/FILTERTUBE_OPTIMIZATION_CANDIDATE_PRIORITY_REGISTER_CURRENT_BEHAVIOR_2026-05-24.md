@@ -142,8 +142,9 @@ optimization order still does not change.
 
 ```text
 latest historical 4663 full runtime proof: 4663/4663 pass, 0 fail, 83.213s
-current generated runtime-test declaration count: 4671
-current full runtime proof for generated 4671 declaration set after audit-drift repair: GO
+current generated runtime-test declaration count: 4719
+current broad runtime proof for generated 4719 declaration set: NO-GO
+current broad runtime audit snapshot: 4719 tests, 4491 pass, 228 fail
 affected callable packet rows: 12
 affected source files covered: 8
 transport no-work source evidence rows: 8
@@ -169,7 +170,8 @@ ASCII flow:
 ```text
 current source/runtime proof
   -> latest recorded 4663/4663 runtime suite proof
-  -> current 4671 generated declaration drift
+  -> current 4719 generated declaration set
+  -> broad runtime backlog boundary
   -> affected whitelist/cache callable packet
   -> live installed-profile evidence blocker
   -> future measured route/mode work-budget artifact
@@ -180,13 +182,14 @@ Mermaid flow:
 
 ```mermaid
 flowchart TD
-  A["Latest recorded 4663 runtime proof"] --> B["Current 4671 generated declaration drift"]
-  B --> C["Affected whitelist/cache callable packet"]
-  C --> D["Live installed-profile evidence blocker"]
-  D --> E["Future route/mode work-budget artifact"]
-  E --> F["Future scoped optimization approval"]
-  C --> G["Optimization approval: NO-GO today"]
-  C --> H["JSON-first promotion: NO-GO today"]
+  A["Latest recorded 4663 runtime proof"] --> B["Current 4719 generated declaration set"]
+  B --> C["Broad runtime backlog boundary"]
+  C --> D["Affected whitelist/cache callable packet"]
+  D --> E["Live installed-profile evidence blocker"]
+  E --> F["Future route/mode work-budget artifact"]
+  F --> G["Future scoped optimization approval"]
+  D --> H["Optimization approval: NO-GO today"]
+  D --> I["JSON-first promotion: NO-GO today"]
 ```
 
 This addendum prevents three bad shortcuts:

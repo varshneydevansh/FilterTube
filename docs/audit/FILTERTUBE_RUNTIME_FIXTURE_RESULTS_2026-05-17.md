@@ -22,16 +22,16 @@ Current count interpretation:
 
 ```text
 historical snapshot count above: 4457
-current generated source top-level declarations: 4671
-latest full runtime pass evidence: current 4663/4663 pass, 0 fail, 83.213s from 2026-05-30 full runtime rerun
+current generated source top-level declarations: 4719
+latest historical full runtime pass evidence: current 4663/4663 pass, 0 fail, 83.213s from 2026-05-30 full runtime rerun
+current broad runtime proof: 4719 tests, 4491 pass, 228 fail
 stored TAP output: /private/tmp/filtertube-runtime-full-after-lifecycle-convergence.tap
 runtime-results ledger completion authority: NO-GO
 ```
 
-The current source count includes four later audit-only declarations that extend
-the content-filter route/surface convergence proof. The latest full-runtime TAP
-evidence remains the earlier 4663-test lifecycle-convergence run until a new
-full-suite rerun is recorded.
+The current source count includes later audit-only declarations beyond the
+earlier 4663-test lifecycle-convergence run. The latest broad runtime audit
+snapshot is not a completion proof because 228 rows still fail.
 
 The historical snapshot is retained because May 24 metric contract rows still
 use it as expected-result evidence. It is not current full-suite proof,
@@ -2648,8 +2648,8 @@ unchanged.
 
 The stored TAP summary proves the 4663-assertion lifecycle-convergence runtime
 set, and this file has an exact backticked row for every top-level runtime test
-file. The generated provenance index now counts the four later audit-only
-content-filter convergence declarations as current source.
+file in the historical May 25 snapshot. The generated provenance index now
+counts later audit-only declarations as current source.
 
 ```text
 528 top-level `tests/runtime/*.test.mjs` files
@@ -2665,3 +2665,26 @@ fixture results ledger. It is still not complete semantic coverage evidence for
 optimization readiness: future behavior work still needs feature-specific
 positive, negative, route, mode, side-effect, false-hide, leak, performance,
 rollout, and rollback proof.
+
+## Runtime Fixture Index Completeness Backfill - 2026-06-01
+
+This audit-only backfill adds exact runtime-results ledger path mentions for
+the latest runtime test files. It does not assert broad runtime completion or
+change product runtime behavior.
+
+```text
+top-level runtime test files: 534
+534 exact backticked test-path entries in this runtime fixture results file
+0 top-level runtime test files without exact backticked entries
+generated per-test provenance rows: 534
+source top-level test declarations counted by generated index: 4719
+current broad runtime proof: 4719 tests, 4491 pass, 228 fail
+runtime-results ledger completion authority: NO-GO
+```
+
+- `tests/runtime/audit-runtime-backlog-current-behavior.test.mjs`
+- `tests/runtime/dom-state-virtual-attributes-current-behavior.test.mjs`
+- `tests/runtime/release-audit-proof-directory-boundary-current-behavior.test.mjs`
+- `tests/runtime/release-live-youtube-spa-smoke-artifact-verifier-current-behavior.test.mjs`
+- `tests/runtime/release-live-youtube-spa-smoke-boundary-current-behavior.test.mjs`
+- `tests/runtime/test-lane-matrix-current-behavior.test.mjs`

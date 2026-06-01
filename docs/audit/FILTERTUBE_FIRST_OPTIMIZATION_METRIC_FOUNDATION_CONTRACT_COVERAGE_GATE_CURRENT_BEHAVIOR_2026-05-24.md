@@ -145,18 +145,21 @@ runtime count:
 
 ```text
 legacy metric contract expected tests: 4457
-current generated runtime test declarations: 4671
-latest full runtime pass count observed: 4663
-latest full runtime pass freshness: 2026-05-30 full runtime rerun covers 4663 generated declarations before 4 later audit-only content-filter declarations
+current generated runtime test declarations: 4719
+latest historical full runtime pass count observed: 4663
+current broad runtime audit snapshot: 4719 tests, 4491 pass, 228 fail
+current broad runtime proof for generated 4719 declaration set: NO-GO
 count reconciliation status for metric foundation: BLOCKED
 runtime behavior changed by this addendum: no
 ```
 
 The legacy `4457` rows are historical metric-contract snapshot evidence, not
 current full-suite proof or optimization approval. The current generated
-runtime test provenance index records `4671` source top-level test declarations.
-The latest full runtime audit evidence records a current `4663/4663` pass, so
-full-suite freshness no longer covers the current generated declaration count.
+runtime test provenance index records `4719` source top-level test declarations.
+The latest historical full runtime audit evidence records a current `4663/4663`
+pass, while the current broad runtime audit snapshot records `4719` tests,
+`4491` pass, and `228` fail. Current broad runtime proof for the generated
+`4719` declaration set is therefore `NO-GO`.
 Until the contract rows and ledgers are reconciled as one scoped audit packet,
 the older `4457` rows cannot prove current full-suite coverage or
 first-optimization readiness.
@@ -171,7 +174,7 @@ expected runtime audit tests: 4457
 current generated test provenance index
         |
         v
-source top-level test declarations counted: 4671
+source top-level test declarations counted: 4719
         |
         v
 metric-foundation contract count is stale for completion proof
@@ -180,7 +183,7 @@ metric-foundation contract count is stale for completion proof
 ```mermaid
 flowchart TD
   A["Metric foundation legacy contract rows"] --> B["4457 expected runtime audit tests"]
-  C["Runtime test provenance index"] --> D["4671 source top-level test declarations"]
+  C["Runtime test provenance index"] --> D["4719 source top-level test declarations"]
   E["Latest full runtime command"] --> F["latest recorded 4663 pass / 0 fail"]
   B --> G{"May this prove current optimization readiness?"}
   D --> G
@@ -191,8 +194,9 @@ flowchart TD
 | Evidence | Artifact | Count | Current interpretation |
 | --- | --- | --- | --- |
 | Legacy metric contract rows | This contract gate and upstream first-optimization gates. | `4457` expected tests, `4457` expected pass. | Historical contract snapshot only. |
-| Runtime test provenance index | `docs/audit/FILTERTUBE_RUNTIME_TEST_FILE_PROVENANCE_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | `4671` source top-level test declarations. | Current generated runtime-test declaration count. |
-| Full runtime command evidence | `node --test --test-reporter=tap tests/runtime/*.test.mjs` | Current `4663/4663` pass, `0` fail, `83.213s`. | Latest local full-suite pass evidence after the 2026-05-30 freshness rerun; it predates the four later audit-only content-filter convergence declarations. |
+| Runtime test provenance index | `docs/audit/FILTERTUBE_RUNTIME_TEST_FILE_PROVENANCE_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | `4719` source top-level test declarations. | Current generated runtime-test declaration count. |
+| Historical full runtime command evidence | `node --test --test-reporter=tap tests/runtime/*.test.mjs` | Current `4663/4663` pass, `0` fail, `83.213s`. | Latest local full-suite pass evidence after the 2026-05-30 freshness rerun; retained as historical evidence only. |
+| Current broad runtime audit evidence | `npm run audit:runtime` | `4719` tests, `4491` pass, `228` fail. | Current generated declaration set remains `NO-GO`. |
 | Metric foundation readiness | This addendum. | Count reconciliation status: `BLOCKED`. | No optimization or artifact authority until the count boundary is reconciled. |
 
 ## Contract Coverage Matrix

@@ -1338,7 +1338,7 @@ function assertReleaseHotPathProofStackAddendum(source) {
   assert.match(jsonFirstNoWorkDoc, /flowchart TD/);
   assert.match(jsonFirstNoWorkDoc, /\| Seed transport admission \| `js\/seed\.js:220-260`, `js\/seed\.js:383-430`, `js\/seed\.js:1002-1014` \|/);
   assert.match(jsonFirstNoWorkDoc, /\| Injector transport admission \| `js\/injector\.js:171-188`, `js\/injector\.js:1940-1944`, `js\/injector\.js:3405-3437` \|/);
-  assert.match(jsonFirstNoWorkDoc, /\| JSON renderer owner \| `js\/filter_logic\.js:426-520`, `js\/filter_logic\.js:1698-2112`, `js\/filter_logic\.js:3434-3479` \|/);
+  assert.match(jsonFirstNoWorkDoc, /\| JSON renderer owner \| `js\/filter_logic\.js:435-529`, `js\/filter_logic\.js:1721-2261`, `js\/filter_logic\.js:3588-3619` \|/);
   assert.match(jsonFirstNoWorkDoc, /\| DOM fallback owner \| `js\/content\/dom_fallback\.js:1933-1999`, `js\/content\/dom_fallback\.js:2035-2088`, `js\/content\/dom_fallback\.js:4547-4752` \|/);
   assert.match(jsonFirstNoWorkDoc, /\| Bridge\/action owner \| `js\/content_bridge\.js:6014-6037`, `js\/content\/block_channel\.js:1205-1222` \|/);
   assert.match(jsonFirstNoWorkDoc, /JSON-first owner budget proof slices: 6/);
@@ -1400,7 +1400,7 @@ function assertReleaseHotPathProofStackAddendum(source) {
   assert.match(diagnosticLoggingPolicyDoc, /flowchart TD/);
   assert.match(diagnosticLoggingPolicyDoc, /\| `diagnostic_flow_seed_gate_and_relay` \| `js\/seed\.js:25-33`, `js\/seed\.js:139-168`, `js\/seed\.js:253-260`, `js\/seed\.js:983-1014` \|/);
   assert.match(diagnosticLoggingPolicyDoc, /\| `diagnostic_flow_injector_postlog_relay` \| `js\/injector\.js:105-130`, `js\/injector\.js:1925-2047`, `js\/injector\.js:3382-3495` \|/);
-  assert.match(diagnosticLoggingPolicyDoc, /\| `diagnostic_flow_filter_logic_engine` \| `js\/filter_logic\.js:19-44`, `js\/filter_logic\.js:1557-1586`, `js\/filter_logic\.js:3434-3496` \|/);
+  assert.match(diagnosticLoggingPolicyDoc, /\| `diagnostic_flow_filter_logic_engine` \| `js\/filter_logic\.js:19-44`, `js\/filter_logic\.js:1566-1595`, `js\/filter_logic\.js:3588-3650` \|/);
   assert.match(diagnosticLoggingPolicyDoc, /\| `diagnostic_flow_bridge_request_response` \| `js\/content_bridge\.js:5424-5524`, `js\/content_bridge\.js:5780-5986` \|/);
   assert.match(diagnosticLoggingPolicyDoc, /\| `diagnostic_flow_bridge_menu_identity` \| `js\/content_bridge\.js:7303-7452`, `js\/content_bridge\.js:10010-10630`, `js\/content_bridge\.js:12237-13151` \|/);
   assert.match(diagnosticLoggingPolicyDoc, /\| `diagnostic_flow_build_release_scripts` \| `build\.js:75-190`, `build\.js:529-682`, `scripts\/build-extension-ui\.mjs:47-48`, `scripts\/build-nanah-vendor\.mjs:62-63`, `scripts\/sync-native-runtime\.mjs:12-30` \|/);
@@ -1498,7 +1498,7 @@ function assertReleaseHotPathProofStackAddendum(source) {
   assert.match(releasePackageDoc, /installed extension id \+ loaded path \+ manifest version \+ source hash/);
   assert.match(releasePackageDoc, /flowchart TD/);
   assert.match(releasePackageDoc, /\| Package command\/version surface \| `package\.json:3-18` \|/);
-  assert.match(releasePackageDoc, /\| Default Chrome manifest load order \| `manifest\.json:1-87`, `manifest\.json:42-55` \|/);
+  assert.match(releasePackageDoc, /\| Default Chrome manifest load order \| `manifest\.json:1-88`, `manifest\.json:42-56` \|/);
   assert.match(releasePackageDoc, /\| Current Topic ampersand and bare-`and` source proof \| `js\/content_bridge\.js:2759-2814`, `js\/content_bridge\.js:4784-4812`, `js\/content_bridge\.js:4902-4928`, `tests\/runtime\/content-bridge-collaborator-identity-promotion-handoff-current-behavior\.test\.mjs:510-544` \|/);
   assert.match(releasePackageDoc, /Kully B & Gussy G - Topic/);
   assert.match(releasePackageDoc, /installed extension provenance authority: NO-GO/);
@@ -1548,18 +1548,18 @@ function assertReleaseHotPathProofStackAddendum(source) {
   assert.match(releasePackageDoc, /visible YouTube tab content-script byte parity authority: NO-GO/);
   assert.match(source, /Browser Manifest Package Reference Closure Addendum - 2026-05-27/);
   assert.match(source, /browser manifest package reference closure snapshot with ASCII\s+and Mermaid flow diagrams/);
-  assert.match(source, /pins the four browser manifests, 23 combined\s+unique manifest-referenced paths, 0 unresolved manifest file references, 0\s+manifest referenced roots outside `COMMON_DIRS`, and 0 manifest content-script\s+CSS references/);
+  assert.match(source, /pins the four browser manifests, 24 combined\s+unique manifest-referenced paths, 0 unresolved manifest file references, 0\s+manifest referenced roots outside `COMMON_DIRS`, and 0 manifest content-script\s+CSS references/);
   assert.match(source, /Manifest package reference source proof is\s+`PARTIAL`/);
   assert.match(source, /build-time manifest reference validation, committed package\s+manifest authority, installed-runtime byte parity, and reload\/package\s+attestation remain at `NO-GO`/);
   assert.match(source, /pre-zip reference validation, and loaded Chrome\/runtime byte proof/);
   assert.match(releasePackageDoc, /Browser Manifest Package Reference Closure Addendum - 2026-05-27/);
-  assert.match(releasePackageDoc, /combined unique referenced paths across browser manifests: 23/);
+  assert.match(releasePackageDoc, /combined unique referenced paths across browser manifests: 24/);
   assert.match(releasePackageDoc, /unresolved manifest file references: 0/);
   assert.match(releasePackageDoc, /manifest referenced roots outside COMMON_DIRS: 0/);
   assert.match(releasePackageDoc, /manifest content-script CSS references: 0/);
   assert.match(releasePackageDoc, /build-time manifest reference validation: absent/);
   assert.match(releasePackageDoc, /Release package parity authority remains NO-GO/);
-  assert.match(releasePackageDoc, /manifest\.opera\.json` \| 27 \| 22 \| 0/);
+  assert.match(releasePackageDoc, /manifest\.opera\.json` \| 28 \| 23 \| 0/);
   assert.match(releasePackageDoc, /build\.js still lacks validatePackagedReferences \/ releasePackageParity gate/);
   assert.match(source, /Browser Manifest Permission And Resource Validation Snapshot - 2026-05-27/);
   assert.match(source, /browser manifest permission\/resource validation snapshot\s+with ASCII and Mermaid flow diagrams/);
@@ -1573,25 +1573,25 @@ function assertReleaseHotPathProofStackAddendum(source) {
   assert.match(releasePackageDoc, /exact permission list per manifest: storage, activeTab, scripting, tabs, downloads/);
   assert.match(releasePackageDoc, /host-only youtube-nocookie gap manifests: 4/);
   assert.match(releasePackageDoc, /build-time permission\/resource\/world validation: absent/);
-  assert.match(releasePackageDoc, /manifest\.firefox\.json` \| 1 \| 13 \| none \| 5 \| yes/);
-  assert.match(releasePackageDoc, /manifest\.opera\.json` \| 2 \| 14 \| none \| 4 \| yes/);
+  assert.match(releasePackageDoc, /manifest\.firefox\.json` \| 1 \| 14 \| none \| 5 \| yes/);
+  assert.match(releasePackageDoc, /manifest\.opera\.json` \| 2 \| 15 \| none \| 4 \| yes/);
   assert.match(source, /Current Local Dist Package Snapshot - 2026-05-27/);
   assert.match(source, /current local `dist\/` package snapshot with ASCII and Mermaid\s+flow diagrams/);
-  assert.match(source, /3 browser staged directories, 58 staged files per browser, 3 ZIP\s+artifacts, 178 total `dist` files including ZIPs/);
-  assert.match(source, /57 source-backed\s+non-manifest staged files per browser, 57 byte-identical source-backed\s+non-manifest staged files per browser/);
+  assert.match(source, /3 browser staged directories, 59 staged files per browser, 3 ZIP\s+artifacts, 180 total `dist` files including ZIPs/);
+  assert.match(source, /58 source-backed\s+non-manifest staged files per browser, 58 byte-identical source-backed\s+non-manifest staged files per browser/);
   assert.match(source, /browser manifest hashes, and ZIP\s+hashes for Chrome, Firefox, and Opera/);
   assert.match(source, /Local dist snapshot proof is\s+`PARTIAL`/);
   assert.match(source, /committed package manifest authority, reproducible package\s+build authority, loaded-browser package\/runtime parity authority, upload proof,\s+public-claim proof, and release publication authority remain at `NO-GO`/);
   assert.match(releasePackageDoc, /Current Local Dist Package Snapshot - 2026-05-27/);
   assert.match(releasePackageDoc, /browser staged directories: 3/);
-  assert.match(releasePackageDoc, /browser staged files per directory: 58/);
+  assert.match(releasePackageDoc, /browser staged files per directory: 59/);
   assert.match(releasePackageDoc, /dist zip artifacts: 3/);
-  assert.match(releasePackageDoc, /total dist files including zips: 178/);
-  assert.match(releasePackageDoc, /source-backed staged files per browser excluding manifest: 57/);
-  assert.match(releasePackageDoc, /byte-identical source-backed staged files per browser excluding manifest: 50/);
-  assert.match(releasePackageDoc, /chrome` \| 58 \| 2470 \| `96eb5e5c8733ecdfa9d3eb447d51a3bfc2c4743a80b1fde1f12d71bd46d1c8e4`/);
-  assert.match(releasePackageDoc, /firefox` \| 58 \| 2560 \| `2221afbc831ea1b5d90f76cd3f1590022dcc92d3c5d992dd163a5d46844b0e72`/);
-  assert.match(releasePackageDoc, /opera` \| 58 \| 2475 \| `f76d4a48b51fc5da65492347ce3f7cb31ebff057afd2185573176991e7d1d4b7`/);
+  assert.match(releasePackageDoc, /total dist files including zips: 180/);
+  assert.match(releasePackageDoc, /source-backed staged files per browser excluding manifest: 58/);
+  assert.match(releasePackageDoc, /byte-identical source-backed staged files per browser excluding manifest: 58/);
+  assert.match(releasePackageDoc, /chrome` \| 59 \| 2513 \|/);
+  assert.match(releasePackageDoc, /firefox` \| 59 \| 2603 \|/);
+  assert.match(releasePackageDoc, /opera` \| 59 \| 2518 \|/);
   assert.match(releasePackageDoc, /local dist snapshot proof: PARTIAL/);
   assert.match(releasePackageDoc, /reproducible package build authority: NO-GO/);
   assert.match(releasePackageDoc, /loaded-browser package\/runtime parity authority: NO-GO/);
@@ -1621,19 +1621,19 @@ function assertReleaseHotPathProofStackAddendum(source) {
   assert.ok(source.includes('docs/audit/FILTERTUBE_NATIVE_RUNTIME_SYNC_METHOD_SEMANTIC_REGISTER_2026-05-21.md'));
   assert.ok(source.includes('docs/audit/FILTERTUBE_SOURCE_OF_TRUTH_CLAIM_REGISTER_2026-05-20.md'));
   assert.match(source, /focused drift repair proof: 10\/10 pass/);
-  assert.match(source, /fresh full runtime command: node --test --test-reporter=dot tests\/runtime\/\*\.test\.mjs/);
-  assert.match(source, /fresh full runtime exit status for current source set: 0/);
-  assert.match(source, /current runtime test files: 528/);
-  assert.match(source, /current source top-level test declarations counted: 4671/);
-  assert.match(source, /current full runtime proof for generated 4671 declaration set: GO/);
+  assert.match(source, /latest broad runtime audit command: npm run audit:runtime/);
+  assert.match(source, /latest broad runtime audit result: 4719 tests, 4491 pass, 228 fail/);
+  assert.match(source, /current runtime test files: 534/);
+  assert.match(source, /current source top-level test declarations counted: 4719/);
+  assert.match(source, /current broad runtime proof for generated 4719 declaration set: NO-GO/);
   assert.match(source, /full codebase audit completion from full runtime proof: NO-GO/);
   assert.match(source, /first optimization implementation approval from full runtime proof: NO-GO/);
   assert.match(source, /JSON-first first-class promotion from full runtime proof: NO-GO/);
   assert.match(source, /whitelist\/cache optimization from full runtime proof: NO-GO/);
   assert.match(source, /release\/public-claim use from full runtime proof: NO-GO/);
   assert.match(source, /runtime behavior changed by this continuation: no/);
-  assert.match(source, /Full runtime dot rerun exits 0/);
-  assert.match(source, /Executable current-behavior freshness: GO/);
+  assert.match(source, /Runtime backlog remains open/);
+  assert.match(source, /Executable broad-audit freshness: NO-GO/);
   assert.match(selectorAuthorityDoc, /Selector Convergence Boundary - 2026-05-30/);
   assert.match(selectorAuthorityDoc, /selector convergence rows: 10/);
   assert.match(selectorAuthorityDoc, /implementation-ready selector convergence rows: 0/);
@@ -2419,13 +2419,13 @@ function assertRuntimeCountReconciliationAddendum(source) {
 
   assert.match(source, /Runtime Count Reconciliation Authority Addendum - 2026-05-27/);
   assert.match(source, /old metric contract rows that still say `4457`/);
-  assert.match(source, /runtime test index moved to\s+`4671` source top-level declarations/);
+  assert.match(source, /runtime test index moved to\s+`4719` source top-level declarations/);
   assert.match(source, /count-reconciled optimization readiness: NO-GO/);
   assert.match(source, /count-reconciliation proof slices: 3/);
   assert.match(source, /legacy metric contract expected tests: 4457/);
-  assert.match(source, /current generated runtime test declarations: 4671/);
-  assert.match(source, /latest full runtime pass count observed: 4663/);
-  assert.match(source, /latest full runtime pass freshness: 2026-05-30 full runtime rerun covers 4663 generated declarations before 4 later audit-only content-filter declarations/);
+  assert.match(source, /current generated runtime test declarations: 4719/);
+  assert.match(source, /latest historical full runtime pass count observed: 4663/);
+  assert.match(source, /latest historical full runtime pass freshness: 2026-05-30 full runtime rerun covers 4663 generated declarations before later audit-only declarations expanded the source count/);
   assert.match(source, /first-optimization count reconciliation status: BLOCKED/);
   assert.match(source, /full codebase audit completion from count reconciliation: NO-GO/);
   assert.match(source, /runtime behavior changed by this addendum: no/);
@@ -2440,7 +2440,7 @@ function assertRuntimeCountReconciliationAddendum(source) {
   assert.ok(source.includes(releaseRegressionPath));
   assert.ok(source.includes('| Legacy first-optimization metric contract rows |'));
   assert.ok(source.includes('| Generated runtime test provenance |'));
-  assert.ok(source.includes('| Latest full runtime evidence |'));
+  assert.ok(source.includes('| Latest historical full runtime evidence |'));
   assert.ok(source.includes('| Completion decision |'));
   assert.match(source, /No first-optimization, JSON-first promotion, whitelist optimization, or broad audit completion approval/);
   assert.match(source, /flowchart TD/);
@@ -2448,9 +2448,10 @@ function assertRuntimeCountReconciliationAddendum(source) {
 
   assert.match(metricGate, /Runtime Count Reconciliation Addendum - 2026-05-27/);
   assert.match(metricGate, /legacy metric contract expected tests: 4457/);
-  assert.match(metricGate, /current generated runtime test declarations: 4671/);
-  assert.match(metricGate, /latest full runtime pass count observed: 4663/);
-  assert.match(metricGate, /latest full runtime pass freshness: 2026-05-30 full runtime rerun covers 4663 generated declarations before 4 later audit-only content-filter declarations/);
+  assert.match(metricGate, /current generated runtime test declarations: 4719/);
+  assert.match(metricGate, /latest historical full runtime pass count observed: 4663/);
+  assert.match(metricGate, /current broad runtime audit snapshot: 4719 tests, 4491 pass, 228 fail/);
+  assert.match(metricGate, /current broad runtime proof for generated 4719 declaration set: NO-GO/);
   assert.match(metricGate, /count reconciliation status for metric foundation: BLOCKED/);
   assert.match(source, /metric foundation inline draft coverage gate/);
   assert.match(source, /combined metric-foundation\s+inline artifact chain and coverage gate verifier is `61\/61` pass/);
@@ -2476,11 +2477,11 @@ function assertRuntimeCountReconciliationAddendum(source) {
   assert.match(metricGate, /accept coverage closure as JSON-first runtime behavior approval now: NO-GO/);
   assert.match(metricGate, /accept coverage closure as whitelist optimization approval now: NO-GO/);
   assert.match(metricGate, /accept coverage closure as release\/public-claim approval now: NO-GO/);
-  assert.match(runtimeTestIndex, /source top-level test declarations counted: 4671/);
+  assert.match(runtimeTestIndex, /source top-level test declarations counted: 4719/);
   assert.match(releaseRegression, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs/);
   assert.match(releaseRegression, /stored TAP output: \/private\/tmp\/filtertube-runtime-full-after-lifecycle-convergence\.tap/);
   assert.match(releaseRegression, /full runtime proof result: 4663\/4663 pass, 0 fail, 83\.213s/);
-  assert.equal(sourceStats.declarations, 4671);
+  assert.equal(sourceStats.declarations, 4719);
 
   assert.match(source, /Runtime Count Drift Census Addendum - 2026-05-27/);
   assert.match(source, /census exclusions: this gap register and its verifier/);
@@ -2501,12 +2502,13 @@ function assertRuntimeCountReconciliationAddendum(source) {
   assert.match(source, /Keep optimization, JSON-first promotion, whitelist changes, and broad audit completion blocked/);
   assert.match(runtimeResults, /Historical 2026-05-17 ledger snapshot:/);
   assert.match(runtimeResults, /historical snapshot count above: 4457/);
-  assert.match(runtimeResults, /current generated source top-level declarations: 4671/);
-  assert.match(runtimeResults, /latest full runtime pass evidence: current 4663\/4663 pass, 0 fail, 83\.213s/);
+  assert.match(runtimeResults, /current generated source top-level declarations: 4719/);
+  assert.match(runtimeResults, /latest historical full runtime pass evidence: current 4663\/4663 pass, 0 fail, 83\.213s/);
+  assert.match(runtimeResults, /current broad runtime proof: 4719 tests, 4491 pass, 228 fail/);
   assert.match(runtimeResults, /stored TAP output: \/private\/tmp\/filtertube-runtime-full-after-lifecycle-convergence\.tap/);
   assert.match(runtimeResults, /runtime-results ledger completion authority: NO-GO/);
 
-  assert.equal(driftStats.scannedFiles, 1075);
+  assert.equal(driftStats.scannedFiles, 1087);
   assert.equal(driftStats.legacy.occurrences, 1230);
   assert.equal(driftStats.legacy.fileCount, 167);
   assert.equal(driftStats.current.occurrences, 11);
@@ -3747,7 +3749,7 @@ function assertWhitelistCacheSpaMetricPacketContinuation(source) {
   assert.match(packet, /runtime JSON-first first-class promotion approvals: 0/);
   assert.match(packet, /release readiness from this gate: NO-GO/);
   assert.match(packet, /non-executed live smoke artifact template/);
-  assert.match(packet, /that is contract\/tooling, not execution proof/);
+  assert.match(packet, /that is contract\/tooling, not execution\s+proof/);
   assert.match(packet, /commit route\/surface metric artifact files now: NO-GO/);
   assert.match(packet, /approve broad whitelist\/cache optimization now: NO-GO/);
   assert.match(packet, /approve JSON-first as first-class filter authority now: NO-GO/);
@@ -4042,8 +4044,9 @@ test('audit_completion_gap_register_is_audit_only_and_keeps_goal_open', () => {
   assert.match(source, /Runtime behavior is unchanged/);
   assert.match(source, /Completion is not proven/);
   assert.match(source, /active audit goal remains open/);
-  assert.match(source, /green\s+`npm run audit:runtime` result proves that current-behavior claims are pinned/);
-  assert.match(source, /does not prove that every feature, file, method, JSON path, DOM selector/);
+  assert.match(source, /current broad\s+`npm run audit:runtime` result is a backlog signal for the expanded runtime\s+declaration set/);
+  assert.match(source, /focused lanes prove scoped current-behavior claims only/);
+  assert.match(source, /do not prove that every feature, file, method, JSON path, DOM selector/);
   assertRuntimeCountReconciliationAddendum(source);
   assertSettingsModeStopGoContinuation(source);
   assertFirstOptimizationArtifactCommitBlockerClosure(source);
@@ -4342,33 +4345,31 @@ test('audit_completion_gap_register_lists_required_evidence_classes', () => {
     assert.match(text, /Browser Runtime-Test Exact Row Backfill/);
     assert.match(text, /Remaining Tail Runtime-Test Exact Row Backfill/);
     assert.match(text, /top-level `tests\/runtime\/\*\.test\.mjs` files/);
-    assert.match(text, /528/);
-    assert.match(text, /528 exact backticked test-path/);
+    assert.match(text, /534/);
+    assert.match(text, /534 exact backticked test-path/);
     assert.match(text, /0 top-level runtime test files without exact backticked entries/);
-    assert.match(text, /generated per-test provenance rows: 528/);
-    assert.match(text, /source top-level test declarations counted by generated index: 4671/);
+    assert.match(text, /generated per-test provenance rows: 534/);
+    assert.match(text, /source top-level test declarations counted by generated index: 4719/);
     assert.match(text, /complete semantic\s+coverage evidence/);
   }
   assert.match(runtimeTestIndex, /Status: audit-only generated current-behavior index/);
-  assert.match(runtimeTestIndex, /top-level runtime test files: 528/);
-  assert.match(runtimeTestIndex, /indexed runtime test rows: 528/);
-  assert.match(runtimeTestIndex, /source top-level test declarations counted: 4671/);
-  assert.match(runtimeTestIndex, /Full Runtime Freshness Boundary - 2026-05-30/);
-  assert.match(runtimeTestIndex, /initial full runtime rerun result: 4665\/4667 pass, 2 fail/);
-  assert.match(runtimeTestIndex, /focused drift repair proof: 10\/10 pass/);
-  assert.match(runtimeTestIndex, /fresh full runtime command: node --test --test-reporter=dot tests\/runtime\/\*\.test\.mjs/);
-  assert.match(runtimeTestIndex, /fresh full runtime exit status for 4671 declaration set: 0/);
-  assert.match(runtimeTestIndex, /current full runtime proof for generated 4671 declaration set: GO/);
-  assert.match(runtimeTestIndex, /runtime results exact backticked test-path rows: 528/);
+  assert.match(runtimeTestIndex, /top-level runtime test files: 534/);
+  assert.match(runtimeTestIndex, /indexed runtime test rows: 534/);
+  assert.match(runtimeTestIndex, /source top-level test declarations counted: 4719/);
+  assert.match(runtimeTestIndex, /Full Runtime Freshness Boundary - 2026-06-01/);
+  assert.match(runtimeTestIndex, /latest broad runtime audit command: npm run audit:runtime/);
+  assert.match(runtimeTestIndex, /latest broad runtime audit tests: 4719/);
+  assert.match(runtimeTestIndex, /latest broad runtime audit pass: 4491/);
+  assert.match(runtimeTestIndex, /latest broad runtime audit fail: 228/);
+  assert.match(runtimeTestIndex, /fresh full runtime exit status for 4719 declaration set: nonzero/);
+  assert.match(runtimeTestIndex, /current full runtime proof for generated 4719 declaration set: NO-GO/);
+  assert.match(runtimeTestIndex, /runtime results exact backticked test-path rows: 534/);
   assert.match(runtimeTestIndex, /runtime results missing exact backticked test-path rows: 0/);
   assert.match(runtimeTestIndex, /This is file-level provenance proof only/);
-  assert.match(runtimeTestIndex, /Missing Runtime Results Row Priority Snapshot/);
-  assert.match(runtimeTestIndex, /Leading runtime-test filename token/);
-  assert.match(runtimeTestIndex, /\| None remaining \| 0 \|/);
-  assert.match(runtimeTestIndex, /JSON-first filtering, whitelist optimization/);
-  for (const [token, count] of missingLeadTokenStats.top) {
-    assert.match(runtimeTestIndex, new RegExp(`\\| \`${token}\` \\| ${count} \\|`));
-  }
+  assert.match(runtimeTestIndex, /This snapshot closes the file-level runtime-test provenance gap/);
+  assert.equal(missingLeadTokenStats.groupCount, 0);
+  assert.equal(missingLeadTokenStats.top.length, 0);
+  assert.equal(missingLeadTokenStats.remainder, 0);
   const escapeRegex = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const assertIndexSummary = (title, familyStats) => {
     assert.match(runtimeTestIndex, new RegExp(escapeRegex(title)));
@@ -4379,20 +4380,6 @@ test('audit_completion_gap_register_lists_required_evidence_classes', () => {
   };
 
   for (const [title, familyStats] of [
-    ['JSON Runtime-Test Family Snapshot', jsonFamilyStats],
-    ['Content Runtime-Test Family Snapshot', contentFamilyStats],
-    ['Background Runtime-Test Family Snapshot', backgroundFamilyStats],
-    ['Website Runtime-Test Family Snapshot', websiteFamilyStats],
-    ['Seed Runtime-Test Family Snapshot', seedFamilyStats],
-    ['DOM Runtime-Test Family Snapshot', domFamilyStats],
-    ['Filter Runtime-Test Family Snapshot', filterFamilyStats],
-    ['Identity Runtime-Test Family Snapshot', identityFamilyStats],
-    ['Settings Runtime-Test Family Snapshot', settingsFamilyStats],
-    ['Bridge Runtime-Test Family Snapshot', bridgeFamilyStats],
-    ['Extension Runtime-Test Family Snapshot', extensionFamilyStats],
-    ['Learned Identity Runtime-Test Family Snapshot', learnedFamilyStats],
-    ['Nanah Runtime-Test Family Snapshot', nanahFamilyStats],
-    ['Native Runtime-Test Family Snapshot', nativeFamilyStats],
     ['Quick Block Runtime-Test Family Snapshot', quickFamilyStats],
     ['Source Runtime-Test Family Snapshot', sourceFamilyStats],
     ['State Manager Runtime-Test Family Snapshot', stateFamilyStats],

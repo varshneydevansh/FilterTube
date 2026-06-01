@@ -124,8 +124,9 @@ function assertMay30FreshnessAndLiveProfileBlocker(doc) {
 
   assert.match(doc, /Current Freshness And Live-Profile Blocker Addendum - 2026-05-30/);
   assert.match(doc, /latest historical 4663 full runtime proof: 4663\/4663 pass, 0 fail, 83\.213s/);
-  assert.match(doc, /current generated runtime-test declaration count: 4671/);
-  assert.match(doc, /current full runtime proof for generated 4671 declaration set after audit-drift repair: GO/);
+  assert.match(doc, /current generated runtime-test declaration count: 4719/);
+  assert.match(doc, /current broad runtime proof for generated 4719 declaration set: NO-GO/);
+  assert.match(doc, /current broad runtime audit snapshot: 4719 tests, 4491 pass, 228 fail/);
   assert.match(doc, /affected callable packet rows: 12/);
   assert.match(doc, /affected source files covered: 8/);
   assert.match(doc, /transport no-work source evidence rows: 8/);
@@ -139,8 +140,8 @@ function assertMay30FreshnessAndLiveProfileBlocker(doc) {
   assert.match(doc, /runtime behavior changed by this addendum: no/);
   assert.match(doc, /normal installed Chrome profile and visible YouTube tab/);
   assert.match(doc, /installed-byte parity and route\/mode behavior\s+samples recorded beside the counters/);
-  assert.match(doc, /current source\/runtime proof\s+-> latest recorded 4663\/4663 runtime suite proof\s+-> current 4671 generated declaration drift\s+-> affected whitelist\/cache callable packet\s+-> live installed-profile evidence blocker/s);
-  assert.match(doc, /flowchart TD\s+A\["Latest recorded 4663 runtime proof"\] --> B\["Current 4671 generated declaration drift"\]/);
+  assert.match(doc, /current source\/runtime proof\s+-> latest recorded 4663\/4663 runtime suite proof\s+-> current 4719 generated declaration set\s+-> broad runtime backlog boundary\s+-> affected whitelist\/cache callable packet\s+-> live installed-profile evidence blocker/s);
+  assert.match(doc, /flowchart TD\s+A\["Latest recorded 4663 runtime proof"\] --> B\["Current 4719 generated declaration set"\]/);
   assert.match(doc, /Treating the green runtime suite as a performance metric artifact/);
   assert.match(doc, /Treating source-only affected-callable anchors as live SPA evidence/);
   assert.match(doc, /Treating a scratch\/private Chrome profile or connected-tab inventory as\s+proof/);
