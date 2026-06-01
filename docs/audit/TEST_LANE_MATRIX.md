@@ -22,8 +22,9 @@ FilterTube change
 
 ## Lane Commands
 
-The lane definitions live in `scripts/run-test-lane.mjs`; package scripts call
-that runner so npm commands and lane contents share one source of truth.
+The lane definitions live in `scripts/test-lane-config.mjs`; package scripts
+call `scripts/run-test-lane.mjs` so npm commands and lane contents share one
+source of truth while execution stays separate from the declarative matrix.
 
 | Lane | Command | Primary purpose |
 |---|---|---|
@@ -48,7 +49,7 @@ goal requirements as follows:
 | Keep audit proof files inside `docs/audit/` | Audit docs and handoff artifacts live under `docs/audit/`; product/core docs are not used as the audit workspace. |
 | Turn confirmed risks into focused fixtures/tests | Each lane points to focused `tests/runtime/*current-behavior.test.mjs` fixtures for the matching risk family. |
 | Create `docs/audit/TEST_LANE_MATRIX.md` | This file is the human-readable matrix; `tests/runtime/test-lane-matrix-current-behavior.test.mjs` pins it. |
-| Define required lanes by touched area | `scripts/run-test-lane.mjs` is the executable classifier; `npm run lanes:changed` and `npm run test:changed` use it. |
+| Define required lanes by touched area | `scripts/test-lane-config.mjs` owns the declarative mapping; `scripts/run-test-lane.mjs` is the executable classifier; `npm run lanes:changed` and `npm run test:changed` use it. |
 | Preserve blocklist, whitelist, keyword/channel blocking, Shorts, end screens, quick-block, 3-dot menus, JSON-first, DOM fallback, no-rule performance, SPA navigation, settings, and release packaging | The lane table, manual-smoke handoff, and file-to-lane matrix name each surface and bind it to focused tests or live-smoke rows. The whitelist lane explicitly owns end-screen videowall, card, autoplay, and player DOM boundary tests so allow-mode changes cannot skip issue-57-style proof. |
 | Commit only with passing lane | The change flow requires lane execution before commit; `npm run test:changed` is the default proof command for a dirty logical change. |
 
@@ -262,7 +263,8 @@ artifact with missing byte parity remain `NO-GO`.
 | fixture names containing `kids`, `shorts`, `watch`, `upnext`, `endscreen`, `autoplay`, `playlist`, or `ytm` | `test:whitelist` | Covers allow-mode fixtures for Kids, Shorts, watch, right-rail/up-next, end-screen, autoplay, playlist, and YouTube Music surfaces. |
 | other YouTube surface fixtures under `tests/runtime/fixtures/` | `test:smoke` | Fixture changes must state which behavior changed and whether old behavior remains intentional; add a focused classifier row when a fixture belongs to a runtime lane not covered above. |
 
-The executable mapping in `scripts/run-test-lane.mjs` is the source of truth.
+The executable mapping in `scripts/test-lane-config.mjs` and
+`scripts/run-test-lane.mjs` is the source of truth.
 This table is the human-readable review copy.
 
 ## Done Criteria

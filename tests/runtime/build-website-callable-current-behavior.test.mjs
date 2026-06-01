@@ -16,6 +16,7 @@ const accountedFiles = [
   'scripts/build-nanah-vendor.mjs',
   'scripts/run-test-lane.mjs',
   'scripts/sync-native-runtime.mjs',
+  'scripts/test-lane-config.mjs',
   'website/app/[slug]/page.js',
   'website/app/downloads/page.js',
   'website/app/layout.js',
@@ -49,6 +50,7 @@ const expectedCounts = new Map([
   ['scripts/build-nanah-vendor.mjs', 4],
   ['scripts/run-test-lane.mjs', 18],
   ['scripts/sync-native-runtime.mjs', 0],
+  ['scripts/test-lane-config.mjs', 0],
   ['website/app/[slug]/page.js', 3],
   ['website/app/downloads/page.js', 3],
   ['website/app/layout.js', 1],
@@ -200,8 +202,8 @@ test('build/website callable counts match the current lexical source surface', (
   }
 
   assert.equal(total, 137);
-  assert.match(auditDoc, /\| Build and sync scripts \| 6 \| 64 \|/);
-  assert.match(auditDoc, /\| Total \| 30 \| 137 \|/);
+  assert.match(auditDoc, /\| Build and sync scripts \| 7 \| 64 \|/);
+  assert.match(auditDoc, /\| Total \| 31 \| 137 \|/);
 
   const build = read('build.js');
   const buildRows = buildMethodRows();

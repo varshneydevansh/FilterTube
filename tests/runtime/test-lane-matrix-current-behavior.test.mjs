@@ -73,6 +73,8 @@ test('test lane matrix defines every required lane and npm script', () => {
   const pkg = readJson('package.json');
   const matrix = read(matrixPath);
   const driftScript = read('scripts/audit-proof-drift.mjs');
+  const runner = read('scripts/run-test-lane.mjs');
+  const config = read('scripts/test-lane-config.mjs');
   const resumedGoalTerms = [
     'FilterTube Change-Safety Audit and Test Lanes',
     'Keep audit proof files inside `docs/audit/`',
@@ -97,10 +99,15 @@ test('test lane matrix defines every required lane and npm script', () => {
   assert.equal(pkg.scripts['lanes:changed'], 'node scripts/run-test-lane.mjs --changed');
   assert.equal(pkg.scripts['test:changed'], 'node scripts/run-test-lane.mjs --run-changed');
   assert.equal(pkg.scripts['audit:runtime'], 'node --test tests/runtime/*.test.mjs');
+  assert.match(runner, /from '\.\/test-lane-config\.mjs'/);
+  assert.match(config, /export const LANES = Object\.freeze/);
+  assert.match(config, /export const FILE_LANE_RULES = Object\.freeze/);
   assert.match(matrix, /npm run test:audit-drift/);
   assert.match(matrix, /npm run lanes:changed/);
   assert.match(matrix, /npm run test:changed/);
   assert.match(matrix, /npm run audit:runtime/);
+  assert.match(matrix, /scripts\/test-lane-config\.mjs/);
+  assert.match(matrix, /execution stays separate from the declarative matrix/);
   assert.match(matrix, /Manual YouTube Smoke Handoff/);
   assert.match(matrix, /docs\/audit\/FILTERTUBE_RELEASE_LIVE_YOUTUBE_SPA_SMOKE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-25\.md/);
   assert.match(matrix, /docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/template\.json/);
@@ -328,8 +335,11 @@ test('executable classifier covers every tracked repository file', () => {
 
 test('changed-lane runner is wired to the classifier and sequential lane execution', () => {
   const runner = read('scripts/run-test-lane.mjs');
+  const config = read('scripts/test-lane-config.mjs');
   const matrix = read(matrixPath);
 
+  assert.match(config, /id: 'lane-workflow-surface'/);
+  assert.match(config, /run-test-lane\|test-lane-config\|audit-proof-drift/);
   assert.match(runner, /gitLineReader\(\['diff', '--name-only', 'HEAD', '--'\]\)/);
   assert.match(runner, /gitLineReader\(\['ls-files', '--others', '--exclude-standard'\]\)/);
   assert.doesNotMatch(runner, /--diff-filter=ACMRTUXB/);
