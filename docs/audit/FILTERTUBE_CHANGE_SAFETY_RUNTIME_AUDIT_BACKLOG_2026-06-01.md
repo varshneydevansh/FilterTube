@@ -13,18 +13,24 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4694
-fail: 43
-duration_ms: 65026.712375
+pass: 4695
+fail: 42
+duration_ms: 37164.02625
 ```
 
-This refresh reduces the pinned broad-suite failure count from 44 failures to
-43 failures after retiring the stale JSON-first video-meta content parity source
-pin row: the content parity proof test now expects the current
+This refresh reduces the pinned broad-suite failure count from 43 failures to
+42 failures after retiring the stale JSON-first video-meta fetch policy source
+pin row: the fetch policy proof test now expects the current
 `js/filter_logic.js` line count, byte count, and hash already recorded in the
-audit doc while content decision fixture behavior remains unchanged and
-first-class video-meta content parity authority remains absent. The previous
-refresh reduced the suite from 45 failures to 44 failures after retiring the
+audit doc while fetch scheduling and watch-metadata fixture behavior remains
+unchanged and first-class video-meta fetch policy authority remains absent. The
+previous refresh reduced the suite from 44 failures to 43 failures after
+retiring the stale JSON-first video-meta content parity source pin row: the
+content parity proof test now expects the current `js/filter_logic.js` line
+count, byte count, and hash already recorded in the audit doc while content
+decision fixture behavior remains unchanged and first-class video-meta content
+parity authority remains absent. The previous refresh reduced the suite from 45
+failures to 44 failures after retiring the
 stale JSON-first video-meta category parity source pin row: the category parity
 proof test now expects the current `js/filter_logic.js` line count, byte count,
 and hash already recorded in the audit doc while category decision fixture
@@ -133,15 +139,15 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 32 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-video-meta-content-parity-refresh.tap` gives this
+Current failing subtests are spread across 31 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-video-meta-fetch-policy-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
 | generated/release/package/docs surfaces | 34 |
 | source-locus/optimization/index contracts | 4 |
-| JSON/video-meta/path/reference | 11 |
+| JSON/video-meta/path/reference | 10 |
 | website/public-doc/source inventory | 14 |
 | settings/content-control/DOM lifecycle | 8 |
 | native/Nanah/Kids/YTM | 8 |
@@ -225,6 +231,11 @@ parity proof test now matches the current `js/filter_logic.js` fingerprint
 already present in the audit doc while content decision fixture behavior remains
 unchanged and first-class video-meta content parity authority remains explicitly
 absent.
+The previous JSON-first video-meta fetch policy row is retired: the fetch policy
+proof test now matches the current `js/filter_logic.js` fingerprint already
+present in the audit doc while fetch scheduling and watch-metadata fixture
+behavior remains unchanged and first-class video-meta fetch policy authority
+remains explicitly absent.
 The previous JSON-first metric artifact gate rows are retired: the metric proof
 now pins current performance-claim and no-work crosswalk hashes plus the current
 `js/filter_logic.js` `processData()` anchor while metric artifact authority

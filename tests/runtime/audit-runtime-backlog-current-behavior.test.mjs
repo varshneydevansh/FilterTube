@@ -20,42 +20,47 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
   assert.match(doc, /tests: 4737/);
-  assert.match(doc, /pass: 4694/);
-  assert.match(doc, /fail: 43/);
-  assert.match(doc, /duration_ms: 65026\.712375/);
-  assert.match(doc, /44 failures\s+to\s+43\s+failures/);
+  assert.match(doc, /pass: 4695/);
+  assert.match(doc, /fail: 42/);
+  assert.match(doc, /duration_ms: 37164\.02625/);
+  assert.match(doc, /43\s+failures\s+to\s+42\s+failures/);
+  assert.match(doc, /JSON-first video-meta fetch policy source\s+pin row/);
+  assert.match(doc, /fetch policy proof test now expects the current\s+`js\/filter_logic\.js` line count, byte count, and hash/);
+  assert.match(doc, /fetch scheduling and watch-metadata fixture behavior remains\s+unchanged/);
+  assert.match(doc, /first-class video-meta fetch policy authority remains absent/);
+  assert.match(doc, /44\s+failures\s+to\s+43\s+failures/);
   assert.match(doc, /JSON-first video-meta content parity source\s+pin row/);
-  assert.match(doc, /content parity proof test now expects the current\s+`js\/filter_logic\.js` line count, byte count, and hash/);
-  assert.match(doc, /content decision fixture behavior remains unchanged/);
-  assert.match(doc, /first-class video-meta content parity authority remains absent/);
-  assert.match(doc, /45 failures\s+to\s+44\s+failures/);
+  assert.match(doc, /content parity proof test now expects the current\s+`js\/filter_logic\.js` line\s+count, byte count, and hash/);
+  assert.match(doc, /content\s+decision fixture behavior remains unchanged/);
+  assert.match(doc, /first-class video-meta content\s+parity authority remains absent/);
+  assert.match(doc, /45\s+failures\s+to\s+44\s+failures/);
   assert.match(doc, /JSON-first video-meta category parity\s+source pin row/);
   assert.match(doc, /category parity\s+proof test now expects the current `js\/filter_logic\.js` line count, byte count,\s+and hash/);
   assert.match(doc, /category decision fixture\s+behavior remains unchanged/);
   assert.match(doc, /first-class video-meta category parity authority\s+remains absent/);
-  assert.match(doc, /46 failures\s+to\s+45\s+failures/);
+  assert.match(doc, /46\s+failures\s+to\s+45\s+failures/);
   assert.match(doc, /JSON-first uppercase title boundary source\s+pin row/);
   assert.match(doc, /current\s+`js\/filter_logic\.js` line count, byte count, and hash/);
   assert.match(doc, /runtime uppercase-title fixture\s+behavior remains unchanged/);
   assert.match(doc, /first-class uppercase-title authority remains\s+absent/);
-  assert.match(doc, /47 failures\s+to\s+46\s+failures/);
+  assert.match(doc, /47\s+failures\s+to\s+46\s+failures/);
   assert.match(doc, /JSON-first route\/surface metric artifact\s+contract coverage ledger row/);
   assert.match(doc, /objective coverage ledger now matches the\s+active-goal and tracked-file ledgers at\s+69 method semantic proof gap files covered/);
   assert.match(doc, /route\/surface metric artifacts,\s+runtime metric collectors,\s+JSON-first implementation, and whitelist optimization\s+remain NO-GO/);
-  assert.match(doc, /49 failures\s+to\s+47\s+failures/);
+  assert.match(doc, /49\s+failures\s+to\s+47\s+failures/);
   assert.match(doc, /JSON-first reference doc surface rows/);
   assert.match(doc, /current `docs\/youtube_renderer_inventory\.md`\s+newline count, byte count, hash,\s+inline-code count, and dot-index count/);
   assert.match(doc, /reference docs remain evidence maps,\s+not runtime authority/);
-  assert.match(doc, /51 failures\s+to\s+49\s+failures/);
+  assert.match(doc, /51\s+failures\s+to\s+49\s+failures/);
   assert.match(doc, /JSON-first metric artifact gate rows/);
   assert.match(doc, /current\s+performance-claim and no-work crosswalk\s+doc hashes/);
   assert.match(doc, /current\s+`js\/filter_logic\.js` `processData\(\)` source line/);
   assert.match(doc, /metric artifact authority\s+remains absent/);
-  assert.match(doc, /52 failures\s+to\s+51\s+failures/);
+  assert.match(doc, /52\s+failures\s+to\s+51\s+failures/);
   assert.match(doc, /implementation\s+readiness gate lifecycle\s+count\s+row/);
   assert.match(doc, /current\s+524 tracked lifecycle\s+primitive instances, 469 install-or-schedule rows,\s+and 55 explicit teardown rows/);
   assert.match(doc, /runtime cleanup and optimization approval\s+remains at NO-GO/);
-  assert.match(doc, /55 failures\s+to\s+52\s+failures/);
+  assert.match(doc, /55\s+failures\s+to\s+52\s+failures/);
   assert.match(doc, /generated local output dependency surface\s+rows/);
   assert.match(doc, /current ignored `dist` v3\.3\.2 package output/);
   assert.match(doc, /current `website\/\.next` local build fingerprints/);
@@ -64,7 +69,7 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /source-locus teardown anchor row/);
   assert.match(doc, /current `js\/filter_logic\.js` video-channel and\s+video-meta flush timer lines/);
   assert.match(doc, /source-locus teardown approval remains at\s+NO-GO/);
-  assert.match(doc, /57 failures\s+to\s+56\s+failures/);
+  assert.match(doc, /57\s+failures\s+to\s+56\s+failures/);
   assert.match(doc, /source-locus side-effect anchor row/);
   assert.match(doc, /current `js\/filter_logic\.js` map flush/);
   assert.match(doc, /current `build\.js`\s+UI-shell and zip artifact lines/);
@@ -73,30 +78,30 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /source-locus parity\/release\s+verification\s+anchor row/);
   assert.match(doc, /current `build\.js`\s+UI-shell, zip artifact, and mobile artifact collection lines/);
   assert.match(doc, /parity,\s+release, and verification approval remains at\s+NO-GO/);
-  assert.match(doc, /59 failures\s+to\s+58\s+failures/);
+  assert.match(doc, /59\s+failures\s+to\s+58\s+failures/);
   assert.match(doc, /source-locus no-work anchor row/);
   assert.match(doc, /current `js\/filter_logic\.js` harvest/);
   assert.match(doc, /current `build\.js`\s+UI-shell and zip artifact lines/);
   assert.match(doc, /source-locus no-work approval remains at\s+NO-GO/);
-  assert.match(doc, /60 failures\s+to\s+59\s+failures/);
+  assert.match(doc, /60\s+failures\s+to\s+59\s+failures/);
   assert.match(doc, /source-locus fingerprint fixture row/);
   assert.match(doc, /current bytes, lines, and hashes/);
   assert.match(doc, /source-owner approval remains at NO-GO/);
-  assert.match(doc, /61 failures\s+to\s+60\s+failures/);
+  assert.match(doc, /61\s+failures\s+to\s+60\s+failures/);
   assert.match(doc, /source-locus diagnostic\s+privacy anchor row/);
   assert.match(doc, /current diagnostic\s+logging matrix owner-family rows/);
   assert.match(doc, /current `js\/filter_logic\.js` console line\s+anchors/);
   assert.match(doc, /diagnostic privacy approval at NO-GO/);
-  assert.match(doc, /62 failures\s+to\s+61\s+failures/);
+  assert.match(doc, /62\s+failures\s+to\s+61\s+failures/);
   assert.match(doc, /collector verification\s+output approval objective-ledger row/);
   assert.match(doc, /current 69 method semantic proof gap file\s+count/);
   assert.match(doc, /collector\s+verification output approval at NO-GO/);
-  assert.match(doc, /63 failures\s+to\s+62\s+failures/);
+  assert.match(doc, /63\s+failures\s+to\s+62\s+failures/);
   assert.match(doc, /external navigation\s+surface boundary row/);
   assert.match(doc, /website\/components\/site-footer\.js/);
   assert.match(doc, /website\/app\/downloads\/page\.js/);
   assert.match(doc, /selected navigation primitive counts and split\s+extension\/website navigation policy proof remain unchanged/);
-  assert.match(doc, /64 failures\s+to\s+63\s+failures/);
+  assert.match(doc, /64\s+failures\s+to\s+63\s+failures/);
   assert.match(doc, /extension UI CSS page-state boundary\s+row/);
   assert.match(doc, /same-size dashboard loader shell hash/);
   assert.match(doc, /generated shell versus hand-owned UI\s+runtime state split remain\s+unchanged/);
@@ -104,7 +109,7 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /design-token build-configuration boundary row/);
   assert.match(doc, /66\s+failures\s+to\s+65\s+failures/);
   assert.match(doc, /current-dirty worktree\s+package-version row/);
-  assert.match(doc, /67 failures\s+to\s+66\s+failures/);
+  assert.match(doc, /67\s+failures\s+to\s+66\s+failures/);
   assert.match(doc, /content-filter field semantics contract/);
   assert.match(doc, /compiled\/settings\s+field-register row count/);
   assert.match(doc, /69\s+failures\s+to\s+67\s+failures/);
@@ -112,7 +117,7 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /stale\s+`compress-video`\s+package\/build boundary row/);
   assert.match(doc, /76\s+failures\s+to\s+69\s+failures/);
   assert.match(doc, /release-note\/package-version proof/);
-  assert.match(doc, /115 failures\s+to\s+76\s+failures/);
+  assert.match(doc, /115\s+failures\s+to\s+76\s+failures/);
   assert.match(doc, /stale method\s+semantic proof gap counts from 5,673 to 5,681 lexical callables/);
   assert.match(doc, /not clean enough\s+to be used as a release gate/);
   assert.match(doc, /node scripts\/audit-proof-drift\.mjs --all --report-only/);
@@ -201,14 +206,14 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   const expectedRows = [
     ['generated/release/package/docs surfaces', '34'],
     ['source-locus/optimization/index contracts', '4'],
-    ['JSON/video-meta/path/reference', '11'],
+    ['JSON/video-meta/path/reference', '10'],
     ['website/public-doc/source inventory', '14'],
     ['settings/content-control/DOM lifecycle', '8'],
     ['native/Nanah/Kids/YTM', '8']
   ];
 
-  assert.match(doc, /Current failing subtests are spread across 32 runtime test files/);
-  assert.match(doc, /filtertube-runtime-current-after-video-meta-content-parity-refresh\.tap/);
+  assert.match(doc, /Current failing subtests are spread across 31 runtime test files/);
+  assert.match(doc, /filtertube-runtime-current-after-video-meta-fetch-policy-refresh\.tap/);
   assert.match(doc, /non-exclusive family snapshot/);
   assert.match(doc, /previous method-proof\/family blocker row is now retired/);
   assert.match(doc, /direct method semantic proof lane passes with 5,681\s+current lexical callables/);
@@ -269,6 +274,10 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   assert.match(doc, /content\s+parity proof test now matches the current `js\/filter_logic\.js` fingerprint/);
   assert.match(doc, /content decision fixture behavior remains\s+unchanged/);
   assert.match(doc, /first-class video-meta content parity authority remains explicitly\s+absent/);
+  assert.match(doc, /previous JSON-first video-meta fetch policy row is retired/);
+  assert.match(doc, /fetch policy\s+proof test now matches the current `js\/filter_logic\.js` fingerprint/);
+  assert.match(doc, /fetch scheduling and watch-metadata fixture\s+behavior remains unchanged/);
+  assert.match(doc, /first-class video-meta fetch policy authority\s+remains explicitly absent/);
   assert.match(doc, /previous JSON-first metric artifact gate rows are retired/);
   assert.match(doc, /metric proof\s+now pins current performance-claim and no-work crosswalk hashes/);
   assert.match(doc, /current\s+`js\/filter_logic\.js` `processData\(\)` anchor/);
