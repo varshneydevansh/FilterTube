@@ -46,7 +46,7 @@ goal requirements as follows:
 
 | Goal requirement | Current proof owner |
 |---|---|
-| Keep audit proof files inside `docs/audit/` | Audit docs and handoff artifacts live under `docs/audit/`; product/core docs are not used as the audit workspace. |
+| Keep audit proof files inside `docs/audit/` | Audit docs and handoff artifacts live under `docs/audit/`; product/core docs are not used as the audit workspace. `tests/runtime/release-audit-proof-directory-boundary-current-behavior.test.mjs` rejects tracked proof-style Markdown outside `docs/audit/`. |
 | Turn confirmed risks into focused fixtures/tests | Each lane points to focused `tests/runtime/*current-behavior.test.mjs` fixtures for the matching risk family. |
 | Create `docs/audit/TEST_LANE_MATRIX.md` | This file is the human-readable matrix; `tests/runtime/test-lane-matrix-current-behavior.test.mjs` pins it. |
 | Define required lanes by touched area | `scripts/test-lane-config.mjs` owns the declarative mapping; `scripts/run-test-lane.mjs` is the executable classifier; `npm run lanes:changed` and `npm run test:changed` use it. |
@@ -145,7 +145,7 @@ the surface connected to a focused lane.
 | no-rule performance | `test:performance` keeps empty-install, no-work, active-rule, diagnostic logging policy, and route-surface budget tests in lane. |
 | SPA navigation | `test:performance` keeps whitelist-cache SPA metric and route-surface no-work tests in lane; live SPA rows remain in manual smoke. |
 | settings | `test:settings` keeps settings-mode, refresh fanout, compiled-cache, import/export, and state-manager tests in lane. |
-| release packaging | `test:release` keeps package parity, public release surface, live-smoke boundary, and artifact claim tests in lane. |
+| release packaging | `test:release` keeps package parity, public release surface, audit proof directory boundary, live-smoke boundary, and artifact claim tests in lane. |
 
 ## User-Reported Regression Anchors
 
