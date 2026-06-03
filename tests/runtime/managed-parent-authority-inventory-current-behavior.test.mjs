@@ -22,6 +22,7 @@ test('managed parent authority inventory is audit-only and names required curren
   assert.match(doc, /Nanah managed link policy/);
   assert.match(doc, /Main\/Kids viewing-space settings/);
   assert.match(doc, /Time-limit policy/);
+  assert.match(doc, /FILTERTUBE_MANAGED_VIEWING_SPACE_ROUTE_GATE_CONTRACT_2026-06-03\.md/);
 });
 
 test('local parent child edit authority remains source-backed by active-profile and child gates', () => {
@@ -94,9 +95,13 @@ test('viewing-space and time-limit enforcement are explicitly not implemented ye
 
   assert.match(tabView, /allowMainViewing/);
   assert.match(tabView, /allowKidsViewing/);
+  assert.match(doc, /now pins Main\/Kids route-gate decisions and no-work states/);
   assert.match(doc, /Extension-side YouTube runtime does not yet route-gate Main\/Kids access/);
+  assert.match(doc, /Runtime route-gate implementation, denied-route overlay, and open-tab SPA\s+revalidation are still absent/);
   assert.match(doc, /No extension runtime time-limit UI, budget counter, overlay, or route gate\s+exists/);
   assert.match(doc, /FILTERTUBE_MANAGED_CHILD_TIME_LIMIT_SCHEMA_CONTRACT_2026-06-03\.md/);
   assert.match(doc, /No runtime time-limit profile store\/compiler/);
   assert.doesNotMatch(runtime, /timeLimits/);
+  assert.doesNotMatch(runtime, /managedViewingRouteGate/);
+  assert.doesNotMatch(runtime, /showManagedViewingBlockedOverlay/);
 });

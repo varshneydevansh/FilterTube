@@ -405,9 +405,12 @@ YouTube budgets, then document app parity.
 ### Task 5.2: Add Main/Kids route-gate fixtures
 
 - **Location**:
-  `tests/runtime/managed-viewing-space-route-gate-current-behavior.test.mjs`
+  - `docs/audit/FILTERTUBE_MANAGED_VIEWING_SPACE_ROUTE_GATE_CONTRACT_2026-06-03.md`
+  - `tests/runtime/managed-viewing-space-route-gate-current-behavior.test.mjs`
 - **Description**: Pin allowed and denied behavior for `youtube.com` and
   `youtubekids.com` per profile policy.
+- **Status**: Contract/proof fixture added. Runtime route blocking and visible
+  denial UI remain pending.
 - **Complexity**: 5/10
 - **Dependencies**: Sprint 1.
 - **Acceptance Criteria**:
