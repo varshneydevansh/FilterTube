@@ -1,0 +1,152 @@
+# Contract: Managed Child Time-Limit Schema
+
+**Generated**: 2026-06-03
+**Status**: Contract/proof fixture only. Runtime behavior is unchanged.
+**Goal slice**: Implementation order item 6, "Add local child/protected-profile
+time-limit UI and schema".
+**Primary inputs**:
+`docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`,
+`docs/audit/FILTERTUBE_MANAGED_POLICY_SCHEMA_REVISION_CONTRACT_2026-06-03.md`,
+and
+`docs/audit/FILTERTUBE_MANAGED_CHILD_LOCAL_AUTHORITY_CONTRACT_2026-06-03.md`.
+
+## Purpose
+
+This contract defines the first protected-profile YouTube time-limit policy
+shape before background counters, route gates, or timeout overlays are added.
+The schema must work for same-device parent edits, Nanah P2P updates,
+local-network managed updates, and downstream mobile/tablet app parity.
+
+The policy is profile-owned. It is not granted by a child/protected-user PIN,
+LAN discovery, open YouTube tab state, or action-history row.
+
+## Required Policy Shape
+
+Every future protected-profile time-limit policy should be stored with this
+minimum shape:
+
+| Field | Meaning | Required behavior |
+| --- | --- | --- |
+| `schema` | Time-limit schema marker. | Must be `filtertube_managed_time_limit`. |
+| `version` | Schema version. | Starts at `1`; migrations must be explicit. |
+| `enabled` | Whether runtime enforcement is active. | `false` means no budget gate and no content-side overlay. |
+| `timezone` | Parent-selected IANA-style reset timezone. | Required when enabled; device timezone drift cannot weaken policy. |
+| `dailyBudgetSeconds` | Whole-profile daily YouTube budget. | Integer `>= 0`; zero is valid and means immediate timeout when enabled. |
+| `surfaceBudgets` | Optional per-space limits. | `main` and `kids` must be integers `>= 0` when present. |
+| `countingMode` | How time is counted. | First mode is `active_youtube_tab`. |
+| `activeDeviceBudgetPolicy` | Multi-tab/device counting rule. | First extension mode is `single_active_tab_no_double_count`. |
+| `resetPolicy` | Day-boundary behavior. | First mode is `policy_timezone_midnight`. |
+| `graceSeconds` | Parent-approved grace after budget exhaustion. | Integer `>= 0`; default `0`. |
+| `parentGrant` | Temporary parent/caregiver extension of time. | Optional; if enabled, requires non-negative extra seconds and expiry. |
+| `policyRevision` | Managed revision for the time-limit scope. | Monotonic per target profile/link/scope. |
+| `policyHash` | Canonical hash of the time-limit payload. | Required for idempotency and equal-revision conflict checks. |
+| `issuedAt` | Parent/caregiver issue timestamp. | Diagnostic; revision still decides authority. |
+| `validFrom` | Earliest accepted policy time. | Optional; future policies must not weaken current runtime until active. |
+| `validUntil` | Optional expiry. | Expired policy cannot grant more access than last valid stricter policy. |
+
+## Counting Decisions
+
+Initial extension behavior should use these decisions:
+
+| Fixture id | Case | Required decision |
+| --- | --- | --- |
+| `valid_two_hour_daily_budget` | Enabled policy, 7200 seconds, Main and Kids allowed. | Budget is enforceable after runtime implementation. |
+| `valid_zero_budget_timeout` | Enabled policy with `dailyBudgetSeconds: 0`. | Immediate timeout when current day has no remaining grant. |
+| `disabled_policy_no_work` | `enabled: false`. | No budget timer, no overlay, no YouTube route work. |
+| `reject_negative_daily_budget` | Negative `dailyBudgetSeconds`. | Reject before policy write. |
+| `reject_negative_surface_budget` | Negative `surfaceBudgets.main` or `.kids`. | Reject before policy write. |
+| `reject_negative_grace_or_grant` | Negative grace or parent grant. | Reject before policy write. |
+| `trusted_reduced_budget_newer_revision` | Parent lowers daily budget in a newer signed policy. | Accept and clamp remaining time immediately. |
+| `stale_reduced_budget_rejected` | Lower budget arrives with stale revision. | Reject as replay/stale; keep current policy. |
+| `equal_revision_different_hash_conflict` | Same revision, different policy hash. | Reject and log conflict. |
+| `single_active_tab_no_double_count` | Multiple YouTube tabs exist but only one is active/focused. | Count one active tab, not all tabs. |
+| `sleep_restart_revalidation_required` | Browser/device sleeps, restarts, or tab state is stale. | Revalidate before granting more time; do not silently reset. |
+| `timezone_drift_revalidation_required` | Device timezone differs from policy timezone. | Use policy timezone for reset boundary and revalidate state. |
+
+## Reset And Resume Rules
+
+Reset authority belongs to the policy timezone, not the device's current
+timezone. Device timezone changes should create a revalidation event, not a
+larger budget.
+
+Sleep and restart handling must be conservative:
+
+- Closed-browser time is not counted as active YouTube time unless persisted
+  active-tab evidence proves a YouTube tab was active.
+- A resumed browser must re-read the current policy revision and consumed
+  counter before granting access.
+- If the parent/caregiver reduced the budget while the child device was
+  offline, the newer accepted policy clamps remaining time on open.
+- If persisted active-tab state is stale or contradictory, fail toward
+  revalidation rather than invisible access.
+
+## Parent Grant Rules
+
+Temporary extra time is allowed only as parent/caregiver authority:
+
+```text
+parentGrant.enabled: true
+parentGrant.extraSeconds: integer >= 0
+parentGrant.expiresAt: timestamp
+parentGrant.reason: optional redacted string
+```
+
+An expired parent grant contributes no time. A grant cannot reduce the
+underlying policy revision requirements and cannot authorize profile, rule, or
+viewing-space edits.
+
+## Authority Flow
+
+ASCII:
+
+```text
+parent/caregiver authority
+  -> managed time-limit policy
+  -> revision/hash/integrity gate
+  -> profile time-limit state
+  -> background budget counter
+  -> route gate and timeout overlay
+```
+
+Mermaid:
+
+```mermaid
+flowchart TD
+  A["Parent/caregiver authority"] --> B["Managed time-limit policy"]
+  B --> C["Revision, hash, and integrity gate"]
+  C --> D["Protected profile time-limit state"]
+  D --> E["Background budget counter"]
+  E --> F["Main/Kids route gate"]
+  E --> G["Timeout overlay"]
+```
+
+## Current Runtime Boundary
+
+Current product runtime source does not yet implement this schema:
+
+```text
+runtime managed time-limit schema store: absent
+runtime managed time-limit policy compiler: absent
+runtime managed active-tab budget counter: absent
+runtime managed timeout overlay: absent
+runtime managed Main/Kids time gate: absent
+runtime behavior changed by this contract: no
+```
+
+Future implementation should keep the enforcement owner in background/runtime
+authority, with content-side UI only showing the gate/overlay state. Settings UI
+may edit the policy only through parent/account authority.
+
+## Verification
+
+Focused test:
+
+```bash
+node --test tests/runtime/managed-child-time-limit-schema-current-behavior.test.mjs
+```
+
+Settings lane:
+
+```bash
+npm run test:settings
+```

@@ -386,9 +386,12 @@ YouTube budgets, then document app parity.
 ### Task 5.1: Add time-limit schema tests
 
 - **Location**:
-  `tests/runtime/managed-child-time-limit-schema-current-behavior.test.mjs`
+  - `docs/audit/FILTERTUBE_MANAGED_CHILD_TIME_LIMIT_SCHEMA_CONTRACT_2026-06-03.md`
+  - `tests/runtime/managed-child-time-limit-schema-current-behavior.test.mjs`
 - **Description**: Define daily budget, timezone/day boundary, grace behavior,
   active-tab counting, reduced budget, and override fields.
+- **Status**: Contract/proof fixture added. Runtime budget counters, route
+  gates, and timeout overlays remain pending.
 - **Complexity**: 6/10
 - **Dependencies**: Sprint 1 for local schema; Sprints 2 and 3 for remote
   managed time-limit updates.

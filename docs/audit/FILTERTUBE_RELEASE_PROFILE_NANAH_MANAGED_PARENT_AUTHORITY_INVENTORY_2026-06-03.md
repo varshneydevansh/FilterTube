@@ -60,6 +60,7 @@ docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md
 | Managed child sync/time-limit plan | `docs/audit/FILTERTUBE_MANAGED_CHILD_SYNC_TIME_LIMIT_PLAN_2026-06-02.md` |
 | Managed policy schema/revision contract | `docs/audit/FILTERTUBE_MANAGED_POLICY_SCHEMA_REVISION_CONTRACT_2026-06-03.md` |
 | Managed child local authority contract | `docs/audit/FILTERTUBE_MANAGED_CHILD_LOCAL_AUTHORITY_CONTRACT_2026-06-03.md` |
+| Managed child time-limit schema contract | `docs/audit/FILTERTUBE_MANAGED_CHILD_TIME_LIMIT_SCHEMA_CONTRACT_2026-06-03.md` |
 | Managed policy action-history model | `docs/audit/FILTERTUBE_MANAGED_POLICY_ACTION_HISTORY_MODEL_2026-06-03.md` |
 
 ## Current Authority Map
@@ -265,8 +266,12 @@ Current gap:
 
 Current behavior:
 
-- No extension runtime time-limit schema, UI, budget counter, overlay, or
-  route gate exists in the product source yet.
+- No extension runtime time-limit UI, budget counter, overlay, or route gate
+  exists in the product source yet.
+- The audit contract
+  `docs/audit/FILTERTUBE_MANAGED_CHILD_TIME_LIMIT_SCHEMA_CONTRACT_2026-06-03.md`
+  now pins the first schema and decision fixtures, without changing runtime
+  behavior.
 
 Authority meaning:
 
@@ -275,9 +280,9 @@ Authority meaning:
 Current gap:
 
 - No active tab counter.
-- No time-limit profile schema.
+- No runtime time-limit profile store/compiler.
 - No fake-clock, sleep/restart, timezone, reduced-budget, or SPA revalidation
-  fixtures.
+  runtime enforcement fixtures.
 
 ## Current Gap Summary
 
@@ -287,7 +292,7 @@ Current gap:
 | No revision store | Stale or replayed updates cannot be rejected as a first-class rule. | Monotonic revision fixtures per parent/source and child target. |
 | No signature/integrity check | Trust is link/session-policy based, not envelope-authenticated. | Signed/authenticated envelope tests. |
 | No Main/Kids route gate | Viewing-space settings can remain advisory in extension runtime. | Main/Kids route matrix fixtures. |
-| No time-limit runtime | Parent cannot yet enforce daily YouTube budgets. | Time-limit schema and active-tab performance fixtures. |
+| No time-limit runtime | Parent cannot yet enforce daily YouTube budgets. | Runtime active-tab counter, route-gate, overlay, fake-clock, and performance fixtures after the schema contract. |
 | Adapter lacks trust context | `applyIncomingEnvelope(...)` applies after caller-side checks. | Upper-layer managed policy apply wrapper before adapter call. |
 | Locked-child bypass has no revision binding | `allow_trusted_updates` can skip unlock for matching managed sessions, but not with policy revision constraints. | Locked child managed-policy fixtures. |
 | No mailbox protocol | Offline later delivery is not specified at runtime. | Ciphertext/replay/ack protocol doc before server work. |
@@ -312,7 +317,8 @@ Before adding parent-managed runtime behavior:
 4. Keep existing `applyScopedPortablePayload(...)` as the low-level profile
    write primitive, but call it only after managed envelope validation.
 5. Add Main/Kids route policy fixtures before route-gating implementation.
-6. Add time-limit schema tests before any background timer or overlay work.
+6. Keep time-limit schema tests passing before any background timer or overlay
+   work, then add runtime counter, route-gate, and overlay fixtures.
 7. Preserve no-policy/no-work behavior for existing YouTube filtering paths.
 8. Keep local-network discovery separate from managed policy authority.
 9. Add action-history fixtures before exposing caregiver-facing history UI.

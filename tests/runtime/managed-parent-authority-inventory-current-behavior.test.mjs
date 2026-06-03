@@ -95,6 +95,8 @@ test('viewing-space and time-limit enforcement are explicitly not implemented ye
   assert.match(tabView, /allowMainViewing/);
   assert.match(tabView, /allowKidsViewing/);
   assert.match(doc, /Extension-side YouTube runtime does not yet route-gate Main\/Kids access/);
-  assert.match(doc, /No extension runtime time-limit schema, UI, budget counter, overlay, or\s+route gate exists/);
+  assert.match(doc, /No extension runtime time-limit UI, budget counter, overlay, or route gate\s+exists/);
+  assert.match(doc, /FILTERTUBE_MANAGED_CHILD_TIME_LIMIT_SCHEMA_CONTRACT_2026-06-03\.md/);
+  assert.match(doc, /No runtime time-limit profile store\/compiler/);
   assert.doesNotMatch(runtime, /timeLimits/);
 });
