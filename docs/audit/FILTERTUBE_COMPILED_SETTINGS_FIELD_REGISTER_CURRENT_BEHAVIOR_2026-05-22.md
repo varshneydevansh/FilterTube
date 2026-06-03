@@ -56,7 +56,7 @@ js/content/bridge_settings.js
 | `js/settings_shared.js` | 1181 | 57535 | `9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c` |
 | `js/filter_logic.js` | 3652 | 172174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 | `js/seed.js` | 1136 | 50026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
-| `js/content_bridge.js` | 13571 | 601694 | `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3` |
+| `js/content_bridge.js` | 13623 | 603362 | `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c` |
 | `js/content/bridge_settings.js` | 651 | 26462 | `c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b` |
 
 ## Unique File Counts
@@ -151,9 +151,9 @@ js/background.js:2549:compiledAssign:categoryFilters:1
 js/content_bridge.js:254:currentSettingsRead:channelMap:8
 js/content_bridge.js:283:currentSettingsRead:videoChannelMap:24
 js/content_bridge.js:416:currentSettingsRead:filterChannels:5
-js/content_bridge.js:1218:currentSettingsRead:listMode:7
-js/content_bridge.js:1654:currentSettingsRead:videoMetaMap:11
-js/content_bridge.js:10678:currentSettingsRead:showBlockMenuItem:1
+js/content_bridge.js:1211:currentSettingsRead:listMode:7
+js/content_bridge.js:1645:currentSettingsRead:videoMetaMap:11
+js/content_bridge.js:10730:currentSettingsRead:showBlockMenuItem:1
 js/filter_logic.js:977:processedAssign:contentFilters:1
 js/filter_logic.js:995:processedAssign:categoryFilters:1
 js/filter_logic.js:1007:processedAssign:filterKeywords:1
@@ -167,16 +167,16 @@ js/background.js:814:settingsRead:autoBackupFormat:2
 js/background.js:839:settingsRead:autoBackupMode:2
 js/background.js:1080:settingsRead:filterComments:1
 js/background.js:1080:settingsRead:hideComments:1
-js/content_bridge.js:1015:settingsRead:enabled:2
-js/content_bridge.js:1016:settingsRead:listMode:2
-js/content_bridge.js:1017:settingsRead:filterChannels:2
-js/content_bridge.js:1026:settingsRead:contentFilters:4
-js/content_bridge.js:1037:settingsRead:categoryFilters:2
-js/content_bridge.js:1046:settingsRead:filterKeywords:1
-js/content_bridge.js:1048:settingsRead:filterKeywordsComments:1
-js/content_bridge.js:1049:settingsRead:hideAllComments:1
-js/content_bridge.js:1050:settingsRead:hideAllShorts:1
-js/content_bridge.js:8327:settingsRead:videoChannelMap:2
+js/content_bridge.js:1008:settingsRead:enabled:2
+js/content_bridge.js:1009:settingsRead:listMode:2
+js/content_bridge.js:1010:settingsRead:filterChannels:2
+js/content_bridge.js:1019:settingsRead:contentFilters:4
+js/content_bridge.js:1030:settingsRead:categoryFilters:2
+js/content_bridge.js:1039:settingsRead:filterKeywords:1
+js/content_bridge.js:1041:settingsRead:filterKeywordsComments:1
+js/content_bridge.js:1042:settingsRead:hideAllComments:1
+js/content_bridge.js:1043:settingsRead:hideAllShorts:1
+js/content_bridge.js:8379:settingsRead:videoChannelMap:2
 js/content/bridge_settings.js:295:settingsRead:profileType:4
 js/content/bridge_settings.js:329:settingsRead:listMode:1
 js/content/bridge_settings.js:332:settingsRead:whitelistChannels:2
@@ -504,9 +504,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

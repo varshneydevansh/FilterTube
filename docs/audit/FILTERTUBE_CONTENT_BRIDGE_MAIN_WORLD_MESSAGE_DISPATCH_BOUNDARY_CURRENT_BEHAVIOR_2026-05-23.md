@@ -20,9 +20,9 @@ message dispatch executable approval: NO-GO
 ## Evidence Inputs
 
 - `js/content_bridge.js`
-  - lines: 13571
-  - bytes: 601694
-  - sha256: `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3`
+  - lines: 13623
+  - bytes: 603362
+  - sha256: `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c`
 
 ## Selected Source Metrics
 
@@ -200,9 +200,9 @@ can support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

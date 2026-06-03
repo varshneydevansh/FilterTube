@@ -43,7 +43,7 @@ about product/runtime transport, not verifier or audit text.
 | `js/content/first_run_prompt.js` | 190 | 7453 | `5672d9060d29b08550ecfc3add54245212a5094ee5137f025b6f788f12e50409` |
 | `js/content/handle_resolver.js` | 282 | 9785 | `67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff` |
 | `js/content/release_notes_prompt.js` | 250 | 9866 | `30b624cbbda1004f354f98dbf3b4513f8ebc298adecbceb4358782f248f80474` |
-| `js/content_bridge.js` | 13571 | 601694 | `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3` |
+| `js/content_bridge.js` | 13623 | 603362 | `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c` |
 | `js/filter_logic.js` | 3652 | 172174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 | `js/injector.js` | 3593 | 155830 | `634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04` |
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
@@ -101,21 +101,21 @@ js/content/handle_resolver.js:263:window.postMessage:channelMapPageMessageUpdate
 js/content/release_notes_prompt.js:75:runtime.sendMessage:releaseNotesAck
 js/content/release_notes_prompt.js:165:runtime.sendMessage:openWhatsNewRequest
 js/content/release_notes_prompt.js:238:runtime.sendMessage:releaseNotesCheckRequest
-js/content_bridge.js:1453:runtime.sendMessage:prefetchVideoChannelMapRuntimeMutation
-js/content_bridge.js:1646:runtime.sendMessage:persistVideoChannelMapRuntimeMutation
-js/content_bridge.js:1706:runtime.sendMessage:videoMetaMapRuntimeMutation
-js/content_bridge.js:5531:window.postMessage:collaboratorInfoRequestToMainWorld
-js/content_bridge.js:5581:window.postMessage:channelInfoRequestToMainWorld
-js/content_bridge.js:5637:window.postMessage:subscriptionImportRequestToMainWorld
-js/content_bridge.js:8406:runtime.sendMessage:shortsChannelMapRuntimeMutation
-js/content_bridge.js:8471:runtime.sendMessage:watchIdentityRuntimeRequest
-js/content_bridge.js:8664:runtime.sendMessage:shortsIdentityRuntimeRequest
-js/content_bridge.js:11319:runtime.sendMessage:channelDetailsRuntimeRequest
-js/content_bridge.js:12706:window.postMessage:collaboratorInfoRequestToMainWorld
-js/content_bridge.js:13388:runtime.sendMessage:addChannelPersistentRuntimeMutation
-js/content_bridge.js:13413:runtime.sendMessage:autoBackupScheduleRuntimeRequest
-js/content_bridge.js:13479:runtime.sendMessage:filterAllToggleRuntimeMutation
-js/content_bridge.js:13567:window.addEventListener(message):contentBridgeMainWorldMessageReceiver
+js/content_bridge.js:1444:runtime.sendMessage:prefetchVideoChannelMapRuntimeMutation
+js/content_bridge.js:1637:runtime.sendMessage:persistVideoChannelMapRuntimeMutation
+js/content_bridge.js:1697:runtime.sendMessage:videoMetaMapRuntimeMutation
+js/content_bridge.js:5522:window.postMessage:collaboratorInfoRequestToMainWorld
+js/content_bridge.js:5572:window.postMessage:channelInfoRequestToMainWorld
+js/content_bridge.js:5628:window.postMessage:subscriptionImportRequestToMainWorld
+js/content_bridge.js:8458:runtime.sendMessage:shortsChannelMapRuntimeMutation
+js/content_bridge.js:8523:runtime.sendMessage:watchIdentityRuntimeRequest
+js/content_bridge.js:8716:runtime.sendMessage:shortsIdentityRuntimeRequest
+js/content_bridge.js:11371:runtime.sendMessage:channelDetailsRuntimeRequest
+js/content_bridge.js:12758:window.postMessage:collaboratorInfoRequestToMainWorld
+js/content_bridge.js:13440:runtime.sendMessage:addChannelPersistentRuntimeMutation
+js/content_bridge.js:13465:runtime.sendMessage:autoBackupScheduleRuntimeRequest
+js/content_bridge.js:13531:runtime.sendMessage:filterAllToggleRuntimeMutation
+js/content_bridge.js:13619:window.addEventListener(message):contentBridgeMainWorldMessageReceiver
 js/filter_logic.js:30:window.postMessage:filterLogicChannelMapBatch
 js/filter_logic.js:80:window.postMessage:filterLogicVideoChannelMapBatch
 js/filter_logic.js:141:window.postMessage:filterLogicVideoMetaMapBatch
@@ -327,9 +327,9 @@ support runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

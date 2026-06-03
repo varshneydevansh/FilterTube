@@ -26,10 +26,10 @@ It does not prove that refreshes are safe to optimize. It records the current si
 | --- | ---: | ---: | --- |
 | `js/background.js` | 6,320 | 285,103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
 | `js/content/bridge_settings.js` | 651 | 26,462 | `c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b` |
-| `js/content_bridge.js` | 13,571 | 601,694 | `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3` |
+| `js/content_bridge.js` | 13,623 | 603,362 | `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c` |
 | `js/injector.js` | 3,593 | 155,830 | `634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04` |
 | `js/seed.js` | 1,136 | 50,026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
-| `js/content/dom_fallback.js` | 4,838 | 228,332 | `2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef` |
+| `js/content/dom_fallback.js` | 5,030 | 235,555 | `fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5` |
 | `js/filter_logic.js` | 3,652 | 172,174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 
 settings refresh cross-context consumer source files pinned: 7
@@ -44,12 +44,12 @@ settings refresh cross-context consumer source files pinned: 7
 | `bridgeRequestSettings` | `js/content/bridge_settings.js:353` | 353 | 115 | 5,333 | `10e99aaff431ece732d33435b7ea618f9c2333ededd839ec07d4b164b8f45227` |
 | `bridgeSeedDelivery` | `js/content/bridge_settings.js:468` | 468 | 51 | 1,335 | `5c47eec7cb865ae7153bbeec5e88da23f125070fbebf33a6a6e4f2d6ecc02d1c` |
 | `bridgeStorageRefresh` | `js/content/bridge_settings.js:557` | 557 | 92 | 3,395 | `6f65d55d5d8dcf9c5ad753df10d9a9f45ca5548787b949b6576bf8c310975dbf` |
-| `contentBridgePageRefresh` | `js/content_bridge.js:5837` | 5,837 | 11 | 538 | `0b467a6bde5abebde690fd2073b3d2aa43422d08d635a0ffdd908ae073799710` |
+| `contentBridgePageRefresh` | `js/content_bridge.js:5889` | 5,889 | 11 | 538 | `0b467a6bde5abebde690fd2073b3d2aa43422d08d635a0ffdd908ae073799710` |
 | `injectorSettingsReceiver` | `js/injector.js:1924` | 1,924 | 23 | 871 | `8c0c9cdff9e9fa153eb8e0ed0528d2f7d431663b15ecebd951866870783a2bf1` |
 | `injectorSeedUpdate` | `js/injector.js:3383` | 3,383 | 21 | 1,003 | `07e4027d2e306ff9046594fc68609b34074526a5a229a31057e06b3a2b97ce0d` |
 | `injectorProcessQueue` | `js/injector.js:3405` | 3,405 | 60 | 2,108 | `d17bae535755636d9b51d10b3153650b7eed3ff0c0abf99ee988b9d44eb76233` |
 | `seedUpdateSettings` | `js/seed.js:983` | 983 | 98 | 4,640 | `687d0cf2fcec26709486afb3b8c99cae3e79e8003e17c398ccf3cf214af06cf7` |
-| `domFallbackApplyHead` | `js/content/dom_fallback.js:2035` | 2,035 | 63 | 2,188 | `c8f88f62bbd72cd9ed3c70476948919cdcb4aa7a125e26c1d684d3267dd8ee43` |
+| `domFallbackApplyHead` | `js/content/dom_fallback.js:2219` | 2,219 | 64 | 2,243 | `8e805dd33b290db7a08670645553b014a46341cb527c005f19b2c28f348dffba` |
 | `filterLogicGlobalProcess` | `js/filter_logic.js:3588` | 3,588 | 34 | 1,247 | `2134623c293b2cddc6177a9a1732f6ca45e4014dc4ba3872ebe375c47e96e4d2` |
 
 settings refresh cross-context consumer source/effect blocks pinned: 13
@@ -166,9 +166,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
