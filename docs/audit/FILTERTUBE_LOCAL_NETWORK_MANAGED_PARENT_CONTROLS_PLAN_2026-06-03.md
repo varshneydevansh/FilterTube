@@ -310,6 +310,8 @@ replica child device over Nanah/P2P or same-network transport.
   envelope validation.
 - **Complexity**: 3/10
 - **Dependencies**: Task 3.1.
+- **Status**: Boundary contract and hostile-LAN proof fixture added. Product
+  runtime behavior remains unchanged.
 - **Acceptance Criteria**:
   - Discovery, pairing, transport, and policy authority are separate rows.
   - Network reachability failure has clear offline behavior.
