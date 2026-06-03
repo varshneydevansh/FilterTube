@@ -1413,16 +1413,25 @@ function ensureContentControlStyles(settings) {
     hideYouTubeOpenAppButtons();
 }
 
-const INLINE_MOBILE_SEARCH_CONTROL_SELECTORS = [
+const INLINE_MOBILE_SEARCH_CONTROL_HOST_SELECTORS = [
     'ytm-searchbox',
+    'ytm-search-box',
+    'ytm-search-box-renderer',
+    'ytm-searchbox-renderer',
     'ytm-searchbox-suggestions-container',
     'ytm-searchbox-dropdown',
+    'ytm-searchbox-form',
+    'ytm-searchbox-input',
     'ytm-search-suggestions-section-renderer',
-    'ytm-search-suggestion-renderer',
     'form[role="search"]',
-    '.searchbox-input',
     '.searchbox-input-container',
     '.searchbox-dropdown'
+];
+
+const INLINE_MOBILE_SEARCH_CONTROL_SELECTORS = [
+    ...INLINE_MOBILE_SEARCH_CONTROL_HOST_SELECTORS,
+    'ytm-search-suggestion-renderer',
+    '.searchbox-input'
 ];
 
 const INLINE_MOBILE_SEARCH_RESULT_ROOT_SELECTOR = [
@@ -1434,6 +1443,8 @@ const INLINE_MOBILE_SEARCH_RESULT_ROOT_SELECTOR = [
     'ytd-search',
     'ytd-section-list-renderer'
 ].join(',');
+
+const INLINE_MOBILE_SEARCH_CONTROL_HOST_SELECTOR = INLINE_MOBILE_SEARCH_CONTROL_HOST_SELECTORS.join(',');
 
 const MOBILE_SEARCH_HEADER_ROOT_SELECTOR = [
     'ytm-mobile-topbar-renderer',
@@ -1455,10 +1466,28 @@ function restoreInlineMobileSearchResultControls() {
     }
 }
 
+function clearContentControlStyles() {
+    try {
+        const contentControlStyle = document.getElementById('filtertube-content-controls-style');
+        if (contentControlStyle) {
+            contentControlStyle.textContent = '';
+        }
+    } catch (e) {
+    }
+}
+
 function isInlineMobileSearchResultControl(element) {
     if (!element) return false;
     if (element.closest?.(MOBILE_SEARCH_HEADER_ROOT_SELECTOR)) return false;
     return Boolean(element.closest?.(INLINE_MOBILE_SEARCH_RESULT_ROOT_SELECTOR));
+}
+
+function inlineMobileSearchResultControlHost(element) {
+    if (!element) return null;
+    const host = element.closest?.(INLINE_MOBILE_SEARCH_CONTROL_HOST_SELECTOR) || element;
+    if (host.closest?.(MOBILE_SEARCH_HEADER_ROOT_SELECTOR)) return null;
+    if (!host.closest?.(INLINE_MOBILE_SEARCH_RESULT_ROOT_SELECTOR)) return null;
+    return host;
 }
 
 function hideInlineMobileSearchResultControls() {
@@ -1471,11 +1500,24 @@ function hideInlineMobileSearchResultControls() {
 
         document.querySelectorAll(INLINE_MOBILE_SEARCH_CONTROL_SELECTORS.join(',')).forEach(element => {
             if (!isInlineMobileSearchResultControl(element)) return;
-            element.setAttribute('data-filtertube-hidden-search-inline', 'true');
-            element.style.setProperty('display', 'none', 'important');
+            const host = inlineMobileSearchResultControlHost(element);
+            if (!host) return;
+            host.setAttribute('data-filtertube-hidden-search-inline', 'true');
+            host.style.setProperty('display', 'none', 'important');
         });
     } catch (e) {
     }
+}
+
+function syncRouteScopedContentControls(settings) {
+    if (!settings || typeof settings !== 'object' || settings.enabled === false) {
+        clearContentControlStyles();
+        restoreInlineMobileSearchResultControls();
+        return;
+    }
+    ensureStyles();
+    ensureContentControlStyles(settings);
+    hideInlineMobileSearchResultControls();
 }
 
 function hideYouTubeOpenAppButtons() {
@@ -2143,6 +2185,7 @@ async function applyDOMFallback(settings, options = {}) {
 
     currentSettings = effectiveSettings;
     const { forceReprocess = false, preserveScroll = true, onlyWhitelistPending = false } = options;
+    syncRouteScopedContentControls(effectiveSettings);
 
     const hasActiveFallbackWork = hasActiveDOMFallbackWork(effectiveSettings);
     if (!hasActiveFallbackWork && !onlyWhitelistPending) {
@@ -2193,9 +2236,6 @@ async function applyDOMFallback(settings, options = {}) {
     const scrollingElement = document.scrollingElement || document.documentElement || document.body;
     const previousScrollTop = scrollingElement ? scrollingElement.scrollTop : window.pageYOffset;
     const previousScrollLeft = scrollingElement ? scrollingElement.scrollLeft : window.pageXOffset;
-    ensureStyles();
-    ensureContentControlStyles(effectiveSettings);
-    hideInlineMobileSearchResultControls();
 
     try {
         const path = document.location?.pathname || '';
@@ -2376,10 +2416,7 @@ async function applyDOMFallback(settings, options = {}) {
 
     if (effectiveSettings.enabled === false) {
         try {
-            const contentControlStyle = document.getElementById('filtertube-content-controls-style');
-            if (contentControlStyle) {
-                contentControlStyle.textContent = '';
-            }
+            clearContentControlStyles();
             document.querySelectorAll('[data-filtertube-hidden], .filtertube-hidden, [data-filtertube-pending-category], [data-filtertube-pending-upload-date]').forEach(el => {
                 toggleVisibility(el, false, '', true);
                 try {
