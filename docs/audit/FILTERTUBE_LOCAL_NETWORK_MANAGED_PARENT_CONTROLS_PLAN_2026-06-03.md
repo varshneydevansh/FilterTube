@@ -184,12 +184,15 @@ revision and action-history entry.
 ### Task 2.1: Add local managed edit authority tests
 
 - **Location**:
-  `tests/runtime/managed-child-local-authority-current-behavior.test.mjs`
+  - `docs/audit/FILTERTUBE_MANAGED_CHILD_LOCAL_AUTHORITY_CONTRACT_2026-06-03.md`
+  - `tests/runtime/managed-child-local-authority-current-behavior.test.mjs`
 - **Description**: Pin current authority and future expected behavior around
   default/account/child profiles, parentProfileId, locked parent sessions, and
   virtual child editing.
 - **Complexity**: 5/10
 - **Dependencies**: Sprint 1.
+- **Status**: Local managed child authority contract and fixture added.
+  Product runtime behavior remains unchanged.
 - **Acceptance Criteria**:
   - Parent/account can target owned child.
   - Child cannot manage itself as admin.
@@ -199,6 +202,7 @@ revision and action-history entry.
   - Sensitive managed-policy actions can require re-auth.
   - Failed unlock attempts are rate-limited and logged.
 - **Validation**:
+  - `node --test tests/runtime/managed-child-local-authority-current-behavior.test.mjs`
   - `npm run test:settings`
 
 ### Task 2.2: Define action-history data model
