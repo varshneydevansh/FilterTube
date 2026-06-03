@@ -1068,6 +1068,7 @@ function ensureContentControlStyles(settings) {
     try {
         document.documentElement.setAttribute('data-filtertube-route-home', routePath === '/' ? 'true' : 'false');
         document.documentElement.setAttribute('data-filtertube-route-watch', routePath === '/watch' ? 'true' : 'false');
+        document.documentElement.setAttribute('data-filtertube-route-search', routePath === '/results' ? 'true' : 'false');
     } catch (e) {
     }
 
@@ -1095,6 +1096,12 @@ function ensureContentControlStyles(settings) {
         ytm-button-renderer a[href*="open_app"],
         ytm-button-renderer a[href*="play.google.com/store/apps/details"],
         a[href^="intent://"] {
+            display: none !important;
+        }
+    `);
+
+    rules.push(`
+        html[data-filtertube-route-search="true"] [data-filtertube-hidden-search-inline="true"] {
             display: none !important;
         }
     `);
@@ -1404,6 +1411,71 @@ function ensureContentControlStyles(settings) {
 
     style.textContent = rules.join('\n');
     hideYouTubeOpenAppButtons();
+}
+
+const INLINE_MOBILE_SEARCH_CONTROL_SELECTORS = [
+    'ytm-searchbox',
+    'ytm-searchbox-suggestions-container',
+    'ytm-searchbox-dropdown',
+    'ytm-search-suggestions-section-renderer',
+    'ytm-search-suggestion-renderer',
+    'form[role="search"]',
+    '.searchbox-input',
+    '.searchbox-input-container',
+    '.searchbox-dropdown'
+];
+
+const INLINE_MOBILE_SEARCH_RESULT_ROOT_SELECTOR = [
+    'ytm-search',
+    'ytm-browse',
+    'ytm-section-list-renderer',
+    'ytm-item-section-renderer',
+    'ytm-search-results-renderer',
+    'ytd-search',
+    'ytd-section-list-renderer'
+].join(',');
+
+const MOBILE_SEARCH_HEADER_ROOT_SELECTOR = [
+    'ytm-mobile-topbar-renderer',
+    'ytm-searchbox-bar-renderer',
+    'ytm-pivot-bar-renderer',
+    'ytd-masthead',
+    '#masthead-container',
+    '[role="dialog"]',
+    'tp-yt-paper-dialog'
+].join(',');
+
+function restoreInlineMobileSearchResultControls() {
+    try {
+        document.querySelectorAll('[data-filtertube-hidden-search-inline="true"]').forEach(element => {
+            element.removeAttribute('data-filtertube-hidden-search-inline');
+            element.style.removeProperty('display');
+        });
+    } catch (e) {
+    }
+}
+
+function isInlineMobileSearchResultControl(element) {
+    if (!element) return false;
+    if (element.closest?.(MOBILE_SEARCH_HEADER_ROOT_SELECTOR)) return false;
+    return Boolean(element.closest?.(INLINE_MOBILE_SEARCH_RESULT_ROOT_SELECTOR));
+}
+
+function hideInlineMobileSearchResultControls() {
+    try {
+        const path = document.location?.pathname || '';
+        if (path !== '/results') {
+            restoreInlineMobileSearchResultControls();
+            return;
+        }
+
+        document.querySelectorAll(INLINE_MOBILE_SEARCH_CONTROL_SELECTORS.join(',')).forEach(element => {
+            if (!isInlineMobileSearchResultControl(element)) return;
+            element.setAttribute('data-filtertube-hidden-search-inline', 'true');
+            element.style.setProperty('display', 'none', 'important');
+        });
+    } catch (e) {
+    }
 }
 
 function hideYouTubeOpenAppButtons() {
@@ -2123,6 +2195,7 @@ async function applyDOMFallback(settings, options = {}) {
     const previousScrollLeft = scrollingElement ? scrollingElement.scrollLeft : window.pageXOffset;
     ensureStyles();
     ensureContentControlStyles(effectiveSettings);
+    hideInlineMobileSearchResultControls();
 
     try {
         const path = document.location?.pathname || '';
