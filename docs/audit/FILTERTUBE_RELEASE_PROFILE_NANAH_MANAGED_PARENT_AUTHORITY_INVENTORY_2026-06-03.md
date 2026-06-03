@@ -316,6 +316,7 @@ Current gap:
 | No managed policy envelope | Remote apply can only be governed by UI/trusted-link policy, not a durable policy object. | Schema and validation tests before runtime writes. |
 | No revision store | Stale or replayed updates cannot be rejected as a first-class rule. | Monotonic revision fixtures per parent/source and child target. |
 | No signature/integrity check | Trust is link/session-policy based, not envelope-authenticated. | Signed/authenticated envelope tests. |
+| No canonical payload/integrity binding | A signed-looking update could otherwise carry a different scope, target, source device, revision, hash, or payload family than the policy being applied. | Binding-tuple fixtures for link, scope, target, source, revision, policy hash, and payload family. |
 | No signed remote Main/Kids policy gate | Local child route denial now works, but remote updates are still not envelope/revision-bound. | Managed policy envelope, revision store, and Nanah/local-network apply wrapper before remote route-policy writes. |
 | No time-limit runtime | Parent cannot yet enforce daily YouTube budgets. | Runtime active-tab counter, route-gate, overlay, fake-clock, and performance fixtures after the schema contract. |
 | Adapter lacks trust context | `applyIncomingEnvelope(...)` applies after caller-side checks. | Upper-layer managed policy apply wrapper before adapter call. |

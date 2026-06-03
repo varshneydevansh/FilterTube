@@ -43,7 +43,8 @@ function baseContext(overrides = {}) {
 }
 
 function baseEnvelope(overrides = {}) {
-  return {
+  const hasIntegrityOverride = Object.prototype.hasOwnProperty.call(overrides, 'integrity');
+  const envelope = {
     type: 'filtertube_managed_policy',
     linkId: 'link-parent-child-1',
     scope: 'keywords',
@@ -55,19 +56,87 @@ function baseEnvelope(overrides = {}) {
     sourcePublicKeyId: 'parent-key-3',
     keyVersion: 3,
     issuedAt: '2026-06-03T10:00:00.000Z',
-    integrity: {
-      algorithm: 'ed25519',
-      signature: 'signature-keyword-5'
-    },
     payload: {
+      scope: 'keywords',
       operations: [{ op: 'add_keyword', value: 'spiders' }]
     },
     ...overrides
   };
+  envelope.integrity = hasIntegrityOverride ? overrides.integrity : {
+    algorithm: 'ed25519',
+    signature: `signature-${envelope.scope}-${envelope.revision}`,
+    signedFields: {
+      linkId: envelope.linkId,
+      scope: envelope.scope,
+      targetProfileId: envelope.targetProfileId,
+      sourceDeviceId: envelope.sourceDeviceId,
+      revision: envelope.revision,
+      policyHash: envelope.policyHash,
+      payloadScope: getPayloadScopeFamily(envelope.payload)
+    }
+  };
+  return envelope;
 }
 
 function validationResult(reason, extra = {}) {
   return { accepted: false, reason, ...extra };
+}
+
+function safeObject(value) {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+}
+
+function getPayloadScopeFamily(payload) {
+  const root = safeObject(payload);
+  const explicitScope = String(root.scope || '').trim().toLowerCase();
+  if (explicitScope) return explicitScope;
+  const firstOperation = Array.isArray(root.operations) ? String(root.operations[0]?.op || '').toLowerCase() : '';
+  if (firstOperation.includes('keyword')) return 'keywords';
+  if (firstOperation.includes('channel')) return 'channels';
+  if (firstOperation.includes('video')) return 'videos';
+  if ('dailyBudgetMinutes' in root || root.timeLimitPolicy) return 'time_limits';
+  if (root.viewingSpace || 'allowMain' in root || 'allowKids' in root || 'defaultLaunchTarget' in root) return 'viewing_space';
+  if (root.surface === 'main') return 'main';
+  if (root.surface === 'kids') return 'kids';
+  return '';
+}
+
+function validatePayloadScope(scope, payload) {
+  const root = safeObject(payload);
+  const family = getPayloadScopeFamily(root);
+  if (!family) return validationResult('payload_scope_unknown');
+  if (family !== scope) return validationResult('payload_scope_mismatch');
+  const operations = Array.isArray(root.operations) ? root.operations : [];
+  if (scope === 'keywords' && operations.some((operation) => !String(operation?.op || '').toLowerCase().includes('keyword'))) {
+    return validationResult('payload_scope_mismatch');
+  }
+  if (scope === 'channels' && operations.some((operation) => !String(operation?.op || '').toLowerCase().includes('channel'))) {
+    return validationResult('payload_scope_mismatch');
+  }
+  if (scope === 'videos' && operations.some((operation) => !String(operation?.op || '').toLowerCase().includes('video'))) {
+    return validationResult('payload_scope_mismatch');
+  }
+  if (scope === 'time_limits' && !(
+    Number.isInteger(root.dailyBudgetMinutes) && root.dailyBudgetMinutes >= 0
+  ) && !root.timeLimitPolicy) {
+    return validationResult('invalid_time_limit_payload');
+  }
+  if (scope === 'viewing_space' && !(root.viewingSpace || 'allowMain' in root || 'allowKids' in root || 'defaultLaunchTarget' in root)) {
+    return validationResult('invalid_viewing_space_payload');
+  }
+  return null;
+}
+
+function validateIntegrityBinding(envelope) {
+  const signed = safeObject(safeObject(envelope.integrity).signedFields);
+  if (Object.keys(signed).length === 0) return validationResult('missing_integrity_binding');
+  for (const field of ['linkId', 'scope', 'targetProfileId', 'sourceDeviceId', 'revision', 'policyHash']) {
+    if (signed[field] !== envelope[field]) return validationResult(`integrity_${field}_mismatch`);
+  }
+  if (signed.payloadScope !== getPayloadScopeFamily(envelope.payload)) {
+    return validationResult('integrity_payload_scope_mismatch');
+  }
+  return null;
 }
 
 function validateManagedPolicyEnvelope(envelope, context = baseContext()) {
@@ -82,6 +151,10 @@ function validateManagedPolicyEnvelope(envelope, context = baseContext()) {
   if (!Number.isInteger(envelope.revision) || envelope.revision <= 0) return validationResult('invalid_revision');
   if (!Number.isInteger(envelope.keyVersion) || envelope.keyVersion <= 0) return validationResult('invalid_keyVersion');
   if (!envelope.integrity?.algorithm || !envelope.integrity?.signature) return validationResult('missing_integrity');
+  const payloadDecision = validatePayloadScope(envelope.scope, envelope.payload);
+  if (payloadDecision) return payloadDecision;
+  const integrityDecision = validateIntegrityBinding(envelope);
+  if (integrityDecision) return integrityDecision;
   if (link.type !== 'managed_link') return validationResult('link_not_managed');
   if (link.localRole !== 'replica' || link.remoteRole !== 'source') return validationResult('wrong_link_roles');
   if (link.revoked) return validationResult('link_revoked');
@@ -137,6 +210,7 @@ test('managed policy schema contract document pins required envelope and runtime
   assert.match(inventory, /No managed policy envelope/);
   assert.match(inventory, /No revision store/);
   assert.match(inventory, /No signature\/integrity check/);
+  assert.match(inventory, /No canonical payload\/integrity binding/);
   assert.doesNotMatch(runtime, /filtertube_managed_policy/);
   assert.doesNotMatch(runtime, /managedPolicyRevisionStore/);
 });
@@ -204,6 +278,60 @@ test('managed policy schema rejects key and integrity failures', () => {
     trustedLink: { ...baseContext().trustedLink, keyRevoked: true }
   })), { accepted: false, reason: 'key_revoked' });
   assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope({ integrity: { algorithm: 'ed25519' } }), baseContext()), { accepted: false, reason: 'missing_integrity' });
+  assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope({
+    integrity: { algorithm: 'ed25519', signature: 'signature-without-binding' }
+  }), baseContext()), { accepted: false, reason: 'missing_integrity_binding' });
+  const signedScopeMismatch = baseEnvelope();
+  signedScopeMismatch.integrity = {
+    ...signedScopeMismatch.integrity,
+    signedFields: { ...signedScopeMismatch.integrity.signedFields, scope: 'channels' }
+  };
+  assert.deepEqual(validateManagedPolicyEnvelope(signedScopeMismatch, baseContext()), { accepted: false, reason: 'integrity_scope_mismatch' });
+  const signedPayloadMismatch = baseEnvelope();
+  signedPayloadMismatch.integrity = {
+    ...signedPayloadMismatch.integrity,
+    signedFields: { ...signedPayloadMismatch.integrity.signedFields, payloadScope: 'channels' }
+  };
+  assert.deepEqual(validateManagedPolicyEnvelope(signedPayloadMismatch, baseContext()), { accepted: false, reason: 'integrity_payload_scope_mismatch' });
+});
+
+test('managed policy payload family must match the envelope scope before trusted apply', () => {
+  assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope({
+    scope: 'keywords',
+    payload: {
+      scope: 'channels',
+      operations: [{ op: 'add_channel', channelId: 'UCblocked' }]
+    }
+  }), baseContext()), { accepted: false, reason: 'payload_scope_mismatch' });
+
+  assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope({
+    scope: 'channels',
+    policyHash: 'hash-channel-5',
+    payload: {
+      scope: 'channels',
+      operations: [{ op: 'add_keyword', value: 'wrong-family' }]
+    }
+  }), baseContext()), { accepted: false, reason: 'payload_scope_mismatch' });
+
+  assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope({
+    scope: 'time_limits',
+    policyHash: 'hash-time-5',
+    payload: {
+      scope: 'time_limits',
+      dailyBudgetMinutes: -1
+    }
+  }), baseContext()), { accepted: false, reason: 'invalid_time_limit_payload' });
+
+  assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope({
+    scope: 'viewing_space',
+    policyHash: 'hash-space-5',
+    payload: {
+      scope: 'viewing_space',
+      allowMain: true,
+      allowKids: false,
+      defaultLaunchTarget: 'main'
+    }
+  }), baseContext()), { accepted: true, decision: 'accept_newer_revision' });
 });
 
 test('managed policy revision matrix accepts idempotent equal hash and rejects stale or conflicting revisions', () => {
@@ -228,7 +356,7 @@ test('managed policy revision matrix accepts stricter time-limit update only fro
     scope: 'time_limits',
     revision: 7,
     policyHash: 'hash-time-7',
-    payload: { dailyBudgetMinutes: 90 }
+    payload: { scope: 'time_limits', dailyBudgetMinutes: 90 }
   }), baseContext({
     accepted: { revision: 6, policyHash: 'hash-time-6' }
   })), { accepted: true, decision: 'accept_newer_revision' });
@@ -237,7 +365,7 @@ test('managed policy revision matrix accepts stricter time-limit update only fro
     scope: 'time_limits',
     revision: 7,
     policyHash: 'hash-time-7',
-    payload: { dailyBudgetMinutes: 90 }
+    payload: { scope: 'time_limits', dailyBudgetMinutes: 90 }
   }), baseContext({
     accepted: { revision: 6, policyHash: 'hash-time-6' },
     trustedLink: { ...baseContext().trustedLink, revoked: true }

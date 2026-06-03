@@ -33,8 +33,8 @@ Required top-level fields:
 | `policyHash` | Hash of canonical policy payload. | Missing or mismatched for equal-revision idempotency. |
 | `sourcePublicKeyId` | Public-key identity bound to pairing. | Missing or not bound to the trusted link. |
 | `keyVersion` | Pairing key version. | Missing, stale, wrong, or revoked. |
-| `integrity` | Signature or equivalent authenticated proof. | Missing algorithm/signature or invalid proof. |
-| `payload` | Canonical policy operation payload. | Missing or not scoped to the envelope scope. |
+| `integrity` | Signature or equivalent authenticated proof over the binding tuple below. | Missing algorithm/signature, missing signed binding fields, or binding mismatch. |
+| `payload` | Canonical policy operation payload. | Missing, not scoped to the envelope scope, or wrong operation family for that scope. |
 
 Allowed scopes for the first contract:
 
@@ -47,6 +47,43 @@ channels
 viewing_space
 time_limits
 ```
+
+## Integrity Binding Tuple
+
+The integrity proof must bind the signature to the policy decision, not just to
+transport reachability. The first executable fixture requires the signed fields
+to match:
+
+```text
+linkId
+scope
+targetProfileId
+sourceDeviceId
+revision
+policyHash
+payloadScope
+```
+
+A future implementation can use real cryptographic verification, but it still
+must reject a valid-looking signature if any signed field points at a different
+link, scope, target profile, source device, revision, policy hash, or payload
+family than the envelope being applied.
+
+## Payload Scope Guard
+
+The envelope scope and payload family must agree before any low-level profile
+write:
+
+| Scope | Required payload family proof |
+| --- | --- |
+| `keywords` | Keyword operation payload only. |
+| `channels` | Channel operation payload only. |
+| `videos` | Video operation payload only. |
+| `viewing_space` | Main/Kids route policy fields. |
+| `time_limits` | Non-negative budget or structured time-limit policy. |
+
+This prevents a parent/caregiver update that is approved for one scope from
+carrying a different policy family under the same signed-looking envelope.
 
 ## Authority Rules
 
@@ -94,6 +131,11 @@ The paired runtime test must reject:
 - missing revision
 - missing key identity
 - missing signature/integrity proof
+- missing signed integrity binding tuple
+- signed scope, target, source device, revision, policy hash, or payload family
+  mismatch
+- payload family not scoped to envelope scope
+- malformed time-limit or viewing-space payload
 - child source profile attempting admin authority
 - sibling profile attempting to manage another sibling
 - wrong target profile
