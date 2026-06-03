@@ -445,6 +445,13 @@ function scheduleQuickBlockHoverIntent(card, event) {
 
             armQuickBlockPointerRecovery();
             ensureQuickBlockButton(targetCard);
+            try {
+                window.FilterTube_prefetchCollaboratorsForCard?.(targetCard, {
+                    timeoutMs: 900,
+                    reason: 'quick-block-hover'
+                });
+            } catch (e) {
+            }
         }, delayMs);
     } catch (e) {
     }
@@ -1743,6 +1750,13 @@ async function runQuickBlockAction(videoCard, triggerBtn) {
     if (triggerBtn) triggerBtn.setAttribute('data-busy', 'true');
 
     try {
+        try {
+            await window.FilterTube_prefetchCollaboratorsForCard?.(videoCard, {
+                timeoutMs: 1200,
+                reason: 'quick-block-action'
+            });
+        } catch (e) {
+        }
         const context = buildQuickBlockContext(videoCard);
         const info = getQuickBlockActionInfo(context);
         if (!info || !info.channelInfo) return;

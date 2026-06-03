@@ -22,7 +22,7 @@ snapshot evidence into DOM and learned-map side effects.
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content_bridge.js` | 13571 | 601694 | `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3` |
+| `js/content_bridge.js` | 13623 | 603362 | `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c` |
 
 Related proof layers:
 
@@ -35,8 +35,8 @@ Related proof layers:
 
 ```text
 content bridge prefetch identity lifecycle boundary source files: 1
-prefetch lifecycle cluster block lines: 490
-prefetch lifecycle cluster block bytes: 16895
+prefetch lifecycle cluster block lines: 488
+prefetch lifecycle cluster block bytes: 16731
 schedulePrefetchScan block lines: 19
 schedulePrefetchScan block bytes: 518
 attachPrefetchObservers block lines: 28
@@ -45,8 +45,8 @@ startCardPrefetchObserver block lines: 22
 startCardPrefetchObserver block bytes: 747
 installPlaylistPanelPrefetchHook block lines: 43
 installPlaylistPanelPrefetchHook block bytes: 1181
-installRightRailWhitelistObserver block lines: 98
-installRightRailWhitelistObserver block bytes: 3251
+installRightRailWhitelistObserver block lines: 96
+installRightRailWhitelistObserver block bytes: 3087
 queuePrefetchForCard block lines: 53
 queuePrefetchForCard block bytes: 2211
 drainPrefetchQueue block lines: 10
@@ -152,9 +152,9 @@ can support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: yes, duplicate right-rail timer fanout and no-op stamp reruns only
 ```
@@ -163,3 +163,22 @@ These counts are audit-only blockers. They do not approve runtime
 optimization, JSON-first behavior, prefetch identity changes, map-write policy
 changes, whitelist pending behavior changes, or observer/timer authority
 changes.
+
+## Scoped Collaborator Warmup Note - 2026-06-03
+
+The collaborator reliability follow-up added
+`window.FilterTube_prefetchCollaboratorsForCard` outside the broad prefetch
+observer queue. The broad `needsIdentityPrefetchWork(settings)` gate still only
+wakes identity prefetch for whitelist mode or existing channel rules. This
+preserves the no-rule/no-work lag fix while allowing quick-block/menu paths to
+warm one interacted card.
+
+Current prefetch gate status:
+
+```text
+broad identity prefetch gate changed: no
+single-card collaborator warmup added: yes
+no-rule full-card observer wakeup restored: no
+quick-block collaborator lookup reliability: IMPROVED_BY_SCOPED_WARMUP
+runtime behavior changed by 2026-06-03 scoped warmup: yes
+```

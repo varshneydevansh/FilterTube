@@ -21,9 +21,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -68,13 +68,13 @@ changes remain blocked by the implementation gate.
 
 ```text
 tracked JS/JSX/MJS files: 69
-repo-wide lexical callables: 5681
+repo-wide lexical callables: 5701
 ```
 
 | Family | Files | Lexical callables | Boundary |
 | --- | ---: | ---: | --- |
-| Hot page/background runtime | 9 | 3088 | Already has detailed first-pass hot runtime table in `FILTERTUBE_FUNCTION_COVERAGE_2026-05-17.md`. |
-| Content helper runtime | 9 | 345 | First-pass helper surface audit exists, but behavior fixtures remain incomplete. |
+| Hot page/background runtime | 9 | 3101 | Already has detailed first-pass hot runtime table in `FILTERTUBE_FUNCTION_COVERAGE_2026-05-17.md`. |
+| Content helper runtime | 9 | 348 | First-pass helper surface audit exists, but behavior fixtures remain incomplete. |
 | UI/settings runtime | 10 | 1563 | First-pass UI/settings audit exists, but action-level fixtures remain incomplete. |
 | Generated/quarantined UI | 6 | 147 | Generated source/output and `js/layout.js`; freshness and quarantine checks required. |
 | Vendor bundles | 2 | 279 | API/provenance boundary, not product-owned method behavior. |
@@ -92,15 +92,15 @@ repo-wide lexical callables: 5681
 | `js/content/bridge_injection.js` | Content helper runtime | 12 | helper counted |
 | `js/content/bridge_settings.js` | Hot page/background runtime | 65 | hot runtime mapped |
 | `js/content/collab_dialog.js` | Content helper runtime | 42 | helper counted |
-| `js/content/dom_extractors.js` | Content helper runtime | 114 | helper counted |
-| `js/content/dom_fallback.js` | Hot page/background runtime | 418 | hot runtime mapped |
+| `js/content/dom_extractors.js` | Content helper runtime | 117 | helper counted |
+| `js/content/dom_fallback.js` | Hot page/background runtime | 431 | hot runtime mapped |
 | `js/content/dom_helpers.js` | Content helper runtime | 21 | helper counted |
 | `js/content/dom_state.js` | Content helper runtime | 42 | helper counted |
 | `js/content/first_run_prompt.js` | Content helper runtime | 7 | helper counted |
 | `js/content/handle_resolver.js` | Hot page/background runtime | 22 | hot runtime mapped |
 | `js/content/menu.js` | Content helper runtime | 3 | helper counted |
 | `js/content/release_notes_prompt.js` | Content helper runtime | 12 | helper counted |
-| `js/content_bridge.js` | Hot page/background runtime | 1198 | hot runtime mapped |
+| `js/content_bridge.js` | Hot page/background runtime | 1202 | hot runtime mapped |
 | `js/content_controls_catalog.js` | UI/settings runtime | 3 | UI/settings counted |
 | `js/filter_logic.js` | Hot page/background runtime | 313 | hot runtime mapped |
 | `js/injector.js` | Hot page/background runtime | 314 | hot runtime mapped |
@@ -159,7 +159,7 @@ repo-wide lexical callables: 5681
 ## High-Impact Scale Findings
 
 1. **`js/content_bridge.js` is the largest callable surface.**
-   The broad parser finds 1,198 callable forms in this file. That reinforces
+   The broad parser finds 1,202 callable forms in this file. That reinforces
    the earlier split-authority finding: content bridge is too large to treat as
    one behavior surface.
 
@@ -169,8 +169,8 @@ repo-wide lexical callables: 5681
    app-card flows.
 
 3. **The hot runtime is not the whole product.**
-   Hot runtime has 3,088 lexical callables, but UI/settings, content helpers,
-   generated shell, vendor, build scripts, and website add another 2,593
+   Hot runtime has 3,105 lexical callables, but UI/settings, content helpers,
+   generated shell, vendor, build scripts, and website add another 2,596
    lexical callable forms.
 
 4. **Vendor and generated files must stay explicitly bounded.**
@@ -205,5 +205,5 @@ That fixture pins:
 
 - all tracked JS/JSX/MJS files are listed,
 - documented callable counts match current lexical source,
-- documented family totals sum to 5,681,
+- documented family totals sum to 5,701,
 - no ignored raw captures or generated package output are part of this index.

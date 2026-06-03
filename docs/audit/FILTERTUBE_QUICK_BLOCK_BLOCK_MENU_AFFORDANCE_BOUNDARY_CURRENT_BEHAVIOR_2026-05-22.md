@@ -49,8 +49,8 @@ quick-block/block-menu affordance source/effect blocks: 16
 | `js/background.js` | 6320 | 285103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
 | `js/content/bridge_settings.js` | 651 | 26462 | `c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b` |
 | `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
-| `js/content/block_channel.js` | 3175 | 127396 | `1b6fffa249a746c01686df0d6a05dc4b770a6f0c5ded08b78a7043c11e9cdd83` |
-| `js/content_bridge.js` | 13571 | 601694 | `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3` |
+| `js/content/block_channel.js` | 3189 | 127857 | `c040b57e0b107fd7b6fb0a18bc4ca014e5a22fbb82755f81e51a497eee387dba` |
+| `js/content_bridge.js` | 13623 | 603362 | `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c` |
 
 ## Pinned Source Counts
 
@@ -355,6 +355,29 @@ installed-tab byte parity trace: MISSING
 runtime behavior changed by 2026-05-29 collaborator handoff continuation: yes
 ```
 
+## Scoped Collaborator Warmup Addendum - 2026-06-03
+
+Quick-block hover and action now ask the content bridge to prefetch
+collaborators for the interacted card only:
+
+- hover calls `window.FilterTube_prefetchCollaboratorsForCard?.(targetCard, { timeoutMs: 900, reason: 'quick-block-hover' })`
+- action awaits `window.FilterTube_prefetchCollaboratorsForCard?.(videoCard, { timeoutMs: 1200, reason: 'quick-block-action' })` before `buildQuickBlockContext(videoCard)`
+
+This restores a reliable collaborator lookup opportunity for users creating
+the first collaborator block after the no-work performance fixes. It does not
+re-enable periodic full-document quick-block sweeps and does not change the
+ampersand Topic guard.
+
+Current quick-block scoped-warmup status:
+
+```text
+quick-block hover collaborator warmup: PRESENT
+quick-block action collaborator warmup before context build: PRESENT
+periodic full-document quick-block sweep: ABSENT
+ampersand Topic quick-block guard changed: no
+runtime behavior changed by 2026-06-03 scoped warmup: yes
+```
+
 ## Non-Completion Boundary
 
 Quick-block and block-menu affordance behavior still needs affordance contracts,
@@ -385,9 +408,9 @@ surface can support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

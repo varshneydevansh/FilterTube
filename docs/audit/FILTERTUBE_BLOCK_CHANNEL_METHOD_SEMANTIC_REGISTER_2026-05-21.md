@@ -21,9 +21,9 @@ selector cleanup, lifecycle cleanup, or mutation behavior changes.
 
 ```text
 source file: js/content/block_channel.js
-line count: 3175
-source bytes: 127396
-source sha256: 1b6fffa249a746c01686df0d6a05dc4b770a6f0c5ded08b78a7043c11e9cdd83
+line count: 3189
+source bytes: 127857
+source sha256: c040b57e0b107fd7b6fb0a18bc4ca014e5a22fbb82755f81e51a497eee387dba
 repo-wide broad parser lexical callable matches: 226
 broad parser declaration/inventory matches: 96
 assignment-expression function declarations outside broad parser: 0
@@ -41,7 +41,7 @@ local const arrow helper/callback declarations: 24
 local const IIFE result declarations: 2
 semantic method groups: 9
 document references: 75
-window references: 33
+window references: 35
 location references: 19
 document.querySelector occurrences: 12
 document.querySelectorAll occurrences: 10
@@ -160,81 +160,81 @@ semantic decisions inside quick-block and Kids context extraction.
 | 390 | `function` | `armQuickBlockPointerRecovery` | `blockChannelQuickBlockDomLifecycle` |
 | 400 | `function` | `cancelQuickBlockHoverIntent` | `blockChannelQuickBlockDomLifecycle` |
 | 411 | `function` | `scheduleQuickBlockHoverIntent` | `blockChannelQuickBlockDomLifecycle` |
-| 453 | `const arrow` | `isMobileWatchNextQuickBlockHost` | `blockChannelSurfaceOverlayAndVisibility` |
-| 488 | `function` | `isPostLikeQuickBlockCard` | `blockChannelCardTargetAndAnchorResolution` |
-| 500 | `function` | `isShortsQuickBlockCard` | `blockChannelCardTargetAndAnchorResolution` |
-| 515 | `function` | `resolveQuickBlockHost` | `blockChannelCardTargetAndAnchorResolution` |
-| 550 | `function` | `resolveOutermostShortsQuickBlockHost` | `blockChannelCardTargetAndAnchorResolution` |
-| 567 | `function` | `resolveQuickBlockHideTarget` | `blockChannelCardTargetAndAnchorResolution` |
-| 593 | `function` | `isRenderableQuickBlockAnchor` | `blockChannelCardTargetAndAnchorResolution` |
-| 610 | `function` | `resolveQuickBlockAnchor` | `blockChannelCardTargetAndAnchorResolution` |
-| 681 | `function` | `getQuickBlockBoundsElement` | `blockChannelCardTargetAndAnchorResolution` |
-| 703 | `function` | `getQuickBlockTopOcclusionPx` | `blockChannelViewportHoverAndOcclusion` |
-| 748 | `function` | `getQuickBlockSampledTopOcclusionPx` | `blockChannelViewportHoverAndOcclusion` |
-| 787 | `function` | `getQuickBlockBottomOcclusionTopPx` | `blockChannelViewportHoverAndOcclusion` |
-| 828 | `function` | `getQuickBlockSampledBottomOcclusionTopPx` | `blockChannelViewportHoverAndOcclusion` |
-| 875 | `function` | `pointInsideQuickBlockElementRect` | `blockChannelViewportHoverAndOcclusion` |
-| 891 | `function` | `pointInsideQuickBlockHost` | `blockChannelViewportHoverAndOcclusion` |
-| 896 | `function` | `updateQuickBlockViewportStateForHost` | `blockChannelViewportHoverAndOcclusion` |
-| 925 | `function` | `isQuickBlockHostNearViewport` | `blockChannelViewportHoverAndOcclusion` |
-| 941 | `function` | `ensureQuickBlockHostVisibilityObserver` | `blockChannelViewportHoverAndOcclusion` |
-| 967 | `function` | `trackQuickBlockViewportHost` | `blockChannelViewportHoverAndOcclusion` |
-| 982 | `function` | `scheduleQuickBlockViewportRefresh` | `blockChannelViewportHoverAndOcclusion` |
-| 1022 | `function` | `setQuickBlockHoverStateForHost` | `blockChannelViewportHoverAndOcclusion` |
-| 1183 | `function` | `findQuickBlockCardFromTarget` | `blockChannelCardTargetAndAnchorResolution` |
-| 1205 | `const arrow` | `isQuickBlockEnabled` | `blockChannelModuleStateAndModeGates` |
-| 1224 | `function` | `hasActiveQuickBlockRuleContext` | `blockChannelModuleStateAndModeGates` |
-| 1230 | `const arrow` | `hasList` | `blockChannelModuleStateAndModeGates` |
-| 1291 | `function` | `shouldEagerQuickBlockSweep` | `blockChannelQuickBlockDomLifecycle` |
-| 1295 | `function` | `ensureQuickBlockStyles` | `blockChannelQuickBlockDomLifecycle` |
-| 1408 | `function` | `removeQuickBlockButtons` | `blockChannelQuickBlockDomLifecycle` |
-| 1418 | `function` | `createSyntheticQuickBlockMenuItem` | `blockChannelQuickBlockIdentityAndActionBuild` |
-| 1428 | `function` | `collectQuickBlockCollaborators` | `blockChannelQuickBlockIdentityAndActionBuild` |
-| 1430 | `const arrow` | `skipAmpersandTopicNameOnlyRoster` | `blockChannelQuickBlockIdentityAndActionBuild` |
-| 1449 | `const arrow` | `pushCollaboratorList` | `blockChannelQuickBlockIdentityAndActionBuild` |
-| 1543 | `function` | `buildQuickBlockContext` | `blockChannelQuickBlockIdentityAndActionBuild` |
-| 1564 | `const IIFE result` | `isPostCard` | `blockChannelQuickBlockIdentityAndActionBuild` |
-| 1607 | `function` | `getQuickBlockActionInfo` | `blockChannelQuickBlockIdentityAndActionBuild` |
-| 1641 | `function` | `buildQuickBlockFallbackMetadata` | `blockChannelQuickBlockIdentityAndActionBuild` |
-| 1653 | `function` | `getQuickBlockInput` | `blockChannelQuickBlockIdentityAndActionBuild` |
-| 1671 | `async function` | `runQuickBlockFallback` | `blockChannelQuickBlockMutationAndImmediateHide` |
-| 1725 | `function` | `applyQuickBlockImmediateHide` | `blockChannelQuickBlockMutationAndImmediateHide` |
-| 1740 | `async function` | `runQuickBlockAction` | `blockChannelQuickBlockMutationAndImmediateHide` |
-| 1774 | `function` | `attachQuickBlockWrapHoverEvents` | `blockChannelQuickBlockDomLifecycle` |
-| 1778 | `const arrow` | `activate` | `blockChannelQuickBlockDomLifecycle` |
-| 1779 | `const arrow` | `release` | `blockChannelQuickBlockDomLifecycle` |
-| 1788 | `function` | `ensureQuickBlockButton` | `blockChannelQuickBlockDomLifecycle` |
-| 1938 | `function` | `sweepQuickBlockButtons` | `blockChannelQuickBlockDomLifecycle` |
-| 1949 | `function` | `scheduleQuickBlockSweep` | `blockChannelQuickBlockDomLifecycle` |
-| 1979 | `function` | `setupQuickBlockObserver` | `blockChannelQuickBlockDomLifecycle` |
-| 1985 | `const arrow` | `boot` | `blockChannelQuickBlockDomLifecycle` |
-| 2044 | `const arrow` | `clearLast` | `blockChannelQuickBlockDomLifecycle` |
-| 2052 | `const arrow` | `stopPointerMoveRecovery` | `blockChannelQuickBlockDomLifecycle` |
-| 2068 | `const arrow` | `schedulePointerMoveRecoveryStop` | `blockChannelQuickBlockDomLifecycle` |
-| 2080 | `const arrow` | `pickHostFromTarget` | `blockChannelQuickBlockDomLifecycle` |
-| 2097 | `const arrow` | `getHostFromCachedTarget` | `blockChannelQuickBlockDomLifecycle` |
-| 2104 | `const arrow` | `pickHostFromPoint` | `blockChannelQuickBlockDomLifecycle` |
-| 2138 | `const arrow` | `tick` | `blockChannelQuickBlockDomLifecycle` |
-| 2304 | `function` | `setupMenuObserver` | `blockChannelDropdownInjectionLifecycle` |
-| 2325 | `const arrow` | `repairFilterTubeHiddenDropdownState` | `blockChannelDropdownInjectionLifecycle` |
-| 2374 | `function` | `ensureDropdownVisibilityObserver` | `blockChannelDropdownInjectionLifecycle` |
-| 2404 | `const arrow` | `isDropdownVisible` | `blockChannelDropdownInjectionLifecycle` |
-| 2420 | `const arrow` | `scheduleDropdownInjection` | `blockChannelDropdownInjectionLifecycle` |
-| 2425 | `const arrow` | `run` | `blockChannelDropdownInjectionLifecycle` |
-| 2447 | `const arrow` | `handleCandidateDropdown` | `blockChannelDropdownInjectionLifecycle` |
-| 2459 | `const arrow` | `scanExistingDropdowns` | `blockChannelDropdownInjectionLifecycle` |
-| 2469 | `const arrow` | `closeFilterTubeInjectedDropdownsOnOutsidePointer` | `blockChannelDropdownInjectionLifecycle` |
-| 2519 | `const arrow` | `stopDropdownDiscoveryObserver` | `blockChannelDropdownInjectionLifecycle` |
-| 2531 | `const arrow` | `armDropdownDiscoveryObserver` | `blockChannelDropdownInjectionLifecycle` |
-| 2579 | `const arrow` | `startObserver` | `blockChannelDropdownInjectionLifecycle` |
-| 2595 | `function` | `setupKidsPassiveBlockListener` | `blockChannelKidsNativeBlockSync` |
-| 2615 | `const arrow` | `waitBody` | `blockChannelKidsNativeBlockSync` |
-| 2641 | `function` | `captureKidsMenuContext` | `blockChannelKidsNativeBlockSync` |
-| 2679 | `const IIFE result` | `decoded` | `blockChannelKidsNativeBlockSync` |
-| 2764 | `async function` | `handleKidsNativeBlock` | `blockChannelKidsNativeBlockSync` |
-| 2864 | `function` | `tryInjectIntoVisibleDropdown` | `blockChannelDropdownInjectionLifecycle` |
-| 2894 | `async function` | `handleDropdownAppeared` | `blockChannelDropdownInjectionLifecycle` |
-| 2913 | `async function` | `handleDropdownAppearedInternal` | `blockChannelDropdownInjectionLifecycle` |
+| 460 | `const arrow` | `isMobileWatchNextQuickBlockHost` | `blockChannelSurfaceOverlayAndVisibility` |
+| 495 | `function` | `isPostLikeQuickBlockCard` | `blockChannelCardTargetAndAnchorResolution` |
+| 507 | `function` | `isShortsQuickBlockCard` | `blockChannelCardTargetAndAnchorResolution` |
+| 522 | `function` | `resolveQuickBlockHost` | `blockChannelCardTargetAndAnchorResolution` |
+| 557 | `function` | `resolveOutermostShortsQuickBlockHost` | `blockChannelCardTargetAndAnchorResolution` |
+| 574 | `function` | `resolveQuickBlockHideTarget` | `blockChannelCardTargetAndAnchorResolution` |
+| 600 | `function` | `isRenderableQuickBlockAnchor` | `blockChannelCardTargetAndAnchorResolution` |
+| 617 | `function` | `resolveQuickBlockAnchor` | `blockChannelCardTargetAndAnchorResolution` |
+| 688 | `function` | `getQuickBlockBoundsElement` | `blockChannelCardTargetAndAnchorResolution` |
+| 710 | `function` | `getQuickBlockTopOcclusionPx` | `blockChannelViewportHoverAndOcclusion` |
+| 755 | `function` | `getQuickBlockSampledTopOcclusionPx` | `blockChannelViewportHoverAndOcclusion` |
+| 794 | `function` | `getQuickBlockBottomOcclusionTopPx` | `blockChannelViewportHoverAndOcclusion` |
+| 835 | `function` | `getQuickBlockSampledBottomOcclusionTopPx` | `blockChannelViewportHoverAndOcclusion` |
+| 882 | `function` | `pointInsideQuickBlockElementRect` | `blockChannelViewportHoverAndOcclusion` |
+| 898 | `function` | `pointInsideQuickBlockHost` | `blockChannelViewportHoverAndOcclusion` |
+| 903 | `function` | `updateQuickBlockViewportStateForHost` | `blockChannelViewportHoverAndOcclusion` |
+| 932 | `function` | `isQuickBlockHostNearViewport` | `blockChannelViewportHoverAndOcclusion` |
+| 948 | `function` | `ensureQuickBlockHostVisibilityObserver` | `blockChannelViewportHoverAndOcclusion` |
+| 974 | `function` | `trackQuickBlockViewportHost` | `blockChannelViewportHoverAndOcclusion` |
+| 989 | `function` | `scheduleQuickBlockViewportRefresh` | `blockChannelViewportHoverAndOcclusion` |
+| 1029 | `function` | `setQuickBlockHoverStateForHost` | `blockChannelViewportHoverAndOcclusion` |
+| 1190 | `function` | `findQuickBlockCardFromTarget` | `blockChannelCardTargetAndAnchorResolution` |
+| 1212 | `const arrow` | `isQuickBlockEnabled` | `blockChannelModuleStateAndModeGates` |
+| 1231 | `function` | `hasActiveQuickBlockRuleContext` | `blockChannelModuleStateAndModeGates` |
+| 1237 | `const arrow` | `hasList` | `blockChannelModuleStateAndModeGates` |
+| 1298 | `function` | `shouldEagerQuickBlockSweep` | `blockChannelQuickBlockDomLifecycle` |
+| 1302 | `function` | `ensureQuickBlockStyles` | `blockChannelQuickBlockDomLifecycle` |
+| 1415 | `function` | `removeQuickBlockButtons` | `blockChannelQuickBlockDomLifecycle` |
+| 1425 | `function` | `createSyntheticQuickBlockMenuItem` | `blockChannelQuickBlockIdentityAndActionBuild` |
+| 1435 | `function` | `collectQuickBlockCollaborators` | `blockChannelQuickBlockIdentityAndActionBuild` |
+| 1437 | `const arrow` | `skipAmpersandTopicNameOnlyRoster` | `blockChannelQuickBlockIdentityAndActionBuild` |
+| 1456 | `const arrow` | `pushCollaboratorList` | `blockChannelQuickBlockIdentityAndActionBuild` |
+| 1550 | `function` | `buildQuickBlockContext` | `blockChannelQuickBlockIdentityAndActionBuild` |
+| 1571 | `const IIFE result` | `isPostCard` | `blockChannelQuickBlockIdentityAndActionBuild` |
+| 1614 | `function` | `getQuickBlockActionInfo` | `blockChannelQuickBlockIdentityAndActionBuild` |
+| 1648 | `function` | `buildQuickBlockFallbackMetadata` | `blockChannelQuickBlockIdentityAndActionBuild` |
+| 1660 | `function` | `getQuickBlockInput` | `blockChannelQuickBlockIdentityAndActionBuild` |
+| 1678 | `async function` | `runQuickBlockFallback` | `blockChannelQuickBlockMutationAndImmediateHide` |
+| 1732 | `function` | `applyQuickBlockImmediateHide` | `blockChannelQuickBlockMutationAndImmediateHide` |
+| 1747 | `async function` | `runQuickBlockAction` | `blockChannelQuickBlockMutationAndImmediateHide` |
+| 1788 | `function` | `attachQuickBlockWrapHoverEvents` | `blockChannelQuickBlockDomLifecycle` |
+| 1792 | `const arrow` | `activate` | `blockChannelQuickBlockDomLifecycle` |
+| 1793 | `const arrow` | `release` | `blockChannelQuickBlockDomLifecycle` |
+| 1802 | `function` | `ensureQuickBlockButton` | `blockChannelQuickBlockDomLifecycle` |
+| 1952 | `function` | `sweepQuickBlockButtons` | `blockChannelQuickBlockDomLifecycle` |
+| 1963 | `function` | `scheduleQuickBlockSweep` | `blockChannelQuickBlockDomLifecycle` |
+| 1993 | `function` | `setupQuickBlockObserver` | `blockChannelQuickBlockDomLifecycle` |
+| 1999 | `const arrow` | `boot` | `blockChannelQuickBlockDomLifecycle` |
+| 2058 | `const arrow` | `clearLast` | `blockChannelQuickBlockDomLifecycle` |
+| 2066 | `const arrow` | `stopPointerMoveRecovery` | `blockChannelQuickBlockDomLifecycle` |
+| 2082 | `const arrow` | `schedulePointerMoveRecoveryStop` | `blockChannelQuickBlockDomLifecycle` |
+| 2094 | `const arrow` | `pickHostFromTarget` | `blockChannelQuickBlockDomLifecycle` |
+| 2111 | `const arrow` | `getHostFromCachedTarget` | `blockChannelQuickBlockDomLifecycle` |
+| 2118 | `const arrow` | `pickHostFromPoint` | `blockChannelQuickBlockDomLifecycle` |
+| 2152 | `const arrow` | `tick` | `blockChannelQuickBlockDomLifecycle` |
+| 2318 | `function` | `setupMenuObserver` | `blockChannelDropdownInjectionLifecycle` |
+| 2339 | `const arrow` | `repairFilterTubeHiddenDropdownState` | `blockChannelDropdownInjectionLifecycle` |
+| 2388 | `function` | `ensureDropdownVisibilityObserver` | `blockChannelDropdownInjectionLifecycle` |
+| 2418 | `const arrow` | `isDropdownVisible` | `blockChannelDropdownInjectionLifecycle` |
+| 2434 | `const arrow` | `scheduleDropdownInjection` | `blockChannelDropdownInjectionLifecycle` |
+| 2439 | `const arrow` | `run` | `blockChannelDropdownInjectionLifecycle` |
+| 2461 | `const arrow` | `handleCandidateDropdown` | `blockChannelDropdownInjectionLifecycle` |
+| 2473 | `const arrow` | `scanExistingDropdowns` | `blockChannelDropdownInjectionLifecycle` |
+| 2483 | `const arrow` | `closeFilterTubeInjectedDropdownsOnOutsidePointer` | `blockChannelDropdownInjectionLifecycle` |
+| 2533 | `const arrow` | `stopDropdownDiscoveryObserver` | `blockChannelDropdownInjectionLifecycle` |
+| 2545 | `const arrow` | `armDropdownDiscoveryObserver` | `blockChannelDropdownInjectionLifecycle` |
+| 2593 | `const arrow` | `startObserver` | `blockChannelDropdownInjectionLifecycle` |
+| 2609 | `function` | `setupKidsPassiveBlockListener` | `blockChannelKidsNativeBlockSync` |
+| 2629 | `const arrow` | `waitBody` | `blockChannelKidsNativeBlockSync` |
+| 2655 | `function` | `captureKidsMenuContext` | `blockChannelKidsNativeBlockSync` |
+| 2693 | `const IIFE result` | `decoded` | `blockChannelKidsNativeBlockSync` |
+| 2778 | `async function` | `handleKidsNativeBlock` | `blockChannelKidsNativeBlockSync` |
+| 2878 | `function` | `tryInjectIntoVisibleDropdown` | `blockChannelDropdownInjectionLifecycle` |
+| 2908 | `async function` | `handleDropdownAppeared` | `blockChannelDropdownInjectionLifecycle` |
+| 2927 | `async function` | `handleDropdownAppearedInternal` | `blockChannelDropdownInjectionLifecycle` |
 
 ## Current Entrypoints And Dependencies
 
@@ -368,9 +368,9 @@ runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

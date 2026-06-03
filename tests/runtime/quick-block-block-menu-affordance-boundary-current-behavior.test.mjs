@@ -213,8 +213,8 @@ test('quick-block/block-menu affordance audit is audit-only and source pinned', 
   assert.ok(doc.includes(`| \`js/background.js\` | 6320 | 285103 | \`${sha256('js/background.js')}\` |`));
   assert.ok(doc.includes(`| \`js/content/bridge_settings.js\` | 651 | 26462 | \`${sha256('js/content/bridge_settings.js')}\` |`));
   assert.ok(doc.includes(`| \`js/state_manager.js\` | 2491 | 99780 | \`${sha256('js/state_manager.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/content/block_channel.js\` | 3175 | 127396 | \`${sha256('js/content/block_channel.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/content_bridge.js\` | 13571 | 601694 | \`${sha256('js/content_bridge.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content/block_channel.js\` | 3189 | 127857 | \`${sha256('js/content/block_channel.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content_bridge.js\` | 13623 | 603362 | \`${sha256('js/content_bridge.js')}\` |`));
 
   for (const token of [
     'Collaborator Grammar Action Handoff Addendum - 2026-05-27',
@@ -376,6 +376,7 @@ test('quick-block action gate exists but setup lifecycle work is broader than th
   assert.equal((blocks.quickBlockSelectors.match(/'[^']+'/g) || []).length, 43);
 
   assert.match(blocks.blockChannel, /function buildQuickBlockContext\(videoCard\)/);
+  assert.match(blocks.blockChannel, /FilterTube_prefetchCollaboratorsForCard\?\.\(videoCard, \{\s+timeoutMs: 1200,\s+reason: 'quick-block-action'\s+\}\)/);
   assert.match(blocks.blockChannel, /promoteChannelInfoFromCollaboratorSignals\(extractedBase, videoCard\)/);
   assert.match(blocks.blockChannel, /const collaborators = collectQuickBlockCollaborators\(\{ \.\.\.base, videoId \}, videoCard\)/);
   assert.match(blocks.blockChannel, /if \(collaborators\.length >= 2\)/);

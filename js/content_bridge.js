@@ -5825,6 +5825,67 @@ async function enrichCollaboratorsWithMainWorld(initialChannelInfo) {
     }
 }
 
+async function prefetchCollaboratorsForCard(videoCard, options = {}) {
+    const card = findVideoCardElement(videoCard) || videoCard;
+    if (!card || typeof card.getAttribute !== 'function') return [];
+
+    const videoId = ensureVideoIdForCard(card) || extractVideoIdFromCard(card) || '';
+    if (!videoId) return [];
+
+    const cached = getValidatedCachedCollaborators(card);
+    if (cached.length >= 2) return cached;
+
+    const timeoutMs = Math.max(250, Math.min(parseInt(options.timeoutMs, 10) || 1200, 2500));
+    let baseInfo = extractChannelFromCard(card) || {};
+    baseInfo = promoteChannelInfoFromCollaboratorSignals(baseInfo, card) || baseInfo;
+
+    let collaborators = sanitizeCollaboratorList(extractCollaboratorMetadataFromElement(card) || []);
+    const warmup = getWatchLikeCollaborationWarmup(card);
+    if (collaborators.length === 0 && warmup.collaborators.length > 0) {
+        collaborators = sanitizeCollaboratorList(warmup.collaborators);
+    }
+
+    const expectedCount = Math.max(
+        parseInt(baseInfo.expectedCollaboratorCount || '0', 10) || 0,
+        parseInt(card.getAttribute('data-filtertube-expected-collaborators') || '0', 10) || 0,
+        collaborators.length,
+        warmup.expectedCount || 0
+    );
+
+    if (collaborators.length === 0 || expectedCount < 2) {
+        return collaborators;
+    }
+
+    const provisionalInfo = {
+        ...baseInfo,
+        ...collaborators[0],
+        isCollaboration: true,
+        allCollaborators: collaborators,
+        needsEnrichment: true,
+        expectedCollaboratorCount: expectedCount,
+        videoId
+    };
+
+    const resolved = await withTimeout(enrichCollaboratorsWithMainWorld(provisionalInfo), timeoutMs);
+    const sanitizedResolved = sanitizeCollaboratorList(resolved || []);
+    if (sanitizedResolved.length > 0) {
+        applyResolvedCollaborators(videoId, sanitizedResolved, {
+            expectedCount: Math.max(expectedCount, sanitizedResolved.length),
+            sourceCard: card,
+            sourceLabel: 'single-card-warmup'
+        });
+        return sanitizedResolved;
+    }
+
+    requestCollaboratorEnrichment(card, videoId, collaborators);
+    return collaborators;
+}
+
+try {
+    window.FilterTube_prefetchCollaboratorsForCard = prefetchCollaboratorsForCard;
+} catch (e) {
+}
+
 function handleMainWorldMessages(event) {
     if (event.source !== window || !event.data?.type?.startsWith('FilterTube_')) return;
     if (event.data.source === 'content_bridge') return;

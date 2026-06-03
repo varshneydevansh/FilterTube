@@ -546,12 +546,12 @@ test('block channel method semantic register is audit-only and scoped to current
   assert.match(text, /Status: current-behavior register with 2026-05-26 second-pass idle-detach addendum/);
   assert.match(text, /periodic quick-block sweep removed/);
   assert.match(text, /source file: js\/content\/block_channel\.js/);
-  assert.match(text, /line count: 3175/);
-  assert.equal(sourceLineCount(), 3175);
-  assert.match(text, /source bytes: 127396/);
-  assert.equal(readBuffer(sourcePath).byteLength, 127396);
-  assert.match(text, /source sha256: 1b6fffa249a746c01686df0d6a05dc4b770a6f0c5ded08b78a7043c11e9cdd83/);
-  assert.equal(sha256(sourcePath), '1b6fffa249a746c01686df0d6a05dc4b770a6f0c5ded08b78a7043c11e9cdd83');
+  assert.match(text, /line count: 3189/);
+  assert.equal(sourceLineCount(), 3189);
+  assert.match(text, /source bytes: 127857/);
+  assert.equal(readBuffer(sourcePath).byteLength, 127857);
+  assert.match(text, /source sha256: c040b57e0b107fd7b6fb0a18bc4ca014e5a22fbb82755f81e51a497eee387dba/);
+  assert.equal(sha256(sourcePath), 'c040b57e0b107fd7b6fb0a18bc4ca014e5a22fbb82755f81e51a497eee387dba');
   assert.match(text, /repo-wide broad parser lexical callable matches: 226/);
   assert.match(text, /broad parser declaration\/inventory matches: 96/);
   assert.match(text, /assignment-expression function declarations outside broad parser: 0/);
@@ -639,7 +639,7 @@ test('block channel register pins DOM lifecycle selector mutation and message co
   const text = doc();
 
   assert.equal(countLiteral(source, 'document.'), 75);
-  assert.equal(countLiteral(source, 'window.'), 33);
+  assert.equal(countLiteral(source, 'window.'), 35);
   assert.equal(countLiteral(source, 'location'), 19);
   assert.equal(countLiteral(source, 'document.querySelector'), 12);
   assert.equal(countLiteral(source, 'document.querySelectorAll'), 10);
@@ -675,7 +675,7 @@ test('block channel register pins DOM lifecycle selector mutation and message co
 
   for (const token of [
     'document references: 75',
-    'window references: 33',
+    'window references: 35',
     'location references: 19',
     'document.querySelector occurrences: 12',
     'document.querySelectorAll occurrences: 10',

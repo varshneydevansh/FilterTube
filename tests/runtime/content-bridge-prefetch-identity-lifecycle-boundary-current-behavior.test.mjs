@@ -91,6 +91,10 @@ test('content bridge prefetch identity lifecycle audit is audit-only and source 
   assert.match(doc, /content bridge prefetch identity lifecycle boundary source files: 1/);
   assert.match(doc, /runtime content bridge prefetch lifecycle fixtures: 6/);
   assert.match(doc, /not completion proof for content bridge prefetch lifecycle authority/);
+  assert.match(doc, /Scoped Collaborator Warmup Note - 2026-06-03/);
+  assert.match(doc, /single-card collaborator warmup added: yes/);
+  assert.match(doc, /no-rule full-card observer wakeup restored: no/);
+  assert.match(doc, /quick-block collaborator lookup reliability: IMPROVED_BY_SCOPED_WARMUP/);
 
   assert.ok(doc.includes(`| \`${contentBridgePath}\` | ${lineCount(source)} | ${Buffer.byteLength(source)} | \`${sha256(contentBridgePath)}\` |`));
 });
@@ -99,12 +103,12 @@ test('content bridge prefetch identity lifecycle source counts remain pinned', (
   const doc = read(docPath);
   const blocks = sourceBlocks();
   const countRows = [
-    ['prefetch lifecycle cluster block', blocks.prefetchCluster, 490, 16895],
+    ['prefetch lifecycle cluster block', blocks.prefetchCluster, 488, 16731],
     ['schedulePrefetchScan block', blocks.schedulePrefetchScan, 19, 518],
     ['attachPrefetchObservers block', blocks.attachPrefetchObservers, 28, 1189],
     ['startCardPrefetchObserver block', blocks.startCardPrefetchObserver, 22, 747],
     ['installPlaylistPanelPrefetchHook block', blocks.installPlaylistPanelPrefetchHook, 43, 1181],
-    ['installRightRailWhitelistObserver block', blocks.installRightRailWhitelistObserver, 98, 3251],
+    ['installRightRailWhitelistObserver block', blocks.installRightRailWhitelistObserver, 96, 3087],
     ['queuePrefetchForCard block', blocks.queuePrefetchForCard, 53, 2211],
     ['drainPrefetchQueue block', blocks.drainPrefetchQueue, 10, 368],
     ['withTimeout block', blocks.withTimeout, 5, 156],
@@ -186,7 +190,7 @@ test('playlist and right-rail hooks install separate lifecycle work before a sha
 
   assert.match(blocks.installRightRailWhitelistObserver, /rightRailWhitelistObserverInstalled/);
   assert.match(blocks.installRightRailWhitelistObserver, /currentSettings\?\.listMode !== 'whitelist'/);
-  assert.match(blocks.installRightRailWhitelistObserver, /startsWith\('\/watch'\)/);
+  assert.doesNotMatch(blocks.installRightRailWhitelistObserver, /startsWith\('\/watch'\)/);
   assert.match(blocks.installRightRailWhitelistObserver, /applyDOMFallback\(null, \{ preserveScroll: true, forceReprocess: true \}\)/);
   assert.match(blocks.installRightRailWhitelistObserver, /}, 0\)/);
   assert.match(blocks.installRightRailWhitelistObserver, /}, 120\)/);

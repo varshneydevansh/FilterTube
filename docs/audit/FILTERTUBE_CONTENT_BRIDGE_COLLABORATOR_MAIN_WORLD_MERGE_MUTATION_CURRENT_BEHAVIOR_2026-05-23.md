@@ -12,16 +12,16 @@ The paired verifier is `tests/runtime/content-bridge-collaborator-main-world-mer
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content_bridge.js` | 13571 | 601694 | `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3` |
+| `js/content_bridge.js` | 13,623 | 603,362 | `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c` |
 
 ## Pinned Blocks
 
 | Block | Source range | Lines | Bytes | SHA-256 | Current role |
 | --- | --- | ---: | ---: | --- | --- |
-| Collaborator name normalization | `js/content_bridge.js:5659` through `js/content_bridge.js:5667` | 10 | 293 | `8946489a721c7d6ec541749d4c3952ba72cb074f1635865b74d8e185eec7a855` | Normalizes collaborator names for merge comparison. |
-| Main-world collaborator merge | `js/content_bridge.js:5669` through `js/content_bridge.js:5810` | 142 | 5989 | `2a7f2bf042da245bc39f7190c5518732ffe55935b1a35eb598a2e9f5971e8285` | Mutates `initialChannelInfo.allCollaborators`, primary channel fields, and `needsEnrichment` after matching main-world candidates. |
-| Main-world collaborator enrichment | `js/content_bridge.js:5811` through `js/content_bridge.js:5836` | 26 | 1235 | `76d244d6f57ac2b125fdadbbbc5ebddeb9cb7a068cc976dabcdddf41027f3d65` | Queries the document by video id, builds lookup options, requests main-world collaborators, then merges returned data. |
-| Menu collaborator enrichment handoff | `js/content_bridge.js:11074` through `js/content_bridge.js:11128` | 55 | 2880 | `e6de2963cd4bae8d1246bf4aa7274c78007df312da0d058287c264823cbba2df` | Starts collaborator enrichment for confirmed collaboration identity or watch/YTM warmup identity. |
+| Collaborator name normalization | `js/content_bridge.js:5650` through `js/content_bridge.js:5659` | 10 | 293 | `8946489a721c7d6ec541749d4c3952ba72cb074f1635865b74d8e185eec7a855` | Normalizes collaborator names for merge comparison. |
+| Main-world collaborator merge | `js/content_bridge.js:5660` through `js/content_bridge.js:5801` | 142 | 5989 | `2a7f2bf042da245bc39f7190c5518732ffe55935b1a35eb598a2e9f5971e8285` | Mutates `initialChannelInfo.allCollaborators`, primary channel fields, and `needsEnrichment` after matching main-world candidates. |
+| Main-world collaborator enrichment | `js/content_bridge.js:5802` through `js/content_bridge.js:5888` | 87 | 3517 | `28214fa122d7525ac6628f2e1d59d20136510656209b5a0b1d70136b47b559df` | Queries the document by video id, builds lookup options, requests main-world collaborators, merges returned data, and exposes scoped single-card collaborator warmup for quick-block/menu recovery. |
+| Menu collaborator enrichment handoff | `js/content_bridge.js:11126` through `js/content_bridge.js:11180` | 55 | 2880 | `e6de2963cd4bae8d1246bf4aa7274c78007df312da0d058287c264823cbba2df` | Starts collaborator enrichment for confirmed collaboration identity or watch/YTM warmup identity. |
 
 ## Selected Token Counts
 
@@ -31,8 +31,8 @@ These counts are over the four pinned blocks, not the whole product.
 | --- | ---: |
 | `normalizeCollaboratorName` | 5 |
 | `mergeCollaboratorsWithMainWorld` | 2 |
-| `enrichCollaboratorsWithMainWorld` | 3 |
-| `allCollaborators` | 7 |
+| `enrichCollaboratorsWithMainWorld` | 4 |
+| `allCollaborators` | 8 |
 | `mainWorldCollaborators` | 12 |
 | `usedIndices` | 3 |
 | `tryMatch` | 4 |
@@ -42,7 +42,7 @@ These counts are over the four pinned blocks, not the whole product.
 | `isProbablyNotChannelNameForCollaborator` | 2 |
 | `isWeakCollaboratorName` | 3 |
 | `normalizeHandleValue` | 4 |
-| `needsEnrichment` | 2 |
+| `needsEnrichment` | 3 |
 | `document.querySelector` | 1 |
 | `buildCollaboratorLookupRequestOptions` | 1 |
 | `requestCollaboratorInfoFromMainWorld` | 1 |
@@ -50,10 +50,10 @@ These counts are over the four pinned blocks, not the whole product.
 | `channelInfo` | 3 |
 | `collaboratorEnrichmentPromise` | 3 |
 | `normalizeCollaboratorChannelInfoForCard` | 2 |
-| `getWatchLikeCollaborationWarmup` | 1 |
-| `extractCollaboratorMetadataFromElement` | 1 |
-| `sanitizeCollaboratorList` | 2 |
-| `expectedCollaboratorCount` | 2 |
+| `getWatchLikeCollaborationWarmup` | 2 |
+| `extractCollaboratorMetadataFromElement` | 2 |
+| `sanitizeCollaboratorList` | 5 |
+| `expectedCollaboratorCount` | 4 |
 | `videoId` | 8 |
 | `isCollaboration` | 4 |
 | `isYtmWatchLikeCollaboratorCard` | 1 |
@@ -100,9 +100,9 @@ surface can support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

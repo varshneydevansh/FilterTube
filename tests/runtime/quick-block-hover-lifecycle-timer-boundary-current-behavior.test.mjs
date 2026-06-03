@@ -10,7 +10,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_QUICK_BLOCK_HOVER_LIFECYCLE_TIMER_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/content/block_channel.js': [3175, 127396, '1b6fffa249a746c01686df0d6a05dc4b770a6f0c5ded08b78a7043c11e9cdd83']
+  'js/content/block_channel.js': [3189, 127857, 'c040b57e0b107fd7b6fb0a18bc4ca014e5a22fbb82755f81e51a497eee387dba']
 };
 
 const blockSpecs = {
@@ -46,15 +46,15 @@ const blockSpecs = {
     start: 'function untrackQuickBlockViewportHost(hostCard) {',
     end: 'const isMobileWatchNextQuickBlockHost =',
     startLine: 310,
-    lines: 143,
-    bytes: 4741,
-    hash: '0d20205995c8c9459ca992a24e942f6eeaae89ef7812dea411eca2f6412338f7'
+    lines: 150,
+    bytes: 4982,
+    hash: 'aa4a222d8d8c3fb28e25045189abc6682dd40427f61d5813d4a773f8c96b2fdf'
   },
   quickBlockViewportRefresh: {
     file: 'js/content/block_channel.js',
     start: 'function isQuickBlockHostNearViewport(hostCard, margin = 900) {',
     end: 'function setQuickBlockHoverStateForHost',
-    startLine: 925,
+    startLine: 932,
     lines: 97,
     bytes: 3961,
     hash: 'b136e450414bb439083d8dc505c6b92b70ceebbf600395d2523b22d5e59e67d2'
@@ -63,7 +63,7 @@ const blockSpecs = {
     file: 'js/content/block_channel.js',
     start: 'function setQuickBlockHoverStateForHost(hostCard, active, stickyMs = 0) {',
     end: 'const QUICK_BLOCK_CARD_SELECTORS =',
-    startLine: 1022,
+    startLine: 1029,
     lines: 67,
     bytes: 2162,
     hash: '58f5cc099c0e78d55405794747e669a110d6f3f54425d91853f9e92058069dcc'
@@ -72,7 +72,7 @@ const blockSpecs = {
     file: 'js/content/block_channel.js',
     start: 'const QUICK_BLOCK_CARD_SELECTORS = [',
     end: 'const isQuickBlockEnabled = () => {',
-    startLine: 1089,
+    startLine: 1096,
     lines: 116,
     bytes: 3885,
     hash: '1912076cdad42fd711131fadfe294de91970d226e08784b83f2c72fa42137500'
@@ -81,16 +81,16 @@ const blockSpecs = {
     file: 'js/content/block_channel.js',
     start: 'async function runQuickBlockAction(videoCard, triggerBtn) {',
     end: 'function attachQuickBlockWrapHoverEvents',
-    startLine: 1740,
-    lines: 34,
-    bytes: 1448,
-    hash: 'ec5afa97351525978b400c7d020dbaa39cbe2e3edae0fd3717c53e72ca89ebf2'
+    startLine: 1747,
+    lines: 41,
+    bytes: 1668,
+    hash: '155082c97c19e455c37dfca135618a0f88eaf2165493f1a5fbee86a92d0c60fe'
   },
   quickBlockWrapHoverEvents: {
     file: 'js/content/block_channel.js',
     start: 'function attachQuickBlockWrapHoverEvents(wrap, hostCard) {',
     end: 'function ensureQuickBlockButton',
-    startLine: 1774,
+    startLine: 1788,
     lines: 14,
     bytes: 888,
     hash: '44533bcceeb20e45528a041e9a1770bd264c393f1872a458efc3ccea6fc8509c'
@@ -99,7 +99,7 @@ const blockSpecs = {
     file: 'js/content/block_channel.js',
     start: 'function ensureQuickBlockButton(card) {',
     end: 'function sweepQuickBlockButtons',
-    startLine: 1788,
+    startLine: 1802,
     lines: 150,
     bytes: 6556,
     hash: 'fc46ee05e9bfb3e63f057563c7c4a50d73dc43792f6b8da4b67fe62e460af78c'
@@ -108,7 +108,7 @@ const blockSpecs = {
     file: 'js/content/block_channel.js',
     start: 'function sweepQuickBlockButtons(root = document) {',
     end: 'function setupQuickBlockObserver',
-    startLine: 1938,
+    startLine: 1952,
     lines: 41,
     bytes: 1342,
     hash: '931331c0e6890d9a364b586463a46b255d17a7b7d5610de81dcf754bb96f2103'
@@ -117,7 +117,7 @@ const blockSpecs = {
     file: 'js/content/block_channel.js',
     start: 'function setupQuickBlockObserver() {',
     end: '/**\n * Observe dropdowns',
-    startLine: 1979,
+    startLine: 1993,
     lines: 322,
     bytes: 13896,
     hash: 'cf6b14c4d67b40cdc33a0126b920c224ef184a60c361481b22c025c9328dffc5'
