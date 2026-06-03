@@ -10,7 +10,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_CONTENT_BRIDGE_MENU_ACTION_LIST_TARGET_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/content_bridge.js': [13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c']
+  'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d']
 };
 
 const blockSpecs = {
@@ -18,7 +18,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'const performBlock = async (channelInfo, filterAll) => {',
     end: "const list = document.createElement('div');",
-    startLine: 7481,
+    startLine: 7494,
     lines: 213,
     bytes: 9930,
     hash: '5340e2307068efb0b3b60b32222a83780905964a8d41a81457a7e5ceaa8e00f1'
@@ -27,7 +27,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'async function injectFilterTubeMenuItem(dropdown, videoCard) {',
     end: 'function attachFilterTubeMenuHandlers',
-    startLine: 10725,
+    startLine: 10738,
     lines: 738,
     bytes: 34747,
     hash: 'bd888fd13303b3b65439b38886c671fa46d87330730efab17e0f11c5eefe6831'
@@ -36,7 +36,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function attachFilterTubeMenuHandlers({ menuItem, toggle, channelInfo, videoCard, injectionOptions = {} }) {',
     end: 'function createFilterTubeIconElement',
-    startLine: 11463,
+    startLine: 11476,
     lines: 71,
     bytes: 2490,
     hash: '07e0e72b5c4c4a7f95615c0e752bd1ea987fd4851f31e23e3569e8d3bcadd540'
@@ -45,7 +45,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false, videoCard = null) {',
     end: '/**\n * Add channel directly using chrome.storage',
-    startLine: 12193,
+    startLine: 12206,
     lines: 1226,
     bytes: 60722,
     hash: '459943dd5f26638ac63bc413a7cee220e862225929aaf2a4a0b6e068cd32ef9f'
@@ -54,7 +54,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'async function addChannelDirectly(input, filterAll = false, collaborationWith = null, collaborationGroupId = null, metadata = {}) {',
     end: '/**\n * Add "Filter All Content" checkbox',
-    startLine: 13427,
+    startLine: 13440,
     lines: 54,
     bytes: 2662,
     hash: '4eb280573a5611b695c8284a8e6b85d17b2a97c459143a3054d02374cdf7c2ca'
@@ -65,7 +65,7 @@ const renderMenuEntriesSpec = {
   file: 'js/content_bridge.js',
   start: 'function renderFilterTubeMenuEntries',
   end: 'function updateInjectedMenuChannelName',
-  startLine: 689,
+  startLine: 697,
   lines: 123,
   bytes: 6374,
   hash: '8ad65b76a720f0ed82a6a2f1664e5d5e078cc887840f8a4d487fb20684c3b3e6'
@@ -75,7 +75,7 @@ const ampersandTopicMenuGuardSpec = {
   file: 'js/content_bridge.js',
   start: 'function contentBridgeAmpersandTopicSingleChannelMenuGuard',
   end: 'const filterTubeRawConsole',
-  startLine: 13552,
+  startLine: 13565,
   lines: 31,
   bytes: 1223,
   hash: '735cefcc42c64e33cd8ff6842c64f0348b70893bbc4a526e3008a37d782753b6'
@@ -360,7 +360,7 @@ test('menu action list-target audit is audit-only and source pinned', () => {
     assert.equal(lineCount(source), lines, `${file} line count changed`);
     assert.equal(Buffer.byteLength(source), bytes, `${file} byte count changed`);
     assert.equal(sha256File(file), hash, `${file} hash changed`);
-    assert.match(audit, new RegExp(`\\| \`${file.replace('.', '\\.')}\` \\| ${lines} \\| ${bytes} \\| \`${hash}\` \\|`));
+    assert.match(audit, new RegExp(`\\| \`${file.replace('.', '\\.')}\` \\| ${lines.toLocaleString('en-US')} \\| ${bytes.toLocaleString('en-US')} \\| \`${hash}\` \\|`));
   }
 });
 

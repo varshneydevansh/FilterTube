@@ -314,13 +314,13 @@ function fireAllTimers(runtime) {
 test('JSON-first network snapshot consumer application audit is audit-only and source pinned', () => {
   const text = doc();
   const bridge = read('js/content_bridge.js');
-  const bridgeHash = 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c';
+  const bridgeHash = '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d';
 
   assert.match(text, /Status: audit-only current-behavior register/);
   assert.match(text, /Runtime behavior is unchanged/);
   assert.match(text, /not an implementation patch, optimization patch, cache patch, DOM patch/);
-  assert.equal(lineCount(bridge), 13623);
-  assert.equal(Buffer.byteLength(bridge), 603362);
+  assert.equal(lineCount(bridge), 13636);
+  assert.equal(Buffer.byteLength(bridge), 604184);
   assert.equal(sha256('js/content_bridge.js'), bridgeHash);
   assert.match(text, new RegExp(bridgeHash));
   assert.match(text, /consumer application source files: 1/);

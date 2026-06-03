@@ -24,7 +24,8 @@ tests/runtime/p0-profile-viewing-space-current-behavior.test.mjs
 | `js/tab-view.js:8848-8895` | Tab-view profile switch unlocks target profile, writes `activeProfileId`, and reloads UI state. |
 | `js/popup.js:1378-1510` | Popup profile switch follows the same unlock/write/reload pattern. |
 | `js/state_manager.js:190-455` | Loads active V4 profile Main/Kids surfaces into UI state without viewing-space runtime authority. |
-| `js/background.js:1974-2555` | Compiles active profile Main/Kids settings for runtime filtering without `allowMainViewing` / `allowKidsViewing` enforcement. |
+| `js/background.js:1974-2555` | Compiles active profile Main/Kids settings and now exposes child-only `managedViewingRouteGate` from `allowMainViewing` / `allowKidsViewing`. |
+| `js/content/bridge_settings.js` | The content bridge now blocks denied child Main/Kids routes before forwarding settings into the page-world runtime. |
 | `js/io_manager.js:1470-1738` | Import writes target profile/V4 state and optional Nanah trusted-device state. |
 | `js/nanah_sync_adapter.js:168-251` | Scoped Nanah apply writes profile sections directly and returns no compiled runtime revision. |
 
@@ -34,8 +35,8 @@ tests/runtime/p0-profile-viewing-space-current-behavior.test.mjs
 | --- | --- | --- | --- |
 | `profile_switch_invalidates_compiled_main_and_kids_by_revision` | Not satisfied by revision. | Profile switch writes `activeProfileId` and reloads local UI; background cache is only `main`/`kids` and no `compiledSettingsRevision` exists. | A stale runtime snapshot can be hard to prove invalidated after profile switch, import, or sync. |
 | `profile_switch_rejects_locked_profile_without_session_unlock` | Satisfied in popup/tab-view UI paths, not a shared authority. | Both switch functions call `ensureProfileUnlocked()` before saving `activeProfileId`. | Other mutation or runtime paths do not consume one profile lock report. |
-| `profile_viewing_space_main_denied_blocks_main_runtime_compile` | Not satisfied. | Background Main compile does not read `allowMainViewing`. | UI can say Main is denied while runtime compile still serves Main settings. |
-| `profile_viewing_space_kids_denied_blocks_kids_runtime_compile` | Not satisfied. | Background Kids compile does not read `allowKidsViewing`. | UI can say Kids is denied while runtime compile still serves Kids settings. |
+| `profile_viewing_space_main_denied_blocks_main_runtime_compile` | Locally satisfied for child route-gate, not revision-backed. | Background compile now exposes `managedViewingRouteGate`; content bridge blocks denied Main routes with a managed overlay. | Remote/imported viewing-space policy still lacks envelope/revision authority. |
+| `profile_viewing_space_kids_denied_blocks_kids_runtime_compile` | Locally satisfied for child route-gate, not revision-backed. | Background compile now exposes `managedViewingRouteGate`; content bridge blocks denied Kids routes with a managed overlay. | Remote/imported viewing-space policy still lacks envelope/revision authority. |
 | `profile_viewing_space_cannot_disable_both_surfaces` | Satisfied in tab-view profile manager. | `updateProfileViewingAccess()` blocks `!nextMain && !nextKids`. | This is UI validation, not a shared import/Nanah/runtime invariant. |
 | `child_profile_cannot_mutate_parent_policy_from_child_surface` | Partially satisfied in tab-view UI. | Viewing-access updates reject active child profiles; admin controls are disabled for child profiles. | Background/import/Nanah paths are not governed by the same child-policy authority. |
 | `parent_managed_child_edit_reports_target_profile_and_surface` | Not satisfied as a structured report. | `managedChildEdit = { profileId, surface }` exists, but save returns boolean and no mutation report/revision. | Parent edits can mutate child rules without an auditable target-profile/surface result. |
@@ -116,9 +117,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

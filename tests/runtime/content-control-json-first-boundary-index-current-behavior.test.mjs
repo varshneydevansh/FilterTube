@@ -165,7 +165,7 @@ test('content-control JSON-first boundary index is audit-only and source pinned'
   assert.ok(doc.includes(`| \`js/content_controls_catalog.js\` | 222 | 7822 | \`${sha256('js/content_controls_catalog.js')}\` |`));
   assert.ok(doc.includes(`| \`js/settings_shared.js\` | 1181 | 57535 | \`${sha256('js/settings_shared.js')}\` |`));
   assert.ok(doc.includes(`| \`js/state_manager.js\` | 2491 | 99780 | \`${sha256('js/state_manager.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/background.js\` | 6320 | 285103 | \`${sha256('js/background.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/background.js\` | 6343 | 286370 | \`${sha256('js/background.js')}\` |`));
 });
 
 test('content-control JSON-first family docs carry the method semantic proof gap blocker', () => {
@@ -173,9 +173,9 @@ test('content-control JSON-first family docs carry the method semantic proof gap
 
   for (const marker of [
     'tracked JS/JSX/MJS files: 69',
-    'repo-wide lexical callables: 5720',
+    'repo-wide lexical callables: 5736',
     'files with complete per-callable semantic proof: 0',
-    'lexical callables requiring semantic proof before behavior changes: 5720',
+    'lexical callables requiring semantic proof before behavior changes: 5736',
     'runtime behavior changed: no'
   ]) {
     assert.ok(methodGap.includes(marker), `method gap source missing ${marker}`);
@@ -187,9 +187,9 @@ test('content-control JSON-first family docs carry the method semantic proof gap
     assert.ok(text.includes(methodGapPath), `${file} should cite method gap source`);
     assert.match(text, /## Method Semantic Proof Gap Boundary/);
     assert.match(text, /method semantic proof gap files covered: 69/);
-    assert.match(text, /method semantic proof gap lexical callables covered: 5720/);
+    assert.match(text, /method semantic proof gap lexical callables covered: 5736/);
     assert.match(text, /files with complete per-callable semantic proof: 0/);
-    assert.match(text, /lexical callables requiring semantic proof before behavior changes: 5720/);
+    assert.match(text, /lexical callables requiring semantic proof before behavior changes: 5736/);
     assert.match(text, /affected callable semantic proof: NO-GO/);
     assert.match(text, /runtime behavior changed: no/);
     assert.match(text, /do not approve runtime\s+optimization/);

@@ -2744,7 +2744,7 @@ function assertSourceOwnerMapDraftReadinessClosure(source) {
   assert.match(draft, /source-owner approval rows covered: 12/);
   assert.match(draft, /inline draft JSON sections covered: 12/);
   assert.match(draft, /inline draft JSON artifact promotion decision: NO-GO/);
-  assert.match(draft, /method semantic proof gap lexical callables covered: 5720/);
+  assert.match(draft, /method semantic proof gap lexical callables covered: 5736/);
   assert.match(draft, /files with complete per-callable semantic proof: 0/);
   assert.match(draft, /source-owner draft closure rows: 12/);
   assert.match(draft, /source-owner draft rows linked by closure: 12/);
@@ -2863,9 +2863,9 @@ function assertMetricSampleDraftClosure(source) {
   assert.match(sample, /collector fixture provenance rows covered: 12/);
   assert.match(sample, /collector parity rollout rows covered: 12/);
   assert.match(sample, /method semantic proof gap files covered: 69/);
-  assert.match(sample, /method semantic proof gap lexical callables covered: 5720/);
+  assert.match(sample, /method semantic proof gap lexical callables covered: 5736/);
   assert.match(sample, /files with complete per-callable semantic proof: 0/);
-  assert.match(sample, /lexical callables requiring semantic proof before behavior changes: 5720/);
+  assert.match(sample, /lexical callables requiring semantic proof before behavior changes: 5736/);
   assert.match(sample, /inline metric sample JSON sections covered: 12/);
   assert.match(sample, /inline metric sample artifact promotion decision: NO-GO/);
   assert.match(sample, /metric sample draft closure rows: 12/);
@@ -2878,7 +2878,7 @@ function assertMetricSampleDraftClosure(source) {
   assert.match(sample, /metric source-owner rows linked by sample closure: 12/);
   assert.match(sample, /collector readiness families linked by sample closure: 5/);
   assert.match(sample, /method semantic proof gap files linked by sample closure: 69/);
-  assert.match(sample, /lexical callables linked by sample closure: 5720/);
+  assert.match(sample, /lexical callables linked by sample closure: 5736/);
   assert.match(sample, /runtime metric sample closure approvals: 0/);
   assert.match(sample, /implementation-ready metric sample closure rows: 0/);
   assert.match(sample, /metric sample draft closure: METRIC-SAMPLE-CHAIN-CLOSED/);
@@ -2934,9 +2934,9 @@ function assertFixtureProvenanceDraftClosure(source) {
   assert.match(fixture, /collector fixture provenance rows covered: 12/);
   assert.match(fixture, /collector parity rollout rows covered: 12/);
   assert.match(fixture, /method semantic proof gap files covered: 69/);
-  assert.match(fixture, /method semantic proof gap lexical callables covered: 5720/);
+  assert.match(fixture, /method semantic proof gap lexical callables covered: 5736/);
   assert.match(fixture, /files with complete per-callable semantic proof: 0/);
-  assert.match(fixture, /lexical callables requiring semantic proof before behavior changes: 5720/);
+  assert.match(fixture, /lexical callables requiring semantic proof before behavior changes: 5736/);
   assert.match(fixture, /inline fixture provenance JSON sections covered: 12/);
   assert.match(fixture, /inline fixture provenance artifact promotion decision: NO-GO/);
   assert.match(fixture, /fixture provenance draft closure rows: 12/);
@@ -2951,7 +2951,7 @@ function assertFixtureProvenanceDraftClosure(source) {
   assert.match(fixture, /metric source-owner rows linked by fixture closure: 12/);
   assert.match(fixture, /collector readiness families linked by fixture closure: 5/);
   assert.match(fixture, /method semantic proof gap files linked by fixture closure: 69/);
-  assert.match(fixture, /lexical callables linked by fixture closure: 5720/);
+  assert.match(fixture, /lexical callables linked by fixture closure: 5736/);
   assert.match(fixture, /runtime fixture provenance closure approvals: 0/);
   assert.match(fixture, /implementation-ready fixture provenance closure rows: 0/);
   assert.match(fixture, /fixture provenance draft closure: FIXTURE-PROVENANCE-CHAIN-CLOSED/);
@@ -3008,9 +3008,9 @@ function assertNoWorkPreservationDraftClosure(source) {
   assert.match(noWork, /collector fixture provenance rows covered: 12/);
   assert.match(noWork, /collector parity rollout rows covered: 12/);
   assert.match(noWork, /method semantic proof gap files covered: 69/);
-  assert.match(noWork, /method semantic proof gap lexical callables covered: 5720/);
+  assert.match(noWork, /method semantic proof gap lexical callables covered: 5736/);
   assert.match(noWork, /files with complete per-callable semantic proof: 0/);
-  assert.match(noWork, /lexical callables requiring semantic proof before behavior changes: 5720/);
+  assert.match(noWork, /lexical callables requiring semantic proof before behavior changes: 5736/);
   assert.match(noWork, /inline no-work preservation JSON sections covered: 12/);
   assert.match(noWork, /inline no-work preservation artifact promotion decision: NO-GO/);
   assert.match(noWork, /no-work preservation draft closure rows: 12/);
@@ -3026,7 +3026,7 @@ function assertNoWorkPreservationDraftClosure(source) {
   assert.match(noWork, /metric source-owner rows linked by no-work closure: 12/);
   assert.match(noWork, /collector readiness families linked by no-work closure: 5/);
   assert.match(noWork, /method semantic proof gap files linked by no-work closure: 69/);
-  assert.match(noWork, /lexical callables linked by no-work closure: 5720/);
+  assert.match(noWork, /lexical callables linked by no-work closure: 5736/);
   assert.match(noWork, /runtime no-work preservation closure approvals: 0/);
   assert.match(noWork, /implementation-ready no-work preservation closure rows: 0/);
   assert.match(noWork, /no-work preservation draft closure: NO-WORK-PRESERVATION-CHAIN-CLOSED/);
@@ -3084,9 +3084,9 @@ function assertSideEffectBudgetDraftClosure(source) {
   assert.match(sideEffect, /collector fixture provenance rows covered: 12/);
   assert.match(sideEffect, /collector parity rollout rows covered: 12/);
   assert.match(sideEffect, /method semantic proof gap files covered: 69/);
-  assert.match(sideEffect, /method semantic proof gap lexical callables covered: 5720/);
+  assert.match(sideEffect, /method semantic proof gap lexical callables covered: 5736/);
   assert.match(sideEffect, /files with complete per-callable semantic proof: 0/);
-  assert.match(sideEffect, /lexical callables requiring semantic proof before behavior changes: 5720/);
+  assert.match(sideEffect, /lexical callables requiring semantic proof before behavior changes: 5736/);
   assert.match(sideEffect, /inline side-effect budget JSON sections covered: 12/);
   assert.match(sideEffect, /inline side-effect budget artifact promotion decision: NO-GO/);
   assert.match(sideEffect, /side-effect budget draft closure rows: 12/);
@@ -3103,7 +3103,7 @@ function assertSideEffectBudgetDraftClosure(source) {
   assert.match(sideEffect, /metric source-owner rows linked by side-effect closure: 12/);
   assert.match(sideEffect, /collector readiness families linked by side-effect closure: 5/);
   assert.match(sideEffect, /method semantic proof gap files linked by side-effect closure: 69/);
-  assert.match(sideEffect, /lexical callables linked by side-effect closure: 5720/);
+  assert.match(sideEffect, /lexical callables linked by side-effect closure: 5736/);
   assert.match(sideEffect, /runtime side-effect budget closure approvals: 0/);
   assert.match(sideEffect, /implementation-ready side-effect budget closure rows: 0/);
   assert.match(sideEffect, /side-effect budget draft closure: SIDE-EFFECT-BUDGET-CHAIN-CLOSED/);
@@ -3169,9 +3169,9 @@ function assertDiagnosticPrivacyDraftClosure(source) {
   assert.match(diagnostic, /console\.debug callsites covered: 24/);
   assert.match(diagnostic, /console\.info callsites covered: 0/);
   assert.match(diagnostic, /method semantic proof gap files covered: 69/);
-  assert.match(diagnostic, /method semantic proof gap lexical callables covered: 5720/);
+  assert.match(diagnostic, /method semantic proof gap lexical callables covered: 5736/);
   assert.match(diagnostic, /files with complete per-callable semantic proof: 0/);
-  assert.match(diagnostic, /lexical callables requiring semantic proof before behavior changes: 5720/);
+  assert.match(diagnostic, /lexical callables requiring semantic proof before behavior changes: 5736/);
   assert.match(diagnostic, /inline diagnostic privacy JSON sections covered: 12/);
   assert.match(diagnostic, /inline diagnostic privacy artifact promotion decision: NO-GO/);
   assert.match(diagnostic, /diagnostic privacy draft closure rows: 12/);
@@ -3191,7 +3191,7 @@ function assertDiagnosticPrivacyDraftClosure(source) {
   assert.match(diagnostic, /diagnostic logging policy source files linked by diagnostic closure: 21/);
   assert.match(diagnostic, /active console callsites linked by diagnostic closure: 418/);
   assert.match(diagnostic, /method semantic proof gap files linked by diagnostic closure: 69/);
-  assert.match(diagnostic, /lexical callables linked by diagnostic closure: 5720/);
+  assert.match(diagnostic, /lexical callables linked by diagnostic closure: 5736/);
   assert.match(diagnostic, /runtime diagnostic privacy closure approvals: 0/);
   assert.match(diagnostic, /implementation-ready diagnostic privacy closure rows: 0/);
   assert.match(diagnostic, /diagnostic privacy draft closure: DIAGNOSTIC-PRIVACY-CHAIN-CLOSED/);
@@ -3255,9 +3255,9 @@ function assertParityRolloutDraftClosure(source) {
   assert.match(parity, /evidence parity rollout rows covered: 2/);
   assert.match(parity, /parity and release boundary source docs covered: 8/);
   assert.match(parity, /method semantic proof gap files covered: 69/);
-  assert.match(parity, /method semantic proof gap lexical callables covered: 5720/);
+  assert.match(parity, /method semantic proof gap lexical callables covered: 5736/);
   assert.match(parity, /files with complete per-callable semantic proof: 0/);
-  assert.match(parity, /lexical callables requiring semantic proof before behavior changes: 5720/);
+  assert.match(parity, /lexical callables requiring semantic proof before behavior changes: 5736/);
   assert.match(parity, /inline parity rollout JSON sections covered: 12/);
   assert.match(parity, /inline parity rollout artifact promotion decision: NO-GO/);
   assert.match(parity, /parity rollout draft closure rows: 12/);
@@ -3278,7 +3278,7 @@ function assertParityRolloutDraftClosure(source) {
   assert.match(parity, /evidence parity rollout rows linked by parity closure: 2/);
   assert.match(parity, /parity and release boundary source docs linked by parity closure: 8/);
   assert.match(parity, /method semantic proof gap files linked by parity closure: 69/);
-  assert.match(parity, /lexical callables linked by parity closure: 5720/);
+  assert.match(parity, /lexical callables linked by parity closure: 5736/);
   assert.match(parity, /runtime parity rollout closure approvals: 0/);
   assert.match(parity, /implementation-ready parity rollout closure rows: 0/);
   assert.match(parity, /parity rollout draft closure: PARITY-ROLLOUT-CHAIN-CLOSED/);
@@ -3344,9 +3344,9 @@ function assertVerificationOutputDraftClosure(source) {
   assert.match(verification, /collector fixture provenance rows covered: 12/);
   assert.match(verification, /collector parity rollout rows covered: 12/);
   assert.match(verification, /method semantic proof gap files covered: 69/);
-  assert.match(verification, /method semantic proof gap lexical callables covered: 5720/);
+  assert.match(verification, /method semantic proof gap lexical callables covered: 5736/);
   assert.match(verification, /files with complete per-callable semantic proof: 0/);
-  assert.match(verification, /lexical callables requiring semantic proof before behavior changes: 5720/);
+  assert.match(verification, /lexical callables requiring semantic proof before behavior changes: 5736/);
   assert.match(verification, /expected runtime audit tests: 4457/);
   assert.match(verification, /expected runtime audit pass: 4457/);
   assert.match(verification, /expected runtime audit fail: 0/);
@@ -3369,7 +3369,7 @@ function assertVerificationOutputDraftClosure(source) {
   assert.match(verification, /metric source-owner rows linked by verification closure: 12/);
   assert.match(verification, /collector readiness families linked by verification closure: 5/);
   assert.match(verification, /method semantic proof gap files linked by verification closure: 69/);
-  assert.match(verification, /lexical callables linked by verification closure: 5720/);
+  assert.match(verification, /lexical callables linked by verification closure: 5736/);
   assert.match(verification, /runtime fixture result count rows linked by verification closure: 3/);
   assert.match(verification, /runtime verification output closure approvals: 0/);
   assert.match(verification, /persisted verification output closure approvals: 0/);

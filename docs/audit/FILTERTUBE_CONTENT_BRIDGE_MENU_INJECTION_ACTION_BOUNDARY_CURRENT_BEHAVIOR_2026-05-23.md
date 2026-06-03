@@ -16,19 +16,19 @@ content bridge menu injection action source/effect blocks: 7
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content_bridge.js` | 13623 | 603362 | `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c` |
+| `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
 
 ## Pinned Blocks
 
 | Block | Start Line | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | ---: | --- |
-| `contentBridgeMetadataPayload` | 119 | 76 | 3754 | `d6c3da5000cfb20dec65c73d66926e70e518fe501a931ea730afb03a655d55eb` |
-| `contentBridgeDropdownCleanup` | 432 | 151 | 5372 | `9aef97fd142a584b06e06b742565f75c301c7c12d673badebc385ac7b2c75aec` |
-| `contentBridgeMenuInjectionEntry` | 10725 | 735 | 34684 | `9310a960d3a007775483683d00dfdcf2fedd773efd33e329fd01aa6f0d52605b` |
-| `contentBridgeMenuHandlers` | 11463 | 71 | 2490 | `07e0e72b5c4c4a7f95615c0e752bd1ea987fd4851f31e23e3569e8d3bcadd540` |
-| `contentBridgeBlockedMarkerAndTargets` | 12034 | 119 | 5113 | `c6eb72ca074bc60447f2914cf3a58f421eafe8db9a18ce44f398c86d3cf8d7f7` |
-| `contentBridgeHandleBlockChannelClick` | 12193 | 1226 | 60722 | `459943dd5f26638ac63bc413a7cee220e862225929aaf2a4a0b6e068cd32ef9f` |
-| `contentBridgeAddChannelDirectly` | 13427 | 54 | 2662 | `4eb280573a5611b695c8284a8e6b85d17b2a97c459143a3054d02374cdf7c2ca` |
+| `contentBridgeMetadataPayload` | 127 | 76 | 3754 | `d6c3da5000cfb20dec65c73d66926e70e518fe501a931ea730afb03a655d55eb` |
+| `contentBridgeDropdownCleanup` | 440 | 151 | 5372 | `9aef97fd142a584b06e06b742565f75c301c7c12d673badebc385ac7b2c75aec` |
+| `contentBridgeMenuInjectionEntry` | 10738 | 735 | 34684 | `9310a960d3a007775483683d00dfdcf2fedd773efd33e329fd01aa6f0d52605b` |
+| `contentBridgeMenuHandlers` | 11476 | 71 | 2490 | `07e0e72b5c4c4a7f95615c0e752bd1ea987fd4851f31e23e3569e8d3bcadd540` |
+| `contentBridgeBlockedMarkerAndTargets` | 12047 | 119 | 5113 | `c6eb72ca074bc60447f2914cf3a58f421eafe8db9a18ce44f398c86d3cf8d7f7` |
+| `contentBridgeHandleBlockChannelClick` | 12206 | 1226 | 60722 | `459943dd5f26638ac63bc413a7cee220e862225929aaf2a4a0b6e068cd32ef9f` |
+| `contentBridgeAddChannelDirectly` | 13440 | 54 | 2662 | `4eb280573a5611b695c8284a8e6b85d17b2a97c459143a3054d02374cdf7c2ca` |
 
 ## Selected Token Counts
 
@@ -142,9 +142,9 @@ surface can support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

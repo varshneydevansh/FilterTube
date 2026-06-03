@@ -10,8 +10,8 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_FILTER_ALL_TOGGLE_LIST_TARGET_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/background.js': [6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
-  'js/content_bridge.js': [13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c'],
+  'js/background.js': [6343, 286370, 'ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36'],
+  'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
   'js/state_manager.js': [2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6']
 };
 
@@ -20,7 +20,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: "if (message.type === 'toggleChannelFilterAll')",
     end: 'return false;\n});',
-    startLine: 5282,
+    startLine: 5305,
     lines: 14,
     bytes: 413,
     hash: '7e15cc800cdde69487959513b30d2cfab29c55f9b1caa566f96b99bcb844c94e'
@@ -29,7 +29,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: 'async function handleToggleChannelFilterAll(channelId, value) {',
     end: "console.log(`FilterTube Background ${IS_FIREFOX ? 'Script' : 'Service Worker'} loaded and ready to serve filtered content.`);",
-    startLine: 6208,
+    startLine: 6231,
     lines: 95,
     bytes: 3435,
     hash: '84afd60fbb6c140a1a20880b7cb2b81a7ce33fe95c89b4278c1d00e1b1756dd4'
@@ -38,7 +38,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function addFilterAllContentCheckbox(menuItem, channelData) {',
     end: 'function contentBridgeAmpersandTopicSingleChannelMenuGuard(channelInfo, videoCard) {',
-    startLine: 13486,
+    startLine: 13499,
     lines: 66,
     bytes: 2391,
     hash: '03861f56c173757f479e0863d16fab83df5ba180e5d21d8adb37cdf0b5fcb490'
@@ -118,6 +118,10 @@ const missingRuntimeSymbols = [
 
 function formatNumber(value) {
   return Number(value).toLocaleString('en-US');
+}
+
+function formatSourceNumber(file, value) {
+  return file === 'js/background.js' ? String(value) : formatNumber(value);
 }
 
 function read(file) {
@@ -299,7 +303,7 @@ test('filter-all toggle list-target audit is audit-only and source pinned', () =
     assert.equal(lineCount(source), lines, `${file} line count changed`);
     assert.equal(Buffer.byteLength(source), bytes, `${file} byte count changed`);
     assert.equal(sha256File(file), hash, `${file} hash changed`);
-    assert.match(audit, new RegExp(`\\| \`${file.replace('.', '\\.')}\` \\| ${formatNumber(lines)} \\| ${formatNumber(bytes)} \\| \`${hash}\` \\|`));
+    assert.match(audit, new RegExp(`\\| \`${file.replace('.', '\\.')}\` \\| ${formatSourceNumber(file, lines)} \\| ${formatSourceNumber(file, bytes)} \\| \`${hash}\` \\|`));
   }
 });
 

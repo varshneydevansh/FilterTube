@@ -24,6 +24,14 @@ function isFilterTubeNativeOverlayQuietMode() {
     return false;
 }
 
+function isFilterTubeManagedViewingRouteDenied() {
+    try {
+        return globalThis.__filtertubeManagedViewingRouteDenied === true;
+    } catch (e) {
+        return false;
+    }
+}
+
 if (isFilterTubeDebugEnabled()) {
     console.log("FilterTube: content_bridge.js loaded (Isolated World)");
 }
@@ -1048,6 +1056,7 @@ function hasBridgeActiveJsonFilterRules(settings) {
 
 function needsMainWorldRuntimeWork(settings) {
     try {
+        if (isFilterTubeManagedViewingRouteDenied()) return false;
         if (!settings || typeof settings !== 'object') return false;
         if (settings.enabled === false) return false;
         if (settings.listMode === 'whitelist') return true;
@@ -5895,6 +5904,7 @@ function handleMainWorldMessages(event) {
         requestSettingsFromBackground();
     } else if (type === 'FilterTube_Refresh') {
         requestSettingsFromBackground().then(result => {
+            if (isFilterTubeManagedViewingRouteDenied()) return;
             if (result?.success) applyDOMFallback(result.settings, { forceReprocess: true });
         });
     } else if (type === 'FilterTube_UpdateChannelMap') {
@@ -6144,6 +6154,7 @@ async function initializeDOMFallback(settings) {
         settings = response?.settings;
     }
     if (settings) {
+        if (isFilterTubeManagedViewingRouteDenied()) return;
         applyDOMFallback(settings);
         try {
             ensureFallbackMenuButtons();
@@ -6157,19 +6168,19 @@ async function initializeDOMFallback(settings) {
         const MIN_FALLBACK_INTERVAL_MS = 250;
 
         const debouncedFallback = debounce(() => {
-            if (isFilterTubeNativeOverlayQuietMode()) return;
+            if (isFilterTubeNativeOverlayQuietMode() || isFilterTubeManagedViewingRouteDenied()) return;
             applyDOMFallback(null);
             lastFallbackRunTs = Date.now();
         }, 200);
 
         let immediateFallbackScheduled = false;
         function scheduleImmediateFallback() {
-            if (isFilterTubeNativeOverlayQuietMode()) return;
+            if (isFilterTubeNativeOverlayQuietMode() || isFilterTubeManagedViewingRouteDenied()) return;
             if (immediateFallbackScheduled) return;
             immediateFallbackScheduled = true;
             requestAnimationFrame(() => {
                 immediateFallbackScheduled = false;
-                if (isFilterTubeNativeOverlayQuietMode()) return;
+                if (isFilterTubeNativeOverlayQuietMode() || isFilterTubeManagedViewingRouteDenied()) return;
 
                 const now = Date.now();
                 const elapsed = now - (lastFallbackRunTs || 0);
@@ -6177,7 +6188,7 @@ async function initializeDOMFallback(settings) {
                     if (pendingImmediateFallbackTimer) return;
                     pendingImmediateFallbackTimer = setTimeout(() => {
                         pendingImmediateFallbackTimer = 0;
-                        if (isFilterTubeNativeOverlayQuietMode()) return;
+                        if (isFilterTubeNativeOverlayQuietMode() || isFilterTubeManagedViewingRouteDenied()) return;
                         lastFallbackRunTs = Date.now();
                         applyDOMFallback(null);
                         try {
@@ -6205,11 +6216,11 @@ async function initializeDOMFallback(settings) {
         const WHITELIST_PENDING_HIDE_CANDIDATE_LIMIT = 160;
 
         function scheduleWhitelistPendingRecheck(delayMs = 120) {
-            if (isFilterTubeNativeOverlayQuietMode()) return;
+            if (isFilterTubeNativeOverlayQuietMode() || isFilterTubeManagedViewingRouteDenied()) return;
             if (whitelistPendingRefreshState.timer) return;
             whitelistPendingRefreshState.timer = setTimeout(() => {
                 whitelistPendingRefreshState.timer = 0;
-                if (isFilterTubeNativeOverlayQuietMode()) return;
+                if (isFilterTubeNativeOverlayQuietMode() || isFilterTubeManagedViewingRouteDenied()) return;
                 try {
                     if (typeof applyDOMFallback === 'function') {
                         applyDOMFallback(null, { preserveScroll: true, onlyWhitelistPending: true });
@@ -6221,7 +6232,7 @@ async function initializeDOMFallback(settings) {
 
         function queueWhitelistPendingHide(mutations, delayMs = 40) {
             try {
-                if (isFilterTubeNativeOverlayQuietMode()) return;
+                if (isFilterTubeNativeOverlayQuietMode() || isFilterTubeManagedViewingRouteDenied()) return;
                 if (!mutations || !mutations.length) return;
                 if (currentSettings?.listMode !== 'whitelist') return;
                 try {
@@ -6268,6 +6279,7 @@ async function initializeDOMFallback(settings) {
 
         function applyWhitelistPendingHide(candidates) {
             try {
+                if (isFilterTubeManagedViewingRouteDenied()) return;
                 const listMode = currentSettings?.listMode === 'whitelist' ? 'whitelist' : 'blocklist';
                 if (listMode !== 'whitelist') return;
 
@@ -6407,6 +6419,7 @@ async function initializeDOMFallback(settings) {
 
         function hasActiveFallbackLifecycleWork() {
             try {
+                if (isFilterTubeManagedViewingRouteDenied()) return false;
                 if (typeof hasActiveDOMFallbackWork === 'function') {
                     return hasActiveDOMFallbackWork(currentSettings);
                 }

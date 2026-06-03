@@ -229,7 +229,7 @@ test('current source proves mode and route gates now run before queue collection
   for (const line of [
     lineOfAfter('js/content_bridge.js', 'async function initializeDOMFallback(settings) {', 'const WHITELIST_PENDING_HIDE_CANDIDATE_LIMIT = 160;'),
     lineOfAfter('js/content_bridge.js', 'async function initializeDOMFallback(settings) {', 'function queueWhitelistPendingHide(mutations, delayMs = 40) {'),
-    lineOfAfter('js/content_bridge.js', 'function queueWhitelistPendingHide(mutations, delayMs = 40) {', 'if (isFilterTubeNativeOverlayQuietMode()) return;'),
+    lineOfAfter('js/content_bridge.js', 'function queueWhitelistPendingHide(mutations, delayMs = 40) {', 'if (isFilterTubeNativeOverlayQuietMode() || isFilterTubeManagedViewingRouteDenied()) return;'),
     lineOfAfter('js/content_bridge.js', 'function queueWhitelistPendingHide(mutations, delayMs = 40) {', "if (currentSettings?.listMode !== 'whitelist') return;"),
     lineOfAfter('js/content_bridge.js', 'function queueWhitelistPendingHide(mutations, delayMs = 40) {', "const path = document.location?.pathname || '';"),
     lineOfAfter('js/content_bridge.js', 'function queueWhitelistPendingHide(mutations, delayMs = 40) {', 'if (whitelistPendingRefreshState.pendingHideCandidates.length >= WHITELIST_PENDING_HIDE_CANDIDATE_LIMIT) return;'),

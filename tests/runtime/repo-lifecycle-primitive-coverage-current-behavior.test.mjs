@@ -210,8 +210,8 @@ test('every tracked JS JSX and MJS file is lifecycle-classified', () => {
 test('repo-wide lifecycle primitive totals match current tracked source', () => {
   const { totals } = aggregate();
   assert.deepEqual(totals, {
-    addEventListener: 294,
-    removeEventListener: 13,
+    addEventListener: 298,
+    removeEventListener: 17,
     mutationObserver: 16,
     intersectionObserver: 4,
     setInterval: 3,
@@ -229,8 +229,8 @@ test('repo-wide lifecycle primitive totals match current tracked source', () => 
     styleDisplay: 96,
     classListMutation: 110
   });
-  assert.equal(Object.values(totals).reduce((sum, value) => sum + value, 0), 875);
-  assert.match(coverageDoc, /\*\*Total\*\* \| \*\*875\*\*/);
+  assert.equal(Object.values(totals).reduce((sum, value) => sum + value, 0), 883);
+  assert.match(coverageDoc, /\*\*Total\*\* \| \*\*883\*\*/);
 });
 
 test('lifecycle primitive family totals pin page runtime UI website vendor and quarantine burden', () => {
@@ -240,7 +240,7 @@ test('lifecycle primitive family totals pin page runtime UI website vendor and q
   );
   assert.deepEqual(familyTotals, {
     'build-release-sync-scripts': 0,
-    'content-runtime-js': 376,
+    'content-runtime-js': 384,
     'extension-ui-background-js': 419,
     'generated-ui-output': 8,
     'generated-ui-source': 2,
@@ -264,7 +264,7 @@ test('hot lifecycle files and teardown imbalance are documented as current audit
   assert.equal(perFile['js/content/block_channel.js'].total, 81);
   assert.equal(perFile['js/layout.js'].total, 37);
 
-  assert.ok(totals.addEventListener > totals.removeEventListener * 20);
+  assert.ok(totals.addEventListener > totals.removeEventListener * 17);
   assert.ok(totals.setTimeout > totals.clearTimeout * 3);
   assert.ok(totals.styleDisplay + totals.classListMutation > 200);
 
@@ -290,15 +290,15 @@ test('page-resident lifecycle token imbalance is pinned as a cleanup no-go', () 
     'js/content/block_channel.js': 74,
     'js/content/dom_fallback.js': 14,
     'js/injector.js': 12,
-    'js/content/bridge_settings.js': 10,
+    'js/content/bridge_settings.js': 18,
     'js/content/collab_dialog.js': 10,
     'js/content/bridge_injection.js': 2,
     'js/content/handle_resolver.js': 1,
     'js/seed.js': 5
   });
   assert.deepEqual(totals, {
-    addEventListener: 74,
-    removeEventListener: 6,
+    addEventListener: 78,
+    removeEventListener: 10,
     mutationObserver: 14,
     disconnect: 8,
     setInterval: 2,
@@ -308,13 +308,13 @@ test('page-resident lifecycle token imbalance is pinned as a cleanup no-go', () 
     requestAnimationFrame: 15,
     cancelAnimationFrame: 0
   });
-  assert.equal(Object.values(totals).reduce((sum, value) => sum + value, 0), 225);
+  assert.equal(Object.values(totals).reduce((sum, value) => sum + value, 0), 233);
 
   for (const token of [
     '2026-05-30 Page-Resident Teardown Imbalance Addendum',
-    '225 selected page-resident lifecycle tokens',
-    '74 `addEventListener`',
-    '6 `removeEventListener`',
+    '233 selected page-resident lifecycle tokens',
+    '78 `addEventListener`',
+    '10 `removeEventListener`',
     '14 `new MutationObserver`',
     '8 `.disconnect()`',
     '81 `setTimeout`',

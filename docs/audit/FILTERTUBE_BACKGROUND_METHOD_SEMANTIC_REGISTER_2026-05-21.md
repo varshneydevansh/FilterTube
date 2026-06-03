@@ -43,18 +43,18 @@ The companion runtime test executes current source slices from
 
 ```text
 source file: js/background.js
-source split lines: 6321
-source wc -l: 6320
-source bytes: 285103
-source sha256: 77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad
-broad lexical callable matches: 440
+source split lines: 6344
+source wc -l: 6343
+source bytes: 286370
+source sha256: ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36
+broad lexical callable matches: 442
 top-level function declarations: 76
 plain function declarations: 63
 async function declarations: 13
 accepted top-level method rows: 76
 semantic method rows promoted: 76
-control-flow lexical artifacts: 299 (`if`: 284, `for`: 10, `while`: 3, `catch`: 2)
-local/helper/listener/timer callbacks held outside this top-level register: 65
+control-flow lexical artifacts: 300 (`if`: 285, `for`: 10, `while`: 3, `catch`: 2)
+local/helper/listener/timer callbacks held outside this top-level register: 66
 semantic method groups: 12
 covered by separate action register: 31 runtime message action/type branches
 executable current-behavior probes: 6
@@ -158,23 +158,23 @@ subscriptionImportAndSenderNormalization: 11
 | 1737 | `async function` | `buildReleaseNotesPayload` | `releaseNotesAndRuntimeInfo` |
 | 1758 | `function` | `getBackgroundRuntimeLabel` | `releaseNotesAndRuntimeInfo` |
 | 1774 | `async function` | `getCompiledSettings` | `profileCompileAndStorage` |
-| 2565 | `function` | `shouldSuppressFirstRunPromptInjectionError` | `releaseNotesAndRuntimeInfo` |
-| 2666 | `function` | `handleFetchShortsIdentityMessage` | `identityResolverNetwork` |
-| 2708 | `function` | `handleFetchWatchIdentityMessage` | `identityResolverNetwork` |
-| 2736 | `function` | `storageGet` | `profileCompileAndStorage` |
-| 2740 | `function` | `identityHasAlternateMetadata` | `identityResolverNetwork` |
-| 2752 | `function` | `mergeStoredVideoIdentity` | `identityResolverNetwork` |
-| 2787 | `async function` | `buildStoredVideoIdentity` | `identityResolverNetwork` |
-| 2879 | `async function` | `performShortsIdentityFetch` | `identityResolverNetwork` |
-| 2946 | `function` | `extractIdentityFromPreview` | `identityResolverNetwork` |
-| 2964 | `function` | `extractKidsWatchIdentityFromPreview` | `identityResolverNetwork` |
-| 2980 | `async function` | `performKidsWatchIdentityFetch` | `identityResolverNetwork` |
-| 3074 | `async function` | `performWatchIdentityFetch` | `identityResolverNetwork` |
-| 4529 | `function` | `extractCustomUrlFromPath` | `identityResolverNetwork` |
-| 4558 | `async function` | `fetchChannelInfo` | `identityResolverNetwork` |
-| 5309 | `async function` | `handleAddFilteredChannel` | `ruleMutationAndChannelPersistence` |
-| 6208 | `async function` | `handleToggleChannelFilterAll` | `ruleMutationAndChannelPersistence` |
-| 6305 | `function` | `installFilterTubeBackgroundConsoleGate` | `defensiveHelpersAndMessaging` |
+| 2588 | `function` | `shouldSuppressFirstRunPromptInjectionError` | `releaseNotesAndRuntimeInfo` |
+| 2689 | `function` | `handleFetchShortsIdentityMessage` | `identityResolverNetwork` |
+| 2731 | `function` | `handleFetchWatchIdentityMessage` | `identityResolverNetwork` |
+| 2759 | `function` | `storageGet` | `profileCompileAndStorage` |
+| 2763 | `function` | `identityHasAlternateMetadata` | `identityResolverNetwork` |
+| 2775 | `function` | `mergeStoredVideoIdentity` | `identityResolverNetwork` |
+| 2810 | `async function` | `buildStoredVideoIdentity` | `identityResolverNetwork` |
+| 2902 | `async function` | `performShortsIdentityFetch` | `identityResolverNetwork` |
+| 2969 | `function` | `extractIdentityFromPreview` | `identityResolverNetwork` |
+| 2987 | `function` | `extractKidsWatchIdentityFromPreview` | `identityResolverNetwork` |
+| 3003 | `async function` | `performKidsWatchIdentityFetch` | `identityResolverNetwork` |
+| 3097 | `async function` | `performWatchIdentityFetch` | `identityResolverNetwork` |
+| 4552 | `function` | `extractCustomUrlFromPath` | `identityResolverNetwork` |
+| 4581 | `async function` | `fetchChannelInfo` | `identityResolverNetwork` |
+| 5332 | `async function` | `handleAddFilteredChannel` | `ruleMutationAndChannelPersistence` |
+| 6231 | `async function` | `handleToggleChannelFilterAll` | `ruleMutationAndChannelPersistence` |
+| 6328 | `function` | `installFilterTubeBackgroundConsoleGate` | `defensiveHelpersAndMessaging` |
 
 ## Current Behavior Boundaries
 
@@ -258,9 +258,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

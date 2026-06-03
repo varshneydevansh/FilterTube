@@ -162,9 +162,9 @@ test('source owner map draft readiness rows and counts stay pinned', () => {
   assert.match(doc, /inline draft JSON sections covered: 12/);
   assert.match(doc, /inline draft JSON artifact promotion decision: NO-GO/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5720/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5736/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5720/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5736/);
   assert.match(doc, /draft artifact promotion decision: NO-GO/);
   assert.match(doc, /source-owner draft closure rows: 12/);
   assert.match(doc, /source-owner draft rows linked by closure: 12/);
@@ -246,7 +246,7 @@ test('draft readiness source inputs preserve current no-go authority gaps', () =
   assert.match(collectorApproval, /0 runtime metric collector approvals/);
   assert.match(collectorInsertion, /runtime collector insertion points approved: 0/);
   assert.match(methodGap, /tracked JS\/JSX\/MJS files: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5720/);
+  assert.match(methodGap, /repo-wide lexical callables: 5736/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
 });
 

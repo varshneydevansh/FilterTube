@@ -32,7 +32,7 @@ const menuDialogFamilyDocs = [
 ];
 
 const sourceFingerprints = {
-  'js/content_bridge.js': [13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c']
+  'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d']
 };
 
 const blockSpecs = {
@@ -40,7 +40,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function buildChannelMetadataPayload(channelInfo = {}) {',
     end: 'function pickMenuChannelDisplayName',
-    startLine: 119,
+    startLine: 127,
     lines: 76,
     bytes: 3754,
     hash: 'd6c3da5000cfb20dec65c73d66926e70e518fe501a931ea730afb03a655d55eb'
@@ -49,7 +49,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function registerActiveCollaborationMenu(videoId, dropdown, videoCard, state = {}) {',
     end: 'function clearFilterTubeMenuItems',
-    startLine: 432,
+    startLine: 440,
     lines: 151,
     bytes: 5372,
     hash: '9aef97fd142a584b06e06b742565f75c301c7c12d673badebc385ac7b2c75aec'
@@ -58,7 +58,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'async function injectFilterTubeMenuItem(dropdown, videoCard) {',
     end: '/**\n * Inject into NEW menu structure',
-    startLine: 10725,
+    startLine: 10738,
     lines: 735,
     bytes: 34684,
     hash: '9310a960d3a007775483683d00dfdcf2fedd773efd33e329fd01aa6f0d52605b'
@@ -67,7 +67,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function attachFilterTubeMenuHandlers({ menuItem, toggle, channelInfo, videoCard, injectionOptions = {} }) {',
     end: 'function createFilterTubeIconElement',
-    startLine: 11463,
+    startLine: 11476,
     lines: 71,
     bytes: 2490,
     hash: '07e0e72b5c4c4a7f95615c0e752bd1ea987fd4851f31e23e3569e8d3bcadd540'
@@ -76,7 +76,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: "function markElementAsBlocked(element, channelInfo, state = 'pending') {",
     end: 'function syncBlockedElementsWithFilters',
-    startLine: 12034,
+    startLine: 12047,
     lines: 119,
     bytes: 5113,
     hash: 'c6eb72ca074bc60447f2914cf3a58f421eafe8db9a18ce44f398c86d3cf8d7f7'
@@ -85,7 +85,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false, videoCard = null) {',
     end: '/**\n * Add channel directly',
-    startLine: 12193,
+    startLine: 12206,
     lines: 1226,
     bytes: 60722,
     hash: '459943dd5f26638ac63bc413a7cee220e862225929aaf2a4a0b6e068cd32ef9f'
@@ -94,7 +94,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'async function addChannelDirectly(input, filterAll = false, collaborationWith = null, collaborationGroupId = null, metadata = {}) {',
     end: '/**\n * Add "Filter All Content" checkbox',
-    startLine: 13427,
+    startLine: 13440,
     lines: 54,
     bytes: 2662,
     hash: '4eb280573a5611b695c8284a8e6b85d17b2a97c459143a3054d02374cdf7c2ca'
@@ -433,10 +433,10 @@ test('content bridge menu injection action audit is audit-only and source pinned
   assert.match(text, /content bridge menu injection action source files: 1/);
   assert.match(text, /content bridge menu injection action source\/effect blocks: 7/);
 
-  assert.match(methodGap, /repo-wide lexical callables: 5720/);
+  assert.match(methodGap, /repo-wide lexical callables: 5736/);
   assert.match(methodGap, /files with lexical accounting: 69/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5720/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5736/);
 
   assert.equal(menuDialogFamilyDocs.length, 19);
   for (const familyDocPath of menuDialogFamilyDocs) {
@@ -444,9 +444,9 @@ test('content bridge menu injection action audit is audit-only and source pinned
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 69/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5720/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5736/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5720/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5736/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     assert.match(familyDoc, /runtime behavior changed: (?:no|yes; collaborator dialog listeners and MutationObserver are lazy)/);
     assert.match(familyDoc, /do not approve runtime\s+optimization/);
@@ -457,7 +457,7 @@ test('content bridge menu injection action audit is audit-only and source pinned
     assert.equal(lineCount(source), expectedLines, `${file} line count drift`);
     assert.equal(Buffer.byteLength(source), expectedBytes, `${file} byte count drift`);
     assert.equal(sha256(source), expectedHash, `${file} hash drift`);
-    assert.match(text, new RegExp(`\\| \`${escapeRegExp(file)}\` \\| ${expectedLines} \\| ${expectedBytes} \\| \`${expectedHash}\` \\|`));
+    assert.match(text, new RegExp(`\\| \`${escapeRegExp(file)}\` \\| ${expectedLines.toLocaleString('en-US')} \\| ${expectedBytes.toLocaleString('en-US')} \\| \`${expectedHash}\` \\|`));
   }
 });
 

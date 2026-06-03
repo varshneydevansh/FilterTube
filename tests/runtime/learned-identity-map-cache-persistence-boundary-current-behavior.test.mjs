@@ -109,9 +109,9 @@ test('learned identity map cache persistence audit document records current boun
 test('learned identity map cache source fingerprints stay pinned', () => {
   const doc = read(auditDocPath);
   const expected = [
-    ['js/background.js', 6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
-    ['js/content_bridge.js', 13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c'],
-    ['js/content/bridge_settings.js', 651, 26462, 'c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b'],
+    ['js/background.js', 6343, 286370, 'ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36'],
+    ['js/content_bridge.js', 13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
+    ['js/content/bridge_settings.js', 845, 34241, 'aea46dd241248db1d1d9bcbdfdf65320d1399ecd84cc7792678f29b1b26ee092'],
     ['js/state_manager.js', 2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6'],
     ['js/filter_logic.js', 3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5']
   ];

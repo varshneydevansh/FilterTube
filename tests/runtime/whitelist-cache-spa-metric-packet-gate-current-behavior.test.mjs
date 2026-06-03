@@ -806,21 +806,21 @@ const affectedCallableSemanticFiles = [
     id: 'FT-WLCACHE-SEMANTIC-GAP-01-content-bridge',
     file: 'js/content_bridge.js',
     family: 'Hot page/background runtime',
-    lexicalCallables: 1202,
+    lexicalCallables: 1203,
     semanticStatus: 'semantic proof incomplete'
   },
   {
     id: 'FT-WLCACHE-SEMANTIC-GAP-02-bridge-settings',
     file: 'js/content/bridge_settings.js',
     family: 'Hot page/background runtime',
-    lexicalCallables: 65,
+    lexicalCallables: 78,
     semanticStatus: 'semantic proof incomplete'
   },
   {
     id: 'FT-WLCACHE-SEMANTIC-GAP-03-background',
     file: 'js/background.js',
     family: 'Hot page/background runtime',
-    lexicalCallables: 440,
+    lexicalCallables: 442,
     semanticStatus: 'semantic proof incomplete'
   },
   {
@@ -1190,16 +1190,16 @@ const affectedCallableAnchorChecks = [
   ['js/filter_logic.js', 94, 'function queueVideoMetaMapping(videoId, meta) {'],
   ['js/filter_logic.js', 1957, '_shouldBlock(item, rendererType) {'],
   ['js/filter_logic.js', 2065, "if (listMode === 'whitelist' && !isCommentRenderer) {"],
-  ['js/content_bridge.js', 1210, 'function installRightRailWhitelistObserver() {'],
-  ['js/content_bridge.js', 1218, 'const runWhitelistRefreshPass = () => {'],
-  ['js/content_bridge.js', 1382, 'async function prefetchIdentityForCard({ videoId, card }) {'],
-  ['js/content_bridge.js', 1629, 'function persistVideoChannelMapping(videoId, channelId) {'],
-  ['js/content_bridge.js', 1640, 'function persistVideoMetaMapping(entries = []) {'],
-  ['js/content_bridge.js', 1705, 'function scheduleVideoMetaDomRerun() {'],
-  ['js/content_bridge.js', 5903, "} else if (type === 'FilterTube_UpdateVideoChannelMap') {"],
-  ['js/content_bridge.js', 5952, "} else if (type === 'FilterTube_UpdateVideoMetaMap') {"],
-  ['js/content/bridge_settings.js', 557, 'function scheduleSettingsRefreshFromStorage({ forceReprocess = true } = {}) {'],
-  ['js/content/bridge_settings.js', 589, 'function handleStorageChanges(changes, area) {'],
+  ['js/content_bridge.js', 1219, 'function installRightRailWhitelistObserver() {'],
+  ['js/content_bridge.js', 1227, 'const runWhitelistRefreshPass = () => {'],
+  ['js/content_bridge.js', 1391, 'async function prefetchIdentityForCard({ videoId, card }) {'],
+  ['js/content_bridge.js', 1638, 'function persistVideoChannelMapping(videoId, channelId) {'],
+  ['js/content_bridge.js', 1649, 'function persistVideoMetaMapping(entries = []) {'],
+  ['js/content_bridge.js', 1714, 'function scheduleVideoMetaDomRerun() {'],
+  ['js/content_bridge.js', 5913, "} else if (type === 'FilterTube_UpdateVideoChannelMap') {"],
+  ['js/content_bridge.js', 5962, "} else if (type === 'FilterTube_UpdateVideoMetaMap') {"],
+  ['js/content/bridge_settings.js', 751, 'function scheduleSettingsRefreshFromStorage({ forceReprocess = true } = {}) {'],
+  ['js/content/bridge_settings.js', 783, 'function handleStorageChanges(changes, area) {'],
   ['js/background.js', 1648, 'function enqueueVideoChannelMapUpdate(videoId, channelId) {'],
   ['js/background.js', 1673, 'function enqueueVideoMetaMapUpdate(videoId, meta) {'],
   ['js/background.js', 1774, 'async function getCompiledSettings(sender = null, profileType = null, forceRefresh = false) {'],
@@ -2413,9 +2413,9 @@ test('packet rows, live smoke rows, and diagrams remain explicit', () => {
 
   const methodGapDoc = read(methodSemanticGapPath);
   assert.match(methodGapDoc, /method semantic proof gap files covered: 69/);
-  assert.match(methodGapDoc, /method semantic proof gap lexical callables covered: 5720/);
+  assert.match(methodGapDoc, /method semantic proof gap lexical callables covered: 5736/);
   assert.match(methodGapDoc, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGapDoc, /lexical callables requiring semantic proof before behavior changes: 5720/);
+  assert.match(methodGapDoc, /lexical callables requiring semantic proof before behavior changes: 5736/);
   assert.match(methodGapDoc, /affected callable semantic proof: NO-GO/);
   for (const row of affectedCallableSemanticFiles) {
     const methodGapRow = methodSemanticGapRow(methodGapDoc, row.file);

@@ -352,7 +352,7 @@ Default Local Extension Settings directory exists: yes
 Default packed Extensions directory for this id exists: no
 workspace manifest.json sha256: 282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734
 workspace package.json sha256: 36053d322780ce787de403be574cc400936ef2a994b4c8eca62561154fe81aec
-workspace js/content_bridge.js sha256: c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c
+workspace js/content_bridge.js sha256: 8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d
 workspace content_bridge ampersand Topic fix token present: yes
 ```
 
@@ -697,9 +697,9 @@ Current local package artifact rows:
 
 | Target | Staged files | Manifest bytes | Manifest sha256 | Version | Content script entries | Content script JS refs | WAR refs | ZIP bytes | ZIP sha256 |
 | --- | ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | --- |
-| `chrome` | 59 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | `3.3.2` | 2 | 15 | 5 | 8693495 | `a62f077d5e517c52e9d92fd96f6ed9a23fded9483cba0abb3dd0ffc8338f3c8f` |
-| `firefox` | 59 | 2603 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` | `3.3.2` | 1 | 14 | 5 | 8693554 | `b66bca3236d0f89996364106fc19dd492466ff9ae22eb880bfb3edffefab8ced` |
-| `opera` | 59 | 2518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | `3.3.2` | 2 | 15 | 4 | 8693497 | `656de3d4ca9f065c927b9cc9fbcb6d60519cf1a02f19cc108bd2db5f0a678d76` |
+| `chrome` | 59 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | `3.3.2` | 2 | 15 | 5 | 8695578 | `55b5566c452c96cef12260f47d4951abafacc7ad2b90eadfef1c3238eaf824d1` |
+| `firefox` | 59 | 2603 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` | `3.3.2` | 1 | 14 | 5 | 8695637 | `b67b853744e758d6d7983f45a68e385e963a0d66e5406543d23c24916edf9400` |
+| `opera` | 59 | 2518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | `3.3.2` | 2 | 15 | 4 | 8695580 | `cc5124d90c3d77cf7ede83c0b7af1207696189d71547665d4e165236ae5b3d80` |
 
 ASCII boundary:
 
@@ -820,9 +820,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

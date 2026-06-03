@@ -9,14 +9,14 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_MESSAGE_TRANSPORT_CALLSITE_REGISTER_CURRENT_BEHAVIOR_2026-05-22.md';
 
 const sourceFingerprints = {
-  'js/background.js': [6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
+  'js/background.js': [6343, 286370, 'ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36'],
   'js/content/bridge_injection.js': [127, 4741, 'd1b84cf4c43ec5ff5cdc3bd607d8f3d3bf448c12829780b0d05fb9fc14fb5d3e'],
-  'js/content/bridge_settings.js': [651, 26462, 'c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b'],
+  'js/content/bridge_settings.js': [845, 34241, 'aea46dd241248db1d1d9bcbdfdf65320d1399ecd84cc7792678f29b1b26ee092'],
   'js/content/collab_dialog.js': [393, 14623, 'dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a'],
   'js/content/first_run_prompt.js': [190, 7453, '5672d9060d29b08550ecfc3add54245212a5094ee5137f025b6f788f12e50409'],
   'js/content/handle_resolver.js': [282, 9785, '67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff'],
   'js/content/release_notes_prompt.js': [250, 9866, '30b624cbbda1004f354f98dbf3b4513f8ebc298adecbceb4358782f248f80474'],
-  'js/content_bridge.js': [13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c'],
+  'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
   'js/filter_logic.js': [3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'],
   'js/injector.js': [3593, 155830, '634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04'],
   'js/popup.js': [1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],

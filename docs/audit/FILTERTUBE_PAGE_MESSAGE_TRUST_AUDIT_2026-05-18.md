@@ -88,26 +88,26 @@ Accepted `content_bridge.js` message rows:
 
 | Message row | Source pin | Pending/request ownership today | Current side-effect class |
 | --- | --- | --- | --- |
-| `FilterTube_InjectorToBridge_Ready` | `js/content_bridge.js:5894` | Not request-owned. | Requests settings from background. |
-| `FilterTube_Refresh` | `js/content_bridge.js:5896` | Not request-owned. | Requests settings and forces DOM fallback reprocessing. |
-| `FilterTube_UpdateChannelMap` | `js/content_bridge.js:5900` | Not request-owned. | Persists learned channel mappings. |
-| `FilterTube_UpdateVideoChannelMap` | `js/content_bridge.js:5903` | Not request-owned. | Persists learned video-channel mappings, stamps matching DOM cards, and can rerun DOM fallback. |
-| `FilterTube_UpdateVideoMetaMap` | `js/content_bridge.js:5952` | Not request-owned. | Persists learned video metadata, touches DOM flags, and can schedule metadata rerun. |
-| `FilterTube_UpdateCustomUrlMap` | `js/content_bridge.js:5978` | Not request-owned. | Writes `channelMap` directly from the content bridge storage path. |
-| `FilterTube_CollaboratorInfoResponse` | `js/content_bridge.js:5991` | Pending request may resolve, but `videoId` collaborator application still runs when collaborators exist. | Applies collaborator identity and can rerun menus/DOM fallback. |
-| `FilterTube_SubscriptionsImportProgress` | `js/content_bridge.js:6017` | Owned by `pendingSubscriptionImportRequests`. | Refreshes pending import timeout and progress. |
-| `FilterTube_SubscriptionsImportResponse` | `js/content_bridge.js:6036` | Owned by `pendingSubscriptionImportRequests`. | Resolves pending import response. |
-| `FilterTube_CacheCollaboratorInfo` | `js/content_bridge.js:6044` | Not request-owned. | Stamps cards and applies collaborator identity by video ID. |
-| `FilterTube_ChannelInfoResponse` | `js/content_bridge.js:6083` | Owned by `pendingChannelInfoRequests`. | Resolves pending single-channel lookup. |
-| `FilterTube_CollabDialogData` | `js/content_bridge.js:6094` | Partially owned by `pendingCollabCards` when `collabKey` matches; `videoId` application still runs independently. | Applies dialog collaborators by card key and/or video ID. |
+| `FilterTube_InjectorToBridge_Ready` | `js/content_bridge.js:5903` | Not request-owned. | Requests settings from background. |
+| `FilterTube_Refresh` | `js/content_bridge.js:5905` | Not request-owned. | Requests settings and forces DOM fallback reprocessing. |
+| `FilterTube_UpdateChannelMap` | `js/content_bridge.js:5910` | Not request-owned. | Persists learned channel mappings. |
+| `FilterTube_UpdateVideoChannelMap` | `js/content_bridge.js:5913` | Not request-owned. | Persists learned video-channel mappings, stamps matching DOM cards, and can rerun DOM fallback. |
+| `FilterTube_UpdateVideoMetaMap` | `js/content_bridge.js:5962` | Not request-owned. | Persists learned video metadata, touches DOM flags, and can schedule metadata rerun. |
+| `FilterTube_UpdateCustomUrlMap` | `js/content_bridge.js:5988` | Not request-owned. | Writes `channelMap` directly from the content bridge storage path. |
+| `FilterTube_CollaboratorInfoResponse` | `js/content_bridge.js:6001` | Pending request may resolve, but `videoId` collaborator application still runs when collaborators exist. | Applies collaborator identity and can rerun menus/DOM fallback. |
+| `FilterTube_SubscriptionsImportProgress` | `js/content_bridge.js:6027` | Owned by `pendingSubscriptionImportRequests`. | Refreshes pending import timeout and progress. |
+| `FilterTube_SubscriptionsImportResponse` | `js/content_bridge.js:6046` | Owned by `pendingSubscriptionImportRequests`. | Resolves pending import response. |
+| `FilterTube_CacheCollaboratorInfo` | `js/content_bridge.js:6054` | Not request-owned. | Stamps cards and applies collaborator identity by video ID. |
+| `FilterTube_ChannelInfoResponse` | `js/content_bridge.js:6093` | Owned by `pendingChannelInfoRequests`. | Resolves pending single-channel lookup. |
+| `FilterTube_CollabDialogData` | `js/content_bridge.js:6104` | Partially owned by `pendingCollabCards` when `collabKey` matches; `videoId` application still runs independently. | Applies dialog collaborators by card key and/or video ID. |
 
 Pending request map rows:
 
 | Pending map | Source pin | Current coverage |
 | --- | --- | --- |
-| `pendingCollaboratorRequests` | `js/content_bridge.js:5472` | Collaborator lookup request/response, but not all collaborator application. |
-| `pendingChannelInfoRequests` | `js/content_bridge.js:5480` | Single-channel lookup request/response. |
-| `pendingSubscriptionImportRequests` | `js/content_bridge.js:5488` | Subscription import progress/response. |
+| `pendingCollaboratorRequests` | `js/content_bridge.js:5481` | Collaborator lookup request/response, but not all collaborator application. |
+| `pendingChannelInfoRequests` | `js/content_bridge.js:5489` | Single-channel lookup request/response. |
+| `pendingSubscriptionImportRequests` | `js/content_bridge.js:5497` | Subscription import progress/response. |
 
 String-source and wildcard bridge rows:
 
@@ -167,9 +167,9 @@ runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

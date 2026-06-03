@@ -54,17 +54,17 @@ const expectedRefs = [
   'js/content/dom_fallback.js:2457',
   'js/content/dom_fallback.js:2469',
   'js/content/block_channel.js:1740',
-  'js/content_bridge.js:509',
-  'js/content_bridge.js:558',
-  'js/content_bridge.js:6353',
-  'js/content_bridge.js:7488',
-  'js/content_bridge.js:8473',
-  'js/content_bridge.js:8592',
-  'js/content_bridge.js:12280',
-  'js/content_bridge.js:12332',
-  'js/content_bridge.js:12588',
-  'js/content_bridge.js:13324',
-  'js/content_bridge.js:13341'
+  'js/content_bridge.js:517',
+  'js/content_bridge.js:566',
+  'js/content_bridge.js:6365',
+  'js/content_bridge.js:7501',
+  'js/content_bridge.js:8486',
+  'js/content_bridge.js:8605',
+  'js/content_bridge.js:12293',
+  'js/content_bridge.js:12345',
+  'js/content_bridge.js:12601',
+  'js/content_bridge.js:13337',
+  'js/content_bridge.js:13354'
 ];
 
 function read(file) {
@@ -226,9 +226,9 @@ test('side-effect ownership docs carry the method proof gap blocker', () => {
 
   for (const token of [
     'tracked JS/JSX/MJS files: 69',
-    'repo-wide lexical callables: 5720',
+    'repo-wide lexical callables: 5736',
     'files with complete per-callable semantic proof: 0',
-    'lexical callables requiring semantic proof before behavior changes: 5720',
+    'lexical callables requiring semantic proof before behavior changes: 5736',
     'runtime behavior changed: no'
   ]) {
     assert.ok(gap.includes(token), `method gap index missing token ${token}`);
@@ -240,9 +240,9 @@ test('side-effect ownership docs carry the method proof gap blocker', () => {
     for (const token of [
       methodGapPath,
       'method semantic proof gap files covered: 69',
-      'method semantic proof gap lexical callables covered: 5720',
+      'method semantic proof gap lexical callables covered: 5736',
       'files with complete per-callable semantic proof: 0',
-      'lexical callables requiring semantic proof before behavior changes: 5720',
+      'lexical callables requiring semantic proof before behavior changes: 5736',
       'affected callable semantic proof: NO-GO',
       'runtime behavior changed: no',
       'JSON-first promotion',

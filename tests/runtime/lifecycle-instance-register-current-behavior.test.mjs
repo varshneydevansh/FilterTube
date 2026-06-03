@@ -2205,25 +2205,25 @@ test('lifecycle instance register enumerates every current observer listener tim
   const ids = new Set(rows.map(row => row.id));
   const doc = read(registerPath);
 
-  assert.equal(rows.length, 527);
+  assert.equal(rows.length, 535);
   assert.equal(ids.size, rows.length, 'file:line:family lifecycle instance ids must be unique');
   assert.deepEqual(countBy(rows, 'family'), {
-    addEventListener: 294,
+    addEventListener: 298,
     cancelAnimationFrame: 4,
     clearInterval: 4,
     clearTimeout: 34,
     intersectionObserver: 4,
     mutationObserver: 16,
-    removeEventListener: 13,
+    removeEventListener: 17,
     requestAnimationFrame: 31,
     setInterval: 3,
     setTimeout: 124
   });
 
-  assert.equal(addListenerOptionRows.length, 294);
+  assert.equal(addListenerOptionRows.length, 298);
   assert.deepEqual(countBy(addListenerOptionRows, 'optionKind'), {
     'boolean-false-bubble': 1,
-    'boolean-true-capture': 23,
+    'boolean-true-capture': 27,
     'expression-or-identifier': 2,
     'no-third-argument': 238,
     'object-capture-true': 1,
@@ -2233,9 +2233,9 @@ test('lifecycle instance register enumerates every current observer listener tim
   });
   assert.deepEqual(countAddEventOptionsBySourceFamily(addListenerOptionRows), {
     'content-runtime-js': {
-      total: 74,
+      total: 78,
       'boolean-false-bubble': 1,
-      'boolean-true-capture': 21,
+      'boolean-true-capture': 25,
       'no-third-argument': 24,
       'object-capture-true': 1,
       'object-once-true': 5,
@@ -2262,7 +2262,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     }
   });
 
-  assert.equal(addListenerEventRows.length, 294);
+  assert.equal(addListenerEventRows.length, 298);
   assert.deepEqual(countBy(addListenerEventRows, 'eventKind'), {
     DOMContentLoaded: 8,
     blur: 1,
@@ -2275,7 +2275,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     focus: 2,
     focusin: 5,
     focusout: 4,
-    hashchange: 1,
+    hashchange: 2,
     input: 20,
     keydown: 14,
     keypress: 7,
@@ -2289,17 +2289,18 @@ test('lifecycle instance register enumerates every current observer listener tim
     pointerleave: 3,
     pointermove: 1,
     pointerover: 1,
-    popstate: 1,
+    popstate: 2,
     resize: 4,
     scroll: 6,
     storage: 1,
     toggle: 1,
     visibilitychange: 4,
-    'yt-navigate-finish': 5
+    'yt-navigate-finish': 6,
+    'yt-page-data-updated': 1
   });
   assert.deepEqual(countAddEventEventsBySourceFamily(addListenerEventRows), {
     'content-runtime-js': {
-      total: 74,
+      total: 78,
       DOMContentLoaded: 6,
       change: 1,
       click: 16,
@@ -2307,6 +2308,7 @@ test('lifecycle instance register enumerates every current observer listener tim
       filterTubeSeedReady: 1,
       focusin: 5,
       focusout: 4,
+      hashchange: 1,
       input: 1,
       keydown: 4,
       message: 4,
@@ -2318,10 +2320,12 @@ test('lifecycle instance register enumerates every current observer listener tim
       pointerleave: 3,
       pointermove: 1,
       pointerover: 1,
+      popstate: 1,
       resize: 1,
       scroll: 4,
       visibilitychange: 1,
-      'yt-navigate-finish': 5
+      'yt-navigate-finish': 6,
+      'yt-page-data-updated': 1
     },
     'extension-ui-background-js': {
       total: 203,
@@ -2359,21 +2363,21 @@ test('lifecycle instance register enumerates every current observer listener tim
     }
   });
 
-  assert.equal(addListenerTargetRows.length, 294);
+  assert.equal(addListenerTargetRows.length, 298);
   assert.deepEqual(countBy(addListenerTargetRows, 'targetKind'), {
     document: 41,
     'generated-shell-node': 2,
     'local-element-reference': 207,
     'optional-local-element-reference': 17,
     'vendor-transport-reference': 8,
-    window: 19
+    window: 23
   });
   assert.deepEqual(countAddEventTargetsBySourceFamily(addListenerTargetRows), {
     'content-runtime-js': {
-      total: 74,
+      total: 78,
       document: 32,
       'local-element-reference': 32,
-      window: 10
+      window: 14
     },
     'extension-ui-background-js': {
       total: 203,
@@ -2398,7 +2402,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     }
   });
 
-  assert.equal(addListenerEventTargetRows.length, 294);
+  assert.equal(addListenerEventTargetRows.length, 298);
   assert.deepEqual(countAddEventTargetEvents(addListenerEventTargetRows), {
     document: {
       total: 41,
@@ -2452,17 +2456,19 @@ test('lifecycle instance register enumerates every current observer listener tim
       open: 2
     },
     window: {
-      total: 19,
+      total: 23,
       DOMContentLoaded: 1,
       filterTubeSeedReady: 1,
-      hashchange: 1,
+      hashchange: 2,
       message: 4,
       'nonliteral-event': 1,
       orientationchange: 1,
-      popstate: 1,
+      popstate: 2,
       resize: 4,
       scroll: 4,
-      storage: 1
+      storage: 1,
+      'yt-navigate-finish': 1,
+      'yt-page-data-updated': 1
     }
   });
   assert.deepEqual(countAddEventGlobalPairsBySourceFamily(addListenerEventTargetRows), {
@@ -2485,13 +2491,17 @@ test('lifecycle instance register enumerates every current observer listener tim
       'yt-navigate-finish': 5
     },
     'content-runtime-js:window': {
-      total: 10,
+      total: 14,
       DOMContentLoaded: 1,
       filterTubeSeedReady: 1,
+      hashchange: 1,
       message: 4,
       orientationchange: 1,
+      popstate: 1,
       resize: 1,
-      scroll: 2
+      scroll: 2,
+      'yt-navigate-finish': 1,
+      'yt-page-data-updated': 1
     },
     'extension-ui-background-js:document': {
       total: 6,
@@ -2522,7 +2532,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     documentKeydown: 3,
     documentPointerOrMouse: 4,
     windowMessage: 4,
-    windowRoute: 2,
+    windowRoute: 5,
     windowScrollResizeOrientation: 9,
     windowStorageVisibility: 1,
     localClick: 106,
@@ -2531,10 +2541,10 @@ test('lifecycle instance register enumerates every current observer listener tim
     vendorTransportLifecycle: 8,
     generatedShellNonliteral: 2
   });
-  assert.equal(contentRuntimePageGlobalListenerRows.length, 42);
+  assert.equal(contentRuntimePageGlobalListenerRows.length, 46);
   assert.deepEqual(countBy(contentRuntimePageGlobalListenerRows, 'targetKind'), {
     document: 32,
-    window: 10
+    window: 14
   });
   assert.deepEqual(countBy(contentRuntimePageGlobalListenerRows, 'eventKind'), {
     DOMContentLoaded: 6,
@@ -2543,23 +2553,26 @@ test('lifecycle instance register enumerates every current observer listener tim
     filterTubeSeedReady: 1,
     focusin: 2,
     focusout: 1,
+    hashchange: 1,
     input: 1,
     keydown: 2,
     message: 4,
     mouseleave: 1,
     'nonliteral-event': 1,
     orientationchange: 1,
+    popstate: 1,
     pointerenter: 1,
     pointermove: 1,
     pointerover: 1,
     resize: 1,
     scroll: 4,
     visibilitychange: 1,
-    'yt-navigate-finish': 5
+    'yt-navigate-finish': 6,
+    'yt-page-data-updated': 1
   });
   assert.deepEqual(countBy(contentRuntimePageGlobalListenerRows, 'file'), {
     'js/content/block_channel.js': 16,
-    'js/content/bridge_settings.js': 2,
+    'js/content/bridge_settings.js': 6,
     'js/content/collab_dialog.js': 3,
     'js/content/dom_fallback.js': 3,
     'js/content/first_run_prompt.js': 1,
@@ -2573,14 +2586,9 @@ test('lifecycle instance register enumerates every current observer listener tim
       document: 3,
       window: 0
     },
-    'content-bridge-dom-fallback-lifecycle': {
-      total: 1,
-      document: 1,
-      window: 0
-    },
     'content-bridge-fallback-menu-lifecycle': {
-      total: 7,
-      document: 6,
+      total: 8,
+      document: 7,
       window: 1
     },
     'content-bridge-main-world-message-lifecycle': {
@@ -2624,9 +2632,9 @@ test('lifecycle instance register enumerates every current observer listener tim
       window: 3
     },
     'settings-bridge-page-message-lifecycle': {
-      total: 2,
+      total: 6,
       document: 0,
-      window: 2
+      window: 6
     }
   });
   assert.equal(contentRuntimePageGlobalListenerRows.filter(row => row.routeScope.startsWith('unclassified')).length, 0);
@@ -2642,12 +2650,11 @@ test('lifecycle instance register enumerates every current observer listener tim
   assert.deepEqual(countBy(contentRuntimePageGlobalListenerRows, 'routeScope'), {
     'extension-prompt-overlay-route': 2,
     'main-youtube-all-spa-routes': 12,
-    'main-youtube-bridge-settings-message-route': 2,
+    'main-youtube-bridge-settings-message-route': 6,
     'main-youtube-collab-dialog-routes': 3,
     'main-youtube-content-bridge-message-route': 1,
-    'main-youtube-dom-fallback-body-route': 1,
     'main-youtube-dom-fallback-scroll-route': 1,
-    'main-youtube-fallback-menu-routes': 6,
+    'main-youtube-fallback-menu-routes': 7,
     'main-youtube-injector-message-route': 2,
     'main-youtube-native-menu-routes': 3,
     'main-youtube-playlist-fallback-popover-route': 1,
@@ -2658,12 +2665,11 @@ test('lifecycle instance register enumerates every current observer listener tim
     'youtube-kids-native-menu-routes': 1
   });
   assert.deepEqual(countBy(contentRuntimePageGlobalListenerRows, 'surfaceScope'), {
-    'bridge-settings-page-message-surface': 2,
+    'bridge-settings-page-message-surface': 6,
     'collab-dialog-trigger-surface': 3,
     'content-bridge-page-message-surface': 1,
-    'dom-fallback-body-observer-surface': 1,
     'dom-fallback-scroll-state-surface': 1,
-    'fallback-menu-card-surface': 6,
+    'fallback-menu-card-surface': 7,
     'identity-prefetch-visibility-surface': 1,
     'injector-page-message-surface': 2,
     'kids-native-menu-surface': 1,
@@ -2679,8 +2685,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     'collab-runtime-enabled-gated': 3,
     'dom-fallback-playlist-guard-gated': 2,
     'dom-fallback-scroll-state-gated': 1,
-    'fallback-lifecycle-work-gated': 1,
-    'fallback-menu-eager-or-hover-gated': 6,
+    'fallback-menu-eager-or-hover-gated': 7,
     'identity-prefetch-work-gated': 3,
     'kids-native-menu-listener-gated': 1,
     'main-world-message-source-gated': 4,
@@ -2688,11 +2693,11 @@ test('lifecycle instance register enumerates every current observer listener tim
     'playlist-popover-open-gated': 1,
     'prompt-needed-check-gated': 2,
     'quick-block-enabled-gated': 12,
-    'seed-ready-pending-settings-gated': 1,
+    'seed-ready-pending-settings-gated': 5,
     'whitelist-mode-non-watch-gated': 2
   });
   assert.deepEqual(countBy(contentRuntimePageGlobalListenerRows, 'duplicateGuardClass'), {
-    'bridge-settings-seed-listener-flag': 1,
+    'bridge-settings-seed-listener-flag': 5,
     'bridge-settings-window-message-flag': 1,
     'collab-domcontentloaded-boot': 1,
     'collab-listener-module-flag': 2,
@@ -2700,8 +2705,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     'dom-fallback-autoplay-guard-flag': 1,
     'dom-fallback-playlist-nav-guard-flag': 1,
     'dom-fallback-scroll-window-flag': 1,
-    'fallback-menu-installed-flag': 6,
-    'fallback-mutation-observer-active-flag': 1,
+    'fallback-menu-installed-flag': 7,
     'injector-script-load-singleton': 1,
     'injector-window-message-flag': 1,
     'kids-passive-script-load-singleton': 1,
@@ -2715,9 +2719,8 @@ test('lifecycle instance register enumerates every current observer listener tim
   });
   assert.deepEqual(countBy(contentRuntimePageGlobalListenerRows, 'nativeMenuImpactClass'), {
     'collaborator-dialog-trigger-impact': 3,
-    'custom-fallback-menu-impact': 7,
-    'dom-fallback-observer-impact': 1,
-    'page-message-impact': 5,
+    'custom-fallback-menu-impact': 8,
+    'page-message-impact': 9,
     'playback-or-scroll-guard-impact': 3,
     'prefetch-or-whitelist-impact': 5,
     'prompt-overlay-impact': 2,
@@ -2731,12 +2734,11 @@ test('lifecycle instance register enumerates every current observer listener tim
     'injector-runtime-lookup-message-trust': 1,
     'injector-subscription-import-message-trust': 1,
     'no-page-message-trust-impact': 37,
-    'seed-ready-event-trust': 1
+    'seed-ready-event-trust': 5
   });
   assert.deepEqual(countBy(contentRuntimePageGlobalListenerRows, 'noWorkBudgetClass'), {
     'collab-runtime-no-work-budget': 3,
-    'fallback-lifecycle-no-work-budget': 1,
-    'fallback-menu-hover-eager-no-work-budget': 6,
+    'fallback-menu-hover-eager-no-work-budget': 7,
     'identity-prefetch-no-work-budget': 3,
     'kids-native-menu-no-work-budget': 1,
     'native-menu-open-no-work-budget': 3,
@@ -2746,17 +2748,16 @@ test('lifecycle instance register enumerates every current observer listener tim
     'prompt-needed-no-work-budget': 2,
     'quick-block-enabled-no-work-budget': 12,
     'scroll-state-no-work-budget': 1,
-    'seed-ready-no-work-budget': 1,
+    'seed-ready-no-work-budget': 5,
     'whitelist-non-watch-no-work-budget': 2
   });
   assert.deepEqual(countBy(contentRuntimePageGlobalListenerRows, 'positiveFixtureClass'), {
     'positive-fixture-card-affordance-refresh': 12,
     'positive-fixture-collab-trigger-dialog': 3,
-    'positive-fixture-fallback-menu-scan': 6,
+    'positive-fixture-fallback-menu-scan': 7,
     'positive-fixture-kids-native-block-sync': 1,
-    'positive-fixture-late-body-fallback-boot': 1,
     'positive-fixture-native-menu-open-close': 3,
-    'positive-fixture-page-message-relay': 5,
+    'positive-fixture-page-message-relay': 9,
     'positive-fixture-playlist-playback-guard': 2,
     'positive-fixture-playlist-popover-close': 1,
     'positive-fixture-prompt-needed-overlay': 2,
@@ -2767,8 +2768,7 @@ test('lifecycle instance register enumerates every current observer listener tim
   assert.deepEqual(countBy(contentRuntimePageGlobalListenerRows, 'negativeFixtureClass'), {
     'negative-fixture-no-card-affordance-when-disabled': 12,
     'negative-fixture-no-collab-dialog-when-disabled': 3,
-    'negative-fixture-no-fallback-menu-when-native-quiet': 6,
-    'negative-fixture-no-fallback-observer-when-inactive': 1,
+    'negative-fixture-no-fallback-menu-when-native-quiet': 7,
     'negative-fixture-no-kids-main-cross-talk': 1,
     'negative-fixture-no-native-menu-poison': 3,
     'negative-fixture-no-playback-guard-off-route': 3,
@@ -2776,28 +2776,28 @@ test('lifecycle instance register enumerates every current observer listener tim
     'negative-fixture-no-prompt-duplicate-overlay': 2,
     'negative-fixture-no-whitelist-watch-route-refresh': 2,
     'negative-fixture-popover-outside-click-only': 1,
-    'negative-fixture-reject-untrusted-page-message': 5
+    'negative-fixture-reject-untrusted-page-message': 9
   });
   assert.deepEqual(countBy(contentRuntimePageGlobalListenerRows, 'pageLifetimeJustificationClass'), {
     'module-singleton-page-lifetime': 30,
     'one-shot-boot-listener': 5,
     'page-world-message-singleton': 4,
-    'seed-ready-singleton': 1,
+    'seed-ready-singleton': 5,
     'transient-pointermove-remove': 1,
     'transient-popover-remove': 1
   });
 
-  assert.equal(addListenerCallbackRows.length, 294);
+  assert.equal(addListenerCallbackRows.length, 298);
   assert.deepEqual(countBy(addListenerCallbackRows, 'callbackKind'), {
-    'identifier-callback-reference': 37,
+    'identifier-callback-reference': 41,
     'inline-arrow-callback': 254,
     'member-callback-reference': 1,
     'other-callback-expression': 2
   });
   assert.deepEqual(countAddEventCallbacksBySourceFamily(addListenerCallbackRows), {
     'content-runtime-js': {
-      total: 74,
-      'identifier-callback-reference': 18,
+      total: 78,
+      'identifier-callback-reference': 22,
       'inline-arrow-callback': 55,
       'member-callback-reference': 1
     },
@@ -2820,30 +2820,34 @@ test('lifecycle instance register enumerates every current observer listener tim
     }
   });
 
-  assert.equal(listenerAddRows.length, 294);
-  assert.equal(listenerRemoveRows.length, 13);
+  assert.equal(listenerAddRows.length, 298);
+  assert.equal(listenerRemoveRows.length, 17);
   assert.deepEqual(countBy(listenerRemoveRows, 'targetKind'), {
     document: 7,
     'generated-shell-node': 2,
     'local-element-reference': 2,
-    window: 2
+    window: 6
   });
   assert.deepEqual(countBy(listenerRemoveRows, 'eventKind'), {
     change: 2,
     click: 2,
+    hashchange: 1,
     keydown: 1,
     'nonliteral-event': 3,
+    popstate: 1,
     pointermove: 1,
     storage: 1,
-    visibilitychange: 3
+    visibilitychange: 3,
+    'yt-navigate-finish': 1,
+    'yt-page-data-updated': 1
   });
   assert.deepEqual(countBy(listenerRemoveRows, 'callbackKind'), {
-    'identifier-callback-reference': 10,
+    'identifier-callback-reference': 14,
     'member-callback-reference': 1,
     'other-callback-expression': 2
   });
   assert.deepEqual(countBy(listenerRemoveRows, 'optionKind'), {
-    'boolean-true-capture': 3,
+    'boolean-true-capture': 7,
     'expression-or-identifier': 2,
     'no-third-argument': 7,
     'object-capture-true': 1
@@ -2851,12 +2855,12 @@ test('lifecycle instance register enumerates every current observer listener tim
   assert.deepEqual(countBy(listenerRemoveRows, 'captureKey'), {
     'capture-expression-or-identifier': 2,
     'capture-false': 7,
-    'capture-true': 4
+    'capture-true': 8
   });
   assert.deepEqual(countListenerAddRemoveBySourceFamily(listenerAddRows, listenerRemoveRows), {
     'content-runtime-js': {
-      add: 74,
-      remove: 4,
+      add: 78,
+      remove: 8,
       delta: 70
     },
     'extension-ui-background-js': {
@@ -2882,8 +2886,8 @@ test('lifecycle instance register enumerates every current observer listener tim
   });
   assert.deepEqual(listenerAddRemoveRiskGaps, {
     installMinusRemove: 281,
-    captureEquivalentRemovePairs: 13,
-    exactOptionShapeRemovePairs: 12,
+    captureEquivalentRemovePairs: 17,
+    exactOptionShapeRemovePairs: 16,
     captureEquivalentOptionShapeMismatchPairs: 1,
     unmatchedRemoveRows: 0,
     pageGlobalListenerInstallsWithoutExplicitRemove: 51,
@@ -3854,12 +3858,12 @@ test('lifecycle instance register enumerates every current observer listener tim
     }
   });
 
-  assert.equal(explicitTeardownRows.length, 55);
+  assert.equal(explicitTeardownRows.length, 59);
   assert.deepEqual(countBy(explicitTeardownRows, 'family'), {
     cancelAnimationFrame: 4,
     clearInterval: 4,
     clearTimeout: 34,
-    removeEventListener: 13
+    removeEventListener: 17
   });
   assert.deepEqual(countBy(explicitTeardownRows, 'handleKind'), {
     'frame-other-handle': 1,
@@ -3871,17 +3875,18 @@ test('lifecycle instance register enumerates every current observer listener tim
     'listener-document-target': 7,
     'listener-generated-shell-target': 2,
     'listener-other-target': 2,
-    'listener-window-target': 2,
+    'listener-window-target': 6,
     'timeout-local-id-handle': 12,
     'timeout-named-state-handle': 14,
     'timeout-property-held-handle': 8
   });
   assert.deepEqual(countExplicitTeardownBySourceFamily(explicitTeardownRows), {
     'content-runtime-js': {
-      total: 29,
+      total: 33,
       'interval-engine-check-handle': 2,
       'interval-warmup-handle': 1,
       'listener-document-target': 4,
+      'listener-window-target': 4,
       'timeout-local-id-handle': 5,
       'timeout-named-state-handle': 9,
       'timeout-property-held-handle': 8
@@ -4636,7 +4641,7 @@ test('lifecycle instance source-family totals match the current register doc', (
   const doc = read(registerPath);
 
   assert.deepEqual(countBy(rows, 'sourceFamily'), {
-    'content-runtime-js': 219,
+    'content-runtime-js': 227,
     'extension-ui-background-js': 273,
     'generated-ui-output': 4,
     'vendor-bundles': 8,
@@ -4645,11 +4650,11 @@ test('lifecycle instance source-family totals match the current register doc', (
 
   for (const phrase of [
     '| `extension-ui-background-js` | 273 |',
-    '| `content-runtime-js` | 219 |',
+    '| `content-runtime-js` | 227 |',
     '| `website-components` | 23 |',
     '| `vendor-bundles` | 8 |',
     '| `generated-ui-output` | 4 |',
-    '| **Total lifecycle instances** | **527** |'
+    '| **Total lifecycle instances** | **535** |'
   ]) {
     assert.ok(doc.includes(phrase), `missing doc phrase ${phrase}`);
   }
@@ -4673,7 +4678,7 @@ test('lifecycle instance hot files remain pinned before cleanup work', () => {
   assert.equal(byFile['js/background.js'], 14);
   assert.equal(byFile['js/content/dom_fallback.js'], 14);
   assert.equal(byFile['js/injector.js'], 12);
-  assert.equal(byFile['js/content/bridge_settings.js'], 10);
+  assert.equal(byFile['js/content/bridge_settings.js'], 18);
   assert.equal(byFile['js/render_engine.js'], 9);
 
   assert.match(doc, /`js\/tab-view\.js` \| 182/);
@@ -4681,11 +4686,11 @@ test('lifecycle instance hot files remain pinned before cleanup work', () => {
   assert.match(doc, /`js\/content\/block_channel\.js` \| 71/);
 
   assert.deepEqual(roleCounts, {
-    'explicit-teardown': 55,
-    'install-or-schedule': 472
+    'explicit-teardown': 59,
+    'install-or-schedule': 476
   });
   assert.deepEqual(countInstallTeardownBySourceFamily(rows), {
-    'content-runtime-js': { install: 190, teardown: 29, total: 219 },
+    'content-runtime-js': { install: 194, teardown: 33, total: 227 },
     'extension-ui-background-js': { install: 259, teardown: 14, total: 273 },
     'generated-ui-output': { install: 2, teardown: 2, total: 4 },
     'vendor-bundles': { install: 8, teardown: 0, total: 8 },
@@ -4697,12 +4702,12 @@ test('lifecycle instance hot files remain pinned before cleanup work', () => {
     '| `install-or-schedule` | `addEventListener`, `MutationObserver`, `IntersectionObserver`, `setInterval`, `setTimeout`, `requestAnimationFrame` | 472 |',
     '| `explicit-teardown` | `removeEventListener`, `clearInterval`, `clearTimeout`, `cancelAnimationFrame` | 55 |',
     '| `extension-ui-background-js` | 259 | 14 | 273 |',
-    '| `content-runtime-js` | 190 | 29 | 219 |',
+    '| `content-runtime-js` | 194 | 33 | 227 |',
     '| `vendor-bundles` | 8 | 0 | 8 |',
     '| `website-components` | 13 | 10 | 23 |',
     '| `generated-ui-output` | 2 | 2 | 4 |',
-    'install-or-schedule lifecycle instances: 472',
-    'explicit-teardown lifecycle instances: 55',
+    'install-or-schedule lifecycle instances: 476',
+    'explicit-teardown lifecycle instances: 59',
     'install-to-teardown ratio: 8.5:1',
     'shared lifecycle registry in product source: absent',
     'lifecycle cleanup approval from imbalance addendum: NO-GO',
@@ -4910,8 +4915,8 @@ function assertModeSplitObserverBudgetAddendum() {
     /\| Empty desktop blocklist \| `docs\/audit\/FILTERTUBE_EMPTY_INSTALL_IDLE_OBSERVER_BUDGET_CURRENT_BEHAVIOR_2026-05-26\.md:81-145` \|/,
     /\| Active desktop blocklist \| `js\/content\/block_channel\.js:353-365`, `js\/content\/block_channel\.js:1979-2028` \|/,
     /\| Mobile\/coarse YouTube \| `js\/content\/block_channel\.js:1291-1293`, `js\/content_bridge\.js:6525-6538`, `js\/content_bridge\.js:7146-7255` \|/,
-    /\| Whitelist mode \| `js\/content_bridge\.js:1006-1015`, `js\/content_bridge\.js:1210-1270`, `js\/content_bridge\.js:1286-1301` \|/,
-    /\| DOM fallback active work \| `js\/content_bridge\.js:6408-6505` \|/,
+    /\| Whitelist mode \| `js\/content_bridge\.js:1013-1022`, `js\/content_bridge\.js:1219-1279`, `js\/content_bridge\.js:1293-1307` \|/,
+    /\| DOM fallback active work \| `js\/content_bridge\.js:6420-6516` \|/,
     /\| Collaborator dialog \| `js\/content\/collab_dialog\.js:29-31`, `js\/content\/collab_dialog\.js:370-378` \|/,
     /\| Seed JSON idle transport \| `js\/seed\.js:97-134`, `js\/seed\.js:684-698` \|/
   ]) {
@@ -5096,8 +5101,8 @@ function assertWatchYtmKidsObserverBudgetAddendum() {
   assert.match(doc, /flowchart TD/);
 
   for (const row of [
-    /\| Watch playlist prefetch hook \| `js\/content_bridge\.js:1165-1208` \|/,
-    /\| Whitelist right-rail observer \| `js\/content_bridge\.js:1210-1270` \|/,
+    /\| Watch playlist prefetch hook \| `js\/content_bridge\.js:1174-1217` \|/,
+    /\| Whitelist right-rail observer \| `js\/content_bridge\.js:1219-1279` \|/,
     /\| DOM playlist click\/autoplay guards \| `js\/content\/dom_fallback\.js:2337-2440` \|/,
     /\| YTM\/watch\/Kids quick-block selectors \| `js\/content\/block_channel\.js:1089-1133`, `js\/content\/block_channel\.js:1979-2028` \|/,
     /\| YTM fallback menu host and scan lifecycle \| `js\/content_bridge\.js:6601-6609`, `js\/content_bridge\.js:6657-6716`, `js\/content_bridge\.js:6945-7149` \|/,
@@ -5259,9 +5264,9 @@ function assertRuntimeLifecycleConvergenceBoundary() {
     .join('\n');
 
   assert.match(doc, /Runtime Lifecycle Convergence Boundary - 2026-05-30/);
-  assert.match(doc, /527 tracked lifecycle primitive instances/);
-  assert.match(doc, /472 install-or-schedule rows/);
-  assert.match(doc, /55 explicit teardown rows/);
+  assert.match(doc, /535 tracked lifecycle primitive instances/);
+  assert.match(doc, /476 install-or-schedule rows/);
+  assert.match(doc, /59 explicit teardown rows/);
   assert.match(doc, /missing shared lifecycle effect\/teardown authority/);
   assert.match(doc, /flowchart TD/);
 
@@ -5283,7 +5288,7 @@ function assertRuntimeLifecycleConvergenceBoundary() {
   for (const phrase of [
     /runtime lifecycle convergence rows: 10/,
     /implementation-ready runtime lifecycle convergence rows: 0/,
-    /tracked lifecycle primitive instances: 527/,
+    /tracked lifecycle primitive instances: 535/,
     /install-or-schedule lifecycle rows: 472/,
     /explicit teardown lifecycle rows: 55/,
     /hot YouTube SPA lifecycle owner rows: 16/,

@@ -12,15 +12,15 @@ The paired verifier is `tests/runtime/content-bridge-menu-blocked-state-list-sha
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content_bridge.js` | 13623 | 603362 | `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c` |
+| `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
 
 ## Pinned Blocks
 
 | Block | Source range | Lines | Bytes | SHA-256 | Current role |
 | --- | --- | ---: | ---: | --- | --- |
 | Stored channel entry lookup | `js/content_bridge.js:2088` through `js/content_bridge.js:2102` | 16 | 581 | `e774f81a3dcfb0cd4830c7a06faf7c6307b2d739651c0a4d49a6b195723418ad` | Reads `currentSettings.filterChannels` to hydrate menu state for a matching stored entry. |
-| Already-blocked menu state check | `js/content_bridge.js:11925` through `js/content_bridge.js:11981` | 57 | 2949 | `232452835d96009435593a555877dea029e32b587b72c0f007d1dfc83dd31c79` | Reads storage `filterChannels` and `channelMap`, then disables the menu item and hydrates filter-all UI when identity is already blocked. |
-| Blocked element sync after settings refresh | `js/content_bridge.js:12101` through `js/content_bridge.js:12133` | 33 | 1521 | `ed51361346f28f1bdf6accc4de5f5ee1625c6a921b4d0b53cc5441ca21513615` | Rechecks stamped blocked elements against effective `filterChannels`, keeping still-blocked elements hidden and restoring stale ones. |
+| Already-blocked menu state check | `js/content_bridge.js:11990` through `js/content_bridge.js:12046` | 57 | 2949 | `232452835d96009435593a555877dea029e32b587b72c0f007d1dfc83dd31c79` | Reads storage `filterChannels` and `channelMap`, then disables the menu item and hydrates filter-all UI when identity is already blocked. |
+| Blocked element sync after settings refresh | `js/content_bridge.js:12166` through `js/content_bridge.js:12198` | 33 | 1521 | `ed51361346f28f1bdf6accc4de5f5ee1625c6a921b4d0b53cc5441ca21513615` | Rechecks stamped blocked elements against effective `filterChannels`, keeping still-blocked elements hidden and restoring stale ones. |
 
 ## Selected Token Counts
 
@@ -95,9 +95,9 @@ surface can support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

@@ -8,12 +8,17 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_WHITELIST_CACHE_HOT_PATH_BOUNDARY_CURRENT_BEHAVIOR_2026-05-25.md';
 
 const sourceRows = [
-  ['js/content_bridge.js', 13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c'],
-  ['js/background.js', 6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
-  ['js/content/bridge_settings.js', 651, 26462, 'c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b'],
+  ['js/content_bridge.js', 13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
+  ['js/background.js', 6343, 286370, 'ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36'],
+  ['js/content/bridge_settings.js', 845, 34241, 'aea46dd241248db1d1d9bcbdfdf65320d1399ecd84cc7792678f29b1b26ee092'],
   ['js/content/handle_resolver.js', 282, 9785, '67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff'],
   ['js/filter_logic.js', 3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5']
 ];
+
+const rawSourceDocNumberFiles = new Set([
+  'js/background.js',
+  'js/content/bridge_settings.js'
+]);
 
 const blockRows = [
   [
@@ -21,7 +26,7 @@ const blockRows = [
     'js/content_bridge.js',
     'function persistVideoChannelMapping(videoId, channelId) {',
     'let pendingVideoMetaDomRerunTimer = 0;',
-    1629,
+    1638,
     74,
     3441,
     '043d1f771d3652cd6f35fa205dbdfa92925ebf5e62eb392da800293c6b070dd7'
@@ -31,7 +36,7 @@ const blockRows = [
     'js/content_bridge.js',
     'function getCachedCollaboratorsFromCard(card) {',
     'function clearCollaboratorMetadataFromCard(card) {',
-    2643,
+    2652,
     94,
     4628,
     'd4c057c1e55d02d8f80062efcbd097b723c111fb5fcce05975aec1cac8684481'
@@ -41,7 +46,7 @@ const blockRows = [
     'js/content_bridge.js',
     'const ytInitialDataChannelCache = new Map();',
     '/**\n * Deeply inspect a ytInitialData-like object',
-    7969,
+    7982,
     117,
     4807,
     'ae717352ad0b82642af2ffa22128b309d60dca9f990ef579ea3ceaac6d70442f'
@@ -71,7 +76,7 @@ const blockRows = [
     'js/content/bridge_settings.js',
     'let pendingStorageRefreshTimer = 0;',
     'try {\n    browserAPI_BRIDGE.storage.onChanged.addListener(handleStorageChanges);',
-    519,
+    713,
     130,
     4506,
     'f3802437cd0f5bee44ac10378fd4b5156ad87cf3f5db3ee142702c0e7a4fed38'
@@ -140,6 +145,10 @@ function escapeRegExp(text) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+function sourceDocNumber(file, value) {
+  return rawSourceDocNumberFiles.has(file) ? String(value) : value.toLocaleString('en-US');
+}
+
 function sliceBlock(file, startNeedle, endNeedle) {
   const source = read(file);
   const start = source.indexOf(startNeedle);
@@ -182,7 +191,7 @@ test('whitelist cache hot-path boundary records narrow dedupe and source pins', 
     assert.equal(sha256File(file), expectedHash, `${file} hash drifted`);
     assert.match(
       text,
-      new RegExp(`\\| \`${escapeRegExp(file)}\` \\| ${expectedLines.toLocaleString('en-US')} \\| ${expectedBytes.toLocaleString('en-US')} \\| \`${expectedHash}\` \\|`)
+      new RegExp(`\\| \`${escapeRegExp(file)}\` \\| ${sourceDocNumber(file, expectedLines)} \\| ${sourceDocNumber(file, expectedBytes)} \\| \`${expectedHash}\` \\|`)
     );
   }
 });

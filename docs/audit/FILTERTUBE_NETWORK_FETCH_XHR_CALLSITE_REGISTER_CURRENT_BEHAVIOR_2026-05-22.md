@@ -48,9 +48,9 @@ file.text() reads an uploaded/imported local File and is not a network response.
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6,320 | 285,103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
+| `js/background.js` | 6,343 | 286,370 | `ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36` |
 | `js/content/handle_resolver.js` | 282 | 9,785 | `67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff` |
-| `js/content_bridge.js` | 13,623 | 603,362 | `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c` |
+| `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
 | `js/injector.js` | 3,593 | 155,830 | `634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04` |
 | `js/seed.js` | 1,136 | 50,026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
 | `js/tab-view.js` | 11,833 | 536,496 | `192961f3f33a85258a941ce23cdd551be5dc985abf64077cc0cedf3ae08dc68e` |
@@ -81,25 +81,25 @@ file.text() reads an uploaded/imported local File and is not a network response.
 ```text
 js/background.js:1723:fetch:releaseNotesExtensionResource
 js/background.js:1725:response.json:releaseNotesJsonDecode
-js/background.js:2891:fetch:shortsIdentityBackgroundHtmlFetch
-js/background.js:2902:response.body.getReader:shortsIdentityStreamReader
-js/background.js:3007:fetch:kidsWatchIdentityHtmlFetch
-js/background.js:3018:response.body.getReader:kidsWatchIdentityStreamReader
-js/background.js:3100:fetch:watchIdentityHtmlFetch
-js/background.js:3111:response.body.getReader:watchIdentityStreamReader
-js/background.js:4643:fetch:channelInfoPrimaryHtmlFetch
-js/background.js:4657:fetch:channelInfoHandleFallbackHtmlFetch
-js/background.js:4671:response.text:channelInfoPrimaryHtmlDecode
-js/background.js:4810:fetch:channelInfoPublicFallbackHtmlFetch
-js/background.js:4819:response.text:channelInfoPublicFallbackHtmlDecode
+js/background.js:2914:fetch:shortsIdentityBackgroundHtmlFetch
+js/background.js:2925:response.body.getReader:shortsIdentityStreamReader
+js/background.js:3030:fetch:kidsWatchIdentityHtmlFetch
+js/background.js:3041:response.body.getReader:kidsWatchIdentityStreamReader
+js/background.js:3123:fetch:watchIdentityHtmlFetch
+js/background.js:3134:response.body.getReader:watchIdentityStreamReader
+js/background.js:4666:fetch:channelInfoPrimaryHtmlFetch
+js/background.js:4680:fetch:channelInfoHandleFallbackHtmlFetch
+js/background.js:4694:response.text:channelInfoPrimaryHtmlDecode
+js/background.js:4833:fetch:channelInfoPublicFallbackHtmlFetch
+js/background.js:4842:response.text:channelInfoPublicFallbackHtmlDecode
 js/content/handle_resolver.js:239:fetch:directHandleHtmlFetch
 js/content/handle_resolver.js:255:response.text:directHandleHtmlDecode
-js/content_bridge.js:1934:fetch:watchMetaDirectHtmlFetch
-js/content_bridge.js:1942:response.text:watchMetaDirectHtmlDecode
-js/content_bridge.js:8758:fetch:shortsDirectHtmlFetch
-js/content_bridge.js:8770:response.text:shortsDirectHtmlDecode
-js/content_bridge.js:8907:fetch:watchIdentityDirectHtmlFetch
-js/content_bridge.js:8919:response.text:watchIdentityDirectHtmlDecode
+js/content_bridge.js:1943:fetch:watchMetaDirectHtmlFetch
+js/content_bridge.js:1951:response.text:watchMetaDirectHtmlDecode
+js/content_bridge.js:8771:fetch:shortsDirectHtmlFetch
+js/content_bridge.js:8783:response.text:shortsDirectHtmlDecode
+js/content_bridge.js:8920:fetch:watchIdentityDirectHtmlFetch
+js/content_bridge.js:8932:response.text:watchIdentityDirectHtmlDecode
 js/injector.js:1471:fetch:subscriptionImportYoutubeiPost
 js/injector.js:1525:response.text:subscriptionImportBodyDecode
 js/seed.js:701:response.json:passiveFetchCloneJsonDecode
@@ -404,9 +404,9 @@ support runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

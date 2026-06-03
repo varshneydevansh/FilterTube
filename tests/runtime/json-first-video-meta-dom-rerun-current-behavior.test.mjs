@@ -264,8 +264,8 @@ test('JSON-first video meta DOM rerun audit is audit-only and source pinned', ()
   assert.equal(Buffer.byteLength(read('js/content_bridge.js')), 601694);
   assert.equal(lineCount(read('js/content/dom_fallback.js')), 5030);
   assert.equal(Buffer.byteLength(read('js/content/dom_fallback.js')), 235555);
-  assert.equal(lineCount(read('js/background.js')), 6320);
-  assert.equal(Buffer.byteLength(read('js/background.js')), 285103);
+  assert.equal(lineCount(read('js/background.js')), 6343);
+  assert.equal(Buffer.byteLength(read('js/background.js')), 286370);
   for (const [file, hash] of Object.entries(hashes)) {
     assert.equal(sha256(file), hash);
     assert.match(text, new RegExp(hash));

@@ -1979,6 +1979,13 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             const activeKids = safeObject(activeProfile.kids);
 
             const activeSettings = safeObject(activeProfile.settings);
+            const activeProfileKind = (() => {
+                if (activeProfileId === DEFAULT_PROFILE_ID) return 'account';
+                const rawType = normalizeString(activeProfile.type).toLowerCase();
+                if (rawType === 'account' || rawType === 'child') return rawType;
+                const parent = normalizeString(activeProfile.parentProfileId);
+                return parent ? 'child' : 'account';
+            })();
             const syncKidsToMain = !!activeSettings.syncKidsToMain;
 
             const mainModeFromV4 = (typeof activeMain.mode === 'string' && activeMain.mode === 'whitelist')
@@ -1989,6 +1996,22 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                 : 'blocklist';
             compiledSettings.listMode = shouldUseKidsProfile ? kidsModeFromV4 : mainModeFromV4;
             compiledSettings.profileType = targetProfile;
+            compiledSettings.activeProfileId = activeProfileId;
+            compiledSettings.activeProfileKind = activeProfileKind;
+
+            if (activeProfileKind === 'child') {
+                const allowMainViewing = activeSettings.allowMainViewing !== false;
+                const allowKidsViewing = activeSettings.allowKidsViewing !== false;
+                compiledSettings.managedViewingRouteGate = {
+                    schema: 'filtertube_managed_viewing_space_route_gate',
+                    version: 1,
+                    profileId: activeProfileId,
+                    profileName: normalizeString(activeProfile.name) || 'Protected profile',
+                    allowMainViewing,
+                    allowKidsViewing,
+                    policySource: 'local_profile_settings'
+                };
+            }
 
             const rawWhitelistKeywords = shouldUseKidsProfile
                 ? (Array.isArray(activeKids.whitelistKeywords) ? activeKids.whitelistKeywords : [])

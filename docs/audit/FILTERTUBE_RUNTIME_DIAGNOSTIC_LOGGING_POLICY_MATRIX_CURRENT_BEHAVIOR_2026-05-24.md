@@ -30,14 +30,14 @@ and website code. Lines whose trimmed text begins with `//` are excluded.
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `build.js` | 740 | 26978 | `c8485cb2600aad89f44015cd7e49ebe4746ebcc35c91c1ff2bf29aec2f087a04` |
-| `js/background.js` | 6320 | 285103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
+| `js/background.js` | 6343 | 286370 | `ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36` |
 | `js/content/block_channel.js` | 3189 | 127857 | `c040b57e0b107fd7b6fb0a18bc4ca014e5a22fbb82755f81e51a497eee387dba` |
-| `js/content/bridge_settings.js` | 651 | 26462 | `c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b` |
+| `js/content/bridge_settings.js` | 845 | 34241 | `aea46dd241248db1d1d9bcbdfdf65320d1399ecd84cc7792678f29b1b26ee092` |
 | `js/content/collab_dialog.js` | 393 | 14623 | `dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a` |
 | `js/content/dom_extractors.js` | 1137 | 46896 | `adf2c04f14f0f3bb44556e216af25aca8ff182dfa569c248ddb150d0cca38a4e` |
 | `js/content/dom_fallback.js` | 5030 | 235555 | `fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5` |
 | `js/content/handle_resolver.js` | 282 | 9785 | `67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff` |
-| `js/content_bridge.js` | 13623 | 603362 | `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c` |
+| `js/content_bridge.js` | 13636 | 604184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
 | `js/filter_logic.js` | 3652 | 172174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 | `js/injector.js` | 3593 | 155830 | `634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04` |
 | `js/io_manager.js` | 2097 | 100479 | `f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62` |
@@ -274,9 +274,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -675,8 +675,8 @@ flowchart TD
 
 | Residual row | Source pins | Current behavior | Missing proof before release cleanup |
 | --- | --- | --- | --- |
-| `production_console_residual_bridge_preface` | `js/content_bridge.js:11-29`; `js/content_bridge.js:13543-13569` | `content_bridge.js` has 126 textual routine rows before the backup gate install, but only one top-level executed routine log before that gate and it is locally debug-gated; the helper definition also checks debug before logging. | Live installed-tab proof that debug-disabled startup emits no content-bridge log/debug output. |
-| `production_console_residual_bridge_function_bodies` | `js/content_bridge.js:702-13495`; `js/content_bridge.js:13565-13569` | The remaining 124 content-bridge routine rows are function-body diagnostics; the backup gate installs before `message` listener registration and the `initialize()` timer. | Route/profile/list-mode sampling proving menu, collaborator, fallback, quick-block, and identity paths stay quiet with debug disabled. |
+| `production_console_residual_bridge_preface` | `js/content_bridge.js:11-37`; `js/content_bridge.js:13596-13630` | `content_bridge.js` has 126 textual routine rows before the backup gate install, but only one top-level executed routine log before that gate and it is locally debug-gated; the helper definition also checks debug before logging. | Live installed-tab proof that debug-disabled startup emits no content-bridge log/debug output. |
+| `production_console_residual_bridge_function_bodies` | `js/content_bridge.js:702-13594`; `js/content_bridge.js:13608-13628` | The remaining 124 content-bridge routine rows are function-body diagnostics; the backup gate installs before `message` listener registration and the `initialize()` timer. | Route/profile/list-mode sampling proving menu, collaborator, fallback, quick-block, and identity paths stay quiet with debug disabled. |
 | `production_console_residual_background_gate` | `js/background.js:12`; `js/background.js:1770-6303`; `js/background.js:6305-6318` | The background console gate is invoked at startup before 62 routine background `log/debug/info` rows. | Service-worker sample showing routine logs stay suppressed while warnings/errors still surface. |
 | `production_console_residual_isolated_shared_gate` | `js/content/dom_fallback.js:5`; active manifest isolated script order; `js/content/dom_fallback.js:4559-4706` | Active manifests load `dom_fallback` before helper and bridge scripts, so 135 manifest-isolated routine rows are behind the shared isolated console gate. | Installed manifest/order byte proof plus live YouTube page sampling after reload. |
 | `production_console_residual_main_world_local_debug` | `js/seed.js:11-153`; `js/filter_logic.js:11-1590`; `js/injector.js:97` | MAIN-world code has 7 routine rows behind local debug checks, but no global MAIN-world console override. | Endpoint/route fixture proving no unconditional MAIN-world routine log is added before JSON-first promotion. |

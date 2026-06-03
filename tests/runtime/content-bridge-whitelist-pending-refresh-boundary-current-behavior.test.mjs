@@ -10,7 +10,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_CONTENT_BRIDGE_WHITELIST_PENDING_REFRESH_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/content_bridge.js': [13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c'],
+  'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
   'js/content/dom_fallback.js': [5030, 235555, 'fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5']
 };
 
@@ -19,7 +19,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function installRightRailWhitelistObserver() {',
     end: 'function queuePrefetchForCard(card) {',
-    startLine: 1210,
+    startLine: 1219,
     lines: 98,
     bytes: 3091,
     hash: '86779f97ba7a65ebe61da86d414b1b3027b916fdc75163053b9dd3b58bcf4976'
@@ -28,37 +28,37 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'async function initializeDOMFallback(settings) {',
     end: '        const whitelistPendingRefreshState = {',
-    startLine: 6140,
-    lines: 60,
-    bytes: 2297,
-    hash: 'b4da976a738c117f0ba7e5f4c379ff80fca9010f2c1e944982cef27c9fe21272'
+    startLine: 6150,
+    lines: 61,
+    bytes: 2530,
+    hash: '60dd75d21580e8c390faed79594521478442789f7e0f3dd5195a1cb9c22fa926'
   },
   contentBridgeWhitelistPendingQueue: {
     file: 'js/content_bridge.js',
     start: '        const whitelistPendingRefreshState = {',
     end: '        function applyWhitelistPendingHide(candidates) {',
-    startLine: 6200,
+    startLine: 6211,
     lines: 69,
-    bytes: 3952,
-    hash: '1155ce5403825a26516b2383a686bcff2dd0a64949e5eb40e8197766510855f9'
+    bytes: 4081,
+    hash: '9b0cbad3e54891d06ef96a1c9d8010e4f3dbc3ca9b5c595865d7b86fec31ee74'
   },
   contentBridgeWhitelistPendingApply: {
     file: 'js/content_bridge.js',
     start: '        function applyWhitelistPendingHide(candidates) {',
     end: '        function fallbackRelevantSelector() {',
-    startLine: 6269,
-    lines: 111,
-    bytes: 5760,
-    hash: '3d2510570b99e4f08e600de63911dce5dc348a4ffd2b28c20d1beadd9ffe028b'
+    startLine: 6280,
+    lines: 112,
+    bytes: 5829,
+    hash: '2ff0a4ef33bdaf0acde1b27bf31d8d026f675702adae2bbc03692c213c266ad8'
   },
   contentBridgeFallbackMutationObserver: {
     file: 'js/content_bridge.js',
     start: '        function fallbackRelevantSelector() {',
     end: '        refreshDOMFallbackMutationObserver();',
-    startLine: 6380,
-    lines: 137,
-    bytes: 5492,
-    hash: 'a97a95ca977eb192a0426f00413b69bc1fe92fb65b1dd9b795488de7244b6d19'
+    startLine: 6392,
+    lines: 138,
+    bytes: 5567,
+    hash: 'dab8f75188fa2468fca2add028355f0ba1b70d45ed133c37fd2affe02c028df8'
   },
   domFallbackOnlyWhitelistPendingSelector: {
     file: 'js/content/dom_fallback.js',
@@ -331,6 +331,7 @@ function loadWhitelistPendingRuntime({ listMode = 'whitelist', pathname = '/feed
     currentSettings: { listMode },
     document: { location: { pathname } },
     isFilterTubeNativeOverlayQuietMode() { return quiet; },
+    isFilterTubeManagedViewingRouteDenied() { return false; },
     applyDOMFallback(...args) { fallbackCalls.push(args); },
     queuePrefetchForCard(card) { prefetchCalls.push(card); },
     setTimeout(handler, delay) {

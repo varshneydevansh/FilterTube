@@ -350,6 +350,194 @@ function normalizeSettingsForHost(settings) {
     }
 }
 
+const MANAGED_VIEWING_ROUTE_GATE_OVERLAY_ID = 'filtertube-managed-viewing-route-gate';
+let managedViewingRouteGateListenersAttached = false;
+let managedViewingRouteGateHandler = null;
+
+function classifyManagedViewingRoute(rawUrl) {
+    try {
+        const parsed = new URL(rawUrl || location.href);
+        const host = String(parsed.hostname || '').toLowerCase();
+        if (host === 'youtubekids.com' || host.endsWith('.youtubekids.com')) {
+            return { surface: 'kids', host };
+        }
+        if (host === 'youtube.com' || host.endsWith('.youtube.com')) {
+            return { surface: 'main', host };
+        }
+        return { surface: 'external', host };
+    } catch (e) {
+        return { surface: 'external', host: '' };
+    }
+}
+
+function getManagedViewingRouteGatePolicy(settings) {
+    try {
+        if (!settings || typeof settings !== 'object') return null;
+        if (settings.activeProfileKind !== 'child') return null;
+        const policy = settings.managedViewingRouteGate;
+        if (!policy || typeof policy !== 'object') return null;
+        if (policy.schema !== 'filtertube_managed_viewing_space_route_gate') return null;
+        if (policy.version !== 1) return null;
+        if (typeof policy.allowMainViewing !== 'boolean') return null;
+        if (typeof policy.allowKidsViewing !== 'boolean') return null;
+        return policy;
+    } catch (e) {
+        return null;
+    }
+}
+
+function removeManagedViewingBlockedOverlay() {
+    try {
+        globalThis.__filtertubeManagedViewingRouteDenied = false;
+        document.documentElement?.removeAttribute?.('data-filtertube-managed-viewing-route-denied');
+        const existing = document.getElementById(MANAGED_VIEWING_ROUTE_GATE_OVERLAY_ID);
+        if (existing) existing.remove();
+    } catch (e) {
+    }
+}
+
+function showManagedViewingBlockedOverlay(decision) {
+    try {
+        globalThis.__filtertubeManagedViewingRouteDenied = true;
+        document.documentElement?.setAttribute?.('data-filtertube-managed-viewing-route-denied', decision.surface || 'blocked');
+        const host = document.body || document.documentElement;
+        if (!host) return true;
+
+        let overlay = document.getElementById(MANAGED_VIEWING_ROUTE_GATE_OVERLAY_ID);
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = MANAGED_VIEWING_ROUTE_GATE_OVERLAY_ID;
+            overlay.setAttribute('role', 'alertdialog');
+            overlay.setAttribute('aria-modal', 'true');
+            overlay.style.cssText = [
+                'position:fixed',
+                'inset:0',
+                'z-index:2147483647',
+                'display:flex',
+                'align-items:center',
+                'justify-content:center',
+                'padding:24px',
+                'background:rgba(8,13,18,.92)',
+                'color:#f8fafc',
+                'font-family:Inter,Roboto,Arial,sans-serif',
+                'pointer-events:auto'
+            ].join(';');
+            host.appendChild(overlay);
+        }
+
+        const profileName = String(decision.profileName || 'This profile').trim() || 'This profile';
+        const surfaceLabel = decision.surface === 'kids' ? 'YouTube Kids' : 'YouTube';
+        overlay.innerHTML = '';
+
+        const panel = document.createElement('section');
+        panel.style.cssText = [
+            'width:min(420px,100%)',
+            'border:1px solid rgba(148,163,184,.32)',
+            'border-radius:8px',
+            'background:#101820',
+            'box-shadow:0 24px 80px rgba(0,0,0,.45)',
+            'padding:24px'
+        ].join(';');
+
+        const eyebrow = document.createElement('div');
+        eyebrow.textContent = 'FilterTube managed profile';
+        eyebrow.style.cssText = 'color:#f87171;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0;margin-bottom:10px';
+
+        const title = document.createElement('h1');
+        title.textContent = `${surfaceLabel} is not available for this profile`;
+        title.style.cssText = 'font-size:22px;line-height:1.2;margin:0 0 10px;font-weight:800;color:#fff';
+
+        const copy = document.createElement('p');
+        copy.textContent = `${profileName} is using parent-managed viewing settings. Ask the parent or caregiver profile to change access.`;
+        copy.style.cssText = 'font-size:14px;line-height:1.5;margin:0;color:#cbd5e1';
+
+        panel.appendChild(eyebrow);
+        panel.appendChild(title);
+        panel.appendChild(copy);
+        overlay.appendChild(panel);
+    } catch (e) {
+    }
+    return true;
+}
+
+function releaseManagedViewingRouteGateRevalidation() {
+    if (!managedViewingRouteGateListenersAttached || !managedViewingRouteGateHandler) return;
+    try {
+        window.removeEventListener('yt-navigate-finish', managedViewingRouteGateHandler, true);
+        window.removeEventListener('yt-page-data-updated', managedViewingRouteGateHandler, true);
+        window.removeEventListener('popstate', managedViewingRouteGateHandler, true);
+        window.removeEventListener('hashchange', managedViewingRouteGateHandler, true);
+    } catch (e) {
+    }
+    managedViewingRouteGateListenersAttached = false;
+    managedViewingRouteGateHandler = null;
+}
+
+function ensureManagedViewingRouteGateRevalidation() {
+    if (managedViewingRouteGateListenersAttached) return;
+    managedViewingRouteGateHandler = () => {
+        try {
+            applyManagedViewingRouteGate(currentSettings);
+        } catch (e) {
+        }
+    };
+    try {
+        window.addEventListener('yt-navigate-finish', managedViewingRouteGateHandler, true);
+        window.addEventListener('yt-page-data-updated', managedViewingRouteGateHandler, true);
+        window.addEventListener('popstate', managedViewingRouteGateHandler, true);
+        window.addEventListener('hashchange', managedViewingRouteGateHandler, true);
+        managedViewingRouteGateListenersAttached = true;
+    } catch (e) {
+        managedViewingRouteGateListenersAttached = false;
+        managedViewingRouteGateHandler = null;
+    }
+}
+
+function applyManagedViewingRouteGate(settings) {
+    try {
+        const route = classifyManagedViewingRoute(location.href);
+        if (route.surface === 'external') {
+            releaseManagedViewingRouteGateRevalidation();
+            removeManagedViewingBlockedOverlay();
+            return false;
+        }
+
+        const policy = getManagedViewingRouteGatePolicy(settings);
+        if (!policy) {
+            releaseManagedViewingRouteGateRevalidation();
+            removeManagedViewingBlockedOverlay();
+            return false;
+        }
+
+        ensureManagedViewingRouteGateRevalidation();
+        const decision = {
+            surface: route.surface,
+            profileName: policy.profileName || '',
+            profileId: policy.profileId || '',
+            reason: 'viewing_space_allowed'
+        };
+
+        if (policy.allowMainViewing !== true && policy.allowKidsViewing !== true) {
+            decision.reason = 'no_viewing_spaces_parent_repair_required';
+            return showManagedViewingBlockedOverlay(decision);
+        }
+        if (route.surface === 'main' && policy.allowMainViewing !== true) {
+            decision.reason = 'main_viewing_space_denied';
+            return showManagedViewingBlockedOverlay(decision);
+        }
+        if (route.surface === 'kids' && policy.allowKidsViewing !== true) {
+            decision.reason = 'kids_viewing_space_denied';
+            return showManagedViewingBlockedOverlay(decision);
+        }
+
+        removeManagedViewingBlockedOverlay();
+        return false;
+    } catch (e) {
+        removeManagedViewingBlockedOverlay();
+        return false;
+    }
+}
+
 function requestSettingsFromBackground(options = {}) {
     return new Promise((resolve) => {
         const safeResolveFailure = () => {
@@ -501,6 +689,12 @@ function scheduleSeedRetry() {
 function sendSettingsToMainWorld(settings) {
     latestSettings = settings;
     currentSettings = settings;
+
+    if (applyManagedViewingRouteGate(settings)) {
+        pendingSeedSettings = null;
+        return;
+    }
+
     window.postMessage({
         type: 'FilterTube_SettingsToInjector',
         payload: settings,

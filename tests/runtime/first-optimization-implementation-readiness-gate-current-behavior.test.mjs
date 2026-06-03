@@ -125,7 +125,7 @@ test('first optimization implementation readiness rows counts and coverage stay 
   assert.match(doc, /collector fixture provenance rows covered: 12/);
   assert.match(doc, /collector parity rollout rows covered: 12/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5720/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5736/);
   assert.match(doc, /complete per-callable semantic proof files covered: 0/);
   assert.match(doc, /5 route\/surface-specific\s+per-file metric artifact contract docs covered/);
   assert.match(doc, /5 route\/surface-specific\s+per-file metric artifact contract tests covered/);
@@ -171,9 +171,9 @@ test('first optimization implementation readiness gate is backed by all current 
   assert.match(fixtureProvenance, /collector fixture provenance rows implementation-ready: 0/);
   assert.match(parityRollout, /collector parity rollout rows implementation-ready: 0/);
   assert.match(methodSemanticGap, /tracked JS\/JSX\/MJS files: 69/);
-  assert.match(methodSemanticGap, /repo-wide lexical callables: 5720/);
+  assert.match(methodSemanticGap, /repo-wide lexical callables: 5736/);
   assert.match(methodSemanticGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodSemanticGap, /lexical callables requiring semantic proof before behavior changes: 5720/);
+  assert.match(methodSemanticGap, /lexical callables requiring semantic proof before behavior changes: 5736/);
 });
 
 test('current source anchors still show implementation readiness risks before a first optimization patch', () => {

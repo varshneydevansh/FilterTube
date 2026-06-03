@@ -154,8 +154,8 @@ change, JSON-first promotion, or quick-block redesign.
 | `release_selector_comment_menu_context_first` | `js/content/block_channel.js:2942-2949:closest` | Dropdown injection prefers comment-thread/comment-view-model/comment-renderer context before generic video-card selectors. | Prevents comment menu actions from falling back to the watch shell or right-rail wrapper. |
 | `release_selector_menu_existing_item_check` | `js/content/block_channel.js:3076:querySelector`, `js/content/block_channel.js:3079:querySelector` | Completed dropdown state is trusted only if the injected item and title span still exist. | Avoids stale “blocked” state while YouTube reuses dropdown nodes. |
 | `release_selector_menu_stale_item_cleanup` | `js/content/block_channel.js:3177:querySelectorAll` | Stale `.filtertube-block-channel-item` rows are removed before injection when the card cannot be identified. | Prevents an old FilterTube action row from leaking into a newly reused native menu. |
-| `release_selector_whitelist_pending_card_intake` | `js/content_bridge.js:6243:matches`, `js/content_bridge.js:6244:querySelector`, `js/content_bridge.js:6245:querySelectorAll` | Pending-hide intake reaches `VIDEO_CARD_SELECTORS` only after mode, route, overlay, and queue-limit guards pass. | Keeps whitelist pending-hide fail-closed repair without charging blocklist/empty routes for nested selector traversal. |
-| `release_selector_fallback_menu_mutation_card_intake` | `js/content_bridge.js:7153-7155:matches/closest` | Fallback-menu mutation scan checks `fallbackMenuCardSelector` only after overlay quiet mode and eager-scan gates pass. | Keeps fallback menu buttons lazy on desktop/no-work surfaces while preserving mobile/coarse-pointer recovery. |
+| `release_selector_whitelist_pending_card_intake` | `js/content_bridge.js:6254:matches`, `js/content_bridge.js:6255:querySelector`, `js/content_bridge.js:6256:querySelectorAll` | Pending-hide intake reaches `VIDEO_CARD_SELECTORS` only after mode, route, overlay, and queue-limit guards pass. | Keeps whitelist pending-hide fail-closed repair without charging blocklist/empty routes for nested selector traversal. |
+| `release_selector_fallback_menu_mutation_card_intake` | `js/content_bridge.js:7166-7168:matches/closest` | Fallback-menu mutation scan checks `fallbackMenuCardSelector` only after overlay quiet mode and eager-scan gates pass. | Keeps fallback menu buttons lazy on desktop/no-work surfaces while preserving mobile/coarse-pointer recovery. |
 
 Current release selector status:
 
@@ -238,9 +238,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

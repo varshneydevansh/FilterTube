@@ -27,9 +27,9 @@ JSON-first route/surface metric artifact approval boundary rows: 12
 Route/surface metric obligations covered: 12
 JSON-first fixture approval rows covered: 12
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5720
+Method semantic proof gap lexical callables covered: 5736
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5720
+Lexical callables requiring semantic proof before behavior changes: 5736
 Runtime route/surface metric artifact approvals: 0
 Runtime metric collector approvals: 0
 Runtime JSON-first implementation approvals: 0
@@ -81,9 +81,9 @@ metric collector side-effect rows covered: 12
 metric collector fixture provenance rows covered: 12
 first optimization implementation readiness rows covered: 14
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 runtime route/surface metric artifact approvals: 0
 runtime metric collector approvals: 0
 runtime JSON-first implementation approvals: 0

@@ -1,8 +1,11 @@
 # Audit: Managed Parent Authority Inventory
 
 **Generated**: 2026-06-03  
-**Status**: Audit-only proof. Runtime behavior is unchanged.  
-**Goal slice**: Implementation order item 1, "Audit current authority paths".  
+**Status**: Runtime route-gate proof updated. Runtime behavior changed for
+protected child Main/Kids denial; remote-policy and time-limit enforcement
+remain pending.
+**Goal slice**: Implementation order item 1 plus first runtime viewing-space
+enforcement slice.
 **Lane proof**: `test:settings` for profile/Nanah authority and `test:release`
 for adding this focused proof test to the lane workflow.  
 **Owner repo**: `/Users/devanshvarshney/FilterTube`
@@ -10,12 +13,14 @@ for adding this focused proof test to the lane workflow.
 ## Purpose
 
 This inventory records the current parent, child, PIN, profile, Nanah, import,
-and viewing-space authority paths before adding a managed policy schema or time
-limit enforcement. The next implementation slices should use this as the
-baseline for what already exists and what is missing.
+viewing-space, and time-limit authority paths while the managed-control system
+is being built. It now includes the first extension runtime viewing-space gate:
+child/protected profiles can be denied Main YouTube or YouTube Kids at content
+runtime from local profile settings.
 
-This document is intentionally not a behavior patch. It does not approve any
-runtime change by itself.
+This document still does not approve remote policy writes by itself. Signed
+managed policy envelopes, revision stores, action history, and time-budget
+runtime remain separate required slices.
 
 ## Issue 60 Local-Network Caregiver Addendum
 
@@ -249,23 +254,32 @@ Current behavior:
 
 - `tab-view.js` reads `allowMainViewing` and `allowKidsViewing` into a profile
   viewing access label.
-- The native app already has route-level viewing-space concepts, but extension
-  runtime enforcement is not implemented in this repo yet.
+- Background compile now exposes `managedViewingRouteGate` only for active
+  child/protected profiles.
+- The isolated content bridge now blocks denied child Main/Kids routes with a
+  managed-profile overlay before settings are forwarded into the page-world
+  runtime.
 - The audit contract
   `docs/audit/FILTERTUBE_MANAGED_VIEWING_SPACE_ROUTE_GATE_CONTRACT_2026-06-03.md`
-  now pins Main/Kids route-gate decisions and no-work states, without changing
-  runtime behavior.
+  now pins Main/Kids route-gate decisions and no-work states, plus denial
+  overlay and SPA revalidation events.
 
 Authority meaning:
 
-- The setting exists as profile policy data and UI label input.
+- Local profile viewing settings now have extension runtime effect for child
+  profiles.
+- This is not remote managed-policy authority yet; Nanah/local-network writes
+  still need envelope, revision, device-binding, and integrity checks before
+  automatic application.
 
 Current gap:
 
-- Extension-side YouTube runtime does not yet route-gate Main/Kids access from
-  `allowMainViewing` or `allowKidsViewing`.
+- Extension-side YouTube runtime now route-gates child Main/Kids access from
+  `allowMainViewing` and `allowKidsViewing`.
 - Runtime route-gate implementation, denied-route overlay, and open-tab SPA
-  revalidation are still absent.
+  revalidation are now present.
+- There is still no signed remote viewing-space policy envelope or monotonic
+  revision store for parent/caregiver device updates.
 
 ### Time-limit policy
 
@@ -301,7 +315,7 @@ Current gap:
 | No managed policy envelope | Remote apply can only be governed by UI/trusted-link policy, not a durable policy object. | Schema and validation tests before runtime writes. |
 | No revision store | Stale or replayed updates cannot be rejected as a first-class rule. | Monotonic revision fixtures per parent/source and child target. |
 | No signature/integrity check | Trust is link/session-policy based, not envelope-authenticated. | Signed/authenticated envelope tests. |
-| No Main/Kids route gate | Viewing-space settings can remain advisory in extension runtime. | Runtime Main/Kids gate, denied-route overlay, and SPA revalidation after the route matrix contract. |
+| No signed remote Main/Kids policy gate | Local child route denial now works, but remote updates are still not envelope/revision-bound. | Managed policy envelope, revision store, and Nanah/local-network apply wrapper before remote route-policy writes. |
 | No time-limit runtime | Parent cannot yet enforce daily YouTube budgets. | Runtime active-tab counter, route-gate, overlay, fake-clock, and performance fixtures after the schema contract. |
 | Adapter lacks trust context | `applyIncomingEnvelope(...)` applies after caller-side checks. | Upper-layer managed policy apply wrapper before adapter call. |
 | Locked-child bypass has no revision binding | `allow_trusted_updates` can skip unlock for matching managed sessions, but not with policy revision constraints. | Locked child managed-policy fixtures. |
@@ -326,8 +340,8 @@ Before adding parent-managed runtime behavior:
    integrity checks before any Nanah managed policy write.
 4. Keep existing `applyScopedPortablePayload(...)` as the low-level profile
    write primitive, but call it only after managed envelope validation.
-5. Keep Main/Kids route policy fixtures passing before route-gating
-   implementation, then add runtime denied-route and SPA revalidation proof.
+5. Keep Main/Kids route policy fixtures passing while extending the local
+   runtime route gate toward signed remote policy apply.
 6. Keep time-limit schema tests passing before any background timer or overlay
    work, then add runtime counter, route-gate, and overlay fixtures.
 7. Preserve no-policy/no-work behavior for existing YouTube filtering paths.

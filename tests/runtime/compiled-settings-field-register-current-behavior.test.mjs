@@ -22,12 +22,12 @@ const productFieldFiles = [
 ];
 
 const sourceFingerprints = {
-  'js/background.js': [6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
+  'js/background.js': [6343, 286370, 'ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36'],
   'js/settings_shared.js': [1181, 57535, '9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c'],
   'js/filter_logic.js': [3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'],
   'js/seed.js': [1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
-  'js/content_bridge.js': [13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c'],
-  'js/content/bridge_settings.js': [651, 26462, 'c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b']
+  'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
+  'js/content/bridge_settings.js': [845, 34241, 'aea46dd241248db1d1d9bcbdfdf65320d1399ecd84cc7792678f29b1b26ee092']
 };
 
 function read(file) {
@@ -177,32 +177,32 @@ test('compiled settings field register counts and rows remain source-derived', (
   const text = doc();
   const actualRows = uniqueRows.map(row => `${row.file}:${row.line}:${row.operation}:${row.field}:${row.count}`);
 
-  assert.equal(rawRows.length, 309);
-  assert.equal(uniqueRows.length, 148);
+  assert.equal(rawRows.length, 314);
+  assert.equal(uniqueRows.length, 153);
   assert.deepEqual(countBy(rawRows, 'operation'), {
     cachedSettingsRead: 12,
-    compiledAssign: 54,
+    compiledAssign: 57,
     currentSettingsRead: 56,
     processedAssign: 7,
-    settingsRead: 144,
+    settingsRead: 146,
     sharedCompiledReturn: 36
-  });
+});
   assert.deepEqual(countBy(uniqueRows, 'operation'), {
     cachedSettingsRead: 7,
-    compiledAssign: 44,
+    compiledAssign: 47,
     currentSettingsRead: 6,
     processedAssign: 7,
-    settingsRead: 48,
+    settingsRead: 50,
     sharedCompiledReturn: 36
-  });
+});
   assert.deepEqual(countBy(uniqueRows, 'file'), {
-    'js/background.js': 50,
-    'js/content/bridge_settings.js': 4,
-    'js/content_bridge.js': 16,
-    'js/filter_logic.js': 26,
-    'js/seed.js': 16,
-    'js/settings_shared.js': 36
-  });
+    "js/background.js": 53,
+    "js/content/bridge_settings.js": 6,
+    "js/content_bridge.js": 16,
+    "js/filter_logic.js": 26,
+    "js/seed.js": 16,
+    "js/settings_shared.js": 36
+});
 
   assert.deepEqual(uniqueRowsFromDoc(text), actualRows);
 });
@@ -219,21 +219,24 @@ test('compiled settings field register records compiler parity and consumer boun
   const bridge = read('js/content_bridge.js');
   const domFallback = read('js/content/dom_fallback.js');
 
-  assert.equal(fields.compiledAssign.length, 44);
+  assert.equal(fields.compiledAssign.length, 47);
   assert.equal(fields.sharedCompiledReturn.length, 36);
   assert.equal(fields.processedAssign.length, 7);
   assert.deepEqual(
     fields.compiledAssign.filter(field => !fields.sharedCompiledReturn.includes(field)),
     [
-      'channelMap',
-      'listMode',
-      'profileType',
-      'useExactWordMatching',
-      'videoChannelMap',
-      'videoMetaMap',
-      'whitelistChannels',
-      'whitelistKeywords'
-    ]
+      "activeProfileId",
+      "activeProfileKind",
+      "channelMap",
+      "listMode",
+      "managedViewingRouteGate",
+      "profileType",
+      "useExactWordMatching",
+      "videoChannelMap",
+      "videoMetaMap",
+      "whitelistChannels",
+      "whitelistKeywords"
+]
   );
   assert.deepEqual(
     fields.sharedCompiledReturn.filter(field => !fields.compiledAssign.includes(field)),
@@ -250,10 +253,10 @@ test('compiled settings field register records compiler parity and consumer boun
   ]);
 
   assert.match(text, /Background-only compiled fields not returned by `buildCompiledSettings/);
-  assert.match(text, /channelMap,listMode,profileType,useExactWordMatching,videoChannelMap,videoMetaMap,whitelistChannels,whitelistKeywords/);
+  assert.match(text, /activeProfileId,activeProfileKind,channelMap,listMode,managedViewingRouteGate,profileType,useExactWordMatching,videoChannelMap,videoMetaMap,whitelistChannels,whitelistKeywords/);
   assert.match(text, /Shared-only compiled fields not assigned by the background compiler/);
   assert.match(text, /none/);
-  assert.match(text, /background compiler currently assigns 44 unique compiled fields/);
+  assert.match(text, /background compiler currently assigns 47 unique compiled fields/);
   assert.match(text, /shared UI compiler currently returns 36 unique compiled fields/);
   assert.match(text, /filter_logic\.js` spreads incoming settings before normalizing seven fields/);
   assert.match(text, /seed\.js` uses 7 cached settings fields in current no-work and route gates/);

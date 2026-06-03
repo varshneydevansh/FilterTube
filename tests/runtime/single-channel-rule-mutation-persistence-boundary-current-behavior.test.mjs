@@ -31,6 +31,10 @@ function countLiteral(text, needle) {
   return text.split(needle).length - 1;
 }
 
+function docNumberForSource(file, value) {
+  return file === 'js/background.js' ? String(value) : value.toLocaleString('en-US');
+}
+
 function blockStats(text) {
   return {
     lines: text.split('\n').length,
@@ -192,9 +196,9 @@ test('single-channel rule mutation persistence audit document records current bo
 test('single-channel rule mutation source fingerprints stay pinned', () => {
   const doc = read(auditDocPath);
   const expected = [
-    ['js/background.js', 6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
+    ['js/background.js', 6343, 286370, 'ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36'],
     ['js/state_manager.js', 2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6'],
-    ['js/content_bridge.js', 13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c']
+    ['js/content_bridge.js', 13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d']
   ];
 
   for (const [file, lines, bytes, hash] of expected) {
@@ -203,8 +207,8 @@ test('single-channel rule mutation source fingerprints stay pinned', () => {
     assert.equal(Buffer.byteLength(source), bytes, `${file} byte count drifted`);
     assert.equal(sha256(file), hash, `${file} hash drifted`);
     const escapedFile = file.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const lineText = lines.toLocaleString('en-US');
-    const byteText = bytes.toLocaleString('en-US');
+    const lineText = docNumberForSource(file, lines);
+    const byteText = docNumberForSource(file, bytes);
     assert.match(doc, new RegExp(`\\| \`${escapedFile}\` \\| ${lineText} \\| ${byteText} \\| \`${hash}\` \\|`));
   }
 });

@@ -10,11 +10,11 @@ function read(relativePath) {
   return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
 }
 
-test('managed parent authority inventory is audit-only and names required current authority areas', () => {
+test('managed parent authority inventory tracks implemented route gate and pending authority areas', () => {
   const doc = read(docPath);
 
-  assert.match(doc, /Status\*\*: Audit-only proof/);
-  assert.match(doc, /Runtime behavior is unchanged/);
+  assert.match(doc, /Status\*\*: Runtime route-gate proof updated/);
+  assert.match(doc, /Runtime behavior changed/);
   assert.match(doc, /Lane proof\*\*: `test:settings`/);
   assert.match(doc, /`test:release`/);
   assert.match(doc, /Local parent-managed child editing/);
@@ -83,11 +83,12 @@ test('Nanah scoped apply currently has target-profile writes but no durable mana
   assert.match(doc, /There is no signed managed policy envelope/);
 });
 
-test('viewing-space and time-limit enforcement are explicitly not implemented yet', () => {
+test('viewing-space route gate is runtime-backed while time-limit enforcement is still pending', () => {
   const doc = read(docPath);
   const tabView = read('js/tab-view.js');
   const runtime = [
     read('js/background.js'),
+    read('js/content/bridge_settings.js'),
     read('js/content_bridge.js'),
     read('js/settings_shared.js'),
     read('js/state_manager.js')
@@ -96,13 +97,14 @@ test('viewing-space and time-limit enforcement are explicitly not implemented ye
   assert.match(tabView, /allowMainViewing/);
   assert.match(tabView, /allowKidsViewing/);
   assert.match(doc, /now pins Main\/Kids route-gate decisions and no-work states/);
-  assert.match(doc, /Extension-side YouTube runtime does not yet route-gate Main\/Kids access/);
-  assert.match(doc, /Runtime route-gate implementation, denied-route overlay, and open-tab SPA\s+revalidation are still absent/);
+  assert.match(doc, /Extension-side YouTube runtime now route-gates child Main\/Kids access/);
+  assert.match(doc, /Runtime route-gate implementation, denied-route overlay, and open-tab SPA\s+revalidation are now present/);
   assert.match(doc, /Accounts & Sync can now set, change, and disable a profile-owned\s+`settings.timeLimitPolicy`/);
   assert.match(doc, /No extension active-tab budget counter, timeout overlay, or Main\/Kids time\s+route gate exists/);
   assert.match(doc, /FILTERTUBE_MANAGED_CHILD_TIME_LIMIT_SCHEMA_CONTRACT_2026-06-03\.md/);
   assert.match(doc, /No runtime time-limit compiler/);
   assert.doesNotMatch(runtime, /timeLimits/);
-  assert.doesNotMatch(runtime, /managedViewingRouteGate/);
-  assert.doesNotMatch(runtime, /showManagedViewingBlockedOverlay/);
+  assert.match(runtime, /managedViewingRouteGate/);
+  assert.match(runtime, /showManagedViewingBlockedOverlay/);
+  assert.match(runtime, /__filtertubeManagedViewingRouteDenied/);
 });

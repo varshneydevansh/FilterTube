@@ -26,8 +26,8 @@ This is narrower than the compiled-settings field register and the list-mode mat
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6,320 | 285,103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
-| `js/content/bridge_settings.js` | 651 | 26,462 | `c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b` |
+| `js/background.js` | 6,343 | 286,370 | `ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36` |
+| `js/content/bridge_settings.js` | 845 | 34,241 | `aea46dd241248db1d1d9bcbdfdf65320d1399ecd84cc7792678f29b1b26ee092` |
 | `js/filter_logic.js` | 3,652 | 172,174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 
 compiled settings profile/list-mode assembly source files pinned: 3
@@ -36,10 +36,10 @@ compiled settings profile/list-mode assembly source files pinned: 3
 
 | Block | Source | Start line | Lines | Bytes | SHA-256 |
 | --- | --- | ---: | ---: | ---: | --- |
-| `backgroundProfileListModeWhitelist` | `js/background.js:1981` | 1,981 | 55 | 3,428 | `fd9e0cc5b9219b358e72f5ede15556df10bf8a9b80af1a98d4518575269fc258` |
-| `backgroundWhitelistChannelCompiler` | `js/background.js:2149` | 2,149 | 65 | 3,878 | `433527aec588525d8f3747ce7ffe20b1d2d78905c6812a6fcf6703bbee507322` |
+| `backgroundProfileListModeWhitelist` | `js/background.js:1981` | 1,981 | 78 | 4,695 | `7962fdb02859394cfdedb5e393ef6fd6c0bc1e1988aa5f0dc34ccd90384a6eea` |
+| `backgroundWhitelistChannelCompiler` | `js/background.js:2172` | 2,172 | 65 | 3,878 | `433527aec588525d8f3747ce7ffe20b1d2d78905c6812a6fcf6703bbee507322` |
 | `bridgeNormalizeSettingsForHost` | `js/content/bridge_settings.js:322` | 322 | 31 | 1,404 | `5f05ac1dba540e69103fe5725ad258d203f03e72762a1cc887d8c70e847988ac` |
-| `bridgeRequestProfileGate` | `js/content/bridge_settings.js:379` | 379 | 36 | 1,758 | `713d4c00573258982f7dbf77cc451307b24a421ad8916fed859445df88fdadb8` |
+| `bridgeRequestProfileGate` | `js/content/bridge_settings.js:567` | 567 | 36 | 1,758 | `713d4c00573258982f7dbf77cc451307b24a421ad8916fed859445df88fdadb8` |
 | `filterProcessSettings` | `js/filter_logic.js:947` | 947 | 125 | 6,348 | `666c5725170dcd5eb01aa66cbfd27e64d33fa0ae937d1c5553665b4ede149e0f` |
 | `filterListModeIdentityAdmission` | `js/filter_logic.js:1715` | 1,715 | 268 | 12,855 | `3de047cd70f0734c2bdcf6ae481d23a3c78fe08f3aa280c2f59680cad04761af` |
 
@@ -70,7 +70,7 @@ Counts below are over the pinned source/effect blocks, not whole files.
 | `processed.whitelistKeywords` | 1 |
 | `processed.whitelistChannels` | 1 |
 | `new RegExp` | 2 |
-| `toLowerCase()` | 16 |
+| `toLowerCase()` | 17 |
 | `_hasChannelPolicyRules` | 2 |
 | `needsChannelIdentity` | 2 |
 | `extractChannelIdentity` | 2 |
@@ -141,9 +141,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

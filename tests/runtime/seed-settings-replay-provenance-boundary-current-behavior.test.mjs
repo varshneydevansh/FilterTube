@@ -242,10 +242,10 @@ test('seed settings replay provenance audit is audit-only and source pinned', ()
 
   for (const [file, lines, bytes, hash] of [
     ['js/seed.js', 1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
-    ['js/content/bridge_settings.js', 651, 26462, 'c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b'],
+    ['js/content/bridge_settings.js', 845, 34241, 'aea46dd241248db1d1d9bcbdfdf65320d1399ecd84cc7792678f29b1b26ee092'],
     ['js/injector.js', 3593, 155830, '634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04'],
     ['js/state_manager.js', 2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6'],
-    ['js/background.js', 6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad']
+    ['js/background.js', 6343, 286370, 'ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36']
   ]) {
     const source = read(file);
     assert.equal(lineCount(source), lines, `${file} line count changed`);

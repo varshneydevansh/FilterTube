@@ -26,9 +26,9 @@ Selected first optimization binding: FT-BIND-00-metric-artifact-foundation
 Required verification output path: docs/audit/artifacts/first-optimization/metric-foundation/verification-output.tap
 Collector verification output approval boundary rows: 12
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5720
+Method semantic proof gap lexical callables covered: 5736
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5720
+Lexical callables requiring semantic proof before behavior changes: 5736
 Runtime source-owner approvals: 0
 Runtime metric collector approvals: 0
 Runtime collector verification output approvals: 0
@@ -79,9 +79,9 @@ collector approval authority rows covered: 12
 rollback/unclaimed rows covered: 12
 current parity release verification anchors covered: 68
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 runtime source-owner approvals: 0
 runtime metric collector approvals: 0
 runtime collector insertion points approved: 0

@@ -210,11 +210,11 @@ test('quick-block/block-menu affordance audit is audit-only and source pinned', 
 
   assert.ok(doc.includes(`| \`js/content_controls_catalog.js\` | 222 | 7822 | \`${sha256('js/content_controls_catalog.js')}\` |`));
   assert.ok(doc.includes(`| \`js/settings_shared.js\` | 1181 | 57535 | \`${sha256('js/settings_shared.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/background.js\` | 6320 | 285103 | \`${sha256('js/background.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/content/bridge_settings.js\` | 651 | 26462 | \`${sha256('js/content/bridge_settings.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/background.js\` | 6343 | 286370 | \`${sha256('js/background.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content/bridge_settings.js\` | 845 | 34241 | \`${sha256('js/content/bridge_settings.js')}\` |`));
   assert.ok(doc.includes(`| \`js/state_manager.js\` | 2491 | 99780 | \`${sha256('js/state_manager.js')}\` |`));
   assert.ok(doc.includes(`| \`js/content/block_channel.js\` | 3189 | 127857 | \`${sha256('js/content/block_channel.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/content_bridge.js\` | 13623 | 603362 | \`${sha256('js/content_bridge.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content_bridge.js\` | 13636 | 604184 | \`${sha256('js/content_bridge.js')}\` |`));
 
   for (const token of [
     'Collaborator Grammar Action Handoff Addendum - 2026-05-27',
@@ -261,8 +261,8 @@ test('quick-block/block-menu affordance audit is audit-only and source pinned', 
     'js/content/block_channel.js:1607-1639',
     'js/content/block_channel.js:1671-1689',
     'js/content_bridge.js:731-795',
-    'js/content_bridge.js:11044-11067',
-    'js/content_bridge.js:11070-11098'
+    'js/content_bridge.js:11139-11208',
+    'js/content_bridge.js:11220-11248'
   ]) {
     assert.ok(doc.includes(`\`${sourcePin}\``), `missing collaborator action source pin ${sourcePin}`);
   }

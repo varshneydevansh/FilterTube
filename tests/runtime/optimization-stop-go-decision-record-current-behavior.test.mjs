@@ -229,16 +229,16 @@ test('high-level readiness and stop-go docs carry the method proof gap blocker',
   const gapText = read(methodGapPath);
   const indexTokens = [
     'tracked JS/JSX/MJS files: 69',
-    'repo-wide lexical callables: 5720',
+    'repo-wide lexical callables: 5736',
     'files with complete per-callable semantic proof: 0',
-    'lexical callables requiring semantic proof before behavior changes: 5720',
+    'lexical callables requiring semantic proof before behavior changes: 5736',
     'runtime behavior changed: no'
   ];
   const registerTokens = [
     'method semantic proof gap files covered: 69',
-    'method semantic proof gap lexical callables covered: 5720',
+    'method semantic proof gap lexical callables covered: 5736',
     'files with complete per-callable semantic proof: 0',
-    'lexical callables requiring semantic proof before behavior changes: 5720',
+    'lexical callables requiring semantic proof before behavior changes: 5736',
     'affected callable semantic proof: NO-GO',
     'runtime behavior changed: no'
   ];

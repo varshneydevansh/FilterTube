@@ -192,9 +192,9 @@ Large product-owned source files:
 
 | File | Current lines | Boundary |
 | --- | ---: | --- |
-| `js/content_bridge.js` | 13623 | Giant cross-context hub. Any growth needs source-owner proof and focused runtime fixtures. |
+| `js/content_bridge.js` | 13636 | Giant cross-context hub. Any growth needs source-owner proof and focused runtime fixtures. |
 | `js/tab-view.js` | 11833 | Dashboard/settings UI surface. Any growth needs UI/state owner proof and release smoke. |
-| `js/background.js` | 6320 | Background storage/message/profile authority. Any growth needs mutation and settings proof. |
+| `js/background.js` | 6343 | Background storage/message/profile authority. Any growth needs mutation and settings proof. |
 | `js/content/dom_fallback.js` | 5030 | DOM fallback selector/hide/restore authority. Any growth needs DOM/no-work proof. |
 | `js/filter_logic.js` | 3652 | JSON renderer rule and decision engine. Any growth needs rule/path proof. |
 | `js/injector.js` | 3593 | Main-world JSON interception and page bridge. Any growth needs JSON/no-work proof. |
@@ -244,9 +244,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

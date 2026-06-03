@@ -121,9 +121,9 @@ function assertWhitelistObserverBudgetMatrixAddendum() {
 
   for (const row of [
     /\| JSON transport admission \| `js\/seed\.js:234-238`, `js\/injector\.js:185-188` \|/,
-    /\| Identity prefetch admission \| `js\/content_bridge\.js:1006-1015`, `js\/content_bridge\.js:1311-1316` \|/,
-    /\| Right-rail observer install \| `js\/content_bridge\.js:1210-1237`, `js\/content_bridge\.js:1256-1269` \|/,
-    /\| Whitelist pending timers \| `js\/content_bridge\.js:6200-6268` \|/,
+    /\| Identity prefetch admission \| `js\/content_bridge\.js:1013-1022`, `js\/content_bridge\.js:1317-1322` \|/,
+    /\| Right-rail observer install \| `js\/content_bridge\.js:1219-1246`, `js\/content_bridge\.js:1256-1272` \|/,
+    /\| Whitelist pending timers \| `js\/content_bridge\.js:6211-6279` \|/,
     /\| DOM fallback active predicate \| `js\/content\/dom_fallback\.js:2117-2184`, `js\/content\/dom_fallback\.js:2220-2327`, `js\/content\/dom_fallback\.js:4739-4891` \|/,
     /\| Quick\/menu quiet gates \| `js\/content\/block_channel\.js:1212-1296`, `js\/content\/block_channel\.js:1993-2042`, `js\/content_bridge\.js:10725-10737` \|/
   ]) {

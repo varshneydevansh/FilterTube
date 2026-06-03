@@ -10,7 +10,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_CONTENT_BRIDGE_COLLABORATOR_IDENTITY_PROMOTION_HANDOFF_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/content_bridge.js': [13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c']
+  'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d']
 };
 
 const blockSpecs = {
@@ -18,7 +18,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function getWatchLikeCollaborationWarmup(videoCard) {',
     end: 'function promoteYtmWatchRowIdentityFromCollaboratorMetadata',
-    startLine: 4813,
+    startLine: 4822,
     lines: 30,
     bytes: 1297,
     hash: '53d862a7e45c0dacd6795046e53cf9e257dee3394deeed10a06eb5ec1a1dfda2'
@@ -27,7 +27,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function promoteYtmWatchRowIdentityFromCollaboratorMetadata(channelInfo, videoCard) {',
     end: 'function cardHasCollaborationDomSignal',
-    startLine: 4843,
+    startLine: 4852,
     lines: 92,
     bytes: 3296,
     hash: 'deefe23561a642fd66ccf80bcab3ff513472356c9141dc145d9a1e2227b2b140'
@@ -36,7 +36,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function cardHasCollaborationDomSignal(videoCard) {',
     end: 'function normalizeCollaboratorChannelInfoForCard',
-    startLine: 4935,
+    startLine: 4944,
     lines: 120,
     bytes: 5285,
     hash: '9a17597d1f08ebb5c4e4ed9bdd74dcdae28dd00135e3151e0e6575f682aca32a'
@@ -45,7 +45,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function normalizeCollaboratorChannelInfoForCard(initialChannelInfo, videoCard, options = {}) {',
     end: 'function promoteChannelInfoFromCollaboratorSignals',
-    startLine: 5055,
+    startLine: 5064,
     lines: 154,
     bytes: 6370,
     hash: 'a1b488fd8228fa830e2914f872e3911cb9b8b6e092a7201540867e6b31cf94d0'
@@ -54,7 +54,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function promoteChannelInfoFromCollaboratorSignals(channelInfo, videoCard) {',
     end: 'function normalizeHandleForComparison',
-    startLine: 5209,
+    startLine: 5218,
     lines: 86,
     bytes: 3081,
     hash: '55ff41d06a422df35dd5c241198978dbd19df3428f0969e06193860652a8a31d'
@@ -63,7 +63,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: '        // PRIORITY: Check for collaboration videos (Search attributed-channel-name, Home metadata rows, Avatar stack)',
     end: '        // Method 2: Check for data attributes (added by FilterTube',
-    startLine: 9967,
+    startLine: 9980,
     lines: 32,
     bytes: 1622,
     hash: '8e2087627598bda37bb8814981dd27df4a44f9970fd0165a8829d390ecfcbfe4'
@@ -72,7 +72,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: '        // Method 5: Homepage Lockup / Modern Metadata fallback',
     end: '                const avatarImg = lockupMetadata.querySelector',
-    startLine: 10434,
+    startLine: 10447,
     lines: 24,
     bytes: 1290,
     hash: '163574a088d8e8bd725e9b668974e39da9e85d17a578dbb834bd6d451a8d0bae'

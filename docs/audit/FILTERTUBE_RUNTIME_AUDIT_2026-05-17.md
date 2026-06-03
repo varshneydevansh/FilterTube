@@ -5902,7 +5902,7 @@ semantics.
 | DOM fallback injection | `js/content/bridge_injection.js:51-73`. | Appends `<script src="chrome-extension://.../js/{name}.js">` sequentially with 50ms gaps. | Firefox fallback is necessary, but appended scripts are not removed and ordering differs from Chromium executeScript timing. Needs browser parity fixture. | `KEEP` + Firefox fixture |
 | `injectMainWorldScripts()` idempotency | `js/content/bridge_injection.js:75-83`, `119-120`. | Returns existing promise when injected or in progress. | Good protection against concurrent import/ping/startup calls. Need proof that a failed injection clears promise and a successful one never reinjects stale script sets. | `KEEP` + failure test |
 | Script set selection | `js/content/bridge_injection.js:84-88`. | Injects `shared/identity`, `filter_logic`, Firefox-only `seed`, then `injector`. | Browser split is important: Chromium manifest loads `seed.js` directly, Firefox injects it here. Needs browser-specific JSON hook timing tests. | `KEEP` + route/browser fixture |
-| Post-injection settings request | `js/content/bridge_injection.js:95-103`. | Schedules `requestSettingsFromBackground()` after 100ms if available. | This is one of several settings request triggers (`content_bridge.js:5474-5476`, `5707-5720`, `bridge_settings.js:526-539`). Without revision dedupe it can cause repeated settings delivery and reprocessing. | `INSTRUMENT` then `REWRITE` revision gate |
+| Post-injection settings request | `js/content/bridge_injection.js:95-103`. | Schedules `requestSettingsFromBackground()` after 100ms if available. | This is one of several settings request triggers (`content_bridge.js:5474-5476`, `5707-5736`, `bridge_settings.js:526-539`). Without revision dedupe it can cause repeated settings delivery and reprocessing. | `INSTRUMENT` then `REWRITE` revision gate |
 | Failure path | `js/content/bridge_injection.js:104-116`. | Marks `scriptsInjected=false`, clears promise only on failure, rethrows. | Correct basic behavior; should emit one structured startup failure event so fallback DOM-only mode is explicit. | `INSTRUMENT` |
 
 Bridge injection invariant:
@@ -7241,9 +7241,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

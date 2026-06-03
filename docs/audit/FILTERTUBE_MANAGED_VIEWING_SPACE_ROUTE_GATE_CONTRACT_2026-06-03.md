@@ -1,8 +1,10 @@
 # Contract: Managed Viewing-Space Route Gate
 
 **Generated**: 2026-06-03
-**Status**: Contract/proof fixture only. Runtime behavior is unchanged.
-**Goal slice**: Implementation order item 7 prerequisite, "Add Main/Kids
+**Status**: Runtime route gate implemented for protected child profiles.
+Runtime behavior changed: denied Main/Kids child routes now show a managed
+profile overlay and skip heavier page-world/filter fallback work for that page.
+**Goal slice**: Implementation order runtime prerequisite, "Enforce Main/Kids
 route-gate fixtures".
 **Primary inputs**:
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`,
@@ -12,10 +14,11 @@ and
 
 ## Purpose
 
-This contract pins the profile viewing-space route gate that must exist before
-FilterTube can enforce protected-profile Main YouTube or YouTube Kids access.
-The current extension UI can store `allowMainViewing` and `allowKidsViewing`,
-but content/background runtime does not yet block routes from those flags.
+This contract pins the profile viewing-space route gate used to enforce
+protected-profile Main YouTube or YouTube Kids access. The extension UI stores
+`allowMainViewing` and `allowKidsViewing`; background compile now exposes a
+child-only `managedViewingRouteGate`, and the isolated content bridge blocks
+denied routes before forwarding settings into the page-world runtime.
 
 The route gate is a runtime authority requirement, not a settings-label
 feature. A child/protected-user PIN cannot grant a denied viewing space, and
@@ -40,15 +43,15 @@ there until a future active-surface proof exists.
 | Fixture id | Policy | Main route decision | Kids route decision |
 | --- | --- | --- | --- |
 | `managed_viewing_both_allowed` | `allowMainViewing: true`, `allowKidsViewing: true` | Allow. | Allow. |
-| `managed_viewing_main_only` | Main true, Kids false. | Allow. | Deny with protected overlay/redirect after implementation. |
-| `managed_viewing_kids_only` | Main false, Kids true. | Deny with protected overlay/redirect after implementation. | Allow. |
+| `managed_viewing_main_only` | Main true, Kids false. | Allow. | Deny with protected overlay. |
+| `managed_viewing_kids_only` | Main false, Kids true. | Deny with protected overlay. | Allow. |
 | `managed_viewing_neither_invalid` | Main false, Kids false. | Reject before policy write; if encountered at runtime, deny both and require parent repair. | Reject before policy write; if encountered at runtime, deny both and require parent repair. |
 | `managed_viewing_missing_policy_no_work` | No profile policy. | No route-gate work; preserve current page behavior. | No route-gate work; preserve current page behavior. |
 | `managed_viewing_external_no_work` | Any policy. | No route-gate work on non-owned routes. | No route-gate work on non-owned routes. |
 
 ## Runtime Enforcement Requirements
 
-Future runtime enforcement must satisfy these requirements before shipping:
+Runtime enforcement in this slice satisfies:
 
 - Route decisions are evaluated from the active protected profile policy, not
   from child PIN state or UI labels.
@@ -58,33 +61,46 @@ Future runtime enforcement must satisfy these requirements before shipping:
 - Missing policy is a no-work state and must not install observers, timers, or
   overlays.
 - External or unsupported hosts are no-work states.
-- Runtime gate changes must listen for profile/policy refresh and re-evaluate
-  already-open tabs.
-- Any visible denial UI must be child-safe, accessible, and not dismissible as
-  admin authority by a child/protected user.
+- Runtime gate changes listen for profile/policy refresh and YouTube SPA
+  navigation events (`yt-navigate-finish`, `yt-page-data-updated`, `popstate`,
+  and `hashchange`) and re-evaluate already-open tabs.
+- The visible denial UI is child-safe, accessible, and does not include a child
+  dismiss or admin bypass.
 - Public docs must describe only extension/app-owned surfaces, not general
   internet-wide blocking.
 
 ## Current Runtime Boundary
 
-Current product runtime source does not yet implement this gate:
+Current product runtime source implements this first extension-side gate:
 
 ```text
-runtime managed viewing-space route gate: absent
-runtime managed Main route denial: absent
-runtime managed Kids route denial: absent
-runtime managed viewing-space deny overlay: absent
-runtime managed viewing-space SPA revalidation: absent
-runtime behavior changed by this contract: no
+runtime managed viewing-space route gate: present
+runtime managed Main route denial: present
+runtime managed Kids route denial: present
+runtime managed viewing-space deny overlay: present
+runtime managed viewing-space SPA revalidation: present
+runtime managed time-limit budget counter: absent
+runtime behavior changed by this contract: yes
 ```
 
-The existing UI/storage behavior remains:
+The existing UI/storage behavior remains, with runtime enforcement now attached:
 
 - Profile settings can store `allowMainViewing` and `allowKidsViewing`.
 - The dashboard can label Main/Kids access.
 - The tab-view UI prevents saving a profile with both viewing spaces disabled
   through that specific UI path.
-- Background runtime compile still does not enforce the flags.
+- Background runtime compile exposes child-only `managedViewingRouteGate`
+  settings from those flags.
+- The content bridge applies the route gate before forwarding settings to the
+  page-world JSON runtime.
+
+Remaining boundaries:
+
+- This is local profile-setting enforcement, not a signed remote managed-policy
+  envelope.
+- There is still no active-tab time-limit counter or timeout overlay.
+- Import/Nanah writes still need managed policy revision and integrity gates
+  before remote route policy can be treated as authoritative.
 
 ## Verification
 

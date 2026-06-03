@@ -48,7 +48,7 @@ function messageTypes(handler) {
   return [...handler.matchAll(/type === '([^']+)'/g)].map((match) => match[1]);
 }
 
-function loadMessageDispatchRuntime() {
+function loadMessageDispatchRuntime({ routeDenied = false } = {}) {
   const { handler } = contentBridgeBlocks();
   const events = [];
   const windowObject = {};
@@ -68,6 +68,9 @@ function loadMessageDispatchRuntime() {
     }
     function applyDOMFallback(settings, options) {
       globalThis.__events.push({ type: 'applyDOMFallback', settings, options });
+    }
+    function isFilterTubeManagedViewingRouteDenied() {
+      return ${routeDenied ? 'true' : 'false'};
     }
     ${handler}
     globalThis.__exports = { handleMainWorldMessages };
@@ -90,11 +93,12 @@ test('content bridge main-world dispatch audit is audit-only and source counted'
 
   for (const marker of [
     'Status: current-behavior proof with a narrow learned-map no-op DOM work fix',
-    'Runtime behavior changed only for duplicate learned-map page messages',
+    'Runtime behavior changed for duplicate learned-map page messages',
+    'managed route-gate refresh suppression',
     'not a broad message-trust',
     'runtime content bridge main-world message dispatch fixtures: 8',
     'message dispatch executable ingress rows: 5',
-    'message dispatch executable behavior changed: no',
+    'message dispatch executable behavior changed: yes - managed route-gate refresh suppression',
     'message dispatch executable approval: NO-GO',
     'not completion proof for page-message trust'
   ]) {
@@ -189,6 +193,11 @@ test('content bridge receiver accepts same-window FilterTube messages with only 
   await flushMicrotasks();
   assert.deepEqual(runtime.events.map(event => event.type), ['requestSettingsFromBackground', 'applyDOMFallback']);
   assert.equal(runtime.events.at(-1).options.forceReprocess, true);
+
+  const deniedRuntime = loadMessageDispatchRuntime({ routeDenied: true });
+  deniedRuntime.exports.handleMainWorldMessages({ source: deniedRuntime.window, data: { type: 'FilterTube_Refresh' } });
+  await flushMicrotasks();
+  assert.deepEqual(deniedRuntime.events.map(event => event.type), ['requestSettingsFromBackground']);
 });
 
 test('refresh and readiness messages can request settings and force DOM fallback without pending ownership', () => {
@@ -198,6 +207,7 @@ test('refresh and readiness messages can request settings and force DOM fallback
 
   assert.match(readiness, /requestSettingsFromBackground\(\);/);
   assert.match(refresh, /requestSettingsFromBackground\(\)\.then\(result =>/);
+  assert.match(refresh, /if \(isFilterTubeManagedViewingRouteDenied\(\)\) return;/);
   assert.match(refresh, /applyDOMFallback\(result\.settings, \{ forceReprocess: true \}\)/);
   assert.doesNotMatch(refresh, /pending[A-Za-z]+Requests|get\(requestId\)|requestId|contentBridgeRefreshOwnershipReport/);
 });

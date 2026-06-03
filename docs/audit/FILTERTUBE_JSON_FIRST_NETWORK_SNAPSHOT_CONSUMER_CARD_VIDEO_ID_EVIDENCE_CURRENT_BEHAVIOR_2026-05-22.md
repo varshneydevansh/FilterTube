@@ -26,7 +26,7 @@ single evidence report, confidence class, restore policy, or side-effect budget.
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `js/content/dom_extractors.js` | 1102 | 45149 | `3f88d18789847d50bed8a515dcd44e969db43bd19b343c38d5c3ea32b6ec6237` |
-| `js/content_bridge.js` | 13,623 | 603,362 | `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c` |
+| `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
 
 Related proof layers:
 
@@ -175,9 +175,9 @@ evidence surface can support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

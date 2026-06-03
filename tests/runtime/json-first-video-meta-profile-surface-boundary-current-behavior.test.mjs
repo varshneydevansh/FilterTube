@@ -392,8 +392,8 @@ test('JSON-first video meta profile/surface boundary audit is audit-only and sou
       hash: 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c'
     },
     'js/background.js': {
-      lines: 6320,
-      bytes: 285103,
+      lines: 6343,
+      bytes: 286370,
       hash: '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'
     },
     'js/filter_logic.js': {

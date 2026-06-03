@@ -56,9 +56,9 @@ const expectedAnchors = [
   'js/filter_logic.js:435',
   'js/filter_logic.js:2263',
   'js/filter_logic.js:3588',
-  'js/content_bridge.js:1785',
-  'js/content_bridge.js:6140',
-  'js/content_bridge.js:6541',
+  'js/content_bridge.js:1794',
+  'js/content_bridge.js:6150',
+  'js/content_bridge.js:6554',
   'js/content/dom_fallback.js:2117',
   'js/content/dom_fallback.js:2669',
   'js/content/block_channel.js:1212',
@@ -216,7 +216,7 @@ test('JSON-first implementation authority rows and counts stay pinned', () => {
   assert.match(doc, /first optimization source-locus implementation rows covered: 12/);
   assert.match(doc, /whitelist readiness gaps covered: 10/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5720/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5736/);
   assert.match(doc, /complete per-callable semantic proof files covered: 0/);
   assert.match(doc, /first optimization implementation readiness rows covered: 14/);
   assert.match(doc, /runtime JSON-first implementation approvals: 0/);
@@ -301,13 +301,13 @@ function assertJsonFirstSourceFlowAddendum(doc) {
     'js/filter_logic.js:947-1069',
     'js/filter_logic.js:3588-3619',
     'js/filter_logic.js:2263-2319',
-    'js/content_bridge.js:1785-1872',
+    'js/content_bridge.js:1794-1881',
     'js/content/dom_fallback.js:2117-2184',
-    'js/content_bridge.js:6408-6466',
+    'js/content_bridge.js:6420-6478',
     'js/content/block_channel.js:1212-1296',
     'js/content/block_channel.js:1993-2042',
-    'js/content_bridge.js:6541-7228',
-    'js/content_bridge.js:7230-7258'
+    'js/content_bridge.js:6554-7241',
+    'js/content_bridge.js:7243-7271'
   ]) {
     assert.ok(doc.includes(`\`${sourcePin}\``), `missing JSON-first source-flow pin ${sourcePin}`);
   }
@@ -372,9 +372,9 @@ test('JSON-first implementation authority is consistent with existing JSON-first
   assert.match(whitelistReadiness, /whitelist readiness gap rows: 10/);
   assert.match(whitelistReadiness, /implementation-ready whitelist optimization rows: 0/);
   assert.match(methodSemanticGap, /tracked JS\/JSX\/MJS files: 69/);
-  assert.match(methodSemanticGap, /repo-wide lexical callables: 5720/);
+  assert.match(methodSemanticGap, /repo-wide lexical callables: 5736/);
   assert.match(methodSemanticGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodSemanticGap, /lexical callables requiring semantic proof before behavior changes: 5720/);
+  assert.match(methodSemanticGap, /lexical callables requiring semantic proof before behavior changes: 5736/);
   assert.match(methodSemanticGap, /as the basis for a first-class JSON filter path/);
 });
 

@@ -10,8 +10,8 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_ADD_FILTERED_CHANNEL_FILTER_ALL_COMMENTS_DEFAULT_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/content_bridge.js': [13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c'],
-  'js/background.js': [6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
+  'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
+  'js/background.js': [6343, 286370, 'ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36'],
   'js/state_manager.js': [2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6'],
   'js/settings_shared.js': [1181, 57535, '9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c']
 };
@@ -21,7 +21,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'async function addChannelDirectly(input, filterAll = false, collaborationWith = null, collaborationGroupId = null, metadata = {}) {',
     end: '/**\n * Add "Filter All Content" checkbox below the blocked channel',
-    startLine: 13427,
+    startLine: 13440,
     lines: 54,
     bytes: 2662,
     hash: '4eb280573a5611b695c8284a8e6b85d17b2a97c459143a3054d02374cdf7c2ca'
@@ -30,7 +30,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: "if (message.type === 'addFilteredChannel')",
     end: "if (message.type === 'toggleChannelFilterAll')",
-    startLine: 5244,
+    startLine: 5267,
     lines: 39,
     bytes: 1579,
     hash: 'f681057e88e4c6aef657464bca124f8d3ae4d59f4d11ca5f05e1135dcf1615f2'
@@ -39,7 +39,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: 'async function handleAddFilteredChannel(input, filterAll = false',
     end: '        const isHandleLike = (value) => {',
-    startLine: 5309,
+    startLine: 5332,
     lines: 2,
     bytes: 204,
     hash: 'ce94174aa1b2f302e1e89a75b463271aa13d1c95f62cb89ee34364fb9c3ab603'
@@ -48,7 +48,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: 'const updated = {\n                ...existing,',
     end: '            if (Array.isArray(collaborationWith) && collaborationWith.length > 0) {',
-    startLine: 5952,
+    startLine: 5975,
     lines: 21,
     bytes: 1247,
     hash: '9ac97ce884e9c319e0267a60bbbacbdb26b0a3ea6f1f0cca416615ad234e96dd'
@@ -57,7 +57,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: 'const newChannel = {\n                id: channelInfo.id,',
     end: '            channels.unshift(newChannel);',
-    startLine: 6002,
+    startLine: 6025,
     lines: 20,
     bytes: 1081,
     hash: '5fa1776809d1d10187ead655c7b8a566c15935b2667f95e8cd5f7875c28f4be4'
@@ -136,6 +136,10 @@ const missingRuntimeSymbols = [
 
 function formatNumber(value) {
   return Number(value).toLocaleString('en-US');
+}
+
+function formatSourceNumber(file, value) {
+  return file === 'js/background.js' ? String(value) : formatNumber(value);
 }
 
 function read(file) {
@@ -314,7 +318,7 @@ test('addFilteredChannel Filter All comments default audit is audit-only and sou
     assert.equal(lineCount(source), lines, `${file} line count changed`);
     assert.equal(Buffer.byteLength(source), bytes, `${file} byte count changed`);
     assert.equal(sha256File(file), hash, `${file} hash changed`);
-    assert.match(audit, new RegExp(`\\| \`${escapeRegex(file)}\` \\| ${formatNumber(lines)} \\| ${formatNumber(bytes)} \\| \`${hash}\` \\|`));
+    assert.match(audit, new RegExp(`\\| \`${escapeRegex(file)}\` \\| ${formatSourceNumber(file, lines)} \\| ${formatSourceNumber(file, bytes)} \\| \`${hash}\` \\|`));
   }
 });
 

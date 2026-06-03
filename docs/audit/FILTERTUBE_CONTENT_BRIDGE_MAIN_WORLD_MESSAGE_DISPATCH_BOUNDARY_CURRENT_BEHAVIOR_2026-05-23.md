@@ -2,9 +2,10 @@
 
 Status: current-behavior proof with a narrow learned-map no-op DOM work fix.
 
-Runtime behavior changed only for duplicate learned-map page messages that do
-not change video-channel/video-meta rows. This is not a broad message-trust,
-JSON-first, or page-message authority patch.
+Runtime behavior changed for duplicate learned-map page messages that do not
+change video-channel/video-meta rows and for managed route-gate refresh
+suppression. This is not a broad message-trust, JSON-first, or page-message
+authority patch.
 
 This slice narrows the existing page-message trust audit to the exact
 `handleMainWorldMessages(event)` receiver in `js/content_bridge.js`. It records
@@ -14,20 +15,20 @@ and collaborator application from the content bridge.
 
 runtime content bridge main-world message dispatch fixtures: 8
 message dispatch executable ingress rows: 5
-message dispatch executable behavior changed: no
+message dispatch executable behavior changed: yes - managed route-gate refresh suppression
 message dispatch executable approval: NO-GO
 
 ## Evidence Inputs
 
 - `js/content_bridge.js`
-  - lines: 13623
-  - bytes: 603362
-  - sha256: `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c`
+  - lines: 13636
+  - bytes: 604184
+  - sha256: `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d`
 
 ## Selected Source Metrics
 
-- handler lines: 236
-- handler bytes: 11060
+- handler lines: 237
+- handler bytes: 11125
 - handler FilterTube type branches: 12
 - handler startsWith FilterTube tokens: 1
 - handler source content_bridge guard tokens: 1
@@ -53,7 +54,7 @@ message dispatch executable approval: NO-GO
 - handler document.querySelector tokens: 4
 - handler sourceLabel tokens: 2
 - handler force true tokens: 3
-- handler return statements: 10
+- handler return statements: 11
 - handler browserAPI_BRIDGE tokens: 2
 
 ## Current Message Inventory
@@ -84,7 +85,7 @@ route, host, or settings revision check exists in this handler today.
 
 | Message class | Current side effects | Current ownership gap |
 |---|---|---|
-| Readiness and refresh | `FilterTube_InjectorToBridge_Ready` calls `requestSettingsFromBackground()`. `FilterTube_Refresh` requests settings and calls `applyDOMFallback(..., { forceReprocess: true })`. | Refresh has no pending request id, background-broadcast proof, or nonce. |
+| Readiness and refresh | `FilterTube_InjectorToBridge_Ready` calls `requestSettingsFromBackground()`. `FilterTube_Refresh` requests settings, rejects managed route-gate denied pages, and otherwise calls `applyDOMFallback(..., { forceReprocess: true })`. | Refresh has no pending request id, background-broadcast proof, nonce, or message-origin authority; route-denied suppression is owned by managed viewing policy. |
 | Learned channel identity | `FilterTube_UpdateChannelMap` calls `persistChannelMappings(payload)`. `FilterTube_UpdateVideoChannelMap` persists video/channel pairs, stamps cards by video id or anchor lookup, then schedules `applyDOMFallback(null)` in `requestAnimationFrame`. | Map writes and reruns are accepted from same-window messages without owned page-world request proof. |
 | Learned video metadata | `FilterTube_UpdateVideoMetaMap` persists metadata, touches matching DOM state, and schedules `scheduleVideoMetaDomRerun()` when DOM was touched. | Metadata writes are not tied to an active metadata filter reason or bounded schema authority. |
 | Custom URL map | `FilterTube_UpdateCustomUrlMap` reads and writes `browserAPI_BRIDGE.storage.local` `channelMap`. | Storage write is not pending-request or sender-class gated. |
@@ -121,7 +122,7 @@ requestSettingsFromBackground()
 same-window FilterTube_Refresh
         |
         v
-requestSettingsFromBackground() -> applyDOMFallback(..., { forceReprocess: true })
+requestSettingsFromBackground() -> managed route-gate check -> applyDOMFallback(..., { forceReprocess: true })
 ```
 
 ```mermaid
@@ -144,7 +145,7 @@ Executable rows pinned:
 | 2 | Same-window non-`FilterTube_*` message | No settings request, no DOM fallback. |
 | 3 | Same-window `FilterTube_Refresh` from `source: 'content_bridge'` | No settings request, no DOM fallback. |
 | 4 | Same-window `FilterTube_InjectorToBridge_Ready` | Calls `requestSettingsFromBackground()`. |
-| 5 | Same-window `FilterTube_Refresh` | Calls `requestSettingsFromBackground()`, then `applyDOMFallback(..., { forceReprocess: true })`. |
+| 5 | Same-window `FilterTube_Refresh` | Calls `requestSettingsFromBackground()`, skips DOM fallback when the managed route gate denies the page, otherwise calls `applyDOMFallback(..., { forceReprocess: true })`. |
 
 This narrows the listener no-work proof for noisy SPA pages: unrelated messages
 do not reach settings refresh or DOM fallback, but the always-installed listener
@@ -200,9 +201,9 @@ can support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

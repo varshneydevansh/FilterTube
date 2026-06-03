@@ -236,35 +236,35 @@ test('background method semantic register pins source fingerprint and broad call
   const text = doc();
 
   assert.deepEqual(stats, {
-    bytes: 285103,
-    sha256: '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad',
-    splitLines: 6321,
-    wcLines: 6320
+    bytes: 286370,
+    sha256: 'ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36',
+    splitLines: 6344,
+    wcLines: 6343
   });
-  assert.equal(broadRows.length, 440);
-  assert.equal(controlArtifacts, 299);
-  assert.equal(heldOutsideRegister, 65);
+  assert.equal(broadRows.length, 442);
+  assert.equal(controlArtifacts, 300);
+  assert.equal(heldOutsideRegister, 66);
   assert.deepEqual({
     if: broadCounts.if,
     for: broadCounts.for,
     while: broadCounts.while,
     catch: broadCounts.catch
   }, {
-    if: 284,
+    if: 285,
     for: 10,
     while: 3,
     catch: 2
   });
 
   for (const expected of [
-    'source split lines: 6321',
-    'source wc -l: 6320',
-    'source bytes: 285103',
-    'source sha256: 77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad',
-    'broad lexical callable matches: 440',
+    'source split lines: 6344',
+    'source wc -l: 6343',
+    'source bytes: 286370',
+    'source sha256: ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36',
+    'broad lexical callable matches: 442',
     'accepted top-level method rows: 76',
-    'control-flow lexical artifacts: 299 (`if`: 284, `for`: 10, `while`: 3, `catch`: 2)',
-    'local/helper/listener/timer callbacks held outside this top-level register: 65',
+    'control-flow lexical artifacts: 300 (`if`: 285, `for`: 10, `while`: 3, `catch`: 2)',
+    'local/helper/listener/timer callbacks held outside this top-level register: 66',
     'executable current-behavior probes: 6'
   ]) {
     assert.ok(text.includes(expected), `missing source reconciliation line ${expected}`);

@@ -40,9 +40,9 @@ runtime JSON-first cache optimization approval: NO-GO
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content_bridge.js` | 13,623 | 603,362 | `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c` |
-| `js/background.js` | 6,320 | 285,103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
-| `js/content/bridge_settings.js` | 651 | 26,462 | `c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b` |
+| `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
+| `js/background.js` | 6343 | 286370 | `ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36` |
+| `js/content/bridge_settings.js` | 845 | 34241 | `aea46dd241248db1d1d9bcbdfdf65320d1399ecd84cc7792678f29b1b26ee092` |
 | `js/content/handle_resolver.js` | 282 | 9,785 | `67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff` |
 | `js/filter_logic.js` | 3,652 | 172,174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 
@@ -50,12 +50,12 @@ runtime JSON-first cache optimization approval: NO-GO
 
 | Block | Source | Start line | Lines | Bytes | SHA-256 | Current behavior pinned |
 | --- | --- | ---: | ---: | ---: | --- | --- |
-| `contentBridgePersistVideoMapping` | `js/content_bridge.js` | 1629 | 74 | 3441 | `043d1f771d3652cd6f35fa205dbdfa92925ebf5e62eb392da800293c6b070dd7` | `persistVideoChannelMapping()` and `persistVideoMetaMapping()` now skip identical learned-map rows before background message handoff and expose changed-row results to page-message receivers. |
-| `contentBridgeValidatedCollaboratorCache` | `js/content_bridge.js` | 2643 | 94 | 4628 | `d4c057c1e55d02d8f80062efcbd097b723c111fb5fcce05975aec1cac8684481` | DOM collaborator attributes are reused only after video-id validation, and stale-card cleanup removes local attributes. |
-| `contentBridgeYtInitialDataChannelCache` | `js/content_bridge.js` | 7969 | 117 | 4807 | `ae717352ad0b82642af2ffa22128b309d60dca9f990ef579ea3ceaac6d70442f` | ytInitialData channel lookup has positive, negative, and in-flight maps keyed by video id plus expected handle/name. |
+| `contentBridgePersistVideoMapping` | `js/content_bridge.js` | 1638 | 74 | 3441 | `043d1f771d3652cd6f35fa205dbdfa92925ebf5e62eb392da800293c6b070dd7` | `persistVideoChannelMapping()` and `persistVideoMetaMapping()` now skip identical learned-map rows before background message handoff and expose changed-row results to page-message receivers. |
+| `contentBridgeValidatedCollaboratorCache` | `js/content_bridge.js` | 2652 | 94 | 4628 | `d4c057c1e55d02d8f80062efcbd097b723c111fb5fcce05975aec1cac8684481` | DOM collaborator attributes are reused only after video-id validation, and stale-card cleanup removes local attributes. |
+| `contentBridgeYtInitialDataChannelCache` | `js/content_bridge.js` | 7982 | 117 | 4807 | `ae717352ad0b82642af2ffa22128b309d60dca9f990ef579ea3ceaac6d70442f` | ytInitialData channel lookup has positive, negative, and in-flight maps keyed by video id plus expected handle/name. |
 | `backgroundMapCacheDeclarations` | `js/background.js` | 1287 | 21 | 686 | `f82fd7936485f08734bf18b4da304978f428be0e36b2eef434007116a9cc53ec` | Background declares separate channel, video-channel, and video-meta cache, load promise, flush promise, timer, and pending map state. |
 | `backgroundMapCacheCluster` | `js/background.js` | 1452 | 263 | 8987 | `de1705105e239ce4de8c79d5e4ab3e135ed7133fcbc17f00ce5c1074230b493a` | Background lazy-loads map caches, patches compiled settings caches, debounces flushes, and caps only video maps. |
-| `bridgeSettingsMapOnlyRefresh` | `js/content/bridge_settings.js` | 519 | 130 | 4506 | `f3802437cd0f5bee44ac10378fd4b5156ad87cf3f5db3ee142702c0e7a4fed38` | `channelMap`-only changes are ignored, while video map-only changes refresh settings without forced DOM reprocess. |
+| `bridgeSettingsMapOnlyRefresh` | `js/content/bridge_settings.js` | 713 | 130 | 4506 | `f3802437cd0f5bee44ac10378fd4b5156ad87cf3f5db3ee142702c0e7a4fed38` | `channelMap`-only changes are ignored, while video map-only changes refresh settings without forced DOM reprocess. |
 | `handleResolverCache` | `js/content/handle_resolver.js` | 133 | 150 | 5256 | `e21518cc23e4fa108b94507a2c5e9e43e25e5a240df74951f830597405e9a12d` | `resolvedHandleCache` stores resolved IDs or a local `PENDING` sentinel and can schedule a forced DOM fallback rerun. |
 
 ## Selected Token Counts

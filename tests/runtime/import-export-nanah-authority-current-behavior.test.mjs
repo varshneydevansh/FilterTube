@@ -92,10 +92,10 @@ test('import export Nanah audit documents current authority flow and future cont
     assert.ok(doc.includes(source), `missing source ${source}`);
   }
 
-  assert.match(methodGap, /repo-wide lexical callables: 5720/);
+  assert.match(methodGap, /repo-wide lexical callables: 5736/);
   assert.match(methodGap, /files with lexical accounting: 69/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5720/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5736/);
 
   assert.equal(backupImportNanahFamilyDocs.length, 10);
   for (const familyDocPath of backupImportNanahFamilyDocs) {
@@ -103,9 +103,9 @@ test('import export Nanah audit documents current authority flow and future cont
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 69/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5720/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5736/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5720/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5736/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     assert.match(familyDoc, /runtime behavior changed: no/);
     assert.match(familyDoc, /do not approve runtime\s+optimization/);

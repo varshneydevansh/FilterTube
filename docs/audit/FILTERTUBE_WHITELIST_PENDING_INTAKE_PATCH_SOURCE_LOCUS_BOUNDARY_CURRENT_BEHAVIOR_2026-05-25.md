@@ -33,20 +33,20 @@ claims.
 
 | Input | Current proof used |
 | --- | --- |
-| `js/content_bridge.js:6205` | Current `WHITELIST_PENDING_HIDE_CANDIDATE_LIMIT` is 160. |
-| `js/content_bridge.js:6222` | Current `queueWhitelistPendingHide(mutations, delayMs = 40)` owns pending-hide intake and candidate collection. |
-| `js/content_bridge.js:6224` | Current queue path rejects native overlay quiet mode before traversal. |
-| `js/content_bridge.js:6226` | Current queue path rejects non-whitelist mode before selector traversal. |
-| `js/content_bridge.js:6228` | Current queue path reads `/`, `/results`, `/feed/channels`, and `/watch` before selector traversal. |
-| `js/content_bridge.js:6231` | Current queue path rejects a full pending-hide candidate queue before nested traversal. |
-| `js/content_bridge.js:6243` | Current nested discovery starts with `node.matches?.(VIDEO_CARD_SELECTORS)`. |
-| `js/content_bridge.js:6244` | Current nested discovery checks `node.querySelector?.(VIDEO_CARD_SELECTORS)`. |
-| `js/content_bridge.js:6245` | Current nested discovery calls `node.querySelectorAll?.(VIDEO_CARD_SELECTORS)`. |
-| `js/content_bridge.js:6269` | Current `applyWhitelistPendingHide(candidates)` owns apply-time semantics. |
-| `js/content_bridge.js:6272` | Current apply-time list-mode no-op gate remains as parity protection. |
-| `js/content_bridge.js:6275` | Current apply-time route no-op gate remains as parity protection. |
-| `js/content_bridge.js:6442` | Current `fallbackMutationSummary(mutations)` already summarizes added-node presence before queue intake. |
-| `js/content_bridge.js:6477` | Current fallback observer calls `queueWhitelistPendingHide(mutations)` for any added-node batch. |
+| `js/content_bridge.js:6216` | Current `WHITELIST_PENDING_HIDE_CANDIDATE_LIMIT` is 160. |
+| `js/content_bridge.js:6233` | Current `queueWhitelistPendingHide(mutations, delayMs = 40)` owns pending-hide intake and candidate collection. |
+| `js/content_bridge.js:6235` | Current queue path rejects native overlay quiet mode before traversal. |
+| `js/content_bridge.js:6237` | Current queue path rejects non-whitelist mode before selector traversal. |
+| `js/content_bridge.js:6239` | Current queue path reads `/`, `/results`, `/feed/channels`, and `/watch` before selector traversal. |
+| `js/content_bridge.js:6242` | Current queue path rejects a full pending-hide candidate queue before nested traversal. |
+| `js/content_bridge.js:6254` | Current nested discovery starts with `node.matches?.(VIDEO_CARD_SELECTORS)`. |
+| `js/content_bridge.js:6255` | Current nested discovery checks `node.querySelector?.(VIDEO_CARD_SELECTORS)`. |
+| `js/content_bridge.js:6256` | Current nested discovery calls `node.querySelectorAll?.(VIDEO_CARD_SELECTORS)`. |
+| `js/content_bridge.js:6280` | Current `applyWhitelistPendingHide(candidates)` owns apply-time semantics. |
+| `js/content_bridge.js:6284` | Current apply-time list-mode no-op gate remains as parity protection. |
+| `js/content_bridge.js:6287` | Current apply-time route no-op gate remains as parity protection. |
+| `js/content_bridge.js:6455` | Current `fallbackMutationSummary(mutations)` already summarizes added-node presence before queue intake. |
+| `js/content_bridge.js:6490` | Current fallback observer calls `queueWhitelistPendingHide(mutations)` for any added-node batch. |
 
 ## Current Counts
 
@@ -163,9 +163,9 @@ optimization. Current related audit evidence records:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 affected callable semantic proof: NO-GO
 narrow runtime behavior changed: yes
 ```

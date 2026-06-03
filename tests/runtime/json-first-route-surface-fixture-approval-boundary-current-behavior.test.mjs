@@ -156,9 +156,9 @@ test('JSON-first route/surface fixture approval rows counts and fields stay pinn
   assert.match(doc, /route\/surface authority rows covered: 12/);
   assert.match(doc, /route\/surface metric obligations covered: 12/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5720/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5736/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5720/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5736/);
   assert.match(doc, /runtime JSON-first fixture artifact approvals: 0/);
   assert.match(doc, /runtime route\/surface metric artifact approvals: 0/);
   assert.match(doc, /committed route\/surface fixture verification output files: 0/);
@@ -191,7 +191,7 @@ test('JSON-first fixture approval is backed by current contracts and NO-GO gates
   assert.match(routeSurfaceMetric, /implementation-ready route\/surface optimization rows: 0/);
   assert.match(jsonFirstImplementation, /method semantic proof gap files covered: 69/);
   assert.match(methodGap, /files with lexical accounting: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5720/);
+  assert.match(methodGap, /repo-wide lexical callables: 5736/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(implementationReadiness, /runtime first optimization approvals: 0/);
   assert.match(implementationReadiness, /implementation-ready first optimization rows: 0/);

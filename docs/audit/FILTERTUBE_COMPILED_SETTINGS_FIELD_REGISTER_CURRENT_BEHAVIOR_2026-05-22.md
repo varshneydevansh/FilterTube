@@ -19,19 +19,19 @@ settings relays, or first-class JSON filtering.
 
 ```text
 tracked product files scanned for compiled/settings fields: 6
-raw compiled/settings field rows: 309
-unique file-field-operation rows: 148
+raw compiled/settings field rows: 314
+unique file-field-operation rows: 153
 raw cachedSettingsRead rows: 12
-raw compiledAssign rows: 54
+raw compiledAssign rows: 57
 raw currentSettingsRead rows: 56
 raw processedAssign rows: 7
-raw settingsRead rows: 144
+raw settingsRead rows: 146
 raw sharedCompiledReturn rows: 36
 unique cachedSettingsRead rows: 7
-unique compiledAssign rows: 44
+unique compiledAssign rows: 47
 unique currentSettingsRead rows: 6
 unique processedAssign rows: 7
-unique settingsRead rows: 48
+unique settingsRead rows: 50
 unique sharedCompiledReturn rows: 36
 runtime behavior changed: no
 ```
@@ -52,19 +52,19 @@ js/content/bridge_settings.js
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6320 | 285103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
+| `js/background.js` | 6343 | 286370 | `ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36` |
 | `js/settings_shared.js` | 1181 | 57535 | `9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c` |
 | `js/filter_logic.js` | 3652 | 172174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 | `js/seed.js` | 1136 | 50026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
-| `js/content_bridge.js` | 13623 | 603362 | `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c` |
-| `js/content/bridge_settings.js` | 651 | 26462 | `c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b` |
+| `js/content_bridge.js` | 13636 | 604184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
+| `js/content/bridge_settings.js` | 845 | 34241 | `aea46dd241248db1d1d9bcbdfdf65320d1399ecd84cc7792678f29b1b26ee092` |
 
 ## Unique File Counts
 
 | File | Unique rows |
 | --- | ---: |
-| `js/background.js` | 50 |
-| `js/content/bridge_settings.js` | 4 |
+| `js/background.js` | 53 |
+| `js/content/bridge_settings.js` | 6 |
 | `js/content_bridge.js` | 16 |
 | `js/filter_logic.js` | 26 |
 | `js/seed.js` | 16 |
@@ -74,10 +74,10 @@ js/content/bridge_settings.js
 
 ```text
 cachedSettingsRead (7): enabled,filterChannels,filterKeywords,hideAllComments,hideAllShorts,listMode,profileType
-compiledAssign (44): categoryFilters,channelMap,contentFilters,disableAnnotations,disableAutoplay,enabled,filterChannels,filterComments,filterKeywords,filterKeywordsComments,hideAllComments,hideAllShorts,hideAskButton,hideEndscreenCards,hideEndscreenVideowall,hideExploreTrending,hideHomeFeed,hideLiveChat,hideMembersOnly,hideMerchTicketsOffers,hideMixPlaylists,hideMoreFromYouTube,hideNotificationBell,hidePlaylistCards,hideRecommended,hideSearchShelves,hideSponsoredCards,hideSubscriptions,hideTopHeader,hideVideoButtonsBar,hideVideoChannelRow,hideVideoDescription,hideVideoInfo,hideVideoSidebar,hideWatchPlaylistPanel,listMode,profileType,showBlockMenuItem,showQuickBlockButton,useExactWordMatching,videoChannelMap,videoMetaMap,whitelistChannels,whitelistKeywords
+compiledAssign (47): activeProfileId,activeProfileKind,categoryFilters,channelMap,contentFilters,disableAnnotations,disableAutoplay,enabled,filterChannels,filterComments,filterKeywords,filterKeywordsComments,hideAllComments,hideAllShorts,hideAskButton,hideEndscreenCards,hideEndscreenVideowall,hideExploreTrending,hideHomeFeed,hideLiveChat,hideMembersOnly,hideMerchTicketsOffers,hideMixPlaylists,hideMoreFromYouTube,hideNotificationBell,hidePlaylistCards,hideRecommended,hideSearchShelves,hideSponsoredCards,hideSubscriptions,hideTopHeader,hideVideoButtonsBar,hideVideoChannelRow,hideVideoDescription,hideVideoInfo,hideVideoSidebar,hideWatchPlaylistPanel,listMode,managedViewingRouteGate,profileType,showBlockMenuItem,showQuickBlockButton,useExactWordMatching,videoChannelMap,videoMetaMap,whitelistChannels,whitelistKeywords
 currentSettingsRead (6): channelMap,filterChannels,listMode,showBlockMenuItem,videoChannelMap,videoMetaMap
 processedAssign (7): categoryFilters,contentFilters,filterChannels,filterKeywords,videoMetaMap,whitelistChannels,whitelistKeywords
-settingsRead (48 rows; 26 fields): autoBackupEnabled,autoBackupFormat,autoBackupMode,categoryFilters,channelMap,contentFilters,disableAutoplay,enabled,filterChannels,filterComments,filterKeywords,filterKeywordsComments,ftProfilesV4,hideAllComments,hideAllShorts,hideComments,hideEndscreenCards,hideEndscreenVideowall,listMode,minWordLength,mode,profileType,videoChannelMap,videoMetaMap,whitelistChannels,whitelistKeywords
+settingsRead (50 rows; 28 fields): activeProfileKind,autoBackupEnabled,autoBackupFormat,autoBackupMode,categoryFilters,channelMap,contentFilters,disableAutoplay,enabled,filterChannels,filterComments,filterKeywords,filterKeywordsComments,ftProfilesV4,hideAllComments,hideAllShorts,hideComments,hideEndscreenCards,hideEndscreenVideowall,listMode,managedViewingRouteGate,minWordLength,mode,profileType,videoChannelMap,videoMetaMap,whitelistChannels,whitelistKeywords
 sharedCompiledReturn (36): categoryFilters,contentFilters,disableAnnotations,disableAutoplay,enabled,filterChannels,filterComments,filterKeywords,filterKeywordsComments,hideAllComments,hideAllShorts,hideAskButton,hideEndscreenCards,hideEndscreenVideowall,hideExploreTrending,hideHomeFeed,hideLiveChat,hideMembersOnly,hideMerchTicketsOffers,hideMixPlaylists,hideMoreFromYouTube,hideNotificationBell,hidePlaylistCards,hideRecommended,hideSearchShelves,hideSponsoredCards,hideSubscriptions,hideTopHeader,hideVideoButtonsBar,hideVideoChannelRow,hideVideoDescription,hideVideoInfo,hideVideoSidebar,hideWatchPlaylistPanel,showBlockMenuItem,showQuickBlockButton
 ```
 
@@ -85,7 +85,7 @@ Background-only compiled fields not returned by `buildCompiledSettings(...)` in
 `js/settings_shared.js`:
 
 ```text
-channelMap,listMode,profileType,useExactWordMatching,videoChannelMap,videoMetaMap,whitelistChannels,whitelistKeywords
+activeProfileId,activeProfileKind,channelMap,listMode,managedViewingRouteGate,profileType,useExactWordMatching,videoChannelMap,videoMetaMap,whitelistChannels,whitelistKeywords
 ```
 
 Shared-only compiled fields not assigned by the background compiler:
@@ -106,54 +106,57 @@ js/seed.js:443:cachedSettingsRead:hideAllComments:3
 js/seed.js:444:cachedSettingsRead:hideAllShorts:1
 js/background.js:1894:compiledAssign:filterKeywords:6
 js/background.js:1930:compiledAssign:filterKeywordsComments:6
-js/background.js:1990:compiledAssign:listMode:1
-js/background.js:1991:compiledAssign:profileType:1
-js/background.js:2011:compiledAssign:whitelistKeywords:1
-js/background.js:2212:compiledAssign:whitelistChannels:1
-js/background.js:2330:compiledAssign:filterChannels:1
-js/background.js:2411:compiledAssign:channelMap:1
-js/background.js:2424:compiledAssign:videoChannelMap:1
-js/background.js:2427:compiledAssign:videoMetaMap:1
-js/background.js:2477:compiledAssign:enabled:1
-js/background.js:2478:compiledAssign:hideAllComments:1
-js/background.js:2479:compiledAssign:filterComments:1
-js/background.js:2480:compiledAssign:useExactWordMatching:1
-js/background.js:2481:compiledAssign:hideAllShorts:1
-js/background.js:2482:compiledAssign:hideHomeFeed:1
-js/background.js:2483:compiledAssign:hideSponsoredCards:1
-js/background.js:2484:compiledAssign:hideWatchPlaylistPanel:1
-js/background.js:2485:compiledAssign:hidePlaylistCards:1
-js/background.js:2486:compiledAssign:hideMembersOnly:1
-js/background.js:2487:compiledAssign:hideMixPlaylists:1
-js/background.js:2488:compiledAssign:hideVideoSidebar:1
-js/background.js:2489:compiledAssign:hideRecommended:1
-js/background.js:2490:compiledAssign:hideLiveChat:1
-js/background.js:2491:compiledAssign:hideVideoInfo:1
-js/background.js:2492:compiledAssign:hideVideoButtonsBar:1
-js/background.js:2493:compiledAssign:hideAskButton:1
-js/background.js:2494:compiledAssign:hideVideoChannelRow:1
-js/background.js:2495:compiledAssign:hideVideoDescription:1
-js/background.js:2496:compiledAssign:hideMerchTicketsOffers:1
-js/background.js:2497:compiledAssign:hideEndscreenVideowall:1
-js/background.js:2498:compiledAssign:hideEndscreenCards:1
-js/background.js:2499:compiledAssign:disableAutoplay:1
-js/background.js:2500:compiledAssign:disableAnnotations:1
-js/background.js:2501:compiledAssign:hideTopHeader:1
-js/background.js:2502:compiledAssign:hideNotificationBell:1
-js/background.js:2503:compiledAssign:hideExploreTrending:1
-js/background.js:2504:compiledAssign:hideMoreFromYouTube:1
-js/background.js:2505:compiledAssign:hideSubscriptions:1
-js/background.js:2506:compiledAssign:showQuickBlockButton:1
-js/background.js:2507:compiledAssign:showBlockMenuItem:1
-js/background.js:2508:compiledAssign:hideSearchShelves:1
-js/background.js:2527:compiledAssign:contentFilters:1
-js/background.js:2549:compiledAssign:categoryFilters:1
-js/content_bridge.js:254:currentSettingsRead:channelMap:8
-js/content_bridge.js:283:currentSettingsRead:videoChannelMap:24
-js/content_bridge.js:416:currentSettingsRead:filterChannels:5
-js/content_bridge.js:1211:currentSettingsRead:listMode:7
-js/content_bridge.js:1645:currentSettingsRead:videoMetaMap:11
-js/content_bridge.js:10730:currentSettingsRead:showBlockMenuItem:1
+js/background.js:1997:compiledAssign:listMode:1
+js/background.js:1998:compiledAssign:profileType:1
+js/background.js:1999:compiledAssign:activeProfileId:1
+js/background.js:2000:compiledAssign:activeProfileKind:1
+js/background.js:2005:compiledAssign:managedViewingRouteGate:1
+js/background.js:2034:compiledAssign:whitelistKeywords:1
+js/background.js:2235:compiledAssign:whitelistChannels:1
+js/background.js:2353:compiledAssign:filterChannels:1
+js/background.js:2434:compiledAssign:channelMap:1
+js/background.js:2447:compiledAssign:videoChannelMap:1
+js/background.js:2450:compiledAssign:videoMetaMap:1
+js/background.js:2500:compiledAssign:enabled:1
+js/background.js:2501:compiledAssign:hideAllComments:1
+js/background.js:2502:compiledAssign:filterComments:1
+js/background.js:2503:compiledAssign:useExactWordMatching:1
+js/background.js:2504:compiledAssign:hideAllShorts:1
+js/background.js:2505:compiledAssign:hideHomeFeed:1
+js/background.js:2506:compiledAssign:hideSponsoredCards:1
+js/background.js:2507:compiledAssign:hideWatchPlaylistPanel:1
+js/background.js:2508:compiledAssign:hidePlaylistCards:1
+js/background.js:2509:compiledAssign:hideMembersOnly:1
+js/background.js:2510:compiledAssign:hideMixPlaylists:1
+js/background.js:2511:compiledAssign:hideVideoSidebar:1
+js/background.js:2512:compiledAssign:hideRecommended:1
+js/background.js:2513:compiledAssign:hideLiveChat:1
+js/background.js:2514:compiledAssign:hideVideoInfo:1
+js/background.js:2515:compiledAssign:hideVideoButtonsBar:1
+js/background.js:2516:compiledAssign:hideAskButton:1
+js/background.js:2517:compiledAssign:hideVideoChannelRow:1
+js/background.js:2518:compiledAssign:hideVideoDescription:1
+js/background.js:2519:compiledAssign:hideMerchTicketsOffers:1
+js/background.js:2520:compiledAssign:hideEndscreenVideowall:1
+js/background.js:2521:compiledAssign:hideEndscreenCards:1
+js/background.js:2522:compiledAssign:disableAutoplay:1
+js/background.js:2523:compiledAssign:disableAnnotations:1
+js/background.js:2524:compiledAssign:hideTopHeader:1
+js/background.js:2525:compiledAssign:hideNotificationBell:1
+js/background.js:2526:compiledAssign:hideExploreTrending:1
+js/background.js:2527:compiledAssign:hideMoreFromYouTube:1
+js/background.js:2528:compiledAssign:hideSubscriptions:1
+js/background.js:2529:compiledAssign:showQuickBlockButton:1
+js/background.js:2530:compiledAssign:showBlockMenuItem:1
+js/background.js:2531:compiledAssign:hideSearchShelves:1
+js/background.js:2550:compiledAssign:contentFilters:1
+js/background.js:2572:compiledAssign:categoryFilters:1
+js/content_bridge.js:262:currentSettingsRead:channelMap:8
+js/content_bridge.js:291:currentSettingsRead:videoChannelMap:24
+js/content_bridge.js:424:currentSettingsRead:filterChannels:5
+js/content_bridge.js:1220:currentSettingsRead:listMode:7
+js/content_bridge.js:1654:currentSettingsRead:videoMetaMap:11
+js/content_bridge.js:10743:currentSettingsRead:showBlockMenuItem:1
 js/filter_logic.js:977:processedAssign:contentFilters:1
 js/filter_logic.js:995:processedAssign:categoryFilters:1
 js/filter_logic.js:1007:processedAssign:filterKeywords:1
@@ -167,20 +170,22 @@ js/background.js:814:settingsRead:autoBackupFormat:2
 js/background.js:839:settingsRead:autoBackupMode:2
 js/background.js:1080:settingsRead:filterComments:1
 js/background.js:1080:settingsRead:hideComments:1
-js/content_bridge.js:1008:settingsRead:enabled:2
-js/content_bridge.js:1009:settingsRead:listMode:2
-js/content_bridge.js:1010:settingsRead:filterChannels:2
-js/content_bridge.js:1019:settingsRead:contentFilters:4
-js/content_bridge.js:1030:settingsRead:categoryFilters:2
-js/content_bridge.js:1039:settingsRead:filterKeywords:1
-js/content_bridge.js:1041:settingsRead:filterKeywordsComments:1
-js/content_bridge.js:1042:settingsRead:hideAllComments:1
-js/content_bridge.js:1043:settingsRead:hideAllShorts:1
-js/content_bridge.js:8379:settingsRead:videoChannelMap:2
+js/content_bridge.js:1016:settingsRead:enabled:2
+js/content_bridge.js:1017:settingsRead:listMode:2
+js/content_bridge.js:1018:settingsRead:filterChannels:2
+js/content_bridge.js:1027:settingsRead:contentFilters:4
+js/content_bridge.js:1038:settingsRead:categoryFilters:2
+js/content_bridge.js:1047:settingsRead:filterKeywords:1
+js/content_bridge.js:1049:settingsRead:filterKeywordsComments:1
+js/content_bridge.js:1050:settingsRead:hideAllComments:1
+js/content_bridge.js:1051:settingsRead:hideAllShorts:1
+js/content_bridge.js:8392:settingsRead:videoChannelMap:2
 js/content/bridge_settings.js:295:settingsRead:profileType:4
 js/content/bridge_settings.js:329:settingsRead:listMode:1
 js/content/bridge_settings.js:332:settingsRead:whitelistChannels:2
 js/content/bridge_settings.js:333:settingsRead:whitelistKeywords:2
+js/content/bridge_settings.js:376:settingsRead:activeProfileKind:1
+js/content/bridge_settings.js:377:settingsRead:managedViewingRouteGate:1
 js/filter_logic.js:857:settingsRead:channelMap:10
 js/filter_logic.js:858:settingsRead:filterChannels:13
 js/filter_logic.js:859:settingsRead:whitelistChannels:10
@@ -249,7 +254,7 @@ js/settings_shared.js:560:sharedCompiledReturn:categoryFilters:1
 
 ## Current Behavior Boundaries
 
-- The background compiler currently assigns 44 unique compiled fields.
+- The background compiler currently assigns 47 unique compiled fields.
 - The shared UI compiler currently returns 36 unique compiled fields.
 - The eight background-only compiled fields are map/list/profile/exactness and
   whitelist fields: `channelMap`, `listMode`, `profileType`,
@@ -504,9 +509,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

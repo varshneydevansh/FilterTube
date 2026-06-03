@@ -123,27 +123,37 @@ test('profile_switch_rejects_locked_profile_without_session_unlock is UI-path sa
   }
 });
 
-test('profile_viewing_space_main_denied_blocks_main_runtime_compile is not satisfied today', () => {
+test('profile_viewing_space_main_denied_blocks_main_runtime_compile is locally route-gate backed today', () => {
   const compile = backgroundCompileBlock();
   const message = backgroundCompiledMessageBlock();
+  const bridgeSettings = read('js/content/bridge_settings.js');
 
   assert.match(message, /isKidsUrl\(senderUrl\) \? 'kids' : 'main'/);
   assert.match(message, /getCompiledSettings\(sender, profileType, !!request\.forceRefresh\)/);
   assert.match(compile, /const activeProfile = safeObject\(safeObject\(effectiveProfilesV4\?\.profiles\)\?\.\[activeProfileId\]\)/);
   assert.match(compile, /compiledSettings\.profileType = targetProfile/);
-  assert.doesNotMatch(`${compile}\n${message}`, /allowMainViewing|viewingAccess|profileViewingAuthority|runtimeAllowed/);
+  assert.match(compile, /compiledSettings\.managedViewingRouteGate = \{/);
+  assert.match(compile, /allowMainViewing/);
+  assert.match(bridgeSettings, /function applyManagedViewingRouteGate\(settings\)/);
+  assert.match(bridgeSettings, /main_viewing_space_denied/);
+  assert.doesNotMatch(`${compile}\n${message}\n${bridgeSettings}`, /profileViewingAuthority|runtimeAllowed|compiledSettingsRevision/);
 });
 
-test('profile_viewing_space_kids_denied_blocks_kids_runtime_compile is not satisfied today', () => {
+test('profile_viewing_space_kids_denied_blocks_kids_runtime_compile is locally route-gate backed today', () => {
   const background = read('js/background.js');
   const compile = backgroundCompileBlock();
   const message = backgroundCompiledMessageBlock();
+  const bridgeSettings = read('js/content/bridge_settings.js');
 
   assert.match(message, /const requestedProfile = request\.profileType/);
   assert.match(message, /const profileType = requestedProfile === 'kids' \? 'kids' :/);
   assert.match(background, /const shouldUseKidsProfile = targetProfile === 'kids'/);
   assert.match(compile, /compiledSettings\.listMode = shouldUseKidsProfile \? kidsModeFromV4 : mainModeFromV4/);
-  assert.doesNotMatch(`${compile}\n${message}`, /allowKidsViewing|viewingAccess|profileViewingAuthority|runtimeAllowed/);
+  assert.match(compile, /compiledSettings\.managedViewingRouteGate = \{/);
+  assert.match(compile, /allowKidsViewing/);
+  assert.match(bridgeSettings, /function applyManagedViewingRouteGate\(settings\)/);
+  assert.match(bridgeSettings, /kids_viewing_space_denied/);
+  assert.doesNotMatch(`${compile}\n${message}\n${bridgeSettings}`, /profileViewingAuthority|runtimeAllowed|compiledSettingsRevision/);
 });
 
 test('profile_viewing_space_cannot_disable_both_surfaces is UI-path satisfied today', () => {

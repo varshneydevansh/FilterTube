@@ -29,9 +29,9 @@ Runtime route/surface metric verification output approval exists: no
 Runtime route/surface metric artifact approval exists: no
 Runtime metric collector approval exists: no
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5720
+Method semantic proof gap lexical callables covered: 5736
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5720
+Lexical callables requiring semantic proof before behavior changes: 5736
 Implementation-ready JSON-first route/surface metric verification output contract rows: 0
 ```
 
@@ -103,9 +103,9 @@ metric collector no-work rows covered: 12
 metric collector side-effect rows covered: 12
 metric collector fixture provenance rows covered: 12
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 committed route/surface metric verification output files: 0
 committed route/surface metric artifact files: 0
 committed first-optimization foundation verification output files: 0

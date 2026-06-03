@@ -25,7 +25,7 @@ This boundary matters for whitelist optimization and first-class JSON filtering 
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content_bridge.js` | 13,623 | 603,362 | `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c` |
+| `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
 | `js/content/dom_fallback.js` | 5,030 | 235,555 | `fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5` |
 
 content bridge whitelist pending refresh source files pinned: 2
@@ -34,11 +34,11 @@ content bridge whitelist pending refresh source files pinned: 2
 
 | Block | Source | Start line | Lines | Bytes | SHA-256 |
 | --- | --- | ---: | ---: | ---: | --- |
-| `contentBridgeRightRailWhitelistObserver` | `js/content_bridge.js:1210` | 1,210 | 98 | 3,091 | `86779f97ba7a65ebe61da86d414b1b3027b916fdc75163053b9dd3b58bcf4976` |
-| `contentBridgeInitializeFallbackThrottle` | `js/content_bridge.js:6140` | 6,140 | 60 | 2,297 | `b4da976a738c117f0ba7e5f4c379ff80fca9010f2c1e944982cef27c9fe21272` |
-| `contentBridgeWhitelistPendingQueue` | `js/content_bridge.js:6200` | 6,200 | 69 | 3,952 | `1155ce5403825a26516b2383a686bcff2dd0a64949e5eb40e8197766510855f9` |
-| `contentBridgeWhitelistPendingApply` | `js/content_bridge.js:6269` | 6,269 | 111 | 5,760 | `3d2510570b99e4f08e600de63911dce5dc348a4ffd2b28c20d1beadd9ffe028b` |
-| `contentBridgeFallbackMutationObserver` | `js/content_bridge.js:6380` | 6,380 | 137 | 5,492 | `a97a95ca977eb192a0426f00413b69bc1fe92fb65b1dd9b795488de7244b6d19` |
+| `contentBridgeRightRailWhitelistObserver` | `js/content_bridge.js:1219` | 1,219 | 98 | 3,091 | `86779f97ba7a65ebe61da86d414b1b3027b916fdc75163053b9dd3b58bcf4976` |
+| `contentBridgeInitializeFallbackThrottle` | `js/content_bridge.js:6150` | 6,150 | 61 | 2,530 | `60dd75d21580e8c390faed79594521478442789f7e0f3dd5195a1cb9c22fa926` |
+| `contentBridgeWhitelistPendingQueue` | `js/content_bridge.js:6211` | 6,211 | 69 | 4,081 | `9b0cbad3e54891d06ef96a1c9d8010e4f3dbc3ca9b5c595865d7b86fec31ee74` |
+| `contentBridgeWhitelistPendingApply` | `js/content_bridge.js:6280` | 6,280 | 112 | 5,829 | `2ff0a4ef33bdaf0acde1b27bf31d8d026f675702adae2bbc03692c213c266ad8` |
+| `contentBridgeFallbackMutationObserver` | `js/content_bridge.js:6392` | 6,392 | 138 | 5,567 | `dab8f75188fa2468fca2add028355f0ba1b70d45ed133c37fd2affe02c028df8` |
 | `domFallbackOnlyWhitelistPendingSelector` | `js/content/dom_fallback.js:2505` | 2,505 | 12 | 468 | `29ac6ab76923722538fb7004f088bda03416d9da1a80c88ef8698f0c96e5e16d` |
 | `domFallbackWhitelistPendingStateReset` | `js/content/dom_fallback.js:2686` | 2,686 | 54 | 3,079 | `1f4523c7359119a8c375614e4fb739f5656ad8186573ea20e6de21ca492f4402` |
 | `domFallbackWhitelistPendingIdentityHide` | `js/content/dom_fallback.js:3841` | 3,841 | 16 | 960 | `db535d5bb1b6d0f6c2e3913e008ab1d67479982ec3155788821410a66b2eb7c1` |
@@ -229,9 +229,9 @@ optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 affected callable semantic proof: NO-GO
 narrow runtime behavior changed: yes
 ```

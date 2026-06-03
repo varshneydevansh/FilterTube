@@ -33,10 +33,10 @@ initializeDOMFallback()
 | Observer install | `js/content_bridge.js:6282` calls `refreshFilterTubeRuntimeObservers()` after DOM fallback setup; that refresh calls `installRightRailWhitelistObserver()` only in whitelist mode. | The observer family starts through the runtime observer refresh path, but still lacks one central active-rule report. |
 | Watch rail target | `js/content_bridge.js:1243-1249` attaches to `#related`, `#secondary`, `ytd-watch-next-secondary-results-renderer`, and `ytd-watch-flexy #secondary`. | The selector authority is watch/right-rail shaped. |
 | Whitelist gate | `js/content_bridge.js:1211`, `js/content_bridge.js:1220`, `js/content_bridge.js:1228`, and `js/content_bridge.js:1284-1285` require `currentSettings?.listMode === 'whitelist'`. | It is mode-specific, but still not represented by `compiledRuleState` or `watchSurfaceControlAuthority`. |
-| Watch route admission | `js/content_bridge.js:1218-1237` has no `/watch` route return in the runner or scheduler. | The right-rail observer can force reprocess on the watch route, but still lacks a first-class watch/right-rail authority and metric budget. |
-| Forced reprocess | `js/content_bridge.js:1218-1237` stores immediate/follow-up timer IDs and routes both through `runWhitelistRefreshPass()`. | Mutation bursts can no longer stack duplicate timer pairs while a pass is pending. |
-| Delayed-pass guard | `js/content_bridge.js:1218-1224` rechecks whitelist mode before `applyDOMFallback`; `js/content_bridge.js:1226-1237` checks mode and fallback availability before scheduling. | A pass scheduled before an SPA route swap can still force reprocess if whitelist mode remains active. |
-| Navigation listener | `js/content_bridge.js:1256-1269` adds `yt-navigate-finish` listeners and calls the same scheduler. | Watch navigations are admitted by the same scheduler rather than a watch-specific rail authority. |
+| Watch route admission | `js/content_bridge.js:1227-1237` has no `/watch` route return in the runner or scheduler. | The right-rail observer can force reprocess on the watch route, but still lacks a first-class watch/right-rail authority and metric budget. |
+| Forced reprocess | `js/content_bridge.js:1227-1237` stores immediate/follow-up timer IDs and routes both through `runWhitelistRefreshPass()`. | Mutation bursts can no longer stack duplicate timer pairs while a pass is pending. |
+| Delayed-pass guard | `js/content_bridge.js:1227-1224` rechecks whitelist mode before `applyDOMFallback`; `js/content_bridge.js:1226-1237` checks mode and fallback availability before scheduling. | A pass scheduled before an SPA route swap can still force reprocess if whitelist mode remains active. |
+| Navigation listener | `js/content_bridge.js:1256-1272` adds `yt-navigate-finish` listeners and calls the same scheduler. | Watch navigations are admitted by the same scheduler rather than a watch-specific rail authority. |
 
 ## Risk
 
@@ -123,9 +123,9 @@ flowchart TD
 | Whitelist budget owner | Source pins | Current behavior | Remaining proof |
 | --- | --- | --- | --- |
 | JSON transport admission | `js/seed.js:234-238`, `js/injector.js:185-188` | Whitelist mode is active JSON work even when blocklist rules are empty. | Needs endpoint-by-endpoint parse/mutation budget and live timing proof. |
-| Identity prefetch admission | `js/content_bridge.js:1006-1015`, `js/content_bridge.js:1311-1316` | Whitelist mode admits identity prefetch work for card channel confidence. | Needs route/surface cap, stale-map policy, and no-leak proof. |
-| Right-rail observer install | `js/content_bridge.js:1210-1237`, `js/content_bridge.js:1256-1269` | Installs only in whitelist mode, attaches to watch-shaped rail selectors, and rechecks mode before delayed passes. | Admits `/watch`, but still lacks a first-class watch/right-rail work budget. |
-| Whitelist pending timers | `js/content_bridge.js:6200-6268` | Owns one recheck timer, one pending-hide timer, a 160-candidate queue, native-overlay quiet gate, and root/search/channel/watch route exclusions before selector traversal. | Needs route policy, mutation budget, placeholder policy, and DOM fallback parity proof. |
+| Identity prefetch admission | `js/content_bridge.js:1013-1022`, `js/content_bridge.js:1317-1322` | Whitelist mode admits identity prefetch work for card channel confidence. | Needs route/surface cap, stale-map policy, and no-leak proof. |
+| Right-rail observer install | `js/content_bridge.js:1219-1246`, `js/content_bridge.js:1256-1272` | Installs only in whitelist mode, attaches to watch-shaped rail selectors, and rechecks mode before delayed passes. | Admits `/watch`, but still lacks a first-class watch/right-rail work budget. |
+| Whitelist pending timers | `js/content_bridge.js:6211-6279` | Owns one recheck timer, one pending-hide timer, a 160-candidate queue, native-overlay quiet gate, and root/search/channel/watch route exclusions before selector traversal. | Needs route policy, mutation budget, placeholder policy, and DOM fallback parity proof. |
 | DOM fallback active predicate | `js/content/dom_fallback.js:2117-2184`, `js/content/dom_fallback.js:2220-2327`, `js/content/dom_fallback.js:4739-4891` | Whitelist mode keeps DOM fallback active and non-comment identity-less cards can fail closed when no whitelist rules are present. | Needs sibling-visible, metadata-visible, comment-safe, and watch/YTM/Kids fixtures. |
 | Quick/menu quiet gates | `js/content/block_channel.js:1212-1296`, `js/content/block_channel.js:1993-2042`, `js/content_bridge.js:10725-10737` | Quick-block and injected menu entrypoints return in whitelist mode. | Needs proof that no alternate menu/fallback path creates block actions in whitelist mode. |
 
@@ -147,9 +147,9 @@ optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

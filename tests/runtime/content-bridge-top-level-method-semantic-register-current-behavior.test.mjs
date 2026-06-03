@@ -141,10 +141,10 @@ test('content bridge top-level method register is audit-only and not nested call
 test('content bridge semantic family docs carry the method semantic proof gap blocker', () => {
   const methodGap = read(methodGapPath);
 
-  assert.match(methodGap, /repo-wide lexical callables: 5720/);
+  assert.match(methodGap, /repo-wide lexical callables: 5736/);
   assert.match(methodGap, /files with lexical accounting: 69/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5720/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5736/);
 
   assert.equal(contentBridgeSemanticFamilyDocs.length, 9);
   for (const familyDocPath of contentBridgeSemanticFamilyDocs) {
@@ -152,9 +152,9 @@ test('content bridge semantic family docs carry the method semantic proof gap bl
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 69/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5720/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5736/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5720/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5736/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     if (familyDocPath === narrowRuntimeChangeDoc) {
       assert.match(familyDoc, /runtime behavior changed: yes, duplicate right-rail timer fanout and no-op stamp reruns only/);

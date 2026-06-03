@@ -10,9 +10,9 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_SETTINGS_REFRESH_CROSS_CONTEXT_CONSUMER_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/background.js': [6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
-  'js/content/bridge_settings.js': [651, 26462, 'c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b'],
-  'js/content_bridge.js': [13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c'],
+  'js/background.js': [6343, 286370, 'ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36'],
+  'js/content/bridge_settings.js': [845, 34241, 'aea46dd241248db1d1d9bcbdfdf65320d1399ecd84cc7792678f29b1b26ee092'],
+  'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
   'js/injector.js': [3593, 155830, '634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04'],
   'js/seed.js': [1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
   'js/content/dom_fallback.js': [5030, 235555, 'fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5'],
@@ -24,7 +24,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: '    } else if (request.action === "FilterTube_ApplySettings" && request.settings) {',
     end: '    } else if (request.action === "updateChannelMap") {',
-    startLine: 4395,
+    startLine: 4418,
     lines: 28,
     bytes: 1487,
     hash: 'b585d94cc410f7acd929db780840f7cb02b44bb9819b34eb34985b713485e3d6'
@@ -33,7 +33,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: '// Listen for storage changes to re-compile settings\n',
     end: '/**\n * Fetch channel name and handle from YouTube by scraping the channel page',
-    startLine: 4484,
+    startLine: 4507,
     lines: 41,
     bytes: 1464,
     hash: 'e5c76f714f31a1d325385b3eaa051c0eb73e6a29ec1c69b1493cc4bb7f796de2'
@@ -51,7 +51,7 @@ const blockSpecs = {
     file: 'js/content/bridge_settings.js',
     start: 'function requestSettingsFromBackground(options = {}) {',
     end: 'function tryApplySettingsToSeed(settings)',
-    startLine: 353,
+    startLine: 541,
     lines: 115,
     bytes: 5333,
     hash: '10e99aaff431ece732d33435b7ea618f9c2333ededd839ec07d4b164b8f45227'
@@ -60,16 +60,16 @@ const blockSpecs = {
     file: 'js/content/bridge_settings.js',
     start: 'function tryApplySettingsToSeed(settings)',
     end: 'let pendingStorageRefreshTimer = 0;',
-    startLine: 468,
-    lines: 51,
-    bytes: 1335,
-    hash: '5c47eec7cb865ae7153bbeec5e88da23f125070fbebf33a6a6e4f2d6ecc02d1c'
+    startLine: 656,
+    lines: 57,
+    bytes: 1445,
+    hash: '47b2921e88606704e08dc9a9c6cd6e2a69daa9e78ebd92d521314b78b30d4592'
   },
   bridgeStorageRefresh: {
     file: 'js/content/bridge_settings.js',
     start: 'function scheduleSettingsRefreshFromStorage({ forceReprocess = true } = {}) {',
     end: 'try {\n    browserAPI_BRIDGE.storage.onChanged.addListener(handleStorageChanges);',
-    startLine: 557,
+    startLine: 751,
     lines: 92,
     bytes: 3395,
     hash: '6f65d55d5d8dcf9c5ad753df10d9a9f45ca5548787b949b6576bf8c310975dbf'
@@ -78,10 +78,10 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function handleMainWorldMessages(event) {',
     end: "    } else if (type === 'FilterTube_UpdateChannelMap') {",
-    startLine: 5889,
-    lines: 11,
-    bytes: 538,
-    hash: '0b467a6bde5abebde690fd2073b3d2aa43422d08d635a0ffdd908ae073799710'
+    startLine: 5898,
+    lines: 12,
+    bytes: 603,
+    hash: '4674cde24c6350286c67ec26e28a75f0e360bdb0a42f89e4c78cc39a58257f5c'
   },
   injectorSettingsReceiver: {
     file: 'js/injector.js',
@@ -150,7 +150,7 @@ const selectedCounts = {
   FilterTube_SettingsToInjector: 2,
   'window.postMessage': 1,
   tryApplySettingsToSeed: 4,
-  pendingSeedSettings: 6,
+  pendingSeedSettings: 7,
   filterTubeSeedReady: 1,
   scheduleSeedRetry: 3,
   setTimeout: 4,

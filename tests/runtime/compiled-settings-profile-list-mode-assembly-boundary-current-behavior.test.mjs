@@ -11,8 +11,8 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_COMPILED_SETTINGS_PROFILE_LIST_MODE_ASSEMBLY_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/background.js': [6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
-  'js/content/bridge_settings.js': [651, 26462, 'c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b'],
+  'js/background.js': [6343, 286370, 'ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36'],
+  'js/content/bridge_settings.js': [845, 34241, 'aea46dd241248db1d1d9bcbdfdf65320d1399ecd84cc7792678f29b1b26ee092'],
   'js/filter_logic.js': [3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5']
 };
 
@@ -23,16 +23,16 @@ const blockSpecs = {
     start: '            const activeSettings = safeObject(activeProfile.settings);',
     end: '            const boolFromV4 = (key, legacyValue) => {',
     startLine: 1981,
-    lines: 55,
-    bytes: 3428,
-    hash: 'fd9e0cc5b9219b358e72f5ede15556df10bf8a9b80af1a98d4518575269fc258'
+    lines: 78,
+    bytes: 4695,
+    hash: '7962fdb02859394cfdedb5e393ef6fd6c0bc1e1988aa5f0dc34ccd90384a6eea'
   },
   backgroundWhitelistChannelCompiler: {
     file: 'js/background.js',
     from: 'async function getCompiledSettings(sender = null, profileType = null, forceRefresh = false) {',
     start: '            const compileWhitelistChannels = (channels = []) => {',
     end: '            const storedChannels = shouldUseKidsProfile',
-    startLine: 2149,
+    startLine: 2172,
     lines: 65,
     bytes: 3878,
     hash: '433527aec588525d8f3747ce7ffe20b1d2d78905c6812a6fcf6703bbee507322'
@@ -40,7 +40,7 @@ const blockSpecs = {
   bridgeNormalizeSettingsForHost: {
     file: 'js/content/bridge_settings.js',
     start: 'function normalizeSettingsForHost(settings) {',
-    end: 'function requestSettingsFromBackground(options = {})',
+    end: "const MANAGED_VIEWING_ROUTE_GATE_OVERLAY_ID = 'filtertube-managed-viewing-route-gate';",
     startLine: 322,
     lines: 31,
     bytes: 1404,
@@ -50,7 +50,7 @@ const blockSpecs = {
     file: 'js/content/bridge_settings.js',
     start: '        const profileType = (() => {',
     end: '                try {\n                    const debugEnabled',
-    startLine: 379,
+    startLine: 567,
     lines: 36,
     bytes: 1758,
     hash: '713d4c00573258982f7dbf77cc451307b24a421ad8916fed859445df88fdadb8'
@@ -95,7 +95,7 @@ const selectedCounts = {
   'processed.whitelistKeywords': 1,
   'processed.whitelistChannels': 1,
   'new RegExp': 2,
-  'toLowerCase()': 16,
+  'toLowerCase()': 17,
   _hasChannelPolicyRules: 2,
   needsChannelIdentity: 2,
   extractChannelIdentity: 2

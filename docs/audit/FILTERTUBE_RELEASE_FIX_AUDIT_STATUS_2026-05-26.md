@@ -818,7 +818,7 @@ runtime behavior changed: no
 
 This continuation is audit-only. It reconciles older ledger text that still
 used stale lexical callable counts with the current method semantic proof
-gap index, which records `5,720` lexical callables across 69 tracked
+gap index, which records `5,736` lexical callables across 69 tracked
 JS/JSX/MJS files. The behavior map did not change; this is a proof-ledger
 freshness update so optimization decisions read one current count.
 

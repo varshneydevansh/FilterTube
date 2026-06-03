@@ -24,9 +24,9 @@ It does not prove that refreshes are safe to optimize. It records the current si
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6,320 | 285,103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
-| `js/content/bridge_settings.js` | 651 | 26,462 | `c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b` |
-| `js/content_bridge.js` | 13,623 | 603,362 | `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c` |
+| `js/background.js` | 6,343 | 286,370 | `ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36` |
+| `js/content/bridge_settings.js` | 845 | 34,241 | `aea46dd241248db1d1d9bcbdfdf65320d1399ecd84cc7792678f29b1b26ee092` |
+| `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
 | `js/injector.js` | 3,593 | 155,830 | `634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04` |
 | `js/seed.js` | 1,136 | 50,026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
 | `js/content/dom_fallback.js` | 5,030 | 235,555 | `fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5` |
@@ -38,13 +38,13 @@ settings refresh cross-context consumer source files pinned: 7
 
 | Block | Source | Start line | Lines | Bytes | SHA-256 |
 | --- | --- | ---: | ---: | ---: | --- |
-| `backgroundApplySettingsBranch` | `js/background.js:4395` | 4,395 | 28 | 1,487 | `b585d94cc410f7acd929db780840f7cb02b44bb9819b34eb34985b713485e3d6` |
-| `backgroundStorageInvalidation` | `js/background.js:4484` | 4,484 | 41 | 1,464 | `e5c76f714f31a1d325385b3eaa051c0eb73e6a29ec1c69b1493cc4bb7f796de2` |
+| `backgroundApplySettingsBranch` | `js/background.js:4418` | 4,418 | 28 | 1,487 | `b585d94cc410f7acd929db780840f7cb02b44bb9819b34eb34985b713485e3d6` |
+| `backgroundStorageInvalidation` | `js/background.js:4507` | 4,507 | 41 | 1,464 | `e5c76f714f31a1d325385b3eaa051c0eb73e6a29ec1c69b1493cc4bb7f796de2` |
 | `bridgeRuntimeListener` | `js/content/bridge_settings.js:198` | 198 | 121 | 5,684 | `ba565d7340f7b7150423e5daaa87f400769b2ce13216ed8af6509e23e6a6085c` |
-| `bridgeRequestSettings` | `js/content/bridge_settings.js:353` | 353 | 115 | 5,333 | `10e99aaff431ece732d33435b7ea618f9c2333ededd839ec07d4b164b8f45227` |
-| `bridgeSeedDelivery` | `js/content/bridge_settings.js:468` | 468 | 51 | 1,335 | `5c47eec7cb865ae7153bbeec5e88da23f125070fbebf33a6a6e4f2d6ecc02d1c` |
-| `bridgeStorageRefresh` | `js/content/bridge_settings.js:557` | 557 | 92 | 3,395 | `6f65d55d5d8dcf9c5ad753df10d9a9f45ca5548787b949b6576bf8c310975dbf` |
-| `contentBridgePageRefresh` | `js/content_bridge.js:5889` | 5,889 | 11 | 538 | `0b467a6bde5abebde690fd2073b3d2aa43422d08d635a0ffdd908ae073799710` |
+| `bridgeRequestSettings` | `js/content/bridge_settings.js:541` | 541 | 115 | 5,333 | `10e99aaff431ece732d33435b7ea618f9c2333ededd839ec07d4b164b8f45227` |
+| `bridgeSeedDelivery` | `js/content/bridge_settings.js:656` | 656 | 57 | 1,445 | `47b2921e88606704e08dc9a9c6cd6e2a69daa9e78ebd92d521314b78b30d4592` |
+| `bridgeStorageRefresh` | `js/content/bridge_settings.js:751` | 751 | 92 | 3,395 | `6f65d55d5d8dcf9c5ad753df10d9a9f45ca5548787b949b6576bf8c310975dbf` |
+| `contentBridgePageRefresh` | `js/content_bridge.js:5898` | 5,898 | 12 | 603 | `4674cde24c6350286c67ec26e28a75f0e360bdb0a42f89e4c78cc39a58257f5c` |
 | `injectorSettingsReceiver` | `js/injector.js:1924` | 1,924 | 23 | 871 | `8c0c9cdff9e9fa153eb8e0ed0528d2f7d431663b15ecebd951866870783a2bf1` |
 | `injectorSeedUpdate` | `js/injector.js:3383` | 3,383 | 21 | 1,003 | `07e4027d2e306ff9046594fc68609b34074526a5a229a31057e06b3a2b97ce0d` |
 | `injectorProcessQueue` | `js/injector.js:3405` | 3,405 | 60 | 2,108 | `d17bae535755636d9b51d10b3153650b7eed3ff0c0abf99ee988b9d44eb76233` |
@@ -72,7 +72,7 @@ Counts below are over the pinned source/effect blocks, not whole files.
 | `FilterTube_SettingsToInjector` | 2 |
 | `window.postMessage` | 1 |
 | `tryApplySettingsToSeed` | 4 |
-| `pendingSeedSettings` | 6 |
+| `pendingSeedSettings` | 7 |
 | `filterTubeSeedReady` | 1 |
 | `scheduleSeedRetry` | 3 |
 | `setTimeout` | 4 |
@@ -119,7 +119,7 @@ Selected missing policy/report tokens over pinned blocks:
 
 `bridgeRequestSettings`: the bridge derives `profileType` from the current host, sends `getCompiledSettings` with optional `forceRefresh`, retries with `forceRefresh: true` on resolved profile mismatch, normalizes settings for host, sends settings to the main world, and resolves the normalized settings.
 
-`bridgeSeedDelivery`: `sendSettingsToMainWorld()` mutates `latestSettings` and `currentSettings`, posts `FilterTube_SettingsToInjector` to `window` with target `*`, tries `window.filterTube.updateSettings(settings)`, and if seed is not ready, records `pendingSeedSettings`, attaches a `filterTubeSeedReady` listener, and schedules 250 ms retries.
+`bridgeSeedDelivery`: `sendSettingsToMainWorld()` mutates `latestSettings` and `currentSettings`, applies the managed viewing-space route gate before page-world delivery, posts/ `FilterTube_SettingsToInjector` to `window` with target `*`, tries `window.filterTube.updateSettings(settings)`, and if seed is not ready, records `pendingSeedSettings`, attaches a `filterTubeSeedReady` listener, and schedules 250 ms retries.
 
 `bridgeStorageRefresh`: isolated-world storage refresh has a 250 ms minimum interval, calls `requestSettingsFromBackground({ forceRefresh: true })`, applies DOM fallback with caller-selected `forceReprocess`, and then refreshes runtime observers. A sole `channelMap` change returns early; sole `videoChannelMap` or `videoMetaMap` changes still refresh settings but pass `forceReprocess: false`.
 
@@ -166,9 +166,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

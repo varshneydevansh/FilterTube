@@ -10,7 +10,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_CONTENT_BRIDGE_MENU_BLOCKED_STATE_LIST_SHAPE_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/content_bridge.js': [13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c']
+  'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d']
 };
 
 const blockSpecs = {
@@ -18,7 +18,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function findStoredChannelEntry(channelInfo) {',
     end: 'function scheduleDropdownCleanup',
-    startLine: 2079,
+    startLine: 2088,
     lines: 16,
     bytes: 581,
     hash: 'e774f81a3dcfb0cd4830c7a06faf7c6307b2d739651c0a4d49a6b195723418ad'
@@ -27,7 +27,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'async function checkIfChannelBlocked(channelInfo, menuItem) {',
     end: 'function markElementAsBlocked',
-    startLine: 11977,
+    startLine: 11990,
     lines: 57,
     bytes: 2949,
     hash: '232452835d96009435593a555877dea029e32b587b72c0f007d1dfc83dd31c79'
@@ -36,7 +36,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function syncBlockedElementsWithFilters(effectiveSettings) {',
     end: '/**\n * Handle click on "Block Channel" menu item',
-    startLine: 12153,
+    startLine: 12166,
     lines: 33,
     bytes: 1521,
     hash: 'ed51361346f28f1bdf6accc4de5f5ee1625c6a921b4d0b53cc5441ca21513615'

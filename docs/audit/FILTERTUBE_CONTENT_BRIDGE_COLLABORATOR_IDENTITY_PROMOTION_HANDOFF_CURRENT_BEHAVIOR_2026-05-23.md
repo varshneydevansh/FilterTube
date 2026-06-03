@@ -12,19 +12,19 @@ The paired verifier is `tests/runtime/content-bridge-collaborator-identity-promo
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content_bridge.js` | 13,623 | 603,362 | `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c` |
+| `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
 
 ## Pinned Blocks
 
 | Block | Source range | Lines | Bytes | SHA-256 | Current role |
 | --- | --- | ---: | ---: | --- | --- |
-| Watch-like collaboration warmup | `js/content_bridge.js:4813` through `js/content_bridge.js:4842` | 30 | 1297 | `53d862a7e45c0dacd6795046e53cf9e257dee3394deeed10a06eb5ec1a1dfda2` | Parses watch/YTM bylines into partial collaborators only after separator evidence is present. |
-| YTM collaborator identity promotion | `js/content_bridge.js:4843` through `js/content_bridge.js:4934` | 92 | 3296 | `deefe23561a642fd66ccf80bcab3ff513472356c9141dc145d9a1e2227b2b140` | Calls collaborator extraction for YTM watch-like rows and clears literal ampersand Topic name-only stale state before returning collaboration-shaped channel info. |
-| Collaboration DOM signal classifier | `js/content_bridge.js:4935` through `js/content_bridge.js:5054` | 120 | 5285 | `9a17597d1f08ebb5c4e4ed9bdd74dcdae28dd00135e3151e0e6575f682aca32a` | Detects avatar stack, attributed collaborator markup, byline, distinct channel-link signals, and the ampersand Topic guard helpers plus the writer-side rejection helper. |
-| Collaborator channel-info normalization | `js/content_bridge.js:5055` through `js/content_bridge.js:5208` | 154 | 6370 | `a1b488fd8228fa830e2914f872e3911cb9b8b6e092a7201540867e6b31cf94d0` | Chooses card, resolved-cache, and avatar-stack collaborator rosters; demotes literal ampersand Topic name-only stale state; can write collaborator cache attrs and expected count. |
-| Generic collaborator signal promotion | `js/content_bridge.js:5209` through `js/content_bridge.js:5294` | 86 | 3081 | `55ff41d06a422df35dd5c241198978dbd19df3428f0969e06193860652a8a31d` | Calls collaborator extraction for ordinary cards, compares with resolved cache through the guard, and returns collaboration-shaped channel info. |
-| `extractChannelFromCard()` collaboration priority handoff | `js/content_bridge.js:9967` through `js/content_bridge.js:9998` | 32 | 1622 | `8e2087627598bda37bb8814981dd27df4a44f9970fd0165a8829d390ecfcbfe4` | Runs collaborator extraction before data-attribute channel identity and returns a collaboration channel-info object when signals pass. |
-| `extractChannelFromCard()` lockup collaboration handoff | `js/content_bridge.js:10434` through `js/content_bridge.js:10457` | 24 | 1290 | `163574a088d8e8bd725e9b668974e39da9e85d17a578dbb834bd6d451a8d0bae` | Runs collaborator extraction inside modern lockup fallback before avatar/link channel extraction. |
+| Watch-like collaboration warmup | `js/content_bridge.js:4822` through `js/content_bridge.js:4851` | 30 | 1297 | `53d862a7e45c0dacd6795046e53cf9e257dee3394deeed10a06eb5ec1a1dfda2` | Parses watch/YTM bylines into partial collaborators only after separator evidence is present. |
+| YTM collaborator identity promotion | `js/content_bridge.js:4852` through `js/content_bridge.js:4943` | 92 | 3296 | `deefe23561a642fd66ccf80bcab3ff513472356c9141dc145d9a1e2227b2b140` | Calls collaborator extraction for YTM watch-like rows and clears literal ampersand Topic name-only stale state before returning collaboration-shaped channel info. |
+| Collaboration DOM signal classifier | `js/content_bridge.js:4944` through `js/content_bridge.js:5063` | 120 | 5285 | `9a17597d1f08ebb5c4e4ed9bdd74dcdae28dd00135e3151e0e6575f682aca32a` | Detects avatar stack, attributed collaborator markup, byline, distinct channel-link signals, and the ampersand Topic guard helpers plus the writer-side rejection helper. |
+| Collaborator channel-info normalization | `js/content_bridge.js:5064` through `js/content_bridge.js:5217` | 154 | 6370 | `a1b488fd8228fa830e2914f872e3911cb9b8b6e092a7201540867e6b31cf94d0` | Chooses card, resolved-cache, and avatar-stack collaborator rosters; demotes literal ampersand Topic name-only stale state; can write collaborator cache attrs and expected count. |
+| Generic collaborator signal promotion | `js/content_bridge.js:5218` through `js/content_bridge.js:5303` | 86 | 3081 | `55ff41d06a422df35dd5c241198978dbd19df3428f0969e06193860652a8a31d` | Calls collaborator extraction for ordinary cards, compares with resolved cache through the guard, and returns collaboration-shaped channel info. |
+| `extractChannelFromCard()` collaboration priority handoff | `js/content_bridge.js:9980` through `js/content_bridge.js:10011` | 32 | 1622 | `8e2087627598bda37bb8814981dd27df4a44f9970fd0165a8829d390ecfcbfe4` | Runs collaborator extraction before data-attribute channel identity and returns a collaboration channel-info object when signals pass. |
+| `extractChannelFromCard()` lockup collaboration handoff | `js/content_bridge.js:10447` through `js/content_bridge.js:10470` | 24 | 1290 | `163574a088d8e8bd725e9b668974e39da9e85d17a578dbb834bd6d451a8d0bae` | Runs collaborator extraction inside modern lockup fallback before avatar/link channel extraction. |
 
 ## Selected Token Counts
 
@@ -1050,9 +1050,9 @@ surface can support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

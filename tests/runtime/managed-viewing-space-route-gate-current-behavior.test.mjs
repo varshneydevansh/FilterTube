@@ -27,12 +27,13 @@ function runtimeSource() {
 
 function viewingPolicy(overrides = {}) {
   return {
+    schema: 'filtertube_managed_viewing_space_route_gate',
+    version: 1,
     allowMainViewing: true,
     allowKidsViewing: true,
-    managed: true,
     profileId: 'child-profile-1',
-    policyRevision: 4,
-    policyHash: 'hash-viewing-4',
+    profileName: 'Child Profile',
+    policySource: 'local_profile_settings',
     ...overrides
   };
 }
@@ -57,11 +58,15 @@ function classifyViewingRoute(rawUrl) {
 
 function validateViewingPolicy(policy) {
   if (!policy || typeof policy !== 'object') return { ok: false, reason: 'missing_policy' };
+  if (policy.schema !== 'filtertube_managed_viewing_space_route_gate') return { ok: false, reason: 'wrong_schema' };
+  if (policy.version !== 1) return { ok: false, reason: 'wrong_version' };
   if (typeof policy.allowMainViewing !== 'boolean') return { ok: false, reason: 'missing_allowMainViewing' };
   if (typeof policy.allowKidsViewing !== 'boolean') return { ok: false, reason: 'missing_allowKidsViewing' };
   if (!policy.allowMainViewing && !policy.allowKidsViewing) return { ok: false, reason: 'no_viewing_spaces' };
-  if (!Number.isInteger(policy.policyRevision) || policy.policyRevision <= 0) return { ok: false, reason: 'invalid_policyRevision' };
-  if (!policy.policyHash) return { ok: false, reason: 'missing_policyHash' };
+  if (!policy.profileId) return { ok: false, reason: 'missing_profileId' };
+  if (policy.policySource !== 'local_profile_settings' && policy.policySource !== 'managed_policy') {
+    return { ok: false, reason: 'invalid_policySource' };
+  }
   return { ok: true };
 }
 
@@ -97,32 +102,35 @@ function routeRevalidationDecision({ profileChanged = false, policyChanged = fal
   return { revalidate: false, reason: 'no_gate_revalidation_needed' };
 }
 
-test('managed viewing-space route-gate contract is audit-only and linked from plan inventory and P0 proof', () => {
+test('managed viewing-space route-gate contract is runtime-backed and linked from plan inventory and P0 proof', () => {
   const doc = read(docPath);
   const plan = read(planPath);
   const inventory = read(inventoryPath);
   const p0Doc = read(p0DocPath);
   const source = runtimeSource();
 
-  assert.match(doc, /Status\*\*: Contract\/proof fixture only/);
-  assert.match(doc, /Runtime behavior is unchanged/);
+  assert.match(doc, /Status\*\*: Runtime route gate implemented/);
+  assert.match(doc, /Runtime behavior changed/);
   assert.match(doc, /Route Classification/);
   assert.match(doc, /Required Route Decisions/);
   assert.match(doc, /managed_viewing_main_only/);
   assert.match(doc, /managed_viewing_kids_only/);
   assert.match(doc, /managed_viewing_missing_policy_no_work/);
-  assert.match(doc, /runtime managed viewing-space route gate: absent/);
+  assert.match(doc, /runtime managed viewing-space route gate: present/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
-  assert.match(p0Doc, /Background Main compile does not read `allowMainViewing`/);
-  assert.match(p0Doc, /Background Kids compile does not read `allowKidsViewing`/);
+  assert.match(p0Doc, /Background compile now exposes `managedViewingRouteGate`/);
+  assert.match(p0Doc, /content bridge now blocks denied child Main\/Kids routes/);
 
   assert.match(source, /allowMainViewing/);
   assert.match(source, /allowKidsViewing/);
-  assert.doesNotMatch(source, /filtertube_managed_viewing_space_route_gate/);
-  assert.doesNotMatch(source, /managedViewingRouteGate/);
-  assert.doesNotMatch(source, /profileViewingRouteGate/);
-  assert.doesNotMatch(source, /showManagedViewingBlockedOverlay/);
+  assert.match(source, /filtertube_managed_viewing_space_route_gate/);
+  assert.match(source, /activeProfileKind === 'child'/);
+  assert.match(source, /managedViewingRouteGate/);
+  assert.match(source, /applyManagedViewingRouteGate/);
+  assert.match(source, /showManagedViewingBlockedOverlay/);
+  assert.match(source, /__filtertubeManagedViewingRouteDenied/);
+  assert.match(source, /yt-navigate-finish/);
 });
 
 test('managed viewing-space route classifier separates Main Kids external and unsupported hosts', () => {

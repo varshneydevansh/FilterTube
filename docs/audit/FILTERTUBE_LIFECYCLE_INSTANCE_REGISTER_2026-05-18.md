@@ -39,7 +39,7 @@ family, source family, and owner class.
 | `clearTimeout` | 34 | Delayed work teardown surface. |
 | `requestAnimationFrame` | 31 | Paint-frame scheduling surface. |
 | `cancelAnimationFrame` | 4 | Paint-frame teardown surface. |
-| **Total lifecycle instances** | **527** | Observer/listener/timer/frame lifecycle surface. |
+| **Total lifecycle instances** | **535** | Observer/listener/timer/frame lifecycle surface. |
 
 This register intentionally does not include direct `fetch`, message,
 display/class, click, or dispatch side effects. Those remain covered by the
@@ -51,7 +51,7 @@ side-effect audits.
 | Source family | Lifecycle instances | Current interpretation |
 | --- | ---: | --- |
 | `extension-ui-background-js` | 273 | Dashboard, popup, background, StateManager, UI components, and import/export/Nanah lifecycle work. |
-| `content-runtime-js` | 219 | YouTube page-runtime work: seed, bridge, quick/menu, DOM fallback, injector, prompts, and helper listeners. |
+| `content-runtime-js` | 227 | YouTube page-runtime work: seed, bridge, quick/menu, DOM fallback, injector, prompts, and helper listeners. |
 | `website-components` | 23 | Website client lifecycle, including theme/scene controls plus hero/footer decorative motion. |
 | `vendor-bundles` | 8 | Packaged vendor transport listeners, especially Nanah. |
 | `generated-ui-output` | 4 | Generated shell output; should be freshness-checked, not hand edited. |
@@ -73,22 +73,22 @@ side-effect audits.
 | `js/background.js` | 14 | Background timers, flushers, backup scheduling, and message/broadcast timing. |
 | `js/content/dom_fallback.js` | 14 | DOM fallback delayed passes, continuation nudges, playlist guard work, and synthetic playlist navigation timing. |
 | `js/injector.js` | 12 | Page-world message/import/readiness lifecycle. |
-| `js/content/bridge_settings.js` | 10 | Runtime settings bridge lifecycle. |
+| `js/content/bridge_settings.js` | 18 | Runtime settings bridge lifecycle. |
 | `js/render_engine.js` | 9 | Dashboard/rendering UI event lifecycle. |
 
 ## Current Findings
 
 | Finding | Evidence | Risk |
 | --- | --- | --- |
-| Lifecycle installs greatly exceed explicit teardown. | 294 listener installs vs 13 listener removals; 124 timeouts vs 34 clears. | Cleanup or route changes cannot rely on teardown being already represented everywhere. |
-| UI/background lifecycle is larger than page runtime. | `extension-ui-background-js` has 273 lifecycle instances, while `content-runtime-js` has 219. | YouTube lag fixes still need settings/profile/import/Nanah lifecycle proof because UI can create stale state and broadcasts. |
+| Lifecycle installs greatly exceed explicit teardown. | 298 listener installs vs 17 listener removals; 124 timeouts vs 34 clears. | Cleanup or route changes cannot rely on teardown being already represented everywhere. |
+| UI/background lifecycle is larger than page runtime. | `extension-ui-background-js` has 273 lifecycle instances, while `content-runtime-js` has 227. | YouTube lag fixes still need settings/profile/import/Nanah lifecycle proof because UI can create stale state and broadcasts. |
 | Page runtime has several independent owners. | `js/content_bridge.js`, `js/content/block_channel.js`, `js/content/dom_fallback.js`, `js/injector.js`, prompts, and helpers all own lifecycle instances. | Empty-install, fullscreen, native overlay, and route changes can wake unrelated owners unless one lifecycle budget exists. |
 | Vendor and generated lifecycle instances are packaged but not product source. | `vendor-bundles` has 8; `generated-ui-output` has 4. | These need source/freshness/hash proof, not manual edits. |
 | No shared registry exists today. | Current tracked source still lacks `lifecycleRegistry`, `registerLifecycle`, `observerRegistry`, `timerRegistry`, `disposeAll`, or `teardownAll`. | A cleanup can remove one visible symptom while another owner keeps equivalent work alive. |
 
 ## Install/Teardown Imbalance Addendum - 2026-05-27
 
-This addendum classifies the 527 lifecycle instances by whether they install or
+This addendum classifies the 535 lifecycle instances by whether they install or
 schedule work versus explicitly tear down a primitive covered by this register.
 It is source-derived proof only; it does not approve lifecycle cleanup, route
 teardown, listener removal, observer disconnect changes, or timer rewrites.
@@ -103,14 +103,14 @@ Source-family imbalance:
 | Source family | Install/schedule instances | Explicit teardown instances | Total lifecycle instances | Current risk |
 | --- | ---: | ---: | ---: | --- |
 | `extension-ui-background-js` | 259 | 14 | 273 | Dashboard/popup/background/state lifecycle has the largest unmatched install surface. |
-| `content-runtime-js` | 190 | 29 | 219 | YouTube page runtime still has many page-lifetime listeners, observers, timers, and frame callbacks. |
+| `content-runtime-js` | 194 | 33 | 227 | YouTube page runtime still has many page-lifetime listeners, observers, timers, and frame callbacks. |
 | `vendor-bundles` | 8 | 0 | 8 | Vendor lifecycle requires source/hash/freshness proof rather than local edits. |
 | `website-components` | 13 | 10 | 23 | Website client lifecycle grew from hero/footer motion work; it remains outside YouTube page-runtime filtering but still needs website unmount proof. |
 | `generated-ui-output` | 2 | 2 | 4 | Generated shell output needs freshness proof before hand edits. |
 
 ```text
-install-or-schedule lifecycle instances: 472
-explicit-teardown lifecycle instances: 55
+install-or-schedule lifecycle instances: 476
+explicit-teardown lifecycle instances: 59
 install-to-teardown ratio: 8.5:1
 shared lifecycle registry in product source: absent
 lifecycle cleanup approval from imbalance addendum: NO-GO
@@ -119,8 +119,8 @@ runtime behavior changed by this addendum: no
 
 ```mermaid
 flowchart TD
-  A["527 lifecycle instances"] --> B["472 install or schedule work"]
-  A --> C["55 explicit teardown primitives"]
+  A["535 lifecycle instances"] --> B["476 install or schedule work"]
+  A --> C["59 explicit teardown primitives"]
   B --> D["Listeners, observers, timers, frames"]
   C --> E["remove, clear, cancel"]
   D --> F["Cleanup authority remains NO-GO"]
@@ -151,7 +151,7 @@ Source-family listener option split:
 | Source family | Total listeners | Dominant current shape | Explicit option shapes |
 | --- | ---: | --- | --- |
 | `extension-ui-background-js` | 203 | 201 no-third-argument UI/background listeners | 2 boolean capture listeners |
-| `content-runtime-js` | 74 | Mixed page-runtime listener policy | 21 boolean capture, 16 passive, 6 passive+capture, 5 once, 1 capture object, 1 explicit bubble, 24 no-third-argument |
+| `content-runtime-js` | 78 | Mixed page-runtime listener policy | 25 boolean capture, 16 passive, 6 passive+capture, 5 once, 1 capture object, 1 explicit bubble, 24 no-third-argument |
 | `vendor-bundles` | 8 | Vendor transport defaults | 2 once, 6 no-third-argument |
 | `generated-ui-output` | 2 | Generated expression/identifier options | 2 non-literal option rows |
 | `website-components` | 7 | Website UI defaults | 7 no-third-argument |
@@ -239,7 +239,7 @@ Source-family listener event split:
 | Source family | Total listeners | Dominant current events | Non-literal event rows |
 | --- | ---: | --- | ---: |
 | `extension-ui-background-js` | 203 | `click` 100, `change` 54, `input` 19, `keydown` 10 | 0 |
-| `content-runtime-js` | 74 | `click` 16, `DOMContentLoaded` 6, `focusin` 5, `mouseleave` 5, `yt-navigate-finish` 5 | 1 |
+| `content-runtime-js` | 78 | `click` 16, `DOMContentLoaded` 6, `focusin` 5, `mouseleave` 5, `yt-navigate-finish` 5 | 1 |
 | `vendor-bundles` | 8 | `open` 2, `error` 2, `message` 2, `close` 2 | 0 |
 | `generated-ui-output` | 2 | Generated `l2` event dispatch | 2 |
 | `website-components` | 7 | `visibilitychange`, `change`, `storage`, and theme sync | 1 |
@@ -323,7 +323,7 @@ Source-family listener target split:
 | Source family | Total listeners | Document/window targets | Local/generated/vendor targets |
 | --- | ---: | ---: | --- |
 | `extension-ui-background-js` | 203 | 13 | 173 local element, 17 optional local element |
-| `content-runtime-js` | 74 | 42 | 32 local element |
+| `content-runtime-js` | 78 | 42 | 32 local element |
 | `vendor-bundles` | 8 | 0 | 8 vendor transport |
 | `website-components` | 7 | 5 | 2 local element |
 | `generated-ui-output` | 2 | 0 | 2 generated shell node |
@@ -406,7 +406,7 @@ Source-family global event-target split:
 | Source/target class | Total pairs | Event mix |
 | --- | ---: | --- |
 | `content-runtime-js:document` | 32 | `click` 7, `yt-navigate-finish` 5, `DOMContentLoaded` 5, `keydown` 2, `scroll` 2, `visibilitychange` 1, `ended` 1, pointer/mouse/nonliteral 5, focus/input 4. |
-| `content-runtime-js:window` | 10 | `message` 4, `scroll` 2, `resize` 1, `orientationchange` 1, `DOMContentLoaded` 1, `filterTubeSeedReady` 1. |
+| `content-runtime-js:window` | 14 | `message` 4, `scroll` 2, `resize` 1, `orientationchange` 1, `DOMContentLoaded` 1, `filterTubeSeedReady` 1, managed viewing route events 4. |
 | `extension-ui-background-js:document` | 6 | `click` 3, `DOMContentLoaded` 2, `keydown` 1. |
 | `extension-ui-background-js:window` | 7 | `resize` 3, `scroll` 2, `hashchange` 1, `popstate` 1. |
 | `website-components:document` | 3 | `visibilitychange` 3. |
@@ -506,7 +506,7 @@ Source-family listener callback split:
 | Source family | Total listener callbacks | Callback shape summary |
 | --- | ---: | --- |
 | `extension-ui-background-js` | 203 | 191 inline arrow callbacks, 12 identifier callbacks. |
-| `content-runtime-js` | 74 | 55 inline arrow callbacks, 18 identifier callbacks, 1 member reference callback. |
+| `content-runtime-js` | 78 | 55 inline arrow callbacks, 18 identifier callbacks, 1 member reference callback. |
 | `vendor-bundles` | 8 | 8 inline arrow callbacks in packaged vendor transport code. |
 | `website-components` | 7 | 7 identifier callbacks. |
 | `generated-ui-output` | 2 | 2 generated expression callbacks. |
@@ -586,7 +586,7 @@ Source-family add/remove parity:
 | Source family | Adds | Removes | Delta |
 | --- | ---: | ---: | ---: |
 | `extension-ui-background-js` | 203 | 0 | 203 |
-| `content-runtime-js` | 74 | 4 | 70 |
+| `content-runtime-js` | 78 | 4 | 70 |
 | `vendor-bundles` | 8 | 0 | 8 |
 | `website-components` | 7 | 7 | 0 |
 | `generated-ui-output` | 2 | 2 | 0 |
@@ -3212,7 +3212,7 @@ Runtime gate cross-check:
 
 | Gate | Current behavior | Source pins |
 | --- | --- | --- |
-| `installRightRailWhitelistObserver()` entry | Returns unless `currentSettings.listMode === 'whitelist'` and the observer has not already been installed. | `js/content_bridge.js:1210-1213` |
+| `installRightRailWhitelistObserver()` entry | Returns unless `currentSettings.listMode === 'whitelist'` and the observer has not already been installed. | `js/content_bridge.js:1219-1213` |
 | `runWhitelistRefreshPass()` route gate | Returns unless whitelist mode is still active, then skips paths whose pathname starts with `/watch`. | `js/content_bridge.js:1226-1228` |
 | `scheduleWhitelistRefresh()` admission gate | Returns unless whitelist mode is still active and `applyDOMFallback` is callable. | `js/content_bridge.js:1226-1230` |
 | DOM fallback side effect | Calls `applyDOMFallback(null, { preserveScroll: true, forceReprocess: true })`. | `js/content_bridge.js:1221` |
@@ -3423,7 +3423,7 @@ Source-family explicit teardown split:
 ASCII explicit teardown flow diagram: present
 
 ```text
-55 explicit teardown handle rows
+59 explicit teardown handle rows
         |
         +--> 13 removeEventListener rows
         |       +--> 7 document targets
@@ -3454,7 +3454,7 @@ Mermaid explicit teardown flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["55 explicit teardown handle rows"] --> B["13 removeEventListener rows"]
+  A["59 explicit teardown handle rows"] --> B["13 removeEventListener rows"]
   A --> C["34 clearTimeout rows"]
   A --> D["4 clearInterval rows"]
   A --> E["4 cancelAnimationFrame rows"]
@@ -4051,7 +4051,7 @@ serialized pending reruns. It records that no
 ## Release Hot-Path Lifecycle Addendum - 2026-05-27
 
 This addendum records semantic lifecycle ownership for the lag/menu/blocklist
-release path. It does not change the 527-instance source count and does not
+release path. It does not change the 535-instance source count and does not
 claim lifecycle cleanup is generally safe. It narrows the highest-risk
 observer/listener/timer instances that were involved in the empty-install lag,
 quick-cross availability, comment-menu close, whitelist pending-hide, and
@@ -4059,7 +4059,7 @@ settings refresh regressions.
 
 | Lifecycle row | Instance | Owner / trigger / active gate | Side-effect and teardown status |
 | --- | --- | --- | --- |
-| `release_lifecycle_storage_refresh_debounce` | `js/content/bridge_settings.js:575:setTimeout` | Storage-change debounce after relevant local-storage changes. `forceReprocess` is upgraded before an existing timer is reused. | Re-fetches settings and applies DOM fallback once per debounce window; timer clears itself. |
+| `release_lifecycle_storage_refresh_debounce` | `js/content/bridge_settings.js:769:setTimeout` | Storage-change debounce after relevant local-storage changes. `forceReprocess` is upgraded before an existing timer is reused. | Re-fetches settings and applies DOM fallback once per debounce window; timer clears itself. |
 | `release_lifecycle_quick_hover_intent_timer` | `js/content/block_channel.js:423:setTimeout` | Quick-block hover/focus intent. Active only while quick-block is enabled and a candidate card remains targeted. | Creates delayed quick-cross affordance; cleared by `cancelQuickBlockHoverIntent()` when disabled or retargeted. |
 | `release_lifecycle_quick_viewport_observer` | `js/content/block_channel.js:951:IntersectionObserver` | Quick-block visible-card tracking. Active after lazy quick-block setup. | Tracks bounded viewport hosts; no broad periodic sweep authority. |
 | `release_lifecycle_quick_sweep_timer` | `js/content/block_channel.js:1976:setTimeout` | Coalesced quick-block scan for queued roots. Gated by quick-block enabled/eager or visible-card state. | Runs once after 80ms and clears queued roots; old periodic timer remains absent. |
@@ -4070,11 +4070,11 @@ settings refresh regressions.
 | `release_lifecycle_menu_outside_pointer_listener` | `js/content/block_channel.js:2523:addEventListener` | Capture pointer/mouse fallback for FilterTube-enriched native dropdowns. | Closes only visible dropdowns containing `.filtertube-block-channel-item`; leaves plain native dropdowns alone. |
 | `release_lifecycle_dropdown_discovery_observer` | `js/content/block_channel.js:2549:MutationObserver` | Short-lived dropdown discovery after menu activation. | Observes body only while armed and uses the stop timer below. |
 | `release_lifecycle_dropdown_discovery_stop_timer` | `js/content/block_channel.js:2579:setTimeout` | Dropdown discovery lifetime cap. | Disconnects discovery after 2500ms; refreshed on menu activation. |
-| `release_lifecycle_whitelist_pending_recheck_timer` | `js/content_bridge.js:6210:setTimeout` | Whitelist pending-card recheck. Active only outside native overlay quiet mode. | Runs one pending whitelist DOM fallback pass and clears itself. |
-| `release_lifecycle_whitelist_pending_hide_timer` | `js/content_bridge.js:6260:setTimeout` | Whitelist pending-hide admission after mutations. Active only in whitelist mode, excluded routes rejected before selector traversal. | Applies pending hide to queued candidates and drains the queue. |
-| `release_lifecycle_fallback_menu_mutation_observer` | `js/content_bridge.js:7146:MutationObserver` | Fallback menu button observer. Active only when `shouldEagerFallbackMenuScan()` is true and native overlay quiet mode is false. | Schedules root-scoped scans; not an always-on empty-install body scan when eager scan is false. |
-| `release_lifecycle_fallback_menu_hover_click_listeners` | `js/content_bridge.js:7203-7205:addEventListener` | Hover/focus/click fallback-menu discovery. | Schedules scans from user-near surfaces; still page-lifetime listeners once installed. |
-| `release_lifecycle_fallback_menu_warmup_interval` | `js/content_bridge.js:7250:setInterval` | Startup warmup scans for fallback menu buttons. Active only when eager fallback menu scan is true. | Clears itself after 8 scans; remains a lifecycle risk if eager scan is enabled without real menu need. |
+| `release_lifecycle_whitelist_pending_recheck_timer` | `js/content_bridge.js:6221:setTimeout` | Whitelist pending-card recheck. Active only outside native overlay quiet mode. | Runs one pending whitelist DOM fallback pass and clears itself. |
+| `release_lifecycle_whitelist_pending_hide_timer` | `js/content_bridge.js:6271:setTimeout` | Whitelist pending-hide admission after mutations. Active only in whitelist mode, excluded routes rejected before selector traversal. | Applies pending hide to queued candidates and drains the queue. |
+| `release_lifecycle_fallback_menu_mutation_observer` | `js/content_bridge.js:7159:MutationObserver` | Fallback menu button observer. Active only when `shouldEagerFallbackMenuScan()` is true and native overlay quiet mode is false. | Schedules root-scoped scans; not an always-on empty-install body scan when eager scan is false. |
+| `release_lifecycle_fallback_menu_hover_click_listeners` | `js/content_bridge.js:7216-7218:addEventListener` | Hover/focus/click fallback-menu discovery. | Schedules scans from user-near surfaces; still page-lifetime listeners once installed. |
+| `release_lifecycle_fallback_menu_warmup_interval` | `js/content_bridge.js:7263:setInterval` | Startup warmup scans for fallback menu buttons. Active only when eager fallback menu scan is true. | Clears itself after 8 scans; remains a lifecycle risk if eager scan is enabled without real menu need. |
 | `release_lifecycle_video_identity_flush_timers` | `js/background.js:1634,1642:setTimeout` | Background video-channel/video-meta map flush debounce. | Batches storage writes after learned identity/meta updates; timers clear before flush. |
 
 Current semantic status after this addendum:
@@ -4133,8 +4133,8 @@ flowchart TD
 | Empty desktop blocklist | `docs/audit/FILTERTUBE_EMPTY_INSTALL_IDLE_OBSERVER_BUDGET_CURRENT_BEHAVIOR_2026-05-26.md:81-145` | Focused proof now covers no startup body observer, no pointermove listener, no dropdown scan, lazy collaborator dialog, DOM/prefetch gates, and seed pass-through. | Still not a live Chrome trace and not proof for active-rule or non-desktop surfaces. |
 | Active desktop blocklist | `js/content/block_channel.js:353-365`, `js/content/block_channel.js:1979-2028` | Once quick-block is enabled or hosts are tracked, page listeners can refresh runtime state and schedule hover/viewport work. | Needs per-action listener, hover, fallback hide, post-action DOM rerun, and teardown budget. |
 | Mobile/coarse YouTube | `js/content/block_channel.js:1291-1293`, `js/content_bridge.js:6525-6538`, `js/content_bridge.js:7146-7255` | Mobile/coarse surfaces intentionally keep eager quick-block and fallback-menu discovery paths so touch users can still create rules. | Needs device/surface-specific scan, warmup, body-observer, and no-rule budget. |
-| Whitelist mode | `js/content_bridge.js:1006-1015`, `js/content_bridge.js:1210-1270`, `js/content_bridge.js:1286-1301` | Whitelist wakes identity prefetch and right-rail observer gates when relevant rails are available. | Needs watch/right-rail JSON-vs-DOM owner, identity-pending, forced-reprocess, false-hide, and leak fixtures. |
-| DOM fallback active work | `js/content_bridge.js:6408-6505` | The fallback mutation observer disconnects when no DOM fallback work is active, but reconnects when active rule work exists. | Needs route, rule-family, whitelist, native-overlay, and teardown proof for each active fallback owner. |
+| Whitelist mode | `js/content_bridge.js:1013-1022`, `js/content_bridge.js:1219-1279`, `js/content_bridge.js:1293-1307` | Whitelist wakes identity prefetch and right-rail observer gates when relevant rails are available. | Needs watch/right-rail JSON-vs-DOM owner, identity-pending, forced-reprocess, false-hide, and leak fixtures. |
+| DOM fallback active work | `js/content_bridge.js:6420-6516` | The fallback mutation observer disconnects when no DOM fallback work is active, but reconnects when active rule work exists. | Needs route, rule-family, whitelist, native-overlay, and teardown proof for each active fallback owner. |
 | Collaborator dialog | `js/content/collab_dialog.js:29-31`, `js/content/collab_dialog.js:370-378` | Dialog capture listeners and observer are now pending-card gated. | Needs active collaborator-card lifecycle budget, installed-runtime provenance, and false-collab negative fixtures across renderer families. |
 | Seed JSON idle transport | `js/seed.js:97-134`, `js/seed.js:684-698` | No active JSON work can pass through before response hooks and avoid replay. | Needs live endpoint timing, startup settings-not-loaded, and active-rule parse/mutation budget proof. |
 
@@ -4251,8 +4251,8 @@ flowchart TD
 
 | Budget slice | Source pins | Current watch/YTM/Kids behavior | Remaining risk |
 | --- | --- | --- | --- |
-| Watch playlist prefetch hook | `js/content_bridge.js:1165-1208` | When identity prefetch work is active, the watch playlist panel installs a scroll listener, panel MutationObserver, navigate-finish reattach path, and scan scheduling. | No shared route/surface owner decides whether JSON identity, DOM prefetch, and playlist guard work are all needed. |
-| Whitelist right-rail observer | `js/content_bridge.js:1210-1270` | The right-rail whitelist refresh observer attaches to available related/secondary rails and schedules immediate plus follow-up refresh passes. | Watch whitelist ownership is still split between JSON decisions, DOM fallback selected-row handling, and pending identity paths. |
+| Watch playlist prefetch hook | `js/content_bridge.js:1174-1217` | When identity prefetch work is active, the watch playlist panel installs a scroll listener, panel MutationObserver, navigate-finish reattach path, and scan scheduling. | No shared route/surface owner decides whether JSON identity, DOM prefetch, and playlist guard work are all needed. |
+| Whitelist right-rail observer | `js/content_bridge.js:1219-1279` | The right-rail whitelist refresh observer attaches to available related/secondary rails and schedules immediate plus follow-up refresh passes. | Watch whitelist ownership is still split between JSON decisions, DOM fallback selected-row handling, and pending identity paths. |
 | DOM playlist click/autoplay guards | `js/content/dom_fallback.js:2337-2440` | DOM fallback installs page-lifetime click and `ended` listeners that can pause/click through hidden playlist rows outside whitelist mode. | Player side effects need route, selected-row, media-state, and teardown proof before optimization. |
 | YTM/watch/Kids quick-block selectors | `js/content/block_channel.js:1089-1133`, `js/content/block_channel.js:1979-2028` | Quick-block admits watch-card, playlist-panel, YTM, and Kids renderer families once quick-block setup is active. | Selector admission is broader than a per-route decision report and still lacks per-surface false-control proof. |
 | YTM fallback menu host and scan lifecycle | `js/content_bridge.js:6601-6609`, `js/content_bridge.js:6657-6716`, `js/content_bridge.js:6945-7149` | Fallback menus can target YTM menu hosts, YTM playlist/compact/Shorts rows, visible scans, mutation observation, navigation, scroll, and warmup paths. | Fallback menu does not share one action gate with primary menu or one YTM route budget. |
@@ -4305,17 +4305,17 @@ flowchart TD
 | `hot_lifecycle_native_menu_setup_owner` | `js/content/block_channel.js:2318-2589` | Native menu setup installs capture click, keydown arming, outside pointer, and dropdown repair/discovery paths. | Non-Kids YouTube menu runtime with block-menu availability and whitelist cleanup gates. | Native dropdown/comment menu behavior still needs route, reusable-node, and outside-click fixture authority. |
 | `hot_lifecycle_dropdown_discovery_owner` | `js/content/block_channel.js:2529-2580` | Dropdown discovery body `MutationObserver` is bounded by a 2500 ms stop timer. | Menu button click/keyboard activation that can reveal a native dropdown. | Bounded discovery is proven locally, but shared dropdown lifecycle and route teardown authority are absent. |
 | `hot_lifecycle_dropdown_visibility_owner` | `js/content/block_channel.js:2388-2426` | Per-dropdown attribute observer tracks hidden/style/aria state to clean injected menu entries. | Candidate dropdown with injected FilterTube rows. | Visibility cleanup depends on YouTube reusable dropdown nodes and lacks one shell-variant restore report. |
-| `hot_lifecycle_identity_prefetch_owner` | `js/content_bridge.js:1086-1160` | Identity prefetch schedules requestAnimationFrame work, starts an `IntersectionObserver`, and listens for visibility changes. | `needsIdentityPrefetchWork(settings)`. | Identity prefetch route/device budget and no-rule metric artifacts are incomplete. |
-| `hot_lifecycle_playlist_prefetch_hook_owner` | `js/content_bridge.js:1165-1208` | Watch playlist panel hook installs scroll listener, panel `MutationObserver`, and navigation reattach work. | Active identity prefetch work on watch playlist surfaces. | Watch playlist identity, DOM fallback, and player guard ownership remain split. |
-| `hot_lifecycle_whitelist_right_rail_owner` | `js/content_bridge.js:1210-1270` | Whitelist right-rail observer schedules immediate/follow-up rail refresh and navigation reattach work. | Whitelist list mode with available related/secondary rail targets. | Watch/right-rail whitelist authority and JSON-vs-DOM owner proof remain incomplete. |
-| `hot_lifecycle_dom_fallback_observer_owner` | `js/content_bridge.js:6408-6505` | DOM fallback mutation observer connects or disconnects based on active fallback work. | `hasActiveDOMFallbackWork(currentSettings)`. | It is locally gated, but no shared lifecycle registry proves route/surface teardown or side-effect budget. |
-| `hot_lifecycle_fallback_menu_owner` | `js/content_bridge.js:6525-7255` | Fallback menu scan lifecycle installs visible-card scans, body observation, pointer/focus/click/scroll/navigation listeners, and warmup interval. | Mobile/coarse eager scan or user-near fallback-card surfaces, plus native-overlay quiet mode. | Fallback menu action gate, quick-block gate, native menu gate, and route budget are still separate owners. |
-| `hot_lifecycle_video_meta_rerun_owner` | `js/content_bridge.js:1705-1718` | Learned video metadata schedules a debounced DOM rerun. | Video metadata update that can affect already-rendered cards. | Revision/max-rerun budget and JSON/DOM parity proof are incomplete. |
+| `hot_lifecycle_identity_prefetch_owner` | `js/content_bridge.js:1095-1160` | Identity prefetch schedules requestAnimationFrame work, starts an `IntersectionObserver`, and listens for visibility changes. | `needsIdentityPrefetchWork(settings)`. | Identity prefetch route/device budget and no-rule metric artifacts are incomplete. |
+| `hot_lifecycle_playlist_prefetch_hook_owner` | `js/content_bridge.js:1174-1217` | Watch playlist panel hook installs scroll listener, panel `MutationObserver`, and navigation reattach work. | Active identity prefetch work on watch playlist surfaces. | Watch playlist identity, DOM fallback, and player guard ownership remain split. |
+| `hot_lifecycle_whitelist_right_rail_owner` | `js/content_bridge.js:1219-1279` | Whitelist right-rail observer schedules immediate/follow-up rail refresh and navigation reattach work. | Whitelist list mode with available related/secondary rail targets. | Watch/right-rail whitelist authority and JSON-vs-DOM owner proof remain incomplete. |
+| `hot_lifecycle_dom_fallback_observer_owner` | `js/content_bridge.js:6420-6516` | DOM fallback mutation observer connects or disconnects based on active fallback work. | `hasActiveDOMFallbackWork(currentSettings)`. | It is locally gated, but no shared lifecycle registry proves route/surface teardown or side-effect budget. |
+| `hot_lifecycle_fallback_menu_owner` | `js/content_bridge.js:6538-7268` | Fallback menu scan lifecycle installs visible-card scans, body observation, pointer/focus/click/scroll/navigation listeners, and warmup interval. | Mobile/coarse eager scan or user-near fallback-card surfaces, plus native-overlay quiet mode. | Fallback menu action gate, quick-block gate, native menu gate, and route budget are still separate owners. |
+| `hot_lifecycle_video_meta_rerun_owner` | `js/content_bridge.js:1714-1727` | Learned video metadata schedules a debounced DOM rerun. | Video metadata update that can affect already-rendered cards. | Revision/max-rerun budget and JSON/DOM parity proof are incomplete. |
 | `hot_lifecycle_dom_fallback_pending_rerun_owner` | `js/content/dom_fallback.js:2219-2240`, `js/content/dom_fallback.js:4722` | DOM fallback serializes overlapping runs and schedules zero-delay pending reruns. | Existing DOM fallback run in progress with newer settings/options pending. | Settings revision, route cancellation, and maximum rerun budget are not first-class. |
 | `hot_lifecycle_dom_pending_meta_owner` | `js/content/dom_fallback.js:3911-3940` | Pending category/upload-date metadata schedules delayed rechecks for unresolved cards. | Pending metadata requirement on a candidate DOM card. | Metadata fetch/recheck side effects lack route/list-mode/negative fixture authority. |
 | `hot_lifecycle_seed_replay_transport_owner` | `js/seed.js:97-134` | Seed transport queues and replays network/page JSON snapshots through a replay timer. | Seed settings and active JSON work admission. | Page-global patch teardown, active-rule parse budget, and no-work metric artifacts remain incomplete. |
 | `hot_lifecycle_injector_startup_owner` | `js/injector.js:3560-3585` | Injector polls for engine readiness with an interval and clears it on readiness or timeout. | Page-world injector startup and engine availability. | Startup duplicate/load authority and first settings handoff proof remain incomplete. |
-| `hot_lifecycle_bridge_settings_refresh_debounce_owner` | `js/content/bridge_settings.js:575-600` | Storage refresh debounce coalesces settings changes while preserving forced reprocess. | Relevant storage keys changed in `local` area. | Refresh budget, revision authority, and sender/apply-settings parity remain incomplete. |
+| `hot_lifecycle_bridge_settings_refresh_debounce_owner` | `js/content/bridge_settings.js:751-842` | Storage refresh debounce coalesces settings changes while preserving forced reprocess. | Relevant storage keys changed in `local` area. | Refresh budget, revision authority, and sender/apply-settings parity remain incomplete. |
 
 Current hot lifecycle owner status:
 
@@ -4347,12 +4347,12 @@ Source inputs:
 - `tests/runtime/lifecycle-instance-register-current-behavior.test.mjs`
 
 ```text
-527 tracked lifecycle primitive instances
+535 tracked lifecycle primitive instances
         |
-        +--> 472 install-or-schedule rows
+        +--> 476 install-or-schedule rows
         |       +--> listeners, observers, timers, intervals, frames
         |
-        +--> 55 explicit teardown rows
+        +--> 59 explicit teardown rows
         |       +--> remove, clear, cancel primitives
         |
         +--> local owner gates and partial disconnects
@@ -4367,8 +4367,8 @@ missing shared lifecycle effect/teardown authority
 
 ```mermaid
 flowchart TD
-  A["527 tracked lifecycle primitive instances"] --> B["472 install-or-schedule rows"]
-  A --> C["55 explicit teardown rows"]
+  A["535 tracked lifecycle primitive instances"] --> B["476 install-or-schedule rows"]
+  A --> C["59 explicit teardown rows"]
   B --> D["Listeners, observers, timers, intervals, frames"]
   C --> E["Remove, clear, cancel primitives"]
   D --> F["Local owner gates and partial disconnects"]
@@ -4381,7 +4381,7 @@ flowchart TD
 
 | Row id | Joined proof surface | Current source-backed state | Why implementation remains NO-GO |
 | --- | --- | --- | --- |
-| `lifecycle_convergence_primitive_census` | Repo-wide primitive census | 527 lifecycle primitive instances are tracked: 472 install-or-schedule rows and 55 explicit teardown rows. | A count proves breadth, not owner, trigger, side-effect, route, or teardown safety. |
+| `lifecycle_convergence_primitive_census` | Repo-wide primitive census | 535 lifecycle primitive instances are tracked: 476 install-or-schedule rows and 59 explicit teardown rows. | A count proves breadth, not owner, trigger, side-effect, route, or teardown safety. |
 | `lifecycle_convergence_listener_surface` | Listener installs, targets, callbacks, and add/remove parity | 294 `addEventListener` rows, 13 `removeEventListener` rows, a 281 install-minus-remove delta, 51 page-global listener installs without explicit remove, and 42 content-runtime document/window listener rows are pinned. | Listener cleanup can change native menu timing, route work, page-message trust, quick-block affordances, and UI mutation behavior. |
 | `lifecycle_convergence_observer_surface` | Observer constructors, observe targets/options, disconnects, and observe/release parity | 20 observer constructor rows, 21 observe activation rows, 15 release rows, 14 disconnect rows, and a 6 observe-minus-release delta are pinned. | Observer cleanup remains split across dropdowns, quick-block, fallback menu, prefetch, DOM fallback, collaborator dialog, and website component owners. |
 | `lifecycle_convergence_timer_frame_surface` | Timer, interval, and animation-frame schedules | 124 lexical `setTimeout` rows, 3 `setInterval` rows, 31 `requestAnimationFrame` rows, 33 YouTube SPA immediate/short hot timer rows, 29 desktop residual rows, and 4 mobile/coarse eager rows are pinned. | Delay or cancellation changes require per-owner no-work, max-rerun, stale-route, and side-effect evidence. |
@@ -4397,7 +4397,7 @@ Current lifecycle convergence status:
 ```text
 runtime lifecycle convergence rows: 10
 implementation-ready runtime lifecycle convergence rows: 0
-tracked lifecycle primitive instances: 527
+tracked lifecycle primitive instances: 535
 install-or-schedule lifecycle rows: 472
 explicit teardown lifecycle rows: 55
 hot YouTube SPA lifecycle owner rows: 16
@@ -4461,9 +4461,9 @@ runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5720
+method semantic proof gap lexical callables covered: 5736
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5720
+lexical callables requiring semantic proof before behavior changes: 5736
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
