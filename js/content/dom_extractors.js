@@ -59,6 +59,41 @@ const VIDEO_CARD_SELECTORS = [
     'ytk-kids-slim-owner-renderer'
 ].join(', ');
 
+const FILTERTUBE_VIDEO_VIEW_COUNT_TAIL_PATTERN = String.raw`\b(?:no\s+views?|[\d,.]+(?:\s*(?:K|M|B|thousand|million|billion|lakh|lakhs|crore|crores))?\s+views?)\b`;
+const FILTERTUBE_VIDEO_AGE_TAIL_PATTERN = String.raw`\b\d+\s*(?:seconds?|secs?|minutes?|mins?|hours?|hrs?|days?|weeks?|months?|years?|sec|min|hr|s|m|h|d|w|mo|y)(?:\s+ago)?\b`;
+const FILTERTUBE_TITLE_BYLINE_METADATA_TAIL_REGEX = new RegExp(
+    String.raw`\s+by\s+.+?\s+${FILTERTUBE_VIDEO_VIEW_COUNT_TAIL_PATTERN}\s+${FILTERTUBE_VIDEO_AGE_TAIL_PATTERN}(?:\s+.*)?$`,
+    'i'
+);
+const FILTERTUBE_TITLE_METADATA_TAIL_REGEX = new RegExp(
+    String.raw`\s+${FILTERTUBE_VIDEO_VIEW_COUNT_TAIL_PATTERN}\s+(?:[\u2022|,-]\s*)?${FILTERTUBE_VIDEO_AGE_TAIL_PATTERN}(?:\s+.*)?$`,
+    'i'
+);
+
+function escapeFilterTubeRegexLiteral(value) {
+    return String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function cleanVideoTitleText(rawTitle, channelName = '') {
+    const value = String(rawTitle || '').replace(/\s+/g, ' ').trim();
+    if (!value) return '';
+
+    const channel = String(channelName || '').replace(/\s+/g, ' ').trim();
+    if (channel) {
+        const channelTailRegex = new RegExp(
+            String.raw`\s+by\s+${escapeFilterTubeRegexLiteral(channel)}\s+${FILTERTUBE_VIDEO_VIEW_COUNT_TAIL_PATTERN}\s+${FILTERTUBE_VIDEO_AGE_TAIL_PATTERN}(?:\s+.*)?$`,
+            'i'
+        );
+        const cleanedWithChannel = value.replace(channelTailRegex, '').trim();
+        if (cleanedWithChannel !== value && cleanedWithChannel) return cleanedWithChannel;
+    }
+
+    return value
+        .replace(FILTERTUBE_TITLE_BYLINE_METADATA_TAIL_REGEX, '')
+        .replace(FILTERTUBE_TITLE_METADATA_TAIL_REGEX, '')
+        .trim() || value;
+}
+
 function ensureVideoIdForCard(card) {
     if (!card || typeof card.getAttribute !== 'function') return '';
     const cachedVideoId = card.getAttribute('data-filtertube-video-id') || '';
@@ -212,15 +247,15 @@ function getCardTitle(card) {
     if (!card || typeof card.querySelector !== 'function') return '';
     const titleElement = card.querySelector('#video-title, .yt-lockup-metadata-view-model__title, .yt-lockup-metadata-view-model__heading-reset, h3 a, yt-formatted-string#title, span#title');
     if (titleElement?.textContent?.trim()) {
-        return titleElement.textContent.trim();
+        return cleanVideoTitleText(titleElement.textContent);
     }
     const ariaLabel = card.getAttribute?.('aria-label');
-    if (ariaLabel) return ariaLabel.trim();
+    if (ariaLabel) return cleanVideoTitleText(ariaLabel);
     const labelledById = card.getAttribute?.('aria-labelledby');
     if (labelledById) {
         const labelSource = document.getElementById(labelledById.trim());
         if (labelSource?.textContent) {
-            return labelSource.textContent.trim();
+            return cleanVideoTitleText(labelSource.textContent);
         }
     }
     return '';

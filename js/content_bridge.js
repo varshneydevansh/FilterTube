@@ -730,7 +730,6 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
     if (channelInfo.isCollaboration && channelInfo.allCollaborators && channelInfo.allCollaborators.length >= 2) {
         const collaborators = channelInfo.allCollaborators;
         const collaboratorCount = Math.min(collaborators.length, 6);
-        const isMultiStep = collaboratorCount >= 3;
         const groupId = generateCollaborationGroupId();
         const hasIdentifier = (c) => Boolean(c?.handle || c?.id || c?.customUrl);
         const anyMissingIdentifiers = collaborators.some(c => !hasIdentifier(c));
@@ -744,26 +743,23 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
 
                 injectIntoNewMenu(containers.newMenuList, collaborator, videoCard, {
                     collaborationWith: otherChannels,
-                    collaborationGroupId: groupId,
-                    isMultiStep
+                    collaborationGroupId: groupId
                 }, {
                     disabled: !hasIdentifier(collaborator),
                     displayName: hasIdentifier(collaborator) ? collaborator.name : `${collaborator.name || 'Channel'} (resolving…)`
                 });
             }
 
-            const blockAllMenuItem = injectIntoNewMenu(containers.newMenuList, {
+            injectIntoNewMenu(containers.newMenuList, {
                 name: collaboratorCount === 2 ? 'Both Channels' : `All ${collaboratorCount} Collaborators`,
                 isBlockAllOption: true,
                 allCollaborators: collaborators.slice(0, collaboratorCount),
-                collaborationGroupId: groupId,
-                isMultiStep
+                collaborationGroupId: groupId
             }, videoCard, null, {
                 disabled: anyMissingIdentifiers,
                 displayName: anyMissingIdentifiers ? 'All Collaborators (resolving…)'
                     : (collaboratorCount === 2 ? 'Both Channels' : `All ${collaboratorCount} Collaborators`)
             });
-            setupMultiStepMenu(dropdown, groupId, collaborators.slice(0, collaboratorCount), blockAllMenuItem);
         } else if (containers.oldMenuList) {
             for (let i = 0; i < collaboratorCount; i++) {
                 const collaborator = collaborators[i];
@@ -773,26 +769,23 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
 
                 injectIntoOldMenu(containers.oldMenuList, collaborator, videoCard, {
                     collaborationWith: otherChannels,
-                    collaborationGroupId: groupId,
-                    isMultiStep
+                    collaborationGroupId: groupId
                 }, {
                     disabled: !hasIdentifier(collaborator),
                     displayName: hasIdentifier(collaborator) ? collaborator.name : `${collaborator.name || 'Channel'} (resolving…)`
                 });
             }
 
-            const blockAllMenuItem = injectIntoOldMenu(containers.oldMenuList, {
+            injectIntoOldMenu(containers.oldMenuList, {
                 name: collaboratorCount === 2 ? 'Both Channels' : `All ${collaboratorCount} Collaborators`,
                 isBlockAllOption: true,
                 allCollaborators: collaborators.slice(0, collaboratorCount),
-                collaborationGroupId: groupId,
-                isMultiStep
+                collaborationGroupId: groupId
             }, videoCard, null, {
                 disabled: anyMissingIdentifiers,
                 displayName: anyMissingIdentifiers ? 'All Collaborators (resolving…)'
                     : (collaboratorCount === 2 ? 'Both Channels' : `All ${collaboratorCount} Collaborators`)
             });
-            setupMultiStepMenu(dropdown, groupId, collaborators.slice(0, collaboratorCount), blockAllMenuItem);
         }
         forceDropdownResize(dropdown);
         return;
@@ -7712,6 +7705,23 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
             const groupId = baseInfo.collaborationGroupId || generateCollaborationGroupId();
             const anyMissingIdentifiers = collaborators.some(collaborator => !hasIdentifier(collaborator));
 
+            const blockAllInfo = {
+                name: collaborators.length === 2 ? 'Both Channels' : `All ${collaborators.length} Collaborators`,
+                isBlockAllOption: true,
+                allCollaborators: collaborators,
+                collaborationGroupId: groupId,
+                videoId: fallbackVideoId
+            };
+            bindFallbackRow(
+                createFallbackMenuRow(blockAllInfo, {
+                    disabled: anyMissingIdentifiers,
+                    displayName: anyMissingIdentifiers
+                        ? 'All Collaborators (resolving...)'
+                        : (collaborators.length === 2 ? 'Both Channels' : `All ${collaborators.length} Collaborators`)
+                }),
+                blockAllInfo
+            );
+
             collaborators.forEach((collaborator, index) => {
                 const otherChannels = collaborators
                     .filter((_, idx) => idx !== index)
@@ -7733,23 +7743,6 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
                     channelInfo
                 );
             });
-
-            const blockAllInfo = {
-                name: collaborators.length === 2 ? 'Both Channels' : `All ${collaborators.length} Collaborators`,
-                isBlockAllOption: true,
-                allCollaborators: collaborators,
-                collaborationGroupId: groupId,
-                videoId: fallbackVideoId
-            };
-            bindFallbackRow(
-                createFallbackMenuRow(blockAllInfo, {
-                    disabled: anyMissingIdentifiers,
-                    displayName: anyMissingIdentifiers
-                        ? 'All Collaborators (resolving...)'
-                        : (collaborators.length === 2 ? 'Both Channels' : `All ${collaborators.length} Collaborators`)
-                }),
-                blockAllInfo
-            );
         } else {
             const visiblePlaylistName = getExpectedName();
             const singleInfo = {

@@ -2937,6 +2937,9 @@ async function applyDOMFallback(settings, options = {}) {
                 ) || extractPlaylistPanelBylineChannelName(channelPrimaryText);
                 channel = compact;
             }
+            if (typeof cleanVideoTitleText === 'function') {
+                title = cleanVideoTitleText(title, channel);
+            }
 
             let descriptionText = '';
             try {
