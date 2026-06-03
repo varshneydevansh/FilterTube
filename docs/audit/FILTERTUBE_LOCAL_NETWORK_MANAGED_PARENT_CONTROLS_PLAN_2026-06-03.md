@@ -204,12 +204,15 @@ revision and action-history entry.
 ### Task 2.2: Define action-history data model
 
 - **Location**:
-  `docs/audit/FILTERTUBE_MANAGED_POLICY_ACTION_HISTORY_MODEL_2026-06-03.md`
+  - `docs/audit/FILTERTUBE_MANAGED_POLICY_ACTION_HISTORY_MODEL_2026-06-03.md`
+  - `tests/runtime/managed-policy-action-history-model-current-behavior.test.mjs`
 - **Description**: Specify local-only action history rows for rule changes,
   viewing-space changes, time-limit changes, trust-link changes, and rejected
   remote policy attempts.
 - **Complexity**: 4/10
 - **Dependencies**: Task 2.1.
+- **Status**: Action-history model and access-control fixture added. Product
+  runtime behavior remains unchanged.
 - **Acceptance Criteria**:
   - Rows include actor profile, actor device, target profile, action type,
     policy revision, timestamp, result, and redacted summary.
@@ -219,7 +222,8 @@ revision and action-history entry.
   - Retention, redaction, local encryption, and clock-skew ordering are
     specified.
 - **Validation**:
-  - `git diff --check`
+  - `node --test tests/runtime/managed-policy-action-history-model-current-behavior.test.mjs`
+  - `npm run test:settings`
 
 ### Task 2.3: Add local policy revision write path
 
