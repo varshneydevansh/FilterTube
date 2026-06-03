@@ -39,7 +39,7 @@ dashboard display all have local rules.
 | --- | ---: | ---: | --- |
 | `js/content/dom_helpers.js` | 206 | 8,292 | `a8c6ebfc10394f67254fbe5d324090ba9d01bead7efbb61d44e63dda4b52c242` |
 | `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
-| `js/background.js` | 6343 | 286370 | `ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36` |
+| `js/background.js` | 6641 | 298986 | `837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd` |
 | `js/settings_shared.js` | 1,181 | 57,535 | `9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c` |
 | `js/state_manager.js` | 2,491 | 99,780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
 | `js/tab-view.js` | 11,617 | 526,763 | `1b7f621d48d16247aecc4c7ee57cbc3db9efd3e597e6f0a4fc188228470648f7` |
@@ -146,9 +146,9 @@ support runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

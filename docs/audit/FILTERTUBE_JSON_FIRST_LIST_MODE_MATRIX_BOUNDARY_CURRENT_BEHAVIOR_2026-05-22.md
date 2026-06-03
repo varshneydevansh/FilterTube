@@ -163,7 +163,7 @@ flowchart TD
 | Injector JSON no-work predicate | `js/injector.js:171-188` | MAIN-world injector shares the same whitelist-active and no-rule blocklist predicate as the seed path. | Drift proof tying both predicates to one named runtime authority. |
 | JSON decision engine | `js/filter_logic.js:1846-2036`, `js/filter_logic.js:2038-2108` | Exact `listMode === 'whitelist'` enters fail-closed non-comment allow logic; blocklist channel/keyword/comment checks run after that branch. | Simultaneous allow/block conflict policy, disabled harvest policy, and comment-specific mode authority. |
 | DOM fallback list-mode gate | `js/content/dom_fallback.js:1933-2088`, `js/content/dom_fallback.js:4547-4746` | DOM fallback treats whitelist as active work, clears stale hides when blocklist has no work, fail-closes whitelist non-comment cards, and then applies blocklist keyword/channel checks. | Per-surface selector proof and negative sibling-visible proof for each fallback card family. |
-| Bridge refresh and delivery | `js/content/bridge_settings.js:353-517`, `js/content/bridge_settings.js:557-646` | Runtime refresh requests forced compiled settings, delivers them to MAIN world/seed, and preserves `forceReprocess` across coalesced storage refreshes. | Revisioned dirty-key report that explains which consumers need JSON, DOM, menu, quick, or prefetch work. |
+| Bridge refresh and delivery | `js/content/bridge_settings.js:806-978`, `js/content/bridge_settings.js:1018-1108` | Runtime refresh requests forced compiled settings, delivers them to MAIN world/seed, applies managed route/time gates, and preserves `forceReprocess` across coalesced storage refreshes. | Revisioned dirty-key report that explains which consumers need JSON, DOM, menu, quick, prefetch, or managed-policy work. |
 | Whitelist pending and quick-block gates | `js/content_bridge.js:6014-6037`, `js/content/block_channel.js:1205-1222` | Whitelist pending hide rejects non-whitelist and excluded routes before selector collection; quick-block is blocklist-only and enabled only by user setting. | Unified mode/action matrix proving passive hide work and explicit add-rule work cannot cross modes. |
 
 Current behavior invariant:
@@ -213,9 +213,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

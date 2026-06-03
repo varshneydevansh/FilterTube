@@ -51,6 +51,7 @@ Current branch inventory:
 | `FilterTube_FirstRunComplete` | Any extension sender with runtime access | Writes first-run state | `trustedUi` |
 | `FilterTube_OpenWhatsNew` | Any extension sender with runtime access | Opens a tab using caller URL fallback | `trustedUi` plus allowlisted URL |
 | `FilterTube_SubscriptionsImportProgress` | Any extension sender with runtime access | Logs import progress | `allowedYoutubeContentScript` with pending import request |
+| `FilterTube_ManagedTimeLimitHeartbeat` | Any extension sender with runtime access | Records managed profile time usage heartbeat and returns remaining budget or timeout state | `allowedYoutubeContentScript` with active profile, tab, route, and surface proof |
 | `getCompiledSettings` | Any extension sender with runtime access | Compiles/caches settings for inferred/requested profile | `allowedYoutubeContentScript` |
 | `FilterTube_SessionPinAuth` | Guarded by `isTrustedUiSender(sender)` | Verifies and caches session PIN | `trustedUi` |
 | `FilterTube_ClearSessionPin` | Guarded by `isTrustedUiSender(sender)` | Clears cached session PIN | `trustedUi` |
@@ -196,9 +197,9 @@ runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

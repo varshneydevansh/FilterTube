@@ -142,6 +142,7 @@ function classifySourceFamily(file) {
     'js/content/block_channel.js',
     'js/content/dom_extractors.js',
     'js/content/collab_dialog.js',
+    'js/content/bridge_settings.js',
     'js/injector.js',
     'js/content/dom_helpers.js',
     'js/content/dom_state.js'
@@ -290,21 +291,21 @@ test('DOM selector instance register enumerates current API sites and literal dy
   const dynamicRows = rows.filter(row => !row.isStaticLiteral);
   const uniqueStatic = new Set(staticRows.map(row => row.selector));
 
-  assert.equal(rows.length, 651);
-  assert.equal(staticRows.length, 580);
+  assert.equal(rows.length, 652);
+  assert.equal(staticRows.length, 581);
   assert.equal(dynamicRows.length, 71);
-  assert.equal(uniqueStatic.size, 375);
+  assert.equal(uniqueStatic.size, 376);
   assert.deepEqual(countBy(rows, 'api'), {
     closest: 96,
     matches: 6,
     querySelector: 399,
-    querySelectorAll: 150
+    querySelectorAll: 151
   });
   assert.deepEqual(countBy(staticRows, 'api'), {
     closest: 93,
     matches: 5,
     querySelector: 375,
-    querySelectorAll: 107
+    querySelectorAll: 108
   });
 });
 
@@ -330,14 +331,14 @@ test('selector source-family totals match the current register doc', () => {
   assert.deepEqual(countStaticDynamic(rows, 'sourceFamily'), {
     'extension-ui': { sites: 90, static: 90, dynamic: 0, unique: 42 },
     'legacy-layout': { sites: 63, static: 63, dynamic: 0, unique: 52 },
-    'page-runtime': { sites: 498, static: 427, dynamic: 71, unique: 287 }
+    'page-runtime': { sites: 499, static: 428, dynamic: 71, unique: 288 }
   });
 
   for (const phrase of [
-    '| `page-runtime` | 498 | 427 | 71 | 287 |',
+    '| `page-runtime` | 499 | 428 | 71 | 288 |',
     '| `extension-ui` | 90 | 90 | 0 | 42 |',
     '| `legacy-layout` | 63 | 63 | 0 | 52 |',
-    '| **Total** | **651** | **580** | **71** |'
+    '| **Total** | **652** | **581** | **71** |'
   ]) {
     assert.ok(doc.includes(phrase), `missing doc phrase ${phrase}`);
   }
@@ -351,6 +352,7 @@ test('selector hot-file totals match the source-derived register', () => {
     Object.fromEntries(Object.entries(byFile).filter(([, value]) => value.sites > 0)),
     {
       'js/content/block_channel.js': { sites: 39, static: 28, dynamic: 11, unique: 21 },
+      'js/content/bridge_settings.js': { sites: 1, static: 1, dynamic: 0, unique: 1 },
       'js/content/collab_dialog.js': { sites: 11, static: 10, dynamic: 1, unique: 10 },
       'js/content/dom_extractors.js': { sites: 27, static: 23, dynamic: 4, unique: 21 },
       'js/content/dom_fallback.js': { sites: 163, static: 151, dynamic: 12, unique: 119 },

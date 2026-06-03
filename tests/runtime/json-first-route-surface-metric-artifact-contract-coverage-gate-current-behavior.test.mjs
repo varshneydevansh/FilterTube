@@ -252,9 +252,9 @@ test('JSON-first route/surface metric artifact contract coverage gate is audit-o
   assert.match(doc, /Route\/surface-specific per-file metric artifact contract docs covered: 5/);
   assert.match(doc, /Committed route\/surface metric artifact files: 0/);
   assert.match(doc, /Method semantic proof gap files covered: 69/);
-  assert.match(doc, /Method semantic proof gap lexical callables covered: 5744/);
+  assert.match(doc, /Method semantic proof gap lexical callables covered: 5789/);
   assert.match(doc, /Files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /Lexical callables requiring semantic proof before behavior changes: 5744/);
+  assert.match(doc, /Lexical callables requiring semantic proof before behavior changes: 5789/);
   assert.match(doc, /Runtime route\/surface metric artifact approval exists: no/);
   assert.match(doc, /Runtime metric collector approval exists: no/);
   assert.match(doc, /Implementation-ready route\/surface metric artifact contract coverage rows: 0/);
@@ -284,9 +284,9 @@ test('JSON-first route/surface metric artifact contract coverage rows counts and
   assert.match(doc, /route\/surface-specific per-file metric artifact contract docs covered: 5/);
   assert.match(doc, /route\/surface-specific per-file metric artifact contract tests covered: 5/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5744/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5789/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5744/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5789/);
   assert.match(doc, /route\/surface-specific per-file contracts now\s+exist/);
   assert.match(doc, /Contract coverage is still not artifact\s+approval/);
   assert.equal(doc.includes('before route/surface-specific per-file contracts exist'), false);
@@ -390,7 +390,7 @@ test('JSON-first route/surface metric artifact contract coverage is backed by cu
   assert.match(collectorFixture, /runtime collector fixture packets approved: 0/);
   assert.match(commitReadiness, /method semantic proof gap files covered: 69/);
   assert.match(methodGap, /files with lexical accounting: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5744/);
+  assert.match(methodGap, /repo-wide lexical callables: 5789/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(implementationReadiness, /implementation-ready first optimization rows: 0/);
   assert.match(stopGo, /Stop-now JSON-first optimization decision: NO-GO/);

@@ -9,9 +9,9 @@ const docPath = 'docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_
 
 const sourceFingerprints = {
   'build.js': [740, 26978, 'c8485cb2600aad89f44015cd7e49ebe4746ebcc35c91c1ff2bf29aec2f087a04'],
-  'js/background.js': [6343, 286370, 'ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36'],
+  'js/background.js': [6641, 298986, '837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd'],
   'js/content/block_channel.js': [3189, 127857, 'c040b57e0b107fd7b6fb0a18bc4ca014e5a22fbb82755f81e51a497eee387dba'],
-  'js/content/bridge_settings.js': [845, 34241, 'aea46dd241248db1d1d9bcbdfdf65320d1399ecd84cc7792678f29b1b26ee092'],
+  'js/content/bridge_settings.js': [1113, 44087, 'f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853'],
   'js/content/collab_dialog.js': [393, 14623, 'dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a'],
   'js/content/dom_extractors.js': [1137, 46896, 'adf2c04f14f0f3bb44556e216af25aca8ff182dfa569c248ddb150d0cca38a4e'],
   'js/content/dom_fallback.js': [5030, 235555, 'fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5'],
@@ -489,7 +489,7 @@ function assertProductionConsoleResidualHotPathPreflight(doc) {
 
   assert.equal(routineConsoleSites('js/background.js').length, 62);
   assert.equal(lineNumberForToken(read('js/background.js'), 'installFilterTubeBackgroundConsoleGate();'), 12);
-  assert.equal(routineConsoleSites('js/background.js')[0], 1770);
+  assert.equal(routineConsoleSites('js/background.js')[0], 2055);
 
   const isolatedGateFiles = new Set();
   for (const manifestFile of activeManifestFiles) {

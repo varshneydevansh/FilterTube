@@ -42,12 +42,12 @@ function assertSettingsRuntimeRefreshAuthoritySnapshot(doc) {
     '| Shared load and V4 migration | `js/settings_shared.js:564-738` |',
     '| Shared save and alias mirroring | `js/settings_shared.js:742-954` |',
     '| StateManager refresh request | `js/state_manager.js:1231-1258` |',
-    '| Background compiled cache | `js/background.js:1288`, `js/background.js:1774-1781`, `js/background.js:3244-3261` |',
-    '| Background apply-settings branch | `js/background.js:4395-4422` |',
-    '| Background storage invalidation | `js/background.js:4484-4523` |',
+    '| Background compiled cache | `js/background.js:1356`, `js/background.js:2059-2065`, `js/background.js:3570-3582` |',
+    '| Background apply-settings branch | `js/background.js:4716-4737` |',
+    '| Background storage invalidation | `js/background.js:4806-4841` |',
     '| Bridge runtime apply/refresh | `js/content/bridge_settings.js:198-315` |',
-    '| Bridge settings pull and main-world delivery | `js/content/bridge_settings.js:353-517` |',
-    '| Bridge storage coalescing | `js/content/bridge_settings.js:519-651` |'
+    '| Bridge settings pull and main-world delivery | `js/content/bridge_settings.js:806-978` |',
+    '| Bridge storage coalescing | `js/content/bridge_settings.js:1018-1108` |'
   ]) {
     assert.ok(doc.includes(row), `missing snapshot row ${row}`);
   }

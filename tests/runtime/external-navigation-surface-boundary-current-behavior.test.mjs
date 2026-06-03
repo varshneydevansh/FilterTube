@@ -27,7 +27,7 @@ const selectedFiles = [
 ];
 
 const expectedFingerprints = new Map([
-  ['js/background.js', [6343, 286370, 'ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36']],
+  ['js/background.js', [6641, 298986, '837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd']],
   ['js/popup.js', [1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a']],
   ['js/tab-view.js', [11617, 526763, '1b7f621d48d16247aecc4c7ee57cbc3db9efd3e597e6f0a4fc188228470648f7']],
   ['js/content/release_notes_prompt.js', [250, 9866, '30b624cbbda1004f354f98dbf3b4513f8ebc298adecbceb4358782f248f80474']],

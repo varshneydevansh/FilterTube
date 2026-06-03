@@ -29,17 +29,17 @@ family, source family, and owner class.
 
 | Primitive family | Current count | Why it matters |
 | --- | ---: | --- |
-| `addEventListener` | 294 | Listener install surface. |
-| `removeEventListener` | 13 | Explicit listener teardown surface. |
+| `addEventListener` | 299 | Listener install surface. |
+| `removeEventListener` | 18 | Explicit listener teardown surface. |
 | `MutationObserver` | 16 | DOM mutation observation surface. |
 | `IntersectionObserver` | 4 | Visibility/identity observation surface. |
-| `setInterval` | 3 | Repeating work surface. |
-| `clearInterval` | 4 | Repeating work teardown surface. |
+| `setInterval` | 4 | Repeating work surface. |
+| `clearInterval` | 5 | Repeating work teardown surface. |
 | `setTimeout` | 124 | Delayed/debounced/retry work surface. |
 | `clearTimeout` | 34 | Delayed work teardown surface. |
 | `requestAnimationFrame` | 31 | Paint-frame scheduling surface. |
 | `cancelAnimationFrame` | 4 | Paint-frame teardown surface. |
-| **Total lifecycle instances** | **535** | Observer/listener/timer/frame lifecycle surface. |
+| **Total lifecycle instances** | **539** | Observer/listener/timer/frame lifecycle surface. |
 
 This register intentionally does not include direct `fetch`, message,
 display/class, click, or dispatch side effects. Those remain covered by the
@@ -51,7 +51,7 @@ side-effect audits.
 | Source family | Lifecycle instances | Current interpretation |
 | --- | ---: | --- |
 | `extension-ui-background-js` | 273 | Dashboard, popup, background, StateManager, UI components, and import/export/Nanah lifecycle work. |
-| `content-runtime-js` | 227 | YouTube page-runtime work: seed, bridge, quick/menu, DOM fallback, injector, prompts, and helper listeners. |
+| `content-runtime-js` | 231 | YouTube page-runtime work: seed, bridge, quick/menu, DOM fallback, injector, prompts, managed time-limit heartbeat work, and helper listeners. |
 | `website-components` | 23 | Website client lifecycle, including theme/scene controls plus hero/footer decorative motion. |
 | `vendor-bundles` | 8 | Packaged vendor transport listeners, especially Nanah. |
 | `generated-ui-output` | 4 | Generated shell output; should be freshness-checked, not hand edited. |
@@ -73,45 +73,45 @@ side-effect audits.
 | `js/background.js` | 14 | Background timers, flushers, backup scheduling, and message/broadcast timing. |
 | `js/content/dom_fallback.js` | 14 | DOM fallback delayed passes, continuation nudges, playlist guard work, and synthetic playlist navigation timing. |
 | `js/injector.js` | 12 | Page-world message/import/readiness lifecycle. |
-| `js/content/bridge_settings.js` | 18 | Runtime settings bridge lifecycle. |
+| `js/content/bridge_settings.js` | 22 | Runtime settings bridge lifecycle, including managed time-limit revalidation and heartbeat teardown. |
 | `js/render_engine.js` | 9 | Dashboard/rendering UI event lifecycle. |
 
 ## Current Findings
 
 | Finding | Evidence | Risk |
 | --- | --- | --- |
-| Lifecycle installs greatly exceed explicit teardown. | 298 listener installs vs 17 listener removals; 124 timeouts vs 34 clears. | Cleanup or route changes cannot rely on teardown being already represented everywhere. |
-| UI/background lifecycle is larger than page runtime. | `extension-ui-background-js` has 273 lifecycle instances, while `content-runtime-js` has 227. | YouTube lag fixes still need settings/profile/import/Nanah lifecycle proof because UI can create stale state and broadcasts. |
+| Lifecycle installs greatly exceed explicit teardown. | 299 listener installs vs 18 listener removals; 124 timeouts vs 34 clears. | Cleanup or route changes cannot rely on teardown being already represented everywhere. |
+| UI/background lifecycle is larger than page runtime. | `extension-ui-background-js` has 273 lifecycle instances, while `content-runtime-js` has 231. | YouTube lag fixes still need settings/profile/import/Nanah lifecycle proof because UI can create stale state and broadcasts. |
 | Page runtime has several independent owners. | `js/content_bridge.js`, `js/content/block_channel.js`, `js/content/dom_fallback.js`, `js/injector.js`, prompts, and helpers all own lifecycle instances. | Empty-install, fullscreen, native overlay, and route changes can wake unrelated owners unless one lifecycle budget exists. |
 | Vendor and generated lifecycle instances are packaged but not product source. | `vendor-bundles` has 8; `generated-ui-output` has 4. | These need source/freshness/hash proof, not manual edits. |
 | No shared registry exists today. | Current tracked source still lacks `lifecycleRegistry`, `registerLifecycle`, `observerRegistry`, `timerRegistry`, `disposeAll`, or `teardownAll`. | A cleanup can remove one visible symptom while another owner keeps equivalent work alive. |
 
 ## Install/Teardown Imbalance Addendum - 2026-05-27
 
-This addendum classifies the 535 lifecycle instances by whether they install or
+This addendum classifies the 539 lifecycle instances by whether they install or
 schedule work versus explicitly tear down a primitive covered by this register.
 It is source-derived proof only; it does not approve lifecycle cleanup, route
 teardown, listener removal, observer disconnect changes, or timer rewrites.
 
 | Lifecycle role | Primitive families | Instances | Current interpretation |
 | --- | --- | ---: | --- |
-| `install-or-schedule` | `addEventListener`, `MutationObserver`, `IntersectionObserver`, `setInterval`, `setTimeout`, `requestAnimationFrame` | 472 | Work can be installed, observed, repeated, delayed, or framed. |
-| `explicit-teardown` | `removeEventListener`, `clearInterval`, `clearTimeout`, `cancelAnimationFrame` | 55 | Only the teardown/clear/cancel primitives counted by this register; observer `disconnect()` and owner-specific cleanup still need semantic proof. |
+| `install-or-schedule` | `addEventListener`, `MutationObserver`, `IntersectionObserver`, `setInterval`, `setTimeout`, `requestAnimationFrame` | 478 | Work can be installed, observed, repeated, delayed, or framed. |
+| `explicit-teardown` | `removeEventListener`, `clearInterval`, `clearTimeout`, `cancelAnimationFrame` | 61 | Only the teardown/clear/cancel primitives counted by this register; observer `disconnect()` and owner-specific cleanup still need semantic proof. |
 
 Source-family imbalance:
 
 | Source family | Install/schedule instances | Explicit teardown instances | Total lifecycle instances | Current risk |
 | --- | ---: | ---: | ---: | --- |
 | `extension-ui-background-js` | 259 | 14 | 273 | Dashboard/popup/background/state lifecycle has the largest unmatched install surface. |
-| `content-runtime-js` | 194 | 33 | 227 | YouTube page runtime still has many page-lifetime listeners, observers, timers, and frame callbacks. |
+| `content-runtime-js` | 196 | 35 | 231 | YouTube page runtime still has many page-lifetime listeners, observers, timers, and frame callbacks. |
 | `vendor-bundles` | 8 | 0 | 8 | Vendor lifecycle requires source/hash/freshness proof rather than local edits. |
 | `website-components` | 13 | 10 | 23 | Website client lifecycle grew from hero/footer motion work; it remains outside YouTube page-runtime filtering but still needs website unmount proof. |
 | `generated-ui-output` | 2 | 2 | 4 | Generated shell output needs freshness proof before hand edits. |
 
 ```text
-install-or-schedule lifecycle instances: 476
-explicit-teardown lifecycle instances: 59
-install-to-teardown ratio: 8.5:1
+install-or-schedule lifecycle instances: 478
+explicit-teardown lifecycle instances: 61
+install-to-teardown ratio: 7.8:1
 shared lifecycle registry in product source: absent
 lifecycle cleanup approval from imbalance addendum: NO-GO
 runtime behavior changed by this addendum: no
@@ -119,8 +119,8 @@ runtime behavior changed by this addendum: no
 
 ```mermaid
 flowchart TD
-  A["535 lifecycle instances"] --> B["476 install or schedule work"]
-  A --> C["59 explicit teardown primitives"]
+  A["539 lifecycle instances"] --> B["478 install or schedule work"]
+  A --> C["61 explicit teardown primitives"]
   B --> D["Listeners, observers, timers, frames"]
   C --> E["remove, clear, cancel"]
   D --> F["Cleanup authority remains NO-GO"]
@@ -1498,17 +1498,17 @@ Source-family timer delay split:
 
 | Source family | Total delay rows | Delay shape summary |
 | --- | ---: | --- |
-| `content-runtime-js` | 87 | 10 zero, 12 in 1-99ms, 14 in 100-199ms, 10 in 200-999ms, 10 in 1000-4999ms, 4 in 5000ms plus, 22 named/expression, 5 `Math.max(...)`. |
+| `content-runtime-js` | 88 | 10 zero, 12 in 1-99ms, 14 in 100-199ms, 10 in 200-999ms, 10 in 1000-4999ms, 4 in 5000ms plus, 23 named/expression, 5 `Math.max(...)`. |
 | `extension-ui-background-js` | 39 | 6 zero, 4 in 1-99ms, 4 in 100-199ms, 7 in 200-999ms, 3 in 1000-4999ms, 15 named/expression. |
 | `website-components` | 1 | 1 named/expression delay. |
 
 ASCII timer delay flow diagram: present
 
 ```text
-127 timer delay rows
+128 timer delay rows
         |
         +--> 124 setTimeout schedules
-        +-->   3 setInterval schedules
+        +-->   4 setInterval schedules
         |
         +--> 16 numeric zero delays
         +--> 16 numeric 1-99ms delays
@@ -1516,7 +1516,7 @@ ASCII timer delay flow diagram: present
         +--> 17 numeric 200-999ms delays
         +--> 13 numeric 1000-4999ms delays
         +-->  4 numeric 5000ms plus delays
-        +--> 38 named or expression delays
+        +--> 39 named or expression delays
         +-->  5 Math.max expression delays
         +-->  0 missing delay arguments
         |
@@ -1530,15 +1530,15 @@ Mermaid timer delay flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["127 timer delay rows"] --> B["124 setTimeout schedules"]
-  A --> C["3 setInterval schedules"]
+  A["128 timer delay rows"] --> B["124 setTimeout schedules"]
+  A --> C["4 setInterval schedules"]
   A --> D["16 zero-delay timers"]
   A --> E["16 1-99ms timers"]
   A --> F["18 100-199ms timers"]
   A --> G["17 200-999ms timers"]
   A --> H["13 1000-4999ms timers"]
   A --> I["4 5000ms plus timers"]
-  A --> J["38 named or expression timers"]
+  A --> J["39 named or expression timers"]
   A --> K["5 Math.max expression timers"]
   B --> L["Timer cleanup authority remains NO-GO"]
   C --> L
@@ -1553,16 +1553,16 @@ flowchart TD
 ```
 
 ```text
-timer delay rows: 127
+timer delay rows: 128
 setTimeout delay rows: 124
-setInterval delay rows: 3
+setInterval delay rows: 4
 numeric zero timer delays: 16
 numeric 1-99ms timer delays: 16
 numeric 100-199ms timer delays: 18
 numeric 200-999ms timer delays: 17
 numeric 1000-4999ms timer delays: 13
 numeric 5000ms plus timer delays: 4
-named or expression timer delays: 38
+named or expression timer delays: 39
 math max expression timer delays: 5
 missing timer delay arguments: 0
 timer delay cleanup approval: NO-GO
@@ -1579,7 +1579,7 @@ timing changes, background flush timing changes, or no-rule timer cleanup.
 
 | Timer callback class | Instances | Current risk meaning |
 | --- | ---: | --- |
-| Inline arrow callback | 107 | Most timer work is anonymous closure-capturing work; pruning needs owner, captured-state, and side-effect proof. |
+| Inline arrow callback | 109 | Most timer work is anonymous closure-capturing work; pruning needs owner, captured-state, and side-effect proof. |
 | Identifier callback reference | 19 | Named callbacks are easier to trace, but still need route, delay, handle, cancellation, and no-work proof. |
 | Inline function callback | 0 | No tracked timer currently uses a classic inline `function` callback. |
 | Member callback reference | 0 | No tracked timer currently schedules a member callback directly. |
@@ -1589,26 +1589,26 @@ Timer callback family split:
 
 | Timer family | Callback rows |
 | --- | ---: |
-| `setTimeout` | 123 |
-| `setInterval` | 3 |
+| `setTimeout` | 124 |
+| `setInterval` | 4 |
 
 Source-family timer callback split:
 
 | Source family | Total callback rows | Callback shape summary |
 | --- | ---: | --- |
-| `content-runtime-js` | 86 | 73 inline arrow callbacks, 13 identifier callbacks. |
+| `content-runtime-js` | 88 | 75 inline arrow callbacks, 13 identifier callbacks. |
 | `extension-ui-background-js` | 39 | 33 inline arrow callbacks, 6 identifier callbacks. |
 | `website-components` | 1 | 1 inline arrow callback. |
 
 ASCII timer callback flow diagram: present
 
 ```text
-127 timer callback rows
+128 timer callback rows
         |
         +--> 124 setTimeout callback rows
-        +-->   3 setInterval callback rows
+        +-->   4 setInterval callback rows
         |
-        +--> 108 inline arrow callbacks
+        +--> 109 inline arrow callbacks
         +-->  19 identifier callback references
         +-->   0 inline function callbacks
         +-->   0 member callback references
@@ -1626,9 +1626,9 @@ Mermaid timer callback flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["127 timer callbacks"] --> B["124 setTimeout callbacks"]
-  A --> C["3 setInterval callbacks"]
-  A --> D["108 inline arrow callbacks"]
+  A["128 timer callbacks"] --> B["124 setTimeout callbacks"]
+  A --> C["4 setInterval callbacks"]
+  A --> D["109 inline arrow callbacks"]
   A --> E["19 identifier callbacks"]
   A --> F["0 inline function callbacks"]
   A --> G["0 member callback references"]
@@ -1641,15 +1641,15 @@ flowchart TD
 ```
 
 ```text
-timer callback rows: 127
+timer callback rows: 128
 setTimeout callback rows: 124
-setInterval callback rows: 3
-inline arrow timer callbacks: 108
+setInterval callback rows: 4
+inline arrow timer callbacks: 109
 identifier timer callbacks: 19
 inline function timer callbacks: 0
 member reference timer callbacks: 0
 missing timer callback arguments: 0
-content runtime timer callbacks: 87
+content runtime timer callbacks: 88
 extension UI background timer callbacks: 39
 website component timer callbacks: 1
 timer callback cleanup approval: NO-GO
@@ -1669,8 +1669,8 @@ performance claims.
 | --- | ---: | --- |
 | `setTimeout` schedule rows for parity | 123 | Timeout scheduling remains broad and needs owner, route, setting, delay, and side-effect proof before pruning. |
 | `clearTimeout` rows for parity | 34 | A subset of timeout work has explicit clear rows. |
-| `setInterval` schedule rows for parity | 3 | Interval work is small but page-lifetime and stale-route behavior still need owner proof. |
-| `clearInterval` rows for parity | 4 | All scheduled interval handles are cleared somewhere; `engineCheckInterval` has two clear rows. |
+| `setInterval` schedule rows for parity | 4 | Interval work is small but page-lifetime and stale-route behavior still need owner proof. |
+| `clearInterval` rows for parity | 5 | All scheduled interval handles are cleared somewhere; `engineCheckInterval` has two clear rows. |
 | `setTimeout` schedule-minus-clear delta | 89 | This is not a leak count, but it is the current unproven timeout cleanup burden. |
 | `setInterval` schedule-minus-clear delta | -1 | Clear rows outnumber interval schedules because one interval handle has multiple clear sites. |
 | `clearTimeout` rows with direct schedule handle | 32 | Most timeout clear rows match a directly scheduled handle by source-derived handle name. |
@@ -1678,9 +1678,9 @@ performance claims.
 | Handled timeout schedule rows with clear handle | 26 | Only part of the handled timeout schedule surface has a matching clear handle. |
 | Handled timeout schedule rows without clear handle | 19 | Assigned timeout handles still need page/route lifetime proof before cleanup changes. |
 | Distinct scheduled timeout handles without clear | 18 | Distinct timeout state variables remain unpaired by direct clear rows. |
-| `clearInterval` rows with direct schedule handle | 4 | Every interval clear row matches a directly scheduled interval handle. |
+| `clearInterval` rows with direct schedule handle | 5 | Every interval clear row matches a directly scheduled interval handle. |
 | `clearInterval` rows without direct schedule handle | 0 | No current interval clear row is orphaned by direct handle matching. |
-| Handled interval schedule rows with clear handle | 3 | Every scheduled interval handle has a matching clear handle. |
+| Handled interval schedule rows with clear handle | 4 | Every scheduled interval handle has a matching clear handle. |
 | Handled interval schedule rows without clear handle | 0 | No scheduled interval handle is missing a direct clear handle today. |
 
 Timeout schedule handle split:
@@ -1698,20 +1698,20 @@ Interval schedule handle split:
 
 | Interval schedule handle class | Instances |
 | --- | ---: |
-| Assigned named state handle | 3 |
+| Assigned named state handle | 4 |
 
 Source-family timer schedule/clear parity:
 
 | Source family | Schedules | Clears | Delta |
 | --- | ---: | ---: | ---: |
-| `content-runtime-js` | 86 | 25 | 61 |
+| `content-runtime-js` | 88 | 26 | 62 |
 | `extension-ui-background-js` | 39 | 11 | 28 |
 | `website-components` | 1 | 2 | -1 |
 
 ASCII timer schedule/clear parity flow diagram: present
 
 ```text
-127 timer schedules
+128 timer schedules
         |
         +--> 124 setTimeout schedules
         |       +--> 34 clearTimeout rows
@@ -1721,11 +1721,11 @@ ASCII timer schedule/clear parity flow diagram: present
         |       +--> 20 handled schedule rows without clear handle
         |       +--> 19 distinct scheduled handles without clear
         |
-        +-->   3 setInterval schedules
-                +--> 4 clearInterval rows
-                +--> 4 clear rows with direct schedule handle
+        +-->   4 setInterval schedules
+                +--> 5 clearInterval rows
+                +--> 5 clear rows with direct schedule handle
                 +--> 0 clear rows without direct schedule handle
-                +--> 3 handled schedule rows with clear handle
+                +--> 4 handled schedule rows with clear handle
                 +--> 0 handled schedule rows without clear handle
 
 timer schedule/clear cleanup authority: NO-GO until each timer has owner,
@@ -1737,15 +1737,15 @@ Mermaid timer schedule/clear parity flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["127 timer schedules"] --> B["124 setTimeout schedules"]
-  A --> C["3 setInterval schedules"]
+  A["128 timer schedules"] --> B["124 setTimeout schedules"]
+  A --> C["4 setInterval schedules"]
   B --> D["34 clearTimeout rows"]
   B --> E["90 timeout schedule-minus-clear delta"]
   D --> F["32 clearTimeout rows with direct schedule handle"]
   D --> G["2 clearTimeout rows without direct schedule handle"]
   B --> H["20 handled timeout schedule rows without clear handle"]
-  C --> I["4 clearInterval rows"]
-  I --> J["4 clearInterval rows with direct schedule handle"]
+  C --> I["5 clearInterval rows"]
+  I --> J["5 clearInterval rows with direct schedule handle"]
   C --> K["0 handled interval schedule rows without clear handle"]
   E --> L["Timer schedule/clear cleanup authority remains NO-GO"]
   F --> L
@@ -1758,8 +1758,8 @@ flowchart TD
 ```text
 setTimeout schedule rows for parity: 124
 clearTimeout rows for parity: 34
-setInterval schedule rows for parity: 3
-clearInterval rows for parity: 4
+setInterval schedule rows for parity: 4
+clearInterval rows for parity: 5
 setTimeout schedule-minus-clear delta: 90
 setInterval schedule-minus-clear delta: -1
 timeout schedules with assigned local id handle: 11
@@ -1768,15 +1768,15 @@ timeout schedules with assigned property-held handle: 11
 timeout fire-and-forget schedules: 63
 timeout promise sleep or timeout schedules: 14
 timeout returned handle schedules: 1
-interval schedules with assigned named state handle: 3
+interval schedules with assigned named state handle: 4
 clearTimeout rows with direct schedule handle: 32
 clearTimeout rows without direct schedule handle: 2
 handled timeout schedule rows with clear handle: 26
 handled timeout schedule rows without clear handle: 20
 distinct scheduled timeout handles without clear: 18
-clearInterval rows with direct schedule handle: 4
+clearInterval rows with direct schedule handle: 5
 clearInterval rows without direct schedule handle: 0
-handled interval schedule rows with clear handle: 3
+handled interval schedule rows with clear handle: 4
 handled interval schedule rows without clear handle: 0
 distinct scheduled interval handles without clear: 0
 content runtime timer schedule/clear delta: 62
@@ -1808,7 +1808,7 @@ Owner-domain timer schedule split:
 | `state-import-owner` | 8 | 8 | 0 | Import/export/state timers can affect bulk list mutation and settings fanout. |
 | `injector-page-world-owner` | 6 | 5 | 1 | Main-world readiness and queue timers can affect JSON-first replay and page-world handoff timing. |
 | `extension-ui-background-owner` | 6 | 6 | 0 | Shared UI/background helper timers still require owner-specific teardown proof. |
-| `content-helper-owner` | 12 | 12 | 0 | Content helper timers remain page-runtime work even when owned outside the central bridge. |
+| `content-helper-owner` | 13 | 12 | 1 | Content helper timers include managed time-limit heartbeat work and other page-runtime work owned outside the central bridge. |
 | `collaborator-dialog-owner` | 2 | 2 | 0 | Dialog timers can affect collaborator UI timing and cleanup. |
 | `popup-ui-owner` | 2 | 2 | 0 | Popup timers can affect settings/list-mode mutation timing. |
 | `seed-network-owner` | 1 | 1 | 0 | Seed network timer work remains tied to MAIN-world readiness and transport no-work budgets. |
@@ -1818,19 +1818,19 @@ Source-family owner context:
 
 | Source family | Timer schedules | Current interpretation |
 | --- | ---: | --- |
-| `content-runtime-js` | 86 | Most timer schedules that can directly affect YouTube page lag, menus, whitelist pending, JSON transport, or fallback scans. |
+| `content-runtime-js` | 88 | Most timer schedules that can directly affect YouTube page lag, menus, whitelist pending, JSON transport, managed time-limit heartbeat, or fallback scans. |
 | `extension-ui-background-js` | 39 | UI/background schedules that can alter settings, cache, import/export, profile, and sync state feeding page runtime. |
 | `website-components` | 1 | Website-only client timer; not a YouTube runtime no-work proof. |
 
 ASCII timer owner-domain flow diagram: present
 
 ```text
-127 timer schedules
+128 timer schedules
   |
-  +--> 87 content-runtime-js
+  +--> 88 content-runtime-js
   |     +--> 37 content bridge owner
   |     +--> 16 quick/menu owner
-  |     +--> 12 content helper owner
+  |     +--> 13 content helper owner
   |     +--> 11 DOM fallback owner
   |     +-->  6 injector page-world owner
   |     +-->  2 collaborator dialog owner
@@ -1850,12 +1850,12 @@ Mermaid timer owner-domain flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["127 timer schedules"] --> B["87 content-runtime timers"]
+  A["128 timer schedules"] --> B["88 content-runtime timers"]
   A --> C["39 extension UI/background timers"]
   A --> D["1 website component timer"]
   B --> E["37 content bridge owner"]
   B --> F["16 quick/menu owner"]
-  B --> G["12 content helper owner"]
+  B --> G["13 content helper owner"]
   B --> H["11 DOM fallback owner"]
   B --> I["6 injector page-world owner"]
   B --> J["2 collaborator dialog owner"]
@@ -1875,9 +1875,9 @@ flowchart TD
 Current semantic status after this addendum:
 
 ```text
-timer owner-context rows: 127
+timer owner-context rows: 128
 timer owner domains: 13
-content-runtime timer owner-context rows: 87
+content-runtime timer owner-context rows: 88
 extension UI/background timer owner-context rows: 39
 website component timer owner-context rows: 1
 content bridge timer owner-context rows: 37
@@ -1903,7 +1903,7 @@ Timer delay-budget split:
 
 | Delay budget | Timer rows | Current risk meaning |
 | --- | ---: | --- |
-| `named-or-expression` | 38 | Named constants and variable delays need owner-specific budget proof before any simplification or coalescing. |
+| `named-or-expression` | 39 | Named constants and variable delays need owner-specific budget proof before any simplification or coalescing. |
 | `short-under-200ms` | 34 | Short page-runtime retries/debounces are the most likely to affect YouTube SPA responsiveness when repeated across navigation. |
 | `medium-200-999ms` | 17 | Medium timers can still stack across route changes, especially when tied to bridge, dashboard, background, or helper owners. |
 | `long-1000ms-plus` | 17 | Long retries and cleanup timers need stale-route and no-work proof before removal or delay changes. |
@@ -1917,7 +1917,7 @@ Owner-domain delay-budget matrix:
 | `content-bridge-owner` | 37 | 3 | 10 | 3 | 8 | 2 | 11 |
 | `quick-and-menu-owner` | 16 | 4 | 5 | 0 | 3 | 0 | 4 |
 | `dashboard-ui-owner` | 15 | 1 | 4 | 5 | 3 | 0 | 2 |
-| `content-helper-owner` | 12 | 0 | 5 | 2 | 0 | 3 | 2 |
+| `content-helper-owner` | 13 | 0 | 5 | 2 | 0 | 3 | 3 |
 | `background-authority-owner` | 10 | 0 | 2 | 1 | 0 | 0 | 7 |
 | `dom-fallback-owner` | 11 | 3 | 3 | 1 | 1 | 0 | 3 |
 | `state-import-owner` | 8 | 3 | 1 | 0 | 0 | 0 | 4 |
@@ -1942,7 +1942,7 @@ High-frequency owner risk notes:
 ASCII timer owner delay-budget flow diagram: present
 
 ```text
-127 timer schedules
+128 timer schedules
   |
   +--> 50 immediate/short rows
   |     +--> 13 content bridge rows
@@ -1952,7 +1952,7 @@ ASCII timer owner delay-budget flow diagram: present
   |     +-->  4 state/import rows
   |
   +--> 34 medium/long rows
-  +--> 38 named/expression rows
+  +--> 39 named/expression rows
   +-->  5 bounded-expression rows
   |
   v
@@ -1965,14 +1965,14 @@ Mermaid timer owner delay-budget flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["127 timer schedules"] --> B["50 immediate or short rows"]
+  A["128 timer schedules"] --> B["50 immediate or short rows"]
   B --> C["13 content bridge rows"]
   B --> D["9 quick/menu rows"]
   B --> E["6 DOM fallback rows"]
   B --> F["5 dashboard rows"]
   B --> G["4 state/import rows"]
   A --> H["34 medium or long rows"]
-  A --> I["38 named/expression rows"]
+  A --> I["39 named/expression rows"]
   A --> J["5 bounded-expression rows"]
   C --> K["Timer owner delay-budget cleanup remains NO-GO"]
   D --> K
@@ -1985,13 +1985,13 @@ flowchart TD
 Current semantic status after this addendum:
 
 ```text
-timer owner delay-budget rows: 127
+timer owner delay-budget rows: 128
 timer owner immediate-zero budget rows: 16
 timer owner short-under-200ms budget rows: 34
 timer owner medium-200-999ms budget rows: 17
 timer owner long-1000ms-plus budget rows: 17
 timer owner bounded-expression budget rows: 5
-timer owner named-or-expression budget rows: 38
+timer owner named-or-expression budget rows: 39
 content bridge immediate-or-short timer budget rows: 13
 quick/menu immediate-or-short timer budget rows: 9
 dom fallback immediate-or-short timer budget rows: 6
@@ -3423,7 +3423,7 @@ Source-family explicit teardown split:
 ASCII explicit teardown flow diagram: present
 
 ```text
-59 explicit teardown handle rows
+61 explicit teardown handle rows
         |
         +--> 13 removeEventListener rows
         |       +--> 7 document targets
@@ -3454,7 +3454,7 @@ Mermaid explicit teardown flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["59 explicit teardown handle rows"] --> B["13 removeEventListener rows"]
+  A["61 explicit teardown handle rows"] --> B["18 removeEventListener rows"]
   A --> C["34 clearTimeout rows"]
   A --> D["4 clearInterval rows"]
   A --> E["4 cancelAnimationFrame rows"]
@@ -3487,10 +3487,10 @@ flowchart TD
 ```
 
 ```text
-explicit teardown handle rows: 55
-removeEventListener teardown rows: 13
+explicit teardown handle rows: 61
+removeEventListener teardown rows: 18
 clearTimeout teardown rows: 34
-clearInterval teardown rows: 4
+clearInterval teardown rows: 5
 cancelAnimationFrame teardown rows: 4
 listener document teardown targets: 7
 listener window teardown targets: 2
@@ -4059,7 +4059,7 @@ settings refresh regressions.
 
 | Lifecycle row | Instance | Owner / trigger / active gate | Side-effect and teardown status |
 | --- | --- | --- | --- |
-| `release_lifecycle_storage_refresh_debounce` | `js/content/bridge_settings.js:769:setTimeout` | Storage-change debounce after relevant local-storage changes. `forceReprocess` is upgraded before an existing timer is reused. | Re-fetches settings and applies DOM fallback once per debounce window; timer clears itself. |
+| `release_lifecycle_storage_refresh_debounce` | `js/content/bridge_settings.js:1037:setTimeout` | Storage-change debounce after relevant local-storage changes. `forceReprocess` is upgraded before an existing timer is reused. | Re-fetches settings and applies DOM fallback once per debounce window; timer clears itself. |
 | `release_lifecycle_quick_hover_intent_timer` | `js/content/block_channel.js:423:setTimeout` | Quick-block hover/focus intent. Active only while quick-block is enabled and a candidate card remains targeted. | Creates delayed quick-cross affordance; cleared by `cancelQuickBlockHoverIntent()` when disabled or retargeted. |
 | `release_lifecycle_quick_viewport_observer` | `js/content/block_channel.js:951:IntersectionObserver` | Quick-block visible-card tracking. Active after lazy quick-block setup. | Tracks bounded viewport hosts; no broad periodic sweep authority. |
 | `release_lifecycle_quick_sweep_timer` | `js/content/block_channel.js:1976:setTimeout` | Coalesced quick-block scan for queued roots. Gated by quick-block enabled/eager or visible-card state. | Runs once after 80ms and clears queued roots; old periodic timer remains absent. |
@@ -4075,7 +4075,7 @@ settings refresh regressions.
 | `release_lifecycle_fallback_menu_mutation_observer` | `js/content_bridge.js:7159:MutationObserver` | Fallback menu button observer. Active only when `shouldEagerFallbackMenuScan()` is true and native overlay quiet mode is false. | Schedules root-scoped scans; not an always-on empty-install body scan when eager scan is false. |
 | `release_lifecycle_fallback_menu_hover_click_listeners` | `js/content_bridge.js:7216-7218:addEventListener` | Hover/focus/click fallback-menu discovery. | Schedules scans from user-near surfaces; still page-lifetime listeners once installed. |
 | `release_lifecycle_fallback_menu_warmup_interval` | `js/content_bridge.js:7263:setInterval` | Startup warmup scans for fallback menu buttons. Active only when eager fallback menu scan is true. | Clears itself after 8 scans; remains a lifecycle risk if eager scan is enabled without real menu need. |
-| `release_lifecycle_video_identity_flush_timers` | `js/background.js:1634,1642:setTimeout` | Background video-channel/video-meta map flush debounce. | Batches storage writes after learned identity/meta updates; timers clear before flush. |
+| `release_lifecycle_video_identity_flush_timers` | `js/background.js:1919,1927:setTimeout` | Background video-channel/video-meta map flush debounce. | Batches storage writes after learned identity/meta updates; timers clear before flush. |
 
 Current semantic status after this addendum:
 
@@ -4315,7 +4315,7 @@ flowchart TD
 | `hot_lifecycle_dom_pending_meta_owner` | `js/content/dom_fallback.js:3911-3940` | Pending category/upload-date metadata schedules delayed rechecks for unresolved cards. | Pending metadata requirement on a candidate DOM card. | Metadata fetch/recheck side effects lack route/list-mode/negative fixture authority. |
 | `hot_lifecycle_seed_replay_transport_owner` | `js/seed.js:97-134` | Seed transport queues and replays network/page JSON snapshots through a replay timer. | Seed settings and active JSON work admission. | Page-global patch teardown, active-rule parse budget, and no-work metric artifacts remain incomplete. |
 | `hot_lifecycle_injector_startup_owner` | `js/injector.js:3560-3585` | Injector polls for engine readiness with an interval and clears it on readiness or timeout. | Page-world injector startup and engine availability. | Startup duplicate/load authority and first settings handoff proof remain incomplete. |
-| `hot_lifecycle_bridge_settings_refresh_debounce_owner` | `js/content/bridge_settings.js:751-842` | Storage refresh debounce coalesces settings changes while preserving forced reprocess. | Relevant storage keys changed in `local` area. | Refresh budget, revision authority, and sender/apply-settings parity remain incomplete. |
+| `hot_lifecycle_bridge_settings_refresh_debounce_owner` | `js/content/bridge_settings.js:1018-1109` | Storage refresh debounce coalesces settings changes while preserving forced reprocess. | Relevant storage keys changed in `local` area. | Refresh budget, revision authority, and sender/apply-settings parity remain incomplete. |
 
 Current hot lifecycle owner status:
 
@@ -4347,12 +4347,12 @@ Source inputs:
 - `tests/runtime/lifecycle-instance-register-current-behavior.test.mjs`
 
 ```text
-535 tracked lifecycle primitive instances
+539 tracked lifecycle primitive instances
         |
         +--> 476 install-or-schedule rows
         |       +--> listeners, observers, timers, intervals, frames
         |
-        +--> 59 explicit teardown rows
+        +--> 61 explicit teardown rows
         |       +--> remove, clear, cancel primitives
         |
         +--> local owner gates and partial disconnects
@@ -4367,8 +4367,8 @@ missing shared lifecycle effect/teardown authority
 
 ```mermaid
 flowchart TD
-  A["535 tracked lifecycle primitive instances"] --> B["476 install-or-schedule rows"]
-  A --> C["59 explicit teardown rows"]
+  A["539 tracked lifecycle primitive instances"] --> B["478 install-or-schedule rows"]
+  A --> C["61 explicit teardown rows"]
   B --> D["Listeners, observers, timers, intervals, frames"]
   C --> E["Remove, clear, cancel primitives"]
   D --> F["Local owner gates and partial disconnects"]
@@ -4381,7 +4381,7 @@ flowchart TD
 
 | Row id | Joined proof surface | Current source-backed state | Why implementation remains NO-GO |
 | --- | --- | --- | --- |
-| `lifecycle_convergence_primitive_census` | Repo-wide primitive census | 535 lifecycle primitive instances are tracked: 476 install-or-schedule rows and 59 explicit teardown rows. | A count proves breadth, not owner, trigger, side-effect, route, or teardown safety. |
+| `lifecycle_convergence_primitive_census` | Repo-wide primitive census | 539 lifecycle primitive instances are tracked: 478 install-or-schedule rows and 61 explicit teardown rows. | A count proves breadth, not owner, trigger, side-effect, route, or teardown safety. |
 | `lifecycle_convergence_listener_surface` | Listener installs, targets, callbacks, and add/remove parity | 294 `addEventListener` rows, 13 `removeEventListener` rows, a 281 install-minus-remove delta, 51 page-global listener installs without explicit remove, and 42 content-runtime document/window listener rows are pinned. | Listener cleanup can change native menu timing, route work, page-message trust, quick-block affordances, and UI mutation behavior. |
 | `lifecycle_convergence_observer_surface` | Observer constructors, observe targets/options, disconnects, and observe/release parity | 20 observer constructor rows, 21 observe activation rows, 15 release rows, 14 disconnect rows, and a 6 observe-minus-release delta are pinned. | Observer cleanup remains split across dropdowns, quick-block, fallback menu, prefetch, DOM fallback, collaborator dialog, and website component owners. |
 | `lifecycle_convergence_timer_frame_surface` | Timer, interval, and animation-frame schedules | 124 lexical `setTimeout` rows, 3 `setInterval` rows, 31 `requestAnimationFrame` rows, 33 YouTube SPA immediate/short hot timer rows, 29 desktop residual rows, and 4 mobile/coarse eager rows are pinned. | Delay or cancellation changes require per-owner no-work, max-rerun, stale-route, and side-effect evidence. |
@@ -4389,7 +4389,7 @@ flowchart TD
 | `lifecycle_convergence_mode_surface_budget` | Empty, active, mobile/coarse, whitelist, watch, YTM, and Kids surfaces | Empty desktop observer proof is partial; active blocklist, mobile/coarse, whitelist, watch/YTM/Kids, and DOM fallback active work all remain separate budget classes. | One successful empty-desktop slice cannot authorize active-rule, mobile, whitelist, watch, YTM, or Kids lifecycle pruning. |
 | `lifecycle_convergence_teardown_effect_budget` | Lifecycle effect budget and teardown decision register | Existing docs identify missing shared runtime authority before observers, listeners, timers, frames, and page-global patches can be reduced. | Local gates and local cleanup are not equivalent to a route-scoped lifecycle teardown authority. |
 | `lifecycle_convergence_menu_overlay_timing` | Native menu, fallback menu, quick-block, fullscreen, and native-overlay timing | Native dropdown repair, outside-pointer close, fallback-menu scans, quick-block viewport work, and fullscreen/native-overlay quiet gates remain separate implementations. | The comment 3-dot/menu regressions prove menu-node reuse and overlay state can break if lifecycle cleanup is too broad. |
-| `lifecycle_convergence_method_json_dependency` | Method semantic and JSON path dependencies | Method proof still has 69 tracked JS/JSX/MJS files, 5,697 lexical callables, 0 complete per-callable proof files, and JSON path proof still blocks JSON-first promotion. | Lifecycle pruning can hide or leak content unless callable effects and JSON/DOM parity are proven for affected owners. |
+| `lifecycle_convergence_method_json_dependency` | Method semantic and JSON path dependencies | Method proof still has 69 tracked JS/JSX/MJS files, 5,789 lexical callables, 0 complete per-callable proof files, and JSON path proof still blocks JSON-first promotion. | Lifecycle pruning can hide or leak content unless callable effects and JSON/DOM parity are proven for affected owners. |
 | `lifecycle_convergence_authority_absence` | Missing runtime authority symbols | Product source still lacks one lifecycle effect/owner/teardown authority for listeners, observers, timers, route pause, native overlay pause, and no-rule counters. | Authority absence keeps lifecycle cleanup, runtime optimization, release claims, and goal completion at NO-GO. |
 
 Current lifecycle convergence status:
@@ -4397,9 +4397,9 @@ Current lifecycle convergence status:
 ```text
 runtime lifecycle convergence rows: 10
 implementation-ready runtime lifecycle convergence rows: 0
-tracked lifecycle primitive instances: 535
-install-or-schedule lifecycle rows: 472
-explicit teardown lifecycle rows: 55
+tracked lifecycle primitive instances: 539
+install-or-schedule lifecycle rows: 478
+explicit teardown lifecycle rows: 61
 hot YouTube SPA lifecycle owner rows: 16
 YouTube SPA immediate/short hot timer rows: 33
 files with complete per-callable semantic proof: 0
@@ -4461,9 +4461,9 @@ runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

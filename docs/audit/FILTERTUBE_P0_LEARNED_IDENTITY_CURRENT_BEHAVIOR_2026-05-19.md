@@ -20,8 +20,8 @@ The affected stores include `channelMap`, `videoChannelMap`, `videoMetaMap`,
 | P0 fixture | Current result | Source proof | Risk |
 | --- | --- | --- | --- |
 | `learned_identity_channel_map_requires_uc_handle_shape` | Not satisfied today. | `js/background.js:1495-1525` accepts trimmed non-empty `key`/`value` pairs and mapping `id`/`handle` pairs without enforcing UC ID or `@handle` shape. | Bad learned channel mappings can make later channel rules match the wrong identity. |
-| `learned_identity_video_channel_map_requires_video_and_uc_shape` | Not satisfied today in the background receiver. | `js/background.js:1648-1670` trims non-empty `videoId` and `channelId` strings but does not enforce 11-character video IDs or UC channel IDs. | Bad `videoId -> channelId` links can enter pending/cache state. |
-| `learned_identity_engine_source_guard_is_stronger_than_background_receiver` | Satisfied only at the engine source edge. | `js/filter_logic.js:50-52` validates video and UC shape before posting, while `js/background.js:1648-1670` does not preserve the same invariant. | A strong source guard can be bypassed by another receiver path. |
+| `learned_identity_video_channel_map_requires_video_and_uc_shape` | Not satisfied today in the background receiver. | `js/background.js:1933-1670` trims non-empty `videoId` and `channelId` strings but does not enforce 11-character video IDs or UC channel IDs. | Bad `videoId -> channelId` links can enter pending/cache state. |
+| `learned_identity_engine_source_guard_is_stronger_than_background_receiver` | Satisfied only at the engine source edge. | `js/filter_logic.js:50-52` validates video and UC shape before posting, while `js/background.js:1933-1670` does not preserve the same invariant. | A strong source guard can be bypassed by another receiver path. |
 | `learned_identity_pending_video_map_enters_compiled_settings_before_flush` | Current behavior. | `js/background.js:2411-2423` merges `pendingVideoChannelMapUpdates` into compiled settings before debounced durable storage flush completes. | Pending learned identity can influence runtime decisions before revision/durability proof. |
 | `learned_identity_storage_invalidation_omits_map_keys` | Current behavior. | `js/background.js:4458-4476` omits `channelMap`, `videoChannelMap`, and `videoMetaMap` from storage-change invalidation keys. | Direct map changes can leave compiled caches stale. |
 | `learned_identity_page_video_map_persists_before_dom_ownership` | Current behavior. | `js/content_bridge.js:5482-5497` persists `FilterTube_UpdateVideoChannelMap` before checking `shouldStampCardForVideoId()`. | Storage can learn an owner relation before current DOM ownership is proven. |
@@ -74,9 +74,9 @@ runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

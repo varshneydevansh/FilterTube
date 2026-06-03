@@ -813,14 +813,14 @@ const affectedCallableSemanticFiles = [
     id: 'FT-WLCACHE-SEMANTIC-GAP-02-bridge-settings',
     file: 'js/content/bridge_settings.js',
     family: 'Hot page/background runtime',
-    lexicalCallables: 78,
+    lexicalCallables: 102,
     semanticStatus: 'semantic proof incomplete'
   },
   {
     id: 'FT-WLCACHE-SEMANTIC-GAP-03-background',
     file: 'js/background.js',
     family: 'Hot page/background runtime',
-    lexicalCallables: 442,
+    lexicalCallables: 463,
     semanticStatus: 'semantic proof incomplete'
   },
   {
@@ -1198,11 +1198,11 @@ const affectedCallableAnchorChecks = [
   ['js/content_bridge.js', 1714, 'function scheduleVideoMetaDomRerun() {'],
   ['js/content_bridge.js', 5913, "} else if (type === 'FilterTube_UpdateVideoChannelMap') {"],
   ['js/content_bridge.js', 5962, "} else if (type === 'FilterTube_UpdateVideoMetaMap') {"],
-  ['js/content/bridge_settings.js', 751, 'function scheduleSettingsRefreshFromStorage({ forceReprocess = true } = {}) {'],
-  ['js/content/bridge_settings.js', 783, 'function handleStorageChanges(changes, area) {'],
-  ['js/background.js', 1648, 'function enqueueVideoChannelMapUpdate(videoId, channelId) {'],
-  ['js/background.js', 1673, 'function enqueueVideoMetaMapUpdate(videoId, meta) {'],
-  ['js/background.js', 1774, 'async function getCompiledSettings(sender = null, profileType = null, forceRefresh = false) {'],
+  ['js/content/bridge_settings.js', 1019, 'function scheduleSettingsRefreshFromStorage({ forceReprocess = true } = {}) {'],
+  ['js/content/bridge_settings.js', 1051, 'function handleStorageChanges(changes, area) {'],
+  ['js/background.js', 1933, 'function enqueueVideoChannelMapUpdate(videoId, channelId) {'],
+  ['js/background.js', 1958, 'function enqueueVideoMetaMapUpdate(videoId, meta) {'],
+  ['js/background.js', 2059, 'async function getCompiledSettings(sender = null, profileType = null, forceRefresh = false) {'],
   ['js/content/dom_fallback.js', 2219, 'async function applyDOMFallback(settings, options = {}) {'],
   ['js/content/dom_fallback.js', 4139, "if (onlyWhitelistPending && listMode === 'whitelist') {"],
   ['js/content/handle_resolver.js', 136, 'function scheduleDomFallbackRerun() {'],
@@ -2413,9 +2413,9 @@ test('packet rows, live smoke rows, and diagrams remain explicit', () => {
 
   const methodGapDoc = read(methodSemanticGapPath);
   assert.match(methodGapDoc, /method semantic proof gap files covered: 69/);
-  assert.match(methodGapDoc, /method semantic proof gap lexical callables covered: 5744/);
+  assert.match(methodGapDoc, /method semantic proof gap lexical callables covered: 5789/);
   assert.match(methodGapDoc, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGapDoc, /lexical callables requiring semantic proof before behavior changes: 5744/);
+  assert.match(methodGapDoc, /lexical callables requiring semantic proof before behavior changes: 5789/);
   assert.match(methodGapDoc, /affected callable semantic proof: NO-GO/);
   for (const row of affectedCallableSemanticFiles) {
     const methodGapRow = methodSemanticGapRow(methodGapDoc, row.file);

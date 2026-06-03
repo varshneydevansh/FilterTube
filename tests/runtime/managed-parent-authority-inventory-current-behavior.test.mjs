@@ -83,7 +83,7 @@ test('Nanah scoped apply currently has target-profile writes but no durable mana
   assert.match(doc, /There is no signed managed policy envelope/);
 });
 
-test('viewing-space route gate is runtime-backed while time-limit enforcement is still pending', () => {
+test('viewing-space route gate and first time-limit runtime enforcement are runtime-backed', () => {
   const doc = read(docPath);
   const tabView = read('js/tab-view.js');
   const runtime = [
@@ -100,10 +100,12 @@ test('viewing-space route gate is runtime-backed while time-limit enforcement is
   assert.match(doc, /Extension-side YouTube runtime now route-gates child Main\/Kids access/);
   assert.match(doc, /Runtime route-gate implementation, denied-route overlay, and open-tab SPA\s+revalidation are now present/);
   assert.match(doc, /Accounts & Sync can now set, change, and disable a profile-owned\s+`settings.timeLimitPolicy`/);
-  assert.match(doc, /No extension active-tab budget counter, timeout overlay, or Main\/Kids time\s+route gate exists/);
+  assert.match(doc, /Extension runtime now compiles a valid active child profile\s+`settings.timeLimitPolicy` into `managedTimeLimitPolicy`/);
+  assert.match(doc, /Background runtime stores whole-profile daily usage in `ftManagedTimeUsageV1`/);
   assert.match(doc, /FILTERTUBE_MANAGED_CHILD_TIME_LIMIT_SCHEMA_CONTRACT_2026-06-03\.md/);
-  assert.match(doc, /No runtime time-limit compiler/);
-  assert.doesNotMatch(runtime, /timeLimits/);
+  assert.match(runtime, /managedTimeLimitPolicy/);
+  assert.match(runtime, /FilterTube_ManagedTimeLimitHeartbeat/);
+  assert.match(runtime, /showManagedTimeoutOverlay/);
   assert.match(runtime, /managedViewingRouteGate/);
   assert.match(runtime, /showManagedViewingBlockedOverlay/);
   assert.match(runtime, /__filtertubeManagedViewingRouteDenied/);

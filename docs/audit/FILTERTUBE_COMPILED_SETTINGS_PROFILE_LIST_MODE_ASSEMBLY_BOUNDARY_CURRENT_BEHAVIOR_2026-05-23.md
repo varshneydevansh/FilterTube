@@ -26,8 +26,8 @@ This is narrower than the compiled-settings field register and the list-mode mat
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6,343 | 286,370 | `ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36` |
-| `js/content/bridge_settings.js` | 845 | 34,241 | `aea46dd241248db1d1d9bcbdfdf65320d1399ecd84cc7792678f29b1b26ee092` |
+| `js/background.js` | 6,641 | 298,986 | `837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd` |
+| `js/content/bridge_settings.js` | 1,113 | 44,087 | `f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853` |
 | `js/filter_logic.js` | 3,652 | 172,174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 
 compiled settings profile/list-mode assembly source files pinned: 3
@@ -36,10 +36,10 @@ compiled settings profile/list-mode assembly source files pinned: 3
 
 | Block | Source | Start line | Lines | Bytes | SHA-256 |
 | --- | --- | ---: | ---: | ---: | --- |
-| `backgroundProfileListModeWhitelist` | `js/background.js:1981` | 1,981 | 78 | 4,695 | `7962fdb02859394cfdedb5e393ef6fd6c0bc1e1988aa5f0dc34ccd90384a6eea` |
-| `backgroundWhitelistChannelCompiler` | `js/background.js:2172` | 2,172 | 65 | 3,878 | `433527aec588525d8f3747ce7ffe20b1d2d78905c6812a6fcf6703bbee507322` |
+| `backgroundProfileListModeWhitelist` | `js/background.js:2266` | 2,266 | 88 | 5,201 | `fde880c68148975730478f0c0e768b9585168ab3e260e8f6ecd8f7fc1220f9b2` |
+| `backgroundWhitelistChannelCompiler` | `js/background.js:2467` | 2,467 | 65 | 3,878 | `433527aec588525d8f3747ce7ffe20b1d2d78905c6812a6fcf6703bbee507322` |
 | `bridgeNormalizeSettingsForHost` | `js/content/bridge_settings.js:322` | 322 | 31 | 1,404 | `5f05ac1dba540e69103fe5725ad258d203f03e72762a1cc887d8c70e847988ac` |
-| `bridgeRequestProfileGate` | `js/content/bridge_settings.js:567` | 567 | 36 | 1,758 | `713d4c00573258982f7dbf77cc451307b24a421ad8916fed859445df88fdadb8` |
+| `bridgeRequestProfileGate` | `js/content/bridge_settings.js:833` | 833 | 36 | 1,758 | `713d4c00573258982f7dbf77cc451307b24a421ad8916fed859445df88fdadb8` |
 | `filterProcessSettings` | `js/filter_logic.js:947` | 947 | 125 | 6,348 | `666c5725170dcd5eb01aa66cbfd27e64d33fa0ae937d1c5553665b4ede149e0f` |
 | `filterListModeIdentityAdmission` | `js/filter_logic.js:1715` | 1,715 | 268 | 12,855 | `3de047cd70f0734c2bdcf6ae481d23a3c78fe08f3aa280c2f59680cad04761af` |
 
@@ -89,6 +89,10 @@ Selected missing policy/report tokens over pinned blocks:
 ## Current Behavior Pinned
 
 `backgroundProfileListModeWhitelist`: background compilation reads the active profile settings, derives `syncKidsToMain`, converts main and Kids modes to exact `whitelist` or `blocklist`, assigns `compiledSettings.listMode`, assigns `compiledSettings.profileType`, compiles `whitelistKeywords`, and can merge Kids whitelist keywords and channels into main when sync is active and both profiles are in whitelist mode. Synced Kids whitelist channels are tagged with `__ftFromKids`.
+
+The same background block now also compiles `managedTimeLimitPolicy` next to
+the managed viewing route gate so protected-profile time budgets travel with
+the same profile-scoped compiled settings payload.
 
 `backgroundWhitelistChannelCompiler`: background compilation compiles the already-selected whitelist channel list into objects with id, handle, display handle, canonical handle, collaboration metadata, and source fields, dedupes channel rows, and assigns `compiledSettings.whitelistChannels`.
 
@@ -141,9 +145,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

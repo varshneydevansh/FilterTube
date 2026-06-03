@@ -10,18 +10,18 @@ This slice covers the background-side receiver for `message.type === 'addFiltere
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6343 | 286370 | `ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36` |
+| `js/background.js` | 6641 | 298986 | `837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd` |
 
 ## Pinned Source And Effect Blocks
 
 | Block | Source lines | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | ---: | --- |
-| `backgroundAddFilteredChannelReceiver` | `js/background.js:5267` | 39 | 1579 | `f681057e88e4c6aef657464bca124f8d3ae4d59f4d11ca5f05e1135dcf1615f2` |
-| `backgroundHandleAddFilteredChannelFull` | `js/background.js:5332` | 893 | 45226 | `e69e660d0af0dd0d523932f733a5de04108cbfb69ef99a155be4466a7527ce25` |
-| `backgroundHandleAddFilteredChannelSignatureAndInput` | `js/background.js:5332` | 158 | 6464 | `60f9b6d40d808f02f822e74a0a9f967844a1d1ef4c956e911ad2ee5265891b80` |
-| `backgroundHandleAddFilteredChannelIdentityRepair` | `js/background.js:5489` | 358 | 19385 | `dc7ccd71be5cb375ac50245617889449621246504390a4a0162c59c3cef6740d` |
-| `backgroundHandleAddFilteredChannelExistingAndWrite` | `js/background.js:5846` | 352 | 18483 | `0f2661d0a32990528ebf6704aa4cfb90cab8f55dcf4567e37852910704966027` |
-| `backgroundHandleAddFilteredChannelCommitAndReturn` | `js/background.js:6197` | 28 | 894 | `ba67796a03d083bf072ac4ef971365f165f0c836dd2eae56c64912729a45be66` |
+| `backgroundAddFilteredChannelReceiver` | `js/background.js:5565` | 39 | 1579 | `f681057e88e4c6aef657464bca124f8d3ae4d59f4d11ca5f05e1135dcf1615f2` |
+| `backgroundHandleAddFilteredChannelFull` | `js/background.js:5630` | 893 | 45226 | `e69e660d0af0dd0d523932f733a5de04108cbfb69ef99a155be4466a7527ce25` |
+| `backgroundHandleAddFilteredChannelSignatureAndInput` | `js/background.js:5630` | 158 | 6464 | `60f9b6d40d808f02f822e74a0a9f967844a1d1ef4c956e911ad2ee5265891b80` |
+| `backgroundHandleAddFilteredChannelIdentityRepair` | `js/background.js:5787` | 358 | 19385 | `dc7ccd71be5cb375ac50245617889449621246504390a4a0162c59c3cef6740d` |
+| `backgroundHandleAddFilteredChannelExistingAndWrite` | `js/background.js:6144` | 352 | 18483 | `0f2661d0a32990528ebf6704aa4cfb90cab8f55dcf4567e37852910704966027` |
+| `backgroundHandleAddFilteredChannelCommitAndReturn` | `js/background.js:6495` | 28 | 894 | `ba67796a03d083bf072ac4ef971365f165f0c836dd2eae56c64912729a45be66` |
 
 ## Selected Token Counts
 
@@ -114,9 +114,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: yes, scoped to secondary addFilteredChannel list target and matching backup trigger
 ```

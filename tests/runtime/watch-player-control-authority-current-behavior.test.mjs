@@ -82,9 +82,9 @@ function assertWatchPlayerRouteConvergenceBoundary(doc) {
   }
 
   for (const sourcePin of [
-    'js/background.js:2484-2500',
-    'js/background.js:4487-4504',
-    'js/content/bridge_settings.js:599-645',
+    'js/background.js:2810-2817',
+    'js/background.js:4808-4823',
+    'js/content/bridge_settings.js:1060-1102',
     'js/seed.js:701-740',
     'js/seed.js:87-90',
     'js/filter_logic.js:1175-1226',

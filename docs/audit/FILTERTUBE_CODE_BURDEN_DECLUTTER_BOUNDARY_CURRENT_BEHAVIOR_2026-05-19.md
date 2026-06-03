@@ -180,7 +180,7 @@ proof.
 Current guard counts:
 
 ```text
-large product-owned JS/JSX/MJS files at or above 1000 lines guarded: 14
+large product-owned JS/JSX/MJS files at or above 1000 lines guarded: 15
 near-threshold product-owned JS/JSX/MJS files from 900 to 999 lines guarded: 2
 large vendor bundle files recorded separately: 1
 new product-owned file crossing 1000 lines without proof: NO-GO
@@ -194,7 +194,7 @@ Large product-owned source files:
 | --- | ---: | --- |
 | `js/content_bridge.js` | 13636 | Giant cross-context hub. Any growth needs source-owner proof and focused runtime fixtures. |
 | `js/tab-view.js` | 11960 | Dashboard/settings UI surface. Any growth needs UI/state owner proof and release smoke. |
-| `js/background.js` | 6343 | Background storage/message/profile authority. Any growth needs mutation and settings proof. |
+| `js/background.js` | 6641 | Background storage/message/profile authority. Any growth needs mutation and settings proof. |
 | `js/content/dom_fallback.js` | 5030 | DOM fallback selector/hide/restore authority. Any growth needs DOM/no-work proof. |
 | `js/filter_logic.js` | 3652 | JSON renderer rule and decision engine. Any growth needs rule/path proof. |
 | `js/injector.js` | 3593 | Main-world JSON interception and page bridge. Any growth needs JSON/no-work proof. |
@@ -206,6 +206,7 @@ Large product-owned source files:
 | `js/settings_shared.js` | 1181 | Canonical settings compiler and migration surface. Any growth needs mode/list proof. |
 | `js/content/dom_extractors.js` | 1137 | DOM identity extraction surface. Any growth needs identity false-hide/leak proof. |
 | `js/seed.js` | 1136 | Transport interception and JSON active-work gate. Any growth needs JSON/no-work proof. |
+| `js/content/bridge_settings.js` | 1113 | Content-script settings relay and managed time-limit runtime. Any growth needs settings, route, and no-work proof. |
 
 Near-threshold product-owned source files:
 
@@ -244,9 +245,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

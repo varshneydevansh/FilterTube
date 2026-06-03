@@ -77,6 +77,7 @@ test('background runtime action inventory is pinned to current branch set', () =
     'FilterTube_FirstRunComplete',
     'FilterTube_KidsBlockChannel',
     'FilterTube_KidsWhitelistChannel',
+    'FilterTube_ManagedTimeLimitHeartbeat',
     'FilterTube_OpenWhatsNew',
     'FilterTube_ReleaseNotesAck',
     'FilterTube_ReleaseNotesCheck',
@@ -100,7 +101,7 @@ test('background runtime action inventory is pinned to current branch set', () =
     'updateVideoMetaMap'
   ]);
 
-  assert.equal(actions.length, 29);
+  assert.equal(actions.length, 30);
 
   const doc = read(auditDocPath);
   for (const action of actions) {

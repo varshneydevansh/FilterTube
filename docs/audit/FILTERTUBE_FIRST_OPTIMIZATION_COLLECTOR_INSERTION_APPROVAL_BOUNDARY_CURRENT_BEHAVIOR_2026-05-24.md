@@ -29,9 +29,9 @@ Runtime metric collector approvals: 0
 Runtime collector insertion points approved: 0
 Implementation-ready collector insertion approval rows: 0
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5744
+Method semantic proof gap lexical callables covered: 5789
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5744
+Lexical callables requiring semantic proof before behavior changes: 5789
 ```
 
 This is an insertion approval boundary, not an insertion design. It keeps every
@@ -48,7 +48,7 @@ release/public boundaries together, plus affected callable semantic proof.
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_INSERTION_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | Maps 12 insertion gate rows, but proves 0 approved runtime insertion points and 0 implementation-ready collector rows. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SOURCE_OWNER_APPROVAL_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves 0 runtime source-owner approvals and keeps source ownership blocked before insertion approval. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_COLLECTOR_SOURCE_LOCUS_CLOSURE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves source-locus classification is not collector approval and keeps insertion at NO-GO. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,697 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,789 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_NO_WORK_PRESERVATION_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Proves 12 no-work rows and 0 approved no-work preservation proofs. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_SIDE_EFFECT_BUDGET_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Proves 12 side-effect rows and 0 approved side-effect budgets. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_FIXTURE_PROVENANCE_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Proves 12 fixture provenance rows and 0 approved fixture packets. |
@@ -81,9 +81,9 @@ runtime rollback approvals: 0
 runtime unclaimed-surface approvals: 0
 implementation-ready collector insertion approval rows: 0
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 expected runtime audit tests: 4457
 expected runtime audit pass: 4457
 expected runtime audit fail: 0
@@ -176,7 +176,7 @@ prove insertion approval absence is still upstream of no-work approval. The
 addendum pins 12 collector no-work approval boundary rows, 12 collector
 insertion approval rows covered, 12 collector no-work preservation rows
 covered, 12 no-work preservation contract rows covered, 63 method semantic
-proof gap files covered, 5,697 lexical callables still requiring semantic proof,
+proof gap files covered, 5,789 lexical callables still requiring semantic proof,
 0 files with complete per-callable semantic proof, 0 runtime source-owner
 approvals, 0 runtime metric collector approvals, 0 runtime collector insertion
 points approved, 0 runtime collector no-work proofs approved, 0
@@ -194,7 +194,7 @@ prove insertion approval absence remains upstream of side-effect approval. The
 addendum pins 12 collector side-effect approval boundary rows, 12 collector
 insertion approval rows covered, 12 collector no-work approval rows covered,
 12 collector side-effect rows covered, 69 method semantic proof gap files
-covered, 5,697 lexical callables still requiring semantic proof, 0 files with
+covered, 5,789 lexical callables still requiring semantic proof, 0 files with
 complete per-callable semantic proof, 0 runtime source-owner approvals, 0
 runtime metric collector approvals, 0 runtime collector insertion points
 approved, 0 runtime collector side-effect budgets approved, 0 committed

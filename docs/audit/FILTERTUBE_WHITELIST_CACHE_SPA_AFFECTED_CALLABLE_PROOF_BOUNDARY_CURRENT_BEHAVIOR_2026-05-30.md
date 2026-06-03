@@ -198,8 +198,8 @@ runtime behavior changed: no
 | --- | ---: | ---: | --- | --- |
 | `js/filter_logic.js` | 3653 | 172174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` | JSON decision, map producers, whitelist branch. |
 | `js/content_bridge.js` | 13637 | 604184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
-| `js/content/bridge_settings.js` | 846 | 34241 | `aea46dd241248db1d1d9bcbdfdf65320d1399ecd84cc7792678f29b1b26ee092` |
-| `js/background.js` | 6344 | 286370 | `ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36` |
+| `js/content/bridge_settings.js` | 1114 | 44087 | `f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853` |
+| `js/background.js` | 6642 | 298986 | `837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd` |
 | `js/content/dom_fallback.js` | 5031 | 235555 | `fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5` | rendered-card fallback pass and whitelist-pending recheck. |
 | `js/content/handle_resolver.js` | 283 | 9785 | `67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff` | handle resolution and pending DOM fallback rerun trigger. |
 | `js/seed.js` | 1137 | 50026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` | MAIN-world fetch/XHR active-work and no-work gates. |
@@ -215,9 +215,9 @@ runtime behavior changed: no
 | `FT-WLCACHE-AFFECTED-03-visible-card-identity-prefetch` | `js/content_bridge.js:1391` `prefetchIdentityForCard`; `js/content/handle_resolver.js:149` `fetchIdForHandle` | Visible-card identity prefetch can improve whitelist correctness but can also add network/cache work during SPA scroll and hydration. | Anchor-only proof; implementation readiness `NO-GO`. |
 | `FT-WLCACHE-AFFECTED-04-video-channel-content-cache` | `js/content_bridge.js:1638` `persistVideoChannelMapping`; `js/content_bridge.js:5913` `FilterTube_UpdateVideoChannelMap` message branch | Channel-map persistence and DOM stamping can trigger fallback reruns. Optimizing it must preserve learned channel blocking and avoid duplicate rerun churn. | Anchor-only proof; implementation readiness `NO-GO`. |
 | `FT-WLCACHE-AFFECTED-05-video-meta-content-cache` | `js/content_bridge.js:1649` `persistVideoMetaMapping`; `js/content_bridge.js:1714` `scheduleVideoMetaDomRerun`; `js/content_bridge.js:5962` `FilterTube_UpdateVideoMetaMap` message branch | Metadata map persistence feeds duration/date/category filters and can schedule DOM reruns after JSON mapping. Pruning must preserve metadata correctness and avoid stale pending cards. | Anchor-only proof; implementation readiness `NO-GO`. |
-| `FT-WLCACHE-AFFECTED-06-background-video-channel-cache` | `js/background.js:1648` `enqueueVideoChannelMapUpdate`; `js/background.js:1774` `getCompiledSettings` | Background channel-map cache updates influence compiled settings returned to content scripts. Optimization must preserve refresh ordering and profile isolation. | Anchor-only proof; implementation readiness `NO-GO`. |
-| `FT-WLCACHE-AFFECTED-07-background-video-meta-cache` | `js/background.js:1673` `enqueueVideoMetaMapUpdate`; `js/background.js:1774` `getCompiledSettings` | Background metadata cache updates influence compiled settings and can drift from content cache behavior if load order or eviction changes. | Anchor-only proof; implementation readiness `NO-GO`. |
-| `FT-WLCACHE-AFFECTED-08-storage-refresh-fanout` | `js/content/bridge_settings.js:751` `scheduleSettingsRefreshFromStorage`; `js/content/bridge_settings.js:783` `handleStorageChanges` | Storage refresh coalescing controls forced reprocess behavior after rule/profile/cache updates. It must not drop force-reprocess semantics or wake heavy work for map-only changes. | Anchor-only proof; implementation readiness `NO-GO`. |
+| `FT-WLCACHE-AFFECTED-06-background-video-channel-cache` | `js/background.js:1933` `enqueueVideoChannelMapUpdate`; `js/background.js:2059` `getCompiledSettings` | Background channel-map cache updates influence compiled settings returned to content scripts. Optimization must preserve refresh ordering and profile isolation. | Anchor-only proof; implementation readiness `NO-GO`. |
+| `FT-WLCACHE-AFFECTED-07-background-video-meta-cache` | `js/background.js:1958` `enqueueVideoMetaMapUpdate`; `js/background.js:2059` `getCompiledSettings` | Background metadata cache updates influence compiled settings and can drift from content cache behavior if load order or eviction changes. | Anchor-only proof; implementation readiness `NO-GO`. |
+| `FT-WLCACHE-AFFECTED-08-storage-refresh-fanout` | `js/content/bridge_settings.js:1019` `scheduleSettingsRefreshFromStorage`; `js/content/bridge_settings.js:1051` `handleStorageChanges` | Storage refresh coalescing controls forced reprocess behavior after rule/profile/cache updates. It must not drop force-reprocess semantics or wake heavy work for map-only changes. | Anchor-only proof; implementation readiness `NO-GO`. |
 | `FT-WLCACHE-AFFECTED-09-dom-fallback-pending-recheck` | `js/content/dom_fallback.js:2219` `applyDOMFallback`; `js/content/dom_fallback.js:4139` `onlyWhitelistPending` branch | DOM fallback is the broad rendered-card pass. It must keep cheap gates before selector traversal and avoid running full fallback when only whitelist pending rows are needed. | Anchor-only proof; implementation readiness `NO-GO`. |
 | `FT-WLCACHE-AFFECTED-10-handle-resolver-pending-cache` | `js/content/handle_resolver.js:136` `scheduleDomFallbackRerun`; `js/content/handle_resolver.js:149` `fetchIdForHandle` | Handle resolution can fill missing channel identity, but pending or failed identity work can repeatedly wake fallback processing if not bounded. | Anchor-only proof; implementation readiness `NO-GO`. |
 | `FT-WLCACHE-AFFECTED-11-transport-active-work-gates` | `js/seed.js:220` `hasActiveJsonFilterRules`; `js/seed.js:253` `shouldBypassYouTubeiNetworkResponse`; `js/seed.js:263` `shouldSkipEngineProcessing`; `js/injector.js:171` `hasActiveJsonFilterRules`; `js/injector.js:3405` `processDataWithFilterLogic` | JSON transport work must stay gated when settings are disabled or no active JSON work exists, while whitelist mode and active rules still process correctly. | Anchor-only proof; implementation readiness `NO-GO`. |
@@ -1021,14 +1021,14 @@ Required future affected-callable semantic gap binding shape:
       "id": "FT-WLCACHE-SEMANTIC-GAP-02-bridge-settings",
       "file": "js/content/bridge_settings.js",
       "family": "Hot page/background runtime",
-      "lexicalCallables": 78,
+      "lexicalCallables": 102,
       "semanticStatus": "semantic proof incomplete"
     },
     {
       "id": "FT-WLCACHE-SEMANTIC-GAP-03-background",
       "file": "js/background.js",
       "family": "Hot page/background runtime",
-      "lexicalCallables": 442,
+      "lexicalCallables": 463,
       "semanticStatus": "semantic proof incomplete"
     },
     {
@@ -1108,8 +1108,8 @@ Required future affected-callable semantic gap binding shape:
 | --- | --- | --- | --- |
 | `FT-WLCACHE-SEMANTIC-GAP-00-filter-logic` | `js/filter_logic.js` / Hot page/background runtime / 313 lexical callables | JSON traversal, harvest/map mutation, block decision, recursion, and no-rule budget proof remain incomplete. | Gap-bound only; semantic proof `NO-GO`. |
 | `FT-WLCACHE-SEMANTIC-GAP-01-content-bridge` | `js/content_bridge.js` / Hot page/background runtime / 1203 lexical callables | Content bridge caller graph, menu/quick action authority, lifecycle callback ownership, and identity confidence proof remain incomplete. | Gap-bound only; semantic proof `NO-GO`. |
-| `FT-WLCACHE-SEMANTIC-GAP-02-bridge-settings` | `js/content/bridge_settings.js` / Hot page/background runtime / 78 lexical callables | Settings relay/import/storage listener authority and caller-class proof remain incomplete. | Gap-bound only; semantic proof `NO-GO`. |
-| `FT-WLCACHE-SEMANTIC-GAP-03-background` | `js/background.js` / Hot page/background runtime / 442 lexical callables | Message, mutation, resolver, storage, stats, and script-injection branches still need per-action authority. | Gap-bound only; semantic proof `NO-GO`. |
+| `FT-WLCACHE-SEMANTIC-GAP-02-bridge-settings` | `js/content/bridge_settings.js` / Hot page/background runtime / 102 lexical callables | Settings relay/import/storage listener authority and caller-class proof remain incomplete. | Gap-bound only; semantic proof `NO-GO`. |
+| `FT-WLCACHE-SEMANTIC-GAP-03-background` | `js/background.js` / Hot page/background runtime / 463 lexical callables | Message, mutation, resolver, storage, stats, and script-injection branches still need per-action authority. | Gap-bound only; semantic proof `NO-GO`. |
 | `FT-WLCACHE-SEMANTIC-GAP-04-dom-fallback` | `js/content/dom_fallback.js` / Hot page/background runtime / 431 lexical callables | Hide/restore, selector target, playlist/player side effect, and no-work proof remain incomplete. | Gap-bound only; semantic proof `NO-GO`. |
 | `FT-WLCACHE-SEMANTIC-GAP-05-handle-resolver` | `js/content/handle_resolver.js` / Hot page/background runtime / 22 lexical callables | Resolver fetch budget, cache source, identity confidence, and route negative proof remain incomplete. | Gap-bound only; semantic proof `NO-GO`. |
 | `FT-WLCACHE-SEMANTIC-GAP-06-seed` | `js/seed.js` / Hot page/background runtime / 92 lexical callables | Fetch/XHR/page-global patch ownership, replay budget, JSON mutation, and pass-through proof remain incomplete. | Gap-bound only; semantic proof `NO-GO`. |
@@ -1260,14 +1260,14 @@ Required future affected-callable semantic file-field matrix shape:
     {
       "id": "FT-WLCACHE-SEMANTIC-MATRIX-02-bridge-settings",
       "file": "js/content/bridge_settings.js",
-      "lexicalCallables": 78,
+      "lexicalCallables": 102,
       "fileFieldCellsRequired": 8,
       "approvedFileFieldCells": 0
     },
     {
       "id": "FT-WLCACHE-SEMANTIC-MATRIX-03-background",
       "file": "js/background.js",
-      "lexicalCallables": 442,
+      "lexicalCallables": 463,
       "fileFieldCellsRequired": 8,
       "approvedFileFieldCells": 0
     },

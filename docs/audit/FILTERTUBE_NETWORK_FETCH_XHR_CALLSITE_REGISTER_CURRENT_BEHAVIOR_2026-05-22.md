@@ -48,7 +48,7 @@ file.text() reads an uploaded/imported local File and is not a network response.
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6,343 | 286,370 | `ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36` |
+| `js/background.js` | 6,641 | 298,986 | `837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd` |
 | `js/content/handle_resolver.js` | 282 | 9,785 | `67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff` |
 | `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
 | `js/injector.js` | 3,593 | 155,830 | `634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04` |
@@ -79,19 +79,19 @@ file.text() reads an uploaded/imported local File and is not a network response.
 ## Network Fetch/XHR Rows
 
 ```text
-js/background.js:1723:fetch:releaseNotesExtensionResource
-js/background.js:1725:response.json:releaseNotesJsonDecode
-js/background.js:2914:fetch:shortsIdentityBackgroundHtmlFetch
-js/background.js:2925:response.body.getReader:shortsIdentityStreamReader
-js/background.js:3030:fetch:kidsWatchIdentityHtmlFetch
-js/background.js:3041:response.body.getReader:kidsWatchIdentityStreamReader
-js/background.js:3123:fetch:watchIdentityHtmlFetch
-js/background.js:3134:response.body.getReader:watchIdentityStreamReader
-js/background.js:4666:fetch:channelInfoPrimaryHtmlFetch
-js/background.js:4680:fetch:channelInfoHandleFallbackHtmlFetch
-js/background.js:4694:response.text:channelInfoPrimaryHtmlDecode
-js/background.js:4833:fetch:channelInfoPublicFallbackHtmlFetch
-js/background.js:4842:response.text:channelInfoPublicFallbackHtmlDecode
+js/background.js:2008:fetch:releaseNotesExtensionResource
+js/background.js:2010:response.json:releaseNotesJsonDecode
+js/background.js:3209:fetch:shortsIdentityBackgroundHtmlFetch
+js/background.js:3220:response.body.getReader:shortsIdentityStreamReader
+js/background.js:3325:fetch:kidsWatchIdentityHtmlFetch
+js/background.js:3336:response.body.getReader:kidsWatchIdentityStreamReader
+js/background.js:3418:fetch:watchIdentityHtmlFetch
+js/background.js:3429:response.body.getReader:watchIdentityStreamReader
+js/background.js:4964:fetch:channelInfoPrimaryHtmlFetch
+js/background.js:4978:fetch:channelInfoHandleFallbackHtmlFetch
+js/background.js:4992:response.text:channelInfoPrimaryHtmlDecode
+js/background.js:5131:fetch:channelInfoPublicFallbackHtmlFetch
+js/background.js:5140:response.text:channelInfoPublicFallbackHtmlDecode
 js/content/handle_resolver.js:239:fetch:directHandleHtmlFetch
 js/content/handle_resolver.js:255:response.text:directHandleHtmlDecode
 js/content_bridge.js:1943:fetch:watchMetaDirectHtmlFetch
@@ -404,9 +404,9 @@ support runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

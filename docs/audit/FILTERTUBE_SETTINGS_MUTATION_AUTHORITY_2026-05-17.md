@@ -162,7 +162,7 @@ fail 0
 | `js/background.js:2062` | background authority/actions | list write | - | `? activeMain.blockedKeywords` | must preserve list type, source, channel-derived entries, and sync/import provenance |
 | `js/background.js:2065` | background authority/actions | list write | - | `const kidsBlockedKeywords = Array.isArray(activeKids.blockedKeywords) ? activeKids.blockedKeywords : [];` | must preserve list type, source, channel-derived entries, and sync/import provenance |
 | `js/background.js:2072` | background authority/actions | list write | - | `compiledSettings.filterKeywords = compileKeywordEntries(v4KeywordEntries);` | must preserve list type, source, channel-derived entries, and sync/import provenance |
-| `js/background.js:2080` | background authority/actions | storage write | `storageUpdates);` | `browserAPI.storage.local.set(storageUpdates);` | must be tied to mutation intent, migration report, or explicit cache/map side-effect |
+| `js/background.js:2380` | background authority/actions | storage write | `storageUpdates);` | `browserAPI.storage.local.set(storageUpdates);` | must be tied to mutation intent, migration report, or explicit cache/map side-effect |
 | `js/background.js:2086` | background authority/actions | list write | - | `const kidsChannelsV3 = Array.isArray(kidsProfile?.blockedChannels) ? kidsProfile.blockedChannels : [];` | must preserve list type, source, channel-derived entries, and sync/import provenance |
 | `js/background.js:2087` | background authority/actions | list write | - | `const kidsKeywordsV3 = Array.isArray(kidsProfile?.blockedKeywords) ? kidsProfile.blockedKeywords : [];` | must preserve list type, source, channel-derived entries, and sync/import provenance |
 | `js/background.js:2089` | background authority/actions | list write | - | `const kidsChannelsV4 = Array.isArray(activeKids.blockedChannels) ? activeKids.blockedChannels : null;` | must preserve list type, source, channel-derived entries, and sync/import provenance |
@@ -647,9 +647,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

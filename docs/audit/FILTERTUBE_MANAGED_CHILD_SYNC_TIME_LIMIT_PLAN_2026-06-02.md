@@ -812,9 +812,19 @@ T1 + T2 + T3
   - `npm run test:settings`
   - `npm run test:release`
   - manual YouTube active-tab smoke
-- **status**: Not Completed
+- **status**: Partially Completed
 - **log**:
+  - 2026-06-04: Extension background now compiles active child
+    `settings.timeLimitPolicy` into `managedTimeLimitPolicy`, accepts
+    content-script active/focused heartbeats, stores whole-profile daily usage
+    in `ftManagedTimeUsageV1`, caps heartbeat deltas, avoids double-counting
+    recently active tabs for the same profile/date, and returns exhausted
+    budget state to the content bridge.
 - **files edited/created**:
+  - `js/background.js`
+  - `js/content/bridge_settings.js`
+  - `tests/runtime/managed-time-budget-enforcement-current-behavior.test.mjs`
+  - `docs/audit/FILTERTUBE_MANAGED_CHILD_TIME_LIMIT_SCHEMA_CONTRACT_2026-06-03.md`
 
 #### T10: Add child timeout overlay
 
@@ -834,9 +844,16 @@ T1 + T2 + T3
   - `npm run test:performance`
   - `npm run test:settings`
   - manual YouTube smoke
-- **status**: Not Completed
+- **status**: Partially Completed
 - **log**:
+  - 2026-06-04: Content bridge now shows a managed timeout overlay only after
+    background reports `timedOut: true`; the overlay covers the page, pauses
+    visible videos, survives SPA revalidation through the heartbeat loop, and
+    does not use content-filter hide markers or hidden-content stats.
 - **files edited/created**:
+  - `js/content/bridge_settings.js`
+  - `tests/runtime/managed-time-budget-enforcement-current-behavior.test.mjs`
+  - `docs/audit/FILTERTUBE_MANAGED_CHILD_TIME_LIMIT_SCHEMA_CONTRACT_2026-06-03.md`
 
 ### Sprint 4: Managed remote sync
 

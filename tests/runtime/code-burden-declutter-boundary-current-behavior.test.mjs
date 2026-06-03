@@ -47,7 +47,8 @@ const largeProductOwnedSourceFiles = [
   'js/render_engine.js',
   'js/settings_shared.js',
   'js/content/dom_extractors.js',
-  'js/seed.js'
+  'js/seed.js',
+  'js/content/bridge_settings.js'
 ];
 
 const nearThresholdProductOwnedSourceFiles = [
@@ -318,7 +319,7 @@ test('large product-owned source files are guarded before new spaghetti growth',
   );
 
   assert.match(doc, /Large-File Growth Guard Addendum - 2026-06-01/);
-  assert.match(doc, /large product-owned JS\/JSX\/MJS files at or above 1000 lines guarded: 14/);
+  assert.match(doc, /large product-owned JS\/JSX\/MJS files at or above 1000 lines guarded: 15/);
   assert.match(doc, /near-threshold product-owned JS\/JSX\/MJS files from 900 to 999 lines guarded: 2/);
   assert.match(doc, /large vendor bundle files recorded separately: 1/);
   assert.match(doc, /new product-owned file crossing 1000 lines without proof: NO-GO/);

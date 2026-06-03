@@ -23,9 +23,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -152,7 +152,7 @@ Source references:
 - `js/settings_shared.js:17-56` omits `contentFilters` and `categoryFilters`
   from the legacy `SETTINGS_KEYS` list, while profile V4 loading can still
   carry those objects.
-- `js/content/bridge_settings.js:557-600` includes `contentFilters` in storage
+- `js/content/bridge_settings.js:1060-1102` includes `contentFilters` in storage
   refresh keys but omits `categoryFilters`.
 
 Current verdict:

@@ -171,7 +171,7 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /76\s+failures\s+to\s+69\s+failures/);
   assert.match(doc, /release-note\/package-version proof/);
   assert.match(doc, /115\s+failures\s+to\s+76\s+failures/);
-  assert.match(doc, /stale method\s+semantic proof gap counts from 5,673 to 5,697 lexical callables/);
+  assert.match(doc, /stale method\s+semantic proof gap counts from 5,673 to 5,789 lexical callables/);
   assert.match(doc, /not clean enough\s+to be used as a release gate/);
   assert.match(doc, /node scripts\/audit-proof-drift\.mjs --all --report-only/);
   assert.match(doc, /no stale source fingerprint proof rows/);
@@ -284,7 +284,7 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   assert.match(doc, /current manifest content-script JS\s+reference totals/);
   assert.match(doc, /`js\/layout\.js`\s+is packaged but inactive and not web-accessible/);
   assert.match(doc, /previous method-proof\/family blocker row is now retired/);
-  assert.match(doc, /direct method semantic proof lane passes with 5,697\s+current lexical callables/);
+  assert.match(doc, /direct method semantic proof lane passes with 5,789\s+current lexical callables/);
   assert.match(doc, /previous release-note\/package-version drift rows are also retired/);
   assert.match(doc, /now align on `3\.3\.2`/);
   assert.match(doc, /previous function-coverage source backlog row is retired/);

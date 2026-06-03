@@ -254,8 +254,8 @@ audit-only and changes no product runtime source.
 
 | Boundary row | Current proof | Remaining risk |
 | --- | --- | --- |
-| `watch_player_ui_settings_cache_split` | UI catalog and shared settings expose independent watch/player toggles; background emits compiled booleans at `js/background.js:2484-2500`, while the background storage invalidation list still has a narrower key owner at `js/background.js:4487-4504`. | A toggle can be present in compiled settings without one central cache-dependency report. |
-| `watch_player_content_refresh_compensation` | Content bridge owns a broader local refresh list at `js/content/bridge_settings.js:599-645`, including watch/player keys and map-only refresh decisions. | Content refresh can mask background drift, but it is not an authority schema. |
+| `watch_player_ui_settings_cache_split` | UI catalog and shared settings expose independent watch/player toggles; background emits compiled booleans at `js/background.js:2810-2817`, while the background storage invalidation list still has a narrower key owner at `js/background.js:4808-4823`. | A toggle can be present in compiled settings without one central cache-dependency report. |
+| `watch_player_content_refresh_compensation` | Content bridge owns a broader local refresh list at `js/content/bridge_settings.js:1060-1102`, including watch/player keys and map-only refresh decisions. | Content refresh can mask background drift, but it is not an authority schema. |
 | `watch_next_no_rule_endpoint_policy_gap` | Seed fetch still clones/parses `/next` before deciding comment continuation behavior at `js/seed.js:701-740`; active JSON admission remains narrower than the watch/player UI control family. | No shared endpoint policy proves pass-through, harvest-only, comments-only rewrite, or mutation per route and rule state. |
 | `watch_player_metadata_only_gap` | `/player` snapshots are stashed at `js/seed.js:87-90`, and player details/microformat metadata are harvested at `js/filter_logic.js:1175-1226`; the Main player fragment addendum proves metadata-only pass-through for one reduced fixture. | No `playerMetadataOnly` runtime decision report proves zero recommendation mutation for every player payload. |
 | `watch_comments_continuation_scaffold_split` | `hideAllComments` continuation rewriting is seed-owned, comment renderer decisions are `filter_logic`-owned, and DOM comment fallback remains a separate owner. | Comment hiding can drift between JSON continuation, JSON renderer, and DOM scaffold behavior. |
@@ -330,9 +330,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

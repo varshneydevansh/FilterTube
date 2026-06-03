@@ -185,9 +185,9 @@ test('JSON-first implementation authority boundary is audit-only and source-back
   assert.match(doc, /JSON path evidence is source evidence/);
   assert.match(doc, /not effect authority by itself/);
   assert.match(doc, /repo-wide method semantic proof gap is now part of this gate/);
-  assert.match(doc, /69 tracked JS\/JSX\/MJS files, 5,697 lexical callables/);
+  assert.match(doc, /69 tracked JS\/JSX\/MJS files, 5,789 lexical callables/);
   assert.match(doc, /0 files with complete\s+per-callable semantic proof/);
-  assert.match(doc, /5,697 callables still requiring semantic proof/);
+  assert.match(doc, /5,789 callables still requiring semantic proof/);
   assert.match(doc, /continue proof-backed audit: GO/);
   assertJsonFirstSourceFlowAddendum(doc);
 
@@ -216,7 +216,7 @@ test('JSON-first implementation authority rows and counts stay pinned', () => {
   assert.match(doc, /first optimization source-locus implementation rows covered: 12/);
   assert.match(doc, /whitelist readiness gaps covered: 10/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5744/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5789/);
   assert.match(doc, /complete per-callable semantic proof files covered: 0/);
   assert.match(doc, /first optimization implementation readiness rows covered: 14/);
   assert.match(doc, /runtime JSON-first implementation approvals: 0/);
@@ -372,9 +372,9 @@ test('JSON-first implementation authority is consistent with existing JSON-first
   assert.match(whitelistReadiness, /whitelist readiness gap rows: 10/);
   assert.match(whitelistReadiness, /implementation-ready whitelist optimization rows: 0/);
   assert.match(methodSemanticGap, /tracked JS\/JSX\/MJS files: 69/);
-  assert.match(methodSemanticGap, /repo-wide lexical callables: 5744/);
+  assert.match(methodSemanticGap, /repo-wide lexical callables: 5789/);
   assert.match(methodSemanticGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodSemanticGap, /lexical callables requiring semantic proof before behavior changes: 5744/);
+  assert.match(methodSemanticGap, /lexical callables requiring semantic proof before behavior changes: 5789/);
   assert.match(methodSemanticGap, /as the basis for a first-class JSON filter path/);
 });
 

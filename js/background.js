@@ -41,6 +41,74 @@ function normalizeString(value) {
     return typeof value === 'string' ? value.trim() : '';
 }
 
+function normalizeNonNegativeInteger(value) {
+    const num = typeof value === 'number' ? value : Number(value);
+    if (!Number.isInteger(num)) return null;
+    return num >= 0 ? num : null;
+}
+
+function normalizeManagedTimeLimitPolicy(value) {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+    const raw = safeObject(value);
+    if (normalizeString(raw.schema) !== 'filtertube_managed_time_limit') return null;
+    if (raw.version !== 1) return null;
+    if (typeof raw.enabled !== 'boolean') return null;
+
+    const timezone = normalizeString(raw.timezone);
+    const dailyBudgetSeconds = normalizeNonNegativeInteger(raw.dailyBudgetSeconds);
+    const policyRevision = normalizeNonNegativeInteger(raw.policyRevision);
+    const policyHash = normalizeString(raw.policyHash);
+    const issuedAt = normalizeNonNegativeInteger(raw.issuedAt);
+    if (!timezone || dailyBudgetSeconds == null || !policyRevision || !policyHash || issuedAt == null) return null;
+
+    const parentGrantRaw = safeObject(raw.parentGrant);
+    const out = {
+        schema: 'filtertube_managed_time_limit',
+        version: 1,
+        enabled: raw.enabled,
+        timezone,
+        dailyBudgetSeconds,
+        countingMode: normalizeString(raw.countingMode) || 'active_youtube_tab',
+        activeDeviceBudgetPolicy: normalizeString(raw.activeDeviceBudgetPolicy) || 'single_active_tab_no_double_count',
+        resetPolicy: normalizeString(raw.resetPolicy) || 'policy_timezone_midnight',
+        graceSeconds: normalizeNonNegativeInteger(raw.graceSeconds) || 0,
+        parentGrant: {
+            enabled: parentGrantRaw.enabled === true,
+            extraSeconds: normalizeNonNegativeInteger(parentGrantRaw.extraSeconds) || 0,
+            expiresAt: parentGrantRaw.expiresAt == null ? null : normalizeNonNegativeInteger(parentGrantRaw.expiresAt),
+            reason: normalizeString(parentGrantRaw.reason)
+        },
+        policyRevision,
+        policyHash,
+        issuedAt,
+        validFrom: raw.validFrom == null ? issuedAt : normalizeNonNegativeInteger(raw.validFrom),
+        validUntil: raw.validUntil == null ? null : normalizeNonNegativeInteger(raw.validUntil)
+    };
+
+    if (
+        out.countingMode !== 'active_youtube_tab' ||
+        out.activeDeviceBudgetPolicy !== 'single_active_tab_no_double_count' ||
+        out.resetPolicy !== 'policy_timezone_midnight'
+    ) {
+        return null;
+    }
+    if (out.parentGrant.enabled && out.parentGrant.expiresAt == null) return null;
+    if (out.validFrom == null || (raw.validUntil != null && out.validUntil == null)) return null;
+
+    const surfaceBudgets = safeObject(raw.surfaceBudgets);
+    const hasSurfaceBudget =
+        Object.prototype.hasOwnProperty.call(surfaceBudgets, 'main') ||
+        Object.prototype.hasOwnProperty.call(surfaceBudgets, 'kids');
+    if (hasSurfaceBudget) {
+        const main = normalizeNonNegativeInteger(surfaceBudgets.main);
+        const kids = normalizeNonNegativeInteger(surfaceBudgets.kids);
+        if (main == null || kids == null) return null;
+        out.surfaceBudgets = { main, kids };
+    }
+
+    return out;
+}
+
 function sendMessageToTabQuietly(tabId, payload) {
     try {
         if (!tabId || !browserAPI?.tabs?.sendMessage) return;
@@ -1309,6 +1377,223 @@ let autoBackupTimer = null;
 let pendingAutoBackupTrigger = null;
 let pendingAutoBackupOptions = null;
 
+const MANAGED_TIME_USAGE_STORAGE_KEY = 'ftManagedTimeUsageV1';
+const MANAGED_TIME_USAGE_SCHEMA = 'filtertube_managed_time_usage';
+const MANAGED_TIME_HEARTBEAT_STALE_MS = 8000;
+const MANAGED_TIME_MAX_HEARTBEAT_DELTA_SECONDS = 10;
+const managedTimeActiveScopes = new Map();
+
+function classifyManagedTimeLimitRoute(rawUrl) {
+    try {
+        const parsed = new URL(rawUrl || '');
+        const host = String(parsed.hostname || '').toLowerCase();
+        if (host === 'youtubekids.com' || host.endsWith('.youtubekids.com')) {
+            return { surface: 'kids', host };
+        }
+        if (host === 'youtube.com' || host.endsWith('.youtube.com')) {
+            return { surface: 'main', host };
+        }
+    } catch (e) {
+    }
+    return { surface: 'external', host: '' };
+}
+
+function managedTimeLimitDateKey(timestamp, timezone) {
+    const tz = normalizeString(timezone) || 'Etc/UTC';
+    try {
+        const parts = new Intl.DateTimeFormat('en-CA', {
+            timeZone: tz,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        }).formatToParts(new Date(timestamp));
+        const get = type => normalizeString(parts.find(part => part.type === type)?.value);
+        const year = get('year');
+        const month = get('month');
+        const day = get('day');
+        if (year && month && day) return `${year}-${month}-${day}`;
+    } catch (e) {
+    }
+    return new Date(timestamp).toISOString().slice(0, 10);
+}
+
+function managedTimeLimitUsageKey(profileId, dateKey) {
+    return `${normalizeString(profileId) || DEFAULT_PROFILE_ID}:${normalizeString(dateKey) || 'unknown'}`;
+}
+
+function managedTimeLimitTotalBudgetSeconds(policy, now) {
+    const baseBudget = normalizeNonNegativeInteger(policy?.dailyBudgetSeconds) || 0;
+    const graceSeconds = normalizeNonNegativeInteger(policy?.graceSeconds) || 0;
+    const grant = safeObject(policy?.parentGrant);
+    const grantSeconds = grant.enabled === true
+        && normalizeNonNegativeInteger(grant.expiresAt) != null
+        && grant.expiresAt > now
+        ? (normalizeNonNegativeInteger(grant.extraSeconds) || 0)
+        : 0;
+    return baseBudget + graceSeconds + grantSeconds;
+}
+
+function normalizeManagedTimeUsageStore(value) {
+    const raw = safeObject(value);
+    const rows = safeObject(raw.rows);
+    return {
+        schema: MANAGED_TIME_USAGE_SCHEMA,
+        version: 1,
+        rows
+    };
+}
+
+function pruneManagedTimeUsageRows(rows, limit = 240) {
+    const entries = Object.entries(safeObject(rows));
+    if (entries.length <= limit) return rows;
+    return Object.fromEntries(
+        entries
+            .sort((a, b) => (normalizeNonNegativeInteger(safeObject(b[1]).updatedAt) || 0) - (normalizeNonNegativeInteger(safeObject(a[1]).updatedAt) || 0))
+            .slice(0, limit)
+    );
+}
+
+async function handleManagedTimeLimitHeartbeat(request, sender, sendResponse) {
+    try {
+        const now = nowTs();
+        const policy = normalizeManagedTimeLimitPolicy(request?.policy);
+        if (!policy || policy.enabled !== true) {
+            sendResponse?.({ ok: true, enforced: false, reason: 'disabled_policy_no_work' });
+            return;
+        }
+
+        const route = classifyManagedTimeLimitRoute(sender?.tab?.url || sender?.url || request?.href || '');
+        if (route.surface === 'external') {
+            sendResponse?.({ ok: true, enforced: false, reason: 'external_route_no_work' });
+            return;
+        }
+
+        const profileId = normalizeString(request?.profileId) || normalizeString(request?.policy?.profileId);
+        if (!profileId) {
+            sendResponse?.({ ok: false, enforced: false, error: 'missing_profile_id' });
+            return;
+        }
+
+        if (policy.validFrom != null && now < policy.validFrom) {
+            sendResponse?.({ ok: true, enforced: false, reason: 'future_policy_not_active' });
+            return;
+        }
+        if (policy.validUntil != null && now > policy.validUntil) {
+            sendResponse?.({
+                ok: true,
+                enforced: true,
+                timedOut: true,
+                remainingSeconds: 0,
+                consumedSeconds: 0,
+                totalBudgetSeconds: 0,
+                reason: 'expired_policy_requires_parent_revalidation',
+                profileId,
+                profileName: normalizeString(request?.policy?.profileName) || 'Protected profile',
+                surface: route.surface,
+                policyRevision: policy.policyRevision,
+                policyHash: policy.policyHash
+            });
+            return;
+        }
+
+        const dateKey = managedTimeLimitDateKey(now, policy.timezone);
+        const usageKey = managedTimeLimitUsageKey(profileId, dateKey);
+        const totalBudgetSeconds = managedTimeLimitTotalBudgetSeconds(policy, now);
+        const tabId = Number(sender?.tab?.id);
+        const visible = request?.visible === true;
+        const focused = request?.focused === true;
+        const shouldCount = visible && focused && Number.isFinite(tabId);
+
+        const data = await storageGet([MANAGED_TIME_USAGE_STORAGE_KEY]);
+        const usageStore = normalizeManagedTimeUsageStore(data?.[MANAGED_TIME_USAGE_STORAGE_KEY]);
+        const rows = safeObject(usageStore.rows);
+        const existing = safeObject(rows[usageKey]);
+        const row = {
+            schema: MANAGED_TIME_USAGE_SCHEMA,
+            version: 1,
+            profileId,
+            dateKey,
+            consumedSeconds: normalizeNonNegativeInteger(existing.consumedSeconds) || 0,
+            updatedAt: normalizeNonNegativeInteger(existing.updatedAt) || now,
+            policyRevision: policy.policyRevision,
+            policyHash: policy.policyHash,
+            lastSurface: route.surface
+        };
+
+        let countedSeconds = 0;
+        let countDecision = shouldCount ? 'first_active_heartbeat' : 'inactive_heartbeat_no_count';
+        const remainingBeforeCount = Math.max(0, totalBudgetSeconds - row.consumedSeconds);
+
+        if (shouldCount && remainingBeforeCount > 0) {
+            const active = managedTimeActiveScopes.get(usageKey);
+            if (active && active.tabId !== tabId && now - active.lastHeartbeatAt < MANAGED_TIME_HEARTBEAT_STALE_MS) {
+                countDecision = 'another_active_tab_recently_counted';
+                managedTimeActiveScopes.set(usageKey, {
+                    ...active,
+                    lastHeartbeatAt: now
+                });
+            } else if (active && active.tabId === tabId) {
+                countedSeconds = Math.max(
+                    0,
+                    Math.min(
+                        MANAGED_TIME_MAX_HEARTBEAT_DELTA_SECONDS,
+                        Math.floor((now - (normalizeNonNegativeInteger(active.lastCountedAt) || now)) / 1000)
+                    )
+                );
+                countedSeconds = Math.min(countedSeconds, remainingBeforeCount);
+                row.consumedSeconds += countedSeconds;
+                row.updatedAt = now;
+                countDecision = countedSeconds > 0 ? 'count_single_active_tab' : 'active_heartbeat_no_elapsed_seconds';
+                managedTimeActiveScopes.set(usageKey, {
+                    tabId,
+                    lastHeartbeatAt: now,
+                    lastCountedAt: now
+                });
+            } else {
+                managedTimeActiveScopes.set(usageKey, {
+                    tabId,
+                    lastHeartbeatAt: now,
+                    lastCountedAt: now
+                });
+            }
+        } else {
+            const active = managedTimeActiveScopes.get(usageKey);
+            if (active?.tabId === tabId || remainingBeforeCount <= 0) {
+                managedTimeActiveScopes.delete(usageKey);
+            }
+        }
+
+        rows[usageKey] = row;
+        await browserAPI.storage.local.set({
+            [MANAGED_TIME_USAGE_STORAGE_KEY]: {
+                schema: MANAGED_TIME_USAGE_SCHEMA,
+                version: 1,
+                rows: pruneManagedTimeUsageRows(rows)
+            }
+        });
+
+        const remainingSeconds = Math.max(0, totalBudgetSeconds - row.consumedSeconds);
+        sendResponse?.({
+            ok: true,
+            enforced: true,
+            timedOut: remainingSeconds === 0,
+            remainingSeconds,
+            consumedSeconds: row.consumedSeconds,
+            totalBudgetSeconds,
+            countedSeconds,
+            countDecision,
+            dateKey,
+            profileId,
+            profileName: normalizeString(request?.policy?.profileName) || 'Protected profile',
+            surface: route.surface,
+            policyRevision: policy.policyRevision,
+            policyHash: policy.policyHash
+        });
+    } catch (e) {
+        sendResponse?.({ ok: false, enforced: false, error: e?.message || 'managed_time_limit_failed' });
+    }
+}
+
 function isKidsUrl(url) {
     return typeof url === 'string' && url.includes('youtubekids.com');
 }
@@ -2011,6 +2296,16 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                     allowKidsViewing,
                     policySource: 'local_profile_settings'
                 };
+
+                const timeLimitPolicy = normalizeManagedTimeLimitPolicy(activeSettings.timeLimitPolicy);
+                if (timeLimitPolicy) {
+                    compiledSettings.managedTimeLimitPolicy = {
+                        ...timeLimitPolicy,
+                        profileId: activeProfileId,
+                        profileName: normalizeString(activeProfile.name) || 'Protected profile',
+                        policySource: 'local_profile_settings'
+                    };
+                }
             }
 
             const rawWhitelistKeywords = shouldUseKidsProfile
@@ -3264,6 +3559,9 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         });
         sendResponse?.({ acknowledged: true });
         return false;
+    } else if (action === 'FilterTube_ManagedTimeLimitHeartbeat') {
+        handleManagedTimeLimitHeartbeat(request, sender, sendResponse);
+        return true;
     } else if (action === "getCompiledSettings") {
         const senderUrl = sender?.tab?.url || sender?.url || '';
         const requestedProfile = request.profileType;

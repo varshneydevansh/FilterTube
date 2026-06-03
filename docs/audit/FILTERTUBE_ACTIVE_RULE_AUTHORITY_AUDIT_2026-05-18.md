@@ -39,7 +39,7 @@ Current issue:
 | Normal 3-dot menu | The normal dropdown injection exits in whitelist mode and when `showBlockMenuItem === false`. | `js/content_bridge.js:10517-10498`, `js/content/block_channel.js:2913-2921` | This is the best current affordance gate and should be reused by all menu paths. |
 | Fallback 3-dot menu | The fallback scan is now eager only on mobile/coarse surfaces; desktop is not an eager fallback scan path. | `js/content_bridge.js:6289-6303`, `js/content_bridge.js:7012-7022` | Mobile/coarse fallback action surfaces still need the same shared menu gate and live observer budget proof. |
 | Settings compile | Background compilation passes through raw `contentFilters` and raw `categoryFilters` objects without producing a normalized active report. | `js/background.js:2498-2558` | Runtime surfaces must each reinterpret validity. |
-| Settings invalidation | Background reads more compiler dependencies than storage invalidation watches; shared settings keys also omit several runtime dependencies. | `js/background.js:1774-1800`, `js/background.js:4484-4520`, `js/settings_shared.js:17-42` | A change can miss cache refresh or leave a stale runtime active state. |
+| Settings invalidation | Background reads more compiler dependencies than storage invalidation watches; shared settings keys also omit several runtime dependencies. | `js/background.js:2059-1800`, `js/background.js:4484-4520`, `js/settings_shared.js:17-42` | A change can miss cache refresh or leave a stale runtime active state. |
 | List-mode transition | `FilterTube_SetListMode` reads `copyBlocklist`, but switching to whitelist always merges and clears blocklist data. | `js/background.js:3304`, `js/background.js:3451-3453` | UI intent and actual mode transition can diverge. |
 | V4 list aliases | Background now prefers canonical Main `keywords` and `channels` before the `blockedKeywords` / `blockedChannels` migration aliases, while shared save mirrors the aliases only for blocklist mode. | `js/background.js:2057-2066`, `js/background.js:2214-2224`, `js/settings_shared.js:918-927` | Alias drift can still recur if future writers bypass shared save or write only one side without a mutation/revision report. |
 
@@ -112,7 +112,7 @@ flowchart TD
 | Quick-block lifecycle gate | `js/content/block_channel.js:353-365`, `js/content/block_channel.js:1205-1222`, `js/content/block_channel.js:1291-1293`, `js/content/block_channel.js:1979-2028` | Quick-block setup is blocked unless enabled, visible in settings, and not whitelist; desktop is hover/viewport lazy while mobile/coarse can still sweep eagerly. | Quick-block intentionally permits first-rule creation, so it is not governed by active filter-rule presence. |
 | Quick-block rule-context helper | `js/content/block_channel.js:1224-1285` | The helper mirrors the blocklist rule predicate family, including selected-category validation. | No active call site uses this helper as the shared lifecycle authority, so it can drift or become dead policy. |
 | Native menu action gate | `js/content_bridge.js:10517-10498`, `js/content/block_channel.js:2913-2921` | Native 3-dot injection exits in whitelist mode and clears/exits when `showBlockMenuItem === false`. | Fallback/mobile menu paths still need one shared menu action gate. |
-| Storage force-reprocess coalescing | `js/content/bridge_settings.js:557-587`, `js/content/bridge_settings.js:630-645` | A queued lightweight refresh no longer swallows a later forced rule reprocess. | Dirty-key fanout is still a list of local consumers, not one revisioned active-state report. |
+| Storage force-reprocess coalescing | `js/content/bridge_settings.js:1019-1049`, `js/content/bridge_settings.js:1051-1109` | A queued lightweight refresh no longer swallows a later forced rule reprocess. | Dirty-key fanout is still a list of local consumers, not one revisioned active-state report. |
 | Main blocklist canonical compile | `js/background.js:2057-2066`, `js/background.js:2214-2224`, `js/settings_shared.js:922-927` | Main blocklist compile prefers canonical `keywords` and `channels`, while shared save mirrors migration aliases in blocklist mode. | Direct writers still need parity proof if they bypass shared save. |
 
 ```text
@@ -250,9 +250,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

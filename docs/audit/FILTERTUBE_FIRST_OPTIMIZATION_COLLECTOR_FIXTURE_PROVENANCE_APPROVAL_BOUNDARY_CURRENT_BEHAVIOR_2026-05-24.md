@@ -39,9 +39,9 @@ Runtime collector fixture packets approved: 0
 Committed fixture provenance files: 0
 Implementation-ready collector fixture provenance approval rows: 0
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5744
+Method semantic proof gap lexical callables covered: 5789
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5744
+Lexical callables requiring semantic proof before behavior changes: 5789
 ```
 
 This is a fixture provenance approval boundary, not fixture approval. It keeps
@@ -62,7 +62,7 @@ rollback, public-claim limits, and affected callable semantic proof.
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_COLLECTOR_NO_WORK_APPROVAL_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves no-work approval remains absent and cannot be inferred from no-work matrices or contracts. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_COLLECTOR_INSERTION_APPROVAL_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves insertion approval remains absent and cannot be inferred from mapped insertion risks. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_COLLECTOR_APPROVAL_AUTHORITY_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves collector approval remains absent and fixture provenance approval is still a missing collector approval row. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,697 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,789 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_SIDE_EFFECT_BUDGET_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Proves 12 side-effect rows and 0 approved side-effect budgets. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_NO_WORK_PRESERVATION_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Proves 12 no-work rows and 0 approved runtime no-work proofs. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_DIAGNOSTIC_PRIVACY_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Proves 0 committed diagnostic privacy files and 0 implementation-ready diagnostic privacy contract rows. |
@@ -105,9 +105,9 @@ runtime unclaimed-surface approvals: 0
 committed fixture provenance files: 0
 implementation-ready collector fixture provenance approval rows: 0
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 expected runtime audit tests: 4457
 expected runtime audit pass: 4457
 expected runtime audit fail: 0
@@ -216,7 +216,7 @@ rows covered, 0 runtime source-owner approvals, 0 runtime metric collector
 approvals, 0 runtime collector fixture packets approved, 0 runtime collector
 diagnostic privacy approvals, 0 committed diagnostic privacy files, 0
 implementation-ready collector diagnostic privacy approval rows, 63 method
-semantic proof gap files covered, 5,697 lexical callables still requiring
+semantic proof gap files covered, 5,789 lexical callables still requiring
 semantic proof, 0 files with complete per-callable semantic proof, expected
 runtime audit tests: 4457, expected runtime audit pass: 4457, and expected
 runtime audit fail 0. It keeps diagnostic privacy approval blocked until

@@ -60,7 +60,7 @@ const expectedFingerprints = new Map([
   ['manifest.chrome.json', [88, 2513, '282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734']],
   ['manifest.firefox.json', [75, 2029, 'c84368c9db6a4900bb6ff055b66a645a88176d3533e307eee0dcb8d230fae2bb']],
   ['manifest.opera.json', [89, 2518, '0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b']],
-  ['js/background.js', [6343, 286370, 'ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36']],
+  ['js/background.js', [6641, 298986, '837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd']],
   ['js/io_manager.js', [2030, 96914, 'd04bfd75d061ee405c1dfa4cab8c9d0fa6a2f072d046add33e4b6782b1f58a21']],
   ['js/tab-view.js', [11617, 526763, '1b7f621d48d16247aecc4c7ee57cbc3db9efd3e597e6f0a4fc188228470648f7']],
   ['js/popup.js', [1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a']],
@@ -179,9 +179,9 @@ test('startup permission navigation and prompt docs carry the method proof gap b
 
   for (const token of [
     'tracked JS/JSX/MJS files: 69',
-    'repo-wide lexical callables: 5744',
+    'repo-wide lexical callables: 5789',
     'files with complete per-callable semantic proof: 0',
-    'lexical callables requiring semantic proof before behavior changes: 5744',
+    'lexical callables requiring semantic proof before behavior changes: 5789',
     'runtime behavior changed: no',
   ]) {
     assert.ok(gap.includes(token), `method gap index missing token ${token}`);
@@ -193,9 +193,9 @@ test('startup permission navigation and prompt docs carry the method proof gap b
     for (const token of [
       methodGapPath,
       'method semantic proof gap files covered: 69',
-      'method semantic proof gap lexical callables covered: 5744',
+      'method semantic proof gap lexical callables covered: 5789',
       'files with complete per-callable semantic proof: 0',
-      'lexical callables requiring semantic proof before behavior changes: 5744',
+      'lexical callables requiring semantic proof before behavior changes: 5789',
       'affected callable semantic proof: NO-GO',
       'runtime behavior changed: no',
       'JSON-first promotion',

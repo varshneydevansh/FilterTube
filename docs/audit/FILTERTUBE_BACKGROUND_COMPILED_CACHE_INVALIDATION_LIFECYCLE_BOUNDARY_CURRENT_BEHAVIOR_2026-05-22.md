@@ -21,14 +21,14 @@ tests/runtime/background-compiled-cache-invalidation-lifecycle-boundary-current-
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6343 | 286370 | `ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36` |
+| `js/background.js` | 6641 | 298986 | `837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd` |
 
 ## Source / Effect Blocks
 
 | Block | Source | Start line | Lines | Bytes | SHA-256 |
 | --- | --- | ---: | ---: | ---: | --- |
 | `cacheShape` | `js/background.js:1288` | 1288 | 1 | 56 | `1036c4cba5a87cfa01e6e456e091676e8f03d64e95e8788de2ac5e875df43398` |
-| `getCompiledSettingsCacheGate` | `js/background.js:1774` | 1774 | 8 | 414 | `9f6bb35a293ebb4cdb91887529559cefe1bf00d316a1547e9ef3273b59ddeea5` |
+| `getCompiledSettingsCacheGate` | `js/background.js:2059` | 1774 | 8 | 414 | `9f6bb35a293ebb4cdb91887529559cefe1bf00d316a1547e9ef3273b59ddeea5` |
 | `getCompiledSettingsStorageKeys` | `js/background.js:1784` | 1784 | 44 | 1,408 | `13672cc628bae23213c11257baed164f5aabbbf6d822b2fbf62fdd9b60b75f9f` |
 | `getCompiledSettingsMigrationWrite` | `js/background.js:2079` | 2079 | 4 | 185 | `22dc5c70ec30edfbc76170a5dab2e12d8d2872521ac5f874bb097c64292ff15f` |
 | `getCompiledSettingsCacheAssign` | `js/background.js:2555` | 2555 | 10 | 336 | `34ea84a49f14d93ccdecf3afbabb42229ff8647582820403b66bb7be56f3643b` |
@@ -247,9 +247,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

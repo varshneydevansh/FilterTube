@@ -9,9 +9,9 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_MESSAGE_TRANSPORT_CALLSITE_REGISTER_CURRENT_BEHAVIOR_2026-05-22.md';
 
 const sourceFingerprints = {
-  'js/background.js': [6343, 286370, 'ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36'],
+  'js/background.js': [6641, 298986, '837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd'],
   'js/content/bridge_injection.js': [127, 4741, 'd1b84cf4c43ec5ff5cdc3bd607d8f3d3bf448c12829780b0d05fb9fc14fb5d3e'],
-  'js/content/bridge_settings.js': [845, 34241, 'aea46dd241248db1d1d9bcbdfdf65320d1399ecd84cc7792678f29b1b26ee092'],
+  'js/content/bridge_settings.js': [1113, 44087, 'f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853'],
   'js/content/collab_dialog.js': [393, 14623, 'dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a'],
   'js/content/first_run_prompt.js': [190, 7453, '5672d9060d29b08550ecfc3add54245212a5094ee5137f025b6f788f12e50409'],
   'js/content/handle_resolver.js': [282, 9785, '67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff'],
@@ -116,37 +116,37 @@ function assertMessageSenderReceiverOwnerSnapshot(text) {
   const rows = transportRows();
 
   assert.match(text, /Message Sender\/Receiver and Owner Layer Addendum - 2026-05-27/);
-  assert.match(text, /message sender rows: 56/);
+  assert.match(text, /message sender rows: 57/);
   assert.match(text, /message receiver rows: 8/);
-  assert.match(text, /extension runtime transport rows: 31/);
+  assert.match(text, /extension runtime transport rows: 32/);
   assert.match(text, /page-message transport rows: 30/);
   assert.match(text, /tab-message transport rows: 3/);
-  assert.match(text, /owner-layer rows: isolated-content-runtime 32, main-world-page-runtime 19, extension-ui-state 10, background 3/);
+  assert.match(text, /owner-layer rows: isolated-content-runtime 33, main-world-page-runtime 19, extension-ui-state 10, background 3/);
   assert.match(text, /message sender\/receiver authority: NO-GO/);
   assert.match(text, /runtime behavior changed by this addendum: no/);
   assert.deepEqual(countBy(rows.map(row => ({ direction: messageDirection(row) })), 'direction'), {
     receiver: 8,
-    sender: 56
+    sender: 57
   });
   assert.deepEqual(countBy(rows.map(row => ({ boundary: messageBoundary(row) })), 'boundary'), {
-    'extension-runtime': 31,
+    'extension-runtime': 32,
     'page-message': 30,
     'tab-message': 3
   });
   assert.deepEqual(countBy(rows.map(row => ({ ownerLayer: messageOwnerLayer(row.file) })), 'ownerLayer'), {
     background: 3,
     'extension-ui-state': 10,
-    'isolated-content-runtime': 32,
+    'isolated-content-runtime': 33,
     'main-world-page-runtime': 19
   });
 
   for (const phrase of [
-    '| `sender` | 56 |',
+    '| `sender` | 57 |',
     '| `receiver` | 8 |',
-    '| `extension-runtime` | 31 |',
+    '| `extension-runtime` | 32 |',
     '| `page-message` | 30 |',
     '| `tab-message` | 3 |',
-    '| `isolated-content-runtime` | 32 |',
+    '| `isolated-content-runtime` | 33 |',
     '| `main-world-page-runtime` | 19 |',
     '| `extension-ui-state` | 10 |',
     '| `background` | 3 |',
@@ -165,9 +165,9 @@ test('message transport callsite register is audit-only and source pinned', () =
   assert.match(text, /Runtime behavior is unchanged/);
   assert.match(text, /tracked product JS\/JSX\/MJS files scanned: 67/);
   assert.match(text, /tracked product files with message transport rows: 14/);
-  assert.match(text, /message transport rows: 64/);
+  assert.match(text, /message transport rows: 65/);
   assert.match(text, /runtime.onMessage.addListener rows: 4/);
-  assert.match(text, /runtime.sendMessage rows: 27/);
+  assert.match(text, /runtime.sendMessage rows: 28/);
   assert.match(text, /tabs.sendMessage rows: 3/);
   assert.match(text, /window.addEventListener\("message"\) rows: 4/);
   assert.match(text, /window.postMessage rows: 26/);
@@ -192,10 +192,10 @@ test('message transport callsite counts remain source-derived', () => {
   const text = doc();
 
   assert.equal(productScriptFiles().length, 67);
-  assert.equal(rows.length, 64);
+  assert.equal(rows.length, 65);
   assert.deepEqual(countBy(rows, 'operation'), {
     'runtime.onMessage.addListener': 4,
-    'runtime.sendMessage': 27,
+    'runtime.sendMessage': 28,
     'tabs.sendMessage': 3,
     'window.addEventListener(message)': 4,
     'window.postMessage': 26
@@ -203,7 +203,7 @@ test('message transport callsite counts remain source-derived', () => {
   assert.deepEqual(countBy(rows, 'file'), {
     'js/background.js': 3,
     'js/content/bridge_injection.js': 1,
-    'js/content/bridge_settings.js': 6,
+    'js/content/bridge_settings.js': 7,
     'js/content/collab_dialog.js': 1,
     'js/content/first_run_prompt.js': 2,
     'js/content/handle_resolver.js': 4,

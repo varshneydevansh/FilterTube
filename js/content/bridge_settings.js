@@ -351,8 +351,26 @@ function normalizeSettingsForHost(settings) {
 }
 
 const MANAGED_VIEWING_ROUTE_GATE_OVERLAY_ID = 'filtertube-managed-viewing-route-gate';
+const MANAGED_TIME_LIMIT_OVERLAY_ID = 'filtertube-managed-timeout-overlay';
+const MANAGED_TIME_LIMIT_HEARTBEAT_MS = 5000;
+const MANAGED_TIME_LIMIT_REVALIDATION_EVENTS = [
+    'yt-navigate-finish',
+    'yt-page-data-updated',
+    'popstate',
+    'hashchange',
+    'visibilitychange',
+    'focus',
+    'blur'
+];
 let managedViewingRouteGateListenersAttached = false;
 let managedViewingRouteGateHandler = null;
+let managedTimeLimitHeartbeatTimer = 0;
+let managedTimeLimitHeartbeatInFlight = false;
+let managedTimeLimitPendingHeartbeat = false;
+let managedTimeLimitListenersAttached = false;
+let managedTimeLimitRouteHandler = null;
+let managedTimeLimitRuntimeGeneration = 0;
+let managedTimeLimitPolicyKey = '';
 
 function classifyManagedViewingRoute(rawUrl) {
     try {
@@ -538,6 +556,254 @@ function applyManagedViewingRouteGate(settings) {
     }
 }
 
+function normalizeManagedTimeLimitInteger(value) {
+    const num = typeof value === 'number' ? value : Number(value);
+    if (!Number.isInteger(num)) return null;
+    return num >= 0 ? num : null;
+}
+
+function getManagedTimeLimitPolicy(settings) {
+    try {
+        if (!settings || typeof settings !== 'object') return null;
+        if (settings.activeProfileKind !== 'child') return null;
+        const policy = settings.managedTimeLimitPolicy;
+        if (!policy || typeof policy !== 'object' || Array.isArray(policy)) return null;
+        if (policy.schema !== 'filtertube_managed_time_limit') return null;
+        if (policy.version !== 1) return null;
+        if (policy.enabled !== true) return null;
+        if (!policy.profileId || typeof policy.profileId !== 'string') return null;
+        if (!policy.timezone || typeof policy.timezone !== 'string') return null;
+        if (normalizeManagedTimeLimitInteger(policy.dailyBudgetSeconds) == null) return null;
+        if (normalizeManagedTimeLimitInteger(policy.policyRevision) == null) return null;
+        if (!policy.policyHash || typeof policy.policyHash !== 'string') return null;
+        if (policy.countingMode !== 'active_youtube_tab') return null;
+        if (policy.activeDeviceBudgetPolicy !== 'single_active_tab_no_double_count') return null;
+        if (policy.resetPolicy !== 'policy_timezone_midnight') return null;
+        return policy;
+    } catch (e) {
+        return null;
+    }
+}
+
+function removeManagedTimeoutOverlay() {
+    try {
+        globalThis.__filtertubeManagedTimeLimitTimedOut = false;
+        const existing = document.getElementById(MANAGED_TIME_LIMIT_OVERLAY_ID);
+        if (existing) existing.remove();
+    } catch (e) {
+    }
+}
+
+function pauseManagedTimeoutVideos() {
+    try {
+        document.querySelectorAll('video').forEach(video => {
+            try {
+                if (!video.paused) video.pause();
+            } catch (e) {
+            }
+        });
+    } catch (e) {
+    }
+}
+
+function showManagedTimeoutOverlay(state) {
+    try {
+        globalThis.__filtertubeManagedTimeLimitTimedOut = true;
+        pauseManagedTimeoutVideos();
+
+        const host = document.body || document.documentElement;
+        if (!host) return;
+
+        let overlay = document.getElementById(MANAGED_TIME_LIMIT_OVERLAY_ID);
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = MANAGED_TIME_LIMIT_OVERLAY_ID;
+            overlay.setAttribute('role', 'alertdialog');
+            overlay.setAttribute('aria-modal', 'true');
+            overlay.style.cssText = [
+                'position:fixed',
+                'inset:0',
+                'z-index:2147483647',
+                'display:flex',
+                'align-items:center',
+                'justify-content:center',
+                'padding:24px',
+                'background:rgba(8,13,18,.94)',
+                'color:#f8fafc',
+                'font-family:Inter,Roboto,Arial,sans-serif',
+                'pointer-events:auto'
+            ].join(';');
+            host.appendChild(overlay);
+        }
+
+        const profileName = String(state?.profileName || 'This profile').trim() || 'This profile';
+        const surfaceLabel = state?.surface === 'kids' ? 'YouTube Kids' : 'YouTube';
+        overlay.innerHTML = '';
+
+        const panel = document.createElement('section');
+        panel.style.cssText = [
+            'width:min(420px,100%)',
+            'border:1px solid rgba(148,163,184,.32)',
+            'border-radius:8px',
+            'background:#101820',
+            'box-shadow:0 24px 80px rgba(0,0,0,.45)',
+            'padding:24px'
+        ].join(';');
+
+        const eyebrow = document.createElement('div');
+        eyebrow.textContent = 'FilterTube managed profile';
+        eyebrow.style.cssText = 'color:#f87171;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0;margin-bottom:10px';
+
+        const title = document.createElement('h1');
+        title.textContent = `${surfaceLabel} time is finished for today`;
+        title.style.cssText = 'font-size:22px;line-height:1.2;margin:0 0 10px;font-weight:800;color:#fff';
+
+        const copy = document.createElement('p');
+        copy.textContent = `${profileName} has used today's parent-managed YouTube time. Ask the parent or caregiver profile for more time.`;
+        copy.style.cssText = 'font-size:14px;line-height:1.5;margin:0;color:#cbd5e1';
+
+        panel.appendChild(eyebrow);
+        panel.appendChild(title);
+        panel.appendChild(copy);
+        overlay.appendChild(panel);
+    } catch (e) {
+    }
+}
+
+function isManagedTimeLimitTabActive() {
+    try {
+        return document.visibilityState === 'visible' && document.hasFocus();
+    } catch (e) {
+        return false;
+    }
+}
+
+function clearManagedTimeLimitHeartbeatTimer() {
+    if (!managedTimeLimitHeartbeatTimer) return;
+    try {
+        clearInterval(managedTimeLimitHeartbeatTimer);
+    } catch (e) {
+    }
+    managedTimeLimitHeartbeatTimer = 0;
+}
+
+function releaseManagedTimeLimitRuntime() {
+    managedTimeLimitRuntimeGeneration += 1;
+    managedTimeLimitPolicyKey = '';
+    clearManagedTimeLimitHeartbeatTimer();
+    if (managedTimeLimitListenersAttached && managedTimeLimitRouteHandler) {
+        try {
+            for (const eventName of MANAGED_TIME_LIMIT_REVALIDATION_EVENTS) {
+                window.removeEventListener(eventName, managedTimeLimitRouteHandler, true);
+            }
+        } catch (e) {
+        }
+    }
+    managedTimeLimitListenersAttached = false;
+    managedTimeLimitRouteHandler = null;
+    managedTimeLimitHeartbeatInFlight = false;
+    managedTimeLimitPendingHeartbeat = false;
+    removeManagedTimeoutOverlay();
+}
+
+function ensureManagedTimeLimitRuntimeListeners() {
+    if (!managedTimeLimitListenersAttached) {
+        managedTimeLimitRouteHandler = () => {
+            try {
+                applyManagedTimeLimitRuntime(currentSettings, { immediate: true });
+            } catch (e) {
+            }
+        };
+        try {
+            for (const eventName of MANAGED_TIME_LIMIT_REVALIDATION_EVENTS) {
+                window.addEventListener(eventName, managedTimeLimitRouteHandler, true);
+            }
+            managedTimeLimitListenersAttached = true;
+        } catch (e) {
+            managedTimeLimitListenersAttached = false;
+            managedTimeLimitRouteHandler = null;
+        }
+    }
+
+    if (!managedTimeLimitHeartbeatTimer) {
+        managedTimeLimitHeartbeatTimer = setInterval(() => {
+            try {
+                sendManagedTimeLimitHeartbeat();
+            } catch (e) {
+            }
+        }, MANAGED_TIME_LIMIT_HEARTBEAT_MS);
+    }
+}
+
+function sendManagedTimeLimitHeartbeat() {
+    const policy = getManagedTimeLimitPolicy(currentSettings);
+    const route = classifyManagedViewingRoute(location.href);
+    if (!policy || route.surface === 'external') {
+        releaseManagedTimeLimitRuntime();
+        return;
+    }
+
+    if (managedTimeLimitHeartbeatInFlight) {
+        managedTimeLimitPendingHeartbeat = true;
+        return;
+    }
+
+    managedTimeLimitHeartbeatInFlight = true;
+    managedTimeLimitPendingHeartbeat = false;
+    const heartbeatGeneration = managedTimeLimitRuntimeGeneration;
+
+    try {
+        browserAPI_BRIDGE.runtime.sendMessage({
+            action: 'FilterTube_ManagedTimeLimitHeartbeat',
+            profileId: policy.profileId,
+            policy,
+            href: location.href,
+            visible: document.visibilityState === 'visible',
+            focused: isManagedTimeLimitTabActive()
+        }, response => {
+            managedTimeLimitHeartbeatInFlight = false;
+            if (heartbeatGeneration !== managedTimeLimitRuntimeGeneration) return;
+            const err = browserAPI_BRIDGE.runtime?.lastError;
+            if (!err && response?.enforced === true && response.timedOut === true) {
+                showManagedTimeoutOverlay(response);
+            } else if (!err && response?.timedOut !== true) {
+                removeManagedTimeoutOverlay();
+            }
+            if (managedTimeLimitPendingHeartbeat) {
+                managedTimeLimitPendingHeartbeat = false;
+                sendManagedTimeLimitHeartbeat();
+            }
+        });
+    } catch (e) {
+        managedTimeLimitHeartbeatInFlight = false;
+    }
+}
+
+function applyManagedTimeLimitRuntime(settings, options = {}) {
+    try {
+        const route = classifyManagedViewingRoute(location.href);
+        const policy = getManagedTimeLimitPolicy(settings);
+        if (!policy || route.surface === 'external') {
+            releaseManagedTimeLimitRuntime();
+            return false;
+        }
+
+        const policyKey = `${policy.profileId}:${policy.policyRevision}:${policy.policyHash}`;
+        if (policyKey !== managedTimeLimitPolicyKey) {
+            managedTimeLimitRuntimeGeneration += 1;
+            managedTimeLimitPolicyKey = policyKey;
+        }
+        ensureManagedTimeLimitRuntimeListeners();
+        if (options?.immediate !== false) {
+            sendManagedTimeLimitHeartbeat();
+        }
+        return true;
+    } catch (e) {
+        releaseManagedTimeLimitRuntime();
+        return false;
+    }
+}
+
 function requestSettingsFromBackground(options = {}) {
     return new Promise((resolve) => {
         const safeResolveFailure = () => {
@@ -691,9 +957,11 @@ function sendSettingsToMainWorld(settings) {
     currentSettings = settings;
 
     if (applyManagedViewingRouteGate(settings)) {
+        releaseManagedTimeLimitRuntime();
         pendingSeedSettings = null;
         return;
     }
+    applyManagedTimeLimitRuntime(settings);
 
     window.postMessage({
         type: 'FilterTube_SettingsToInjector',

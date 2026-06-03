@@ -294,24 +294,32 @@ Current behavior:
   `settings.timeLimitPolicy` through parent/account authority.
 - Import/profile sanitation preserves valid `filtertube_managed_time_limit`
   policies and drops malformed policy payloads.
-- No extension active-tab budget counter, timeout overlay, or Main/Kids time
-  route gate exists in the product source yet.
+- Extension runtime now compiles a valid active child profile
+  `settings.timeLimitPolicy` into `managedTimeLimitPolicy`.
+- The content bridge sends active/focused YouTube heartbeats only while that
+  policy is enabled on a YouTube-owned route.
+- Background runtime stores whole-profile daily usage in `ftManagedTimeUsageV1`
+  and clamps remaining budget by policy timezone date, revision, and hash.
+- The child/protected timeout overlay appears only after the background reports
+  an exhausted budget, and it does not write hidden-content stats.
 - The audit contract
   `docs/audit/FILTERTUBE_MANAGED_CHILD_TIME_LIMIT_SCHEMA_CONTRACT_2026-06-03.md`
-  now pins the schema, local UI/store boundary, and decision fixtures, without
-  changing YouTube runtime behavior.
+  now pins the schema, local UI/store boundary, runtime heartbeat service, and
+  timeout overlay fixtures.
 
 Authority meaning:
 
-- Time limit policy editing is local parent/account authority. Runtime
-  enforcement remains a future background/content implementation slice.
+- Time limit policy editing remains local parent/account authority. Runtime
+  enforcement is now a background/content implementation slice for active child
+  profiles with an enabled policy.
 
 Current gap:
 
-- No active tab counter.
-- No runtime time-limit compiler.
-- No fake-clock, sleep/restart, timezone, reduced-budget, or SPA revalidation
-  runtime enforcement fixtures.
+- Remote time-limit updates are still not envelope/revision-bound.
+- The first runtime path uses whole-profile daily budget; per-surface budget
+  enforcement remains a later refinement.
+- Fake-clock/browser-level active-tab smoke is still manual, not automated
+  against an installed extension.
 
 ## Current Gap Summary
 

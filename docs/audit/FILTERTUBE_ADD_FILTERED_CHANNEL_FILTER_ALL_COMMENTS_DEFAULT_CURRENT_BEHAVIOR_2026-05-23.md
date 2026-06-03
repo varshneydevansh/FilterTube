@@ -24,7 +24,7 @@ runtime addFilteredChannel Filter All comments default fixtures: 11
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
-| `js/background.js` | 6343 | 286370 | `ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36` |
+| `js/background.js` | 6641 | 298986 | `837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd` |
 | `js/state_manager.js` | 2,491 | 99,780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
 | `js/settings_shared.js` | 1,181 | 57,535 | `9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c` |
 
@@ -33,11 +33,11 @@ runtime addFilteredChannel Filter All comments default fixtures: 11
 | Block | Anchor | Lines | Bytes | SHA-256 |
 | --- | --- | ---: | ---: | --- |
 | `contentBridgeAddChannelDirectly` | `js/content_bridge.js:13440` | 54 | 2662 | `4eb280573a5611b695c8284a8e6b85d17b2a97c459143a3054d02374cdf7c2ca` |
-| `backgroundAddFilteredChannelReceiver` | `js/background.js:5267` | 39 | 1579 | `f681057e88e4c6aef657464bca124f8d3ae4d59f4d11ca5f05e1135dcf1615f2` |
-| `backgroundHandleAddFilteredChannelSignature` | `js/background.js:5332` | 2 | 204 | `ce94174aa1b2f302e1e89a75b463271aa13d1c95f62cb89ee34364fb9c3ab603` |
-| `backgroundExistingChannelUpdate` | `js/background.js:5975` | 21 | 1247 | `9ac97ce884e9c319e0267a60bbbacbdb26b0a3ea6f1f0cca416615ad234e96dd` |
-| `backgroundNewChannelObject` | `js/background.js:6025` | 20 | 1081 | `5fa1776809d1d10187ead655c7b8a566c15935b2667f95e8cd5f7875c28f4be4` |
-| `backgroundChannelDerivedKeywordHelpersAndSync` | `js/background.js:1172` | 106 | 3482 | `22f1f880c4b67f0b366020641f94e988d19a4e0312b073c20048c4f2bcd0a455` |
+| `backgroundAddFilteredChannelReceiver` | `js/background.js:5565` | 39 | 1579 | `f681057e88e4c6aef657464bca124f8d3ae4d59f4d11ca5f05e1135dcf1615f2` |
+| `backgroundHandleAddFilteredChannelSignature` | `js/background.js:5630` | 2 | 204 | `ce94174aa1b2f302e1e89a75b463271aa13d1c95f62cb89ee34364fb9c3ab603` |
+| `backgroundExistingChannelUpdate` | `js/background.js:6273` | 21 | 1247 | `9ac97ce884e9c319e0267a60bbbacbdb26b0a3ea6f1f0cca416615ad234e96dd` |
+| `backgroundNewChannelObject` | `js/background.js:6323` | 20 | 1081 | `5fa1776809d1d10187ead655c7b8a566c15935b2667f95e8cd5f7875c28f4be4` |
+| `backgroundChannelDerivedKeywordHelpersAndSync` | `js/background.js:1240` | 106 | 3482 | `22f1f880c4b67f0b366020641f94e988d19a4e0312b073c20048c4f2bcd0a455` |
 | `stateManagerChannelEnrichmentMessage` | `js/state_manager.js:665` | 12 | 460 | `1f802c946742b856d5c4f6aea62777de9e1e3fcebae08085d632259d1bac0132` |
 | `settingsSharedSyncFilterAllKeywords` | `js/settings_shared.js:412` | 72 | 2967 | `ce4e49c6055252ab9a6db6a30be91ddfb50efead1c1ef76bf736c38717febd25` |
 
@@ -141,9 +141,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

@@ -103,8 +103,8 @@ make a later legitimate rule match the wrong content.
 
 | Path | Current authority | Proof | Risk |
 | --- | --- | --- | --- |
-| Page-world `FilterTube_UpdateVideoChannelMap` | Same-window page message is accepted, then content bridge persists `videoId -> channelId` before DOM ownership proof. | `js/content_bridge.js:5468-5490`; `js/background.js:4400`; `js/background.js:1648-1671` | Learned map poisoning can cause false channel matches. |
-| Page-world `FilterTube_UpdateVideoMetaMap` | Same-window page message persists meta, touches DOM processed flags, and schedules rerun. | `js/content_bridge.js:5531-5555`; `js/background.js:4407`; `js/background.js:1673-1693` | Spoofed metadata can force reprocessing and alter duration/category/title decisions. |
+| Page-world `FilterTube_UpdateVideoChannelMap` | Same-window page message is accepted, then content bridge persists `videoId -> channelId` before DOM ownership proof. | `js/content_bridge.js:5468-5490`; `js/background.js:4400`; `js/background.js:1933-1671` | Learned map poisoning can cause false channel matches. |
+| Page-world `FilterTube_UpdateVideoMetaMap` | Same-window page message persists meta, touches DOM processed flags, and schedules rerun. | `js/content_bridge.js:5531-5555`; `js/background.js:4407`; `js/background.js:1958-1693` | Spoofed metadata can force reprocessing and alter duration/category/title decisions. |
 | Page-world `FilterTube_UpdateCustomUrlMap` | Content bridge writes `channelMap` directly through storage APIs. | `js/content_bridge.js:5557-5568` | Bypasses background cache-aware map path and background invalidation assumptions. |
 | `FilterTube_ApplySettings` | Caller payload becomes `compiledSettingsCache[targetProfile]` and is broadcast to matching tabs. | `js/background.js:4381-4394` | Runtime behavior can change without storage-derived settings truth. |
 
@@ -286,9 +286,9 @@ can support runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

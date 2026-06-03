@@ -15,6 +15,7 @@ function read(relativePath) {
 function runtimeSource() {
   return [
     'js/background.js',
+    'js/content/bridge_settings.js',
     'js/content_bridge.js',
     'js/io_manager.js',
     'js/settings_shared.js',
@@ -162,14 +163,13 @@ function timezoneDriftDecision({ policyTimezone, deviceTimezone }) {
   };
 }
 
-test('managed child time-limit schema contract documents local UI store and pending runtime enforcement', () => {
+test('managed child time-limit schema contract documents local UI store and runtime enforcement', () => {
   const doc = read(docPath);
   const plan = read(planPath);
   const inventory = read(inventoryPath);
   const source = runtimeSource();
 
-  assert.match(doc, /Status\*\*: Local profile UI\/store implemented/);
-  assert.match(doc, /YouTube runtime enforcement is\s+not implemented yet/);
+  assert.match(doc, /Status\*\*: Local profile UI\/store and first extension runtime enforcement are\s+implemented/);
   assert.match(doc, /filtertube_managed_time_limit/);
   assert.match(doc, /Required Policy Shape/);
   assert.match(doc, /Counting Decisions/);
@@ -178,15 +178,17 @@ test('managed child time-limit schema contract documents local UI store and pend
   assert.match(doc, /Current Local UI And Store Boundary/);
   assert.match(doc, /local managed time-limit profile store: present/);
   assert.match(doc, /local managed time-limit parent UI: present/);
-  assert.match(doc, /runtime managed active-tab budget counter: absent/);
-  assert.match(doc, /runtime managed timeout overlay: absent/);
+  assert.match(doc, /runtime managed time-limit policy compiler: present/);
+  assert.match(doc, /runtime managed active-tab budget counter: present/);
+  assert.match(doc, /runtime managed timeout overlay: present/);
+  assert.match(doc, /Missing, disabled, malformed, non-child, or external-route policies remain\s+no-work states/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
 
   assert.match(source, /filtertube_managed_time_limit/);
   assert.match(source, /timeLimitPolicy/);
-  assert.doesNotMatch(source, /computeManagedTimeBudgetRemaining/);
-  assert.doesNotMatch(source, /showManagedTimeoutOverlay/);
+  assert.match(source, /managedTimeLimitTotalBudgetSeconds/);
+  assert.match(source, /showManagedTimeoutOverlay/);
 });
 
 test('local parent UI writes time-limit policy through profile settings and admin gates', () => {

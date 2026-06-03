@@ -204,13 +204,13 @@ addendum: no.
 
 | Boundary row | Current proof | Remaining risk |
 | --- | --- | --- |
-| `storage_cache_compiler_invalidation_split` | `getCompiledSettings()` starts at `js/background.js:1774` and reads broader storage inputs than the background invalidation list at `js/background.js:4487`. | Compiler dependencies still lack one revisioned invalidation report. |
-| `storage_cache_bridge_map_only_refresh_split` | Content bridge storage coalescing starts at `js/content/bridge_settings.js:557`; `handleStorageChanges()` starts at `js/content/bridge_settings.js:589`; map keys are classified in the local `relevantKeys` list at `js/content/bridge_settings.js:599`. | Map-only refresh is local content-script policy, not shared storage authority. |
+| `storage_cache_compiler_invalidation_split` | `getCompiledSettings()` starts at `js/background.js:2059` and reads broader storage inputs than the background invalidation list at `js/background.js:4808`. | Compiler dependencies still lack one revisioned invalidation report. |
+| `storage_cache_bridge_map_only_refresh_split` | Content bridge storage coalescing starts at `js/content/bridge_settings.js:1018`; `handleStorageChanges()` starts at `js/content/bridge_settings.js:1050`; map keys are classified in the local `relevantKeys` list at `js/content/bridge_settings.js:1060`. | Map-only refresh is local content-script policy, not shared storage authority. |
 | `storage_cache_force_reprocess_coalescing_guard` | `docs/audit/FILTERTUBE_STORAGE_REFRESH_FORCE_REPROCESS_COALESCING_CURRENT_BEHAVIOR_2026-05-30.md` proves map-only pending refresh upgrade is present and map-only non-forcing proof is present. | The fix prevents dropped forced reprocess, but it does not approve map-only pruning or broad whitelist/cache optimization. |
 | `storage_cache_state_manager_reload_split` | Dashboard/UI reload owns a third key list at `js/state_manager.js:2356`, while `state.statsBySurface` is loaded separately at `js/state_manager.js:243-244`. | UI reload, runtime refresh, and stats refresh still lack one key-owner matrix. |
 | `storage_cache_shared_settings_load_split` | Shared settings include `statsBySurface` in the key list at `js/settings_shared.js:52` and load settings at `js/settings_shared.js:564`, but this path remains UI-oriented. | Shared load does not prove compiled-cache, DOM, dashboard, backup, and import semantics for every key. |
-| `storage_cache_background_map_flush_dirty_state` | Background video-channel and video-meta queue owners start at `js/background.js:1648` and `js/background.js:1673`, and runtime message writes enter at `js/background.js:4429` and `js/background.js:4446`. | Dirty map writes can patch caches and flush storage without one stale-card freshness budget. |
-| `storage_cache_profile_import_nanah_revision_gap` | List-mode mutation starts at `js/background.js:3292`, batch whitelist import at `js/background.js:3545`, and the UI sender starts that batch import at `js/state_manager.js:1809`. | Profile/list writes, cache invalidation, backup, and tab refresh still lack one actor/profile/list revision report. |
+| `storage_cache_background_map_flush_dirty_state` | Background video-channel and video-meta queue owners start at `js/background.js:1933` and `js/background.js:1958`, and runtime message writes enter at `js/background.js:4747` and `js/background.js:4754`. | Dirty map writes can patch caches and flush storage without one stale-card freshness budget. |
+| `storage_cache_profile_import_nanah_revision_gap` | List-mode mutation starts at `js/background.js:3613`, batch whitelist import at `js/background.js:3866`, and the UI sender starts that batch import at `js/state_manager.js:1809`. | Profile/list writes, cache invalidation, backup, and tab refresh still lack one actor/profile/list revision report. |
 | `storage_cache_stats_dashboard_reload_gap` | Runtime stats paths read/write `stats` and `statsBySurface` at `js/content_bridge.js:3713-3718` and `js/content_bridge.js:3926-3944`. | Dashboard reload and runtime counter writes still need surface-scoped refresh proof. |
 | `storage_cache_settings_refresh_evidence_packet_gap` | `docs/audit/FILTERTUBE_SETTINGS_REFRESH_OPTIMIZATION_CANDIDATE_EVIDENCE_PACKET_CONTRACT_CURRENT_BEHAVIOR_2026-05-29.md` defines 12 settings-refresh evidence packet rows and 29 required packet fields. | Implementation-ready settings-refresh evidence packets remain 0. |
 | `storage_cache_whitelist_spa_metric_gap` | `docs/audit/FILTERTUBE_WHITELIST_CACHE_HOT_PATH_BOUNDARY_CURRENT_BEHAVIOR_2026-05-25.md` pins five whitelist-cache hot-path source files and keeps broader runtime whitelist cache optimization at `NO-GO`. | Source-only cache proof is not live SPA route/mode metric evidence. |
@@ -283,9 +283,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

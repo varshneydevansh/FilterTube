@@ -22,9 +22,9 @@ The current boundary is:
 ```text
 Reserved route/surface fixture provenance artifact path: docs/audit/artifacts/json-first/route-surface-fixture-packet/provenance.json
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5744
+Method semantic proof gap lexical callables covered: 5789
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5744
+Lexical callables requiring semantic proof before behavior changes: 5789
 Committed route/surface fixture provenance artifact files: 0
 Runtime JSON-first fixture provenance approval exists: no
 Runtime JSON-first fixture packet approval exists: no
@@ -54,7 +54,7 @@ used as JSON-first implementation authority.
 | `docs/audit/FILTERTUBE_JSON_FIRST_ROUTE_SURFACE_IMPLEMENTATION_AUTHORITY_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Keeps route/surface implementation approval at NO-GO. |
 | `docs/audit/FILTERTUBE_P0_OPTIMIZATION_ROUTE_SURFACE_METRIC_FIXTURE_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Defines 12 route/surface metric obligations and 0 implementation-ready route/surface optimization rows. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_FIXTURE_PROVENANCE_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Proves collector fixture packets remain unapproved. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,697 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,789 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_IMPLEMENTATION_READINESS_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | Keeps first optimization implementation at NO-GO. |
 | `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` | Runtime proof is tracked in the audit harness, not as a committed provenance artifact. |
 
@@ -76,9 +76,9 @@ collector fixture provenance rows covered: 12
 fixture mode classes covered: 8
 fixture evidence classes covered: 14
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 committed route/surface fixture provenance artifact files: 0
 committed route/surface fixture packet files: 0
 runtime JSON-first fixture provenance approvals: 0

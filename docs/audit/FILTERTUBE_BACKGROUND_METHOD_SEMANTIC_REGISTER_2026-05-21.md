@@ -44,9 +44,9 @@ The companion runtime test executes current source slices from
 ```text
 source file: js/background.js
 source split lines: 6344
-source wc -l: 6343
-source bytes: 286370
-source sha256: ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36
+source wc -l: 6641
+source bytes: 298986
+source sha256: 837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd
 broad lexical callable matches: 442
 top-level function declarations: 76
 plain function declarations: 63
@@ -133,7 +133,7 @@ subscriptionImportAndSenderNormalization: 11
 | 968 | `function` | `applyQuickBlockDefaultMigrationOnce` | `migrationAndVersioning` |
 | 1021 | `function` | `applyKeywordCommentsScopeMigrationOnce` | `migrationAndVersioning` |
 | 1108 | `function` | `schedulePostBlockEnrichment` | `postBlockEnrichmentAndChannelKeywords` |
-| 1172 | `function` | `getChannelDerivedKeywordRef` | `postBlockEnrichmentAndChannelKeywords` |
+| 1240 | `function` | `getChannelDerivedKeywordRef` | `postBlockEnrichmentAndChannelKeywords` |
 | 1178 | `function` | `getChannelDerivedKeywordWord` | `postBlockEnrichmentAndChannelKeywords` |
 | 1189 | `function` | `parsePackedChannelKeywordSource` | `postBlockEnrichmentAndChannelKeywords` |
 | 1196 | `function` | `syncStoredMainKeywordsWithChannels` | `postBlockEnrichmentAndChannelKeywords` |
@@ -172,8 +172,8 @@ subscriptionImportAndSenderNormalization: 11
 | 3097 | `async function` | `performWatchIdentityFetch` | `identityResolverNetwork` |
 | 4552 | `function` | `extractCustomUrlFromPath` | `identityResolverNetwork` |
 | 4581 | `async function` | `fetchChannelInfo` | `identityResolverNetwork` |
-| 5332 | `async function` | `handleAddFilteredChannel` | `ruleMutationAndChannelPersistence` |
-| 6231 | `async function` | `handleToggleChannelFilterAll` | `ruleMutationAndChannelPersistence` |
+| 5630 | `async function` | `handleAddFilteredChannel` | `ruleMutationAndChannelPersistence` |
+| 6529 | `async function` | `handleToggleChannelFilterAll` | `ruleMutationAndChannelPersistence` |
 | 6328 | `function` | `installFilterTubeBackgroundConsoleGate` | `defensiveHelpersAndMessaging` |
 
 ## Current Behavior Boundaries
@@ -258,9 +258,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

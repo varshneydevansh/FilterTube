@@ -348,9 +348,9 @@ test('metric foundation contract coverage rows counts and field names stay pinne
   assert.match(doc, /collector fixture provenance rows covered: 12/);
   assert.match(doc, /collector parity rollout rows covered: 12/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5744/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5789/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5744/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5789/);
   assert.match(doc, /expected runtime audit tests: 4457/);
   assert.match(doc, /expected runtime audit pass: 4457/);
   assert.match(doc, /expected runtime audit fail: 0/);
@@ -421,9 +421,9 @@ test('metric foundation contract coverage is backed by every artifact contract a
   assert.match(fixtureProvenance, /collector fixture provenance rows implementation-ready: 0/);
   assert.match(parityRollout, /collector parity rollout rows implementation-ready: 0/);
   assert.match(methodGap, /tracked JS\/JSX\/MJS files: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5744/);
+  assert.match(methodGap, /repo-wide lexical callables: 5789/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5744/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5789/);
   assert.match(runtimeResults, /Historical 2026-05-17 ledger snapshot:[\s\S]*tests 4457/);
   assert.match(runtimeResults, /Historical 2026-05-17 ledger snapshot:[\s\S]*pass 4457/);
   assert.match(runtimeResults, /fail 0/);

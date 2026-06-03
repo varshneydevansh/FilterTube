@@ -131,10 +131,10 @@ test('profile management persistence audit document records current boundary and
     assert.ok(doc.includes(marker), `missing marker: ${marker}`);
   }
 
-  assert.match(methodGap, /repo-wide lexical callables: 5744/);
+  assert.match(methodGap, /repo-wide lexical callables: 5789/);
   assert.match(methodGap, /files with lexical accounting: 69/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5744/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5789/);
 
   assert.equal(profileSettingsUiFamilyDocs.length, 12);
   for (const familyDocPath of profileSettingsUiFamilyDocs) {
@@ -142,9 +142,9 @@ test('profile management persistence audit document records current boundary and
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 69/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5744/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5789/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5744/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5789/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     assert.match(familyDoc, /runtime behavior changed: no/);
     assert.match(familyDoc, /do not approve runtime\s+optimization/);
@@ -157,7 +157,7 @@ test('profile management source fingerprints stay pinned', () => {
     ['js/tab-view.js', 11960, 542356, '0bc598eec24a3800592fd570a1b411ab71d77f610b56589d9b6a6baff3021bce'],
     ['js/popup.js', 1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
     ['js/io_manager.js', 2097, 100479, 'f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62'],
-    ['js/background.js', 6343, 286370, 'ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36']
+    ['js/background.js', 6641, 298986, '837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd']
   ];
 
   for (const [file, lines, bytes, hash] of expected) {

@@ -10,7 +10,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_FILTER_ALL_TOGGLE_LIST_TARGET_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/background.js': [6343, 286370, 'ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36'],
+  'js/background.js': [6641, 298986, '837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd'],
   'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
   'js/state_manager.js': [2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6']
 };
@@ -20,7 +20,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: "if (message.type === 'toggleChannelFilterAll')",
     end: 'return false;\n});',
-    startLine: 5305,
+    startLine: 5603,
     lines: 14,
     bytes: 413,
     hash: '7e15cc800cdde69487959513b30d2cfab29c55f9b1caa566f96b99bcb844c94e'
@@ -29,7 +29,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: 'async function handleToggleChannelFilterAll(channelId, value) {',
     end: "console.log(`FilterTube Background ${IS_FIREFOX ? 'Script' : 'Service Worker'} loaded and ready to serve filtered content.`);",
-    startLine: 6231,
+    startLine: 6529,
     lines: 95,
     bytes: 3435,
     hash: '84afd60fbb6c140a1a20880b7cb2b81a7ce33fe95c89b4278c1d00e1b1756dd4'

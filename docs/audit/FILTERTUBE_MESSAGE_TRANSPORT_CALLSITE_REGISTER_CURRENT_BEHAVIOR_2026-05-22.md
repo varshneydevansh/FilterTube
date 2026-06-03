@@ -20,9 +20,9 @@ injection changes, map-write changes, stats/backup changes, or DOM rerun changes
 ```text
 tracked product JS/JSX/MJS files scanned: 67
 tracked product files with message transport rows: 14
-message transport rows: 64
+message transport rows: 65
 runtime.onMessage.addListener rows: 4
-runtime.sendMessage rows: 27
+runtime.sendMessage rows: 28
 tabs.sendMessage rows: 3
 window.addEventListener("message") rows: 4
 window.postMessage rows: 26
@@ -36,9 +36,9 @@ about product/runtime transport, not verifier or audit text.
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6343 | 286370 | `ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36` |
+| `js/background.js` | 6641 | 298986 | `837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd` |
 | `js/content/bridge_injection.js` | 127 | 4741 | `d1b84cf4c43ec5ff5cdc3bd607d8f3d3bf448c12829780b0d05fb9fc14fb5d3e` |
-| `js/content/bridge_settings.js` | 845 | 34241 | `aea46dd241248db1d1d9bcbdfdf65320d1399ecd84cc7792678f29b1b26ee092` |
+| `js/content/bridge_settings.js` | 1113 | 44087 | `f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853` |
 | `js/content/collab_dialog.js` | 393 | 14623 | `dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a` |
 | `js/content/first_run_prompt.js` | 190 | 7453 | `5672d9060d29b08550ecfc3add54245212a5094ee5137f025b6f788f12e50409` |
 | `js/content/handle_resolver.js` | 282 | 9785 | `67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff` |
@@ -57,7 +57,7 @@ about product/runtime transport, not verifier or audit text.
 | --- | ---: |
 | `js/background.js` | 3 |
 | `js/content/bridge_injection.js` | 1 |
-| `js/content/bridge_settings.js` | 6 |
+| `js/content/bridge_settings.js` | 7 |
 | `js/content/collab_dialog.js` | 1 |
 | `js/content/first_run_prompt.js` | 2 |
 | `js/content/handle_resolver.js` | 4 |
@@ -73,7 +73,7 @@ about product/runtime transport, not verifier or audit text.
 | Operation | Rows |
 | --- | ---: |
 | `runtime.onMessage.addListener` | 4 |
-| `runtime.sendMessage` | 27 |
+| `runtime.sendMessage` | 28 |
 | `tabs.sendMessage` | 3 |
 | `window.addEventListener(message)` | 4 |
 | `window.postMessage` | 26 |
@@ -81,16 +81,17 @@ about product/runtime transport, not verifier or audit text.
 ## Message Transport Rows
 
 ```text
-js/background.js:47:tabs.sendMessage:quietTabBroadcast
-js/background.js:3191:runtime.onMessage.addListener:primaryBackgroundActionReceiver
-js/background.js:5258:runtime.onMessage.addListener:secondaryBackgroundTypeReceiver
+js/background.js:115:tabs.sendMessage:quietTabBroadcast
+js/background.js:3486:runtime.onMessage.addListener:primaryBackgroundActionReceiver
+js/background.js:5556:runtime.onMessage.addListener:secondaryBackgroundTypeReceiver
 js/content/bridge_injection.js:38:runtime.sendMessage:backgroundScriptInjectionRequest
 js/content/bridge_settings.js:130:window.postMessage:subscriptionImportRequestToMainWorld
 js/content/bridge_settings.js:148:window.addEventListener(message):subscriptionImportResponseListener
 js/content/bridge_settings.js:200:runtime.onMessage.addListener:contentRuntimeActionReceiver
 js/content/bridge_settings.js:257:runtime.sendMessage:settingsFetchOrActionRuntimeRequest
-js/content/bridge_settings.js:552:runtime.sendMessage:compiledSettingsRuntimeRequest
-js/content/bridge_settings.js:698:window.postMessage:settingsRelayToMainWorld
+js/content/bridge_settings.js:756:runtime.sendMessage:managedTimeLimitHeartbeatRuntimeRequest
+js/content/bridge_settings.js:818:runtime.sendMessage:compiledSettingsRuntimeRequest
+js/content/bridge_settings.js:966:window.postMessage:settingsRelayToMainWorld
 js/content/collab_dialog.js:244:window.postMessage:collabDialogDataToIsolatedWorld
 js/content/first_run_prompt.js:174:runtime.sendMessage:firstRunCompleteAck
 js/content/first_run_prompt.js:178:runtime.sendMessage:firstRunCheckRequest
@@ -169,7 +170,7 @@ js/tab-view.js:11315:runtime.onMessage.addListener:dashboardRuntimeMessageReceiv
 
 ## Message Sender/Receiver and Owner Layer Addendum - 2026-05-27
 
-This addendum classifies the same 64 message transport rows by direction,
+This addendum classifies the same 65 message transport rows by direction,
 transport boundary, and owner layer. It is source-derived proof only. It does
 not approve sender hardening, receiver consolidation, nonce insertion, page
 message rewrites, tab broadcast changes, listener teardown, or route/profile
@@ -179,9 +180,9 @@ Direction and boundary census:
 
 | Class | Rows | Current interpretation |
 | --- | ---: | --- |
-| `sender` | 56 | Most transport rows initiate work or hand off payloads into another owner. |
+| `sender` | 57 | Most transport rows initiate work or hand off payloads into another owner. |
 | `receiver` | 8 | Few receiver rows fan into many action/message branches, so sender authority cannot be inferred from listener count. |
-| `extension-runtime` | 31 | Runtime messages carry settings, list mutation, identity fetch, backup, prompt, popup, and dashboard actions. |
+| `extension-runtime` | 32 | Runtime messages carry settings, list mutation, identity fetch, backup, prompt, popup, dashboard, and managed time heartbeat actions. |
 | `page-message` | 30 | Page-world messages cross isolated/main-world boundaries for settings, learned maps, collaborator, channel, subscription, and seed traffic. |
 | `tab-message` | 3 | Tab messages are broadcast/request surfaces and need route/frame proof before behavior changes. |
 
@@ -189,27 +190,27 @@ Owner layer census:
 
 | Owner layer | Rows | Current risk |
 | --- | ---: | --- |
-| `isolated-content-runtime` | 32 | Content scripts own the largest transport surface, spanning runtime calls and page-world bridge traffic. |
+| `isolated-content-runtime` | 33 | Content scripts own the largest transport surface, spanning runtime calls and page-world bridge traffic. |
 | `main-world-page-runtime` | 19 | Injector, seed, and filter logic exchange page-world messages with wildcard target posts and page-lifetime listeners. |
 | `extension-ui-state` | 10 | Popup, dashboard, and StateManager can request profile/list/security/import/backup behavior through runtime or tab messages. |
 | `background` | 3 | Background has few transport rows but owns the broadest runtime receiver side effects. |
 
 ```text
-message sender rows: 56
+message sender rows: 57
 message receiver rows: 8
-extension runtime transport rows: 31
+extension runtime transport rows: 32
 page-message transport rows: 30
 tab-message transport rows: 3
-owner-layer rows: isolated-content-runtime 32, main-world-page-runtime 19, extension-ui-state 10, background 3
+owner-layer rows: isolated-content-runtime 33, main-world-page-runtime 19, extension-ui-state 10, background 3
 message sender/receiver authority: NO-GO
 runtime behavior changed by this addendum: no
 ```
 
 ```mermaid
 flowchart TD
-  A["64 message transport rows"] --> B["56 senders"]
+  A["65 message transport rows"] --> B["57 senders"]
   A --> C["8 receivers"]
-  B --> D["31 extension runtime rows"]
+  B --> D["32 extension runtime rows"]
   B --> E["30 page-message rows"]
   B --> F["3 tab-message rows"]
   C --> G["Receiver authority remains NO-GO"]
@@ -327,9 +328,9 @@ support runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

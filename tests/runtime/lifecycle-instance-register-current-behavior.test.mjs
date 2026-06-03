@@ -1649,7 +1649,10 @@ function classifyContentRuntimePageGlobalListenerDomain(row) {
     if (row.line < 8000) return 'content-bridge-fallback-menu-lifecycle';
     return 'content-bridge-main-world-message-lifecycle';
   }
-  if (row.file === 'js/content/bridge_settings.js') return 'settings-bridge-page-message-lifecycle';
+  if (row.file === 'js/content/bridge_settings.js') {
+    if (row.line >= 650 && row.line < 760) return 'settings-bridge-managed-time-limit-lifecycle';
+    return 'settings-bridge-page-message-lifecycle';
+  }
   if (row.file === 'js/content/collab_dialog.js') return 'collab-dialog-page-trigger-lifecycle';
   if (row.file === 'js/content/dom_fallback.js') return 'dom-fallback-page-lifecycle';
   if (row.file === 'js/content/first_run_prompt.js' || row.file === 'js/content/release_notes_prompt.js') {
@@ -1675,6 +1678,7 @@ function classifyContentRuntimePageGlobalRouteScope(row) {
     return 'main-youtube-fallback-menu-routes';
   }
   if (domain === 'content-bridge-main-world-message-lifecycle') return 'main-youtube-content-bridge-message-route';
+  if (domain === 'settings-bridge-managed-time-limit-lifecycle') return 'main-youtube-managed-time-limit-routes';
   if (domain === 'settings-bridge-page-message-lifecycle') return 'main-youtube-bridge-settings-message-route';
   if (domain === 'collab-dialog-page-trigger-lifecycle') return 'main-youtube-collab-dialog-routes';
   if (domain === 'dom-fallback-page-lifecycle') {
@@ -1702,6 +1706,7 @@ function classifyContentRuntimePageGlobalSurfaceScope(row) {
     return 'fallback-menu-card-surface';
   }
   if (domain === 'content-bridge-main-world-message-lifecycle') return 'content-bridge-page-message-surface';
+  if (domain === 'settings-bridge-managed-time-limit-lifecycle') return 'managed-time-limit-timeout-surface';
   if (domain === 'settings-bridge-page-message-lifecycle') return 'bridge-settings-page-message-surface';
   if (domain === 'collab-dialog-page-trigger-lifecycle') return 'collab-dialog-trigger-surface';
   if (domain === 'dom-fallback-page-lifecycle') {
@@ -1738,6 +1743,7 @@ function classifyContentRuntimePageGlobalPredicateClass(row) {
       ? 'main-world-message-source-gated'
       : 'seed-ready-pending-settings-gated';
   }
+  if (domain === 'settings-bridge-managed-time-limit-lifecycle') return 'managed-time-limit-policy-gated';
   if (domain === 'collab-dialog-page-trigger-lifecycle') return 'collab-runtime-enabled-gated';
   if (domain === 'dom-fallback-page-lifecycle') {
     if (row.line < 2300) return 'dom-fallback-scroll-state-gated';
@@ -1768,6 +1774,7 @@ function classifyContentRuntimePageGlobalDuplicateGuard(row) {
       ? 'bridge-settings-window-message-flag'
       : 'bridge-settings-seed-listener-flag';
   }
+  if (domain === 'settings-bridge-managed-time-limit-lifecycle') return 'managed-time-limit-listener-flag';
   if (domain === 'collab-dialog-page-trigger-lifecycle') {
     return row.eventKind === 'DOMContentLoaded'
       ? 'collab-domcontentloaded-boot'
@@ -1802,6 +1809,7 @@ function classifyContentRuntimePageGlobalNativeMenuImpact(row) {
   ) {
     return 'page-message-impact';
   }
+  if (domain === 'settings-bridge-managed-time-limit-lifecycle') return 'managed-time-limit-lock-impact';
   if (domain === 'collab-dialog-page-trigger-lifecycle') return 'collaborator-dialog-trigger-impact';
   if (domain === 'dom-fallback-page-lifecycle') return 'playback-or-scroll-guard-impact';
   if (domain === 'prompt-page-boot-lifecycle') return 'prompt-overlay-impact';
@@ -1816,6 +1824,7 @@ function classifyContentRuntimePageGlobalPageMessageTrustImpact(row) {
       ? 'bridge-settings-window-message-trust'
       : 'seed-ready-event-trust';
   }
+  if (domain === 'settings-bridge-managed-time-limit-lifecycle') return 'no-page-message-trust-impact';
   if (domain === 'injector-main-world-message-lifecycle') {
     return row.line < 100
       ? 'injector-subscription-import-message-trust'
@@ -1846,6 +1855,7 @@ function classifyContentRuntimePageGlobalNoWorkBudget(row) {
     return 'page-message-no-work-budget';
   }
   if (domain === 'settings-bridge-page-message-lifecycle') return 'seed-ready-no-work-budget';
+  if (domain === 'settings-bridge-managed-time-limit-lifecycle') return 'managed-time-limit-policy-no-work-budget';
   if (domain === 'collab-dialog-page-trigger-lifecycle') return 'collab-runtime-no-work-budget';
   if (domain === 'dom-fallback-page-lifecycle') {
     if (row.line < 2300) return 'scroll-state-no-work-budget';
@@ -1876,6 +1886,7 @@ function classifyContentRuntimePageGlobalPositiveFixture(row) {
   ) {
     return 'positive-fixture-page-message-relay';
   }
+  if (domain === 'settings-bridge-managed-time-limit-lifecycle') return 'positive-fixture-managed-timeout-overlay';
   if (domain === 'collab-dialog-page-trigger-lifecycle') return 'positive-fixture-collab-trigger-dialog';
   if (domain === 'dom-fallback-page-lifecycle') {
     if (row.line < 2300) return 'positive-fixture-scroll-state-refresh';
@@ -1906,6 +1917,7 @@ function classifyContentRuntimePageGlobalNegativeFixture(row) {
   ) {
     return 'negative-fixture-reject-untrusted-page-message';
   }
+  if (domain === 'settings-bridge-managed-time-limit-lifecycle') return 'negative-fixture-no-timeout-runtime-without-policy';
   if (domain === 'collab-dialog-page-trigger-lifecycle') return 'negative-fixture-no-collab-dialog-when-disabled';
   if (domain === 'dom-fallback-page-lifecycle') return 'negative-fixture-no-playback-guard-off-route';
   if (domain === 'prompt-page-boot-lifecycle') return 'negative-fixture-no-prompt-duplicate-overlay';
@@ -1942,6 +1954,9 @@ function classifyContentRuntimePageGlobalPageLifetimeJustification(row) {
   }
   if (row.contentRuntimePageGlobalDomain === 'settings-bridge-page-message-lifecycle') {
     return 'seed-ready-singleton';
+  }
+  if (row.contentRuntimePageGlobalDomain === 'settings-bridge-managed-time-limit-lifecycle') {
+    return 'managed-time-limit-route-revalidation-singleton';
   }
   return 'module-singleton-page-lifetime';
 }
@@ -2205,25 +2220,25 @@ test('lifecycle instance register enumerates every current observer listener tim
   const ids = new Set(rows.map(row => row.id));
   const doc = read(registerPath);
 
-  assert.equal(rows.length, 535);
+  assert.equal(rows.length, 539);
   assert.equal(ids.size, rows.length, 'file:line:family lifecycle instance ids must be unique');
   assert.deepEqual(countBy(rows, 'family'), {
-    addEventListener: 298,
+    addEventListener: 299,
     cancelAnimationFrame: 4,
-    clearInterval: 4,
+    clearInterval: 5,
     clearTimeout: 34,
     intersectionObserver: 4,
     mutationObserver: 16,
-    removeEventListener: 17,
+    removeEventListener: 18,
     requestAnimationFrame: 31,
-    setInterval: 3,
+    setInterval: 4,
     setTimeout: 124
   });
 
-  assert.equal(addListenerOptionRows.length, 298);
+  assert.equal(addListenerOptionRows.length, 299);
   assert.deepEqual(countBy(addListenerOptionRows, 'optionKind'), {
     'boolean-false-bubble': 1,
-    'boolean-true-capture': 27,
+    'boolean-true-capture': 28,
     'expression-or-identifier': 2,
     'no-third-argument': 238,
     'object-capture-true': 1,
@@ -2233,9 +2248,9 @@ test('lifecycle instance register enumerates every current observer listener tim
   });
   assert.deepEqual(countAddEventOptionsBySourceFamily(addListenerOptionRows), {
     'content-runtime-js': {
-      total: 78,
+      total: 79,
       'boolean-false-bubble': 1,
-      'boolean-true-capture': 25,
+      'boolean-true-capture': 26,
       'no-third-argument': 24,
       'object-capture-true': 1,
       'object-once-true': 5,
@@ -2262,7 +2277,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     }
   });
 
-  assert.equal(addListenerEventRows.length, 298);
+  assert.equal(addListenerEventRows.length, 299);
   assert.deepEqual(countBy(addListenerEventRows, 'eventKind'), {
     DOMContentLoaded: 8,
     blur: 1,
@@ -2282,7 +2297,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     message: 6,
     mouseenter: 4,
     mouseleave: 5,
-    'nonliteral-event': 4,
+    'nonliteral-event': 5,
     open: 2,
     orientationchange: 1,
     pointerenter: 4,
@@ -2300,7 +2315,7 @@ test('lifecycle instance register enumerates every current observer listener tim
   });
   assert.deepEqual(countAddEventEventsBySourceFamily(addListenerEventRows), {
     'content-runtime-js': {
-      total: 78,
+      total: 79,
       DOMContentLoaded: 6,
       change: 1,
       click: 16,
@@ -2314,7 +2329,7 @@ test('lifecycle instance register enumerates every current observer listener tim
       message: 4,
       mouseenter: 4,
       mouseleave: 5,
-      'nonliteral-event': 1,
+      'nonliteral-event': 2,
       orientationchange: 1,
       pointerenter: 4,
       pointerleave: 3,
@@ -2363,21 +2378,21 @@ test('lifecycle instance register enumerates every current observer listener tim
     }
   });
 
-  assert.equal(addListenerTargetRows.length, 298);
+  assert.equal(addListenerTargetRows.length, 299);
   assert.deepEqual(countBy(addListenerTargetRows, 'targetKind'), {
     document: 41,
     'generated-shell-node': 2,
     'local-element-reference': 207,
     'optional-local-element-reference': 17,
     'vendor-transport-reference': 8,
-    window: 23
+    window: 24
   });
   assert.deepEqual(countAddEventTargetsBySourceFamily(addListenerTargetRows), {
     'content-runtime-js': {
-      total: 78,
+      total: 79,
       document: 32,
       'local-element-reference': 32,
-      window: 14
+      window: 15
     },
     'extension-ui-background-js': {
       total: 203,
@@ -2402,7 +2417,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     }
   });
 
-  assert.equal(addListenerEventTargetRows.length, 298);
+  assert.equal(addListenerEventTargetRows.length, 299);
   assert.deepEqual(countAddEventTargetEvents(addListenerEventTargetRows), {
     document: {
       total: 41,
@@ -2456,12 +2471,12 @@ test('lifecycle instance register enumerates every current observer listener tim
       open: 2
     },
     window: {
-      total: 23,
+      total: 24,
       DOMContentLoaded: 1,
       filterTubeSeedReady: 1,
       hashchange: 2,
       message: 4,
-      'nonliteral-event': 1,
+      'nonliteral-event': 2,
       orientationchange: 1,
       popstate: 2,
       resize: 4,
@@ -2491,11 +2506,12 @@ test('lifecycle instance register enumerates every current observer listener tim
       'yt-navigate-finish': 5
     },
     'content-runtime-js:window': {
-      total: 14,
+      total: 15,
       DOMContentLoaded: 1,
       filterTubeSeedReady: 1,
       hashchange: 1,
       message: 4,
+      'nonliteral-event': 1,
       orientationchange: 1,
       popstate: 1,
       resize: 1,
@@ -2541,10 +2557,10 @@ test('lifecycle instance register enumerates every current observer listener tim
     vendorTransportLifecycle: 8,
     generatedShellNonliteral: 2
   });
-  assert.equal(contentRuntimePageGlobalListenerRows.length, 46);
+  assert.equal(contentRuntimePageGlobalListenerRows.length, 47);
   assert.deepEqual(countBy(contentRuntimePageGlobalListenerRows, 'targetKind'), {
     document: 32,
-    window: 14
+    window: 15
   });
   assert.deepEqual(countBy(contentRuntimePageGlobalListenerRows, 'eventKind'), {
     DOMContentLoaded: 6,
@@ -2558,7 +2574,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     keydown: 2,
     message: 4,
     mouseleave: 1,
-    'nonliteral-event': 1,
+    'nonliteral-event': 2,
     orientationchange: 1,
     popstate: 1,
     pointerenter: 1,
@@ -2572,7 +2588,7 @@ test('lifecycle instance register enumerates every current observer listener tim
   });
   assert.deepEqual(countBy(contentRuntimePageGlobalListenerRows, 'file'), {
     'js/content/block_channel.js': 16,
-    'js/content/bridge_settings.js': 6,
+    'js/content/bridge_settings.js': 7,
     'js/content/collab_dialog.js': 3,
     'js/content/dom_fallback.js': 3,
     'js/content/first_run_prompt.js': 1,
@@ -2635,6 +2651,11 @@ test('lifecycle instance register enumerates every current observer listener tim
       total: 6,
       document: 0,
       window: 6
+    },
+    'settings-bridge-managed-time-limit-lifecycle': {
+      total: 1,
+      document: 0,
+      window: 1
     }
   });
   assert.equal(contentRuntimePageGlobalListenerRows.filter(row => row.routeScope.startsWith('unclassified')).length, 0);
@@ -2656,6 +2677,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     'main-youtube-dom-fallback-scroll-route': 1,
     'main-youtube-fallback-menu-routes': 7,
     'main-youtube-injector-message-route': 2,
+    'main-youtube-managed-time-limit-routes': 1,
     'main-youtube-native-menu-routes': 3,
     'main-youtube-playlist-fallback-popover-route': 1,
     'main-youtube-prefetch-visibility-route': 1,
@@ -2673,6 +2695,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     'identity-prefetch-visibility-surface': 1,
     'injector-page-message-surface': 2,
     'kids-native-menu-surface': 1,
+    'managed-time-limit-timeout-surface': 1,
     'native-dropdown-menu-surface': 3,
     'playlist-fallback-popover-surface': 1,
     'playlist-panel-prefetch-surface': 2,
@@ -2689,6 +2712,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     'identity-prefetch-work-gated': 3,
     'kids-native-menu-listener-gated': 1,
     'main-world-message-source-gated': 4,
+    'managed-time-limit-policy-gated': 1,
     'native-menu-listener-gated': 3,
     'playlist-popover-open-gated': 1,
     'prompt-needed-check-gated': 2,
@@ -2709,6 +2733,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     'injector-script-load-singleton': 1,
     'injector-window-message-flag': 1,
     'kids-passive-script-load-singleton': 1,
+    'managed-time-limit-listener-flag': 1,
     'native-menu-script-load-singleton': 3,
     'playlist-popover-replace-remove': 1,
     'playlist-prefetch-hook-flag': 2,
@@ -2720,6 +2745,7 @@ test('lifecycle instance register enumerates every current observer listener tim
   assert.deepEqual(countBy(contentRuntimePageGlobalListenerRows, 'nativeMenuImpactClass'), {
     'collaborator-dialog-trigger-impact': 3,
     'custom-fallback-menu-impact': 8,
+    'managed-time-limit-lock-impact': 1,
     'page-message-impact': 9,
     'playback-or-scroll-guard-impact': 3,
     'prefetch-or-whitelist-impact': 5,
@@ -2733,7 +2759,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     'content-bridge-main-world-message-trust': 1,
     'injector-runtime-lookup-message-trust': 1,
     'injector-subscription-import-message-trust': 1,
-    'no-page-message-trust-impact': 37,
+    'no-page-message-trust-impact': 38,
     'seed-ready-event-trust': 5
   });
   assert.deepEqual(countBy(contentRuntimePageGlobalListenerRows, 'noWorkBudgetClass'), {
@@ -2741,6 +2767,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     'fallback-menu-hover-eager-no-work-budget': 7,
     'identity-prefetch-no-work-budget': 3,
     'kids-native-menu-no-work-budget': 1,
+    'managed-time-limit-policy-no-work-budget': 1,
     'native-menu-open-no-work-budget': 3,
     'page-message-no-work-budget': 4,
     'playback-guard-no-work-budget': 2,
@@ -2756,6 +2783,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     'positive-fixture-collab-trigger-dialog': 3,
     'positive-fixture-fallback-menu-scan': 7,
     'positive-fixture-kids-native-block-sync': 1,
+    'positive-fixture-managed-timeout-overlay': 1,
     'positive-fixture-native-menu-open-close': 3,
     'positive-fixture-page-message-relay': 9,
     'positive-fixture-playlist-playback-guard': 2,
@@ -2770,6 +2798,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     'negative-fixture-no-collab-dialog-when-disabled': 3,
     'negative-fixture-no-fallback-menu-when-native-quiet': 7,
     'negative-fixture-no-kids-main-cross-talk': 1,
+    'negative-fixture-no-timeout-runtime-without-policy': 1,
     'negative-fixture-no-native-menu-poison': 3,
     'negative-fixture-no-playback-guard-off-route': 3,
     'negative-fixture-no-prefetch-when-rules-inactive': 3,
@@ -2779,6 +2808,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     'negative-fixture-reject-untrusted-page-message': 9
   });
   assert.deepEqual(countBy(contentRuntimePageGlobalListenerRows, 'pageLifetimeJustificationClass'), {
+    'managed-time-limit-route-revalidation-singleton': 1,
     'module-singleton-page-lifetime': 30,
     'one-shot-boot-listener': 5,
     'page-world-message-singleton': 4,
@@ -2787,17 +2817,17 @@ test('lifecycle instance register enumerates every current observer listener tim
     'transient-popover-remove': 1
   });
 
-  assert.equal(addListenerCallbackRows.length, 298);
+  assert.equal(addListenerCallbackRows.length, 299);
   assert.deepEqual(countBy(addListenerCallbackRows, 'callbackKind'), {
-    'identifier-callback-reference': 41,
+    'identifier-callback-reference': 42,
     'inline-arrow-callback': 254,
     'member-callback-reference': 1,
     'other-callback-expression': 2
   });
   assert.deepEqual(countAddEventCallbacksBySourceFamily(addListenerCallbackRows), {
     'content-runtime-js': {
-      total: 78,
-      'identifier-callback-reference': 22,
+      total: 79,
+      'identifier-callback-reference': 23,
       'inline-arrow-callback': 55,
       'member-callback-reference': 1
     },
@@ -2820,20 +2850,20 @@ test('lifecycle instance register enumerates every current observer listener tim
     }
   });
 
-  assert.equal(listenerAddRows.length, 298);
-  assert.equal(listenerRemoveRows.length, 17);
+  assert.equal(listenerAddRows.length, 299);
+  assert.equal(listenerRemoveRows.length, 18);
   assert.deepEqual(countBy(listenerRemoveRows, 'targetKind'), {
     document: 7,
     'generated-shell-node': 2,
     'local-element-reference': 2,
-    window: 6
+    window: 7
   });
   assert.deepEqual(countBy(listenerRemoveRows, 'eventKind'), {
     change: 2,
     click: 2,
     hashchange: 1,
     keydown: 1,
-    'nonliteral-event': 3,
+    'nonliteral-event': 4,
     popstate: 1,
     pointermove: 1,
     storage: 1,
@@ -2842,12 +2872,12 @@ test('lifecycle instance register enumerates every current observer listener tim
     'yt-page-data-updated': 1
   });
   assert.deepEqual(countBy(listenerRemoveRows, 'callbackKind'), {
-    'identifier-callback-reference': 14,
+    'identifier-callback-reference': 15,
     'member-callback-reference': 1,
     'other-callback-expression': 2
   });
   assert.deepEqual(countBy(listenerRemoveRows, 'optionKind'), {
-    'boolean-true-capture': 7,
+    'boolean-true-capture': 8,
     'expression-or-identifier': 2,
     'no-third-argument': 7,
     'object-capture-true': 1
@@ -2855,12 +2885,12 @@ test('lifecycle instance register enumerates every current observer listener tim
   assert.deepEqual(countBy(listenerRemoveRows, 'captureKey'), {
     'capture-expression-or-identifier': 2,
     'capture-false': 7,
-    'capture-true': 8
+    'capture-true': 9
   });
   assert.deepEqual(countListenerAddRemoveBySourceFamily(listenerAddRows, listenerRemoveRows), {
     'content-runtime-js': {
-      add: 78,
-      remove: 8,
+      add: 79,
+      remove: 9,
       delta: 70
     },
     'extension-ui-background-js': {
@@ -2886,8 +2916,8 @@ test('lifecycle instance register enumerates every current observer listener tim
   });
   assert.deepEqual(listenerAddRemoveRiskGaps, {
     installMinusRemove: 281,
-    captureEquivalentRemovePairs: 17,
-    exactOptionShapeRemovePairs: 16,
+    captureEquivalentRemovePairs: 18,
+    exactOptionShapeRemovePairs: 17,
     captureEquivalentOptionShapeMismatchPairs: 1,
     unmatchedRemoveRows: 0,
     pageGlobalListenerInstallsWithoutExplicitRemove: 51,
@@ -3102,14 +3132,14 @@ test('lifecycle instance register enumerates every current observer listener tim
     extensionUiObserveReleaseDelta: 1
   });
 
-  assert.equal(timerDelayRows.length, 127);
+  assert.equal(timerDelayRows.length, 128);
   assert.deepEqual(countBy(timerDelayRows, 'family'), {
-    setInterval: 3,
+    setInterval: 4,
     setTimeout: 124
   });
   assert.deepEqual(countBy(timerDelayRows, 'delayKind'), {
     'math-max-expression': 5,
-    'named-or-expression-delay': 38,
+    'named-or-expression-delay': 39,
     'numeric-1-99-ms': 16,
     'numeric-100-199-ms': 18,
     'numeric-1000-4999-ms': 13,
@@ -3119,9 +3149,9 @@ test('lifecycle instance register enumerates every current observer listener tim
   });
   assert.deepEqual(countTimerDelaysBySourceFamily(timerDelayRows), {
     'content-runtime-js': {
-      total: 87,
+      total: 88,
       'math-max-expression': 5,
-      'named-or-expression-delay': 22,
+      'named-or-expression-delay': 23,
       'numeric-1-99-ms': 12,
       'numeric-100-199-ms': 14,
       'numeric-1000-4999-ms': 10,
@@ -3144,20 +3174,20 @@ test('lifecycle instance register enumerates every current observer listener tim
     }
   });
 
-  assert.equal(timerCallbackRows.length, 127);
+  assert.equal(timerCallbackRows.length, 128);
   assert.deepEqual(countBy(timerCallbackRows, 'family'), {
-    setInterval: 3,
+    setInterval: 4,
     setTimeout: 124
   });
   assert.deepEqual(countBy(timerCallbackRows, 'callbackKind'), {
     'identifier-callback-reference': 19,
-    'inline-arrow-callback': 108
+    'inline-arrow-callback': 109
   });
   assert.deepEqual(countTimerCallbacksBySourceFamily(timerCallbackRows), {
     'content-runtime-js': {
-      total: 87,
+      total: 88,
       'identifier-callback-reference': 13,
-      'inline-arrow-callback': 74
+      'inline-arrow-callback': 75
     },
     'extension-ui-background-js': {
       total: 39,
@@ -3172,8 +3202,8 @@ test('lifecycle instance register enumerates every current observer listener tim
 
   assert.equal(timeoutScheduleRows.length, 124);
   assert.equal(timeoutClearRows.length, 34);
-  assert.equal(intervalScheduleRows.length, 3);
-  assert.equal(intervalClearRows.length, 4);
+  assert.equal(intervalScheduleRows.length, 4);
+  assert.equal(intervalClearRows.length, 5);
   assert.deepEqual(countBy(timeoutScheduleRows, 'handleKind'), {
     'assigned-local-id-handle': 11,
     'assigned-named-state-handle': 24,
@@ -3183,12 +3213,12 @@ test('lifecycle instance register enumerates every current observer listener tim
     'returned-timer-handle': 1
   });
   assert.deepEqual(countBy(intervalScheduleRows, 'handleKind'), {
-    'assigned-named-state-handle': 3
+    'assigned-named-state-handle': 4
   });
   assert.deepEqual(countTimerScheduleClearBySourceFamily(timerScheduleClearRows, timerClearRows), {
     'content-runtime-js': {
-      schedules: 87,
-      clears: 25,
+      schedules: 88,
+      clears: 26,
       delta: 62
     },
     'extension-ui-background-js': {
@@ -3206,7 +3236,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     'background-authority-owner': { total: 10, setTimeout: 10, setInterval: 0 },
     'collaborator-dialog-owner': { total: 2, setTimeout: 2, setInterval: 0 },
     'content-bridge-owner': { total: 37, setTimeout: 36, setInterval: 1 },
-    'content-helper-owner': { total: 12, setTimeout: 12, setInterval: 0 },
+    'content-helper-owner': { total: 13, setTimeout: 12, setInterval: 1 },
     'dashboard-ui-owner': { total: 15, setTimeout: 14, setInterval: 1 },
     'dom-fallback-owner': { total: 11, setTimeout: 11, setInterval: 0 },
     'extension-ui-background-owner': { total: 6, setTimeout: 6, setInterval: 0 },
@@ -3246,13 +3276,13 @@ test('lifecycle instance register enumerates every current observer listener tim
       'named-or-expression': 11
     },
     'content-helper-owner': {
-      total: 12,
+      total: 13,
       'immediate-zero': 0,
       'short-under-200ms': 5,
       'medium-200-999ms': 2,
       'long-1000ms-plus': 0,
       'bounded-expression': 3,
-      'named-or-expression': 2
+      'named-or-expression': 3
     },
     'dashboard-ui-owner': {
       total: 15,
@@ -3738,9 +3768,9 @@ test('lifecycle instance register enumerates every current observer listener tim
     handledTimeoutScheduleRowsWithClearHandle: 26,
     handledTimeoutScheduleRowsWithoutClearHandle: 20,
     distinctScheduledTimeoutHandlesWithoutClear: 18,
-    intervalClearRowsWithScheduleHandle: 4,
+    intervalClearRowsWithScheduleHandle: 5,
     intervalClearRowsWithoutDirectScheduleHandle: 0,
-    handledIntervalScheduleRowsWithClearHandle: 3,
+    handledIntervalScheduleRowsWithClearHandle: 4,
     handledIntervalScheduleRowsWithoutClearHandle: 0,
     distinctScheduledIntervalHandlesWithoutClear: 0
   });
@@ -3858,12 +3888,12 @@ test('lifecycle instance register enumerates every current observer listener tim
     }
   });
 
-  assert.equal(explicitTeardownRows.length, 59);
+  assert.equal(explicitTeardownRows.length, 61);
   assert.deepEqual(countBy(explicitTeardownRows, 'family'), {
     cancelAnimationFrame: 4,
-    clearInterval: 4,
+    clearInterval: 5,
     clearTimeout: 34,
-    removeEventListener: 17
+    removeEventListener: 18
   });
   assert.deepEqual(countBy(explicitTeardownRows, 'handleKind'), {
     'frame-other-handle': 1,
@@ -3871,22 +3901,24 @@ test('lifecycle instance register enumerates every current observer listener tim
     'frame-profile-dropdown-handle': 2,
     'interval-dashboard-rotation-handle': 1,
     'interval-engine-check-handle': 2,
+    'interval-other-handle': 1,
     'interval-warmup-handle': 1,
     'listener-document-target': 7,
     'listener-generated-shell-target': 2,
     'listener-other-target': 2,
-    'listener-window-target': 6,
+    'listener-window-target': 7,
     'timeout-local-id-handle': 12,
     'timeout-named-state-handle': 14,
     'timeout-property-held-handle': 8
   });
   assert.deepEqual(countExplicitTeardownBySourceFamily(explicitTeardownRows), {
     'content-runtime-js': {
-      total: 33,
+      total: 35,
       'interval-engine-check-handle': 2,
+      'interval-other-handle': 1,
       'interval-warmup-handle': 1,
       'listener-document-target': 4,
-      'listener-window-target': 4,
+      'listener-window-target': 5,
       'timeout-local-id-handle': 5,
       'timeout-named-state-handle': 9,
       'timeout-property-held-handle': 8
@@ -4228,31 +4260,31 @@ test('lifecycle instance register enumerates every current observer listener tim
     'ASCII observer constructor callback flow diagram: present',
     'Mermaid observer constructor callback flow diagram: present',
     'Timer Delay Shape Addendum - 2026-05-28',
-    'timer delay rows: 127',
+    'timer delay rows: 128',
     'setTimeout delay rows: 124',
-    'setInterval delay rows: 3',
+    'setInterval delay rows: 4',
     'numeric zero timer delays: 16',
     'numeric 1-99ms timer delays: 16',
     'numeric 100-199ms timer delays: 18',
     'numeric 200-999ms timer delays: 17',
     'numeric 1000-4999ms timer delays: 13',
     'numeric 5000ms plus timer delays: 4',
-    'named or expression timer delays: 38',
+    'named or expression timer delays: 39',
     'math max expression timer delays: 5',
     'missing timer delay arguments: 0',
     'timer delay cleanup approval: NO-GO',
     'ASCII timer delay flow diagram: present',
     'Mermaid timer delay flow diagram: present',
     'Timer Callback Identity Addendum - 2026-05-28',
-    'timer callback rows: 127',
+    'timer callback rows: 128',
     'setTimeout callback rows: 124',
-    'setInterval callback rows: 3',
-    'inline arrow timer callbacks: 108',
+    'setInterval callback rows: 4',
+    'inline arrow timer callbacks: 109',
     'identifier timer callbacks: 19',
     'inline function timer callbacks: 0',
     'member reference timer callbacks: 0',
     'missing timer callback arguments: 0',
-    'content runtime timer callbacks: 87',
+    'content runtime timer callbacks: 88',
     'extension UI background timer callbacks: 39',
     'website component timer callbacks: 1',
     'timer callback cleanup approval: NO-GO',
@@ -4261,8 +4293,8 @@ test('lifecycle instance register enumerates every current observer listener tim
     'Timer Schedule/Clear Parity Addendum - 2026-05-28',
     'setTimeout schedule rows for parity: 124',
     'clearTimeout rows for parity: 34',
-    'setInterval schedule rows for parity: 3',
-    'clearInterval rows for parity: 4',
+    'setInterval schedule rows for parity: 4',
+    'clearInterval rows for parity: 5',
     'setTimeout schedule-minus-clear delta: 90',
     'setInterval schedule-minus-clear delta: -1',
     'timeout schedules with assigned local id handle: 11',
@@ -4271,15 +4303,15 @@ test('lifecycle instance register enumerates every current observer listener tim
     'timeout fire-and-forget schedules: 63',
     'timeout promise sleep or timeout schedules: 14',
     'timeout returned handle schedules: 1',
-    'interval schedules with assigned named state handle: 3',
+    'interval schedules with assigned named state handle: 4',
     'clearTimeout rows with direct schedule handle: 32',
     'clearTimeout rows without direct schedule handle: 2',
     'handled timeout schedule rows with clear handle: 26',
     'handled timeout schedule rows without clear handle: 20',
     'distinct scheduled timeout handles without clear: 18',
-    'clearInterval rows with direct schedule handle: 4',
+    'clearInterval rows with direct schedule handle: 5',
     'clearInterval rows without direct schedule handle: 0',
-    'handled interval schedule rows with clear handle: 3',
+    'handled interval schedule rows with clear handle: 4',
     'handled interval schedule rows without clear handle: 0',
     'distinct scheduled interval handles without clear: 0',
     'content runtime timer schedule/clear delta: 62',
@@ -4289,9 +4321,9 @@ test('lifecycle instance register enumerates every current observer listener tim
     'ASCII timer schedule/clear parity flow diagram: present',
     'Mermaid timer schedule/clear parity flow diagram: present',
     'Timer Owner Domain Context Addendum - 2026-05-30',
-    'timer owner-context rows: 127',
+    'timer owner-context rows: 128',
     'timer owner domains: 13',
-    'content-runtime timer owner-context rows: 87',
+    'content-runtime timer owner-context rows: 88',
     'extension UI/background timer owner-context rows: 39',
     'website component timer owner-context rows: 1',
     'content bridge timer owner-context rows: 37',
@@ -4303,13 +4335,13 @@ test('lifecycle instance register enumerates every current observer listener tim
     'ASCII timer owner-domain flow diagram: present',
     'Mermaid timer owner-domain flow diagram: present',
     'Timer Owner Delay Budget Addendum - 2026-05-30',
-    'timer owner delay-budget rows: 127',
+    'timer owner delay-budget rows: 128',
     'timer owner immediate-zero budget rows: 16',
     'timer owner short-under-200ms budget rows: 34',
     'timer owner medium-200-999ms budget rows: 17',
     'timer owner long-1000ms-plus budget rows: 17',
     'timer owner bounded-expression budget rows: 5',
-    'timer owner named-or-expression budget rows: 38',
+    'timer owner named-or-expression budget rows: 39',
     'content bridge immediate-or-short timer budget rows: 13',
     'quick/menu immediate-or-short timer budget rows: 9',
     'dom fallback immediate-or-short timer budget rows: 6',
@@ -4562,10 +4594,10 @@ test('lifecycle instance register enumerates every current observer listener tim
     'ASCII website component lifecycle boundary flow diagram: present',
     'Mermaid website component lifecycle boundary flow diagram: present',
     'Explicit Teardown Handle Addendum - 2026-05-28',
-    'explicit teardown handle rows: 55',
-    'removeEventListener teardown rows: 13',
+    'explicit teardown handle rows: 61',
+    'removeEventListener teardown rows: 18',
     'clearTimeout teardown rows: 34',
-    'clearInterval teardown rows: 4',
+    'clearInterval teardown rows: 5',
     'cancelAnimationFrame teardown rows: 4',
     'listener document teardown targets: 7',
     'listener window teardown targets: 2',
@@ -4641,7 +4673,7 @@ test('lifecycle instance source-family totals match the current register doc', (
   const doc = read(registerPath);
 
   assert.deepEqual(countBy(rows, 'sourceFamily'), {
-    'content-runtime-js': 227,
+    'content-runtime-js': 231,
     'extension-ui-background-js': 273,
     'generated-ui-output': 4,
     'vendor-bundles': 8,
@@ -4650,11 +4682,11 @@ test('lifecycle instance source-family totals match the current register doc', (
 
   for (const phrase of [
     '| `extension-ui-background-js` | 273 |',
-    '| `content-runtime-js` | 227 |',
+    '| `content-runtime-js` | 231 |',
     '| `website-components` | 23 |',
     '| `vendor-bundles` | 8 |',
     '| `generated-ui-output` | 4 |',
-    '| **Total lifecycle instances** | **535** |'
+    '| **Total lifecycle instances** | **539** |'
   ]) {
     assert.ok(doc.includes(phrase), `missing doc phrase ${phrase}`);
   }
@@ -4678,7 +4710,7 @@ test('lifecycle instance hot files remain pinned before cleanup work', () => {
   assert.equal(byFile['js/background.js'], 14);
   assert.equal(byFile['js/content/dom_fallback.js'], 14);
   assert.equal(byFile['js/injector.js'], 12);
-  assert.equal(byFile['js/content/bridge_settings.js'], 18);
+  assert.equal(byFile['js/content/bridge_settings.js'], 22);
   assert.equal(byFile['js/render_engine.js'], 9);
 
   assert.match(doc, /`js\/tab-view\.js` \| 182/);
@@ -4686,11 +4718,11 @@ test('lifecycle instance hot files remain pinned before cleanup work', () => {
   assert.match(doc, /`js\/content\/block_channel\.js` \| 71/);
 
   assert.deepEqual(roleCounts, {
-    'explicit-teardown': 59,
-    'install-or-schedule': 476
+    'explicit-teardown': 61,
+    'install-or-schedule': 478
   });
   assert.deepEqual(countInstallTeardownBySourceFamily(rows), {
-    'content-runtime-js': { install: 194, teardown: 33, total: 227 },
+    'content-runtime-js': { install: 196, teardown: 35, total: 231 },
     'extension-ui-background-js': { install: 259, teardown: 14, total: 273 },
     'generated-ui-output': { install: 2, teardown: 2, total: 4 },
     'vendor-bundles': { install: 8, teardown: 0, total: 8 },
@@ -4699,16 +4731,16 @@ test('lifecycle instance hot files remain pinned before cleanup work', () => {
 
   for (const phrase of [
     'Install/Teardown Imbalance Addendum - 2026-05-27',
-    '| `install-or-schedule` | `addEventListener`, `MutationObserver`, `IntersectionObserver`, `setInterval`, `setTimeout`, `requestAnimationFrame` | 472 |',
-    '| `explicit-teardown` | `removeEventListener`, `clearInterval`, `clearTimeout`, `cancelAnimationFrame` | 55 |',
+    '| `install-or-schedule` | `addEventListener`, `MutationObserver`, `IntersectionObserver`, `setInterval`, `setTimeout`, `requestAnimationFrame` | 478 |',
+    '| `explicit-teardown` | `removeEventListener`, `clearInterval`, `clearTimeout`, `cancelAnimationFrame` | 61 |',
     '| `extension-ui-background-js` | 259 | 14 | 273 |',
-    '| `content-runtime-js` | 194 | 33 | 227 |',
+    '| `content-runtime-js` | 196 | 35 | 231 |',
     '| `vendor-bundles` | 8 | 0 | 8 |',
     '| `website-components` | 13 | 10 | 23 |',
     '| `generated-ui-output` | 2 | 2 | 4 |',
-    'install-or-schedule lifecycle instances: 476',
-    'explicit-teardown lifecycle instances: 59',
-    'install-to-teardown ratio: 8.5:1',
+    'install-or-schedule lifecycle instances: 478',
+    'explicit-teardown lifecycle instances: 61',
+    'install-to-teardown ratio: 7.8:1',
     'shared lifecycle registry in product source: absent',
     'lifecycle cleanup approval from imbalance addendum: NO-GO',
     'runtime behavior changed by this addendum: no'
@@ -5264,9 +5296,9 @@ function assertRuntimeLifecycleConvergenceBoundary() {
     .join('\n');
 
   assert.match(doc, /Runtime Lifecycle Convergence Boundary - 2026-05-30/);
-  assert.match(doc, /535 tracked lifecycle primitive instances/);
-  assert.match(doc, /476 install-or-schedule rows/);
-  assert.match(doc, /59 explicit teardown rows/);
+  assert.match(doc, /539 tracked lifecycle primitive instances/);
+  assert.match(doc, /478 install-or-schedule rows/);
+  assert.match(doc, /61 explicit teardown rows/);
   assert.match(doc, /missing shared lifecycle effect\/teardown authority/);
   assert.match(doc, /flowchart TD/);
 
@@ -5288,9 +5320,9 @@ function assertRuntimeLifecycleConvergenceBoundary() {
   for (const phrase of [
     /runtime lifecycle convergence rows: 10/,
     /implementation-ready runtime lifecycle convergence rows: 0/,
-    /tracked lifecycle primitive instances: 535/,
-    /install-or-schedule lifecycle rows: 472/,
-    /explicit teardown lifecycle rows: 55/,
+    /tracked lifecycle primitive instances: 539/,
+    /install-or-schedule lifecycle rows: 478/,
+    /explicit teardown lifecycle rows: 61/,
     /hot YouTube SPA lifecycle owner rows: 16/,
     /YouTube SPA immediate\/short hot timer rows: 33/,
     /files with complete per-callable semantic proof: 0/,

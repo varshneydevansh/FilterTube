@@ -153,7 +153,7 @@ function assertActiveBlocklistObserverBudgetAddendum(doc) {
   assert.match(doc, /\| Quick-block lifecycle gate \| `js\/content\/block_channel\.js:353-365`, `js\/content\/block_channel\.js:1205-1222`, `js\/content\/block_channel\.js:1291-1293`, `js\/content\/block_channel\.js:1979-2028` \|/);
   assert.match(doc, /\| Quick-block rule-context helper \| `js\/content\/block_channel\.js:1224-1285` \|/);
   assert.match(doc, /\| Native menu action gate \| `js\/content_bridge\.js:10517-10498`, `js\/content\/block_channel\.js:2913-2921` \|/);
-  assert.match(doc, /\| Storage force-reprocess coalescing \| `js\/content\/bridge_settings\.js:557-587`, `js\/content\/bridge_settings\.js:630-645` \|/);
+  assert.match(doc, /\| Storage force-reprocess coalescing \| `js\/content\/bridge_settings\.js:1019-1049`, `js\/content\/bridge_settings\.js:1051-1109` \|/);
   assert.match(doc, /\| Main blocklist canonical compile \| `js\/background\.js:2057-2066`, `js\/background\.js:2214-2224`, `js\/settings_shared\.js:922-927` \|/);
 
   assert.match(seedJsonGate, /if \(!settings \|\| settings\.enabled === false\) return false;/);

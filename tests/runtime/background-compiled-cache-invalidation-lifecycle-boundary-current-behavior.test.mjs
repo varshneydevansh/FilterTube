@@ -36,8 +36,8 @@ const backgroundSettingsStorageFamilyDocs = [
 ];
 
 const sourceFingerprint = {
-  lines: 6343,
-  bytes: 286370,
+  lines: 6641,
+  bytes: 298986,
   hash: '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'
 };
 
@@ -265,10 +265,10 @@ test('background compiled cache invalidation doc records audit-only boundary', (
   assert.match(doc, /compiler-only storage key rows \| 30/);
   assert.match(doc, /invalidation-only storage key rows \| 1/);
 
-  assert.match(methodGap, /repo-wide lexical callables: 5744/);
+  assert.match(methodGap, /repo-wide lexical callables: 5789/);
   assert.match(methodGap, /files with lexical accounting: 69/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5744/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5789/);
 
   assert.equal(backgroundSettingsStorageFamilyDocs.length, 23);
   for (const familyDocPath of backgroundSettingsStorageFamilyDocs) {
@@ -276,9 +276,9 @@ test('background compiled cache invalidation doc records audit-only boundary', (
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 69/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5744/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5789/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5744/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5789/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     if (familyDocPath.includes('BACKGROUND_ADD_FILTERED_CHANNEL_LIST_TARGET')) {
       assert.match(familyDoc, /runtime behavior changed: yes, scoped to secondary addFilteredChannel list target and matching backup trigger/);

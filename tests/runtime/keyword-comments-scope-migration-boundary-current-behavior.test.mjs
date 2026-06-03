@@ -146,7 +146,7 @@ test('keyword-comments scope migration audit is audit-only and source pinned', (
   assert.match(doc, /keyword-comments scope migration boundary source files: 1/);
   assert.match(doc, /keyword-comments scope migration source\/effect blocks: 5/);
   assert.match(doc, /runtime keyword-comments scope migration fixtures: 7/);
-  assert.ok(doc.includes(`| \`js/background.js\` | 6343 | 286370 | \`${sha256(backgroundPath)}\` |`));
+  assert.ok(doc.includes(`| \`js/background.js\` | 6641 | 298986 | \`${sha256(backgroundPath)}\` |`));
 });
 
 test('keyword-comments scope migration source counts remain pinned', () => {

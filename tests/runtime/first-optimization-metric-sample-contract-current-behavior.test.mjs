@@ -202,9 +202,9 @@ test('metric sample contract rows counts and field names stay pinned', () => {
   assert.match(doc, /collector fixture provenance rows covered: 12/);
   assert.match(doc, /collector parity rollout rows covered: 12/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5744/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5789/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5744/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5789/);
   assert.match(doc, /inline metric sample JSON sections covered: 12/);
   assert.match(doc, /inline metric sample artifact promotion decision: NO-GO/);
   assert.match(doc, /metric sample draft closure rows: 12/);
@@ -217,7 +217,7 @@ test('metric sample contract rows counts and field names stay pinned', () => {
   assert.match(doc, /metric source-owner rows linked by sample closure: 12/);
   assert.match(doc, /collector readiness families linked by sample closure: 5/);
   assert.match(doc, /method semantic proof gap files linked by sample closure: 69/);
-  assert.match(doc, /lexical callables linked by sample closure: 5744/);
+  assert.match(doc, /lexical callables linked by sample closure: 5789/);
   assert.match(doc, /runtime metric sample closure approvals: 0/);
   assert.match(doc, /implementation-ready metric sample closure rows: 0/);
   assert.match(doc, /metric sample draft closure: METRIC-SAMPLE-CHAIN-CLOSED/);
@@ -343,9 +343,9 @@ test('metric sample contract is backed by current manifest artifact and collecto
   assert.match(fixtureProvenance, /collector fixture provenance rows implementation-ready: 0/);
   assert.match(parityRollout, /collector parity rollout rows implementation-ready: 0/);
   assert.match(methodGap, /tracked JS\/JSX\/MJS files: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5744/);
+  assert.match(methodGap, /repo-wide lexical callables: 5789/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5744/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5789/);
 });
 
 test('metric sample authority symbols are absent from product runtime source', () => {

@@ -1,8 +1,8 @@
 # Contract: Managed Child Time-Limit Schema
 
 **Generated**: 2026-06-03
-**Status**: Local profile UI/store implemented. YouTube runtime enforcement is
-not implemented yet.
+**Status**: Local profile UI/store and first extension runtime enforcement are
+implemented for child/protected profiles.
 **Goal slice**: Implementation order item 6, "Add local child/protected-profile
 time-limit UI and schema".
 **Primary inputs**:
@@ -141,22 +141,36 @@ Current extension UI can now create or disable a profile-owned
 
 ## Current Runtime Boundary
 
-Current product source implements the local UI/store path, but YouTube runtime
-enforcement is still absent:
+Current product source implements the local UI/store path and the first
+extension runtime path:
 
 ```text
 local managed time-limit profile store: present
 local managed time-limit parent UI: present
-runtime managed time-limit policy compiler: absent
-runtime managed active-tab budget counter: absent
-runtime managed timeout overlay: absent
-runtime managed Main/Kids time gate: absent
-YouTube runtime behavior changed by this contract: no
+runtime managed time-limit policy compiler: present
+runtime managed active-tab budget counter: present
+runtime managed timeout overlay: present
+runtime managed Main/Kids time gate: present
+YouTube runtime behavior changed by this contract: yes, for child profiles with enabled time-limit policy
 ```
 
-Future implementation should keep the enforcement owner in background/runtime
-authority, with content-side UI only showing the gate/overlay state. Settings UI
-may edit the policy only through parent/account authority.
+The first runtime path is intentionally lazy:
+
+- Background compile emits `managedTimeLimitPolicy` only for active child
+  profiles with a valid `settings.timeLimitPolicy`.
+- Content bridge arms heartbeat listeners and a timer only when that policy is
+  enabled on a YouTube-owned route.
+- The background owns the persisted `ftManagedTimeUsageV1` counter and clamps
+  elapsed time by active/focused tab heartbeat, policy date, revision, and hash.
+- The content overlay does not mark videos hidden, does not click YouTube, and
+  only covers the route after background reports `timedOut: true`.
+- Missing, disabled, malformed, non-child, or external-route policies remain
+  no-work states.
+
+The current budget is whole-profile daily time from `dailyBudgetSeconds`; the
+schema still preserves `surfaceBudgets` for later per-space refinements, but the
+first runtime path does not reset budget by switching between YouTube Main and
+YouTube Kids.
 
 ## Verification
 

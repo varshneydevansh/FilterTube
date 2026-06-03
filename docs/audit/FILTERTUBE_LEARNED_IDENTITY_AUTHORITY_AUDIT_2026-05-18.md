@@ -52,7 +52,7 @@ from user-visible keyword/channel rows.
 | Area | Current behavior | Source proof | Risk |
 | --- | --- | --- | --- |
 | Background channel-map validation | `enqueueChannelMapMappings()` requires only `id` and `handle`, then writes both directions through `enqueueChannelMapUpdate()`; it does not validate `id` as UC or `handle` as `@...`. | `js/background.js:1495-1525` | Bad learned mappings can cross-match future channel rules. |
-| Background video-map validation | `enqueueVideoChannelMapUpdate()` trims non-empty strings but does not enforce 11-character video IDs or UC IDs. | `js/background.js:1648-1670` | Bad `videoId -> channelId` data can enter pending/cache state. |
+| Background video-map validation | `enqueueVideoChannelMapUpdate()` trims non-empty strings but does not enforce 11-character video IDs or UC IDs. | `js/background.js:1933-1670` | Bad `videoId -> channelId` data can enter pending/cache state. |
 | Engine-side video-map validation | `filter_logic.js` validates video IDs and UC IDs before posting `FilterTube_UpdateVideoChannelMap`. | `js/filter_logic.js:50-52` | Good source-side guard exists, but later content/background receivers do not preserve the same invariant. |
 | Pending map compile | `getCompiledSettings()` merges pending `pendingVideoChannelMapUpdates` into compiled settings before the debounced storage flush completes. | `js/background.js:2411-2423` | Newly learned identity can affect runtime before durable storage/revision accounting. |
 | Invalidation drift | Background storage invalidation omits `channelMap`, `videoChannelMap`, and `videoMetaMap`. | `js/background.js:4458-4476` | Direct storage writes or map changes can leave compiled caches stale unless another path manually patches them. |
@@ -120,9 +120,9 @@ support runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

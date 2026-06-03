@@ -1504,9 +1504,9 @@ test('objective coverage ledger records active goal completion audit as current-
   assert.match(doc, /active-thread completion rule to the exact user objective/);
   assert.match(doc, /149 tracked files still have open obligations/);
   assert.match(doc, /69 tracked JS\/JSX\/MJS files have lexical callable accounting/);
-  assert.match(doc, /5,697 callables are lexical rather than semantic method proof/);
+  assert.match(doc, /5,789 callables are lexical rather than semantic method proof/);
   assert.match(doc, /0 files have complete per-callable semantic proof/);
-  assert.match(doc, /5,697 lexical callables still require semantic proof before behavior changes/);
+  assert.match(doc, /5,789 lexical callables still require semantic proof before behavior changes/);
   assert.match(doc, /643 selector sites and 489 lifecycle instances/);
   assert.match(doc, /217\/217 P0 obligations remain `future-proof-missing`/);
   assert.match(doc, /`update_goal\(status='complete'\)` must not be called/);

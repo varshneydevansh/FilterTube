@@ -135,7 +135,7 @@ compiledRuleState(settings) must normalize:
 
 Proof:
 
-- `getCompiledSettings()` reads broad storage state: `js/background.js:1774`
+- `getCompiledSettings()` reads broad storage state: `js/background.js:2059`
 - Missing V4 profiles can be built and stored during compile: `js/background.js:1966`
 - Migrations are persisted inside compile: `js/background.js:2078`
 - `filterAll` channel names derive keyword rules: `js/background.js:2282`
@@ -202,9 +202,9 @@ runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

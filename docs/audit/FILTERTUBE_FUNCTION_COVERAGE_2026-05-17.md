@@ -21,9 +21,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -192,7 +192,7 @@ That pass does not prove behavior, but it closes the first accounting gap: every
 tracked JS/JSX/MJS file now has a lexical callable count and family assignment.
 
 - 69 tracked JS/JSX/MJS files accounted for by `git ls-files`.
-- 5,697 lexical callables pinned by
+- 5,789 lexical callables pinned by
   `tests/runtime/all-callable-index-current-behavior.test.mjs`.
 - Family totals: hot runtime 2,930, content helpers 298, UI/settings 1,556,
   generated/quarantined UI 147, vendor bundles 279, build/sync scripts 52,

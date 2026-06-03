@@ -54,8 +54,8 @@ and DOM rerun budget for every write.
 | Successful channel-block video mapping | `js/content_bridge.js:12637-12645` persists `channelInfo.videoId -> channelInfo.id` and stamps cards after a block. | User-action scoped map write and DOM stamp. | Needs mutation/action id to distinguish from passive learning. |
 | Content handle resolver mapping | `js/content/handle_resolver.js:25-48` sends `updateChannelMap` and patches `currentSettings.channelMap`; `js/content/handle_resolver.js:200-224` and `263-273` post `FilterTube_UpdateChannelMap` after background/direct resolution. | ChannelMap write plus DOM fallback rerun after resolver success. | `PENDING` dedupe is local; the write lacks route/profile/list-mode reason. |
 | Background channelMap queue | `js/background.js:1495-1525` trims non-empty key/value, patches `channelMapCache` and compiled caches, and schedules a 250ms flush. | Pending map, cache patch, compiled settings cache patch, debounced storage write. | Does not enforce UC/handle shape. |
-| Background videoChannelMap queue | `js/background.js:1648-1670` trims non-empty video/channel values, patches caches, and schedules a 50ms flush. | Pending map, compiled cache patch, debounced storage write. | Does not enforce 11-character video ids or UC shape. |
-| Background videoMetaMap queue | `js/background.js:1673-1693` cleans non-empty metadata and patches caches before a 75ms flush. | Pending map, compiled cache patch, debounced storage write. | No route/rule activity report gates metadata work. |
+| Background videoChannelMap queue | `js/background.js:1933-1670` trims non-empty video/channel values, patches caches, and schedules a 50ms flush. | Pending map, compiled cache patch, debounced storage write. | Does not enforce 11-character video ids or UC shape. |
+| Background videoMetaMap queue | `js/background.js:1958-1693` cleans non-empty metadata and patches caches before a 75ms flush. | Pending map, compiled cache patch, debounced storage write. | No route/rule activity report gates metadata work. |
 | Background message receiver | `js/background.js:4397-4422` accepts `updateChannelMap`, `updateVideoChannelMap`, and `updateVideoMetaMap`. | Queues learned map writes from extension senders. | Sender class/provenance is not encoded per map write. |
 | Background channel-add resolver repair | `js/background.js:5468-5484` can enqueue `videoChannelMap` and handle/id `channelMap` entries after resolving a `watch:`/`shorts:` input. | User-action resolver map repair before/around rule persistence. | Should remain scoped to the channel-add action and its exact input/fanout reason. |
 
@@ -140,9 +140,9 @@ proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

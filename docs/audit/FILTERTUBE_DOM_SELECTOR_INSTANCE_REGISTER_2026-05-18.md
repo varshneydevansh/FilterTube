@@ -27,13 +27,13 @@ safe, or complete for every YouTube renderer.
 
 | Selector API | Current call sites | Static literal args | Dynamic/non-literal args |
 | --- | ---: | ---: | ---: |
-| `querySelectorAll()` | 150 | 107 | 43 |
+| `querySelectorAll()` | 151 | 108 | 43 |
 | `querySelector()` | 399 | 375 | 24 |
 | `closest()` | 96 | 93 | 3 |
 | `matches()` | 6 | 5 | 1 |
-| **Total** | **651** | **580** | **71** |
+| **Total** | **652** | **581** | **71** |
 
-The 580 static literal argument sites contain 375 unique literal selector
+The 581 static literal argument sites contain 376 unique literal selector
 strings. The 71 dynamic selector expressions include constants and assembled
 selectors such as `VIDEO_CARD_SELECTORS`, `QUICK_BLOCK_CARD_SELECTORS`,
 `FT_DROPDOWN_SELECTORS`, `linkSelectors`, `selectors.join(',')`, and template
@@ -43,7 +43,7 @@ selectors using runtime ids.
 
 | Source family | Selector API sites | Static literal args | Dynamic/non-literal args | Unique static selector literals |
 | --- | ---: | ---: | ---: | ---: |
-| `page-runtime` | 498 | 427 | 71 | 287 |
+| `page-runtime` | 499 | 428 | 71 | 288 |
 | `extension-ui` | 90 | 90 | 0 | 42 |
 | `legacy-layout` | 63 | 63 | 0 | 52 |
 
@@ -63,6 +63,7 @@ selectors using runtime ids.
 | `js/ui_components.js` | 6 | 6 | 0 | Shared extension UI selectors. |
 | `js/content/dom_helpers.js` | 3 | 2 | 1 | Shared hide/container helper selector input. |
 | `js/content/dom_state.js` | 3 | 0 | 3 | Virtual attribute selector patch wrappers forward caller-provided selectors through patched `querySelector()` methods. |
+| `js/content/bridge_settings.js` | 1 | 1 | 0 | Managed child timeout overlay pauses active page videos after budget exhaustion. |
 
 ## Dynamic Selector Families
 
@@ -171,9 +172,9 @@ runtime behavior changed by this addendum: no
 
 | Finding | Evidence | Risk |
 | --- | --- | --- |
-| Selector authority is not centralized. | 651 selector API call sites across 12 non-vendor tracked files and no product `selectorAuthority` token. | A cleanup can narrow one selector path while another broad path still targets the same DOM. |
-| Page runtime dominates selector risk. | Page-runtime owns 498 of 651 selector API sites and all 71 dynamic selector expressions. | Empty-install lag, false hides, and route drift are mostly page-runtime selector risks. |
-| Static selector literals are numerous. | 580 literal selector-argument sites and 375 unique literal selector strings. | A broad edit needs a source-derived register, not manual memory of a few constants. |
+| Selector authority is not centralized. | 652 selector API call sites across 13 non-vendor tracked files and no product `selectorAuthority` token. | A cleanup can narrow one selector path while another broad path still targets the same DOM. |
+| Page runtime dominates selector risk. | Page-runtime owns 499 of 652 selector API sites and all 71 dynamic selector expressions. | Empty-install lag, false hides, and route drift are mostly page-runtime selector risks. |
+| Static selector literals are numerous. | 581 literal selector-argument sites and 376 unique literal selector strings. | A broad edit needs a source-derived register, not manual memory of a few constants. |
 | Dynamic selectors need ownership proof. | 71 sites use constants, joined arrays, runtime templates, virtual selector wrappers, or caller-provided selector variables. | These cannot be proven safe by static literal review alone. |
 | Inventory docs remain evidence maps. | `docs/youtube_renderer_inventory.md`, `docs/json_paths_encyclopedia.md`, and ignored root captures inform fixtures but are not selector authority. | A documented DOM tag is not proof that current runtime selects it safely. |
 
@@ -238,9 +239,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

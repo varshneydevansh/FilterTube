@@ -26,9 +26,9 @@ Selected first optimization binding: FT-BIND-00-metric-artifact-foundation
 Required verification output path: docs/audit/artifacts/first-optimization/metric-foundation/verification-output.tap
 Collector verification output approval boundary rows: 12
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5744
+Method semantic proof gap lexical callables covered: 5789
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5744
+Lexical callables requiring semantic proof before behavior changes: 5789
 Runtime source-owner approvals: 0
 Runtime metric collector approvals: 0
 Runtime collector verification output approvals: 0
@@ -57,7 +57,7 @@ runtime result ledger, and implementation-readiness gate.
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_COLLECTOR_NO_WORK_APPROVAL_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves no-work approval remains absent before verification output can claim disabled, empty-list, pass-through, or no-rule preservation. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_COLLECTOR_INSERTION_APPROVAL_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves insertion approval remains absent before verification output can become collector approval evidence. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_COLLECTOR_APPROVAL_AUTHORITY_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves collector approval authority remains absent across insertion, no-work, side-effect, fixture, diagnostic, parity, verification, and rollback gates. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,697 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,789 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_ROLLBACK_UNCLAIMED_SURFACE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves rollback and unclaimed-surface authority remains absent. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_IMPLEMENTATION_READINESS_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | Keeps the first optimization implementation gate at NO-GO. |
 | `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` | Records audit harness counts as current-behavior proof, not verification output approval. |
@@ -79,9 +79,9 @@ collector approval authority rows covered: 12
 rollback/unclaimed rows covered: 12
 current parity release verification anchors covered: 68
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 runtime source-owner approvals: 0
 runtime metric collector approvals: 0
 runtime collector insertion points approved: 0
@@ -204,7 +204,7 @@ prove collector verification output approval absence remains a prerequisite for
 rollback/unclaimed approval, not rollback/unclaimed approval itself. The
 addendum pins 12 collector rollback/unclaimed approval boundary rows, 12
 collector verification output approval rows covered, 12 rollback/unclaimed rows
-covered, 69 method semantic proof gap files covered, 5,697 lexical callables
+covered, 69 method semantic proof gap files covered, 5,789 lexical callables
 still requiring semantic proof, 0 files with complete per-callable semantic
 proof, 0 runtime collector verification output approvals, 0 runtime rollback
 approvals, 0 runtime unclaimed-surface approvals, 0 runtime collector

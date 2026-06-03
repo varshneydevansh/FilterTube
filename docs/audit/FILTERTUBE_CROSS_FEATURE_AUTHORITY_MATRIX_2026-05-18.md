@@ -51,7 +51,7 @@ change, identity policy change, or release claim.
 
 | Interaction row | Cross-feature path | Source pins | Current proof meaning |
 | --- | --- | --- | --- |
-| `release_cross_visible_blocklist_to_runtime_filter` | Popup/dashboard visible Main keyword -> background compile -> content refresh/DOM rerun. | `js/background.js:2057-2074`; `js/content/bridge_settings.js:557-583` | Canonical `main.keywords` now wins over `main.blockedKeywords`, and a later rule-changing storage refresh upgrades pending map-only debounce to `forceReprocess:true`. |
+| `release_cross_visible_blocklist_to_runtime_filter` | Popup/dashboard visible Main keyword -> background compile -> content refresh/DOM rerun. | `js/background.js:2057-2074`; `js/content/bridge_settings.js:1018-1043` | Canonical `main.keywords` now wins over `main.blockedKeywords`, and a later rule-changing storage refresh upgrades pending map-only debounce to `forceReprocess:true`. |
 | `release_cross_empty_blocklist_no_json_work` | Settings mode -> seed transport -> injector page-world queue. | `js/seed.js:253-260`; `js/injector.js:3412-3436` | Missing/no-active JSON work bypasses YouTubei fetch/XHR body processing before parse/replay, while injector processing clears or returns inactive queued JSON. |
 | `release_cross_whitelist_pending_hide_budget` | Whitelist mode -> DOM mutation observer -> pending-card hide queue. | `js/content_bridge.js:6170-6212` | Whitelist pending-hide selector work is admitted only after overlay, list-mode, route, and queue-limit gates. |
 | `release_cross_quick_block_menu_mode_boundary` | Settings mode -> quick-cross affordance -> native menu close behavior. | `js/content/block_channel.js:1205-1218`; `js/content/block_channel.js:2469-2493` | Quick-block is blocklist-only and outside-click close only targets visible FilterTube-enriched dropdowns. |
@@ -156,9 +156,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

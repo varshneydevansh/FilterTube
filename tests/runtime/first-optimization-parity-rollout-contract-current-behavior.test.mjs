@@ -260,9 +260,9 @@ test('parity rollout contract rows counts and field names stay pinned', () => {
   assert.match(doc, /evidence parity rollout rows covered: 2/);
   assert.match(doc, /parity and release boundary source docs covered: 8/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5744/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5789/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5744/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5789/);
   assert.match(doc, /inline parity rollout JSON sections covered: 12/);
   assert.match(doc, /inline parity rollout artifact promotion decision: NO-GO/);
   assert.match(doc, /parity rollout draft closure rows: 12/);
@@ -283,7 +283,7 @@ test('parity rollout contract rows counts and field names stay pinned', () => {
   assert.match(doc, /evidence parity rollout rows linked by parity closure: 2/);
   assert.match(doc, /parity and release boundary source docs linked by parity closure: 8/);
   assert.match(doc, /method semantic proof gap files linked by parity closure: 69/);
-  assert.match(doc, /lexical callables linked by parity closure: 5744/);
+  assert.match(doc, /lexical callables linked by parity closure: 5789/);
   assert.match(doc, /runtime parity rollout closure approvals: 0/);
   assert.match(doc, /implementation-ready parity rollout closure rows: 0/);
   assert.match(doc, /parity rollout draft closure: PARITY-ROLLOUT-CHAIN-CLOSED/);
@@ -360,9 +360,9 @@ test('parity rollout contract is backed by current artifact collector parity rel
   assert.match(diagnosticPrivacyContract, /Implementation-ready diagnostic privacy contract rows: 0/);
   assert.match(diagnosticPrivacyContract, /method semantic proof gap files covered: 69/);
   assert.match(methodGap, /tracked JS\/JSX\/MJS files: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5744/);
+  assert.match(methodGap, /repo-wide lexical callables: 5789/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5744/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5789/);
   assert.match(sideEffectBudgetContract, /Committed side-effect budget files: 0/);
   assert.match(sideEffectBudgetContract, /Implementation-ready side-effect budget contract rows: 0/);
   assert.match(noWorkPreservationContract, /Committed no-work preservation files: 0/);

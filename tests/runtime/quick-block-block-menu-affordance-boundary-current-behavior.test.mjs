@@ -210,8 +210,8 @@ test('quick-block/block-menu affordance audit is audit-only and source pinned', 
 
   assert.ok(doc.includes(`| \`js/content_controls_catalog.js\` | 222 | 7822 | \`${sha256('js/content_controls_catalog.js')}\` |`));
   assert.ok(doc.includes(`| \`js/settings_shared.js\` | 1181 | 57535 | \`${sha256('js/settings_shared.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/background.js\` | 6343 | 286370 | \`${sha256('js/background.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/content/bridge_settings.js\` | 845 | 34241 | \`${sha256('js/content/bridge_settings.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/background.js\` | 6641 | 298986 | \`${sha256('js/background.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content/bridge_settings.js\` | 1113 | 44087 | \`${sha256('js/content/bridge_settings.js')}\` |`));
   assert.ok(doc.includes(`| \`js/state_manager.js\` | 2491 | 99780 | \`${sha256('js/state_manager.js')}\` |`));
   assert.ok(doc.includes(`| \`js/content/block_channel.js\` | 3189 | 127857 | \`${sha256('js/content/block_channel.js')}\` |`));
   assert.ok(doc.includes(`| \`js/content_bridge.js\` | 13636 | 604184 | \`${sha256('js/content_bridge.js')}\` |`));

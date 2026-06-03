@@ -48,12 +48,12 @@ changing any owner.
 
 | Primitive | Count | Audit meaning |
 | --- | ---: | --- |
-| `addEventListener` | 298 | Listener lifecycle surface. |
-| `removeEventListener` | 17 | Explicit listener teardown surface. |
+| `addEventListener` | 299 | Listener lifecycle surface. |
+| `removeEventListener` | 18 | Explicit listener teardown surface. |
 | `MutationObserver` | 16 | DOM mutation observation surface. |
 | `IntersectionObserver` | 4 | Visibility/identity prefetch observation surface. |
-| `setInterval` | 3 | Repeating work surface. |
-| `clearInterval` | 4 | Repeating work teardown surface. |
+| `setInterval` | 4 | Repeating work surface. |
+| `clearInterval` | 5 | Repeating work teardown surface. |
 | `setTimeout` | 124 | Delayed/debounced/retry work surface. |
 | `clearTimeout` | 34 | Delayed work teardown surface. |
 | `requestAnimationFrame` | 31 | Paint-frame scheduling surface. |
@@ -61,18 +61,18 @@ changing any owner.
 | `fetch(` | 14 | Direct network side-effect surface. |
 | `XMLHttpRequest` | 2 | Prototype/network interception surface. |
 | `.postMessage(` | 26 | Page-world message bridge surface. |
-| `.sendMessage(` | 34 | Extension runtime/tab message surface. |
+| `.sendMessage(` | 35 | Extension runtime/tab message surface. |
 | `.dispatchEvent(` | 33 | Synthetic event surface. |
 | `.click(` | 33 | Synthetic click/navigation surface. |
 | `.style.display =` | 96 | Direct visual hide/show side-effect surface. |
 | `.classList.add/remove/toggle(` | 110 | Class-based visual/state side-effect surface. |
-| **Total** | **883** | Conservative lifecycle/side-effect primitive count. |
+| **Total** | **888** | Conservative lifecycle/side-effect primitive count. |
 
 ## Family Breakdown
 
 | Audit family | Files | Primitive count | Current interpretation |
 | --- | ---: | ---: | --- |
-| `content-runtime-js` | 17 | 384 | Page-resident filtering, JSON interception, DOM fallback, quick/menu surfaces, learned identity, and bridge work. |
+| `content-runtime-js` | 17 | 389 | Page-resident filtering, JSON interception, DOM fallback, quick/menu surfaces, learned identity, managed time-limit heartbeats, and bridge work. |
 | `extension-ui-background-js` | 11 | 419 | Dashboard/popup/background settings, import/export, Nanah, row actions, profile/PIN, and UI state work. |
 | `quarantined-legacy-js` | 1 | 37 | `js/layout.js`; direct style/class mutation risk if ever reactivated. |
 | `website-components` | 15 | 24 | Website client components with theme/scene and hero/footer lifecycle; separate from extension runtime filtering. |
@@ -101,7 +101,7 @@ effects` is dispatch/click/display/class mutation.
 | `js/background.js` | `extension-ui-background-js` | 0 | 0 | 14 | 8 | 0 | 22 |
 | `js/content/block_channel.js` | `content-runtime-js` | 38 | 7 | 26 | 2 | 8 | 81 |
 | `js/content/bridge_injection.js` | `content-runtime-js` | 0 | 0 | 2 | 1 | 0 | 3 |
-| `js/content/bridge_settings.js` | `content-runtime-js` | 10 | 0 | 8 | 4 | 0 | 22 |
+| `js/content/bridge_settings.js` | `content-runtime-js` | 12 | 0 | 10 | 5 | 0 | 27 |
 | `js/content/collab_dialog.js` | `content-runtime-js` | 5 | 1 | 4 | 1 | 0 | 11 |
 | `js/content/dom_extractors.js` | `content-runtime-js` | 0 | 0 | 0 | 0 | 4 | 4 |
 | `js/content/dom_fallback.js` | `content-runtime-js` | 3 | 0 | 11 | 0 | 14 | 28 |
@@ -216,12 +216,12 @@ Current token totals across those files:
 
 | Marker family | Install / schedule tokens | Teardown / cancel tokens | Current meaning |
 | --- | ---: | ---: | --- |
-| Listeners | 78 `addEventListener` | 10 `removeEventListener` | Page listeners are mostly lifetime or internally gated today. |
+| Listeners | 79 `addEventListener` | 11 `removeEventListener` | Page listeners are mostly lifetime or internally gated today. |
 | Mutation observers | 14 `new MutationObserver` | 8 `.disconnect()` | Some observer families have disconnect paths, but observer ownership is not centralized. |
-| Intervals | 2 `setInterval` | 3 `clearInterval` | Repeating checks are bounded in places, but not represented by a shared registry. |
+| Intervals | 3 `setInterval` | 4 `clearInterval` | Repeating checks are bounded in places, but not represented by a shared registry. |
 | Timeouts | 81 `setTimeout` | 22 `clearTimeout` | Delayed/debounced work is still much broader than explicit cancellation. |
 | Animation frames | 15 `requestAnimationFrame` | 0 `cancelAnimationFrame` | Frame work is coalesced locally, not cancellable through a shared route/disable gate. |
-| **Total** | **190** | **43** | **233 selected page-resident lifecycle tokens** |
+| **Total** | **192** | **45** | **237 selected page-resident lifecycle tokens** |
 
 Per-file selected token totals:
 
@@ -231,7 +231,7 @@ Per-file selected token totals:
 | `js/content/block_channel.js` | 74 |
 | `js/content/dom_fallback.js` | 14 |
 | `js/injector.js` | 12 |
-| `js/content/bridge_settings.js` | 18 |
+| `js/content/bridge_settings.js` | 22 |
 | `js/content/collab_dialog.js` | 10 |
 | `js/seed.js` | 5 |
 | `js/content/bridge_injection.js` | 2 |
@@ -274,9 +274,9 @@ can support runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

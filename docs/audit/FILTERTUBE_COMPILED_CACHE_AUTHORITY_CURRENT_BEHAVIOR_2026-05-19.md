@@ -15,9 +15,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -72,12 +72,12 @@ compiledSettingsCache = { main: null, kids: null }
 | Behavior | Source proof | Risk |
 | --- | --- | --- |
 | Cache shape is only `main` and `kids`. | `js/background.js:1288` | Active profile identity, viewing space, revision, and storage source are not part of cache identity. |
-| Compiler returns cache before storage read. | `js/background.js:1774-1781` | A cached entry can bypass storage inspection when `forceRefresh` is false. |
+| Compiler returns cache before storage read. | `js/background.js:2059-1781` | A cached entry can bypass storage inspection when `forceRefresh` is false. |
 | Message handler also returns cache before compiler. | `js/background.js:3242-3250` | There are two cache-return gates before storage read. |
 | Compiler writes cache internally. | `js/background.js:2555-2560` | Compile and cache assignment are coupled. |
 | Message handler writes cache after compiler. | `js/background.js:3254-3262` | The same compile request can assign cache in two places. |
 | UI/caller-pushed settings recompile cache. | `js/background.js:4395-4422` | Caller payload no longer becomes cache truth, but this path still lacks sender and revision proof. |
-| Learned map writers patch cache entries. | `js/background.js:1495-1512`, `js/background.js:1648-1671`, `js/background.js:1673-1712` | Cache can change without a full compile or revision report. |
+| Learned map writers patch cache entries. | `js/background.js:1495-1512`, `js/background.js:1933-1671`, `js/background.js:1958-1712` | Cache can change without a full compile or revision report. |
 | Storage invalidation is broad but incomplete. | `js/background.js:4484-4521` | Background invalidates on some keys and recompiles both surfaces, but misses some compiler dependencies already pinned by storage-key proof. |
 
 ## Current Behavior Fixtures

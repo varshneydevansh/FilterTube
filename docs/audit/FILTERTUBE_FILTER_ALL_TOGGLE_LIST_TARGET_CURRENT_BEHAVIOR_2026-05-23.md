@@ -14,9 +14,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5744
+method semantic proof gap lexical callables covered: 5789
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5744
+lexical callables requiring semantic proof before behavior changes: 5789
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -29,7 +29,7 @@ changes, or whitelist behavior changes.
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6343 | 286370 | `ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36` |
+| `js/background.js` | 6641 | 298986 | `837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd` |
 | `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
 | `js/state_manager.js` | 2,491 | 99,780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
 
@@ -37,8 +37,8 @@ changes, or whitelist behavior changes.
 
 | Block | Source lines | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | ---: | --- |
-| `backgroundToggleChannelFilterAllReceiver` | `js/background.js:5305` | 14 | 413 | `7e15cc800cdde69487959513b30d2cfab29c55f9b1caa566f96b99bcb844c94e` |
-| `backgroundHandleToggleChannelFilterAll` | `js/background.js:6231` | 95 | 3435 | `84afd60fbb6c140a1a20880b7cb2b81a7ce33fe95c89b4278c1d00e1b1756dd4` |
+| `backgroundToggleChannelFilterAllReceiver` | `js/background.js:5603` | 14 | 413 | `7e15cc800cdde69487959513b30d2cfab29c55f9b1caa566f96b99bcb844c94e` |
+| `backgroundHandleToggleChannelFilterAll` | `js/background.js:6529` | 95 | 3435 | `84afd60fbb6c140a1a20880b7cb2b81a7ce33fe95c89b4278c1d00e1b1756dd4` |
 | `contentBridgeAddFilterAllContentCheckbox` | `js/content_bridge.js:13499` | 66 | 2391 | `03861f56c173757f479e0863d16fab83df5ba180e5d21d8adb37cdf0b5fcb490` |
 | `stateManagerToggleChannelFilterAll` | `js/state_manager.js:1892` | 34 | 988 | `b7028d96e93e5b89cfcf68d83d09256c9b06888a3b5b0ee181e6165f74318298` |
 | `stateManagerToggleKidsChannelFilterAll` | `js/state_manager.js:968` | 36 | 1188 | `f798f6b4a379f1101dea3b1777b046e2631ea1ab032b01b56716dc09878b72ac` |
