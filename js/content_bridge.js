@@ -1218,7 +1218,6 @@ function installRightRailWhitelistObserver() {
     const runWhitelistRefreshPass = () => {
         try {
             if (currentSettings?.listMode !== 'whitelist') return;
-            if ((document.location?.pathname || '').startsWith('/watch')) return;
             if (typeof applyDOMFallback === 'function') applyDOMFallback(null, { preserveScroll: true, forceReprocess: true });
         } catch (e) {
         }
@@ -1227,7 +1226,6 @@ function installRightRailWhitelistObserver() {
     const scheduleWhitelistRefresh = () => {
         try {
             if (currentSettings?.listMode !== 'whitelist') return;
-            if ((document.location?.pathname || '').startsWith('/watch')) return;
             if (typeof applyDOMFallback !== 'function') return;
         } catch (e) { return; }
 

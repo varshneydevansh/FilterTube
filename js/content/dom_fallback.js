@@ -1046,6 +1046,76 @@ function isExplicitlyHiddenByFilterTube(element) {
     );
 }
 
+function scheduleFilterTubeContinuationNudge(reason) {
+    try {
+        const path = String(document.location?.pathname || '');
+        if (path !== '/results' && !path.startsWith('/watch')) return;
+
+        const scrollingElement = document.scrollingElement || document.documentElement || document.body;
+        if (!scrollingElement) return;
+
+        const viewportHeight = window.innerHeight || document.documentElement?.clientHeight || 800;
+        const currentTop = Number(scrollingElement.scrollTop) || Number(window.pageYOffset) || 0;
+        const scrollHeight = Number(scrollingElement.scrollHeight) || 0;
+        if (scrollHeight <= viewportHeight) return;
+
+        const distanceFromBottom = scrollHeight - (currentTop + viewportHeight);
+        if (distanceFromBottom > Math.max(900, viewportHeight * 1.25)) return;
+
+        const scrollState = window.__filtertubeScrollState || {};
+        const now = Date.now();
+        const recentlyScrolled = now - (scrollState.lastScrollTs || 0) < 450;
+
+        const state = window.__filtertubeContinuationNudgeState || (window.__filtertubeContinuationNudgeState = {
+            lastNudgeTs: 0,
+            timer: 0,
+            lastReason: ''
+        });
+        if (now - (state.lastNudgeTs || 0) < 1600) return;
+        if (state.timer) return;
+
+        state.timer = setTimeout(() => {
+            state.timer = 0;
+            try {
+                const activeScrollState = window.__filtertubeScrollState || {};
+                const nudgeNow = Date.now();
+                if (nudgeNow - (activeScrollState.lastScrollTs || 0) < 450) return;
+
+                const activeScrollingElement = document.scrollingElement || document.documentElement || document.body;
+                if (!activeScrollingElement) return;
+                const activeViewportHeight = window.innerHeight || document.documentElement?.clientHeight || 800;
+                const activeTop = Number(activeScrollingElement.scrollTop) || Number(window.pageYOffset) || 0;
+                const activeHeight = Number(activeScrollingElement.scrollHeight) || 0;
+                if (activeHeight <= activeViewportHeight) return;
+
+                const activeDistance = activeHeight - (activeTop + activeViewportHeight);
+                if (activeDistance > Math.max(900, activeViewportHeight * 1.25)) return;
+
+                const nextTop = Math.min(
+                    Math.max(activeHeight - activeViewportHeight - 1, activeTop),
+                    activeTop + Math.max(320, Math.floor(activeViewportHeight * 0.6))
+                );
+                if (nextTop > activeTop + 2) {
+                    try {
+                        window.scrollTo({ top: nextTop, behavior: 'auto' });
+                    } catch (e) {
+                        window.scrollTo(0, nextTop);
+                    }
+                }
+                try {
+                    window.dispatchEvent(new Event('scroll'));
+                    window.dispatchEvent(new Event('resize'));
+                } catch (e) {
+                }
+                state.lastNudgeTs = nudgeNow;
+                state.lastReason = reason || '';
+            } catch (e) {
+            }
+        }, recentlyScrolled ? 650 : 180);
+    } catch (e) {
+    }
+}
+
 function hasExplicitHideReasonMarker(element) {
     if (!element) return false;
     return Boolean(
@@ -2551,6 +2621,8 @@ async function applyDOMFallback(settings, options = {}) {
         }
     }
 
+    let filterTubeHiddenRowsThisRun = 0;
+
     try {
         for (let elementIndex = 0; elementIndex < videoElements.length; elementIndex++) {
             const element = videoElements[elementIndex];
@@ -4040,6 +4112,9 @@ async function applyDOMFallback(settings, options = {}) {
             }
 
             toggleVisibility(targetToHide, shouldHide, hideReason, pendingMetaOnly);
+            if (shouldHide) {
+                filterTubeHiddenRowsThisRun += 1;
+            }
             element.setAttribute('data-filtertube-processed', 'true');
             element.setAttribute('data-filtertube-last-processed-mode', listMode);
             if (uniqueId) {
@@ -4055,6 +4130,10 @@ async function applyDOMFallback(settings, options = {}) {
             }
         }
     } catch (e) {
+    }
+
+    if (filterTubeHiddenRowsThisRun > 0) {
+        scheduleFilterTubeContinuationNudge(`hidden rows: ${filterTubeHiddenRowsThisRun}`);
     }
 
     if (onlyWhitelistPending && listMode === 'whitelist') {
