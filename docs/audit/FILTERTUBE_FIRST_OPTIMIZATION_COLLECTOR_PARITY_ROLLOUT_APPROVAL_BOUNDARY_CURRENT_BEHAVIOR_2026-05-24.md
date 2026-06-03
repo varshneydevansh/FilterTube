@@ -24,9 +24,9 @@ Selected first optimization binding: FT-BIND-00-metric-artifact-foundation
 Required parity rollout path: docs/audit/artifacts/first-optimization/metric-foundation/parity-rollout.json
 Collector parity rollout approval boundary rows: 12
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5736
+Method semantic proof gap lexical callables covered: 5744
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5736
+Lexical callables requiring semantic proof before behavior changes: 5744
 Runtime source-owner approvals: 0
 Runtime metric collector approvals: 0
 Runtime collector parity rollout approvals: 0
@@ -77,9 +77,9 @@ verification output contract rows covered: 12
 rollback/unclaimed rows covered: 12
 current parity release verification anchors covered: 68
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5736
+method semantic proof gap lexical callables covered: 5744
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5736
+lexical callables requiring semantic proof before behavior changes: 5744
 runtime source-owner approvals: 0
 runtime metric collector approvals: 0
 runtime collector insertion points approved: 0

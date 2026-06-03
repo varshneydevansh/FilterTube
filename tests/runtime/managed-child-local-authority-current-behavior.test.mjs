@@ -7,6 +7,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_MANAGED_CHILD_LOCAL_AUTHORITY_CONTRACT_2026-06-03.md';
 const planPath = 'docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md';
 const inventoryPath = 'docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md';
+const managedActionHistorySchema = 'filtertube_managed_action_history';
 
 function read(relativePath) {
   return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
@@ -80,7 +81,7 @@ function saveManagedChildSurfaceDecision({ freshProfilesV4, managedChildEdit }) 
     return { allowed: false, reason: 'fresh_authority_recheck_failed' };
   }
   if (!freshProfilesV4.profiles?.[profileId]) return { allowed: false, reason: 'target_missing' };
-  return { allowed: true, decision: 'save_child_surface_only' };
+  return { allowed: true, decision: 'save_child_surface_with_revision_history' };
 }
 
 function adminSessionDecision({ activeProfileId, sessionProfileId, now, expiresAt, sensitiveAction = false, reauthAt = 0 }) {
@@ -102,18 +103,106 @@ function failedUnlockAttemptDecision({ failedAttempts, windowLimit = 5 }) {
   };
 }
 
-test('managed child local authority contract is audit-only and source-backed', () => {
+function buildLocalPolicyHash(prefix, seed) {
+  const source = JSON.stringify(seed);
+  let hash = 0;
+  for (let index = 0; index < source.length; index += 1) {
+    hash = ((hash << 5) - hash + source.charCodeAt(index)) | 0;
+  }
+  return `${prefix}-${Math.abs(hash).toString(16)}`;
+}
+
+function surfaceSummary(scope, surface) {
+  if (scope === 'kids') {
+    return {
+      redacted: true,
+      label: 'Updated Kids rules',
+      blockedKeywordCount: Array.isArray(surface.blockedKeywords) ? surface.blockedKeywords.length : 0,
+      blockedChannelCount: Array.isArray(surface.blockedChannels) ? surface.blockedChannels.length : 0
+    };
+  }
+  return {
+    redacted: true,
+    label: 'Updated Main rules',
+    keywordCount: Array.isArray(surface.keywords) ? surface.keywords.length : 0,
+    channelCount: Array.isArray(surface.channels) ? surface.channels.length : 0
+  };
+}
+
+function buildManagedChildLocalEditReportFixture({ profile, actorProfileId, actorDeviceId = 'device-1', targetProfileId, scope, surface, now = 1780520400000 }) {
+  const prior = profile.managedPolicyState?.localManagedEdits?.[scope] || {};
+  const revision = (Number.isInteger(prior.policyRevision) ? prior.policyRevision : 0) + 1;
+  const policyHash = buildLocalPolicyHash('local-managed-edit', {
+    scope,
+    targetProfileId,
+    policyRevision: revision,
+    surface
+  });
+  return {
+    scope,
+    policyState: {
+      schema: 'filtertube_managed_local_edit_policy',
+      version: 1,
+      source: 'local_parent_managed_edit',
+      scope,
+      targetProfileId,
+      actorProfileId,
+      actorDeviceId,
+      policyRevision: revision,
+      policyHash,
+      updatedAt: now
+    },
+    historyRow: {
+      rowId: `local-managed-${scope}-${revision}-${now}`,
+      schema: managedActionHistorySchema,
+      version: 1,
+      actorProfileId,
+      actorDeviceId,
+      targetProfileId,
+      trustedLinkId: null,
+      actionType: 'local_policy.update',
+      scope,
+      revision,
+      policyHash,
+      result: 'accepted',
+      reason: null,
+      receivedAt: now,
+      issuedAt: now,
+      orderKey: `${String(revision).padStart(6, '0')}:${now}`,
+      summary: surfaceSummary(scope, surface),
+      sensitive: true
+    }
+  };
+}
+
+function recordManagedChildLocalEditHistoryFixture(profile, report, limit = 500) {
+  const existingRows = Array.isArray(profile.managedActionHistory)
+    ? profile.managedActionHistory.filter(row => row?.schema === managedActionHistorySchema)
+    : [];
+  return {
+    ...profile,
+    managedPolicyState: {
+      ...(profile.managedPolicyState || {}),
+      localManagedEdits: {
+        ...(profile.managedPolicyState?.localManagedEdits || {}),
+        [report.scope]: report.policyState
+      }
+    },
+    managedActionHistory: [...existingRows, report.historyRow].slice(-limit)
+  };
+}
+
+test('managed child local authority contract is source-backed with accepted-save revision history', () => {
   const doc = read(docPath);
   const plan = read(planPath);
   const inventory = read(inventoryPath);
   const tabView = read('js/tab-view.js');
   const source = runtimeSource();
 
-  assert.match(doc, /Status\*\*: Contract\/proof fixture only/);
-  assert.match(doc, /Runtime behavior is unchanged/);
+  assert.match(doc, /Status\*\*: Runtime local managed-save hardening partially present/);
   assert.match(doc, /Who is allowed to enter virtual child edit mode/);
   assert.match(doc, /Required Local Authority Decisions/);
-  assert.match(doc, /Hardening Requirements Before Runtime Changes/);
+  assert.match(doc, /Hardening Requirements/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
 
@@ -124,9 +213,11 @@ test('managed child local authority contract is audit-only and source-backed', (
   assert.match(tabView, /const ok = await ensureProfileUnlocked\(fresh, currentActive\)/);
   assert.match(tabView, /async function saveManagedChildSurface\(surface, mutator\)/);
   assert.match(tabView, /if \(!canActiveProfileManageProfile\(fresh, profileId\)\)/);
+  assert.match(tabView, /function localManagedEditPolicyRevisionStore\(profile, scope\)/);
+  assert.match(tabView, /function buildManagedChildLocalEditReport/);
+  assert.match(tabView, /function recordManagedChildLocalEditHistory\(profile, report\)/);
+  assert.match(source, /filtertube_managed_action_history/);
 
-  assert.doesNotMatch(source, /localManagedEditPolicyRevisionStore/);
-  assert.doesNotMatch(source, /recordManagedChildLocalEditHistory/);
   assert.doesNotMatch(source, /managedChildFailedUnlockLogger/);
   assert.doesNotMatch(source, /managedChildAdminSessionTtl/);
 });
@@ -175,7 +266,7 @@ test('local managed child edit requires parent unlock and save-time fresh author
       freshProfilesV4: profilesFixture('parentA'),
       managedChildEdit: { profileId: 'childA', surface: 'main' }
     }),
-    { allowed: true, decision: 'save_child_surface_only' }
+    { allowed: true, decision: 'save_child_surface_with_revision_history' }
   );
   assert.deepEqual(
     saveManagedChildSurfaceDecision({
@@ -196,7 +287,57 @@ test('local managed child edit requires parent unlock and save-time fresh author
   );
 });
 
-test('future local hardening requires session ttl reauth and failed attempt logging fixtures', () => {
+test('local managed child save report increments revision and stores redacted protected history', () => {
+  const childProfile = {
+    id: 'childA',
+    type: 'child',
+    parentProfileId: 'parentA',
+    managedPolicyState: {
+      localManagedEdits: {
+        main: {
+          schema: 'filtertube_managed_local_edit_policy',
+          policyRevision: 2,
+          policyHash: 'old-hash'
+        }
+      }
+    },
+    managedActionHistory: [
+      { schema: managedActionHistorySchema, rowId: 'old-row', result: 'accepted' },
+      { schema: 'other_debug_row', rowId: 'drop-me' }
+    ]
+  };
+  const nextSurface = {
+    mode: 'blocklist',
+    keywords: [{ word: 'shakira' }],
+    channels: [{ name: 'Example Channel' }],
+    whitelistKeywords: [],
+    whitelistChannels: []
+  };
+
+  const report = buildManagedChildLocalEditReportFixture({
+    profile: childProfile,
+    actorProfileId: 'parentA',
+    targetProfileId: 'childA',
+    scope: 'main',
+    surface: nextSurface
+  });
+  const stored = recordManagedChildLocalEditHistoryFixture(childProfile, report);
+  const latest = stored.managedActionHistory.at(-1);
+
+  assert.equal(stored.managedPolicyState.localManagedEdits.main.policyRevision, 3);
+  assert.equal(stored.managedPolicyState.localManagedEdits.main.policyHash, latest.policyHash);
+  assert.equal(latest.actionType, 'local_policy.update');
+  assert.equal(latest.result, 'accepted');
+  assert.equal(latest.sensitive, true);
+  assert.equal(latest.summary.redacted, true);
+  assert.equal(latest.summary.keywordCount, 1);
+  assert.equal(latest.summary.channelCount, 1);
+  assert.equal(JSON.stringify(latest.summary).includes('shakira'), false);
+  assert.equal(JSON.stringify(latest.summary).includes('Example Channel'), false);
+  assert.equal(stored.managedActionHistory.length, 2);
+});
+
+test('remaining local hardening requires session ttl reauth and failed attempt logging fixtures', () => {
   const doc = read(docPath);
 
   assert.deepEqual(
@@ -223,7 +364,7 @@ test('future local hardening requires session ttl reauth and failed attempt logg
   assert.match(doc, /Admin session authority has TTL and relocks on profile switch/);
   assert.match(doc, /Sensitive actions, including time-limit changes, viewing-space changes,\s+sync-policy changes, trust-link changes, and history clearing, can require\s+re-auth/);
   assert.match(doc, /A failed unlock records a protected action-history row/);
-  assert.match(doc, /runtime local managed edit policy revision store: absent/);
-  assert.match(doc, /runtime local managed edit action-history writer: absent/);
+  assert.match(doc, /runtime local managed edit policy revision store: present/);
+  assert.match(doc, /runtime local managed edit action-history writer: present/);
   assert.match(doc, /runtime local managed edit admin session TTL: absent/);
 });

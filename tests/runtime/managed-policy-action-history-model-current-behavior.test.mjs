@@ -21,6 +21,7 @@ const approvedActionTypes = new Set([
   'trust_link.revoke',
   'admin_session.unlock',
   'admin_session.failed_unlock',
+  'local_policy.update',
   'remote_policy.accept',
   'remote_policy.reject',
   'remote_policy.conflict',
@@ -154,14 +155,13 @@ function historyAccessDecision({ actor, target, operation, hasRecentAdminAuth = 
   return { allowed: true, decision: 'clear_allowed' };
 }
 
-test('managed policy action-history model is audit-only and linked from plan and inventory', () => {
+test('managed policy action-history model is linked from plan and has local accepted-save writer', () => {
   const doc = read(docPath);
   const plan = read(planPath);
   const inventory = read(inventoryPath);
   const source = runtimeSource();
 
-  assert.match(doc, /Status\*\*: Contract\/proof fixture only/);
-  assert.match(doc, /Runtime behavior is unchanged/);
+  assert.match(doc, /Status\*\*: Contract\/proof fixture with local managed-save writer partially\s+present/);
   assert.match(doc, /Issue 60 asks for feedback, logs, or history/);
   assert.match(doc, /Action history is protected evidence and parent\/caregiver UX/);
   assert.match(doc, /It is not policy\s+authority/);
@@ -172,7 +172,8 @@ test('managed policy action-history model is audit-only and linked from plan and
   assert.match(doc, /Required Recorded Outcomes/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
-  assert.doesNotMatch(source, /filtertube_managed_action_history/);
+  assert.match(source, /filtertube_managed_action_history/);
+  assert.match(source, /recordManagedChildLocalEditHistory/);
   assert.doesNotMatch(source, /managedActionHistoryStore/);
   assert.doesNotMatch(source, /writeManagedActionHistory/);
   assert.doesNotMatch(source, /canViewManagedActionHistory/);
@@ -237,6 +238,7 @@ test('managed action history required outcomes cover accepted rejected conflict 
   const doc = read(docPath);
   const requiredFixtures = [
     'accepted_remote_keyword_policy',
+    'accepted_local_child_surface_policy',
     'rejected_spoofed_lan_policy',
     'rejected_equal_revision_conflict',
     'rejected_after_trust_revocation',
@@ -253,8 +255,8 @@ test('managed action history required outcomes cover accepted rejected conflict 
   assert.match(doc, /default accepted-action retention days: 30/);
   assert.match(doc, /plaintext sensitive rule values: no/);
   assert.match(doc, /remote upload or telemetry: no/);
-  assert.match(doc, /runtime managed action history store: absent/);
-  assert.match(doc, /runtime managed action history row writer: absent/);
+  assert.match(doc, /runtime managed action history store: local managed child edit only/);
+  assert.match(doc, /runtime managed action history row writer: local managed child edit only/);
   assert.match(doc, /runtime managed action history access gate: absent/);
   assert.match(doc, /runtime managed action history clear path: absent/);
 });

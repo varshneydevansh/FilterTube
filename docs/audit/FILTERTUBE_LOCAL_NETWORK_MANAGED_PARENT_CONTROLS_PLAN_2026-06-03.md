@@ -1,8 +1,9 @@
 # Plan: Local-Network Managed Parent Controls
 
-**Generated**: 2026-06-03  
-**Estimated Complexity**: High  
-**Status**: Planning/specification only. Runtime behavior is unchanged.  
+**Generated**: 2026-06-03
+**Estimated Complexity**: High
+**Status**: Planning/specification plus first local managed-save runtime slice.
+Remote/local-network managed policy behavior remains unchanged.
 **Primary audit input**:
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
 
@@ -191,8 +192,9 @@ revision and action-history entry.
   virtual child editing.
 - **Complexity**: 5/10
 - **Dependencies**: Sprint 1.
-- **Status**: Local managed child authority contract and fixture added.
-  Product runtime behavior remains unchanged.
+- **Status**: Local managed child authority contract and fixture updated with
+  the first accepted-save revision/history runtime slice. Failed unlock
+  logging, admin TTL, and sensitive re-auth remain pending.
 - **Acceptance Criteria**:
   - Parent/account can target owned child.
   - Child cannot manage itself as admin.
@@ -215,8 +217,9 @@ revision and action-history entry.
   remote policy attempts.
 - **Complexity**: 4/10
 - **Dependencies**: Task 2.1.
-- **Status**: Action-history model and access-control fixture added. Product
-  runtime behavior remains unchanged.
+- **Status**: Action-history model and access-control fixture updated. Product
+  runtime now writes accepted local managed child save rows only; remote
+  rejected/conflict rows, access UI, and clear path remain pending.
 - **Acceptance Criteria**:
   - Rows include actor profile, actor device, target profile, action type,
     policy revision, timestamp, result, and redacted summary.
@@ -244,6 +247,12 @@ revision and action-history entry.
   - Existing blocklist/whitelist writes remain intact.
   - Policy revision increments atomically with the child profile write.
   - Failed writes do not create successful action-history rows.
+- **Status**: Implemented for `saveManagedChildSurface(...)` in
+  `js/tab-view.js`. The runtime writes
+  `profile.managedPolicyState.localManagedEdits.{main,kids}` and appends a
+  redacted protected row to `profile.managedActionHistory[]` on accepted local
+  parent-managed child saves. Failed unlock and remote rejection writers remain
+  separate future work.
 - **Validation**:
   - `npm run test:settings`
   - `npm run test:blocking`

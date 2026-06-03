@@ -90,9 +90,9 @@ console.error callsites covered: 68
 console.debug callsites covered: 24
 console.info callsites covered: 0
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5736
+method semantic proof gap lexical callables covered: 5744
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5736
+lexical callables requiring semantic proof before behavior changes: 5744
 inline diagnostic privacy JSON sections covered: 12
 inline diagnostic privacy artifact promotion decision: NO-GO
 diagnostic privacy draft closure rows: 12
@@ -112,7 +112,7 @@ collector readiness families linked by diagnostic closure: 5
 diagnostic logging policy source files linked by diagnostic closure: 21
 active console callsites linked by diagnostic closure: 418
 method semantic proof gap files linked by diagnostic closure: 69
-lexical callables linked by diagnostic closure: 5736
+lexical callables linked by diagnostic closure: 5744
 runtime diagnostic privacy closure approvals: 0
 implementation-ready diagnostic privacy closure rows: 0
 diagnostic privacy draft closure: DIAGNOSTIC-PRIVACY-CHAIN-CLOSED

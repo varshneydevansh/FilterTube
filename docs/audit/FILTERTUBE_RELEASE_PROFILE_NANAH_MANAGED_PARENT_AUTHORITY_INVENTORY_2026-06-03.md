@@ -1,9 +1,10 @@
 # Audit: Managed Parent Authority Inventory
 
 **Generated**: 2026-06-03  
-**Status**: Runtime route-gate proof updated. Runtime behavior changed for
-protected child Main/Kids denial; remote-policy and time-limit enforcement
-remain pending.
+**Status**: Runtime route-gate proof and local managed-save revision/history
+proof updated. Runtime behavior changed for protected child Main/Kids denial
+and accepted same-device parent-managed child saves; remote-policy and
+time-limit enforcement remain pending.
 **Goal slice**: Implementation order item 1 plus first runtime viewing-space
 enforcement slice.
 **Lane proof**: `test:settings` for profile/Nanah authority and `test:release`
@@ -19,8 +20,8 @@ child/protected profiles can be denied Main YouTube or YouTube Kids at content
 runtime from local profile settings.
 
 This document still does not approve remote policy writes by itself. Signed
-managed policy envelopes, revision stores, action history, and time-budget
-runtime remain separate required slices.
+managed policy envelopes, remote revision/replay stores, protected history UI,
+failed-auth history, and time-budget runtime remain separate required slices.
 
 ## Issue 60 Local-Network Caregiver Addendum
 
@@ -30,8 +31,8 @@ pediatric/sensitive-user scenarios where a trusted parent or caregiver wants to
 show the useful parts of the internet while reducing exposure to content that
 can destabilize the protected user.
 
-This does not change runtime behavior today, but it changes the planning
-priority for the managed policy work:
+This addendum does not create remote runtime authority by itself, but it changes
+the planning priority for the managed policy work:
 
 - Local-network or P2P management should be treated as a first-class managed
   profile workflow, not a later nice-to-have.
@@ -92,7 +93,7 @@ Authority meaning:
 
 Current gap:
 
-- There is no managed policy revision store for parent-to-child updates.
+- There is no remote managed policy revision store for parent-to-child updates.
 - There is no signed/authenticated policy envelope persisted with accepted
   child policies.
 
@@ -112,7 +113,8 @@ Current behavior:
   active parent/account profile to be unlocked.
 - `saveManagedChildSurface(surface, mutator)` reloads fresh `ftProfilesV4`,
   re-runs `canActiveProfileManageProfile(...)`, writes only the target child
-  profile surface, then reloads settings and UI.
+  profile surface, records local accepted-save revision/history metadata, then
+  reloads settings and UI.
 
 Authority meaning:
 
@@ -122,12 +124,14 @@ Authority meaning:
 - The save path re-checks authority after the editor is opened, which protects
   against some profile-switch races.
 
-Current gap:
+Current local-write boundary:
 
-- Managed child saves do not yet create a policy revision.
-- Managed child saves do not emit an actor/authority report.
-- Managed child saves refresh UI, but there is not yet a single runtime policy
-  revision that all extension contexts can compare against.
+- Accepted same-device managed child saves now create a local managed edit
+  revision at `profile.managedPolicyState.localManagedEdits.{main,kids}`.
+- Accepted same-device managed child saves now emit one protected redacted
+  action-history row at `profile.managedActionHistory[]`.
+- These local rows are not signed remote-policy authority and do not yet create
+  a global revision that all extension contexts can compare against.
 
 ### PIN/session authority
 
@@ -314,7 +318,7 @@ Current gap:
 | Gap | Risk | Required next proof |
 |---|---|---|
 | No managed policy envelope | Remote apply can only be governed by UI/trusted-link policy, not a durable policy object. | Schema and validation tests before runtime writes. |
-| No revision store | Stale or replayed updates cannot be rejected as a first-class rule. | Monotonic revision fixtures per parent/source and child target. |
+| No remote revision store | Stale or replayed remote updates cannot be rejected as a first-class rule. Local same-device managed saves now have local revision metadata only. | Monotonic revision fixtures per parent/source and child target. |
 | No signature/integrity check | Trust is link/session-policy based, not envelope-authenticated. | Signed/authenticated envelope tests. |
 | No canonical payload/integrity binding | A signed-looking update could otherwise carry a different scope, target, source device, revision, hash, or payload family than the policy being applied. | Binding-tuple fixtures for link, scope, target, source, revision, policy hash, and payload family. |
 | No signed remote Main/Kids policy gate | Local child route denial now works, but remote updates are still not envelope/revision-bound. | Managed policy envelope, revision store, and Nanah/local-network apply wrapper before remote route-policy writes. |
@@ -323,7 +327,7 @@ Current gap:
 | Locked-child bypass has no revision binding | `allow_trusted_updates` can skip unlock for matching managed sessions, but not with policy revision constraints. | Locked child managed-policy fixtures. |
 | No mailbox protocol | Offline later delivery is not specified at runtime. | Ciphertext/replay/ack protocol doc before server work. |
 | No local-network management contract | Same-network discovery could be mistaken for authority. | Separate discovery, pairing, transport, and policy-authority proof. |
-| No protected-user action history | Parent/caregiver has no durable feedback about accepted or rejected changes. | Action-history model with actor, target, revision, result, and redacted summary. |
+| Partial protected-user action history | Accepted local managed child saves now have durable redacted rows; rejected remote updates, failed unlocks, access control, clear policy, and UI are still missing. | Action-history access/clear fixtures and remote reject/failed-auth writers. |
 | No admin lock for remote management | Child PIN or protected profile state could be confused with admin authority. | Parent/account PIN and trusted-device authority fixtures before writes. |
 | No pairing key/signature contract | P2P or local-network transport could authenticate reachability instead of authority. | Device-bound key, signature/integrity, rotation, revocation, and compromise-recovery fixtures. |
 | No hostile-LAN fixture set | Spoofed peer announcements, duplicate device ids, stale pairings, reconnect drift, or MITM attempts could be missed. | Discovery-versus-authority negative fixtures before local-network writes. |
@@ -348,7 +352,8 @@ Before adding parent-managed runtime behavior:
    work, then add runtime counter, route-gate, and overlay fixtures.
 7. Preserve no-policy/no-work behavior for existing YouTube filtering paths.
 8. Keep local-network discovery separate from managed policy authority.
-9. Add action-history fixtures before exposing caregiver-facing history UI.
+9. Keep local action-history fixtures passing and add access/clear plus rejected
+   remote/failed-auth fixtures before exposing caregiver-facing history UI.
 10. Require parent/account admin authority for protected remote management;
     child PIN must never authorize managed policy edits.
 11. Require pairing key/signature, device binding, rotation, revocation, and

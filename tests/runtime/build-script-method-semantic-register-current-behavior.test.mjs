@@ -276,7 +276,7 @@ test('build script register keeps future build authorities absent and method gap
 
   assert.ok(text.includes(methodGapPath));
   assert.match(text, /method semantic proof gap files covered: 69/);
-  assert.match(text, /method semantic proof gap lexical callables covered: 5736/);
+  assert.match(text, /method semantic proof gap lexical callables covered: 5744/);
   assert.match(text, /files with complete per-callable semantic proof: 0/);
   assert.match(text, /affected callable semantic proof: NO-GO/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);

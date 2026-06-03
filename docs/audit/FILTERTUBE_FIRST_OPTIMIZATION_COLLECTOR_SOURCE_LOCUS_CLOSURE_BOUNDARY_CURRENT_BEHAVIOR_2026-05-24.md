@@ -30,9 +30,9 @@ Runtime collector insertion points approved: 0
 Committed metric foundation artifact files: 0
 Implementation-ready collector source-locus closure rows: 0
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5736
+Method semantic proof gap lexical callables covered: 5744
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5736
+Lexical callables requiring semantic proof before behavior changes: 5744
 ```
 
 This is a closure boundary, not an approval boundary. It prevents a future
@@ -89,9 +89,9 @@ runtime unclaimed-surface approvals: 0
 committed metric foundation artifact files: 0
 implementation-ready collector source-locus closure rows: 0
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5736
+method semantic proof gap lexical callables covered: 5744
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5736
+lexical callables requiring semantic proof before behavior changes: 5744
 expected runtime audit tests: 4457
 expected runtime audit pass: 4457
 expected runtime audit fail: 0

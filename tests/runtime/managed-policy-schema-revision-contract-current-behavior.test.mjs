@@ -208,7 +208,7 @@ test('managed policy schema contract document pins required envelope and runtime
   assert.match(doc, /runtime filtertube_managed_policy envelope support: absent/);
   assert.match(doc, /runtime managed policy revision store: absent/);
   assert.match(inventory, /No managed policy envelope/);
-  assert.match(inventory, /No revision store/);
+  assert.match(inventory, /no remote managed policy revision store/i);
   assert.match(inventory, /No signature\/integrity check/);
   assert.match(inventory, /No canonical payload\/integrity binding/);
   assert.doesNotMatch(runtime, /filtertube_managed_policy/);

@@ -1,9 +1,10 @@
 # Model: Managed Policy Action History And Access Control
 
-**Generated**: 2026-06-03  
-**Status**: Contract/proof fixture only. Runtime behavior is unchanged.  
+**Generated**: 2026-06-03
+**Status**: Contract/proof fixture with local managed-save writer partially
+present.
 **Goal slice**: Implementation order item 4, "Add action-history/log model and
-access-control tests".  
+access-control tests".
 **Primary inputs**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`
 and
@@ -13,7 +14,8 @@ and
 
 Issue 60 asks for feedback, logs, or history so a parent/caregiver can see what
 changed on a protected profile and diagnose rejected local-network or P2P
-updates. This model defines that history before runtime writes are added.
+updates. This model defines that history and now tracks the first runtime
+writer for accepted same-device parent-managed child surface saves.
 
 Action history is protected evidence and parent/caregiver UX. It is not policy
 authority. Runtime policy must still come from the current accepted managed
@@ -60,6 +62,7 @@ trust_link.create
 trust_link.revoke
 admin_session.unlock
 admin_session.failed_unlock
+local_policy.update
 remote_policy.accept
 remote_policy.reject
 remote_policy.conflict
@@ -115,6 +118,7 @@ The following events must produce action-history rows in future implementation:
 | Fixture id | Event | Required row result |
 | --- | --- | --- |
 | `accepted_remote_keyword_policy` | Trusted parent/source updates child keyword policy. | `accepted` with revision and policy hash. |
+| `accepted_local_child_surface_policy` | Same-device parent/account saves child Main or Kids rules through managed edit mode. | `accepted` with local revision, policy hash, and redacted counts. |
 | `rejected_spoofed_lan_policy` | Local-network discovery claims parent device without trusted key. | `rejected` with `reason: untrusted_discovery`. |
 | `rejected_equal_revision_conflict` | Same revision arrives with different policy hash. | `conflict` with old/new hashes redacted or hashed. |
 | `rejected_after_trust_revocation` | Queued mailbox/P2P update arrives after link revocation. | `rejected` with `reason: trust_revoked`. |
@@ -123,20 +127,24 @@ The following events must produce action-history rows in future implementation:
 
 ## Current Runtime Boundary
 
-Current product runtime source does not yet implement this model:
+Current product runtime source implements a narrow accepted local-write subset
+of this model in `js/tab-view.js`; global remote accept/reject history,
+protected access gates, and clear paths are still pending:
 
 ```text
-runtime managed action history store: absent
-runtime managed action history row writer: absent
+runtime managed action history store: local managed child edit only
+runtime managed action history row writer: local managed child edit only
 runtime managed action history access gate: absent
 runtime managed action history clear path: absent
-runtime behavior changed by this contract: no
+runtime behavior changed by this contract: yes, for accepted local managed child saves
 ```
 
-Future implementation should add the history writer beside the managed policy
-accept/reject gate, not inside low-level content rule mutation helpers. This
-keeps local keyword/channel/video writes, Nanah apply, mailbox apply, and admin
-session events using one history model without turning logs into policy state.
+The current local writer stores redacted count summaries under
+`profile.managedActionHistory[]`. Future implementation should add the remote
+accept/reject history writer beside the managed policy accept/reject gate, not
+inside low-level content rule mutation helpers. This keeps local
+keyword/channel/video writes, Nanah apply, mailbox apply, and admin session
+events using one history model without turning logs into policy state.
 
 ## Verification
 

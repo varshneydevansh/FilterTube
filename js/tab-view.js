@@ -3035,6 +3035,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const LOCK_ALLOWED_VIEWS = new Set(['help', 'whatsnew', 'donate']);
     const CHILD_ALLOWED_VIEWS = new Set([...LOCK_ALLOWED_VIEWS, 'sync']);
     const MANAGED_TIME_LIMIT_SCHEMA = 'filtertube_managed_time_limit';
+    const MANAGED_LOCAL_EDIT_POLICY_SCHEMA = 'filtertube_managed_local_edit_policy';
+    const MANAGED_ACTION_HISTORY_SCHEMA = 'filtertube_managed_action_history';
+    const MANAGED_ACTION_HISTORY_LIMIT = 500;
 
     async function sendRuntimeMessage(payload) {
         return new Promise((resolve) => {
@@ -4143,13 +4146,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
-    function buildManagedTimeLimitPolicyHash(seed) {
+    function buildLocalPolicyHash(prefix, seed) {
         const source = JSON.stringify(seed);
         let hash = 0;
         for (let i = 0; i < source.length; i += 1) {
             hash = ((hash << 5) - hash + source.charCodeAt(i)) | 0;
         }
-        return `local-time-limit-${Math.abs(hash).toString(16)}`;
+        return `${prefix}-${Math.abs(hash).toString(16)}`;
+    }
+
+    function buildManagedTimeLimitPolicyHash(seed) {
+        return buildLocalPolicyHash('local-time-limit', seed);
+    }
+
+    function buildManagedLocalEditPolicyHash(seed) {
+        return buildLocalPolicyHash('local-managed-edit', seed);
     }
 
     function buildManagedTimeLimitPolicy(existingPolicy, { enabled, dailyBudgetSeconds }) {
@@ -4312,6 +4323,114 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
+    function localManagedEditPolicyRevisionStore(profile, scope) {
+        const policyState = safeObject(profile?.managedPolicyState);
+        const localEdits = safeObject(policyState.localManagedEdits);
+        return safeObject(localEdits[scope === 'kids' ? 'kids' : 'main']);
+    }
+
+    function countEnabledFlags(value) {
+        return Object.values(safeObject(value)).filter(Boolean).length;
+    }
+
+    function summarizeManagedChildSurface(scope, surfaceState) {
+        const surface = safeObject(surfaceState);
+        if (scope === 'kids') {
+            return {
+                redacted: true,
+                label: 'Updated Kids rules',
+                mode: surface.mode === 'whitelist' ? 'whitelist' : 'blocklist',
+                blockedKeywordCount: Array.isArray(surface.blockedKeywords) ? surface.blockedKeywords.length : 0,
+                blockedChannelCount: Array.isArray(surface.blockedChannels) ? surface.blockedChannels.length : 0,
+                whitelistKeywordCount: Array.isArray(surface.whitelistKeywords) ? surface.whitelistKeywords.length : 0,
+                whitelistChannelCount: Array.isArray(surface.whitelistChannels) ? surface.whitelistChannels.length : 0,
+                videoIdCount: Array.isArray(surface.videoIds) ? surface.videoIds.length : 0,
+                subscriptionCount: Array.isArray(surface.subscriptions) ? surface.subscriptions.length : 0,
+                contentFilterCount: countEnabledFlags(surface.contentFilters),
+                categoryFilterCount: countEnabledFlags(surface.categoryFilters)
+            };
+        }
+        return {
+            redacted: true,
+            label: 'Updated Main rules',
+            mode: surface.mode === 'whitelist' ? 'whitelist' : 'blocklist',
+            keywordCount: Array.isArray(surface.keywords) ? surface.keywords.length : 0,
+            channelCount: Array.isArray(surface.channels) ? surface.channels.length : 0,
+            whitelistKeywordCount: Array.isArray(surface.whitelistKeywords) ? surface.whitelistKeywords.length : 0,
+            whitelistChannelCount: Array.isArray(surface.whitelistChannels) ? surface.whitelistChannels.length : 0
+        };
+    }
+
+    function buildManagedChildLocalEditReport({ actorProfileId, targetProfileId, surface, priorProfile, nextSurface }) {
+        const scope = surface === 'kids' ? 'kids' : 'main';
+        const priorState = localManagedEditPolicyRevisionStore(priorProfile, scope);
+        const revision = Math.max(0, normalizeNonNegativeInteger(priorState.policyRevision) || 0) + 1;
+        const now = Date.now();
+        const actorId = normalizeString(actorProfileId) || 'default';
+        const targetId = normalizeString(targetProfileId);
+        const actorDeviceId = normalizeString(nanahStableDeviceId) || 'local-extension-device';
+        const summary = summarizeManagedChildSurface(scope, nextSurface);
+        const policyHash = buildManagedLocalEditPolicyHash({
+            scope,
+            targetProfileId: targetId,
+            policyRevision: revision,
+            surface: nextSurface
+        });
+        const policyState = {
+            schema: MANAGED_LOCAL_EDIT_POLICY_SCHEMA,
+            version: 1,
+            source: 'local_parent_managed_edit',
+            scope,
+            targetProfileId: targetId,
+            actorProfileId: actorId,
+            actorDeviceId,
+            policyRevision: revision,
+            policyHash,
+            updatedAt: now
+        };
+        const historyRow = {
+            rowId: `local-managed-${scope}-${revision}-${now}`,
+            schema: MANAGED_ACTION_HISTORY_SCHEMA,
+            version: 1,
+            actorProfileId: actorId,
+            actorDeviceId,
+            targetProfileId: targetId,
+            trustedLinkId: null,
+            actionType: 'local_policy.update',
+            scope,
+            revision,
+            policyHash,
+            result: 'accepted',
+            reason: null,
+            receivedAt: now,
+            issuedAt: now,
+            orderKey: `${String(revision).padStart(6, '0')}:${now}`,
+            summary,
+            sensitive: true
+        };
+        return { scope, policyState, historyRow };
+    }
+
+    function recordManagedChildLocalEditHistory(profile, report) {
+        const existingPolicyState = safeObject(profile?.managedPolicyState);
+        const localEdits = safeObject(existingPolicyState.localManagedEdits);
+        const existingRows = Array.isArray(profile?.managedActionHistory)
+            ? profile.managedActionHistory.filter(row => safeObject(row).schema === MANAGED_ACTION_HISTORY_SCHEMA)
+            : [];
+        const nextRows = [...existingRows, report.historyRow].slice(-MANAGED_ACTION_HISTORY_LIMIT);
+        return {
+            ...profile,
+            managedPolicyState: {
+                ...existingPolicyState,
+                localManagedEdits: {
+                    ...localEdits,
+                    [report.scope]: report.policyState
+                }
+            },
+            managedActionHistory: nextRows
+        };
+    }
+
     function isManagedChildEditFor(surface) {
         const targetSurface = surface === 'kids' ? 'kids' : 'main';
         return !!managedChildEdit && (managedChildEdit.surface ? managedChildEdit.surface === targetSurface : true);
@@ -4378,7 +4497,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const result = await mutator(nextSurface, profile);
         if (result === false) return false;
 
-        profiles[profileId] = setProfileSurface(profile, surface, nextSurface);
+        const nextProfile = setProfileSurface(profile, surface, nextSurface);
+        const report = buildManagedChildLocalEditReport({
+            actorProfileId: normalizeString(fresh.activeProfileId) || activeProfileId || 'default',
+            targetProfileId: profileId,
+            surface,
+            priorProfile: profile,
+            nextSurface
+        });
+        profiles[profileId] = recordManagedChildLocalEditHistory(nextProfile, report);
         await io.saveProfilesV4({
             ...fresh,
             schemaVersion: 4,

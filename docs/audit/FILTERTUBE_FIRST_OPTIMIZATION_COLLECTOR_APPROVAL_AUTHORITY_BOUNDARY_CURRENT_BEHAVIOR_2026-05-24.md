@@ -31,9 +31,9 @@ Runtime rollback approvals: 0
 Runtime unclaimed-surface approvals: 0
 Implementation-ready collector approval rows: 0
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5736
+Method semantic proof gap lexical callables covered: 5744
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5736
+Lexical callables requiring semantic proof before behavior changes: 5744
 ```
 
 This is a collector approval boundary, not a collector design or implementation.
@@ -87,9 +87,9 @@ runtime rollback approvals: 0
 runtime unclaimed-surface approvals: 0
 implementation-ready collector approval rows: 0
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5736
+method semantic proof gap lexical callables covered: 5744
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5736
+lexical callables requiring semantic proof before behavior changes: 5744
 expected runtime audit tests: 4457
 expected runtime audit pass: 4457
 expected runtime audit fail: 0

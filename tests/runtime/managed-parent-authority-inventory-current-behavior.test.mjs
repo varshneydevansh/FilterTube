@@ -13,7 +13,7 @@ function read(relativePath) {
 test('managed parent authority inventory tracks implemented route gate and pending authority areas', () => {
   const doc = read(docPath);
 
-  assert.match(doc, /Status\*\*: Runtime route-gate proof updated/);
+  assert.match(doc, /Status\*\*: Runtime route-gate proof and local managed-save revision\/history\s+proof updated/);
   assert.match(doc, /Runtime behavior changed/);
   assert.match(doc, /Lane proof\*\*: `test:settings`/);
   assert.match(doc, /`test:release`/);
@@ -78,7 +78,7 @@ test('Nanah scoped apply currently has target-profile writes but no durable mana
   assert.doesNotMatch(runtime, /filtertube_managed_policy/);
   assert.doesNotMatch(runtime, /managedPolicyRevisionStore/);
 
-  assert.match(doc, /no managed policy revision store/i);
+  assert.match(doc, /no remote managed policy revision store/i);
   assert.match(doc, /There is no stale\/replay rejection/);
   assert.match(doc, /There is no signed managed policy envelope/);
 });

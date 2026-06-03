@@ -122,7 +122,7 @@ test('profile management persistence audit document records current boundary and
     'profile_manager_delete_writes_resolved_active_profile_without_backup_report',
     'account_profile_creation_copies_backup_policy_without_switching_active_profile',
     'child_profile_creation_requires_parent_account_and_defaults_main_denied_kids_allowed',
-    'managed_child_save_writes_target_profile_surface_without_broadcast_report',
+    'managed_child_save_writes_target_profile_surface_with_local_revision_history_without_broadcast_report',
     'io_load_profiles_can_write_sanitized_or_migrated_v4_during_read_path',
     'background_profile_storage_change_invalidates_both_compiled_caches_without_revision_report',
     'Profile switch, create, delete, managed-child save, IO read-path writes, and background cache invalidation do not share one mutation report.',
@@ -131,10 +131,10 @@ test('profile management persistence audit document records current boundary and
     assert.ok(doc.includes(marker), `missing marker: ${marker}`);
   }
 
-  assert.match(methodGap, /repo-wide lexical callables: 5736/);
+  assert.match(methodGap, /repo-wide lexical callables: 5744/);
   assert.match(methodGap, /files with lexical accounting: 69/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5736/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5744/);
 
   assert.equal(profileSettingsUiFamilyDocs.length, 12);
   for (const familyDocPath of profileSettingsUiFamilyDocs) {
@@ -142,9 +142,9 @@ test('profile management persistence audit document records current boundary and
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 69/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5736/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5744/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5736/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5744/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     assert.match(familyDoc, /runtime behavior changed: no/);
     assert.match(familyDoc, /do not approve runtime\s+optimization/);
@@ -154,7 +154,7 @@ test('profile management persistence audit document records current boundary and
 test('profile management source fingerprints stay pinned', () => {
   const doc = read(auditDocPath);
   const expected = [
-    ['js/tab-view.js', 11833, 536496, '192961f3f33a85258a941ce23cdd551be5dc985abf64077cc0cedf3ae08dc68e'],
+    ['js/tab-view.js', 11960, 542356, '0bc598eec24a3800592fd570a1b411ab71d77f610b56589d9b6a6baff3021bce'],
     ['js/popup.js', 1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
     ['js/io_manager.js', 2097, 100479, 'f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62'],
     ['js/background.js', 6343, 286370, 'ce17fee7a80398be91f89e286ef0dea8c85deff0b4363729d79a957c9989cd36']
@@ -179,7 +179,7 @@ test('profile management source/effect block metrics stay pinned in the doc', ()
     popupSwitchToProfile: ['popup switchToProfile block', 48, 1659],
     tabCreateAccountHandler: ['tab-view create account handler block', 120, 5004],
     tabCreateChildHandler: ['tab-view create child handler block', 107, 4589],
-    tabSaveManagedChildSurface: ['tab-view saveManagedChildSurface block', 53, 2341],
+    tabSaveManagedChildSurface: ['tab-view saveManagedChildSurface block', 61, 2716],
     ioLoadSaveProfiles: ['io_manager load/save profiles block', 67, 2563],
     backgroundProfileStorageInvalidation: ['background profile storage invalidation block', 42, 1464]
   };
@@ -196,7 +196,7 @@ test('selected profile management token counts stay pinned', () => {
     ['tab-view ensureProfileUnlocked tokens: 16', sources.tabView, 'ensureProfileUnlocked', 16],
     ['tab-view saveProfilesV4 tokens: 30', sources.tabView, 'saveProfilesV4', 30],
     ['tab-view loadProfilesV4 tokens: 54', sources.tabView, 'loadProfilesV4', 54],
-    ['tab-view activeProfileId tokens: 67', sources.tabView, 'activeProfileId', 67],
+    ['tab-view activeProfileId tokens: 69', sources.tabView, 'activeProfileId', 69],
     ['tab-view StateManager.loadSettings tokens: 8', sources.tabView, 'StateManager.loadSettings', 8],
     ['tab-view refreshProfilesUI tokens: 20', sources.tabView, 'refreshProfilesUI', 20],
     ['tab-view applyLockGateIfNeeded tokens: 4', sources.tabView, 'applyLockGateIfNeeded', 4],
@@ -300,13 +300,16 @@ test('account and child profile creation write V4 and conditionally schedule bac
   assert.doesNotMatch(child, /activeProfileId:\s*candidate|profileManagementCreateDeleteReport|profileManagementMutationReport/);
 });
 
-test('managed child save writes target surface locally without broadcast or compiled revision report', () => {
+test('managed child save writes target surface locally with local revision history but without broadcast or compiled revision report', () => {
   const { tabSaveManagedChildSurface: block } = blocks();
 
   assert.match(block, /const profileId = normalizeString\(managedChildEdit\?\.profileId\)/);
   assert.match(block, /canActiveProfileManageProfile\(fresh, profileId\)/);
   assert.match(block, /const nextSurface = getProfileSurface\(profile, surface\)/);
-  assert.match(block, /profiles\[profileId\] = setProfileSurface\(profile, surface, nextSurface\)/);
+  assert.match(block, /const nextProfile = setProfileSurface\(profile, surface, nextSurface\)/);
+  assert.match(block, /const report = buildManagedChildLocalEditReport\(\{/);
+  assert.match(block, /actorProfileId: normalizeString\(fresh\.activeProfileId\) \|\| activeProfileId \|\| 'default'/);
+  assert.match(block, /profiles\[profileId\] = recordManagedChildLocalEditHistory\(nextProfile, report\)/);
   assert.match(block, /await io\.saveProfilesV4\(\{/);
   assert.match(block, /profilesV4Cache = \{ \.\.\.fresh, schemaVersion: 4, profiles \}/);
   assert.match(block, /await StateManager\.loadSettings\(\{ notify: false, resetEnrichment: false, scheduleEnrichment: false \}\)/);
