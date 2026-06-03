@@ -42,28 +42,29 @@ const providerLoadOrder = {
 
 const expectedRefs = [
   'js/content/dom_helpers.js:91',
-  'js/content/dom_fallback.js:1424',
-  'js/content/dom_fallback.js:2184',
-  'js/content/dom_fallback.js:2206',
-  'js/content/dom_fallback.js:2212',
-  'js/content/dom_fallback.js:2224',
-  'js/content/dom_fallback.js:2237',
-  'js/content/dom_fallback.js:2264',
-  'js/content/dom_fallback.js:2269',
-  'js/content/dom_fallback.js:2274',
-  'js/content/dom_fallback.js:2286',
-  'js/content/block_channel.js:1733',
+  'js/content/dom_fallback.js:1576',
+  'js/content/dom_fallback.js:1608',
+  'js/content/dom_fallback.js:2367',
+  'js/content/dom_fallback.js:2389',
+  'js/content/dom_fallback.js:2395',
+  'js/content/dom_fallback.js:2407',
+  'js/content/dom_fallback.js:2420',
+  'js/content/dom_fallback.js:2447',
+  'js/content/dom_fallback.js:2452',
+  'js/content/dom_fallback.js:2457',
+  'js/content/dom_fallback.js:2469',
+  'js/content/block_channel.js:1740',
   'js/content_bridge.js:509',
   'js/content_bridge.js:558',
-  'js/content_bridge.js:6301',
-  'js/content_bridge.js:7436',
-  'js/content_bridge.js:8421',
-  'js/content_bridge.js:8540',
-  'js/content_bridge.js:12228',
+  'js/content_bridge.js:6353',
+  'js/content_bridge.js:7488',
+  'js/content_bridge.js:8473',
+  'js/content_bridge.js:8592',
   'js/content_bridge.js:12280',
-  'js/content_bridge.js:12536',
-  'js/content_bridge.js:13272',
-  'js/content_bridge.js:13289'
+  'js/content_bridge.js:12332',
+  'js/content_bridge.js:12588',
+  'js/content_bridge.js:13324',
+  'js/content_bridge.js:13341'
 ];
 
 function read(file) {
@@ -225,9 +226,9 @@ test('side-effect ownership docs carry the method proof gap blocker', () => {
 
   for (const token of [
     'tracked JS/JSX/MJS files: 69',
-    'repo-wide lexical callables: 5681',
+    'repo-wide lexical callables: 5701',
     'files with complete per-callable semantic proof: 0',
-    'lexical callables requiring semantic proof before behavior changes: 5681',
+    'lexical callables requiring semantic proof before behavior changes: 5701',
     'runtime behavior changed: no'
   ]) {
     assert.ok(gap.includes(token), `method gap index missing token ${token}`);
@@ -239,9 +240,9 @@ test('side-effect ownership docs carry the method proof gap blocker', () => {
     for (const token of [
       methodGapPath,
       'method semantic proof gap files covered: 69',
-      'method semantic proof gap lexical callables covered: 5681',
+      'method semantic proof gap lexical callables covered: 5701',
       'files with complete per-callable semantic proof: 0',
-      'lexical callables requiring semantic proof before behavior changes: 5681',
+      'lexical callables requiring semantic proof before behavior changes: 5701',
       'affected callable semantic proof: NO-GO',
       'runtime behavior changed: no',
       'JSON-first promotion',
@@ -258,7 +259,7 @@ test('direct hide writer register enumerates every active page-runtime display-n
   const refs = directDisplayNoneRefs();
 
   assert.deepEqual(refs, expectedRefs);
-  assert.equal(refs.length, 23);
+  assert.equal(refs.length, 24);
 
   for (const ref of expectedRefs) {
     assert.ok(doc.includes(ref), `register missing direct hide writer ref ${ref}`);
@@ -266,10 +267,10 @@ test('direct hide writer register enumerates every active page-runtime display-n
 
   for (const count of [
     '| `js/content/dom_helpers.js` | 1 |',
-    '| `js/content/dom_fallback.js` | 10 |',
+    '| `js/content/dom_fallback.js` | 11 |',
     '| `js/content/block_channel.js` | 1 |',
     '| `js/content_bridge.js` | 11 |',
-    '| **Total** | **23** |'
+    '| **Total** | **24** |'
   ]) {
     assert.ok(doc.includes(count), `missing count row ${count}`);
   }

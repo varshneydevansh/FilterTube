@@ -232,7 +232,7 @@ test('comments DOM cleanup boundary audit is audit-only and source pinned', () =
   assert.match(doc, /comments DOM cleanup boundary source\/effect blocks: 10/);
   assert.match(doc, /runtime comments DOM cleanup fixtures: 9/);
 
-  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 4838 | 228332 | \`${sha256('js/content/dom_fallback.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 5,030 | 235,555 | \`${sha256('js/content/dom_fallback.js')}\` |`));
 });
 
 test('comments DOM cleanup source counts remain pinned', () => {
@@ -240,7 +240,7 @@ test('comments DOM cleanup source counts remain pinned', () => {
   const blocks = sourceBlocks();
 
   for (const [label, block, expectedLines, expectedBytes] of [
-    ['ensureContentControlStyles block', blocks.ensureBlock, 345, 12583],
+    ['ensureContentControlStyles block', blocks.ensureBlock, 459, 16337],
     ['comments CSS block', blocks.commentsCssBlock, 16, 671],
     ['collectMobileCommentEntryCards block', blocks.collectMobileBlock, 30, 1386],
     ['comments global hide block', blocks.commentsGlobalBlock, 42, 1934],
@@ -248,7 +248,7 @@ test('comments DOM cleanup source counts remain pinned', () => {
     ['active DOM fallback work block', blocks.activeBlock, 68, 2333],
     ['no-active cleanup branch', blocks.noActiveCleanupBlock, 14, 629],
     ['clearStaleDOMFallbackVisibility block', blocks.clearBlock, 33, 1412],
-    ['disabled cleanup branch', blocks.disabledCleanupBlock, 21, 959],
+    ['disabled cleanup branch', blocks.disabledCleanupBlock, 18, 791],
     ['comments fallback callsite block', blocks.callsiteBlock, 1, 46]
   ]) {
     assert.equal(lineCount(block), expectedLines, label);

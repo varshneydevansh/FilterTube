@@ -193,7 +193,7 @@ after retiring the stale function-coverage source backlog row and the stale
 `compress-video` package/build boundary row, from 76 failures to 69 failures
 after refreshing release-note/package-version proof for the `3.3.2` release
 alignment, and from 115 failures to 76 failures after refreshing stale method
-semantic proof gap counts from 5,673 to 5,681 lexical callables. The broad suite
+semantic proof gap counts from 5,673 to 5,697 lexical callables. The broad suite
 is not clean enough to be used as a release gate, but the current baseline is
 narrower and more useful for retiring backlog slices.
 
@@ -248,7 +248,7 @@ failure snapshot: the proof lane now matches current manifest content-script JS
 reference totals while preserving the load/exposure invariant that `js/layout.js`
 is packaged but inactive and not web-accessible.
 The previous method-proof/family blocker row is now retired from the broad
-failure snapshot: the direct method semantic proof lane passes with 5,681
+failure snapshot: the direct method semantic proof lane passes with 5,697
 current lexical callables and 0 complete per-callable semantic proof files.
 The previous release-note/package-version drift rows are also retired from this
 snapshot: package metadata, browser manifests, and `data/release_notes.json`

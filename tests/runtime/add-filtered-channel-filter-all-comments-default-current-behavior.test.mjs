@@ -10,7 +10,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_ADD_FILTERED_CHANNEL_FILTER_ALL_COMMENTS_DEFAULT_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/content_bridge.js': [13571, 601694, '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3'],
+  'js/content_bridge.js': [13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c'],
   'js/background.js': [6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
   'js/state_manager.js': [2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6'],
   'js/settings_shared.js': [1181, 57535, '9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c']
@@ -21,7 +21,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'async function addChannelDirectly(input, filterAll = false, collaborationWith = null, collaborationGroupId = null, metadata = {}) {',
     end: '/**\n * Add "Filter All Content" checkbox below the blocked channel',
-    startLine: 13375,
+    startLine: 13427,
     lines: 54,
     bytes: 2662,
     hash: '4eb280573a5611b695c8284a8e6b85d17b2a97c459143a3054d02374cdf7c2ca'
@@ -133,6 +133,10 @@ const missingRuntimeSymbols = [
   'addFilteredChannelFilterAllCommentsFixtureProvenance',
   'addFilteredChannelFilterAllCommentsAuthorityGate'
 ];
+
+function formatNumber(value) {
+  return Number(value).toLocaleString('en-US');
+}
 
 function read(file) {
   return fs.readFileSync(path.join(repoRoot, file), 'utf8');
@@ -310,7 +314,7 @@ test('addFilteredChannel Filter All comments default audit is audit-only and sou
     assert.equal(lineCount(source), lines, `${file} line count changed`);
     assert.equal(Buffer.byteLength(source), bytes, `${file} byte count changed`);
     assert.equal(sha256File(file), hash, `${file} hash changed`);
-    assert.match(audit, new RegExp(`\\| \`${escapeRegex(file)}\` \\| ${lines} \\| ${bytes} \\| \`${hash}\` \\|`));
+    assert.match(audit, new RegExp(`\\| \`${escapeRegex(file)}\` \\| ${formatNumber(lines)} \\| ${formatNumber(bytes)} \\| \`${hash}\` \\|`));
   }
 });
 

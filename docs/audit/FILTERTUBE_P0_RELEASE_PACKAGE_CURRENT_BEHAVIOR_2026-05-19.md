@@ -117,7 +117,7 @@ Sanitized selected result:
   "disable_reasons": [],
   "has_started_service_worker": true,
   "service_worker_registration_info": {
-    "version": "3.3.1"
+    "version": "3.3.2"
   },
   "newAllowFileAccess": true,
   "withholding_permissions": false,
@@ -146,7 +146,7 @@ Default/Preferences
 Default/Secure Preferences
   -> proves the same extension id has a settings object
   -> proves Chrome is configured to load it from $WORKSPACE_ROOT
-  -> proves the stored service worker registration version is 3.3.1
+  -> proves the stored service worker registration version is 3.3.2
   -> proves active host/api permissions match the YouTube runtime surface
 
 still missing
@@ -165,7 +165,7 @@ flowchart TD
   B --> E["No settings object for this id"]
   C --> F["Settings object present"]
   F --> G["Path normalizes to $WORKSPACE_ROOT"]
-  F --> H["Service worker registration version 3.3.1"]
+  F --> H["Service worker registration version 3.3.2"]
   F --> I["Active YouTube host permissions"]
   G --> J{"Running tab byte parity proven?"}
   H --> J
@@ -347,12 +347,12 @@ secure preferences extension path: /Users/devanshvarshney/FilterTube
 secure preferences path matches workspace root: yes
 Default/Preferences extension settings object present: no
 Default/Secure Preferences extension settings object present: yes
-stored extension/service-worker version: 3.3.1
+stored extension/service-worker version: 3.3.2
 Default Local Extension Settings directory exists: yes
 Default packed Extensions directory for this id exists: no
 workspace manifest.json sha256: 282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734
 workspace package.json sha256: 36053d322780ce787de403be574cc400936ef2a994b4c8eca62561154fe81aec
-workspace js/content_bridge.js sha256: 1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3
+workspace js/content_bridge.js sha256: c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c
 workspace content_bridge ampersand Topic fix token present: yes
 ```
 
@@ -672,7 +672,7 @@ browser staged files per directory: 59
 dist zip artifacts: 3
 total dist files including zips: 180
 source-backed staged files per browser excluding manifest: 58
-byte-identical source-backed staged files per browser excluding manifest: 58
+byte-identical source-backed staged files per browser excluding manifest: 54
 committed package manifest: absent
 zip checksum manifest: absent
 reproducible build proof: absent
@@ -715,7 +715,7 @@ workspace source paths
 ```mermaid
 flowchart TD
   A["Workspace source paths"] --> B["Existing ignored dist browser directories"]
-  B --> C["58 source-backed staged files match source per browser"]
+  B --> C["54 of 58 source-backed staged files mostly match source per browser"]
   B --> D["dist browser manifest.json files"]
   B --> E["Existing local ZIP files"]
   C --> F["Local snapshot proof only"]
@@ -730,7 +730,7 @@ flowchart TD
 ```
 
 This closes a local-artifact inventory gap, not the release gate. The staged
-browser directories currently match workspace source bytes for source-backed
+browser directories currently match workspace source bytes for 54 of 58 source-backed
 non-manifest files, and the three local ZIPs have recorded hashes. The package
 still lacks a committed per-file manifest, a clean rebuild record, ZIP content
 attestation tied to source revision, upload proof, public-claim proof, and
@@ -738,7 +738,7 @@ loaded-browser byte proof.
 
 ```text
 local dist snapshot proof: PARTIAL
-source-backed staged byte parity: yes
+source-backed staged byte parity: partial
 zip checksum snapshot: yes
 committed release package manifest authority: NO-GO
 reproducible package build authority: NO-GO
@@ -819,9 +819,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

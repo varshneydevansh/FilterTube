@@ -160,9 +160,9 @@ pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -411,7 +411,7 @@ prove mapped collector parity rollout rows are not runtime parity rollout
 approval. The addendum pins 12 collector parity rollout approval boundary rows,
 12 collector parity rollout rows covered, 12 parity rollout contract rows
 covered, 12 source-locus parity release verification rows covered, 63 method
-semantic proof gap files covered, 5,681 lexical callables still requiring
+semantic proof gap files covered, 5,697 lexical callables still requiring
 semantic proof, 0 files with complete per-callable semantic proof, 0 runtime
 collector parity rollout approvals, 0 committed parity rollout files, 0
 implementation-ready collector parity rollout approval rows, expected runtime

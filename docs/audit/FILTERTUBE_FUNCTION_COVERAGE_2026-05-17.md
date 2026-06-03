@@ -21,9 +21,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -192,7 +192,7 @@ That pass does not prove behavior, but it closes the first accounting gap: every
 tracked JS/JSX/MJS file now has a lexical callable count and family assignment.
 
 - 69 tracked JS/JSX/MJS files accounted for by `git ls-files`.
-- 5,681 lexical callables pinned by
+- 5,697 lexical callables pinned by
   `tests/runtime/all-callable-index-current-behavior.test.mjs`.
 - Family totals: hot runtime 2,930, content helpers 298, UI/settings 1,556,
   generated/quarantined UI 147, vendor bundles 279, build/sync scripts 52,
@@ -739,7 +739,7 @@ truth, vendor provenance, and website asset budgets.
 | 2363 | `pickNext` | general helper | timer/raf, engagement, dom-query | covered by caller family or promote to named family |
 | 2472 | `isHomeOrSearch` | general helper | dom-query | covered by caller family or promote to named family |
 | 2956 | `playlistMappedChannelId` | filter/hide decision | dom-query | activeRuntimeReport + structured hide reason |
-| 3088 | `addRichMeta` | general helper | dom-query | covered by caller family or promote to named family |
+| 3101 | `addRichMeta` | general helper | dom-query | covered by caller family or promote to named family |
 | 3221 | `parseDateMs` | general helper | none detected | covered by caller family or promote to named family |
 | 3226 | `parseRelativeTimeToTimestamp` | general helper | none detected | covered by caller family or promote to named family |
 | 3267 | `resolvePublishTimestamp` | general helper | dom-query | covered by caller family or promote to named family |

@@ -54,7 +54,7 @@ changing any owner.
 | `IntersectionObserver` | 4 | Visibility/identity prefetch observation surface. |
 | `setInterval` | 3 | Repeating work surface. |
 | `clearInterval` | 4 | Repeating work teardown surface. |
-| `setTimeout` | 123 | Delayed/debounced/retry work surface. |
+| `setTimeout` | 124 | Delayed/debounced/retry work surface. |
 | `clearTimeout` | 34 | Delayed work teardown surface. |
 | `requestAnimationFrame` | 31 | Paint-frame scheduling surface. |
 | `cancelAnimationFrame` | 4 | Paint-frame teardown surface. |
@@ -62,17 +62,17 @@ changing any owner.
 | `XMLHttpRequest` | 2 | Prototype/network interception surface. |
 | `.postMessage(` | 26 | Page-world message bridge surface. |
 | `.sendMessage(` | 34 | Extension runtime/tab message surface. |
-| `.dispatchEvent(` | 31 | Synthetic event surface. |
+| `.dispatchEvent(` | 33 | Synthetic event surface. |
 | `.click(` | 33 | Synthetic click/navigation surface. |
 | `.style.display =` | 96 | Direct visual hide/show side-effect surface. |
 | `.classList.add/remove/toggle(` | 110 | Class-based visual/state side-effect surface. |
-| **Total** | **870** | Conservative lifecycle/side-effect primitive count. |
+| **Total** | **873** | Conservative lifecycle/side-effect primitive count. |
 
 ## Family Breakdown
 
 | Audit family | Files | Primitive count | Current interpretation |
 | --- | ---: | ---: | --- |
-| `content-runtime-js` | 17 | 373 | Page-resident filtering, JSON interception, DOM fallback, quick/menu surfaces, learned identity, and bridge work. |
+| `content-runtime-js` | 17 | 376 | Page-resident filtering, JSON interception, DOM fallback, quick/menu surfaces, learned identity, and bridge work. |
 | `extension-ui-background-js` | 11 | 417 | Dashboard/popup/background settings, import/export, Nanah, row actions, profile/PIN, and UI state work. |
 | `quarantined-legacy-js` | 1 | 37 | `js/layout.js`; direct style/class mutation risk if ever reactivated. |
 | `website-components` | 15 | 24 | Website client components with theme/scene and hero/footer lifecycle; separate from extension runtime filtering. |
@@ -104,7 +104,7 @@ effects` is dispatch/click/display/class mutation.
 | `js/content/bridge_settings.js` | `content-runtime-js` | 2 | 0 | 8 | 4 | 0 | 14 |
 | `js/content/collab_dialog.js` | `content-runtime-js` | 5 | 1 | 4 | 1 | 0 | 11 |
 | `js/content/dom_extractors.js` | `content-runtime-js` | 0 | 0 | 0 | 0 | 4 | 4 |
-| `js/content/dom_fallback.js` | `content-runtime-js` | 3 | 0 | 10 | 0 | 12 | 25 |
+| `js/content/dom_fallback.js` | `content-runtime-js` | 3 | 0 | 11 | 0 | 14 | 28 |
 | `js/content/dom_helpers.js` | `content-runtime-js` | 0 | 0 | 0 | 0 | 10 | 10 |
 | `js/content/dom_state.js` | `content-runtime-js` | 0 | 0 | 0 | 0 | 0 | 0 |
 | `js/content/first_run_prompt.js` | `content-runtime-js` | 1 | 0 | 2 | 2 | 3 | 8 |
@@ -178,7 +178,7 @@ effects` is dispatch/click/display/class mutation.
 | `js/ui_components.js` | 39 | Shared UI widget lifecycle and class/display mutations. |
 | `js/layout.js` | 37 | Quarantined legacy style/class mutation surface. |
 | `js/injector.js` | 26 | Page-world bridge, subscription import, collaborator lookup, and JSON runtime readiness. |
-| `js/content/dom_fallback.js` | 25 | DOM fallback, playlist/watch side effects, synthetic clicks, and delayed passes. |
+| `js/content/dom_fallback.js` | 28 | DOM fallback, playlist/watch side effects, synthetic clicks, and delayed passes. |
 | `js/background.js` | 22 | Background timers, direct fetches, and message broadcasts. |
 
 ## Findings
@@ -186,9 +186,9 @@ effects` is dispatch/click/display/class mutation.
 | Finding | Evidence | Risk |
 | --- | --- | --- |
 | Listener teardown is much smaller than listener install surface. | 292 `addEventListener` vs 13 `removeEventListener` lexical hits. | Listeners can become page-lifetime or UI-lifetime by default unless explicitly justified. |
-| Delayed work teardown is smaller than delayed work setup. | 123 `setTimeout` vs 34 `clearTimeout`. | Debounced/retry work can outlive route, profile, or feature state. |
+| Delayed work teardown is smaller than delayed work setup. | 124 `setTimeout` vs 34 `clearTimeout`. | Debounced/retry work can outlive route, profile, or feature state. |
 | Direct visual side effects are broad. | 96 `.style.display =` and 110 class mutations. | False-hide recovery requires a structured hide reason/restore contract. |
-| Page-runtime work is not the only burden. | Extension UI/background files have 417 primitives, more than content runtime's 373. | Settings/profile/import/Nanah/UI work can still create stale or conflicting runtime state. |
+| Page-runtime work is not the only burden. | Extension UI/background files have 417 primitives, more than content runtime's 376. | Settings/profile/import/Nanah/UI work can still create stale or conflicting runtime state. |
 | Quarantined code still carries side-effect density. | `js/layout.js` has 37 direct style/class primitives. | If reactivated, it can bring old default-hide/reveal assumptions back into product behavior. |
 
 ## 2026-05-30 Page-Resident Teardown Imbalance Addendum
@@ -219,9 +219,9 @@ Current token totals across those files:
 | Listeners | 74 `addEventListener` | 6 `removeEventListener` | Page listeners are mostly lifetime or internally gated today. |
 | Mutation observers | 14 `new MutationObserver` | 8 `.disconnect()` | Some observer families have disconnect paths, but observer ownership is not centralized. |
 | Intervals | 2 `setInterval` | 3 `clearInterval` | Repeating checks are bounded in places, but not represented by a shared registry. |
-| Timeouts | 80 `setTimeout` | 22 `clearTimeout` | Delayed/debounced work is still much broader than explicit cancellation. |
+| Timeouts | 81 `setTimeout` | 22 `clearTimeout` | Delayed/debounced work is still much broader than explicit cancellation. |
 | Animation frames | 15 `requestAnimationFrame` | 0 `cancelAnimationFrame` | Frame work is coalesced locally, not cancellable through a shared route/disable gate. |
-| **Total** | **185** | **39** | **224 selected page-resident lifecycle tokens** |
+| **Total** | **186** | **39** | **225 selected page-resident lifecycle tokens** |
 
 Per-file selected token totals:
 
@@ -229,7 +229,7 @@ Per-file selected token totals:
 | --- | ---: |
 | `js/content_bridge.js` | 97 |
 | `js/content/block_channel.js` | 74 |
-| `js/content/dom_fallback.js` | 13 |
+| `js/content/dom_fallback.js` | 14 |
 | `js/injector.js` | 12 |
 | `js/content/bridge_settings.js` | 10 |
 | `js/content/collab_dialog.js` | 10 |
@@ -274,9 +274,9 @@ can support runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

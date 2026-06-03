@@ -107,7 +107,7 @@ test('dynamic content-control style can own broad content hides and must be tied
   assert.match(block, /ytd-watch-flexy:has\(\.yt-badge-shape--membership\)/);
   assert.match(block, /if \(settings\.hideEndscreenVideowall\)/);
   assert.match(block, /if \(settings\.hideEndscreenCards\)/);
-  assert.equal(count(block, /display:\s*none\s*!important/g), 26);
+  assert.equal(count(block, /display:\s*none\s*!important/g), 27);
   assert.doesNotMatch(block, /filter-tube-visible/);
 });
 

@@ -1639,7 +1639,7 @@ function countWebsiteComponentLifecycleByDomain(rows) {
 
 function classifyContentRuntimePageGlobalListenerDomain(row) {
   if (row.file === 'js/content/block_channel.js') {
-    if (row.line < 2300) return 'quick-block-global-lifecycle';
+    if (row.line < 2310) return 'quick-block-global-lifecycle';
     if (row.line < 2595) return 'native-menu-global-lifecycle';
     return 'kids-passive-menu-lifecycle';
   }
@@ -1678,7 +1678,7 @@ function classifyContentRuntimePageGlobalRouteScope(row) {
   if (domain === 'settings-bridge-page-message-lifecycle') return 'main-youtube-bridge-settings-message-route';
   if (domain === 'collab-dialog-page-trigger-lifecycle') return 'main-youtube-collab-dialog-routes';
   if (domain === 'dom-fallback-page-lifecycle') {
-    if (row.line < 2200) return 'main-youtube-dom-fallback-scroll-route';
+    if (row.line < 2300) return 'main-youtube-dom-fallback-scroll-route';
     return 'main-youtube-watch-playlist-guard-route';
   }
   if (domain === 'prompt-page-boot-lifecycle') return 'extension-prompt-overlay-route';
@@ -1705,7 +1705,7 @@ function classifyContentRuntimePageGlobalSurfaceScope(row) {
   if (domain === 'settings-bridge-page-message-lifecycle') return 'bridge-settings-page-message-surface';
   if (domain === 'collab-dialog-page-trigger-lifecycle') return 'collab-dialog-trigger-surface';
   if (domain === 'dom-fallback-page-lifecycle') {
-    if (row.line < 2200) return 'dom-fallback-scroll-state-surface';
+    if (row.line < 2300) return 'dom-fallback-scroll-state-surface';
     return 'watch-playlist-playback-guard-surface';
   }
   if (domain === 'prompt-page-boot-lifecycle') return 'prompt-overlay-boot-surface';
@@ -1740,7 +1740,7 @@ function classifyContentRuntimePageGlobalPredicateClass(row) {
   }
   if (domain === 'collab-dialog-page-trigger-lifecycle') return 'collab-runtime-enabled-gated';
   if (domain === 'dom-fallback-page-lifecycle') {
-    if (row.line < 2200) return 'dom-fallback-scroll-state-gated';
+    if (row.line < 2300) return 'dom-fallback-scroll-state-gated';
     return 'dom-fallback-playlist-guard-gated';
   }
   if (domain === 'prompt-page-boot-lifecycle') return 'prompt-needed-check-gated';
@@ -1774,7 +1774,7 @@ function classifyContentRuntimePageGlobalDuplicateGuard(row) {
       : 'collab-listener-module-flag';
   }
   if (domain === 'dom-fallback-page-lifecycle') {
-    if (row.line < 2200) return 'dom-fallback-scroll-window-flag';
+    if (row.line < 2300) return 'dom-fallback-scroll-window-flag';
     if (row.eventKind === 'click') return 'dom-fallback-playlist-nav-guard-flag';
     return 'dom-fallback-autoplay-guard-flag';
   }
@@ -1848,7 +1848,7 @@ function classifyContentRuntimePageGlobalNoWorkBudget(row) {
   if (domain === 'settings-bridge-page-message-lifecycle') return 'seed-ready-no-work-budget';
   if (domain === 'collab-dialog-page-trigger-lifecycle') return 'collab-runtime-no-work-budget';
   if (domain === 'dom-fallback-page-lifecycle') {
-    if (row.line < 2200) return 'scroll-state-no-work-budget';
+    if (row.line < 2300) return 'scroll-state-no-work-budget';
     return 'playback-guard-no-work-budget';
   }
   if (domain === 'prompt-page-boot-lifecycle') return 'prompt-needed-no-work-budget';
@@ -1878,7 +1878,7 @@ function classifyContentRuntimePageGlobalPositiveFixture(row) {
   }
   if (domain === 'collab-dialog-page-trigger-lifecycle') return 'positive-fixture-collab-trigger-dialog';
   if (domain === 'dom-fallback-page-lifecycle') {
-    if (row.line < 2200) return 'positive-fixture-scroll-state-refresh';
+    if (row.line < 2300) return 'positive-fixture-scroll-state-refresh';
     return 'positive-fixture-playlist-playback-guard';
   }
   if (domain === 'prompt-page-boot-lifecycle') return 'positive-fixture-prompt-needed-overlay';
@@ -2205,7 +2205,7 @@ test('lifecycle instance register enumerates every current observer listener tim
   const ids = new Set(rows.map(row => row.id));
   const doc = read(registerPath);
 
-  assert.equal(rows.length, 524);
+  assert.equal(rows.length, 525);
   assert.equal(ids.size, rows.length, 'file:line:family lifecycle instance ids must be unique');
   assert.deepEqual(countBy(rows, 'family'), {
     addEventListener: 292,
@@ -2217,7 +2217,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     removeEventListener: 13,
     requestAnimationFrame: 31,
     setInterval: 3,
-    setTimeout: 123
+    setTimeout: 124
   });
 
   assert.equal(addListenerOptionRows.length, 292);
@@ -3098,14 +3098,14 @@ test('lifecycle instance register enumerates every current observer listener tim
     extensionUiObserveReleaseDelta: 1
   });
 
-  assert.equal(timerDelayRows.length, 126);
+  assert.equal(timerDelayRows.length, 127);
   assert.deepEqual(countBy(timerDelayRows, 'family'), {
     setInterval: 3,
-    setTimeout: 123
+    setTimeout: 124
   });
   assert.deepEqual(countBy(timerDelayRows, 'delayKind'), {
     'math-max-expression': 5,
-    'named-or-expression-delay': 37,
+    'named-or-expression-delay': 38,
     'numeric-1-99-ms': 16,
     'numeric-100-199-ms': 18,
     'numeric-1000-4999-ms': 13,
@@ -3115,9 +3115,9 @@ test('lifecycle instance register enumerates every current observer listener tim
   });
   assert.deepEqual(countTimerDelaysBySourceFamily(timerDelayRows), {
     'content-runtime-js': {
-      total: 86,
+      total: 87,
       'math-max-expression': 5,
-      'named-or-expression-delay': 21,
+      'named-or-expression-delay': 22,
       'numeric-1-99-ms': 12,
       'numeric-100-199-ms': 14,
       'numeric-1000-4999-ms': 10,
@@ -3140,20 +3140,20 @@ test('lifecycle instance register enumerates every current observer listener tim
     }
   });
 
-  assert.equal(timerCallbackRows.length, 126);
+  assert.equal(timerCallbackRows.length, 127);
   assert.deepEqual(countBy(timerCallbackRows, 'family'), {
     setInterval: 3,
-    setTimeout: 123
+    setTimeout: 124
   });
   assert.deepEqual(countBy(timerCallbackRows, 'callbackKind'), {
     'identifier-callback-reference': 19,
-    'inline-arrow-callback': 107
+    'inline-arrow-callback': 108
   });
   assert.deepEqual(countTimerCallbacksBySourceFamily(timerCallbackRows), {
     'content-runtime-js': {
-      total: 86,
+      total: 87,
       'identifier-callback-reference': 13,
-      'inline-arrow-callback': 73
+      'inline-arrow-callback': 74
     },
     'extension-ui-background-js': {
       total: 39,
@@ -3166,14 +3166,14 @@ test('lifecycle instance register enumerates every current observer listener tim
     }
   });
 
-  assert.equal(timeoutScheduleRows.length, 123);
+  assert.equal(timeoutScheduleRows.length, 124);
   assert.equal(timeoutClearRows.length, 34);
   assert.equal(intervalScheduleRows.length, 3);
   assert.equal(intervalClearRows.length, 4);
   assert.deepEqual(countBy(timeoutScheduleRows, 'handleKind'), {
     'assigned-local-id-handle': 11,
     'assigned-named-state-handle': 24,
-    'assigned-property-held-handle': 10,
+    'assigned-property-held-handle': 11,
     'fire-and-forget-schedule': 63,
     'promise-sleep-or-timeout': 14,
     'returned-timer-handle': 1
@@ -3183,9 +3183,9 @@ test('lifecycle instance register enumerates every current observer listener tim
   });
   assert.deepEqual(countTimerScheduleClearBySourceFamily(timerScheduleClearRows, timerClearRows), {
     'content-runtime-js': {
-      schedules: 86,
+      schedules: 87,
       clears: 25,
-      delta: 61
+      delta: 62
     },
     'extension-ui-background-js': {
       schedules: 39,
@@ -3204,7 +3204,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     'content-bridge-owner': { total: 37, setTimeout: 36, setInterval: 1 },
     'content-helper-owner': { total: 12, setTimeout: 12, setInterval: 0 },
     'dashboard-ui-owner': { total: 15, setTimeout: 14, setInterval: 1 },
-    'dom-fallback-owner': { total: 10, setTimeout: 10, setInterval: 0 },
+    'dom-fallback-owner': { total: 11, setTimeout: 11, setInterval: 0 },
     'extension-ui-background-owner': { total: 6, setTimeout: 6, setInterval: 0 },
     'injector-page-world-owner': { total: 6, setTimeout: 5, setInterval: 1 },
     'popup-ui-owner': { total: 2, setTimeout: 2, setInterval: 0 },
@@ -3260,13 +3260,13 @@ test('lifecycle instance register enumerates every current observer listener tim
       'named-or-expression': 2
     },
     'dom-fallback-owner': {
-      total: 10,
+      total: 11,
       'immediate-zero': 3,
       'short-under-200ms': 3,
       'medium-200-999ms': 1,
       'long-1000ms-plus': 1,
       'bounded-expression': 0,
-      'named-or-expression': 2
+      'named-or-expression': 3
     },
     'extension-ui-background-owner': {
       total: 6,
@@ -3664,8 +3664,8 @@ test('lifecycle instance register enumerates every current observer listener tim
   });
   const explicitListModeRouteContentBridgeSource = read('js/content_bridge.js');
   assert.match(explicitListModeRouteContentBridgeSource, /function installRightRailWhitelistObserver\(\) \{[\s\S]*if \(currentSettings\?\.listMode !== 'whitelist'\) return;[\s\S]*if \(rightRailWhitelistObserverInstalled\) return;/);
-  assert.match(explicitListModeRouteContentBridgeSource, /const runWhitelistRefreshPass = \(\) => \{[\s\S]*if \(currentSettings\?\.listMode !== 'whitelist'\) return;[\s\S]*if \(\(document\.location\?\.pathname \|\| ''\)\.startsWith\('\/watch'\)\) return;[\s\S]*applyDOMFallback\(null, \{ preserveScroll: true, forceReprocess: true \}\);/);
-  assert.match(explicitListModeRouteContentBridgeSource, /const scheduleWhitelistRefresh = \(\) => \{[\s\S]*if \(currentSettings\?\.listMode !== 'whitelist'\) return;[\s\S]*if \(\(document\.location\?\.pathname \|\| ''\)\.startsWith\('\/watch'\)\) return;[\s\S]*if \(typeof applyDOMFallback !== 'function'\) return;/);
+  assert.match(explicitListModeRouteContentBridgeSource, /const runWhitelistRefreshPass = \(\) => \{[\s\S]*if \(currentSettings\?\.listMode !== 'whitelist'\) return;[\s\S]*applyDOMFallback\(null, \{ preserveScroll: true, forceReprocess: true \}\);/);
+  assert.match(explicitListModeRouteContentBridgeSource, /const scheduleWhitelistRefresh = \(\) => \{[\s\S]*if \(currentSettings\?\.listMode !== 'whitelist'\) return;[\s\S]*if \(typeof applyDOMFallback !== 'function'\) return;/);
   assert.match(explicitListModeRouteContentBridgeSource, /whitelistRefreshImmediateTimer = setTimeout\(\(\) => \{ whitelistRefreshImmediateTimer = 0; runWhitelistRefreshPass\(\); \}, 0\);/);
   assert.match(explicitListModeRouteContentBridgeSource, /whitelistRefreshFollowupTimer = setTimeout\(\(\) => \{ whitelistRefreshFollowupTimer = 0; runWhitelistRefreshPass\(\); \}, 120\);/);
   assert.match(explicitListModeRouteContentBridgeSource, /observer\.observe\(rail, \{ childList: true, subtree: true \}\);[\s\S]*document\.addEventListener\('yt-navigate-finish', \(\) => \{[\s\S]*scheduleWhitelistRefresh\(\);/);
@@ -3727,12 +3727,12 @@ test('lifecycle instance register enumerates every current observer listener tim
     'quick-and-menu-owner': 8
   });
   assert.deepEqual(timerScheduleClearRiskGaps, {
-    timeoutScheduleMinusClear: 89,
+    timeoutScheduleMinusClear: 90,
     intervalScheduleMinusClear: -1,
     timeoutClearRowsWithScheduleHandle: 32,
     timeoutClearRowsWithoutDirectScheduleHandle: 2,
     handledTimeoutScheduleRowsWithClearHandle: 26,
-    handledTimeoutScheduleRowsWithoutClearHandle: 19,
+    handledTimeoutScheduleRowsWithoutClearHandle: 20,
     distinctScheduledTimeoutHandlesWithoutClear: 18,
     intervalClearRowsWithScheduleHandle: 4,
     intervalClearRowsWithoutDirectScheduleHandle: 0,
@@ -4223,8 +4223,8 @@ test('lifecycle instance register enumerates every current observer listener tim
     'ASCII observer constructor callback flow diagram: present',
     'Mermaid observer constructor callback flow diagram: present',
     'Timer Delay Shape Addendum - 2026-05-28',
-    'timer delay rows: 126',
-    'setTimeout delay rows: 123',
+    'timer delay rows: 127',
+    'setTimeout delay rows: 124',
     'setInterval delay rows: 3',
     'numeric zero timer delays: 16',
     'numeric 1-99ms timer delays: 16',
@@ -4232,37 +4232,37 @@ test('lifecycle instance register enumerates every current observer listener tim
     'numeric 200-999ms timer delays: 17',
     'numeric 1000-4999ms timer delays: 13',
     'numeric 5000ms plus timer delays: 4',
-    'named or expression timer delays: 37',
+    'named or expression timer delays: 38',
     'math max expression timer delays: 5',
     'missing timer delay arguments: 0',
     'timer delay cleanup approval: NO-GO',
     'ASCII timer delay flow diagram: present',
     'Mermaid timer delay flow diagram: present',
     'Timer Callback Identity Addendum - 2026-05-28',
-    'timer callback rows: 126',
-    'setTimeout callback rows: 123',
+    'timer callback rows: 127',
+    'setTimeout callback rows: 124',
     'setInterval callback rows: 3',
-    'inline arrow timer callbacks: 107',
+    'inline arrow timer callbacks: 108',
     'identifier timer callbacks: 19',
     'inline function timer callbacks: 0',
     'member reference timer callbacks: 0',
     'missing timer callback arguments: 0',
-    'content runtime timer callbacks: 86',
+    'content runtime timer callbacks: 87',
     'extension UI background timer callbacks: 39',
     'website component timer callbacks: 1',
     'timer callback cleanup approval: NO-GO',
     'ASCII timer callback flow diagram: present',
     'Mermaid timer callback flow diagram: present',
     'Timer Schedule/Clear Parity Addendum - 2026-05-28',
-    'setTimeout schedule rows for parity: 123',
+    'setTimeout schedule rows for parity: 124',
     'clearTimeout rows for parity: 34',
     'setInterval schedule rows for parity: 3',
     'clearInterval rows for parity: 4',
-    'setTimeout schedule-minus-clear delta: 89',
+    'setTimeout schedule-minus-clear delta: 90',
     'setInterval schedule-minus-clear delta: -1',
     'timeout schedules with assigned local id handle: 11',
     'timeout schedules with assigned named state handle: 24',
-    'timeout schedules with assigned property-held handle: 10',
+    'timeout schedules with assigned property-held handle: 11',
     'timeout fire-and-forget schedules: 63',
     'timeout promise sleep or timeout schedules: 14',
     'timeout returned handle schedules: 1',
@@ -4270,41 +4270,41 @@ test('lifecycle instance register enumerates every current observer listener tim
     'clearTimeout rows with direct schedule handle: 32',
     'clearTimeout rows without direct schedule handle: 2',
     'handled timeout schedule rows with clear handle: 26',
-    'handled timeout schedule rows without clear handle: 19',
+    'handled timeout schedule rows without clear handle: 20',
     'distinct scheduled timeout handles without clear: 18',
     'clearInterval rows with direct schedule handle: 4',
     'clearInterval rows without direct schedule handle: 0',
     'handled interval schedule rows with clear handle: 3',
     'handled interval schedule rows without clear handle: 0',
     'distinct scheduled interval handles without clear: 0',
-    'content runtime timer schedule/clear delta: 61',
+    'content runtime timer schedule/clear delta: 62',
     'extension UI background timer schedule/clear delta: 28',
     'website component timer schedule/clear delta: -1',
     'timer schedule/clear cleanup approval: NO-GO',
     'ASCII timer schedule/clear parity flow diagram: present',
     'Mermaid timer schedule/clear parity flow diagram: present',
     'Timer Owner Domain Context Addendum - 2026-05-30',
-    'timer owner-context rows: 126',
+    'timer owner-context rows: 127',
     'timer owner domains: 13',
-    'content-runtime timer owner-context rows: 86',
+    'content-runtime timer owner-context rows: 87',
     'extension UI/background timer owner-context rows: 39',
     'website component timer owner-context rows: 1',
     'content bridge timer owner-context rows: 37',
     'quick/menu timer owner-context rows: 16',
     'dashboard timer owner-context rows: 15',
     'background timer owner-context rows: 10',
-    'dom fallback timer owner-context rows: 10',
+    'dom fallback timer owner-context rows: 11',
     'timer owner-context cleanup approval: NO-GO',
     'ASCII timer owner-domain flow diagram: present',
     'Mermaid timer owner-domain flow diagram: present',
     'Timer Owner Delay Budget Addendum - 2026-05-30',
-    'timer owner delay-budget rows: 126',
+    'timer owner delay-budget rows: 127',
     'timer owner immediate-zero budget rows: 16',
     'timer owner short-under-200ms budget rows: 34',
     'timer owner medium-200-999ms budget rows: 17',
     'timer owner long-1000ms-plus budget rows: 17',
     'timer owner bounded-expression budget rows: 5',
-    'timer owner named-or-expression budget rows: 37',
+    'timer owner named-or-expression budget rows: 38',
     'content bridge immediate-or-short timer budget rows: 13',
     'quick/menu immediate-or-short timer budget rows: 9',
     'dom fallback immediate-or-short timer budget rows: 6',
@@ -4636,7 +4636,7 @@ test('lifecycle instance source-family totals match the current register doc', (
   const doc = read(registerPath);
 
   assert.deepEqual(countBy(rows, 'sourceFamily'), {
-    'content-runtime-js': 218,
+    'content-runtime-js': 219,
     'extension-ui-background-js': 271,
     'generated-ui-output': 4,
     'vendor-bundles': 8,
@@ -4645,11 +4645,11 @@ test('lifecycle instance source-family totals match the current register doc', (
 
   for (const phrase of [
     '| `extension-ui-background-js` | 271 |',
-    '| `content-runtime-js` | 218 |',
+    '| `content-runtime-js` | 219 |',
     '| `website-components` | 23 |',
     '| `vendor-bundles` | 8 |',
     '| `generated-ui-output` | 4 |',
-    '| **Total lifecycle instances** | **524** |'
+    '| **Total lifecycle instances** | **525** |'
   ]) {
     assert.ok(doc.includes(phrase), `missing doc phrase ${phrase}`);
   }
@@ -4671,7 +4671,7 @@ test('lifecycle instance hot files remain pinned before cleanup work', () => {
   assert.equal(byFile['js/popup.js'], 33);
   assert.equal(byFile['js/ui_components.js'], 26);
   assert.equal(byFile['js/background.js'], 14);
-  assert.equal(byFile['js/content/dom_fallback.js'], 13);
+  assert.equal(byFile['js/content/dom_fallback.js'], 14);
   assert.equal(byFile['js/injector.js'], 12);
   assert.equal(byFile['js/content/bridge_settings.js'], 10);
   assert.equal(byFile['js/render_engine.js'], 9);
@@ -4682,10 +4682,10 @@ test('lifecycle instance hot files remain pinned before cleanup work', () => {
 
   assert.deepEqual(roleCounts, {
     'explicit-teardown': 55,
-    'install-or-schedule': 469
+    'install-or-schedule': 470
   });
   assert.deepEqual(countInstallTeardownBySourceFamily(rows), {
-    'content-runtime-js': { install: 189, teardown: 29, total: 218 },
+    'content-runtime-js': { install: 190, teardown: 29, total: 219 },
     'extension-ui-background-js': { install: 257, teardown: 14, total: 271 },
     'generated-ui-output': { install: 2, teardown: 2, total: 4 },
     'vendor-bundles': { install: 8, teardown: 0, total: 8 },
@@ -4694,14 +4694,14 @@ test('lifecycle instance hot files remain pinned before cleanup work', () => {
 
   for (const phrase of [
     'Install/Teardown Imbalance Addendum - 2026-05-27',
-    '| `install-or-schedule` | `addEventListener`, `MutationObserver`, `IntersectionObserver`, `setInterval`, `setTimeout`, `requestAnimationFrame` | 469 |',
+    '| `install-or-schedule` | `addEventListener`, `MutationObserver`, `IntersectionObserver`, `setInterval`, `setTimeout`, `requestAnimationFrame` | 470 |',
     '| `explicit-teardown` | `removeEventListener`, `clearInterval`, `clearTimeout`, `cancelAnimationFrame` | 55 |',
     '| `extension-ui-background-js` | 257 | 14 | 271 |',
-    '| `content-runtime-js` | 189 | 29 | 218 |',
+    '| `content-runtime-js` | 190 | 29 | 219 |',
     '| `vendor-bundles` | 8 | 0 | 8 |',
     '| `website-components` | 13 | 10 | 23 |',
     '| `generated-ui-output` | 2 | 2 | 4 |',
-    'install-or-schedule lifecycle instances: 469',
+    'install-or-schedule lifecycle instances: 470',
     'explicit-teardown lifecycle instances: 55',
     'install-to-teardown ratio: 8.5:1',
     'shared lifecycle registry in product source: absent',
@@ -4793,11 +4793,11 @@ test('lifecycle instance register links the source-derived DOM fallback lifecycl
     'DOM Fallback Lifecycle Callback Addendum',
     'docs/audit/FILTERTUBE_DOM_FALLBACK_LIFECYCLE_CALLBACK_SEMANTIC_REGISTER_2026-05-21.md',
     'tests/runtime/dom-fallback-lifecycle-callback-semantic-register-current-behavior.test.mjs',
-    '`js/content/dom_fallback.js` 13-instance hot-file row',
+    '`js/content/dom_fallback.js` 14-instance hot-file row',
     'source-derived callback/effect groups',
     '3 addEventListener',
-    '10 setTimeout',
-    '7 semantic callback',
+    '11 setTimeout',
+    '8 semantic callback',
     'current-watch owner retry/navigation timers',
     'page-lifetime scroll state',
     'playlist click/ended guards',
@@ -4909,9 +4909,9 @@ function assertModeSplitObserverBudgetAddendum() {
   for (const row of [
     /\| Empty desktop blocklist \| `docs\/audit\/FILTERTUBE_EMPTY_INSTALL_IDLE_OBSERVER_BUDGET_CURRENT_BEHAVIOR_2026-05-26\.md:81-145` \|/,
     /\| Active desktop blocklist \| `js\/content\/block_channel\.js:353-365`, `js\/content\/block_channel\.js:1979-2028` \|/,
-    /\| Mobile\/coarse YouTube \| `js\/content\/block_channel\.js:1291-1293`, `js\/content_bridge\.js:6473-6487`, `js\/content_bridge\.js:7139-7149` \|/,
-    /\| Whitelist mode \| `js\/content_bridge\.js:1006-1015`, `js\/content_bridge\.js:1211-1226`, `js\/content_bridge\.js:1286-1301` \|/,
-    /\| DOM fallback active work \| `js\/content_bridge\.js:6356-6446` \|/,
+    /\| Mobile\/coarse YouTube \| `js\/content\/block_channel\.js:1291-1293`, `js\/content_bridge\.js:6525-6538`, `js\/content_bridge\.js:7146-7255` \|/,
+    /\| Whitelist mode \| `js\/content_bridge\.js:1006-1015`, `js\/content_bridge\.js:1210-1270`, `js\/content_bridge\.js:1286-1301` \|/,
+    /\| DOM fallback active work \| `js\/content_bridge\.js:6408-6505` \|/,
     /\| Collaborator dialog \| `js\/content\/collab_dialog\.js:29-31`, `js\/content\/collab_dialog\.js:370-378` \|/,
     /\| Seed JSON idle transport \| `js\/seed\.js:97-134`, `js\/seed\.js:684-698` \|/
   ]) {
@@ -4990,13 +4990,13 @@ function assertMobileCoarseObserverBudgetAddendum() {
   assert.match(doc, /flowchart TD/);
 
   for (const row of [
-    /\| Surface classifier \| `js\/content\/block_channel\.js:121-141`, `js\/content_bridge\.js:6473-6483` \|/,
+    /\| Surface classifier \| `js\/content\/block_channel\.js:121-141`, `js\/content_bridge\.js:6525-6538` \|/,
     /\| Quick-block mobile style\/admission \| `js\/content\/block_channel\.js:1291-1300`, `js\/content\/block_channel\.js:1369-1403`, `js\/content\/block_channel\.js:1774-1800` \|/,
     /\| Quick-block mobile observer \| `js\/content\/block_channel\.js:1979-1989`, `js\/content\/block_channel\.js:2212-2275`, `js\/content\/block_channel\.js:2277-2289` \|/,
-    /\| Fallback eager admission \| `js\/content_bridge\.js:6473-6487`, `js\/content_bridge\.js:6489-6498` \|/,
+    /\| Fallback eager admission \| `js\/content_bridge\.js:6525-6538`, `js\/content_bridge\.js:6541-6550` \|/,
     /\| Fallback visible scan budget \| `js\/content_bridge\.js:6917-6946`, `js\/content_bridge\.js:7051-7084` \|/,
-    /\| Fallback observer\/listener\/warmup budget \| `js\/content_bridge\.js:7094-7139`, `js\/content_bridge\.js:7151-7206` \|/,
-    /\| Native overlay quiet gate \| `js\/content_bridge\.js:16-25`, `js\/content_bridge\.js:7051-7084`, `js\/content_bridge\.js:7094-7206` \|/
+    /\| Fallback observer\/listener\/warmup budget \| `js\/content_bridge\.js:7146-7179`, `js\/content_bridge\.js:7190-7255` \|/,
+    /\| Native overlay quiet gate \| `js\/content_bridge\.js:16-25`, `js\/content_bridge\.js:7051-7084`, `js\/content_bridge\.js:7146-7255` \|/
   ]) {
     assert.match(doc, row);
   }
@@ -5096,12 +5096,12 @@ function assertWatchYtmKidsObserverBudgetAddendum() {
   assert.match(doc, /flowchart TD/);
 
   for (const row of [
-    /\| Watch playlist prefetch hook \| `js\/content_bridge\.js:1162-1209` \|/,
-    /\| Whitelist watch right-rail skip \| `js\/content_bridge\.js:1211-1223` \|/,
+    /\| Watch playlist prefetch hook \| `js\/content_bridge\.js:1165-1208` \|/,
+    /\| Whitelist right-rail observer \| `js\/content_bridge\.js:1210-1270` \|/,
     /\| DOM playlist click\/autoplay guards \| `js\/content\/dom_fallback\.js:2337-2440` \|/,
     /\| YTM\/watch\/Kids quick-block selectors \| `js\/content\/block_channel\.js:1089-1133`, `js\/content\/block_channel\.js:1979-2028` \|/,
     /\| YTM fallback menu host and scan lifecycle \| `js\/content_bridge\.js:6601-6609`, `js\/content_bridge\.js:6657-6716`, `js\/content_bridge\.js:6945-7149` \|/,
-    /\| Kids passive menu listener \| `js\/content\/block_channel\.js:2304-2307`, `js\/content\/block_channel\.js:2595-2639`, `js\/content\/block_channel\.js:2764-2859` \|/,
+    /\| Kids passive menu listener \| `js\/content\/block_channel\.js:2318-2321`, `js\/content\/block_channel\.js:2595-2639`, `js\/content\/block_channel\.js:2764-2859` \|/,
     /\| Existing fixture\/document proof \| `docs\/audit\/FILTERTUBE_YTM_WATCH_PLAYER_OBSERVER_TIMER_BUDGET_CURRENT_BEHAVIOR_2026-05-23\.md:24-53`, `docs\/audit\/FILTERTUBE_MENU_OBSERVER_KIDS_PASSIVE_LIFECYCLE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23\.md:102-121` \|/
   ]) {
     assert.match(doc, row);
@@ -5113,7 +5113,6 @@ function assertWatchYtmKidsObserverBudgetAddendum() {
   assert.match(playlistPrefetchHook, /const observer = new MutationObserver/);
   assert.match(playlistPrefetchHook, /observer\.observe\(panel, \{ childList: true, subtree: true \}\);/);
   assert.match(playlistPrefetchHook, /document\.addEventListener\('yt-navigate-finish'/);
-  assert.match(rightRailWhitelist, /if \(\(document\.location\?\.pathname \|\| ''\)\.startsWith\('\/watch'\)\) return;/);
   assert.match(rightRailWhitelist, /observer\.observe\(rail, \{ childList: true, subtree: true \}\);/);
   assert.match(playlistGuards, /window\.__filtertubePlaylistNavGuardInstalled = true;/);
   assert.match(playlistGuards, /document\.addEventListener\('click'/);
@@ -5260,8 +5259,8 @@ function assertRuntimeLifecycleConvergenceBoundary() {
     .join('\n');
 
   assert.match(doc, /Runtime Lifecycle Convergence Boundary - 2026-05-30/);
-  assert.match(doc, /524 tracked lifecycle primitive instances/);
-  assert.match(doc, /469 install-or-schedule rows/);
+  assert.match(doc, /525 tracked lifecycle primitive instances/);
+  assert.match(doc, /470 install-or-schedule rows/);
   assert.match(doc, /55 explicit teardown rows/);
   assert.match(doc, /missing shared lifecycle effect\/teardown authority/);
   assert.match(doc, /flowchart TD/);
@@ -5284,8 +5283,8 @@ function assertRuntimeLifecycleConvergenceBoundary() {
   for (const phrase of [
     /runtime lifecycle convergence rows: 10/,
     /implementation-ready runtime lifecycle convergence rows: 0/,
-    /tracked lifecycle primitive instances: 524/,
-    /install-or-schedule lifecycle rows: 469/,
+    /tracked lifecycle primitive instances: 525/,
+    /install-or-schedule lifecycle rows: 470/,
     /explicit teardown lifecycle rows: 55/,
     /hot YouTube SPA lifecycle owner rows: 16/,
     /YouTube SPA immediate\/short hot timer rows: 33/,

@@ -169,9 +169,9 @@ test('collector insertion approval rows counts and fields stay pinned', () => {
   assert.match(doc, /runtime unclaimed-surface approvals: 0/);
   assert.match(doc, /implementation-ready collector insertion approval rows: 0/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5681/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5701/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5681/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5701/);
   assert.match(doc, /expected runtime audit tests: 4457/);
   assert.match(doc, /expected runtime audit pass: 4457/);
   assert.match(doc, /expected runtime audit fail: 0/);
@@ -207,7 +207,7 @@ test('collector insertion approval is backed by current NO-GO gates', () => {
   assert.match(sourceLocusClosure, /use source-locus classification as collector approval now: NO-GO/);
   assert.match(sourceLocusClosure, /method semantic proof gap files covered: 69/);
   assert.match(methodGap, /files with lexical accounting: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5681/);
+  assert.match(methodGap, /repo-wide lexical callables: 5701/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(collectorNoWork, /runtime collector no-work proofs approved: 0/);
   assert.match(collectorSideEffect, /runtime collector side-effect budgets approved: 0/);

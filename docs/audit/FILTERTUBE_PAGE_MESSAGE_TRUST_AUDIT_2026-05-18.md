@@ -88,26 +88,26 @@ Accepted `content_bridge.js` message rows:
 
 | Message row | Source pin | Pending/request ownership today | Current side-effect class |
 | --- | --- | --- | --- |
-| `FilterTube_InjectorToBridge_Ready` | `js/content_bridge.js:5842` | Not request-owned. | Requests settings from background. |
-| `FilterTube_Refresh` | `js/content_bridge.js:5844` | Not request-owned. | Requests settings and forces DOM fallback reprocessing. |
-| `FilterTube_UpdateChannelMap` | `js/content_bridge.js:5848` | Not request-owned. | Persists learned channel mappings. |
-| `FilterTube_UpdateVideoChannelMap` | `js/content_bridge.js:5851` | Not request-owned. | Persists learned video-channel mappings, stamps matching DOM cards, and can rerun DOM fallback. |
-| `FilterTube_UpdateVideoMetaMap` | `js/content_bridge.js:5900` | Not request-owned. | Persists learned video metadata, touches DOM flags, and can schedule metadata rerun. |
-| `FilterTube_UpdateCustomUrlMap` | `js/content_bridge.js:5926` | Not request-owned. | Writes `channelMap` directly from the content bridge storage path. |
-| `FilterTube_CollaboratorInfoResponse` | `js/content_bridge.js:5939` | Pending request may resolve, but `videoId` collaborator application still runs when collaborators exist. | Applies collaborator identity and can rerun menus/DOM fallback. |
-| `FilterTube_SubscriptionsImportProgress` | `js/content_bridge.js:5965` | Owned by `pendingSubscriptionImportRequests`. | Refreshes pending import timeout and progress. |
-| `FilterTube_SubscriptionsImportResponse` | `js/content_bridge.js:5984` | Owned by `pendingSubscriptionImportRequests`. | Resolves pending import response. |
-| `FilterTube_CacheCollaboratorInfo` | `js/content_bridge.js:5992` | Not request-owned. | Stamps cards and applies collaborator identity by video ID. |
-| `FilterTube_ChannelInfoResponse` | `js/content_bridge.js:6031` | Owned by `pendingChannelInfoRequests`. | Resolves pending single-channel lookup. |
-| `FilterTube_CollabDialogData` | `js/content_bridge.js:6042` | Partially owned by `pendingCollabCards` when `collabKey` matches; `videoId` application still runs independently. | Applies dialog collaborators by card key and/or video ID. |
+| `FilterTube_InjectorToBridge_Ready` | `js/content_bridge.js:5894` | Not request-owned. | Requests settings from background. |
+| `FilterTube_Refresh` | `js/content_bridge.js:5896` | Not request-owned. | Requests settings and forces DOM fallback reprocessing. |
+| `FilterTube_UpdateChannelMap` | `js/content_bridge.js:5900` | Not request-owned. | Persists learned channel mappings. |
+| `FilterTube_UpdateVideoChannelMap` | `js/content_bridge.js:5903` | Not request-owned. | Persists learned video-channel mappings, stamps matching DOM cards, and can rerun DOM fallback. |
+| `FilterTube_UpdateVideoMetaMap` | `js/content_bridge.js:5952` | Not request-owned. | Persists learned video metadata, touches DOM flags, and can schedule metadata rerun. |
+| `FilterTube_UpdateCustomUrlMap` | `js/content_bridge.js:5978` | Not request-owned. | Writes `channelMap` directly from the content bridge storage path. |
+| `FilterTube_CollaboratorInfoResponse` | `js/content_bridge.js:5991` | Pending request may resolve, but `videoId` collaborator application still runs when collaborators exist. | Applies collaborator identity and can rerun menus/DOM fallback. |
+| `FilterTube_SubscriptionsImportProgress` | `js/content_bridge.js:6017` | Owned by `pendingSubscriptionImportRequests`. | Refreshes pending import timeout and progress. |
+| `FilterTube_SubscriptionsImportResponse` | `js/content_bridge.js:6036` | Owned by `pendingSubscriptionImportRequests`. | Resolves pending import response. |
+| `FilterTube_CacheCollaboratorInfo` | `js/content_bridge.js:6044` | Not request-owned. | Stamps cards and applies collaborator identity by video ID. |
+| `FilterTube_ChannelInfoResponse` | `js/content_bridge.js:6083` | Owned by `pendingChannelInfoRequests`. | Resolves pending single-channel lookup. |
+| `FilterTube_CollabDialogData` | `js/content_bridge.js:6094` | Partially owned by `pendingCollabCards` when `collabKey` matches; `videoId` application still runs independently. | Applies dialog collaborators by card key and/or video ID. |
 
 Pending request map rows:
 
 | Pending map | Source pin | Current coverage |
 | --- | --- | --- |
-| `pendingCollaboratorRequests` | `js/content_bridge.js:5481` | Collaborator lookup request/response, but not all collaborator application. |
-| `pendingChannelInfoRequests` | `js/content_bridge.js:5489` | Single-channel lookup request/response. |
-| `pendingSubscriptionImportRequests` | `js/content_bridge.js:5497` | Subscription import progress/response. |
+| `pendingCollaboratorRequests` | `js/content_bridge.js:5472` | Collaborator lookup request/response, but not all collaborator application. |
+| `pendingChannelInfoRequests` | `js/content_bridge.js:5480` | Single-channel lookup request/response. |
+| `pendingSubscriptionImportRequests` | `js/content_bridge.js:5488` | Subscription import progress/response. |
 
 String-source and wildcard bridge rows:
 
@@ -121,13 +121,13 @@ String-source and wildcard bridge rows:
 
 | Claim | Current source |
 | --- | --- |
-| `content_bridge.js` accepts same-window `FilterTube_*` messages and excludes only `source: "content_bridge"` at the top of the handler. | `js/content_bridge.js:5838`, `js/content_bridge.js:5839` |
-| Learned video-channel map messages persist maps and can rerun DOM fallback. | `js/content_bridge.js:5859`, `js/content_bridge.js:5867`, `js/content_bridge.js:5899` |
-| Video metadata map messages persist data and can schedule DOM rerun. | `js/content_bridge.js:5909`, `js/content_bridge.js:5913`, `js/content_bridge.js:5921` |
-| Custom URL map messages write `channelMap` directly from the content bridge instead of a pending request or background enqueue path. | `js/content_bridge.js:5929`, `js/content_bridge.js:5933`, `js/content_bridge.js:5934` |
-| Collaborator cache messages can apply collaborator data by `videoId` without pending request ownership. | `js/content_bridge.js:5992`, `js/content_bridge.js:6024` |
-| Collaborator dialog messages are accepted and applied by `collabKey` or `videoId`. | `js/content_bridge.js:6042`, `js/content_bridge.js:6053`, `js/content_bridge.js:6064` |
-| Refresh messages can fetch settings and force DOM fallback reprocessing. | `js/content_bridge.js:5845`, `js/content_bridge.js:5846` |
+| `content_bridge.js` accepts same-window `FilterTube_*` messages and excludes only `source: "content_bridge"` at the top of the handler. | `js/content_bridge.js:5829`, `js/content_bridge.js:5830` |
+| Learned video-channel map messages persist maps and can rerun DOM fallback. | `js/content_bridge.js:5850`, `js/content_bridge.js:5858`, `js/content_bridge.js:5890` |
+| Video metadata map messages persist data and can schedule DOM rerun. | `js/content_bridge.js:5900`, `js/content_bridge.js:5904`, `js/content_bridge.js:5912` |
+| Custom URL map messages write `channelMap` directly from the content bridge instead of a pending request or background enqueue path. | `js/content_bridge.js:5920`, `js/content_bridge.js:5924`, `js/content_bridge.js:5925` |
+| Collaborator cache messages can apply collaborator data by `videoId` without pending request ownership. | `js/content_bridge.js:5983`, `js/content_bridge.js:6015` |
+| Collaborator dialog messages are accepted and applied by `collabKey` or `videoId`. | `js/content_bridge.js:6033`, `js/content_bridge.js:6044`, `js/content_bridge.js:6055` |
+| Refresh messages can fetch settings and force DOM fallback reprocessing. | `js/content_bridge.js:5836`, `js/content_bridge.js:5837` |
 | Injector accepts string-source messages from `content_bridge` and `filter_logic`. | `js/injector.js:1873`, `js/injector.js:1881`, `js/injector.js:1901`, `js/injector.js:1914`, `js/injector.js:1964` |
 | Collab dialog broadcasts with wildcard target and `source: "collab_dialog"`. | `js/content/collab_dialog.js:224` |
 
@@ -167,9 +167,9 @@ runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

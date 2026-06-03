@@ -8,7 +8,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_WHITELIST_CACHE_HOT_PATH_BOUNDARY_CURRENT_BEHAVIOR_2026-05-25.md';
 
 const sourceRows = [
-  ['js/content_bridge.js', 13571, 601694, '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3'],
+  ['js/content_bridge.js', 13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c'],
   ['js/background.js', 6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
   ['js/content/bridge_settings.js', 651, 26462, 'c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b'],
   ['js/content/handle_resolver.js', 282, 9785, '67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff'],
@@ -21,7 +21,7 @@ const blockRows = [
     'js/content_bridge.js',
     'function persistVideoChannelMapping(videoId, channelId) {',
     'let pendingVideoMetaDomRerunTimer = 0;',
-    1638,
+    1629,
     74,
     3441,
     '043d1f771d3652cd6f35fa205dbdfa92925ebf5e62eb392da800293c6b070dd7'
@@ -31,7 +31,7 @@ const blockRows = [
     'js/content_bridge.js',
     'function getCachedCollaboratorsFromCard(card) {',
     'function clearCollaboratorMetadataFromCard(card) {',
-    2652,
+    2643,
     94,
     4628,
     'd4c057c1e55d02d8f80062efcbd097b723c111fb5fcce05975aec1cac8684481'
@@ -41,7 +41,7 @@ const blockRows = [
     'js/content_bridge.js',
     'const ytInitialDataChannelCache = new Map();',
     '/**\n * Deeply inspect a ytInitialData-like object',
-    7917,
+    7969,
     117,
     4807,
     'ae717352ad0b82642af2ffa22128b309d60dca9f990ef579ea3ceaac6d70442f'
@@ -182,7 +182,7 @@ test('whitelist cache hot-path boundary records narrow dedupe and source pins', 
     assert.equal(sha256File(file), expectedHash, `${file} hash drifted`);
     assert.match(
       text,
-      new RegExp(`\\| \`${escapeRegExp(file)}\` \\| ${expectedLines} \\| ${expectedBytes} \\| \`${expectedHash}\` \\|`)
+      new RegExp(`\\| \`${escapeRegExp(file)}\` \\| ${expectedLines.toLocaleString('en-US')} \\| ${expectedBytes.toLocaleString('en-US')} \\| \`${expectedHash}\` \\|`)
     );
   }
 });

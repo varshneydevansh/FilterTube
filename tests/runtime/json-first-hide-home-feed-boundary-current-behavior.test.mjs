@@ -247,7 +247,7 @@ test('JSON-first hideHomeFeed boundary audit is audit-only and source pinned', (
 
   assert.ok(doc.includes(`| \`js/filter_logic.js\` | 3652 | 172174 | \`${sha256('js/filter_logic.js')}\` |`));
   assert.ok(doc.includes(`| \`js/seed.js\` | 1136 | 50026 | \`${sha256('js/seed.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 4838 | 228332 | \`${sha256('js/content/dom_fallback.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 5,030 | 235,555 | \`${sha256('js/content/dom_fallback.js')}\` |`));
   assert.ok(doc.includes(`| \`js/background.js\` | 6320 | 285103 | \`${sha256('js/background.js')}\` |`));
   assert.ok(doc.includes(`| \`js/settings_shared.js\` | 1181 | 57535 | \`${sha256('js/settings_shared.js')}\` |`));
 });
@@ -282,8 +282,8 @@ test('hideHomeFeed source counts remain pinned', () => {
   assert.equal(countLiteral(blocks.domFallback, 'data-filtertube-route-home'), 9);
   assert.equal(countLiteral(blocks.domFallback, 'ytm-rich-grid-renderer'), 2);
   assert.equal(countLiteral(blocks.domFallback, 'ytm-rich-section-renderer'), 2);
-  assert.equal(countLiteral(blocks.domFallback, 'ytm-item-section-renderer'), 6);
-  assert.equal(countLiteral(blocks.domFallback, 'ytm-section-list-renderer'), 2);
+  assert.equal(countLiteral(blocks.domFallback, 'ytm-item-section-renderer'), 7);
+  assert.equal(countLiteral(blocks.domFallback, 'ytm-section-list-renderer'), 3);
   assert.equal(countLiteral(blocks.background, 'hideHomeFeed'), 13);
   assert.equal(countLiteral(blocks.settingsShared, 'hideHomeFeed'), 23);
 
@@ -295,8 +295,8 @@ test('hideHomeFeed source counts remain pinned', () => {
   assert.match(doc, /DOM fallback total data-filtertube-route-home tokens: 9/);
   assert.match(doc, /DOM fallback total ytm-rich-grid-renderer tokens: 2/);
   assert.match(doc, /DOM fallback total ytm-rich-section-renderer tokens: 2/);
-  assert.match(doc, /DOM fallback total ytm-item-section-renderer tokens: 6/);
-  assert.match(doc, /DOM fallback total ytm-section-list-renderer tokens: 2/);
+  assert.match(doc, /DOM fallback total ytm-item-section-renderer tokens: 7/);
+  assert.match(doc, /DOM fallback total ytm-section-list-renderer tokens: 3/);
   assert.match(doc, /background total hideHomeFeed tokens: 13/);
   assert.match(doc, /settings_shared total hideHomeFeed tokens: 23/);
 });

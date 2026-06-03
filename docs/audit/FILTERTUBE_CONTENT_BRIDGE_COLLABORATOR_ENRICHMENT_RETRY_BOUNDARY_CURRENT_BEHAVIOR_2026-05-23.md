@@ -16,18 +16,18 @@ content bridge collaborator enrichment retry source/effect blocks: 6
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content_bridge.js` | 13571 | 601694 | `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3` |
+| `js/content_bridge.js` | 13,623 | 603,362 | `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c` |
 
 ## Pinned Blocks
 
 | Block | Start Line | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | ---: | --- |
-| `contentBridgeCollaboratorPendingDialogState` | 3308 | 66 | 2426 | `2fb03120d2c077a1700cdfd7c8dc46a906440eee4e63a5f140f77e1298315165` |
-| `contentBridgeCollaboratorRetry` | 3374 | 17 | 778 | `cbf39cc96640174f6df8bf2184b155bd8abde10ed01f759208ad577be474760f` |
-| `contentBridgeCollaboratorLookupOptions` | 3391 | 54 | 2358 | `710a851d88bb76cd65f3102c489accfdaa68e278a3967c070662cc033be40e7d` |
-| `contentBridgeCollaboratorEnrichmentRequest` | 3445 | 56 | 2572 | `80f0359372c11ac0614e4eceb12291bc2c853fe0504e4f195c2eb5c37b60c444` |
-| `contentBridgeApplyResolvedCollaborators` | 3501 | 102 | 3877 | `1e7fbf0db7c63fb93aceb9d952f65a97da5d26a442c5bfae080d8d789dc435e4` |
-| `contentBridgeApplyCollaboratorsByVideoId` | 3603 | 105 | 3995 | `3774b5599d4a959c83f6ea1c441985ba1b74304cb5d0720a79fd94006818459c` |
+| `contentBridgeCollaboratorPendingDialogState` | 3299 | 66 | 2426 | `2fb03120d2c077a1700cdfd7c8dc46a906440eee4e63a5f140f77e1298315165` |
+| `contentBridgeCollaboratorRetry` | 3365 | 17 | 778 | `cbf39cc96640174f6df8bf2184b155bd8abde10ed01f759208ad577be474760f` |
+| `contentBridgeCollaboratorLookupOptions` | 3382 | 54 | 2358 | `710a851d88bb76cd65f3102c489accfdaa68e278a3967c070662cc033be40e7d` |
+| `contentBridgeCollaboratorEnrichmentRequest` | 3436 | 56 | 2572 | `80f0359372c11ac0614e4eceb12291bc2c853fe0504e4f195c2eb5c37b60c444` |
+| `contentBridgeApplyResolvedCollaborators` | 3492 | 102 | 3877 | `1e7fbf0db7c63fb93aceb9d952f65a97da5d26a442c5bfae080d8d789dc435e4` |
+| `contentBridgeApplyCollaboratorsByVideoId` | 3594 | 105 | 3995 | `3774b5599d4a959c83f6ea1c441985ba1b74304cb5d0720a79fd94006818459c` |
 
 ## Selected Token Counts
 
@@ -119,9 +119,9 @@ surface can support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

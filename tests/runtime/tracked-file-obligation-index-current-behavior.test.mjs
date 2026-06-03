@@ -841,7 +841,7 @@ test('tracked_file_obligation_index_covers_runtime_release_docs_vendor_and_websi
 
   assert.match(doc, /FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25/);
   assert.match(doc, /69 method semantic proof gap files covered/);
-  assert.match(doc, /5,681 method semantic proof gap lexical callables covered/);
+  assert.match(doc, /5,697 method semantic proof gap lexical callables covered/);
   assert.match(doc, /0 files with complete per-callable semantic proof/);
 });
 
@@ -7745,7 +7745,7 @@ test('tracked_file_obligation_index_links_bridge_settings_listener_timer_boundar
   assert.match(doc, /53 subscription message listener block lines/);
   assert.match(doc, /2299 subscription message listener block bytes/);
   assert.match(doc, /122 runtime listener block lines/);
-  assert.match(doc, /5684 runtime listener block bytes/);
+  assert.match(doc, /5701 runtime listener block bytes/);
   assert.match(doc, /201 seed relay cluster block lines/);
   assert.match(doc, /8139 seed relay cluster block bytes/);
   assert.match(doc, /131 storage refresh cluster block lines/);
@@ -8232,7 +8232,7 @@ test('tracked_file_obligation_index_links_settings_refresh_cross_context_consume
   assert.match(doc, /41 background storage invalidation lines/);
   assert.match(doc, /1464 background storage invalidation bytes/);
   assert.match(doc, /121 bridge runtime listener lines/);
-  assert.match(doc, /5684 bridge runtime listener bytes/);
+  assert.match(doc, /5701 bridge runtime listener bytes/);
   assert.match(doc, /115 bridge request settings lines/);
   assert.match(doc, /5333 bridge request settings bytes/);
   assert.match(doc, /51 bridge seed delivery lines/);

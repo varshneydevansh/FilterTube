@@ -806,7 +806,7 @@ const affectedCallableSemanticFiles = [
     id: 'FT-WLCACHE-SEMANTIC-GAP-01-content-bridge',
     file: 'js/content_bridge.js',
     family: 'Hot page/background runtime',
-    lexicalCallables: 1198,
+    lexicalCallables: 1202,
     semanticStatus: 'semantic proof incomplete'
   },
   {
@@ -827,7 +827,7 @@ const affectedCallableSemanticFiles = [
     id: 'FT-WLCACHE-SEMANTIC-GAP-04-dom-fallback',
     file: 'js/content/dom_fallback.js',
     family: 'Hot page/background runtime',
-    lexicalCallables: 418,
+    lexicalCallables: 431,
     semanticStatus: 'semantic proof incomplete'
   },
   {
@@ -1190,21 +1190,21 @@ const affectedCallableAnchorChecks = [
   ['js/filter_logic.js', 94, 'function queueVideoMetaMapping(videoId, meta) {'],
   ['js/filter_logic.js', 1957, '_shouldBlock(item, rendererType) {'],
   ['js/filter_logic.js', 2065, "if (listMode === 'whitelist' && !isCommentRenderer) {"],
-  ['js/content_bridge.js', 1217, 'function installRightRailWhitelistObserver() {'],
-  ['js/content_bridge.js', 1225, 'const runWhitelistRefreshPass = () => {'],
-  ['js/content_bridge.js', 1391, 'async function prefetchIdentityForCard({ videoId, card }) {'],
-  ['js/content_bridge.js', 1638, 'function persistVideoChannelMapping(videoId, channelId) {'],
-  ['js/content_bridge.js', 1649, 'function persistVideoMetaMapping(entries = []) {'],
-  ['js/content_bridge.js', 1714, 'function scheduleVideoMetaDomRerun() {'],
-  ['js/content_bridge.js', 5851, "} else if (type === 'FilterTube_UpdateVideoChannelMap') {"],
-  ['js/content_bridge.js', 5900, "} else if (type === 'FilterTube_UpdateVideoMetaMap') {"],
+  ['js/content_bridge.js', 1210, 'function installRightRailWhitelistObserver() {'],
+  ['js/content_bridge.js', 1218, 'const runWhitelistRefreshPass = () => {'],
+  ['js/content_bridge.js', 1382, 'async function prefetchIdentityForCard({ videoId, card }) {'],
+  ['js/content_bridge.js', 1629, 'function persistVideoChannelMapping(videoId, channelId) {'],
+  ['js/content_bridge.js', 1640, 'function persistVideoMetaMapping(entries = []) {'],
+  ['js/content_bridge.js', 1705, 'function scheduleVideoMetaDomRerun() {'],
+  ['js/content_bridge.js', 5903, "} else if (type === 'FilterTube_UpdateVideoChannelMap') {"],
+  ['js/content_bridge.js', 5952, "} else if (type === 'FilterTube_UpdateVideoMetaMap') {"],
   ['js/content/bridge_settings.js', 557, 'function scheduleSettingsRefreshFromStorage({ forceReprocess = true } = {}) {'],
   ['js/content/bridge_settings.js', 589, 'function handleStorageChanges(changes, area) {'],
   ['js/background.js', 1648, 'function enqueueVideoChannelMapUpdate(videoId, channelId) {'],
   ['js/background.js', 1673, 'function enqueueVideoMetaMapUpdate(videoId, meta) {'],
   ['js/background.js', 1774, 'async function getCompiledSettings(sender = null, profileType = null, forceRefresh = false) {'],
-  ['js/content/dom_fallback.js', 2035, 'async function applyDOMFallback(settings, options = {}) {'],
-  ['js/content/dom_fallback.js', 3947, "if (onlyWhitelistPending && listMode === 'whitelist') {"],
+  ['js/content/dom_fallback.js', 2219, 'async function applyDOMFallback(settings, options = {}) {'],
+  ['js/content/dom_fallback.js', 4139, "if (onlyWhitelistPending && listMode === 'whitelist') {"],
   ['js/content/handle_resolver.js', 136, 'function scheduleDomFallbackRerun() {'],
   ['js/content/handle_resolver.js', 149, 'async function fetchIdForHandle(handle, options = {}) {'],
   ['js/seed.js', 220, 'function hasActiveJsonFilterRules(settings) {'],
@@ -1585,7 +1585,7 @@ test('whitelist/cache SPA metric packet gate is audit-only and source-backed', (
   assert.match(affectedDoc, /route\/mode callable budget collector approval dependency fields required: 20/);
   assert.match(affectedDoc, /affected callable semantic gap binding rows: 8/);
   assert.match(affectedDoc, /affected source files with method-gap rows: 8/);
-  assert.match(affectedDoc, /affected lexical callables requiring semantic proof: 2854/);
+  assert.match(affectedDoc, /affected lexical callables requiring semantic proof: 2871/);
   assert.match(affectedDoc, /affected semantic proof required fields: 8/);
   assert.match(affectedDoc, /affected callable semantic required-field closure rows: 8/);
   assert.match(affectedDoc, /affected callable semantic file-field cells required: 64/);
@@ -2099,7 +2099,7 @@ test('packet rows, live smoke rows, and diagrams remain explicit', () => {
   assert.equal(affectedCallableSemanticGapContract.runtimeBehaviorChanged, false);
   assert.deepEqual(affectedCallableSemanticGapContract.methodGapTotals, {
     filesCovered: 69,
-    lexicalCallablesCovered: 5681,
+    lexicalCallablesCovered: 5701,
     filesWithCompletePerCallableSemanticProof: 0,
     requiredSemanticProofFields: 8
   });
@@ -2107,7 +2107,7 @@ test('packet rows, live smoke rows, and diagrams remain explicit', () => {
   assert.deepEqual(affectedCallableSemanticGapContract.requiredSemanticFields, affectedCallableSemanticRequiredFields);
   assert.deepEqual(affectedCallableSemanticGapContract.approvalCounts, {
     affectedFileRows: 8,
-    affectedLexicalCallablesRequiringSemanticProof: 2854,
+    affectedLexicalCallablesRequiringSemanticProof: 2871,
     filesWithCompletePerCallableSemanticProof: 0,
     implementationReadyAffectedSemanticRows: 0,
     runtimeAffectedCallableSemanticApprovals: 0
@@ -2413,9 +2413,9 @@ test('packet rows, live smoke rows, and diagrams remain explicit', () => {
 
   const methodGapDoc = read(methodSemanticGapPath);
   assert.match(methodGapDoc, /method semantic proof gap files covered: 69/);
-  assert.match(methodGapDoc, /method semantic proof gap lexical callables covered: 5681/);
+  assert.match(methodGapDoc, /method semantic proof gap lexical callables covered: 5701/);
   assert.match(methodGapDoc, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGapDoc, /lexical callables requiring semantic proof before behavior changes: 5681/);
+  assert.match(methodGapDoc, /lexical callables requiring semantic proof before behavior changes: 5701/);
   assert.match(methodGapDoc, /affected callable semantic proof: NO-GO/);
   for (const row of affectedCallableSemanticFiles) {
     const methodGapRow = methodSemanticGapRow(methodGapDoc, row.file);
@@ -2832,7 +2832,7 @@ test('metric packet gate preserves optimization and JSON-first approval absence'
     assert.match(ledgerSource, /2026-05-30 whitelist\/cache affected callable semantic gap binding\s+continuation/);
     assert.match(ledgerSource, /8\s+affected\s+callable\s+semantic\s+gap\s+binding\s+rows/);
     assert.match(ledgerSource, /8\s+affected\s+source\s+files\s+with\s+method-gap\s+rows/);
-    assert.match(ledgerSource, /2854\s+affected\s+lexical\s+callables\s+requiring\s+semantic\s+proof/);
+    assert.match(ledgerSource, /2871\s+affected\s+lexical\s+callables\s+requiring\s+semantic\s+proof/);
     assert.match(ledgerSource, /8\s+affected\s+semantic\s+proof\s+required\s+fields/);
     assert.match(ledgerSource, /affected\s+files\s+with\s+complete\s+per-callable\s+semantic\s+proof\s+(?:remain )?0/i);
     assert.match(ledgerSource, /runtime\s+affected\s+callable\s+semantic\s+approvals\s+(?:remain )?0/i);

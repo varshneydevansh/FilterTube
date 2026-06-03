@@ -10,7 +10,7 @@ const docPath = 'docs/audit/FILTERTUBE_STATS_SURFACE_LEGACY_METRIC_BOUNDARY_CURR
 
 const sourceFingerprints = {
   'js/content/dom_helpers.js': [206, 8292, 'a8c6ebfc10394f67254fbe5d324090ba9d01bead7efbb61d44e63dda4b52c242'],
-  'js/content_bridge.js': [13571, 601694, '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3'],
+  'js/content_bridge.js': [13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c'],
   'js/background.js': [6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
   'js/settings_shared.js': [1181, 57535, '9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c'],
   'js/state_manager.js': [2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6'],

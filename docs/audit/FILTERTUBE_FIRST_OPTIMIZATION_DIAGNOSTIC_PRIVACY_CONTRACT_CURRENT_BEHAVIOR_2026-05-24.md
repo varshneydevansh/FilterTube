@@ -42,7 +42,7 @@ remains open.
 | Input | Current proof used |
 | --- | --- |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SIDE_EFFECT_BUDGET_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `side-effect-budget.json` shape, but proves 0 side-effect budget files and 0 runtime collector approvals exist. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 tracked JS/JSX/MJS files and 5,681 lexical callables still lack complete per-callable semantic proof before behavior changes. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 tracked JS/JSX/MJS files and 5,697 lexical callables still lack complete per-callable semantic proof before behavior changes. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_NO_WORK_PRESERVATION_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `no-work-preservation.json` shape, but proves 0 no-work preservation files and 0 runtime collector approvals exist. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_FIXTURE_PROVENANCE_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `fixture-provenance.json` shape, but proves 0 fixture provenance files and 0 runtime collector approvals exist. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SOURCE_OWNER_MAP_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `source-owner-map.json` shape, but proves 0 source owner map files and 0 runtime collector approvals exist. |
@@ -90,9 +90,9 @@ console.error callsites covered: 68
 console.debug callsites covered: 24
 console.info callsites covered: 0
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 inline diagnostic privacy JSON sections covered: 12
 inline diagnostic privacy artifact promotion decision: NO-GO
 diagnostic privacy draft closure rows: 12
@@ -112,7 +112,7 @@ collector readiness families linked by diagnostic closure: 5
 diagnostic logging policy source files linked by diagnostic closure: 21
 active console callsites linked by diagnostic closure: 418
 method semantic proof gap files linked by diagnostic closure: 69
-lexical callables linked by diagnostic closure: 5681
+lexical callables linked by diagnostic closure: 5701
 runtime diagnostic privacy closure approvals: 0
 implementation-ready diagnostic privacy closure rows: 0
 diagnostic privacy draft closure: DIAGNOSTIC-PRIVACY-CHAIN-CLOSED
@@ -421,7 +421,7 @@ privacy approval. The addendum pins 12 collector diagnostic privacy approval
 boundary rows, 12 diagnostic privacy contract rows covered, 12 source-locus
 diagnostic privacy rows covered, 21 diagnostic logging policy source files
 covered, 419 active console callsites covered, 69 method semantic proof gap
-files covered, 5,681 lexical callables still requiring semantic proof, 0 files
+files covered, 5,697 lexical callables still requiring semantic proof, 0 files
 with complete per-callable semantic proof, 0 runtime source-owner approvals, 0
 runtime metric collector approvals, 0 runtime collector insertion points
 approved, 0 runtime collector diagnostic privacy approvals, 0 committed

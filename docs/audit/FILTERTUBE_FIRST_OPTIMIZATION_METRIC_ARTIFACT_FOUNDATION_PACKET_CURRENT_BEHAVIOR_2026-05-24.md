@@ -40,7 +40,7 @@ teardown/idempotence, and fixtures.
 | --- | --- |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_CANDIDATE_SELECTION_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | `FT-BIND-00-metric-artifact-foundation` is selected as the next audit-only work packet; 0 runtime behavior patches are selected. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_IMPLEMENTATION_READINESS_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | 14 readiness rows remain NO-GO with 0 runtime first optimization approvals. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | 69 tracked JS/JSX/MJS files and 5,681 lexical callables remain at 0 files with complete per-callable semantic proof; affected callable proof remains required before behavior changes. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | 69 tracked JS/JSX/MJS files and 5,697 lexical callables remain at 0 files with complete per-callable semantic proof; affected callable proof remains required before behavior changes. |
 | `docs/audit/FILTERTUBE_CANDIDATE_OBLIGATION_BINDING_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | `FT-BIND-00-metric-artifact-foundation` is the metric prerequisite for every work-reduction row, but no binding has a committed metric artifact. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_ARTIFACT_SCHEMA_CURRENT_BEHAVIOR_2026-05-24.md` | 12 schema rows define the required metric field groups; 0 committed first-optimization artifacts exist. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_SOURCE_OWNER_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 12 source-owner rows map the current runtime owners that would have to produce the fields; 0 owner rows are implementation-ready. |
@@ -68,9 +68,9 @@ collector parity rollout rows covered: 12
 route/surface obligations covered: 12
 diagnostic logging policy rows covered: 8
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 required foundation metric artifact packet exists: no
 committed foundation metric artifacts: 0
 runtime metric collectors approved: 0

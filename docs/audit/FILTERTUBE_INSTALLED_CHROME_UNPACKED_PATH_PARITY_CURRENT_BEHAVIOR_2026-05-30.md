@@ -25,7 +25,7 @@ Observed fields:
   "path": "/Users/devanshvarshney/FilterTube",
   "from_webstore": false,
   "location": 4,
-  "version": "3.3.1",
+  "version": "3.3.2",
   "has_started_service_worker": true,
   "incognito": null,
   "active_permissions": {

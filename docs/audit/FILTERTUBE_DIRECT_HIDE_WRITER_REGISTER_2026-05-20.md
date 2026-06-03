@@ -33,28 +33,29 @@ cleanup contract.
 | Ref | Class | Current owner | Current effect | Main risk |
 | --- | --- | --- | --- | --- |
 | `js/content/dom_helpers.js:91` | shared helper | `toggleVisibility()` | Adds `.filtertube-hidden`, `data-filtertube-hidden`, inline `display:none!important`, stats, tracker, and media side effects unless skipped. | Central sink is useful, but its input is a boolean and string reason rather than a structured decision. |
-| `js/content/dom_fallback.js:1424` | shell cleanup | Open-app button cleanup | Directly hides mobile/open-app affordances and marks `data-filtertube-hidden-open-app`. | Shell cleanup is outside shared content stats/media policy and outside generic stale marker cleanup. |
-| `js/content/dom_fallback.js:2184` | content broad hide | Members-only title/aria fallback | Hides the nearest video/card host and marks generic plus members-only markers. | Title/aria detection can broaden to host without a registry-owned sibling-visible proof. |
-| `js/content/dom_fallback.js:2206` | content broad hide | Members-only badge fallback | Hides card/watch host and marks generic plus members-only markers. | Host selector includes watch-shell targets, so a false badge match can hide broad surfaces. |
-| `js/content/dom_fallback.js:2212` | content broad hide | Members-only shelf fallback | Hides closest shelf/list around a membership host. | Parent hide can remove nonmatching siblings. |
-| `js/content/dom_fallback.js:2224` | content broad hide | Members-only playlist/link fallback | Hides shelf from UUMO/members-only link evidence. | Shelf-level target needs route and sibling-visible proof. |
-| `js/content/dom_fallback.js:2237` | content broad hide | Members-only shelf-title fallback | Hides shelf from title text. | Title text can make the whole shelf disappear. |
-| `js/content/dom_fallback.js:2264` | content broad hide | Playlist-card lockup fallback | Hides a collection-stack lockup. | Direct writer has no local shared restore report. |
-| `js/content/dom_fallback.js:2269` | content broad hide | Playlist-card shelf fallback | Hides closest shelf around a playlist lockup. | One matching lockup can remove a mixed shelf. |
-| `js/content/dom_fallback.js:2274` | content broad hide | Playlist-card horizontal-list fallback | Hides closest horizontal list around a playlist lockup. | One matching lockup can remove a mixed horizontal row. |
-| `js/content/dom_fallback.js:2286` | shell/control cleanup | Mixes chip fallback | Hides the `Mixes` chip when Mix playlists are hidden. | Control-chip cleanup uses generic hidden marker and can be restored by unrelated generic cleanup. |
-| `js/content/block_channel.js:1733` | user-action optimistic hide | Quick block immediate hide | Hides the resolved quick-block target after marking it blocked pending. | Valid user-action UX, but outside shared stats/media/restore authority. |
+| `js/content/dom_fallback.js:1576` | shell/control cleanup | Inline mobile search-result control cleanup | Hides search controls that appear inside mobile result cards and marks `data-filtertube-hidden-search-inline`. | Route-scoped control cleanup is outside shared content stats/media policy and needs route restore proof. |
+| `js/content/dom_fallback.js:1608` | shell cleanup | Open-app button cleanup | Directly hides mobile/open-app affordances and marks `data-filtertube-hidden-open-app`. | Shell cleanup is outside shared content stats/media policy and outside generic stale marker cleanup. |
+| `js/content/dom_fallback.js:2367` | content broad hide | Members-only title/aria fallback | Hides the nearest video/card host and marks generic plus members-only markers. | Title/aria detection can broaden to host without a registry-owned sibling-visible proof. |
+| `js/content/dom_fallback.js:2389` | content broad hide | Members-only badge fallback | Hides card/watch host and marks generic plus members-only markers. | Host selector includes watch-shell targets, so a false badge match can hide broad surfaces. |
+| `js/content/dom_fallback.js:2395` | content broad hide | Members-only shelf fallback | Hides closest shelf/list around a membership host. | Parent hide can remove nonmatching siblings. |
+| `js/content/dom_fallback.js:2407` | content broad hide | Members-only playlist/link fallback | Hides shelf from UUMO/members-only link evidence. | Shelf-level target needs route and sibling-visible proof. |
+| `js/content/dom_fallback.js:2420` | content broad hide | Members-only shelf-title fallback | Hides shelf from title text. | Title text can make the whole shelf disappear. |
+| `js/content/dom_fallback.js:2447` | content broad hide | Playlist-card lockup fallback | Hides a collection-stack lockup. | Direct writer has no local shared restore report. |
+| `js/content/dom_fallback.js:2452` | content broad hide | Playlist-card shelf fallback | Hides closest shelf around a playlist lockup. | One matching lockup can remove a mixed shelf. |
+| `js/content/dom_fallback.js:2457` | content broad hide | Playlist-card horizontal-list fallback | Hides closest horizontal list around a playlist lockup. | One matching lockup can remove a mixed horizontal row. |
+| `js/content/dom_fallback.js:2469` | shell/control cleanup | Mixes chip fallback | Hides the `Mixes` chip when Mix playlists are hidden. | Control-chip cleanup uses generic hidden marker and can be restored by unrelated generic cleanup. |
+| `js/content/block_channel.js:1740` | user-action optimistic hide | Quick block immediate hide | Hides the resolved quick-block target after marking it blocked pending. | Valid user-action UX, but outside shared stats/media/restore authority. |
 | `js/content_bridge.js:509` | menu shell cleanup | FilterTube-owned fallback popover close helper | Hides a FilterTube-owned popover only if removal throws. | UI shell writer should be excluded from content hide/stats policy explicitly. |
 | `js/content_bridge.js:558` | menu shell cleanup | Native/mobile menu close helper | Hides a mobile/native dropdown and updates accessibility state. | UI shell writer should be excluded from content hide/stats policy explicitly. |
-| `js/content_bridge.js:6301` | pending hide | Whitelist pending hide | Hides newly observed cards in whitelist mode while identity is pending. | Fail-closed whitelist UX needs TTL, identity outcome, and restore owner. |
-| `js/content_bridge.js:7436` | user-action optimistic hide | Fallback menu row immediate hide | Hides the clicked fallback-menu row after block action begins. | User action is valid, but rollback and stats/media policy are local. |
-| `js/content_bridge.js:8421` | enrichment hide | Visible Shorts enrichment | Hides visible Shorts containers after a newly blocked channel is learned. | Post-action fanout can affect multiple visible nodes beyond the clicked target. |
-| `js/content_bridge.js:8540` | enrichment hide | Playlist-row enrichment | Hides playlist row target and marks `data-filtertube-hidden-by-playlist-enrichment`. | Better marker ownership, but still outside shared writer registry. |
-| `js/content_bridge.js:12228` | user-action optimistic hide | Main block flow optimistic hide transaction | Records previous state, marks blocked pending, then hides. | Stronger local rollback model, but not shared with other writers. |
 | `js/content_bridge.js:12280` | user-action confirmed hide | Main block flow confirmed hide | Marks blocked confirmed and hides a resolved element. | Confirmation still writes direct visual state outside shared authority. |
-| `js/content_bridge.js:12536` | user-action scoped immediate hide | Collaborator/channel immediate hide | Hides the clicked card target after collaborator/channel block. | The fanout was narrowed, but target and restore policy are still local. |
-| `js/content_bridge.js:13272` | user-action immediate hide | Comment context immediate hide | Hides a resolved comment target after block action. | Comment target requires separate comment/surface restore proof. |
-| `js/content_bridge.js:13289` | user-action immediate hide | Video/card immediate hide | Hides the clicked video/card target after block action. | Target resolver and restore policy are local to this path. |
+| `js/content_bridge.js:6353` | pending hide | Whitelist pending hide | Hides newly observed cards in whitelist mode while identity is pending. | Fail-closed whitelist UX needs TTL, identity outcome, and restore owner. |
+| `js/content_bridge.js:7488` | user-action optimistic hide | Fallback menu row immediate hide | Hides the clicked fallback-menu row after block action begins. | User action is valid, but rollback and stats/media policy are local. |
+| `js/content_bridge.js:8473` | enrichment hide | Visible Shorts enrichment | Hides visible Shorts containers after a newly blocked channel is learned. | Post-action fanout can affect multiple visible nodes beyond the clicked target. |
+| `js/content_bridge.js:8592` | enrichment hide | Playlist-row enrichment | Hides playlist row target and marks `data-filtertube-hidden-by-playlist-enrichment`. | Better marker ownership, but still outside shared writer registry. |
+| `js/content_bridge.js:12332` | user-action optimistic hide | Main block flow optimistic hide transaction | Records previous state, marks blocked pending, then hides. | Stronger local rollback model, but not shared with other writers. |
+| `js/content_bridge.js:12588` | user-action scoped immediate hide | Collaborator/channel immediate hide | Hides the clicked card target after collaborator/channel block. | The fanout was narrowed, but target and restore policy are still local. |
+| `js/content_bridge.js:13324` | user-action immediate hide | Comment context immediate hide | Hides a resolved comment target after block action. | Comment target requires separate comment/surface restore proof. |
+| `js/content_bridge.js:13341` | user-action immediate hide | Video/card immediate hide | Hides the clicked video/card target after block action. | Target resolver and restore policy are local to this path. |
 
 ## Count Baseline
 
@@ -63,10 +64,10 @@ Current active page-runtime direct `display:none` writes:
 | File | Count |
 | --- | ---: |
 | `js/content/dom_helpers.js` | 1 |
-| `js/content/dom_fallback.js` | 10 |
+| `js/content/dom_fallback.js` | 11 |
 | `js/content/block_channel.js` | 1 |
 | `js/content_bridge.js` | 11 |
-| **Total** | **23** |
+| **Total** | **24** |
 
 This count intentionally excludes dashboard/popup UI display toggles, legacy
 layout normalization, and generated/package output. Those are covered by the
@@ -78,11 +79,11 @@ writers that can affect YouTube content or in-page FilterTube affordances.
 | Class | Refs | Why it matters |
 | --- | --- | --- |
 | Shared helper | `js/content/dom_helpers.js:91` | Correct central visual sink, but still lacks structured writer/report fields. |
-| Shell/menu cleanup | `js/content/dom_fallback.js:1424`; `js/content_bridge.js:509`; `js/content_bridge.js:558`; `js/content/dom_fallback.js:2286` | These should not count as content filtering, but no shared policy says that. |
-| Broad-control fallback | `js/content/dom_fallback.js:2184`; `2206`; `2212`; `2224`; `2237`; `2264`; `2269`; `2274` | These can hide parents/shelves/rows and need sibling-visible fixtures. |
-| Pending identity | `js/content_bridge.js:6301` | Whitelist fail-closed can be correct, but needs identity outcome and TTL proof. |
-| User-action optimistic/confirmed hide | `js/content/block_channel.js:1733`; `js/content_bridge.js:7436`; `12228`; `12280`; `12536`; `13272`; `13289` | User actions justify immediate UX, but rollback, stats, media, and fanout must be explicit. |
-| Post-action enrichment hide | `js/content_bridge.js:8421`; `8540` | Successful channel block can hide additional visible Shorts/playlist rows. That needs a post-action fanout budget. |
+| Shell/menu cleanup | `js/content/dom_fallback.js:1576`; `1608`; `2469`; `js/content_bridge.js:509`; `js/content_bridge.js:558` | These should not count as content filtering, but no shared policy says that. |
+| Broad-control fallback | `js/content/dom_fallback.js:2367`; `2389`; `2395`; `2407`; `2420`; `2447`; `2452`; `2457` | These can hide parents/shelves/rows and need sibling-visible fixtures. |
+| Pending identity | `js/content_bridge.js:6353` | Whitelist fail-closed can be correct, but needs identity outcome and TTL proof. |
+| User-action optimistic/confirmed hide | `js/content/block_channel.js:1740`; `js/content_bridge.js:7488`; `12280`; `12332`; `12588`; `13324`; `13341` | User actions justify immediate UX, but rollback, stats, media, and fanout must be explicit. |
+| Post-action enrichment hide | `js/content_bridge.js:8473`; `8592` | Successful channel block can hide additional visible Shorts/playlist rows. That needs a post-action fanout budget. |
 
 ## Shared Helper External Dependency Boundary
 
@@ -245,9 +246,9 @@ runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

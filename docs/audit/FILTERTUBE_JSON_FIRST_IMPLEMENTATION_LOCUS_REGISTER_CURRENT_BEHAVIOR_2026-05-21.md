@@ -25,9 +25,9 @@ no-work, DOM parity, native parity, and metric proof.
 | --- | --- |
 | `js/seed.js` | 1,136 lines, 50,026 bytes, sha256 `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
 | `js/filter_logic.js` | 3,652 lines, 172,174 bytes, sha256 `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
-| `js/content_bridge.js` | 13,571 lines, 601,694 bytes, sha256 `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3` |
-| `js/content/dom_fallback.js` | 4,838 lines, 228,332 bytes, sha256 `2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef` |
-| `js/content/block_channel.js` | 3,175 lines, 127,396 bytes, sha256 `1b6fffa249a746c01686df0d6a05dc4b770a6f0c5ded08b78a7043c11e9cdd83` |
+| `js/content_bridge.js` | 13,623 lines, 603,362 bytes, sha256 `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c` |
+| `js/content/dom_fallback.js` | 5,030 lines, 235,555 bytes, sha256 `fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5` |
+| `js/content/block_channel.js` | 3,189 lines, 127,857 bytes, sha256 `c040b57e0b107fd7b6fb0a18bc4ca014e5a22fbb82755f81e51a497eee387dba` |
 
 Related proof layers:
 
@@ -49,12 +49,12 @@ Related proof layers:
 | `js/filter_logic.js:435` `FILTER_RULES` | Hand-authored renderer rules are the current JSON extraction surface. They are not generated from the documentation corpus and have no per-path provenance fields. | `jsonFirstRendererRuleManifest` tying renderer, endpoint, route, field effect, fixture, and documentation provenance before adding or deleting paths. |
 | `js/filter_logic.js:2263` `_checkCategoryFilters()` | Category rules can schedule `scheduleVideoMetaFetch(videoId, { needDuration: false, needDates: false, needCategory: true })` when metadata is absent. | `jsonFirstCategoryFetchDecision` with selected categories, mode, cache hit/miss, fetch budget, DOM rerun budget, and network artifact proof. |
 | `js/filter_logic.js:3588` `processData()` | Harvests channel data before the disabled-filtering skip, then mutates through `filter()` only after that. | `jsonFirstHarvestMutationBudget` separating passive learning, map writes, disabled mode, no-rule mode, and visible hide/allow mutations. |
-| `js/content_bridge.js:1794` `scheduleVideoMetaFetch()` | Normalizes video ids, checks existing duration/date/category metadata, queues metadata fetch work, and is shared by JSON and DOM category/duration/date gaps. | `jsonFirstMetadataFetchBudget` with reason, need flags, dedupe, concurrency, retry, cache write, and route/profile/list-mode proof. |
-| `js/content_bridge.js:6088` `initializeDOMFallback()` | Waits one second, applies DOM fallback, installs fallback menu buttons, and sets up debounced mutation-driven fallback work. | `jsonFirstDomLifecycleBudget` before pruning or quieting DOM fallback due to JSON coverage. |
-| `js/content/dom_fallback.js:1933` `hasActiveDOMFallbackWork()` | Treats whitelist mode as active work, checks broad boolean UI controls, requires strict content-filter booleans and selected categories, but still lacks route and value-validity proof for duration/upload-date work. | `jsonFirstDomActiveWorkReport` with route, selector owner, visible rule state, content-control scope, and false-hide/leak fixtures. |
-| `js/content/dom_fallback.js:2487` category metadata branch | DOM fallback schedules category metadata fetches and can mark pending category metadata for allow mode or home/search surfaces. | `jsonFirstDomCategoryParityReport` showing when DOM category work is required beside JSON filtering. |
-| `js/content_bridge.js:6489` `ensureFallbackMenuButtons()` | Installs fallback menu CSS and later owns menu repair listeners/observer/timer work outside the JSON engine. | `jsonFirstMenuLifecycleBudget` separating explicit user action affordances from passive filtering work. |
-| `js/content/block_channel.js:1205` and `js/content/block_channel.js:1979` | `isQuickBlockEnabled()` is the action gate, but `setupQuickBlockObserver()` still installs styles/listeners/observer/route sweep scheduling after the fixed `setTimeout()` at `js/content/block_channel.js:3172`. | `jsonFirstQuickBlockLifecycleBudget` with disabled, whitelist, enabled, mobile, desktop, and action-click fixtures. |
+| `js/content_bridge.js:1785` `scheduleVideoMetaFetch()` | Normalizes video ids, checks existing duration/date/category metadata, queues metadata fetch work, and is shared by JSON and DOM category/duration/date gaps. | `jsonFirstMetadataFetchBudget` with reason, need flags, dedupe, concurrency, retry, cache write, and route/profile/list-mode proof. |
+| `js/content_bridge.js:6140` `initializeDOMFallback()` | Waits one second, applies DOM fallback, installs fallback menu buttons, and sets up debounced mutation-driven fallback work. | `jsonFirstDomLifecycleBudget` before pruning or quieting DOM fallback due to JSON coverage. |
+| `js/content/dom_fallback.js:2117` `hasActiveDOMFallbackWork()` | Treats whitelist mode as active work, checks broad boolean UI controls, requires strict content-filter booleans and selected categories, but still lacks route and value-validity proof for duration/upload-date work. | `jsonFirstDomActiveWorkReport` with route, selector owner, visible rule state, content-control scope, and false-hide/leak fixtures. |
+| `js/content/dom_fallback.js:2669` category metadata branch | DOM fallback schedules category metadata fetches and can mark pending category metadata for allow mode or home/search surfaces. | `jsonFirstDomCategoryParityReport` showing when DOM category work is required beside JSON filtering. |
+| `js/content_bridge.js:6541` `ensureFallbackMenuButtons()` | Installs fallback menu CSS and later owns menu repair listeners/observer/timer work outside the JSON engine. | `jsonFirstMenuLifecycleBudget` separating explicit user action affordances from passive filtering work. |
+| `js/content/block_channel.js:1212` and `js/content/block_channel.js:1993` | `isQuickBlockEnabled()` is the action gate, but `setupQuickBlockObserver()` still installs styles/listeners/observer/route sweep scheduling after the fixed `setTimeout()` at `js/content/block_channel.js:3185`. | `jsonFirstQuickBlockLifecycleBudget` with disabled, whitelist, enabled, mobile, desktop, and action-click fixtures. |
 
 ## First-Class JSON Contract Shape
 
@@ -152,9 +152,9 @@ can support runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

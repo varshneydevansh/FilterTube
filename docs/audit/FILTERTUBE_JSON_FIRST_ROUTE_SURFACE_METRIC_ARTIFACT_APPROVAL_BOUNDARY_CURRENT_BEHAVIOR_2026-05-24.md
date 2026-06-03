@@ -27,9 +27,9 @@ JSON-first route/surface metric artifact approval boundary rows: 12
 Route/surface metric obligations covered: 12
 JSON-first fixture approval rows covered: 12
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5681
+Method semantic proof gap lexical callables covered: 5701
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5681
+Lexical callables requiring semantic proof before behavior changes: 5701
 Runtime route/surface metric artifact approvals: 0
 Runtime metric collector approvals: 0
 Runtime JSON-first implementation approvals: 0
@@ -60,7 +60,7 @@ release, and public-claim limits.
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_NO_WORK_PRESERVATION_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Maps no-work preservation obligations while proving 0 runtime collector no-work proofs approved. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_SIDE_EFFECT_BUDGET_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Maps collector side-effect budgets while proving 0 runtime collector side-effect budgets approved. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_FIXTURE_PROVENANCE_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Maps collector fixture provenance while proving 0 runtime collector fixture packets approved. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,681 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,697 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_IMPLEMENTATION_READINESS_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | Keeps first optimization implementation at NO-GO. |
 | `docs/audit/FILTERTUBE_OPTIMIZATION_STOP_GO_DECISION_RECORD_CURRENT_BEHAVIOR_2026-05-24.md` | Keeps stop-now JSON-first and whitelist optimization at NO-GO. |
 | `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` | Tracks audit harness counts as current-behavior proof, not metric artifact approval. |
@@ -81,9 +81,9 @@ metric collector side-effect rows covered: 12
 metric collector fixture provenance rows covered: 12
 first optimization implementation readiness rows covered: 14
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 runtime route/surface metric artifact approvals: 0
 runtime metric collector approvals: 0
 runtime JSON-first implementation approvals: 0

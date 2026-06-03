@@ -252,8 +252,8 @@ function loadVideoMetaRuntime({ initialSettings = {}, cards = [], anchors = [], 
 test('JSON-first video meta DOM rerun audit is audit-only and source pinned', () => {
   const text = doc();
   const hashes = {
-    'js/content_bridge.js': '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3',
-    'js/content/dom_fallback.js': '2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef',
+    'js/content_bridge.js': 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c',
+    'js/content/dom_fallback.js': 'fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5',
     'js/background.js': '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'
   };
 
@@ -262,8 +262,8 @@ test('JSON-first video meta DOM rerun audit is audit-only and source pinned', ()
   assert.match(text, /not a broad JSON-first patch/);
   assert.equal(lineCount(read('js/content_bridge.js')), 13571);
   assert.equal(Buffer.byteLength(read('js/content_bridge.js')), 601694);
-  assert.equal(lineCount(read('js/content/dom_fallback.js')), 4838);
-  assert.equal(Buffer.byteLength(read('js/content/dom_fallback.js')), 228332);
+  assert.equal(lineCount(read('js/content/dom_fallback.js')), 5030);
+  assert.equal(Buffer.byteLength(read('js/content/dom_fallback.js')), 235555);
   assert.equal(lineCount(read('js/background.js')), 6320);
   assert.equal(Buffer.byteLength(read('js/background.js')), 285103);
   for (const [file, hash] of Object.entries(hashes)) {

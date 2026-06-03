@@ -27,14 +27,14 @@ safe, or complete for every YouTube renderer.
 
 | Selector API | Current call sites | Static literal args | Dynamic/non-literal args |
 | --- | ---: | ---: | ---: |
-| `querySelectorAll()` | 148 | 106 | 42 |
+| `querySelectorAll()` | 150 | 107 | 43 |
 | `querySelector()` | 399 | 375 | 24 |
 | `closest()` | 96 | 93 | 3 |
 | `matches()` | 6 | 5 | 1 |
-| **Total** | **649** | **579** | **70** |
+| **Total** | **651** | **580** | **71** |
 
-The 579 static literal argument sites contain 374 unique literal selector
-strings. The 70 dynamic selector expressions include constants and assembled
+The 580 static literal argument sites contain 375 unique literal selector
+strings. The 71 dynamic selector expressions include constants and assembled
 selectors such as `VIDEO_CARD_SELECTORS`, `QUICK_BLOCK_CARD_SELECTORS`,
 `FT_DROPDOWN_SELECTORS`, `linkSelectors`, `selectors.join(',')`, and template
 selectors using runtime ids.
@@ -43,7 +43,7 @@ selectors using runtime ids.
 
 | Source family | Selector API sites | Static literal args | Dynamic/non-literal args | Unique static selector literals |
 | --- | ---: | ---: | ---: | ---: |
-| `page-runtime` | 496 | 426 | 70 | 286 |
+| `page-runtime` | 498 | 427 | 71 | 287 |
 | `extension-ui` | 90 | 90 | 0 | 42 |
 | `legacy-layout` | 63 | 63 | 0 | 52 |
 
@@ -52,7 +52,7 @@ selectors using runtime ids.
 | File | Selector API sites | Static literal args | Dynamic/non-literal args | Current concern |
 | --- | ---: | ---: | ---: | --- |
 | `js/content_bridge.js` | 246 | 208 | 38 | Native menu, fallback menu, prefetch, identity, collaborator, dynamic video-id selectors, and optimistic hide selectors share one large bridge. |
-| `js/content/dom_fallback.js` | 161 | 150 | 11 | Global card scans, route cleanup, comments, watch controls, members/playlist/Mix hides, and shelf cleanup. |
+| `js/content/dom_fallback.js` | 163 | 151 | 12 | Global card scans, route cleanup, comments, watch controls, members/playlist/Mix hides, and shelf cleanup. |
 | `js/tab-view.js` | 68 | 68 | 0 | Dashboard UI settings/profile/import/Nanah selectors. |
 | `js/layout.js` | 63 | 63 | 0 | Legacy/support layout selector surface; not active content-runtime authority unless explicitly loaded. |
 | `js/content/block_channel.js` | 39 | 28 | 11 | Quick-block and 3-dot menu selectors, including broad constants and overlay/menu constants. |
@@ -120,9 +120,10 @@ and
 `tests/runtime/dom-fallback-selector-semantic-register-current-behavior.test.mjs`
 promote the `js/content/dom_fallback.js` and `js/content/dom_helpers.js`
 hot-file rows from selector-count proof to source-derived selector/effect
-groups. The addendum pins 164 selector API sites, 152 static literal args, 12 dynamic/non-literal args, 120 unique static selector literals, 3 selector API
-families, 11 semantic selector groups, and 12 dynamic selector families. The
-dynamic families are `commentEntryCandidateArray`, `homeFeedSelectorArray`,
+groups. The addendum pins 166 selector API sites, 153 static literal args, 13 dynamic/non-literal args, 121 unique static selector literals, 3 selector API
+families, 10 semantic selector groups, and 13 dynamic selector families. The
+dynamic families are `inlineMobileSearchControlSelectorArray`,
+`commentEntryCandidateArray`, `homeFeedSelectorArray`,
 `staleHiddenSelectorArgument`, `videoCardPendingTemplate`,
 `globalVideoCardSelectorConstant`, `shortsContainerSelectorArray`,
 `mobileShortsNavSelectorArray`, `disguisedShortsSelectorArray`,
@@ -143,18 +144,18 @@ change, JSON-first promotion, or quick-block redesign.
 
 | Selector row | Source pins | Current gate/effect | Release risk controlled |
 | --- | --- | --- | --- |
-| `release_selector_quick_block_overlay_exclusion` | `js/content/block_channel.js:461:closest` | Mobile watch-next quick-block hosts are rejected when they are inside YouTube dropdown/bottom-sheet selectors. | Prevents quick-cross hosts from being attached inside active native overlays. |
-| `release_selector_quick_block_target_card` | `js/content/block_channel.js:1186:closest` | Pointer/focus targets resolve to `QUICK_BLOCK_CARD_SELECTORS` before falling back to bounded parent walking. | Preserves quick-cross recovery on deep Home/Shorts markup without global sweeping. |
-| `release_selector_quick_block_sweep_cards` | `js/content/block_channel.js:1944:querySelectorAll` | Coalesced sweeps scan only queued roots for `QUICK_BLOCK_CARD_SELECTORS` after quick-block active gates pass. | Keeps the quick-cross affordance available while avoiding the old broad periodic body sweep. |
-| `release_selector_menu_dropdown_repair_nested` | `js/content/block_channel.js:2330:querySelectorAll` | Hidden-state repair scans nested native menu/dropdown containers only during explicit menu-open repair. | Prevents reusable YouTube dropdown nodes from staying poisoned while avoiding unrelated dropdown mutation repair. |
-| `release_selector_menu_button_activation` | `js/content/block_channel.js:2359:closest` | Capture click listener resolves YouTube menu buttons through the shared `menuButtonSelector`. | Keeps 3-dot menu augmentation tied to explicit menu activation rather than page-wide dropdown observation. |
-| `release_selector_menu_outside_close_owned_items` | `js/content/block_channel.js:2481:querySelectorAll`, `js/content/block_channel.js:2484:querySelector` | Outside pointer close scans visible dropdown containers but closes only dropdowns containing `.filtertube-block-channel-item`. | Lets FilterTube-enriched comment/native menus close on outside selection without closing plain YouTube menus. |
-| `release_selector_dropdown_discovery_added_node` | `js/content/block_channel.js:2542:matches`, `js/content/block_channel.js:2546:querySelectorAll` | Short-lived dropdown discovery accepts added dropdown nodes or nested dropdown descendants. | Keeps menu injection responsive after a menu click while limiting discovery to the armed 2500 ms window. |
-| `release_selector_comment_menu_context_first` | `js/content/block_channel.js:2928-2935:closest` | Dropdown injection prefers comment-thread/comment-view-model/comment-renderer context before generic video-card selectors. | Prevents comment menu actions from falling back to the watch shell or right-rail wrapper. |
-| `release_selector_menu_existing_item_check` | `js/content/block_channel.js:3062:querySelector`, `js/content/block_channel.js:3065:querySelector` | Completed dropdown state is trusted only if the injected item and title span still exist. | Avoids stale “blocked” state while YouTube reuses dropdown nodes. |
-| `release_selector_menu_stale_item_cleanup` | `js/content/block_channel.js:3163:querySelectorAll` | Stale `.filtertube-block-channel-item` rows are removed before injection when the card cannot be identified. | Prevents an old FilterTube action row from leaking into a newly reused native menu. |
-| `release_selector_whitelist_pending_card_intake` | `js/content_bridge.js:6191:matches`, `js/content_bridge.js:6192:querySelector`, `js/content_bridge.js:6193:querySelectorAll` | Pending-hide intake reaches `VIDEO_CARD_SELECTORS` only after mode, route, overlay, and queue-limit guards pass. | Keeps whitelist pending-hide fail-closed repair without charging blocklist/empty routes for nested selector traversal. |
-| `release_selector_fallback_menu_mutation_card_intake` | `js/content_bridge.js:7101-7103:matches/closest` | Fallback-menu mutation scan checks `fallbackMenuCardSelector` only after overlay quiet mode and eager-scan gates pass. | Keeps fallback menu buttons lazy on desktop/no-work surfaces while preserving mobile/coarse-pointer recovery. |
+| `release_selector_quick_block_overlay_exclusion` | `js/content/block_channel.js:468:closest` | Mobile watch-next quick-block hosts are rejected when they are inside YouTube dropdown/bottom-sheet selectors. | Prevents quick-cross hosts from being attached inside active native overlays. |
+| `release_selector_quick_block_target_card` | `js/content/block_channel.js:1193:closest` | Pointer/focus targets resolve to `QUICK_BLOCK_CARD_SELECTORS` before falling back to bounded parent walking. | Preserves quick-cross recovery on deep Home/Shorts markup without global sweeping. |
+| `release_selector_quick_block_sweep_cards` | `js/content/block_channel.js:1958:querySelectorAll` | Coalesced sweeps scan only queued roots for `QUICK_BLOCK_CARD_SELECTORS` after quick-block active gates pass. | Keeps the quick-cross affordance available while avoiding the old broad periodic body sweep. |
+| `release_selector_menu_dropdown_repair_nested` | `js/content/block_channel.js:2344:querySelectorAll` | Hidden-state repair scans nested native menu/dropdown containers only during explicit menu-open repair. | Prevents reusable YouTube dropdown nodes from staying poisoned while avoiding unrelated dropdown mutation repair. |
+| `release_selector_menu_button_activation` | `js/content/block_channel.js:2373:closest` | Capture click listener resolves YouTube menu buttons through the shared `menuButtonSelector`. | Keeps 3-dot menu augmentation tied to explicit menu activation rather than page-wide dropdown observation. |
+| `release_selector_menu_outside_close_owned_items` | `js/content/block_channel.js:2495:querySelectorAll`, `js/content/block_channel.js:2498:querySelector` | Outside pointer close scans visible dropdown containers but closes only dropdowns containing `.filtertube-block-channel-item`. | Lets FilterTube-enriched comment/native menus close on outside selection without closing plain YouTube menus. |
+| `release_selector_dropdown_discovery_added_node` | `js/content/block_channel.js:2556:matches`, `js/content/block_channel.js:2560:querySelectorAll` | Short-lived dropdown discovery accepts added dropdown nodes or nested dropdown descendants. | Keeps menu injection responsive after a menu click while limiting discovery to the armed 2500 ms window. |
+| `release_selector_comment_menu_context_first` | `js/content/block_channel.js:2942-2949:closest` | Dropdown injection prefers comment-thread/comment-view-model/comment-renderer context before generic video-card selectors. | Prevents comment menu actions from falling back to the watch shell or right-rail wrapper. |
+| `release_selector_menu_existing_item_check` | `js/content/block_channel.js:3076:querySelector`, `js/content/block_channel.js:3079:querySelector` | Completed dropdown state is trusted only if the injected item and title span still exist. | Avoids stale “blocked” state while YouTube reuses dropdown nodes. |
+| `release_selector_menu_stale_item_cleanup` | `js/content/block_channel.js:3177:querySelectorAll` | Stale `.filtertube-block-channel-item` rows are removed before injection when the card cannot be identified. | Prevents an old FilterTube action row from leaking into a newly reused native menu. |
+| `release_selector_whitelist_pending_card_intake` | `js/content_bridge.js:6243:matches`, `js/content_bridge.js:6244:querySelector`, `js/content_bridge.js:6245:querySelectorAll` | Pending-hide intake reaches `VIDEO_CARD_SELECTORS` only after mode, route, overlay, and queue-limit guards pass. | Keeps whitelist pending-hide fail-closed repair without charging blocklist/empty routes for nested selector traversal. |
+| `release_selector_fallback_menu_mutation_card_intake` | `js/content_bridge.js:7153-7155:matches/closest` | Fallback-menu mutation scan checks `fallbackMenuCardSelector` only after overlay quiet mode and eager-scan gates pass. | Keeps fallback menu buttons lazy on desktop/no-work surfaces while preserving mobile/coarse-pointer recovery. |
 
 Current release selector status:
 
@@ -170,10 +171,10 @@ runtime behavior changed by this addendum: no
 
 | Finding | Evidence | Risk |
 | --- | --- | --- |
-| Selector authority is not centralized. | 649 selector API call sites across 12 non-vendor tracked files and no product `selectorAuthority` token. | A cleanup can narrow one selector path while another broad path still targets the same DOM. |
-| Page runtime dominates selector risk. | Page-runtime owns 496 of 649 selector API sites and all 70 dynamic selector expressions. | Empty-install lag, false hides, and route drift are mostly page-runtime selector risks. |
-| Static selector literals are numerous. | 579 literal selector-argument sites and 374 unique literal selector strings. | A broad edit needs a source-derived register, not manual memory of a few constants. |
-| Dynamic selectors need ownership proof. | 70 sites use constants, joined arrays, runtime templates, virtual selector wrappers, or caller-provided selector variables. | These cannot be proven safe by static literal review alone. |
+| Selector authority is not centralized. | 651 selector API call sites across 12 non-vendor tracked files and no product `selectorAuthority` token. | A cleanup can narrow one selector path while another broad path still targets the same DOM. |
+| Page runtime dominates selector risk. | Page-runtime owns 498 of 651 selector API sites and all 71 dynamic selector expressions. | Empty-install lag, false hides, and route drift are mostly page-runtime selector risks. |
+| Static selector literals are numerous. | 580 literal selector-argument sites and 375 unique literal selector strings. | A broad edit needs a source-derived register, not manual memory of a few constants. |
+| Dynamic selectors need ownership proof. | 71 sites use constants, joined arrays, runtime templates, virtual selector wrappers, or caller-provided selector variables. | These cannot be proven safe by static literal review alone. |
 | Inventory docs remain evidence maps. | `docs/youtube_renderer_inventory.md`, `docs/json_paths_encyclopedia.md`, and ignored root captures inform fixtures but are not selector authority. | A documented DOM tag is not proof that current runtime selects it safely. |
 
 ## Required Selector Instance Contract
@@ -237,9 +238,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

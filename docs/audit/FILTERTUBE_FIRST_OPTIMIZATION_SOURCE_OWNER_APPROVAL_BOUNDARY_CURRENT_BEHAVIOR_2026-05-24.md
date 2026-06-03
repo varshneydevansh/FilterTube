@@ -30,9 +30,9 @@ Runtime metric collector approvals: 0
 Runtime collector insertion points approved: 0
 Implementation-ready source-owner approval rows: 0
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5681
+Method semantic proof gap lexical callables covered: 5701
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5681
+Lexical callables requiring semantic proof before behavior changes: 5701
 ```
 
 This is a source-owner approval boundary, not a source-owner map. It requires a
@@ -52,7 +52,7 @@ collector approval can exist.
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_SAMPLE_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines sample owner attribution fields, but proves 0 committed metric sample files. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_PACKET_MANIFEST_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines manifest ownership fields, but proves 0 committed packet manifest files. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_COLLECTOR_APPROVAL_AUTHORITY_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves 0 runtime metric collector approvals and 0 implementation-ready collector approval rows. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,681 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,697 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_INSERTION_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | Proves 0 approved collector insertion points and 0 implementation-ready collector rows. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_IMPLEMENTATION_READINESS_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | Proves 0 runtime first optimization approvals and 0 implementation-ready first optimization rows. |
 | `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` | Runtime proof is tracked in the audit harness, not as source-owner approval. |
@@ -76,9 +76,9 @@ runtime metric collector approvals: 0
 runtime collector insertion points approved: 0
 implementation-ready source-owner approval rows: 0
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 expected runtime audit tests: 4457
 expected runtime audit pass: 4457
 expected runtime audit fail: 0

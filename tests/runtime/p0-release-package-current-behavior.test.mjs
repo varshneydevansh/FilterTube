@@ -431,7 +431,7 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
   assert.match(doc, /dist zip artifacts: 3/);
   assert.match(doc, /total dist files including zips: 180/);
   assert.match(doc, /source-backed staged files per browser excluding manifest: 58/);
-  assert.match(doc, /byte-identical source-backed staged files per browser excluding manifest: 58/);
+  assert.match(doc, /byte-identical source-backed staged files per browser excluding manifest: 54/);
   assert.match(doc, /committed package manifest: absent/);
   assert.match(doc, /zip checksum manifest: absent/);
   assert.match(doc, /reproducible build proof: absent/);
@@ -440,7 +440,7 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
   assert.match(doc, /flowchart TD/);
   assert.match(doc, /Release package parity authority remains NO-GO/);
   assert.match(doc, /local dist snapshot proof: PARTIAL/);
-  assert.match(doc, /source-backed staged byte parity: yes/);
+  assert.match(doc, /source-backed staged byte parity: partial/);
   assert.match(doc, /zip checksum snapshot: yes/);
   assert.match(doc, /committed release package manifest authority: NO-GO/);
   assert.match(doc, /reproducible package build authority: NO-GO/);
@@ -460,7 +460,7 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
     assert.equal(actual.stagedFiles, 59);
     assert.equal(actual.version, '3.3.2');
     assert.equal(actual.sourceBackedFiles, 58);
-    assert.equal(actual.byteIdenticalSourceBackedFiles, 58);
+    assert.equal(actual.byteIdenticalSourceBackedFiles, 54);
     assert.equal(actual.manifestBytes, expected.manifestBytes);
     assert.equal(actual.manifestSha256, expected.manifestSha256);
     assert.equal(actual.contentScriptEntries, expected.contentScriptEntries);
@@ -502,7 +502,7 @@ function assertInstalledRuntimeProvenanceSnapshot(doc) {
   assert.match(doc, /"preferences_pinned_extension": "present"/);
   assert.match(doc, /"secure_preferences_settings_object": "present"/);
   assert.match(doc, /"secure_preferences_path": "\$WORKSPACE_ROOT"/);
-  assert.match(doc, /"service_worker_registration_info": \{\s+"version": "3\.3\.1"\s+\}/);
+  assert.match(doc, /"service_worker_registration_info": \{\s+"version": "3\.3\.2"\s+\}/);
   assert.match(doc, /"withholding_permissions": false/);
   assert.match(doc, /Default\/Secure Preferences[\s\S]*proves Chrome is configured to load it from \$WORKSPACE_ROOT/);
   assert.match(doc, /incognito allow\/deny proof from the active incognito profile\/session/);
@@ -562,7 +562,7 @@ function assertInstalledRuntimeProvenanceSnapshot(doc) {
   assert.match(doc, /secure preferences path matches workspace root: yes/);
   assert.match(doc, /Default\/Preferences extension settings object present: no/);
   assert.match(doc, /Default\/Secure Preferences extension settings object present: yes/);
-  assert.match(doc, /stored extension\/service-worker version: 3\.3\.1/);
+  assert.match(doc, /stored extension\/service-worker version: 3\.3\.2/);
   assert.match(doc, /Default Local Extension Settings directory exists: yes/);
   assert.match(doc, /Default packed Extensions directory for this id exists: no/);
   assert.match(doc, /workspace content_bridge ampersand Topic fix token present: yes/);
@@ -631,7 +631,7 @@ function assertInstalledRuntimeProvenanceSnapshot(doc) {
   assert.deepEqual(chromeStats.grantedExplicitHosts, [...expectedManifestHostPermissions].sort());
   assert.deepEqual(chromeStats.activeScriptableHosts, [...expectedActiveManifestMatches].sort());
   assert.deepEqual(chromeStats.grantedScriptableHosts, [...expectedActiveManifestMatches].sort());
-  assert.equal(chromeStats.version, '3.3.1');
+  assert.equal(chromeStats.version, '3.3.2');
   assert.equal(chromeStats.localExtensionSettingsExists, true);
   assert.equal(chromeStats.packedExtensionDirExists, false);
   assert.equal(chromeStats.ampersandTopicFixTokenPresent, true);
@@ -684,10 +684,10 @@ test('P0 release package audit documents blocked verdict and all named gates', (
     assert.ok(doc.includes(phrase), `missing ${phrase}`);
   }
 
-  assert.match(methodGap, /repo-wide lexical callables: 5681/);
+  assert.match(methodGap, /repo-wide lexical callables: 5701/);
   assert.match(methodGap, /files with lexical accounting: 69/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5681/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5701/);
 
   assert.equal(releasePackageFamilyDocs.length, 9);
   for (const familyDocPath of releasePackageFamilyDocs) {
@@ -695,9 +695,9 @@ test('P0 release package audit documents blocked verdict and all named gates', (
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 69/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5681/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5701/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5681/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5701/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     assert.match(familyDoc, /runtime behavior changed: no/);
     assert.match(familyDoc, /do not approve runtime\s+optimization/);

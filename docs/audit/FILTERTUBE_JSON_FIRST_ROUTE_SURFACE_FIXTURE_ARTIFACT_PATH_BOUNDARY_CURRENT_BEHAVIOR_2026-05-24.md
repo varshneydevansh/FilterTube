@@ -19,9 +19,9 @@ The current boundary is:
 Reserved route/surface fixture packet root: docs/audit/artifacts/json-first/route-surface-fixture-packet/
 Reserved route/surface fixture packet files: 5
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5681
+Method semantic proof gap lexical callables covered: 5701
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5681
+Lexical callables requiring semantic proof before behavior changes: 5701
 Committed route/surface fixture packet files: 0
 Runtime JSON-first fixture packet approval exists: no
 Implementation-ready route/surface fixture artifact path rows: 0
@@ -42,7 +42,7 @@ from being treated as first-class filtering authority.
 | `docs/audit/FILTERTUBE_JSON_FIRST_IMPLEMENTATION_AUTHORITY_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Keeps JSON-first implementation at NO-GO until fixture, metric, parity, rollback, native/release, and public-claim proof exists. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_FIXTURE_PROVENANCE_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Proves collector fixture packets remain unapproved and implementation-blocking. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_FIXTURE_PROVENANCE_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future fixture provenance shape without creating fixture provenance files. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,681 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,697 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_IMPLEMENTATION_READINESS_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | Keeps first optimization implementation at NO-GO. |
 | `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` | Runtime proof is tracked by the audit harness, not as committed route/surface fixture packet files. |
 
@@ -53,9 +53,9 @@ JSON-first route/surface fixture artifact path rows: 6
 reserved future artifact roots: 1
 reserved future artifact files: 5
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 committed route/surface fixture packet files: 0
 runtime JSON-first fixture packet approvals: 0
 runtime route/surface metric artifacts: 0
@@ -147,7 +147,7 @@ prove the reserved route/surface fixture artifact root and files are still not
 commit-ready. The addendum pins 10 fixture artifact commit readiness rows, 1
 reserved future artifact root, 5 reserved future artifact files, 0 committed
 route/surface fixture packet files, 69 method semantic proof gap files
-covered, 5,681 method semantic proof gap lexical callables covered, 0 files
+covered, 5,697 method semantic proof gap lexical callables covered, 0 files
 with complete per-callable semantic proof, 0 runtime JSON-first fixture packet
 approvals, 0 runtime route/surface metric artifact approvals, 0 runtime metric
 collector approvals, and 0 implementation-ready route/surface fixture artifact
@@ -163,7 +163,7 @@ at the per-file contract level while artifact approval remains blocked. The adde
 reserved future artifact root, 5 reserved future artifact files, 1 aggregate
 fixture packet contract doc, 1 aggregate fixture packet contract test, 5
 per-file fixture artifact contract docs, 5 per-file fixture artifact contract
-tests, 69 method semantic proof gap files covered, 5,681 method semantic proof
+tests, 69 method semantic proof gap files covered, 5,697 method semantic proof
 gap lexical callables covered, 0 files with complete per-callable semantic
 proof, 0 committed route/surface fixture packet files, 0 runtime JSON-first
 fixture packet approvals, 0 runtime route/surface metric artifact approvals,

@@ -173,7 +173,7 @@ test('live chat DOM cleanup boundary audit is audit-only and source pinned', () 
   assert.match(doc, /live-chat DOM cleanup source\/effect blocks: 6/);
   assert.match(doc, /runtime live-chat DOM cleanup fixtures: 6/);
 
-  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 4838 | 228332 | \`${sha256('js/content/dom_fallback.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 5,030 | 235,555 | \`${sha256('js/content/dom_fallback.js')}\` |`));
 });
 
 test('live chat DOM cleanup source counts remain pinned', () => {

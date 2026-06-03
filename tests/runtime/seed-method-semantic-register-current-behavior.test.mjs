@@ -243,9 +243,9 @@ test('hot-runtime method semantic registers carry the method proof gap blocker',
 
   for (const marker of [
     'tracked JS/JSX/MJS files: 69',
-    'repo-wide lexical callables: 5681',
+    'repo-wide lexical callables: 5701',
     'files with complete per-callable semantic proof: 0',
-    'lexical callables requiring semantic proof before behavior changes: 5681',
+    'lexical callables requiring semantic proof before behavior changes: 5701',
     'runtime behavior changed: no'
   ]) {
     assert.ok(methodGap.includes(marker), `method gap source missing ${marker}`);
@@ -257,9 +257,9 @@ test('hot-runtime method semantic registers carry the method proof gap blocker',
     assert.ok(text.includes(methodGapPath), `${file} should cite method gap source`);
     assert.match(text, /## Method Semantic Proof Gap Boundary/);
     assert.match(text, /method semantic proof gap files covered: 69/);
-    assert.match(text, /method semantic proof gap lexical callables covered: 5681/);
+    assert.match(text, /method semantic proof gap lexical callables covered: 5701/);
     assert.match(text, /files with complete per-callable semantic proof: 0/);
-    assert.match(text, /lexical callables requiring semantic proof before behavior changes: 5681/);
+    assert.match(text, /lexical callables requiring semantic proof before behavior changes: 5701/);
     assert.match(text, /affected callable semantic proof: NO-GO/);
     assert.match(text, /runtime behavior changed: no/);
     assert.match(text, /do not approve runtime\s+optimization/);

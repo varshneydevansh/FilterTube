@@ -290,10 +290,10 @@ test('Shorts DOM cleanup boundary audit is audit-only and source pinned', () => 
   assert.match(doc, /Shorts DOM cleanup boundary source\/effect blocks: 12/);
   assert.match(doc, /runtime Shorts DOM cleanup fixtures: 9/);
 
-  assert.match(methodGap, /repo-wide lexical callables: 5681/);
+  assert.match(methodGap, /repo-wide lexical callables: 5701/);
   assert.match(methodGap, /files with lexical accounting: 69/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5681/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5701/);
 
   assert.equal(shortsFamilyDocs.length, 7);
   for (const familyDocPath of shortsFamilyDocs) {
@@ -301,15 +301,15 @@ test('Shorts DOM cleanup boundary audit is audit-only and source pinned', () => 
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 69/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5681/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5701/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5681/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5701/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     assert.match(familyDoc, /runtime behavior changed: no/);
     assert.match(familyDoc, /do not approve runtime\s+optimization/);
   }
 
-  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 4838 | 228332 | \`${sha256('js/content/dom_fallback.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 5,030 | 235,555 | \`${sha256('js/content/dom_fallback.js')}\` |`));
 });
 
 test('Shorts DOM cleanup source counts remain pinned', () => {
@@ -320,7 +320,7 @@ test('Shorts DOM cleanup source counts remain pinned', () => {
     ['active DOM fallback work block', blocks.activeBlock, 68, 2333],
     ['no-active cleanup branch', blocks.noActiveCleanupBlock, 14, 629],
     ['clearStaleDOMFallbackVisibility block', blocks.clearBlock, 33, 1412],
-    ['disabled cleanup branch', blocks.disabledCleanupBlock, 21, 959],
+    ['disabled cleanup branch', blocks.disabledCleanupBlock, 18, 791],
     ['Shorts collection block', blocks.shortsCollectionBlock, 29, 1651],
     ['Shorts container toggle block', blocks.shortsContainerToggleBlock, 22, 1165],
     ['disguised Shorts detection block', blocks.disguisedDetectionBlock, 29, 1409],

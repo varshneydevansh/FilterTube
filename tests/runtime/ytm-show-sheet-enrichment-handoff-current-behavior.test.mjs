@@ -373,9 +373,9 @@ test('YTM showSheet enrichment handoff doc and source facts are pinned', () => {
   assert.match(doc, /not an implementation patch/);
   assert.match(doc, /headerless YTM showSheet/);
 
-  assert.equal(lineCount(bridge), 13571);
-  assert.equal(Buffer.byteLength(bridge), 601694);
-  assert.equal(sha256('js/content_bridge.js'), '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3');
+  assert.equal(lineCount(bridge), 13623);
+  assert.equal(Buffer.byteLength(bridge), 603362);
+  assert.equal(sha256('js/content_bridge.js'), 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c');
   assert.equal(lineCount(injector), 3593);
   assert.equal(Buffer.byteLength(injector), 155830);
   assert.equal(sha256('js/injector.js'), '634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04');

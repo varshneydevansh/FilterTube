@@ -19,9 +19,9 @@ native overlay/fullscreen quiet mode source/effect blocks: 5
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content_bridge.js` | 13571 | 601694 | `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3` |
-| `js/content/block_channel.js` | 3175 | 127396 | `1b6fffa249a746c01686df0d6a05dc4b770a6f0c5ded08b78a7043c11e9cdd83` |
-| `js/content/dom_fallback.js` | 4838 | 228332 | `2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef` |
+| `js/content_bridge.js` | 13623 | 603362 | `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c` |
+| `js/content/block_channel.js` | 3189 | 127857 | `c040b57e0b107fd7b6fb0a18bc4ca014e5a22fbb82755f81e51a497eee387dba` |
+| `js/content/dom_fallback.js` | 5030 | 235555 | `fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5` |
 | `js/seed.js` | 1136 | 50026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
 | `js/content/bridge_settings.js` | 651 | 26462 | `c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b` |
 | `js/content/first_run_prompt.js` | 190 | 7453 | `5672d9060d29b08550ecfc3add54245212a5094ee5137f025b6f788f12e50409` |
@@ -30,10 +30,10 @@ native overlay/fullscreen quiet mode source/effect blocks: 5
 ## Source / Effect Blocks
 
 - content_bridge native quiet predicate block: line 16, 11 lines, 468 bytes
-- content_bridge initializeDOMFallback quiet cluster block: line 6088, 382 lines, 17601 bytes
-- content_bridge fallback menu quiet cluster block: line 6489, 721 lines, 29321 bytes
-- block_channel quick-block enabled predicate block: line 1205, 90 lines, 2943 bytes
-- block_channel quick-block lifecycle setup block: line 1979, 322 lines, 13896 bytes
+- content_bridge initializeDOMFallback quiet cluster block: line 6140, 382 lines, 17601 bytes
+- content_bridge fallback menu quiet cluster block: line 6541, 721 lines, 29321 bytes
+- block_channel quick-block enabled predicate block: line 1212, 90 lines, 2943 bytes
+- block_channel quick-block lifecycle setup block: line 1993, 322 lines, 13896 bytes
 
 ## Selected Token Counts
 
@@ -179,9 +179,9 @@ can support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

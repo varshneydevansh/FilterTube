@@ -276,7 +276,7 @@ privacy approval. The addendum pins 12 collector diagnostic privacy approval
 boundary rows, 12 source-locus diagnostic privacy rows covered, 12 diagnostic
 privacy contract rows covered, 35 current diagnostic privacy anchors covered,
 8 diagnostic privacy risk classes covered, 69 method semantic proof gap files
-covered, 5,681 lexical callables still requiring semantic proof, 0 files with
+covered, 5,697 lexical callables still requiring semantic proof, 0 files with
 complete per-callable semantic proof, 0 runtime source-owner approvals, 0
 runtime metric collector approvals, 0 runtime collector insertion points
 approved, 0 runtime collector diagnostic privacy approvals, 0 committed

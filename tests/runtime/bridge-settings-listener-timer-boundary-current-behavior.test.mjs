@@ -226,7 +226,7 @@ test('bridge settings listener/timer source counts remain pinned', () => {
     ['waiter cluster block', blocks.waiterCluster, 71, 2340],
     ['subscription request block', blocks.subscriptionRequest, 43, 1942],
     ['subscription message listener block', blocks.messageListener, 53, 2299],
-    ['runtime listener block', blocks.runtimeListener, 122, 5684],
+    ['runtime listener block', blocks.runtimeListener, 122, 5701],
     ['seed relay cluster block', blocks.seedRelay, 201, 8139],
     ['storage refresh cluster block', blocks.storageRefresh, 131, 4506],
     ['storage listener registration block', blocks.storageListener, 3, 96]

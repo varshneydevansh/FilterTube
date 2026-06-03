@@ -14,9 +14,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -74,7 +74,7 @@ coordination and importer input ordering instead of broad runtime authority.
 | Reference | Claim class | Audit decision |
 | --- | --- | --- |
 | `js/shared/identity.js:12` | `narrow-local-owner` | Legitimate for handle parsing and normalization only. It is not a global channel-match or hide authority. |
-| `js/content_bridge.js:2676` | `narrow-local-owner` | Local current-video-id extraction only. A video id is a join key, not channel identity. |
+| `js/content_bridge.js:2667` | `narrow-local-owner` | Local current-video-id extraction only. A video id is a join key, not channel identity. |
 | `docs/JSON_FIRST_FILTERING_PLAN.md:205` | `misleading-identity-effect-risk` | `json_paths_encyclopedia.md` is an evidence map for documented fields, not proof that runtime consumes each path or may mutate a renderer. |
 | `docs/NETWORK_REQUEST_PIPELINE.md:6` | `audit-boundary` | Acceptable as a pointer to the current waterfall audit doc, not as direct behavior authority. |
 | `docs/THREE_DOT_MENU_IMPROVEMENTS.md:58` | `misleading-identity-effect-risk` | Collaborator roster precedence is plausible for that renderer shape, but still needs route/mode/effect proof before menu or hide behavior changes. |

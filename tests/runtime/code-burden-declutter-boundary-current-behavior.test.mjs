@@ -46,8 +46,8 @@ const largeProductOwnedSourceFiles = [
   'js/popup.js',
   'js/render_engine.js',
   'js/settings_shared.js',
-  'js/seed.js',
-  'js/content/dom_extractors.js'
+  'js/content/dom_extractors.js',
+  'js/seed.js'
 ];
 
 const nearThresholdProductOwnedSourceFiles = [

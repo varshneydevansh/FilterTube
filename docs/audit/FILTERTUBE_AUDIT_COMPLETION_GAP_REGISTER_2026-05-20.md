@@ -63,7 +63,7 @@ the file and lifecycle rows without changing their completion status:
 - `docs/audit/FILTERTUBE_AUDIT_DOC_LAYOUT_CURRENT_BEHAVIOR_2026-05-24.md`
   and `tests/runtime/audit-doc-layout-current-behavior.test.mjs` prove the
   current audit corpus placement boundary: 0 root-level `FILTERTUBE_*.md`
-  files under plain `docs/`, 550 `docs/audit/FILTERTUBE_*.md` files,
+  files under plain `docs/`, 554 `docs/audit/FILTERTUBE_*.md` files,
   root-level FilterTube audit doc placement `NO-GO`, and new audit artifact
   placement under `docs/audit`.
 - `docs/audit/FILTERTUBE_REPO_LIFECYCLE_PRIMITIVE_COVERAGE_2026-05-18.md`
@@ -83,9 +83,9 @@ optimization readiness.
 The method/callable audit now has an explicit repo-wide semantic gap index:
 
 - `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md`
-  records 69 tracked JS/JSX/MJS files, 5,681 lexical callables, 69 files with
+  records 69 tracked JS/JSX/MJS files, 5,697 lexical callables, 69 files with
   lexical accounting, 0 files with complete per-callable semantic proof, and
-  5,681 lexical callables still requiring semantic proof before behavior
+  5,697 lexical callables still requiring semantic proof before behavior
   changes.
 - `tests/runtime/all-callable-index-current-behavior.test.mjs` proves that the
   gap index matches the current tracked source file list, callable counts,
@@ -513,12 +513,14 @@ The runtime fixture results ledger now records its own index-completeness gap,
 and the generated companion index remains useful file-level enumeration while
 one current drift row stays open:
 
-- The current worktree has 538 current top-level `tests/runtime/*.test.mjs`
-  files and 4737 live source top-level test declarations.
+- The current worktree has 540 current top-level `tests/runtime/*.test.mjs`
+  files and 4754 live source top-level test declarations.
 - `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` still has
-  537 exact backticked test-path entries in that ledger, leaving 1 top-level
-  runtime test file without exact backticked entries there:
-  `tests/runtime/change-safety-goal-requirement-audit-current-behavior.test.mjs`.
+  537 exact backticked test-path entries in that ledger, leaving 3 top-level
+  runtime test files without exact backticked entries there:
+  `tests/runtime/change-safety-goal-requirement-audit-current-behavior.test.mjs`,
+  `tests/runtime/managed-parent-authority-inventory-current-behavior.test.mjs`,
+  and `tests/runtime/managed-policy-schema-revision-contract-current-behavior.test.mjs`.
 - `docs/audit/FILTERTUBE_RUNTIME_TEST_FILE_PROVENANCE_INDEX_CURRENT_BEHAVIOR_2026-05-25.md`
   provides 537 runtime test file rows, 4731 source top-level test declarations,
   537 `yes` rows for exact runtime-results entries, and 0 `no` rows for
@@ -536,13 +538,13 @@ one current drift row stays open:
   optimization work.
 
 ```text
-538 current top-level `tests/runtime/*.test.mjs` files
-4737 live source top-level test declarations
+540 current top-level `tests/runtime/*.test.mjs` files
+4754 live source top-level test declarations
 537 exact backticked test-path entries
 537 runtime test file rows
 4731 source top-level test declarations
 0 `no` rows
-1 top-level runtime test file without exact backticked entries
+3 top-level runtime test file without exact backticked entries
 ```
 
 - The generated index keeps exact-row-complete prefix-family snapshots for
@@ -655,8 +657,8 @@ legacy metric contract expected tests: 4457
 current generated runtime test declarations: 4731
 latest historical full runtime pass count observed: 4663
 latest historical full runtime pass freshness: 2026-05-30 full runtime rerun covers 4663 generated declarations before later audit-only declarations expanded the source count
-current live runtime source scan: 538 files, 4737 source top-level test declarations
-latest broad runtime backlog snapshot: 4737 tests, 4661 pass, 76 fail
+current live runtime source scan: 540 files, 4754 source top-level test declarations
+latest broad runtime backlog snapshot: 4754 tests, 4661 pass, 93 fail
 generated provenance index remains stale at 537 rows and 4731 declarations
 first-optimization count reconciliation status: BLOCKED
 full codebase audit completion from count reconciliation: NO-GO
@@ -689,7 +691,7 @@ excluding this register and its verifier found the following footprint:
 ```text
 census scope: docs/audit markdown plus tests/runtime modules
 census exclusions: this gap register and its verifier
-census files scanned: 1092
+census files scanned: 1098
 legacy runtime-count token 4457 occurrences: 1230
 legacy runtime-count token 4457 files: 167
 current runtime-count token 4660 occurrences: 11
@@ -712,7 +714,7 @@ Interpretation:
 
 | Census item | Current value | Completion effect |
 | --- | ---: | --- |
-| Files scanned outside this self-referential register/verifier | 1092 | Wide enough to quantify audit-surface drift without self-counting this addendum. |
+| Files scanned outside this self-referential register/verifier | 1098 | Wide enough to quantify audit-surface drift without self-counting this addendum. |
 | Legacy `4457` occurrences | 1230 | The stale expected-test count is broad historical contract wording, not current completion proof. |
 | Files containing legacy `4457` | 167 | Future count reconciliation is a multi-document audit cleanup, not a single-row fix. |
 | Current `4660` occurrences | 11 | Recalculated after the fresh 2026-05-30 full runtime rerun matched the current generated declaration count. |
@@ -868,7 +870,7 @@ flowchart TD
 | Network JSON no-work | `docs/audit/FILTERTUBE_NETWORK_FETCH_XHR_CALLSITE_REGISTER_CURRENT_BEHAVIOR_2026-05-22.md` | 9 | Seed and injector now avoid clone, parse, replay, and queue work when JSON filtering is inactive or empty. | No central network authority, and JSON-first filtering is not promoted to a complete first-class behavior model. |
 | DOM selector hot path | `docs/audit/FILTERTUBE_DOM_SELECTOR_INSTANCE_REGISTER_2026-05-18.md` | 12 | Quick-block overlay/card/sweep selectors, dropdown repair/close selectors, menu activation/discovery selectors, whitelist pending intake, and fallback menu intake are pinned. | No central selector authority, and every selector family still needs surface, route, target, restore, and sibling-visible proof. |
 | Cross-feature hot path | `docs/audit/FILTERTUBE_CROSS_FEATURE_AUTHORITY_MATRIX_2026-05-18.md` | 5 | Visible blocklist refresh, empty blocklist no-JSON work, whitelist pending-hide budget, quick-block/menu mode boundary, and Topic byline identity boundary are pinned together. | No `crossFeatureRuntimeAuthority`, and end-to-end cross-feature records are incomplete outside this release path. |
-| Method semantic triage | `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | 13 | The specific hot-path callables touched by the lag, stale keyword, native menu, quick-block, and Topic byline fixes have owner/trigger/input/side-effect/no-work boundaries recorded. | Repo-wide callable proof remains incomplete: 5,681 lexical callables still require semantic proof before broad behavior changes. |
+| Method semantic triage | `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | 13 | The specific hot-path callables touched by the lag, stale keyword, native menu, quick-block, and Topic byline fixes have owner/trigger/input/side-effect/no-work boundaries recorded. | Repo-wide callable proof remains incomplete: 5,697 lexical callables still require semantic proof before broad behavior changes. |
 
 Behavior-change checkpoint from the current source:
 
@@ -2273,7 +2275,7 @@ artifact.
 now carries a Chrome Default unpacked workspace byte snapshot with ASCII and
 Mermaid flow diagrams. It pins the local Default profile extension id
 `gkgjigdfdccckblmglboobikfcpeelio`, the Secure Preferences path
-`/Users/devanshvarshney/FilterTube`, path-to-workspace match, 3.3.1 stored
+`/Users/devanshvarshney/FilterTube`, path-to-workspace match, 3.3.2 stored
 version, absence of a packed `Default/Extensions/<id>` directory, presence of
 the Local Extension Settings directory, current workspace hashes for
 `manifest.json`, `package.json`, and `js/content_bridge.js`, and the
@@ -2365,7 +2367,7 @@ now carries a current local `dist/` package snapshot with ASCII and Mermaid
 flow diagrams. It pins the existing ignored `dist/` tree without running a
 build: 3 browser staged directories, 59 staged files per browser, 3 ZIP
 artifacts, 180 total `dist` files including ZIPs, 58 source-backed
-non-manifest staged files per browser, 58 byte-identical source-backed
+non-manifest staged files per browser, 54 byte-identical source-backed
 non-manifest staged files per browser, browser manifest hashes, and ZIP
 hashes for Chrome, Firefox, and Opera.
 
@@ -2450,9 +2452,9 @@ support runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -2759,7 +2761,7 @@ The same sample now closes the metric-sample documentation chain: 12 closure
 rows link all 12 sample rows, 12 inline metric sample JSON sections, 12
 manifest contract rows, 10 artifact path boundary rows, 12 foundation packet
 rows, 12 metric schema rows, 12 metric source-owner rows, 5 collector
-readiness families, 69 method semantic proof gap files, and 5,681 lexical callables, while keeping runtime metric sample closure approvals 0,
+readiness families, 69 method semantic proof gap files, and 5,697 lexical callables, while keeping runtime metric sample closure approvals 0,
 implementation-ready metric sample closure rows 0, metric sample draft closure
 `METRIC-SAMPLE-CHAIN-CLOSED`, and metric sample implementation readiness from
 closure `NO-GO`. It keeps committed artifact approval, artifact root creation,
@@ -2785,7 +2787,7 @@ documentation chain: 12 closure rows link all 12 fixture provenance rows, 12
 inline fixture provenance JSON sections, 12 source owner map contract rows, 12
 metric sample contract rows, 12 manifest contract rows, 10 artifact path
 boundary rows, 12 foundation packet rows, 12 metric schema rows, 12 metric
-source-owner rows, 5 collector readiness families, 69 method semantic proof gap files, and 5,681 lexical callables, while keeping runtime fixture
+source-owner rows, 5 collector readiness families, 69 method semantic proof gap files, and 5,697 lexical callables, while keeping runtime fixture
 provenance closure approvals 0, implementation-ready fixture provenance
 closure rows 0, fixture provenance draft closure
 `FIXTURE-PROVENANCE-CHAIN-CLOSED`, and fixture provenance implementation
@@ -2813,7 +2815,7 @@ inline no-work preservation JSON sections, 12 fixture provenance contract
 rows, 12 source owner map contract rows, 12 metric sample contract rows, 12
 manifest contract rows, 10 artifact path boundary rows, 12 foundation packet
 rows, 12 metric schema rows, 12 metric source-owner rows, 5 collector
-readiness families, 69 method semantic proof gap files, and 5,681 lexical callables, while keeping runtime no-work preservation closure approvals 0,
+readiness families, 69 method semantic proof gap files, and 5,697 lexical callables, while keeping runtime no-work preservation closure approvals 0,
 implementation-ready no-work preservation closure rows 0, no-work preservation
 draft closure `NO-WORK-PRESERVATION-CHAIN-CLOSED`, and no-work preservation
 implementation readiness from closure `NO-GO`. It keeps committed artifact
@@ -2840,7 +2842,7 @@ inline side-effect budget JSON sections, 12 no-work preservation contract
 rows, 12 fixture provenance contract rows, 12 source owner map contract rows,
 12 metric sample contract rows, 12 manifest contract rows, 10 artifact path
 boundary rows, 12 foundation packet rows, 12 metric schema rows, 12 metric
-source-owner rows, 5 collector readiness families, 69 method semantic proof gap files, and 5,681 lexical callables, while keeping runtime side-effect
+source-owner rows, 5 collector readiness families, 69 method semantic proof gap files, and 5,697 lexical callables, while keeping runtime side-effect
 budget closure approvals 0, implementation-ready side-effect budget closure
 rows 0, side-effect budget draft closure
 `SIDE-EFFECT-BUDGET-CHAIN-CLOSED`, and side-effect budget implementation
@@ -2872,7 +2874,7 @@ source owner map contract rows, 12 metric sample contract rows, 12 manifest
 contract rows, 10 artifact path boundary rows, 12 foundation packet rows, 12
 metric schema rows, 12 metric source-owner rows, 5 collector readiness
 families, 21 diagnostic logging policy source files, 419 active console
-callsites, 69 method semantic proof gap files, and 5,681 lexical callables,
+callsites, 69 method semantic proof gap files, and 5,697 lexical callables,
 while keeping runtime diagnostic privacy closure approvals 0,
 implementation-ready diagnostic privacy closure rows 0, diagnostic privacy
 draft closure `DIAGNOSTIC-PRIVACY-CHAIN-CLOSED`, and diagnostic privacy
@@ -2903,7 +2905,7 @@ provenance contract rows, 12 source owner map contract rows, 12 metric sample
 contract rows, 12 manifest contract rows, 10 artifact path boundary rows, 12
 foundation packet rows, 12 metric schema rows, 12 metric source-owner rows, 5
 collector readiness families, 2 evidence parity rollout rows, 8 parity and
-release boundary source docs, 69 method semantic proof gap files, and 5,681
+release boundary source docs, 69 method semantic proof gap files, and 5,697
 lexical callables, while keeping runtime parity rollout closure approvals 0,
 implementation-ready parity rollout closure rows 0, parity rollout draft
 closure `PARITY-ROLLOUT-CHAIN-CLOSED`, and parity rollout implementation
@@ -2935,7 +2937,7 @@ no-work preservation contract rows, 12 fixture provenance contract rows, 12
 source owner map contract rows, 12 metric sample contract rows, 12 manifest
 contract rows, 10 artifact path boundary rows, 12 foundation packet rows, 12
 metric schema rows, 12 metric source-owner rows, 5 collector readiness
-families, 69 method semantic proof gap files, 5,681 lexical callables, 4,457
+families, 69 method semantic proof gap files, 5,697 lexical callables, 4,457
 expected runtime audit tests, 4,457 expected runtime audit passes, and 0
 expected runtime audit failures, while keeping runtime verification output
 closure approvals 0, persisted verification output closure approvals 0,
@@ -3324,7 +3326,7 @@ and the existing
 bind the affected whitelist/cache source files to the method semantic proof
 gap index while leaving method proof, optimization approval, and runtime
 unchanged. The continuation pins 8 affected callable semantic gap binding
-rows, 8 affected source files with method-gap rows, 2854 affected lexical
+rows, 8 affected source files with method-gap rows, 2871 affected lexical
 callables requiring semantic proof, 8 affected semantic proof required fields,
 affected files with complete per-callable semantic proof remain 0, runtime
 affected callable semantic approvals remain 0, implementation-ready affected
@@ -3955,7 +3957,7 @@ proof. The linkage pins extension id `gkgjigdfdccckblmglboobikfcpeelio`,
 Chrome Default profile source path `/Users/devanshvarshney/FilterTube`,
 matching workspace root, no CRX-style copy under `Default/Extensions`,
 Default-profile local extension storage presence, service worker version
-`3.3.1`, and `incognito: null`. Default-profile source-path owner status is
+`3.3.2`, and `incognito: null`. Default-profile source-path owner status is
 `GO_PATH`, but already-open visible-tab injected byte freshness, incognito
 runtime availability, stale open-tab cache cleanup, live `Kully B & Gussy G -
 Topic` negative fixture proof, live smoke acceptance, release/public-claim use,

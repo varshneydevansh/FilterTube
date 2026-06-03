@@ -10,8 +10,8 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_CONTENT_BRIDGE_WHITELIST_PENDING_REFRESH_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/content_bridge.js': [13571, 601694, '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3'],
-  'js/content/dom_fallback.js': [4838, 228332, '2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef']
+  'js/content_bridge.js': [13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c'],
+  'js/content/dom_fallback.js': [5030, 235555, 'fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5']
 };
 
 const blockSpecs = {
@@ -19,16 +19,16 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function installRightRailWhitelistObserver() {',
     end: 'function queuePrefetchForCard(card) {',
-    startLine: 1217,
-    lines: 100,
-    bytes: 3255,
-    hash: '25809587e6d3175b0e4d064c84c86b0708e6c89027c32fa3a7f81c30e6a16988'
+    startLine: 1210,
+    lines: 98,
+    bytes: 3091,
+    hash: '86779f97ba7a65ebe61da86d414b1b3027b916fdc75163053b9dd3b58bcf4976'
   },
   contentBridgeInitializeFallbackThrottle: {
     file: 'js/content_bridge.js',
     start: 'async function initializeDOMFallback(settings) {',
     end: '        const whitelistPendingRefreshState = {',
-    startLine: 6088,
+    startLine: 6140,
     lines: 60,
     bytes: 2297,
     hash: 'b4da976a738c117f0ba7e5f4c379ff80fca9010f2c1e944982cef27c9fe21272'
@@ -37,7 +37,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: '        const whitelistPendingRefreshState = {',
     end: '        function applyWhitelistPendingHide(candidates) {',
-    startLine: 6148,
+    startLine: 6200,
     lines: 69,
     bytes: 3952,
     hash: '1155ce5403825a26516b2383a686bcff2dd0a64949e5eb40e8197766510855f9'
@@ -46,7 +46,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: '        function applyWhitelistPendingHide(candidates) {',
     end: '        function fallbackRelevantSelector() {',
-    startLine: 6217,
+    startLine: 6269,
     lines: 111,
     bytes: 5760,
     hash: '3d2510570b99e4f08e600de63911dce5dc348a4ffd2b28c20d1beadd9ffe028b'
@@ -55,7 +55,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: '        function fallbackRelevantSelector() {',
     end: '        refreshDOMFallbackMutationObserver();',
-    startLine: 6328,
+    startLine: 6380,
     lines: 137,
     bytes: 5492,
     hash: 'a97a95ca977eb192a0426f00413b69bc1fe92fb65b1dd9b795488de7244b6d19'
@@ -64,7 +64,7 @@ const blockSpecs = {
     file: 'js/content/dom_fallback.js',
     start: '    // 1. Video/Content Filtering',
     end: '    if (!window.__filtertubePlaylistNavGuardInstalled) {',
-    startLine: 2325,
+    startLine: 2505,
     lines: 12,
     bytes: 468,
     hash: '29ac6ab76923722538fb7004f088bda03416d9da1a80c88ef8698f0c96e5e16d'
@@ -73,7 +73,7 @@ const blockSpecs = {
     file: 'js/content/dom_fallback.js',
     start: "            const alreadyProcessed = element.hasAttribute('data-filtertube-processed');",
     end: "            const cachedVideoId = element.getAttribute('data-filtertube-video-id') || '';",
-    startLine: 2504,
+    startLine: 2686,
     lines: 54,
     bytes: 3079,
     hash: '1f4523c7359119a8c375614e4fb739f5656ad8186573ea20e6de21ca492f4402'
@@ -82,7 +82,7 @@ const blockSpecs = {
     file: 'js/content/dom_fallback.js',
     start: '            let hideReason = `Content: ${title}`;',
     end: '            if (hideByDuration) {',
-    startLine: 3656,
+    startLine: 3841,
     lines: 16,
     bytes: 960,
     hash: 'db535d5bb1b6d0f6c2e3913e008ab1d67479982ec3155788821410a66b2eb7c1'
@@ -91,7 +91,7 @@ const blockSpecs = {
     file: 'js/content/dom_fallback.js',
     start: "    if (onlyWhitelistPending && listMode === 'whitelist') {",
     end: '    // Inline survey containers',
-    startLine: 3947,
+    startLine: 4139,
     lines: 4,
     bytes: 83,
     hash: '438296f1dbec1d892317f6177e74323886b6830fd0697eb1b1c12e4779776ad0'
@@ -576,7 +576,6 @@ test('content bridge and DOM fallback whitelist pending flow remains source-deri
 
   assert.match(blocks.contentBridgeRightRailWhitelistObserver, /rightRailWhitelistObserverInstalled/);
   assert.match(blocks.contentBridgeRightRailWhitelistObserver, /currentSettings\?\.listMode !== 'whitelist'/);
-  assert.match(blocks.contentBridgeRightRailWhitelistObserver, /startsWith\('\/watch'\)/);
   assert.match(blocks.contentBridgeRightRailWhitelistObserver, /forceReprocess: true/);
   assert.match(blocks.contentBridgeInitializeFallbackThrottle, /await new Promise\(resolve => setTimeout\(resolve, 1000\)\)/);
   assert.match(blocks.contentBridgeInitializeFallbackThrottle, /const MIN_FALLBACK_INTERVAL_MS = 250/);

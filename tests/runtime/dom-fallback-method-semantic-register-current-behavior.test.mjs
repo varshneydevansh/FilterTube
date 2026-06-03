@@ -69,8 +69,15 @@ const groupByName = new Map(Object.entries({
   markElementAsBlocked: 'blockedMarkerAndStaleRestore',
   clearBlockedElementAttributes: 'blockedMarkerAndStaleRestore',
   isExplicitlyHiddenByFilterTube: 'blockedMarkerAndStaleRestore',
+  scheduleFilterTubeContinuationNudge: 'activeWorkAndCleanup',
   hasExplicitHideReasonMarker: 'blockedMarkerAndStaleRestore',
   ensureContentControlStyles: 'styleAndStaticSurfaceControls',
+  restoreInlineMobileSearchResultControls: 'styleAndStaticSurfaceControls',
+  clearContentControlStyles: 'styleAndStaticSurfaceControls',
+  isInlineMobileSearchResultControl: 'styleAndStaticSurfaceControls',
+  inlineMobileSearchResultControlHost: 'styleAndStaticSurfaceControls',
+  hideInlineMobileSearchResultControls: 'styleAndStaticSurfaceControls',
+  syncRouteScopedContentControls: 'styleAndStaticSurfaceControls',
   hideYouTubeOpenAppButtons: 'styleAndStaticSurfaceControls',
   normalizeTextForMatching: 'textAndKeywordMatching',
   extractPlainKeyword: 'textAndKeywordMatching',
@@ -488,33 +495,33 @@ test('DOM fallback method semantic register is audit-only and scoped to current 
   assert.match(text, /Runtime behavior is unchanged/);
   assert.match(text, /source files: js\/content\/dom_fallback\.js; js\/content\/dom_helpers\.js/);
   assert.match(text, /runtime owner: isolated-world DOM fallback and visual helper runtime/);
-  assert.match(text, /js\/content\/dom_fallback\.js split source lines: 4839/);
-  assert.match(text, /js\/content\/dom_fallback\.js wc line count: 4838/);
-  assert.match(text, /js\/content\/dom_fallback\.js source bytes: 228332/);
-  assert.match(text, /js\/content\/dom_fallback\.js source sha256: 2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef/);
+  assert.match(text, /js\/content\/dom_fallback\.js split source lines: 5031/);
+  assert.match(text, /js\/content\/dom_fallback\.js wc line count: 5030/);
+  assert.match(text, /js\/content\/dom_fallback\.js source bytes: 235555/);
+  assert.match(text, /js\/content\/dom_fallback\.js source sha256: fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5/);
   assert.match(text, /js\/content\/dom_helpers\.js split source lines: 207/);
   assert.match(text, /js\/content\/dom_helpers\.js wc line count: 206/);
   assert.match(text, /js\/content\/dom_helpers\.js source bytes: 8292/);
   assert.match(text, /js\/content\/dom_helpers\.js source sha256: a8c6ebfc10394f67254fbe5d324090ba9d01bead7efbb61d44e63dda4b52c242/);
-  assert.match(text, /combined source bytes: 236587/);
-  assert.match(text, /top-level function declarations: 50/);
-  assert.match(text, /js\/content\/dom_fallback\.js top-level function declarations: 47/);
+  assert.match(text, /combined source bytes: 243847/);
+  assert.match(text, /top-level function declarations: 57/);
+  assert.match(text, /js\/content\/dom_fallback\.js top-level function declarations: 54/);
   assert.match(text, /js\/content\/dom_helpers\.js top-level function declarations: 3/);
   assert.match(text, /semantic method groups: 11/);
-  assert.match(text, /repo-wide broad parser lexical callable matches: 439/);
-  assert.match(text, /broad parser declaration\/inventory matches: 85/);
-  assert.match(text, /semantic method rows promoted: 50/);
+  assert.match(text, /repo-wide broad parser lexical callable matches: 452/);
+  assert.match(text, /broad parser declaration\/inventory matches: 92/);
+  assert.match(text, /semantic method rows promoted: 57/);
   assert.match(text, /local callable tokens held below method authority: 35/);
-  assert.match(text, /control-flow lexical artifacts: 354/);
+  assert.match(text, /control-flow lexical artifacts: 360/);
   assert.match(text, /file-local executable proof probes: 8/);
   assert.match(text, /global method proof count promoted: 0/);
   assert.match(text, /not completion proof for every inline loop callback/);
   assert.match(text, /negative sibling-visible fixture/);
 
   assert.deepEqual(sourceStats('js/content/dom_fallback.js'), {
-    bytes: 228332,
-    sha256: '2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef',
-    splitLines: 4839
+    bytes: 235555,
+    sha256: 'fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5',
+    splitLines: 5031
   });
   assert.deepEqual(sourceStats('js/content/dom_helpers.js'), {
     bytes: 8292,
@@ -526,13 +533,13 @@ test('DOM fallback method semantic register is audit-only and scoped to current 
 test('DOM fallback method semantic register accounts for every current top-level method row in scope', () => {
   const rows = domFallbackMethodRows();
 
-  assert.equal(rows.length, 50);
+  assert.equal(rows.length, 57);
   assert.deepEqual(countBy(rows, 'file'), {
-    'js/content/dom_fallback.js': 47,
+    'js/content/dom_fallback.js': 54,
     'js/content/dom_helpers.js': 3
   });
   assert.deepEqual(countBy(rows, 'group'), {
-    activeWorkAndCleanup: 3,
+    activeWorkAndCleanup: 4,
     blockedMarkerAndStaleRestore: 5,
     domFallbackMainPipeline: 1,
     fallbackSurfaceHandlers: 4,
@@ -541,7 +548,7 @@ test('DOM fallback method semantic register accounts for every current top-level
     identityNormalizationAndCompiledRules: 9,
     playlistWatchAndRouteIdentity: 16,
     runStateAndTracking: 2,
-    styleAndStaticSurfaceControls: 2,
+    styleAndStaticSurfaceControls: 8,
     textAndKeywordMatching: 4
   });
 
@@ -607,22 +614,22 @@ test('DOM fallback broad lexical reconciliation separates semantic rows from art
   ]);
   const artifacts = rows.filter(row => !acceptedNames.has(row.name));
 
-  assert.equal(rows.length, 439);
+  assert.equal(rows.length, 452);
   assert.deepEqual(countBy(rows, 'file'), {
-    'js/content/dom_fallback.js': 418,
+    'js/content/dom_fallback.js': 431,
     'js/content/dom_helpers.js': 21
   });
-  assert.equal(semanticRows.length, 50);
+  assert.equal(semanticRows.length, 57);
   assert.equal(localRows.length, 35);
   assert.deepEqual(countBy(localRows, 'kind'), {
     'local arrow': 34,
     'nested function': 1
   });
-  assert.equal(semanticRows.length + localRows.length, 85);
-  assert.equal(artifacts.length, 354);
+  assert.equal(semanticRows.length + localRows.length, 92);
+  assert.equal(artifacts.length, 360);
   assert.deepEqual(countByName(artifacts.map(row => row.name)), {
     for: 25,
-    if: 325,
+    if: 331,
     logSummary: 1,
     recordHide: 1,
     recordRestore: 1,
@@ -631,12 +638,12 @@ test('DOM fallback broad lexical reconciliation separates semantic rows from art
 
   for (const token of [
     '## Lexical Callable Reconciliation',
-    'js/content/dom_fallback.js broad callable matches: 418',
+    'js/content/dom_fallback.js broad callable matches: 431',
     'js/content/dom_helpers.js broad callable matches: 21',
-    'accepted top-level semantic method rows: 50',
+    'accepted top-level semantic method rows: 57',
     'accepted local arrow callable tokens: 34',
     'accepted nested local helper tokens: 1',
-    'rejected if artifacts: 325',
+    'rejected if artifacts: 331',
     'rejected for artifacts: 25',
     'rejected fallback tracker object-method artifacts: 4',
     'runtime behavior changed: no'

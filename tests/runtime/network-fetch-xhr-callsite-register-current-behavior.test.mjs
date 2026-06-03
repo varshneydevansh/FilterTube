@@ -11,7 +11,7 @@ const docPath = 'docs/audit/FILTERTUBE_NETWORK_FETCH_XHR_CALLSITE_REGISTER_CURRE
 const sourceFingerprints = {
   'js/background.js': [6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
   'js/content/handle_resolver.js': [282, 9785, '67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff'],
-  'js/content_bridge.js': [13571, 601694, '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3'],
+  'js/content_bridge.js': [13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c'],
   'js/injector.js': [3593, 155830, '634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04'],
   'js/seed.js': [1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
   'js/tab-view.js': [11617, 526763, '1b7f621d48d16247aecc4c7ee57cbc3db9efd3e597e6f0a4fc188228470648f7']
@@ -42,6 +42,10 @@ function sha256(text) {
 
 function escapeRegExp(text) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function formatNumber(value) {
+  return Number(value).toLocaleString('en-US');
 }
 
 function lineOf(file, needle) {
@@ -153,7 +157,7 @@ test('network fetch/xhr callsite register is audit-only and source pinned', () =
     assert.equal(sha256(source), expectedHash, `${file} hash drifted`);
     assert.match(
       text,
-      new RegExp(`\\| \`${escapeRegExp(file)}\` \\| ${expectedLines} \\| ${expectedBytes} \\| \`${expectedHash}\` \\|`)
+      new RegExp(`\\| \`${escapeRegExp(file)}\` \\| ${formatNumber(expectedLines)} \\| ${formatNumber(expectedBytes)} \\| \`${expectedHash}\` \\|`)
     );
   }
 });

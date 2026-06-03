@@ -10,15 +10,15 @@ const docPath = 'docs/audit/FILTERTUBE_JSON_FIRST_METRIC_ARTIFACT_GATE_CURRENT_B
 const sourceRows = [
   ['js/seed.js', 1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
   ['js/filter_logic.js', 3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'],
-  ['js/content_bridge.js', 13571, 601694, '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3'],
-  ['js/content/dom_fallback.js', 4838, 228332, '2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef'],
-  ['js/content/block_channel.js', 3175, 127396, '1b6fffa249a746c01686df0d6a05dc4b770a6f0c5ded08b78a7043c11e9cdd83'],
+  ['js/content_bridge.js', 13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c'],
+  ['js/content/dom_fallback.js', 5030, 235555, 'fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5'],
+  ['js/content/block_channel.js', 3189, 127857, 'c040b57e0b107fd7b6fb0a18bc4ca014e5a22fbb82755f81e51a497eee387dba'],
   ['js/content/handle_resolver.js', 282, 9785, '67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff'],
   ['js/background.js', 6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
   ['js/state_manager.js', 2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6'],
   ['js/settings_shared.js', 1181, 57535, '9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c'],
-  ['docs/audit/FILTERTUBE_PERFORMANCE_CLAIM_EVIDENCE_BOUNDARY_2026-05-20.md', 116, 6248, 'aaf58bd4057f4477fb2b4f7b9c60a0bc93b88d1ab2831c41cb570f379408838c'],
-  ['docs/audit/FILTERTUBE_JSON_FIRST_NO_WORK_OPTIMIZATION_CROSSWALK_CURRENT_BEHAVIOR_2026-05-21.md', 273, 16005, 'b4592ebf7e9947d95a97ca0e8c14eb298bcd3a296e24c424b4c350adb2333e86'],
+  ['docs/audit/FILTERTUBE_PERFORMANCE_CLAIM_EVIDENCE_BOUNDARY_2026-05-20.md', 116, 6248, 'f460f1987fda8ec26b639b261bddfb55b92ec3da05877b01dfb9c16e13f7277b'],
+  ['docs/audit/FILTERTUBE_JSON_FIRST_NO_WORK_OPTIMIZATION_CROSSWALK_CURRENT_BEHAVIOR_2026-05-21.md', 273, 16005, 'f753087303cbad26f09ac45d9dccf2b60ebf2942d2b64dea6c9373cc168d6f1a'],
 ];
 
 const runtimeFiles = sourceRows
@@ -34,8 +34,8 @@ const blockRows = [
   ['backgroundKidsWatchIdentityFetchBudget', 'js/background.js', 'async function performKidsWatchIdentityFetch', 'async function performWatchIdentityFetch', 2980, 94, 3605],
   ['backgroundWatchIdentityFetchBudget', 'js/background.js', 'async function performWatchIdentityFetch', 'browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse)', 3074, 94, 3678],
   ['handleResolverActiveFetchBudget', 'js/content/handle_resolver.js', 'const resolvedHandleCache = new Map();', null, 133, 150, 5256],
-  ['contentBridgeStatsMetricBlock', 'js/content_bridge.js', '// Initialize stats from storage', 'function saveStats()', 3708, 213, 7246],
-  ['contentBridgeSaveStatsBlock', 'js/content_bridge.js', 'function saveStats()', 'function handleMediaPlayback', 3921, 36, 1109],
+  ['contentBridgeStatsMetricBlock', 'js/content_bridge.js', '// Initialize stats from storage', 'function saveStats()', 3699, 213, 7246],
+  ['contentBridgeSaveStatsBlock', 'js/content_bridge.js', 'function saveStats()', 'function handleMediaPlayback', 3912, 36, 1109],
 ];
 
 function filePath(file) {
@@ -134,14 +134,14 @@ test('JSON-first metric artifact gate records current runtime instrumentation co
     ['performance.now callsites', count(source, /performance\.now\s*\(/g), 0],
     ['console.time callsites', count(source, /console\.time\s*\(/g), 0],
     ['console.timeEnd callsites', count(source, /console\.timeEnd\s*\(/g), 0],
-    ['Date.now callsites', count(source, /Date\.now\s*\(/g), 82],
+    ['Date.now callsites', count(source, /Date\.now\s*\(/g), 84],
     ['debugStatsEnabled token occurrences', countLiteral(source, 'debugStatsEnabled'), 5],
     ['statsBySurface token occurrences', countLiteral(source, 'statsBySurface'), 21],
     ['recordTimeSaved token occurrences', countLiteral(source, 'recordTimeSaved'), 1],
     ['console.log token occurrences', countLiteral(source, 'console.log'), 180],
     ['console.debug token occurrences', countLiteral(source, 'console.debug'), 27],
     ['console.warn token occurrences', countLiteral(source, 'console.warn'), 101],
-    ['setTimeout callsites', count(source, /\bsetTimeout\s*\(/g), 82],
+    ['setTimeout callsites', count(source, /\bsetTimeout\s*\(/g), 83],
     ['setInterval callsites', count(source, /\bsetInterval\s*\(/g), 1],
     ['MutationObserver token occurrences', countLiteral(source, 'MutationObserver'), 23],
     ['requestAnimationFrame token occurrences', countLiteral(source, 'requestAnimationFrame'), 15],

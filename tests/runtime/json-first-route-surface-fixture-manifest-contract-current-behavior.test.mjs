@@ -196,9 +196,9 @@ test('JSON-first route/surface fixture manifest rows counts and fields stay pinn
   assert.match(doc, /fixture mode classes covered: 8/);
   assert.match(doc, /fixture evidence classes covered: 14/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5681/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5701/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5681/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5701/);
   assert.match(doc, /committed route\/surface fixture manifest files: 0/);
   assert.match(doc, /committed route\/surface fixture packet files: 0/);
   assert.match(doc, /runtime JSON-first fixture manifest approvals: 0/);
@@ -249,7 +249,7 @@ test('JSON-first route/surface fixture manifest contract is backed by current NO
   assert.match(jsonFirstImplementation, /method semantic proof gap files covered: 69/);
   assert.match(collectorFixtureProvenance, /runtime collector fixture packets approved: 0/);
   assert.match(methodGap, /files with lexical accounting: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5681/);
+  assert.match(methodGap, /repo-wide lexical callables: 5701/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(implementationReadiness, /implementation-ready first optimization rows: 0/);
 });

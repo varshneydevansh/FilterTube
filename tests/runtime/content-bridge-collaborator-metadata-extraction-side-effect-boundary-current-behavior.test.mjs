@@ -12,7 +12,7 @@ const ytmShowSheetFixturePath = 'tests/runtime/fixtures/captures/ytm-show-sheet-
 const ytmShowSheetParityDocPath = 'docs/audit/FILTERTUBE_YTM_SHOW_SHEET_INJECTOR_FILTER_LOGIC_PARITY_CURRENT_BEHAVIOR_2026-05-24.md';
 
 const sourceFingerprints = {
-  'js/content_bridge.js': [13571, 601694, '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3']
+  'js/content_bridge.js': [13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c']
 };
 
 const blockSpecs = {

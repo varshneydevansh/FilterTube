@@ -33,9 +33,9 @@ Collector fixture provenance approval rows covered: 12
 Diagnostic logging policy source files covered: 21
 Active console callsites covered: 418
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5681
+Method semantic proof gap lexical callables covered: 5701
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5681
+Lexical callables requiring semantic proof before behavior changes: 5701
 Runtime source-owner approvals: 0
 Runtime metric collector approvals: 0
 Runtime collector insertion points approved: 0
@@ -66,7 +66,7 @@ rollback, and public-claim limits.
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_COLLECTOR_NO_WORK_APPROVAL_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves no-work approval remains absent and cannot be inferred from no-work matrices or contracts. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_COLLECTOR_INSERTION_APPROVAL_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves insertion approval remains absent and cannot be inferred from mapped insertion risks. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_COLLECTOR_APPROVAL_AUTHORITY_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves collector approval remains absent and diagnostic privacy approval is still a missing collector approval row. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,681 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,697 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_FIXTURE_PROVENANCE_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Proves 12 fixture provenance rows and 0 approved fixture packets. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_PARITY_ROLLOUT_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves 0 approved parity rollout proofs. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_VERIFICATION_OUTPUT_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Proves 0 committed verification output files and 0 implementation-ready verification output contract rows. |
@@ -98,9 +98,9 @@ console.debug callsites covered: 24
 current diagnostic privacy anchors covered: 35
 diagnostic privacy risk classes covered: 8
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 runtime source-owner approvals: 0
 runtime metric collector approvals: 0
 runtime collector insertion points approved: 0
@@ -219,7 +219,7 @@ prove diagnostic privacy approval absence is still only a prerequisite for
 parity rollout approval, not parity rollout approval itself. The addendum pins
 12 collector parity rollout approval boundary rows, 12 collector diagnostic
 privacy approval rows covered, 12 collector fixture provenance approval rows
-covered, 69 method semantic proof gap files covered, 5,681 lexical callables
+covered, 69 method semantic proof gap files covered, 5,697 lexical callables
 still requiring semantic proof, 0 files with complete per-callable semantic
 proof, 0 runtime collector diagnostic privacy approvals, 0 runtime collector
 parity rollout approvals, 0 committed parity rollout files, 0

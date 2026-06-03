@@ -40,7 +40,7 @@ DOM fallback / menu / quick-block / enrichment path
 | Members-only CSS and JS fallback | `js/content/dom_fallback.js:1174`, `js/content/dom_fallback.js:2172` | CSS uses broad `:has()` selectors including watch containers; JS fallback directly hides hosts and shelves using inline display. | Can hide watch-page containers or whole shelves instead of only the matching card. |
 | Playlist enrichment hide | `js/content_bridge.js:8356` | Directly hides enriched playlist targets and marks `data-filtertube-hidden-by-playlist-enrichment`. | Bypasses shared `toggleVisibility()` stats/media/restore path. |
 | Optimistic menu hide | `js/content_bridge.js:12044` | Directly hides clicked targets before persistence completes; custom restore stores only a subset of previous state. | Failure rollback can diverge from shared restore behavior. |
-| Immediate comment/card hide | `js/content_bridge.js:13088`, `js/content_bridge.js:13105` | Directly hides comment or clicked content target after a block action. | Bypasses shared hide reason/stat/media contract. |
+| Immediate comment/card hide | `js/content_bridge.js:13101`, `js/content_bridge.js:13105` | Directly hides comment or clicked content target after a block action. | Bypasses shared hide reason/stat/media contract. |
 | DOM recycled-card cleanup | `js/content/dom_extractors.js:109` | Clears stale `data-filtertube-*` identity/hide state when a card receives a new video ID. | This is necessary, but it proves stale hidden classes can survive without explicit cleanup. |
 
 ## Direct Hide Count Baseline
@@ -50,7 +50,7 @@ Current direct `display:none` writes outside the shared helper:
 | File | Direct display-none writes | Shared helper refs |
 | --- | ---: | ---: |
 | `js/content_bridge.js` | 11 | 3 |
-| `js/content/dom_fallback.js` | 10 | 55 |
+| `js/content/dom_fallback.js` | 11 | 55 |
 | `js/content/dom_helpers.js` | 1 | 1 |
 
 The direct writes are not automatically wrong; several are intentional
@@ -93,9 +93,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

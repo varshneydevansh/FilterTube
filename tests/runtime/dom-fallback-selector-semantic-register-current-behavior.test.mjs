@@ -123,6 +123,7 @@ function semanticGroup(file, line) {
 
 function dynamicFamily(expression) {
   if (expression === 'childSelector') return 'callerProvidedChildSelector';
+  if (expression === "INLINE_MOBILE_SEARCH_CONTROL_SELECTORS.join(',')") return 'inlineMobileSearchControlSelectorArray';
   if (expression.startsWith('[') && expression.includes('ytm-comment-section-renderer')) return 'commentEntryCandidateArray';
   if (expression === 'homeFeedSelectors') return 'homeFeedSelectorArray';
   if (expression === 'hiddenSelector') return 'staleHiddenSelectorArgument';
@@ -196,12 +197,12 @@ test('DOM fallback selector semantic register is audit-only and scoped to curren
   assert.match(text, /Status: audit-only current-behavior register/);
   assert.match(text, /Runtime behavior is unchanged/);
   assert.match(text, /source files: js\/content\/dom_fallback\.js, js\/content\/dom_helpers\.js/);
-  assert.match(text, /selector API sites: 164/);
-  assert.match(text, /static literal args: 152/);
-  assert.match(text, /dynamic\/non-literal args: 12/);
-  assert.match(text, /unique static selector literals: 120/);
-  assert.match(text, /semantic selector groups: 11/);
-  assert.match(text, /dynamic selector families: 12/);
+  assert.match(text, /selector API sites: 166/);
+  assert.match(text, /static literal args: 153/);
+  assert.match(text, /dynamic\/non-literal args: 13/);
+  assert.match(text, /unique static selector literals: 121/);
+  assert.match(text, /semantic selector groups: 10/);
+  assert.match(text, /dynamic selector families: 13/);
   assert.match(text, /not completion proof for every\s+DOM selector/);
   assert.match(text, /not permission to broaden, prune, merge, escape, or\s+optimize selector behavior/);
 });
@@ -213,18 +214,18 @@ test('DOM fallback selector semantic register accounts for every current selecto
   const dynamicRows = rows.filter(row => !row.isStaticLiteral);
   const uniqueStatic = new Set(staticRows.map(row => row.selector));
 
-  assert.equal(rows.length, 164);
+  assert.equal(rows.length, 166);
   assert.equal(ids.size, rows.length, 'DOM fallback/helper selector site ids must remain unique');
-  assert.equal(staticRows.length, 152);
-  assert.equal(dynamicRows.length, 12);
-  assert.equal(uniqueStatic.size, 120);
+  assert.equal(staticRows.length, 153);
+  assert.equal(dynamicRows.length, 13);
+  assert.equal(uniqueStatic.size, 121);
   assert.deepEqual(countBy(rows, 'api'), {
     closest: 32,
     querySelector: 92,
-    querySelectorAll: 40
+    querySelectorAll: 42
   });
   assert.deepEqual(countStaticDynamic(rows, 'file'), {
-    'js/content/dom_fallback.js': { sites: 161, static: 150, dynamic: 11 },
+    'js/content/dom_fallback.js': { sites: 163, static: 151, dynamic: 12 },
     'js/content/dom_helpers.js': { sites: 3, static: 2, dynamic: 1 }
   });
 });
@@ -233,17 +234,16 @@ test('DOM fallback selector semantic register preserves semantic group counts an
   const rows = selectorSites();
   const text = doc();
   const expectedGroups = {
-    commentFallbackSelectors: { sites: 18, static: 16, dynamic: 2 },
+    commentFallbackSelectors: { sites: 13, static: 10, dynamic: 3 },
     currentWatchOwnerAndPlayerControlSelectors: { sites: 6, static: 6, dynamic: 0 },
-    guideSubscriptionFallbackSelectors: { sites: 4, static: 4, dynamic: 0 },
+    guideSubscriptionFallbackSelectors: { sites: 3, static: 3, dynamic: 0 },
     helperVisualWriters: { sites: 3, static: 2, dynamic: 1 },
-    mainCardIdentityAndTargetSelectors: { sites: 59, static: 57, dynamic: 2 },
+    mainCardIdentityAndTargetSelectors: { sites: 73, static: 71, dynamic: 2 },
     mixPlaylistAndWatchIdentitySelectors: { sites: 12, static: 12, dynamic: 0 },
-    pendingWhitelistAndMetadataSelectors: { sites: 1, static: 1, dynamic: 0 },
-    shelfGridPlaylistGuardSelectors: { sites: 11, static: 11, dynamic: 0 },
-    staleRestoreAndBroadControlSelectors: { sites: 27, static: 26, dynamic: 1 },
-    styleAndMobileOpenAppCleanupSelectors: { sites: 2, static: 2, dynamic: 0 },
-    surveyChipAndShortsSelectors: { sites: 21, static: 15, dynamic: 6 }
+    pendingWhitelistAndMetadataSelectors: { sites: 7, static: 7, dynamic: 0 },
+    shelfGridPlaylistGuardSelectors: { sites: 18, static: 15, dynamic: 3 },
+    staleRestoreAndBroadControlSelectors: { sites: 11, static: 10, dynamic: 1 },
+    surveyChipAndShortsSelectors: { sites: 20, static: 17, dynamic: 3 }
   };
 
   assert.deepEqual(countStaticDynamic(rows, 'group'), expectedGroups);
@@ -290,13 +290,14 @@ test('DOM fallback selector semantic register pins every dynamic selector expres
   const dynamicRows = selectorSites().filter(row => !row.isStaticLiteral);
   const text = doc();
 
-  assert.equal(dynamicRows.length, 12);
+  assert.equal(dynamicRows.length, 13);
   assert.deepEqual(countBy(dynamicRows, 'dynamicFamily'), {
     callerProvidedChildSelector: 1,
     commentEntryCandidateArray: 1,
     disguisedShortsSelectorArray: 1,
     globalVideoCardSelectorConstant: 1,
     homeFeedSelectorArray: 1,
+    inlineMobileSearchControlSelectorArray: 1,
     iteratedLinkSelectorCandidate: 1,
     iteratedShortsSelectorCandidate: 1,
     mobileShortsNavSelectorArray: 1,
@@ -317,6 +318,7 @@ test('DOM fallback selector semantic register pins every dynamic selector expres
   for (const token of [
     'homeFeedSelectors',
     'hiddenSelector',
+    'INLINE_MOBILE_SEARCH_CONTROL_SELECTORS',
     'VIDEO_CARD_SELECTORS',
     'shortsContainerSelectors',
     'disguisedShortsSelectors',

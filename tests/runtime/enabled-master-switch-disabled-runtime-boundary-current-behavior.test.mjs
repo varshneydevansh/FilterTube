@@ -13,7 +13,7 @@ const docPath = 'docs/audit/FILTERTUBE_ENABLED_MASTER_SWITCH_DISABLED_RUNTIME_BO
 const sourceFingerprints = {
   'js/seed.js': [1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
   'js/filter_logic.js': [3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'],
-  'js/content/dom_fallback.js': [4838, 228332, '2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef'],
+  'js/content/dom_fallback.js': [5030, 235555, 'fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5'],
   'js/background.js': [6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
   'js/settings_shared.js': [1181, 57535, '9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c'],
   'js/content/bridge_settings.js': [651, 26462, 'c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b'],
@@ -65,7 +65,7 @@ const blockSpecs = {
     file: 'js/content/dom_fallback.js',
     start: 'function hasActiveDOMFallbackWork(settings) {',
     end: 'function clearStaleDOMFallbackVisibility() {',
-    startLine: 1933,
+    startLine: 2117,
     lines: 68,
     bytes: 2333
   },
@@ -73,9 +73,9 @@ const blockSpecs = {
     file: 'js/content/dom_fallback.js',
     start: '    if (effectiveSettings.enabled === false) {',
     end: '    // 1. Video/Content Filtering',
-    startLine: 2304,
-    lines: 21,
-    bytes: 959
+    startLine: 2487,
+    lines: 18,
+    bytes: 791
   },
   backgroundEnabledFromV4: {
     file: 'js/background.js',
@@ -325,7 +325,7 @@ test('enabled disabled-runtime source/effect blocks remain current', () => {
   assert.match(domPredicate, /return categoryFilters\?\.enabled === true && hasList\(categoryFilters\.selected\)/);
 
   const domCleanup = blockMetric(blockSpecs.domDisabledCleanupGate).block;
-  assert.match(domCleanup, /contentControlStyle\.textContent = ''/);
+  assert.match(domCleanup, /clearContentControlStyles\(\)/);
   assert.match(domCleanup, /toggleVisibility\(el, false, '', true\)/);
 });
 

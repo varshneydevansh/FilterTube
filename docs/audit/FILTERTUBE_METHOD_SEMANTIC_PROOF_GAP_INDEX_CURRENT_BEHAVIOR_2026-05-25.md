@@ -765,7 +765,7 @@ current-source method gap freshness date: 2026-05-30
 tracked JS/JSX/MJS files still covered: 69
 repo-wide lexical callables still requiring semantic proof: 5701
 files with complete per-callable semantic proof: 0
-latest full runtime proof: broad audit backlog 4737 tests, 4661 pass, 76 fail
+latest full runtime proof: broad audit backlog 4754 tests, 4661 pass, 93 fail
 method semantic completion from freshness rerun: NO-GO
 optimization approval from method freshness rerun: NO-GO
 JSON-first first-class promotion from method freshness rerun: NO-GO

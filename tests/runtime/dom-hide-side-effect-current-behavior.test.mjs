@@ -84,7 +84,7 @@ test('direct display-none writes currently bypass the shared toggleVisibility pa
 
   assert.equal(countDirectDisplayNone(bridge), 11);
   assert.equal(countToggleRefs(bridge), 3);
-  assert.equal(countDirectDisplayNone(fallback), 10);
+  assert.equal(countDirectDisplayNone(fallback), 11);
   assert.equal(countToggleRefs(fallback), 55);
   assert.equal(countDirectDisplayNone(helpers), 1);
   assert.equal(countToggleRefs(helpers), 1);

@@ -286,7 +286,7 @@ gap evidence, while build-time permission/resource/world validation remains
 absent
 post-release audit continuation after Chrome Default unpacked workspace byte snapshot:
 audit-only installed-profile proof now pins Default Secure Preferences path to
-the workspace root, stored version 3.3.1, absence of a packed Default
+the workspace root, stored version 3.3.2, absence of a packed Default
 Extensions directory for the id, workspace manifest/package/content_bridge
 hashes, and the content_bridge ampersand Topic fix token; active-tab byte
 parity and reload timestamp remain NO-GO
@@ -307,7 +307,7 @@ Firefox, and Opera `v3.3.1` archives.
 Installed Chrome extension provenance was narrowed without changing runtime
 code. Sanitized `Chrome/Default/Secure Preferences` evidence shows extension id
 `gkgjigdfdccckblmglboobikfcpeelio` is configured from the workspace root, has a
-stored service worker registration version of `3.3.1`, and has active YouTube
+stored service worker registration version of `3.3.2`, and has active YouTube
 host permissions. This does not yet prove an already-open YouTube tab is running
 the latest content-script bytes, does not provide a reload timestamp, and does
 not prove incognito runtime availability.
@@ -458,7 +458,7 @@ promoted as a first-class authority.
   -> menu, quick-block, Topic byline, lifecycle, and register pins refreshed
 2026-05-28 audit continuation
   -> content-filter validity, route/surface, and value-normalization gaps pinned
-  -> callable proof gap ledgers reconciled to 5,681 lexical callables
+  -> callable proof gap ledgers reconciled to 5,701 lexical callables
   -> runtime behavior changed: no
 ```
 

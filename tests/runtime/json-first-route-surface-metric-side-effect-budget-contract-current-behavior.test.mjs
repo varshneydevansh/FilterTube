@@ -229,9 +229,9 @@ test('JSON-first route/surface metric side-effect budget contract is audit-only 
   assert.match(doc, /Runtime route\/surface metric artifact approval exists: no/);
   assert.match(doc, /Runtime metric collector approval exists: no/);
   assert.match(doc, /Method semantic proof gap files covered: 69/);
-  assert.match(doc, /Method semantic proof gap lexical callables covered: 5681/);
+  assert.match(doc, /Method semantic proof gap lexical callables covered: 5701/);
   assert.match(doc, /Files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /Lexical callables requiring semantic proof before behavior changes: 5681/);
+  assert.match(doc, /Lexical callables requiring semantic proof before behavior changes: 5701/);
   assert.match(doc, /Implementation-ready JSON-first route\/surface metric side-effect budget contract rows: 0/);
   assert.match(doc, /not completion proof for JSON-first route\/surface metric side-effect budget authority/);
 
@@ -268,9 +268,9 @@ test('JSON-first route/surface metric side-effect budget rows counts and fields 
   assert.match(doc, /source-locus side-effect rows covered: 12/);
   assert.match(doc, /collector side-effect approval rows covered: 12/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5681/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5701/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5681/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5701/);
   assert.match(doc, /committed route\/surface metric side-effect budget files: 0/);
   assert.match(doc, /committed route\/surface metric artifact files: 0/);
   assert.match(doc, /committed first-optimization foundation side-effect budget files: 0/);
@@ -345,7 +345,7 @@ test('JSON-first route/surface metric side-effect budget contract is backed by c
   assert.match(sourceLocusSideEffect, /implementation-ready source-locus side-effect rows: 0/);
   assert.match(collectorSideEffectApproval, /implementation-ready collector side-effect approval rows: 0/);
   assert.match(methodGap, /files with lexical accounting: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5681/);
+  assert.match(methodGap, /repo-wide lexical callables: 5701/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(implementationReadiness, /implementation-ready first optimization rows: 0/);
 });

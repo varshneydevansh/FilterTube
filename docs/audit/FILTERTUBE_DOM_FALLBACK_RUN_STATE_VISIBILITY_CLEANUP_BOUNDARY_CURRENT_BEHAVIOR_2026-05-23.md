@@ -23,7 +23,7 @@ This file also records the current reason for the codebase inspection: we are fi
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `js/content/dom_helpers.js` | 206 | 8,292 | `a8c6ebfc10394f67254fbe5d324090ba9d01bead7efbb61d44e63dda4b52c242` |
-| `js/content/dom_fallback.js` | 4,838 | 228,332 | `2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef` |
+| `js/content/dom_fallback.js` | 5,030 | 235,555 | `fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5` |
 
 DOM fallback run-state visibility cleanup source files pinned: 2
 
@@ -34,13 +34,13 @@ DOM fallback run-state visibility cleanup source files pinned: 2
 | `domHelpersToggleVisibility` | `js/content/dom_helpers.js:67` | 67 | 84 | 3,286 | `23e68a0a3522deb7dc786dbcf836723a5a1c63681e82888b14b4c2125015e623` |
 | `domHelpersContainerVisibility` | `js/content/dom_helpers.js:154` | 154 | 53 | 2,177 | `d3018c075d23c41add85406382b4f6dc2327cb031c96935db0fdecfe5edcf91d` |
 | `domFallbackExplicitHidden` | `js/content/dom_fallback.js:991` | 991 | 58 | 2,864 | `341302faf4f61e9fbabe2df16b59992a8bf41dadf2cb4b0017133599812be604` |
-| `domFallbackHasActiveWork` | `js/content/dom_fallback.js:1933` | 1,933 | 68 | 2,333 | `394f7a99044dcf8da10d631b5b7ec216235c427228f78d53583ebb07cbb0d583` |
-| `domFallbackStaleVisibilityCleanup` | `js/content/dom_fallback.js:2001` | 2,001 | 33 | 1,412 | `c43b2bb0bdcaa495f1c077b5c164d5666d2ed74ff334afb5ddd41dd217fe8412` |
-| `domFallbackApplyRunHead` | `js/content/dom_fallback.js:2035` | 2,035 | 63 | 2,188 | `c8f88f62bbd72cd9ed3c70476948919cdcb4aa7a125e26c1d684d3267dd8ee43` |
-| `domFallbackApplyScrollAndWatchCleanup` | `js/content/dom_fallback.js:2098` | 2,098 | 71 | 3,055 | `ef270a74e07e72c6767c65446da33adee02bb6541d02044fd4cafd6edfd5d707` |
-| `domFallbackDisabledCleanup` | `js/content/dom_fallback.js:2304` | 2,304 | 21 | 959 | `74a2a03bddccb449441616a374260b720067023533b9077e26bbc0aa6cc926b3` |
-| `domFallbackApplyScrollRestore` | `js/content/dom_fallback.js:4427` | 4,427 | 22 | 893 | `62ffc9b810d4515e5db8da3ccd9e98c6c4cbbae2b90fd8778ce647d816fb5508` |
-| `domFallbackApplyFinally` | `js/content/dom_fallback.js:4522` | 4,522 | 11 | 342 | `068457333a32e3b43aa59be0d1172964832201c6a6602121440e95ba3ebbf37e` |
+| `domFallbackHasActiveWork` | `js/content/dom_fallback.js:2117` | 2,117 | 68 | 2,333 | `394f7a99044dcf8da10d631b5b7ec216235c427228f78d53583ebb07cbb0d583` |
+| `domFallbackStaleVisibilityCleanup` | `js/content/dom_fallback.js:2185` | 2,185 | 33 | 1,412 | `c43b2bb0bdcaa495f1c077b5c164d5666d2ed74ff334afb5ddd41dd217fe8412` |
+| `domFallbackApplyRunHead` | `js/content/dom_fallback.js:2219` | 2,219 | 64 | 2,243 | `8e805dd33b290db7a08670645553b014a46341cb527c005f19b2c28f348dffba` |
+| `domFallbackApplyScrollAndWatchCleanup` | `js/content/dom_fallback.js:2283` | 2,283 | 69 | 2,984 | `a4803cbae26b8d2228c1c17bca16f9fe027d02183d2b6d1b76703da1e4b1c353` |
+| `domFallbackDisabledCleanup` | `js/content/dom_fallback.js:2487` | 2,487 | 18 | 791 | `474b2c2aef51cf0bf4cf8fefca5d8419b72ee094d037be5586bf49b7f5bdc63f` |
+| `domFallbackApplyScrollRestore` | `js/content/dom_fallback.js:4619` | 4,619 | 22 | 893 | `62ffc9b810d4515e5db8da3ccd9e98c6c4cbbae2b90fd8778ce647d816fb5508` |
+| `domFallbackApplyFinally` | `js/content/dom_fallback.js:4714` | 4,714 | 11 | 342 | `068457333a32e3b43aa59be0d1172964832201c6a6602121440e95ba3ebbf37e` |
 
 DOM fallback run-state visibility cleanup source/effect blocks pinned: 10
 
@@ -88,8 +88,10 @@ Counts below are over the pinned source/effect blocks, not whole files.
 | `scrollTo` | 5 |
 | `document.location?.pathname || ''` | 1 |
 | `path === '/feed/channels'` | 1 |
-| `ensureContentControlStyles` | 1 |
-| `contentControlStyle.textContent = ''` | 2 |
+| `ensureContentControlStyles` | 0 |
+| `contentControlStyle.textContent = ''` | 1 |
+| `clearContentControlStyles` | 1 |
+| `syncRouteScopedContentControls` | 1 |
 | `delete window.__filtertubeDomFallbackActiveRun` | 1 |
 
 Selected missing policy/report tokens over pinned blocks:
@@ -121,7 +123,7 @@ Selected missing policy/report tokens over pinned blocks:
 
 `domFallbackApplyScrollAndWatchCleanup`: the scroll listener is installed once on `window.__filtertubeScrollState`, user scrolling is treated as recent for 150 ms, scroll preservation is disabled for forced reprocess and active user scrolling, `/feed/channels` restores hidden/pending elements and returns, and whitelist watch metadata/buttons are restored before broad card work.
 
-`domFallbackDisabledCleanup`: disabled settings clear the content-control style node, restore currently hidden or pending elements, remove pending category/upload-date attributes, and return before video-card processing.
+`domFallbackDisabledCleanup`: disabled settings call `clearContentControlStyles()`, restore currently hidden or pending elements, remove pending category/upload-date attributes, and return before video-card processing.
 
 `domFallbackApplyScrollRestore`: scroll restoration only runs when preservation is allowed and no scroll happened during the run or within the recent-user-scroll window. It attempts `scrollingElement.scrollTo()` first and falls back to `window.scrollTo()`.
 
@@ -168,9 +170,9 @@ runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

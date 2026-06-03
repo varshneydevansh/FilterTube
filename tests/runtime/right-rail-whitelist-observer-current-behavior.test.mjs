@@ -122,10 +122,10 @@ function assertWhitelistObserverBudgetMatrixAddendum() {
   for (const row of [
     /\| JSON transport admission \| `js\/seed\.js:234-238`, `js\/injector\.js:185-188` \|/,
     /\| Identity prefetch admission \| `js\/content_bridge\.js:1006-1015`, `js\/content_bridge\.js:1311-1316` \|/,
-    /\| Right-rail observer install \| `js\/content_bridge\.js:1211-1226`, `js\/content_bridge\.js:1286-1301` \|/,
-    /\| Whitelist pending timers \| `js\/content_bridge\.js:5992-6040` \|/,
-    /\| DOM fallback active predicate \| `js\/content\/dom_fallback\.js:1933-1938`, `js\/content\/dom_fallback\.js:2039-2076`, `js\/content\/dom_fallback\.js:4595-4604` \|/,
-    /\| Quick\/menu quiet gates \| `js\/content\/block_channel\.js:1209-1229`, `js\/content\/block_channel\.js:2895-2897`, `js\/content_bridge\.js:10517-10498` \|/
+    /\| Right-rail observer install \| `js\/content_bridge\.js:1210-1237`, `js\/content_bridge\.js:1256-1269` \|/,
+    /\| Whitelist pending timers \| `js\/content_bridge\.js:6200-6268` \|/,
+    /\| DOM fallback active predicate \| `js\/content\/dom_fallback\.js:2117-2184`, `js\/content\/dom_fallback\.js:2220-2327`, `js\/content\/dom_fallback\.js:4739-4891` \|/,
+    /\| Quick\/menu quiet gates \| `js\/content\/block_channel\.js:1212-1296`, `js\/content\/block_channel\.js:1993-2042`, `js\/content_bridge\.js:10725-10737` \|/
   ]) {
     assert.match(doc, row);
   }
@@ -134,7 +134,7 @@ function assertWhitelistObserverBudgetMatrixAddendum() {
   assert.match(injector, /function hasNetworkJsonWork\(settings\) \{\s*if \(!settings \|\| settings\.enabled === false\) return false;\s*if \(settings\.listMode === 'whitelist'\) return true;/);
   assert.match(bridge, /function needsIdentityPrefetchWork\(settings\) \{[\s\S]*if \(settings\.listMode === 'whitelist'\) return true;/);
   assert.match(bridge, /function installRightRailWhitelistObserver\(\) \{\s*if \(currentSettings\?\.listMode !== 'whitelist'\) return;/);
-  assert.match(bridge, /if \(\(document\.location\?\.pathname \|\| ''\)\.startsWith\('\/watch'\)\) return;/);
+  assert.doesNotMatch(sliceBetween(bridge, 'function installRightRailWhitelistObserver() {', 'function queuePrefetchForCard(card) {'), /startsWith\('\/watch'\)/);
   assert.match(bridge, /const whitelistPendingRefreshState = \{[\s\S]*pendingHideCandidates: \[\][\s\S]*\};/);
   assert.match(bridge, /if \(path === '\/' \|\| path === '\/results' \|\| path === '\/feed\/channels' \|\| path\.startsWith\('\/watch'\)\) return;/);
   assert.match(fallback, /function hasActiveDOMFallbackWork\(settings\) \{[\s\S]*if \(listMode === 'whitelist'\) return true;/);
@@ -151,7 +151,7 @@ test('right-rail whitelist observer audit documents watch-route ambiguity and co
   for (const phrase of [
     'current-behavior audit proof with a narrow runtime hot-path fix',
     'installRightRailWhitelistObserver()',
-    'returns immediately when pathname starts /watch',
+    'current callback no longer',
     'coalesces one immediate and one follow-up forced applyDOMFallback() pass',
     'right-rail duplicate forced refresh fanout: reduced',
     'watch/right-rail shaped',
@@ -380,7 +380,7 @@ test('initializeDOMFallback currently installs the right-rail observer after fal
   assert.match(initializer, /refreshFilterTubeRuntimeObservers\(\)/);
 });
 
-test('right-rail observer attaches to watch rail selectors but its scheduler skips watch routes', () => {
+test('right-rail observer attaches to watch rail selectors and its scheduler admits watch routes', () => {
   const source = read('js/content_bridge.js');
   const block = sliceBetween(
     source,
@@ -401,10 +401,10 @@ test('right-rail observer attaches to watch rail selectors but its scheduler ski
   assert.match(attach, /'#related, #secondary, ytd-watch-next-secondary-results-renderer, ytd-watch-flexy #secondary'/);
   assert.match(attach, /observer\.observe\(rail, \{ childList: true, subtree: true \}\)/);
   assert.match(scheduler, /currentSettings\?\.listMode !== 'whitelist'/);
-  assert.match(scheduler, /\(document\.location\?\.pathname \|\| ''\)\.startsWith\('\/watch'\)/);
+  assert.doesNotMatch(scheduler, /startsWith\('\/watch'\)/);
 });
 
-test('forced whitelist reprocess is coalesced and delayed passes recheck route', () => {
+test('forced whitelist reprocess is coalesced and delayed passes recheck mode', () => {
   const source = read('js/content_bridge.js');
   const block = sliceBetween(
     source,
@@ -423,9 +423,9 @@ test('forced whitelist reprocess is coalesced and delayed passes recheck route',
   );
 
   const watchSkipIndex = scheduler.indexOf("startsWith('/watch')");
-  assert.ok(watchSkipIndex > -1, 'expected watch skip in scheduler');
+  assert.equal(watchSkipIndex, -1, 'right-rail scheduler should not skip watch routes');
   assert.match(runner, /currentSettings\?\.listMode !== 'whitelist'/);
-  assert.match(runner, /\(document\.location\?\.pathname \|\| ''\)\.startsWith\('\/watch'\)/);
+  assert.doesNotMatch(runner, /startsWith\('\/watch'\)/);
   assert.match(runner, /applyDOMFallback\(null, \{ preserveScroll: true, forceReprocess: true \}\)/);
   assert.match(scheduler, /if \(!whitelistRefreshImmediateTimer\)/);
   assert.match(scheduler, /whitelistRefreshImmediateTimer = setTimeout\(\(\) => \{/);
@@ -453,7 +453,7 @@ test('forced whitelist reprocess is coalesced and delayed passes recheck route',
   runtime.setPathname('/watch');
   runtime.runTimer(0);
   runtime.runTimer(1);
-  assert.equal(runtime.applyCalls.length, 0, 'stale delayed passes should skip after SPA navigation to /watch');
+  assert.equal(runtime.applyCalls.length, 2, 'delayed passes should run after SPA navigation to /watch when whitelist mode remains active');
 
   const whitelistRuntime = createRightRailHarness({ pathname: '/results' });
   whitelistRuntime.triggerMutation();
@@ -469,7 +469,7 @@ test('forced whitelist reprocess is coalesced and delayed passes recheck route',
   assert.equal(blocklistRuntime.timers.length, 0);
 });
 
-test('right-rail mutation and navigation callbacks reuse the same watch-skipping scheduler', () => {
+test('right-rail mutation and navigation callbacks reuse the same watch-admitting scheduler', () => {
   const source = read('js/content_bridge.js');
   const block = sliceBetween(
     source,

@@ -295,7 +295,7 @@ provenance approval. The addendum pins 12 collector fixture provenance approval
 boundary rows, 12 source-locus fixture provenance rows covered, 12 collector
 fixture provenance rows covered, 12 fixture provenance contract rows covered,
 25 current fixture provenance anchors covered, 8 fixture provenance risk
-classes covered, 69 method semantic proof gap files covered, 5,681 lexical callables still requiring semantic proof, 0 files with complete per-callable
+classes covered, 69 method semantic proof gap files covered, 5,697 lexical callables still requiring semantic proof, 0 files with complete per-callable
 semantic proof, 0 runtime source-owner approvals, 0 runtime metric collector
 approvals, 0 runtime collector insertion points approved, 0 runtime collector
 fixture packets approved, 0 committed fixture provenance files, 0

@@ -21,7 +21,7 @@ authority, or first-class JSON filtering gate.
 - `js/content_bridge.js`
   - Lines: 13571
   - Bytes: 601694
-  - sha256: `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3`
+  - sha256: `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c`
 
 Related proof already present:
 
@@ -37,8 +37,8 @@ Related proof already present:
 content bridge startup timing source files: 2
 bridge_injection lines: 127
 bridge_injection bytes: 4741
-content_bridge lines: 13571
-content_bridge bytes: 601694
+content_bridge lines: 13562
+content_bridge bytes: 601080
 fallback block lines: 23
 fallback block bytes: 904
 injectMainWorldScripts block lines: 46
@@ -220,9 +220,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

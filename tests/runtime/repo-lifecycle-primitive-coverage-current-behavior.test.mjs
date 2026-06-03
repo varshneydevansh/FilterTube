@@ -216,7 +216,7 @@ test('repo-wide lifecycle primitive totals match current tracked source', () => 
     intersectionObserver: 4,
     setInterval: 3,
     clearInterval: 4,
-    setTimeout: 123,
+    setTimeout: 124,
     clearTimeout: 34,
     requestAnimationFrame: 31,
     cancelAnimationFrame: 4,
@@ -224,13 +224,13 @@ test('repo-wide lifecycle primitive totals match current tracked source', () => 
     xmlHttpRequest: 2,
     postMessage: 26,
     sendMessage: 34,
-    dispatchEvent: 31,
+    dispatchEvent: 33,
     clickCall: 33,
     styleDisplay: 96,
     classListMutation: 110
   });
-  assert.equal(Object.values(totals).reduce((sum, value) => sum + value, 0), 870);
-  assert.match(coverageDoc, /\*\*Total\*\* \| \*\*870\*\*/);
+  assert.equal(Object.values(totals).reduce((sum, value) => sum + value, 0), 873);
+  assert.match(coverageDoc, /\*\*Total\*\* \| \*\*873\*\*/);
 });
 
 test('lifecycle primitive family totals pin page runtime UI website vendor and quarantine burden', () => {
@@ -240,7 +240,7 @@ test('lifecycle primitive family totals pin page runtime UI website vendor and q
   );
   assert.deepEqual(familyTotals, {
     'build-release-sync-scripts': 0,
-    'content-runtime-js': 373,
+    'content-runtime-js': 376,
     'extension-ui-background-js': 417,
     'generated-ui-output': 8,
     'generated-ui-source': 2,
@@ -288,7 +288,7 @@ test('page-resident lifecycle token imbalance is pinned as a cleanup no-go', () 
   assert.deepEqual(perFileTotals, {
     'js/content_bridge.js': 97,
     'js/content/block_channel.js': 74,
-    'js/content/dom_fallback.js': 13,
+    'js/content/dom_fallback.js': 14,
     'js/injector.js': 12,
     'js/content/bridge_settings.js': 10,
     'js/content/collab_dialog.js': 10,
@@ -303,21 +303,21 @@ test('page-resident lifecycle token imbalance is pinned as a cleanup no-go', () 
     disconnect: 8,
     setInterval: 2,
     clearInterval: 3,
-    setTimeout: 80,
+    setTimeout: 81,
     clearTimeout: 22,
     requestAnimationFrame: 15,
     cancelAnimationFrame: 0
   });
-  assert.equal(Object.values(totals).reduce((sum, value) => sum + value, 0), 224);
+  assert.equal(Object.values(totals).reduce((sum, value) => sum + value, 0), 225);
 
   for (const token of [
     '2026-05-30 Page-Resident Teardown Imbalance Addendum',
-    '224 selected page-resident lifecycle tokens',
+    '225 selected page-resident lifecycle tokens',
     '74 `addEventListener`',
     '6 `removeEventListener`',
     '14 `new MutationObserver`',
     '8 `.disconnect()`',
-    '80 `setTimeout`',
+    '81 `setTimeout`',
     '22 `clearTimeout`',
     '15 `requestAnimationFrame`',
     '0 `cancelAnimationFrame`',

@@ -11,7 +11,7 @@ const docPath = 'docs/audit/FILTERTUBE_DOM_FALLBACK_RUN_STATE_VISIBILITY_CLEANUP
 
 const sourceFingerprints = {
   'js/content/dom_helpers.js': [206, 8292, 'a8c6ebfc10394f67254fbe5d324090ba9d01bead7efbb61d44e63dda4b52c242'],
-  'js/content/dom_fallback.js': [4838, 228332, '2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef']
+  'js/content/dom_fallback.js': [5030, 235555, 'fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5']
 };
 
 const blockSpecs = {
@@ -36,7 +36,7 @@ const blockSpecs = {
   domFallbackExplicitHidden: {
     file: 'js/content/dom_fallback.js',
     start: 'function clearBlockedElementAttributes(element) {',
-    end: 'function hasExplicitHideReasonMarker',
+    end: 'function scheduleFilterTubeContinuationNudge',
     startLine: 991,
     lines: 58,
     bytes: 2864,
@@ -46,7 +46,7 @@ const blockSpecs = {
     file: 'js/content/dom_fallback.js',
     start: 'function hasActiveDOMFallbackWork(settings) {',
     end: 'function clearStaleDOMFallbackVisibility',
-    startLine: 1933,
+    startLine: 2117,
     lines: 68,
     bytes: 2333,
     hash: '394f7a99044dcf8da10d631b5b7ec216235c427228f78d53583ebb07cbb0d583'
@@ -55,7 +55,7 @@ const blockSpecs = {
     file: 'js/content/dom_fallback.js',
     start: 'function clearStaleDOMFallbackVisibility() {',
     end: '// DOM fallback function that processes already-rendered content',
-    startLine: 2001,
+    startLine: 2185,
     lines: 33,
     bytes: 1412,
     hash: 'c43b2bb0bdcaa495f1c077b5c164d5666d2ed74ff334afb5ddd41dd217fe8412'
@@ -63,35 +63,35 @@ const blockSpecs = {
   domFallbackApplyRunHead: {
     file: 'js/content/dom_fallback.js',
     start: 'async function applyDOMFallback(settings, options = {}) {',
-    end: '    const scrollState = window.__filtertubeScrollState',
-    startLine: 2035,
-    lines: 63,
-    bytes: 2188,
-    hash: 'c8f88f62bbd72cd9ed3c70476948919cdcb4aa7a125e26c1d684d3267dd8ee43'
+    end: '    const scrollState = window.__filtertubeScrollState || (window.__filtertubeScrollState = {',
+    startLine: 2219,
+    lines: 64,
+    bytes: 2243,
+    hash: '8e805dd33b290db7a08670645553b014a46341cb527c005f19b2c28f348dffba'
   },
   domFallbackApplyScrollAndWatchCleanup: {
     file: 'js/content/dom_fallback.js',
-    start: '    const scrollState = window.__filtertubeScrollState',
+    start: '    const scrollState = window.__filtertubeScrollState || (window.__filtertubeScrollState = {',
     end: '    // Robust DOM-based passes',
-    startLine: 2098,
-    lines: 71,
-    bytes: 3055,
-    hash: 'ef270a74e07e72c6767c65446da33adee02bb6541d02044fd4cafd6edfd5d707'
+    startLine: 2283,
+    lines: 69,
+    bytes: 2984,
+    hash: 'a4803cbae26b8d2228c1c17bca16f9fe027d02183d2b6d1b76703da1e4b1c353'
   },
   domFallbackDisabledCleanup: {
     file: 'js/content/dom_fallback.js',
     start: '    if (effectiveSettings.enabled === false) {',
     end: '    // 1. Video/Content Filtering',
-    startLine: 2304,
-    lines: 21,
-    bytes: 959,
-    hash: '74a2a03bddccb449441616a374260b720067023533b9077e26bbc0aa6cc926b3'
+    startLine: 2487,
+    lines: 18,
+    bytes: 791,
+    hash: '474b2c2aef51cf0bf4cf8fefca5d8419b72ee094d037be5586bf49b7f5bdc63f'
   },
   domFallbackApplyScrollRestore: {
     file: 'js/content/dom_fallback.js',
     start: '    if (allowPreserveScroll && scrollingElement) {',
     end: '    // Log hide/restore summary',
-    startLine: 4427,
+    startLine: 4619,
     lines: 22,
     bytes: 893,
     hash: '62ffc9b810d4515e5db8da3ccd9e98c6c4cbbae2b90fd8778ce647d816fb5508'
@@ -100,7 +100,7 @@ const blockSpecs = {
     file: 'js/content/dom_fallback.js',
     start: '    } finally {',
     end: '}\n\n// Helper function to check if content should be hidden',
-    startLine: 4522,
+    startLine: 4714,
     lines: 11,
     bytes: 342,
     hash: '068457333a32e3b43aa59be0d1172964832201c6a6602121440e95ba3ebbf37e'
@@ -146,8 +146,10 @@ const selectedCounts = {
   scrollTo: 5,
   "document.location?.pathname || ''": 1,
   "path === '/feed/channels'": 1,
-  ensureContentControlStyles: 1,
-  "contentControlStyle.textContent = ''": 2,
+  ensureContentControlStyles: 0,
+  "contentControlStyle.textContent = ''": 1,
+  clearContentControlStyles: 1,
+  syncRouteScopedContentControls: 1,
   'delete window.__filtertubeDomFallbackActiveRun': 1
 };
 
@@ -555,7 +557,7 @@ test('DOM fallback run-state and scroll cleanup remain source-derived', () => {
   assert.match(blocks.domFallbackApplyScrollAndWatchCleanup, /path === '\/feed\/channels'/);
   assert.match(blocks.domFallbackApplyScrollAndWatchCleanup, /watchMeta\.querySelectorAll/);
   assert.match(blocks.domFallbackDisabledCleanup, /effectiveSettings\.enabled === false/);
-  assert.match(blocks.domFallbackDisabledCleanup, /contentControlStyle\.textContent = ''/);
+  assert.match(blocks.domFallbackDisabledCleanup, /clearContentControlStyles\(\)/);
   assert.match(blocks.domFallbackDisabledCleanup, /return/);
   assert.match(blocks.domFallbackApplyScrollRestore, /didScrollDuringRun/);
   assert.match(blocks.domFallbackApplyScrollRestore, /isUserScrollingNow/);

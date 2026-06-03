@@ -29,9 +29,9 @@ Runtime route/surface metric verification output approval exists: no
 Runtime route/surface metric artifact approval exists: no
 Runtime metric collector approval exists: no
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5681
+Method semantic proof gap lexical callables covered: 5701
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5681
+Lexical callables requiring semantic proof before behavior changes: 5701
 Implementation-ready JSON-first route/surface metric verification output contract rows: 0
 ```
 
@@ -70,7 +70,7 @@ can be used as implementation authority.
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_NO_WORK_PRESERVATION_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Maps no-work preservation obligations while proving 0 runtime collector no-work proofs approved. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_SIDE_EFFECT_BUDGET_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Maps collector side-effect budgets while proving 0 runtime collector side-effect budgets approved. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_FIXTURE_PROVENANCE_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Maps collector fixture provenance while proving 0 runtime collector fixture packets approved. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 tracked JS/JSX/MJS files still have 5681 lexical callables requiring per-callable semantic proof before behavior changes. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 tracked JS/JSX/MJS files still have 5701 lexical callables requiring per-callable semantic proof before behavior changes. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_IMPLEMENTATION_READINESS_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | Keeps first optimization implementation at NO-GO. |
 | `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` | Runtime proof is tracked in the audit harness, not as a committed route/surface metric verification output artifact. |
 
@@ -103,9 +103,9 @@ metric collector no-work rows covered: 12
 metric collector side-effect rows covered: 12
 metric collector fixture provenance rows covered: 12
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 committed route/surface metric verification output files: 0
 committed route/surface metric artifact files: 0
 committed first-optimization foundation verification output files: 0

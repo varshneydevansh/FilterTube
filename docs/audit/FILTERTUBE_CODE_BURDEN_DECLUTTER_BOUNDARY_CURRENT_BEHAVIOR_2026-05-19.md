@@ -192,20 +192,20 @@ Large product-owned source files:
 
 | File | Current lines | Boundary |
 | --- | ---: | --- |
-| `js/content_bridge.js` | 13571 | Giant cross-context hub. Any growth needs source-owner proof and focused runtime fixtures. |
+| `js/content_bridge.js` | 13623 | Giant cross-context hub. Any growth needs source-owner proof and focused runtime fixtures. |
 | `js/tab-view.js` | 11617 | Dashboard/settings UI surface. Any growth needs UI/state owner proof and release smoke. |
 | `js/background.js` | 6320 | Background storage/message/profile authority. Any growth needs mutation and settings proof. |
-| `js/content/dom_fallback.js` | 4838 | DOM fallback selector/hide/restore authority. Any growth needs DOM/no-work proof. |
+| `js/content/dom_fallback.js` | 5030 | DOM fallback selector/hide/restore authority. Any growth needs DOM/no-work proof. |
 | `js/filter_logic.js` | 3652 | JSON renderer rule and decision engine. Any growth needs rule/path proof. |
 | `js/injector.js` | 3593 | Main-world JSON interception and page bridge. Any growth needs JSON/no-work proof. |
-| `js/content/block_channel.js` | 3175 | Quick-block/native menu/Kids action surface. Any growth needs menu/action lifecycle proof. |
+| `js/content/block_channel.js` | 3189 | Quick-block/native menu/Kids action surface. Any growth needs menu/action lifecycle proof. |
 | `js/state_manager.js` | 2491 | Settings persistence and profile mutation surface. Any growth needs storage proof. |
 | `js/io_manager.js` | 2030 | Import/export and backup surface. Any growth needs payload and migration proof. |
 | `js/popup.js` | 1841 | Popup settings/action UI. Any growth needs settings UI proof and popup smoke. |
 | `js/render_engine.js` | 1389 | Dashboard renderer helper. Any growth needs release UI proof. |
 | `js/settings_shared.js` | 1181 | Canonical settings compiler and migration surface. Any growth needs mode/list proof. |
+| `js/content/dom_extractors.js` | 1137 | DOM identity extraction surface. Any growth needs identity false-hide/leak proof. |
 | `js/seed.js` | 1136 | Transport interception and JSON active-work gate. Any growth needs JSON/no-work proof. |
-| `js/content/dom_extractors.js` | 1102 | DOM identity extraction surface. Any growth needs identity false-hide/leak proof. |
 
 Near-threshold product-owned source files:
 
@@ -244,9 +244,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

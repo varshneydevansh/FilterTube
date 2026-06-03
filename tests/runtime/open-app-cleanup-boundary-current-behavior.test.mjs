@@ -149,7 +149,7 @@ test('open-app cleanup boundary audit is audit-only and source pinned', () => {
   assert.match(doc, /open-app cleanup boundary source\/effect blocks: 4/);
   assert.match(doc, /runtime open-app cleanup fixtures: 6/);
 
-  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 4838 | 228332 | \`${sha256('js/content/dom_fallback.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 5,030 | 235,555 | \`${sha256('js/content/dom_fallback.js')}\` |`));
 });
 
 test('open-app cleanup source counts and CSS coupling remain pinned', () => {

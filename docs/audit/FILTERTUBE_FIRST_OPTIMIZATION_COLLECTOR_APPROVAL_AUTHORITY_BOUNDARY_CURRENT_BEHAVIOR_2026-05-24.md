@@ -31,9 +31,9 @@ Runtime rollback approvals: 0
 Runtime unclaimed-surface approvals: 0
 Implementation-ready collector approval rows: 0
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5681
+Method semantic proof gap lexical callables covered: 5701
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5681
+Lexical callables requiring semantic proof before behavior changes: 5701
 ```
 
 This is a collector approval boundary, not a collector design or implementation.
@@ -59,7 +59,7 @@ teardown, and fixtures.
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_PARITY_ROLLOUT_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves 12 parity rollout rows and 0 approved parity rollout proofs. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_VERIFICATION_OUTPUT_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Proves 0 committed verification output files and 0 implementation-ready verification output contract rows. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_ROLLBACK_UNCLAIMED_SURFACE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves 0 runtime rollback approvals, 0 runtime unclaimed-surface approvals, and 0 implementation-ready rollback/unclaimed rows. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,681 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,697 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_IMPLEMENTATION_READINESS_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | Proves 0 runtime first optimization approvals and 0 implementation-ready first optimization rows. |
 | `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` | Runtime proof is tracked in the audit harness, not as runtime collector approval. |
 
@@ -87,9 +87,9 @@ runtime rollback approvals: 0
 runtime unclaimed-surface approvals: 0
 implementation-ready collector approval rows: 0
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 expected runtime audit tests: 4457
 expected runtime audit pass: 4457
 expected runtime audit fail: 0
@@ -232,7 +232,7 @@ covered, 12 source-locus implementation authority rows covered, 12
 source-owner approval rows covered, 12 callable rows covered, 12 teardown rows
 covered, 12 no-work rows covered, 12 side-effect rows covered, 12 fixture
 provenance rows covered, 12 diagnostic privacy rows covered, 12 parity release
-verification rows covered, 69 method semantic proof gap files covered, 5,681
+verification rows covered, 69 method semantic proof gap files covered, 5,697
 lexical callables still requiring semantic proof, 0 files with complete
 per-callable semantic proof, 0 runtime source-owner approvals, 0 runtime metric
 collector approvals, 0 runtime collector insertion points approved, 0 committed
@@ -253,7 +253,7 @@ source-owner approval rows covered, 12 collector source-locus closure rows
 covered, 12 no-work rows covered, 12 side-effect rows covered, 12 fixture
 provenance rows covered, 12 diagnostic privacy rows covered, 12 parity rollout
 rows covered, 12 verification output rows covered, 12 rollback/unclaimed rows
-covered, 69 method semantic proof gap files covered, 5,681 lexical callables
+covered, 69 method semantic proof gap files covered, 5,697 lexical callables
 still requiring semantic proof, 0 files with complete per-callable semantic
 proof, 0 runtime source-owner approvals, 0 runtime metric collector approvals,
 0 runtime collector insertion points approved, 0 runtime rollback approvals, 0
@@ -275,7 +275,7 @@ preservation rows covered, 12 no-work preservation contract rows covered, 12
 source-locus no-work rows covered, 12 insertion approval rows covered, 0
 runtime source-owner approvals, 0 runtime metric collector approvals, 0
 runtime collector insertion points approved, 0 runtime collector no-work
-proofs approved, 69 method semantic proof gap files covered, 5,681 lexical
+proofs approved, 69 method semantic proof gap files covered, 5,697 lexical
 callables still requiring semantic proof, 0 files with complete per-callable
 semantic proof, 0 committed no-work preservation files, 0 implementation-ready
 collector no-work approval rows, expected runtime audit tests: 4457, expected
@@ -293,7 +293,7 @@ precondition. The addendum pins 12 collector side-effect approval boundary
 rows, 12 collector approval authority rows covered, 12 collector side-effect
 rows covered, 12 side-effect budget contract rows covered, 12 source-locus
 side-effect rows covered, 12 no-work approval rows covered, 63 method semantic
-proof gap files covered, 5,681 lexical callables still requiring semantic proof,
+proof gap files covered, 5,697 lexical callables still requiring semantic proof,
 0 files with complete per-callable semantic proof, 0 runtime source-owner
 approvals, 0 runtime metric collector approvals, 0 runtime collector insertion
 points approved, 0 runtime collector no-work proofs approved, 0 runtime
@@ -313,7 +313,7 @@ precondition. The addendum pins 12 collector fixture provenance approval
 boundary rows, 12 collector approval authority rows covered, 12 collector
 fixture provenance rows covered, 12 fixture provenance contract rows covered,
 12 source-locus fixture provenance rows covered, 12 side-effect approval rows
-covered, 69 method semantic proof gap files covered, 5,681 lexical callables
+covered, 69 method semantic proof gap files covered, 5,697 lexical callables
 still requiring semantic proof, 0 files with complete per-callable semantic
 proof, 0 runtime source-owner approvals, 0 runtime metric collector approvals,
 0 runtime collector insertion points approved, 0 runtime collector side-effect
@@ -333,7 +333,7 @@ prove diagnostic privacy approval remains absent as its own collector approval
 precondition. The addendum pins 12 collector diagnostic privacy approval
 boundary rows, 12 collector approval authority rows covered, 12 diagnostic
 privacy contract rows covered, 12 source-locus diagnostic privacy rows
-covered, 12 fixture provenance approval rows covered, 69 method semantic proof gap files covered, 5,681 lexical callables still requiring semantic proof, 0
+covered, 12 fixture provenance approval rows covered, 69 method semantic proof gap files covered, 5,697 lexical callables still requiring semantic proof, 0
 files with complete per-callable semantic proof, 0 runtime source-owner
 approvals, 0 runtime metric collector approvals, 0 runtime collector insertion
 points approved, 0 runtime collector fixture packets approved, 0 runtime
@@ -353,7 +353,7 @@ approval precondition. The addendum pins 12 collector parity rollout approval
 boundary rows, 12 collector approval authority rows covered, 12 collector
 parity rollout rows covered, 12 parity rollout contract rows covered, 12
 source-locus parity release verification rows covered, 12 diagnostic privacy
-approval rows covered, 69 method semantic proof gap files covered, 5,681
+approval rows covered, 69 method semantic proof gap files covered, 5,697
 lexical callables still requiring semantic proof, 0 files with complete
 per-callable semantic proof, 0 runtime source-owner approvals, 0 runtime
 metric collector approvals, 0 runtime collector parity rollout approvals, 0
@@ -372,7 +372,7 @@ prove collector verification output approval remains absent as its own
 collector approval precondition. The addendum pins 12 collector verification
 output approval boundary rows, 12 collector approval authority rows covered, 12
 verification output contract rows covered, 12 collector parity rollout
-approval rows covered, 69 method semantic proof gap files covered, 5,681
+approval rows covered, 69 method semantic proof gap files covered, 5,697
 lexical callables still requiring semantic proof, 0 files with complete
 per-callable semantic proof, 0 runtime source-owner approvals, 0 runtime
 metric collector approvals, 0 runtime collector verification output approvals,
@@ -391,7 +391,7 @@ prove collector rollback/unclaimed approval remains absent as its own collector
 approval precondition. The addendum pins 12 collector rollback/unclaimed
 approval boundary rows, 12 collector approval authority rows covered, 12
 rollback/unclaimed rows covered, 12 collector verification output approval
-rows covered, 69 method semantic proof gap files covered, 5,681 lexical
+rows covered, 69 method semantic proof gap files covered, 5,697 lexical
 callables still requiring semantic proof, 0 files with complete per-callable
 semantic proof, 0 runtime source-owner approvals, 0 runtime metric collector
 approvals, 0 runtime rollback approvals, 0 runtime unclaimed-surface approvals,

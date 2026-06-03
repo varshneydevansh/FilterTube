@@ -35,8 +35,8 @@ filter implementation surface.
 The repo-wide method semantic proof gap is now part of this gate. A JSON field
 or renderer path cannot become first-class filter authority while its affected
 callables remain only lexically counted. The current callable gap index proves
-69 tracked JS/JSX/MJS files, 5,681 lexical callables, 0 files with complete
-per-callable semantic proof, and 5,681 callables still requiring semantic proof
+69 tracked JS/JSX/MJS files, 5,697 lexical callables, 0 files with complete
+per-callable semantic proof, and 5,697 callables still requiring semantic proof
 before behavior changes.
 
 ## Source Inputs
@@ -54,7 +54,7 @@ before behavior changes.
 | `docs/audit/FILTERTUBE_CANDIDATE_OBLIGATION_BINDING_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 10 candidate-obligation bindings are mapped, but 0 bindings have committed metric artifacts. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SOURCE_LOCUS_IMPLEMENTATION_AUTHORITY_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | 12 first-optimization source-locus implementation authority rows remain NO-GO. |
 | `docs/audit/FILTERTUBE_WHITELIST_OPTIMIZATION_READINESS_GAP_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 10 whitelist readiness gaps keep recent whitelist optimization in audit mode. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | 69 tracked JS/JSX/MJS files, 5,681 lexical callables, 0 files with complete per-callable semantic proof, and 5,681 callables still requiring semantic proof before JSON-first behavior changes. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | 69 tracked JS/JSX/MJS files, 5,697 lexical callables, 0 files with complete per-callable semantic proof, and 5,697 callables still requiring semantic proof before JSON-first behavior changes. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_IMPLEMENTATION_READINESS_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | 14 first-optimization readiness rows remain NO-GO. |
 | `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` | Runtime proof is tracked by the audit harness, not as implementation authority. |
 
@@ -74,7 +74,7 @@ candidate-obligation binding rows covered: 10
 first optimization source-locus implementation rows covered: 12
 whitelist readiness gaps covered: 10
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 complete per-callable semantic proof files covered: 0
 first optimization implementation readiness rows covered: 14
 runtime JSON-first implementation approvals: 0
@@ -120,14 +120,14 @@ not completion proof for JSON-first implementation authority
 | `js/filter_logic.js:435` | hand-authored renderer rule surface |
 | `js/filter_logic.js:2263` | category metadata fetch trigger |
 | `js/filter_logic.js:3588` | harvest before disabled skip and later mutation split |
-| `js/content_bridge.js:1794` | shared metadata fetch queue and cache-write path |
-| `js/content_bridge.js:6088` | DOM fallback startup and debounced mutation-driven fallback work |
-| `js/content_bridge.js:6489` | fallback menu CSS/listener/observer/timer repair path |
-| `js/content/dom_fallback.js:1933` | DOM fallback active-work predicate |
-| `js/content/dom_fallback.js:2487` | DOM category metadata branch |
-| `js/content/block_channel.js:1205` | quick-block action gate |
-| `js/content/block_channel.js:1979` | quick-block observer setup |
-| `js/content/block_channel.js:3172` | fixed quick-block delayed startup |
+| `js/content_bridge.js:1785` | shared metadata fetch queue and cache-write path |
+| `js/content_bridge.js:6140` | DOM fallback startup and debounced mutation-driven fallback work |
+| `js/content_bridge.js:6541` | fallback menu CSS/listener/observer/timer repair path |
+| `js/content/dom_fallback.js:2117` | DOM fallback active-work predicate |
+| `js/content/dom_fallback.js:2669` | DOM category metadata branch |
+| `js/content/block_channel.js:1212` | quick-block action gate |
+| `js/content/block_channel.js:1993` | quick-block observer setup |
+| `js/content/block_channel.js:3185` | fixed quick-block delayed startup |
 
 ## Current JSON-First Source-Flow Addendum - 2026-05-27
 
@@ -199,10 +199,10 @@ flowchart TD
 | `json_flow_renderer_rule_owner` | `js/filter_logic.js:435-844` | `FILTER_RULES` owns current renderer key to field-path extraction for supported JSON-like renderer shapes. | Generated renderer owner manifest with endpoint, route, surface, supported/unsupported class, field effect, fixture, and doc provenance. |
 | `json_flow_settings_list_mode_owner` | `js/filter_logic.js:947-1069` | Filter logic reconstructs serialized keyword regexes, list-mode settings, content filters, category filters, and channel rows before rule evaluation. | Product policy and fixtures for exact/substr, comments, empty whitelist, conflicts, unknown mode, and simultaneous allow/block states. |
 | `json_flow_harvest_mutation_owner` | `js/filter_logic.js:3588-3619` | Engine processing harvests identity mappings before enabled-state mutation and separates `processData()` from `harvestOnly()`. | Harvest-versus-mutation budget with storage/map side-effect counters, disabled behavior, rollback, and no-rule proof. |
-| `json_flow_category_metadata_owner` | `js/filter_logic.js:2263-2319`; `js/content_bridge.js:1794-1872` | Category rules can request video metadata when JSON row data lacks a category, delegating to a bridge fetch queue/cache. | Category fetch budget with cache hit/miss, credential class, retry/dedupe, network/storage counters, and false-hide proof. |
-| `json_flow_dom_fallback_parity_owner` | `js/content/dom_fallback.js:1933-1995`; `js/content_bridge.js:6356-6466` | DOM fallback active-work predicates and bridge mutation observation remain separate from JSON renderer mutation. | DOM parity packet with selector owner, observer/listener/timer budget, sibling-visible proof, selected-row proof, restore proof, and native parity. |
-| `json_flow_quick_block_action_owner` | `js/content/block_channel.js:1205-1285`; `js/content/block_channel.js:1979-2289` | Quick-block rule creation and hover/action lifecycle stay outside JSON filtering so users can create the first rule and use explicit actions. | Action lifecycle budget with disabled, whitelist, empty blocklist, desktop/mobile, menu-open, quick-click, teardown, and diagnostic proof. |
-| `json_flow_fallback_menu_action_owner` | `js/content_bridge.js:6489-7206`; `js/content_bridge.js:7233-7265` | Fallback menu UI and playlist popover cleanup remain imperative DOM/action owners outside JSON row mutation. | Shared menu action authority for primary dropdown, fallback scanner, fallback popover, quick block, list mode, disabled state, and teardown. |
+| `json_flow_category_metadata_owner` | `js/filter_logic.js:2263-2319`; `js/content_bridge.js:1785-1872` | Category rules can request video metadata when JSON row data lacks a category, delegating to a bridge fetch queue/cache. | Category fetch budget with cache hit/miss, credential class, retry/dedupe, network/storage counters, and false-hide proof. |
+| `json_flow_dom_fallback_parity_owner` | `js/content/dom_fallback.js:2117-2184`; `js/content_bridge.js:6408-6466` | DOM fallback active-work predicates and bridge mutation observation remain separate from JSON renderer mutation. | DOM parity packet with selector owner, observer/listener/timer budget, sibling-visible proof, selected-row proof, restore proof, and native parity. |
+| `json_flow_quick_block_action_owner` | `js/content/block_channel.js:1212-1296`; `js/content/block_channel.js:1993-2042` | Quick-block rule creation and hover/action lifecycle stay outside JSON filtering so users can create the first rule and use explicit actions. | Action lifecycle budget with disabled, whitelist, empty blocklist, desktop/mobile, menu-open, quick-click, teardown, and diagnostic proof. |
+| `json_flow_fallback_menu_action_owner` | `js/content_bridge.js:6541-7228`; `js/content_bridge.js:7230-7258` | Fallback menu UI and playlist popover cleanup remain imperative DOM/action owners outside JSON row mutation. | Shared menu action authority for primary dropdown, fallback scanner, fallback popover, quick block, list mode, disabled state, and teardown. |
 
 Current JSON-first source-flow status:
 
@@ -457,7 +457,7 @@ current full-suite proof and they do not approve JSON-first promotion.
 current-source freshness date: 2026-05-30
 latest full runtime proof: 4663/4663 pass, 0 fail, 83.213s
 current method semantic gap files: 69
-current method semantic gap lexical callables: 5681
+current method semantic gap lexical callables: 5701
 complete per-callable semantic proof files: 0
 runtime JSON-first implementation approvals: 0
 runtime JSON-first promotion authority rows: 0

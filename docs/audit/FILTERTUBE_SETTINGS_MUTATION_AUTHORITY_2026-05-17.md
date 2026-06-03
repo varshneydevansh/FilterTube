@@ -92,7 +92,7 @@ fail 0
 | `FilterTube_ReleaseNotesAck` | `js/background.js:3198` | Sender trust, target profile/surface, mutation intent, storage writes, background revision, runtime broadcast, rollback/failure result. |
 | `FilterTube_ReleaseNotesCheck` | `js/background.js:3169` | Sender trust, target profile/surface, mutation intent, storage writes, background revision, runtime broadcast, rollback/failure result. |
 | `FilterTube_ScheduleAutoBackup` | `js/background.js:3950`<br>`js/tab-view.js:3068` | Sender trust, target profile/surface, mutation intent, storage writes, background revision, runtime broadcast, rollback/failure result. |
-| `FilterTube_SessionPinAuth` | `js/background.js:3266`<br>`js/tab-view.js:3088`<br>`js/popup.js:727` | Sender trust, target profile/surface, mutation intent, storage writes, background revision, runtime broadcast, rollback/failure result. |
+| `FilterTube_SessionPinAuth` | `js/background.js:3266`<br>`js/tab-view.js:3101`<br>`js/popup.js:727` | Sender trust, target profile/surface, mutation intent, storage writes, background revision, runtime broadcast, rollback/failure result. |
 | `FilterTube_SetListMode` | `js/background.js:3290`<br>`js/tab-view.js:4656`<br>`js/tab-view.js:10626`<br>`js/popup.js:856` | Sender trust, target profile/surface, mutation intent, storage writes, background revision, runtime broadcast, rollback/failure result. |
 | `FilterTube_SubscriptionsImportProgress` | `js/background.js:3233` | Sender trust, target profile/surface, mutation intent, storage writes, background revision, runtime broadcast, rollback/failure result. |
 | `FilterTube_TransferWhitelistToBlocklist` | `js/background.js:3759`<br>`js/tab-view.js:10613`<br>`js/popup.js:843` | Sender trust, target profile/surface, mutation intent, storage writes, background revision, runtime broadcast, rollback/failure result. |
@@ -549,7 +549,7 @@ fail 0
 | `js/state_manager.js:2307` | state manager UI model | settings save call | - | `await loadSettings({ notify: false, resetEnrichment: false, scheduleEnrichment: false });` | must be revisioned/queued and surface failure to caller |
 | `js/tab-view.js:2989` | full dashboard UI | settings save call | - | `await StateManager.loadSettings();` | must be revisioned/queued and surface failure to caller |
 | `js/tab-view.js:3068` | full dashboard UI | message action object | `FilterTube_ScheduleAutoBackup` | `action: 'FilterTube_ScheduleAutoBackup',` | must declare sender trust, target profile/surface, storage writes, broadcast, and network budget |
-| `js/tab-view.js:3088` | full dashboard UI | message action object | `FilterTube_SessionPinAuth` | `action: 'FilterTube_SessionPinAuth',` | must declare sender trust, target profile/surface, storage writes, broadcast, and network budget |
+| `js/tab-view.js:3101` | full dashboard UI | message action object | `FilterTube_SessionPinAuth` | `action: 'FilterTube_SessionPinAuth',` | must declare sender trust, target profile/surface, storage writes, broadcast, and network budget |
 | `js/tab-view.js:3101` | full dashboard UI | message action object | `FilterTube_ClearSessionPin` | `action: 'FilterTube_ClearSessionPin',` | must declare sender trust, target profile/surface, storage writes, broadcast, and network budget |
 | `js/tab-view.js:3276` | full dashboard UI | message action object | `FilterTube_EnsureSubscriptionsImportBridge` | `action: 'FilterTube_EnsureSubscriptionsImportBridge',` | must declare sender trust, target profile/surface, storage writes, broadcast, and network budget |
 | `js/tab-view.js:3449` | full dashboard UI | message action object | `FilterTube_Ping` | `action: 'FilterTube_Ping',` | must declare sender trust, target profile/surface, storage writes, broadcast, and network budget |
@@ -647,9 +647,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

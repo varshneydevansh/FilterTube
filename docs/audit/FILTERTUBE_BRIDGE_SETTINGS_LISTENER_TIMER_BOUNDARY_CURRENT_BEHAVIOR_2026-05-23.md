@@ -35,7 +35,7 @@ subscription request block bytes: 1942
 subscription message listener block lines: 53
 subscription message listener block bytes: 2299
 runtime listener block lines: 122
-runtime listener block bytes: 5684
+runtime listener block bytes: 5701
 seed relay cluster block lines: 201
 seed relay cluster block bytes: 8139
 storage refresh cluster block lines: 131
@@ -136,9 +136,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

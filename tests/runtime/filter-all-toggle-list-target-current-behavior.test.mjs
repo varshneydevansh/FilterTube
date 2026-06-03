@@ -11,7 +11,7 @@ const docPath = 'docs/audit/FILTERTUBE_FILTER_ALL_TOGGLE_LIST_TARGET_CURRENT_BEH
 
 const sourceFingerprints = {
   'js/background.js': [6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
-  'js/content_bridge.js': [13571, 601694, '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3'],
+  'js/content_bridge.js': [13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c'],
   'js/state_manager.js': [2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6']
 };
 
@@ -38,7 +38,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function addFilterAllContentCheckbox(menuItem, channelData) {',
     end: 'function contentBridgeAmpersandTopicSingleChannelMenuGuard(channelInfo, videoCard) {',
-    startLine: 13434,
+    startLine: 13486,
     lines: 66,
     bytes: 2391,
     hash: '03861f56c173757f479e0863d16fab83df5ba180e5d21d8adb37cdf0b5fcb490'
@@ -115,6 +115,10 @@ const missingRuntimeSymbols = [
   'filterAllToggleCommentScopeReport',
   'filterAllToggleFixtureProvenance'
 ];
+
+function formatNumber(value) {
+  return Number(value).toLocaleString('en-US');
+}
 
 function read(file) {
   return fs.readFileSync(path.join(repoRoot, file), 'utf8');
@@ -295,7 +299,7 @@ test('filter-all toggle list-target audit is audit-only and source pinned', () =
     assert.equal(lineCount(source), lines, `${file} line count changed`);
     assert.equal(Buffer.byteLength(source), bytes, `${file} byte count changed`);
     assert.equal(sha256File(file), hash, `${file} hash changed`);
-    assert.match(audit, new RegExp(`\\| \`${file.replace('.', '\\.')}\` \\| ${lines} \\| ${bytes} \\| \`${hash}\` \\|`));
+    assert.match(audit, new RegExp(`\\| \`${file.replace('.', '\\.')}\` \\| ${formatNumber(lines)} \\| ${formatNumber(bytes)} \\| \`${hash}\` \\|`));
   }
 });
 

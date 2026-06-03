@@ -75,19 +75,19 @@ const expectedFingerprints = {
     hash: '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'
   },
   'js/content_bridge.js': {
-    lines: 13571,
-    bytes: 601694,
-    hash: '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3'
+    lines: 13623,
+    bytes: 603362,
+    hash: 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c'
   },
   'js/content/dom_fallback.js': {
-    lines: 4838,
-    bytes: 228332,
-    hash: '2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef'
+    lines: 5030,
+    bytes: 235555,
+    hash: 'fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5'
   },
   'js/content/block_channel.js': {
-    lines: 3175,
-    bytes: 127396,
-    hash: '1b6fffa249a746c01686df0d6a05dc4b770a6f0c5ded08b78a7043c11e9cdd83'
+    lines: 3189,
+    bytes: 127857,
+    hash: 'c040b57e0b107fd7b6fb0a18bc4ca014e5a22fbb82755f81e51a497eee387dba'
   },
   'js/content/handle_resolver.js': {
     lines: 282,
@@ -137,12 +137,12 @@ const expectedFingerprints = {
   'tests/runtime/first-optimization-source-owner-approval-boundary-current-behavior.test.mjs': {
     lines: 297,
     bytes: 12983,
-    hash: '528812533c7bc82e720419efefef5fb12e690fe93e95f8d6660887c2bf4ec43e'
+    hash: '0d5217c6674b32ac2a4cb4dcace0cda60558ad6481e01e5a0fb1de39fe6d5521'
   },
   'docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SOURCE_OWNER_APPROVAL_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md': {
     lines: 254,
     bytes: 16411,
-    hash: 'f98e5794d6a3737b9d8f43525137b27afd4b68fa41be4f6b8fb5dbc38f1fd904'
+    hash: 'ddab073bf8fe0b5d0f5f69d2c31e92990ba47c46eda93d3d5fe669cd05290c88'
   }
 };
 

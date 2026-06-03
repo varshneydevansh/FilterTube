@@ -19,24 +19,24 @@ DOM fallback and visual helper method rows.
 ```text
 source files: js/content/dom_fallback.js; js/content/dom_helpers.js
 runtime owner: isolated-world DOM fallback and visual helper runtime
-js/content/dom_fallback.js split source lines: 4839
-js/content/dom_fallback.js wc line count: 4838
-js/content/dom_fallback.js source bytes: 228332
-js/content/dom_fallback.js source sha256: 2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef
+js/content/dom_fallback.js split source lines: 5031
+js/content/dom_fallback.js wc line count: 5030
+js/content/dom_fallback.js source bytes: 235555
+js/content/dom_fallback.js source sha256: fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5
 js/content/dom_helpers.js split source lines: 207
 js/content/dom_helpers.js wc line count: 206
 js/content/dom_helpers.js source bytes: 8292
 js/content/dom_helpers.js source sha256: a8c6ebfc10394f67254fbe5d324090ba9d01bead7efbb61d44e63dda4b52c242
-combined source bytes: 236587
-top-level function declarations: 50
-js/content/dom_fallback.js top-level function declarations: 47
+combined source bytes: 243847
+top-level function declarations: 57
+js/content/dom_fallback.js top-level function declarations: 54
 js/content/dom_helpers.js top-level function declarations: 3
 semantic method groups: 11
-repo-wide broad parser lexical callable matches: 439
-broad parser declaration/inventory matches: 85
-semantic method rows promoted: 50
+repo-wide broad parser lexical callable matches: 452
+broad parser declaration/inventory matches: 92
+semantic method rows promoted: 57
 local callable tokens held below method authority: 35
-control-flow lexical artifacts: 354
+control-flow lexical artifacts: 360
 file-local executable proof probes: 8
 global method proof count promoted: 0
 runtime behavior changed: no
@@ -45,7 +45,7 @@ runtime behavior changed: no
 ## Method Group Counts
 
 ```text
-activeWorkAndCleanup: 3
+activeWorkAndCleanup: 4
 blockedMarkerAndStaleRestore: 5
 domFallbackMainPipeline: 1
 fallbackSurfaceHandlers: 4
@@ -54,7 +54,7 @@ hideDecisionEngine: 1
 identityNormalizationAndCompiledRules: 9
 playlistWatchAndRouteIdentity: 16
 runStateAndTracking: 2
-styleAndStaticSurfaceControls: 2
+styleAndStaticSurfaceControls: 8
 textAndKeywordMatching: 4
 ```
 
@@ -65,15 +65,15 @@ matches control-flow shapes in addition to function declarations and local
 arrow helpers. The reconciliation is:
 
 ```text
-js/content/dom_fallback.js broad callable matches: 418
+js/content/dom_fallback.js broad callable matches: 431
 js/content/dom_helpers.js broad callable matches: 21
-broad callable matches total: 439
-accepted top-level semantic method rows: 50
+broad callable matches total: 452
+accepted top-level semantic method rows: 57
 accepted local arrow callable tokens: 34
 accepted nested local helper tokens: 1
-accepted declaration/inventory rows total: 85
-rejected control-flow artifacts total: 354
-rejected if artifacts: 325
+accepted declaration/inventory rows total: 92
+rejected control-flow artifacts total: 360
+rejected if artifacts: 331
 rejected for artifacts: 25
 rejected fallback tracker object-method artifacts: 4
 global method proof count promoted: 0
@@ -81,7 +81,7 @@ runtime behavior changed: no
 ```
 
 The 35 accepted local callable tokens remain below method-authority promotion:
-they are executable implementation details inside the 50 top-level method rows,
+they are executable implementation details inside the 57 top-level method rows,
 not independent approval to change DOM fallback behavior.
 
 ## Semantic Group Summary
@@ -92,10 +92,10 @@ not independent approval to change DOM fallback behavior.
 | `identityNormalizationAndCompiledRules` | 9 | Channel id/handle/custom URL/name normalization, compiled keyword regexes, compiled channel indexes, channel-map lookup, and shared identity fallback wrapper. | Source confidence, stale alias policy, map provenance, whitelist/blocklist parity, and unresolved-handle fetch budget. |
 | `playlistWatchAndRouteIdentity` | 16 | Mix/radio detection, playlist panel row discovery, creator/watch owner metadata, current-watch block enforcement, and playlist skip/open fallback. | Current-video authority, selected-row preservation, pause/click policy, playlist target proof, and route-specific negative fixtures. |
 | `blockedMarkerAndStaleRestore` | 5 | Pending/confirmed blocked-channel markers, hidden marker inspection, recycled-card stale marker cleanup, and explicit hide-reason checks. | Marker owner, stale-card reset fixture, pending-state TTL proof, restore ownership, and false-hide sibling visibility. |
-| `styleAndStaticSurfaceControls` | 2 | Dynamic content-control style injection and mobile Open App button direct hide. | Style registry, route/mode scope, direct display writer registry, and generated CSS parity proof. |
+| `styleAndStaticSurfaceControls` | 8 | Dynamic content-control style injection, route-scoped content-control synchronization, inline mobile-search control hide/restore, and mobile Open App button direct hide. | Style registry, route/mode scope, direct display writer registry, and generated CSS parity proof. |
 | `textAndKeywordMatching` | 4 | Unicode normalization, plain keyword extraction, alphanumeric boundary heuristic, and regex/normalized fallback matching. | Exact/substr policy authority, locale proof, comment/title split, and negative keyword fixture coverage. |
 | `fallbackSurfaceHandlers` | 4 | Home feed, comment containers/threads/renderers/view-models, mobile comment cards, and guide subscription entries. | Route/mode proof, author identity confidence, composer preservation, guide whitelist behavior, and container false-hide fixtures. |
-| `activeWorkAndCleanup` | 3 | Active-work predicate, stale DOM fallback cleanup for hidden/pending markers plus content-control CSS clearing, and the production routine console-log gate. | Disabled/no-rule/empty-list budget, cleanup scope, stale-marker preservation, debug-mode authority, and cleanup side-effect proof. |
+| `activeWorkAndCleanup` | 4 | Active-work predicate, continuation-scroll nudging, stale DOM fallback cleanup for hidden/pending markers plus content-control CSS clearing, and the production routine console-log gate. | Disabled/no-rule/empty-list budget, cleanup scope, stale-marker preservation, debug-mode authority, and cleanup side-effect proof. |
 | `domFallbackMainPipeline` | 1 | Main rendered-DOM pipeline: run serialization, scan/yield loop, style injection, card extraction, hide markers, timers, permanent guards, and scroll preservation. | Selector target registry, lifecycle owner, per-route budgets, positive/negative fixtures, and exact hide/restore authority. |
 | `hideDecisionEngine` | 1 | Central DOM fallback decision helper for whitelist fail-closed, keyword, channel, collaborator, and unresolved-handle background-only repair. | Decision report, source-tier effect authority, unresolved identity policy, background resolver budget, and allow/block fixtures. |
 | `helperVisualWriters` | 3 | Shared hide CSS, `toggleVisibility()` stats/media side effects, and parent container collapse. | Visual writer registry, stats/media policy, restore/decrement proof, parent collapse target proof, and no-rule sibling-visible fixtures. |
@@ -135,22 +135,29 @@ not independent approval to change DOM fallback behavior.
 | js/content/dom_fallback.js | 972 | `markElementAsBlocked` | function | `blockedMarkerAndStaleRestore` |
 | js/content/dom_fallback.js | 991 | `clearBlockedElementAttributes` | function | `blockedMarkerAndStaleRestore` |
 | js/content/dom_fallback.js | 1001 | `isExplicitlyHiddenByFilterTube` | function | `blockedMarkerAndStaleRestore` |
-| js/content/dom_fallback.js | 1049 | `hasExplicitHideReasonMarker` | function | `blockedMarkerAndStaleRestore` |
-| js/content/dom_fallback.js | 1064 | `ensureContentControlStyles` | function | `styleAndStaticSurfaceControls` |
-| js/content/dom_fallback.js | 1409 | `hideYouTubeOpenAppButtons` | function | `styleAndStaticSurfaceControls` |
-| js/content/dom_fallback.js | 1431 | `normalizeTextForMatching` | function | `textAndKeywordMatching` |
-| js/content/dom_fallback.js | 1448 | `extractPlainKeyword` | function | `textAndKeywordMatching` |
-| js/content/dom_fallback.js | 1466 | `isAlphanumeric` | function | `textAndKeywordMatching` |
-| js/content/dom_fallback.js | 1480 | `matchesKeyword` | function | `textAndKeywordMatching` |
-| js/content/dom_fallback.js | 1520 | `collectMobileCommentEntryCards` | function | `fallbackSurfaceHandlers` |
-| js/content/dom_fallback.js | 1551 | `handleHomeFeedFallback` | function | `fallbackSurfaceHandlers` |
-| js/content/dom_fallback.js | 1575 | `handleCommentsFallback` | function | `fallbackSurfaceHandlers` |
-| js/content/dom_fallback.js | 1888 | `handleGuideSubscriptionsFallback` | function | `fallbackSurfaceHandlers` |
-| js/content/dom_fallback.js | 1933 | `hasActiveDOMFallbackWork` | function | `activeWorkAndCleanup` |
-| js/content/dom_fallback.js | 2001 | `clearStaleDOMFallbackVisibility` | function | `activeWorkAndCleanup` |
-| js/content/dom_fallback.js | 2035 | `applyDOMFallback` | async function | `domFallbackMainPipeline` |
-| js/content/dom_fallback.js | 4536 | `shouldHideContent` | function | `hideDecisionEngine` |
-| js/content/dom_fallback.js | 4817 | `installFilterTubeRoutineConsoleGate` | function | `activeWorkAndCleanup` |
+| js/content/dom_fallback.js | 1049 | `scheduleFilterTubeContinuationNudge` | function | `activeWorkAndCleanup` |
+| js/content/dom_fallback.js | 1119 | `hasExplicitHideReasonMarker` | function | `blockedMarkerAndStaleRestore` |
+| js/content/dom_fallback.js | 1134 | `ensureContentControlStyles` | function | `styleAndStaticSurfaceControls` |
+| js/content/dom_fallback.js | 1529 | `restoreInlineMobileSearchResultControls` | function | `styleAndStaticSurfaceControls` |
+| js/content/dom_fallback.js | 1539 | `clearContentControlStyles` | function | `styleAndStaticSurfaceControls` |
+| js/content/dom_fallback.js | 1549 | `isInlineMobileSearchResultControl` | function | `styleAndStaticSurfaceControls` |
+| js/content/dom_fallback.js | 1555 | `inlineMobileSearchResultControlHost` | function | `styleAndStaticSurfaceControls` |
+| js/content/dom_fallback.js | 1563 | `hideInlineMobileSearchResultControls` | function | `styleAndStaticSurfaceControls` |
+| js/content/dom_fallback.js | 1582 | `syncRouteScopedContentControls` | function | `styleAndStaticSurfaceControls` |
+| js/content/dom_fallback.js | 1593 | `hideYouTubeOpenAppButtons` | function | `styleAndStaticSurfaceControls` |
+| js/content/dom_fallback.js | 1615 | `normalizeTextForMatching` | function | `textAndKeywordMatching` |
+| js/content/dom_fallback.js | 1632 | `extractPlainKeyword` | function | `textAndKeywordMatching` |
+| js/content/dom_fallback.js | 1650 | `isAlphanumeric` | function | `textAndKeywordMatching` |
+| js/content/dom_fallback.js | 1664 | `matchesKeyword` | function | `textAndKeywordMatching` |
+| js/content/dom_fallback.js | 1704 | `collectMobileCommentEntryCards` | function | `fallbackSurfaceHandlers` |
+| js/content/dom_fallback.js | 1735 | `handleHomeFeedFallback` | function | `fallbackSurfaceHandlers` |
+| js/content/dom_fallback.js | 1759 | `handleCommentsFallback` | function | `fallbackSurfaceHandlers` |
+| js/content/dom_fallback.js | 2072 | `handleGuideSubscriptionsFallback` | function | `fallbackSurfaceHandlers` |
+| js/content/dom_fallback.js | 2117 | `hasActiveDOMFallbackWork` | function | `activeWorkAndCleanup` |
+| js/content/dom_fallback.js | 2185 | `clearStaleDOMFallbackVisibility` | function | `activeWorkAndCleanup` |
+| js/content/dom_fallback.js | 2219 | `applyDOMFallback` | async function | `domFallbackMainPipeline` |
+| js/content/dom_fallback.js | 4728 | `shouldHideContent` | function | `hideDecisionEngine` |
+| js/content/dom_fallback.js | 5009 | `installFilterTubeRoutineConsoleGate` | function | `activeWorkAndCleanup` |
 | js/content/dom_helpers.js | 11 | `ensureStyles` | function | `helperVisualWriters` |
 | js/content/dom_helpers.js | 67 | `toggleVisibility` | function | `helperVisualWriters` |
 | js/content/dom_helpers.js | 154 | `updateContainerVisibility` | function | `helperVisualWriters` |
@@ -352,9 +359,9 @@ runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

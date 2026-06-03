@@ -197,7 +197,7 @@ test('content-control DOM style selector matrix is audit-only and source pinned'
   assert.match(doc, /`:not\(:has\(\.\.\.\)\)` selector token count in style writer: 5/);
   assert.match(doc, /runtime content-control DOM style selector matrix fixtures: 6/);
 
-  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 4838 | 228332 | \`${sha256('js/content/dom_fallback.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 5,030 | 235,555 | \`${sha256('js/content/dom_fallback.js')}\` |`));
   assert.ok(doc.includes(`| \`js/content_controls_catalog.js\` | 222 | 7822 | \`${sha256('js/content_controls_catalog.js')}\` |`));
 });
 

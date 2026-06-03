@@ -246,7 +246,7 @@ function loadStaleCacheRuntime() {
 test('JSON-first network snapshot consumer stale-cache cleanup audit is audit-only and source pinned', () => {
   const text = doc();
   const bridge = read('js/content_bridge.js');
-  const bridgeHash = '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3';
+  const bridgeHash = 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c';
 
   assert.match(text, /Status: audit-only current-behavior register/);
   assert.match(text, /Runtime behavior is unchanged/);

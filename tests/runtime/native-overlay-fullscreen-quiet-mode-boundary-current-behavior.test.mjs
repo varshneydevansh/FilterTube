@@ -10,9 +10,9 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_NATIVE_OVERLAY_FULLSCREEN_QUIET_MODE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/content_bridge.js': [13571, 601694, '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3'],
-  'js/content/block_channel.js': [3175, 127396, '1b6fffa249a746c01686df0d6a05dc4b770a6f0c5ded08b78a7043c11e9cdd83'],
-  'js/content/dom_fallback.js': [4838, 228332, '2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef'],
+  'js/content_bridge.js': [13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c'],
+  'js/content/block_channel.js': [3189, 127857, 'c040b57e0b107fd7b6fb0a18bc4ca014e5a22fbb82755f81e51a497eee387dba'],
+  'js/content/dom_fallback.js': [5030, 235555, 'fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5'],
   'js/seed.js': [1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
   'js/content/bridge_settings.js': [651, 26462, 'c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b'],
   'js/content/first_run_prompt.js': [190, 7453, '5672d9060d29b08550ecfc3add54245212a5094ee5137f025b6f788f12e50409'],
@@ -34,7 +34,7 @@ const blockSpecs = {
     start: 'async function initializeDOMFallback(settings) {',
     end: 'let fallbackMenuButtonsInstalled = false;',
     label: 'content_bridge initializeDOMFallback quiet cluster block',
-    startLine: 6088,
+    startLine: 6140,
     lines: 382,
     bytes: 17601
   },
@@ -43,7 +43,7 @@ const blockSpecs = {
     start: 'function ensureFallbackMenuButtons() {',
     end: 'let playlistFallbackPopoverState = null;',
     label: 'content_bridge fallback menu quiet cluster block',
-    startLine: 6489,
+    startLine: 6541,
     lines: 721,
     bytes: 29321
   },
@@ -52,7 +52,7 @@ const blockSpecs = {
     start: 'const isQuickBlockEnabled = () => {',
     end: 'function ensureQuickBlockStyles()',
     label: 'block_channel quick-block enabled predicate block',
-    startLine: 1205,
+    startLine: 1212,
     lines: 90,
     bytes: 2943
   },
@@ -61,7 +61,7 @@ const blockSpecs = {
     start: 'function setupQuickBlockObserver() {',
     end: '/**\n * Observe dropdowns and inject FilterTube menu items',
     label: 'block_channel quick-block lifecycle setup block',
-    startLine: 1979,
+    startLine: 1993,
     lines: 322,
     bytes: 13896
   }

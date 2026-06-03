@@ -3,7 +3,7 @@
 Status: audit-only current-behavior register. Runtime behavior is unchanged.
 
 This register promotes `js/content/dom_fallback.js` lifecycle instances from
-source-count proof to a callback/effect inventory. It covers exactly the 13
+source-count proof to a callback/effect inventory. It covers exactly the 14
 current listener and timer instances in that file, using the same
 lifecycle-register source patterns as
 `tests/runtime/lifecycle-instance-register-current-behavior.test.mjs`.
@@ -18,9 +18,9 @@ before behavior changes.
 
 ```text
 source file: js/content/dom_fallback.js
-lifecycle instances: 13
+lifecycle instances: 14
 lifecycle primitive families: 2
-semantic callback groups: 7
+semantic callback groups: 8
 explicit teardown or clear instances: 0
 page-lifetime listener guards: 3
 source-derived from exact lifecycle-register patterns
@@ -31,13 +31,14 @@ source-derived from exact lifecycle-register patterns
 | Primitive family | Count |
 | --- | ---: |
 | `addEventListener` | 3 |
-| `setTimeout` | 10 |
+| `setTimeout` | 11 |
 
 ## Semantic Callback Groups
 
 | Semantic group | Count |
 | --- | ---: |
 | `currentWatchOwnerRetryAndNavigationTimers` | 4 |
+| `continuationNudgeTimer` | 1 |
 | `mainPipelineYieldTimer` | 1 |
 | `mainPipelineScrollStateListener` | 1 |
 | `playlistClickEndedGuards` | 2 |
@@ -53,21 +54,23 @@ source-derived from exact lifecycle-register patterns
 | 883 | `setTimeout` | `currentWatchOwnerRetryAndNavigationTimers` | `setTimeout(() => {` |
 | 902 | `setTimeout` | `currentWatchOwnerRetryAndNavigationTimers` | `setTimeout(() => {` |
 | 915 | `setTimeout` | `currentWatchOwnerRetryAndNavigationTimers` | `setTimeout(() => {` |
-| 2056 | `setTimeout` | `mainPipelineYieldTimer` | `const yieldToMain = () => new Promise(resolve => setTimeout(resolve, 0));` |
-| 2105 | `addEventListener` | `mainPipelineScrollStateListener` | `window.addEventListener('scroll', () => {` |
-| 2339 | `addEventListener` | `playlistClickEndedGuards` | `document.addEventListener('click', (event) => {` |
-| 2403 | `addEventListener` | `playlistClickEndedGuards` | `document.addEventListener('ended', (event) => {` |
-| 2432 | `setTimeout` | `playlistAutoplayDeferredClickTimer` | `setTimeout(() => {` |
-| 3728 | `setTimeout` | `pendingMetadataAndSelectedRowTimers` | `pendingTimerState.timer = setTimeout(() => {` |
-| 3750 | `setTimeout` | `pendingMetadataAndSelectedRowTimers` | `pendingTimerState.timer = setTimeout(() => {` |
-| 3816 | `setTimeout` | `pendingMetadataAndSelectedRowTimers` | `setTimeout(() => {` |
-| 4530 | `setTimeout` | `pendingRunRerunTimer` | `setTimeout(() => applyDOMFallback(runState.latestSettings, runState.latestOptions), 0);` |
+| 1077 | `setTimeout` | `continuationNudgeTimer` | `state.timer = setTimeout(() => {` |
+| 2240 | `setTimeout` | `mainPipelineYieldTimer` | `const yieldToMain = () => new Promise(resolve => setTimeout(resolve, 0));` |
+| 2290 | `addEventListener` | `mainPipelineScrollStateListener` | `window.addEventListener('scroll', () => {` |
+| 2519 | `addEventListener` | `playlistClickEndedGuards` | `document.addEventListener('click', (event) => {` |
+| 2583 | `addEventListener` | `playlistClickEndedGuards` | `document.addEventListener('ended', (event) => {` |
+| 2612 | `setTimeout` | `playlistAutoplayDeferredClickTimer` | `setTimeout(() => {` |
+| 3913 | `setTimeout` | `pendingMetadataAndSelectedRowTimers` | `pendingTimerState.timer = setTimeout(() => {` |
+| 3935 | `setTimeout` | `pendingMetadataAndSelectedRowTimers` | `pendingTimerState.timer = setTimeout(() => {` |
+| 4001 | `setTimeout` | `pendingMetadataAndSelectedRowTimers` | `setTimeout(() => {` |
+| 4722 | `setTimeout` | `pendingRunRerunTimer` | `setTimeout(() => applyDOMFallback(runState.latestSettings, runState.latestOptions), 0);` |
 
 ## Cross-Feature Risk Shape
 
 ```text
 DOM fallback lifecycle callback
   -> current watch owner enforcement
+  -> search/watch continuation nudge
   -> playlist panel retry and synthetic navigation
   -> main DOM fallback pipeline yielding and scroll state
   -> playlist next/previous and autoplay guards
@@ -137,9 +140,9 @@ can support runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

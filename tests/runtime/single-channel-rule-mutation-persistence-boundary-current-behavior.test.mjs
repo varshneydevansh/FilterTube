@@ -194,7 +194,7 @@ test('single-channel rule mutation source fingerprints stay pinned', () => {
   const expected = [
     ['js/background.js', 6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
     ['js/state_manager.js', 2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6'],
-    ['js/content_bridge.js', 13571, 601694, '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3']
+    ['js/content_bridge.js', 13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c']
   ];
 
   for (const [file, lines, bytes, hash] of expected) {
@@ -202,7 +202,10 @@ test('single-channel rule mutation source fingerprints stay pinned', () => {
     assert.equal(sourceLineCount(source), lines, `${file} line count drifted`);
     assert.equal(Buffer.byteLength(source), bytes, `${file} byte count drifted`);
     assert.equal(sha256(file), hash, `${file} hash drifted`);
-    assert.match(doc, new RegExp(`\\| \`${file.replace('.', '\\.')}\` \\| ${lines} \\| ${bytes} \\| \`${hash}\` \\|`));
+    const escapedFile = file.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const lineText = lines.toLocaleString('en-US');
+    const byteText = bytes.toLocaleString('en-US');
+    assert.match(doc, new RegExp(`\\| \`${escapedFile}\` \\| ${lineText} \\| ${byteText} \\| \`${hash}\` \\|`));
   }
 });
 

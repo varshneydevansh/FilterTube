@@ -314,13 +314,13 @@ function fireAllTimers(runtime) {
 test('JSON-first network snapshot consumer application audit is audit-only and source pinned', () => {
   const text = doc();
   const bridge = read('js/content_bridge.js');
-  const bridgeHash = '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3';
+  const bridgeHash = 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c';
 
   assert.match(text, /Status: audit-only current-behavior register/);
   assert.match(text, /Runtime behavior is unchanged/);
   assert.match(text, /not an implementation patch, optimization patch, cache patch, DOM patch/);
-  assert.equal(lineCount(bridge), 13571);
-  assert.equal(Buffer.byteLength(bridge), 601694);
+  assert.equal(lineCount(bridge), 13623);
+  assert.equal(Buffer.byteLength(bridge), 603362);
   assert.equal(sha256('js/content_bridge.js'), bridgeHash);
   assert.match(text, new RegExp(bridgeHash));
   assert.match(text, /consumer application source files: 1/);
@@ -342,7 +342,7 @@ test('application source counts remain pinned to current content bridge behavior
 
   assert.equal(countLiteral(bridge, 'const resolvedCollaboratorsByVideoId = new Map();'), 1);
   assert.equal(countLiteral(bridge, 'const activeCollaborationDropdowns = new Map();'), 1);
-  assert.equal(countLiteral(bridge, 'applyResolvedCollaborators('), 7);
+  assert.equal(countLiteral(bridge, 'applyResolvedCollaborators('), 8);
   assert.equal(countLiteral(bridge, 'refreshActiveCollaborationMenu('), 4);
   assert.equal(countLiteral(bridge, 'resolvedCollaboratorsByVideoId.set('), 5);
   assert.equal(countLiteral(bridge, 'resolvedCollaboratorsByVideoId.get('), 5);
@@ -363,8 +363,8 @@ test('application source counts remain pinned to current content bridge behavior
 
   assert.match(text, /resolved collaborator cache maps: 1/);
   assert.match(text, /active collaboration menu maps: 1/);
-  assert.match(text, /applyResolvedCollaborators token occurrences: 7/);
-  assert.match(text, /applyResolvedCollaborators callsites outside declaration: 6/);
+  assert.match(text, /applyResolvedCollaborators token occurrences: 8/);
+  assert.match(text, /applyResolvedCollaborators callsites outside declaration: 7/);
   assert.match(text, /refreshActiveCollaborationMenu token occurrences: 4/);
   assert.match(text, /refreshActiveCollaborationMenu callsites outside declaration: 3/);
   assert.match(text, /resolved collaborator map set callsites: 5/);

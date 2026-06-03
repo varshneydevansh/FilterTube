@@ -62,9 +62,9 @@ test('JSON-first implementation locus register is audit-only and source pinned',
   for (const [file, lines, bytes, hash] of [
     ['js/seed.js', 1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
     ['js/filter_logic.js', 3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'],
-    ['js/content_bridge.js', 13571, 601694, '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3'],
-    ['js/content/dom_fallback.js', 4838, 228332, '2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef'],
-    ['js/content/block_channel.js', 3175, 127396, '1b6fffa249a746c01686df0d6a05dc4b770a6f0c5ded08b78a7043c11e9cdd83']
+    ['js/content_bridge.js', 13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c'],
+    ['js/content/dom_fallback.js', 5030, 235555, 'fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5'],
+    ['js/content/block_channel.js', 3189, 127857, 'c040b57e0b107fd7b6fb0a18bc4ca014e5a22fbb82755f81e51a497eee387dba']
   ]) {
     const source = read(file);
     assert.equal(lineCount(source), lines, `${file} line count changed`);
@@ -105,14 +105,14 @@ test('JSON-first implementation locus register line anchors match current source
     ['js/filter_logic.js', 'const FILTER_RULES = {', 435, filterLogic, true],
     ['js/filter_logic.js', '_checkCategoryFilters(item, rules, rendererType) {', 2263, filterLogic, true],
     ['js/filter_logic.js', "processData(data, dataName = 'unknown') {", 3588, filterLogic, true],
-    ['js/content_bridge.js', 'function scheduleVideoMetaFetch(videoId, options = null) {', 1794, bridge, true],
-    ['js/content_bridge.js', 'async function initializeDOMFallback(settings) {', 6088, bridge, true],
-    ['js/content_bridge.js', 'function ensureFallbackMenuButtons() {', 6489, bridge, true],
-    ['js/content/dom_fallback.js', 'function hasActiveDOMFallbackWork(settings) {', 1933, domFallback, true],
-    ['js/content/dom_fallback.js', 'if (!categoryRaw && videoId && typeof scheduleVideoMetaFetch ===', 2487, domFallback, true],
-    ['js/content/block_channel.js', 'const isQuickBlockEnabled = () => {', 1205, quickBlock, true],
-    ['js/content/block_channel.js', 'function setupQuickBlockObserver() {', 1979, quickBlock, true],
-    ['js/content/block_channel.js', '// Initialize menu observer after a delay', 3171, quickBlock, false]
+    ['js/content_bridge.js', 'function scheduleVideoMetaFetch(videoId, options = null) {', 1785, bridge, true],
+    ['js/content_bridge.js', 'async function initializeDOMFallback(settings) {', 6140, bridge, true],
+    ['js/content_bridge.js', 'function ensureFallbackMenuButtons() {', 6541, bridge, true],
+    ['js/content/dom_fallback.js', 'function hasActiveDOMFallbackWork(settings) {', 2117, domFallback, true],
+    ['js/content/dom_fallback.js', 'if (!categoryRaw && videoId && typeof scheduleVideoMetaFetch ===', 2669, domFallback, true],
+    ['js/content/block_channel.js', 'const isQuickBlockEnabled = () => {', 1212, quickBlock, true],
+    ['js/content/block_channel.js', 'function setupQuickBlockObserver() {', 1993, quickBlock, true],
+    ['js/content/block_channel.js', '// Initialize menu observer after a delay', 3185, quickBlock, false]
   ];
 
   for (const [file, needle, expectedLine, source, requireDocCitation] of anchors) {
@@ -121,7 +121,7 @@ test('JSON-first implementation locus register line anchors match current source
       assert.ok(doc.includes(`\`${file}:${expectedLine}\``), `doc should cite ${file}:${expectedLine}`);
     }
   }
-  assert.ok(doc.includes('`js/content/block_channel.js:3172`'), 'doc should cite fixed quick-block startup timer');
+  assert.ok(doc.includes('`js/content/block_channel.js:3185`'), 'doc should cite fixed quick-block startup timer');
 });
 
 test('JSON-first implementation loci preserve current behavior risks', () => {

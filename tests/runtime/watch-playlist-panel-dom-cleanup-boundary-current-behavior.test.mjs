@@ -173,7 +173,7 @@ test('watch playlist panel DOM cleanup boundary audit is audit-only and source p
   assert.match(doc, /watch-playlist-panel DOM cleanup source\/effect blocks: 6/);
   assert.match(doc, /runtime watch-playlist-panel DOM cleanup fixtures: 6/);
 
-  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 4838 | 228332 | \`${sha256('js/content/dom_fallback.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 5,030 | 235,555 | \`${sha256('js/content/dom_fallback.js')}\` |`));
 });
 
 test('watch playlist panel DOM cleanup source counts remain pinned', () => {
@@ -188,8 +188,8 @@ test('watch playlist panel DOM cleanup source counts remain pinned', () => {
     disabledCleanupBlock
   } = sourceBlocks();
 
-  assert.equal(lineCount(ensureBlock), 345);
-  assert.equal(Buffer.byteLength(ensureBlock), 12583);
+  assert.equal(lineCount(ensureBlock), 459);
+  assert.equal(Buffer.byteLength(ensureBlock), 16337);
   assert.equal(lineCount(watchPlaylistCssBlock), 9);
   assert.equal(Buffer.byteLength(watchPlaylistCssBlock), 264);
   assert.equal(lineCount(activeBlock), 68);
@@ -198,8 +198,8 @@ test('watch playlist panel DOM cleanup source counts remain pinned', () => {
   assert.equal(Buffer.byteLength(noActiveCleanupBlock), 629);
   assert.equal(lineCount(clearBlock), 33);
   assert.equal(Buffer.byteLength(clearBlock), 1412);
-  assert.equal(lineCount(disabledCleanupBlock), 21);
-  assert.equal(Buffer.byteLength(disabledCleanupBlock), 959);
+  assert.equal(lineCount(disabledCleanupBlock), 18);
+  assert.equal(Buffer.byteLength(disabledCleanupBlock), 791);
 
   assert.equal(countLiteral(watchPlaylistCssBlock, 'rules.push'), 1);
   assert.equal(countLiteral(watchPlaylistCssBlock, 'display: none !important'), 1);
@@ -244,7 +244,7 @@ test('watch playlist panel CSS branch writes panel selectors route attributes an
   assert.match(css, /ytm-playlist-panel-renderer-v2/);
   assert.doesNotMatch(css, /ytd-ad-slot-renderer/);
   assert.doesNotMatch(css, /ytd-playlist-renderer/);
-  assert.equal(countLiteral(css, 'display: none !important'), 2);
+  assert.equal(countLiteral(css, 'display: none !important'), 3);
 });
 
 test('watch playlist panel style restore is shared style regeneration without feature-local marker cleanup', () => {

@@ -763,7 +763,7 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
   assert.match(doc, /3 ZIP artifacts/);
   assert.match(doc, /180 total `dist` files including ZIPs/);
   assert.match(doc, /58 source-backed non-manifest staged files per browser/);
-  assert.match(doc, /58 byte-identical source-backed non-manifest staged files per browser/);
+  assert.match(doc, /54 byte-identical source-backed non-manifest staged files per browser/);
   assert.match(doc, /per-browser staged group counts/);
   assert.match(doc, /browser manifest hashes, and local ZIP hashes/);
   assert.match(doc, /release package parity, generated-output, package artifact, manifest\/resource, code-burden, source\/evidence, and implementation-change rows/);
@@ -776,7 +776,7 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
   assert.match(releasePackageDoc, /browser staged files per directory: 59/);
   assert.match(releasePackageDoc, /total dist files including zips: 180/);
   assert.match(releasePackageDoc, /source-backed staged files per browser excluding manifest: 58/);
-  assert.match(releasePackageDoc, /byte-identical source-backed staged files per browser excluding manifest: 58/);
+  assert.match(releasePackageDoc, /byte-identical source-backed staged files per browser excluding manifest: 54/);
   assert.match(releasePackageDoc, /zip checksum snapshot: yes/);
   assert.match(releasePackageDoc, /reproducible package build authority: NO-GO/);
   assert.match(releasePackageDoc, /loaded-browser package\/runtime parity authority: NO-GO/);
@@ -787,7 +787,7 @@ function assertChromeDefaultUnpackedWorkspaceByteSnapshot(doc) {
   assert.match(doc, /local Default profile installed-path evidence for `gkgjigdfdccckblmglboobikfcpeelio`/);
   assert.match(doc, /Secure Preferences points at `\/Users\/devanshvarshney\/FilterTube`/);
   assert.match(doc, /path matches the current workspace root/);
-  assert.match(doc, /stored version is 3\.3\.1/);
+  assert.match(doc, /stored version is 3\.3\.2/);
   assert.match(doc, /Local Extension Settings exists/);
   assert.match(doc, /no packed `Default\/Extensions\/<id>` directory is present/);
   assert.match(doc, /current `manifest\.json`, `package\.json`, and `js\/content_bridge\.js` hashes are recorded/);
@@ -1504,9 +1504,9 @@ test('objective coverage ledger records active goal completion audit as current-
   assert.match(doc, /active-thread completion rule to the exact user objective/);
   assert.match(doc, /149 tracked files still have open obligations/);
   assert.match(doc, /69 tracked JS\/JSX\/MJS files have lexical callable accounting/);
-  assert.match(doc, /5,681 callables are lexical rather than semantic method proof/);
+  assert.match(doc, /5,697 callables are lexical rather than semantic method proof/);
   assert.match(doc, /0 files have complete per-callable semantic proof/);
-  assert.match(doc, /5,681 lexical callables still require semantic proof before behavior changes/);
+  assert.match(doc, /5,697 lexical callables still require semantic proof before behavior changes/);
   assert.match(doc, /643 selector sites and 489 lifecycle instances/);
   assert.match(doc, /217\/217 P0 obligations remain `future-proof-missing`/);
   assert.match(doc, /`update_goal\(status='complete'\)` must not be called/);
@@ -9180,7 +9180,7 @@ test('objective coverage ledger records bridge settings listener timer boundary 
   assert.match(doc, /53 subscription message listener block lines/);
   assert.match(doc, /2299 subscription message listener block bytes/);
   assert.match(doc, /122 runtime listener block lines/);
-  assert.match(doc, /5684 runtime listener block bytes/);
+  assert.match(doc, /5701 runtime listener block bytes/);
   assert.match(doc, /201 seed relay cluster block lines/);
   assert.match(doc, /8139 seed relay cluster block bytes/);
   assert.match(doc, /131 storage refresh cluster block lines/);
@@ -9605,7 +9605,7 @@ test('objective coverage ledger records settings refresh cross-context consumer 
   assert.match(doc, /41 background storage invalidation lines/);
   assert.match(doc, /1464 background storage invalidation bytes/);
   assert.match(doc, /121 bridge runtime listener lines/);
-  assert.match(doc, /5684 bridge runtime listener bytes/);
+  assert.match(doc, /5701 bridge runtime listener bytes/);
   assert.match(doc, /115 bridge request settings lines/);
   assert.match(doc, /5333 bridge request settings bytes/);
   assert.match(doc, /51 bridge seed delivery lines/);

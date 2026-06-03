@@ -10,19 +10,19 @@ This slice covers the content bridge menu action path where the visible three-do
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content_bridge.js` | 13571 | 601694 | `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3` |
+| `js/content_bridge.js` | 13623 | 603362 | `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c` |
 
 ## Pinned Source And Effect Blocks
 
 | Block | Source lines | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | ---: | --- |
-| `contentBridgeFallbackPerformBlock` | `js/content_bridge.js:7429` | 213 | 9930 | `5340e2307068efb0b3b60b32222a83780905964a8d41a81457a7e5ceaa8e00f1` |
-| `contentBridgeRenderFilterTubeMenuEntries` | `js/content_bridge.js:689` | 130 | 6824 | `852fa9120a3dc7cc232e8f048b6833141fc4e34cd50bc48e3de696faf6100e9d` |
-| `contentBridgeInjectFilterTubeMenuItem` | `js/content_bridge.js:10673` | 738 | 34747 | `bd888fd13303b3b65439b38886c671fa46d87330730efab17e0f11c5eefe6831` |
-| `contentBridgeAttachFilterTubeMenuHandlers` | `js/content_bridge.js:11411` | 71 | 2490 | `07e0e72b5c4c4a7f95615c0e752bd1ea987fd4851f31e23e3569e8d3bcadd540` |
-| `contentBridgeHandleBlockChannelClick` | `js/content_bridge.js:12141` | 1226 | 60722 | `459943dd5f26638ac63bc413a7cee220e862225929aaf2a4a0b6e068cd32ef9f` |
-| `contentBridgeAddChannelDirectly` | `js/content_bridge.js:13375` | 54 | 2662 | `4eb280573a5611b695c8284a8e6b85d17b2a97c459143a3054d02374cdf7c2ca` |
-| `contentBridgeAmpersandTopicSingleChannelMenuGuard` | `js/content_bridge.js:13500` | 31 | 1223 | `735cefcc42c64e33cd8ff6842c64f0348b70893bbc4a526e3008a37d782753b6` |
+| `contentBridgeFallbackPerformBlock` | `js/content_bridge.js:7481` | 213 | 9930 | `5340e2307068efb0b3b60b32222a83780905964a8d41a81457a7e5ceaa8e00f1` |
+| `contentBridgeRenderFilterTubeMenuEntries` | `js/content_bridge.js:689` | 123 | 6374 | `8ad65b76a720f0ed82a6a2f1664e5d5e078cc887840f8a4d487fb20684c3b3e6` |
+| `contentBridgeInjectFilterTubeMenuItem` | `js/content_bridge.js:10725` | 738 | 34747 | `bd888fd13303b3b65439b38886c671fa46d87330730efab17e0f11c5eefe6831` |
+| `contentBridgeAttachFilterTubeMenuHandlers` | `js/content_bridge.js:11463` | 71 | 2490 | `07e0e72b5c4c4a7f95615c0e752bd1ea987fd4851f31e23e3569e8d3bcadd540` |
+| `contentBridgeHandleBlockChannelClick` | `js/content_bridge.js:12193` | 1226 | 60722 | `459943dd5f26638ac63bc413a7cee220e862225929aaf2a4a0b6e068cd32ef9f` |
+| `contentBridgeAddChannelDirectly` | `js/content_bridge.js:13427` | 54 | 2662 | `4eb280573a5611b695c8284a8e6b85d17b2a97c459143a3054d02374cdf7c2ca` |
+| `contentBridgeAmpersandTopicSingleChannelMenuGuard` | `js/content_bridge.js:13552` | 31 | 1223 | `735cefcc42c64e33cd8ff6842c64f0348b70893bbc4a526e3008a37d782753b6` |
 
 ## Selected Token Counts
 
@@ -273,9 +273,9 @@ surface can support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

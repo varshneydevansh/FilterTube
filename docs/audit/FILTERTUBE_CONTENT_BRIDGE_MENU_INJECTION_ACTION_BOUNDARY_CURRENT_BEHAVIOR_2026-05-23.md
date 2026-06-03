@@ -16,7 +16,7 @@ content bridge menu injection action source/effect blocks: 7
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content_bridge.js` | 13571 | 601694 | `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3` |
+| `js/content_bridge.js` | 13623 | 603362 | `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c` |
 
 ## Pinned Blocks
 
@@ -24,11 +24,11 @@ content bridge menu injection action source/effect blocks: 7
 | --- | ---: | ---: | ---: | --- |
 | `contentBridgeMetadataPayload` | 119 | 76 | 3754 | `d6c3da5000cfb20dec65c73d66926e70e518fe501a931ea730afb03a655d55eb` |
 | `contentBridgeDropdownCleanup` | 432 | 151 | 5372 | `9aef97fd142a584b06e06b742565f75c301c7c12d673badebc385ac7b2c75aec` |
-| `contentBridgeMenuInjectionEntry` | 10673 | 735 | 34684 | `9310a960d3a007775483683d00dfdcf2fedd773efd33e329fd01aa6f0d52605b` |
-| `contentBridgeMenuHandlers` | 11411 | 71 | 2490 | `07e0e72b5c4c4a7f95615c0e752bd1ea987fd4851f31e23e3569e8d3bcadd540` |
-| `contentBridgeBlockedMarkerAndTargets` | 11982 | 119 | 5113 | `c6eb72ca074bc60447f2914cf3a58f421eafe8db9a18ce44f398c86d3cf8d7f7` |
-| `contentBridgeHandleBlockChannelClick` | 12141 | 1226 | 60722 | `459943dd5f26638ac63bc413a7cee220e862225929aaf2a4a0b6e068cd32ef9f` |
-| `contentBridgeAddChannelDirectly` | 13375 | 54 | 2662 | `4eb280573a5611b695c8284a8e6b85d17b2a97c459143a3054d02374cdf7c2ca` |
+| `contentBridgeMenuInjectionEntry` | 10725 | 735 | 34684 | `9310a960d3a007775483683d00dfdcf2fedd773efd33e329fd01aa6f0d52605b` |
+| `contentBridgeMenuHandlers` | 11463 | 71 | 2490 | `07e0e72b5c4c4a7f95615c0e752bd1ea987fd4851f31e23e3569e8d3bcadd540` |
+| `contentBridgeBlockedMarkerAndTargets` | 12034 | 119 | 5113 | `c6eb72ca074bc60447f2914cf3a58f421eafe8db9a18ce44f398c86d3cf8d7f7` |
+| `contentBridgeHandleBlockChannelClick` | 12193 | 1226 | 60722 | `459943dd5f26638ac63bc413a7cee220e862225929aaf2a4a0b6e068cd32ef9f` |
+| `contentBridgeAddChannelDirectly` | 13427 | 54 | 2662 | `4eb280573a5611b695c8284a8e6b85d17b2a97c459143a3054d02374cdf7c2ca` |
 
 ## Selected Token Counts
 
@@ -142,9 +142,9 @@ surface can support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

@@ -13,7 +13,7 @@ const docPath = 'docs/audit/FILTERTUBE_JSON_COMMENT_STRUCTURAL_WRAPPER_CLEANUP_B
 const sourceFingerprints = {
   'js/filter_logic.js': [3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'],
   'js/seed.js': [1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
-  'js/content/dom_fallback.js': [4838, 228332, '2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef']
+  'js/content/dom_fallback.js': [5030, 235555, 'fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5']
 };
 
 const blockSpecs = {
@@ -116,6 +116,10 @@ function sha256(file) {
 
 function lineCount(text) {
   return text.split(/\r?\n/).length - (text.endsWith('\n') ? 1 : 0);
+}
+
+function formatNumber(value) {
+  return Number(value).toLocaleString('en-US');
 }
 
 function escapeRegex(value) {
@@ -270,7 +274,7 @@ test('JSON comment structural wrapper cleanup audit is audit-only and source pin
     assert.equal(lineCount(source), lines, `${file} line count changed`);
     assert.equal(Buffer.byteLength(source), bytes, `${file} byte count changed`);
     assert.equal(sha256(file), hash, `${file} hash changed`);
-    assert.match(audit, new RegExp(`\\| \`${escapeRegex(file)}\` \\| ${lines} \\| ${bytes} \\| \`${hash}\` \\|`));
+    assert.match(audit, new RegExp(`\\| \`${escapeRegex(file)}\` \\| ${formatNumber(lines)} \\| ${formatNumber(bytes)} \\| \`${hash}\` \\|`));
   }
 });
 

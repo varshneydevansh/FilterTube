@@ -238,7 +238,7 @@ test('player/end-screen DOM cleanup boundary audit is audit-only and source pinn
   assert.match(doc, /player\/end-screen DOM cleanup source\/effect blocks: 9/);
   assert.match(doc, /runtime player\/end-screen DOM cleanup fixtures: 6/);
 
-  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 4838 | 228332 | \`${sha256('js/content/dom_fallback.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 5,030 | 235,555 | \`${sha256('js/content/dom_fallback.js')}\` |`));
 });
 
 test('player/end-screen DOM cleanup source counts remain pinned', () => {
@@ -246,7 +246,7 @@ test('player/end-screen DOM cleanup source counts remain pinned', () => {
   const blocks = sourceBlocks();
 
   for (const [label, block, expectedLines, expectedBytes] of [
-    ['ensureContentControlStyles block', blocks.ensureBlock, 345, 12583],
+    ['ensureContentControlStyles block', blocks.ensureBlock, 459, 16337],
     ['player/end-screen CSS group block', blocks.playerGroupBlock, 34, 856],
     ['endscreen videowall CSS block', blocks.endscreenVideowallCssBlock, 8, 253],
     ['endscreen cards CSS block', blocks.endscreenCardsCssBlock, 7, 177],
@@ -255,7 +255,7 @@ test('player/end-screen DOM cleanup source counts remain pinned', () => {
     ['active DOM fallback work block', blocks.activeBlock, 68, 2333],
     ['no-active cleanup branch', blocks.noActiveCleanupBlock, 14, 629],
     ['clearStaleDOMFallbackVisibility block', blocks.clearBlock, 33, 1412],
-    ['disabled cleanup branch', blocks.disabledCleanupBlock, 21, 959]
+    ['disabled cleanup branch', blocks.disabledCleanupBlock, 18, 791]
   ]) {
     assert.equal(lineCount(block), expectedLines, label);
     assert.equal(Buffer.byteLength(block), expectedBytes, label);
@@ -319,7 +319,7 @@ test('all player/end-screen controls emit current CSS selectors when the style w
   assert.equal(sandbox.__openAppCalls, 1);
   assert.match(css, /ytm-button-renderer a\[href\^="intent:\/\/"\]/);
   assertPlayerSelectors(css, { present: true });
-  assert.equal(countLiteral(css, 'display: none !important'), 5);
+  assert.equal(countLiteral(css, 'display: none !important'), 6);
 });
 
 test('disable autoplay and annotations can write CSS directly but are not blocklist active-work keys', () => {
@@ -334,7 +334,7 @@ test('disable autoplay and annotations can write CSS directly but are not blockl
   assert.match(css, /\.autonav-endscreen/);
   assert.match(css, /\.annotation/);
   assert.match(css, /\.iv-branding/);
-  assert.equal(countLiteral(css, 'display: none !important'), 3);
+  assert.equal(countLiteral(css, 'display: none !important'), 4);
 
   assert.equal(runActiveWork({ disableAutoplay: true }), false);
   assert.equal(runActiveWork({ disableAnnotations: true }), false);
@@ -363,7 +363,7 @@ test('player/end-screen selector restore is shared style regeneration', () => {
   assert.equal(document.head.appended.length, 1);
   assertPlayerSelectors(rewrittenStyle.textContent, { present: false });
   assert.match(rewrittenStyle.textContent, /ytm-button-renderer a\[href\^="intent:\/\/"\]/);
-  assert.equal(countLiteral(rewrittenStyle.textContent, 'display: none !important'), 1);
+  assert.equal(countLiteral(rewrittenStyle.textContent, 'display: none !important'), 2);
   assert.equal(sandbox.__openAppCalls, 1);
 });
 

@@ -16,7 +16,7 @@ quick-block hover lifecycle timer source/effect blocks: 12
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content/block_channel.js` | 3175 | 127396 | `1b6fffa249a746c01686df0d6a05dc4b770a6f0c5ded08b78a7043c11e9cdd83` |
+| `js/content/block_channel.js` | 3189 | 127857 | `c040b57e0b107fd7b6fb0a18bc4ca014e5a22fbb82755f81e51a497eee387dba` |
 
 ## Pinned Blocks
 
@@ -25,15 +25,15 @@ quick-block hover lifecycle timer source/effect blocks: 12
 | `quickBlockGlobals` | 80 | 22 | 1055 | `5c9dbc252a94d17b25e29e5c35233d551deeef0d8e1ee0e52c67c5065be9651d` |
 | `quickBlockSurfacePredicates` | 121 | 31 | 974 | `b0319db9efb0cb16f6dac8b450949df41542075f1eb4cd11be20db4e786d8dcf` |
 | `quickBlockOcclusionCache` | 237 | 73 | 2579 | `0a257411a4f81964972bfe4e340a65761e21e7548c325783ad8821072f74aa44` |
-| `quickBlockViewportPruning` | 310 | 143 | 4741 | `0d20205995c8c9459ca992a24e942f6eeaae89ef7812dea411eca2f6412338f7` |
-| `quickBlockViewportRefresh` | 925 | 97 | 3961 | `b136e450414bb439083d8dc505c6b92b70ceebbf600395d2523b22d5e59e67d2` |
-| `quickBlockHoverState` | 1022 | 67 | 2162 | `58f5cc099c0e78d55405794747e669a110d6f3f54425d91853f9e92058069dcc` |
-| `quickBlockCardTargetFastPath` | 1089 | 116 | 3885 | `1912076cdad42fd711131fadfe294de91970d226e08784b83f2c72fa42137500` |
-| `quickBlockActionFallback` | 1740 | 34 | 1448 | `ec5afa97351525978b400c7d020dbaa39cbe2e3edae0fd3717c53e72ca89ebf2` |
-| `quickBlockWrapHoverEvents` | 1774 | 14 | 888 | `44533bcceeb20e45528a041e9a1770bd264c393f1872a458efc3ccea6fc8509c` |
-| `quickBlockEnsureButton` | 1788 | 150 | 6556 | `fc46ee05e9bfb3e63f057563c7c4a50d73dc43792f6b8da4b67fe62e460af78c` |
-| `quickBlockSweepSchedule` | 1938 | 41 | 1342 | `931331c0e6890d9a364b586463a46b255d17a7b7d5610de81dcf754bb96f2103` |
-| `quickBlockObserverSetup` | 1979 | 322 | 13896 | `cf6b14c4d67b40cdc33a0126b920c224ef184a60c361481b22c025c9328dffc5` |
+| `quickBlockViewportPruning` | 310 | 150 | 4982 | `aa4a222d8d8c3fb28e25045189abc6682dd40427f61d5813d4a773f8c96b2fdf` |
+| `quickBlockViewportRefresh` | 932 | 97 | 3961 | `b136e450414bb439083d8dc505c6b92b70ceebbf600395d2523b22d5e59e67d2` |
+| `quickBlockHoverState` | 1029 | 67 | 2162 | `58f5cc099c0e78d55405794747e669a110d6f3f54425d91853f9e92058069dcc` |
+| `quickBlockCardTargetFastPath` | 1096 | 116 | 3885 | `1912076cdad42fd711131fadfe294de91970d226e08784b83f2c72fa42137500` |
+| `quickBlockActionFallback` | 1747 | 41 | 1668 | `155082c97c19e455c37dfca135618a0f88eaf2165493f1a5fbee86a92d0c60fe` |
+| `quickBlockWrapHoverEvents` | 1788 | 14 | 888 | `44533bcceeb20e45528a041e9a1770bd264c393f1872a458efc3ccea6fc8509c` |
+| `quickBlockEnsureButton` | 1802 | 150 | 6556 | `fc46ee05e9bfb3e63f057563c7c4a50d73dc43792f6b8da4b67fe62e460af78c` |
+| `quickBlockSweepSchedule` | 1952 | 41 | 1342 | `931331c0e6890d9a364b586463a46b255d17a7b7d5610de81dcf754bb96f2103` |
+| `quickBlockObserverSetup` | 1993 | 322 | 13896 | `cf6b14c4d67b40cdc33a0126b920c224ef184a60c361481b22c025c9328dffc5` |
 
 
 ## Selected Token Counts
@@ -376,9 +376,9 @@ surface can support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

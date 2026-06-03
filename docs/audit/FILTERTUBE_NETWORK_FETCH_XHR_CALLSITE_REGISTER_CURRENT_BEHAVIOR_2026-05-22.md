@@ -48,12 +48,12 @@ file.text() reads an uploaded/imported local File and is not a network response.
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6320 | 285103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
-| `js/content/handle_resolver.js` | 282 | 9785 | `67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff` |
-| `js/content_bridge.js` | 13571 | 601694 | `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3` |
-| `js/injector.js` | 3593 | 155830 | `634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04` |
-| `js/seed.js` | 1136 | 50026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
-| `js/tab-view.js` | 11617 | 526763 | `1b7f621d48d16247aecc4c7ee57cbc3db9efd3e597e6f0a4fc188228470648f7` |
+| `js/background.js` | 6,320 | 285,103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
+| `js/content/handle_resolver.js` | 282 | 9,785 | `67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff` |
+| `js/content_bridge.js` | 13,623 | 603,362 | `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c` |
+| `js/injector.js` | 3,593 | 155,830 | `634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04` |
+| `js/seed.js` | 1,136 | 50,026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
+| `js/tab-view.js` | 11,617 | 526,763 | `1b7f621d48d16247aecc4c7ee57cbc3db9efd3e597e6f0a4fc188228470648f7` |
 
 ## File And Operation Counts
 
@@ -94,12 +94,12 @@ js/background.js:4810:fetch:channelInfoPublicFallbackHtmlFetch
 js/background.js:4819:response.text:channelInfoPublicFallbackHtmlDecode
 js/content/handle_resolver.js:239:fetch:directHandleHtmlFetch
 js/content/handle_resolver.js:255:response.text:directHandleHtmlDecode
-js/content_bridge.js:1943:fetch:watchMetaDirectHtmlFetch
-js/content_bridge.js:1951:response.text:watchMetaDirectHtmlDecode
-js/content_bridge.js:8706:fetch:shortsDirectHtmlFetch
-js/content_bridge.js:8718:response.text:shortsDirectHtmlDecode
-js/content_bridge.js:8855:fetch:watchIdentityDirectHtmlFetch
-js/content_bridge.js:8867:response.text:watchIdentityDirectHtmlDecode
+js/content_bridge.js:1934:fetch:watchMetaDirectHtmlFetch
+js/content_bridge.js:1942:response.text:watchMetaDirectHtmlDecode
+js/content_bridge.js:8758:fetch:shortsDirectHtmlFetch
+js/content_bridge.js:8770:response.text:shortsDirectHtmlDecode
+js/content_bridge.js:8907:fetch:watchIdentityDirectHtmlFetch
+js/content_bridge.js:8919:response.text:watchIdentityDirectHtmlDecode
 js/injector.js:1471:fetch:subscriptionImportYoutubeiPost
 js/injector.js:1525:response.text:subscriptionImportBodyDecode
 js/seed.js:701:response.json:passiveFetchCloneJsonDecode
@@ -404,9 +404,9 @@ support runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

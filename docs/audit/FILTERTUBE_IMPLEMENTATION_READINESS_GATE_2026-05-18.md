@@ -784,9 +784,9 @@ support runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -881,7 +881,7 @@ Installed Chrome unpacked path parity boundary - 2026-05-31:
   It pins extension id `gkgjigdfdccckblmglboobikfcpeelio`, Chrome Default
   profile path `/Users/devanshvarshney/FilterTube`, matching workspace root,
   no CRX-style copy under `Default/Extensions`, Default-profile local extension
-  storage presence, service worker version `3.3.1`, and `incognito: null`.
+  storage presence, service worker version `3.3.2`, and `incognito: null`.
   The narrow Default-profile source-path owner question is `GO_PATH`, while
   already-open visible-tab injected byte freshness, incognito runtime
   availability, stale open-tab cache cleanup, live `Kully B & Gussy G - Topic`

@@ -133,16 +133,16 @@ test('capture corpus family docs carry the method semantic proof gap blocker', (
   const methodGap = read(methodGapPath);
 
   assert.match(methodGap, /tracked JS\/JSX\/MJS files: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5681/);
+  assert.match(methodGap, /repo-wide lexical callables: 5701/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5681/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5701/);
 
   for (const familyDocPath of captureCorpusFamilyDocs) {
     const familyDoc = read(familyDocPath);
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 69/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5681/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5701/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     assert.match(familyDoc, /runtime behavior changed: no/);

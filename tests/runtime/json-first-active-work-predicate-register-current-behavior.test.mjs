@@ -33,9 +33,9 @@ const jsonNoWorkReadinessDocs = [
 const sourceFingerprints = [
   ['js/seed.js', 1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
   ['js/filter_logic.js', 3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'],
-  ['js/content/dom_fallback.js', 4838, 228332, '2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef'],
-  ['js/content/block_channel.js', 3175, 127396, '1b6fffa249a746c01686df0d6a05dc4b770a6f0c5ded08b78a7043c11e9cdd83'],
-  ['js/content_bridge.js', 13571, 601694, '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3']
+  ['js/content/dom_fallback.js', 5030, 235555, 'fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5'],
+  ['js/content/block_channel.js', 3189, 127857, 'c040b57e0b107fd7b6fb0a18bc4ca014e5a22fbb82755f81e51a497eee387dba'],
+  ['js/content_bridge.js', 13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c']
 ];
 
 const endpoints = [
@@ -192,9 +192,9 @@ test('JSON-first no-work and endpoint readiness docs carry the method proof gap 
 
   for (const token of [
     'tracked JS/JSX/MJS files: 69',
-    'repo-wide lexical callables: 5681',
+    'repo-wide lexical callables: 5701',
     'files with complete per-callable semantic proof: 0',
-    'lexical callables requiring semantic proof before behavior changes: 5681',
+    'lexical callables requiring semantic proof before behavior changes: 5701',
     'runtime behavior changed: no'
   ]) {
     assert.ok(gap.includes(token), `method gap index missing token ${token}`);
@@ -206,9 +206,9 @@ test('JSON-first no-work and endpoint readiness docs carry the method proof gap 
     for (const token of [
       methodGapPath,
       'method semantic proof gap files covered: 69',
-      'method semantic proof gap lexical callables covered: 5681',
+      'method semantic proof gap lexical callables covered: 5701',
       'files with complete per-callable semantic proof: 0',
-      'lexical callables requiring semantic proof before behavior changes: 5681',
+      'lexical callables requiring semantic proof before behavior changes: 5701',
       'affected callable semantic proof: NO-GO',
       'runtime behavior changed: no',
       'JSON-first promotion',
@@ -285,19 +285,19 @@ test('JSON-first active work source anchors and predicate mismatches remain pinn
     ['js/seed.js', 'function setupFetchInterception() {', 666, seed],
     ['js/seed.js', 'function setupXhrInterception() {', 757, seed],
     ['js/filter_logic.js', "processData(data, dataName = 'unknown') {", 3588, filterLogic],
-    ['js/content/dom_fallback.js', 'function hasActiveDOMFallbackWork(settings) {', 1933, domFallback],
-    ['js/content/dom_fallback.js', 'if (!categoryRaw && videoId && typeof scheduleVideoMetaFetch ===', 2487, domFallback],
-    ['js/content_bridge.js', 'async function initializeDOMFallback(settings) {', 6088, bridge],
-    ['js/content_bridge.js', 'function ensureFallbackMenuButtons() {', 6489, bridge],
-    ['js/content/block_channel.js', 'const isQuickBlockEnabled = () => {', 1205, quickBlock],
-    ['js/content/block_channel.js', 'function setupQuickBlockObserver() {', 1979, quickBlock]
+    ['js/content/dom_fallback.js', 'function hasActiveDOMFallbackWork(settings) {', 2117, domFallback],
+    ['js/content/dom_fallback.js', 'if (!categoryRaw && videoId && typeof scheduleVideoMetaFetch ===', 2669, domFallback],
+    ['js/content_bridge.js', 'async function initializeDOMFallback(settings) {', 6140, bridge],
+    ['js/content_bridge.js', 'function ensureFallbackMenuButtons() {', 6541, bridge],
+    ['js/content/block_channel.js', 'const isQuickBlockEnabled = () => {', 1212, quickBlock],
+    ['js/content/block_channel.js', 'function setupQuickBlockObserver() {', 1993, quickBlock]
   ];
 
   for (const [file, needle, expectedLine, source] of anchors) {
     assert.equal(lineOf(source, needle), expectedLine, `${file} anchor moved: ${needle}`);
     assert.ok(text.includes(`\`${file}:${expectedLine}\``), `doc should cite ${file}:${expectedLine}`);
   }
-  assert.ok(text.includes('`js/content/block_channel.js:3174`'), 'doc should cite fixed quick-block startup timer');
+  assert.ok(text.includes('`js/content/block_channel.js:3185`'), 'doc should cite fixed quick-block startup timer');
 
   const helperBlock = sliceBetween(seed, 'function hasEnabledContentFilters(settings) {', 'function shouldCaptureRawSnapshot() {');
   for (const token of [
@@ -459,10 +459,10 @@ test('JSON-first active work source anchors and predicate mismatches remain pinn
   for (const row of [
     /\| Seed JSON active work \| `js\/seed\.js:202-238`, `js\/seed\.js:253-260`, `js\/seed\.js:383-430` \|/,
     /\| Injector JSON active work \| `js\/injector\.js:153-188`, `js\/injector\.js:1940-1944`, `js\/injector\.js:3405-3437` \|/,
-    /\| Bridge MAIN-world and identity work \| `js\/content_bridge\.js:1008-1065`, `js\/content_bridge\.js:1067-1074` \|/,
-    /\| DOM fallback lifecycle work \| `js\/content\/dom_fallback\.js:1933-1999`, `js\/content\/dom_fallback\.js:2035-2088`, `js\/content_bridge\.js:6356-6365` \|/,
-    /\| Quick-block action and rule context \| `js\/content\/block_channel\.js:1205-1289`, `js\/content\/block_channel\.js:1979-2028` \|/,
-    /\| Native\/fallback menu action gate \| `js\/content_bridge\.js:10673-10685` \|/,
+    /\| Bridge MAIN-world and identity work \| `js\/content_bridge\.js:1005-1058`, `js\/content_bridge\.js:1060-1071` \|/,
+    /\| DOM fallback lifecycle work \| `js\/content\/dom_fallback\.js:2117-2184`, `js\/content\/dom_fallback\.js:2185-2218`, `js\/content_bridge\.js:6408-6417` \|/,
+    /\| Quick-block action and rule context \| `js\/content\/block_channel\.js:1212-1296`, `js\/content\/block_channel\.js:1993-2042` \|/,
+    /\| Native\/fallback menu action gate \| `js\/content_bridge\.js:10725-10737` \|/,
     /\| Filter engine mutation gate \| `js\/filter_logic\.js:1957-2261`, `js\/filter_logic\.js:3588-3619` \|/
   ]) {
     assert.match(text, row);
@@ -471,11 +471,11 @@ test('JSON-first active work source anchors and predicate mismatches remain pinn
   assert.equal(lineOf(injector, 'function hasNetworkJsonWork(settings) {'), 185);
   assert.equal(lineOf(injector, 'if (!hasNetworkJsonWork(currentSettings)) {'), 1940);
   assert.equal(lineOf(injector, 'function processDataWithFilterLogic(data, dataName) {'), 3405);
-  assert.equal(lineOf(bridge, 'function needsMainWorldRuntimeWork(settings) {'), 1056);
-  assert.equal(lineOf(bridge, 'async function ensureMainWorldRuntimeForSettings(settings) {'), 1067);
-  assert.equal(lineOf(bridge, 'function hasActiveFallbackLifecycleWork() {'), 6356);
-  assert.equal(lineOf(bridge, 'async function injectFilterTubeMenuItem(dropdown, videoCard) {'), 10673);
-  assert.equal(lineOf(quickBlock, 'function hasActiveQuickBlockRuleContext(settings) {'), 1224);
+  assert.equal(lineOf(bridge, 'function needsMainWorldRuntimeWork(settings) {'), 1049);
+  assert.equal(lineOf(bridge, 'async function ensureMainWorldRuntimeForSettings(settings) {'), 1060);
+  assert.equal(lineOf(bridge, 'function hasActiveFallbackLifecycleWork() {'), 6408);
+  assert.equal(lineOf(bridge, 'async function injectFilterTubeMenuItem(dropdown, videoCard) {'), 10725);
+  assert.equal(lineOf(quickBlock, 'function hasActiveQuickBlockRuleContext(settings) {'), 1231);
 
   const injectorActive = sliceBetween(injector, 'function hasEnabledContentFilters(settings) {', 'const HANDLE_TERMINATOR_REGEX');
   assert.match(injectorActive, /settings\.contentFilters\.duration\?\.enabled === true/);

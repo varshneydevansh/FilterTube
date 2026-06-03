@@ -164,10 +164,10 @@ test('home-feed DOM cleanup boundary audit is audit-only and source pinned', () 
   assert.match(doc, /home-feed DOM cleanup boundary source\/effect blocks: 8/);
   assert.match(doc, /runtime home-feed DOM cleanup fixtures: 8/);
 
-  assert.match(methodGap, /repo-wide lexical callables: 5681/);
+  assert.match(methodGap, /repo-wide lexical callables: 5701/);
   assert.match(methodGap, /files with lexical accounting: 69/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5681/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5701/);
 
   assert.equal(homeSearchFamilyDocs.length, 6);
   for (const familyDocPath of homeSearchFamilyDocs) {
@@ -175,15 +175,15 @@ test('home-feed DOM cleanup boundary audit is audit-only and source pinned', () 
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 69/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5681/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5701/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5681/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5701/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     assert.match(familyDoc, /runtime behavior changed: no/);
     assert.match(familyDoc, /do not approve runtime\s+optimization/);
   }
 
-  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 4838 | 228332 | \`${sha256('js/content/dom_fallback.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 5,030 | 235,555 | \`${sha256('js/content/dom_fallback.js')}\` |`));
 });
 
 test('home-feed DOM cleanup source counts remain pinned', () => {
@@ -191,13 +191,13 @@ test('home-feed DOM cleanup source counts remain pinned', () => {
   const blocks = sourceBlocks();
 
   for (const [label, block, expectedLines, expectedBytes] of [
-    ['ensureContentControlStyles block', blocks.ensureBlock, 345, 12583],
+    ['ensureContentControlStyles block', blocks.ensureBlock, 459, 16337],
     ['home-feed CSS block', blocks.homeCssBlock, 12, 622],
     ['home-feed fallback block', blocks.homeFallbackBlock, 23, 1286],
     ['active DOM fallback work block', blocks.activeBlock, 68, 2333],
     ['no-active cleanup branch', blocks.noActiveCleanupBlock, 14, 629],
     ['clearStaleDOMFallbackVisibility block', blocks.clearBlock, 33, 1412],
-    ['disabled cleanup branch', blocks.disabledCleanupBlock, 21, 959],
+    ['disabled cleanup branch', blocks.disabledCleanupBlock, 18, 791],
     ['home-feed fallback callsite block', blocks.callsiteBlock, 1, 46]
   ]) {
     assert.equal(lineCount(block), expectedLines, label);
@@ -317,11 +317,11 @@ test('home-feed cleanup gate and invocation order remain source-local', () => {
   assert.equal(callsiteBlock.trim(), 'handleHomeFeedFallback(effectiveSettings);');
 
   const noActiveIndex = source.indexOf('if (!hasActiveFallbackWork && !onlyWhitelistPending) {');
-  const ensureIndex = source.indexOf('ensureContentControlStyles(effectiveSettings);');
+  const syncIndex = source.indexOf('syncRouteScopedContentControls(effectiveSettings);');
   const homeCallIndex = source.indexOf('handleHomeFeedFallback(effectiveSettings);');
   const shortsIndex = source.indexOf('// 3. Shorts Filtering');
-  assert.ok(noActiveIndex < ensureIndex);
-  assert.ok(ensureIndex < homeCallIndex);
+  assert.ok(syncIndex < noActiveIndex);
+  assert.ok(noActiveIndex < homeCallIndex);
   assert.ok(homeCallIndex < shortsIndex);
 });
 

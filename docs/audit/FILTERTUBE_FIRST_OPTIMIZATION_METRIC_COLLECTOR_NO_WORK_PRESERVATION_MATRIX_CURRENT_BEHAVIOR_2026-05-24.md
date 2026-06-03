@@ -176,9 +176,9 @@ pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -423,7 +423,7 @@ rows covered, 12 no-work preservation contract rows covered, 12 source-locus
 no-work rows covered, 12 collector insertion approval rows covered, 12
 collector approval authority rows covered, 0 runtime source-owner approvals,
 0 runtime metric collector approvals, 0 runtime collector insertion points
-approved, 0 runtime collector no-work proofs approved, 69 method semantic proof gap files covered, 5,681 lexical callables still requiring semantic proof, 0
+approved, 0 runtime collector no-work proofs approved, 69 method semantic proof gap files covered, 5,697 lexical callables still requiring semantic proof, 0
 files with complete per-callable semantic proof, 0 committed no-work
 preservation files, 0 implementation-ready collector no-work approval rows,
 expected runtime audit tests: 4457, expected runtime audit pass: 4457, and

@@ -15,7 +15,7 @@ false-hide investigations do not confuse inactive styles with runtime logic.
 | Legacy `content.css` | Not manifest-loaded. | Fallback default-hide plus `.filter-tube-visible` reveal and direct media hides. | `css/content.css:9-78` | Same default-hide risk plus old lockup/image hiding. |
 | Legacy `layout.css` | Not manifest-loaded. | Heavy `:not(.filter-tube-visible)` Shorts/Mix/playlist layout hides. | `css/layout.css:509-803` | High false-hide risk if active; this file has many old reveal-class assumptions. |
 | Runtime hide helper style | Yes, injected by content script. | `.filtertube-hidden` and `.filtertube-hidden-shelf` display-none plus pending metadata shimmer. | `js/content/dom_helpers.js:11-57` | Correct central model, but direct writers can bypass reason/restore metadata. |
-| Runtime content-control style | Yes, created dynamically by DOM fallback. | Feature-driven CSS rules for open-app buttons, home, playlist, Mix, members-only, watch UI, comments, end-screen, guide, etc. | `js/content/dom_fallback.js:1069-1405` | Broad selectors are valid only when tied to compiled active settings and route. |
+| Runtime content-control style | Yes, created dynamically by DOM fallback. | Feature-driven CSS rules for open-app buttons, inline mobile search-result controls, home, playlist, Mix, members-only, watch UI, comments, end-screen, guide, etc. | `js/content/dom_fallback.js:1134-1524` | Broad selectors are valid only when tied to compiled active settings and route. |
 | Fallback menu style | Yes, created dynamically by content bridge. | Button/popover styling, not content hiding. | `js/content_bridge.js:6067-6135` | Low hide risk; still part of style lifecycle ownership. |
 
 ## Class Model Drift
@@ -42,7 +42,7 @@ explicitly rebuilds them around the current `.filtertube-hidden` model.
 | `css/content.css` | 6 | 5 | Fallback legacy reveal model. |
 | `css/layout.css` | 11 | 62 | Aggressive legacy layout hide model. |
 | `js/content/dom_helpers.js` | 2 | 0 | Current central hide class injection. |
-| `js/content/dom_fallback.js` | 26 | 0 | Current dynamic content-control CSS. |
+| `js/content/dom_fallback.js` | 27 | 0 | Current dynamic content-control CSS. |
 | `js/content_bridge.js` | 0 | 0 | Current fallback menu style, not content hide. |
 
 ## Required Guardrails
@@ -87,9 +87,9 @@ runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

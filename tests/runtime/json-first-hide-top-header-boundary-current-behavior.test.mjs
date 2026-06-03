@@ -212,7 +212,7 @@ test('JSON-first hideTopHeader boundary audit is audit-only and source pinned', 
 
   assert.ok(doc.includes(`| \`js/filter_logic.js\` | 3652 | 172174 | \`${sha256('js/filter_logic.js')}\` |`));
   assert.ok(doc.includes(`| \`js/seed.js\` | 1136 | 50026 | \`${sha256('js/seed.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 4838 | 228332 | \`${sha256('js/content/dom_fallback.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 5,030 | 235,555 | \`${sha256('js/content/dom_fallback.js')}\` |`));
   assert.ok(doc.includes(`| \`js/background.js\` | 6320 | 285103 | \`${sha256('js/background.js')}\` |`));
   assert.ok(doc.includes(`| \`js/settings_shared.js\` | 1181 | 57535 | \`${sha256('js/settings_shared.js')}\` |`));
   assert.ok(doc.includes(`| \`js/content/bridge_settings.js\` | 651 | 26462 | \`${sha256('js/content/bridge_settings.js')}\` |`));
@@ -248,7 +248,7 @@ test('hideTopHeader source counts remain pinned', () => {
   assert.equal(countLiteral(blocks.bridgeSettings, 'hideTopHeader'), 1);
   assert.equal(countLiteral(blocks.filterLogic, 'desktopTopbarRenderer'), 0);
   assert.equal(countLiteral(blocks.filterLogic, 'topbarRenderer'), 0);
-  assert.equal(countLiteral(blocks.domFallback, '#masthead-container'), 1);
+  assert.equal(countLiteral(blocks.domFallback, '#masthead-container'), 2);
 
   assert.match(doc, /filter_logic total hideTopHeader tokens: 0/);
   assert.match(doc, /seed total hideTopHeader tokens: 0/);
@@ -258,7 +258,7 @@ test('hideTopHeader source counts remain pinned', () => {
   assert.match(doc, /bridge_settings total hideTopHeader token: 1/);
   assert.match(doc, /filter_logic total desktopTopbarRenderer tokens: 0/);
   assert.match(doc, /filter_logic total topbarRenderer tokens: 0/);
-  assert.match(doc, /DOM fallback total #masthead-container tokens: 1/);
+  assert.match(doc, /DOM fallback total #masthead-container tokens: 2/);
 });
 
 test('hideTopHeader does not remove JSON topbar or watch rows in filter_logic', () => {

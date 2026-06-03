@@ -120,7 +120,7 @@ currently reports 3 lexical callable matches:
 | --- | --- | --- | --- |
 | `escapeHtml` | yes | `function escapeHtml(str = '')` | Real file-local helper. It is pure string escaping and has no DOM, storage, message, network, listener, observer, timer, or settings side effect. |
 | `ensureFilterTubeMenuStyles` | yes | `function ensureFilterTubeMenuStyles()` | Real file-local helper. It appends one style node per isolated-world runtime through a module boolean guard. |
-| `if` | no | `if (filterTubeMenuStylesInjected) {` inside `ensureFilterTubeMenuStyles()` | Control-flow artifact from the broad method-shorthand branch, not a behavior-changing callable. It remains part of the current 5,681 lexical count until the repo-wide proof layer has a callable-kind classifier. |
+| `if` | no | `if (filterTubeMenuStylesInjected) {` inside `ensureFilterTubeMenuStyles()` | Control-flow artifact from the broad method-shorthand branch, not a behavior-changing callable. It remains part of the current 5,701 lexical count until the repo-wide proof layer has a callable-kind classifier. |
 
 This file-local reconciliation reduces ambiguity for `js/content/menu.js`, but
 it does not promote the global method proof count. The repo-wide index still
@@ -237,9 +237,9 @@ surface can support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

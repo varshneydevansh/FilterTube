@@ -23,13 +23,13 @@ runtime home-feed DOM cleanup fixtures: 8
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content/dom_fallback.js` | 4838 | 228332 | `2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef` |
+| `js/content/dom_fallback.js` | 5,030 | 235,555 | `fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5` |
 
 ## Pinned Source Counts
 
-ensureContentControlStyles block lines: 345
+ensureContentControlStyles block lines: 459
 
-ensureContentControlStyles block bytes: 12583
+ensureContentControlStyles block bytes: 16337
 
 home-feed CSS block lines: 12
 
@@ -51,9 +51,9 @@ clearStaleDOMFallbackVisibility block lines: 33
 
 clearStaleDOMFallbackVisibility block bytes: 1412
 
-disabled cleanup branch lines: 21
+disabled cleanup branch lines: 18
 
-disabled cleanup branch bytes: 959
+disabled cleanup branch bytes: 791
 
 home-feed fallback callsite block lines: 1
 
@@ -126,7 +126,7 @@ product runtime `toggleVisibility(` callsites: 55
 | Route condition | The direct fallback hides only when `settings.hideHomeFeed` is true and `document.location.pathname === "/"`. | Home route scope is pathname-only inside this helper. |
 | Marker write | Matching elements receive `data-filtertube-hidden-by-hide-home-feed="true"` before `toggleVisibility(element, true, "Hide Home Feed", true)`. | The specialized marker and generic hidden state are split between the helper and `toggleVisibility()`. |
 | Local restore | Marked elements are restored by the helper when the setting is false or the pathname is not `/`. | Restore depends on the helper running again after route/settings changes. |
-| Active-work gate | `hideHomeFeed` is one of the boolean keys that keeps DOM fallback work active. | When active work is absent, the ordinary no-active branch can return before the style writer and home helper run. |
+| Active-work gate | `hideHomeFeed` is one of the boolean keys that keeps DOM fallback work active. | Route-scoped style synchronization runs before the no-active branch, but the ordinary no-active branch can still return before the home helper runs. |
 | Stale cleanup | `clearStaleDOMFallbackVisibility()` clears generic hidden state and hide-all-shorts markers but has no home-feed marker reference. | Generic stale cleanup does not remove `data-filtertube-hidden-by-hide-home-feed`. |
 | Disabled cleanup | Disabled mode clears the style node and generic hidden/pending selectors but has no home-feed marker reference. | Disabled mode can restore display through generic hidden selection without removing the specialized home-feed marker. |
 | JSON-first status | Home-feed hiding remains DOM-owned today. | First-class JSON promotion still needs route parity, marker restore proof, and JSON/DOM parity gates. |
@@ -176,9 +176,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

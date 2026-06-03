@@ -199,7 +199,7 @@ function assertReadinessGateLinksCurrentYouTubeSpaHotTimerAudit() {
   assert.match(doc, /Installed Chrome unpacked path parity boundary - 2026-05-31/);
   assert.ok(doc.includes('docs/audit/FILTERTUBE_INSTALLED_CHROME_UNPACKED_PATH_PARITY_CURRENT_BEHAVIOR_2026-05-30.md'));
   assert.match(doc, /pins extension id `gkgjigdfdccckblmglboobikfcpeelio`, Chrome Default\s+profile path `\/Users\/devanshvarshney\/FilterTube`, matching workspace root/);
-  assert.match(doc, /no CRX-style copy under `Default\/Extensions`, Default-profile local extension\s+storage presence, service worker version `3\.3\.1`, and `incognito: null`/);
+  assert.match(doc, /no CRX-style copy under `Default\/Extensions`, Default-profile local extension\s+storage presence, service worker version `3\.3\.2`, and `incognito: null`/);
   assert.match(doc, /Default-profile source-path owner question is `GO_PATH`, while\s+already-open visible-tab injected byte freshness, incognito runtime\s+availability, stale open-tab cache cleanup, live `Kully B & Gussy G - Topic`\s+negative fixture proof, live smoke acceptance, release\/public-claim use, and\s+broad audit completion remain `NO-GO`/);
   assert.match(doc, /Runtime behavior changed by this\s+addendum: no/);
   assert.match(doc, /Visible installed-tab byte parity preflight boundary - 2026-05-31/);

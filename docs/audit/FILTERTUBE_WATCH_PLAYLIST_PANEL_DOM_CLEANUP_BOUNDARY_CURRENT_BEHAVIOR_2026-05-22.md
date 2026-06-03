@@ -16,7 +16,7 @@ write a feature-local DOM marker.
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content/dom_fallback.js` | 4838 | 228332 | `2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef` |
+| `js/content/dom_fallback.js` | 5,030 | 235,555 | `fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5` |
 
 ## Boundary Counts
 
@@ -24,8 +24,8 @@ write a feature-local DOM marker.
 watch-playlist-panel DOM cleanup boundary source files: 1
 watch-playlist-panel DOM cleanup source/effect blocks: 6
 runtime watch-playlist-panel DOM cleanup fixtures: 6
-ensureContentControlStyles block lines: 345
-ensureContentControlStyles block bytes: 12583
+ensureContentControlStyles block lines: 459
+ensureContentControlStyles block bytes: 16337
 watch-playlist-panel CSS block lines: 9
 watch-playlist-panel CSS block bytes: 264
 active DOM fallback work block lines: 68
@@ -34,8 +34,8 @@ no-active cleanup branch lines: 14
 no-active cleanup branch bytes: 629
 clearStaleDOMFallbackVisibility block lines: 33
 clearStaleDOMFallbackVisibility block bytes: 1412
-disabled cleanup branch lines: 21
-disabled cleanup branch bytes: 959
+disabled cleanup branch lines: 18
+disabled cleanup branch bytes: 791
 watch-playlist-panel CSS rules.push callsites: 1
 watch-playlist-panel CSS display-none declarations: 1
 watch-playlist-panel CSS selector rows: 3
@@ -136,9 +136,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

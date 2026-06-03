@@ -122,10 +122,10 @@ test('YouTube Music surface identity boundary audit is audit-only and source pin
   assert.match(doc, /This is not an implementation patch/);
   assert.match(doc, /not completion proof for YTM surface authority/);
 
-  assert.match(methodGap, /repo-wide lexical callables: 5681/);
+  assert.match(methodGap, /repo-wide lexical callables: 5701/);
   assert.match(methodGap, /files with lexical accounting: 69/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5681/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5701/);
 
   assert.equal(ytmFamilyDocs.length, 12);
   for (const familyDocPath of ytmFamilyDocs) {
@@ -133,9 +133,9 @@ test('YouTube Music surface identity boundary audit is audit-only and source pin
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 69/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5681/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5701/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5681/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5701/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     assert.match(familyDoc, /runtime behavior changed: no/);
     assert.match(familyDoc, /do not approve runtime\s+optimization/);
@@ -144,10 +144,10 @@ test('YouTube Music surface identity boundary audit is audit-only and source pin
   for (const [file, lines, bytes, hash] of [
     ['js/background.js', 6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
     ['js/content/bridge_settings.js', 651, 26462, 'c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b'],
-    ['js/content/dom_extractors.js', 1102, 45149, '3f88d18789847d50bed8a515dcd44e969db43bd19b343c38d5c3ea32b6ec6237'],
+    ['js/content/dom_extractors.js', 1137, 46896, 'adf2c04f14f0f3bb44556e216af25aca8ff182dfa569c248ddb150d0cca38a4e'],
     ['js/filter_logic.js', 3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'],
-    ['js/content_bridge.js', 13571, 601694, '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3'],
-    ['js/content/dom_fallback.js', 4838, 228332, '2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef']
+    ['js/content_bridge.js', 13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c'],
+    ['js/content/dom_fallback.js', 5030, 235555, 'fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5']
   ]) {
     const source = read(file);
     assert.equal(lineCount(source), lines, `${file} line count changed`);

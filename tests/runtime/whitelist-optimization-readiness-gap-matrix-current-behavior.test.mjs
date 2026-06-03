@@ -92,9 +92,9 @@ test('whitelist optimization readiness gap matrix is audit-only and source-backe
   assert.match(doc, /This is not an implementation patch, optimization patch/);
   assert.match(doc, /No whitelist optimization row is implementation-ready/);
   assert.match(doc, /Method semantic proof gap files covered: 69/);
-  assert.match(doc, /Method semantic proof gap lexical callables covered: 5681/);
+  assert.match(doc, /Method semantic proof gap lexical callables covered: 5701/);
   assert.match(doc, /Files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /Lexical callables requiring semantic proof before behavior changes: 5681/);
+  assert.match(doc, /Lexical callables requiring semantic proof before behavior changes: 5701/);
   assert.match(doc, /not completion proof for whitelist optimization readiness/);
 
   for (const sourceDoc of Object.values(sourceDocs)) {
@@ -106,9 +106,9 @@ test('whitelist optimization readiness gap matrix is audit-only and source-backe
     assert.ok(whitelistDoc.includes(methodGapPath), `${whitelistDocPath} missing method gap source path`);
     assert.match(whitelistDoc, /## Method Semantic Proof Gap Boundary/, `${whitelistDocPath} missing method gap section`);
     assert.match(whitelistDoc, /method semantic proof gap files covered: 69/, `${whitelistDocPath} missing file count`);
-    assert.match(whitelistDoc, /method semantic proof gap lexical callables covered: 5681/, `${whitelistDocPath} missing callable count`);
+    assert.match(whitelistDoc, /method semantic proof gap lexical callables covered: 5701/, `${whitelistDocPath} missing callable count`);
     assert.match(whitelistDoc, /files with complete per-callable semantic proof: 0/, `${whitelistDocPath} missing complete proof count`);
-    assert.match(whitelistDoc, /lexical callables requiring semantic proof before behavior changes: 5681/, `${whitelistDocPath} missing required proof count`);
+    assert.match(whitelistDoc, /lexical callables requiring semantic proof before behavior changes: 5701/, `${whitelistDocPath} missing required proof count`);
     assert.match(whitelistDoc, /affected callable semantic proof: NO-GO/, `${whitelistDocPath} missing affected callable NO-GO`);
     if (whitelistDocPath === sourceDocs.pendingRefresh || whitelistDocPath === sourceDocs.pendingIntake || whitelistDocPath === sourceDocs.pendingSourceLocus) {
       assert.match(whitelistDoc, /narrow runtime behavior changed: yes|Runtime behavior changed only for whitelist pending-hide mutation intake/, `${whitelistDocPath} missing narrow runtime change boundary`);
@@ -132,9 +132,9 @@ test('whitelist optimization readiness rows and counts stay pinned', () => {
   assert.match(doc, /readiness rows requiring route\/surface proof: 10/);
   assert.match(doc, /required first whitelist patch evidence classes: 12/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5681/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5701/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5681/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5701/);
   assert.match(doc, /affected callable semantic proof: NO-GO/);
 });
 
@@ -182,7 +182,9 @@ test('whitelist readiness matrix is backed by list-mode identity pending and sur
   assert.match(pendingSourceLocus, /patch source locus approval: GO/);
   assert.match(pendingSourceLocus, /narrow runtime whitelist pending intake patch in this audit slice: GO/);
 
-  assert.match(rightRail, /returns immediately when pathname starts \/watch/);
+  assert.match(rightRail, /current callback no longer\s+skips watch routes/);
+  assert.match(rightRail, /watch-route delayed stale pass: admitted when whitelist mode remains active/);
+  assert.match(rightRail, /right-rail duplicate forced refresh fanout: reduced/);
   assert.match(rightRail, /current-gap/);
 
   assert.match(ytmSelected, /has no selected\/current-row state/);
@@ -197,9 +199,9 @@ test('whitelist readiness matrix is backed by list-mode identity pending and sur
   assert.match(routeSurfaceMetric, /FT-METRIC-06-empty-whitelist-main-json/);
   assert.match(routeSurfaceMetric, /implementation-ready route\/surface optimization rows: 0/);
   assert.match(methodGap, /files with lexical accounting: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5681/);
+  assert.match(methodGap, /repo-wide lexical callables: 5701/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5681/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5701/);
 });
 
 test('whitelist readiness source anchors still show split runtime ownership', () => {

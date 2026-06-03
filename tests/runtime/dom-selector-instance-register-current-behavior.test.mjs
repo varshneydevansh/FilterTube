@@ -290,21 +290,21 @@ test('DOM selector instance register enumerates current API sites and literal dy
   const dynamicRows = rows.filter(row => !row.isStaticLiteral);
   const uniqueStatic = new Set(staticRows.map(row => row.selector));
 
-  assert.equal(rows.length, 649);
-  assert.equal(staticRows.length, 579);
-  assert.equal(dynamicRows.length, 70);
-  assert.equal(uniqueStatic.size, 374);
+  assert.equal(rows.length, 651);
+  assert.equal(staticRows.length, 580);
+  assert.equal(dynamicRows.length, 71);
+  assert.equal(uniqueStatic.size, 375);
   assert.deepEqual(countBy(rows, 'api'), {
     closest: 96,
     matches: 6,
     querySelector: 399,
-    querySelectorAll: 148
+    querySelectorAll: 150
   });
   assert.deepEqual(countBy(staticRows, 'api'), {
     closest: 93,
     matches: 5,
     querySelector: 375,
-    querySelectorAll: 106
+    querySelectorAll: 107
   });
 });
 
@@ -330,14 +330,14 @@ test('selector source-family totals match the current register doc', () => {
   assert.deepEqual(countStaticDynamic(rows, 'sourceFamily'), {
     'extension-ui': { sites: 90, static: 90, dynamic: 0, unique: 42 },
     'legacy-layout': { sites: 63, static: 63, dynamic: 0, unique: 52 },
-    'page-runtime': { sites: 496, static: 426, dynamic: 70, unique: 286 }
+    'page-runtime': { sites: 498, static: 427, dynamic: 71, unique: 287 }
   });
 
   for (const phrase of [
-    '| `page-runtime` | 496 | 426 | 70 | 286 |',
+    '| `page-runtime` | 498 | 427 | 71 | 287 |',
     '| `extension-ui` | 90 | 90 | 0 | 42 |',
     '| `legacy-layout` | 63 | 63 | 0 | 52 |',
-    '| **Total** | **649** | **579** | **70** |'
+    '| **Total** | **651** | **580** | **71** |'
   ]) {
     assert.ok(doc.includes(phrase), `missing doc phrase ${phrase}`);
   }
@@ -353,7 +353,7 @@ test('selector hot-file totals match the source-derived register', () => {
       'js/content/block_channel.js': { sites: 39, static: 28, dynamic: 11, unique: 21 },
       'js/content/collab_dialog.js': { sites: 11, static: 10, dynamic: 1, unique: 10 },
       'js/content/dom_extractors.js': { sites: 27, static: 23, dynamic: 4, unique: 21 },
-      'js/content/dom_fallback.js': { sites: 161, static: 150, dynamic: 11, unique: 118 },
+      'js/content/dom_fallback.js': { sites: 163, static: 151, dynamic: 12, unique: 119 },
       'js/content/dom_helpers.js': { sites: 3, static: 2, dynamic: 1, unique: 2 },
       'js/content/dom_state.js': { sites: 3, static: 0, dynamic: 3, unique: 0 },
       'js/content_bridge.js': { sites: 246, static: 208, dynamic: 38, unique: 137 },
@@ -422,12 +422,12 @@ test('DOM selector instance register links the source-derived DOM fallback selec
     'tests/runtime/dom-fallback-selector-semantic-register-current-behavior.test.mjs',
     '`js/content/dom_fallback.js` and `js/content/dom_helpers.js`',
     'source-derived selector/effect groups',
-    '164 selector API sites',
-    '152 static literal args',
-    '12 dynamic/non-literal args',
-    '120 unique static selector literals',
-    '11 semantic selector groups',
-    '12 dynamic selector families',
+    '166 selector API sites',
+    '153 static literal args',
+    '13 dynamic/non-literal args',
+    '121 unique static selector literals',
+    '10 semantic selector groups',
+    '13 dynamic selector families',
     'domFallbackSelectorSemanticAuthority',
     'domFallbackSelectorEffectReport',
     'domFallbackSelectorOwnerContract',

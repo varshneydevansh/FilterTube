@@ -49,11 +49,12 @@ function lineForIndex(starts, index) {
 
 function groupForLine(line) {
   if (line <= 930) return 'currentWatchOwnerRetryAndNavigationTimers';
-  if (line <= 2060) return 'mainPipelineYieldTimer';
-  if (line <= 2120) return 'mainPipelineScrollStateListener';
-  if (line <= 2410) return 'playlistClickEndedGuards';
-  if (line <= 2450) return 'playlistAutoplayDeferredClickTimer';
-  if (line <= 3820) return 'pendingMetadataAndSelectedRowTimers';
+  if (line <= 1100) return 'continuationNudgeTimer';
+  if (line <= 2250) return 'mainPipelineYieldTimer';
+  if (line <= 2300) return 'mainPipelineScrollStateListener';
+  if (line <= 2590) return 'playlistClickEndedGuards';
+  if (line <= 2620) return 'playlistAutoplayDeferredClickTimer';
+  if (line <= 4010) return 'pendingMetadataAndSelectedRowTimers';
   return 'pendingRunRerunTimer';
 }
 
@@ -91,9 +92,9 @@ test('DOM fallback lifecycle callback register is audit-only and scoped to curre
   assert.match(text, /Status: audit-only current-behavior register/);
   assert.match(text, /Runtime behavior is unchanged/);
   assert.match(text, /source file: js\/content\/dom_fallback\.js/);
-  assert.match(text, /lifecycle instances: 13/);
+  assert.match(text, /lifecycle instances: 14/);
   assert.match(text, /lifecycle primitive families: 2/);
-  assert.match(text, /semantic callback groups: 7/);
+  assert.match(text, /semantic callback groups: 8/);
   assert.match(text, /explicit teardown or clear instances: 0/);
   assert.match(text, /page-lifetime listener guards: 3/);
   assert.match(text, /source-derived from exact lifecycle-register patterns/);
@@ -106,11 +107,11 @@ test('DOM fallback lifecycle callback register accounts for every current DOM fa
   const ids = new Set(rows.map(row => row.id));
   const text = doc();
 
-  assert.equal(rows.length, 13);
+  assert.equal(rows.length, 14);
   assert.equal(ids.size, rows.length, 'DOM fallback lifecycle instance ids must remain unique');
   assert.deepEqual(countBy(rows, 'family'), {
     addEventListener: 3,
-    setTimeout: 10
+    setTimeout: 11
   });
 
   assert.deepEqual(
@@ -132,6 +133,7 @@ test('DOM fallback lifecycle callback register preserves semantic group counts a
   const text = doc();
   const expectedGroups = new Map([
     ['currentWatchOwnerRetryAndNavigationTimers', 4],
+    ['continuationNudgeTimer', 1],
     ['mainPipelineScrollStateListener', 1],
     ['mainPipelineYieldTimer', 1],
     ['pendingMetadataAndSelectedRowTimers', 3],

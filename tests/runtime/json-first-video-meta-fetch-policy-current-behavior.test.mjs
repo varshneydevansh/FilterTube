@@ -218,8 +218,8 @@ function loadWatchFetchRuntime({
 test('JSON-first video meta fetch policy audit is audit-only and source pinned', () => {
   const text = doc();
   const hashes = {
-    'js/content_bridge.js': '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3',
-    'js/content/dom_fallback.js': '2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef',
+    'js/content_bridge.js': 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c',
+    'js/content/dom_fallback.js': 'fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5',
     'js/filter_logic.js': '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'
   };
 
@@ -228,8 +228,8 @@ test('JSON-first video meta fetch policy audit is audit-only and source pinned',
   assert.match(text, /not an implementation patch, optimization patch, network patch/);
   assert.equal(lineCount(read('js/content_bridge.js')), 13571);
   assert.equal(Buffer.byteLength(read('js/content_bridge.js')), 601694);
-  assert.equal(lineCount(read('js/content/dom_fallback.js')), 4838);
-  assert.equal(Buffer.byteLength(read('js/content/dom_fallback.js')), 228332);
+  assert.equal(lineCount(read('js/content/dom_fallback.js')), 5030);
+  assert.equal(Buffer.byteLength(read('js/content/dom_fallback.js')), 235555);
   assert.equal(lineCount(read('js/filter_logic.js')), 3652);
   assert.equal(Buffer.byteLength(read('js/filter_logic.js')), 172174);
   for (const [file, hash] of Object.entries(hashes)) {
@@ -244,9 +244,9 @@ test('video metadata JSON-first family docs carry the method semantic proof gap 
 
   for (const marker of [
     'tracked JS/JSX/MJS files: 69',
-    'repo-wide lexical callables: 5681',
+    'repo-wide lexical callables: 5701',
     'files with complete per-callable semantic proof: 0',
-    'lexical callables requiring semantic proof before behavior changes: 5681',
+    'lexical callables requiring semantic proof before behavior changes: 5701',
     'runtime behavior changed: no'
   ]) {
     assert.ok(methodGap.includes(marker), `method gap source missing ${marker}`);
@@ -258,9 +258,9 @@ test('video metadata JSON-first family docs carry the method semantic proof gap 
     assert.ok(text.includes(methodGapPath), `${file} should cite method gap source`);
     assert.match(text, /## Method Semantic Proof Gap Boundary/);
     assert.match(text, /method semantic proof gap files covered: 69/);
-    assert.match(text, /method semantic proof gap lexical callables covered: 5681/);
+    assert.match(text, /method semantic proof gap lexical callables covered: 5701/);
     assert.match(text, /files with complete per-callable semantic proof: 0/);
-    assert.match(text, /lexical callables requiring semantic proof before behavior changes: 5681/);
+    assert.match(text, /lexical callables requiring semantic proof before behavior changes: 5701/);
     assert.match(text, /affected callable semantic proof: NO-GO/);
     assert.match(text, /runtime behavior changed: no/);
     assert.match(text, /do not approve runtime\s+optimization/);

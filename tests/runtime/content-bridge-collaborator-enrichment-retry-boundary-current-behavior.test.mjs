@@ -10,7 +10,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_CONTENT_BRIDGE_COLLABORATOR_ENRICHMENT_RETRY_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/content_bridge.js': [13571, 601694, '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3']
+  'js/content_bridge.js': [13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c']
 };
 
 const blockSpecs = {
@@ -18,7 +18,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function generateCollabEntryKey(card, videoId) {',
     end: 'function scheduleCollaboratorRetry',
-    startLine: 3308,
+    startLine: 3299,
     lines: 66,
     bytes: 2426,
     hash: '2fb03120d2c077a1700cdfd7c8dc46a906440eee4e63a5f140f77e1298315165'
@@ -27,7 +27,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function scheduleCollaboratorRetry(element, videoId, options = {}) {',
     end: 'function buildCollaboratorLookupRequestOptions',
-    startLine: 3374,
+    startLine: 3365,
     lines: 17,
     bytes: 778,
     hash: 'cbf39cc96640174f6df8bf2184b155bd8abde10ed01f759208ad577be474760f'
@@ -36,7 +36,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function buildCollaboratorLookupRequestOptions({ card = null, element = null, partialCollaborators = [], channelInfo = null } = {}) {',
     end: 'function requestCollaboratorEnrichment',
-    startLine: 3391,
+    startLine: 3382,
     lines: 54,
     bytes: 2358,
     hash: '710a851d88bb76cd65f3102c489accfdaa68e278a3967c070662cc033be40e7d'
@@ -45,7 +45,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function requestCollaboratorEnrichment(element, videoId, partialCollaborators = []) {',
     end: 'function applyResolvedCollaborators',
-    startLine: 3445,
+    startLine: 3436,
     lines: 56,
     bytes: 2572,
     hash: '80f0359372c11ac0614e4eceb12291bc2c853fe0504e4f195c2eb5c37b60c444'
@@ -54,7 +54,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function applyResolvedCollaborators(videoId, collaborators, options = {}) {',
     end: 'function applyCollaboratorsByVideoId',
-    startLine: 3501,
+    startLine: 3492,
     lines: 102,
     bytes: 3877,
     hash: '1e7fbf0db7c63fb93aceb9d952f65a97da5d26a442c5bfae080d8d789dc435e4'
@@ -63,7 +63,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function applyCollaboratorsByVideoId(videoId, collaborators, options = {}) {',
     end: '// Initialize stats from storage',
-    startLine: 3603,
+    startLine: 3594,
     lines: 105,
     bytes: 3995,
     hash: '3774b5599d4a959c83f6ea1c441985ba1b74304cb5d0720a79fd94006818459c'

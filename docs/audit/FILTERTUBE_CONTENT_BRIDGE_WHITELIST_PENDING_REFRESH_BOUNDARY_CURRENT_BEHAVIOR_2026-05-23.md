@@ -25,8 +25,8 @@ This boundary matters for whitelist optimization and first-class JSON filtering 
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content_bridge.js` | 13,571 | 601,694 | `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3` |
-| `js/content/dom_fallback.js` | 4,838 | 228,332 | `2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef` |
+| `js/content_bridge.js` | 13,623 | 603,362 | `c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c` |
+| `js/content/dom_fallback.js` | 5,030 | 235,555 | `fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5` |
 
 content bridge whitelist pending refresh source files pinned: 2
 
@@ -34,15 +34,15 @@ content bridge whitelist pending refresh source files pinned: 2
 
 | Block | Source | Start line | Lines | Bytes | SHA-256 |
 | --- | --- | ---: | ---: | ---: | --- |
-| `contentBridgeRightRailWhitelistObserver` | `js/content_bridge.js:1217` | 1,217 | 100 | 3,255 | `25809587e6d3175b0e4d064c84c86b0708e6c89027c32fa3a7f81c30e6a16988` |
-| `contentBridgeInitializeFallbackThrottle` | `js/content_bridge.js:6088` | 6,088 | 60 | 2,297 | `b4da976a738c117f0ba7e5f4c379ff80fca9010f2c1e944982cef27c9fe21272` |
-| `contentBridgeWhitelistPendingQueue` | `js/content_bridge.js:6148` | 6,148 | 69 | 3,952 | `1155ce5403825a26516b2383a686bcff2dd0a64949e5eb40e8197766510855f9` |
-| `contentBridgeWhitelistPendingApply` | `js/content_bridge.js:6217` | 6,217 | 111 | 5,760 | `3d2510570b99e4f08e600de63911dce5dc348a4ffd2b28c20d1beadd9ffe028b` |
-| `contentBridgeFallbackMutationObserver` | `js/content_bridge.js:6328` | 6,328 | 137 | 5,492 | `a97a95ca977eb192a0426f00413b69bc1fe92fb65b1dd9b795488de7244b6d19` |
-| `domFallbackOnlyWhitelistPendingSelector` | `js/content/dom_fallback.js:2325` | 2,325 | 12 | 468 | `29ac6ab76923722538fb7004f088bda03416d9da1a80c88ef8698f0c96e5e16d` |
-| `domFallbackWhitelistPendingStateReset` | `js/content/dom_fallback.js:2504` | 2,504 | 54 | 3,079 | `1f4523c7359119a8c375614e4fb739f5656ad8186573ea20e6de21ca492f4402` |
-| `domFallbackWhitelistPendingIdentityHide` | `js/content/dom_fallback.js:3656` | 3,656 | 16 | 960 | `db535d5bb1b6d0f6c2e3913e008ab1d67479982ec3155788821410a66b2eb7c1` |
-| `domFallbackOnlyWhitelistPendingReturn` | `js/content/dom_fallback.js:3947` | 3,947 | 4 | 83 | `438296f1dbec1d892317f6177e74323886b6830fd0697eb1b1c12e4779776ad0` |
+| `contentBridgeRightRailWhitelistObserver` | `js/content_bridge.js:1210` | 1,210 | 98 | 3,091 | `86779f97ba7a65ebe61da86d414b1b3027b916fdc75163053b9dd3b58bcf4976` |
+| `contentBridgeInitializeFallbackThrottle` | `js/content_bridge.js:6140` | 6,140 | 60 | 2,297 | `b4da976a738c117f0ba7e5f4c379ff80fca9010f2c1e944982cef27c9fe21272` |
+| `contentBridgeWhitelistPendingQueue` | `js/content_bridge.js:6200` | 6,200 | 69 | 3,952 | `1155ce5403825a26516b2383a686bcff2dd0a64949e5eb40e8197766510855f9` |
+| `contentBridgeWhitelistPendingApply` | `js/content_bridge.js:6269` | 6,269 | 111 | 5,760 | `3d2510570b99e4f08e600de63911dce5dc348a4ffd2b28c20d1beadd9ffe028b` |
+| `contentBridgeFallbackMutationObserver` | `js/content_bridge.js:6380` | 6,380 | 137 | 5,492 | `a97a95ca977eb192a0426f00413b69bc1fe92fb65b1dd9b795488de7244b6d19` |
+| `domFallbackOnlyWhitelistPendingSelector` | `js/content/dom_fallback.js:2505` | 2,505 | 12 | 468 | `29ac6ab76923722538fb7004f088bda03416d9da1a80c88ef8698f0c96e5e16d` |
+| `domFallbackWhitelistPendingStateReset` | `js/content/dom_fallback.js:2686` | 2,686 | 54 | 3,079 | `1f4523c7359119a8c375614e4fb739f5656ad8186573ea20e6de21ca492f4402` |
+| `domFallbackWhitelistPendingIdentityHide` | `js/content/dom_fallback.js:3841` | 3,841 | 16 | 960 | `db535d5bb1b6d0f6c2e3913e008ab1d67479982ec3155788821410a66b2eb7c1` |
+| `domFallbackOnlyWhitelistPendingReturn` | `js/content/dom_fallback.js:4139` | 4,139 | 4 | 83 | `438296f1dbec1d892317f6177e74323886b6830fd0697eb1b1c12e4779776ad0` |
 
 content bridge whitelist pending refresh source/effect blocks pinned: 9
 
@@ -105,7 +105,7 @@ Selected missing policy/report tokens over pinned blocks:
 
 ## Current Behavior Pinned
 
-`contentBridgeRightRailWhitelistObserver`: the right-rail observer is singleton-guarded, attaches to `#related`, `#secondary`, and watch-next rail selectors, and uses mutation and `yt-navigate-finish` callbacks to coalesce one immediate and one follow-up forced DOM fallback pass. The scheduler exits unless current settings are whitelist mode, exits on watch routes before arming timers, and the delayed runner rechecks mode and route before applying fallback.
+`contentBridgeRightRailWhitelistObserver`: the right-rail observer is singleton-guarded, attaches to `#related`, `#secondary`, and watch-next rail selectors, and uses mutation and `yt-navigate-finish` callbacks to coalesce one immediate and one follow-up forced DOM fallback pass. The scheduler exits unless current settings are whitelist mode and the delayed runner rechecks mode before applying fallback.
 
 `contentBridgeInitializeFallbackThrottle`: DOM fallback startup waits 1000 ms, requests settings if missing, runs `applyDOMFallback(settings)`, installs fallback menu buttons, defines a debounced 200 ms fallback, defines a 250 ms immediate fallback throttle, and schedules prefetch scans after immediate reruns.
 
@@ -229,9 +229,9 @@ optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5681
+method semantic proof gap lexical callables covered: 5701
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5681
+lexical callables requiring semantic proof before behavior changes: 5701
 affected callable semantic proof: NO-GO
 narrow runtime behavior changed: yes
 ```
