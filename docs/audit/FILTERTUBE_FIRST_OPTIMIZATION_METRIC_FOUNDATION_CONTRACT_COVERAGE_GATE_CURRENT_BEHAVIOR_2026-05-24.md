@@ -123,9 +123,9 @@ collector side-effect rows covered: 12
 collector fixture provenance rows covered: 12
 collector parity rollout rows covered: 12
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5701
+method semantic proof gap lexical callables covered: 5720
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5701
+lexical callables requiring semantic proof before behavior changes: 5720
 expected runtime audit tests: 4457
 expected runtime audit pass: 4457
 expected runtime audit fail: 0

@@ -45,6 +45,70 @@
         return typeof value === 'string' ? value.trim() : '';
     }
 
+    function normalizeNonNegativeInteger(value) {
+        const num = typeof value === 'number' ? value : Number(value);
+        if (!Number.isInteger(num)) return null;
+        return num >= 0 ? num : null;
+    }
+
+    function normalizeManagedTimeLimitPolicy(value) {
+        if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+        const raw = safeObject(value);
+        if (normalizeString(raw.schema) !== 'filtertube_managed_time_limit') return null;
+        if (raw.version !== 1) return null;
+        if (typeof raw.enabled !== 'boolean') return null;
+
+        const timezone = normalizeString(raw.timezone);
+        const dailyBudgetSeconds = normalizeNonNegativeInteger(raw.dailyBudgetSeconds);
+        const policyRevision = normalizeNonNegativeInteger(raw.policyRevision);
+        const policyHash = normalizeString(raw.policyHash);
+        const issuedAt = normalizeNonNegativeInteger(raw.issuedAt);
+        if (!timezone || dailyBudgetSeconds == null || !policyRevision || !policyHash || issuedAt == null) return null;
+
+        const out = {
+            schema: 'filtertube_managed_time_limit',
+            version: 1,
+            enabled: raw.enabled,
+            timezone,
+            dailyBudgetSeconds,
+            countingMode: normalizeString(raw.countingMode) || 'active_youtube_tab',
+            activeDeviceBudgetPolicy: normalizeString(raw.activeDeviceBudgetPolicy) || 'single_active_tab_no_double_count',
+            resetPolicy: normalizeString(raw.resetPolicy) || 'policy_timezone_midnight',
+            graceSeconds: normalizeNonNegativeInteger(raw.graceSeconds) || 0,
+            parentGrant: {
+                enabled: safeObject(raw.parentGrant).enabled === true,
+                extraSeconds: normalizeNonNegativeInteger(safeObject(raw.parentGrant).extraSeconds) || 0,
+                expiresAt: safeObject(raw.parentGrant).expiresAt == null ? null : normalizeNonNegativeInteger(safeObject(raw.parentGrant).expiresAt),
+                reason: normalizeString(safeObject(raw.parentGrant).reason)
+            },
+            policyRevision,
+            policyHash,
+            issuedAt,
+            validFrom: raw.validFrom == null ? issuedAt : normalizeNonNegativeInteger(raw.validFrom),
+            validUntil: raw.validUntil == null ? null : normalizeNonNegativeInteger(raw.validUntil)
+        };
+
+        if (out.countingMode !== 'active_youtube_tab'
+            || out.activeDeviceBudgetPolicy !== 'single_active_tab_no_double_count'
+            || out.resetPolicy !== 'policy_timezone_midnight') {
+            return null;
+        }
+        if (out.parentGrant.enabled && out.parentGrant.expiresAt == null) return null;
+        if (out.validFrom == null || (raw.validUntil != null && out.validUntil == null)) return null;
+
+        const surfaceBudgets = safeObject(raw.surfaceBudgets);
+        const hasSurfaceBudget = Object.prototype.hasOwnProperty.call(surfaceBudgets, 'main')
+            || Object.prototype.hasOwnProperty.call(surfaceBudgets, 'kids');
+        if (hasSurfaceBudget) {
+            const main = normalizeNonNegativeInteger(surfaceBudgets.main);
+            const kids = normalizeNonNegativeInteger(surfaceBudgets.kids);
+            if (main == null || kids == null) return null;
+            out.surfaceBudgets = { main, kids };
+        }
+
+        return out;
+    }
+
     function revokeDownloadBlobUrlLater(blobUrl, delayMs = 60000) {
         if (!blobUrl || typeof URL === 'undefined' || typeof URL.revokeObjectURL !== 'function') return;
         setTimeout(() => {
@@ -650,7 +714,9 @@
                 }))
                 .filter(Boolean);
             const sanitizedSettings = { ...settings };
+            const timeLimitPolicy = normalizeManagedTimeLimitPolicy(settings.timeLimitPolicy);
             delete sanitizedSettings.filterComments;
+            delete sanitizedSettings.timeLimitPolicy;
 
             const rawType = normalizeString(profile.type).toLowerCase();
             const isDefault = profileId === DEFAULT_PROFILE_ID;
@@ -677,7 +743,8 @@
                     ...sanitizedSettings,
                     allowMainViewing: settings.allowMainViewing !== false,
                     allowKidsViewing: settings.allowKidsViewing !== false,
-                    syncKidsToMain: !!settings.syncKidsToMain
+                    syncKidsToMain: !!settings.syncKidsToMain,
+                    ...(timeLimitPolicy ? { timeLimitPolicy } : {})
                 },
                 main: normalizeMainProfileAliasFields({
                     ...main,

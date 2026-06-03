@@ -29,9 +29,9 @@ Runtime metric collector approvals: 0
 Runtime collector insertion points approved: 0
 Implementation-ready collector insertion approval rows: 0
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5701
+Method semantic proof gap lexical callables covered: 5720
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5701
+Lexical callables requiring semantic proof before behavior changes: 5720
 ```
 
 This is an insertion approval boundary, not an insertion design. It keeps every
@@ -81,9 +81,9 @@ runtime rollback approvals: 0
 runtime unclaimed-surface approvals: 0
 implementation-ready collector insertion approval rows: 0
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5701
+method semantic proof gap lexical callables covered: 5720
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5701
+lexical callables requiring semantic proof before behavior changes: 5720
 expected runtime audit tests: 4457
 expected runtime audit pass: 4457
 expected runtime audit fail: 0

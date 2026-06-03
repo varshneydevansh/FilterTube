@@ -236,18 +236,18 @@ test('JSON-first list-mode matrix audit is audit-only and source pinned', () => 
   }
 
   assert.match(methodGap, /files with lexical accounting: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5701/);
+  assert.match(methodGap, /repo-wide lexical callables: 5720/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5701/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5720/);
 
   for (const listModeDocPath of listModeFamilyDocs) {
     const listModeDoc = read(listModeDocPath);
     assert.ok(listModeDoc.includes(methodGapPath), `${listModeDocPath} missing method gap source path`);
     assert.match(listModeDoc, /## Method Semantic Proof Gap Boundary/, `${listModeDocPath} missing method gap section`);
     assert.match(listModeDoc, /method semantic proof gap files covered: 69/, `${listModeDocPath} missing file count`);
-    assert.match(listModeDoc, /method semantic proof gap lexical callables covered: 5701/, `${listModeDocPath} missing callable count`);
+    assert.match(listModeDoc, /method semantic proof gap lexical callables covered: 5720/, `${listModeDocPath} missing callable count`);
     assert.match(listModeDoc, /files with complete per-callable semantic proof: 0/, `${listModeDocPath} missing complete proof count`);
-    assert.match(listModeDoc, /lexical callables requiring semantic proof before behavior changes: 5701/, `${listModeDocPath} missing required proof count`);
+    assert.match(listModeDoc, /lexical callables requiring semantic proof before behavior changes: 5720/, `${listModeDocPath} missing required proof count`);
     assert.match(listModeDoc, /affected callable semantic proof: NO-GO/, `${listModeDocPath} missing affected callable NO-GO`);
     assert.match(listModeDoc, /runtime behavior changed: no/, `${listModeDocPath} missing runtime unchanged boundary`);
     assert.match(listModeDoc, /do not\s+approve runtime\s+optimization/, `${listModeDocPath} missing approval warning`);

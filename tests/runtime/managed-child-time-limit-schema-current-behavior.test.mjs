@@ -16,6 +16,7 @@ function runtimeSource() {
   return [
     'js/background.js',
     'js/content_bridge.js',
+    'js/io_manager.js',
     'js/settings_shared.js',
     'js/state_manager.js',
     'js/tab-view.js'
@@ -161,29 +162,50 @@ function timezoneDriftDecision({ policyTimezone, deviceTimezone }) {
   };
 }
 
-test('managed child time-limit schema contract is audit-only and linked from plan and inventory', () => {
+test('managed child time-limit schema contract documents local UI store and pending runtime enforcement', () => {
   const doc = read(docPath);
   const plan = read(planPath);
   const inventory = read(inventoryPath);
   const source = runtimeSource();
 
-  assert.match(doc, /Status\*\*: Contract\/proof fixture only/);
-  assert.match(doc, /Runtime behavior is unchanged/);
+  assert.match(doc, /Status\*\*: Local profile UI\/store implemented/);
+  assert.match(doc, /YouTube runtime enforcement is\s+not implemented yet/);
   assert.match(doc, /filtertube_managed_time_limit/);
   assert.match(doc, /Required Policy Shape/);
   assert.match(doc, /Counting Decisions/);
   assert.match(doc, /Reset And Resume Rules/);
   assert.match(doc, /Parent Grant Rules/);
-  assert.match(doc, /runtime managed time-limit schema store: absent/);
+  assert.match(doc, /Current Local UI And Store Boundary/);
+  assert.match(doc, /local managed time-limit profile store: present/);
+  assert.match(doc, /local managed time-limit parent UI: present/);
   assert.match(doc, /runtime managed active-tab budget counter: absent/);
   assert.match(doc, /runtime managed timeout overlay: absent/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
 
-  assert.doesNotMatch(source, /filtertube_managed_time_limit/);
-  assert.doesNotMatch(source, /managedTimeLimitPolicyStore/);
+  assert.match(source, /filtertube_managed_time_limit/);
+  assert.match(source, /timeLimitPolicy/);
   assert.doesNotMatch(source, /computeManagedTimeBudgetRemaining/);
   assert.doesNotMatch(source, /showManagedTimeoutOverlay/);
+});
+
+test('local parent UI writes time-limit policy through profile settings and admin gates', () => {
+  const tabView = read('js/tab-view.js');
+  const ioManager = read('js/io_manager.js');
+
+  assert.match(tabView, /function updateProfileTimeLimitPolicy\(profileId, action\)/);
+  assert.match(tabView, /getProfileType\(fresh, currentActive\) === 'child'/);
+  assert.match(tabView, /canActiveProfileManageProfile\(fresh, targetId\)/);
+  assert.match(tabView, /ensureProfileUnlocked\(fresh, currentActive\)/);
+  assert.match(tabView, /const nextPolicy = buildManagedTimeLimitPolicy/);
+  assert.match(tabView, /if \(!nextPolicy\)/);
+  assert.match(tabView, /timeLimitPolicy: nextPolicy/);
+  assert.match(tabView, /Time limit:/);
+  assert.match(tabView, /Child profiles cannot change time limits here/);
+
+  assert.match(ioManager, /function normalizeManagedTimeLimitPolicy\(value\)/);
+  assert.match(ioManager, /delete sanitizedSettings\.timeLimitPolicy/);
+  assert.match(ioManager, /\.\.\.\(timeLimitPolicy \? \{ timeLimitPolicy \} : \{\}\)/);
 });
 
 test('managed child time-limit schema accepts valid two-hour zero-budget and disabled policies', () => {

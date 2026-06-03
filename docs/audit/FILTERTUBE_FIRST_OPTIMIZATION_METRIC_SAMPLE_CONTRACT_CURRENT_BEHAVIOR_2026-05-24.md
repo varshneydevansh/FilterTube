@@ -69,9 +69,9 @@ collector side-effect rows covered: 12
 collector fixture provenance rows covered: 12
 collector parity rollout rows covered: 12
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5701
+method semantic proof gap lexical callables covered: 5720
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5701
+lexical callables requiring semantic proof before behavior changes: 5720
 inline metric sample JSON sections covered: 12
 inline metric sample artifact promotion decision: NO-GO
 metric sample draft closure rows: 12
@@ -84,7 +84,7 @@ metric schema rows linked by sample closure: 12
 metric source-owner rows linked by sample closure: 12
 collector readiness families linked by sample closure: 5
 method semantic proof gap files linked by sample closure: 69
-lexical callables linked by sample closure: 5701
+lexical callables linked by sample closure: 5720
 runtime metric sample closure approvals: 0
 implementation-ready metric sample closure rows: 0
 metric sample draft closure: METRIC-SAMPLE-CHAIN-CLOSED

@@ -401,8 +401,8 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
       contentScriptEntries: 2,
       contentScriptJsRefs: 15,
       webAccessibleResourceRefs: 5,
-      zipBytes: 8688743,
-      zipSha256: '844a3ef1530ed1787e0911d43707e2b5ab687e83930edf7332c534c69e9ff898'
+      zipBytes: 8693495,
+      zipSha256: 'a62f077d5e517c52e9d92fd96f6ed9a23fded9483cba0abb3dd0ffc8338f3c8f'
     }],
     ['firefox', {
       manifestBytes: 2603,
@@ -410,8 +410,8 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
       contentScriptEntries: 1,
       contentScriptJsRefs: 14,
       webAccessibleResourceRefs: 5,
-      zipBytes: 8688802,
-      zipSha256: 'b39728fdec2292f7d54c839a383dae44142357ac0b8a0ffe056ee19078c51217'
+      zipBytes: 8693554,
+      zipSha256: 'b66bca3236d0f89996364106fc19dd492466ff9ae22eb880bfb3edffefab8ced'
     }],
     ['opera', {
       manifestBytes: 2518,
@@ -419,8 +419,8 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
       contentScriptEntries: 2,
       contentScriptJsRefs: 15,
       webAccessibleResourceRefs: 4,
-      zipBytes: 8688745,
-      zipSha256: 'd1a70a71f376cbfd19670563b2e384f252879d10a62b8972768cebd63479fae1'
+      zipBytes: 8693497,
+      zipSha256: '656de3d4ca9f065c927b9cc9fbcb6d60519cf1a02f19cc108bd2db5f0a678d76'
     }]
   ]);
 
@@ -431,7 +431,7 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
   assert.match(doc, /dist zip artifacts: 3/);
   assert.match(doc, /total dist files including zips: 180/);
   assert.match(doc, /source-backed staged files per browser excluding manifest: 58/);
-  assert.match(doc, /byte-identical source-backed staged files per browser excluding manifest: 54/);
+  assert.match(doc, /byte-identical source-backed staged files per browser excluding manifest: 58/);
   assert.match(doc, /committed package manifest: absent/);
   assert.match(doc, /zip checksum manifest: absent/);
   assert.match(doc, /reproducible build proof: absent/);
@@ -440,7 +440,7 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
   assert.match(doc, /flowchart TD/);
   assert.match(doc, /Release package parity authority remains NO-GO/);
   assert.match(doc, /local dist snapshot proof: PARTIAL/);
-  assert.match(doc, /source-backed staged byte parity: partial/);
+  assert.match(doc, /source-backed staged byte parity: local complete, release authority partial/);
   assert.match(doc, /zip checksum snapshot: yes/);
   assert.match(doc, /committed release package manifest authority: NO-GO/);
   assert.match(doc, /reproducible package build authority: NO-GO/);
@@ -460,7 +460,7 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
     assert.equal(actual.stagedFiles, 59);
     assert.equal(actual.version, '3.3.2');
     assert.equal(actual.sourceBackedFiles, 58);
-    assert.equal(actual.byteIdenticalSourceBackedFiles, 54);
+    assert.equal(actual.byteIdenticalSourceBackedFiles, 58);
     assert.equal(actual.manifestBytes, expected.manifestBytes);
     assert.equal(actual.manifestSha256, expected.manifestSha256);
     assert.equal(actual.contentScriptEntries, expected.contentScriptEntries);
@@ -684,10 +684,10 @@ test('P0 release package audit documents blocked verdict and all named gates', (
     assert.ok(doc.includes(phrase), `missing ${phrase}`);
   }
 
-  assert.match(methodGap, /repo-wide lexical callables: 5701/);
+  assert.match(methodGap, /repo-wide lexical callables: 5720/);
   assert.match(methodGap, /files with lexical accounting: 69/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5701/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5720/);
 
   assert.equal(releasePackageFamilyDocs.length, 9);
   for (const familyDocPath of releasePackageFamilyDocs) {
@@ -695,9 +695,9 @@ test('P0 release package audit documents blocked verdict and all named gates', (
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 69/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5701/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5720/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5701/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5720/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     assert.match(familyDoc, /runtime behavior changed: no/);
     assert.match(familyDoc, /do not approve runtime\s+optimization/);

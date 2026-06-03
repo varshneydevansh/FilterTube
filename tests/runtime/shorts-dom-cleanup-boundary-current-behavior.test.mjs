@@ -290,10 +290,10 @@ test('Shorts DOM cleanup boundary audit is audit-only and source pinned', () => 
   assert.match(doc, /Shorts DOM cleanup boundary source\/effect blocks: 12/);
   assert.match(doc, /runtime Shorts DOM cleanup fixtures: 9/);
 
-  assert.match(methodGap, /repo-wide lexical callables: 5701/);
+  assert.match(methodGap, /repo-wide lexical callables: 5720/);
   assert.match(methodGap, /files with lexical accounting: 69/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5701/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5720/);
 
   assert.equal(shortsFamilyDocs.length, 7);
   for (const familyDocPath of shortsFamilyDocs) {
@@ -301,9 +301,9 @@ test('Shorts DOM cleanup boundary audit is audit-only and source pinned', () => 
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 69/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5701/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5720/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5701/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5720/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     assert.match(familyDoc, /runtime behavior changed: no/);
     assert.match(familyDoc, /do not approve runtime\s+optimization/);

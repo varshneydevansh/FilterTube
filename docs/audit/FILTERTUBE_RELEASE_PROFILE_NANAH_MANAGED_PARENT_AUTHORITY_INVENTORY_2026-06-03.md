@@ -271,21 +271,26 @@ Current gap:
 
 Current behavior:
 
-- No extension runtime time-limit UI, budget counter, overlay, or route gate
-  exists in the product source yet.
+- Accounts & Sync can now set, change, and disable a profile-owned
+  `settings.timeLimitPolicy` through parent/account authority.
+- Import/profile sanitation preserves valid `filtertube_managed_time_limit`
+  policies and drops malformed policy payloads.
+- No extension active-tab budget counter, timeout overlay, or Main/Kids time
+  route gate exists in the product source yet.
 - The audit contract
   `docs/audit/FILTERTUBE_MANAGED_CHILD_TIME_LIMIT_SCHEMA_CONTRACT_2026-06-03.md`
-  now pins the first schema and decision fixtures, without changing runtime
-  behavior.
+  now pins the schema, local UI/store boundary, and decision fixtures, without
+  changing YouTube runtime behavior.
 
 Authority meaning:
 
-- Time limit work is still a future implementation slice.
+- Time limit policy editing is local parent/account authority. Runtime
+  enforcement remains a future background/content implementation slice.
 
 Current gap:
 
 - No active tab counter.
-- No runtime time-limit profile store/compiler.
+- No runtime time-limit compiler.
 - No fake-clock, sleep/restart, timezone, reduced-budget, or SPA revalidation
   runtime enforcement fixtures.
 

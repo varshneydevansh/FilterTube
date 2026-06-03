@@ -201,9 +201,9 @@ test('collector approval rows counts and field names stay pinned', () => {
   assert.match(doc, /runtime unclaimed-surface approvals: 0/);
   assert.match(doc, /implementation-ready collector approval rows: 0/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5701/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5720/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5701/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5720/);
   assert.match(doc, /expected runtime audit tests: 4457/);
   assert.match(doc, /expected runtime audit pass: 4457/);
   assert.match(doc, /expected runtime audit fail: 0/);
@@ -249,7 +249,7 @@ test('collector approval boundary is backed by current collector and artifact ga
   assert.match(rollbackUnclaimed, /runtime unclaimed-surface approvals: 0/);
   assert.match(rollbackUnclaimed, /method semantic proof gap files covered: 69/);
   assert.match(methodGap, /files with lexical accounting: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5701/);
+  assert.match(methodGap, /repo-wide lexical callables: 5720/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(implementationReadiness, /runtime first optimization approvals: 0/);
   assert.match(runtimeResults, /tests 4457/);

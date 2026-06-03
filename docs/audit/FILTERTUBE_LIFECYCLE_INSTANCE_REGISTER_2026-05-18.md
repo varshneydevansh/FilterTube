@@ -29,7 +29,7 @@ family, source family, and owner class.
 
 | Primitive family | Current count | Why it matters |
 | --- | ---: | --- |
-| `addEventListener` | 292 | Listener install surface. |
+| `addEventListener` | 294 | Listener install surface. |
 | `removeEventListener` | 13 | Explicit listener teardown surface. |
 | `MutationObserver` | 16 | DOM mutation observation surface. |
 | `IntersectionObserver` | 4 | Visibility/identity observation surface. |
@@ -39,7 +39,7 @@ family, source family, and owner class.
 | `clearTimeout` | 34 | Delayed work teardown surface. |
 | `requestAnimationFrame` | 31 | Paint-frame scheduling surface. |
 | `cancelAnimationFrame` | 4 | Paint-frame teardown surface. |
-| **Total lifecycle instances** | **525** | Observer/listener/timer/frame lifecycle surface. |
+| **Total lifecycle instances** | **527** | Observer/listener/timer/frame lifecycle surface. |
 
 This register intentionally does not include direct `fetch`, message,
 display/class, click, or dispatch side effects. Those remain covered by the
@@ -50,7 +50,7 @@ side-effect audits.
 
 | Source family | Lifecycle instances | Current interpretation |
 | --- | ---: | --- |
-| `extension-ui-background-js` | 271 | Dashboard, popup, background, StateManager, UI components, and import/export/Nanah lifecycle work. |
+| `extension-ui-background-js` | 273 | Dashboard, popup, background, StateManager, UI components, and import/export/Nanah lifecycle work. |
 | `content-runtime-js` | 219 | YouTube page-runtime work: seed, bridge, quick/menu, DOM fallback, injector, prompts, and helper listeners. |
 | `website-components` | 23 | Website client lifecycle, including theme/scene controls plus hero/footer decorative motion. |
 | `vendor-bundles` | 8 | Packaged vendor transport listeners, especially Nanah. |
@@ -65,7 +65,7 @@ side-effect audits.
 
 | File | Lifecycle instances | Audit meaning |
 | --- | ---: | --- |
-| `js/tab-view.js` | 180 | Largest UI listener/timer surface; affects profiles, filters, import/export, Nanah, app cards, and settings mutation. |
+| `js/tab-view.js` | 182 | Largest UI listener/timer surface; affects profiles, filters, import/export, Nanah, app cards, and settings mutation. |
 | `js/content_bridge.js` | 91 | Page-runtime bridge, whitelist pending, fallback menu, prefetch/hydration, page messages, and route listeners. |
 | `js/content/block_channel.js` | 71 | Quick-block, normal 3-dot, Kids passive listener, dropdown observers, resize/orientation work. |
 | `js/popup.js` | 33 | Popup filter/profile/list-mode mutation controls. |
@@ -80,36 +80,36 @@ side-effect audits.
 
 | Finding | Evidence | Risk |
 | --- | --- | --- |
-| Lifecycle installs greatly exceed explicit teardown. | 292 listener installs vs 13 listener removals; 124 timeouts vs 34 clears. | Cleanup or route changes cannot rely on teardown being already represented everywhere. |
-| UI/background lifecycle is larger than page runtime. | `extension-ui-background-js` has 271 lifecycle instances, while `content-runtime-js` has 219. | YouTube lag fixes still need settings/profile/import/Nanah lifecycle proof because UI can create stale state and broadcasts. |
+| Lifecycle installs greatly exceed explicit teardown. | 294 listener installs vs 13 listener removals; 124 timeouts vs 34 clears. | Cleanup or route changes cannot rely on teardown being already represented everywhere. |
+| UI/background lifecycle is larger than page runtime. | `extension-ui-background-js` has 273 lifecycle instances, while `content-runtime-js` has 219. | YouTube lag fixes still need settings/profile/import/Nanah lifecycle proof because UI can create stale state and broadcasts. |
 | Page runtime has several independent owners. | `js/content_bridge.js`, `js/content/block_channel.js`, `js/content/dom_fallback.js`, `js/injector.js`, prompts, and helpers all own lifecycle instances. | Empty-install, fullscreen, native overlay, and route changes can wake unrelated owners unless one lifecycle budget exists. |
 | Vendor and generated lifecycle instances are packaged but not product source. | `vendor-bundles` has 8; `generated-ui-output` has 4. | These need source/freshness/hash proof, not manual edits. |
 | No shared registry exists today. | Current tracked source still lacks `lifecycleRegistry`, `registerLifecycle`, `observerRegistry`, `timerRegistry`, `disposeAll`, or `teardownAll`. | A cleanup can remove one visible symptom while another owner keeps equivalent work alive. |
 
 ## Install/Teardown Imbalance Addendum - 2026-05-27
 
-This addendum classifies the 525 lifecycle instances by whether they install or
+This addendum classifies the 527 lifecycle instances by whether they install or
 schedule work versus explicitly tear down a primitive covered by this register.
 It is source-derived proof only; it does not approve lifecycle cleanup, route
 teardown, listener removal, observer disconnect changes, or timer rewrites.
 
 | Lifecycle role | Primitive families | Instances | Current interpretation |
 | --- | --- | ---: | --- |
-| `install-or-schedule` | `addEventListener`, `MutationObserver`, `IntersectionObserver`, `setInterval`, `setTimeout`, `requestAnimationFrame` | 470 | Work can be installed, observed, repeated, delayed, or framed. |
+| `install-or-schedule` | `addEventListener`, `MutationObserver`, `IntersectionObserver`, `setInterval`, `setTimeout`, `requestAnimationFrame` | 472 | Work can be installed, observed, repeated, delayed, or framed. |
 | `explicit-teardown` | `removeEventListener`, `clearInterval`, `clearTimeout`, `cancelAnimationFrame` | 55 | Only the teardown/clear/cancel primitives counted by this register; observer `disconnect()` and owner-specific cleanup still need semantic proof. |
 
 Source-family imbalance:
 
 | Source family | Install/schedule instances | Explicit teardown instances | Total lifecycle instances | Current risk |
 | --- | ---: | ---: | ---: | --- |
-| `extension-ui-background-js` | 257 | 14 | 271 | Dashboard/popup/background/state lifecycle has the largest unmatched install surface. |
+| `extension-ui-background-js` | 259 | 14 | 273 | Dashboard/popup/background/state lifecycle has the largest unmatched install surface. |
 | `content-runtime-js` | 190 | 29 | 219 | YouTube page runtime still has many page-lifetime listeners, observers, timers, and frame callbacks. |
 | `vendor-bundles` | 8 | 0 | 8 | Vendor lifecycle requires source/hash/freshness proof rather than local edits. |
 | `website-components` | 13 | 10 | 23 | Website client lifecycle grew from hero/footer motion work; it remains outside YouTube page-runtime filtering but still needs website unmount proof. |
 | `generated-ui-output` | 2 | 2 | 4 | Generated shell output needs freshness proof before hand edits. |
 
 ```text
-install-or-schedule lifecycle instances: 470
+install-or-schedule lifecycle instances: 472
 explicit-teardown lifecycle instances: 55
 install-to-teardown ratio: 8.5:1
 shared lifecycle registry in product source: absent
@@ -119,7 +119,7 @@ runtime behavior changed by this addendum: no
 
 ```mermaid
 flowchart TD
-  A["525 lifecycle instances"] --> B["470 install or schedule work"]
+  A["527 lifecycle instances"] --> B["472 install or schedule work"]
   A --> C["55 explicit teardown primitives"]
   B --> D["Listeners, observers, timers, frames"]
   C --> E["remove, clear, cancel"]
@@ -137,7 +137,7 @@ optimization.
 
 | Listener option shape | Instances | Current risk meaning |
 | --- | ---: | --- |
-| No third argument | 236 | Browser defaults decide capture/passive/once behavior. These are not automatically safe to remove or merge because owner intent is implicit. |
+| No third argument | 238 | Browser defaults decide capture/passive/once behavior. These are not automatically safe to remove or merge because owner intent is implicit. |
 | Boolean `true` capture | 23 | Capture-phase ordering is explicit and can affect native YouTube menu, Kids, playlist, and document-level action behavior. |
 | Object `{ passive: true }` | 16 | Passive scroll/touch/input behavior is explicit and can affect perceived lag, but it is not teardown proof. |
 | Object `{ passive: true, capture: true }` | 6 | Both ordering and passive behavior are explicit; cleanup needs route/action proof. |
@@ -150,7 +150,7 @@ Source-family listener option split:
 
 | Source family | Total listeners | Dominant current shape | Explicit option shapes |
 | --- | ---: | --- | --- |
-| `extension-ui-background-js` | 201 | 199 no-third-argument UI/background listeners | 2 boolean capture listeners |
+| `extension-ui-background-js` | 203 | 201 no-third-argument UI/background listeners | 2 boolean capture listeners |
 | `content-runtime-js` | 74 | Mixed page-runtime listener policy | 21 boolean capture, 16 passive, 6 passive+capture, 5 once, 1 capture object, 1 explicit bubble, 24 no-third-argument |
 | `vendor-bundles` | 8 | Vendor transport defaults | 2 once, 6 no-third-argument |
 | `generated-ui-output` | 2 | Generated expression/identifier options | 2 non-literal option rows |
@@ -159,9 +159,9 @@ Source-family listener option split:
 ASCII listener option flow diagram: present
 
 ```text
-292 addEventListener installs
+294 addEventListener installs
         |
-        +--> 236 omitted options
+        +--> 238 omitted options
         +--> 23 boolean capture
         +--> 30 object options
         |       +--> passive / capture / once policy
@@ -178,7 +178,7 @@ Mermaid listener option flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["292 addEventListener installs"] --> B["236 omitted option installs"]
+  A["294 addEventListener installs"] --> B["238 omitted option installs"]
   A --> C["23 boolean capture installs"]
   A --> D["30 object option installs"]
   A --> E["1 explicit bubble false install"]
@@ -192,8 +192,8 @@ flowchart TD
 ```
 
 ```text
-addEventListener option rows: 292
-no-third-argument listener installs: 236
+addEventListener option rows: 294
+no-third-argument listener installs: 238
 boolean true capture listener installs: 23
 object passive true listener installs: 16
 object passive true plus capture true listener installs: 6
@@ -216,7 +216,7 @@ interception changes, teardown changes, or route-scoped cleanup.
 
 | Listener event type | Instances | Current risk meaning |
 | --- | ---: | --- |
-| `click` | 114 | Dominant UI/menu/action event; delegation or capture changes can alter native YouTube and dashboard behavior. |
+| `click` | 116 | Dominant UI/menu/action event; delegation or capture changes can alter native YouTube and dashboard behavior. |
 | `change` | 57 | Settings, form controls, and website media UI; needs storage/profile/list-mode mutation proof. |
 | `input` | 20 | Live form input; needs debounce, validation, and no-rule UI proof. |
 | `keydown` | 14 | Keyboard shortcuts and command handling; needs focus/native overlay proof. |
@@ -238,7 +238,7 @@ Source-family listener event split:
 
 | Source family | Total listeners | Dominant current events | Non-literal event rows |
 | --- | ---: | --- | ---: |
-| `extension-ui-background-js` | 201 | `click` 98, `change` 54, `input` 19, `keydown` 10 | 0 |
+| `extension-ui-background-js` | 203 | `click` 100, `change` 54, `input` 19, `keydown` 10 | 0 |
 | `content-runtime-js` | 74 | `click` 16, `DOMContentLoaded` 6, `focusin` 5, `mouseleave` 5, `yt-navigate-finish` 5 | 1 |
 | `vendor-bundles` | 8 | `open` 2, `error` 2, `message` 2, `close` 2 | 0 |
 | `generated-ui-output` | 2 | Generated `l2` event dispatch | 2 |
@@ -247,9 +247,9 @@ Source-family listener event split:
 ASCII listener event flow diagram: present
 
 ```text
-292 addEventListener installs
+294 addEventListener installs
         |
-        +--> 114 click listeners
+        +--> 116 click listeners
         +--> 57 change listeners
         +--> 20 input listeners
         +--> 14 keydown listeners
@@ -269,7 +269,7 @@ Mermaid listener event flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["292 addEventListener installs"] --> B["114 click listeners"]
+  A["294 addEventListener installs"] --> B["116 click listeners"]
   A --> C["57 change listeners"]
   A --> D["20 input listeners"]
   A --> E["14 keydown listeners"]
@@ -288,8 +288,8 @@ flowchart TD
 ```
 
 ```text
-addEventListener event rows: 292
-click listener installs: 114
+addEventListener event rows: 294
+click listener installs: 116
 change listener installs: 57
 input listener installs: 20
 keydown listener installs: 14
@@ -311,7 +311,7 @@ generated shell edits.
 
 | Listener target class | Instances | Current risk meaning |
 | --- | ---: | --- |
-| Local element reference | 205 | Dashboard, popup, quick-block, menu, rendered card, and website media listeners dominate the target surface; each still needs owner and teardown proof. |
+| Local element reference | 207 | Dashboard, popup, quick-block, menu, rendered card, and website media listeners dominate the target surface; each still needs owner and teardown proof. |
 | Optional local element reference | 17 | Conditional UI listeners are skipped when elements are absent, but absence tolerance is not lifecycle cleanup proof. |
 | `document` | 41 | Page/global capture and bubble listeners can affect native YouTube menus, SPA route work, and page-level controls. |
 | `window` | 19 | Page/app lifecycle, message, resize, scroll, and visibility listeners need cross-context and pause/resume proof. |
@@ -322,7 +322,7 @@ Source-family listener target split:
 
 | Source family | Total listeners | Document/window targets | Local/generated/vendor targets |
 | --- | ---: | ---: | --- |
-| `extension-ui-background-js` | 201 | 13 | 171 local element, 17 optional local element |
+| `extension-ui-background-js` | 203 | 13 | 173 local element, 17 optional local element |
 | `content-runtime-js` | 74 | 42 | 32 local element |
 | `vendor-bundles` | 8 | 0 | 8 vendor transport |
 | `website-components` | 7 | 5 | 2 local element |
@@ -331,9 +331,9 @@ Source-family listener target split:
 ASCII listener target flow diagram: present
 
 ```text
-292 addEventListener installs
+294 addEventListener installs
         |
-        +--> 205 local element targets
+        +--> 207 local element targets
         +--> 17 optional local element targets
         +--> 41 document targets
         +--> 19 window targets
@@ -350,7 +350,7 @@ Mermaid listener target flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["292 addEventListener installs"] --> B["205 local element targets"]
+  A["294 addEventListener installs"] --> B["207 local element targets"]
   A --> C["17 optional local element targets"]
   A --> D["41 document targets"]
   A --> E["19 window targets"]
@@ -365,8 +365,8 @@ flowchart TD
 ```
 
 ```text
-addEventListener target rows: 292
-local element listener targets: 205
+addEventListener target rows: 294
+local element listener targets: 207
 optional local element listener targets: 17
 document listener targets: 41
 window listener targets: 19
@@ -395,7 +395,7 @@ generated edits, or teardown changes.
 | Window route events | 2 | `hashchange`/`popstate` app route listeners need page/view ownership proof. |
 | Window scroll/resize/orientation | 9 | Layout, quick-block, and fallback/menu positioning work can add perceived lag. |
 | Window storage/visibility | 1 | Cross-tab/theme sync needs storage-key and no-op proof. |
-| Local element `click` | 104 | Local UI action listeners dominate the count; cleanup requires owner and rendered-node lifecycle proof. |
+| Local element `click` | 106 | Local UI action listeners dominate the count; cleanup requires owner and rendered-node lifecycle proof. |
 | Local element `change`/`input`/`keydown` | 70 | Settings/list-mode/profile/media mutation events need storage and validation proof before delegation or pruning. |
 | Optional local `click` | 0 | Optional local targets currently carry no click listeners; optionality is mostly settings/input control work. |
 | Vendor transport lifecycle | 8 | Vendor open/error/message/close listeners require vendor freshness and session teardown proof. |
@@ -415,7 +415,7 @@ Source-family global event-target split:
 ASCII listener event-target flow diagram: present
 
 ```text
-292 addEventListener event-target rows
+294 addEventListener event-target rows
         |
         +--> document globals
         |       +--> 10 click
@@ -428,7 +428,7 @@ ASCII listener event-target flow diagram: present
         |       +--> 9 scroll/resize/orientation
         |       +--> 1 storage/visibility
         +--> local rendered nodes
-        |       +--> 104 click
+        |       +--> 106 click
         |       +--> 70 change/input/keydown
         +--> vendor/generated
                 +--> 8 vendor lifecycle
@@ -444,7 +444,7 @@ Mermaid listener event-target flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["292 addEventListener event-target rows"] --> B["41 document targets"]
+  A["294 addEventListener event-target rows"] --> B["41 document targets"]
   A --> C["19 window targets"]
   A --> D["222 local and optional local targets"]
   A --> E["10 vendor/generated targets"]
@@ -455,7 +455,7 @@ flowchart TD
   C --> J["4 window message pairs"]
   C --> K["2 window route pairs"]
   C --> L["9 window scroll/resize/orientation pairs"]
-  D --> M["104 local click pairs"]
+  D --> M["106 local click pairs"]
   D --> N["70 local change/input/keydown pairs"]
   E --> O["8 vendor lifecycle pairs"]
   E --> P["2 generated nonliteral pairs"]
@@ -465,7 +465,7 @@ flowchart TD
 ```
 
 ```text
-addEventListener event-target matrix rows: 292
+addEventListener event-target matrix rows: 294
 document click listener pairs: 10
 document DOMContentLoaded listener pairs: 7
 document keydown listener pairs: 3
@@ -474,7 +474,7 @@ window message listener pairs: 4
 window route listener pairs: 2
 window scroll resize orientation listener pairs: 9
 window storage visibility listener pairs: 1
-local element click listener pairs: 104
+local element click listener pairs: 106
 local element change input keydown listener pairs: 70
 optional local click listener pairs: 0
 vendor transport lifecycle listener pairs: 8
@@ -496,7 +496,7 @@ install pruning, generated-shell edits, vendor edits, or listener teardown.
 
 | Listener callback class | Instances | Current risk meaning |
 | --- | ---: | --- |
-| Inline arrow callback | 252 | Most listeners are anonymous installs; removal or deduping needs owner, closure-capture, and side-effect proof. |
+| Inline arrow callback | 254 | Most listeners are anonymous installs; removal or deduping needs owner, closure-capture, and side-effect proof. |
 | Identifier callback reference | 37 | Named references are easier to match to teardown, but still need target, option, route, and active-state proof. |
 | Member callback reference | 1 | One callback is a member expression; binding/receiver assumptions need explicit owner proof before refactor. |
 | Generated expression callback | 2 | Generated shell output owns two non-local callback expressions; hand edits require source-generation parity proof. |
@@ -505,7 +505,7 @@ Source-family listener callback split:
 
 | Source family | Total listener callbacks | Callback shape summary |
 | --- | ---: | --- |
-| `extension-ui-background-js` | 201 | 189 inline arrow callbacks, 12 identifier callbacks. |
+| `extension-ui-background-js` | 203 | 191 inline arrow callbacks, 12 identifier callbacks. |
 | `content-runtime-js` | 74 | 55 inline arrow callbacks, 18 identifier callbacks, 1 member reference callback. |
 | `vendor-bundles` | 8 | 8 inline arrow callbacks in packaged vendor transport code. |
 | `website-components` | 7 | 7 identifier callbacks. |
@@ -514,9 +514,9 @@ Source-family listener callback split:
 ASCII listener callback flow diagram: present
 
 ```text
-292 addEventListener installs
+294 addEventListener installs
         |
-        +--> 252 inline arrow callbacks
+        +--> 254 inline arrow callbacks
         +--> 37 identifier callback references
         +--> 1 member callback reference
         +--> 2 generated expression callbacks
@@ -533,7 +533,7 @@ Mermaid listener callback flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["292 addEventListener installs"] --> B["252 inline arrow callbacks"]
+  A["294 addEventListener installs"] --> B["254 inline arrow callbacks"]
   A --> C["37 identifier callback references"]
   A --> D["1 member callback reference"]
   A --> E["2 generated expression callbacks"]
@@ -546,14 +546,14 @@ flowchart TD
 ```
 
 ```text
-addEventListener callback rows: 292
-inline arrow listener callbacks: 252
+addEventListener callback rows: 294
+inline arrow listener callbacks: 254
 identifier listener callbacks: 37
 member reference listener callbacks: 1
 other generated expression listener callbacks: 2
 missing listener callback arguments: 0
 content runtime listener callbacks: 74
-extension UI background listener callbacks: 201
+extension UI background listener callbacks: 203
 generated output listener callbacks: 2
 vendor bundle listener callbacks: 8
 website component listener callbacks: 7
@@ -571,21 +571,21 @@ edits, inline callback refactors, or route teardown changes.
 
 | Listener add/remove measurement | Instances | Current risk meaning |
 | --- | ---: | --- |
-| `addEventListener` install rows for parity | 292 | Listener install surface remains broad and mostly page-lifetime unless each owner proves teardown or a page-lifetime reason. |
+| `addEventListener` install rows for parity | 294 | Listener install surface remains broad and mostly page-lifetime unless each owner proves teardown or a page-lifetime reason. |
 | `removeEventListener` teardown rows for parity | 13 | Only a small subset has explicit lexical teardown rows. |
-| Install-minus-remove delta | 279 | This is not automatically a leak count, but it is the current unproven listener cleanup burden. |
+| Install-minus-remove delta | 281 | This is not automatically a leak count, but it is the current unproven listener cleanup burden. |
 | Capture-equivalent remove pairs | 13 | Every current remove row has a target/event/callback/capture-compatible add row. |
 | Exact option-shape remove pairs | 12 | One pair is capture-equivalent but not source-identical on the option object. |
 | Capture-equivalent option-shape mismatch pairs | 1 | Quick-block pointermove recovery installs with `passive: true, capture: true` and removes with `capture: true`; capture semantics match, option shape does not. |
 | Remove rows without capture-equivalent add pair | 0 | No current remove row is orphaned by source-derived capture matching. |
 | Page-global installs without explicit remove | 51 | `document` and `window` listener installs still need route/page lifetime proof before optimization changes. |
-| Inline listener installs without remove handle | 252 | Inline callbacks cannot be individually removed without refactoring callback ownership. |
+| Inline listener installs without remove handle | 254 | Inline callbacks cannot be individually removed without refactoring callback ownership. |
 
 Source-family add/remove parity:
 
 | Source family | Adds | Removes | Delta |
 | --- | ---: | ---: | ---: |
-| `extension-ui-background-js` | 201 | 0 | 201 |
+| `extension-ui-background-js` | 203 | 0 | 203 |
 | `content-runtime-js` | 74 | 4 | 70 |
 | `vendor-bundles` | 8 | 0 | 8 |
 | `website-components` | 7 | 7 | 0 |
@@ -623,7 +623,7 @@ Remove-row callback split:
 ASCII listener add/remove parity flow diagram: present
 
 ```text
-292 listener installs
+294 listener installs
         |
         +--> 13 removeEventListener rows
         |       |
@@ -632,9 +632,9 @@ ASCII listener add/remove parity flow diagram: present
         |       +--> 1 capture-equivalent option-shape mismatch
         |       +--> 0 orphan remove rows
         |
-        +--> 279 install-minus-remove delta
+        +--> 281 install-minus-remove delta
         +--> 51 page-global installs without explicit remove
-        +--> 252 inline callback installs without a removable handle
+        +--> 254 inline callback installs without a removable handle
         |
         v
 listener add/remove cleanup authority: NO-GO until each listener has owner,
@@ -646,14 +646,14 @@ Mermaid listener add/remove parity flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["292 addEventListener installs"] --> B["13 removeEventListener rows"]
+  A["294 addEventListener installs"] --> B["13 removeEventListener rows"]
   B --> C["13 capture-equivalent add/remove pairs"]
   B --> D["12 exact option-shape pairs"]
   B --> E["1 capture-equivalent option-shape mismatch"]
   B --> F["0 orphan remove rows"]
-  A --> G["279 install-minus-remove delta"]
+  A --> G["281 install-minus-remove delta"]
   A --> H["51 page-global installs without explicit remove"]
-  A --> I["252 inline callbacks without remove handle"]
+  A --> I["254 inline callbacks without remove handle"]
   C --> J["Listener add/remove cleanup authority remains NO-GO"]
   D --> J
   E --> J
@@ -664,17 +664,17 @@ flowchart TD
 ```
 
 ```text
-addEventListener install rows for parity: 292
+addEventListener install rows for parity: 294
 removeEventListener teardown rows for parity: 13
-listener install-minus-remove delta: 279
+listener install-minus-remove delta: 281
 capture-equivalent listener remove pairs: 13
 exact option-shape listener remove pairs: 12
 capture-equivalent option-shape mismatch listener pairs: 1
 listener remove rows without capture-equivalent add pair: 0
 page-global listener installs without explicit remove: 51
-inline listener installs without remove handle: 252
+inline listener installs without remove handle: 254
 content runtime listener add/remove delta: 70
-extension UI background listener add/remove delta: 201
+extension UI background listener add/remove delta: 203
 generated UI output listener add/remove delta: 0
 vendor bundle listener add/remove delta: 8
 website component listener add/remove delta: 0
@@ -2031,7 +2031,7 @@ Immediate/short side-effect classes:
 | `dom-fallback-playlist-navigation` | 4 | `js/content/dom_fallback.js:873`, `js/content/dom_fallback.js:915`, `js/content/dom_fallback.js:2432`, `js/content/dom_fallback.js:3816` |
 | `content-bridge-fallback-menu-scan` | 3 | `js/content_bridge.js:7071`, `js/content_bridge.js:7083`, `js/content_bridge.js:7190` |
 | `content-helper-prompt-dismiss-animation` | 3 | `js/content/first_run_prompt.js:122`, `js/content/first_run_prompt.js:143`, `js/content/release_notes_prompt.js:62` |
-| `dashboard-quick-action-focus` | 3 | `js/tab-view.js:11456`, `js/tab-view.js:11466`, `js/tab-view.js:11477` |
+| `dashboard-quick-action-focus` | 3 | `js/tab-view.js:11672`, `js/tab-view.js:11682`, `js/tab-view.js:11693` |
 | `quick-menu-native-dropdown-injection` | 3 | `js/content/block_channel.js:2368`, `js/content/block_channel.js:2439`, `js/content/block_channel.js:2444` |
 | `background-map-flush` | 2 | `js/background.js:1634`, `js/background.js:1642` |
 | `content-bridge-collaborator-rerun` | 2 | `js/content_bridge.js:3591`, `js/content_bridge.js:3696` |
@@ -2047,8 +2047,8 @@ Immediate/short side-effect classes:
 | `content-bridge-startup-initialize` | 1 | `js/content_bridge.js:13533` |
 | `content-helper-main-world-script-chain` | 1 | `js/content/bridge_injection.js:64` |
 | `content-helper-post-injection-settings-refresh` | 1 | `js/content/bridge_injection.js:96` |
-| `dashboard-content-filter-listener-bind` | 1 | `js/tab-view.js:1204` |
-| `dashboard-dialog-focus` | 1 | `js/tab-view.js:5223` |
+| `dashboard-content-filter-listener-bind` | 1 | `js/tab-view.js:1210` |
+| `dashboard-dialog-focus` | 1 | `js/tab-view.js:5508` |
 | `dom-fallback-cooperative-yield` | 1 | `js/content/dom_fallback.js:2056` |
 | `dom-fallback-pending-rerun` | 1 | `js/content/dom_fallback.js:4530` |
 | `extension-ui-background-render-engine-idle-polyfill` | 1 | `js/render_engine.js:22` |
@@ -2141,14 +2141,14 @@ Immediate/short admission trigger classes:
 | --- | --- | ---: | --- |
 | `watch-playlist-navigation-action` | `user-menu-or-navigation` | 4 | `js/content/dom_fallback.js:873`, `js/content/dom_fallback.js:915`, `js/content/dom_fallback.js:2432`, `js/content/dom_fallback.js:3816` |
 | `content-prompt-dismiss-click` | `user-menu-or-navigation` | 3 | `js/content/first_run_prompt.js:122`, `js/content/first_run_prompt.js:143`, `js/content/release_notes_prompt.js:62` |
-| `dashboard-quick-action-click-focus` | `user-menu-or-navigation` | 3 | `js/tab-view.js:11456`, `js/tab-view.js:11466`, `js/tab-view.js:11477` |
+| `dashboard-quick-action-click-focus` | `user-menu-or-navigation` | 3 | `js/tab-view.js:11672`, `js/tab-view.js:11682`, `js/tab-view.js:11693` |
 | `fallback-menu-scan-trigger` | `dom-rerun-or-scan` | 3 | `js/content_bridge.js:7071`, `js/content_bridge.js:7083`, `js/content_bridge.js:7190` |
 | `native-dropdown-injection-trigger` | `user-menu-or-navigation` | 3 | `js/content/block_channel.js:2368`, `js/content/block_channel.js:2439`, `js/content/block_channel.js:2444` |
 | `background-cache-write-debounce` | `storage-cache-refresh` | 2 | `js/background.js:1634`, `js/background.js:1642` |
 | `block-action-menu-close` | `user-menu-or-navigation` | 2 | `js/content_bridge.js:12552`, `js/content_bridge.js:13305` |
 | `collaborator-resolution-dom-rerun` | `dom-rerun-or-scan` | 2 | `js/content_bridge.js:3591`, `js/content_bridge.js:3696` |
-| `extension-ui-dialog-focus` | `user-menu-or-navigation` | 2 | `js/tab-view.js:5223`, `js/popup.js:1216` |
-| `extension-ui-listener-bootstrap` | `bootstrap-readiness` | 2 | `js/tab-view.js:1204`, `js/popup.js:505` |
+| `extension-ui-dialog-focus` | `user-menu-or-navigation` | 2 | `js/tab-view.js:5508`, `js/popup.js:1216` |
+| `extension-ui-listener-bootstrap` | `bootstrap-readiness` | 2 | `js/tab-view.js:1210`, `js/popup.js:505` |
 | `page-world-map-message-debounce` | `storage-cache-refresh` | 2 | `js/filter_logic.js:65`, `js/filter_logic.js:126` |
 | `quick-block-global-input-refresh` | `user-menu-or-navigation` | 2 | `js/content/block_channel.js:1995`, `js/content/block_channel.js:2004` |
 | `storage-channel-enrichment` | `storage-cache-refresh` | 2 | `js/state_manager.js:500`, `js/state_manager.js:650` |
@@ -2251,8 +2251,8 @@ No-work predicate evidence:
 
 | Predicate class | Rows | Source evidence |
 | --- | ---: | --- |
-| `direct-user-action-gated` | 20 | `js/content_bridge.js:569`, `js/content_bridge.js:7647`, `js/content_bridge.js:12552`, `js/content_bridge.js:13305`, `js/content/block_channel.js:1762`, `js/content/block_channel.js:2368`, `js/content/block_channel.js:2439`, `js/content/block_channel.js:2444`, `js/content/dom_fallback.js:873`, `js/content/dom_fallback.js:915`, `js/content/dom_fallback.js:2432`, `js/content/dom_fallback.js:3816`, `js/content/first_run_prompt.js:122`, `js/content/first_run_prompt.js:143`, `js/content/release_notes_prompt.js:62`, `js/tab-view.js:5223`, `js/tab-view.js:11456`, `js/tab-view.js:11466`, `js/tab-view.js:11477`, `js/popup.js:1216` |
-| `bootstrap-readiness-gated` | 9 | `js/content_bridge.js:13533`, `js/content/block_channel.js:2581`, `js/content/block_channel.js:2616`, `js/content/bridge_injection.js:64`, `js/content/bridge_injection.js:96`, `js/injector.js:3560`, `js/render_engine.js:22`, `js/tab-view.js:1204`, `js/popup.js:505` |
+| `direct-user-action-gated` | 20 | `js/content_bridge.js:569`, `js/content_bridge.js:7647`, `js/content_bridge.js:12552`, `js/content_bridge.js:13305`, `js/content/block_channel.js:1762`, `js/content/block_channel.js:2368`, `js/content/block_channel.js:2439`, `js/content/block_channel.js:2444`, `js/content/dom_fallback.js:873`, `js/content/dom_fallback.js:915`, `js/content/dom_fallback.js:2432`, `js/content/dom_fallback.js:3816`, `js/content/first_run_prompt.js:122`, `js/content/first_run_prompt.js:143`, `js/content/release_notes_prompt.js:62`, `js/tab-view.js:5508`, `js/tab-view.js:11672`, `js/tab-view.js:11682`, `js/tab-view.js:11693`, `js/popup.js:1216` |
+| `bootstrap-readiness-gated` | 9 | `js/content_bridge.js:13533`, `js/content/block_channel.js:2581`, `js/content/block_channel.js:2616`, `js/content/bridge_injection.js:64`, `js/content/bridge_injection.js:96`, `js/injector.js:3560`, `js/render_engine.js:22`, `js/tab-view.js:1210`, `js/popup.js:505` |
 | `storage-dirty-state-gated` | 8 | `js/background.js:1634`, `js/background.js:1642`, `js/filter_logic.js:65`, `js/filter_logic.js:126`, `js/state_manager.js:500`, `js/state_manager.js:650`, `js/state_manager.js:2344`, `js/state_manager.js:2350` |
 | `dom-fallback-run-inherited` | 5 | `js/content_bridge.js:1503`, `js/content_bridge.js:3591`, `js/content_bridge.js:3696`, `js/content/dom_fallback.js:2056`, `js/content/dom_fallback.js:4530` |
 | `eager-surface-gated` | 4 | `js/content_bridge.js:7071`, `js/content_bridge.js:7083`, `js/content_bridge.js:7190`, `js/content/block_channel.js:1962` |
@@ -4051,7 +4051,7 @@ serialized pending reruns. It records that no
 ## Release Hot-Path Lifecycle Addendum - 2026-05-27
 
 This addendum records semantic lifecycle ownership for the lag/menu/blocklist
-release path. It does not change the 525-instance source count and does not
+release path. It does not change the 527-instance source count and does not
 claim lifecycle cleanup is generally safe. It narrows the highest-risk
 observer/listener/timer instances that were involved in the empty-install lag,
 quick-cross availability, comment-menu close, whitelist pending-hide, and
@@ -4347,9 +4347,9 @@ Source inputs:
 - `tests/runtime/lifecycle-instance-register-current-behavior.test.mjs`
 
 ```text
-525 tracked lifecycle primitive instances
+527 tracked lifecycle primitive instances
         |
-        +--> 470 install-or-schedule rows
+        +--> 472 install-or-schedule rows
         |       +--> listeners, observers, timers, intervals, frames
         |
         +--> 55 explicit teardown rows
@@ -4367,7 +4367,7 @@ missing shared lifecycle effect/teardown authority
 
 ```mermaid
 flowchart TD
-  A["525 tracked lifecycle primitive instances"] --> B["470 install-or-schedule rows"]
+  A["527 tracked lifecycle primitive instances"] --> B["472 install-or-schedule rows"]
   A --> C["55 explicit teardown rows"]
   B --> D["Listeners, observers, timers, intervals, frames"]
   C --> E["Remove, clear, cancel primitives"]
@@ -4381,8 +4381,8 @@ flowchart TD
 
 | Row id | Joined proof surface | Current source-backed state | Why implementation remains NO-GO |
 | --- | --- | --- | --- |
-| `lifecycle_convergence_primitive_census` | Repo-wide primitive census | 525 lifecycle primitive instances are tracked: 470 install-or-schedule rows and 55 explicit teardown rows. | A count proves breadth, not owner, trigger, side-effect, route, or teardown safety. |
-| `lifecycle_convergence_listener_surface` | Listener installs, targets, callbacks, and add/remove parity | 292 `addEventListener` rows, 13 `removeEventListener` rows, a 279 install-minus-remove delta, 51 page-global listener installs without explicit remove, and 42 content-runtime document/window listener rows are pinned. | Listener cleanup can change native menu timing, route work, page-message trust, quick-block affordances, and UI mutation behavior. |
+| `lifecycle_convergence_primitive_census` | Repo-wide primitive census | 527 lifecycle primitive instances are tracked: 472 install-or-schedule rows and 55 explicit teardown rows. | A count proves breadth, not owner, trigger, side-effect, route, or teardown safety. |
+| `lifecycle_convergence_listener_surface` | Listener installs, targets, callbacks, and add/remove parity | 294 `addEventListener` rows, 13 `removeEventListener` rows, a 281 install-minus-remove delta, 51 page-global listener installs without explicit remove, and 42 content-runtime document/window listener rows are pinned. | Listener cleanup can change native menu timing, route work, page-message trust, quick-block affordances, and UI mutation behavior. |
 | `lifecycle_convergence_observer_surface` | Observer constructors, observe targets/options, disconnects, and observe/release parity | 20 observer constructor rows, 21 observe activation rows, 15 release rows, 14 disconnect rows, and a 6 observe-minus-release delta are pinned. | Observer cleanup remains split across dropdowns, quick-block, fallback menu, prefetch, DOM fallback, collaborator dialog, and website component owners. |
 | `lifecycle_convergence_timer_frame_surface` | Timer, interval, and animation-frame schedules | 124 lexical `setTimeout` rows, 3 `setInterval` rows, 31 `requestAnimationFrame` rows, 33 YouTube SPA immediate/short hot timer rows, 29 desktop residual rows, and 4 mobile/coarse eager rows are pinned. | Delay or cancellation changes require per-owner no-work, max-rerun, stale-route, and side-effect evidence. |
 | `lifecycle_convergence_hot_spa_owners` | High-risk YouTube SPA lifecycle owners | 16 hot YouTube SPA owner rows cover quick-block, native menu, dropdown discovery/visibility, identity prefetch, playlist prefetch, whitelist right rail, DOM fallback, fallback menu, metadata reruns, seed replay, injector readiness, and settings refresh debounce. | Hot owners are locally gated, but no shared lifecycle registry proves route/surface teardown or disabled-mode zero work. |
@@ -4397,8 +4397,8 @@ Current lifecycle convergence status:
 ```text
 runtime lifecycle convergence rows: 10
 implementation-ready runtime lifecycle convergence rows: 0
-tracked lifecycle primitive instances: 525
-install-or-schedule lifecycle rows: 470
+tracked lifecycle primitive instances: 527
+install-or-schedule lifecycle rows: 472
 explicit teardown lifecycle rows: 55
 hot YouTube SPA lifecycle owner rows: 16
 YouTube SPA immediate/short hot timer rows: 33
@@ -4461,9 +4461,9 @@ runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5701
+method semantic proof gap lexical callables covered: 5720
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5701
+lexical callables requiring semantic proof before behavior changes: 5720
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

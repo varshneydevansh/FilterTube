@@ -390,8 +390,8 @@ YouTube budgets, then document app parity.
   - `tests/runtime/managed-child-time-limit-schema-current-behavior.test.mjs`
 - **Description**: Define daily budget, timezone/day boundary, grace behavior,
   active-tab counting, reduced budget, and override fields.
-- **Status**: Contract/proof fixture added. Runtime budget counters, route
-  gates, and timeout overlays remain pending.
+- **Status**: Local profile UI/store and contract fixture added. Runtime budget
+  counters, route gates, and timeout overlays remain pending.
 - **Complexity**: 6/10
 - **Dependencies**: Sprint 1 for local schema; Sprints 2 and 3 for remote
   managed time-limit updates.

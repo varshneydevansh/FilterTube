@@ -193,14 +193,14 @@ Large product-owned source files:
 | File | Current lines | Boundary |
 | --- | ---: | --- |
 | `js/content_bridge.js` | 13623 | Giant cross-context hub. Any growth needs source-owner proof and focused runtime fixtures. |
-| `js/tab-view.js` | 11617 | Dashboard/settings UI surface. Any growth needs UI/state owner proof and release smoke. |
+| `js/tab-view.js` | 11833 | Dashboard/settings UI surface. Any growth needs UI/state owner proof and release smoke. |
 | `js/background.js` | 6320 | Background storage/message/profile authority. Any growth needs mutation and settings proof. |
 | `js/content/dom_fallback.js` | 5030 | DOM fallback selector/hide/restore authority. Any growth needs DOM/no-work proof. |
 | `js/filter_logic.js` | 3652 | JSON renderer rule and decision engine. Any growth needs rule/path proof. |
 | `js/injector.js` | 3593 | Main-world JSON interception and page bridge. Any growth needs JSON/no-work proof. |
 | `js/content/block_channel.js` | 3189 | Quick-block/native menu/Kids action surface. Any growth needs menu/action lifecycle proof. |
 | `js/state_manager.js` | 2491 | Settings persistence and profile mutation surface. Any growth needs storage proof. |
-| `js/io_manager.js` | 2030 | Import/export and backup surface. Any growth needs payload and migration proof. |
+| `js/io_manager.js` | 2097 | Import/export and backup surface. Any growth needs payload and migration proof. |
 | `js/popup.js` | 1841 | Popup settings/action UI. Any growth needs settings UI proof and popup smoke. |
 | `js/render_engine.js` | 1389 | Dashboard renderer helper. Any growth needs release UI proof. |
 | `js/settings_shared.js` | 1181 | Canonical settings compiler and migration surface. Any growth needs mode/list proof. |
@@ -244,9 +244,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5701
+method semantic proof gap lexical callables covered: 5720
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5701
+lexical callables requiring semantic proof before behavior changes: 5720
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

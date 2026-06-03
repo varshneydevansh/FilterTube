@@ -1,7 +1,8 @@
 # Contract: Managed Child Time-Limit Schema
 
 **Generated**: 2026-06-03
-**Status**: Contract/proof fixture only. Runtime behavior is unchanged.
+**Status**: Local profile UI/store implemented. YouTube runtime enforcement is
+not implemented yet.
 **Goal slice**: Implementation order item 6, "Add local child/protected-profile
 time-limit UI and schema".
 **Primary inputs**:
@@ -13,9 +14,10 @@ and
 ## Purpose
 
 This contract defines the first protected-profile YouTube time-limit policy
-shape before background counters, route gates, or timeout overlays are added.
-The schema must work for same-device parent edits, Nanah P2P updates,
-local-network managed updates, and downstream mobile/tablet app parity.
+shape and the current local parent UI/store boundary before background
+counters, route gates, or timeout overlays are added. The schema must work for
+same-device parent edits, Nanah P2P updates, local-network managed updates, and
+downstream mobile/tablet app parity.
 
 The policy is profile-owned. It is not granted by a child/protected-user PIN,
 LAN discovery, open YouTube tab state, or action-history row.
@@ -120,17 +122,36 @@ flowchart TD
   E --> G["Timeout overlay"]
 ```
 
+## Current Local UI And Store Boundary
+
+Current extension UI can now create or disable a profile-owned
+`settings.timeLimitPolicy` from Accounts & Sync profile rows:
+
+- Parents/account profiles can set a daily limit in whole minutes.
+- `0` minutes is valid and stores an immediate-timeout policy for future
+  runtime enforcement.
+- Child/protected active profiles cannot set, change, or disable time limits.
+- Writes use the same parent/account unlock gate used for viewing-space edits:
+  active child profiles are rejected, the active manager must be allowed to
+  manage the target profile, and the manager profile must be unlocked.
+- Import/profile sanitation preserves only valid `filtertube_managed_time_limit`
+  policies and drops malformed payloads.
+- Disabling a limit writes a disabled policy revision; disabled policy remains a
+  no-budget-work state for future runtime.
+
 ## Current Runtime Boundary
 
-Current product runtime source does not yet implement this schema:
+Current product source implements the local UI/store path, but YouTube runtime
+enforcement is still absent:
 
 ```text
-runtime managed time-limit schema store: absent
+local managed time-limit profile store: present
+local managed time-limit parent UI: present
 runtime managed time-limit policy compiler: absent
 runtime managed active-tab budget counter: absent
 runtime managed timeout overlay: absent
 runtime managed Main/Kids time gate: absent
-runtime behavior changed by this contract: no
+YouTube runtime behavior changed by this contract: no
 ```
 
 Future implementation should keep the enforcement owner in background/runtime

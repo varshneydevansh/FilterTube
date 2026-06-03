@@ -3034,6 +3034,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const LOCK_ALLOWED_VIEWS = new Set(['help', 'whatsnew', 'donate']);
     const CHILD_ALLOWED_VIEWS = new Set([...LOCK_ALLOWED_VIEWS, 'sync']);
+    const MANAGED_TIME_LIMIT_SCHEMA = 'filtertube_managed_time_limit';
 
     async function sendRuntimeMessage(payload) {
         return new Promise((resolve) => {
@@ -4098,6 +4099,113 @@ document.addEventListener('DOMContentLoaded', async () => {
         return 'No viewing spaces';
     }
 
+    function normalizeNonNegativeInteger(value) {
+        const num = typeof value === 'number' ? value : Number(value);
+        if (!Number.isInteger(num)) return null;
+        return num >= 0 ? num : null;
+    }
+
+    function getManagedTimeLimitTimezone() {
+        try {
+            const tz = normalizeString(Intl?.DateTimeFormat?.().resolvedOptions?.().timeZone);
+            return tz || 'Etc/UTC';
+        } catch (e) {
+            return 'Etc/UTC';
+        }
+    }
+
+    function getManagedTimeLimitPolicy(profile) {
+        const raw = safeObject(safeObject(profile?.settings).timeLimitPolicy);
+        if (normalizeString(raw.schema) !== MANAGED_TIME_LIMIT_SCHEMA || raw.version !== 1) return null;
+        const dailyBudgetSeconds = normalizeNonNegativeInteger(raw.dailyBudgetSeconds);
+        const policyRevision = normalizeNonNegativeInteger(raw.policyRevision);
+        const issuedAt = normalizeNonNegativeInteger(raw.issuedAt);
+        const policyHash = normalizeString(raw.policyHash);
+        const timezone = normalizeString(raw.timezone);
+        if (dailyBudgetSeconds == null || !policyRevision || issuedAt == null || !policyHash || !timezone) return null;
+        return {
+            schema: MANAGED_TIME_LIMIT_SCHEMA,
+            version: 1,
+            enabled: raw.enabled === true,
+            timezone,
+            dailyBudgetSeconds,
+            surfaceBudgets: safeObject(raw.surfaceBudgets),
+            countingMode: normalizeString(raw.countingMode) || 'active_youtube_tab',
+            activeDeviceBudgetPolicy: normalizeString(raw.activeDeviceBudgetPolicy) || 'single_active_tab_no_double_count',
+            resetPolicy: normalizeString(raw.resetPolicy) || 'policy_timezone_midnight',
+            graceSeconds: normalizeNonNegativeInteger(raw.graceSeconds) || 0,
+            parentGrant: safeObject(raw.parentGrant),
+            policyRevision,
+            policyHash,
+            issuedAt,
+            validFrom: raw.validFrom == null ? issuedAt : normalizeNonNegativeInteger(raw.validFrom),
+            validUntil: raw.validUntil == null ? null : normalizeNonNegativeInteger(raw.validUntil)
+        };
+    }
+
+    function buildManagedTimeLimitPolicyHash(seed) {
+        const source = JSON.stringify(seed);
+        let hash = 0;
+        for (let i = 0; i < source.length; i += 1) {
+            hash = ((hash << 5) - hash + source.charCodeAt(i)) | 0;
+        }
+        return `local-time-limit-${Math.abs(hash).toString(16)}`;
+    }
+
+    function buildManagedTimeLimitPolicy(existingPolicy, { enabled, dailyBudgetSeconds }) {
+        const now = Date.now();
+        const budget = normalizeNonNegativeInteger(dailyBudgetSeconds);
+        if (budget == null) return null;
+        const prior = existingPolicy || null;
+        const revision = Math.max(0, normalizeNonNegativeInteger(prior?.policyRevision) || 0) + 1;
+        const timezone = normalizeString(prior?.timezone) || getManagedTimeLimitTimezone();
+        const surfaceBudgets = {
+            main: budget,
+            kids: budget
+        };
+        const seed = {
+            enabled: enabled === true,
+            timezone,
+            dailyBudgetSeconds: budget,
+            surfaceBudgets,
+            policyRevision: revision
+        };
+        return {
+            schema: MANAGED_TIME_LIMIT_SCHEMA,
+            version: 1,
+            enabled: enabled === true,
+            timezone,
+            dailyBudgetSeconds: budget,
+            surfaceBudgets,
+            countingMode: 'active_youtube_tab',
+            activeDeviceBudgetPolicy: 'single_active_tab_no_double_count',
+            resetPolicy: 'policy_timezone_midnight',
+            graceSeconds: normalizeNonNegativeInteger(prior?.graceSeconds) || 0,
+            parentGrant: {
+                enabled: false,
+                extraSeconds: 0,
+                expiresAt: null,
+                reason: ''
+            },
+            policyRevision: revision,
+            policyHash: buildManagedTimeLimitPolicyHash(seed),
+            issuedAt: now,
+            validFrom: now,
+            validUntil: null
+        };
+    }
+
+    function managedTimeLimitLabel(profile) {
+        const policy = getManagedTimeLimitPolicy(profile);
+        if (!policy || policy.enabled !== true) return 'Off';
+        const totalMinutes = Math.floor(policy.dailyBudgetSeconds / 60);
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        if (hours && minutes) return `${hours}h ${minutes}m/day`;
+        if (hours) return `${hours}h/day`;
+        return `${minutes}m/day`;
+    }
+
     function canActiveProfileManageProfile(profilesV4, targetProfileId) {
         const targetId = normalizeString(targetProfileId);
         const currentActive = normalizeString(profilesV4?.activeProfileId) || activeProfileId || 'default';
@@ -4580,6 +4688,81 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         await refreshProfilesUI();
         UIComponents.showToast('Viewing access updated', 'success');
+    }
+
+    async function updateProfileTimeLimitPolicy(profileId, action) {
+        const targetId = normalizeString(profileId);
+        if (!targetId) return;
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
+            UIComponents.showToast('Profiles unavailable', 'error');
+            return;
+        }
+        const fresh = await io.loadProfilesV4();
+        const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
+        if (getProfileType(fresh, currentActive) === 'child') {
+            UIComponents.showToast('Child profiles cannot change time limits', 'error');
+            return;
+        }
+        if (!canActiveProfileManageProfile(fresh, targetId)) {
+            UIComponents.showToast('Switch to the parent account to change this profile', 'error');
+            return;
+        }
+        const okAdmin = await ensureProfileUnlocked(fresh, currentActive);
+        if (!okAdmin) return;
+
+        const profiles = safeObject(fresh.profiles);
+        const profile = safeObject(profiles[targetId]);
+        if (!profile || !profiles[targetId]) return;
+        const settings = safeObject(profile.settings);
+        const existingPolicy = getManagedTimeLimitPolicy(profile);
+
+        let enabled = true;
+        let budgetSeconds = existingPolicy?.dailyBudgetSeconds || 7200;
+        if (action === 'disable') {
+            enabled = false;
+        } else {
+            const currentMinutes = Math.max(0, Math.floor((existingPolicy?.dailyBudgetSeconds || 7200) / 60));
+            const rawMinutes = await showPromptModal({
+                title: 'Set YouTube Time Limit',
+                message: 'Daily YouTube minutes for this profile. Use 0 to require parent approval before viewing.',
+                placeholder: 'Minutes per day',
+                inputType: 'number',
+                confirmText: 'Save Limit',
+                initialValue: String(currentMinutes)
+            });
+            if (rawMinutes === null) return;
+            const minutes = normalizeNonNegativeInteger(rawMinutes);
+            if (minutes == null) {
+                UIComponents.showToast('Enter whole minutes, 0 or higher', 'error');
+                return;
+            }
+            budgetSeconds = minutes * 60;
+        }
+
+        const nextPolicy = buildManagedTimeLimitPolicy(existingPolicy, {
+            enabled,
+            dailyBudgetSeconds: budgetSeconds
+        });
+        if (!nextPolicy) {
+            UIComponents.showToast('Time limit policy could not be saved', 'error');
+            return;
+        }
+
+        profiles[targetId] = {
+            ...profile,
+            settings: {
+                ...settings,
+                timeLimitPolicy: nextPolicy
+            }
+        };
+        await io.saveProfilesV4({
+            ...fresh,
+            schemaVersion: 4,
+            profiles
+        });
+        await refreshProfilesUI();
+        UIComponents.showToast(enabled ? 'Time limit updated' : 'Time limit disabled', 'success');
     }
 
     function isUiLocked() {
@@ -8473,7 +8656,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const root = safeObject(profilesV4);
         const profiles = safeObject(root.profiles);
         const childAdminRestricted = isChildProfileAdminSurface();
-        const childAdminTitle = 'Child profiles cannot manage profile names, deletion, or PIN rules from this surface.';
+        const childAdminTitle = 'Child profiles cannot manage profile names, deletion, PIN rules, viewing spaces, or time limits from this surface.';
 
         ftProfilesManager.innerHTML = '';
 
@@ -8513,7 +8696,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const body = document.createElement('div');
             body.className = 'help-item-body';
-            body.textContent = `Viewing access: ${viewingAccessLabel(profiles[profileId])}`;
+            body.textContent = `Viewing access: ${viewingAccessLabel(profiles[profileId])} | Time limit: ${managedTimeLimitLabel(profiles[profileId])}`;
 
             const actions = document.createElement('div');
             actions.style.display = 'flex';
@@ -8667,6 +8850,39 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             actions.appendChild(mainAccessBtn);
             actions.appendChild(kidsAccessBtn);
+
+            const timeLimitPolicy = getManagedTimeLimitPolicy(profiles[profileId]);
+            const timeLimitBtn = document.createElement('button');
+            timeLimitBtn.className = timeLimitPolicy?.enabled ? 'btn-primary' : 'btn-secondary';
+            timeLimitBtn.type = 'button';
+            timeLimitBtn.textContent = timeLimitPolicy?.enabled ? 'Change limit' : 'Set limit';
+            timeLimitBtn.disabled = childAdminRestricted;
+            timeLimitBtn.title = childAdminRestricted ? childAdminTitle : 'Set the daily YouTube time limit for this profile.';
+            timeLimitBtn.addEventListener('click', async () => {
+                if (childAdminRestricted) {
+                    UIComponents.showToast('Child profiles cannot change time limits here', 'error');
+                    return;
+                }
+                await updateProfileTimeLimitPolicy(profileId, 'set');
+            });
+            actions.appendChild(timeLimitBtn);
+
+            if (timeLimitPolicy?.enabled) {
+                const disableTimeLimitBtn = document.createElement('button');
+                disableTimeLimitBtn.className = 'btn-secondary';
+                disableTimeLimitBtn.type = 'button';
+                disableTimeLimitBtn.textContent = 'Disable limit';
+                disableTimeLimitBtn.disabled = childAdminRestricted;
+                disableTimeLimitBtn.title = childAdminRestricted ? childAdminTitle : 'Disable the daily YouTube time limit for this profile.';
+                disableTimeLimitBtn.addEventListener('click', async () => {
+                    if (childAdminRestricted) {
+                        UIComponents.showToast('Child profiles cannot change time limits here', 'error');
+                        return;
+                    }
+                    await updateProfileTimeLimitPolicy(profileId, 'disable');
+                });
+                actions.appendChild(disableTimeLimitBtn);
+            }
 
             const canManageTarget = canActiveProfileManageProfile(profilesV4, profileId);
             if (type === 'child' && canManageTarget && !childAdminRestricted) {

@@ -15,7 +15,7 @@ separate list-mode transition path owns the destructive copy/clear behavior.
 | --- | ---: | ---: | --- |
 | `js/background.js` | 6320 | 285103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
-| `js/tab-view.js` | 11617 | 526763 | `1b7f621d48d16247aecc4c7ee57cbc3db9efd3e597e6f0a4fc188228470648f7` |
+| `js/tab-view.js` | 11833 | 536496 | `192961f3f33a85258a941ce23cdd551be5dc985abf64077cc0cedf3ae08dc68e` |
 | `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
 
 ## Source/Effect Blocks Pinned
@@ -118,9 +118,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5701
+method semantic proof gap lexical callables covered: 5720
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5701
+lexical callables requiring semantic proof before behavior changes: 5720
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

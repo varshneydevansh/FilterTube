@@ -27,9 +27,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5701
+method semantic proof gap lexical callables covered: 5720
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5701
+lexical callables requiring semantic proof before behavior changes: 5720
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -42,10 +42,10 @@ changes, or whitelist behavior changes.
 
 ```text
 tracked JS/JSX/MJS files: 69
-repo-wide lexical callables: 5701
+repo-wide lexical callables: 5720
 files with lexical accounting: 69
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5701
+lexical callables requiring semantic proof before behavior changes: 5720
 required semantic proof fields: 8
 selected release hot-path semantic triage rows: 13
 selected visual-writer semantic triage rows: 8
@@ -97,8 +97,8 @@ Source inputs:
 
 | Convergence row | Current source-backed finding | Risk if treated as implementation-ready now |
 | --- | --- | --- |
-| `method_convergence_repo_census` | 69 tracked JS/JSX/MJS files and 5,701 lexical callables are visible to the audit. | Visibility can be mistaken for behavior proof. |
-| `method_convergence_zero_complete_files` | 0 files have complete per-callable semantic proof; 5,701 lexical callables still require proof before behavior changes. | A behavior patch can touch an unproved callable path while tests only cover a selected slice. |
+| `method_convergence_repo_census` | 69 tracked JS/JSX/MJS files and 5,720 lexical callables are visible to the audit. | Visibility can be mistaken for behavior proof. |
+| `method_convergence_zero_complete_files` | 0 files have complete per-callable semantic proof; 5,720 lexical callables still require proof before behavior changes. | A behavior patch can touch an unproved callable path while tests only cover a selected slice. |
 | `method_convergence_family_weight` | 8 families are represented: hot page/background runtime, content helper runtime, UI/settings runtime, generated/quarantined UI, vendor bundles, build/sync scripts, and website routes/components/config. | Runtime, build, vendor, website, and generated-output methods need different proof types and cannot share one cleanup assumption. |
 | `method_convergence_hot_runtime_dominance` | Hot page/background runtime owns 3,105 lexical callables, including 1,202 in `content_bridge.js`, 440 in `background.js`, and 431 in `dom_fallback.js`. | YouTube lag and false-hide regressions are concentrated in hot files with many interacting callables. |
 | `method_convergence_selected_triage_not_closure` | 149 selected semantic triage rows cover release hot paths, visual writers, collaborator cache/writer/menu guards, native dropdowns, JSON active-work predicates, content/category fields, mutation persistence, DOM fallback traversal, content-bridge lifecycle, background cache refresh, and quick-block lifecycle. | Selected hot-path proof can hide the fact that repo-wide semantic closure is still 0 files. |
@@ -111,9 +111,9 @@ Source inputs:
 ```text
 69 tracked JS/JSX/MJS files
         |
-        +--> 5,701 lexical callables
+        +--> 5,720 lexical callables
         |       +--> 3,105 hot page/background runtime
-        |       +--> 2,596 UI, helper, generated, vendor, build, audit-lane, website
+        |       +--> 2,615 UI, helper, generated, vendor, build, audit-lane, website
         |
         +--> 149 selected semantic triage rows
         +--> 4 rejected closure candidates
@@ -129,9 +129,9 @@ parity, rollback, native/release, and public-claim boundaries.
 
 ```mermaid
 flowchart TD
-  A["69 tracked JS/JSX/MJS files"] --> B["5,701 lexical callables"]
+  A["69 tracked JS/JSX/MJS files"] --> B["5,720 lexical callables"]
   B --> C["3,105 hot page/background runtime callables"]
-  B --> D["2,596 UI, helper, generated, vendor, build, audit-lane, website callables"]
+  B --> D["2,615 UI, helper, generated, vendor, build, audit-lane, website callables"]
   A --> E["149 selected semantic triage rows"]
   A --> F["4 rejected closure candidates"]
   C --> G["0 complete per-callable proof files"]
@@ -196,9 +196,9 @@ have all of these fields pinned:
 
 | Family | Files | Lexical callables | Semantic status |
 | --- | ---: | ---: | --- |
-| Hot page/background runtime | 9 | 3101 | `semantic proof incomplete` |
+| Hot page/background runtime | 9 | 3105 | `semantic proof incomplete` |
 | Content helper runtime | 9 | 348 | `semantic proof incomplete` |
-| UI/settings runtime | 10 | 1563 | `semantic proof incomplete` |
+| UI/settings runtime | 10 | 1582 | `semantic proof incomplete` |
 | Generated/quarantined UI | 6 | 147 | `semantic proof incomplete` |
 | Vendor bundles | 2 | 279 | `semantic proof incomplete` |
 | Build/sync scripts | 4 | 58 | `semantic proof incomplete` |
@@ -227,7 +227,7 @@ have all of these fields pinned:
 | `js/content_controls_catalog.js` | UI/settings runtime | 3 | `semantic proof incomplete` | Content-control catalog ownership, settings parity, and row-action fixture proof remain incomplete. |
 | `js/filter_logic.js` | Hot page/background runtime | 313 | `semantic proof incomplete` | JSON traversal, harvest/map mutation, block decision, recursion, and no-rule budget proof remain incomplete. |
 | `js/injector.js` | Hot page/background runtime | 314 | `semantic proof incomplete` | Main-world message dispatch, settings capability, and injection idempotence proof remain incomplete. |
-| `js/io_manager.js` | UI/settings runtime | 115 | `semantic proof incomplete` | Import/export target-profile, trusted envelope, mutation report, and rollback proof remain incomplete. |
+| `js/io_manager.js` | UI/settings runtime | 119 | `semantic proof incomplete` | Import/export target-profile, trusted envelope, mutation report, and rollback proof remain incomplete. |
 | `js/layout.js` | Generated/quarantined UI | 52 | `semantic proof incomplete` | Packaged-but-inactive legacy layout quarantine, selector target, and deletion readiness proof remain incomplete. |
 | `js/nanah_sync_adapter.js` | UI/settings runtime | 39 | `semantic proof incomplete` | Nanah envelope, trust, replay, profile target, and sync parity proof remain incomplete. |
 | `js/popup.js` | UI/settings runtime | 131 | `semantic proof incomplete` | Popup render/action lifecycle, settings mutation, and selector proof remain incomplete. |
@@ -237,7 +237,7 @@ have all of these fields pinned:
 | `js/settings_shared.js` | UI/settings runtime | 43 | `semantic proof incomplete` | Shared save/refresh semantics, profile/list-mode inputs, and caller proof remain incomplete. |
 | `js/shared/identity.js` | Content helper runtime | 92 | `semantic proof incomplete` | Identity normalization, handle/name/UC confidence, and JSON/DOM fallback parity proof remain incomplete. |
 | `js/state_manager.js` | UI/settings runtime | 155 | `semantic proof incomplete` | Settings save, profile mutation, cache revision, backup, and broadcast proof remain incomplete. |
-| `js/tab-view.js` | UI/settings runtime | 869 | `semantic proof incomplete` | Dashboard profile/list-mode/Nanah/import/export/release-note action proof remains incomplete. |
+| `js/tab-view.js` | UI/settings runtime | 884 | `semantic proof incomplete` | Dashboard profile/list-mode/Nanah/import/export/release-note action proof remains incomplete. |
 | `js/ui-shell/popup-shell.js` | Generated/quarantined UI | 42 | `semantic proof incomplete` | Generated output freshness, mount failure, package parity, and source/output hash proof remain incomplete. |
 | `js/ui-shell/tab-view-decor.js` | Generated/quarantined UI | 41 | `semantic proof incomplete` | Generated output freshness, ambient UI behavior, and package parity proof remain incomplete. |
 | `js/ui_components.js` | UI/settings runtime | 64 | `semantic proof incomplete` | Modal/portal lifecycle, row controls, and DOM ownership proof remain incomplete. |
@@ -414,7 +414,7 @@ promotion.
 | `background_addFilteredChannel_secondary_default_blocklist` | `js/background.js:5244` | Secondary runtime receiver for content/menu/quick-block adds. Inputs are message channel identity, collaborator metadata, profile, video id, and optional list type. | Calls `handleAddFilteredChannel()` with normalized `message.listType`, defaulting to blocklist when omitted; schedules list-target backup after successful helper result. | Content-script channel add authority is not a first-class allowed-action token and still needs sender and list-target authority proof. |
 | `background_handleAddFilteredChannel_multi_surface_writer` | `js/background.js:5309` | Shared channel mutation helper for Main/Kids and blocklist/whitelist callers. Inputs are normalized channel input, filter-all, collaborator fields, metadata, profile, video id, and list type. | Can perform identity repair/network fetches, update channel/video maps, write V4/V3/root list storage, invalidate both compiled caches, refresh Kids tabs, queue post-block enrichment, and return channel data. | Side effects are broad and source-pinned, but no revisioned storage/cache/backup/enrichment report exists. |
 | `content_bridge_addChannelDirectly_content_payload` | `js/content_bridge.js:13427` | Content-script direct add handoff used by menu and fallback actions. Inputs are raw channel input, filter-all state, collaborator metadata, host-derived profile, and card identity metadata. | Sends `type: 'addFilteredChannel'` to background with no list-target field, then schedules a second backup message on success. | Menu action list-target proof remains `NO-GO`; backup ownership is duplicated. |
-| `io_manager_importV3_multi_profile_import_writer` | `js/io_manager.js:1241` | Import/restore mutation entrypoint. Inputs are parsed backup JSON, strategy, scope, auth pins, optional target profile id, current settings, and local profiles. | Can call `SettingsAPI.saveSettings()`, write V3/V4 profile blobs, merge/replace rule lists, write channel maps/theme/Nanah trusted state, and enforce some target/profile PIN checks. | Import is a multi-rule mutation surface; encrypted/plain target parity and one shared mutation report remain incomplete. |
+| `io_manager_importV3_multi_profile_import_writer` | `js/io_manager.js:1308` | Import/restore mutation entrypoint. Inputs are parsed backup JSON, strategy, scope, auth pins, optional target profile id, current settings, and local profiles. | Can call `SettingsAPI.saveSettings()`, write V3/V4 profile blobs, merge/replace rule lists, write channel maps/theme/Nanah trusted state, and enforce some target/profile PIN checks. | Import is a multi-rule mutation surface; encrypted/plain target parity and one shared mutation report remain incomplete. |
 
 Current rule/settings mutation persistence semantic status after this addendum:
 
@@ -763,7 +763,7 @@ triage rows as complete per-callable authority.
 ```text
 current-source method gap freshness date: 2026-05-30
 tracked JS/JSX/MJS files still covered: 69
-repo-wide lexical callables still requiring semantic proof: 5701
+repo-wide lexical callables still requiring semantic proof: 5720
 files with complete per-callable semantic proof: 0
 latest full runtime proof: broad audit backlog 4754 tests, 4661 pass, 93 fail
 method semantic completion from freshness rerun: NO-GO

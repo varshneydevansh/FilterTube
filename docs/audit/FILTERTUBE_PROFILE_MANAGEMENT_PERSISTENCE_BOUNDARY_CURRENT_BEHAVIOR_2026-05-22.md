@@ -18,9 +18,9 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/tab-view.js` | 11617 | 526763 | `1b7f621d48d16247aecc4c7ee57cbc3db9efd3e597e6f0a4fc188228470648f7` |
+| `js/tab-view.js` | 11833 | 536496 | `192961f3f33a85258a941ce23cdd551be5dc985abf64077cc0cedf3ae08dc68e` |
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
-| `js/io_manager.js` | 2030 | 96914 | `d04bfd75d061ee405c1dfa4cab8c9d0fa6a2f072d046add33e4b6782b1f58a21` |
+| `js/io_manager.js` | 2097 | 100479 | `f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62` |
 | `js/background.js` | 6320 | 285103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
 
 ## Source / Effect Blocks
@@ -28,7 +28,7 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 ```text
 4 profile management persistence source files
 source/effect blocks: 9
-tab-view renderProfilesManager block: 357 lines, 17731 bytes
+tab-view renderProfilesManager block: 390 lines, 19757 bytes
 tab-view refreshProfilesUI block: 24 lines, 954 bytes
 tab-view switchToProfile block: 44 lines, 1595 bytes
 popup switchToProfile block: 48 lines, 1659 bytes
@@ -42,12 +42,12 @@ background profile storage invalidation block: 42 lines, 1464 bytes
 ## Selected Token Counts
 
 ```text
-tab-view ensureProfileUnlocked tokens: 15
-tab-view saveProfilesV4 tokens: 28
-tab-view loadProfilesV4 tokens: 52
-tab-view activeProfileId tokens: 66
+tab-view ensureProfileUnlocked tokens: 16
+tab-view saveProfilesV4 tokens: 30
+tab-view loadProfilesV4 tokens: 54
+tab-view activeProfileId tokens: 67
 tab-view StateManager.loadSettings tokens: 8
-tab-view refreshProfilesUI tokens: 19
+tab-view refreshProfilesUI tokens: 20
 tab-view applyLockGateIfNeeded tokens: 4
 tab-view scheduleAutoBackup tokens: 6
 tab-view profile_created tokens: 2
@@ -55,7 +55,7 @@ tab-view managedChildEdit tokens: 12
 tab-view unlockedProfiles tokens: 18
 tab-view allowMainViewing tokens: 4
 tab-view allowKidsViewing tokens: 4
-tab-view schemaVersion tokens: 15
+tab-view schemaVersion tokens: 16
 popup ensureProfileUnlocked tokens: 3
 popup saveProfilesV4 tokens: 2
 popup loadProfilesV4 tokens: 4
@@ -135,9 +135,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5701
+method semantic proof gap lexical callables covered: 5720
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5701
+lexical callables requiring semantic proof before behavior changes: 5720
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

@@ -81,7 +81,7 @@ const anchorChecks = [
   { file: 'js/background.js', line: 1452, needle: 'function ensureChannelMapCache()' },
   { file: 'js/background.js', line: 1472, needle: 'function flushChannelMapUpdates()' },
   { file: 'js/state_manager.js', line: 2356, needle: 'chrome.storage.onChanged.addListener' },
-  { file: 'js/io_manager.js', line: 409, needle: 'async function readStorage(keys)' },
+  { file: 'js/io_manager.js', line: 473, needle: 'async function readStorage(keys)' },
   { file: 'js/content/dom_fallback.js', line: 972, needle: 'function markElementAsBlocked' },
   { file: 'js/content/dom_fallback.js', line: 1027, needle: "element.classList.remove('filtertube-hidden')" },
   { file: 'js/content_bridge.js', line: 12193, needle: 'async function handleBlockChannelClick' },

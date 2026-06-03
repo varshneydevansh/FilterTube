@@ -216,7 +216,7 @@ test('JSON-first implementation authority rows and counts stay pinned', () => {
   assert.match(doc, /first optimization source-locus implementation rows covered: 12/);
   assert.match(doc, /whitelist readiness gaps covered: 10/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5701/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5720/);
   assert.match(doc, /complete per-callable semantic proof files covered: 0/);
   assert.match(doc, /first optimization implementation readiness rows covered: 14/);
   assert.match(doc, /runtime JSON-first implementation approvals: 0/);
@@ -372,9 +372,9 @@ test('JSON-first implementation authority is consistent with existing JSON-first
   assert.match(whitelistReadiness, /whitelist readiness gap rows: 10/);
   assert.match(whitelistReadiness, /implementation-ready whitelist optimization rows: 0/);
   assert.match(methodSemanticGap, /tracked JS\/JSX\/MJS files: 69/);
-  assert.match(methodSemanticGap, /repo-wide lexical callables: 5701/);
+  assert.match(methodSemanticGap, /repo-wide lexical callables: 5720/);
   assert.match(methodSemanticGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodSemanticGap, /lexical callables requiring semantic proof before behavior changes: 5701/);
+  assert.match(methodSemanticGap, /lexical callables requiring semantic proof before behavior changes: 5720/);
   assert.match(methodSemanticGap, /as the basis for a first-class JSON filter path/);
 });
 

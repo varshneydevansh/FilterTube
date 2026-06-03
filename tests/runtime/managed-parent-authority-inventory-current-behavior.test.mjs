@@ -98,9 +98,10 @@ test('viewing-space and time-limit enforcement are explicitly not implemented ye
   assert.match(doc, /now pins Main\/Kids route-gate decisions and no-work states/);
   assert.match(doc, /Extension-side YouTube runtime does not yet route-gate Main\/Kids access/);
   assert.match(doc, /Runtime route-gate implementation, denied-route overlay, and open-tab SPA\s+revalidation are still absent/);
-  assert.match(doc, /No extension runtime time-limit UI, budget counter, overlay, or route gate\s+exists/);
+  assert.match(doc, /Accounts & Sync can now set, change, and disable a profile-owned\s+`settings.timeLimitPolicy`/);
+  assert.match(doc, /No extension active-tab budget counter, timeout overlay, or Main\/Kids time\s+route gate exists/);
   assert.match(doc, /FILTERTUBE_MANAGED_CHILD_TIME_LIMIT_SCHEMA_CONTRACT_2026-06-03\.md/);
-  assert.match(doc, /No runtime time-limit profile store\/compiler/);
+  assert.match(doc, /No runtime time-limit compiler/);
   assert.doesNotMatch(runtime, /timeLimits/);
   assert.doesNotMatch(runtime, /managedViewingRouteGate/);
   assert.doesNotMatch(runtime, /showManagedViewingBlockedOverlay/);

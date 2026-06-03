@@ -83,7 +83,7 @@ not completion proof for source-locus or callable approval authority
 | `FT-SOURCE-LOCUS-CALLABLE-04-dom-fallback` | DOM fallback, selector scans, and passive lifecycle work. | `js/content/dom_fallback.js:2219`, `js/content/dom_fallback.js:2290`, `js/content_bridge.js:1186`. | `applyDOMFallback`, scroll listener attachment, and playlist-panel mutation observation split DOM lifecycle work across files. | Missing approval; DOM lifecycle counters are not approved. |
 | `FT-SOURCE-LOCUS-CALLABLE-05-menu-quickblock` | Menu injection, quick-block affordances, and active UI lifecycle. | `js/content/block_channel.js:1963`, `js/content/block_channel.js:2232`, `js/content_bridge.js:11526`. | Quick-block sweep timers, mutation observers, global document/window listeners, and menu item interaction listeners are action-affordance owned. | Missing approval; action lifecycle counters are not approved. |
 | `FT-SOURCE-LOCUS-CALLABLE-06-network-resolver` | Handle, watch, Shorts, Kids, and background resolver work. | `js/content/handle_resolver.js:149`, `js/content/handle_resolver.js:239`, `js/background.js:912`. | `fetchIdForHandle`, same-origin direct fetches, background resolver messages, and wait-for-enrichment timers remain split. | Missing approval; resolver/network counters are not approved. |
-| `FT-SOURCE-LOCUS-CALLABLE-07-storage-map-mutation` | Storage, learned maps, cache flush, import/export, and refresh fanout. | `js/background.js:1452`, `js/background.js:1472`, `js/state_manager.js:2356`, `js/io_manager.js:409`. | Channel-map caches, flush timers, storage change listeners, and import/export storage wrappers are separate mutation authorities. | Missing approval; storage/map mutation counters are not approved. |
+| `FT-SOURCE-LOCUS-CALLABLE-07-storage-map-mutation` | Storage, learned maps, cache flush, import/export, and refresh fanout. | `js/background.js:1452`, `js/background.js:1472`, `js/state_manager.js:2356`, `js/io_manager.js:473`. | Channel-map caches, flush timers, storage change listeners, and import/export storage wrappers are separate mutation authorities. | Missing approval; storage/map mutation counters are not approved. |
 | `FT-SOURCE-LOCUS-CALLABLE-08-hide-restore-visual` | Hide, restore, stale-row cleanup, and visible side effects. | `js/content/dom_fallback.js:972`, `js/content/dom_fallback.js:1027`, `js/content_bridge.js:12193`. | Block markers, stale hide cleanup, and click-time optimistic hide/restore are visual side effects without one owner. | Missing approval; visual mutation counters are not approved. |
 | `FT-SOURCE-LOCUS-CALLABLE-09-whitelist-policy` | Whitelist identity, pending-hide, and list-mode policy. | `js/content/dom_fallback.js:2074`, `js/content_bridge.js:6200`, `js/content_bridge.js:6260`. | Guide whitelist handling, pending refresh timers, and pending-hide candidate timers are split between DOM fallback and bridge lifecycle. | Missing approval; whitelist policy counters are not approved. |
 | `FT-SOURCE-LOCUS-CALLABLE-10-diagnostic-privacy` | Runtime diagnostics, debug gates, and console budgets. | `js/seed.js:150`, `js/seed.js:153`, `js/filter_logic.js:21`. | Seed and filter-logic diagnostic relays are local console/postMessage decisions, not privacy-classed metric output. | Missing approval; diagnostic privacy and redaction are not approved. |
@@ -121,9 +121,9 @@ pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5701
+method semantic proof gap lexical callables covered: 5720
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5701
+lexical callables requiring semantic proof before behavior changes: 5720
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

@@ -74,7 +74,7 @@ candidate-obligation binding rows covered: 10
 first optimization source-locus implementation rows covered: 12
 whitelist readiness gaps covered: 10
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5701
+method semantic proof gap lexical callables covered: 5720
 complete per-callable semantic proof files covered: 0
 first optimization implementation readiness rows covered: 14
 runtime JSON-first implementation approvals: 0

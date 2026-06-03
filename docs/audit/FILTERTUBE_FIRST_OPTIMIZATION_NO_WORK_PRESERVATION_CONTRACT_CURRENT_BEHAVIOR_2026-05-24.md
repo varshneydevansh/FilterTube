@@ -76,9 +76,9 @@ collector side-effect rows covered: 12
 collector fixture provenance rows covered: 12
 collector parity rollout rows covered: 12
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5701
+method semantic proof gap lexical callables covered: 5720
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5701
+lexical callables requiring semantic proof before behavior changes: 5720
 inline no-work preservation JSON sections covered: 12
 inline no-work preservation artifact promotion decision: NO-GO
 no-work preservation draft closure rows: 12
@@ -94,7 +94,7 @@ metric schema rows linked by no-work closure: 12
 metric source-owner rows linked by no-work closure: 12
 collector readiness families linked by no-work closure: 5
 method semantic proof gap files linked by no-work closure: 69
-lexical callables linked by no-work closure: 5701
+lexical callables linked by no-work closure: 5720
 runtime no-work preservation closure approvals: 0
 implementation-ready no-work preservation closure rows: 0
 no-work preservation draft closure: NO-WORK-PRESERVATION-CHAIN-CLOSED

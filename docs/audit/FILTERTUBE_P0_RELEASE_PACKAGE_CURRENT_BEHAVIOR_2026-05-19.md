@@ -661,9 +661,10 @@ scope drift, or package/runtime parity.
 ## Current Local Dist Package Snapshot - 2026-05-27
 
 This addendum records the current ignored `dist/` tree as a local package
-artifact snapshot. It is audit-only: no build command was run for this
-snapshot, no ZIP was regenerated, no package file was promoted to release
-authority, and no runtime source was changed.
+artifact snapshot. It is audit-only: the local `dist/` tree was refreshed by
+the current working-tree build, but no package file was promoted to release
+authority and no committed package manifest or loaded-runtime attestation was
+created.
 
 ```text
 dist snapshot source: existing ignored local dist tree
@@ -672,7 +673,7 @@ browser staged files per directory: 59
 dist zip artifacts: 3
 total dist files including zips: 180
 source-backed staged files per browser excluding manifest: 58
-byte-identical source-backed staged files per browser excluding manifest: 54
+byte-identical source-backed staged files per browser excluding manifest: 58
 committed package manifest: absent
 zip checksum manifest: absent
 reproducible build proof: absent
@@ -696,9 +697,9 @@ Current local package artifact rows:
 
 | Target | Staged files | Manifest bytes | Manifest sha256 | Version | Content script entries | Content script JS refs | WAR refs | ZIP bytes | ZIP sha256 |
 | --- | ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | --- |
-| `chrome` | 59 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | `3.3.2` | 2 | 15 | 5 | 8688743 | `844a3ef1530ed1787e0911d43707e2b5ab687e83930edf7332c534c69e9ff898` |
-| `firefox` | 59 | 2603 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` | `3.3.2` | 1 | 14 | 5 | 8688802 | `b39728fdec2292f7d54c839a383dae44142357ac0b8a0ffe056ee19078c51217` |
-| `opera` | 59 | 2518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | `3.3.2` | 2 | 15 | 4 | 8688745 | `d1a70a71f376cbfd19670563b2e384f252879d10a62b8972768cebd63479fae1` |
+| `chrome` | 59 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | `3.3.2` | 2 | 15 | 5 | 8693495 | `a62f077d5e517c52e9d92fd96f6ed9a23fded9483cba0abb3dd0ffc8338f3c8f` |
+| `firefox` | 59 | 2603 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` | `3.3.2` | 1 | 14 | 5 | 8693554 | `b66bca3236d0f89996364106fc19dd492466ff9ae22eb880bfb3edffefab8ced` |
+| `opera` | 59 | 2518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | `3.3.2` | 2 | 15 | 4 | 8693497 | `656de3d4ca9f065c927b9cc9fbcb6d60519cf1a02f19cc108bd2db5f0a678d76` |
 
 ASCII boundary:
 
@@ -715,7 +716,7 @@ workspace source paths
 ```mermaid
 flowchart TD
   A["Workspace source paths"] --> B["Existing ignored dist browser directories"]
-  B --> C["54 of 58 source-backed staged files mostly match source per browser"]
+  B --> C["58 of 58 source-backed staged files match source per browser"]
   B --> D["dist browser manifest.json files"]
   B --> E["Existing local ZIP files"]
   C --> F["Local snapshot proof only"]
@@ -730,7 +731,7 @@ flowchart TD
 ```
 
 This closes a local-artifact inventory gap, not the release gate. The staged
-browser directories currently match workspace source bytes for 54 of 58 source-backed
+browser directories currently match workspace source bytes for 58 of 58 source-backed
 non-manifest files, and the three local ZIPs have recorded hashes. The package
 still lacks a committed per-file manifest, a clean rebuild record, ZIP content
 attestation tied to source revision, upload proof, public-claim proof, and
@@ -738,7 +739,7 @@ loaded-browser byte proof.
 
 ```text
 local dist snapshot proof: PARTIAL
-source-backed staged byte parity: partial
+source-backed staged byte parity: local complete, release authority partial
 zip checksum snapshot: yes
 committed release package manifest authority: NO-GO
 reproducible package build authority: NO-GO
@@ -819,9 +820,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5701
+method semantic proof gap lexical callables covered: 5720
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5701
+lexical callables requiring semantic proof before behavior changes: 5720
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
