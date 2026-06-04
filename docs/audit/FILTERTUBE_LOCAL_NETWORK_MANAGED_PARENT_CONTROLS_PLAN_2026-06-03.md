@@ -24,6 +24,8 @@ remain gated.
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
 **Current pull-on-open proof**:
 `docs/audit/FILTERTUBE_NANAH_MANAGED_PULL_ON_OPEN_2026-06-04.md`
+**Current multi-target fanout boundary**:
+`docs/audit/FILTERTUBE_NANAH_MANAGED_MULTI_TARGET_FANOUT_BOUNDARY_2026-06-04.md`
 
 ## Overview
 
@@ -472,6 +474,31 @@ replica child device over Nanah/P2P or same-network transport.
     scopes instead of silently converting them to active-profile proposals.
   - Outbound revision/hash state is persisted per trusted link and scope.
   - Receive path still validates before apply.
+- **Validation**:
+  - `node --test tests/runtime/managed-nanah-live-signed-send-current-behavior.test.mjs`
+  - `npm run test:settings`
+
+### Task 3.7: Pin multi-target fanout authority boundary
+
+- **Location**:
+  - `docs/audit/FILTERTUBE_NANAH_MANAGED_MULTI_TARGET_FANOUT_BOUNDARY_2026-06-04.md`
+  - `tests/runtime/managed-nanah-live-signed-send-current-behavior.test.mjs`
+- **Description**: Prevent parent/caregiver bulk sends from reusing a
+  device-level trusted link as authority for several protected profiles on the
+  same replica device.
+- **Complexity**: 4/10
+- **Dependencies**: Task 3.6.
+- **Status**: Boundary proof added. Runtime behavior remains unchanged:
+  `saveNanahTrustedLink(...)`, `findNanahTrustedLink(...)`, and
+  `getNanahCurrentTrustedLink(...)` remain device-scoped, so multi-target
+  fanout UI remains disabled until profile-scoped trusted-link identity exists.
+- **Acceptance Criteria**:
+  - The doc names the current one-link-per-remote-device behavior.
+  - The doc requires device plus target-profile binding before multi-child
+    fanout.
+  - The doc keeps live Nanah sessions separate from offline mailbox or
+    local-network provider fanout.
+  - Tests pin that the current runtime must not be treated as bulk-send ready.
 - **Validation**:
   - `node --test tests/runtime/managed-nanah-live-signed-send-current-behavior.test.mjs`
   - `npm run test:settings`

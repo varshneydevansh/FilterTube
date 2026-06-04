@@ -12,6 +12,7 @@ const docPath = 'docs/audit/FILTERTUBE_NANAH_MANAGED_LIVE_SIGNED_SEND_2026-06-04
 const signingDocPath = 'docs/audit/FILTERTUBE_NANAH_MANAGED_SIGNING_KEYPAIR_2026-06-04.md';
 const planPath = 'docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md';
 const inventoryPath = 'docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md';
+const fanoutDocPath = 'docs/audit/FILTERTUBE_NANAH_MANAGED_MULTI_TARGET_FANOUT_BOUNDARY_2026-06-04.md';
 const laneConfigPath = 'scripts/test-lane-config.mjs';
 
 function read(relativePath) {
@@ -161,6 +162,34 @@ test('managed live signed-send audit is linked without claiming mailbox runtime'
   assert.match(signingDoc, new RegExp(docPath));
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, /fixed-target Main\/Kids, keyword, channel, video, viewing-space, and time-limit managed live sends build signed `filtertube_managed_policy` envelopes/);
+});
+
+test('managed multi-target fanout stays blocked until trusted links are profile scoped', () => {
+  const doc = read(fanoutDocPath);
+  const liveDoc = read(docPath);
+  const plan = read(planPath);
+  const inventory = read(inventoryPath);
+  const tabView = read(tabViewPath);
+  const helperSource = read(managedLivePolicyPath);
+
+  assert.match(doc, /Runtime multi-target fanout remains\s+disabled because current trusted-link lookup is device-scoped/);
+  assert.match(doc, /saveNanahTrustedLink\(entry\)[\s\S]*replaces an existing row by remoteDeviceId/);
+  assert.match(doc, /A device-level trusted link is not enough for multi-target authority/);
+  assert.match(doc, /runtime profile-scoped trusted link id: absent/);
+  assert.match(doc, /runtime multi-target chooser: absent/);
+  assert.match(doc, /Runtime behavior changed by this proof: no/);
+  assert.match(doc, /flowchart TD/);
+  assert.match(liveDoc, new RegExp(fanoutDocPath));
+  assert.match(plan, new RegExp(fanoutDocPath));
+  assert.match(inventory, new RegExp(fanoutDocPath));
+  assert.match(inventory, /device-scoped trusted-link boundary/);
+
+  assert.match(tabView, /function findNanahTrustedLink\(remoteDeviceId\)[\s\S]*remoteDeviceId/);
+  assert.match(tabView, /nanahTrustedLinks\.find\(\(entry\) => normalizeString\(entry\?\.remoteDeviceId\) === deviceId\)/);
+  assert.match(tabView, /function getNanahCurrentTrustedLink\(\)[\s\S]*findNanahTrustedLink\(remoteId\)/);
+  assert.match(tabView, /const existingIndex = nanahTrustedLinks\.findIndex\(\(item\) => normalizeString\(item\?\.remoteDeviceId\) === deviceId\)/);
+  assert.match(tabView, /linkId: `nanah-\$\{remoteDeviceId\}`/);
+  assert.match(helperSource, /function resolveTargetProfile\(trustedLink\)[\s\S]*policyBehavior === 'fixed_profile'/);
 });
 
 test('dashboard exposes explicit Main Kids rule source picker for granular managed sends', () => {

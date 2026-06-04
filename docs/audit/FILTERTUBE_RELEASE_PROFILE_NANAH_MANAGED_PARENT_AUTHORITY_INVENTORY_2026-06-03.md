@@ -125,6 +125,7 @@ docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md
 | Managed pairing public-key descriptor | `docs/audit/FILTERTUBE_NANAH_MANAGED_PAIRING_KEY_DESCRIPTOR_2026-06-04.md` |
 | Managed signing keypair provisioning | `docs/audit/FILTERTUBE_NANAH_MANAGED_SIGNING_KEYPAIR_2026-06-04.md` |
 | Managed app policy contract parity | `docs/audit/FILTERTUBE_MANAGED_APP_POLICY_CONTRACT_PARITY_2026-06-04.md` |
+| Managed multi-target fanout boundary | `docs/audit/FILTERTUBE_NANAH_MANAGED_MULTI_TARGET_FANOUT_BOUNDARY_2026-06-04.md` |
 
 ## Current Authority Map
 
@@ -317,8 +318,11 @@ Current gap:
       eligible fixed-target Main/Kids and granular managed live sends now use
       signed envelopes, with explicit Main/Kids rule-source selection for
       granular sends, plus Rule bundle expansion into separate signed
-      keyword/channel/video envelopes. Active/full signed conversion and richer
-      viewing-space/time-limit or multi-target bulk outbound controls remain pending. Without trusted stored public-key
+      keyword/channel/video envelopes. Multi-target fanout is now pinned as a
+      device-scoped trusted-link boundary: bulk child sends require
+      device-plus-target-profile link identity before runtime UI can safely
+      fan out. Active/full signed conversion and richer viewing-space/time-limit
+      bulk outbound controls remain pending. Without trusted stored public-key
       material, the receive path still rejects otherwise well-shaped managed
       envelopes rather than treating them as valid.
 - The adapter's validated apply wrapper still depends on higher layers for
@@ -453,7 +457,7 @@ Current gap:
 | Target-local remote revision store | Stale or replayed remote updates can now be rejected per target profile/link/scope after the first accepted write, and trusted-link removal now purges accepted state plus open-sync status for the removed link. There is still no server mailbox queue or multi-device conflict-resolution layer yet. | Multi-parent, revoked-link, equal-revision/different-hash, mailbox-delivery, and server-queue-purge fixtures. |
 | Pairing public-key descriptor, source keypair provisioning, and eligible live signed send present | The helper now requires verifier evidence, adapter WebCrypto verification is wired, Nanah pairing can persist advertised source public-key descriptors, source sessions can provision local managed signing keypairs, fixed-target Main/Kids, keyword, channel, video, viewing-space, and time-limit managed live sends build signed `filtertube_managed_policy` envelopes, granular rule sends expose an explicit Main/Kids rule-source picker, and Rule bundle expands into separate signed keyword/channel/video envelopes. Active/full sends and richer viewing-space/time-limit or multi-target bulk outbound controls still remain proposal/spec work. | Authenticated two-device live-delivery smoke, signed granular live-delivery smoke, rotation/revocation, and active/full conversion policy. |
 | Partial canonical payload/integrity binding | The helper checks binding fields and verifier result, but no canonical payload hash recomputation exists yet. | Binding-tuple fixtures plus canonical payload hash proof. |
-| Signed remote managed-policy gate is partially live | Fixed-target Main/Kids, keyword, channel, video, viewing-space, and time-limit managed Nanah sends can now travel as signed envelopes and receive-side code validates before apply. Granular keyword/channel/video sends can choose Main or Kids local rule source explicitly, and Rule bundle sends those three granular scopes as separate signed envelopes. Active/full signed conversion, mailbox delivery, and richer viewing-space/time-limit or multi-target bulk outbound controls are still pending. | Installed two-device Main/Kids and granular smoke plus dedicated signed route/time policy fixtures. |
+| Signed remote managed-policy gate is partially live | Fixed-target Main/Kids, keyword, channel, video, viewing-space, and time-limit managed Nanah sends can now travel as signed envelopes and receive-side code validates before apply. Granular keyword/channel/video sends can choose Main or Kids local rule source explicitly, and Rule bundle sends those three granular scopes as separate signed envelopes. Multi-target fanout is intentionally blocked by the current device-scoped trusted-link model until profile-scoped link identity exists. Active/full signed conversion, mailbox delivery, and richer viewing-space/time-limit bulk outbound controls are still pending. | Installed two-device Main/Kids and granular smoke plus dedicated signed route/time policy fixtures, then profile-scoped trusted-link fixtures before multi-target UI. |
 | Remote time-limit policy apply is wrapper-backed and live-send eligible | Local child time-budget enforcement exists and accepted managed envelopes can write runtime-compatible time-limit policy; the source send path can now emit signed live time-limit envelopes when the profile has a saved time limit. | Installed two-device signed remote time-limit smoke through Nanah/local-network receive. |
 | Adapter depends on caller trust context | `validateManagedPolicyEnvelope(...)` depends on caller-supplied trusted-link/profile/revision/signature context; the wrapper rechecks stored profiles before writing but does not fetch trust keys itself. | Keep dashboard receive context and add pairing key lookup/revocation fixtures before automatic apply. |
 | Locked-child bypass has no revision binding | `allow_trusted_updates` can skip unlock for matching managed sessions, but not with policy revision constraints. | Locked child managed-policy fixtures. |

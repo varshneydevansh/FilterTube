@@ -5,6 +5,8 @@
 Main/Kids granular rule-source selection.
 **Related**:
 `docs/audit/FILTERTUBE_NANAH_MANAGED_SIGNING_KEYPAIR_2026-06-04.md`
+**Multi-target boundary**:
+`docs/audit/FILTERTUBE_NANAH_MANAGED_MULTI_TARGET_FANOUT_BOUNDARY_2026-06-04.md`
 
 ## Scope
 
@@ -77,6 +79,8 @@ Still pending:
 
 - richer bulk outbound controls for viewing-space/time-limit combinations,
   per-child multi-target fanout, and selectable Main+Kids dual-surface sends;
+- profile-scoped trusted-link identity before any multi-target child fanout UI
+  can safely send to several protected profiles on the same replica device;
 - active/full proposal conversion policy;
 - installed-extension two-device smoke proof;
 - key rotation/revocation UI;
