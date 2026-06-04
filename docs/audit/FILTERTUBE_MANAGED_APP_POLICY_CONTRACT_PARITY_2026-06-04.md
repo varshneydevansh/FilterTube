@@ -2,8 +2,10 @@
 
 **Generated**: 2026-06-04
 **Status**: Extension-owned app policy artifact plus managed Nanah helper
-source copies are wired into the app runtime sync manifest. Android/iOS native
-enforcement remains pending.
+source copies are wired into the app runtime sync manifest. Android native
+model proof for managed profile state, action history, and time-budget
+decisions has started; Activity-wide runtime wiring and iOS parity remain
+pending.
 **Runtime behavior changed**: no.
 **Goal slice**: Implementation order item 12, "Sync shared policy contract to
 apps", and item 13, "Add app viewing-space/time-limit parity tests".
@@ -264,9 +266,17 @@ pull-on-open helper sources into `packages/extension-source/upstream/js/` so the
 downstream app repo can track the exact helper contracts without treating them
 as native runtime authority.
 
-Android/iOS still need a later implementation slice that consumes this artifact
-inside native route gates, native time-budget gates, and native settings locks
-without forking extension authority semantics.
+Android now has a first native model proof that preserves
+`managedPolicyState`, `managedActionHistory`, and `settings.timeLimitPolicy`
+through the profile model, includes `timeLimitPolicy.policyFingerprint()` in
+route policy versions, and pins pure time-budget decisions for disabled
+policies, zero-budget timeout, active-session no-double-counting, timezone
+revalidation, newer reduced-budget clamping, and stale reduced-budget rejection.
+
+Android still needs Activity-wide runtime wiring that applies the model before
+opening or continuing managed web content. iOS still needs the matching native
+adapter proof. Both platforms still need native settings locks that consume this
+artifact without forking extension authority semantics.
 
 ## Edge Cases To Keep
 
@@ -290,6 +300,14 @@ Focused test:
 node --test tests/runtime/managed-app-policy-contract-parity-current-behavior.test.mjs
 node --test tests/runtime/native-runtime-sync-authority-current-behavior.test.mjs \
   tests/runtime/native-runtime-sync-manifest-freshness-boundary-current-behavior.test.mjs
+```
+
+Android focused proof:
+
+```bash
+cd /Users/devanshvarshney/FilterTubeApp/apps/android
+JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" \
+  ./gradlew :app:testDebugUnitTest --tests com.filtertube.app.ProfilePolicyGateTest -x syncFilterTubeRuntime
 ```
 
 Settings lane:

@@ -10,6 +10,10 @@ const planPath = 'docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PL
 const inventoryPath = 'docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md';
 const appManifestPath = '/Users/devanshvarshney/FilterTubeApp/tools/runtime-sync-manifest.json';
 const appContractDestinationPath = '/Users/devanshvarshney/FilterTubeApp/packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json';
+const appProfileModelsPath = '/Users/devanshvarshney/FilterTubeApp/apps/android/app/src/main/java/com/filtertube/app/ProfileModels.kt';
+const appPreferencesPath = '/Users/devanshvarshney/FilterTubeApp/apps/android/app/src/main/java/com/filtertube/app/AppPreferences.kt';
+const appProfilePolicyGatePath = '/Users/devanshvarshney/FilterTubeApp/apps/android/app/src/main/java/com/filtertube/app/ProfilePolicyGate.kt';
+const appProfilePolicyGateTestPath = '/Users/devanshvarshney/FilterTubeApp/apps/android/app/src/test/java/com/filtertube/app/ProfilePolicyGateTest.kt';
 const appManagedHelperDestinations = Object.freeze({
   'js/nanah_managed_live_policy.js': '/Users/devanshvarshney/FilterTubeApp/packages/extension-source/upstream/js/nanah_managed_live_policy.js',
   'js/nanah_managed_open_sync.js': '/Users/devanshvarshney/FilterTubeApp/packages/extension-source/upstream/js/nanah_managed_open_sync.js'
@@ -76,12 +80,67 @@ test('managed app policy parity doc records extension-owned app contract artifac
     assert.match(helper.boundary, /native|server mailbox|local-network/);
   }
   assert.match(doc, /Runtime behavior changed\*\*: no/);
+  assert.match(doc, /Android native\s+model proof/);
+  assert.match(doc, /Activity-wide runtime wiring and iOS parity remain\s+pending/);
   assert.match(doc, /App Sync Boundary/);
   assert.match(doc, /Required Parity Decisions/);
   assert.match(doc, /Current Gap/);
   assert.match(doc, /flowchart TD/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
+});
+
+test('android app has native managed time-limit model proof without claiming full runtime wiring', () => {
+  for (const absolutePath of [
+    appProfileModelsPath,
+    appPreferencesPath,
+    appProfilePolicyGatePath,
+    appProfilePolicyGateTestPath
+  ]) {
+    assert.equal(fs.existsSync(absolutePath), true, `missing app proof file ${absolutePath}`);
+  }
+
+  const profileModels = readAbsolute(appProfileModelsPath);
+  const preferences = readAbsolute(appPreferencesPath);
+  const policyGate = readAbsolute(appProfilePolicyGatePath);
+  const policyGateTest = readAbsolute(appProfilePolicyGateTestPath);
+
+  for (const token of [
+    'data class ManagedTimeLimitPolicy',
+    'data class ManagedPolicyState',
+    'data class ManagedActionHistoryRow',
+    'object ManagedAppTimeBudgetGate',
+    'sealed class ManagedTimeBudgetDecision',
+    'zero_budget_immediate_timeout',
+    'single_active_tab_no_double_count',
+    'stale_reduced_budget_rejected',
+    'equal_revision_hash_conflict',
+    'ManagedTimePolicyUpdateDecision'
+  ]) {
+    assert.match(profileModels, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  }
+
+  for (const token of [
+    'managedPolicyState',
+    'managedActionHistory',
+    'timeLimitPolicy'
+  ]) {
+    assert.match(profileModels, new RegExp(token));
+    assert.match(preferences, new RegExp(token));
+  }
+
+  assert.match(policyGate, /timeLimitPolicy\?\.policyFingerprint\(\)/);
+  for (const token of [
+    'managedTimeLimitPolicyChangeInvalidatesPolicyVersion',
+    'disabledManagedTimeLimitPolicyIsNoWorkForNativeApp',
+    'zeroManagedTimeBudgetImmediatelyTimesOutBeforeOpeningManagedWebContent',
+    'activeManagedTimeSessionHeartbeatDoesNotDoubleCountSameTick',
+    'managedTimeTimezoneDriftRevalidatesDayBucketInsteadOfCarryingWrongZoneUsage',
+    'newerManagedTimeReducedBudgetClampsRemainingTime',
+    'staleManagedTimeReducedBudgetIsRejected'
+  ]) {
+    assert.match(policyGateTest, new RegExp(token));
+  }
 });
 
 test('managed app contract preserves profile viewing time envelope and history fields', () => {
