@@ -300,7 +300,7 @@ subscriptionsImportBridge: 17
 | 5940 | `const arrow` | `closeWith` | `modalDialogHelpers` |
 | 5983 | `async function` | `showChoiceModal` | `modalDialogHelpers` |
 | 6028 | `const arrow` | `cleanup` | `modalDialogHelpers` |
-| 6035 | `const arrow` | `closeWith` | `modalDialogHelpers` |
+| 6045 | `const arrow` | `closeWith` | `modalDialogHelpers` |
 | 6069 | `const arrow` | `handleEscape` | `modalDialogHelpers` |
 | 6085 | `function` | `isNanahAvailable` | `nanahModeScopePolicyModal` |
 | 6089 | `function` | `normalizeNanahCode` | `nanahModeScopePolicyModal` |
@@ -555,9 +555,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 71
-method semantic proof gap lexical callables covered: 6035
+method semantic proof gap lexical callables covered: 6045
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6035
+lexical callables requiring semantic proof before behavior changes: 6045
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

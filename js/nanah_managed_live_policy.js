@@ -8,8 +8,12 @@
         'keywords',
         'channels',
         'viewing_space',
-        'time_limits'
+        'time_limits',
+        'rules_bundle'
     ];
+    const MANAGED_LIVE_BUNDLE_SCOPES = {
+        rules_bundle: ['keywords', 'channels', 'videos']
+    };
 
     function create(deps = {}) {
         const normalizeString = deps.normalizeString;
@@ -19,6 +23,11 @@
         function normalizeScope(scope) {
             const normalized = normalizeString(scope).toLowerCase();
             return MANAGED_LIVE_POLICY_SCOPES.includes(normalized) ? normalized : '';
+        }
+
+        function expandScope(scope) {
+            const normalizedScope = normalizeScope(scope);
+            return MANAGED_LIVE_BUNDLE_SCOPES[normalizedScope] || (normalizedScope ? [normalizedScope] : []);
         }
 
         function cloneList(value) {
@@ -128,6 +137,9 @@
             if (!normalizedScope) {
                 throw new Error('Signed managed sends require a managed policy scope.');
             }
+            if (MANAGED_LIVE_BUNDLE_SCOPES[normalizedScope]) {
+                throw new Error('Managed bundle sends must expand into individual policy payloads.');
+            }
             const source = resolvePolicySourceProfile();
             const profile = safeObject(source.profile);
             if (!profile || Object.keys(profile).length === 0) {
@@ -204,7 +216,7 @@
             return revision && policyHash ? { revision, policyHash } : null;
         }
 
-        async function buildEnvelopeForLiveSend(policy) {
+        async function buildEnvelopeForScope(policy, scope) {
             const adapter = deps.getAdapter();
             if (typeof adapter.signManagedPolicyEnvelope !== 'function') {
                 throw new Error('Managed policy signing is unavailable');
@@ -218,13 +230,13 @@
                 throw new Error('Signed managed sends require Source -> Replica roles.');
             }
 
-            const scope = normalizeScope(policy.scope);
-            if (!scope) {
+            const normalizedScope = normalizeScope(scope);
+            if (!normalizedScope) {
                 throw new Error('Signed managed sends require Main, Kids, keyword, channel, video, viewing-space, or time-limit scope.');
             }
             const allowedScopes = deps.getAllowedScopeList(safeObject(trustedLink.policy).allowedScopes || safeObject(trustedLink.policy).defaultScope);
-            if (!allowedScopes.includes(scope)) {
-                throw new Error(`This managed link does not allow signed ${deps.getScopeLabel(scope)} policy sends.`);
+            if (!allowedScopes.includes(normalizedScope)) {
+                throw new Error(`This managed link does not allow signed ${deps.getScopeLabel(normalizedScope)} policy sends.`);
             }
 
             const targetProfile = resolveTargetProfile(trustedLink);
@@ -240,16 +252,16 @@
             }
 
             const sourceProfile = deps.getLocalProfileContext();
-            const payload = buildPayload(scope);
+            const payload = buildPayload(normalizedScope);
             const policyHash = buildPolicyHash({
                 linkId: trustedLink.linkId,
-                scope,
+                scope: normalizedScope,
                 targetProfileId: targetProfile.profileId,
                 sourceProfileId: sourceProfile.profileId,
                 sourceDeviceId: normalizeString(deps.getStableDeviceId()),
                 payload
             });
-            const prior = getOutgoingPolicyState(trustedLink, scope);
+            const prior = getOutgoingPolicyState(trustedLink, normalizedScope);
             const revision = prior?.policyHash === policyHash
                 ? prior.revision
                 : Math.max(0, prior?.revision || 0) + 1;
@@ -257,7 +269,7 @@
             return adapter.signManagedPolicyEnvelope({
                 type: 'filtertube_managed_policy',
                 linkId: normalizeString(trustedLink.linkId),
-                scope,
+                scope: normalizedScope,
                 targetProfileId: targetProfile.profileId,
                 targetProfileName: normalizeString(targetProfile.profileName),
                 sourceProfileId: normalizeString(sourceProfile.profileId),
@@ -270,6 +282,26 @@
                 payload,
                 privateKeyJwk: keyPair.privateKeyJwk
             });
+        }
+
+        async function buildEnvelopeForLiveSend(policy) {
+            const scope = normalizeScope(policy.scope);
+            if (MANAGED_LIVE_BUNDLE_SCOPES[scope]) {
+                throw new Error('Managed bundle sends must use buildEnvelopeBatchForLiveSend.');
+            }
+            return buildEnvelopeForScope(policy, scope);
+        }
+
+        async function buildEnvelopeBatchForLiveSend(policy) {
+            const scopes = expandScope(policy.scope);
+            if (scopes.length === 0) {
+                throw new Error('Signed managed sends require Main, Kids, keyword, channel, video, viewing-space, or time-limit scope.');
+            }
+            const envelopes = [];
+            for (const scope of scopes) {
+                envelopes.push(await buildEnvelopeForScope(policy, scope));
+            }
+            return envelopes;
         }
 
         async function markSent(linkId, scope, revision, policyHash) {
@@ -295,8 +327,10 @@
 
         return {
             normalizeScope,
+            expandScope,
             buildPayload,
             buildEnvelopeForLiveSend,
+            buildEnvelopeBatchForLiveSend,
             markSent
         };
     }

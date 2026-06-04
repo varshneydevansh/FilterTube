@@ -17,13 +17,14 @@ background session PIN rate limiting, child time-budget enforcement,
 managed-envelope validation/classification, managed-policy receive/apply
 evidence, managed public-key descriptor pairing, source signing-key
 provisioning, eligible signed Main/Kids/granular live managed-policy sends, and
-an explicit Main/Kids rule-source picker for granular sends, plus a
+an explicit Main/Kids rule-source picker plus Rule bundle send for granular
+sends, plus a
 provider-gated dashboard/profile-open pull hook for already-decrypted mailbox
 items, redacted provider ack handoff for mailbox apply/reject outcomes,
 trusted-link removal cleanup for target-local accepted managed-policy state,
 plus an extension-owned downstream app policy contract artifact wired
-into the app sync manifest. Active/full signed conversion, richer bulk outbound
-controls, server mailbox pull/decryption runtime, server mailbox queue purge,
+into the app sync manifest. Active/full signed conversion, richer viewing-space/time-limit
+and multi-target bulk outbound controls, server mailbox pull/decryption runtime, server mailbox queue purge,
 local-network discovery runtime, and app native settings/iOS enforcement proofs
 remain pending.
 **Goal slice**: Implementation order item 1 plus first runtime viewing-space
@@ -53,8 +54,10 @@ source/parent Nanah sessions can provision local managed signing key material.
 Eligible fixed-target Main/Kids, keyword, channel, video, viewing-space, and
 time-limit live sends can now build signed managed-policy envelopes. Granular
 rule sends use an explicit Main/Kids rule-source picker that defaults from the
-dashboard's active surface, and parent-managed child edit mode can provide the
-child-policy payload source while the parent profile remains signing authority.
+dashboard's active surface, and Rule bundle expands into separate signed
+keyword, channel, and video envelopes instead of creating a new receive-side
+scope. Parent-managed child edit mode can provide the child-policy payload
+source while the parent profile remains signing authority.
 Local/decrypted mailbox items can now bind
 mailbox metadata to the decrypted managed envelope before calling the same
 managed-policy validation/apply path. The dashboard/profile-open hook can ask a
@@ -64,8 +67,8 @@ after each local apply/reject decision. Trusted-link removal now purges
 target-local accepted managed-policy revision state for that link and clears
 matching open-sync status rows before the removed trust can be reused as local
 authority evidence. Server mailbox pull, mailbox decryption client, server
-mailbox queue purge, active/full signed conversion, richer bulk outbound
-controls, local-network delivery runtime, background/session-service
+mailbox queue purge, active/full signed conversion, richer viewing-space/time-limit
+and multi-target bulk outbound controls, local-network delivery runtime, background/session-service
 failed-attempt durability, and remote admin session semantics remain separate
 required slices.
 
@@ -313,8 +316,9 @@ Current gap:
       provision a local managed signing keypair plus public descriptor, and
       eligible fixed-target Main/Kids and granular managed live sends now use
       signed envelopes, with explicit Main/Kids rule-source selection for
-      granular sends. Active/full signed conversion and richer bulk outbound
-      controls remain pending. Without trusted stored public-key
+      granular sends, plus Rule bundle expansion into separate signed
+      keyword/channel/video envelopes. Active/full signed conversion and richer
+      viewing-space/time-limit or multi-target bulk outbound controls remain pending. Without trusted stored public-key
       material, the receive path still rejects otherwise well-shaped managed
       envelopes rather than treating them as valid.
 - The adapter's validated apply wrapper still depends on higher layers for
@@ -447,9 +451,9 @@ Current gap:
 |---|---|---|
 | Validated managed policy apply wrapper | Remote apply can now persist a durable accepted-revision object for a fixed child target, but only when a caller supplies accepted validation context. | Key-store/WebCrypto verifier plumbing and live Nanah/local-network receive tests before automatic remote apply. |
 | Target-local remote revision store | Stale or replayed remote updates can now be rejected per target profile/link/scope after the first accepted write, and trusted-link removal now purges accepted state plus open-sync status for the removed link. There is still no server mailbox queue or multi-device conflict-resolution layer yet. | Multi-parent, revoked-link, equal-revision/different-hash, mailbox-delivery, and server-queue-purge fixtures. |
-| Pairing public-key descriptor, source keypair provisioning, and eligible live signed send present | The helper now requires verifier evidence, adapter WebCrypto verification is wired, Nanah pairing can persist advertised source public-key descriptors, source sessions can provision local managed signing keypairs, fixed-target Main/Kids, keyword, channel, video, viewing-space, and time-limit managed live sends build signed `filtertube_managed_policy` envelopes, and granular rule sends expose an explicit Main/Kids rule-source picker. Active/full sends and richer bulk outbound controls still remain proposal/spec work. | Authenticated two-device live-delivery smoke, signed granular live-delivery smoke, rotation/revocation, and active/full conversion policy. |
+| Pairing public-key descriptor, source keypair provisioning, and eligible live signed send present | The helper now requires verifier evidence, adapter WebCrypto verification is wired, Nanah pairing can persist advertised source public-key descriptors, source sessions can provision local managed signing keypairs, fixed-target Main/Kids, keyword, channel, video, viewing-space, and time-limit managed live sends build signed `filtertube_managed_policy` envelopes, granular rule sends expose an explicit Main/Kids rule-source picker, and Rule bundle expands into separate signed keyword/channel/video envelopes. Active/full sends and richer viewing-space/time-limit or multi-target bulk outbound controls still remain proposal/spec work. | Authenticated two-device live-delivery smoke, signed granular live-delivery smoke, rotation/revocation, and active/full conversion policy. |
 | Partial canonical payload/integrity binding | The helper checks binding fields and verifier result, but no canonical payload hash recomputation exists yet. | Binding-tuple fixtures plus canonical payload hash proof. |
-| Signed remote managed-policy gate is partially live | Fixed-target Main/Kids, keyword, channel, video, viewing-space, and time-limit managed Nanah sends can now travel as signed envelopes and receive-side code validates before apply. Granular keyword/channel/video sends can choose Main or Kids local rule source explicitly. Active/full signed conversion, mailbox delivery, and richer bulk outbound controls are still pending. | Installed two-device Main/Kids and granular smoke plus dedicated signed route/time policy fixtures. |
+| Signed remote managed-policy gate is partially live | Fixed-target Main/Kids, keyword, channel, video, viewing-space, and time-limit managed Nanah sends can now travel as signed envelopes and receive-side code validates before apply. Granular keyword/channel/video sends can choose Main or Kids local rule source explicitly, and Rule bundle sends those three granular scopes as separate signed envelopes. Active/full signed conversion, mailbox delivery, and richer viewing-space/time-limit or multi-target bulk outbound controls are still pending. | Installed two-device Main/Kids and granular smoke plus dedicated signed route/time policy fixtures. |
 | Remote time-limit policy apply is wrapper-backed and live-send eligible | Local child time-budget enforcement exists and accepted managed envelopes can write runtime-compatible time-limit policy; the source send path can now emit signed live time-limit envelopes when the profile has a saved time limit. | Installed two-device signed remote time-limit smoke through Nanah/local-network receive. |
 | Adapter depends on caller trust context | `validateManagedPolicyEnvelope(...)` depends on caller-supplied trusted-link/profile/revision/signature context; the wrapper rechecks stored profiles before writing but does not fetch trust keys itself. | Keep dashboard receive context and add pairing key lookup/revocation fixtures before automatic apply. |
 | Locked-child bypass has no revision binding | `allow_trusted_updates` can skip unlock for matching managed sessions, but not with policy revision constraints. | Locked child managed-policy fixtures. |

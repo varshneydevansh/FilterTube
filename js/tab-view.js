@@ -6361,6 +6361,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             'videos',
             'keywords',
             'channels',
+            'rules_bundle',
             'viewing_space',
             'time_limits'
         ].includes(raw)) return raw;
@@ -6402,12 +6403,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const list = Array.isArray(value) ? value : [value];
         const normalized = list
             .map((item) => normalizeString(item).toLowerCase())
+            .flatMap((item) => item === 'rules_bundle' ? ['keywords', 'channels', 'videos'] : [item])
             .filter((item) => [
                 'main',
                 'kids',
                 'videos',
                 'keywords',
                 'channels',
+                'rules_bundle',
                 'viewing_space',
                 'time_limits'
             ].includes(item));
@@ -6418,6 +6421,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const list = Array.isArray(value) ? value : [value];
         const normalized = list
             .map((item) => normalizeString(item).toLowerCase())
+            .flatMap((item) => item === 'rules_bundle' ? ['keywords', 'channels', 'videos'] : [item])
             .filter((item) => [
                 'active',
                 'main',
@@ -6426,6 +6430,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 'videos',
                 'keywords',
                 'channels',
+                'rules_bundle',
                 'viewing_space',
                 'time_limits'
             ].includes(item));
@@ -6448,6 +6453,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (normalized === 'videos') return 'Videos';
         if (normalized === 'keywords') return 'Keywords';
         if (normalized === 'channels') return 'Channels';
+        if (normalized === 'rules_bundle') return 'Rule bundle';
         if (normalized === 'viewing_space') return 'Viewing space';
         if (normalized === 'time_limits') return 'Time limits';
         return 'Active profile';
@@ -6548,10 +6554,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (normalized === 'keywords') return 'Only keyword rules from the selected Main or Kids surface.';
         if (normalized === 'channels') return 'Only channel rules from the selected Main or Kids surface.';
         if (normalized === 'videos') return 'Only blocked video IDs from the selected Main or Kids surface.';
+        if (normalized === 'rules_bundle') return 'Keyword, channel, and blocked-video rules from the selected Main or Kids surface.';
         if (normalized === 'viewing_space') return 'Only Main/Kids access policy for the protected profile.';
         if (normalized === 'time_limits') return 'Only the protected profile daily YouTube time limit.';
         if (normalized === 'full') return 'The wider account snapshot, best for full migration.';
         return 'The currently active FilterTube profile snapshot.';
+    }
+
+    function expandNanahManagedSendScope(scope) {
+        const normalized = normalizeString(scope).toLowerCase();
+        if (normalized === 'rules_bundle') return ['keywords', 'channels', 'videos'];
+        return normalized ? [normalized] : [];
     }
 
     function describeNanahScopeList(scopes) {
@@ -7537,7 +7550,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const scopeLabel = getNanahSelectedText(ftNanahScope, getNanahScopeLabel(scope));
         const strategyLabel = getNanahSelectedText(ftNanahStrategy, getNanahStrategyLabel(getNanahStrategy()));
         const parts = [roleLabel, scopeLabel];
-        if (['keywords', 'channels', 'videos'].includes(scope) && ftNanahGranularSurface) {
+        if (['keywords', 'channels', 'videos', 'rules_bundle'].includes(scope) && ftNanahGranularSurface) {
             const surfaceLabel = getNanahSelectedText(
                 ftNanahGranularSurface,
                 ftNanahGranularSurface.value === 'kids' ? 'YouTube Kids rules' : 'YouTube Main rules'
@@ -8561,7 +8574,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const linkType = classifyNanahTrustedLink(localRole, remoteRole);
         const trustedManaged = isCurrentNanahManagedLink();
         const scope = getNanahScope();
-        const granularScope = ['keywords', 'channels', 'videos'].includes(scope);
+        const granularScope = ['keywords', 'channels', 'videos', 'rules_bundle'].includes(scope);
 
         if (ftNanahGranularSurface) {
             if (!granularScope) {
@@ -8580,7 +8593,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahGranularSurface.disabled = !granularScope || childReceiveOnly || childReplicaOnly || !!nanahClient;
             ftNanahGranularSurface.title = granularScope
                 ? (nanahClient ? 'Rule source is locked for the current Nanah session.' : '')
-                : 'Rule source applies only to keyword, channel, and blocked-video sends.';
+                : 'Rule source applies only to keyword, channel, blocked-video, and rule-bundle sends.';
         }
         if (ftNanahGranularSurfaceHint) {
             const surfaceLabel = ftNanahGranularSurface?.value === 'kids' ? 'YouTube Kids' : 'YouTube Main';
@@ -9187,7 +9200,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (isTrustedManagedSender) {
             const allowedScopes = getNanahManagedSendScopeList(managedPolicy.allowedScopes);
-            if (!allowedScopes.includes(selectedScope)) {
+            const requiredScopes = expandNanahManagedSendScope(selectedScope);
+            const missingScopes = requiredScopes.filter((item) => !allowedScopes.includes(item));
+            if (missingScopes.length > 0) {
                 throw new Error(`This managed link only allows ${allowedScopes.map(getNanahScopeLabel).join(', ')} syncs`);
             }
             return {
@@ -9195,11 +9210,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 authorityMode: 'managed',
                 scope: selectedScope,
                 strategy: normalizeString(managedPolicy.applyMode).toLowerCase() === 'replace' ? 'replace' : 'merge',
-                allowedScopes
+                allowedScopes,
+                requiredScopes
             };
         }
 
-        if (['videos', 'keywords', 'channels', 'viewing_space', 'time_limits'].includes(selectedScope)) {
+        if (['videos', 'keywords', 'channels', 'rules_bundle', 'viewing_space', 'time_limits'].includes(selectedScope)) {
             throw new Error('Keyword, channel, video, viewing-space, and time-limit sends require a saved Source -> Replica managed link.');
         }
 
@@ -9237,7 +9253,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function getNanahActiveManagedSurface() {
         const scope = getNanahScope();
         const selectedSurface = normalizeString(ftNanahGranularSurface?.value).toLowerCase();
-        if (['keywords', 'channels', 'videos'].includes(scope) && (selectedSurface === 'main' || selectedSurface === 'kids')) {
+        if (['keywords', 'channels', 'videos', 'rules_bundle'].includes(scope) && (selectedSurface === 'main' || selectedSurface === 'kids')) {
             return selectedSurface;
         }
         const activeView = normalizeString(document.body?.dataset?.activeView)
@@ -11380,15 +11396,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                         if (!nanahManagedLivePolicy) {
                             throw new Error('Managed policy live-send helpers are unavailable');
                         }
-                        const signedEnvelope = await nanahManagedLivePolicy.buildEnvelopeForLiveSend(policy);
-                        await nanahClient.send(signedEnvelope);
-                        await nanahManagedLivePolicy.markSent(
-                            signedEnvelope.linkId,
-                            signedEnvelope.scope,
-                            signedEnvelope.revision,
-                            signedEnvelope.policyHash
-                        );
-                        UIComponents.showToast(`Sent signed managed ${signedEnvelope.scope} policy to ${getNanahRemoteLabel()}`, 'success');
+                        const signedEnvelopes = typeof nanahManagedLivePolicy.buildEnvelopeBatchForLiveSend === 'function'
+                            ? await nanahManagedLivePolicy.buildEnvelopeBatchForLiveSend(policy)
+                            : [await nanahManagedLivePolicy.buildEnvelopeForLiveSend(policy)];
+                        for (const signedEnvelope of signedEnvelopes) {
+                            await nanahClient.send(signedEnvelope);
+                            await nanahManagedLivePolicy.markSent(
+                                signedEnvelope.linkId,
+                                signedEnvelope.scope,
+                                signedEnvelope.revision,
+                                signedEnvelope.policyHash
+                            );
+                        }
+                        const sentScopes = signedEnvelopes.map((envelope) => getNanahScopeLabel(envelope.scope)).join(', ');
+                        UIComponents.showToast(`Sent signed managed ${sentScopes} policy to ${getNanahRemoteLabel()}`, 'success');
                         return;
                     }
                     let envelope = await adapter.buildControlProposal({ scope: policy.scope, strategy: policy.strategy, auth });

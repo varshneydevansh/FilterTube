@@ -82,9 +82,9 @@ Current ZIP artifacts:
 
 | ZIP path | Bytes | SHA-256 |
 | --- | ---: | --- |
-| `dist/filtertube-chrome-v3.3.2.zip` | 8,727,759 | `766fb9ec8c4ec4cfd4700ae16f6c1e6c221785d729e1ce8ad6496297b80200e3` |
-| `dist/filtertube-firefox-v3.3.2.zip` | 8,727,818 | `3157bbf6a23b78e900e66ee28e4dab572a10097c3f01112ffa8dff75e2085195` |
-| `dist/filtertube-opera-v3.3.2.zip` | 8,727,761 | `2acbd2efe325e7fb833d4914988d03a1dc2f15b9f210e60d87e2a24604905bda` |
+| `dist/filtertube-chrome-v3.3.2.zip` | 8,728,281 | `a14599fc1726507dbdfa049b9640f218c8538f367b6120b065c35fb7287628fb` |
+| `dist/filtertube-firefox-v3.3.2.zip` | 8,728,340 | `4e64521b8ed5b4385a41896864794d1dae0d31f73b27f8d30973add7cbe00cc4` |
+| `dist/filtertube-opera-v3.3.2.zip` | 8,728,283 | `475ae17a9b4c9f2c71a4b80b6e120f612d511a473bb888feeedbedb4459752db` |
 
 The package tree is broad because `build.js` copies:
 

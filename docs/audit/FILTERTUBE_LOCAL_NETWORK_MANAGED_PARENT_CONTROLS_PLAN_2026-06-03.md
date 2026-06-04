@@ -10,8 +10,9 @@ Managed pairing public-key descriptor persistence is now present when a key
 descriptor is already provisioned, and source-side managed signing keypair
 provisioning plus an adapter signing helper are present. Live fixed-target
 Nanah managed-policy sends are present for Main/Kids, keyword, channel, video,
-viewing-space, and time-limit scopes, and granular keyword/channel/video sends
-now expose an explicit Main/Kids rule-source picker. A provider-gated
+viewing-space, and time-limit scopes, granular keyword/channel/video sends now
+expose an explicit Main/Kids rule-source picker, and Rule bundle expands into
+separate signed keyword/channel/video envelopes. A provider-gated
 dashboard/profile-open pull hook and redacted provider ack handoff are present
 for already-decrypted mailbox items. An extension-owned managed app policy
 contract artifact and app manifest copy row are now present so downstream app
@@ -429,8 +430,10 @@ replica child device over Nanah/P2P or same-network transport.
   local signing key. Eligible fixed-target Main/Kids plus keyword, channel,
   video, viewing-space, and time-limit dashboard live sends now build signed
   `filtertube_managed_policy` envelopes; granular keyword/channel/video sends
-  expose an explicit Main/Kids rule-source picker; active/full sends and richer
-  bulk outbound controls remain later slices.
+  expose an explicit Main/Kids rule-source picker, and Rule bundle expands into
+  separate signed keyword/channel/video envelopes; active/full sends and richer
+  viewing-space/time-limit or multi-target bulk outbound controls remain later
+  slices.
 - **Acceptance Criteria**:
   - The public descriptor is separated from the private keypair.
   - The private JWK is not placed in the Nanah hello descriptor or trusted link
@@ -457,9 +460,10 @@ replica child device over Nanah/P2P or same-network transport.
 - **Status**: Implemented for live Main/Kids, keyword, channel, video,
   viewing-space, and time-limit scope. Granular rule scopes expose an explicit
   Main/Kids rule-source picker, default from the active dashboard surface, and
-  can source payloads from parent-managed child edit mode. Active/full proposal
-  sends, mailbox delivery, local-network delivery, and richer bulk outbound
-  controls remain pending.
+  can source payloads from parent-managed child edit mode. Rule bundle expands
+  into separate signed keyword/channel/video envelopes. Active/full proposal
+  sends, mailbox delivery, local-network delivery, and richer viewing-space/time-limit
+  or multi-target bulk outbound controls remain pending.
 - **Acceptance Criteria**:
   - Existing proposal sends still work for unsupported active/full scopes.
   - Signed sends require saved managed link, Source -> Replica roles, allowed

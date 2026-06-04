@@ -17,7 +17,7 @@ path from an unsigned managed `control_proposal` into a signed
 - a saved `managed_link` exists;
 - the link allows the selected scope;
 - the selected scope is `main`, `kids`, `keywords`, `channels`, `videos`,
-  `viewing_space`, or `time_limits`;
+  `rules_bundle`, `viewing_space`, or `time_limits`;
 - the replica side has saved a fixed child target profile;
 - the source has a complete local managed signing keypair.
 
@@ -55,21 +55,28 @@ flowchart TD
 ## Behavior Boundary
 
 Eligible fixed-target Main/Kids and granular managed live sends are now present
-for managed policy snapshots. Granular keyword, channel, and video payloads use
-an explicit Main/Kids rule-source picker in the Nanah advanced panel. The picker
-defaults to the dashboard's active Main/Kids surface when the user first selects
-a granular scope, so existing active-view behavior stays intact until the parent
-chooses a different source. When parent-managed child edit mode is active, the
-payload source is the edited child profile while the envelope authority remains
-the parent source profile.
+for managed policy snapshots. Granular keyword, channel, video, and Rule bundle
+payloads use an explicit Main/Kids rule-source picker in the Nanah advanced
+panel. The picker defaults to the dashboard's active Main/Kids surface when the
+user first selects a granular scope, so existing active-view behavior stays
+intact until the parent chooses a different source. When parent-managed child
+edit mode is active, the payload source is the edited child profile while the
+envelope authority remains the parent source profile.
+
+`rules_bundle` is only a parent UI convenience. It does not create a new
+receive-side scope and does not weaken the managed-policy envelope validator.
+The helper expands it into separate signed `keywords`, `channels`, and `videos`
+envelopes, each with its own revision, hash, signature binding, send call, and
+`outgoingManagedPolicies` row. A saved managed link must explicitly allow all
+three underlying scopes before the bundle send is accepted.
 
 This is not a mailbox runtime, local-network discovery runtime, key-rotation
 system, or offline later-delivery mechanism.
 
 Still pending:
 
-- richer bulk outbound controls beyond the explicit Main/Kids rule-source
-  picker;
+- richer bulk outbound controls for viewing-space/time-limit combinations,
+  per-child multi-target fanout, and selectable Main+Kids dual-surface sends;
 - active/full proposal conversion policy;
 - installed-extension two-device smoke proof;
 - key rotation/revocation UI;

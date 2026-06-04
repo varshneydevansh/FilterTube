@@ -155,6 +155,7 @@ test('managed live signed-send audit is linked without claiming mailbox runtime'
   assert.match(doc, /Eligible live-session source send runtime slice/);
   assert.match(doc, /fixed-target Main\/Kids and granular managed live sends/);
   assert.match(doc, /explicit Main\/Kids rule-source picker/);
+  assert.match(doc, /Rule bundle/);
   assert.match(doc, /All unsupported live sends continue through the existing proposal path/);
   assert.match(doc, /not a mailbox runtime, local-network discovery runtime, key-rotation\s+system, or offline later-delivery mechanism/);
   assert.match(signingDoc, new RegExp(docPath));
@@ -170,9 +171,10 @@ test('dashboard exposes explicit Main Kids rule source picker for granular manag
   assert.match(html, /id="ftNanahGranularSurface"/);
   assert.match(html, /YouTube Main rules/);
   assert.match(html, /YouTube Kids rules/);
+  assert.match(html, /value="rules_bundle">Rule bundle/);
   assert.match(source, /const ftNanahGranularSurfaceField = document\.getElementById\('ftNanahGranularSurfaceField'\)/);
   assert.match(source, /const ftNanahGranularSurface = document\.getElementById\('ftNanahGranularSurface'\)/);
-  assert.match(source, /const granularScope = \['keywords', 'channels', 'videos'\]\.includes\(scope\)/);
+  assert.match(source, /const granularScope = \['keywords', 'channels', 'videos', 'rules_bundle'\]\.includes\(scope\)/);
   assert.match(source, /ftNanahGranularSurfaceField\.hidden = !granularScope \|\| childReceiveOnly \|\| childReplicaOnly/);
   assert.match(source, /function getNanahActiveManagedSurface\(\)[\s\S]*ftNanahGranularSurface\?\.value[\s\S]*return selectedSurface/);
 });
@@ -188,9 +190,11 @@ test('dashboard builds signed managed envelopes only after source link scope tar
   assert.match(source, /function buildViewingSpacePayload\(profile\)/);
   assert.match(source, /function buildTimeLimitPayload\(profile\)/);
   assert.match(source, /async function buildEnvelopeForLiveSend\(policy\)/);
+  assert.match(source, /async function buildEnvelopeBatchForLiveSend\(policy\)/);
   assert.match(source, /if \(!trustedLink \|\| trustedLink\.linkType !== 'managed_link'\)/);
   assert.match(source, /if \(trustedLink\.localRole !== 'source' \|\| trustedLink\.remoteRole !== 'replica'\)/);
-  assert.match(source, /if \(!allowedScopes\.includes\(scope\)\)/);
+  assert.match(source, /MANAGED_LIVE_BUNDLE_SCOPES/);
+  assert.match(source, /if \(!allowedScopes\.includes\(normalizedScope\)\)/);
   assert.match(source, /if \(!normalizeString\(targetProfile\?\.profileId\)\)/);
   assert.match(source, /deps\.ensureSigningKeyPair\(\{ required: true \}\)/);
   assert.match(source, /privateKeyJwk: keyPair\.privateKeyJwk/);
@@ -205,7 +209,8 @@ test('managed source send uses signed envelope before proposal fallback and reco
   assert.notEqual(listenerEnd, -1);
   const sendButtonBlock = source.slice(listenerStart, listenerEnd);
   assert.match(sendButtonBlock, /policy\.linkType === 'managed_link' && policy\.authorityMode === 'managed' && getNanahRole\(\) === 'source'/);
-  assert.match(sendButtonBlock, /const signedEnvelope = await nanahManagedLivePolicy\.buildEnvelopeForLiveSend\(policy\)/);
+  assert.match(sendButtonBlock, /buildEnvelopeBatchForLiveSend/);
+  assert.match(sendButtonBlock, /for \(const signedEnvelope of signedEnvelopes\)/);
   assert.match(sendButtonBlock, /await nanahClient\.send\(signedEnvelope\)/);
   assert.match(sendButtonBlock, /await nanahManagedLivePolicy\.markSent\(/);
   assert.match(sendButtonBlock, /return;\s+\}\s+let envelope = await adapter\.buildControlProposal/);
@@ -265,6 +270,27 @@ test('managed live signed-send helper builds granular parent-control payloads fr
   assert.equal(envelope.sourceProfileId, 'parent-profile-1');
   assert.deepEqual(plain(envelope.payload.channels), [{ id: 'UC-shakira', name: 'Shakira' }]);
   assert.equal(envelope.integrity.signedFields.payloadScope, 'channels');
+});
+
+test('managed live signed-send helper expands rule bundle into individual signed envelopes', async () => {
+  const { helper } = createManagedLivePolicyHarness({ activeSurface: 'main' });
+
+  assert.deepEqual(plain(helper.expandScope('rules_bundle')), ['keywords', 'channels', 'videos']);
+  assert.throws(() => helper.buildPayload('rules_bundle'), /expand into individual policy payloads/);
+
+  const envelopes = await helper.buildEnvelopeBatchForLiveSend({ scope: 'rules_bundle' });
+  assert.deepEqual(plain(envelopes.map((envelope) => envelope.scope)), ['keywords', 'channels', 'videos']);
+  assert.deepEqual(plain(envelopes.map((envelope) => envelope.targetProfileId)), ['child-profile-1', 'child-profile-1', 'child-profile-1']);
+  assert.deepEqual(plain(envelopes[0].payload.keywords), [{ word: 'shakira' }]);
+  assert.deepEqual(plain(envelopes[1].payload.channels), [{ id: 'UC-shakira', name: 'Shakira' }]);
+  assert.deepEqual(plain(envelopes[2].payload.videoIds), ['video-main-1']);
+  assert.deepEqual(plain(envelopes.map((envelope) => envelope.integrity.signedFields.payloadScope)), ['keywords', 'channels', 'videos']);
+
+  const limited = createManagedLivePolicyHarness({ allowedScopes: ['keywords'] }).helper;
+  await assert.rejects(
+    () => limited.buildEnvelopeBatchForLiveSend({ scope: 'rules_bundle' }),
+    /does not allow signed channels policy sends/
+  );
 });
 
 test('managed live signed-send helper uses Kids surface for granular scopes when selected', () => {
