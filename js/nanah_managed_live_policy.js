@@ -1,6 +1,16 @@
 (function initNanahManagedLivePolicy(global) {
     'use strict';
 
+    const MANAGED_LIVE_POLICY_SCOPES = [
+        'main',
+        'kids',
+        'videos',
+        'keywords',
+        'channels',
+        'viewing_space',
+        'time_limits'
+    ];
+
     function create(deps = {}) {
         const normalizeString = deps.normalizeString;
         const safeObject = deps.safeObject;
@@ -8,19 +18,138 @@
 
         function normalizeScope(scope) {
             const normalized = normalizeString(scope).toLowerCase();
-            return normalized === 'main' || normalized === 'kids' ? normalized : '';
+            return MANAGED_LIVE_POLICY_SCOPES.includes(normalized) ? normalized : '';
+        }
+
+        function cloneList(value) {
+            return Array.isArray(value)
+                ? value.map((entry) => entry && typeof entry === 'object' && !Array.isArray(entry) ? { ...entry } : entry)
+                : [];
+        }
+
+        function resolvePolicySourceProfile() {
+            const explicitSource = typeof deps.getPolicySourceProfile === 'function'
+                ? safeObject(deps.getPolicySourceProfile())
+                : {};
+            if (Object.keys(safeObject(explicitSource.profile)).length > 0) {
+                return explicitSource;
+            }
+            const profilesRoot = safeObject(deps.getProfilesRoot());
+            const profileId = normalizeString(deps.getLocalProfileContext().profileId) || 'default';
+            const profile = safeObject(safeObject(profilesRoot.profiles)[profileId]);
+            return {
+                profileId,
+                profile,
+                sourceKind: 'active_profile'
+            };
+        }
+
+        function resolvePayloadSurface(scope) {
+            if (scope === 'kids') return 'kids';
+            if (scope === 'main') return 'main';
+            const activeSurface = normalizeString(typeof deps.getActiveManagedSurface === 'function'
+                ? deps.getActiveManagedSurface()
+                : '').toLowerCase();
+            return activeSurface === 'kids' ? 'kids' : 'main';
+        }
+
+        function buildListPayload(scope, profile, surface) {
+            const data = deps.getProfileSurface(profile, surface);
+            const list = data.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+            const payload = {
+                scope,
+                surface,
+                list,
+                replace: true
+            };
+            if (scope === 'keywords') {
+                if (list === 'whitelist') {
+                    payload.whitelistKeywords = cloneList(data.whitelistKeywords);
+                } else if (surface === 'kids') {
+                    payload.blockedKeywords = cloneList(data.blockedKeywords);
+                } else {
+                    payload.keywords = cloneList(data.keywords);
+                }
+            } else if (scope === 'channels') {
+                if (list === 'whitelist') {
+                    payload.whitelistChannels = cloneList(data.whitelistChannels);
+                } else if (surface === 'kids') {
+                    payload.blockedChannels = cloneList(data.blockedChannels);
+                } else {
+                    payload.channels = cloneList(data.channels);
+                }
+            }
+            return payload;
+        }
+
+        function buildViewingSpacePayload(profile) {
+            const settings = safeObject(profile.settings);
+            const allowMain = settings.allowMainViewing !== false;
+            const allowKids = settings.allowKidsViewing !== false;
+            if (!allowMain && !allowKids) {
+                throw new Error('Signed managed viewing-space sends require at least one allowed viewing space.');
+            }
+            return {
+                scope: 'viewing_space',
+                allowMain,
+                allowKids,
+                ...(normalizeString(settings.defaultLaunchTarget)
+                    ? { defaultLaunchTarget: normalizeString(settings.defaultLaunchTarget) }
+                    : {})
+            };
+        }
+
+        function buildTimeLimitPayload(profile) {
+            const policy = typeof deps.getManagedTimeLimitPolicy === 'function'
+                ? deps.getManagedTimeLimitPolicy(profile)
+                : null;
+            if (!policy) {
+                throw new Error('Signed managed time-limit sends require a saved profile time limit.');
+            }
+            return {
+                scope: 'time_limits',
+                enabled: policy.enabled === true,
+                timezone: normalizeString(policy.timezone) || 'UTC',
+                dailyBudgetMinutes: Math.floor(policy.dailyBudgetSeconds / 60),
+                dailyBudgetSeconds: policy.dailyBudgetSeconds,
+                surfaceBudgets: safeObject(policy.surfaceBudgets),
+                countingMode: normalizeString(policy.countingMode) || 'active_youtube_tab',
+                activeDeviceBudgetPolicy: normalizeString(policy.activeDeviceBudgetPolicy) || 'single_active_tab_no_double_count',
+                resetPolicy: normalizeString(policy.resetPolicy) || 'policy_timezone_midnight',
+                graceSeconds: normalizeNonNegativeInteger(policy.graceSeconds) || 0,
+                parentGrant: safeObject(policy.parentGrant),
+                validFrom: policy.validFrom == null ? null : normalizeNonNegativeInteger(policy.validFrom),
+                validUntil: policy.validUntil == null ? null : normalizeNonNegativeInteger(policy.validUntil)
+            };
         }
 
         function buildPayload(scope) {
             const normalizedScope = normalizeScope(scope);
             if (!normalizedScope) {
-                throw new Error('Signed managed sends currently require Main or Kids scope.');
+                throw new Error('Signed managed sends require a managed policy scope.');
             }
-            const profilesRoot = safeObject(deps.getProfilesRoot());
-            const profileId = normalizeString(deps.getLocalProfileContext().profileId) || 'default';
-            const profile = safeObject(safeObject(profilesRoot.profiles)[profileId]);
+            const source = resolvePolicySourceProfile();
+            const profile = safeObject(source.profile);
             if (!profile || Object.keys(profile).length === 0) {
                 throw new Error('Active profile is unavailable for managed policy send.');
+            }
+            const surface = resolvePayloadSurface(normalizedScope);
+            if (normalizedScope === 'keywords' || normalizedScope === 'channels') {
+                return buildListPayload(normalizedScope, profile, surface);
+            }
+            if (normalizedScope === 'videos') {
+                return {
+                    scope: 'videos',
+                    surface,
+                    replace: true,
+                    videoIds: cloneList(deps.getProfileSurface(profile, surface).videoIds)
+                };
+            }
+            if (normalizedScope === 'viewing_space') {
+                return buildViewingSpacePayload(profile);
+            }
+            if (normalizedScope === 'time_limits') {
+                return buildTimeLimitPayload(profile);
             }
             return {
                 scope: normalizedScope,
@@ -91,7 +220,7 @@
 
             const scope = normalizeScope(policy.scope);
             if (!scope) {
-                throw new Error('Signed managed sends currently support Main or Kids scope. Use a proposal for other scopes.');
+                throw new Error('Signed managed sends require Main, Kids, keyword, channel, video, viewing-space, or time-limit scope.');
             }
             const allowedScopes = deps.getAllowedScopeList(safeObject(trustedLink.policy).allowedScopes || safeObject(trustedLink.policy).defaultScope);
             if (!allowedScopes.includes(scope)) {

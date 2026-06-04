@@ -4383,7 +4383,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             keywords: Array.isArray(source.keywords) ? clonePlain(source.keywords, []) : (Array.isArray(source.blockedKeywords) ? clonePlain(source.blockedKeywords, []) : []),
             channels: Array.isArray(source.channels) ? clonePlain(source.channels, []) : (Array.isArray(source.blockedChannels) ? clonePlain(source.blockedChannels, []) : []),
             whitelistKeywords: Array.isArray(source.whitelistKeywords) ? clonePlain(source.whitelistKeywords, []) : [],
-            whitelistChannels: Array.isArray(source.whitelistChannels) ? clonePlain(source.whitelistChannels, []) : []
+            whitelistChannels: Array.isArray(source.whitelistChannels) ? clonePlain(source.whitelistChannels, []) : [],
+            videoIds: Array.isArray(source.videoIds) ? clonePlain(source.videoIds, []) : []
         };
     }
 
@@ -6131,7 +6132,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     function getNanahScope() {
         const raw = normalizeString(ftNanahScope?.value).toLowerCase();
         if (getActiveProfileType() === 'child' && raw === 'full') return 'active';
-        if (raw === 'main' || raw === 'kids' || raw === 'full' || raw === 'active') return raw;
+        if ([
+            'main',
+            'kids',
+            'full',
+            'active',
+            'videos',
+            'keywords',
+            'channels',
+            'viewing_space',
+            'time_limits'
+        ].includes(raw)) return raw;
         return 'active';
     }
 
@@ -6180,6 +6191,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                 'time_limits'
             ].includes(item));
         return Array.from(new Set(normalized));
+    }
+
+    function getNanahManagedSendScopeList(value) {
+        const list = Array.isArray(value) ? value : [value];
+        const normalized = list
+            .map((item) => normalizeString(item).toLowerCase())
+            .filter((item) => [
+                'active',
+                'main',
+                'kids',
+                'full',
+                'videos',
+                'keywords',
+                'channels',
+                'viewing_space',
+                'time_limits'
+            ].includes(item));
+        return normalized.length > 0 ? Array.from(new Set(normalized)) : ['active'];
     }
 
     function classifyNanahTrustedLink(localRole, remoteRole) {
@@ -6295,12 +6324,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         const normalized = normalizeString(scope).toLowerCase();
         if (normalized === 'main') return 'Only the main YouTube rules and lists.';
         if (normalized === 'kids') return 'Only the Kids profile rules and lists.';
+        if (normalized === 'keywords') return 'Only keyword rules from the selected Main or Kids surface.';
+        if (normalized === 'channels') return 'Only channel rules from the selected Main or Kids surface.';
+        if (normalized === 'videos') return 'Only blocked video IDs from the selected Main or Kids surface.';
+        if (normalized === 'viewing_space') return 'Only Main/Kids access policy for the protected profile.';
+        if (normalized === 'time_limits') return 'Only the protected profile daily YouTube time limit.';
         if (normalized === 'full') return 'The wider account snapshot, best for full migration.';
         return 'The currently active FilterTube profile snapshot.';
     }
 
     function describeNanahScopeList(scopes) {
-        return getNanahScopeList(scopes).map(getNanahScopeLabel).join(', ');
+        return getNanahManagedSendScopeList(scopes).map(getNanahScopeLabel).join(', ');
     }
 
     async function showNanahManagedLinkModal({
@@ -6321,8 +6355,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         forceFixedTargetProfile = false
     }) {
         const scopeOptions = showLockedChildMode
-            ? ['active', 'main', 'kids']
-            : ['active', 'main', 'kids', 'full'];
+            ? ['active', 'main', 'kids', 'keywords', 'channels', 'videos', 'viewing_space', 'time_limits']
+            : ['active', 'main', 'kids', 'keywords', 'channels', 'videos', 'viewing_space', 'time_limits', 'full'];
         const localProfileContext = getNanahLocalProfileContext();
 
         return new Promise((resolve) => {
@@ -6356,8 +6390,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 body.appendChild(introEl);
             }
 
-            const initialScopes = getNanahScopeList(initialPolicy.allowedScopes || initialPolicy.defaultScope || 'active');
-            const lockedScopes = getNanahScopeList(requiredScopes);
+            const initialScopes = getNanahManagedSendScopeList(initialPolicy.allowedScopes || initialPolicy.defaultScope || 'active');
+            const lockedScopes = getNanahManagedSendScopeList(requiredScopes);
             let initialDefaultScope = normalizeString(initialPolicy.defaultScope).toLowerCase();
             if (!initialScopes.includes(initialDefaultScope)) {
                 initialDefaultScope = initialScopes[0];
@@ -8652,7 +8686,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             && managedPolicy;
 
         if (isTrustedManagedSender) {
-            const allowedScopes = getNanahScopeList(managedPolicy.allowedScopes);
+            const allowedScopes = getNanahManagedSendScopeList(managedPolicy.allowedScopes);
             if (!allowedScopes.includes(selectedScope)) {
                 throw new Error(`This managed link only allows ${allowedScopes.map(getNanahScopeLabel).join(', ')} syncs`);
             }
@@ -8663,6 +8697,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 strategy: normalizeString(managedPolicy.applyMode).toLowerCase() === 'replace' ? 'replace' : 'merge',
                 allowedScopes
             };
+        }
+
+        if (['videos', 'keywords', 'channels', 'viewing_space', 'time_limits'].includes(selectedScope)) {
+            throw new Error('Keyword, channel, video, viewing-space, and time-limit sends require a saved Source -> Replica managed link.');
         }
 
         return {
@@ -8679,7 +8717,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const parsed = safeObject(JSON.parse(root.payload));
         parsed.authorityMode = policy.authorityMode;
         parsed.linkType = policy.linkType;
-        parsed.allowedScopes = getNanahScopeList(policy.allowedScopes);
+        parsed.allowedScopes = getNanahManagedSendScopeList(policy.allowedScopes);
         parsed.strategy = policy.strategy;
         const explicitRemoteTarget = getNanahSelectedRemoteTargetProfile();
         if (explicitRemoteTarget) {
@@ -8696,13 +8734,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         return root;
     }
 
+    function getNanahActiveManagedSurface() {
+        const activeView = normalizeString(document.body?.dataset?.activeView)
+            || normalizeString(document.documentElement?.dataset?.activeView)
+            || normalizeString(document.querySelector('.nav-item.active')?.getAttribute('data-tab'));
+        return activeView === 'kids' ? 'kids' : 'main';
+    }
+
+    function getNanahManagedPolicySourceProfile() {
+        const managedProfile = getManagedChildProfile();
+        const managedProfileId = normalizeString(managedChildEdit?.profileId);
+        if (managedProfileId && managedProfile && Object.keys(safeObject(managedProfile)).length > 0) {
+            return {
+                profileId: managedProfileId,
+                profile: managedProfile,
+                sourceKind: 'managed_child_edit'
+            };
+        }
+        const profilesRoot = safeObject(profilesV4Cache);
+        const profileId = normalizeString(profilesRoot.activeProfileId) || activeProfileId || 'default';
+        return {
+            profileId,
+            profile: safeObject(safeObject(profilesRoot.profiles)[profileId]),
+            sourceKind: 'active_profile'
+        };
+    }
+
     const nanahManagedLivePolicy = window.FilterTubeNanahManagedLivePolicy?.create({
         normalizeString,
         safeObject,
         normalizeNonNegativeInteger,
         getProfilesRoot: () => profilesV4Cache,
         getLocalProfileContext: getNanahLocalProfileContext,
+        getPolicySourceProfile: getNanahManagedPolicySourceProfile,
+        getActiveManagedSurface: getNanahActiveManagedSurface,
         getProfileSurface,
+        getManagedTimeLimitPolicy,
         normalizeTrustedLink: normalizeNanahTrustedLink,
         getTargetProfileBehavior: getNanahTargetProfileBehavior,
         normalizeTargetProfileContext: normalizeNanahTargetProfileContext,
@@ -8722,7 +8789,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function resolveTrustedNanahManagedApply(details, trustedLink) {
         const policy = getManagedNanahLinkPolicy(trustedLink);
         if (!policy) return null;
-        const allowedScopes = getNanahScopeList(policy.allowedScopes);
+        const allowedScopes = getNanahManagedSendScopeList(policy.allowedScopes);
         if (!allowedScopes.includes(details.scope)) {
             return {
                 ok: false,

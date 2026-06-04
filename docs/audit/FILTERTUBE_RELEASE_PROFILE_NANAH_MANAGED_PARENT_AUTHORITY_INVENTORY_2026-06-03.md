@@ -6,16 +6,16 @@ failed-unlock history, protected history access, time-limit enforcement, and
 receive-side managed-policy validation/history proofs updated, with encrypted
 mailbox protocol proof specified, managed pairing public-key descriptor
 persistence added, source-side managed signing keypair provisioning plus
-adapter signing helper added, and eligible fixed-target Main/Kids managed live
-send added. Runtime behavior changed for protected child Main/Kids denial, accepted same-device
+adapter signing helper added, and eligible fixed-target Main/Kids plus granular
+managed live send added. Runtime behavior changed for protected child Main/Kids denial, accepted same-device
 parent-managed child saves, protected parent unlock-failure evidence,
 parent/account history viewing, accepted-row history clearing, dashboard and
 background admin-session expiry, sensitive managed-action re-auth, in-memory
 managed/admin failed-attempt rate limiting, child time-budget enforcement,
 managed-envelope validation/classification, managed-policy receive/apply
 evidence, managed public-key descriptor pairing, source signing-key
-provisioning, and eligible signed Main/Kids live managed-policy sends.
-Active/full signed conversion, dedicated managed-scope outbound UI, mailbox
+provisioning, and eligible signed Main/Kids/granular live managed-policy sends.
+Active/full signed conversion, richer granular surface-picking UI, mailbox
 runtime, and local-network discovery runtime remain pending.
 **Goal slice**: Implementation order item 1 plus first runtime viewing-space
 enforcement slice.
@@ -32,7 +32,7 @@ viewing-space denial, local protected history access, active child time-budget
 enforcement from local profile settings, receive-side managed-policy
 validation history, managed pairing public-key descriptor persistence,
 source-side managed signing keypair provisioning with an adapter signing helper,
-and eligible fixed-target Main/Kids live signed-send support.
+and eligible fixed-target Main/Kids plus granular live signed-send support.
 
 This document still does not approve remote policy writes by itself. The first
 managed-envelope validator, validated apply wrapper, receive-side
@@ -41,10 +41,14 @@ and the validator requires signature-verification evidence. Dashboard
 WebCrypto verifier plumbing now exists when a trusted link carries source
 public-key material. Pairing-time public-key descriptor persistence exists, and
 source/parent Nanah sessions can provision local managed signing key material.
-Eligible fixed-target Main/Kids live sends can now build signed managed-policy
-envelopes. Active/full signed conversion, dedicated managed-scope outbound UI,
-encrypted/local-network delivery runtime, failed-attempt durability, and remote
-admin session semantics remain separate required slices.
+Eligible fixed-target Main/Kids, keyword, channel, video, viewing-space, and
+time-limit live sends can now build signed managed-policy envelopes. Granular
+rule sends use the dashboard's active Main/Kids surface, and parent-managed
+child edit mode can provide the child-policy payload source while the parent
+profile remains signing authority. Active/full signed conversion, richer
+granular surface-picking UI, encrypted/local-network delivery runtime,
+failed-attempt durability, and remote admin session semantics remain separate
+required slices.
 
 ## Issue 60 Local-Network Caregiver Addendum
 
@@ -263,7 +267,8 @@ Authority meaning:
       `sourcePublicKeyJwk` material exists, validated apply dispatch, and
       accepted/rejected apply history.
     - The dashboard send path can now build signed `filtertube_managed_policy`
-      envelopes for fixed-target Main/Kids Source -> Replica managed links.
+      envelopes for fixed-target Main/Kids, keyword, channel, video,
+      viewing-space, and time-limit Source -> Replica managed links.
 
 Current gap:
 
@@ -275,11 +280,11 @@ Current gap:
     - The signature verifier gate and adapter verifier helper exist. Pairing can
       persist source public-key descriptor material, source sessions can now
       provision a local managed signing keypair plus public descriptor, and
-      eligible fixed-target Main/Kids managed live sends now use signed envelopes.
-      Active/full signed conversion and dedicated managed-scope outbound UI remain
-      pending. Without trusted stored public-key material, the receive path still
-      rejects otherwise well-shaped managed envelopes rather than treating them as
-      valid.
+      eligible fixed-target Main/Kids and granular managed live sends now use
+      signed envelopes. Active/full signed conversion and richer granular
+      surface-picking UI remain pending. Without trusted stored public-key
+      material, the receive path still rejects otherwise well-shaped managed
+      envelopes rather than treating them as valid.
 - The adapter's validated apply wrapper still depends on higher layers for
   canonical hash recomputation, key lookup, local-network pull scheduling,
   encrypted mailbox runtime delivery, and remote admin session semantics.
@@ -329,7 +334,8 @@ Current gap:
     - There is now a signature verifier gate plus adapter WebCrypto verifier
       helper, Nanah pairing can persist trusted source public-key descriptors,
       source sessions can provision managed signing keypairs, and eligible
-      fixed-target Main/Kids live signed policy construction is wired.
+      fixed-target Main/Kids and granular live signed policy construction is
+      wired.
 - Trust revocation does not yet purge queued updates or invalidate an accepted
   policy revision. The encrypted mailbox protocol now specifies revoked queued
   delivery behavior, but no runtime queue exists yet.
@@ -408,10 +414,10 @@ Current gap:
 |---|---|---|
 | Validated managed policy apply wrapper | Remote apply can now persist a durable accepted-revision object for a fixed child target, but only when a caller supplies accepted validation context. | Key-store/WebCrypto verifier plumbing and live Nanah/local-network receive tests before automatic remote apply. |
 | Target-local remote revision store | Stale or replayed remote updates can now be rejected per target profile/link/scope after the first accepted write, but there is no mailbox or multi-device conflict-resolution layer yet. | Multi-parent, revoked-link, equal-revision/different-hash, and mailbox-delivery fixtures. |
-| Pairing public-key descriptor, source keypair provisioning, and eligible live signed send present | The helper now requires verifier evidence, adapter WebCrypto verification is wired, Nanah pairing can persist advertised source public-key descriptors, source sessions can provision local managed signing keypairs, and fixed-target Main/Kids managed live sends build signed `filtertube_managed_policy` envelopes. Active/full sends and dedicated keyword/channel/video/time-limit outbound UI still remain proposal/spec work. | Authenticated two-device live-delivery smoke, dedicated managed-scope outbound fixtures, rotation/revocation, and active/full conversion policy. |
+| Pairing public-key descriptor, source keypair provisioning, and eligible live signed send present | The helper now requires verifier evidence, adapter WebCrypto verification is wired, Nanah pairing can persist advertised source public-key descriptors, source sessions can provision local managed signing keypairs, and fixed-target Main/Kids, keyword, channel, video, viewing-space, and time-limit managed live sends build signed `filtertube_managed_policy` envelopes. Active/full sends and richer granular surface-picking UI still remain proposal/spec work. | Authenticated two-device live-delivery smoke, signed granular live-delivery smoke, rotation/revocation, and active/full conversion policy. |
 | Partial canonical payload/integrity binding | The helper checks binding fields and verifier result, but no canonical payload hash recomputation exists yet. | Binding-tuple fixtures plus canonical payload hash proof. |
-| Signed remote Main/Kids policy gate is partially live | Fixed-target Main/Kids managed Nanah sends can now travel as signed envelopes and receive-side code validates before apply. Viewing-space and time-limit signed outbound UI are still pending. | Installed two-device Main/Kids smoke plus dedicated signed route-policy fixtures. |
-| Remote time-limit policy apply is wrapper-only | Local child time-budget enforcement exists and accepted managed envelopes can write runtime-compatible time-limit policy, but live parent-device delivery is not wired. | Signed remote time-limit fixtures through Nanah/local-network receive. |
+| Signed remote managed-policy gate is partially live | Fixed-target Main/Kids, keyword, channel, video, viewing-space, and time-limit managed Nanah sends can now travel as signed envelopes and receive-side code validates before apply. Active/full signed conversion, mailbox delivery, and richer granular surface picking are still pending. | Installed two-device Main/Kids and granular smoke plus dedicated signed route/time policy fixtures. |
+| Remote time-limit policy apply is wrapper-backed and live-send eligible | Local child time-budget enforcement exists and accepted managed envelopes can write runtime-compatible time-limit policy; the source send path can now emit signed live time-limit envelopes when the profile has a saved time limit. | Installed two-device signed remote time-limit smoke through Nanah/local-network receive. |
 | Adapter depends on caller trust context | `validateManagedPolicyEnvelope(...)` depends on caller-supplied trusted-link/profile/revision/signature context; the wrapper rechecks stored profiles before writing but does not fetch trust keys itself. | Keep dashboard receive context and add pairing key lookup/revocation fixtures before automatic apply. |
 | Locked-child bypass has no revision binding | `allow_trusted_updates` can skip unlock for matching managed sessions, but not with policy revision constraints. | Locked child managed-policy fixtures. |
 | Mailbox protocol specified, runtime absent | Offline later delivery now has a ciphertext-only protocol and replay/ack proof fixture, but no mailbox client, pull scheduler, ack writer, or server path exists. | Pairing key persistence plus signed live-delivery tests before mailbox runtime work. |

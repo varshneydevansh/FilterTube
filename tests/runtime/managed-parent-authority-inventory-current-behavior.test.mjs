@@ -116,7 +116,7 @@ test('Nanah scoped apply has target-profile writes plus receive-side managed env
   assert.match(doc, /signature verifier gate and adapter verifier helper exist/i);
   assert.match(doc, /Pairing-time public-key descriptor persistence exists/i);
   assert.match(doc, /source\/parent Nanah sessions can provision local managed signing key material/i);
-  assert.match(doc, /fixed-target Main\/Kids managed live sends build signed `filtertube_managed_policy` envelopes/i);
+  assert.match(doc, /fixed-target Main\/Kids, keyword, channel, video,\s+viewing-space, and time-limit managed live sends build signed `filtertube_managed_policy`\s+envelopes/i);
 });
 
 test('viewing-space route gate and first time-limit runtime enforcement are runtime-backed', () => {

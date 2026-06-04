@@ -15,13 +15,15 @@ path from an unsigned managed `control_proposal` into a signed
 - the remote role is `replica`;
 - a saved `managed_link` exists;
 - the link allows the selected scope;
-- the selected scope is `main` or `kids`;
+- the selected scope is `main`, `kids`, `keywords`, `channels`, `videos`,
+  `viewing_space`, or `time_limits`;
 - the replica side has saved a fixed child target profile;
 - the source has a complete local managed signing keypair.
 
-All other live sends continue through the existing proposal path. This avoids
+All unsupported live sends continue through the existing proposal path. This avoids
 silently widening older `active` or `full` trusted-link policy into multiple
-signed child-policy writes.
+signed child-policy writes, while allowing focused parent-control rule,
+viewing-space, and time-limit updates to travel as signed managed policy.
 
 ## Source Boundary
 
@@ -37,11 +39,11 @@ flowchart TD
   A["Parent selects Send"] --> B["Existing profile unlock/auth gate"]
   B --> C{"Saved managed Source -> Replica link?"}
   C -->|No| D["Send existing control_proposal"]
-  C -->|Yes| E{"Scope is Main or Kids?"}
+  C -->|Yes| E{"Scope is managed policy scope?"}
   E -->|No| D
   E -->|Yes| F{"Replica fixed child target known?"}
   F -->|No| D
-  F -->|Yes| G["Build Main/Kids policy payload"]
+  F -->|Yes| G["Build surface, rule, viewing-space, or time-limit payload"]
   G --> H["Compute outbound policy hash and revision"]
   H --> I["Sign envelope with managed keypair"]
   I --> J["Send filtertube_managed_policy"]
@@ -51,14 +53,20 @@ flowchart TD
 
 ## Behavior Boundary
 
-Eligible fixed-target Main/Kids managed live sends are now present for managed
-policy snapshots. This is not a mailbox runtime, local-network discovery
-runtime, key-rotation system, or offline later-delivery mechanism.
+Eligible fixed-target Main/Kids and granular managed live sends are now present
+for managed policy snapshots. Granular keyword, channel, and video payloads use
+the dashboard's active Main/Kids surface, defaulting to Main outside those
+editing views. When parent-managed child edit mode is active, the payload source
+is the edited child profile while the envelope authority remains the parent
+source profile.
+
+This is not a mailbox runtime, local-network discovery runtime, key-rotation
+system, or offline later-delivery mechanism.
 
 Still pending:
 
-- dedicated outbound controls for keyword-only, channel-only, video-only,
-  viewing-space, and time-limit managed envelopes;
+- dedicated richer outbound controls for choosing a different granular surface
+  without switching the dashboard view;
 - active/full proposal conversion policy;
 - installed-extension two-device smoke proof;
 - key rotation/revocation UI;

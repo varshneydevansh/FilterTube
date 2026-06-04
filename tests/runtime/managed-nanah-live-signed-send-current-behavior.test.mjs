@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import vm from 'node:vm';
 
 const repoRoot = process.cwd();
 const tabViewPath = 'js/tab-view.js';
@@ -16,6 +17,134 @@ function read(relativePath) {
   return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
 }
 
+function plain(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function loadManagedLivePolicyFactory() {
+  const context = { window: {} };
+  vm.runInNewContext(read(managedLivePolicyPath), context);
+  return context.window.FilterTubeNanahManagedLivePolicy.create;
+}
+
+function createManagedLivePolicyHarness({ activeSurface = 'main', sourceProfile = null, allowedScopes = ['main', 'kids', 'keywords', 'channels', 'videos', 'viewing_space', 'time_limits'] } = {}) {
+  const parentProfile = sourceProfile || {
+    settings: {
+      allowMainViewing: false,
+      allowKidsViewing: true,
+      defaultLaunchTarget: 'kids',
+      timeLimitPolicy: {
+        schema: 'filtertube_managed_time_limit',
+        version: 1,
+        enabled: true,
+        timezone: 'Asia/Kolkata',
+        dailyBudgetSeconds: 5400,
+        surfaceBudgets: { main: 0, kids: 5400 },
+        countingMode: 'active_youtube_tab',
+        activeDeviceBudgetPolicy: 'single_active_tab_no_double_count',
+        resetPolicy: 'policy_timezone_midnight',
+        graceSeconds: 30,
+        parentGrant: { enabled: false, extraSeconds: 0, expiresAt: null, reason: '' },
+        policyRevision: 2,
+        policyHash: 'local-time-limit-hash',
+        issuedAt: 1779300000000,
+        validFrom: 1779300000000,
+        validUntil: null
+      }
+    },
+    main: {
+      mode: 'blocklist',
+      keywords: [{ word: 'shakira' }],
+      channels: [{ id: 'UC-shakira', name: 'Shakira' }],
+      whitelistKeywords: [],
+      whitelistChannels: [],
+      videoIds: ['video-main-1']
+    },
+    kids: {
+      mode: 'whitelist',
+      blockedKeywords: [],
+      blockedChannels: [],
+      whitelistKeywords: [{ word: 'science' }],
+      whitelistChannels: [{ id: 'UC-science', name: 'Science' }],
+      videoIds: ['video-kids-1']
+    }
+  };
+  const trustedLink = {
+    linkType: 'managed_link',
+    localRole: 'source',
+    remoteRole: 'replica',
+    linkId: 'link-parent-child-1',
+    policy: {
+      allowedScopes,
+      targetProfileBehavior: 'fixed_profile',
+      targetProfileId: 'child-profile-1',
+      targetProfileName: 'Child'
+    }
+  };
+  const create = loadManagedLivePolicyFactory();
+  const helper = create({
+    normalizeString(value) {
+      return typeof value === 'string' ? value.trim() : '';
+    },
+    safeObject(value) {
+      return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+    },
+    normalizeNonNegativeInteger(value) {
+      const num = typeof value === 'number' ? value : Number(value);
+      return Number.isInteger(num) && num >= 0 ? num : null;
+    },
+    getProfilesRoot: () => ({ profiles: { 'parent-profile-1': parentProfile } }),
+    getLocalProfileContext: () => ({ profileId: 'parent-profile-1', profileName: 'Parent' }),
+    getPolicySourceProfile: () => ({ profileId: 'child-profile-local-copy', profile: parentProfile, sourceKind: 'managed_child_edit' }),
+    getActiveManagedSurface: () => activeSurface,
+    getProfileSurface(profile, surface) {
+      const key = surface === 'kids' ? 'kids' : 'main';
+      return profile[key] || {};
+    },
+    getManagedTimeLimitPolicy(profile) {
+      return profile.settings?.timeLimitPolicy || null;
+    },
+    normalizeTrustedLink: (link) => link,
+    getTargetProfileBehavior: (value) => value === 'fixed_profile' ? 'fixed_profile' : 'current_active',
+    normalizeTargetProfileContext: (value) => value || {},
+    getRemoteTargetProfile: () => null,
+    buildLocalPolicyHash: (prefix, seed) => `${prefix}-${String(seed).length}`,
+    getCurrentTrustedLink: () => trustedLink,
+    getAllowedScopeList: (value) => Array.isArray(value) ? value : [value],
+    getScopeLabel: (scope) => scope,
+    ensureSigningKeyPair: async () => ({
+      managedPublicKeyId: 'managed-key-1',
+      managedKeyVersion: 1,
+      privateKeyJwk: { kty: 'OKP', crv: 'Ed25519', d: 'private', x: 'public' }
+    }),
+    getStableDeviceId: () => 'parent-device-1',
+    findTrustedLinkById: () => trustedLink,
+    updateTrustedLinkPolicy: async (linkId, patch) => ({ linkId, patch, ok: true }),
+    getAdapter: () => ({
+      async signManagedPolicyEnvelope(envelope) {
+        return {
+          ...envelope,
+          integrity: {
+            algorithm: 'ed25519',
+            signature: 'signature',
+            signedFields: {
+              linkId: envelope.linkId,
+              scope: envelope.scope,
+              targetProfileId: envelope.targetProfileId,
+              sourceDeviceId: envelope.sourceDeviceId,
+              revision: envelope.revision,
+              policyHash: envelope.policyHash,
+              payloadScope: envelope.payload.scope
+            }
+          }
+        };
+      }
+    }),
+    now: () => 1779300000000
+  });
+  return { helper, parentProfile, trustedLink };
+}
+
 test('managed live signed-send audit is linked without claiming mailbox runtime', () => {
   const doc = read(docPath);
   const signingDoc = read(signingDocPath);
@@ -23,12 +152,12 @@ test('managed live signed-send audit is linked without claiming mailbox runtime'
   const inventory = read(inventoryPath);
 
   assert.match(doc, /Eligible live-session source send runtime slice/);
-  assert.match(doc, /fixed-target Main\/Kids managed live sends/);
-  assert.match(doc, /All other live sends continue through the existing proposal path/);
-  assert.match(doc, /not a mailbox runtime, local-network discovery\s+runtime, key-rotation system, or offline later-delivery mechanism/);
+  assert.match(doc, /fixed-target Main\/Kids and granular managed live sends/);
+  assert.match(doc, /All unsupported live sends continue through the existing proposal path/);
+  assert.match(doc, /not a mailbox runtime, local-network discovery runtime, key-rotation\s+system, or offline later-delivery mechanism/);
   assert.match(signingDoc, new RegExp(docPath));
   assert.match(plan, new RegExp(docPath));
-  assert.match(inventory, /fixed-target Main\/Kids managed live sends build signed `filtertube_managed_policy` envelopes/);
+  assert.match(inventory, /fixed-target Main\/Kids, keyword, channel, video, viewing-space, and time-limit managed live sends build signed `filtertube_managed_policy` envelopes/);
 });
 
 test('dashboard builds signed managed envelopes only after source link scope target and key gates', () => {
@@ -36,8 +165,11 @@ test('dashboard builds signed managed envelopes only after source link scope tar
 
   assert.match(source, /global\.FilterTubeNanahManagedLivePolicy = \{ create \}/);
   assert.match(source, /function normalizeScope\(scope\)/);
-  assert.match(source, /return normalized === 'main' \|\| normalized === 'kids' \? normalized : ''/);
+  assert.match(source, /MANAGED_LIVE_POLICY_SCOPES\.includes\(normalized\)/);
   assert.match(source, /function resolveTargetProfile\(trustedLink\)/);
+  assert.match(source, /function buildListPayload\(scope, profile, surface\)/);
+  assert.match(source, /function buildViewingSpacePayload\(profile\)/);
+  assert.match(source, /function buildTimeLimitPayload\(profile\)/);
   assert.match(source, /async function buildEnvelopeForLiveSend\(policy\)/);
   assert.match(source, /if \(!trustedLink \|\| trustedLink\.linkType !== 'managed_link'\)/);
   assert.match(source, /if \(trustedLink\.localRole !== 'source' \|\| trustedLink\.remoteRole !== 'replica'\)/);
@@ -62,6 +194,85 @@ test('managed source send uses signed envelope before proposal fallback and reco
   assert.match(sendButtonBlock, /return;\s+\}\s+let envelope = await adapter\.buildControlProposal/);
   assert.match(source, /window\.FilterTubeNanahManagedLivePolicy\?\.create/);
   assert.match(read(managedLivePolicyPath), /outgoingManagedPolicies/);
+});
+
+test('managed live signed-send helper builds granular parent-control payloads from selected surface', async () => {
+  const { helper } = createManagedLivePolicyHarness({ activeSurface: 'main' });
+
+  assert.deepEqual(plain(helper.buildPayload('keywords')), {
+    scope: 'keywords',
+    surface: 'main',
+    list: 'blocklist',
+    replace: true,
+    keywords: [{ word: 'shakira' }]
+  });
+  assert.deepEqual(plain(helper.buildPayload('channels')), {
+    scope: 'channels',
+    surface: 'main',
+    list: 'blocklist',
+    replace: true,
+    channels: [{ id: 'UC-shakira', name: 'Shakira' }]
+  });
+  assert.deepEqual(plain(helper.buildPayload('videos')), {
+    scope: 'videos',
+    surface: 'main',
+    replace: true,
+    videoIds: ['video-main-1']
+  });
+  assert.deepEqual(plain(helper.buildPayload('viewing_space')), {
+    scope: 'viewing_space',
+    allowMain: false,
+    allowKids: true,
+    defaultLaunchTarget: 'kids'
+  });
+  assert.deepEqual(plain(helper.buildPayload('time_limits')), {
+    scope: 'time_limits',
+    enabled: true,
+    timezone: 'Asia/Kolkata',
+    dailyBudgetMinutes: 90,
+    dailyBudgetSeconds: 5400,
+    surfaceBudgets: { main: 0, kids: 5400 },
+    countingMode: 'active_youtube_tab',
+    activeDeviceBudgetPolicy: 'single_active_tab_no_double_count',
+    resetPolicy: 'policy_timezone_midnight',
+    graceSeconds: 30,
+    parentGrant: { enabled: false, extraSeconds: 0, expiresAt: null, reason: '' },
+    validFrom: 1779300000000,
+    validUntil: null
+  });
+
+  const envelope = await helper.buildEnvelopeForLiveSend({ scope: 'channels' });
+  assert.equal(envelope.type, 'filtertube_managed_policy');
+  assert.equal(envelope.scope, 'channels');
+  assert.equal(envelope.targetProfileId, 'child-profile-1');
+  assert.equal(envelope.sourceProfileId, 'parent-profile-1');
+  assert.deepEqual(plain(envelope.payload.channels), [{ id: 'UC-shakira', name: 'Shakira' }]);
+  assert.equal(envelope.integrity.signedFields.payloadScope, 'channels');
+});
+
+test('managed live signed-send helper uses Kids surface for granular scopes when selected', () => {
+  const { helper } = createManagedLivePolicyHarness({ activeSurface: 'kids' });
+
+  assert.deepEqual(plain(helper.buildPayload('keywords')), {
+    scope: 'keywords',
+    surface: 'kids',
+    list: 'whitelist',
+    replace: true,
+    whitelistKeywords: [{ word: 'science' }]
+  });
+  assert.deepEqual(plain(helper.buildPayload('channels')), {
+    scope: 'channels',
+    surface: 'kids',
+    list: 'whitelist',
+    replace: true,
+    whitelistChannels: [{ id: 'UC-science', name: 'Science' }]
+  });
+  assert.deepEqual(plain(helper.buildPayload('videos')), {
+    scope: 'videos',
+    surface: 'kids',
+    replace: true,
+    videoIds: ['video-kids-1']
+  });
 });
 
 test('settings lane includes managed live signed-send regression proof', () => {

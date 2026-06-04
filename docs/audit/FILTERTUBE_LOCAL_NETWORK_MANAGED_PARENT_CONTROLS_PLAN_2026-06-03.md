@@ -411,9 +411,10 @@ replica child device over Nanah/P2P or same-network transport.
   sending the Nanah hello, public descriptors are mirrored into
   `ftNanahManagedSigningPublicKey`, private JWK material stays under
   `ftNanahManagedSigningKeyPair`, and source-side managed link saves require a
-  local signing key. Eligible fixed-target Main/Kids dashboard live sends now
-  build signed `filtertube_managed_policy` envelopes; active/full sends and
-  dedicated keyword/channel/video/time-limit outbound UI remain later slices.
+  local signing key. Eligible fixed-target Main/Kids plus keyword, channel,
+  video, viewing-space, and time-limit dashboard live sends now build signed
+  `filtertube_managed_policy` envelopes; active/full sends and richer
+  granular surface-picking UI remain later slices.
 - **Acceptance Criteria**:
   - The public descriptor is separated from the private keypair.
   - The private JWK is not placed in the Nanah hello descriptor or trusted link
@@ -425,24 +426,29 @@ replica child device over Nanah/P2P or same-network transport.
   - `node --test tests/runtime/managed-nanah-signing-keypair-current-behavior.test.mjs`
   - `npm run test:settings`
 
-### Task 3.6: Send eligible managed Main/Kids policies as signed live envelopes
+### Task 3.6: Send eligible managed policies as signed live envelopes
 
 - **Location**:
   - `js/tab-view.js`
   - `docs/audit/FILTERTUBE_NANAH_MANAGED_LIVE_SIGNED_SEND_2026-06-04.md`
   - `tests/runtime/managed-nanah-live-signed-send-current-behavior.test.mjs`
-- **Description**: Convert saved Source -> Replica managed Main/Kids sends to
-  signed `filtertube_managed_policy` envelopes once the replica has a fixed
-  child target profile and the source has a complete signing keypair.
+- **Description**: Convert saved Source -> Replica managed Main/Kids and
+  granular rule/viewing/time-limit sends to signed `filtertube_managed_policy`
+  envelopes once the replica has a fixed child target profile and the source
+  has a complete signing keypair.
 - **Complexity**: 6/10
 - **Dependencies**: Task 3.5.
-- **Status**: Implemented for live Main/Kids scope only. Active/full proposal
-  sends, mailbox delivery, arbitrary keyword/channel/video outbound UI,
-  viewing-space outbound UI, and time-limit outbound UI remain pending.
+- **Status**: Implemented for live Main/Kids, keyword, channel, video,
+  viewing-space, and time-limit scope. Granular rule scopes use the dashboard's
+  active Main/Kids surface and can source payloads from parent-managed child
+  edit mode. Active/full proposal sends, mailbox delivery, local-network
+  delivery, and richer granular surface-picking controls remain pending.
 - **Acceptance Criteria**:
-  - Existing proposal sends still work for unsupported scopes.
+  - Existing proposal sends still work for unsupported active/full scopes.
   - Signed sends require saved managed link, Source -> Replica roles, allowed
     scope, fixed child target, and signing keypair material.
+  - Non-managed peer sends reject keyword/channel/video/viewing/time-limit
+    scopes instead of silently converting them to active-profile proposals.
   - Outbound revision/hash state is persisted per trusted link and scope.
   - Receive path still validates before apply.
 - **Validation**:

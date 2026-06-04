@@ -18,7 +18,7 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/tab-view.js` | 12728 | 582754 | `3b24857f2207c3787fdc1bfa6400aacc0747c8fb9f54aa2bbc57fc00da3c53b3` |
+| `js/tab-view.js` | 12795 | 585960 | `3e52cf1b3b189450bb9f7b3a6ae7adb833ddc29d90a8564164314f53ced79109` |
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/io_manager.js` | 2097 | 100479 | `f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62` |
 | `js/background.js` | 6711 | 301840 | `b27206ec2b6927fc33f823c4832ff95ace7c97bd4284eb950fc5964baf666346` |
@@ -45,13 +45,13 @@ background profile storage invalidation block: 42 lines, 1464 bytes
 tab-view ensureProfileUnlocked tokens: 18
 tab-view saveProfilesV4 tokens: 37
 tab-view loadProfilesV4 tokens: 62
-tab-view activeProfileId tokens: 75
+tab-view activeProfileId tokens: 77
 tab-view StateManager.loadSettings tokens: 8
 tab-view refreshProfilesUI tokens: 21
 tab-view applyLockGateIfNeeded tokens: 4
 tab-view scheduleAutoBackup tokens: 6
 tab-view profile_created tokens: 2
-tab-view managedChildEdit tokens: 12
+tab-view managedChildEdit tokens: 13
 tab-view unlockedProfiles tokens: 4
 tab-view clearProfileUnlockSession tokens: 6
 tab-view allowMainViewing tokens: 4

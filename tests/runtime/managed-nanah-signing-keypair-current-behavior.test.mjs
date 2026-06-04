@@ -74,7 +74,7 @@ test('managed signing keypair audit is linked without overclaiming broad remote 
   assert.match(doc, /ftNanahManagedSigningKeyPair/);
   assert.match(doc, /ftNanahManagedSigningPublicKey/);
   assert.match(doc, /privateKeyJwk/);
-  assert.match(doc, /eligible fixed-target Main\/Kids managed sends now use signed managed-policy\s+envelopes/);
+  assert.match(doc, /eligible fixed-target Main\/Kids, keyword, channel, video, viewing-space, and\s+time-limit managed sends now use signed managed-policy envelopes/);
   assert.match(doc, /does not claim hardware-backed, non-extractable, encrypted-at-rest, or\s+password-wrapped private key storage/);
   assert.match(doc, /active\/full sync conversion into signed managed-policy envelopes/);
   assert.match(plan, new RegExp(docPath));
@@ -210,6 +210,6 @@ test('managed signing slice does not overclaim mailbox or broad signed-send runt
   assert.doesNotMatch(source, /managedPolicyOutbox/);
   assert.doesNotMatch(source, /FilterTubeManagedMailbox/);
   assert.match(source, /buildEnvelopeForLiveSend/);
-  assert.match(doc, /eligible fixed-target Main\/Kids managed sends now use signed managed-policy\s+envelopes/);
+  assert.match(doc, /eligible fixed-target Main\/Kids, keyword, channel, video, viewing-space, and\s+time-limit managed sends now use signed managed-policy envelopes/);
   assert.match(doc, /local-network or mailbox delivery runtime/);
 });
