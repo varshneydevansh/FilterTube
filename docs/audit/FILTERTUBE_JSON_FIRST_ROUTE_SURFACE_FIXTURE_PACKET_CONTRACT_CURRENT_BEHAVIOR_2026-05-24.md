@@ -23,9 +23,9 @@ Route/surface metric obligations covered: 12
 Fixture mode classes required: 8
 Fixture evidence classes required: 14
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5797
+Method semantic proof gap lexical callables covered: 5812
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5797
+Lexical callables requiring semantic proof before behavior changes: 5812
 Runtime JSON-first fixture packet approvals: 0
 Committed route/surface fixture packet files: 0
 Implementation-ready JSON-first fixture packet rows: 0
@@ -60,9 +60,9 @@ fixture evidence classes required: 14
 JSON-first implementation authority rows covered: 13
 first optimization implementation readiness rows covered: 14
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5797
+method semantic proof gap lexical callables covered: 5812
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5797
+lexical callables requiring semantic proof before behavior changes: 5812
 runtime JSON-first fixture packet approvals: 0
 runtime route/surface metric artifacts: 0
 runtime metric collector approvals: 0

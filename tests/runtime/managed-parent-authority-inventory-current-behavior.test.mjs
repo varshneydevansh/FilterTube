@@ -13,7 +13,7 @@ function read(relativePath) {
 test('managed parent authority inventory tracks implemented route gate and pending authority areas', () => {
   const doc = read(docPath);
 
-  assert.match(doc, /Status\*\*: Runtime route-gate, local managed-save revision\/history, protected\s+history access, and time-limit enforcement proofs updated/);
+  assert.match(doc, /Status\*\*: Runtime route-gate, local managed-save revision\/history, protected\s+history access, time-limit enforcement, and validation-only managed-policy\s+envelope proofs updated/);
   assert.match(doc, /Runtime behavior\s+changed/);
   assert.match(doc, /Lane proof\*\*: `test:settings`/);
   assert.match(doc, /`test:release`/);
@@ -58,7 +58,7 @@ test('session PIN authority remains trusted-ui gated and memory scoped', () => {
   assert.match(doc, /Current PIN authority is local and session-scoped/);
 });
 
-test('Nanah scoped apply currently has target-profile writes but no durable managed policy revision contract', () => {
+test('Nanah scoped apply has target-profile writes plus validation-only managed envelope support', () => {
   const doc = read(docPath);
   const adapter = read('js/nanah_sync_adapter.js');
   const tabView = read('js/tab-view.js');
@@ -73,14 +73,17 @@ test('Nanah scoped apply currently has target-profile writes but no durable mana
   assert.match(tabView, /function resolveNanahLocalTargetProfile\(trustedLink, profilesV4 = profilesV4Cache\)/);
   assert.match(tabView, /trusted\.localRole !== 'replica' \|\| trusted\.remoteRole !== 'source'/);
   assert.match(tabView, /function resolveTrustedNanahManagedApply\(details, trustedLink\)/);
+  assert.match(adapter, /function validateManagedPolicyEnvelope\(envelope, context = \{\}\)/);
+  assert.match(adapter, /Managed policy envelopes require validated managed apply flow/);
 
   const runtime = [adapter, tabView, read('js/io_manager.js'), read('js/background.js')].join('\n');
-  assert.doesNotMatch(runtime, /filtertube_managed_policy/);
+  assert.match(runtime, /filtertube_managed_policy/);
   assert.doesNotMatch(runtime, /managedPolicyRevisionStore/);
 
+  assert.match(doc, /validation-only managed policy envelope helper/i);
   assert.match(doc, /no remote managed policy revision store/i);
-  assert.match(doc, /There is no stale\/replay rejection/);
-  assert.match(doc, /There is no signed managed policy envelope/);
+  assert.match(doc, /There is still no persisted stale\/replay rejection state/);
+  assert.match(doc, /There is no cryptographic signature verification yet/);
 });
 
 test('viewing-space route gate and first time-limit runtime enforcement are runtime-backed', () => {

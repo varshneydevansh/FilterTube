@@ -92,9 +92,9 @@ collector parity rollout rows covered: 12
 evidence parity rollout rows covered: 2
 parity and release boundary source docs covered: 8
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5797
+method semantic proof gap lexical callables covered: 5812
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5797
+lexical callables requiring semantic proof before behavior changes: 5812
 inline parity rollout JSON sections covered: 12
 inline parity rollout artifact promotion decision: NO-GO
 parity rollout draft closure rows: 12
@@ -115,7 +115,7 @@ collector readiness families linked by parity closure: 5
 evidence parity rollout rows linked by parity closure: 2
 parity and release boundary source docs linked by parity closure: 8
 method semantic proof gap files linked by parity closure: 69
-lexical callables linked by parity closure: 5797
+lexical callables linked by parity closure: 5812
 runtime parity rollout closure approvals: 0
 implementation-ready parity rollout closure rows: 0
 parity rollout draft closure: PARITY-ROLLOUT-CHAIN-CLOSED

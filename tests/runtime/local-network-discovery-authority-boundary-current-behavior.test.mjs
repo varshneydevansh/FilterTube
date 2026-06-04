@@ -140,24 +140,26 @@ function rejectedHistoryRow(reason, overrides = {}) {
   };
 }
 
-test('local-network discovery authority boundary is contract-only and linked from plan and inventory', () => {
+test('local-network discovery authority boundary is validation-backed and linked from plan and inventory', () => {
   const doc = read(docPath);
   const plan = read(planPath);
   const inventory = read(inventoryPath);
   const source = runtimeSource();
 
-  assert.match(doc, /Status\*\*: Contract\/proof fixture only/);
-  assert.match(doc, /Runtime behavior is unchanged/);
+  assert.match(doc, /Status\*\*: Managed-policy validation helper present/);
+  assert.match(doc, /Runtime local-network\s+discovery behavior is unchanged/);
   assert.match(doc, /Local-network discovery is convenience only/);
   assert.match(doc, /Boundary Rows/);
   assert.match(doc, /Hostile LAN Threat Model/);
   assert.match(doc, /No-Work And Performance Boundary/);
   assert.match(doc, /runtime local-network discovery authority gate: absent/);
-  assert.match(doc, /runtime behavior changed by this contract: no/);
+  assert.match(doc, /runtime filtertube_managed_policy envelope validator: present/);
+  assert.match(doc, /runtime behavior changed by this contract: validation helper only/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
 
-  assert.doesNotMatch(source, /filtertube_managed_policy/);
+  assert.match(source, /function validateManagedPolicyEnvelope\(envelope, context = \{\}\)/);
+  assert.match(source, /Managed policy envelopes require validated managed apply flow/);
   assert.doesNotMatch(source, /FilterTubeLocalNetworkDiscovery/);
   assert.doesNotMatch(source, /managedLanDiscovery/);
   assert.doesNotMatch(source, /localNetworkPolicyApply/);

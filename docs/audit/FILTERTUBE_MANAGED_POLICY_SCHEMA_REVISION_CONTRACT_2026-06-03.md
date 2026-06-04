@@ -1,7 +1,10 @@
 # Contract: Managed Policy Schema And Revision Gate
 
 **Generated**: 2026-06-03  
-**Status**: Contract/proof fixture only. Runtime behavior is unchanged.  
+**Status**: Runtime validation helper present. Remote managed profile writes
+are still blocked until persistent revision state, cryptographic signature
+verification, action-history accept/reject rows, and a managed apply wrapper
+exist.
 **Goal slice**: Implementation order item 3, "Add managed policy schema,
 device-binding, signature, and revision tests".  
 **Primary input**:
@@ -13,9 +16,11 @@ This contract defines the minimum `filtertube_managed_policy` envelope that a
 future Nanah P2P, local-network, or encrypted-mailbox update must satisfy before
 FilterTube applies remote parent/caregiver policy to a protected profile.
 
-The current product source does not apply this envelope yet. This file and its
-paired runtime test are the gate that later implementation must satisfy before
-runtime writes are enabled.
+The current product source validates this envelope shape in
+`js/nanah_sync_adapter.js`, and the legacy portable-payload apply path refuses
+to apply `filtertube_managed_policy` envelopes directly. This file and its
+paired runtime test remain the gate that later implementation must satisfy
+before remote runtime writes are enabled.
 
 ## Managed Envelope Shape
 
@@ -149,18 +154,21 @@ The paired runtime test must reject:
 
 ## Runtime Boundary
 
-Current product behavior remains unchanged:
+Current product behavior has the first validation-only runtime helper, but it
+still does not apply remote policy writes:
 
 ```text
-runtime filtertube_managed_policy envelope support: absent
-runtime managed policy revision store: absent
-runtime managed policy signature verification: absent
-runtime behavior changed by this contract: no
+runtime filtertube_managed_policy envelope support: validation helper present in js/nanah_sync_adapter.js
+runtime managed policy persistent revision store: absent
+runtime managed policy signature verification: integrity binding presence check only; cryptographic verification pending
+runtime remote profile write from filtertube_managed_policy: blocked through legacy applyIncomingEnvelope
+runtime behavior changed by this contract: validation-only envelope classification and legacy-path rejection
 ```
 
 Future implementation may use `FilterTubeNanahAdapter.applyScopedPortablePayload`
 as the low-level profile write primitive only after this managed envelope
-contract accepts the incoming update.
+contract accepts the incoming update and the caller records persistent revision
+state plus protected action-history rows.
 
 ## Verification
 

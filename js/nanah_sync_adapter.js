@@ -3,6 +3,16 @@
 
     const APP_ID = 'filtertube';
     const PAYLOAD_VERSION = 'v3';
+    const MANAGED_POLICY_ENVELOPE_TYPE = 'filtertube_managed_policy';
+    const MANAGED_POLICY_ALLOWED_SCOPES = [
+        'main',
+        'kids',
+        'videos',
+        'keywords',
+        'channels',
+        'viewing_space',
+        'time_limits'
+    ];
     const DEFAULT_DEVICE_CAPABILITIES = [
         'sync.send',
         'sync.receive',
@@ -21,12 +31,189 @@
         return 'active';
     }
 
+    function normalizeManagedPolicyScope(scope) {
+        const raw = normalizeString(scope).toLowerCase();
+        return MANAGED_POLICY_ALLOWED_SCOPES.includes(raw) ? raw : '';
+    }
+
     function safeObject(value) {
         return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
     }
 
     function safeArray(value) {
         return Array.isArray(value) ? value : [];
+    }
+
+    function validationResult(reason, extra = {}) {
+        return { accepted: false, reason, ...extra };
+    }
+
+    function getManagedPayloadScopeFamily(payload) {
+        const root = safeObject(payload);
+        const explicitScope = normalizeManagedPolicyScope(root.scope);
+        if (explicitScope) return explicitScope;
+        const operations = safeArray(root.operations);
+        const firstOperation = normalizeString(operations[0]?.op).toLowerCase();
+        if (firstOperation.includes('keyword')) return 'keywords';
+        if (firstOperation.includes('channel')) return 'channels';
+        if (firstOperation.includes('video')) return 'videos';
+        if (Object.prototype.hasOwnProperty.call(root, 'dailyBudgetMinutes') || root.timeLimitPolicy) return 'time_limits';
+        if (
+            root.viewingSpace
+            || Object.prototype.hasOwnProperty.call(root, 'allowMain')
+            || Object.prototype.hasOwnProperty.call(root, 'allowKids')
+            || Object.prototype.hasOwnProperty.call(root, 'defaultLaunchTarget')
+        ) {
+            return 'viewing_space';
+        }
+        return '';
+    }
+
+    function validateManagedPayloadScope(scope, payload) {
+        const family = getManagedPayloadScopeFamily(payload);
+        if (!family) return validationResult('payload_scope_unknown');
+        if (family !== scope) return validationResult('payload_scope_mismatch');
+        const root = safeObject(payload);
+        const operations = safeArray(root.operations);
+        if (scope === 'keywords' && operations.some(operation => !normalizeString(operation?.op).toLowerCase().includes('keyword'))) {
+            return validationResult('payload_scope_mismatch');
+        }
+        if (scope === 'channels' && operations.some(operation => !normalizeString(operation?.op).toLowerCase().includes('channel'))) {
+            return validationResult('payload_scope_mismatch');
+        }
+        if (scope === 'videos' && operations.some(operation => !normalizeString(operation?.op).toLowerCase().includes('video'))) {
+            return validationResult('payload_scope_mismatch');
+        }
+        if (
+            scope === 'time_limits'
+            && !(Number.isInteger(root.dailyBudgetMinutes) && root.dailyBudgetMinutes >= 0)
+            && !root.timeLimitPolicy
+        ) {
+            return validationResult('invalid_time_limit_payload');
+        }
+        if (
+            scope === 'viewing_space'
+            && !(root.viewingSpace
+                || Object.prototype.hasOwnProperty.call(root, 'allowMain')
+                || Object.prototype.hasOwnProperty.call(root, 'allowKids')
+                || Object.prototype.hasOwnProperty.call(root, 'defaultLaunchTarget'))
+        ) {
+            return validationResult('invalid_viewing_space_payload');
+        }
+        return null;
+    }
+
+    function validateManagedIntegrityBinding(envelope) {
+        const signed = safeObject(safeObject(envelope.integrity).signedFields);
+        if (Object.keys(signed).length === 0) return validationResult('missing_integrity_binding');
+        for (const field of ['linkId', 'scope', 'targetProfileId', 'sourceDeviceId', 'revision', 'policyHash']) {
+            if (signed[field] !== envelope[field]) return validationResult(`integrity_${field}_mismatch`);
+        }
+        if (signed.payloadScope !== getManagedPayloadScopeFamily(envelope.payload)) {
+            return validationResult('integrity_payload_scope_mismatch');
+        }
+        return null;
+    }
+
+    function managedPolicyProfileMap(context) {
+        return safeObject(context.profiles || safeObject(context.profilesV4).profiles);
+    }
+
+    function getAcceptedManagedPolicyState(context) {
+        const accepted = safeObject(context.accepted);
+        if (Number.isInteger(accepted.revision) && normalizeString(accepted.policyHash)) return accepted;
+        return null;
+    }
+
+    function validateManagedPolicyEnvelope(envelope, context = {}) {
+        const root = safeObject(envelope);
+        const trustedLink = safeObject(context.trustedLink);
+        if (!root || Object.keys(root).length === 0) return validationResult('missing_envelope');
+        if (root.type !== MANAGED_POLICY_ENVELOPE_TYPE) return validationResult('wrong_type');
+        for (const field of [
+            'linkId',
+            'scope',
+            'targetProfileId',
+            'sourceProfileId',
+            'sourceDeviceId',
+            'revision',
+            'policyHash',
+            'sourcePublicKeyId',
+            'keyVersion',
+            'integrity',
+            'payload'
+        ]) {
+            if (root[field] === undefined || root[field] === null || root[field] === '') {
+                return validationResult(`missing_${field}`);
+            }
+        }
+
+        const scope = normalizeManagedPolicyScope(root.scope);
+        if (!scope) return validationResult('scope_not_allowed');
+        if (!Number.isInteger(root.revision) || root.revision <= 0) return validationResult('invalid_revision');
+        if (!Number.isInteger(root.keyVersion) || root.keyVersion <= 0) return validationResult('invalid_keyVersion');
+        if (!root.integrity?.algorithm || !root.integrity?.signature) return validationResult('missing_integrity');
+
+        const payloadDecision = validateManagedPayloadScope(scope, root.payload);
+        if (payloadDecision) return payloadDecision;
+        const integrityDecision = validateManagedIntegrityBinding(root);
+        if (integrityDecision) return integrityDecision;
+
+        if (trustedLink.type !== 'managed_link') return validationResult('link_not_managed');
+        if (trustedLink.localRole !== 'replica' || trustedLink.remoteRole !== 'source') return validationResult('wrong_link_roles');
+        if (trustedLink.revoked) return validationResult('link_revoked');
+        if (trustedLink.keyRevoked) return validationResult('key_revoked');
+        if (trustedLink.stalePairing) return validationResult('stale_pairing');
+        if (root.linkId !== trustedLink.id && root.linkId !== trustedLink.linkId) return validationResult('wrong_link_id');
+        if (root.sourceDeviceId !== trustedLink.sourceDeviceId) return validationResult('wrong_source_device');
+        if (safeArray(context.duplicateDeviceIds).includes(root.sourceDeviceId)) return validationResult('duplicate_source_device_id');
+        if (root.sourceProfileId !== trustedLink.sourceProfileId) return validationResult('wrong_source_profile');
+        if (root.targetProfileId !== trustedLink.targetProfileId) return validationResult('wrong_target_profile');
+        if (!safeArray(trustedLink.allowedScopes).includes(scope) && !safeArray(safeObject(trustedLink.policy).allowedScopes).includes(scope)) {
+            return validationResult('scope_not_allowed');
+        }
+        if (root.sourcePublicKeyId !== trustedLink.sourcePublicKeyId) return validationResult('wrong_public_key');
+        if (root.keyVersion !== trustedLink.keyVersion) return validationResult('wrong_key_version');
+
+        const profiles = managedPolicyProfileMap(context);
+        const sourceProfile = safeObject(profiles[root.sourceProfileId]);
+        const targetProfile = safeObject(profiles[root.targetProfileId]);
+        if (!sourceProfile || Object.keys(sourceProfile).length === 0 || sourceProfile.type === 'child') {
+            return validationResult('source_not_parent_authority');
+        }
+        if (!targetProfile || Object.keys(targetProfile).length === 0 || targetProfile.type !== 'child') {
+            return validationResult('target_not_protected_child');
+        }
+        if (normalizeString(targetProfile.parentProfileId) !== root.sourceProfileId) {
+            return validationResult('source_not_bound_to_target');
+        }
+
+        const accepted = getAcceptedManagedPolicyState(context);
+        if (accepted) {
+            if (root.revision < accepted.revision) return validationResult('stale_revision');
+            if (root.revision === accepted.revision && root.policyHash !== accepted.policyHash) {
+                return validationResult('equal_revision_hash_conflict');
+            }
+            if (root.revision === accepted.revision && root.policyHash === accepted.policyHash) {
+                return {
+                    accepted: true,
+                    decision: 'idempotent_same_hash',
+                    scope,
+                    targetProfileId: root.targetProfileId,
+                    revision: root.revision,
+                    policyHash: root.policyHash
+                };
+            }
+        }
+
+        return {
+            accepted: true,
+            decision: 'accept_newer_revision',
+            scope,
+            targetProfileId: root.targetProfileId,
+            revision: root.revision,
+            policyHash: root.policyHash
+        };
     }
 
     function parsePackedChannelKeywordSource(sourceValue) {
@@ -352,6 +539,9 @@
 
     function extractPortableFromEnvelope(envelope) {
         const root = safeObject(envelope);
+        if (root.type === MANAGED_POLICY_ENVELOPE_TYPE) {
+            throw new Error('Managed policy envelopes require validated managed apply flow');
+        }
         if (root.t === 'app_sync') {
             return {
                 scope: normalizeScope(root.scope),
@@ -427,6 +617,7 @@
         buildPortablePayload,
         buildSyncEnvelope,
         buildControlProposal,
+        validateManagedPolicyEnvelope,
         applyIncomingEnvelope,
         extractPortableFromEnvelope
     };

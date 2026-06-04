@@ -135,10 +135,10 @@ test('extension asset data package surface doc is audit-only and fingerprint pin
   assert.match(read('icons/file.svg'), /viewBox="0 0 128 128"/);
   assert.match(read('icons/icon-128.svg'), /width="128" height="128"/);
 
-  assert.match(methodGap, /repo-wide lexical callables: 5797/);
+  assert.match(methodGap, /repo-wide lexical callables: 5812/);
   assert.match(methodGap, /files with lexical accounting: 69/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5797/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5812/);
 
   assert.equal(staticGeneratedAssetFamilyDocs.length, 14);
   for (const familyDocPath of staticGeneratedAssetFamilyDocs) {
@@ -146,9 +146,9 @@ test('extension asset data package surface doc is audit-only and fingerprint pin
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 69/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5797/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5812/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5797/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5812/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     assert.match(familyDoc, /runtime behavior changed: no/);
     assert.match(familyDoc, /do not approve runtime\s+optimization/);

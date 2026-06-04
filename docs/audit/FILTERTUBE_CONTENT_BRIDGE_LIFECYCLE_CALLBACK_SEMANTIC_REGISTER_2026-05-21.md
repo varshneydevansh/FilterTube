@@ -208,9 +208,9 @@ can support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5797
+method semantic proof gap lexical callables covered: 5812
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5797
+lexical callables requiring semantic proof before behavior changes: 5812
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

@@ -1,7 +1,8 @@
 # Contract: Local-Network Discovery Authority Boundary
 
 **Generated**: 2026-06-04  
-**Status**: Contract/proof fixture only. Runtime behavior is unchanged.  
+**Status**: Managed-policy validation helper present. Runtime local-network
+discovery behavior is unchanged.
 **Goal slice**: Implementation order item 2, "Add local-network/P2P
 managed-control plan and hostile-LAN threat model".  
 **Primary inputs**:
@@ -84,16 +85,17 @@ Current product runtime state:
 ```text
 runtime local-network discovery authority gate: absent
 runtime local-network peer discovery: absent
-runtime filtertube_managed_policy envelope support: absent
+runtime filtertube_managed_policy envelope validator: present in js/nanah_sync_adapter.js
 runtime managed policy revision store: absent
 runtime managed action-history writer: absent
-runtime behavior changed by this contract: no
+runtime behavior changed by this contract: validation helper only; no LAN discovery and no remote write
 ```
 
 Existing Nanah profile-scoped `app_sync` and `control_proposal` paths are not
 promoted to managed policy authority by this document. They remain lower-level
-transport/apply primitives until a managed-policy validator and action-history
-writer are implemented.
+transport/apply primitives until a managed apply wrapper, persistent revision
+store, cryptographic signature verification, and action-history writer are
+implemented.
 
 ## Verification
 

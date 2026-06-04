@@ -4389,7 +4389,7 @@ flowchart TD
 | `lifecycle_convergence_mode_surface_budget` | Empty, active, mobile/coarse, whitelist, watch, YTM, and Kids surfaces | Empty desktop observer proof is partial; active blocklist, mobile/coarse, whitelist, watch/YTM/Kids, and DOM fallback active work all remain separate budget classes. | One successful empty-desktop slice cannot authorize active-rule, mobile, whitelist, watch, YTM, or Kids lifecycle pruning. |
 | `lifecycle_convergence_teardown_effect_budget` | Lifecycle effect budget and teardown decision register | Existing docs identify missing shared runtime authority before observers, listeners, timers, frames, and page-global patches can be reduced. | Local gates and local cleanup are not equivalent to a route-scoped lifecycle teardown authority. |
 | `lifecycle_convergence_menu_overlay_timing` | Native menu, fallback menu, quick-block, fullscreen, and native-overlay timing | Native dropdown repair, outside-pointer close, fallback-menu scans, quick-block viewport work, and fullscreen/native-overlay quiet gates remain separate implementations. | The comment 3-dot/menu regressions prove menu-node reuse and overlay state can break if lifecycle cleanup is too broad. |
-| `lifecycle_convergence_method_json_dependency` | Method semantic and JSON path dependencies | Method proof still has 69 tracked JS/JSX/MJS files, 5,797 lexical callables, 0 complete per-callable proof files, and JSON path proof still blocks JSON-first promotion. | Lifecycle pruning can hide or leak content unless callable effects and JSON/DOM parity are proven for affected owners. |
+| `lifecycle_convergence_method_json_dependency` | Method semantic and JSON path dependencies | Method proof still has 69 tracked JS/JSX/MJS files, 5,812 lexical callables, 0 complete per-callable proof files, and JSON path proof still blocks JSON-first promotion. | Lifecycle pruning can hide or leak content unless callable effects and JSON/DOM parity are proven for affected owners. |
 | `lifecycle_convergence_authority_absence` | Missing runtime authority symbols | Product source still lacks one lifecycle effect/owner/teardown authority for listeners, observers, timers, route pause, native overlay pause, and no-rule counters. | Authority absence keeps lifecycle cleanup, runtime optimization, release claims, and goal completion at NO-GO. |
 
 Current lifecycle convergence status:
@@ -4461,9 +4461,9 @@ runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5797
+method semantic proof gap lexical callables covered: 5812
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5797
+lexical callables requiring semantic proof before behavior changes: 5812
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

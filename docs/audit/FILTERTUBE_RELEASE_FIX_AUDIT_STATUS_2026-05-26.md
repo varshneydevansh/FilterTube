@@ -818,13 +818,13 @@ runtime behavior changed: no
 
 This continuation is audit-only. It reconciles older ledger text that still
 used stale lexical callable counts with the current method semantic proof
-gap index, which records `5,797` lexical callables across 69 tracked
+gap index, which records `5,812` lexical callables across 69 tracked
 JS/JSX/MJS files. The behavior map did not change; this is a proof-ledger
 freshness update so optimization decisions read one current count.
 
 ```text
 callable proof gap count before reconciliation: stale older counts in prior ledgers
-current callable proof gap index: 5,797
+current callable proof gap index: 5,812
 docs/audit and tests/runtime stale callable strings remaining: 0
 focused audit verifier after reconciliation: 761/761 pass
 fingerprint verifier after hash refresh: 6/6 pass

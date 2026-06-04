@@ -2,11 +2,12 @@
 
 **Generated**: 2026-06-03  
 **Status**: Runtime route-gate, local managed-save revision/history, protected
-history access, and time-limit enforcement proofs updated. Runtime behavior
-changed for protected child Main/Kids denial, accepted same-device
-parent-managed child saves, parent/account history viewing, accepted-row
-history clearing, and child time-budget enforcement; remote-policy apply
-remains pending.
+history access, time-limit enforcement, and validation-only managed-policy
+envelope proofs updated. Runtime behavior changed for protected child Main/Kids
+denial, accepted same-device parent-managed child saves, parent/account history
+viewing, accepted-row history clearing, child time-budget enforcement, and
+managed-envelope validation/classification; remote-policy apply remains
+pending.
 **Goal slice**: Implementation order item 1 plus first runtime viewing-space
 enforcement slice.
 **Lane proof**: `test:settings` for profile/Nanah authority and `test:release`
@@ -21,9 +22,10 @@ managed-control system is being built. It now includes extension runtime
 viewing-space denial, local protected history access, and active child
 time-budget enforcement from local profile settings.
 
-This document still does not approve remote policy writes by itself. Signed
-managed policy envelopes, remote revision/replay stores, remote accept/reject
-history rows, and failed-auth history remain separate required slices.
+This document still does not approve remote policy writes by itself. The first
+managed-envelope validator now exists, but persistent remote revision/replay
+stores, cryptographic signature verification, remote accept/reject history
+rows, and failed-auth history remain separate required slices.
 
 ## Issue 60 Local-Network Caregiver Addendum
 
@@ -202,6 +204,14 @@ Current behavior:
   extracts an `app_sync` or `control_proposal` payload, supports preview, and
   forwards profile-scoped `main` or `kids` work to
   `applyScopedPortablePayload(...)`.
+- `validateManagedPolicyEnvelope(envelope, context)` now validates a
+  `filtertube_managed_policy` envelope against trusted-link role, source device,
+  source profile, target profile, allowed scope, key id, key version, payload
+  family, integrity binding, and supplied revision state.
+- `extractPortableFromEnvelope(...)` rejects `filtertube_managed_policy`
+  envelopes with `Managed policy envelopes require validated managed apply
+  flow`, so the old portable-payload path cannot accidentally mutate a profile
+  from the new envelope type.
 
 Authority meaning:
 
@@ -209,14 +219,21 @@ Authority meaning:
 - It is suitable as a future lower-level apply primitive after an upper-layer
   managed policy envelope validates trust, scope, target, revision, and
   integrity.
+- The adapter now provides the first validation-only managed envelope helper,
+  but that helper is not a persistent policy authority and does not write
+  profiles.
 
 Current gap:
 
-- The adapter itself does not validate managed link identity.
-- The adapter itself does not know trusted source role, replica target role,
-  locked-child mode, revision, replay state, or signature integrity.
-- The adapter supports `app_sync` and `control_proposal`; it does not yet
-  support a `filtertube_managed_policy` envelope.
+- The adapter validates link/profile/scope/device/key/revision inputs only from
+  caller-supplied context; there is still no remote managed policy revision
+  store.
+- There is still no persisted stale/replay rejection state.
+- There is no cryptographic signature verification yet; the first helper checks
+  integrity field presence and binding tuple consistency.
+- The adapter supports validation-only `filtertube_managed_policy` handling,
+  but there is still no managed apply wrapper that records accepted/rejected
+  history and then calls the low-level scoped write primitive.
 
 ### Nanah managed link policy
 
@@ -252,10 +269,12 @@ Authority meaning:
 
 Current gap:
 
-- There is no monotonic managed policy revision.
-- There is no stale/replay rejection.
-- There is no per-target policy hash idempotency check.
-- There is no signed managed policy envelope.
+- The first validation-only managed policy envelope helper exists in
+  `js/nanah_sync_adapter.js`.
+- There is no persisted monotonic managed policy revision.
+- There is still no persisted stale/replay rejection state.
+- There is no stored per-target policy hash idempotency state.
+- There is no cryptographic signature verification yet.
 - Trust revocation does not yet purge queued updates or invalidate an accepted
   policy revision because those structures do not exist yet.
 
@@ -331,13 +350,13 @@ Current gap:
 
 | Gap | Risk | Required next proof |
 |---|---|---|
-| No managed policy envelope | Remote apply can only be governed by UI/trusted-link policy, not a durable policy object. | Schema and validation tests before runtime writes. |
+| Validation-only managed policy envelope helper | Remote apply still cannot use a durable policy object because there is no managed apply wrapper or persistent revision state. | Managed apply wrapper plus accepted/rejected history rows before runtime writes. |
 | No remote revision store | Stale or replayed remote updates cannot be rejected as a first-class rule. Local same-device managed saves now have local revision metadata only. | Monotonic revision fixtures per parent/source and child target. |
-| No signature/integrity check | Trust is link/session-policy based, not envelope-authenticated. | Signed/authenticated envelope tests. |
-| No canonical payload/integrity binding | A signed-looking update could otherwise carry a different scope, target, source device, revision, hash, or payload family than the policy being applied. | Binding-tuple fixtures for link, scope, target, source, revision, policy hash, and payload family. |
+| No cryptographic signature verification | Trust is link/session-policy plus validation-field based, not cryptographically authenticated yet. | Signed/authenticated envelope tests. |
+| Partial canonical payload/integrity binding | The helper checks binding fields, but no real signature verification or canonical hash recomputation exists yet. | Binding-tuple fixtures plus cryptographic verification and canonical payload hash proof. |
 | No signed remote Main/Kids policy gate | Local child route denial now works, but remote updates are still not envelope/revision-bound. | Managed policy envelope, revision store, and Nanah/local-network apply wrapper before remote route-policy writes. |
 | No remote time-limit policy apply | Local child time-budget enforcement exists, but parent/caregiver device updates are still not envelope/revision-bound. | Managed policy envelope, revision store, and remote time-limit fixtures before Nanah/local-network writes. |
-| Adapter lacks trust context | `applyIncomingEnvelope(...)` applies after caller-side checks. | Upper-layer managed policy apply wrapper before adapter call. |
+| Adapter lacks persisted trust context | `validateManagedPolicyEnvelope(...)` depends on caller-supplied trusted-link/profile/revision context and `applyIncomingEnvelope(...)` still applies legacy payloads after caller-side checks. | Upper-layer managed policy apply wrapper before adapter call. |
 | Locked-child bypass has no revision binding | `allow_trusted_updates` can skip unlock for matching managed sessions, but not with policy revision constraints. | Locked child managed-policy fixtures. |
 | No mailbox protocol | Offline later delivery is not specified at runtime. | Ciphertext/replay/ack protocol doc before server work. |
 | No local-network management contract | Same-network discovery could be mistaken for authority. | Separate discovery, pairing, transport, and policy-authority proof. |

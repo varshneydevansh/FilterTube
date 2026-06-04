@@ -68,9 +68,9 @@ test('DOM lifecycle and runtime observer docs carry the method proof gap blocker
     assert.ok(doc.includes('## Method Semantic Proof Gap Boundary'), `${docPath} missing method proof gap section`);
     assert.ok(doc.includes(methodGapPath), `${docPath} missing method proof gap source path`);
     assert.match(doc, /method semantic proof gap files covered: 69/, `${docPath} missing file count`);
-    assert.match(doc, /method semantic proof gap lexical callables covered: 5797/, `${docPath} missing callable count`);
+    assert.match(doc, /method semantic proof gap lexical callables covered: 5812/, `${docPath} missing callable count`);
     assert.match(doc, /files with complete per-callable semantic proof: 0/, `${docPath} missing complete proof count`);
-    assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5797/, `${docPath} missing required proof count`);
+    assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5812/, `${docPath} missing required proof count`);
     assert.match(doc, /affected callable semantic proof: NO-GO/, `${docPath} missing callable NO-GO`);
     assert.match(doc, /runtime behavior changed: no/, `${docPath} missing runtime unchanged boundary`);
     assert.match(doc, /do not approve runtime optimization/, `${docPath} missing audit-only approval warning`);

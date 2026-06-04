@@ -218,8 +218,10 @@ revision and action-history entry.
 - **Complexity**: 4/10
 - **Dependencies**: Task 2.1.
 - **Status**: Action-history model and access-control fixture updated. Product
-  runtime now writes accepted local managed child save rows only; remote
-  rejected/conflict rows, access UI, and clear path remain pending.
+  runtime now writes accepted local managed child save rows, exposes
+  parent/account-only protected history access, and clears accepted rows while
+  preserving protected evidence. Remote rejected/conflict rows and failed
+  unlock rows remain pending.
 - **Acceptance Criteria**:
   - Rows include actor profile, actor device, target profile, action type,
     policy revision, timestamp, result, and redacted summary.
@@ -279,6 +281,11 @@ replica child device over Nanah/P2P or same-network transport.
   trust state.
 - **Complexity**: 6/10
 - **Dependencies**: Sprint 1.
+- **Status**: Runtime validation helper added in `js/nanah_sync_adapter.js`.
+  The helper validates trusted-link/profile/scope/device/key/revision inputs
+  and integrity binding fields from caller-supplied context. Persistent
+  revision storage, real cryptographic verification, and profile writes remain
+  pending.
 - **Acceptance Criteria**:
   - Trusted source to fixed child target passes.
   - Peer mode, sibling target, missing fixed target, stale revision, wrong
@@ -300,6 +307,11 @@ replica child device over Nanah/P2P or same-network transport.
   target, scope, revision, and integrity.
 - **Complexity**: 8/10
 - **Dependencies**: Task 3.1 and Task 2.2.
+- **Status**: Partially started. The adapter now rejects
+  `filtertube_managed_policy` envelopes from the legacy portable apply path
+  with `Managed policy envelopes require validated managed apply flow`. The
+  managed apply wrapper, revision persistence, and remote accepted/rejected
+  action-history writer are still pending.
 - **Acceptance Criteria**:
   - Existing `app_sync` and `control_proposal` behavior remains compatible.
   - New managed policy applies only to target profile and target surface.
@@ -320,7 +332,9 @@ replica child device over Nanah/P2P or same-network transport.
 - **Complexity**: 3/10
 - **Dependencies**: Task 3.1.
 - **Status**: Boundary contract and hostile-LAN proof fixture added. Product
-  runtime behavior remains unchanged.
+  runtime local-network discovery behavior remains unchanged. Managed-policy
+  envelope validation exists, but it does not implement discovery or remote
+  writes.
 - **Acceptance Criteria**:
   - Discovery, pairing, transport, and policy authority are separate rows.
   - Network reachability failure has clear offline behavior.

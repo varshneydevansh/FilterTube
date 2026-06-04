@@ -45,6 +45,18 @@ function groupForMethod(name) {
   if (['buildScopedPortablePayload', 'applyScopedPortablePayload'].includes(name)) {
     return 'nanahScopedPortableProfileTransfer';
   }
+  if ([
+    'normalizeManagedPolicyScope',
+    'validationResult',
+    'getManagedPayloadScopeFamily',
+    'validateManagedPayloadScope',
+    'validateManagedIntegrityBinding',
+    'managedPolicyProfileMap',
+    'getAcceptedManagedPolicyState',
+    'validateManagedPolicyEnvelope'
+  ].includes(name)) {
+    return 'nanahManagedPolicyEnvelopeValidation';
+  }
   if (['generateId', 'getIO', 'getDeviceDescriptor'].includes(name)) {
     return 'nanahAdapterRuntimeAndDescriptor';
   }
@@ -140,34 +152,35 @@ function productRuntimeSource() {
 test('Nanah sync adapter method semantic register is audit-only and scoped to current behavior', () => {
   const text = doc();
 
-  assert.match(text, /Status: audit-only current-behavior register/);
-  assert.match(text, /Runtime behavior is unchanged/);
+  assert.match(text, /Status: runtime managed-policy validation boundary present/);
+  assert.match(text, /Runtime behavior changed for\s+validation-only managed envelope support/);
   assert.match(text, /source file: js\/nanah_sync_adapter\.js/);
-  assert.match(text, /line count: 433/);
-  assert.equal(sourceLineCount(), 433);
-  assert.match(text, /named declarations: 24/);
-  assert.match(text, /plain function declarations: 17/);
+  assert.match(text, /line count: 624/);
+  assert.equal(sourceLineCount(), 624);
+  assert.match(text, /named declarations: 32/);
+  assert.match(text, /plain function declarations: 25/);
   assert.match(text, /async function declarations: 7/);
   assert.match(text, /const arrow helper declarations: 0/);
-  assert.match(text, /public FilterTubeNanahAdapter entries: 10/);
-  assert.match(text, /semantic method groups: 5/);
-  assert.match(text, /runtime behavior changed: no/);
-  assert.match(text, /not completion proof for trusted-link sender class/);
+  assert.match(text, /public FilterTubeNanahAdapter entries: 11/);
+  assert.match(text, /semantic method groups: 6/);
+  assert.match(text, /runtime behavior changed: validation-only managed envelope support/);
+  assert.match(text, /not completion proof for persistent remote revision storage/);
 });
 
 test('Nanah sync adapter register accounts for every current named declaration', () => {
   const rows = methodRows();
 
-  assert.equal(rows.length, 24);
+  assert.equal(rows.length, 32);
   assert.deepEqual(countBy(rows, 'kind'), {
     'async function': 7,
-    function: 17
+    function: 25
   });
   assert.deepEqual(countBy(rows, 'group'), {
     nanahAdapterRuntimeAndDescriptor: 3,
     nanahDefensiveNormalizationAndMerge: 13,
     nanahEnvelopeBuildAndSummary: 4,
     nanahIncomingEnvelopeApply: 2,
+    nanahManagedPolicyEnvelopeValidation: 8,
     nanahScopedPortableProfileTransfer: 2
   });
 
@@ -195,6 +208,7 @@ test('Nanah sync adapter register preserves every source row and public API entr
     'buildPortablePayload',
     'buildSyncEnvelope',
     'buildControlProposal',
+    'validateManagedPolicyEnvelope',
     'applyIncomingEnvelope',
     'extractPortableFromEnvelope'
   ]) {
@@ -207,13 +221,13 @@ test('Nanah sync adapter register pins import export envelope and no-DOM surface
   const text = doc();
 
   assert.equal(countLiteral(source, 'new Map('), 2);
-  assert.equal(countLiteral(source, 'safeArray('), 16);
-  assert.equal(countLiteral(source, 'safeObject('), 25);
-  assert.equal(countLiteral(source, 'normalizeString('), 30);
+  assert.equal(countLiteral(source, 'safeArray('), 21);
+  assert.equal(countLiteral(source, 'safeObject('), 37);
+  assert.equal(countLiteral(source, 'normalizeString('), 37);
   assert.equal(countLiteral(source, 'normalizeScope('), 6);
   assert.equal(countLiteral(source, 'JSON.stringify('), 3);
   assert.equal(countLiteral(source, 'JSON.parse('), 3);
-  assert.equal(countLiteral(source, 'throw new Error('), 8);
+  assert.equal(countLiteral(source, 'throw new Error('), 9);
   assert.equal(countLiteral(source, 'await io.loadProfilesV4'), 2);
   assert.equal(countLiteral(source, 'await io.saveProfilesV4'), 1);
   assert.equal(countLiteral(source, 'await io.exportV3'), 1);
@@ -238,13 +252,13 @@ test('Nanah sync adapter register pins import export envelope and no-DOM surface
 
   for (const token of [
     'new Map calls: 2',
-    'safeArray references: 16',
-    'safeObject references: 25',
-    'normalizeString references: 30',
+    'safeArray references: 21',
+    'safeObject references: 37',
+    'normalizeString references: 37',
     'normalizeScope references: 6',
     'JSON.stringify calls: 3',
     'JSON.parse calls: 3',
-    'throw new Error statements: 8',
+    'throw new Error statements: 9',
     'await io.loadProfilesV4 calls: 2',
     'await io.saveProfilesV4 calls: 1',
     'await io.exportV3 calls: 1',
@@ -289,6 +303,62 @@ test('Nanah sync adapter source still proves current payload and apply boundarie
   assert.equal(adapter.payloadVersion, 'v3');
   assert.deepEqual(JSON.parse(JSON.stringify(adapter.supportedScopes)), ['main', 'kids', 'active', 'full']);
   assert.equal(adapter.getDeviceDescriptor({ deviceId: 'dev-1', deviceLabel: 'Desk', appVersion: '3.3.1' }).deviceLabel, 'Desk');
+  assert.equal(typeof adapter.validateManagedPolicyEnvelope, 'function');
+
+  const managedEnvelope = {
+    type: 'filtertube_managed_policy',
+    linkId: 'link-parent-child-1',
+    scope: 'keywords',
+    targetProfileId: 'child-profile-1',
+    sourceProfileId: 'parent-profile-1',
+    sourceDeviceId: 'parent-device-1',
+    revision: 5,
+    policyHash: 'hash-keyword-5',
+    sourcePublicKeyId: 'parent-key-3',
+    keyVersion: 3,
+    payload: {
+      scope: 'keywords',
+      operations: [{ op: 'add_keyword', valueHash: 'sha256:redacted' }]
+    }
+  };
+  managedEnvelope.integrity = {
+    algorithm: 'ed25519',
+    signature: 'signature-keyword-5',
+    signedFields: {
+      linkId: managedEnvelope.linkId,
+      scope: managedEnvelope.scope,
+      targetProfileId: managedEnvelope.targetProfileId,
+      sourceDeviceId: managedEnvelope.sourceDeviceId,
+      revision: managedEnvelope.revision,
+      policyHash: managedEnvelope.policyHash,
+      payloadScope: 'keywords'
+    }
+  };
+  const managedDecision = adapter.validateManagedPolicyEnvelope(managedEnvelope, {
+    trustedLink: {
+      id: 'link-parent-child-1',
+      type: 'managed_link',
+      localRole: 'replica',
+      remoteRole: 'source',
+      sourceDeviceId: 'parent-device-1',
+      sourceProfileId: 'parent-profile-1',
+      targetProfileId: 'child-profile-1',
+      allowedScopes: ['keywords'],
+      sourcePublicKeyId: 'parent-key-3',
+      keyVersion: 3
+    },
+    profiles: {
+      'parent-profile-1': { id: 'parent-profile-1', type: 'account' },
+      'child-profile-1': { id: 'child-profile-1', type: 'child', parentProfileId: 'parent-profile-1' }
+    },
+    accepted: {
+      revision: 4,
+      policyHash: 'hash-keyword-4'
+    }
+  });
+  assert.equal(managedDecision.accepted, true);
+  assert.equal(managedDecision.decision, 'accept_newer_revision');
+  assert.equal(managedDecision.targetProfileId, 'child-profile-1');
 
   const mainPayload = await adapter.buildPortablePayload({ scope: 'main' });
   assert.equal(mainPayload.scope, 'main');
@@ -345,6 +415,11 @@ test('Nanah sync adapter source still proves current payload and apply boundarie
   assert.equal(activeApply.options.scope, 'active');
   assert.equal(activeApply.options.strategy, 'replace');
   assert.equal(activeApply.options.targetProfileId, 'child');
+
+  await assert.rejects(
+    () => adapter.applyIncomingEnvelope(managedEnvelope, { strategy: 'merge' }),
+    /Managed policy envelopes require validated managed apply flow/
+  );
 });
 
 test('Nanah sync adapter source preserves envelope and mutation source snippets', () => {
@@ -353,8 +428,11 @@ test('Nanah sync adapter source preserves envelope and mutation source snippets'
 
   assert.match(source, /const APP_ID = 'filtertube'/);
   assert.match(source, /const PAYLOAD_VERSION = 'v3'/);
+  assert.match(source, /const MANAGED_POLICY_ENVELOPE_TYPE = 'filtertube_managed_policy'/);
   assert.match(source, /const DEFAULT_DEVICE_CAPABILITIES = \[/);
   assert.match(source, /function normalizeScope\(scope\)/);
+  assert.match(source, /function validateManagedPolicyEnvelope\(envelope, context = \{\}\)/);
+  assert.match(source, /Managed policy envelopes require validated managed apply flow/);
   assert.match(source, /if \(raw === 'main' \|\| raw === 'kids' \|\| raw === 'active' \|\| raw === 'full'\)/);
   assert.match(source, /function parsePackedChannelKeywordSource\(sourceValue\)/);
   assert.match(source, /if \(!raw\.toLowerCase\(\)\.startsWith\('channel:'\)\) return null/);

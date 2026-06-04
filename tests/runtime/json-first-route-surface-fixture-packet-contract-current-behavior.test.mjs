@@ -224,9 +224,9 @@ test('JSON-first route/surface fixture packet rows and counts stay pinned', () =
   assert.match(doc, /JSON-first implementation authority rows covered: 13/);
   assert.match(doc, /first optimization implementation readiness rows covered: 14/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5797/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5812/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5797/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5812/);
   assert.match(doc, /runtime JSON-first fixture packet approvals: 0/);
   assert.match(doc, /runtime route\/surface metric artifacts: 0/);
   assert.match(doc, /runtime metric collector approvals: 0/);
@@ -261,7 +261,7 @@ test('JSON-first route/surface fixture packet rows bind authority rows and metri
   assert.match(collectorFixtureProvenance, /runtime collector fixture packets approved: 0/);
   assert.match(collectorFixtureProvenance, /collector fixture provenance rows implementation-ready: 0/);
   assert.match(methodGap, /files with lexical accounting: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5797/);
+  assert.match(methodGap, /repo-wide lexical callables: 5812/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
 });
 
