@@ -3044,7 +3044,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const MANAGED_LOCAL_EDIT_POLICY_SCHEMA = 'filtertube_managed_local_edit_policy';
     const MANAGED_ACTION_HISTORY_SCHEMA = 'filtertube_managed_action_history';
     const MANAGED_ACTION_HISTORY_LIMIT = 500;
-    const MANAGED_ACTION_HISTORY_PROTECTED_RESULTS = new Set(['rejected', 'conflict', 'failed_auth', 'expired_session']);
+    const MANAGED_ACTION_HISTORY_PROTECTED_RESULTS = new Set(['rejected', 'conflict', 'failed_auth', 'expired_session', 'cleared_by_admin']);
     const MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set(['trust_link.revoke', 'policy.time_limit.update', 'policy.viewing_space.update']);
     const MANAGED_ADMIN_SESSION_TTL_MS = 15 * 60 * 1000;
     const MANAGED_ADMIN_REAUTH_TTL_MS = 5 * 60 * 1000;
@@ -4755,9 +4755,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         const rows = getManagedActionHistoryRows(profile);
         const protectedRows = rows.filter(managedActionHistoryRowIsProtected);
         const clearedRows = rows.length - protectedRows.length;
+        const now = Date.now();
+        const clearRow = {
+            rowId: `managed-history-clear-${targetId}-${now}`,
+            schema: MANAGED_ACTION_HISTORY_SCHEMA,
+            version: 1,
+            actorProfileId: currentActive,
+            actorDeviceId: normalizeString(nanahStableDeviceId) || 'local-extension-device',
+            targetProfileId: targetId,
+            trustedLinkId: null,
+            actionType: 'history.clear',
+            scope: 'admin_session',
+            revision: null,
+            policyHash: null,
+            result: 'cleared_by_admin',
+            reason: 'accepted_rows_cleared',
+            receivedAt: now,
+            issuedAt: now,
+            orderKey: `clear:${now}`,
+            summary: {
+                redacted: true,
+                label: 'Parent cleared accepted history',
+                clearedAcceptedRows: clearedRows,
+                retainedProtectedRows: protectedRows.length
+            },
+            sensitive: true
+        };
         profiles[targetId] = {
             ...profile,
-            managedActionHistory: protectedRows
+            managedActionHistory: [...protectedRows, clearRow].slice(-MANAGED_ACTION_HISTORY_LIMIT)
         };
         await io.saveProfilesV4({
             ...fresh,

@@ -115,6 +115,26 @@ function validFailedAuthRow(overrides = {}) {
   });
 }
 
+function validClearRow(overrides = {}) {
+  return validAcceptedRow({
+    rowId: 'history-row-clear-1',
+    trustedLinkId: null,
+    actionType: 'history.clear',
+    scope: 'admin_session',
+    revision: null,
+    policyHash: null,
+    result: 'cleared_by_admin',
+    reason: 'accepted_rows_cleared',
+    summary: {
+      redacted: true,
+      label: 'Parent cleared accepted history',
+      clearedAcceptedRows: 3,
+      retainedProtectedRows: 1
+    },
+    ...overrides
+  });
+}
+
 function validateHistoryRow(row) {
   if (!row || typeof row !== 'object') return { ok: false, reason: 'missing_row' };
   for (const field of [
@@ -188,7 +208,7 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(doc, /Issue 60 asks for feedback, logs, or history/);
   assert.match(doc, /Action history is protected evidence and parent\/caregiver UX/);
   assert.match(doc, /It is not policy\s+authority/);
-  assert.match(doc, /Nanah receive path now also parses\s+`filtertube_managed_policy` envelopes/);
+  assert.match(doc, /Nanah receive\s+path now also parses\s+`filtertube_managed_policy` envelopes/);
   assert.match(doc, /local\/decrypted `filtertube_managed_mailbox_item` outcomes/);
   assert.match(doc, /validated remote accepted apply history can now be recorded/);
   assert.match(doc, /Required History Row Shape/);
@@ -205,6 +225,10 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(source, /function canViewManagedActionHistory\(profilesV4, targetProfileId\)/);
   assert.match(source, /function showManagedActionHistory\(profileId\)/);
   assert.match(source, /function clearManagedActionHistory\(profileId\)/);
+  assert.match(source, /actionType: 'history\.clear'/);
+  assert.match(source, /result: 'cleared_by_admin'/);
+  assert.match(source, /accepted_rows_cleared/);
+  assert.match(source, /retainedProtectedRows: protectedRows\.length/);
   assert.match(source, /function recordManagedAdminAuthFailureHistory\(profilesV4, targetProfileId, reason = 'unlock_failed'\)/);
   assert.match(source, /admin_session\.failed_unlock/);
   assert.match(source, /failed_auth/);
@@ -253,6 +277,8 @@ test('managed policy action-history row fixture requires actor target revision r
   assert.deepEqual(validateHistoryRow(validAcceptedRow({ summary: { redacted: false, plaintextValue: 'spiders' } })), { ok: false, reason: 'sensitive_plaintext_value' });
   assert.deepEqual(validateHistoryRow(validFailedAuthRow()), { ok: true });
   assert.deepEqual(validateHistoryRow(validFailedAuthRow({ reason: null })), { ok: false, reason: 'missing_rejection_reason' });
+  assert.deepEqual(validateHistoryRow(validClearRow()), { ok: true });
+  assert.deepEqual(validateHistoryRow(validClearRow({ reason: null })), { ok: false, reason: 'missing_rejection_reason' });
 });
 
 test('managed action history access is parent/caregiver authority not child PIN authority', () => {
@@ -307,6 +333,7 @@ test('managed action history required outcomes cover accepted rejected conflict 
   assert.match(doc, /runtime managed action history row writer: local managed child edit plus failed parent unlock plus Nanah managed-policy validation\/apply outcomes/);
   assert.match(doc, /runtime managed action history access gate: present for parent\/account authority/);
   assert.match(doc, /runtime managed action history clear path: present for accepted rows only/);
+  assert.match(doc, /runtime managed action history clear event writer: present as protected `history.clear` evidence/);
   assert.match(doc, /runtime remote managed validation\/apply history writer: present/);
   assert.match(doc, /runtime remote managed accepted apply history writer: present behind validated managed apply wrapper/);
   assert.match(doc, /runtime mailbox managed validation\/apply history writer: present/);

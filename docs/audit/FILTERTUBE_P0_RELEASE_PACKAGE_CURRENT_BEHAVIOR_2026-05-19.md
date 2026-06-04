@@ -697,9 +697,9 @@ Current local package artifact rows:
 
 | Target | Staged files | Manifest bytes | Manifest sha256 | Version | Content script entries | Content script JS refs | WAR refs | ZIP bytes | ZIP sha256 |
 | --- | ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | --- |
-| `chrome` | 60 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | `3.3.2` | 2 | 15 | 5 | 8721073 | `b384ebe6700c2a5cd5757159443618acd879ee6dead5ae67c8c4577e34573416` |
-| `firefox` | 60 | 2603 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` | `3.3.2` | 1 | 14 | 5 | 8721132 | `1fcedb2a7e98647973778fe4d686a4ab6e5d7637f6eaeb3aad410b9cf0133de0` |
-| `opera` | 60 | 2518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | `3.3.2` | 2 | 15 | 4 | 8721075 | `8cbcf99ae1345493e9cbe5d13bbed72ff6cb74a01caac5698544af51fa9a8995` |
+| `chrome` | 60 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | `3.3.2` | 2 | 15 | 5 | 8721193 | `9ba18fc15a934c364532a9e154b37210d7c756fd1fec8eb71f806aeb21f52ca6` |
+| `firefox` | 60 | 2603 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` | `3.3.2` | 1 | 14 | 5 | 8721252 | `68993f0959ba4166917f913f1e92e2e629a26490a02997abdf534371acc6e7ef` |
+| `opera` | 60 | 2518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | `3.3.2` | 2 | 15 | 4 | 8721195 | `9fb231ddce1d4bfc57f8b6510da4e8230a3243c11d8aca150930b4769676a4c1` |
 
 ASCII boundary:
 
@@ -716,7 +716,7 @@ workspace source paths
 ```mermaid
 flowchart TD
   A["Workspace source paths"] --> B["Existing ignored dist browser directories"]
-  B --> C["58 of 58 source-backed staged files match source per browser"]
+  B --> C["59 of 59 source-backed staged files match source per browser"]
   B --> D["dist browser manifest.json files"]
   B --> E["Existing local ZIP files"]
   C --> F["Local snapshot proof only"]
@@ -731,7 +731,7 @@ flowchart TD
 ```
 
 This closes a local-artifact inventory gap, not the release gate. The staged
-browser directories currently match workspace source bytes for 58 of 58 source-backed
+browser directories currently match workspace source bytes for 59 of 59 source-backed
 non-manifest files, and the three local ZIPs have recorded hashes. The package
 still lacks a committed per-file manifest, a clean rebuild record, ZIP content
 attestation tied to source revision, upload proof, public-claim proof, and

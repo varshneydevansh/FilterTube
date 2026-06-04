@@ -6,7 +6,9 @@ history writer present for managed-profile gates; remote managed-policy
 validation history writer present for rejection/idempotent/apply outcomes, and
 validated remote accepted apply history can now be recorded after the managed
 apply wrapper succeeds. Local/decrypted mailbox-item intake now writes distinct
-mailbox action-history rows through the same protected model.
+mailbox action-history rows through the same protected model. Parent/caregiver
+history clearing now records its own protected `history.clear` evidence row
+instead of silently removing accepted rows.
 **Goal slice**: Implementation order item 4, "Add action-history/log model and
 access-control tests".
 **Primary inputs**:
@@ -29,7 +31,7 @@ through a validated apply wrapper before history records the accepted remote
 result. It also records protected
 failed-auth rows when parent/admin unlock fails while opening managed child
 edit, viewing/clearing protected history, changing viewing space, or changing
-time limits.
+time limits, and records a protected clear row when accepted history is cleared.
 
 Action history is protected evidence and parent/caregiver UX. It is not policy
 authority. Runtime policy must still come from the current accepted managed
@@ -150,8 +152,10 @@ Current product runtime source implements a narrow accepted local-write subset
 of this model in `js/tab-view.js`. Parent/account profiles can now open a
 protected child profile's local managed history from the profile row and clear
 accepted rows while retaining rejected/conflict/failed-auth/trust/time/viewing
-evidence. The Nanah receive path now also parses
-`filtertube_managed_policy` envelopes and local/decrypted
+evidence. The clear path appends a protected `history.clear` /
+`cleared_by_admin` row with redacted cleared/retained counts so the act of
+clearing remains visible to the parent/caregiver audit trail. The Nanah receive
+path now also parses `filtertube_managed_policy` envelopes and local/decrypted
 `filtertube_managed_mailbox_item` rows, builds a trusted-link/profile/revision
 validation context, and records protected validation-history rows on the target
 profile when a row can be attached to a known protected profile:
@@ -160,7 +164,8 @@ profile when a row can be attached to a known protected profile:
 runtime managed action history store: profile-local managed child rows
 runtime managed action history row writer: local managed child edit plus failed parent unlock plus Nanah managed-policy validation/apply outcomes
 runtime managed action history access gate: present for parent/account authority
-runtime managed action history clear path: present for accepted rows only
+runtime managed action history clear path: present for accepted rows only while retaining protected evidence
+runtime managed action history clear event writer: present as protected `history.clear` evidence
 runtime remote managed validation/apply history writer: present for rejected, conflict, idempotent, and accepted apply outcomes
 runtime remote managed accepted apply history writer: present behind validated managed apply wrapper
 runtime mailbox managed validation/apply history writer: present for local/decrypted mailbox item intake outcomes
@@ -171,7 +176,7 @@ The current local writer stores redacted count summaries under
 `profile.managedActionHistory[]`. The local access gate uses active
 parent/account authority, not child PIN authority, and `clearManagedActionHistory`
 preserves rows that are rejected, conflict, failed-auth, expired-session, trust
-revocation, time-limit, or viewing-space evidence.
+revocation, time-limit, viewing-space, or prior clear evidence.
 
 The current failed-auth writer records only protected evidence rows. It does not
 rate-limit yet, does not extend an admin session, and does not authorize any
