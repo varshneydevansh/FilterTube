@@ -4,6 +4,7 @@
     const APP_ID = 'filtertube';
     const PAYLOAD_VERSION = 'v3';
     const MANAGED_POLICY_ENVELOPE_TYPE = 'filtertube_managed_policy';
+    const MANAGED_MAILBOX_ITEM_SCHEMA = 'filtertube_managed_mailbox_item';
     const MANAGED_POLICY_ALLOWED_SCOPES = [
         'main',
         'kids',
@@ -279,6 +280,15 @@
         return null;
     }
 
+    function normalizeMailboxTimestampMs(value) {
+        const integer = normalizeNonNegativeInteger(value);
+        if (integer !== null) return integer;
+        const normalized = normalizeString(value);
+        if (!normalized) return null;
+        const parsed = Date.parse(normalized);
+        return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
+    }
+
     function validateManagedPolicyEnvelope(envelope, context = {}) {
         const root = safeObject(envelope);
         const trustedLink = safeObject(context.trustedLink);
@@ -387,6 +397,107 @@
             targetProfileId: root.targetProfileId,
             revision: root.revision,
             policyHash: root.policyHash
+        };
+    }
+
+    function getManagedMailboxEnvelope(item) {
+        const root = safeObject(item);
+        return safeObject(root.decryptedEnvelope || root.envelope || root.managedPolicyEnvelope);
+    }
+
+    function validateManagedMailboxBinding(item, envelope) {
+        const root = safeObject(item);
+        const policy = safeObject(envelope);
+        for (const field of [
+            'linkId',
+            'targetProfileId',
+            'sourceDeviceId',
+            'sourceProfileId',
+            'scope',
+            'revision',
+            'policyHash',
+            'sourcePublicKeyId',
+            'keyVersion'
+        ]) {
+            if (root[field] !== policy[field]) {
+                return validationResult(`ciphertext_binding_${field}_mismatch`, { ackState: 'rejected' });
+            }
+        }
+        return null;
+    }
+
+    function validateManagedMailboxItem(item, context = {}) {
+        const root = safeObject(item);
+        const trustedLink = safeObject(context.trustedLink);
+        if (!root || Object.keys(root).length === 0 || root.schema !== MANAGED_MAILBOX_ITEM_SCHEMA) {
+            return validationResult('missing_mailbox_item', { ackState: 'rejected' });
+        }
+        if (root.version !== 1) return validationResult('wrong_mailbox_version', { ackState: 'rejected' });
+        if (trustedLink.type !== 'managed_link') return validationResult('missing_trusted_link', { ackState: 'rejected' });
+        if (trustedLink.localRole !== 'replica' || trustedLink.remoteRole !== 'source') {
+            return validationResult('wrong_link_roles', { ackState: 'rejected' });
+        }
+        if (trustedLink.revoked) return validationResult('link_revoked', { ackState: 'revoked' });
+        if (trustedLink.keyRevoked) return validationResult('key_revoked', { ackState: 'revoked' });
+
+        const expiresAtMs = normalizeMailboxTimestampMs(root.expiresAtMs || root.expiresAt);
+        const nowMs = normalizeMailboxTimestampMs(context.nowMs) || Date.now();
+        if (expiresAtMs !== null && expiresAtMs <= nowMs) {
+            return validationResult('mailbox_item_expired', { ackState: 'expired' });
+        }
+        for (const field of ['mailboxItemId', 'linkId', 'targetProfileId', 'sourceDeviceId', 'sourceProfileId', 'scope', 'revision', 'policyHash', 'sourcePublicKeyId', 'keyVersion']) {
+            if (root[field] === undefined || root[field] === null || root[field] === '') {
+                return validationResult(`missing_${field}`, { ackState: 'rejected' });
+            }
+        }
+        if (!root.ciphertext || !root.encryptedDek || !root.nonce) {
+            return validationResult('missing_ciphertext', { ackState: 'rejected' });
+        }
+        if (root.linkId !== trustedLink.id && root.linkId !== trustedLink.linkId) {
+            return validationResult('wrong_link_id', { ackState: 'rejected' });
+        }
+        if (root.targetProfileId !== trustedLink.targetProfileId) {
+            return validationResult('wrong_target_profile', { ackState: 'rejected' });
+        }
+        if (root.sourceDeviceId !== trustedLink.sourceDeviceId) {
+            return validationResult('wrong_source_device', { ackState: 'rejected' });
+        }
+        if (root.sourceProfileId !== trustedLink.sourceProfileId) {
+            return validationResult('wrong_source_profile', { ackState: 'rejected' });
+        }
+        const scope = normalizeManagedPolicyScope(root.scope);
+        if (!scope || (!safeArray(trustedLink.allowedScopes).includes(scope) && !safeArray(safeObject(trustedLink.policy).allowedScopes).includes(scope))) {
+            return validationResult('scope_not_allowed', { ackState: 'rejected' });
+        }
+        if (root.sourcePublicKeyId !== trustedLink.sourcePublicKeyId) {
+            return validationResult('wrong_public_key', { ackState: 'rejected' });
+        }
+        if (root.keyVersion !== trustedLink.keyVersion) {
+            return validationResult('wrong_key_version', { ackState: 'rejected' });
+        }
+        const envelope = getManagedMailboxEnvelope(root);
+        if (!envelope || Object.keys(envelope).length === 0) {
+            return validationResult('missing_managed_policy_envelope', { ackState: 'rejected' });
+        }
+        const bindingDecision = validateManagedMailboxBinding(root, envelope);
+        if (bindingDecision) return bindingDecision;
+        const envelopeDecision = validateManagedPolicyEnvelope(envelope, context);
+        if (envelopeDecision.accepted !== true) {
+            const ackState = envelopeDecision.reason === 'equal_revision_hash_conflict'
+                ? 'conflict'
+                : (envelopeDecision.reason === 'link_revoked' || envelopeDecision.reason === 'key_revoked' ? 'revoked' : 'rejected');
+            return {
+                ...envelopeDecision,
+                ackState,
+                mailboxItemId: normalizeString(root.mailboxItemId)
+            };
+        }
+        return {
+            ...envelopeDecision,
+            accepted: true,
+            ackState: 'delivered',
+            mailboxItemId: normalizeString(root.mailboxItemId),
+            envelope
         };
     }
 
@@ -1078,6 +1189,31 @@
         };
     }
 
+    async function applyManagedMailboxItem(item, context = {}) {
+        const mailboxDecision = validateManagedMailboxItem(item, context);
+        if (mailboxDecision.accepted !== true) return mailboxDecision;
+        if (mailboxDecision.decision === 'idempotent_same_hash') {
+            return {
+                ok: true,
+                accepted: true,
+                decision: 'idempotent_same_hash',
+                scope: mailboxDecision.scope,
+                profileId: mailboxDecision.targetProfileId,
+                revision: mailboxDecision.revision,
+                policyHash: mailboxDecision.policyHash,
+                applied: false,
+                ackState: 'delivered',
+                mailboxItemId: mailboxDecision.mailboxItemId
+            };
+        }
+        const result = await applyManagedPolicyEnvelope(mailboxDecision.envelope, context);
+        return {
+            ...result,
+            ackState: result.accepted === true ? 'delivered' : (mailboxDecision.ackState || 'rejected'),
+            mailboxItemId: mailboxDecision.mailboxItemId
+        };
+    }
+
     function generateId() {
         if (global.crypto && typeof global.crypto.randomUUID === 'function') {
             return global.crypto.randomUUID();
@@ -1245,10 +1381,12 @@
         buildSyncEnvelope,
         buildControlProposal,
         validateManagedPolicyEnvelope,
+        validateManagedMailboxItem,
         verifyManagedNanahPolicyIntegritySignature,
         createManagedNanahSigningKeyPair,
         signManagedPolicyEnvelope,
         applyManagedPolicyEnvelope,
+        applyManagedMailboxItem,
         applyIncomingEnvelope,
         extractPortableFromEnvelope
     };

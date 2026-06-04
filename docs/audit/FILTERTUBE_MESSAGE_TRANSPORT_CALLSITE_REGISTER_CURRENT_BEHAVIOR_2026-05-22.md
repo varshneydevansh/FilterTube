@@ -53,7 +53,7 @@ transport rows; the dashboard send path still owns the Nanah client callsite.
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/seed.js` | 1136 | 50026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
 | `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
-| `js/tab-view.js` | 12795 | 585960 | `3e52cf1b3b189450bb9f7b3a6ae7adb833ddc29d90a8564164314f53ced79109` |
+| `js/tab-view.js` | 12880 | 590790 | `05f1a67bcf38abcc6ed9dfd7e9c3909caada338cebc9a05351a7e8c22487a1e2` |
 
 ## File And Operation Counts
 
@@ -149,7 +149,7 @@ js/state_manager.js:1636:runtime.sendMessage:kidsWhitelistRuntimeMutation
 js/state_manager.js:1808:runtime.sendMessage:whitelistTransferRuntimeMutation
 js/tab-view.js:3061:runtime.sendMessage:dashboardRuntimeRequest
 js/tab-view.js:3342:tabs.sendMessage:dashboardTabRuntimeRequest
-js/tab-view.js:12150:runtime.onMessage.addListener:dashboardRuntimeMessageReceiver
+js/tab-view.js:12235:runtime.onMessage.addListener:dashboardRuntimeMessageReceiver
 ```
 
 ## Current Behavior Boundaries
@@ -157,7 +157,7 @@ js/tab-view.js:12150:runtime.onMessage.addListener:dashboardRuntimeMessageReceiv
 - Background has two runtime receivers: the primary `request.action` /
   `request.type` router and a secondary `message.type` router.
 - Content/dashboard code has two more runtime receivers:
-  `js/content/bridge_settings.js:200` and `js/tab-view.js:12150`.
+  `js/content/bridge_settings.js:200` and `js/tab-view.js:12235`.
 - Runtime sender rows cover settings fetches, prompt acknowledgements, list-mode
   mutations, whitelist/Kids mutations, identity fetches, learned-map writes,
   script injection, browser info, stats/backup scheduling, and popup/dashboard

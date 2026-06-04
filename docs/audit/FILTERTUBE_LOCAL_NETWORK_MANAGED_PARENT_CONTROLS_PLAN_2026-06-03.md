@@ -601,12 +601,15 @@ where parent and child devices are not reachable at the same time.
   target link id, revision metadata, expiry, and ack state.
 - **Complexity**: 6/10
 - **Dependencies**: Sprint 3.
-- **Status**: Protocol doc and executable proof fixture added. Runtime mailbox
-  pull/delivery remains absent by design.
+- **Status**: Protocol doc, executable proof fixture, and local/decrypted
+  mailbox-item validation/apply intake added. Runtime mailbox server pull,
+  server ack, and decryption client remain absent by design.
 - **Acceptance Criteria**:
   - Server cannot read rules.
   - Replay, stale, revoked, wrong-target, and duplicate delivery behavior is
     specified.
+  - Local/decrypted items bind mailbox metadata to the decrypted managed-policy
+    envelope before validation/apply.
   - Mailbox is optional and does not weaken local/P2P security.
 - **Validation**:
   - `git diff --check`

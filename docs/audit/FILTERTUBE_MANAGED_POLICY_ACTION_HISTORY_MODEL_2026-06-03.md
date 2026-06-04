@@ -5,7 +5,8 @@
 history writer present for managed-profile gates; remote managed-policy
 validation history writer present for rejection/idempotent/apply outcomes, and
 validated remote accepted apply history can now be recorded after the managed
-apply wrapper succeeds.
+apply wrapper succeeds. Local/decrypted mailbox-item intake now writes distinct
+mailbox action-history rows through the same protected model.
 **Goal slice**: Implementation order item 4, "Add action-history/log model and
 access-control tests".
 **Primary inputs**:
@@ -21,9 +22,11 @@ updates. This model defines that history, tracks the first runtime writer for
 accepted same-device parent-managed child surface saves, exposes a
 parent/account-only local history view for protected child rows, and now records
 receive-side managed-policy validation outcomes when a
-`filtertube_managed_policy` envelope reaches the Nanah dashboard path. Accepted
-managed-policy envelopes now route through a validated apply wrapper before
-history records the accepted remote result. It also records protected
+`filtertube_managed_policy` envelope reaches the Nanah dashboard path, and now
+also records local/decrypted `filtertube_managed_mailbox_item` outcomes with
+distinct mailbox action types. Accepted managed-policy envelopes now route
+through a validated apply wrapper before history records the accepted remote
+result. It also records protected
 failed-auth rows when parent/admin unlock fails while opening managed child
 edit, viewing/clearing protected history, changing viewing space, or changing
 time limits.
@@ -77,6 +80,11 @@ local_policy.update
 remote_policy.accept
 remote_policy.reject
 remote_policy.conflict
+remote_policy.mailbox.accept
+remote_policy.mailbox.reject
+remote_policy.mailbox.conflict
+remote_policy.mailbox.expire
+remote_policy.mailbox.revoke
 history.clear
 ```
 
@@ -143,7 +151,8 @@ of this model in `js/tab-view.js`. Parent/account profiles can now open a
 protected child profile's local managed history from the profile row and clear
 accepted rows while retaining rejected/conflict/failed-auth/trust/time/viewing
 evidence. The Nanah receive path now also parses
-`filtertube_managed_policy` envelopes, builds a trusted-link/profile/revision
+`filtertube_managed_policy` envelopes and local/decrypted
+`filtertube_managed_mailbox_item` rows, builds a trusted-link/profile/revision
 validation context, and records protected validation-history rows on the target
 profile when a row can be attached to a known protected profile:
 
@@ -154,7 +163,8 @@ runtime managed action history access gate: present for parent/account authority
 runtime managed action history clear path: present for accepted rows only
 runtime remote managed validation/apply history writer: present for rejected, conflict, idempotent, and accepted apply outcomes
 runtime remote managed accepted apply history writer: present behind validated managed apply wrapper
-runtime behavior changed by this contract: yes, for accepted local managed child saves, protected failed-auth rows, parent/account history access, Nanah managed-policy receive evidence, and validated remote apply history
+runtime mailbox managed validation/apply history writer: present for local/decrypted mailbox item intake outcomes
+runtime behavior changed by this contract: yes, for accepted local managed child saves, protected failed-auth rows, parent/account history access, Nanah managed-policy receive evidence, validated remote apply history, and local/decrypted mailbox item evidence
 ```
 
 The current local writer stores redacted count summaries under
@@ -177,6 +187,9 @@ revision/hash state on the target child profile before the history row records
 recorded as accepted because no policy rewrite is needed. Missing verifier,
 revoked link, stale revision, equal-revision conflict, sibling target, and
 wrong-source cases still produce protected rejected or conflict history rows.
+Mailbox rows use `remote_policy.mailbox.*` action types so parent/caregiver
+history can distinguish delayed delivery from live Nanah delivery without
+making the log authoritative.
 This keeps local keyword/channel/video writes, Nanah apply, mailbox apply, and
 admin session events using one history model without turning logs into policy
 state.

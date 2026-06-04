@@ -1,8 +1,8 @@
 # Audit: Managed Policy Encrypted Mailbox Protocol
 
 **Generated**: 2026-06-04  
-**Status**: Protocol and proof fixture only. Runtime mailbox delivery is not
-implemented.  
+**Status**: Protocol, proof fixture, and local decrypted mailbox-item intake are
+present. Runtime server mailbox pull is not implemented.
 **Related plan**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`  
 **Related inventory**:
@@ -20,14 +20,16 @@ video ids, viewing-space settings, time budgets, PIN values, or action-history
 summaries.
 
 The decrypted payload is still a normal `filtertube_managed_policy` envelope.
-After local decryption, the protected replica must run the same managed-policy
+After local decryption, the protected replica runs the same managed-policy
 validation and apply path used by live Nanah/P2P delivery:
 
 - `validateManagedPolicyEnvelope(...)`
 - trusted-link key and signature verification
 - fixed target profile, source device, source profile, scope, revision, and
   policy-hash checks
-- `applyManagedPolicyEnvelope(...)` only after accepted validation context
+- `validateManagedMailboxItem(...)` to bind mailbox metadata to the decrypted
+  envelope
+- `applyManagedMailboxItem(...)` only after accepted validation context
 
 Mailbox delivery does not weaken local/P2P security. It only changes when the
 child device can receive the ciphertext.
@@ -163,12 +165,27 @@ or failed-delivery evidence.
 
 ## Current Runtime Boundary
 
-Runtime mailbox delivery is intentionally absent in this slice. The current
-extension can validate and apply a managed policy envelope only after the
-dashboard/Nanah receive path supplies trusted validation context and signature
-evidence. There is no mailbox pull scheduler, mailbox storage client, or server
-ack writer in runtime code yet.
+Runtime decrypted mailbox intake is present in this slice. The current extension
+can validate a local/decrypted `filtertube_managed_mailbox_item`, bind its
+metadata to the decrypted `filtertube_managed_policy` envelope, verify the
+trusted managed signature context, apply through `applyManagedPolicyEnvelope(...)`,
+and write protected redacted action-history evidence.
 
-Before adding runtime mailbox delivery, the next implementation slice must add
-pairing-time public-key persistence and live signed-envelope tests so the
-mailbox cannot become an alternate, weaker authority path.
+The runtime still does not implement a server mailbox pull scheduler, mailbox
+storage client, mailbox decryption client, or server ack writer. The mailbox
+server cannot become policy authority, and pull-on-open remains a future
+transport slice.
+
+Current runtime status:
+
+```text
+runtime mailbox item schema intake: present for local/decrypted items
+runtime mailbox item metadata-to-envelope binding: present
+runtime mailbox item signature gate reuse: present
+runtime mailbox item managed-policy apply wrapper: present
+runtime mailbox protected history rows: present
+runtime mailbox server pull client: absent
+runtime mailbox server ack writer: absent
+runtime mailbox decryption client: absent
+runtime behavior changed by this slice: yes, for local/decrypted mailbox item intake only
+```

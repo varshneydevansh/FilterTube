@@ -58,7 +58,7 @@ file.text() reads an uploaded/imported local File and is not a network response.
 | `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
 | `js/injector.js` | 3,593 | 155,830 | `634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04` |
 | `js/seed.js` | 1,136 | 50,026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
-| `js/tab-view.js` | 12,795 | 585,960 | `3e52cf1b3b189450bb9f7b3a6ae7adb833ddc29d90a8564164314f53ced79109` |
+| `js/tab-view.js` | 12,880 | 590,790 | `05f1a67bcf38abcc6ed9dfd7e9c3909caada338cebc9a05351a7e8c22487a1e2` |
 
 ## File And Operation Counts
 

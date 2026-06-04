@@ -193,7 +193,7 @@ Large product-owned source files:
 | File | Current lines | Boundary |
 | --- | ---: | --- |
 | `js/content_bridge.js` | 13636 | Giant cross-context hub. Any growth needs source-owner proof and focused runtime fixtures. |
-| `js/tab-view.js` | 12795 | Dashboard/settings UI surface. Current residual growth is owned by the managed Nanah live signed-send and granular scope UI slice after extracting policy construction to `js/nanah_managed_live_policy.js`; any further growth needs UI/state owner proof and release smoke. |
+| `js/tab-view.js` | 12880 | Dashboard/settings UI surface. Current residual growth is owned by the managed Nanah live signed-send, granular scope UI, and managed mailbox intake slices after extracting policy construction to `js/nanah_managed_live_policy.js`; any further growth needs UI/state owner proof and release smoke. |
 | `js/background.js` | 6711 | Background storage/message/profile authority. Any growth needs mutation and settings proof. |
 | `js/content/dom_fallback.js` | 5030 | DOM fallback selector/hide/restore authority. Any growth needs DOM/no-work proof. |
 | `js/filter_logic.js` | 3652 | JSON renderer rule and decision engine. Any growth needs rule/path proof. |
@@ -202,8 +202,8 @@ Large product-owned source files:
 | `js/state_manager.js` | 2491 | Settings persistence and profile mutation surface. Any growth needs storage proof. |
 | `js/io_manager.js` | 2097 | Import/export and backup surface. Any growth needs payload and migration proof. |
 | `js/popup.js` | 1841 | Popup settings/action UI. Any growth needs settings UI proof and popup smoke. |
+| `js/nanah_sync_adapter.js` | 1393 | Nanah portable payload, managed-policy apply surface, WebCrypto verifier helper, managed public-key descriptor advertisement, source signing-key helpers, and local decrypted managed mailbox item intake. Current growth is owned by the managed mailbox intake slice; follow-up should extract managed-policy helpers behind the same validation tests before broadening transport. |
 | `js/render_engine.js` | 1389 | Dashboard renderer helper. Any growth needs release UI proof. |
-| `js/nanah_sync_adapter.js` | 1255 | Nanah portable payload, managed-policy apply surface, WebCrypto verifier helper, managed public-key descriptor advertisement, and source signing-key helpers. Current growth is owned by the managed Nanah keypair provisioning slice; follow-up should extract managed-policy helpers behind the same validation tests before broadening transport. |
 | `js/settings_shared.js` | 1181 | Canonical settings compiler and migration surface. Any growth needs mode/list proof. |
 | `js/content/dom_extractors.js` | 1137 | DOM identity extraction surface. Any growth needs identity false-hide/leak proof. |
 | `js/seed.js` | 1136 | Transport interception and JSON active-work gate. Any growth needs JSON/no-work proof. |

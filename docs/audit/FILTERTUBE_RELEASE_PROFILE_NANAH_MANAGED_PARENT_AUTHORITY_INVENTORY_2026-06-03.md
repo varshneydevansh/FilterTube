@@ -7,7 +7,8 @@ receive-side managed-policy validation/history proofs updated, with encrypted
 mailbox protocol proof specified, managed pairing public-key descriptor
 persistence added, source-side managed signing keypair provisioning plus
 adapter signing helper added, and eligible fixed-target Main/Kids plus granular
-managed live send added. Runtime behavior changed for protected child Main/Kids denial, accepted same-device
+managed live send added, with local/decrypted mailbox-item intake added for the
+same managed-policy validator/apply path. Runtime behavior changed for protected child Main/Kids denial, accepted same-device
 parent-managed child saves, protected parent unlock-failure evidence,
 parent/account history viewing, accepted-row history clearing, dashboard and
 background admin-session expiry, sensitive managed-action re-auth, in-memory
@@ -16,7 +17,8 @@ managed-envelope validation/classification, managed-policy receive/apply
 evidence, managed public-key descriptor pairing, source signing-key
 provisioning, and eligible signed Main/Kids/granular live managed-policy sends.
 Active/full signed conversion, richer granular surface-picking UI, mailbox
-runtime, and local-network discovery runtime remain pending.
+server pull/ack/decryption runtime, and local-network discovery runtime remain
+pending.
 **Goal slice**: Implementation order item 1 plus first runtime viewing-space
 enforcement slice.
 **Lane proof**: `test:settings` for profile/Nanah authority and `test:release`
@@ -45,10 +47,12 @@ Eligible fixed-target Main/Kids, keyword, channel, video, viewing-space, and
 time-limit live sends can now build signed managed-policy envelopes. Granular
 rule sends use the dashboard's active Main/Kids surface, and parent-managed
 child edit mode can provide the child-policy payload source while the parent
-profile remains signing authority. Active/full signed conversion, richer
-granular surface-picking UI, encrypted/local-network delivery runtime,
-failed-attempt durability, and remote admin session semantics remain separate
-required slices.
+profile remains signing authority. Local/decrypted mailbox items can now bind
+mailbox metadata to the decrypted managed envelope before calling the same
+managed-policy validation/apply path, but server mailbox pull, mailbox ack,
+mailbox decryption client, active/full signed conversion, richer granular
+surface-picking UI, local-network delivery runtime, failed-attempt durability,
+and remote admin session semantics remain separate required slices.
 
 ## Issue 60 Local-Network Caregiver Addendum
 

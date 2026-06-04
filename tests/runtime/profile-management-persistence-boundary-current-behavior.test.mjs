@@ -154,7 +154,7 @@ test('profile management persistence audit document records current boundary and
 test('profile management source fingerprints stay pinned', () => {
   const doc = read(auditDocPath);
   const expected = [
-    ['js/tab-view.js', 12795, 585960, '3e52cf1b3b189450bb9f7b3a6ae7adb833ddc29d90a8564164314f53ced79109'],
+    ['js/tab-view.js', 12880, 590790, '05f1a67bcf38abcc6ed9dfd7e9c3909caada338cebc9a05351a7e8c22487a1e2'],
     ['js/popup.js', 1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
     ['js/io_manager.js', 2097, 100479, 'f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62'],
     ['js/background.js', 6711, 301840, 'b27206ec2b6927fc33f823c4832ff95ace7c97bd4284eb950fc5964baf666346']
@@ -195,7 +195,7 @@ test('selected profile management token counts stay pinned', () => {
   const selected = [
     ['tab-view ensureProfileUnlocked tokens: 18', sources.tabView, 'ensureProfileUnlocked', 18],
     ['tab-view saveProfilesV4 tokens: 37', sources.tabView, 'saveProfilesV4', 37],
-    ['tab-view loadProfilesV4 tokens: 62', sources.tabView, 'loadProfilesV4', 62],
+    ['tab-view loadProfilesV4 tokens: 64', sources.tabView, 'loadProfilesV4', 64],
     ['tab-view activeProfileId tokens: 77', sources.tabView, 'activeProfileId', 77],
     ['tab-view StateManager.loadSettings tokens: 8', sources.tabView, 'StateManager.loadSettings', 8],
     ['tab-view refreshProfilesUI tokens: 21', sources.tabView, 'refreshProfilesUI', 21],

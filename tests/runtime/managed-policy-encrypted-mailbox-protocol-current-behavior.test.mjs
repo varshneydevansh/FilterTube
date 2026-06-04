@@ -189,8 +189,8 @@ test('managed mailbox protocol is docs-backed and linked from plan and inventory
   const plan = read(planPath);
   const inventory = read(inventoryPath);
 
-  assert.match(doc, /Status\*\*: Protocol and proof fixture only/);
-  assert.match(doc, /Runtime mailbox delivery is not\s+implemented/);
+  assert.match(doc, /Status\*\*: Protocol, proof fixture, and local decrypted mailbox-item intake are\s+present/);
+  assert.match(doc, /Runtime server mailbox pull is not\s+implemented/);
   assert.match(doc, /The mailbox server is storage and relay only/);
   assert.match(doc, /must never receive plaintext rules, keywords, channel names,\s+video ids, viewing-space settings, time budgets, PIN values, or action-history\s+summaries/);
   assert.match(doc, /filtertube_managed_mailbox_item/);
@@ -207,15 +207,23 @@ test('managed mailbox protocol is docs-backed and linked from plan and inventory
   assert.match(inventory, new RegExp(docPath));
 });
 
-test('managed mailbox runtime delivery remains absent in this protocol-only slice', () => {
+test('managed mailbox runtime intake validates decrypted items without adding server pull authority', () => {
   const source = runtimeSource();
 
   assert.match(source, /function validateManagedPolicyEnvelope\(envelope, context = \{\}\)/);
   assert.match(source, /async function applyManagedPolicyEnvelope\(envelope, context = \{\}\)/);
   assert.match(source, /Managed policy envelopes require validated managed apply flow/);
+  assert.match(source, /function validateManagedMailboxItem\(item, context = \{\}\)/);
+  assert.match(source, /async function applyManagedMailboxItem\(item, context = \{\}\)/);
+  assert.match(source, /function handleNanahIncomingManagedMailboxItem\(item\)/);
+  assert.match(source, /root\.schema === 'filtertube_managed_mailbox_item'/);
+  assert.match(source, /remote_policy\.mailbox\.accept/);
+  assert.match(source, /remote_policy\.mailbox\.reject/);
+  assert.match(source, /remote_policy\.mailbox\.conflict/);
+  assert.match(source, /remote_policy\.mailbox\.expire/);
+  assert.match(source, /remote_policy\.mailbox\.revoke/);
   assert.doesNotMatch(source, /FilterTubeManagedMailbox/);
   assert.doesNotMatch(source, /managedMailboxPull/);
-  assert.doesNotMatch(source, /filtertube_managed_mailbox_item/);
 });
 
 test('managed mailbox delivery accepts only newer trusted ciphertext-backed policy', () => {

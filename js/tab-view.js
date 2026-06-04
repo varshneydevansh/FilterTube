@@ -4797,6 +4797,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
+    function resolveManagedRemoteHistoryActionType({ accepted, conflict, reason, transport }) {
+        const channel = normalizeString(transport).toLowerCase();
+        if (channel === 'mailbox') {
+            if (accepted) return 'remote_policy.mailbox.accept';
+            if (conflict) return 'remote_policy.mailbox.conflict';
+            if (reason === 'mailbox_item_expired') return 'remote_policy.mailbox.expire';
+            if (reason === 'link_revoked' || reason === 'key_revoked') return 'remote_policy.mailbox.revoke';
+            return 'remote_policy.mailbox.reject';
+        }
+        return accepted ? 'remote_policy.accept' : (conflict ? 'remote_policy.conflict' : 'remote_policy.reject');
+    }
+
     async function recordManagedNanahPolicyValidationHistory(envelope, decision, context = {}) {
         const root = safeObject(envelope);
         const io = window.FilterTubeIO || {};
@@ -4819,11 +4831,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         const accepted = decision?.accepted === true && !reason;
         const conflict = reason === 'equal_revision_hash_conflict';
         const result = accepted ? 'accepted' : (conflict ? 'conflict' : 'rejected');
-        const actionType = accepted ? 'remote_policy.accept' : (conflict ? 'remote_policy.conflict' : 'remote_policy.reject');
+        const actionType = resolveManagedRemoteHistoryActionType({
+            accepted,
+            conflict,
+            reason,
+            transport: context.transport
+        });
         const trustedLink = safeObject(context.trustedLink);
         const trustedLinkId = normalizeString(root.linkId || trustedLink.linkId || trustedLink.id);
         const row = {
-            rowId: `remote-managed-${scope}-${revision || 'none'}-${now}`,
+            rowId: `remote-managed-${normalizeString(context.transport) || 'nanah'}-${scope}-${revision || 'none'}-${now}`,
             schema: MANAGED_ACTION_HISTORY_SCHEMA,
             version: 1,
             actorProfileId: normalizeString(root.sourceProfileId) || null,
@@ -4839,7 +4856,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             receivedAt: now,
             issuedAt: normalizeNonNegativeInteger(root.issuedAt) || null,
             orderKey: `${String(revision || 0).padStart(6, '0')}:${now}`,
-            summary: summarizeManagedNanahPolicyEnvelope(root, decision),
+            summary: {
+                ...summarizeManagedNanahPolicyEnvelope(root, decision),
+                transport: normalizeString(context.transport) || 'nanah',
+                mailboxItemId: normalizeString(context.mailboxItemId || decision?.mailboxItemId) || null
+            },
             sensitive: true
         };
         const existingRows = Array.isArray(profile.managedActionHistory)
@@ -8667,6 +8688,66 @@ document.addEventListener('DOMContentLoaded', async () => {
         UIComponents.showToast(`Managed policy rejected: ${normalizeString(validation.reason) || 'validation failed'}`, 'error');
     }
 
+    async function handleNanahIncomingManagedMailboxItem(item) {
+        const adapter = window.FilterTubeNanahAdapter || {};
+        if (typeof adapter.validateManagedMailboxItem !== 'function') {
+            throw new Error('Managed mailbox validation is unavailable');
+        }
+        const envelope = safeObject(item?.decryptedEnvelope || item?.envelope || item?.managedPolicyEnvelope);
+        const io = window.FilterTubeIO || {};
+        const localProfilesV4 = profilesV4Cache || (typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null);
+        const context = {
+            ...buildManagedNanahPolicyValidationContext(envelope, localProfilesV4),
+            transport: 'mailbox',
+            mailboxItemId: normalizeString(item?.mailboxItemId),
+            nowMs: Date.now()
+        };
+        const verifyManagedSignature = typeof adapter.verifyManagedNanahPolicyIntegritySignature === 'function'
+            ? adapter.verifyManagedNanahPolicyIntegritySignature
+            : null;
+        const signatureVerification = envelope && Object.keys(envelope).length > 0 && verifyManagedSignature
+            ? await verifyManagedSignature(envelope, context.trustedLink)
+            : { verified: false, reason: 'missing_signature_verifier' };
+        context.signatureVerification = signatureVerification;
+        context.verifyIntegritySignature = () => signatureVerification;
+        if (signatureVerification?.verified === true) {
+            context.signatureVerified = true;
+            context.integrityVerified = true;
+        }
+        const validation = adapter.validateManagedMailboxItem(item, context);
+        if (validation.accepted === true && validation.decision === 'idempotent_same_hash') {
+            await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
+            UIComponents.showToast('Managed mailbox policy already matches the last accepted revision', 'info');
+            return;
+        }
+        if (validation.accepted === true) {
+            if (typeof adapter.applyManagedMailboxItem !== 'function') {
+                await recordManagedNanahPolicyValidationHistory(envelope, {
+                    accepted: false,
+                    reason: 'managed_mailbox_apply_unavailable',
+                    mailboxItemId: validation.mailboxItemId
+                }, context);
+                UIComponents.showToast('Managed mailbox apply is unavailable', 'error');
+                return;
+            }
+            const result = await adapter.applyManagedMailboxItem(item, context);
+            await recordManagedNanahPolicyValidationHistory(envelope, result.accepted === true ? validation : result, context);
+            if (result.accepted === true && result.applied !== false) {
+                await refreshFilterTubeUiAfterNanahImport();
+                UIComponents.showToast(`Applied managed mailbox ${normalizeString(validation.scope) || 'policy'} update`, 'success');
+                return;
+            }
+            if (result.accepted === true && result.decision === 'idempotent_same_hash') {
+                UIComponents.showToast('Managed mailbox policy already matches the last accepted revision', 'info');
+                return;
+            }
+            UIComponents.showToast(`Managed mailbox policy rejected: ${normalizeString(result.reason) || 'apply failed'}`, 'error');
+            return;
+        }
+        await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
+        UIComponents.showToast(`Managed mailbox policy rejected: ${normalizeString(validation.reason) || 'validation failed'}`, 'error');
+    }
+
     function buildNanahOutgoingProposalPolicy(scope, strategy) {
         if (isNanahChildReceiveOnly()) {
             throw new Error('Child profiles are receive-only in Accounts & Sync. Use a parent/source profile to send updates.');
@@ -9210,6 +9291,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (root.type === 'filtertube_managed_policy') {
             await handleNanahIncomingManagedPolicyEnvelope(root);
+            return;
+        }
+        if (root.schema === 'filtertube_managed_mailbox_item') {
+            await handleNanahIncomingManagedMailboxItem(root);
             return;
         }
         if (root.t === 'control_proposal' || root.t === 'app_sync') {

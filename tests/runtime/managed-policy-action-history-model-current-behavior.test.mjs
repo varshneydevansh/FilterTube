@@ -25,6 +25,11 @@ const approvedActionTypes = new Set([
   'remote_policy.accept',
   'remote_policy.reject',
   'remote_policy.conflict',
+  'remote_policy.mailbox.accept',
+  'remote_policy.mailbox.reject',
+  'remote_policy.mailbox.conflict',
+  'remote_policy.mailbox.expire',
+  'remote_policy.mailbox.revoke',
   'history.clear'
 ]);
 
@@ -184,6 +189,7 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(doc, /Action history is protected evidence and parent\/caregiver UX/);
   assert.match(doc, /It is not policy\s+authority/);
   assert.match(doc, /Nanah receive path now also parses\s+`filtertube_managed_policy` envelopes/);
+  assert.match(doc, /local\/decrypted `filtertube_managed_mailbox_item` outcomes/);
   assert.match(doc, /validated remote accepted apply history can now be recorded/);
   assert.match(doc, /Required History Row Shape/);
   assert.match(doc, /Approved Action Types/);
@@ -203,9 +209,18 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(source, /admin_session\.failed_unlock/);
   assert.match(source, /failed_auth/);
   assert.match(source, /function recordManagedNanahPolicyValidationHistory\(envelope, decision, context = \{\}\)/);
+  assert.match(source, /function resolveManagedRemoteHistoryActionType\(\{ accepted, conflict, reason, transport \}\)/);
+  assert.match(source, /remote_policy\.mailbox\.accept/);
+  assert.match(source, /remote_policy\.mailbox\.reject/);
+  assert.match(source, /remote_policy\.mailbox\.conflict/);
+  assert.match(source, /remote_policy\.mailbox\.expire/);
+  assert.match(source, /remote_policy\.mailbox\.revoke/);
+  assert.match(source, /function handleNanahIncomingManagedMailboxItem\(item\)/);
   assert.match(source, /function handleNanahIncomingManagedPolicyEnvelope\(envelope\)/);
   assert.match(source, /root\.type === 'filtertube_managed_policy'/);
+  assert.match(source, /root\.schema === 'filtertube_managed_mailbox_item'/);
   assert.match(source, /applyManagedPolicyEnvelope\(envelope, context\)/);
+  assert.match(source, /applyManagedMailboxItem\(item, context\)/);
   assert.match(source, /function getNanahManagedPolicyScopeList\(value\)/);
   assert.match(source, /historyBtn\.textContent = 'History'/);
   assert.doesNotMatch(source, /managedActionHistoryStore/);
@@ -294,6 +309,7 @@ test('managed action history required outcomes cover accepted rejected conflict 
   assert.match(doc, /runtime managed action history clear path: present for accepted rows only/);
   assert.match(doc, /runtime remote managed validation\/apply history writer: present/);
   assert.match(doc, /runtime remote managed accepted apply history writer: present behind validated managed apply wrapper/);
+  assert.match(doc, /runtime mailbox managed validation\/apply history writer: present/);
   assert.match(doc, /The current failed-auth writer records only protected evidence rows/);
   assert.match(doc, /does not\s+rate-limit yet/);
 });
