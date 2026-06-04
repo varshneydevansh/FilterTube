@@ -18,7 +18,7 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/tab-view.js` | 13215 | 608012 | `fa9552f13f971f767b58636bc4be91b96daf4dbf9e0f21528aee8b0b61f9b20a` |
+| `js/tab-view.js` | 13324 | 612648 | `c2c2ddcb1fa03e2a89e03012b71e3c981bcc4f86b7a5594084990da5639e8982` |
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/io_manager.js` | 2097 | 100479 | `f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62` |
 | `js/background.js` | 6711 | 301840 | `b27206ec2b6927fc33f823c4832ff95ace7c97bd4284eb950fc5964baf666346` |
@@ -43,9 +43,9 @@ background profile storage invalidation block: 42 lines, 1464 bytes
 
 ```text
 tab-view ensureProfileUnlocked tokens: 18
-tab-view saveProfilesV4 tokens: 39
-tab-view loadProfilesV4 tokens: 70
-tab-view activeProfileId tokens: 81
+tab-view saveProfilesV4 tokens: 41
+tab-view loadProfilesV4 tokens: 72
+tab-view activeProfileId tokens: 82
 tab-view StateManager.loadSettings tokens: 8
 tab-view refreshProfilesUI tokens: 21
 tab-view applyLockGateIfNeeded tokens: 4
@@ -56,7 +56,7 @@ tab-view unlockedProfiles tokens: 4
 tab-view clearProfileUnlockSession tokens: 6
 tab-view allowMainViewing tokens: 4
 tab-view allowKidsViewing tokens: 4
-tab-view schemaVersion tokens: 23
+tab-view schemaVersion tokens: 24
 popup ensureProfileUnlocked tokens: 3
 popup saveProfilesV4 tokens: 2
 popup loadProfilesV4 tokens: 4
@@ -135,10 +135,10 @@ is a required source input before this profile/settings/UI surface can support
 runtime optimization. Current proof pins:
 
 ```text
-method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 6024
+method semantic proof gap files covered: 71
+method semantic proof gap lexical callables covered: 6028
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6024
+lexical callables requiring semantic proof before behavior changes: 6028
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

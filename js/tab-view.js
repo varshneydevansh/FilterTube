@@ -7868,6 +7868,113 @@ document.addEventListener('DOMContentLoaded', async () => {
         await writeNanahStorage(NANAH_TRUSTED_LINKS_KEY, nanahTrustedLinks);
     }
 
+    function buildManagedTrustRevocationHistoryRow({ profileId, linkId, removedScopes, reason, now }) {
+        return {
+            rowId: `managed-trust-revoke-${profileId}-${linkId}-${now}`,
+            schema: MANAGED_ACTION_HISTORY_SCHEMA,
+            version: 1,
+            actorProfileId: activeProfileId || null,
+            actorDeviceId: nanahStableDeviceId || null,
+            targetProfileId: profileId,
+            trustedLinkId: linkId,
+            actionType: 'trust_link.revoke',
+            scope: 'trust_link',
+            revision: null,
+            policyHash: null,
+            result: 'accepted',
+            reason: null,
+            receivedAt: now,
+            issuedAt: now,
+            orderKey: `revoke:${now}:${linkId}`,
+            summary: {
+                redacted: true,
+                label: 'Trusted parent link removed',
+                reason,
+                removedScopeCount: removedScopes.length,
+                removedScopes
+            },
+            sensitive: true
+        };
+    }
+
+    async function purgeNanahManagedPolicyStateForTrustedLink(linkId, { reason = 'trusted_link_removed' } = {}) {
+        const normalized = normalizeString(linkId);
+        if (!normalized) return { profilesTouched: 0, scopesRemoved: 0 };
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
+            return { profilesTouched: 0, scopesRemoved: 0 };
+        }
+
+        const fresh = await io.loadProfilesV4();
+        const profiles = { ...safeObject(fresh.profiles) };
+        let changed = false;
+        let profilesTouched = 0;
+        let scopesRemoved = 0;
+        const now = Date.now();
+
+        Object.entries(profiles).forEach(([profileId, profile]) => {
+            const managedState = safeObject(profile?.managedPolicyState);
+            const remotePolicies = safeObject(managedState.remoteManagedPolicies);
+            if (!Object.prototype.hasOwnProperty.call(remotePolicies, normalized)) return;
+
+            const removedScopes = Object.keys(safeObject(remotePolicies[normalized]))
+                .filter(scope => Object.keys(safeObject(remotePolicies[normalized]?.[scope])).length > 0);
+            const nextRemotePolicies = { ...remotePolicies };
+            delete nextRemotePolicies[normalized];
+            const nextManagedState = { ...managedState };
+            if (Object.keys(nextRemotePolicies).length > 0) {
+                nextManagedState.remoteManagedPolicies = nextRemotePolicies;
+            } else {
+                delete nextManagedState.remoteManagedPolicies;
+            }
+
+            const historyRows = Array.isArray(profile?.managedActionHistory)
+                ? profile.managedActionHistory.filter(row => safeObject(row).schema === MANAGED_ACTION_HISTORY_SCHEMA)
+                : [];
+            const revokeRow = buildManagedTrustRevocationHistoryRow({
+                profileId,
+                linkId: normalized,
+                removedScopes,
+                reason,
+                now
+            });
+            profiles[profileId] = {
+                ...profile,
+                managedPolicyState: nextManagedState,
+                managedActionHistory: [...historyRows, revokeRow].slice(-MANAGED_ACTION_HISTORY_LIMIT)
+            };
+            changed = true;
+            profilesTouched += 1;
+            scopesRemoved += removedScopes.length;
+        });
+
+        if (!changed) return { profilesTouched: 0, scopesRemoved: 0 };
+        const nextProfilesV4 = {
+            ...fresh,
+            schemaVersion: 4,
+            profiles
+        };
+        await io.saveProfilesV4(nextProfilesV4);
+        profilesV4Cache = nextProfilesV4;
+        return { profilesTouched, scopesRemoved };
+    }
+
+    async function purgeNanahManagedOpenSyncStateForTrustedLink(linkId) {
+        const normalized = normalizeString(linkId);
+        if (!normalized) return false;
+        const state = safeObject(nanahManagedOpenSyncState);
+        const linkResults = safeArray(state.linkResults);
+        if (!linkResults.some(row => normalizeString(row?.linkId) === normalized)) return false;
+        await persistNanahManagedOpenSyncState({
+            ...state,
+            checkedAt: Date.now(),
+            reasonCode: 'trusted_link_removed',
+            purgedLinkId: normalized,
+            linkResults: linkResults.filter(row => normalizeString(row?.linkId) !== normalized)
+        });
+        return true;
+    }
+
     async function saveNanahTrustedLink(entry) {
         const deviceId = normalizeString(entry?.remoteDeviceId);
         if (!deviceId) return;
@@ -7899,6 +8006,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const normalized = normalizeString(linkId);
         if (!normalized) return;
         nanahTrustedLinks = nanahTrustedLinks.filter((entry) => normalizeString(entry?.linkId) !== normalized);
+        await purgeNanahManagedPolicyStateForTrustedLink(normalized);
+        await purgeNanahManagedOpenSyncStateForTrustedLink(normalized);
         await persistNanahTrustedLinks();
         renderNanahTrustedLinks();
     }

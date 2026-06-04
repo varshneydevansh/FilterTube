@@ -8,7 +8,9 @@ validated remote accepted apply history can now be recorded after the managed
 apply wrapper succeeds. Local/decrypted mailbox-item intake now writes distinct
 mailbox action-history rows through the same protected model. Parent/caregiver
 history clearing now records its own protected `history.clear` evidence row
-instead of silently removing accepted rows.
+instead of silently removing accepted rows. Trusted-link removal history writer
+now records protected `trust_link.revoke` rows when local accepted managed
+policy state is purged for a removed link.
 **Goal slice**: Implementation order item 4, "Add action-history/log model and
 access-control tests".
 **Primary inputs**:
@@ -31,7 +33,9 @@ through a validated apply wrapper before history records the accepted remote
 result. It also records protected
 failed-auth rows when parent/admin unlock fails while opening managed child
 edit, viewing/clearing protected history, changing viewing space, or changing
-time limits, and records a protected clear row when accepted history is cleared.
+time limits, records a protected clear row when accepted history is cleared, and
+records a protected `trust_link.revoke` row when trusted-link removal purges
+target-local remote managed-policy state for that link.
 
 Action history is protected evidence and parent/caregiver UX. It is not policy
 authority. Runtime policy must still come from the current accepted managed

@@ -19,10 +19,12 @@ evidence, managed public-key descriptor pairing, source signing-key
 provisioning, eligible signed Main/Kids/granular live managed-policy sends, and
 an explicit Main/Kids rule-source picker for granular sends, plus a
 provider-gated dashboard/profile-open pull hook for already-decrypted mailbox
-items, plus an extension-owned downstream app policy contract artifact wired
+items, trusted-link removal cleanup for target-local accepted managed-policy
+state, plus an extension-owned downstream app policy contract artifact wired
 into the app sync manifest. Active/full signed conversion, richer bulk outbound
-controls, server mailbox pull/ack/decryption runtime, local-network discovery
-runtime, and app native settings/iOS enforcement proofs remain pending.
+controls, server mailbox pull/ack/decryption runtime, server mailbox queue
+purge, local-network discovery runtime, and app native settings/iOS enforcement
+proofs remain pending.
 **Goal slice**: Implementation order item 1 plus first runtime viewing-space
 enforcement slice.
 **Lane proof**: `test:settings` for profile/Nanah authority and `test:release`
@@ -56,10 +58,14 @@ Local/decrypted mailbox items can now bind
 mailbox metadata to the decrypted managed envelope before calling the same
 managed-policy validation/apply path. The dashboard/profile-open hook can ask a
 trusted local provider for already-decrypted mailbox items when an opted-in
-managed replica link opens. Server mailbox pull, mailbox ack, mailbox decryption
-client, active/full signed conversion, richer bulk outbound controls,
-local-network delivery runtime, background/session-service failed-attempt
-durability, and remote admin session semantics remain separate required slices.
+managed replica link opens. Trusted-link removal now purges target-local
+accepted managed-policy revision state for that link and clears matching
+open-sync status rows before the removed trust can be reused as local authority
+evidence. Server mailbox pull, mailbox ack, mailbox decryption client, server
+mailbox queue purge, active/full signed conversion, richer bulk outbound
+controls, local-network delivery runtime, background/session-service
+failed-attempt durability, and remote admin session semantics remain separate
+required slices.
 
 ## Issue 60 Local-Network Caregiver Addendum
 
@@ -360,9 +366,10 @@ Current gap:
       source sessions can provision managed signing keypairs, and eligible
       fixed-target Main/Kids and granular live signed policy construction is
       wired.
-- Trust revocation does not yet purge queued updates or invalidate an accepted
-  policy revision. The encrypted mailbox protocol now specifies revoked queued
-  delivery behavior, but no runtime queue exists yet.
+- Trusted-link removal now purges target-local accepted managed-policy revision
+  state for the removed link and clears matching open-sync status rows. The
+  encrypted mailbox protocol specifies revoked queued delivery behavior, but no
+  runtime queue exists yet, so server mailbox queue purge remains pending.
 
 ### Main/Kids viewing-space settings
 
@@ -437,7 +444,7 @@ Current gap:
 | Gap | Risk | Required next proof |
 |---|---|---|
 | Validated managed policy apply wrapper | Remote apply can now persist a durable accepted-revision object for a fixed child target, but only when a caller supplies accepted validation context. | Key-store/WebCrypto verifier plumbing and live Nanah/local-network receive tests before automatic remote apply. |
-| Target-local remote revision store | Stale or replayed remote updates can now be rejected per target profile/link/scope after the first accepted write, but there is no mailbox or multi-device conflict-resolution layer yet. | Multi-parent, revoked-link, equal-revision/different-hash, and mailbox-delivery fixtures. |
+| Target-local remote revision store | Stale or replayed remote updates can now be rejected per target profile/link/scope after the first accepted write, and trusted-link removal now purges accepted state plus open-sync status for the removed link. There is still no server mailbox queue or multi-device conflict-resolution layer yet. | Multi-parent, revoked-link, equal-revision/different-hash, mailbox-delivery, and server-queue-purge fixtures. |
 | Pairing public-key descriptor, source keypair provisioning, and eligible live signed send present | The helper now requires verifier evidence, adapter WebCrypto verification is wired, Nanah pairing can persist advertised source public-key descriptors, source sessions can provision local managed signing keypairs, fixed-target Main/Kids, keyword, channel, video, viewing-space, and time-limit managed live sends build signed `filtertube_managed_policy` envelopes, and granular rule sends expose an explicit Main/Kids rule-source picker. Active/full sends and richer bulk outbound controls still remain proposal/spec work. | Authenticated two-device live-delivery smoke, signed granular live-delivery smoke, rotation/revocation, and active/full conversion policy. |
 | Partial canonical payload/integrity binding | The helper checks binding fields and verifier result, but no canonical payload hash recomputation exists yet. | Binding-tuple fixtures plus canonical payload hash proof. |
 | Signed remote managed-policy gate is partially live | Fixed-target Main/Kids, keyword, channel, video, viewing-space, and time-limit managed Nanah sends can now travel as signed envelopes and receive-side code validates before apply. Granular keyword/channel/video sends can choose Main or Kids local rule source explicitly. Active/full signed conversion, mailbox delivery, and richer bulk outbound controls are still pending. | Installed two-device Main/Kids and granular smoke plus dedicated signed route/time policy fixtures. |
@@ -451,7 +458,7 @@ Current gap:
 | No pairing key/signature contract | P2P or local-network transport could authenticate reachability instead of authority. | Device-bound key, signature/integrity, rotation, revocation, and compromise-recovery fixtures. |
 | No hostile-LAN fixture set | Spoofed peer announcements, duplicate device ids, stale pairings, reconnect drift, or MITM attempts could be missed. | Discovery-versus-authority negative fixtures before local-network writes. |
 | Partial protected log access policy | Local child history viewer, accepted-row clear path, and dashboard failed-attempt persistence now preserve protected evidence; encrypted summaries and background/session-service failed-attempt durability remain pending. | Retention, encryption, and background/session-service failed-attempt durability proof. |
-| No conflict-resolution matrix | Simultaneous parent edits or mailbox delivery after revocation could produce nondeterministic policy state. | Equal-revision, different-hash, multi-parent, local-vs-remote, and revoked-queued-update fixtures. |
+| No conflict-resolution matrix | Simultaneous parent edits or server mailbox delivery after revocation could produce nondeterministic policy state. Local accepted-state cleanup now removes the revoked link's cached revision evidence, but mailbox/server queue conflict handling remains pending. | Equal-revision, different-hash, multi-parent, local-vs-remote, and revoked-queued-update fixtures. |
 | App policy contract parity now explicit | The extension-owned contract names the fields apps must preserve, the app sync manifest copies a dedicated contract artifact, and Android now has model-level proof for managed policy state/action history preservation plus Activity startup/resume/heartbeat/pause enforcement for managed time budgets. Rich timeout UI, settings locks, installed-device app smoke, and iOS parity remain pending. | Installed Android Main/Kids time-budget smoke, native settings-lock tests, iOS adapter parity, and child/admin authority separation fixtures. |
 
 ## Required Next Implementation Gates
