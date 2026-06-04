@@ -3007,6 +3007,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const NANAH_DEVICE_ID_KEY = 'ftNanahDeviceId';
     const NANAH_DEVICE_LABEL_KEY = 'ftNanahDeviceLabel';
     const NANAH_UI_MODE_KEY = 'ftNanahUiMode';
+    const NANAH_MANAGED_SIGNING_KEYPAIR_KEY = 'ftNanahManagedSigningKeyPair';
     const NANAH_MANAGED_SIGNING_PUBLIC_KEY_KEY = 'ftNanahManagedSigningPublicKey';
     let nanahClient = null;
     let nanahTrustedLinks = [];
@@ -7479,6 +7480,91 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    function normalizeNanahManagedSigningPublicDescriptor(value) {
+        const root = safeObject(value);
+        const managedPublicKeyId = normalizeString(root.managedPublicKeyId || root.sourcePublicKeyId || root.publicKeyId);
+        const managedPublicKeyJwk = safeObject(root.managedPublicKeyJwk || root.sourcePublicKeyJwk || root.publicKeyJwk);
+        const managedKeyVersion = normalizeNonNegativeInteger(root.managedKeyVersion || root.keyVersion || root.sourceKeyVersion) || 0;
+        if (!managedPublicKeyId || Object.keys(managedPublicKeyJwk).length === 0 || managedKeyVersion <= 0) {
+            return null;
+        }
+        return {
+            managedPublicKeyId,
+            managedPublicKeyJwk,
+            managedKeyVersion,
+            sourcePublicKeyId: managedPublicKeyId,
+            sourcePublicKeyJwk: managedPublicKeyJwk,
+            keyVersion: managedKeyVersion,
+            algorithm: normalizeString(root.algorithm).toLowerCase() || 'ed25519',
+            createdAt: normalizeNonNegativeInteger(root.createdAt) || Date.now()
+        };
+    }
+
+    function normalizeNanahManagedSigningKeyPair(value) {
+        const root = safeObject(value);
+        const publicDescriptor = normalizeNanahManagedSigningPublicDescriptor(root);
+        const privateKeyJwk = safeObject(root.privateKeyJwk);
+        if (!publicDescriptor || Object.keys(privateKeyJwk).length === 0) {
+            return null;
+        }
+        return {
+            ...publicDescriptor,
+            privateKeyJwk
+        };
+    }
+
+    async function persistNanahManagedSigningKeyPair(keyPair) {
+        const normalized = normalizeNanahManagedSigningKeyPair(keyPair);
+        if (!normalized) return null;
+        const publicDescriptor = normalizeNanahManagedSigningPublicDescriptor(normalized);
+        const privateStored = {
+            ...publicDescriptor,
+            privateKeyJwk: normalized.privateKeyJwk
+        };
+        const wrotePrivate = await writeNanahStorage(NANAH_MANAGED_SIGNING_KEYPAIR_KEY, privateStored);
+        const wrotePublic = await writeNanahStorage(NANAH_MANAGED_SIGNING_PUBLIC_KEY_KEY, publicDescriptor);
+        if (!wrotePrivate || !wrotePublic) return null;
+        nanahManagedSigningKeyDescriptor = publicDescriptor;
+        return privateStored;
+    }
+
+    async function loadNanahManagedSigningKeyDescriptor() {
+        const publicDescriptor = normalizeNanahManagedSigningPublicDescriptor(
+            await readNanahStorage(NANAH_MANAGED_SIGNING_PUBLIC_KEY_KEY)
+        );
+        if (publicDescriptor) {
+            nanahManagedSigningKeyDescriptor = publicDescriptor;
+            return publicDescriptor;
+        }
+        const keyPair = normalizeNanahManagedSigningKeyPair(
+            await readNanahStorage(NANAH_MANAGED_SIGNING_KEYPAIR_KEY)
+        );
+        if (!keyPair) {
+            nanahManagedSigningKeyDescriptor = null;
+            return null;
+        }
+        return normalizeNanahManagedSigningPublicDescriptor(await persistNanahManagedSigningKeyPair(keyPair));
+    }
+
+    async function ensureNanahManagedSigningKeyPair({ required = false } = {}) {
+        const existing = normalizeNanahManagedSigningKeyPair(
+            await readNanahStorage(NANAH_MANAGED_SIGNING_KEYPAIR_KEY)
+        );
+        if (existing) {
+            await persistNanahManagedSigningKeyPair(existing);
+            return existing;
+        }
+        const adapter = window.FilterTubeNanahAdapter || {};
+        if (typeof adapter.createManagedNanahSigningKeyPair !== 'function') {
+            if (required) throw new Error('Managed signing key generation is unavailable');
+            return null;
+        }
+        const generated = await adapter.createManagedNanahSigningKeyPair({
+            managedKeyVersion: 1
+        });
+        return persistNanahManagedSigningKeyPair(generated);
+    }
+
     async function loadNanahTrustedLinks() {
         const stored = await readNanahStorage(NANAH_TRUSTED_LINKS_KEY);
         nanahTrustedLinks = Array.isArray(stored)
@@ -9049,7 +9135,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             await resetNanahSession(true);
         }
         await ensureNanahStableDeviceId();
-        nanahManagedSigningKeyDescriptor = safeObject(await readNanahStorage(NANAH_MANAGED_SIGNING_PUBLIC_KEY_KEY));
+        await loadNanahManagedSigningKeyDescriptor();
+        if (getNanahRole() === 'source') {
+            try {
+                await ensureNanahManagedSigningKeyPair();
+            } catch (error) {
+                // Optional provisioning can fail closed later when managed source authority is required.
+            }
+        }
 
         const device = buildNanahDeviceDescriptor();
         const NanahApi = window.FilterTubeNanah;
@@ -9141,6 +9234,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (isNanahChildReplicaOnly() && (localRole !== 'replica' || remoteRole !== 'source' || linkType !== 'managed_link')) {
             UIComponents.showToast('Locked child profiles can only save managed Source -> Replica links. Unlock the child profile first to send from it.', 'error');
             return;
+        }
+        if (linkType === 'managed_link' && localRole === 'source') {
+            try {
+                const keyPair = await ensureNanahManagedSigningKeyPair({ required: true });
+                if (!keyPair) {
+                    UIComponents.showToast('Managed source links require a local signing key before they can be saved.', 'error');
+                    return;
+                }
+            } catch (error) {
+                // The toast below is the user-facing required-key failure report.
+                UIComponents.showToast(error?.message || 'Managed signing key is unavailable', 'error');
+                return;
+            }
         }
 
         const scope = getNanahScope();
@@ -10647,6 +10753,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                     const selectionStrategy = getNanahStrategy();
                     const policy = buildNanahOutgoingProposalPolicy(selectionScope, selectionStrategy);
+                    if (policy.linkType === 'managed_link' && getNanahRole() === 'source') {
+                        await ensureNanahManagedSigningKeyPair({ required: true });
+                    }
                     const auth = await ensureNanahOutgoingAuth(policy.scope);
                     let envelope = await adapter.buildControlProposal({ scope: policy.scope, strategy: policy.strategy, auth });
                     envelope = attachNanahProposalPolicy(envelope, policy);

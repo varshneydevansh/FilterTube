@@ -6,6 +6,7 @@ import vm from 'node:vm';
 
 const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_NANAH_MANAGED_PAIRING_KEY_DESCRIPTOR_2026-06-04.md';
+const signingDocPath = 'docs/audit/FILTERTUBE_NANAH_MANAGED_SIGNING_KEYPAIR_2026-06-04.md';
 const planPath = 'docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md';
 const inventoryPath = 'docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md';
 
@@ -35,18 +36,20 @@ function loadNanahAdapter() {
 
 test('managed pairing key descriptor audit is linked from plan and authority inventory', () => {
   const doc = read(docPath);
+  const signingDoc = read(signingDocPath);
   const plan = read(planPath);
   const inventory = read(inventoryPath);
 
   assert.match(doc, /Status\*\*: Runtime descriptor persistence slice/);
-  assert.match(doc, /does not generate a\s+managed signing keypair/);
+  assert.match(doc, /related\s+same-day signing-key proof/);
   assert.match(doc, /ftNanahManagedSigningPublicKey/);
   assert.match(doc, /managedPublicKeyId/);
   assert.match(doc, /sourcePublicKeyJwk/);
   assert.match(doc, /If no public key descriptor exists, managed envelopes still fail closed/);
+  assert.match(signingDoc, new RegExp(docPath));
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
-  assert.match(inventory, /Pairing public-key descriptor stored, signing pending/);
+  assert.match(inventory, /Pairing public-key descriptor and source keypair provisioning present/);
 });
 
 test('Nanah device descriptor advertises managed public key aliases only when a complete descriptor exists', () => {
@@ -90,7 +93,8 @@ test('dashboard Nanah pairing preserves source key fields on managed trusted lin
 
   assert.match(tabView, /const NANAH_MANAGED_SIGNING_PUBLIC_KEY_KEY = 'ftNanahManagedSigningPublicKey'/);
   assert.match(tabView, /let nanahManagedSigningKeyDescriptor = null/);
-  assert.match(tabView, /nanahManagedSigningKeyDescriptor = safeObject\(await readNanahStorage\(NANAH_MANAGED_SIGNING_PUBLIC_KEY_KEY\)\)/);
+  assert.match(tabView, /async function loadNanahManagedSigningKeyDescriptor\(\)/);
+  assert.match(tabView, /await loadNanahManagedSigningKeyDescriptor\(\)/);
   assert.match(tabView, /managedPublicKeyId: normalizeString\(managedKey\.managedPublicKeyId \|\| managedKey\.sourcePublicKeyId \|\| managedKey\.publicKeyId\)/);
   assert.match(tabView, /managedPublicKeyJwk: safeObject\(managedKey\.managedPublicKeyJwk \|\| managedKey\.sourcePublicKeyJwk \|\| managedKey\.publicKeyJwk\)/);
   assert.match(tabView, /managedKeyVersion: normalizeNonNegativeInteger\(managedKey\.managedKeyVersion \|\| managedKey\.keyVersion \|\| managedKey\.sourceKeyVersion\) \|\| 0/);
@@ -110,13 +114,14 @@ test('dashboard Nanah pairing preserves source key fields on managed trusted lin
 
 test('managed pairing key descriptor slice does not overclaim outgoing signing or mailbox runtime', () => {
   const source = runtimeSource();
+  const doc = read(docPath);
 
   assert.match(source, /function verifyManagedNanahPolicyIntegritySignature\(envelope, trustedLink\)/);
   assert.match(source, /function validateManagedPolicyEnvelope\(envelope, context = \{\}\)/);
   assert.match(source, /async function applyManagedPolicyEnvelope\(envelope, context = \{\}\)/);
-  assert.doesNotMatch(source, /generateManagedNanahSigningKeyPair/);
-  assert.doesNotMatch(source, /createManagedNanahSigningKeyPair/);
-  assert.doesNotMatch(source, /signManagedPolicyEnvelope/);
+  assert.match(source, /createManagedNanahSigningKeyPair/);
+  assert.match(source, /signManagedPolicyEnvelope/);
   assert.doesNotMatch(source, /managedPolicyOutbox/);
   assert.doesNotMatch(source, /FilterTubeManagedMailbox/);
+  assert.match(doc, /dashboard live send conversion from `control_proposal` to signed\s+`filtertube_managed_policy`/);
 });

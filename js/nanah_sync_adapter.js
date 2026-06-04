@@ -148,11 +148,98 @@
         }
     }
 
+    function encodeManagedNanahBase64Url(value) {
+        const bytes = value instanceof Uint8Array ? value : new Uint8Array(value || []);
+        if (!bytes.length || typeof global.btoa !== 'function') return '';
+        let binary = '';
+        for (let index = 0; index < bytes.length; index += 1) {
+            binary += String.fromCharCode(bytes[index]);
+        }
+        return global.btoa(binary)
+            .replace(/\+/g, '-')
+            .replace(/\//g, '_')
+            .replace(/=+$/g, '');
+    }
+
     function getManagedNanahSourcePublicKeyJwk(trustedLink) {
         const trusted = safeObject(trustedLink);
         const policy = safeObject(trusted.policy);
         const jwk = safeObject(trusted.sourcePublicKeyJwk || policy.sourcePublicKeyJwk || policy.publicKeyJwk);
         return Object.keys(jwk).length > 0 ? jwk : null;
+    }
+
+    function buildManagedPolicySignedFields(envelope) {
+        const root = safeObject(envelope);
+        return {
+            linkId: normalizeString(root.linkId),
+            scope: normalizeManagedPolicyScope(root.scope),
+            targetProfileId: normalizeString(root.targetProfileId),
+            sourceDeviceId: normalizeString(root.sourceDeviceId),
+            revision: normalizeNonNegativeInteger(root.revision) || 0,
+            policyHash: normalizeString(root.policyHash),
+            payloadScope: getManagedPayloadScopeFamily(root.payload)
+        };
+    }
+
+    async function createManagedNanahSigningKeyPair(options = {}) {
+        const subtle = global.crypto?.subtle;
+        if (!subtle || typeof subtle.generateKey !== 'function' || typeof subtle.exportKey !== 'function') {
+            throw new Error('Managed Nanah signing requires WebCrypto key generation');
+        }
+        const keyVersion = normalizeNonNegativeInteger(options.managedKeyVersion || options.keyVersion || options.sourceKeyVersion) || 1;
+        const keyId = normalizeString(options.managedPublicKeyId || options.sourcePublicKeyId || options.publicKeyId)
+            || `managed-${generateId()}`;
+        const generated = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
+        const publicKeyJwk = await subtle.exportKey('jwk', generated.publicKey);
+        const privateKeyJwk = await subtle.exportKey('jwk', generated.privateKey);
+        return {
+            managedPublicKeyId: keyId,
+            managedPublicKeyJwk: publicKeyJwk,
+            managedKeyVersion: keyVersion,
+            sourcePublicKeyId: keyId,
+            sourcePublicKeyJwk: publicKeyJwk,
+            keyVersion,
+            privateKeyJwk,
+            algorithm: 'ed25519',
+            createdAt: Date.now()
+        };
+    }
+
+    async function signManagedPolicyEnvelope(envelope, privateKeyJwk) {
+        const root = safeObject(envelope);
+        const keyJwk = safeObject(privateKeyJwk || root.privateKeyJwk);
+        const subtle = global.crypto?.subtle;
+        if (!subtle || typeof subtle.importKey !== 'function' || typeof subtle.sign !== 'function') {
+            throw new Error('Managed Nanah signing requires WebCrypto signing support');
+        }
+        if (!Object.keys(keyJwk).length) {
+            throw new Error('Managed Nanah signing requires a private key');
+        }
+        if (typeof global.TextEncoder !== 'function') {
+            throw new Error('Managed Nanah signing requires TextEncoder');
+        }
+        const signedFields = buildManagedPolicySignedFields(root);
+        const bindingDecision = validateManagedIntegrityBinding({
+            ...root,
+            integrity: {
+                signedFields
+            }
+        });
+        if (bindingDecision) {
+            throw new Error(`Managed Nanah signing refused: ${bindingDecision.reason}`);
+        }
+        const key = await subtle.importKey('jwk', keyJwk, { name: 'Ed25519' }, false, ['sign']);
+        const data = new global.TextEncoder().encode(stableManagedNanahJson(signedFields));
+        const signature = await subtle.sign({ name: 'Ed25519' }, key, data);
+        const { privateKeyJwk: _discardPrivateKey, ...publicEnvelope } = root;
+        return {
+            ...publicEnvelope,
+            integrity: {
+                algorithm: 'ed25519',
+                signedFields,
+                signature: encodeManagedNanahBase64Url(signature)
+            }
+        };
     }
 
     async function verifyManagedNanahPolicyIntegritySignature(envelope, trustedLink) {
@@ -1159,6 +1246,8 @@
         buildControlProposal,
         validateManagedPolicyEnvelope,
         verifyManagedNanahPolicyIntegritySignature,
+        createManagedNanahSigningKeyPair,
+        signManagedPolicyEnvelope,
         applyManagedPolicyEnvelope,
         applyIncomingEnvelope,
         extractPortableFromEnvelope

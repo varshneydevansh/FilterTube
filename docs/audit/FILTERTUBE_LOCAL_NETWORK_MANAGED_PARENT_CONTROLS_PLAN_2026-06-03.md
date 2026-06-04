@@ -7,8 +7,10 @@ Nanah receive-side managed-policy validation/apply-history slice, validated
 managed-policy apply wrapper, adapter WebCrypto verifier helper, runtime
 viewing-space/time-budget enforcement, and encrypted mailbox protocol proof.
 Managed pairing public-key descriptor persistence is now present when a key
-descriptor is already provisioned. Live remote/local-network transport,
-managed keypair generation, and outgoing signing remain gated.
+descriptor is already provisioned, and source-side managed signing keypair
+provisioning plus an adapter signing helper are present. Live
+remote/local-network transport and dashboard signed managed-policy sends remain
+gated.
 **Primary audit input**:
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
 
@@ -327,9 +329,9 @@ replica child device over Nanah/P2P or same-network transport.
   `applyManagedPolicyEnvelope(...)` for accepted envelopes, persists accepted
   revision/hash state on the target child profile, and records
   accepted/rejected apply history. Pairing-time public-key descriptor
-  persistence now exists when a descriptor is already provisioned, while
-  managed keypair generation, outgoing signing, and local-network/P2P delivery
-  remain pending.
+  persistence and source-side signing keypair provisioning now exist, while
+  dashboard signed managed-policy sends, canonical outbound policy hashing, and
+  local-network/P2P delivery remain pending.
 - **Acceptance Criteria**:
   - Existing `app_sync` and `control_proposal` behavior remains compatible.
   - New managed policy applies only to target profile and target surface.
@@ -368,7 +370,9 @@ replica child device over Nanah/P2P or same-network transport.
   - `js/nanah_sync_adapter.js`
   - `js/tab-view.js`
   - `docs/audit/FILTERTUBE_NANAH_MANAGED_PAIRING_KEY_DESCRIPTOR_2026-06-04.md`
+  - `docs/audit/FILTERTUBE_NANAH_MANAGED_SIGNING_KEYPAIR_2026-06-04.md`
   - `tests/runtime/managed-nanah-pairing-key-descriptor-current-behavior.test.mjs`
+  - `tests/runtime/managed-nanah-signing-keypair-current-behavior.test.mjs`
 - **Description**: Preserve source public-key descriptors across managed Nanah
   pairing so a trusted replica can later verify signed parent/caregiver policy
   envelopes against trusted-link key material.
@@ -378,8 +382,9 @@ replica child device over Nanah/P2P or same-network transport.
   reads `ftNanahManagedSigningPublicKey`, device descriptors advertise
   `managedPublicKey*` and `sourcePublicKey*` aliases when the descriptor is
   already present, and managed trusted links save source device/profile/key
-  bindings. This does not generate keys, store private keys, sign outgoing
-  envelopes, or enable mailbox runtime delivery.
+  bindings. The next signing-key slice now provisions source keypairs and adds
+  an adapter signing helper; this descriptor task still does not enable signed
+  dashboard sends or mailbox runtime delivery.
 - **Acceptance Criteria**:
   - Pairing descriptors never grant authority without managed-link validation.
   - Missing key descriptors keep the fail-closed receive path.
@@ -387,6 +392,36 @@ replica child device over Nanah/P2P or same-network transport.
   - Docs do not overclaim automatic remote policy writes.
 - **Validation**:
   - `node --test tests/runtime/managed-nanah-pairing-key-descriptor-current-behavior.test.mjs`
+  - `npm run test:settings`
+
+### Task 3.5: Provision managed signing keypairs
+
+- **Location**:
+  - `js/nanah_sync_adapter.js`
+  - `js/tab-view.js`
+  - `docs/audit/FILTERTUBE_NANAH_MANAGED_SIGNING_KEYPAIR_2026-06-04.md`
+  - `tests/runtime/managed-nanah-signing-keypair-current-behavior.test.mjs`
+- **Description**: Generate durable source-side managed signing keypairs and
+  sign managed-policy envelope fields with the same canonical binding that the
+  receive-side verifier already checks.
+- **Complexity**: 6/10
+- **Dependencies**: Task 3.4.
+- **Status**: Runtime provisioning and adapter signing helper are present.
+  Source / Parent sessions try to provision a WebCrypto Ed25519 keypair before
+  sending the Nanah hello, public descriptors are mirrored into
+  `ftNanahManagedSigningPublicKey`, private JWK material stays under
+  `ftNanahManagedSigningKeyPair`, and source-side managed link saves require a
+  local signing key. Dashboard live sends still use `control_proposal`; signed
+  `filtertube_managed_policy` send remains a later slice.
+- **Acceptance Criteria**:
+  - The public descriptor is separated from the private keypair.
+  - The private JWK is not placed in the Nanah hello descriptor or trusted link
+    policy.
+  - The signing helper refuses malformed signed-field bindings.
+  - Docs do not claim encrypted-at-rest private key storage or live remote
+    managed-policy transport.
+- **Validation**:
+  - `node --test tests/runtime/managed-nanah-signing-keypair-current-behavior.test.mjs`
   - `npm run test:settings`
 
 ## Sprint 4: Protected User Experience

@@ -1,12 +1,15 @@
 # Audit: Nanah Managed Pairing Key Descriptor
 
 **Generated**: 2026-06-04
-**Status**: Runtime descriptor persistence slice. This does not generate a
-managed signing keypair and does not sign outgoing managed policies yet.
+**Status**: Runtime descriptor persistence slice. A later same-day keypair
+provisioning slice now exists, but this document remains the public descriptor
+boundary and does not claim live outgoing managed-policy delivery.
 **Related plan**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`
 **Related inventory**:
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
+**Related signing-key proof**:
+`docs/audit/FILTERTUBE_NANAH_MANAGED_SIGNING_KEYPAIR_2026-06-04.md`
 
 ## Purpose
 
@@ -26,8 +29,10 @@ This slice adds the first public-key descriptor plumbing:
 - Receive-side validation can continue using the existing trusted-link
   `sourcePublicKeyJwk` verifier path.
 
-It intentionally does not add a keypair generator, private-key storage,
-outgoing signature writer, mailbox client, or automatic remote admin session.
+It intentionally does not add mailbox delivery, automatic remote admin
+sessions, signed live sends, key rotation, or key revocation. Keypair
+provisioning and an adapter signing helper are covered by the related
+same-day signing-key proof.
 
 ## Runtime Shape
 
@@ -99,12 +104,13 @@ from either the trusted-link root or policy object.
 
 ## Boundaries
 
-This slice is not enough to enable automatic remote policy writes by itself.
+This descriptor slice is not enough to enable automatic remote policy writes by
+itself.
 The following remain pending:
 
-- managed keypair generation
-- protected private-key storage
-- outgoing `filtertube_managed_policy` signature creation
+- protected or encrypted private-key storage
+- dashboard live send conversion from `control_proposal` to signed
+  `filtertube_managed_policy`
 - canonical payload hash recomputation
 - key rotation and revocation UI
 - mailbox pull/ack runtime
