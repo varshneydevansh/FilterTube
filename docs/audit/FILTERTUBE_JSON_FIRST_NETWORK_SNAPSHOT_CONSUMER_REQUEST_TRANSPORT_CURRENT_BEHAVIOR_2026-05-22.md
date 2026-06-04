@@ -111,7 +111,7 @@ channelPendingSet: `js/content_bridge.js:5394`
 channelRequestPost: `js/content_bridge.js:5425` through `js/content_bridge.js:5406`
 channelRetry250: `js/content_bridge.js:5416` through `js/content_bridge.js:5420`
 channelRetry1000: `js/content_bridge.js:5421` through `js/content_bridge.js:5425`
-injectorSameWindowGate: `js/injector.js:1916` through `js/injector.js:1922`
+injectorSameWindowGate: `js/injector.js:1916` through `js/injector.js:1937`
 injectorCollaboratorRequestGate: `js/injector.js:1961`
 injectorCollaboratorResponsePost: `js/injector.js:1997` through `js/injector.js:2005`
 injectorChannelRequestGate: `js/injector.js:2011`

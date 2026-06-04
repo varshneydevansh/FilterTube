@@ -3016,11 +3016,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const NANAH_MANAGED_SIGNING_KEYPAIR_KEY = 'ftNanahManagedSigningKeyPair';
     const NANAH_MANAGED_SIGNING_PUBLIC_KEY_KEY = 'ftNanahManagedSigningPublicKey';
     const NANAH_MANAGED_OPEN_SYNC_STATE_KEY = 'ftNanahManagedOpenSyncState';
+    const NANAH_MANAGED_LOCAL_NETWORK_SYNC_STATE_KEY = 'ftNanahManagedLocalNetworkSyncState';
     let nanahClient = null;
     let nanahTrustedLinks = [];
     let nanahStableDeviceId = '';
     let nanahManagedSigningKeyDescriptor = null;
     let nanahManagedOpenSyncState = null;
+    let nanahManagedLocalNetworkSyncState = null;
     let nanahUiMode = 'send_once';
     let isApplyingNanahModePreset = false;
     let nanahTrustedReconnectApprovalPromise = null;
@@ -8241,6 +8243,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         return true;
     }
 
+    async function purgeNanahManagedLocalNetworkSyncStateForTrustedLink(linkId) {
+        const normalized = normalizeString(linkId);
+        if (!normalized) return false;
+        const state = safeObject(nanahManagedLocalNetworkSyncState);
+        const linkResults = safeArray(state.linkResults);
+        if (!linkResults.some(row => normalizeString(row?.linkId) === normalized)) return false;
+        await persistNanahManagedLocalNetworkSyncState({
+            ...state,
+            checkedAt: Date.now(),
+            reasonCode: 'trusted_link_removed',
+            purgedLinkId: normalized,
+            linkResults: linkResults.filter(row => normalizeString(row?.linkId) !== normalized)
+        });
+        return true;
+    }
+
     async function saveNanahTrustedLink(entry) {
         const deviceId = normalizeString(entry?.remoteDeviceId);
         if (!deviceId) return;
@@ -8281,6 +8299,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         nanahTrustedLinks = nanahTrustedLinks.filter((entry) => normalizeString(entry?.linkId) !== normalized);
         await purgeNanahManagedPolicyStateForTrustedLink(normalized);
         await purgeNanahManagedOpenSyncStateForTrustedLink(normalized);
+        await purgeNanahManagedLocalNetworkSyncStateForTrustedLink(normalized);
         await persistNanahTrustedLinks();
         renderNanahTrustedLinks();
     }
@@ -8357,6 +8376,172 @@ document.addEventListener('DOMContentLoaded', async () => {
             applyMailboxItem: (item) => handleNanahIncomingManagedMailboxItem(item),
             writeState: persistNanahManagedOpenSyncState
         });
+        renderNanahTrustedLinks();
+        return state;
+    }
+
+    async function loadNanahManagedLocalNetworkSyncState() {
+        nanahManagedLocalNetworkSyncState = safeObject(await readNanahStorage(NANAH_MANAGED_LOCAL_NETWORK_SYNC_STATE_KEY));
+    }
+
+    async function persistNanahManagedLocalNetworkSyncState(state) {
+        nanahManagedLocalNetworkSyncState = safeObject(state);
+        await writeNanahStorage(NANAH_MANAGED_LOCAL_NETWORK_SYNC_STATE_KEY, nanahManagedLocalNetworkSyncState);
+    }
+
+    function getNanahManagedLocalNetworkProvider() {
+        return safeObject(window.FilterTubeManagedPolicyLocalNetwork);
+    }
+
+    function resolveNanahManagedLocalNetworkTargetProfileId(link, activeId) {
+        const policy = safeObject(link?.policy);
+        const behavior = getNanahTargetProfileBehavior(policy.targetProfileBehavior, 'current_active');
+        return behavior === 'fixed_profile'
+            ? normalizeString(policy.targetProfileId)
+            : normalizeString(activeId);
+    }
+
+    function buildNanahManagedLocalNetworkDiscoveryRequest(link, activeId, reason) {
+        const trusted = safeObject(link);
+        const policy = safeObject(trusted.policy);
+        const targetProfileId = resolveNanahManagedLocalNetworkTargetProfileId(trusted, activeId);
+        return {
+            schema: 'filtertube_managed_local_network_discovery_request',
+            version: 1,
+            reason: normalizeString(reason) || 'dashboard_open',
+            requestedAt: Date.now(),
+            linkId: normalizeString(trusted.linkId || trusted.id),
+            remoteDeviceId: normalizeString(trusted.remoteDeviceId),
+            sourceDeviceId: normalizeString(trusted.sourceDeviceId || policy.sourceDeviceId) || normalizeString(trusted.remoteDeviceId),
+            sourceProfileId: normalizeString(trusted.sourceProfileId || policy.sourceProfileId),
+            targetProfileId,
+            allowedScopes: getNanahScopeList(policy.allowedScopes || policy.defaultScope),
+            sourcePublicKeyId: normalizeString(trusted.sourcePublicKeyId || policy.sourcePublicKeyId),
+            keyVersion: Number(trusted.keyVersion || policy.keyVersion) || 0
+        };
+    }
+
+    function getNanahManagedLocalNetworkEligibleLinks(activeId, localProfilesV4) {
+        const profiles = safeObject(safeObject(localProfilesV4).profiles);
+        return safeArray(nanahTrustedLinks)
+            .map((link) => {
+                const trusted = normalizeNanahTrustedLink(link);
+                if (!trusted) return null;
+                const policy = safeObject(trusted.policy);
+                if (trusted.linkType !== 'managed_link') return null;
+                if (trusted.localRole !== 'replica' || trusted.remoteRole !== 'source') return null;
+                if (trusted.revoked === true || policy.revoked === true || trusted.keyRevoked === true || policy.keyRevoked === true) return null;
+                if (trusted.stalePairing === true || policy.stalePairing === true) return null;
+                if (policy.syncOnProfileOpen !== true) return null;
+                if (normalizeString(policy.lockedChildMode).toLowerCase() !== 'allow_trusted_updates') return null;
+                const targetProfileId = resolveNanahManagedLocalNetworkTargetProfileId(trusted, activeId);
+                if (!targetProfileId || targetProfileId !== normalizeString(activeId)) return null;
+                if (!safeObject(profiles[targetProfileId]) || Object.keys(safeObject(profiles[targetProfileId])).length === 0) return null;
+                const request = buildNanahManagedLocalNetworkDiscoveryRequest(trusted, activeId, 'candidate_probe');
+                if (!request.sourceDeviceId || !request.sourceProfileId || !request.sourcePublicKeyId) return null;
+                return trusted;
+            })
+            .filter(Boolean);
+    }
+
+    async function pullNanahManagedLocalNetworkCandidates(provider, request) {
+        const discovery = provider && (
+            typeof provider.discoverManagedPolicyCandidates === 'function'
+                ? provider.discoverManagedPolicyCandidates
+                : (typeof provider.discoverLocalNetworkCandidates === 'function' ? provider.discoverLocalNetworkCandidates : null)
+        );
+        if (!discovery) return { ok: false, reason: 'local_network_provider_unavailable', candidates: [] };
+        try {
+            const result = await discovery.call(provider, request);
+            if (Array.isArray(result)) return { ok: true, reason: '', candidates: result };
+            const ok = result?.ok !== false;
+            return {
+                ok,
+                reason: normalizeString(result?.reason),
+                candidates: ok ? safeArray(result?.candidates || result?.items) : []
+            };
+        } catch (error) {
+            return {
+                ok: false,
+                reason: normalizeString(error?.message) || 'local_network_provider_failed',
+                candidates: []
+            };
+        }
+    }
+
+    function formatNanahManagedLocalNetworkSyncStatus(link) {
+        const trusted = safeObject(link);
+        const policy = safeObject(trusted.policy);
+        if (trusted.linkType !== 'managed_link' || trusted.localRole !== 'replica' || trusted.remoteRole !== 'source') return '';
+        if (policy.syncOnProfileOpen !== true) return 'Off';
+        const state = safeObject(nanahManagedLocalNetworkSyncState);
+        if (normalizeString(state.profileId) && normalizeString(state.profileId) !== activeProfileId) return 'Ready';
+        if (normalizeString(state.reasonCode) === 'local_network_provider_unavailable') return 'Waiting for provider';
+        const row = safeArray(state.linkResults).find(result => normalizeString(result?.linkId) === normalizeString(trusted.linkId || trusted.id));
+        if (!row) return state.checkedAt ? 'Checked' : 'Ready';
+        const accepted = Number(row.acceptedCandidateCount) || 0;
+        const rejected = Number(row.rejectedCandidateCount) || 0;
+        const candidates = Number(row.candidateCount) || 0;
+        if (accepted || rejected) return `${accepted} accepted, ${rejected} rejected`;
+        if (row.ok === false) return 'Rejected by provider';
+        if (candidates === 0) return 'Checked, no candidates';
+        return 'Checked';
+    }
+
+    async function runNanahManagedLocalNetworkSync({ reason = 'dashboard_open' } = {}) {
+        const io = window.FilterTubeIO || {};
+        const localProfilesV4 = profilesV4Cache || (typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null);
+        const activeId = normalizeString(localProfilesV4?.activeProfileId) || activeProfileId || 'default';
+        const provider = getNanahManagedLocalNetworkProvider();
+        const discovery = provider && (provider.discoverManagedPolicyCandidates || provider.discoverLocalNetworkCandidates);
+        const eligibleLinks = getNanahManagedLocalNetworkEligibleLinks(activeId, localProfilesV4);
+        const state = {
+            schema: 'filtertube_managed_local_network_sync_state',
+            version: 1,
+            reason: normalizeString(reason) || 'dashboard_open',
+            profileId: activeId,
+            checkedAt: Date.now(),
+            eligibleLinkCount: eligibleLinks.length,
+            providerAvailable: typeof discovery === 'function',
+            candidateCount: 0,
+            acceptedCandidateCount: 0,
+            rejectedCandidateCount: 0,
+            linkResults: []
+        };
+        if (!state.providerAvailable || eligibleLinks.length === 0) {
+            state.reasonCode = eligibleLinks.length === 0 ? 'no_eligible_links' : 'local_network_provider_unavailable';
+            await persistNanahManagedLocalNetworkSyncState(state);
+            renderNanahTrustedLinks();
+            return state;
+        }
+        for (const link of eligibleLinks) {
+            const request = buildNanahManagedLocalNetworkDiscoveryRequest(link, activeId, reason);
+            const result = await pullNanahManagedLocalNetworkCandidates(provider, request);
+            const linkRow = {
+                linkId: request.linkId,
+                targetProfileId: request.targetProfileId,
+                ok: result.ok === true,
+                reason: result.reason || null,
+                candidateCount: result.candidates.length,
+                acceptedCandidateCount: 0,
+                rejectedCandidateCount: 0
+            };
+            state.candidateCount += result.candidates.length;
+            if (result.ok === true) {
+                for (const candidate of result.candidates) {
+                    const decision = await handleNanahIncomingManagedLocalNetworkCandidate(candidate);
+                    if (decision?.accepted === true || decision?.applied === true) {
+                        linkRow.acceptedCandidateCount += 1;
+                        state.acceptedCandidateCount += 1;
+                    } else {
+                        linkRow.rejectedCandidateCount += 1;
+                        state.rejectedCandidateCount += 1;
+                    }
+                }
+            }
+            state.linkResults.push(linkRow);
+        }
+        await persistNanahManagedLocalNetworkSyncState(state);
         renderNanahTrustedLinks();
         return state;
     }
@@ -8661,6 +8846,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                     openSyncRow.appendChild(openSyncLabel);
                     openSyncRow.appendChild(openSyncValue);
                     policyRows.appendChild(openSyncRow);
+
+                    const localNetworkRow = document.createElement('div');
+                    localNetworkRow.className = 'nanah-trusted-link__policy-row';
+                    const localNetworkLabel = document.createElement('span');
+                    localNetworkLabel.textContent = 'Local network';
+                    const localNetworkValue = document.createElement('strong');
+                    localNetworkValue.textContent = formatNanahManagedLocalNetworkSyncStatus(entry);
+                    localNetworkRow.appendChild(localNetworkLabel);
+                    localNetworkRow.appendChild(localNetworkValue);
+                    policyRows.appendChild(localNetworkRow);
                 }
 
                 card.appendChild(policyRows);
@@ -10981,6 +11176,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             await StateManager.loadSettings();
             await refreshProfilesUI();
             await runNanahManagedOpenSync({ reason: 'profile_switch' });
+            await runNanahManagedLocalNetworkSync({ reason: 'profile_switch' });
             updateStats();
             UIComponents.showToast('Profile switched', 'success');
         } catch (e) {
@@ -11579,7 +11775,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     await ensureNanahStableDeviceId();
     await loadNanahTrustedLinks();
     await loadNanahManagedOpenSyncState();
+    await loadNanahManagedLocalNetworkSyncState();
     await runNanahManagedOpenSync({ reason: 'dashboard_open' });
+    await runNanahManagedLocalNetworkSync({ reason: 'dashboard_open' });
     renderNanahTrustedLinks();
     setNanahMode(nanahUiMode, { persist: false, applyPreset: true });
     updateNanahUi();

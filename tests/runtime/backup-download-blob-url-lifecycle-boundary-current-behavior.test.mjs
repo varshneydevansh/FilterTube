@@ -72,7 +72,7 @@ const blockSpecs = {
     file: 'js/io_manager.js',
     start: '    async function saveBackupFile(data, filename, options = {}) {',
     end: '\n\n    /**\n     * Rotates backup files',
-    startLine: 1922,
+    startLine: 1937,
     lines: 29,
     bytes: 1269,
     hash: '162e600e6ecb4c9e86195f7bb1d363828182329079336bf9084fb47bae508b20'

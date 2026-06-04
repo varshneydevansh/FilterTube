@@ -297,7 +297,7 @@ test('pending queue replay source rows and anchors remain current', () => {
     ["queueForLater('harvestOnly-missing');", 429],
     ["queueForLater('engine-missing');", 482],
     ['if (pendingDataQueue.length > 0) {', 1021],
-    ['const queue = [...pendingDataQueue];', 1024],
+    ['const queue = [...pendingDataQueue];', 1039],
     ['pendingDataQueue = [];', 1025],
     ['const sourceData = cloneData(item.data) || item.data;', 1029],
     ['const processed = processWithEngine(sourceData, `${item.name}-queued`);', 1030],

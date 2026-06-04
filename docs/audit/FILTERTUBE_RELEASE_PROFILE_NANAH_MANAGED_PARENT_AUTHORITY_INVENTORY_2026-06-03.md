@@ -23,10 +23,12 @@ provider-gated dashboard/profile-open pull hook for already-decrypted mailbox
 items, redacted provider ack handoff for mailbox apply/reject outcomes,
 trusted-link removal cleanup for target-local accepted managed-policy state,
 sanitized local-network candidate receive/history handling, plus an
+optional provider-gated dashboard/profile-open local-network candidate
+discovery hook, plus an
 extension-owned downstream app policy contract artifact wired
 into the app sync manifest. Active/full signed conversion, richer viewing-space/time-limit
 and multi-target bulk outbound controls, server mailbox pull/decryption runtime, server mailbox queue purge,
-local-network discovery runtime, and app native settings/iOS enforcement proofs
+built-in local-network peer discovery/LAN delivery runtime, and app native settings/iOS enforcement proofs
 remain pending.
 **Goal slice**: Implementation order item 1 plus first runtime viewing-space
 enforcement slice.
@@ -72,9 +74,12 @@ matching open-sync status rows before the removed trust can be reused as local
 authority evidence. Explicitly delivered local-network candidate messages now
 sanitize caller payloads, ignore caller-provided trust objects, rebuild trust
 from local managed-link state, and record protected apply/reject history through
-the same managed-policy path. Server mailbox pull, mailbox decryption client,
+the same managed-policy path. The dashboard can also ask an optional local
+provider for local-network candidates on dashboard/profile open, but returned
+candidates still enter that same sanitized receive/validation path and provider
+failure applies nothing. Server mailbox pull, mailbox decryption client,
 server mailbox queue purge, active/full signed conversion, richer viewing-space/time-limit
-and multi-target bulk outbound controls, local-network discovery/delivery runtime, and
+and multi-target bulk outbound controls, built-in local-network peer discovery/LAN delivery runtime, and
 remote admin session semantics remain separate
 required slices.
 
@@ -126,6 +131,7 @@ docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md
 | Managed policy action-history model | `docs/audit/FILTERTUBE_MANAGED_POLICY_ACTION_HISTORY_MODEL_2026-06-03.md` |
 | Managed parent UI surface spec | `docs/audit/FILTERTUBE_MANAGED_PARENT_UI_SURFACE_SPEC_2026-06-03.md` |
 | Local-network discovery authority boundary | `docs/audit/FILTERTUBE_LOCAL_NETWORK_DISCOVERY_AUTHORITY_BOUNDARY_2026-06-03.md` |
+| Local-network managed provider hook | `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PROVIDER_HOOK_2026-06-05.md` |
 | Managed policy encrypted mailbox protocol | `docs/audit/FILTERTUBE_MANAGED_POLICY_ENCRYPTED_MAILBOX_PROTOCOL_2026-06-04.md` |
 | Nanah managed pull-on-open hook | `docs/audit/FILTERTUBE_NANAH_MANAGED_PULL_ON_OPEN_2026-06-04.md` |
 | Managed pairing public-key descriptor | `docs/audit/FILTERTUBE_NANAH_MANAGED_PAIRING_KEY_DESCRIPTOR_2026-06-04.md` |
@@ -476,7 +482,7 @@ Current gap:
 | Adapter depends on caller trust context | `validateManagedPolicyEnvelope(...)` depends on caller-supplied trusted-link/profile/revision/signature context; the wrapper rechecks stored profiles before writing but does not fetch trust keys itself. | Keep dashboard receive context and add pairing key lookup/revocation fixtures before automatic apply. |
 | Locked-child bypass has no revision binding | `allow_trusted_updates` can skip unlock for matching managed sessions, but not with policy revision constraints. | Locked child managed-policy fixtures. |
 | Mailbox protocol specified, runtime partially hooked | Offline later delivery now has a ciphertext-only protocol and replay/ack proof fixture. The dashboard/profile-open hook can ask a trusted local provider for already-decrypted mailbox items and return redacted ack records after local apply/reject. Provider rejection or provider failure fails closed without applying or acknowledging returned items, but no server mailbox client, pull scheduler, decryption client, or server path exists. | Pairing key persistence plus signed live-delivery tests before mailbox runtime work. |
-| Local-network candidate authority gate and sanitized receive/history bridge are present; discovery/delivery absent | Same-network discovery can no longer be promoted by future callers without passing trusted-link, discovered-device, key, target, scope, revision, signature, and envelope validation. Explicit local-network candidate messages are sanitized before validation so caller-provided trust objects are ignored, and accepted/rejected outcomes can be written as protected history. No peer discovery or LAN delivery runtime exists yet. | Installed/local two-device LAN delivery smoke plus mailbox/local-network ack fixtures before claiming local-network management. |
+| Local-network candidate authority gate, sanitized receive/history bridge, and provider-gated candidate handoff are present; built-in peer discovery/delivery absent | Same-network discovery can no longer be promoted by future callers without passing trusted-link, discovered-device, key, target, scope, revision, signature, and envelope validation. Explicit and provider-returned local-network candidate messages are sanitized before validation so caller-provided trust objects are ignored, and accepted/rejected outcomes can be written as protected history. The dashboard/profile-open hook can ask an optional local provider for candidates, but no built-in peer discovery or LAN delivery runtime exists yet. | Installed/local two-device LAN delivery smoke plus mailbox/local-network ack fixtures before claiming local-network management. |
 | Partial protected-user action history | Accepted local managed child saves, local parent/account history access, accepted-row clearing, protected failed unlock rows, dashboard/background session expiry, sensitive managed-action re-auth, profile-persisted local/background failed-attempt rate limiting, and remote managed validation/apply rows exist. | Retention expiry, encrypted summary fixtures, and live remote apply smoke. |
 | No admin lock for remote management | Child PIN or protected profile state could be confused with admin authority. | Parent/account PIN and trusted-device authority fixtures before writes. |
 | No pairing key/signature contract | P2P or local-network transport could authenticate reachability instead of authority. | Device-bound key, signature/integrity, rotation, revocation, and compromise-recovery fixtures. |

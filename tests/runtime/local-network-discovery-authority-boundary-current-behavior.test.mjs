@@ -175,15 +175,17 @@ test('local-network discovery authority boundary is validation-backed and linked
   const inventory = read(inventoryPath);
   const source = runtimeSource();
 
-  assert.match(doc, /Status\*\*: Managed-policy validation\/apply, signed live Nanah send, mailbox\s+intake, revision state, protected history evidence, adapter-level\s+local-network candidate validation, and dashboard local-network candidate\s+receive handling are present/);
-  assert.match(doc, /Runtime\s+local-network peer discovery and LAN delivery are\s+still absent/);
+  assert.match(doc, /Status\*\*: Managed-policy validation\/apply, signed live Nanah send, mailbox\s+intake, revision state, protected history evidence, adapter-level\s+local-network candidate validation, dashboard local-network candidate receive\s+handling, and a provider-gated dashboard\/profile-open local-network candidate\s+discovery hook are present/);
+  assert.match(doc, /Runtime built-in\s+LAN peer discovery and LAN delivery are still absent/);
   assert.match(doc, /Local-network discovery is convenience only/);
   assert.match(doc, /Boundary Rows/);
   assert.match(doc, /Hostile LAN Threat Model/);
   assert.match(doc, /No-Work And Performance Boundary/);
   assert.match(doc, /runtime local-network candidate authority gate: present in js\/nanah_sync_adapter\.js/);
   assert.match(doc, /runtime local-network candidate receive bridge: present in js\/tab-view\.js/);
-  assert.match(doc, /runtime local-network peer discovery: absent/);
+  assert.match(doc, /runtime provider-gated local-network candidate discovery hook: present in js\/tab-view\.js/);
+  assert.match(doc, /runtime built-in local-network peer discovery: absent/);
+  assert.match(doc, /runtime built-in LAN delivery: absent/);
   assert.match(doc, /runtime filtertube_managed_policy envelope validator: present/);
   assert.match(doc, /runtime managed policy revision store: present on target profile remoteManagedPolicies/);
   assert.match(doc, /runtime managed validation-history writer: present for Nanah, mailbox, and local-network candidate managed-policy receive events/);
@@ -191,14 +193,17 @@ test('local-network discovery authority boundary is validation-backed and linked
   assert.match(doc, /runtime managed signature verifier gate: present with dashboard\/WebCrypto key verifier context/);
   assert.match(doc, /runtime signed live Nanah managed-policy send: present/);
   assert.match(doc, /runtime local\/decrypted mailbox item intake: present/);
-  assert.match(doc, /local-network candidate intake does not add peer discovery or LAN delivery/);
-  assert.match(doc, /LAN discovery and LAN delivery remain absent/);
+  assert.match(doc, /provider-gated candidate discovery does not add built-in LAN peer discovery or LAN delivery/);
+  assert.match(doc, /no\s+built-in LAN peer discovery or LAN delivery runtime exists in the extension/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
 
   assert.match(source, /function validateManagedPolicyEnvelope\(envelope, context = \{\}\)/);
   assert.match(source, /function validateManagedLocalNetworkCandidate\(candidate, context = \{\}\)/);
   assert.match(source, /function handleNanahIncomingManagedLocalNetworkCandidate\(candidate\)/);
+  assert.match(source, /function getNanahManagedLocalNetworkProvider\(\)/);
+  assert.match(source, /window\.FilterTubeManagedPolicyLocalNetwork/);
+  assert.match(source, /discoverManagedPolicyCandidates/);
   assert.match(source, /schema === 'filtertube_managed_local_network_candidate'/);
   assert.match(source, /transport: 'local_network'/);
   assert.match(source, /const sanitizedCandidate = \{\s*peer,\s*envelope,\s*source: normalizeString\(root\.source\),\s*networkReachable: root\.networkReachable\s*\}/s);

@@ -17,21 +17,26 @@ and lookup are now profile-scoped for fixed child/profile targets on the same
 remote device, and the dashboard can now choose multiple eligible fixed targets
 on the currently connected replica for live same-replica signed sends. A
 provider-gated dashboard/profile-open pull hook and redacted provider ack
-handoff are present for already-decrypted mailbox items. An extension-owned
+handoff are present for already-decrypted mailbox items. A provider-gated
+dashboard/profile-open local-network candidate discovery hook is present for
+already trusted managed replica links. An extension-owned
 managed app policy contract artifact and app manifest copy row are now present
 so downstream app parity can be tested before native enforcement changes.
-Local-network peer discovery, LAN delivery, server mailbox pull, mailbox
+Built-in local-network peer discovery, LAN delivery, server mailbox pull, mailbox
 decryption, app native enforcement proofs, and active/full signed managed sends
 remain gated. The adapter now exposes a local-network candidate authority gate
 for future LAN providers, and the dashboard has a sanitized receive bridge that
 records accepted/rejected local-network candidate outcomes through protected
-managed action history. This does not add peer discovery or LAN delivery.
+managed action history. This does not add built-in peer discovery or LAN
+delivery.
 **Primary audit input**:
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
 **Current pull-on-open proof**:
 `docs/audit/FILTERTUBE_NANAH_MANAGED_PULL_ON_OPEN_2026-06-04.md`
 **Current multi-target fanout boundary**:
 `docs/audit/FILTERTUBE_NANAH_MANAGED_MULTI_TARGET_FANOUT_BOUNDARY_2026-06-04.md`
+**Current local-network provider hook proof**:
+`docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PROVIDER_HOOK_2026-06-05.md`
 
 ## Overview
 
@@ -374,11 +379,13 @@ replica child device over Nanah/P2P or same-network transport.
   envelope validation.
 - **Complexity**: 3/10
 - **Dependencies**: Task 3.1.
-- **Status**: Boundary contract and hostile-LAN proof fixture added. Product
-  runtime local-network discovery behavior remains unchanged. Managed-policy
-  envelope validation, adapter-level local-network candidate validation, and
-  dashboard sanitized local-network candidate receive/history handling are
-  present, but they do not implement discovery or LAN delivery.
+- **Status**: Boundary contract and hostile-LAN proof fixture added. A
+  provider-gated dashboard/profile-open local-network candidate discovery hook
+  is present for already trusted managed replica links, while built-in peer
+  discovery and LAN delivery remain absent. Managed-policy envelope
+  validation, adapter-level local-network candidate validation, and dashboard
+  sanitized local-network candidate receive/history handling are present, but
+  they do not make LAN reachability authority.
 - **Acceptance Criteria**:
   - Discovery, pairing, transport, and policy authority are separate rows.
   - Network reachability failure has clear offline behavior.

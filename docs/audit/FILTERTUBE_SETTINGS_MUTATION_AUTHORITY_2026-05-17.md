@@ -148,7 +148,7 @@ fail 0
 | `js/background.js:1898` | background authority/actions | list write | - | `storageUpdates.uiKeywords = compiledSettings.filterKeywords.map(keyword => {` | must preserve list type, source, channel-derived entries, and sync/import provenance |
 | `js/background.js:1912` | background authority/actions | list write | - | `compiledSettings.filterKeywords = parsedKeywords.map(keyword => {` | must preserve list type, source, channel-derived entries, and sync/import provenance |
 | `js/background.js:1921` | background authority/actions | list write | - | `storageUpdates.filterKeywords = compiledSettings.filterKeywords;` | must preserve list type, source, channel-derived entries, and sync/import provenance |
-| `js/background.js:1922` | background authority/actions | list write | - | `storageUpdates.uiKeywords = parsedKeywords.map(keyword => ({ word: keyword, exact: useExact }));` | must preserve list type, source, channel-derived entries, and sync/import provenance |
+| `js/background.js:1937` | background authority/actions | list write | - | `storageUpdates.uiKeywords = parsedKeywords.map(keyword => ({ word: keyword, exact: useExact }));` | must preserve list type, source, channel-derived entries, and sync/import provenance |
 | `js/background.js:1924` | background authority/actions | list write | - | `compiledSettings.filterKeywords = [];` | must preserve list type, source, channel-derived entries, and sync/import provenance |
 | `js/background.js:1934` | background authority/actions | list write | - | `const uiKeywords = storedUiKeywords;` | must preserve list type, source, channel-derived entries, and sync/import provenance |
 | `js/background.js:1994` | background authority/actions | list write | - | `? (Array.isArray(activeKids.whitelistKeywords) ? activeKids.whitelistKeywords : [])` | must preserve list type, source, channel-derived entries, and sync/import provenance |
@@ -647,9 +647,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 72
-method semantic proof gap lexical callables covered: 6127
+method semantic proof gap lexical callables covered: 6142
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6127
+lexical callables requiring semantic proof before behavior changes: 6142
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

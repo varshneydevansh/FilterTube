@@ -697,9 +697,9 @@ Current local package artifact rows:
 
 | Target | Staged files | Manifest bytes | Manifest sha256 | Version | Content script entries | Content script JS refs | WAR refs | ZIP bytes | ZIP sha256 |
 | --- | ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | --- |
-| `chrome` | 62 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | `3.3.2` | 2 | 15 | 5 | 8736560 | `3edc58988585288fcc5bd07586fcd2d0b33ec5aadf4fbcf10884b47ce62e96c3` |
-| `firefox` | 62 | 2603 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` | `3.3.2` | 1 | 14 | 5 | 8736619 | `b72bf7ef069545c2c5df49c18cd54dd26ad4063fbf369f88aeb6fe7b7d7c724e` |
-| `opera` | 62 | 2518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | `3.3.2` | 2 | 15 | 4 | 8736562 | `92e248b979e32c772750935e8a713d0f9f778732ca09769ba702135ff4665d21` |
+| `chrome` | 62 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | `3.3.2` | 2 | 15 | 5 | 8738262 | `3e6a1543cd6b8ce50759ba49959463a39a2e0c5ad4455f30571772677d9a0359` |
+| `firefox` | 62 | 2603 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` | `3.3.2` | 1 | 14 | 5 | 8738321 | `32cb1fe09937b458d1e4226f0d082b3d780006647bef43315b1b913daaf64946` |
+| `opera` | 62 | 2518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | `3.3.2` | 2 | 15 | 4 | 8738264 | `4f43f4f8d5a6c27198eeb4dae4c9004b225e90ece2f95d93ca00f986cb1c074f` |
 
 ASCII boundary:
 
@@ -820,9 +820,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 72
-method semantic proof gap lexical callables covered: 6127
+method semantic proof gap lexical callables covered: 6142
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6127
+lexical callables requiring semantic proof before behavior changes: 6142
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

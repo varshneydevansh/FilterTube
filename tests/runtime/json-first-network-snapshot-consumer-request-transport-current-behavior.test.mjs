@@ -305,7 +305,7 @@ test('consumer request transport source rows and counts are pinned', () => {
   for (const line of [5296, 5299, 5304, 5307, 5325, 5332, 5344, 5375, 5366, 5371, 5380, 5383, 5394, 5425, 5416, 5421, 5789, 5767, 5853]) {
     assert.ok(text.includes(`\`js/content_bridge.js:${line}\``), `doc should cite js/content_bridge.js:${line}`);
   }
-  for (const line of [1916, 1922, 1961, 1997, 2005, 2011, 2023, 2031]) {
+  for (const line of [1916, 1937, 1961, 1997, 2005, 2011, 2023, 2031]) {
     assert.ok(text.includes(`\`js/injector.js:${line}\``), `doc should cite js/injector.js:${line}`);
   }
 

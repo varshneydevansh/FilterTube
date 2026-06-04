@@ -18,7 +18,7 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/tab-view.js` | 13768 | 636474 | `f603e16fe2e94c5fd4161514e62bdfe8208c2d5ed62cf21fdcb0551d581dd480` |
+| `js/tab-view.js` | 13966 | 647528 | `50a3ac95b73de6aaa30eb67c314bac34a4f467dbddbb9e7487435fe337d86f68` |
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/io_manager.js` | 2097 | 100479 | `f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62` |
 | `js/background.js` | 6773 | 305166 | `b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5` |
@@ -30,7 +30,7 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 source/effect blocks: 9
 tab-view renderProfilesManager block: 411 lines, 20884 bytes
 tab-view refreshProfilesUI block: 24 lines, 954 bytes
-tab-view switchToProfile block: 45 lines, 1668 bytes
+tab-view switchToProfile block: 46 lines, 1749 bytes
 popup switchToProfile block: 48 lines, 1659 bytes
 tab-view create account handler block: 120 lines, 5004 bytes
 tab-view create child handler block: 107 lines, 4589 bytes
@@ -44,8 +44,8 @@ background profile storage invalidation block: 42 lines, 1464 bytes
 ```text
 tab-view ensureProfileUnlocked tokens: 18
 tab-view saveProfilesV4 tokens: 41
-tab-view loadProfilesV4 tokens: 74
-tab-view activeProfileId tokens: 82
+tab-view loadProfilesV4 tokens: 76
+tab-view activeProfileId tokens: 85
 tab-view StateManager.loadSettings tokens: 8
 tab-view refreshProfilesUI tokens: 21
 tab-view applyLockGateIfNeeded tokens: 4
@@ -136,9 +136,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 72
-method semantic proof gap lexical callables covered: 6127
+method semantic proof gap lexical callables covered: 6142
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6127
+lexical callables requiring semantic proof before behavior changes: 6142
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

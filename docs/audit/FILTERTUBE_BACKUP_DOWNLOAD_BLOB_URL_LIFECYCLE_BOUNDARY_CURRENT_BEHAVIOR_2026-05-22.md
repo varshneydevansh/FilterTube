@@ -34,7 +34,7 @@ tests/runtime/backup-download-blob-url-lifecycle-boundary-current-behavior.test.
 | `ioRevokeDownloadBlobUrl` | `js/io_manager.js:48` | 48 | 9 | 330 | `3795b2ece3edfcc4980ed14742a82bacae310a5e9b876017536d4240403a2891` |
 | `ioDownloadWithRuntimeApi` | `js/io_manager.js:58` | 58 | 46 | 1,988 | `d936f57b125a029f0e08efa03570ce11e23952a52498a395e8fa13f5cfaaa55e` |
 | `ioDirectoryProbeDownload` | `js/io_manager.js:1875` | 1875 | 40 | 1,791 | `e49ec15eeb2a71db8778bb14ef1b49157b21aa836f201bddb7024495e6072882` |
-| `ioSaveBackupFile` | `js/io_manager.js:1922` | 1922 | 29 | 1,269 | `162e600e6ecb4c9e86195f7bb1d363828182329079336bf9084fb47bae508b20` |
+| `ioSaveBackupFile` | `js/io_manager.js:1937` | 1937 | 29 | 1,269 | `162e600e6ecb4c9e86195f7bb1d363828182329079336bf9084fb47bae508b20` |
 | `tabRevokeBlobUrl` | `js/tab-view.js:9038` | 9038 | 10 | 363 | `5c7be08580711c5ee2c0b3032728069e36dba664e228bdc8ac3d324d1f272f70` |
 | `tabDownloadViaAnchor` | `js/tab-view.js:9053` | 9053 | 26 | 956 | `6f04762a80c47f638df2adb986fb8ea0d376801426e095ecc285fe351b2405c5` |
 | `tabDownloadJsonToDownloadsFolder` | `js/tab-view.js:9080` | 9080 | 40 | 2,028 | `95b1310ddf6fe63a1e058f1916c17506fb7d6e9868c4d0229f246becd61a74e1` |

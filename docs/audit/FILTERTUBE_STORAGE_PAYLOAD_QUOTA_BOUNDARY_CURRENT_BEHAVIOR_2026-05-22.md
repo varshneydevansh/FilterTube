@@ -36,7 +36,7 @@ tests/runtime/storage-payload-quota-boundary-current-behavior.test.mjs
 | `ioWriteStorage` | `js/io_manager.js:421` | 421 | 14 | 473 |
 | `ioExportV3` | `js/io_manager.js:1146` | 1146 | 96 | 3,941 |
 | `ioCreateAutoBackup` | `js/io_manager.js:1782` | 1782 | 89 | 4,063 |
-| `ioSaveBackupFile` | `js/io_manager.js:1922` | 1922 | 30 | 1,267 |
+| `ioSaveBackupFile` | `js/io_manager.js:1937` | 1937 | 30 | 1,267 |
 | `ioRotateBackups` | `js/io_manager.js:1956` | 1956 | 34 | 1,377 |
 | `nanahBuildPortablePayload` | `js/nanah_sync_adapter.js:307` | 307 | 16 | 633 |
 | `nanahBuildSyncEnvelope` | `js/nanah_sync_adapter.js:322` | 322 | 13 | 397 |

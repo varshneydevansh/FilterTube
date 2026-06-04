@@ -31,8 +31,8 @@ const manifestFiles = [
 ];
 
 const assetRows = [
-  ['assets/images/Android_icon.png', 2203736, '201e1b73771f39ad033241da2b20318aeaad1d81f72398b6099fc122d3df3cb0', { width: 1536, height: 1024 }],
-  ['assets/images/iOS_icon.png', 1586597, 'f165dd8170531ba1f467ad7a8e5c54b2715c2559c5ea0c6688cfbf03e6763689', { width: 1536, height: 1024 }],
+  ['assets/images/Android_icon.png', 2203736, '201e1b73771f39ad033241da2b20318aeaad1d81f72398b6099fc122d3df3cb0', { width: 1536, height: 1039 }],
+  ['assets/images/iOS_icon.png', 1586597, 'f165dd8170531ba1f467ad7a8e5c54b2715c2559c5ea0c6688cfbf03e6763689', { width: 1536, height: 1039 }],
   ['assets/images/homepage_hero_day.mp4', 4537443, '9b1e853b60c861de124821161444ff54c0318b1a88f9c632a38128306811df74', null],
   ['icons/file.svg', 3818, '05cdc5bc1eeacc9530ec299f54e1c1465e4ba153e378b4ba845f8b3fcfc0cfff', null],
   ['icons/icon-128.png', 3406, '2ae3aa4258aab5165f16d02d1a3e721cef68a57cca63542d50543bc6f02b9755', { width: 128, height: 128 }],

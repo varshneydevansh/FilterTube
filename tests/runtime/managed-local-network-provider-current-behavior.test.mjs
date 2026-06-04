@@ -1,0 +1,242 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import test from 'node:test';
+import assert from 'node:assert/strict';
+
+const repoRoot = process.cwd();
+const docPath = 'docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PROVIDER_HOOK_2026-06-05.md';
+const boundaryPath = 'docs/audit/FILTERTUBE_LOCAL_NETWORK_DISCOVERY_AUTHORITY_BOUNDARY_2026-06-03.md';
+const planPath = 'docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md';
+const inventoryPath = 'docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md';
+const tabViewPath = 'js/tab-view.js';
+
+function read(relativePath) {
+  return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
+}
+
+function managedLink(overrides = {}) {
+  return {
+    linkId: 'link-parent-child-1',
+    remoteDeviceId: 'parent-device-1',
+    linkType: 'managed_link',
+    localRole: 'replica',
+    remoteRole: 'source',
+    sourceDeviceId: 'parent-device-1',
+    sourceProfileId: 'parent-profile-1',
+    sourcePublicKeyId: 'parent-key-1',
+    keyVersion: 2,
+    policy: {
+      allowedScopes: ['keywords', 'channels'],
+      defaultScope: 'keywords',
+      targetProfileBehavior: 'fixed_profile',
+      targetProfileId: 'child-profile-1',
+      lockedChildMode: 'allow_trusted_updates',
+      syncOnProfileOpen: true,
+      sourceDeviceId: 'parent-device-1',
+      sourceProfileId: 'parent-profile-1',
+      sourcePublicKeyId: 'parent-key-1',
+      keyVersion: 2
+    },
+    ...overrides
+  };
+}
+
+function profilesV4() {
+  return {
+    activeProfileId: 'child-profile-1',
+    profiles: {
+      'child-profile-1': { id: 'child-profile-1', type: 'child', parentProfileId: 'parent-profile-1' }
+    }
+  };
+}
+
+function eligibleLinks(links, activeProfileId, profiles) {
+  const profileMap = profiles.profiles || {};
+  return links.filter((link) => {
+    const policy = link.policy || {};
+    const targetProfileId = policy.targetProfileBehavior === 'fixed_profile' ? policy.targetProfileId : activeProfileId;
+    return link.linkType === 'managed_link'
+      && link.localRole === 'replica'
+      && link.remoteRole === 'source'
+      && link.revoked !== true
+      && policy.revoked !== true
+      && link.keyRevoked !== true
+      && policy.keyRevoked !== true
+      && link.stalePairing !== true
+      && policy.stalePairing !== true
+      && policy.syncOnProfileOpen === true
+      && policy.lockedChildMode === 'allow_trusted_updates'
+      && targetProfileId === activeProfileId
+      && !!profileMap[targetProfileId]
+      && !!(link.sourceDeviceId || policy.sourceDeviceId || link.remoteDeviceId)
+      && !!(link.sourceProfileId || policy.sourceProfileId)
+      && !!(link.sourcePublicKeyId || policy.sourcePublicKeyId);
+  });
+}
+
+async function runProviderModel({ provider, links = [managedLink()], applyCandidate = async () => ({ accepted: true }) } = {}) {
+  const activeProfileId = 'child-profile-1';
+  const candidates = eligibleLinks(links, activeProfileId, profilesV4());
+  const state = {
+    providerAvailable: !!provider,
+    eligibleLinkCount: candidates.length,
+    candidateCount: 0,
+    acceptedCandidateCount: 0,
+    rejectedCandidateCount: 0,
+    linkResults: []
+  };
+  if (!provider || candidates.length === 0) return state;
+  for (const link of candidates) {
+    let result;
+    try {
+      result = await provider({
+        schema: 'filtertube_managed_local_network_discovery_request',
+        linkId: link.linkId,
+        targetProfileId: activeProfileId,
+        allowedScopes: link.policy.allowedScopes,
+        sourcePublicKeyId: link.sourcePublicKeyId
+      });
+    } catch (error) {
+      result = { ok: false, reason: error.message, candidates: [] };
+    }
+    const items = result?.ok === false ? [] : (Array.isArray(result) ? result : (result.candidates || result.items || []));
+    const row = {
+      linkId: link.linkId,
+      ok: result?.ok !== false,
+      candidateCount: items.length,
+      acceptedCandidateCount: 0,
+      rejectedCandidateCount: 0
+    };
+    state.candidateCount += items.length;
+    if (row.ok) {
+      for (const [index, item] of items.entries()) {
+        const decision = await applyCandidate(item, index);
+        if (decision?.accepted === true || decision?.applied === true) {
+          row.acceptedCandidateCount += 1;
+          state.acceptedCandidateCount += 1;
+        } else {
+          row.rejectedCandidateCount += 1;
+          state.rejectedCandidateCount += 1;
+        }
+      }
+    }
+    state.linkResults.push(row);
+  }
+  return state;
+}
+
+test('local-network provider hook is docs-backed and linked from managed parent plan', () => {
+  const doc = read(docPath);
+  const boundary = read(boundaryPath);
+  const plan = read(planPath);
+  const inventory = read(inventoryPath);
+
+  assert.match(doc, /Dashboard\/profile-open provider hook is present/);
+  assert.match(doc, /Built-in LAN peer discovery, LAN transport, server\s+mailbox pull, and mailbox decryption remain absent/);
+  assert.match(doc, /window\.FilterTubeManagedPolicyLocalNetwork/);
+  assert.match(doc, /discoverManagedPolicyCandidates/);
+  assert.match(doc, /runtime provider-gated local-network discovery hook: present/);
+  assert.match(doc, /runtime built-in LAN peer discovery: absent/);
+  assert.match(doc, /runtime YouTube page hot-path work from this slice: absent/);
+  assert.match(boundary, /provider-gated local-network candidate discovery hook/);
+  assert.match(plan, new RegExp(docPath));
+  assert.match(inventory, new RegExp(docPath));
+});
+
+test('dashboard source wires provider-gated local-network discovery without YouTube hot-path primitives', () => {
+  const source = read(tabViewPath);
+
+  assert.match(source, /const NANAH_MANAGED_LOCAL_NETWORK_SYNC_STATE_KEY = 'ftNanahManagedLocalNetworkSyncState'/);
+  assert.match(source, /function getNanahManagedLocalNetworkProvider\(\)/);
+  assert.match(source, /window\.FilterTubeManagedPolicyLocalNetwork/);
+  assert.match(source, /function buildNanahManagedLocalNetworkDiscoveryRequest\(link, activeId, reason\)/);
+  assert.match(source, /schema: 'filtertube_managed_local_network_discovery_request'/);
+  assert.match(source, /function getNanahManagedLocalNetworkEligibleLinks\(activeId, localProfilesV4\)/);
+  assert.match(source, /async function pullNanahManagedLocalNetworkCandidates\(provider, request\)/);
+  assert.match(source, /discoverManagedPolicyCandidates/);
+  assert.match(source, /discoverLocalNetworkCandidates/);
+  assert.match(source, /async function runNanahManagedLocalNetworkSync\(\{ reason = 'dashboard_open' \} = \{\}\)/);
+  assert.match(source, /handleNanahIncomingManagedLocalNetworkCandidate\(candidate\)/);
+  assert.match(source, /await runNanahManagedLocalNetworkSync\(\{ reason: 'dashboard_open' \}\)/);
+  assert.match(source, /await runNanahManagedLocalNetworkSync\(\{ reason: 'profile_switch' \}\)/);
+  assert.match(source, /Local network/);
+});
+
+test('local-network provider eligibility keeps discovery scoped to opted-in replica child links', () => {
+  const active = 'child-profile-1';
+  const profiles = profilesV4();
+  const links = [
+    managedLink(),
+    managedLink({ linkId: 'sync-off', policy: { ...managedLink().policy, syncOnProfileOpen: false } }),
+    managedLink({ linkId: 'wrong-role', localRole: 'source', remoteRole: 'replica' }),
+    managedLink({ linkId: 'wrong-target', policy: { ...managedLink().policy, targetProfileId: 'sibling-profile-1' } }),
+    managedLink({ linkId: 'revoked', revoked: true })
+  ];
+
+  const result = eligibleLinks(links, active, profiles);
+  assert.equal(result.length, 1);
+  assert.equal(result[0].linkId, 'link-parent-child-1');
+});
+
+test('local-network provider failure fails closed without applying returned candidates', async () => {
+  let applied = 0;
+  const state = await runProviderModel({
+    provider: async () => ({
+      ok: false,
+      reason: 'lan_parent_unreachable',
+      candidates: [{ schema: 'filtertube_managed_local_network_candidate' }]
+    }),
+    applyCandidate: async () => {
+      applied += 1;
+      return { accepted: true };
+    }
+  });
+
+  assert.equal(applied, 0);
+  assert.equal(state.candidateCount, 0);
+  assert.equal(state.acceptedCandidateCount, 0);
+  assert.equal(state.rejectedCandidateCount, 0);
+  assert.equal(state.linkResults[0].ok, false);
+});
+
+test('local-network provider applies only validated candidates and keeps request/records redacted', async () => {
+  const requests = [];
+  const state = await runProviderModel({
+    provider: async (request) => {
+      requests.push(request);
+      return {
+        ok: true,
+        candidates: [
+          { schema: 'filtertube_managed_local_network_candidate', envelope: { linkId: 'link-parent-child-1' } },
+          { schema: 'filtertube_managed_local_network_candidate', envelope: { linkId: 'link-parent-child-1' } }
+        ]
+      };
+    },
+    applyCandidate: async (_candidate, index = 0) => ({ accepted: index === 0 })
+  });
+
+  assert.equal(state.candidateCount, 2);
+  assert.equal(state.acceptedCandidateCount, 1);
+  assert.equal(state.rejectedCandidateCount, 1);
+  assert.equal(requests[0].schema, 'filtertube_managed_local_network_discovery_request');
+  assert.equal(requests[0].targetProfileId, 'child-profile-1');
+  assert.deepEqual(requests[0].allowedScopes, ['keywords', 'channels']);
+  assert.doesNotMatch(JSON.stringify(requests), /spiders|keywordValue|channelName|videoTitle|plaintext|pin/i);
+});
+
+test('local-network provider hook does not add direct page/network runtime primitives', () => {
+  const source = read(tabViewPath);
+  const sliceStart = source.indexOf('function getNanahManagedLocalNetworkProvider()');
+  const sliceEnd = source.indexOf('async function configureNanahTrustedLink(link)', sliceStart);
+  assert.notEqual(sliceStart, -1);
+  assert.notEqual(sliceEnd, -1);
+  const slice = source.slice(sliceStart, sliceEnd);
+
+  assert.doesNotMatch(slice, /MutationObserver/);
+  assert.doesNotMatch(slice, /addEventListener/);
+  assert.doesNotMatch(slice, /setInterval/);
+  assert.doesNotMatch(slice, /\bfetch\s*\(/);
+  assert.doesNotMatch(slice, /XMLHttpRequest/);
+  assert.doesNotMatch(slice, /chrome\.tabs/);
+  assert.doesNotMatch(slice, /browser\.tabs/);
+});
