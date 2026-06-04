@@ -29,7 +29,7 @@ Runtime route/surface metric side-effect budget approval exists: no
 Runtime route/surface metric artifact approval exists: no
 Runtime metric collector approval exists: no
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5830
+Method semantic proof gap lexical callables covered: 5836
 Files with complete per-callable semantic proof: 0
 Lexical callables requiring semantic proof before behavior changes: 5830
 Implementation-ready JSON-first route/surface metric side-effect budget contract rows: 0
@@ -96,9 +96,9 @@ metric collector fixture provenance rows covered: 12
 source-locus side-effect rows covered: 12
 collector side-effect approval rows covered: 12
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5830
+method semantic proof gap lexical callables covered: 5836
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5830
+lexical callables requiring semantic proof before behavior changes: 5836
 committed route/surface metric side-effect budget files: 0
 committed route/surface metric artifact files: 0
 committed first-optimization foundation side-effect budget files: 0

@@ -25,7 +25,7 @@ const sourceFingerprints = {
   'js/seed.js': [1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
   'js/settings_shared.js': [1181, 57535, '9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c'],
   'js/state_manager.js': [2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6'],
-  'js/tab-view.js': [12332, 560297, '1d51ba59aaee4296e56a8371426e5d7ad0ca9aee43cc533827909137bf41247e'],
+  'js/tab-view.js': [12398, 563015, '98ea6b678d7e4bbe7d08c02a920e4ec1cf276967be9b7f0a02a8949d29e1f3f5'],
   'scripts/build-extension-ui.mjs': [50, 1188, '6326362ebf90f448ccdbf68945b3fb522b7b215edaf9b3e28589a4e166239cf3'],
   'scripts/build-nanah-vendor.mjs': [65, 1818, 'dae8d3ef29c4cd44b0bf975090e9d53f3bb05b523355f5038930fc03b27e921c'],
   'scripts/sync-native-runtime.mjs': [34, 1070, '4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6']
@@ -113,7 +113,7 @@ const expectedDiagnosticSourceFlowRows = {
   ],
   diagnostic_flow_import_export_backup: [
     '`js/io_manager.js:1670-1987`',
-    '`js/tab-view.js:9100-9350`'
+    '`js/tab-view.js:9166-9416`'
   ],
   diagnostic_flow_content_helper_menu: [
     '`js/content/block_channel.js:7-14`',

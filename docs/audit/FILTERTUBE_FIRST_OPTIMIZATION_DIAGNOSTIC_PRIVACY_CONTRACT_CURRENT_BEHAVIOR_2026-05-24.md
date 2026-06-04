@@ -90,9 +90,9 @@ console.error callsites covered: 68
 console.debug callsites covered: 24
 console.info callsites covered: 0
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5830
+method semantic proof gap lexical callables covered: 5836
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5830
+lexical callables requiring semantic proof before behavior changes: 5836
 inline diagnostic privacy JSON sections covered: 12
 inline diagnostic privacy artifact promotion decision: NO-GO
 diagnostic privacy draft closure rows: 12

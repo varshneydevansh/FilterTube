@@ -92,9 +92,9 @@ collector parity rollout rows covered: 12
 evidence parity rollout rows covered: 2
 parity and release boundary source docs covered: 8
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5830
+method semantic proof gap lexical callables covered: 5836
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5830
+lexical callables requiring semantic proof before behavior changes: 5836
 inline parity rollout JSON sections covered: 12
 inline parity rollout artifact promotion decision: NO-GO
 parity rollout draft closure rows: 12

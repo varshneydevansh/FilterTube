@@ -4433,6 +4433,57 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
+    async function recordManagedAdminAuthFailureHistory(profilesV4, targetProfileId, reason = 'unlock_failed') {
+        const io = window.FilterTubeIO || {};
+        if (typeof io.saveProfilesV4 !== 'function') return false;
+
+        const targetId = normalizeString(targetProfileId);
+        const root = safeObject(profilesV4);
+        if (!targetId || !canActiveProfileManageProfile(root, targetId)) return false;
+
+        const profiles = { ...safeObject(root.profiles) };
+        const profile = safeObject(profiles[targetId]);
+        if (!profile || Object.keys(profile).length === 0 || getProfileType(root, targetId) !== 'child') return false;
+
+        const now = Date.now();
+        const actorId = normalizeString(root.activeProfileId) || activeProfileId || 'default';
+        const row = {
+            rowId: `managed-auth-failed-${targetId}-${now}`,
+            schema: MANAGED_ACTION_HISTORY_SCHEMA,
+            version: 1,
+            actorProfileId: actorId,
+            actorDeviceId: normalizeString(nanahStableDeviceId) || 'local-extension-device',
+            targetProfileId: targetId,
+            trustedLinkId: null,
+            actionType: 'admin_session.failed_unlock',
+            scope: 'admin_session',
+            revision: null,
+            policyHash: null,
+            result: 'failed_auth',
+            reason: normalizeString(reason) || 'unlock_failed',
+            receivedAt: now,
+            issuedAt: now,
+            orderKey: `auth:${now}`,
+            summary: {
+                redacted: true,
+                label: 'Parent unlock failed'
+            },
+            sensitive: true
+        };
+        const existingRows = getManagedActionHistoryRows(profile);
+        profiles[targetId] = {
+            ...profile,
+            managedActionHistory: [...existingRows, row].slice(-MANAGED_ACTION_HISTORY_LIMIT)
+        };
+        await io.saveProfilesV4({
+            ...root,
+            schemaVersion: 4,
+            profiles
+        });
+        profilesV4Cache = { ...root, schemaVersion: 4, profiles };
+        return true;
+    }
+
     function getManagedActionHistoryRows(profile) {
         return Array.isArray(profile?.managedActionHistory)
             ? profile.managedActionHistory.filter(row => safeObject(row).schema === MANAGED_ACTION_HISTORY_SCHEMA)
@@ -4483,7 +4534,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         const okAdmin = await ensureProfileUnlocked(fresh, currentActive);
-        if (!okAdmin) return;
+        if (!okAdmin) {
+            await recordManagedAdminAuthFailureHistory(fresh, targetId, 'history_view_unlock_failed');
+            return;
+        }
 
         const profiles = safeObject(fresh.profiles);
         const profile = safeObject(profiles[targetId]);
@@ -4530,7 +4584,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         const okAdmin = await ensureProfileUnlocked(fresh, currentActive);
-        if (!okAdmin) return false;
+        if (!okAdmin) {
+            await recordManagedAdminAuthFailureHistory(fresh, targetId, 'history_clear_unlock_failed');
+            return false;
+        }
 
         const profiles = safeObject(fresh.profiles);
         const profile = safeObject(profiles[targetId]);
@@ -4928,7 +4985,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         const ok = await ensureProfileUnlocked(fresh, currentActive);
-        if (!ok) return;
+        if (!ok) {
+            await recordManagedAdminAuthFailureHistory(fresh, targetId, 'managed_child_edit_unlock_failed');
+            return;
+        }
         profilesV4Cache = fresh;
         managedChildEdit = targetSurface ? { profileId: targetId, surface: targetSurface } : { profileId: targetId };
         renderManagedChildEditorBanner();
@@ -5072,7 +5132,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const okAdmin = await ensureProfileUnlocked(fresh, currentActive);
-        if (!okAdmin) return;
+        if (!okAdmin) {
+            await recordManagedAdminAuthFailureHistory(fresh, targetId, 'viewing_space_unlock_failed');
+            return;
+        }
         const profiles = safeObject(fresh.profiles);
         const profile = safeObject(profiles[targetId]);
         if (!profile || !profiles[targetId]) return;
@@ -5120,7 +5183,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const okAdmin = await ensureProfileUnlocked(fresh, currentActive);
-        if (!okAdmin) return;
+        if (!okAdmin) {
+            await recordManagedAdminAuthFailureHistory(fresh, targetId, 'time_limit_unlock_failed');
+            return;
+        }
 
         const profiles = safeObject(fresh.profiles);
         const profile = safeObject(profiles[targetId]);

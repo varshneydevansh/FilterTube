@@ -207,9 +207,9 @@ test('no-work preservation contract rows counts and field names stay pinned', ()
   assert.match(doc, /collector fixture provenance rows covered: 12/);
   assert.match(doc, /collector parity rollout rows covered: 12/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5830/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5836/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5830/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5836/);
   assert.match(doc, /inline no-work preservation JSON sections covered: 12/);
   assert.match(doc, /inline no-work preservation artifact promotion decision: NO-GO/);
   assert.match(doc, /no-work preservation draft closure rows: 12/);
@@ -310,9 +310,9 @@ test('no-work preservation contract is backed by current fixture owner sample ar
   assert.match(fixtureProvenance, /collector fixture provenance rows implementation-ready: 0/);
   assert.match(parityRollout, /collector parity rollout rows implementation-ready: 0/);
   assert.match(methodGap, /tracked JS\/JSX\/MJS files: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5830/);
+  assert.match(methodGap, /repo-wide lexical callables: 5836/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5830/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5836/);
 });
 
 test('no-work preservation authority symbols are absent from product runtime source', () => {

@@ -2,12 +2,13 @@
 
 **Generated**: 2026-06-03  
 **Status**: Runtime route-gate, local managed-save revision/history, protected
-history access, time-limit enforcement, and receive-side managed-policy
-validation/history proofs updated. Runtime behavior changed for protected child
-Main/Kids denial, accepted same-device parent-managed child saves,
-parent/account history viewing, accepted-row history clearing, child
-time-budget enforcement, managed-envelope validation/classification, and
-managed-policy receive evidence; remote-policy apply remains pending.
+failed-unlock history, protected history access, time-limit enforcement, and
+receive-side managed-policy validation/history proofs updated. Runtime behavior
+changed for protected child Main/Kids denial, accepted same-device
+parent-managed child saves, protected parent unlock-failure evidence,
+parent/account history viewing, accepted-row history clearing, child time-budget
+enforcement, managed-envelope validation/classification, and managed-policy
+receive evidence; remote-policy apply remains pending.
 **Goal slice**: Implementation order item 1 plus first runtime viewing-space
 enforcement slice.
 **Lane proof**: `test:settings` for profile/Nanah authority and `test:release`
@@ -27,8 +28,8 @@ This document still does not approve remote policy writes by itself. The first
 managed-envelope validator and receive-side validation-history writer now
 exist, and the validator now requires signature-verification evidence. Persistent
 accepted-revision writes, dashboard key-verification plumbing, remote
-accepted-apply history rows, and failed-auth history remain separate required
-slices.
+accepted-apply history rows, admin session TTL, rate limiting, and sensitive
+action re-auth remain separate required slices.
 
 ## Issue 60 Local-Network Caregiver Addendum
 
@@ -137,6 +138,9 @@ Current local-write boundary:
   revision at `profile.managedPolicyState.localManagedEdits.{main,kids}`.
 - Accepted same-device managed child saves now emit one protected redacted
   action-history row at `profile.managedActionHistory[]`.
+- Failed parent/account unlock attempts for managed child edit, protected
+  history view/clear, viewing-space changes, and time-limit changes now emit
+  protected `admin_session.failed_unlock` evidence rows.
 - Parent/account profiles that can manage a child can now open that child's
   local protected action history from the profile row.
 - The local clear path removes accepted rows but preserves rejected, conflict,
@@ -378,7 +382,7 @@ Current gap:
 | Locked-child bypass has no revision binding | `allow_trusted_updates` can skip unlock for matching managed sessions, but not with policy revision constraints. | Locked child managed-policy fixtures. |
 | No mailbox protocol | Offline later delivery is not specified at runtime. | Ciphertext/replay/ack protocol doc before server work. |
 | No local-network management contract | Same-network discovery could be mistaken for authority. | Separate discovery, pairing, transport, and policy-authority proof. |
-| Partial protected-user action history | Accepted local managed child saves, local parent/account history access, and accepted-row clearing exist; rejected remote updates and failed unlock rows are still missing. | Remote reject/failed-auth writers and retention fixtures. |
+| Partial protected-user action history | Accepted local managed child saves, local parent/account history access, accepted-row clearing, protected failed unlock rows, and remote managed validation-history rows exist. | Accepted remote apply writer, rate-limit fixtures, retention expiry, and encrypted summary fixtures. |
 | No admin lock for remote management | Child PIN or protected profile state could be confused with admin authority. | Parent/account PIN and trusted-device authority fixtures before writes. |
 | No pairing key/signature contract | P2P or local-network transport could authenticate reachability instead of authority. | Device-bound key, signature/integrity, rotation, revocation, and compromise-recovery fixtures. |
 | No hostile-LAN fixture set | Spoofed peer announcements, duplicate device ids, stale pairings, reconnect drift, or MITM attempts could be missed. | Discovery-versus-authority negative fixtures before local-network writes. |

@@ -13,8 +13,9 @@ function read(relativePath) {
 test('managed parent authority inventory tracks implemented route gate and pending authority areas', () => {
   const doc = read(docPath);
 
-  assert.match(doc, /Status\*\*: Runtime route-gate, local managed-save revision\/history, protected\s+history access, time-limit enforcement, and receive-side managed-policy\s+validation\/history proofs updated/);
+  assert.match(doc, /Status\*\*: Runtime route-gate, local managed-save revision\/history, protected\s+failed-unlock history, protected history access, time-limit enforcement, and\s+receive-side managed-policy validation\/history proofs updated/);
   assert.match(doc, /Runtime behavior\s+changed/);
+  assert.match(doc, /protected parent unlock-failure evidence/);
   assert.match(doc, /Lane proof\*\*: `test:settings`/);
   assert.match(doc, /`test:release`/);
   assert.match(doc, /Local parent-managed child editing/);
@@ -37,9 +38,13 @@ test('local parent child edit authority remains source-backed by active-profile 
   assert.match(tabView, /async function startManagedChildEdit\(profileId, surface\)/);
   assert.match(tabView, /getProfileType\(fresh, targetId\) !== 'child'/);
   assert.match(tabView, /const ok = await ensureProfileUnlocked\(fresh, currentActive\)/);
+  assert.match(tabView, /async function recordManagedAdminAuthFailureHistory\(profilesV4, targetProfileId, reason = 'unlock_failed'\)/);
+  assert.match(tabView, /admin_session\.failed_unlock/);
+  assert.match(tabView, /failed_auth/);
 
   assert.match(doc, /canActiveProfileManageProfile/);
   assert.match(doc, /saveManagedChildSurface/);
+  assert.match(doc, /Failed parent\/account unlock attempts/);
   assert.match(doc, /Child PIN unlock does not make the child an admin/);
 });
 

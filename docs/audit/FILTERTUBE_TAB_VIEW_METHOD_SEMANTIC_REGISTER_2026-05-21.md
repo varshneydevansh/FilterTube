@@ -19,20 +19,20 @@ navigation, lock, or list-mode behavior changes.
 
 ```text
 source file: js/tab-view.js
-source split lines: 12333
-source wc -l: 12332
-source bytes: 560297
-source sha256: 1d51ba59aaee4296e56a8371426e5d7ad0ca9aee43cc533827909137bf41247e
-broad lexical callable matches: 915
-named declarations: 340
+source split lines: 12399
+source wc -l: 12398
+source bytes: 563015
+source sha256: 98ea6b678d7e4bbe7d08c02a920e4ec1cf276967be9b7f0a02a8949d29e1f3f5
+broad lexical callable matches: 921
+named declarations: 341
 plain function declarations: 234
-async function declarations: 75
+async function declarations: 76
 const arrow helper declarations: 29
 async const arrow helper declarations: 2
 semantic method groups: 22
-accepted named declaration rows: 340
-semantic method rows promoted: 340
-control-flow lexical artifacts: 575 (`if`: 571, `for`: 2, `while`: 2)
+accepted named declaration rows: 341
+semantic method rows promoted: 341
+control-flow lexical artifacts: 580 (`if`: 576, `for`: 2, `while`: 2)
 local/listener/timer callbacks held outside this named method register: 0
 addEventListener sites: 150
 document.addEventListener sites: 2
@@ -80,7 +80,7 @@ nanahTargetProfileDevicePolicy: 32
 nanahTrustedLinkStorage: 12
 navigationAndToasts: 3
 pinProfilesManager: 8
-profileAccessAndManagedChild: 66
+profileAccessAndManagedChild: 67
 profileDropdownAndBackupControls: 11
 responsiveNavigationShell: 3
 routeIntentAndReleaseNotes: 4
@@ -100,7 +100,7 @@ subscriptionsImportBridge: 17
 | `runtimeMessagingBrowserTabs` | 17 | Wraps extension runtime messaging, auto-backup scheduling, session PIN notifications, browser tab queries, tab creation/update, active tab lookup, and tab messages. | Sender/result contract, lastError policy, backup trigger budget, session lock report, and browser API negative fixtures. |
 | `subscriptionsImportBridge` | 17 | Selects and prepares YouTube subscription tabs, injects/pings the import receiver, waits for readiness, and renders import status. | Tab trust, URL allowlist, wait timeout budget, receiver idempotence, and import failure fixtures. |
 | `profileDropdownAndBackupControls` | 11 | Renders profile selector/dropdown state, positions the dropdown, resets scroll, and syncs auto-backup policy controls. | Dropdown lifecycle teardown, scroll restoration proof, and backup policy/source metadata. |
-| `profileAccessAndManagedChild` | 66 | Models profile type/access, parent-child relationships, managed child edit surfaces, child editor banners, admin controls, and viewing access updates. | Profile revision report, managed-child mutation contract, parent authority proof, lock/session negatives, and rollback proof. |
+| `profileAccessAndManagedChild` | 67 | Models profile type/access, parent-child relationships, managed child edit surfaces, child editor banners, admin controls, and viewing access updates. | Profile revision report, managed-child mutation contract, parent authority proof, lock/session negatives, and rollback proof. |
 | `lockNavigationAndSubscriptionFlow` | 14 | Applies lock and child navigation gates, imports subscribed channels, enables whitelist after import, and updates subscription progress. | Lock gate authority, list-mode transfer proof, import whitelist negative fixtures, and navigation access parity. |
 | `modalDialogHelpers` | 7 | Creates prompt and choice modals with cleanup and escape handling. | Focus trap, keyboard teardown, duplicate modal guard, and accessibility fixtures. |
 | `nanahModeScopePolicyModal` | 40 | Normalizes Nanah mode/scope/strategy labels, child protections, managed-link modal policy, and trusted-link normalization. | Sync policy authority, managed-link permission proof, child/parent scope negatives, and remote capability fixtures. |
@@ -245,222 +245,222 @@ subscriptionsImportBridge: 17
 | 4338 | `function` | `summarizeManagedChildSurface` | `profileAccessAndManagedChild` |
 | 4366 | `function` | `buildManagedChildLocalEditReport` | `profileAccessAndManagedChild` |
 | 4416 | `function` | `recordManagedChildLocalEditHistory` | `profileAccessAndManagedChild` |
-| 4436 | `function` | `getManagedActionHistoryRows` | `profileAccessAndManagedChild` |
-| 4442 | `function` | `managedActionHistoryRowIsProtected` | `profileAccessAndManagedChild` |
-| 4448 | `function` | `canViewManagedActionHistory` | `profileAccessAndManagedChild` |
-| 4454 | `function` | `formatManagedActionHistoryRow` | `profileAccessAndManagedChild` |
-| 4469 | `async function` | `showManagedActionHistory` | `profileAccessAndManagedChild` |
-| 4516 | `async function` | `clearManagedActionHistory` | `profileAccessAndManagedChild` |
-| 4560 | `function` | `getManagedNanahPolicyAcceptedState` | `profileAccessAndManagedChild` |
-| 4570 | `function` | `findNanahTrustedLinkForManagedEnvelope` | `profileAccessAndManagedChild` |
-| 4579 | `function` | `buildNanahManagedValidationTrustedLink` | `profileAccessAndManagedChild` |
-| 4602 | `function` | `getNanahManagedDuplicateDeviceIds` | `profileAccessAndManagedChild` |
-| 4615 | `function` | `buildManagedNanahPolicyValidationContext` | `profileAccessAndManagedChild` |
-| 4634 | `function` | `summarizeManagedNanahPolicyEnvelope` | `profileAccessAndManagedChild` |
-| 4653 | `async function` | `recordManagedNanahPolicyValidationHistory` | `profileAccessAndManagedChild` |
-| 4718 | `function` | `isManagedChildEditFor` | `profileAccessAndManagedChild` |
-| 4723 | `function` | `getManagedChildProfile` | `profileAccessAndManagedChild` |
-| 4729 | `function` | `getManagedChildSettings` | `profileAccessAndManagedChild` |
-| 4733 | `function` | `buildManagedChildState` | `profileAccessAndManagedChild` |
-| 4763 | `async function` | `saveManagedChildSurface` | `profileAccessAndManagedChild` |
-| 4831 | `function` | `isManagedChildEditorView` | `profileAccessAndManagedChild` |
-| 4835 | `function` | `endManagedChildEdit` | `profileAccessAndManagedChild` |
-| 4857 | `function` | `renderManagedChildGlobalBanner` | `profileAccessAndManagedChild` |
-| 4897 | `function` | `renderManagedChildEditorBanner` | `profileAccessAndManagedChild` |
-| 4903 | `const arrow` | `renderFor` | `profileAccessAndManagedChild` |
-| 4915 | `async function` | `startManagedChildEdit` | `profileAccessAndManagedChild` |
-| 4957 | `function` | `updateAdminPolicyControls` | `profileAccessAndManagedChild` |
-| 4970 | `function` | `updateChildProfileCapabilityControls` | `profileAccessAndManagedChild` |
-| 5032 | `function` | `isChildProfileAdminSurface` | `profileAccessAndManagedChild` |
-| 5036 | `function` | `isViewAllowedForCurrentAccess` | `profileAccessAndManagedChild` |
-| 5047 | `function` | `ensureNonChildAdminAction` | `profileAccessAndManagedChild` |
-| 5053 | `async function` | `updateProfileViewingAccess` | `profileAccessAndManagedChild` |
-| 5104 | `async function` | `updateProfileTimeLimitPolicy` | `profileAccessAndManagedChild` |
-| 5179 | `function` | `isUiLocked` | `lockNavigationAndSubscriptionFlow` |
-| 5188 | `function` | `getActiveProfileType` | `lockNavigationAndSubscriptionFlow` |
-| 5194 | `function` | `getNanahProfileTypeLabel` | `lockNavigationAndSubscriptionFlow` |
-| 5199 | `function` | `getNanahLocalProfileContext` | `lockNavigationAndSubscriptionFlow` |
-| 5211 | `function` | `getNanahProfileInventory` | `lockNavigationAndSubscriptionFlow` |
-| 5231 | `function` | `normalizeNanahProfileInventory` | `lockNavigationAndSubscriptionFlow` |
-| 5237 | `function` | `isNanahChildReplicaOnly` | `lockNavigationAndSubscriptionFlow` |
-| 5242 | `async function` | `enableWhitelistModeAfterImport` | `lockNavigationAndSubscriptionFlow` |
-| 5288 | `function` | `handleSubscriptionsImportProgress` | `lockNavigationAndSubscriptionFlow` |
-| 5323 | `async function` | `resolveSubscriptionsImportTab` | `lockNavigationAndSubscriptionFlow` |
-| 5401 | `async function` | `startSubscribedChannelsImport` | `lockNavigationAndSubscriptionFlow` |
-| 5603 | `function` | `resolveViewAccess` | `lockNavigationAndSubscriptionFlow` |
-| 5621 | `function` | `updateNavigationAccessUI` | `lockNavigationAndSubscriptionFlow` |
-| 5649 | `function` | `applyLockGateIfNeeded` | `lockNavigationAndSubscriptionFlow` |
-| 5726 | `async function` | `showPromptModal` | `modalDialogHelpers` |
-| 5777 | `const arrow` | `cleanup` | `modalDialogHelpers` |
-| 5784 | `const arrow` | `closeWith` | `modalDialogHelpers` |
-| 5830 | `async function` | `showChoiceModal` | `modalDialogHelpers` |
-| 5872 | `const arrow` | `cleanup` | `modalDialogHelpers` |
-| 5879 | `const arrow` | `closeWith` | `modalDialogHelpers` |
-| 5913 | `const arrow` | `handleEscape` | `modalDialogHelpers` |
-| 5929 | `function` | `isNanahAvailable` | `nanahModeScopePolicyModal` |
-| 5933 | `function` | `normalizeNanahCode` | `nanahModeScopePolicyModal` |
-| 5940 | `function` | `extractNanahCodeFromInput` | `nanahModeScopePolicyModal` |
-| 5954 | `function` | `formatNanahStage` | `nanahModeScopePolicyModal` |
-| 5963 | `function` | `getNanahRole` | `nanahModeScopePolicyModal` |
-| 5969 | `function` | `getNanahRoleLabel` | `nanahModeScopePolicyModal` |
-| 5976 | `function` | `getNanahScope` | `nanahModeScopePolicyModal` |
-| 5983 | `function` | `getNanahStrategy` | `nanahModeScopePolicyModal` |
-| 5988 | `function` | `normalizeNanahUiMode` | `nanahModeScopePolicyModal` |
-| 5995 | `function` | `inferNanahUiModeFromControls` | `nanahModeScopePolicyModal` |
-| 6002 | `function` | `getNanahUiMode` | `nanahModeScopePolicyModal` |
-| 6006 | `function` | `getNanahScopeList` | `nanahModeScopePolicyModal` |
-| 6014 | `function` | `getNanahManagedPolicyScopeList` | `nanahModeScopePolicyModal` |
-| 6030 | `function` | `classifyNanahTrustedLink` | `nanahModeScopePolicyModal` |
-| 6038 | `function` | `getNanahScopeLabel` | `nanahModeScopePolicyModal` |
-| 6051 | `function` | `getNanahStrategyLabel` | `nanahModeScopePolicyModal` |
-| 6055 | `function` | `getNanahReconnectMode` | `nanahModeScopePolicyModal` |
-| 6062 | `function` | `getNanahReconnectModeLabel` | `nanahModeScopePolicyModal` |
-| 6066 | `function` | `getNanahLockedChildMode` | `nanahModeScopePolicyModal` |
-| 6073 | `function` | `getNanahLockedChildModeLabel` | `nanahModeScopePolicyModal` |
-| 6079 | `function` | `getNanahChildProtectionLevel` | `nanahModeScopePolicyModal` |
-| 6086 | `function` | `getNanahChildProtectionLevelLabel` | `nanahModeScopePolicyModal` |
-| 6092 | `function` | `getNanahTargetProfileBehavior` | `nanahModeScopePolicyModal` |
-| 6099 | `function` | `getNanahTargetProfileBehaviorLabel` | `nanahModeScopePolicyModal` |
-| 6105 | `function` | `getNanahLinkTypeLabel` | `nanahModeScopePolicyModal` |
-| 6109 | `function` | `getNanahRoleLabel` | `nanahModeScopePolicyModal` |
-| 6116 | `function` | `isActiveChildNanahProfile` | `nanahModeScopePolicyModal` |
-| 6120 | `function` | `isNanahChildReceiveOnly` | `nanahModeScopePolicyModal` |
-| 6124 | `async function` | `ensureChildNanahParentAuthorityUnlocked` | `nanahModeScopePolicyModal` |
-| 6139 | `function` | `getNanahScopeDescription` | `nanahModeScopePolicyModal` |
-| 6147 | `function` | `describeNanahScopeList` | `nanahModeScopePolicyModal` |
-| 6151 | `async function` | `showNanahManagedLinkModal` | `nanahModeScopePolicyModal` |
-| 6560 | `const arrow` | `readPolicy` | `nanahModeScopePolicyModal` |
-| 6595 | `const arrow` | `syncDefaultScopeState` | `nanahModeScopePolicyModal` |
-| 6620 | `const arrow` | `cleanup` | `nanahModeScopePolicyModal` |
-| 6627 | `const arrow` | `closeWith` | `nanahModeScopePolicyModal` |
-| 6679 | `function` | `normalizeNanahTrustedLink` | `nanahModeScopePolicyModal` |
-| 6684 | `const arrow` | `localRole` | `nanahModeScopePolicyModal` |
-| 6688 | `const arrow` | `remoteRole` | `nanahModeScopePolicyModal` |
-| 6743 | `function` | `getManagedNanahLinkPolicy` | `nanahModeScopePolicyModal` |
-| 6749 | `function` | `getNanahCurrentTrustedLink` | `nanahTargetProfileDevicePolicy` |
-| 6754 | `function` | `resolveNanahLocalTargetProfile` | `nanahTargetProfileDevicePolicy` |
-| 6795 | `function` | `resolveNanahTargetProfileFromPolicy` | `nanahTargetProfileDevicePolicy` |
-| 6825 | `function` | `resolveNanahExplicitTargetProfile` | `nanahTargetProfileDevicePolicy` |
-| 6835 | `function` | `buildNanahHelloTargetProfileContext` | `nanahTargetProfileDevicePolicy` |
-| 6851 | `function` | `getNanahSelectedRemoteTargetProfileId` | `nanahTargetProfileDevicePolicy` |
-| 6855 | `function` | `getNanahSelectedRemoteTargetProfile` | `nanahTargetProfileDevicePolicy` |
-| 6862 | `function` | `syncNanahRemoteTargetOptions` | `nanahTargetProfileDevicePolicy` |
-| 6890 | `async function` | `ensureNanahManagedChildLinkPermission` | `nanahTargetProfileDevicePolicy` |
-| 6906 | `function` | `isCurrentNanahManagedLink` | `nanahTargetProfileDevicePolicy` |
-| 6911 | `function` | `getNanahCapabilitiesForRole` | `nanahTargetProfileDevicePolicy` |
-| 6921 | `function` | `buildNanahPairUri` | `nanahTargetProfileDevicePolicy` |
-| 6936 | `function` | `getNanahRemoteLabel` | `nanahTargetProfileDevicePolicy` |
-| 6941 | `function` | `getNanahLocalDeviceLabel` | `nanahTargetProfileDevicePolicy` |
-| 6945 | `function` | `normalizeNanahProfileContext` | `nanahTargetProfileDevicePolicy` |
-| 6957 | `function` | `normalizeNanahTargetProfileContext` | `nanahTargetProfileDevicePolicy` |
-| 6969 | `function` | `resolveNanahDisplayTargetProfile` | `nanahTargetProfileDevicePolicy` |
-| 6987 | `function` | `formatNanahProfileContext` | `nanahTargetProfileDevicePolicy` |
-| 6996 | `function` | `formatNanahEndpointContext` | `nanahTargetProfileDevicePolicy` |
-| 7002 | `function` | `buildNanahTargetHint` | `nanahTargetProfileDevicePolicy` |
-| 7037 | `async function` | `ensureNanahStableDeviceId` | `nanahTargetProfileDevicePolicy` |
-| 7044 | `const arrow` | `generated` | `nanahTargetProfileDevicePolicy` |
-| 7058 | `async function` | `loadNanahPreferredDeviceLabel` | `nanahTargetProfileDevicePolicy` |
-| 7074 | `async function` | `persistNanahPreferredDeviceLabel` | `nanahTargetProfileDevicePolicy` |
-| 7080 | `async function` | `loadNanahUiModePreference` | `nanahTargetProfileDevicePolicy` |
-| 7084 | `async function` | `persistNanahUiModePreference` | `nanahTargetProfileDevicePolicy` |
-| 7088 | `function` | `getNanahSelectedText` | `nanahTargetProfileDevicePolicy` |
-| 7098 | `function` | `refreshNanahAdvancedSummary` | `nanahTargetProfileDevicePolicy` |
-| 7106 | `function` | `enforceChildSyncSurfaceRestrictions` | `nanahTargetProfileDevicePolicy` |
-| 7142 | `function` | `setNanahModeButtons` | `nanahTargetProfileDevicePolicy` |
-| 7167 | `function` | `setNanahMode` | `nanahTargetProfileDevicePolicy` |
-| 7215 | `async function` | `confirmNanahRemoteTarget` | `nanahTargetProfileDevicePolicy` |
-| 7278 | `function` | `findNanahTrustedLink` | `nanahTrustedLinkStorage` |
-| 7284 | `async function` | `readNanahStorage` | `nanahTrustedLinkStorage` |
-| 7308 | `async function` | `writeNanahStorage` | `nanahTrustedLinkStorage` |
-| 7328 | `async function` | `loadNanahTrustedLinks` | `nanahTrustedLinkStorage` |
-| 7337 | `async function` | `persistNanahTrustedLinks` | `nanahTrustedLinkStorage` |
-| 7341 | `async function` | `saveNanahTrustedLink` | `nanahTrustedLinkStorage` |
-| 7368 | `async function` | `removeNanahTrustedLink` | `nanahTrustedLinkStorage` |
-| 7376 | `async function` | `updateNanahTrustedLinkPolicy` | `nanahTrustedLinkStorage` |
-| 7399 | `async function` | `markNanahTrustedLinkUsed` | `nanahTrustedLinkStorage` |
-| 7407 | `async function` | `configureNanahTrustedLink` | `nanahTrustedLinkStorage` |
-| 7452 | `async function` | `startNanahTrustedReconnect` | `nanahTrustedLinkStorage` |
-| 7503 | `function` | `renderNanahTrustedLinks` | `nanahTrustedLinkStorage` |
-| 7712 | `async function` | `renderNanahQr` | `nanahSessionUiAndEnvelope` |
-| 7749 | `function` | `updateNanahModeUi` | `nanahSessionUiAndEnvelope` |
-| 7864 | `function` | `updateNanahPolicyControls` | `nanahSessionUiAndEnvelope` |
-| 7942 | `function` | `updateNanahUi` | `nanahSessionUiAndEnvelope` |
-| 8058 | `function` | `buildNanahDeviceDescriptor` | `nanahSessionUiAndEnvelope` |
-| 8070 | `async function` | `resetNanahSession` | `nanahSessionUiAndEnvelope` |
-| 8099 | `async function` | `sendNanahHelloEnvelope` | `nanahSessionUiAndEnvelope` |
-| 8117 | `async function` | `ensureNanahOutgoingAuth` | `nanahSessionUiAndEnvelope` |
-| 8148 | `async function` | `ensureNanahIncomingAuth` | `nanahSessionUiAndEnvelope` |
-| 8212 | `function` | `parseNanahEnvelopeDetails` | `nanahApplyProposalTransport` |
-| 8281 | `function` | `shouldAutoApplyNanahProposal` | `nanahApplyProposalTransport` |
-| 8290 | `async function` | `refreshFilterTubeUiAfterNanahImport` | `nanahApplyProposalTransport` |
-| 8309 | `async function` | `applyNanahEnvelope` | `nanahApplyProposalTransport` |
-| 8338 | `async function` | `handleNanahIncomingManagedPolicyEnvelope` | `nanahApplyProposalTransport` |
-| 8366 | `function` | `buildNanahOutgoingProposalPolicy` | `nanahApplyProposalTransport` |
-| 8407 | `function` | `attachNanahProposalPolicy` | `nanahApplyProposalTransport` |
-| 8429 | `function` | `resolveTrustedNanahManagedApply` | `nanahApplyProposalTransport` |
-| 8446 | `function` | `requiresNanahTrustedReconnectApproval` | `nanahApplyProposalTransport` |
-| 8455 | `async function` | `ensureNanahTrustedReconnectApproved` | `nanahApplyProposalTransport` |
-| 8526 | `async function` | `sendNanahDecision` | `nanahApplyProposalTransport` |
-| 8541 | `async function` | `handleNanahIncomingProposal` | `nanahApplyProposalTransport` |
-| 8772 | `async function` | `handleNanahIncomingEnvelope` | `nanahApplyProposalTransport` |
-| 8830 | `async function` | `createNanahClient` | `nanahApplyProposalTransport` |
-| 8904 | `async function` | `trustConnectedNanahDevice` | `nanahApplyProposalTransport` |
-| 8990 | `async function` | `confirmSubscriptionsImportModeChoice` | `nanahApplyProposalTransport` |
-| 9020 | `async function` | `verifyPin` | `pinProfilesManager` |
-| 9028 | `async function` | `ensureProfileUnlocked` | `pinProfilesManager` |
-| 9063 | `async function` | `ensureAdminUnlocked` | `pinProfilesManager` |
-| 9070 | `function` | `updateExportScopeControls` | `pinProfilesManager` |
-| 9082 | `function` | `renderProfileSelector` | `pinProfilesManager` |
-| 9142 | `function` | `renderProfilesManager` | `pinProfilesManager` |
-| 9542 | `async function` | `refreshProfilesUI` | `pinProfilesManager` |
-| 9565 | `async function` | `switchToProfile` | `pinProfilesManager` |
-| 9753 | `function` | `revokeBlobUrlLater` | `importExportDownload` |
-| 9768 | `function` | `downloadViaAnchor` | `importExportDownload` |
-| 9795 | `function` | `downloadJsonToDownloadsFolder` | `importExportDownload` |
-| 9837 | `async function` | `runExportV3` | `importExportDownload` |
-| 9867 | `const arrow` | `safePart` | `importExportDownload` |
-| 9901 | `async function` | `runExportV3Encrypted` | `importExportDownload` |
-| 9949 | `const arrow` | `safePart` | `importExportDownload` |
-| 9982 | `async function` | `runImportV3FromFile` | `importExportDownload` |
-| 10436 | `async const arrow` | `persistPolicy` | `settingsSyncAccountPolicyHandlers` |
-| 10546 | `const arrow` | `makeIdPart` | `settingsSyncAccountPolicyHandlers` |
-| 10655 | `const arrow` | `makeIdPart` | `settingsSyncAccountPolicyHandlers` |
-| 10982 | `function` | `toDateInputValue` | `dateFilterHelpers` |
-| 10990 | `function` | `parseDateInput` | `dateFilterHelpers` |
-| 11003 | `function` | `applyPresetToDateControls` | `dateFilterHelpers` |
-| 11029 | `async function` | `addManagedKeyword` | `managedRowsListModeRender` |
-| 11044 | `async function` | `removeManagedKeyword` | `managedRowsListModeRender` |
-| 11057 | `async function` | `toggleManagedKeywordExact` | `managedRowsListModeRender` |
-| 11072 | `async function` | `toggleManagedKeywordComments` | `managedRowsListModeRender` |
-| 11087 | `async function` | `addManagedChannel` | `managedRowsListModeRender` |
-| 11107 | `async function` | `removeManagedChannel` | `managedRowsListModeRender` |
-| 11120 | `async function` | `toggleManagedChannelFilterAll` | `managedRowsListModeRender` |
-| 11137 | `function` | `renderKeywords` | `managedRowsListModeRender` |
-| 11155 | `function` | `renderChannels` | `managedRowsListModeRender` |
-| 11173 | `function` | `renderKidsKeywords` | `managedRowsListModeRender` |
-| 11192 | `function` | `renderKidsChannels` | `managedRowsListModeRender` |
-| 11211 | `function` | `renderListModeControls` | `managedRowsListModeRender` |
-| 11221 | `const arrow` | `currentMode` | `managedRowsListModeRender` |
-| 11247 | `async const arrow` | `handleModeToggle` | `managedRowsListModeRender` |
-| 11256 | `const arrow` | `whitelistEmpty` | `managedRowsListModeRender` |
-| 11389 | `function` | `updateCheckboxes` | `dashboardStatsFiltering` |
-| 11411 | `function` | `filterContentControls` | `dashboardStatsFiltering` |
-| 11432 | `function` | `filterHelpCards` | `dashboardStatsFiltering` |
-| 11459 | `function` | `getDashboardSurfaceStats` | `dashboardStatsFiltering` |
-| 11470 | `function` | `getDashboardCounts` | `dashboardStatsFiltering` |
-| 11508 | `const arrow` | `keyFor` | `dashboardStatsFiltering` |
-| 11543 | `function` | `formatSavedTime` | `dashboardStatsFiltering` |
-| 11563 | `function` | `setDashboardStatsSurface` | `dashboardStatsFiltering` |
-| 11572 | `function` | `scheduleDashboardStatsRotation` | `dashboardStatsFiltering` |
-| 11613 | `function` | `updateStats` | `dashboardStatsFiltering` |
-| 11787 | `function` | `updateKeywordDateFilterFromInputs` | `dateFilterHelpers` |
-| 11902 | `function` | `updateChannelDateFilterFromInputs` | `dateFilterHelpers` |
-| 11983 | `function` | `updateKidsKeywordDateFilterFromInputs` | `dateFilterHelpers` |
-| 12065 | `function` | `updateKidsChannelDateFilterFromInputs` | `dateFilterHelpers` |
-| 12212 | `function` | `setupNavigation` | `navigationAndToasts` |
-| 12234 | `function` | `switchView` | `navigationAndToasts` |
-| 12322 | `function` | `showSuccessToast` | `navigationAndToasts` |
-
+| 4436 | `async function` | `recordManagedAdminAuthFailureHistory` | `profileAccessAndManagedChild` |
+| 4487 | `function` | `getManagedActionHistoryRows` | `profileAccessAndManagedChild` |
+| 4493 | `function` | `managedActionHistoryRowIsProtected` | `profileAccessAndManagedChild` |
+| 4499 | `function` | `canViewManagedActionHistory` | `profileAccessAndManagedChild` |
+| 4505 | `function` | `formatManagedActionHistoryRow` | `profileAccessAndManagedChild` |
+| 4520 | `async function` | `showManagedActionHistory` | `profileAccessAndManagedChild` |
+| 4570 | `async function` | `clearManagedActionHistory` | `profileAccessAndManagedChild` |
+| 4617 | `function` | `getManagedNanahPolicyAcceptedState` | `profileAccessAndManagedChild` |
+| 4627 | `function` | `findNanahTrustedLinkForManagedEnvelope` | `profileAccessAndManagedChild` |
+| 4636 | `function` | `buildNanahManagedValidationTrustedLink` | `profileAccessAndManagedChild` |
+| 4659 | `function` | `getNanahManagedDuplicateDeviceIds` | `profileAccessAndManagedChild` |
+| 4672 | `function` | `buildManagedNanahPolicyValidationContext` | `profileAccessAndManagedChild` |
+| 4691 | `function` | `summarizeManagedNanahPolicyEnvelope` | `profileAccessAndManagedChild` |
+| 4710 | `async function` | `recordManagedNanahPolicyValidationHistory` | `profileAccessAndManagedChild` |
+| 4775 | `function` | `isManagedChildEditFor` | `profileAccessAndManagedChild` |
+| 4780 | `function` | `getManagedChildProfile` | `profileAccessAndManagedChild` |
+| 4786 | `function` | `getManagedChildSettings` | `profileAccessAndManagedChild` |
+| 4790 | `function` | `buildManagedChildState` | `profileAccessAndManagedChild` |
+| 4820 | `async function` | `saveManagedChildSurface` | `profileAccessAndManagedChild` |
+| 4888 | `function` | `isManagedChildEditorView` | `profileAccessAndManagedChild` |
+| 4892 | `function` | `endManagedChildEdit` | `profileAccessAndManagedChild` |
+| 4914 | `function` | `renderManagedChildGlobalBanner` | `profileAccessAndManagedChild` |
+| 4954 | `function` | `renderManagedChildEditorBanner` | `profileAccessAndManagedChild` |
+| 4960 | `const arrow` | `renderFor` | `profileAccessAndManagedChild` |
+| 4972 | `async function` | `startManagedChildEdit` | `profileAccessAndManagedChild` |
+| 5017 | `function` | `updateAdminPolicyControls` | `profileAccessAndManagedChild` |
+| 5030 | `function` | `updateChildProfileCapabilityControls` | `profileAccessAndManagedChild` |
+| 5092 | `function` | `isChildProfileAdminSurface` | `profileAccessAndManagedChild` |
+| 5096 | `function` | `isViewAllowedForCurrentAccess` | `profileAccessAndManagedChild` |
+| 5107 | `function` | `ensureNonChildAdminAction` | `profileAccessAndManagedChild` |
+| 5113 | `async function` | `updateProfileViewingAccess` | `profileAccessAndManagedChild` |
+| 5167 | `async function` | `updateProfileTimeLimitPolicy` | `profileAccessAndManagedChild` |
+| 5245 | `function` | `isUiLocked` | `lockNavigationAndSubscriptionFlow` |
+| 5254 | `function` | `getActiveProfileType` | `lockNavigationAndSubscriptionFlow` |
+| 5260 | `function` | `getNanahProfileTypeLabel` | `lockNavigationAndSubscriptionFlow` |
+| 5265 | `function` | `getNanahLocalProfileContext` | `lockNavigationAndSubscriptionFlow` |
+| 5277 | `function` | `getNanahProfileInventory` | `lockNavigationAndSubscriptionFlow` |
+| 5297 | `function` | `normalizeNanahProfileInventory` | `lockNavigationAndSubscriptionFlow` |
+| 5303 | `function` | `isNanahChildReplicaOnly` | `lockNavigationAndSubscriptionFlow` |
+| 5308 | `async function` | `enableWhitelistModeAfterImport` | `lockNavigationAndSubscriptionFlow` |
+| 5354 | `function` | `handleSubscriptionsImportProgress` | `lockNavigationAndSubscriptionFlow` |
+| 5389 | `async function` | `resolveSubscriptionsImportTab` | `lockNavigationAndSubscriptionFlow` |
+| 5467 | `async function` | `startSubscribedChannelsImport` | `lockNavigationAndSubscriptionFlow` |
+| 5669 | `function` | `resolveViewAccess` | `lockNavigationAndSubscriptionFlow` |
+| 5687 | `function` | `updateNavigationAccessUI` | `lockNavigationAndSubscriptionFlow` |
+| 5715 | `function` | `applyLockGateIfNeeded` | `lockNavigationAndSubscriptionFlow` |
+| 5792 | `async function` | `showPromptModal` | `modalDialogHelpers` |
+| 5843 | `const arrow` | `cleanup` | `modalDialogHelpers` |
+| 5850 | `const arrow` | `closeWith` | `modalDialogHelpers` |
+| 5893 | `async function` | `showChoiceModal` | `modalDialogHelpers` |
+| 5938 | `const arrow` | `cleanup` | `modalDialogHelpers` |
+| 5945 | `const arrow` | `closeWith` | `modalDialogHelpers` |
+| 5979 | `const arrow` | `handleEscape` | `modalDialogHelpers` |
+| 5995 | `function` | `isNanahAvailable` | `nanahModeScopePolicyModal` |
+| 5999 | `function` | `normalizeNanahCode` | `nanahModeScopePolicyModal` |
+| 6006 | `function` | `extractNanahCodeFromInput` | `nanahModeScopePolicyModal` |
+| 6020 | `function` | `formatNanahStage` | `nanahModeScopePolicyModal` |
+| 6029 | `function` | `getNanahRole` | `nanahModeScopePolicyModal` |
+| 6035 | `function` | `getNanahRoleLabel` | `nanahModeScopePolicyModal` |
+| 6042 | `function` | `getNanahScope` | `nanahModeScopePolicyModal` |
+| 6049 | `function` | `getNanahStrategy` | `nanahModeScopePolicyModal` |
+| 6054 | `function` | `normalizeNanahUiMode` | `nanahModeScopePolicyModal` |
+| 6061 | `function` | `inferNanahUiModeFromControls` | `nanahModeScopePolicyModal` |
+| 6068 | `function` | `getNanahUiMode` | `nanahModeScopePolicyModal` |
+| 6072 | `function` | `getNanahScopeList` | `nanahModeScopePolicyModal` |
+| 6080 | `function` | `getNanahManagedPolicyScopeList` | `nanahModeScopePolicyModal` |
+| 6096 | `function` | `classifyNanahTrustedLink` | `nanahModeScopePolicyModal` |
+| 6104 | `function` | `getNanahScopeLabel` | `nanahModeScopePolicyModal` |
+| 6117 | `function` | `getNanahStrategyLabel` | `nanahModeScopePolicyModal` |
+| 6121 | `function` | `getNanahReconnectMode` | `nanahModeScopePolicyModal` |
+| 6128 | `function` | `getNanahReconnectModeLabel` | `nanahModeScopePolicyModal` |
+| 6132 | `function` | `getNanahLockedChildMode` | `nanahModeScopePolicyModal` |
+| 6139 | `function` | `getNanahLockedChildModeLabel` | `nanahModeScopePolicyModal` |
+| 6145 | `function` | `getNanahChildProtectionLevel` | `nanahModeScopePolicyModal` |
+| 6152 | `function` | `getNanahChildProtectionLevelLabel` | `nanahModeScopePolicyModal` |
+| 6158 | `function` | `getNanahTargetProfileBehavior` | `nanahModeScopePolicyModal` |
+| 6165 | `function` | `getNanahTargetProfileBehaviorLabel` | `nanahModeScopePolicyModal` |
+| 6171 | `function` | `getNanahLinkTypeLabel` | `nanahModeScopePolicyModal` |
+| 6175 | `function` | `getNanahRoleLabel` | `nanahModeScopePolicyModal` |
+| 6182 | `function` | `isActiveChildNanahProfile` | `nanahModeScopePolicyModal` |
+| 6186 | `function` | `isNanahChildReceiveOnly` | `nanahModeScopePolicyModal` |
+| 6190 | `async function` | `ensureChildNanahParentAuthorityUnlocked` | `nanahModeScopePolicyModal` |
+| 6205 | `function` | `getNanahScopeDescription` | `nanahModeScopePolicyModal` |
+| 6213 | `function` | `describeNanahScopeList` | `nanahModeScopePolicyModal` |
+| 6217 | `async function` | `showNanahManagedLinkModal` | `nanahModeScopePolicyModal` |
+| 6626 | `const arrow` | `readPolicy` | `nanahModeScopePolicyModal` |
+| 6661 | `const arrow` | `syncDefaultScopeState` | `nanahModeScopePolicyModal` |
+| 6686 | `const arrow` | `cleanup` | `nanahModeScopePolicyModal` |
+| 6693 | `const arrow` | `closeWith` | `nanahModeScopePolicyModal` |
+| 6745 | `function` | `normalizeNanahTrustedLink` | `nanahModeScopePolicyModal` |
+| 6750 | `const arrow` | `localRole` | `nanahModeScopePolicyModal` |
+| 6754 | `const arrow` | `remoteRole` | `nanahModeScopePolicyModal` |
+| 6809 | `function` | `getManagedNanahLinkPolicy` | `nanahModeScopePolicyModal` |
+| 6815 | `function` | `getNanahCurrentTrustedLink` | `nanahTargetProfileDevicePolicy` |
+| 6820 | `function` | `resolveNanahLocalTargetProfile` | `nanahTargetProfileDevicePolicy` |
+| 6861 | `function` | `resolveNanahTargetProfileFromPolicy` | `nanahTargetProfileDevicePolicy` |
+| 6891 | `function` | `resolveNanahExplicitTargetProfile` | `nanahTargetProfileDevicePolicy` |
+| 6901 | `function` | `buildNanahHelloTargetProfileContext` | `nanahTargetProfileDevicePolicy` |
+| 6917 | `function` | `getNanahSelectedRemoteTargetProfileId` | `nanahTargetProfileDevicePolicy` |
+| 6921 | `function` | `getNanahSelectedRemoteTargetProfile` | `nanahTargetProfileDevicePolicy` |
+| 6928 | `function` | `syncNanahRemoteTargetOptions` | `nanahTargetProfileDevicePolicy` |
+| 6956 | `async function` | `ensureNanahManagedChildLinkPermission` | `nanahTargetProfileDevicePolicy` |
+| 6972 | `function` | `isCurrentNanahManagedLink` | `nanahTargetProfileDevicePolicy` |
+| 6977 | `function` | `getNanahCapabilitiesForRole` | `nanahTargetProfileDevicePolicy` |
+| 6987 | `function` | `buildNanahPairUri` | `nanahTargetProfileDevicePolicy` |
+| 7002 | `function` | `getNanahRemoteLabel` | `nanahTargetProfileDevicePolicy` |
+| 7007 | `function` | `getNanahLocalDeviceLabel` | `nanahTargetProfileDevicePolicy` |
+| 7011 | `function` | `normalizeNanahProfileContext` | `nanahTargetProfileDevicePolicy` |
+| 7023 | `function` | `normalizeNanahTargetProfileContext` | `nanahTargetProfileDevicePolicy` |
+| 7035 | `function` | `resolveNanahDisplayTargetProfile` | `nanahTargetProfileDevicePolicy` |
+| 7053 | `function` | `formatNanahProfileContext` | `nanahTargetProfileDevicePolicy` |
+| 7062 | `function` | `formatNanahEndpointContext` | `nanahTargetProfileDevicePolicy` |
+| 7068 | `function` | `buildNanahTargetHint` | `nanahTargetProfileDevicePolicy` |
+| 7103 | `async function` | `ensureNanahStableDeviceId` | `nanahTargetProfileDevicePolicy` |
+| 7110 | `const arrow` | `generated` | `nanahTargetProfileDevicePolicy` |
+| 7124 | `async function` | `loadNanahPreferredDeviceLabel` | `nanahTargetProfileDevicePolicy` |
+| 7140 | `async function` | `persistNanahPreferredDeviceLabel` | `nanahTargetProfileDevicePolicy` |
+| 7146 | `async function` | `loadNanahUiModePreference` | `nanahTargetProfileDevicePolicy` |
+| 7150 | `async function` | `persistNanahUiModePreference` | `nanahTargetProfileDevicePolicy` |
+| 7154 | `function` | `getNanahSelectedText` | `nanahTargetProfileDevicePolicy` |
+| 7164 | `function` | `refreshNanahAdvancedSummary` | `nanahTargetProfileDevicePolicy` |
+| 7172 | `function` | `enforceChildSyncSurfaceRestrictions` | `nanahTargetProfileDevicePolicy` |
+| 7208 | `function` | `setNanahModeButtons` | `nanahTargetProfileDevicePolicy` |
+| 7233 | `function` | `setNanahMode` | `nanahTargetProfileDevicePolicy` |
+| 7281 | `async function` | `confirmNanahRemoteTarget` | `nanahTargetProfileDevicePolicy` |
+| 7344 | `function` | `findNanahTrustedLink` | `nanahTrustedLinkStorage` |
+| 7350 | `async function` | `readNanahStorage` | `nanahTrustedLinkStorage` |
+| 7374 | `async function` | `writeNanahStorage` | `nanahTrustedLinkStorage` |
+| 7394 | `async function` | `loadNanahTrustedLinks` | `nanahTrustedLinkStorage` |
+| 7403 | `async function` | `persistNanahTrustedLinks` | `nanahTrustedLinkStorage` |
+| 7407 | `async function` | `saveNanahTrustedLink` | `nanahTrustedLinkStorage` |
+| 7434 | `async function` | `removeNanahTrustedLink` | `nanahTrustedLinkStorage` |
+| 7442 | `async function` | `updateNanahTrustedLinkPolicy` | `nanahTrustedLinkStorage` |
+| 7465 | `async function` | `markNanahTrustedLinkUsed` | `nanahTrustedLinkStorage` |
+| 7473 | `async function` | `configureNanahTrustedLink` | `nanahTrustedLinkStorage` |
+| 7518 | `async function` | `startNanahTrustedReconnect` | `nanahTrustedLinkStorage` |
+| 7569 | `function` | `renderNanahTrustedLinks` | `nanahTrustedLinkStorage` |
+| 7778 | `async function` | `renderNanahQr` | `nanahSessionUiAndEnvelope` |
+| 7815 | `function` | `updateNanahModeUi` | `nanahSessionUiAndEnvelope` |
+| 7930 | `function` | `updateNanahPolicyControls` | `nanahSessionUiAndEnvelope` |
+| 8008 | `function` | `updateNanahUi` | `nanahSessionUiAndEnvelope` |
+| 8124 | `function` | `buildNanahDeviceDescriptor` | `nanahSessionUiAndEnvelope` |
+| 8136 | `async function` | `resetNanahSession` | `nanahSessionUiAndEnvelope` |
+| 8165 | `async function` | `sendNanahHelloEnvelope` | `nanahSessionUiAndEnvelope` |
+| 8183 | `async function` | `ensureNanahOutgoingAuth` | `nanahSessionUiAndEnvelope` |
+| 8214 | `async function` | `ensureNanahIncomingAuth` | `nanahSessionUiAndEnvelope` |
+| 8278 | `function` | `parseNanahEnvelopeDetails` | `nanahApplyProposalTransport` |
+| 8347 | `function` | `shouldAutoApplyNanahProposal` | `nanahApplyProposalTransport` |
+| 8356 | `async function` | `refreshFilterTubeUiAfterNanahImport` | `nanahApplyProposalTransport` |
+| 8375 | `async function` | `applyNanahEnvelope` | `nanahApplyProposalTransport` |
+| 8404 | `async function` | `handleNanahIncomingManagedPolicyEnvelope` | `nanahApplyProposalTransport` |
+| 8432 | `function` | `buildNanahOutgoingProposalPolicy` | `nanahApplyProposalTransport` |
+| 8473 | `function` | `attachNanahProposalPolicy` | `nanahApplyProposalTransport` |
+| 8495 | `function` | `resolveTrustedNanahManagedApply` | `nanahApplyProposalTransport` |
+| 8512 | `function` | `requiresNanahTrustedReconnectApproval` | `nanahApplyProposalTransport` |
+| 8521 | `async function` | `ensureNanahTrustedReconnectApproved` | `nanahApplyProposalTransport` |
+| 8592 | `async function` | `sendNanahDecision` | `nanahApplyProposalTransport` |
+| 8607 | `async function` | `handleNanahIncomingProposal` | `nanahApplyProposalTransport` |
+| 8838 | `async function` | `handleNanahIncomingEnvelope` | `nanahApplyProposalTransport` |
+| 8896 | `async function` | `createNanahClient` | `nanahApplyProposalTransport` |
+| 8970 | `async function` | `trustConnectedNanahDevice` | `nanahApplyProposalTransport` |
+| 9056 | `async function` | `confirmSubscriptionsImportModeChoice` | `nanahApplyProposalTransport` |
+| 9086 | `async function` | `verifyPin` | `pinProfilesManager` |
+| 9094 | `async function` | `ensureProfileUnlocked` | `pinProfilesManager` |
+| 9129 | `async function` | `ensureAdminUnlocked` | `pinProfilesManager` |
+| 9136 | `function` | `updateExportScopeControls` | `pinProfilesManager` |
+| 9148 | `function` | `renderProfileSelector` | `pinProfilesManager` |
+| 9208 | `function` | `renderProfilesManager` | `pinProfilesManager` |
+| 9608 | `async function` | `refreshProfilesUI` | `pinProfilesManager` |
+| 9631 | `async function` | `switchToProfile` | `pinProfilesManager` |
+| 9819 | `function` | `revokeBlobUrlLater` | `importExportDownload` |
+| 9834 | `function` | `downloadViaAnchor` | `importExportDownload` |
+| 9861 | `function` | `downloadJsonToDownloadsFolder` | `importExportDownload` |
+| 9903 | `async function` | `runExportV3` | `importExportDownload` |
+| 9933 | `const arrow` | `safePart` | `importExportDownload` |
+| 9967 | `async function` | `runExportV3Encrypted` | `importExportDownload` |
+| 10015 | `const arrow` | `safePart` | `importExportDownload` |
+| 10048 | `async function` | `runImportV3FromFile` | `importExportDownload` |
+| 10502 | `async const arrow` | `persistPolicy` | `settingsSyncAccountPolicyHandlers` |
+| 10612 | `const arrow` | `makeIdPart` | `settingsSyncAccountPolicyHandlers` |
+| 10721 | `const arrow` | `makeIdPart` | `settingsSyncAccountPolicyHandlers` |
+| 11048 | `function` | `toDateInputValue` | `dateFilterHelpers` |
+| 11056 | `function` | `parseDateInput` | `dateFilterHelpers` |
+| 11069 | `function` | `applyPresetToDateControls` | `dateFilterHelpers` |
+| 11095 | `async function` | `addManagedKeyword` | `managedRowsListModeRender` |
+| 11110 | `async function` | `removeManagedKeyword` | `managedRowsListModeRender` |
+| 11123 | `async function` | `toggleManagedKeywordExact` | `managedRowsListModeRender` |
+| 11138 | `async function` | `toggleManagedKeywordComments` | `managedRowsListModeRender` |
+| 11153 | `async function` | `addManagedChannel` | `managedRowsListModeRender` |
+| 11173 | `async function` | `removeManagedChannel` | `managedRowsListModeRender` |
+| 11186 | `async function` | `toggleManagedChannelFilterAll` | `managedRowsListModeRender` |
+| 11203 | `function` | `renderKeywords` | `managedRowsListModeRender` |
+| 11221 | `function` | `renderChannels` | `managedRowsListModeRender` |
+| 11239 | `function` | `renderKidsKeywords` | `managedRowsListModeRender` |
+| 11258 | `function` | `renderKidsChannels` | `managedRowsListModeRender` |
+| 11277 | `function` | `renderListModeControls` | `managedRowsListModeRender` |
+| 11287 | `const arrow` | `currentMode` | `managedRowsListModeRender` |
+| 11313 | `async const arrow` | `handleModeToggle` | `managedRowsListModeRender` |
+| 11322 | `const arrow` | `whitelistEmpty` | `managedRowsListModeRender` |
+| 11455 | `function` | `updateCheckboxes` | `dashboardStatsFiltering` |
+| 11477 | `function` | `filterContentControls` | `dashboardStatsFiltering` |
+| 11498 | `function` | `filterHelpCards` | `dashboardStatsFiltering` |
+| 11525 | `function` | `getDashboardSurfaceStats` | `dashboardStatsFiltering` |
+| 11536 | `function` | `getDashboardCounts` | `dashboardStatsFiltering` |
+| 11574 | `const arrow` | `keyFor` | `dashboardStatsFiltering` |
+| 11609 | `function` | `formatSavedTime` | `dashboardStatsFiltering` |
+| 11629 | `function` | `setDashboardStatsSurface` | `dashboardStatsFiltering` |
+| 11638 | `function` | `scheduleDashboardStatsRotation` | `dashboardStatsFiltering` |
+| 11679 | `function` | `updateStats` | `dashboardStatsFiltering` |
+| 11853 | `function` | `updateKeywordDateFilterFromInputs` | `dateFilterHelpers` |
+| 11968 | `function` | `updateChannelDateFilterFromInputs` | `dateFilterHelpers` |
+| 12049 | `function` | `updateKidsKeywordDateFilterFromInputs` | `dateFilterHelpers` |
+| 12131 | `function` | `updateKidsChannelDateFilterFromInputs` | `dateFilterHelpers` |
+| 12278 | `function` | `setupNavigation` | `navigationAndToasts` |
+| 12300 | `function` | `switchView` | `navigationAndToasts` |
+| 12388 | `function` | `showSuccessToast` | `navigationAndToasts` |
 ## Future Method Proof Fields
 
 Any future behavior change in this file needs rows with at least:
@@ -543,9 +543,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5830
+method semantic proof gap lexical callables covered: 5836
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5830
+lexical callables requiring semantic proof before behavior changes: 5836
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

@@ -119,9 +119,9 @@ test('JSON-first route/surface fixture artifact path rows and counts stay pinned
   assert.match(doc, /reserved future artifact roots: 1/);
   assert.match(doc, /reserved future artifact files: 5/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5830/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5836/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5830/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5836/);
   assert.match(doc, /committed route\/surface fixture packet files: 0/);
   assert.match(doc, /runtime JSON-first fixture packet approvals: 0/);
   assert.match(doc, /runtime route\/surface metric artifacts: 0/);
@@ -168,7 +168,7 @@ test('JSON-first route/surface fixture artifact path boundary is backed by curre
   assert.match(fixtureProvenanceContract, /Implementation-ready fixture provenance contract rows: 0/);
   assert.match(jsonFirstImplementation, /method semantic proof gap files covered: 69/);
   assert.match(methodGap, /files with lexical accounting: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5830/);
+  assert.match(methodGap, /repo-wide lexical callables: 5836/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(implementationReadiness, /implementation-ready first optimization rows: 0/);
 });

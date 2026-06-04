@@ -1,7 +1,8 @@
 # Model: Managed Policy Action History And Access Control
 
 **Generated**: 2026-06-03
-**Status**: Local protected history access proof present; remote managed-policy
+**Status**: Local protected history access proof present; failed parent unlock
+history writer present for managed-profile gates; remote managed-policy
 validation history writer present for rejection and valid-but-apply-gated
 evidence. Remote accepted apply history is still pending.
 **Goal slice**: Implementation order item 4, "Add action-history/log model and
@@ -19,7 +20,10 @@ updates. This model defines that history, tracks the first runtime writer for
 accepted same-device parent-managed child surface saves, exposes a
 parent/account-only local history view for protected child rows, and now records
 receive-side managed-policy validation outcomes when a
-`filtertube_managed_policy` envelope reaches the Nanah dashboard path.
+`filtertube_managed_policy` envelope reaches the Nanah dashboard path. It also
+records protected failed-auth rows when parent/admin unlock fails while opening
+managed child edit, viewing/clearing protected history, changing viewing space,
+or changing time limits.
 
 Action history is protected evidence and parent/caregiver UX. It is not policy
 authority. Runtime policy must still come from the current accepted managed
@@ -142,12 +146,12 @@ profile when a row can be attached to a known protected profile:
 
 ```text
 runtime managed action history store: profile-local managed child rows
-runtime managed action history row writer: local managed child edit plus Nanah managed-policy validation outcomes
+runtime managed action history row writer: local managed child edit plus failed parent unlock plus Nanah managed-policy validation outcomes
 runtime managed action history access gate: present for parent/account authority
 runtime managed action history clear path: present for accepted rows only
 runtime remote managed validation history writer: present for rejected, conflict, idempotent, and valid-but-apply-gated receive outcomes
 runtime remote managed accepted apply history writer: pending
-runtime behavior changed by this contract: yes, for accepted local managed child saves, parent/account history access, and Nanah managed-policy receive evidence
+runtime behavior changed by this contract: yes, for accepted local managed child saves, protected failed-auth rows, parent/account history access, and Nanah managed-policy receive evidence
 ```
 
 The current local writer stores redacted count summaries under
@@ -155,6 +159,10 @@ The current local writer stores redacted count summaries under
 parent/account authority, not child PIN authority, and `clearManagedActionHistory`
 preserves rows that are rejected, conflict, failed-auth, expired-session, trust
 revocation, time-limit, or viewing-space evidence.
+
+The current failed-auth writer records only protected evidence rows. It does not
+rate-limit yet, does not extend an admin session, and does not authorize any
+future policy mutation.
 
 The current remote validation writer is deliberately still not a low-level
 profile mutation path. A valid newer `filtertube_managed_policy` envelope is

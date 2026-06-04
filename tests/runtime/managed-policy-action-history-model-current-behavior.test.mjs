@@ -92,6 +92,24 @@ function validAcceptedRow(overrides = {}) {
   };
 }
 
+function validFailedAuthRow(overrides = {}) {
+  return validAcceptedRow({
+    rowId: 'history-row-failed-auth-1',
+    trustedLinkId: null,
+    actionType: 'admin_session.failed_unlock',
+    scope: 'admin_session',
+    revision: null,
+    policyHash: null,
+    result: 'failed_auth',
+    reason: 'history_clear_unlock_failed',
+    summary: {
+      redacted: true,
+      label: 'Parent unlock failed'
+    },
+    ...overrides
+  });
+}
+
 function validateHistoryRow(row) {
   if (!row || typeof row !== 'object') return { ok: false, reason: 'missing_row' };
   for (const field of [
@@ -161,7 +179,7 @@ test('managed policy action-history model is linked from plan and has protected 
   const inventory = read(inventoryPath);
   const source = runtimeSource();
 
-  assert.match(doc, /Status\*\*: Local protected history access proof present; remote managed-policy\s+validation history writer present/);
+  assert.match(doc, /Status\*\*: Local protected history access proof present; failed parent unlock\s+history writer present for managed-profile gates; remote managed-policy\s+validation history writer present/);
   assert.match(doc, /Issue 60 asks for feedback, logs, or history/);
   assert.match(doc, /Action history is protected evidence and parent\/caregiver UX/);
   assert.match(doc, /It is not policy\s+authority/);
@@ -181,6 +199,9 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(source, /function canViewManagedActionHistory\(profilesV4, targetProfileId\)/);
   assert.match(source, /function showManagedActionHistory\(profileId\)/);
   assert.match(source, /function clearManagedActionHistory\(profileId\)/);
+  assert.match(source, /function recordManagedAdminAuthFailureHistory\(profilesV4, targetProfileId, reason = 'unlock_failed'\)/);
+  assert.match(source, /admin_session\.failed_unlock/);
+  assert.match(source, /failed_auth/);
   assert.match(source, /function recordManagedNanahPolicyValidationHistory\(envelope, decision, context = \{\}\)/);
   assert.match(source, /function handleNanahIncomingManagedPolicyEnvelope\(envelope\)/);
   assert.match(source, /root\.type === 'filtertube_managed_policy'/);
@@ -215,6 +236,8 @@ test('managed policy action-history row fixture requires actor target revision r
   assert.deepEqual(validateHistoryRow(validAcceptedRow({ result: 'rejected', reason: null })), { ok: false, reason: 'missing_rejection_reason' });
   assert.deepEqual(validateHistoryRow(validAcceptedRow({ revision: null })), { ok: false, reason: 'missing_policy_revision' });
   assert.deepEqual(validateHistoryRow(validAcceptedRow({ summary: { redacted: false, plaintextValue: 'spiders' } })), { ok: false, reason: 'sensitive_plaintext_value' });
+  assert.deepEqual(validateHistoryRow(validFailedAuthRow()), { ok: true });
+  assert.deepEqual(validateHistoryRow(validFailedAuthRow({ reason: null })), { ok: false, reason: 'missing_rejection_reason' });
 });
 
 test('managed action history access is parent/caregiver authority not child PIN authority', () => {
@@ -266,9 +289,11 @@ test('managed action history required outcomes cover accepted rejected conflict 
   assert.match(doc, /plaintext sensitive rule values: no/);
   assert.match(doc, /remote upload or telemetry: no/);
   assert.match(doc, /runtime managed action history store: profile-local managed child rows/);
-  assert.match(doc, /runtime managed action history row writer: local managed child edit plus Nanah managed-policy validation outcomes/);
+  assert.match(doc, /runtime managed action history row writer: local managed child edit plus failed parent unlock plus Nanah managed-policy validation outcomes/);
   assert.match(doc, /runtime managed action history access gate: present for parent\/account authority/);
   assert.match(doc, /runtime managed action history clear path: present for accepted rows only/);
   assert.match(doc, /runtime remote managed validation history writer: present/);
   assert.match(doc, /runtime remote managed accepted apply history writer: pending/);
+  assert.match(doc, /The current failed-auth writer records only protected evidence rows/);
+  assert.match(doc, /does not\s+rate-limit yet/);
 });

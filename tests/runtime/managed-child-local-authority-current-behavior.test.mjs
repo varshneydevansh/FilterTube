@@ -175,6 +175,32 @@ function buildManagedChildLocalEditReportFixture({ profile, actorProfileId, acto
   };
 }
 
+function buildFailedUnlockHistoryRowFixture({ actorProfileId = 'parentA', actorDeviceId = 'device-1', targetProfileId = 'childA', reason = 'managed_child_edit_unlock_failed', now = 1780520500000 } = {}) {
+  return {
+    rowId: `managed-auth-failed-${targetProfileId}-${now}`,
+    schema: managedActionHistorySchema,
+    version: 1,
+    actorProfileId,
+    actorDeviceId,
+    targetProfileId,
+    trustedLinkId: null,
+    actionType: 'admin_session.failed_unlock',
+    scope: 'admin_session',
+    revision: null,
+    policyHash: null,
+    result: 'failed_auth',
+    reason,
+    receivedAt: now,
+    issuedAt: now,
+    orderKey: `auth:${now}`,
+    summary: {
+      redacted: true,
+      label: 'Parent unlock failed'
+    },
+    sensitive: true
+  };
+}
+
 function recordManagedChildLocalEditHistoryFixture(profile, report, limit = 500) {
   const existingRows = Array.isArray(profile.managedActionHistory)
     ? profile.managedActionHistory.filter(row => row?.schema === managedActionHistorySchema)
@@ -199,7 +225,7 @@ test('managed child local authority contract is source-backed with accepted-save
   const tabView = read('js/tab-view.js');
   const source = runtimeSource();
 
-  assert.match(doc, /Status\*\*: Runtime local managed-save hardening partially present/);
+  assert.match(doc, /Status\*\*: Runtime local managed-save and failed-unlock history hardening\s+partially present/);
   assert.match(doc, /Who is allowed to enter virtual child edit mode/);
   assert.match(doc, /Required Local Authority Decisions/);
   assert.match(doc, /Hardening Requirements/);
@@ -216,9 +242,16 @@ test('managed child local authority contract is source-backed with accepted-save
   assert.match(tabView, /function localManagedEditPolicyRevisionStore\(profile, scope\)/);
   assert.match(tabView, /function buildManagedChildLocalEditReport/);
   assert.match(tabView, /function recordManagedChildLocalEditHistory\(profile, report\)/);
+  assert.match(tabView, /async function recordManagedAdminAuthFailureHistory\(profilesV4, targetProfileId, reason = 'unlock_failed'\)/);
+  assert.match(tabView, /actionType: 'admin_session\.failed_unlock'/);
+  assert.match(tabView, /result: 'failed_auth'/);
+  assert.match(tabView, /managed_child_edit_unlock_failed/);
+  assert.match(tabView, /history_view_unlock_failed/);
+  assert.match(tabView, /history_clear_unlock_failed/);
+  assert.match(tabView, /viewing_space_unlock_failed/);
+  assert.match(tabView, /time_limit_unlock_failed/);
   assert.match(source, /filtertube_managed_action_history/);
 
-  assert.doesNotMatch(source, /managedChildFailedUnlockLogger/);
   assert.doesNotMatch(source, /managedChildAdminSessionTtl/);
 });
 
@@ -366,5 +399,22 @@ test('remaining local hardening requires session ttl reauth and failed attempt l
   assert.match(doc, /A failed unlock records a protected action-history row/);
   assert.match(doc, /runtime local managed edit policy revision store: present/);
   assert.match(doc, /runtime local managed edit action-history writer: present/);
+  assert.match(doc, /runtime local managed edit failed-unlock logger: present for managed child\/history\/viewing-space\/time-limit unlock gates/);
   assert.match(doc, /runtime local managed edit admin session TTL: absent/);
+});
+
+test('local managed failed unlock report stores protected redacted failed-auth history without policy authority', () => {
+  const row = buildFailedUnlockHistoryRowFixture();
+
+  assert.equal(row.schema, managedActionHistorySchema);
+  assert.equal(row.actionType, 'admin_session.failed_unlock');
+  assert.equal(row.scope, 'admin_session');
+  assert.equal(row.result, 'failed_auth');
+  assert.equal(row.reason, 'managed_child_edit_unlock_failed');
+  assert.equal(row.revision, null);
+  assert.equal(row.policyHash, null);
+  assert.equal(row.sensitive, true);
+  assert.equal(row.summary.redacted, true);
+  assert.equal(JSON.stringify(row.summary).includes('parentA'), false);
+  assert.equal(JSON.stringify(row.summary).includes('childA'), false);
 });

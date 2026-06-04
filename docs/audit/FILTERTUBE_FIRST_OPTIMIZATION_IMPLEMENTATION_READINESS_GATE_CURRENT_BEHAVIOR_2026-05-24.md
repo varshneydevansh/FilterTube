@@ -70,7 +70,7 @@ collector side-effect rows covered: 12
 collector fixture provenance rows covered: 12
 collector parity rollout rows covered: 12
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5830
+method semantic proof gap lexical callables covered: 5836
 complete per-callable semantic proof files covered: 0
 runtime first optimization approvals: 0
 implementation-ready first optimization rows: 0

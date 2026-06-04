@@ -200,9 +200,9 @@ endpoint-set fix slice and now pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5830
+method semantic proof gap lexical callables covered: 5836
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5830
+lexical callables requiring semantic proof before behavior changes: 5836
 affected callable semantic proof: NO-GO
 runtime behavior changed: yes, 2026-05-31
 ```
