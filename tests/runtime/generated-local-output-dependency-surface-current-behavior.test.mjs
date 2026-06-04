@@ -154,9 +154,9 @@ test('dist package trees and zip artifacts are current local output not package 
   }
 
   for (const [zip, bytes, hash] of [
-    ['dist/filtertube-chrome-v3.3.2.zip', 8688743, '844a3ef1530ed1787e0911d43707e2b5ab687e83930edf7332c534c69e9ff898'],
-    ['dist/filtertube-firefox-v3.3.2.zip', 8688802, 'b39728fdec2292f7d54c839a383dae44142357ac0b8a0ffe056ee19078c51217'],
-    ['dist/filtertube-opera-v3.3.2.zip', 8688745, 'd1a70a71f376cbfd19670563b2e384f252879d10a62b8972768cebd63479fae1'],
+    ['dist/filtertube-chrome-v3.3.2.zip', 8727759, '766fb9ec8c4ec4cfd4700ae16f6c1e6c221785d729e1ce8ad6496297b80200e3'],
+    ['dist/filtertube-firefox-v3.3.2.zip', 8727818, '3157bbf6a23b78e900e66ee28e4dab572a10097c3f01112ffa8dff75e2085195'],
+    ['dist/filtertube-opera-v3.3.2.zip', 8727761, '2acbd2efe325e7fb833d4914988d03a1dc2f15b9f210e60d87e2a24604905bda'],
   ]) {
     assert.equal(byteCount(zip), bytes, `${zip} size drifted`);
     assert.equal(sha256(zip), hash, `${zip} hash drifted`);

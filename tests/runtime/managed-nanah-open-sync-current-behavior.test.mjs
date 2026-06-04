@@ -92,11 +92,14 @@ test('managed open-sync audit is docs-backed and linked from plan inventory and 
   const plan = read(planPath);
   const inventory = read(inventoryPath);
 
-  assert.match(doc, /Provider-gated dashboard\/profile-open hook is present/);
-  assert.match(doc, /Server\s+mailbox client, server ack writer, mailbox decryption client, and local-network\s+discovery are still absent/);
+  assert.match(doc, /Provider-gated dashboard\/profile-open hook and provider ack handoff\s+are present/);
+  assert.match(doc, /provider ack handoff\s+are present/);
+  assert.match(doc, /Server\s+mailbox client, mailbox decryption client, and\s+local-network discovery are still absent/);
   assert.match(doc, /runtime pull-on-open candidate gate: present/);
   assert.match(doc, /runtime provider-gated decrypted item pull: present/);
+  assert.match(doc, /runtime provider-gated mailbox ack handoff: present/);
   assert.match(doc, /runtime YouTube page hot-path work from this slice: absent/);
+  assert.match(mailboxDoc, /provider-gated ack handoff: present/);
   assert.match(mailboxDoc, /provider-gated dashboard\/profile-open pull hook: present/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
@@ -161,7 +164,8 @@ test('open-sync provider absence records status without applying or pulling', as
   assert.deepEqual(savedState, state);
 });
 
-test('open-sync provider applies only returned decrypted mailbox items and counts rejected results', async () => {
+test('open-sync provider applies only returned decrypted mailbox items and emits redacted ack records', async () => {
+  const ackPayloads = [];
   const provider = {
     async pullDecryptedMailboxItems(request) {
       assert.equal(request.schema, 'filtertube_nanah_managed_open_sync_request');
@@ -174,6 +178,10 @@ test('open-sync provider applies only returned decrypted mailbox items and count
           { schema: 'filtertube_managed_mailbox_item', mailboxItemId: 'rejected-item' }
         ]
       };
+    },
+    async ackDecryptedMailboxItems(payload) {
+      ackPayloads.push(payload);
+      return { ok: true, ackedItemCount: payload.records.length };
     }
   };
   const helper = loadFactory({ provider });
@@ -191,13 +199,60 @@ test('open-sync provider applies only returned decrypted mailbox items and count
   assert.equal(state.pulledItemCount, 2);
   assert.equal(state.appliedItemCount, 1);
   assert.equal(state.rejectedItemCount, 1);
+  assert.equal(state.ackProviderAvailable, true);
+  assert.equal(state.ackAttemptedCount, 2);
+  assert.equal(state.ackedItemCount, 2);
+  assert.equal(state.ackFailedCount, 0);
   assert.equal(state.linkResults[0].appliedItemCount, 1);
   assert.equal(state.linkResults[0].rejectedItemCount, 1);
+  assert.equal(state.linkResults[0].ackedItemCount, 2);
+
+  assert.equal(ackPayloads.length, 1);
+  assert.equal(ackPayloads[0].schema, 'filtertube_nanah_managed_open_sync_ack');
+  assert.equal(ackPayloads[0].linkId, 'link-parent-child-1');
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(ackPayloads[0].records.map(row => [row.mailboxItemId, row.ackState, row.accepted, row.applied]))),
+    [
+      ['accepted-item', 'delivered', true, true],
+      ['rejected-item', 'rejected', false, false]
+    ]
+  );
+  assert.doesNotMatch(JSON.stringify(ackPayloads[0]), /spiders|keywordValue|channelName|videoTitle|plaintext/i);
+});
+
+test('open-sync provider pull without ack writer records ack-unavailable without retrying YouTube hot paths', async () => {
+  const provider = {
+    async pullDecryptedMailboxItems() {
+      return {
+        ok: true,
+        items: [{ schema: 'filtertube_managed_mailbox_item', mailboxItemId: 'accepted-item' }]
+      };
+    }
+  };
+  const helper = loadFactory({ provider });
+  const state = await helper.runOpenSync({
+    links: [managedLink()],
+    activeProfileId: 'child-profile-1',
+    profilesV4: profilesV4(),
+    applyMailboxItem: async () => ({ accepted: true, applied: true }),
+    writeState: async () => {}
+  });
+
+  assert.equal(state.providerAvailable, true);
+  assert.equal(state.ackProviderAvailable, false);
+  assert.equal(state.ackAttemptedCount, 1);
+  assert.equal(state.ackedItemCount, 0);
+  assert.equal(state.ackFailedCount, 1);
+  assert.equal(state.linkResults[0].ackReason, 'ack_provider_unavailable');
+  assert.equal(helper.formatStatus(managedLink(), state, 'child-profile-1'), '1 applied, 0 rejected, 1 ack failed');
 });
 
 test('open-sync helper does not add page hot-path observers timers or network clients', () => {
   const helperSource = read(helperPath);
 
+  assert.match(helperSource, /filtertube_nanah_managed_open_sync_ack/);
+  assert.match(helperSource, /ackDecryptedMailboxItems/);
+  assert.match(helperSource, /ackMailboxItems/);
   assert.doesNotMatch(helperSource, /MutationObserver/);
   assert.doesNotMatch(helperSource, /addEventListener/);
   assert.doesNotMatch(helperSource, /setInterval/);

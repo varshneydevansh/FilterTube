@@ -173,10 +173,11 @@ trusted managed signature context, apply through `applyManagedPolicyEnvelope(...
 and write protected redacted action-history evidence.
 
 The runtime still does not implement a server mailbox pull scheduler, mailbox
-storage client, mailbox decryption client, or server ack writer. The mailbox
-server cannot become policy authority. The first pull-on-open hook now exists
-only as a provider-gated dashboard/profile-open bridge for local/decrypted
-mailbox items.
+storage client, or mailbox decryption client. The mailbox server cannot become
+policy authority. The first pull-on-open hook now exists only as a
+provider-gated dashboard/profile-open bridge for local/decrypted mailbox items,
+and the same provider can receive redacted ack records after extension-side
+validation/apply/reject.
 
 Current runtime status:
 
@@ -187,8 +188,8 @@ runtime mailbox item signature gate reuse: present
 runtime mailbox item managed-policy apply wrapper: present
 runtime mailbox protected history rows: present
 runtime provider-gated dashboard/profile-open pull hook: present
+runtime provider-gated ack handoff: present
 runtime mailbox server pull client: absent
-runtime mailbox server ack writer: absent
 runtime mailbox decryption client: absent
-runtime behavior changed by this slice: yes, for local/decrypted mailbox item intake and provider-gated dashboard/profile-open pull status only
+runtime behavior changed by this slice: yes, for local/decrypted mailbox item intake, provider-gated dashboard/profile-open pull status, and provider ack handoff only
 ```

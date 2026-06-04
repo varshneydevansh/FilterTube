@@ -21,9 +21,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 71
-method semantic proof gap lexical callables covered: 6028
+method semantic proof gap lexical callables covered: 6035
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6028
+lexical callables requiring semantic proof before behavior changes: 6035
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -68,14 +68,14 @@ changes remain blocked by the implementation gate.
 
 ```text
 tracked JS/JSX/MJS files: 71
-repo-wide lexical callables: 6028
+repo-wide lexical callables: 6035
 ```
 
 | Family | Files | Lexical callables | Boundary |
 | --- | ---: | ---: | --- |
 | Hot page/background runtime | 9 | 3170 | Already has detailed first-pass hot runtime table in `FILTERTUBE_FUNCTION_COVERAGE_2026-05-17.md`. |
 | Content helper runtime | 9 | 348 | First-pass helper surface audit exists, but behavior fixtures remain incomplete. |
-| UI/settings runtime | 12 | 1825 | First-pass UI/settings audit exists, but action-level fixtures remain incomplete. |
+| UI/settings runtime | 12 | 1832 | First-pass UI/settings audit exists, but action-level fixtures remain incomplete. |
 | Generated/quarantined UI | 6 | 147 | Generated source/output and `js/layout.js`; freshness and quarantine checks required. |
 | Vendor bundles | 2 | 279 | API/provenance boundary, not product-owned method behavior. |
 | Build/sync scripts | 4 | 58 | Release/package/native-sync behavior; separate release fixtures required. |
@@ -107,7 +107,7 @@ repo-wide lexical callables: 6028
 | `js/io_manager.js` | UI/settings runtime | 119 | UI/settings counted |
 | `js/layout.js` | Generated/quarantined UI | 52 | quarantined/generated boundary |
 | `js/nanah_managed_live_policy.js` | UI/settings runtime | 30 | UI/settings counted |
-| `js/nanah_managed_open_sync.js` | UI/settings runtime | 24 | UI/settings counted |
+| `js/nanah_managed_open_sync.js` | UI/settings runtime | 31 | UI/settings counted |
 | `js/nanah_sync_adapter.js` | UI/settings runtime | 129 | UI/settings counted |
 | `js/popup.js` | UI/settings runtime | 131 | UI/settings counted |
 | `js/render_engine.js` | UI/settings runtime | 126 | UI/settings counted |
@@ -172,7 +172,7 @@ repo-wide lexical callables: 6028
 
 3. **The hot runtime is not the whole product.**
    Hot runtime has 3,170 lexical callables, but UI/settings, content helpers,
-   generated shell, vendor, build scripts, and website add another 2,858
+   generated shell, vendor, build scripts, and website add another 2,865
    lexical callable forms.
 
 4. **Vendor and generated files must stay explicitly bounded.**

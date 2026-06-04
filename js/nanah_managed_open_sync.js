@@ -3,6 +3,7 @@
 
     const REQUEST_SCHEMA = 'filtertube_nanah_managed_open_sync_request';
     const STATE_SCHEMA = 'filtertube_nanah_managed_open_sync_state';
+    const ACK_SCHEMA = 'filtertube_nanah_managed_open_sync_ack';
 
     function defaultNormalizeString(value) {
         return typeof value === 'string' ? value.trim() : '';
@@ -153,6 +154,118 @@
             };
         }
 
+        function normalizeAckState(result) {
+            const root = safeObject(result);
+            const explicit = normalizeString(root.ackState).toLowerCase();
+            if (['delivered', 'rejected', 'expired', 'revoked', 'conflict'].includes(explicit)) {
+                return explicit;
+            }
+            if (root.accepted === true || root.applied === true) return 'delivered';
+            const reason = normalizeString(root.reason).toLowerCase();
+            if (reason === 'mailbox_item_expired') return 'expired';
+            if (reason === 'link_revoked' || reason === 'key_revoked') return 'revoked';
+            if (reason === 'equal_revision_hash_conflict') return 'conflict';
+            return 'rejected';
+        }
+
+        function buildAckRecord(candidate, item, applyResult = {}, error = null) {
+            const root = safeObject(item);
+            const result = safeObject(applyResult);
+            const errorReason = error ? normalizeString(error.reason || error.message) : '';
+            return {
+                schema: ACK_SCHEMA,
+                version: 1,
+                ackedAt: now(),
+                linkId: candidate.linkId,
+                mailboxItemId: normalizeString(root.mailboxItemId || result.mailboxItemId),
+                targetProfileId: candidate.targetProfileId,
+                sourceDeviceId: candidate.sourceDeviceId,
+                sourceProfileId: candidate.sourceProfileId,
+                scope: normalizeString(root.scope || result.scope).toLowerCase(),
+                revision: Number(root.revision || result.revision) || null,
+                policyHash: normalizeString(root.policyHash || result.policyHash),
+                ackState: normalizeAckState(error ? { reason: errorReason } : result),
+                accepted: result.accepted === true,
+                applied: result.applied === true,
+                decision: normalizeString(result.decision),
+                reason: normalizeString(result.reason) || errorReason || null
+            };
+        }
+
+        function normalizeAckResult(result, attemptedCount) {
+            if (attemptedCount <= 0) {
+                return { ok: true, reason: '', ackedItemCount: 0, failedAckCount: 0 };
+            }
+            if (Array.isArray(result)) {
+                return {
+                    ok: true,
+                    reason: '',
+                    ackedItemCount: result.length,
+                    failedAckCount: Math.max(0, attemptedCount - result.length)
+                };
+            }
+            const root = safeObject(result);
+            const ok = root.ok !== false;
+            const acked = Number(root.ackedItemCount ?? root.acknowledgedItemCount ?? root.ackedCount);
+            const failed = Number(root.failedAckCount ?? root.failedItemCount ?? root.rejectedAckCount);
+            return {
+                ok,
+                reason: normalizeString(root.reason),
+                ackedItemCount: Number.isFinite(acked)
+                    ? Math.max(0, acked)
+                    : (ok ? attemptedCount : 0),
+                failedAckCount: Number.isFinite(failed)
+                    ? Math.max(0, failed)
+                    : (ok ? 0 : attemptedCount)
+            };
+        }
+
+        async function ackItems(provider, request, records) {
+            const ackRecords = safeArray(records).filter(row => normalizeString(row?.mailboxItemId));
+            if (ackRecords.length === 0) {
+                return { ok: true, reason: '', ackedItemCount: 0, failedAckCount: 0, providerAvailable: false };
+            }
+            const ackPayload = {
+                schema: ACK_SCHEMA,
+                version: 1,
+                ackedAt: now(),
+                linkId: request.linkId,
+                remoteDeviceId: request.remoteDeviceId,
+                sourceDeviceId: request.sourceDeviceId,
+                sourceProfileId: request.sourceProfileId,
+                targetProfileId: request.targetProfileId,
+                records: ackRecords
+            };
+            const ackWriter = provider && (
+                typeof provider.ackDecryptedMailboxItems === 'function'
+                    ? provider.ackDecryptedMailboxItems
+                    : (typeof provider.ackMailboxItems === 'function' ? provider.ackMailboxItems : null)
+            );
+            if (!ackWriter) {
+                return {
+                    ok: false,
+                    reason: 'ack_provider_unavailable',
+                    ackedItemCount: 0,
+                    failedAckCount: ackRecords.length,
+                    providerAvailable: false
+                };
+            }
+            try {
+                return {
+                    ...normalizeAckResult(await ackWriter.call(provider, ackPayload), ackRecords.length),
+                    providerAvailable: true
+                };
+            } catch (error) {
+                return {
+                    ok: false,
+                    reason: normalizeString(error?.message) || 'ack_failed',
+                    ackedItemCount: 0,
+                    failedAckCount: ackRecords.length,
+                    providerAvailable: true
+                };
+            }
+        }
+
         async function runOpenSync({
             links = [],
             activeProfileId = '',
@@ -171,9 +284,13 @@
                 checkedAt: startedAt,
                 eligibleLinkCount: candidates.length,
                 providerAvailable: false,
+                ackProviderAvailable: false,
                 pulledItemCount: 0,
                 appliedItemCount: 0,
                 rejectedItemCount: 0,
+                ackAttemptedCount: 0,
+                ackedItemCount: 0,
+                ackFailedCount: 0,
                 linkResults: []
             };
 
@@ -201,24 +318,41 @@
                     reason: result.reason || null,
                     pulledItemCount: result.items.length,
                     appliedItemCount: 0,
-                    rejectedItemCount: 0
+                    rejectedItemCount: 0,
+                    ackAttemptedCount: 0,
+                    ackedItemCount: 0,
+                    ackFailedCount: 0,
+                    ackReason: null
                 };
                 state.pulledItemCount += result.items.length;
+                const ackRecords = [];
                 for (const item of result.items) {
                     try {
                         const applyResult = await applyMailboxItem(item);
                         if (applyResult?.accepted === true || applyResult?.applied === true || applyResult === true) {
                             linkRow.appliedItemCount += 1;
                             state.appliedItemCount += 1;
+                            ackRecords.push(buildAckRecord(candidate, item, applyResult === true ? { accepted: true, applied: true } : applyResult));
                         } else {
                             linkRow.rejectedItemCount += 1;
                             state.rejectedItemCount += 1;
+                            ackRecords.push(buildAckRecord(candidate, item, applyResult));
                         }
                     } catch (error) {
                         linkRow.rejectedItemCount += 1;
                         state.rejectedItemCount += 1;
+                        ackRecords.push(buildAckRecord(candidate, item, { accepted: false }, error));
                     }
                 }
+                const ackResult = await ackItems(provider, request, ackRecords);
+                linkRow.ackAttemptedCount = ackRecords.length;
+                linkRow.ackedItemCount = ackResult.ackedItemCount;
+                linkRow.ackFailedCount = ackResult.failedAckCount;
+                linkRow.ackReason = ackResult.reason || null;
+                state.ackProviderAvailable = state.ackProviderAvailable || ackResult.providerAvailable === true;
+                state.ackAttemptedCount += ackRecords.length;
+                state.ackedItemCount += ackResult.ackedItemCount;
+                state.ackFailedCount += ackResult.failedAckCount;
                 state.linkResults.push(linkRow);
             }
 
@@ -248,6 +382,8 @@
             const applied = Number(result.appliedItemCount) || 0;
             const rejected = Number(result.rejectedItemCount) || 0;
             const pulled = Number(result.pulledItemCount) || 0;
+            const ackFailed = Number(result.ackFailedCount) || 0;
+            if (ackFailed > 0) return `${applied} applied, ${rejected} rejected, ${ackFailed} ack failed`;
             if (applied || rejected) return `${applied} applied, ${rejected} rejected`;
             if (pulled === 0) return 'Checked, no updates';
             return result.ok === false ? 'Rejected by provider' : 'Checked';

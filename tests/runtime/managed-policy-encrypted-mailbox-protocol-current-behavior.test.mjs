@@ -16,6 +16,7 @@ function runtimeSource() {
   return [
     'js/background.js',
     'js/io_manager.js',
+    'js/nanah_managed_open_sync.js',
     'js/nanah_sync_adapter.js',
     'js/state_manager.js',
     'js/tab-view.js'
@@ -204,6 +205,7 @@ test('managed mailbox protocol is docs-backed and linked from plan and inventory
   assert.match(doc, /Server metadata is not enough to apply policy/);
   assert.match(doc, /No-policy\/no-work YouTube runtime performance remains a release gate/);
   assert.match(doc, /runtime provider-gated dashboard\/profile-open pull hook: present/);
+  assert.match(doc, /runtime provider-gated ack handoff: present/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
 });
@@ -223,6 +225,8 @@ test('managed mailbox runtime intake validates decrypted items without adding se
   assert.match(source, /remote_policy\.mailbox\.conflict/);
   assert.match(source, /remote_policy\.mailbox\.expire/);
   assert.match(source, /remote_policy\.mailbox\.revoke/);
+  assert.match(source, /filtertube_nanah_managed_open_sync_ack/);
+  assert.match(source, /ackDecryptedMailboxItems/);
   assert.doesNotMatch(source, /FilterTubeManagedMailbox/);
   assert.doesNotMatch(source, /managedMailboxPull/);
 });

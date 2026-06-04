@@ -12,13 +12,13 @@ provisioning plus an adapter signing helper are present. Live fixed-target
 Nanah managed-policy sends are present for Main/Kids, keyword, channel, video,
 viewing-space, and time-limit scopes, and granular keyword/channel/video sends
 now expose an explicit Main/Kids rule-source picker. A provider-gated
-dashboard/profile-open pull hook is present for already-decrypted mailbox
-items. An extension-owned managed app policy contract artifact and app manifest
-copy row are now present so downstream app parity can be tested before native
-enforcement changes.
-Local-network peer discovery, LAN delivery, server mailbox pull, mailbox ack,
-mailbox decryption, app native enforcement proofs, and active/full signed
-managed sends remain gated.
+dashboard/profile-open pull hook and redacted provider ack handoff are present
+for already-decrypted mailbox items. An extension-owned managed app policy
+contract artifact and app manifest copy row are now present so downstream app
+parity can be tested before native enforcement changes.
+Local-network peer discovery, LAN delivery, server mailbox pull, mailbox
+decryption, app native enforcement proofs, and active/full signed managed sends
+remain gated.
 **Primary audit input**:
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
 **Current pull-on-open proof**:
@@ -668,8 +668,8 @@ where parent and child devices are not reachable at the same time.
 - **Status**: Protocol doc, executable proof fixture, and local/decrypted
   mailbox-item validation/apply intake added. A provider-gated
   dashboard/profile-open hook can request already-decrypted mailbox items from
-  a trusted local provider. Runtime mailbox server pull, server ack, and
-  decryption client remain absent by design.
+  a trusted local provider and send redacted ack records after apply/reject.
+  Runtime mailbox server pull and decryption client remain absent by design.
 - **Acceptance Criteria**:
   - Server cannot read rules.
   - Replay, stale, revoked, wrong-target, and duplicate delivery behavior is
@@ -678,6 +678,8 @@ where parent and child devices are not reachable at the same time.
     envelope before validation/apply.
   - Pull-on-open does no work unless the trusted link opted into
     `syncOnProfileOpen` and a local provider is available.
+  - Provider ack handoff uses redacted metadata only and does not expose
+    plaintext rules.
   - Mailbox is optional and does not weaken local/P2P security.
 - **Validation**:
   - `git diff --check`

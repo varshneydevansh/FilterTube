@@ -1,9 +1,9 @@
 # Audit: Nanah Managed Pull-On-Open Hook
 
 **Generated**: 2026-06-04
-**Status**: Provider-gated dashboard/profile-open hook is present. Server
-mailbox client, server ack writer, mailbox decryption client, and local-network
-discovery are still absent.
+**Status**: Provider-gated dashboard/profile-open hook and provider ack handoff
+are present. Server mailbox client, mailbox decryption client, and
+local-network discovery are still absent.
 **Related plan**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`
 **Related inventory**:
@@ -13,10 +13,11 @@ discovery are still absent.
 
 ## Purpose
 
-This slice adds the first safe runtime step toward parent/caregiver
+This slice adds the first safe runtime steps toward parent/caregiver
 pull-on-open sync. When the FilterTube dashboard opens or the active profile is
-switched, a protected replica profile can check eligible trusted managed links
-and ask an optional local provider for already-decrypted mailbox items.
+switched, a protected replica profile can check eligible trusted managed links,
+ask an optional local provider for already-decrypted mailbox items, and hand
+redacted delivery acknowledgements back to the same provider.
 
 The hook is intentionally not a mailbox server client. It does not poll from
 YouTube pages, does not add a service-worker scheduler, and does not make
@@ -38,6 +39,8 @@ flowchart TD
   I --> J{"Accepted?"}
   J -->|Yes| K["Apply policy and write protected history"]
   J -->|No| L["Reject and keep last valid policy"]
+  K --> M["Send redacted provider ack"]
+  L --> M
 ```
 
 ## Runtime Hooks Added
@@ -62,13 +65,18 @@ The optional provider shape is:
 window.FilterTubeManagedPolicyOpenSync = {
   async pullDecryptedMailboxItems(request) {
     return { ok: true, items: [/* filtertube_managed_mailbox_item */] };
+  },
+  async ackDecryptedMailboxItems(ack) {
+    return { ok: true, ackedItemCount: ack.records.length };
   }
 };
 ```
 
-The request object is redacted and contains link/profile/scope/revision metadata
-only. It does not contain plaintext filters, PINs, channel names, video titles,
-or viewing history.
+The request and ack objects are redacted and contain only
+link/profile/scope/revision/hash/result metadata. They do not contain plaintext
+filters, PINs, channel names, video titles, viewing history, or action-history
+summaries. Providers may also expose `ackMailboxItems(...)` for the same ack
+payload shape.
 
 ## Eligibility Gates
 
@@ -106,6 +114,7 @@ Checked, no updates
 Waiting for provider
 Apply unavailable
 N applied, M rejected
+N applied, M rejected, A ack failed
 ```
 
 This is feedback/status only. It does not grant authority.
@@ -115,10 +124,10 @@ This is feedback/status only. It does not grant authority.
 ```text
 runtime pull-on-open candidate gate: present
 runtime provider-gated decrypted item pull: present
+runtime provider-gated mailbox ack handoff: present
 runtime mailbox item apply reuse: present
 runtime pull status persistence: present
 runtime server mailbox pull client: absent
-runtime mailbox server ack writer: absent
 runtime mailbox decryption client: absent
 runtime local-network discovery: absent
 runtime background scheduler: absent
@@ -134,6 +143,8 @@ runtime YouTube page hot-path work from this slice: absent
 - Returned items still go through `handleNanahIncomingManagedMailboxItem(...)`,
   `validateManagedMailboxItem(...)`, managed signature verification, accepted
   revision/hash checks, and protected action-history recording.
+- Ack records are result metadata only. They never include decrypted payload
+  contents and are sent only when the same local provider offers an ack method.
 - This does not replace manual live Nanah sessions. It only creates the
   extension-side hook that downstream app/local-network/mailbox providers can
   use safely later.
