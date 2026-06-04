@@ -30,14 +30,14 @@ covered by the CSS load/style surface and style-hide authority audits.
 | `css/tab-view.css` | active dashboard CSS | 2,834 | 68,789 | `e328965f44468e90cca22bb11b25103b1821ed2037775fbe312e2025c241c7c9` |
 | `css/serene-shell.css` | active generated-shell CSS | 3,414 | 87,230 | `785e988dd0176b16defcc08f77925de8eaa60ea831d53cd57147eb601c490f0a` |
 | `html/popup.html` | popup loader shell | 31 | 1,213 | `c5e03a38b2737dbd01e2cd0c243b37754936e2e349e9d2275b195350159aea31` |
-| `html/tab-view.html` | dashboard loader shell | 1,598 | 136,177 | `15ca4b3a6c1e5a6c8e43a6dbce796fdb33d7dcedcc5ed80a03c4373e184afbef` |
+| `html/tab-view.html` | dashboard loader shell | 1,599 | 136,238 | `7533a194eb509f340ec80894f34280e79ba0a17b40b59bf9c98dc49c92ce716d` |
 | `src/extension-shell/popup.jsx` | popup generated-shell source | 113 | 3,864 | `3a3772e7d77f8466fea609a80c1d4f09873e47022aee17f3b8b09858397b298c` |
 | `src/extension-shell/tab-view-decor.jsx` | dashboard ambient-shell source | 34 | 1,101 | `354cd36fa62b215a415e88b8b0c84bd43725196613766d6af921eac44d1f63f1` |
 | `src/extension-shell/shared/runtime.js` | shell environment source | 52 | 1,462 | `d54cc87b8f48736df6ca063fa79e37b2439b580710746e215e8b428fc7207ec8` |
 | `js/ui-shell/popup-shell.js` | generated popup shell output | 374 | 21,080 | `dc750d44dd4b9fde63b85b4dfc9f5ce9ba76964afbd6dfcedc7b3b7cce084b05` |
 | `js/ui-shell/tab-view-decor.js` | generated dashboard ambient output | 323 | 18,289 | `234171091e523aa5de4c3c0f97e7341c55893bdd31b3e25a075490170fa9742f` |
 | `js/popup.js` | hand-owned popup runtime | 1,841 | 75,587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
-| `js/tab-view.js` | hand-owned dashboard runtime | 13,631 | 628,942 | `572c30cc72b123920342348827cab704a79083bb4b92e8ab57eceea8969a4de4` |
+| `js/tab-view.js` | hand-owned dashboard runtime | 13,695 | 632,194 | `b0c71608c02a00a74920f780b7c958cc58b42703cd301a946c748cb894ab1279` |
 
 ## Active CSS State Counters
 
@@ -71,8 +71,9 @@ declarations, 91 `transform` declarations, 38 `z-index` declarations, 26
   and 9 `data-tab` values.
 - `html/popup.html` loads 9 scripts and places `../js/ui-shell/popup-shell.js`
   before `../js/popup.js`.
-- `html/tab-view.html` loads 14 scripts and places
-  `../js/ui-shell/tab-view-decor.js` before `../js/tab-view.js`.
+- `html/tab-view.html` loads 15 scripts and places
+  `../js/ui-shell/tab-view-decor.js` and
+  `../js/managed_admin_authority.js` before `../js/tab-view.js`.
 - `src/extension-shell/shared/runtime.js` sets `root.dataset.scene`,
   `root.dataset.theme`, `root.dataset.surface`, `body.dataset.surface`,
   `body.classList.add("ft-extension-surface")`, and popup inline width values
@@ -139,10 +140,10 @@ is a required source input before this profile/settings/UI surface can support
 runtime optimization. Current proof pins:
 
 ```text
-method semantic proof gap files covered: 71
-method semantic proof gap lexical callables covered: 6086
+method semantic proof gap files covered: 72
+method semantic proof gap lexical callables covered: 6107
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6086
+lexical callables requiring semantic proof before behavior changes: 6107
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

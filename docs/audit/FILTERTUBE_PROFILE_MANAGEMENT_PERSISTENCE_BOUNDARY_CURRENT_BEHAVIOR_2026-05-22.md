@@ -18,7 +18,7 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/tab-view.js` | 13669 | 630787 | `9bd95b31b0afb3caf80236e509db3496d1a8b6a4e5aa70ec7bc6205e755f0961` |
+| `js/tab-view.js` | 13695 | 632194 | `b0c71608c02a00a74920f780b7c958cc58b42703cd301a946c748cb894ab1279` |
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/io_manager.js` | 2097 | 100479 | `f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62` |
 | `js/background.js` | 6711 | 301840 | `b27206ec2b6927fc33f823c4832ff95ace7c97bd4284eb950fc5964baf666346` |
@@ -52,8 +52,8 @@ tab-view applyLockGateIfNeeded tokens: 4
 tab-view scheduleAutoBackup tokens: 6
 tab-view profile_created tokens: 2
 tab-view managedChildEdit tokens: 13
-tab-view unlockedProfiles tokens: 4
-tab-view clearProfileUnlockSession tokens: 6
+tab-view unlockedProfiles tokens: 5
+tab-view clearProfileUnlockSession tokens: 7
 tab-view allowMainViewing tokens: 4
 tab-view allowKidsViewing tokens: 4
 tab-view schemaVersion tokens: 24
@@ -135,10 +135,10 @@ is a required source input before this profile/settings/UI surface can support
 runtime optimization. Current proof pins:
 
 ```text
-method semantic proof gap files covered: 71
-method semantic proof gap lexical callables covered: 6086
+method semantic proof gap files covered: 72
+method semantic proof gap lexical callables covered: 6107
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6086
+lexical callables requiring semantic proof before behavior changes: 6107
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

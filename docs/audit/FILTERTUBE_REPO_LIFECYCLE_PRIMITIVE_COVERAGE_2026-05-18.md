@@ -18,7 +18,7 @@ git ls-files '*.js' '*.jsx' '*.mjs'
 Current tracked JS/JSX/MJS count:
 
 ```text
-71
+72
 ```
 
 Ignored root captures and generated package output are excluded. Vendor bundles
@@ -73,7 +73,7 @@ changing any owner.
 | Audit family | Files | Primitive count | Current interpretation |
 | --- | ---: | ---: | --- |
 | `content-runtime-js` | 17 | 389 | Page-resident filtering, JSON interception, DOM fallback, quick/menu surfaces, learned identity, managed time-limit heartbeats, and bridge work. |
-| `extension-ui-background-js` | 13 | 421 | Dashboard/popup/background settings, import/export, Nanah, row actions, profile/PIN, managed policy live-send/open-sync helpers, and UI state work. |
+| `extension-ui-background-js` | 14 | 421 | Dashboard/popup/background settings, import/export, Nanah, row actions, profile/PIN, managed policy live-send/open-sync helpers, managed admin authority helper, and UI state work. |
 | `quarantined-legacy-js` | 1 | 37 | `js/layout.js`; direct style/class mutation risk if ever reactivated. |
 | `website-components` | 15 | 24 | Website client components with theme/scene and hero/footer lifecycle; separate from extension runtime filtering. |
 | `generated-ui-output` | 2 | 8 | Generated shell output; freshness proof required rather than hand edits. |
@@ -85,7 +85,7 @@ changing any owner.
 
 ## Per-file Primitive Footprint
 
-Per-file primitive footprint rows: 71
+Per-file primitive footprint rows: 72
 
 These grouped counts are computed from the same `git ls-files '*.js' '*.jsx'
 '*.mjs'` source boundary and the same lexical primitive patterns above.
@@ -116,6 +116,7 @@ effects` is dispatch/click/display/class mutation.
 | `js/filter_logic.js` | `content-runtime-js` | 0 | 0 | 2 | 6 | 0 | 8 |
 | `js/injector.js` | `content-runtime-js` | 2 | 0 | 10 | 11 | 3 | 26 |
 | `js/io_manager.js` | `extension-ui-background-js` | 0 | 0 | 3 | 0 | 0 | 3 |
+| `js/managed_admin_authority.js` | `extension-ui-background-js` | 0 | 0 | 0 | 0 | 0 | 0 |
 | `js/layout.js` | `quarantined-legacy-js` | 0 | 0 | 0 | 0 | 37 | 37 |
 | `js/nanah_managed_live_policy.js` | `extension-ui-background-js` | 0 | 0 | 0 | 0 | 0 | 0 |
 | `js/nanah_managed_open_sync.js` | `extension-ui-background-js` | 0 | 0 | 0 | 0 | 0 | 0 |

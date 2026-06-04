@@ -19,10 +19,11 @@ const sourceFingerprints = {
   'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
   'js/filter_logic.js': [3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'],
   'js/injector.js': [3593, 155830, '634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04'],
+  'js/managed_admin_authority.js': [157, 6669, '89e50ee150fe5dc6e069a8c52b39fab243a6563888d283e15f091775975ecfc2'],
   'js/popup.js': [1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
   'js/seed.js': [1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
   'js/state_manager.js': [2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6'],
-  'js/tab-view.js': [13669, 630787, '9bd95b31b0afb3caf80236e509db3496d1a8b6a4e5aa70ec7bc6205e755f0961']
+  'js/tab-view.js': [13695, 632194, 'b0c71608c02a00a74920f780b7c958cc58b42703cd301a946c748cb894ab1279']
 };
 
 function read(file) {
@@ -163,7 +164,8 @@ test('message transport callsite register is audit-only and source pinned', () =
 
   assert.match(text, /Status: audit-only current-behavior register/);
   assert.match(text, /Runtime behavior is unchanged/);
-  assert.match(text, /tracked product JS\/JSX\/MJS files scanned: 69/);
+  assert.match(text, /tracked product JS\/JSX\/MJS files scanned: 70/);
+  assert.match(text, /js\/managed_admin_authority\.js.*zero message\s+transport rows/s);
   assert.match(text, /js\/nanah_managed_live_policy\.js.*zero message\s+transport rows/s);
   assert.match(text, /js\/nanah_managed_open_sync\.js.*zero message\s+transport rows/s);
   assert.match(text, /tracked product files with message transport rows: 14/);
@@ -193,7 +195,7 @@ test('message transport callsite counts remain source-derived', () => {
   const rows = transportRows();
   const text = doc();
 
-  assert.equal(productScriptFiles().length, 69);
+  assert.equal(productScriptFiles().length, 70);
   assert.equal(rows.length, 65);
   assert.deepEqual(countBy(rows, 'operation'), {
     'runtime.onMessage.addListener': 4,

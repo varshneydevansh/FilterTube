@@ -2,8 +2,8 @@
 
 **Generated**: 2026-06-03
 **Status**: Runtime local managed-save, failed-unlock history, admin-session
-TTL, sensitive-action re-auth, and dashboard-persisted failed-attempt
-rate-limit hardening partially present.
+TTL, sensitive-action re-auth, dashboard-persisted failed-attempt rate-limit
+hardening, and a shared managed-admin authority helper are partially present.
 **Goal slice**: Implementation order item 5, "Harden local
 parent-managed child/protected-profile edits".
 **Primary inputs**:
@@ -28,18 +28,22 @@ metadata for successful parent-managed child surface saves.
 
 ## Current Source-Backed Authority
 
-Current source evidence in `js/tab-view.js`:
+Current source evidence in `js/managed_admin_authority.js` and
+`js/tab-view.js`:
 
 | Source function | Current authority behavior |
 | --- | --- |
-| `canActiveProfileManageProfile(profilesV4, targetProfileId)` | Rejects when the active profile is a child. Allows Default, the active non-child profile managing itself, or an account whose id matches the target child's `parentProfileId`. |
+| `FilterTubeManagedAdminAuthority.canActorManageProfile(profilesV4, options)` | Shared runtime authority helper. Rejects child actors, missing targets, and sibling/unowned targets. Allows Default, a non-child actor managing itself, or an account whose id matches the target child's `parentProfileId`. |
+| `canActiveProfileManageProfile(profilesV4, targetProfileId)` | Dashboard wrapper that delegates to `FilterTubeManagedAdminAuthority.canActorManageProfile(...)` when the helper is loaded, preserving the prior inline fallback. |
 | `startManagedChildEdit(profileId, surface)` | Loads fresh profiles, requires the target to be a child profile, requires `canActiveProfileManageProfile(...)`, then requires `ensureProfileUnlocked(...)` for the active parent/account profile. |
 | `saveManagedChildSurface(surface, mutator)` | Requires an active managed-child edit target, reloads fresh profiles, reruns `canActiveProfileManageProfile(...)`, writes only the target child's selected surface, records local revision/history metadata, then reloads UI state. |
 | `localManagedEditPolicyRevisionStore(profile, scope)` | Reads the target child's last local managed edit revision for `main` or `kids`. |
 | `recordManagedChildLocalEditHistory(profile, report)` | Stores the accepted local edit revision and a protected redacted action-history row on the target child profile in the same V4 profile write. |
 | `recordManagedAdminAuthFailureHistory(profilesV4, targetProfileId, reason)` | Stores a protected `admin_session.failed_unlock` row on the target child profile when parent/admin unlock fails for managed child edit, history view/clear, viewing-space, or time-limit changes. |
 | `ensureProfileUnlocked(profilesV4, profileId, options)` | Syncs session state, allows unlocked/no-PIN profiles, requires an unexpired local unlock session, rate-limits repeated failed PIN attempts through memory plus a profile-persisted dashboard row, prompts for profile PIN otherwise, verifies PIN locally, records a local TTL/reauth window, clears the persisted dashboard failure row, then notifies background. |
-| `isProfileUnlockSessionValid.check(profileId, options)` | Rejects expired admin sessions, clears stale session metadata, and requires fresher auth for sensitive managed actions. |
+| `FilterTubeManagedAdminAuthority.checkAdminUnlockSession(session, options)` | Shared runtime session decision helper for unlocked profile membership, TTL expiry, and sensitive-action re-auth. |
+| `isProfileUnlockSessionValid.check(profileId, options)` | Dashboard wrapper that delegates to `FilterTubeManagedAdminAuthority.checkAdminUnlockSession(...)`, clears stale session metadata, and preserves the prior inline fallback. |
+| `FilterTubeManagedAdminAuthority.normalizeFailedUnlockState(...)` | Shared runtime failed-unlock window normalizer used by the dashboard's persisted failed-attempt state. |
 
 ## Required Local Authority Decisions
 
@@ -95,6 +99,7 @@ runtime local managed edit admin session TTL: present for tab-view and backgroun
 runtime local managed edit sensitive-action re-auth gate: present for managed child/history/viewing-space/time-limit unlock gates
 runtime local managed edit failed-attempt rate limit: present for tab-view unlock prompts and background session PIN auth
 runtime local managed edit failed-attempt rate limit durability: present for tab-view managed unlock prompts through profile.managedPolicyState.adminFailedUnlockRateLimit; background session PIN auth remains memory-only
+runtime managed-admin authority helper: present for local dashboard actor/target decisions, admin-session TTL, sensitive reauth, and dashboard failed-unlock window normalization
 runtime behavior changed by this contract: yes
 ```
 
@@ -112,12 +117,34 @@ small local managed-write helper near the profile storage boundary so UI edits,
 local bulk apply, and later P2P applies do not each invent separate
 revision/history behavior.
 
+## Addendum - 2026-06-05
+
+This slice promotes the local parent/child authority decision into
+`js/managed_admin_authority.js` and loads it before `js/tab-view.js`. The
+dashboard still owns UI prompting, PIN verification, profile writes, and action
+history rendering, but the actor/target allow/reject decision and admin-session
+TTL/reauth decision now have one shared runtime helper that future
+local-network and Nanah managed-policy paths can reuse.
+
+The helper is deliberately narrow. It does not trust LAN discovery, action
+history, or a child PIN as authority. It only answers:
+
+- whether an actor profile can manage a target profile;
+- whether a cached admin unlock session is still valid;
+- what TTL/reauth timestamps a new admin session receives;
+- how dashboard failed-unlock rate-limit windows normalize.
+
+This reduces the risk that extension UI, local-network management, and
+downstream app sync fork the parent/caregiver authority contract.
+
 ## Verification
 
 Focused test:
 
 ```bash
-node --test tests/runtime/managed-child-local-authority-current-behavior.test.mjs
+node --test \
+  tests/runtime/managed-admin-authority-helper-current-behavior.test.mjs \
+  tests/runtime/managed-child-local-authority-current-behavior.test.mjs
 ```
 
 Settings lane:

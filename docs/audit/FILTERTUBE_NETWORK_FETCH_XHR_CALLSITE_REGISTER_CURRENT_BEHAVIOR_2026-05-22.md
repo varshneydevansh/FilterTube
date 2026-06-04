@@ -18,7 +18,7 @@ subscription import, release-note loading, or first-class JSON filtering.
 ## Source Boundary
 
 ```text
-tracked product JS/JSX/MJS files scanned: 69
+tracked product JS/JSX/MJS files scanned: 70
 tracked product files with network fetch/XHR rows: 6
 network fetch/XHR rows: 29
 request primitive rows: 16
@@ -41,6 +41,10 @@ after the managed-policy live-send slice, but it contributes zero network
 fetch/XHR rows; live transport still flows through the Nanah client owned by the
 dashboard runtime.
 
+`js/managed_admin_authority.js` is included in the scanned product file count
+after the local managed-admin authority helper slice, but it contributes zero
+network fetch/XHR rows; parent/child authority checks remain local helper logic.
+
 Adjacent APIs intentionally excluded from the network row count:
 
 ```text
@@ -58,7 +62,7 @@ file.text() reads an uploaded/imported local File and is not a network response.
 | `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
 | `js/injector.js` | 3,593 | 155,830 | `634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04` |
 | `js/seed.js` | 1,136 | 50,026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
-| `js/tab-view.js` | 13,669 | 630,787 | `9bd95b31b0afb3caf80236e509db3496d1a8b6a4e5aa70ec7bc6205e755f0961` |
+| `js/tab-view.js` | 13,695 | 632,194 | `b0c71608c02a00a74920f780b7c958cc58b42703cd301a946c748cb894ab1279` |
 
 ## File And Operation Counts
 
@@ -408,10 +412,10 @@ is a required source input before this network fetch/XHR callsite register can
 support runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
-method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5836
+method semantic proof gap files covered: 72
+method semantic proof gap lexical callables covered: 6107
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5836
+lexical callables requiring semantic proof before behavior changes: 6107
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

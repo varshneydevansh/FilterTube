@@ -19,6 +19,7 @@ function runtimeSource() {
     'js/background.js',
     'js/io_manager.js',
     'js/state_manager.js',
+    'js/managed_admin_authority.js',
     'js/tab-view.js'
   ].map(read).join('\n');
 }
@@ -247,14 +248,17 @@ test('managed child local authority contract is source-backed with accepted-save
   const tabView = read('js/tab-view.js');
   const source = runtimeSource();
 
-  assert.match(doc, /Status\*\*: Runtime local managed-save, failed-unlock history, admin-session\s+TTL, sensitive-action re-auth, and dashboard-persisted failed-attempt\s+rate-limit hardening partially present/);
+  assert.match(doc, /Status\*\*: Runtime local managed-save, failed-unlock history, admin-session\s+TTL, sensitive-action re-auth, dashboard-persisted failed-attempt rate-limit\s+hardening, and a shared managed-admin authority helper are partially present/);
   assert.match(doc, /Who is allowed to enter virtual child edit mode/);
   assert.match(doc, /Required Local Authority Decisions/);
   assert.match(doc, /Hardening Requirements/);
+  assert.match(doc, /Addendum - 2026-06-05/);
+  assert.match(doc, /js\/managed_admin_authority\.js/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
 
   assert.match(tabView, /function canActiveProfileManageProfile\(profilesV4, targetProfileId\)/);
+  assert.match(tabView, /ManagedAdminAuthority\.canActorManageProfile/);
   assert.match(tabView, /getProfileType\(profilesV4, currentActive\) === 'child'\) return false/);
   assert.match(tabView, /async function startManagedChildEdit\(profileId, surface\)/);
   assert.match(tabView, /getProfileType\(fresh, targetId\) !== 'child'/);
@@ -278,6 +282,7 @@ test('managed child local authority contract is source-backed with accepted-save
   assert.match(tabView, /delete managedPolicyState\.adminFailedUnlockRateLimit/);
   assert.match(tabView, /const isProfileUnlockSessionValid = \{/);
   assert.match(tabView, /check: \(profileId, \{ sensitiveAction = false \} = \{\}\) =>/);
+  assert.match(tabView, /ManagedAdminAuthority\.checkAdminUnlockSession/);
   assert.match(tabView, /profileUnlockSessions\.set\(id,/);
   assert.match(tabView, /clearProfileUnlockSession\.run\(id\)/);
   assert.match(tabView, /async function recordManagedAdminUnlockFailure\(profileId, profilesV4 = profilesV4Cache\)/);

@@ -96,10 +96,10 @@ is a required source input before this profile/settings/UI surface can support
 runtime optimization. Current proof pins:
 
 ```text
-method semantic proof gap files covered: 71
-method semantic proof gap lexical callables covered: 6086
+method semantic proof gap files covered: 72
+method semantic proof gap lexical callables covered: 6107
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6086
+lexical callables requiring semantic proof before behavior changes: 6107
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

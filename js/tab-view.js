@@ -3056,6 +3056,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const MANAGED_ADMIN_FAILED_UNLOCK_LIMIT = 5;
     const MANAGED_ADMIN_FAILED_UNLOCK_WINDOW_MS = 10 * 60 * 1000;
     const MANAGED_ADMIN_FAILED_UNLOCK_SCHEMA = 'filtertube_managed_admin_failed_unlock_rate_limit';
+    const ManagedAdminAuthority = window.FilterTubeManagedAdminAuthority || null;
     const profileUnlockSessions = new Map();
     const managedAdminFailedUnlocks = new Map();
 
@@ -3139,6 +3140,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     function normalizeManagedAdminFailedUnlockState(value, now = Date.now()) {
+        if (ManagedAdminAuthority && typeof ManagedAdminAuthority.normalizeFailedUnlockState === 'function') {
+            return ManagedAdminAuthority.normalizeFailedUnlockState(value, now);
+        }
         const raw = safeObject(value);
         const resetAt = Number(raw.resetAt);
         const failedAttempts = Number(raw.failedAttempts);
@@ -3278,11 +3282,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             const id = normalizeString(profileId); if (!id) return;
             const now = Date.now();
             unlockedProfiles.add(id);
-            profileUnlockSessions.set(id, {
-                unlockedAt: now,
-                expiresAt: now + MANAGED_ADMIN_SESSION_TTL_MS,
-                reauthAt: now + MANAGED_ADMIN_REAUTH_TTL_MS
-            });
+            const session = ManagedAdminAuthority && typeof ManagedAdminAuthority.createAdminUnlockSession === 'function'
+                ? ManagedAdminAuthority.createAdminUnlockSession(now)
+                : {
+                    unlockedAt: now,
+                    expiresAt: now + MANAGED_ADMIN_SESSION_TTL_MS,
+                    reauthAt: now + MANAGED_ADMIN_REAUTH_TTL_MS
+                };
+            profileUnlockSessions.set(id, session);
         }
     };
 
@@ -3291,6 +3298,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             const id = normalizeString(profileId);
             const session = safeObject(profileUnlockSessions.get(id));
             const now = Date.now();
+            if (ManagedAdminAuthority && typeof ManagedAdminAuthority.checkAdminUnlockSession === 'function') {
+                const decision = ManagedAdminAuthority.checkAdminUnlockSession(session, {
+                    profileId: id,
+                    hasUnlockedProfile: unlockedProfiles.has(id),
+                    now,
+                    sensitiveAction
+                });
+                if (!decision.valid) {
+                    clearProfileUnlockSession.run(id);
+                    return false;
+                }
+                return true;
+            }
             const expired = !Number.isFinite(session.expiresAt) || now >= session.expiresAt;
             const requiresReauth = sensitiveAction && (!Number.isFinite(session.reauthAt) || now >= session.reauthAt);
             if (!id || !unlockedProfiles.has(id) || expired || requiresReauth) {
@@ -4412,6 +4432,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     function canActiveProfileManageProfile(profilesV4, targetProfileId) {
         const targetId = normalizeString(targetProfileId);
         const currentActive = normalizeString(profilesV4?.activeProfileId) || activeProfileId || 'default';
+        if (ManagedAdminAuthority && typeof ManagedAdminAuthority.canActorManageProfile === 'function') {
+            return ManagedAdminAuthority.canActorManageProfile(profilesV4, {
+                actorProfileId: currentActive,
+                targetProfileId: targetId
+            }).allowed === true;
+        }
         if (!targetId || getProfileType(profilesV4, currentActive) === 'child') return false;
         return currentActive === 'default' ||
             currentActive === targetId ||

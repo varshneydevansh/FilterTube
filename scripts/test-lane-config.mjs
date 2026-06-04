@@ -451,6 +451,11 @@ export const FILE_LANE_RULES = Object.freeze([
     lanes: ['release', 'settings', 'smoke']
   },
   {
+    id: 'managed-admin-authority-runtime',
+    patterns: [/^js\/managed_admin_authority\.js$/],
+    lanes: ['release', 'settings', 'smoke']
+  },
+  {
     id: 'security-crypto-runtime',
     patterns: [/^js\/security_manager\.js$/],
     lanes: ['release', 'settings', 'smoke']
@@ -673,6 +678,11 @@ export const FILE_LANE_RULES = Object.freeze([
   {
     id: 'audit-settings-proof-doc',
     patterns: [/^docs\/audit\/.*(?:SETTING|PROFILE|STORAGE|IMPORT|EXPORT|SYNC|COMPILED|BACKUP|NANAH|ALIAS).*\.md$/i],
+    lanes: ['settings']
+  },
+  {
+    id: 'audit-managed-child-local-authority-proof-doc',
+    patterns: [/^docs\/audit\/FILTERTUBE_MANAGED_CHILD_LOCAL_AUTHORITY_CONTRACT_.*\.md$/],
     lanes: ['settings']
   },
   {
