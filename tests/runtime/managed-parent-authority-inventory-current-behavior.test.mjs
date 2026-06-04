@@ -14,6 +14,7 @@ test('managed parent authority inventory tracks implemented route gate and pendi
   const doc = read(docPath);
 
   assert.match(doc, /Status\*\*: Runtime route-gate, local managed-save revision\/history, protected\s+failed-unlock history, protected history access, time-limit enforcement, and\s+receive-side managed-policy validation\/history proofs updated/);
+  assert.match(doc, /managed-policy receive\/apply evidence/);
   assert.match(doc, /dashboard and\s+background admin-session expiry/);
   assert.match(doc, /sensitive managed-action re-auth/);
   assert.match(doc, /Runtime behavior\s+changed/);
@@ -92,6 +93,8 @@ test('Nanah scoped apply has target-profile writes plus receive-side managed env
   assert.match(tabView, /function buildManagedNanahPolicyValidationContext\(envelope, profilesV4 = profilesV4Cache\)/);
   assert.match(tabView, /function recordManagedNanahPolicyValidationHistory\(envelope, decision, context = \{\}\)/);
   assert.match(tabView, /function getNanahManagedPolicyScopeList\(value\)/);
+  assert.match(adapter, /async function applyManagedPolicyEnvelope\(envelope, context = \{\}\)/);
+  assert.match(adapter, /function withAcceptedManagedPolicyState/);
   assert.match(adapter, /Managed policy envelopes require validated managed apply flow/);
   assert.match(adapter, /missing_signature_verifier/);
   assert.match(adapter, /signature_invalid/);
@@ -101,8 +104,9 @@ test('Nanah scoped apply has target-profile writes plus receive-side managed env
   assert.doesNotMatch(runtime, /managedPolicyRevisionStore/);
 
   assert.match(doc, /receive path now provides managed-policy envelope parsing/i);
-  assert.match(doc, /no persisted accepted-revision writer/i);
-  assert.match(doc, /There is still no persisted stale\/replay authority state/);
+  assert.match(doc, /validated managed policy apply wrapper/i);
+  assert.match(doc, /accepted revision\/hash state/i);
+  assert.match(doc, /Persisted stale\/replay authority state exists for accepted managed policies/);
   assert.match(doc, /signature[- ]verifier gate exists/i);
   assert.match(doc, /dashboard\/key-store verifier plumbing\s+is not wired yet/i);
 });

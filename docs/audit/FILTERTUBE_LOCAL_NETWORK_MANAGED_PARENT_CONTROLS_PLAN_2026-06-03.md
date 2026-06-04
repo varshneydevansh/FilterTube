@@ -2,9 +2,10 @@
 
 **Generated**: 2026-06-03
 **Estimated Complexity**: High
-**Status**: Planning/specification plus local managed-save runtime slice and
-Nanah receive-side managed-policy validation-history slice. Remote/local-network
-managed policy apply behavior remains gated.
+**Status**: Planning/specification plus local managed-save runtime slice,
+Nanah receive-side managed-policy validation/apply-history slice, and validated
+managed-policy apply wrapper. Live remote/local-network transport and key
+verification remain gated.
 **Primary audit input**:
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
 
@@ -222,8 +223,8 @@ revision and action-history entry.
   runtime now writes accepted local managed child save rows, exposes
   parent/account-only protected history access, clears accepted rows while
   preserving protected evidence, and records Nanah managed-policy validation
-  rows for rejected, conflict, idempotent, and valid-but-apply-gated receive
-  outcomes. Remote accepted-apply rows and failed unlock rows remain pending.
+  rows for rejected, conflict, idempotent, and accepted validated-apply receive
+  outcomes. Rate-limited remote failed-attempt rows remain pending.
 - **Acceptance Criteria**:
   - Rows include actor profile, actor device, target profile, action type,
     policy revision, timestamp, result, and redacted summary.
@@ -310,13 +311,14 @@ replica child device over Nanah/P2P or same-network transport.
   target, scope, revision, and integrity.
 - **Complexity**: 8/10
 - **Dependencies**: Task 3.1 and Task 2.2.
-- **Status**: Partially started. The adapter now rejects
+- **Status**: Runtime wrapper present. The adapter now rejects
   `filtertube_managed_policy` envelopes from the legacy portable apply path
   with `Managed policy envelopes require validated managed apply flow`. The
   dashboard receive path now parses managed envelopes, builds validation context,
-  and records protected validation history. The managed apply wrapper, accepted
-  revision persistence, and remote accepted-apply action-history writer are
-  still pending.
+  records protected validation history, invokes `applyManagedPolicyEnvelope(...)`
+  for accepted envelopes, persists accepted revision/hash state on the target
+  child profile, and records accepted/rejected apply history. Live key-verifier
+  plumbing and local-network/P2P delivery remain pending.
 - **Acceptance Criteria**:
   - Existing `app_sync` and `control_proposal` behavior remains compatible.
   - New managed policy applies only to target profile and target surface.

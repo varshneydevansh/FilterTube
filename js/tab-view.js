@@ -8450,22 +8450,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         const localProfilesV4 = profilesV4Cache || (typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null);
         const context = buildManagedNanahPolicyValidationContext(envelope, localProfilesV4);
         const validation = adapter.validateManagedPolicyEnvelope(envelope, context);
-        const historyDecision = validation.accepted === true && validation.decision !== 'idempotent_same_hash'
-            ? {
-                accepted: false,
-                reason: 'managed_apply_pending',
-                validationDecision: validation.decision
-            }
-            : validation;
-        await recordManagedNanahPolicyValidationHistory(envelope, historyDecision, context);
         if (validation.accepted === true && validation.decision === 'idempotent_same_hash') {
+            await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
             UIComponents.showToast('Managed policy already matches the last accepted revision', 'info');
             return;
         }
         if (validation.accepted === true) {
-            UIComponents.showToast('Managed policy validated; remote apply is still gated', 'info');
+            if (typeof adapter.applyManagedPolicyEnvelope !== 'function') {
+                await recordManagedNanahPolicyValidationHistory(envelope, {
+                    accepted: false,
+                    reason: 'managed_apply_unavailable',
+                    validationDecision: validation.decision
+                }, context);
+                UIComponents.showToast('Managed policy apply is unavailable', 'error');
+                return;
+            }
+            const result = await adapter.applyManagedPolicyEnvelope(envelope, context);
+            await recordManagedNanahPolicyValidationHistory(envelope, result.accepted === true ? validation : result, context);
+            if (result.accepted === true && result.applied !== false) {
+                await refreshFilterTubeUiAfterNanahImport();
+                UIComponents.showToast(`Applied managed ${normalizeString(validation.scope) || 'policy'} update`, 'success');
+                return;
+            }
+            if (result.accepted === true && result.decision === 'idempotent_same_hash') {
+                UIComponents.showToast('Managed policy already matches the last accepted revision', 'info');
+                return;
+            }
+            UIComponents.showToast(`Managed policy rejected: ${normalizeString(result.reason) || 'apply failed'}`, 'error');
             return;
         }
+        await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
         UIComponents.showToast(`Managed policy rejected: ${normalizeString(validation.reason) || 'validation failed'}`, 'error');
     }
 

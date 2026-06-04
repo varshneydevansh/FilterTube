@@ -184,7 +184,7 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(doc, /Action history is protected evidence and parent\/caregiver UX/);
   assert.match(doc, /It is not policy\s+authority/);
   assert.match(doc, /Nanah receive path now also parses\s+`filtertube_managed_policy` envelopes/);
-  assert.match(doc, /reason: managed_apply_pending/);
+  assert.match(doc, /validated remote accepted apply history can now be recorded/);
   assert.match(doc, /Required History Row Shape/);
   assert.match(doc, /Approved Action Types/);
   assert.match(doc, /Access Control/);
@@ -205,7 +205,7 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(source, /function recordManagedNanahPolicyValidationHistory\(envelope, decision, context = \{\}\)/);
   assert.match(source, /function handleNanahIncomingManagedPolicyEnvelope\(envelope\)/);
   assert.match(source, /root\.type === 'filtertube_managed_policy'/);
-  assert.match(source, /reason: 'managed_apply_pending'/);
+  assert.match(source, /applyManagedPolicyEnvelope\(envelope, context\)/);
   assert.match(source, /function getNanahManagedPolicyScopeList\(value\)/);
   assert.match(source, /historyBtn\.textContent = 'History'/);
   assert.doesNotMatch(source, /managedActionHistoryStore/);
@@ -289,11 +289,11 @@ test('managed action history required outcomes cover accepted rejected conflict 
   assert.match(doc, /plaintext sensitive rule values: no/);
   assert.match(doc, /remote upload or telemetry: no/);
   assert.match(doc, /runtime managed action history store: profile-local managed child rows/);
-  assert.match(doc, /runtime managed action history row writer: local managed child edit plus failed parent unlock plus Nanah managed-policy validation outcomes/);
+  assert.match(doc, /runtime managed action history row writer: local managed child edit plus failed parent unlock plus Nanah managed-policy validation\/apply outcomes/);
   assert.match(doc, /runtime managed action history access gate: present for parent\/account authority/);
   assert.match(doc, /runtime managed action history clear path: present for accepted rows only/);
-  assert.match(doc, /runtime remote managed validation history writer: present/);
-  assert.match(doc, /runtime remote managed accepted apply history writer: pending/);
+  assert.match(doc, /runtime remote managed validation\/apply history writer: present/);
+  assert.match(doc, /runtime remote managed accepted apply history writer: present behind validated managed apply wrapper/);
   assert.match(doc, /The current failed-auth writer records only protected evidence rows/);
   assert.match(doc, /does not\s+rate-limit yet/);
 });

@@ -16,9 +16,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5836
+method semantic proof gap lexical callables covered: 5875
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5836
+lexical callables requiring semantic proof before behavior changes: 5875
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

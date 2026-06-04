@@ -9,7 +9,8 @@ parent-managed child saves, protected parent unlock-failure evidence,
 parent/account history viewing, accepted-row history clearing, dashboard and
 background admin-session expiry, sensitive managed-action re-auth, child
 time-budget enforcement, managed-envelope validation/classification, and
-managed-policy receive evidence; remote-policy apply remains pending.
+managed-policy receive/apply evidence. Live remote transport key-verifier
+plumbing remains pending.
 **Goal slice**: Implementation order item 1 plus first runtime viewing-space
 enforcement slice.
 **Lane proof**: `test:settings` for profile/Nanah authority and `test:release`
@@ -26,11 +27,11 @@ enforcement from local profile settings, and receive-side managed-policy
 validation history.
 
 This document still does not approve remote policy writes by itself. The first
-managed-envelope validator and receive-side validation-history writer now
-exist, and the validator now requires signature-verification evidence. Persistent
-accepted-revision writes, dashboard key-verification plumbing, remote
-accepted-apply history rows, failed-attempt rate limiting, and remote admin
-session semantics remain separate required slices.
+managed-envelope validator, validated apply wrapper, receive-side
+validation/apply history writer, and accepted-revision state writer now exist,
+and the validator requires signature-verification evidence. Dashboard
+key-verification plumbing, encrypted/local-network delivery, failed-attempt rate
+limiting, and remote admin session semantics remain separate required slices.
 
 ## Issue 60 Local-Network Caregiver Addendum
 
@@ -231,29 +232,32 @@ Authority meaning:
 - It is suitable as a future lower-level apply primitive after an upper-layer
   managed policy envelope validates trust, scope, target, revision, and
   integrity.
-- The adapter now provides the first validation-only managed envelope helper,
-  but that helper is not a persistent policy authority and does not write
-  profiles.
+- The adapter now provides a validated managed policy apply wrapper that can
+  write accepted keyword, channel, video, viewing-space, time-limit, main, and
+  kids policy to the fixed target child profile only.
+- The apply wrapper persists accepted revision/hash state under
+  `profile.managedPolicyState.remoteManagedPolicies[linkId][scope]` before the
+  dashboard records accepted remote-policy history.
 - The validation helper now fails closed with `missing_signature_verifier` or
   `signature_invalid` when a caller cannot provide trusted signature evidence.
 - The dashboard receive path now provides managed-policy envelope parsing,
-  trusted-link/profile/revision context construction, and protected validation
-  evidence rows, but it does not yet provide key material or a verifier
-  callback.
+  trusted-link/profile/revision context construction, protected validation
+  evidence rows, validated apply dispatch, and accepted/rejected apply history,
+  but it does not yet provide key material or a verifier callback.
 
 Current gap:
 
-- The adapter validates link/profile/scope/device/key/revision inputs only from
-  caller-supplied context; there is still no persisted accepted-revision writer.
-- There is still no persisted stale/replay authority state beyond any existing
-  profile metadata passed into the validation context.
+- The adapter validates link/profile/scope/device/key/revision inputs from
+  caller-supplied context and rechecks the persisted source/target
+  parent-child binding before writing.
+- Persisted stale/replay authority state exists for accepted managed policies,
+  but only inside the target profile's managed policy state.
 - The signature verifier gate exists, but dashboard/key-store verifier plumbing
   is not wired yet; the receive path therefore rejects otherwise well-shaped
   managed envelopes rather than treating them as valid.
-- The adapter supports validation-only `filtertube_managed_policy` handling,
-  but there is still no managed apply wrapper that records accepted revision
-  state and accepted-apply history before calling the low-level scoped write
-  primitive.
+- The adapter's validated apply wrapper still depends on higher layers for
+  canonical hash recomputation, key lookup, local-network pull scheduling,
+  encrypted mailbox delivery, and remote admin session semantics.
 
 ### Nanah managed link policy
 
@@ -373,17 +377,17 @@ Current gap:
 
 | Gap | Risk | Required next proof |
 |---|---|---|
-| Validation-only managed policy envelope helper | Remote apply still cannot use a durable policy object because there is no managed apply wrapper or persistent revision state. | Managed apply wrapper plus accepted/rejected history rows before runtime writes. |
-| No remote revision store | Stale or replayed remote updates cannot be rejected as a first-class rule. Local same-device managed saves now have local revision metadata only. | Monotonic revision fixtures per parent/source and child target. |
+| Validated managed policy apply wrapper | Remote apply can now persist a durable accepted-revision object for a fixed child target, but only when a caller supplies accepted validation context. | Key-store/WebCrypto verifier plumbing and live Nanah/local-network receive tests before automatic remote apply. |
+| Target-local remote revision store | Stale or replayed remote updates can now be rejected per target profile/link/scope after the first accepted write, but there is no mailbox or multi-device conflict-resolution layer yet. | Multi-parent, revoked-link, equal-revision/different-hash, and mailbox-delivery fixtures. |
 | Signature verifier context not wired | The helper now requires verifier evidence, but Nanah/dashboard key material is not wired yet, so remote managed envelopes fail closed before apply. | Key-store/WebCrypto verifier plumbing plus signed/authenticated envelope tests. |
 | Partial canonical payload/integrity binding | The helper checks binding fields and verifier result, but no canonical payload hash recomputation exists yet. | Binding-tuple fixtures plus canonical payload hash proof. |
-| No signed remote Main/Kids policy gate | Local child route denial now works, but remote updates are still not envelope/revision-bound. | Managed policy envelope, revision store, and Nanah/local-network apply wrapper before remote route-policy writes. |
-| No remote time-limit policy apply | Local child time-budget enforcement exists, but parent/caregiver device updates are still not envelope/revision-bound. | Managed policy envelope, revision store, and remote time-limit fixtures before Nanah/local-network writes. |
-| Adapter lacks persisted trust context | `validateManagedPolicyEnvelope(...)` depends on caller-supplied trusted-link/profile/revision context and `applyIncomingEnvelope(...)` still applies legacy payloads after caller-side checks. | Upper-layer managed policy apply wrapper before adapter call. |
+| Signed remote Main/Kids policy gate is not live | Local child route denial works and accepted managed envelopes can write viewing-space policy, but dashboard key verification and live transport are still not wired. | Signed route-policy fixtures through live Nanah/local-network receive. |
+| Remote time-limit policy apply is wrapper-only | Local child time-budget enforcement exists and accepted managed envelopes can write runtime-compatible time-limit policy, but live parent-device delivery is not wired. | Signed remote time-limit fixtures through Nanah/local-network receive. |
+| Adapter lacks persisted key/trust lookup | `validateManagedPolicyEnvelope(...)` depends on caller-supplied trusted-link/profile/revision context; the wrapper rechecks stored profiles before writing but does not fetch trust keys itself. | Key lookup and canonical verifier context before automatic apply. |
 | Locked-child bypass has no revision binding | `allow_trusted_updates` can skip unlock for matching managed sessions, but not with policy revision constraints. | Locked child managed-policy fixtures. |
 | No mailbox protocol | Offline later delivery is not specified at runtime. | Ciphertext/replay/ack protocol doc before server work. |
 | No local-network management contract | Same-network discovery could be mistaken for authority. | Separate discovery, pairing, transport, and policy-authority proof. |
-| Partial protected-user action history | Accepted local managed child saves, local parent/account history access, accepted-row clearing, protected failed unlock rows, dashboard/background session expiry, sensitive managed-action re-auth, and remote managed validation-history rows exist. | Accepted remote apply writer, rate-limit fixtures, retention expiry, and encrypted summary fixtures. |
+| Partial protected-user action history | Accepted local managed child saves, local parent/account history access, accepted-row clearing, protected failed unlock rows, dashboard/background session expiry, sensitive managed-action re-auth, and remote managed validation/apply rows exist. | Rate-limit fixtures, retention expiry, encrypted summary fixtures, and live remote apply smoke. |
 | No admin lock for remote management | Child PIN or protected profile state could be confused with admin authority. | Parent/account PIN and trusted-device authority fixtures before writes. |
 | No pairing key/signature contract | P2P or local-network transport could authenticate reachability instead of authority. | Device-bound key, signature/integrity, rotation, revocation, and compromise-recovery fixtures. |
 | No hostile-LAN fixture set | Spoofed peer announcements, duplicate device ids, stale pairings, reconnect drift, or MITM attempts could be missed. | Discovery-versus-authority negative fixtures before local-network writes. |
@@ -396,12 +400,13 @@ Before adding parent-managed runtime behavior:
 
 1. Keep the `filtertube_managed_policy` schema/revision fixtures passing while
    moving from contract proof into runtime helper code.
-2. Add accepted revision state per parent/source device and target child
-   profile.
-3. Require scope, target profile, link role, locked-child mode, revision, and
-   integrity checks before any Nanah managed policy write.
-4. Keep existing `applyScopedPortablePayload(...)` as the low-level profile
-   write primitive, but call it only after managed envelope validation.
+2. Keep accepted revision state per parent/source device, link, scope, and
+   target child profile covered by runtime fixtures.
+3. Wire durable key lookup and WebCrypto verifier context before any live
+   Nanah/local-network managed policy write.
+4. Keep existing `applyIncomingEnvelope(...)` closed to
+   `filtertube_managed_policy`; managed envelopes must use
+   `applyManagedPolicyEnvelope(...)`.
 5. Keep Main/Kids route policy fixtures passing while extending the local
    runtime route gate toward signed remote policy apply.
 6. Keep time-limit schema and runtime counter/overlay fixtures passing before

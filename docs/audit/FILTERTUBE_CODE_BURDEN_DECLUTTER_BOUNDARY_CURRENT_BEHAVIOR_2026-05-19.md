@@ -180,7 +180,7 @@ proof.
 Current guard counts:
 
 ```text
-large product-owned JS/JSX/MJS files at or above 1000 lines guarded: 15
+large product-owned JS/JSX/MJS files at or above 1000 lines guarded: 16
 near-threshold product-owned JS/JSX/MJS files from 900 to 999 lines guarded: 2
 large vendor bundle files recorded separately: 1
 new product-owned file crossing 1000 lines without proof: NO-GO
@@ -193,7 +193,7 @@ Large product-owned source files:
 | File | Current lines | Boundary |
 | --- | ---: | --- |
 | `js/content_bridge.js` | 13636 | Giant cross-context hub. Any growth needs source-owner proof and focused runtime fixtures. |
-| `js/tab-view.js` | 12437 | Dashboard/settings UI surface. Current growth is owned by the managed Nanah policy receive/history slice; any further growth needs UI/state owner proof and release smoke. |
+| `js/tab-view.js` | 12451 | Dashboard/settings UI surface. Current growth is owned by the managed Nanah policy receive/history slice; any further growth needs UI/state owner proof and release smoke. |
 | `js/background.js` | 6657 | Background storage/message/profile authority. Any growth needs mutation and settings proof. |
 | `js/content/dom_fallback.js` | 5030 | DOM fallback selector/hide/restore authority. Any growth needs DOM/no-work proof. |
 | `js/filter_logic.js` | 3652 | JSON renderer rule and decision engine. Any growth needs rule/path proof. |
@@ -207,6 +207,7 @@ Large product-owned source files:
 | `js/content/dom_extractors.js` | 1137 | DOM identity extraction surface. Any growth needs identity false-hide/leak proof. |
 | `js/seed.js` | 1136 | Transport interception and JSON active-work gate. Any growth needs JSON/no-work proof. |
 | `js/content/bridge_settings.js` | 1113 | Content-script settings relay and managed time-limit runtime. Any growth needs settings, route, and no-work proof. |
+| `js/nanah_sync_adapter.js` | 1092 | Nanah portable payload and managed-policy apply surface. Current crossing is owned by the validated managed-policy wrapper slice; follow-up should extract managed-policy helpers behind the same validation tests before broadening transport. |
 
 Near-threshold product-owned source files:
 

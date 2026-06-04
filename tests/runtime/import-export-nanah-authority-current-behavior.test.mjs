@@ -151,9 +151,9 @@ test('content-filter ingress addendum pins pass-through normalization contrast',
     'async function applyScopedPortablePayload',
     'await io.saveProfilesV4({'
   );
-  assert.match(nanahApplyBlock, /\.\.\.data/);
-  assert.match(nanahApplyBlock, /main: nextMain/);
-  assert.match(nanahApplyBlock, /kids: nextKids/);
+  assert.match(nanahApplyBlock, /const data = safeObject\(root\.data\)/);
+  assert.match(nanahApplyBlock, /main: applyMainSurfaceData\(activeProfile\.main, data, replace\)/);
+  assert.match(nanahApplyBlock, /kids: applyKidsSurfaceData\(activeProfile\.kids, data, replace\)/);
   assert.doesNotMatch(nanahApplyBlock, /contentFilters[\s\S]{0,160}enabled\s*===\s*true/);
   assert.doesNotMatch(nanahApplyBlock, /sanitizeContentFilter|normalizeContentFilter|coerceContentFilter/);
 
@@ -321,7 +321,7 @@ test('scoped Nanah apply currently writes V4 directly and returns no refresh or 
   const block = sliceBetween(
     source,
     'async function applyScopedPortablePayload',
-    'function generateId'
+    'function managedPayloadSurface'
   );
 
   assert.match(block, /await io\.saveProfilesV4\(\{/);
@@ -336,14 +336,14 @@ test('scoped Nanah replace uses safeArray for channel arrays and normalizes Main
   const source = read('js/nanah_sync_adapter.js');
   const block = sliceBetween(
     source,
-    'async function applyScopedPortablePayload',
-    'function generateId'
+    'function applyMainSurfaceData',
+    'function applyKidsSurfaceData'
   );
 
-  assert.match(block, /const incomingChannels = Array\.isArray\(data\.channels\) \? data\.channels : data\.blockedChannels/);
+  assert.match(block, /const incomingChannels = Array\.isArray\(incoming\.channels\) \? incoming\.channels : incoming\.blockedChannels/);
   assert.match(block, /channels: replace\s*\?\s*safeArray\(incomingChannels\)/);
-  assert.match(block, /whitelistChannels: replace\s*\?\s*safeArray\(data\.whitelistChannels\)/);
-  assert.match(block, /blockedChannels: replace\s*\?\s*safeArray\(data\.blockedChannels\)/);
+  assert.match(block, /whitelistChannels: replace\s*\?\s*safeArray\(incoming\.whitelistChannels\)/);
+  assert.match(block, /\.\.\.incoming/);
   assert.match(block, /normalizeMainProfileAliasFields/);
   assert.doesNotMatch(block, /sanitizeChannelEntry|FilterTubeIO\.sanitize|normalizeChannel/);
 });

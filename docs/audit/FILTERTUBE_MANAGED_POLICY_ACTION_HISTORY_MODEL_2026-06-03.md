@@ -3,8 +3,9 @@
 **Generated**: 2026-06-03
 **Status**: Local protected history access proof present; failed parent unlock
 history writer present for managed-profile gates; remote managed-policy
-validation history writer present for rejection and valid-but-apply-gated
-evidence. Remote accepted apply history is still pending.
+validation history writer present for rejection/idempotent/apply outcomes, and
+validated remote accepted apply history can now be recorded after the managed
+apply wrapper succeeds.
 **Goal slice**: Implementation order item 4, "Add action-history/log model and
 access-control tests".
 **Primary inputs**:
@@ -20,10 +21,12 @@ updates. This model defines that history, tracks the first runtime writer for
 accepted same-device parent-managed child surface saves, exposes a
 parent/account-only local history view for protected child rows, and now records
 receive-side managed-policy validation outcomes when a
-`filtertube_managed_policy` envelope reaches the Nanah dashboard path. It also
-records protected failed-auth rows when parent/admin unlock fails while opening
-managed child edit, viewing/clearing protected history, changing viewing space,
-or changing time limits.
+`filtertube_managed_policy` envelope reaches the Nanah dashboard path. Accepted
+managed-policy envelopes now route through a validated apply wrapper before
+history records the accepted remote result. It also records protected
+failed-auth rows when parent/admin unlock fails while opening managed child
+edit, viewing/clearing protected history, changing viewing space, or changing
+time limits.
 
 Action history is protected evidence and parent/caregiver UX. It is not policy
 authority. Runtime policy must still come from the current accepted managed
@@ -146,12 +149,12 @@ profile when a row can be attached to a known protected profile:
 
 ```text
 runtime managed action history store: profile-local managed child rows
-runtime managed action history row writer: local managed child edit plus failed parent unlock plus Nanah managed-policy validation outcomes
+runtime managed action history row writer: local managed child edit plus failed parent unlock plus Nanah managed-policy validation/apply outcomes
 runtime managed action history access gate: present for parent/account authority
 runtime managed action history clear path: present for accepted rows only
-runtime remote managed validation history writer: present for rejected, conflict, idempotent, and valid-but-apply-gated receive outcomes
-runtime remote managed accepted apply history writer: pending
-runtime behavior changed by this contract: yes, for accepted local managed child saves, protected failed-auth rows, parent/account history access, and Nanah managed-policy receive evidence
+runtime remote managed validation/apply history writer: present for rejected, conflict, idempotent, and accepted apply outcomes
+runtime remote managed accepted apply history writer: present behind validated managed apply wrapper
+runtime behavior changed by this contract: yes, for accepted local managed child saves, protected failed-auth rows, parent/account history access, Nanah managed-policy receive evidence, and validated remote apply history
 ```
 
 The current local writer stores redacted count summaries under
@@ -166,17 +169,17 @@ future policy mutation. Dashboard unlock sessions and the background session PIN
 cache now expire, and sensitive managed gates require fresher re-auth before
 history, rule-edit, viewing-space, or time-limit mutations.
 
-The current remote validation writer is deliberately still not a low-level
-profile mutation path. A valid newer `filtertube_managed_policy` envelope is
-recorded as `remote_policy.reject` with `reason: managed_apply_pending` until a
-separate managed apply wrapper persists revision state and applies the scoped
-policy through the approved rule/write path. Idempotent equal-revision/same-hash
-envelopes can be recorded as accepted because no policy rewrite is needed.
-Future implementation should add the remote accepted-apply writer beside the
-managed policy apply wrapper, not inside low-level content rule mutation
-helpers. This keeps local keyword/channel/video writes, Nanah apply, mailbox
-apply, and admin session events using one history model without turning logs
-into policy state.
+The current remote writer is still not policy authority by itself. A valid newer
+`filtertube_managed_policy` envelope must first pass the managed envelope
+validator and then `applyManagedPolicyEnvelope(...)`, which persists accepted
+revision/hash state on the target child profile before the history row records
+`remote_policy.accept`. Idempotent equal-revision/same-hash envelopes can be
+recorded as accepted because no policy rewrite is needed. Missing verifier,
+revoked link, stale revision, equal-revision conflict, sibling target, and
+wrong-source cases still produce protected rejected or conflict history rows.
+This keeps local keyword/channel/video writes, Nanah apply, mailbox apply, and
+admin session events using one history model without turning logs into policy
+state.
 
 ## Verification
 

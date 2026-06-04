@@ -44,6 +44,12 @@
         return Array.isArray(value) ? value : [];
     }
 
+    function normalizeNonNegativeInteger(value) {
+        const num = typeof value === 'number' ? value : Number(value);
+        if (!Number.isInteger(num)) return null;
+        return num >= 0 ? num : null;
+    }
+
     function validationResult(reason, extra = {}) {
         return { accepted: false, reason, ...extra };
     }
@@ -319,6 +325,19 @@
         return Array.from(seen.values());
     }
 
+    function mergeStringLists(base, incoming) {
+        const seen = new Map();
+        safeArray(base).forEach((entry) => {
+            const value = normalizeString(entry);
+            if (value) seen.set(value.toLowerCase(), value);
+        });
+        safeArray(incoming).forEach((entry) => {
+            const value = normalizeString(entry);
+            if (value) seen.set(value.toLowerCase(), value);
+        });
+        return Array.from(seen.values());
+    }
+
     function normalizeMainProfileAliasFields(main) {
         const out = { ...safeObject(main) };
         const mode = normalizeString(out.mode) === 'whitelist' ? 'whitelist' : 'blocklist';
@@ -335,6 +354,61 @@
             out.blockedKeywords = [];
         }
         return out;
+    }
+
+    function applyMainSurfaceData(currentMain, data, replace) {
+        const current = safeObject(currentMain);
+        const incoming = safeObject(data);
+        const incomingChannels = Array.isArray(incoming.channels) ? incoming.channels : incoming.blockedChannels;
+        const incomingKeywords = Array.isArray(incoming.keywords) ? incoming.keywords : incoming.blockedKeywords;
+        return normalizeMainProfileAliasFields({
+            ...current,
+            ...incoming,
+            mode: normalizeString(incoming.mode) === 'whitelist' ? 'whitelist' : (current.mode === 'whitelist' ? 'whitelist' : 'blocklist'),
+            channels: replace
+                ? safeArray(incomingChannels)
+                : mergeChannelLists(current.channels, incomingChannels),
+            keywords: replace
+                ? normalizeKeywordList(incomingKeywords)
+                : mergeKeywordLists(current.keywords, incomingKeywords),
+            whitelistChannels: replace
+                ? safeArray(incoming.whitelistChannels)
+                : mergeChannelLists(current.whitelistChannels, incoming.whitelistChannels),
+            whitelistKeywords: replace
+                ? normalizeKeywordList(incoming.whitelistKeywords)
+                : mergeKeywordLists(current.whitelistKeywords, incoming.whitelistKeywords),
+            videoIds: replace
+                ? safeArray(incoming.videoIds).map(normalizeString).filter(Boolean)
+                : mergeStringLists(current.videoIds, incoming.videoIds)
+        });
+    }
+
+    function applyKidsSurfaceData(currentKids, data, replace) {
+        const current = safeObject(currentKids);
+        const incoming = safeObject(data);
+        return {
+            ...current,
+            ...incoming,
+            mode: normalizeString(incoming.mode) === 'whitelist' ? 'whitelist' : (current.mode === 'whitelist' ? 'whitelist' : 'blocklist'),
+            strictMode: Object.prototype.hasOwnProperty.call(incoming, 'strictMode')
+                ? incoming.strictMode !== false
+                : current.strictMode !== false,
+            blockedChannels: replace
+                ? safeArray(incoming.blockedChannels)
+                : mergeChannelLists(current.blockedChannels, incoming.blockedChannels),
+            blockedKeywords: replace
+                ? safeArray(incoming.blockedKeywords)
+                : mergeKeywordLists(current.blockedKeywords, incoming.blockedKeywords),
+            whitelistChannels: replace
+                ? safeArray(incoming.whitelistChannels)
+                : mergeChannelLists(current.whitelistChannels, incoming.whitelistChannels),
+            whitelistKeywords: replace
+                ? normalizeKeywordList(incoming.whitelistKeywords)
+                : mergeKeywordLists(current.whitelistKeywords, incoming.whitelistKeywords),
+            videoIds: replace
+                ? safeArray(incoming.videoIds).map(normalizeString).filter(Boolean)
+                : mergeStringLists(current.videoIds, incoming.videoIds)
+        };
     }
 
     function cloneJson(value) {
@@ -416,57 +490,14 @@
         const replace = strategy === 'replace';
 
         if (scope === 'main') {
-            const currentMain = safeObject(activeProfile.main);
-            const incomingChannels = Array.isArray(data.channels) ? data.channels : data.blockedChannels;
-            const incomingKeywords = Array.isArray(data.keywords) ? data.keywords : data.blockedKeywords;
-            const nextMain = normalizeMainProfileAliasFields({
-                ...currentMain,
-                ...data,
-                mode: normalizeString(data.mode) === 'whitelist' ? 'whitelist' : (currentMain.mode === 'whitelist' ? 'whitelist' : 'blocklist'),
-                channels: replace
-                    ? safeArray(incomingChannels)
-                    : mergeChannelLists(currentMain.channels, incomingChannels),
-                keywords: replace
-                    ? normalizeKeywordList(incomingKeywords)
-                    : mergeKeywordLists(currentMain.keywords, incomingKeywords),
-                whitelistChannels: replace
-                    ? safeArray(data.whitelistChannels)
-                    : mergeChannelLists(currentMain.whitelistChannels, data.whitelistChannels),
-                whitelistKeywords: replace
-                    ? normalizeKeywordList(data.whitelistKeywords)
-                    : mergeKeywordLists(currentMain.whitelistKeywords, data.whitelistKeywords)
-            });
-
             profiles[resolvedTargetProfileId] = {
                 ...activeProfile,
-                main: nextMain
+                main: applyMainSurfaceData(activeProfile.main, data, replace)
             };
         } else {
-            const currentKids = safeObject(activeProfile.kids);
-            const nextKids = {
-                ...currentKids,
-                ...data,
-                mode: normalizeString(data.mode) === 'whitelist' ? 'whitelist' : (currentKids.mode === 'whitelist' ? 'whitelist' : 'blocklist'),
-                strictMode: Object.prototype.hasOwnProperty.call(data, 'strictMode')
-                    ? data.strictMode !== false
-                    : currentKids.strictMode !== false,
-                blockedChannels: replace
-                    ? safeArray(data.blockedChannels)
-                    : mergeChannelLists(currentKids.blockedChannels, data.blockedChannels),
-                blockedKeywords: replace
-                    ? safeArray(data.blockedKeywords)
-                    : mergeKeywordLists(currentKids.blockedKeywords, data.blockedKeywords),
-                whitelistChannels: replace
-                    ? safeArray(data.whitelistChannels)
-                    : mergeChannelLists(currentKids.whitelistChannels, data.whitelistChannels),
-                whitelistKeywords: replace
-                    ? safeArray(data.whitelistKeywords)
-                    : mergeKeywordLists(currentKids.whitelistKeywords, data.whitelistKeywords)
-            };
-
             profiles[resolvedTargetProfileId] = {
                 ...activeProfile,
-                kids: nextKids
+                kids: applyKidsSurfaceData(activeProfile.kids, data, replace)
             };
         }
 
@@ -480,6 +511,422 @@
             scope,
             profileId: resolvedTargetProfileId,
             strategy: replace ? 'replace' : 'merge'
+        };
+    }
+
+    function managedPayloadSurface(payload, fallback = 'main') {
+        const raw = normalizeString(payload.surface || payload.targetSurface || payload.section).toLowerCase();
+        return raw === 'kids' ? 'kids' : (fallback === 'kids' ? 'kids' : 'main');
+    }
+
+    function managedPayloadListKind(payload, fallback = 'blocklist') {
+        const raw = normalizeString(payload.list || payload.targetList || payload.listKind || payload.mode).toLowerCase();
+        if (raw.includes('white') || raw === 'allow') return 'whitelist';
+        if (raw.includes('block') || raw === 'deny') return 'blocklist';
+        return fallback === 'whitelist' ? 'whitelist' : 'blocklist';
+    }
+
+    function managedPayloadReplace(payload) {
+        const raw = normalizeString(payload.strategy || payload.applyMode || payload.mode).toLowerCase();
+        return raw === 'replace' || payload.replace === true;
+    }
+
+    function managedOperationKind(operation) {
+        const raw = normalizeString(operation?.op || operation?.action).toLowerCase();
+        if (raw.includes('remove') || raw.includes('delete')) return 'remove';
+        if (raw.includes('replace') || raw.includes('set')) return 'replace';
+        return 'add';
+    }
+
+    function managedKeywordFromOperation(operation) {
+        const item = safeObject(operation);
+        const candidate = safeObject(item.keyword || item.entry);
+        const word = normalizeString(candidate.word || item.word || item.value);
+        if (!word) return null;
+        return normalizeKeywordEntry({
+            ...candidate,
+            word,
+            source: normalizeString(candidate.source || item.source) || 'managed'
+        });
+    }
+
+    function managedChannelFromOperation(operation) {
+        const item = safeObject(operation);
+        const candidate = safeObject(item.channel || item.entry);
+        const channel = {
+            ...candidate,
+            id: normalizeString(candidate.id || item.id || item.channelId),
+            handle: normalizeString(candidate.handle || item.handle),
+            customUrl: normalizeString(candidate.customUrl || item.customUrl),
+            name: normalizeString(candidate.name || item.name || item.value),
+            source: normalizeString(candidate.source || item.source) || 'managed'
+        };
+        return channelKey(channel) ? channel : null;
+    }
+
+    function managedVideoIdFromOperation(operation) {
+        const item = safeObject(operation);
+        return normalizeString(item.videoId || item.id || item.value);
+    }
+
+    function mergeWithFactory(base, incoming, entryFactory, keyFn) {
+        const seen = new Map();
+        safeArray(base).forEach((entry) => {
+            const key = keyFn(entry);
+            if (key) seen.set(key, entry);
+        });
+        safeArray(incoming).forEach((entry) => {
+            const normalized = entryFactory(entry);
+            const key = keyFn(normalized);
+            if (key) seen.set(key, normalized);
+        });
+        return Array.from(seen.values());
+    }
+
+    function removeEntriesByKeys(list, incoming, keyFn) {
+        const removeKeys = new Set(safeArray(incoming).map(keyFn).filter(Boolean));
+        if (removeKeys.size === 0) return safeArray(list);
+        return safeArray(list).filter(entry => !removeKeys.has(keyFn(entry)));
+    }
+
+    function applyManagedListPayload(list, payload, entryFactory, keyFn, listFields) {
+        const root = safeObject(payload);
+        const operations = safeArray(root.operations);
+        let next = managedPayloadReplace(root) || operations.some(operation => managedOperationKind(operation) === 'replace')
+            ? []
+            : safeArray(list);
+        const directEntries = listFields.flatMap(field => safeArray(root[field]));
+        if (directEntries.length > 0) {
+            next = mergeWithFactory(next, directEntries, entryFactory, keyFn);
+        }
+        for (const operation of operations) {
+            const kind = managedOperationKind(operation);
+            const entry = entryFactory(operation);
+            if (!entry) continue;
+            if (kind === 'remove') {
+                next = removeEntriesByKeys(next, [entry], keyFn);
+            } else {
+                next = mergeWithFactory(next, [entry], value => value, keyFn);
+            }
+        }
+        return next;
+    }
+
+    function applyManagedKeywordPolicy(profile, payload) {
+        const surface = managedPayloadSurface(payload);
+        const listKind = managedPayloadListKind(payload);
+        if (surface === 'kids') {
+            const kids = safeObject(profile.kids);
+            const listKey = listKind === 'whitelist' ? 'whitelistKeywords' : 'blockedKeywords';
+            return {
+                ...profile,
+                kids: {
+                    ...kids,
+                    [listKey]: applyManagedListPayload(kids[listKey], payload, managedKeywordFromOperation, keywordKey, [
+                        listKey,
+                        listKind === 'whitelist' ? 'keywords' : 'blockedKeywords'
+                    ])
+                }
+            };
+        }
+        const main = normalizeMainProfileAliasFields(profile.main);
+        const listKey = listKind === 'whitelist' ? 'whitelistKeywords' : 'keywords';
+        return {
+            ...profile,
+            main: normalizeMainProfileAliasFields({
+                ...main,
+                [listKey]: applyManagedListPayload(main[listKey], payload, managedKeywordFromOperation, keywordKey, [
+                    listKey,
+                    listKind === 'whitelist' ? 'whitelistKeywords' : 'blockedKeywords',
+                    'keywords'
+                ])
+            })
+        };
+    }
+
+    function applyManagedChannelPolicy(profile, payload) {
+        const surface = managedPayloadSurface(payload);
+        const listKind = managedPayloadListKind(payload);
+        if (surface === 'kids') {
+            const kids = safeObject(profile.kids);
+            const listKey = listKind === 'whitelist' ? 'whitelistChannels' : 'blockedChannels';
+            return {
+                ...profile,
+                kids: {
+                    ...kids,
+                    [listKey]: applyManagedListPayload(kids[listKey], payload, managedChannelFromOperation, channelKey, [
+                        listKey,
+                        listKind === 'whitelist' ? 'channels' : 'blockedChannels'
+                    ])
+                }
+            };
+        }
+        const main = normalizeMainProfileAliasFields(profile.main);
+        const listKey = listKind === 'whitelist' ? 'whitelistChannels' : 'channels';
+        return {
+            ...profile,
+            main: normalizeMainProfileAliasFields({
+                ...main,
+                [listKey]: applyManagedListPayload(main[listKey], payload, managedChannelFromOperation, channelKey, [
+                    listKey,
+                    listKind === 'whitelist' ? 'whitelistChannels' : 'blockedChannels',
+                    'channels'
+                ])
+            })
+        };
+    }
+
+    function applyManagedVideoPolicy(profile, payload) {
+        const surface = managedPayloadSurface(payload);
+        const target = surface === 'kids' ? safeObject(profile.kids) : safeObject(profile.main);
+        const operations = safeArray(payload.operations);
+        let next = managedPayloadReplace(payload) || operations.some(operation => managedOperationKind(operation) === 'replace')
+            ? []
+            : safeArray(target.videoIds);
+        next = mergeStringLists(next, safeArray(payload.videoIds || payload.videos));
+        for (const operation of operations) {
+            const videoId = managedVideoIdFromOperation(operation);
+            if (!videoId) continue;
+            if (managedOperationKind(operation) === 'remove') {
+                next = next.filter(existing => normalizeString(existing).toLowerCase() !== videoId.toLowerCase());
+            } else {
+                next = mergeStringLists(next, [videoId]);
+            }
+        }
+        if (surface === 'kids') {
+            return {
+                ...profile,
+                kids: {
+                    ...target,
+                    videoIds: next
+                }
+            };
+        }
+        return {
+            ...profile,
+            main: normalizeMainProfileAliasFields({
+                ...target,
+                videoIds: next
+            })
+        };
+    }
+
+    function applyManagedViewingSpacePolicy(profile, payload) {
+        const current = safeObject(profile.settings);
+        const hasMain = Object.prototype.hasOwnProperty.call(payload, 'allowMain')
+            || Object.prototype.hasOwnProperty.call(payload, 'allowMainViewing');
+        const hasKids = Object.prototype.hasOwnProperty.call(payload, 'allowKids')
+            || Object.prototype.hasOwnProperty.call(payload, 'allowKidsViewing');
+        const allowMainViewing = hasMain
+            ? (Object.prototype.hasOwnProperty.call(payload, 'allowMainViewing') ? payload.allowMainViewing !== false : payload.allowMain !== false)
+            : current.allowMainViewing !== false;
+        const allowKidsViewing = hasKids
+            ? (Object.prototype.hasOwnProperty.call(payload, 'allowKidsViewing') ? payload.allowKidsViewing !== false : payload.allowKids !== false)
+            : current.allowKidsViewing !== false;
+        if (!allowMainViewing && !allowKidsViewing) {
+            throw new Error('Managed viewing-space policy cannot disable every viewing space');
+        }
+        return {
+            ...profile,
+            settings: {
+                ...current,
+                allowMainViewing,
+                allowKidsViewing,
+                ...(normalizeString(payload.defaultLaunchTarget)
+                    ? { defaultLaunchTarget: normalizeString(payload.defaultLaunchTarget) }
+                    : {})
+            }
+        };
+    }
+
+    function applyManagedTimeLimitPolicy(profile, payload, envelope) {
+        const current = safeObject(profile.settings);
+        const incoming = safeObject(payload.timeLimitPolicy || payload);
+        const root = safeObject(envelope);
+        const now = Date.now();
+        const nextPolicy = Object.prototype.hasOwnProperty.call(payload, 'timeLimitPolicy')
+            ? incoming
+            : (() => {
+                const currentPolicy = safeObject(current.timeLimitPolicy);
+                const budgetMinutes = normalizeNonNegativeInteger(incoming.dailyBudgetMinutes);
+                const budgetSeconds = normalizeNonNegativeInteger(incoming.dailyBudgetSeconds)
+                    ?? (budgetMinutes == null ? null : budgetMinutes * 60);
+                if (budgetSeconds == null) throw new Error('Managed time-limit policy requires a non-negative budget');
+                return {
+                    ...currentPolicy,
+                    schema: 'filtertube_managed_time_limit',
+                    version: 1,
+                    enabled: incoming.enabled !== false,
+                    timezone: normalizeString(incoming.timezone) || normalizeString(currentPolicy.timezone) || 'UTC',
+                    dailyBudgetSeconds: budgetSeconds,
+                    surfaceBudgets: safeObject(incoming.surfaceBudgets || currentPolicy.surfaceBudgets || {
+                        main: budgetSeconds,
+                        kids: budgetSeconds
+                    }),
+                    countingMode: normalizeString(incoming.countingMode) || normalizeString(currentPolicy.countingMode) || 'active_youtube_tab',
+                    activeDeviceBudgetPolicy: normalizeString(incoming.activeDeviceBudgetPolicy)
+                        || normalizeString(currentPolicy.activeDeviceBudgetPolicy)
+                        || 'single_active_tab_no_double_count',
+                    resetPolicy: normalizeString(incoming.resetPolicy) || normalizeString(currentPolicy.resetPolicy) || 'policy_timezone_midnight',
+                    graceSeconds: normalizeNonNegativeInteger(incoming.graceSeconds)
+                        ?? normalizeNonNegativeInteger(currentPolicy.graceSeconds)
+                        ?? 0,
+                    parentGrant: safeObject(incoming.parentGrant || currentPolicy.parentGrant || {
+                        enabled: false,
+                        extraSeconds: 0,
+                        expiresAt: null,
+                        reason: ''
+                    }),
+                    policyRevision: normalizeNonNegativeInteger(root.revision) || normalizeNonNegativeInteger(currentPolicy.policyRevision) || 1,
+                    policyHash: normalizeString(root.policyHash) || normalizeString(incoming.policyHash) || normalizeString(currentPolicy.policyHash),
+                    issuedAt: normalizeNonNegativeInteger(incoming.issuedAt) || now,
+                    validFrom: normalizeNonNegativeInteger(incoming.validFrom) || now,
+                    validUntil: incoming.validUntil == null ? null : normalizeNonNegativeInteger(incoming.validUntil)
+                };
+            })();
+        if (!normalizeString(nextPolicy.policyHash)) throw new Error('Managed time-limit policy requires policyHash');
+        return {
+            ...profile,
+            settings: {
+                ...current,
+                timeLimitPolicy: nextPolicy
+            }
+        };
+    }
+
+    function applyManagedPolicyPayloadToProfile(profile, envelope) {
+        const root = safeObject(envelope);
+        const scope = normalizeManagedPolicyScope(root.scope);
+        const payload = safeObject(root.payload);
+        const replace = managedPayloadReplace(payload);
+        if (scope === 'main') {
+            return {
+                ...profile,
+                main: applyMainSurfaceData(profile.main, safeObject(payload.data || payload), replace)
+            };
+        }
+        if (scope === 'kids') {
+            return {
+                ...profile,
+                kids: applyKidsSurfaceData(profile.kids, safeObject(payload.data || payload), replace)
+            };
+        }
+        if (scope === 'keywords') return applyManagedKeywordPolicy(profile, payload);
+        if (scope === 'channels') return applyManagedChannelPolicy(profile, payload);
+        if (scope === 'videos') return applyManagedVideoPolicy(profile, payload);
+        if (scope === 'viewing_space') return applyManagedViewingSpacePolicy(profile, payload);
+        if (scope === 'time_limits') return applyManagedTimeLimitPolicy(profile, payload, envelope);
+        throw new Error('Unsupported managed policy scope');
+    }
+
+    function withAcceptedManagedPolicyState(profile, envelope) {
+        const root = safeObject(envelope);
+        const scope = normalizeManagedPolicyScope(root.scope);
+        const linkId = normalizeString(root.linkId);
+        const existingState = safeObject(profile.managedPolicyState);
+        const remotePolicies = safeObject(existingState.remoteManagedPolicies);
+        const linkPolicies = safeObject(remotePolicies[linkId]);
+        return {
+            ...profile,
+            managedPolicyState: {
+                ...existingState,
+                remoteManagedPolicies: {
+                    ...remotePolicies,
+                    [linkId]: {
+                        ...linkPolicies,
+                        [scope]: {
+                            revision: root.revision,
+                            policyHash: normalizeString(root.policyHash),
+                            sourceProfileId: normalizeString(root.sourceProfileId),
+                            sourceDeviceId: normalizeString(root.sourceDeviceId),
+                            sourcePublicKeyId: normalizeString(root.sourcePublicKeyId),
+                            keyVersion: root.keyVersion,
+                            acceptedAt: Date.now()
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    async function applyManagedPolicyEnvelope(envelope, context = {}) {
+        const root = safeObject(envelope);
+        if (!context || Object.keys(safeObject(context)).length === 0) {
+            return validationResult('missing_managed_validation_context');
+        }
+        const validation = validateManagedPolicyEnvelope(root, context);
+        if (validation.accepted !== true) return validation;
+        if (validation.decision === 'idempotent_same_hash') {
+            return {
+                ok: true,
+                accepted: true,
+                decision: 'idempotent_same_hash',
+                scope: validation.scope,
+                profileId: validation.targetProfileId,
+                revision: validation.revision,
+                policyHash: validation.policyHash,
+                applied: false
+            };
+        }
+
+        const io = await getIO();
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
+            throw new Error('Managed policy apply requires load/saveProfilesV4');
+        }
+        const profilesV4 = safeObject(await io.loadProfilesV4());
+        const profiles = { ...safeObject(profilesV4.profiles) };
+        const targetProfile = safeObject(profiles[root.targetProfileId]);
+        const sourceProfile = safeObject(profiles[root.sourceProfileId]);
+        if (!targetProfile || Object.keys(targetProfile).length === 0 || targetProfile.type !== 'child') {
+            return validationResult('target_not_protected_child');
+        }
+        if (!sourceProfile || Object.keys(sourceProfile).length === 0 || sourceProfile.type === 'child') {
+            return validationResult('source_not_parent_authority');
+        }
+        if (normalizeString(targetProfile.parentProfileId) !== root.sourceProfileId) {
+            return validationResult('source_not_bound_to_target');
+        }
+        const latestAccepted = safeObject(safeObject(safeObject(targetProfile.managedPolicyState).remoteManagedPolicies)[root.linkId])[
+            normalizeManagedPolicyScope(root.scope)
+        ];
+        if (Number.isInteger(latestAccepted?.revision)) {
+            if (root.revision < latestAccepted.revision) return validationResult('stale_revision');
+            if (root.revision === latestAccepted.revision && root.policyHash !== latestAccepted.policyHash) {
+                return validationResult('equal_revision_hash_conflict');
+            }
+            if (root.revision === latestAccepted.revision && root.policyHash === latestAccepted.policyHash) {
+                return {
+                    ok: true,
+                    accepted: true,
+                    decision: 'idempotent_same_hash',
+                    scope: normalizeManagedPolicyScope(root.scope),
+                    profileId: root.targetProfileId,
+                    revision: root.revision,
+                    policyHash: root.policyHash,
+                    applied: false
+                };
+            }
+        }
+
+        const updatedProfile = withAcceptedManagedPolicyState(
+            applyManagedPolicyPayloadToProfile(targetProfile, root),
+            root
+        );
+        profiles[root.targetProfileId] = updatedProfile;
+        await io.saveProfilesV4({
+            ...profilesV4,
+            schemaVersion: 4,
+            profiles
+        });
+        return {
+            ok: true,
+            accepted: true,
+            decision: validation.decision,
+            scope: validation.scope,
+            profileId: validation.targetProfileId,
+            revision: validation.revision,
+            policyHash: validation.policyHash,
+            applied: true
         };
     }
 
@@ -638,6 +1085,7 @@
         buildSyncEnvelope,
         buildControlProposal,
         validateManagedPolicyEnvelope,
+        applyManagedPolicyEnvelope,
         applyIncomingEnvelope,
         extractPortableFromEnvelope
     };
