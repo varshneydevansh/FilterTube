@@ -1124,7 +1124,10 @@
             || normalizeString(global.navigator?.userAgentData?.platform)
             || normalizeString(global.navigator?.platform)
             || 'browser';
-        return {
+        const managedPublicKeyId = normalizeString(root.managedPublicKeyId || root.sourcePublicKeyId || root.publicKeyId);
+        const managedPublicKeyJwk = safeObject(root.managedPublicKeyJwk || root.sourcePublicKeyJwk || root.publicKeyJwk);
+        const managedKeyVersion = normalizeNonNegativeInteger(root.managedKeyVersion || root.keyVersion || root.sourceKeyVersion);
+        const descriptor = {
             deviceId: normalizeString(root.deviceId) || generateId(),
             deviceLabel: label,
             app: APP_ID,
@@ -1134,6 +1137,15 @@
                 ? root.capabilities
                 : DEFAULT_DEVICE_CAPABILITIES.slice()
         };
+        if (managedPublicKeyId && Object.keys(managedPublicKeyJwk).length > 0 && managedKeyVersion > 0) {
+            descriptor.managedPublicKeyId = managedPublicKeyId;
+            descriptor.managedPublicKeyJwk = managedPublicKeyJwk;
+            descriptor.managedKeyVersion = managedKeyVersion;
+            descriptor.sourcePublicKeyId = managedPublicKeyId;
+            descriptor.sourcePublicKeyJwk = managedPublicKeyJwk;
+            descriptor.keyVersion = managedKeyVersion;
+        }
+        return descriptor;
     }
 
     global.FilterTubeNanahAdapter = {

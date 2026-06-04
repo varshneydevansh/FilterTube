@@ -3007,9 +3007,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const NANAH_DEVICE_ID_KEY = 'ftNanahDeviceId';
     const NANAH_DEVICE_LABEL_KEY = 'ftNanahDeviceLabel';
     const NANAH_UI_MODE_KEY = 'ftNanahUiMode';
+    const NANAH_MANAGED_SIGNING_PUBLIC_KEY_KEY = 'ftNanahManagedSigningPublicKey';
     let nanahClient = null;
     let nanahTrustedLinks = [];
     let nanahStableDeviceId = '';
+    let nanahManagedSigningKeyDescriptor = null;
     let nanahUiMode = 'send_once';
     let isApplyingNanahModePreset = false;
     let nanahTrustedReconnectApprovalPromise = null;
@@ -8211,11 +8213,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const adapter = window.FilterTubeNanahAdapter || {};
         const role = getNanahRole();
         const deviceLabel = normalizeString(ftNanahDeviceLabel?.value);
+        const managedKey = safeObject(nanahManagedSigningKeyDescriptor);
         return adapter.getDeviceDescriptor({
             deviceId: normalizeString(nanahStableDeviceId) || undefined,
             deviceLabel: deviceLabel || undefined,
             appVersion: manifestVersion,
-            capabilities: getNanahCapabilitiesForRole(role)
+            capabilities: getNanahCapabilitiesForRole(role),
+            managedPublicKeyId: normalizeString(managedKey.managedPublicKeyId || managedKey.sourcePublicKeyId || managedKey.publicKeyId),
+            managedPublicKeyJwk: safeObject(managedKey.managedPublicKeyJwk || managedKey.sourcePublicKeyJwk || managedKey.publicKeyJwk),
+            managedKeyVersion: normalizeNonNegativeInteger(managedKey.managedKeyVersion || managedKey.keyVersion || managedKey.sourceKeyVersion) || 0
         });
     }
 
@@ -8847,17 +8853,27 @@ document.addEventListener('DOMContentLoaded', async () => {
                     await sendNanahDecision(envelope.id, false, 'local child authorization required');
                     return;
                 }
+                const remoteDevice = safeObject(nanahSessionState.remoteDevice);
+                const remoteProfileContext = normalizeNanahProfileContext(nanahSessionState.remoteProfile);
+                const remoteManagedPublicKeyId = normalizeString(remoteDevice.managedPublicKeyId || remoteDevice.sourcePublicKeyId || remoteDevice.publicKeyId);
+                const remoteManagedPublicKeyJwk = safeObject(remoteDevice.managedPublicKeyJwk || remoteDevice.sourcePublicKeyJwk || remoteDevice.publicKeyJwk);
+                const remoteManagedKeyVersion = normalizeNonNegativeInteger(remoteDevice.managedKeyVersion || remoteDevice.keyVersion || remoteDevice.sourceKeyVersion) || 0;
                 await saveNanahTrustedLink({
                     linkId: `nanah-${remoteId}`,
                     remoteDeviceId: remoteId,
                     deviceLabel: getNanahRemoteLabel(),
-                    capabilities: safeArray(safeObject(nanahSessionState.remoteDevice).capabilities),
+                    capabilities: safeArray(remoteDevice.capabilities),
                     localRole,
                     remoteRole,
                     linkType: 'managed_link',
+                    sourceDeviceId: remoteRole === 'source' ? remoteId : '',
+                    sourceProfileId: remoteRole === 'source' ? normalizeString(remoteProfileContext.profileId) : '',
+                    sourcePublicKeyId: remoteRole === 'source' ? remoteManagedPublicKeyId : '',
+                    sourcePublicKeyJwk: remoteRole === 'source' && Object.keys(remoteManagedPublicKeyJwk).length > 0 ? remoteManagedPublicKeyJwk : {},
+                    keyVersion: remoteRole === 'source' ? (remoteManagedKeyVersion || 0) : 0,
                     policy: {
                         linkType: 'managed_link',
-                        capabilities: safeArray(safeObject(nanahSessionState.remoteDevice).capabilities),
+                        capabilities: safeArray(remoteDevice.capabilities),
                         allowedScopes: managedApproval.policy.allowedScopes,
                         defaultScope: managedApproval.policy.defaultScope,
                         applyMode: managedApproval.policy.applyMode,
@@ -8867,7 +8883,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                         childProtectionLevel: managedApproval.policy.childProtectionLevel,
                         targetProfileBehavior: managedApproval.policy.targetProfileBehavior,
                         targetProfileId: managedApproval.policy.targetProfileId,
-                        targetProfileName: managedApproval.policy.targetProfileName
+                        targetProfileName: managedApproval.policy.targetProfileName,
+                        sourceDeviceId: remoteRole === 'source' ? remoteId : '',
+                        sourceProfileId: remoteRole === 'source' ? normalizeString(remoteProfileContext.profileId) : '',
+                        sourcePublicKeyId: remoteRole === 'source' ? remoteManagedPublicKeyId : '',
+                        sourcePublicKeyJwk: remoteRole === 'source' && Object.keys(remoteManagedPublicKeyJwk).length > 0 ? remoteManagedPublicKeyJwk : {},
+                        keyVersion: remoteRole === 'source' ? (remoteManagedKeyVersion || 0) : 0
                     }
                 });
             }
@@ -8974,6 +8995,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const remote = safeObject(nanahSessionState.remoteDevice);
                 const remoteDeviceId = normalizeString(remote.deviceId);
                 if (remoteDeviceId) {
+                    const localProfileContext = getNanahLocalProfileContext();
+                    const localManagedKey = safeObject(nanahManagedSigningKeyDescriptor);
+                    const localManagedPublicKeyId = normalizeString(localManagedKey.managedPublicKeyId || localManagedKey.sourcePublicKeyId || localManagedKey.publicKeyId);
+                    const localManagedPublicKeyJwk = safeObject(localManagedKey.managedPublicKeyJwk || localManagedKey.sourcePublicKeyJwk || localManagedKey.publicKeyJwk);
+                    const localManagedKeyVersion = normalizeNonNegativeInteger(localManagedKey.managedKeyVersion || localManagedKey.keyVersion || localManagedKey.sourceKeyVersion) || 0;
                     await saveNanahTrustedLink({
                         linkId: `nanah-${remoteDeviceId}`,
                         remoteDeviceId,
@@ -8982,8 +9008,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                         localRole: getNanahRole(),
                         remoteRole: normalizeString(nanahSessionState.remoteRole) || 'peer',
                         linkType: 'managed_link',
+                        sourceDeviceId: normalizeString(nanahStableDeviceId),
+                        sourceProfileId: normalizeString(localProfileContext.profileId),
+                        sourcePublicKeyId: localManagedPublicKeyId,
+                        sourcePublicKeyJwk: Object.keys(localManagedPublicKeyJwk).length > 0 ? localManagedPublicKeyJwk : {},
+                        keyVersion: localManagedKeyVersion || 0,
                         policy: {
-                            ...safeObject(root.savedManagedLink)
+                            ...safeObject(root.savedManagedLink),
+                            sourceDeviceId: normalizeString(nanahStableDeviceId),
+                            sourceProfileId: normalizeString(localProfileContext.profileId),
+                            sourcePublicKeyId: localManagedPublicKeyId,
+                            sourcePublicKeyJwk: Object.keys(localManagedPublicKeyJwk).length > 0 ? localManagedPublicKeyJwk : {},
+                            keyVersion: localManagedKeyVersion || 0
                         }
                     });
                 }
@@ -9013,6 +9049,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             await resetNanahSession(true);
         }
         await ensureNanahStableDeviceId();
+        nanahManagedSigningKeyDescriptor = safeObject(await readNanahStorage(NANAH_MANAGED_SIGNING_PUBLIC_KEY_KEY));
 
         const device = buildNanahDeviceDescriptor();
         const NanahApi = window.FilterTubeNanah;
@@ -9108,6 +9145,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const scope = getNanahScope();
         const strategy = getNanahStrategy();
+        const localProfileContext = getNanahLocalProfileContext();
+        const remoteProfileContext = normalizeNanahProfileContext(nanahSessionState.remoteProfile);
+        const localManagedKey = safeObject(nanahManagedSigningKeyDescriptor);
+        const remoteManagedPublicKeyId = normalizeString(remote.managedPublicKeyId || remote.sourcePublicKeyId || remote.publicKeyId);
+        const remoteManagedPublicKeyJwk = safeObject(remote.managedPublicKeyJwk || remote.sourcePublicKeyJwk || remote.publicKeyJwk);
+        const remoteManagedKeyVersion = normalizeNonNegativeInteger(remote.managedKeyVersion || remote.keyVersion || remote.sourceKeyVersion) || 0;
+        const localManagedPublicKeyId = normalizeString(localManagedKey.managedPublicKeyId || localManagedKey.sourcePublicKeyId || localManagedKey.publicKeyId);
+        const localManagedPublicKeyJwk = safeObject(localManagedKey.managedPublicKeyJwk || localManagedKey.sourcePublicKeyJwk || localManagedKey.publicKeyJwk);
+        const localManagedKeyVersion = normalizeNonNegativeInteger(localManagedKey.managedKeyVersion || localManagedKey.keyVersion || localManagedKey.sourceKeyVersion) || 0;
+        const managedSourceDeviceId = localRole === 'source' ? normalizeString(nanahStableDeviceId) : remoteDeviceId;
+        const managedSourceProfileId = localRole === 'source' ? normalizeString(localProfileContext.profileId) : normalizeString(remoteProfileContext.profileId);
+        const managedSourcePublicKeyId = localRole === 'source' ? localManagedPublicKeyId : remoteManagedPublicKeyId;
+        const managedSourcePublicKeyJwk = localRole === 'source' ? localManagedPublicKeyJwk : remoteManagedPublicKeyJwk;
+        const managedSourceKeyVersion = localRole === 'source' ? localManagedKeyVersion : remoteManagedKeyVersion;
         let policy = {
             linkType,
             capabilities: safeArray(remote.capabilities),
@@ -9119,8 +9170,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             lockedChildMode: 'require_unlock',
             childProtectionLevel: isActiveChildNanahProfile() ? 'strict' : 'standard',
             targetProfileBehavior: isActiveChildNanahProfile() ? 'fixed_profile' : 'current_active',
-            targetProfileId: getNanahLocalProfileContext().profileId,
-            targetProfileName: getNanahLocalProfileContext().profileName
+            targetProfileId: localProfileContext.profileId,
+            targetProfileName: localProfileContext.profileName,
+            sourceDeviceId: managedSourceDeviceId,
+            sourceProfileId: managedSourceProfileId,
+            sourcePublicKeyId: managedSourcePublicKeyId,
+            sourcePublicKeyJwk: Object.keys(managedSourcePublicKeyJwk).length > 0 ? managedSourcePublicKeyJwk : {},
+            keyVersion: managedSourceKeyVersion || 0
         };
 
         if (linkType === 'managed_link') {
@@ -9159,6 +9215,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             localRole,
             remoteRole,
             linkType,
+            sourceDeviceId: managedSourceDeviceId,
+            sourceProfileId: managedSourceProfileId,
+            sourcePublicKeyId: managedSourcePublicKeyId,
+            sourcePublicKeyJwk: Object.keys(managedSourcePublicKeyJwk).length > 0 ? managedSourcePublicKeyJwk : {},
+            keyVersion: managedSourceKeyVersion || 0,
             policy
         });
         UIComponents.showToast(linkType === 'managed_link' ? 'Managed link saved' : 'Trusted peer saved', 'success');

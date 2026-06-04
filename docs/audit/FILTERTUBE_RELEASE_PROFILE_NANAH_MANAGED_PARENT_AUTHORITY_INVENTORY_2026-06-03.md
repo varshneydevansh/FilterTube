@@ -4,13 +4,15 @@
 **Status**: Runtime route-gate, local managed-save revision/history, protected
 failed-unlock history, protected history access, time-limit enforcement, and
 receive-side managed-policy validation/history proofs updated, with encrypted
-mailbox protocol proof specified. Runtime behavior changed for protected child Main/Kids denial, accepted same-device
+mailbox protocol proof specified and managed pairing public-key descriptor
+persistence added. Runtime behavior changed for protected child Main/Kids denial, accepted same-device
 parent-managed child saves, protected parent unlock-failure evidence,
 parent/account history viewing, accepted-row history clearing, dashboard and
 background admin-session expiry, sensitive managed-action re-auth, in-memory
 managed/admin failed-attempt rate limiting, child time-budget enforcement,
 managed-envelope validation/classification, and managed-policy receive/apply
-evidence. Live remote transport key-verifier plumbing remains pending.
+evidence. Managed keypair generation, outgoing signing, and live remote
+transport remain pending.
 **Goal slice**: Implementation order item 1 plus first runtime viewing-space
 enforcement slice.
 **Lane proof**: `test:settings` for profile/Nanah authority and `test:release`
@@ -23,17 +25,19 @@ This inventory records the current parent, child, PIN, profile, Nanah, import,
 viewing-space, history, and time-limit authority paths while the
 managed-control system is being built. It now includes extension runtime
 viewing-space denial, local protected history access, active child time-budget
-enforcement from local profile settings, and receive-side managed-policy
-validation history.
+enforcement from local profile settings, receive-side managed-policy
+validation history, and managed pairing public-key descriptor persistence.
 
 This document still does not approve remote policy writes by itself. The first
 managed-envelope validator, validated apply wrapper, receive-side
 validation/apply history writer, and accepted-revision state writer now exist,
 and the validator requires signature-verification evidence. Dashboard
 WebCrypto verifier plumbing now exists when a trusted link carries source
-public-key material. Pairing-time key storage, encrypted/local-network
-delivery runtime, failed-attempt durability, and remote admin session semantics
-remain separate required slices.
+public-key material. Pairing-time public-key descriptor persistence now exists
+when descriptor material is already provisioned. Managed keypair generation,
+outgoing signing, encrypted/local-network delivery runtime, failed-attempt
+durability, and remote admin session semantics remain separate required
+slices.
 
 ## Issue 60 Local-Network Caregiver Addendum
 
@@ -83,6 +87,7 @@ docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md
 | Managed policy action-history model | `docs/audit/FILTERTUBE_MANAGED_POLICY_ACTION_HISTORY_MODEL_2026-06-03.md` |
 | Local-network discovery authority boundary | `docs/audit/FILTERTUBE_LOCAL_NETWORK_DISCOVERY_AUTHORITY_BOUNDARY_2026-06-03.md` |
 | Managed policy encrypted mailbox protocol | `docs/audit/FILTERTUBE_MANAGED_POLICY_ENCRYPTED_MAILBOX_PROTOCOL_2026-06-04.md` |
+| Managed pairing public-key descriptor | `docs/audit/FILTERTUBE_NANAH_MANAGED_PAIRING_KEY_DESCRIPTOR_2026-06-04.md` |
 
 ## Current Authority Map
 
@@ -257,10 +262,11 @@ Current gap:
   parent-child binding before writing.
 - Persisted stale/replay authority state exists for accepted managed policies,
   but only inside the target profile's managed policy state.
-- The signature verifier gate and adapter verifier helper exist, but pairing
-  does not yet persist source public-key material for managed links; the receive
-  path therefore rejects otherwise well-shaped managed envelopes without stored
-  key material rather than treating them as valid.
+- The signature verifier gate and adapter verifier helper exist. Pairing can
+  now persist source public-key descriptor material when the connected source
+  advertises it, but managed keypair generation and outgoing envelope signing
+  remain pending; without stored key material, the receive path still rejects
+  otherwise well-shaped managed envelopes rather than treating them as valid.
 - The adapter's validated apply wrapper still depends on higher layers for
   canonical hash recomputation, key lookup, local-network pull scheduling,
   encrypted mailbox runtime delivery, and remote admin session semantics.
@@ -308,7 +314,8 @@ Current gap:
 - Persisted stale/replay authority state now exists for accepted managed
   policies on the target profile.
 - There is now a signature verifier gate plus adapter WebCrypto verifier
-  helper, but Nanah pairing still does not persist trusted source public keys.
+  helper, and Nanah pairing can persist trusted source public-key descriptors
+  when the source advertises them.
 - Trust revocation does not yet purge queued updates or invalidate an accepted
   policy revision. The encrypted mailbox protocol now specifies revoked queued
   delivery behavior, but no runtime queue exists yet.
@@ -387,7 +394,7 @@ Current gap:
 |---|---|---|
 | Validated managed policy apply wrapper | Remote apply can now persist a durable accepted-revision object for a fixed child target, but only when a caller supplies accepted validation context. | Key-store/WebCrypto verifier plumbing and live Nanah/local-network receive tests before automatic remote apply. |
 | Target-local remote revision store | Stale or replayed remote updates can now be rejected per target profile/link/scope after the first accepted write, but there is no mailbox or multi-device conflict-resolution layer yet. | Multi-parent, revoked-link, equal-revision/different-hash, and mailbox-delivery fixtures. |
-| Pairing key material not stored | The helper now requires verifier evidence and adapter WebCrypto verification is wired, but Nanah pairing does not yet persist source public keys, so remote managed envelopes without `sourcePublicKeyJwk` fail closed before apply. | Pairing-time key-store write plus signed/authenticated envelope tests. |
+| Pairing public-key descriptor stored, signing pending | The helper now requires verifier evidence, adapter WebCrypto verification is wired, and Nanah pairing can persist advertised source public-key descriptors. It still does not generate managed keypairs, store private signing keys, or sign outgoing managed envelopes. | Keypair generation, rotation/revocation, and signed/authenticated live-envelope tests. |
 | Partial canonical payload/integrity binding | The helper checks binding fields and verifier result, but no canonical payload hash recomputation exists yet. | Binding-tuple fixtures plus canonical payload hash proof. |
 | Signed remote Main/Kids policy gate is not live | Local child route denial works and accepted managed envelopes can write viewing-space policy, but pairing key storage and live transport are still not wired. | Signed route-policy fixtures through live Nanah/local-network receive. |
 | Remote time-limit policy apply is wrapper-only | Local child time-budget enforcement exists and accepted managed envelopes can write runtime-compatible time-limit policy, but live parent-device delivery is not wired. | Signed remote time-limit fixtures through Nanah/local-network receive. |
@@ -432,8 +439,8 @@ Before adding parent-managed runtime behavior:
 13. Keep action-history access and accepted-row clearing behind parent/account
     authority, then add encryption and failed-attempt retention proof.
 14. Keep mailbox delivery ciphertext-only and reuse validated managed-policy
-    apply; do not add a mailbox runtime path until trusted key persistence and
-    live signed-envelope tests exist.
+    apply; do not add a mailbox runtime path until managed key generation,
+    trusted descriptor persistence, and live signed-envelope tests exist.
 
 ## Verification
 

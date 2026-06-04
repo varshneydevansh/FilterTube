@@ -6,7 +6,9 @@
 Nanah receive-side managed-policy validation/apply-history slice, validated
 managed-policy apply wrapper, adapter WebCrypto verifier helper, runtime
 viewing-space/time-budget enforcement, and encrypted mailbox protocol proof.
-Live remote/local-network transport and pairing-time key storage remain gated.
+Managed pairing public-key descriptor persistence is now present when a key
+descriptor is already provisioned. Live remote/local-network transport,
+managed keypair generation, and outgoing signing remain gated.
 **Primary audit input**:
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
 
@@ -324,8 +326,10 @@ replica child device over Nanah/P2P or same-network transport.
   protected validation history, invokes
   `applyManagedPolicyEnvelope(...)` for accepted envelopes, persists accepted
   revision/hash state on the target child profile, and records
-  accepted/rejected apply history. Pairing-time public-key storage and
-  local-network/P2P delivery remain pending.
+  accepted/rejected apply history. Pairing-time public-key descriptor
+  persistence now exists when a descriptor is already provisioned, while
+  managed keypair generation, outgoing signing, and local-network/P2P delivery
+  remain pending.
 - **Acceptance Criteria**:
   - Existing `app_sync` and `control_proposal` behavior remains compatible.
   - New managed policy applies only to target profile and target surface.
@@ -357,6 +361,33 @@ replica child device over Nanah/P2P or same-network transport.
   - Hostile-LAN scenarios are named with fixture ids.
 - **Validation**:
   - `git diff --check`
+
+### Task 3.4: Persist managed pairing public-key descriptors
+
+- **Location**:
+  - `js/nanah_sync_adapter.js`
+  - `js/tab-view.js`
+  - `docs/audit/FILTERTUBE_NANAH_MANAGED_PAIRING_KEY_DESCRIPTOR_2026-06-04.md`
+  - `tests/runtime/managed-nanah-pairing-key-descriptor-current-behavior.test.mjs`
+- **Description**: Preserve source public-key descriptors across managed Nanah
+  pairing so a trusted replica can later verify signed parent/caregiver policy
+  envelopes against trusted-link key material.
+- **Complexity**: 5/10
+- **Dependencies**: Task 3.2.
+- **Status**: Runtime descriptor plumbing is present. Dashboard Nanah startup
+  reads `ftNanahManagedSigningPublicKey`, device descriptors advertise
+  `managedPublicKey*` and `sourcePublicKey*` aliases when the descriptor is
+  already present, and managed trusted links save source device/profile/key
+  bindings. This does not generate keys, store private keys, sign outgoing
+  envelopes, or enable mailbox runtime delivery.
+- **Acceptance Criteria**:
+  - Pairing descriptors never grant authority without managed-link validation.
+  - Missing key descriptors keep the fail-closed receive path.
+  - Trusted links store JSON-safe source key fields without `undefined` values.
+  - Docs do not overclaim automatic remote policy writes.
+- **Validation**:
+  - `node --test tests/runtime/managed-nanah-pairing-key-descriptor-current-behavior.test.mjs`
+  - `npm run test:settings`
 
 ## Sprint 4: Protected User Experience
 

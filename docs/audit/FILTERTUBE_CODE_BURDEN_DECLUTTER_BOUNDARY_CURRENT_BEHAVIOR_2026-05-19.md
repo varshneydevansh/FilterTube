@@ -193,7 +193,7 @@ Large product-owned source files:
 | File | Current lines | Boundary |
 | --- | ---: | --- |
 | `js/content_bridge.js` | 13636 | Giant cross-context hub. Any growth needs source-owner proof and focused runtime fixtures. |
-| `js/tab-view.js` | 12520 | Dashboard/settings UI surface. Current growth is owned by the managed Nanah policy receive/history slice; any further growth needs UI/state owner proof and release smoke. |
+| `js/tab-view.js` | 12581 | Dashboard/settings UI surface. Current growth is owned by the managed Nanah key-descriptor persistence slice; any further growth needs UI/state owner proof and release smoke. |
 | `js/background.js` | 6711 | Background storage/message/profile authority. Any growth needs mutation and settings proof. |
 | `js/content/dom_fallback.js` | 5030 | DOM fallback selector/hide/restore authority. Any growth needs DOM/no-work proof. |
 | `js/filter_logic.js` | 3652 | JSON renderer rule and decision engine. Any growth needs rule/path proof. |
@@ -204,7 +204,7 @@ Large product-owned source files:
 | `js/popup.js` | 1841 | Popup settings/action UI. Any growth needs settings UI proof and popup smoke. |
 | `js/render_engine.js` | 1389 | Dashboard renderer helper. Any growth needs release UI proof. |
 | `js/settings_shared.js` | 1181 | Canonical settings compiler and migration surface. Any growth needs mode/list proof. |
-| `js/nanah_sync_adapter.js` | 1154 | Nanah portable payload, managed-policy apply surface, and WebCrypto verifier helper. Current growth is owned by the validated managed-policy signature/apply slice; follow-up should extract managed-policy helpers behind the same validation tests before broadening transport. |
+| `js/nanah_sync_adapter.js` | 1166 | Nanah portable payload, managed-policy apply surface, WebCrypto verifier helper, and managed public-key descriptor advertisement. Current growth is owned by the managed Nanah key-descriptor persistence slice; follow-up should extract managed-policy helpers behind the same validation tests before broadening transport. |
 | `js/content/dom_extractors.js` | 1137 | DOM identity extraction surface. Any growth needs identity false-hide/leak proof. |
 | `js/seed.js` | 1136 | Transport interception and JSON active-work gate. Any growth needs JSON/no-work proof. |
 | `js/content/bridge_settings.js` | 1113 | Content-script settings relay and managed time-limit runtime. Any growth needs settings, route, and no-work proof. |
