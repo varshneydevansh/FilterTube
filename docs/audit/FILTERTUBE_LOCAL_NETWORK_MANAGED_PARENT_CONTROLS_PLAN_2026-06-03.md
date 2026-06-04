@@ -349,10 +349,10 @@ replica child device over Nanah/P2P or same-network transport.
   revision/hash state on the target child profile, and records
   accepted/rejected apply history. Trusted-link removal cleanup: present for
   target-local accepted managed-policy revision state and matching open-sync
-  status rows. Pairing-time public-key descriptor persistence and source-side
-  signing keypair provisioning now exist, while canonical outbound policy
-  hashing, server mailbox queue purge, and local-network/P2P delivery remain
-  pending.
+  status rows. Pairing-time public-key descriptor persistence, source-side
+  signing keypair provisioning, canonical outbound payload hashing, and
+  receive-side canonical payload-hash recomputation now exist, while server
+  mailbox queue purge and local-network/P2P delivery remain pending.
 - **Acceptance Criteria**:
   - Existing `app_sync` and `control_proposal` behavior remains compatible.
   - New managed policy applies only to target profile and target surface.

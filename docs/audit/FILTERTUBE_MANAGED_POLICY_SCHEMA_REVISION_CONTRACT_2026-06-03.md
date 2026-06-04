@@ -4,9 +4,10 @@
 **Status**: Runtime validation helper, receive-side validation context, and
 adapter WebCrypto verifier plumbing are present. A validated managed apply
 wrapper now persists accepted-revision state and scoped child policy writes
-after the envelope validator accepts the update. Pairing-time trusted key
-material is still required before live Nanah managed envelopes can pass the
-verifier gate automatically.
+after the envelope validator accepts the update. The validator now recomputes
+the canonical payload hash before trust/revision acceptance. Pairing-time
+trusted key material is still required before live Nanah managed envelopes can
+pass the verifier gate automatically.
 **Goal slice**: Implementation order item 3, "Add managed policy schema,
 device-binding, signature, and revision tests".  
 **Primary input**:
@@ -40,7 +41,7 @@ Required top-level fields:
 | `sourceProfileId` | Parent/caregiver profile issuing the policy. | Missing, child profile, sibling profile, or profile not bound to target. |
 | `sourceDeviceId` | Trusted source device identity. | Missing, wrong device, duplicate LAN device id, or untrusted device. |
 | `revision` | Monotonic policy revision for the target/link/scope. | Missing, non-integer, stale, or equal revision with different policy hash. |
-| `policyHash` | Hash of canonical policy payload. | Missing or mismatched for equal-revision idempotency. |
+| `policyHash` | Hash of canonical policy payload. | Missing, mismatched against the canonical payload, or mismatched for equal-revision idempotency. |
 | `sourcePublicKeyId` | Public-key identity bound to pairing. | Missing or not bound to the trusted link. |
 | `keyVersion` | Pairing key version. | Missing, stale, wrong, or revoked. |
 | `integrity` | Signature or equivalent authenticated proof over the binding tuple below. | Missing algorithm/signature, missing signed binding fields, binding mismatch, missing verifier, or verifier rejection. |
@@ -87,6 +88,23 @@ same binding rejection: even a valid-looking signature is rejected if any signed
 field points at a different link, scope, target profile, source device,
 revision, policy hash, or payload family than the envelope being applied.
 
+After the binding tuple passes, the runtime recomputes the canonical
+`remote-managed-policy` payload hash from:
+
+```text
+linkId
+scope
+targetProfileId
+sourceProfileId
+sourceDeviceId
+payload
+```
+
+The envelope fails closed with `policy_hash_mismatch` when `policyHash` does not
+match that canonical hash. That check runs before trusted-link, signature, or
+revision acceptance, so a transport cannot mutate payload content while keeping
+the old hash.
+
 ## Payload Scope Guard
 
 The envelope scope and payload family must agree before any low-level profile
@@ -131,6 +149,10 @@ Managed policy acceptance requires all of these to be true:
 | `valid_reduced_time_budget_from_parent` | `7/hash-time-7` | `6/hash-time-6` | Accept when signed by trusted parent authority. |
 | `reject_mailbox_after_revocation` | `8/hash-mailbox-8` | link revoked | Reject before low-level profile apply. |
 
+The symbolic hashes above represent canonical hashes in the executable
+fixtures; non-canonical dummy hashes are accepted only in fixtures whose
+expected result is `policy_hash_mismatch`.
+
 Offline protected-device behavior:
 
 - The last accepted policy remains active while the parent/caregiver device is
@@ -155,6 +177,7 @@ The paired runtime test must reject:
 - invalid signature verifier result
 - signed scope, target, source device, revision, policy hash, or payload family
   mismatch
+- canonical payload hash mismatch
 - payload family not scoped to envelope scope
 - malformed time-limit or viewing-space payload
 - child source profile attempting admin authority
@@ -178,10 +201,11 @@ pairing-time key material and transport plumbing:
 runtime filtertube_managed_policy envelope support: validation helper plus validated apply wrapper present in js/nanah_sync_adapter.js
 runtime filtertube_managed_policy receive path: parses envelope, builds validation context, applies only accepted envelopes, records protected evidence
 runtime managed policy persistent accepted-revision writer: present under target profile managedPolicyState.remoteManagedPolicies
+runtime managed policy canonical payload hash recomputation: present; mismatches fail closed with policy_hash_mismatch before trust/revision acceptance
 runtime managed policy signature verifier gate: present in js/nanah_sync_adapter.js
 runtime Nanah adapter key-verification context: WebCrypto Ed25519 helper present; dashboard receive path passes result; missing sourcePublicKeyJwk fails closed before apply
 runtime remote profile write from filtertube_managed_policy: enabled only through applyManagedPolicyEnvelope after validation context accepts
-runtime behavior changed by this contract: envelope validation, signature-verifier gate, adapter verifier helper, dashboard receive-side validation/apply evidence, accepted revision persistence, scoped child policy apply, and legacy-path rejection
+runtime behavior changed by this contract: envelope validation, canonical payload hash recomputation, signature-verifier gate, adapter verifier helper, dashboard receive-side validation/apply evidence, accepted revision persistence, scoped child policy apply, and legacy-path rejection
 ```
 
 Future implementation may extend the live Nanah/local-network/mailbox transport

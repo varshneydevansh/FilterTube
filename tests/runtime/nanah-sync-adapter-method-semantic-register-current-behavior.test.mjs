@@ -51,8 +51,14 @@ function groupForMethod(name) {
   }
   if ([
     'stableManagedNanahJson',
+    'buildManagedPolicyHash',
+    'buildManagedPolicyPayloadHash',
     'decodeManagedNanahBase64Url',
+    'encodeManagedNanahBase64Url',
     'getManagedNanahSourcePublicKeyJwk',
+    'buildManagedPolicySignedFields',
+    'createManagedNanahSigningKeyPair',
+    'signManagedPolicyEnvelope',
     'verifyManagedNanahPolicyIntegritySignature'
   ].includes(name)) {
     return 'nanahManagedPolicyIntegrityVerifier';
@@ -65,7 +71,11 @@ function groupForMethod(name) {
     'validateManagedIntegrityBinding',
     'managedPolicyProfileMap',
     'getAcceptedManagedPolicyState',
-    'validateManagedPolicyEnvelope'
+    'normalizeMailboxTimestampMs',
+    'validateManagedPolicyEnvelope',
+    'getManagedMailboxEnvelope',
+    'validateManagedMailboxBinding',
+    'validateManagedMailboxItem'
   ].includes(name)) {
     return 'nanahManagedPolicyEnvelopeValidation';
   }
@@ -87,7 +97,8 @@ function groupForMethod(name) {
     'applyManagedTimeLimitPolicy',
     'applyManagedPolicyPayloadToProfile',
     'withAcceptedManagedPolicyState',
-    'applyManagedPolicyEnvelope'
+    'applyManagedPolicyEnvelope',
+    'applyManagedMailboxItem'
   ].includes(name)) {
     return 'nanahManagedPolicyEnvelopeApply';
   }
@@ -189,13 +200,13 @@ test('Nanah sync adapter method semantic register is audit-only and scoped to cu
   assert.match(text, /Status: runtime managed-policy validation, adapter signature verification, and\s+validated apply boundary present/);
   assert.match(text, /Runtime behavior changed for\s+validated managed envelope apply support/);
   assert.match(text, /source file: js\/nanah_sync_adapter\.js/);
-  assert.match(text, /line count: 1154/);
-  assert.equal(sourceLineCount(), 1154);
-  assert.match(text, /named declarations: 58/);
-  assert.match(text, /plain function declarations: 49/);
-  assert.match(text, /async function declarations: 9/);
+  assert.match(text, /line count: 1419/);
+  assert.equal(sourceLineCount(), 1419);
+  assert.match(text, /named declarations: 69/);
+  assert.match(text, /plain function declarations: 57/);
+  assert.match(text, /async function declarations: 12/);
   assert.match(text, /const arrow helper declarations: 0/);
-  assert.match(text, /public FilterTubeNanahAdapter entries: 13/);
+  assert.match(text, /public FilterTubeNanahAdapter entries: 18/);
   assert.match(text, /semantic method groups: 8/);
   assert.match(text, /runtime behavior changed: validated managed envelope apply support/);
   assert.match(text, /not completion proof for live transport key distribution/);
@@ -204,19 +215,19 @@ test('Nanah sync adapter method semantic register is audit-only and scoped to cu
 test('Nanah sync adapter register accounts for every current named declaration', () => {
   const rows = methodRows();
 
-  assert.equal(rows.length, 58);
+  assert.equal(rows.length, 69);
   assert.deepEqual(countBy(rows, 'kind'), {
-    'async function': 9,
-    function: 49
+    'async function': 12,
+    function: 57
   });
   assert.deepEqual(countBy(rows, 'group'), {
     nanahAdapterRuntimeAndDescriptor: 3,
     nanahDefensiveNormalizationAndMerge: 17,
     nanahEnvelopeBuildAndSummary: 4,
     nanahIncomingEnvelopeApply: 2,
-    nanahManagedPolicyEnvelopeApply: 18,
-    nanahManagedPolicyEnvelopeValidation: 8,
-    nanahManagedPolicyIntegrityVerifier: 4,
+    nanahManagedPolicyEnvelopeApply: 19,
+    nanahManagedPolicyEnvelopeValidation: 12,
+    nanahManagedPolicyIntegrityVerifier: 10,
     nanahScopedPortableProfileTransfer: 2
   });
 
@@ -245,8 +256,13 @@ test('Nanah sync adapter register preserves every source row and public API entr
     'buildSyncEnvelope',
     'buildControlProposal',
     'validateManagedPolicyEnvelope',
+    'validateManagedMailboxItem',
+    'buildManagedPolicyPayloadHash',
     'verifyManagedNanahPolicyIntegritySignature',
+    'createManagedNanahSigningKeyPair',
+    'signManagedPolicyEnvelope',
     'applyManagedPolicyEnvelope',
+    'applyManagedMailboxItem',
     'applyIncomingEnvelope',
     'extractPortableFromEnvelope'
   ]) {
@@ -259,13 +275,13 @@ test('Nanah sync adapter register pins import export envelope and no-DOM surface
   const text = doc();
 
   assert.equal(countLiteral(source, 'new Map('), 4);
-  assert.equal(countLiteral(source, 'safeArray('), 35);
-  assert.equal(countLiteral(source, 'safeObject('), 82);
-  assert.equal(countLiteral(source, 'normalizeString('), 75);
+  assert.equal(countLiteral(source, 'safeArray('), 37);
+  assert.equal(countLiteral(source, 'safeObject('), 95);
+  assert.equal(countLiteral(source, 'normalizeString('), 88);
   assert.equal(countLiteral(source, 'normalizeScope('), 6);
-  assert.equal(countLiteral(source, 'JSON.stringify('), 5);
+  assert.equal(countLiteral(source, 'JSON.stringify('), 6);
   assert.equal(countLiteral(source, 'JSON.parse('), 3);
-  assert.equal(countLiteral(source, 'throw new Error('), 14);
+  assert.equal(countLiteral(source, 'throw new Error('), 19);
   assert.equal(countLiteral(source, 'await io.loadProfilesV4'), 3);
   assert.equal(countLiteral(source, 'await io.saveProfilesV4'), 2);
   assert.equal(countLiteral(source, 'await io.exportV3'), 1);
@@ -273,7 +289,7 @@ test('Nanah sync adapter register pins import export envelope and no-DOM surface
   assert.equal(countLiteral(source, 'global.FilterTubeIO'), 1);
   assert.equal(countLiteral(source, 'global.FilterTubeNanahAdapter'), 1);
   assert.equal(countLiteral(source, 'global.crypto.randomUUID'), 2);
-  assert.equal(countLiteral(source, 'Date.now('), 3);
+  assert.equal(countLiteral(source, 'Date.now('), 5);
   assert.equal(countLiteral(source, 'Math.random('), 1);
   assert.equal(countLiteral(source, 'global.navigator'), 4);
   assert.equal(countLiteral(source, 'DEFAULT_DEVICE_CAPABILITIES'), 2);
@@ -290,13 +306,13 @@ test('Nanah sync adapter register pins import export envelope and no-DOM surface
 
   for (const token of [
     'new Map calls: 4',
-    'safeArray references: 35',
-    'safeObject references: 82',
-    'normalizeString references: 75',
+    'safeArray references: 37',
+    'safeObject references: 95',
+    'normalizeString references: 88',
     'normalizeScope references: 6',
-    'JSON.stringify calls: 5',
+    'JSON.stringify calls: 6',
     'JSON.parse calls: 3',
-    'throw new Error statements: 14',
+    'throw new Error statements: 19',
     'await io.loadProfilesV4 calls: 3',
     'await io.saveProfilesV4 calls: 2',
     'await io.exportV3 calls: 1',
@@ -304,7 +320,7 @@ test('Nanah sync adapter register pins import export envelope and no-DOM surface
     'global.FilterTubeIO references: 1',
     'global.FilterTubeNanahAdapter assignments: 1',
     'global.crypto.randomUUID references: 2',
-    'Date.now calls: 3',
+    'Date.now calls: 5',
     'Math.random calls: 1',
     'global.navigator references: 4',
     'DEFAULT_DEVICE_CAPABILITIES references: 2',
@@ -351,7 +367,6 @@ test('Nanah sync adapter source still proves current payload and apply boundarie
     sourceProfileId: 'parent-profile-1',
     sourceDeviceId: 'parent-device-1',
     revision: 5,
-    policyHash: 'hash-keyword-5',
     sourcePublicKeyId: 'parent-key-3',
     keyVersion: 3,
     payload: {
@@ -359,6 +374,7 @@ test('Nanah sync adapter source still proves current payload and apply boundarie
       operations: [{ op: 'add_keyword', valueHash: 'sha256:redacted' }]
     }
   };
+  managedEnvelope.policyHash = adapter.buildManagedPolicyPayloadHash(managedEnvelope);
   managedEnvelope.integrity = {
     algorithm: 'ed25519',
     signature: 'signature-keyword-5',
@@ -391,7 +407,7 @@ test('Nanah sync adapter source still proves current payload and apply boundarie
     },
     accepted: {
       revision: 4,
-      policyHash: 'hash-keyword-4'
+      policyHash: managedEnvelope.policyHash
     },
     verifyIntegritySignature: () => true
   });

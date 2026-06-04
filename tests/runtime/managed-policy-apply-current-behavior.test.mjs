@@ -15,6 +15,40 @@ function plain(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
+function safeObject(value) {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+}
+
+function stablePolicyJson(value) {
+  if (Array.isArray(value)) {
+    return `[${value.map(stablePolicyJson).join(',')}]`;
+  }
+  if (value && typeof value === 'object') {
+    return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stablePolicyJson(value[key])}`).join(',')}}`;
+  }
+  return JSON.stringify(value);
+}
+
+function buildLocalPolicyHash(prefix, seed) {
+  const source = JSON.stringify(seed);
+  let hash = 0;
+  for (let index = 0; index < source.length; index += 1) {
+    hash = ((hash << 5) - hash + source.charCodeAt(index)) | 0;
+  }
+  return `${prefix}-${Math.abs(hash).toString(16)}`;
+}
+
+function canonicalPolicyHashForEnvelope(envelope) {
+  return buildLocalPolicyHash('remote-managed-policy', stablePolicyJson({
+    linkId: String(envelope.linkId || '').trim(),
+    scope: String(envelope.scope || '').trim().toLowerCase(),
+    targetProfileId: String(envelope.targetProfileId || '').trim(),
+    sourceProfileId: String(envelope.sourceProfileId || '').trim(),
+    sourceDeviceId: String(envelope.sourceDeviceId || '').trim(),
+    payload: safeObject(envelope.payload)
+  }));
+}
+
 function createProfilesFixture() {
   return {
     schemaVersion: 4,
@@ -90,6 +124,7 @@ function createAdapterHarness(initialProfiles = createProfilesFixture()) {
 }
 
 function signedEnvelope(overrides = {}) {
+  const hasPolicyHashOverride = Object.prototype.hasOwnProperty.call(overrides, 'policyHash');
   const envelope = {
     type: 'filtertube_managed_policy',
     linkId: 'link-parent-child-1',
@@ -98,7 +133,6 @@ function signedEnvelope(overrides = {}) {
     sourceProfileId: 'parent-profile-1',
     sourceDeviceId: 'parent-device-1',
     revision: 5,
-    policyHash: 'hash-keywords-5',
     sourcePublicKeyId: 'parent-key-3',
     keyVersion: 3,
     payload: {
@@ -108,6 +142,9 @@ function signedEnvelope(overrides = {}) {
     },
     ...overrides
   };
+  if (!hasPolicyHashOverride) {
+    envelope.policyHash = canonicalPolicyHashForEnvelope(envelope);
+  }
   envelope.integrity = overrides.integrity || {
     algorithm: 'ed25519',
     signature: `signature-${envelope.scope}-${envelope.revision}`,
@@ -156,10 +193,11 @@ test('managed policy apply refuses to write without validation context', async (
 
 test('managed policy apply writes keyword policy only to fixed child profile and persists revision state', async () => {
   const harness = createAdapterHarness();
+  const envelope = signedEnvelope();
   const result = await harness.adapter.applyManagedPolicyEnvelope(
-    signedEnvelope(),
+    envelope,
     validationContext(harness.profiles, {
-      accepted: { revision: 4, policyHash: 'hash-keywords-4' }
+      accepted: { revision: 4, policyHash: envelope.policyHash }
     })
   );
 
@@ -170,7 +208,7 @@ test('managed policy apply writes keyword policy only to fixed child profile and
     scope: 'keywords',
     profileId: 'child-profile-1',
     revision: 5,
-    policyHash: 'hash-keywords-5',
+    policyHash: envelope.policyHash,
     applied: true
   });
   assert.equal(harness.saveCount, 1);
@@ -194,11 +232,10 @@ test('managed policy apply blocks stale replay after accepted revision has been 
 
   const replay = await harness.adapter.applyManagedPolicyEnvelope(
     signedEnvelope({
-      revision: 4,
-      policyHash: 'hash-keywords-4'
+      revision: 4
     }),
     validationContext(harness.profiles, {
-      accepted: { revision: 5, policyHash: 'hash-keywords-5' }
+      accepted: { revision: 5, policyHash: signedEnvelope().policyHash }
     })
   );
 
@@ -212,7 +249,6 @@ test('managed policy apply supports channel and video blocking on child kids sur
     signedEnvelope({
       scope: 'channels',
       revision: 6,
-      policyHash: 'hash-channels-6',
       payload: {
         scope: 'channels',
         surface: 'kids',
@@ -225,7 +261,6 @@ test('managed policy apply supports channel and video blocking on child kids sur
     signedEnvelope({
       scope: 'videos',
       revision: 7,
-      policyHash: 'hash-videos-7',
       payload: {
         scope: 'videos',
         surface: 'kids',
@@ -248,7 +283,6 @@ test('managed policy apply supports viewing-space and time-limit child policy up
     signedEnvelope({
       scope: 'viewing_space',
       revision: 8,
-      policyHash: 'hash-viewing-8',
       payload: {
         scope: 'viewing_space',
         allowMain: false,
@@ -258,16 +292,16 @@ test('managed policy apply supports viewing-space and time-limit child policy up
     }),
     validationContext(harness.profiles)
   );
-  await harness.adapter.applyManagedPolicyEnvelope(
-    signedEnvelope({
+  const timeLimitEnvelope = signedEnvelope({
+    scope: 'time_limits',
+    revision: 9,
+    payload: {
       scope: 'time_limits',
-      revision: 9,
-      policyHash: 'hash-time-9',
-      payload: {
-        scope: 'time_limits',
-        dailyBudgetMinutes: 120
-      }
-    }),
+      dailyBudgetMinutes: 120
+    }
+  });
+  await harness.adapter.applyManagedPolicyEnvelope(
+    timeLimitEnvelope,
     validationContext(harness.profiles)
   );
 
@@ -296,7 +330,7 @@ test('managed policy apply supports viewing-space and time-limit child policy up
       reason: ''
     },
     policyRevision: 9,
-    policyHash: 'hash-time-9',
+    policyHash: timeLimitEnvelope.policyHash,
     issuedAt: 1779300000000,
     validFrom: 1779300000000,
     validUntil: null
@@ -307,7 +341,6 @@ test('managed policy apply supports viewing-space and time-limit child policy up
       signedEnvelope({
         scope: 'viewing_space',
         revision: 10,
-        policyHash: 'hash-viewing-10',
         payload: {
           scope: 'viewing_space',
           allowMain: false,

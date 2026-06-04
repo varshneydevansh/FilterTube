@@ -117,7 +117,6 @@ test('Nanah adapter signs canonical managed-policy fields and strips private key
     sourceProfileId: 'parent-profile-1',
     sourceDeviceId: 'parent-device-1',
     revision: 4,
-    policyHash: 'sha256:test',
     sourcePublicKeyId: 'parent-key-1',
     keyVersion: 2,
     payload: {
@@ -133,6 +132,7 @@ test('Nanah adapter signs canonical managed-policy fields and strips private key
       d: 'private-d'
     }
   };
+  envelope.policyHash = adapter.buildManagedPolicyPayloadHash(envelope);
 
   const signed = await adapter.signManagedPolicyEnvelope(envelope);
 
@@ -144,7 +144,7 @@ test('Nanah adapter signs canonical managed-policy fields and strips private key
     targetProfileId: 'child-profile-1',
     sourceDeviceId: 'parent-device-1',
     revision: 4,
-    policyHash: 'sha256:test',
+    policyHash: envelope.policyHash,
     payloadScope: 'keywords'
   });
   assert.equal(signed.integrity.signature, 'AQID');

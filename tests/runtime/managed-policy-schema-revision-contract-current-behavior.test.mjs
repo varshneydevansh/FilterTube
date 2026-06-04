@@ -35,7 +35,7 @@ function baseContext(overrides = {}) {
     },
     accepted: {
       revision: 4,
-      policyHash: 'hash-keyword-4'
+      policyHash: canonicalKeywordPolicyHash()
     },
     duplicateDeviceIds: [],
     verifyIntegritySignature({ envelope, integrity, signedFields, payloadScope, trustedLink }) {
@@ -58,7 +58,6 @@ function baseEnvelope(overrides = {}) {
     sourceProfileId: 'parent-profile-1',
     sourceDeviceId: 'parent-device-1',
     revision: 5,
-    policyHash: 'hash-keyword-5',
     sourcePublicKeyId: 'parent-key-3',
     keyVersion: 3,
     issuedAt: '2026-06-03T10:00:00.000Z',
@@ -68,6 +67,9 @@ function baseEnvelope(overrides = {}) {
     },
     ...overrides
   };
+  if (!Object.prototype.hasOwnProperty.call(overrides, 'policyHash')) {
+    envelope.policyHash = canonicalPolicyHashForEnvelope(envelope);
+  }
   envelope.integrity = hasIntegrityOverride ? overrides.integrity : {
     algorithm: 'ed25519',
     signature: `signature-${envelope.scope}-${envelope.revision}`,
@@ -90,6 +92,51 @@ function validationResult(reason, extra = {}) {
 
 function safeObject(value) {
   return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+}
+
+function stablePolicyJson(value) {
+  if (Array.isArray(value)) {
+    return `[${value.map(stablePolicyJson).join(',')}]`;
+  }
+  if (value && typeof value === 'object') {
+    return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stablePolicyJson(value[key])}`).join(',')}}`;
+  }
+  return JSON.stringify(value);
+}
+
+function buildLocalPolicyHash(prefix, seed) {
+  const source = JSON.stringify(seed);
+  let hash = 0;
+  for (let index = 0; index < source.length; index += 1) {
+    hash = ((hash << 5) - hash + source.charCodeAt(index)) | 0;
+  }
+  return `${prefix}-${Math.abs(hash).toString(16)}`;
+}
+
+function canonicalPolicyHashForEnvelope(envelope) {
+  return buildLocalPolicyHash('remote-managed-policy', stablePolicyJson({
+    linkId: String(envelope.linkId || '').trim(),
+    scope: String(envelope.scope || '').trim().toLowerCase(),
+    targetProfileId: String(envelope.targetProfileId || '').trim(),
+    sourceProfileId: String(envelope.sourceProfileId || '').trim(),
+    sourceDeviceId: String(envelope.sourceDeviceId || '').trim(),
+    payload: safeObject(envelope.payload)
+  }));
+}
+
+function canonicalKeywordPolicyHash(overrides = {}) {
+  return canonicalPolicyHashForEnvelope({
+    linkId: 'link-parent-child-1',
+    scope: 'keywords',
+    targetProfileId: 'child-profile-1',
+    sourceProfileId: 'parent-profile-1',
+    sourceDeviceId: 'parent-device-1',
+    payload: {
+      scope: 'keywords',
+      operations: [{ op: 'add_keyword', value: 'spiders' }]
+    },
+    ...overrides
+  });
 }
 
 function getPayloadScopeFamily(payload) {
@@ -161,6 +208,9 @@ function validateManagedPolicyEnvelope(envelope, context = baseContext()) {
   if (payloadDecision) return payloadDecision;
   const integrityDecision = validateIntegrityBinding(envelope);
   if (integrityDecision) return integrityDecision;
+  if (envelope.policyHash !== canonicalPolicyHashForEnvelope(envelope)) {
+    return validationResult('policy_hash_mismatch');
+  }
   if (link.type !== 'managed_link') return validationResult('link_not_managed');
   if (link.localRole !== 'replica' || link.remoteRole !== 'source') return validationResult('wrong_link_roles');
   if (link.revoked) return validationResult('link_revoked');
@@ -236,8 +286,10 @@ test('managed policy schema contract document pins required envelope and receive
   assert.match(inventory, /validated managed policy apply wrapper/i);
   assert.match(inventory, /accepted revision\/hash state/i);
   assert.match(inventory, /signature verifier gate/i);
-  assert.match(inventory, /partial canonical payload\/integrity binding/i);
+  assert.match(inventory, /canonical payload\/integrity binding present/i);
   assert.match(runtime, /function validateManagedPolicyEnvelope\(envelope, context = \{\}\)/);
+  assert.match(runtime, /function buildManagedPolicyPayloadHash\(envelope\)/);
+  assert.match(runtime, /policy_hash_mismatch/);
   assert.match(runtime, /function buildManagedNanahPolicyValidationContext\(envelope, profilesV4 = profilesV4Cache\)/);
   assert.match(runtime, /async function verifyManagedNanahPolicyIntegritySignature\(envelope, trustedLink\)/);
   assert.match(runtime, /sourcePublicKeyJwk: safeObject\(trusted\.sourcePublicKeyJwk \|\| policy\.sourcePublicKeyJwk \|\| policy\.publicKeyJwk\)/);
@@ -334,6 +386,15 @@ test('managed policy schema rejects key and integrity failures', () => {
     signedFields: { ...signedPayloadMismatch.integrity.signedFields, payloadScope: 'channels' }
   };
   assert.deepEqual(validateManagedPolicyEnvelope(signedPayloadMismatch, baseContext()), { accepted: false, reason: 'integrity_payload_scope_mismatch' });
+  const tamperedPolicyHash = canonicalPolicyHashForEnvelope(baseEnvelope());
+  const tamperedPayload = baseEnvelope({
+    policyHash: tamperedPolicyHash,
+    payload: {
+      scope: 'keywords',
+      operations: [{ op: 'add_keyword', value: 'tampered-after-hash' }]
+    }
+  });
+  assert.deepEqual(validateManagedPolicyEnvelope(tamperedPayload, baseContext()), { accepted: false, reason: 'policy_hash_mismatch' });
 });
 
 test('managed policy schema requires explicit signature verification evidence after binding checks', () => {
@@ -378,7 +439,6 @@ test('managed policy payload family must match the envelope scope before trusted
 
   assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope({
     scope: 'channels',
-    policyHash: 'hash-channel-5',
     payload: {
       scope: 'channels',
       operations: [{ op: 'add_keyword', value: 'wrong-family' }]
@@ -387,7 +447,6 @@ test('managed policy payload family must match the envelope scope before trusted
 
   assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope({
     scope: 'time_limits',
-    policyHash: 'hash-time-5',
     payload: {
       scope: 'time_limits',
       dailyBudgetMinutes: -1
@@ -396,7 +455,6 @@ test('managed policy payload family must match the envelope scope before trusted
 
   assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope({
     scope: 'viewing_space',
-    policyHash: 'hash-space-5',
     payload: {
       scope: 'viewing_space',
       allowMain: true,
@@ -408,18 +466,19 @@ test('managed policy payload family must match the envelope scope before trusted
 
 test('managed policy revision matrix accepts idempotent equal hash and rejects stale or conflicting revisions', () => {
   assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope({
-    revision: 4,
-    policyHash: 'hash-keyword-4'
+    revision: 4
   }), baseContext()), { accepted: true, decision: 'idempotent_same_hash' });
 
   assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope({
-    revision: 3,
-    policyHash: 'hash-keyword-3'
+    revision: 3
   }), baseContext()), { accepted: false, reason: 'stale_revision' });
 
   assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope({
     revision: 4,
-    policyHash: 'hash-other'
+    payload: {
+      scope: 'keywords',
+      operations: [{ op: 'add_keyword', value: 'changed-at-same-revision' }]
+    }
   }), baseContext()), { accepted: false, reason: 'equal_revision_hash_conflict' });
 });
 
@@ -427,19 +486,17 @@ test('managed policy revision matrix accepts stricter time-limit update only fro
   assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope({
     scope: 'time_limits',
     revision: 7,
-    policyHash: 'hash-time-7',
     payload: { scope: 'time_limits', dailyBudgetMinutes: 90 }
   }), baseContext({
-    accepted: { revision: 6, policyHash: 'hash-time-6' }
+    accepted: { revision: 6, policyHash: canonicalPolicyHashForEnvelope(baseEnvelope({ scope: 'time_limits', payload: { scope: 'time_limits', dailyBudgetMinutes: 120 } })) }
   })), { accepted: true, decision: 'accept_newer_revision' });
 
   assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope({
     scope: 'time_limits',
     revision: 7,
-    policyHash: 'hash-time-7',
     payload: { scope: 'time_limits', dailyBudgetMinutes: 90 }
   }), baseContext({
-    accepted: { revision: 6, policyHash: 'hash-time-6' },
+    accepted: { revision: 6, policyHash: canonicalPolicyHashForEnvelope(baseEnvelope({ scope: 'time_limits', payload: { scope: 'time_limits', dailyBudgetMinutes: 120 } })) },
     trustedLink: { ...baseContext().trustedLink, revoked: true }
   })), { accepted: false, reason: 'link_revoked' });
 });

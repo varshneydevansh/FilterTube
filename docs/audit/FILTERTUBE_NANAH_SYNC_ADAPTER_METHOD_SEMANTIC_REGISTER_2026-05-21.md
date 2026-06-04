@@ -23,29 +23,29 @@ validated managed envelope apply support: the adapter can validate
 verify Ed25519 integrity signatures through WebCrypto when trusted public-key
 material is available, apply accepted
 keyword/channel/video/viewing-space/time-limit payloads to the fixed protected
-target profile, persist accepted revision/hash state under that profile, and
-still refuses that envelope type through the legacy portable apply path. This is
-not completion proof for live transport key distribution.
+target profile, persist accepted revision/hash state under that profile,
+recompute canonical payload hashes before trust/revision acceptance, and still
+refuses that envelope type through the legacy portable apply path. This is not completion proof for live transport key distribution.
 
 ## Source-Derived Summary
 
 ```text
 source file: js/nanah_sync_adapter.js
-line count: 1154
-named declarations: 58
-plain function declarations: 49
-async function declarations: 9
+line count: 1419
+named declarations: 69
+plain function declarations: 57
+async function declarations: 12
 const arrow helper declarations: 0
-public FilterTubeNanahAdapter entries: 13
+public FilterTubeNanahAdapter entries: 18
 semantic method groups: 8
 new Map calls: 4
-safeArray references: 35
-safeObject references: 82
-normalizeString references: 75
+safeArray references: 37
+safeObject references: 95
+normalizeString references: 88
 normalizeScope references: 6
-JSON.stringify calls: 5
+JSON.stringify calls: 6
 JSON.parse calls: 3
-throw new Error statements: 14
+throw new Error statements: 19
 await io.loadProfilesV4 calls: 3
 await io.saveProfilesV4 calls: 2
 await io.exportV3 calls: 1
@@ -53,7 +53,7 @@ return io.importV3 calls: 1
 global.FilterTubeIO references: 1
 global.FilterTubeNanahAdapter assignments: 1
 global.crypto.randomUUID references: 2
-Date.now calls: 3
+Date.now calls: 5
 Math.random calls: 1
 global.navigator references: 4
 DEFAULT_DEVICE_CAPABILITIES references: 2
@@ -76,9 +76,9 @@ nanahAdapterRuntimeAndDescriptor: 3
 nanahDefensiveNormalizationAndMerge: 17
 nanahEnvelopeBuildAndSummary: 4
 nanahIncomingEnvelopeApply: 2
-nanahManagedPolicyEnvelopeApply: 18
-nanahManagedPolicyEnvelopeValidation: 8
-nanahManagedPolicyIntegrityVerifier: 4
+nanahManagedPolicyEnvelopeApply: 19
+nanahManagedPolicyEnvelopeValidation: 12
+nanahManagedPolicyIntegrityVerifier: 10
 nanahScopedPortableProfileTransfer: 2
 ```
 
@@ -91,72 +91,83 @@ nanahScopedPortableProfileTransfer: 2
 | `nanahAdapterRuntimeAndDescriptor` | 3 | Generates envelope/device ids, requires `FilterTubeIO` import/export APIs, and derives device descriptor labels/capabilities from overrides or navigator. | Peer identity provenance, stable device id policy, IO availability fixture, and trusted-link sender class proof. |
 | `nanahEnvelopeBuildAndSummary` | 4 | Builds portable payloads for active/full/Main/Kids scopes, creates `app_sync` envelopes, creates `control_proposal` envelopes, and summarizes portable payloads. | Envelope schema validation, scope-specific list-count summary, proposal action contract, payload-version compatibility, and invalid-scope fixture. |
 | `nanahIncomingEnvelopeApply` | 2 | Parses `app_sync` and `control_proposal` JSON payloads, returns preview payloads without writes, routes Main/Kids to scoped V4 apply, and routes active/full to `io.importV3()`. | JSON parse provenance, app/action/version checks, preview-to-apply equivalence, sender trust, mutation result contract, and negative malformed-envelope fixtures. |
-| `nanahManagedPolicyEnvelopeValidation` | 8 | Normalizes managed scopes, classifies managed payload families, validates binding fields, requires caller-supplied signature-verification evidence, validates target/source/link/key/revision context, and rejects managed envelopes from the legacy apply path. | Canonical payload hash recomputation, trust-key lookup, and live transport proof. |
-| `nanahManagedPolicyIntegrityVerifier` | 4 | Canonicalizes signed managed-policy fields, decodes base64url signatures, resolves trusted public-key material, and verifies Ed25519 integrity signatures with WebCrypto before validation can treat the envelope as signed. | Live trusted-link key distribution, sender revocation, key rotation transport, fallback diagnostics, and cross-browser compatibility proof. |
-| `nanahManagedPolicyEnvelopeApply` | 18 | Applies already validated managed-policy payloads to the fixed child target, supports keyword/channel/video/viewing-space/time-limit scope writes, persists accepted revision/hash state, and rejects missing validation context, stale replay, conflicting equal revision, non-child targets, and parent/child binding drift. | Canonical policy hash recomputation, encrypted mailbox pull, remote action-history parity, app shared-contract parity, and local-network discovery transport. |
+| `nanahManagedPolicyEnvelopeValidation` | 12 | Normalizes managed scopes, classifies managed payload families, validates binding fields, validates mailbox metadata binding, requires caller-supplied signature-verification evidence, validates target/source/link/key/revision context, and rejects managed envelopes from the legacy apply path. | Trust-key lookup owned by persisted trusted-link context, live transport proof, server mailbox pull, and hostile-LAN proof. |
+| `nanahManagedPolicyIntegrityVerifier` | 10 | Canonicalizes signed managed-policy fields, recomputes canonical payload hashes, decodes/encodes base64url signatures, resolves trusted public-key material, provisions/signs managed key material, and verifies Ed25519 integrity signatures with WebCrypto before validation can treat the envelope as signed. | Live trusted-link key distribution, sender revocation, key rotation transport, fallback diagnostics, and cross-browser compatibility proof. |
+| `nanahManagedPolicyEnvelopeApply` | 19 | Applies already validated managed-policy payloads to the fixed child target, supports local/decrypted mailbox delivery into the same validation/apply path, supports keyword/channel/video/viewing-space/time-limit scope writes, persists accepted revision/hash state, and rejects missing validation context, stale replay, conflicting equal revision, non-child targets, and parent/child binding drift. | Encrypted mailbox pull, remote action-history parity, app shared-contract parity, and local-network discovery transport. |
 
 ## Current Method Inventory
 
 | Source line | Kind | Method or function | Semantic group |
 | ---: | --- | --- | --- |
-| 22 | `function` | `normalizeString` | `nanahDefensiveNormalizationAndMerge` |
-| 26 | `function` | `normalizeScope` | `nanahDefensiveNormalizationAndMerge` |
-| 34 | `function` | `normalizeManagedPolicyScope` | `nanahManagedPolicyEnvelopeValidation` |
-| 39 | `function` | `safeObject` | `nanahDefensiveNormalizationAndMerge` |
-| 43 | `function` | `safeArray` | `nanahDefensiveNormalizationAndMerge` |
-| 47 | `function` | `normalizeNonNegativeInteger` | `nanahDefensiveNormalizationAndMerge` |
-| 53 | `function` | `validationResult` | `nanahManagedPolicyEnvelopeValidation` |
-| 57 | `function` | `getManagedPayloadScopeFamily` | `nanahManagedPolicyEnvelopeValidation` |
-| 78 | `function` | `validateManagedPayloadScope` | `nanahManagedPolicyEnvelopeValidation` |
-| 112 | `function` | `validateManagedIntegrityBinding` | `nanahManagedPolicyEnvelopeValidation` |
-| 124 | `function` | `stableManagedNanahJson` | `nanahManagedPolicyIntegrityVerifier` |
-| 134 | `function` | `decodeManagedNanahBase64Url` | `nanahManagedPolicyIntegrityVerifier` |
-| 151 | `function` | `getManagedNanahSourcePublicKeyJwk` | `nanahManagedPolicyIntegrityVerifier` |
-| 158 | `async function` | `verifyManagedNanahPolicyIntegritySignature` | `nanahManagedPolicyIntegrityVerifier` |
-| 185 | `function` | `managedPolicyProfileMap` | `nanahManagedPolicyEnvelopeValidation` |
-| 189 | `function` | `getAcceptedManagedPolicyState` | `nanahManagedPolicyEnvelopeValidation` |
-| 195 | `function` | `validateManagedPolicyEnvelope` | `nanahManagedPolicyEnvelopeValidation` |
-| 306 | `function` | `parsePackedChannelKeywordSource` | `nanahDefensiveNormalizationAndMerge` |
-| 313 | `function` | `normalizeKeywordEntry` | `nanahDefensiveNormalizationAndMerge` |
-| 329 | `function` | `normalizeKeywordList` | `nanahDefensiveNormalizationAndMerge` |
-| 335 | `function` | `keywordKey` | `nanahDefensiveNormalizationAndMerge` |
-| 350 | `function` | `channelKey` | `nanahDefensiveNormalizationAndMerge` |
-| 359 | `function` | `mergeKeywordLists` | `nanahDefensiveNormalizationAndMerge` |
-| 374 | `function` | `mergeChannelLists` | `nanahDefensiveNormalizationAndMerge` |
-| 389 | `function` | `mergeStringLists` | `nanahDefensiveNormalizationAndMerge` |
-| 402 | `function` | `normalizeMainProfileAliasFields` | `nanahDefensiveNormalizationAndMerge` |
-| 420 | `function` | `applyMainSurfaceData` | `nanahDefensiveNormalizationAndMerge` |
-| 447 | `function` | `applyKidsSurfaceData` | `nanahDefensiveNormalizationAndMerge` |
-| 475 | `function` | `cloneJson` | `nanahDefensiveNormalizationAndMerge` |
-| 479 | `async function` | `buildScopedPortablePayload` | `nanahScopedPortableProfileTransfer` |
-| 528 | `async function` | `applyScopedPortablePayload` | `nanahScopedPortableProfileTransfer` |
-| 578 | `function` | `managedPayloadSurface` | `nanahManagedPolicyEnvelopeApply` |
-| 583 | `function` | `managedPayloadListKind` | `nanahManagedPolicyEnvelopeApply` |
-| 590 | `function` | `managedPayloadReplace` | `nanahManagedPolicyEnvelopeApply` |
-| 595 | `function` | `managedOperationKind` | `nanahManagedPolicyEnvelopeApply` |
-| 602 | `function` | `managedKeywordFromOperation` | `nanahManagedPolicyEnvelopeApply` |
-| 614 | `function` | `managedChannelFromOperation` | `nanahManagedPolicyEnvelopeApply` |
-| 628 | `function` | `managedVideoIdFromOperation` | `nanahManagedPolicyEnvelopeApply` |
-| 633 | `function` | `mergeWithFactory` | `nanahManagedPolicyEnvelopeApply` |
-| 647 | `function` | `removeEntriesByKeys` | `nanahManagedPolicyEnvelopeApply` |
-| 653 | `function` | `applyManagedListPayload` | `nanahManagedPolicyEnvelopeApply` |
-| 676 | `function` | `applyManagedKeywordPolicy` | `nanahManagedPolicyEnvelopeApply` |
-| 708 | `function` | `applyManagedChannelPolicy` | `nanahManagedPolicyEnvelopeApply` |
-| 740 | `function` | `applyManagedVideoPolicy` | `nanahManagedPolicyEnvelopeApply` |
-| 775 | `function` | `applyManagedViewingSpacePolicy` | `nanahManagedPolicyEnvelopeApply` |
-| 803 | `function` | `applyManagedTimeLimitPolicy` | `nanahManagedPolicyEnvelopeApply` |
-| 858 | `function` | `applyManagedPolicyPayloadToProfile` | `nanahManagedPolicyEnvelopeApply` |
-| 883 | `function` | `withAcceptedManagedPolicyState` | `nanahManagedPolicyEnvelopeApply` |
-| 913 | `async function` | `applyManagedPolicyEnvelope` | `nanahManagedPolicyEnvelopeApply` |
-| 994 | `function` | `generateId` | `nanahAdapterRuntimeAndDescriptor` |
-| 1001 | `function` | `summarizePortablePayload` | `nanahEnvelopeBuildAndSummary` |
-| 1014 | `async function` | `getIO` | `nanahAdapterRuntimeAndDescriptor` |
-| 1022 | `async function` | `buildPortablePayload` | `nanahEnvelopeBuildAndSummary` |
-| 1037 | `async function` | `buildSyncEnvelope` | `nanahEnvelopeBuildAndSummary` |
-| 1049 | `async function` | `buildControlProposal` | `nanahEnvelopeBuildAndSummary` |
-| 1068 | `function` | `extractPortableFromEnvelope` | `nanahIncomingEnvelopeApply` |
-| 1089 | `async function` | `applyIncomingEnvelope` | `nanahIncomingEnvelopeApply` |
-| 1117 | `function` | `getDeviceDescriptor` | `nanahAdapterRuntimeAndDescriptor` |
+| 23 | `function` | `normalizeString` | `nanahDefensiveNormalizationAndMerge` |
+| 27 | `function` | `normalizeScope` | `nanahDefensiveNormalizationAndMerge` |
+| 35 | `function` | `normalizeManagedPolicyScope` | `nanahManagedPolicyEnvelopeValidation` |
+| 40 | `function` | `safeObject` | `nanahDefensiveNormalizationAndMerge` |
+| 44 | `function` | `safeArray` | `nanahDefensiveNormalizationAndMerge` |
+| 48 | `function` | `normalizeNonNegativeInteger` | `nanahDefensiveNormalizationAndMerge` |
+| 54 | `function` | `validationResult` | `nanahManagedPolicyEnvelopeValidation` |
+| 58 | `function` | `getManagedPayloadScopeFamily` | `nanahManagedPolicyEnvelopeValidation` |
+| 79 | `function` | `validateManagedPayloadScope` | `nanahManagedPolicyEnvelopeValidation` |
+| 113 | `function` | `validateManagedIntegrityBinding` | `nanahManagedPolicyEnvelopeValidation` |
+| 125 | `function` | `stableManagedNanahJson` | `nanahManagedPolicyIntegrityVerifier` |
+| 135 | `function` | `buildManagedPolicyHash` | `nanahManagedPolicyIntegrityVerifier` |
+| 144 | `function` | `buildManagedPolicyPayloadHash` | `nanahManagedPolicyIntegrityVerifier` |
+| 157 | `function` | `decodeManagedNanahBase64Url` | `nanahManagedPolicyIntegrityVerifier` |
+| 174 | `function` | `encodeManagedNanahBase64Url` | `nanahManagedPolicyIntegrityVerifier` |
+| 187 | `function` | `getManagedNanahSourcePublicKeyJwk` | `nanahManagedPolicyIntegrityVerifier` |
+| 194 | `function` | `buildManagedPolicySignedFields` | `nanahManagedPolicyIntegrityVerifier` |
+| 207 | `async function` | `createManagedNanahSigningKeyPair` | `nanahManagedPolicyIntegrityVerifier` |
+| 231 | `async function` | `signManagedPolicyEnvelope` | `nanahManagedPolicyIntegrityVerifier` |
+| 268 | `async function` | `verifyManagedNanahPolicyIntegritySignature` | `nanahManagedPolicyIntegrityVerifier` |
+| 295 | `function` | `managedPolicyProfileMap` | `nanahManagedPolicyEnvelopeValidation` |
+| 299 | `function` | `getAcceptedManagedPolicyState` | `nanahManagedPolicyEnvelopeValidation` |
+| 305 | `function` | `normalizeMailboxTimestampMs` | `nanahManagedPolicyEnvelopeValidation` |
+| 314 | `function` | `validateManagedPolicyEnvelope` | `nanahManagedPolicyEnvelopeValidation` |
+| 428 | `function` | `getManagedMailboxEnvelope` | `nanahManagedPolicyEnvelopeValidation` |
+| 433 | `function` | `validateManagedMailboxBinding` | `nanahManagedPolicyEnvelopeValidation` |
+| 454 | `function` | `validateManagedMailboxItem` | `nanahManagedPolicyEnvelopeValidation` |
+| 529 | `function` | `parsePackedChannelKeywordSource` | `nanahDefensiveNormalizationAndMerge` |
+| 536 | `function` | `normalizeKeywordEntry` | `nanahDefensiveNormalizationAndMerge` |
+| 552 | `function` | `normalizeKeywordList` | `nanahDefensiveNormalizationAndMerge` |
+| 558 | `function` | `keywordKey` | `nanahDefensiveNormalizationAndMerge` |
+| 573 | `function` | `channelKey` | `nanahDefensiveNormalizationAndMerge` |
+| 582 | `function` | `mergeKeywordLists` | `nanahDefensiveNormalizationAndMerge` |
+| 597 | `function` | `mergeChannelLists` | `nanahDefensiveNormalizationAndMerge` |
+| 612 | `function` | `mergeStringLists` | `nanahDefensiveNormalizationAndMerge` |
+| 625 | `function` | `normalizeMainProfileAliasFields` | `nanahDefensiveNormalizationAndMerge` |
+| 643 | `function` | `applyMainSurfaceData` | `nanahDefensiveNormalizationAndMerge` |
+| 670 | `function` | `applyKidsSurfaceData` | `nanahDefensiveNormalizationAndMerge` |
+| 698 | `function` | `cloneJson` | `nanahDefensiveNormalizationAndMerge` |
+| 702 | `async function` | `buildScopedPortablePayload` | `nanahScopedPortableProfileTransfer` |
+| 751 | `async function` | `applyScopedPortablePayload` | `nanahScopedPortableProfileTransfer` |
+| 801 | `function` | `managedPayloadSurface` | `nanahManagedPolicyEnvelopeApply` |
+| 806 | `function` | `managedPayloadListKind` | `nanahManagedPolicyEnvelopeApply` |
+| 813 | `function` | `managedPayloadReplace` | `nanahManagedPolicyEnvelopeApply` |
+| 818 | `function` | `managedOperationKind` | `nanahManagedPolicyEnvelopeApply` |
+| 825 | `function` | `managedKeywordFromOperation` | `nanahManagedPolicyEnvelopeApply` |
+| 837 | `function` | `managedChannelFromOperation` | `nanahManagedPolicyEnvelopeApply` |
+| 851 | `function` | `managedVideoIdFromOperation` | `nanahManagedPolicyEnvelopeApply` |
+| 856 | `function` | `mergeWithFactory` | `nanahManagedPolicyEnvelopeApply` |
+| 870 | `function` | `removeEntriesByKeys` | `nanahManagedPolicyEnvelopeApply` |
+| 876 | `function` | `applyManagedListPayload` | `nanahManagedPolicyEnvelopeApply` |
+| 899 | `function` | `applyManagedKeywordPolicy` | `nanahManagedPolicyEnvelopeApply` |
+| 931 | `function` | `applyManagedChannelPolicy` | `nanahManagedPolicyEnvelopeApply` |
+| 963 | `function` | `applyManagedVideoPolicy` | `nanahManagedPolicyEnvelopeApply` |
+| 998 | `function` | `applyManagedViewingSpacePolicy` | `nanahManagedPolicyEnvelopeApply` |
+| 1026 | `function` | `applyManagedTimeLimitPolicy` | `nanahManagedPolicyEnvelopeApply` |
+| 1081 | `function` | `applyManagedPolicyPayloadToProfile` | `nanahManagedPolicyEnvelopeApply` |
+| 1106 | `function` | `withAcceptedManagedPolicyState` | `nanahManagedPolicyEnvelopeApply` |
+| 1136 | `async function` | `applyManagedPolicyEnvelope` | `nanahManagedPolicyEnvelopeApply` |
+| 1217 | `async function` | `applyManagedMailboxItem` | `nanahManagedPolicyEnvelopeApply` |
+| 1242 | `function` | `generateId` | `nanahAdapterRuntimeAndDescriptor` |
+| 1249 | `function` | `summarizePortablePayload` | `nanahEnvelopeBuildAndSummary` |
+| 1262 | `async function` | `getIO` | `nanahAdapterRuntimeAndDescriptor` |
+| 1270 | `async function` | `buildPortablePayload` | `nanahEnvelopeBuildAndSummary` |
+| 1285 | `async function` | `buildSyncEnvelope` | `nanahEnvelopeBuildAndSummary` |
+| 1297 | `async function` | `buildControlProposal` | `nanahEnvelopeBuildAndSummary` |
+| 1316 | `function` | `extractPortableFromEnvelope` | `nanahIncomingEnvelopeApply` |
+| 1337 | `async function` | `applyIncomingEnvelope` | `nanahIncomingEnvelopeApply` |
+| 1365 | `function` | `getDeviceDescriptor` | `nanahAdapterRuntimeAndDescriptor` |
 
 ## Current Public API Surface
 
@@ -170,8 +181,13 @@ buildPortablePayload
 buildSyncEnvelope
 buildControlProposal
 validateManagedPolicyEnvelope
+validateManagedMailboxItem
+buildManagedPolicyPayloadHash
 verifyManagedNanahPolicyIntegritySignature
+createManagedNanahSigningKeyPair
+signManagedPolicyEnvelope
 applyManagedPolicyEnvelope
+applyManagedMailboxItem
 applyIncomingEnvelope
 extractPortableFromEnvelope
 ```
@@ -191,7 +207,9 @@ proposal strategies: replace, preview, merge
 incoming preview strategy writes storage: no
 managed policy incoming apply through legacy portable path: rejected
 managed policy validator writes storage: no
+managed policy canonical payload hash recomputation: yes
 managed policy validated apply wrapper writes storage: yes, only after accepted context
+managed mailbox item apply wrapper writes storage: yes, only through validated managed policy apply
 main/kids incoming apply path: applyScopedPortablePayload then io.saveProfilesV4
 active/full incoming apply path: io.importV3
 main/kids outgoing scope path: buildScopedPortablePayload

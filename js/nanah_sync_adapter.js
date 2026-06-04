@@ -132,6 +132,28 @@
         return JSON.stringify(value);
     }
 
+    function buildManagedPolicyHash(prefix, seed) {
+        const source = JSON.stringify(seed);
+        let hash = 0;
+        for (let index = 0; index < source.length; index += 1) {
+            hash = ((hash << 5) - hash + source.charCodeAt(index)) | 0;
+        }
+        return `${prefix}-${Math.abs(hash).toString(16)}`;
+    }
+
+    function buildManagedPolicyPayloadHash(envelope) {
+        const root = safeObject(envelope);
+        const seed = {
+            linkId: normalizeString(root.linkId),
+            scope: normalizeManagedPolicyScope(root.scope),
+            targetProfileId: normalizeString(root.targetProfileId),
+            sourceProfileId: normalizeString(root.sourceProfileId),
+            sourceDeviceId: normalizeString(root.sourceDeviceId),
+            payload: safeObject(root.payload)
+        };
+        return buildManagedPolicyHash('remote-managed-policy', stableManagedNanahJson(seed));
+    }
+
     function decodeManagedNanahBase64Url(value) {
         const raw = normalizeString(value);
         if (!raw || typeof global.atob !== 'function') return null;
@@ -322,6 +344,9 @@
         if (payloadDecision) return payloadDecision;
         const integrityDecision = validateManagedIntegrityBinding(root);
         if (integrityDecision) return integrityDecision;
+        if (root.policyHash !== buildManagedPolicyPayloadHash(root)) {
+            return validationResult('policy_hash_mismatch');
+        }
 
         if (trustedLink.type !== 'managed_link') return validationResult('link_not_managed');
         if (trustedLink.localRole !== 'replica' || trustedLink.remoteRole !== 'source') return validationResult('wrong_link_roles');
@@ -1382,6 +1407,7 @@
         buildControlProposal,
         validateManagedPolicyEnvelope,
         validateManagedMailboxItem,
+        buildManagedPolicyPayloadHash,
         verifyManagedNanahPolicyIntegritySignature,
         createManagedNanahSigningKeyPair,
         signManagedPolicyEnvelope,
