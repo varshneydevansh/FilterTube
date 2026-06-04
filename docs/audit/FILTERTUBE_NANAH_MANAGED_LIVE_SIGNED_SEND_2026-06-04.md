@@ -1,7 +1,8 @@
 # Audit: Nanah Managed Live Signed Send
 
 **Generated**: 2026-06-04
-**Status**: Eligible live-session source send runtime slice.
+**Status**: Eligible live-session source send runtime slice with explicit
+Main/Kids granular rule-source selection.
 **Related**:
 `docs/audit/FILTERTUBE_NANAH_MANAGED_SIGNING_KEYPAIR_2026-06-04.md`
 
@@ -55,18 +56,20 @@ flowchart TD
 
 Eligible fixed-target Main/Kids and granular managed live sends are now present
 for managed policy snapshots. Granular keyword, channel, and video payloads use
-the dashboard's active Main/Kids surface, defaulting to Main outside those
-editing views. When parent-managed child edit mode is active, the payload source
-is the edited child profile while the envelope authority remains the parent
-source profile.
+an explicit Main/Kids rule-source picker in the Nanah advanced panel. The picker
+defaults to the dashboard's active Main/Kids surface when the user first selects
+a granular scope, so existing active-view behavior stays intact until the parent
+chooses a different source. When parent-managed child edit mode is active, the
+payload source is the edited child profile while the envelope authority remains
+the parent source profile.
 
 This is not a mailbox runtime, local-network discovery runtime, key-rotation
 system, or offline later-delivery mechanism.
 
 Still pending:
 
-- dedicated richer outbound controls for choosing a different granular surface
-  without switching the dashboard view;
+- richer bulk outbound controls beyond the explicit Main/Kids rule-source
+  picker;
 - active/full proposal conversion policy;
 - installed-extension two-device smoke proof;
 - key rotation/revocation UI;

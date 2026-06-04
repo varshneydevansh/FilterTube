@@ -2848,10 +2848,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftNanahRemoteTargetField = document.getElementById('ftNanahRemoteTargetField');
     const ftNanahRole = document.getElementById('ftNanahRole');
     const ftNanahScope = document.getElementById('ftNanahScope');
+    const ftNanahGranularSurfaceField = document.getElementById('ftNanahGranularSurfaceField');
+    const ftNanahGranularSurface = document.getElementById('ftNanahGranularSurface');
     const ftNanahStrategy = document.getElementById('ftNanahStrategy');
     const ftNanahRemoteTarget = document.getElementById('ftNanahRemoteTarget');
     const ftNanahStrategyLabel = document.getElementById('ftNanahStrategyLabel');
     const ftNanahStrategyHint = document.getElementById('ftNanahStrategyHint');
+    const ftNanahGranularSurfaceHint = document.getElementById('ftNanahGranularSurfaceHint');
     const ftNanahRemoteTargetHint = document.getElementById('ftNanahRemoteTargetHint');
     const ftNanahActions = document.querySelector('.nanah-sync-actions');
     const ftNanahHostBtn = document.getElementById('ftNanahHostBtn');
@@ -7377,10 +7380,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function refreshNanahAdvancedSummary() {
         if (!ftNanahAdvancedSummary) return;
+        const scope = getNanahScope();
         const roleLabel = getNanahSelectedText(ftNanahRole, getNanahRoleLabel());
-        const scopeLabel = getNanahSelectedText(ftNanahScope, getNanahScopeLabel(getNanahScope()));
+        const scopeLabel = getNanahSelectedText(ftNanahScope, getNanahScopeLabel(scope));
         const strategyLabel = getNanahSelectedText(ftNanahStrategy, getNanahStrategyLabel(getNanahStrategy()));
-        ftNanahAdvancedSummary.textContent = `${roleLabel} · ${scopeLabel} · ${strategyLabel}`;
+        const parts = [roleLabel, scopeLabel];
+        if (['keywords', 'channels', 'videos'].includes(scope) && ftNanahGranularSurface) {
+            const surfaceLabel = getNanahSelectedText(
+                ftNanahGranularSurface,
+                ftNanahGranularSurface.value === 'kids' ? 'YouTube Kids rules' : 'YouTube Main rules'
+            );
+            parts.push(surfaceLabel);
+        }
+        parts.push(strategyLabel);
+        ftNanahAdvancedSummary.textContent = parts.join(' · ');
     }
 
     function enforceChildSyncSurfaceRestrictions() {
@@ -8239,6 +8252,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         const remoteRole = normalizeString(nanahSessionState.remoteRole) || 'peer';
         const linkType = classifyNanahTrustedLink(localRole, remoteRole);
         const trustedManaged = isCurrentNanahManagedLink();
+        const scope = getNanahScope();
+        const granularScope = ['keywords', 'channels', 'videos'].includes(scope);
+
+        if (ftNanahGranularSurface) {
+            if (!granularScope) {
+                delete ftNanahGranularSurface.dataset.userSelected;
+            } else if (ftNanahGranularSurface.dataset.userSelected !== 'true') {
+                const activeView = normalizeString(document.body?.dataset?.activeView)
+                    || normalizeString(document.documentElement?.dataset?.activeView)
+                    || normalizeString(document.querySelector('.nav-item.active')?.getAttribute('data-tab'));
+                ftNanahGranularSurface.value = activeView === 'kids' ? 'kids' : 'main';
+            }
+        }
+        if (ftNanahGranularSurfaceField) {
+            ftNanahGranularSurfaceField.hidden = !granularScope || childReceiveOnly || childReplicaOnly;
+        }
+        if (ftNanahGranularSurface) {
+            ftNanahGranularSurface.disabled = !granularScope || childReceiveOnly || childReplicaOnly || !!nanahClient;
+            ftNanahGranularSurface.title = granularScope
+                ? (nanahClient ? 'Rule source is locked for the current Nanah session.' : '')
+                : 'Rule source applies only to keyword, channel, and blocked-video sends.';
+        }
+        if (ftNanahGranularSurfaceHint) {
+            const surfaceLabel = ftNanahGranularSurface?.value === 'kids' ? 'YouTube Kids' : 'YouTube Main';
+            ftNanahGranularSurfaceHint.textContent = `${getNanahScopeLabel(scope)} sends will use ${surfaceLabel} rules from this local profile.`;
+        }
 
         if (ftNanahStrategyLabel) {
             ftNanahStrategyLabel.textContent = (trustedManaged && linkType === 'managed_link' && localRole === 'source' && !childReplicaOnly)
@@ -8886,6 +8925,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function getNanahActiveManagedSurface() {
+        const scope = getNanahScope();
+        const selectedSurface = normalizeString(ftNanahGranularSurface?.value).toLowerCase();
+        if (['keywords', 'channels', 'videos'].includes(scope) && (selectedSurface === 'main' || selectedSurface === 'kids')) {
+            return selectedSurface;
+        }
         const activeView = normalizeString(document.body?.dataset?.activeView)
             || normalizeString(document.documentElement?.dataset?.activeView)
             || normalizeString(document.querySelector('.nav-item.active')?.getAttribute('data-tab'));
@@ -10808,10 +10852,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     setNanahMode(nanahUiMode, { persist: false, applyPreset: true });
     updateNanahUi();
 
-    [ftNanahRole, ftNanahScope, ftNanahStrategy, ftNanahRemoteTarget].forEach((element) => {
+    [ftNanahRole, ftNanahScope, ftNanahGranularSurface, ftNanahStrategy, ftNanahRemoteTarget].forEach((element) => {
         if (!element) return;
         element.addEventListener('change', () => {
-            if (!isApplyingNanahModePreset && element !== ftNanahRemoteTarget) {
+            if (element === ftNanahGranularSurface) {
+                element.dataset.userSelected = 'true';
+            }
+            if (!isApplyingNanahModePreset && element !== ftNanahRemoteTarget && element !== ftNanahGranularSurface) {
                 nanahUiMode = inferNanahUiModeFromControls();
                 setNanahModeButtons(nanahUiMode);
                 void persistNanahUiModePreference(nanahUiMode);

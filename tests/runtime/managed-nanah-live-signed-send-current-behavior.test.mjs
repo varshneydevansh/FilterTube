@@ -6,6 +6,7 @@ import vm from 'node:vm';
 
 const repoRoot = process.cwd();
 const tabViewPath = 'js/tab-view.js';
+const tabViewHtmlPath = 'html/tab-view.html';
 const managedLivePolicyPath = 'js/nanah_managed_live_policy.js';
 const docPath = 'docs/audit/FILTERTUBE_NANAH_MANAGED_LIVE_SIGNED_SEND_2026-06-04.md';
 const signingDocPath = 'docs/audit/FILTERTUBE_NANAH_MANAGED_SIGNING_KEYPAIR_2026-06-04.md';
@@ -153,11 +154,27 @@ test('managed live signed-send audit is linked without claiming mailbox runtime'
 
   assert.match(doc, /Eligible live-session source send runtime slice/);
   assert.match(doc, /fixed-target Main\/Kids and granular managed live sends/);
+  assert.match(doc, /explicit Main\/Kids rule-source picker/);
   assert.match(doc, /All unsupported live sends continue through the existing proposal path/);
   assert.match(doc, /not a mailbox runtime, local-network discovery runtime, key-rotation\s+system, or offline later-delivery mechanism/);
   assert.match(signingDoc, new RegExp(docPath));
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, /fixed-target Main\/Kids, keyword, channel, video, viewing-space, and time-limit managed live sends build signed `filtertube_managed_policy` envelopes/);
+});
+
+test('dashboard exposes explicit Main Kids rule source picker for granular managed sends', () => {
+  const html = read(tabViewHtmlPath);
+  const source = read(tabViewPath);
+
+  assert.match(html, /id="ftNanahGranularSurfaceField" hidden/);
+  assert.match(html, /id="ftNanahGranularSurface"/);
+  assert.match(html, /YouTube Main rules/);
+  assert.match(html, /YouTube Kids rules/);
+  assert.match(source, /const ftNanahGranularSurfaceField = document\.getElementById\('ftNanahGranularSurfaceField'\)/);
+  assert.match(source, /const ftNanahGranularSurface = document\.getElementById\('ftNanahGranularSurface'\)/);
+  assert.match(source, /const granularScope = \['keywords', 'channels', 'videos'\]\.includes\(scope\)/);
+  assert.match(source, /ftNanahGranularSurfaceField\.hidden = !granularScope \|\| childReceiveOnly \|\| childReplicaOnly/);
+  assert.match(source, /function getNanahActiveManagedSurface\(\)[\s\S]*ftNanahGranularSurface\?\.value[\s\S]*return selectedSurface/);
 });
 
 test('dashboard builds signed managed envelopes only after source link scope target and key gates', () => {

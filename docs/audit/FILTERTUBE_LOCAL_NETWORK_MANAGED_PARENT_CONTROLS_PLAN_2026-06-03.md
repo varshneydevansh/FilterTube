@@ -10,9 +10,10 @@ Managed pairing public-key descriptor persistence is now present when a key
 descriptor is already provisioned, and source-side managed signing keypair
 provisioning plus an adapter signing helper are present. Live fixed-target
 Nanah managed-policy sends are present for Main/Kids, keyword, channel, video,
-viewing-space, and time-limit scopes. Local-network peer discovery, LAN
-delivery, mailbox pull, mailbox ack, and active/full signed managed sends
-remain gated.
+viewing-space, and time-limit scopes, and granular keyword/channel/video sends
+now expose an explicit Main/Kids rule-source picker. Local-network peer
+discovery, LAN delivery, mailbox pull, mailbox ack, and active/full signed
+managed sends remain gated.
 **Primary audit input**:
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
 
@@ -415,8 +416,9 @@ replica child device over Nanah/P2P or same-network transport.
   `ftNanahManagedSigningKeyPair`, and source-side managed link saves require a
   local signing key. Eligible fixed-target Main/Kids plus keyword, channel,
   video, viewing-space, and time-limit dashboard live sends now build signed
-  `filtertube_managed_policy` envelopes; active/full sends and richer
-  granular surface-picking UI remain later slices.
+  `filtertube_managed_policy` envelopes; granular keyword/channel/video sends
+  expose an explicit Main/Kids rule-source picker; active/full sends and richer
+  bulk outbound controls remain later slices.
 - **Acceptance Criteria**:
   - The public descriptor is separated from the private keypair.
   - The private JWK is not placed in the Nanah hello descriptor or trusted link
@@ -441,10 +443,11 @@ replica child device over Nanah/P2P or same-network transport.
 - **Complexity**: 6/10
 - **Dependencies**: Task 3.5.
 - **Status**: Implemented for live Main/Kids, keyword, channel, video,
-  viewing-space, and time-limit scope. Granular rule scopes use the dashboard's
-  active Main/Kids surface and can source payloads from parent-managed child
-  edit mode. Active/full proposal sends, mailbox delivery, local-network
-  delivery, and richer granular surface-picking controls remain pending.
+  viewing-space, and time-limit scope. Granular rule scopes expose an explicit
+  Main/Kids rule-source picker, default from the active dashboard surface, and
+  can source payloads from parent-managed child edit mode. Active/full proposal
+  sends, mailbox delivery, local-network delivery, and richer bulk outbound
+  controls remain pending.
 - **Acceptance Criteria**:
   - Existing proposal sends still work for unsupported active/full scopes.
   - Signed sends require saved managed link, Source -> Replica roles, allowed

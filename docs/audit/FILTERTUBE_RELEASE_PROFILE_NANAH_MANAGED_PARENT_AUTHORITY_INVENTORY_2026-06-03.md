@@ -15,8 +15,9 @@ background admin-session expiry, sensitive managed-action re-auth, in-memory
 managed/admin failed-attempt rate limiting, child time-budget enforcement,
 managed-envelope validation/classification, managed-policy receive/apply
 evidence, managed public-key descriptor pairing, source signing-key
-provisioning, and eligible signed Main/Kids/granular live managed-policy sends.
-Active/full signed conversion, richer granular surface-picking UI, mailbox
+provisioning, eligible signed Main/Kids/granular live managed-policy sends, and
+an explicit Main/Kids rule-source picker for granular sends. Active/full signed
+conversion, richer bulk outbound controls, mailbox
 server pull/ack/decryption runtime, and local-network discovery runtime remain
 pending.
 **Goal slice**: Implementation order item 1 plus first runtime viewing-space
@@ -45,13 +46,14 @@ public-key material. Pairing-time public-key descriptor persistence exists, and
 source/parent Nanah sessions can provision local managed signing key material.
 Eligible fixed-target Main/Kids, keyword, channel, video, viewing-space, and
 time-limit live sends can now build signed managed-policy envelopes. Granular
-rule sends use the dashboard's active Main/Kids surface, and parent-managed
-child edit mode can provide the child-policy payload source while the parent
-profile remains signing authority. Local/decrypted mailbox items can now bind
+rule sends use an explicit Main/Kids rule-source picker that defaults from the
+dashboard's active surface, and parent-managed child edit mode can provide the
+child-policy payload source while the parent profile remains signing authority.
+Local/decrypted mailbox items can now bind
 mailbox metadata to the decrypted managed envelope before calling the same
 managed-policy validation/apply path, but server mailbox pull, mailbox ack,
-mailbox decryption client, active/full signed conversion, richer granular
-surface-picking UI, local-network delivery runtime, failed-attempt durability,
+mailbox decryption client, active/full signed conversion, richer bulk outbound
+controls, local-network delivery runtime, failed-attempt durability,
 and remote admin session semantics remain separate required slices.
 
 ## Issue 60 Local-Network Caregiver Addendum
@@ -295,8 +297,9 @@ Current gap:
       persist source public-key descriptor material, source sessions can now
       provision a local managed signing keypair plus public descriptor, and
       eligible fixed-target Main/Kids and granular managed live sends now use
-      signed envelopes. Active/full signed conversion and richer granular
-      surface-picking UI remain pending. Without trusted stored public-key
+      signed envelopes, with explicit Main/Kids rule-source selection for
+      granular sends. Active/full signed conversion and richer bulk outbound
+      controls remain pending. Without trusted stored public-key
       material, the receive path still rejects otherwise well-shaped managed
       envelopes rather than treating them as valid.
 - The adapter's validated apply wrapper still depends on higher layers for
@@ -428,9 +431,9 @@ Current gap:
 |---|---|---|
 | Validated managed policy apply wrapper | Remote apply can now persist a durable accepted-revision object for a fixed child target, but only when a caller supplies accepted validation context. | Key-store/WebCrypto verifier plumbing and live Nanah/local-network receive tests before automatic remote apply. |
 | Target-local remote revision store | Stale or replayed remote updates can now be rejected per target profile/link/scope after the first accepted write, but there is no mailbox or multi-device conflict-resolution layer yet. | Multi-parent, revoked-link, equal-revision/different-hash, and mailbox-delivery fixtures. |
-| Pairing public-key descriptor, source keypair provisioning, and eligible live signed send present | The helper now requires verifier evidence, adapter WebCrypto verification is wired, Nanah pairing can persist advertised source public-key descriptors, source sessions can provision local managed signing keypairs, and fixed-target Main/Kids, keyword, channel, video, viewing-space, and time-limit managed live sends build signed `filtertube_managed_policy` envelopes. Active/full sends and richer granular surface-picking UI still remain proposal/spec work. | Authenticated two-device live-delivery smoke, signed granular live-delivery smoke, rotation/revocation, and active/full conversion policy. |
+| Pairing public-key descriptor, source keypair provisioning, and eligible live signed send present | The helper now requires verifier evidence, adapter WebCrypto verification is wired, Nanah pairing can persist advertised source public-key descriptors, source sessions can provision local managed signing keypairs, fixed-target Main/Kids, keyword, channel, video, viewing-space, and time-limit managed live sends build signed `filtertube_managed_policy` envelopes, and granular rule sends expose an explicit Main/Kids rule-source picker. Active/full sends and richer bulk outbound controls still remain proposal/spec work. | Authenticated two-device live-delivery smoke, signed granular live-delivery smoke, rotation/revocation, and active/full conversion policy. |
 | Partial canonical payload/integrity binding | The helper checks binding fields and verifier result, but no canonical payload hash recomputation exists yet. | Binding-tuple fixtures plus canonical payload hash proof. |
-| Signed remote managed-policy gate is partially live | Fixed-target Main/Kids, keyword, channel, video, viewing-space, and time-limit managed Nanah sends can now travel as signed envelopes and receive-side code validates before apply. Active/full signed conversion, mailbox delivery, and richer granular surface picking are still pending. | Installed two-device Main/Kids and granular smoke plus dedicated signed route/time policy fixtures. |
+| Signed remote managed-policy gate is partially live | Fixed-target Main/Kids, keyword, channel, video, viewing-space, and time-limit managed Nanah sends can now travel as signed envelopes and receive-side code validates before apply. Granular keyword/channel/video sends can choose Main or Kids local rule source explicitly. Active/full signed conversion, mailbox delivery, and richer bulk outbound controls are still pending. | Installed two-device Main/Kids and granular smoke plus dedicated signed route/time policy fixtures. |
 | Remote time-limit policy apply is wrapper-backed and live-send eligible | Local child time-budget enforcement exists and accepted managed envelopes can write runtime-compatible time-limit policy; the source send path can now emit signed live time-limit envelopes when the profile has a saved time limit. | Installed two-device signed remote time-limit smoke through Nanah/local-network receive. |
 | Adapter depends on caller trust context | `validateManagedPolicyEnvelope(...)` depends on caller-supplied trusted-link/profile/revision/signature context; the wrapper rechecks stored profiles before writing but does not fetch trust keys itself. | Keep dashboard receive context and add pairing key lookup/revocation fixtures before automatic apply. |
 | Locked-child bypass has no revision binding | `allow_trusted_updates` can skip unlock for matching managed sessions, but not with policy revision constraints. | Locked child managed-policy fixtures. |
