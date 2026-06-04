@@ -46,10 +46,10 @@ const largeProductOwnedSourceFiles = [
   'js/popup.js',
   'js/render_engine.js',
   'js/settings_shared.js',
+  'js/nanah_sync_adapter.js',
   'js/content/dom_extractors.js',
   'js/seed.js',
-  'js/content/bridge_settings.js',
-  'js/nanah_sync_adapter.js'
+  'js/content/bridge_settings.js'
 ];
 
 const nearThresholdProductOwnedSourceFiles = [

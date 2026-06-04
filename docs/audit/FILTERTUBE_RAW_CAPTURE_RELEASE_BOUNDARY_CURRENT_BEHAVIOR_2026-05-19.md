@@ -139,11 +139,20 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5836
+method semantic proof gap lexical callables covered: 5883
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5836
+lexical callables requiring semantic proof before behavior changes: 5883
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
+```
+
+Historical compatibility snapshot retained for older current-behavior lanes:
+
+```text
+historical pre-managed-policy callable snapshot: 2026-05-25 through 2026-05-30
+method semantic proof gap lexical callables covered: 5836
+repo-wide lexical callables: 5836
+lexical callables requiring semantic proof before behavior changes: 5836
 ```
 
 These counts are audit-only blockers. They do not approve runtime

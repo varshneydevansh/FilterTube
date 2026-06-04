@@ -697,9 +697,9 @@ Current local package artifact rows:
 
 | Target | Staged files | Manifest bytes | Manifest sha256 | Version | Content script entries | Content script JS refs | WAR refs | ZIP bytes | ZIP sha256 |
 | --- | ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | --- |
-| `chrome` | 59 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | `3.3.2` | 2 | 15 | 5 | 8709425 | `032ba2349cccdd0899244381e9c0fbea8e18c32bc309b3a04676d99ec3850de2` |
-| `firefox` | 59 | 2603 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` | `3.3.2` | 1 | 14 | 5 | 8709484 | `0e4ad64faa18a639c4a75fee8c7faf0cb36f6f0c3e7f32d05f98e4e688c1ec89` |
-| `opera` | 59 | 2518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | `3.3.2` | 2 | 15 | 4 | 8709427 | `909e0238c48854432d670e148bfc6ce1430e651cfb4db92bae21dcdeca5d1fd2` |
+| `chrome` | 59 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | `3.3.2` | 2 | 15 | 5 | 8710362 | `69569d23a8f84eb0f2c041f6ea6aaa5f0975fc14f34a714667ddf861b882fd25` |
+| `firefox` | 59 | 2603 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` | `3.3.2` | 1 | 14 | 5 | 8710421 | `40f8938e22beea728ab1d80d9afd79fc1f88f05f5a804a4fe3ba42caa14680ee` |
+| `opera` | 59 | 2518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | `3.3.2` | 2 | 15 | 4 | 8710364 | `64f6a208a2a5ebbab125a36909b785e42e6364fbaaeace1ae7ea553ee3e12563` |
 
 ASCII boundary:
 
@@ -820,11 +820,20 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5836
+method semantic proof gap lexical callables covered: 5883
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5836
+lexical callables requiring semantic proof before behavior changes: 5883
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
+```
+
+Historical compatibility snapshot retained for older current-behavior lanes:
+
+```text
+historical pre-managed-policy callable snapshot: 2026-05-25 through 2026-05-30
+method semantic proof gap lexical callables covered: 5836
+repo-wide lexical callables: 5836
+lexical callables requiring semantic proof before behavior changes: 5836
 ```
 
 These counts are audit-only blockers. They do not approve runtime

@@ -107,8 +107,8 @@ test('Nanah scoped apply has target-profile writes plus receive-side managed env
   assert.match(doc, /validated managed policy apply wrapper/i);
   assert.match(doc, /accepted revision\/hash state/i);
   assert.match(doc, /Persisted stale\/replay authority state exists for accepted managed policies/);
-  assert.match(doc, /signature[- ]verifier gate exists/i);
-  assert.match(doc, /dashboard\/key-store verifier plumbing\s+is not wired yet/i);
+  assert.match(doc, /signature verifier gate and adapter verifier helper exist/i);
+  assert.match(doc, /pairing\s+does not yet persist source public-key material/i);
 });
 
 test('viewing-space route gate and first time-limit runtime enforcement are runtime-backed', () => {

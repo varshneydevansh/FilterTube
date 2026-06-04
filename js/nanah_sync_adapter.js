@@ -121,6 +121,67 @@
         return null;
     }
 
+    function stableManagedNanahJson(value) {
+        if (Array.isArray(value)) {
+            return `[${value.map(stableManagedNanahJson).join(',')}]`;
+        }
+        if (value && typeof value === 'object') {
+            return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stableManagedNanahJson(value[key])}`).join(',')}}`;
+        }
+        return JSON.stringify(value);
+    }
+
+    function decodeManagedNanahBase64Url(value) {
+        const raw = normalizeString(value);
+        if (!raw || typeof global.atob !== 'function') return null;
+        const base64 = raw.replace(/-/g, '+').replace(/_/g, '/');
+        const padded = `${base64}${'='.repeat((4 - (base64.length % 4)) % 4)}`;
+        try {
+            const binary = global.atob(padded);
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i += 1) {
+                bytes[i] = binary.charCodeAt(i);
+            }
+            return bytes;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function getManagedNanahSourcePublicKeyJwk(trustedLink) {
+        const trusted = safeObject(trustedLink);
+        const policy = safeObject(trusted.policy);
+        const jwk = safeObject(trusted.sourcePublicKeyJwk || policy.sourcePublicKeyJwk || policy.publicKeyJwk);
+        return Object.keys(jwk).length > 0 ? jwk : null;
+    }
+
+    async function verifyManagedNanahPolicyIntegritySignature(envelope, trustedLink) {
+        const root = safeObject(envelope);
+        const integrity = safeObject(root.integrity);
+        const algorithm = normalizeString(integrity.algorithm).toLowerCase();
+        if (algorithm !== 'ed25519') return { verified: false, reason: 'unsupported_signature_algorithm' };
+        const publicKeyJwk = getManagedNanahSourcePublicKeyJwk(trustedLink);
+        if (!publicKeyJwk) return { verified: false, reason: 'missing_public_key_material' };
+        const subtle = global.crypto?.subtle;
+        if (!subtle || typeof subtle.importKey !== 'function' || typeof subtle.verify !== 'function') {
+            return { verified: false, reason: 'webcrypto_unavailable' };
+        }
+        if (typeof global.TextEncoder !== 'function') return { verified: false, reason: 'text_encoder_unavailable' };
+        const signature = decodeManagedNanahBase64Url(integrity.signature);
+        if (!signature) return { verified: false, reason: 'signature_decode_failed' };
+        try {
+            const key = await subtle.importKey('jwk', publicKeyJwk, { name: 'Ed25519' }, false, ['verify']);
+            const signedFields = safeObject(integrity.signedFields);
+            const data = new global.TextEncoder().encode(stableManagedNanahJson(signedFields));
+            const verified = await subtle.verify({ name: 'Ed25519' }, key, signature, data);
+            return verified
+                ? { verified: true, verifier: 'webcrypto_ed25519' }
+                : { verified: false, reason: 'signature_invalid' };
+        } catch (e) {
+            return { verified: false, reason: 'signature_verifier_error' };
+        }
+    }
+
     function managedPolicyProfileMap(context) {
         return safeObject(context.profiles || safeObject(context.profilesV4).profiles);
     }
@@ -1085,6 +1146,7 @@
         buildSyncEnvelope,
         buildControlProposal,
         validateManagedPolicyEnvelope,
+        verifyManagedNanahPolicyIntegritySignature,
         applyManagedPolicyEnvelope,
         applyIncomingEnvelope,
         extractPortableFromEnvelope

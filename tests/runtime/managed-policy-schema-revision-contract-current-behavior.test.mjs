@@ -221,8 +221,8 @@ test('managed policy schema contract document pins required envelope and receive
     read('js/background.js')
   ].join('\n');
 
-  assert.match(doc, /Status\*\*: Runtime validation helper and receive-side validation context\s+present/);
-  assert.match(doc, /validated managed apply wrapper now persists accepted-revision state/);
+  assert.match(doc, /Status\*\*: Runtime validation helper, receive-side validation context, and\s+adapter WebCrypto verifier plumbing are present/);
+  assert.match(doc, /validated managed apply\s+wrapper now persists accepted-revision state/);
   assert.match(doc, /filtertube_managed_policy/);
   assert.match(doc, /Managed Envelope Shape/);
   assert.match(doc, /Revision Decision Matrix/);
@@ -231,6 +231,7 @@ test('managed policy schema contract document pins required envelope and receive
   assert.match(doc, /runtime filtertube_managed_policy receive path: parses envelope, builds validation context, applies only accepted envelopes, records protected evidence/);
   assert.match(doc, /runtime managed policy persistent accepted-revision writer: present/);
   assert.match(doc, /runtime managed policy signature verifier gate: present/);
+  assert.match(doc, /runtime Nanah adapter key-verification context: WebCrypto Ed25519 helper present/);
   assert.match(doc, /runtime remote profile write from filtertube_managed_policy: enabled only through applyManagedPolicyEnvelope/);
   assert.match(inventory, /validated managed policy apply wrapper/i);
   assert.match(inventory, /accepted revision\/hash state/i);
@@ -238,12 +239,19 @@ test('managed policy schema contract document pins required envelope and receive
   assert.match(inventory, /partial canonical payload\/integrity binding/i);
   assert.match(runtime, /function validateManagedPolicyEnvelope\(envelope, context = \{\}\)/);
   assert.match(runtime, /function buildManagedNanahPolicyValidationContext\(envelope, profilesV4 = profilesV4Cache\)/);
+  assert.match(runtime, /async function verifyManagedNanahPolicyIntegritySignature\(envelope, trustedLink\)/);
+  assert.match(runtime, /sourcePublicKeyJwk: safeObject\(trusted\.sourcePublicKeyJwk \|\| policy\.sourcePublicKeyJwk \|\| policy\.publicKeyJwk\)/);
+  assert.match(runtime, /context\.verifyIntegritySignature = \(\) => signatureVerification/);
+  assert.match(runtime, /context\.signatureVerified = true/);
+  assert.match(runtime, /verifyManagedNanahPolicyIntegritySignature,/);
   assert.match(runtime, /function getManagedNanahPolicyAcceptedState\(profile, linkId, scope\)/);
   assert.match(runtime, /function handleNanahIncomingManagedPolicyEnvelope\(envelope\)/);
   assert.match(runtime, /async function applyManagedPolicyEnvelope\(envelope, context = \{\}\)/);
   assert.match(runtime, /filtertube_managed_policy/);
   assert.match(runtime, /Managed policy envelopes require validated managed apply flow/);
   assert.match(runtime, /missing_signature_verifier/);
+  assert.match(runtime, /missing_public_key_material/);
+  assert.match(runtime, /webcrypto_ed25519/);
   assert.match(runtime, /signature_invalid/);
   assert.doesNotMatch(runtime, /managedPolicyRevisionStore/);
 });

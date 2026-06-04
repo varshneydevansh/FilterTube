@@ -3,9 +3,9 @@
 **Generated**: 2026-06-03
 **Estimated Complexity**: High
 **Status**: Planning/specification plus local managed-save runtime slice,
-Nanah receive-side managed-policy validation/apply-history slice, and validated
-managed-policy apply wrapper. Live remote/local-network transport and key
-verification remain gated.
+Nanah receive-side managed-policy validation/apply-history slice, validated
+managed-policy apply wrapper, and adapter WebCrypto verifier helper. Live
+remote/local-network transport and pairing-time key storage remain gated.
 **Primary audit input**:
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
 
@@ -311,14 +311,18 @@ replica child device over Nanah/P2P or same-network transport.
   target, scope, revision, and integrity.
 - **Complexity**: 8/10
 - **Dependencies**: Task 3.1 and Task 2.2.
-- **Status**: Runtime wrapper present. The adapter now rejects
+- **Status**: Runtime wrapper plus adapter verifier helper present. The
+  adapter now rejects
   `filtertube_managed_policy` envelopes from the legacy portable apply path
   with `Managed policy envelopes require validated managed apply flow`. The
-  dashboard receive path now parses managed envelopes, builds validation context,
-  records protected validation history, invokes `applyManagedPolicyEnvelope(...)`
-  for accepted envelopes, persists accepted revision/hash state on the target
-  child profile, and records accepted/rejected apply history. Live key-verifier
-  plumbing and local-network/P2P delivery remain pending.
+  dashboard receive path now parses managed envelopes and builds validation
+  context, the adapter builds WebCrypto Ed25519 signature-verification evidence
+  from trusted-link `sourcePublicKeyJwk` material, the dashboard records
+  protected validation history, invokes
+  `applyManagedPolicyEnvelope(...)` for accepted envelopes, persists accepted
+  revision/hash state on the target child profile, and records
+  accepted/rejected apply history. Pairing-time public-key storage and
+  local-network/P2P delivery remain pending.
 - **Acceptance Criteria**:
   - Existing `app_sync` and `control_proposal` behavior remains compatible.
   - New managed policy applies only to target profile and target surface.

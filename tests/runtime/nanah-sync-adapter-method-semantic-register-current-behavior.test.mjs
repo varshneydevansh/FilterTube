@@ -50,6 +50,14 @@ function groupForMethod(name) {
     return 'nanahScopedPortableProfileTransfer';
   }
   if ([
+    'stableManagedNanahJson',
+    'decodeManagedNanahBase64Url',
+    'getManagedNanahSourcePublicKeyJwk',
+    'verifyManagedNanahPolicyIntegritySignature'
+  ].includes(name)) {
+    return 'nanahManagedPolicyIntegrityVerifier';
+  }
+  if ([
     'normalizeManagedPolicyScope',
     'validationResult',
     'getManagedPayloadScopeFamily',
@@ -178,28 +186,28 @@ function productRuntimeSource() {
 test('Nanah sync adapter method semantic register is audit-only and scoped to current behavior', () => {
   const text = doc();
 
-  assert.match(text, /Status: runtime managed-policy validation and validated apply boundary present/);
+  assert.match(text, /Status: runtime managed-policy validation, adapter signature verification, and\s+validated apply boundary present/);
   assert.match(text, /Runtime behavior changed for\s+validated managed envelope apply support/);
   assert.match(text, /source file: js\/nanah_sync_adapter\.js/);
-  assert.match(text, /line count: 1092/);
-  assert.equal(sourceLineCount(), 1092);
-  assert.match(text, /named declarations: 54/);
-  assert.match(text, /plain function declarations: 46/);
-  assert.match(text, /async function declarations: 8/);
+  assert.match(text, /line count: 1154/);
+  assert.equal(sourceLineCount(), 1154);
+  assert.match(text, /named declarations: 58/);
+  assert.match(text, /plain function declarations: 49/);
+  assert.match(text, /async function declarations: 9/);
   assert.match(text, /const arrow helper declarations: 0/);
-  assert.match(text, /public FilterTubeNanahAdapter entries: 12/);
-  assert.match(text, /semantic method groups: 7/);
+  assert.match(text, /public FilterTubeNanahAdapter entries: 13/);
+  assert.match(text, /semantic method groups: 8/);
   assert.match(text, /runtime behavior changed: validated managed envelope apply support/);
-  assert.match(text, /not completion proof for dashboard key-verifier plumbing/);
+  assert.match(text, /not completion proof for live transport key distribution/);
 });
 
 test('Nanah sync adapter register accounts for every current named declaration', () => {
   const rows = methodRows();
 
-  assert.equal(rows.length, 54);
+  assert.equal(rows.length, 58);
   assert.deepEqual(countBy(rows, 'kind'), {
-    'async function': 8,
-    function: 46
+    'async function': 9,
+    function: 49
   });
   assert.deepEqual(countBy(rows, 'group'), {
     nanahAdapterRuntimeAndDescriptor: 3,
@@ -208,6 +216,7 @@ test('Nanah sync adapter register accounts for every current named declaration',
     nanahIncomingEnvelopeApply: 2,
     nanahManagedPolicyEnvelopeApply: 18,
     nanahManagedPolicyEnvelopeValidation: 8,
+    nanahManagedPolicyIntegrityVerifier: 4,
     nanahScopedPortableProfileTransfer: 2
   });
 
@@ -236,6 +245,7 @@ test('Nanah sync adapter register preserves every source row and public API entr
     'buildSyncEnvelope',
     'buildControlProposal',
     'validateManagedPolicyEnvelope',
+    'verifyManagedNanahPolicyIntegritySignature',
     'applyManagedPolicyEnvelope',
     'applyIncomingEnvelope',
     'extractPortableFromEnvelope'
@@ -250,10 +260,10 @@ test('Nanah sync adapter register pins import export envelope and no-DOM surface
 
   assert.equal(countLiteral(source, 'new Map('), 4);
   assert.equal(countLiteral(source, 'safeArray('), 35);
-  assert.equal(countLiteral(source, 'safeObject('), 76);
-  assert.equal(countLiteral(source, 'normalizeString('), 73);
+  assert.equal(countLiteral(source, 'safeObject('), 82);
+  assert.equal(countLiteral(source, 'normalizeString('), 75);
   assert.equal(countLiteral(source, 'normalizeScope('), 6);
-  assert.equal(countLiteral(source, 'JSON.stringify('), 3);
+  assert.equal(countLiteral(source, 'JSON.stringify('), 5);
   assert.equal(countLiteral(source, 'JSON.parse('), 3);
   assert.equal(countLiteral(source, 'throw new Error('), 14);
   assert.equal(countLiteral(source, 'await io.loadProfilesV4'), 3);
@@ -281,10 +291,10 @@ test('Nanah sync adapter register pins import export envelope and no-DOM surface
   for (const token of [
     'new Map calls: 4',
     'safeArray references: 35',
-    'safeObject references: 76',
-    'normalizeString references: 73',
+    'safeObject references: 82',
+    'normalizeString references: 75',
     'normalizeScope references: 6',
-    'JSON.stringify calls: 3',
+    'JSON.stringify calls: 5',
     'JSON.parse calls: 3',
     'throw new Error statements: 14',
     'await io.loadProfilesV4 calls: 3',

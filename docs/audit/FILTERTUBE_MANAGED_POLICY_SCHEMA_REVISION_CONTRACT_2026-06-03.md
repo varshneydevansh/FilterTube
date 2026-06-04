@@ -1,11 +1,12 @@
 # Contract: Managed Policy Schema And Revision Gate
 
 **Generated**: 2026-06-03  
-**Status**: Runtime validation helper and receive-side validation context
-present. A validated managed apply wrapper now persists accepted-revision state
-and scoped child policy writes after the envelope validator accepts the update.
-Dashboard key-verification plumbing is still required before live Nanah
-managed envelopes can pass the verifier gate automatically.
+**Status**: Runtime validation helper, receive-side validation context, and
+adapter WebCrypto verifier plumbing are present. A validated managed apply
+wrapper now persists accepted-revision state and scoped child policy writes
+after the envelope validator accepts the update. Pairing-time trusted key
+material is still required before live Nanah managed envelopes can pass the
+verifier gate automatically.
 **Goal slice**: Implementation order item 3, "Add managed policy schema,
 device-binding, signature, and revision tests".  
 **Primary input**:
@@ -75,13 +76,16 @@ payloadScope
 
 The runtime helper now requires explicit signature-verification evidence after
 the binding tuple passes. A caller can satisfy that gate by providing a
-trusted verification result or a synchronous verifier callback. The dashboard
-Nanah receive path does not yet provide key material or a verifier callback, so
-managed envelopes received there fail closed instead of being treated as valid.
-Future WebCrypto/key-store plumbing must preserve the same binding rejection:
-even a valid-looking signature is rejected if any signed field points at a
-different link, scope, target profile, source device, revision, policy hash, or
-payload family than the envelope being applied.
+trusted verification result or a synchronous verifier callback. The Nanah
+adapter now builds WebCrypto Ed25519 verification evidence from trusted-link
+`sourcePublicKeyJwk` material, and the dashboard receive path passes that
+evidence into the synchronous adapter validator. If the trusted link has no
+stored public key material,
+managed envelopes fail closed with `missing_public_key_material` instead of
+being treated as valid. Future pairing/key-store plumbing must preserve the
+same binding rejection: even a valid-looking signature is rejected if any signed
+field points at a different link, scope, target profile, source device,
+revision, policy hash, or payload family than the envelope being applied.
 
 ## Payload Scope Guard
 
@@ -166,17 +170,18 @@ The paired runtime test must reject:
 
 ## Runtime Boundary
 
-Current product behavior has the first validation helper plus receive-side
-context/history plumbing, but it still does not apply remote policy writes:
+Current product behavior has the validation helper, validated apply wrapper, and
+receive-side context/history plumbing. Live remote delivery still depends on
+pairing-time key material and transport plumbing:
 
 ```text
 runtime filtertube_managed_policy envelope support: validation helper plus validated apply wrapper present in js/nanah_sync_adapter.js
 runtime filtertube_managed_policy receive path: parses envelope, builds validation context, applies only accepted envelopes, records protected evidence
 runtime managed policy persistent accepted-revision writer: present under target profile managedPolicyState.remoteManagedPolicies
 runtime managed policy signature verifier gate: present in js/nanah_sync_adapter.js
-runtime Nanah dashboard key-verification context: absent, so received managed envelopes fail closed before apply
+runtime Nanah adapter key-verification context: WebCrypto Ed25519 helper present; dashboard receive path passes result; missing sourcePublicKeyJwk fails closed before apply
 runtime remote profile write from filtertube_managed_policy: enabled only through applyManagedPolicyEnvelope after validation context accepts
-runtime behavior changed by this contract: envelope validation, signature-verifier gate, receive-side validation/apply evidence, accepted revision persistence, scoped child policy apply, and legacy-path rejection
+runtime behavior changed by this contract: envelope validation, signature-verifier gate, adapter verifier helper, dashboard receive-side validation/apply evidence, accepted revision persistence, scoped child policy apply, and legacy-path rejection
 ```
 
 Future implementation may extend the live Nanah/local-network/mailbox transport

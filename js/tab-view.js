@@ -4688,6 +4688,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             targetProfileId: normalizeString(trusted.targetProfileId || policy.targetProfileId),
             allowedScopes: getNanahManagedPolicyScopeList(trusted.allowedScopes || policy.allowedScopes || policy.defaultScope),
             sourcePublicKeyId: normalizeString(trusted.sourcePublicKeyId || policy.sourcePublicKeyId),
+            sourcePublicKeyJwk: safeObject(trusted.sourcePublicKeyJwk || policy.sourcePublicKeyJwk || policy.publicKeyJwk),
             keyVersion: keyVersion || 0,
             revoked: trusted.revoked === true || policy.revoked === true,
             keyRevoked: trusted.keyRevoked === true || policy.keyRevoked === true,
@@ -4724,6 +4725,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             trustedLink,
             accepted,
             duplicateDeviceIds: getNanahManagedDuplicateDeviceIds(root.sourceDeviceId, root.linkId || trustedLink.linkId),
+            signatureVerification: null,
             historyTargetProfileId: targetProfileId
         };
     }
@@ -8449,6 +8451,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         const io = window.FilterTubeIO || {};
         const localProfilesV4 = profilesV4Cache || (typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null);
         const context = buildManagedNanahPolicyValidationContext(envelope, localProfilesV4);
+        const verifyManagedSignature = typeof adapter.verifyManagedNanahPolicyIntegritySignature === 'function'
+            ? adapter.verifyManagedNanahPolicyIntegritySignature
+            : null;
+        const signatureVerification = verifyManagedSignature
+            ? await verifyManagedSignature(envelope, context.trustedLink)
+            : { verified: false, reason: 'missing_signature_verifier' };
+        context.signatureVerification = signatureVerification;
+        context.verifyIntegritySignature = () => signatureVerification;
+        if (signatureVerification?.verified === true) {
+            context.signatureVerified = true;
+            context.integrityVerified = true;
+        }
         const validation = adapter.validateManagedPolicyEnvelope(envelope, context);
         if (validation.accepted === true && validation.decision === 'idempotent_same_hash') {
             await recordManagedNanahPolicyValidationHistory(envelope, validation, context);

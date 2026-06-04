@@ -30,8 +30,10 @@ This document still does not approve remote policy writes by itself. The first
 managed-envelope validator, validated apply wrapper, receive-side
 validation/apply history writer, and accepted-revision state writer now exist,
 and the validator requires signature-verification evidence. Dashboard
-key-verification plumbing, encrypted/local-network delivery, failed-attempt rate
-limiting, and remote admin session semantics remain separate required slices.
+WebCrypto verifier plumbing now exists when a trusted link carries source
+public-key material. Pairing-time key storage, encrypted/local-network
+delivery, failed-attempt rate limiting, and remote admin session semantics
+remain separate required slices.
 
 ## Issue 60 Local-Network Caregiver Addendum
 
@@ -238,12 +240,14 @@ Authority meaning:
 - The apply wrapper persists accepted revision/hash state under
   `profile.managedPolicyState.remoteManagedPolicies[linkId][scope]` before the
   dashboard records accepted remote-policy history.
-- The validation helper now fails closed with `missing_signature_verifier` or
-  `signature_invalid` when a caller cannot provide trusted signature evidence.
+- The validation helper now fails closed with `missing_signature_verifier`,
+  `missing_public_key_material`, or `signature_invalid` when a caller cannot
+  provide trusted signature evidence.
 - The dashboard receive path now provides managed-policy envelope parsing,
   trusted-link/profile/revision context construction, protected validation
-  evidence rows, validated apply dispatch, and accepted/rejected apply history,
-  but it does not yet provide key material or a verifier callback.
+  evidence rows, adapter WebCrypto Ed25519 verifier evidence when trusted-link
+  `sourcePublicKeyJwk` material exists, validated apply dispatch, and
+  accepted/rejected apply history.
 
 Current gap:
 
@@ -252,9 +256,10 @@ Current gap:
   parent-child binding before writing.
 - Persisted stale/replay authority state exists for accepted managed policies,
   but only inside the target profile's managed policy state.
-- The signature verifier gate exists, but dashboard/key-store verifier plumbing
-  is not wired yet; the receive path therefore rejects otherwise well-shaped
-  managed envelopes rather than treating them as valid.
+- The signature verifier gate and adapter verifier helper exist, but pairing
+  does not yet persist source public-key material for managed links; the receive
+  path therefore rejects otherwise well-shaped managed envelopes without stored
+  key material rather than treating them as valid.
 - The adapter's validated apply wrapper still depends on higher layers for
   canonical hash recomputation, key lookup, local-network pull scheduling,
   encrypted mailbox delivery, and remote admin session semantics.
@@ -293,15 +298,16 @@ Authority meaning:
 
 Current gap:
 
-- The first validation-only managed policy envelope helper exists in
+- The first managed policy envelope validator exists in
   `js/nanah_sync_adapter.js`.
-- The first receive-side validation-history writer exists in `js/tab-view.js`.
-- There is no persisted accepted monotonic managed policy revision writer.
-- There is still no persisted stale/replay authority state.
-- There is no stored per-target accepted policy hash writer for new remote
-  apply decisions.
-- There is now a signature verifier gate, but Nanah/dashboard key verification
-  context is not wired yet.
+- The first receive-side validation/apply history writer exists in
+  `js/tab-view.js`.
+- A persisted accepted monotonic managed policy revision/hash writer now stores
+  state under `profile.managedPolicyState.remoteManagedPolicies[linkId][scope]`.
+- Persisted stale/replay authority state now exists for accepted managed
+  policies on the target profile.
+- There is now a signature verifier gate plus adapter WebCrypto verifier
+  helper, but Nanah pairing still does not persist trusted source public keys.
 - Trust revocation does not yet purge queued updates or invalidate an accepted
   policy revision because those structures do not exist yet.
 
@@ -379,11 +385,11 @@ Current gap:
 |---|---|---|
 | Validated managed policy apply wrapper | Remote apply can now persist a durable accepted-revision object for a fixed child target, but only when a caller supplies accepted validation context. | Key-store/WebCrypto verifier plumbing and live Nanah/local-network receive tests before automatic remote apply. |
 | Target-local remote revision store | Stale or replayed remote updates can now be rejected per target profile/link/scope after the first accepted write, but there is no mailbox or multi-device conflict-resolution layer yet. | Multi-parent, revoked-link, equal-revision/different-hash, and mailbox-delivery fixtures. |
-| Signature verifier context not wired | The helper now requires verifier evidence, but Nanah/dashboard key material is not wired yet, so remote managed envelopes fail closed before apply. | Key-store/WebCrypto verifier plumbing plus signed/authenticated envelope tests. |
+| Pairing key material not stored | The helper now requires verifier evidence and adapter WebCrypto verification is wired, but Nanah pairing does not yet persist source public keys, so remote managed envelopes without `sourcePublicKeyJwk` fail closed before apply. | Pairing-time key-store write plus signed/authenticated envelope tests. |
 | Partial canonical payload/integrity binding | The helper checks binding fields and verifier result, but no canonical payload hash recomputation exists yet. | Binding-tuple fixtures plus canonical payload hash proof. |
-| Signed remote Main/Kids policy gate is not live | Local child route denial works and accepted managed envelopes can write viewing-space policy, but dashboard key verification and live transport are still not wired. | Signed route-policy fixtures through live Nanah/local-network receive. |
+| Signed remote Main/Kids policy gate is not live | Local child route denial works and accepted managed envelopes can write viewing-space policy, but pairing key storage and live transport are still not wired. | Signed route-policy fixtures through live Nanah/local-network receive. |
 | Remote time-limit policy apply is wrapper-only | Local child time-budget enforcement exists and accepted managed envelopes can write runtime-compatible time-limit policy, but live parent-device delivery is not wired. | Signed remote time-limit fixtures through Nanah/local-network receive. |
-| Adapter lacks persisted key/trust lookup | `validateManagedPolicyEnvelope(...)` depends on caller-supplied trusted-link/profile/revision context; the wrapper rechecks stored profiles before writing but does not fetch trust keys itself. | Key lookup and canonical verifier context before automatic apply. |
+| Adapter depends on caller trust context | `validateManagedPolicyEnvelope(...)` depends on caller-supplied trusted-link/profile/revision/signature context; the wrapper rechecks stored profiles before writing but does not fetch trust keys itself. | Keep dashboard receive context and add pairing key lookup/revocation fixtures before automatic apply. |
 | Locked-child bypass has no revision binding | `allow_trusted_updates` can skip unlock for matching managed sessions, but not with policy revision constraints. | Locked child managed-policy fixtures. |
 | No mailbox protocol | Offline later delivery is not specified at runtime. | Ciphertext/replay/ack protocol doc before server work. |
 | No local-network management contract | Same-network discovery could be mistaken for authority. | Separate discovery, pairing, transport, and policy-authority proof. |
