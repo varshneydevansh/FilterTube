@@ -570,7 +570,7 @@ fail 0
 | `js/tab-view.js:4658` | full dashboard UI | profile mode write | - | `mode: 'whitelist',` | must preserve whitelist/blocklist migration invariant and empty-mode policy |
 | `js/tab-view.js:4667` | full dashboard UI | settings save call | - | `await StateManager.loadSettings();` | must be revisioned/queued and surface failure to caller |
 | `js/tab-view.js:6032` | full dashboard UI | message action object | `apply_once` | `closeWith({ action: 'apply_once', policy });` | must declare sender trust, target profile/surface, storage writes, broadcast, and network budget |
-| `js/tab-view.js:6045` | full dashboard UI | message action object | `save` | `closeWith({ action: 'save', policy });` | must declare sender trust, target profile/surface, storage writes, broadcast, and network budget |
+| `js/tab-view.js:6072` | full dashboard UI | message action object | `save` | `closeWith({ action: 'save', policy });` | must declare sender trust, target profile/surface, storage writes, broadcast, and network budget |
 | `js/tab-view.js:6672` | full dashboard UI | storage read | `[key], (result) => {` | `const maybePromise = runtimeAPI.storage.local.get([key], (result) => {` | must be covered by authority/mutation fixture |
 | `js/tab-view.js:6696` | full dashboard UI | storage write | `{ [key]: value }, () => {` | `const maybePromise = runtimeAPI.storage.local.set({ [key]: value }, () => {` | must be tied to mutation intent, migration report, or explicit cache/map side-effect |
 | `js/tab-view.js:7652` | full dashboard UI | settings save call | - | `await StateManager.loadSettings();` | must be revisioned/queued and surface failure to caller |
@@ -647,9 +647,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 71
-method semantic proof gap lexical callables covered: 6045
+method semantic proof gap lexical callables covered: 6072
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6045
+lexical callables requiring semantic proof before behavior changes: 6072
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

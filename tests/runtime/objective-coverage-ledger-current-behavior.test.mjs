@@ -3377,9 +3377,9 @@ test('objective coverage ledger records CSS load and style surfaces as current-b
   assert.match(doc, /package\/quarantine, accessibility\/responsive, false-hide\/leak/);
   assert.match(doc, /without opening the implementation gate/);
   assert.match(doc, /all 9 tracked CSS files/);
-  assert.match(doc, /11,077 counted source lines/);
-  assert.match(doc, /296,952 bytes/);
-  assert.match(doc, /1,548 lexical rule blocks/);
+  assert.match(doc, /11,134 counted source lines/);
+  assert.match(doc, /298,089 bytes/);
+  assert.match(doc, /1,556 lexical rule blocks/);
   assert.match(doc, /593 `!important` declarations/);
   assert.match(doc, /47 `display:none` declarations/);
   assert.match(doc, /72 `:not\(\.filter-tube-visible\)` clauses/);
@@ -8307,9 +8307,9 @@ test('objective coverage ledger records extension UI CSS page-state boundary as 
   assert.match(doc, /3 generated-shell source files/);
   assert.match(doc, /2 generated-shell output files/);
   assert.match(doc, /2 hand-owned UI runtime files/);
-  assert.match(doc, /9,329 counted active CSS lines/);
-  assert.match(doc, /240,541 active CSS bytes/);
-  assert.match(doc, /1,342 lexical rule blocks/);
+  assert.match(doc, /9,386 counted active CSS lines/);
+  assert.match(doc, /241,678 active CSS bytes/);
+  assert.match(doc, /1,350 lexical rule blocks/);
   assert.match(doc, /115 `!important` declarations/);
   assert.match(doc, /25 `display:none` declarations/);
   assert.match(doc, /36 `@media` blocks/);
@@ -8323,7 +8323,7 @@ test('objective coverage ledger records extension UI CSS page-state boundary as 
   assert.match(doc, /7 `data-scene` tokens/);
   assert.match(doc, /47 `\.active` selectors/);
   assert.match(doc, /56 `transition` declarations/);
-  assert.match(doc, /90 `transform` declarations/);
+  assert.match(doc, /91 `transform` declarations/);
   assert.match(doc, /5 runtime extension UI CSS page-state fixtures/);
   assert.match(doc, /generated shell output loads before hand-owned popup\/dashboard runtime/);
   assert.match(doc, /shell runtime owns `root\.dataset\.scene`, `root\.dataset\.theme`, `root\.dataset\.surface`, `body\.dataset\.surface`, `ft-extension-surface`, and popup width `392px`/);

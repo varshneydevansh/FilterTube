@@ -18,7 +18,7 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/tab-view.js` | 13490 | 621440 | `4b5c7474a686eae49d41926a2e4fe4daa670322d91138c6c6d715e07832827b2` |
+| `js/tab-view.js` | 13624 | 628461 | `77f20044b7e6bddf0bf9b8a455f0d38f7018cffcde82c42ba9af1c4a3491b428` |
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/io_manager.js` | 2097 | 100479 | `f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62` |
 | `js/background.js` | 6711 | 301840 | `b27206ec2b6927fc33f823c4832ff95ace7c97bd4284eb950fc5964baf666346` |
@@ -136,9 +136,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 71
-method semantic proof gap lexical callables covered: 6045
+method semantic proof gap lexical callables covered: 6072
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6045
+lexical callables requiring semantic proof before behavior changes: 6072
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

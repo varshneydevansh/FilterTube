@@ -2878,9 +2878,9 @@ test('active goal completion audit records CSS load and style surfaces without d
   assert.match(source, /every-file, DOM selector, style\/hide, extension UI, website/);
   assert.match(source, /all tracked CSS files/);
   assert.match(source, /9 tracked CSS files/);
-  assert.match(source, /11,077 counted source lines/);
-  assert.match(source, /296,952 bytes/);
-  assert.match(source, /1,548 lexical rule blocks/);
+  assert.match(source, /11,134 counted source lines/);
+  assert.match(source, /298,089 bytes/);
+  assert.match(source, /1,556 lexical rule blocks/);
   assert.match(source, /593 `!important` declarations/);
   assert.match(source, /47 `display:none` declarations/);
   assert.match(source, /72 `:not\(\.filter-tube-visible\)` clauses/);
@@ -8566,9 +8566,9 @@ test('active goal completion audit records extension UI CSS page-state boundary 
   assert.match(source, /3 generated-shell source files/);
   assert.match(source, /2 generated-shell output files/);
   assert.match(source, /2 hand-owned UI runtime files/);
-  assert.match(source, /9,329 counted active CSS lines/);
-  assert.match(source, /240,541 active CSS bytes/);
-  assert.match(source, /1,342 lexical rule blocks/);
+  assert.match(source, /9,386 counted active CSS lines/);
+  assert.match(source, /241,678 active CSS bytes/);
+  assert.match(source, /1,350 lexical rule blocks/);
   assert.match(source, /115 `!important` declarations/);
   assert.match(source, /25 `display:none` declarations/);
   assert.match(source, /36 `@media` blocks/);
@@ -8582,7 +8582,7 @@ test('active goal completion audit records extension UI CSS page-state boundary 
   assert.match(source, /7 `data-scene` tokens/);
   assert.match(source, /47 `\.active` selectors/);
   assert.match(source, /56 `transition` declarations/);
-  assert.match(source, /90 `transform` declarations/);
+  assert.match(source, /91 `transform` declarations/);
   assert.match(source, /5 runtime extension UI CSS page-state fixtures/);
   assert.match(source, /generated shell output loads before hand-owned popup\/dashboard runtime/);
   assert.match(source, /shell runtime sets `root\.dataset\.scene`, `root\.dataset\.theme`, `root\.dataset\.surface`, `body\.dataset\.surface`, `ft-extension-surface`, and popup width `392px`/);

@@ -13,7 +13,7 @@ const activeCssRows = [
   ['css/components.css', 1686, 45567, 'db01d30c717e34c108e48d92807ce3df4bcafccace62a1808d86d03ed7047ebc', 240, 47, 1, 5, 1, 0, 1, 49, 53, 53, 0, 0, 2, 18, 1, 0, 19, 20, 5, 3, 4, 0],
   ['css/popup.css', 1151, 29731, '812cb4ba8b4c9be732bd8a2a6f7b06b5d8d0a8c3fb7416f391f475ae627d45fa', 182, 5, 3, 2, 0, 1, 3, 23, 52, 75, 0, 0, 5, 6, 0, 0, 8, 8, 1, 1, 2, 0],
   ['css/tab-view.css', 2834, 68789, 'e328965f44468e90cca22bb11b25103b1821ed2037775fbe312e2025c241c7c9', 422, 24, 14, 12, 4, 2, 1, 28, 26, 74, 0, 0, 1, 20, 0, 0, 17, 17, 15, 12, 12, 1],
-  ['css/serene-shell.css', 3357, 86093, '92dddf7925091481ab5364b1bd9c67ff65a8435854c2753ee5f0de1c14098228', 486, 39, 7, 16, 1, 0, 11, 34, 124, 124, 54, 0, 4, 3, 0, 0, 12, 45, 17, 10, 14, 0]
+  ['css/serene-shell.css', 3414, 87230, '785e988dd0176b16defcc08f77925de8eaa60ea831d53cd57147eb601c490f0a', 494, 39, 7, 16, 1, 0, 11, 34, 124, 124, 54, 0, 4, 3, 0, 0, 12, 46, 17, 10, 14, 0]
 ];
 
 const selectedSourceRows = [
@@ -21,16 +21,16 @@ const selectedSourceRows = [
   ['css/components.css', 1686, 45567, 'db01d30c717e34c108e48d92807ce3df4bcafccace62a1808d86d03ed7047ebc'],
   ['css/popup.css', 1151, 29731, '812cb4ba8b4c9be732bd8a2a6f7b06b5d8d0a8c3fb7416f391f475ae627d45fa'],
   ['css/tab-view.css', 2834, 68789, 'e328965f44468e90cca22bb11b25103b1821ed2037775fbe312e2025c241c7c9'],
-  ['css/serene-shell.css', 3357, 86093, '92dddf7925091481ab5364b1bd9c67ff65a8435854c2753ee5f0de1c14098228'],
+  ['css/serene-shell.css', 3414, 87230, '785e988dd0176b16defcc08f77925de8eaa60ea831d53cd57147eb601c490f0a'],
   ['html/popup.html', 31, 1213, 'c5e03a38b2737dbd01e2cd0c243b37754936e2e349e9d2275b195350159aea31'],
-  ['html/tab-view.html', 1577, 133585, 'd11914a138ab29fb764a6aede4921c4d491bacaad83ecd44f8d7392758ece3e1'],
+  ['html/tab-view.html', 1598, 136177, '15ca4b3a6c1e5a6c8e43a6dbce796fdb33d7dcedcc5ed80a03c4373e184afbef'],
   ['src/extension-shell/popup.jsx', 113, 3864, '3a3772e7d77f8466fea609a80c1d4f09873e47022aee17f3b8b09858397b298c'],
   ['src/extension-shell/tab-view-decor.jsx', 34, 1101, '354cd36fa62b215a415e88b8b0c84bd43725196613766d6af921eac44d1f63f1'],
   ['src/extension-shell/shared/runtime.js', 52, 1462, 'd54cc87b8f48736df6ca063fa79e37b2439b580710746e215e8b428fc7207ec8'],
   ['js/ui-shell/popup-shell.js', 374, 21080, 'dc750d44dd4b9fde63b85b4dfc9f5ce9ba76964afbd6dfcedc7b3b7cce084b05'],
   ['js/ui-shell/tab-view-decor.js', 323, 18289, '234171091e523aa5de4c3c0f97e7341c55893bdd31b3e25a075490170fa9742f'],
   ['js/popup.js', 1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
-  ['js/tab-view.js', 11617, 526763, '1b7f621d48d16247aecc4c7ee57cbc3db9efd3e597e6f0a4fc188228470648f7']
+  ['js/tab-view.js', 13624, 628461, '77f20044b7e6bddf0bf9b8a455f0d38f7018cffcde82c42ba9af1c4a3491b428']
 ];
 
 function read(file) {
@@ -169,9 +169,9 @@ test('active extension UI CSS state counters match current source', () => {
   }
 
   assert.deepEqual(totals, {
-    lines: 9329,
-    bytes: 240541,
-    rules: 1342,
+    lines: 9386,
+    bytes: 241678,
+    rules: 1350,
     important: 115,
     displayNone: 25,
     media: 36,
@@ -188,21 +188,21 @@ test('active extension UI CSS state counters match current source', () => {
     show: 1,
     hiddenClass: 0,
     transition: 56,
-    transform: 90,
+    transform: 91,
     zIndex: 38,
     pointerNone: 26,
     overflowHidden: 32,
     reducedMotion: 1
   });
 
-  assert.match(doc, /9,329 counted source lines/);
-  assert.match(doc, /240,541 bytes, 1,342 lexical rule blocks/);
+  assert.match(doc, /9,386 counted source lines/);
+  assert.match(doc, /241,678 bytes, 1,350 lexical rule blocks/);
   assert.match(doc, /115 `!important` declarations, 25\s+`display:none` declarations/);
   assert.match(doc, /36 `@media` blocks, 6 `@keyframes` blocks, 3\s+`\[hidden\]` selectors/);
   assert.match(doc, /16 `:focus-visible` selectors, 134 `:hover` selectors/);
   assert.match(doc, /255 dark-theme selector prefixes, 331 `data-theme` tokens, 54 `data-surface`\s+tokens, 7 `data-scene` tokens/);
   assert.match(doc, /47 `\.active`\s+selectors, 1 `\.show` selector, 0 `\.hidden` selectors/);
-  assert.match(doc, /56 `transition`\s+declarations, 90 `transform` declarations, 38 `z-index` declarations/);
+  assert.match(doc, /56 `transition`\s+declarations, 91 `transform` declarations, 38 `z-index` declarations/);
   assert.match(doc, /26\s+`pointer-events:none` declarations, 32 overflow-hidden declarations, and 1\s+`prefers-reduced-motion` token/);
 });
 
@@ -229,17 +229,17 @@ test('popup and tab-view CSS loader order is tied to generated shell before hand
   const popupScripts = tagAttrValues(popupHtml, 'script', 'src');
   const tabScripts = tagAttrValues(tabHtml, 'script', 'src');
   assert.equal(popupScripts.length, 9);
-  assert.equal(tabScripts.length, 12);
+  assert.equal(tabScripts.length, 14);
   assert.ok(popupScripts.indexOf('../js/ui-shell/popup-shell.js') < popupScripts.indexOf('../js/popup.js'));
   assert.ok(tabScripts.indexOf('../js/ui-shell/tab-view-decor.js') < tabScripts.indexOf('../js/tab-view.js'));
   assert.deepEqual(tagAttrValues(popupHtml, 'div', 'id'), ['popupRoot']);
-  assert.equal([...tabHtml.matchAll(/id="([^"]+)"/g)].length, 100);
+  assert.equal([...tabHtml.matchAll(/id="([^"]+)"/g)].length, 106);
   assert.equal([...tabHtml.matchAll(/data-tab="([^"]+)"/g)].length, 9);
 
   assert.match(doc, /`html\/popup\.html` loads 9 scripts and places `\.\.\/js\/ui-shell\/popup-shell\.js`\s+before `\.\.\/js\/popup\.js`/);
-  assert.match(doc, /`html\/tab-view\.html` loads 12 scripts and places\s+`\.\.\/js\/ui-shell\/tab-view-decor\.js` before `\.\.\/js\/tab-view\.js`/);
+  assert.match(doc, /`html\/tab-view\.html` loads 14 scripts and places\s+`\.\.\/js\/ui-shell\/tab-view-decor\.js` before `\.\.\/js\/tab-view\.js`/);
   assert.match(doc, /It has 1 static id: `popupRoot`/);
-  assert.match(doc, /It has 100 static ids\s+and 9 `data-tab` values/);
+  assert.match(doc, /It has 106 static ids\s+and 9 `data-tab` values/);
 });
 
 test('generated shell environment and hand-owned UI runtime state tokens remain split', () => {

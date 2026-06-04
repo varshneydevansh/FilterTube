@@ -1,10 +1,10 @@
 # Audit: Nanah Managed Multi-Target Fanout Boundary
 
 **Generated**: 2026-06-04
-**Status**: Profile-scoped identity foundation present; boundary contract still
-active. Runtime multi-target fanout remains disabled because the dashboard does
-not yet expose a target chooser, live-session fanout send loop, or per-target
-ack/history summary.
+**Status**: Profile-scoped identity foundation present; connected-device target
+chooser and live same-replica fanout send loop present. Boundary contract still
+active for per-target ack/history, mailbox delivery, local-network delivery, and
+offline later delivery.
 **Related live-send proof**:
 `docs/audit/FILTERTUBE_NANAH_MANAGED_LIVE_SIGNED_SEND_2026-06-04.md`
 **Related plan**:
@@ -18,13 +18,17 @@ that should all receive the same keyword, channel, video, viewing-space, or
 time-limit policy.
 
 The current live Nanah runtime can safely send signed managed policy envelopes
-to one connected replica target. Trusted-link storage and lookup can now
-distinguish fixed child/profile targets on the same remote device, but the
-dashboard must not expose a bulk target UI until target selection, live-session
-fanout send wiring, and per-target status/history are implemented. Otherwise a
-bulk action could still overclaim delivery or hide a skipped/rejected child
-target behind one success toast. The helper-level per-target envelope batcher is
-now present as a non-UI primitive only.
+to one or more saved fixed child/profile targets on the currently connected
+replica device. Trusted-link storage and lookup can distinguish fixed targets on
+the same remote device, and the dashboard now exposes a bounded target chooser
+only when at least two saved profile-scoped targets on that connected replica
+are eligible for the selected scope.
+
+The runtime still must not claim offline or cross-device fanout. A live Nanah
+data channel reaches the current remote session only. Other saved devices need a
+future encrypted mailbox or local-network provider, and per-target ack/history
+is still pending before a parent gets a complete accepted/rejected delivery
+ledger.
 
 ## Current Runtime Evidence
 
@@ -53,6 +57,21 @@ findNanahTrustedLinkForManagedEnvelope(envelope)
 getNanahManagedDuplicateDeviceIds(sourceDeviceId, linkId, targetProfileId)
   -> treats same source device + different target profile as allowed
   -> still flags ambiguous or same-target duplicate source authority
+
+getNanahEligibleManagedTargetLinks(scope)
+  -> filters saved links to the currently connected remoteDeviceId
+  -> requires Source -> Replica managed_link roles
+  -> requires fixed targetProfileId
+  -> requires the selected scope or Rule bundle child scopes to be allowed
+
+syncNanahManagedTargetOptions(scope)
+  -> shows the dashboard chooser only after at least two eligible targets
+  -> defaults to the current target link or the first eligible target
+  -> keeps single-target sends on the existing current-link path
+
+getNanahSelectedManagedTargetLinks(scope)
+  -> returns explicit checked target links while the chooser is visible
+  -> returns no links when the chooser is hidden, preserving single-target send
 ```
 
 Current behavior in `js/nanah_managed_live_policy.js`:
@@ -68,12 +87,14 @@ buildEnvelopeBatchForTrustedLinks(policy, trustedLinks)
   -> expands selected scope or Rule bundle per target
   -> signs each envelope with its own linkId, targetProfileId, scope,
      revision, hash, and integrity binding
-  -> does not send, choose targets, or record per-target ack/history
+  -> is now used by the dashboard for selected targets on the connected replica
+  -> does not record per-target ack/history
 ```
 
 That is correct for single-target signed sends and for storing multiple fixed
-targets from one trusted remote device. It provides the envelope-building
-primitive for future fanout, but it is still not enough for bulk fanout UI.
+targets from one trusted remote device. It now provides a bounded live fanout UI
+for same-replica sessions, but it is still not enough for offline, mailbox, or
+local-network fanout claims.
 
 ## Required Identity Upgrade
 
@@ -87,7 +108,8 @@ managed authority key =
   + targetProfileId
 ```
 
-Future fanout still needs the full per-target send authority:
+Each live same-replica fanout target still needs the full per-target send
+authority:
 
 ```text
 fanout target authority =
@@ -113,8 +135,11 @@ flowchart TD
   D -->|No| E["Refuse missing or ambiguous target"]
   D -->|Yes| F["Build signed envelope batch per target"]
   F --> G["Each envelope binds linkId, targetProfileId, scope, revision, hash"]
-  G --> H["Send sequentially over live session or queue encrypted mailbox item"]
-  H --> I["Record per-target accepted/rejected/ack status"]
+  G --> H{"Target is on current live replica?"}
+  H -->|Yes| I["Send sequentially over live session"]
+  H -->|No| J["Future encrypted mailbox/local-network delivery"]
+  I --> K["Record sent revision/hash per link"]
+  J --> L["Pending: protected per-target ack/history"]
 ```
 
 ASCII boundary:
@@ -123,7 +148,7 @@ ASCII boundary:
 requested fanout
   -> target A has profile-scoped trusted link? yes -> signed envelope A
   -> target B has profile-scoped trusted link? yes -> signed envelope B
-  -> target C missing trusted link? stop or skip with protected rejection row
+  -> target C missing trusted link? do not show as selectable live target
 ```
 
 ## UI/UX Boundary
@@ -132,11 +157,11 @@ The parent-facing UI should stay simple:
 
 - Single-target remains the default.
 - Bulk send appears only after at least two saved profile-scoped child targets
-  are eligible for the selected scope.
+  on the connected replica are eligible for the selected scope.
 - Targets should show child name, remote device label, last accepted revision,
   open-sync status, and whether the selected scope is allowed.
-- The confirmation copy should say exactly how many profiles will receive the
-  update and which profiles are skipped.
+- The success copy says how many selected target profiles received a live send.
+  A richer accepted/rejected ledger is still pending.
 - The UI must never imply that a live Nanah session can reach offline devices;
   offline devices require encrypted mailbox or local-network provider delivery.
 
@@ -155,16 +180,18 @@ The parent-facing UI should stay simple:
 
 ```text
 runtime profile-scoped trusted link id: present
-runtime multi-target chooser: absent
-runtime signed fanout envelope builder: helper present, UI path absent
-runtime per-target mark-sent state: absent
+runtime connected-device multi-target chooser: present
+runtime signed fanout envelope builder: present
+runtime signed fanout send loop: present for selected targets on the connected replica only
+runtime per-target mark-sent state: present per envelope linkId/scope
 runtime per-target ack/history summary: absent
 runtime mailbox/local-network fanout delivery: absent
 ```
 
-Runtime behavior changed by this proof: yes, trusted-link storage and lookup now
-distinguish fixed managed target profiles, and the helper can build per-target
-signed envelope batches. Bulk fanout remains disabled.
+Runtime behavior changed by this proof: yes, the dashboard can now choose
+multiple saved fixed-profile targets on the connected replica and send signed
+managed envelopes for each selected link. Offline device fanout, local-network
+fanout, and protected per-target ack/history remain pending.
 
 ## Proof Commands
 

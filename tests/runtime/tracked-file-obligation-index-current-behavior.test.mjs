@@ -6668,9 +6668,9 @@ test('tracked_file_obligation_index_links_extension_ui_css_page_state_boundary_w
   assert.match(doc, /3 selected generated-shell source files/);
   assert.match(doc, /2 selected generated-shell output files/);
   assert.match(doc, /2 selected hand-owned UI runtime files/);
-  assert.match(doc, /9,329 selected active CSS lines/);
-  assert.match(doc, /240,541 selected active CSS bytes/);
-  assert.match(doc, /1,342 selected lexical rule blocks/);
+  assert.match(doc, /9,386 selected active CSS lines/);
+  assert.match(doc, /241,678 selected active CSS bytes/);
+  assert.match(doc, /1,350 selected lexical rule blocks/);
   assert.match(doc, /115 selected `!important` declarations/);
   assert.match(doc, /25 selected `display:none` declarations/);
   assert.match(doc, /36 selected `@media` blocks/);

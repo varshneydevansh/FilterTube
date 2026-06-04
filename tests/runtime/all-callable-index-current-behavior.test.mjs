@@ -34,7 +34,7 @@ const releaseFixStatusDoc = fs.readFileSync(
 const expectedFamilyTotals = new Map([
   ['Hot page/background runtime', { files: 9, count: 3170 }],
   ['Content helper runtime', { files: 9, count: 348 }],
-  ['UI/settings runtime', { files: 12, count: 1842 }],
+  ['UI/settings runtime', { files: 12, count: 1869 }],
   ['Generated/quarantined UI', { files: 6, count: 147 }],
   ['Vendor bundles', { files: 2, count: 279 }],
   ['Build/sync scripts', { files: 4, count: 58 }],
@@ -187,9 +187,9 @@ function assertMethodSemanticConvergenceBoundary(doc) {
 
   for (const phrase of [
     '71 tracked JS/JSX/MJS files',
-    '6,045 lexical callables',
+    '6,072 lexical callables',
     '3,170 hot page/background runtime',
-    '2,875 UI, helper, generated, vendor, build, audit-lane, website',
+    '2,902 UI, helper, generated, vendor, build, audit-lane, website',
     '149 selected semantic triage rows',
     '4 rejected closure candidates',
     '0 files with complete per-callable semantic proof',
@@ -222,9 +222,9 @@ function assertMethodSemanticConvergenceBoundary(doc) {
 test('audit meta index docs carry the method proof gap blocker', () => {
   for (const phrase of [
     'tracked JS/JSX/MJS files: 71',
-    'repo-wide lexical callables: 6045',
+    'repo-wide lexical callables: 6072',
     'files with complete per-callable semantic proof: 0',
-    'lexical callables requiring semantic proof before behavior changes: 6045',
+    'lexical callables requiring semantic proof before behavior changes: 6072',
     'optimization work and a first-class JSON\nfilter model remain blocked',
     'runtime behavior changed: no',
     'Method Semantic Convergence Boundary - 2026-05-30',
@@ -242,7 +242,7 @@ test('audit meta index docs carry the method proof gap blocker', () => {
   for (const docPath of auditMetaReadinessDocs) {
     const doc = source(docPath);
     assert.ok(doc.includes(methodGapPath), `${docPath} must cite method semantic gap source`);
-    assert.ok(doc.includes('method semantic proof gap lexical callables covered: 6045'), `${docPath} must pin callable gap count`);
+    assert.ok(doc.includes('method semantic proof gap lexical callables covered: 6072'), `${docPath} must pin callable gap count`);
     assert.ok(doc.includes('affected callable semantic proof: NO-GO'), `${docPath} must keep behavior-change blocker`);
     if (docPath.includes('CURRENT_DIRTY_WORKTREE_AUDIT_BOUNDARY')) {
       assert.ok(doc.includes('runtime behavior changed: yes in the 2026-05-26 release-lag fix batch'), `${docPath} must record release-lag runtime changes`);
@@ -272,8 +272,8 @@ test('all-callable index counts match current lexical callable source', () => {
     assert.equal(documented, actual, `${file} callable count should match current source`);
   }
 
-  assert.equal(total, 6045);
-  assert.match(indexDoc, /repo-wide lexical callables: 6045/);
+  assert.equal(total, 6072);
+  assert.match(indexDoc, /repo-wide lexical callables: 6072/);
 });
 
 test('all-callable family totals match the documented file rows', () => {
@@ -319,15 +319,15 @@ test('all-callable index documents semantic method proof boundary', () => {
   assert.doesNotMatch(indexDoc, /2,834 lexical callables/);
   assert.doesNotMatch(indexDoc, /another 2,483/);
   assert.match(indexDoc, /Hot runtime has 3,170 lexical callables/);
-  assert.match(indexDoc, /another 2,875/);
+  assert.match(indexDoc, /another 2,902/);
   assert.match(indexDoc, /Only 123 lexical callable forms/);
 
   assert.match(methodSemanticGapDoc, /Status: audit-only current-behavior gap index/);
   assert.match(methodSemanticGapDoc, /tracked JS\/JSX\/MJS files: 71/);
-  assert.match(methodSemanticGapDoc, /repo-wide lexical callables: 6045/);
+  assert.match(methodSemanticGapDoc, /repo-wide lexical callables: 6072/);
   assert.match(methodSemanticGapDoc, /files with lexical accounting: 71/);
   assert.match(methodSemanticGapDoc, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodSemanticGapDoc, /lexical callables requiring semantic proof before behavior changes: 6045/);
+  assert.match(methodSemanticGapDoc, /lexical callables requiring semantic proof before behavior changes: 6072/);
   assert.match(methodSemanticGapDoc, /required semantic proof fields: 8/);
   assert.match(methodSemanticGapDoc, /selected release hot-path semantic triage rows: 13/);
   assert.match(methodSemanticGapDoc, /selected visual-writer semantic triage rows: 8/);
@@ -354,7 +354,7 @@ test('all-callable index documents semantic method proof boundary', () => {
   assert.match(methodSemanticGapDoc, /closure rejection reason: repo-wide broad parser and build\/website route parser intentionally count different lexical shapes; current build\/sync plus website\/config broad total is 181 while build\/website audit total is 108, so parser agreement and complete semantic proof remain absent/);
   assert.match(methodSemanticGapDoc, /2026-05-30 Current-Source Method Gap Freshness Addendum/);
   assert.match(methodSemanticGapDoc, /tracked JS\/JSX\/MJS files still covered: 71/);
-  assert.match(methodSemanticGapDoc, /repo-wide lexical callables still requiring semantic proof: 6045/);
+  assert.match(methodSemanticGapDoc, /repo-wide lexical callables still requiring semantic proof: 6072/);
   assert.match(methodSemanticGapDoc, /latest full runtime proof: broad audit backlog 4754 tests, 4661 pass, 93 fail/);
   assert.match(methodSemanticGapDoc, /method semantic completion from freshness rerun: NO-GO/);
   assert.match(methodSemanticGapDoc, /JSON-first first-class promotion from method freshness rerun: NO-GO/);
@@ -461,7 +461,7 @@ test('all-callable index documents semantic method proof boundary', () => {
     });
   }
 
-  assert.equal(total, 6045);
+  assert.equal(total, 6072);
   assert.deepEqual(methodTotals, expectedFamilyTotals);
 
   for (const authority of [

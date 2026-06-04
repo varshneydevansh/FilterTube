@@ -15,7 +15,7 @@ const cssRows = [
   ['css/filter.css', 'packaged quarantined content CSS', 74, 2412, 'e2462d446b1a3738d937945eabf013ec05173224970b0c877593901aba5a5032', 6, 12, 5, 5, 6, 0, 0, 0, 0],
   ['css/layout.css', 'packaged quarantined content CSS', 803, 28581, '9ae38491aeb2dc3a58027d4a005c6136042c66dc438786483285fdbd91cb1941', 86, 353, 11, 62, 126, 6, 0, 0, 0],
   ['css/popup.css', 'active extension popup CSS', 1151, 29731, '812cb4ba8b4c9be732bd8a2a6f7b06b5d8d0a8c3fb7416f391f475ae627d45fa', 182, 5, 3, 0, 0, 0, 2, 0, 1],
-  ['css/serene-shell.css', 'active extension shell CSS', 3357, 86093, '92dddf7925091481ab5364b1bd9c67ff65a8435854c2753ee5f0de1c14098228', 486, 39, 7, 0, 0, 0, 16, 1, 0],
+  ['css/serene-shell.css', 'active extension shell CSS', 3414, 87230, '785e988dd0176b16defcc08f77925de8eaa60ea831d53cd57147eb601c490f0a', 494, 39, 7, 0, 0, 0, 16, 1, 0],
   ['css/tab-view.css', 'active extension dashboard CSS', 2834, 68789, 'e328965f44468e90cca22bb11b25103b1821ed2037775fbe312e2025c241c7c9', 422, 24, 14, 0, 0, 0, 12, 4, 2],
   ['website/app/globals.css', 'website-only global CSS', 486, 12528, '2b583fc11e8f5a3a6fa5113daebf71b91d46bf685b02c544727167cf9ed7f760', 69, 0, 0, 0, 0, 0, 1, 1, 0]
 ];
@@ -90,9 +90,9 @@ test('CSS load style surface register is audit-only and covers every tracked CSS
   }
 
   assert.deepEqual(totals, {
-    lines: 11077,
-    bytes: 296952,
-    rules: 1548,
+    lines: 11134,
+    bytes: 298089,
+    rules: 1556,
     important: 593,
     displayNone: 47,
     notVisible: 72,
@@ -102,8 +102,8 @@ test('CSS load style surface register is audit-only and covers every tracked CSS
     keyframes: 7,
     hiddenAttr: 3
   });
-  assert.match(doc, /9 CSS files, 11,077 counted source lines/);
-  assert.match(doc, /296,952 bytes, 1,548 lexical rule blocks/);
+  assert.match(doc, /9 CSS files, 11,134 counted source lines/);
+  assert.match(doc, /298,089 bytes, 1,556 lexical rule blocks/);
   assert.match(doc, /593 `!important` declarations, 47\s+`display:none` declarations/);
 });
 

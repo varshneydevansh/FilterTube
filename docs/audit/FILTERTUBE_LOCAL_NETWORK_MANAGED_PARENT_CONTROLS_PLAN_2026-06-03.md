@@ -14,14 +14,15 @@ viewing-space, and time-limit scopes, granular keyword/channel/video sends now
 expose an explicit Main/Kids rule-source picker, and Rule bundle expands into
 separate signed keyword/channel/video envelopes. Managed trusted-link storage
 and lookup are now profile-scoped for fixed child/profile targets on the same
-remote device, while bulk multi-target fanout UI remains gated. A provider-gated
-dashboard/profile-open pull hook and redacted provider ack handoff are present
-for already-decrypted mailbox items. An extension-owned managed app policy
-contract artifact and app manifest copy row are now present so downstream app
-parity can be tested before native enforcement changes.
+remote device, and the dashboard can now choose multiple eligible fixed targets
+on the currently connected replica for live same-replica signed sends. A
+provider-gated dashboard/profile-open pull hook and redacted provider ack
+handoff are present for already-decrypted mailbox items. An extension-owned
+managed app policy contract artifact and app manifest copy row are now present
+so downstream app parity can be tested before native enforcement changes.
 Local-network peer discovery, LAN delivery, server mailbox pull, mailbox
-decryption, app native enforcement proofs, and active/full signed managed sends
-remain gated.
+decryption, per-target accepted/rejected live ack history, app native
+enforcement proofs, and active/full signed managed sends remain gated.
 **Primary audit input**:
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
 **Current pull-on-open proof**:
@@ -435,11 +436,11 @@ replica child device over Nanah/P2P or same-network transport.
   video, viewing-space, and time-limit dashboard live sends now build signed
   `filtertube_managed_policy` envelopes; granular keyword/channel/video sends
   expose an explicit Main/Kids rule-source picker, and Rule bundle expands into
-  separate signed keyword/channel/video envelopes. The helper can also build
-  per-target signed envelope batches for explicit saved profile-scoped links;
-  active/full sends, target chooser/live fanout wiring, and richer
-  viewing-space/time-limit or multi-target bulk outbound controls remain later
-  slices.
+  separate signed keyword/channel/video envelopes. The dashboard can now choose
+  multiple eligible fixed targets on the connected replica and use the
+  per-target envelope batcher for that live same-replica send; active/full
+  sends, per-target ack/history, offline delivery, and richer viewing-space/time-limit
+  or multi-device bulk outbound controls remain later slices.
 - **Acceptance Criteria**:
   - The public descriptor is separated from the private keypair.
   - The private JWK is not placed in the Nanah hello descriptor or trusted link
@@ -467,9 +468,11 @@ replica child device over Nanah/P2P or same-network transport.
   viewing-space, and time-limit scope. Granular rule scopes expose an explicit
   Main/Kids rule-source picker, default from the active dashboard surface, and
   can source payloads from parent-managed child edit mode. Rule bundle expands
-  into separate signed keyword/channel/video envelopes. Active/full proposal
-  sends, mailbox delivery, local-network delivery, and richer viewing-space/time-limit
-  or multi-target bulk outbound controls remain pending.
+  into separate signed keyword/channel/video envelopes. Connected-replica
+  multi-target sends can choose eligible fixed targets before signing.
+  Active/full proposal sends, mailbox delivery, local-network delivery,
+  per-target ack/history, and richer viewing-space/time-limit or multi-device
+  bulk outbound controls remain pending.
 - **Acceptance Criteria**:
   - Existing proposal sends still work for unsupported active/full scopes.
   - Signed sends require saved managed link, Source -> Replica roles, allowed
@@ -492,20 +495,23 @@ replica child device over Nanah/P2P or same-network transport.
   same replica device.
 - **Complexity**: 4/10
 - **Dependencies**: Task 3.6.
-- **Status**: Boundary proof plus identity foundation added.
+- **Status**: Boundary proof, identity foundation, and connected-replica target
+  chooser added.
   `saveNanahTrustedLink(...)`, `findNanahTrustedLink(...)`, and
   `getNanahCurrentTrustedLink(...)` now distinguish fixed managed target
   profiles on the same remote device. `buildEnvelopeBatchForTrustedLinks(...)`
-  can build per-target signed envelope batches for explicit saved links.
-  Multi-target fanout UI remains disabled until the target chooser,
-  live-session fanout send wiring, and per-target ack/history summary exist.
+  can build per-target signed envelope batches for explicit saved links, and
+  the dashboard uses it for selected eligible fixed targets on the connected
+  replica. Mailbox/local-network fanout and per-target ack/history summary
+  remain pending.
 - **Acceptance Criteria**:
   - The doc names the profile-scoped trusted-link behavior.
   - The doc requires device plus target-profile binding before multi-child
     fanout.
   - The doc keeps live Nanah sessions separate from offline mailbox or
     local-network provider fanout.
-  - Tests pin that the current runtime must not be treated as bulk-send ready.
+  - Tests pin that the current runtime is connected-replica only and must not be
+    treated as offline, mailbox, or local-network fanout.
 - **Validation**:
   - `node --test tests/runtime/managed-nanah-live-signed-send-current-behavior.test.mjs`
   - `npm run test:settings`

@@ -1839,6 +1839,63 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     color: var(--ft-color-text-secondary);
 }
 
+.nanah-managed-targets {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.nanah-managed-targets > legend {
+    padding: 0;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ft-color-text-secondary);
+}
+
+.nanah-managed-targets__list {
+    display: grid;
+    gap: 0.52rem;
+}
+
+.nanah-managed-target {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.7rem;
+    align-items: start;
+    min-height: 3rem;
+    padding: 0.72rem 0.8rem;
+    border: 1px solid rgba(96, 120, 145, 0.16);
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.76);
+}
+
+.nanah-managed-target input {
+    width: 1.05rem;
+    height: 1.05rem;
+    margin: 0.16rem 0 0;
+    accent-color: var(--ft-color-primary);
+}
+
+.nanah-managed-target__name,
+.nanah-managed-target__meta {
+    display: block;
+    min-width: 0;
+}
+
+.nanah-managed-target__name {
+    font-weight: 700;
+    color: var(--ft-color-text-primary);
+}
+
+.nanah-managed-target__meta {
+    margin-top: 0.15rem;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: var(--ft-color-text-secondary);
+}
+
 .nanah-sync-form .text-input,
 .nanah-sync-form .ft-select-menu,
 .nanah-sync-form .select-input,

@@ -164,7 +164,7 @@ test('managed live signed-send audit is linked without claiming mailbox runtime'
   assert.match(inventory, /fixed-target Main\/Kids, keyword, channel, video, viewing-space, and time-limit managed live sends build signed `filtertube_managed_policy` envelopes/);
 });
 
-test('managed trusted links are profile scoped while multi-target fanout stays blocked', () => {
+test('managed trusted links are profile scoped and connected target fanout is bounded', () => {
   const doc = read(fanoutDocPath);
   const liveDoc = read(docPath);
   const plan = read(planPath);
@@ -178,9 +178,11 @@ test('managed trusted links are profile scoped while multi-target fanout stays b
   assert.match(doc, /buildEnvelopeBatchForTrustedLinks\(policy, trustedLinks\)/);
   assert.match(doc, /A device-level trusted link is still not enough for multi-target authority/);
   assert.match(doc, /runtime profile-scoped trusted link id: present/);
-  assert.match(doc, /runtime multi-target chooser: absent/);
-  assert.match(doc, /runtime signed fanout envelope builder: helper present, UI path absent/);
-  assert.match(doc, /Runtime behavior changed by this proof: yes, trusted-link storage and lookup now\s+distinguish fixed managed target profiles/);
+  assert.match(doc, /runtime connected-device multi-target chooser: present/);
+  assert.match(doc, /runtime signed fanout send loop: present for selected targets on the connected replica only/);
+  assert.match(doc, /runtime per-target ack\/history summary: absent/);
+  assert.match(doc, /runtime mailbox\/local-network fanout delivery: absent/);
+  assert.match(doc, /Runtime behavior changed by this proof: yes, the dashboard can now choose\s+multiple saved fixed-profile targets on the connected replica/);
   assert.match(doc, /flowchart TD/);
   assert.match(liveDoc, new RegExp(fanoutDocPath));
   assert.match(plan, new RegExp(fanoutDocPath));
@@ -199,6 +201,12 @@ test('managed trusted links are profile scoped while multi-target fanout stays b
   assert.match(tabView, /function getNanahManagedDuplicateDeviceIds\(sourceDeviceId, trustedLinkId, targetProfileId = ''\)/);
   assert.match(tabView, /candidateTargetProfileId === currentTargetProfileId/);
   assert.match(tabView, /function findNanahTrustedLinkForManagedEnvelope\(envelope\)[\s\S]*targetProfileId/);
+  assert.match(tabView, /function getNanahEligibleManagedTargetLinks\(scope = getNanahScope\(\)\)/);
+  assert.match(tabView, /normalizeString\(entry\.remoteDeviceId\) === remoteDeviceId/);
+  assert.match(tabView, /entry\.linkType === 'managed_link'[\s\S]*entry\.localRole === 'source'[\s\S]*entry\.remoteRole === 'replica'/);
+  assert.match(tabView, /function syncNanahManagedTargetOptions\(scope = getNanahScope\(\)\)/);
+  assert.match(tabView, /const showChooser = eligibleLinks\.length > 1/);
+  assert.match(tabView, /function getNanahSelectedManagedTargetLinks\(scope = getNanahScope\(\)\)/);
   assert.match(helperSource, /function resolveTargetProfile\(trustedLink\)[\s\S]*policyBehavior === 'fixed_profile'/);
   assert.match(helperSource, /async function buildEnvelopeBatchForTrustedLinks\(policy, trustedLinks\)/);
 });
@@ -209,11 +217,17 @@ test('dashboard exposes explicit Main Kids rule source picker for granular manag
 
   assert.match(html, /id="ftNanahGranularSurfaceField" hidden/);
   assert.match(html, /id="ftNanahGranularSurface"/);
+  assert.match(html, /id="ftNanahManagedTargetsField" hidden/);
+  assert.match(html, /id="ftNanahManagedTargets"/);
+  assert.match(html, /id="ftNanahManagedTargetsHint"/);
   assert.match(html, /YouTube Main rules/);
   assert.match(html, /YouTube Kids rules/);
   assert.match(html, /value="rules_bundle">Rule bundle/);
   assert.match(source, /const ftNanahGranularSurfaceField = document\.getElementById\('ftNanahGranularSurfaceField'\)/);
   assert.match(source, /const ftNanahGranularSurface = document\.getElementById\('ftNanahGranularSurface'\)/);
+  assert.match(source, /const ftNanahManagedTargetsField = document\.getElementById\('ftNanahManagedTargetsField'\)/);
+  assert.match(source, /const ftNanahManagedTargets = document\.getElementById\('ftNanahManagedTargets'\)/);
+  assert.match(source, /const ftNanahManagedTargetsHint = document\.getElementById\('ftNanahManagedTargetsHint'\)/);
   assert.match(source, /const granularScope = \['keywords', 'channels', 'videos', 'rules_bundle'\]\.includes\(scope\)/);
   assert.match(source, /ftNanahGranularSurfaceField\.hidden = !granularScope \|\| childReceiveOnly \|\| childReplicaOnly/);
   assert.match(source, /function getNanahActiveManagedSurface\(\)[\s\S]*ftNanahGranularSurface\?\.value[\s\S]*return selectedSurface/);
@@ -250,6 +264,8 @@ test('managed source send uses signed envelope before proposal fallback and reco
   assert.notEqual(listenerEnd, -1);
   const sendButtonBlock = source.slice(listenerStart, listenerEnd);
   assert.match(sendButtonBlock, /policy\.linkType === 'managed_link' && policy\.authorityMode === 'managed' && getNanahRole\(\) === 'source'/);
+  assert.match(sendButtonBlock, /const selectedTargetLinks = getNanahSelectedManagedTargetLinks\(policy\.scope\)/);
+  assert.match(sendButtonBlock, /buildEnvelopeBatchForTrustedLinks\(policy, selectedTargetLinks\)/);
   assert.match(sendButtonBlock, /buildEnvelopeBatchForLiveSend/);
   assert.match(sendButtonBlock, /for \(const signedEnvelope of signedEnvelopes\)/);
   assert.match(sendButtonBlock, /await nanahClient\.send\(signedEnvelope\)/);
@@ -259,7 +275,7 @@ test('managed source send uses signed envelope before proposal fallback and reco
   assert.match(read(managedLivePolicyPath), /outgoingManagedPolicies/);
 });
 
-test('managed live signed-send helper can build per-target envelope batches without exposing fanout UI', async () => {
+test('managed live signed-send helper can build connected per-target envelope batches', async () => {
   const { helper, trustedLink } = createManagedLivePolicyHarness({
     allowedScopes: ['keywords', 'channels', 'videos']
   });

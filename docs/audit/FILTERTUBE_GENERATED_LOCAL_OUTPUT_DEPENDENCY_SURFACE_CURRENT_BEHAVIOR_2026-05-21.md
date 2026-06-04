@@ -30,7 +30,7 @@ mess, but they do not close product-runtime proof obligations.
 
 | Local path | Git boundary | Current files | Current bytes | Current role |
 | --- | --- | ---: | ---: | --- |
-| `dist` | ignored by `.gitignore:6:dist/` | 180 | 61,493,319 | Browser package trees plus ZIPs from the current local v3.3.2 extension build. |
+| `dist` | ignored by `.gitignore:6:dist/` | 186 | 62,334,390 | Browser package trees plus ZIPs from the current local v3.3.2 extension build. |
 | `node_modules` | ignored by `.gitignore:2:node_modules/` | 956 | 26,325,623 | Root npm dependency install cache. |
 | `website/.next` | ignored by `.gitignore:12:website/.next/` | 2,468 | 388,755,617 | Next.js build/dev output and cache. |
 | `website/.vercel` | ignored by `website/.gitignore:1:.vercel` | 291 | 29,815,128 | Local Vercel project/output metadata. |
@@ -74,17 +74,17 @@ Current browser package sizes and manifest hashes:
 
 | Browser output | Files | Bytes | Manifest SHA-256 |
 | --- | ---: | ---: | --- |
-| `dist/chrome` | 59 | 11,808,978 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` |
-| `dist/firefox` | 59 | 11,809,068 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` |
-| `dist/opera` | 59 | 11,808,983 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` |
+| `dist/chrome` | 61 | 12,047,135 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` |
+| `dist/firefox` | 61 | 12,047,225 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` |
+| `dist/opera` | 61 | 12,047,140 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` |
 
 Current ZIP artifacts:
 
 | ZIP path | Bytes | SHA-256 |
 | --- | ---: | --- |
-| `dist/filtertube-chrome-v3.3.2.zip` | 8,728,281 | `a14599fc1726507dbdfa049b9640f218c8538f367b6120b065c35fb7287628fb` |
-| `dist/filtertube-firefox-v3.3.2.zip` | 8,728,340 | `4e64521b8ed5b4385a41896864794d1dae0d31f73b27f8d30973add7cbe00cc4` |
-| `dist/filtertube-opera-v3.3.2.zip` | 8,728,283 | `475ae17a9b4c9f2c71a4b80b6e120f612d511a473bb888feeedbedb4459752db` |
+| `dist/filtertube-chrome-v3.3.2.zip` | 8,730,943 | `ea63f1d46b9bd9cf914281c5759cd9b75fb7f48517f71983d41c6ff44585b93a` |
+| `dist/filtertube-firefox-v3.3.2.zip` | 8,731,002 | `815e2de2eddb98bca5b87a01eecd27c75d5cc02437ef196c427cda2a0653bf83` |
+| `dist/filtertube-opera-v3.3.2.zip` | 8,730,945 | `e6552669ef06bd7329bc0fdcd84e827dc6d66a80d75d03c286139da05454e329` |
 
 The package tree is broad because `build.js` copies:
 

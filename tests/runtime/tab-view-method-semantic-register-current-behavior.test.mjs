@@ -49,26 +49,26 @@ function groupForLine(line) {
   if (line <= 1375) return 'mainFiltersContentControls';
   if (line <= 2542) return 'kidsFiltersContentControls';
   if (line <= 2656) return 'routeIntentAndReleaseNotes';
-  if (line >= 3132 && line <= 3260) return 'profileAccessAndManagedChild';
-  if (line <= 3427) return 'runtimeMessagingBrowserTabs';
-  if (line <= 3814) return 'subscriptionsImportBridge';
-  if (line <= 4102) return 'profileDropdownAndBackupControls';
-  if (line <= 5631) return 'profileAccessAndManagedChild';
-  if (line <= 6043) return 'lockNavigationAndSubscriptionFlow';
-  if (line <= 6307) return 'modalDialogHelpers';
-  if (line <= 7275) return 'nanahModeScopePolicyModal';
-  if (line <= 7766) return 'nanahTargetProfileDevicePolicy';
-  if (line <= 8321) return 'nanahTrustedLinkStorage';
-  if (line <= 9139) return 'nanahSessionUiAndEnvelope';
-  if (line <= 10099) return 'nanahApplyProposalTransport';
-  if (line <= 10695) return 'pinProfilesManager';
-  if (line <= 11113) return 'importExportDownload';
-  if (line <= 11814) return 'settingsSyncAccountPolicyHandlers';
-  if (line >= 12140 && line <= 12161) return 'dateFilterHelpers';
-  if (line <= 12414) return 'managedRowsListModeRender';
-  if (line <= 12771) return 'dashboardStatsFiltering';
-  if (line <= 13223) return 'dateFilterHelpers';
-  if (line <= 13490) return 'navigationAndToasts';
+  if (line >= 3141 && line <= 3263) return 'profileAccessAndManagedChild';
+  if (line <= 3430) return 'runtimeMessagingBrowserTabs';
+  if (line <= 3817) return 'subscriptionsImportBridge';
+  if (line <= 4105) return 'profileDropdownAndBackupControls';
+  if (line <= 5634) return 'profileAccessAndManagedChild';
+  if (line <= 6046) return 'lockNavigationAndSubscriptionFlow';
+  if (line <= 6310) return 'modalDialogHelpers';
+  if (line <= 7278) return 'nanahModeScopePolicyModal';
+  if (line <= 7880) return 'nanahTargetProfileDevicePolicy';
+  if (line <= 8435) return 'nanahTrustedLinkStorage';
+  if (line <= 9256) return 'nanahSessionUiAndEnvelope';
+  if (line <= 10216) return 'nanahApplyProposalTransport';
+  if (line <= 10812) return 'pinProfilesManager';
+  if (line <= 11230) return 'importExportDownload';
+  if (line <= 11948) return 'settingsSyncAccountPolicyHandlers';
+  if (line >= 12274 && line <= 12295) return 'dateFilterHelpers';
+  if (line <= 12548) return 'managedRowsListModeRender';
+  if (line <= 12905) return 'dashboardStatsFiltering';
+  if (line <= 13357) return 'dateFilterHelpers';
+  if (line <= 13624) return 'navigationAndToasts';
   return 'UNCLASSIFIED';
 }
 
@@ -193,15 +193,15 @@ test('tab-view method semantic register is audit-only and scoped to current beha
   const text = doc();
 
   assert.match(text, /Status: audit-only current-behavior register/);
-  assert.match(text, /Runtime behavior changed: profile-scoped Nanah managed trusted-link lookup and storage/);
+  assert.match(text, /Runtime behavior changed: profile-scoped Nanah managed trusted-link lookup, storage, connected target chooser, and signed fanout./);
   assert.match(text, /source file: js\/tab-view\.js/);
-  assert.match(text, /named declarations: 375/);
-  assert.match(text, /plain function declarations: 254/);
+  assert.match(text, /named declarations: 380/);
+  assert.match(text, /plain function declarations: 259/);
   assert.match(text, /async function declarations: 88/);
   assert.match(text, /const arrow helper declarations: 31/);
   assert.match(text, /async const arrow helper declarations: 2/);
   assert.match(text, /semantic method groups: 22/);
-  assert.match(text, /addEventListener sites: 150/);
+  assert.match(text, /addEventListener sites: 151/);
   assert.match(text, /direct StateManager calls: 42/);
   assert.match(text, /unique StateManager methods reached: 14/);
   assert.match(text, /RenderEngine calls: 4/);
@@ -219,33 +219,33 @@ test('tab-view register pins source fingerprint and broad callable reconciliatio
   const text = doc();
 
   assert.deepEqual(stats, {
-    bytes: 621440,
-    sha256: '4b5c7474a686eae49d41926a2e4fe4daa670322d91138c6c6d715e07832827b2',
-    splitLines: 13491,
-    wcLines: 13490
+    bytes: 628461,
+    sha256: '77f20044b7e6bddf0bf9b8a455f0d38f7018cffcde82c42ba9af1c4a3491b428',
+    splitLines: 13625,
+    wcLines: 13624
   });
-  assert.equal(broadRows.length, 995);
-  assert.equal(controlArtifacts, 620);
+  assert.equal(broadRows.length, 1008);
+  assert.equal(controlArtifacts, 628);
   assert.equal(heldOutsideRegister, 0);
   assert.deepEqual({
     if: broadCounts.if,
     for: broadCounts.for,
     while: broadCounts.while
   }, {
-    if: 615,
+    if: 623,
     for: 3,
     while: 2
   });
 
   for (const expected of [
-    'source split lines: 13491',
-    'source wc -l: 13490',
-    'source bytes: 621440',
-    'source sha256: 4b5c7474a686eae49d41926a2e4fe4daa670322d91138c6c6d715e07832827b2',
-    'broad lexical callable matches: 995',
-    'accepted named declaration rows: 375',
-    'semantic method rows promoted: 375',
-    'control-flow lexical artifacts: 620 (`if`: 615, `for`: 3, `while`: 2)',
+    'source split lines: 13625',
+    'source wc -l: 13624',
+    'source bytes: 628461',
+    'source sha256: 77f20044b7e6bddf0bf9b8a455f0d38f7018cffcde82c42ba9af1c4a3491b428',
+    'broad lexical callable matches: 1008',
+    'accepted named declaration rows: 380',
+    'semantic method rows promoted: 380',
+    'control-flow lexical artifacts: 628 (`if`: 623, `for`: 3, `while`: 2)',
     'local/listener/timer callbacks held outside this named method register: 0',
     'executable current-behavior probes: 6'
   ]) {
@@ -256,12 +256,12 @@ test('tab-view register pins source fingerprint and broad callable reconciliatio
 test('tab-view register accounts for every current named declaration', () => {
   const rows = methodRows();
 
-  assert.equal(rows.length, 375);
+  assert.equal(rows.length, 380);
   assert.deepEqual(countBy(rows, 'kind'), {
     'async const arrow': 2,
     'async function': 88,
     'const arrow': 31,
-    function: 254
+    function: 259
   });
   assert.deepEqual(countBy(rows, 'group'), {
     dashboardStatsFiltering: 10,
@@ -275,7 +275,7 @@ test('tab-view register accounts for every current named declaration', () => {
     nanahApplyProposalTransport: 17,
     nanahModeScopePolicyModal: 47,
     nanahSessionUiAndEnvelope: 11,
-    nanahTargetProfileDevicePolicy: 32,
+    nanahTargetProfileDevicePolicy: 37,
     nanahTrustedLinkStorage: 25,
     navigationAndToasts: 3,
     pinProfilesManager: 8,
@@ -308,7 +308,7 @@ test('tab-view register pins current DOM listener timer and dependency surface',
   const source = read(sourcePath);
   const text = doc();
 
-  assert.equal((source.match(/\.addEventListener\(/g) || []).length, 150);
+  assert.equal((source.match(/\.addEventListener\(/g) || []).length, 151);
   assert.equal((source.match(/document\.addEventListener\(/g) || []).length, 2);
   assert.equal((source.match(/window\.addEventListener\(/g) || []).length, 5);
   assert.equal((source.match(/\bsetTimeout\(/g) || []).length, 14);
@@ -316,23 +316,24 @@ test('tab-view register pins current DOM listener timer and dependency surface',
   assert.equal((source.match(/\bclearInterval\(/g) || []).length, 1);
   assert.equal((source.match(/\brequestAnimationFrame\(/g) || []).length, 11);
   assert.equal((source.match(/\bMutationObserver\b/g) || []).length, 0);
-  assert.equal((source.match(/document\.getElementById\(/g) || []).length, 245);
-  assert.equal((source.match(/\.querySelector\(/g) || []).length, 32);
-  assert.equal((source.match(/\.querySelectorAll\(/g) || []).length, 27);
-  assert.equal((source.match(/document\.createElement\(/g) || []).length, 346);
-  assert.equal((source.match(/\.innerHTML\s*=/g) || []).length, 39);
+  assert.equal((source.match(/document\.getElementById\(/g) || []).length, 248);
+  assert.equal((source.match(/\.querySelector\(/g) || []).length, 33);
+  assert.equal((source.match(/\.querySelectorAll\(/g) || []).length, 28);
+  assert.equal((source.match(/document\.createElement\(/g) || []).length, 351);
+  assert.equal((source.match(/\.innerHTML\s*=/g) || []).length, 40);
   assert.equal((source.match(/\.setAttribute\(/g) || []).length, 61);
-  assert.equal((source.match(/\.dataset\.[A-Za-z_$][\w$]*\s*=/g) || []).length, 14);
+  assert.equal((source.match(/\.dataset\.[A-Za-z_$][\w$]*\s*=/g) || []).length, 15);
   assert.equal((source.match(/window\.confirm\(/g) || []).length, 6);
   assert.equal((source.match(/showPromptModal\(/g) || []).length, 14);
   assert.equal((source.match(/showChoiceModal\(/g) || []).length, 10);
 
   for (const token of [
-    'document.getElementById calls: 245',
-    'querySelector calls: 32',
-    'querySelectorAll calls: 27',
-    'document.createElement calls: 346',
-    'innerHTML writes: 39',
+    'document.getElementById calls: 248',
+    'querySelector calls: 33',
+    'querySelectorAll calls: 28',
+    'document.createElement calls: 351',
+    'innerHTML writes: 40',
+    'dataset writes: 15',
     'setAttribute calls: 61',
     'requestAnimationFrame calls: 11'
   ]) {

@@ -13,8 +13,8 @@ deleted, merged, activated, or used as behavior evidence.
 
 ## Tracked CSS Surface
 
-Tracked source currently contains 9 CSS files, 11,077 counted source lines,
-296,952 bytes, 1,548 lexical rule blocks, 593 `!important` declarations, 47
+Tracked source currently contains 9 CSS files, 11,134 counted source lines,
+298,089 bytes, 1,556 lexical rule blocks, 593 `!important` declarations, 47
 `display:none` declarations, 72 `:not(.filter-tube-visible)` clauses, 167
 `filter-tube-visible` tokens, 6 `filtertube-hidden` tokens, 37 `@media`
 blocks, 7 `@keyframes` blocks, and 3 `[hidden]` selectors.
@@ -27,7 +27,7 @@ blocks, 7 `@keyframes` blocks, and 3 `[hidden]` selectors.
 | `css/filter.css` | packaged quarantined content CSS | 74 | 2,412 | `e2462d446b1a3738d937945eabf013ec05173224970b0c877593901aba5a5032` |
 | `css/layout.css` | packaged quarantined content CSS | 803 | 28,581 | `9ae38491aeb2dc3a58027d4a005c6136042c66dc438786483285fdbd91cb1941` |
 | `css/popup.css` | active extension popup CSS | 1,151 | 29,731 | `812cb4ba8b4c9be732bd8a2a6f7b06b5d8d0a8c3fb7416f391f475ae627d45fa` |
-| `css/serene-shell.css` | active extension shell CSS | 3,357 | 86,093 | `92dddf7925091481ab5364b1bd9c67ff65a8435854c2753ee5f0de1c14098228` |
+| `css/serene-shell.css` | active extension shell CSS | 3,414 | 87,230 | `785e988dd0176b16defcc08f77925de8eaa60ea831d53cd57147eb601c490f0a` |
 | `css/tab-view.css` | active extension dashboard CSS | 2,834 | 68,789 | `e328965f44468e90cca22bb11b25103b1821ed2037775fbe312e2025c241c7c9` |
 | `website/app/globals.css` | website-only global CSS | 486 | 12,528 | `2b583fc11e8f5a3a6fa5113daebf71b91d46bf685b02c544727167cf9ed7f760` |
 
@@ -61,7 +61,7 @@ Current root CSS ownership classes:
 | `css/filter.css` | 6 | 12 | 5 | 5 | 6 | 0 | 0 | 0 | 0 |
 | `css/layout.css` | 86 | 353 | 11 | 62 | 126 | 6 | 0 | 0 | 0 |
 | `css/popup.css` | 182 | 5 | 3 | 0 | 0 | 0 | 2 | 0 | 1 |
-| `css/serene-shell.css` | 486 | 39 | 7 | 0 | 0 | 0 | 16 | 1 | 0 |
+| `css/serene-shell.css` | 494 | 39 | 7 | 0 | 0 | 0 | 16 | 1 | 0 |
 | `css/tab-view.css` | 422 | 24 | 14 | 0 | 0 | 0 | 12 | 4 | 2 |
 | `website/app/globals.css` | 69 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 0 |
 

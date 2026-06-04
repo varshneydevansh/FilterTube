@@ -2850,6 +2850,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftNanahScope = document.getElementById('ftNanahScope');
     const ftNanahGranularSurfaceField = document.getElementById('ftNanahGranularSurfaceField');
     const ftNanahGranularSurface = document.getElementById('ftNanahGranularSurface');
+    const ftNanahManagedTargetsField = document.getElementById('ftNanahManagedTargetsField');
+    const ftNanahManagedTargets = document.getElementById('ftNanahManagedTargets');
+    const ftNanahManagedTargetsHint = document.getElementById('ftNanahManagedTargetsHint');
     const ftNanahStrategy = document.getElementById('ftNanahStrategy');
     const ftNanahRemoteTarget = document.getElementById('ftNanahRemoteTarget');
     const ftNanahStrategyLabel = document.getElementById('ftNanahStrategyLabel');
@@ -7428,6 +7431,113 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    function getNanahSelectedManagedTargetLinkIds() {
+        if (!ftNanahManagedTargets) return [];
+        return Array.from(ftNanahManagedTargets.querySelectorAll('input[type="checkbox"][data-link-id]:checked'))
+            .map((input) => normalizeString(input.dataset.linkId))
+            .filter(Boolean);
+    }
+
+    function getNanahEligibleManagedTargetLinks(scope = getNanahScope()) {
+        const remoteDeviceId = normalizeString(safeObject(nanahSessionState.remoteDevice).deviceId);
+        const requiredScopes = expandNanahManagedSendScope(scope);
+        if (!remoteDeviceId || requiredScopes.length === 0) return [];
+        if (!nanahClient || !nanahSessionState.connected || getNanahRole() !== 'source') return [];
+        if (normalizeString(nanahSessionState.remoteRole) !== 'replica') return [];
+
+        return nanahTrustedLinks
+            .map((entry) => normalizeNanahTrustedLink(entry))
+            .filter((entry) => entry
+                && entry.linkType === 'managed_link'
+                && entry.localRole === 'source'
+                && entry.remoteRole === 'replica'
+                && normalizeString(entry.remoteDeviceId) === remoteDeviceId
+                && !!getNanahTrustedLinkTargetProfileId(entry))
+            .filter((entry) => {
+                const allowedScopes = getNanahManagedPolicyScopeList(safeObject(entry.policy).allowedScopes);
+                return requiredScopes.every((requiredScope) => allowedScopes.includes(requiredScope));
+            });
+    }
+
+    function getNanahManagedTargetLabel(link) {
+        const trusted = normalizeNanahTrustedLink(link);
+        const policy = safeObject(trusted?.policy);
+        return normalizeString(policy.targetProfileName)
+            || normalizeString(policy.targetProfileId)
+            || 'Protected profile';
+    }
+
+    function syncNanahManagedTargetOptions(scope = getNanahScope()) {
+        if (!ftNanahManagedTargetsField || !ftNanahManagedTargets) return [];
+        const selectedBefore = new Set(getNanahSelectedManagedTargetLinkIds());
+        const eligibleLinks = getNanahEligibleManagedTargetLinks(scope);
+        const currentLinkId = normalizeString(getNanahCurrentTrustedLink()?.linkId);
+        const showChooser = eligibleLinks.length > 1;
+
+        ftNanahManagedTargets.innerHTML = '';
+        ftNanahManagedTargetsField.hidden = !showChooser;
+
+        if (!showChooser) {
+            if (ftNanahManagedTargetsHint) {
+                ftNanahManagedTargetsHint.textContent = eligibleLinks.length === 1
+                    ? `This live send will target ${getNanahManagedTargetLabel(eligibleLinks[0])} on ${getNanahRemoteLabel()}.`
+                    : 'Save fixed managed child targets on the connected replica before using multi-target sends.';
+            }
+            return eligibleLinks;
+        }
+
+        let checkedCount = 0;
+        eligibleLinks.forEach((link, index) => {
+            const linkId = normalizeString(link.linkId);
+            const policy = safeObject(link.policy);
+            const label = document.createElement('label');
+            label.className = 'nanah-managed-target';
+
+            const input = document.createElement('input');
+            input.type = 'checkbox';
+            input.dataset.linkId = linkId;
+            input.checked = selectedBefore.size > 0
+                ? selectedBefore.has(linkId)
+                : (currentLinkId ? linkId === currentLinkId : index === 0);
+            if (input.checked) checkedCount += 1;
+
+            const body = document.createElement('span');
+            const name = document.createElement('span');
+            name.className = 'nanah-managed-target__name';
+            name.textContent = getNanahManagedTargetLabel(link);
+            const meta = document.createElement('span');
+            meta.className = 'nanah-managed-target__meta';
+            meta.textContent = `${getNanahRemoteLabel()} · ${describeNanahScopeList(policy.allowedScopes)}`;
+
+            body.appendChild(name);
+            body.appendChild(meta);
+            label.appendChild(input);
+            label.appendChild(body);
+            ftNanahManagedTargets.appendChild(label);
+        });
+
+        if (checkedCount === 0) {
+            const fallback = ftNanahManagedTargets.querySelector('input[type="checkbox"][data-link-id]');
+            if (fallback) {
+                fallback.checked = true;
+                checkedCount = 1;
+            }
+        }
+
+        if (ftNanahManagedTargetsHint) {
+            ftNanahManagedTargetsHint.textContent = `Choose which saved child targets on ${getNanahRemoteLabel()} receive this live policy. Offline devices still need mailbox or local-network delivery later.`;
+        }
+        return eligibleLinks;
+    }
+
+    function getNanahSelectedManagedTargetLinks(scope = getNanahScope()) {
+        if (!ftNanahManagedTargetsField || ftNanahManagedTargetsField.hidden) return [];
+        const selectedIds = new Set(getNanahSelectedManagedTargetLinkIds());
+        if (selectedIds.size === 0) return [];
+        return getNanahEligibleManagedTargetLinks(scope)
+            .filter((entry) => selectedIds.has(normalizeString(entry.linkId)));
+    }
+
     async function ensureNanahManagedChildLinkPermission(policy) {
         if (!isActiveChildNanahProfile()) return true;
         if (getNanahLockedChildMode(safeObject(policy).lockedChildMode, 'require_unlock') !== 'allow_trusted_updates') {
@@ -7649,6 +7759,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ftNanahGranularSurface.value === 'kids' ? 'YouTube Kids rules' : 'YouTube Main rules'
             );
             parts.push(surfaceLabel);
+        }
+        if (ftNanahManagedTargetsField && !ftNanahManagedTargetsField.hidden) {
+            const selectedTargets = getNanahSelectedManagedTargetLinks(scope);
+            parts.push(`${selectedTargets.length || 0} target${selectedTargets.length === 1 ? '' : 's'}`);
         }
         parts.push(strategyLabel);
         ftNanahAdvancedSummary.textContent = parts.join(' · ');
@@ -8327,6 +8441,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             empty.className = 'nanah-trusted-links__empty';
             empty.textContent = 'No trusted devices yet.';
             ftNanahTrustedLinks.appendChild(empty);
+            syncNanahManagedTargetOptions();
             return;
         }
 
@@ -8535,6 +8650,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             card.appendChild(actions);
             ftNanahTrustedLinks.appendChild(card);
         });
+        syncNanahManagedTargetOptions();
     }
 
     async function renderNanahQr() {
@@ -8791,6 +8907,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ftNanahRemoteTargetHint.textContent = 'After the secure handshake, choose a specific remote profile here if you want this update to land somewhere other than the receiver’s currently active profile.';
             }
         }
+        syncNanahManagedTargetOptions(scope);
     }
 
     function updateNanahUi() {
@@ -11354,6 +11471,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    if (ftNanahManagedTargets) {
+        ftNanahManagedTargets.addEventListener('change', () => {
+            refreshNanahAdvancedSummary();
+        });
+    }
+
     [
         ftNanahModeSendOnce,
         ftNanahModeParent,
@@ -11541,9 +11664,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                         if (!nanahManagedLivePolicy) {
                             throw new Error('Managed policy live-send helpers are unavailable');
                         }
-                        const signedEnvelopes = typeof nanahManagedLivePolicy.buildEnvelopeBatchForLiveSend === 'function'
-                            ? await nanahManagedLivePolicy.buildEnvelopeBatchForLiveSend(policy)
-                            : [await nanahManagedLivePolicy.buildEnvelopeForLiveSend(policy)];
+                        const selectedTargetLinks = getNanahSelectedManagedTargetLinks(policy.scope);
+                        if (ftNanahManagedTargetsField && !ftNanahManagedTargetsField.hidden && selectedTargetLinks.length === 0) {
+                            throw new Error('Choose at least one managed child target for this send.');
+                        }
+                        const signedEnvelopes = selectedTargetLinks.length > 0
+                            && typeof nanahManagedLivePolicy.buildEnvelopeBatchForTrustedLinks === 'function'
+                            ? await nanahManagedLivePolicy.buildEnvelopeBatchForTrustedLinks(policy, selectedTargetLinks)
+                            : (typeof nanahManagedLivePolicy.buildEnvelopeBatchForLiveSend === 'function'
+                                ? await nanahManagedLivePolicy.buildEnvelopeBatchForLiveSend(policy)
+                                : [await nanahManagedLivePolicy.buildEnvelopeForLiveSend(policy)]);
                         for (const signedEnvelope of signedEnvelopes) {
                             await nanahClient.send(signedEnvelope);
                             await nanahManagedLivePolicy.markSent(
@@ -11553,8 +11683,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 signedEnvelope.policyHash
                             );
                         }
-                        const sentScopes = signedEnvelopes.map((envelope) => getNanahScopeLabel(envelope.scope)).join(', ');
-                        UIComponents.showToast(`Sent signed managed ${sentScopes} policy to ${getNanahRemoteLabel()}`, 'success');
+                        const sentScopes = Array.from(new Set(signedEnvelopes.map((envelope) => getNanahScopeLabel(envelope.scope)))).join(', ');
+                        const targetCount = new Set(signedEnvelopes.map((envelope) => normalizeString(envelope.linkId))).size || 1;
+                        const targetLabel = targetCount > 1
+                            ? `${targetCount} target profiles on ${getNanahRemoteLabel()}`
+                            : getNanahRemoteLabel();
+                        UIComponents.showToast(`Sent signed managed ${sentScopes} policy to ${targetLabel}`, 'success');
                         return;
                     }
                     let envelope = await adapter.buildControlProposal({ scope: policy.scope, strategy: policy.strategy, auth });
