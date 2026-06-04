@@ -6,14 +6,17 @@ history writer present for managed-profile gates; remote managed-policy
 validation history writer present for rejection/idempotent/apply outcomes, and
 validated remote accepted apply history can now be recorded after the managed
 apply wrapper succeeds. Local/decrypted mailbox-item intake now writes distinct
-mailbox action-history rows through the same protected model. Parent/caregiver
-history clearing now records its own protected `history.clear` evidence row
-instead of silently removing accepted rows. Trusted-link removal history writer
-now records protected `trust_link.revoke` rows when local accepted managed
-policy state is purged for a removed link. Parent-side live sends now record
-redacted outbound trusted-link history rows without storing policy payload
-plaintext, and connected replicas now return redacted live ack rows that the
-source stores only when they match a prior sent revision/hash.
+mailbox action-history rows through the same protected model, and explicitly
+delivered local-network candidate `filtertube_managed_local_network_candidate`
+outcomes now reuse the remote validation/apply history writer with
+`transport: local_network`. Parent/caregiver history clearing now records its
+own protected `history.clear` evidence row instead of silently removing
+accepted rows. Trusted-link removal history writer now records protected
+`trust_link.revoke` rows when local accepted managed policy state is purged for
+a removed link. Parent-side live sends now record redacted outbound
+trusted-link history rows without storing policy payload plaintext, and
+connected replicas now return redacted live ack rows that the source stores only
+when they match a prior sent revision/hash.
 **Goal slice**: Implementation order item 4, "Add action-history/log model and
 access-control tests".
 **Primary inputs**:
@@ -31,7 +34,10 @@ parent/account-only local history view for protected child rows, and now records
 receive-side managed-policy validation outcomes when a
 `filtertube_managed_policy` envelope reaches the Nanah dashboard path, and now
 also records local/decrypted `filtertube_managed_mailbox_item` outcomes with
-distinct mailbox action types. Accepted managed-policy envelopes now route
+distinct mailbox action types. It also records local-network candidate
+`filtertube_managed_local_network_candidate` outcomes after the dashboard
+sanitizes the candidate and rebuilds trust from local managed-link state rather
+than caller-provided trust objects. Accepted managed-policy envelopes now route
 through a validated apply wrapper before history records the accepted remote
 result. It also records protected
 failed-auth rows when parent/admin unlock fails while opening managed child
@@ -182,9 +188,10 @@ runtime managed action history clear event writer: present as protected `history
 runtime remote managed validation/apply history writer: present for rejected, conflict, idempotent, and accepted apply outcomes
 runtime remote managed accepted apply history writer: present behind validated managed apply wrapper
 runtime mailbox managed validation/apply history writer: present for local/decrypted mailbox item intake outcomes
+runtime local-network candidate validation/apply history writer: present for sanitized local-network candidate outcomes without adding discovery or LAN delivery
 runtime managed outbound live send history writer: present on trusted link policy rows as redacted parent-side send evidence
 runtime managed inbound live ack history writer: present on trusted link policy rows as redacted parent-side applied/rejected feedback
-runtime behavior changed by this contract: yes, for accepted local managed child saves, protected failed-auth rows, parent/account history access, Nanah managed-policy receive evidence, validated remote apply history, local/decrypted mailbox item evidence, parent-side outbound live send evidence, and parent-side live ack feedback
+runtime behavior changed by this contract: yes, for accepted local managed child saves, protected failed-auth rows, parent/account history access, Nanah managed-policy receive evidence, validated remote apply history, local/decrypted mailbox item evidence, sanitized local-network candidate evidence, parent-side outbound live send evidence, and parent-side live ack feedback
 ```
 
 The current local writer stores redacted count summaries under
@@ -214,6 +221,11 @@ wrong-source cases still produce protected rejected or conflict history rows.
 Mailbox rows use `remote_policy.mailbox.*` action types so parent/caregiver
 history can distinguish delayed delivery from live Nanah delivery without
 making the log authoritative.
+Local-network candidate rows use the same `remote_policy.accept`,
+`remote_policy.reject`, or `remote_policy.conflict` action types with
+`summary.transport: local_network`. The transport marker is diagnostic only;
+authority still comes from the locally saved managed link, signature evidence,
+target profile, scope, revision, and policy hash.
 Outbound live-send rows use `filtertube_managed_outbound_policy_history` under a
 trusted link policy row because the parent/source may not have the remote child
 profile locally. Those rows are feedback evidence for the parent only; the

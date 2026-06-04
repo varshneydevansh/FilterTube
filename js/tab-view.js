@@ -9462,6 +9462,75 @@ document.addEventListener('DOMContentLoaded', async () => {
         return validation;
     }
 
+    async function handleNanahIncomingManagedLocalNetworkCandidate(candidate) {
+        const adapter = window.FilterTubeNanahAdapter || {};
+        if (typeof adapter.validateManagedLocalNetworkCandidate !== 'function') {
+            throw new Error('Managed local-network validation is unavailable');
+        }
+        const root = safeObject(candidate);
+        const envelope = safeObject(root.envelope || root.managedPolicyEnvelope || root.policy);
+        const peer = safeObject(root.peer || root.discoveredPeer || root.discovery);
+        const sanitizedCandidate = {
+            peer,
+            envelope,
+            source: normalizeString(root.source),
+            networkReachable: root.networkReachable
+        };
+        const io = window.FilterTubeIO || {};
+        const localProfilesV4 = profilesV4Cache || (typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null);
+        const context = {
+            ...buildManagedNanahPolicyValidationContext(envelope, localProfilesV4),
+            transport: 'local_network',
+            nowMs: Date.now()
+        };
+        const verifyManagedSignature = typeof adapter.verifyManagedNanahPolicyIntegritySignature === 'function'
+            ? adapter.verifyManagedNanahPolicyIntegritySignature
+            : null;
+        const signatureVerification = envelope && Object.keys(envelope).length > 0 && verifyManagedSignature
+            ? await verifyManagedSignature(envelope, context.trustedLink)
+            : { verified: false, reason: 'missing_signature_verifier' };
+        context.signatureVerification = signatureVerification;
+        context.verifyIntegritySignature = () => signatureVerification;
+        if (signatureVerification?.verified === true) {
+            context.signatureVerified = true;
+            context.integrityVerified = true;
+        }
+        const validation = adapter.validateManagedLocalNetworkCandidate(sanitizedCandidate, context);
+        if (validation.accepted === true && validation.decision === 'idempotent_same_hash') {
+            await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
+            UIComponents.showToast('Managed local-network policy already matches the last accepted revision', 'info');
+            return validation;
+        }
+        if (validation.accepted === true) {
+            if (typeof adapter.applyManagedPolicyEnvelope !== 'function') {
+                const decision = {
+                    accepted: false,
+                    reason: 'managed_local_network_apply_unavailable',
+                    validationDecision: validation.decision
+                };
+                await recordManagedNanahPolicyValidationHistory(envelope, decision, context);
+                UIComponents.showToast('Managed local-network apply is unavailable', 'error');
+                return decision;
+            }
+            const result = await adapter.applyManagedPolicyEnvelope(envelope, context);
+            await recordManagedNanahPolicyValidationHistory(envelope, result.accepted === true ? validation : result, context);
+            if (result.accepted === true && result.applied !== false) {
+                await refreshFilterTubeUiAfterNanahImport();
+                UIComponents.showToast(`Applied managed local-network ${normalizeString(validation.scope) || 'policy'} update`, 'success');
+                return result;
+            }
+            if (result.accepted === true && result.decision === 'idempotent_same_hash') {
+                UIComponents.showToast('Managed local-network policy already matches the last accepted revision', 'info');
+                return result;
+            }
+            UIComponents.showToast(`Managed local-network policy rejected: ${normalizeString(result.reason) || 'apply failed'}`, 'error');
+            return result;
+        }
+        await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
+        UIComponents.showToast(`Managed local-network policy rejected: ${normalizeString(validation.reason) || 'validation failed'}`, 'error');
+        return validation;
+    }
+
     function buildNanahOutgoingProposalPolicy(scope, strategy) {
         if (isNanahChildReceiveOnly()) {
             throw new Error('Child profiles are receive-only in Accounts & Sync. Use a parent/source profile to send updates.');
@@ -10064,6 +10133,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (root.schema === 'filtertube_managed_mailbox_item') {
             await handleNanahIncomingManagedMailboxItem(root);
+            return;
+        }
+        if (root.schema === 'filtertube_managed_local_network_candidate') {
+            await handleNanahIncomingManagedLocalNetworkCandidate(root);
             return;
         }
         if (root.t === 'control_proposal' || root.t === 'app_sync') {

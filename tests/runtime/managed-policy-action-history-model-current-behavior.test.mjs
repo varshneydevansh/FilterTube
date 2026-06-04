@@ -210,6 +210,7 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(doc, /It is not policy\s+authority/);
   assert.match(doc, /Nanah receive\s+path now also parses\s+`filtertube_managed_policy` envelopes/);
   assert.match(doc, /local\/decrypted `filtertube_managed_mailbox_item` outcomes/);
+  assert.match(doc, /local-network candidate\s+`filtertube_managed_local_network_candidate`\s+outcomes/);
   assert.match(doc, /validated remote accepted apply history can now be recorded/);
   assert.match(doc, /Required History Row Shape/);
   assert.match(doc, /Approved Action Types/);
@@ -240,11 +241,14 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(source, /remote_policy\.mailbox\.expire/);
   assert.match(source, /remote_policy\.mailbox\.revoke/);
   assert.match(source, /function handleNanahIncomingManagedMailboxItem\(item\)/);
+  assert.match(source, /function handleNanahIncomingManagedLocalNetworkCandidate\(candidate\)/);
   assert.match(source, /function handleNanahIncomingManagedPolicyEnvelope\(envelope\)/);
   assert.match(source, /root\.type === 'filtertube_managed_policy'/);
   assert.match(source, /root\.schema === 'filtertube_managed_mailbox_item'/);
+  assert.match(source, /root\.schema === 'filtertube_managed_local_network_candidate'/);
   assert.match(source, /applyManagedPolicyEnvelope\(envelope, context\)/);
   assert.match(source, /applyManagedMailboxItem\(item, context\)/);
+  assert.match(source, /validateManagedLocalNetworkCandidate\(sanitizedCandidate, context\)/);
   assert.match(read('js/nanah_managed_live_policy.js'), /filtertube_managed_outbound_policy_history/);
   assert.match(read('js/nanah_managed_live_policy.js'), /outboundManagedPolicyHistory/);
   assert.match(read('js/nanah_managed_live_policy.js'), /filtertube_nanah_managed_live_ack/);
@@ -343,6 +347,7 @@ test('managed action history required outcomes cover accepted rejected conflict 
   assert.match(doc, /runtime remote managed validation\/apply history writer: present/);
   assert.match(doc, /runtime remote managed accepted apply history writer: present behind validated managed apply wrapper/);
   assert.match(doc, /runtime mailbox managed validation\/apply history writer: present/);
+  assert.match(doc, /runtime local-network candidate validation\/apply history writer: present/);
   assert.match(doc, /runtime managed outbound live send history writer: present on trusted link policy rows/);
   assert.match(doc, /runtime managed inbound live ack history writer: present on trusted link policy rows/);
   assert.match(doc, /The current failed-auth writer records protected evidence rows on the target\s+protected profile/);

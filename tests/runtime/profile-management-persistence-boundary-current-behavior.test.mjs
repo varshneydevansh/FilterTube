@@ -131,10 +131,10 @@ test('profile management persistence audit document records current boundary and
     assert.ok(doc.includes(marker), `missing marker: ${marker}`);
   }
 
-  assert.match(methodGap, /repo-wide lexical callables: 6118/);
+  assert.match(methodGap, /repo-wide lexical callables: 6127/);
   assert.match(methodGap, /files with lexical accounting: 72/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 6118/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 6127/);
 
   assert.equal(profileSettingsUiFamilyDocs.length, 12);
   for (const familyDocPath of profileSettingsUiFamilyDocs) {
@@ -142,9 +142,9 @@ test('profile management persistence audit document records current boundary and
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 72/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 6118/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 6127/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 6118/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 6127/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     assert.match(familyDoc, /runtime behavior changed: no/);
     assert.match(familyDoc, /do not approve runtime\s+optimization/);
@@ -154,7 +154,7 @@ test('profile management persistence audit document records current boundary and
 test('profile management source fingerprints stay pinned', () => {
   const doc = read(auditDocPath);
   const expected = [
-    ['js/tab-view.js', 13695, 632194, 'b0c71608c02a00a74920f780b7c958cc58b42703cd301a946c748cb894ab1279'],
+    ['js/tab-view.js', 13768, 636474, 'f603e16fe2e94c5fd4161514e62bdfe8208c2d5ed62cf21fdcb0551d581dd480'],
     ['js/popup.js', 1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
     ['js/io_manager.js', 2097, 100479, 'f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62'],
     ['js/background.js', 6773, 305166, 'b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5']
@@ -195,7 +195,7 @@ test('selected profile management token counts stay pinned', () => {
   const selected = [
     ['tab-view ensureProfileUnlocked tokens: 18', sources.tabView, 'ensureProfileUnlocked', 18],
     ['tab-view saveProfilesV4 tokens: 41', sources.tabView, 'saveProfilesV4', 41],
-    ['tab-view loadProfilesV4 tokens: 72', sources.tabView, 'loadProfilesV4', 72],
+    ['tab-view loadProfilesV4 tokens: 74', sources.tabView, 'loadProfilesV4', 74],
     ['tab-view activeProfileId tokens: 82', sources.tabView, 'activeProfileId', 82],
     ['tab-view StateManager.loadSettings tokens: 8', sources.tabView, 'StateManager.loadSettings', 8],
     ['tab-view refreshProfilesUI tokens: 21', sources.tabView, 'refreshProfilesUI', 21],

@@ -21,11 +21,11 @@ handoff are present for already-decrypted mailbox items. An extension-owned
 managed app policy contract artifact and app manifest copy row are now present
 so downstream app parity can be tested before native enforcement changes.
 Local-network peer discovery, LAN delivery, server mailbox pull, mailbox
-decryption, per-target accepted/rejected live ack history, app native
-enforcement proofs, and active/full signed managed sends remain gated. The
-adapter now exposes a local-network candidate authority gate for future LAN
-providers, but it is validation-only and does not add peer discovery or LAN
-delivery.
+decryption, app native enforcement proofs, and active/full signed managed sends
+remain gated. The adapter now exposes a local-network candidate authority gate
+for future LAN providers, and the dashboard has a sanitized receive bridge that
+records accepted/rejected local-network candidate outcomes through protected
+managed action history. This does not add peer discovery or LAN delivery.
 **Primary audit input**:
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
 **Current pull-on-open proof**:
@@ -376,8 +376,9 @@ replica child device over Nanah/P2P or same-network transport.
 - **Dependencies**: Task 3.1.
 - **Status**: Boundary contract and hostile-LAN proof fixture added. Product
   runtime local-network discovery behavior remains unchanged. Managed-policy
-  envelope validation exists, but it does not implement discovery or remote
-  writes.
+  envelope validation, adapter-level local-network candidate validation, and
+  dashboard sanitized local-network candidate receive/history handling are
+  present, but they do not implement discovery or LAN delivery.
 - **Acceptance Criteria**:
   - Discovery, pairing, transport, and policy authority are separate rows.
   - Network reachability failure has clear offline behavior.

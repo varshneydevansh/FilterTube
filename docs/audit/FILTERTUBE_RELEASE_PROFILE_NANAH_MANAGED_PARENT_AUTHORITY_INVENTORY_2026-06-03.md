@@ -22,7 +22,8 @@ sends, plus a
 provider-gated dashboard/profile-open pull hook for already-decrypted mailbox
 items, redacted provider ack handoff for mailbox apply/reject outcomes,
 trusted-link removal cleanup for target-local accepted managed-policy state,
-plus an extension-owned downstream app policy contract artifact wired
+sanitized local-network candidate receive/history handling, plus an
+extension-owned downstream app policy contract artifact wired
 into the app sync manifest. Active/full signed conversion, richer viewing-space/time-limit
 and multi-target bulk outbound controls, server mailbox pull/decryption runtime, server mailbox queue purge,
 local-network discovery runtime, and app native settings/iOS enforcement proofs
@@ -68,9 +69,12 @@ now fails closed without applying or acknowledging returned mailbox items.
 Trusted-link removal now purges
 target-local accepted managed-policy revision state for that link and clears
 matching open-sync status rows before the removed trust can be reused as local
-authority evidence. Server mailbox pull, mailbox decryption client, server
-mailbox queue purge, active/full signed conversion, richer viewing-space/time-limit
-and multi-target bulk outbound controls, local-network delivery runtime, and
+authority evidence. Explicitly delivered local-network candidate messages now
+sanitize caller payloads, ignore caller-provided trust objects, rebuild trust
+from local managed-link state, and record protected apply/reject history through
+the same managed-policy path. Server mailbox pull, mailbox decryption client,
+server mailbox queue purge, active/full signed conversion, richer viewing-space/time-limit
+and multi-target bulk outbound controls, local-network discovery/delivery runtime, and
 remote admin session semantics remain separate
 required slices.
 
@@ -472,11 +476,11 @@ Current gap:
 | Adapter depends on caller trust context | `validateManagedPolicyEnvelope(...)` depends on caller-supplied trusted-link/profile/revision/signature context; the wrapper rechecks stored profiles before writing but does not fetch trust keys itself. | Keep dashboard receive context and add pairing key lookup/revocation fixtures before automatic apply. |
 | Locked-child bypass has no revision binding | `allow_trusted_updates` can skip unlock for matching managed sessions, but not with policy revision constraints. | Locked child managed-policy fixtures. |
 | Mailbox protocol specified, runtime partially hooked | Offline later delivery now has a ciphertext-only protocol and replay/ack proof fixture. The dashboard/profile-open hook can ask a trusted local provider for already-decrypted mailbox items and return redacted ack records after local apply/reject. Provider rejection or provider failure fails closed without applying or acknowledging returned items, but no server mailbox client, pull scheduler, decryption client, or server path exists. | Pairing key persistence plus signed live-delivery tests before mailbox runtime work. |
-| Local-network candidate authority gate is adapter-backed; discovery/delivery absent | Same-network discovery can no longer be promoted by future callers without passing trusted-link, discovered-device, key, target, scope, revision, signature, and envelope validation. No peer discovery or LAN delivery runtime exists yet. | Installed/local two-device LAN delivery smoke plus mailbox/local-network ack fixtures before claiming local-network management. |
+| Local-network candidate authority gate and sanitized receive/history bridge are present; discovery/delivery absent | Same-network discovery can no longer be promoted by future callers without passing trusted-link, discovered-device, key, target, scope, revision, signature, and envelope validation. Explicit local-network candidate messages are sanitized before validation so caller-provided trust objects are ignored, and accepted/rejected outcomes can be written as protected history. No peer discovery or LAN delivery runtime exists yet. | Installed/local two-device LAN delivery smoke plus mailbox/local-network ack fixtures before claiming local-network management. |
 | Partial protected-user action history | Accepted local managed child saves, local parent/account history access, accepted-row clearing, protected failed unlock rows, dashboard/background session expiry, sensitive managed-action re-auth, profile-persisted local/background failed-attempt rate limiting, and remote managed validation/apply rows exist. | Retention expiry, encrypted summary fixtures, and live remote apply smoke. |
 | No admin lock for remote management | Child PIN or protected profile state could be confused with admin authority. | Parent/account PIN and trusted-device authority fixtures before writes. |
 | No pairing key/signature contract | P2P or local-network transport could authenticate reachability instead of authority. | Device-bound key, signature/integrity, rotation, revocation, and compromise-recovery fixtures. |
-| Hostile-LAN fixture set is adapter-backed; live transport still absent | Runtime tests now call the Nanah adapter local-network candidate gate for spoofed peer announcements, duplicate device ids, stale pairings, reconnect drift, wrong keys, page-message spoofing, revoked trust, and reachability loss. | Installed/local two-device LAN transport smoke and per-target ack history before local-network writes are exposed. |
+| Hostile-LAN fixture set is adapter-backed; live transport still absent | Runtime tests now call the Nanah adapter local-network candidate gate for spoofed peer announcements, duplicate device ids, stale pairings, reconnect drift, wrong keys, page-message spoofing, revoked trust, and reachability loss, and they pin the dashboard sanitized local-network candidate history bridge. | Installed/local two-device LAN transport smoke and per-target ack history before local-network writes are exposed. |
 | Partial protected log access policy | Local child history viewer, accepted-row clear path, and profile-persisted failed-attempt state now preserve protected evidence; encrypted summaries remain pending. | Retention and encryption proof. |
 | No conflict-resolution matrix | Simultaneous parent edits or server mailbox delivery after revocation could produce nondeterministic policy state. Local accepted-state cleanup now removes the revoked link's cached revision evidence, but mailbox/server queue conflict handling remains pending. | Equal-revision, different-hash, multi-parent, local-vs-remote, and revoked-queued-update fixtures. |
 | App policy contract parity now explicit | The extension-owned contract names the fields apps must preserve, the app sync manifest copies a dedicated contract artifact, and Android now has model-level proof for managed policy state/action history preservation plus Activity startup/resume/heartbeat/pause enforcement for managed time budgets. Rich timeout UI, settings locks, installed-device app smoke, and iOS parity remain pending. | Installed Android Main/Kids time-budget smoke, native settings-lock tests, iOS adapter parity, and child/admin authority separation fixtures. |
