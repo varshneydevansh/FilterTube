@@ -208,9 +208,10 @@ revision and action-history entry.
 - **Dependencies**: Sprint 1.
 - **Status**: Local managed child authority contract and fixture updated with
   accepted-save revision/history runtime behavior, protected failed-unlock
-  logging, dashboard/background admin TTL, sensitive re-auth, and in-memory
-  failed-attempt rate limiting. Durable failed-attempt retention remains
-  pending.
+  logging, dashboard/background admin TTL, sensitive re-auth, dashboard
+  profile-persisted failed-attempt rate limiting, and in-memory background
+  session PIN failed-attempt limiting. Background/session-service failed-attempt
+  durability remains pending.
 - **Acceptance Criteria**:
   - Parent/account can target owned child.
   - Child cannot manage itself as admin.
@@ -236,9 +237,11 @@ revision and action-history entry.
 - **Status**: Action-history model and access-control fixture updated. Product
   runtime now writes accepted local managed child save rows, exposes
   parent/account-only protected history access, clears accepted rows while
-  preserving protected evidence, and records Nanah managed-policy validation
-  rows for rejected, conflict, idempotent, and accepted validated-apply receive
-  outcomes. Rate-limited remote failed-attempt rows remain pending.
+  preserving protected evidence, records dashboard local failed-attempt
+  rate-limit state on the managing profile, and records Nanah managed-policy
+  validation rows for rejected, conflict, idempotent, and accepted
+  validated-apply receive outcomes. Rate-limited remote failed-attempt rows
+  remain pending.
 - **Acceptance Criteria**:
   - Rows include actor profile, actor device, target profile, action type,
     policy revision, timestamp, result, and redacted summary.

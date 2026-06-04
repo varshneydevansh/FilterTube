@@ -193,7 +193,7 @@ Large product-owned source files:
 | File | Current lines | Boundary |
 | --- | ---: | --- |
 | `js/content_bridge.js` | 13636 | Giant cross-context hub. Any growth needs source-owner proof and focused runtime fixtures. |
-| `js/tab-view.js` | 13116 | Dashboard/settings UI surface. Current residual growth is owned by the managed Nanah live signed-send, explicit granular rule-source UI, managed mailbox intake, managed parent status surface, managed action-history clear-evidence, and provider-gated open-sync UI wiring slices after extracting policy construction to `js/nanah_managed_live_policy.js` and open-sync status/pull logic to `js/nanah_managed_open_sync.js`; any further growth needs UI/state owner proof and release smoke. |
+| `js/tab-view.js` | 13215 | Dashboard/settings UI surface. Current residual growth is owned by the managed Nanah live signed-send, explicit granular rule-source UI, managed mailbox intake, managed parent status surface, managed action-history clear-evidence, provider-gated open-sync UI wiring, and persisted managed-admin failed-unlock rate-limit slices after extracting policy construction to `js/nanah_managed_live_policy.js` and open-sync status/pull logic to `js/nanah_managed_open_sync.js`; any further growth needs UI/state owner proof and release smoke. |
 | `js/background.js` | 6711 | Background storage/message/profile authority. Any growth needs mutation and settings proof. |
 | `js/content/dom_fallback.js` | 5030 | DOM fallback selector/hide/restore authority. Any growth needs DOM/no-work proof. |
 | `js/filter_logic.js` | 3652 | JSON renderer rule and decision engine. Any growth needs rule/path proof. |

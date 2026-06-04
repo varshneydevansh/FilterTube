@@ -337,6 +337,7 @@ test('managed action history required outcomes cover accepted rejected conflict 
   assert.match(doc, /runtime remote managed validation\/apply history writer: present/);
   assert.match(doc, /runtime remote managed accepted apply history writer: present behind validated managed apply wrapper/);
   assert.match(doc, /runtime mailbox managed validation\/apply history writer: present/);
-  assert.match(doc, /The current failed-auth writer records only protected evidence rows/);
-  assert.match(doc, /does not\s+rate-limit yet/);
+  assert.match(doc, /The current failed-auth writer records protected evidence rows on the target\s+protected profile/);
+  assert.match(doc, /profile\.managedPolicyState\.adminFailedUnlockRateLimit/);
+  assert.match(doc, /background session PIN failed-attempt cache is\s+still memory-only/);
 });

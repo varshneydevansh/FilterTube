@@ -11,8 +11,9 @@ managed live send added, with local/decrypted mailbox-item intake added for the
 same managed-policy validator/apply path. Runtime behavior changed for protected child Main/Kids denial, accepted same-device
 parent-managed child saves, protected parent unlock-failure evidence,
 parent/account history viewing, accepted-row history clearing, dashboard and
-background admin-session expiry, sensitive managed-action re-auth, in-memory
-managed/admin failed-attempt rate limiting, child time-budget enforcement,
+background admin-session expiry, sensitive managed-action re-auth,
+dashboard-persisted managed/admin failed-attempt rate limiting with in-memory
+background session PIN rate limiting, child time-budget enforcement,
 managed-envelope validation/classification, managed-policy receive/apply
 evidence, managed public-key descriptor pairing, source signing-key
 provisioning, eligible signed Main/Kids/granular live managed-policy sends, and
@@ -56,8 +57,8 @@ managed-policy validation/apply path. The dashboard/profile-open hook can ask a
 trusted local provider for already-decrypted mailbox items when an opted-in
 managed replica link opens. Server mailbox pull, mailbox ack, mailbox decryption
 client, active/full signed conversion, richer bulk outbound controls,
-local-network delivery runtime, failed-attempt durability, and remote admin
-session semantics remain separate required slices.
+local-network delivery runtime, background/session-service failed-attempt
+durability, and remote admin session semantics remain separate required slices.
 
 ## Issue 60 Local-Network Caregiver Addendum
 
@@ -443,11 +444,11 @@ Current gap:
 | Locked-child bypass has no revision binding | `allow_trusted_updates` can skip unlock for matching managed sessions, but not with policy revision constraints. | Locked child managed-policy fixtures. |
 | Mailbox protocol specified, runtime partially hooked | Offline later delivery now has a ciphertext-only protocol and replay/ack proof fixture. The dashboard/profile-open hook can ask a trusted local provider for already-decrypted mailbox items, but no server mailbox client, pull scheduler, ack writer, decryption client, or server path exists. | Pairing key persistence plus signed live-delivery tests before mailbox runtime work. |
 | No local-network management contract | Same-network discovery could be mistaken for authority. | Separate discovery, pairing, transport, and policy-authority proof. |
-| Partial protected-user action history | Accepted local managed child saves, local parent/account history access, accepted-row clearing, protected failed unlock rows, dashboard/background session expiry, sensitive managed-action re-auth, in-memory local/background failed-attempt rate limiting, and remote managed validation/apply rows exist. | Retention expiry, encrypted summary fixtures, failed-attempt durability proof, and live remote apply smoke. |
+| Partial protected-user action history | Accepted local managed child saves, local parent/account history access, accepted-row clearing, protected failed unlock rows, dashboard/background session expiry, sensitive managed-action re-auth, dashboard-persisted local failed-attempt rate limiting, in-memory background session PIN failed-attempt limiting, and remote managed validation/apply rows exist. | Retention expiry, encrypted summary fixtures, background/session-service failed-attempt durability proof, and live remote apply smoke. |
 | No admin lock for remote management | Child PIN or protected profile state could be confused with admin authority. | Parent/account PIN and trusted-device authority fixtures before writes. |
 | No pairing key/signature contract | P2P or local-network transport could authenticate reachability instead of authority. | Device-bound key, signature/integrity, rotation, revocation, and compromise-recovery fixtures. |
 | No hostile-LAN fixture set | Spoofed peer announcements, duplicate device ids, stale pairings, reconnect drift, or MITM attempts could be missed. | Discovery-versus-authority negative fixtures before local-network writes. |
-| Partial protected log access policy | Local child history viewer and accepted-row clear path now preserve protected evidence; encrypted summaries and failed-attempt durability remain pending. | Retention, encryption, and failed-attempt durability proof. |
+| Partial protected log access policy | Local child history viewer, accepted-row clear path, and dashboard failed-attempt persistence now preserve protected evidence; encrypted summaries and background/session-service failed-attempt durability remain pending. | Retention, encryption, and background/session-service failed-attempt durability proof. |
 | No conflict-resolution matrix | Simultaneous parent edits or mailbox delivery after revocation could produce nondeterministic policy state. | Equal-revision, different-hash, multi-parent, local-vs-remote, and revoked-queued-update fixtures. |
 
 ## Required Next Implementation Gates
@@ -477,8 +478,9 @@ Before adding parent-managed runtime behavior:
     compromise-recovery proof before accepting local-network/P2P policy writes.
 12. Add hostile-LAN and simultaneous-update conflict fixtures before enabling
     automatic remote apply.
-13. Keep action-history access and accepted-row clearing behind parent/account
-    authority, then add encryption and failed-attempt retention proof.
+13. Keep action-history access, accepted-row clearing, and dashboard
+    failed-attempt persistence behind parent/account authority, then add
+    encryption and background/session-service failed-attempt retention proof.
 14. Keep mailbox delivery ciphertext-only and reuse validated managed-policy
     apply; do not add a mailbox runtime path until source key provisioning,
     trusted descriptor persistence, signed live-send construction, and live

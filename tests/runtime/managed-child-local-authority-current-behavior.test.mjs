@@ -8,6 +8,7 @@ const docPath = 'docs/audit/FILTERTUBE_MANAGED_CHILD_LOCAL_AUTHORITY_CONTRACT_20
 const planPath = 'docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md';
 const inventoryPath = 'docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md';
 const managedActionHistorySchema = 'filtertube_managed_action_history';
+const managedAdminFailedUnlockSchema = 'filtertube_managed_admin_failed_unlock_rate_limit';
 
 function read(relativePath) {
   return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
@@ -101,6 +102,27 @@ function failedUnlockAttemptDecision({ failedAttempts, windowLimit = 5 }) {
     logResult: 'failed_auth',
     reason: nextAttempts >= windowLimit ? 'rate_limited' : 'incorrect_pin'
   };
+}
+
+function persistFailedUnlockRateLimitFixture(profile, { failedAttempts, resetAt = 1780521100000, updatedAt = 1780520500000 }) {
+  const next = {
+    ...profile,
+    managedPolicyState: {
+      ...(profile.managedPolicyState || {})
+    }
+  };
+  if (failedAttempts > 0) {
+    next.managedPolicyState.adminFailedUnlockRateLimit = {
+      schema: managedAdminFailedUnlockSchema,
+      version: 1,
+      failedAttempts,
+      resetAt,
+      updatedAt
+    };
+  } else {
+    delete next.managedPolicyState.adminFailedUnlockRateLimit;
+  }
+  return next;
 }
 
 function buildLocalPolicyHash(prefix, seed) {
@@ -225,7 +247,7 @@ test('managed child local authority contract is source-backed with accepted-save
   const tabView = read('js/tab-view.js');
   const source = runtimeSource();
 
-  assert.match(doc, /Status\*\*: Runtime local managed-save, failed-unlock history, admin-session\s+TTL, sensitive-action re-auth, and in-memory failed-attempt rate-limit\s+hardening partially present/);
+  assert.match(doc, /Status\*\*: Runtime local managed-save, failed-unlock history, admin-session\s+TTL, sensitive-action re-auth, and dashboard-persisted failed-attempt\s+rate-limit hardening partially present/);
   assert.match(doc, /Who is allowed to enter virtual child edit mode/);
   assert.match(doc, /Required Local Authority Decisions/);
   assert.match(doc, /Hardening Requirements/);
@@ -247,13 +269,19 @@ test('managed child local authority contract is source-backed with accepted-save
   assert.match(tabView, /const MANAGED_ADMIN_REAUTH_TTL_MS = 5 \* 60 \* 1000/);
   assert.match(tabView, /const MANAGED_ADMIN_FAILED_UNLOCK_LIMIT = 5/);
   assert.match(tabView, /const MANAGED_ADMIN_FAILED_UNLOCK_WINDOW_MS = 10 \* 60 \* 1000/);
+  assert.match(tabView, /const MANAGED_ADMIN_FAILED_UNLOCK_SCHEMA = 'filtertube_managed_admin_failed_unlock_rate_limit'/);
   assert.match(tabView, /const managedAdminFailedUnlocks = new Map\(\)/);
+  assert.match(tabView, /function normalizeManagedAdminFailedUnlockState\(value, now = Date\.now\(\)\)/);
+  assert.match(tabView, /function getPersistedManagedAdminFailedUnlockState\(profilesV4, profileId, now = Date\.now\(\)\)/);
+  assert.match(tabView, /async function persistManagedAdminFailedUnlockState\(profileId, state\)/);
+  assert.match(tabView, /managedPolicyState\.adminFailedUnlockRateLimit = nextState/);
+  assert.match(tabView, /delete managedPolicyState\.adminFailedUnlockRateLimit/);
   assert.match(tabView, /const isProfileUnlockSessionValid = \{/);
   assert.match(tabView, /check: \(profileId, \{ sensitiveAction = false \} = \{\}\) =>/);
   assert.match(tabView, /profileUnlockSessions\.set\(id,/);
   assert.match(tabView, /clearProfileUnlockSession\.run\(id\)/);
-  assert.match(tabView, /function recordManagedAdminUnlockFailure\(profileId\)/);
-  assert.match(tabView, /function isManagedAdminUnlockRateLimited\(profileId\)/);
+  assert.match(tabView, /async function recordManagedAdminUnlockFailure\(profileId, profilesV4 = profilesV4Cache\)/);
+  assert.match(tabView, /function isManagedAdminUnlockRateLimited\(profileId, profilesV4 = profilesV4Cache\)/);
   assert.match(tabView, /Too many incorrect PIN attempts\. Try again later\./);
   assert.match(tabView, /ensureProfileUnlocked\(fresh, currentActive, \{ sensitiveAction: true \}\)/);
   assert.match(tabView, /actionType: 'admin_session\.failed_unlock'/);
@@ -421,7 +449,20 @@ test('local hardening covers session ttl reauth failed attempt logging and rate 
   assert.match(doc, /runtime local managed edit admin session TTL: present for tab-view and background session cache/);
   assert.match(doc, /runtime local managed edit sensitive-action re-auth gate: present for managed child\/history\/viewing-space\/time-limit unlock gates/);
   assert.match(doc, /runtime local managed edit failed-attempt rate limit: present for tab-view unlock prompts and background session PIN auth/);
-  assert.match(doc, /runtime local managed edit failed-attempt rate limit durability: absent/);
+  assert.match(doc, /runtime local managed edit failed-attempt rate limit durability: present for tab-view managed unlock prompts through profile\.managedPolicyState\.adminFailedUnlockRateLimit; background session PIN auth remains memory-only/);
+});
+
+test('local managed failed unlock rate limit persists and clears on managing profile state', () => {
+  const parent = { id: 'parentA', type: 'account', name: 'Parent A' };
+  const stored = persistFailedUnlockRateLimitFixture(parent, { failedAttempts: 5 });
+
+  assert.equal(stored.managedPolicyState.adminFailedUnlockRateLimit.schema, managedAdminFailedUnlockSchema);
+  assert.equal(stored.managedPolicyState.adminFailedUnlockRateLimit.version, 1);
+  assert.equal(stored.managedPolicyState.adminFailedUnlockRateLimit.failedAttempts, 5);
+  assert.equal(stored.managedPolicyState.adminFailedUnlockRateLimit.failedAttempts >= 5, true);
+
+  const cleared = persistFailedUnlockRateLimitFixture(stored, { failedAttempts: 0 });
+  assert.equal(Object.hasOwn(cleared.managedPolicyState, 'adminFailedUnlockRateLimit'), false);
 });
 
 test('local managed failed unlock report stores protected redacted failed-auth history without policy authority', () => {

@@ -178,11 +178,15 @@ parent/account authority, not child PIN authority, and `clearManagedActionHistor
 preserves rows that are rejected, conflict, failed-auth, expired-session, trust
 revocation, time-limit, viewing-space, or prior clear evidence.
 
-The current failed-auth writer records only protected evidence rows. It does not
-rate-limit yet, does not extend an admin session, and does not authorize any
-future policy mutation. Dashboard unlock sessions and the background session PIN
-cache now expire, and sensitive managed gates require fresher re-auth before
-history, rule-edit, viewing-space, or time-limit mutations.
+The current failed-auth writer records protected evidence rows on the target
+protected profile. The dashboard unlock gate also persists local managed-action
+failed-attempt rate-limit state on the managing profile under
+`profile.managedPolicyState.adminFailedUnlockRateLimit`. It does not extend an
+admin session, and it does not authorize any future policy mutation. Dashboard
+unlock sessions and the background session PIN cache now expire, sensitive
+managed gates require fresher re-auth before history, rule-edit, viewing-space,
+or time-limit mutations, and the background session PIN failed-attempt cache is
+still memory-only.
 
 The current remote writer is still not policy authority by itself. A valid newer
 `filtertube_managed_policy` envelope must first pass the managed envelope

@@ -17,7 +17,8 @@ test('managed parent authority inventory tracks implemented route gate and pendi
   assert.match(doc, /managed-policy receive\/apply\s+evidence/);
   assert.match(doc, /dashboard and\s+background admin-session expiry/);
   assert.match(doc, /sensitive managed-action re-auth/);
-  assert.match(doc, /in-memory\s+managed\/admin failed-attempt rate limiting/);
+  assert.match(doc, /dashboard-persisted managed\/admin failed-attempt rate limiting/);
+  assert.match(doc, /in-memory\s+background session PIN rate limiting/);
   assert.match(doc, /Runtime behavior\s+changed/);
   assert.match(doc, /protected parent unlock-failure evidence/);
   assert.match(doc, /Lane proof\*\*: `test:settings`/);
@@ -74,7 +75,7 @@ test('session PIN authority remains trusted-ui gated and memory scoped', () => {
   assert.match(background, /expiresAt: Date\.now\(\) \+ SESSION_PIN_CACHE_TTL_MS/);
 
   assert.match(doc, /sessionPinCache/);
-  assert.match(doc, /in-memory local\/background failed-attempt rate limiting/);
+  assert.match(doc, /in-memory\s+background session PIN rate limiting/);
   assert.match(doc, /trusted UI sender/i);
   assert.match(doc, /Current PIN authority is local and session-scoped/);
 });

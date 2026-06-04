@@ -18,7 +18,7 @@ changes.
 | --- | ---: | ---: | --- |
 | `build.js` | 740 | 26978 | `c8485cb2600aad89f44015cd7e49ebe4746ebcc35c91c1ff2bf29aec2f087a04` |
 | `package.json` | 61 | 2405 | `36053d322780ce787de403be574cc400936ef2a994b4c8eca62561154fe81aec` |
-| `README.md` | 401 | 22476 | `ee466856f0c25d97a2b261e1d76f0c0d22673e601e8b4072e103e928165a4036` |
+| `README.md` | 401 | 22476 | `72bbda7e379c5aebb7aa317b42a295a57077bf89bde7e1649d93250ef8977337` |
 | `CHANGELOG.md` | 591 | 40124 | `e22a87ce7eeb88d171587d4b0f4676881a2c3081a7fbf15978d7e8d8582cdfdd` |
 | `manifest.json` | 88 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` |
 | `manifest.chrome.json` | 88 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` |
@@ -169,9 +169,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 71
-method semantic proof gap lexical callables covered: 6019
+method semantic proof gap lexical callables covered: 6024
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6019
+lexical callables requiring semantic proof before behavior changes: 6024
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
