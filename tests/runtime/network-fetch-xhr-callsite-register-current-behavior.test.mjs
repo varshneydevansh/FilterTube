@@ -14,7 +14,7 @@ const sourceFingerprints = {
   'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
   'js/injector.js': [3593, 155830, '634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04'],
   'js/seed.js': [1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
-  'js/tab-view.js': [13033, 598858, '53544f1615a08ec6dcff7533d6671638b5a27c16183ba00ec0fbd5bf5993609c']
+  'js/tab-view.js': [13116, 603708, '5d77115a38cfec8b575e0e8953d357e2a7bb60dbaed057304ed5b69a61a0fed0']
 };
 
 function read(file) {
@@ -134,7 +134,7 @@ test('network fetch/xhr callsite register is audit-only and source pinned', () =
 
   assert.match(text, /Status: audit-only current-behavior register/);
   assert.match(text, /Runtime behavior is unchanged/);
-  assert.match(text, /tracked product JS\/JSX\/MJS files scanned: 68/);
+  assert.match(text, /tracked product JS\/JSX\/MJS files scanned: 69/);
   assert.match(text, /js\/nanah_managed_live_policy\.js.*zero network\s+fetch\/XHR rows/s);
   assert.match(text, /tracked product files with network fetch\/XHR rows: 6/);
   assert.match(text, /network fetch\/XHR rows: 29/);
@@ -488,7 +488,7 @@ test('network fetch/xhr callsite counts remain source-derived', () => {
   const rows = networkRows();
   const text = doc();
 
-  assert.equal(productScriptFiles().length, 68);
+  assert.equal(productScriptFiles().length, 69);
   assert.equal(rows.length, 29);
   assert.deepEqual(countBy(rows, 'operation'), {
     XMLHttpRequest: 1,

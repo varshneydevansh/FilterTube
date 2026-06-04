@@ -154,7 +154,7 @@ test('profile management persistence audit document records current boundary and
 test('profile management source fingerprints stay pinned', () => {
   const doc = read(auditDocPath);
   const expected = [
-    ['js/tab-view.js', 13033, 598858, '53544f1615a08ec6dcff7533d6671638b5a27c16183ba00ec0fbd5bf5993609c'],
+    ['js/tab-view.js', 13116, 603708, '5d77115a38cfec8b575e0e8953d357e2a7bb60dbaed057304ed5b69a61a0fed0'],
     ['js/popup.js', 1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
     ['js/io_manager.js', 2097, 100479, 'f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62'],
     ['js/background.js', 6711, 301840, 'b27206ec2b6927fc33f823c4832ff95ace7c97bd4284eb950fc5964baf666346']
@@ -175,7 +175,7 @@ test('profile management source/effect block metrics stay pinned in the doc', ()
   const expected = {
     tabRenderProfilesManager: ['tab-view renderProfilesManager block', 411, 20884],
     tabRefreshProfilesUI: ['tab-view refreshProfilesUI block', 24, 954],
-    tabSwitchToProfile: ['tab-view switchToProfile block', 44, 1595],
+    tabSwitchToProfile: ['tab-view switchToProfile block', 45, 1668],
     popupSwitchToProfile: ['popup switchToProfile block', 48, 1659],
     tabCreateAccountHandler: ['tab-view create account handler block', 120, 5004],
     tabCreateChildHandler: ['tab-view create child handler block', 107, 4589],
@@ -195,8 +195,8 @@ test('selected profile management token counts stay pinned', () => {
   const selected = [
     ['tab-view ensureProfileUnlocked tokens: 18', sources.tabView, 'ensureProfileUnlocked', 18],
     ['tab-view saveProfilesV4 tokens: 37', sources.tabView, 'saveProfilesV4', 37],
-    ['tab-view loadProfilesV4 tokens: 64', sources.tabView, 'loadProfilesV4', 64],
-    ['tab-view activeProfileId tokens: 77', sources.tabView, 'activeProfileId', 77],
+    ['tab-view loadProfilesV4 tokens: 66', sources.tabView, 'loadProfilesV4', 66],
+    ['tab-view activeProfileId tokens: 81', sources.tabView, 'activeProfileId', 81],
     ['tab-view StateManager.loadSettings tokens: 8', sources.tabView, 'StateManager.loadSettings', 8],
     ['tab-view refreshProfilesUI tokens: 21', sources.tabView, 'refreshProfilesUI', 21],
     ['tab-view applyLockGateIfNeeded tokens: 4', sources.tabView, 'applyLockGateIfNeeded', 4],

@@ -669,11 +669,11 @@ created.
 ```text
 dist snapshot source: existing ignored local dist tree
 browser staged directories: 3
-browser staged files per directory: 60
+browser staged files per directory: 61
 dist zip artifacts: 3
-total dist files including zips: 183
-source-backed staged files per browser excluding manifest: 59
-byte-identical source-backed staged files per browser excluding manifest: 59
+total dist files including zips: 186
+source-backed staged files per browser excluding manifest: 60
+byte-identical source-backed staged files per browser excluding manifest: 60
 committed package manifest: absent
 zip checksum manifest: absent
 reproducible build proof: absent
@@ -691,15 +691,15 @@ Per-browser staged group counts are currently identical:
 | `data` | 1 |
 | `html` | 3 |
 | `icons` | 7 |
-| `js` | 34 |
+| `js` | 35 |
 
 Current local package artifact rows:
 
 | Target | Staged files | Manifest bytes | Manifest sha256 | Version | Content script entries | Content script JS refs | WAR refs | ZIP bytes | ZIP sha256 |
 | --- | ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | --- |
-| `chrome` | 60 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | `3.3.2` | 2 | 15 | 5 | 8721193 | `9ba18fc15a934c364532a9e154b37210d7c756fd1fec8eb71f806aeb21f52ca6` |
-| `firefox` | 60 | 2603 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` | `3.3.2` | 1 | 14 | 5 | 8721252 | `68993f0959ba4166917f913f1e92e2e629a26490a02997abdf534371acc6e7ef` |
-| `opera` | 60 | 2518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | `3.3.2` | 2 | 15 | 4 | 8721195 | `9fb231ddce1d4bfc57f8b6510da4e8230a3243c11d8aca150930b4769676a4c1` |
+| `chrome` | 61 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | `3.3.2` | 2 | 15 | 5 | 8724938 | `3809d1c9d28af96ab608c484f9bcfe90728cb5ef8fb1c1f3af48d49e7d1f0428` |
+| `firefox` | 61 | 2603 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` | `3.3.2` | 1 | 14 | 5 | 8724997 | `1818fe5be849419cc7183607e2071c4711b7892fd66355edc452ddf8a07862b9` |
+| `opera` | 61 | 2518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | `3.3.2` | 2 | 15 | 4 | 8724940 | `bb6f94d4883aabb001722c7624dad7187cf4b430a7853560b4310244d8831d4e` |
 
 ASCII boundary:
 
@@ -716,7 +716,7 @@ workspace source paths
 ```mermaid
 flowchart TD
   A["Workspace source paths"] --> B["Existing ignored dist browser directories"]
-  B --> C["59 of 59 source-backed staged files match source per browser"]
+  B --> C["60 of 60 source-backed staged files match source per browser"]
   B --> D["dist browser manifest.json files"]
   B --> E["Existing local ZIP files"]
   C --> F["Local snapshot proof only"]
@@ -731,7 +731,7 @@ flowchart TD
 ```
 
 This closes a local-artifact inventory gap, not the release gate. The staged
-browser directories currently match workspace source bytes for 59 of 59 source-backed
+browser directories currently match workspace source bytes for 60 of 60 source-backed
 non-manifest files, and the three local ZIPs have recorded hashes. The package
 still lacks a committed per-file manifest, a clean rebuild record, ZIP content
 attestation tied to source revision, upload proof, public-claim proof, and
@@ -819,10 +819,10 @@ is a required source input before this release/package/public-claim surface can
 support runtime optimization. Current proof pins:
 
 ```text
-method semantic proof gap files covered: 70
-method semantic proof gap lexical callables covered: 5990
+method semantic proof gap files covered: 71
+method semantic proof gap lexical callables covered: 6019
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5990
+lexical callables requiring semantic proof before behavior changes: 6019
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

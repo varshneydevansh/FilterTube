@@ -1,8 +1,9 @@
 # Audit: Managed Policy Encrypted Mailbox Protocol
 
 **Generated**: 2026-06-04  
-**Status**: Protocol, proof fixture, and local decrypted mailbox-item intake are
-present. Runtime server mailbox pull is not implemented.
+**Status**: Protocol, proof fixture, local decrypted mailbox-item intake, and a
+provider-gated dashboard/profile-open pull hook are present. Runtime server
+mailbox pull is not implemented.
 **Related plan**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`  
 **Related inventory**:
@@ -173,8 +174,9 @@ and write protected redacted action-history evidence.
 
 The runtime still does not implement a server mailbox pull scheduler, mailbox
 storage client, mailbox decryption client, or server ack writer. The mailbox
-server cannot become policy authority, and pull-on-open remains a future
-transport slice.
+server cannot become policy authority. The first pull-on-open hook now exists
+only as a provider-gated dashboard/profile-open bridge for local/decrypted
+mailbox items.
 
 Current runtime status:
 
@@ -184,8 +186,9 @@ runtime mailbox item metadata-to-envelope binding: present
 runtime mailbox item signature gate reuse: present
 runtime mailbox item managed-policy apply wrapper: present
 runtime mailbox protected history rows: present
+runtime provider-gated dashboard/profile-open pull hook: present
 runtime mailbox server pull client: absent
 runtime mailbox server ack writer: absent
 runtime mailbox decryption client: absent
-runtime behavior changed by this slice: yes, for local/decrypted mailbox item intake only
+runtime behavior changed by this slice: yes, for local/decrypted mailbox item intake and provider-gated dashboard/profile-open pull status only
 ```

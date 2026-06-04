@@ -3012,10 +3012,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const NANAH_UI_MODE_KEY = 'ftNanahUiMode';
     const NANAH_MANAGED_SIGNING_KEYPAIR_KEY = 'ftNanahManagedSigningKeyPair';
     const NANAH_MANAGED_SIGNING_PUBLIC_KEY_KEY = 'ftNanahManagedSigningPublicKey';
+    const NANAH_MANAGED_OPEN_SYNC_STATE_KEY = 'ftNanahManagedOpenSyncState';
     let nanahClient = null;
     let nanahTrustedLinks = [];
     let nanahStableDeviceId = '';
     let nanahManagedSigningKeyDescriptor = null;
+    let nanahManagedOpenSyncState = null;
     let nanahUiMode = 'send_once';
     let isApplyingNanahModePreset = false;
     let nanahTrustedReconnectApprovalPromise = null;
@@ -6660,6 +6662,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             let reconnectFastInput = null;
             let reconnectApprovalInput = null;
+            let syncOnOpenInput = null;
             if (showReconnectMode) {
                 const reconnectSection = document.createElement('section');
                 reconnectSection.className = 'nanah-managed-modal__section';
@@ -6704,6 +6707,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                 reconnectSection.appendChild(reconnectCopy);
                 reconnectSection.appendChild(reconnectGrid);
                 body.appendChild(reconnectSection);
+
+                const openSyncSection = document.createElement('section');
+                openSyncSection.className = 'nanah-managed-modal__section';
+                const openSyncToggle = document.createElement('label');
+                openSyncToggle.className = 'nanah-managed-modal__toggle';
+                syncOnOpenInput = document.createElement('input');
+                syncOnOpenInput.type = 'checkbox';
+                syncOnOpenInput.checked = safeObject(initialPolicy).syncOnProfileOpen === true;
+                const openSyncCopy = document.createElement('div');
+                const openSyncTitle = document.createElement('strong');
+                openSyncTitle.textContent = 'Check for parent updates when this profile opens';
+                const openSyncBody = document.createElement('span');
+                openSyncBody.textContent = 'Uses a trusted local provider only when available, then applies only signed mailbox items that match this saved link.';
+                openSyncCopy.appendChild(openSyncTitle);
+                openSyncCopy.appendChild(openSyncBody);
+                openSyncToggle.appendChild(syncOnOpenInput);
+                openSyncToggle.appendChild(openSyncCopy);
+                openSyncSection.appendChild(openSyncToggle);
+                body.appendChild(openSyncSection);
             }
 
             let targetCurrentInput = null;
@@ -6894,6 +6916,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     autoApplyControlProposals: childProtectionLevel === 'strict' ? false : (autoApplyInput?.checked === true),
                     reconnectMode: childProtectionLevel === 'strict' ? 'approval_needed' : (reconnectApprovalInput?.checked === true ? 'approval_needed' : 'fast'),
                     lockedChildMode: childProtectionLevel === 'strict' ? 'require_unlock' : (childLockAllowInput?.checked === true ? 'allow_trusted_updates' : 'require_unlock'),
+                    syncOnProfileOpen: childProtectionLevel === 'strict'
+                        ? false
+                        : ((syncOnOpenInput?.checked === true) && (childLockAllowInput ? childLockAllowInput.checked === true : true)),
                     childProtectionLevel,
                     targetProfileBehavior,
                     targetProfileId: targetProfileBehavior === 'fixed_profile' ? localProfileContext.profileId : '',
@@ -7012,6 +7037,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const autoApply = safeObject(raw.policy).autoApplyControlProposals === true;
         const reconnectMode = getNanahReconnectMode(safeObject(raw.policy).reconnectMode || raw.reconnectMode, linkType === 'managed_link' ? 'approval_needed' : 'fast');
         const lockedChildMode = getNanahLockedChildMode(safeObject(raw.policy).lockedChildMode || raw.lockedChildMode, 'require_unlock');
+        const syncOnProfileOpen = safeObject(raw.policy).syncOnProfileOpen === true || raw.syncOnProfileOpen === true;
         const childProtectionLevel = getNanahChildProtectionLevel(safeObject(raw.policy).childProtectionLevel || raw.childProtectionLevel, 'standard');
         const targetProfileBehavior = getNanahTargetProfileBehavior(
             safeObject(raw.policy).targetProfileBehavior || raw.targetProfileBehavior,
@@ -7041,6 +7067,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 autoApplyControlProposals: linkType === 'managed_link' && autoApply,
                 reconnectMode,
                 lockedChildMode,
+                syncOnProfileOpen: linkType === 'managed_link' && syncOnProfileOpen,
                 childProtectionLevel,
                 targetProfileBehavior,
                 targetProfileId: targetProfileBehavior === 'fixed_profile' ? targetProfileId : '',
@@ -7808,6 +7835,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderNanahTrustedLinks();
     }
 
+    async function loadNanahManagedOpenSyncState() {
+        nanahManagedOpenSyncState = safeObject(await readNanahStorage(NANAH_MANAGED_OPEN_SYNC_STATE_KEY));
+    }
+
+    async function persistNanahManagedOpenSyncState(state) {
+        nanahManagedOpenSyncState = safeObject(state);
+        await writeNanahStorage(NANAH_MANAGED_OPEN_SYNC_STATE_KEY, nanahManagedOpenSyncState);
+    }
+
+    function createNanahManagedOpenSyncHelper() {
+        const factory = window.FilterTubeNanahManagedOpenSync?.create;
+        return typeof factory === 'function' ? factory({ normalizeString, safeObject, safeArray }) : null;
+    }
+
+    function formatNanahManagedOpenSyncStatus(link) {
+        return createNanahManagedOpenSyncHelper()?.formatStatus(link, nanahManagedOpenSyncState, activeProfileId) || '';
+    }
+
+    async function runNanahManagedOpenSync({ reason = 'dashboard_open' } = {}) {
+        const helper = createNanahManagedOpenSyncHelper();
+        if (!helper) return null;
+        const io = window.FilterTubeIO || {};
+        const localProfilesV4 = profilesV4Cache || (typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null);
+        const activeId = normalizeString(localProfilesV4?.activeProfileId) || activeProfileId || 'default';
+        const state = await helper.runOpenSync({
+            links: nanahTrustedLinks,
+            activeProfileId: activeId,
+            profilesV4: localProfilesV4,
+            reason,
+            applyMailboxItem: (item) => handleNanahIncomingManagedMailboxItem(item),
+            writeState: persistNanahManagedOpenSyncState
+        });
+        renderNanahTrustedLinks();
+        return state;
+    }
+
     async function configureNanahTrustedLink(link) {
         const trusted = normalizeNanahTrustedLink(link);
         if (!trusted) return;
@@ -7844,6 +7907,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 autoApplyControlProposals: nextPolicyDecision.policy.autoApplyControlProposals,
                 reconnectMode: nextPolicyDecision.policy.reconnectMode,
                 lockedChildMode: nextPolicyDecision.policy.lockedChildMode,
+                syncOnProfileOpen: nextPolicyDecision.policy.syncOnProfileOpen,
                 childProtectionLevel: nextPolicyDecision.policy.childProtectionLevel,
                 targetProfileBehavior: nextPolicyDecision.policy.targetProfileBehavior,
                 targetProfileId: nextPolicyDecision.policy.targetProfileId,
@@ -8096,6 +8160,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                     lockedChildRow.className = 'nanah-trusted-link__policy-row';
                     lockedChildRow.innerHTML = `<span>Locked child profile</span><strong>${getNanahLockedChildModeLabel(safeObject(entry?.policy).lockedChildMode)}</strong>`;
                     policyRows.appendChild(lockedChildRow);
+
+                    const openSyncRow = document.createElement('div');
+                    openSyncRow.className = 'nanah-trusted-link__policy-row';
+                    const openSyncLabel = document.createElement('span');
+                    openSyncLabel.textContent = 'Open sync';
+                    const openSyncValue = document.createElement('strong');
+                    openSyncValue.textContent = formatNanahManagedOpenSyncStatus(entry);
+                    openSyncRow.appendChild(openSyncLabel);
+                    openSyncRow.appendChild(openSyncValue);
+                    policyRows.appendChild(openSyncRow);
                 }
 
                 card.appendChild(policyRows);
@@ -8853,34 +8927,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (validation.accepted === true && validation.decision === 'idempotent_same_hash') {
             await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
             UIComponents.showToast('Managed mailbox policy already matches the last accepted revision', 'info');
-            return;
+            return validation;
         }
         if (validation.accepted === true) {
             if (typeof adapter.applyManagedMailboxItem !== 'function') {
-                await recordManagedNanahPolicyValidationHistory(envelope, {
+                const decision = {
                     accepted: false,
                     reason: 'managed_mailbox_apply_unavailable',
                     mailboxItemId: validation.mailboxItemId
-                }, context);
+                };
+                await recordManagedNanahPolicyValidationHistory(envelope, decision, context);
                 UIComponents.showToast('Managed mailbox apply is unavailable', 'error');
-                return;
+                return decision;
             }
             const result = await adapter.applyManagedMailboxItem(item, context);
             await recordManagedNanahPolicyValidationHistory(envelope, result.accepted === true ? validation : result, context);
             if (result.accepted === true && result.applied !== false) {
                 await refreshFilterTubeUiAfterNanahImport();
                 UIComponents.showToast(`Applied managed mailbox ${normalizeString(validation.scope) || 'policy'} update`, 'success');
-                return;
+                return result;
             }
             if (result.accepted === true && result.decision === 'idempotent_same_hash') {
                 UIComponents.showToast('Managed mailbox policy already matches the last accepted revision', 'info');
-                return;
+                return result;
             }
             UIComponents.showToast(`Managed mailbox policy rejected: ${normalizeString(result.reason) || 'apply failed'}`, 'error');
-            return;
+            return result;
         }
         await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
         UIComponents.showToast(`Managed mailbox policy rejected: ${normalizeString(validation.reason) || 'validation failed'}`, 'error');
+        return validation;
     }
 
     function buildNanahOutgoingProposalPolicy(scope, strategy) {
@@ -9219,6 +9295,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     autoApplyControlProposals: false,
                     reconnectMode: 'approval_needed',
                     lockedChildMode: 'require_unlock',
+                    syncOnProfileOpen: false,
                     childProtectionLevel: isActiveChildNanahProfile() ? 'strict' : 'standard',
                     targetProfileBehavior: (normalizeString(safeObject(details.targetProfile).profileId) || isActiveChildNanahProfile())
                         ? 'fixed_profile'
@@ -9277,6 +9354,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         autoApplyControlProposals: managedApproval.policy.autoApplyControlProposals,
                         reconnectMode: managedApproval.policy.reconnectMode,
                         lockedChildMode: managedApproval.policy.lockedChildMode,
+                        syncOnProfileOpen: managedApproval.policy.syncOnProfileOpen,
                         childProtectionLevel: managedApproval.policy.childProtectionLevel,
                         targetProfileBehavior: managedApproval.policy.targetProfileBehavior,
                         targetProfileId: managedApproval.policy.targetProfileId,
@@ -9305,6 +9383,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             autoApplyControlProposals: managedApproval.policy.autoApplyControlProposals,
                             reconnectMode: managedApproval.policy.reconnectMode,
                             lockedChildMode: managedApproval.policy.lockedChildMode,
+                            syncOnProfileOpen: managedApproval.policy.syncOnProfileOpen,
                             childProtectionLevel: managedApproval.policy.childProtectionLevel,
                             targetProfileBehavior: managedApproval.policy.targetProfileBehavior,
                             targetProfileId: managedApproval.policy.targetProfileId,
@@ -9589,6 +9668,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             autoApplyControlProposals: false,
             reconnectMode: linkType === 'managed_link' ? 'approval_needed' : 'fast',
             lockedChildMode: 'require_unlock',
+            syncOnProfileOpen: false,
             childProtectionLevel: isActiveChildNanahProfile() ? 'strict' : 'standard',
             targetProfileBehavior: isActiveChildNanahProfile() ? 'fixed_profile' : 'current_active',
             targetProfileId: localProfileContext.profileId,
@@ -10277,6 +10357,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             managedChildEdit = null;
             await StateManager.loadSettings();
             await refreshProfilesUI();
+            await runNanahManagedOpenSync({ reason: 'profile_switch' });
             updateStats();
             UIComponents.showToast('Profile switched', 'success');
         } catch (e) {
@@ -10874,6 +10955,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await ensureNanahStableDeviceId();
     await loadNanahTrustedLinks();
+    await loadNanahManagedOpenSyncState();
+    await runNanahManagedOpenSync({ reason: 'dashboard_open' });
     renderNanahTrustedLinks();
     setNanahMode(nanahUiMode, { persist: false, applyPreset: true });
     updateNanahUi();

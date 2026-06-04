@@ -189,8 +189,8 @@ test('managed mailbox protocol is docs-backed and linked from plan and inventory
   const plan = read(planPath);
   const inventory = read(inventoryPath);
 
-  assert.match(doc, /Status\*\*: Protocol, proof fixture, and local decrypted mailbox-item intake are\s+present/);
-  assert.match(doc, /Runtime server mailbox pull is not\s+implemented/);
+  assert.match(doc, /Status\*\*: Protocol, proof fixture, local decrypted mailbox-item intake, and a\s+provider-gated dashboard\/profile-open pull hook are present/);
+  assert.match(doc, /Runtime\s+server\s+mailbox pull is not\s+implemented/);
   assert.match(doc, /The mailbox server is storage and relay only/);
   assert.match(doc, /must never receive plaintext rules, keywords, channel names,\s+video ids, viewing-space settings, time budgets, PIN values, or action-history\s+summaries/);
   assert.match(doc, /filtertube_managed_mailbox_item/);
@@ -203,6 +203,7 @@ test('managed mailbox protocol is docs-backed and linked from plan and inventory
   assert.match(doc, /last valid accepted parent policy remains active/);
   assert.match(doc, /Server metadata is not enough to apply policy/);
   assert.match(doc, /No-policy\/no-work YouTube runtime performance remains a release gate/);
+  assert.match(doc, /runtime provider-gated dashboard\/profile-open pull hook: present/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
 });

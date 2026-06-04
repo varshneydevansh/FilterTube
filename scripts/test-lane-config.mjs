@@ -304,6 +304,7 @@ export const LANES = Object.freeze({
       'tests/runtime/managed-nanah-pairing-key-descriptor-current-behavior.test.mjs',
       'tests/runtime/managed-nanah-signing-keypair-current-behavior.test.mjs',
       'tests/runtime/managed-nanah-live-signed-send-current-behavior.test.mjs',
+      'tests/runtime/managed-nanah-open-sync-current-behavior.test.mjs',
       'tests/runtime/managed-viewing-space-route-gate-current-behavior.test.mjs',
       'tests/runtime/managed-child-time-limit-schema-current-behavior.test.mjs',
       'tests/runtime/managed-time-budget-enforcement-current-behavior.test.mjs',
@@ -445,7 +446,7 @@ export const FILE_LANE_RULES = Object.freeze([
   },
   {
     id: 'nanah-managed-policy-runtime',
-    patterns: [/^js\/nanah_managed_live_policy\.js$/],
+    patterns: [/^js\/nanah_managed_(?:live_policy|open_sync)\.js$/],
     lanes: ['release', 'settings', 'smoke']
   },
   {

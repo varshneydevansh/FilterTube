@@ -1291,7 +1291,7 @@
                                                     <li>A live Nanah session is not meant to survive a page refresh, browser restart, or tab close. Refresh ends the live pairing session.</li>
                                                     <li>Trusted links are saved locally so you do not lose the remembered relationship, but today you still start a fresh live session when reconnecting.</li>
                                                     <li>The trusted-device card now has a <strong>Start New Session</strong> shortcut that starts the next fresh session with the saved role/policy defaults.</li>
-                                                    <li>Saved trust means a faster next session, not automatic background syncing with no live connection.</li>
+                                                    <li>Saved trust means a faster next session. Optional open sync checks can run only when a trusted local provider is available; they do not make YouTube pages do background work.</li>
                                                     <li>If you try to reuse the same pairing code on the same active device session, FilterTube now blocks that locally instead of silently burning the code.</li>
                                                     <li>If no fixed target is saved on the managed replica link, non-<code>full</code> sync still writes into the receiver's current active profile at receive time.</li>
                                                     <li>If a managed replica link is saved with <strong>Always this local profile</strong>, future managed updates land in that pinned local profile even when some other profile is active on the receiving device.</li>
@@ -1580,6 +1580,7 @@
     <script src="../js/vendor/nanah.bundle.js"></script>
     <script src="../js/nanah_sync_adapter.js"></script>
     <script src="../js/nanah_managed_live_policy.js"></script>
+    <script src="../js/nanah_managed_open_sync.js"></script>
     <script src="../js/content_controls_catalog.js"></script>
     <script src="../js/ui_components.js"></script>
     <script src="../js/state_manager.js"></script>

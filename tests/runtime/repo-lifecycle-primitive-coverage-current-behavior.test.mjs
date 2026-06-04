@@ -168,19 +168,19 @@ function aggregate() {
 test('repo lifecycle primitive coverage documents the tracked JS source boundary', () => {
   assert.match(coverageDoc, /git ls-files '\*\.js' '\*\.jsx' '\*\.mjs'/);
   assert.match(coverageDoc, /Current tracked JS\/JSX\/MJS count:/);
-  assert.match(coverageDoc, /70/);
+  assert.match(coverageDoc, /71/);
   assert.match(coverageDoc, /Ignored root captures and generated package output are excluded/);
 });
 
 test('every tracked JS JSX and MJS file is lifecycle-classified', () => {
   const { files, families, perFile } = aggregate();
-  assert.equal(files.length, 70);
+  assert.equal(files.length, 71);
   assert.deepEqual(
     Object.fromEntries(Object.entries(families).map(([family, stats]) => [family, stats.files]).sort()),
     {
       'build-release-sync-scripts': 7,
       'content-runtime-js': 17,
-      'extension-ui-background-js': 12,
+      'extension-ui-background-js': 13,
       'generated-ui-output': 2,
       'generated-ui-source': 3,
       'quarantined-legacy-js': 1,
@@ -191,7 +191,7 @@ test('every tracked JS JSX and MJS file is lifecycle-classified', () => {
     }
   );
 
-  assert.match(coverageDoc, /Per-file primitive footprint rows: 70/);
+  assert.match(coverageDoc, /Per-file primitive footprint rows: 71/);
   const documentedRows = [
     ...coverageDoc.matchAll(/^\| `([^`]+)` \| `([^`]+)` \| \d+ \| \d+ \| \d+ \| \d+ \| \d+ \| \d+ \|$/gm)
   ];

@@ -18,7 +18,7 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/tab-view.js` | 13033 | 598858 | `53544f1615a08ec6dcff7533d6671638b5a27c16183ba00ec0fbd5bf5993609c` |
+| `js/tab-view.js` | 13116 | 603708 | `5d77115a38cfec8b575e0e8953d357e2a7bb60dbaed057304ed5b69a61a0fed0` |
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/io_manager.js` | 2097 | 100479 | `f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62` |
 | `js/background.js` | 6711 | 301840 | `b27206ec2b6927fc33f823c4832ff95ace7c97bd4284eb950fc5964baf666346` |
@@ -30,7 +30,7 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 source/effect blocks: 9
 tab-view renderProfilesManager block: 411 lines, 20884 bytes
 tab-view refreshProfilesUI block: 24 lines, 954 bytes
-tab-view switchToProfile block: 44 lines, 1595 bytes
+tab-view switchToProfile block: 45 lines, 1668 bytes
 popup switchToProfile block: 48 lines, 1659 bytes
 tab-view create account handler block: 120 lines, 5004 bytes
 tab-view create child handler block: 107 lines, 4589 bytes
@@ -44,8 +44,8 @@ background profile storage invalidation block: 42 lines, 1464 bytes
 ```text
 tab-view ensureProfileUnlocked tokens: 18
 tab-view saveProfilesV4 tokens: 37
-tab-view loadProfilesV4 tokens: 64
-tab-view activeProfileId tokens: 77
+tab-view loadProfilesV4 tokens: 66
+tab-view activeProfileId tokens: 81
 tab-view StateManager.loadSettings tokens: 8
 tab-view refreshProfilesUI tokens: 21
 tab-view applyLockGateIfNeeded tokens: 4

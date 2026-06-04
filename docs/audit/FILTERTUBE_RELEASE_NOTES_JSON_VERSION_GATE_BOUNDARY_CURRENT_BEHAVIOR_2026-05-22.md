@@ -110,10 +110,10 @@ is a required source input before this release/package/public-claim surface can
 support runtime optimization. Current proof pins:
 
 ```text
-method semantic proof gap files covered: 70
-method semantic proof gap lexical callables covered: 5990
+method semantic proof gap files covered: 71
+method semantic proof gap lexical callables covered: 6019
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5990
+lexical callables requiring semantic proof before behavior changes: 6019
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

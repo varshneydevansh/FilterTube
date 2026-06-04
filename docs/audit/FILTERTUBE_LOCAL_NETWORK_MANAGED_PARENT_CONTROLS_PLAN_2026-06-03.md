@@ -11,11 +11,14 @@ descriptor is already provisioned, and source-side managed signing keypair
 provisioning plus an adapter signing helper are present. Live fixed-target
 Nanah managed-policy sends are present for Main/Kids, keyword, channel, video,
 viewing-space, and time-limit scopes, and granular keyword/channel/video sends
-now expose an explicit Main/Kids rule-source picker. Local-network peer
-discovery, LAN delivery, mailbox pull, mailbox ack, and active/full signed
-managed sends remain gated.
+now expose an explicit Main/Kids rule-source picker. A provider-gated
+dashboard/profile-open pull hook is present for already-decrypted mailbox items.
+Local-network peer discovery, LAN delivery, server mailbox pull, mailbox ack,
+mailbox decryption, and active/full signed managed sends remain gated.
 **Primary audit input**:
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
+**Current pull-on-open proof**:
+`docs/audit/FILTERTUBE_NANAH_MANAGED_PULL_ON_OPEN_2026-06-04.md`
 
 ## Overview
 
@@ -612,14 +615,18 @@ where parent and child devices are not reachable at the same time.
 - **Complexity**: 6/10
 - **Dependencies**: Sprint 3.
 - **Status**: Protocol doc, executable proof fixture, and local/decrypted
-  mailbox-item validation/apply intake added. Runtime mailbox server pull,
-  server ack, and decryption client remain absent by design.
+  mailbox-item validation/apply intake added. A provider-gated
+  dashboard/profile-open hook can request already-decrypted mailbox items from
+  a trusted local provider. Runtime mailbox server pull, server ack, and
+  decryption client remain absent by design.
 - **Acceptance Criteria**:
   - Server cannot read rules.
   - Replay, stale, revoked, wrong-target, and duplicate delivery behavior is
     specified.
   - Local/decrypted items bind mailbox metadata to the decrypted managed-policy
     envelope before validation/apply.
+  - Pull-on-open does no work unless the trusted link opted into
+    `syncOnProfileOpen` and a local provider is available.
   - Mailbox is optional and does not weaken local/P2P security.
 - **Validation**:
   - `git diff --check`
