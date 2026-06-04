@@ -75,7 +75,8 @@ function groupForMethod(name) {
     'validateManagedPolicyEnvelope',
     'getManagedMailboxEnvelope',
     'validateManagedMailboxBinding',
-    'validateManagedMailboxItem'
+    'validateManagedMailboxItem',
+    'validateManagedLocalNetworkCandidate'
   ].includes(name)) {
     return 'nanahManagedPolicyEnvelopeValidation';
   }
@@ -200,13 +201,13 @@ test('Nanah sync adapter method semantic register is audit-only and scoped to cu
   assert.match(text, /Status: runtime managed-policy validation, adapter signature verification, and\s+validated apply boundary present/);
   assert.match(text, /Runtime behavior changed for\s+validated managed envelope apply support/);
   assert.match(text, /source file: js\/nanah_sync_adapter\.js/);
-  assert.match(text, /line count: 1419/);
-  assert.equal(sourceLineCount(), 1419);
-  assert.match(text, /named declarations: 69/);
-  assert.match(text, /plain function declarations: 57/);
+  assert.match(text, /line count: 1468/);
+  assert.equal(sourceLineCount(), 1468);
+  assert.match(text, /named declarations: 70/);
+  assert.match(text, /plain function declarations: 58/);
   assert.match(text, /async function declarations: 12/);
   assert.match(text, /const arrow helper declarations: 0/);
-  assert.match(text, /public FilterTubeNanahAdapter entries: 18/);
+  assert.match(text, /public FilterTubeNanahAdapter entries: 19/);
   assert.match(text, /semantic method groups: 8/);
   assert.match(text, /runtime behavior changed: validated managed envelope apply support/);
   assert.match(text, /not completion proof for live transport key distribution/);
@@ -215,10 +216,10 @@ test('Nanah sync adapter method semantic register is audit-only and scoped to cu
 test('Nanah sync adapter register accounts for every current named declaration', () => {
   const rows = methodRows();
 
-  assert.equal(rows.length, 69);
+  assert.equal(rows.length, 70);
   assert.deepEqual(countBy(rows, 'kind'), {
     'async function': 12,
-    function: 57
+    function: 58
   });
   assert.deepEqual(countBy(rows, 'group'), {
     nanahAdapterRuntimeAndDescriptor: 3,
@@ -226,7 +227,7 @@ test('Nanah sync adapter register accounts for every current named declaration',
     nanahEnvelopeBuildAndSummary: 4,
     nanahIncomingEnvelopeApply: 2,
     nanahManagedPolicyEnvelopeApply: 19,
-    nanahManagedPolicyEnvelopeValidation: 12,
+    nanahManagedPolicyEnvelopeValidation: 13,
     nanahManagedPolicyIntegrityVerifier: 10,
     nanahScopedPortableProfileTransfer: 2
   });
@@ -257,6 +258,7 @@ test('Nanah sync adapter register preserves every source row and public API entr
     'buildControlProposal',
     'validateManagedPolicyEnvelope',
     'validateManagedMailboxItem',
+    'validateManagedLocalNetworkCandidate',
     'buildManagedPolicyPayloadHash',
     'verifyManagedNanahPolicyIntegritySignature',
     'createManagedNanahSigningKeyPair',
@@ -275,9 +277,9 @@ test('Nanah sync adapter register pins import export envelope and no-DOM surface
   const text = doc();
 
   assert.equal(countLiteral(source, 'new Map('), 4);
-  assert.equal(countLiteral(source, 'safeArray('), 37);
-  assert.equal(countLiteral(source, 'safeObject('), 95);
-  assert.equal(countLiteral(source, 'normalizeString('), 88);
+  assert.equal(countLiteral(source, 'safeArray('), 38);
+  assert.equal(countLiteral(source, 'safeObject('), 99);
+  assert.equal(countLiteral(source, 'normalizeString('), 91);
   assert.equal(countLiteral(source, 'normalizeScope('), 6);
   assert.equal(countLiteral(source, 'JSON.stringify('), 6);
   assert.equal(countLiteral(source, 'JSON.parse('), 3);
@@ -306,9 +308,9 @@ test('Nanah sync adapter register pins import export envelope and no-DOM surface
 
   for (const token of [
     'new Map calls: 4',
-    'safeArray references: 37',
-    'safeObject references: 95',
-    'normalizeString references: 88',
+    'safeArray references: 38',
+    'safeObject references: 99',
+    'normalizeString references: 91',
     'normalizeScope references: 6',
     'JSON.stringify calls: 6',
     'JSON.parse calls: 3',
@@ -487,6 +489,7 @@ test('Nanah sync adapter source preserves envelope and mutation source snippets'
   assert.match(source, /const DEFAULT_DEVICE_CAPABILITIES = \[/);
   assert.match(source, /function normalizeScope\(scope\)/);
   assert.match(source, /function validateManagedPolicyEnvelope\(envelope, context = \{\}\)/);
+  assert.match(source, /function validateManagedLocalNetworkCandidate\(candidate, context = \{\}\)/);
   assert.match(source, /async function applyManagedPolicyEnvelope\(envelope, context = \{\}\)/);
   assert.match(source, /Managed policy envelopes require validated managed apply flow/);
   assert.match(source, /if \(raw === 'main' \|\| raw === 'kids' \|\| raw === 'active' \|\| raw === 'full'\)/);

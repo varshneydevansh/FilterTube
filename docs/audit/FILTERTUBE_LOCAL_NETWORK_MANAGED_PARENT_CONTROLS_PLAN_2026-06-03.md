@@ -22,7 +22,10 @@ managed app policy contract artifact and app manifest copy row are now present
 so downstream app parity can be tested before native enforcement changes.
 Local-network peer discovery, LAN delivery, server mailbox pull, mailbox
 decryption, per-target accepted/rejected live ack history, app native
-enforcement proofs, and active/full signed managed sends remain gated.
+enforcement proofs, and active/full signed managed sends remain gated. The
+adapter now exposes a local-network candidate authority gate for future LAN
+providers, but it is validation-only and does not add peer discovery or LAN
+delivery.
 **Primary audit input**:
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
 **Current pull-on-open proof**:

@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import vm from 'node:vm';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -20,6 +21,22 @@ function runtimeSource() {
     'js/state_manager.js',
     'js/tab-view.js'
   ].map(read).join('\n');
+}
+
+let adapterCache = null;
+
+function nanahAdapter() {
+  if (adapterCache) return adapterCache;
+  const sandbox = {
+    crypto: { randomUUID: () => 'nanah-local-network-test-uuid' },
+    navigator: { platform: 'TestOS' },
+    Date: { now: () => 1779300000000 },
+    Math
+  };
+  vm.runInNewContext(read('js/nanah_sync_adapter.js'), sandbox, { filename: 'js/nanah_sync_adapter.js' });
+  adapterCache = sandbox.FilterTubeNanahAdapter;
+  assert.ok(adapterCache, 'Nanah adapter export should exist');
+  return adapterCache;
 }
 
 function trustedLink(overrides = {}) {
@@ -55,7 +72,9 @@ function discoveredPeer(overrides = {}) {
 }
 
 function managedEnvelope(overrides = {}) {
-  return {
+  const hasIntegrityOverride = Object.prototype.hasOwnProperty.call(overrides, 'integrity');
+  const adapter = nanahAdapter();
+  const envelope = {
     type: 'filtertube_managed_policy',
     linkId: 'link-parent-child-1',
     scope: 'keywords',
@@ -63,25 +82,53 @@ function managedEnvelope(overrides = {}) {
     sourceProfileId: 'parent-profile-1',
     targetProfileId: 'child-profile-1',
     revision: 5,
-    policyHash: 'hash-keywords-5',
     sourcePublicKeyId: 'parent-key-3',
     keyVersion: 3,
-    integrity: {
-      algorithm: 'ed25519',
-      signature: 'signature-keywords-5'
-    },
     payload: {
+      scope: 'keywords',
       operations: [{ op: 'add_keyword', valueHash: 'sha256:keyword-hash' }]
     },
     ...overrides
   };
+  if (!Object.prototype.hasOwnProperty.call(overrides, 'policyHash')) {
+    envelope.policyHash = adapter.buildManagedPolicyPayloadHash(envelope);
+  }
+  envelope.integrity = hasIntegrityOverride ? overrides.integrity : {
+    algorithm: 'ed25519',
+    signature: `signature-${envelope.scope}-${envelope.revision}`,
+    signedFields: {
+      linkId: envelope.linkId,
+      scope: envelope.scope,
+      targetProfileId: envelope.targetProfileId,
+      sourceDeviceId: envelope.sourceDeviceId,
+      revision: envelope.revision,
+      policyHash: envelope.policyHash,
+      payloadScope: 'keywords'
+    }
+  };
+  return envelope;
 }
 
 function context(overrides = {}) {
+  const acceptedEnvelope = managedEnvelope({ revision: 4 });
   return {
-    acceptedRevision: 4,
-    acceptedPolicyHash: 'hash-keywords-4',
+    trustedLink: trustedLink(),
+    profiles: {
+      'parent-profile-1': { id: 'parent-profile-1', type: 'account' },
+      'child-profile-1': { id: 'child-profile-1', type: 'child', parentProfileId: 'parent-profile-1' },
+      'sibling-profile-1': { id: 'sibling-profile-1', type: 'child', parentProfileId: 'other-parent-profile' }
+    },
+    accepted: {
+      revision: 4,
+      policyHash: acceptedEnvelope.policyHash
+    },
     duplicateDeviceIds: [],
+    verifyIntegritySignature({ envelope, integrity, signedFields, payloadScope, trustedLink }) {
+      return envelope?.sourcePublicKeyId === trustedLink?.sourcePublicKeyId
+        && integrity?.algorithm === 'ed25519'
+        && typeof integrity?.signature === 'string'
+        && signedFields?.payloadScope === payloadScope;
+    },
     ...overrides
   };
 }
@@ -90,34 +137,16 @@ function reject(reason, extra = {}) {
   return { accepted: false, reason, ...extra };
 }
 
+function plain(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
 function evaluateLocalNetworkPolicy({ peer = discoveredPeer(), link = trustedLink(), envelope = managedEnvelope(), state = context() } = {}) {
-  if (!peer?.networkReachable) return { accepted: false, decision: 'keep_last_valid_policy', reason: 'peer_unreachable' };
-  if (peer.source === 'page_message' || peer.source === 'content_script') return reject('untrusted_message_source');
-  if (!link || link.type !== 'managed_link') return reject('discovery_without_pairing');
-  if (link.localRole !== 'replica' || link.remoteRole !== 'source') return reject('wrong_link_roles');
-  if (link.revoked) return reject('link_revoked');
-  if (link.keyRevoked) return reject('key_revoked');
-  if (link.stalePairing) return reject('stale_pairing');
-  if (link.quarantined) return reject('trusted_link_quarantined');
-  if (peer.duplicateDeviceId || state.duplicateDeviceIds.includes(peer.deviceId)) return reject('duplicate_source_device_id');
-  if (peer.deviceId !== link.sourceDeviceId) return reject('discovered_device_mismatch');
-  if (peer.publicKeyId && peer.publicKeyId !== link.sourcePublicKeyId) return reject('discovered_key_mismatch');
-  if (!envelope || envelope.type !== 'filtertube_managed_policy') return reject('missing_managed_policy_envelope');
-  if (envelope.linkId !== link.id) return reject('wrong_link_id');
-  if (envelope.sourceDeviceId !== link.sourceDeviceId) return reject('wrong_source_device');
-  if (envelope.sourceProfileId !== link.sourceProfileId) return reject('wrong_source_profile');
-  if (envelope.targetProfileId !== link.targetProfileId) return reject('wrong_target_profile');
-  if (!link.allowedScopes.includes(envelope.scope)) return reject('scope_not_allowed');
-  if (envelope.sourcePublicKeyId !== link.sourcePublicKeyId) return reject('wrong_public_key');
-  if (envelope.keyVersion !== link.keyVersion) return reject('wrong_key_version');
-  if (!envelope.integrity?.algorithm || !envelope.integrity?.signature) return reject('missing_integrity');
-  if (envelope.revision < state.acceptedRevision) return reject('stale_revision');
-  if (envelope.revision === state.acceptedRevision && envelope.policyHash !== state.acceptedPolicyHash) {
-    return reject('equal_revision_hash_conflict');
-  }
-  return envelope.revision === state.acceptedRevision
-    ? { accepted: true, decision: 'idempotent_same_hash' }
-    : { accepted: true, decision: 'accept_newer_revision' };
+  return plain(nanahAdapter().validateManagedLocalNetworkCandidate({
+    peer,
+    trustedLink: link,
+    envelope
+  }, state));
 }
 
 function rejectedHistoryRow(reason, overrides = {}) {
@@ -146,13 +175,13 @@ test('local-network discovery authority boundary is validation-backed and linked
   const inventory = read(inventoryPath);
   const source = runtimeSource();
 
-  assert.match(doc, /Status\*\*: Managed-policy validation\/apply, signed live Nanah send, mailbox\s+intake, revision state, and protected history evidence are present/);
+  assert.match(doc, /Status\*\*: Managed-policy validation\/apply, signed live Nanah send, mailbox\s+intake, revision state, protected history evidence, and adapter-level\s+local-network candidate validation are present/);
   assert.match(doc, /Runtime local-network peer discovery and LAN delivery are\s+still absent/);
   assert.match(doc, /Local-network discovery is convenience only/);
   assert.match(doc, /Boundary Rows/);
   assert.match(doc, /Hostile LAN Threat Model/);
   assert.match(doc, /No-Work And Performance Boundary/);
-  assert.match(doc, /runtime local-network discovery authority gate: absent/);
+  assert.match(doc, /runtime local-network candidate authority gate: present in js\/nanah_sync_adapter\.js/);
   assert.match(doc, /runtime local-network peer discovery: absent/);
   assert.match(doc, /runtime filtertube_managed_policy envelope validator: present/);
   assert.match(doc, /runtime managed policy revision store: present on target profile remoteManagedPolicies/);
@@ -165,6 +194,7 @@ test('local-network discovery authority boundary is validation-backed and linked
   assert.match(inventory, new RegExp(docPath));
 
   assert.match(source, /function validateManagedPolicyEnvelope\(envelope, context = \{\}\)/);
+  assert.match(source, /function validateManagedLocalNetworkCandidate\(candidate, context = \{\}\)/);
   assert.match(source, /Managed policy envelopes require validated managed apply flow/);
   assert.match(source, /remoteManagedPolicies/);
   assert.match(source, /applyManagedPolicyEnvelope/);
@@ -175,7 +205,10 @@ test('local-network discovery authority boundary is validation-backed and linked
 });
 
 test('local-network discovery cannot grant authority without trusted pairing and signed envelope', () => {
-  assert.deepEqual(evaluateLocalNetworkPolicy({}), { accepted: true, decision: 'accept_newer_revision' });
+  const accepted = evaluateLocalNetworkPolicy({});
+  assert.equal(accepted.accepted, true);
+  assert.equal(accepted.decision, 'accept_newer_revision');
+  assert.equal(accepted.targetProfileId, 'child-profile-1');
   assert.deepEqual(evaluateLocalNetworkPolicy({ link: null }), reject('discovery_without_pairing'));
   assert.deepEqual(evaluateLocalNetworkPolicy({ envelope: null }), reject('missing_managed_policy_envelope'));
   assert.deepEqual(evaluateLocalNetworkPolicy({
@@ -221,9 +254,11 @@ test('network reachability and address changes do not weaken last valid managed 
     peer: discoveredPeer({ networkReachable: false })
   }), { accepted: false, decision: 'keep_last_valid_policy', reason: 'peer_unreachable' });
 
-  assert.deepEqual(evaluateLocalNetworkPolicy({
+  const accepted = evaluateLocalNetworkPolicy({
     peer: discoveredPeer({ networkAddress: '192.168.1.45' })
-  }), { accepted: true, decision: 'accept_newer_revision' });
+  });
+  assert.equal(accepted.accepted, true);
+  assert.equal(accepted.decision, 'accept_newer_revision');
 });
 
 test('local-network policy authority still rejects wrong target scope replay and conflict cases', () => {
@@ -236,16 +271,24 @@ test('local-network policy authority still rejects wrong target scope replay and
   }), reject('scope_not_allowed'));
 
   assert.deepEqual(evaluateLocalNetworkPolicy({
-    envelope: managedEnvelope({ revision: 3, policyHash: 'hash-keywords-3' })
+    envelope: managedEnvelope({ revision: 3 })
   }), reject('stale_revision'));
 
   assert.deepEqual(evaluateLocalNetworkPolicy({
-    envelope: managedEnvelope({ revision: 4, policyHash: 'hash-other' })
+    envelope: managedEnvelope({
+      revision: 4,
+      payload: {
+        scope: 'keywords',
+        operations: [{ op: 'add_keyword', valueHash: 'sha256:other-keyword-hash' }]
+      }
+    })
   }), reject('equal_revision_hash_conflict'));
 
-  assert.deepEqual(evaluateLocalNetworkPolicy({
-    envelope: managedEnvelope({ revision: 4, policyHash: 'hash-keywords-4' })
-  }), { accepted: true, decision: 'idempotent_same_hash' });
+  const idempotent = evaluateLocalNetworkPolicy({
+    envelope: managedEnvelope({ revision: 4 })
+  });
+  assert.equal(idempotent.accepted, true);
+  assert.equal(idempotent.decision, 'idempotent_same_hash');
 });
 
 test('rejected local-network attempts produce protected redacted history rows not policy authority', () => {

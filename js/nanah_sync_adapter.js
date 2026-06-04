@@ -526,6 +526,54 @@
         };
     }
 
+    function validateManagedLocalNetworkCandidate(candidate, context = {}) {
+        const root = safeObject(candidate);
+        const peer = safeObject(root.peer || root.discoveredPeer || root.discovery);
+        const trustedLinkSource = Object.prototype.hasOwnProperty.call(root, 'trustedLink')
+            ? root.trustedLink
+            : context.trustedLink;
+        const trustedLink = safeObject(trustedLinkSource);
+        const envelope = safeObject(root.envelope || root.managedPolicyEnvelope || root.policy);
+        const duplicateDeviceIds = safeArray(context.duplicateDeviceIds);
+        const source = normalizeString(peer.source || root.source).toLowerCase();
+
+        if (peer.networkReachable === false || root.networkReachable === false) {
+            return validationResult('peer_unreachable', { decision: 'keep_last_valid_policy' });
+        }
+        if (source === 'page_message' || source === 'content_script' || source === 'postmessage') {
+            return validationResult('untrusted_message_source');
+        }
+        if (trustedLink.type !== 'managed_link') return validationResult('discovery_without_pairing');
+        if (trustedLink.localRole !== 'replica' || trustedLink.remoteRole !== 'source') {
+            return validationResult('wrong_link_roles');
+        }
+        if (trustedLink.revoked) return validationResult('link_revoked');
+        if (trustedLink.keyRevoked) return validationResult('key_revoked');
+        if (trustedLink.stalePairing) return validationResult('stale_pairing');
+        if (trustedLink.quarantined) return validationResult('trusted_link_quarantined');
+
+        const peerDeviceId = normalizeString(peer.deviceId || peer.sourceDeviceId || root.sourceDeviceId);
+        if (!peerDeviceId) return validationResult('missing_discovered_device');
+        if (peer.duplicateDeviceId === true || duplicateDeviceIds.includes(peerDeviceId)) {
+            return validationResult('duplicate_source_device_id');
+        }
+        if (peerDeviceId !== trustedLink.sourceDeviceId) return validationResult('discovered_device_mismatch');
+
+        const peerPublicKeyId = normalizeString(peer.publicKeyId || peer.sourcePublicKeyId || peer.managedPublicKeyId);
+        if (peerPublicKeyId && peerPublicKeyId !== trustedLink.sourcePublicKeyId) {
+            return validationResult('discovered_key_mismatch');
+        }
+        if (!envelope || Object.keys(envelope).length === 0) {
+            return validationResult('missing_managed_policy_envelope');
+        }
+
+        return validateManagedPolicyEnvelope(envelope, {
+            ...context,
+            trustedLink,
+            duplicateDeviceIds
+        });
+    }
+
     function parsePackedChannelKeywordSource(sourceValue) {
         const raw = normalizeString(sourceValue);
         if (!raw.toLowerCase().startsWith('channel:')) return null;
@@ -1407,6 +1455,7 @@
         buildControlProposal,
         validateManagedPolicyEnvelope,
         validateManagedMailboxItem,
+        validateManagedLocalNetworkCandidate,
         buildManagedPolicyPayloadHash,
         verifyManagedNanahPolicyIntegritySignature,
         createManagedNanahSigningKeyPair,
