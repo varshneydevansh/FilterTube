@@ -10,6 +10,10 @@ const planPath = 'docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PL
 const inventoryPath = 'docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md';
 const appManifestPath = '/Users/devanshvarshney/FilterTubeApp/tools/runtime-sync-manifest.json';
 const appContractDestinationPath = '/Users/devanshvarshney/FilterTubeApp/packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json';
+const appManagedHelperDestinations = Object.freeze({
+  'js/nanah_managed_live_policy.js': '/Users/devanshvarshney/FilterTubeApp/packages/extension-source/upstream/js/nanah_managed_live_policy.js',
+  'js/nanah_managed_open_sync.js': '/Users/devanshvarshney/FilterTubeApp/packages/extension-source/upstream/js/nanah_managed_open_sync.js'
+});
 
 function read(relativePath) {
   return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
@@ -57,11 +61,20 @@ test('managed app policy parity doc records extension-owned app contract artifac
   assert.equal(contract.schema, 'filtertube_managed_app_policy_contract');
   assert.equal(contract.version, 1);
   assert.equal(contract.runtimeBehaviorChanged, false);
-  assert.equal(contract.appSyncStatus, 'app_manifest_contract_sync_present_native_enforcement_pending');
+  assert.equal(contract.appSyncStatus, 'app_manifest_contract_and_managed_helper_sync_present_native_enforcement_pending');
   assert.deepEqual(contract, artifactContract);
   assert.equal(contract.artifact.sourcePath, contractArtifactPath);
   assert.equal(contract.artifact.appDestination, 'packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json');
   assert.equal(contract.artifact.manifestSyncMode, 'copy');
+  assert.deepEqual(
+    contract.runtimeHelperSync.map(row => row.sourcePath),
+    Object.keys(appManagedHelperDestinations)
+  );
+  for (const helper of contract.runtimeHelperSync) {
+    assert.equal(helper.manifestSyncMode, 'copy');
+    assert.equal(helper.appDestination, appManagedHelperDestinations[helper.sourcePath].replace('/Users/devanshvarshney/FilterTubeApp/', ''));
+    assert.match(helper.boundary, /native|server mailbox|local-network/);
+  }
   assert.match(doc, /Runtime behavior changed\*\*: no/);
   assert.match(doc, /App Sync Boundary/);
   assert.match(doc, /Required Parity Decisions/);
@@ -181,13 +194,15 @@ test('extension runtime has the fields the app contract requires today', () => {
   }
 });
 
-test('current app sync manifest copies runtime sources and dedicated contract artifact', () => {
+test('current app sync manifest copies runtime sources dedicated contract artifact and managed helpers', () => {
   assert.equal(fs.existsSync(appManifestPath), true);
   const manifest = JSON.parse(readAbsolute(appManifestPath));
 
   for (const source of [
     'js/settings_shared.js',
     'js/nanah_sync_adapter.js',
+    'js/nanah_managed_live_policy.js',
+    'js/nanah_managed_open_sync.js',
     'js/content_bridge.js',
     'js/injector.js',
     'js/seed.js'
@@ -201,4 +216,13 @@ test('current app sync manifest copies runtime sources and dedicated contract ar
   assert.equal(contractEntry.syncMode, 'copy');
   assert.equal(fs.existsSync(appContractDestinationPath), true);
   assert.equal(read(contractArtifactPath), readAbsolute(appContractDestinationPath));
+
+  for (const [source, destination] of Object.entries(appManagedHelperDestinations)) {
+    const helperEntry = manifest.find(entry => entry.source === source);
+    assert.ok(helperEntry, `missing managed helper sync entry ${source}`);
+    assert.equal(helperEntry.destination, destination.replace('/Users/devanshvarshney/FilterTubeApp/', ''));
+    assert.equal(helperEntry.syncMode, 'copy');
+    assert.equal(fs.existsSync(destination), true);
+    assert.equal(read(source), readAbsolute(destination));
+  }
 });

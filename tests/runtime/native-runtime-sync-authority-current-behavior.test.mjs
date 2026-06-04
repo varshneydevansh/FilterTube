@@ -115,7 +115,7 @@ test('public wrapper delegates to the sibling or env-selected app sync script', 
 test('app sync manifest sources exist and are owned by the public repo path', () => {
   const manifest = readJson('tools/runtime-sync-manifest.json', appRoot);
 
-  assert.equal(manifest.length, 30);
+  assert.equal(manifest.length, 32);
   assert.deepEqual([...new Set(manifest.map(entry => entry.sourceRepo))], [repoRoot]);
 
   const missing = manifest.filter(entry => !fs.existsSync(path.join(entry.sourceRepo, entry.source)));
@@ -130,6 +130,8 @@ test('app sync manifest sources exist and are owned by the public repo path', ()
     'js/settings_shared.js',
     'js/tab-view.js',
     'js/nanah_sync_adapter.js',
+    'js/nanah_managed_live_policy.js',
+    'js/nanah_managed_open_sync.js',
     'js/vendor/nanah.bundle.js',
     'docs/audit/artifacts/managed-app-policy-contract-v1.json'
   ]) {
@@ -217,8 +219,6 @@ test('broad extension source mirror drift is detected separately from contract c
     'js/content/bridge_settings.js:hash-diff',
     'js/content_bridge.js:hash-diff',
     'js/io_manager.js:hash-diff',
-    'js/nanah_managed_live_policy.js:missing',
-    'js/nanah_managed_open_sync.js:missing',
     'js/nanah_sync_adapter.js:hash-diff',
     'js/tab-view.js:hash-diff'
   ]);

@@ -3135,9 +3135,9 @@ test('objective coverage ledger records native runtime sync wrapper methods as s
   assert.match(doc, /109,397 bytes/);
   assert.match(doc, /18 total named function declarations/);
   assert.match(doc, /16 `runtimeBundleOrder` entries/);
-  assert.match(doc, /current app manifest has 30 entries all sourced from `\/Users\/devanshvarshney\/FilterTube`/);
+  assert.match(doc, /current app manifest has 32 entries all sourced from `\/Users\/devanshvarshney\/FilterTube`/);
   assert.match(doc, /0 `destinationKind` fields/);
-  assert.match(doc, /includes `js\/layout\.js`, `js\/vendor\/nanah\.bundle\.js`, and `js\/vendor\/qrcode\.bundle\.js`/);
+  assert.match(doc, /includes `js\/layout\.js`, `js\/vendor\/nanah\.bundle\.js`, `js\/vendor\/qrcode\.bundle\.js`, the managed app policy contract artifact, `js\/nanah_managed_live_policy\.js`, and `js\/nanah_managed_open_sync\.js`/);
   assert.match(doc, /excludes `data\/release_notes\.json`/);
   assert.match(doc, /`nativeSyncWrapperMethodAuthority`, `nativeSyncWrapperAppRepoContract`, `nativeSyncWrapperAppRevisionReport`, `nativeSyncWrapperManifestHashReport`, `nativeSyncWrapperDestinationKindManifest`, `nativeSyncWrapperBuildIntegrationGate`, `nativeSyncWrapperReleaseFreshnessReport`, `nativeSyncWrapperStatusContract`, `nativeSyncWrapperFixtureProvenance`, or `nativeSyncWrapperRawCaptureExclusionReport`/);
 });
@@ -3152,12 +3152,12 @@ test('objective coverage ledger records native runtime sync manifest freshness a
   assert.match(doc, /release-note parity, first-class JSON filtering parity/);
   assert.match(doc, /direct app manifest freshness proof/);
   assert.match(doc, /app dirty state is not release authority/);
-  assert.match(doc, /30 runtime sync manifest entries/);
+  assert.match(doc, /32 runtime sync manifest entries/);
   assert.match(doc, /0 `destinationKind` fields/);
-  assert.match(doc, /24 direct source\/destination hash matches/);
+  assert.match(doc, /26 direct source\/destination hash matches/);
   assert.match(doc, /6 direct hash diffs/);
-  assert.match(doc, /36 broad extension-source mirror hash matches/);
-  assert.match(doc, /2 missing mirror files/);
+  assert.match(doc, /38 broad extension-source mirror hash matches/);
+  assert.match(doc, /0 missing mirror files/);
   assert.match(doc, /8 mirror hash diffs/);
   assert.match(doc, /16 `runtimeBundleOrder` entries including `js\/layout\.js`/);
   assert.match(doc, /6 generated app runtime artifact hashes/);

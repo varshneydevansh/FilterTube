@@ -78,7 +78,7 @@ test('native_runtime_sync_public_wrapper_delegates_to_app_sync_script', () => {
 test('native_runtime_sync_manifest_sources_exist_and_are_public_repo_owned', () => {
   const manifest = readJson('tools/runtime-sync-manifest.json', appRoot);
 
-  assert.equal(manifest.length, 30);
+  assert.equal(manifest.length, 32);
   assert.deepEqual([...new Set(manifest.map(entry => entry.sourceRepo))], [repoRoot]);
 
   for (const entry of manifest) {
@@ -156,8 +156,6 @@ test('native_runtime_sync_extension_source_mirror_drift_is_detected', () => {
     'js/content/bridge_settings.js:hash-diff',
     'js/content_bridge.js:hash-diff',
     'js/io_manager.js:hash-diff',
-    'js/nanah_managed_live_policy.js:missing',
-    'js/nanah_managed_open_sync.js:missing',
     'js/nanah_sync_adapter.js:hash-diff',
     'js/tab-view.js:hash-diff'
   ]);

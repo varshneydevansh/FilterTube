@@ -2,7 +2,7 @@
 
 Status: audit-only current-behavior proof. Runtime, build, package, and website
 behavior are unchanged; the native app sync manifest has one managed-policy
-contract copy addition.
+contract copy addition plus two managed helper source copy additions.
 
 This slice deepens the native sync wrapper audit into the sibling app manifest
 and generated runtime freshness boundary. It confirms the current work is still
@@ -16,7 +16,7 @@ changes.
 | --- | ---: | ---: | --- |
 | `scripts/sync-native-runtime.mjs` | 34 | 1070 | `4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6` |
 | `/Users/devanshvarshney/FilterTubeApp/tools/sync-runtime-from-extension.mjs` | 2284 | 109397 | `ce0e231f9f0384eb538e76a553ef41453673c3231b8c5ab62d94ff7d38b90ae9` |
-| `/Users/devanshvarshney/FilterTubeApp/tools/runtime-sync-manifest.json` | 212 | 8900 | `58c9b9b34259fcf701bcabac7faa044985a4c3a9846f9405a3b9009ec68f51e7` |
+| `/Users/devanshvarshney/FilterTubeApp/tools/runtime-sync-manifest.json` | 226 | 9654 | `f08e48f7e329fd7ac22b9c3b990f3c53771f356d6f8cbe2ebe5fe51226b5b540` |
 | `data/release_notes.json` | 317 | 23020 | `a8d59b18e9bffd1c828538ee58b3b8e9be7c641fea3ff064220311485a3b1c6b` |
 | `/Users/devanshvarshney/FilterTubeApp/apps/android/app/src/main/assets/extension_shell/data/release_notes.json` | 301 | 21095 | `911628cbd7f6354c58aa82064f3ef1f29cda3904a87e3ea263534600a0880737` |
 | `/Users/devanshvarshney/FilterTubeApp/apps/ios/FilterTube/Resources/release_notes.json` | 301 | 21095 | `911628cbd7f6354c58aa82064f3ef1f29cda3904a87e3ea263534600a0880737` |
@@ -28,24 +28,24 @@ public repo HEAD: 7f0e66641aa576fb264085baf59949244ea32291
 app repo HEAD: cfc651cd4294e528c2c371778d7698ce82e94a71
 app dirty state authority: not pinned by this contract-copy slice
 app dirty paths: out-of-scope native app changes may exist and are not release freshness proof
-runtime sync manifest entries: 30
+runtime sync manifest entries: 32
 manifest source repos: /Users/devanshvarshney/FilterTube
 manifest sync modes: copy
 manifest destinationKind fields present: 0
-manifest entries missing destinationKind: 30
+manifest entries missing destinationKind: 32
 manifest includes js/layout.js: yes
 manifest includes data/release_notes.json: no
 runtimeBundleOrder entries: 16
 runtimeBundleOrder includes js/layout.js: yes
 source mirror dirs: js, html, css
-direct manifest copy sources present: 30
-direct manifest copy destinations present: 30
-direct manifest source/destination hash matches: 24
+direct manifest copy sources present: 32
+direct manifest copy destinations present: 32
+direct manifest source/destination hash matches: 26
 direct manifest source/destination hash mismatches: 6
 extension-source mirror files compared: 46
-extension-source mirror files present: 44
-extension-source mirror hash matches: 36
-extension-source mirror missing files: 2
+extension-source mirror files present: 46
+extension-source mirror hash matches: 38
+extension-source mirror missing files: 0
 extension-source mirror hash mismatches: 8
 runtime behavior changed: no
 ```
@@ -55,6 +55,7 @@ Manifest destination roots:
 | Destination root | Entries |
 | --- | ---: |
 | `apps/android` | 3 |
+| `packages/extension-source` | 2 |
 | `packages/extension-ui` | 8 |
 | `packages/managed-policy-contract` | 1 |
 | `packages/runtime-adapters` | 12 |
@@ -74,9 +75,10 @@ Manifest destination roots:
 
 ## Current Boundary
 
-The managed app policy contract copy row currently matches the public checkout
-byte-for-byte. The broader native runtime sync remains stale: 6 direct manifest
-rows differ, 2 source-mirror files are missing, and 8 source-mirror files differ.
+The managed app policy contract copy row and the two managed Nanah helper source
+copy rows currently match the public checkout byte-for-byte. The broader native
+runtime sync remains stale: 6 direct manifest rows differ and 8 source-mirror
+files differ.
 That is useful evidence, but it is not a release freshness authority. Generated
 runtime assets are derived by the app-side script, and no emitted report ties
 source revision, manifest hash, destination hash, generated runtime hash, app

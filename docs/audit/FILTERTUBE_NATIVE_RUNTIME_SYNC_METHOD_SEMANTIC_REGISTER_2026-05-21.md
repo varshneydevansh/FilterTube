@@ -86,17 +86,19 @@ fs.readFile occurrences in app sync script: 5
 fs.mkdir occurrences in app sync script: 3
 FILTERTUBE_APP_RUNTIME_BUNDLE_START occurrences in app sync script: 1
 js/layout.js literal occurrences in app sync script: 1
-manifest line count: 212
-manifest bytes: 8900
-manifest sha256: 58c9b9b34259fcf701bcabac7faa044985a4c3a9846f9405a3b9009ec68f51e7
-manifest entries: 30
+manifest line count: 226
+manifest bytes: 9654
+manifest sha256: f08e48f7e329fd7ac22b9c3b990f3c53771f356d6f8cbe2ebe5fe51226b5b540
+manifest entries: 32
 manifest source repos: /Users/devanshvarshney/FilterTube
 manifest destinationKind fields present: 0
-manifest entries missing destinationKind: 30
+manifest entries missing destinationKind: 32
 manifest includes js/layout.js: yes
 manifest includes js/vendor/nanah.bundle.js: yes
 manifest includes js/vendor/qrcode.bundle.js: yes
 manifest includes managed-app-policy-contract-v1.json: yes
+manifest includes js/nanah_managed_live_policy.js: yes
+manifest includes js/nanah_managed_open_sync.js: yes
 manifest includes data/release_notes.json: no
 ```
 

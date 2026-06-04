@@ -14,14 +14,16 @@ captures are mistaken for native runtime source.
 P0 native runtime sync authority is not green:
 
 - The public repo only delegates sync to the sibling/private app repo.
-- Manifest-listed source/destination copies are byte-identical today, but this
-  is not a committed freshness manifest.
+- The managed policy contract row and managed Nanah helper source rows are
+  byte-identical today, but the broader manifest still has stale runtime/UI
+  rows and this is not a committed freshness manifest.
 - Android and iOS generated Main runtime assets are build outputs, not source
   authority.
 - iOS Kids runtime intentionally diverges from Android Kids runtime for WebKit
   phone-fit behavior.
-- The broad app-side extension-source mirror currently has no hash drift, but
-  it still needs to be reported separately from direct manifest copy freshness.
+- The broad app-side extension-source mirror now includes the managed Nanah
+  helper sources, but still has stale runtime/UI hash drift that must be
+  reported separately from direct manifest copy freshness.
 - Android has a documented prebuild sync dependency; iOS still needs an
   explicit release hash/sync gate.
 - Ignored root capture files remain evidence-only and must not enter native
@@ -50,11 +52,11 @@ public FilterTube repo
 | Fixture | Current behavior pinned | Source proof | Future gate |
 | --- | --- | --- | --- |
 | `native_runtime_sync_public_wrapper_delegates_to_app_sync_script` | Public script resolves `FILTERTUBE_APP_REPO` or sibling `FilterTubeApp`, then runs the app sync script. | `scripts/sync-native-runtime.mjs`; P0 test | Wrapper should record app repo revision and sync command output. |
-| `native_runtime_sync_manifest_sources_exist_and_are_public_repo_owned` | App manifest has 30 source entries owned by `/Users/devanshvarshney/FilterTube`; all sources and destinations exist, including the managed app policy contract artifact. | App `runtime-sync-manifest.json`; P0 test | Add a committed freshness manifest with source repo revision and destination hashes. |
-| `native_runtime_sync_manifest_destinations_record_current_stale_rows_after_contract_sync` | The managed policy contract row is byte-identical, but 6 runtime/UI/Nanah manifest destinations are stale after the scoped contract sync. | P0 test | Keep direct copies byte-identical unless explicitly classified as generated, divergent, or pending broader native runtime sync. |
+| `native_runtime_sync_manifest_sources_exist_and_are_public_repo_owned` | App manifest has 32 source entries owned by `/Users/devanshvarshney/FilterTube`; all sources and destinations exist, including the managed app policy contract artifact and two managed helper source copies. | App `runtime-sync-manifest.json`; P0 test | Add a committed freshness manifest with source repo revision and destination hashes. |
+| `native_runtime_sync_manifest_destinations_record_current_stale_rows_after_contract_sync` | The managed policy contract row and managed helper source rows are byte-identical, but 6 runtime/UI/Nanah manifest destinations are stale after the scoped contract/helper sync. | P0 test | Keep direct copies byte-identical unless explicitly classified as generated, divergent, or pending broader native runtime sync. |
 | `native_runtime_sync_generated_main_assets_are_not_source_authority` | Android/iOS Main runtime assets are large generated outputs and are not byte-identical source files. | App assets/resources; P0 test | Record generated-from list, source hashes, output hashes, and build command. |
 | `native_runtime_sync_ios_kids_runtime_documents_intentional_divergence` | iOS Kids runtime contains iOS WebKit phone-fit behavior absent from Android Kids runtime. | App Kids runtime assets; P0 test | Record intentional divergence reason and watch-DOM non-touch invariant. |
-| `native_runtime_sync_extension_source_mirror_drift_is_detected` | Broad `packages/extension-source/upstream` mirror currently reports zero hash-different files. | App mirror; P0 test | Mirror claims need explicit freshness status instead of relying on direct-copy freshness. |
+| `native_runtime_sync_extension_source_mirror_drift_is_detected` | Broad `packages/extension-source/upstream` mirror now has the managed helper files present and byte-identical, while 8 older runtime/UI mirror files remain stale. | App mirror; P0 test | Mirror claims need explicit freshness status instead of relying on direct-copy freshness. |
 | `native_runtime_sync_android_has_prebuild_freshness_but_ios_needs_release_gate` | Android docs state a `preBuild` sync dependency; iOS docs state manual sync is still required. | App docs; P0 test | Add iOS build-phase or release checklist hash gate before iOS release. |
 | `native_runtime_sync_raw_root_captures_never_become_app_runtime_inputs` | Ignored root captures are absent from manifest sources/destinations and native runtime inputs. | `.gitignore`; app manifest; P0 test | Keep raw captures as evidence only; use minimal extracted fixtures for tests. |
 | `native_runtime_sync_future_authority_token_is_absent_from_product_source` | Product source has no `nativeRuntimeSyncAuthority` implementation today. | P0 test | Add the authority record before app release/runtime sync changes. |

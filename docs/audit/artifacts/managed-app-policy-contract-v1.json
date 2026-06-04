@@ -4,12 +4,26 @@
   "generated": "2026-06-04",
   "owner": "extension_upstream_policy_contract",
   "runtimeBehaviorChanged": false,
-  "appSyncStatus": "app_manifest_contract_sync_present_native_enforcement_pending",
+  "appSyncStatus": "app_manifest_contract_and_managed_helper_sync_present_native_enforcement_pending",
   "artifact": {
     "sourcePath": "docs/audit/artifacts/managed-app-policy-contract-v1.json",
     "appDestination": "packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json",
     "manifestSyncMode": "copy"
   },
+  "runtimeHelperSync": [
+    {
+      "sourcePath": "js/nanah_managed_live_policy.js",
+      "appDestination": "packages/extension-source/upstream/js/nanah_managed_live_policy.js",
+      "manifestSyncMode": "copy",
+      "boundary": "managed live signed-send helper source parity; native UI and transport authority remain app-owned"
+    },
+    {
+      "sourcePath": "js/nanah_managed_open_sync.js",
+      "appDestination": "packages/extension-source/upstream/js/nanah_managed_open_sync.js",
+      "manifestSyncMode": "copy",
+      "boundary": "managed pull-on-open helper source parity; server mailbox and local-network runtime remain absent"
+    }
+  ],
   "profileAuthority": {
     "stores": [
       "ftProfilesV4",

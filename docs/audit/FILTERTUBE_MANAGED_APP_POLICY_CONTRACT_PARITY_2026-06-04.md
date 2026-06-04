@@ -1,8 +1,9 @@
 # Contract: Managed App Policy Parity
 
 **Generated**: 2026-06-04
-**Status**: Extension-owned app policy artifact added and wired into the app
-runtime sync manifest. Android/iOS native enforcement remains pending.
+**Status**: Extension-owned app policy artifact plus managed Nanah helper
+source copies are wired into the app runtime sync manifest. Android/iOS native
+enforcement remains pending.
 **Runtime behavior changed**: no.
 **Goal slice**: Implementation order item 12, "Sync shared policy contract to
 apps", and item 13, "Add app viewing-space/time-limit parity tests".
@@ -34,12 +35,26 @@ the extension. It does not claim Android or iOS enforcement is complete yet.
   "generated": "2026-06-04",
   "owner": "extension_upstream_policy_contract",
   "runtimeBehaviorChanged": false,
-  "appSyncStatus": "app_manifest_contract_sync_present_native_enforcement_pending",
+  "appSyncStatus": "app_manifest_contract_and_managed_helper_sync_present_native_enforcement_pending",
   "artifact": {
     "sourcePath": "docs/audit/artifacts/managed-app-policy-contract-v1.json",
     "appDestination": "packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json",
     "manifestSyncMode": "copy"
   },
+  "runtimeHelperSync": [
+    {
+      "sourcePath": "js/nanah_managed_live_policy.js",
+      "appDestination": "packages/extension-source/upstream/js/nanah_managed_live_policy.js",
+      "manifestSyncMode": "copy",
+      "boundary": "managed live signed-send helper source parity; native UI and transport authority remain app-owned"
+    },
+    {
+      "sourcePath": "js/nanah_managed_open_sync.js",
+      "appDestination": "packages/extension-source/upstream/js/nanah_managed_open_sync.js",
+      "manifestSyncMode": "copy",
+      "boundary": "managed pull-on-open helper source parity; server mailbox and local-network runtime remain absent"
+    }
+  ],
   "profileAuthority": {
     "stores": [
       "ftProfilesV4",
@@ -244,6 +259,10 @@ The extension contract is now explicit, test-pinned, and available as a JSON
 artifact at `docs/audit/artifacts/managed-app-policy-contract-v1.json`. The app
 runtime sync manifest copies that artifact into
 `packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json`.
+The same manifest also copies the extension-owned managed Nanah signed-send and
+pull-on-open helper sources into `packages/extension-source/upstream/js/` so the
+downstream app repo can track the exact helper contracts without treating them
+as native runtime authority.
 
 Android/iOS still need a later implementation slice that consumes this artifact
 inside native route gates, native time-budget gates, and native settings locks

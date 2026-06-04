@@ -1123,10 +1123,12 @@ boundary: the app sync script at
 has 2,284 lines, 109,397 bytes, 15 plain function declarations,
 3 async function declarations, 18 total named function declarations,
 16 `runtimeBundleOrder` entries, and reads
-`runtime-sync-manifest.json`; the current app manifest has 30 entries, all
+`runtime-sync-manifest.json`; the current app manifest has 32 entries, all
 sourced from `/Users/devanshvarshney/FilterTube`, has 0 `destinationKind` fields,
 includes `js/layout.js`, `js/vendor/nanah.bundle.js`, and
-`js/vendor/qrcode.bundle.js`, and does not include `data/release_notes.json`.
+`js/vendor/qrcode.bundle.js`, includes the managed policy contract plus
+`js/nanah_managed_live_policy.js` and `js/nanah_managed_open_sync.js`, and does
+not include `data/release_notes.json`.
 It also records that `nativeSyncWrapperMethodAuthority`,
 `nativeSyncWrapperAppRepoContract`, `nativeSyncWrapperAppRevisionReport`,
 `nativeSyncWrapperManifestHashReport`,

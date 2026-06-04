@@ -19,7 +19,7 @@ const iosReleaseNotesPath = path.join(appRoot, 'apps/ios/FilterTube/Resources/re
 const sourceRows = [
   [wrapperPath, 34, 1070, '4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6'],
   [appSyncScriptPath, 2284, 109397, 'ce0e231f9f0384eb538e76a553ef41453673c3231b8c5ab62d94ff7d38b90ae9'],
-  [appManifestPath, 212, 8900, '58c9b9b34259fcf701bcabac7faa044985a4c3a9846f9405a3b9009ec68f51e7'],
+  [appManifestPath, 226, 9654, 'f08e48f7e329fd7ac22b9c3b990f3c53771f356d6f8cbe2ebe5fe51226b5b540'],
   [publicReleaseNotesPath, 317, 23020, 'a8d59b18e9bffd1c828538ee58b3b8e9be7c641fea3ff064220311485a3b1c6b'],
   [androidReleaseNotesPath, 301, 21095, '911628cbd7f6354c58aa82064f3ef1f29cda3904a87e3ea263534600a0880737'],
   [iosReleaseNotesPath, 301, 21095, '911628cbd7f6354c58aa82064f3ef1f29cda3904a87e3ea263534600a0880737'],
@@ -137,7 +137,7 @@ test('native runtime sync manifest freshness doc is audit-only and fingerprint p
 
   assert.match(text, /Status: audit-only current-behavior proof/);
   assert.match(text, /Runtime, build, package, and website\s+behavior are unchanged/);
-  assert.match(text, /native app sync manifest has one managed-policy\s+contract copy addition/);
+  assert.match(text, /native app sync manifest has one managed-policy\s+contract copy addition plus two managed helper source copy additions/);
   assert.match(text, /codebase inspection/);
   assert.match(text, /first-class JSON filter blockers/);
   assert.match(text, /runtime behavior changed: no/);
@@ -160,38 +160,38 @@ test('native runtime sync manifest direct copies and broad mirror record current
   const copyRows = manifestCopyRows();
   const mirrorRows = sourceMirrorRows();
 
-  assert.equal(manifest.length, 30);
+  assert.equal(manifest.length, 32);
   assert.deepEqual([...new Set(manifest.map((entry) => entry.sourceRepo))], [repoRoot]);
   assert.deepEqual([...new Set(manifest.map((entry) => entry.syncMode))], ['copy']);
   assert.equal(manifest.filter((entry) => Object.hasOwn(entry, 'destinationKind')).length, 0);
-  assert.equal(manifest.filter((entry) => !Object.hasOwn(entry, 'destinationKind')).length, 30);
+  assert.equal(manifest.filter((entry) => !Object.hasOwn(entry, 'destinationKind')).length, 32);
   assert.equal(manifest.some((entry) => entry.source === 'js/layout.js'), true);
   assert.equal(manifest.some((entry) => entry.source === 'data/release_notes.json'), false);
 
-  assert.equal(copyRows.filter((row) => row.sourceExists).length, 30);
-  assert.equal(copyRows.filter((row) => row.destinationExists).length, 30);
-  assert.equal(copyRows.filter((row) => row.equal).length, 24);
+  assert.equal(copyRows.filter((row) => row.sourceExists).length, 32);
+  assert.equal(copyRows.filter((row) => row.destinationExists).length, 32);
+  assert.equal(copyRows.filter((row) => row.equal).length, 26);
   assert.equal(copyRows.filter((row) => !row.equal).length, 6);
 
   assert.deepEqual(sourceMirrorDirs(), ['js', 'html', 'css']);
   assert.equal(mirrorRows.length, 46);
-  assert.equal(mirrorRows.filter((row) => row.destinationExists).length, 44);
-  assert.equal(mirrorRows.filter((row) => row.equal).length, 36);
-  assert.equal(mirrorRows.filter((row) => !row.destinationExists).length, 2);
+  assert.equal(mirrorRows.filter((row) => row.destinationExists).length, 46);
+  assert.equal(mirrorRows.filter((row) => row.equal).length, 38);
+  assert.equal(mirrorRows.filter((row) => !row.destinationExists).length, 0);
   assert.equal(mirrorRows.filter((row) => row.destinationExists && !row.equal).length, 8);
 
   for (const [label, value] of [
-    ['runtime sync manifest entries', 30],
+    ['runtime sync manifest entries', 32],
     ['manifest destinationKind fields present', 0],
-    ['manifest entries missing destinationKind', 30],
-    ['direct manifest copy sources present', 30],
-    ['direct manifest copy destinations present', 30],
-    ['direct manifest source/destination hash matches', 24],
+    ['manifest entries missing destinationKind', 32],
+    ['direct manifest copy sources present', 32],
+    ['direct manifest copy destinations present', 32],
+    ['direct manifest source/destination hash matches', 26],
     ['direct manifest source/destination hash mismatches', 6],
     ['extension-source mirror files compared', 46],
-    ['extension-source mirror files present', 44],
-    ['extension-source mirror hash matches', 36],
-    ['extension-source mirror missing files', 2],
+    ['extension-source mirror files present', 46],
+    ['extension-source mirror hash matches', 38],
+    ['extension-source mirror missing files', 0],
     ['extension-source mirror hash mismatches', 8],
   ]) {
     assert.match(text, new RegExp(`${escapeRegExp(label)}: ${value}`));
