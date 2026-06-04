@@ -85,7 +85,9 @@ test('background auto-backup owns encryption policy based on autoBackupFormat an
   assert.match(block, /const hasPin = !!extractPinVerifierFromProfilesV4\(profilesV4, activeId\)/);
   assert.match(block, /const format = typeof settings\?\.autoBackupFormat === 'string' \? settings\.autoBackupFormat : 'auto'/);
   assert.match(block, /const shouldEncrypt = \(format === 'encrypted'\) \|\| \(format !== 'plain' && hasPin\)/);
-  assert.match(block, /const pin = sessionPinCache\.get\(activeId\) \|\| ''/);
+  assert.match(block, /const pinEntry = safeObject\(sessionPinCache\.get\(activeId\)\)/);
+  assert.match(block, /if \(!isSessionPinCacheEntryFresh\(pinEntry\)\)/);
+  assert.match(block, /const pin = pinEntry\.pin/);
   assert.match(block, /reason: 'missing_session_pin'/);
   assert.match(block, /Security\.encryptJson\(payload, pin\)/);
 });

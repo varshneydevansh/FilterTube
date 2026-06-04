@@ -21,7 +21,7 @@ implementation-change rows. It keeps the implementation gate closed.
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6641 | 298986 | `837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd` |
+| `js/background.js` | 6657 | 299580 | `f05fe6f65f9de1218299374ac3c82dd6b6ae9e17e3d862926a20e6c2981c19c7` |
 | `js/content/bridge_settings.js` | 1113 | 44087 | `f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853` |
 | `js/content/dom_extractors.js` | 1137 | 46896 | `adf2c04f14f0f3bb44556e216af25aca8ff182dfa569c248ddb150d0cca38a4e` |
 | `js/filter_logic.js` | 3652 | 172174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |

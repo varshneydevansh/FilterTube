@@ -9,7 +9,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_MESSAGE_TRANSPORT_CALLSITE_REGISTER_CURRENT_BEHAVIOR_2026-05-22.md';
 
 const sourceFingerprints = {
-  'js/background.js': [6641, 298986, '837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd'],
+  'js/background.js': [6657, 299580, 'f05fe6f65f9de1218299374ac3c82dd6b6ae9e17e3d862926a20e6c2981c19c7'],
   'js/content/bridge_injection.js': [127, 4741, 'd1b84cf4c43ec5ff5cdc3bd607d8f3d3bf448c12829780b0d05fb9fc14fb5d3e'],
   'js/content/bridge_settings.js': [1113, 44087, 'f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853'],
   'js/content/collab_dialog.js': [393, 14623, 'dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a'],
@@ -22,7 +22,7 @@ const sourceFingerprints = {
   'js/popup.js': [1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
   'js/seed.js': [1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
   'js/state_manager.js': [2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6'],
-  'js/tab-view.js': [12398, 563015, '98ea6b678d7e4bbe7d08c02a920e4ec1cf276967be9b7f0a02a8949d29e1f3f5']
+  'js/tab-view.js': [12437, 564952, 'b7174155f23ee5b006a9f37be921a1aad0506030af56f96695710ac10d436066']
 };
 
 function read(file) {

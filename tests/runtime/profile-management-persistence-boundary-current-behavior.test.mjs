@@ -154,10 +154,10 @@ test('profile management persistence audit document records current boundary and
 test('profile management source fingerprints stay pinned', () => {
   const doc = read(auditDocPath);
   const expected = [
-    ['js/tab-view.js', 12398, 563015, '98ea6b678d7e4bbe7d08c02a920e4ec1cf276967be9b7f0a02a8949d29e1f3f5'],
+    ['js/tab-view.js', 12437, 564952, 'b7174155f23ee5b006a9f37be921a1aad0506030af56f96695710ac10d436066'],
     ['js/popup.js', 1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
     ['js/io_manager.js', 2097, 100479, 'f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62'],
-    ['js/background.js', 6641, 298986, '837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd']
+    ['js/background.js', 6657, 299580, 'f05fe6f65f9de1218299374ac3c82dd6b6ae9e17e3d862926a20e6c2981c19c7']
   ];
 
   for (const [file, lines, bytes, hash] of expected) {
@@ -173,7 +173,7 @@ test('profile management source/effect block metrics stay pinned in the doc', ()
   const doc = read(auditDocPath);
   const currentBlocks = blocks();
   const expected = {
-    tabRenderProfilesManager: ['tab-view renderProfilesManager block', 401, 20286],
+    tabRenderProfilesManager: ['tab-view renderProfilesManager block', 401, 20304],
     tabRefreshProfilesUI: ['tab-view refreshProfilesUI block', 24, 954],
     tabSwitchToProfile: ['tab-view switchToProfile block', 44, 1595],
     popupSwitchToProfile: ['popup switchToProfile block', 48, 1659],
@@ -203,7 +203,8 @@ test('selected profile management token counts stay pinned', () => {
     ['tab-view scheduleAutoBackup tokens: 6', sources.tabView, 'scheduleAutoBackup', 6],
     ['tab-view profile_created tokens: 2', sources.tabView, 'profile_created', 2],
     ['tab-view managedChildEdit tokens: 12', sources.tabView, 'managedChildEdit', 12],
-    ['tab-view unlockedProfiles tokens: 18', sources.tabView, 'unlockedProfiles', 18],
+    ['tab-view unlockedProfiles tokens: 4', sources.tabView, 'unlockedProfiles', 4],
+    ['tab-view clearProfileUnlockSession tokens: 6', sources.tabView, 'clearProfileUnlockSession', 6],
     ['tab-view allowMainViewing tokens: 4', sources.tabView, 'allowMainViewing', 4],
     ['tab-view allowKidsViewing tokens: 4', sources.tabView, 'allowKidsViewing', 4],
     ['tab-view schemaVersion tokens: 22', sources.tabView, 'schemaVersion', 22],
@@ -260,7 +261,7 @@ test('profile manager delete writes resolved active profile without backup or re
   assert.match(block, /delete profiles\[profileId\]/);
   assert.match(block, /const resolvedActive = profiles\[nextActive\] \? nextActive : 'default'/);
   assert.match(block, /activeProfileId: resolvedActive/);
-  assert.match(block, /unlockedProfiles\.delete\(profileId\)/);
+  assert.match(block, /clearProfileUnlockSession\.run\(profileId\)/);
   assert.match(block, /await StateManager\.loadSettings\(\)/);
   assert.match(block, /await applyLockGateIfNeeded\(\)/);
   assert.doesNotMatch(block, /scheduleAutoBackup|compiledSettingsRevision|profileManagementCreateDeleteReport|profileManagementBackupPolicy/);

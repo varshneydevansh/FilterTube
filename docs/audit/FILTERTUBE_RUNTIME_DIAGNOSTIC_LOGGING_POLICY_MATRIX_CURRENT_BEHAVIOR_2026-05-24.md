@@ -30,7 +30,7 @@ and website code. Lines whose trimmed text begins with `//` are excluded.
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `build.js` | 740 | 26978 | `c8485cb2600aad89f44015cd7e49ebe4746ebcc35c91c1ff2bf29aec2f087a04` |
-| `js/background.js` | 6641 | 298986 | `837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd` |
+| `js/background.js` | 6657 | 299580 | `f05fe6f65f9de1218299374ac3c82dd6b6ae9e17e3d862926a20e6c2981c19c7` |
 | `js/content/block_channel.js` | 3189 | 127857 | `c040b57e0b107fd7b6fb0a18bc4ca014e5a22fbb82755f81e51a497eee387dba` |
 | `js/content/bridge_settings.js` | 1113 | 44087 | `f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853` |
 | `js/content/collab_dialog.js` | 393 | 14623 | `dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a` |
@@ -46,7 +46,7 @@ and website code. Lines whose trimmed text begins with `//` are excluded.
 | `js/seed.js` | 1136 | 50026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
 | `js/settings_shared.js` | 1181 | 57535 | `9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c` |
 | `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
-| `js/tab-view.js` | 12398 | 563015 | `98ea6b678d7e4bbe7d08c02a920e4ec1cf276967be9b7f0a02a8949d29e1f3f5` |
+| `js/tab-view.js` | 12437 | 564952 | `b7174155f23ee5b006a9f37be921a1aad0506030af56f96695710ac10d436066` |
 | `scripts/build-extension-ui.mjs` | 50 | 1188 | `6326362ebf90f448ccdbf68945b3fb522b7b215edaf9b3e28589a4e166239cf3` |
 | `scripts/build-nanah-vendor.mjs` | 65 | 1818 | `dae8d3ef29c4cd44b0bf975090e9d53f3bb05b523355f5038930fc03b27e921c` |
 | `scripts/sync-native-runtime.mjs` | 34 | 1070 | `4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6` |
@@ -677,7 +677,7 @@ flowchart TD
 | --- | --- | --- | --- |
 | `production_console_residual_bridge_preface` | `js/content_bridge.js:11-37`; `js/content_bridge.js:13596-13630` | `content_bridge.js` has 126 textual routine rows before the backup gate install, but only one top-level executed routine log before that gate and it is locally debug-gated; the helper definition also checks debug before logging. | Live installed-tab proof that debug-disabled startup emits no content-bridge log/debug output. |
 | `production_console_residual_bridge_function_bodies` | `js/content_bridge.js:702-13594`; `js/content_bridge.js:13608-13628` | The remaining 124 content-bridge routine rows are function-body diagnostics; the backup gate installs before `message` listener registration and the `initialize()` timer. | Route/profile/list-mode sampling proving menu, collaborator, fallback, quick-block, and identity paths stay quiet with debug disabled. |
-| `production_console_residual_background_gate` | `js/background.js:12`; `js/background.js:1770-6303`; `js/background.js:6305-6318` | The background console gate is invoked at startup before 62 routine background `log/debug/info` rows. | Service-worker sample showing routine logs stay suppressed while warnings/errors still surface. |
+| `production_console_residual_background_gate` | `js/background.js:12`; `js/background.js:1786-6319`; `js/background.js:6321-6334` | The background console gate is invoked at startup before 62 routine background `log/debug/info` rows. | Service-worker sample showing routine logs stay suppressed while warnings/errors still surface. |
 | `production_console_residual_isolated_shared_gate` | `js/content/dom_fallback.js:5`; active manifest isolated script order; `js/content/dom_fallback.js:4559-4706` | Active manifests load `dom_fallback` before helper and bridge scripts, so 135 manifest-isolated routine rows are behind the shared isolated console gate. | Installed manifest/order byte proof plus live YouTube page sampling after reload. |
 | `production_console_residual_main_world_local_debug` | `js/seed.js:11-153`; `js/filter_logic.js:11-1590`; `js/injector.js:97` | MAIN-world code has 7 routine rows behind local debug checks, but no global MAIN-world console override. | Endpoint/route fixture proving no unconditional MAIN-world routine log is added before JSON-first promotion. |
 | `production_console_residual_non_hotpath_ui_layout` | `js/popup.js:1544`; `js/tab-view.js:8959`; `js/layout.js:71-483` | Popup/tab-view routine rows are extension UI diagnostics, and `layout.js` routine rows are not active-manifest loaded. | Release cleanup decision for UI diagnostics and inactive layout package burden. |

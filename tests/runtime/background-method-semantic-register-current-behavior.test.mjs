@@ -237,7 +237,7 @@ test('background method semantic register pins source fingerprint and broad call
 
   assert.deepEqual(stats, {
     bytes: 298986,
-    sha256: '837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd',
+    sha256: 'f05fe6f65f9de1218299374ac3c82dd6b6ae9e17e3d862926a20e6c2981c19c7',
     splitLines: 6344,
     wcLines: 6641
   });
@@ -260,7 +260,7 @@ test('background method semantic register pins source fingerprint and broad call
     'source split lines: 6344',
     'source wc -l: 6641',
     'source bytes: 298986',
-    'source sha256: 837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd',
+    'source sha256: f05fe6f65f9de1218299374ac3c82dd6b6ae9e17e3d862926a20e6c2981c19c7',
     'broad lexical callable matches: 442',
     'accepted top-level method rows: 76',
     'control-flow lexical artifacts: 300 (`if`: 285, `for`: 10, `while`: 3, `catch`: 2)',

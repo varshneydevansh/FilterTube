@@ -147,7 +147,9 @@ test('backup_auto_encryption_policy_matches_manual_export_policy is split today'
 
   assert.match(backgroundCreate, /const format = typeof settings\?\.autoBackupFormat === 'string' \? settings\.autoBackupFormat : 'auto'/);
   assert.match(backgroundCreate, /const shouldEncrypt = \(format === 'encrypted'\) \|\| \(format !== 'plain' && hasPin\)/);
-  assert.match(backgroundCreate, /const pin = sessionPinCache\.get\(activeId\) \|\| ''/);
+  assert.match(backgroundCreate, /const pinEntry = safeObject\(sessionPinCache\.get\(activeId\)\)/);
+  assert.match(backgroundCreate, /if \(!isSessionPinCacheEntryFresh\(pinEntry\)\)/);
+  assert.match(backgroundCreate, /const pin = pinEntry\.pin/);
   assert.match(encryptedExportBlock, /showPromptModal\(\{\s*title: 'Encrypted Export Password'/);
   assert.match(encryptedExportBlock, /io\.exportV3Encrypted/);
   assert.doesNotMatch(ioCreate, /autoBackupFormat|sessionPinCache|encryptJson|missing_session_pin/);

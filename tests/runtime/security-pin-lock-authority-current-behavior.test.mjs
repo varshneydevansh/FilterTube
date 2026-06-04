@@ -105,14 +105,21 @@ test('security manager currently uses PBKDF2 SHA-256 and AES-GCM for PIN verifie
   assert.match(decryptBlock, /Unsupported cipher/);
 });
 
-test('background currently has a session PIN cache but only explicit callers consult it', () => {
+test('background currently has an expiring session PIN cache but only explicit callers consult it', () => {
   const source = read('js/background.js');
 
+  assert.match(source, /const SESSION_PIN_CACHE_TTL_MS = 15 \* 60 \* 1000/);
   assert.match(source, /const sessionPinCache = new Map\(\)/);
+  assert.doesNotMatch(source, /function getCachedSessionPin\(profileId\)/);
+  assert.match(source, /function isSessionPinCacheEntryFresh\(entry\)/);
+  assert.match(source, /const entry = safeObject\(sessionPinCache\.get\(id\)\)/);
+  assert.match(source, /Date\.now\(\) < entry\.expiresAt/);
+  assert.match(source, /if \(!isSessionPinCacheEntryFresh\(entry\)\)/);
+  assert.match(source, /sessionPinCache\.delete\(id\)/);
   assert.match(source, /function isProfileSessionAuthorized\(profilesV4, profileId\)/);
-  assert.match(source, /return sessionPinCache\.has\(profileId\)/);
   assert.match(source, /async function verifyAndCacheSessionPin\(profileId, pin\)/);
-  assert.match(source, /sessionPinCache\.set\(profileId, pin\)/);
+  assert.match(source, /sessionPinCache\.set\(profileId, \{/);
+  assert.match(source, /expiresAt: Date\.now\(\) \+ SESSION_PIN_CACHE_TTL_MS/);
 });
 
 test('SessionPinAuth and ClearSessionPin are trusted UI guarded', () => {
@@ -268,8 +275,10 @@ test('tab UI currently has lock gates for navigation list mode and row add actio
   assert.match(source, /let sessionMasterPin = ''/);
   assert.match(source, /const unlockedProfiles = new Set\(\)/);
   assert.match(source, /async function notifyBackgroundUnlocked\(profileId, pin = ''\)/);
-  assert.match(source, /async function ensureProfileUnlocked\(profilesV4, profileId\)/);
-  assert.match(source, /async function ensureAdminUnlocked\(profilesV4\)/);
+  assert.match(source, /async function ensureProfileUnlocked\(profilesV4, profileId, options = \{\}\)/);
+  assert.match(source, /const isProfileUnlockSessionValid = \{/);
+  assert.match(source, /check: \(profileId, \{ sensitiveAction = false \} = \{\}\) =>/);
+  assert.match(source, /async function ensureAdminUnlocked\(profilesV4, options = \{\}\)/);
   assert.match(source, /function ensureNonChildAdminAction/);
   assert.match(source, /async function saveManagedChildSurface\(surface, mutator\)/);
 });

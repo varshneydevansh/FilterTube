@@ -1,8 +1,8 @@
 # Contract: Managed Child Local Edit Authority
 
 **Generated**: 2026-06-03
-**Status**: Runtime local managed-save and failed-unlock history hardening
-partially present.
+**Status**: Runtime local managed-save, failed-unlock history, admin-session
+TTL, and sensitive-action re-auth hardening partially present.
 **Goal slice**: Implementation order item 5, "Harden local
 parent-managed child/protected-profile edits".
 **Primary inputs**:
@@ -37,7 +37,8 @@ Current source evidence in `js/tab-view.js`:
 | `localManagedEditPolicyRevisionStore(profile, scope)` | Reads the target child's last local managed edit revision for `main` or `kids`. |
 | `recordManagedChildLocalEditHistory(profile, report)` | Stores the accepted local edit revision and a protected redacted action-history row on the target child profile in the same V4 profile write. |
 | `recordManagedAdminAuthFailureHistory(profilesV4, targetProfileId, reason)` | Stores a protected `admin_session.failed_unlock` row on the target child profile when parent/admin unlock fails for managed child edit, history view/clear, viewing-space, or time-limit changes. |
-| `ensureProfileUnlocked(profilesV4, profileId)` | Syncs session state, allows unlocked/no-PIN profiles, prompts for profile PIN otherwise, verifies PIN locally, then notifies background. |
+| `ensureProfileUnlocked(profilesV4, profileId, options)` | Syncs session state, allows unlocked/no-PIN profiles, requires an unexpired local unlock session, prompts for profile PIN otherwise, verifies PIN locally, records a local TTL/reauth window, then notifies background. |
+| `isProfileUnlockSessionValid.check(profileId, options)` | Rejects expired admin sessions, clears stale session metadata, and requires fresher auth for sensitive managed actions. |
 
 ## Required Local Authority Decisions
 
@@ -77,16 +78,17 @@ filtering behavior:
 
 ## Current Runtime Boundary
 
-Current product runtime source implements accepted local managed-save metadata
-and protected failed-unlock history rows. TTL, rate limiting, and sensitive
-action re-auth remain future slices:
+Current product runtime source implements accepted local managed-save metadata,
+protected failed-unlock history rows, local dashboard session TTL, and fresher
+reauth for sensitive managed actions. Rate limiting remains a future slice:
 
 ```text
 runtime local managed edit policy revision store: present
 runtime local managed edit action-history writer: present
 runtime local managed edit failed-unlock logger: present for managed child/history/viewing-space/time-limit unlock gates
-runtime local managed edit admin session TTL: absent
-runtime local managed edit sensitive-action re-auth gate: absent
+runtime local managed edit admin session TTL: present for tab-view and background session cache
+runtime local managed edit sensitive-action re-auth gate: present for managed child/history/viewing-space/time-limit unlock gates
+runtime local managed edit failed-attempt rate limit: absent
 runtime behavior changed by this contract: yes
 ```
 

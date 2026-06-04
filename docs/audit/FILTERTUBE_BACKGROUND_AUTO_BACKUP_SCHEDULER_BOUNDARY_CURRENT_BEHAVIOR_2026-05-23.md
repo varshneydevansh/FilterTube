@@ -21,7 +21,7 @@ whitelist optimization work changes mutation side effects.
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6641 | 298986 | `837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd` |
+| `js/background.js` | 6657 | 299580 | `f05fe6f65f9de1218299374ac3c82dd6b6ae9e17e3d862926a20e6c2981c19c7` |
 | `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
 | `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
 | `js/tab-view.js` | 11617 | 526763 | `1b7f621d48d16247aecc4c7ee57cbc3db9efd3e597e6f0a4fc188228470648f7` |
@@ -74,7 +74,7 @@ isProfileSessionAuthorized: 0
 | Schedule message authority | `FilterTube_ScheduleAutoBackup` accepts caller `triggerType`, object `options`, and any finite numeric `delay`, then schedules the background timer. | A content/UI caller that can reach the action can request backup work; delay has no clamp or sender class contract in the pinned action block. | Sender policy, trigger allowlist, delay clamp, and actor report. |
 | Timer coalescing | `scheduleAutoBackupInBackground()` stores one pending trigger/options pair, clears any previous timer, then starts a new timer. | Different mutation triggers can collapse into the last scheduled trigger, so side-effect accounting can lose provenance. | Per-mutation revision/report and dedupe policy. |
 | Post-block wait | Channel-added style triggers wait for pending post-block enrichment unless `options.waitForPostBlockEnrichment === false`. | Backup timing depends on enrichment state outside the backup owner and can delay up to the wait budget. | Enrichment wait budget and completion metric. |
-| Encrypted auto backup | `createAutoBackupInBackground()` encrypts when format requires it or profile PIN exists; if no session PIN is cached it returns `missing_session_pin`. | Encrypted auto-backup can skip silently from the scheduler path unless a caller separately surfaces the result. | Visible skip report and encryption-policy parity with manual export. |
+| Encrypted auto backup | `createAutoBackupInBackground()` encrypts when format requires it or profile PIN exists; if no TTL-checked session PIN is cached it returns `missing_session_pin`. | Encrypted auto-backup can skip silently from the scheduler path unless a caller separately surfaces the result. | Visible skip report and encryption-policy parity with manual export. |
 | Download and rotation | Background auto-backup writes through browser downloads and rotates history backups after a successful history-mode download. | Download and rotation are side effects of rule/list/profile mutations but are not represented in one mutation report. | Download/rotation result report and byte budget. |
 | Split scheduling owners | StateManager and content bridge send `FilterTube_ScheduleAutoBackup`; tab-view has another runtime scheduler; IO manager has a separate local timer/download implementation. | One user mutation can schedule backup work through more than one owner or fallback path. | Split-owner report and one backup side-effect contract. |
 

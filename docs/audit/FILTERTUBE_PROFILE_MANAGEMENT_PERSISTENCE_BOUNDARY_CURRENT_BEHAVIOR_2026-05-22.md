@@ -18,17 +18,17 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/tab-view.js` | 12398 | 563015 | `98ea6b678d7e4bbe7d08c02a920e4ec1cf276967be9b7f0a02a8949d29e1f3f5` |
+| `js/tab-view.js` | 12437 | 564952 | `b7174155f23ee5b006a9f37be921a1aad0506030af56f96695710ac10d436066` |
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/io_manager.js` | 2097 | 100479 | `f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62` |
-| `js/background.js` | 6641 | 298986 | `837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd` |
+| `js/background.js` | 6657 | 299580 | `f05fe6f65f9de1218299374ac3c82dd6b6ae9e17e3d862926a20e6c2981c19c7` |
 
 ## Source / Effect Blocks
 
 ```text
 4 profile management persistence source files
 source/effect blocks: 9
-tab-view renderProfilesManager block: 401 lines, 20286 bytes
+tab-view renderProfilesManager block: 401 lines, 20304 bytes
 tab-view refreshProfilesUI block: 24 lines, 954 bytes
 tab-view switchToProfile block: 44 lines, 1595 bytes
 popup switchToProfile block: 48 lines, 1659 bytes
@@ -52,7 +52,8 @@ tab-view applyLockGateIfNeeded tokens: 4
 tab-view scheduleAutoBackup tokens: 6
 tab-view profile_created tokens: 2
 tab-view managedChildEdit tokens: 12
-tab-view unlockedProfiles tokens: 18
+tab-view unlockedProfiles tokens: 4
+tab-view clearProfileUnlockSession tokens: 6
 tab-view allowMainViewing tokens: 4
 tab-view allowKidsViewing tokens: 4
 tab-view schemaVersion tokens: 22
@@ -91,7 +92,7 @@ profile_management_future_authority_symbols_absent_from_product_runtime
 | --- | --- | --- | --- |
 | Tab-view profile switch | `switchToProfile()` loads V4, verifies the target exists, calls `ensureProfileUnlocked()`, writes `activeProfileId`, clears `managedChildEdit`, reloads `StateManager`, refreshes profile UI, updates stats, and shows a toast. | `tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs` | The switch has local lock proof, but no shared revision, runtime broadcast, or compiled-settings freshness report. |
 | Popup profile switch | Popup switch repeats the load/unlock/write/reload pattern and rerenders popup state. | Same runtime test. | Popup and tab-view share behavior by convention rather than one switch authority. |
-| Profile manager delete | The tab-view delete action rejects child-admin and default deletion, requires Default admin or self unlock, deletes `profiles[profileId]`, resolves active profile back to Default if needed, writes V4, removes the unlocked session entry, reloads StateManager, refreshes UI, and applies the lock gate. | Same runtime test. | Delete has no backup scheduling token, no deletion report, and no explicit background cache revision report. |
+| Profile manager delete | The tab-view delete action rejects child-admin and default deletion, requires Default admin or self unlock, deletes `profiles[profileId]`, resolves active profile back to Default if needed, writes V4, clears the profile unlock session, reloads StateManager, refreshes UI, and applies the lock gate. | Same runtime test. | Delete has no backup scheduling token, no deletion report, and no explicit background cache revision report. |
 | Account profile creation | Account creation requires non-child admin action, active Default, admin unlock, account policy allowance, and account limit checks. It creates an account with Main and Kids viewing allowed, empty block/allow lists, copied active backup policy settings, writes V4, refreshes UI, and conditionally schedules `profile_created` backup from the active profile setting. | Same runtime test. | The new profile does not become active, and backup scheduling is conditional and side-effect only, not part of a mutation report. |
 | Child profile creation | Child creation requires non-child admin action, an active account profile, parent unlock, then creates a child with `allowMainViewing:false`, `allowKidsViewing:true`, empty lists, copied parent backup policy settings, writes V4, refreshes UI, and conditionally schedules `profile_created` backup. | Same runtime test. | Child defaults and parent authority are UI-local; no structured parent/child policy report is emitted. |
 | Managed child save | `saveManagedChildSurface()` checks `canActiveProfileManageProfile()`, mutates the selected child surface, writes local accepted-save revision/history metadata, writes V4, updates local cache, calls `StateManager.loadSettings({ notify:false, resetEnrichment:false, scheduleEnrichment:false })`, rerenders Main and Kids rows, applies content controls locally, and updates stats. | Same runtime test. | Parent-managed child edits now have local redacted revision/history proof, but still do not emit broadcast-scope, compiled-revision, or backup reports. |

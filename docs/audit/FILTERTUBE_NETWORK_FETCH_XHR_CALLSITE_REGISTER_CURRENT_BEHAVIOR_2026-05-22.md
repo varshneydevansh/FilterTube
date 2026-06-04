@@ -48,12 +48,12 @@ file.text() reads an uploaded/imported local File and is not a network response.
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6,641 | 298,986 | `837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd` |
+| `js/background.js` | 6,657 | 299,580 | `f05fe6f65f9de1218299374ac3c82dd6b6ae9e17e3d862926a20e6c2981c19c7` |
 | `js/content/handle_resolver.js` | 282 | 9,785 | `67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff` |
 | `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
 | `js/injector.js` | 3,593 | 155,830 | `634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04` |
 | `js/seed.js` | 1,136 | 50,026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
-| `js/tab-view.js` | 12,398 | 563,015 | `98ea6b678d7e4bbe7d08c02a920e4ec1cf276967be9b7f0a02a8949d29e1f3f5` |
+| `js/tab-view.js` | 12,437 | 564,952 | `b7174155f23ee5b006a9f37be921a1aad0506030af56f96695710ac10d436066` |
 
 ## File And Operation Counts
 
@@ -79,19 +79,19 @@ file.text() reads an uploaded/imported local File and is not a network response.
 ## Network Fetch/XHR Rows
 
 ```text
-js/background.js:2008:fetch:releaseNotesExtensionResource
-js/background.js:2010:response.json:releaseNotesJsonDecode
-js/background.js:3209:fetch:shortsIdentityBackgroundHtmlFetch
-js/background.js:3220:response.body.getReader:shortsIdentityStreamReader
-js/background.js:3325:fetch:kidsWatchIdentityHtmlFetch
-js/background.js:3336:response.body.getReader:kidsWatchIdentityStreamReader
-js/background.js:3418:fetch:watchIdentityHtmlFetch
-js/background.js:3429:response.body.getReader:watchIdentityStreamReader
-js/background.js:4964:fetch:channelInfoPrimaryHtmlFetch
-js/background.js:4978:fetch:channelInfoHandleFallbackHtmlFetch
-js/background.js:4992:response.text:channelInfoPrimaryHtmlDecode
-js/background.js:5131:fetch:channelInfoPublicFallbackHtmlFetch
-js/background.js:5140:response.text:channelInfoPublicFallbackHtmlDecode
+js/background.js:2024:fetch:releaseNotesExtensionResource
+js/background.js:2026:response.json:releaseNotesJsonDecode
+js/background.js:3225:fetch:shortsIdentityBackgroundHtmlFetch
+js/background.js:3236:response.body.getReader:shortsIdentityStreamReader
+js/background.js:3341:fetch:kidsWatchIdentityHtmlFetch
+js/background.js:3352:response.body.getReader:kidsWatchIdentityStreamReader
+js/background.js:3434:fetch:watchIdentityHtmlFetch
+js/background.js:3445:response.body.getReader:watchIdentityStreamReader
+js/background.js:4980:fetch:channelInfoPrimaryHtmlFetch
+js/background.js:4994:fetch:channelInfoHandleFallbackHtmlFetch
+js/background.js:5008:response.text:channelInfoPrimaryHtmlDecode
+js/background.js:5147:fetch:channelInfoPublicFallbackHtmlFetch
+js/background.js:5156:response.text:channelInfoPublicFallbackHtmlDecode
 js/content/handle_resolver.js:239:fetch:directHandleHtmlFetch
 js/content/handle_resolver.js:255:response.text:directHandleHtmlDecode
 js/content_bridge.js:1943:fetch:watchMetaDirectHtmlFetch

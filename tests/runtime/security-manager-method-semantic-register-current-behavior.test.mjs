@@ -261,12 +261,12 @@ test('security manager source still proves current behavior boundaries', () => {
 
   for (const token of [
     '| Popup unlock wrapper | `js/popup.js:1226-1262` |',
-    '| Dashboard unlock wrapper | `js/tab-view.js:8349-8397` |',
-    '| Background session cache | `js/background.js:634-655`, `js/background.js:3268-3284`, `js/background.js:3571-3579` |',
+    '| Dashboard unlock wrapper | `js/tab-view.js:9126-9174` |',
+    '| Background session cache | `js/background.js:716-759`, `js/background.js:3603-3615` |',
     '| IO PIN requirement | `js/io_manager.js:190-212`, `js/io_manager.js:1241-1289` |',
-    '| IO encrypted export/import | `js/io_manager.js:1729-1770` |',
-    '| Background encrypted backup | `js/background.js:819-837` |',
-    '| Dashboard encrypted import decrypt | `js/tab-view.js:9299-9315` |',
+    '| IO encrypted export/import | `js/io_manager.js:1796-1838` |',
+    '| Background encrypted backup | `js/background.js:901-919` |',
+    '| Dashboard encrypted import decrypt | `js/tab-view.js:10120-10136` |',
     'The security manager remains intentionally pure: no DOM selectors, listeners,',
     'every behavior change',
     'must cite the caller'

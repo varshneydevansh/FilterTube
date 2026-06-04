@@ -712,12 +712,23 @@ function extractPinVerifierFromProfilesV4(profilesV4, profileId) {
     return verifier && typeof verifier === 'object' ? verifier : null;
 }
 
+const SESSION_PIN_CACHE_TTL_MS = 15 * 60 * 1000;
 const sessionPinCache = new Map();
+
+function isSessionPinCacheEntryFresh(entry) {
+    return !!entry.pin && Number.isFinite(entry.expiresAt) && Date.now() < entry.expiresAt;
+}
 
 function isProfileSessionAuthorized(profilesV4, profileId) {
     const verifier = extractPinVerifierFromProfilesV4(profilesV4, profileId);
     if (!verifier) return true;
-    return sessionPinCache.has(profileId);
+    const id = normalizeString(profileId) || DEFAULT_PROFILE_ID;
+    const entry = safeObject(sessionPinCache.get(id));
+    if (!isSessionPinCacheEntryFresh(entry)) {
+        sessionPinCache.delete(id);
+        return false;
+    }
+    return true;
 }
 
 async function verifyAndCacheSessionPin(profileId, pin) {
@@ -741,7 +752,10 @@ async function verifyAndCacheSessionPin(profileId, pin) {
     if (!ok) {
         return { ok: false, error: 'Incorrect PIN' };
     }
-    sessionPinCache.set(profileId, pin);
+    sessionPinCache.set(profileId, {
+        pin,
+        expiresAt: Date.now() + SESSION_PIN_CACHE_TTL_MS
+    });
     return { ok: true, stored: true };
 }
 
@@ -885,10 +899,12 @@ async function createAutoBackupInBackground(triggerType, options = {}) {
     let exportObject = payload;
     let ext = 'json';
     if (shouldEncrypt) {
-        const pin = sessionPinCache.get(activeId) || '';
-        if (!pin) {
+        const pinEntry = safeObject(sessionPinCache.get(activeId));
+        if (!isSessionPinCacheEntryFresh(pinEntry)) {
+            sessionPinCache.delete(activeId);
             return { ok: true, skipped: true, reason: 'missing_session_pin' };
         }
+        const pin = pinEntry.pin;
         const Security = globalThis.FilterTubeSecurity || null;
         if (!Security || typeof Security.encryptJson !== 'function') {
             return { ok: false, reason: 'security_unavailable' };

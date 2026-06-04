@@ -11,7 +11,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_COMPILED_SETTINGS_PROFILE_LIST_MODE_ASSEMBLY_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/background.js': [6641, 298986, '837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd'],
+  'js/background.js': [6657, 299580, 'f05fe6f65f9de1218299374ac3c82dd6b6ae9e17e3d862926a20e6c2981c19c7'],
   'js/content/bridge_settings.js': [1113, 44087, 'f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853'],
   'js/filter_logic.js': [3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5']
 };
@@ -22,7 +22,7 @@ const blockSpecs = {
     from: 'async function getCompiledSettings(sender = null, profileType = null, forceRefresh = false) {',
     start: '            const activeSettings = safeObject(activeProfile.settings);',
     end: '            const boolFromV4 = (key, legacyValue) => {',
-    startLine: 2266,
+    startLine: 2282,
     lines: 88,
     bytes: 5201,
     hash: 'fde880c68148975730478f0c0e768b9585168ab3e260e8f6ecd8f7fc1220f9b2'
@@ -32,7 +32,7 @@ const blockSpecs = {
     from: 'async function getCompiledSettings(sender = null, profileType = null, forceRefresh = false) {',
     start: '            const compileWhitelistChannels = (channels = []) => {',
     end: '            const storedChannels = shouldUseKidsProfile',
-    startLine: 2467,
+    startLine: 2483,
     lines: 65,
     bytes: 3878,
     hash: '433527aec588525d8f3747ce7ffe20b1d2d78905c6812a6fcf6703bbee507322'

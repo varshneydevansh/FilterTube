@@ -3040,6 +3040,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const MANAGED_ACTION_HISTORY_LIMIT = 500;
     const MANAGED_ACTION_HISTORY_PROTECTED_RESULTS = new Set(['rejected', 'conflict', 'failed_auth', 'expired_session']);
     const MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set(['trust_link.revoke', 'policy.time_limit.update', 'policy.viewing_space.update']);
+    const MANAGED_ADMIN_SESSION_TTL_MS = 15 * 60 * 1000;
+    const MANAGED_ADMIN_REAUTH_TTL_MS = 5 * 60 * 1000;
+    const profileUnlockSessions = new Map();
 
     async function sendRuntimeMessage(payload) {
         return new Promise((resolve) => {
@@ -3110,6 +3113,43 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (e) {
         }
     }
+
+    const clearProfileUnlockSession = {
+        run: (profileId) => {
+            const id = normalizeString(profileId); if (!id) return;
+            unlockedProfiles.delete(id);
+            profileUnlockSessions.delete(id);
+            id === 'default' && (sessionMasterPin = '');
+        }
+    };
+
+    const markProfileUnlockSession = {
+        run: (profileId) => {
+            const id = normalizeString(profileId); if (!id) return;
+            const now = Date.now();
+            unlockedProfiles.add(id);
+            profileUnlockSessions.set(id, {
+                unlockedAt: now,
+                expiresAt: now + MANAGED_ADMIN_SESSION_TTL_MS,
+                reauthAt: now + MANAGED_ADMIN_REAUTH_TTL_MS
+            });
+        }
+    };
+
+    const isProfileUnlockSessionValid = {
+        check: (profileId, { sensitiveAction = false } = {}) => {
+            const id = normalizeString(profileId);
+            const session = safeObject(profileUnlockSessions.get(id));
+            const now = Date.now();
+            const expired = !Number.isFinite(session.expiresAt) || now >= session.expiresAt;
+            const requiresReauth = sensitiveAction && (!Number.isFinite(session.reauthAt) || now >= session.reauthAt);
+            if (!id || !unlockedProfiles.has(id) || expired || requiresReauth) {
+                clearProfileUnlockSession.run(id);
+                return false;
+            }
+            return true;
+        }
+    };
 
     function safeObject(value) {
         return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
@@ -4533,7 +4573,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
-        const okAdmin = await ensureProfileUnlocked(fresh, currentActive);
+        const okAdmin = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
         if (!okAdmin) {
             await recordManagedAdminAuthFailureHistory(fresh, targetId, 'history_view_unlock_failed');
             return;
@@ -4583,7 +4623,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
-        const okAdmin = await ensureProfileUnlocked(fresh, currentActive);
+        const okAdmin = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
         if (!okAdmin) {
             await recordManagedAdminAuthFailureHistory(fresh, targetId, 'history_clear_unlock_failed');
             return false;
@@ -4984,7 +5024,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
-        const ok = await ensureProfileUnlocked(fresh, currentActive);
+        const ok = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
         if (!ok) {
             await recordManagedAdminAuthFailureHistory(fresh, targetId, 'managed_child_edit_unlock_failed');
             return;
@@ -5131,7 +5171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             UIComponents.showToast('Switch to the parent account to change this profile', 'error');
             return;
         }
-        const okAdmin = await ensureProfileUnlocked(fresh, currentActive);
+        const okAdmin = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
         if (!okAdmin) {
             await recordManagedAdminAuthFailureHistory(fresh, targetId, 'viewing_space_unlock_failed');
             return;
@@ -5182,7 +5222,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             UIComponents.showToast('Switch to the parent account to change this profile', 'error');
             return;
         }
-        const okAdmin = await ensureProfileUnlocked(fresh, currentActive);
+        const okAdmin = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
         if (!okAdmin) {
             await recordManagedAdminAuthFailureHistory(fresh, targetId, 'time_limit_unlock_failed');
             return;
@@ -5248,7 +5288,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return document.body.classList.contains('ft-app-locked');
         }
         return getProfileType(profilesV4, activeProfileId) === 'child' ||
-            !!(profilesV4 && isProfileLocked(profilesV4, activeProfileId) && !unlockedProfiles.has(activeProfileId));
+            !!(profilesV4 && isProfileLocked(profilesV4, activeProfileId) && !isProfileUnlockSessionValid.check(activeProfileId));
     }
 
     function getActiveProfileType() {
@@ -5270,7 +5310,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             profileId,
             profileName: getProfileName(profilesV4, profileId),
             profileType,
-            locked: isProfileLocked(profilesV4, profileId) && !unlockedProfiles.has(profileId)
+            locked: isProfileLocked(profilesV4, profileId) && !isProfileUnlockSessionValid.check(profileId)
         };
     }
 
@@ -5284,7 +5324,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     profileId,
                     profileName: normalizeString(profile.name) || (profileId === 'default' ? 'Default' : profileId),
                     profileType: getProfileType(root, profileId),
-                    locked: isProfileLocked(root, profileId) && !unlockedProfiles.has(profileId)
+                    locked: isProfileLocked(root, profileId) && !isProfileUnlockSessionValid.check(profileId)
                 };
             })
             .sort((a, b) => {
@@ -5714,7 +5754,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function applyLockGateIfNeeded() {
         const profilesV4 = profilesV4Cache;
-        const isLocked = profilesV4 && isProfileLocked(profilesV4, activeProfileId) && !unlockedProfiles.has(activeProfileId);
+        const isLocked = profilesV4 && isProfileLocked(profilesV4, activeProfileId) && !isProfileUnlockSessionValid.check(activeProfileId);
         document.body.classList.toggle('ft-app-locked', !!isLocked);
 
         window.FilterTubeIsUiLocked = () => isUiLocked();
@@ -6829,7 +6869,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 profileId: currentActiveId,
                 profileName: getProfileName(localProfiles, currentActiveId),
                 profileType: getProfileType(localProfiles, currentActiveId),
-                locked: isProfileLocked(localProfiles, currentActiveId) && !unlockedProfiles.has(currentActiveId)
+                locked: isProfileLocked(localProfiles, currentActiveId) && !isProfileUnlockSessionValid.check(currentActiveId)
             };
         }
 
@@ -6840,7 +6880,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 profileId: currentActiveId,
                 profileName: getProfileName(localProfiles, currentActiveId),
                 profileType: getProfileType(localProfiles, currentActiveId),
-                locked: isProfileLocked(localProfiles, currentActiveId) && !unlockedProfiles.has(currentActiveId)
+                locked: isProfileLocked(localProfiles, currentActiveId) && !isProfileUnlockSessionValid.check(currentActiveId)
             };
         }
 
@@ -6854,7 +6894,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             profileId: targetProfileId,
             profileName: normalizeString(safeObject(trusted.policy).targetProfileName) || getProfileName(localProfiles, targetProfileId),
             profileType: getProfileType(localProfiles, targetProfileId),
-            locked: isProfileLocked(localProfiles, targetProfileId) && !unlockedProfiles.has(targetProfileId)
+            locked: isProfileLocked(localProfiles, targetProfileId) && !isProfileUnlockSessionValid.check(targetProfileId)
         };
     }
 
@@ -6870,7 +6910,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 profileId: currentActiveId,
                 profileName: getProfileName(localProfiles, currentActiveId),
                 profileType: getProfileType(localProfiles, currentActiveId),
-                locked: isProfileLocked(localProfiles, currentActiveId) && !unlockedProfiles.has(currentActiveId)
+                locked: isProfileLocked(localProfiles, currentActiveId) && !isProfileUnlockSessionValid.check(currentActiveId)
             };
         }
 
@@ -6884,7 +6924,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             profileId: targetProfileId,
             profileName: normalizeString(safeObject(policy).targetProfileName) || getProfileName(localProfiles, targetProfileId),
             profileType: getProfileType(localProfiles, targetProfileId),
-            locked: isProfileLocked(localProfiles, targetProfileId) && !unlockedProfiles.has(targetProfileId)
+            locked: isProfileLocked(localProfiles, targetProfileId) && !isProfileUnlockSessionValid.check(targetProfileId)
         };
     }
 
@@ -9091,10 +9131,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         return Security.verifyPin(pin, verifier);
     }
 
-    async function ensureProfileUnlocked(profilesV4, profileId) {
+    async function ensureProfileUnlocked(profilesV4, profileId, options = {}) {
         await syncSessionUnlockStateFromBackground();
         if (!isProfileLocked(profilesV4, profileId)) return true;
-        if (unlockedProfiles.has(profileId)) return true;
+        if (isProfileUnlockSessionValid.check(profileId, options)) return true;
 
         const verifier = profileId === 'default'
             ? extractMasterPinVerifier(profilesV4)
@@ -9118,7 +9158,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return false;
         }
 
-        unlockedProfiles.add(profileId);
+        markProfileUnlockSession.run(profileId);
         if (profileId === 'default') {
             sessionMasterPin = normalized;
         }
@@ -9126,11 +9166,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         return true;
     }
 
-    async function ensureAdminUnlocked(profilesV4) {
+    async function ensureAdminUnlocked(profilesV4, options = {}) {
         const masterVerifier = extractMasterPinVerifier(profilesV4);
         if (!masterVerifier) return true;
-        if (unlockedProfiles.has('default') && sessionMasterPin) return true;
-        return ensureProfileUnlocked(profilesV4, 'default');
+        if (isProfileUnlockSessionValid.check('default', options) && sessionMasterPin) return true;
+        return ensureProfileUnlocked(profilesV4, 'default', options);
     }
 
     function updateExportScopeControls() {
@@ -9362,7 +9402,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     activeProfileId: resolvedActive,
                     profiles
                 });
-                unlockedProfiles.delete(profileId);
+                clearProfileUnlockSession.run(profileId);
                 await StateManager.loadSettings();
                 await refreshProfilesUI();
                 await applyLockGateIfNeeded();
@@ -9536,7 +9576,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         schemaVersion: 4,
                         profiles
                     });
-                    unlockedProfiles.delete(profileId);
+                    clearProfileUnlockSession.run(profileId);
                     await refreshProfilesUI();
                     UIComponents.showToast('Profile PIN updated', 'success');
                 });
@@ -9587,7 +9627,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         schemaVersion: 4,
                         profiles
                     });
-                    unlockedProfiles.delete(profileId);
+                    clearProfileUnlockSession.run(profileId);
                     await notifyBackgroundLocked(profileId);
                     await refreshProfilesUI();
                     UIComponents.showToast('Profile PIN removed', 'success');
@@ -10863,7 +10903,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             sessionMasterPin = normalizeString(pin1);
-            unlockedProfiles.add('default');
+            markProfileUnlockSession.run('default');
             await refreshProfilesUI();
             UIComponents.showToast('Master PIN updated', 'success');
         });
@@ -10913,8 +10953,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 profiles
             });
 
-            sessionMasterPin = '';
-            unlockedProfiles.delete('default');
+            clearProfileUnlockSession.run('default');
             await notifyBackgroundLocked('default');
             await refreshProfilesUI();
             UIComponents.showToast('Master PIN removed', 'success');

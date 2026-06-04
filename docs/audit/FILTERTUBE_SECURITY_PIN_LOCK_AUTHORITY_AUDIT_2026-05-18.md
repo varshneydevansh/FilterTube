@@ -44,10 +44,10 @@ which callers are allowed to reach write paths after a PIN has been checked.
 
 ## Background Session Cache
 
-`js/background.js:634` extracts master/profile PIN verifiers from
-`ftProfilesV4`. `js/background.js:647` stores unlocked session state in
-`sessionPinCache`, and `js/background.js:655` verifies the submitted PIN before
-caching the profile id.
+`js/background.js:702` extracts master/profile PIN verifiers from
+`ftProfilesV4`. `js/background.js:715` stores unlocked session state in
+`sessionPinCache`, and `js/background.js:723` verifies the submitted PIN before
+caching the profile id with an expiry.
 
 The message path for unlocking is guarded by extension-page sender origin:
 
@@ -55,10 +55,10 @@ The message path for unlocking is guarded by extension-page sender origin:
 FilterTube_SessionPinAuth
   -> isTrustedUiSender(sender)
   -> verifyAndCacheSessionPin(profileId, pin)
-  -> sessionPinCache.set(profileId, pin)
+  -> sessionPinCache.set(profileId, { pin, expiresAt })
 ```
 
-Proof: `js/background.js:3266-3278`.
+Proof: `js/background.js:3589-3601`.
 
 Risk: this creates a background session cache, but only some later mutation
 paths consult it.

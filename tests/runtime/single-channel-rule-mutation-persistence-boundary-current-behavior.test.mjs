@@ -196,7 +196,7 @@ test('single-channel rule mutation persistence audit document records current bo
 test('single-channel rule mutation source fingerprints stay pinned', () => {
   const doc = read(auditDocPath);
   const expected = [
-    ['js/background.js', 6641, 298986, '837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd'],
+    ['js/background.js', 6657, 299580, 'f05fe6f65f9de1218299374ac3c82dd6b6ae9e17e3d862926a20e6c2981c19c7'],
     ['js/state_manager.js', 2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6'],
     ['js/content_bridge.js', 13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d']
   ];

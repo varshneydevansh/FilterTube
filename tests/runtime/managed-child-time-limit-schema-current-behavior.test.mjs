@@ -198,7 +198,7 @@ test('local parent UI writes time-limit policy through profile settings and admi
   assert.match(tabView, /function updateProfileTimeLimitPolicy\(profileId, action\)/);
   assert.match(tabView, /getProfileType\(fresh, currentActive\) === 'child'/);
   assert.match(tabView, /canActiveProfileManageProfile\(fresh, targetId\)/);
-  assert.match(tabView, /ensureProfileUnlocked\(fresh, currentActive\)/);
+  assert.match(tabView, /ensureProfileUnlocked\(fresh, currentActive, \{ sensitiveAction: true \}\)/);
   assert.match(tabView, /const nextPolicy = buildManagedTimeLimitPolicy/);
   assert.match(tabView, /if \(!nextPolicy\)/);
   assert.match(tabView, /timeLimitPolicy: nextPolicy/);

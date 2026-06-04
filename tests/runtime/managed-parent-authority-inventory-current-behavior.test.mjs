@@ -14,6 +14,8 @@ test('managed parent authority inventory tracks implemented route gate and pendi
   const doc = read(docPath);
 
   assert.match(doc, /Status\*\*: Runtime route-gate, local managed-save revision\/history, protected\s+failed-unlock history, protected history access, time-limit enforcement, and\s+receive-side managed-policy validation\/history proofs updated/);
+  assert.match(doc, /dashboard and\s+background admin-session expiry/);
+  assert.match(doc, /sensitive managed-action re-auth/);
   assert.match(doc, /Runtime behavior\s+changed/);
   assert.match(doc, /protected parent unlock-failure evidence/);
   assert.match(doc, /Lane proof\*\*: `test:settings`/);
@@ -37,7 +39,7 @@ test('local parent child edit authority remains source-backed by active-profile 
   assert.match(tabView, /if \(!canActiveProfileManageProfile\(fresh, profileId\)\)/);
   assert.match(tabView, /async function startManagedChildEdit\(profileId, surface\)/);
   assert.match(tabView, /getProfileType\(fresh, targetId\) !== 'child'/);
-  assert.match(tabView, /const ok = await ensureProfileUnlocked\(fresh, currentActive\)/);
+  assert.match(tabView, /const ok = await ensureProfileUnlocked\(fresh, currentActive, \{ sensitiveAction: true \}\)/);
   assert.match(tabView, /async function recordManagedAdminAuthFailureHistory\(profilesV4, targetProfileId, reason = 'unlock_failed'\)/);
   assert.match(tabView, /admin_session\.failed_unlock/);
   assert.match(tabView, /failed_auth/);
@@ -53,10 +55,17 @@ test('session PIN authority remains trusted-ui gated and memory scoped', () => {
   const background = read('js/background.js');
 
   assert.match(background, /const sessionPinCache = new Map\(\)/);
+  assert.match(background, /const SESSION_PIN_CACHE_TTL_MS = 15 \* 60 \* 1000/);
+  assert.doesNotMatch(background, /function getCachedSessionPin\(profileId\)/);
+  assert.match(background, /function isSessionPinCacheEntryFresh\(entry\)/);
+  assert.match(background, /const entry = safeObject\(sessionPinCache\.get\(id\)\)/);
+  assert.match(background, /if \(!isSessionPinCacheEntryFresh\(entry\)\)/);
+  assert.match(background, /sessionPinCache\.delete\(id\)/);
   assert.match(background, /async function verifyAndCacheSessionPin\(profileId, pin\)/);
   assert.match(background, /FilterTube_SessionPinAuth/);
   assert.match(background, /if \(!isTrustedUiSender\(sender\)\)/);
-  assert.match(background, /sessionPinCache\.set\(profileId, pin\)/);
+  assert.match(background, /sessionPinCache\.set\(profileId, \{/);
+  assert.match(background, /expiresAt: Date\.now\(\) \+ SESSION_PIN_CACHE_TTL_MS/);
 
   assert.match(doc, /sessionPinCache/);
   assert.match(doc, /trusted UI sender/i);

@@ -225,7 +225,7 @@ test('managed child local authority contract is source-backed with accepted-save
   const tabView = read('js/tab-view.js');
   const source = runtimeSource();
 
-  assert.match(doc, /Status\*\*: Runtime local managed-save and failed-unlock history hardening\s+partially present/);
+  assert.match(doc, /Status\*\*: Runtime local managed-save, failed-unlock history, admin-session\s+TTL, and sensitive-action re-auth hardening partially present/);
   assert.match(doc, /Who is allowed to enter virtual child edit mode/);
   assert.match(doc, /Required Local Authority Decisions/);
   assert.match(doc, /Hardening Requirements/);
@@ -236,13 +236,20 @@ test('managed child local authority contract is source-backed with accepted-save
   assert.match(tabView, /getProfileType\(profilesV4, currentActive\) === 'child'\) return false/);
   assert.match(tabView, /async function startManagedChildEdit\(profileId, surface\)/);
   assert.match(tabView, /getProfileType\(fresh, targetId\) !== 'child'/);
-  assert.match(tabView, /const ok = await ensureProfileUnlocked\(fresh, currentActive\)/);
+  assert.match(tabView, /const ok = await ensureProfileUnlocked\(fresh, currentActive, \{ sensitiveAction: true \}\)/);
   assert.match(tabView, /async function saveManagedChildSurface\(surface, mutator\)/);
   assert.match(tabView, /if \(!canActiveProfileManageProfile\(fresh, profileId\)\)/);
   assert.match(tabView, /function localManagedEditPolicyRevisionStore\(profile, scope\)/);
   assert.match(tabView, /function buildManagedChildLocalEditReport/);
   assert.match(tabView, /function recordManagedChildLocalEditHistory\(profile, report\)/);
   assert.match(tabView, /async function recordManagedAdminAuthFailureHistory\(profilesV4, targetProfileId, reason = 'unlock_failed'\)/);
+  assert.match(tabView, /const MANAGED_ADMIN_SESSION_TTL_MS = 15 \* 60 \* 1000/);
+  assert.match(tabView, /const MANAGED_ADMIN_REAUTH_TTL_MS = 5 \* 60 \* 1000/);
+  assert.match(tabView, /const isProfileUnlockSessionValid = \{/);
+  assert.match(tabView, /check: \(profileId, \{ sensitiveAction = false \} = \{\}\) =>/);
+  assert.match(tabView, /profileUnlockSessions\.set\(id,/);
+  assert.match(tabView, /clearProfileUnlockSession\.run\(id\)/);
+  assert.match(tabView, /ensureProfileUnlocked\(fresh, currentActive, \{ sensitiveAction: true \}\)/);
   assert.match(tabView, /actionType: 'admin_session\.failed_unlock'/);
   assert.match(tabView, /result: 'failed_auth'/);
   assert.match(tabView, /managed_child_edit_unlock_failed/);
@@ -400,7 +407,9 @@ test('remaining local hardening requires session ttl reauth and failed attempt l
   assert.match(doc, /runtime local managed edit policy revision store: present/);
   assert.match(doc, /runtime local managed edit action-history writer: present/);
   assert.match(doc, /runtime local managed edit failed-unlock logger: present for managed child\/history\/viewing-space\/time-limit unlock gates/);
-  assert.match(doc, /runtime local managed edit admin session TTL: absent/);
+  assert.match(doc, /runtime local managed edit admin session TTL: present for tab-view and background session cache/);
+  assert.match(doc, /runtime local managed edit sensitive-action re-auth gate: present for managed child\/history\/viewing-space\/time-limit unlock gates/);
+  assert.match(doc, /runtime local managed edit failed-attempt rate limit: absent/);
 });
 
 test('local managed failed unlock report stores protected redacted failed-auth history without policy authority', () => {

@@ -162,7 +162,9 @@ revocation, time-limit, or viewing-space evidence.
 
 The current failed-auth writer records only protected evidence rows. It does not
 rate-limit yet, does not extend an admin session, and does not authorize any
-future policy mutation.
+future policy mutation. Dashboard unlock sessions and the background session PIN
+cache now expire, and sensitive managed gates require fresher re-auth before
+history, rule-edit, viewing-space, or time-limit mutations.
 
 The current remote validation writer is deliberately still not a low-level
 profile mutation path. A valid newer `filtertube_managed_policy` envelope is

@@ -131,9 +131,10 @@ Current extension UI can now create or disable a profile-owned
 - `0` minutes is valid and stores an immediate-timeout policy for future
   runtime enforcement.
 - Child/protected active profiles cannot set, change, or disable time limits.
-- Writes use the same parent/account unlock gate used for viewing-space edits:
-  active child profiles are rejected, the active manager must be allowed to
-  manage the target profile, and the manager profile must be unlocked.
+- Writes use the same sensitive parent/account re-auth gate used for
+  viewing-space edits: active child profiles are rejected, the active manager
+  must be allowed to manage the target profile, and the manager profile must
+  have a fresh sensitive admin session.
 - Import/profile sanitation preserves only valid `filtertube_managed_time_limit`
   policies and drops malformed payloads.
 - Disabling a limit writes a disabled policy revision; disabled policy remains a

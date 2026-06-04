@@ -10,9 +10,9 @@ const docPath = 'docs/audit/FILTERTUBE_SECURITY_CRYPTO_PAYLOAD_BOUNDARY_CURRENT_
 
 const sourceFingerprints = {
   'js/security_manager.js': [198, 6374, '1fb1ec9c8339cbdad57107c5b596d893a025af68870ae7928083977a8d29ebd3'],
-  'js/background.js': [6641, 298986, '837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd'],
-  'js/io_manager.js': [2030, 96914, 'd04bfd75d061ee405c1dfa4cab8c9d0fa6a2f072d046add33e4b6782b1f58a21'],
-  'js/tab-view.js': [11617, 526763, '1b7f621d48d16247aecc4c7ee57cbc3db9efd3e597e6f0a4fc188228470648f7'],
+  'js/background.js': [6657, 299580, 'f05fe6f65f9de1218299374ac3c82dd6b6ae9e17e3d862926a20e6c2981c19c7'],
+  'js/io_manager.js': [2097, 100479, 'f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62'],
+  'js/tab-view.js': [12437, 564952, 'b7174155f23ee5b006a9f37be921a1aad0506030af56f96695710ac10d436066'],
   'js/popup.js': [1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a']
 };
 
@@ -57,16 +57,16 @@ const blockSpecs = {
     file: 'js/background.js',
     start: '    if (shouldEncrypt) {',
     end: '\n\n    const mode = typeof settings?.autoBackupMode',
-    startLine: 819,
-    lines: 19,
-    bytes: 678,
-    hash: '330f5c26b86b36df286f183f28aaa565aa5d3fa924d1fb1e01e957965fefda81'
+    startLine: 901,
+    lines: 21,
+    bytes: 803,
+    hash: '0f19dcb14b25fec0add42586fb91f54ff223b7324c0a852020e93310e5ec6e54'
   },
   ioExportV3Encrypted: {
     file: 'js/io_manager.js',
     start: '    async function exportV3Encrypted',
     end: '    async function importV3Encrypted',
-    startLine: 1729,
+    startLine: 1796,
     lines: 30,
     bytes: 1415,
     hash: '861997baefd50a8347f487b34383dc57628c73b3aadc3d122cdeea303480b7fc'
@@ -75,7 +75,7 @@ const blockSpecs = {
     file: 'js/io_manager.js',
     start: '    async function importV3Encrypted',
     end: '\n\n    // ============================================================================\n    // AUTO-BACKUP SYSTEM',
-    startLine: 1759,
+    startLine: 1826,
     lines: 13,
     bytes: 686,
     hash: '4d7589e51eb4c0bb622645a1dfbe912d61d5c9eb48cc5c16177de5fbd6bcc079'
@@ -84,7 +84,7 @@ const blockSpecs = {
     file: 'js/tab-view.js',
     start: '            if (safeObject(parsed?.meta).encrypted === true && parsed?.encrypted) {',
     end: '\n\n            let auth = null;',
-    startLine: 9299,
+    startLine: 10120,
     lines: 17,
     bytes: 890,
     hash: '8fbbe7a9da2d4e609eedcf2edd58d4d926b3439d8f087dd3de4e462b9cac6a56'
@@ -102,7 +102,7 @@ const blockSpecs = {
     file: 'js/tab-view.js',
     start: '    async function verifyPin(pin, verifier) {',
     end: '\n\n    async function ensureProfileUnlocked',
-    startLine: 8349,
+    startLine: 9126,
     lines: 7,
     bytes: 286,
     hash: '777e585119022de23e3c23f64689848b8327494e5ea11ae7c6273258f4794815'
@@ -397,7 +397,9 @@ test('caller blocks expect current security payload shape', () => {
   const popupPin = blockMetric(blockSpecs.popupVerifyPinWrapper).block;
   const tabPin = blockMetric(blockSpecs.tabVerifyPinWrapper).block;
 
-  assert.match(background, /const pin = sessionPinCache\.get\(activeId\) \|\| ''/);
+  assert.match(background, /const pinEntry = safeObject\(sessionPinCache\.get\(activeId\)\)/);
+  assert.match(background, /if \(!isSessionPinCacheEntryFresh\(pinEntry\)\)/);
+  assert.match(background, /const pin = pinEntry\.pin/);
   assert.match(background, /reason: 'missing_session_pin'/);
   assert.match(background, /typeof Security\.encryptJson !== 'function'/);
   assert.match(background, /const encrypted = await Security\.encryptJson\(payload, pin\)/);

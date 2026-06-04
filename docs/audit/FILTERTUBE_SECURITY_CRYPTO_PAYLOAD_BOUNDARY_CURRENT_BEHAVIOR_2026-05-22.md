@@ -22,9 +22,9 @@ tests/runtime/security-crypto-payload-boundary-current-behavior.test.mjs
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `js/security_manager.js` | 198 | 6,374 | `1fb1ec9c8339cbdad57107c5b596d893a025af68870ae7928083977a8d29ebd3` |
-| `js/background.js` | 6641 | 298986 | `837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd` |
-| `js/io_manager.js` | 2,030 | 96,914 | `d04bfd75d061ee405c1dfa4cab8c9d0fa6a2f072d046add33e4b6782b1f58a21` |
-| `js/tab-view.js` | 11,617 | 526,763 | `1b7f621d48d16247aecc4c7ee57cbc3db9efd3e597e6f0a4fc188228470648f7` |
+| `js/background.js` | 6,657 | 299,580 | `f05fe6f65f9de1218299374ac3c82dd6b6ae9e17e3d862926a20e6c2981c19c7` |
+| `js/io_manager.js` | 2,097 | 100,479 | `f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62` |
+| `js/tab-view.js` | 12,437 | 564,952 | `b7174155f23ee5b006a9f37be921a1aad0506030af56f96695710ac10d436066` |
 | `js/popup.js` | 1,841 | 75,587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 
 ## Source / Effect Blocks
@@ -35,12 +35,12 @@ tests/runtime/security-crypto-payload-boundary-current-behavior.test.mjs
 | `verifyPin` | `js/security_manager.js:112` | 112 | 13 | 620 | `eb642568bc033675ae2f945c7b02c1cc0c3dbbdf60db23caaf37d1c1821ca0c5` |
 | `encryptJson` | `js/security_manager.js:125` | 125 | 31 | 1,051 | `752dcf24ac84a9bc896b94e83745f7206f0b6289882f7328ff8a38003f1f1549` |
 | `decryptJson` | `js/security_manager.js:156` | 156 | 36 | 1,264 | `9a8659936cfea24b95bca95535311f083a098794863f5fbafd9477f575596c6a` |
-| `backgroundEncryptedAutoBackup` | `js/background.js:819` | 819 | 19 | 678 | `330f5c26b86b36df286f183f28aaa565aa5d3fa924d1fb1e01e957965fefda81` |
-| `ioExportV3Encrypted` | `js/io_manager.js:1729` | 1729 | 30 | 1,415 | `861997baefd50a8347f487b34383dc57628c73b3aadc3d122cdeea303480b7fc` |
-| `ioImportV3Encrypted` | `js/io_manager.js:1759` | 1759 | 13 | 686 | `4d7589e51eb4c0bb622645a1dfbe912d61d5c9eb48cc5c16177de5fbd6bcc079` |
-| `tabManualEncryptedDecrypt` | `js/tab-view.js:9299` | 9299 | 17 | 890 | `8fbbe7a9da2d4e609eedcf2edd58d4d926b3439d8f087dd3de4e462b9cac6a56` |
+| `backgroundEncryptedAutoBackup` | `js/background.js:901` | 901 | 21 | 803 | `0f19dcb14b25fec0add42586fb91f54ff223b7324c0a852020e93310e5ec6e54` |
+| `ioExportV3Encrypted` | `js/io_manager.js:1796` | 1796 | 30 | 1,415 | `861997baefd50a8347f487b34383dc57628c73b3aadc3d122cdeea303480b7fc` |
+| `ioImportV3Encrypted` | `js/io_manager.js:1826` | 1826 | 13 | 686 | `4d7589e51eb4c0bb622645a1dfbe912d61d5c9eb48cc5c16177de5fbd6bcc079` |
+| `tabManualEncryptedDecrypt` | `js/tab-view.js:10120` | 10120 | 17 | 890 | `8fbbe7a9da2d4e609eedcf2edd58d4d926b3439d8f087dd3de4e462b9cac6a56` |
 | `popupVerifyPinWrapper` | `js/popup.js:1226` | 1226 | 7 | 286 | `777e585119022de23e3c23f64689848b8327494e5ea11ae7c6273258f4794815` |
-| `tabVerifyPinWrapper` | `js/tab-view.js:8349` | 8349 | 7 | 286 | `777e585119022de23e3c23f64689848b8327494e5ea11ae7c6273258f4794815` |
+| `tabVerifyPinWrapper` | `js/tab-view.js:9126` | 9126 | 7 | 286 | `777e585119022de23e3c23f64689848b8327494e5ea11ae7c6273258f4794815` |
 
 ## Selected Token Counts
 
@@ -135,7 +135,7 @@ The deterministic encrypted JSON container for `{ "answer": 42, "rows":
 | PIN verification | `verifyPin()` accepts only `PBKDF2` and `SHA-256`, rejects missing/non-finite iteration data, derives 256 bits, and compares base64 strings with `got === expected`. | Runtime fixture proves correct PIN true, wrong PIN false, unsupported KDF false, and malformed iteration false. | String equality is a current timing boundary and cannot be changed without caller/UX/timing fixtures. |
 | Encrypted JSON container | `encryptJson()` emits `{ kdf, cipher, data }` with PBKDF2/SHA-256 and AES-GCM, 16-byte salt, 12-byte IV, `JSON.stringify(obj)`, and no associated data. | Runtime fixture executes deterministic salt/IV encryption and decrypts it back to the object. | The encrypted container has no version, payload type, profile/scope binding, associated-data policy, or payload-size budget. |
 | Malformed encrypted payloads | `decryptJson()` throws `Password required`, `Unsupported KDF`, `Unsupported cipher`, or `Invalid encrypted payload` before WebCrypto decrypt, while wrong passwords surface WebCrypto `OperationError`. | Runtime fixture captures each failure class. | Import/export and Nanah callers need one visible failure classification before UX or restore behavior changes. |
-| Background encrypted auto-backup | The encrypted auto-backup block requires a session PIN, requires `Security.encryptJson`, wraps the payload as `{ meta: { encrypted: true }, encrypted }`, and changes the extension to `encrypted.json`. | Source/effect block `backgroundEncryptedAutoBackup`. | Auto-backup encryption policy depends on session state and current container shape, not a shared encrypted payload manifest. |
+| Background encrypted auto-backup | The encrypted auto-backup block requires a TTL-checked session PIN, requires `Security.encryptJson`, wraps the payload as `{ meta: { encrypted: true }, encrypted }`, and changes the extension to `encrypted.json`. | Source/effect block `backgroundEncryptedAutoBackup`. | Auto-backup encryption policy depends on session state and current container shape, not a shared encrypted payload manifest. |
 | IO encrypted helpers | `exportV3Encrypted()` returns encrypted payload containers; `importV3Encrypted()` decrypts then delegates to `importV3()` without forwarding `targetProfileId`. | Source/effect blocks `ioExportV3Encrypted` and `ioImportV3Encrypted`. | Plain and encrypted imports can diverge on target profile, and decrypted payloads do not carry a cryptographic profile binding. |
 | Dashboard and popup PIN wrappers | Popup and dashboard wrappers delegate verification to `FilterTubeSecurity.verifyPin`; dashboard encrypted import decrypts via `FilterTubeSecurity.decryptJson`. | Source/effect blocks `popupVerifyPinWrapper`, `tabVerifyPinWrapper`, and `tabManualEncryptedDecrypt`. | UI surfaces assume the same global crypto payload API and need shared availability, error, and compatibility fixtures. |
 

@@ -24,7 +24,7 @@ StateManager row/settings mutations
         |       +--> optional post-block enrichment wait
         |       +--> createAutoBackupInBackground()
         |               +--> read settings/profiles/theme
-        |               +--> maybe encrypt with session PIN
+        |               +--> maybe encrypt with TTL-checked session PIN
         |               +--> browser downloads API
         |               +--> latest/history file policy
         |
@@ -61,21 +61,21 @@ Manual tab-view export/import
 | Surface | Current source | Audit meaning |
 | --- | --- | --- |
 | StateManager backup scheduler shim | `js/state_manager.js:25-43` | UI mutations schedule background backup through `FilterTube_ScheduleAutoBackup`, or fall back to `window.FilterTubeIO.scheduleAutoBackup`. |
-| Background auto-backup implementation | `js/background.js:680-902` | Background owns downloads API save, latest/history filename policy, optional encryption from session PIN, and delayed scheduling. |
-| Background schedule message | `js/background.js:3950-3960` | `FilterTube_ScheduleAutoBackup` accepts caller `triggerType`, `delay`, and `options` and schedules backup work. It is not currently guarded by the same trusted UI sender check as some direct whitelist/import paths. |
-| Background post-block wait | `js/background.js:904-918` | Channel-add backup triggers can wait for pending post-block enrichment before writing a backup. |
-| IO-manager auto-backup implementation | `js/io_manager.js:1755-1988` | IO manager owns a second auto-backup path with its own timer, directory probing, silent save, and rotation logic. |
-| IO-manager manual export/import authority | `js/io_manager.js:1128-1748` | Export/import owns profile scope, Master PIN checks, encrypted container handling, V4 writes, and Nanah trusted-state restore. |
-| Tab-view manual download/import UI | `js/tab-view.js:9049-9408` | Tab UI owns manual JSON downloads, Firefox anchor fallback, child/default gates, import prompts, and trusted Nanah restore choice. |
-| Auto-backup policy UI | `js/tab-view.js:3874-3908`, `10143-10232` | UI toggles backup mode/format directly in V4 profile settings and schedules another backup after the setting write. |
+| Background auto-backup implementation | `js/background.js:864-994` | Background owns downloads API save, latest/history filename policy, optional encryption from a TTL-checked session PIN, and delayed scheduling. |
+| Background schedule message | `js/background.js:4299-4309` | `FilterTube_ScheduleAutoBackup` accepts caller `triggerType`, `delay`, and `options` and schedules backup work. It is not currently guarded by the same trusted UI sender check as some direct whitelist/import paths. |
+| Background post-block wait | `js/background.js:994-1016` | Channel-add backup triggers can wait for pending post-block enrichment before writing a backup. |
+| IO-manager auto-backup implementation | `js/io_manager.js:1849-2097` | IO manager owns a second auto-backup path with its own timer, directory probing, silent save, and rotation logic. |
+| IO-manager manual export/import authority | `js/io_manager.js:1213-1838` | Export/import owns profile scope, Master PIN checks, encrypted container handling, V4 writes, and Nanah trusted-state restore. |
+| Tab-view manual download/import UI | `js/tab-view.js:9944-10270` | Tab UI owns manual JSON downloads, Firefox anchor fallback, child/default gates, import prompts, and trusted Nanah restore choice. |
+| Auto-backup policy UI | `js/tab-view.js:3921-3951`, `5091-5109` | UI toggles backup mode/format directly in V4 profile settings and schedules another backup after the setting write. |
 | Content-script channel add backup | `js/content_bridge.js:12754-12839` | Content bridge schedules `channel_added` backup after a successful background channel-add response, while the background handler can also schedule backup for the same mutation. |
 
 ## High-Confidence Findings
 
 1. **There are two auto-backup implementations.**
    Background and IO manager both implement scheduling and downloads. Background
-   can encrypt auto-backups when the active profile has a PIN and a session PIN
-   is cached; IO-manager auto-backup builds a plain V3 export and writes it
+   can encrypt auto-backups when the active profile has a PIN and a TTL-checked
+   session PIN is cached; IO-manager auto-backup builds a plain V3 export and writes it
    through its own downloads path.
 
 2. **`FilterTube_ScheduleAutoBackup` is a scheduling authority, not just a UI
@@ -99,7 +99,7 @@ Manual tab-view export/import
 
 5. **Background backup encryption depends on session state.**
    If `autoBackupFormat` is `encrypted`, or `auto` with a profile PIN, the
-   background path needs a cached session PIN. If no session PIN exists, it
+   background path needs a TTL-checked cached session PIN. If no session PIN exists, it
    returns a skipped `missing_session_pin` result instead of writing a backup.
 
 6. **IO-manager backup directory probing writes a test download.**
