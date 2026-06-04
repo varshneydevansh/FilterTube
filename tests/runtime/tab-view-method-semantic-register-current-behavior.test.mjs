@@ -68,7 +68,7 @@ function groupForLine(line) {
   if (line <= 12548) return 'managedRowsListModeRender';
   if (line <= 12905) return 'dashboardStatsFiltering';
   if (line <= 13357) return 'dateFilterHelpers';
-  if (line <= 13624) return 'navigationAndToasts';
+  if (line <= 13631) return 'navigationAndToasts';
   return 'UNCLASSIFIED';
 }
 
@@ -219,10 +219,10 @@ test('tab-view register pins source fingerprint and broad callable reconciliatio
   const text = doc();
 
   assert.deepEqual(stats, {
-    bytes: 628461,
-    sha256: '77f20044b7e6bddf0bf9b8a455f0d38f7018cffcde82c42ba9af1c4a3491b428',
-    splitLines: 13625,
-    wcLines: 13624
+    bytes: 628942,
+    sha256: '572c30cc72b123920342348827cab704a79083bb4b92e8ab57eceea8969a4de4',
+    splitLines: 13632,
+    wcLines: 13631
   });
   assert.equal(broadRows.length, 1008);
   assert.equal(controlArtifacts, 628);
@@ -238,10 +238,10 @@ test('tab-view register pins source fingerprint and broad callable reconciliatio
   });
 
   for (const expected of [
-    'source split lines: 13625',
-    'source wc -l: 13624',
-    'source bytes: 628461',
-    'source sha256: 77f20044b7e6bddf0bf9b8a455f0d38f7018cffcde82c42ba9af1c4a3491b428',
+    'source split lines: 13632',
+    'source wc -l: 13631',
+    'source bytes: 628942',
+    'source sha256: 572c30cc72b123920342348827cab704a79083bb4b92e8ab57eceea8969a4de4',
     'broad lexical callable matches: 1008',
     'accepted named declaration rows: 380',
     'semantic method rows promoted: 380',
@@ -265,26 +265,26 @@ test('tab-view register accounts for every current named declaration', () => {
   });
   assert.deepEqual(countBy(rows, 'group'), {
     dashboardStatsFiltering: 10,
-    dateFilterHelpers: 7,
+    dateFilterHelpers: 6,
     importExportDownload: 8,
     kidsFiltersContentControls: 18,
     lockNavigationAndSubscriptionFlow: 7,
     mainFiltersContentControls: 20,
-    managedRowsListModeRender: 15,
+    managedRowsListModeRender: 16,
     modalDialogHelpers: 7,
     nanahApplyProposalTransport: 17,
     nanahModeScopePolicyModal: 47,
     nanahSessionUiAndEnvelope: 11,
     nanahTargetProfileDevicePolicy: 37,
     nanahTrustedLinkStorage: 25,
-    navigationAndToasts: 3,
+    navigationAndToasts: 4,
     pinProfilesManager: 8,
     profileAccessAndManagedChild: 84,
     profileDropdownAndBackupControls: 11,
     responsiveNavigationShell: 3,
     routeIntentAndReleaseNotes: 4,
     runtimeMessagingBrowserTabs: 17,
-    settingsSyncAccountPolicyHandlers: 3,
+    settingsSyncAccountPolicyHandlers: 2,
     subscriptionsImportBridge: 18
   });
 

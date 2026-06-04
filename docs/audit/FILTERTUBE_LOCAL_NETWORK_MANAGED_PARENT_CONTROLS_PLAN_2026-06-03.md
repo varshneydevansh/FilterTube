@@ -438,8 +438,9 @@ replica child device over Nanah/P2P or same-network transport.
   expose an explicit Main/Kids rule-source picker, and Rule bundle expands into
   separate signed keyword/channel/video envelopes. The dashboard can now choose
   multiple eligible fixed targets on the connected replica and use the
-  per-target envelope batcher for that live same-replica send; active/full
-  sends, per-target ack/history, offline delivery, and richer viewing-space/time-limit
+  per-target envelope batcher for that live same-replica send. Redacted outbound
+  send history is present per trusted link/scope; active/full sends, per-target
+  accepted/rejected ack history, offline delivery, and richer viewing-space/time-limit
   or multi-device bulk outbound controls remain later slices.
 - **Acceptance Criteria**:
   - The public descriptor is separated from the private keypair.
@@ -469,10 +470,11 @@ replica child device over Nanah/P2P or same-network transport.
   Main/Kids rule-source picker, default from the active dashboard surface, and
   can source payloads from parent-managed child edit mode. Rule bundle expands
   into separate signed keyword/channel/video envelopes. Connected-replica
-  multi-target sends can choose eligible fixed targets before signing.
+  multi-target sends can choose eligible fixed targets before signing, and each
+  successful live send appends redacted outbound history to the trusted link.
   Active/full proposal sends, mailbox delivery, local-network delivery,
-  per-target ack/history, and richer viewing-space/time-limit or multi-device
-  bulk outbound controls remain pending.
+  per-target accepted/rejected ack history, and richer viewing-space/time-limit
+  or multi-device bulk outbound controls remain pending.
 - **Acceptance Criteria**:
   - Existing proposal sends still work for unsupported active/full scopes.
   - Signed sends require saved managed link, Source -> Replica roles, allowed
@@ -502,8 +504,9 @@ replica child device over Nanah/P2P or same-network transport.
   profiles on the same remote device. `buildEnvelopeBatchForTrustedLinks(...)`
   can build per-target signed envelope batches for explicit saved links, and
   the dashboard uses it for selected eligible fixed targets on the connected
-  replica. Mailbox/local-network fanout and per-target ack/history summary
-  remain pending.
+  replica. Redacted per-target outbound send history is now present;
+  mailbox/local-network fanout and accepted/rejected ack history summary remain
+  pending.
 - **Acceptance Criteria**:
   - The doc names the profile-scoped trusted-link behavior.
   - The doc requires device plus target-profile binding before multi-child

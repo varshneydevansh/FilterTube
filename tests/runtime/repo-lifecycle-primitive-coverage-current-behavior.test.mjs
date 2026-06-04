@@ -210,7 +210,7 @@ test('every tracked JS JSX and MJS file is lifecycle-classified', () => {
 test('repo-wide lifecycle primitive totals match current tracked source', () => {
   const { totals } = aggregate();
   assert.deepEqual(totals, {
-    addEventListener: 300,
+    addEventListener: 301,
     removeEventListener: 18,
     mutationObserver: 16,
     intersectionObserver: 4,
@@ -229,8 +229,8 @@ test('repo-wide lifecycle primitive totals match current tracked source', () => 
     styleDisplay: 96,
     classListMutation: 110
   });
-  assert.equal(Object.values(totals).reduce((sum, value) => sum + value, 0), 889);
-  assert.match(coverageDoc, /\*\*Total\*\* \| \*\*889\*\*/);
+  assert.equal(Object.values(totals).reduce((sum, value) => sum + value, 0), 890);
+  assert.match(coverageDoc, /\*\*Total\*\* \| \*\*890\*\*/);
 });
 
 test('lifecycle primitive family totals pin page runtime UI website vendor and quarantine burden', () => {
@@ -241,7 +241,7 @@ test('lifecycle primitive family totals pin page runtime UI website vendor and q
   assert.deepEqual(familyTotals, {
     'build-release-sync-scripts': 0,
     'content-runtime-js': 389,
-    'extension-ui-background-js': 420,
+    'extension-ui-background-js': 421,
     'generated-ui-output': 8,
     'generated-ui-source': 2,
     'quarantined-legacy-js': 37,
@@ -259,7 +259,7 @@ test('lifecycle primitive family totals pin page runtime UI website vendor and q
 
 test('hot lifecycle files and teardown imbalance are documented as current audit findings', () => {
   const { perFile, totals } = aggregate();
-  assert.equal(perFile['js/tab-view.js'].total, 273);
+  assert.equal(perFile['js/tab-view.js'].total, 274);
   assert.equal(perFile['js/content_bridge.js'].total, 165);
   assert.equal(perFile['js/content/block_channel.js'].total, 81);
   assert.equal(perFile['js/layout.js'].total, 37);

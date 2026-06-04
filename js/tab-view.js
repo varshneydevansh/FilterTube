@@ -11680,7 +11680,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 signedEnvelope.linkId,
                                 signedEnvelope.scope,
                                 signedEnvelope.revision,
-                                signedEnvelope.policyHash
+                                signedEnvelope.policyHash,
+                                {
+                                    targetProfileId: signedEnvelope.targetProfileId,
+                                    targetProfileName: signedEnvelope.targetProfileName,
+                                    sourceProfileId: signedEnvelope.sourceProfileId,
+                                    sourceDeviceId: signedEnvelope.sourceDeviceId,
+                                    issuedAt: signedEnvelope.issuedAt
+                                }
                             );
                         }
                         const sentScopes = Array.from(new Set(signedEnvelopes.map((envelope) => getNanahScopeLabel(envelope.scope)))).join(', ');

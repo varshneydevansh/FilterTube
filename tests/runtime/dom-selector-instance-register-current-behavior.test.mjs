@@ -291,21 +291,21 @@ test('DOM selector instance register enumerates current API sites and literal dy
   const dynamicRows = rows.filter(row => !row.isStaticLiteral);
   const uniqueStatic = new Set(staticRows.map(row => row.selector));
 
-  assert.equal(rows.length, 652);
-  assert.equal(staticRows.length, 581);
+  assert.equal(rows.length, 656);
+  assert.equal(staticRows.length, 585);
   assert.equal(dynamicRows.length, 71);
-  assert.equal(uniqueStatic.size, 376);
+  assert.equal(uniqueStatic.size, 378);
   assert.deepEqual(countBy(rows, 'api'), {
     closest: 96,
     matches: 6,
-    querySelector: 399,
-    querySelectorAll: 151
+    querySelector: 402,
+    querySelectorAll: 152
   });
   assert.deepEqual(countBy(staticRows, 'api'), {
     closest: 93,
     matches: 5,
-    querySelector: 375,
-    querySelectorAll: 108
+    querySelector: 378,
+    querySelectorAll: 109
   });
 });
 
@@ -329,16 +329,16 @@ test('selector source-family totals match the current register doc', () => {
   const doc = read(registerPath);
 
   assert.deepEqual(countStaticDynamic(rows, 'sourceFamily'), {
-    'extension-ui': { sites: 90, static: 90, dynamic: 0, unique: 42 },
+    'extension-ui': { sites: 94, static: 94, dynamic: 0, unique: 44 },
     'legacy-layout': { sites: 63, static: 63, dynamic: 0, unique: 52 },
     'page-runtime': { sites: 499, static: 428, dynamic: 71, unique: 288 }
   });
 
   for (const phrase of [
     '| `page-runtime` | 499 | 428 | 71 | 288 |',
-    '| `extension-ui` | 90 | 90 | 0 | 42 |',
+    '| `extension-ui` | 94 | 94 | 0 | 44 |',
     '| `legacy-layout` | 63 | 63 | 0 | 52 |',
-    '| **Total** | **652** | **581** | **71** |'
+    '| **Total** | **656** | **585** | **71** |'
   ]) {
     assert.ok(doc.includes(phrase), `missing doc phrase ${phrase}`);
   }
@@ -362,7 +362,7 @@ test('selector hot-file totals match the source-derived register', () => {
       'js/injector.js': { sites: 6, static: 5, dynamic: 1, unique: 5 },
       'js/layout.js': { sites: 63, static: 63, dynamic: 0, unique: 52 },
       'js/popup.js': { sites: 16, static: 16, dynamic: 0, unique: 7 },
-      'js/tab-view.js': { sites: 68, static: 68, dynamic: 0, unique: 33 },
+      'js/tab-view.js': { sites: 72, static: 72, dynamic: 0, unique: 35 },
       'js/ui_components.js': { sites: 6, static: 6, dynamic: 0, unique: 6 }
     }
   );

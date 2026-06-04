@@ -37,7 +37,7 @@ covered by the CSS load/style surface and style-hide authority audits.
 | `js/ui-shell/popup-shell.js` | generated popup shell output | 374 | 21,080 | `dc750d44dd4b9fde63b85b4dfc9f5ce9ba76964afbd6dfcedc7b3b7cce084b05` |
 | `js/ui-shell/tab-view-decor.js` | generated dashboard ambient output | 323 | 18,289 | `234171091e523aa5de4c3c0f97e7341c55893bdd31b3e25a075490170fa9742f` |
 | `js/popup.js` | hand-owned popup runtime | 1,841 | 75,587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
-| `js/tab-view.js` | hand-owned dashboard runtime | 13,624 | 628,461 | `77f20044b7e6bddf0bf9b8a455f0d38f7018cffcde82c42ba9af1c4a3491b428` |
+| `js/tab-view.js` | hand-owned dashboard runtime | 13,631 | 628,942 | `572c30cc72b123920342348827cab704a79083bb4b92e8ab57eceea8969a4de4` |
 
 ## Active CSS State Counters
 
@@ -140,9 +140,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 71
-method semantic proof gap lexical callables covered: 6072
+method semantic proof gap lexical callables covered: 6073
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6072
+lexical callables requiring semantic proof before behavior changes: 6073
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

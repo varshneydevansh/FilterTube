@@ -27,13 +27,13 @@ safe, or complete for every YouTube renderer.
 
 | Selector API | Current call sites | Static literal args | Dynamic/non-literal args |
 | --- | ---: | ---: | ---: |
-| `querySelectorAll()` | 151 | 108 | 43 |
-| `querySelector()` | 399 | 375 | 24 |
+| `querySelectorAll()` | 152 | 109 | 43 |
+| `querySelector()` | 402 | 378 | 24 |
 | `closest()` | 96 | 93 | 3 |
 | `matches()` | 6 | 5 | 1 |
-| **Total** | **652** | **581** | **71** |
+| **Total** | **656** | **585** | **71** |
 
-The 581 static literal argument sites contain 376 unique literal selector
+The 585 static literal argument sites contain 378 unique literal selector
 strings. The 71 dynamic selector expressions include constants and assembled
 selectors such as `VIDEO_CARD_SELECTORS`, `QUICK_BLOCK_CARD_SELECTORS`,
 `FT_DROPDOWN_SELECTORS`, `linkSelectors`, `selectors.join(',')`, and template
@@ -44,7 +44,7 @@ selectors using runtime ids.
 | Source family | Selector API sites | Static literal args | Dynamic/non-literal args | Unique static selector literals |
 | --- | ---: | ---: | ---: | ---: |
 | `page-runtime` | 499 | 428 | 71 | 288 |
-| `extension-ui` | 90 | 90 | 0 | 42 |
+| `extension-ui` | 94 | 94 | 0 | 44 |
 | `legacy-layout` | 63 | 63 | 0 | 52 |
 
 ## Hottest Selector Files
@@ -53,7 +53,7 @@ selectors using runtime ids.
 | --- | ---: | ---: | ---: | --- |
 | `js/content_bridge.js` | 246 | 208 | 38 | Native menu, fallback menu, prefetch, identity, collaborator, dynamic video-id selectors, and optimistic hide selectors share one large bridge. |
 | `js/content/dom_fallback.js` | 163 | 151 | 12 | Global card scans, route cleanup, comments, watch controls, members/playlist/Mix hides, and shelf cleanup. |
-| `js/tab-view.js` | 68 | 68 | 0 | Dashboard UI settings/profile/import/Nanah selectors. |
+| `js/tab-view.js` | 72 | 72 | 0 | Dashboard UI settings/profile/import/Nanah selectors, including managed live-send history/navigation plumbing. |
 | `js/layout.js` | 63 | 63 | 0 | Legacy/support layout selector surface; not active content-runtime authority unless explicitly loaded. |
 | `js/content/block_channel.js` | 39 | 28 | 11 | Quick-block and 3-dot menu selectors, including broad constants and overlay/menu constants. |
 | `js/content/dom_extractors.js` | 27 | 23 | 4 | Shared video-card/title/channel selectors and global `VIDEO_CARD_SELECTORS` usage. |
@@ -172,9 +172,9 @@ runtime behavior changed by this addendum: no
 
 | Finding | Evidence | Risk |
 | --- | --- | --- |
-| Selector authority is not centralized. | 652 selector API call sites across 13 non-vendor tracked files and no product `selectorAuthority` token. | A cleanup can narrow one selector path while another broad path still targets the same DOM. |
-| Page runtime dominates selector risk. | Page-runtime owns 499 of 652 selector API sites and all 71 dynamic selector expressions. | Empty-install lag, false hides, and route drift are mostly page-runtime selector risks. |
-| Static selector literals are numerous. | 581 literal selector-argument sites and 376 unique literal selector strings. | A broad edit needs a source-derived register, not manual memory of a few constants. |
+| Selector authority is not centralized. | 656 selector API call sites across 13 non-vendor tracked files and no product `selectorAuthority` token. | A cleanup can narrow one selector path while another broad path still targets the same DOM. |
+| Page runtime dominates selector risk. | Page-runtime owns 499 of 656 selector API sites and all 71 dynamic selector expressions. | Empty-install lag, false hides, and route drift are mostly page-runtime selector risks. |
+| Static selector literals are numerous. | 585 literal selector-argument sites and 378 unique literal selector strings. | A broad edit needs a source-derived register, not manual memory of a few constants. |
 | Dynamic selectors need ownership proof. | 71 sites use constants, joined arrays, runtime templates, virtual selector wrappers, or caller-provided selector variables. | These cannot be proven safe by static literal review alone. |
 | Inventory docs remain evidence maps. | `docs/youtube_renderer_inventory.md`, `docs/json_paths_encyclopedia.md`, and ignored root captures inform fixtures but are not selector authority. | A documented DOM tag is not proof that current runtime selects it safely. |
 

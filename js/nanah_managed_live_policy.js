@@ -14,6 +14,8 @@
     const MANAGED_LIVE_BUNDLE_SCOPES = {
         rules_bundle: ['keywords', 'channels', 'videos']
     };
+    const MANAGED_OUTBOUND_HISTORY_SCHEMA = 'filtertube_managed_outbound_policy_history';
+    const MANAGED_OUTBOUND_HISTORY_LIMIT = 50;
 
     function create(deps = {}) {
         const normalizeString = deps.normalizeString;
@@ -328,13 +330,61 @@
             return envelopes;
         }
 
-        async function markSent(linkId, scope, revision, policyHash) {
+        function buildOutboundHistoryRow(trustedLink, scope, revision, policyHash, options = {}) {
+            const trusted = deps.normalizeTrustedLink(trustedLink);
+            const policy = safeObject(trusted?.policy);
+            const optionRoot = safeObject(options);
+            const now = normalizeNonNegativeInteger(optionRoot.sentAt) || deps.now();
+            const normalizedScope = normalizeScope(scope);
+            const sourceProfile = deps.getLocalProfileContext();
+            const targetProfileId = normalizeString(optionRoot.targetProfileId)
+                || normalizeString(policy.targetProfileId);
+            return {
+                rowId: `managed-outbound-${normalizeString(trusted?.linkId)}-${normalizedScope}-${revision}-${now}`,
+                schema: MANAGED_OUTBOUND_HISTORY_SCHEMA,
+                version: 1,
+                trustedLinkId: normalizeString(trusted?.linkId),
+                actionType: 'remote_policy.live_send',
+                scope: normalizedScope,
+                revision,
+                policyHash: normalizeString(policyHash),
+                result: 'sent',
+                reason: null,
+                targetProfileId,
+                targetProfileName: normalizeString(optionRoot.targetProfileName)
+                    || normalizeString(policy.targetProfileName),
+                sourceProfileId: normalizeString(optionRoot.sourceProfileId)
+                    || normalizeString(sourceProfile.profileId),
+                sourceDeviceId: normalizeString(optionRoot.sourceDeviceId)
+                    || normalizeString(deps.getStableDeviceId()),
+                issuedAt: normalizeNonNegativeInteger(optionRoot.issuedAt) || now,
+                sentAt: now,
+                summary: {
+                    redacted: true,
+                    label: 'Sent signed managed policy',
+                    delivery: 'live_nanah_session'
+                },
+                sensitive: true
+            };
+        }
+
+        async function markSent(linkId, scope, revision, policyHash, options = {}) {
             const normalizedLinkId = normalizeString(linkId);
             const normalizedScope = normalizeScope(scope);
             if (!normalizedLinkId || !normalizedScope || !Number.isInteger(revision) || !normalizeString(policyHash)) return false;
             const trusted = deps.normalizeTrustedLink(deps.findTrustedLinkById(normalizedLinkId));
             if (!trusted) return false;
-            const outgoing = safeObject(safeObject(trusted.policy).outgoingManagedPolicies);
+            const policy = safeObject(trusted.policy);
+            const outgoing = safeObject(policy.outgoingManagedPolicies);
+            const sentAt = deps.now();
+            const historyRows = Array.isArray(policy.outboundManagedPolicyHistory)
+                ? policy.outboundManagedPolicyHistory
+                    .filter((row) => safeObject(row).schema === MANAGED_OUTBOUND_HISTORY_SCHEMA)
+                : [];
+            const historyRow = buildOutboundHistoryRow(trusted, normalizedScope, revision, policyHash, {
+                ...safeObject(options),
+                sentAt
+            });
             return deps.updateTrustedLinkPolicy(normalizedLinkId, {
                 policy: {
                     outgoingManagedPolicies: {
@@ -342,9 +392,10 @@
                         [normalizedScope]: {
                             revision,
                             policyHash,
-                            sentAt: deps.now()
+                            sentAt
                         }
-                    }
+                    },
+                    outboundManagedPolicyHistory: [...historyRows, historyRow].slice(-MANAGED_OUTBOUND_HISTORY_LIMIT)
                 }
             });
         }
@@ -356,6 +407,7 @@
             buildEnvelopeForLiveSend,
             buildEnvelopeBatchForLiveSend,
             buildEnvelopeBatchForTrustedLinks,
+            buildOutboundHistoryRow,
             markSent
         };
     }

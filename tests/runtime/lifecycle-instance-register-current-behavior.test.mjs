@@ -2220,10 +2220,10 @@ test('lifecycle instance register enumerates every current observer listener tim
   const ids = new Set(rows.map(row => row.id));
   const doc = read(registerPath);
 
-  assert.equal(rows.length, 540);
+  assert.equal(rows.length, 541);
   assert.equal(ids.size, rows.length, 'file:line:family lifecycle instance ids must be unique');
   assert.deepEqual(countBy(rows, 'family'), {
-    addEventListener: 300,
+    addEventListener: 301,
     cancelAnimationFrame: 4,
     clearInterval: 5,
     clearTimeout: 34,
@@ -2235,12 +2235,12 @@ test('lifecycle instance register enumerates every current observer listener tim
     setTimeout: 124
   });
 
-  assert.equal(addListenerOptionRows.length, 300);
+  assert.equal(addListenerOptionRows.length, 301);
   assert.deepEqual(countBy(addListenerOptionRows, 'optionKind'), {
     'boolean-false-bubble': 1,
     'boolean-true-capture': 28,
     'expression-or-identifier': 2,
-    'no-third-argument': 239,
+    'no-third-argument': 240,
     'object-capture-true': 1,
     'object-once-true': 7,
     'object-passive-true': 16,
@@ -2258,9 +2258,9 @@ test('lifecycle instance register enumerates every current observer listener tim
       'object-passive-true+capture-true': 6
     },
     'extension-ui-background-js': {
-      total: 204,
+      total: 205,
       'boolean-true-capture': 2,
-      'no-third-argument': 202
+      'no-third-argument': 203
     },
     'generated-ui-output': {
       total: 2,
@@ -2277,11 +2277,11 @@ test('lifecycle instance register enumerates every current observer listener tim
     }
   });
 
-  assert.equal(addListenerEventRows.length, 300);
+  assert.equal(addListenerEventRows.length, 301);
   assert.deepEqual(countBy(addListenerEventRows, 'eventKind'), {
     DOMContentLoaded: 8,
     blur: 1,
-    change: 57,
+    change: 58,
     click: 117,
     close: 2,
     ended: 1,
@@ -2343,10 +2343,10 @@ test('lifecycle instance register enumerates every current observer listener tim
       'yt-page-data-updated': 1
     },
     'extension-ui-background-js': {
-      total: 204,
+      total: 205,
       DOMContentLoaded: 2,
       blur: 1,
-      change: 54,
+      change: 55,
       click: 101,
       focus: 2,
       hashchange: 1,
@@ -2378,11 +2378,11 @@ test('lifecycle instance register enumerates every current observer listener tim
     }
   });
 
-  assert.equal(addListenerTargetRows.length, 300);
+  assert.equal(addListenerTargetRows.length, 301);
   assert.deepEqual(countBy(addListenerTargetRows, 'targetKind'), {
     document: 41,
     'generated-shell-node': 2,
-    'local-element-reference': 208,
+    'local-element-reference': 209,
     'optional-local-element-reference': 17,
     'vendor-transport-reference': 8,
     window: 24
@@ -2395,9 +2395,9 @@ test('lifecycle instance register enumerates every current observer listener tim
       window: 15
     },
     'extension-ui-background-js': {
-      total: 204,
+      total: 205,
       document: 6,
-      'local-element-reference': 174,
+      'local-element-reference': 175,
       'optional-local-element-reference': 17,
       window: 7
     },
@@ -2417,7 +2417,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     }
   });
 
-  assert.equal(addListenerEventTargetRows.length, 300);
+  assert.equal(addListenerEventTargetRows.length, 301);
   assert.deepEqual(countAddEventTargetEvents(addListenerEventTargetRows), {
     document: {
       total: 41,
@@ -2442,9 +2442,9 @@ test('lifecycle instance register enumerates every current observer listener tim
       'nonliteral-event': 2
     },
     'local-element-reference': {
-      total: 208,
+      total: 209,
       blur: 1,
-      change: 42,
+      change: 43,
       click: 107,
       focus: 2,
       focusin: 3,
@@ -2552,7 +2552,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     windowScrollResizeOrientation: 9,
     windowStorageVisibility: 1,
     localClick: 107,
-    localChangeInputKeydown: 70,
+    localChangeInputKeydown: 71,
     optionalLocalClick: 0,
     vendorTransportLifecycle: 8,
     generatedShellNonliteral: 2
@@ -2817,10 +2817,10 @@ test('lifecycle instance register enumerates every current observer listener tim
     'transient-popover-remove': 1
   });
 
-  assert.equal(addListenerCallbackRows.length, 300);
+  assert.equal(addListenerCallbackRows.length, 301);
   assert.deepEqual(countBy(addListenerCallbackRows, 'callbackKind'), {
     'identifier-callback-reference': 42,
-    'inline-arrow-callback': 255,
+    'inline-arrow-callback': 256,
     'member-callback-reference': 1,
     'other-callback-expression': 2
   });
@@ -2832,9 +2832,9 @@ test('lifecycle instance register enumerates every current observer listener tim
       'member-callback-reference': 1
     },
     'extension-ui-background-js': {
-      total: 204,
+      total: 205,
       'identifier-callback-reference': 12,
-      'inline-arrow-callback': 192
+      'inline-arrow-callback': 193
     },
     'generated-ui-output': {
       total: 2,
@@ -2850,7 +2850,7 @@ test('lifecycle instance register enumerates every current observer listener tim
     }
   });
 
-  assert.equal(listenerAddRows.length, 300);
+  assert.equal(listenerAddRows.length, 301);
   assert.equal(listenerRemoveRows.length, 18);
   assert.deepEqual(countBy(listenerRemoveRows, 'targetKind'), {
     document: 7,
@@ -2894,9 +2894,9 @@ test('lifecycle instance register enumerates every current observer listener tim
       delta: 70
     },
     'extension-ui-background-js': {
-      add: 204,
+      add: 205,
       remove: 0,
-      delta: 204
+      delta: 205
     },
     'generated-ui-output': {
       add: 2,
@@ -2915,13 +2915,13 @@ test('lifecycle instance register enumerates every current observer listener tim
     }
   });
   assert.deepEqual(listenerAddRemoveRiskGaps, {
-    installMinusRemove: 282,
+    installMinusRemove: 283,
     captureEquivalentRemovePairs: 18,
     exactOptionShapeRemovePairs: 17,
     captureEquivalentOptionShapeMismatchPairs: 1,
     unmatchedRemoveRows: 0,
     pageGlobalListenerInstallsWithoutExplicitRemove: 51,
-    inlineListenerInstallsWithoutRemoveHandle: 255
+    inlineListenerInstallsWithoutRemoveHandle: 256
   });
 
   assert.equal(observerConstructorRows.length, 20);
@@ -4674,19 +4674,19 @@ test('lifecycle instance source-family totals match the current register doc', (
 
   assert.deepEqual(countBy(rows, 'sourceFamily'), {
     'content-runtime-js': 231,
-    'extension-ui-background-js': 274,
+    'extension-ui-background-js': 275,
     'generated-ui-output': 4,
     'vendor-bundles': 8,
     'website-components': 23
   });
 
   for (const phrase of [
-    '| `extension-ui-background-js` | 274 |',
+    '| `extension-ui-background-js` | 275 |',
     '| `content-runtime-js` | 231 |',
     '| `website-components` | 23 |',
     '| `vendor-bundles` | 8 |',
     '| `generated-ui-output` | 4 |',
-    '| **Total lifecycle instances** | **540** |'
+    '| **Total lifecycle instances** | **541** |'
   ]) {
     assert.ok(doc.includes(phrase), `missing doc phrase ${phrase}`);
   }
@@ -4702,7 +4702,7 @@ test('lifecycle instance hot files remain pinned before cleanup work', () => {
     return acc;
   }, {});
 
-  assert.equal(byFile['js/tab-view.js'], 183);
+  assert.equal(byFile['js/tab-view.js'], 184);
   assert.equal(byFile['js/content_bridge.js'], 91);
   assert.equal(byFile['js/content/block_channel.js'], 71);
   assert.equal(byFile['js/popup.js'], 33);
@@ -4713,17 +4713,17 @@ test('lifecycle instance hot files remain pinned before cleanup work', () => {
   assert.equal(byFile['js/content/bridge_settings.js'], 22);
   assert.equal(byFile['js/render_engine.js'], 9);
 
-  assert.match(doc, /`js\/tab-view\.js` \| 182/);
+  assert.match(doc, /`js\/tab-view\.js` \| 184/);
   assert.match(doc, /`js\/content_bridge\.js` \| 91/);
   assert.match(doc, /`js\/content\/block_channel\.js` \| 71/);
 
   assert.deepEqual(roleCounts, {
     'explicit-teardown': 61,
-    'install-or-schedule': 479
+    'install-or-schedule': 480
   });
   assert.deepEqual(countInstallTeardownBySourceFamily(rows), {
     'content-runtime-js': { install: 196, teardown: 35, total: 231 },
-    'extension-ui-background-js': { install: 260, teardown: 14, total: 274 },
+    'extension-ui-background-js': { install: 261, teardown: 14, total: 275 },
     'generated-ui-output': { install: 2, teardown: 2, total: 4 },
     'vendor-bundles': { install: 8, teardown: 0, total: 8 },
     'website-components': { install: 13, teardown: 10, total: 23 }
@@ -4731,16 +4731,16 @@ test('lifecycle instance hot files remain pinned before cleanup work', () => {
 
   for (const phrase of [
     'Install/Teardown Imbalance Addendum - 2026-05-27',
-    '| `install-or-schedule` | `addEventListener`, `MutationObserver`, `IntersectionObserver`, `setInterval`, `setTimeout`, `requestAnimationFrame` | 479 |',
+    '| `install-or-schedule` | `addEventListener`, `MutationObserver`, `IntersectionObserver`, `setInterval`, `setTimeout`, `requestAnimationFrame` | 480 |',
     '| `explicit-teardown` | `removeEventListener`, `clearInterval`, `clearTimeout`, `cancelAnimationFrame` | 61 |',
-    '| `extension-ui-background-js` | 260 | 14 | 274 |',
+    '| `extension-ui-background-js` | 261 | 14 | 275 |',
     '| `content-runtime-js` | 196 | 35 | 231 |',
     '| `vendor-bundles` | 8 | 0 | 8 |',
     '| `website-components` | 13 | 10 | 23 |',
     '| `generated-ui-output` | 2 | 2 | 4 |',
-    'install-or-schedule lifecycle instances: 478',
+    'install-or-schedule lifecycle instances: 480',
     'explicit-teardown lifecycle instances: 61',
-    'install-to-teardown ratio: 7.8:1',
+    'install-to-teardown ratio: 7.9:1',
     'shared lifecycle registry in product source: absent',
     'lifecycle cleanup approval from imbalance addendum: NO-GO',
     'runtime behavior changed by this addendum: no'

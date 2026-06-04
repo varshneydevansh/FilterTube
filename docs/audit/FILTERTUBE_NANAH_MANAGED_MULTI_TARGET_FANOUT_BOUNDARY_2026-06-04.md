@@ -2,9 +2,9 @@
 
 **Generated**: 2026-06-04
 **Status**: Profile-scoped identity foundation present; connected-device target
-chooser and live same-replica fanout send loop present. Boundary contract still
-active for per-target ack/history, mailbox delivery, local-network delivery, and
-offline later delivery.
+chooser, live same-replica fanout send loop, and redacted per-target outbound
+send history present. Boundary contract still active for accepted/rejected ack
+history, mailbox delivery, local-network delivery, and offline later delivery.
 **Related live-send proof**:
 `docs/audit/FILTERTUBE_NANAH_MANAGED_LIVE_SIGNED_SEND_2026-06-04.md`
 **Related plan**:
@@ -26,9 +26,9 @@ are eligible for the selected scope.
 
 The runtime still must not claim offline or cross-device fanout. A live Nanah
 data channel reaches the current remote session only. Other saved devices need a
-future encrypted mailbox or local-network provider, and per-target ack/history
-is still pending before a parent gets a complete accepted/rejected delivery
-ledger.
+future encrypted mailbox or local-network provider. Source-side outbound send
+history is present, but per-target accepted/rejected ack history is still
+pending before a parent gets a complete applied/rejected delivery ledger.
 
 ## Current Runtime Evidence
 
@@ -88,7 +88,11 @@ buildEnvelopeBatchForTrustedLinks(policy, trustedLinks)
   -> signs each envelope with its own linkId, targetProfileId, scope,
      revision, hash, and integrity binding
   -> is now used by the dashboard for selected targets on the connected replica
-  -> does not record per-target ack/history
+
+markSent(linkId, scope, revision, policyHash, options)
+  -> records last sent revision/hash per link and scope
+  -> appends one redacted outbound history row per sent envelope
+  -> does not claim remote accepted/rejected apply status
 ```
 
 That is correct for single-target signed sends and for storing multiple fixed
@@ -139,7 +143,8 @@ flowchart TD
   H -->|Yes| I["Send sequentially over live session"]
   H -->|No| J["Future encrypted mailbox/local-network delivery"]
   I --> K["Record sent revision/hash per link"]
-  J --> L["Pending: protected per-target ack/history"]
+  K --> L["Append redacted outbound send history"]
+  J --> M["Pending: protected accepted/rejected ack history"]
 ```
 
 ASCII boundary:
@@ -172,7 +177,9 @@ The parent-facing UI should stay simple:
 - Each envelope must carry its own `targetProfileId`, `linkId`, revision, hash,
   and signature.
 - Mark-sent state must be stored per target link and scope.
-- Ack/status history must be per target, not a single bulk success toast.
+- Outbound send history must be per target, not a single bulk success toast.
+- Accepted/rejected ack history must also be per target before claiming applied
+  delivery status.
 - Missing, ambiguous, revoked, stale, or wrong-scope links must reject before
   any low-level apply path.
 
@@ -184,14 +191,15 @@ runtime connected-device multi-target chooser: present
 runtime signed fanout envelope builder: present
 runtime signed fanout send loop: present for selected targets on the connected replica only
 runtime per-target mark-sent state: present per envelope linkId/scope
-runtime per-target ack/history summary: absent
+runtime per-target outbound send history: present
+runtime per-target accepted/rejected ack history: absent
 runtime mailbox/local-network fanout delivery: absent
 ```
 
 Runtime behavior changed by this proof: yes, the dashboard can now choose
 multiple saved fixed-profile targets on the connected replica and send signed
 managed envelopes for each selected link. Offline device fanout, local-network
-fanout, and protected per-target ack/history remain pending.
+fanout, and protected per-target accepted/rejected ack history remain pending.
 
 ## Proof Commands
 

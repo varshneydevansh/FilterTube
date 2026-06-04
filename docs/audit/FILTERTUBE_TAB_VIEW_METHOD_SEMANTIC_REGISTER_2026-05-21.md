@@ -19,10 +19,10 @@ navigation, lock, or list-mode behavior changes.
 
 ```text
 source file: js/tab-view.js
-source split lines: 13625
-source wc -l: 13624
-source bytes: 628461
-source sha256: 77f20044b7e6bddf0bf9b8a455f0d38f7018cffcde82c42ba9af1c4a3491b428
+source split lines: 13632
+source wc -l: 13631
+source bytes: 628942
+source sha256: 572c30cc72b123920342348827cab704a79083bb4b92e8ab57eceea8969a4de4
 broad lexical callable matches: 1008
 named declarations: 380
 plain function declarations: 259
@@ -66,26 +66,26 @@ runtime behavior changed: profile-scoped Nanah managed trusted-link lookup, stor
 
 ```text
 dashboardStatsFiltering: 10
-dateFilterHelpers: 7
+dateFilterHelpers: 6
 importExportDownload: 8
 kidsFiltersContentControls: 18
 lockNavigationAndSubscriptionFlow: 7
 mainFiltersContentControls: 20
-managedRowsListModeRender: 15
+managedRowsListModeRender: 16
 modalDialogHelpers: 7
 nanahApplyProposalTransport: 17
 nanahModeScopePolicyModal: 47
 nanahSessionUiAndEnvelope: 11
 nanahTargetProfileDevicePolicy: 37
 nanahTrustedLinkStorage: 25
-navigationAndToasts: 3
+navigationAndToasts: 4
 pinProfilesManager: 8
 profileAccessAndManagedChild: 84
 profileDropdownAndBackupControls: 11
 responsiveNavigationShell: 3
 routeIntentAndReleaseNotes: 4
 runtimeMessagingBrowserTabs: 17
-settingsSyncAccountPolicyHandlers: 3
+settingsSyncAccountPolicyHandlers: 2
 subscriptionsImportBridge: 18
 ```
 
@@ -110,11 +110,11 @@ subscriptionsImportBridge: 18
 | `nanahApplyProposalTransport` | 17 | Applies incoming envelopes, builds/attaches proposal policy, handles proposal decisions, creates clients, trusts devices, and confirms subscription-import mode. | Apply mutation plan, profile target proof, trusted reconnect approval, transport failure fixtures, and post-apply refresh proof. |
 | `pinProfilesManager` | 8 | Verifies PINs, unlocks profiles/admin, renders profile manager and profile selector, refreshes profiles, and switches active profile. | PIN/session boundary, active profile revision, profile switch rollback, and locked-profile negative fixtures. |
 | `importExportDownload` | 8 | Exports/imports V3 JSON/encrypted backups, downloads through anchors, revokes blob URLs, and reloads UI after imports. | Import dry-run mutation plan, encrypted target policy, download cleanup proof, and failed-import rollback. |
-| `settingsSyncAccountPolicyHandlers` | 3 | Persists account policy and derives generated account/child ids from UI input. | Account creation policy proof, conflict handling, and locked-profile negatives. |
-| `managedRowsListModeRender` | 15 | Adds/removes/toggles managed child rows, renders Main/Kids lists through `RenderEngine`, applies date filters, and sends list-mode runtime messages. | Row-action mutation report, Main/Kids list-mode parity, copy/transfer proof, RenderEngine callback contract, and whitelist empty-state fixtures. |
+| `settingsSyncAccountPolicyHandlers` | 2 | Persists account policy and derives generated account/child ids from UI input. | Account creation policy proof, conflict handling, and locked-profile negatives. |
+| `managedRowsListModeRender` | 16 | Adds/removes/toggles managed child rows, renders Main/Kids lists through `RenderEngine`, applies date filters, and sends list-mode runtime messages. | Row-action mutation report, Main/Kids list-mode parity, copy/transfer proof, RenderEngine callback contract, and whitelist empty-state fixtures. |
 | `dashboardStatsFiltering` | 10 | Updates setting checkboxes, filters content controls/help cards, computes dashboard counts/stats, rotates stats surfaces, and updates stat UI. | Stats source policy, interval lifecycle, no-rule render budget, and managed-child dashboard parity. |
-| `dateFilterHelpers` | 7 | Applies keyword/channel date presets for Main and Kids list rendering. | Timezone boundary, date inclusion proof, and row-filter negative fixtures. |
-| `navigationAndToasts` | 3 | Sets up navigation, exposes `window.switchView`, updates hash/title/view state, and renders success toasts. | Navigation state contract, global export policy, toast cleanup proof, and route access fixtures. |
+| `dateFilterHelpers` | 6 | Applies keyword/channel date presets for Main and Kids list rendering. | Timezone boundary, date inclusion proof, and row-filter negative fixtures. |
+| `navigationAndToasts` | 4 | Sets up navigation, exposes `window.switchView`, updates hash/title/view state, and renders success toasts. | Navigation state contract, global export policy, toast cleanup proof, and route access fixtures. |
 
 ## Current Named Method Inventory
 
@@ -462,44 +462,44 @@ subscriptionsImportBridge: 18
 | 11149 | `async function` | `runExportV3Encrypted` | `importExportDownload` |
 | 11197 | `const arrow` | `safePart` | `importExportDownload` |
 | 11230 | `async function` | `runImportV3FromFile` | `importExportDownload` |
-| 11729 | `async const arrow` | `persistPolicy` | `settingsSyncAccountPolicyHandlers` |
-| 11839 | `const arrow` | `makeIdPart` | `settingsSyncAccountPolicyHandlers` |
-| 11948 | `const arrow` | `makeIdPart` | `settingsSyncAccountPolicyHandlers` |
-| 12274 | `function` | `toDateInputValue` | `dateFilterHelpers` |
-| 12282 | `function` | `parseDateInput` | `dateFilterHelpers` |
-| 12295 | `function` | `applyPresetToDateControls` | `dateFilterHelpers` |
-| 12321 | `async function` | `addManagedKeyword` | `managedRowsListModeRender` |
-| 12336 | `async function` | `removeManagedKeyword` | `managedRowsListModeRender` |
-| 12349 | `async function` | `toggleManagedKeywordExact` | `managedRowsListModeRender` |
-| 12364 | `async function` | `toggleManagedKeywordComments` | `managedRowsListModeRender` |
-| 12379 | `async function` | `addManagedChannel` | `managedRowsListModeRender` |
-| 12399 | `async function` | `removeManagedChannel` | `managedRowsListModeRender` |
-| 12412 | `async function` | `toggleManagedChannelFilterAll` | `managedRowsListModeRender` |
-| 12429 | `function` | `renderKeywords` | `managedRowsListModeRender` |
-| 12447 | `function` | `renderChannels` | `managedRowsListModeRender` |
-| 12465 | `function` | `renderKidsKeywords` | `managedRowsListModeRender` |
-| 12484 | `function` | `renderKidsChannels` | `managedRowsListModeRender` |
-| 12503 | `function` | `renderListModeControls` | `managedRowsListModeRender` |
-| 12513 | `const arrow` | `currentMode` | `managedRowsListModeRender` |
-| 12539 | `async const arrow` | `handleModeToggle` | `managedRowsListModeRender` |
-| 12548 | `const arrow` | `whitelistEmpty` | `managedRowsListModeRender` |
-| 12681 | `function` | `updateCheckboxes` | `dashboardStatsFiltering` |
-| 12703 | `function` | `filterContentControls` | `dashboardStatsFiltering` |
-| 12724 | `function` | `filterHelpCards` | `dashboardStatsFiltering` |
-| 12751 | `function` | `getDashboardSurfaceStats` | `dashboardStatsFiltering` |
-| 12762 | `function` | `getDashboardCounts` | `dashboardStatsFiltering` |
-| 12800 | `const arrow` | `keyFor` | `dashboardStatsFiltering` |
-| 12835 | `function` | `formatSavedTime` | `dashboardStatsFiltering` |
-| 12855 | `function` | `setDashboardStatsSurface` | `dashboardStatsFiltering` |
-| 12864 | `function` | `scheduleDashboardStatsRotation` | `dashboardStatsFiltering` |
-| 12905 | `function` | `updateStats` | `dashboardStatsFiltering` |
-| 13079 | `function` | `updateKeywordDateFilterFromInputs` | `dateFilterHelpers` |
-| 13194 | `function` | `updateChannelDateFilterFromInputs` | `dateFilterHelpers` |
-| 13275 | `function` | `updateKidsKeywordDateFilterFromInputs` | `dateFilterHelpers` |
-| 13357 | `function` | `updateKidsChannelDateFilterFromInputs` | `dateFilterHelpers` |
-| 13504 | `function` | `setupNavigation` | `navigationAndToasts` |
-| 13526 | `function` | `switchView` | `navigationAndToasts` |
-| 13614 | `function` | `showSuccessToast` | `navigationAndToasts` |
+| 11736 | `async const arrow` | `persistPolicy` | `settingsSyncAccountPolicyHandlers` |
+| 11846 | `const arrow` | `makeIdPart` | `settingsSyncAccountPolicyHandlers` |
+| 11955 | `const arrow` | `makeIdPart` | `managedRowsListModeRender` |
+| 12281 | `function` | `toDateInputValue` | `dateFilterHelpers` |
+| 12289 | `function` | `parseDateInput` | `dateFilterHelpers` |
+| 12302 | `function` | `applyPresetToDateControls` | `managedRowsListModeRender` |
+| 12328 | `async function` | `addManagedKeyword` | `managedRowsListModeRender` |
+| 12343 | `async function` | `removeManagedKeyword` | `managedRowsListModeRender` |
+| 12356 | `async function` | `toggleManagedKeywordExact` | `managedRowsListModeRender` |
+| 12371 | `async function` | `toggleManagedKeywordComments` | `managedRowsListModeRender` |
+| 12386 | `async function` | `addManagedChannel` | `managedRowsListModeRender` |
+| 12406 | `async function` | `removeManagedChannel` | `managedRowsListModeRender` |
+| 12419 | `async function` | `toggleManagedChannelFilterAll` | `managedRowsListModeRender` |
+| 12436 | `function` | `renderKeywords` | `managedRowsListModeRender` |
+| 12454 | `function` | `renderChannels` | `managedRowsListModeRender` |
+| 12472 | `function` | `renderKidsKeywords` | `managedRowsListModeRender` |
+| 12491 | `function` | `renderKidsChannels` | `managedRowsListModeRender` |
+| 12510 | `function` | `renderListModeControls` | `managedRowsListModeRender` |
+| 12520 | `const arrow` | `currentMode` | `managedRowsListModeRender` |
+| 12546 | `async const arrow` | `handleModeToggle` | `managedRowsListModeRender` |
+| 12555 | `const arrow` | `whitelistEmpty` | `dashboardStatsFiltering` |
+| 12688 | `function` | `updateCheckboxes` | `dashboardStatsFiltering` |
+| 12710 | `function` | `filterContentControls` | `dashboardStatsFiltering` |
+| 12731 | `function` | `filterHelpCards` | `dashboardStatsFiltering` |
+| 12758 | `function` | `getDashboardSurfaceStats` | `dashboardStatsFiltering` |
+| 12769 | `function` | `getDashboardCounts` | `dashboardStatsFiltering` |
+| 12807 | `const arrow` | `keyFor` | `dashboardStatsFiltering` |
+| 12842 | `function` | `formatSavedTime` | `dashboardStatsFiltering` |
+| 12862 | `function` | `setDashboardStatsSurface` | `dashboardStatsFiltering` |
+| 12871 | `function` | `scheduleDashboardStatsRotation` | `dashboardStatsFiltering` |
+| 12912 | `function` | `updateStats` | `dateFilterHelpers` |
+| 13086 | `function` | `updateKeywordDateFilterFromInputs` | `dateFilterHelpers` |
+| 13201 | `function` | `updateChannelDateFilterFromInputs` | `dateFilterHelpers` |
+| 13282 | `function` | `updateKidsKeywordDateFilterFromInputs` | `dateFilterHelpers` |
+| 13364 | `function` | `updateKidsChannelDateFilterFromInputs` | `navigationAndToasts` |
+| 13511 | `function` | `setupNavigation` | `navigationAndToasts` |
+| 13533 | `function` | `switchView` | `navigationAndToasts` |
+| 13621 | `function` | `showSuccessToast` | `navigationAndToasts` |
 
 ## Future Method Proof Fields
 
@@ -583,9 +583,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 71
-method semantic proof gap lexical callables covered: 6072
+method semantic proof gap lexical callables covered: 6073
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6072
+lexical callables requiring semantic proof before behavior changes: 6073
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

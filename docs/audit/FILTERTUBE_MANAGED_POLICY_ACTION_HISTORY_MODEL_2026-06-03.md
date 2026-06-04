@@ -10,7 +10,9 @@ mailbox action-history rows through the same protected model. Parent/caregiver
 history clearing now records its own protected `history.clear` evidence row
 instead of silently removing accepted rows. Trusted-link removal history writer
 now records protected `trust_link.revoke` rows when local accepted managed
-policy state is purged for a removed link.
+policy state is purged for a removed link. Parent-side live sends now record
+redacted outbound trusted-link history rows without storing policy payload
+plaintext.
 **Goal slice**: Implementation order item 4, "Add action-history/log model and
 access-control tests".
 **Primary inputs**:
@@ -35,7 +37,9 @@ failed-auth rows when parent/admin unlock fails while opening managed child
 edit, viewing/clearing protected history, changing viewing space, or changing
 time limits, records a protected clear row when accepted history is cleared, and
 records a protected `trust_link.revoke` row when trusted-link removal purges
-target-local remote managed-policy state for that link.
+target-local remote managed-policy state for that link. It also records
+redacted outbound live-send evidence on the parent/source trusted link after a
+signed Nanah envelope is sent.
 
 Action history is protected evidence and parent/caregiver UX. It is not policy
 authority. Runtime policy must still come from the current accepted managed
@@ -143,6 +147,7 @@ The following events must produce action-history rows in future implementation:
 | Fixture id | Event | Required row result |
 | --- | --- | --- |
 | `accepted_remote_keyword_policy` | Trusted parent/source updates child keyword policy. | `accepted` with revision and policy hash. |
+| `sent_live_remote_policy` | Parent/source sends a signed live Nanah policy to a trusted fixed target. | `sent` outbound evidence with revision and policy hash, redacted summary, and no payload plaintext. |
 | `accepted_local_child_surface_policy` | Same-device parent/account saves child Main or Kids rules through managed edit mode. | `accepted` with local revision, policy hash, and redacted counts. |
 | `rejected_spoofed_lan_policy` | Local-network discovery claims parent device without trusted key. | `rejected` with `reason: untrusted_discovery`. |
 | `rejected_equal_revision_conflict` | Same revision arrives with different policy hash. | `conflict` with old/new hashes redacted or hashed. |
@@ -173,7 +178,8 @@ runtime managed action history clear event writer: present as protected `history
 runtime remote managed validation/apply history writer: present for rejected, conflict, idempotent, and accepted apply outcomes
 runtime remote managed accepted apply history writer: present behind validated managed apply wrapper
 runtime mailbox managed validation/apply history writer: present for local/decrypted mailbox item intake outcomes
-runtime behavior changed by this contract: yes, for accepted local managed child saves, protected failed-auth rows, parent/account history access, Nanah managed-policy receive evidence, validated remote apply history, and local/decrypted mailbox item evidence
+runtime managed outbound live send history writer: present on trusted link policy rows as redacted parent-side send evidence
+runtime behavior changed by this contract: yes, for accepted local managed child saves, protected failed-auth rows, parent/account history access, Nanah managed-policy receive evidence, validated remote apply history, local/decrypted mailbox item evidence, and parent-side outbound live send evidence
 ```
 
 The current local writer stores redacted count summaries under
@@ -203,6 +209,10 @@ wrong-source cases still produce protected rejected or conflict history rows.
 Mailbox rows use `remote_policy.mailbox.*` action types so parent/caregiver
 history can distinguish delayed delivery from live Nanah delivery without
 making the log authoritative.
+Outbound live-send rows use `filtertube_managed_outbound_policy_history` under a
+trusted link policy row because the parent/source may not have the remote child
+profile locally. Those rows are feedback evidence for the parent only; the
+remote child policy still changes only after receive-side validation/apply.
 This keeps local keyword/channel/video writes, Nanah apply, mailbox apply, and
 admin session events using one history model without turning logs into policy
 state.

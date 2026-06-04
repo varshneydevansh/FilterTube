@@ -56,7 +56,7 @@ dashboard/profile-open caller owns status persistence and mailbox item intake.
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/seed.js` | 1136 | 50026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
 | `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
-| `js/tab-view.js` | 13624 | 628461 | `77f20044b7e6bddf0bf9b8a455f0d38f7018cffcde82c42ba9af1c4a3491b428` |
+| `js/tab-view.js` | 13631 | 628942 | `572c30cc72b123920342348827cab704a79083bb4b92e8ab57eceea8969a4de4` |
 
 ## File And Operation Counts
 
@@ -152,7 +152,7 @@ js/state_manager.js:1636:runtime.sendMessage:kidsWhitelistRuntimeMutation
 js/state_manager.js:1808:runtime.sendMessage:whitelistTransferRuntimeMutation
 js/tab-view.js:3070:runtime.sendMessage:dashboardRuntimeRequest
 js/tab-view.js:3445:tabs.sendMessage:dashboardTabRuntimeRequest
-js/tab-view.js:12979:runtime.onMessage.addListener:dashboardRuntimeMessageReceiver
+js/tab-view.js:12986:runtime.onMessage.addListener:dashboardRuntimeMessageReceiver
 ```
 
 ## Current Behavior Boundaries
@@ -160,7 +160,7 @@ js/tab-view.js:12979:runtime.onMessage.addListener:dashboardRuntimeMessageReceiv
 - Background has two runtime receivers: the primary `request.action` /
   `request.type` router and a secondary `message.type` router.
 - Content/dashboard code has two more runtime receivers:
-  `js/content/bridge_settings.js:200` and `js/tab-view.js:12979`.
+  `js/content/bridge_settings.js:200` and `js/tab-view.js:12986`.
 - Runtime sender rows cover settings fetches, prompt acknowledgements, list-mode
   mutations, whitelist/Kids mutations, identity fetches, learned-map writes,
   script injection, browser info, stats/backup scheduling, and popup/dashboard

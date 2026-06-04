@@ -83,6 +83,7 @@ function createManagedLivePolicyHarness({ activeSurface = 'main', sourceProfile 
       targetProfileName: 'Child'
     }
   };
+  const policyUpdates = [];
   const create = loadManagedLivePolicyFactory();
   const helper = create({
     normalizeString(value) {
@@ -121,7 +122,10 @@ function createManagedLivePolicyHarness({ activeSurface = 'main', sourceProfile 
     }),
     getStableDeviceId: () => 'parent-device-1',
     findTrustedLinkById: () => trustedLink,
-    updateTrustedLinkPolicy: async (linkId, patch) => ({ linkId, patch, ok: true }),
+    updateTrustedLinkPolicy: async (linkId, patch) => {
+      policyUpdates.push({ linkId, patch: plain(patch) });
+      return true;
+    },
     getAdapter: () => ({
       async signManagedPolicyEnvelope(envelope) {
         return {
@@ -144,7 +148,7 @@ function createManagedLivePolicyHarness({ activeSurface = 'main', sourceProfile 
     }),
     now: () => 1779300000000
   });
-  return { helper, parentProfile, trustedLink };
+  return { helper, parentProfile, trustedLink, policyUpdates };
 }
 
 test('managed live signed-send audit is linked without claiming mailbox runtime', () => {
@@ -180,7 +184,8 @@ test('managed trusted links are profile scoped and connected target fanout is bo
   assert.match(doc, /runtime profile-scoped trusted link id: present/);
   assert.match(doc, /runtime connected-device multi-target chooser: present/);
   assert.match(doc, /runtime signed fanout send loop: present for selected targets on the connected replica only/);
-  assert.match(doc, /runtime per-target ack\/history summary: absent/);
+  assert.match(doc, /runtime per-target outbound send history: present/);
+  assert.match(doc, /runtime per-target accepted\/rejected ack history: absent/);
   assert.match(doc, /runtime mailbox\/local-network fanout delivery: absent/);
   assert.match(doc, /Runtime behavior changed by this proof: yes, the dashboard can now choose\s+multiple saved fixed-profile targets on the connected replica/);
   assert.match(doc, /flowchart TD/);
@@ -270,9 +275,12 @@ test('managed source send uses signed envelope before proposal fallback and reco
   assert.match(sendButtonBlock, /for \(const signedEnvelope of signedEnvelopes\)/);
   assert.match(sendButtonBlock, /await nanahClient\.send\(signedEnvelope\)/);
   assert.match(sendButtonBlock, /await nanahManagedLivePolicy\.markSent\(/);
+  assert.match(sendButtonBlock, /targetProfileId: signedEnvelope\.targetProfileId/);
+  assert.match(sendButtonBlock, /issuedAt: signedEnvelope\.issuedAt/);
   assert.match(sendButtonBlock, /return;\s+\}\s+let envelope = await adapter\.buildControlProposal/);
   assert.match(source, /window\.FilterTubeNanahManagedLivePolicy\?\.create/);
   assert.match(read(managedLivePolicyPath), /outgoingManagedPolicies/);
+  assert.match(read(managedLivePolicyPath), /outboundManagedPolicyHistory/);
 });
 
 test('managed live signed-send helper can build connected per-target envelope batches', async () => {
@@ -321,6 +329,48 @@ test('managed live signed-send helper can build connected per-target envelope ba
     ),
     /at least one saved profile-scoped trusted link/
   );
+});
+
+test('managed live signed-send helper records redacted outbound history per target scope', async () => {
+  const { helper, policyUpdates } = createManagedLivePolicyHarness({ activeSurface: 'main' });
+  const envelope = await helper.buildEnvelopeForLiveSend({ scope: 'keywords' });
+
+  const didMark = await helper.markSent(
+    envelope.linkId,
+    envelope.scope,
+    envelope.revision,
+    envelope.policyHash,
+    {
+      targetProfileId: envelope.targetProfileId,
+      targetProfileName: envelope.targetProfileName,
+      sourceProfileId: envelope.sourceProfileId,
+      sourceDeviceId: envelope.sourceDeviceId,
+      issuedAt: envelope.issuedAt
+    }
+  );
+
+  assert.equal(didMark, true);
+  assert.equal(policyUpdates.length, 1);
+  const policyPatch = policyUpdates[0].patch.policy;
+  assert.equal(policyPatch.outgoingManagedPolicies.keywords.revision, envelope.revision);
+  assert.equal(policyPatch.outgoingManagedPolicies.keywords.policyHash, envelope.policyHash);
+  assert.equal(policyPatch.outgoingManagedPolicies.keywords.sentAt, 1779300000000);
+
+  const row = policyPatch.outboundManagedPolicyHistory[0];
+  assert.equal(row.schema, 'filtertube_managed_outbound_policy_history');
+  assert.equal(row.actionType, 'remote_policy.live_send');
+  assert.equal(row.trustedLinkId, envelope.linkId);
+  assert.equal(row.scope, 'keywords');
+  assert.equal(row.targetProfileId, 'child-profile-1');
+  assert.equal(row.sourceProfileId, 'parent-profile-1');
+  assert.equal(row.sourceDeviceId, 'parent-device-1');
+  assert.equal(row.revision, envelope.revision);
+  assert.equal(row.policyHash, envelope.policyHash);
+  assert.equal(row.result, 'sent');
+  assert.equal(row.summary.redacted, true);
+  assert.equal(row.summary.delivery, 'live_nanah_session');
+  assert.equal(JSON.stringify(row).includes('shakira'), false);
+  assert.equal(JSON.stringify(row).includes('UC-shakira'), false);
 });
 
 test('managed live signed-send helper builds granular parent-control payloads from selected surface', async () => {
