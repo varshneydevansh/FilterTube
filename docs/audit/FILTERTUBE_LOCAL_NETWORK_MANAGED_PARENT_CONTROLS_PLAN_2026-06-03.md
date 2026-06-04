@@ -719,6 +719,8 @@ where parent and child devices are not reachable at the same time.
   mailbox-item validation/apply intake added. A provider-gated
   dashboard/profile-open hook can request already-decrypted mailbox items from
   a trusted local provider and send redacted ack records after apply/reject.
+  Provider rejection or provider failure now fails closed without applying or
+  acknowledging any returned items.
   Runtime mailbox server pull and decryption client remain absent by design.
 - **Acceptance Criteria**:
   - Server cannot read rules.
@@ -728,6 +730,8 @@ where parent and child devices are not reachable at the same time.
     envelope before validation/apply.
   - Pull-on-open does no work unless the trusted link opted into
     `syncOnProfileOpen` and a local provider is available.
+  - Provider `ok: false` responses and provider exceptions do not apply or ack
+    returned items and leave the last accepted policy active.
   - Provider ack handoff uses redacted metadata only and does not expose
     plaintext rules.
   - Mailbox is optional and does not weaken local/P2P security.

@@ -178,6 +178,9 @@ policy authority. The first pull-on-open hook now exists only as a
 provider-gated dashboard/profile-open bridge for local/decrypted mailbox items,
 and the same provider can receive redacted ack records after extension-side
 validation/apply/reject.
+If that provider returns `ok: false` or throws while pulling, the open-sync hook
+discards any returned mailbox items, does not apply or acknowledge them, and
+keeps the last valid accepted policy active.
 
 Current runtime status:
 
@@ -189,6 +192,7 @@ runtime mailbox item managed-policy apply wrapper: present
 runtime mailbox protected history rows: present
 runtime provider-gated dashboard/profile-open pull hook: present
 runtime provider-gated ack handoff: present
+runtime provider failure fail-closed apply guard: present
 runtime mailbox server pull client: absent
 runtime mailbox decryption client: absent
 runtime behavior changed by this slice: yes, for local/decrypted mailbox item intake, provider-gated dashboard/profile-open pull status, and provider ack handoff only

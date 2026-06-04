@@ -529,7 +529,7 @@ fail 0
 | `js/state_manager.js:1856` | state manager UI model | settings save call | - | `await saveSettings();` | must be revisioned/queued and surface failure to caller |
 | `js/state_manager.js:1874` | state manager UI model | settings save call | - | `await loadSettings();` | must be revisioned/queued and surface failure to caller |
 | `js/state_manager.js:1886` | state manager UI model | settings save call | - | `await saveSettings();` | must be revisioned/queued and surface failure to caller |
-| `js/state_manager.js:1907` | state manager UI model | settings save call | - | `await loadSettings();` | must be revisioned/queued and surface failure to caller |
+| `js/state_manager.js:1908` | state manager UI model | settings save call | - | `await loadSettings();` | must be revisioned/queued and surface failure to caller |
 | `js/state_manager.js:1935` | state manager UI model | settings save call | - | `await saveSettings();` | must be revisioned/queued and surface failure to caller |
 | `js/state_manager.js:2002` | state manager UI model | settings save call | - | `await loadSettings();` | must be revisioned/queued and surface failure to caller |
 | `js/state_manager.js:2093` | state manager UI model | settings save call | - | `await requestRefresh('main');` | must be revisioned/queued and surface failure to caller |
@@ -647,9 +647,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 72
-method semantic proof gap lexical callables covered: 6110
+method semantic proof gap lexical callables covered: 6111
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6110
+lexical callables requiring semantic proof before behavior changes: 6111
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

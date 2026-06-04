@@ -145,13 +145,22 @@
             if (!provider || typeof provider.pullDecryptedMailboxItems !== 'function') {
                 return { ok: false, reason: 'pull_provider_unavailable', items: [] };
             }
-            const result = await provider.pullDecryptedMailboxItems(request);
-            if (Array.isArray(result)) return { ok: true, reason: '', items: result };
-            return {
-                ok: result?.ok !== false,
-                reason: normalizeString(result?.reason),
-                items: safeArray(result?.items)
-            };
+            try {
+                const result = await provider.pullDecryptedMailboxItems(request);
+                if (Array.isArray(result)) return { ok: true, reason: '', items: result };
+                const ok = result?.ok !== false;
+                return {
+                    ok,
+                    reason: normalizeString(result?.reason),
+                    items: ok ? safeArray(result?.items) : []
+                };
+            } catch (error) {
+                return {
+                    ok: false,
+                    reason: normalizeString(error?.message) || 'pull_provider_failed',
+                    items: []
+                };
+            }
         }
 
         function normalizeAckState(result) {
@@ -326,6 +335,10 @@
                 };
                 state.pulledItemCount += result.items.length;
                 const ackRecords = [];
+                if (result.ok !== true) {
+                    state.linkResults.push(linkRow);
+                    continue;
+                }
                 for (const item of result.items) {
                     try {
                         const applyResult = await applyMailboxItem(item);
@@ -385,8 +398,9 @@
             const ackFailed = Number(result.ackFailedCount) || 0;
             if (ackFailed > 0) return `${applied} applied, ${rejected} rejected, ${ackFailed} ack failed`;
             if (applied || rejected) return `${applied} applied, ${rejected} rejected`;
+            if (result.ok === false) return 'Rejected by provider';
             if (pulled === 0) return 'Checked, no updates';
-            return result.ok === false ? 'Rejected by provider' : 'Checked';
+            return 'Checked';
         }
 
         return {

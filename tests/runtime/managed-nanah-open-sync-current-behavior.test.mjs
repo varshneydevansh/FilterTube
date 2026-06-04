@@ -98,9 +98,16 @@ test('managed open-sync audit is docs-backed and linked from plan inventory and 
   assert.match(doc, /runtime pull-on-open candidate gate: present/);
   assert.match(doc, /runtime provider-gated decrypted item pull: present/);
   assert.match(doc, /runtime provider-gated mailbox ack handoff: present/);
+  assert.match(doc, /runtime provider failure fail-closed item apply guard: present/);
+  assert.match(doc, /Provider failures and thrown provider errors do not apply or ack returned\s+items/);
   assert.match(doc, /runtime YouTube page hot-path work from this slice: absent/);
   assert.match(mailboxDoc, /provider-gated ack handoff: present/);
+  assert.match(mailboxDoc, /provider failure fail-closed apply guard: present/);
   assert.match(mailboxDoc, /provider-gated dashboard\/profile-open pull hook: present/);
+  assert.match(plan, /Provider rejection or provider failure now fails closed without applying or\s+acknowledging any returned items/);
+  assert.match(plan, /Provider `ok: false` responses and provider exceptions do not apply or ack\s+returned items and leave the last accepted policy active/);
+  assert.match(inventory, /Provider rejection or provider failure\s+now fails closed without applying or acknowledging returned mailbox items/);
+  assert.match(inventory, /Provider rejection or provider failure fails closed without applying or acknowledging returned items/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
 });
@@ -162,6 +169,78 @@ test('open-sync provider absence records status without applying or pulling', as
   assert.equal(state.providerAvailable, false);
   assert.equal(state.eligibleLinkCount, 1);
   assert.deepEqual(savedState, state);
+});
+
+test('open-sync provider failure never applies or acknowledges returned mailbox items', async () => {
+  const provider = {
+    async pullDecryptedMailboxItems() {
+      return {
+        ok: false,
+        reason: 'parent_offline',
+        items: [
+          { schema: 'filtertube_managed_mailbox_item', mailboxItemId: 'must-not-apply' }
+        ]
+      };
+    },
+    async ackDecryptedMailboxItems() {
+      throw new Error('ack should not run');
+    }
+  };
+  const helper = loadFactory({ provider });
+  let applied = 0;
+  const state = await helper.runOpenSync({
+    links: [managedLink()],
+    activeProfileId: 'child-profile-1',
+    profilesV4: profilesV4(),
+    applyMailboxItem: async () => {
+      applied += 1;
+      return { accepted: true, applied: true };
+    },
+    writeState: async () => {}
+  });
+
+  assert.equal(applied, 0);
+  assert.equal(state.providerAvailable, true);
+  assert.equal(state.pulledItemCount, 0);
+  assert.equal(state.appliedItemCount, 0);
+  assert.equal(state.rejectedItemCount, 0);
+  assert.equal(state.ackAttemptedCount, 0);
+  assert.equal(state.ackedItemCount, 0);
+  assert.equal(state.ackFailedCount, 0);
+  assert.equal(state.linkResults[0].ok, false);
+  assert.equal(state.linkResults[0].reason, 'parent_offline');
+  assert.equal(state.linkResults[0].pulledItemCount, 0);
+  assert.equal(helper.formatStatus(managedLink(), state, 'child-profile-1'), 'Rejected by provider');
+});
+
+test('open-sync provider throw fails closed without applying or acknowledging items', async () => {
+  const provider = {
+    async pullDecryptedMailboxItems() {
+      throw new Error('local provider unavailable');
+    },
+    async ackDecryptedMailboxItems() {
+      throw new Error('ack should not run');
+    }
+  };
+  const helper = loadFactory({ provider });
+  let applied = 0;
+  const state = await helper.runOpenSync({
+    links: [managedLink()],
+    activeProfileId: 'child-profile-1',
+    profilesV4: profilesV4(),
+    applyMailboxItem: async () => {
+      applied += 1;
+      return { accepted: true, applied: true };
+    },
+    writeState: async () => {}
+  });
+
+  assert.equal(applied, 0);
+  assert.equal(state.providerAvailable, true);
+  assert.equal(state.linkResults[0].ok, false);
+  assert.equal(state.linkResults[0].reason, 'local provider unavailable');
+  assert.equal(state.ackAttemptedCount, 0);
+  assert.equal(helper.formatStatus(managedLink(), state, 'child-profile-1'), 'Rejected by provider');
 });
 
 test('open-sync provider applies only returned decrypted mailbox items and emits redacted ack records', async () => {
@@ -253,6 +332,9 @@ test('open-sync helper does not add page hot-path observers timers or network cl
   assert.match(helperSource, /filtertube_nanah_managed_open_sync_ack/);
   assert.match(helperSource, /ackDecryptedMailboxItems/);
   assert.match(helperSource, /ackMailboxItems/);
+  assert.match(helperSource, /items: ok \? safeArray\(result\?\.items\) : \[\]/);
+  assert.match(helperSource, /catch \(error\)/);
+  assert.match(helperSource, /if \(result\.ok !== true\)/);
   assert.doesNotMatch(helperSource, /MutationObserver/);
   assert.doesNotMatch(helperSource, /addEventListener/);
   assert.doesNotMatch(helperSource, /setInterval/);

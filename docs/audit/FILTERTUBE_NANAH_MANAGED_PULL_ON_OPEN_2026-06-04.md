@@ -23,6 +23,9 @@ The hook is intentionally not a mailbox server client. It does not poll from
 YouTube pages, does not add a service-worker scheduler, and does not make
 network discovery authority. If no provider is installed, it records a local
 status of `pull_provider_unavailable` and leaves the last valid policy active.
+If the provider reports `ok: false` or throws, returned items are discarded,
+no mailbox item is applied, no ack is sent, and the last valid policy remains
+active.
 
 ## Runtime Shape
 
@@ -113,6 +116,7 @@ Checked
 Checked, no updates
 Waiting for provider
 Apply unavailable
+Rejected by provider
 N applied, M rejected
 N applied, M rejected, A ack failed
 ```
@@ -125,6 +129,7 @@ This is feedback/status only. It does not grant authority.
 runtime pull-on-open candidate gate: present
 runtime provider-gated decrypted item pull: present
 runtime provider-gated mailbox ack handoff: present
+runtime provider failure fail-closed item apply guard: present
 runtime mailbox item apply reuse: present
 runtime pull status persistence: present
 runtime server mailbox pull client: absent
@@ -140,6 +145,9 @@ runtime YouTube page hot-path work from this slice: absent
   timer, or SPA listener is touched by this slice.
 - No provider means no remote pull. The hook fails closed with a persisted
   status row.
+- Provider failures and thrown provider errors do not apply or ack returned
+  items. They surface as a provider rejection status and keep the last valid
+  policy active.
 - Returned items still go through `handleNanahIncomingManagedMailboxItem(...)`,
   `validateManagedMailboxItem(...)`, managed signature verification, accepted
   revision/hash checks, and protected action-history recording.
