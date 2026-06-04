@@ -5,16 +5,18 @@
 failed-unlock history, protected history access, time-limit enforcement, and
 receive-side managed-policy validation/history proofs updated, with encrypted
 mailbox protocol proof specified, managed pairing public-key descriptor
-persistence added, and source-side managed signing keypair provisioning plus
-adapter signing helper added. Runtime behavior changed for protected child Main/Kids denial, accepted same-device
+persistence added, source-side managed signing keypair provisioning plus
+adapter signing helper added, and eligible fixed-target Main/Kids managed live
+send added. Runtime behavior changed for protected child Main/Kids denial, accepted same-device
 parent-managed child saves, protected parent unlock-failure evidence,
 parent/account history viewing, accepted-row history clearing, dashboard and
 background admin-session expiry, sensitive managed-action re-auth, in-memory
 managed/admin failed-attempt rate limiting, child time-budget enforcement,
 managed-envelope validation/classification, managed-policy receive/apply
-evidence, managed public-key descriptor pairing, and source signing-key
-provisioning. Dashboard signed managed-policy send, canonical outbound payload
-hashing, and live remote transport remain pending.
+evidence, managed public-key descriptor pairing, source signing-key
+provisioning, and eligible signed Main/Kids live managed-policy sends.
+Active/full signed conversion, dedicated managed-scope outbound UI, mailbox
+runtime, and local-network discovery runtime remain pending.
 **Goal slice**: Implementation order item 1 plus first runtime viewing-space
 enforcement slice.
 **Lane proof**: `test:settings` for profile/Nanah authority and `test:release`
@@ -28,8 +30,9 @@ viewing-space, history, and time-limit authority paths while the
 managed-control system is being built. It now includes extension runtime
 viewing-space denial, local protected history access, active child time-budget
 enforcement from local profile settings, receive-side managed-policy
-validation history, managed pairing public-key descriptor persistence, and
-source-side managed signing keypair provisioning with an adapter signing helper.
+validation history, managed pairing public-key descriptor persistence,
+source-side managed signing keypair provisioning with an adapter signing helper,
+and eligible fixed-target Main/Kids live signed-send support.
 
 This document still does not approve remote policy writes by itself. The first
 managed-envelope validator, validated apply wrapper, receive-side
@@ -38,7 +41,8 @@ and the validator requires signature-verification evidence. Dashboard
 WebCrypto verifier plumbing now exists when a trusted link carries source
 public-key material. Pairing-time public-key descriptor persistence exists, and
 source/parent Nanah sessions can provision local managed signing key material.
-Dashboard signed managed-policy sends, canonical outbound policy-hash creation,
+Eligible fixed-target Main/Kids live sends can now build signed managed-policy
+envelopes. Active/full signed conversion, dedicated managed-scope outbound UI,
 encrypted/local-network delivery runtime, failed-attempt durability, and remote
 admin session semantics remain separate required slices.
 
@@ -256,8 +260,10 @@ Authority meaning:
 - The dashboard receive path now provides managed-policy envelope parsing,
   trusted-link/profile/revision context construction, protected validation
   evidence rows, adapter WebCrypto Ed25519 verifier evidence when trusted-link
-  `sourcePublicKeyJwk` material exists, validated apply dispatch, and
-  accepted/rejected apply history.
+      `sourcePublicKeyJwk` material exists, validated apply dispatch, and
+      accepted/rejected apply history.
+    - The dashboard send path can now build signed `filtertube_managed_policy`
+      envelopes for fixed-target Main/Kids Source -> Replica managed links.
 
 Current gap:
 
@@ -266,13 +272,14 @@ Current gap:
   parent-child binding before writing.
 - Persisted stale/replay authority state exists for accepted managed policies,
   but only inside the target profile's managed policy state.
-- The signature verifier gate and adapter verifier helper exist. Pairing can
-  persist source public-key descriptor material, and source sessions can now
-  provision a local managed signing keypair plus public descriptor. Dashboard
-  live sends still use `control_proposal`; signed managed-policy send and
-  canonical outbound policy-hash creation remain pending. Without trusted
-  stored public-key material, the receive path still rejects otherwise
-  well-shaped managed envelopes rather than treating them as valid.
+    - The signature verifier gate and adapter verifier helper exist. Pairing can
+      persist source public-key descriptor material, source sessions can now
+      provision a local managed signing keypair plus public descriptor, and
+      eligible fixed-target Main/Kids managed live sends now use signed envelopes.
+      Active/full signed conversion and dedicated managed-scope outbound UI remain
+      pending. Without trusted stored public-key material, the receive path still
+      rejects otherwise well-shaped managed envelopes rather than treating them as
+      valid.
 - The adapter's validated apply wrapper still depends on higher layers for
   canonical hash recomputation, key lookup, local-network pull scheduling,
   encrypted mailbox runtime delivery, and remote admin session semantics.
@@ -319,10 +326,10 @@ Current gap:
   state under `profile.managedPolicyState.remoteManagedPolicies[linkId][scope]`.
 - Persisted stale/replay authority state now exists for accepted managed
   policies on the target profile.
-- There is now a signature verifier gate plus adapter WebCrypto verifier
-  helper, Nanah pairing can persist trusted source public-key descriptors, and
-  source sessions can provision managed signing keypairs. Live signed policy
-  construction and transport are still not wired.
+    - There is now a signature verifier gate plus adapter WebCrypto verifier
+      helper, Nanah pairing can persist trusted source public-key descriptors,
+      source sessions can provision managed signing keypairs, and eligible
+      fixed-target Main/Kids live signed policy construction is wired.
 - Trust revocation does not yet purge queued updates or invalidate an accepted
   policy revision. The encrypted mailbox protocol now specifies revoked queued
   delivery behavior, but no runtime queue exists yet.
@@ -401,9 +408,9 @@ Current gap:
 |---|---|---|
 | Validated managed policy apply wrapper | Remote apply can now persist a durable accepted-revision object for a fixed child target, but only when a caller supplies accepted validation context. | Key-store/WebCrypto verifier plumbing and live Nanah/local-network receive tests before automatic remote apply. |
 | Target-local remote revision store | Stale or replayed remote updates can now be rejected per target profile/link/scope after the first accepted write, but there is no mailbox or multi-device conflict-resolution layer yet. | Multi-parent, revoked-link, equal-revision/different-hash, and mailbox-delivery fixtures. |
-| Pairing public-key descriptor and source keypair provisioning present | The helper now requires verifier evidence, adapter WebCrypto verification is wired, Nanah pairing can persist advertised source public-key descriptors, and source sessions can provision local managed signing keypairs. Live dashboard sends still do not build signed `filtertube_managed_policy` envelopes or deliver them automatically. | Canonical outbound policy hash generation, live signed-envelope send, rotation/revocation, and authenticated live-delivery tests. |
+| Pairing public-key descriptor, source keypair provisioning, and eligible live signed send present | The helper now requires verifier evidence, adapter WebCrypto verification is wired, Nanah pairing can persist advertised source public-key descriptors, source sessions can provision local managed signing keypairs, and fixed-target Main/Kids managed live sends build signed `filtertube_managed_policy` envelopes. Active/full sends and dedicated keyword/channel/video/time-limit outbound UI still remain proposal/spec work. | Authenticated two-device live-delivery smoke, dedicated managed-scope outbound fixtures, rotation/revocation, and active/full conversion policy. |
 | Partial canonical payload/integrity binding | The helper checks binding fields and verifier result, but no canonical payload hash recomputation exists yet. | Binding-tuple fixtures plus canonical payload hash proof. |
-| Signed remote Main/Kids policy gate is not live | Local child route denial works and accepted managed envelopes can write viewing-space policy, but pairing key storage and live transport are still not wired. | Signed route-policy fixtures through live Nanah/local-network receive. |
+| Signed remote Main/Kids policy gate is partially live | Fixed-target Main/Kids managed Nanah sends can now travel as signed envelopes and receive-side code validates before apply. Viewing-space and time-limit signed outbound UI are still pending. | Installed two-device Main/Kids smoke plus dedicated signed route-policy fixtures. |
 | Remote time-limit policy apply is wrapper-only | Local child time-budget enforcement exists and accepted managed envelopes can write runtime-compatible time-limit policy, but live parent-device delivery is not wired. | Signed remote time-limit fixtures through Nanah/local-network receive. |
 | Adapter depends on caller trust context | `validateManagedPolicyEnvelope(...)` depends on caller-supplied trusted-link/profile/revision/signature context; the wrapper rechecks stored profiles before writing but does not fetch trust keys itself. | Keep dashboard receive context and add pairing key lookup/revocation fixtures before automatic apply. |
 | Locked-child bypass has no revision binding | `allow_trusted_updates` can skip unlock for matching managed sessions, but not with policy revision constraints. | Locked child managed-policy fixtures. |

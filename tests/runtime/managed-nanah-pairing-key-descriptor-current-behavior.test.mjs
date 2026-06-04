@@ -49,7 +49,7 @@ test('managed pairing key descriptor audit is linked from plan and authority inv
   assert.match(signingDoc, new RegExp(docPath));
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
-  assert.match(inventory, /Pairing public-key descriptor and source keypair provisioning present/);
+  assert.match(inventory, /Pairing public-key descriptor, source keypair provisioning, and eligible live signed send present/);
 });
 
 test('Nanah device descriptor advertises managed public key aliases only when a complete descriptor exists', () => {

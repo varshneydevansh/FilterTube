@@ -18,7 +18,7 @@ injection changes, map-write changes, stats/backup changes, or DOM rerun changes
 ## Source Boundary
 
 ```text
-tracked product JS/JSX/MJS files scanned: 67
+tracked product JS/JSX/MJS files scanned: 68
 tracked product files with message transport rows: 14
 message transport rows: 65
 runtime.onMessage.addListener rows: 4
@@ -31,6 +31,10 @@ runtime behavior changed: no
 
 The scan excludes `tests/`, `docs/`, and `js/vendor/` because this register is
 about product/runtime transport, not verifier or audit text.
+
+`js/nanah_managed_live_policy.js` is included in the scanned product file count
+after the managed-policy live-send slice, but it contributes zero message
+transport rows; the dashboard send path still owns the Nanah client callsite.
 
 ## Source Fingerprints
 
@@ -49,7 +53,7 @@ about product/runtime transport, not verifier or audit text.
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/seed.js` | 1136 | 50026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
 | `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
-| `js/tab-view.js` | 12690 | 580598 | `492ccdae0eb6ccf7c1fa97a47966da9dc9d8f60a5b7e7df2c651ad71448d1b3d` |
+| `js/tab-view.js` | 12728 | 582754 | `3b24857f2207c3787fdc1bfa6400aacc0747c8fb9f54aa2bbc57fc00da3c53b3` |
 
 ## File And Operation Counts
 
@@ -145,7 +149,7 @@ js/state_manager.js:1636:runtime.sendMessage:kidsWhitelistRuntimeMutation
 js/state_manager.js:1808:runtime.sendMessage:whitelistTransferRuntimeMutation
 js/tab-view.js:3061:runtime.sendMessage:dashboardRuntimeRequest
 js/tab-view.js:3342:tabs.sendMessage:dashboardTabRuntimeRequest
-js/tab-view.js:12045:runtime.onMessage.addListener:dashboardRuntimeMessageReceiver
+js/tab-view.js:12083:runtime.onMessage.addListener:dashboardRuntimeMessageReceiver
 ```
 
 ## Current Behavior Boundaries
@@ -153,7 +157,7 @@ js/tab-view.js:12045:runtime.onMessage.addListener:dashboardRuntimeMessageReceiv
 - Background has two runtime receivers: the primary `request.action` /
   `request.type` router and a secondary `message.type` router.
 - Content/dashboard code has two more runtime receivers:
-  `js/content/bridge_settings.js:200` and `js/tab-view.js:12045`.
+  `js/content/bridge_settings.js:200` and `js/tab-view.js:12083`.
 - Runtime sender rows cover settings fetches, prompt acknowledgements, list-mode
   mutations, whitelist/Kids mutations, identity fetches, learned-map writes,
   script injection, browser info, stats/backup scheduling, and popup/dashboard

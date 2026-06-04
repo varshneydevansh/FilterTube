@@ -64,19 +64,19 @@ function loadNanahAdapter() {
   return context.window.FilterTubeNanahAdapter;
 }
 
-test('managed signing keypair audit is linked without claiming live remote delivery', () => {
+test('managed signing keypair audit is linked without overclaiming broad remote delivery', () => {
   const doc = read(docPath);
   const descriptorDoc = read(descriptorDocPath);
   const plan = read(planPath);
   const inventory = read(inventoryPath);
 
-  assert.match(doc, /Status\*\*: Runtime keypair provisioning and adapter signing helper slice/);
+  assert.match(doc, /Status\*\*: Runtime keypair provisioning, adapter signing helper, and eligible\s+live signed-send slice/);
   assert.match(doc, /ftNanahManagedSigningKeyPair/);
   assert.match(doc, /ftNanahManagedSigningPublicKey/);
   assert.match(doc, /privateKeyJwk/);
-  assert.match(doc, /Live signed managed-policy send remains pending/);
+  assert.match(doc, /eligible fixed-target Main\/Kids managed sends now use signed managed-policy\s+envelopes/);
   assert.match(doc, /does not claim hardware-backed, non-extractable, encrypted-at-rest, or\s+password-wrapped private key storage/);
-  assert.match(doc, /converting the dashboard send button from managed `control_proposal` to\s+signed `filtertube_managed_policy`/);
+  assert.match(doc, /active\/full sync conversion into signed managed-policy envelopes/);
   assert.match(plan, new RegExp(docPath));
   assert.match(plan, /Task 3\.5: Provision managed signing keypairs/);
   assert.match(inventory, new RegExp(docPath));
@@ -197,9 +197,10 @@ test('dashboard provisions source keypairs and keeps private material out of pub
   assert.doesNotMatch(descriptorBlock, /privateKeyJwk/);
 });
 
-test('managed signing slice does not overclaim mailbox or live signed send runtime', () => {
+test('managed signing slice does not overclaim mailbox or broad signed-send runtime', () => {
   const source = [
     'js/nanah_sync_adapter.js',
+    'js/nanah_managed_live_policy.js',
     'js/tab-view.js'
   ].map(read).join('\n');
   const doc = read(docPath);
@@ -208,8 +209,7 @@ test('managed signing slice does not overclaim mailbox or live signed send runti
   assert.match(source, /signManagedPolicyEnvelope/);
   assert.doesNotMatch(source, /managedPolicyOutbox/);
   assert.doesNotMatch(source, /FilterTubeManagedMailbox/);
-  assert.doesNotMatch(source, /sendManagedPolicyEnvelope/);
-  assert.doesNotMatch(source, /buildManagedPolicyEnvelopeForLiveSend/);
-  assert.match(doc, /Live signed managed-policy send remains pending/);
+  assert.match(source, /buildEnvelopeForLiveSend/);
+  assert.match(doc, /eligible fixed-target Main\/Kids managed sends now use signed managed-policy\s+envelopes/);
   assert.match(doc, /local-network or mailbox delivery runtime/);
 });

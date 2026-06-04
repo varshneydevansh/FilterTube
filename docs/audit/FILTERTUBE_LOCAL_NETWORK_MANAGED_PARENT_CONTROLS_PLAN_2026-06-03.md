@@ -411,17 +411,42 @@ replica child device over Nanah/P2P or same-network transport.
   sending the Nanah hello, public descriptors are mirrored into
   `ftNanahManagedSigningPublicKey`, private JWK material stays under
   `ftNanahManagedSigningKeyPair`, and source-side managed link saves require a
-  local signing key. Dashboard live sends still use `control_proposal`; signed
-  `filtertube_managed_policy` send remains a later slice.
+  local signing key. Eligible fixed-target Main/Kids dashboard live sends now
+  build signed `filtertube_managed_policy` envelopes; active/full sends and
+  dedicated keyword/channel/video/time-limit outbound UI remain later slices.
 - **Acceptance Criteria**:
   - The public descriptor is separated from the private keypair.
   - The private JWK is not placed in the Nanah hello descriptor or trusted link
     policy.
   - The signing helper refuses malformed signed-field bindings.
-  - Docs do not claim encrypted-at-rest private key storage or live remote
-    managed-policy transport.
+  - Docs do not claim encrypted-at-rest private key storage, mailbox runtime,
+    or broad active/full managed-policy transport.
 - **Validation**:
   - `node --test tests/runtime/managed-nanah-signing-keypair-current-behavior.test.mjs`
+  - `npm run test:settings`
+
+### Task 3.6: Send eligible managed Main/Kids policies as signed live envelopes
+
+- **Location**:
+  - `js/tab-view.js`
+  - `docs/audit/FILTERTUBE_NANAH_MANAGED_LIVE_SIGNED_SEND_2026-06-04.md`
+  - `tests/runtime/managed-nanah-live-signed-send-current-behavior.test.mjs`
+- **Description**: Convert saved Source -> Replica managed Main/Kids sends to
+  signed `filtertube_managed_policy` envelopes once the replica has a fixed
+  child target profile and the source has a complete signing keypair.
+- **Complexity**: 6/10
+- **Dependencies**: Task 3.5.
+- **Status**: Implemented for live Main/Kids scope only. Active/full proposal
+  sends, mailbox delivery, arbitrary keyword/channel/video outbound UI,
+  viewing-space outbound UI, and time-limit outbound UI remain pending.
+- **Acceptance Criteria**:
+  - Existing proposal sends still work for unsupported scopes.
+  - Signed sends require saved managed link, Source -> Replica roles, allowed
+    scope, fixed child target, and signing keypair material.
+  - Outbound revision/hash state is persisted per trusted link and scope.
+  - Receive path still validates before apply.
+- **Validation**:
+  - `node --test tests/runtime/managed-nanah-live-signed-send-current-behavior.test.mjs`
   - `npm run test:settings`
 
 ## Sprint 4: Protected User Experience

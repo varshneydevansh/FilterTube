@@ -8696,6 +8696,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         return root;
     }
 
+    const nanahManagedLivePolicy = window.FilterTubeNanahManagedLivePolicy?.create({
+        normalizeString,
+        safeObject,
+        normalizeNonNegativeInteger,
+        getProfilesRoot: () => profilesV4Cache,
+        getLocalProfileContext: getNanahLocalProfileContext,
+        getProfileSurface,
+        normalizeTrustedLink: normalizeNanahTrustedLink,
+        getTargetProfileBehavior: getNanahTargetProfileBehavior,
+        normalizeTargetProfileContext: normalizeNanahTargetProfileContext,
+        getRemoteTargetProfile: () => nanahSessionState.remoteTargetProfile,
+        buildLocalPolicyHash,
+        getCurrentTrustedLink: getNanahCurrentTrustedLink,
+        getAllowedScopeList: getNanahManagedPolicyScopeList,
+        getScopeLabel: getNanahScopeLabel,
+        ensureSigningKeyPair: ensureNanahManagedSigningKeyPair,
+        getStableDeviceId: () => nanahStableDeviceId,
+        findTrustedLinkById: (linkId) => nanahTrustedLinks.find((entry) => normalizeString(entry?.linkId) === linkId),
+        updateTrustedLinkPolicy: updateNanahTrustedLinkPolicy,
+        getAdapter: () => window.FilterTubeNanahAdapter || {},
+        now: () => Date.now()
+    }) || null;
+
     function resolveTrustedNanahManagedApply(details, trustedLink) {
         const policy = getManagedNanahLinkPolicy(trustedLink);
         if (!policy) return null;
@@ -10757,6 +10780,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                         await ensureNanahManagedSigningKeyPair({ required: true });
                     }
                     const auth = await ensureNanahOutgoingAuth(policy.scope);
+                    if (policy.linkType === 'managed_link' && policy.authorityMode === 'managed' && getNanahRole() === 'source') {
+                        if (!nanahManagedLivePolicy) {
+                            throw new Error('Managed policy live-send helpers are unavailable');
+                        }
+                        const signedEnvelope = await nanahManagedLivePolicy.buildEnvelopeForLiveSend(policy);
+                        await nanahClient.send(signedEnvelope);
+                        await nanahManagedLivePolicy.markSent(
+                            signedEnvelope.linkId,
+                            signedEnvelope.scope,
+                            signedEnvelope.revision,
+                            signedEnvelope.policyHash
+                        );
+                        UIComponents.showToast(`Sent signed managed ${signedEnvelope.scope} policy to ${getNanahRemoteLabel()}`, 'success');
+                        return;
+                    }
                     let envelope = await adapter.buildControlProposal({ scope: policy.scope, strategy: policy.strategy, auth });
                     envelope = attachNanahProposalPolicy(envelope, policy);
                     await nanahClient.send(envelope);

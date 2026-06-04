@@ -1,12 +1,14 @@
 # Audit: Nanah Managed Signing Keypair
 
 **Generated**: 2026-06-04
-**Status**: Runtime keypair provisioning and adapter signing helper slice.
-Live signed managed-policy send remains pending.
+**Status**: Runtime keypair provisioning, adapter signing helper, and eligible
+live signed-send slice.
 **Related plan**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`
 **Related descriptor proof**:
 `docs/audit/FILTERTUBE_NANAH_MANAGED_PAIRING_KEY_DESCRIPTOR_2026-06-04.md`
+**Related live-send proof**:
+`docs/audit/FILTERTUBE_NANAH_MANAGED_LIVE_SIGNED_SEND_2026-06-04.md`
 
 ## Purpose
 
@@ -26,7 +28,12 @@ runtime boundary:
 - Source-side managed links require local signing keypair material before they
   can be saved as managed authority;
 - the adapter can sign a `filtertube_managed_policy` envelope using the same
-  canonical signed-field shape that receive-side validation verifies.
+  canonical signed-field shape that receive-side validation verifies;
+- eligible fixed-target Main/Kids managed sends now use signed managed-policy
+  envelopes instead of managed `control_proposal` envelopes;
+- fixed-target managed live policy construction is isolated in
+  `js/nanah_managed_live_policy.js` instead of growing the dashboard file with
+  policy-build internals.
 
 ## Storage Boundary
 
@@ -99,19 +106,21 @@ flowchart TD
   D --> H["build Nanah hello descriptor"]
   G --> H
   H --> I["replica can save trusted source public key"]
-  J["future managed send"] --> K["sign managed envelope"]
-  K --> L["replica validates and applies only after trusted checks"]
+  J["eligible fixed-target Main/Kids managed send"] --> K["build payload hash and revision"]
+  K --> L["sign managed envelope"]
+  L --> M["replica validates and applies only after trusted checks"]
 ```
 
 ## Boundaries
 
-This slice still does not enable automatic remote management by itself.
+This slice enables live signed send only for saved Source / Parent -> Replica
+managed links where the replica has a fixed child target profile and the sender
+chooses the Main or Kids scope.
 
 Still pending:
 
-- converting the dashboard send button from managed `control_proposal` to
-  signed `filtertube_managed_policy` for eligible managed scopes;
-- canonical policy-hash generation for outbound policy payloads;
+- active/full sync conversion into signed managed-policy envelopes;
+- dedicated keyword/channel/video/time-limit/viewing-space outbound UI;
 - local-network or mailbox delivery runtime;
 - key rotation and revocation UI;
 - encrypted-at-rest or non-extractable private-key storage;

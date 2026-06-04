@@ -669,11 +669,11 @@ created.
 ```text
 dist snapshot source: existing ignored local dist tree
 browser staged directories: 3
-browser staged files per directory: 59
+browser staged files per directory: 60
 dist zip artifacts: 3
-total dist files including zips: 180
-source-backed staged files per browser excluding manifest: 58
-byte-identical source-backed staged files per browser excluding manifest: 58
+total dist files including zips: 183
+source-backed staged files per browser excluding manifest: 59
+byte-identical source-backed staged files per browser excluding manifest: 59
 committed package manifest: absent
 zip checksum manifest: absent
 reproducible build proof: absent
@@ -691,15 +691,15 @@ Per-browser staged group counts are currently identical:
 | `data` | 1 |
 | `html` | 3 |
 | `icons` | 7 |
-| `js` | 33 |
+| `js` | 34 |
 
 Current local package artifact rows:
 
 | Target | Staged files | Manifest bytes | Manifest sha256 | Version | Content script entries | Content script JS refs | WAR refs | ZIP bytes | ZIP sha256 |
 | --- | ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | --- |
-| `chrome` | 59 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | `3.3.2` | 2 | 15 | 5 | 8713779 | `afde5b9c24480abd75f822098bf9e90ece5a519a7291279c69234933e7351a5b` |
-| `firefox` | 59 | 2603 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` | `3.3.2` | 1 | 14 | 5 | 8713838 | `9e3577cf90a4f9b45473084a24257ae99e2f15a16d7d5cc32255cbfc5d77db68` |
-| `opera` | 59 | 2518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | `3.3.2` | 2 | 15 | 4 | 8713781 | `bbd2ab22a947ccb8f41dc61a4186615a6cb573533c8435765ec4635610b6c341` |
+| `chrome` | 60 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | `3.3.2` | 2 | 15 | 5 | 8716254 | `d53060bae6359bb4062643e09f5eac96076c68a86c7c61287cf46fe25aa68198` |
+| `firefox` | 60 | 2603 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` | `3.3.2` | 1 | 14 | 5 | 8716313 | `c52ca7cb4b72c40e99348e0128669a46db2e65ef60b1937cd989e56d132a57c0` |
+| `opera` | 60 | 2518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | `3.3.2` | 2 | 15 | 4 | 8716256 | `b5e72d5894c206104b71338a56a5f34c44b92185ecd9ace787262579657d50ae` |
 
 ASCII boundary:
 
@@ -819,10 +819,10 @@ is a required source input before this release/package/public-claim surface can
 support runtime optimization. Current proof pins:
 
 ```text
-method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5912
+method semantic proof gap files covered: 70
+method semantic proof gap lexical callables covered: 5928
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5912
+lexical callables requiring semantic proof before behavior changes: 5928
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
