@@ -14,6 +14,7 @@ const appProfileModelsPath = '/Users/devanshvarshney/FilterTubeApp/apps/android/
 const appPreferencesPath = '/Users/devanshvarshney/FilterTubeApp/apps/android/app/src/main/java/com/filtertube/app/AppPreferences.kt';
 const appProfilePolicyGatePath = '/Users/devanshvarshney/FilterTubeApp/apps/android/app/src/main/java/com/filtertube/app/ProfilePolicyGate.kt';
 const appProfilePolicyGateTestPath = '/Users/devanshvarshney/FilterTubeApp/apps/android/app/src/test/java/com/filtertube/app/ProfilePolicyGateTest.kt';
+const appManagedWebViewActivityPath = '/Users/devanshvarshney/FilterTubeApp/apps/android/app/src/main/java/com/filtertube/app/ManagedWebViewActivity.kt';
 const appManagedHelperDestinations = Object.freeze({
   'js/nanah_managed_live_policy.js': '/Users/devanshvarshney/FilterTubeApp/packages/extension-source/upstream/js/nanah_managed_live_policy.js',
   'js/nanah_managed_open_sync.js': '/Users/devanshvarshney/FilterTubeApp/packages/extension-source/upstream/js/nanah_managed_open_sync.js'
@@ -55,7 +56,7 @@ function runtimeSource() {
   ].map(read).join('\n');
 }
 
-test('managed app policy parity doc records extension-owned app contract artifact without runtime change', () => {
+test('managed app policy parity doc records extension-owned app contract artifact with app runtime proof boundary', () => {
   const doc = read(docPath);
   const plan = read(planPath);
   const inventory = read(inventoryPath);
@@ -65,7 +66,7 @@ test('managed app policy parity doc records extension-owned app contract artifac
   assert.equal(contract.schema, 'filtertube_managed_app_policy_contract');
   assert.equal(contract.version, 1);
   assert.equal(contract.runtimeBehaviorChanged, false);
-  assert.equal(contract.appSyncStatus, 'app_manifest_contract_and_managed_helper_sync_present_native_enforcement_pending');
+  assert.equal(contract.appSyncStatus, 'app_manifest_contract_helpers_and_android_time_entry_wiring_present_ios_pending');
   assert.deepEqual(contract, artifactContract);
   assert.equal(contract.artifact.sourcePath, contractArtifactPath);
   assert.equal(contract.artifact.appDestination, 'packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json');
@@ -79,9 +80,9 @@ test('managed app policy parity doc records extension-owned app contract artifac
     assert.equal(helper.appDestination, appManagedHelperDestinations[helper.sourcePath].replace('/Users/devanshvarshney/FilterTubeApp/', ''));
     assert.match(helper.boundary, /native|server mailbox|local-network/);
   }
-  assert.match(doc, /Runtime behavior changed\*\*: no/);
-  assert.match(doc, /Android native\s+model proof/);
-  assert.match(doc, /Activity-wide runtime wiring and iOS parity remain\s+pending/);
+  assert.match(doc, /Runtime behavior changed\*\*: extension no; Android app yes/);
+  assert.match(doc, /Android native\s+model and Activity runtime proof/);
+  assert.match(doc, /iOS parity remains\s+pending/);
   assert.match(doc, /App Sync Boundary/);
   assert.match(doc, /Required Parity Decisions/);
   assert.match(doc, /Current Gap/);
@@ -90,12 +91,13 @@ test('managed app policy parity doc records extension-owned app contract artifac
   assert.match(inventory, new RegExp(docPath));
 });
 
-test('android app has native managed time-limit model proof without claiming full runtime wiring', () => {
+test('android app has native managed time-limit model and Activity runtime proof', () => {
   for (const absolutePath of [
     appProfileModelsPath,
     appPreferencesPath,
     appProfilePolicyGatePath,
-    appProfilePolicyGateTestPath
+    appProfilePolicyGateTestPath,
+    appManagedWebViewActivityPath
   ]) {
     assert.equal(fs.existsSync(absolutePath), true, `missing app proof file ${absolutePath}`);
   }
@@ -104,6 +106,7 @@ test('android app has native managed time-limit model proof without claiming ful
   const preferences = readAbsolute(appPreferencesPath);
   const policyGate = readAbsolute(appProfilePolicyGatePath);
   const policyGateTest = readAbsolute(appProfilePolicyGateTestPath);
+  const managedWebViewActivity = readAbsolute(appManagedWebViewActivityPath);
 
   for (const token of [
     'data class ManagedTimeLimitPolicy',
@@ -123,13 +126,39 @@ test('android app has native managed time-limit model proof without claiming ful
   for (const token of [
     'managedPolicyState',
     'managedActionHistory',
-    'timeLimitPolicy'
+    'timeLimitPolicy',
+    'loadManagedTimeBudgetState',
+    'saveManagedTimeBudgetState',
+    'clearManagedTimeBudgetState',
+    'KEY_MANAGED_TIME_BUDGET_STATES'
   ]) {
-    assert.match(profileModels, new RegExp(token));
+    if (['managedPolicyState', 'managedActionHistory', 'timeLimitPolicy'].includes(token)) {
+      assert.match(profileModels, new RegExp(token));
+    }
     assert.match(preferences, new RegExp(token));
   }
 
   assert.match(policyGate, /timeLimitPolicy\?\.policyFingerprint\(\)/);
+  for (const token of [
+    'enforceManagedTimeBudget(source = "startup", active = true)',
+    'enforceManagedTimeBudget(source = "resume", active = true)',
+    'recordManagedTimeBudgetPause()',
+    'cancelManagedTimeBudgetHeartbeat()',
+    'ManagedAppTimeBudgetGate.evaluate',
+    'ViewingLaunchCoordinator.safeExitToLauncher',
+    'loadUrl("about:blank")',
+    'MANAGED_TIME_BUDGET_HEARTBEAT_MS',
+    'profile.type != ProfileType.CHILD',
+    'policy == null || !policy.enabled'
+  ]) {
+    assert.match(managedWebViewActivity, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  }
+  assert.ok(
+    managedWebViewActivity.indexOf('enforceManagedTimeBudget(source = "startup", active = true)') <
+      managedWebViewActivity.indexOf('configureWebSurface()'),
+    'startup time-budget gate should run before initial web surface configuration'
+  );
+  assert.match(managedWebViewActivity, /binding\.webView\.removeCallbacks\(managedTimeBudgetHeartbeatRunnable\)/);
   for (const token of [
     'managedTimeLimitPolicyChangeInvalidatesPolicyVersion',
     'disabledManagedTimeLimitPolicyIsNoWorkForNativeApp',

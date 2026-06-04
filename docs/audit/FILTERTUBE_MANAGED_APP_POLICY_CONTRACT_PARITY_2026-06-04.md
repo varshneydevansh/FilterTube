@@ -3,10 +3,10 @@
 **Generated**: 2026-06-04
 **Status**: Extension-owned app policy artifact plus managed Nanah helper
 source copies are wired into the app runtime sync manifest. Android native
-model proof for managed profile state, action history, and time-budget
-decisions has started; Activity-wide runtime wiring and iOS parity remain
-pending.
-**Runtime behavior changed**: no.
+model and Activity runtime proof now persist managed profile state, action
+history, and time-budget decisions, and gate managed web content at startup,
+resume, heartbeat, and pause. iOS parity remains pending.
+**Runtime behavior changed**: extension no; Android app yes.
 **Goal slice**: Implementation order item 12, "Sync shared policy contract to
 apps", and item 13, "Add app viewing-space/time-limit parity tests".
 **Primary inputs**:
@@ -26,7 +26,8 @@ YouTube DOM assumptions as native app authority.
 
 This proof defines the shared profile, viewing-space, time-limit, managed
 envelope, and action-history contract that apps must preserve when syncing from
-the extension. It does not claim Android or iOS enforcement is complete yet.
+the extension. It does not claim full Android settings-lock, rich timeout UI,
+or iOS enforcement is complete yet.
 
 ## Contract Snapshot JSON
 
@@ -37,7 +38,7 @@ the extension. It does not claim Android or iOS enforcement is complete yet.
   "generated": "2026-06-04",
   "owner": "extension_upstream_policy_contract",
   "runtimeBehaviorChanged": false,
-  "appSyncStatus": "app_manifest_contract_and_managed_helper_sync_present_native_enforcement_pending",
+  "appSyncStatus": "app_manifest_contract_helpers_and_android_time_entry_wiring_present_ios_pending",
   "artifact": {
     "sourcePath": "docs/audit/artifacts/managed-app-policy-contract-v1.json",
     "appDestination": "packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json",
@@ -266,17 +267,18 @@ pull-on-open helper sources into `packages/extension-source/upstream/js/` so the
 downstream app repo can track the exact helper contracts without treating them
 as native runtime authority.
 
-Android now has a first native model proof that preserves
+Android now has a native model and Activity runtime proof that preserves
 `managedPolicyState`, `managedActionHistory`, and `settings.timeLimitPolicy`
 through the profile model, includes `timeLimitPolicy.policyFingerprint()` in
-route policy versions, and pins pure time-budget decisions for disabled
-policies, zero-budget timeout, active-session no-double-counting, timezone
-revalidation, newer reduced-budget clamping, and stale reduced-budget rejection.
+route policy versions, persists per-profile managed time-budget state, gates
+managed web content before initial surface configuration, rechecks on resume
+and heartbeat, records pause usage, clears disabled-policy state, blanks managed
+web surfaces on timeout, and exits through `ViewingLaunchCoordinator`.
 
-Android still needs Activity-wide runtime wiring that applies the model before
-opening or continuing managed web content. iOS still needs the matching native
-adapter proof. Both platforms still need native settings locks that consume this
-artifact without forking extension authority semantics.
+Android still needs richer timeout UI, installed-device smoke coverage for
+Main/Kids surfaces, and native settings locks that consume this artifact without
+forking extension authority semantics. iOS still needs the matching native
+adapter proof.
 
 ## Edge Cases To Keep
 
