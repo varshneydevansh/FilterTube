@@ -139,7 +139,7 @@ test('app sync manifest sources exist and are owned by the public repo path', ()
   }
 });
 
-test('manifest copy destinations record current stale runtime rows and synced contract row', () => {
+test('manifest copy destinations record current fresh runtime rows and synced contract row', () => {
   const manifest = readJson('tools/runtime-sync-manifest.json', appRoot);
   const diffs = [];
 
@@ -155,14 +155,7 @@ test('manifest copy destinations record current stale runtime rows and synced co
     }
   }
 
-  assert.deepEqual(diffs, [
-    'js/content_bridge.js:hash-diff',
-    'js/content/block_channel.js:hash-diff',
-    'js/content/bridge_settings.js:hash-diff',
-    'js/io_manager.js:hash-diff',
-    'js/tab-view.js:hash-diff',
-    'js/nanah_sync_adapter.js:hash-diff'
-  ]);
+  assert.deepEqual(diffs, []);
   assert.equal(
     diffs.some((diff) => diff.includes('managed-app-policy-contract-v1.json')),
     false
@@ -173,10 +166,10 @@ test('generated main runtime assets are large app outputs and not byte-identical
   const androidPath = path.join(appRoot, 'apps/android/app/src/main/assets/filtertube_runtime_full.js');
   const iosPath = path.join(appRoot, 'apps/ios/FilterTube/Resources/filtertube_runtime_full.js');
 
-  assert.equal(fs.statSync(androidPath).size, 1612973);
-  assert.equal(fs.statSync(iosPath).size, 1609476);
-  assert.equal(sha256(androidPath), '8657e8db5b57630fb5eca8d912a19c146e0a074f8c3b9bda0ce98705f140bca8');
-  assert.equal(sha256(iosPath), '326a26190fdbf67b782a74982a13b951a10c947918dd7e71a71c5af97cdf8003');
+  assert.equal(fs.statSync(androidPath).size, 1634163);
+  assert.equal(fs.statSync(iosPath).size, 1632501);
+  assert.equal(sha256(androidPath), '4b0681ed60b3c9f80be10a0e46582e3c832ea9d287e6909995b3a9a5b79692d7');
+  assert.equal(sha256(iosPath), '6955e1934822b49222555fb201be9f18976610ddcc1855b0159e7bb3d7da567a');
   assert.notEqual(sha256(androidPath), sha256(iosPath));
   assert.match(read(auditDocPath), /Generated app runtime assets are not source authority/);
 });
@@ -212,16 +205,7 @@ test('broad extension source mirror drift is detected separately from contract c
     }
   }
 
-  assert.deepEqual(mirrorDiffs.sort(), [
-    'html/tab-view.html:hash-diff',
-    'js/background.js:hash-diff',
-    'js/content/block_channel.js:hash-diff',
-    'js/content/bridge_settings.js:hash-diff',
-    'js/content_bridge.js:hash-diff',
-    'js/io_manager.js:hash-diff',
-    'js/nanah_sync_adapter.js:hash-diff',
-    'js/tab-view.js:hash-diff'
-  ]);
+  assert.deepEqual(mirrorDiffs.sort(), []);
   assert.match(read(auditDocPath), /Current mirror check:/);
 });
 

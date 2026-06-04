@@ -32,10 +32,10 @@ The app sync script reads:
 Current manifest shape:
 
 ```text
-entries: 30
+entries: 32
 sourceRepo: /Users/devanshvarshney/FilterTube
 missing source files: 0
-direct manifest copy hash diffs: 6
+direct manifest copy hash diffs: 0
 ```
 
 The manifest copies upstream runtime, UI parity, Nanah adapter, Nanah vendor,
@@ -48,8 +48,8 @@ Generated app runtime assets are not source authority:
 
 | Asset | Current bytes | SHA-256 | Current behavior |
 | --- | ---: | --- | --- |
-| Android Main runtime | 1,562,220 | `b95585c35da6e0855bce8d70d5da0cc1af3be60308b499edebb35d9a1a466215` | Generated bundle consumed by Android WebView. |
-| iOS Main runtime | 1,560,557 | `2282dee01331c6633cf13c8461847a9e8d1985734d99ec7e2fee92801ee82e20` | Generated from the Android runtime path, normalized for iOS resources. |
+| Android Main runtime | 1,634,163 | `4b0681ed60b3c9f80be10a0e46582e3c832ea9d287e6909995b3a9a5b79692d7` | Generated bundle consumed by Android WebView. |
+| iOS Main runtime | 1,632,501 | `6955e1934822b49222555fb201be9f18976610ddcc1855b0159e7bb3d7da567a` | Generated from the Android runtime path, normalized for iOS resources. |
 | Android Kids runtime | 13,153 | `05b47e2310222a68ba5356cbf6dca24b507aa225bfbe6e971c2a4819d647b711` | Android Kids runtime asset. |
 | iOS Kids runtime | 20,835 | `3f279f275bf93cca6385df6c8d0422a51c533c26cbd29ddd5d9ea5655efc7340` | Android Kids runtime plus iOS-specific WebKit fit/performance patches. |
 
@@ -69,7 +69,7 @@ Current mirror check:
 
 ```text
 mirror dirs: js, html, css
-source files checked: 43
+source files checked: 46
 missing mirror files: 0
 hash-different mirror files: 0
 ```
