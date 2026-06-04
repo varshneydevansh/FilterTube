@@ -159,9 +159,9 @@ test('collector parity rollout approval rows counts and fields stay pinned', () 
   assert.match(doc, /rollback\/unclaimed rows covered: 12/);
   assert.match(doc, /current parity release verification anchors covered: 68/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5789/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5797/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5789/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5797/);
   assert.match(doc, /runtime source-owner approvals: 0/);
   assert.match(doc, /runtime metric collector approvals: 0/);
   assert.match(doc, /runtime collector insertion points approved: 0/);
@@ -223,7 +223,7 @@ test('collector parity rollout approval is backed by current NO-GO gates', () =>
   assert.match(collectorApproval, /collector parity rollout approval/i);
   assert.match(collectorApproval, /implementation-ready collector approval rows: 0/);
   assert.match(methodGap, /files with lexical accounting: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5789/);
+  assert.match(methodGap, /repo-wide lexical callables: 5797/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(verificationOutput, /implementation-ready verification output contract rows: 0/);
   assert.match(rollbackUnclaimed, /runtime rollback approvals: 0/);

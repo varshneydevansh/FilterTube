@@ -49,7 +49,7 @@ about product/runtime transport, not verifier or audit text.
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/seed.js` | 1136 | 50026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
 | `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
-| `js/tab-view.js` | 11960 | 542356 | `0bc598eec24a3800592fd570a1b411ab71d77f610b56589d9b6a6baff3021bce` |
+| `js/tab-view.js` | 12097 | 548665 | `1d76562bc25f8baf1c134da48c6ab3e25cce80dc186f320378f22646ef6ddd74` |
 
 ## File And Operation Counts
 
@@ -143,9 +143,9 @@ js/state_manager.js:914:runtime.sendMessage:kidsBlockChannelRuntimeMutation
 js/state_manager.js:1297:tabs.sendMessage:subscriptionsImportContentRequest
 js/state_manager.js:1636:runtime.sendMessage:kidsWhitelistRuntimeMutation
 js/state_manager.js:1808:runtime.sendMessage:whitelistTransferRuntimeMutation
-js/tab-view.js:3050:runtime.sendMessage:dashboardRuntimeRequest
-js/tab-view.js:3253:tabs.sendMessage:dashboardTabRuntimeRequest
-js/tab-view.js:11315:runtime.onMessage.addListener:dashboardRuntimeMessageReceiver
+js/tab-view.js:3052:runtime.sendMessage:dashboardRuntimeRequest
+js/tab-view.js:3255:tabs.sendMessage:dashboardTabRuntimeRequest
+js/tab-view.js:11452:runtime.onMessage.addListener:dashboardRuntimeMessageReceiver
 ```
 
 ## Current Behavior Boundaries
@@ -153,7 +153,7 @@ js/tab-view.js:11315:runtime.onMessage.addListener:dashboardRuntimeMessageReceiv
 - Background has two runtime receivers: the primary `request.action` /
   `request.type` router and a secondary `message.type` router.
 - Content/dashboard code has two more runtime receivers:
-  `js/content/bridge_settings.js:200` and `js/tab-view.js:11315`.
+  `js/content/bridge_settings.js:200` and `js/tab-view.js:11452`.
 - Runtime sender rows cover settings fetches, prompt acknowledgements, list-mode
   mutations, whitelist/Kids mutations, identity fetches, learned-map writes,
   script injection, browser info, stats/backup scheduling, and popup/dashboard
@@ -328,9 +328,9 @@ support runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5789
+method semantic proof gap lexical callables covered: 5797
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5789
+lexical callables requiring semantic proof before behavior changes: 5797
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

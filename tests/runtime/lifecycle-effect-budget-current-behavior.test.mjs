@@ -46,16 +46,16 @@ test('lifecycle and runtime-owner docs carry the method proof gap blocker', () =
   const gapText = read(methodGapPath);
   const indexTokens = [
     'tracked JS/JSX/MJS files: 69',
-    'repo-wide lexical callables: 5789',
+    'repo-wide lexical callables: 5797',
     'files with complete per-callable semantic proof: 0',
-    'lexical callables requiring semantic proof before behavior changes: 5789',
+    'lexical callables requiring semantic proof before behavior changes: 5797',
     'runtime behavior changed: no'
   ];
   const registerTokens = [
     'method semantic proof gap files covered: 69',
-    'method semantic proof gap lexical callables covered: 5789',
+    'method semantic proof gap lexical callables covered: 5797',
     'files with complete per-callable semantic proof: 0',
-    'lexical callables requiring semantic proof before behavior changes: 5789',
+    'lexical callables requiring semantic proof before behavior changes: 5797',
     'affected callable semantic proof: NO-GO',
     'runtime behavior changed: no'
   ];

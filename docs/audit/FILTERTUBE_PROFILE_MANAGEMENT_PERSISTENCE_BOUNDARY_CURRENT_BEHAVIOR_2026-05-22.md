@@ -18,7 +18,7 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/tab-view.js` | 11960 | 542356 | `0bc598eec24a3800592fd570a1b411ab71d77f610b56589d9b6a6baff3021bce` |
+| `js/tab-view.js` | 12097 | 548665 | `1d76562bc25f8baf1c134da48c6ab3e25cce80dc186f320378f22646ef6ddd74` |
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/io_manager.js` | 2097 | 100479 | `f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62` |
 | `js/background.js` | 6641 | 298986 | `837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd` |
@@ -28,7 +28,7 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 ```text
 4 profile management persistence source files
 source/effect blocks: 9
-tab-view renderProfilesManager block: 390 lines, 19757 bytes
+tab-view renderProfilesManager block: 401 lines, 20286 bytes
 tab-view refreshProfilesUI block: 24 lines, 954 bytes
 tab-view switchToProfile block: 44 lines, 1595 bytes
 popup switchToProfile block: 48 lines, 1659 bytes
@@ -42,12 +42,12 @@ background profile storage invalidation block: 42 lines, 1464 bytes
 ## Selected Token Counts
 
 ```text
-tab-view ensureProfileUnlocked tokens: 16
-tab-view saveProfilesV4 tokens: 30
-tab-view loadProfilesV4 tokens: 54
-tab-view activeProfileId tokens: 69
+tab-view ensureProfileUnlocked tokens: 18
+tab-view saveProfilesV4 tokens: 33
+tab-view loadProfilesV4 tokens: 58
+tab-view activeProfileId tokens: 73
 tab-view StateManager.loadSettings tokens: 8
-tab-view refreshProfilesUI tokens: 20
+tab-view refreshProfilesUI tokens: 21
 tab-view applyLockGateIfNeeded tokens: 4
 tab-view scheduleAutoBackup tokens: 6
 tab-view profile_created tokens: 2
@@ -55,7 +55,7 @@ tab-view managedChildEdit tokens: 12
 tab-view unlockedProfiles tokens: 18
 tab-view allowMainViewing tokens: 4
 tab-view allowKidsViewing tokens: 4
-tab-view schemaVersion tokens: 16
+tab-view schemaVersion tokens: 18
 popup ensureProfileUnlocked tokens: 3
 popup saveProfilesV4 tokens: 2
 popup loadProfilesV4 tokens: 4
@@ -135,9 +135,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5789
+method semantic proof gap lexical callables covered: 5797
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5789
+lexical callables requiring semantic proof before behavior changes: 5797
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

@@ -20,9 +20,9 @@ The current boundary is:
 Reserved route/surface metric artifact root: docs/audit/artifacts/json-first/route-surface-metric-artifact/
 Reserved route/surface metric artifact files: 5
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5789
+Method semantic proof gap lexical callables covered: 5797
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5789
+Lexical callables requiring semantic proof before behavior changes: 5797
 Committed route/surface metric artifact files: 0
 Runtime route/surface metric artifact approval exists: no
 Runtime metric collector approval exists: no
@@ -62,9 +62,9 @@ reserved future metric artifact roots: 1
 reserved future metric artifact files: 5
 related first-optimization foundation sample paths covered: 1
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5789
+method semantic proof gap lexical callables covered: 5797
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5789
+lexical callables requiring semantic proof before behavior changes: 5797
 committed route/surface metric artifact files: 0
 committed first-optimization foundation metric sample files: 0
 runtime route/surface metric artifact approvals: 0

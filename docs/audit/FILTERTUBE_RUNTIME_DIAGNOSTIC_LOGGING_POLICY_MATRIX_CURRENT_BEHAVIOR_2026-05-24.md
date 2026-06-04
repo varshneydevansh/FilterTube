@@ -46,7 +46,7 @@ and website code. Lines whose trimmed text begins with `//` are excluded.
 | `js/seed.js` | 1136 | 50026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
 | `js/settings_shared.js` | 1181 | 57535 | `9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c` |
 | `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
-| `js/tab-view.js` | 11960 | 542356 | `0bc598eec24a3800592fd570a1b411ab71d77f610b56589d9b6a6baff3021bce` |
+| `js/tab-view.js` | 12097 | 548665 | `1d76562bc25f8baf1c134da48c6ab3e25cce80dc186f320378f22646ef6ddd74` |
 | `scripts/build-extension-ui.mjs` | 50 | 1188 | `6326362ebf90f448ccdbf68945b3fb522b7b215edaf9b3e28589a4e166239cf3` |
 | `scripts/build-nanah-vendor.mjs` | 65 | 1818 | `dae8d3ef29c4cd44b0bf975090e9d53f3bb05b523355f5038930fc03b27e921c` |
 | `scripts/sync-native-runtime.mjs` | 34 | 1070 | `4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6` |
@@ -274,9 +274,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5789
+method semantic proof gap lexical callables covered: 5797
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5789
+lexical callables requiring semantic proof before behavior changes: 5797
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

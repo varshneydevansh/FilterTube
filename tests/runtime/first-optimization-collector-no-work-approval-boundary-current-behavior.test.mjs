@@ -165,9 +165,9 @@ test('collector no-work approval rows counts and fields stay pinned', () => {
   assert.match(doc, /committed no-work preservation files: 0/);
   assert.match(doc, /implementation-ready collector no-work approval rows: 0/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5789/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5797/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5789/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5797/);
   assert.match(doc, /expected runtime audit tests: 4457/);
   assert.match(doc, /expected runtime audit pass: 4457/);
   assert.match(doc, /expected runtime audit fail: 0/);
@@ -203,7 +203,7 @@ test('collector no-work approval is backed by current NO-GO gates', () => {
   assert.match(collectorInsertionApproval, /method semantic proof gap files covered: 69/);
   assert.match(collectorApproval, /runtime collector no-work proofs approved: 0/);
   assert.match(methodGap, /files with lexical accounting: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5789/);
+  assert.match(methodGap, /repo-wide lexical callables: 5797/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(collectorInsertion, /collector rows with no-work preservation proof: 0/);
   assert.match(collectorSideEffect, /runtime collector side-effect budgets approved: 0/);

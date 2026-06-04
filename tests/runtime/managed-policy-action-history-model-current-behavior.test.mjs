@@ -155,13 +155,13 @@ function historyAccessDecision({ actor, target, operation, hasRecentAdminAuth = 
   return { allowed: true, decision: 'clear_allowed' };
 }
 
-test('managed policy action-history model is linked from plan and has local accepted-save writer', () => {
+test('managed policy action-history model is linked from plan and has local protected access helpers', () => {
   const doc = read(docPath);
   const plan = read(planPath);
   const inventory = read(inventoryPath);
   const source = runtimeSource();
 
-  assert.match(doc, /Status\*\*: Contract\/proof fixture with local managed-save writer partially\s+present/);
+  assert.match(doc, /Status\*\*: Local protected history access proof present/);
   assert.match(doc, /Issue 60 asks for feedback, logs, or history/);
   assert.match(doc, /Action history is protected evidence and parent\/caregiver UX/);
   assert.match(doc, /It is not policy\s+authority/);
@@ -174,10 +174,14 @@ test('managed policy action-history model is linked from plan and has local acce
   assert.match(inventory, new RegExp(docPath));
   assert.match(source, /filtertube_managed_action_history/);
   assert.match(source, /recordManagedChildLocalEditHistory/);
+  assert.match(source, /function getManagedActionHistoryRows\(profile\)/);
+  assert.match(source, /function managedActionHistoryRowIsProtected\(row\)/);
+  assert.match(source, /function canViewManagedActionHistory\(profilesV4, targetProfileId\)/);
+  assert.match(source, /function showManagedActionHistory\(profileId\)/);
+  assert.match(source, /function clearManagedActionHistory\(profileId\)/);
+  assert.match(source, /historyBtn\.textContent = 'History'/);
   assert.doesNotMatch(source, /managedActionHistoryStore/);
   assert.doesNotMatch(source, /writeManagedActionHistory/);
-  assert.doesNotMatch(source, /canViewManagedActionHistory/);
-  assert.doesNotMatch(source, /clearManagedActionHistory/);
 });
 
 test('managed policy action-history row fixture requires actor target revision result and redacted summary', () => {
@@ -255,8 +259,9 @@ test('managed action history required outcomes cover accepted rejected conflict 
   assert.match(doc, /default accepted-action retention days: 30/);
   assert.match(doc, /plaintext sensitive rule values: no/);
   assert.match(doc, /remote upload or telemetry: no/);
-  assert.match(doc, /runtime managed action history store: local managed child edit only/);
+  assert.match(doc, /runtime managed action history store: profile-local managed child rows/);
   assert.match(doc, /runtime managed action history row writer: local managed child edit only/);
-  assert.match(doc, /runtime managed action history access gate: absent/);
-  assert.match(doc, /runtime managed action history clear path: absent/);
+  assert.match(doc, /runtime managed action history access gate: present for parent\/account authority/);
+  assert.match(doc, /runtime managed action history clear path: present for accepted rows only/);
+  assert.match(doc, /runtime remote managed accept\/reject history writer: absent/);
 });

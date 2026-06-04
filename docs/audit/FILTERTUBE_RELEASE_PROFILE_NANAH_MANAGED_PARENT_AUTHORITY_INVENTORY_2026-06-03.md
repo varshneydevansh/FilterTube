@@ -1,10 +1,12 @@
 # Audit: Managed Parent Authority Inventory
 
 **Generated**: 2026-06-03  
-**Status**: Runtime route-gate proof and local managed-save revision/history
-proof updated. Runtime behavior changed for protected child Main/Kids denial
-and accepted same-device parent-managed child saves; remote-policy and
-time-limit enforcement remain pending.
+**Status**: Runtime route-gate, local managed-save revision/history, protected
+history access, and time-limit enforcement proofs updated. Runtime behavior
+changed for protected child Main/Kids denial, accepted same-device
+parent-managed child saves, parent/account history viewing, accepted-row
+history clearing, and child time-budget enforcement; remote-policy apply
+remains pending.
 **Goal slice**: Implementation order item 1 plus first runtime viewing-space
 enforcement slice.
 **Lane proof**: `test:settings` for profile/Nanah authority and `test:release`
@@ -14,14 +16,14 @@ for adding this focused proof test to the lane workflow.
 ## Purpose
 
 This inventory records the current parent, child, PIN, profile, Nanah, import,
-viewing-space, and time-limit authority paths while the managed-control system
-is being built. It now includes the first extension runtime viewing-space gate:
-child/protected profiles can be denied Main YouTube or YouTube Kids at content
-runtime from local profile settings.
+viewing-space, history, and time-limit authority paths while the
+managed-control system is being built. It now includes extension runtime
+viewing-space denial, local protected history access, and active child
+time-budget enforcement from local profile settings.
 
 This document still does not approve remote policy writes by itself. Signed
-managed policy envelopes, remote revision/replay stores, protected history UI,
-failed-auth history, and time-budget runtime remain separate required slices.
+managed policy envelopes, remote revision/replay stores, remote accept/reject
+history rows, and failed-auth history remain separate required slices.
 
 ## Issue 60 Local-Network Caregiver Addendum
 
@@ -130,6 +132,10 @@ Current local-write boundary:
   revision at `profile.managedPolicyState.localManagedEdits.{main,kids}`.
 - Accepted same-device managed child saves now emit one protected redacted
   action-history row at `profile.managedActionHistory[]`.
+- Parent/account profiles that can manage a child can now open that child's
+  local protected action history from the profile row.
+- The local clear path removes accepted rows but preserves rejected, conflict,
+  failed-auth, expired-session, trust, time-limit, and viewing-space evidence.
 - These local rows are not signed remote-policy authority and do not yet create
   a global revision that all extension contexts can compare against.
 
@@ -330,16 +336,16 @@ Current gap:
 | No signature/integrity check | Trust is link/session-policy based, not envelope-authenticated. | Signed/authenticated envelope tests. |
 | No canonical payload/integrity binding | A signed-looking update could otherwise carry a different scope, target, source device, revision, hash, or payload family than the policy being applied. | Binding-tuple fixtures for link, scope, target, source, revision, policy hash, and payload family. |
 | No signed remote Main/Kids policy gate | Local child route denial now works, but remote updates are still not envelope/revision-bound. | Managed policy envelope, revision store, and Nanah/local-network apply wrapper before remote route-policy writes. |
-| No time-limit runtime | Parent cannot yet enforce daily YouTube budgets. | Runtime active-tab counter, route-gate, overlay, fake-clock, and performance fixtures after the schema contract. |
+| No remote time-limit policy apply | Local child time-budget enforcement exists, but parent/caregiver device updates are still not envelope/revision-bound. | Managed policy envelope, revision store, and remote time-limit fixtures before Nanah/local-network writes. |
 | Adapter lacks trust context | `applyIncomingEnvelope(...)` applies after caller-side checks. | Upper-layer managed policy apply wrapper before adapter call. |
 | Locked-child bypass has no revision binding | `allow_trusted_updates` can skip unlock for matching managed sessions, but not with policy revision constraints. | Locked child managed-policy fixtures. |
 | No mailbox protocol | Offline later delivery is not specified at runtime. | Ciphertext/replay/ack protocol doc before server work. |
 | No local-network management contract | Same-network discovery could be mistaken for authority. | Separate discovery, pairing, transport, and policy-authority proof. |
-| Partial protected-user action history | Accepted local managed child saves now have durable redacted rows; rejected remote updates, failed unlocks, access control, clear policy, and UI are still missing. | Action-history access/clear fixtures and remote reject/failed-auth writers. |
+| Partial protected-user action history | Accepted local managed child saves, local parent/account history access, and accepted-row clearing exist; rejected remote updates and failed unlock rows are still missing. | Remote reject/failed-auth writers and retention fixtures. |
 | No admin lock for remote management | Child PIN or protected profile state could be confused with admin authority. | Parent/account PIN and trusted-device authority fixtures before writes. |
 | No pairing key/signature contract | P2P or local-network transport could authenticate reachability instead of authority. | Device-bound key, signature/integrity, rotation, revocation, and compromise-recovery fixtures. |
 | No hostile-LAN fixture set | Spoofed peer announcements, duplicate device ids, stale pairings, reconnect drift, or MITM attempts could be missed. | Discovery-versus-authority negative fixtures before local-network writes. |
-| No protected log access policy | Action history could leak sensitive rules or be cleared by the protected user. | Log viewer/clear authority, retention, redaction/encryption, and failed-attempt durability proof. |
+| Partial protected log access policy | Local child history viewer and accepted-row clear path now preserve protected evidence; encrypted summaries and failed-attempt durability remain pending. | Retention, encryption, and failed-attempt durability proof. |
 | No conflict-resolution matrix | Simultaneous parent edits or mailbox delivery after revocation could produce nondeterministic policy state. | Equal-revision, different-hash, multi-parent, local-vs-remote, and revoked-queued-update fixtures. |
 
 ## Required Next Implementation Gates
@@ -356,20 +362,20 @@ Before adding parent-managed runtime behavior:
    write primitive, but call it only after managed envelope validation.
 5. Keep Main/Kids route policy fixtures passing while extending the local
    runtime route gate toward signed remote policy apply.
-6. Keep time-limit schema tests passing before any background timer or overlay
-   work, then add runtime counter, route-gate, and overlay fixtures.
+6. Keep time-limit schema and runtime counter/overlay fixtures passing before
+   adding remote time-limit policy apply.
 7. Preserve no-policy/no-work behavior for existing YouTube filtering paths.
 8. Keep local-network discovery separate from managed policy authority.
-9. Keep local action-history fixtures passing and add access/clear plus rejected
-   remote/failed-auth fixtures before exposing caregiver-facing history UI.
+9. Keep local action-history access/clear fixtures passing and add rejected
+   remote/failed-auth fixtures before accepting remote policy writes.
 10. Require parent/account admin authority for protected remote management;
     child PIN must never authorize managed policy edits.
 11. Require pairing key/signature, device binding, rotation, revocation, and
     compromise-recovery proof before accepting local-network/P2P policy writes.
 12. Add hostile-LAN and simultaneous-update conflict fixtures before enabling
     automatic remote apply.
-13. Protect action-history access and clearing behind parent/account authority,
-    with redaction/encryption and retention rules defined before UI exposure.
+13. Keep action-history access and accepted-row clearing behind parent/account
+    authority, then add encryption and failed-attempt retention proof.
 
 ## Verification
 

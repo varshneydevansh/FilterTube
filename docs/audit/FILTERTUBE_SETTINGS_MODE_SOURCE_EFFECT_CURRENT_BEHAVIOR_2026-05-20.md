@@ -113,7 +113,7 @@ flowchart TD
 
 | Owner row | Source pins | Current contract | Optimization risk controlled |
 | --- | --- | --- | --- |
-| `list_mode_ui_intent` | `js/popup.js:816-860`; `js/tab-view.js:4958-4970`; `js/tab-view.js:10883-10973` | Popup/dashboard/import compute the target mode, ask copy/transfer questions, and send `FilterTube_SetListMode`; managed-child dashboard state can mutate the target surface locally. | User-visible "copy blocklist into whitelist" intent is not the same authority as the background transition writer. |
+| `list_mode_ui_intent` | `js/popup.js:816-860`; `js/tab-view.js:5084-5096`; `js/tab-view.js:11020-11110` | Popup/dashboard/import compute the target mode, ask copy/transfer questions, and send `FilterTube_SetListMode`; managed-child dashboard state can mutate the target surface locally. | User-visible "copy blocklist into whitelist" intent is not the same authority as the background transition writer. |
 | `list_mode_transition_writer` | `js/background.js:3613-3821` | Background accepts trusted UI senders, reads `copyBlocklist`, writes Main/Kids mode, merges blocklist rows into whitelist whenever `requestedMode === 'whitelist'`, clears Main legacy aliases/storage lists on Main whitelist transition, invalidates both compiled caches, schedules backup, and refreshes matching tabs. | Mode transition semantics and cache invalidation are centralized, but `copyBlocklist` still needs conflict-policy proof before transition cleanup. |
 | `list_mode_visible_row_owner` | `js/state_manager.js:315-348`; `js/render_engine.js:189-224`; `js/render_engine.js:572-604` | StateManager hydrates Main mode and canonical/legacy rows; render_engine chooses visible keyword/channel rows by profile, mode, and `syncKidsToMain`. | Visible dashboard rows can diverge from compiled runtime rows unless the compiler emits the same source report. |
 | `list_mode_import_alias_owner` | `js/io_manager.js:848-863` | Import/export normalization mirrors `channels`/`keywords` into `blocked*` aliases only in blocklist mode and clears `blocked*` aliases in whitelist mode. | External import and Nanah paths cannot be optimized with UI-only assumptions. |
@@ -320,9 +320,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5789
+method semantic proof gap lexical callables covered: 5797
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5789
+lexical callables requiring semantic proof before behavior changes: 5797
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

@@ -48,7 +48,7 @@ changing any owner.
 
 | Primitive | Count | Audit meaning |
 | --- | ---: | --- |
-| `addEventListener` | 299 | Listener lifecycle surface. |
+| `addEventListener` | 300 | Listener lifecycle surface. |
 | `removeEventListener` | 18 | Explicit listener teardown surface. |
 | `MutationObserver` | 16 | DOM mutation observation surface. |
 | `IntersectionObserver` | 4 | Visibility/identity prefetch observation surface. |
@@ -66,14 +66,14 @@ changing any owner.
 | `.click(` | 33 | Synthetic click/navigation surface. |
 | `.style.display =` | 96 | Direct visual hide/show side-effect surface. |
 | `.classList.add/remove/toggle(` | 110 | Class-based visual/state side-effect surface. |
-| **Total** | **888** | Conservative lifecycle/side-effect primitive count. |
+| **Total** | **889** | Conservative lifecycle/side-effect primitive count. |
 
 ## Family Breakdown
 
 | Audit family | Files | Primitive count | Current interpretation |
 | --- | ---: | ---: | --- |
 | `content-runtime-js` | 17 | 389 | Page-resident filtering, JSON interception, DOM fallback, quick/menu surfaces, learned identity, managed time-limit heartbeats, and bridge work. |
-| `extension-ui-background-js` | 11 | 419 | Dashboard/popup/background settings, import/export, Nanah, row actions, profile/PIN, and UI state work. |
+| `extension-ui-background-js` | 11 | 420 | Dashboard/popup/background settings, import/export, Nanah, row actions, profile/PIN, and UI state work. |
 | `quarantined-legacy-js` | 1 | 37 | `js/layout.js`; direct style/class mutation risk if ever reactivated. |
 | `website-components` | 15 | 24 | Website client components with theme/scene and hero/footer lifecycle; separate from extension runtime filtering. |
 | `generated-ui-output` | 2 | 8 | Generated shell output; freshness proof required rather than hand edits. |
@@ -125,7 +125,7 @@ effects` is dispatch/click/display/class mutation.
 | `js/settings_shared.js` | `extension-ui-background-js` | 0 | 0 | 0 | 0 | 0 | 0 |
 | `js/shared/identity.js` | `content-runtime-js` | 0 | 0 | 0 | 0 | 0 | 0 |
 | `js/state_manager.js` | `extension-ui-background-js` | 0 | 0 | 6 | 8 | 0 | 14 |
-| `js/tab-view.js` | `extension-ui-background-js` | 149 | 0 | 33 | 3 | 87 | 272 |
+| `js/tab-view.js` | `extension-ui-background-js` | 150 | 0 | 33 | 3 | 87 | 273 |
 | `js/ui-shell/popup-shell.js` | `generated-ui-output` | 2 | 0 | 0 | 0 | 2 | 4 |
 | `js/ui-shell/tab-view-decor.js` | `generated-ui-output` | 2 | 0 | 0 | 0 | 2 | 4 |
 | `js/ui_components.js` | `extension-ui-background-js` | 17 | 1 | 8 | 0 | 13 | 39 |
@@ -171,7 +171,7 @@ effects` is dispatch/click/display/class mutation.
 
 | File | Primitive count | Why it matters |
 | --- | ---: | --- |
-| `js/tab-view.js` | 272 | Large UI mutation/listener surface for settings, profiles, Nanah, import/export, app cards, and dashboard state. |
+| `js/tab-view.js` | 273 | Large UI mutation/listener surface for settings, profiles, Nanah, import/export, app cards, and dashboard state. |
 | `js/content_bridge.js` | 165 | Page-runtime bridge with prefetch, fallback menu, whitelist pending work, message bridges, direct hides, and synthetic side effects. |
 | `js/content/block_channel.js` | 81 | Quick-block and native 3-dot affordance lifecycle. |
 | `js/popup.js` | 52 | Popup UI listener and profile/filter mutation surface. |
@@ -274,9 +274,9 @@ can support runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5789
+method semantic proof gap lexical callables covered: 5797
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5789
+lexical callables requiring semantic proof before behavior changes: 5797
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

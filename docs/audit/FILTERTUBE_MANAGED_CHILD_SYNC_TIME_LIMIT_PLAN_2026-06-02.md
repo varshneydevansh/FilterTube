@@ -754,9 +754,18 @@ T1 + T2 + T3
 - **validation**:
   - `npm run test:settings`
   - manual Dashboard/Filters/Kids Mode child-edit smoke
-- **status**: Not Completed
+- **status**: Partially Completed
 - **log**:
+- 2026-06-04: Same-device parent-managed child edits now re-check
+  parent/account authority at save time, record local managed edit revision
+  metadata, write redacted local action-history rows, and expose a parent-only
+  child History action that preserves protected evidence on clear.
 - **files edited/created**:
+  - `js/tab-view.js`
+  - `tests/runtime/managed-child-local-authority-current-behavior.test.mjs`
+  - `tests/runtime/managed-policy-action-history-model-current-behavior.test.mjs`
+  - `docs/audit/FILTERTUBE_MANAGED_CHILD_LOCAL_AUTHORITY_CONTRACT_2026-06-03.md`
+  - `docs/audit/FILTERTUBE_MANAGED_POLICY_ACTION_HISTORY_MODEL_2026-06-03.md`
 
 #### T8: Add local time-limit policy UI
 
@@ -776,9 +785,14 @@ T1 + T2 + T3
   - `npm run build:ui`
   - `npm run test:settings`
   - `npm run test:release`
-- **status**: Not Completed
+- **status**: Partially Completed
 - **log**:
+- 2026-06-04: Profile rows now expose parent-only per-profile time-limit
+  controls. Bulk apply and parent extension-grant UX remain pending.
 - **files edited/created**:
+  - `js/tab-view.js`
+  - `tests/runtime/managed-child-time-limit-schema-current-behavior.test.mjs`
+  - `docs/audit/FILTERTUBE_MANAGED_CHILD_TIME_LIMIT_SCHEMA_CONTRACT_2026-06-03.md`
 
 ### Sprint 3: Extension time-limit enforcement
 

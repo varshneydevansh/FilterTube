@@ -458,7 +458,7 @@ promoted as a first-class authority.
   -> menu, quick-block, Topic byline, lifecycle, and register pins refreshed
 2026-05-28 audit continuation
   -> content-filter validity, route/surface, and value-normalization gaps pinned
-  -> callable proof gap ledgers reconciled to 5,789 lexical callables
+  -> callable proof gap ledgers reconciled to 5,797 lexical callables
   -> runtime behavior changed: no
 ```
 

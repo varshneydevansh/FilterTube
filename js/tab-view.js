@@ -3038,6 +3038,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const MANAGED_LOCAL_EDIT_POLICY_SCHEMA = 'filtertube_managed_local_edit_policy';
     const MANAGED_ACTION_HISTORY_SCHEMA = 'filtertube_managed_action_history';
     const MANAGED_ACTION_HISTORY_LIMIT = 500;
+    const MANAGED_ACTION_HISTORY_PROTECTED_RESULTS = new Set(['rejected', 'conflict', 'failed_auth', 'expired_session']);
+    const MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set(['trust_link.revoke', 'policy.time_limit.update', 'policy.viewing_space.update']);
 
     async function sendRuntimeMessage(payload) {
         return new Promise((resolve) => {
@@ -4429,6 +4431,130 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
             managedActionHistory: nextRows
         };
+    }
+
+    function getManagedActionHistoryRows(profile) {
+        return Array.isArray(profile?.managedActionHistory)
+            ? profile.managedActionHistory.filter(row => safeObject(row).schema === MANAGED_ACTION_HISTORY_SCHEMA)
+            : [];
+    }
+
+    function managedActionHistoryRowIsProtected(row) {
+        const item = safeObject(row);
+        return MANAGED_ACTION_HISTORY_PROTECTED_RESULTS.has(normalizeString(item.result)) ||
+            MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS.has(normalizeString(item.actionType));
+    }
+
+    function canViewManagedActionHistory(profilesV4, targetProfileId) {
+        const currentActive = normalizeString(profilesV4?.activeProfileId) || activeProfileId || 'default';
+        if (getProfileType(profilesV4, currentActive) === 'child') return false;
+        return canActiveProfileManageProfile(profilesV4, targetProfileId);
+    }
+
+    function formatManagedActionHistoryRow(row) {
+        const item = safeObject(row);
+        const summary = safeObject(item.summary);
+        const date = Number.isFinite(Number(item.receivedAt))
+            ? new Date(Number(item.receivedAt)).toLocaleString()
+            : 'Unknown time';
+        const scope = normalizeString(item.scope) || 'policy';
+        const result = normalizeString(item.result) || 'unknown';
+        const label = normalizeString(summary.label) || normalizeString(item.actionType) || 'Managed action';
+        const reason = normalizeString(item.reason);
+        return reason
+            ? `${date} - ${result} - ${scope} - ${label} (${reason})`
+            : `${date} - ${result} - ${scope} - ${label}`;
+    }
+
+    async function showManagedActionHistory(profileId) {
+        const targetId = normalizeString(profileId);
+        if (!targetId) return;
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
+            UIComponents.showToast('Profiles unavailable', 'error');
+            return;
+        }
+
+        const fresh = await io.loadProfilesV4();
+        if (!canViewManagedActionHistory(fresh, targetId)) {
+            UIComponents.showToast('Switch to the parent account to view protected history', 'error');
+            return;
+        }
+
+        const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
+        const okAdmin = await ensureProfileUnlocked(fresh, currentActive);
+        if (!okAdmin) return;
+
+        const profiles = safeObject(fresh.profiles);
+        const profile = safeObject(profiles[targetId]);
+        const rows = getManagedActionHistoryRows(profile);
+        const latestRows = rows.slice(-12).reverse();
+        const profileName = getProfileName(fresh, targetId);
+        const details = latestRows.length
+            ? latestRows.map(formatManagedActionHistoryRow)
+            : ['No parent-managed actions have been recorded for this profile yet.'];
+        const protectedCount = rows.filter(managedActionHistoryRowIsProtected).length;
+        const choice = await showChoiceModal({
+            title: `${profileName} History`,
+            message: protectedCount
+                ? `${rows.length} rows recorded. ${protectedCount} protected rows are retained until parent re-auth and retention rules allow clearing.`
+                : `${rows.length} parent-managed rows recorded.`,
+            details,
+            choices: rows.length ? [
+                {
+                    value: 'clear',
+                    label: protectedCount ? 'Clear Accepted Only' : 'Clear History',
+                    className: 'btn-secondary'
+                }
+            ] : [],
+            cancelText: 'Close'
+        });
+        if (choice !== 'clear') return;
+        await clearManagedActionHistory(targetId);
+    }
+
+    async function clearManagedActionHistory(profileId) {
+        const targetId = normalizeString(profileId);
+        if (!targetId) return false;
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
+            UIComponents.showToast('Profiles unavailable', 'error');
+            return false;
+        }
+
+        const fresh = await io.loadProfilesV4();
+        if (!canViewManagedActionHistory(fresh, targetId)) {
+            UIComponents.showToast('Switch to the parent account to clear protected history', 'error');
+            return false;
+        }
+
+        const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
+        const okAdmin = await ensureProfileUnlocked(fresh, currentActive);
+        if (!okAdmin) return false;
+
+        const profiles = safeObject(fresh.profiles);
+        const profile = safeObject(profiles[targetId]);
+        const rows = getManagedActionHistoryRows(profile);
+        const protectedRows = rows.filter(managedActionHistoryRowIsProtected);
+        const clearedRows = rows.length - protectedRows.length;
+        profiles[targetId] = {
+            ...profile,
+            managedActionHistory: protectedRows
+        };
+        await io.saveProfilesV4({
+            ...fresh,
+            schemaVersion: 4,
+            profiles
+        });
+        profilesV4Cache = { ...fresh, schemaVersion: 4, profiles };
+        await refreshProfilesUI();
+        UIComponents.showToast(
+            protectedRows.length
+                ? `Cleared ${clearedRows} accepted rows; protected evidence retained`
+                : 'History cleared',
+            'success'
+        );
+        return true;
     }
 
     function isManagedChildEditFor(surface) {
@@ -9023,6 +9149,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
 
                 actions.appendChild(editRulesBtn);
+
+                const historyBtn = document.createElement('button');
+                historyBtn.className = 'btn-secondary';
+                historyBtn.type = 'button';
+                historyBtn.textContent = 'History';
+                historyBtn.title = 'View protected parent-managed action history for this child profile.';
+                historyBtn.addEventListener('click', async () => {
+                    await showManagedActionHistory(profileId);
+                });
+
+                actions.appendChild(historyBtn);
             }
 
             if (profileId !== 'default') {

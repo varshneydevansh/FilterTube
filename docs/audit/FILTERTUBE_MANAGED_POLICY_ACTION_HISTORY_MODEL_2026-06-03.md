@@ -1,8 +1,8 @@
 # Model: Managed Policy Action History And Access Control
 
 **Generated**: 2026-06-03
-**Status**: Contract/proof fixture with local managed-save writer partially
-present.
+**Status**: Local protected history access proof present; remote policy
+accept/reject history is still pending.
 **Goal slice**: Implementation order item 4, "Add action-history/log model and
 access-control tests".
 **Primary inputs**:
@@ -14,8 +14,9 @@ and
 
 Issue 60 asks for feedback, logs, or history so a parent/caregiver can see what
 changed on a protected profile and diagnose rejected local-network or P2P
-updates. This model defines that history and now tracks the first runtime
-writer for accepted same-device parent-managed child surface saves.
+updates. This model defines that history, tracks the first runtime writer for
+accepted same-device parent-managed child surface saves, and now exposes a
+parent/account-only local history view for protected child rows.
 
 Action history is protected evidence and parent/caregiver UX. It is not policy
 authority. Runtime policy must still come from the current accepted managed
@@ -128,23 +129,29 @@ The following events must produce action-history rows in future implementation:
 ## Current Runtime Boundary
 
 Current product runtime source implements a narrow accepted local-write subset
-of this model in `js/tab-view.js`; global remote accept/reject history,
-protected access gates, and clear paths are still pending:
+of this model in `js/tab-view.js`. Parent/account profiles can now open a
+protected child profile's local managed history from the profile row and clear
+accepted rows while retaining rejected/conflict/failed-auth/trust/time/viewing
+evidence. Global remote accept/reject history is still pending:
 
 ```text
-runtime managed action history store: local managed child edit only
+runtime managed action history store: profile-local managed child rows
 runtime managed action history row writer: local managed child edit only
-runtime managed action history access gate: absent
-runtime managed action history clear path: absent
-runtime behavior changed by this contract: yes, for accepted local managed child saves
+runtime managed action history access gate: present for parent/account authority
+runtime managed action history clear path: present for accepted rows only
+runtime remote managed accept/reject history writer: absent
+runtime behavior changed by this contract: yes, for accepted local managed child saves and parent/account history access
 ```
 
 The current local writer stores redacted count summaries under
-`profile.managedActionHistory[]`. Future implementation should add the remote
-accept/reject history writer beside the managed policy accept/reject gate, not
-inside low-level content rule mutation helpers. This keeps local
-keyword/channel/video writes, Nanah apply, mailbox apply, and admin session
-events using one history model without turning logs into policy state.
+`profile.managedActionHistory[]`. The local access gate uses active
+parent/account authority, not child PIN authority, and `clearManagedActionHistory`
+preserves rows that are rejected, conflict, failed-auth, expired-session, trust
+revocation, time-limit, or viewing-space evidence. Future implementation should
+add the remote accept/reject history writer beside the managed policy
+accept/reject gate, not inside low-level content rule mutation helpers. This
+keeps local keyword/channel/video writes, Nanah apply, mailbox apply, and admin
+session events using one history model without turning logs into policy state.
 
 ## Verification
 

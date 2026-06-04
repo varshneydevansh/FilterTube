@@ -13,8 +13,8 @@ function read(relativePath) {
 test('managed parent authority inventory tracks implemented route gate and pending authority areas', () => {
   const doc = read(docPath);
 
-  assert.match(doc, /Status\*\*: Runtime route-gate proof and local managed-save revision\/history\s+proof updated/);
-  assert.match(doc, /Runtime behavior changed/);
+  assert.match(doc, /Status\*\*: Runtime route-gate, local managed-save revision\/history, protected\s+history access, and time-limit enforcement proofs updated/);
+  assert.match(doc, /Runtime behavior\s+changed/);
   assert.match(doc, /Lane proof\*\*: `test:settings`/);
   assert.match(doc, /`test:release`/);
   assert.match(doc, /Local parent-managed child editing/);

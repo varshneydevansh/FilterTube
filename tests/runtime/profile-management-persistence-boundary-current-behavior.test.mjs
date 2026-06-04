@@ -131,10 +131,10 @@ test('profile management persistence audit document records current boundary and
     assert.ok(doc.includes(marker), `missing marker: ${marker}`);
   }
 
-  assert.match(methodGap, /repo-wide lexical callables: 5789/);
+  assert.match(methodGap, /repo-wide lexical callables: 5797/);
   assert.match(methodGap, /files with lexical accounting: 69/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5789/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5797/);
 
   assert.equal(profileSettingsUiFamilyDocs.length, 12);
   for (const familyDocPath of profileSettingsUiFamilyDocs) {
@@ -142,9 +142,9 @@ test('profile management persistence audit document records current boundary and
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 69/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5789/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5797/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5789/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5797/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     assert.match(familyDoc, /runtime behavior changed: no/);
     assert.match(familyDoc, /do not approve runtime\s+optimization/);
@@ -154,7 +154,7 @@ test('profile management persistence audit document records current boundary and
 test('profile management source fingerprints stay pinned', () => {
   const doc = read(auditDocPath);
   const expected = [
-    ['js/tab-view.js', 11960, 542356, '0bc598eec24a3800592fd570a1b411ab71d77f610b56589d9b6a6baff3021bce'],
+    ['js/tab-view.js', 12097, 548665, '1d76562bc25f8baf1c134da48c6ab3e25cce80dc186f320378f22646ef6ddd74'],
     ['js/popup.js', 1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
     ['js/io_manager.js', 2097, 100479, 'f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62'],
     ['js/background.js', 6641, 298986, '837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd']
@@ -173,7 +173,7 @@ test('profile management source/effect block metrics stay pinned in the doc', ()
   const doc = read(auditDocPath);
   const currentBlocks = blocks();
   const expected = {
-    tabRenderProfilesManager: ['tab-view renderProfilesManager block', 390, 19757],
+    tabRenderProfilesManager: ['tab-view renderProfilesManager block', 401, 20286],
     tabRefreshProfilesUI: ['tab-view refreshProfilesUI block', 24, 954],
     tabSwitchToProfile: ['tab-view switchToProfile block', 44, 1595],
     popupSwitchToProfile: ['popup switchToProfile block', 48, 1659],
@@ -193,12 +193,12 @@ test('profile management source/effect block metrics stay pinned in the doc', ()
 test('selected profile management token counts stay pinned', () => {
   const doc = read(auditDocPath);
   const selected = [
-    ['tab-view ensureProfileUnlocked tokens: 16', sources.tabView, 'ensureProfileUnlocked', 16],
-    ['tab-view saveProfilesV4 tokens: 30', sources.tabView, 'saveProfilesV4', 30],
-    ['tab-view loadProfilesV4 tokens: 54', sources.tabView, 'loadProfilesV4', 54],
-    ['tab-view activeProfileId tokens: 69', sources.tabView, 'activeProfileId', 69],
+    ['tab-view ensureProfileUnlocked tokens: 18', sources.tabView, 'ensureProfileUnlocked', 18],
+    ['tab-view saveProfilesV4 tokens: 33', sources.tabView, 'saveProfilesV4', 33],
+    ['tab-view loadProfilesV4 tokens: 58', sources.tabView, 'loadProfilesV4', 58],
+    ['tab-view activeProfileId tokens: 73', sources.tabView, 'activeProfileId', 73],
     ['tab-view StateManager.loadSettings tokens: 8', sources.tabView, 'StateManager.loadSettings', 8],
-    ['tab-view refreshProfilesUI tokens: 20', sources.tabView, 'refreshProfilesUI', 20],
+    ['tab-view refreshProfilesUI tokens: 21', sources.tabView, 'refreshProfilesUI', 21],
     ['tab-view applyLockGateIfNeeded tokens: 4', sources.tabView, 'applyLockGateIfNeeded', 4],
     ['tab-view scheduleAutoBackup tokens: 6', sources.tabView, 'scheduleAutoBackup', 6],
     ['tab-view profile_created tokens: 2', sources.tabView, 'profile_created', 2],
@@ -206,7 +206,7 @@ test('selected profile management token counts stay pinned', () => {
     ['tab-view unlockedProfiles tokens: 18', sources.tabView, 'unlockedProfiles', 18],
     ['tab-view allowMainViewing tokens: 4', sources.tabView, 'allowMainViewing', 4],
     ['tab-view allowKidsViewing tokens: 4', sources.tabView, 'allowKidsViewing', 4],
-    ['tab-view schemaVersion tokens: 16', sources.tabView, 'schemaVersion', 16],
+    ['tab-view schemaVersion tokens: 18', sources.tabView, 'schemaVersion', 18],
     ['popup ensureProfileUnlocked tokens: 3', sources.popup, 'ensureProfileUnlocked', 3],
     ['popup saveProfilesV4 tokens: 2', sources.popup, 'saveProfilesV4', 2],
     ['popup loadProfilesV4 tokens: 4', sources.popup, 'loadProfilesV4', 4],

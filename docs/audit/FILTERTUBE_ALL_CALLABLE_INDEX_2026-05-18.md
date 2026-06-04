@@ -21,9 +21,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5789
+method semantic proof gap lexical callables covered: 5797
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5789
+lexical callables requiring semantic proof before behavior changes: 5797
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -68,14 +68,14 @@ changes remain blocked by the implementation gate.
 
 ```text
 tracked JS/JSX/MJS files: 69
-repo-wide lexical callables: 5789
+repo-wide lexical callables: 5797
 ```
 
 | Family | Files | Lexical callables | Boundary |
 | --- | ---: | ---: | --- |
 | Hot page/background runtime | 9 | 3166 | Already has detailed first-pass hot runtime table in `FILTERTUBE_FUNCTION_COVERAGE_2026-05-17.md`. |
 | Content helper runtime | 9 | 348 | First-pass helper surface audit exists, but behavior fixtures remain incomplete. |
-| UI/settings runtime | 10 | 1590 | First-pass UI/settings audit exists, but action-level fixtures remain incomplete. |
+| UI/settings runtime | 10 | 1598 | First-pass UI/settings audit exists, but action-level fixtures remain incomplete. |
 | Generated/quarantined UI | 6 | 147 | Generated source/output and `js/layout.js`; freshness and quarantine checks required. |
 | Vendor bundles | 2 | 279 | API/provenance boundary, not product-owned method behavior. |
 | Build/sync scripts | 4 | 58 | Release/package/native-sync behavior; separate release fixtures required. |
@@ -114,7 +114,7 @@ repo-wide lexical callables: 5789
 | `js/settings_shared.js` | UI/settings runtime | 43 | UI/settings counted |
 | `js/shared/identity.js` | Content helper runtime | 92 | helper counted |
 | `js/state_manager.js` | UI/settings runtime | 155 | UI/settings counted |
-| `js/tab-view.js` | UI/settings runtime | 892 | UI/settings counted |
+| `js/tab-view.js` | UI/settings runtime | 900 | UI/settings counted |
 | `js/ui-shell/popup-shell.js` | Generated/quarantined UI | 42 | generated output boundary |
 | `js/ui-shell/tab-view-decor.js` | Generated/quarantined UI | 41 | generated output boundary |
 | `js/ui_components.js` | UI/settings runtime | 64 | UI/settings counted |
@@ -170,7 +170,7 @@ repo-wide lexical callables: 5789
 
 3. **The hot runtime is not the whole product.**
    Hot runtime has 3,166 lexical callables, but UI/settings, content helpers,
-   generated shell, vendor, build scripts, and website add another 2,623
+   generated shell, vendor, build scripts, and website add another 2,631
    lexical callable forms.
 
 4. **Vendor and generated files must stay explicitly bounded.**
@@ -205,5 +205,5 @@ That fixture pins:
 
 - all tracked JS/JSX/MJS files are listed,
 - documented callable counts match current lexical source,
-- documented family totals sum to 5,789,
+- documented family totals sum to 5,797,
 - no ignored raw captures or generated package output are part of this index.

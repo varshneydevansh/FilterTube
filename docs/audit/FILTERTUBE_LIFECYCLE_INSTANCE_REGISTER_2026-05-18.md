@@ -29,7 +29,7 @@ family, source family, and owner class.
 
 | Primitive family | Current count | Why it matters |
 | --- | ---: | --- |
-| `addEventListener` | 299 | Listener install surface. |
+| `addEventListener` | 300 | Listener install surface. |
 | `removeEventListener` | 18 | Explicit listener teardown surface. |
 | `MutationObserver` | 16 | DOM mutation observation surface. |
 | `IntersectionObserver` | 4 | Visibility/identity observation surface. |
@@ -39,7 +39,7 @@ family, source family, and owner class.
 | `clearTimeout` | 34 | Delayed work teardown surface. |
 | `requestAnimationFrame` | 31 | Paint-frame scheduling surface. |
 | `cancelAnimationFrame` | 4 | Paint-frame teardown surface. |
-| **Total lifecycle instances** | **539** | Observer/listener/timer/frame lifecycle surface. |
+| **Total lifecycle instances** | **540** | Observer/listener/timer/frame lifecycle surface. |
 
 This register intentionally does not include direct `fetch`, message,
 display/class, click, or dispatch side effects. Those remain covered by the
@@ -50,7 +50,7 @@ side-effect audits.
 
 | Source family | Lifecycle instances | Current interpretation |
 | --- | ---: | --- |
-| `extension-ui-background-js` | 273 | Dashboard, popup, background, StateManager, UI components, and import/export/Nanah lifecycle work. |
+| `extension-ui-background-js` | 274 | Dashboard, popup, background, StateManager, UI components, and import/export/Nanah lifecycle work. |
 | `content-runtime-js` | 231 | YouTube page-runtime work: seed, bridge, quick/menu, DOM fallback, injector, prompts, managed time-limit heartbeat work, and helper listeners. |
 | `website-components` | 23 | Website client lifecycle, including theme/scene controls plus hero/footer decorative motion. |
 | `vendor-bundles` | 8 | Packaged vendor transport listeners, especially Nanah. |
@@ -95,14 +95,14 @@ teardown, listener removal, observer disconnect changes, or timer rewrites.
 
 | Lifecycle role | Primitive families | Instances | Current interpretation |
 | --- | --- | ---: | --- |
-| `install-or-schedule` | `addEventListener`, `MutationObserver`, `IntersectionObserver`, `setInterval`, `setTimeout`, `requestAnimationFrame` | 478 | Work can be installed, observed, repeated, delayed, or framed. |
+| `install-or-schedule` | `addEventListener`, `MutationObserver`, `IntersectionObserver`, `setInterval`, `setTimeout`, `requestAnimationFrame` | 479 | Work can be installed, observed, repeated, delayed, or framed. |
 | `explicit-teardown` | `removeEventListener`, `clearInterval`, `clearTimeout`, `cancelAnimationFrame` | 61 | Only the teardown/clear/cancel primitives counted by this register; observer `disconnect()` and owner-specific cleanup still need semantic proof. |
 
 Source-family imbalance:
 
 | Source family | Install/schedule instances | Explicit teardown instances | Total lifecycle instances | Current risk |
 | --- | ---: | ---: | ---: | --- |
-| `extension-ui-background-js` | 259 | 14 | 273 | Dashboard/popup/background/state lifecycle has the largest unmatched install surface. |
+| `extension-ui-background-js` | 260 | 14 | 274 | Dashboard/popup/background/state lifecycle has the largest unmatched install surface. |
 | `content-runtime-js` | 196 | 35 | 231 | YouTube page runtime still has many page-lifetime listeners, observers, timers, and frame callbacks. |
 | `vendor-bundles` | 8 | 0 | 8 | Vendor lifecycle requires source/hash/freshness proof rather than local edits. |
 | `website-components` | 13 | 10 | 23 | Website client lifecycle grew from hero/footer motion work; it remains outside YouTube page-runtime filtering but still needs website unmount proof. |
@@ -150,8 +150,8 @@ Source-family listener option split:
 
 | Source family | Total listeners | Dominant current shape | Explicit option shapes |
 | --- | ---: | --- | --- |
-| `extension-ui-background-js` | 203 | 201 no-third-argument UI/background listeners | 2 boolean capture listeners |
-| `content-runtime-js` | 78 | Mixed page-runtime listener policy | 25 boolean capture, 16 passive, 6 passive+capture, 5 once, 1 capture object, 1 explicit bubble, 24 no-third-argument |
+| `extension-ui-background-js` | 204 | 202 no-third-argument UI/background listeners | 2 boolean capture listeners |
+| `content-runtime-js` | 79 | Mixed page-runtime listener policy | 26 boolean capture, 16 passive, 6 passive+capture, 5 once, 1 capture object, 1 explicit bubble, 24 no-third-argument |
 | `vendor-bundles` | 8 | Vendor transport defaults | 2 once, 6 no-third-argument |
 | `generated-ui-output` | 2 | Generated expression/identifier options | 2 non-literal option rows |
 | `website-components` | 7 | Website UI defaults | 7 no-third-argument |
@@ -238,7 +238,7 @@ Source-family listener event split:
 
 | Source family | Total listeners | Dominant current events | Non-literal event rows |
 | --- | ---: | --- | ---: |
-| `extension-ui-background-js` | 203 | `click` 100, `change` 54, `input` 19, `keydown` 10 | 0 |
+| `extension-ui-background-js` | 204 | `click` 101, `change` 54, `input` 19, `keydown` 10 | 0 |
 | `content-runtime-js` | 78 | `click` 16, `DOMContentLoaded` 6, `focusin` 5, `mouseleave` 5, `yt-navigate-finish` 5 | 1 |
 | `vendor-bundles` | 8 | `open` 2, `error` 2, `message` 2, `close` 2 | 0 |
 | `generated-ui-output` | 2 | Generated `l2` event dispatch | 2 |
@@ -249,7 +249,7 @@ ASCII listener event flow diagram: present
 ```text
 294 addEventListener installs
         |
-        +--> 116 click listeners
+        +--> 117 click listeners
         +--> 57 change listeners
         +--> 20 input listeners
         +--> 14 keydown listeners
@@ -269,7 +269,7 @@ Mermaid listener event flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["294 addEventListener installs"] --> B["116 click listeners"]
+  A["294 addEventListener installs"] --> B["117 click listeners"]
   A --> C["57 change listeners"]
   A --> D["20 input listeners"]
   A --> E["14 keydown listeners"]
@@ -322,7 +322,7 @@ Source-family listener target split:
 
 | Source family | Total listeners | Document/window targets | Local/generated/vendor targets |
 | --- | ---: | ---: | --- |
-| `extension-ui-background-js` | 203 | 13 | 173 local element, 17 optional local element |
+| `extension-ui-background-js` | 204 | 13 | 174 local element, 17 optional local element |
 | `content-runtime-js` | 78 | 42 | 32 local element |
 | `vendor-bundles` | 8 | 0 | 8 vendor transport |
 | `website-components` | 7 | 5 | 2 local element |
@@ -333,7 +333,7 @@ ASCII listener target flow diagram: present
 ```text
 294 addEventListener installs
         |
-        +--> 207 local element targets
+        +--> 208 local element targets
         +--> 17 optional local element targets
         +--> 41 document targets
         +--> 19 window targets
@@ -350,7 +350,7 @@ Mermaid listener target flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["294 addEventListener installs"] --> B["207 local element targets"]
+  A["294 addEventListener installs"] --> B["208 local element targets"]
   A --> C["17 optional local element targets"]
   A --> D["41 document targets"]
   A --> E["19 window targets"]
@@ -505,7 +505,7 @@ Source-family listener callback split:
 
 | Source family | Total listener callbacks | Callback shape summary |
 | --- | ---: | --- |
-| `extension-ui-background-js` | 203 | 191 inline arrow callbacks, 12 identifier callbacks. |
+| `extension-ui-background-js` | 204 | 192 inline arrow callbacks, 12 identifier callbacks. |
 | `content-runtime-js` | 78 | 55 inline arrow callbacks, 18 identifier callbacks, 1 member reference callback. |
 | `vendor-bundles` | 8 | 8 inline arrow callbacks in packaged vendor transport code. |
 | `website-components` | 7 | 7 identifier callbacks. |
@@ -516,7 +516,7 @@ ASCII listener callback flow diagram: present
 ```text
 294 addEventListener installs
         |
-        +--> 254 inline arrow callbacks
+        +--> 255 inline arrow callbacks
         +--> 37 identifier callback references
         +--> 1 member callback reference
         +--> 2 generated expression callbacks
@@ -533,7 +533,7 @@ Mermaid listener callback flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["294 addEventListener installs"] --> B["254 inline arrow callbacks"]
+  A["294 addEventListener installs"] --> B["255 inline arrow callbacks"]
   A --> C["37 identifier callback references"]
   A --> D["1 member callback reference"]
   A --> E["2 generated expression callbacks"]
@@ -585,7 +585,7 @@ Source-family add/remove parity:
 
 | Source family | Adds | Removes | Delta |
 | --- | ---: | ---: | ---: |
-| `extension-ui-background-js` | 203 | 0 | 203 |
+| `extension-ui-background-js` | 204 | 0 | 204 |
 | `content-runtime-js` | 78 | 4 | 70 |
 | `vendor-bundles` | 8 | 0 | 8 |
 | `website-components` | 7 | 7 | 0 |
@@ -4382,14 +4382,14 @@ flowchart TD
 | Row id | Joined proof surface | Current source-backed state | Why implementation remains NO-GO |
 | --- | --- | --- | --- |
 | `lifecycle_convergence_primitive_census` | Repo-wide primitive census | 539 lifecycle primitive instances are tracked: 478 install-or-schedule rows and 61 explicit teardown rows. | A count proves breadth, not owner, trigger, side-effect, route, or teardown safety. |
-| `lifecycle_convergence_listener_surface` | Listener installs, targets, callbacks, and add/remove parity | 294 `addEventListener` rows, 13 `removeEventListener` rows, a 281 install-minus-remove delta, 51 page-global listener installs without explicit remove, and 42 content-runtime document/window listener rows are pinned. | Listener cleanup can change native menu timing, route work, page-message trust, quick-block affordances, and UI mutation behavior. |
+| `lifecycle_convergence_listener_surface` | Listener installs, targets, callbacks, and add/remove parity | 294 `addEventListener` rows, 13 `removeEventListener` rows, a 282 install-minus-remove delta, 51 page-global listener installs without explicit remove, and 42 content-runtime document/window listener rows are pinned. | Listener cleanup can change native menu timing, route work, page-message trust, quick-block affordances, and UI mutation behavior. |
 | `lifecycle_convergence_observer_surface` | Observer constructors, observe targets/options, disconnects, and observe/release parity | 20 observer constructor rows, 21 observe activation rows, 15 release rows, 14 disconnect rows, and a 6 observe-minus-release delta are pinned. | Observer cleanup remains split across dropdowns, quick-block, fallback menu, prefetch, DOM fallback, collaborator dialog, and website component owners. |
 | `lifecycle_convergence_timer_frame_surface` | Timer, interval, and animation-frame schedules | 124 lexical `setTimeout` rows, 3 `setInterval` rows, 31 `requestAnimationFrame` rows, 33 YouTube SPA immediate/short hot timer rows, 29 desktop residual rows, and 4 mobile/coarse eager rows are pinned. | Delay or cancellation changes require per-owner no-work, max-rerun, stale-route, and side-effect evidence. |
 | `lifecycle_convergence_hot_spa_owners` | High-risk YouTube SPA lifecycle owners | 16 hot YouTube SPA owner rows cover quick-block, native menu, dropdown discovery/visibility, identity prefetch, playlist prefetch, whitelist right rail, DOM fallback, fallback menu, metadata reruns, seed replay, injector readiness, and settings refresh debounce. | Hot owners are locally gated, but no shared lifecycle registry proves route/surface teardown or disabled-mode zero work. |
 | `lifecycle_convergence_mode_surface_budget` | Empty, active, mobile/coarse, whitelist, watch, YTM, and Kids surfaces | Empty desktop observer proof is partial; active blocklist, mobile/coarse, whitelist, watch/YTM/Kids, and DOM fallback active work all remain separate budget classes. | One successful empty-desktop slice cannot authorize active-rule, mobile, whitelist, watch, YTM, or Kids lifecycle pruning. |
 | `lifecycle_convergence_teardown_effect_budget` | Lifecycle effect budget and teardown decision register | Existing docs identify missing shared runtime authority before observers, listeners, timers, frames, and page-global patches can be reduced. | Local gates and local cleanup are not equivalent to a route-scoped lifecycle teardown authority. |
 | `lifecycle_convergence_menu_overlay_timing` | Native menu, fallback menu, quick-block, fullscreen, and native-overlay timing | Native dropdown repair, outside-pointer close, fallback-menu scans, quick-block viewport work, and fullscreen/native-overlay quiet gates remain separate implementations. | The comment 3-dot/menu regressions prove menu-node reuse and overlay state can break if lifecycle cleanup is too broad. |
-| `lifecycle_convergence_method_json_dependency` | Method semantic and JSON path dependencies | Method proof still has 69 tracked JS/JSX/MJS files, 5,789 lexical callables, 0 complete per-callable proof files, and JSON path proof still blocks JSON-first promotion. | Lifecycle pruning can hide or leak content unless callable effects and JSON/DOM parity are proven for affected owners. |
+| `lifecycle_convergence_method_json_dependency` | Method semantic and JSON path dependencies | Method proof still has 69 tracked JS/JSX/MJS files, 5,797 lexical callables, 0 complete per-callable proof files, and JSON path proof still blocks JSON-first promotion. | Lifecycle pruning can hide or leak content unless callable effects and JSON/DOM parity are proven for affected owners. |
 | `lifecycle_convergence_authority_absence` | Missing runtime authority symbols | Product source still lacks one lifecycle effect/owner/teardown authority for listeners, observers, timers, route pause, native overlay pause, and no-rule counters. | Authority absence keeps lifecycle cleanup, runtime optimization, release claims, and goal completion at NO-GO. |
 
 Current lifecycle convergence status:
@@ -4461,9 +4461,9 @@ runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5789
+method semantic proof gap lexical callables covered: 5797
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5789
+lexical callables requiring semantic proof before behavior changes: 5797
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
