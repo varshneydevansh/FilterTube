@@ -19,9 +19,10 @@ evidence, managed public-key descriptor pairing, source signing-key
 provisioning, eligible signed Main/Kids/granular live managed-policy sends, and
 an explicit Main/Kids rule-source picker for granular sends, plus a
 provider-gated dashboard/profile-open pull hook for already-decrypted mailbox
-items. Active/full signed conversion, richer bulk outbound controls, server
-mailbox pull/ack/decryption runtime, and local-network discovery runtime remain
-pending.
+items, plus an extension-owned downstream app policy contract proof. Active/full
+signed conversion, richer bulk outbound controls, server mailbox
+pull/ack/decryption runtime, local-network discovery runtime, app manifest
+contract sync, and app native enforcement proofs remain pending.
 **Goal slice**: Implementation order item 1 plus first runtime viewing-space
 enforcement slice.
 **Lane proof**: `test:settings` for profile/Nanah authority and `test:release`
@@ -112,6 +113,7 @@ docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md
 | Nanah managed pull-on-open hook | `docs/audit/FILTERTUBE_NANAH_MANAGED_PULL_ON_OPEN_2026-06-04.md` |
 | Managed pairing public-key descriptor | `docs/audit/FILTERTUBE_NANAH_MANAGED_PAIRING_KEY_DESCRIPTOR_2026-06-04.md` |
 | Managed signing keypair provisioning | `docs/audit/FILTERTUBE_NANAH_MANAGED_SIGNING_KEYPAIR_2026-06-04.md` |
+| Managed app policy contract parity | `docs/audit/FILTERTUBE_MANAGED_APP_POLICY_CONTRACT_PARITY_2026-06-04.md` |
 
 ## Current Authority Map
 
@@ -450,6 +452,7 @@ Current gap:
 | No hostile-LAN fixture set | Spoofed peer announcements, duplicate device ids, stale pairings, reconnect drift, or MITM attempts could be missed. | Discovery-versus-authority negative fixtures before local-network writes. |
 | Partial protected log access policy | Local child history viewer, accepted-row clear path, and dashboard failed-attempt persistence now preserve protected evidence; encrypted summaries and background/session-service failed-attempt durability remain pending. | Retention, encryption, and background/session-service failed-attempt durability proof. |
 | No conflict-resolution matrix | Simultaneous parent edits or mailbox delivery after revocation could produce nondeterministic policy state. | Equal-revision, different-hash, multi-parent, local-vs-remote, and revoked-queued-update fixtures. |
+| App policy contract parity now explicit | The extension-owned contract names the fields apps must preserve, but the app sync manifest has not yet copied a dedicated contract artifact and native app enforcement proofs remain pending. | App manifest contract sync plus Android/iOS adapter tests for Main/Kids route gates, time limits, sync locks, and child/admin authority separation. |
 
 ## Required Next Implementation Gates
 

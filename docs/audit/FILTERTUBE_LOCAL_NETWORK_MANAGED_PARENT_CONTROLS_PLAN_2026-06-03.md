@@ -12,9 +12,12 @@ provisioning plus an adapter signing helper are present. Live fixed-target
 Nanah managed-policy sends are present for Main/Kids, keyword, channel, video,
 viewing-space, and time-limit scopes, and granular keyword/channel/video sends
 now expose an explicit Main/Kids rule-source picker. A provider-gated
-dashboard/profile-open pull hook is present for already-decrypted mailbox items.
+dashboard/profile-open pull hook is present for already-decrypted mailbox
+items. An extension-owned managed app policy contract proof is now present so
+downstream app parity can be tested before app runtime sync changes.
 Local-network peer discovery, LAN delivery, server mailbox pull, mailbox ack,
-mailbox decryption, and active/full signed managed sends remain gated.
+mailbox decryption, app manifest contract sync, app native enforcement proofs,
+and active/full signed managed sends remain gated.
 **Primary audit input**:
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
 **Current pull-on-open proof**:
@@ -598,9 +601,48 @@ YouTube budgets, then document app parity.
   - `npm run test:settings`
   - `npm run test:performance`
   - `npm run test:dom`
-  - manual installed-extension YouTube smoke
+- manual installed-extension YouTube smoke
 
-## Sprint 6: Offline Mailbox Specification
+## Sprint 6: Downstream App Policy Parity
+
+**Goal**: Keep the extension and mobile/tablet apps on one managed policy
+contract before wiring more native app runtime behavior.
+
+**Demo/Validation**:
+
+- App contract lists profile, viewing-space, time-limit, envelope, and history
+  fields.
+- Contract excludes extension runtime APIs from downstream authority payloads.
+- Current app sync manifest gap is explicit before app-side changes.
+
+### Task 6.1: Add extension-owned app policy contract proof
+
+- **Location**:
+  - `docs/audit/FILTERTUBE_MANAGED_APP_POLICY_CONTRACT_PARITY_2026-06-04.md`
+  - `tests/runtime/managed-app-policy-contract-parity-current-behavior.test.mjs`
+- **Description**: Define the shared managed policy contract that Android/iOS
+  app adapters must preserve while keeping native route/time/app-open locks as
+  app-shell responsibilities.
+- **Status**: Contract doc and focused settings-lane proof added. Product
+  runtime behavior is unchanged. Mobile app repo files are not touched in this
+  slice.
+- **Complexity**: 4/10
+- **Dependencies**: Sprint 1 policy schema, Sprint 5 viewing-space/time-limit
+  runtime contracts.
+- **Acceptance Criteria**:
+  - Apps consume profile, envelope, viewing-space, time-limit, and history
+    contracts.
+  - Apps do not treat extension background/session cache, content-script DOM
+    state, YouTube selectors, or page-message state as native authority.
+  - Main/Kids remain viewing spaces, not separate child profiles.
+  - Native app shell owns app-open lock, Main/Kids route gate, and time budget
+    gate before managed web content opens.
+  - The current app sync manifest contract-copy gap is explicit.
+- **Validation**:
+  - `node --test tests/runtime/managed-app-policy-contract-parity-current-behavior.test.mjs`
+  - `npm run test:settings`
+
+## Sprint 7: Offline Mailbox Specification
 
 **Goal**: Specify but do not rush an encrypted pending-update mailbox for cases
 where parent and child devices are not reachable at the same time.
