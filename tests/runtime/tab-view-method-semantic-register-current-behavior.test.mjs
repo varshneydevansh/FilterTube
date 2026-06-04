@@ -49,26 +49,26 @@ function groupForLine(line) {
   if (line <= 1375) return 'mainFiltersContentControls';
   if (line <= 2542) return 'kidsFiltersContentControls';
   if (line <= 2656) return 'routeIntentAndReleaseNotes';
-  if (line >= 3132 && line <= 3168) return 'profileAccessAndManagedChild';
-  if (line <= 3327) return 'runtimeMessagingBrowserTabs';
-  if (line <= 3694) return 'subscriptionsImportBridge';
-  if (line <= 3967) return 'profileDropdownAndBackupControls';
-  if (line <= 5257) return 'profileAccessAndManagedChild';
-  if (line <= 5805) return 'lockNavigationAndSubscriptionFlow';
-  if (line <= 6069) return 'modalDialogHelpers';
-  if (line <= 6816) return 'nanahModeScopePolicyModal';
-  if (line <= 7467) return 'nanahTargetProfileDevicePolicy';
-  if (line <= 7777) return 'nanahTrustedLinkStorage';
-  if (line <= 8490) return 'nanahSessionUiAndEnvelope';
-  if (line <= 9425) return 'nanahApplyProposalTransport';
-  if (line <= 10011) return 'pinProfilesManager';
-  if (line <= 10899) return 'importExportDownload';
-  if (line <= 11119) return 'settingsSyncAccountPolicyHandlers';
-  if (line <= 11466) return 'dateFilterHelpers';
-  if (line <= 11719) return 'managedRowsListModeRender';
-  if (line <= 12076) return 'dashboardStatsFiltering';
-  if (line <= 12528) return 'dateFilterHelpers';
-  if (line <= 12796) return 'navigationAndToasts';
+  if (line >= 3132 && line <= 3260) return 'profileAccessAndManagedChild';
+  if (line <= 3427) return 'runtimeMessagingBrowserTabs';
+  if (line <= 3814) return 'subscriptionsImportBridge';
+  if (line <= 4102) return 'profileDropdownAndBackupControls';
+  if (line <= 5631) return 'profileAccessAndManagedChild';
+  if (line <= 6043) return 'lockNavigationAndSubscriptionFlow';
+  if (line <= 6307) return 'modalDialogHelpers';
+  if (line <= 7275) return 'nanahModeScopePolicyModal';
+  if (line <= 7766) return 'nanahTargetProfileDevicePolicy';
+  if (line <= 8321) return 'nanahTrustedLinkStorage';
+  if (line <= 9139) return 'nanahSessionUiAndEnvelope';
+  if (line <= 10099) return 'nanahApplyProposalTransport';
+  if (line <= 10695) return 'pinProfilesManager';
+  if (line <= 11113) return 'importExportDownload';
+  if (line <= 11814) return 'settingsSyncAccountPolicyHandlers';
+  if (line >= 12140 && line <= 12161) return 'dateFilterHelpers';
+  if (line <= 12414) return 'managedRowsListModeRender';
+  if (line <= 12771) return 'dashboardStatsFiltering';
+  if (line <= 13223) return 'dateFilterHelpers';
+  if (line <= 13490) return 'navigationAndToasts';
   return 'UNCLASSIFIED';
 }
 
@@ -193,12 +193,12 @@ test('tab-view method semantic register is audit-only and scoped to current beha
   const text = doc();
 
   assert.match(text, /Status: audit-only current-behavior register/);
-  assert.match(text, /Runtime behavior is unchanged/);
+  assert.match(text, /Runtime behavior changed: profile-scoped Nanah managed trusted-link lookup and storage/);
   assert.match(text, /source file: js\/tab-view\.js/);
-  assert.match(text, /named declarations: 353/);
-  assert.match(text, /plain function declarations: 243/);
-  assert.match(text, /async function declarations: 79/);
-  assert.match(text, /const arrow helper declarations: 29/);
+  assert.match(text, /named declarations: 375/);
+  assert.match(text, /plain function declarations: 254/);
+  assert.match(text, /async function declarations: 88/);
+  assert.match(text, /const arrow helper declarations: 31/);
   assert.match(text, /async const arrow helper declarations: 2/);
   assert.match(text, /semantic method groups: 22/);
   assert.match(text, /addEventListener sites: 150/);
@@ -219,33 +219,33 @@ test('tab-view register pins source fingerprint and broad callable reconciliatio
   const text = doc();
 
   assert.deepEqual(stats, {
-    bytes: 585960,
-    sha256: '3e52cf1b3b189450bb9f7b3a6ae7adb833ddc29d90a8564164314f53ced79109',
-    splitLines: 12796,
-    wcLines: 12795
+    bytes: 621440,
+    sha256: '4b5c7474a686eae49d41926a2e4fe4daa670322d91138c6c6d715e07832827b2',
+    splitLines: 13491,
+    wcLines: 13490
   });
-  assert.equal(broadRows.length, 945);
-  assert.equal(controlArtifacts, 592);
+  assert.equal(broadRows.length, 995);
+  assert.equal(controlArtifacts, 620);
   assert.equal(heldOutsideRegister, 0);
   assert.deepEqual({
     if: broadCounts.if,
     for: broadCounts.for,
     while: broadCounts.while
   }, {
-    if: 588,
-    for: 2,
+    if: 615,
+    for: 3,
     while: 2
   });
 
   for (const expected of [
-    'source split lines: 12796',
-    'source wc -l: 12795',
-    'source bytes: 585960',
-    'source sha256: 3e52cf1b3b189450bb9f7b3a6ae7adb833ddc29d90a8564164314f53ced79109',
-    'broad lexical callable matches: 945',
-    'accepted named declaration rows: 353',
-    'semantic method rows promoted: 353',
-    'control-flow lexical artifacts: 592 (`if`: 588, `for`: 2, `while`: 2)',
+    'source split lines: 13491',
+    'source wc -l: 13490',
+    'source bytes: 621440',
+    'source sha256: 4b5c7474a686eae49d41926a2e4fe4daa670322d91138c6c6d715e07832827b2',
+    'broad lexical callable matches: 995',
+    'accepted named declaration rows: 375',
+    'semantic method rows promoted: 375',
+    'control-flow lexical artifacts: 620 (`if`: 615, `for`: 3, `while`: 2)',
     'local/listener/timer callbacks held outside this named method register: 0',
     'executable current-behavior probes: 6'
   ]) {
@@ -256,36 +256,36 @@ test('tab-view register pins source fingerprint and broad callable reconciliatio
 test('tab-view register accounts for every current named declaration', () => {
   const rows = methodRows();
 
-  assert.equal(rows.length, 353);
+  assert.equal(rows.length, 375);
   assert.deepEqual(countBy(rows, 'kind'), {
     'async const arrow': 2,
-    'async function': 79,
-    'const arrow': 29,
-    function: 243
+    'async function': 88,
+    'const arrow': 31,
+    function: 254
   });
   assert.deepEqual(countBy(rows, 'group'), {
     dashboardStatsFiltering: 10,
     dateFilterHelpers: 7,
     importExportDownload: 8,
     kidsFiltersContentControls: 18,
-    lockNavigationAndSubscriptionFlow: 14,
+    lockNavigationAndSubscriptionFlow: 7,
     mainFiltersContentControls: 20,
     managedRowsListModeRender: 15,
     modalDialogHelpers: 7,
     nanahApplyProposalTransport: 17,
-    nanahModeScopePolicyModal: 37,
-    nanahSessionUiAndEnvelope: 10,
-    nanahTargetProfileDevicePolicy: 37,
-    nanahTrustedLinkStorage: 16,
+    nanahModeScopePolicyModal: 47,
+    nanahSessionUiAndEnvelope: 11,
+    nanahTargetProfileDevicePolicy: 32,
+    nanahTrustedLinkStorage: 25,
     navigationAndToasts: 3,
     pinProfilesManager: 8,
-    profileAccessAndManagedChild: 71,
+    profileAccessAndManagedChild: 84,
     profileDropdownAndBackupControls: 11,
     responsiveNavigationShell: 3,
     routeIntentAndReleaseNotes: 4,
     runtimeMessagingBrowserTabs: 17,
     settingsSyncAccountPolicyHandlers: 3,
-    subscriptionsImportBridge: 17
+    subscriptionsImportBridge: 18
   });
 
   for (const row of rows) {
@@ -316,22 +316,22 @@ test('tab-view register pins current DOM listener timer and dependency surface',
   assert.equal((source.match(/\bclearInterval\(/g) || []).length, 1);
   assert.equal((source.match(/\brequestAnimationFrame\(/g) || []).length, 11);
   assert.equal((source.match(/\bMutationObserver\b/g) || []).length, 0);
-  assert.equal((source.match(/document\.getElementById\(/g) || []).length, 242);
-  assert.equal((source.match(/\.querySelector\(/g) || []).length, 31);
+  assert.equal((source.match(/document\.getElementById\(/g) || []).length, 245);
+  assert.equal((source.match(/\.querySelector\(/g) || []).length, 32);
   assert.equal((source.match(/\.querySelectorAll\(/g) || []).length, 27);
-  assert.equal((source.match(/document\.createElement\(/g) || []).length, 336);
+  assert.equal((source.match(/document\.createElement\(/g) || []).length, 346);
   assert.equal((source.match(/\.innerHTML\s*=/g) || []).length, 39);
   assert.equal((source.match(/\.setAttribute\(/g) || []).length, 61);
-  assert.equal((source.match(/\.dataset\.[A-Za-z_$][\w$]*\s*=/g) || []).length, 13);
+  assert.equal((source.match(/\.dataset\.[A-Za-z_$][\w$]*\s*=/g) || []).length, 14);
   assert.equal((source.match(/window\.confirm\(/g) || []).length, 6);
   assert.equal((source.match(/showPromptModal\(/g) || []).length, 14);
   assert.equal((source.match(/showChoiceModal\(/g) || []).length, 10);
 
   for (const token of [
-    'document.getElementById calls: 242',
-    'querySelector calls: 31',
+    'document.getElementById calls: 245',
+    'querySelector calls: 32',
     'querySelectorAll calls: 27',
-    'document.createElement calls: 336',
+    'document.createElement calls: 346',
     'innerHTML writes: 39',
     'setAttribute calls: 61',
     'requestAnimationFrame calls: 11'
@@ -541,6 +541,9 @@ test('tab-view executable probes date helpers and Nanah policy normalization', (
     'getNanahLockedChildMode',
     'getNanahChildProtectionLevel',
     'getNanahTargetProfileBehavior',
+    'buildNanahProfileScopedLinkId',
+    'getNanahTrustedLinkTargetProfileId',
+    'getNanahTrustedLinkIdentityKey',
     'normalizeNanahTrustedLink'
   ]);
 
@@ -573,6 +576,9 @@ test('tab-view executable probes date helpers and Nanah policy normalization', (
     }
   }));
   assert.equal(managedLink.remoteDeviceId, 'device-1');
+  assert.equal(managedLink.linkId, 'nanah-device-1-target-child-1');
+  assert.equal(managedLink.trustedLinkIdentityKey, 'managed:device-1:source:replica:child-1');
+  assert.equal(managedLink.identityKey, 'managed:device-1:source:replica:child-1');
   assert.equal(managedLink.linkType, 'managed_link');
   assert.equal(managedLink.policy.decisionMode, 'source');
   assert.deepEqual(managedLink.policy.allowedScopes, ['main', 'kids']);
@@ -582,6 +588,19 @@ test('tab-view executable probes date helpers and Nanah policy normalization', (
   assert.equal(managedLink.policy.reconnectMode, 'approval_needed');
   assert.equal(managedLink.policy.targetProfileBehavior, 'fixed_profile');
   assert.equal(managedLink.policy.targetProfileId, 'child-1');
+
+  const customManagedLink = plain(helpers.normalizeNanahTrustedLink({
+    linkId: 'custom-link-1',
+    remoteDeviceId: 'device-1',
+    localRole: 'source',
+    remoteRole: 'replica',
+    policy: {
+      targetProfileBehavior: 'fixed_profile',
+      targetProfileId: 'child-2'
+    }
+  }));
+  assert.equal(customManagedLink.linkId, 'custom-link-1');
+  assert.equal(customManagedLink.trustedLinkIdentityKey, 'managed:device-1:source:replica:child-2');
 
   const granularManagedLink = plain(helpers.normalizeNanahTrustedLink({
     remoteDeviceId: ' device-2 ',
@@ -597,6 +616,8 @@ test('tab-view executable probes date helpers and Nanah policy normalization', (
 
   const peerLink = plain(helpers.normalizeNanahTrustedLink({ remoteDeviceId: 'peer-1', localRole: 'peer', remoteRole: 'peer' }));
   assert.equal(peerLink.linkType, 'peer_link');
+  assert.equal(peerLink.linkId, 'nanah-peer-1');
+  assert.equal(peerLink.trustedLinkIdentityKey, 'device:peer-1:peer:peer:peer_link');
   assert.equal(peerLink.policy.decisionMode, 'receiver');
   assert.equal(peerLink.policy.autoApplyControlProposals, false);
   assert.equal(peerLink.policy.reconnectMode, 'fast');

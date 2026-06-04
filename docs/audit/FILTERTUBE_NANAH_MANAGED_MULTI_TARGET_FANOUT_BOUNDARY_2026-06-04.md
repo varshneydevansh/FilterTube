@@ -1,9 +1,10 @@
 # Audit: Nanah Managed Multi-Target Fanout Boundary
 
 **Generated**: 2026-06-04
-**Status**: Boundary contract only. Runtime multi-target fanout remains
-disabled because current trusted-link lookup is device-scoped, not
-device-plus-target-profile scoped.
+**Status**: Profile-scoped identity foundation present; boundary contract still
+active. Runtime multi-target fanout remains disabled because the dashboard does
+not yet expose a target chooser, per-target envelope batcher, or per-target
+ack/history summary.
 **Related live-send proof**:
 `docs/audit/FILTERTUBE_NANAH_MANAGED_LIVE_SIGNED_SEND_2026-06-04.md`
 **Related plan**:
@@ -17,27 +18,40 @@ that should all receive the same keyword, channel, video, viewing-space, or
 time-limit policy.
 
 The current live Nanah runtime can safely send signed managed policy envelopes
-to one connected replica target. It must not expose a bulk target UI until the
-trusted-link model can distinguish which child profile a saved authority record
-belongs to. Otherwise a device-level saved link could be reused for a sibling
-profile that the parent did not explicitly pair and approve.
+to one connected replica target. Trusted-link storage and lookup can now
+distinguish fixed child/profile targets on the same remote device, but the
+dashboard must not expose a bulk target UI until target selection, per-target
+envelope building, and per-target status/history are implemented. Otherwise a
+bulk action could still overclaim delivery or hide a skipped/rejected child
+target behind one success toast.
 
 ## Current Runtime Evidence
 
 Current behavior in `js/tab-view.js`:
 
 ```text
-findNanahTrustedLink(remoteDeviceId)
-  -> returns first trusted row matching remoteDeviceId
+buildNanahProfileScopedLinkId(remoteDeviceId, targetProfileId)
+  -> builds nanah-${remoteDeviceId}-target-${targetProfileId}
+     for fixed managed links
 
-getNanahCurrentTrustedLink()
-  -> calls findNanahTrustedLink(remote device id)
+getNanahTrustedLinkIdentityKey(entry)
+  -> includes remoteDeviceId + local/remote roles + link type
+  -> adds targetProfileId for fixed managed links
 
 saveNanahTrustedLink(entry)
-  -> replaces an existing row by remoteDeviceId
+  -> replaces an existing row by exact link id or trustedLinkIdentityKey
+  -> no longer collapses all fixed child targets on one remoteDeviceId
 
-trustConnectedNanahDevice()
-  -> writes linkId as nanah-${remoteDeviceId}
+findNanahTrustedLink(remoteDeviceId, options = {})
+  -> can prefer exact linkId and targetProfileId before fallback
+
+findNanahTrustedLinkForManagedEnvelope(envelope)
+  -> exact link id first
+  -> then sourceDeviceId + targetProfileId managed-link lookup
+
+getNanahManagedDuplicateDeviceIds(sourceDeviceId, linkId, targetProfileId)
+  -> treats same source device + different target profile as allowed
+  -> still flags ambiguous or same-target duplicate source authority
 ```
 
 Current behavior in `js/nanah_managed_live_policy.js`:
@@ -49,26 +63,36 @@ resolveTargetProfile(trustedLink)
   -> returns null when no fixed protected target is known
 ```
 
-That is correct for one saved target per connected device. It is not enough for
-bulk fanout.
+That is correct for single-target signed sends and for storing multiple fixed
+targets from one trusted remote device. It is still not enough for bulk fanout.
 
 ## Required Identity Upgrade
 
 Multi-target fanout requires link identity to include both the device and the
-protected target profile:
+protected target profile. The runtime now covers the minimum identity key:
 
 ```text
 managed authority key =
   remoteDeviceId
   + localRole/remoteRole
-  + sourceDeviceId/sourceProfileId/sourcePublicKeyId/keyVersion
   + targetProfileId
-  + allowedScopes
 ```
 
-The future link id can be deterministic, but it must be profile-scoped. A
-device-level id such as `nanah-${remoteDeviceId}` cannot safely represent
-several children on the same device.
+Future fanout still needs the full per-target send authority:
+
+```text
+fanout target authority =
+  trustedLinkIdentityKey
+  + sourceDeviceId/sourceProfileId/sourcePublicKeyId/keyVersion
+  + allowedScopes
+  + selected scope
+  + last accepted/sent revision
+```
+
+A device-level id such as `nanah-${remoteDeviceId}` cannot safely represent
+several children on the same device. The normalizer now upgrades legacy default
+managed ids to `nanah-${remoteDeviceId}-target-${targetProfileId}` when the
+policy has a fixed target profile, while preserving explicit custom link ids.
 
 ## Safe Future Flow
 
@@ -109,7 +133,7 @@ The parent-facing UI should stay simple:
 
 ## Non-Negotiable Runtime Gates
 
-- A device-level trusted link is not enough for multi-target authority.
+- A device-level trusted link is still not enough for multi-target authority.
 - Each target must have its own target profile binding.
 - Each envelope must carry its own `targetProfileId`, `linkId`, revision, hash,
   and signature.
@@ -121,7 +145,7 @@ The parent-facing UI should stay simple:
 ## Current Pending Runtime Work
 
 ```text
-runtime profile-scoped trusted link id: absent
+runtime profile-scoped trusted link id: present
 runtime multi-target chooser: absent
 runtime signed fanout envelope builder: absent
 runtime per-target mark-sent state: absent
@@ -129,7 +153,8 @@ runtime per-target ack/history summary: absent
 runtime mailbox/local-network fanout delivery: absent
 ```
 
-Runtime behavior changed by this proof: no.
+Runtime behavior changed by this proof: yes, trusted-link storage and lookup now
+distinguish fixed managed target profiles. Bulk fanout remains disabled.
 
 ## Proof Commands
 

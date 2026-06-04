@@ -79,8 +79,10 @@ Still pending:
 
 - richer bulk outbound controls for viewing-space/time-limit combinations,
   per-child multi-target fanout, and selectable Main+Kids dual-surface sends;
-- profile-scoped trusted-link identity before any multi-target child fanout UI
-  can safely send to several protected profiles on the same replica device;
+- target chooser, per-target envelope batching, and per-target ack/history
+  before any multi-target child fanout UI can safely send to several protected
+  profiles on the same replica device; profile-scoped trusted-link identity is
+  now present as the foundation for that later UI;
 - active/full proposal conversion policy;
 - installed-extension two-device smoke proof;
 - key rotation/revocation UI;

@@ -4916,8 +4916,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const root = safeObject(envelope);
         const sourceDeviceId = normalizeString(root.sourceDeviceId);
         const linkId = normalizeString(root.linkId);
-        return (sourceDeviceId ? findNanahTrustedLink(sourceDeviceId) : null)
-            || nanahTrustedLinks.find((entry) => normalizeString(entry?.linkId) === linkId)
+        const targetProfileId = normalizeString(root.targetProfileId);
+        return nanahTrustedLinks.find((entry) => normalizeString(entry?.linkId) === linkId)
+            || (sourceDeviceId ? findNanahTrustedLink(sourceDeviceId, {
+                targetProfileId,
+                linkId,
+                linkType: 'managed_link',
+                localRole: 'replica',
+                remoteRole: 'source'
+            }) : null)
             || null;
     }
 
@@ -4945,15 +4952,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
-    function getNanahManagedDuplicateDeviceIds(sourceDeviceId, trustedLinkId) {
+    function getNanahManagedDuplicateDeviceIds(sourceDeviceId, trustedLinkId, targetProfileId = '') {
         const deviceId = normalizeString(sourceDeviceId);
         if (!deviceId) return [];
+        const currentTargetProfileId = normalizeString(targetProfileId);
         const matching = nanahTrustedLinks.filter((entry) => {
             const trusted = normalizeNanahTrustedLink(entry);
             if (!trusted) return false;
             const policy = safeObject(trusted.policy);
             const candidate = normalizeString(trusted.sourceDeviceId || policy.sourceDeviceId) || trusted.remoteDeviceId;
-            return candidate === deviceId && normalizeString(trusted.linkId) !== normalizeString(trustedLinkId);
+            if (candidate !== deviceId || normalizeString(trusted.linkId) === normalizeString(trustedLinkId)) {
+                return false;
+            }
+            const candidateTargetProfileId = getNanahTrustedLinkTargetProfileId(trusted);
+            if (!currentTargetProfileId || !candidateTargetProfileId) return true;
+            return candidateTargetProfileId === currentTargetProfileId;
         });
         return matching.length > 0 ? [deviceId] : [];
     }
@@ -4972,7 +4985,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             profiles,
             trustedLink,
             accepted,
-            duplicateDeviceIds: getNanahManagedDuplicateDeviceIds(root.sourceDeviceId, root.linkId || trustedLink.linkId),
+            duplicateDeviceIds: getNanahManagedDuplicateDeviceIds(
+                root.sourceDeviceId,
+                root.linkId || trustedLink.linkId,
+                targetProfileId
+            ),
             signatureVerification: null,
             historyTargetProfileId: targetProfileId
         };
@@ -7122,6 +7139,50 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    function buildNanahProfileScopedLinkId(remoteDeviceId, targetProfileId) {
+        const devicePart = normalizeString(remoteDeviceId).replace(/[^A-Za-z0-9_.-]/g, '-');
+        const targetPart = normalizeString(targetProfileId).replace(/[^A-Za-z0-9_.-]/g, '-');
+        if (!devicePart || !targetPart) return '';
+        return `nanah-${devicePart}-target-${targetPart}`;
+    }
+
+    function getNanahTrustedLinkTargetProfileId(entry) {
+        const raw = safeObject(entry);
+        const policy = safeObject(raw.policy);
+        const targetProfileBehavior = getNanahTargetProfileBehavior(
+            policy.targetProfileBehavior || raw.targetProfileBehavior,
+            'current_active'
+        );
+        return targetProfileBehavior === 'fixed_profile'
+            ? normalizeString(policy.targetProfileId || raw.targetProfileId)
+            : '';
+    }
+
+    function getNanahTrustedLinkIdentityKey(entry) {
+        const raw = safeObject(entry);
+        const policy = safeObject(raw.policy);
+        const remoteDeviceId = normalizeString(raw.remoteDeviceId);
+        if (!remoteDeviceId) return '';
+        const localRole = (() => {
+            const value = normalizeString(raw.localRole).toLowerCase();
+            return value === 'source' || value === 'replica' || value === 'peer' ? value : 'peer';
+        })();
+        const remoteRole = (() => {
+            const value = normalizeString(raw.remoteRole || raw.role).toLowerCase();
+            return value === 'source' || value === 'replica' || value === 'peer' ? value : 'peer';
+        })();
+        const derivedLinkType = classifyNanahTrustedLink(localRole, remoteRole);
+        const requestedLinkType = normalizeString(raw.linkType || policy.linkType);
+        const linkType = requestedLinkType === 'managed_link' || requestedLinkType === 'peer_link'
+            ? requestedLinkType
+            : (derivedLinkType || 'peer_link');
+        const targetProfileId = getNanahTrustedLinkTargetProfileId(raw);
+        if (linkType === 'managed_link' && targetProfileId) {
+            return `managed:${remoteDeviceId}:${localRole}:${remoteRole}:${targetProfileId}`;
+        }
+        return `device:${remoteDeviceId}:${localRole}:${remoteRole}:${linkType}`;
+    }
+
     function normalizeNanahTrustedLink(entry) {
         const raw = safeObject(entry);
         const remoteDeviceId = normalizeString(raw.remoteDeviceId);
@@ -7157,10 +7218,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         );
         const targetProfileId = normalizeString(safeObject(raw.policy).targetProfileId || raw.targetProfileId);
         const targetProfileName = normalizeString(safeObject(raw.policy).targetProfileName || raw.targetProfileName);
+        const legacyDefaultLinkId = `nanah-${remoteDeviceId}`;
+        const profileScopedLinkId = linkType === 'managed_link'
+            && targetProfileBehavior === 'fixed_profile'
+            && targetProfileId
+            ? buildNanahProfileScopedLinkId(remoteDeviceId, targetProfileId)
+            : legacyDefaultLinkId;
+        const rawLinkId = normalizeString(raw.linkId);
+        const linkId = rawLinkId && rawLinkId !== legacyDefaultLinkId ? rawLinkId : profileScopedLinkId;
+
+        const trustedLinkIdentityKey = getNanahTrustedLinkIdentityKey({
+            ...raw,
+            remoteDeviceId,
+            localRole,
+            remoteRole,
+            linkType,
+            policy: {
+                ...safeObject(raw.policy),
+                targetProfileBehavior,
+                targetProfileId: targetProfileBehavior === 'fixed_profile' ? targetProfileId : ''
+            }
+        });
 
         return {
             ...raw,
-            linkId: normalizeString(raw.linkId) || `nanah-${remoteDeviceId}`,
+            linkId,
+            trustedLinkIdentityKey,
+            identityKey: trustedLinkIdentityKey,
             remoteDeviceId,
             deviceLabel: normalizeString(raw.deviceLabel) || remoteDeviceId,
             app: 'filtertube',
@@ -7196,7 +7280,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function getNanahCurrentTrustedLink() {
         const remoteId = normalizeString(safeObject(nanahSessionState.remoteDevice).deviceId);
-        return remoteId ? findNanahTrustedLink(remoteId) : null;
+        if (!remoteId) return null;
+        const selectedTargetId = getNanahSelectedRemoteTargetProfileId();
+        const remoteTargetProfile = normalizeNanahTargetProfileContext(nanahSessionState.remoteTargetProfile);
+        const targetProfileId = selectedTargetId
+            || (remoteTargetProfile.behavior === 'fixed_profile' ? normalizeString(remoteTargetProfile.profileId) : '');
+        return findNanahTrustedLink(remoteId, {
+            targetProfileId,
+            localRole: getNanahRole(),
+            remoteRole: normalizeString(nanahSessionState.remoteRole)
+        }) || findNanahTrustedLink(remoteId);
     }
 
     function resolveNanahLocalTargetProfile(trustedLink, profilesV4 = profilesV4Cache) {
@@ -7733,10 +7826,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         return response === 'continue';
     }
 
-    function findNanahTrustedLink(remoteDeviceId) {
+    function findNanahTrustedLink(remoteDeviceId, options = {}) {
         const deviceId = normalizeString(remoteDeviceId);
         if (!deviceId) return null;
-        return nanahTrustedLinks.find((entry) => normalizeString(entry?.remoteDeviceId) === deviceId) || null;
+        const filters = safeObject(options);
+        const requestedLinkId = normalizeString(filters.linkId);
+        const requestedTargetProfileId = normalizeString(filters.targetProfileId);
+        const requestedLinkType = normalizeString(filters.linkType);
+        const requestedLocalRole = normalizeString(filters.localRole).toLowerCase();
+        const requestedRemoteRole = normalizeString(filters.remoteRole).toLowerCase();
+        const candidates = nanahTrustedLinks
+            .map((entry) => normalizeNanahTrustedLink(entry))
+            .filter((entry) => entry && normalizeString(entry.remoteDeviceId) === deviceId)
+            .filter((entry) => !requestedLinkType || entry.linkType === requestedLinkType)
+            .filter((entry) => !requestedLocalRole || entry.localRole === requestedLocalRole)
+            .filter((entry) => !requestedRemoteRole || entry.remoteRole === requestedRemoteRole);
+        if (requestedLinkId) {
+            const exact = candidates.find((entry) => normalizeString(entry.linkId) === requestedLinkId);
+            if (exact) return exact;
+        }
+        if (requestedTargetProfileId) {
+            const targetExact = candidates.find((entry) => getNanahTrustedLinkTargetProfileId(entry) === requestedTargetProfileId);
+            if (targetExact) return targetExact;
+        }
+        return candidates[0] || null;
     }
 
     async function readNanahStorage(key) {
@@ -7991,18 +8104,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function saveNanahTrustedLink(entry) {
         const deviceId = normalizeString(entry?.remoteDeviceId);
         if (!deviceId) return;
-        const nextEntry = {
-            ...normalizeNanahTrustedLink({
-                ...safeObject(entry),
-                linkId: normalizeString(entry?.linkId) || `nanah-${deviceId}`,
-                remoteDeviceId: deviceId,
-                deviceLabel: normalizeString(entry?.deviceLabel) || deviceId,
-                app: 'filtertube',
-                createdAt: normalizeString(entry?.createdAt) || new Date().toISOString(),
-                lastUsedAt: new Date().toISOString()
-            })
-        };
-        const existingIndex = nanahTrustedLinks.findIndex((item) => normalizeString(item?.remoteDeviceId) === deviceId);
+        const nextEntry = normalizeNanahTrustedLink({
+            ...safeObject(entry),
+            linkId: normalizeString(entry?.linkId) || `nanah-${deviceId}`,
+            remoteDeviceId: deviceId,
+            deviceLabel: normalizeString(entry?.deviceLabel) || deviceId,
+            app: 'filtertube',
+            createdAt: normalizeString(entry?.createdAt) || new Date().toISOString(),
+            lastUsedAt: new Date().toISOString()
+        });
+        if (!nextEntry) return;
+        const nextIdentityKey = normalizeString(nextEntry.trustedLinkIdentityKey || nextEntry.identityKey);
+        const nextLinkId = normalizeString(nextEntry.linkId);
+        const existingIndex = nanahTrustedLinks.findIndex((item) => {
+            const current = normalizeNanahTrustedLink(item);
+            if (!current) return false;
+            if (normalizeString(current.linkId) === nextLinkId) return true;
+            const currentIdentityKey = normalizeString(current.trustedLinkIdentityKey || current.identityKey);
+            return !!nextIdentityKey && currentIdentityKey === nextIdentityKey;
+        });
         if (existingIndex >= 0) {
             nanahTrustedLinks.splice(existingIndex, 1, {
                 ...nanahTrustedLinks[existingIndex],
@@ -8048,10 +8168,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         return true;
     }
 
-    async function markNanahTrustedLinkUsed(remoteDeviceId) {
-        const link = findNanahTrustedLink(remoteDeviceId);
+    async function markNanahTrustedLinkUsed(remoteDeviceId, options = {}) {
+        const link = findNanahTrustedLink(remoteDeviceId, options);
         if (!link) return;
-        link.lastUsedAt = new Date().toISOString();
+        const linkId = normalizeString(link.linkId);
+        const linkIndex = nanahTrustedLinks.findIndex((entry) => normalizeString(entry?.linkId) === linkId);
+        if (linkIndex >= 0) {
+            nanahTrustedLinks.splice(linkIndex, 1, {
+                ...nanahTrustedLinks[linkIndex],
+                lastUsedAt: new Date().toISOString()
+            });
+        } else {
+            link.lastUsedAt = new Date().toISOString();
+        }
         await persistNanahTrustedLinks();
         renderNanahTrustedLinks();
     }
@@ -8672,7 +8801,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else if (!nanahSessionState.sasConfirmed && normalizeString(nanahSessionState.sasPhrase)) {
             nanahTone = 'verify';
         } else if (nanahSessionState.connected) {
-            const trusted = findNanahTrustedLink(safeObject(nanahSessionState.remoteDevice).deviceId);
+            const trusted = getNanahCurrentTrustedLink();
             nanahTone = trusted ? 'trusted' : 'connected';
         } else if (normalizeString(nanahSessionState.code)) {
             nanahTone = 'pairing';
@@ -8754,7 +8883,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else if (!nanahSessionState.sasConfirmed && normalizeString(nanahSessionState.sasPhrase)) {
                 ftNanahStatusHint.textContent = 'Compare the safety phrase on both devices and confirm only if they match exactly.';
             } else if (nanahSessionState.connected) {
-                const trusted = findNanahTrustedLink(safeObject(nanahSessionState.remoteDevice).deviceId);
+                const trusted = getNanahCurrentTrustedLink();
                 const trustedPolicy = safeObject(trusted?.policy);
                 ftNanahStatusHint.textContent = isNanahChildReplicaOnly()
                     ? (trusted
@@ -9007,11 +9136,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
-    function shouldAutoApplyNanahProposal(remoteDeviceId) {
+    function shouldAutoApplyNanahProposal(remoteDeviceId, options = {}) {
         const localRole = getNanahRole();
         if (localRole !== 'replica') return false;
         if (normalizeString(nanahSessionState.remoteRole) !== 'source') return false;
-        const trusted = findNanahTrustedLink(remoteDeviceId);
+        const trusted = findNanahTrustedLink(remoteDeviceId, {
+            ...safeObject(options),
+            localRole,
+            remoteRole: 'source',
+            linkType: 'managed_link'
+        });
         const policy = getManagedNanahLinkPolicy(trusted);
         return policy?.autoApplyControlProposals === true;
     }
@@ -9422,9 +9556,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function handleNanahIncomingProposal(envelope) {
         const details = parseNanahEnvelopeDetails(envelope);
         const remoteId = normalizeString(safeObject(nanahSessionState.remoteDevice).deviceId);
-        const trustedLink = remoteId ? findNanahTrustedLink(remoteId) : null;
         const localRole = getNanahRole();
         const remoteRole = normalizeString(nanahSessionState.remoteRole) || 'peer';
+        const targetProfileId = normalizeString(safeObject(details.targetProfile).profileId);
+        const trustedLink = remoteId ? findNanahTrustedLink(remoteId, {
+            targetProfileId,
+            localRole,
+            remoteRole,
+            linkType: localRole === 'replica' && remoteRole === 'source' ? 'managed_link' : ''
+        }) : null;
         const isManagedReceiver = localRole === 'replica'
             && remoteRole === 'source'
             && safeObject(trustedLink).linkType === 'managed_link';
@@ -9454,7 +9594,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        if (remoteId && shouldAutoApplyNanahProposal(remoteId) && isManagedReceiver) {
+        if (remoteId && shouldAutoApplyNanahProposal(remoteId, { targetProfileId }) && isManagedReceiver) {
             const trustedDecision = resolveTrustedNanahManagedApply(details, trustedLink);
             if (trustedDecision?.ok) {
                 await applyNanahEnvelope(envelope, trustedDecision.strategy);
@@ -9682,10 +9822,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             syncNanahRemoteTargetOptions();
             updateNanahUi();
-            const trustedLink = findNanahTrustedLink(safeObject(root.device).deviceId);
+            const trustedLink = getNanahCurrentTrustedLink();
             const approved = await ensureNanahTrustedReconnectApproved(trustedLink, { closeOnDecline: true });
             if (approved) {
-                await markNanahTrustedLinkUsed(safeObject(root.device).deviceId);
+                const targetProfile = normalizeNanahTargetProfileContext(nanahSessionState.remoteTargetProfile);
+                await markNanahTrustedLinkUsed(safeObject(root.device).deviceId, {
+                    targetProfileId: targetProfile.behavior === 'fixed_profile' ? targetProfile.profileId : '',
+                    localRole: getNanahRole(),
+                    remoteRole: normalizeString(nanahSessionState.remoteRole)
+                });
             }
             return;
         }

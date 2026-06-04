@@ -164,7 +164,7 @@ test('managed live signed-send audit is linked without claiming mailbox runtime'
   assert.match(inventory, /fixed-target Main\/Kids, keyword, channel, video, viewing-space, and time-limit managed live sends build signed `filtertube_managed_policy` envelopes/);
 });
 
-test('managed multi-target fanout stays blocked until trusted links are profile scoped', () => {
+test('managed trusted links are profile scoped while multi-target fanout stays blocked', () => {
   const doc = read(fanoutDocPath);
   const liveDoc = read(docPath);
   const plan = read(planPath);
@@ -172,23 +172,31 @@ test('managed multi-target fanout stays blocked until trusted links are profile 
   const tabView = read(tabViewPath);
   const helperSource = read(managedLivePolicyPath);
 
-  assert.match(doc, /Runtime multi-target fanout remains\s+disabled because current trusted-link lookup is device-scoped/);
-  assert.match(doc, /saveNanahTrustedLink\(entry\)[\s\S]*replaces an existing row by remoteDeviceId/);
-  assert.match(doc, /A device-level trusted link is not enough for multi-target authority/);
-  assert.match(doc, /runtime profile-scoped trusted link id: absent/);
+  assert.match(doc, /Profile-scoped identity foundation present/);
+  assert.match(doc, /findNanahTrustedLink\(remoteDeviceId, options = \{\}\)/);
+  assert.match(doc, /saveNanahTrustedLink\(entry\)[\s\S]*replaces an existing row by exact link id or trustedLinkIdentityKey/);
+  assert.match(doc, /A device-level trusted link is still not enough for multi-target authority/);
+  assert.match(doc, /runtime profile-scoped trusted link id: present/);
   assert.match(doc, /runtime multi-target chooser: absent/);
-  assert.match(doc, /Runtime behavior changed by this proof: no/);
+  assert.match(doc, /Runtime behavior changed by this proof: yes, trusted-link storage and lookup now\s+distinguish fixed managed target profiles/);
   assert.match(doc, /flowchart TD/);
   assert.match(liveDoc, new RegExp(fanoutDocPath));
   assert.match(plan, new RegExp(fanoutDocPath));
   assert.match(inventory, new RegExp(fanoutDocPath));
-  assert.match(inventory, /device-scoped trusted-link boundary/);
+  assert.match(inventory, /profile-scoped trusted-link identity/);
 
-  assert.match(tabView, /function findNanahTrustedLink\(remoteDeviceId\)[\s\S]*remoteDeviceId/);
-  assert.match(tabView, /nanahTrustedLinks\.find\(\(entry\) => normalizeString\(entry\?\.remoteDeviceId\) === deviceId\)/);
-  assert.match(tabView, /function getNanahCurrentTrustedLink\(\)[\s\S]*findNanahTrustedLink\(remoteId\)/);
-  assert.match(tabView, /const existingIndex = nanahTrustedLinks\.findIndex\(\(item\) => normalizeString\(item\?\.remoteDeviceId\) === deviceId\)/);
-  assert.match(tabView, /linkId: `nanah-\$\{remoteDeviceId\}`/);
+  assert.match(tabView, /function buildNanahProfileScopedLinkId\(remoteDeviceId, targetProfileId\)/);
+  assert.match(tabView, /function getNanahTrustedLinkTargetProfileId\(entry\)/);
+  assert.match(tabView, /function getNanahTrustedLinkIdentityKey\(entry\)/);
+  assert.match(tabView, /trustedLinkIdentityKey/);
+  assert.match(tabView, /function findNanahTrustedLink\(remoteDeviceId, options = \{\}\)/);
+  assert.match(tabView, /const requestedTargetProfileId = normalizeString\(filters\.targetProfileId\)/);
+  assert.match(tabView, /getNanahTrustedLinkTargetProfileId\(entry\) === requestedTargetProfileId/);
+  assert.match(tabView, /const existingIndex = nanahTrustedLinks\.findIndex\(\(item\) => \{/);
+  assert.match(tabView, /currentIdentityKey === nextIdentityKey/);
+  assert.match(tabView, /function getNanahManagedDuplicateDeviceIds\(sourceDeviceId, trustedLinkId, targetProfileId = ''\)/);
+  assert.match(tabView, /candidateTargetProfileId === currentTargetProfileId/);
+  assert.match(tabView, /function findNanahTrustedLinkForManagedEnvelope\(envelope\)[\s\S]*targetProfileId/);
   assert.match(helperSource, /function resolveTargetProfile\(trustedLink\)[\s\S]*policyBehavior === 'fixed_profile'/);
 });
 

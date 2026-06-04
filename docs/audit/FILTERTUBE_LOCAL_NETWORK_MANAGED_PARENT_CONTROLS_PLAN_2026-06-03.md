@@ -12,7 +12,9 @@ provisioning plus an adapter signing helper are present. Live fixed-target
 Nanah managed-policy sends are present for Main/Kids, keyword, channel, video,
 viewing-space, and time-limit scopes, granular keyword/channel/video sends now
 expose an explicit Main/Kids rule-source picker, and Rule bundle expands into
-separate signed keyword/channel/video envelopes. A provider-gated
+separate signed keyword/channel/video envelopes. Managed trusted-link storage
+and lookup are now profile-scoped for fixed child/profile targets on the same
+remote device, while bulk multi-target fanout UI remains gated. A provider-gated
 dashboard/profile-open pull hook and redacted provider ack handoff are present
 for already-decrypted mailbox items. An extension-owned managed app policy
 contract artifact and app manifest copy row are now present so downstream app
@@ -488,12 +490,14 @@ replica child device over Nanah/P2P or same-network transport.
   same replica device.
 - **Complexity**: 4/10
 - **Dependencies**: Task 3.6.
-- **Status**: Boundary proof added. Runtime behavior remains unchanged:
+- **Status**: Boundary proof plus identity foundation added.
   `saveNanahTrustedLink(...)`, `findNanahTrustedLink(...)`, and
-  `getNanahCurrentTrustedLink(...)` remain device-scoped, so multi-target
-  fanout UI remains disabled until profile-scoped trusted-link identity exists.
+  `getNanahCurrentTrustedLink(...)` now distinguish fixed managed target
+  profiles on the same remote device. Multi-target fanout UI remains disabled
+  until the target chooser, per-target envelope batcher, and per-target
+  ack/history summary exist.
 - **Acceptance Criteria**:
-  - The doc names the current one-link-per-remote-device behavior.
+  - The doc names the profile-scoped trusted-link behavior.
   - The doc requires device plus target-profile binding before multi-child
     fanout.
   - The doc keeps live Nanah sessions separate from offline mailbox or
