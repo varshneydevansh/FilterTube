@@ -87,15 +87,17 @@ runtime local-network discovery authority gate: absent
 runtime local-network peer discovery: absent
 runtime filtertube_managed_policy envelope validator: present in js/nanah_sync_adapter.js
 runtime managed policy revision store: absent
-runtime managed action-history writer: absent
-runtime behavior changed by this contract: validation helper only; no LAN discovery and no remote write
+runtime managed validation-history writer: present for Nanah managed-policy receive events
+runtime managed accepted-apply action-history writer: absent
+runtime managed signature verifier gate: present; dashboard/WebCrypto key verifier context absent
+runtime behavior changed by this contract: validation helper and verifier gate only; no LAN discovery and no remote write
 ```
 
 Existing Nanah profile-scoped `app_sync` and `control_proposal` paths are not
 promoted to managed policy authority by this document. They remain lower-level
 transport/apply primitives until a managed apply wrapper, persistent revision
-store, cryptographic signature verification, and action-history writer are
-implemented.
+store, dashboard/WebCrypto key verifier context, and accepted-apply
+action-history writer are implemented.
 
 ## Verification
 

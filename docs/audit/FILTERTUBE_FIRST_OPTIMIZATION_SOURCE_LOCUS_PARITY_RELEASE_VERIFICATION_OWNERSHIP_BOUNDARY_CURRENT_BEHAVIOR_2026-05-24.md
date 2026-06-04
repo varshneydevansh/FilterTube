@@ -27,9 +27,9 @@ Required verification output path: docs/audit/artifacts/first-optimization/metri
 Source-locus parity release verification boundary rows: 12
 Current parity release verification anchors covered: 68
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5827
+Method semantic proof gap lexical callables covered: 5830
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5827
+Lexical callables requiring semantic proof before behavior changes: 5830
 Runtime source-owner approvals: 0
 Runtime metric collector approvals: 0
 Runtime rollback approvals: 0
@@ -88,9 +88,9 @@ release/native/public boundary source docs covered: 8
 current parity release verification anchors covered: 68
 parity release verification risk classes covered: 8
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5827
+method semantic proof gap lexical callables covered: 5830
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5827
+lexical callables requiring semantic proof before behavior changes: 5830
 committed parity rollout files: 0
 committed verification output files: 0
 committed diagnostic privacy files: 0

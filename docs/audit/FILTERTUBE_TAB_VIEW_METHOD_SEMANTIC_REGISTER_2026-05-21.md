@@ -293,7 +293,7 @@ subscriptionsImportBridge: 17
 | 5726 | `async function` | `showPromptModal` | `modalDialogHelpers` |
 | 5777 | `const arrow` | `cleanup` | `modalDialogHelpers` |
 | 5784 | `const arrow` | `closeWith` | `modalDialogHelpers` |
-| 5827 | `async function` | `showChoiceModal` | `modalDialogHelpers` |
+| 5830 | `async function` | `showChoiceModal` | `modalDialogHelpers` |
 | 5872 | `const arrow` | `cleanup` | `modalDialogHelpers` |
 | 5879 | `const arrow` | `closeWith` | `modalDialogHelpers` |
 | 5913 | `const arrow` | `handleEscape` | `modalDialogHelpers` |
@@ -543,9 +543,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5827
+method semantic proof gap lexical callables covered: 5830
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5827
+lexical callables requiring semantic proof before behavior changes: 5830
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

@@ -24,9 +24,9 @@ The current boundary is:
 Selected first optimization binding: FT-BIND-00-metric-artifact-foundation
 Collector rollback/unclaimed approval boundary rows: 12
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5827
+Method semantic proof gap lexical callables covered: 5830
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5827
+Lexical callables requiring semantic proof before behavior changes: 5830
 Runtime rollback approvals: 0
 Runtime unclaimed-surface approvals: 0
 Runtime collector rollback/unclaimed approvals: 0
@@ -77,9 +77,9 @@ collector insertion approval rows covered: 12
 collector approval authority rows covered: 12
 current parity release verification anchors covered: 68
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5827
+method semantic proof gap lexical callables covered: 5830
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5827
+lexical callables requiring semantic proof before behavior changes: 5830
 runtime source-owner approvals: 0
 runtime metric collector approvals: 0
 runtime collector insertion points approved: 0

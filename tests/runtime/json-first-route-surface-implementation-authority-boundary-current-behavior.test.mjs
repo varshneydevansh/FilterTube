@@ -150,9 +150,9 @@ test('JSON-first route/surface implementation authority boundary is audit-only a
   assert.match(doc, /endpoint-shaped JSON rows are not enough/);
   assert.match(doc, /route\/surface implementation authority classification, not route\/surface\s+implementation approval/);
   assert.match(doc, /Method semantic proof gap files covered: 69/);
-  assert.match(doc, /Method semantic proof gap lexical callables covered: 5827/);
+  assert.match(doc, /Method semantic proof gap lexical callables covered: 5830/);
   assert.match(doc, /Files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /Lexical callables requiring semantic proof before behavior changes: 5827/);
+  assert.match(doc, /Lexical callables requiring semantic proof before behavior changes: 5830/);
   assert.match(doc, /continue proof-backed audit: GO/);
 
   for (const sourceDoc of Object.values(sourceDocs)) {
@@ -178,9 +178,9 @@ test('JSON-first route/surface rows and counts stay pinned', () => {
   assert.match(doc, /candidate-obligation binding rows covered: 10/);
   assert.match(doc, /first optimization implementation readiness rows covered: 14/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5827/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5830/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5827/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5830/);
   assert.match(doc, /runtime JSON-first route\/surface approvals: 0/);
   assert.match(doc, /runtime route\/surface metric artifacts: 0/);
   assert.match(doc, /runtime JSON-first implementation approvals: 0/);
@@ -223,7 +223,7 @@ test('JSON-first route/surface authority is backed by route and metric obligatio
   assert.match(metricMatrix, /P0 route\/surface metric fixture obligations: 12/);
   assert.match(metricMatrix, /implementation-ready route\/surface optimization rows: 0/);
   assert.match(methodGap, /files with lexical accounting: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5827/);
+  assert.match(methodGap, /repo-wide lexical callables: 5830/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(doc, /Route\/surface metric artifact with sample envelope/);
 });

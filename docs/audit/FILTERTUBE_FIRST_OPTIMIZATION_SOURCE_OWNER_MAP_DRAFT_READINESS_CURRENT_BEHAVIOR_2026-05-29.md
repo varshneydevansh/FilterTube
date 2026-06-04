@@ -65,9 +65,9 @@ implementation-ready draft readiness rows: 0
 inline draft JSON sections covered: 12
 inline draft JSON artifact promotion decision: NO-GO
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5827
+method semantic proof gap lexical callables covered: 5830
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5827
+lexical callables requiring semantic proof before behavior changes: 5830
 draft artifact promotion decision: NO-GO
 source-owner draft closure rows: 12
 source-owner draft rows linked by closure: 12

@@ -84,9 +84,9 @@ collector side-effect rows covered: 12
 collector fixture provenance rows covered: 12
 collector parity rollout rows covered: 12
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5827
+method semantic proof gap lexical callables covered: 5830
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5827
+lexical callables requiring semantic proof before behavior changes: 5830
 expected runtime audit tests: 4457
 expected runtime audit pass: 4457
 expected runtime audit fail: 0
@@ -109,7 +109,7 @@ metric schema rows linked by verification closure: 12
 metric source-owner rows linked by verification closure: 12
 collector readiness families linked by verification closure: 5
 method semantic proof gap files linked by verification closure: 69
-lexical callables linked by verification closure: 5827
+lexical callables linked by verification closure: 5830
 runtime fixture result count rows linked by verification closure: 3
 runtime verification output closure approvals: 0
 persisted verification output closure approvals: 0

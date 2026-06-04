@@ -29,9 +29,9 @@ Source metric foundation contract tests referenced: 5
 Route/surface-specific per-file metric artifact contract docs covered: 5
 Route/surface-specific per-file metric artifact contract tests covered: 5
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5827
+Method semantic proof gap lexical callables covered: 5830
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5827
+Lexical callables requiring semantic proof before behavior changes: 5830
 Committed route/surface metric artifact files: 0
 Runtime route/surface metric artifact approval exists: no
 Runtime metric collector approval exists: no
@@ -128,9 +128,9 @@ source metric foundation contract tests referenced: 5
 route/surface-specific per-file metric artifact contract docs covered: 5
 route/surface-specific per-file metric artifact contract tests covered: 5
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5827
+method semantic proof gap lexical callables covered: 5830
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5827
+lexical callables requiring semantic proof before behavior changes: 5830
 metric artifact path boundary rows covered: 6
 metric artifact commit readiness rows covered: 10
 metric artifact approval boundary rows covered: 12

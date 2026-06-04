@@ -79,6 +79,8 @@ test('Nanah scoped apply has target-profile writes plus receive-side managed env
   assert.match(tabView, /function recordManagedNanahPolicyValidationHistory\(envelope, decision, context = \{\}\)/);
   assert.match(tabView, /function getNanahManagedPolicyScopeList\(value\)/);
   assert.match(adapter, /Managed policy envelopes require validated managed apply flow/);
+  assert.match(adapter, /missing_signature_verifier/);
+  assert.match(adapter, /signature_invalid/);
 
   const runtime = [adapter, tabView, read('js/io_manager.js'), read('js/background.js')].join('\n');
   assert.match(runtime, /filtertube_managed_policy/);
@@ -87,7 +89,8 @@ test('Nanah scoped apply has target-profile writes plus receive-side managed env
   assert.match(doc, /receive path now provides managed-policy envelope parsing/i);
   assert.match(doc, /no persisted accepted-revision writer/i);
   assert.match(doc, /There is still no persisted stale\/replay authority state/);
-  assert.match(doc, /There is no cryptographic signature verification yet/);
+  assert.match(doc, /signature[- ]verifier gate exists/i);
+  assert.match(doc, /dashboard\/key-store verifier plumbing\s+is not wired yet/i);
 });
 
 test('viewing-space route gate and first time-limit runtime enforcement are runtime-backed', () => {

@@ -135,7 +135,7 @@ test('media duplicate and derivative byte budgets remain current behavior facts'
   const iosReduction = bytes('website/assets/videos/ios/ios.mp4') - bytes('website/public/videos/ios/ios_hero_slow_540.mp4');
 
   assert.equal(homepageFiles.length, 3);
-  assert.equal(homepageBytes, 37258272);
+  assert.equal(homepageBytes, 37258302);
   assert.equal(duplicateOverhead, 24838848);
   assert.equal(iosReduction, 3973023);
 

@@ -68,9 +68,9 @@ collector parity rollout rows covered: 12
 route/surface obligations covered: 12
 diagnostic logging policy rows covered: 8
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5827
+method semantic proof gap lexical callables covered: 5830
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5827
+lexical callables requiring semantic proof before behavior changes: 5830
 required foundation metric artifact packet exists: no
 committed foundation metric artifacts: 0
 runtime metric collectors approved: 0

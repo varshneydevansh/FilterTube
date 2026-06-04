@@ -38,6 +38,12 @@ function baseContext(overrides = {}) {
       policyHash: 'hash-keyword-4'
     },
     duplicateDeviceIds: [],
+    verifyIntegritySignature({ envelope, integrity, signedFields, payloadScope, trustedLink }) {
+      return envelope?.sourcePublicKeyId === trustedLink?.sourcePublicKeyId
+        && integrity?.algorithm === 'ed25519'
+        && typeof integrity?.signature === 'string'
+        && signedFields?.payloadScope === payloadScope;
+    },
     ...overrides
   };
 }
@@ -175,6 +181,22 @@ function validateManagedPolicyEnvelope(envelope, context = baseContext()) {
   if (!targetProfile || targetProfile.type !== 'child') return validationResult('target_not_protected_child');
   if (targetProfile.parentProfileId !== sourceProfile.id) return validationResult('source_not_bound_to_target');
 
+  if (context.signatureVerified !== true && context.integrityVerified !== true) {
+    const verifier = context.verifyIntegritySignature || context.verifyManagedPolicySignature;
+    if (typeof verifier !== 'function') return validationResult('missing_signature_verifier');
+    const verification = verifier({
+      envelope,
+      integrity: safeObject(envelope.integrity),
+      signedFields: safeObject(envelope.integrity?.signedFields),
+      payloadScope: getPayloadScopeFamily(envelope.payload),
+      trustedLink: link
+    });
+    if (verification && typeof verification.then === 'function') return validationResult('async_signature_verifier_unsupported');
+    const verificationObject = safeObject(verification);
+    const verified = verification === true || verificationObject.verified === true || verificationObject.accepted === true;
+    if (!verified) return validationResult(verificationObject.reason || 'signature_invalid');
+  }
+
   const accepted = context.accepted || null;
   if (accepted) {
     if (envelope.revision < accepted.revision) return validationResult('stale_revision');
@@ -208,10 +230,11 @@ test('managed policy schema contract document pins required envelope and receive
   assert.match(doc, /runtime filtertube_managed_policy envelope support: validation helper present/);
   assert.match(doc, /runtime filtertube_managed_policy receive path: parses envelope, builds validation context, records protected validation evidence/);
   assert.match(doc, /runtime managed policy persistent accepted-revision writer: absent/);
+  assert.match(doc, /runtime managed policy signature verifier gate: present/);
   assert.match(doc, /runtime remote profile write from filtertube_managed_policy: blocked through legacy applyIncomingEnvelope/);
   assert.match(inventory, /validation-only managed envelope helper/i);
   assert.match(inventory, /no persisted accepted-revision writer/i);
-  assert.match(inventory, /No cryptographic signature verification/);
+  assert.match(inventory, /signature verifier gate/i);
   assert.match(inventory, /partial canonical payload\/integrity binding/i);
   assert.match(runtime, /function validateManagedPolicyEnvelope\(envelope, context = \{\}\)/);
   assert.match(runtime, /function buildManagedNanahPolicyValidationContext\(envelope, profilesV4 = profilesV4Cache\)/);
@@ -219,6 +242,8 @@ test('managed policy schema contract document pins required envelope and receive
   assert.match(runtime, /function handleNanahIncomingManagedPolicyEnvelope\(envelope\)/);
   assert.match(runtime, /filtertube_managed_policy/);
   assert.match(runtime, /Managed policy envelopes require validated managed apply flow/);
+  assert.match(runtime, /missing_signature_verifier/);
+  assert.match(runtime, /signature_invalid/);
   assert.doesNotMatch(runtime, /managedPolicyRevisionStore/);
 });
 
@@ -300,6 +325,37 @@ test('managed policy schema rejects key and integrity failures', () => {
     signedFields: { ...signedPayloadMismatch.integrity.signedFields, payloadScope: 'channels' }
   };
   assert.deepEqual(validateManagedPolicyEnvelope(signedPayloadMismatch, baseContext()), { accepted: false, reason: 'integrity_payload_scope_mismatch' });
+});
+
+test('managed policy schema requires explicit signature verification evidence after binding checks', () => {
+  assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope(), baseContext({
+    verifyIntegritySignature: null
+  })), { accepted: false, reason: 'missing_signature_verifier' });
+
+  assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope(), baseContext({
+    verifyIntegritySignature: () => false
+  })), { accepted: false, reason: 'signature_invalid' });
+
+  assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope(), baseContext({
+    verifyIntegritySignature: () => ({ verified: false, reason: 'signature_key_mismatch' })
+  })), { accepted: false, reason: 'signature_key_mismatch' });
+
+  assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope(), baseContext({
+    verifyIntegritySignature: () => Promise.resolve(true)
+  })), { accepted: false, reason: 'async_signature_verifier_unsupported' });
+
+  const observed = {};
+  assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope(), baseContext({
+    verifyIntegritySignature(input) {
+      Object.assign(observed, input);
+      return { verified: true };
+    }
+  })), { accepted: true, decision: 'accept_newer_revision' });
+  assert.equal(observed.envelope.type, 'filtertube_managed_policy');
+  assert.equal(observed.integrity.algorithm, 'ed25519');
+  assert.equal(observed.signedFields.linkId, 'link-parent-child-1');
+  assert.equal(observed.payloadScope, 'keywords');
+  assert.equal(observed.trustedLink.sourcePublicKeyId, 'parent-key-3');
 });
 
 test('managed policy payload family must match the envelope scope before trusted apply', () => {

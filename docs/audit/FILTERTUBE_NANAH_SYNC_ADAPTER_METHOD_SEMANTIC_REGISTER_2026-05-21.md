@@ -26,7 +26,7 @@ This is not completion proof for persistent remote revision storage.
 
 ```text
 source file: js/nanah_sync_adapter.js
-line count: 624
+line count: 644
 named declarations: 32
 plain function declarations: 25
 async function declarations: 7
@@ -35,8 +35,8 @@ public FilterTubeNanahAdapter entries: 11
 semantic method groups: 6
 new Map calls: 2
 safeArray references: 21
-safeObject references: 37
-normalizeString references: 37
+safeObject references: 40
+normalizeString references: 38
 normalizeScope references: 6
 JSON.stringify calls: 3
 JSON.parse calls: 3
@@ -84,7 +84,7 @@ nanahScopedPortableProfileTransfer: 2
 | `nanahAdapterRuntimeAndDescriptor` | 3 | Generates envelope/device ids, requires `FilterTubeIO` import/export APIs, and derives device descriptor labels/capabilities from overrides or navigator. | Peer identity provenance, stable device id policy, IO availability fixture, and trusted-link sender class proof. |
 | `nanahEnvelopeBuildAndSummary` | 4 | Builds portable payloads for active/full/Main/Kids scopes, creates `app_sync` envelopes, creates `control_proposal` envelopes, and summarizes portable payloads. | Envelope schema validation, scope-specific list-count summary, proposal action contract, payload-version compatibility, and invalid-scope fixture. |
 | `nanahIncomingEnvelopeApply` | 2 | Parses `app_sync` and `control_proposal` JSON payloads, returns preview payloads without writes, routes Main/Kids to scoped V4 apply, and routes active/full to `io.importV3()`. | JSON parse provenance, app/action/version checks, preview-to-apply equivalence, sender trust, mutation result contract, and negative malformed-envelope fixtures. |
-| `nanahManagedPolicyEnvelopeValidation` | 8 | Normalizes managed scopes, classifies managed payload families, validates binding fields, target/source/link/key/revision context, and rejects managed envelopes from the legacy apply path. | Persistent revision store, real cryptographic signature verification, canonical payload hash recomputation, action-history accept/reject writer, and managed apply wrapper proof. |
+| `nanahManagedPolicyEnvelopeValidation` | 8 | Normalizes managed scopes, classifies managed payload families, validates binding fields, requires caller-supplied signature-verification evidence, validates target/source/link/key/revision context, and rejects managed envelopes from the legacy apply path. | Persistent revision store, dashboard/WebCrypto key-verifier plumbing, canonical payload hash recomputation, action-history accept/reject writer, and managed apply wrapper proof. |
 
 ## Current Method Inventory
 
@@ -102,26 +102,26 @@ nanahScopedPortableProfileTransfer: 2
 | 118 | `function` | `managedPolicyProfileMap` | `nanahManagedPolicyEnvelopeValidation` |
 | 122 | `function` | `getAcceptedManagedPolicyState` | `nanahManagedPolicyEnvelopeValidation` |
 | 128 | `function` | `validateManagedPolicyEnvelope` | `nanahManagedPolicyEnvelopeValidation` |
-| 219 | `function` | `parsePackedChannelKeywordSource` | `nanahDefensiveNormalizationAndMerge` |
-| 226 | `function` | `normalizeKeywordEntry` | `nanahDefensiveNormalizationAndMerge` |
-| 242 | `function` | `normalizeKeywordList` | `nanahDefensiveNormalizationAndMerge` |
-| 248 | `function` | `keywordKey` | `nanahDefensiveNormalizationAndMerge` |
-| 263 | `function` | `channelKey` | `nanahDefensiveNormalizationAndMerge` |
-| 272 | `function` | `mergeKeywordLists` | `nanahDefensiveNormalizationAndMerge` |
-| 287 | `function` | `mergeChannelLists` | `nanahDefensiveNormalizationAndMerge` |
-| 302 | `function` | `normalizeMainProfileAliasFields` | `nanahDefensiveNormalizationAndMerge` |
-| 320 | `function` | `cloneJson` | `nanahDefensiveNormalizationAndMerge` |
-| 324 | `async function` | `buildScopedPortablePayload` | `nanahScopedPortableProfileTransfer` |
-| 373 | `async function` | `applyScopedPortablePayload` | `nanahScopedPortableProfileTransfer` |
-| 466 | `function` | `generateId` | `nanahAdapterRuntimeAndDescriptor` |
-| 473 | `function` | `summarizePortablePayload` | `nanahEnvelopeBuildAndSummary` |
-| 486 | `async function` | `getIO` | `nanahAdapterRuntimeAndDescriptor` |
-| 494 | `async function` | `buildPortablePayload` | `nanahEnvelopeBuildAndSummary` |
-| 509 | `async function` | `buildSyncEnvelope` | `nanahEnvelopeBuildAndSummary` |
-| 521 | `async function` | `buildControlProposal` | `nanahEnvelopeBuildAndSummary` |
-| 540 | `function` | `extractPortableFromEnvelope` | `nanahIncomingEnvelopeApply` |
-| 561 | `async function` | `applyIncomingEnvelope` | `nanahIncomingEnvelopeApply` |
-| 589 | `function` | `getDeviceDescriptor` | `nanahAdapterRuntimeAndDescriptor` |
+| 239 | `function` | `parsePackedChannelKeywordSource` | `nanahDefensiveNormalizationAndMerge` |
+| 246 | `function` | `normalizeKeywordEntry` | `nanahDefensiveNormalizationAndMerge` |
+| 262 | `function` | `normalizeKeywordList` | `nanahDefensiveNormalizationAndMerge` |
+| 268 | `function` | `keywordKey` | `nanahDefensiveNormalizationAndMerge` |
+| 283 | `function` | `channelKey` | `nanahDefensiveNormalizationAndMerge` |
+| 292 | `function` | `mergeKeywordLists` | `nanahDefensiveNormalizationAndMerge` |
+| 307 | `function` | `mergeChannelLists` | `nanahDefensiveNormalizationAndMerge` |
+| 322 | `function` | `normalizeMainProfileAliasFields` | `nanahDefensiveNormalizationAndMerge` |
+| 340 | `function` | `cloneJson` | `nanahDefensiveNormalizationAndMerge` |
+| 344 | `async function` | `buildScopedPortablePayload` | `nanahScopedPortableProfileTransfer` |
+| 393 | `async function` | `applyScopedPortablePayload` | `nanahScopedPortableProfileTransfer` |
+| 486 | `function` | `generateId` | `nanahAdapterRuntimeAndDescriptor` |
+| 493 | `function` | `summarizePortablePayload` | `nanahEnvelopeBuildAndSummary` |
+| 506 | `async function` | `getIO` | `nanahAdapterRuntimeAndDescriptor` |
+| 514 | `async function` | `buildPortablePayload` | `nanahEnvelopeBuildAndSummary` |
+| 529 | `async function` | `buildSyncEnvelope` | `nanahEnvelopeBuildAndSummary` |
+| 541 | `async function` | `buildControlProposal` | `nanahEnvelopeBuildAndSummary` |
+| 560 | `function` | `extractPortableFromEnvelope` | `nanahIncomingEnvelopeApply` |
+| 581 | `async function` | `applyIncomingEnvelope` | `nanahIncomingEnvelopeApply` |
+| 609 | `function` | `getDeviceDescriptor` | `nanahAdapterRuntimeAndDescriptor` |
 
 ## Current Public API Surface
 
@@ -251,9 +251,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5827
+method semantic proof gap lexical callables covered: 5830
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5827
+lexical callables requiring semantic proof before behavior changes: 5830
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

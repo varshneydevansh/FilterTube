@@ -226,9 +226,9 @@ test('JSON-first route/surface metric verification output contract is audit-only
   assert.match(doc, /Runtime route\/surface metric artifact approval exists: no/);
   assert.match(doc, /Runtime metric collector approval exists: no/);
   assert.match(doc, /Method semantic proof gap files covered: 69/);
-  assert.match(doc, /Method semantic proof gap lexical callables covered: 5827/);
+  assert.match(doc, /Method semantic proof gap lexical callables covered: 5830/);
   assert.match(doc, /Files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /Lexical callables requiring semantic proof before behavior changes: 5827/);
+  assert.match(doc, /Lexical callables requiring semantic proof before behavior changes: 5830/);
   assert.match(doc, /Implementation-ready JSON-first route\/surface metric verification output contract rows: 0/);
   assert.match(doc, /not completion proof for JSON-first route\/surface metric verification output authority/);
 
@@ -269,9 +269,9 @@ test('JSON-first route/surface metric verification output rows counts and fields
   assert.match(doc, /metric collector side-effect rows covered: 12/);
   assert.match(doc, /metric collector fixture provenance rows covered: 12/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5827/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5830/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5827/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5830/);
   assert.match(doc, /committed route\/surface metric verification output files: 0/);
   assert.match(doc, /committed route\/surface metric artifact files: 0/);
   assert.match(doc, /committed first-optimization foundation verification output files: 0/);
@@ -352,7 +352,7 @@ test('JSON-first route/surface metric verification output contract is backed by 
   assert.match(collectorSideEffect, /runtime collector side-effect budgets approved: 0/);
   assert.match(collectorFixture, /runtime collector fixture packets approved: 0/);
   assert.match(methodGap, /files with lexical accounting: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5827/);
+  assert.match(methodGap, /repo-wide lexical callables: 5830/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(implementationReadiness, /implementation-ready first optimization rows: 0/);
 });

@@ -39,9 +39,9 @@ Runtime collector fixture packets approved: 0
 Committed fixture provenance files: 0
 Implementation-ready collector fixture provenance approval rows: 0
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5827
+Method semantic proof gap lexical callables covered: 5830
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5827
+Lexical callables requiring semantic proof before behavior changes: 5830
 ```
 
 This is a fixture provenance approval boundary, not fixture approval. It keeps
@@ -105,9 +105,9 @@ runtime unclaimed-surface approvals: 0
 committed fixture provenance files: 0
 implementation-ready collector fixture provenance approval rows: 0
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5827
+method semantic proof gap lexical callables covered: 5830
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5827
+lexical callables requiring semantic proof before behavior changes: 5830
 expected runtime audit tests: 4457
 expected runtime audit pass: 4457
 expected runtime audit fail: 0

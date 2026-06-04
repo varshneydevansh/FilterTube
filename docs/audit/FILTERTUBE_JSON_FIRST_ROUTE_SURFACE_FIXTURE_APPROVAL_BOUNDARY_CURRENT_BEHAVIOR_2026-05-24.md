@@ -21,9 +21,9 @@ The current boundary is:
 ```text
 JSON-first route/surface fixture approval boundary rows: 12
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5827
+Method semantic proof gap lexical callables covered: 5830
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5827
+Lexical callables requiring semantic proof before behavior changes: 5830
 Runtime JSON-first fixture packet approvals: 0
 Runtime JSON-first fixture artifact approvals: 0
 Runtime route/surface metric artifact approvals: 0
@@ -73,9 +73,9 @@ verification output contract rows covered: 12
 route/surface authority rows covered: 12
 route/surface metric obligations covered: 12
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5827
+method semantic proof gap lexical callables covered: 5830
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5827
+lexical callables requiring semantic proof before behavior changes: 5830
 runtime JSON-first fixture packet approvals: 0
 runtime JSON-first fixture artifact approvals: 0
 runtime JSON-first fixture manifest approvals: 0

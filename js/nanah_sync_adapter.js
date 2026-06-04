@@ -188,6 +188,26 @@
             return validationResult('source_not_bound_to_target');
         }
 
+        if (context.signatureVerified !== true && context.integrityVerified !== true) {
+            const verifier = context.verifyIntegritySignature || context.verifyManagedPolicySignature;
+            if (typeof verifier !== 'function') return validationResult('missing_signature_verifier');
+            const verification = verifier({
+                envelope: root,
+                integrity: safeObject(root.integrity),
+                signedFields: safeObject(root.integrity?.signedFields),
+                payloadScope: getManagedPayloadScopeFamily(root.payload),
+                trustedLink
+            });
+            if (verification && typeof verification.then === 'function') {
+                return validationResult('async_signature_verifier_unsupported');
+            }
+            const verificationObject = safeObject(verification);
+            const verified = verification === true || verificationObject.verified === true || verificationObject.accepted === true;
+            if (!verified) {
+                return validationResult(normalizeString(verificationObject.reason) || 'signature_invalid');
+            }
+        }
+
         const accepted = getAcceptedManagedPolicyState(context);
         if (accepted) {
             if (root.revision < accepted.revision) return validationResult('stale_revision');

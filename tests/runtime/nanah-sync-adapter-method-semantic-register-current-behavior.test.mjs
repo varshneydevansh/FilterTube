@@ -155,8 +155,8 @@ test('Nanah sync adapter method semantic register is audit-only and scoped to cu
   assert.match(text, /Status: runtime managed-policy validation boundary present/);
   assert.match(text, /Runtime behavior changed for\s+validation-only managed envelope support/);
   assert.match(text, /source file: js\/nanah_sync_adapter\.js/);
-  assert.match(text, /line count: 624/);
-  assert.equal(sourceLineCount(), 624);
+  assert.match(text, /line count: 644/);
+  assert.equal(sourceLineCount(), 644);
   assert.match(text, /named declarations: 32/);
   assert.match(text, /plain function declarations: 25/);
   assert.match(text, /async function declarations: 7/);
@@ -222,8 +222,8 @@ test('Nanah sync adapter register pins import export envelope and no-DOM surface
 
   assert.equal(countLiteral(source, 'new Map('), 2);
   assert.equal(countLiteral(source, 'safeArray('), 21);
-  assert.equal(countLiteral(source, 'safeObject('), 37);
-  assert.equal(countLiteral(source, 'normalizeString('), 37);
+  assert.equal(countLiteral(source, 'safeObject('), 40);
+  assert.equal(countLiteral(source, 'normalizeString('), 38);
   assert.equal(countLiteral(source, 'normalizeScope('), 6);
   assert.equal(countLiteral(source, 'JSON.stringify('), 3);
   assert.equal(countLiteral(source, 'JSON.parse('), 3);
@@ -253,8 +253,8 @@ test('Nanah sync adapter register pins import export envelope and no-DOM surface
   for (const token of [
     'new Map calls: 2',
     'safeArray references: 21',
-    'safeObject references: 37',
-    'normalizeString references: 37',
+    'safeObject references: 40',
+    'normalizeString references: 38',
     'normalizeScope references: 6',
     'JSON.stringify calls: 3',
     'JSON.parse calls: 3',
@@ -354,7 +354,8 @@ test('Nanah sync adapter source still proves current payload and apply boundarie
     accepted: {
       revision: 4,
       policyHash: 'hash-keyword-4'
-    }
+    },
+    verifyIntegritySignature: () => true
   });
   assert.equal(managedDecision.accepted, true);
   assert.equal(managedDecision.decision, 'accept_newer_revision');

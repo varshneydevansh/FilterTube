@@ -25,9 +25,10 @@ validation history.
 
 This document still does not approve remote policy writes by itself. The first
 managed-envelope validator and receive-side validation-history writer now
-exist, but persistent accepted-revision writes, cryptographic signature
-verification, remote accepted-apply history rows, and failed-auth history remain
-separate required slices.
+exist, and the validator now requires signature-verification evidence. Persistent
+accepted-revision writes, dashboard key-verification plumbing, remote
+accepted-apply history rows, and failed-auth history remain separate required
+slices.
 
 ## Issue 60 Local-Network Caregiver Addendum
 
@@ -209,7 +210,8 @@ Current behavior:
 - `validateManagedPolicyEnvelope(envelope, context)` now validates a
   `filtertube_managed_policy` envelope against trusted-link role, source device,
   source profile, target profile, allowed scope, key id, key version, payload
-  family, integrity binding, and supplied revision state.
+  family, integrity binding, explicit signature-verification evidence, and
+  supplied revision state.
 - `handleNanahIncomingManagedPolicyEnvelope(envelope)` now routes
   `filtertube_managed_policy` receive events through validation and records a
   protected validation-history row on the known target profile when possible.
@@ -227,9 +229,12 @@ Authority meaning:
 - The adapter now provides the first validation-only managed envelope helper,
   but that helper is not a persistent policy authority and does not write
   profiles.
+- The validation helper now fails closed with `missing_signature_verifier` or
+  `signature_invalid` when a caller cannot provide trusted signature evidence.
 - The dashboard receive path now provides managed-policy envelope parsing,
   trusted-link/profile/revision context construction, and protected validation
-  evidence rows.
+  evidence rows, but it does not yet provide key material or a verifier
+  callback.
 
 Current gap:
 
@@ -237,8 +242,9 @@ Current gap:
   caller-supplied context; there is still no persisted accepted-revision writer.
 - There is still no persisted stale/replay authority state beyond any existing
   profile metadata passed into the validation context.
-- There is no cryptographic signature verification yet; the first helper checks
-  integrity field presence and binding tuple consistency.
+- The signature verifier gate exists, but dashboard/key-store verifier plumbing
+  is not wired yet; the receive path therefore rejects otherwise well-shaped
+  managed envelopes rather than treating them as valid.
 - The adapter supports validation-only `filtertube_managed_policy` handling,
   but there is still no managed apply wrapper that records accepted revision
   state and accepted-apply history before calling the low-level scoped write
@@ -285,7 +291,8 @@ Current gap:
 - There is still no persisted stale/replay authority state.
 - There is no stored per-target accepted policy hash writer for new remote
   apply decisions.
-- There is no cryptographic signature verification yet.
+- There is now a signature verifier gate, but Nanah/dashboard key verification
+  context is not wired yet.
 - Trust revocation does not yet purge queued updates or invalidate an accepted
   policy revision because those structures do not exist yet.
 
@@ -363,8 +370,8 @@ Current gap:
 |---|---|---|
 | Validation-only managed policy envelope helper | Remote apply still cannot use a durable policy object because there is no managed apply wrapper or persistent revision state. | Managed apply wrapper plus accepted/rejected history rows before runtime writes. |
 | No remote revision store | Stale or replayed remote updates cannot be rejected as a first-class rule. Local same-device managed saves now have local revision metadata only. | Monotonic revision fixtures per parent/source and child target. |
-| No cryptographic signature verification | Trust is link/session-policy plus validation-field based, not cryptographically authenticated yet. | Signed/authenticated envelope tests. |
-| Partial canonical payload/integrity binding | The helper checks binding fields, but no real signature verification or canonical hash recomputation exists yet. | Binding-tuple fixtures plus cryptographic verification and canonical payload hash proof. |
+| Signature verifier context not wired | The helper now requires verifier evidence, but Nanah/dashboard key material is not wired yet, so remote managed envelopes fail closed before apply. | Key-store/WebCrypto verifier plumbing plus signed/authenticated envelope tests. |
+| Partial canonical payload/integrity binding | The helper checks binding fields and verifier result, but no canonical payload hash recomputation exists yet. | Binding-tuple fixtures plus canonical payload hash proof. |
 | No signed remote Main/Kids policy gate | Local child route denial now works, but remote updates are still not envelope/revision-bound. | Managed policy envelope, revision store, and Nanah/local-network apply wrapper before remote route-policy writes. |
 | No remote time-limit policy apply | Local child time-budget enforcement exists, but parent/caregiver device updates are still not envelope/revision-bound. | Managed policy envelope, revision store, and remote time-limit fixtures before Nanah/local-network writes. |
 | Adapter lacks persisted trust context | `validateManagedPolicyEnvelope(...)` depends on caller-supplied trusted-link/profile/revision context and `applyIncomingEnvelope(...)` still applies legacy payloads after caller-side checks. | Upper-layer managed policy apply wrapper before adapter call. |

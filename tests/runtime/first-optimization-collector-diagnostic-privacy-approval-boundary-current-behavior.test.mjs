@@ -167,9 +167,9 @@ test('collector diagnostic privacy approval rows counts and fields stay pinned',
   assert.match(doc, /current diagnostic privacy anchors covered: 35/);
   assert.match(doc, /diagnostic privacy risk classes covered: 8/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5827/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5830/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5827/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5830/);
   assert.match(doc, /runtime source-owner approvals: 0/);
   assert.match(doc, /runtime metric collector approvals: 0/);
   assert.match(doc, /runtime collector insertion points approved: 0/);
@@ -219,7 +219,7 @@ test('collector diagnostic privacy approval is backed by current NO-GO gates', (
   assert.match(collectorApproval, /Diagnostic privacy approval/);
   assert.match(collectorApproval, /implementation-ready collector approval rows: 0/);
   assert.match(methodGap, /files with lexical accounting: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5827/);
+  assert.match(methodGap, /repo-wide lexical callables: 5830/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(collectorFixture, /runtime collector fixture packets approved: 0/);
   assert.match(collectorParity, /runtime collector parity rollout proofs approved: 0/);

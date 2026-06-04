@@ -3,7 +3,7 @@
 **Generated**: 2026-06-03  
 **Status**: Runtime validation helper and receive-side validation context
 present. Remote managed profile writes are still blocked until persistent
-accepted-revision writes, cryptographic signature verification, accepted-apply
+accepted-revision writes, dashboard key-verification plumbing, accepted-apply
 history rows, and a managed apply wrapper exist.
 **Goal slice**: Implementation order item 3, "Add managed policy schema,
 device-binding, signature, and revision tests".  
@@ -40,7 +40,7 @@ Required top-level fields:
 | `policyHash` | Hash of canonical policy payload. | Missing or mismatched for equal-revision idempotency. |
 | `sourcePublicKeyId` | Public-key identity bound to pairing. | Missing or not bound to the trusted link. |
 | `keyVersion` | Pairing key version. | Missing, stale, wrong, or revoked. |
-| `integrity` | Signature or equivalent authenticated proof over the binding tuple below. | Missing algorithm/signature, missing signed binding fields, or binding mismatch. |
+| `integrity` | Signature or equivalent authenticated proof over the binding tuple below. | Missing algorithm/signature, missing signed binding fields, binding mismatch, missing verifier, or verifier rejection. |
 | `payload` | Canonical policy operation payload. | Missing, not scoped to the envelope scope, or wrong operation family for that scope. |
 
 Allowed scopes for the first contract:
@@ -71,10 +71,15 @@ policyHash
 payloadScope
 ```
 
-A future implementation can use real cryptographic verification, but it still
-must reject a valid-looking signature if any signed field points at a different
-link, scope, target profile, source device, revision, policy hash, or payload
-family than the envelope being applied.
+The runtime helper now requires explicit signature-verification evidence after
+the binding tuple passes. A caller can satisfy that gate by providing a
+trusted verification result or a synchronous verifier callback. The dashboard
+Nanah receive path does not yet provide key material or a verifier callback, so
+managed envelopes received there fail closed instead of being treated as valid.
+Future WebCrypto/key-store plumbing must preserve the same binding rejection:
+even a valid-looking signature is rejected if any signed field points at a
+different link, scope, target profile, source device, revision, policy hash, or
+payload family than the envelope being applied.
 
 ## Payload Scope Guard
 
@@ -106,7 +111,8 @@ Managed policy acceptance requires all of these to be true:
 6. The source parent/caregiver profile is allowed to manage the target profile.
 7. The requested scope is allowed by the trusted link.
 8. The envelope integrity proof is present before apply.
-9. The revision decision accepts the envelope.
+9. A signature verifier or trusted verification result accepts the envelope.
+10. The revision decision accepts the envelope.
 
 ## Revision Decision Matrix
 
@@ -139,6 +145,8 @@ The paired runtime test must reject:
 - missing key identity
 - missing signature/integrity proof
 - missing signed integrity binding tuple
+- missing signature verifier
+- invalid signature verifier result
 - signed scope, target, source device, revision, policy hash, or payload family
   mismatch
 - payload family not scoped to envelope scope
@@ -163,9 +171,10 @@ context/history plumbing, but it still does not apply remote policy writes:
 runtime filtertube_managed_policy envelope support: validation helper present in js/nanah_sync_adapter.js
 runtime filtertube_managed_policy receive path: parses envelope, builds validation context, records protected validation evidence
 runtime managed policy persistent accepted-revision writer: absent
-runtime managed policy signature verification: integrity binding presence check only; cryptographic verification pending
+runtime managed policy signature verifier gate: present in js/nanah_sync_adapter.js
+runtime Nanah dashboard key-verification context: absent, so received managed envelopes fail closed before apply
 runtime remote profile write from filtertube_managed_policy: blocked through legacy applyIncomingEnvelope
-runtime behavior changed by this contract: envelope validation, receive-side validation evidence, and legacy-path rejection
+runtime behavior changed by this contract: envelope validation, signature-verifier gate, receive-side validation evidence, and legacy-path rejection
 ```
 
 Future implementation may use `FilterTubeNanahAdapter.applyScopedPortablePayload`

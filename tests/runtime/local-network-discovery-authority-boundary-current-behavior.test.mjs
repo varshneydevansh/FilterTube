@@ -154,7 +154,8 @@ test('local-network discovery authority boundary is validation-backed and linked
   assert.match(doc, /No-Work And Performance Boundary/);
   assert.match(doc, /runtime local-network discovery authority gate: absent/);
   assert.match(doc, /runtime filtertube_managed_policy envelope validator: present/);
-  assert.match(doc, /runtime behavior changed by this contract: validation helper only/);
+  assert.match(doc, /runtime managed signature verifier gate: present/);
+  assert.match(doc, /runtime behavior changed by this contract: validation helper and verifier gate only/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
 

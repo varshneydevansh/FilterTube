@@ -73,9 +73,9 @@ collector side-effect rows covered: 12
 collector fixture provenance rows covered: 12
 collector parity rollout rows covered: 12
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5827
+method semantic proof gap lexical callables covered: 5830
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5827
+lexical callables requiring semantic proof before behavior changes: 5830
 inline fixture provenance JSON sections covered: 12
 inline fixture provenance artifact promotion decision: NO-GO
 fixture provenance draft closure rows: 12
@@ -90,7 +90,7 @@ metric schema rows linked by fixture closure: 12
 metric source-owner rows linked by fixture closure: 12
 collector readiness families linked by fixture closure: 5
 method semantic proof gap files linked by fixture closure: 69
-lexical callables linked by fixture closure: 5827
+lexical callables linked by fixture closure: 5830
 runtime fixture provenance closure approvals: 0
 implementation-ready fixture provenance closure rows: 0
 fixture provenance draft closure: FIXTURE-PROVENANCE-CHAIN-CLOSED
