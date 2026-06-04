@@ -9,7 +9,7 @@ const docPath = 'docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_
 
 const sourceFingerprints = {
   'build.js': [740, 26978, 'c8485cb2600aad89f44015cd7e49ebe4746ebcc35c91c1ff2bf29aec2f087a04'],
-  'js/background.js': [6657, 299580, 'f05fe6f65f9de1218299374ac3c82dd6b6ae9e17e3d862926a20e6c2981c19c7'],
+  'js/background.js': [6711, 301840, 'b27206ec2b6927fc33f823c4832ff95ace7c97bd4284eb950fc5964baf666346'],
   'js/content/block_channel.js': [3189, 127857, 'c040b57e0b107fd7b6fb0a18bc4ca014e5a22fbb82755f81e51a497eee387dba'],
   'js/content/bridge_settings.js': [1113, 44087, 'f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853'],
   'js/content/collab_dialog.js': [393, 14623, 'dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a'],
@@ -25,7 +25,7 @@ const sourceFingerprints = {
   'js/seed.js': [1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
   'js/settings_shared.js': [1181, 57535, '9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c'],
   'js/state_manager.js': [2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6'],
-  'js/tab-view.js': [12465, 566832, 'ceadd9ffe3de825966cd277d906e101bda39baaeb2d1b743772edfd78cad4a6a'],
+  'js/tab-view.js': [12520, 569155, '64951d9c9b2225dccf65e54e8ac0dd7ab27077870dbba7565d11150937a0dd1c'],
   'scripts/build-extension-ui.mjs': [50, 1188, '6326362ebf90f448ccdbf68945b3fb522b7b215edaf9b3e28589a4e166239cf3'],
   'scripts/build-nanah-vendor.mjs': [65, 1818, 'dae8d3ef29c4cd44b0bf975090e9d53f3bb05b523355f5038930fc03b27e921c'],
   'scripts/sync-native-runtime.mjs': [34, 1070, '4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6']
@@ -108,8 +108,8 @@ const expectedDiagnosticSourceFlowRows = {
     '`js/content_bridge.js:12237-13151`'
   ],
   diagnostic_flow_background_settings_identity: [
-    '`js/background.js:2555-2620`',
-    '`js/background.js:2666-3267`'
+    '`js/background.js:2609-2674`',
+    '`js/background.js:2720-3321`'
   ],
   diagnostic_flow_import_export_backup: [
     '`js/io_manager.js:1670-1987`',
@@ -489,7 +489,7 @@ function assertProductionConsoleResidualHotPathPreflight(doc) {
 
   assert.equal(routineConsoleSites('js/background.js').length, 62);
   assert.equal(lineNumberForToken(read('js/background.js'), 'installFilterTubeBackgroundConsoleGate();'), 12);
-  assert.equal(routineConsoleSites('js/background.js')[0], 2071);
+  assert.equal(routineConsoleSites('js/background.js')[0], 2125);
 
   const isolatedGateFiles = new Set();
   for (const manifestFile of activeManifestFiles) {

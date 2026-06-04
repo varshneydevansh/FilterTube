@@ -47,7 +47,7 @@ release-note data file, and the dashboard renderer.
 | `data/release_notes.json` | 317 | 23,020 | `a8d59b18e9bffd1c828538ee58b3b8e9be7c641fea3ff064220311485a3b1c6b` |
 | `js/content/first_run_prompt.js` | 190 | 7,453 | `5672d9060d29b08550ecfc3add54245212a5094ee5137f025b6f788f12e50409` |
 | `js/content/release_notes_prompt.js` | 250 | 9,866 | `30b624cbbda1004f354f98dbf3b4513f8ebc298adecbceb4358782f248f80474` |
-| `js/background.js` | 6657 | 299580 | `f05fe6f65f9de1218299374ac3c82dd6b6ae9e17e3d862926a20e6c2981c19c7` |
+| `js/background.js` | 6711 | 301840 | `b27206ec2b6927fc33f823c4832ff95ace7c97bd4284eb950fc5964baf666346` |
 | `js/tab-view.js` | 11,617 | 526,763 | `1b7f621d48d16247aecc4c7ee57cbc3db9efd3e597e6f0a4fc188228470648f7` |
 
 ## Source/Effect Blocks
@@ -155,9 +155,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5883
+method semantic proof gap lexical callables covered: 5892
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5883
+lexical callables requiring semantic proof before behavior changes: 5892
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

@@ -3042,7 +3042,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set(['trust_link.revoke', 'policy.time_limit.update', 'policy.viewing_space.update']);
     const MANAGED_ADMIN_SESSION_TTL_MS = 15 * 60 * 1000;
     const MANAGED_ADMIN_REAUTH_TTL_MS = 5 * 60 * 1000;
+    const MANAGED_ADMIN_FAILED_UNLOCK_LIMIT = 5;
+    const MANAGED_ADMIN_FAILED_UNLOCK_WINDOW_MS = 10 * 60 * 1000;
     const profileUnlockSessions = new Map();
+    const managedAdminFailedUnlocks = new Map();
 
     async function sendRuntimeMessage(payload) {
         return new Promise((resolve) => {
@@ -3122,6 +3125,47 @@ document.addEventListener('DOMContentLoaded', async () => {
             id === 'default' && (sessionMasterPin = '');
         }
     };
+
+    function getManagedAdminFailedUnlockState(profileId, now = Date.now()) {
+        const id = normalizeString(profileId);
+        if (!id) return { failedAttempts: 0, resetAt: now + MANAGED_ADMIN_FAILED_UNLOCK_WINDOW_MS };
+        const existing = safeObject(managedAdminFailedUnlocks.get(id));
+        const resetAt = Number(existing.resetAt);
+        if (!Number.isFinite(resetAt) || now >= resetAt) {
+            managedAdminFailedUnlocks.delete(id);
+            return { failedAttempts: 0, resetAt: now + MANAGED_ADMIN_FAILED_UNLOCK_WINDOW_MS };
+        }
+        return {
+            failedAttempts: Number.isFinite(Number(existing.failedAttempts)) ? Number(existing.failedAttempts) : 0,
+            resetAt
+        };
+    }
+
+    function isManagedAdminUnlockRateLimited(profileId) {
+        return getManagedAdminFailedUnlockState(profileId).failedAttempts >= MANAGED_ADMIN_FAILED_UNLOCK_LIMIT;
+    }
+
+    function recordManagedAdminUnlockFailure(profileId) {
+        const id = normalizeString(profileId);
+        const now = Date.now();
+        const state = getManagedAdminFailedUnlockState(id, now);
+        const next = {
+            failedAttempts: state.failedAttempts + 1,
+            resetAt: state.resetAt || (now + MANAGED_ADMIN_FAILED_UNLOCK_WINDOW_MS)
+        };
+        if (id) {
+            managedAdminFailedUnlocks.set(id, next);
+        }
+        return {
+            ...next,
+            rateLimited: next.failedAttempts >= MANAGED_ADMIN_FAILED_UNLOCK_LIMIT
+        };
+    }
+
+    function clearManagedAdminUnlockFailures(profileId) {
+        const id = normalizeString(profileId);
+        if (id) managedAdminFailedUnlocks.delete(id);
+    }
 
     const markProfileUnlockSession = {
         run: (profileId) => {
@@ -9168,6 +9212,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? extractMasterPinVerifier(profilesV4)
             : extractProfilePinVerifier(profilesV4, profileId);
         if (!verifier) return true;
+        if (isManagedAdminUnlockRateLimited(profileId)) {
+            UIComponents.showToast('Too many incorrect PIN attempts. Try again later.', 'error');
+            return false;
+        }
 
         const copy = getProfileAccessCopy(profilesV4, profileId);
         const pin = await showPromptModal({
@@ -9182,10 +9230,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!normalized) return false;
         const ok = await verifyPin(normalized, verifier);
         if (!ok) {
-            UIComponents.showToast('Incorrect PIN', 'error');
+            const failedAttempt = recordManagedAdminUnlockFailure(profileId);
+            UIComponents.showToast(
+                failedAttempt.rateLimited
+                    ? 'Too many incorrect PIN attempts. Try again later.'
+                    : 'Incorrect PIN',
+                'error'
+            );
             return false;
         }
 
+        clearManagedAdminUnlockFailures(profileId);
         markProfileUnlockSession.run(profileId);
         if (profileId === 'default') {
             sessionMasterPin = normalized;

@@ -29,7 +29,7 @@ changes, or whitelist behavior changes.
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6657 | 299580 | `f05fe6f65f9de1218299374ac3c82dd6b6ae9e17e3d862926a20e6c2981c19c7` |
+| `js/background.js` | 6711 | 301840 | `b27206ec2b6927fc33f823c4832ff95ace7c97bd4284eb950fc5964baf666346` |
 | `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
 | `js/state_manager.js` | 2,491 | 99,780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
 
@@ -37,8 +37,8 @@ changes, or whitelist behavior changes.
 
 | Block | Source lines | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | ---: | --- |
-| `backgroundToggleChannelFilterAllReceiver` | `js/background.js:5619` | 14 | 413 | `7e15cc800cdde69487959513b30d2cfab29c55f9b1caa566f96b99bcb844c94e` |
-| `backgroundHandleToggleChannelFilterAll` | `js/background.js:6545` | 95 | 3435 | `84afd60fbb6c140a1a20880b7cb2b81a7ce33fe95c89b4278c1d00e1b1756dd4` |
+| `backgroundToggleChannelFilterAllReceiver` | `js/background.js:5673` | 14 | 413 | `7e15cc800cdde69487959513b30d2cfab29c55f9b1caa566f96b99bcb844c94e` |
+| `backgroundHandleToggleChannelFilterAll` | `js/background.js:6599` | 95 | 3435 | `84afd60fbb6c140a1a20880b7cb2b81a7ce33fe95c89b4278c1d00e1b1756dd4` |
 | `contentBridgeAddFilterAllContentCheckbox` | `js/content_bridge.js:13499` | 66 | 2391 | `03861f56c173757f479e0863d16fab83df5ba180e5d21d8adb37cdf0b5fcb490` |
 | `stateManagerToggleChannelFilterAll` | `js/state_manager.js:1892` | 34 | 988 | `b7028d96e93e5b89cfcf68d83d09256c9b06888a3b5b0ee181e6165f74318298` |
 | `stateManagerToggleKidsChannelFilterAll` | `js/state_manager.js:968` | 36 | 1188 | `f798f6b4a379f1101dea3b1777b046e2631ea1ab032b01b56716dc09878b72ac` |

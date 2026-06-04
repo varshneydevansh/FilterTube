@@ -7,10 +7,10 @@ receive-side managed-policy validation/history proofs updated. Runtime behavior
 changed for protected child Main/Kids denial, accepted same-device
 parent-managed child saves, protected parent unlock-failure evidence,
 parent/account history viewing, accepted-row history clearing, dashboard and
-background admin-session expiry, sensitive managed-action re-auth, child
-time-budget enforcement, managed-envelope validation/classification, and
-managed-policy receive/apply evidence. Live remote transport key-verifier
-plumbing remains pending.
+background admin-session expiry, sensitive managed-action re-auth, in-memory
+managed/admin failed-attempt rate limiting, child time-budget enforcement,
+managed-envelope validation/classification, and managed-policy receive/apply
+evidence. Live remote transport key-verifier plumbing remains pending.
 **Goal slice**: Implementation order item 1 plus first runtime viewing-space
 enforcement slice.
 **Lane proof**: `test:settings` for profile/Nanah authority and `test:release`
@@ -32,8 +32,8 @@ validation/apply history writer, and accepted-revision state writer now exist,
 and the validator requires signature-verification evidence. Dashboard
 WebCrypto verifier plumbing now exists when a trusted link carries source
 public-key material. Pairing-time key storage, encrypted/local-network
-delivery, failed-attempt rate limiting, and remote admin session semantics
-remain separate required slices.
+delivery, failed-attempt durability, and remote admin session semantics remain
+separate required slices.
 
 ## Issue 60 Local-Network Caregiver Addendum
 
@@ -393,7 +393,7 @@ Current gap:
 | Locked-child bypass has no revision binding | `allow_trusted_updates` can skip unlock for matching managed sessions, but not with policy revision constraints. | Locked child managed-policy fixtures. |
 | No mailbox protocol | Offline later delivery is not specified at runtime. | Ciphertext/replay/ack protocol doc before server work. |
 | No local-network management contract | Same-network discovery could be mistaken for authority. | Separate discovery, pairing, transport, and policy-authority proof. |
-| Partial protected-user action history | Accepted local managed child saves, local parent/account history access, accepted-row clearing, protected failed unlock rows, dashboard/background session expiry, sensitive managed-action re-auth, and remote managed validation/apply rows exist. | Rate-limit fixtures, retention expiry, encrypted summary fixtures, and live remote apply smoke. |
+| Partial protected-user action history | Accepted local managed child saves, local parent/account history access, accepted-row clearing, protected failed unlock rows, dashboard/background session expiry, sensitive managed-action re-auth, in-memory local/background failed-attempt rate limiting, and remote managed validation/apply rows exist. | Retention expiry, encrypted summary fixtures, failed-attempt durability proof, and live remote apply smoke. |
 | No admin lock for remote management | Child PIN or protected profile state could be confused with admin authority. | Parent/account PIN and trusted-device authority fixtures before writes. |
 | No pairing key/signature contract | P2P or local-network transport could authenticate reachability instead of authority. | Device-bound key, signature/integrity, rotation, revocation, and compromise-recovery fixtures. |
 | No hostile-LAN fixture set | Spoofed peer announcements, duplicate device ids, stale pairings, reconnect drift, or MITM attempts could be missed. | Discovery-versus-authority negative fixtures before local-network writes. |

@@ -24,7 +24,7 @@ It does not prove that refreshes are safe to optimize. It records the current si
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6,657 | 299,580 | `f05fe6f65f9de1218299374ac3c82dd6b6ae9e17e3d862926a20e6c2981c19c7` |
+| `js/background.js` | 6,711 | 301,840 | `b27206ec2b6927fc33f823c4832ff95ace7c97bd4284eb950fc5964baf666346` |
 | `js/content/bridge_settings.js` | 1,113 | 44,087 | `f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853` |
 | `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
 | `js/injector.js` | 3,593 | 155,830 | `634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04` |
@@ -38,8 +38,8 @@ settings refresh cross-context consumer source files pinned: 7
 
 | Block | Source | Start line | Lines | Bytes | SHA-256 |
 | --- | --- | ---: | ---: | ---: | --- |
-| `backgroundApplySettingsBranch` | `js/background.js:4732` | 4,732 | 28 | 1,487 | `b585d94cc410f7acd929db780840f7cb02b44bb9819b34eb34985b713485e3d6` |
-| `backgroundStorageInvalidation` | `js/background.js:4821` | 4,821 | 41 | 1,464 | `e5c76f714f31a1d325385b3eaa051c0eb73e6a29ec1c69b1493cc4bb7f796de2` |
+| `backgroundApplySettingsBranch` | `js/background.js:4786` | 4,786 | 28 | 1,487 | `b585d94cc410f7acd929db780840f7cb02b44bb9819b34eb34985b713485e3d6` |
+| `backgroundStorageInvalidation` | `js/background.js:4875` | 4,875 | 41 | 1,464 | `e5c76f714f31a1d325385b3eaa051c0eb73e6a29ec1c69b1493cc4bb7f796de2` |
 | `bridgeRuntimeListener` | `js/content/bridge_settings.js:198` | 198 | 121 | 5,684 | `ba565d7340f7b7150423e5daaa87f400769b2ce13216ed8af6509e23e6a6085c` |
 | `bridgeRequestSettings` | `js/content/bridge_settings.js:807` | 807 | 115 | 5,333 | `10e99aaff431ece732d33435b7ea618f9c2333ededd839ec07d4b164b8f45227` |
 | `bridgeSeedDelivery` | `js/content/bridge_settings.js:922` | 922 | 59 | 1,531 | `15627c0c528d75636e9954d0b0ff5d0b4b03e4792e37514423654ea4d4d16c2f` |

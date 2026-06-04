@@ -195,8 +195,10 @@ revision and action-history entry.
 - **Complexity**: 5/10
 - **Dependencies**: Sprint 1.
 - **Status**: Local managed child authority contract and fixture updated with
-  the first accepted-save revision/history runtime slice. Failed unlock
-  logging, admin TTL, and sensitive re-auth remain pending.
+  accepted-save revision/history runtime behavior, protected failed-unlock
+  logging, dashboard/background admin TTL, sensitive re-auth, and in-memory
+  failed-attempt rate limiting. Durable failed-attempt retention remains
+  pending.
 - **Acceptance Criteria**:
   - Parent/account can target owned child.
   - Child cannot manage itself as admin.

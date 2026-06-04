@@ -36,7 +36,7 @@ about product/runtime transport, not verifier or audit text.
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6657 | 299580 | `f05fe6f65f9de1218299374ac3c82dd6b6ae9e17e3d862926a20e6c2981c19c7` |
+| `js/background.js` | 6711 | 301840 | `b27206ec2b6927fc33f823c4832ff95ace7c97bd4284eb950fc5964baf666346` |
 | `js/content/bridge_injection.js` | 127 | 4741 | `d1b84cf4c43ec5ff5cdc3bd607d8f3d3bf448c12829780b0d05fb9fc14fb5d3e` |
 | `js/content/bridge_settings.js` | 1113 | 44087 | `f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853` |
 | `js/content/collab_dialog.js` | 393 | 14623 | `dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a` |
@@ -49,7 +49,7 @@ about product/runtime transport, not verifier or audit text.
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/seed.js` | 1136 | 50026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
 | `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
-| `js/tab-view.js` | 12465 | 566832 | `ceadd9ffe3de825966cd277d906e101bda39baaeb2d1b743772edfd78cad4a6a` |
+| `js/tab-view.js` | 12520 | 569155 | `64951d9c9b2225dccf65e54e8ac0dd7ab27077870dbba7565d11150937a0dd1c` |
 
 ## File And Operation Counts
 
@@ -82,8 +82,8 @@ about product/runtime transport, not verifier or audit text.
 
 ```text
 js/background.js:115:tabs.sendMessage:quietTabBroadcast
-js/background.js:3502:runtime.onMessage.addListener:primaryBackgroundActionReceiver
-js/background.js:5572:runtime.onMessage.addListener:secondaryBackgroundTypeReceiver
+js/background.js:3556:runtime.onMessage.addListener:primaryBackgroundActionReceiver
+js/background.js:5626:runtime.onMessage.addListener:secondaryBackgroundTypeReceiver
 js/content/bridge_injection.js:38:runtime.sendMessage:backgroundScriptInjectionRequest
 js/content/bridge_settings.js:130:window.postMessage:subscriptionImportRequestToMainWorld
 js/content/bridge_settings.js:148:window.addEventListener(message):subscriptionImportResponseListener
@@ -143,9 +143,9 @@ js/state_manager.js:914:runtime.sendMessage:kidsBlockChannelRuntimeMutation
 js/state_manager.js:1297:tabs.sendMessage:subscriptionsImportContentRequest
 js/state_manager.js:1636:runtime.sendMessage:kidsWhitelistRuntimeMutation
 js/state_manager.js:1808:runtime.sendMessage:whitelistTransferRuntimeMutation
-js/tab-view.js:3055:runtime.sendMessage:dashboardRuntimeRequest
-js/tab-view.js:3295:tabs.sendMessage:dashboardTabRuntimeRequest
-js/tab-view.js:11820:runtime.onMessage.addListener:dashboardRuntimeMessageReceiver
+js/tab-view.js:3058:runtime.sendMessage:dashboardRuntimeRequest
+js/tab-view.js:3339:tabs.sendMessage:dashboardTabRuntimeRequest
+js/tab-view.js:11875:runtime.onMessage.addListener:dashboardRuntimeMessageReceiver
 ```
 
 ## Current Behavior Boundaries
@@ -153,7 +153,7 @@ js/tab-view.js:11820:runtime.onMessage.addListener:dashboardRuntimeMessageReceiv
 - Background has two runtime receivers: the primary `request.action` /
   `request.type` router and a secondary `message.type` router.
 - Content/dashboard code has two more runtime receivers:
-  `js/content/bridge_settings.js:200` and `js/tab-view.js:11820`.
+  `js/content/bridge_settings.js:200` and `js/tab-view.js:11875`.
 - Runtime sender rows cover settings fetches, prompt acknowledgements, list-mode
   mutations, whitelist/Kids mutations, identity fetches, learned-map writes,
   script injection, browser info, stats/backup scheduling, and popup/dashboard

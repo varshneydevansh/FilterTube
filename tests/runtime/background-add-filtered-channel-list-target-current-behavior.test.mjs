@@ -10,7 +10,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_BACKGROUND_ADD_FILTERED_CHANNEL_LIST_TARGET_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/background.js': [6657, 299580, 'f05fe6f65f9de1218299374ac3c82dd6b6ae9e17e3d862926a20e6c2981c19c7']
+  'js/background.js': [6711, 301840, 'b27206ec2b6927fc33f823c4832ff95ace7c97bd4284eb950fc5964baf666346']
 };
 
 const blockSpecs = {
@@ -18,7 +18,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: "if (message.type === 'addFilteredChannel')",
     end: "if (message.type === 'toggleChannelFilterAll')",
-    startLine: 5581,
+    startLine: 5635,
     lines: 39,
     bytes: 1579,
     hash: 'f681057e88e4c6aef657464bca124f8d3ae4d59f4d11ca5f05e1135dcf1615f2'
@@ -27,7 +27,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: 'async function handleAddFilteredChannel(input, filterAll = false',
     end: '/**\n * Handle toggling Filter All Content for a channel',
-    startLine: 5646,
+    startLine: 5700,
     lines: 893,
     bytes: 45226,
     hash: 'e69e660d0af0dd0d523932f733a5de04108cbfb69ef99a155be4466a7527ce25'
@@ -36,7 +36,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: 'async function handleAddFilteredChannel(input, filterAll = false',
     end: '// Prefer canonical UC IDs via channelMap when available',
-    startLine: 5646,
+    startLine: 5700,
     lines: 158,
     bytes: 6464,
     hash: '60f9b6d40d808f02f822e74a0a9f967844a1d1ef4c956e911ad2ee5265891b80'
@@ -45,7 +45,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: '// Prefer canonical UC IDs via channelMap when available',
     end: '// Check if channel already exists; if so, upgrade instead of rejecting.',
-    startLine: 5803,
+    startLine: 5857,
     lines: 358,
     bytes: 19385,
     hash: 'dc7ccd71be5cb375ac50245617889449621246504390a4a0162c59c3cef6740d'
@@ -54,7 +54,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: '// Check if channel already exists; if so, upgrade instead of rejecting.',
     end: 'if (didMutateChannelList && Object.keys(storageWritePayload).length > 0) {',
-    startLine: 6160,
+    startLine: 6214,
     lines: 352,
     bytes: 18483,
     hash: '0f2661d0a32990528ebf6704aa4cfb90cab8f55dcf4567e37852910704966027'
@@ -63,7 +63,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: 'if (didMutateChannelList && Object.keys(storageWritePayload).length > 0) {',
     end: '/**\n * Handle toggling Filter All Content for a channel',
-    startLine: 6511,
+    startLine: 6565,
     lines: 28,
     bytes: 894,
     hash: 'ba67796a03d083bf072ac4ef971365f165f0c836dd2eae56c64912729a45be66'

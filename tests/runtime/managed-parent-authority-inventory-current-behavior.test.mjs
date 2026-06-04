@@ -14,9 +14,10 @@ test('managed parent authority inventory tracks implemented route gate and pendi
   const doc = read(docPath);
 
   assert.match(doc, /Status\*\*: Runtime route-gate, local managed-save revision\/history, protected\s+failed-unlock history, protected history access, time-limit enforcement, and\s+receive-side managed-policy validation\/history proofs updated/);
-  assert.match(doc, /managed-policy receive\/apply evidence/);
+  assert.match(doc, /managed-policy receive\/apply\s+evidence/);
   assert.match(doc, /dashboard and\s+background admin-session expiry/);
   assert.match(doc, /sensitive managed-action re-auth/);
+  assert.match(doc, /in-memory\s+managed\/admin failed-attempt rate limiting/);
   assert.match(doc, /Runtime behavior\s+changed/);
   assert.match(doc, /protected parent unlock-failure evidence/);
   assert.match(doc, /Lane proof\*\*: `test:settings`/);
@@ -57,18 +58,23 @@ test('session PIN authority remains trusted-ui gated and memory scoped', () => {
 
   assert.match(background, /const sessionPinCache = new Map\(\)/);
   assert.match(background, /const SESSION_PIN_CACHE_TTL_MS = 15 \* 60 \* 1000/);
+  assert.match(background, /const SESSION_PIN_FAILED_ATTEMPT_LIMIT = 5/);
+  assert.match(background, /const sessionPinFailedAttempts = new Map\(\)/);
   assert.doesNotMatch(background, /function getCachedSessionPin\(profileId\)/);
   assert.match(background, /function isSessionPinCacheEntryFresh\(entry\)/);
   assert.match(background, /const entry = safeObject\(sessionPinCache\.get\(id\)\)/);
   assert.match(background, /if \(!isSessionPinCacheEntryFresh\(entry\)\)/);
   assert.match(background, /sessionPinCache\.delete\(id\)/);
   assert.match(background, /async function verifyAndCacheSessionPin\(profileId, pin\)/);
+  assert.match(background, /function isSessionPinRateLimited\(profileId\)/);
+  assert.match(background, /function recordSessionPinFailedAttempt\(profileId\)/);
   assert.match(background, /FilterTube_SessionPinAuth/);
   assert.match(background, /if \(!isTrustedUiSender\(sender\)\)/);
-  assert.match(background, /sessionPinCache\.set\(profileId, \{/);
+  assert.match(background, /sessionPinCache\.set\(id, \{/);
   assert.match(background, /expiresAt: Date\.now\(\) \+ SESSION_PIN_CACHE_TTL_MS/);
 
   assert.match(doc, /sessionPinCache/);
+  assert.match(doc, /in-memory local\/background failed-attempt rate limiting/);
   assert.match(doc, /trusted UI sender/i);
   assert.match(doc, /Current PIN authority is local and session-scoped/);
 });

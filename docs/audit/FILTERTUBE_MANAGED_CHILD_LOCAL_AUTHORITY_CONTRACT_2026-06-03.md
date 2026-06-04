@@ -2,7 +2,8 @@
 
 **Generated**: 2026-06-03
 **Status**: Runtime local managed-save, failed-unlock history, admin-session
-TTL, and sensitive-action re-auth hardening partially present.
+TTL, sensitive-action re-auth, and in-memory failed-attempt rate-limit
+hardening partially present.
 **Goal slice**: Implementation order item 5, "Harden local
 parent-managed child/protected-profile edits".
 **Primary inputs**:
@@ -37,7 +38,7 @@ Current source evidence in `js/tab-view.js`:
 | `localManagedEditPolicyRevisionStore(profile, scope)` | Reads the target child's last local managed edit revision for `main` or `kids`. |
 | `recordManagedChildLocalEditHistory(profile, report)` | Stores the accepted local edit revision and a protected redacted action-history row on the target child profile in the same V4 profile write. |
 | `recordManagedAdminAuthFailureHistory(profilesV4, targetProfileId, reason)` | Stores a protected `admin_session.failed_unlock` row on the target child profile when parent/admin unlock fails for managed child edit, history view/clear, viewing-space, or time-limit changes. |
-| `ensureProfileUnlocked(profilesV4, profileId, options)` | Syncs session state, allows unlocked/no-PIN profiles, requires an unexpired local unlock session, prompts for profile PIN otherwise, verifies PIN locally, records a local TTL/reauth window, then notifies background. |
+| `ensureProfileUnlocked(profilesV4, profileId, options)` | Syncs session state, allows unlocked/no-PIN profiles, requires an unexpired local unlock session, rate-limits repeated failed PIN attempts in-memory, prompts for profile PIN otherwise, verifies PIN locally, records a local TTL/reauth window, then notifies background. |
 | `isProfileUnlockSessionValid.check(profileId, options)` | Rejects expired admin sessions, clears stale session metadata, and requires fresher auth for sensitive managed actions. |
 
 ## Required Local Authority Decisions
@@ -65,8 +66,8 @@ filtering behavior:
 - A successful write records a managed action-history row with actor profile,
   actor device, target profile, scope, revision, policy hash, result, and
   redacted summary.
-- A failed unlock records a protected action-history row and can contribute to
-  future rate limiting.
+- A failed unlock records a protected action-history row and contributes to
+  the current in-memory dashboard/background PIN rate limit.
 - Admin session authority has TTL and relocks on profile switch, window close,
   explicit logout, or sensitive action re-auth requirement.
 - Sensitive actions, including time-limit changes, viewing-space changes,
@@ -79,8 +80,10 @@ filtering behavior:
 ## Current Runtime Boundary
 
 Current product runtime source implements accepted local managed-save metadata,
-protected failed-unlock history rows, local dashboard session TTL, and fresher
-reauth for sensitive managed actions. Rate limiting remains a future slice:
+protected failed-unlock history rows, local dashboard session TTL, fresher
+reauth for sensitive managed actions, and in-memory failed-attempt rate limiting
+for the tab-view managed unlock prompt plus background session PIN auth. Durable
+failed-attempt retention remains a future slice:
 
 ```text
 runtime local managed edit policy revision store: present
@@ -88,7 +91,8 @@ runtime local managed edit action-history writer: present
 runtime local managed edit failed-unlock logger: present for managed child/history/viewing-space/time-limit unlock gates
 runtime local managed edit admin session TTL: present for tab-view and background session cache
 runtime local managed edit sensitive-action re-auth gate: present for managed child/history/viewing-space/time-limit unlock gates
-runtime local managed edit failed-attempt rate limit: absent
+runtime local managed edit failed-attempt rate limit: present for tab-view unlock prompts and background session PIN auth
+runtime local managed edit failed-attempt rate limit durability: absent
 runtime behavior changed by this contract: yes
 ```
 

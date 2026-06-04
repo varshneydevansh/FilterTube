@@ -26,7 +26,7 @@ This is narrower than the compiled-settings field register and the list-mode mat
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6,657 | 299,580 | `f05fe6f65f9de1218299374ac3c82dd6b6ae9e17e3d862926a20e6c2981c19c7` |
+| `js/background.js` | 6,711 | 301,840 | `b27206ec2b6927fc33f823c4832ff95ace7c97bd4284eb950fc5964baf666346` |
 | `js/content/bridge_settings.js` | 1,113 | 44,087 | `f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853` |
 | `js/filter_logic.js` | 3,652 | 172,174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 
@@ -36,8 +36,8 @@ compiled settings profile/list-mode assembly source files pinned: 3
 
 | Block | Source | Start line | Lines | Bytes | SHA-256 |
 | --- | --- | ---: | ---: | ---: | --- |
-| `backgroundProfileListModeWhitelist` | `js/background.js:2282` | 2,282 | 88 | 5,201 | `fde880c68148975730478f0c0e768b9585168ab3e260e8f6ecd8f7fc1220f9b2` |
-| `backgroundWhitelistChannelCompiler` | `js/background.js:2483` | 2,483 | 65 | 3,878 | `433527aec588525d8f3747ce7ffe20b1d2d78905c6812a6fcf6703bbee507322` |
+| `backgroundProfileListModeWhitelist` | `js/background.js:2336` | 2,336 | 88 | 5,201 | `fde880c68148975730478f0c0e768b9585168ab3e260e8f6ecd8f7fc1220f9b2` |
+| `backgroundWhitelistChannelCompiler` | `js/background.js:2537` | 2,537 | 65 | 3,878 | `433527aec588525d8f3747ce7ffe20b1d2d78905c6812a6fcf6703bbee507322` |
 | `bridgeNormalizeSettingsForHost` | `js/content/bridge_settings.js:322` | 322 | 31 | 1,404 | `5f05ac1dba540e69103fe5725ad258d203f03e72762a1cc887d8c70e847988ac` |
 | `bridgeRequestProfileGate` | `js/content/bridge_settings.js:833` | 833 | 36 | 1,758 | `713d4c00573258982f7dbf77cc451307b24a421ad8916fed859445df88fdadb8` |
 | `filterProcessSettings` | `js/filter_logic.js:947` | 947 | 125 | 6,348 | `666c5725170dcd5eb01aa66cbfd27e64d33fa0ae937d1c5553665b4ede149e0f` |

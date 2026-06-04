@@ -11,7 +11,7 @@ const docPath = 'docs/audit/FILTERTUBE_ADD_FILTERED_CHANNEL_FILTER_ALL_COMMENTS_
 
 const sourceFingerprints = {
   'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
-  'js/background.js': [6657, 299580, 'f05fe6f65f9de1218299374ac3c82dd6b6ae9e17e3d862926a20e6c2981c19c7'],
+  'js/background.js': [6711, 301840, 'b27206ec2b6927fc33f823c4832ff95ace7c97bd4284eb950fc5964baf666346'],
   'js/state_manager.js': [2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6'],
   'js/settings_shared.js': [1181, 57535, '9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c']
 };
@@ -30,7 +30,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: "if (message.type === 'addFilteredChannel')",
     end: "if (message.type === 'toggleChannelFilterAll')",
-    startLine: 5581,
+    startLine: 5635,
     lines: 39,
     bytes: 1579,
     hash: 'f681057e88e4c6aef657464bca124f8d3ae4d59f4d11ca5f05e1135dcf1615f2'
@@ -39,7 +39,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: 'async function handleAddFilteredChannel(input, filterAll = false',
     end: '        const isHandleLike = (value) => {',
-    startLine: 5646,
+    startLine: 5700,
     lines: 2,
     bytes: 204,
     hash: 'ce94174aa1b2f302e1e89a75b463271aa13d1c95f62cb89ee34364fb9c3ab603'
@@ -48,7 +48,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: 'const updated = {\n                ...existing,',
     end: '            if (Array.isArray(collaborationWith) && collaborationWith.length > 0) {',
-    startLine: 6289,
+    startLine: 6343,
     lines: 21,
     bytes: 1247,
     hash: '9ac97ce884e9c319e0267a60bbbacbdb26b0a3ea6f1f0cca416615ad234e96dd'
@@ -57,7 +57,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: 'const newChannel = {\n                id: channelInfo.id,',
     end: '            channels.unshift(newChannel);',
-    startLine: 6339,
+    startLine: 6393,
     lines: 20,
     bytes: 1081,
     hash: '5fa1776809d1d10187ead655c7b8a566c15935b2667f95e8cd5f7875c28f4be4'
@@ -66,7 +66,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: 'function getChannelDerivedKeywordRef(channel) {',
     end: '// Deep link into the tab-view dashboard',
-    startLine: 1256,
+    startLine: 1310,
     lines: 106,
     bytes: 3482,
     hash: '22f1f880c4b67f0b366020641f94e988d19a4e0312b073c20048c4f2bcd0a455'

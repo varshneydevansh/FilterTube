@@ -4075,7 +4075,7 @@ settings refresh regressions.
 | `release_lifecycle_fallback_menu_mutation_observer` | `js/content_bridge.js:7159:MutationObserver` | Fallback menu button observer. Active only when `shouldEagerFallbackMenuScan()` is true and native overlay quiet mode is false. | Schedules root-scoped scans; not an always-on empty-install body scan when eager scan is false. |
 | `release_lifecycle_fallback_menu_hover_click_listeners` | `js/content_bridge.js:7216-7218:addEventListener` | Hover/focus/click fallback-menu discovery. | Schedules scans from user-near surfaces; still page-lifetime listeners once installed. |
 | `release_lifecycle_fallback_menu_warmup_interval` | `js/content_bridge.js:7263:setInterval` | Startup warmup scans for fallback menu buttons. Active only when eager fallback menu scan is true. | Clears itself after 8 scans; remains a lifecycle risk if eager scan is enabled without real menu need. |
-| `release_lifecycle_video_identity_flush_timers` | `js/background.js:1935,1943:setTimeout` | Background video-channel/video-meta map flush debounce. | Batches storage writes after learned identity/meta updates; timers clear before flush. |
+| `release_lifecycle_video_identity_flush_timers` | `js/background.js:1989,1997:setTimeout` | Background video-channel/video-meta map flush debounce. | Batches storage writes after learned identity/meta updates; timers clear before flush. |
 
 Current semantic status after this addendum:
 
