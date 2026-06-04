@@ -100,6 +100,7 @@ docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md
 | Managed viewing-space route-gate contract | `docs/audit/FILTERTUBE_MANAGED_VIEWING_SPACE_ROUTE_GATE_CONTRACT_2026-06-03.md` |
 | Managed child time-limit schema contract | `docs/audit/FILTERTUBE_MANAGED_CHILD_TIME_LIMIT_SCHEMA_CONTRACT_2026-06-03.md` |
 | Managed policy action-history model | `docs/audit/FILTERTUBE_MANAGED_POLICY_ACTION_HISTORY_MODEL_2026-06-03.md` |
+| Managed parent UI surface spec | `docs/audit/FILTERTUBE_MANAGED_PARENT_UI_SURFACE_SPEC_2026-06-03.md` |
 | Local-network discovery authority boundary | `docs/audit/FILTERTUBE_LOCAL_NETWORK_DISCOVERY_AUTHORITY_BOUNDARY_2026-06-03.md` |
 | Managed policy encrypted mailbox protocol | `docs/audit/FILTERTUBE_MANAGED_POLICY_ENCRYPTED_MAILBOX_PROTOCOL_2026-06-04.md` |
 | Managed pairing public-key descriptor | `docs/audit/FILTERTUBE_NANAH_MANAGED_PAIRING_KEY_DESCRIPTOR_2026-06-04.md` |
@@ -169,10 +170,19 @@ Current local-write boundary:
   protected `admin_session.failed_unlock` evidence rows.
 - Parent/account profiles that can manage a child can now open that child's
   local protected action history from the profile row.
+- Parent/account profiles that can manage a child can now see a compact,
+  read-only managed status line on that child row. The line summarizes local
+  Main/Kids revision state, accepted remote policy scope/link counts, and
+  protected history counts without exposing rule values or raw policy data.
+- Child/protected admin surfaces do not receive the detailed managed status
+  text and still gate Edit Rules, History, viewing-space, and time-limit
+  controls.
 - The local clear path removes accepted rows but preserves rejected, conflict,
   failed-auth, expired-session, trust, time-limit, and viewing-space evidence.
 - These local rows are not signed remote-policy authority and do not yet create
   a global revision that all extension contexts can compare against.
+- The profile-row status line is display evidence only; it does not weaken or
+  replace the save-time authority checks.
 
 ### PIN/session authority
 

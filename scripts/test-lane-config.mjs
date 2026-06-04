@@ -308,6 +308,7 @@ export const LANES = Object.freeze({
       'tests/runtime/managed-child-time-limit-schema-current-behavior.test.mjs',
       'tests/runtime/managed-time-budget-enforcement-current-behavior.test.mjs',
       'tests/runtime/managed-policy-action-history-model-current-behavior.test.mjs',
+      'tests/runtime/managed-parent-ui-surface-current-behavior.test.mjs',
       'tests/runtime/backup-export-authority-current-behavior.test.mjs',
       'tests/runtime/io-manager-method-semantic-register-current-behavior.test.mjs',
       'tests/runtime/background-message-action-semantic-register-current-behavior.test.mjs',

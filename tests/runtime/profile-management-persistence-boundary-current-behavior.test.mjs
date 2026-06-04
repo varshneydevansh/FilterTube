@@ -154,7 +154,7 @@ test('profile management persistence audit document records current boundary and
 test('profile management source fingerprints stay pinned', () => {
   const doc = read(auditDocPath);
   const expected = [
-    ['js/tab-view.js', 12880, 590790, '05f1a67bcf38abcc6ed9dfd7e9c3909caada338cebc9a05351a7e8c22487a1e2'],
+    ['js/tab-view.js', 12960, 594978, '098d292b9c139e3230aea4471aefc228d89d6020cd63dfe439e9c963c6452091'],
     ['js/popup.js', 1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
     ['js/io_manager.js', 2097, 100479, 'f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62'],
     ['js/background.js', 6711, 301840, 'b27206ec2b6927fc33f823c4832ff95ace7c97bd4284eb950fc5964baf666346']
@@ -173,7 +173,7 @@ test('profile management source/effect block metrics stay pinned in the doc', ()
   const doc = read(auditDocPath);
   const currentBlocks = blocks();
   const expected = {
-    tabRenderProfilesManager: ['tab-view renderProfilesManager block', 401, 20304],
+    tabRenderProfilesManager: ['tab-view renderProfilesManager block', 411, 20884],
     tabRefreshProfilesUI: ['tab-view refreshProfilesUI block', 24, 954],
     tabSwitchToProfile: ['tab-view switchToProfile block', 44, 1595],
     popupSwitchToProfile: ['popup switchToProfile block', 48, 1659],

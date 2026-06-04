@@ -155,9 +155,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 70
-method semantic proof gap lexical callables covered: 5977
+method semantic proof gap lexical callables covered: 5984
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5977
+lexical callables requiring semantic proof before behavior changes: 5984
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

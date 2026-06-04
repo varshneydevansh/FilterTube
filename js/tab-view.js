@@ -4605,6 +4605,76 @@ document.addEventListener('DOMContentLoaded', async () => {
             : `${date} - ${result} - ${scope} - ${label}`;
     }
 
+    function managedPolicyRevisionLabel(state, label) {
+        const root = safeObject(state);
+        const revision = normalizeNonNegativeInteger(root.policyRevision || root.revision);
+        const updatedAt = normalizeNonNegativeInteger(root.updatedAt || root.receivedAt || root.issuedAt);
+        if (!revision) return '';
+        const suffix = updatedAt ? `, ${new Date(updatedAt).toLocaleDateString()}` : '';
+        return `${label} r${revision}${suffix}`;
+    }
+
+    function summarizeManagedPolicyStateForProfile(profile) {
+        const managedState = safeObject(profile?.managedPolicyState);
+        const localEdits = safeObject(managedState.localManagedEdits);
+        const remotePolicies = safeObject(managedState.remoteManagedPolicies);
+        const localLabels = ['main', 'kids']
+            .map(scope => managedPolicyRevisionLabel(localEdits[scope], scope === 'kids' ? 'Kids' : 'Main'))
+            .filter(Boolean);
+        let remoteLinkCount = 0;
+        let remoteScopeCount = 0;
+        let latestRemoteRevision = 0;
+        Object.values(remotePolicies).forEach((linkPolicies) => {
+            const scopes = Object.values(safeObject(linkPolicies)).filter((entry) => {
+                const state = safeObject(entry);
+                return !!(normalizeNonNegativeInteger(state.revision) && normalizeString(state.policyHash));
+            });
+            if (!scopes.length) return;
+            remoteLinkCount += 1;
+            remoteScopeCount += scopes.length;
+            scopes.forEach((entry) => {
+                latestRemoteRevision = Math.max(latestRemoteRevision, normalizeNonNegativeInteger(safeObject(entry).revision) || 0);
+            });
+        });
+        const historyRows = getManagedActionHistoryRows(profile);
+        const protectedRows = historyRows.filter(managedActionHistoryRowIsProtected);
+        const latestRow = safeObject(historyRows[historyRows.length - 1]);
+        return {
+            localLabels,
+            remoteLinkCount,
+            remoteScopeCount,
+            latestRemoteRevision,
+            historyRowCount: historyRows.length,
+            protectedRowCount: protectedRows.length,
+            latestResult: normalizeString(latestRow.result),
+            latestScope: normalizeString(latestRow.scope)
+        };
+    }
+
+    function buildManagedProfileStatusText(profile, { revealDetails = false } = {}) {
+        if (!revealDetails) return '';
+        const summary = summarizeManagedPolicyStateForProfile(profile);
+        const parts = [];
+        if (summary.localLabels.length) {
+            parts.push(`Local edits: ${summary.localLabels.join(', ')}`);
+        }
+        if (summary.remoteScopeCount) {
+            const linkLabel = summary.remoteLinkCount === 1 ? 'link' : 'links';
+            const scopeLabel = summary.remoteScopeCount === 1 ? 'scope' : 'scopes';
+            parts.push(`Remote sync: ${summary.remoteScopeCount} ${scopeLabel} across ${summary.remoteLinkCount} ${linkLabel}, latest r${summary.latestRemoteRevision}`);
+        }
+        if (summary.historyRowCount) {
+            const rowLabel = summary.historyRowCount === 1 ? 'row' : 'rows';
+            const latest = summary.latestResult && summary.latestScope
+                ? `, latest ${summary.latestResult}/${summary.latestScope}`
+                : '';
+            parts.push(`History: ${summary.historyRowCount} ${rowLabel}, ${summary.protectedRowCount} protected${latest}`);
+        }
+        return parts.length
+            ? `Managed status: ${parts.join(' | ')}`
+            : 'Managed status: no parent-managed policy revisions yet.';
+    }
+
     async function showManagedActionHistory(profileId) {
         const targetId = normalizeString(profileId);
         if (!targetId) return;
@@ -9716,6 +9786,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             const body = document.createElement('div');
             body.className = 'help-item-body';
             body.textContent = `Viewing access: ${viewingAccessLabel(profiles[profileId])} | Time limit: ${managedTimeLimitLabel(profiles[profileId])}`;
+            const canManageTarget = canActiveProfileManageProfile(profilesV4, profileId);
+            const managedStatusText = type === 'child'
+                ? buildManagedProfileStatusText(profiles[profileId], { revealDetails: canManageTarget && !childAdminRestricted })
+                : '';
+            if (managedStatusText) {
+                const managedStatus = document.createElement('div');
+                managedStatus.className = 'help-item-body ft-managed-profile-status';
+                managedStatus.style.marginTop = '6px';
+                managedStatus.textContent = managedStatusText;
+                body.appendChild(managedStatus);
+            }
 
             const actions = document.createElement('div');
             actions.style.display = 'flex';
@@ -9903,7 +9984,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 actions.appendChild(disableTimeLimitBtn);
             }
 
-            const canManageTarget = canActiveProfileManageProfile(profilesV4, profileId);
             if (type === 'child' && canManageTarget && !childAdminRestricted) {
                 const editRulesBtn = document.createElement('button');
                 editRulesBtn.className = 'btn-secondary btn-profile-main';

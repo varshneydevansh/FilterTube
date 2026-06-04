@@ -485,11 +485,16 @@ the current extension dashboard.
   recent action history.
 - **Complexity**: 4/10
 - **Dependencies**: Sprints 1 and 2.
+- **Status**: Spec plus first dashboard child-row status increment present.
+  Parent/account-authorized child rows can now show compact local revision,
+  remote accepted-policy scope/link count, and protected history count status.
+  Child/protected views do not receive detailed managed status text.
 - **Acceptance Criteria**:
   - UI has empty, loading, error, locked, offline, and sync-conflict states.
   - Parent actions are clear and reversible where possible.
   - Child/protected profile view hides admin controls.
 - **Validation**:
+  - `node --test tests/runtime/managed-parent-ui-surface-current-behavior.test.mjs`
   - UI spec review against existing `docs/MOBILE_APP_UI_SPEC.md`.
 
 ### Task 4.2: Implement parent/caregiver UI increment
