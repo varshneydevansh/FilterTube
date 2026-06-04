@@ -21,9 +21,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 72
-method semantic proof gap lexical callables covered: 6111
+method semantic proof gap lexical callables covered: 6113
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6111
+lexical callables requiring semantic proof before behavior changes: 6113
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -68,12 +68,12 @@ changes remain blocked by the implementation gate.
 
 ```text
 tracked JS/JSX/MJS files: 72
-repo-wide lexical callables: 6111
+repo-wide lexical callables: 6113
 ```
 
 | Family | Files | Lexical callables | Boundary |
 | --- | ---: | ---: | --- |
-| Hot page/background runtime | 9 | 3170 | Already has detailed first-pass hot runtime table in `FILTERTUBE_FUNCTION_COVERAGE_2026-05-17.md`. |
+| Hot page/background runtime | 9 | 3172 | Already has detailed first-pass hot runtime table in `FILTERTUBE_FUNCTION_COVERAGE_2026-05-17.md`. |
 | Content helper runtime | 9 | 348 | First-pass helper surface audit exists, but behavior fixtures remain incomplete. |
 | UI/settings runtime | 13 | 1908 | First-pass UI/settings audit exists, but action-level fixtures remain incomplete. |
 | Generated/quarantined UI | 6 | 147 | Generated source/output and `js/layout.js`; freshness and quarantine checks required. |
@@ -87,7 +87,7 @@ repo-wide lexical callables: 6111
 | File | Family | Lexical callables | Audit status |
 | --- | --- | ---: | --- |
 | `build.js` | Build/sync scripts | 51 | release-audited first pass |
-| `js/background.js` | Hot page/background runtime | 467 | hot runtime mapped |
+| `js/background.js` | Hot page/background runtime | 469 | hot runtime mapped |
 | `js/content/block_channel.js` | Hot page/background runtime | 226 | hot runtime mapped |
 | `js/content/bridge_injection.js` | Content helper runtime | 12 | helper counted |
 | `js/content/bridge_settings.js` | Hot page/background runtime | 102 | hot runtime mapped |
@@ -172,7 +172,7 @@ repo-wide lexical callables: 6111
    app-card flows.
 
 3. **The hot runtime is not the whole product.**
-   Hot runtime has 3,170 lexical callables, but UI/settings, content helpers,
+   Hot runtime has 3,172 lexical callables, but UI/settings, content helpers,
    generated shell, vendor, build scripts, and website add another 2,941
    lexical callable forms.
 
@@ -208,5 +208,5 @@ That fixture pins:
 
 - all tracked JS/JSX/MJS files are listed,
 - documented callable counts match current lexical source,
-- documented family totals sum to 6,111,
+- documented family totals sum to 6,113,
 - no ignored raw captures or generated package output are part of this index.

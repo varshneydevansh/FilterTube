@@ -55,13 +55,19 @@ The message path for unlocking is guarded by extension-page sender origin:
 FilterTube_SessionPinAuth
   -> isTrustedUiSender(sender)
   -> verifyAndCacheSessionPin(profileId, pin)
-  -> sessionPinCache.set(profileId, { pin, expiresAt })
+  -> sessionPinCache.set(id, { pin, expiresAt })
 ```
 
 Proof: `js/background.js:3589-3601`.
 
 Risk: this creates a background session cache, but only some later mutation
 paths consult it.
+
+2026-06-05 update: the cached PIN/session entry remains memory-only, but failed
+`FilterTube_SessionPinAuth` attempts now merge memory state with
+`profile.managedPolicyState.adminFailedUnlockRateLimit`, persist the failed
+attempt window, and clear that persisted row on successful PIN verification or
+no-PIN profiles.
 
 ## Mutation Paths With Session Checks
 

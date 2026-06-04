@@ -12,8 +12,8 @@ same managed-policy validator/apply path. Runtime behavior changed for protected
 parent-managed child saves, protected parent unlock-failure evidence,
 parent/account history viewing, accepted-row history clearing, dashboard and
 background admin-session expiry, sensitive managed-action re-auth,
-dashboard-persisted managed/admin failed-attempt rate limiting with in-memory
-background session PIN rate limiting, child time-budget enforcement,
+profile-persisted managed/admin failed-attempt rate limiting while the
+background PIN cache remains memory-only, child time-budget enforcement,
 managed-envelope validation/classification, managed-policy receive/apply
 evidence, managed public-key descriptor pairing, source signing-key
 provisioning, eligible signed Main/Kids/granular live managed-policy sends, and
@@ -70,8 +70,8 @@ target-local accepted managed-policy revision state for that link and clears
 matching open-sync status rows before the removed trust can be reused as local
 authority evidence. Server mailbox pull, mailbox decryption client, server
 mailbox queue purge, active/full signed conversion, richer viewing-space/time-limit
-and multi-target bulk outbound controls, local-network delivery runtime, background/session-service
-failed-attempt durability, and remote admin session semantics remain separate
+and multi-target bulk outbound controls, local-network delivery runtime, and
+remote admin session semantics remain separate
 required slices.
 
 ## Issue 60 Local-Network Caregiver Addendum
@@ -217,6 +217,10 @@ Current behavior:
 - `verifyAndCacheSessionPin(profileId, pin)` loads `ftProfilesV4`, extracts the
   relevant verifier, runs `FilterTubeSecurity.verifyPin(...)`, and stores the
   PIN in memory only when verification succeeds.
+- Failed `FilterTube_SessionPinAuth` attempts merge the in-memory failed-attempt
+  window with `profile.managedPolicyState.adminFailedUnlockRateLimit`, persist
+  the current failed-attempt window, and clear the persisted row on success or
+  no-PIN profiles.
 - `isProfileSessionAuthorized(profilesV4, profileId)` returns true when the
   profile has no verifier, otherwise it requires a cached session PIN entry.
 
@@ -469,11 +473,11 @@ Current gap:
 | Locked-child bypass has no revision binding | `allow_trusted_updates` can skip unlock for matching managed sessions, but not with policy revision constraints. | Locked child managed-policy fixtures. |
 | Mailbox protocol specified, runtime partially hooked | Offline later delivery now has a ciphertext-only protocol and replay/ack proof fixture. The dashboard/profile-open hook can ask a trusted local provider for already-decrypted mailbox items and return redacted ack records after local apply/reject. Provider rejection or provider failure fails closed without applying or acknowledging returned items, but no server mailbox client, pull scheduler, decryption client, or server path exists. | Pairing key persistence plus signed live-delivery tests before mailbox runtime work. |
 | No local-network management contract | Same-network discovery could be mistaken for authority. | Separate discovery, pairing, transport, and policy-authority proof. |
-| Partial protected-user action history | Accepted local managed child saves, local parent/account history access, accepted-row clearing, protected failed unlock rows, dashboard/background session expiry, sensitive managed-action re-auth, dashboard-persisted local failed-attempt rate limiting, in-memory background session PIN failed-attempt limiting, and remote managed validation/apply rows exist. | Retention expiry, encrypted summary fixtures, background/session-service failed-attempt durability proof, and live remote apply smoke. |
+| Partial protected-user action history | Accepted local managed child saves, local parent/account history access, accepted-row clearing, protected failed unlock rows, dashboard/background session expiry, sensitive managed-action re-auth, profile-persisted local/background failed-attempt rate limiting, and remote managed validation/apply rows exist. | Retention expiry, encrypted summary fixtures, and live remote apply smoke. |
 | No admin lock for remote management | Child PIN or protected profile state could be confused with admin authority. | Parent/account PIN and trusted-device authority fixtures before writes. |
 | No pairing key/signature contract | P2P or local-network transport could authenticate reachability instead of authority. | Device-bound key, signature/integrity, rotation, revocation, and compromise-recovery fixtures. |
 | No hostile-LAN fixture set | Spoofed peer announcements, duplicate device ids, stale pairings, reconnect drift, or MITM attempts could be missed. | Discovery-versus-authority negative fixtures before local-network writes. |
-| Partial protected log access policy | Local child history viewer, accepted-row clear path, and dashboard failed-attempt persistence now preserve protected evidence; encrypted summaries and background/session-service failed-attempt durability remain pending. | Retention, encryption, and background/session-service failed-attempt durability proof. |
+| Partial protected log access policy | Local child history viewer, accepted-row clear path, and profile-persisted failed-attempt state now preserve protected evidence; encrypted summaries remain pending. | Retention and encryption proof. |
 | No conflict-resolution matrix | Simultaneous parent edits or server mailbox delivery after revocation could produce nondeterministic policy state. Local accepted-state cleanup now removes the revoked link's cached revision evidence, but mailbox/server queue conflict handling remains pending. | Equal-revision, different-hash, multi-parent, local-vs-remote, and revoked-queued-update fixtures. |
 | App policy contract parity now explicit | The extension-owned contract names the fields apps must preserve, the app sync manifest copies a dedicated contract artifact, and Android now has model-level proof for managed policy state/action history preservation plus Activity startup/resume/heartbeat/pause enforcement for managed time budgets. Rich timeout UI, settings locks, installed-device app smoke, and iOS parity remain pending. | Installed Android Main/Kids time-budget smoke, native settings-lock tests, iOS adapter parity, and child/admin authority separation fixtures. |
 
@@ -504,9 +508,9 @@ Before adding parent-managed runtime behavior:
     compromise-recovery proof before accepting local-network/P2P policy writes.
 12. Add hostile-LAN and simultaneous-update conflict fixtures before enabling
     automatic remote apply.
-13. Keep action-history access, accepted-row clearing, and dashboard
-    failed-attempt persistence behind parent/account authority, then add
-    encryption and background/session-service failed-attempt retention proof.
+13. Keep action-history access, accepted-row clearing, and profile-persisted
+    failed-attempt state behind parent/account authority, then add encryption
+    proof for protected summaries.
 14. Keep mailbox delivery ciphertext-only and reuse validated managed-policy
     apply; do not add a mailbox runtime path until source key provisioning,
     trusted descriptor persistence, signed live-send construction, and live

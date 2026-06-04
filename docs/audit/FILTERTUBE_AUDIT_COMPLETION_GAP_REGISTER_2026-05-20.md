@@ -3326,7 +3326,7 @@ and the existing
 bind the affected whitelist/cache source files to the method semantic proof
 gap index while leaving method proof, optimization approval, and runtime
 unchanged. The continuation pins 8 affected callable semantic gap binding
-rows, 8 affected source files with method-gap rows, 2871 affected lexical
+rows, 8 affected source files with method-gap rows, 2873 affected lexical
 callables requiring semantic proof, 8 affected semantic proof required fields,
 affected files with complete per-callable semantic proof remain 0, runtime
 affected callable semantic approvals remain 0, implementation-ready affected

@@ -17,8 +17,8 @@ test('managed parent authority inventory tracks implemented route gate and pendi
   assert.match(doc, /managed-policy receive\/apply\s+evidence/);
   assert.match(doc, /dashboard and\s+background admin-session expiry/);
   assert.match(doc, /sensitive managed-action re-auth/);
-  assert.match(doc, /dashboard-persisted managed\/admin failed-attempt rate limiting/);
-  assert.match(doc, /in-memory\s+background session PIN rate limiting/);
+  assert.match(doc, /profile-persisted managed\/admin failed-attempt rate limiting/);
+  assert.match(doc, /background PIN cache remains memory-only/);
   assert.match(doc, /Runtime behavior\s+changed/);
   assert.match(doc, /protected parent unlock-failure evidence/);
   assert.match(doc, /Lane proof\*\*: `test:settings`/);
@@ -53,12 +53,13 @@ test('local parent child edit authority remains source-backed by active-profile 
   assert.match(doc, /Child PIN unlock does not make the child an admin/);
 });
 
-test('session PIN authority remains trusted-ui gated and memory scoped', () => {
+test('session PIN authority remains trusted-ui gated with memory-only PIN cache and persisted failed attempts', () => {
   const doc = read(docPath);
   const background = read('js/background.js');
 
   assert.match(background, /const sessionPinCache = new Map\(\)/);
   assert.match(background, /const SESSION_PIN_CACHE_TTL_MS = 15 \* 60 \* 1000/);
+  assert.match(background, /const SESSION_PIN_FAILED_ATTEMPT_SCHEMA = 'filtertube_managed_admin_failed_unlock_rate_limit'/);
   assert.match(background, /const SESSION_PIN_FAILED_ATTEMPT_LIMIT = 5/);
   assert.match(background, /const sessionPinFailedAttempts = new Map\(\)/);
   assert.doesNotMatch(background, /function getCachedSessionPin\(profileId\)/);
@@ -67,15 +68,22 @@ test('session PIN authority remains trusted-ui gated and memory scoped', () => {
   assert.match(background, /if \(!isSessionPinCacheEntryFresh\(entry\)\)/);
   assert.match(background, /sessionPinCache\.delete\(id\)/);
   assert.match(background, /async function verifyAndCacheSessionPin\(profileId, pin\)/);
-  assert.match(background, /function isSessionPinRateLimited\(profileId\)/);
-  assert.match(background, /function recordSessionPinFailedAttempt\(profileId\)/);
+  assert.match(background, /function isSessionPinRateLimited\(profileId, profilesV4 = null\)/);
+  assert.match(background, /function getSessionPinFailedAttemptState\(profileId, now = Date\.now\(\), profilesV4 = null\)/);
+  assert.match(background, /function recordSessionPinFailedAttempt\(profileId, profilesV4 = null\)/);
+  assert.match(background, /async function persistSessionPinFailedAttemptState\(profileId, state, profilesV4 = null\)/);
+  assert.match(background, /adminFailedUnlockRateLimit/);
+  assert.match(background, /getSessionPinFailedAttemptState\(profileId, Date\.now\(\), profilesV4\)/);
+  assert.match(background, /persistSessionPinFailedAttemptState\(id, failedAttempt, stored\)/);
+  assert.match(background, /persistSessionPinFailedAttemptState\(id, null, stored\)/);
   assert.match(background, /FilterTube_SessionPinAuth/);
   assert.match(background, /if \(!isTrustedUiSender\(sender\)\)/);
   assert.match(background, /sessionPinCache\.set\(id, \{/);
   assert.match(background, /expiresAt: Date\.now\(\) \+ SESSION_PIN_CACHE_TTL_MS/);
 
   assert.match(doc, /sessionPinCache/);
-  assert.match(doc, /in-memory\s+background session PIN rate limiting/);
+  assert.match(doc, /background PIN cache remains memory-only/);
+  assert.match(doc, /profile\.managedPolicyState\.adminFailedUnlockRateLimit/);
   assert.match(doc, /trusted UI sender/i);
   assert.match(doc, /Current PIN authority is local and session-scoped/);
 });

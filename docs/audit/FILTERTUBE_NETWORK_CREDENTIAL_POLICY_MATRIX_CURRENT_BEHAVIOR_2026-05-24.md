@@ -22,7 +22,7 @@ while release-note fetches currently omit an explicit credential option.
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6711 | 301840 | `b27206ec2b6927fc33f823c4832ff95ace7c97bd4284eb950fc5964baf666346` |
+| `js/background.js` | 6773 | 305166 | `b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5` |
 | `js/content/handle_resolver.js` | 282 | 9785 | `67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff` |
 | `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
 | `js/injector.js` | 3593 | 155830 | `634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04` |
@@ -54,12 +54,12 @@ not completion proof for network credential policy authority
 
 | File | Line | Owner / reason | Credential mode |
 | --- | ---: | --- | --- |
-| `js/background.js` | 2892 | Background Shorts identity HTML fetch | `include` |
-| `js/background.js` | 3008 | Background Kids watch identity HTML fetch | `include` |
-| `js/background.js` | 3101 | Background Main watch identity HTML fetch | `include` |
-| `js/background.js` | 4644 | Background channel info primary HTML fetch | `include` |
-| `js/background.js` | 4658 | Background channel info handle fallback HTML fetch | `include` |
-| `js/background.js` | 4811 | Background channel info public fallback HTML fetch | `omit` |
+| `js/background.js` | 6773 | Background Shorts identity HTML fetch | `include` |
+| `js/background.js` | 6773 | Background Kids watch identity HTML fetch | `include` |
+| `js/background.js` | 6773 | Background Main watch identity HTML fetch | `include` |
+| `js/background.js` | 6773 | Background channel info primary HTML fetch | `include` |
+| `js/background.js` | 6773 | Background channel info handle fallback HTML fetch | `include` |
+| `js/background.js` | 6773 | Background channel info public fallback HTML fetch | `omit` |
 | `js/content/handle_resolver.js` | 240 | Content handle resolver direct same-origin HTML fetch | `same-origin` |
 | `js/content_bridge.js` | 1944 | Content bridge watch metadata direct HTML fetch | `same-origin` |
 | `js/content_bridge.js` | 8707 | Content bridge Shorts direct HTML fetch | `same-origin` |
@@ -70,7 +70,7 @@ not completion proof for network credential policy authority
 
 | File | Line | Owner / reason | Boundary |
 | --- | ---: | --- | --- |
-| `js/background.js` | 1723 | Background release-note extension-resource fetch | No explicit credentials option. |
+| `js/background.js` | 6773 | Background release-note extension-resource fetch | No explicit credentials option. |
 | `js/tab-view.js` | 2664 | Dashboard release-note extension-resource fetch | No explicit credentials option. |
 
 These two rows are still network request primitives, but they are extension

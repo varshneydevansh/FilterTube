@@ -165,7 +165,7 @@ test('content-control JSON-first boundary index is audit-only and source pinned'
   assert.ok(doc.includes(`| \`js/content_controls_catalog.js\` | 222 | 7822 | \`${sha256('js/content_controls_catalog.js')}\` |`));
   assert.ok(doc.includes(`| \`js/settings_shared.js\` | 1181 | 57535 | \`${sha256('js/settings_shared.js')}\` |`));
   assert.ok(doc.includes(`| \`js/state_manager.js\` | 2491 | 99780 | \`${sha256('js/state_manager.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/background.js\` | 6711 | 301840 | \`${sha256('js/background.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/background.js\` | 6773 | 305166 | \`${sha256('js/background.js')}\` |`));
 });
 
 test('content-control JSON-first family docs carry the method semantic proof gap blocker', () => {

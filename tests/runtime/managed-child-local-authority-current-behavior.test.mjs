@@ -248,7 +248,7 @@ test('managed child local authority contract is source-backed with accepted-save
   const tabView = read('js/tab-view.js');
   const source = runtimeSource();
 
-  assert.match(doc, /Status\*\*: Runtime local managed-save, failed-unlock history, admin-session\s+TTL, sensitive-action re-auth, dashboard-persisted failed-attempt rate-limit\s+hardening, and a shared managed-admin authority helper are partially present/);
+  assert.match(doc, /Status\*\*: Runtime local managed-save, failed-unlock history, admin-session\s+TTL, sensitive-action re-auth, profile-persisted failed-attempt rate-limit\s+hardening, and a shared managed-admin authority helper are partially present/);
   assert.match(doc, /Who is allowed to enter virtual child edit mode/);
   assert.match(doc, /Required Local Authority Decisions/);
   assert.match(doc, /Hardening Requirements/);
@@ -300,8 +300,11 @@ test('managed child local authority contract is source-backed with accepted-save
   assert.match(source, /const SESSION_PIN_FAILED_ATTEMPT_LIMIT = 5/);
   assert.match(source, /const SESSION_PIN_FAILED_ATTEMPT_WINDOW_MS = 10 \* 60 \* 1000/);
   assert.match(source, /const sessionPinFailedAttempts = new Map\(\)/);
-  assert.match(source, /function recordSessionPinFailedAttempt\(profileId\)/);
+  assert.match(source, /function recordSessionPinFailedAttempt\(profileId, profilesV4 = null\)/);
+  assert.match(source, /const SESSION_PIN_FAILED_ATTEMPT_SCHEMA = 'filtertube_managed_admin_failed_unlock_rate_limit'/);
   assert.match(source, /error: 'rate_limited'/);
+  assert.match(source, /function persistSessionPinFailedAttemptState\(profileId, state, profilesV4 = null\)/);
+  assert.match(source, /managedPolicyState\.adminFailedUnlockRateLimit = \{/);
 
   assert.doesNotMatch(source, /managedChildAdminSessionTtl/);
 });
@@ -454,7 +457,7 @@ test('local hardening covers session ttl reauth failed attempt logging and rate 
   assert.match(doc, /runtime local managed edit admin session TTL: present for tab-view and background session cache/);
   assert.match(doc, /runtime local managed edit sensitive-action re-auth gate: present for managed child\/history\/viewing-space\/time-limit unlock gates/);
   assert.match(doc, /runtime local managed edit failed-attempt rate limit: present for tab-view unlock prompts and background session PIN auth/);
-  assert.match(doc, /runtime local managed edit failed-attempt rate limit durability: present for tab-view managed unlock prompts through profile\.managedPolicyState\.adminFailedUnlockRateLimit; background session PIN auth remains memory-only/);
+  assert.match(doc, /runtime local managed edit failed-attempt rate limit durability: present for tab-view managed unlock prompts and background session PIN auth through profile\.managedPolicyState\.adminFailedUnlockRateLimit/);
 });
 
 test('local managed failed unlock rate limit persists and clears on managing profile state', () => {

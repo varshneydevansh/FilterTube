@@ -3347,7 +3347,7 @@ and
 extend objective coverage for affected-callable semantic proof without closing
 method proof, approving optimization, or changing product runtime behavior.
 The continuation pins 8 affected callable semantic gap binding rows, 8
-affected source files with method-gap rows, 2871 affected lexical callables
+affected source files with method-gap rows, 2873 affected lexical callables
 requiring semantic proof, 8 affected semantic proof required fields, affected
 files with complete per-callable semantic proof remain 0, runtime affected
 callable semantic approvals remain 0, implementation-ready affected semantic

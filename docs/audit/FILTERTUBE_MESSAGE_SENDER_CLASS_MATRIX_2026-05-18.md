@@ -53,7 +53,7 @@ Current branch inventory:
 | `FilterTube_SubscriptionsImportProgress` | Any extension sender with runtime access | Logs import progress | `allowedYoutubeContentScript` with pending import request |
 | `FilterTube_ManagedTimeLimitHeartbeat` | Any extension sender with runtime access | Records managed profile time usage heartbeat and returns remaining budget or timeout state | `allowedYoutubeContentScript` with active profile, tab, route, and surface proof |
 | `getCompiledSettings` | Any extension sender with runtime access | Compiles/caches settings for inferred/requested profile | `allowedYoutubeContentScript` |
-| `FilterTube_SessionPinAuth` | Guarded by `isTrustedUiSender(sender)` | Verifies and caches session PIN | `trustedUi` |
+| `FilterTube_SessionPinAuth` | Guarded by `isTrustedUiSender(sender)` | Verifies and caches session PIN in memory; persists failed-attempt rate-limit state | `trustedUi` |
 | `FilterTube_ClearSessionPin` | Guarded by `isTrustedUiSender(sender)` | Clears cached session PIN | `trustedUi` |
 | `FilterTube_SetListMode` | Guarded by `isTrustedUiSender(sender)` | Mutates active profile mode and optionally migrates lists | `trustedUi` with lock/profile authority |
 | `addWhitelistChannelPersistent` | Guarded by `isTrustedUiSender(sender)` | Adds Main whitelist channel and schedules backup | `trustedUi` |

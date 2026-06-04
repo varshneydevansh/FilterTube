@@ -46,7 +46,7 @@ source file: js/background.js
 source split lines: 6344
 source wc -l: 6641
 source bytes: 298986
-source sha256: b27206ec2b6927fc33f823c4832ff95ace7c97bd4284eb950fc5964baf666346
+source sha256: b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5
 broad lexical callable matches: 442
 top-level function declarations: 76
 plain function declarations: 63

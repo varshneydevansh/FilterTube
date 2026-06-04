@@ -713,6 +713,7 @@ function extractPinVerifierFromProfilesV4(profilesV4, profileId) {
 }
 
 const SESSION_PIN_CACHE_TTL_MS = 15 * 60 * 1000;
+const SESSION_PIN_FAILED_ATTEMPT_SCHEMA = 'filtertube_managed_admin_failed_unlock_rate_limit';
 const SESSION_PIN_FAILED_ATTEMPT_LIMIT = 5;
 const SESSION_PIN_FAILED_ATTEMPT_WINDOW_MS = 10 * 60 * 1000;
 const sessionPinCache = new Map();
@@ -734,27 +735,49 @@ function isProfileSessionAuthorized(profilesV4, profileId) {
     return true;
 }
 
-function getSessionPinFailedAttemptState(profileId, now = Date.now()) {
+function getSessionPinFailedAttemptState(profileId, now = Date.now(), profilesV4 = null) {
     const id = normalizeString(profileId) || DEFAULT_PROFILE_ID;
     const existing = safeObject(sessionPinFailedAttempts.get(id));
     const resetAt = Number(existing.resetAt);
-    if (!Number.isFinite(resetAt) || now >= resetAt) {
+    const profile = safeObject(safeObject(safeObject(profilesV4).profiles)[id]);
+    const persisted = safeObject(safeObject(profile.managedPolicyState).adminFailedUnlockRateLimit);
+    const persistedResetAt = Number(persisted.resetAt);
+    const persistedFailedAttempts = Number(persisted.failedAttempts);
+    const hasMemoryState = Number.isFinite(resetAt) && now < resetAt;
+    const hasPersistedState = persisted.schema === SESSION_PIN_FAILED_ATTEMPT_SCHEMA
+        && Number.isFinite(persistedResetAt)
+        && now < persistedResetAt;
+
+    if (!hasMemoryState && !hasPersistedState) {
         sessionPinFailedAttempts.delete(id);
         return { failedAttempts: 0, resetAt: now + SESSION_PIN_FAILED_ATTEMPT_WINDOW_MS };
     }
-    return {
-        failedAttempts: Number.isFinite(Number(existing.failedAttempts)) ? Number(existing.failedAttempts) : 0,
-        resetAt
+    const next = {
+        schema: SESSION_PIN_FAILED_ATTEMPT_SCHEMA,
+        version: 1,
+        failedAttempts: Math.max(
+            hasMemoryState && Number.isFinite(Number(existing.failedAttempts)) ? Number(existing.failedAttempts) : 0,
+            hasPersistedState && Number.isFinite(persistedFailedAttempts) ? Math.max(0, Math.floor(persistedFailedAttempts)) : 0
+        ),
+        resetAt: Math.max(hasMemoryState ? resetAt : 0, hasPersistedState ? persistedResetAt : 0),
+        updatedAt: Number.isFinite(Number(existing.updatedAt))
+            ? Number(existing.updatedAt)
+            : (Number.isFinite(Number(persisted.updatedAt)) ? Number(persisted.updatedAt) : now)
     };
+    if (next.failedAttempts > 0) sessionPinFailedAttempts.set(id, next);
+    return next;
 }
 
-function recordSessionPinFailedAttempt(profileId) {
+function recordSessionPinFailedAttempt(profileId, profilesV4 = null) {
     const id = normalizeString(profileId) || DEFAULT_PROFILE_ID;
     const now = Date.now();
-    const state = getSessionPinFailedAttemptState(id, now);
+    const state = getSessionPinFailedAttemptState(id, now, profilesV4);
     const next = {
+        schema: SESSION_PIN_FAILED_ATTEMPT_SCHEMA,
+        version: 1,
         failedAttempts: state.failedAttempts + 1,
-        resetAt: state.resetAt || (now + SESSION_PIN_FAILED_ATTEMPT_WINDOW_MS)
+        resetAt: state.resetAt || (now + SESSION_PIN_FAILED_ATTEMPT_WINDOW_MS),
+        updatedAt: now
     };
     sessionPinFailedAttempts.set(id, next);
     return {
@@ -763,12 +786,49 @@ function recordSessionPinFailedAttempt(profileId) {
     };
 }
 
-function isSessionPinRateLimited(profileId) {
-    return getSessionPinFailedAttemptState(profileId).failedAttempts >= SESSION_PIN_FAILED_ATTEMPT_LIMIT;
+function isSessionPinRateLimited(profileId, profilesV4 = null) {
+    return getSessionPinFailedAttemptState(profileId, Date.now(), profilesV4).failedAttempts >= SESSION_PIN_FAILED_ATTEMPT_LIMIT;
 }
 
 function clearSessionPinFailedAttempts(profileId) {
     sessionPinFailedAttempts.delete(normalizeString(profileId) || DEFAULT_PROFILE_ID);
+}
+
+async function persistSessionPinFailedAttemptState(profileId, state, profilesV4 = null) {
+    const id = normalizeString(profileId) || DEFAULT_PROFILE_ID;
+    const root = isValidProfilesV4(profilesV4)
+        ? profilesV4
+        : await new Promise(resolve => {
+            browserAPI.storage.local.get([FT_PROFILES_V4_KEY], items => resolve(items?.[FT_PROFILES_V4_KEY] || null));
+        });
+    if (!isValidProfilesV4(root)) return false;
+    const profiles = { ...safeObject(root.profiles) };
+    const profile = safeObject(profiles[id]);
+    if (!profile || Object.keys(profile).length === 0) return false;
+    const managedPolicyState = { ...safeObject(profile.managedPolicyState) };
+    const normalized = safeObject(state);
+    if (normalized.schema === SESSION_PIN_FAILED_ATTEMPT_SCHEMA && Number(normalized.failedAttempts) > 0) {
+        managedPolicyState.adminFailedUnlockRateLimit = {
+            schema: SESSION_PIN_FAILED_ATTEMPT_SCHEMA,
+            version: 1,
+            failedAttempts: Math.floor(Number(normalized.failedAttempts)),
+            resetAt: Number(normalized.resetAt) || (Date.now() + SESSION_PIN_FAILED_ATTEMPT_WINDOW_MS),
+            updatedAt: Number(normalized.updatedAt) || Date.now()
+        };
+    } else {
+        delete managedPolicyState.adminFailedUnlockRateLimit;
+    }
+    profiles[id] = { ...profile, managedPolicyState };
+    await new Promise(resolve => {
+        browserAPI.storage.local.set({
+            [FT_PROFILES_V4_KEY]: {
+                ...root,
+                schemaVersion: 4,
+                profiles
+            }
+        }, resolve);
+    });
+    return true;
 }
 
 async function verifyAndCacheSessionPin(profileId, pin) {
@@ -777,26 +837,27 @@ async function verifyAndCacheSessionPin(profileId, pin) {
         throw new Error('Security manager unavailable');
     }
     const id = normalizeString(profileId) || DEFAULT_PROFILE_ID;
-    if (isSessionPinRateLimited(id)) {
-        const state = getSessionPinFailedAttemptState(id);
-        return { ok: false, error: 'rate_limited', reason: 'rate_limited', failedAttempts: state.failedAttempts, retryAt: state.resetAt };
-    }
-
     const stored = await new Promise(resolve => {
         browserAPI.storage.local.get([FT_PROFILES_V4_KEY], items => resolve(items?.[FT_PROFILES_V4_KEY] || null));
     });
     if (!isValidProfilesV4(stored)) {
         throw new Error('Profiles unavailable');
     }
+    if (isSessionPinRateLimited(id, stored)) {
+        const state = getSessionPinFailedAttemptState(id, Date.now(), stored);
+        return { ok: false, error: 'rate_limited', reason: 'rate_limited', failedAttempts: state.failedAttempts, retryAt: state.resetAt };
+    }
     const verifier = extractPinVerifierFromProfilesV4(stored, id);
     if (!verifier) {
         sessionPinCache.delete(id);
         clearSessionPinFailedAttempts(id);
+        await persistSessionPinFailedAttemptState(id, null, stored);
         return { ok: true, stored: false, reason: 'no_pin' };
     }
     const ok = await Security.verifyPin(pin, verifier);
     if (!ok) {
-        const failedAttempt = recordSessionPinFailedAttempt(id);
+        const failedAttempt = recordSessionPinFailedAttempt(id, stored);
+        await persistSessionPinFailedAttemptState(id, failedAttempt, stored);
         return {
             ok: false,
             error: failedAttempt.rateLimited ? 'rate_limited' : 'Incorrect PIN',
@@ -806,6 +867,7 @@ async function verifyAndCacheSessionPin(profileId, pin) {
         };
     }
     clearSessionPinFailedAttempts(id);
+    await persistSessionPinFailedAttemptState(id, null, stored);
     sessionPinCache.set(id, {
         pin,
         expiresAt: Date.now() + SESSION_PIN_CACHE_TTL_MS

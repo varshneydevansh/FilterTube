@@ -47,7 +47,7 @@ decisions.
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6711 | 301840 | `b27206ec2b6927fc33f823c4832ff95ace7c97bd4284eb950fc5964baf666346` |
+| `js/background.js` | 6773 | 305166 | `b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5` |
 | `js/content/bridge_injection.js` | 127 | 4741 | `d1b84cf4c43ec5ff5cdc3bd607d8f3d3bf448c12829780b0d05fb9fc14fb5d3e` |
 | `js/content/bridge_settings.js` | 1113 | 44087 | `f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853` |
 | `js/content/collab_dialog.js` | 393 | 14623 | `dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a` |
@@ -94,8 +94,8 @@ decisions.
 
 ```text
 js/background.js:115:tabs.sendMessage:quietTabBroadcast
-js/background.js:3556:runtime.onMessage.addListener:primaryBackgroundActionReceiver
-js/background.js:5626:runtime.onMessage.addListener:secondaryBackgroundTypeReceiver
+js/background.js:3618:runtime.onMessage.addListener:primaryBackgroundActionReceiver
+js/background.js:5688:runtime.onMessage.addListener:secondaryBackgroundTypeReceiver
 js/content/bridge_injection.js:38:runtime.sendMessage:backgroundScriptInjectionRequest
 js/content/bridge_settings.js:130:window.postMessage:subscriptionImportRequestToMainWorld
 js/content/bridge_settings.js:148:window.addEventListener(message):subscriptionImportResponseListener

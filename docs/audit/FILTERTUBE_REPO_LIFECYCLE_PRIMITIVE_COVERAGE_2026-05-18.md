@@ -182,7 +182,7 @@ effects` is dispatch/click/display/class mutation.
 | `js/layout.js` | 37 | Quarantined legacy style/class mutation surface. |
 | `js/injector.js` | 26 | Page-world bridge, subscription import, collaborator lookup, and JSON runtime readiness. |
 | `js/content/dom_fallback.js` | 28 | DOM fallback, playlist/watch side effects, synthetic clicks, and delayed passes. |
-| `js/background.js` | 22 | Background timers, direct fetches, and message broadcasts. |
+| `js/background.js` | 6773 | Background timers, direct fetches, and message broadcasts. |
 
 ## Findings
 

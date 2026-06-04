@@ -42,7 +42,7 @@ Relevant implemented foundation:
 - `js/io_manager.js`
   - has profile-targeted `importV3(..., { targetProfileId })` and V4 profile merge/replace behavior.
 - `js/background.js`
-  - verifies session PINs through `FilterTube_SessionPinAuth` from trusted UI senders and keeps PINs memory-only.
+  - verifies session PINs through `FilterTube_SessionPinAuth` from trusted UI senders, keeps PINs/session cache memory-only, and persists failed-attempt rate-limit state under the profile managed-policy state.
 - `scripts/sync-native-runtime.mjs`
   - already defines the extension-to-native sync handoff script boundary.
 - `docs/audit/TEST_LANE_MATRIX.md`

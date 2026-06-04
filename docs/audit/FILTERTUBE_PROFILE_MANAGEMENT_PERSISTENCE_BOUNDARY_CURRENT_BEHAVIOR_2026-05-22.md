@@ -21,7 +21,7 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 | `js/tab-view.js` | 13695 | 632194 | `b0c71608c02a00a74920f780b7c958cc58b42703cd301a946c748cb894ab1279` |
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/io_manager.js` | 2097 | 100479 | `f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62` |
-| `js/background.js` | 6711 | 301840 | `b27206ec2b6927fc33f823c4832ff95ace7c97bd4284eb950fc5964baf666346` |
+| `js/background.js` | 6773 | 305166 | `b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5` |
 
 ## Source / Effect Blocks
 
@@ -69,7 +69,7 @@ io_manager FT_PROFILES_V4_KEY tokens: 10
 io_manager writeStorage tokens: 8
 background compiledSettingsCache tokens: 39
 background getCompiledSettings tokens: 8
-background FT_PROFILES_V4_KEY tokens: 34
+background FT_PROFILES_V4_KEY tokens: 37
 ```
 
 ## Runtime Fixtures Pinned
@@ -136,9 +136,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 72
-method semantic proof gap lexical callables covered: 6111
+method semantic proof gap lexical callables covered: 6113
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6111
+lexical callables requiring semantic proof before behavior changes: 6113
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

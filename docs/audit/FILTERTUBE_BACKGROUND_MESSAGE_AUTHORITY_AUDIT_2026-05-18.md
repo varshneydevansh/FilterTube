@@ -44,7 +44,7 @@ points.
 
 | Action | Current guard | Source proof | Authority |
 | --- | --- | --- | --- |
-| `FilterTube_SessionPinAuth` | `isTrustedUiSender(sender)` | `js/background.js:3266-3270` | Session PIN cache mutation. |
+| `FilterTube_SessionPinAuth` | `isTrustedUiSender(sender)` | `js/background.js:3266-3270` | Memory-only session PIN cache mutation plus profile-persisted failed-attempt rate-limit state. |
 | `FilterTube_ClearSessionPin` | `isTrustedUiSender(sender)` | `js/background.js:3279-3283` | Session PIN cache deletion. |
 | `FilterTube_SetListMode` | `isTrustedUiSender(sender)` | `js/background.js:3290-3302` | Main/Kids list-mode mutation, blocklist merge/clear, tab refresh broadcast. |
 | `addWhitelistChannelPersistent` | `isTrustedUiSender(sender)` | `js/background.js:3498-3519` | Main whitelist channel add through the shared channel helper. |

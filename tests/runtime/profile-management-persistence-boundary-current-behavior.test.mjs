@@ -131,10 +131,10 @@ test('profile management persistence audit document records current boundary and
     assert.ok(doc.includes(marker), `missing marker: ${marker}`);
   }
 
-  assert.match(methodGap, /repo-wide lexical callables: 6111/);
+  assert.match(methodGap, /repo-wide lexical callables: 6113/);
   assert.match(methodGap, /files with lexical accounting: 72/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 6111/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 6113/);
 
   assert.equal(profileSettingsUiFamilyDocs.length, 12);
   for (const familyDocPath of profileSettingsUiFamilyDocs) {
@@ -142,9 +142,9 @@ test('profile management persistence audit document records current boundary and
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 72/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 6111/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 6113/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 6111/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 6113/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     assert.match(familyDoc, /runtime behavior changed: no/);
     assert.match(familyDoc, /do not approve runtime\s+optimization/);
@@ -157,7 +157,7 @@ test('profile management source fingerprints stay pinned', () => {
     ['js/tab-view.js', 13695, 632194, 'b0c71608c02a00a74920f780b7c958cc58b42703cd301a946c748cb894ab1279'],
     ['js/popup.js', 1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
     ['js/io_manager.js', 2097, 100479, 'f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62'],
-    ['js/background.js', 6711, 301840, 'b27206ec2b6927fc33f823c4832ff95ace7c97bd4284eb950fc5964baf666346']
+    ['js/background.js', 6773, 305166, 'b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5']
   ];
 
   for (const [file, lines, bytes, hash] of expected) {
@@ -220,7 +220,7 @@ test('selected profile management token counts stay pinned', () => {
     ['io_manager writeStorage tokens: 8', sources.ioManager, 'writeStorage', 8],
     ['background compiledSettingsCache tokens: 39', sources.background, 'compiledSettingsCache', 39],
     ['background getCompiledSettings tokens: 8', sources.background, 'getCompiledSettings', 8],
-    ['background FT_PROFILES_V4_KEY tokens: 34', sources.background, 'FT_PROFILES_V4_KEY', 34]
+    ['background FT_PROFILES_V4_KEY tokens: 37', sources.background, 'FT_PROFILES_V4_KEY', 37]
   ];
 
   for (const [docLine, source, token, expected] of selected) {

@@ -583,9 +583,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 72
-method semantic proof gap lexical callables covered: 6111
+method semantic proof gap lexical callables covered: 6113
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6111
+lexical callables requiring semantic proof before behavior changes: 6113
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

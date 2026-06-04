@@ -218,10 +218,9 @@ revision and action-history entry.
 - **Dependencies**: Sprint 1.
 - **Status**: Local managed child authority contract and fixture updated with
   accepted-save revision/history runtime behavior, protected failed-unlock
-  logging, dashboard/background admin TTL, sensitive re-auth, dashboard
-  profile-persisted failed-attempt rate limiting, and in-memory background
-  session PIN failed-attempt limiting. Background/session-service failed-attempt
-  durability remains pending.
+  logging, dashboard/background admin TTL, sensitive re-auth, profile-persisted
+  failed-attempt rate limiting for dashboard and background session PIN auth,
+  while the actual background PIN/session cache remains memory-only.
 - **Acceptance Criteria**:
   - Parent/account can target owned child.
   - Child cannot manage itself as admin.

@@ -218,7 +218,7 @@ Latest function-inventory refinement:
 | Hot runtime file | Lexical functions / nested helpers found | Current method proof state | Completion blocker |
 | --- | ---: | --- | --- |
 | `js/content_bridge.js` | 330 | Family-level ledgers cover the full file at line-range granularity; generated helper-to-family map now exists in `docs/audit/FILTERTUBE_FUNCTION_COVERAGE_2026-05-17.md`. | Counter/fixture proof is still missing for direct hides, prefetch, map writes, fallback menu scans, and action rollback. |
-| `js/background.js` | 139 | Background authority and action-family ledgers exist. | Action registry fixtures must prove sender/write/network/profile/broadcast contract per action. |
+| `js/background.js` | 6773 | Background authority and action-family ledgers exist. | Action registry fixtures must prove sender/write/network/profile/broadcast contract per action. |
 | `js/injector.js` | 103 | Import, data hook, collaborator/channel lookup, seed relay families are ledgered. | Capability-token and settings-revision fixtures are missing. |
 | `js/content/dom_fallback.js` | 80 | DOM fallback method-family ledger exists. | Direct writer/restorer inventory and structured decision fixtures are missing. |
 | `js/content/block_channel.js` | 61 | Quick block/menu lifecycle ledger exists. | Disabled-affordance observer/timer proof is missing. |

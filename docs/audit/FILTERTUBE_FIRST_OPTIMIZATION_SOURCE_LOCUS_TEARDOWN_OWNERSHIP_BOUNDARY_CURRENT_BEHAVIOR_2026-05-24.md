@@ -165,8 +165,8 @@ js/io_manager.js
 | `js/content/dom_fallback.js` | 2105 | DOM fallback installs a page scroll listener. |
 | `js/content/dom_fallback.js` | 2339 | Playlist nav guard installs a document click listener. |
 | `js/content/dom_fallback.js` | 2403 | Playlist autoplay guard installs an ended listener. |
-| `js/background.js` | 912 | Background waits for post-block enrichment before backup. |
-| `js/background.js` | 918 | Background wait includes a timeout race. |
+| `js/background.js` | 6773 | Background waits for post-block enrichment before backup. |
+| `js/background.js` | 6773 | Background wait includes a timeout race. |
 | `js/background.js` | 1489 | Channel-map flush scheduling uses a timer. |
 | `js/state_manager.js` | 2350 | External settings reload uses a debounce timer. |
 | `js/state_manager.js` | 2356 | StateManager installs a storage change listener. |

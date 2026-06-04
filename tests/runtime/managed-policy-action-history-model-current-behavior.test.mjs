@@ -347,5 +347,5 @@ test('managed action history required outcomes cover accepted rejected conflict 
   assert.match(doc, /runtime managed inbound live ack history writer: present on trusted link policy rows/);
   assert.match(doc, /The current failed-auth writer records protected evidence rows on the target\s+protected profile/);
   assert.match(doc, /profile\.managedPolicyState\.adminFailedUnlockRateLimit/);
-  assert.match(doc, /background session PIN failed-attempt cache is\s+still memory-only/);
+  assert.match(doc, /background PIN cache\s+remains memory-only while failed-attempt rate-limit state is profile-persisted/);
 });

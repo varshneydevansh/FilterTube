@@ -2,7 +2,7 @@
 
 **Generated**: 2026-06-03
 **Status**: Runtime local managed-save, failed-unlock history, admin-session
-TTL, sensitive-action re-auth, dashboard-persisted failed-attempt rate-limit
+TTL, sensitive-action re-auth, profile-persisted failed-attempt rate-limit
 hardening, and a shared managed-admin authority helper are partially present.
 **Goal slice**: Implementation order item 5, "Harden local
 parent-managed child/protected-profile edits".
@@ -71,8 +71,8 @@ filtering behavior:
   actor device, target profile, scope, revision, policy hash, result, and
   redacted summary.
 - A failed unlock records a protected action-history row, contributes to the
-  dashboard managed-action PIN rate limit persisted on the managing profile,
-  and still contributes to the background session PIN rate limit in memory.
+  profile-persisted managed-action PIN rate limit, and keeps the actual
+  background PIN/session cache memory-only.
 - Admin session authority has TTL and relocks on profile switch, window close,
   explicit logout, or sensitive action re-auth requirement.
 - Sensitive actions, including time-limit changes, viewing-space changes,
@@ -86,10 +86,9 @@ filtering behavior:
 
 Current product runtime source implements accepted local managed-save metadata,
 protected failed-unlock history rows, local dashboard session TTL, fresher
-reauth for sensitive managed actions, dashboard-persisted failed-attempt rate
-limiting for the tab-view managed unlock prompt, and in-memory background
-session PIN rate limiting. Background/session-service durability remains a
-future slice:
+reauth for sensitive managed actions, profile-persisted failed-attempt rate
+limiting for tab-view managed unlock prompts and background session PIN auth,
+while the background PIN/session cache remains memory-only:
 
 ```text
 runtime local managed edit policy revision store: present
@@ -98,7 +97,7 @@ runtime local managed edit failed-unlock logger: present for managed child/histo
 runtime local managed edit admin session TTL: present for tab-view and background session cache
 runtime local managed edit sensitive-action re-auth gate: present for managed child/history/viewing-space/time-limit unlock gates
 runtime local managed edit failed-attempt rate limit: present for tab-view unlock prompts and background session PIN auth
-runtime local managed edit failed-attempt rate limit durability: present for tab-view managed unlock prompts through profile.managedPolicyState.adminFailedUnlockRateLimit; background session PIN auth remains memory-only
+runtime local managed edit failed-attempt rate limit durability: present for tab-view managed unlock prompts and background session PIN auth through profile.managedPolicyState.adminFailedUnlockRateLimit
 runtime managed-admin authority helper: present for local dashboard actor/target decisions, admin-session TTL, sensitive reauth, and dashboard failed-unlock window normalization
 runtime behavior changed by this contract: yes
 ```
@@ -136,6 +135,13 @@ history, or a child PIN as authority. It only answers:
 
 This reduces the risk that extension UI, local-network management, and
 downstream app sync fork the parent/caregiver authority contract.
+
+The same 2026-06-05 hardening slice also makes background
+`FilterTube_SessionPinAuth` failed-attempt rate limiting durable. The verified
+PIN/session entry remains in `sessionPinCache` memory only, but failed attempts
+now merge memory state with `profile.managedPolicyState.adminFailedUnlockRateLimit`,
+persist new failed-attempt windows, and clear the persisted row on successful
+PIN verification or no-PIN profiles.
 
 ## Verification
 

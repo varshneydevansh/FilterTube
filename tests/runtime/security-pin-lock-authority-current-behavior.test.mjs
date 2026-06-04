@@ -105,7 +105,7 @@ test('security manager currently uses PBKDF2 SHA-256 and AES-GCM for PIN verifie
   assert.match(decryptBlock, /Unsupported cipher/);
 });
 
-test('background currently has an expiring session PIN cache but only explicit callers consult it', () => {
+test('background currently has an expiring session PIN cache with persisted failed-attempt rate limit', () => {
   const source = read('js/background.js');
 
   assert.match(source, /const SESSION_PIN_CACHE_TTL_MS = 15 \* 60 \* 1000/);
@@ -118,7 +118,16 @@ test('background currently has an expiring session PIN cache but only explicit c
   assert.match(source, /sessionPinCache\.delete\(id\)/);
   assert.match(source, /function isProfileSessionAuthorized\(profilesV4, profileId\)/);
   assert.match(source, /async function verifyAndCacheSessionPin\(profileId, pin\)/);
-  assert.match(source, /sessionPinCache\.set\(profileId, \{/);
+  assert.match(source, /const SESSION_PIN_FAILED_ATTEMPT_SCHEMA = 'filtertube_managed_admin_failed_unlock_rate_limit'/);
+  assert.match(source, /function isSessionPinRateLimited\(profileId, profilesV4 = null\)/);
+  assert.match(source, /function recordSessionPinFailedAttempt\(profileId, profilesV4 = null\)/);
+  assert.match(source, /async function persistSessionPinFailedAttemptState\(profileId, state, profilesV4 = null\)/);
+  assert.match(source, /adminFailedUnlockRateLimit/);
+  assert.match(source, /isSessionPinRateLimited\(id, stored\)/);
+  assert.match(source, /recordSessionPinFailedAttempt\(id, stored\)/);
+  assert.match(source, /await persistSessionPinFailedAttemptState\(id, failedAttempt, stored\)/);
+  assert.match(source, /await persistSessionPinFailedAttemptState\(id, null, stored\)/);
+  assert.match(source, /sessionPinCache\.set\(id, \{/);
   assert.match(source, /expiresAt: Date\.now\(\) \+ SESSION_PIN_CACHE_TTL_MS/);
 });
 
