@@ -3,8 +3,8 @@
 **Generated**: 2026-06-03  
 **Status**: Runtime route-gate, local managed-save revision/history, protected
 failed-unlock history, protected history access, time-limit enforcement, and
-receive-side managed-policy validation/history proofs updated. Runtime behavior
-changed for protected child Main/Kids denial, accepted same-device
+receive-side managed-policy validation/history proofs updated, with encrypted
+mailbox protocol proof specified. Runtime behavior changed for protected child Main/Kids denial, accepted same-device
 parent-managed child saves, protected parent unlock-failure evidence,
 parent/account history viewing, accepted-row history clearing, dashboard and
 background admin-session expiry, sensitive managed-action re-auth, in-memory
@@ -32,8 +32,8 @@ validation/apply history writer, and accepted-revision state writer now exist,
 and the validator requires signature-verification evidence. Dashboard
 WebCrypto verifier plumbing now exists when a trusted link carries source
 public-key material. Pairing-time key storage, encrypted/local-network
-delivery, failed-attempt durability, and remote admin session semantics remain
-separate required slices.
+delivery runtime, failed-attempt durability, and remote admin session semantics
+remain separate required slices.
 
 ## Issue 60 Local-Network Caregiver Addendum
 
@@ -82,6 +82,7 @@ docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md
 | Managed child time-limit schema contract | `docs/audit/FILTERTUBE_MANAGED_CHILD_TIME_LIMIT_SCHEMA_CONTRACT_2026-06-03.md` |
 | Managed policy action-history model | `docs/audit/FILTERTUBE_MANAGED_POLICY_ACTION_HISTORY_MODEL_2026-06-03.md` |
 | Local-network discovery authority boundary | `docs/audit/FILTERTUBE_LOCAL_NETWORK_DISCOVERY_AUTHORITY_BOUNDARY_2026-06-03.md` |
+| Managed policy encrypted mailbox protocol | `docs/audit/FILTERTUBE_MANAGED_POLICY_ENCRYPTED_MAILBOX_PROTOCOL_2026-06-04.md` |
 
 ## Current Authority Map
 
@@ -262,7 +263,7 @@ Current gap:
   key material rather than treating them as valid.
 - The adapter's validated apply wrapper still depends on higher layers for
   canonical hash recomputation, key lookup, local-network pull scheduling,
-  encrypted mailbox delivery, and remote admin session semantics.
+  encrypted mailbox runtime delivery, and remote admin session semantics.
 
 ### Nanah managed link policy
 
@@ -309,7 +310,8 @@ Current gap:
 - There is now a signature verifier gate plus adapter WebCrypto verifier
   helper, but Nanah pairing still does not persist trusted source public keys.
 - Trust revocation does not yet purge queued updates or invalidate an accepted
-  policy revision because those structures do not exist yet.
+  policy revision. The encrypted mailbox protocol now specifies revoked queued
+  delivery behavior, but no runtime queue exists yet.
 
 ### Main/Kids viewing-space settings
 
@@ -391,7 +393,7 @@ Current gap:
 | Remote time-limit policy apply is wrapper-only | Local child time-budget enforcement exists and accepted managed envelopes can write runtime-compatible time-limit policy, but live parent-device delivery is not wired. | Signed remote time-limit fixtures through Nanah/local-network receive. |
 | Adapter depends on caller trust context | `validateManagedPolicyEnvelope(...)` depends on caller-supplied trusted-link/profile/revision/signature context; the wrapper rechecks stored profiles before writing but does not fetch trust keys itself. | Keep dashboard receive context and add pairing key lookup/revocation fixtures before automatic apply. |
 | Locked-child bypass has no revision binding | `allow_trusted_updates` can skip unlock for matching managed sessions, but not with policy revision constraints. | Locked child managed-policy fixtures. |
-| No mailbox protocol | Offline later delivery is not specified at runtime. | Ciphertext/replay/ack protocol doc before server work. |
+| Mailbox protocol specified, runtime absent | Offline later delivery now has a ciphertext-only protocol and replay/ack proof fixture, but no mailbox client, pull scheduler, ack writer, or server path exists. | Pairing key persistence plus signed live-delivery tests before mailbox runtime work. |
 | No local-network management contract | Same-network discovery could be mistaken for authority. | Separate discovery, pairing, transport, and policy-authority proof. |
 | Partial protected-user action history | Accepted local managed child saves, local parent/account history access, accepted-row clearing, protected failed unlock rows, dashboard/background session expiry, sensitive managed-action re-auth, in-memory local/background failed-attempt rate limiting, and remote managed validation/apply rows exist. | Retention expiry, encrypted summary fixtures, failed-attempt durability proof, and live remote apply smoke. |
 | No admin lock for remote management | Child PIN or protected profile state could be confused with admin authority. | Parent/account PIN and trusted-device authority fixtures before writes. |
@@ -429,6 +431,9 @@ Before adding parent-managed runtime behavior:
     automatic remote apply.
 13. Keep action-history access and accepted-row clearing behind parent/account
     authority, then add encryption and failed-attempt retention proof.
+14. Keep mailbox delivery ciphertext-only and reuse validated managed-policy
+    apply; do not add a mailbox runtime path until trusted key persistence and
+    live signed-envelope tests exist.
 
 ## Verification
 
