@@ -1,7 +1,8 @@
 # FilterTube Native Runtime Sync Manifest Freshness Boundary - Current Behavior - 2026-05-22
 
-Status: audit-only current-behavior proof. Runtime, build, package, website,
-and native app sync behavior are unchanged.
+Status: audit-only current-behavior proof. Runtime, build, package, and website
+behavior are unchanged; the native app sync manifest has one managed-policy
+contract copy addition.
 
 This slice deepens the native sync wrapper audit into the sibling app manifest
 and generated runtime freshness boundary. It confirms the current work is still
@@ -14,9 +15,9 @@ changes.
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `scripts/sync-native-runtime.mjs` | 34 | 1070 | `4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6` |
-| `/Users/devanshvarshney/FilterTubeApp/tools/sync-runtime-from-extension.mjs` | 1758 | 76587 | `d48bdc271f707f0f960ac8a6b0d2712a602fb6c84a8c2bf2e0a138d112f9ba8e` |
-| `/Users/devanshvarshney/FilterTubeApp/tools/runtime-sync-manifest.json` | 198 | 8178 | `e899e29d946270865750b8f6415c298a92da6b4e1917367b6a174afe2a0c6583` |
-| `data/release_notes.json` | 316 | 23039 | `e012f6c071fffa67958f55544ecae9bbb26e7ec91edd2066df4d06a62de69962` |
+| `/Users/devanshvarshney/FilterTubeApp/tools/sync-runtime-from-extension.mjs` | 2284 | 109397 | `ce0e231f9f0384eb538e76a553ef41453673c3231b8c5ab62d94ff7d38b90ae9` |
+| `/Users/devanshvarshney/FilterTubeApp/tools/runtime-sync-manifest.json` | 212 | 8900 | `58c9b9b34259fcf701bcabac7faa044985a4c3a9846f9405a3b9009ec68f51e7` |
+| `data/release_notes.json` | 317 | 23020 | `a8d59b18e9bffd1c828538ee58b3b8e9be7c641fea3ff064220311485a3b1c6b` |
 | `/Users/devanshvarshney/FilterTubeApp/apps/android/app/src/main/assets/extension_shell/data/release_notes.json` | 301 | 21095 | `911628cbd7f6354c58aa82064f3ef1f29cda3904a87e3ea263534600a0880737` |
 | `/Users/devanshvarshney/FilterTubeApp/apps/ios/FilterTube/Resources/release_notes.json` | 301 | 21095 | `911628cbd7f6354c58aa82064f3ef1f29cda3904a87e3ea263534600a0880737` |
 
@@ -25,71 +26,27 @@ changes.
 ```text
 public repo HEAD: 7f0e66641aa576fb264085baf59949244ea32291
 app repo HEAD: cfc651cd4294e528c2c371778d7698ce82e94a71
-app dirty tracked paths: 46
-app dirty paths:
-- apps/android/app/src/debug/java/com/filtertube/app/DebugNativeOwnedKidsActivity.kt
-- apps/android/app/src/main/assets/filtertube_nanah/nanah_sync_adapter.js
-- apps/android/app/src/main/assets/filtertube_runtime_full.js
-- apps/android/app/src/main/java/com/filtertube/app/AppLaunchRouter.kt
-- apps/android/app/src/main/java/com/filtertube/app/LauncherActivity.kt
-- apps/android/app/src/main/java/com/filtertube/app/ManagedWebViewActivity.kt
-- apps/android/app/src/main/java/com/filtertube/app/NativeOwnedMainPlaybackBridgeFallback.kt
-- apps/android/app/src/main/java/com/filtertube/app/NativeOwnedPreviewEntryPoint.kt
-- apps/android/app/src/main/java/com/filtertube/app/ProfileViewingAccess.kt
-- apps/android/app/src/main/java/com/filtertube/app/ViewingLaunchCoordinator.kt
-- apps/android/app/src/main/java/com/filtertube/app/ViewingSpaceChooserPolicy.kt
-- apps/android/app/src/main/java/com/filtertube/app/ViewingTargetAccessUiState.kt
-- apps/android/app/src/main/java/com/filtertube/app/ViewingTargetLaunchPolicy.kt
-- apps/android/app/src/test/java/com/filtertube/app/AppLaunchRouterTest.kt
-- apps/android/app/src/test/java/com/filtertube/app/NativeOwnedMainPlaybackBridgeFallbackTest.kt
-- apps/android/app/src/test/java/com/filtertube/app/NativeOwnedPreviewEntryPointTest.kt
-- apps/android/app/src/test/java/com/filtertube/app/ProfileViewingAccessTest.kt
-- apps/android/app/src/test/java/com/filtertube/app/ViewingSpaceChooserPolicyTest.kt
-- apps/android/app/src/test/java/com/filtertube/app/ViewingTargetAccessUiStateTest.kt
-- apps/android/app/src/test/java/com/filtertube/app/ViewingTargetLaunchPolicyTest.kt
-- apps/ios/FilterTube/Resources/filtertube_nanah/nanah_sync_adapter.js
-- apps/ios/FilterTube/Resources/filtertube_runtime_full.js
-- packages/extension-source/upstream/css/serene-shell.css
-- packages/extension-source/upstream/html/tab-view.html
-- packages/extension-source/upstream/js/background.js
-- packages/extension-source/upstream/js/content/block_channel.js
-- packages/extension-source/upstream/js/content/bridge_settings.js
-- packages/extension-source/upstream/js/content/collab_dialog.js
-- packages/extension-source/upstream/js/content/dom_fallback.js
-- packages/extension-source/upstream/js/content_bridge.js
-- packages/extension-source/upstream/js/injector.js
-- packages/extension-source/upstream/js/io_manager.js
-- packages/extension-source/upstream/js/nanah_sync_adapter.js
-- packages/extension-source/upstream/js/seed.js
-- packages/extension-source/upstream/js/settings_shared.js
-- packages/extension-source/upstream/js/state_manager.js
-- packages/extension-ui/src/upstream/io_manager.js
-- packages/extension-ui/src/upstream/settings_shared.js
-- packages/extension-ui/src/upstream/state_manager.js
-- packages/runtime-adapters/src/upstream/block_channel.js
-- packages/runtime-adapters/src/upstream/collab_dialog.js
-- packages/runtime-adapters/src/upstream/dom_fallback.js
-- packages/runtime-bridge/src/upstream/bridge_settings.js
-- packages/runtime-bridge/src/upstream/content_bridge.js
-- packages/runtime-bridge/src/upstream/injector.js
-- packages/runtime-bridge/src/upstream/seed.js
-runtime sync manifest entries: 28
+app dirty state authority: not pinned by this contract-copy slice
+app dirty paths: out-of-scope native app changes may exist and are not release freshness proof
+runtime sync manifest entries: 30
 manifest source repos: /Users/devanshvarshney/FilterTube
 manifest sync modes: copy
 manifest destinationKind fields present: 0
-manifest entries missing destinationKind: 28
+manifest entries missing destinationKind: 30
 manifest includes js/layout.js: yes
 manifest includes data/release_notes.json: no
-runtimeBundleOrder entries: 15
+runtimeBundleOrder entries: 16
 runtimeBundleOrder includes js/layout.js: yes
 source mirror dirs: js, html, css
-direct manifest copy sources present: 28
-direct manifest copy destinations present: 28
-direct manifest source/destination hash matches: 28
-direct manifest source/destination hash mismatches: 0
-extension-source mirror files compared: 43
-extension-source mirror hash matches: 43
-extension-source mirror hash mismatches: 0
+direct manifest copy sources present: 30
+direct manifest copy destinations present: 30
+direct manifest source/destination hash matches: 24
+direct manifest source/destination hash mismatches: 6
+extension-source mirror files compared: 46
+extension-source mirror files present: 44
+extension-source mirror hash matches: 36
+extension-source mirror missing files: 2
+extension-source mirror hash mismatches: 8
 runtime behavior changed: no
 ```
 
@@ -99,7 +56,8 @@ Manifest destination roots:
 | --- | ---: |
 | `apps/android` | 3 |
 | `packages/extension-ui` | 8 |
-| `packages/runtime-adapters` | 11 |
+| `packages/managed-policy-contract` | 1 |
+| `packages/runtime-adapters` | 12 |
 | `packages/runtime-bridge` | 5 |
 | `packages/runtime-core` | 1 |
 
@@ -107,26 +65,26 @@ Manifest destination roots:
 
 | Artifact | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `apps/android/app/src/main/assets/filtertube_runtime_full.js` | 35747 | 1574364 | `df82c9ddfc77bbed1025741222d0468e55c760e3376a2cedc5fc45bc651787c6` |
+| `apps/android/app/src/main/assets/filtertube_runtime_full.js` | 36663 | 1612973 | `8657e8db5b57630fb5eca8d912a19c146e0a074f8c3b9bda0ce98705f140bca8` |
 | `apps/android/app/src/main/assets/filtertube_kids_runtime.js` | 370 | 13153 | `05b47e2310222a68ba5356cbf6dca24b507aa225bfbe6e971c2a4819d647b711` |
-| `apps/ios/FilterTube/Resources/filtertube_runtime_full.js` | 35746 | 1572701 | `f146e2284af6429c8a30c87406ae30dce6e69003f64e9082aa459194df81fae2` |
+| `apps/ios/FilterTube/Resources/filtertube_runtime_full.js` | 36631 | 1609476 | `326a26190fdbf67b782a74982a13b951a10c947918dd7e71a71c5af97cdf8003` |
 | `apps/ios/FilterTube/Resources/filtertube_kids_runtime.js` | 575 | 20835 | `3f279f275bf93cca6385df6c8d0422a51c533c26cbd29ddd5d9ea5655efc7340` |
 | `apps/android/app/src/main/assets/filtertube_nanah_engine.html` | 875 | 34907 | `e63d29f43a5c94790a665bfda985071b26b530dd7b532cdb66f0cd3d27a1a93e` |
 | `apps/ios/FilterTube/Resources/filtertube_nanah_engine.html` | 875 | 34899 | `84df57dacdaaf394e47864cc7a70ed5185e7547b693afbe69a363811f787112d` |
 
 ## Current Boundary
 
-The direct manifest copy rows currently match the public checkout byte-for-byte,
-and the broad app source mirror currently matches `js`, `html`, and `css`
-source files byte-for-byte. That is useful evidence, but it is not a release
-freshness authority. The app worktree is dirty, generated runtime assets are
-derived by the app-side script, and no emitted report ties source revision,
-manifest hash, destination hash, generated runtime hash, app revision, and
-release artifacts together.
+The managed app policy contract copy row currently matches the public checkout
+byte-for-byte. The broader native runtime sync remains stale: 6 direct manifest
+rows differ, 2 source-mirror files are missing, and 8 source-mirror files differ.
+That is useful evidence, but it is not a release freshness authority. Generated
+runtime assets are derived by the app-side script, and no emitted report ties
+source revision, manifest hash, destination hash, generated runtime hash, app
+revision, and release artifacts together.
 
 Release notes also remain outside the direct runtime sync manifest. The public
-`data/release_notes.json` file has 316 lines and hash
-`e012f6c071fffa67958f55544ecae9bbb26e7ec91edd2066df4d06a62de69962`, while
+`data/release_notes.json` file has 317 lines and hash
+`a8d59b18e9bffd1c828538ee58b3b8e9be7c641fea3ff064220311485a3b1c6b`, while
 the current Android/iOS native release-note resources have 301 lines and hash
 `911628cbd7f6354c58aa82064f3ef1f29cda3904a87e3ea263534600a0880737`.
 

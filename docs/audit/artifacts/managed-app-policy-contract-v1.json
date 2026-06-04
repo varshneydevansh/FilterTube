@@ -1,0 +1,167 @@
+{
+  "schema": "filtertube_managed_app_policy_contract",
+  "version": 1,
+  "generated": "2026-06-04",
+  "owner": "extension_upstream_policy_contract",
+  "runtimeBehaviorChanged": false,
+  "appSyncStatus": "app_manifest_contract_sync_present_native_enforcement_pending",
+  "artifact": {
+    "sourcePath": "docs/audit/artifacts/managed-app-policy-contract-v1.json",
+    "appDestination": "packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json",
+    "manifestSyncMode": "copy"
+  },
+  "profileAuthority": {
+    "stores": [
+      "ftProfilesV4",
+      "profile.settings",
+      "profile.managedPolicyState",
+      "profile.managedActionHistory"
+    ],
+    "managerProfileTypes": [
+      "default",
+      "account"
+    ],
+    "protectedProfileTypes": [
+      "child"
+    ],
+    "requiredBoundaries": [
+      "child_pin_is_not_admin_authority",
+      "sibling_profiles_cannot_manage_each_other",
+      "parent_account_must_be_bound_to_target_child",
+      "admin_session_ttl_required_for_sensitive_actions"
+    ]
+  },
+  "viewingSpaces": {
+    "schema": "filtertube_managed_viewing_space_route_gate",
+    "identity": "main_and_kids_are_viewing_spaces_not_profiles",
+    "requiredFields": [
+      "allowMainViewing",
+      "allowKidsViewing",
+      "defaultLaunchTarget",
+      "allowYouTubeAccountSessionActions",
+      "nativeOwnedMainSurface",
+      "nativeOwnedKidsSurface"
+    ],
+    "requiredDecisions": [
+      "main_allowed",
+      "main_denied",
+      "kids_allowed",
+      "kids_denied",
+      "external_route_no_work",
+      "missing_policy_no_work",
+      "invalid_policy_no_work"
+    ]
+  },
+  "timeLimitPolicy": {
+    "schema": "filtertube_managed_time_limit",
+    "requiredFields": [
+      "schema",
+      "version",
+      "enabled",
+      "timezone",
+      "dailyBudgetSeconds",
+      "surfaceBudgets",
+      "countingMode",
+      "activeDeviceBudgetPolicy",
+      "resetPolicy",
+      "graceSeconds",
+      "parentGrant",
+      "policyRevision",
+      "policyHash",
+      "issuedAt",
+      "validFrom",
+      "validUntil"
+    ],
+    "requiredDecisions": [
+      "disabled_policy_no_work",
+      "zero_budget_immediate_timeout",
+      "active_tab_no_double_count",
+      "sleep_restart_revalidation",
+      "timezone_drift_revalidation",
+      "newer_reduced_budget_clamps_remaining_time",
+      "stale_reduced_budget_rejected"
+    ]
+  },
+  "managedEnvelope": {
+    "type": "filtertube_managed_policy",
+    "requiredFields": [
+      "linkId",
+      "scope",
+      "targetProfileId",
+      "sourceProfileId",
+      "sourceDeviceId",
+      "revision",
+      "policyHash",
+      "sourcePublicKeyId",
+      "keyVersion",
+      "issuedAt",
+      "integrity",
+      "payload"
+    ],
+    "scopes": [
+      "main",
+      "kids",
+      "keywords",
+      "channels",
+      "videos",
+      "viewing_space",
+      "time_limits"
+    ],
+    "requiredRejects": [
+      "stale_revision",
+      "equal_revision_hash_conflict",
+      "wrong_target_profile",
+      "wrong_source_device",
+      "wrong_public_key",
+      "revoked_link",
+      "missing_signature_verifier",
+      "signature_invalid"
+    ]
+  },
+  "actionHistory": {
+    "store": "profile.managedActionHistory",
+    "requiredRows": [
+      "local_managed_save_accepted",
+      "remote_policy_rejected",
+      "remote_policy_conflict",
+      "remote_policy_accepted",
+      "admin_session_failed_unlock",
+      "history_clear_accepted_rows"
+    ],
+    "requiredBoundaries": [
+      "history_is_evidence_not_policy_authority",
+      "protected_user_cannot_clear_rejected_or_failed_auth_evidence",
+      "rows_must_be_redacted_before_child_surface_display"
+    ]
+  },
+  "appBoundary": {
+    "appsMustConsume": [
+      "profile_contract",
+      "managed_policy_envelope_contract",
+      "viewing_space_policy_contract",
+      "time_limit_policy_contract",
+      "action_history_contract"
+    ],
+    "appsMustNotConsumeAsAuthority": [
+      "extension_background_session_cache",
+      "extension_content_script_dom_state",
+      "youtube_dom_selectors",
+      "page_message_sender_state"
+    ],
+    "nativeOwnedResponsibilities": [
+      "app_open_lock",
+      "native_main_surface_route_gate",
+      "native_kids_surface_route_gate",
+      "native_time_budget_gate_before_web_content",
+      "native_settings_sync_lock"
+    ],
+    "forbiddenRuntimeTokens": [
+      "chrome.",
+      "browser.",
+      "chrome.runtime",
+      "browser.runtime",
+      "chrome.tabs",
+      "browser.tabs"
+    ]
+  }
+}

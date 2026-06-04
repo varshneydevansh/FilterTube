@@ -161,8 +161,8 @@ test('first optimization collector parity rollout boundary is backed by current 
   assert.match(commentParity, /runtime JSON comment continuation collection-root parity fixtures: 8/);
   assert.match(commentParity, /mixed-root leak behavior/);
 
-  assert.match(nativeSync, /entries: 28/);
-  assert.match(nativeSync, /direct manifest copy hash diffs: 0/);
+  assert.match(nativeSync, /entries: 30/);
+  assert.match(nativeSync, /direct manifest copy hash diffs: 6/);
   assert.match(nativeSync, /Raw Capture Evidence Boundary/);
 
   assert.match(releaseParity, /COMMON_DIRS = js, css, html, icons, data, assets/);

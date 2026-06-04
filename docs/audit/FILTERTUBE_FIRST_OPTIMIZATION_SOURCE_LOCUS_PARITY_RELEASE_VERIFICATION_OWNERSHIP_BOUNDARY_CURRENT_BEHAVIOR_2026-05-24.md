@@ -241,9 +241,9 @@ diagnostic-performance-claim-scope
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_PARITY_ROLLOUT_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | 49 | `runtime collector parity rollout proofs approved: 0` |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_PARITY_ROLLOUT_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | 50 | `collector parity rollout rows implementation-ready: 0` |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_PARITY_ROLLOUT_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | 51 | `runtime behavior changed: no` |
-| `docs/audit/FILTERTUBE_NATIVE_RUNTIME_SYNC_AUTHORITY_AUDIT_2026-05-18.md` | 35 | `entries: 28` |
+| `docs/audit/FILTERTUBE_NATIVE_RUNTIME_SYNC_AUTHORITY_AUDIT_2026-05-18.md` | 35 | `entries: 30` |
 | `docs/audit/FILTERTUBE_NATIVE_RUNTIME_SYNC_AUTHORITY_AUDIT_2026-05-18.md` | 37 | `missing source files: 0` |
-| `docs/audit/FILTERTUBE_NATIVE_RUNTIME_SYNC_AUTHORITY_AUDIT_2026-05-18.md` | 38 | `direct manifest copy hash diffs: 0` |
+| `docs/audit/FILTERTUBE_NATIVE_RUNTIME_SYNC_AUTHORITY_AUDIT_2026-05-18.md` | 38 | `direct manifest copy hash diffs: 6` |
 | `docs/audit/FILTERTUBE_NATIVE_RUNTIME_SYNC_AUTHORITY_AUDIT_2026-05-18.md` | 199 | `Android and iOS freshness gates are asymmetric.` |
 | `docs/audit/FILTERTUBE_NATIVE_RUNTIME_SYNC_AUTHORITY_AUDIT_2026-05-18.md` | 209 | `Future token: `nativeRuntimeSyncAuthority`` |
 | `docs/audit/FILTERTUBE_RELEASE_PACKAGE_PARITY_AUDIT_2026-05-18.md` | 26 | `COMMON_DIRS = js, css, html, icons, data, assets` |

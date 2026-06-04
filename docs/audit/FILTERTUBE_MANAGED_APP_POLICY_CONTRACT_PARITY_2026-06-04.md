@@ -1,8 +1,8 @@
 # Contract: Managed App Policy Parity
 
 **Generated**: 2026-06-04
-**Status**: Extension-owned app policy parity proof added. Android/iOS runtime
-sync remains pending.
+**Status**: Extension-owned app policy artifact added and wired into the app
+runtime sync manifest. Android/iOS native enforcement remains pending.
 **Runtime behavior changed**: no.
 **Goal slice**: Implementation order item 12, "Sync shared policy contract to
 apps", and item 13, "Add app viewing-space/time-limit parity tests".
@@ -34,7 +34,12 @@ the extension. It does not claim Android or iOS enforcement is complete yet.
   "generated": "2026-06-04",
   "owner": "extension_upstream_policy_contract",
   "runtimeBehaviorChanged": false,
-  "appSyncStatus": "extension_contract_proof_app_sync_pending",
+  "appSyncStatus": "app_manifest_contract_sync_present_native_enforcement_pending",
+  "artifact": {
+    "sourcePath": "docs/audit/artifacts/managed-app-policy-contract-v1.json",
+    "appDestination": "packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json",
+    "manifestSyncMode": "copy"
+  },
   "profileAuthority": {
     "stores": [
       "ftProfilesV4",
@@ -235,15 +240,14 @@ device binding, and signature checks pass.
 
 ## Current Gap
 
-The extension contract is now explicit and test-pinned. The app runtime sync
-manifest still needs a later implementation slice that copies this contract into
-the mobile/tablet app repo and proves Android/iOS consume it without forking
-authority semantics.
+The extension contract is now explicit, test-pinned, and available as a JSON
+artifact at `docs/audit/artifacts/managed-app-policy-contract-v1.json`. The app
+runtime sync manifest copies that artifact into
+`packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json`.
 
-This slice intentionally does not touch the mobile app repo, because app-side
-working tree changes may be unrelated user work. The next app parity slice
-should update the app sync manifest and app adapter tests in a separate logical
-commit.
+Android/iOS still need a later implementation slice that consumes this artifact
+inside native route gates, native time-budget gates, and native settings locks
+without forking extension authority semantics.
 
 ## Edge Cases To Keep
 
@@ -265,6 +269,8 @@ Focused test:
 
 ```bash
 node --test tests/runtime/managed-app-policy-contract-parity-current-behavior.test.mjs
+node --test tests/runtime/native-runtime-sync-authority-current-behavior.test.mjs \
+  tests/runtime/native-runtime-sync-manifest-freshness-boundary-current-behavior.test.mjs
 ```
 
 Settings lane:

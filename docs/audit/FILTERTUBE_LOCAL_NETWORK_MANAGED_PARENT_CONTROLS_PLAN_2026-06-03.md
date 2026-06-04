@@ -13,11 +13,12 @@ Nanah managed-policy sends are present for Main/Kids, keyword, channel, video,
 viewing-space, and time-limit scopes, and granular keyword/channel/video sends
 now expose an explicit Main/Kids rule-source picker. A provider-gated
 dashboard/profile-open pull hook is present for already-decrypted mailbox
-items. An extension-owned managed app policy contract proof is now present so
-downstream app parity can be tested before app runtime sync changes.
+items. An extension-owned managed app policy contract artifact and app manifest
+copy row are now present so downstream app parity can be tested before native
+enforcement changes.
 Local-network peer discovery, LAN delivery, server mailbox pull, mailbox ack,
-mailbox decryption, app manifest contract sync, app native enforcement proofs,
-and active/full signed managed sends remain gated.
+mailbox decryption, app native enforcement proofs, and active/full signed
+managed sends remain gated.
 **Primary audit input**:
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
 **Current pull-on-open proof**:
@@ -613,7 +614,8 @@ contract before wiring more native app runtime behavior.
 - App contract lists profile, viewing-space, time-limit, envelope, and history
   fields.
 - Contract excludes extension runtime APIs from downstream authority payloads.
-- Current app sync manifest gap is explicit before app-side changes.
+- Current app sync manifest copies the dedicated contract artifact before
+  native app enforcement changes.
 
 ### Task 6.1: Add extension-owned app policy contract proof
 
@@ -623,9 +625,9 @@ contract before wiring more native app runtime behavior.
 - **Description**: Define the shared managed policy contract that Android/iOS
   app adapters must preserve while keeping native route/time/app-open locks as
   app-shell responsibilities.
-- **Status**: Contract doc and focused settings-lane proof added. Product
-  runtime behavior is unchanged. Mobile app repo files are not touched in this
-  slice.
+- **Status**: Contract doc, JSON artifact, app sync manifest row, and focused
+  settings/native-sync proof added. Product runtime behavior is unchanged;
+  native Android/iOS enforcement remains pending.
 - **Complexity**: 4/10
 - **Dependencies**: Sprint 1 policy schema, Sprint 5 viewing-space/time-limit
   runtime contracts.
@@ -637,9 +639,11 @@ contract before wiring more native app runtime behavior.
   - Main/Kids remain viewing spaces, not separate child profiles.
   - Native app shell owns app-open lock, Main/Kids route gate, and time budget
     gate before managed web content opens.
-  - The current app sync manifest contract-copy gap is explicit.
+  - The current app sync manifest contract-copy row exists and remains
+    byte-identical to the extension artifact.
 - **Validation**:
   - `node --test tests/runtime/managed-app-policy-contract-parity-current-behavior.test.mjs`
+  - `node --test tests/runtime/native-runtime-sync-authority-current-behavior.test.mjs`
   - `npm run test:settings`
 
 ## Sprint 7: Offline Mailbox Specification

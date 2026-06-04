@@ -387,7 +387,7 @@ test('parity rollout contract is backed by current artifact collector parity rel
   assert.match(jsonDomInventory, /discovery indexes and fixture backlog/);
   assert.match(ytmParity, /JSON playlist-panel filtering cannot yet replace the DOM selected-row\s+policy/);
   assert.match(commentParity, /runtime JSON comment continuation collection-root parity fixtures: 8/);
-  assert.match(nativeSync, /entries: 28/);
+  assert.match(nativeSync, /entries: 30/);
   assert.match(releaseParity, /no committed `releasePackageParity` manifest/);
   assert.match(publicClaim, /publicReleaseClaimAuthority/);
   assert.match(rawRelease, /must not enter browser ZIPs, website source, native sync manifests/);

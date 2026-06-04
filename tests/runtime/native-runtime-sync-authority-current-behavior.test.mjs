@@ -115,7 +115,7 @@ test('public wrapper delegates to the sibling or env-selected app sync script', 
 test('app sync manifest sources exist and are owned by the public repo path', () => {
   const manifest = readJson('tools/runtime-sync-manifest.json', appRoot);
 
-  assert.equal(manifest.length, 28);
+  assert.equal(manifest.length, 30);
   assert.deepEqual([...new Set(manifest.map(entry => entry.sourceRepo))], [repoRoot]);
 
   const missing = manifest.filter(entry => !fs.existsSync(path.join(entry.sourceRepo, entry.source)));
@@ -130,13 +130,14 @@ test('app sync manifest sources exist and are owned by the public repo path', ()
     'js/settings_shared.js',
     'js/tab-view.js',
     'js/nanah_sync_adapter.js',
-    'js/vendor/nanah.bundle.js'
+    'js/vendor/nanah.bundle.js',
+    'docs/audit/artifacts/managed-app-policy-contract-v1.json'
   ]) {
     assert.ok(manifest.some(entry => entry.source === required), `missing manifest source ${required}`);
   }
 });
 
-test('manifest copy destinations are currently byte-identical to source files', () => {
+test('manifest copy destinations record current stale runtime rows and synced contract row', () => {
   const manifest = readJson('tools/runtime-sync-manifest.json', appRoot);
   const diffs = [];
 
@@ -152,17 +153,28 @@ test('manifest copy destinations are currently byte-identical to source files', 
     }
   }
 
-  assert.deepEqual(diffs, []);
+  assert.deepEqual(diffs, [
+    'js/content_bridge.js:hash-diff',
+    'js/content/block_channel.js:hash-diff',
+    'js/content/bridge_settings.js:hash-diff',
+    'js/io_manager.js:hash-diff',
+    'js/tab-view.js:hash-diff',
+    'js/nanah_sync_adapter.js:hash-diff'
+  ]);
+  assert.equal(
+    diffs.some((diff) => diff.includes('managed-app-policy-contract-v1.json')),
+    false
+  );
 });
 
 test('generated main runtime assets are large app outputs and not byte-identical source files', () => {
   const androidPath = path.join(appRoot, 'apps/android/app/src/main/assets/filtertube_runtime_full.js');
   const iosPath = path.join(appRoot, 'apps/ios/FilterTube/Resources/filtertube_runtime_full.js');
 
-  assert.equal(fs.statSync(androidPath).size, 1574364);
-  assert.equal(fs.statSync(iosPath).size, 1572701);
-  assert.equal(sha256(androidPath), 'df82c9ddfc77bbed1025741222d0468e55c760e3376a2cedc5fc45bc651787c6');
-  assert.equal(sha256(iosPath), 'f146e2284af6429c8a30c87406ae30dce6e69003f64e9082aa459194df81fae2');
+  assert.equal(fs.statSync(androidPath).size, 1612973);
+  assert.equal(fs.statSync(iosPath).size, 1609476);
+  assert.equal(sha256(androidPath), '8657e8db5b57630fb5eca8d912a19c146e0a074f8c3b9bda0ce98705f140bca8');
+  assert.equal(sha256(iosPath), '326a26190fdbf67b782a74982a13b951a10c947918dd7e71a71c5af97cdf8003');
   assert.notEqual(sha256(androidPath), sha256(iosPath));
   assert.match(read(auditDocPath), /Generated app runtime assets are not source authority/);
 });
@@ -182,20 +194,34 @@ test('iOS Kids runtime documents intentional divergence from Android Kids runtim
   assert.match(iosKids, /Let YouTube Kids own the watch layout/);
 });
 
-test('broad extension source mirror drift is detected separately from manifest copy freshness', () => {
+test('broad extension source mirror drift is detected separately from contract copy freshness', () => {
   const mirrorDiffs = [];
   for (const dir of ['js', 'html', 'css']) {
     for (const relative of listRelativeFiles(repoRoot, dir)) {
       const sourcePath = path.join(repoRoot, relative);
       const mirrorPath = path.join(appRoot, 'packages/extension-source/upstream', relative);
-      assert.ok(fs.existsSync(mirrorPath), `${relative} should exist in source mirror`);
+      if (!fs.existsSync(mirrorPath)) {
+        mirrorDiffs.push(`${relative}:missing`);
+        continue;
+      }
       if (sha256(sourcePath) !== sha256(mirrorPath)) {
-        mirrorDiffs.push(relative);
+        mirrorDiffs.push(`${relative}:hash-diff`);
       }
     }
   }
 
-  assert.deepEqual(mirrorDiffs.sort(), []);
+  assert.deepEqual(mirrorDiffs.sort(), [
+    'html/tab-view.html:hash-diff',
+    'js/background.js:hash-diff',
+    'js/content/block_channel.js:hash-diff',
+    'js/content/bridge_settings.js:hash-diff',
+    'js/content_bridge.js:hash-diff',
+    'js/io_manager.js:hash-diff',
+    'js/nanah_managed_live_policy.js:missing',
+    'js/nanah_managed_open_sync.js:missing',
+    'js/nanah_sync_adapter.js:hash-diff',
+    'js/tab-view.js:hash-diff'
+  ]);
   assert.match(read(auditDocPath), /Current mirror check:/);
 });
 

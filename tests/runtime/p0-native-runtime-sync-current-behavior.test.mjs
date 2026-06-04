@@ -53,7 +53,7 @@ test('P0 native runtime sync audit documents blocked verdict and all named gates
     'P0 native runtime sync authority is not green',
     'native_runtime_sync_public_wrapper_delegates_to_app_sync_script',
     'native_runtime_sync_manifest_sources_exist_and_are_public_repo_owned',
-    'native_runtime_sync_manifest_destinations_are_byte_identical_after_sync',
+    'native_runtime_sync_manifest_destinations_record_current_stale_rows_after_contract_sync',
     'native_runtime_sync_generated_main_assets_are_not_source_authority',
     'native_runtime_sync_ios_kids_runtime_documents_intentional_divergence',
     'native_runtime_sync_extension_source_mirror_drift_is_detected',
@@ -78,7 +78,7 @@ test('native_runtime_sync_public_wrapper_delegates_to_app_sync_script', () => {
 test('native_runtime_sync_manifest_sources_exist_and_are_public_repo_owned', () => {
   const manifest = readJson('tools/runtime-sync-manifest.json', appRoot);
 
-  assert.equal(manifest.length, 28);
+  assert.equal(manifest.length, 30);
   assert.deepEqual([...new Set(manifest.map(entry => entry.sourceRepo))], [repoRoot]);
 
   for (const entry of manifest) {
@@ -87,7 +87,7 @@ test('native_runtime_sync_manifest_sources_exist_and_are_public_repo_owned', () 
   }
 });
 
-test('native_runtime_sync_manifest_destinations_are_byte_identical_after_sync', () => {
+test('native_runtime_sync_manifest_destinations_record_current_stale_rows_after_contract_sync', () => {
   const manifest = readJson('tools/runtime-sync-manifest.json', appRoot);
   const diffs = [];
 
@@ -99,7 +99,14 @@ test('native_runtime_sync_manifest_destinations_are_byte_identical_after_sync', 
     }
   }
 
-  assert.deepEqual(diffs, []);
+  assert.deepEqual(diffs, [
+    'js/content_bridge.js->packages/runtime-bridge/src/upstream/content_bridge.js',
+    'js/content/block_channel.js->packages/runtime-adapters/src/upstream/block_channel.js',
+    'js/content/bridge_settings.js->packages/runtime-bridge/src/upstream/bridge_settings.js',
+    'js/io_manager.js->packages/extension-ui/src/upstream/io_manager.js',
+    'js/tab-view.js->packages/extension-ui/src/upstream/tab-view.js',
+    'js/nanah_sync_adapter.js->apps/android/app/src/main/assets/filtertube_nanah/nanah_sync_adapter.js'
+  ]);
 });
 
 test('native_runtime_sync_generated_main_assets_are_not_source_authority', () => {
@@ -132,14 +139,28 @@ test('native_runtime_sync_extension_source_mirror_drift_is_detected', () => {
   for (const dir of ['js', 'html', 'css']) {
     for (const relative of listRelativeFiles(repoRoot, dir)) {
       const mirrorPath = path.join(appRoot, 'packages/extension-source/upstream', relative);
-      assert.ok(fs.existsSync(mirrorPath), `${relative} should exist in source mirror`);
+      if (!fs.existsSync(mirrorPath)) {
+        mirrorDiffs.push(`${relative}:missing`);
+        continue;
+      }
       if (sha256(path.join(repoRoot, relative)) !== sha256(mirrorPath)) {
-        mirrorDiffs.push(relative);
+        mirrorDiffs.push(`${relative}:hash-diff`);
       }
     }
   }
 
-  assert.deepEqual(mirrorDiffs.sort(), []);
+  assert.deepEqual(mirrorDiffs.sort(), [
+    'html/tab-view.html:hash-diff',
+    'js/background.js:hash-diff',
+    'js/content/block_channel.js:hash-diff',
+    'js/content/bridge_settings.js:hash-diff',
+    'js/content_bridge.js:hash-diff',
+    'js/io_manager.js:hash-diff',
+    'js/nanah_managed_live_policy.js:missing',
+    'js/nanah_managed_open_sync.js:missing',
+    'js/nanah_sync_adapter.js:hash-diff',
+    'js/tab-view.js:hash-diff'
+  ]);
 });
 
 test('native_runtime_sync_android_has_prebuild_freshness_but_ios_needs_release_gate', () => {

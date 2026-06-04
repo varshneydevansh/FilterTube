@@ -16,68 +16,19 @@ const appSyncScriptPath = path.join(appRoot, 'tools', 'sync-runtime-from-extensi
 const appManifestPath = path.join(appRoot, 'tools', 'runtime-sync-manifest.json');
 const androidReleaseNotesPath = path.join(appRoot, 'apps/android/app/src/main/assets/extension_shell/data/release_notes.json');
 const iosReleaseNotesPath = path.join(appRoot, 'apps/ios/FilterTube/Resources/release_notes.json');
-const capturedAppDirtyPaths = [
-  'apps/android/app/src/debug/java/com/filtertube/app/DebugNativeOwnedKidsActivity.kt',
-  'apps/android/app/src/main/assets/filtertube_nanah/nanah_sync_adapter.js',
-  'apps/android/app/src/main/assets/filtertube_runtime_full.js',
-  'apps/android/app/src/main/java/com/filtertube/app/AppLaunchRouter.kt',
-  'apps/android/app/src/main/java/com/filtertube/app/LauncherActivity.kt',
-  'apps/android/app/src/main/java/com/filtertube/app/ManagedWebViewActivity.kt',
-  'apps/android/app/src/main/java/com/filtertube/app/NativeOwnedMainPlaybackBridgeFallback.kt',
-  'apps/android/app/src/main/java/com/filtertube/app/NativeOwnedPreviewEntryPoint.kt',
-  'apps/android/app/src/main/java/com/filtertube/app/ProfileViewingAccess.kt',
-  'apps/android/app/src/main/java/com/filtertube/app/ViewingLaunchCoordinator.kt',
-  'apps/android/app/src/main/java/com/filtertube/app/ViewingSpaceChooserPolicy.kt',
-  'apps/android/app/src/main/java/com/filtertube/app/ViewingTargetAccessUiState.kt',
-  'apps/android/app/src/main/java/com/filtertube/app/ViewingTargetLaunchPolicy.kt',
-  'apps/android/app/src/test/java/com/filtertube/app/AppLaunchRouterTest.kt',
-  'apps/android/app/src/test/java/com/filtertube/app/NativeOwnedMainPlaybackBridgeFallbackTest.kt',
-  'apps/android/app/src/test/java/com/filtertube/app/NativeOwnedPreviewEntryPointTest.kt',
-  'apps/android/app/src/test/java/com/filtertube/app/ProfileViewingAccessTest.kt',
-  'apps/android/app/src/test/java/com/filtertube/app/ViewingSpaceChooserPolicyTest.kt',
-  'apps/android/app/src/test/java/com/filtertube/app/ViewingTargetAccessUiStateTest.kt',
-  'apps/android/app/src/test/java/com/filtertube/app/ViewingTargetLaunchPolicyTest.kt',
-  'apps/ios/FilterTube/Resources/filtertube_nanah/nanah_sync_adapter.js',
-  'apps/ios/FilterTube/Resources/filtertube_runtime_full.js',
-  'packages/extension-source/upstream/css/serene-shell.css',
-  'packages/extension-source/upstream/html/tab-view.html',
-  'packages/extension-source/upstream/js/background.js',
-  'packages/extension-source/upstream/js/content/block_channel.js',
-  'packages/extension-source/upstream/js/content/bridge_settings.js',
-  'packages/extension-source/upstream/js/content/collab_dialog.js',
-  'packages/extension-source/upstream/js/content/dom_fallback.js',
-  'packages/extension-source/upstream/js/content_bridge.js',
-  'packages/extension-source/upstream/js/injector.js',
-  'packages/extension-source/upstream/js/io_manager.js',
-  'packages/extension-source/upstream/js/nanah_sync_adapter.js',
-  'packages/extension-source/upstream/js/seed.js',
-  'packages/extension-source/upstream/js/settings_shared.js',
-  'packages/extension-source/upstream/js/state_manager.js',
-  'packages/extension-ui/src/upstream/io_manager.js',
-  'packages/extension-ui/src/upstream/settings_shared.js',
-  'packages/extension-ui/src/upstream/state_manager.js',
-  'packages/runtime-adapters/src/upstream/block_channel.js',
-  'packages/runtime-adapters/src/upstream/collab_dialog.js',
-  'packages/runtime-adapters/src/upstream/dom_fallback.js',
-  'packages/runtime-bridge/src/upstream/bridge_settings.js',
-  'packages/runtime-bridge/src/upstream/content_bridge.js',
-  'packages/runtime-bridge/src/upstream/injector.js',
-  'packages/runtime-bridge/src/upstream/seed.js',
-];
-
 const sourceRows = [
   [wrapperPath, 34, 1070, '4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6'],
-  [appSyncScriptPath, 1758, 76587, 'd48bdc271f707f0f960ac8a6b0d2712a602fb6c84a8c2bf2e0a138d112f9ba8e'],
-  [appManifestPath, 198, 8178, 'e899e29d946270865750b8f6415c298a92da6b4e1917367b6a174afe2a0c6583'],
-  [publicReleaseNotesPath, 316, 23039, 'e012f6c071fffa67958f55544ecae9bbb26e7ec91edd2066df4d06a62de69962'],
+  [appSyncScriptPath, 2284, 109397, 'ce0e231f9f0384eb538e76a553ef41453673c3231b8c5ab62d94ff7d38b90ae9'],
+  [appManifestPath, 212, 8900, '58c9b9b34259fcf701bcabac7faa044985a4c3a9846f9405a3b9009ec68f51e7'],
+  [publicReleaseNotesPath, 317, 23020, 'a8d59b18e9bffd1c828538ee58b3b8e9be7c641fea3ff064220311485a3b1c6b'],
   [androidReleaseNotesPath, 301, 21095, '911628cbd7f6354c58aa82064f3ef1f29cda3904a87e3ea263534600a0880737'],
   [iosReleaseNotesPath, 301, 21095, '911628cbd7f6354c58aa82064f3ef1f29cda3904a87e3ea263534600a0880737'],
 ];
 
 const runtimeRows = [
-  ['apps/android/app/src/main/assets/filtertube_runtime_full.js', 35747, 1574364, 'df82c9ddfc77bbed1025741222d0468e55c760e3376a2cedc5fc45bc651787c6'],
+  ['apps/android/app/src/main/assets/filtertube_runtime_full.js', 36663, 1612973, '8657e8db5b57630fb5eca8d912a19c146e0a074f8c3b9bda0ce98705f140bca8'],
   ['apps/android/app/src/main/assets/filtertube_kids_runtime.js', 370, 13153, '05b47e2310222a68ba5356cbf6dca24b507aa225bfbe6e971c2a4819d647b711'],
-  ['apps/ios/FilterTube/Resources/filtertube_runtime_full.js', 35746, 1572701, 'f146e2284af6429c8a30c87406ae30dce6e69003f64e9082aa459194df81fae2'],
+  ['apps/ios/FilterTube/Resources/filtertube_runtime_full.js', 36631, 1609476, '326a26190fdbf67b782a74982a13b951a10c947918dd7e71a71c5af97cdf8003'],
   ['apps/ios/FilterTube/Resources/filtertube_kids_runtime.js', 575, 20835, '3f279f275bf93cca6385df6c8d0422a51c533c26cbd29ddd5d9ea5655efc7340'],
   ['apps/android/app/src/main/assets/filtertube_nanah_engine.html', 875, 34907, 'e63d29f43a5c94790a665bfda985071b26b530dd7b532cdb66f0cd3d27a1a93e'],
   ['apps/ios/FilterTube/Resources/filtertube_nanah_engine.html', 875, 34899, '84df57dacdaaf394e47864cc7a70ed5185e7547b693afbe69a363811f787112d'],
@@ -119,19 +70,6 @@ function git(cwd, args) {
   return execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();
 }
 
-function gitLines(cwd, args) {
-  return execFileSync('git', args, { cwd, encoding: 'utf8' })
-    .split(/\r?\n/)
-    .filter(Boolean);
-}
-
-function appStatusPaths() {
-  return gitLines(appRoot, ['status', '--short'])
-    .map((line) => line.replace(/^.. /, '').trim())
-    .filter(Boolean)
-    .sort();
-}
-
 function runtimeBundleOrder() {
   const source = read(appSyncScriptPath);
   const match = source.match(/const runtimeBundleOrder = \[([\s\S]*?)\];/);
@@ -171,6 +109,7 @@ function sourceMirrorRows() {
         rel: path.join(dir, rel),
         sourcePath,
         destinationPath,
+        destinationExists: fs.existsSync(destinationPath),
         equal: fs.existsSync(destinationPath) && sha256(sourcePath) === sha256(destinationPath)
       });
     }
@@ -197,7 +136,8 @@ test('native runtime sync manifest freshness doc is audit-only and fingerprint p
   const text = doc();
 
   assert.match(text, /Status: audit-only current-behavior proof/);
-  assert.match(text, /Runtime, build, package, website,\s+and native app sync behavior are unchanged/);
+  assert.match(text, /Runtime, build, package, and website\s+behavior are unchanged/);
+  assert.match(text, /native app sync manifest has one managed-policy\s+contract copy addition/);
   assert.match(text, /codebase inspection/);
   assert.match(text, /first-class JSON filter blockers/);
   assert.match(text, /runtime behavior changed: no/);
@@ -214,41 +154,45 @@ test('native runtime sync manifest freshness doc is audit-only and fingerprint p
   }
 });
 
-test('native runtime sync manifest direct copies and broad mirror currently match checkout bytes', () => {
+test('native runtime sync manifest direct copies and broad mirror record current drift', () => {
   const text = doc();
   const manifest = readJson(appManifestPath);
   const copyRows = manifestCopyRows();
   const mirrorRows = sourceMirrorRows();
 
-  assert.equal(manifest.length, 28);
+  assert.equal(manifest.length, 30);
   assert.deepEqual([...new Set(manifest.map((entry) => entry.sourceRepo))], [repoRoot]);
   assert.deepEqual([...new Set(manifest.map((entry) => entry.syncMode))], ['copy']);
   assert.equal(manifest.filter((entry) => Object.hasOwn(entry, 'destinationKind')).length, 0);
-  assert.equal(manifest.filter((entry) => !Object.hasOwn(entry, 'destinationKind')).length, 28);
+  assert.equal(manifest.filter((entry) => !Object.hasOwn(entry, 'destinationKind')).length, 30);
   assert.equal(manifest.some((entry) => entry.source === 'js/layout.js'), true);
   assert.equal(manifest.some((entry) => entry.source === 'data/release_notes.json'), false);
 
-  assert.equal(copyRows.filter((row) => row.sourceExists).length, 28);
-  assert.equal(copyRows.filter((row) => row.destinationExists).length, 28);
-  assert.equal(copyRows.filter((row) => row.equal).length, 28);
-  assert.equal(copyRows.filter((row) => !row.equal).length, 0);
+  assert.equal(copyRows.filter((row) => row.sourceExists).length, 30);
+  assert.equal(copyRows.filter((row) => row.destinationExists).length, 30);
+  assert.equal(copyRows.filter((row) => row.equal).length, 24);
+  assert.equal(copyRows.filter((row) => !row.equal).length, 6);
 
   assert.deepEqual(sourceMirrorDirs(), ['js', 'html', 'css']);
-  assert.equal(mirrorRows.length, 43);
-  assert.equal(mirrorRows.filter((row) => row.equal).length, 43);
-  assert.equal(mirrorRows.filter((row) => !row.equal).length, 0);
+  assert.equal(mirrorRows.length, 46);
+  assert.equal(mirrorRows.filter((row) => row.destinationExists).length, 44);
+  assert.equal(mirrorRows.filter((row) => row.equal).length, 36);
+  assert.equal(mirrorRows.filter((row) => !row.destinationExists).length, 2);
+  assert.equal(mirrorRows.filter((row) => row.destinationExists && !row.equal).length, 8);
 
   for (const [label, value] of [
-    ['runtime sync manifest entries', 28],
+    ['runtime sync manifest entries', 30],
     ['manifest destinationKind fields present', 0],
-    ['manifest entries missing destinationKind', 28],
-    ['direct manifest copy sources present', 28],
-    ['direct manifest copy destinations present', 28],
-    ['direct manifest source/destination hash matches', 28],
-    ['direct manifest source/destination hash mismatches', 0],
-    ['extension-source mirror files compared', 43],
-    ['extension-source mirror hash matches', 43],
-    ['extension-source mirror hash mismatches', 0],
+    ['manifest entries missing destinationKind', 30],
+    ['direct manifest copy sources present', 30],
+    ['direct manifest copy destinations present', 30],
+    ['direct manifest source/destination hash matches', 24],
+    ['direct manifest source/destination hash mismatches', 6],
+    ['extension-source mirror files compared', 46],
+    ['extension-source mirror files present', 44],
+    ['extension-source mirror hash matches', 36],
+    ['extension-source mirror missing files', 2],
+    ['extension-source mirror hash mismatches', 8],
   ]) {
     assert.match(text, new RegExp(`${escapeRegExp(label)}: ${value}`));
   }
@@ -258,9 +202,9 @@ test('native runtime sync manifest records generated artifact hashes and release
   const text = doc();
   const order = runtimeBundleOrder();
 
-  assert.equal(order.length, 15);
+  assert.equal(order.length, 16);
   assert.equal(order.includes('js/layout.js'), true);
-  assert.match(text, /runtimeBundleOrder entries: 15/);
+  assert.match(text, /runtimeBundleOrder entries: 16/);
   assert.match(text, /runtimeBundleOrder includes js\/layout\.js: yes/);
 
   for (const [rel, expectedLines, expectedBytes, expectedHash] of runtimeRows) {
@@ -277,7 +221,7 @@ test('native runtime sync manifest records generated artifact hashes and release
   assert.notEqual(sha256(publicReleaseNotesPath), sha256(androidReleaseNotesPath));
   assert.equal(sha256(androidReleaseNotesPath), sha256(iosReleaseNotesPath));
   assert.match(text, /Release notes also remain outside the direct runtime sync manifest/);
-  assert.match(text, /public\s+`data\/release_notes\.json` file has 316 lines/);
+  assert.match(text, /public\s+`data\/release_notes\.json` file has 317 lines/);
   assert.match(text, /current Android\/iOS native release-note resources have 301 lines/);
 });
 
@@ -295,8 +239,8 @@ test('native runtime sync manifest freshness boundary pins app dirty state and w
 
   assert.match(text, /public repo HEAD: [0-9a-f]{40}/);
   assert.match(text, /app repo HEAD: [0-9a-f]{40}/);
-  assert.match(text, /app dirty tracked paths: 46/);
-  for (const dirtyPath of capturedAppDirtyPaths) assert.match(text, new RegExp(escapeRegExp(dirtyPath)));
+  assert.match(text, /app dirty state authority: not pinned by this contract-copy slice/);
+  assert.match(text, /out-of-scope native app changes may exist/);
 
   assert.equal(pkg.scripts['sync:native-runtime'], 'node scripts/sync-native-runtime.mjs');
   assert.doesNotMatch(build, /sync-native-runtime/);

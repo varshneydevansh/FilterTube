@@ -511,6 +511,11 @@ export const FILE_LANE_RULES = Object.freeze([
     lanes: ['performance', 'smoke']
   },
   {
+    id: 'managed-app-policy-contract-artifact',
+    patterns: [/^docs\/audit\/artifacts\/managed-app-policy-contract-v\d+\.json$/],
+    lanes: ['settings', 'release', 'smoke']
+  },
+  {
     id: 'public-release-copy',
     patterns: [/^README\.md$/, /^CHANGELOG\.md$/, /^data\/release_notes\.json$/],
     lanes: ['release', 'smoke']

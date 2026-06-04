@@ -32,10 +32,10 @@ The app sync script reads:
 Current manifest shape:
 
 ```text
-entries: 28
+entries: 30
 sourceRepo: /Users/devanshvarshney/FilterTube
 missing source files: 0
-direct manifest copy hash diffs: 0
+direct manifest copy hash diffs: 6
 ```
 
 The manifest copies upstream runtime, UI parity, Nanah adapter, Nanah vendor,
@@ -141,7 +141,7 @@ flowchart TD
 | Public wrapper script | `scripts/sync-native-runtime.mjs:5-34` | Resolves `FILTERTUBE_APP_REPO` or sibling `FilterTubeApp`, then delegates to the app sync script with inherited stdio. | Wrapper does not emit a machine-readable sync report. |
 | Package entrypoint | `package.json:6-15` | `sync:native-runtime` exists, while ordinary build scripts are separate. | Extension build alone is not a native freshness gate. |
 | App sync script | `/Users/devanshvarshney/FilterTubeApp/tools/sync-runtime-from-extension.mjs:100-199`, `226` | Declares runtime bundle order, source mirror dirs, direct manifest copy, generated asset rebuild, and iOS Kids runtime patching. | Generated assets need declared source/destination/hash output before release claims. |
-| Direct manifest copies | `/Users/devanshvarshney/FilterTubeApp/tools/runtime-sync-manifest.json` | 28 copy entries currently match source/destination hashes, with no `destinationKind` fields. | Manifest lacks destination-kind and generated-output participation metadata. |
+| Direct manifest copies | `/Users/devanshvarshney/FilterTubeApp/tools/runtime-sync-manifest.json` | 30 copy entries exist, 24 currently match source/destination hashes, and 6 runtime/UI/Nanah rows are stale. One row carries the managed app policy contract artifact. | Manifest lacks destination-kind and generated-output participation metadata. |
 | Generated app assets | `docs/audit/FILTERTUBE_NATIVE_RUNTIME_SYNC_MANIFEST_FRESHNESS_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md:68-73` | Android/iOS Main/Kids/Nanah runtime hashes are pinned as generated outputs. | Generated outputs are not source authority and need post-sync hash reports. |
 | Native release notes | `docs/audit/FILTERTUBE_NATIVE_RUNTIME_SYNC_MANIFEST_FRESHNESS_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md:86-93` | Native Android/iOS release-note resources differ from public `data/release_notes.json` and are outside the direct manifest. | Release notes need parity proof or intentional divergence record before release claims. |
 | Android/iOS build boundary | `/Users/devanshvarshney/FilterTubeApp/docs/app/TECHNICAL_RUNTIME.md` | Android prebuild sync is documented; iOS lacks a Gradle-style prebuild hook and needs manual sync before release. | iOS release remains blocked without an explicit sync/hash gate. |
@@ -181,8 +181,8 @@ runtime bundles.
 ## High-Confidence Findings
 
 1. **The manifest copy path is currently fresh.**
-   All 28 `runtime-sync-manifest.json` source/destination pairs exist and are
-   byte-identical.
+   All 30 `runtime-sync-manifest.json` source/destination pairs exist; 24 are
+   byte-identical and 6 need a broader native runtime sync.
 
 2. **Generated Main/Kids runtime assets are build outputs, not source.**
    Android and iOS ship generated assets under app resource folders. Real fixes

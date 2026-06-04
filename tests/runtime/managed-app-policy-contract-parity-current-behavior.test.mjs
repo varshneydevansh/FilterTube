@@ -5,9 +5,11 @@ import assert from 'node:assert/strict';
 
 const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_MANAGED_APP_POLICY_CONTRACT_PARITY_2026-06-04.md';
+const contractArtifactPath = 'docs/audit/artifacts/managed-app-policy-contract-v1.json';
 const planPath = 'docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md';
 const inventoryPath = 'docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md';
 const appManifestPath = '/Users/devanshvarshney/FilterTubeApp/tools/runtime-sync-manifest.json';
+const appContractDestinationPath = '/Users/devanshvarshney/FilterTubeApp/packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json';
 
 function read(relativePath) {
   return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
@@ -22,6 +24,10 @@ function contractFromDoc() {
   const match = doc.match(/## Contract Snapshot JSON[\s\S]*?```json\n([\s\S]*?)\n```/);
   assert.ok(match, 'contract JSON block should exist');
   return JSON.parse(match[1]);
+}
+
+function contractFromArtifact() {
+  return JSON.parse(read(contractArtifactPath));
 }
 
 function withoutForbiddenRuntimeTokenList(contract) {
@@ -41,16 +47,21 @@ function runtimeSource() {
   ].map(read).join('\n');
 }
 
-test('managed app policy parity doc records extension-owned app contract without runtime change', () => {
+test('managed app policy parity doc records extension-owned app contract artifact without runtime change', () => {
   const doc = read(docPath);
   const plan = read(planPath);
   const inventory = read(inventoryPath);
   const contract = contractFromDoc();
+  const artifactContract = contractFromArtifact();
 
   assert.equal(contract.schema, 'filtertube_managed_app_policy_contract');
   assert.equal(contract.version, 1);
   assert.equal(contract.runtimeBehaviorChanged, false);
-  assert.equal(contract.appSyncStatus, 'extension_contract_proof_app_sync_pending');
+  assert.equal(contract.appSyncStatus, 'app_manifest_contract_sync_present_native_enforcement_pending');
+  assert.deepEqual(contract, artifactContract);
+  assert.equal(contract.artifact.sourcePath, contractArtifactPath);
+  assert.equal(contract.artifact.appDestination, 'packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json');
+  assert.equal(contract.artifact.manifestSyncMode, 'copy');
   assert.match(doc, /Runtime behavior changed\*\*: no/);
   assert.match(doc, /App Sync Boundary/);
   assert.match(doc, /Required Parity Decisions/);
@@ -170,7 +181,7 @@ test('extension runtime has the fields the app contract requires today', () => {
   }
 });
 
-test('current app sync manifest copies runtime sources but has no dedicated contract entry yet', () => {
+test('current app sync manifest copies runtime sources and dedicated contract artifact', () => {
   assert.equal(fs.existsSync(appManifestPath), true);
   const manifest = JSON.parse(readAbsolute(appManifestPath));
 
@@ -184,8 +195,10 @@ test('current app sync manifest copies runtime sources but has no dedicated cont
     assert.ok(manifest.some(entry => entry.source === source), `missing app sync source ${source}`);
   }
 
-  assert.equal(
-    manifest.some(entry => String(entry.source || '').includes('MANAGED_APP_POLICY_CONTRACT_PARITY')),
-    false
-  );
+  const contractEntry = manifest.find(entry => entry.source === contractArtifactPath);
+  assert.ok(contractEntry, 'missing managed app policy contract artifact entry');
+  assert.equal(contractEntry.destination, 'packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json');
+  assert.equal(contractEntry.syncMode, 'copy');
+  assert.equal(fs.existsSync(appContractDestinationPath), true);
+  assert.equal(read(contractArtifactPath), readAbsolute(appContractDestinationPath));
 });

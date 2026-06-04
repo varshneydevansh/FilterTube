@@ -1120,10 +1120,10 @@ inherited env, and inherited stdio, `result.error` exits `1`, and normal
 completion exits `result.status ?? 1`. The addendum also records the sibling app
 boundary: the app sync script at
 `/Users/devanshvarshney/FilterTubeApp/tools/sync-runtime-from-extension.mjs`
-has 1,758 lines, 76,587 bytes, 14 plain function declarations,
-3 async function declarations, 17 total named function declarations,
-15 `runtimeBundleOrder` entries, and reads
-`runtime-sync-manifest.json`; the current app manifest has 28 entries, all
+has 2,284 lines, 109,397 bytes, 15 plain function declarations,
+3 async function declarations, 18 total named function declarations,
+16 `runtimeBundleOrder` entries, and reads
+`runtime-sync-manifest.json`; the current app manifest has 30 entries, all
 sourced from `/Users/devanshvarshney/FilterTube`, has 0 `destinationKind` fields,
 includes `js/layout.js`, `js/vendor/nanah.bundle.js`, and
 `js/vendor/qrcode.bundle.js`, and does not include `data/release_notes.json`.

@@ -303,15 +303,15 @@ test('native runtime sync method register preserves sibling app script and manif
 
   assert.equal(fs.existsSync(appSyncScriptPath), true);
   assert.equal(fs.existsSync(appManifestPath), true);
-  assert.equal(sourceLineCount(appScript), 1758);
-  assert.equal(fs.statSync(appSyncScriptPath).size, 76587);
-  assert.equal(sourceLineCount(manifestText), 198);
-  assert.equal(fs.statSync(appManifestPath).size, 8178);
-  assert.match(text, /app sync script line count: 1758/);
-  assert.match(text, /app sync script bytes: 76587/);
+  assert.equal(sourceLineCount(appScript), 2284);
+  assert.equal(fs.statSync(appSyncScriptPath).size, 109397);
+  assert.equal(sourceLineCount(manifestText), 212);
+  assert.equal(fs.statSync(appManifestPath).size, 8900);
+  assert.match(text, /app sync script line count: 2284/);
+  assert.match(text, /app sync script bytes: 109397/);
   assert.match(text, new RegExp(`app sync script sha256: ${sha256Abs(appSyncScriptPath)}`));
-  assert.match(text, /manifest line count: 198/);
-  assert.match(text, /manifest bytes: 8178/);
+  assert.match(text, /manifest line count: 212/);
+  assert.match(text, /manifest bytes: 8900/);
   assert.match(text, new RegExp(`manifest sha256: ${sha256Abs(appManifestPath)}`));
 
   const countPairs = [
@@ -337,18 +337,20 @@ test('native runtime sync method register preserves sibling app script and manif
     assert.match(text, new RegExp(`${escapeRegExp(label)}: ${value}`));
   }
 
-  assert.equal(order.length, 15);
+  assert.equal(order.length, 16);
   assert.ok(order.includes('js/layout.js'));
-  assert.equal(manifest.length, 28);
+  assert.equal(manifest.length, 30);
   assert.deepEqual([...new Set(manifest.map((entry) => entry.sourceRepo))], [repoRoot]);
   assert.equal(manifest.some((entry) => entry.source === 'js/layout.js'), true);
   assert.equal(manifest.some((entry) => entry.source === 'js/vendor/nanah.bundle.js'), true);
   assert.equal(manifest.some((entry) => entry.source === 'js/vendor/qrcode.bundle.js'), true);
+  assert.equal(manifest.some((entry) => entry.source === 'docs/audit/artifacts/managed-app-policy-contract-v1.json'), true);
   assert.equal(manifest.some((entry) => entry.source === 'data/release_notes.json'), false);
   assert.match(text, /manifest source repos: \/Users\/devanshvarshney\/FilterTube/);
   assert.match(text, /manifest includes js\/layout\.js: yes/);
   assert.match(text, /manifest includes js\/vendor\/nanah\.bundle\.js: yes/);
   assert.match(text, /manifest includes js\/vendor\/qrcode\.bundle\.js: yes/);
+  assert.match(text, /manifest includes managed-app-policy-contract-v1\.json: yes/);
   assert.match(text, /manifest includes data\/release_notes\.json: no/);
 });
 

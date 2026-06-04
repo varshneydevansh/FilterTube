@@ -70,13 +70,13 @@ runtime behavior changed: no
 ```text
 public repo HEAD: 7f0e66641aa576fb264085baf59949244ea32291
 app repo HEAD: cfc651cd4294e528c2c371778d7698ce82e94a71
-app sync script line count: 1758
-app sync script bytes: 76587
-app sync script sha256: d48bdc271f707f0f960ac8a6b0d2712a602fb6c84a8c2bf2e0a138d112f9ba8e
-plain function declarations in app sync script: 14
+app sync script line count: 2284
+app sync script bytes: 109397
+app sync script sha256: ce0e231f9f0384eb538e76a553ef41453673c3231b8c5ab62d94ff7d38b90ae9
+plain function declarations in app sync script: 15
 async function declarations in app sync script: 3
-total named function declarations in app sync script: 17
-runtimeBundleOrder entries in app sync script: 15
+total named function declarations in app sync script: 18
+runtimeBundleOrder entries in app sync script: 16
 runtime-sync-manifest literal occurrences in app sync script: 3
 fs.copyFile occurrences in app sync script: 2
 fs.cp occurrences in app sync script: 2
@@ -86,16 +86,17 @@ fs.readFile occurrences in app sync script: 5
 fs.mkdir occurrences in app sync script: 3
 FILTERTUBE_APP_RUNTIME_BUNDLE_START occurrences in app sync script: 1
 js/layout.js literal occurrences in app sync script: 1
-manifest line count: 198
-manifest bytes: 8178
-manifest sha256: e899e29d946270865750b8f6415c298a92da6b4e1917367b6a174afe2a0c6583
-manifest entries: 28
+manifest line count: 212
+manifest bytes: 8900
+manifest sha256: 58c9b9b34259fcf701bcabac7faa044985a4c3a9846f9405a3b9009ec68f51e7
+manifest entries: 30
 manifest source repos: /Users/devanshvarshney/FilterTube
 manifest destinationKind fields present: 0
-manifest entries missing destinationKind: 28
+manifest entries missing destinationKind: 30
 manifest includes js/layout.js: yes
 manifest includes js/vendor/nanah.bundle.js: yes
 manifest includes js/vendor/qrcode.bundle.js: yes
+manifest includes managed-app-policy-contract-v1.json: yes
 manifest includes data/release_notes.json: no
 ```
 
@@ -212,9 +213,9 @@ Current runtime manifest shape:
 
 ```text
 manifest keys: destination, notes, source, sourceRepo, syncMode
-manifest source root js entries: 28
+manifest source root js entries: 29
 manifest destination root apps entries: 3
-manifest destination root packages entries: 25
+manifest destination root packages entries: 27
 manifest destinationKind fields present: 0
 manifest destinationKind release gate: absent
 pre/post sync hash ledger: absent
@@ -276,13 +277,13 @@ app sync script owns manifest reads, source/destination copies, generated Androi
 
 ## Current Manifest Boundary
 
-The sibling app manifest currently contains 28 copy entries, all sourced from
+The sibling app manifest currently contains 30 copy entries, all sourced from
 `/Users/devanshvarshney/FilterTube`. It includes shared JSON filtering and DOM
 fallback runtime files such as `js/seed.js`, `js/filter_logic.js`,
 `js/content_bridge.js`, `js/content/dom_fallback.js`, `js/content/block_channel.js`,
-`js/layout.js`, extension UI files, and Nanah vendor bundles. It does not include
-`data/release_notes.json`, and no entry currently records a `destinationKind`
-field.
+`js/layout.js`, extension UI files, Nanah vendor bundles, and the managed app
+policy contract artifact. It does not include `data/release_notes.json`, and no
+entry currently records a `destinationKind` field.
 
 This means the public wrapper can prove only that it delegates to the selected
 app sync script. It cannot, by itself, prove that JSON-first filtering changes,
