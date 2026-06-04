@@ -12,7 +12,8 @@ instead of silently removing accepted rows. Trusted-link removal history writer
 now records protected `trust_link.revoke` rows when local accepted managed
 policy state is purged for a removed link. Parent-side live sends now record
 redacted outbound trusted-link history rows without storing policy payload
-plaintext.
+plaintext, and connected replicas now return redacted live ack rows that the
+source stores only when they match a prior sent revision/hash.
 **Goal slice**: Implementation order item 4, "Add action-history/log model and
 access-control tests".
 **Primary inputs**:
@@ -39,7 +40,9 @@ time limits, records a protected clear row when accepted history is cleared, and
 records a protected `trust_link.revoke` row when trusted-link removal purges
 target-local remote managed-policy state for that link. It also records
 redacted outbound live-send evidence on the parent/source trusted link after a
-signed Nanah envelope is sent.
+signed Nanah envelope is sent, and redacted inbound live-ack evidence on the
+same trusted link after a connected replica reports accepted, rejected, or
+conflict status for that exact revision/hash.
 
 Action history is protected evidence and parent/caregiver UX. It is not policy
 authority. Runtime policy must still come from the current accepted managed
@@ -148,6 +151,7 @@ The following events must produce action-history rows in future implementation:
 | --- | --- | --- |
 | `accepted_remote_keyword_policy` | Trusted parent/source updates child keyword policy. | `accepted` with revision and policy hash. |
 | `sent_live_remote_policy` | Parent/source sends a signed live Nanah policy to a trusted fixed target. | `sent` outbound evidence with revision and policy hash, redacted summary, and no payload plaintext. |
+| `acked_live_remote_policy` | Replica reports whether a signed live Nanah policy was applied or rejected. | `accepted`, `rejected`, or `conflict` ack evidence with matching revision and policy hash, redacted summary, and no payload plaintext. |
 | `accepted_local_child_surface_policy` | Same-device parent/account saves child Main or Kids rules through managed edit mode. | `accepted` with local revision, policy hash, and redacted counts. |
 | `rejected_spoofed_lan_policy` | Local-network discovery claims parent device without trusted key. | `rejected` with `reason: untrusted_discovery`. |
 | `rejected_equal_revision_conflict` | Same revision arrives with different policy hash. | `conflict` with old/new hashes redacted or hashed. |
@@ -179,7 +183,8 @@ runtime remote managed validation/apply history writer: present for rejected, co
 runtime remote managed accepted apply history writer: present behind validated managed apply wrapper
 runtime mailbox managed validation/apply history writer: present for local/decrypted mailbox item intake outcomes
 runtime managed outbound live send history writer: present on trusted link policy rows as redacted parent-side send evidence
-runtime behavior changed by this contract: yes, for accepted local managed child saves, protected failed-auth rows, parent/account history access, Nanah managed-policy receive evidence, validated remote apply history, local/decrypted mailbox item evidence, and parent-side outbound live send evidence
+runtime managed inbound live ack history writer: present on trusted link policy rows as redacted parent-side applied/rejected feedback
+runtime behavior changed by this contract: yes, for accepted local managed child saves, protected failed-auth rows, parent/account history access, Nanah managed-policy receive evidence, validated remote apply history, local/decrypted mailbox item evidence, parent-side outbound live send evidence, and parent-side live ack feedback
 ```
 
 The current local writer stores redacted count summaries under
@@ -213,6 +218,10 @@ Outbound live-send rows use `filtertube_managed_outbound_policy_history` under a
 trusted link policy row because the parent/source may not have the remote child
 profile locally. Those rows are feedback evidence for the parent only; the
 remote child policy still changes only after receive-side validation/apply.
+Inbound live-ack rows use `filtertube_managed_live_ack_history` under the same
+trusted link policy row. They are recorded only when a connected replica's ack
+matches the prior outbound link id, target profile, source device, scope,
+revision, and policy hash.
 This keeps local keyword/channel/video writes, Nanah apply, mailbox apply, and
 admin session events using one history model without turning logs into policy
 state.

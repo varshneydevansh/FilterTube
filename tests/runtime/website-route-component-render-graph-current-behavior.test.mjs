@@ -26,7 +26,7 @@ const sourceRows = [
   ['website/components/scenic-illustration.js', 193, 8573, '37238b5d80e68ef14db79433d28e3cf21f92108f42850e24466bb233f3ddeab5'],
   ['website/components/scenic-tones.js', 102, 4671, '7732ffaa1751d9ceb403f5e0710e57a44a72d999b346cc96fb12dd1ffbb2a67c'],
   ['website/components/site-data.js', 211, 6999, '54858021772c73c7d4ceaabf123470e0611b03b7267291bf7360bf68a151bfd9'],
-  ['website/components/site-footer.js', 135, 6073, 'c7e344060916fa91cd8f597d661626ef82298032ce7615c777b8d5c61954a4f8'],
+  ['website/components/site-footer.js', 135, 6086, 'c7e344060916fa91cd8f597d661626ef82298032ce7615c777b8d5c61954a4f8'],
   ['website/components/site-header.js', 186, 7700, '6ffe1ff1815300d7e9f407c27bebe7bff14e2e6c1a794ce5290b9c0eb8c6f734'],
   ['website/components/site-shell-data.js', 21, 473, '28a1ac9ce4806438149720a36b7e4c586dd09f99142ebc63e1c863afcbd145d0'],
   ['website/components/theme-toggle.js', 106, 3577, '17352421ab9eee46d72aded73f0b1dacb27e8ab0b93dad7096c7343b4bdd323d'],

@@ -199,7 +199,7 @@ or mutation behavior.
 | 5669 | `mergeCollaboratorsWithMainWorld` | function | `mainWorldMessageBridge` |
 | 5811 | `enrichCollaboratorsWithMainWorld` | async function | `startupDomFallbackBridge` |
 | 5837 | `handleMainWorldMessages` | function | `startupDomFallbackBridge` |
-| 6073 | `initialize` | async function | `startupDomFallbackBridge` |
+| 6086 | `initialize` | async function | `startupDomFallbackBridge` |
 | 6088 | `initializeDOMFallback` | async function | `startupDomFallbackBridge` |
 | 6473 | `shouldEagerFallbackMenuScan` | function | `fallbackMenuAndPlaylistPopover` |
 | 6485 | `shouldInstallFallbackMenuButtons` | function | `fallbackMenuAndPlaylistPopover` |

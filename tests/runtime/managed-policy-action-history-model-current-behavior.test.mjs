@@ -247,6 +247,8 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(source, /applyManagedMailboxItem\(item, context\)/);
   assert.match(read('js/nanah_managed_live_policy.js'), /filtertube_managed_outbound_policy_history/);
   assert.match(read('js/nanah_managed_live_policy.js'), /outboundManagedPolicyHistory/);
+  assert.match(read('js/nanah_managed_live_policy.js'), /filtertube_nanah_managed_live_ack/);
+  assert.match(read('js/nanah_managed_live_policy.js'), /inboundManagedAckHistory/);
   assert.match(source, /function getNanahManagedPolicyScopeList\(value\)/);
   assert.match(source, /historyBtn\.textContent = 'History'/);
   assert.doesNotMatch(source, /managedActionHistoryStore/);
@@ -315,6 +317,7 @@ test('managed action history required outcomes cover accepted rejected conflict 
   const requiredFixtures = [
     'accepted_remote_keyword_policy',
     'sent_live_remote_policy',
+    'acked_live_remote_policy',
     'accepted_local_child_surface_policy',
     'rejected_spoofed_lan_policy',
     'rejected_equal_revision_conflict',
@@ -341,6 +344,7 @@ test('managed action history required outcomes cover accepted rejected conflict 
   assert.match(doc, /runtime remote managed accepted apply history writer: present behind validated managed apply wrapper/);
   assert.match(doc, /runtime mailbox managed validation\/apply history writer: present/);
   assert.match(doc, /runtime managed outbound live send history writer: present on trusted link policy rows/);
+  assert.match(doc, /runtime managed inbound live ack history writer: present on trusted link policy rows/);
   assert.match(doc, /The current failed-auth writer records protected evidence rows on the target\s+protected profile/);
   assert.match(doc, /profile\.managedPolicyState\.adminFailedUnlockRateLimit/);
   assert.match(doc, /background session PIN failed-attempt cache is\s+still memory-only/);

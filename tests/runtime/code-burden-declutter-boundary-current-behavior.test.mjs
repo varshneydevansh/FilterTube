@@ -34,8 +34,8 @@ const futureStructuralTokens = [
 ];
 
 const largeProductOwnedSourceFiles = [
-  'js/content_bridge.js',
   'js/tab-view.js',
+  'js/content_bridge.js',
   'js/background.js',
   'js/content/dom_fallback.js',
   'js/filter_logic.js',

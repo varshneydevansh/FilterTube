@@ -3,7 +3,8 @@
 **Generated**: 2026-06-04
 **Status**: Eligible live-session source send runtime slice with explicit
 Main/Kids granular rule-source selection and connected-replica managed target
-selection plus redacted outbound send history per target link/scope.
+selection plus redacted outbound send and live ack history per target
+link/scope.
 **Related**:
 `docs/audit/FILTERTUBE_NANAH_MANAGED_SIGNING_KEYPAIR_2026-06-04.md`
 **Multi-target boundary**:
@@ -54,6 +55,8 @@ flowchart TD
   J --> K["Store last sent revision/hash on trusted link"]
   K --> L["Append redacted outbound send history"]
   L --> M["Replica validates signature/trust/revision before apply"]
+  M --> N["Replica sends redacted live ack"]
+  N --> O["Source stores matching trusted-link ack history"]
 ```
 
 ## Behavior Boundary
@@ -89,8 +92,14 @@ bounded `filtertube_managed_outbound_policy_history` row under
 id, source profile/device, scope, revision, and policy hash, but its summary is
 redacted and does not store keyword values, channel names, video ids, time-budget
 values, or other rule payload plaintext. This is parent-side send evidence only;
-remote accepted/rejected apply history still comes from receive-side validation
-and future ack flow.
+remote accepted/rejected apply history still comes from receive-side validation.
+For live Nanah sessions, the replica now also sends a redacted
+`filtertube_nanah_managed_live_ack` payload for accepted, idempotent, rejected,
+conflict, or unavailable-apply outcomes. The source records matching ack rows
+under `policy.inboundManagedAckHistory[]` only when link id, target profile,
+source device, scope, revision, and policy hash match a prior
+`outgoingManagedPolicies[scope]` send row. This is parent feedback/log evidence,
+not policy authority.
 
 This is not a mailbox runtime, local-network discovery runtime, key-rotation
 system, or offline later-delivery mechanism.
@@ -99,8 +108,8 @@ Still pending:
 
 - richer bulk outbound controls for viewing-space/time-limit combinations,
   selectable Main+Kids dual-surface sends, and clearer per-target previews;
-- per-target accepted/rejected ack history before parent UI can show delivery
-  application status for every protected profile;
+- installed-extension two-device smoke proof that live ack status renders
+  clearly for every protected profile;
 - active/full proposal conversion policy;
 - installed-extension two-device smoke proof;
 - key rotation/revocation UI;

@@ -14,8 +14,11 @@
     const MANAGED_LIVE_BUNDLE_SCOPES = {
         rules_bundle: ['keywords', 'channels', 'videos']
     };
+    const MANAGED_LIVE_ACK_SCHEMA = 'filtertube_nanah_managed_live_ack';
+    const MANAGED_LIVE_ACK_HISTORY_SCHEMA = 'filtertube_managed_live_ack_history';
     const MANAGED_OUTBOUND_HISTORY_SCHEMA = 'filtertube_managed_outbound_policy_history';
     const MANAGED_OUTBOUND_HISTORY_LIMIT = 50;
+    const MANAGED_LIVE_ACK_HISTORY_LIMIT = 50;
 
     function create(deps = {}) {
         const normalizeString = deps.normalizeString;
@@ -25,6 +28,10 @@
         function normalizeScope(scope) {
             const normalized = normalizeString(scope).toLowerCase();
             return MANAGED_LIVE_POLICY_SCOPES.includes(normalized) ? normalized : '';
+        }
+
+        function safeArray(value) {
+            return Array.isArray(value) ? value : [];
         }
 
         function expandScope(scope) {
@@ -368,6 +375,171 @@
             };
         }
 
+        function normalizeAckState(value) {
+            const normalized = normalizeString(value).toLowerCase();
+            if (['delivered', 'rejected', 'conflict', 'expired', 'revoked'].includes(normalized)) {
+                return normalized;
+            }
+            return 'rejected';
+        }
+
+        function resolveAckState(decision) {
+            const root = safeObject(decision);
+            const explicit = normalizeString(root.ackState).toLowerCase();
+            if (explicit) return normalizeAckState(explicit);
+            const reason = normalizeString(root.reason).toLowerCase();
+            if (reason === 'equal_revision_hash_conflict') return 'conflict';
+            if (reason === 'mailbox_item_expired') return 'expired';
+            if (reason === 'link_revoked' || reason === 'key_revoked' || reason === 'trust_revoked') return 'revoked';
+            return root.accepted === true ? 'delivered' : 'rejected';
+        }
+
+        function resultForAckState(ackState) {
+            if (ackState === 'delivered') return 'accepted';
+            if (ackState === 'conflict') return 'conflict';
+            if (ackState === 'expired') return 'expired';
+            if (ackState === 'revoked') return 'revoked';
+            return 'rejected';
+        }
+
+        function buildLiveAckPayload(envelope, decision, options = {}) {
+            const root = safeObject(envelope);
+            const optionRoot = safeObject(options);
+            const decisionRoot = safeObject(decision);
+            const scope = normalizeScope(root.scope);
+            const now = normalizeNonNegativeInteger(optionRoot.ackedAt) || deps.now();
+            const ackState = resolveAckState(decisionRoot);
+            const reason = normalizeString(decisionRoot.reason);
+            const record = {
+                mailboxItemId: normalizeString(optionRoot.mailboxItemId || decisionRoot.mailboxItemId) || null,
+                scope,
+                revision: normalizeNonNegativeInteger(root.revision) || null,
+                policyHash: normalizeString(root.policyHash),
+                ackState,
+                accepted: ackState === 'delivered',
+                applied: decisionRoot.applied !== false && ackState === 'delivered',
+                decision: normalizeString(decisionRoot.decision),
+                reason: ackState === 'delivered' ? null : (reason || ackState),
+                ackedAt: now
+            };
+            return {
+                schema: MANAGED_LIVE_ACK_SCHEMA,
+                version: 1,
+                ackedAt: now,
+                linkId: normalizeString(root.linkId),
+                sourceDeviceId: normalizeString(root.sourceDeviceId),
+                sourceProfileId: normalizeString(root.sourceProfileId),
+                targetDeviceId: normalizeString(deps.getStableDeviceId()),
+                targetProfileId: normalizeString(root.targetProfileId),
+                targetProfileName: normalizeString(root.targetProfileName),
+                transport: normalizeString(optionRoot.transport) || 'live_nanah_session',
+                records: [record],
+                summary: {
+                    redacted: true,
+                    label: ackState === 'delivered' ? 'Managed policy applied' : 'Managed policy rejected',
+                    ackState
+                },
+                sensitive: true
+            };
+        }
+
+        function buildInboundAckHistoryRow(trustedLink, ackPayload, ackRecord) {
+            const trusted = deps.normalizeTrustedLink(trustedLink);
+            const policy = safeObject(trusted?.policy);
+            const root = safeObject(ackPayload);
+            const record = safeObject(ackRecord);
+            const scope = normalizeScope(record.scope || root.scope);
+            const revision = normalizeNonNegativeInteger(record.revision);
+            const policyHash = normalizeString(record.policyHash);
+            const ackState = normalizeAckState(record.ackState);
+            const receivedAt = deps.now();
+            const ackedAt = normalizeNonNegativeInteger(record.ackedAt || root.ackedAt) || receivedAt;
+            const result = resultForAckState(ackState);
+            return {
+                rowId: `managed-live-ack-${normalizeString(trusted?.linkId)}-${scope}-${revision || 'none'}-${receivedAt}`,
+                schema: MANAGED_LIVE_ACK_HISTORY_SCHEMA,
+                version: 1,
+                trustedLinkId: normalizeString(trusted?.linkId),
+                actionType: 'remote_policy.live_ack',
+                scope,
+                revision,
+                policyHash,
+                result,
+                reason: result === 'accepted' ? null : (normalizeString(record.reason) || ackState),
+                targetProfileId: normalizeString(root.targetProfileId) || normalizeString(policy.targetProfileId),
+                targetProfileName: normalizeString(root.targetProfileName) || normalizeString(policy.targetProfileName),
+                sourceProfileId: normalizeString(root.sourceProfileId) || normalizeString(policy.sourceProfileId),
+                sourceDeviceId: normalizeString(root.sourceDeviceId) || normalizeString(policy.sourceDeviceId),
+                targetDeviceId: normalizeString(root.targetDeviceId),
+                ackState,
+                ackedAt,
+                receivedAt,
+                summary: {
+                    redacted: true,
+                    label: result === 'accepted' ? 'Replica applied managed policy' : 'Replica rejected managed policy',
+                    transport: normalizeString(root.transport) || 'live_nanah_session'
+                },
+                sensitive: true
+            };
+        }
+
+        async function recordLiveAckPayload(ackPayload) {
+            const root = safeObject(ackPayload);
+            if (root.schema !== MANAGED_LIVE_ACK_SCHEMA) return { ok: false, reason: 'wrong_ack_schema', recordedCount: 0 };
+            const normalizedLinkId = normalizeString(root.linkId);
+            if (!normalizedLinkId) return { ok: false, reason: 'missing_link_id', recordedCount: 0 };
+            const trusted = deps.normalizeTrustedLink(deps.findTrustedLinkById(normalizedLinkId));
+            if (!trusted) return { ok: false, reason: 'unknown_trusted_link', recordedCount: 0 };
+
+            const policy = safeObject(trusted.policy);
+            const localSourceDeviceId = normalizeString(deps.getStableDeviceId());
+            const ackSourceDeviceId = normalizeString(root.sourceDeviceId);
+            if (localSourceDeviceId && ackSourceDeviceId && localSourceDeviceId !== ackSourceDeviceId) {
+                return { ok: false, reason: 'source_device_mismatch', recordedCount: 0 };
+            }
+            const policyTargetProfileId = normalizeString(policy.targetProfileId);
+            const ackTargetProfileId = normalizeString(root.targetProfileId);
+            if (policyTargetProfileId && ackTargetProfileId && policyTargetProfileId !== ackTargetProfileId) {
+                return { ok: false, reason: 'target_profile_mismatch', recordedCount: 0 };
+            }
+
+            const outgoing = safeObject(policy.outgoingManagedPolicies);
+            const validRows = [];
+            const nextOutgoing = { ...outgoing };
+            for (const ackRecord of safeArray(root.records)) {
+                const row = buildInboundAckHistoryRow(trusted, root, ackRecord);
+                if (!row.scope || !Number.isInteger(row.revision) || !row.policyHash) continue;
+                const currentState = safeObject(outgoing[row.scope]);
+                if (currentState.revision !== row.revision || normalizeString(currentState.policyHash) !== row.policyHash) continue;
+                validRows.push(row);
+                nextOutgoing[row.scope] = {
+                    ...currentState,
+                    lastAckAt: row.receivedAt,
+                    lastAckState: row.ackState,
+                    lastAckResult: row.result,
+                    lastAckReason: row.reason,
+                    lastAckTargetProfileId: row.targetProfileId
+                };
+            }
+            if (validRows.length === 0) {
+                return { ok: false, reason: 'no_matching_ack_records', recordedCount: 0 };
+            }
+
+            const historyRows = Array.isArray(policy.inboundManagedAckHistory)
+                ? policy.inboundManagedAckHistory
+                    .filter((row) => safeObject(row).schema === MANAGED_LIVE_ACK_HISTORY_SCHEMA)
+                : [];
+            const updated = await deps.updateTrustedLinkPolicy(normalizedLinkId, {
+                policy: {
+                    outgoingManagedPolicies: nextOutgoing,
+                    inboundManagedAckHistory: [...historyRows, ...validRows].slice(-MANAGED_LIVE_ACK_HISTORY_LIMIT)
+                }
+            });
+            return updated
+                ? { ok: true, reason: '', recordedCount: validRows.length, latest: validRows[validRows.length - 1] }
+                : { ok: false, reason: 'trusted_link_update_failed', recordedCount: 0 };
+        }
+
         async function markSent(linkId, scope, revision, policyHash, options = {}) {
             const normalizedLinkId = normalizeString(linkId);
             const normalizedScope = normalizeScope(scope);
@@ -408,6 +580,8 @@
             buildEnvelopeBatchForLiveSend,
             buildEnvelopeBatchForTrustedLinks,
             buildOutboundHistoryRow,
+            buildLiveAckPayload,
+            recordLiveAckPayload,
             markSent
         };
     }

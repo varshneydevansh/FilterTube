@@ -3,8 +3,8 @@
 **Generated**: 2026-06-04
 **Status**: Profile-scoped identity foundation present; connected-device target
 chooser, live same-replica fanout send loop, and redacted per-target outbound
-send history present. Boundary contract still active for accepted/rejected ack
-history, mailbox delivery, local-network delivery, and offline later delivery.
+send and live ack history present. Boundary contract still active for mailbox
+delivery, local-network delivery, and offline later delivery.
 **Related live-send proof**:
 `docs/audit/FILTERTUBE_NANAH_MANAGED_LIVE_SIGNED_SEND_2026-06-04.md`
 **Related plan**:
@@ -27,8 +27,9 @@ are eligible for the selected scope.
 The runtime still must not claim offline or cross-device fanout. A live Nanah
 data channel reaches the current remote session only. Other saved devices need a
 future encrypted mailbox or local-network provider. Source-side outbound send
-history is present, but per-target accepted/rejected ack history is still
-pending before a parent gets a complete applied/rejected delivery ledger.
+history and live accepted/rejected ack history are present, but mailbox and
+local-network ack history are still pending before a parent gets a complete
+offline applied/rejected delivery ledger.
 
 ## Current Runtime Evidence
 
@@ -92,7 +93,8 @@ buildEnvelopeBatchForTrustedLinks(policy, trustedLinks)
 markSent(linkId, scope, revision, policyHash, options)
   -> records last sent revision/hash per link and scope
   -> appends one redacted outbound history row per sent envelope
-  -> does not claim remote accepted/rejected apply status
+  -> accepts matching redacted live ack payloads from the replica
+  -> appends one redacted live ack history row per matching sent envelope
 ```
 
 That is correct for single-target signed sends and for storing multiple fixed
@@ -144,7 +146,9 @@ flowchart TD
   H -->|No| J["Future encrypted mailbox/local-network delivery"]
   I --> K["Record sent revision/hash per link"]
   K --> L["Append redacted outbound send history"]
-  J --> M["Pending: protected accepted/rejected ack history"]
+  L --> M["Replica returns redacted live ack"]
+  M --> N["Append matching accepted/rejected ack history"]
+  J --> O["Pending: mailbox/local-network ack history"]
 ```
 
 ASCII boundary:
@@ -166,7 +170,8 @@ The parent-facing UI should stay simple:
 - Targets should show child name, remote device label, last accepted revision,
   open-sync status, and whether the selected scope is allowed.
 - The success copy says how many selected target profiles received a live send.
-  A richer accepted/rejected ledger is still pending.
+  Live accepted/rejected ack rows can now update trusted-link history when the
+  replica replies.
 - The UI must never imply that a live Nanah session can reach offline devices;
   offline devices require encrypted mailbox or local-network provider delivery.
 
@@ -178,8 +183,10 @@ The parent-facing UI should stay simple:
   and signature.
 - Mark-sent state must be stored per target link and scope.
 - Outbound send history must be per target, not a single bulk success toast.
-- Accepted/rejected ack history must also be per target before claiming applied
-  delivery status.
+- Accepted/rejected live ack history must also be per target before claiming
+  applied delivery status for a connected same-session replica.
+- Mailbox/local-network ack history must also be per target before claiming
+  applied delivery status for offline or non-connected protected profiles.
 - Missing, ambiguous, revoked, stale, or wrong-scope links must reject before
   any low-level apply path.
 
@@ -192,14 +199,14 @@ runtime signed fanout envelope builder: present
 runtime signed fanout send loop: present for selected targets on the connected replica only
 runtime per-target mark-sent state: present per envelope linkId/scope
 runtime per-target outbound send history: present
-runtime per-target accepted/rejected ack history: absent
+runtime per-target accepted/rejected live ack history: present
 runtime mailbox/local-network fanout delivery: absent
 ```
 
 Runtime behavior changed by this proof: yes, the dashboard can now choose
 multiple saved fixed-profile targets on the connected replica and send signed
 managed envelopes for each selected link. Offline device fanout, local-network
-fanout, and protected per-target accepted/rejected ack history remain pending.
+fanout, and mailbox/local-network per-target ack history remain pending.
 
 ## Proof Commands
 

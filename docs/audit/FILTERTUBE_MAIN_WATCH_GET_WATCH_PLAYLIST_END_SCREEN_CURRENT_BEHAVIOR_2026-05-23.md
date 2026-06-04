@@ -20,7 +20,7 @@ remain unextracted.
 ## Reduced Fixture
 
 `tests/runtime/fixtures/captures/main-watch-get-watch-playlist-end-screen.json`
-is a 183-line, 6,073-byte reduced fixture with sha256
+is a 183-line, 6,086-byte reduced fixture with sha256
 `bd3763ac139f55ea579b7a52cacc1a65f7883f586a64cbe65319bc43bd3c51e5`.
 
 It carries four renderer rows:

@@ -9338,21 +9338,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         const validation = adapter.validateManagedPolicyEnvelope(envelope, context);
         if (validation.accepted === true && validation.decision === 'idempotent_same_hash') {
             await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
+            await sendNanahManagedLivePolicyAck(envelope, validation);
             UIComponents.showToast('Managed policy already matches the last accepted revision', 'info');
             return;
         }
         if (validation.accepted === true) {
             if (typeof adapter.applyManagedPolicyEnvelope !== 'function') {
-                await recordManagedNanahPolicyValidationHistory(envelope, {
+                const decision = {
                     accepted: false,
                     reason: 'managed_apply_unavailable',
                     validationDecision: validation.decision
-                }, context);
+                };
+                await recordManagedNanahPolicyValidationHistory(envelope, decision, context);
+                await sendNanahManagedLivePolicyAck(envelope, decision);
                 UIComponents.showToast('Managed policy apply is unavailable', 'error');
                 return;
             }
             const result = await adapter.applyManagedPolicyEnvelope(envelope, context);
             await recordManagedNanahPolicyValidationHistory(envelope, result.accepted === true ? validation : result, context);
+            await sendNanahManagedLivePolicyAck(envelope, result.accepted === true ? validation : result);
             if (result.accepted === true && result.applied !== false) {
                 await refreshFilterTubeUiAfterNanahImport();
                 UIComponents.showToast(`Applied managed ${normalizeString(validation.scope) || 'policy'} update`, 'success');
@@ -9366,6 +9370,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
+        await sendNanahManagedLivePolicyAck(envelope, validation);
         UIComponents.showToast(`Managed policy rejected: ${normalizeString(validation.reason) || 'validation failed'}`, 'error');
     }
 
@@ -9668,6 +9673,35 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         } catch (error) {
         }
+    }
+
+    async function sendNanahManagedLivePolicyAck(envelope, decision, context = {}) {
+        if (!nanahClient || !nanahManagedLivePolicy || typeof nanahManagedLivePolicy.buildLiveAckPayload !== 'function') return false;
+        try {
+            const ackPayload = nanahManagedLivePolicy.buildLiveAckPayload(envelope, decision, {
+                transport: 'live_nanah_session',
+                ...safeObject(context)
+            });
+            await nanahClient.send(ackPayload);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    async function handleNanahIncomingManagedLiveAck(ackPayload) {
+        if (!nanahManagedLivePolicy || typeof nanahManagedLivePolicy.recordLiveAckPayload !== 'function') return;
+        const result = await nanahManagedLivePolicy.recordLiveAckPayload(ackPayload);
+        if (safeObject(result).ok !== true) return;
+        updateNanahUi();
+        const latest = safeObject(result.latest);
+        const state = normalizeString(latest.ackState);
+        UIComponents.showToast(
+            state === 'delivered'
+                ? `${getNanahRemoteLabel()} applied the managed policy`
+                : `${getNanahRemoteLabel()} reported managed policy ${state || 'status'}`,
+            state === 'delivered' ? 'success' : 'info'
+        );
     }
 
     async function handleNanahIncomingProposal(envelope) {
@@ -9996,6 +10030,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (root.type === 'filtertube_managed_policy') {
             await handleNanahIncomingManagedPolicyEnvelope(root);
+            return;
+        }
+        if (root.schema === 'filtertube_nanah_managed_live_ack') {
+            await handleNanahIncomingManagedLiveAck(root);
             return;
         }
         if (root.schema === 'filtertube_managed_mailbox_item') {

@@ -185,7 +185,7 @@ test('managed trusted links are profile scoped and connected target fanout is bo
   assert.match(doc, /runtime connected-device multi-target chooser: present/);
   assert.match(doc, /runtime signed fanout send loop: present for selected targets on the connected replica only/);
   assert.match(doc, /runtime per-target outbound send history: present/);
-  assert.match(doc, /runtime per-target accepted\/rejected ack history: absent/);
+  assert.match(doc, /runtime per-target accepted\/rejected live ack history: present/);
   assert.match(doc, /runtime mailbox\/local-network fanout delivery: absent/);
   assert.match(doc, /Runtime behavior changed by this proof: yes, the dashboard can now choose\s+multiple saved fixed-profile targets on the connected replica/);
   assert.match(doc, /flowchart TD/);
@@ -248,6 +248,8 @@ test('dashboard builds signed managed envelopes only after source link scope tar
   assert.match(source, /function buildListPayload\(scope, profile, surface\)/);
   assert.match(source, /function buildViewingSpacePayload\(profile\)/);
   assert.match(source, /function buildTimeLimitPayload\(profile\)/);
+  assert.match(source, /function buildLiveAckPayload\(envelope, decision, options = \{\}\)/);
+  assert.match(source, /async function recordLiveAckPayload\(ackPayload\)/);
   assert.match(source, /async function buildEnvelopeForLiveSend\(policy\)/);
   assert.match(source, /async function buildEnvelopeBatchForLiveSend\(policy\)/);
   assert.match(source, /async function buildEnvelopeBatchForTrustedLinks\(policy, trustedLinks\)/);
@@ -279,8 +281,14 @@ test('managed source send uses signed envelope before proposal fallback and reco
   assert.match(sendButtonBlock, /issuedAt: signedEnvelope\.issuedAt/);
   assert.match(sendButtonBlock, /return;\s+\}\s+let envelope = await adapter\.buildControlProposal/);
   assert.match(source, /window\.FilterTubeNanahManagedLivePolicy\?\.create/);
+  assert.match(source, /async function sendNanahManagedLivePolicyAck\(envelope, decision, context = \{\}\)/);
+  assert.match(source, /nanahManagedLivePolicy\.buildLiveAckPayload/);
+  assert.match(source, /async function handleNanahIncomingManagedLiveAck\(ackPayload\)/);
+  assert.match(source, /nanahManagedLivePolicy\.recordLiveAckPayload/);
+  assert.match(source, /root\.schema === 'filtertube_nanah_managed_live_ack'/);
   assert.match(read(managedLivePolicyPath), /outgoingManagedPolicies/);
   assert.match(read(managedLivePolicyPath), /outboundManagedPolicyHistory/);
+  assert.match(read(managedLivePolicyPath), /inboundManagedAckHistory/);
 });
 
 test('managed live signed-send helper can build connected per-target envelope batches', async () => {
@@ -371,6 +379,70 @@ test('managed live signed-send helper records redacted outbound history per targ
   assert.equal(row.summary.delivery, 'live_nanah_session');
   assert.equal(JSON.stringify(row).includes('shakira'), false);
   assert.equal(JSON.stringify(row).includes('UC-shakira'), false);
+});
+
+test('managed live signed-send helper records matching live ack history without plaintext values', async () => {
+  const { helper, trustedLink, policyUpdates } = createManagedLivePolicyHarness({ activeSurface: 'main' });
+  const envelope = await helper.buildEnvelopeForLiveSend({ scope: 'keywords' });
+  trustedLink.policy.outgoingManagedPolicies = {
+    keywords: {
+      revision: envelope.revision,
+      policyHash: envelope.policyHash,
+      sentAt: 1779300000000
+    }
+  };
+
+  const ackPayload = helper.buildLiveAckPayload(envelope, {
+    accepted: true,
+    applied: true,
+    decision: 'accept_newer_revision'
+  });
+
+  assert.equal(ackPayload.schema, 'filtertube_nanah_managed_live_ack');
+  assert.equal(ackPayload.linkId, envelope.linkId);
+  assert.equal(ackPayload.sourceDeviceId, 'parent-device-1');
+  assert.equal(ackPayload.targetProfileId, 'child-profile-1');
+  assert.equal(ackPayload.records[0].scope, 'keywords');
+  assert.equal(ackPayload.records[0].revision, envelope.revision);
+  assert.equal(ackPayload.records[0].policyHash, envelope.policyHash);
+  assert.equal(ackPayload.records[0].ackState, 'delivered');
+  assert.equal(JSON.stringify(ackPayload).includes('shakira'), false);
+  assert.equal(JSON.stringify(ackPayload).includes('UC-shakira'), false);
+
+  const result = await helper.recordLiveAckPayload(ackPayload);
+  assert.deepEqual(plain({ ok: result.ok, reason: result.reason, recordedCount: result.recordedCount }), {
+    ok: true,
+    reason: '',
+    recordedCount: 1
+  });
+  assert.equal(policyUpdates.length, 1);
+  const policyPatch = policyUpdates[0].patch.policy;
+  assert.equal(policyPatch.outgoingManagedPolicies.keywords.lastAckState, 'delivered');
+  assert.equal(policyPatch.outgoingManagedPolicies.keywords.lastAckResult, 'accepted');
+  assert.equal(policyPatch.outgoingManagedPolicies.keywords.lastAckReason, null);
+  assert.equal(policyPatch.outgoingManagedPolicies.keywords.lastAckTargetProfileId, 'child-profile-1');
+
+  const row = policyPatch.inboundManagedAckHistory[0];
+  assert.equal(row.schema, 'filtertube_managed_live_ack_history');
+  assert.equal(row.actionType, 'remote_policy.live_ack');
+  assert.equal(row.trustedLinkId, envelope.linkId);
+  assert.equal(row.scope, 'keywords');
+  assert.equal(row.revision, envelope.revision);
+  assert.equal(row.policyHash, envelope.policyHash);
+  assert.equal(row.result, 'accepted');
+  assert.equal(row.ackState, 'delivered');
+  assert.equal(row.summary.redacted, true);
+  assert.equal(JSON.stringify(row).includes('shakira'), false);
+  assert.equal(JSON.stringify(row).includes('UC-shakira'), false);
+
+  const staleAck = plain(ackPayload);
+  staleAck.records[0].policyHash = 'remote-managed-policy-other';
+  const staleResult = await helper.recordLiveAckPayload(staleAck);
+  assert.deepEqual(plain({ ok: staleResult.ok, reason: staleResult.reason, recordedCount: staleResult.recordedCount }), {
+    ok: false,
+    reason: 'no_matching_ack_records',
+    recordedCount: 0
+  });
 });
 
 test('managed live signed-send helper builds granular parent-control payloads from selected surface', async () => {
