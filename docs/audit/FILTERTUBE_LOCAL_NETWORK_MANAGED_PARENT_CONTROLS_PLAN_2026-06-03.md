@@ -8,9 +8,11 @@ managed-policy apply wrapper, adapter WebCrypto verifier helper, runtime
 viewing-space/time-budget enforcement, and encrypted mailbox protocol proof.
 Managed pairing public-key descriptor persistence is now present when a key
 descriptor is already provisioned, and source-side managed signing keypair
-provisioning plus an adapter signing helper are present. Live
-remote/local-network transport and dashboard signed managed-policy sends remain
-gated.
+provisioning plus an adapter signing helper are present. Live fixed-target
+Nanah managed-policy sends are present for Main/Kids, keyword, channel, video,
+viewing-space, and time-limit scopes. Local-network peer discovery, LAN
+delivery, mailbox pull, mailbox ack, and active/full signed managed sends
+remain gated.
 **Primary audit input**:
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
 

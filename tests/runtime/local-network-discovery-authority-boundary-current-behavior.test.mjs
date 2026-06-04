@@ -146,21 +146,29 @@ test('local-network discovery authority boundary is validation-backed and linked
   const inventory = read(inventoryPath);
   const source = runtimeSource();
 
-  assert.match(doc, /Status\*\*: Managed-policy validation helper present/);
-  assert.match(doc, /Runtime local-network\s+discovery behavior is unchanged/);
+  assert.match(doc, /Status\*\*: Managed-policy validation\/apply, signed live Nanah send, mailbox\s+intake, revision state, and protected history evidence are present/);
+  assert.match(doc, /Runtime local-network peer discovery and LAN delivery are\s+still absent/);
   assert.match(doc, /Local-network discovery is convenience only/);
   assert.match(doc, /Boundary Rows/);
   assert.match(doc, /Hostile LAN Threat Model/);
   assert.match(doc, /No-Work And Performance Boundary/);
   assert.match(doc, /runtime local-network discovery authority gate: absent/);
+  assert.match(doc, /runtime local-network peer discovery: absent/);
   assert.match(doc, /runtime filtertube_managed_policy envelope validator: present/);
-  assert.match(doc, /runtime managed signature verifier gate: present/);
-  assert.match(doc, /runtime behavior changed by this contract: validation helper and verifier gate only/);
+  assert.match(doc, /runtime managed policy revision store: present on target profile remoteManagedPolicies/);
+  assert.match(doc, /runtime managed accepted-apply action-history writer: present behind validated apply wrappers/);
+  assert.match(doc, /runtime managed signature verifier gate: present with dashboard\/WebCrypto key verifier context/);
+  assert.match(doc, /runtime signed live Nanah managed-policy send: present/);
+  assert.match(doc, /runtime local\/decrypted mailbox item intake: present/);
+  assert.match(doc, /LAN discovery and LAN delivery remain absent/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
 
   assert.match(source, /function validateManagedPolicyEnvelope\(envelope, context = \{\}\)/);
   assert.match(source, /Managed policy envelopes require validated managed apply flow/);
+  assert.match(source, /remoteManagedPolicies/);
+  assert.match(source, /applyManagedPolicyEnvelope/);
+  assert.match(source, /verifyManagedNanahPolicyIntegritySignature/);
   assert.doesNotMatch(source, /FilterTubeLocalNetworkDiscovery/);
   assert.doesNotMatch(source, /managedLanDiscovery/);
   assert.doesNotMatch(source, /localNetworkPolicyApply/);
