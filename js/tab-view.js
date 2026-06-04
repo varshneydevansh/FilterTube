@@ -4557,6 +4557,164 @@ document.addEventListener('DOMContentLoaded', async () => {
         return true;
     }
 
+    function getManagedNanahPolicyAcceptedState(profile, linkId, scope) {
+        const managedState = safeObject(profile?.managedPolicyState);
+        const remotePolicies = safeObject(managedState.remoteManagedPolicies);
+        const linkPolicies = safeObject(remotePolicies[normalizeString(linkId)]);
+        const accepted = safeObject(linkPolicies[normalizeString(scope).toLowerCase()]);
+        const revision = normalizeNonNegativeInteger(accepted.revision);
+        const policyHash = normalizeString(accepted.policyHash);
+        return revision && policyHash ? { revision, policyHash } : null;
+    }
+
+    function findNanahTrustedLinkForManagedEnvelope(envelope) {
+        const root = safeObject(envelope);
+        const sourceDeviceId = normalizeString(root.sourceDeviceId);
+        const linkId = normalizeString(root.linkId);
+        return (sourceDeviceId ? findNanahTrustedLink(sourceDeviceId) : null)
+            || nanahTrustedLinks.find((entry) => normalizeString(entry?.linkId) === linkId)
+            || null;
+    }
+
+    function buildNanahManagedValidationTrustedLink(envelope, link) {
+        const trusted = normalizeNanahTrustedLink(link);
+        if (!trusted) return {};
+        const policy = safeObject(trusted.policy);
+        const keyVersion = normalizeNonNegativeInteger(trusted.keyVersion || policy.keyVersion);
+        return {
+            ...trusted,
+            id: normalizeString(trusted.id) || trusted.linkId,
+            type: trusted.linkType,
+            sourceDeviceId: normalizeString(trusted.sourceDeviceId || policy.sourceDeviceId)
+                || (trusted.localRole === 'replica' && trusted.remoteRole === 'source' ? trusted.remoteDeviceId : ''),
+            sourceProfileId: normalizeString(trusted.sourceProfileId || policy.sourceProfileId),
+            targetProfileId: normalizeString(trusted.targetProfileId || policy.targetProfileId),
+            allowedScopes: getNanahManagedPolicyScopeList(trusted.allowedScopes || policy.allowedScopes || policy.defaultScope),
+            sourcePublicKeyId: normalizeString(trusted.sourcePublicKeyId || policy.sourcePublicKeyId),
+            keyVersion: keyVersion || 0,
+            revoked: trusted.revoked === true || policy.revoked === true,
+            keyRevoked: trusted.keyRevoked === true || policy.keyRevoked === true,
+            stalePairing: trusted.stalePairing === true || policy.stalePairing === true,
+            policy
+        };
+    }
+
+    function getNanahManagedDuplicateDeviceIds(sourceDeviceId, trustedLinkId) {
+        const deviceId = normalizeString(sourceDeviceId);
+        if (!deviceId) return [];
+        const matching = nanahTrustedLinks.filter((entry) => {
+            const trusted = normalizeNanahTrustedLink(entry);
+            if (!trusted) return false;
+            const policy = safeObject(trusted.policy);
+            const candidate = normalizeString(trusted.sourceDeviceId || policy.sourceDeviceId) || trusted.remoteDeviceId;
+            return candidate === deviceId && normalizeString(trusted.linkId) !== normalizeString(trustedLinkId);
+        });
+        return matching.length > 0 ? [deviceId] : [];
+    }
+
+    function buildManagedNanahPolicyValidationContext(envelope, profilesV4 = profilesV4Cache) {
+        const root = safeObject(envelope);
+        const link = findNanahTrustedLinkForManagedEnvelope(root);
+        const trustedLink = buildNanahManagedValidationTrustedLink(root, link);
+        const profilesRoot = safeObject(profilesV4);
+        const profiles = safeObject(profilesRoot.profiles);
+        const targetProfileId = normalizeString(root.targetProfileId || trustedLink.targetProfileId);
+        const targetProfile = safeObject(profiles[targetProfileId]);
+        const accepted = getManagedNanahPolicyAcceptedState(targetProfile, root.linkId || trustedLink.linkId, root.scope);
+        return {
+            profilesV4: profilesRoot,
+            profiles,
+            trustedLink,
+            accepted,
+            duplicateDeviceIds: getNanahManagedDuplicateDeviceIds(root.sourceDeviceId, root.linkId || trustedLink.linkId),
+            historyTargetProfileId: targetProfileId
+        };
+    }
+
+    function summarizeManagedNanahPolicyEnvelope(envelope, decision) {
+        const root = safeObject(envelope);
+        const payload = safeObject(root.payload);
+        const operations = safeArray(payload.operations);
+        const scope = normalizeString(root.scope).toLowerCase() || 'policy';
+        const reason = normalizeString(decision?.reason);
+        const label = reason
+            ? `Rejected remote ${scope} policy`
+            : `Received remote ${scope} policy`;
+        return {
+            redacted: true,
+            label,
+            operationCount: operations.length,
+            payloadScope: normalizeString(payload.scope) || scope,
+            decision: normalizeString(decision?.decision),
+            reason: reason || null
+        };
+    }
+
+    async function recordManagedNanahPolicyValidationHistory(envelope, decision, context = {}) {
+        const root = safeObject(envelope);
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
+            return false;
+        }
+        const targetProfileId = normalizeString(context.historyTargetProfileId || root.targetProfileId);
+        if (!targetProfileId) return false;
+
+        const fresh = await io.loadProfilesV4();
+        const profiles = { ...safeObject(fresh.profiles) };
+        const profile = safeObject(profiles[targetProfileId]);
+        if (!profile || Object.keys(profile).length === 0) return false;
+
+        const now = Date.now();
+        const scope = normalizeString(root.scope).toLowerCase() || 'sync_policy';
+        const revision = normalizeNonNegativeInteger(root.revision) || null;
+        const policyHash = normalizeString(root.policyHash) || null;
+        const reason = normalizeString(decision?.reason);
+        const accepted = decision?.accepted === true && !reason;
+        const conflict = reason === 'equal_revision_hash_conflict';
+        const result = accepted ? 'accepted' : (conflict ? 'conflict' : 'rejected');
+        const actionType = accepted ? 'remote_policy.accept' : (conflict ? 'remote_policy.conflict' : 'remote_policy.reject');
+        const trustedLink = safeObject(context.trustedLink);
+        const trustedLinkId = normalizeString(root.linkId || trustedLink.linkId || trustedLink.id);
+        const row = {
+            rowId: `remote-managed-${scope}-${revision || 'none'}-${now}`,
+            schema: MANAGED_ACTION_HISTORY_SCHEMA,
+            version: 1,
+            actorProfileId: normalizeString(root.sourceProfileId) || null,
+            actorDeviceId: normalizeString(root.sourceDeviceId) || null,
+            targetProfileId,
+            trustedLinkId,
+            actionType,
+            scope,
+            revision,
+            policyHash,
+            result,
+            reason: accepted ? null : (reason || 'validation_failed'),
+            receivedAt: now,
+            issuedAt: normalizeNonNegativeInteger(root.issuedAt) || null,
+            orderKey: `${String(revision || 0).padStart(6, '0')}:${now}`,
+            summary: summarizeManagedNanahPolicyEnvelope(root, decision),
+            sensitive: true
+        };
+        const existingRows = Array.isArray(profile.managedActionHistory)
+            ? profile.managedActionHistory.filter(existing => safeObject(existing).schema === MANAGED_ACTION_HISTORY_SCHEMA)
+            : [];
+        profiles[targetProfileId] = {
+            ...profile,
+            managedActionHistory: [...existingRows, row].slice(-MANAGED_ACTION_HISTORY_LIMIT)
+        };
+        await io.saveProfilesV4({
+            ...fresh,
+            schemaVersion: 4,
+            profiles
+        });
+        profilesV4Cache = {
+            ...fresh,
+            schemaVersion: 4,
+            profiles
+        };
+        return true;
+    }
+
     function isManagedChildEditFor(surface) {
         const targetSurface = surface === 'kids' ? 'kids' : 'main';
         return !!managedChildEdit && (managedChildEdit.surface ? managedChildEdit.surface === targetSurface : true);
@@ -5853,6 +6011,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         return normalized.length > 0 ? Array.from(new Set(normalized)) : ['active'];
     }
 
+    function getNanahManagedPolicyScopeList(value) {
+        const list = Array.isArray(value) ? value : [value];
+        const normalized = list
+            .map((item) => normalizeString(item).toLowerCase())
+            .filter((item) => [
+                'main',
+                'kids',
+                'videos',
+                'keywords',
+                'channels',
+                'viewing_space',
+                'time_limits'
+            ].includes(item));
+        return Array.from(new Set(normalized));
+    }
+
     function classifyNanahTrustedLink(localRole, remoteRole) {
         if (localRole === 'peer' && remoteRole === 'peer') return 'peer_link';
         if ((localRole === 'source' && remoteRole === 'replica') || (localRole === 'replica' && remoteRole === 'source')) {
@@ -5866,6 +6040,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (normalized === 'main') return 'Main';
         if (normalized === 'kids') return 'Kids';
         if (normalized === 'full') return 'Full backup';
+        if (normalized === 'videos') return 'Videos';
+        if (normalized === 'keywords') return 'Keywords';
+        if (normalized === 'channels') return 'Channels';
+        if (normalized === 'viewing_space') return 'Viewing space';
+        if (normalized === 'time_limits') return 'Time limits';
         return 'Active profile';
     }
 
@@ -6515,7 +6694,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const linkType = requestedLinkType === 'managed_link' || requestedLinkType === 'peer_link'
             ? requestedLinkType
             : (derivedLinkType || 'peer_link');
-        const normalizedScopes = getNanahScopeList(safeObject(raw.policy).allowedScopes || raw.allowedScopes || safeObject(raw.policy).defaultScope || raw.defaultScope);
+        const rawScopes = safeObject(raw.policy).allowedScopes || raw.allowedScopes || safeObject(raw.policy).defaultScope || raw.defaultScope;
+        const managedScopes = linkType === 'managed_link' ? getNanahManagedPolicyScopeList(rawScopes) : [];
+        const normalizedScopes = linkType === 'managed_link'
+            ? (managedScopes.length ? managedScopes : getNanahScopeList(rawScopes))
+            : getNanahScopeList(rawScopes);
         const applyMode = normalizeString(safeObject(raw.policy).applyMode || raw.applyMode).toLowerCase() === 'replace' ? 'replace' : 'merge';
         const autoApply = safeObject(raw.policy).autoApplyControlProposals === true;
         const reconnectMode = getNanahReconnectMode(safeObject(raw.policy).reconnectMode || raw.reconnectMode, linkType === 'managed_link' ? 'approval_needed' : 'fast');
@@ -8028,6 +8211,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function parseNanahEnvelopeDetails(envelope) {
         const root = safeObject(envelope);
+        if (root.type === 'filtertube_managed_policy') {
+            const scope = normalizeString(root.scope).toLowerCase() || 'sync_policy';
+            return {
+                type: 'managed_policy',
+                scope,
+                strategy: 'merge',
+                portable: null,
+                summary: `FilterTube managed ${scope} policy`,
+                targetProfile: normalizeNanahProfileContext({
+                    profileId: root.targetProfileId,
+                    profileName: normalizeString(root.targetProfileName),
+                    profileType: 'child'
+                }),
+                authorityMode: 'managed',
+                linkType: 'managed_link',
+                allowedScopes: [scope],
+                senderStrategySuggested: false,
+                managedEnvelope: root
+            };
+        }
         if (root.t === 'control_proposal') {
             const parsed = safeObject(JSON.parse(root.payload));
             return {
@@ -8130,6 +8333,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         await refreshFilterTubeUiAfterNanahImport();
         return result;
+    }
+
+    async function handleNanahIncomingManagedPolicyEnvelope(envelope) {
+        const adapter = window.FilterTubeNanahAdapter || {};
+        if (typeof adapter.validateManagedPolicyEnvelope !== 'function') {
+            throw new Error('Managed policy validation is unavailable');
+        }
+        const io = window.FilterTubeIO || {};
+        const localProfilesV4 = profilesV4Cache || (typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null);
+        const context = buildManagedNanahPolicyValidationContext(envelope, localProfilesV4);
+        const validation = adapter.validateManagedPolicyEnvelope(envelope, context);
+        const historyDecision = validation.accepted === true && validation.decision !== 'idempotent_same_hash'
+            ? {
+                accepted: false,
+                reason: 'managed_apply_pending',
+                validationDecision: validation.decision
+            }
+            : validation;
+        await recordManagedNanahPolicyValidationHistory(envelope, historyDecision, context);
+        if (validation.accepted === true && validation.decision === 'idempotent_same_hash') {
+            UIComponents.showToast('Managed policy already matches the last accepted revision', 'info');
+            return;
+        }
+        if (validation.accepted === true) {
+            UIComponents.showToast('Managed policy validated; remote apply is still gated', 'info');
+            return;
+        }
+        UIComponents.showToast(`Managed policy rejected: ${normalizeString(validation.reason) || 'validation failed'}`, 'error');
     }
 
     function buildNanahOutgoingProposalPolicy(scope, strategy) {
@@ -8585,6 +8816,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     : `${getNanahRemoteLabel()} declined the sync`,
                 accepted ? 'success' : 'info'
             );
+            return;
+        }
+        if (root.type === 'filtertube_managed_policy') {
+            await handleNanahIncomingManagedPolicyEnvelope(root);
             return;
         }
         if (root.t === 'control_proposal' || root.t === 'app_sync') {

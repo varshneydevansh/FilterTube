@@ -179,9 +179,9 @@ test('startup permission navigation and prompt docs carry the method proof gap b
 
   for (const token of [
     'tracked JS/JSX/MJS files: 69',
-    'repo-wide lexical callables: 5812',
+    'repo-wide lexical callables: 5827',
     'files with complete per-callable semantic proof: 0',
-    'lexical callables requiring semantic proof before behavior changes: 5812',
+    'lexical callables requiring semantic proof before behavior changes: 5827',
     'runtime behavior changed: no',
   ]) {
     assert.ok(gap.includes(token), `method gap index missing token ${token}`);
@@ -193,9 +193,9 @@ test('startup permission navigation and prompt docs carry the method proof gap b
     for (const token of [
       methodGapPath,
       'method semantic proof gap files covered: 69',
-      'method semantic proof gap lexical callables covered: 5812',
+      'method semantic proof gap lexical callables covered: 5827',
       'files with complete per-callable semantic proof: 0',
-      'lexical callables requiring semantic proof before behavior changes: 5812',
+      'lexical callables requiring semantic proof before behavior changes: 5827',
       'affected callable semantic proof: NO-GO',
       'runtime behavior changed: no',
       'JSON-first promotion',

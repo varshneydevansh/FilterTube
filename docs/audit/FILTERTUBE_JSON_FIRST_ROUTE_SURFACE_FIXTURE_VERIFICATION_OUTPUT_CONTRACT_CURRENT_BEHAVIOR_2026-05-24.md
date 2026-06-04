@@ -24,9 +24,9 @@ The current boundary is:
 ```text
 Reserved route/surface fixture verification output path: docs/audit/artifacts/json-first/route-surface-fixture-packet/verification-output.tap
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5812
+Method semantic proof gap lexical callables covered: 5827
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5812
+Lexical callables requiring semantic proof before behavior changes: 5827
 Committed route/surface fixture verification output files: 0
 Runtime JSON-first fixture verification output approval exists: no
 Runtime JSON-first fixture packet approval exists: no
@@ -81,9 +81,9 @@ route/surface metric obligations covered: 12
 fixture mode classes covered: 8
 fixture evidence classes covered: 14
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5812
+method semantic proof gap lexical callables covered: 5827
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5812
+lexical callables requiring semantic proof before behavior changes: 5827
 committed route/surface fixture verification output files: 0
 committed route/surface fixture packet files: 0
 runtime JSON-first fixture verification output approvals: 0

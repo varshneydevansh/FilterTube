@@ -18,7 +18,7 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/tab-view.js` | 12097 | 548665 | `1d76562bc25f8baf1c134da48c6ab3e25cce80dc186f320378f22646ef6ddd74` |
+| `js/tab-view.js` | 12332 | 560297 | `1d51ba59aaee4296e56a8371426e5d7ad0ca9aee43cc533827909137bf41247e` |
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/io_manager.js` | 2097 | 100479 | `f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62` |
 | `js/background.js` | 6641 | 298986 | `837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd` |
@@ -43,8 +43,8 @@ background profile storage invalidation block: 42 lines, 1464 bytes
 
 ```text
 tab-view ensureProfileUnlocked tokens: 18
-tab-view saveProfilesV4 tokens: 33
-tab-view loadProfilesV4 tokens: 58
+tab-view saveProfilesV4 tokens: 35
+tab-view loadProfilesV4 tokens: 62
 tab-view activeProfileId tokens: 73
 tab-view StateManager.loadSettings tokens: 8
 tab-view refreshProfilesUI tokens: 21
@@ -55,7 +55,7 @@ tab-view managedChildEdit tokens: 12
 tab-view unlockedProfiles tokens: 18
 tab-view allowMainViewing tokens: 4
 tab-view allowKidsViewing tokens: 4
-tab-view schemaVersion tokens: 18
+tab-view schemaVersion tokens: 20
 popup ensureProfileUnlocked tokens: 3
 popup saveProfilesV4 tokens: 2
 popup loadProfilesV4 tokens: 4
@@ -135,9 +135,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5812
+method semantic proof gap lexical callables covered: 5827
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5812
+lexical callables requiring semantic proof before behavior changes: 5827
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

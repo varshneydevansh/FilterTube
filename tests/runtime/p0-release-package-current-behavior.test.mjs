@@ -401,8 +401,8 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
       contentScriptEntries: 2,
       contentScriptJsRefs: 15,
       webAccessibleResourceRefs: 5,
-      zipBytes: 8703530,
-      zipSha256: 'a8a58bb5e3c769877f16de0b91de398856dcf5dc3dda71e02327c99030d265e8'
+      zipBytes: 8705500,
+      zipSha256: 'b9a993afddf8d00212183dbeeae4249d33b6a390df2c9ef04174fb4fa8e7801d'
     }],
     ['firefox', {
       manifestBytes: 2603,
@@ -410,8 +410,8 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
       contentScriptEntries: 1,
       contentScriptJsRefs: 14,
       webAccessibleResourceRefs: 5,
-      zipBytes: 8703589,
-      zipSha256: 'b104827abcf5994ac9bf725a2fddae109b4bcd38b8755aa53470ab355a44f3ac'
+      zipBytes: 8705559,
+      zipSha256: '7a817e6e5c5a1c0aa37be3e358731ca529000923848c440b78eaabd2aef63f11'
     }],
     ['opera', {
       manifestBytes: 2518,
@@ -419,8 +419,8 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
       contentScriptEntries: 2,
       contentScriptJsRefs: 15,
       webAccessibleResourceRefs: 4,
-      zipBytes: 8703532,
-      zipSha256: '8e20716036c0b6cdf1013a2ab7b2e62f0e63ecb1a658073a9c4f438539c7d94c'
+      zipBytes: 8705502,
+      zipSha256: '376260ee0795cad453bbf4e86b76704446f05ee5ccdeb4cca4b681d064c66fc7'
     }]
   ]);
 
@@ -684,10 +684,10 @@ test('P0 release package audit documents blocked verdict and all named gates', (
     assert.ok(doc.includes(phrase), `missing ${phrase}`);
   }
 
-  assert.match(methodGap, /repo-wide lexical callables: 5812/);
+  assert.match(methodGap, /repo-wide lexical callables: 5827/);
   assert.match(methodGap, /files with lexical accounting: 69/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5812/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5827/);
 
   assert.equal(releasePackageFamilyDocs.length, 9);
   for (const familyDocPath of releasePackageFamilyDocs) {
@@ -695,9 +695,9 @@ test('P0 release package audit documents blocked verdict and all named gates', (
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 69/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5812/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5827/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5812/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5827/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     assert.match(familyDoc, /runtime behavior changed: no/);
     assert.match(familyDoc, /do not approve runtime\s+optimization/);

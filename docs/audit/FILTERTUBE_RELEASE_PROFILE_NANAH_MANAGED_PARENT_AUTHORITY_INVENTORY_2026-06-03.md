@@ -2,12 +2,12 @@
 
 **Generated**: 2026-06-03  
 **Status**: Runtime route-gate, local managed-save revision/history, protected
-history access, time-limit enforcement, and validation-only managed-policy
-envelope proofs updated. Runtime behavior changed for protected child Main/Kids
-denial, accepted same-device parent-managed child saves, parent/account history
-viewing, accepted-row history clearing, child time-budget enforcement, and
-managed-envelope validation/classification; remote-policy apply remains
-pending.
+history access, time-limit enforcement, and receive-side managed-policy
+validation/history proofs updated. Runtime behavior changed for protected child
+Main/Kids denial, accepted same-device parent-managed child saves,
+parent/account history viewing, accepted-row history clearing, child
+time-budget enforcement, managed-envelope validation/classification, and
+managed-policy receive evidence; remote-policy apply remains pending.
 **Goal slice**: Implementation order item 1 plus first runtime viewing-space
 enforcement slice.
 **Lane proof**: `test:settings` for profile/Nanah authority and `test:release`
@@ -19,13 +19,15 @@ for adding this focused proof test to the lane workflow.
 This inventory records the current parent, child, PIN, profile, Nanah, import,
 viewing-space, history, and time-limit authority paths while the
 managed-control system is being built. It now includes extension runtime
-viewing-space denial, local protected history access, and active child
-time-budget enforcement from local profile settings.
+viewing-space denial, local protected history access, active child time-budget
+enforcement from local profile settings, and receive-side managed-policy
+validation history.
 
 This document still does not approve remote policy writes by itself. The first
-managed-envelope validator now exists, but persistent remote revision/replay
-stores, cryptographic signature verification, remote accept/reject history
-rows, and failed-auth history remain separate required slices.
+managed-envelope validator and receive-side validation-history writer now
+exist, but persistent accepted-revision writes, cryptographic signature
+verification, remote accepted-apply history rows, and failed-auth history remain
+separate required slices.
 
 ## Issue 60 Local-Network Caregiver Addendum
 
@@ -208,6 +210,9 @@ Current behavior:
   `filtertube_managed_policy` envelope against trusted-link role, source device,
   source profile, target profile, allowed scope, key id, key version, payload
   family, integrity binding, and supplied revision state.
+- `handleNanahIncomingManagedPolicyEnvelope(envelope)` now routes
+  `filtertube_managed_policy` receive events through validation and records a
+  protected validation-history row on the known target profile when possible.
 - `extractPortableFromEnvelope(...)` rejects `filtertube_managed_policy`
   envelopes with `Managed policy envelopes require validated managed apply
   flow`, so the old portable-payload path cannot accidentally mutate a profile
@@ -222,18 +227,22 @@ Authority meaning:
 - The adapter now provides the first validation-only managed envelope helper,
   but that helper is not a persistent policy authority and does not write
   profiles.
+- The dashboard receive path now provides managed-policy envelope parsing,
+  trusted-link/profile/revision context construction, and protected validation
+  evidence rows.
 
 Current gap:
 
 - The adapter validates link/profile/scope/device/key/revision inputs only from
-  caller-supplied context; there is still no remote managed policy revision
-  store.
-- There is still no persisted stale/replay rejection state.
+  caller-supplied context; there is still no persisted accepted-revision writer.
+- There is still no persisted stale/replay authority state beyond any existing
+  profile metadata passed into the validation context.
 - There is no cryptographic signature verification yet; the first helper checks
   integrity field presence and binding tuple consistency.
 - The adapter supports validation-only `filtertube_managed_policy` handling,
-  but there is still no managed apply wrapper that records accepted/rejected
-  history and then calls the low-level scoped write primitive.
+  but there is still no managed apply wrapper that records accepted revision
+  state and accepted-apply history before calling the low-level scoped write
+  primitive.
 
 ### Nanah managed link policy
 
@@ -271,9 +280,11 @@ Current gap:
 
 - The first validation-only managed policy envelope helper exists in
   `js/nanah_sync_adapter.js`.
-- There is no persisted monotonic managed policy revision.
-- There is still no persisted stale/replay rejection state.
-- There is no stored per-target policy hash idempotency state.
+- The first receive-side validation-history writer exists in `js/tab-view.js`.
+- There is no persisted accepted monotonic managed policy revision writer.
+- There is still no persisted stale/replay authority state.
+- There is no stored per-target accepted policy hash writer for new remote
+  apply decisions.
 - There is no cryptographic signature verification yet.
 - Trust revocation does not yet purge queued updates or invalidate an accepted
   policy revision because those structures do not exist yet.

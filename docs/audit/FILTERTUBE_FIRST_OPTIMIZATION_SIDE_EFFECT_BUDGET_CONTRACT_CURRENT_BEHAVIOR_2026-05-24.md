@@ -79,9 +79,9 @@ collector side-effect rows covered: 12
 collector fixture provenance rows covered: 12
 collector parity rollout rows covered: 12
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5812
+method semantic proof gap lexical callables covered: 5827
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5812
+lexical callables requiring semantic proof before behavior changes: 5827
 inline side-effect budget JSON sections covered: 12
 inline side-effect budget artifact promotion decision: NO-GO
 side-effect budget draft closure rows: 12
@@ -98,7 +98,7 @@ metric schema rows linked by side-effect closure: 12
 metric source-owner rows linked by side-effect closure: 12
 collector readiness families linked by side-effect closure: 5
 method semantic proof gap files linked by side-effect closure: 69
-lexical callables linked by side-effect closure: 5812
+lexical callables linked by side-effect closure: 5827
 runtime side-effect budget closure approvals: 0
 implementation-ready side-effect budget closure rows: 0
 side-effect budget draft closure: SIDE-EFFECT-BUDGET-CHAIN-CLOSED

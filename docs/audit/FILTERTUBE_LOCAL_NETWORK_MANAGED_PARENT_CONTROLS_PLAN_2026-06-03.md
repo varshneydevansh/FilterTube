@@ -2,8 +2,9 @@
 
 **Generated**: 2026-06-03
 **Estimated Complexity**: High
-**Status**: Planning/specification plus first local managed-save runtime slice.
-Remote/local-network managed policy behavior remains unchanged.
+**Status**: Planning/specification plus local managed-save runtime slice and
+Nanah receive-side managed-policy validation-history slice. Remote/local-network
+managed policy apply behavior remains gated.
 **Primary audit input**:
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
 
@@ -219,9 +220,10 @@ revision and action-history entry.
 - **Dependencies**: Task 2.1.
 - **Status**: Action-history model and access-control fixture updated. Product
   runtime now writes accepted local managed child save rows, exposes
-  parent/account-only protected history access, and clears accepted rows while
-  preserving protected evidence. Remote rejected/conflict rows and failed
-  unlock rows remain pending.
+  parent/account-only protected history access, clears accepted rows while
+  preserving protected evidence, and records Nanah managed-policy validation
+  rows for rejected, conflict, idempotent, and valid-but-apply-gated receive
+  outcomes. Remote accepted-apply rows and failed unlock rows remain pending.
 - **Acceptance Criteria**:
   - Rows include actor profile, actor device, target profile, action type,
     policy revision, timestamp, result, and redacted summary.
@@ -281,11 +283,12 @@ replica child device over Nanah/P2P or same-network transport.
   trust state.
 - **Complexity**: 6/10
 - **Dependencies**: Sprint 1.
-- **Status**: Runtime validation helper added in `js/nanah_sync_adapter.js`.
-  The helper validates trusted-link/profile/scope/device/key/revision inputs
-  and integrity binding fields from caller-supplied context. Persistent
-  revision storage, real cryptographic verification, and profile writes remain
-  pending.
+- **Status**: Runtime validation helper added in `js/nanah_sync_adapter.js`,
+  and receive-side validation context/history plumbing added in
+  `js/tab-view.js`. The helper validates trusted-link/profile/scope/device/key/
+  revision inputs and integrity binding fields from caller-supplied context.
+  Persistent accepted-revision writes, real cryptographic verification, and
+  profile writes remain pending.
 - **Acceptance Criteria**:
   - Trusted source to fixed child target passes.
   - Peer mode, sibling target, missing fixed target, stale revision, wrong
@@ -310,8 +313,10 @@ replica child device over Nanah/P2P or same-network transport.
 - **Status**: Partially started. The adapter now rejects
   `filtertube_managed_policy` envelopes from the legacy portable apply path
   with `Managed policy envelopes require validated managed apply flow`. The
-  managed apply wrapper, revision persistence, and remote accepted/rejected
-  action-history writer are still pending.
+  dashboard receive path now parses managed envelopes, builds validation context,
+  and records protected validation history. The managed apply wrapper, accepted
+  revision persistence, and remote accepted-apply action-history writer are
+  still pending.
 - **Acceptance Criteria**:
   - Existing `app_sync` and `control_proposal` behavior remains compatible.
   - New managed policy applies only to target profile and target surface.

@@ -202,9 +202,9 @@ test('fixture provenance contract rows counts and field names stay pinned', () =
   assert.match(doc, /collector fixture provenance rows covered: 12/);
   assert.match(doc, /collector parity rollout rows covered: 12/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5812/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5827/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5812/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5827/);
   assert.match(doc, /inline fixture provenance JSON sections covered: 12/);
   assert.match(doc, /inline fixture provenance artifact promotion decision: NO-GO/);
   assert.match(doc, /fixture provenance draft closure rows: 12/);
@@ -219,7 +219,7 @@ test('fixture provenance contract rows counts and field names stay pinned', () =
   assert.match(doc, /metric source-owner rows linked by fixture closure: 12/);
   assert.match(doc, /collector readiness families linked by fixture closure: 5/);
   assert.match(doc, /method semantic proof gap files linked by fixture closure: 69/);
-  assert.match(doc, /lexical callables linked by fixture closure: 5812/);
+  assert.match(doc, /lexical callables linked by fixture closure: 5827/);
   assert.match(doc, /runtime fixture provenance closure approvals: 0/);
   assert.match(doc, /implementation-ready fixture provenance closure rows: 0/);
   assert.match(doc, /fixture provenance draft closure: FIXTURE-PROVENANCE-CHAIN-CLOSED/);
@@ -301,9 +301,9 @@ test('fixture provenance contract is backed by current owner sample artifact and
   assert.match(fixtureProvenance, /collector fixture provenance rows implementation-ready: 0/);
   assert.match(parityRollout, /collector parity rollout rows implementation-ready: 0/);
   assert.match(methodGap, /tracked JS\/JSX\/MJS files: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5812/);
+  assert.match(methodGap, /repo-wide lexical callables: 5827/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5812/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5827/);
 });
 
 test('fixture provenance authority symbols are absent from product runtime source', () => {

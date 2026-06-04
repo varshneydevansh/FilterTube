@@ -29,9 +29,9 @@ Runtime route/surface metric fixture provenance approval exists: no
 Runtime route/surface metric artifact approval exists: no
 Runtime metric collector approval exists: no
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5812
+Method semantic proof gap lexical callables covered: 5827
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5812
+Lexical callables requiring semantic proof before behavior changes: 5827
 Implementation-ready JSON-first route/surface metric fixture provenance contract rows: 0
 ```
 
@@ -98,9 +98,9 @@ metric collector fixture provenance rows covered: 12
 source-locus fixture provenance rows covered: 12
 collector fixture provenance approval rows covered: 12
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5812
+method semantic proof gap lexical callables covered: 5827
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5812
+lexical callables requiring semantic proof before behavior changes: 5827
 committed route/surface metric fixture provenance files: 0
 committed route/surface metric artifact files: 0
 committed first-optimization foundation fixture provenance files: 0

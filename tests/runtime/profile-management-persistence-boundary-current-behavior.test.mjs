@@ -131,10 +131,10 @@ test('profile management persistence audit document records current boundary and
     assert.ok(doc.includes(marker), `missing marker: ${marker}`);
   }
 
-  assert.match(methodGap, /repo-wide lexical callables: 5812/);
+  assert.match(methodGap, /repo-wide lexical callables: 5827/);
   assert.match(methodGap, /files with lexical accounting: 69/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5812/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5827/);
 
   assert.equal(profileSettingsUiFamilyDocs.length, 12);
   for (const familyDocPath of profileSettingsUiFamilyDocs) {
@@ -142,9 +142,9 @@ test('profile management persistence audit document records current boundary and
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 69/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5812/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5827/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5812/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5827/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     assert.match(familyDoc, /runtime behavior changed: no/);
     assert.match(familyDoc, /do not approve runtime\s+optimization/);
@@ -154,7 +154,7 @@ test('profile management persistence audit document records current boundary and
 test('profile management source fingerprints stay pinned', () => {
   const doc = read(auditDocPath);
   const expected = [
-    ['js/tab-view.js', 12097, 548665, '1d76562bc25f8baf1c134da48c6ab3e25cce80dc186f320378f22646ef6ddd74'],
+    ['js/tab-view.js', 12332, 560297, '1d51ba59aaee4296e56a8371426e5d7ad0ca9aee43cc533827909137bf41247e'],
     ['js/popup.js', 1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
     ['js/io_manager.js', 2097, 100479, 'f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62'],
     ['js/background.js', 6641, 298986, '837cc8e438b30f53cc14da0317262a0ed5e7c5ae2ece0026611a3963767ae6fd']
@@ -194,8 +194,8 @@ test('selected profile management token counts stay pinned', () => {
   const doc = read(auditDocPath);
   const selected = [
     ['tab-view ensureProfileUnlocked tokens: 18', sources.tabView, 'ensureProfileUnlocked', 18],
-    ['tab-view saveProfilesV4 tokens: 33', sources.tabView, 'saveProfilesV4', 33],
-    ['tab-view loadProfilesV4 tokens: 58', sources.tabView, 'loadProfilesV4', 58],
+    ['tab-view saveProfilesV4 tokens: 35', sources.tabView, 'saveProfilesV4', 35],
+    ['tab-view loadProfilesV4 tokens: 62', sources.tabView, 'loadProfilesV4', 62],
     ['tab-view activeProfileId tokens: 73', sources.tabView, 'activeProfileId', 73],
     ['tab-view StateManager.loadSettings tokens: 8', sources.tabView, 'StateManager.loadSettings', 8],
     ['tab-view refreshProfilesUI tokens: 21', sources.tabView, 'refreshProfilesUI', 21],
@@ -206,7 +206,7 @@ test('selected profile management token counts stay pinned', () => {
     ['tab-view unlockedProfiles tokens: 18', sources.tabView, 'unlockedProfiles', 18],
     ['tab-view allowMainViewing tokens: 4', sources.tabView, 'allowMainViewing', 4],
     ['tab-view allowKidsViewing tokens: 4', sources.tabView, 'allowKidsViewing', 4],
-    ['tab-view schemaVersion tokens: 18', sources.tabView, 'schemaVersion', 18],
+    ['tab-view schemaVersion tokens: 20', sources.tabView, 'schemaVersion', 20],
     ['popup ensureProfileUnlocked tokens: 3', sources.popup, 'ensureProfileUnlocked', 3],
     ['popup saveProfilesV4 tokens: 2', sources.popup, 'saveProfilesV4', 2],
     ['popup loadProfilesV4 tokens: 4', sources.popup, 'loadProfilesV4', 4],

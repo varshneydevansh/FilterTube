@@ -33,9 +33,9 @@ Runtime rollback approval exists: no
 Runtime unclaimed-surface approval exists: no
 Implementation-ready artifact commit rows: 0
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5812
+Method semantic proof gap lexical callables covered: 5827
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5812
+Lexical callables requiring semantic proof before behavior changes: 5827
 ```
 
 This is an artifact commit readiness gate, not an artifact packet. It prevents
@@ -124,9 +124,9 @@ foundation packet rows covered: 12
 artifact path boundary rows covered: 10
 implementation readiness rows covered: 14
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5812
+method semantic proof gap lexical callables covered: 5827
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5812
+lexical callables requiring semantic proof before behavior changes: 5827
 expected runtime audit tests: 4457
 expected runtime audit pass: 4457
 expected runtime audit fail: 0

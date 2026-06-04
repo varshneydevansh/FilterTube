@@ -34,7 +34,7 @@ Current tracked root metadata inventory: 7 files, 2,950 newline counts, and
 | `.gitignore` | 153 | 2,197 | `c90a7834297cf0a7b65493f41a21947fd5d85d1e14740b902cb3a3664028e3ca` |
 | `CHANGELOG.md` | 591 | 40,124 | `e22a87ce7eeb88d171587d4b0f4676881a2c3081a7fbf15978d7e8d8582cdfdd` |
 | `LICENSE` | 21 | 1,073 | `d0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d` |
-| `README.md` | 401 | 22,476 | `56bbb7e032fb38441dd8253247f9552e4177d7a485768ec41da30e694d0d2fb5` |
+| `README.md` | 401 | 22,476 | `3d7ca25a3f73f16b3f5ce1e8864fbcff013b1a545b75da9db2f1c3ffcfbc29f2` |
 | `channel-identity-watch-mix-collab-recovery-plan.md` | 262 | 16,023 | `01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a` |
 | `package.json` | 61 | 2,405 | `36053d322780ce787de403be574cc400936ef2a994b4c8eca62561154fe81aec` |
 | `package-lock.json` | 1,461 | 49,916 | `f52d6482693be9cd4edacdc1f1491b4d2cda796522bfd0e4dcf86e0c879ad974` |
@@ -135,7 +135,7 @@ vendor-bundle freshness, generated UI freshness, and release ZIP contents.
 ## Public Root Documents
 
 `README.md` is public release copy. It currently displays version `3.3.2`,
-license `MIT`, total line count `516.8k`, JavaScript line count `75.9k`, and
+license `MIT`, total line count `517.0k`, JavaScript line count `76.1k`, and
 links the download hub `https://filtertube.in/downloads`.
 
 Current README claims relevant to optimization and JSON-first filtering:
@@ -259,9 +259,9 @@ can support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5812
+method semantic proof gap lexical callables covered: 5827
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5812
+lexical callables requiring semantic proof before behavior changes: 5827
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

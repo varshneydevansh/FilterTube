@@ -206,9 +206,9 @@ test('rollback unclaimed surface rows counts and field names stay pinned', () =>
   assert.match(doc, /runtime metric collector approvals: 0/);
   assert.match(doc, /implementation-ready rollback\/unclaimed rows: 0/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5812/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5827/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5812/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5827/);
   assert.match(doc, /expected runtime audit tests: 4457/);
   assert.match(doc, /expected runtime audit pass: 4457/);
   assert.match(doc, /expected runtime audit fail: 0/);
@@ -244,9 +244,9 @@ test('rollback unclaimed surface boundary is backed by current parity release an
   assert.match(diagnosticPrivacyContract, /release package changes, or public\s+claims/);
   assert.match(metricCoverage, /method semantic proof gap files covered: 69/);
   assert.match(methodGap, /tracked JS\/JSX\/MJS files: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5812/);
+  assert.match(methodGap, /repo-wide lexical callables: 5827/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5812/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5827/);
   assert.match(collectorParityRollout, /runtime collector parity rollout proofs approved: 0/);
   assert.match(jsonDomInventory, /native sync proof, release proof, and public claim proof exist/);
   assert.match(nativeRuntimeSync, /generated assets, native parity, release packages, and public claims/);

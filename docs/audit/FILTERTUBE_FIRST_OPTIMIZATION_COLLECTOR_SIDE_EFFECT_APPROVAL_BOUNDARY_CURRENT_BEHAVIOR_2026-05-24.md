@@ -38,9 +38,9 @@ Runtime collector side-effect budgets approved: 0
 Committed side-effect budget files: 0
 Implementation-ready collector side-effect approval rows: 0
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5812
+Method semantic proof gap lexical callables covered: 5827
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5812
+Lexical callables requiring semantic proof before behavior changes: 5827
 ```
 
 This is a side-effect approval boundary, not a side-effect optimization. It
@@ -102,9 +102,9 @@ runtime unclaimed-surface approvals: 0
 committed side-effect budget files: 0
 implementation-ready collector side-effect approval rows: 0
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5812
+method semantic proof gap lexical callables covered: 5827
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5812
+lexical callables requiring semantic proof before behavior changes: 5827
 expected runtime audit tests: 4457
 expected runtime audit pass: 4457
 expected runtime audit fail: 0

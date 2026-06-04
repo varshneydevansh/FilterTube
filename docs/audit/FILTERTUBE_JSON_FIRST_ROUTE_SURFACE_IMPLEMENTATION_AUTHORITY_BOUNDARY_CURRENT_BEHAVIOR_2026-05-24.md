@@ -23,9 +23,9 @@ Route/surface effect classes covered: 9
 Route/surface metric obligations covered: 12
 Runtime JSON-first route/surface approvals: 0
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5812
+Method semantic proof gap lexical callables covered: 5827
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5812
+Lexical callables requiring semantic proof before behavior changes: 5827
 Implementation-ready JSON-first route/surface rows: 0
 ```
 
@@ -62,9 +62,9 @@ JSON-first whitelist decision states covered: 7
 candidate-obligation binding rows covered: 10
 first optimization implementation readiness rows covered: 14
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5812
+method semantic proof gap lexical callables covered: 5827
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5812
+lexical callables requiring semantic proof before behavior changes: 5827
 runtime JSON-first route/surface approvals: 0
 runtime route/surface metric artifacts: 0
 runtime JSON-first implementation approvals: 0

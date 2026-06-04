@@ -189,7 +189,7 @@ function validateManagedPolicyEnvelope(envelope, context = baseContext()) {
   return { accepted: true, decision: 'accept_newer_revision' };
 }
 
-test('managed policy schema contract document pins required envelope and validation-only runtime boundary', () => {
+test('managed policy schema contract document pins required envelope and receive-side gated runtime boundary', () => {
   const doc = read(docPath);
   const inventory = read(inventoryPath);
   const runtime = [
@@ -199,20 +199,24 @@ test('managed policy schema contract document pins required envelope and validat
     read('js/background.js')
   ].join('\n');
 
-  assert.match(doc, /Status\*\*: Runtime validation helper present/);
+  assert.match(doc, /Status\*\*: Runtime validation helper and receive-side validation context\s+present/);
   assert.match(doc, /Remote managed profile writes\s+are still blocked/);
   assert.match(doc, /filtertube_managed_policy/);
   assert.match(doc, /Managed Envelope Shape/);
   assert.match(doc, /Revision Decision Matrix/);
   assert.match(doc, /Negative Fixture Requirements/);
   assert.match(doc, /runtime filtertube_managed_policy envelope support: validation helper present/);
-  assert.match(doc, /runtime managed policy persistent revision store: absent/);
+  assert.match(doc, /runtime filtertube_managed_policy receive path: parses envelope, builds validation context, records protected validation evidence/);
+  assert.match(doc, /runtime managed policy persistent accepted-revision writer: absent/);
   assert.match(doc, /runtime remote profile write from filtertube_managed_policy: blocked through legacy applyIncomingEnvelope/);
-  assert.match(inventory, /validation-only managed policy envelope helper/i);
-  assert.match(inventory, /no remote managed policy revision store/i);
+  assert.match(inventory, /validation-only managed envelope helper/i);
+  assert.match(inventory, /no persisted accepted-revision writer/i);
   assert.match(inventory, /No cryptographic signature verification/);
   assert.match(inventory, /partial canonical payload\/integrity binding/i);
   assert.match(runtime, /function validateManagedPolicyEnvelope\(envelope, context = \{\}\)/);
+  assert.match(runtime, /function buildManagedNanahPolicyValidationContext\(envelope, profilesV4 = profilesV4Cache\)/);
+  assert.match(runtime, /function getManagedNanahPolicyAcceptedState\(profile, linkId, scope\)/);
+  assert.match(runtime, /function handleNanahIncomingManagedPolicyEnvelope\(envelope\)/);
   assert.match(runtime, /filtertube_managed_policy/);
   assert.match(runtime, /Managed policy envelopes require validated managed apply flow/);
   assert.doesNotMatch(runtime, /managedPolicyRevisionStore/);

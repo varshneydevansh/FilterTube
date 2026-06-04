@@ -345,10 +345,10 @@ test('JSON-first network snapshot source precedence audit is audit-only and sour
 test('network snapshot family docs carry the method semantic proof gap blocker', () => {
   const methodGap = read(methodGapPath);
 
-  assert.match(methodGap, /repo-wide lexical callables: 5812/);
+  assert.match(methodGap, /repo-wide lexical callables: 5827/);
   assert.match(methodGap, /files with lexical accounting: 69/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5812/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5827/);
 
   assert.equal(networkSnapshotFamilyDocs.length, 15);
   for (const familyDocPath of networkSnapshotFamilyDocs) {
@@ -356,9 +356,9 @@ test('network snapshot family docs carry the method semantic proof gap blocker',
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 69/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5812/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5827/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5812/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5827/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     assert.match(familyDoc, /runtime behavior changed: no/);
     assert.match(familyDoc, /do not approve runtime\s+optimization/);
