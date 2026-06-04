@@ -220,7 +220,7 @@ P0 release-package addendum: `docs/audit/FILTERTUBE_P0_RELEASE_PACKAGE_CURRENT_B
 
 2026-05-27 browser manifest permission/resource validation snapshot: the same P0 release-package doc and verifier now pin the current four-manifest permission and resource policy: 5 exact permissions per manifest, 3 exact host permissions per manifest, active content-script and web-accessible-resource matches limited to `youtube.com` and `youtubekids.com`, 4 host-only `youtube-nocookie.com` gaps, 0 content-script CSS references, Chrome/default explicit `MAIN` plus `ISOLATED` world split, Firefox one implicit-world content script entry, and Opera two implicit-world content script entries. This strengthens release package parity, manifest/permission, manifest/resource, host-scope, false-hide/leak, code-burden, and implementation-change rows, but does not open the release gate: build-time permission, host, web-accessible-resource, content-script world, committed package manifest, installed-runtime byte parity, and reload/package validation remain `NO-GO`.
 
-2026-05-27 current local dist package snapshot: the same P0 release-package doc and verifier now pin the existing ignored `dist/` tree as local artifact evidence: 3 browser staged directories, 59 staged files per browser, 3 ZIP artifacts, 180 total `dist` files including ZIPs, 58 source-backed non-manifest staged files per browser, 54 byte-identical source-backed non-manifest staged files per browser, per-browser staged group counts, browser manifest hashes, and local ZIP hashes. This strengthens release package parity, generated-output, package artifact, manifest/resource, code-burden, source/evidence, and implementation-change rows, but does not open the release gate: committed package manifest authority, reproducible package build authority, loaded-browser package/runtime parity authority, upload proof, public-claim proof, and release publication authority remain `NO-GO`.
+2026-06-04 current local dist package snapshot: the same P0 release-package doc and verifier now pin the existing ignored `dist/` tree as local artifact evidence: 3 browser staged directories, 61 staged files per browser, 3 ZIP artifacts, 186 total `dist` files including ZIPs, 60 source-backed non-manifest staged files per browser, 60 byte-identical source-backed non-manifest staged files per browser, per-browser staged group counts, browser manifest hashes, and local ZIP hashes. This strengthens release package parity, generated-output, package artifact, manifest/resource, code-burden, source/evidence, and implementation-change rows, but does not open the release gate: committed package manifest authority, reproducible package build authority, loaded-browser package/runtime parity authority, upload proof, public-claim proof, and release publication authority remain `NO-GO`.
 
 2026-05-27 Chrome Default unpacked workspace byte snapshot: the same P0 release-package doc and verifier now pin local Default profile installed-path evidence for `gkgjigdfdccckblmglboobikfcpeelio`: Secure Preferences points at `/Users/devanshvarshney/FilterTube`, the path matches the current workspace root, stored version is 3.3.2, Local Extension Settings exists, no packed `Default/Extensions/<id>` directory is present, current `manifest.json`, `package.json`, and `js/content_bridge.js` hashes are recorded, and the workspace content bridge contains the ampersand Topic fix token. This strengthens release package parity, installed-profile provenance, false-hide/leak, reliability, and implementation-change rows, but does not open the browser runtime gate: running-tab content-script byte authority and extension reload timestamp authority remain `NO-GO`.
 
@@ -422,7 +422,7 @@ Legacy layout method semantic register addendum: `docs/audit/FILTERTUBE_LEGACY_L
 
 Native runtime sync method semantic register addendum: `docs/audit/FILTERTUBE_NATIVE_RUNTIME_SYNC_METHOD_SEMANTIC_REGISTER_2026-05-21.md` and `tests/runtime/native-runtime-sync-method-semantic-register-current-behavior.test.mjs` extend the method/callable, release/package, native app sync, static/generated/source boundary, JSON-first filtering parity, reliability, false-hide/leak, performance-risk, code-burden, cross-feature interaction, and implementation-change rows without opening the implementation gate. This current-behavior slice promotes `scripts/sync-native-runtime.mjs` from a release/native marker to a source-derived method, package-script, delegation, manifest, and app-boundary inventory: 34 source lines, 1,070 source bytes, 4 script-level semantic phases, 0 named method declarations, 0 plain function declarations, 0 async function declarations, 0 arrow token sites, 3 import declarations, 6 const declarations, 1 `spawnSync` call site, 3 `process.exit` calls, 0 listeners, 0 timers, 0 observers, 0 fetch calls, and 0 write/copy/remove file mutation calls in the public wrapper. It pins that `npm run sync:native-runtime` invokes the wrapper, normal `npm run build` does not invoke it, the wrapper resolves `FILTERTUBE_APP_REPO` or sibling `../FilterTubeApp`, delegates with `spawnSync(process.execPath, [syncScript])`, inherits env and stdio, and exits `result.status ?? 1`. It also pins the sibling app boundary: `/Users/devanshvarshney/FilterTubeApp/tools/sync-runtime-from-extension.mjs` has 2,284 lines, 109,397 bytes, 18 total named function declarations, and 16 `runtimeBundleOrder` entries, while the current app manifest has 32 entries all sourced from `/Users/devanshvarshney/FilterTube`, has 0 `destinationKind` fields, includes `js/layout.js`, `js/vendor/nanah.bundle.js`, `js/vendor/qrcode.bundle.js`, the managed app policy contract artifact, `js/nanah_managed_live_policy.js`, and `js/nanah_managed_open_sync.js`, and excludes `data/release_notes.json`. No `nativeSyncWrapperMethodAuthority`, `nativeSyncWrapperAppRepoContract`, `nativeSyncWrapperAppRevisionReport`, `nativeSyncWrapperManifestHashReport`, `nativeSyncWrapperDestinationKindManifest`, `nativeSyncWrapperBuildIntegrationGate`, `nativeSyncWrapperReleaseFreshnessReport`, `nativeSyncWrapperStatusContract`, `nativeSyncWrapperFixtureProvenance`, or `nativeSyncWrapperRawCaptureExclusionReport` exists in the public wrapper, package file, build script, app sync script, or current app runtime manifest yet.
 
-Native runtime sync manifest freshness boundary addendum: `docs/audit/FILTERTUBE_NATIVE_RUNTIME_SYNC_MANIFEST_FRESHNESS_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md` and `tests/runtime/native-runtime-sync-manifest-freshness-boundary-current-behavior.test.mjs` extend the native sync, release/package, generated runtime, release-note parity, first-class JSON filtering parity, reliability, false-hide/leak, performance-risk, code-burden, cross-feature interaction, source/evidence boundary, and implementation-change rows without opening the implementation gate. This current-behavior slice promotes wrapper/app-boundary proof into direct app manifest freshness proof: app dirty state is not release authority for this contract-plus-helper-copy slice, 32 runtime sync manifest entries, 0 `destinationKind` fields, 26 direct source/destination hash matches, 6 direct hash diffs, 38 broad extension-source mirror hash matches, 0 missing mirror files, 8 mirror hash diffs, 16 `runtimeBundleOrder` entries including `js/layout.js`, 6 generated app runtime artifact hashes, and release-note drift between public `data/release_notes.json` and current Android/iOS native release-note resources. It pins current behavior: the managed contract and managed Nanah helper copy rows match the public checkout bytes, broader runtime mirror rows are stale, no emitted report ties public revision, app revision, dirty state, manifest hash, destination hashes, generated runtime hashes, and release artifacts together; generated Android/iOS runtime assets are app-side outputs; and native release notes are outside the direct runtime sync manifest. No `nativeRuntimeSyncManifestFreshnessContract`, `nativeRuntimeSyncDirectCopyHashReport`, `nativeRuntimeSyncGeneratedRuntimeHashReport`, `nativeRuntimeSyncAppDirtyStateReport`, `nativeRuntimeSyncReleaseNotesParityReport`, `nativeRuntimeSyncDestinationKindManifest`, `nativeRuntimeSyncSourceMirrorReport`, `nativeRuntimeSyncRuntimeBundleOrderGate`, `nativeRuntimeSyncLayoutQuarantineGate`, or `nativeRuntimeSyncFirstClassJsonParityGate` exists in the public wrapper, package file, build script, app sync script, or current app runtime manifest yet.
+Native runtime sync manifest freshness boundary addendum: `docs/audit/FILTERTUBE_NATIVE_RUNTIME_SYNC_MANIFEST_FRESHNESS_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md` and `tests/runtime/native-runtime-sync-manifest-freshness-boundary-current-behavior.test.mjs` extend the native sync, release/package, generated runtime, release-note parity, first-class JSON filtering parity, reliability, false-hide/leak, performance-risk, code-burden, cross-feature interaction, source/evidence boundary, and implementation-change rows without opening the implementation gate. This current-behavior slice promotes wrapper/app-boundary proof into direct app manifest freshness proof: app dirty state is not release authority for this contract-plus-helper-copy slice, 32 runtime sync manifest entries, 0 `destinationKind` fields, 32 direct source/destination hash matches, 0 direct hash diffs, 46 broad extension-source mirror hash matches, 0 missing mirror files, 0 mirror hash diffs, 16 `runtimeBundleOrder` entries including `js/layout.js`, 6 generated app runtime artifact hashes, and release-note drift between public `data/release_notes.json` and current Android/iOS native release-note resources. It pins current behavior: managed contract, managed Nanah helper rows, manifest-listed direct copies, and the broad extension-source mirror match the public checkout bytes, but no emitted report ties public revision, app revision, dirty state, manifest hash, destination hashes, generated runtime hashes, and release artifacts together; generated Android/iOS runtime assets are app-side outputs; and native release notes are outside the direct runtime sync manifest. No `nativeRuntimeSyncManifestFreshnessContract`, `nativeRuntimeSyncDirectCopyHashReport`, `nativeRuntimeSyncGeneratedRuntimeHashReport`, `nativeRuntimeSyncAppDirtyStateReport`, `nativeRuntimeSyncReleaseNotesParityReport`, `nativeRuntimeSyncDestinationKindManifest`, `nativeRuntimeSyncSourceMirrorReport`, `nativeRuntimeSyncRuntimeBundleOrderGate`, `nativeRuntimeSyncLayoutQuarantineGate`, or `nativeRuntimeSyncFirstClassJsonParityGate` exists in the public wrapper, package file, build script, app sync script, or current app runtime manifest yet.
 
 Website client lifecycle surface addendum: `docs/audit/FILTERTUBE_WEBSITE_CLIENT_LIFECYCLE_SURFACE_CURRENT_BEHAVIOR_2026-05-21.md` and `tests/runtime/website-client-lifecycle-surface-current-behavior.test.mjs` extend the tracked-file, website component, runtime lifecycle, localStorage, hydration, menu interaction, public-claim, performance-risk, code-burden, source/evidence boundary, first-class JSON public-claim, and implementation-change rows without opening the implementation gate. This current-behavior slice promotes the website client shell from broad route context to a lifecycle inventory: 22 tracked website app/component JavaScript files, 3 `"use client";` files, `website/app/layout.js` beforeInteractive bootstrap, `website/components/scene-controller.js` scene timer/listener owner, `website/components/theme-toggle.js` storage/custom-event owner, and `website/components/site-header.js` mobile menu owner. It pins 3 `useEffect(...)` calls, 1 `useEffectEvent(...)` call, 2 `useState(...)` calls, 1 `startTransition(...)` call, 3 add/remove listener pairs across scene/theme code, 1 `window.setTimeout(...)` call, 2 `window.clearTimeout(...)` calls, 2 `localStorage.getItem(...)` calls, 1 `localStorage.setItem(...)` call, 1 `window.dispatchEvent(...)` call, and 4 JSX `onClick=` props, with no tracked website app/component `fetch(...)`, observer, interval, animation-frame, or `sessionStorage` references. The 2026-05-27 method-semantic continuation adds 22 selected method/callback rows: 8 scene controller rows, 8 theme toggle rows, 5 site header rows, 1 reveal row, 3 listener rows, 1 timer row, 1 storage-write row, and 1 dispatch row. It adds ASCII and Mermaid lifecycle diagrams for layout bootstrap, scene scheduling, theme storage, header menu state, and reveal rendering boundaries, while keeping website client method semantic proof PARTIAL and lifecycle cleanup, theme preference authority, timer/listener budgets, and first-class JSON public-claim use at NO-GO. No `websiteClientLifecycleAuthority`, `websiteHydrationScriptContract`, `websiteSceneScheduleBudget`, `websiteThemePreferenceAuthority`, `websiteClientListenerRegistry`, `websiteClientTimerBudget`, `websiteLocalStorageContract`, `websiteHeaderMenuInteractionAuthority`, `websiteClientLifecycleFixtureProvenance`, or `websiteFirstClassJsonPublicClaimGate` exists in tracked website app/component source yet.
 
@@ -2325,7 +2325,7 @@ pruning, and release/public-claim use remain `NO-GO`; continued audit remains
 2026-05-28 listener-option shape continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now adds
 ASCII plus Mermaid listener option diagrams and a source-derived split for all
-292 `addEventListener` installs. It records 236 omitted-option listeners, 23
+294 `addEventListener` installs. It records 238 omitted-option listeners, 23
 boolean capture listeners, 30 object-option listeners, 1 explicit bubble
 listener, and 2 generated expression/identifier option listeners. This extends
 objective coverage for runtime listeners, menu/scroll ordering, passive-event
@@ -2339,7 +2339,7 @@ and release/public-claim use remain `NO-GO`; continued audit remains `GO`.
 2026-05-28 listener-event type continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now adds
 ASCII plus Mermaid listener event diagrams and a source-derived split for all
-292 `addEventListener` installs. It records 114 click listeners, 57 change
+294 `addEventListener` installs. It records 116 click listeners, 57 change
 listeners, 20 input listeners, 14 keydown listeners, 8 `DOMContentLoaded`
 listeners, 1 `ended` media listener, 74 other literal event listeners, 4
 non-literal event expressions, and 0 missing event arguments. This extends
@@ -2388,7 +2388,7 @@ logging cleanup approval `NO-GO`, and continued audit remains `GO`.
 2026-05-28 listener-target continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now adds
 ASCII plus Mermaid listener target diagrams and a source-derived split for all
-292 `addEventListener` installs. It records 205 local element targets, 17
+294 `addEventListener` installs. It records 207 local element targets, 17
 optional local element targets, 41 document targets, 19 window targets, 8
 vendor transport targets, and 2 generated shell targets. This extends objective
 coverage for runtime listeners, target ownership, native menu interference,
@@ -2405,10 +2405,10 @@ audit remains `GO`.
 2026-05-28 listener event-target matrix continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now adds
 ASCII plus Mermaid listener event-target diagrams and a source-derived joined
-matrix for all 292 `addEventListener` installs. It records 10 document click
+matrix for all 294 `addEventListener` installs. It records 10 document click
 pairs, 7 document `DOMContentLoaded` pairs, 3 document keydown pairs, 4
 document pointer/mouse pairs, 4 window message pairs, 2 window route pairs, 9
-window scroll/resize/orientation pairs, 1 window storage/visibility pair, 104
+window scroll/resize/orientation pairs, 1 window storage/visibility pair, 106
 local click pairs, 70 local change/input/keydown pairs, 8 vendor transport
 lifecycle pairs, and 2 generated shell nonliteral pairs. This extends
 objective coverage for runtime listeners, native menu interference, SPA route
@@ -2547,11 +2547,11 @@ remains `GO`.
 
 2026-05-28 timer-delay shape continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now adds
-ASCII plus Mermaid timer delay diagrams and a source-derived split for all 126
-current tracked `setTimeout` and `setInterval` delay arguments. It records 123
-`setTimeout` delay rows, 3 `setInterval` delay rows, 16 zero-delay timers, 16
+ASCII plus Mermaid timer delay diagrams and a source-derived split for all 128
+current tracked `setTimeout` and `setInterval` delay arguments. It records 124
+`setTimeout` delay rows, 4 `setInterval` delay rows, 16 zero-delay timers, 16
 1-99ms timers, 18 100-199ms timers, 17 200-999ms timers, 13 1000-4999ms
-timers, 4 5000ms-plus timers, 37 named/expression timers, 5 `Math.max(...)`
+timers, 4 5000ms-plus timers, 39 named/expression timers, 5 `Math.max(...)`
 expression timers, and 0 missing delay arguments. This extends objective
 coverage for runtime timers, observer/listener/timer lifecycle, YouTube SPA lag
 risk, no-rule budgets, menu/quick-block timing, JSON replay timing, background
@@ -2567,11 +2567,11 @@ remains `GO`.
 2026-05-28 timer-callback identity continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now adds
 ASCII plus Mermaid timer-callback diagrams and a source-derived split for all
-126 current tracked `setTimeout` and `setInterval` callback arguments. It
-records 123 `setTimeout` callback rows, 3 `setInterval` callback rows, 107
+128 current tracked `setTimeout` and `setInterval` callback arguments. It
+records 124 `setTimeout` callback rows, 4 `setInterval` callback rows, 109
 inline arrow timer callbacks, 19 identifier timer callbacks, 0 inline function
 timer callbacks, 0 member-reference timer callbacks, 0 missing callback
-arguments, 86 content-runtime timer callbacks, 39 extension UI/background timer
+arguments, 88 content-runtime timer callbacks, 39 extension UI/background timer
 callbacks, and 1 website-component timer callback. This extends objective
 coverage for timer pruning, callback coalescing, debounce behavior, SPA refresh
 cadence, menu/quick-block timing, JSON replay timing, background flush timing,
@@ -2587,18 +2587,18 @@ remains `GO`.
 2026-05-28 timer schedule/clear parity continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now adds
 ASCII plus Mermaid timer schedule/clear parity diagrams and a source-derived
-join for all 123 tracked `setTimeout` schedules, 34 tracked `clearTimeout`
-rows, 3 tracked `setInterval` schedules, and 4 tracked `clearInterval` rows.
-It records an 89 timeout schedule-minus-clear delta, -1 interval
+join for all 124 tracked `setTimeout` schedules, 34 tracked `clearTimeout`
+rows, 4 tracked `setInterval` schedules, and 5 tracked `clearInterval` rows.
+It records a 90 timeout schedule-minus-clear delta, -1 interval
 schedule-minus-clear delta, 11 timeout schedules with assigned local id
-handles, 24 assigned named state handles, 10 assigned property-held handles, 63
+handles, 24 assigned named state handles, 11 assigned property-held handles, 63
 fire-and-forget schedules, 14 promise sleep/timeout schedules, 1 returned timer
-handle schedule, 3 interval schedules with assigned named state handles, 32
+handle schedule, 4 interval schedules with assigned named state handles, 32
 `clearTimeout` rows with direct schedule handle, 2 `clearTimeout` rows without
-direct schedule handle, 26 handled timeout schedule rows with clear handle, 19
+direct schedule handle, 26 handled timeout schedule rows with clear handle, 20
 handled timeout schedule rows without clear handle, 18 distinct scheduled
-timeout handles without clear, 4 `clearInterval` rows with direct schedule
-handle, 0 `clearInterval` rows without direct schedule handle, 3 handled
+timeout handles without clear, 5 `clearInterval` rows with direct schedule
+handle, 0 `clearInterval` rows without direct schedule handle, 4 handled
 interval schedule rows with clear handle, 0 handled interval schedule rows
 without clear handle, and 0 distinct scheduled interval handles without clear.
 This extends objective coverage for timer teardown, debounce behavior, SPA
@@ -2636,11 +2636,11 @@ release/public-claim use remain `NO-GO`; continued audit remains `GO`.
 2026-05-28 listener-callback identity continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now adds
 ASCII plus Mermaid listener-callback diagrams and a source-derived split for
-all 292 current tracked `addEventListener` callback arguments. It records 252
+all 294 current tracked `addEventListener` callback arguments. It records 254
 inline arrow callbacks, 37 identifier callback references, 1 member callback
-reference, 2 generated expression callbacks, 74 content-runtime callbacks, 201
+reference, 2 generated expression callbacks, 74 content-runtime callbacks, 203
 extension UI/background callbacks, 2 generated-output callbacks, 8
-vendor-bundle callbacks, and 3 website-component callbacks. This extends
+vendor-bundle callbacks, and 7 website-component callbacks. This extends
 objective coverage for listener teardown, duplicate-install risk,
 closure-capture proof, native menu behavior, quick-block/menu timing, SPA
 route work, settings/list-mode predicates, generated shell freshness, vendor
@@ -2721,13 +2721,13 @@ continued audit remains `GO`.
 2026-05-28 listener add/remove parity continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now adds
 ASCII plus Mermaid listener add/remove parity diagrams and a source-derived
-join for all 292 tracked `addEventListener` installs and 9 tracked
-`removeEventListener` teardowns. It records a 279 install-minus-remove delta,
+join for all 294 tracked `addEventListener` installs and 13 tracked
+`removeEventListener` teardowns. It records a 281 install-minus-remove delta,
 13 capture-equivalent remove pairs, 12 exact option-shape remove pairs, 1
 capture-equivalent option-shape mismatch pair, 0 remove rows without a
 capture-equivalent add pair, 51 page-global listener installs without explicit
-remove, 252 inline listener installs without remove handle, 70 content-runtime
-add/remove delta, 201 extension UI/background delta, 0 generated-output delta,
+remove, 254 inline listener installs without remove handle, 70 content-runtime
+add/remove delta, 203 extension UI/background delta, 0 generated-output delta,
 8 vendor-bundle delta, 0 website-component delta, 7 document listener removes,
 2 window listener removes, and 2 generated shell listener removes. This
 extends objective coverage for listener teardown, page-lifetime listener
@@ -3015,11 +3015,11 @@ extend objective coverage for runtime timers, page-runtime lag analysis,
 native/menu timing, whitelist pending work, settings propagation, cache flush
 timing, no-work budgets, performance-risk, false-hide/leak, code-burden, and
 cross-feature interaction without changing product runtime behavior. The
-continuation pins 126 timer owner-context rows, 13 timer owner domains, 86
+continuation pins 128 timer owner-context rows, 13 timer owner domains, 88
 content-runtime timer owner-context rows, 39 extension UI/background timer
 owner-context rows, 1 website component timer owner-context row, 37 content
 bridge timer rows, 16 quick/menu timer rows, 15 dashboard timer rows, 10
-background timer rows, 10 DOM fallback timer rows, and ASCII plus Mermaid timer
+background timer rows, 11 DOM fallback timer rows, and ASCII plus Mermaid timer
 owner-domain diagrams. Timer owner-context cleanup, timer pruning, route
 teardown authority, native/menu timing authority, whitelist/cache optimization,
 JSON-first promotion, and release/public-claim use remain `NO-GO`; continued
@@ -3272,10 +3272,10 @@ extend objective coverage for runtime timer delay budgets, page-runtime lag
 analysis, native/menu timing, whitelist pending work, DOM fallback scan
 pressure, settings propagation, no-work budgets, performance-risk,
 false-hide/leak, code-burden, and cross-feature interaction without changing
-product runtime behavior. The continuation pins 126 timer owner delay-budget
+product runtime behavior. The continuation pins 128 timer owner delay-budget
 rows, 16 immediate-zero timer rows, 34 short-under-200ms timer rows, 17
 medium-200-999ms timer rows, 17 long-1000ms-plus timer rows, 5
-bounded-expression timer rows, 37 named-or-expression timer rows, 13 content
+bounded-expression timer rows, 39 named-or-expression timer rows, 13 content
 bridge immediate-or-short timer rows, 9 quick/menu immediate-or-short timer
 rows, 6 DOM fallback immediate-or-short timer rows, 5 dashboard
 immediate-or-short timer rows, and ASCII plus Mermaid timer owner

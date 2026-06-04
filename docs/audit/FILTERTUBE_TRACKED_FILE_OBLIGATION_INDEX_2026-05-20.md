@@ -10,7 +10,7 @@ Completion is not proven. Every row remains `obligation-open` until a future fea
 
 ```text
 git ls-files
-156 tracked source files outside docs/audit and tests
+158 tracked source files outside docs/audit and tests
 ```
 
 Ignored raw captures and generated output remain outside this index. If any path below changes family, starts affecting runtime, or becomes generated/release source, this index and its test must change in the same patch.
@@ -100,6 +100,8 @@ Ignored raw captures and generated output remain outside this index. If any path
 | `js/injector.js` | `content-runtime-js` | Route, mode, source-confidence, side-effect, no-work, teardown, and sibling-visible behavior proof. | obligation-open |
 | `js/io_manager.js` | `extension-ui-background-js` | Storage mutation, compiled-settings, profile/mode, message trust, UI action, and sync proof. | obligation-open |
 | `js/layout.js` | `quarantined-legacy-js` | Manifest-inactive quarantine and replacement/deletion proof. | obligation-open |
+| `js/nanah_managed_live_policy.js` | `extension-ui-background-js` | Storage mutation, compiled-settings, profile/mode, message trust, UI action, and sync proof. | obligation-open |
+| `js/nanah_managed_open_sync.js` | `extension-ui-background-js` | Storage mutation, compiled-settings, profile/mode, message trust, UI action, and sync proof. | obligation-open |
 | `js/nanah_sync_adapter.js` | `extension-ui-background-js` | Storage mutation, compiled-settings, profile/mode, message trust, UI action, and sync proof. | obligation-open |
 | `js/popup.js` | `extension-ui-background-js` | Storage mutation, compiled-settings, profile/mode, message trust, UI action, and sync proof. | obligation-open |
 | `js/render_engine.js` | `extension-ui-background-js` | Storage mutation, compiled-settings, profile/mode, message trust, UI action, and sync proof. | obligation-open |
@@ -458,7 +460,7 @@ Background compiled cache invalidation lifecycle boundary addendum: `docs/audit/
 
 StateManager request refresh fanout boundary addendum: `docs/audit/FILTERTUBE_STATE_MANAGER_REQUEST_REFRESH_FANOUT_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md` and `tests/runtime/state-manager-request-refresh-fanout-boundary-current-behavior.test.mjs` adds current-behavior proof for the open settings-mode, storage/cache, message mutation, profile/viewing-space, JSON-first readiness, performance, reliability, false-hide/leak, code-burden, cross-feature, and source/evidence rows in `js/state_manager.js`. It pins 1 StateManager request refresh fanout source file, 10 source/effect blocks, 59 saveSettingsBroadcastPath block lines, 2677 saveSettingsBroadcastPath block bytes, 11 broadcastSettings block lines, 309 broadcastSettings block bytes, 15 requestRefresh block lines, 486 requestRefresh block bytes, 302 kidsRequestRefreshMutations block lines, 11258 kidsRequestRefreshMutations block bytes, 214 mainKeywordRequestRefreshMutations block lines, 8120 mainKeywordRequestRefreshMutations block bytes, 74 mainChannelWhitelistRequestRefresh block lines, 3276 mainChannelWhitelistRequestRefresh block bytes, 110 subscriptionImportRequestRefresh block lines, 4533 subscriptionImportRequestRefresh block bytes, 39 mainChannelRemoveRequestRefresh block lines, 1391 mainChannelRemoveRequestRefresh block bytes, 112 syncKidsToMainRequestRefresh block lines, 4232 syncKidsToMainRequestRefresh block bytes, 104 contentCategoryRequestRefresh block lines, 4476 contentCategoryRequestRefresh block bytes, 18 requestRefresh callsite rows, 10 selected `await requestRefresh('main')` tokens, 8 selected `await requestRefresh('kids')` tokens, 3 selected `broadcastSettings(` tokens, 1 selected `FilterTube_ApplySettings` token, 1 selected `getCompiledSettings` token, 1 selected `forceRefresh` token, 10 selected `await saveSettings()` tokens, 6 selected `persistMainProfiles(` tokens, 9 selected `persistKidsProfiles(` tokens, and 0 selected `settingsRevision` tokens. It pins current harness behavior: `saveSettings()` can broadcast `result.compiledSettings` directly; `broadcastSettings()` sends caller payloads through `FilterTube_ApplySettings`; `requestRefresh()` asks background for `getCompiledSettings` with `forceRefresh:true` and rebounds that response through the same apply-settings surface; Main whitelist branches use `persistMainProfiles()` plus `requestRefresh('main')` while blocklist branches generally use `saveSettings()`; Kids mutation branches use profile persistence plus `requestRefresh('kids')`; subscription import and `syncKidsToMain` add profile/import side effects before `requestRefresh('main')`; and Main content/category changes can produce direct save broadcast plus background force-refresh rebound. This does not close those rows: request-refresh contracts, callsite reports, direct compiled broadcast policies, background refresh rebound policies, revision reports, profile scope reports, save-vs-refresh decision reports, content/category refresh budgets, Kids mutation refresh policies, metrics, and first-class StateManager refresh fanout gates are still missing.
 
-Native runtime sync manifest freshness boundary addendum: `docs/audit/FILTERTUBE_NATIVE_RUNTIME_SYNC_MANIFEST_FRESHNESS_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md` and `tests/runtime/native-runtime-sync-manifest-freshness-boundary-current-behavior.test.mjs` adds current-behavior proof for open native sync, release/package, generated runtime, release-note parity, first-class JSON filtering parity, false-hide/leak, performance, code-burden, cross-feature, source/evidence, and implementation-change rows in `scripts/sync-native-runtime.mjs`, `package.json`, `build.js`, `/Users/devanshvarshney/FilterTubeApp/tools/sync-runtime-from-extension.mjs`, and `/Users/devanshvarshney/FilterTubeApp/tools/runtime-sync-manifest.json`. It pins the public wrapper at 34 lines and 1070 bytes, app sync script at 2284 lines and 109397 bytes, app runtime sync manifest at 226 lines and 9654 bytes, public repo HEAD `ffaca7afd9a73ca2e609e7dd0cb652339af43aaf`, app repo HEAD `b6a4c2fffd0a22622e2bd1b253f626f242480c9e`, app dirty state as not release authority, 32 manifest entries, 0 `destinationKind` fields, 26 direct manifest copy hash matches, 6 direct manifest copy hash diffs, 38 broad source-mirror hash matches, 0 source-mirror missing files, 8 source-mirror hash diffs, 16 `runtimeBundleOrder` entries including `js/layout.js`, 6 generated app runtime artifact hashes, and Android/iOS native release-note resources that differ from current public `data/release_notes.json`. This does not close those rows: sync reports, app/source revision reports, dirty-state policies, destination-kind manifests, generated runtime hash reports, release-note parity reports, layout quarantine gates, native parity fixtures, first-class JSON parity gates, and release artifact gates are still missing.
+Native runtime sync manifest freshness boundary addendum: `docs/audit/FILTERTUBE_NATIVE_RUNTIME_SYNC_MANIFEST_FRESHNESS_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md` and `tests/runtime/native-runtime-sync-manifest-freshness-boundary-current-behavior.test.mjs` adds current-behavior proof for open native sync, release/package, generated runtime, release-note parity, first-class JSON filtering parity, false-hide/leak, performance, code-burden, cross-feature, source/evidence, and implementation-change rows in `scripts/sync-native-runtime.mjs`, `package.json`, `build.js`, `/Users/devanshvarshney/FilterTubeApp/tools/sync-runtime-from-extension.mjs`, and `/Users/devanshvarshney/FilterTubeApp/tools/runtime-sync-manifest.json`. It pins the public wrapper at 34 lines and 1070 bytes, app sync script at 2284 lines and 109397 bytes, app runtime sync manifest at 226 lines and 9654 bytes, public repo HEAD `ffaca7afd9a73ca2e609e7dd0cb652339af43aaf`, app repo HEAD `b6a4c2fffd0a22622e2bd1b253f626f242480c9e`, app dirty state as not release authority, 32 manifest entries, 0 `destinationKind` fields, 32 direct manifest copy hash matches, 0 direct manifest copy hash diffs, 46 broad source-mirror hash matches, 0 source-mirror missing files, 0 source-mirror hash diffs, 16 `runtimeBundleOrder` entries including `js/layout.js`, 6 generated app runtime artifact hashes, and Android/iOS native release-note resources that differ from current public `data/release_notes.json`. This does not close those rows: sync reports, app/source revision reports, dirty-state policies, destination-kind manifests, generated runtime hash reports, release-note parity reports, layout quarantine gates, native parity fixtures, first-class JSON parity gates, and release artifact gates are still missing.
 
 Nanah vendor runtime session lifecycle boundary addendum: `docs/audit/FILTERTUBE_NANAH_VENDOR_RUNTIME_SESSION_LIFECYCLE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md` and `tests/runtime/nanah-vendor-runtime-session-lifecycle-boundary-current-behavior.test.mjs` adds current-behavior proof for open vendor bundle, runtime observer/listener/timer, crypto/session, dashboard Nanah sync, storage payload carrier, reliability, leak, performance, code-burden, cross-feature, JSON-first readiness, source/evidence, native parity, and implementation-change rows in `js/vendor/nanah.bundle.js`, `js/tab-view.js`, `js/nanah_sync_adapter.js`, and `html/tab-view.html`. It pins 4 selected source files, `js/vendor/nanah.bundle.js` at 876 lines and 27692 bytes, 1 `WebRtcDataChannelTransport` class at line 489 with 381 lines and 12964 bytes, 8 selected `addEventListener` tokens, 0 selected `removeEventListener` tokens, 0 selected timers, 18 selected `crypto.subtle` tokens, 6 selected `getRandomValues` tokens, 6 selected `randomUUID` tokens, 6 selected `AES-GCM` tokens, 6 selected `HKDF` tokens, 7 selected `ECDH` tokens, 5 selected `MAX_DATA_CHANNEL_MESSAGE_CHARS` tokens, 4 selected `incomingChunks` tokens, 7 dashboard `client.on` registrations, 3 `nanahClient.send` call sites, 1 `nanahClient.confirmSas` gate, and 1 SAS relay impersonation warning. It pins current harness behavior: Nanah carries settings payloads rather than YouTube response JSON; vendor session listeners are not paired with selected remove-listener tokens; no selected timeout/reconnect/chunk-expiry token exists in the vendor runtime; dashboard reset/apply ownership remains split across tab-view and adapter code; and first-class JSON filter parity is not established by the settings-envelope transport. This does not close those rows: connect timeout policies, reconnect policies, chunk-expiry budgets, listener-owner teardown reports, close teardown fixtures, crypto handshake fixtures, memory/latency budgets, native sync parity reports, and first-class Nanah JSON filter parity gates are still missing.
 
@@ -1306,7 +1308,7 @@ The continuation adds current-behavior proof for open lifecycle,
 observer/listener/timer, menu/quick-block, dashboard/popup, vendor/generated
 freshness, performance, reliability, false-hide/leak, code-burden,
 cross-feature, and source/evidence rows in tracked JS/JSX/MJS files. It pins
-292 `addEventListener` option rows, 232 omitted-option listeners, 23 boolean
+294 `addEventListener` option rows, 238 omitted-option listeners, 23 boolean
 capture listeners, 30 object-option listeners, 1 explicit bubble listener, and
 2 generated expression/identifier option listeners. It keeps listener option
 cleanup authority, lifecycle pruning authority, route-teardown authority, and
@@ -1324,12 +1326,12 @@ observer/listener/timer/frame, timer owner isolation, YouTube SPA lag analysis,
 native/menu timing, whitelist pending work, background cache flush timing,
 settings/list-mode propagation, no-work budget, performance, reliability,
 false-hide/leak, code-burden, cross-feature, and source/evidence rows in
-tracked JS/JSX/MJS files. It pins 126 timer owner-context rows, 13 timer owner
-domains, 123 `setTimeout` rows, 3 `setInterval` rows, 86 content-runtime
+tracked JS/JSX/MJS files. It pins 128 timer owner-context rows, 13 timer owner
+domains, 124 `setTimeout` rows, 4 `setInterval` rows, 88 content-runtime
 timer owner-context rows, 39 extension UI/background timer owner-context rows,
 1 website component timer owner-context row, 37 content bridge timer rows, 16
 quick/menu timer rows, 15 dashboard timer rows, 10 background timer rows, and
-10 DOM fallback timer rows. It keeps timer owner-context cleanup authority,
+11 DOM fallback timer rows. It keeps timer owner-context cleanup authority,
 lifecycle pruning authority, route-teardown authority, native/menu timing
 authority, metric artifact use, and release/public-claim use at `NO-GO`;
 runtime behavior changed by this continuation: no.
@@ -1346,9 +1348,9 @@ analysis, native/menu timing, whitelist pending work, DOM fallback scan
 pressure, background cache flush timing, settings/list-mode propagation,
 no-work budget, performance, reliability, false-hide/leak, code-burden,
 cross-feature, and source/evidence rows in tracked JS/JSX/MJS files. It pins
-126 timer owner delay-budget rows, 16 immediate-zero timer rows, 34
+128 timer owner delay-budget rows, 16 immediate-zero timer rows, 34
 short-under-200ms timer rows, 17 medium-200-999ms timer rows, 17
-long-1000ms-plus timer rows, 5 bounded-expression timer rows, 37
+long-1000ms-plus timer rows, 5 bounded-expression timer rows, 39
 named-or-expression timer rows, 13 content bridge immediate-or-short timer
 rows, 9 quick/menu immediate-or-short timer rows, 6 DOM fallback
 immediate-or-short timer rows, and 5 dashboard immediate-or-short timer rows.
@@ -1989,7 +1991,7 @@ The continuation adds current-behavior proof for open lifecycle,
 observer/listener/timer, menu/quick-block, dashboard/popup, vendor/generated
 freshness, media engagement, route events, performance, reliability,
 false-hide/leak, code-burden, cross-feature, and source/evidence rows in
-tracked JS/JSX/MJS files. It pins 292 `addEventListener` event rows, 114 click
+tracked JS/JSX/MJS files. It pins 294 `addEventListener` event rows, 116 click
 listeners, 57 change listeners, 20 input listeners, 14 keydown listeners, 8
 `DOMContentLoaded` listeners, 1 `ended` media listener, 74 other literal event
 listeners, 4 non-literal event expressions, and 0 missing event arguments. It
@@ -2007,7 +2009,7 @@ row. The continuation adds current-behavior proof for open lifecycle,
 observer/listener/timer, menu/quick-block, dashboard/popup, vendor/generated
 freshness, document/window page-global listeners, performance, reliability,
 false-hide/leak, code-burden, cross-feature, and source/evidence rows in
-tracked JS/JSX/MJS files. It pins 292 `addEventListener` target rows, 205 local
+tracked JS/JSX/MJS files. It pins 294 `addEventListener` target rows, 207 local
 element targets, 17 optional local element targets, 41 document targets, 19
 window targets, 8 vendor transport targets, and 2 generated shell targets. It
 keeps listener target cleanup authority, lifecycle pruning authority,
@@ -2026,10 +2028,10 @@ observer/listener/timer, menu/quick-block, dashboard/popup, native-menu
 document click handling, SPA route listeners, storage/message trust,
 vendor/generated freshness, performance, reliability, false-hide/leak,
 code-burden, cross-feature, and source/evidence rows in tracked JS/JSX/MJS
-files. It pins 292 `addEventListener` event-target matrix rows, 10 document
+files. It pins 294 `addEventListener` event-target matrix rows, 10 document
 click pairs, 7 document `DOMContentLoaded` pairs, 3 document keydown pairs, 4
 document pointer/mouse pairs, 4 window message pairs, 2 window route pairs, 9
-window scroll/resize/orientation pairs, 1 window storage/visibility pair, 104
+window scroll/resize/orientation pairs, 1 window storage/visibility pair, 106
 local click pairs, 70 local change/input/keydown pairs, 8 vendor transport
 lifecycle pairs, and 2 generated shell nonliteral pairs. It keeps listener
 event-target cleanup authority, lifecycle pruning authority, route-teardown
@@ -2177,10 +2179,10 @@ The continuation adds current-behavior proof for open lifecycle,
 observer/listener/timer, menu/quick-block, JSON replay, background flush,
 retry/watchdog, SPA lag, no-rule budget, performance, reliability,
 false-hide/leak, code-burden, cross-feature, and source/evidence rows in
-tracked JS/JSX/MJS files. It pins 126 timer delay rows, 123 `setTimeout` delay
-rows, 3 `setInterval` delay rows, 16 zero-delay timers, 16 1-99ms timers, 18
+tracked JS/JSX/MJS files. It pins 128 timer delay rows, 124 `setTimeout` delay
+rows, 4 `setInterval` delay rows, 16 zero-delay timers, 16 1-99ms timers, 18
 100-199ms timers, 17 200-999ms timers, 13 1000-4999ms timers, 4 5000ms-plus
-timers, 37 named/expression timers, 5 `Math.max(...)` expression timers, and
+timers, 39 named/expression timers, 5 `Math.max(...)` expression timers, and
 0 missing delay arguments. It keeps timer delay cleanup authority, lifecycle
 pruning authority, route-teardown authority, native/menu timing authority, and
 release/public-claim use at `NO-GO`; runtime behavior changed by this
@@ -2198,10 +2200,10 @@ behavior, SPA refresh cadence, menu/quick-block timing, JSON replay timing,
 background flush timing, retry/watchdog ownership, no-rule budget, stale-route
 cancellation, performance, reliability, false-hide/leak, code-burden,
 cross-feature, and source/evidence rows in tracked JS/JSX/MJS files. It pins
-126 timer callback rows, 123 `setTimeout` callback rows, 3 `setInterval`
-callback rows, 107 inline arrow timer callbacks, 19 identifier timer
+128 timer callback rows, 124 `setTimeout` callback rows, 4 `setInterval`
+callback rows, 109 inline arrow timer callbacks, 19 identifier timer
 callbacks, 0 inline function timer callbacks, 0 member-reference timer
-callbacks, 0 missing callback arguments, 86 content-runtime timer callbacks,
+callbacks, 0 missing callback arguments, 88 content-runtime timer callbacks,
 39 extension UI/background timer callbacks, and 1 website-component timer
 callback. It keeps timer callback cleanup authority, lifecycle pruning
 authority, route-teardown authority, native/menu timing authority, and
@@ -2219,19 +2221,19 @@ observer/listener/timer/frame, timer teardown, debounce behavior, SPA refresh
 cadence, menu/quick-block timing, JSON replay timing, background flush,
 no-work budget, stale-route policy, performance, reliability, false-hide/leak,
 code-burden, cross-feature, and source/evidence rows in tracked JS/JSX/MJS
-files. It pins 123 `setTimeout` schedule rows, 34 `clearTimeout` rows, 3
-`setInterval` schedule rows, 4 `clearInterval` rows, an 89 timeout
+files. It pins 124 `setTimeout` schedule rows, 34 `clearTimeout` rows, 4
+`setInterval` schedule rows, 5 `clearInterval` rows, a 90 timeout
 schedule-minus-clear delta, -1 interval schedule-minus-clear delta, 11 timeout
 schedules with assigned local id handles, 24 timeout schedules with assigned
-named state handles, 10 timeout schedules with assigned property-held handles,
+named state handles, 11 timeout schedules with assigned property-held handles,
 63 timeout fire-and-forget schedules, 14 timeout promise sleep or timeout
-schedules, 1 timeout returned handle schedule, 3 interval schedules with
+schedules, 1 timeout returned handle schedule, 4 interval schedules with
 assigned named state handles, 32 `clearTimeout` rows with direct schedule
 handle, 2 `clearTimeout` rows without direct schedule handle, 26 handled
-timeout schedule rows with clear handle, 19 handled timeout schedule rows
-without clear handle, 18 distinct scheduled timeout handles without clear, 4
+timeout schedule rows with clear handle, 20 handled timeout schedule rows
+without clear handle, 18 distinct scheduled timeout handles without clear, 5
 `clearInterval` rows with direct schedule handle, 0 `clearInterval` rows
-without direct schedule handle, 3 handled interval schedule rows with clear
+without direct schedule handle, 4 handled interval schedule rows with clear
 handle, 0 handled interval schedule rows without clear handle, and 0 distinct
 scheduled interval handles without clear. It keeps timer schedule/clear cleanup
 authority, lifecycle pruning authority, route-teardown authority,
@@ -2272,11 +2274,11 @@ closure-capture proof, native menu behavior, quick-block/menu timing, SPA route
 work, settings/list-mode predicates, generated shell freshness, vendor
 transport, no-work budget, performance, reliability, false-hide/leak,
 code-burden, cross-feature, and source/evidence rows in tracked JS/JSX/MJS
-files. It pins 292 `addEventListener` callback rows, 252 inline arrow listener
+files. It pins 294 `addEventListener` callback rows, 254 inline arrow listener
 callbacks, 37 identifier listener callbacks, 1 member-reference listener
 callback, 2 generated expression listener callbacks, 0 missing callback
-arguments, 74 content-runtime callbacks, 201 extension UI/background
-callbacks, 2 generated-output callbacks, 8 vendor-bundle callbacks, and 3
+arguments, 74 content-runtime callbacks, 203 extension UI/background
+callbacks, 2 generated-output callbacks, 8 vendor-bundle callbacks, and 7
 website-component callbacks. It keeps listener callback cleanup authority,
 lifecycle pruning authority, route-teardown authority, native/menu timing
 authority, and release/public-claim use at `NO-GO`; runtime behavior changed
@@ -2365,13 +2367,13 @@ observer/listener/timer/frame, listener teardown, page-lifetime listeners,
 quick-block pointermove recovery, native menu behavior, SPA route work,
 generated shell freshness, vendor transport, no-work budget, performance,
 reliability, false-hide/leak, code-burden, cross-feature, and source/evidence
-rows in tracked JS/JSX/MJS files. It pins 292 `addEventListener` install rows,
-13 `removeEventListener` teardown rows, a 279 install-minus-remove delta, 13
+rows in tracked JS/JSX/MJS files. It pins 294 `addEventListener` install rows,
+13 `removeEventListener` teardown rows, a 281 install-minus-remove delta, 13
 capture-equivalent listener remove pairs, 12 exact option-shape listener remove
 pairs, 1 capture-equivalent option-shape mismatch listener pair, 0 listener
 remove rows without a capture-equivalent add pair, 51 page-global listener
-installs without explicit remove, 252 inline listener installs without remove
-handle, 70 content-runtime listener add/remove delta, 201 extension
+installs without explicit remove, 254 inline listener installs without remove
+handle, 70 content-runtime listener add/remove delta, 203 extension
 UI/background listener add/remove delta, 0 generated-output listener
 add/remove delta, 8 vendor-bundle listener add/remove delta, 0
 website-component listener add/remove delta, 7 document listener removes, 2

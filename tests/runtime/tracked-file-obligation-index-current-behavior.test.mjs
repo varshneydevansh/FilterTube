@@ -111,7 +111,7 @@ function assertListenerOptionShapeContinuation(doc) {
   assert.ok(doc.includes('tests/runtime/lifecycle-instance-register-current-behavior.test.mjs'));
   assert.match(doc, /tracked-file context for listener option shapes without closing any file row/);
   assert.match(doc, /open lifecycle,\s+observer\/listener\/timer, menu\/quick-block, dashboard\/popup, vendor\/generated\s+freshness/);
-  assert.match(doc, /292 `addEventListener` option rows, 232 omitted-option listeners, 23 boolean\s+capture listeners, 30 object-option listeners, 1 explicit bubble listener, and\s+2 generated expression\/identifier option listeners/);
+  assert.match(doc, /294 `addEventListener` option rows, 238 omitted-option listeners, 23 boolean\s+capture listeners, 30 object-option listeners, 1 explicit bubble listener, and\s+2 generated expression\/identifier option listeners/);
   assert.match(doc, /listener option\s+cleanup authority, lifecycle pruning authority, route-teardown authority, and\s+release\/public-claim use at `NO-GO`; runtime behavior changed by this\s+continuation: no/);
   assert.match(lifecycleDoc, /Event Listener Option Shape Addendum - 2026-05-28/);
   assert.match(lifecycleDoc, /ASCII listener option flow diagram: present/);
@@ -126,7 +126,7 @@ function assertListenerEventTypeContinuation(doc) {
   assert.ok(doc.includes('tests/runtime/lifecycle-instance-register-current-behavior.test.mjs'));
   assert.match(doc, /tracked-file context for listener event types without closing any file row/);
   assert.match(doc, /open lifecycle,\s+observer\/listener\/timer, menu\/quick-block, dashboard\/popup, vendor\/generated\s+freshness, media engagement, route events/);
-  assert.match(doc, /292 `addEventListener` event rows, 114 click\s+listeners, 57 change listeners, 20 input listeners, 14 keydown listeners, 8\s+`DOMContentLoaded` listeners, 1 `ended` media listener, 74 other literal event\s+listeners, 4 non-literal event expressions, and 0 missing event arguments/);
+  assert.match(doc, /294 `addEventListener` event rows, 116 click\s+listeners, 57 change listeners, 20 input listeners, 14 keydown listeners, 8\s+`DOMContentLoaded` listeners, 1 `ended` media listener, 74 other literal event\s+listeners, 4 non-literal event expressions, and 0 missing event arguments/);
   assert.match(doc, /listener event cleanup authority, lifecycle pruning authority,\s+route-teardown authority, media side-effect authority, and release\/public-claim\s+use at `NO-GO`; runtime behavior changed by this continuation: no/);
   assert.match(lifecycleDoc, /Event Listener Event-Type Addendum - 2026-05-28/);
   assert.match(lifecycleDoc, /ASCII listener event flow diagram: present/);
@@ -141,7 +141,7 @@ function assertListenerTargetContinuation(doc) {
   assert.ok(doc.includes('tests/runtime/lifecycle-instance-register-current-behavior.test.mjs'));
   assert.match(doc, /tracked-file context for listener target expressions without closing any file\s+row/);
   assert.match(doc, /open lifecycle,\s+observer\/listener\/timer, menu\/quick-block, dashboard\/popup, vendor\/generated\s+freshness, document\/window page-global listeners/);
-  assert.match(doc, /292 `addEventListener` target rows, 205 local\s+element targets, 17 optional local element targets, 41 document targets, 19\s+window targets, 8 vendor transport targets, and 2 generated shell targets/);
+  assert.match(doc, /294 `addEventListener` target rows, 207 local\s+element targets, 17 optional local element targets, 41 document targets, 19\s+window targets, 8 vendor transport targets, and 2 generated shell targets/);
   assert.match(doc, /listener target cleanup authority, lifecycle pruning authority,\s+route-teardown authority, generated-output parity, vendor session authority,\s+and release\/public-claim use at `NO-GO`; runtime behavior changed by this\s+continuation: no/);
   assert.match(lifecycleDoc, /Event Listener Target Addendum - 2026-05-28/);
   assert.match(lifecycleDoc, /ASCII listener target flow diagram: present/);
@@ -156,7 +156,7 @@ function assertListenerEventTargetMatrixContinuation(doc) {
   assert.ok(doc.includes('tests/runtime/lifecycle-instance-register-current-behavior.test.mjs'));
   assert.match(doc, /tracked-file context for listener event-target pairs without closing any file\s+row/);
   assert.match(doc, /open lifecycle,\s+observer\/listener\/timer, menu\/quick-block, dashboard\/popup, native-menu\s+document click handling, SPA route listeners, storage\/message trust/);
-  assert.match(doc, /292 `addEventListener` event-target matrix rows, 10 document\s+click pairs, 7 document `DOMContentLoaded` pairs, 3 document keydown pairs, 4\s+document pointer\/mouse pairs, 4 window message pairs, 2 window route pairs, 9\s+window scroll\/resize\/orientation pairs, 1 window storage\/visibility pair, 104\s+local click pairs, 70 local change\/input\/keydown pairs, 8 vendor transport\s+lifecycle pairs, and 2 generated shell nonliteral pairs/);
+  assert.match(doc, /294 `addEventListener` event-target matrix rows, 10 document\s+click pairs, 7 document `DOMContentLoaded` pairs, 3 document keydown pairs, 4\s+document pointer\/mouse pairs, 4 window message pairs, 2 window route pairs, 9\s+window scroll\/resize\/orientation pairs, 1 window storage\/visibility pair, 106\s+local click pairs, 70 local change\/input\/keydown pairs, 8 vendor transport\s+lifecycle pairs, and 2 generated shell nonliteral pairs/);
   assert.match(doc, /listener\s+event-target cleanup authority, lifecycle pruning authority, route-teardown\s+authority, native\/menu timing authority, generated-output parity, vendor\s+session authority, and release\/public-claim use at `NO-GO`; runtime behavior\s+changed by this continuation: no/);
   assert.match(lifecycleDoc, /Event Listener Event-Target Matrix Addendum - 2026-05-28/);
   assert.match(lifecycleDoc, /ASCII listener event-target flow diagram: present/);
@@ -201,7 +201,7 @@ function assertListenerCallbackIdentityContinuation(doc) {
   assert.ok(doc.includes('tests/runtime/lifecycle-instance-register-current-behavior.test.mjs'));
   assert.match(doc, /tracked-file context for listener callback argument shapes without closing any\s+file row/);
   assert.match(doc, /open lifecycle,\s+observer\/listener\/timer\/frame, listener teardown, duplicate-install risk,\s+closure-capture proof, native menu behavior, quick-block\/menu timing, SPA route\s+work/);
-  assert.match(doc, /292 `addEventListener` callback rows, 252 inline arrow listener\s+callbacks, 37 identifier listener callbacks, 1 member-reference listener\s+callback, 2 generated expression listener callbacks, 0 missing callback\s+arguments, 74 content-runtime callbacks, 201 extension UI\/background\s+callbacks, 2 generated-output callbacks, 8 vendor-bundle callbacks, and 3\s+website-component callbacks/);
+  assert.match(doc, /294 `addEventListener` callback rows, 254 inline arrow listener\s+callbacks, 37 identifier listener callbacks, 1 member-reference listener\s+callback, 2 generated expression listener callbacks, 0 missing callback\s+arguments, 74 content-runtime callbacks, 203 extension UI\/background\s+callbacks, 2 generated-output callbacks, 8 vendor-bundle callbacks, and 7\s+website-component callbacks/);
   assert.match(doc, /listener callback cleanup authority,\s+lifecycle pruning authority, route-teardown authority, native\/menu timing\s+authority, and release\/public-claim use at `NO-GO`; runtime behavior changed\s+by this continuation: no/);
   assert.match(lifecycleDoc, /Event Listener Callback Identity Addendum - 2026-05-28/);
   assert.match(lifecycleDoc, /ASCII listener callback flow diagram: present/);
@@ -216,7 +216,7 @@ function assertListenerAddRemoveParityContinuation(doc) {
   assert.ok(doc.includes('tests/runtime/lifecycle-instance-register-current-behavior.test.mjs'));
   assert.match(doc, /tracked-file context for listener add\/remove parity without closing any file\s+row/);
   assert.match(doc, /open lifecycle,\s+observer\/listener\/timer\/frame, listener teardown, page-lifetime listeners,\s+quick-block pointermove recovery, native menu behavior, SPA route work/);
-  assert.match(doc, /292 `addEventListener` install rows,\s+13 `removeEventListener` teardown rows, a 279 install-minus-remove delta, 13\s+capture-equivalent listener remove pairs, 12 exact option-shape listener remove\s+pairs, 1 capture-equivalent option-shape mismatch listener pair, 0 listener\s+remove rows without a capture-equivalent add pair, 51 page-global listener\s+installs without explicit remove, 252 inline listener installs without remove\s+handle, 70 content-runtime listener add\/remove delta, 201 extension\s+UI\/background listener add\/remove delta, 0 generated-output listener\s+add\/remove delta, 8 vendor-bundle listener add\/remove delta, 0\s+website-component listener add\/remove delta, 7 document listener removes, 2\s+window listener removes, and 2 generated shell listener removes/);
+  assert.match(doc, /294 `addEventListener` install rows,\s+13 `removeEventListener` teardown rows, a 281 install-minus-remove delta, 13\s+capture-equivalent listener remove pairs, 12 exact option-shape listener remove\s+pairs, 1 capture-equivalent option-shape mismatch listener pair, 0 listener\s+remove rows without a capture-equivalent add pair, 51 page-global listener\s+installs without explicit remove, 254 inline listener installs without remove\s+handle, 70 content-runtime listener add\/remove delta, 203 extension\s+UI\/background listener add\/remove delta, 0 generated-output listener\s+add\/remove delta, 8 vendor-bundle listener add\/remove delta, 0\s+website-component listener add\/remove delta, 7 document listener removes, 2\s+window listener removes, and 2 generated shell listener removes/);
   assert.match(doc, /listener add\/remove cleanup authority, lifecycle pruning authority,\s+route-teardown authority, native\/menu timing authority, and release\/public-claim\s+use at `NO-GO`; runtime behavior changed by this continuation: no/);
   assert.match(lifecycleDoc, /Event Listener Add\/Remove Parity Addendum - 2026-05-28/);
   assert.match(lifecycleDoc, /ASCII listener add\/remove parity flow diagram: present/);
@@ -336,7 +336,7 @@ function assertTimerDelayShapeContinuation(doc) {
   assert.ok(doc.includes('tests/runtime/lifecycle-instance-register-current-behavior.test.mjs'));
   assert.match(doc, /tracked-file context for timer delay arguments without closing any file row/);
   assert.match(doc, /open lifecycle,\s+observer\/listener\/timer, menu\/quick-block, JSON replay, background flush,\s+retry\/watchdog, SPA lag, no-rule budget/);
-  assert.match(doc, /126 timer delay rows, 123 `setTimeout` delay\s+rows, 3 `setInterval` delay rows, 16 zero-delay timers, 16 1-99ms timers, 18\s+100-199ms timers, 17 200-999ms timers, 13 1000-4999ms timers, 4 5000ms-plus\s+timers, 37 named\/expression timers, 5 `Math\.max\(\.\.\.\)` expression timers, and\s+0 missing delay arguments/);
+  assert.match(doc, /128 timer delay rows, 124 `setTimeout` delay\s+rows, 4 `setInterval` delay rows, 16 zero-delay timers, 16 1-99ms timers, 18\s+100-199ms timers, 17 200-999ms timers, 13 1000-4999ms timers, 4 5000ms-plus\s+timers, 39 named\/expression timers, 5 `Math\.max\(\.\.\.\)` expression timers, and\s+0 missing delay arguments/);
   assert.match(doc, /timer delay cleanup authority, lifecycle\s+pruning authority, route-teardown authority, native\/menu timing authority, and\s+release\/public-claim use at `NO-GO`; runtime behavior changed by this\s+continuation: no/);
   assert.match(lifecycleDoc, /Timer Delay Shape Addendum - 2026-05-28/);
   assert.match(lifecycleDoc, /ASCII timer delay flow diagram: present/);
@@ -351,7 +351,7 @@ function assertTimerCallbackIdentityContinuation(doc) {
   assert.ok(doc.includes('tests/runtime/lifecycle-instance-register-current-behavior.test.mjs'));
   assert.match(doc, /tracked-file context for timer callback argument shapes without closing any\s+file row/);
   assert.match(doc, /open lifecycle,\s+observer\/listener\/timer\/frame, timer pruning, callback coalescing, debounce\s+behavior, SPA refresh cadence, menu\/quick-block timing, JSON replay timing/);
-  assert.match(doc, /126 timer callback rows, 123 `setTimeout` callback rows, 3 `setInterval`\s+callback rows, 107 inline arrow timer callbacks, 19 identifier timer\s+callbacks, 0 inline function timer callbacks, 0 member-reference timer\s+callbacks, 0 missing callback arguments, 86 content-runtime timer callbacks,\s+39 extension UI\/background timer callbacks, and 1 website-component timer\s+callback/);
+  assert.match(doc, /128 timer callback rows, 124 `setTimeout` callback rows, 4 `setInterval`\s+callback rows, 109 inline arrow timer callbacks, 19 identifier timer\s+callbacks, 0 inline function timer callbacks, 0 member-reference timer\s+callbacks, 0 missing callback arguments, 88 content-runtime timer callbacks,\s+39 extension UI\/background timer callbacks, and 1 website-component timer\s+callback/);
   assert.match(doc, /timer callback cleanup authority, lifecycle pruning\s+authority, route-teardown authority, native\/menu timing authority, and\s+release\/public-claim use at `NO-GO`; runtime behavior changed by this\s+continuation: no/);
   assert.match(lifecycleDoc, /Timer Callback Identity Addendum - 2026-05-28/);
   assert.match(lifecycleDoc, /ASCII timer callback flow diagram: present/);
@@ -366,7 +366,7 @@ function assertTimerScheduleClearParityContinuation(doc) {
   assert.ok(doc.includes('tests/runtime/lifecycle-instance-register-current-behavior.test.mjs'));
   assert.match(doc, /tracked-file context for timer schedule\/clear parity without closing any file\s+row/);
   assert.match(doc, /open lifecycle,\s+observer\/listener\/timer\/frame, timer teardown, debounce behavior, SPA refresh\s+cadence, menu\/quick-block timing, JSON replay timing, background flush/);
-  assert.match(doc, /123 `setTimeout` schedule rows, 34 `clearTimeout` rows, 3\s+`setInterval` schedule rows, 4 `clearInterval` rows, an 89 timeout\s+schedule-minus-clear delta, -1 interval schedule-minus-clear delta, 11 timeout\s+schedules with assigned local id handles, 24 timeout schedules with assigned\s+named state handles, 10 timeout schedules with assigned property-held handles,\s+63 timeout fire-and-forget schedules, 14 timeout promise sleep or timeout\s+schedules, 1 timeout returned handle schedule, 3 interval schedules with\s+assigned named state handles, 32 `clearTimeout` rows with direct schedule\s+handle, 2 `clearTimeout` rows without direct schedule handle, 26 handled\s+timeout schedule rows with clear handle, 19 handled timeout schedule rows\s+without clear handle, 18 distinct scheduled timeout handles without clear, 4\s+`clearInterval` rows with direct schedule handle, 0 `clearInterval` rows\s+without direct schedule handle, 3 handled interval schedule rows with clear\s+handle, 0 handled interval schedule rows without clear handle, and 0 distinct\s+scheduled interval handles without clear/);
+  assert.match(doc, /124 `setTimeout` schedule rows, 34 `clearTimeout` rows, 4\s+`setInterval` schedule rows, 5 `clearInterval` rows, a 90 timeout\s+schedule-minus-clear delta, -1 interval schedule-minus-clear delta, 11 timeout\s+schedules with assigned local id handles, 24 timeout schedules with assigned\s+named state handles, 11 timeout schedules with assigned property-held handles,\s+63 timeout fire-and-forget schedules, 14 timeout promise sleep or timeout\s+schedules, 1 timeout returned handle schedule, 4 interval schedules with\s+assigned named state handles, 32 `clearTimeout` rows with direct schedule\s+handle, 2 `clearTimeout` rows without direct schedule handle, 26 handled\s+timeout schedule rows with clear handle, 20 handled timeout schedule rows\s+without clear handle, 18 distinct scheduled timeout handles without clear, 5\s+`clearInterval` rows with direct schedule handle, 0 `clearInterval` rows\s+without direct schedule handle, 4 handled interval schedule rows with clear\s+handle, 0 handled interval schedule rows without clear handle, and 0 distinct\s+scheduled interval handles without clear/);
   assert.match(doc, /timer schedule\/clear cleanup\s+authority, lifecycle pruning authority, route-teardown authority,\s+native\/menu timing authority, and release\/public-claim use at `NO-GO`; runtime\s+behavior changed by this continuation: no/);
   assert.match(lifecycleDoc, /Timer Schedule\/Clear Parity Addendum - 2026-05-28/);
   assert.match(lifecycleDoc, /ASCII timer schedule\/clear parity flow diagram: present/);
@@ -380,11 +380,11 @@ function assertTimerOwnerDomainContextContinuation(doc) {
   assert.ok(doc.includes('docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md'));
   assert.ok(doc.includes('tests/runtime/lifecycle-instance-register-current-behavior.test.mjs'));
   assert.match(doc, /tracked-file context for timer owner-domain rows without closing any file\s+row/);
-  assert.match(doc, /126 timer owner-context rows, 13 timer owner\s+domains, 123 `setTimeout` rows, 3 `setInterval` rows, 86 content-runtime\s+timer owner-context rows, 39 extension UI\/background timer owner-context rows/);
-  assert.match(doc, /37 content bridge timer rows, 16\s+quick\/menu timer rows, 15 dashboard timer rows, 10 background timer rows, and\s+10 DOM fallback timer rows/);
+  assert.match(doc, /128 timer owner-context rows, 13 timer owner\s+domains, 124 `setTimeout` rows, 4 `setInterval` rows, 88 content-runtime\s+timer owner-context rows, 39 extension UI\/background timer owner-context rows/);
+  assert.match(doc, /37 content bridge timer rows, 16\s+quick\/menu timer rows, 15 dashboard timer rows, 10 background timer rows, and\s+11 DOM fallback timer rows/);
   assert.match(doc, /timer owner-context cleanup authority,\s+lifecycle pruning authority, route-teardown authority, native\/menu timing\s+authority, metric artifact use, and release\/public-claim use at `NO-GO`;\s+runtime behavior changed by this continuation: no/);
   assert.match(lifecycleDoc, /Timer Owner Domain Context Addendum - 2026-05-30/);
-  assert.match(lifecycleDoc, /timer owner-context rows: 126/);
+  assert.match(lifecycleDoc, /timer owner-context rows: 128/);
   assert.match(lifecycleDoc, /ASCII timer owner-domain flow diagram: present/);
 }
 
@@ -396,11 +396,11 @@ function assertTimerOwnerDelayBudgetContinuation(doc) {
   assert.ok(doc.includes('docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md'));
   assert.ok(doc.includes('tests/runtime/lifecycle-instance-register-current-behavior.test.mjs'));
   assert.match(doc, /tracked-file context for timer owner delay-budget rows without closing any file\s+row/);
-  assert.match(doc, /126 timer owner delay-budget rows, 16 immediate-zero timer rows, 34\s+short-under-200ms timer rows, 17 medium-200-999ms timer rows, 17\s+long-1000ms-plus timer rows, 5 bounded-expression timer rows, 37\s+named-or-expression timer rows/);
+  assert.match(doc, /128 timer owner delay-budget rows, 16 immediate-zero timer rows, 34\s+short-under-200ms timer rows, 17 medium-200-999ms timer rows, 17\s+long-1000ms-plus timer rows, 5 bounded-expression timer rows, 39\s+named-or-expression timer rows/);
   assert.match(doc, /13 content bridge immediate-or-short timer\s+rows, 9 quick\/menu immediate-or-short timer rows, 6 DOM fallback\s+immediate-or-short timer rows, and 5 dashboard immediate-or-short timer rows/);
   assert.match(doc, /timer owner delay-budget cleanup authority, lifecycle pruning\s+authority, route-teardown authority, native\/menu timing authority, metric\s+artifact use, whitelist\/cache optimization, JSON-first promotion, and\s+release\/public-claim use at `NO-GO`; runtime behavior changed by this\s+continuation: no/);
   assert.match(lifecycleDoc, /Timer Owner Delay Budget Addendum - 2026-05-30/);
-  assert.match(lifecycleDoc, /timer owner delay-budget rows: 126/);
+  assert.match(lifecycleDoc, /timer owner delay-budget rows: 128/);
   assert.match(lifecycleDoc, /ASCII timer owner delay-budget flow diagram: present/);
 }
 
@@ -812,7 +812,7 @@ test('tracked_file_obligation_index_represents_every_tracked_file_exactly_once',
   const rows = parseRows(read(docPath));
   const rowPaths = rows.map(row => row.path);
 
-  assert.equal(files.length, 156);
+  assert.equal(files.length, 158);
   assert.equal(rows.length, files.length);
   assert.deepEqual([...rowPaths].sort(), [...files].sort());
   assert.equal(new Set(rowPaths).size, files.length);
@@ -7169,11 +7169,11 @@ test('tracked_file_obligation_index_links_native_runtime_sync_manifest_freshness
   assert.match(doc, /app dirty state as not release authority/);
   assert.match(doc, /32 manifest entries/);
   assert.match(doc, /0 `destinationKind` fields/);
-  assert.match(doc, /26 direct manifest copy hash matches/);
-  assert.match(doc, /6 direct manifest copy hash diffs/);
-  assert.match(doc, /38 broad source-mirror hash matches/);
+  assert.match(doc, /32 direct manifest copy hash matches/);
+  assert.match(doc, /0 direct manifest copy hash diffs/);
+  assert.match(doc, /46 broad source-mirror hash matches/);
   assert.match(doc, /0 source-mirror missing files/);
-  assert.match(doc, /8 source-mirror hash diffs/);
+  assert.match(doc, /0 source-mirror hash diffs/);
   assert.match(doc, /16 `runtimeBundleOrder` entries including `js\/layout\.js`/);
   assert.match(doc, /6 generated app runtime artifact hashes/);
   assert.match(doc, /Android\/iOS native release-note resources that differ from current public `data\/release_notes\.json`/);

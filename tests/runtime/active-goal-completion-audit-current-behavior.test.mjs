@@ -47,13 +47,13 @@ function assertListenerOptionShapeContinuation(source) {
   assert.match(source, /Event Listener Option Shape Continuation/);
   assert.match(source, /2026-05-28 listener-option shape continuation/);
   assert.ok(source.includes('docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md'));
-  assert.match(source, /third-argument option shape for all 292 current `addEventListener` installs/);
-  assert.match(source, /236 omitted-option listeners, 23 boolean capture listeners, 30\s+object-option listeners, 1 explicit bubble listener, and 2 generated\s+expression\/identifier option listeners/);
+  assert.match(source, /third-argument option shape for all 294 current `addEventListener` installs/);
+  assert.match(source, /238 omitted-option listeners, 23 boolean capture listeners, 30\s+object-option listeners, 1 explicit bubble listener, and 2 generated\s+expression\/identifier option listeners/);
   assert.match(source, /ASCII and Mermaid flow diagrams/);
   assert.match(source, /Listener\s+option cleanup authority, broad lifecycle pruning, and\s+`update_goal\(status='complete'\)` remain `NO-GO`/);
   assert.match(source, /Runtime behavior changed by\s+this continuation: no; the broad audit remains active/);
   assert.match(lifecycleDoc, /Event Listener Option Shape Addendum - 2026-05-28/);
-  assert.match(lifecycleDoc, /addEventListener option rows: 292/);
+  assert.match(lifecycleDoc, /addEventListener option rows: 294/);
   assert.match(lifecycleDoc, /listener option cleanup approval: NO-GO/);
 }
 
@@ -63,13 +63,13 @@ function assertListenerEventTypeContinuation(source) {
   assert.match(source, /Event Listener Event-Type Continuation/);
   assert.match(source, /2026-05-28 listener-event type continuation/);
   assert.ok(source.includes('docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md'));
-  assert.match(source, /first-argument event type for all 292 current `addEventListener` installs/);
-  assert.match(source, /114 click listeners, 57 change listeners, 20 input listeners, 14\s+keydown listeners, 8 `DOMContentLoaded` listeners, 1 `ended` media listener, 74\s+other literal event listeners, 4 non-literal event expressions, and 0 missing\s+event arguments/);
+  assert.match(source, /first-argument event type for all 294 current `addEventListener` installs/);
+  assert.match(source, /116 click listeners, 57 change listeners, 20 input listeners, 14\s+keydown listeners, 8 `DOMContentLoaded` listeners, 1 `ended` media listener, 74\s+other literal event listeners, 4 non-literal event expressions, and 0 missing\s+event arguments/);
   assert.match(source, /ASCII and Mermaid flow diagrams/);
   assert.match(source, /Listener event cleanup authority, broad lifecycle pruning, and\s+`update_goal\(status='complete'\)` remain `NO-GO`/);
   assert.match(source, /Runtime behavior changed by\s+this continuation: no; the broad audit remains active/);
   assert.match(lifecycleDoc, /Event Listener Event-Type Addendum - 2026-05-28/);
-  assert.match(lifecycleDoc, /addEventListener event rows: 292/);
+  assert.match(lifecycleDoc, /addEventListener event rows: 294/);
   assert.match(lifecycleDoc, /listener event cleanup approval: NO-GO/);
 }
 
@@ -79,13 +79,13 @@ function assertListenerTargetContinuation(source) {
   assert.match(source, /Event Listener Target Continuation/);
   assert.match(source, /2026-05-28 listener-target continuation/);
   assert.ok(source.includes('docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md'));
-  assert.match(source, /receiver\/target expression for all 292 current `addEventListener` installs/);
-  assert.match(source, /205 local element targets, 17 optional local element targets, 41\s+document targets, 19 window targets, 8 vendor transport targets, and 2\s+generated shell targets/);
+  assert.match(source, /receiver\/target expression for all 294 current `addEventListener` installs/);
+  assert.match(source, /207 local element targets, 17 optional local element targets, 41\s+document targets, 19 window targets, 8 vendor transport targets, and 2\s+generated shell targets/);
   assert.match(source, /ASCII and Mermaid flow diagrams/);
   assert.match(source, /Listener\s+target cleanup authority, broad lifecycle pruning, and\s+`update_goal\(status='complete'\)` remain `NO-GO`/);
   assert.match(source, /Runtime behavior changed by\s+this continuation: no; the broad audit remains active/);
   assert.match(lifecycleDoc, /Event Listener Target Addendum - 2026-05-28/);
-  assert.match(lifecycleDoc, /addEventListener target rows: 292/);
+  assert.match(lifecycleDoc, /addEventListener target rows: 294/);
   assert.match(lifecycleDoc, /listener target cleanup approval: NO-GO/);
 }
 
@@ -95,13 +95,13 @@ function assertListenerEventTargetMatrixContinuation(source) {
   assert.match(source, /Event Listener Event-Target Matrix Continuation/);
   assert.match(source, /2026-05-28 listener event-target matrix continuation/);
   assert.ok(source.includes('docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md'));
-  assert.match(source, /event type and target expression for all 292 current `addEventListener`\s+installs/);
-  assert.match(source, /10 document click pairs, 7 document `DOMContentLoaded`\s+pairs, 3 document keydown pairs, 4 document pointer\/mouse pairs, 4 window\s+message pairs, 2 window route pairs, 9 window scroll\/resize\/orientation pairs,\s+1 window storage\/visibility pair, 104 local click pairs, 70 local\s+change\/input\/keydown pairs, 8 vendor transport lifecycle pairs, and 2\s+generated shell nonliteral pairs/);
+  assert.match(source, /event type and target expression for all 294 current `addEventListener`\s+installs/);
+  assert.match(source, /10 document click pairs, 7 document `DOMContentLoaded`\s+pairs, 3 document keydown pairs, 4 document pointer\/mouse pairs, 4 window\s+message pairs, 2 window route pairs, 9 window scroll\/resize\/orientation pairs,\s+1 window storage\/visibility pair, 106 local click pairs, 70 local\s+change\/input\/keydown pairs, 8 vendor transport lifecycle pairs, and 2\s+generated shell nonliteral pairs/);
   assert.match(source, /ASCII and Mermaid flow diagrams/);
   assert.match(source, /Listener event-target cleanup authority, broad lifecycle\s+pruning, route teardown authority, native\/menu timing authority, and\s+`update_goal\(status='complete'\)` remain `NO-GO`/);
   assert.match(source, /Runtime behavior changed by\s+this continuation: no; the broad audit remains active/);
   assert.match(lifecycleDoc, /Event Listener Event-Target Matrix Addendum - 2026-05-28/);
-  assert.match(lifecycleDoc, /addEventListener event-target matrix rows: 292/);
+  assert.match(lifecycleDoc, /addEventListener event-target matrix rows: 294/);
   assert.match(lifecycleDoc, /listener event-target cleanup approval: NO-GO/);
 }
 
@@ -143,13 +143,13 @@ function assertListenerCallbackIdentityContinuation(source) {
   assert.match(source, /Event Listener Callback Identity Continuation/);
   assert.match(source, /2026-05-28 listener-callback identity continuation/);
   assert.ok(source.includes('docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md'));
-  assert.match(source, /callback argument shape for all 292 current tracked `addEventListener`\s+installs/);
-  assert.match(source, /252 inline arrow callbacks, 37 identifier callback\s+references, 1 member callback reference, 2 generated expression callbacks, 74\s+content-runtime callbacks, 201 extension UI\/background callbacks, 2\s+generated-output callbacks, 8 vendor-bundle callbacks, and 3 website-component\s+callbacks/);
+  assert.match(source, /callback argument shape for all 294 current tracked `addEventListener`\s+installs/);
+  assert.match(source, /254 inline arrow callbacks, 37 identifier callback\s+references, 1 member callback reference, 2 generated expression callbacks, 74\s+content-runtime callbacks, 203 extension UI\/background callbacks, 2\s+generated-output callbacks, 8 vendor-bundle callbacks, and 7 website-component\s+callbacks/);
   assert.match(source, /ASCII and Mermaid flow diagrams/);
   assert.match(source, /Listener callback cleanup authority, broad lifecycle\s+pruning, route teardown authority, native\/menu timing authority, and\s+`update_goal\(status='complete'\)` remain `NO-GO`/);
   assert.match(source, /Runtime behavior changed by\s+this continuation: no; the broad audit remains active/);
   assert.match(lifecycleDoc, /Event Listener Callback Identity Addendum - 2026-05-28/);
-  assert.match(lifecycleDoc, /addEventListener callback rows: 292/);
+  assert.match(lifecycleDoc, /addEventListener callback rows: 294/);
   assert.match(lifecycleDoc, /listener callback cleanup approval: NO-GO/);
 }
 
@@ -159,13 +159,13 @@ function assertListenerAddRemoveParityContinuation(source) {
   assert.match(source, /Event Listener Add\/Remove Parity Continuation/);
   assert.match(source, /2026-05-28 listener add\/remove parity continuation/);
   assert.ok(source.includes('docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md'));
-  assert.match(source, /current add\/remove parity for all 292 tracked `addEventListener`\s+installs\s+and 13 tracked `removeEventListener` teardowns/);
-  assert.match(source, /279\s+install-minus-remove delta, 13 capture-equivalent remove pairs, 12 exact\s+option-shape remove pairs, 1 capture-equivalent option-shape mismatch pair, 0\s+remove rows without a capture-equivalent add pair, 51 page-global listener\s+installs without explicit remove, 252 inline listener installs without remove\s+handle, 70 content-runtime add\/remove delta, 201 extension UI\/background\s+delta, 0 generated-output delta, 8 vendor-bundle delta, 0 website-component\s+delta, 7 document listener removes, 2 window listener removes, and 2 generated\s+shell listener removes/);
+  assert.match(source, /current add\/remove parity for all 294 tracked `addEventListener`\s+installs\s+and 13 tracked `removeEventListener` teardowns/);
+  assert.match(source, /281\s+install-minus-remove delta, 13 capture-equivalent remove pairs, 12 exact\s+option-shape remove pairs, 1 capture-equivalent option-shape mismatch pair, 0\s+remove rows without a capture-equivalent add pair, 51 page-global listener\s+installs without explicit remove, 254 inline listener installs without remove\s+handle, 70 content-runtime add\/remove delta, 203 extension UI\/background\s+delta, 0 generated-output delta, 8 vendor-bundle delta, 0 website-component\s+delta, 7 document listener removes, 2 window listener removes, and 2 generated\s+shell listener removes/);
   assert.match(source, /ASCII and Mermaid flow diagrams/);
   assert.match(source, /Listener\s+add\/remove cleanup authority, broad lifecycle pruning, route teardown\s+authority, native\/menu timing authority, and `update_goal\(status='complete'\)`\s+remain `NO-GO`/);
   assert.match(source, /Runtime behavior changed by this continuation: no; the broad\s+audit remains active/);
   assert.match(lifecycleDoc, /Event Listener Add\/Remove Parity Addendum - 2026-05-28/);
-  assert.match(lifecycleDoc, /addEventListener install rows for parity: 292/);
+  assert.match(lifecycleDoc, /addEventListener install rows for parity: 294/);
   assert.match(lifecycleDoc, /capture-equivalent listener remove pairs: 13/);
   assert.match(lifecycleDoc, /listener add\/remove cleanup approval: NO-GO/);
 }
@@ -292,13 +292,13 @@ function assertTimerDelayShapeContinuation(source) {
   assert.match(source, /Timer Delay Shape Continuation/);
   assert.match(source, /2026-05-28 timer-delay shape continuation/);
   assert.ok(source.includes('docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md'));
-  assert.match(source, /delay argument shape for all 126 current tracked `setTimeout` and\s+`setInterval` schedules/);
-  assert.match(source, /123 `setTimeout` delay rows, 3\s+`setInterval` delay rows, 16 zero-delay timers, 16 1-99ms timers, 18\s+100-199ms timers, 17 200-999ms timers, 13 1000-4999ms timers, 4 5000ms-plus\s+timers, 37 named\/expression timers, 5 `Math\.max\(\.\.\.\)` expression timers, and\s+0 missing delay arguments/);
+  assert.match(source, /delay argument shape for all 128 current tracked `setTimeout` and\s+`setInterval` schedules/);
+  assert.match(source, /124 `setTimeout` delay rows, 4\s+`setInterval` delay rows, 16 zero-delay timers, 16 1-99ms timers, 18\s+100-199ms timers, 17 200-999ms timers, 13 1000-4999ms timers, 4 5000ms-plus\s+timers, 39 named\/expression timers, 5 `Math\.max\(\.\.\.\)` expression timers, and\s+0 missing delay arguments/);
   assert.match(source, /ASCII and Mermaid flow diagrams/);
   assert.match(source, /Timer\s+delay cleanup authority, broad lifecycle pruning, route teardown authority,\s+native\/menu timing authority, and `update_goal\(status='complete'\)` remain\s+`NO-GO`/);
   assert.match(source, /Runtime behavior changed by this continuation: no; the broad audit\s+remains active/);
   assert.match(lifecycleDoc, /Timer Delay Shape Addendum - 2026-05-28/);
-  assert.match(lifecycleDoc, /timer delay rows: 126/);
+  assert.match(lifecycleDoc, /timer delay rows: 128/);
   assert.match(lifecycleDoc, /timer delay cleanup approval: NO-GO/);
 }
 
@@ -308,13 +308,13 @@ function assertTimerCallbackIdentityContinuation(source) {
   assert.match(source, /Timer Callback Identity Continuation/);
   assert.match(source, /2026-05-28 timer-callback identity continuation/);
   assert.ok(source.includes('docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md'));
-  assert.match(source, /callback argument shape for all 126 current tracked `setTimeout` and\s+`setInterval` schedules/);
-  assert.match(source, /123 `setTimeout` callback rows, 3\s+`setInterval` callback rows, 107 inline arrow timer callbacks, 19 identifier\s+timer callbacks, 0 inline function timer callbacks, 0 member-reference timer\s+callbacks, 0 missing callback arguments, 86 content-runtime timer callbacks,\s+39 extension UI\/background timer callbacks, and 1 website-component timer\s+callback/);
+  assert.match(source, /callback argument shape for all 128 current tracked `setTimeout` and\s+`setInterval` schedules/);
+  assert.match(source, /124 `setTimeout` callback rows, 4\s+`setInterval` callback rows, 109 inline arrow timer callbacks, 19 identifier\s+timer callbacks, 0 inline function timer callbacks, 0 member-reference timer\s+callbacks, 0 missing callback arguments, 88 content-runtime timer callbacks,\s+39 extension UI\/background timer callbacks, and 1 website-component timer\s+callback/);
   assert.match(source, /ASCII and Mermaid flow diagrams/);
   assert.match(source, /Timer callback cleanup authority, broad lifecycle pruning, route\s+teardown authority, native\/menu timing authority, and\s+`update_goal\(status='complete'\)` remain `NO-GO`/);
   assert.match(source, /Runtime behavior changed by\s+this continuation: no; the broad audit remains active/);
   assert.match(lifecycleDoc, /Timer Callback Identity Addendum - 2026-05-28/);
-  assert.match(lifecycleDoc, /timer callback rows: 126/);
+  assert.match(lifecycleDoc, /timer callback rows: 128/);
   assert.match(lifecycleDoc, /timer callback cleanup approval: NO-GO/);
 }
 
@@ -324,13 +324,13 @@ function assertTimerScheduleClearParityContinuation(source) {
   assert.match(source, /Timer Schedule\/Clear Parity Continuation/);
   assert.match(source, /2026-05-28 timer schedule\/clear parity continuation/);
   assert.ok(source.includes('docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md'));
-  assert.match(source, /current schedule\/clear parity for all 123 tracked `setTimeout` schedules,\s+34 tracked `clearTimeout` rows, 3 tracked `setInterval` schedules, and 4\s+tracked `clearInterval` rows/);
-  assert.match(source, /89 timeout schedule-minus-clear\s+delta, -1 interval schedule-minus-clear delta, 11 timeout schedules with\s+assigned local id handles, 24 assigned named state handles, 10 assigned\s+property-held handles, 63 fire-and-forget schedules, 14 promise sleep\/timeout\s+schedules, 1 returned timer handle schedule, 3 interval schedules with assigned\s+named state handles, 32 `clearTimeout` rows with direct schedule handle, 2\s+`clearTimeout` rows without direct schedule handle, 26 handled timeout schedule\s+rows with clear handle, 19 handled timeout schedule rows without clear handle,\s+18 distinct scheduled timeout handles without clear, 4 `clearInterval` rows\s+with direct schedule handle, 0 `clearInterval` rows without direct schedule\s+handle, 3 handled interval schedule rows with clear handle, 0 handled interval\s+schedule rows without clear handle, and 0 distinct scheduled interval handles\s+without clear/);
+  assert.match(source, /current schedule\/clear parity for all 124 tracked `setTimeout` schedules,\s+34 tracked `clearTimeout` rows, 4 tracked `setInterval` schedules, and 5\s+tracked `clearInterval` rows/);
+  assert.match(source, /90 timeout schedule-minus-clear\s+delta, -1 interval schedule-minus-clear delta, 11 timeout schedules with\s+assigned local id handles, 24 assigned named state handles, 11 assigned\s+property-held handles, 63 fire-and-forget schedules, 14 promise sleep\/timeout\s+schedules, 1 returned timer handle schedule, 4 interval schedules with assigned\s+named state handles, 32 `clearTimeout` rows with direct schedule handle, 2\s+`clearTimeout` rows without direct schedule handle, 26 handled timeout schedule\s+rows with clear handle, 20 handled timeout schedule rows without clear handle,\s+18 distinct scheduled timeout handles without clear, 5 `clearInterval` rows\s+with direct schedule handle, 0 `clearInterval` rows without direct schedule\s+handle, 4 handled interval schedule rows with clear handle, 0 handled interval\s+schedule rows without clear handle, and 0 distinct scheduled interval handles\s+without clear/);
   assert.match(source, /ASCII and Mermaid flow diagrams/);
   assert.match(source, /Timer schedule\/clear cleanup authority,\s+broad lifecycle pruning, route teardown authority, native\/menu timing\s+authority, and `update_goal\(status='complete'\)` remain `NO-GO`/);
   assert.match(source, /Runtime\s+behavior changed by this continuation: no; the broad audit remains active/);
   assert.match(lifecycleDoc, /Timer Schedule\/Clear Parity Addendum - 2026-05-28/);
-  assert.match(lifecycleDoc, /setTimeout schedule rows for parity: 123/);
+  assert.match(lifecycleDoc, /setTimeout schedule rows for parity: 124/);
   assert.match(lifecycleDoc, /timer schedule\/clear cleanup approval: NO-GO/);
 }
 
@@ -340,13 +340,13 @@ function assertTimerOwnerDomainContextContinuation(source) {
   assert.match(source, /Timer Owner Domain Context Continuation/);
   assert.match(source, /2026-05-30 timer owner-domain context continuation/);
   assert.ok(source.includes('docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md'));
-  assert.match(source, /owner-domain context for all 126 current tracked timer schedule\s+rows/);
-  assert.match(source, /123 `setTimeout` rows, 3 `setInterval` rows, 13 timer\s+owner domains, 86 content-runtime timer owner-context rows, 39 extension\s+UI\/background timer owner-context rows, 1 website component timer owner-context\s+row/);
-  assert.match(source, /37 content bridge timer rows, 16 quick\/menu timer rows, 15 dashboard timer\s+rows, 10 background timer rows, 10 DOM fallback timer rows/);
+  assert.match(source, /owner-domain context for all 128 current tracked timer schedule\s+rows/);
+  assert.match(source, /124 `setTimeout` rows, 4 `setInterval` rows, 13 timer\s+owner domains, 88 content-runtime timer owner-context rows, 39 extension\s+UI\/background timer owner-context rows, 1 website component timer owner-context\s+row/);
+  assert.match(source, /37 content bridge timer rows, 16 quick\/menu timer rows, 15 dashboard timer\s+rows, 10 background timer rows, 11 DOM fallback timer rows/);
   assert.match(source, /Timer\s+owner-context cleanup authority, timer pruning, route teardown authority,\s+native\/menu timing authority, release\/public-claim use, and\s+`update_goal\(status='complete'\)` remain `NO-GO`/);
   assert.match(source, /Runtime behavior changed by\s+this continuation: no; the broad audit remains active/);
   assert.match(lifecycleDoc, /Timer Owner Domain Context Addendum - 2026-05-30/);
-  assert.match(lifecycleDoc, /timer owner-context rows: 126/);
+  assert.match(lifecycleDoc, /timer owner-context rows: 128/);
   assert.match(lifecycleDoc, /timer owner domains: 13/);
   assert.match(lifecycleDoc, /timer owner-context cleanup approval: NO-GO/);
 }
@@ -357,13 +357,13 @@ function assertTimerOwnerDelayBudgetContinuation(source) {
   assert.match(source, /Timer Owner Delay Budget Continuation/);
   assert.match(source, /2026-05-30 timer owner delay-budget continuation/);
   assert.ok(source.includes('docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md'));
-  assert.match(source, /delay-budget context for all 126 current tracked timer schedule\s+rows by owner domain/);
-  assert.match(source, /16 immediate-zero timer rows, 34\s+short-under-200ms timer rows, 17 medium-200-999ms timer rows, 17\s+long-1000ms-plus timer rows, 5 bounded-expression timer rows, 37\s+named-or-expression timer rows/);
+  assert.match(source, /delay-budget context for all 128 current tracked timer schedule\s+rows by owner domain/);
+  assert.match(source, /16 immediate-zero timer rows, 34\s+short-under-200ms timer rows, 17 medium-200-999ms timer rows, 17\s+long-1000ms-plus timer rows, 5 bounded-expression timer rows, 39\s+named-or-expression timer rows/);
   assert.match(source, /13 content bridge immediate-or-short timer\s+rows, 9 quick\/menu immediate-or-short timer rows, 6 DOM fallback\s+immediate-or-short timer rows, and 5 dashboard immediate-or-short timer rows/);
   assert.match(source, /Timer\s+owner delay-budget cleanup authority, timer pruning, route teardown authority,\s+native\/menu timing authority, whitelist\/cache optimization, JSON-first\s+promotion, release\/public-claim use, and `update_goal\(status='complete'\)`\s+remain `NO-GO`/);
   assert.match(source, /Runtime behavior changed by this continuation: no; the broad\s+audit remains active/);
   assert.match(lifecycleDoc, /Timer Owner Delay Budget Addendum - 2026-05-30/);
-  assert.match(lifecycleDoc, /timer owner delay-budget rows: 126/);
+  assert.match(lifecycleDoc, /timer owner delay-budget rows: 128/);
   assert.match(lifecycleDoc, /timer owner short-under-200ms budget rows: 34/);
   assert.match(lifecycleDoc, /timer owner delay-budget cleanup approval: NO-GO/);
 }
@@ -645,13 +645,13 @@ function assertExplicitTeardownHandleContinuation(source) {
   assert.match(source, /Explicit Teardown Handle Continuation/);
   assert.match(source, /2026-05-28 explicit-teardown handle continuation/);
   assert.ok(source.includes('docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md'));
-  assert.match(source, /handle or target expression shape for all 55 current tracked\s+`removeEventListener`, `clearTimeout`, `clearInterval`, and\s+`cancelAnimationFrame` rows/);
-  assert.match(source, /13 `removeEventListener` rows, 34\s+`clearTimeout` rows, 4 `clearInterval` rows, 4 `cancelAnimationFrame` rows, 7\s+listener document targets, 2 listener window targets, 2 generated shell\s+listener targets, 2 other listener targets, 12 local timeout id handles, 14 named timeout state handles,\s+8 property-held timeout handles, 2 engine-check interval handles, 1 warmup\s+interval handle, 1 dashboard rotation interval handle, 2 profile dropdown\s+frame handles, 1 generic position frame handle, and 1 other frame handle/);
+  assert.match(source, /handle or target expression shape for all 61 current tracked\s+`removeEventListener`, `clearTimeout`, `clearInterval`, and\s+`cancelAnimationFrame` rows/);
+  assert.match(source, /18 `removeEventListener` rows, 34\s+`clearTimeout` rows, 5 `clearInterval` rows, 4 `cancelAnimationFrame` rows, 7\s+listener document targets, 2 listener window targets, 2 generated shell\s+listener targets, 2 other listener targets, 12 local timeout id handles, 14 named timeout state handles,\s+8 property-held timeout handles, 2 engine-check interval handles, 1 warmup\s+interval handle, 1 dashboard rotation interval handle, 2 profile dropdown\s+frame handles, 1 generic position frame handle, and 1 other frame handle/);
   assert.match(source, /ASCII and Mermaid flow\s+diagrams/);
   assert.match(source, /Explicit teardown cleanup\s+authority, broad lifecycle pruning, route teardown authority, native\/menu\s+timing authority, and `update_goal\(status='complete'\)` remain `NO-GO`/);
   assert.match(source, /Runtime behavior changed by this continuation: no; the broad audit remains\s+active/);
   assert.match(lifecycleDoc, /Explicit Teardown Handle Addendum - 2026-05-28/);
-  assert.match(lifecycleDoc, /explicit teardown handle rows: 55/);
+  assert.match(lifecycleDoc, /explicit teardown handle rows: 61/);
   assert.match(lifecycleDoc, /explicit teardown cleanup approval: NO-GO/);
 }
 
@@ -2509,17 +2509,17 @@ test('active goal completion audit records native runtime sync manifest freshnes
   assert.match(source, /app dirty state is not release authority/);
   assert.match(source, /32 runtime sync manifest entries/);
   assert.match(source, /0 `destinationKind` fields/);
-  assert.match(source, /26 direct source\/destination hash matches/);
-  assert.match(source, /6 direct hash diffs/);
-  assert.match(source, /38 broad extension-source mirror matches/);
+  assert.match(source, /32 direct source\/destination hash matches/);
+  assert.match(source, /0 direct hash diffs/);
+  assert.match(source, /46 broad extension-source mirror matches/);
   assert.match(source, /0 missing mirror files/);
-  assert.match(source, /8 mirror hash diffs/);
+  assert.match(source, /0 mirror hash diffs/);
   assert.match(source, /16 `runtimeBundleOrder` entries including `js\/layout\.js`/);
   assert.match(source, /6 generated app runtime artifact hashes/);
   assert.match(source, /public `data\/release_notes\.json` has 317 lines/);
   assert.match(source, /current Android\/iOS native release-note resources have 301 lines/);
-  assert.match(source, /broader runtime mirror equality is not a release freshness authority/);
-  assert.match(source, /app worktree is dirty/);
+  assert.match(source, /manifest-listed direct copies and broad runtime mirror rows now match/);
+  assert.match(source, /generated runtime assets still lack a report/);
   assert.match(source, /source revision, app revision, manifest hash, destination hashes, generated runtime hashes, and release artifacts/);
   assert.match(source, /`nativeRuntimeSyncManifestFreshnessContract`, `nativeRuntimeSyncDirectCopyHashReport`, `nativeRuntimeSyncGeneratedRuntimeHashReport`, `nativeRuntimeSyncAppDirtyStateReport`, `nativeRuntimeSyncReleaseNotesParityReport`, `nativeRuntimeSyncDestinationKindManifest`, `nativeRuntimeSyncSourceMirrorReport`, `nativeRuntimeSyncRuntimeBundleOrderGate`, `nativeRuntimeSyncLayoutQuarantineGate`, or `nativeRuntimeSyncFirstClassJsonParityGate`/);
 });

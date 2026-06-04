@@ -18,7 +18,7 @@ const androidReleaseNotesPath = path.join(appRoot, 'apps/android/app/src/main/as
 const iosReleaseNotesPath = path.join(appRoot, 'apps/ios/FilterTube/Resources/release_notes.json');
 const sourceRows = [
   [wrapperPath, 34, 1070, '4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6'],
-  [appSyncScriptPath, 2284, 109397, 'ce0e231f9f0384eb538e76a553ef41453673c3231b8c5ab62d94ff7d38b90ae9'],
+  [appSyncScriptPath, 2288, 109519, '1cd84715cb370b0935abeadc88bbb7285a16a097561e510d1eb3572928a394ae'],
   [appManifestPath, 226, 9654, 'f08e48f7e329fd7ac22b9c3b990f3c53771f356d6f8cbe2ebe5fe51226b5b540'],
   [publicReleaseNotesPath, 317, 23020, 'a8d59b18e9bffd1c828538ee58b3b8e9be7c641fea3ff064220311485a3b1c6b'],
   [androidReleaseNotesPath, 301, 21095, '911628cbd7f6354c58aa82064f3ef1f29cda3904a87e3ea263534600a0880737'],
