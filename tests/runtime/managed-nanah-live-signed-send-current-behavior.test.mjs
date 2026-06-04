@@ -175,9 +175,11 @@ test('managed trusted links are profile scoped while multi-target fanout stays b
   assert.match(doc, /Profile-scoped identity foundation present/);
   assert.match(doc, /findNanahTrustedLink\(remoteDeviceId, options = \{\}\)/);
   assert.match(doc, /saveNanahTrustedLink\(entry\)[\s\S]*replaces an existing row by exact link id or trustedLinkIdentityKey/);
+  assert.match(doc, /buildEnvelopeBatchForTrustedLinks\(policy, trustedLinks\)/);
   assert.match(doc, /A device-level trusted link is still not enough for multi-target authority/);
   assert.match(doc, /runtime profile-scoped trusted link id: present/);
   assert.match(doc, /runtime multi-target chooser: absent/);
+  assert.match(doc, /runtime signed fanout envelope builder: helper present, UI path absent/);
   assert.match(doc, /Runtime behavior changed by this proof: yes, trusted-link storage and lookup now\s+distinguish fixed managed target profiles/);
   assert.match(doc, /flowchart TD/);
   assert.match(liveDoc, new RegExp(fanoutDocPath));
@@ -198,6 +200,7 @@ test('managed trusted links are profile scoped while multi-target fanout stays b
   assert.match(tabView, /candidateTargetProfileId === currentTargetProfileId/);
   assert.match(tabView, /function findNanahTrustedLinkForManagedEnvelope\(envelope\)[\s\S]*targetProfileId/);
   assert.match(helperSource, /function resolveTargetProfile\(trustedLink\)[\s\S]*policyBehavior === 'fixed_profile'/);
+  assert.match(helperSource, /async function buildEnvelopeBatchForTrustedLinks\(policy, trustedLinks\)/);
 });
 
 test('dashboard exposes explicit Main Kids rule source picker for granular managed sends', () => {
@@ -228,6 +231,7 @@ test('dashboard builds signed managed envelopes only after source link scope tar
   assert.match(source, /function buildTimeLimitPayload\(profile\)/);
   assert.match(source, /async function buildEnvelopeForLiveSend\(policy\)/);
   assert.match(source, /async function buildEnvelopeBatchForLiveSend\(policy\)/);
+  assert.match(source, /async function buildEnvelopeBatchForTrustedLinks\(policy, trustedLinks\)/);
   assert.match(source, /if \(!trustedLink \|\| trustedLink\.linkType !== 'managed_link'\)/);
   assert.match(source, /if \(trustedLink\.localRole !== 'source' \|\| trustedLink\.remoteRole !== 'replica'\)/);
   assert.match(source, /MANAGED_LIVE_BUNDLE_SCOPES/);
@@ -253,6 +257,54 @@ test('managed source send uses signed envelope before proposal fallback and reco
   assert.match(sendButtonBlock, /return;\s+\}\s+let envelope = await adapter\.buildControlProposal/);
   assert.match(source, /window\.FilterTubeNanahManagedLivePolicy\?\.create/);
   assert.match(read(managedLivePolicyPath), /outgoingManagedPolicies/);
+});
+
+test('managed live signed-send helper can build per-target envelope batches without exposing fanout UI', async () => {
+  const { helper, trustedLink } = createManagedLivePolicyHarness({
+    allowedScopes: ['keywords', 'channels', 'videos']
+  });
+  const siblingLink = plain({
+    ...trustedLink,
+    linkId: 'link-parent-child-2',
+    policy: {
+      ...trustedLink.policy,
+      targetProfileId: 'child-profile-2',
+      targetProfileName: 'Sibling'
+    }
+  });
+
+  const envelopes = await helper.buildEnvelopeBatchForTrustedLinks(
+    { scope: 'rules_bundle', linkType: 'managed_link', authorityMode: 'managed' },
+    [trustedLink, siblingLink]
+  );
+
+  assert.equal(envelopes.length, 6);
+  assert.deepEqual(plain([...new Set(envelopes.map((envelope) => envelope.linkId))]), [
+    'link-parent-child-1',
+    'link-parent-child-2'
+  ]);
+  assert.deepEqual(plain([...new Set(envelopes.map((envelope) => envelope.targetProfileId))]), [
+    'child-profile-1',
+    'child-profile-2'
+  ]);
+  assert.deepEqual(plain(envelopes.map((envelope) => `${envelope.linkId}:${envelope.scope}`)), [
+    'link-parent-child-1:keywords',
+    'link-parent-child-1:channels',
+    'link-parent-child-1:videos',
+    'link-parent-child-2:keywords',
+    'link-parent-child-2:channels',
+    'link-parent-child-2:videos'
+  ]);
+  assert.ok(envelopes.every((envelope) => envelope.type === 'filtertube_managed_policy'));
+  assert.ok(envelopes.every((envelope) => envelope.integrity?.signedFields?.linkId === envelope.linkId));
+
+  await assert.rejects(
+    () => helper.buildEnvelopeBatchForTrustedLinks(
+      { scope: 'keywords', linkType: 'managed_link', authorityMode: 'managed' },
+      []
+    ),
+    /at least one saved profile-scoped trusted link/
+  );
 });
 
 test('managed live signed-send helper builds granular parent-control payloads from selected surface', async () => {

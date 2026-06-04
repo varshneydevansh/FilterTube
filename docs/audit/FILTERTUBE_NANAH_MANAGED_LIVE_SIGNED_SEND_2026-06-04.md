@@ -72,6 +72,11 @@ envelopes, each with its own revision, hash, signature binding, send call, and
 `outgoingManagedPolicies` row. A saved managed link must explicitly allow all
 three underlying scopes before the bundle send is accepted.
 
+The helper can also build per-target signed envelope batches for an explicit
+list of saved profile-scoped managed links. That is a non-UI primitive only:
+it signs one envelope per target and scope, but it does not choose targets,
+send a live fanout, or record per-target ack/history.
+
 This is not a mailbox runtime, local-network discovery runtime, key-rotation
 system, or offline later-delivery mechanism.
 
@@ -79,10 +84,11 @@ Still pending:
 
 - richer bulk outbound controls for viewing-space/time-limit combinations,
   per-child multi-target fanout, and selectable Main+Kids dual-surface sends;
-- target chooser, per-target envelope batching, and per-target ack/history
+- target chooser, live-session fanout send wiring, and per-target ack/history
   before any multi-target child fanout UI can safely send to several protected
-  profiles on the same replica device; profile-scoped trusted-link identity is
-  now present as the foundation for that later UI;
+  profiles on the same replica device; profile-scoped trusted-link identity and
+  helper-level per-target envelope batching are now present as foundations for
+  that later UI;
 - active/full proposal conversion policy;
 - installed-extension two-device smoke proof;
 - key rotation/revocation UI;

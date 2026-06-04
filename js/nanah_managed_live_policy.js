@@ -216,13 +216,14 @@
             return revision && policyHash ? { revision, policyHash } : null;
         }
 
-        async function buildEnvelopeForScope(policy, scope) {
+        async function buildEnvelopeForScope(policy, scope, options = {}) {
             const adapter = deps.getAdapter();
             if (typeof adapter.signManagedPolicyEnvelope !== 'function') {
                 throw new Error('Managed policy signing is unavailable');
             }
 
-            const trustedLink = deps.normalizeTrustedLink(deps.getCurrentTrustedLink());
+            const optionRoot = safeObject(options);
+            const trustedLink = deps.normalizeTrustedLink(optionRoot.trustedLink || deps.getCurrentTrustedLink());
             if (!trustedLink || trustedLink.linkType !== 'managed_link') {
                 throw new Error('Signed managed sends require a saved managed link.');
             }
@@ -304,6 +305,29 @@
             return envelopes;
         }
 
+        async function buildEnvelopeBatchForTrustedLinks(policy, trustedLinks) {
+            const links = Array.isArray(trustedLinks)
+                ? trustedLinks.map((link) => deps.normalizeTrustedLink(link)).filter(Boolean)
+                : [];
+            if (links.length === 0) {
+                throw new Error('Managed fanout sends require at least one saved profile-scoped trusted link.');
+            }
+            const scopes = expandScope(policy.scope);
+            if (scopes.length === 0) {
+                throw new Error('Signed managed sends require Main, Kids, keyword, channel, video, viewing-space, or time-limit scope.');
+            }
+            const envelopes = [];
+            for (const trustedLink of links) {
+                if (!normalizeString(trustedLink.linkId)) {
+                    throw new Error('Managed fanout sends require every trusted link to have a link id.');
+                }
+                for (const scope of scopes) {
+                    envelopes.push(await buildEnvelopeForScope(policy, scope, { trustedLink }));
+                }
+            }
+            return envelopes;
+        }
+
         async function markSent(linkId, scope, revision, policyHash) {
             const normalizedLinkId = normalizeString(linkId);
             const normalizedScope = normalizeScope(scope);
@@ -331,6 +355,7 @@
             buildPayload,
             buildEnvelopeForLiveSend,
             buildEnvelopeBatchForLiveSend,
+            buildEnvelopeBatchForTrustedLinks,
             markSent
         };
     }

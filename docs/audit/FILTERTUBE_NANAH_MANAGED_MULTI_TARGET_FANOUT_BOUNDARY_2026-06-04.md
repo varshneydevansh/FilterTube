@@ -3,7 +3,7 @@
 **Generated**: 2026-06-04
 **Status**: Profile-scoped identity foundation present; boundary contract still
 active. Runtime multi-target fanout remains disabled because the dashboard does
-not yet expose a target chooser, per-target envelope batcher, or per-target
+not yet expose a target chooser, live-session fanout send loop, or per-target
 ack/history summary.
 **Related live-send proof**:
 `docs/audit/FILTERTUBE_NANAH_MANAGED_LIVE_SIGNED_SEND_2026-06-04.md`
@@ -20,10 +20,11 @@ time-limit policy.
 The current live Nanah runtime can safely send signed managed policy envelopes
 to one connected replica target. Trusted-link storage and lookup can now
 distinguish fixed child/profile targets on the same remote device, but the
-dashboard must not expose a bulk target UI until target selection, per-target
-envelope building, and per-target status/history are implemented. Otherwise a
+dashboard must not expose a bulk target UI until target selection, live-session
+fanout send wiring, and per-target status/history are implemented. Otherwise a
 bulk action could still overclaim delivery or hide a skipped/rejected child
-target behind one success toast.
+target behind one success toast. The helper-level per-target envelope batcher is
+now present as a non-UI primitive only.
 
 ## Current Runtime Evidence
 
@@ -61,10 +62,18 @@ resolveTargetProfile(trustedLink)
   -> first uses trustedLink.policy.targetProfileId when fixed
   -> otherwise uses replica hello target profile
   -> returns null when no fixed protected target is known
+
+buildEnvelopeBatchForTrustedLinks(policy, trustedLinks)
+  -> accepts explicit saved managed links
+  -> expands selected scope or Rule bundle per target
+  -> signs each envelope with its own linkId, targetProfileId, scope,
+     revision, hash, and integrity binding
+  -> does not send, choose targets, or record per-target ack/history
 ```
 
 That is correct for single-target signed sends and for storing multiple fixed
-targets from one trusted remote device. It is still not enough for bulk fanout.
+targets from one trusted remote device. It provides the envelope-building
+primitive for future fanout, but it is still not enough for bulk fanout UI.
 
 ## Required Identity Upgrade
 
@@ -147,14 +156,15 @@ The parent-facing UI should stay simple:
 ```text
 runtime profile-scoped trusted link id: present
 runtime multi-target chooser: absent
-runtime signed fanout envelope builder: absent
+runtime signed fanout envelope builder: helper present, UI path absent
 runtime per-target mark-sent state: absent
 runtime per-target ack/history summary: absent
 runtime mailbox/local-network fanout delivery: absent
 ```
 
 Runtime behavior changed by this proof: yes, trusted-link storage and lookup now
-distinguish fixed managed target profiles. Bulk fanout remains disabled.
+distinguish fixed managed target profiles, and the helper can build per-target
+signed envelope batches. Bulk fanout remains disabled.
 
 ## Proof Commands
 

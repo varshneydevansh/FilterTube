@@ -435,7 +435,9 @@ replica child device over Nanah/P2P or same-network transport.
   video, viewing-space, and time-limit dashboard live sends now build signed
   `filtertube_managed_policy` envelopes; granular keyword/channel/video sends
   expose an explicit Main/Kids rule-source picker, and Rule bundle expands into
-  separate signed keyword/channel/video envelopes; active/full sends and richer
+  separate signed keyword/channel/video envelopes. The helper can also build
+  per-target signed envelope batches for explicit saved profile-scoped links;
+  active/full sends, target chooser/live fanout wiring, and richer
   viewing-space/time-limit or multi-target bulk outbound controls remain later
   slices.
 - **Acceptance Criteria**:
@@ -493,9 +495,10 @@ replica child device over Nanah/P2P or same-network transport.
 - **Status**: Boundary proof plus identity foundation added.
   `saveNanahTrustedLink(...)`, `findNanahTrustedLink(...)`, and
   `getNanahCurrentTrustedLink(...)` now distinguish fixed managed target
-  profiles on the same remote device. Multi-target fanout UI remains disabled
-  until the target chooser, per-target envelope batcher, and per-target
-  ack/history summary exist.
+  profiles on the same remote device. `buildEnvelopeBatchForTrustedLinks(...)`
+  can build per-target signed envelope batches for explicit saved links.
+  Multi-target fanout UI remains disabled until the target chooser,
+  live-session fanout send wiring, and per-target ack/history summary exist.
 - **Acceptance Criteria**:
   - The doc names the profile-scoped trusted-link behavior.
   - The doc requires device plus target-profile binding before multi-child
