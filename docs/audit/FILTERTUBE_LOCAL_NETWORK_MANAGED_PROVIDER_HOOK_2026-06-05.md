@@ -11,6 +11,8 @@ transport remain absent.
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_DISCOVERY_AUTHORITY_BOUNDARY_2026-06-03.md`
 **Related inventory**:
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
+**Related source status**:
+`docs/audit/FILTERTUBE_MANAGED_SOURCE_DELIVERY_ACK_STATUS_2026-06-05.md`
 
 ## Purpose
 
@@ -61,6 +63,11 @@ It does not include plaintext keywords, channel names, video titles, PINs,
 viewing history, or full action-history rows. If the ack writer is missing or
 throws, local policy apply/reject history remains intact and the sync state
 records the failed ack handoff.
+
+When a provider later returns this same ack payload to the parent/source
+dashboard through the source delivery-ack provider hook, the source records a
+trusted-link status row only if the ack matches a previously sent
+scope/revision/policy-hash tuple.
 
 ## Runtime Hooks Added
 

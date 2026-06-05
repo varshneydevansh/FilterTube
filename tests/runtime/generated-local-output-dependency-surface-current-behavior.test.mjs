@@ -129,15 +129,15 @@ test('dist package trees and zip artifacts are current local output not package 
   };
   const expectedBrowsers = {
     chrome: {
-      bytes: 12125312,
+      bytes: 12181565,
       manifestHash: '282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734',
     },
     firefox: {
-      bytes: 12125402,
+      bytes: 12181655,
       manifestHash: 'a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0',
     },
     opera: {
-      bytes: 12125317,
+      bytes: 12181570,
       manifestHash: '0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b',
     },
   };
@@ -154,9 +154,9 @@ test('dist package trees and zip artifacts are current local output not package 
   }
 
   for (const [zip, bytes, hash] of [
-    ['dist/filtertube-chrome-v3.3.2.zip', 8744265, 'eebce0f32f2faf9cccd03b249f83b96dd9d861340ab9bd968af1d77ba7a558cc'],
-    ['dist/filtertube-firefox-v3.3.2.zip', 8744324, 'e4ee2d10ebf2e4cffa44a5bdf688b47018bd6d7495248b75a343f02fc739d9ed'],
-    ['dist/filtertube-opera-v3.3.2.zip', 8744267, '5a39f14dc23e885539e0cc19423eae6f6858756077ec3f1c9bc5b99986e84259'],
+    ['dist/filtertube-chrome-v3.3.2.zip', 8751498, 'bd3e708caf7b15f34db73d99d3423833dc2c3894e04f7e876fceb8b5a9aa57ed'],
+    ['dist/filtertube-firefox-v3.3.2.zip', 8751557, 'da6ca5b5dbd555ae998285e12eee01c55b87d6f13ebc2ce48ff411054a914669'],
+    ['dist/filtertube-opera-v3.3.2.zip', 8751500, 'e4c93669627372a538d239a8637d54897beb1c75730bdbe062e0463670d28bcb'],
   ]) {
     assert.equal(byteCount(zip), bytes, `${zip} size drifted`);
     assert.equal(sha256(zip), hash, `${zip} hash drifted`);

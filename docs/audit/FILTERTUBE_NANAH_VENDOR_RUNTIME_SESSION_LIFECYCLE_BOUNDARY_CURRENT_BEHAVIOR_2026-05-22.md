@@ -16,7 +16,7 @@ first-class JSON filter parity.
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `js/vendor/nanah.bundle.js` | 876 | 27692 | `11c43c120c58ed4de81d2b1d341efd488d1bd6792d49ce5fdc9220aacf6e07ca` |
-| `js/tab-view.js` | 14702 | 684139 | `6ffc4f25bb294dfc7cc95a445611f8d31c9ee507bbc7facbcce7d03cb1ad304c` |
+| `js/tab-view.js` | 14926 | 695872 | `5cdae945aca165b11af3c3f9fc246e89da3ce6780939013081e5d035b4163323` |
 | `js/nanah_sync_adapter.js` | 433 | 17072 | `8094261e6fb9fa72a86e6e79e8614bf18b93134f54dcca7327114b5410447824` |
 | `html/tab-view.html` | 1577 | 133585 | `d11914a138ab29fb764a6aede4921c4d491bacaad83ecd44f8d7392758ece3e1` |
 

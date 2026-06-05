@@ -461,11 +461,12 @@ replica child device over Nanah/P2P or same-network transport.
   same-replica send. Redacted outbound send history and redacted live ack
   history are present per trusted link/scope. Pull-on-open mailbox ack handoff
   now writes protected redacted target-profile history after the provider ack
-  attempt. Offline mailbox/local-network delivery, source-side
-  mailbox/local-network ack summaries, offline delivery, cross-device fanout,
-  and richer per-target preview controls remain later slices. Local
-  selected-profile time-limit and viewing-space bulk writes are already
-  dashboard-gated.
+  attempt. Source-side provider-fed mailbox/local-network delivery ack summaries
+  are now present under
+  `docs/audit/FILTERTUBE_MANAGED_SOURCE_DELIVERY_ACK_STATUS_2026-06-05.md`.
+  Offline mailbox/local-network delivery, cross-device fanout, and richer
+  per-target preview controls remain later slices. Local selected-profile
+  time-limit and viewing-space bulk writes are already dashboard-gated.
 - **Acceptance Criteria**:
   - The public descriptor is separated from the private keypair.
   - The private JWK is not placed in the Nanah hello descriptor or trusted link
@@ -501,10 +502,12 @@ replica child device over Nanah/P2P or same-network transport.
   aliases expand into concrete signed Main, Kids, viewing-space, and optional
   time-limit envelopes instead of using the legacy proposal path. Pull-on-open
   mailbox ack handoff now writes protected redacted target-profile history
-  after the provider ack attempt. Mailbox delivery, local-network delivery,
-  source-side mailbox/local-network ack summaries, cross-device fanout, and
-  richer per-target preview controls remain pending. Local selected-profile
-  time-limit and viewing-space bulk writes are already dashboard-gated.
+  after the provider ack attempt. Source-side provider-fed mailbox/local-network
+  delivery ack summaries are now present under
+  `docs/audit/FILTERTUBE_MANAGED_SOURCE_DELIVERY_ACK_STATUS_2026-06-05.md`.
+  Mailbox delivery, local-network delivery, cross-device fanout, and richer
+  per-target preview controls remain pending. Local selected-profile time-limit
+  and viewing-space bulk writes are already dashboard-gated.
 - **Acceptance Criteria**:
   - Existing proposal sends still work for non-managed peer scopes.
   - Signed sends require saved managed link, Source -> Replica roles, allowed

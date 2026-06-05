@@ -274,6 +274,12 @@ Inbound live-ack rows use `filtertube_managed_live_ack_history` under the same
 trusted link policy row. They are recorded only when a connected replica's ack
 matches the prior outbound link id, target profile, source device, scope,
 revision, and policy hash.
+Provider-fed mailbox and local-network delivery ack rows use
+`filtertube_managed_remote_delivery_ack_history` under the same trusted link
+policy row. They are recorded only when the provider payload matches a prior
+outbound link id, target profile, source device, scope, revision, and policy
+hash. This gives parent/caregiver feedback for later-delivery handoffs without
+letting the provider authorize policy or store plaintext rule values.
 This keeps local keyword/channel/video writes, Nanah apply, mailbox apply, and
 admin session events using one history model without turning logs into policy
 state.

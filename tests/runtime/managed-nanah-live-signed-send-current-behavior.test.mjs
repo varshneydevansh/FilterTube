@@ -277,6 +277,7 @@ test('dashboard builds signed managed envelopes only after source link scope tar
   assert.match(source, /function buildTimeLimitPayload\(profile\)/);
   assert.match(source, /function buildLiveAckPayload\(envelope, decision, options = \{\}\)/);
   assert.match(source, /async function recordLiveAckPayload\(ackPayload\)/);
+  assert.match(source, /async function recordRemoteDeliveryAckPayload\(ackPayload\)/);
   assert.match(source, /async function buildEnvelopeForLiveSend\(policy\)/);
   assert.match(source, /async function buildEnvelopeBatchForLiveSend\(policy\)/);
   assert.match(source, /async function buildEnvelopeBatchForTrustedLinks\(policy, trustedLinks\)/);
@@ -318,10 +319,15 @@ test('managed source send uses signed envelope before proposal fallback and reco
   assert.match(source, /nanahManagedLivePolicy\.buildLiveAckPayload/);
   assert.match(source, /async function handleNanahIncomingManagedLiveAck\(ackPayload\)/);
   assert.match(source, /nanahManagedLivePolicy\.recordLiveAckPayload/);
+  assert.match(source, /async function handleNanahIncomingManagedRemoteDeliveryAck\(ackPayload, options = \{\}\)/);
+  assert.match(source, /nanahManagedLivePolicy\.recordRemoteDeliveryAckPayload/);
   assert.match(source, /root\.schema === 'filtertube_nanah_managed_live_ack'/);
+  assert.match(source, /root\.schema === 'filtertube_nanah_managed_open_sync_ack'/);
+  assert.match(source, /root\.schema === 'filtertube_managed_local_network_candidate_ack'/);
   assert.match(read(managedLivePolicyPath), /outgoingManagedPolicies/);
   assert.match(read(managedLivePolicyPath), /outboundManagedPolicyHistory/);
   assert.match(read(managedLivePolicyPath), /inboundManagedAckHistory/);
+  assert.match(read(managedLivePolicyPath), /filtertube_managed_remote_delivery_ack_history/);
 });
 
 test('managed live signed-send helper can build connected per-target envelope batches', async () => {
@@ -471,6 +477,96 @@ test('managed live signed-send helper records matching live ack history without 
   const staleAck = plain(ackPayload);
   staleAck.records[0].policyHash = 'remote-managed-policy-other';
   const staleResult = await helper.recordLiveAckPayload(staleAck);
+  assert.deepEqual(plain({ ok: staleResult.ok, reason: staleResult.reason, recordedCount: staleResult.recordedCount }), {
+    ok: false,
+    reason: 'no_matching_ack_records',
+    recordedCount: 0
+  });
+});
+
+test('managed live signed-send helper records provider mailbox and local-network delivery acks by revision hash', async () => {
+  const { helper, trustedLink, policyUpdates } = createManagedLivePolicyHarness({ activeSurface: 'main' });
+  const envelope = await helper.buildEnvelopeForLiveSend({ scope: 'keywords' });
+  trustedLink.policy.outgoingManagedPolicies = {
+    keywords: {
+      revision: envelope.revision,
+      policyHash: envelope.policyHash,
+      sentAt: 1779300000000
+    }
+  };
+
+  const mailboxAck = {
+    schema: 'filtertube_nanah_managed_open_sync_ack',
+    version: 1,
+    ackedAt: 1779300001000,
+    linkId: envelope.linkId,
+    sourceDeviceId: 'parent-device-1',
+    sourceProfileId: 'parent-profile-1',
+    targetProfileId: 'child-profile-1',
+    records: [{
+      mailboxItemId: 'mbx-child-keywords-1',
+      scope: 'keywords',
+      revision: envelope.revision,
+      policyHash: envelope.policyHash,
+      ackState: 'delivered',
+      accepted: true,
+      applied: true,
+      ackedAt: 1779300001000
+    }]
+  };
+  const mailboxResult = await helper.recordRemoteDeliveryAckPayload(mailboxAck);
+  assert.deepEqual(plain({ ok: mailboxResult.ok, reason: mailboxResult.reason, recordedCount: mailboxResult.recordedCount }), {
+    ok: true,
+    reason: '',
+    recordedCount: 1
+  });
+  const mailboxPatch = policyUpdates[0].patch.policy;
+  assert.equal(mailboxPatch.outgoingManagedPolicies.keywords.lastAckState, 'delivered');
+  assert.equal(mailboxPatch.outgoingManagedPolicies.keywords.lastAckResult, 'accepted');
+  const mailboxRow = mailboxPatch.inboundManagedAckHistory[0];
+  assert.equal(mailboxRow.schema, 'filtertube_managed_remote_delivery_ack_history');
+  assert.equal(mailboxRow.actionType, 'remote_policy.mailbox.ack');
+  assert.equal(mailboxRow.summary.transport, 'mailbox');
+  assert.equal(mailboxRow.summary.mailboxItemId, 'mbx-child-keywords-1');
+  assert.equal(JSON.stringify(mailboxRow).includes('shakira'), false);
+  assert.equal(JSON.stringify(mailboxRow).includes('UC-shakira'), false);
+
+  const localNetworkAck = {
+    schema: 'filtertube_managed_local_network_candidate_ack',
+    version: 1,
+    ackedAt: 1779300002000,
+    linkId: envelope.linkId,
+    sourceDeviceId: 'parent-device-1',
+    sourceProfileId: 'parent-profile-1',
+    targetProfileId: 'child-profile-1',
+    records: [{
+      localNetworkCandidateId: 'lan-candidate-1',
+      scope: 'keywords',
+      revision: envelope.revision,
+      policyHash: envelope.policyHash,
+      ackState: 'accepted',
+      accepted: true,
+      applied: true,
+      ackedAt: 1779300002000
+    }]
+  };
+  const localNetworkResult = await helper.recordRemoteDeliveryAckPayload(localNetworkAck);
+  assert.deepEqual(plain({ ok: localNetworkResult.ok, reason: localNetworkResult.reason, recordedCount: localNetworkResult.recordedCount }), {
+    ok: true,
+    reason: '',
+    recordedCount: 1
+  });
+  const localNetworkPatch = policyUpdates[1].patch.policy;
+  const localNetworkRow = localNetworkPatch.inboundManagedAckHistory[0];
+  assert.equal(localNetworkRow.schema, 'filtertube_managed_remote_delivery_ack_history');
+  assert.equal(localNetworkRow.actionType, 'remote_policy.local_network.ack');
+  assert.equal(localNetworkRow.ackState, 'delivered');
+  assert.equal(localNetworkRow.summary.transport, 'local_network');
+  assert.equal(localNetworkRow.summary.localNetworkCandidateId, 'lan-candidate-1');
+
+  const staleAck = plain(localNetworkAck);
+  staleAck.records[0].policyHash = 'sha256:other-policy';
+  const staleResult = await helper.recordRemoteDeliveryAckPayload(staleAck);
   assert.deepEqual(plain({ ok: staleResult.ok, reason: staleResult.reason, recordedCount: staleResult.recordedCount }), {
     ok: false,
     reason: 'no_matching_ack_records',

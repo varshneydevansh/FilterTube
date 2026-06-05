@@ -19,7 +19,10 @@
         rules_bundle: ['keywords', 'channels', 'videos']
     };
     const MANAGED_LIVE_ACK_SCHEMA = 'filtertube_nanah_managed_live_ack';
+    const MANAGED_MAILBOX_ACK_SCHEMA = 'filtertube_nanah_managed_open_sync_ack';
+    const MANAGED_LOCAL_NETWORK_ACK_SCHEMA = 'filtertube_managed_local_network_candidate_ack';
     const MANAGED_LIVE_ACK_HISTORY_SCHEMA = 'filtertube_managed_live_ack_history';
+    const MANAGED_REMOTE_DELIVERY_ACK_HISTORY_SCHEMA = 'filtertube_managed_remote_delivery_ack_history';
     const MANAGED_OUTBOUND_HISTORY_SCHEMA = 'filtertube_managed_outbound_policy_history';
     const MANAGED_OUTBOUND_HISTORY_LIMIT = 50;
     const MANAGED_LIVE_ACK_HISTORY_LIMIT = 50;
@@ -399,6 +402,7 @@
 
         function normalizeAckState(value) {
             const normalized = normalizeString(value).toLowerCase();
+            if (normalized === 'accepted' || normalized === 'applied') return 'delivered';
             if (['delivered', 'rejected', 'conflict', 'expired', 'revoked'].includes(normalized)) {
                 return normalized;
             }
@@ -465,6 +469,37 @@
             };
         }
 
+        function resolveAckTransport(ackPayload) {
+            const root = safeObject(ackPayload);
+            const schema = normalizeString(root.schema);
+            const explicit = normalizeString(root.transport).toLowerCase();
+            if (schema === MANAGED_MAILBOX_ACK_SCHEMA || explicit === 'mailbox') return 'mailbox';
+            if (schema === MANAGED_LOCAL_NETWORK_ACK_SCHEMA || explicit === 'local_network') return 'local_network';
+            return 'live_nanah_session';
+        }
+
+        function ackActionTypeForTransport(transport) {
+            if (transport === 'mailbox') return 'remote_policy.mailbox.ack';
+            if (transport === 'local_network') return 'remote_policy.local_network.ack';
+            return 'remote_policy.live_ack';
+        }
+
+        function ackHistorySchemaForTransport(transport) {
+            return transport === 'live_nanah_session'
+                ? MANAGED_LIVE_ACK_HISTORY_SCHEMA
+                : MANAGED_REMOTE_DELIVERY_ACK_HISTORY_SCHEMA;
+        }
+
+        function ackLabelForTransport(transport, result) {
+            if (transport === 'mailbox') {
+                return result === 'accepted' ? 'Mailbox policy delivered' : 'Mailbox policy delivery failed';
+            }
+            if (transport === 'local_network') {
+                return result === 'accepted' ? 'Local-network policy delivered' : 'Local-network policy delivery failed';
+            }
+            return result === 'accepted' ? 'Replica applied managed policy' : 'Replica rejected managed policy';
+        }
+
         function buildInboundAckHistoryRow(trustedLink, ackPayload, ackRecord) {
             const trusted = deps.normalizeTrustedLink(trustedLink);
             const policy = safeObject(trusted?.policy);
@@ -477,12 +512,16 @@
             const receivedAt = deps.now();
             const ackedAt = normalizeNonNegativeInteger(record.ackedAt || root.ackedAt) || receivedAt;
             const result = resultForAckState(ackState);
+            const transport = resolveAckTransport(root);
+            const rowTransport = transport.replace(/[^a-z0-9]+/g, '-');
+            const mailboxItemId = normalizeString(record.mailboxItemId);
+            const localNetworkCandidateId = normalizeString(record.localNetworkCandidateId || record.candidateId);
             return {
-                rowId: `managed-live-ack-${normalizeString(trusted?.linkId)}-${scope}-${revision || 'none'}-${receivedAt}`,
-                schema: MANAGED_LIVE_ACK_HISTORY_SCHEMA,
+                rowId: `managed-${rowTransport}-ack-${normalizeString(trusted?.linkId)}-${scope}-${revision || 'none'}-${receivedAt}`,
+                schema: ackHistorySchemaForTransport(transport),
                 version: 1,
                 trustedLinkId: normalizeString(trusted?.linkId),
-                actionType: 'remote_policy.live_ack',
+                actionType: ackActionTypeForTransport(transport),
                 scope,
                 revision,
                 policyHash,
@@ -498,16 +537,24 @@
                 receivedAt,
                 summary: {
                     redacted: true,
-                    label: result === 'accepted' ? 'Replica applied managed policy' : 'Replica rejected managed policy',
-                    transport: normalizeString(root.transport) || 'live_nanah_session'
+                    label: ackLabelForTransport(transport, result),
+                    transport,
+                    mailboxItemId: mailboxItemId || null,
+                    localNetworkCandidateId: localNetworkCandidateId || null
                 },
                 sensitive: true
             };
         }
 
-        async function recordLiveAckPayload(ackPayload) {
+        function isInboundAckHistoryRow(row) {
+            const schema = normalizeString(safeObject(row).schema);
+            return schema === MANAGED_LIVE_ACK_HISTORY_SCHEMA || schema === MANAGED_REMOTE_DELIVERY_ACK_HISTORY_SCHEMA;
+        }
+
+        async function recordInboundAckPayload(ackPayload, allowedSchemas) {
             const root = safeObject(ackPayload);
-            if (root.schema !== MANAGED_LIVE_ACK_SCHEMA) return { ok: false, reason: 'wrong_ack_schema', recordedCount: 0 };
+            const schema = normalizeString(root.schema);
+            if (!allowedSchemas.includes(schema)) return { ok: false, reason: 'wrong_ack_schema', recordedCount: 0 };
             const normalizedLinkId = normalizeString(root.linkId);
             if (!normalizedLinkId) return { ok: false, reason: 'missing_link_id', recordedCount: 0 };
             const trusted = deps.normalizeTrustedLink(deps.findTrustedLinkById(normalizedLinkId));
@@ -549,7 +596,7 @@
 
             const historyRows = Array.isArray(policy.inboundManagedAckHistory)
                 ? policy.inboundManagedAckHistory
-                    .filter((row) => safeObject(row).schema === MANAGED_LIVE_ACK_HISTORY_SCHEMA)
+                    .filter(isInboundAckHistoryRow)
                 : [];
             const updated = await deps.updateTrustedLinkPolicy(normalizedLinkId, {
                 policy: {
@@ -560,6 +607,14 @@
             return updated
                 ? { ok: true, reason: '', recordedCount: validRows.length, latest: validRows[validRows.length - 1] }
                 : { ok: false, reason: 'trusted_link_update_failed', recordedCount: 0 };
+        }
+
+        async function recordLiveAckPayload(ackPayload) {
+            return recordInboundAckPayload(ackPayload, [MANAGED_LIVE_ACK_SCHEMA]);
+        }
+
+        async function recordRemoteDeliveryAckPayload(ackPayload) {
+            return recordInboundAckPayload(ackPayload, [MANAGED_MAILBOX_ACK_SCHEMA, MANAGED_LOCAL_NETWORK_ACK_SCHEMA]);
         }
 
         async function markSent(linkId, scope, revision, policyHash, options = {}) {
@@ -605,6 +660,7 @@
             buildOutboundHistoryRow,
             buildLiveAckPayload,
             recordLiveAckPayload,
+            recordRemoteDeliveryAckPayload,
             markSent
         };
     }

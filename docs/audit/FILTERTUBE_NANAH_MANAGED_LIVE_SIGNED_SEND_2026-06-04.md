@@ -119,6 +119,14 @@ source device, scope, revision, and policy hash match a prior
 `outgoingManagedPolicies[scope]` send row. This is parent feedback/log evidence,
 not policy authority.
 
+The same trusted-link ack recorder now also accepts provider-fed mailbox and
+local-network ack payloads through `recordRemoteDeliveryAckPayload(...)`.
+Matching rows use `filtertube_managed_remote_delivery_ack_history` and the
+`remote_policy.mailbox.ack` or `remote_policy.local_network.ack` action type.
+They are accepted only when the ack matches a prior sent link/scope/revision/hash
+row, and the stored summary keeps mailbox item ids or local-network candidate
+ids as metadata without plaintext rule values.
+
 This is not a mailbox runtime, local-network discovery runtime, key-rotation
 system, or offline later-delivery mechanism.
 

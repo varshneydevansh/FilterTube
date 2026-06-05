@@ -34,7 +34,7 @@ Current tracked root metadata inventory: 7 files, 2,950 newline counts, and
 | `.gitignore` | 153 | 2,197 | `c90a7834297cf0a7b65493f41a21947fd5d85d1e14740b902cb3a3664028e3ca` |
 | `CHANGELOG.md` | 591 | 40,124 | `e22a87ce7eeb88d171587d4b0f4676881a2c3081a7fbf15978d7e8d8582cdfdd` |
 | `LICENSE` | 21 | 1,073 | `d0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d` |
-| `README.md` | 401 | 22,476 | `13d2bdf22b12fe686b371e053929a08cd1e734e1bd26e21fac04fc7d2f54fda8` |
+| `README.md` | 401 | 22,476 | `1e2ee2f090c69cb73a0b8bc3cef08136dbd4d13a36b4b8991d3006bb2c69e100` |
 | `channel-identity-watch-mix-collab-recovery-plan.md` | 262 | 16,023 | `01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a` |
 | `package.json` | 61 | 2,405 | `36053d322780ce787de403be574cc400936ef2a994b4c8eca62561154fe81aec` |
 | `package-lock.json` | 1,461 | 49,916 | `f52d6482693be9cd4edacdc1f1491b4d2cda796522bfd0e4dcf86e0c879ad974` |
@@ -135,7 +135,7 @@ vendor-bundle freshness, generated UI freshness, and release ZIP contents.
 ## Public Root Documents
 
 `README.md` is public release copy. It currently displays version `3.3.2`,
-license `MIT`, total line count `532.8k`, JavaScript line count `81.3k`, and
+license `MIT`, total line count `533.5k`, JavaScript line count `81.6k`, and
 links the download hub `https://filtertube.in/downloads`.
 
 Current README claims relevant to optimization and JSON-first filtering:

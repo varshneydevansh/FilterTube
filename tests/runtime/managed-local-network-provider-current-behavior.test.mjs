@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 
 const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PROVIDER_HOOK_2026-06-05.md';
+const sourceAckDocPath = 'docs/audit/FILTERTUBE_MANAGED_SOURCE_DELIVERY_ACK_STATUS_2026-06-05.md';
 const boundaryPath = 'docs/audit/FILTERTUBE_LOCAL_NETWORK_DISCOVERY_AUTHORITY_BOUNDARY_2026-06-03.md';
 const planPath = 'docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md';
 const inventoryPath = 'docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md';
@@ -180,6 +181,7 @@ async function runProviderModel({
 
 test('local-network provider hook is docs-backed and linked from managed parent plan', () => {
   const doc = read(docPath);
+  const sourceAckDoc = read(sourceAckDocPath);
   const boundary = read(boundaryPath);
   const plan = read(planPath);
   const inventory = read(inventoryPath);
@@ -195,10 +197,17 @@ test('local-network provider hook is docs-backed and linked from managed parent 
   assert.match(doc, /runtime protected local-network ack-handoff history writer: present/);
   assert.match(doc, /runtime built-in LAN peer discovery: absent/);
   assert.match(doc, /runtime YouTube page hot-path work from this slice: absent/);
+  assert.match(doc, new RegExp(sourceAckDocPath));
+  assert.match(sourceAckDoc, /Source-side mailbox\/local-network delivery ack intake and dashboard\s+status are present/);
+  assert.match(sourceAckDoc, /filtertube_managed_source_delivery_ack_request/);
+  assert.match(sourceAckDoc, /runtime source-side provider-gated ack pull: present/);
+  assert.match(sourceAckDoc, /runtime YouTube page hot-path work from this slice: absent/);
   assert.match(boundary, /provider-gated local-network candidate discovery hook/);
   assert.match(boundary, /redacted provider ack handoff/);
   assert.match(plan, new RegExp(docPath));
+  assert.match(plan, new RegExp(sourceAckDocPath));
   assert.match(inventory, new RegExp(docPath));
+  assert.match(inventory, /provider-fed mailbox\/local-network delivery acks can now be recorded/);
 });
 
 test('dashboard source wires provider-gated local-network discovery without YouTube hot-path primitives', () => {
@@ -224,6 +233,39 @@ test('dashboard source wires provider-gated local-network discovery without YouT
   assert.match(source, /await runNanahManagedLocalNetworkSync\(\{ reason: 'dashboard_open' \}\)/);
   assert.match(source, /await runNanahManagedLocalNetworkSync\(\{ reason: 'profile_switch' \}\)/);
   assert.match(source, /Local network/);
+});
+
+test('dashboard source wires provider-gated parent delivery ack status without YouTube hot-path primitives', () => {
+  const source = read(tabViewPath);
+
+  assert.match(source, /const NANAH_MANAGED_SOURCE_ACK_SYNC_STATE_KEY = 'ftNanahManagedSourceAckSyncState'/);
+  assert.match(source, /function getNanahManagedSourceAckProvider\(\)/);
+  assert.match(source, /window\.FilterTubeManagedPolicyDeliveryAcks/);
+  assert.match(source, /function buildNanahManagedSourceAckRequest\(link, reason\)/);
+  assert.match(source, /schema: 'filtertube_managed_source_delivery_ack_request'/);
+  assert.match(source, /function getNanahManagedSourceAckEligibleLinks\(\)/);
+  assert.match(source, /async function pullNanahManagedSourceDeliveryAcks\(provider, request\)/);
+  assert.match(source, /pullManagedDeliveryAcks/);
+  assert.match(source, /pullRemoteDeliveryAcks/);
+  assert.match(source, /getManagedDeliveryAcks/);
+  assert.match(source, /async function runNanahManagedSourceAckSync\(\{ reason = 'dashboard_open' \} = \{\}\)/);
+  assert.match(source, /handleNanahIncomingManagedRemoteDeliveryAck\(ackPayload, \{ silent: true \}\)/);
+  assert.match(source, /await runNanahManagedSourceAckSync\(\{ reason: 'dashboard_open' \}\)/);
+  assert.match(source, /await runNanahManagedSourceAckSync\(\{ reason: 'profile_switch' \}\)/);
+  assert.match(source, /Remote delivery/);
+
+  const sliceStart = source.indexOf('function getNanahManagedSourceAckProvider()');
+  const sliceEnd = source.indexOf('async function configureNanahTrustedLink(link)', sliceStart);
+  assert.notEqual(sliceStart, -1);
+  assert.notEqual(sliceEnd, -1);
+  const slice = source.slice(sliceStart, sliceEnd);
+  assert.doesNotMatch(slice, /MutationObserver/);
+  assert.doesNotMatch(slice, /addEventListener/);
+  assert.doesNotMatch(slice, /setInterval/);
+  assert.doesNotMatch(slice, /\bfetch\s*\(/);
+  assert.doesNotMatch(slice, /XMLHttpRequest/);
+  assert.doesNotMatch(slice, /chrome\.tabs/);
+  assert.doesNotMatch(slice, /browser\.tabs/);
 });
 
 test('local-network provider eligibility keeps discovery scoped to opted-in replica child links', () => {

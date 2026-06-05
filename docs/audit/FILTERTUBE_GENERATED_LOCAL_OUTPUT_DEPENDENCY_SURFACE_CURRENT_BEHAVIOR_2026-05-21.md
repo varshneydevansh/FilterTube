@@ -74,17 +74,17 @@ Current browser package sizes and manifest hashes:
 
 | Browser output | Files | Bytes | Manifest SHA-256 |
 | --- | ---: | ---: | --- |
-| `dist/chrome` | 63 | 12,125,312 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` |
-| `dist/firefox` | 63 | 12,125,402 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` |
-| `dist/opera` | 63 | 12,125,317 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` |
+| `dist/chrome` | 63 | 12,181,565 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` |
+| `dist/firefox` | 63 | 12,181,655 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` |
+| `dist/opera` | 63 | 12,181,570 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` |
 
 Current ZIP artifacts:
 
 | ZIP path | Bytes | SHA-256 |
 | --- | ---: | --- |
-| `dist/filtertube-chrome-v3.3.2.zip` | 8,744,265 | `eebce0f32f2faf9cccd03b249f83b96dd9d861340ab9bd968af1d77ba7a558cc` |
-| `dist/filtertube-firefox-v3.3.2.zip` | 8,744,324 | `e4ee2d10ebf2e4cffa44a5bdf688b47018bd6d7495248b75a343f02fc739d9ed` |
-| `dist/filtertube-opera-v3.3.2.zip` | 8,744,267 | `5a39f14dc23e885539e0cc19423eae6f6858756077ec3f1c9bc5b99986e84259` |
+| `dist/filtertube-chrome-v3.3.2.zip` | 8,751,498 | `bd3e708caf7b15f34db73d99d3423833dc2c3894e04f7e876fceb8b5a9aa57ed` |
+| `dist/filtertube-firefox-v3.3.2.zip` | 8,751,557 | `da6ca5b5dbd555ae998285e12eee01c55b87d6f13ebc2ce48ff411054a914669` |
+| `dist/filtertube-opera-v3.3.2.zip` | 8,751,500 | `e4c93669627372a538d239a8637d54897beb1c75730bdbe062e0463670d28bcb` |
 
 The package tree is broad because `build.js` copies:
 

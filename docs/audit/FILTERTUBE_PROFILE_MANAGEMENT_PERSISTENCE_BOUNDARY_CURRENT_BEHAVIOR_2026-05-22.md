@@ -18,7 +18,7 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/tab-view.js` | 14702 | 684139 | `6ffc4f25bb294dfc7cc95a445611f8d31c9ee507bbc7facbcce7d03cb1ad304c` |
+| `js/tab-view.js` | 14926 | 695872 | `5cdae945aca165b11af3c3f9fc246e89da3ce6780939013081e5d035b4163323` |
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/io_manager.js` | 2097 | 100479 | `f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62` |
 | `js/background.js` | 6789 | 306239 | `618e41011a6031c7a4eb3d022c4612536942a7a58a3c41eb0fd7e31c29a60311` |
@@ -30,7 +30,7 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 source/effect blocks: 9
 tab-view renderProfilesManager block: 447 lines, 22917 bytes
 tab-view refreshProfilesUI block: 24 lines, 954 bytes
-tab-view switchToProfile block: 46 lines, 1749 bytes
+tab-view switchToProfile block: 47 lines, 1827 bytes
 popup switchToProfile block: 48 lines, 1659 bytes
 tab-view create account handler block: 120 lines, 5004 bytes
 tab-view create child handler block: 107 lines, 4589 bytes
@@ -90,7 +90,7 @@ profile_management_future_authority_symbols_absent_from_product_runtime
 
 | Boundary | Current behavior | Current proof | Risk before profile, JSON-first, or optimization work |
 | --- | --- | --- | --- |
-| Tab-view profile switch | `switchToProfile()` loads V4, verifies the target exists, calls `ensureProfileUnlocked()`, writes `activeProfileId`, clears `managedChildEdit`, reloads `StateManager`, refreshes profile UI, updates stats, and shows a toast. | `tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs` | The switch has local lock proof, but no shared revision, runtime broadcast, or compiled-settings freshness report. |
+| Tab-view profile switch | `switchToProfile()` loads V4, verifies the target exists, calls `ensureProfileUnlocked()`, writes `activeProfileId`, clears `managedChildEdit`, reloads `StateManager`, refreshes profile UI, updates stats, runs managed local-network/source-ack sync, and shows a toast. | `tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs` | The switch has local lock proof, but no shared revision, runtime broadcast, or compiled-settings freshness report. |
 | Popup profile switch | Popup switch repeats the load/unlock/write/reload pattern and rerenders popup state. | Same runtime test. | Popup and tab-view share behavior by convention rather than one switch authority. |
 | Profile manager delete | The tab-view delete action rejects child-admin and default deletion, requires Default admin or self unlock, deletes `profiles[profileId]`, resolves active profile back to Default if needed, writes V4, clears the profile unlock session, reloads StateManager, refreshes UI, and applies the lock gate. | Same runtime test. | Delete has no backup scheduling token, no deletion report, and no explicit background cache revision report. |
 | Account profile creation | Account creation requires non-child admin action, active Default, admin unlock, account policy allowance, and account limit checks. It creates an account with Main and Kids viewing allowed, empty block/allow lists, copied active backup policy settings, writes V4, refreshes UI, and conditionally schedules `profile_created` backup from the active profile setting. | Same runtime test. | The new profile does not become active, and backup scheduling is conditional and side-effect only, not part of a mutation report. |

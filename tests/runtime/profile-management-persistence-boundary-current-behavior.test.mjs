@@ -131,10 +131,10 @@ test('profile management persistence audit document records current boundary and
     assert.ok(doc.includes(marker), `missing marker: ${marker}`);
   }
 
-  assert.match(methodGap, /repo-wide lexical callables: 6231/);
+  assert.match(methodGap, /repo-wide lexical callables: 6259/);
   assert.match(methodGap, /files with lexical accounting: 73/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 6231/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 6259/);
 
   assert.equal(profileSettingsUiFamilyDocs.length, 12);
   for (const familyDocPath of profileSettingsUiFamilyDocs) {
@@ -154,7 +154,7 @@ test('profile management persistence audit document records current boundary and
 test('profile management source fingerprints stay pinned', () => {
   const doc = read(auditDocPath);
   const expected = [
-    ['js/tab-view.js', 14702, 684139, '6ffc4f25bb294dfc7cc95a445611f8d31c9ee507bbc7facbcce7d03cb1ad304c'],
+    ['js/tab-view.js', 14926, 695872, '5cdae945aca165b11af3c3f9fc246e89da3ce6780939013081e5d035b4163323'],
     ['js/popup.js', 1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
     ['js/io_manager.js', 2097, 100479, 'f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62'],
     ['js/background.js', 6789, 306239, '618e41011a6031c7a4eb3d022c4612536942a7a58a3c41eb0fd7e31c29a60311']
@@ -175,7 +175,7 @@ test('profile management source/effect block metrics stay pinned in the doc', ()
   const expected = {
     tabRenderProfilesManager: ['tab-view renderProfilesManager block', 447, 22917],
     tabRefreshProfilesUI: ['tab-view refreshProfilesUI block', 24, 954],
-    tabSwitchToProfile: ['tab-view switchToProfile block', 46, 1749],
+    tabSwitchToProfile: ['tab-view switchToProfile block', 47, 1827],
     popupSwitchToProfile: ['popup switchToProfile block', 48, 1659],
     tabCreateAccountHandler: ['tab-view create account handler block', 120, 5004],
     tabCreateChildHandler: ['tab-view create child handler block', 107, 4589],

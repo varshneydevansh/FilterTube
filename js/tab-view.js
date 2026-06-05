@@ -3017,12 +3017,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const NANAH_MANAGED_SIGNING_PUBLIC_KEY_KEY = 'ftNanahManagedSigningPublicKey';
     const NANAH_MANAGED_OPEN_SYNC_STATE_KEY = 'ftNanahManagedOpenSyncState';
     const NANAH_MANAGED_LOCAL_NETWORK_SYNC_STATE_KEY = 'ftNanahManagedLocalNetworkSyncState';
+    const NANAH_MANAGED_SOURCE_ACK_SYNC_STATE_KEY = 'ftNanahManagedSourceAckSyncState';
     let nanahClient = null;
     let nanahTrustedLinks = [];
     let nanahStableDeviceId = '';
     let nanahManagedSigningKeyDescriptor = null;
     let nanahManagedOpenSyncState = null;
     let nanahManagedLocalNetworkSyncState = null;
+    let nanahManagedSourceAckSyncState = null;
     let nanahUiMode = 'send_once';
     let isApplyingNanahModePreset = false;
     let nanahTrustedReconnectApprovalPromise = null;
@@ -9226,6 +9228,208 @@ document.addEventListener('DOMContentLoaded', async () => {
         return state;
     }
 
+    async function loadNanahManagedSourceAckSyncState() {
+        nanahManagedSourceAckSyncState = safeObject(await readNanahStorage(NANAH_MANAGED_SOURCE_ACK_SYNC_STATE_KEY));
+    }
+
+    async function persistNanahManagedSourceAckSyncState(state) {
+        nanahManagedSourceAckSyncState = safeObject(state);
+        await writeNanahStorage(NANAH_MANAGED_SOURCE_ACK_SYNC_STATE_KEY, nanahManagedSourceAckSyncState);
+    }
+
+    function getNanahManagedSourceAckProvider() {
+        return safeObject(window.FilterTubeManagedPolicyDeliveryAcks);
+    }
+
+    function getNanahOutgoingManagedPolicyStateByScope(policy) {
+        const outgoing = safeObject(safeObject(policy).outgoingManagedPolicies);
+        return Object.entries(outgoing)
+            .map(([scope, value]) => {
+                const state = safeObject(value);
+                const revision = normalizeNonNegativeInteger(state.revision);
+                const policyHash = normalizeString(state.policyHash);
+                const normalizedScope = normalizeString(scope).toLowerCase();
+                if (!normalizedScope || !revision || !policyHash) return null;
+                return {
+                    scope: normalizedScope,
+                    revision,
+                    policyHash,
+                    sentAt: normalizeNonNegativeInteger(state.sentAt) || null,
+                    lastAckAt: normalizeNonNegativeInteger(state.lastAckAt) || null,
+                    lastAckState: normalizeString(state.lastAckState) || null,
+                    lastAckResult: normalizeString(state.lastAckResult) || null
+                };
+            })
+            .filter(Boolean);
+    }
+
+    function getNanahManagedSourceAckEligibleLinks() {
+        return safeArray(nanahTrustedLinks)
+            .map((link) => normalizeNanahTrustedLink(link))
+            .filter((trusted) => {
+                if (!trusted) return false;
+                const policy = safeObject(trusted.policy);
+                if (trusted.linkType !== 'managed_link') return false;
+                if (trusted.localRole !== 'source' || trusted.remoteRole !== 'replica') return false;
+                if (trusted.revoked === true || policy.revoked === true || trusted.keyRevoked === true || policy.keyRevoked === true) return false;
+                if (trusted.stalePairing === true || policy.stalePairing === true) return false;
+                if (!normalizeString(trusted.linkId || trusted.id)) return false;
+                if (!getNanahTrustedLinkTargetProfileId(trusted)) return false;
+                if (getNanahOutgoingManagedPolicyStateByScope(policy).length === 0) return false;
+                return true;
+            });
+    }
+
+    function buildNanahManagedSourceAckRequest(link, reason) {
+        const trusted = normalizeNanahTrustedLink(link);
+        const policy = safeObject(trusted?.policy);
+        const localContext = getNanahLocalProfileContext();
+        return {
+            schema: 'filtertube_managed_source_delivery_ack_request',
+            version: 1,
+            reason: normalizeString(reason) || 'dashboard_open',
+            requestedAt: Date.now(),
+            linkId: normalizeString(trusted?.linkId || trusted?.id),
+            remoteDeviceId: normalizeString(trusted?.remoteDeviceId),
+            sourceDeviceId: normalizeString(trusted?.sourceDeviceId || policy.sourceDeviceId) || normalizeString(nanahStableDeviceId),
+            sourceProfileId: normalizeString(trusted?.sourceProfileId || policy.sourceProfileId) || normalizeString(localContext.profileId),
+            targetProfileId: getNanahTrustedLinkTargetProfileId(trusted),
+            allowedScopes: getNanahScopeList(policy.allowedScopes || policy.defaultScope),
+            sentPolicies: getNanahOutgoingManagedPolicyStateByScope(policy)
+        };
+    }
+
+    async function pullNanahManagedSourceDeliveryAcks(provider, request) {
+        const pull = provider && (
+            typeof provider.pullManagedDeliveryAcks === 'function'
+                ? provider.pullManagedDeliveryAcks
+                : (typeof provider.pullRemoteDeliveryAcks === 'function'
+                    ? provider.pullRemoteDeliveryAcks
+                    : (typeof provider.getManagedDeliveryAcks === 'function' ? provider.getManagedDeliveryAcks : null))
+        );
+        if (!pull) return { ok: false, reason: 'delivery_ack_provider_unavailable', acks: [] };
+        try {
+            const result = await pull.call(provider, request);
+            if (Array.isArray(result)) return { ok: true, reason: '', acks: result };
+            const ok = result?.ok !== false;
+            return {
+                ok,
+                reason: normalizeString(result?.reason),
+                acks: ok ? safeArray(result?.acks || result?.items || result?.payloads) : []
+            };
+        } catch (error) {
+            return {
+                ok: false,
+                reason: normalizeString(error?.message) || 'delivery_ack_provider_failed',
+                acks: []
+            };
+        }
+    }
+
+    function normalizeNanahManagedDeliveryAckSchema(payload) {
+        const schema = normalizeString(safeObject(payload).schema);
+        if (schema === 'filtertube_nanah_managed_open_sync_ack') return 'mailbox';
+        if (schema === 'filtertube_managed_local_network_candidate_ack') return 'local_network';
+        return '';
+    }
+
+    function formatNanahManagedSourceAckSyncStatus(link) {
+        const trusted = safeObject(link);
+        if (trusted.linkType !== 'managed_link' || trusted.localRole !== 'source' || trusted.remoteRole !== 'replica') return '';
+        const policy = safeObject(trusted.policy);
+        if (getNanahOutgoingManagedPolicyStateByScope(policy).length === 0) return 'No sent policy';
+        const state = safeObject(nanahManagedSourceAckSyncState);
+        if (normalizeString(state.reasonCode) === 'delivery_ack_provider_unavailable') return 'Waiting for provider';
+        const row = safeArray(state.linkResults).find(result => normalizeString(result?.linkId) === normalizeString(trusted.linkId || trusted.id));
+        if (!row) return state.checkedAt ? 'Checked' : 'Ready';
+        const recorded = Number(row.recordedAckCount) || 0;
+        const rejected = Number(row.rejectedAckCount) || 0;
+        const payloads = Number(row.ackPayloadCount) || 0;
+        if (recorded || rejected) return `${recorded} recorded, ${rejected} ignored`;
+        if (row.ok === false) return 'Rejected by provider';
+        if (payloads === 0) return 'Checked, no acks';
+        return 'Checked';
+    }
+
+    async function handleNanahIncomingManagedRemoteDeliveryAck(ackPayload, options = {}) {
+        if (!nanahManagedLivePolicy || typeof nanahManagedLivePolicy.recordRemoteDeliveryAckPayload !== 'function') {
+            return { ok: false, reason: 'managed_delivery_ack_recorder_unavailable', recordedCount: 0 };
+        }
+        const result = await nanahManagedLivePolicy.recordRemoteDeliveryAckPayload(ackPayload);
+        if (safeObject(options).silent !== true && safeObject(result).ok === true) {
+            const latest = safeObject(result.latest);
+            UIComponents.showToast(
+                normalizeString(latest.result) === 'accepted'
+                    ? 'Managed remote delivery ack recorded'
+                    : 'Managed remote delivery ack recorded with rejection status',
+                'info'
+            );
+        }
+        return result;
+    }
+
+    async function runNanahManagedSourceAckSync({ reason = 'dashboard_open' } = {}) {
+        const provider = getNanahManagedSourceAckProvider();
+        const pull = provider && (provider.pullManagedDeliveryAcks || provider.pullRemoteDeliveryAcks || provider.getManagedDeliveryAcks);
+        const eligibleLinks = getNanahManagedSourceAckEligibleLinks();
+        const state = {
+            schema: 'filtertube_managed_source_delivery_ack_sync_state',
+            version: 1,
+            reason: normalizeString(reason) || 'dashboard_open',
+            checkedAt: Date.now(),
+            eligibleLinkCount: eligibleLinks.length,
+            providerAvailable: typeof pull === 'function',
+            ackPayloadCount: 0,
+            recordedAckCount: 0,
+            rejectedAckCount: 0,
+            linkResults: []
+        };
+        if (!state.providerAvailable || eligibleLinks.length === 0) {
+            state.reasonCode = eligibleLinks.length === 0 ? 'no_eligible_source_links' : 'delivery_ack_provider_unavailable';
+            await persistNanahManagedSourceAckSyncState(state);
+            renderNanahTrustedLinks();
+            return state;
+        }
+
+        for (const link of eligibleLinks) {
+            const request = buildNanahManagedSourceAckRequest(link, reason);
+            const result = await pullNanahManagedSourceDeliveryAcks(provider, request);
+            const linkRow = {
+                linkId: request.linkId,
+                targetProfileId: request.targetProfileId,
+                ok: result.ok === true,
+                reason: result.reason || null,
+                ackPayloadCount: result.acks.length,
+                recordedAckCount: 0,
+                rejectedAckCount: 0
+            };
+            state.ackPayloadCount += result.acks.length;
+            if (result.ok === true) {
+                for (const ackPayload of result.acks) {
+                    const transport = normalizeNanahManagedDeliveryAckSchema(ackPayload);
+                    if (!transport) {
+                        linkRow.rejectedAckCount += 1;
+                        state.rejectedAckCount += 1;
+                        continue;
+                    }
+                    const ackResult = await handleNanahIncomingManagedRemoteDeliveryAck(ackPayload, { silent: true });
+                    const recorded = Number(safeObject(ackResult).recordedCount) || 0;
+                    if (safeObject(ackResult).ok === true && recorded > 0) {
+                        linkRow.recordedAckCount += recorded;
+                        state.recordedAckCount += recorded;
+                    } else {
+                        linkRow.rejectedAckCount += 1;
+                        state.rejectedAckCount += 1;
+                    }
+                }
+            }
+            state.linkResults.push(linkRow);
+        }
+        await persistNanahManagedSourceAckSyncState(state);
+        renderNanahTrustedLinks();
+        return state;
+    }
+
     async function configureNanahTrustedLink(link) {
         const trusted = normalizeNanahTrustedLink(link);
         if (!trusted) return;
@@ -9536,6 +9740,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                     localNetworkRow.appendChild(localNetworkLabel);
                     localNetworkRow.appendChild(localNetworkValue);
                     policyRows.appendChild(localNetworkRow);
+                }
+
+                if (entry?.localRole === 'source' && entry?.remoteRole === 'replica') {
+                    const deliveryAckRow = document.createElement('div');
+                    deliveryAckRow.className = 'nanah-trusted-link__policy-row';
+                    const deliveryAckLabel = document.createElement('span');
+                    deliveryAckLabel.textContent = 'Remote delivery';
+                    const deliveryAckValue = document.createElement('strong');
+                    deliveryAckValue.textContent = formatNanahManagedSourceAckSyncStatus(entry);
+                    deliveryAckRow.appendChild(deliveryAckLabel);
+                    deliveryAckRow.appendChild(deliveryAckValue);
+                    policyRows.appendChild(deliveryAckRow);
                 }
 
                 card.appendChild(policyRows);
@@ -11025,6 +11241,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             await handleNanahIncomingManagedLiveAck(root);
             return;
         }
+        if (root.schema === 'filtertube_nanah_managed_open_sync_ack'
+            || root.schema === 'filtertube_managed_local_network_candidate_ack') {
+            await handleNanahIncomingManagedRemoteDeliveryAck(root);
+            return;
+        }
         if (root.schema === 'filtertube_managed_mailbox_item') {
             await handleNanahIncomingManagedMailboxItem(root);
             return;
@@ -11912,6 +12133,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             await refreshProfilesUI();
             await runNanahManagedOpenSync({ reason: 'profile_switch' });
             await runNanahManagedLocalNetworkSync({ reason: 'profile_switch' });
+            await runNanahManagedSourceAckSync({ reason: 'profile_switch' });
             updateStats();
             UIComponents.showToast('Profile switched', 'success');
         } catch (e) {
@@ -12511,8 +12733,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadNanahTrustedLinks();
     await loadNanahManagedOpenSyncState();
     await loadNanahManagedLocalNetworkSyncState();
+    await loadNanahManagedSourceAckSyncState();
     await runNanahManagedOpenSync({ reason: 'dashboard_open' });
     await runNanahManagedLocalNetworkSync({ reason: 'dashboard_open' });
+    await runNanahManagedSourceAckSync({ reason: 'dashboard_open' });
     renderNanahTrustedLinks();
     setNanahMode(nanahUiMode, { persist: false, applyPreset: true });
     updateNanahUi();

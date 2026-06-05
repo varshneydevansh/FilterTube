@@ -29,7 +29,7 @@ tests/runtime/state-manager-storage-reload-enrichment-lifecycle-boundary-current
 | --- | --- | ---: | ---: | ---: | --- |
 | `scheduleChannelNameEnrichment` | `js/state_manager.js:496` | 496 | 11 | 343 | `e7f5faa954cde32eeaab4a0a187dd411975f56e241834e22e0885feb72c4a172` |
 | `processChannelEnrichmentQueue` | `js/state_manager.js:639` | 639 | 57 | 2,074 | `6c9cf0a07af47f993e967f3d34a7a9f82203f2510e28172acd49d2a10b6b3c13` |
-| `saveSettings` | `js/state_manager.js:1009` | 1009 | 58 | 2,675 | `d8e54f713f42461db3416a5e746814c86958cd2bfa8a633bb115c1f624047523` |
+| `saveSettings` | `js/state_manager.js:1009` | 1009 | 58 | 2,675 | `d8e54f713f42461db3416a5e746814c86958cd2bfa8a633bb115c1f625947523` |
 | `setupStorageListener` | `js/state_manager.js:2313` | 2313 | 120 | 5,053 | `79fc928744231a416b3c7a9646aa8e5e219c72bb85ac3bb93c969d18170cb27d` |
 
 ## Selected Token Counts

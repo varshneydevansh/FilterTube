@@ -37,7 +37,7 @@ covered by the CSS load/style surface and style-hide authority audits.
 | `js/ui-shell/popup-shell.js` | generated popup shell output | 374 | 21,080 | `dc750d44dd4b9fde63b85b4dfc9f5ce9ba76964afbd6dfcedc7b3b7cce084b05` |
 | `js/ui-shell/tab-view-decor.js` | generated dashboard ambient output | 323 | 18,289 | `234171091e523aa5de4c3c0f97e7341c55893bdd31b3e25a075490170fa9742f` |
 | `js/popup.js` | hand-owned popup runtime | 1,841 | 75,587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
-| `js/tab-view.js` | hand-owned dashboard runtime | 14,702 | 684,139 | `6ffc4f25bb294dfc7cc95a445611f8d31c9ee507bbc7facbcce7d03cb1ad304c` |
+| `js/tab-view.js` | hand-owned dashboard runtime | 14,926 | 695,872 | `5cdae945aca165b11af3c3f9fc246e89da3ce6780939013081e5d035b4163323` |
 | `js/managed_parent_command_center.js` | hand-owned managed parent command-center runtime | 296 | 14,757 | `23138da6164f82b507f355cae5cd4d594d78222cec3023f0f5c98d5fcd6514a6` |
 
 ## Active CSS State Counters
