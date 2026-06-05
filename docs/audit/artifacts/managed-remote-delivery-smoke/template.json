@@ -1,0 +1,126 @@
+{
+  "artifactType": "filtertube-managed-remote-delivery-smoke",
+  "schemaVersion": 1,
+  "status": "template-not-executed",
+  "transportSliceReadiness": "NO-GO",
+  "remoteManagementReleaseReadiness": "NO-GO",
+  "runtimeBehaviorChanged": false,
+  "boundaryDoc": "docs/audit/FILTERTUBE_NANAH_MANAGED_POLICY_REMOTE_DELIVERY_RELEASE_READINESS_GATE_2026-06-05.md",
+  "changeContext": {
+    "logicalChangeType": "",
+    "requiredLanes": [],
+    "automatedLaneEvidence": []
+  },
+  "transport": {
+    "mode": "",
+    "providerName": "",
+    "networkContext": "",
+    "parentDeviceLabel": "",
+    "childDeviceLabel": ""
+  },
+  "recordingFields": {
+    "manualTimestamp": "",
+    "testerInitials": "",
+    "parentBrowserNameVersion": "",
+    "childBrowserNameVersion": "",
+    "parentExtensionId": "",
+    "childExtensionId": "",
+    "parentProfileId": "",
+    "childProfileId": "",
+    "trustedLinkId": "",
+    "sourceDeviceId": "",
+    "targetDeviceId": "",
+    "sourcePublicKeyId": "",
+    "keyVersion": "",
+    "transportMode": "",
+    "observedAckHistory": "",
+    "observedNoWorkState": ""
+  },
+  "installedExtensionParity": {
+    "parent": {
+      "workspaceRevisionOrHash": "",
+      "extensionPath": "",
+      "manifestVersion": "",
+      "serviceWorkerVersion": "",
+      "extensionReloadTimestamp": "",
+      "dashboardUrl": "",
+      "sourceHashes": {},
+      "missingFields": [],
+      "verdict": "NO-GO"
+    },
+    "child": {
+      "workspaceRevisionOrHash": "",
+      "extensionPath": "",
+      "manifestVersion": "",
+      "serviceWorkerVersion": "",
+      "extensionReloadTimestamp": "",
+      "dashboardUrl": "",
+      "activeYouTubeUrl": "",
+      "sourceHashes": {},
+      "missingFields": [],
+      "verdict": "NO-GO"
+    }
+  },
+  "requiredRows": [
+    {
+      "id": "FT-MANAGED-REMOTE-00-trust-link-preflight",
+      "requiredObservation": "Parent and child devices show the same trusted managed link, source key id, target child profile, allowed scopes, and locked trusted-update mode.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-REMOTE-01-keyword-policy-apply",
+      "requiredObservation": "Parent sends a signed keyword policy and the child applies the newer revision through managed validation, with blocked keyword behavior visible after refresh.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-REMOTE-02-channel-policy-apply",
+      "requiredObservation": "Parent sends a signed channel policy and the child applies it through the same managed channel blocking path as local controls.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-REMOTE-03-video-policy-apply",
+      "requiredObservation": "Parent sends a signed video policy and the child applies it through the managed video blocking path.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-REMOTE-04-viewing-space-gate",
+      "requiredObservation": "Parent changes Main/Kids viewing-space policy and the child route gate enforces the new policy before managed YouTube content remains usable.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-REMOTE-05-time-limit-policy",
+      "requiredObservation": "Parent sends a signed time-limit policy and the child compiles/enforces it, including reduced-budget or zero-budget timeout behavior.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-REMOTE-06-offline-last-policy",
+      "requiredObservation": "When transport becomes unavailable, the child keeps the last accepted parent policy active and records a safe unavailable state.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-REMOTE-07-revoked-replay-reject",
+      "requiredObservation": "A stale, replayed, revoked-link, wrong-key, or wrong-target policy is rejected and does not weaken the last accepted policy.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-REMOTE-08-action-history-redaction",
+      "requiredObservation": "Parent-visible action history records accepted and rejected outcomes without plaintext rules, PINs, private keys, mailbox ciphertext, or decrypted payloads.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-REMOTE-09-no-work-idle",
+      "requiredObservation": "With no eligible provider or no pending policy, YouTube pages remain in no-work state: no added observers, timers, DOM scans, JSON work, or LAN fetch loops.",
+      "status": "missing"
+    }
+  ],
+  "completionRules": {
+    "allRecordingFieldsRequired": true,
+    "installedExtensionParityMustPassForParentAndChild": true,
+    "allRowsMustPass": true,
+    "automatedLaneEvidenceMustPass": true,
+    "automatedLaneEvidenceMustCoverRequiredLanes": true,
+    "noPlaintextSensitiveFields": true,
+    "transportSliceReadinessWhenTemplate": "NO-GO",
+    "remoteManagementReleaseReadinessWhenTemplate": "NO-GO"
+  }
+}

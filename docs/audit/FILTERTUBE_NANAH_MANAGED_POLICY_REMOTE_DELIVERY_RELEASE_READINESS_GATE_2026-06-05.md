@@ -102,6 +102,36 @@ Complete remote delivery is not release-ready until all rows below are true:
 | Installed smoke | Two-device installed smoke proves parent edit to child apply for keyword, channel, video, viewing-space, and time-limit policies. |
 | App parity | Android and iOS native surfaces consume the shared policy contract and enforce route/time gates before managed web content opens. |
 
+## Managed Remote Delivery Smoke Artifact
+
+This gate now has an executable manual smoke artifact contract:
+
+```text
+docs/audit/artifacts/managed-remote-delivery-smoke/template.json
+docs/audit/artifacts/managed-remote-delivery-smoke/verify-managed-smoke-artifact.mjs
+```
+
+The verifier accepts only executed artifacts with parent and child installed
+extension parity, passed automated lane evidence, one explicit transport mode,
+and all managed remote-delivery rows passed. A valid artifact proves one
+transport slice, not complete remote-management release readiness across all
+transport modes.
+
+Required smoke rows:
+
+```text
+FT-MANAGED-REMOTE-00-trust-link-preflight
+FT-MANAGED-REMOTE-01-keyword-policy-apply
+FT-MANAGED-REMOTE-02-channel-policy-apply
+FT-MANAGED-REMOTE-03-video-policy-apply
+FT-MANAGED-REMOTE-04-viewing-space-gate
+FT-MANAGED-REMOTE-05-time-limit-policy
+FT-MANAGED-REMOTE-06-offline-last-policy
+FT-MANAGED-REMOTE-07-revoked-replay-reject
+FT-MANAGED-REMOTE-08-action-history-redaction
+FT-MANAGED-REMOTE-09-no-work-idle
+```
+
 ## Current Decision
 
 ```text
@@ -125,6 +155,7 @@ Focused proof:
 
 ```bash
 node --test tests/runtime/managed-policy-sync-remote-delivery-readiness-gate-current-behavior.test.mjs
+node --test tests/runtime/managed-policy-sync-remote-delivery-smoke-artifact-verifier-current-behavior.test.mjs
 ```
 
 Settings lane:

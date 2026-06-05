@@ -18,6 +18,10 @@ export const LIVE_SMOKE_VERIFY_COMMAND =
   'npm run smoke:youtube:verify -- docs/audit/artifacts/release-live-youtube-spa-smoke/<artifact>.json';
 export const LIVE_SMOKE_ARTIFACT_VERIFIER =
   'node docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs docs/audit/artifacts/release-live-youtube-spa-smoke/<artifact>.json';
+export const MANAGED_REMOTE_DELIVERY_SMOKE_ARTIFACT_TEMPLATE =
+  'docs/audit/artifacts/managed-remote-delivery-smoke/template.json';
+export const MANAGED_REMOTE_DELIVERY_SMOKE_ARTIFACT_VERIFIER =
+  'node docs/audit/artifacts/managed-remote-delivery-smoke/verify-managed-smoke-artifact.mjs docs/audit/artifacts/managed-remote-delivery-smoke/<artifact>.json';
 export const LIVE_SMOKE_CHANGE_CONTEXT_ENV = Object.freeze([
   'FILTERTUBE_LOGICAL_CHANGE_TYPE',
   'FILTERTUBE_REQUIRED_LANES',
@@ -33,6 +37,18 @@ export const LIVE_SMOKE_REQUIRED_ROWS = Object.freeze([
   'FT-LIVE-SPA-03-watch-to-home',
   'FT-LIVE-SPA-04-watch-rail-scroll',
   'FT-LIVE-SPA-05-cache-repeat-navigation'
+]);
+export const MANAGED_REMOTE_DELIVERY_SMOKE_REQUIRED_ROWS = Object.freeze([
+  'FT-MANAGED-REMOTE-00-trust-link-preflight',
+  'FT-MANAGED-REMOTE-01-keyword-policy-apply',
+  'FT-MANAGED-REMOTE-02-channel-policy-apply',
+  'FT-MANAGED-REMOTE-03-video-policy-apply',
+  'FT-MANAGED-REMOTE-04-viewing-space-gate',
+  'FT-MANAGED-REMOTE-05-time-limit-policy',
+  'FT-MANAGED-REMOTE-06-offline-last-policy',
+  'FT-MANAGED-REMOTE-07-revoked-replay-reject',
+  'FT-MANAGED-REMOTE-08-action-history-redaction',
+  'FT-MANAGED-REMOTE-09-no-work-idle'
 ]);
 
 export const RUNTIME_FIXTURE_LANE_REASONS = Object.freeze({
@@ -75,6 +91,7 @@ export const LANES = Object.freeze({
       'tests/runtime/release-build-artifact-claim-boundary-current-behavior.test.mjs',
       'tests/runtime/release-live-youtube-spa-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/release-live-youtube-spa-smoke-boundary-current-behavior.test.mjs',
+      'tests/runtime/managed-policy-sync-remote-delivery-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/release-notes-json-version-gate-boundary-current-behavior.test.mjs',
       'tests/runtime/release-package-parity-current-behavior.test.mjs',
       'tests/runtime/root-package-metadata-script-surface-current-behavior.test.mjs',
@@ -307,6 +324,7 @@ export const LANES = Object.freeze({
       'tests/runtime/managed-nanah-live-signed-send-current-behavior.test.mjs',
       'tests/runtime/managed-nanah-open-sync-current-behavior.test.mjs',
       'tests/runtime/managed-policy-sync-remote-delivery-readiness-gate-current-behavior.test.mjs',
+      'tests/runtime/managed-policy-sync-remote-delivery-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/managed-viewing-space-route-gate-current-behavior.test.mjs',
       'tests/runtime/managed-child-time-limit-schema-current-behavior.test.mjs',
       'tests/runtime/managed-time-budget-enforcement-current-behavior.test.mjs',
@@ -344,6 +362,7 @@ export const LANES = Object.freeze({
       'tests/runtime/release-audit-proof-directory-boundary-current-behavior.test.mjs',
       'tests/runtime/release-live-youtube-spa-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/release-live-youtube-spa-smoke-boundary-current-behavior.test.mjs',
+      'tests/runtime/managed-policy-sync-remote-delivery-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/all-callable-index-current-behavior.test.mjs',
       'tests/runtime/audit-runtime-backlog-current-behavior.test.mjs',
       'tests/runtime/source-of-truth-claim-register-current-behavior.test.mjs',
@@ -511,6 +530,11 @@ export const FILE_LANE_RULES = Object.freeze([
     id: 'live-smoke-artifact-surface',
     patterns: [/^docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/.*\.(?:json|mjs)$/],
     lanes: ['release', 'smoke']
+  },
+  {
+    id: 'managed-remote-delivery-smoke-artifact-surface',
+    patterns: [/^docs\/audit\/artifacts\/managed-remote-delivery-smoke\/.*\.(?:json|mjs)$/],
+    lanes: ['release', 'settings', 'smoke']
   },
   {
     id: 'audit-performance-artifact-surface',
