@@ -4497,7 +4497,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return buildLocalPolicyHash('local-managed-edit', seed);
     }
 
-    function buildManagedTimeLimitPolicy(existingPolicy, { enabled, dailyBudgetSeconds }) {
+    function buildManagedTimeLimitPolicy(existingPolicy, { enabled, dailyBudgetSeconds, parentGrant = null }) {
         const now = Date.now();
         const budget = normalizeNonNegativeInteger(dailyBudgetSeconds);
         if (budget == null) return null;
@@ -4508,11 +4508,27 @@ document.addEventListener('DOMContentLoaded', async () => {
             main: budget,
             kids: budget
         };
+        const grantRoot = safeObject(parentGrant);
+        const grantExpiresAt = grantRoot.expiresAt == null ? null : normalizeNonNegativeInteger(grantRoot.expiresAt);
+        const nextParentGrant = grantRoot.enabled === true
+            ? {
+                enabled: true,
+                extraSeconds: normalizeNonNegativeInteger(grantRoot.extraSeconds) || 0,
+                expiresAt: grantExpiresAt,
+                reason: normalizeString(grantRoot.reason) || 'parent_grant'
+            }
+            : {
+                enabled: false,
+                extraSeconds: 0,
+                expiresAt: null,
+                reason: ''
+            };
         const seed = {
             enabled: enabled === true,
             timezone,
             dailyBudgetSeconds: budget,
             surfaceBudgets,
+            parentGrant: nextParentGrant,
             policyRevision: revision
         };
         return {
@@ -4526,12 +4542,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             activeDeviceBudgetPolicy: 'single_active_tab_no_double_count',
             resetPolicy: 'policy_timezone_midnight',
             graceSeconds: normalizeNonNegativeInteger(prior?.graceSeconds) || 0,
-            parentGrant: {
-                enabled: false,
-                extraSeconds: 0,
-                expiresAt: null,
-                reason: ''
-            },
+            parentGrant: nextParentGrant,
             policyRevision: revision,
             policyHash: buildManagedTimeLimitPolicyHash(seed),
             issuedAt: now,
@@ -4710,14 +4721,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         const item = safeObject(policy);
         const dailyBudgetSeconds = normalizeNonNegativeInteger(item.dailyBudgetSeconds) || 0;
         const surfaceBudgets = safeObject(item.surfaceBudgets);
+        const parentGrant = safeObject(item.parentGrant);
+        const parentGrantSeconds = parentGrant.enabled === true
+            ? (normalizeNonNegativeInteger(parentGrant.extraSeconds) || 0)
+            : 0;
         const surfaceBudgetCount = ['main', 'kids'].filter(surface => normalizeNonNegativeInteger(surfaceBudgets[surface]) != null).length;
         return {
             redacted: true,
-            label: item.enabled === true ? 'Updated time limit' : 'Disabled time limit',
+            label: parentGrantSeconds > 0 ? 'Granted extra time' : (item.enabled === true ? 'Updated time limit' : 'Disabled time limit'),
             enabled: item.enabled === true,
             dailyBudgetSeconds,
             dailyBudgetMinutes: Math.floor(dailyBudgetSeconds / 60),
             timezone: normalizeString(item.timezone) || 'Etc/UTC',
+            parentGrantSeconds,
             surfaceBudgetCount
         };
     }
@@ -6383,6 +6399,148 @@ document.addEventListener('DOMContentLoaded', async () => {
                 : `${changedCount} time limits disabled`,
             'success'
         );
+    }
+
+    async function promptManagedExtraTimeMinutes({ selectedCount = 1 } = {}) {
+        const rawMinutes = await showPromptModal({
+            title: selectedCount > 1 ? 'Add Time To Selected Profiles' : 'Add Extra YouTube Time',
+            message: 'Extra parent-approved YouTube minutes. The grant expires automatically in 2 hours.',
+            placeholder: 'Extra minutes',
+            inputType: 'number',
+            confirmText: 'Add Time',
+            initialValue: '15'
+        });
+        if (rawMinutes === null) return null;
+        const minutes = normalizeNonNegativeInteger(rawMinutes);
+        if (minutes == null || minutes <= 0) {
+            UIComponents.showToast('Enter whole extra minutes greater than 0', 'error');
+            return null;
+        }
+        return minutes;
+    }
+
+    async function offerManagedTimeLimitPushForChangedProfiles(profileIds) {
+        const changedProfileIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
+        if (!changedProfileIds.length) return;
+        const mailboxReady = hasNanahManagedMailboxUploadWriter();
+        const localReady = hasNanahManagedLocalNetworkDeliveryWriter();
+        const readyProfileCount = changedProfileIds.filter((targetId) => {
+            const profile = safeObject(safeObject(profilesV4Cache).profiles)[targetId];
+            const links = getNanahSourceManagedLinksForTargetProfile(targetId, 'time_limits', profile);
+            if (!links.length) return false;
+            return links.some(isNanahManagedLinkLiveConnected) || mailboxReady || localReady;
+        }).length;
+        if (readyProfileCount <= 0) return;
+
+        const sendNow = await showConfirmModal({
+            title: 'Send time-limit update now?',
+            message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send this time-limit policy update to those devices now.`,
+            confirmText: 'Send update',
+            cancelText: 'Not now'
+        });
+        if (sendNow) {
+            await sendManagedParentPolicyToVerifiedDevices(changedProfileIds, { scope: 'time_limits' });
+        }
+    }
+
+    async function grantExtraTimeToProfiles(profileIds) {
+        const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
+        if (!targetIds.length) {
+            UIComponents.showToast('Select at least one protected profile', 'error');
+            return;
+        }
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
+            UIComponents.showToast('Profiles unavailable', 'error');
+            return;
+        }
+
+        const fresh = await io.loadProfilesV4();
+        const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
+        if (getProfileType(fresh, currentActive) === 'child') {
+            UIComponents.showToast('Child profiles cannot grant extra time', 'error');
+            return;
+        }
+
+        const profiles = { ...safeObject(fresh.profiles) };
+        const eligibleIds = targetIds.filter((targetId) => {
+            const profile = safeObject(profiles[targetId]);
+            return !!profile && Object.keys(profile).length > 0
+                && canActiveProfileManageProfile(fresh, targetId)
+                && getManagedTimeLimitPolicy(profile)?.enabled === true;
+        });
+        if (!eligibleIds.length) {
+            UIComponents.showToast('Select protected profiles with active time limits first', 'error');
+            return;
+        }
+
+        const minutes = await promptManagedExtraTimeMinutes({ selectedCount: eligibleIds.length });
+        if (minutes == null) return;
+
+        const confirmGrant = await showConfirmModal({
+            title: `Grant ${minutes} extra minute${minutes === 1 ? '' : 's'}?`,
+            message: `This will add temporary parent-approved YouTube time to ${eligibleIds.length} protected ${eligibleIds.length === 1 ? 'profile' : 'profiles'} after parent/account re-auth. The grant expires in 2 hours.`,
+            confirmText: 'Grant time',
+            cancelText: 'Cancel'
+        });
+        if (!confirmGrant) return;
+
+        const okAdmin = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
+        if (!okAdmin) {
+            for (const targetId of eligibleIds) {
+                await recordManagedAdminAuthFailureHistory(fresh, targetId, 'extra_time_unlock_failed');
+            }
+            return;
+        }
+
+        const now = Date.now();
+        const grant = {
+            enabled: true,
+            extraSeconds: minutes * 60,
+            expiresAt: now + (2 * 60 * 60 * 1000),
+            reason: 'parent_grant'
+        };
+        const changedProfileIds = [];
+        for (const targetId of eligibleIds) {
+            const profile = safeObject(profiles[targetId]);
+            const existingPolicy = getManagedTimeLimitPolicy(profile);
+            if (!existingPolicy?.enabled) continue;
+            const nextPolicy = buildManagedTimeLimitPolicy(existingPolicy, {
+                enabled: true,
+                dailyBudgetSeconds: existingPolicy.dailyBudgetSeconds,
+                parentGrant: grant
+            });
+            if (!nextPolicy) continue;
+            const nextProfile = {
+                ...profile,
+                settings: {
+                    ...safeObject(profile.settings),
+                    timeLimitPolicy: nextPolicy
+                }
+            };
+            const report = buildManagedTimeLimitLocalEditReport({
+                actorProfileId: currentActive,
+                targetProfileId: targetId,
+                nextPolicy
+            });
+            profiles[targetId] = recordManagedChildLocalEditHistory(nextProfile, report);
+            changedProfileIds.push(targetId);
+        }
+
+        if (!changedProfileIds.length) {
+            UIComponents.showToast('No selected profiles changed', 'info');
+            return;
+        }
+
+        await io.saveProfilesV4({
+            ...fresh,
+            schemaVersion: 4,
+            profiles
+        });
+        profilesV4Cache = { ...fresh, schemaVersion: 4, profiles };
+        await refreshProfilesUI();
+        UIComponents.showToast(`${changedProfileIds.length} extra-time ${changedProfileIds.length === 1 ? 'grant' : 'grants'} added`, 'success');
+        await offerManagedTimeLimitPushForChangedProfiles(changedProfileIds);
     }
 
     function managedRuleListKeyFor(surface, ruleType, target) {
@@ -13011,6 +13169,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         await showManagedActionHistory(targetId);
                     } else if (action === 'set_time_limit' || action === 'change_time_limit') {
                         await updateProfileTimeLimitPolicy(targetId, 'set');
+                    } else if (action === 'grant_extra_time') {
+                        await grantExtraTimeToProfiles([targetId]);
                     } else if (action === 'send_managed_policy') {
                         await sendManagedParentPolicyToVerifiedDevices(
                             [targetId],
@@ -13035,6 +13195,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                             safeArray(intent?.profileIds),
                             action === 'bulk_disable_time_limit' ? 'disable' : 'set'
                         );
+                    } else if (action === 'bulk_grant_extra_time') {
+                        await grantExtraTimeToProfiles(safeArray(intent?.profileIds));
                     } else if (action === 'bulk_send_managed_policy') {
                         await sendManagedParentPolicyToVerifiedDevices(
                             safeArray(intent?.profileIds),

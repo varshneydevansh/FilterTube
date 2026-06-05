@@ -343,6 +343,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(doc, /runtime managed command-center redacted delivery preview: present/);
   assert.match(doc, /runtime managed command-center delegated action intents: present/);
   assert.match(doc, /runtime managed command-center bulk time-limit controls: present via delegated runtime gate/);
+  assert.match(doc, /runtime managed command-center parent extra-time grants: present via delegated runtime gate/);
   assert.match(doc, /runtime managed command-center bulk viewing-space controls: present via delegated runtime gate/);
   assert.match(doc, /runtime managed command-center direct policy writes: absent/);
   assert.match(doc, /runtime managed command-center direct rule bulk writes: present via confirmation plus delegated runtime gate/);
@@ -369,6 +370,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /bulk_edit_rules/);
   assert.match(helperSource, /bulk_send_managed_policy/);
   assert.match(helperSource, /bulk_disable_time_limit/);
+  assert.match(helperSource, /bulk_grant_extra_time/);
   assert.match(helperSource, /bulk_allow_main_kids/);
   assert.match(helperSource, /bulk_kids_only/);
   assert.match(helperSource, /bulk_main_only/);
@@ -387,7 +389,9 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /action === 'edit_rules'/);
   assert.match(source, /action === 'view_history'/);
   assert.match(source, /action === 'set_time_limit' \|\| action === 'change_time_limit'/);
+  assert.match(source, /action === 'grant_extra_time'/);
   assert.match(source, /action === 'bulk_set_time_limit' \|\| action === 'bulk_disable_time_limit'/);
+  assert.match(source, /action === 'bulk_grant_extra_time'/);
   assert.match(source, /action === 'bulk_allow_main_kids' \|\| action === 'bulk_kids_only' \|\| action === 'bulk_main_only'/);
   assert.match(source, /function updateMultipleProfileTimeLimitPolicies\(profileIds, action\)/);
   assert.match(source, /function updateMultipleProfileViewingAccess\(profileIds, accessMode\)/);
@@ -401,6 +405,9 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /sendManagedParentPolicyToVerifiedDevices\(changedProfileIds, \{\s+scope: remoteScope,\s+surface\s+\}\)/);
   assert.match(source, /const overrideSurface = normalizeString\(safeObject\(nanahManagedPolicySourceOverride\)\.surface\)\.toLowerCase\(\)/);
   assert.match(source, /bulk_time_limit_unlock_failed/);
+  assert.match(source, /extra_time_unlock_failed/);
+  assert.match(source, /async function grantExtraTimeToProfiles\(profileIds\)/);
+  assert.match(source, /offerManagedTimeLimitPushForChangedProfiles\(changedProfileIds\)/);
   assert.match(source, /bulk_viewing_space_unlock_failed/);
   assert.match(source, /confirmText: 'Save Limits'/);
   assert.match(source, /ft-managed-profile-status/);
@@ -443,6 +450,7 @@ test('managed command-center spec pins parent workflow without making UI authori
   assert.match(doc, /Delivery links and preview labels are not authority/);
   assert.match(doc, /UI choice is not authority; runtime route gate remains the enforcement layer/);
   assert.match(doc, /Runtime budget accounting remains background-owned/);
+  assert.match(doc, /Add Time and Add selected time/);
   assert.match(doc, /Reachability is never authorization/);
   assert.match(doc, /post-rule-write granular verified-device push: present with selected surface binding/);
   assert.match(doc, /Present for selected-profile rule editor handoff, same-budget local time-limit changes, same-access local viewing-space changes, selected-profile keyword\/channel\/video-ID rule additions, and selected-profile signed-policy sends on selected protected profiles/);
@@ -757,8 +765,8 @@ test('managed command-center helper emits delegated action intents without polic
           timeLimitPolicy: {
             schema: 'filtertube_managed_time_limit',
             version: 1,
-            enabled: false,
-            dailyBudgetSeconds: 0
+            enabled: true,
+            dailyBudgetSeconds: 7200
           }
         },
         managedPolicyState: {
@@ -865,6 +873,14 @@ test('managed command-center helper emits delegated action intents without polic
       sensitiveAction: true
     },
     {
+      action: 'bulk_grant_extra_time',
+      label: 'Add selected time',
+      profileIds: ['childA'],
+      scope: 'time_limits',
+      authority: 'delegated_runtime_gate',
+      sensitiveAction: true
+    },
+    {
       action: 'bulk_allow_main_kids',
       label: 'Allow Main + Kids',
       profileIds: ['childA'],
@@ -918,8 +934,16 @@ test('managed command-center helper emits delegated action intents without polic
       sensitiveAction: true
     },
     {
-      action: 'set_time_limit',
-      label: 'Set Limit',
+      action: 'change_time_limit',
+      label: 'Change Limit',
+      profileId: 'childA',
+      scope: 'time_limits',
+      authority: 'delegated_runtime_gate',
+      sensitiveAction: true
+    },
+    {
+      action: 'grant_extra_time',
+      label: 'Add Time',
       profileId: 'childA',
       scope: 'time_limits',
       authority: 'delegated_runtime_gate',

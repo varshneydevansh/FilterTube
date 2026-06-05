@@ -122,6 +122,10 @@ re-auth and a review-confirmation step. A successful local selected-profile
 rule addition can now offer an immediate verified-device push for only the
 matching keyword/channel/video scope, and that granular send uses the
 parent-selected Main/Kids surface rather than the visible Nanah surface picker.
+The dashboard can now also grant temporary parent-approved extra YouTube time
+to protected profiles with active time limits, persist that as a newer
+`time_limits` policy revision with redacted history, and offer an immediate
+verified-device `time_limits` push.
 The extension still does not ship a built-in server mailbox client or LAN
 peer-discovery transport; those are downstream app/server/provider integration
 surfaces. Built-in server upload/pull/purge clients, built-in local-network
@@ -504,6 +508,10 @@ Current behavior:
 
 - Accounts & Sync can now set, change, and disable a profile-owned
   `settings.timeLimitPolicy` through parent/account authority.
+- Accounts & Sync can now add a bounded temporary parent grant for profiles
+  with active time limits. The grant is stored as `parentGrant`, receives a new
+  policy revision/hash, and can be sent to verified devices through the
+  existing `time_limits` managed-policy scope.
 - Import/profile sanitation preserves valid `filtertube_managed_time_limit`
   policies and drops malformed policy payloads.
 - Extension runtime now compiles a valid active child profile

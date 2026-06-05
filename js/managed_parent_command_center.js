@@ -82,6 +82,16 @@
                 sensitiveAction: true
             }
         ];
+        if (timeLimitActive) {
+            intents.push({
+                action: 'grant_extra_time',
+                label: 'Add Time',
+                profileId: targetId,
+                scope: 'time_limits',
+                authority: 'delegated_runtime_gate',
+                sensitiveAction: true
+            });
+        }
         if ((Number(policySummary.remoteConflictCount) || 0) > 0) {
             intents.splice(2, 0, {
                 action: 'review_conflicts',
@@ -270,6 +280,14 @@
             {
                 action: 'bulk_disable_time_limit',
                 label: 'Disable selected limits',
+                profileIds,
+                scope: 'time_limits',
+                authority: 'delegated_runtime_gate',
+                sensitiveAction: true
+            },
+            {
+                action: 'bulk_grant_extra_time',
+                label: 'Add selected time',
                 profileIds,
                 scope: 'time_limits',
                 authority: 'delegated_runtime_gate',

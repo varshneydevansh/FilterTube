@@ -77,6 +77,8 @@ extension authority code.
   rows for managed protected-profile edits.
 - [x] Local same-budget bulk time-limit changes work for selected manageable
   protected profiles.
+- [x] Local parent extra-time grants work for manageable protected profiles with
+  active time limits and can offer a verified-device `time_limits` push.
 - [x] Local same-access bulk viewing-space changes work for selected manageable
   protected profiles.
 - [x] Local selected-profile video/keyword/channel rule additions work for manageable
@@ -713,7 +715,10 @@ the current extension dashboard.
   redacted revision/history row per changed target. When changed profiles have
   verified delivery, the dashboard offers to send the matching granular
   keyword/channel/video scope immediately and binds the parent-selected Main/Kids
-  surface into the signed send path. Bulk time-limit and viewing-space actions now use the same
+  surface into the signed send path. Parent extra-time grants now write
+  revisioned redacted time-limit history for active limits, expire automatically
+  after the bounded grant window, and can offer an immediate verified-device
+  `time_limits` push. Bulk time-limit and viewing-space actions now use the same
   protected-profile authority predicate as the command-center rows, so
   Default/Master-managed independent account profiles are not silently skipped.
 - **Complexity**: 7/10

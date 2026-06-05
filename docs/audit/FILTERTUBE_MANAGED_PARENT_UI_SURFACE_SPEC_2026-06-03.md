@@ -4,7 +4,8 @@
 **Status**: Spec, dashboard protected-profile status, command-center overview,
 delegated command-center action intents, delegated selected-profile rule editor
 handoff, delegated same-budget bulk time-limit controls, delegated local
-bulk viewing-space controls, command-center verified-device send actions,
+bulk viewing-space controls, delegated parent extra-time grants, command-center
+verified-device send actions,
 live P2P signed managed-policy push for connected verified replica devices,
 provider-gated mailbox/LAN delivery handoff, and protected redacted push
 history rows are present. The command center now includes a compact
@@ -16,7 +17,9 @@ including Default/Master-managed independent account profiles. Direct rule bulk
 writes for keyword, channel, and video ID rules are now present behind a
 review-confirmation step and parent/account re-auth, and changed profiles with
 verified delivery can immediately push the matching Main/Kids rule scope to
-their saved devices.
+their saved devices. Parents can also grant temporary extra YouTube time to
+profiles with active limits and optionally push the updated `time_limits`
+policy to verified devices.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 
@@ -71,6 +74,10 @@ state without exposing plaintext rule values:
   offer an immediate verified-device push for only the matching granular rule
   scope. That send binds the parent-selected Main/Kids surface instead of
   reading the visible Nanah granular-surface selector.
+- `Add Time` and `Add selected time` are delegated actions for profiles with
+  active time limits. They require parent/account re-auth, write a revisioned
+  redacted time-limit history row, and can offer an immediate verified-device
+  `time_limits` push.
 - `Send Update` and `Send selected updates` use saved managed Source -> Replica
   links only. A live connected verified replica receives signed envelopes over
   Nanah immediately. Optional mailbox/LAN providers receive ciphertext items or
@@ -110,6 +117,7 @@ runtime managed command-center delegated action intents: present
 runtime managed command-center redacted delivery preview: present
 runtime managed command-center selected-profile rule editor handoff: present via delegated runtime gate
 runtime managed command-center bulk time-limit controls: present via delegated runtime gate
+runtime managed command-center parent extra-time grants: present via delegated runtime gate
 runtime managed command-center bulk viewing-space controls: present via delegated runtime gate
 runtime managed command-center per-profile signed policy push: present
 runtime managed command-center selected-profile signed policy push: present
@@ -138,7 +146,7 @@ weakening the authority model:
 | Rule editing | Command-center row actions still enter the existing managed protected-profile editor, selected-profile bulk controls can hand off one selected protected profile to the same editor, and selected-profile bulk keyword/channel/video-ID additions can apply one reviewed rule to selected protected profiles. Changed profiles with verified delivery can then push the matching rule scope immediately. | Writes must use the same validated local/remote managed-policy paths as current FilterTube controls; bulk rule writes require review confirmation, parent/account re-auth, per-target revision/history rows, selected Main/Kids surface binding for granular sends, and no child authority. |
 | Remote send | Parent can send one protected profile or selected protected profiles to saved verified devices and see whether the next attempt is live, later via LAN/mailbox provider, blocked by conflict, blocked by stale/revoked pairing, or missing a verified device. | Delivery links and preview labels are not authority; each envelope still requires Source -> Replica trust, fixed target profile, allowed scope, signature/integrity proof, and newer revision/hash. |
 | Viewing spaces | Show Main, Kids, both, or neither per protected profile; row actions still change policy and selected-profile bulk actions can apply Main + Kids, Kids only, or Main only locally. | UI choice is not authority; runtime route gate remains the enforcement layer; every selected target gets its own redacted revision/history row after parent re-auth. |
-| Time limits | Show daily YouTube budget state; command-center row actions still set/disable one profile and bulk selected-profile actions can apply the same daily budget or disable existing limits. | Runtime budget accounting remains background-owned; every target gets its own revision/history row after parent re-auth. |
+| Time limits | Show daily YouTube budget state; command-center row actions still set/disable one profile, can add temporary extra time to one active limit, and bulk selected-profile actions can apply the same daily budget, disable existing limits, or add temporary extra time to selected active limits. | Runtime budget accounting remains background-owned; every target gets its own revision/history row after parent re-auth, and extra-time grants are bounded by expiry. |
 | Sync status | Show trusted device, delivery preview, local-network provider, Nanah open-sync, and mailbox status. | Reachability is never authorization; offline state keeps the last valid policy active. |
 | Action history | Show accepted, rejected, conflict, failed-auth, and expired-session counts/latest labels; detailed history remains gated by the History action. | History stays redacted, protected by parent/account re-auth, and never becomes policy authority. |
 | Multi-profile apply | Present for selected-profile rule editor handoff, same-budget local time-limit changes, same-access local viewing-space changes, selected-profile keyword/channel/video-ID rule additions, and selected-profile signed-policy sends on selected protected profiles. | Local bulk rule writes are one reviewed rule at a time and every local or remote target still needs its own target profile, revision/history row, and authority gate; remote sends additionally require trusted link, scope, revision, hash, and signature/integrity proof. |
@@ -201,6 +209,8 @@ For the current feature-first slice, manual verification should cover:
 - If verified delivery is available after a selected-profile rule write, the
   follow-up Send update confirmation pushes only the matching keyword/channel/video
   scope for the selected Main/Kids surface.
+- Add Time and Add selected time appear only as delegated parent actions, write
+  redacted time-limit history, and can push `time_limits` to verified devices.
 - A receiving protected profile applies only trusted, signed, newer policy for
   its fixed target profile.
 - YouTube hot paths stay idle when the dashboard command center is open.
