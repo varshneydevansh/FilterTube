@@ -22,13 +22,15 @@ dashboard/profile-open local-network candidate discovery hook is present for
 already trusted managed replica links. An extension-owned
 managed app policy contract artifact and app manifest copy row are now present
 so downstream app parity can be tested before native enforcement changes.
-Built-in local-network peer discovery, LAN delivery, server mailbox pull, mailbox
-decryption, app native enforcement proofs, and active/full signed managed sends
-remain gated. The adapter now exposes a local-network candidate authority gate
-for future LAN providers, and the dashboard has a sanitized receive bridge that
-records accepted/rejected local-network candidate outcomes through protected
-managed action history. This does not add built-in peer discovery or LAN
-delivery.
+Active/full signed managed sends now expand into concrete Main, Kids,
+viewing-space, and optional time-limit envelopes for eligible fixed targets.
+Built-in local-network peer discovery, LAN delivery, server mailbox pull,
+mailbox decryption, app native enforcement proofs, offline later delivery, and
+multi-device fanout remain gated. The adapter now exposes a local-network
+candidate authority gate for future LAN providers, and the dashboard has a
+sanitized receive bridge that records accepted/rejected local-network candidate
+outcomes through protected managed action history. This does not add built-in
+peer discovery or LAN delivery.
 **Primary audit input**:
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
 **Current pull-on-open proof**:
@@ -455,9 +457,10 @@ replica child device over Nanah/P2P or same-network transport.
   history are present per trusted link/scope. Pull-on-open mailbox ack handoff
   now writes protected redacted target-profile history after the provider ack
   attempt. Offline mailbox/local-network delivery, source-side
-  mailbox/local-network ack summaries, and richer remote-rule or multi-device
-  bulk outbound controls remain later slices. Local selected-profile time-limit
-  and viewing-space bulk writes are already dashboard-gated.
+  mailbox/local-network ack summaries, offline delivery, cross-device fanout,
+  and richer per-target preview controls remain later slices. Local
+  selected-profile time-limit and viewing-space bulk writes are already
+  dashboard-gated.
 - **Acceptance Criteria**:
   - The public descriptor is separated from the private keypair.
   - The private JWK is not placed in the Nanah hello descriptor or trusted link
@@ -489,14 +492,16 @@ replica child device over Nanah/P2P or same-network transport.
   multi-target sends can choose eligible fixed targets before signing, and each
   successful live send appends redacted outbound history to the trusted link.
   Connected replicas now return redacted live acks that the source records only
-  when they match a prior sent revision/hash. Pull-on-open mailbox ack handoff
-  now writes protected redacted target-profile history after the provider ack
-  attempt. Active/full proposal sends, mailbox delivery, local-network delivery,
-  source-side mailbox/local-network ack summaries, and richer remote-rule or
-  multi-device bulk outbound controls remain pending. Local selected-profile
+  when they match a prior sent revision/hash. Active/full and full-profile
+  aliases expand into concrete signed Main, Kids, viewing-space, and optional
+  time-limit envelopes instead of using the legacy proposal path. Pull-on-open
+  mailbox ack handoff now writes protected redacted target-profile history
+  after the provider ack attempt. Mailbox delivery, local-network delivery,
+  source-side mailbox/local-network ack summaries, cross-device fanout, and
+  richer per-target preview controls remain pending. Local selected-profile
   time-limit and viewing-space bulk writes are already dashboard-gated.
 - **Acceptance Criteria**:
-  - Existing proposal sends still work for unsupported active/full scopes.
+  - Existing proposal sends still work for non-managed peer scopes.
   - Signed sends require saved managed link, Source -> Replica roles, allowed
     scope, fixed child target, and signing keypair material.
   - Non-managed peer sends reject keyword/channel/video/viewing/time-limit
