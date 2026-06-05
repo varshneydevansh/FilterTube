@@ -27,7 +27,11 @@ without storing policy payload plaintext, and connected replicas now return
 redacted live ack rows that the source stores only when they match a prior sent
 revision/hash. The dashboard history renderer now treats sensitive rows as
 protected display data: it uses fixed action labels and normalized reason codes
-instead of rendering free-form sensitive summary labels.
+instead of rendering free-form sensitive summary labels. Runtime history
+appends now prune expired rows with the documented retention windows: accepted
+actions are retained for 30 days, rejected/conflict/failed-auth/expired/clear
+evidence is retained for 90 days, and each protected profile remains capped at
+500 rows.
 **Goal slice**: Implementation order item 4, "Add action-history/log model and
 access-control tests".
 **Primary inputs**:
@@ -207,6 +211,7 @@ runtime managed action history store: profile-local managed child rows
 runtime managed action history row writer: local managed child edit plus local time-limit policy edit plus failed parent unlock plus Nanah managed-policy validation/apply outcomes
 runtime managed action history access gate: present for parent/account authority
 runtime managed action history display redaction: present for sensitive rows through fixed labels and normalized reason codes
+runtime managed action history retention pruning: present for 30-day accepted rows, 90-day protected evidence rows, and 500-row profile cap
 runtime managed action history clear path: present for accepted rows only while retaining protected evidence
 runtime managed action history clear event writer: present as protected `history.clear` evidence
 runtime remote managed validation/apply history writer: present for rejected, conflict, idempotent, and accepted apply outcomes
@@ -223,8 +228,10 @@ runtime behavior changed by this contract: yes, for accepted local managed child
 
 The current local writer stores redacted count summaries under
 `profile.managedActionHistory[]`; local time-limit rows store only enabled
-state, daily budget counts, timezone, and surface-budget count. The local access
-gate uses active
+state, daily budget counts, timezone, and surface-budget count. Every runtime
+append path now prunes expired rows before saving, using the documented 30-day
+accepted-action window, 90-day protected-evidence window, and 500-row cap. The
+local access gate uses active
 parent/account authority, not child PIN authority, and `clearManagedActionHistory`
 preserves rows that are rejected, conflict, failed-auth, expired-session, trust
 revocation, time-limit, viewing-space, or prior clear evidence.

@@ -3054,6 +3054,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const MANAGED_LOCAL_EDIT_POLICY_SCHEMA = 'filtertube_managed_local_edit_policy';
     const MANAGED_ACTION_HISTORY_SCHEMA = 'filtertube_managed_action_history';
     const MANAGED_ACTION_HISTORY_LIMIT = 500;
+    const MANAGED_ACTION_HISTORY_DAY_MS = 24 * 60 * 60 * 1000;
+    const MANAGED_ACTION_HISTORY_ACCEPTED_RETENTION_MS = 30 * MANAGED_ACTION_HISTORY_DAY_MS;
+    const MANAGED_ACTION_HISTORY_PROTECTED_RETENTION_MS = 90 * MANAGED_ACTION_HISTORY_DAY_MS;
     const MANAGED_ACTION_HISTORY_PROTECTED_RESULTS = new Set(['rejected', 'conflict', 'failed_auth', 'expired_session', 'cleared_by_admin']);
     const MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set(['trust_link.revoke', 'policy.time_limit.update', 'policy.viewing_space.update', 'remote_policy.source_push']);
     const MANAGED_ACTION_HISTORY_SAFE_LABELS = Object.freeze({
@@ -4826,10 +4829,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function recordManagedChildLocalEditHistory(profile, report) {
         const existingPolicyState = safeObject(profile?.managedPolicyState);
         const localEdits = safeObject(existingPolicyState.localManagedEdits);
-        const existingRows = Array.isArray(profile?.managedActionHistory)
-            ? profile.managedActionHistory.filter(row => safeObject(row).schema === MANAGED_ACTION_HISTORY_SCHEMA)
-            : [];
-        const nextRows = [...existingRows, report.historyRow].slice(-MANAGED_ACTION_HISTORY_LIMIT);
+        const nextRows = appendManagedActionHistoryRow(profile, report.historyRow);
         return {
             ...profile,
             managedPolicyState: {
@@ -4857,7 +4857,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const profiles = { ...safeObject(root.profiles) };
         const profile = safeObject(profiles[targetId]);
-        if (!profile || Object.keys(profile).length === 0 || getProfileType(root, targetId) !== 'child') return false;
+        if (!profile || Object.keys(profile).length === 0) return false;
 
         const now = Date.now();
         const actorId = normalizeString(root.activeProfileId) || activeProfileId || 'default';
@@ -4884,10 +4884,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
             sensitive: true
         };
-        const existingRows = getManagedActionHistoryRows(profile);
         profiles[targetId] = {
             ...profile,
-            managedActionHistory: [...existingRows, row].slice(-MANAGED_ACTION_HISTORY_LIMIT)
+            managedActionHistory: appendManagedActionHistoryRow(profile, row)
         };
         await io.saveProfilesV4({
             ...root,
@@ -4898,10 +4897,56 @@ document.addEventListener('DOMContentLoaded', async () => {
         return true;
     }
 
+    function getManagedActionHistoryRowTime(row) {
+        const item = safeObject(row);
+        for (const key of ['receivedAt', 'issuedAt', 'createdAt']) {
+            const value = normalizeNonNegativeInteger(item[key]);
+            if (value != null) return value;
+        }
+        const orderKey = normalizeString(item.orderKey);
+        const match = orderKey.match(/(\d{12,})$/);
+        if (match) {
+            const value = normalizeNonNegativeInteger(match[1]);
+            if (value != null) return value;
+        }
+        return null;
+    }
+
+    function getManagedActionHistoryRetentionMs(row) {
+        const item = safeObject(row);
+        const result = normalizeString(item.result);
+        if (MANAGED_ACTION_HISTORY_PROTECTED_RESULTS.has(result)) {
+            return MANAGED_ACTION_HISTORY_PROTECTED_RETENTION_MS;
+        }
+        return MANAGED_ACTION_HISTORY_ACCEPTED_RETENTION_MS;
+    }
+
+    function pruneManagedActionHistoryRows(rows, now = Date.now()) {
+        return safeArray(rows)
+            .filter(row => safeObject(row).schema === MANAGED_ACTION_HISTORY_SCHEMA)
+            .filter((row) => {
+                const timestamp = getManagedActionHistoryRowTime(row);
+                if (timestamp == null) return true;
+                return now - timestamp < getManagedActionHistoryRetentionMs(row);
+            })
+            .slice(-MANAGED_ACTION_HISTORY_LIMIT);
+    }
+
+    function appendManagedActionHistoryRow(profile, row) {
+        const receivedAt = getManagedActionHistoryRowTime(row);
+        const now = receivedAt == null ? Date.now() : receivedAt;
+        return appendManagedActionHistoryRows(profile, [row], now);
+    }
+
+    function appendManagedActionHistoryRows(profile, rows, now = Date.now()) {
+        return pruneManagedActionHistoryRows([
+            ...safeArray(profile?.managedActionHistory),
+            ...safeArray(rows)
+        ], now);
+    }
+
     function getManagedActionHistoryRows(profile) {
-        return Array.isArray(profile?.managedActionHistory)
-            ? profile.managedActionHistory.filter(row => safeObject(row).schema === MANAGED_ACTION_HISTORY_SCHEMA)
-            : [];
+        return pruneManagedActionHistoryRows(profile?.managedActionHistory);
     }
 
     function managedActionHistoryRowIsProtected(row) {
@@ -5117,7 +5162,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
         profiles[targetId] = {
             ...profile,
-            managedActionHistory: [...protectedRows, clearRow].slice(-MANAGED_ACTION_HISTORY_LIMIT)
+            managedActionHistory: pruneManagedActionHistoryRows([...protectedRows, clearRow], now)
         };
         await io.saveProfilesV4({
             ...fresh,
@@ -5361,13 +5406,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
             sensitive: true
         };
-        const existingRows = Array.isArray(profile.managedActionHistory)
-            ? profile.managedActionHistory.filter(existing => safeObject(existing).schema === MANAGED_ACTION_HISTORY_SCHEMA)
-            : [];
         profiles[targetProfileId] = {
             ...profile,
             ...(remoteFailedAttempt ? { managedPolicyState } : {}),
-            managedActionHistory: [...existingRows, row].slice(-MANAGED_ACTION_HISTORY_LIMIT)
+            managedActionHistory: appendManagedActionHistoryRow(profile, row)
         };
         await io.saveProfilesV4({
             ...fresh,
@@ -8685,9 +8727,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 delete nextManagedState.remoteManagedPolicies;
             }
 
-            const historyRows = Array.isArray(profile?.managedActionHistory)
-                ? profile.managedActionHistory.filter(row => safeObject(row).schema === MANAGED_ACTION_HISTORY_SCHEMA)
-                : [];
             const revokeRow = buildManagedTrustRevocationHistoryRow({
                 profileId,
                 linkId: normalized,
@@ -8698,7 +8737,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             profiles[profileId] = {
                 ...profile,
                 managedPolicyState: nextManagedState,
-                managedActionHistory: [...historyRows, revokeRow].slice(-MANAGED_ACTION_HISTORY_LIMIT)
+                managedActionHistory: appendManagedActionHistoryRow(profile, revokeRow)
             };
             changed = true;
             profilesTouched += 1;
@@ -8907,10 +8946,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
             sensitive: true
         };
-        const existingRows = getManagedActionHistoryRows(profile);
         profiles[targetId] = {
             ...profile,
-            managedActionHistory: [...existingRows, row].slice(-MANAGED_ACTION_HISTORY_LIMIT)
+            managedActionHistory: appendManagedActionHistoryRow(profile, row)
         };
         const nextRoot = {
             ...fresh,
@@ -9303,10 +9341,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             return { ok: false, reason: 'no_recordable_ack_history_rows', recordedCount: 0, failedCount: records.length };
         }
 
-        const existingRows = getManagedActionHistoryRows(profile);
         profiles[targetProfileId] = {
             ...profile,
-            managedActionHistory: [...existingRows, ...historyRows].slice(-MANAGED_ACTION_HISTORY_LIMIT)
+            managedActionHistory: appendManagedActionHistoryRows(profile, historyRows)
         };
         await io.saveProfilesV4({
             ...fresh,

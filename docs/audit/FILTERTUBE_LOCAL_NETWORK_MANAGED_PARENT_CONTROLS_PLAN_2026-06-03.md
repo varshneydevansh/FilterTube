@@ -156,7 +156,8 @@ not policy authority.
 
 - Only parent/account authority can view or clear protected action history.
 - Protected users cannot clear rejected-update or failed-unlock evidence.
-- Rows need retention limits and redaction/encryption defaults.
+- Rows use local retention limits and redacted defaults; encrypted summaries
+  remain future-compatible.
 - Rejected and failed remote-policy attempts should be durable enough for a
   caregiver to diagnose misuse or trust problems.
 - Ordering must be stable under clock skew by using policy revision and receive
