@@ -62,6 +62,12 @@ metadata, not plaintext rules or authority.
 
 ## Extension MVP Checklist
 
+**Extension-owned MVP status**: implemented through the current dashboard,
+runtime, Nanah managed-policy, protected-history, route-gate, time-budget,
+open-sync, mailbox-provider, and local-network-provider hook slices. Remaining
+unchecked rows below are intentionally provider/app lanes, not missing
+extension authority code.
+
 - [x] Parent/account profiles can manage protected child profiles locally.
 - [x] Default/Master can manage independent protected account profiles without
   switching into them.
