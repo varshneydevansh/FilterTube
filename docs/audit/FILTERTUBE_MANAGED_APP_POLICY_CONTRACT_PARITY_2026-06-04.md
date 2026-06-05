@@ -280,6 +280,13 @@ Main/Kids surfaces, and native settings locks that consume this artifact without
 forking extension authority semantics. iOS still needs the matching native
 adapter proof.
 
+Installed app smoke is now pinned as a separate release handoff at
+`docs/audit/artifacts/managed-app-parity-smoke/template.json`, with verifier
+`docs/audit/artifacts/managed-app-parity-smoke/verify-managed-app-parity-smoke-artifact.mjs`.
+That artifact must pass before an installed Android or iOS app parity claim is
+used as release evidence; one passing artifact proves only that one installed
+platform.
+
 ## Edge Cases To Keep
 
 - Parent updates multiple child profiles in one session; each target keeps its
@@ -300,6 +307,7 @@ Focused test:
 
 ```bash
 node --test tests/runtime/managed-app-policy-contract-parity-current-behavior.test.mjs
+node --test tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs
 node --test tests/runtime/native-runtime-sync-authority-current-behavior.test.mjs \
   tests/runtime/native-runtime-sync-manifest-freshness-boundary-current-behavior.test.mjs
 ```

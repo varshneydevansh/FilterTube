@@ -1,0 +1,193 @@
+{
+  "artifactType": "filtertube-managed-app-parity-smoke",
+  "schemaVersion": 1,
+  "status": "template",
+  "appParityReadiness": "NO-GO",
+  "crossPlatformReleaseReadiness": "NO-GO",
+  "runtimeBehaviorChanged": false,
+  "boundaryDoc": "docs/audit/FILTERTUBE_MANAGED_TRANSPORT_APP_PARITY_GATE_2026-06-05.md",
+  "changeContext": {
+    "logicalChangeType": "",
+    "requiredLanes": [],
+    "automatedLaneEvidence": []
+  },
+  "appPlatform": {
+    "platform": "",
+    "appName": "",
+    "appVersion": "",
+    "buildIdentifier": "",
+    "installedArtifactType": "",
+    "installedArtifactLabel": "",
+    "deviceLabel": "",
+    "deviceModel": "",
+    "osVersion": "",
+    "upstreamRevisionOrHash": ""
+  },
+  "contractParity": {
+    "contractArtifactPath": "docs/audit/artifacts/managed-app-policy-contract-v1.json",
+    "contractHash": "",
+    "contractSynced": false,
+    "nativeRuntimeSynced": false,
+    "nativeAdapterProof": {
+      "sourcePath": "",
+      "status": ""
+    }
+  },
+  "recordingFields": {
+    "manualTimestamp": "",
+    "testerInitials": "",
+    "parentProfileId": "",
+    "managedProfileId": "",
+    "managedProfileRole": "",
+    "parentAuthorityObservation": "",
+    "childAuthorityObservation": "",
+    "mainViewingSpaceObservation": "",
+    "kidsViewingSpaceObservation": "",
+    "timeBudgetObservation": "",
+    "historyAccessObservation": "",
+    "noPolicyNoWorkObservation": ""
+  },
+  "requiredRows": [
+    {
+      "id": "FT-MANAGED-APP-00-contract-sync",
+      "requiredObservation": "The installed app uses the synced extension-owned managed policy contract and runtime helpers without forking authority semantics.",
+      "status": "pending",
+      "observation": {
+        "pass": false,
+        "summary": ""
+      },
+      "evidence": {},
+      "durationMs": 0
+    },
+    {
+      "id": "FT-MANAGED-APP-01-parent-admin-lock",
+      "requiredObservation": "Parent/account authority can edit managed settings and the protected user cannot access admin mutation paths.",
+      "status": "pending",
+      "observation": {
+        "pass": false,
+        "summary": ""
+      },
+      "evidence": {},
+      "durationMs": 0
+    },
+    {
+      "id": "FT-MANAGED-APP-02-child-pin-not-admin",
+      "requiredObservation": "Protected-user PIN unlock does not become admin authority for settings, sync, logs, or policy mutation.",
+      "status": "pending",
+      "observation": {
+        "pass": false,
+        "summary": ""
+      },
+      "evidence": {},
+      "durationMs": 0
+    },
+    {
+      "id": "FT-MANAGED-APP-03-main-route-gate",
+      "requiredObservation": "Main YouTube access is allowed or blocked before app web/native content opens, according to the managed profile policy.",
+      "status": "pending",
+      "observation": {
+        "pass": false,
+        "summary": ""
+      },
+      "evidence": {},
+      "durationMs": 0
+    },
+    {
+      "id": "FT-MANAGED-APP-04-kids-route-gate",
+      "requiredObservation": "YouTube Kids access is allowed or blocked before app web/native content opens, according to the managed profile policy.",
+      "status": "pending",
+      "observation": {
+        "pass": false,
+        "summary": ""
+      },
+      "evidence": {},
+      "durationMs": 0
+    },
+    {
+      "id": "FT-MANAGED-APP-05-time-budget-startup",
+      "requiredObservation": "The app enforces a managed daily time budget before initial content surface configuration.",
+      "status": "pending",
+      "observation": {
+        "pass": false,
+        "summary": ""
+      },
+      "evidence": {},
+      "durationMs": 0
+    },
+    {
+      "id": "FT-MANAGED-APP-06-time-budget-resume-heartbeat-pause",
+      "requiredObservation": "The app rechecks budget on resume, heartbeat, and pause, and records active usage without double-counting idle time.",
+      "status": "pending",
+      "observation": {
+        "pass": false,
+        "summary": ""
+      },
+      "evidence": {},
+      "durationMs": 0
+    },
+    {
+      "id": "FT-MANAGED-APP-07-reduced-budget-clamp",
+      "requiredObservation": "A newer parent policy that reduces daily budget clamps remaining time after sync/apply.",
+      "status": "pending",
+      "observation": {
+        "pass": false,
+        "summary": ""
+      },
+      "evidence": {},
+      "durationMs": 0
+    },
+    {
+      "id": "FT-MANAGED-APP-08-timeout-surface",
+      "requiredObservation": "When budget expires, the app shows a protected timeout surface and does not keep a playable YouTube surface active behind it.",
+      "status": "pending",
+      "observation": {
+        "pass": false,
+        "summary": ""
+      },
+      "evidence": {},
+      "durationMs": 0
+    },
+    {
+      "id": "FT-MANAGED-APP-09-history-redaction",
+      "requiredObservation": "Accepted/rejected managed action history is visible only to parent/account authority and never records plaintext rule values.",
+      "status": "pending",
+      "observation": {
+        "pass": false,
+        "summary": ""
+      },
+      "evidence": {},
+      "durationMs": 0
+    },
+    {
+      "id": "FT-MANAGED-APP-10-no-policy-no-work",
+      "requiredObservation": "With no managed policy active, the app does not add sync, timer, route-gate, or polling churn.",
+      "status": "pending",
+      "observation": {
+        "pass": false,
+        "summary": ""
+      },
+      "evidence": {},
+      "durationMs": 0
+    },
+    {
+      "id": "FT-MANAGED-APP-11-native-settings-lock",
+      "requiredObservation": "Native settings locks consume the shared managed policy contract and cannot be bypassed by protected-user navigation.",
+      "status": "pending",
+      "observation": {
+        "pass": false,
+        "summary": ""
+      },
+      "evidence": {},
+      "durationMs": 0
+    }
+  ],
+  "completionRules": {
+    "allRecordingFieldsRequired": true,
+    "contractParityMustPass": true,
+    "allRowsMustPass": true,
+    "automatedLaneEvidenceMustPass": true,
+    "automatedLaneEvidenceMustCoverRequiredLanes": true,
+    "noPlaintextSensitiveFields": true,
+    "platformSpecificAdapterProofRequired": true
+  }
+}

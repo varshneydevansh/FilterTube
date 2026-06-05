@@ -60,6 +60,10 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(runner, /MANAGED_REMOTE_DELIVERY_SMOKE_ARTIFACT_VERIFIER/);
   assert.match(runner, /MANAGED_REMOTE_DELIVERY_SMOKE_REQUIRED_ROWS/);
   assert.match(runner, /Managed remote delivery smoke artifact handoff/);
+  assert.match(runner, /MANAGED_APP_PARITY_SMOKE_ARTIFACT_TEMPLATE/);
+  assert.match(runner, /MANAGED_APP_PARITY_SMOKE_ARTIFACT_VERIFIER/);
+  assert.match(runner, /MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS/);
+  assert.match(runner, /Managed app parity smoke artifact handoff/);
   assert.match(runner, /RUNTIME_FIXTURE_LANE_REASONS/);
   assert.match(runner, /function runtimeFixtureRequirement\(result\)/);
   assert.match(runner, /Runtime fixture\/test proof files in this change/);
@@ -100,6 +104,9 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(matrix, /Managed parent\/caregiver transport changes also receive a second handoff/);
   assert.match(matrix, /docs\/audit\/artifacts\/managed-remote-delivery-smoke\/template\.json/);
   assert.match(matrix, /[Oo]ne passing managed remote-delivery artifact proves\s+only one transport slice/);
+  assert.match(matrix, /Managed app parity changes receive their own installed-app smoke handoff/);
+  assert.match(matrix, /docs\/audit\/artifacts\/managed-app-parity-smoke\/template\.json/);
+  assert.match(matrix, /[Oo]ne passing managed app parity artifact proves\s+only one installed app platform/);
   assert.match(matrix, /reports whether a changed\s+`docs\/audit\/` proof file is present/);
   assert.match(matrix, /fails\s+when source, release, asset, or product-doc paths changed without a matching\s+`docs\/audit\/` proof file/);
   assert.match(matrix, /fails when changed\s+`docs\/audit\/` proof does not share\s+at least one non-smoke lane/);
@@ -252,6 +259,35 @@ test('classifier output surfaces managed remote delivery smoke handoff for Nanah
     assert.match(result.stdout, /FT-MANAGED-REMOTE-00-trust-link-preflight/);
     assert.match(result.stdout, /FT-MANAGED-REMOTE-09-no-work-idle/);
     assert.match(result.stdout, /one passing transport artifact proves only that transport slice/);
+  }
+});
+
+test('classifier output surfaces managed app parity smoke handoff for native parity artifacts', () => {
+  const appContract = spawnSync(process.execPath, [
+    'scripts/run-test-lane.mjs',
+    '--classify',
+    'docs/audit/artifacts/managed-app-policy-contract-v1.json'
+  ], {
+    cwd: repoRoot,
+    encoding: 'utf8'
+  });
+  const appSmoke = spawnSync(process.execPath, [
+    'scripts/run-test-lane.mjs',
+    '--classify',
+    'docs/audit/artifacts/managed-app-parity-smoke/template.json'
+  ], {
+    cwd: repoRoot,
+    encoding: 'utf8'
+  });
+
+  for (const result of [appContract, appSmoke]) {
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /Managed app parity smoke artifact handoff:/);
+    assert.match(result.stdout, /template: docs\/audit\/artifacts\/managed-app-parity-smoke\/template\.json/);
+    assert.match(result.stdout, /verifier: node docs\/audit\/artifacts\/managed-app-parity-smoke\/verify-managed-app-parity-smoke-artifact\.mjs docs\/audit\/artifacts\/managed-app-parity-smoke\/<artifact>\.json/);
+    assert.match(result.stdout, /FT-MANAGED-APP-00-contract-sync/);
+    assert.match(result.stdout, /FT-MANAGED-APP-11-native-settings-lock/);
+    assert.match(result.stdout, /one passing app artifact proves only one installed app platform/);
   }
 });
 

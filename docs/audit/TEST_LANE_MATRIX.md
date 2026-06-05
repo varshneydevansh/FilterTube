@@ -254,6 +254,20 @@ or local-network surfaces. One passing managed remote-delivery artifact proves
 only one transport slice; complete remote management remains gated until the
 readiness gate is satisfied across the required transport and app-parity rows.
 
+Managed app parity changes receive their own installed-app smoke handoff:
+
+```text
+docs/audit/artifacts/managed-app-parity-smoke/template.json
+docs/audit/artifacts/managed-app-parity-smoke/verify-managed-app-parity-smoke-artifact.mjs
+```
+
+That app-parity handoff is scoped to Android/iOS/native runtime parity and the
+shared managed policy contract. One passing managed app parity artifact proves
+only one installed app platform; cross-platform remote management remains gated
+until Android and iOS both have platform-specific adapter proof, settings-lock
+proof, Main/Kids route-gate proof, time-limit proof, protected history proof,
+and no-policy/no-work proof.
+
 The `test:release` and `test:smoke` lanes keep the live YouTube handoff visible by running
 `tests/runtime/release-live-youtube-spa-smoke-boundary-current-behavior.test.mjs`.
 That test does not claim the manual smoke has passed; it prevents the template,
@@ -323,6 +337,7 @@ or uncovered required lanes remain `NO-GO`.
 | `docs/*.md` outside `docs/audit/` | `test:release`, `test:smoke` | Covers product docs, release-facing architecture/behavior claims, and the audit-doc boundary that keeps proof files inside `docs/audit/`. |
 | `docs/audit/artifacts/release-live-youtube-spa-smoke/*.{json,mjs}` | `test:release`, `test:smoke` | Covers live-smoke templates, runners, verifiers, and future dated smoke artifacts. |
 | `docs/audit/artifacts/managed-remote-delivery-smoke/*.{json,mjs}` | `test:release`, `test:settings`, `test:smoke` | Covers managed parent/caregiver remote-delivery smoke templates, verifiers, and future dated transport-slice artifacts. |
+| `docs/audit/artifacts/managed-app-parity-smoke/*.{json,mjs}` | `test:release`, `test:settings`, `test:smoke` | Covers managed app parity smoke templates, verifiers, and future dated installed Android/iOS app parity artifacts. |
 | `docs/audit/artifacts/empty-install-idle-probe.mjs` | `test:performance`, `test:smoke` | Covers the no-rule/no-work idle observer probe used as performance evidence. |
 | diagnostic, logging, console, no-work, cache, SPA, lag, active-work, active-rule, disabled-runtime, master-switch, or performance audit docs under `docs/audit/` | `test:performance`, `test:smoke` | Covers audit proof for production console gates, diagnostic logging budgets, empty-rule/no-work behavior, cache/SPA lag, active-rule gates, disabled-mode gates, and performance-risk boundaries even when only the proof doc changes. Match these as filename tokens only, so `SPA` does not accidentally classify unrelated words such as `DISPATCH`. |
 | code-burden, declutter, structural-burden, large-file, or large-source audit docs/tests under `docs/audit/` or `tests/runtime/` | `test:performance`, `test:smoke` | Covers maintainability pressure that can turn into runtime lag or risky optimizations, including the large-file guard for product-owned source files and workflow-owned lane files crossing 1000 lines. |

@@ -19,6 +19,9 @@ import {
   MANAGED_REMOTE_DELIVERY_SMOKE_ARTIFACT_TEMPLATE,
   MANAGED_REMOTE_DELIVERY_SMOKE_ARTIFACT_VERIFIER,
   MANAGED_REMOTE_DELIVERY_SMOKE_REQUIRED_ROWS,
+  MANAGED_APP_PARITY_SMOKE_ARTIFACT_TEMPLATE,
+  MANAGED_APP_PARITY_SMOKE_ARTIFACT_VERIFIER,
+  MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS,
   MANUAL_YOUTUBE_SMOKE_LANE_REASONS,
   NON_PROOF_LANE,
   RUNTIME_FIXTURE_LANE_REASONS,
@@ -266,6 +269,16 @@ function requiresManagedRemoteDeliveryHandoff(result) {
   ));
 }
 
+function requiresManagedAppParityHandoff(result) {
+  const hasManagedLane = result.lanes.some(lane => lane === 'settings' || lane === 'release' || lane === 'smoke');
+  if (!hasManagedLane) return false;
+
+  return result.classifications.some(entry => (
+    /managed-app-policy-contract|managed-app-parity|app-parity|native-runtime|android|ios/i.test(entry.file)
+    || entry.file.startsWith('docs/audit/artifacts/managed-app-parity-smoke/')
+  ));
+}
+
 function runLane(lane) {
   const config = LANES[lane];
   if (!config) {
@@ -331,6 +344,13 @@ function printClassification(result) {
       console.log(`    verifier: ${MANAGED_REMOTE_DELIVERY_SMOKE_ARTIFACT_VERIFIER}`);
       console.log(`    required rows: ${MANAGED_REMOTE_DELIVERY_SMOKE_REQUIRED_ROWS.join(', ')}`);
       console.log('    readiness: one passing transport artifact proves only that transport slice; complete remote management remains gated.');
+    }
+    if (requiresManagedAppParityHandoff(result)) {
+      console.log('  Managed app parity smoke artifact handoff:');
+      console.log(`    template: ${MANAGED_APP_PARITY_SMOKE_ARTIFACT_TEMPLATE}`);
+      console.log(`    verifier: ${MANAGED_APP_PARITY_SMOKE_ARTIFACT_VERIFIER}`);
+      console.log(`    required rows: ${MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS.join(', ')}`);
+      console.log('    readiness: one passing app artifact proves only one installed app platform; cross-platform remote management remains gated.');
     }
   }
 

@@ -22,6 +22,10 @@ export const MANAGED_REMOTE_DELIVERY_SMOKE_ARTIFACT_TEMPLATE =
   'docs/audit/artifacts/managed-remote-delivery-smoke/template.json';
 export const MANAGED_REMOTE_DELIVERY_SMOKE_ARTIFACT_VERIFIER =
   'node docs/audit/artifacts/managed-remote-delivery-smoke/verify-managed-smoke-artifact.mjs docs/audit/artifacts/managed-remote-delivery-smoke/<artifact>.json';
+export const MANAGED_APP_PARITY_SMOKE_ARTIFACT_TEMPLATE =
+  'docs/audit/artifacts/managed-app-parity-smoke/template.json';
+export const MANAGED_APP_PARITY_SMOKE_ARTIFACT_VERIFIER =
+  'node docs/audit/artifacts/managed-app-parity-smoke/verify-managed-app-parity-smoke-artifact.mjs docs/audit/artifacts/managed-app-parity-smoke/<artifact>.json';
 export const LIVE_SMOKE_CHANGE_CONTEXT_ENV = Object.freeze([
   'FILTERTUBE_LOGICAL_CHANGE_TYPE',
   'FILTERTUBE_REQUIRED_LANES',
@@ -49,6 +53,20 @@ export const MANAGED_REMOTE_DELIVERY_SMOKE_REQUIRED_ROWS = Object.freeze([
   'FT-MANAGED-REMOTE-07-revoked-replay-reject',
   'FT-MANAGED-REMOTE-08-action-history-redaction',
   'FT-MANAGED-REMOTE-09-no-work-idle'
+]);
+export const MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS = Object.freeze([
+  'FT-MANAGED-APP-00-contract-sync',
+  'FT-MANAGED-APP-01-parent-admin-lock',
+  'FT-MANAGED-APP-02-child-pin-not-admin',
+  'FT-MANAGED-APP-03-main-route-gate',
+  'FT-MANAGED-APP-04-kids-route-gate',
+  'FT-MANAGED-APP-05-time-budget-startup',
+  'FT-MANAGED-APP-06-time-budget-resume-heartbeat-pause',
+  'FT-MANAGED-APP-07-reduced-budget-clamp',
+  'FT-MANAGED-APP-08-timeout-surface',
+  'FT-MANAGED-APP-09-history-redaction',
+  'FT-MANAGED-APP-10-no-policy-no-work',
+  'FT-MANAGED-APP-11-native-settings-lock'
 ]);
 
 export const RUNTIME_FIXTURE_LANE_REASONS = Object.freeze({
@@ -92,6 +110,7 @@ export const LANES = Object.freeze({
       'tests/runtime/release-live-youtube-spa-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/release-live-youtube-spa-smoke-boundary-current-behavior.test.mjs',
       'tests/runtime/managed-policy-sync-remote-delivery-smoke-artifact-verifier-current-behavior.test.mjs',
+      'tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/release-notes-json-version-gate-boundary-current-behavior.test.mjs',
       'tests/runtime/release-package-parity-current-behavior.test.mjs',
       'tests/runtime/root-package-metadata-script-surface-current-behavior.test.mjs',
@@ -326,6 +345,7 @@ export const LANES = Object.freeze({
       'tests/runtime/managed-policy-sync-remote-delivery-readiness-gate-current-behavior.test.mjs',
       'tests/runtime/managed-remote-transport-app-parity-gate-current-behavior.test.mjs',
       'tests/runtime/managed-policy-sync-remote-delivery-smoke-artifact-verifier-current-behavior.test.mjs',
+      'tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/managed-viewing-space-route-gate-current-behavior.test.mjs',
       'tests/runtime/managed-child-time-limit-schema-current-behavior.test.mjs',
       'tests/runtime/managed-time-budget-enforcement-current-behavior.test.mjs',
@@ -364,6 +384,7 @@ export const LANES = Object.freeze({
       'tests/runtime/release-live-youtube-spa-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/release-live-youtube-spa-smoke-boundary-current-behavior.test.mjs',
       'tests/runtime/managed-policy-sync-remote-delivery-smoke-artifact-verifier-current-behavior.test.mjs',
+      'tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/all-callable-index-current-behavior.test.mjs',
       'tests/runtime/audit-runtime-backlog-current-behavior.test.mjs',
       'tests/runtime/source-of-truth-claim-register-current-behavior.test.mjs',
@@ -535,6 +556,11 @@ export const FILE_LANE_RULES = Object.freeze([
   {
     id: 'managed-remote-delivery-smoke-artifact-surface',
     patterns: [/^docs\/audit\/artifacts\/managed-remote-delivery-smoke\/.*\.(?:json|mjs)$/],
+    lanes: ['release', 'settings', 'smoke']
+  },
+  {
+    id: 'managed-app-parity-smoke-artifact-surface',
+    patterns: [/^docs\/audit\/artifacts\/managed-app-parity-smoke\/.*\.(?:json|mjs)$/],
     lanes: ['release', 'settings', 'smoke']
   },
   {

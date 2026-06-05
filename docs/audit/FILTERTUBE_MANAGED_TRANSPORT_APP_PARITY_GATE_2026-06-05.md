@@ -14,6 +14,9 @@ sync, and downstream app parity.
 `docs/audit/FILTERTUBE_MANAGED_APP_POLICY_CONTRACT_PARITY_2026-06-04.md`,
 and
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_DISCOVERY_AUTHORITY_BOUNDARY_2026-06-03.md`.
+**Manual app parity smoke handoff**:
+`docs/audit/artifacts/managed-app-parity-smoke/template.json` and
+`docs/audit/artifacts/managed-app-parity-smoke/verify-managed-app-parity-smoke-artifact.mjs`.
 
 ## Purpose
 
@@ -75,6 +78,13 @@ iOS parity proof: required
 public release wording review: required
 ```
 
+A valid managed app parity artifact proves one installed app platform smoke,
+not complete cross-platform remote-management readiness. Android and iOS must
+each provide platform-specific adapter proof, settings-lock proof, Main/Kids
+route-gate proof, time-limit proof, protected history proof, and no-policy
+no-work proof before public release copy can claim cross-platform managed
+parent/caregiver control.
+
 ## Allowed Wording
 
 - Managed local child/protected-profile edits are supported.
@@ -100,6 +110,7 @@ Focused proof:
 
 ```bash
 node --test tests/runtime/managed-remote-transport-app-parity-gate-current-behavior.test.mjs
+node --test tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs
 ```
 
 Settings lane:

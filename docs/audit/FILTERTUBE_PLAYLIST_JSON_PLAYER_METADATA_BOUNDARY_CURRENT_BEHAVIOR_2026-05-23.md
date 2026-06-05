@@ -18,7 +18,7 @@ the current watch video, but it is current-video metadata, not playlist creator 
 | `playlist.json` | 3609 | 165443 | `f5766312bdddcceb20ecd2a4b54045843dfab89108b75c2f5bc8a0ee368d4ce5` | Prose-prefaced mixed capture. |
 | fragment 0 | starts line 3 | 16485 | `52b52269372f0c9160cc33362dcc6d1c4977be650b1da78848d76799f79e5450` | Generated Mix `compactRadioRenderer`; no creator channel fields. |
 | fragment 1 | starts line 288 | 148701 | `e0798e02cc864bed06899c5c6ab94a3900c6050c7baa494edc14d7822b5aa72a` | `ytInitialPlayerResponse` current-video/player metadata. |
-| `tests/runtime/fixtures/captures/playlist-json-player-metadata.json` | 181 | 6067 | `c3f1134676f5ea96cb2dadf6b757ef96c607d334372fe31b2bea4eb4f616369b` | Reduced current-video metadata fixture. |
+| `tests/runtime/fixtures/captures/playlist-json-player-metadata.json` | 181 | 6067 | `c3f1134676f5ea96cb2dadf6b757ef96c607d334372fe31b2bea4eb4f616469b` | Reduced current-video metadata fixture. |
 | `tests/runtime/playlist-json-player-metadata-boundary-current-behavior.test.mjs` | audit test | audit test | audit test | Pins raw mixed-fragment classification, reduced fixture provenance, current behavior, ledger links, and missing future authority. |
 
 ## Current Behavior

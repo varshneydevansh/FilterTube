@@ -3,8 +3,9 @@
 Status: audit artifact only. This file does not change build, release, website,
 or filtering behavior. The 2026-06-01 addendum records the build/release prompt
 guard added to `build.js` and the `test:changed` same-path mutation guard
-added to `scripts/run-test-lane.mjs`; extension runtime filtering behavior is
-unchanged.
+added to `scripts/run-test-lane.mjs`; the 2026-06-05 addendum records the
+managed app parity smoke handoff helper added to the changed-lane runner.
+Extension runtime filtering behavior is unchanged.
 
 This pass expands the complete-codebase audit into build/release scripts and
 the public website. These files do not decide whether a YouTube card is hidden,
@@ -21,10 +22,10 @@ surfaces even when they do not contain callables.
 
 | Family | Files | Lexical callables | Public authority |
 | --- | ---: | ---: | --- |
-| Build and sync scripts | 7 | 69 | Extension ZIPs, generated UI shell, vendor Nanah/QR bundles, native app runtime sync, GitHub release body/assets, focused test-lane runner, declarative test-lane config, lane-owned audit proof drift guard |
+| Build and sync scripts | 7 | 70 | Extension ZIPs, generated UI shell, vendor Nanah/QR bundles, native app runtime sync, GitHub release body/assets, focused test-lane runner, declarative test-lane config, lane-owned audit proof drift guard |
 | Website app routes | 9 | 19 | Public metadata, downloads page, privacy/terms policy, sitemap, robots, platform detail pages |
 | Website components | 15 | 54 | Public platform copy, browser links, footer/header/navigation, theme/scene runtime, animation/reveal behavior, hero media control |
-| Total | 31 | 142 | Public release and website truth boundary |
+| Total | 31 | 143 | Public release and website truth boundary |
 
 ## Accounted Files
 
@@ -34,7 +35,7 @@ surfaces even when they do not contain callables.
 | `scripts/audit-proof-drift.mjs` | 12 | `currentSourceProofs`, `laneOwnedProofFiles`, `defaultAuditProofFiles`, `collectProofDrift`, `main` |
 | `scripts/build-extension-ui.mjs` | 2 | `ensureOutputDirectories`, `bundleAll` |
 | `scripts/build-nanah-vendor.mjs` | 4 | `buildQrcodeBundle`, `buildNanahBundle`, `main` |
-| `scripts/run-test-lane.mjs` | 22 | `classifyPaths`, `auditProofRequirement`, `runtimeFixtureRequirement`, `changedPathsFromGit`, `newChangedPaths`, `changedPathContentSnapshot`, `changedPathsWithSnapshotDrift`, `snapshotFileContent`, `formatLaneList`, `requiresManagedRemoteDeliveryHandoff`, `laneNames`, `validateLaneFiles`, `runNode`, `runLane`, `runAuditDrift`, `printClassification`, `printList`, `main` |
+| `scripts/run-test-lane.mjs` | 23 | `classifyPaths`, `auditProofRequirement`, `runtimeFixtureRequirement`, `changedPathsFromGit`, `newChangedPaths`, `changedPathContentSnapshot`, `changedPathsWithSnapshotDrift`, `snapshotFileContent`, `formatLaneList`, `requiresManagedRemoteDeliveryHandoff`, `requiresManagedAppParityHandoff`, `laneNames`, `validateLaneFiles`, `runNode`, `runLane`, `runAuditDrift`, `printClassification`, `printList`, `main` |
 | `scripts/sync-native-runtime.mjs` | 0 | top-level native repo sync authority |
 | `scripts/test-lane-config.mjs` | 0 | declarative lane matrix and file classification data |
 | `website/app/[slug]/page.js` | 3 | `generateStaticParams`, `generateMetadata`, `DetailPage` |
@@ -216,7 +217,7 @@ tests/runtime/build-website-callable-current-behavior.test.mjs
 They pin:
 
 - 31 accounted build/website files.
-- 142 lexical build/website callables.
+- 143 lexical build/website callables.
 - public surfaces for release scripts, vendor/native sync, website app routes,
   website components, and public claim data.
 - high-risk source patterns for README mutation, non-atomic GitHub release,
