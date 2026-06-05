@@ -48,8 +48,8 @@ Generated app runtime assets are not source authority:
 
 | Asset | Current bytes | SHA-256 | Current behavior |
 | --- | ---: | --- | --- |
-| Android Main runtime | 1,634,163 | `4b0681ed60b3c9f80be10a0e46582e3c832ea9d287e6909995b3a9a5b79692d7` | Generated bundle consumed by Android WebView. |
-| iOS Main runtime | 1,632,501 | `6955e1934822b49222555fb201be9f18976610ddcc1855b0159e7bb3d7da567a` | Generated from the Android runtime path, normalized for iOS resources. |
+| Android Main runtime | 1,634,621 | `9cd4153bd713a9f43da81ae53ee92be5b566eddbc7d6902ed41a7a1e6551f05c` | Generated bundle consumed by Android WebView. |
+| iOS Main runtime | 1,632,959 | `697152093a134068ae08e9da094a31afd36b0957975b60ff483935914a743a7f` | Generated from the Android runtime path, normalized for iOS resources. |
 | Android Kids runtime | 13,153 | `05b47e2310222a68ba5356cbf6dca24b507aa225bfbe6e971c2a4819d647b711` | Android Kids runtime asset. |
 | iOS Kids runtime | 20,835 | `3f279f275bf93cca6385df6c8d0422a51c533c26cbd29ddd5d9ea5655efc7340` | Android Kids runtime plus iOS-specific WebKit fit/performance patches. |
 
@@ -141,7 +141,7 @@ flowchart TD
 | Public wrapper script | `scripts/sync-native-runtime.mjs:5-34` | Resolves `FILTERTUBE_APP_REPO` or sibling `FilterTubeApp`, then delegates to the app sync script with inherited stdio. | Wrapper does not emit a machine-readable sync report. |
 | Package entrypoint | `package.json:6-15` | `sync:native-runtime` exists, while ordinary build scripts are separate. | Extension build alone is not a native freshness gate. |
 | App sync script | `/Users/devanshvarshney/FilterTubeApp/tools/sync-runtime-from-extension.mjs:100-199`, `226` | Declares runtime bundle order, source mirror dirs, direct manifest copy, generated asset rebuild, and iOS Kids runtime patching. | Generated assets need declared source/destination/hash output before release claims. |
-| Direct manifest copies | `/Users/devanshvarshney/FilterTubeApp/tools/runtime-sync-manifest.json` | 30 copy entries exist, 24 currently match source/destination hashes, and 6 runtime/UI/Nanah rows are stale. One row carries the managed app policy contract artifact. | Manifest lacks destination-kind and generated-output participation metadata. |
+| Direct manifest copies | `/Users/devanshvarshney/FilterTubeApp/tools/runtime-sync-manifest.json` | 32 copy entries exist and all currently match source/destination hashes. One row carries the managed app policy contract artifact. | Manifest lacks destination-kind, source revision, app revision, and generated-output participation metadata. |
 | Generated app assets | `docs/audit/FILTERTUBE_NATIVE_RUNTIME_SYNC_MANIFEST_FRESHNESS_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md:68-73` | Android/iOS Main/Kids/Nanah runtime hashes are pinned as generated outputs. | Generated outputs are not source authority and need post-sync hash reports. |
 | Native release notes | `docs/audit/FILTERTUBE_NATIVE_RUNTIME_SYNC_MANIFEST_FRESHNESS_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md:86-93` | Native Android/iOS release-note resources differ from public `data/release_notes.json` and are outside the direct manifest. | Release notes need parity proof or intentional divergence record before release claims. |
 | Android/iOS build boundary | `/Users/devanshvarshney/FilterTubeApp/docs/app/TECHNICAL_RUNTIME.md` | Android prebuild sync is documented; iOS lacks a Gradle-style prebuild hook and needs manual sync before release. | iOS release remains blocked without an explicit sync/hash gate. |
@@ -181,8 +181,8 @@ runtime bundles.
 ## High-Confidence Findings
 
 1. **The manifest copy path is currently fresh.**
-   All 30 `runtime-sync-manifest.json` source/destination pairs exist; 24 are
-   byte-identical and 6 need a broader native runtime sync.
+   All 32 `runtime-sync-manifest.json` source/destination pairs exist and are
+   byte-identical after the latest managed-parent/runtime sync state.
 
 2. **Generated Main/Kids runtime assets are build outputs, not source.**
    Android and iOS ship generated assets under app resource folders. Real fixes
@@ -238,10 +238,10 @@ from declared sources, or intentionally platform-divergent with proof.
 ```text
 native_runtime_sync_public_wrapper_delegates_to_app_sync_script
 native_runtime_sync_manifest_sources_exist_and_are_public_repo_owned
-native_runtime_sync_manifest_destinations_are_byte_identical_after_sync
+native_runtime_sync_manifest_destinations_record_current_fresh_rows_after_contract_sync
 native_runtime_sync_generated_main_assets_are_not_source_authority
 native_runtime_sync_ios_kids_runtime_documents_intentional_divergence
-native_runtime_sync_extension_source_mirror_drift_is_detected
+native_runtime_sync_extension_source_mirror_freshness_is_reported
 native_runtime_sync_android_has_prebuild_freshness_but_ios_needs_release_gate
 native_runtime_sync_raw_root_captures_never_become_app_runtime_inputs
 native_runtime_sync_future_authority_token_is_absent_from_product_source

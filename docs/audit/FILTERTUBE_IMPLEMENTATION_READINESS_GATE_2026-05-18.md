@@ -241,10 +241,10 @@ P0 release package parity:
 P0 native runtime sync authority:
   native_runtime_sync_public_wrapper_delegates_to_app_sync_script
   native_runtime_sync_manifest_sources_exist_and_are_public_repo_owned
-  native_runtime_sync_manifest_destinations_are_byte_identical_after_sync
+  native_runtime_sync_manifest_destinations_record_current_fresh_rows_after_contract_sync
   native_runtime_sync_generated_main_assets_are_not_source_authority
   native_runtime_sync_ios_kids_runtime_documents_intentional_divergence
-  native_runtime_sync_extension_source_mirror_drift_is_detected
+  native_runtime_sync_extension_source_mirror_freshness_is_reported
   native_runtime_sync_android_has_prebuild_freshness_but_ios_needs_release_gate
   native_runtime_sync_raw_root_captures_never_become_app_runtime_inputs
   native_runtime_sync_future_authority_token_is_absent_from_product_source
@@ -817,8 +817,8 @@ Runtime lifecycle convergence boundary - 2026-05-30:
   mode/surface observer budgets, teardown/effect-budget gaps, menu/overlay
   timing, method/JSON dependencies, and missing runtime authority symbols into
   one audit-only convergence boundary. It pins 10 runtime lifecycle convergence
-  rows, 0 implementation-ready runtime lifecycle convergence rows, 524 tracked
-  lifecycle primitive instances, 469 install-or-schedule rows, 55 explicit
+  rows, 0 implementation-ready runtime lifecycle convergence rows, 539 tracked
+  lifecycle primitive instances, 478 install-or-schedule rows, 61 explicit
   teardown rows, 16 hot YouTube SPA lifecycle owner rows, 33 YouTube SPA
   immediate/short hot timer rows, source-derived ASCII and Mermaid diagrams,
   and keeps observer/listener/timer/frame cleanup, route teardown,

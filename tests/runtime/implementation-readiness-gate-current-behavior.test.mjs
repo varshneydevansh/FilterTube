@@ -177,7 +177,7 @@ function assertReadinessGateLinksCurrentYouTubeSpaHotTimerAudit() {
   assert.ok(doc.includes('docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md'));
   assert.ok(doc.includes('tests/runtime/lifecycle-instance-register-current-behavior.test.mjs'));
   assert.match(doc, /This addendum joins lifecycle primitive census, listener add\/remove shape,\s+observer observe\/release shape, timer\/frame shape, hot YouTube SPA owners,\s+mode\/surface observer budgets, teardown\/effect-budget gaps, menu\/overlay\s+timing, method\/JSON dependencies, and missing runtime authority symbols into\s+one audit-only convergence boundary/);
-  assert.match(doc, /It pins 10 runtime lifecycle convergence\s+rows, 0 implementation-ready runtime lifecycle convergence rows, 524 tracked\s+lifecycle primitive instances, 469 install-or-schedule rows, 55 explicit\s+teardown rows, 16 hot YouTube SPA lifecycle owner rows, 33 YouTube SPA\s+immediate\/short hot timer rows/);
+  assert.match(doc, /It pins 10 runtime lifecycle convergence\s+rows, 0 implementation-ready runtime lifecycle convergence rows, 539 tracked\s+lifecycle primitive instances, 478 install-or-schedule rows, 61 explicit\s+teardown rows, 16 hot YouTube SPA lifecycle owner rows, 33 YouTube SPA\s+immediate\/short hot timer rows/);
   assert.match(doc, /observer\/listener\/timer\/frame cleanup, route teardown,\s+native-overlay pause rewrites, whitelist\/cache optimization, JSON-first\s+promotion, release claims, and `lifecycleEffectBudget` implementation at\s+`NO-GO`/);
   assert.match(doc, /Diagnostic logging convergence boundary - 2026-05-30/);
   assert.ok(doc.includes('docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md'));
@@ -301,7 +301,7 @@ function assertReadinessGateLinksCurrentYouTubeSpaHotTimerAudit() {
   assert.match(methodSemanticGap, /JSON-first method promotion approval: NO-GO/);
   assert.match(lifecycle, /runtime lifecycle convergence rows: 10/);
   assert.match(lifecycle, /implementation-ready runtime lifecycle convergence rows: 0/);
-  assert.match(lifecycle, /tracked lifecycle primitive instances: 524/);
+  assert.match(lifecycle, /tracked lifecycle primitive instances: 539/);
   assert.match(lifecycle, /runtime lifecycle cleanup approval: NO-GO/);
   assert.match(lifecycle, /lifecycleEffectBudget product source symbol: absent/);
   assert.match(diagnosticPolicy, /diagnostic logging convergence rows: 10/);
@@ -460,10 +460,10 @@ test('minimum behavior-patch gate names concrete P0 fixture families', () => {
     'release_package_parity_raw_captures_never_enter_package_contents',
     'native_runtime_sync_public_wrapper_delegates_to_app_sync_script',
     'native_runtime_sync_manifest_sources_exist_and_are_public_repo_owned',
-    'native_runtime_sync_manifest_destinations_are_byte_identical_after_sync',
+    'native_runtime_sync_manifest_destinations_record_current_fresh_rows_after_contract_sync',
     'native_runtime_sync_generated_main_assets_are_not_source_authority',
     'native_runtime_sync_ios_kids_runtime_documents_intentional_divergence',
-    'native_runtime_sync_extension_source_mirror_drift_is_detected',
+    'native_runtime_sync_extension_source_mirror_freshness_is_reported',
     'native_runtime_sync_android_has_prebuild_freshness_but_ios_needs_release_gate',
     'native_runtime_sync_raw_root_captures_never_become_app_runtime_inputs',
     'native_runtime_sync_future_authority_token_is_absent_from_product_source',

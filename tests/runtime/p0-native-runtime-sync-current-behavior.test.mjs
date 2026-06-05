@@ -53,10 +53,10 @@ test('P0 native runtime sync audit documents blocked verdict and all named gates
     'P0 native runtime sync authority is not green',
     'native_runtime_sync_public_wrapper_delegates_to_app_sync_script',
     'native_runtime_sync_manifest_sources_exist_and_are_public_repo_owned',
-    'native_runtime_sync_manifest_destinations_record_current_stale_rows_after_contract_sync',
+    'native_runtime_sync_manifest_destinations_record_current_fresh_rows_after_contract_sync',
     'native_runtime_sync_generated_main_assets_are_not_source_authority',
     'native_runtime_sync_ios_kids_runtime_documents_intentional_divergence',
-    'native_runtime_sync_extension_source_mirror_drift_is_detected',
+    'native_runtime_sync_extension_source_mirror_freshness_is_reported',
     'native_runtime_sync_android_has_prebuild_freshness_but_ios_needs_release_gate',
     'native_runtime_sync_raw_root_captures_never_become_app_runtime_inputs',
     'native_runtime_sync_future_authority_token_is_absent_from_product_source',
@@ -87,7 +87,7 @@ test('native_runtime_sync_manifest_sources_exist_and_are_public_repo_owned', () 
   }
 });
 
-test('native_runtime_sync_manifest_destinations_record_current_stale_rows_after_contract_sync', () => {
+test('native_runtime_sync_manifest_destinations_record_current_fresh_rows_after_contract_sync', () => {
   const manifest = readJson('tools/runtime-sync-manifest.json', appRoot);
   const diffs = [];
 
@@ -99,14 +99,7 @@ test('native_runtime_sync_manifest_destinations_record_current_stale_rows_after_
     }
   }
 
-  assert.deepEqual(diffs, [
-    'js/content_bridge.js->packages/runtime-bridge/src/upstream/content_bridge.js',
-    'js/content/block_channel.js->packages/runtime-adapters/src/upstream/block_channel.js',
-    'js/content/bridge_settings.js->packages/runtime-bridge/src/upstream/bridge_settings.js',
-    'js/io_manager.js->packages/extension-ui/src/upstream/io_manager.js',
-    'js/tab-view.js->packages/extension-ui/src/upstream/tab-view.js',
-    'js/nanah_sync_adapter.js->apps/android/app/src/main/assets/filtertube_nanah/nanah_sync_adapter.js'
-  ]);
+  assert.deepEqual(diffs, []);
 });
 
 test('native_runtime_sync_generated_main_assets_are_not_source_authority', () => {
@@ -133,7 +126,7 @@ test('native_runtime_sync_ios_kids_runtime_documents_intentional_divergence', ()
   assert.match(read(auditDocPath), /iOS Kids runtime intentionally diverges/);
 });
 
-test('native_runtime_sync_extension_source_mirror_drift_is_detected', () => {
+test('native_runtime_sync_extension_source_mirror_freshness_is_reported', () => {
   const mirrorDiffs = [];
 
   for (const dir of ['js', 'html', 'css']) {
@@ -149,16 +142,7 @@ test('native_runtime_sync_extension_source_mirror_drift_is_detected', () => {
     }
   }
 
-  assert.deepEqual(mirrorDiffs.sort(), [
-    'html/tab-view.html:hash-diff',
-    'js/background.js:hash-diff',
-    'js/content/block_channel.js:hash-diff',
-    'js/content/bridge_settings.js:hash-diff',
-    'js/content_bridge.js:hash-diff',
-    'js/io_manager.js:hash-diff',
-    'js/nanah_sync_adapter.js:hash-diff',
-    'js/tab-view.js:hash-diff'
-  ]);
+  assert.deepEqual(mirrorDiffs.sort(), []);
 });
 
 test('native_runtime_sync_android_has_prebuild_freshness_but_ios_needs_release_gate', () => {

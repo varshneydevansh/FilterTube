@@ -166,10 +166,10 @@ test('generated main runtime assets are large app outputs and not byte-identical
   const androidPath = path.join(appRoot, 'apps/android/app/src/main/assets/filtertube_runtime_full.js');
   const iosPath = path.join(appRoot, 'apps/ios/FilterTube/Resources/filtertube_runtime_full.js');
 
-  assert.equal(fs.statSync(androidPath).size, 1634163);
-  assert.equal(fs.statSync(iosPath).size, 1632501);
-  assert.equal(sha256(androidPath), '4b0681ed60b3c9f80be10a0e46582e3c832ea9d287e6909995b3a9a5b79692d7');
-  assert.equal(sha256(iosPath), '6955e1934822b49222555fb201be9f18976610ddcc1855b0159e7bb3d7da567a');
+  assert.equal(fs.statSync(androidPath).size, 1634621);
+  assert.equal(fs.statSync(iosPath).size, 1632959);
+  assert.equal(sha256(androidPath), '9cd4153bd713a9f43da81ae53ee92be5b566eddbc7d6902ed41a7a1e6551f05c');
+  assert.equal(sha256(iosPath), '697152093a134068ae08e9da094a31afd36b0957975b60ff483935914a743a7f');
   assert.notEqual(sha256(androidPath), sha256(iosPath));
   assert.match(read(auditDocPath), /Generated app runtime assets are not source authority/);
 });
@@ -189,7 +189,7 @@ test('iOS Kids runtime documents intentional divergence from Android Kids runtim
   assert.match(iosKids, /Let YouTube Kids own the watch layout/);
 });
 
-test('broad extension source mirror drift is detected separately from contract copy freshness', () => {
+test('broad extension source mirror freshness is reported separately from contract copy freshness', () => {
   const mirrorDiffs = [];
   for (const dir of ['js', 'html', 'css']) {
     for (const relative of listRelativeFiles(repoRoot, dir)) {
