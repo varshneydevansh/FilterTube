@@ -54,6 +54,40 @@ metadata, not plaintext rules or authority.
 **Current local-network provider hook proof**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PROVIDER_HOOK_2026-06-05.md`
 
+## Extension MVP Checklist
+
+- [x] Parent/account profiles can manage protected child profiles locally.
+- [x] Default/Master can manage independent protected account profiles without
+  switching into them.
+- [x] Protected profiles cannot use child authority to edit admin settings,
+  viewing-space policy, time limits, trusted-link policy, or protected history.
+- [x] Local Main/Kids viewing-space changes write protected revision/history
+  rows for managed protected-profile edits.
+- [x] Local same-budget bulk time-limit changes work for selected manageable
+  protected profiles.
+- [x] Local same-access bulk viewing-space changes work for selected manageable
+  protected profiles.
+- [x] Dashboard command center lists protected profiles, time-limit state,
+  viewing-space state, protected history count, verified-device readiness, and
+  delegated actions.
+- [x] Command center can send signed active managed-policy updates to currently
+  connected verified replica devices over Nanah P2P.
+- [x] Command center can hand ciphertext mailbox items or signed LAN candidates
+  to optional trusted providers when those provider hooks are installed.
+- [x] Parent-side push attempts write redacted protected history rows for sent,
+  missing-link, provider-pending, and failed cases.
+- [x] Child/protected-device open-sync path can apply only validated signed
+  managed-policy envelopes from trusted links and keeps the last accepted policy
+  while offline.
+- [x] Runtime Main/Kids route gate, background-owned time-budget accounting, and
+  protected timeout overlay exist for active protected profiles.
+- [ ] Built-in server mailbox upload/pull/purge client. This remains app/server
+  provider work, not extension-owned runtime.
+- [ ] Built-in LAN peer discovery and LAN transport. This remains app/provider
+  work, with extension authority hooks already gated.
+- [ ] Native Android/iOS settings-lock and timeout UI parity. This belongs in
+  the downstream app sync/runtime lane.
+
 ## Overview
 
 FilterTube has already started the extension-side managed parent control work
@@ -636,7 +670,9 @@ the current extension dashboard.
   selected updates actions, and records protected redacted history for send
   success/failure/provider-pending cases. The implementation intentionally
   avoids a separate oversized remote-management page until app/server provider
-  work exists.
+  work exists. Bulk time-limit and viewing-space actions now use the same
+  protected-profile authority predicate as the command-center rows, so
+  Default/Master-managed independent account profiles are not silently skipped.
 - **Complexity**: 7/10
 - **Dependencies**: Task 4.1 and action-history model.
 - **Acceptance Criteria**:

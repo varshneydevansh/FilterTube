@@ -7,7 +7,9 @@ handoff, delegated same-budget bulk time-limit controls, delegated local
 bulk viewing-space controls, command-center verified-device send actions,
 live P2P signed managed-policy push for connected verified replica devices,
 provider-gated mailbox/LAN delivery handoff, and protected redacted push
-history rows are present. Direct rule bulk writes remain intentionally absent.
+history rows are present. Bulk local time-limit and viewing-space actions cover
+all manageable protected profiles, including Default/Master-managed independent
+account profiles. Direct rule bulk writes remain intentionally absent.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 

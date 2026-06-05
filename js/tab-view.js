@@ -5739,9 +5739,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             UIComponents.showToast('Child profiles cannot change viewing access', 'error');
             return;
         }
-        const allowedManager = currentActive === 'default' ||
-            currentActive === targetId ||
-            getParentAccountId(fresh, targetId) === currentActive;
+        const allowedManager = currentActive === targetId || canActiveProfileManageProfile(fresh, targetId);
         if (!allowedManager) {
             UIComponents.showToast('Switch to the parent account to change this profile', 'error');
             return;
@@ -5770,7 +5768,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 allowKidsViewing: nextKids
             }
         };
-        if (getProfileType(fresh, targetId) === 'child') {
+        if (targetId !== 'default' && currentActive !== targetId && canActiveProfileManageProfile(fresh, targetId)) {
             const report = buildManagedViewingSpaceLocalEditReport({
                 actorProfileId: currentActive,
                 targetProfileId: targetId,
@@ -5835,11 +5833,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const eligibleIds = targetIds.filter((targetId) => {
             const profile = safeObject(profiles[targetId]);
             return !!profile && Object.keys(profile).length > 0
-                && getProfileType(fresh, targetId) === 'child'
                 && canActiveProfileManageProfile(fresh, targetId);
         });
         if (!eligibleIds.length) {
-            UIComponents.showToast('No selected child profiles can be managed by this account', 'error');
+            UIComponents.showToast('No selected protected profiles can be managed by this account', 'error');
             return;
         }
 
@@ -6005,11 +6002,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const eligibleIds = targetIds.filter((targetId) => {
             const profile = safeObject(profiles[targetId]);
             return !!profile && Object.keys(profile).length > 0
-                && getProfileType(fresh, targetId) === 'child'
                 && canActiveProfileManageProfile(fresh, targetId);
         });
         if (!eligibleIds.length) {
-            UIComponents.showToast('No selected child profiles can be managed by this account', 'error');
+            UIComponents.showToast('No selected protected profiles can be managed by this account', 'error');
             return;
         }
 
@@ -8002,7 +7998,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (ftNanahManagedTargetsHint) {
                 ftNanahManagedTargetsHint.textContent = eligibleLinks.length === 1
                     ? `This live send will target ${getNanahManagedTargetLabel(eligibleLinks[0])} on ${getNanahRemoteLabel()}.`
-                    : 'Save fixed managed child targets on the connected replica before using multi-target sends.';
+                    : 'Save fixed managed protected-profile targets on the connected replica before using multi-target sends.';
             }
             return eligibleLinks;
         }
@@ -8046,7 +8042,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (ftNanahManagedTargetsHint) {
-            ftNanahManagedTargetsHint.textContent = `Choose which saved child targets on ${getNanahRemoteLabel()} receive this live policy. Offline devices still need mailbox or local-network delivery later.`;
+            ftNanahManagedTargetsHint.textContent = `Choose which saved protected-profile targets on ${getNanahRemoteLabel()} receive this live policy. Offline devices still need mailbox or local-network delivery later.`;
         }
         return eligibleLinks;
     }
@@ -8817,7 +8813,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const readyCount = (liveReady || mailboxReady || localReady) ? targetCount : 0;
         if (!targetCount) {
             return {
-                label: 'No verified child device',
+                label: 'No verified device',
                 targetCount: 0,
                 readyCount: 0
             };
@@ -8995,7 +8991,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     linkCount: 0,
                     deliveredCount: 0,
                     failedCount: 1,
-                    reason: 'no_verified_child_device'
+                    reason: 'no_verified_device'
                 });
                 continue;
             }
@@ -9119,7 +9115,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (summary.deliveredCount > 0) {
             UIComponents.showToast(`Sent managed updates to ${summary.deliveredCount} verified policy queue${summary.deliveredCount === 1 ? '' : 's'}`, 'success');
         } else if (summary.noLinkCount > 0) {
-            UIComponents.showToast('No selected profile has a verified child device link yet', 'error');
+            UIComponents.showToast('No selected protected profile has a verified device link yet', 'error');
         } else {
             UIComponents.showToast('No delivery provider is available for verified-device updates yet', 'error');
         }
@@ -12338,12 +12334,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 actions.appendChild(disableTimeLimitBtn);
             }
 
-            if (type === 'child' && canManageTarget && !childAdminRestricted) {
+            if (profileId !== 'default' && canManageTarget && !childAdminRestricted) {
                 const editRulesBtn = document.createElement('button');
                 editRulesBtn.className = 'btn-secondary btn-profile-main';
                 editRulesBtn.type = 'button';
                 editRulesBtn.textContent = 'Edit Rules';
-                editRulesBtn.title = 'Enter parent-managed child edit mode without switching into this child profile.';
+                editRulesBtn.title = 'Enter parent-managed edit mode without switching into this protected profile.';
                 editRulesBtn.addEventListener('click', async () => {
                     await startManagedChildEdit(profileId);
                 });
@@ -12354,7 +12350,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 historyBtn.className = 'btn-secondary';
                 historyBtn.type = 'button';
                 historyBtn.textContent = 'History';
-                historyBtn.title = 'View protected parent-managed action history for this child profile.';
+                historyBtn.title = 'View protected parent-managed action history for this profile.';
                 historyBtn.addEventListener('click', async () => {
                     await showManagedActionHistory(profileId);
                 });
