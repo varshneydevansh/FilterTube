@@ -42,6 +42,14 @@ export const LIVE_SMOKE_REQUIRED_ROWS = Object.freeze([
   'FT-LIVE-SPA-04-watch-rail-scroll',
   'FT-LIVE-SPA-05-cache-repeat-navigation'
 ]);
+export const LIVE_SMOKE_MANAGED_CONTROL_ROWS = Object.freeze([
+  'FT-MANAGED-LIVE-00-protected-profile-preflight',
+  'FT-MANAGED-LIVE-01-main-kids-route-gate',
+  'FT-MANAGED-LIVE-02-time-budget-active-tab',
+  'FT-MANAGED-LIVE-03-zero-budget-timeout-overlay',
+  'FT-MANAGED-LIVE-04-parent-history-redaction',
+  'FT-MANAGED-LIVE-05-no-policy-no-work'
+]);
 export const MANAGED_REMOTE_DELIVERY_SMOKE_REQUIRED_ROWS = Object.freeze([
   'FT-MANAGED-REMOTE-00-trust-link-preflight',
   'FT-MANAGED-REMOTE-01-keyword-policy-apply',

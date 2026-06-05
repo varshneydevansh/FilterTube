@@ -1025,9 +1025,23 @@ T1 + T2 + T3
   - `npm run test:release`
   - `npm run test:smoke`
   - manual YouTube smoke artifact verification
-- **status**: Not Completed
+- **status**: Partially Completed
 - **log**:
+  - 2026-06-05: Release live YouTube smoke schema v4 now carries
+    `managedControlSmoke` rows for protected-profile preflight, Main/Kids route
+    gate, active-tab time budget, exhausted-budget timeout overlay, protected
+    history redaction, and no-policy/no-work behavior. The verifier requires
+    those rows only when the logical change is managed-control related, so
+    ordinary whitelist/performance live SPA smoke keeps its original six route
+    rows.
 - **files edited/created**:
+  - `docs/audit/TEST_LANE_MATRIX.md`
+  - `docs/audit/FILTERTUBE_RELEASE_LIVE_YOUTUBE_SPA_SMOKE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-25.md`
+  - `docs/audit/artifacts/release-live-youtube-spa-smoke/template.json`
+  - `docs/audit/artifacts/release-live-youtube-spa-smoke/run-live-smoke.mjs`
+  - `docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs`
+  - `tests/runtime/release-live-youtube-spa-smoke-artifact-verifier-current-behavior.test.mjs`
+  - `tests/runtime/release-live-youtube-spa-smoke-boundary-current-behavior.test.mjs`
 
 ## Parallel Execution Groups
 

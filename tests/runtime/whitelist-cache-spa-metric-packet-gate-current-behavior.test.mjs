@@ -2617,7 +2617,7 @@ test('live smoke template is still non-executed and no result artifact is presen
   const resultJsonFiles = artifactFiles.filter(file => file.endsWith('.json') && file !== liveSmokeTemplatePath);
 
   assert.equal(template.artifactType, 'filtertube-release-live-youtube-spa-smoke');
-  assert.equal(template.schemaVersion, 3);
+  assert.equal(template.schemaVersion, 4);
   assert.equal(template.status, 'template-not-executed');
   assert.equal(template.smokeSliceReadiness, 'NO-GO');
   assert.equal(template.releaseReadiness, 'NO-GO');
@@ -2638,6 +2638,8 @@ test('live smoke template is still non-executed and no result artifact is presen
   assert.equal(template.completionRules.releaseReadinessWhenAutomatedLaneEvidenceMissing, 'NO-GO');
   assert.deepEqual(template.requiredRows.map(row => row.id), liveSmokeRows);
   assert.deepEqual([...new Set(template.requiredRows.map(row => row.status))], ['missing']);
+  assert.equal(template.managedControlSmoke.applicable, false);
+  assert.deepEqual([...new Set(template.managedControlSmoke.requiredRows.map(row => row.status))], ['missing']);
   assert.equal(resultJsonFiles.length, 0, `unexpected executed live smoke artifacts: ${resultJsonFiles.join(', ')}`);
   assert.deepEqual(artifactFiles, [liveSmokeRunnerPath, liveSmokeTemplatePath, liveSmokeVerifierPath]);
 
@@ -2645,7 +2647,8 @@ test('live smoke template is still non-executed and no result artifact is presen
     assert.ok(runner.includes(row), `runner missing ${row}`);
   }
   assert.match(runner, /artifactType: 'filtertube-release-live-youtube-spa-smoke'/);
-  assert.match(runner, /schemaVersion: 3/);
+  assert.match(runner, /schemaVersion: 4/);
+  assert.match(runner, /function buildManagedControlSmokePlaceholder/);
   assert.match(runner, /function buildInstalledByteParity/);
   assert.match(runner, /function sourceHashSnapshot/);
   assert.match(runner, /packet_id: 'FT-WLCACHE-SPA-PACKET-01-installed-profile-bytes'/);

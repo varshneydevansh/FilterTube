@@ -4,7 +4,7 @@ import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { LANES } from '../../../../scripts/test-lane-config.mjs';
+import { LANES, LIVE_SMOKE_MANAGED_CONTROL_ROWS } from '../../../../scripts/test-lane-config.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const artifactRoot = path.dirname(__filename);
@@ -271,6 +271,23 @@ function isReleaseReadyChangeContext(changeContext) {
       && hasOnlyKnownTestLanes(evidence.lanes)
     ))
     && changeContext.requiredLanes.every(lane => coveredLanes.has(lane));
+}
+
+function buildManagedControlSmokePlaceholder() {
+  return {
+    applicable: false,
+    parentProfileId: '',
+    protectedProfileId: '',
+    observedPolicyRevision: '',
+    observedTimeBudgetState: '',
+    observedHistoryState: '',
+    requiredRows: LIVE_SMOKE_MANAGED_CONTROL_ROWS.map(id => ({
+      id,
+      routeAction: 'Managed parent/caregiver manual row; not executed by the whitelist SPA runner.',
+      requiredObservation: 'Mark applicable=true and record this row only when the logical change touches managed profile sync, viewing-space policy, time limits, Nanah, mailbox, or local-network controls.',
+      status: 'missing'
+    }))
+  };
 }
 
 function sourceHashSnapshot() {
@@ -698,7 +715,7 @@ async function main() {
   const changeContextReady = isReleaseReadyChangeContext(changeContext);
   const artifact = {
     artifactType: 'filtertube-release-live-youtube-spa-smoke',
-    schemaVersion: 3,
+    schemaVersion: 4,
     status: allRowsPassed ? 'executed' : 'executed-with-failures',
     smokeSliceReadiness,
     releaseReadiness: smokeSliceReadiness === 'GO-FOR-THIS-SMOKE-SLICE' && installedByteParity.verdict === 'GO' && changeContextReady ? 'GO-FOR-RELEASE-SMOKE' : 'NO-GO',
@@ -721,6 +738,7 @@ async function main() {
     manualTimestamp: generatedAt,
     testerInitials: process.env.FILTERTUBE_TESTER_INITIALS || 'codex',
     requiredRows: rows,
+    managedControlSmoke: buildManagedControlSmokePlaceholder(),
     completionRules: {
       allRecordingFieldsRequired: true,
       allRowsMustPass: true,
@@ -728,6 +746,8 @@ async function main() {
       installedByteParityMustPass: true,
       automatedLaneEvidenceMustPass: true,
       automatedLaneEvidenceMustCoverRequiredLanes: true,
+      managedControlRowsRequiredWhenApplicable: true,
+      managedControlRowsRequiredForManagedLogicalChanges: true,
       releaseReadinessWhenByteParityMissing: 'NO-GO',
       releaseReadinessWhenAutomatedLaneEvidenceMissing: 'NO-GO',
       releaseReadinessWhenAnyRowMissing: 'NO-GO',

@@ -1,6 +1,6 @@
 {
   "artifactType": "filtertube-release-live-youtube-spa-smoke",
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "status": "template-not-executed",
   "smokeSliceReadiness": "NO-GO",
   "releaseReadiness": "NO-GO",
@@ -102,6 +102,64 @@
       "status": "missing"
     }
   ],
+  "managedControlSmoke": {
+    "applicable": false,
+    "parentProfileId": "",
+    "protectedProfileId": "",
+    "observedPolicyRevision": "",
+    "observedTimeBudgetState": "",
+    "observedHistoryState": "",
+    "requiredWhenLogicalChangeMatches": [
+      "managed",
+      "parent",
+      "caregiver",
+      "protected",
+      "child sync",
+      "time-limit",
+      "viewing-space",
+      "nanah",
+      "mailbox",
+      "local-network"
+    ],
+    "requiredRows": [
+      {
+        "id": "FT-MANAGED-LIVE-00-protected-profile-preflight",
+        "routeAction": "Open the extension dashboard as a parent/account profile and confirm the protected target profile, managed link, and installed extension identity before touching YouTube.",
+        "requiredObservation": "Parent/account authority is active, the protected profile is not the admin authority, and the artifact records parent/protected profile ids without PINs or plaintext rule values.",
+        "status": "missing"
+      },
+      {
+        "id": "FT-MANAGED-LIVE-01-main-kids-route-gate",
+        "routeAction": "Apply a Main/Kids viewing-space policy for the protected profile and open the denied YouTube surface.",
+        "requiredObservation": "The denied surface is blocked by the managed route gate before usable YouTube content remains available, while the allowed surface still opens.",
+        "status": "missing"
+      },
+      {
+        "id": "FT-MANAGED-LIVE-02-time-budget-active-tab",
+        "routeAction": "Set a small protected-profile daily YouTube budget and keep an active YouTube tab open long enough to consume budget.",
+        "requiredObservation": "The background-owned active-tab budget decreases across SPA navigation/reload and does not count when no managed time policy is active.",
+        "status": "missing"
+      },
+      {
+        "id": "FT-MANAGED-LIVE-03-zero-budget-timeout-overlay",
+        "routeAction": "Set a zero or already-exhausted protected-profile budget and reload/open YouTube.",
+        "requiredObservation": "The protected timeout overlay appears, is not dismissible by child authority, and normal FilterTube blocklist/whitelist behavior is not used as the time-limit authority.",
+        "status": "missing"
+      },
+      {
+        "id": "FT-MANAGED-LIVE-04-parent-history-redaction",
+        "routeAction": "Open protected action history after a managed policy accept/reject or time-limit change.",
+        "requiredObservation": "Parent-visible history shows accepted/rejected outcomes, policy scope, revision, and redacted labels without plaintext rules, PINs, private keys, ciphertext, or raw policy JSON.",
+        "status": "missing"
+      },
+      {
+        "id": "FT-MANAGED-LIVE-05-no-policy-no-work",
+        "routeAction": "Switch to a profile with no managed policy/time limit and repeat one Home/Search/Watch navigation.",
+        "requiredObservation": "No managed provider pull loop, time-limit heartbeat, timeout overlay, or extra YouTube observer/timer work runs when no managed policy is applicable.",
+        "status": "missing"
+      }
+    ]
+  },
   "completionRules": {
     "allRecordingFieldsRequired": true,
     "allRowsMustPass": true,
@@ -113,6 +171,8 @@
     "releaseReadinessWhenByteParityMissing": "NO-GO",
     "releaseReadinessWhenAutomatedLaneEvidenceMissing": "NO-GO",
     "releaseReadinessWhenAnyRowMissing": "NO-GO",
-    "releaseReadinessWhenAnyRowFailed": "NO-GO"
+    "releaseReadinessWhenAnyRowFailed": "NO-GO",
+    "managedControlRowsRequiredWhenApplicable": true,
+    "managedControlRowsRequiredForManagedLogicalChanges": true
   }
 }

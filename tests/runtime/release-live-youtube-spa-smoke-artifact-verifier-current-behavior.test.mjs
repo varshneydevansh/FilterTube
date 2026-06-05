@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 import { LANES, classifyPaths } from '../../scripts/run-test-lane.mjs';
 import {
   LIVE_SMOKE_BOUNDARY_DOC,
+  MANAGED_CONTROL_LIVE_SMOKE_ROWS,
   REQUIRED_LIVE_SMOKE_ROWS,
   validateLiveSmokeArtifact
 } from '../../docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs';
@@ -48,11 +49,38 @@ function baseSnapshot(rowId) {
   };
 }
 
+function managedControlSmoke({ applicable = false } = {}) {
+  return {
+    applicable,
+    parentProfileId: applicable ? 'parent-profile-01' : '',
+    protectedProfileId: applicable ? 'child-profile-01' : '',
+    observedPolicyRevision: applicable ? 'managed r7' : '',
+    observedTimeBudgetState: applicable ? 'zero budget overlay plus active-tab budget observed' : '',
+    observedHistoryState: applicable ? 'redacted accepted/rejected managed rows observed' : '',
+    requiredRows: MANAGED_CONTROL_LIVE_SMOKE_ROWS.map((id, index) => ({
+      id,
+      routeAction: `managed row ${index}`,
+      requiredObservation: `managed observation ${index}`,
+      status: applicable ? 'passed' : 'missing',
+      ...(applicable ? {
+        observation: { pass: true, summary: `${id} passed` },
+        evidence: {
+          parentProfileId: 'parent-profile-01',
+          protectedProfileId: 'child-profile-01',
+          installedExtensionId: 'gkgjigdfdccckblmglboobikfcpeelio',
+          policyRevision: 7
+        },
+        durationMs: 750 + index
+      } : {})
+    }))
+  };
+}
+
 function validArtifact() {
   const generatedAt = '2026-06-01T00:00:00.000Z';
   return {
     artifactType: 'filtertube-release-live-youtube-spa-smoke',
-    schemaVersion: 3,
+    schemaVersion: 4,
     status: 'executed',
     smokeSliceReadiness: 'GO-FOR-THIS-SMOKE-SLICE',
     releaseReadiness: 'GO-FOR-RELEASE-SMOKE',
@@ -115,6 +143,7 @@ function validArtifact() {
       snapshot: baseSnapshot(id),
       durationMs: 1200 + index
     })),
+    managedControlSmoke: managedControlSmoke(),
     completionRules: {
       allRecordingFieldsRequired: true,
       allRowsMustPass: true,
@@ -161,6 +190,33 @@ test('verifier rejects the non-executed template and missing byte parity', () =>
 
 test('verifier accepts a complete executed artifact with byte parity and clean rows', () => {
   assert.deepEqual(validateLiveSmokeArtifact(validArtifact()), []);
+});
+
+test('verifier requires managed child sync and time-limit rows for managed-control artifacts', () => {
+  const managed = validArtifact();
+  managed.changeContext.logicalChangeType = 'managed parent time-limit change';
+  managed.changeContext.requiredLanes = ['test:settings', 'test:smoke'];
+  managed.changeContext.automatedLaneEvidence = [{
+    command: 'npm run test:changed',
+    status: 'passed',
+    summary: 'settings and smoke lanes passed for managed time-limit change',
+    lanes: ['test:settings', 'test:smoke']
+  }];
+
+  const missingManagedRows = validateLiveSmokeArtifact(managed);
+  assert.ok(missingManagedRows.includes('managedControlSmoke.applicable must be true for managed-control changes'));
+
+  managed.managedControlSmoke = managedControlSmoke({ applicable: true });
+  assert.deepEqual(validateLiveSmokeArtifact(managed), []);
+
+  managed.managedControlSmoke.requiredRows[2].status = 'failed';
+  managed.managedControlSmoke.requiredRows[2].observation.pass = false;
+  delete managed.managedControlSmoke.requiredRows[2].evidence.protectedProfileId;
+
+  const failedManagedRows = validateLiveSmokeArtifact(managed);
+  assert.ok(failedManagedRows.includes('FT-MANAGED-LIVE-02-time-budget-active-tab.status must be passed'));
+  assert.ok(failedManagedRows.includes('FT-MANAGED-LIVE-02-time-budget-active-tab.observation.pass must be true'));
+  assert.ok(failedManagedRows.includes('FT-MANAGED-LIVE-02-time-budget-active-tab.evidence.protectedProfileId is required'));
 });
 
 test('verifier rejects row failures console issues and stale route order', () => {

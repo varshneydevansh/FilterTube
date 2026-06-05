@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { LANES } from '../../../../scripts/test-lane-config.mjs';
+import { LANES, LIVE_SMOKE_MANAGED_CONTROL_ROWS } from '../../../../scripts/test-lane-config.mjs';
 
 export const LIVE_SMOKE_BOUNDARY_DOC = 'docs/audit/FILTERTUBE_RELEASE_LIVE_YOUTUBE_SPA_SMOKE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-25.md';
 
@@ -16,6 +16,9 @@ export const REQUIRED_LIVE_SMOKE_ROWS = Object.freeze([
   'FT-LIVE-SPA-04-watch-rail-scroll',
   'FT-LIVE-SPA-05-cache-repeat-navigation'
 ]);
+export const MANAGED_CONTROL_LIVE_SMOKE_ROWS = LIVE_SMOKE_MANAGED_CONTROL_ROWS;
+
+const MANAGED_CONTROL_CHANGE_PATTERN = /managed|parent|caregiver|protected|child sync|time[- ]limit|viewing[- ]space|nanah|mailbox|local[- ]network/i;
 
 const REQUIRED_RECORDING_FIELDS = Object.freeze([
   'browserNameVersion',
@@ -75,6 +78,10 @@ function addMissingFieldErrors(errors, source, fields, prefix) {
   for (const field of fields) {
     if (isBlank(source?.[field])) errors.push(`${prefix}.${field} is required`);
   }
+}
+
+function requiresManagedControlSmoke(changeContext) {
+  return MANAGED_CONTROL_CHANGE_PATTERN.test(String(changeContext?.logicalChangeType || ''));
 }
 
 function validateLaneList(errors, lanes, prefix) {
@@ -138,6 +145,48 @@ function validateChangeContext(errors, changeContext) {
   }
 }
 
+function validateManagedControlSmoke(errors, managedControlSmoke, changeContext) {
+  if (!isPlainObject(managedControlSmoke)) {
+    errors.push('managedControlSmoke must be an object');
+    return;
+  }
+
+  if (managedControlSmoke.applicable !== true && managedControlSmoke.applicable !== false) {
+    errors.push('managedControlSmoke.applicable must be boolean');
+  }
+
+  if (requiresManagedControlSmoke(changeContext) && managedControlSmoke.applicable !== true) {
+    errors.push('managedControlSmoke.applicable must be true for managed-control changes');
+  }
+
+  const rows = Array.isArray(managedControlSmoke.requiredRows) ? managedControlSmoke.requiredRows : [];
+  if (!sameItems(rows.map(row => row?.id), MANAGED_CONTROL_LIVE_SMOKE_ROWS)) {
+    errors.push('managedControlSmoke.requiredRows must exactly match the managed control smoke rows');
+  }
+
+  if (managedControlSmoke.applicable !== true) return;
+
+  addMissingFieldErrors(errors, managedControlSmoke, [
+    'parentProfileId',
+    'protectedProfileId',
+    'observedPolicyRevision',
+    'observedTimeBudgetState',
+    'observedHistoryState'
+  ], 'managedControlSmoke');
+
+  for (const row of rows) {
+    const rowId = row?.id || '<missing-managed-row-id>';
+    if (row?.status !== 'passed') errors.push(`${rowId}.status must be passed`);
+    if (row?.observation?.pass !== true) errors.push(`${rowId}.observation.pass must be true`);
+    if (!Number.isFinite(row?.durationMs) || row.durationMs < 0) {
+      errors.push(`${rowId}.durationMs must be a non-negative finite number`);
+    }
+    if (isBlank(row?.evidence?.parentProfileId)) errors.push(`${rowId}.evidence.parentProfileId is required`);
+    if (isBlank(row?.evidence?.protectedProfileId)) errors.push(`${rowId}.evidence.protectedProfileId is required`);
+    if (isBlank(row?.evidence?.installedExtensionId)) errors.push(`${rowId}.evidence.installedExtensionId is required`);
+  }
+}
+
 export function validateLiveSmokeArtifact(artifact) {
   const errors = [];
   if (!artifact || typeof artifact !== 'object' || Array.isArray(artifact)) {
@@ -145,12 +194,13 @@ export function validateLiveSmokeArtifact(artifact) {
   }
 
   if (artifact.artifactType !== 'filtertube-release-live-youtube-spa-smoke') errors.push('artifactType must be filtertube-release-live-youtube-spa-smoke');
-  if (artifact.schemaVersion !== 3) errors.push('schemaVersion must be 3');
+  if (artifact.schemaVersion !== 4) errors.push('schemaVersion must be 4');
   if (artifact.status !== 'executed') errors.push('status must be executed');
   if (artifact.boundaryDoc !== LIVE_SMOKE_BOUNDARY_DOC) errors.push(`boundaryDoc must be ${LIVE_SMOKE_BOUNDARY_DOC}`);
   if (artifact.smokeSliceReadiness !== 'GO-FOR-THIS-SMOKE-SLICE') errors.push('smokeSliceReadiness must be GO-FOR-THIS-SMOKE-SLICE');
   if (artifact.releaseReadiness !== 'GO-FOR-RELEASE-SMOKE') errors.push('releaseReadiness must be GO-FOR-RELEASE-SMOKE');
   validateChangeContext(errors, artifact.changeContext);
+  validateManagedControlSmoke(errors, artifact.managedControlSmoke, artifact.changeContext);
 
   addMissingFieldErrors(errors, artifact, REQUIRED_RECORDING_FIELDS, 'artifact');
   if (!Array.isArray(artifact.whitelistEntriesUsed) || artifact.whitelistEntriesUsed.length === 0) {

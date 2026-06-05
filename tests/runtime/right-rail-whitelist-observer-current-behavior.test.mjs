@@ -177,6 +177,7 @@ test('release live YouTube SPA smoke remains a separate missing release gate', (
   assert.match(smokeDoc, /live YouTube SPA smoke status: missing/);
   assert.match(smokeDoc, /live smoke evidence template: docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/template\.json/);
   assert.match(smokeDoc, /live smoke runner contract rows: 12/);
+  assert.match(smokeDoc, /managed control smoke manual rows: 6/);
   assert.match(smokeDoc, /runner\/template source anchors covered: 60/);
   assert.match(smokeDoc, /executed live smoke result artifacts committed: 0/);
   assert.match(smokeDoc, /release readiness from this slice: NO-GO until live smoke is recorded/);
@@ -295,13 +296,14 @@ test('release live YouTube SPA smoke remains a separate missing release gate', (
   }
 
   assert.equal(template.artifactType, 'filtertube-release-live-youtube-spa-smoke');
-  assert.equal(template.schemaVersion, 3);
+  assert.equal(template.schemaVersion, 4);
   assert.equal(template.status, 'template-not-executed');
   assert.equal(template.smokeSliceReadiness, 'NO-GO');
   assert.equal(template.releaseReadiness, 'NO-GO');
   assert.equal(template.runtimeBehaviorChanged, false);
   assert.deepEqual(template.changeContext.requiredLanes, []);
   assert.deepEqual(template.changeContext.automatedLaneEvidence, []);
+  assert.equal(template.managedControlSmoke.applicable, false);
   assert.equal(template.boundaryDoc, liveSmokeDoc);
   assert.equal(template.installedByteParity.packet_id, 'FT-WLCACHE-SPA-PACKET-01-installed-profile-bytes');
   assert.equal(template.installedByteParity.verdict, 'NO-GO');

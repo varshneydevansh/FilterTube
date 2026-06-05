@@ -21,6 +21,14 @@ const requiredRows = [
   'FT-LIVE-SPA-04-watch-rail-scroll',
   'FT-LIVE-SPA-05-cache-repeat-navigation'
 ];
+const managedRows = [
+  'FT-MANAGED-LIVE-00-protected-profile-preflight',
+  'FT-MANAGED-LIVE-01-main-kids-route-gate',
+  'FT-MANAGED-LIVE-02-time-budget-active-tab',
+  'FT-MANAGED-LIVE-03-zero-budget-timeout-overlay',
+  'FT-MANAGED-LIVE-04-parent-history-redaction',
+  'FT-MANAGED-LIVE-05-no-policy-no-work'
+];
 
 function read(file) {
   return fs.readFileSync(path.join(repoRoot, file), 'utf8');
@@ -84,6 +92,9 @@ test('manual smoke handoff covers the release-critical visible behavior set', ()
   for (const row of requiredRows) {
     assert.ok(matrix.includes(row), `matrix missing ${row}`);
   }
+  for (const row of managedRows) {
+    assert.ok(matrix.includes(row), `matrix missing managed row ${row}`);
+  }
 });
 
 test('live smoke boundary remains explicit that current release smoke is missing', () => {
@@ -112,13 +123,16 @@ test('live smoke boundary remains explicit that current release smoke is missing
   for (const row of requiredRows) {
     assert.ok(doc.includes(row), `boundary doc missing ${row}`);
   }
+  for (const row of managedRows) {
+    assert.ok(doc.includes(row), `boundary doc missing managed row ${row}`);
+  }
 });
 
 test('live smoke template is non-executed and cannot satisfy release readiness', () => {
   const template = readJson(templatePath);
 
   assert.equal(template.artifactType, 'filtertube-release-live-youtube-spa-smoke');
-  assert.equal(template.schemaVersion, 3);
+  assert.equal(template.schemaVersion, 4);
   assert.equal(template.status, 'template-not-executed');
   assert.equal(template.smokeSliceReadiness, 'NO-GO');
   assert.equal(template.releaseReadiness, 'NO-GO');
@@ -131,6 +145,9 @@ test('live smoke template is non-executed and cannot satisfy release readiness',
 
   assert.deepEqual(template.requiredRows.map(row => row.id), requiredRows);
   assert.deepEqual([...new Set(template.requiredRows.map(row => row.status))], ['missing']);
+  assert.equal(template.managedControlSmoke.applicable, false);
+  assert.deepEqual(template.managedControlSmoke.requiredRows.map(row => row.id), managedRows);
+  assert.deepEqual([...new Set(template.managedControlSmoke.requiredRows.map(row => row.status))], ['missing']);
   assert.equal(template.completionRules.allRecordingFieldsRequired, true);
   assert.equal(template.completionRules.allRowsMustPass, true);
   assert.equal(template.completionRules.consoleErrorsMustBeClassified, true);
@@ -141,6 +158,8 @@ test('live smoke template is non-executed and cannot satisfy release readiness',
   assert.equal(template.completionRules.releaseReadinessWhenByteParityMissing, 'NO-GO');
   assert.equal(template.completionRules.releaseReadinessWhenAutomatedLaneEvidenceMissing, 'NO-GO');
   assert.equal(template.completionRules.releaseReadinessWhenAnyRowMissing, 'NO-GO');
+  assert.equal(template.completionRules.managedControlRowsRequiredWhenApplicable, true);
+  assert.equal(template.completionRules.managedControlRowsRequiredForManagedLogicalChanges, true);
 });
 
 test('live smoke runner contract writes a dated artifact but no executed artifact is committed now', () => {
@@ -153,6 +172,8 @@ test('live smoke runner contract writes a dated artifact but no executed artifac
   assert.match(runner, /boundaryDoc: 'docs\/audit\/FILTERTUBE_RELEASE_LIVE_YOUTUBE_SPA_SMOKE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-25\.md'/);
   assert.match(runner, /const smokeSliceReadiness = allRowsPassed && consoleIssues\.length === 0 \?/);
   assert.match(runner, /const changeContext = buildChangeContext\(\)/);
+  assert.match(runner, /function buildManagedControlSmokePlaceholder\(\)/);
+  assert.match(runner, /LIVE_SMOKE_MANAGED_CONTROL_ROWS\.map/);
   assert.match(runner, /const KNOWN_TEST_LANES = new Set\(Object\.keys\(LANES\)\.map\(lane => `test:\$\{lane\}`\)\)/);
   assert.match(runner, /function hasOnlyKnownTestLanes\(lanes\)/);
   assert.match(runner, /hasOnlyKnownTestLanes\(changeContext\.requiredLanes\)/);
@@ -161,6 +182,7 @@ test('live smoke runner contract writes a dated artifact but no executed artifac
   assert.match(runner, /fs\.writeFileSync\(artifactPath, `\$\{JSON\.stringify\(artifact, null, 2\)\}\\n`\)/);
   assert.match(read(verifierPath), /export function validateLiveSmokeArtifact/);
   assert.match(read(verifierPath), /releaseReadiness must be GO-FOR-RELEASE-SMOKE/);
+  assert.match(read(verifierPath), /managedControlSmoke\.applicable must be true for managed-control changes/);
   assert.match(read(verifierPath), /installedByteParity\.verdict must be GO/);
   assert.match(read(verifierPath), /changeContext\.automatedLaneEvidence/);
   assert.deepEqual(executedArtifacts, []);
