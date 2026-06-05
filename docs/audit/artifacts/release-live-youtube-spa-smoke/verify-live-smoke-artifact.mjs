@@ -194,7 +194,7 @@ export function validateLiveSmokeArtifact(artifact) {
   }
 
   if (artifact.artifactType !== 'filtertube-release-live-youtube-spa-smoke') errors.push('artifactType must be filtertube-release-live-youtube-spa-smoke');
-  if (artifact.schemaVersion !== 4) errors.push('schemaVersion must be 4');
+  if (artifact.schemaVersion !== 5) errors.push('schemaVersion must be 5');
   if (artifact.status !== 'executed') errors.push('status must be executed');
   if (artifact.boundaryDoc !== LIVE_SMOKE_BOUNDARY_DOC) errors.push(`boundaryDoc must be ${LIVE_SMOKE_BOUNDARY_DOC}`);
   if (artifact.smokeSliceReadiness !== 'GO-FOR-THIS-SMOKE-SLICE') errors.push('smokeSliceReadiness must be GO-FOR-THIS-SMOKE-SLICE');

@@ -27,7 +27,8 @@ const managedRows = [
   'FT-MANAGED-LIVE-02-time-budget-active-tab',
   'FT-MANAGED-LIVE-03-zero-budget-timeout-overlay',
   'FT-MANAGED-LIVE-04-parent-history-redaction',
-  'FT-MANAGED-LIVE-05-no-policy-no-work'
+  'FT-MANAGED-LIVE-05-command-center-bulk-rail',
+  'FT-MANAGED-LIVE-06-no-policy-no-work'
 ];
 
 function read(file) {
@@ -132,7 +133,7 @@ test('live smoke template is non-executed and cannot satisfy release readiness',
   const template = readJson(templatePath);
 
   assert.equal(template.artifactType, 'filtertube-release-live-youtube-spa-smoke');
-  assert.equal(template.schemaVersion, 4);
+  assert.equal(template.schemaVersion, 5);
   assert.equal(template.status, 'template-not-executed');
   assert.equal(template.smokeSliceReadiness, 'NO-GO');
   assert.equal(template.releaseReadiness, 'NO-GO');

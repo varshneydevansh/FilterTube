@@ -715,7 +715,7 @@ async function main() {
   const changeContextReady = isReleaseReadyChangeContext(changeContext);
   const artifact = {
     artifactType: 'filtertube-release-live-youtube-spa-smoke',
-    schemaVersion: 4,
+    schemaVersion: 5,
     status: allRowsPassed ? 'executed' : 'executed-with-failures',
     smokeSliceReadiness,
     releaseReadiness: smokeSliceReadiness === 'GO-FOR-THIS-SMOKE-SLICE' && installedByteParity.verdict === 'GO' && changeContextReady ? 'GO-FOR-RELEASE-SMOKE' : 'NO-GO',

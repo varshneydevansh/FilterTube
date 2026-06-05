@@ -80,7 +80,7 @@ function validArtifact() {
   const generatedAt = '2026-06-01T00:00:00.000Z';
   return {
     artifactType: 'filtertube-release-live-youtube-spa-smoke',
-    schemaVersion: 4,
+    schemaVersion: 5,
     status: 'executed',
     smokeSliceReadiness: 'GO-FOR-THIS-SMOKE-SLICE',
     releaseReadiness: 'GO-FOR-RELEASE-SMOKE',

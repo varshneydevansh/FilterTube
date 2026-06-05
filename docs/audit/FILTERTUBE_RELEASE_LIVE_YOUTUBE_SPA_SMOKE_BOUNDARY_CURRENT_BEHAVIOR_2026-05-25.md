@@ -64,7 +64,8 @@ same dated artifact:
 | `FT-MANAGED-LIVE-02-time-budget-active-tab` | Set a small protected-profile daily YouTube budget and keep an active YouTube tab open long enough to consume budget. | The background-owned active-tab budget decreases across SPA navigation/reload and does not count when no managed time policy is active. |
 | `FT-MANAGED-LIVE-03-zero-budget-timeout-overlay` | Set a zero or already-exhausted protected-profile budget and reload/open YouTube. | The protected timeout overlay appears, is not dismissible by child authority, and normal FilterTube blocklist/whitelist behavior is not used as the time-limit authority. |
 | `FT-MANAGED-LIVE-04-parent-history-redaction` | Open protected action history after a managed policy accept/reject or time-limit change. | Parent-visible history shows accepted/rejected outcomes, policy scope, revision, and redacted labels without plaintext rules, PINs, private keys, ciphertext, or raw policy JSON. |
-| `FT-MANAGED-LIVE-05-no-policy-no-work` | Switch to a profile with no managed policy/time limit and repeat one Home/Search/Watch navigation. | No managed provider pull loop, time-limit heartbeat, timeout overlay, or extra YouTube observer/timer work runs when no managed policy is applicable. |
+| `FT-MANAGED-LIVE-05-command-center-bulk-rail` | Open the managed parent command center with one or more selected protected profiles. | Selected-profile actions are grouped into Rules, Send, Time, and Access rails, every action remains disabled until selection, and the grouping does not expose plaintext rules, PINs, keys, raw JSON, or new policy authority. |
+| `FT-MANAGED-LIVE-06-no-policy-no-work` | Switch to a profile with no managed policy/time limit and repeat one Home/Search/Watch navigation. | No managed provider pull loop, time-limit heartbeat, timeout overlay, or extra YouTube observer/timer work runs when no managed policy is applicable. |
 
 ## Required Recording Fields
 
@@ -90,14 +91,14 @@ docs/audit/artifacts/release-live-youtube-spa-smoke/template.json
 ```
 
 The template is intentionally `template-not-executed` and keeps
-`smokeSliceReadiness` and `releaseReadiness` at `NO-GO`. Schema version 4
+`smokeSliceReadiness` and `releaseReadiness` at `NO-GO`. Schema version 5
 also carries an `installedByteParity` block for
 `FT-WLCACHE-SPA-PACKET-01-installed-profile-bytes`; the template block is
 `NO-GO` because it has no visible profile, active tab, content-script marker,
 or reload timestamp evidence. The template may be copied into a dated evidence
 artifact after a real browser run, but the template itself must not be treated
 as proof that live YouTube SPA smoke or installed byte parity is complete.
-Schema version 4 adds `managedControlSmoke`; it is `applicable:false` for
+Schema version 5 carries `managedControlSmoke`; it is `applicable:false` for
 ordinary whitelist/performance live SPA runs, but managed parent/caregiver,
 protected-profile sync, viewing-space, time-limit, Nanah, mailbox, or
 local-network changes must mark it applicable and pass every managed row.

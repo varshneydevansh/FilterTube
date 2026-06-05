@@ -238,7 +238,8 @@ FT-MANAGED-LIVE-01-main-kids-route-gate
 FT-MANAGED-LIVE-02-time-budget-active-tab
 FT-MANAGED-LIVE-03-zero-budget-timeout-overlay
 FT-MANAGED-LIVE-04-parent-history-redaction
-FT-MANAGED-LIVE-05-no-policy-no-work
+FT-MANAGED-LIVE-05-command-center-bulk-rail
+FT-MANAGED-LIVE-06-no-policy-no-work
 ```
 
 Manual smoke scope by touched behavior:
@@ -253,7 +254,7 @@ Manual smoke scope by touched behavior:
 | quick-block and 3-dot menus | Quick-block controls appear on supported cards; native YouTube menus open, close on outside click, and comment 3-dot menus are not hidden by stale FilterTube state. |
 | JSON-first and DOM fallback | JSON-hidden and DOM-hidden cards agree on visible results; recycled YouTube nodes do not keep stale hidden/menu state. |
 | settings/profile/storage | Mode/profile changes reprocess already-rendered cards without requiring a refresh; import/export and storage migration preserve list authority. |
-| managed parent/caregiver controls | Parent/account authority controls the protected profile; child PIN is not admin authority; Main/Kids route gate, time budget, timeout overlay, protected history redaction, and no-policy/no-work behavior match the managed rows. |
+| managed parent/caregiver controls | Parent/account authority controls the protected profile; child PIN is not admin authority; Main/Kids route gate, time budget, timeout overlay, protected history redaction, grouped command-center bulk action rails, and no-policy/no-work behavior match the managed rows. |
 | release packaging | Built Chrome/Firefox/Opera packages include the intended source, manifests, UI shells, release notes, and optional Android mobile/tablet artifacts only when explicitly attached. |
 
 Managed parent/caregiver transport changes also receive a second handoff from

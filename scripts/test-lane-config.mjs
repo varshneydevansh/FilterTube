@@ -48,7 +48,8 @@ export const LIVE_SMOKE_MANAGED_CONTROL_ROWS = Object.freeze([
   'FT-MANAGED-LIVE-02-time-budget-active-tab',
   'FT-MANAGED-LIVE-03-zero-budget-timeout-overlay',
   'FT-MANAGED-LIVE-04-parent-history-redaction',
-  'FT-MANAGED-LIVE-05-no-policy-no-work'
+  'FT-MANAGED-LIVE-05-command-center-bulk-rail',
+  'FT-MANAGED-LIVE-06-no-policy-no-work'
 ]);
 export const MANAGED_REMOTE_DELIVERY_SMOKE_REQUIRED_ROWS = Object.freeze([
   'FT-MANAGED-REMOTE-00-trust-link-preflight',
