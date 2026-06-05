@@ -125,7 +125,9 @@ parent-selected Main/Kids surface rather than the visible Nanah surface picker.
 The dashboard can now also grant temporary parent-approved extra YouTube time
 to protected profiles with active time limits, persist that as a newer
 `time_limits` policy revision with redacted history, and offer an immediate
-verified-device `time_limits` push.
+verified-device `time_limits` push. Local viewing-space and normal time-limit
+edits now use the same scoped post-save push offer for changed profiles when a
+verified delivery path exists.
 The extension still does not ship a built-in server mailbox client or LAN
 peer-discovery transport; those are downstream app/server/provider integration
 surfaces. Built-in server upload/pull/purge clients, built-in local-network
@@ -512,6 +514,9 @@ Current behavior:
   with active time limits. The grant is stored as `parentGrant`, receives a new
   policy revision/hash, and can be sent to verified devices through the
   existing `time_limits` managed-policy scope.
+- Accounts & Sync can now offer the matching verified-device push after local
+  viewing-space and normal time-limit saves instead of requiring parents to
+  remember a separate Send Update action.
 - Import/profile sanitation preserves valid `filtertube_managed_time_limit`
   policies and drops malformed policy payloads.
 - Extension runtime now compiles a valid active child profile

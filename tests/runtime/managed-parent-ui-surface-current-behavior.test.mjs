@@ -345,6 +345,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(doc, /runtime managed command-center bulk time-limit controls: present via delegated runtime gate/);
   assert.match(doc, /runtime managed command-center parent extra-time grants: present via delegated runtime gate/);
   assert.match(doc, /runtime managed command-center bulk viewing-space controls: present via delegated runtime gate/);
+  assert.match(doc, /runtime managed command-center post-viewing\/time-limit verified-device push: present/);
   assert.match(doc, /runtime managed command-center direct policy writes: absent/);
   assert.match(doc, /runtime managed command-center direct rule bulk writes: present via confirmation plus delegated runtime gate/);
   assert.match(doc, /runtime YouTube hot-path work from command-center UI: absent/);
@@ -407,7 +408,11 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /bulk_time_limit_unlock_failed/);
   assert.match(source, /extra_time_unlock_failed/);
   assert.match(source, /async function grantExtraTimeToProfiles\(profileIds\)/);
+  assert.match(source, /async function offerManagedPolicyPushForChangedProfiles\(profileIds, \{ scope, title, label \}\)/);
   assert.match(source, /offerManagedTimeLimitPushForChangedProfiles\(changedProfileIds\)/);
+  assert.match(source, /offerManagedPolicyPushForChangedProfiles\(\[targetId\], \{\s+scope: 'viewing_space'/);
+  assert.match(source, /offerManagedPolicyPushForChangedProfiles\(changedProfileIds, \{\s+scope: 'viewing_space'/);
+  assert.match(source, /offerManagedTimeLimitPushForChangedProfiles\(\[targetId\]\)/);
   assert.match(source, /bulk_viewing_space_unlock_failed/);
   assert.match(source, /confirmText: 'Save Limits'/);
   assert.match(source, /ft-managed-profile-status/);
@@ -453,9 +458,11 @@ test('managed command-center spec pins parent workflow without making UI authori
   assert.match(doc, /Add Time and Add selected time/);
   assert.match(doc, /Reachability is never authorization/);
   assert.match(doc, /post-rule-write granular verified-device push: present with selected surface binding/);
+  assert.match(doc, /post-viewing\/time-limit verified-device push: present/);
   assert.match(doc, /Present for selected-profile rule editor handoff, same-budget local time-limit changes, same-access local viewing-space changes, selected-profile keyword\/channel\/video-ID rule additions, and selected-profile signed-policy sends on selected protected profiles/);
   assert.match(doc, /Local bulk rule writes are one reviewed rule at a time/);
   assert.match(doc, /selected Main\/Kids surface binding for granular sends/);
+  assert.match(doc, /Viewing-space and time-limit saves offer scoped verified-device pushes only\s+for changed profiles with delivery ready/);
   assert.match(doc, /Mobile-first layout with a single-column protected-profile list/);
   assert.match(doc, /Touch targets .* at\s+least 44px high/);
   assert.match(doc, /Use segmented controls for Main\/Kids access/);

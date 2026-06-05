@@ -6103,8 +6103,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             schemaVersion: 4,
             profiles
         });
+        profilesV4Cache = { ...fresh, schemaVersion: 4, profiles };
         await refreshProfilesUI();
         UIComponents.showToast('Viewing access updated', 'success');
+        if (targetId !== 'default' && currentActive !== targetId && canActiveProfileManageProfile(fresh, targetId)) {
+            await offerManagedPolicyPushForChangedProfiles([targetId], {
+                scope: 'viewing_space',
+                title: 'Send viewing access update now?',
+                label: 'viewing access'
+            });
+        }
     }
 
     function managedViewingAccessPatchForMode(accessMode) {
@@ -6165,6 +6173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         let changedCount = 0;
+        const changedProfileIds = [];
         for (const targetId of eligibleIds) {
             const profile = safeObject(profiles[targetId]);
             const settings = safeObject(profile.settings);
@@ -6194,6 +6203,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             profiles[targetId] = recordManagedChildLocalEditHistory(nextProfile, report);
             changedCount += 1;
+            changedProfileIds.push(targetId);
         }
 
         if (!changedCount) {
@@ -6209,6 +6219,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         profilesV4Cache = { ...fresh, schemaVersion: 4, profiles };
         await refreshProfilesUI();
         UIComponents.showToast(`${changedCount} profiles set to ${patch.label}`, 'success');
+        await offerManagedPolicyPushForChangedProfiles(changedProfileIds, {
+            scope: 'viewing_space',
+            title: 'Send viewing access update now?',
+            label: 'viewing access'
+        });
     }
 
     async function updateProfileTimeLimitPolicy(profileId, action) {
@@ -6291,8 +6306,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             schemaVersion: 4,
             profiles
         });
+        profilesV4Cache = { ...fresh, schemaVersion: 4, profiles };
         await refreshProfilesUI();
         UIComponents.showToast(enabled ? 'Time limit updated' : 'Time limit disabled', 'success');
+        await offerManagedTimeLimitPushForChangedProfiles([targetId]);
     }
 
     async function updateMultipleProfileTimeLimitPolicies(profileIds, action) {
@@ -6356,6 +6373,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         let changedCount = 0;
+        const changedProfileIds = [];
         for (const targetId of eligibleIds) {
             const profile = safeObject(profiles[targetId]);
             const existingPolicy = getManagedTimeLimitPolicy(profile);
@@ -6379,6 +6397,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             profiles[targetId] = recordManagedChildLocalEditHistory(nextProfile, report);
             changedCount += 1;
+            changedProfileIds.push(targetId);
         }
 
         if (!changedCount) {
@@ -6399,6 +6418,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 : `${changedCount} time limits disabled`,
             'success'
         );
+        await offerManagedTimeLimitPushForChangedProfiles(changedProfileIds);
     }
 
     async function promptManagedExtraTimeMinutes({ selectedCount = 1 } = {}) {
@@ -6420,26 +6440,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function offerManagedTimeLimitPushForChangedProfiles(profileIds) {
+        return offerManagedPolicyPushForChangedProfiles(profileIds, {
+            scope: 'time_limits',
+            title: 'Send time-limit update now?',
+            label: 'time-limit policy'
+        });
+    }
+
+    async function offerManagedPolicyPushForChangedProfiles(profileIds, { scope, title, label }) {
         const changedProfileIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
         if (!changedProfileIds.length) return;
+        const normalizedScope = normalizeString(scope).toLowerCase();
+        if (!normalizedScope) return;
         const mailboxReady = hasNanahManagedMailboxUploadWriter();
         const localReady = hasNanahManagedLocalNetworkDeliveryWriter();
         const readyProfileCount = changedProfileIds.filter((targetId) => {
             const profile = safeObject(safeObject(profilesV4Cache).profiles)[targetId];
-            const links = getNanahSourceManagedLinksForTargetProfile(targetId, 'time_limits', profile);
+            const links = getNanahSourceManagedLinksForTargetProfile(targetId, normalizedScope, profile);
             if (!links.length) return false;
             return links.some(isNanahManagedLinkLiveConnected) || mailboxReady || localReady;
         }).length;
         if (readyProfileCount <= 0) return;
 
         const sendNow = await showConfirmModal({
-            title: 'Send time-limit update now?',
-            message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send this time-limit policy update to those devices now.`,
+            title: title || 'Send managed update now?',
+            message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send this ${normalizeString(label) || normalizedScope} update to those devices now.`,
             confirmText: 'Send update',
             cancelText: 'Not now'
         });
         if (sendNow) {
-            await sendManagedParentPolicyToVerifiedDevices(changedProfileIds, { scope: 'time_limits' });
+            await sendManagedParentPolicyToVerifiedDevices(changedProfileIds, { scope: normalizedScope });
         }
     }
 
