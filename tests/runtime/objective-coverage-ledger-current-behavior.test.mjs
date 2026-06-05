@@ -756,27 +756,27 @@ function assertBrowserManifestPermissionResourceValidation(doc) {
 }
 
 function assertCurrentLocalDistPackageSnapshot(doc) {
-  assert.match(doc, /2026-06-04 current local dist package snapshot/);
+  assert.match(doc, /2026-06-05 current local dist package snapshot/);
   assert.match(doc, /existing ignored `dist\/` tree as local artifact evidence/);
   assert.match(doc, /3 browser staged directories/);
-  assert.match(doc, /61 staged files per browser/);
+  assert.match(doc, /63 staged files per browser/);
   assert.match(doc, /3 ZIP artifacts/);
-  assert.match(doc, /186 total `dist` files including ZIPs/);
-  assert.match(doc, /60 source-backed non-manifest staged files per browser/);
-  assert.match(doc, /60 byte-identical source-backed non-manifest staged files per browser/);
+  assert.match(doc, /192 total `dist` files including ZIPs/);
+  assert.match(doc, /62 source-backed non-manifest staged files per browser/);
+  assert.match(doc, /62 byte-identical source-backed non-manifest staged files per browser/);
   assert.match(doc, /per-browser staged group counts/);
   assert.match(doc, /browser manifest hashes, and local ZIP hashes/);
   assert.match(doc, /release package parity, generated-output, package artifact, manifest\/resource, code-burden, source\/evidence, and implementation-change rows/);
   assert.match(doc, /committed package manifest authority, reproducible package build authority,\s+loaded-browser package\/runtime parity authority, upload proof, public-claim proof,\s+and release publication authority remain `NO-GO`/);
 
   const releasePackageDoc = read('docs/audit/FILTERTUBE_P0_RELEASE_PACKAGE_CURRENT_BEHAVIOR_2026-05-19.md');
-  assert.match(releasePackageDoc, /Current Local Dist Package Snapshot - 2026-06-04/);
+  assert.match(releasePackageDoc, /Current Local Dist Package Snapshot - 2026-06-05/);
   assert.match(releasePackageDoc, /dist snapshot source: existing ignored local dist tree/);
   assert.match(releasePackageDoc, /browser staged directories: 3/);
-  assert.match(releasePackageDoc, /browser staged files per directory: 61/);
-  assert.match(releasePackageDoc, /total dist files including zips: 186/);
-  assert.match(releasePackageDoc, /source-backed staged files per browser excluding manifest: 60/);
-  assert.match(releasePackageDoc, /byte-identical source-backed staged files per browser excluding manifest: 60/);
+  assert.match(releasePackageDoc, /browser staged files per directory: 63/);
+  assert.match(releasePackageDoc, /total dist files including zips: 192/);
+  assert.match(releasePackageDoc, /source-backed staged files per browser excluding manifest: 62/);
+  assert.match(releasePackageDoc, /byte-identical source-backed staged files per browser excluding manifest: 62/);
   assert.match(releasePackageDoc, /zip checksum snapshot: yes/);
   assert.match(releasePackageDoc, /reproducible package build authority: NO-GO/);
   assert.match(releasePackageDoc, /loaded-browser package\/runtime parity authority: NO-GO/);
