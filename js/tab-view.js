@@ -6127,6 +6127,169 @@ document.addEventListener('DOMContentLoaded', async () => {
         );
     }
 
+    function managedRuleListKeyFor(surface, ruleType, target) {
+        const mode = safeObject(target).mode === 'whitelist' ? 'whitelist' : 'blocklist';
+        if (ruleType === 'channel') {
+            if (surface === 'kids') return mode === 'whitelist' ? 'whitelistChannels' : 'blockedChannels';
+            return mode === 'whitelist' ? 'whitelistChannels' : 'channels';
+        }
+        if (surface === 'kids') return mode === 'whitelist' ? 'whitelistKeywords' : 'blockedKeywords';
+        return mode === 'whitelist' ? 'whitelistKeywords' : 'keywords';
+    }
+
+    function addManagedRuleToSurface(target, surface, ruleType, value) {
+        const item = safeObject(target);
+        const type = ruleType === 'channel' ? 'channel' : 'keyword';
+        const listKey = managedRuleListKeyFor(surface, type, item);
+        const list = Array.isArray(item[listKey]) ? item[listKey] : [];
+
+        if (type === 'channel') {
+            const channel = normalizeProfileChannel(value);
+            if (!channel) return { changed: false, error: 'invalid_channel' };
+            const key = normalizeString(channel.id || channel.handle || channel.customUrl || channel.name).toLowerCase();
+            const exists = list.some(row => normalizeString(row?.id || row?.handle || row?.customUrl || row?.name).toLowerCase() === key);
+            if (exists) return { changed: false, duplicate: true };
+            item[listKey] = [channel, ...list];
+            return { changed: true };
+        }
+
+        const entry = normalizeProfileKeyword(value, { comments: surface !== 'kids' });
+        if (!entry) return { changed: false, error: 'invalid_keyword' };
+        const lower = entry.word.toLowerCase();
+        const exists = list.some(row => normalizeString(row?.word).toLowerCase() === lower);
+        if (exists) return { changed: false, duplicate: true };
+        item[listKey] = [entry, ...list];
+        return { changed: true };
+    }
+
+    async function promptManagedBulkRuleSurface(ruleType) {
+        const type = ruleType === 'channel' ? 'channel' : 'keyword';
+        const rawSurface = await showPromptModal({
+            title: type === 'channel' ? 'Add Channel To Selected Profiles' : 'Add Keyword To Selected Profiles',
+            message: 'Enter main or kids. The rule is added using each profile surface current Blocklist/Whitelist mode.',
+            placeholder: 'main or kids',
+            confirmText: 'Choose Surface',
+            initialValue: 'main'
+        });
+        if (rawSurface === null) return null;
+        const surface = normalizeString(rawSurface).toLowerCase();
+        if (surface !== 'main' && surface !== 'kids') {
+            UIComponents.showToast('Use main or kids for the managed rule surface', 'error');
+            return null;
+        }
+        return surface;
+    }
+
+    async function promptManagedBulkRuleValue(ruleType) {
+        const type = ruleType === 'channel' ? 'channel' : 'keyword';
+        const rawValue = await showPromptModal({
+            title: type === 'channel' ? 'Channel To Add' : 'Keyword To Add',
+            message: type === 'channel'
+                ? 'Use @handle, Channel ID, c/ChannelName, user/ChannelName, or a YouTube URL.'
+                : 'Enter the keyword to add to selected protected profiles.',
+            placeholder: type === 'channel' ? '@channel or UC...' : 'keyword',
+            confirmText: type === 'channel' ? 'Add Channel' : 'Add Keyword'
+        });
+        if (rawValue === null) return null;
+        return normalizeString(rawValue);
+    }
+
+    async function addManagedBulkRuleToProfiles(profileIds, ruleType) {
+        const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
+        const type = ruleType === 'channel' ? 'channel' : 'keyword';
+        if (!targetIds.length) {
+            UIComponents.showToast('Select at least one protected profile', 'error');
+            return;
+        }
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
+            UIComponents.showToast('Profiles unavailable', 'error');
+            return;
+        }
+
+        const fresh = await io.loadProfilesV4();
+        const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
+        if (getProfileType(fresh, currentActive) === 'child') {
+            UIComponents.showToast('Child profiles cannot change managed rules', 'error');
+            return;
+        }
+
+        const profiles = { ...safeObject(fresh.profiles) };
+        const eligibleIds = targetIds.filter((targetId) => {
+            const profile = safeObject(profiles[targetId]);
+            return !!profile && Object.keys(profile).length > 0
+                && canActiveProfileManageProfile(fresh, targetId);
+        });
+        if (!eligibleIds.length) {
+            UIComponents.showToast('No selected protected profiles can be managed by this account', 'error');
+            return;
+        }
+
+        const surface = await promptManagedBulkRuleSurface(type);
+        if (!surface) return;
+        const value = await promptManagedBulkRuleValue(type);
+        if (!value) {
+            UIComponents.showToast(type === 'channel' ? 'Enter a channel to add' : 'Enter a keyword to add', 'error');
+            return;
+        }
+        if (type === 'channel' && !normalizeProfileChannel(value)) {
+            UIComponents.showToast('Invalid format. Use @handle, Channel ID, c/ChannelName, or YouTube URL', 'error');
+            return;
+        }
+        if (type === 'keyword' && !normalizeProfileKeyword(value, { comments: surface !== 'kids' })) {
+            UIComponents.showToast('Enter a valid keyword', 'error');
+            return;
+        }
+
+        const okAdmin = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
+        if (!okAdmin) {
+            for (const targetId of eligibleIds) {
+                await recordManagedAdminAuthFailureHistory(fresh, targetId, `bulk_${type}_rule_unlock_failed`);
+            }
+            return;
+        }
+
+        let changedCount = 0;
+        let duplicateCount = 0;
+        for (const targetId of eligibleIds) {
+            const profile = safeObject(profiles[targetId]);
+            const nextSurface = getProfileSurface(profile, surface);
+            const result = addManagedRuleToSurface(nextSurface, surface, type, value);
+            if (!result.changed) {
+                if (result.duplicate) duplicateCount += 1;
+                continue;
+            }
+            const nextProfile = setProfileSurface(profile, surface, nextSurface);
+            const report = buildManagedChildLocalEditReport({
+                actorProfileId: currentActive,
+                targetProfileId: targetId,
+                surface,
+                priorProfile: profile,
+                nextSurface
+            });
+            profiles[targetId] = recordManagedChildLocalEditHistory(nextProfile, report);
+            changedCount += 1;
+        }
+
+        if (!changedCount) {
+            UIComponents.showToast(
+                duplicateCount ? 'Selected profiles already have that managed rule' : 'No selected profiles were changed',
+                'info'
+            );
+            return;
+        }
+
+        await io.saveProfilesV4({
+            ...fresh,
+            schemaVersion: 4,
+            profiles
+        });
+        profilesV4Cache = { ...fresh, schemaVersion: 4, profiles };
+        await StateManager.loadSettings({ notify: false, resetEnrichment: false, scheduleEnrichment: false });
+        await refreshProfilesUI();
+        UIComponents.showToast(`${changedCount} profiles updated with managed ${type}`, 'success');
+    }
+
     function isUiLocked() {
         const profilesV4 = profilesV4Cache;
         if (!profilesV4) {
@@ -12121,6 +12284,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                             return;
                         }
                         await startManagedChildEdit(profileIds[0]);
+                    } else if (action === 'bulk_add_keyword' || action === 'bulk_add_channel') {
+                        await addManagedBulkRuleToProfiles(
+                            safeArray(intent?.profileIds),
+                            action === 'bulk_add_channel' ? 'channel' : 'keyword'
+                        );
                     } else if (action === 'bulk_set_time_limit' || action === 'bulk_disable_time_limit') {
                         await updateMultipleProfileTimeLimitPolicies(
                             safeArray(intent?.profileIds),

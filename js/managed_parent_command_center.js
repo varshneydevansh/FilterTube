@@ -89,6 +89,22 @@
                 sensitiveAction: false
             },
             {
+                action: 'bulk_add_keyword',
+                label: 'Add keyword',
+                profileIds,
+                scope: 'main_kids_rules',
+                authority: 'delegated_runtime_gate',
+                sensitiveAction: true
+            },
+            {
+                action: 'bulk_add_channel',
+                label: 'Add channel',
+                profileIds,
+                scope: 'main_kids_rules',
+                authority: 'delegated_runtime_gate',
+                sensitiveAction: true
+            },
+            {
                 action: 'bulk_send_managed_policy',
                 label: 'Send selected updates',
                 profileIds,
