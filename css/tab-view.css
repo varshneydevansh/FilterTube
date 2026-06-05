@@ -567,7 +567,7 @@ html[data-theme="dark"] body::after {
 .ft-managed-command-center__row {
     min-height: 44px;
     display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(160px, 1fr) minmax(110px, 0.7fr) minmax(0, 0.95fr) minmax(170px, 0.9fr);
+    grid-template-columns: minmax(0, 1.05fr) minmax(150px, 0.9fr) minmax(96px, 0.55fr) minmax(120px, 0.7fr) minmax(0, 0.85fr) minmax(168px, 0.85fr);
     gap: 10px;
     align-items: center;
     padding: 9px 10px;

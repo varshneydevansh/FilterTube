@@ -29,7 +29,17 @@
             managedTimeLimitLabel: typeof helpers.managedTimeLimitLabel === 'function' ? helpers.managedTimeLimitLabel : () => 'No limit',
             getManagedSyncTargetSummary: typeof helpers.getManagedSyncTargetSummary === 'function'
                 ? helpers.getManagedSyncTargetSummary
-                : () => ({ label: 'No verified device', targetCount: 0, readyCount: 0, revokedCount: 0, staleCount: 0, totalCount: 0 }),
+                : () => ({
+                    label: 'No verified device',
+                    targetCount: 0,
+                    readyCount: 0,
+                    revokedCount: 0,
+                    staleCount: 0,
+                    totalCount: 0,
+                    liveReady: false,
+                    localNetworkReady: false,
+                    mailboxReady: false
+                }),
             onAction: typeof helpers.onAction === 'function' ? helpers.onAction : null
         };
     }
@@ -129,6 +139,76 @@
         return {
             key: 'ready',
             label: 'Sync ready',
+            tone: 'success'
+        };
+    }
+
+    function resolveManagedCommandCenterDeliveryPreview(item = {}) {
+        const conflictCount = Number(item.remoteConflictCount) || 0;
+        if (conflictCount > 0) {
+            return {
+                key: 'conflict',
+                label: 'Review conflict first',
+                tone: 'danger'
+            };
+        }
+        const targetCount = Number(item.syncTargetCount) || 0;
+        const readyCount = Number(item.syncReadyCount) || 0;
+        const revokedCount = Number(item.syncRevokedCount) || 0;
+        const staleCount = Number(item.syncStaleCount) || 0;
+        const totalCount = Number(item.syncTotalCount) || 0;
+        if (targetCount <= 0 && revokedCount > 0) {
+            return {
+                key: 'repair',
+                label: 'Re-pair before sending',
+                tone: 'warning'
+            };
+        }
+        if (targetCount <= 0 && staleCount > 0) {
+            return {
+                key: 'stale',
+                label: 'Refresh stale link',
+                tone: 'warning'
+            };
+        }
+        if (targetCount <= 0 || totalCount <= 0) {
+            return {
+                key: 'pair_device',
+                label: 'Pair verified device',
+                tone: 'muted'
+            };
+        }
+        if (readyCount <= 0) {
+            return {
+                key: 'provider_needed',
+                label: 'Provider setup needed',
+                tone: 'warning'
+            };
+        }
+        if (item.syncLiveReady === true) {
+            return {
+                key: 'live',
+                label: readyCount > 1 ? `Live now (${readyCount})` : 'Live now',
+                tone: 'success'
+            };
+        }
+        if (item.syncLocalNetworkReady === true) {
+            return {
+                key: 'local_network',
+                label: 'LAN provider ready',
+                tone: 'success'
+            };
+        }
+        if (item.syncMailboxReady === true) {
+            return {
+                key: 'mailbox',
+                label: 'Mailbox later',
+                tone: 'success'
+            };
+        }
+        return {
+            key: 'ready',
+            label: 'Delivery ready',
             tone: 'success'
         };
     }
@@ -259,7 +339,7 @@
                 ? `Remote r${summary.latestRemoteRevision}`
                 : (summary.localLabels.length ? 'Local managed' : 'No policy yet');
             const remoteConflictCount = summary.remoteConflictCount || 0;
-            rows.push({
+            const row = {
                 profileId,
                 profileName: h.getProfileName(root, profileId),
                 parentName: h.getProfileName(root, parentId || 'default'),
@@ -274,6 +354,9 @@
                 syncRevokedCount: syncTarget.revokedCount || 0,
                 syncStaleCount: syncTarget.staleCount || 0,
                 syncTotalCount: syncTarget.totalCount || syncTarget.targetCount || 0,
+                syncLiveReady: syncTarget.liveReady === true,
+                syncMailboxReady: syncTarget.mailboxReady === true,
+                syncLocalNetworkReady: syncTarget.localNetworkReady === true,
                 remoteScopeCount: summary.remoteScopeCount,
                 historyRowCount: summary.historyRowCount,
                 protectedRowCount: summary.protectedRowCount,
@@ -282,7 +365,9 @@
                 actionIntents: buildManagedCommandCenterActionIntents(profileId, timePolicy, {
                     remoteConflictCount
                 })
-            });
+            };
+            row.deliveryPreview = resolveManagedCommandCenterDeliveryPreview(row);
+            rows.push(row);
         };
         h.getAccountIds(root).forEach((accountId) => {
             addRow(accountId, 'default');
@@ -458,6 +543,7 @@
             });
             row.appendChild(statusCell);
             [
+                ['Delivery', item.deliveryPreview?.label || 'Pair verified device'],
                 ['Device', item.syncTargetLabel],
                 ['History', `${item.historyRowCount} rows | latest ${item.latestActionLabel}`]
             ].forEach(([label, value]) => {
@@ -502,6 +588,7 @@
         buildSummary: buildManagedCommandCenterSummary,
         buildActionIntents: buildManagedCommandCenterActionIntents,
         buildBulkActionIntents: buildManagedCommandCenterBulkActionIntents,
+        resolveDeliveryPreview: resolveManagedCommandCenterDeliveryPreview,
         render: renderManagedCommandCenter
     };
 })(typeof globalThis !== 'undefined' ? globalThis : window);

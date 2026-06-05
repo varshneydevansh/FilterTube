@@ -111,11 +111,14 @@ ack-handoff history without exposing plaintext rules. Direct signed-envelope
 apply and already-decrypted mailbox item apply now also reject revoked trusted
 links before any profile save, and mailbox apply marks that local decision as
 `ackState: revoked`. Command-center `Send Update` and `Send selected updates`
-can now send signed managed-policy envelopes to a currently connected verified
-replica over Nanah P2P, can hand ciphertext mailbox rows or signed
-local-network candidates to optional providers when those hooks are present,
-and can add the same video/keyword/channel rule to selected protected profiles after
-parent/account re-auth.
+now show redacted per-target delivery preview state before the parent acts:
+live, LAN provider, mailbox later, provider setup needed, re-pair/stale,
+conflict review, or missing verified device. They can send signed
+managed-policy envelopes to a currently connected verified replica over Nanah
+P2P, can hand ciphertext mailbox rows or signed local-network candidates to
+optional providers when those hooks are present, and can add the same
+video/keyword/channel rule to selected protected profiles after parent/account
+re-auth.
 The extension still does not ship a built-in server mailbox client or LAN
 peer-discovery transport; those are downstream app/server/provider integration
 surfaces. Built-in server upload/pull/purge clients, built-in local-network

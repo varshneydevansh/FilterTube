@@ -8,11 +8,12 @@ bulk viewing-space controls, command-center verified-device send actions,
 live P2P signed managed-policy push for connected verified replica devices,
 provider-gated mailbox/LAN delivery handoff, and protected redacted push
 history rows are present. The command center now includes a compact
-parent-facing protection strip plus labeled Device/History row details so
-parents can scan readiness, re-pairing, conflicts, and history without reading
-raw policy state. Bulk local time-limit and viewing-space actions cover all
-manageable protected profiles, including Default/Master-managed independent
-account profiles. Direct rule bulk writes remain intentionally absent.
+parent-facing protection strip plus labeled Delivery/Device/History row details
+so parents can scan live delivery, later-delivery provider readiness,
+re-pairing, conflicts, and history without reading raw policy state. Bulk local
+time-limit and viewing-space actions cover all manageable protected profiles,
+including Default/Master-managed independent account profiles. Direct rule bulk
+writes remain intentionally absent.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 
@@ -67,6 +68,11 @@ state without exposing plaintext rule values:
   links only. A live connected verified replica receives signed envelopes over
   Nanah immediately. Optional mailbox/LAN providers receive ciphertext items or
   signed local-network candidates only when those provider hooks exist.
+- The Delivery row preview is a redacted status summary only. It can say Live
+  now, LAN provider ready, Mailbox later, Provider setup needed, Re-pair before
+  sending, Refresh stale link, Review conflict first, or Pair verified device;
+  it does not contain rule text, policy JSON, hashes, keys, ciphertext, or
+  mutation authority.
 - The extension does not currently include a built-in server mailbox client or
   LAN peer-discovery transport. Those remain provider/app/server integration
   surfaces, not hidden extension authority.
@@ -92,8 +98,9 @@ runtime status admin mutation authority: absent
 runtime detailed history modal re-auth gate: present
 runtime managed command-center overview: present
 runtime managed command-center protection strip: present
-runtime managed command-center labeled device/history details: present
+runtime managed command-center labeled delivery/device/history details: present
 runtime managed command-center delegated action intents: present
+runtime managed command-center redacted delivery preview: present
 runtime managed command-center selected-profile rule editor handoff: present via delegated runtime gate
 runtime managed command-center bulk time-limit controls: present via delegated runtime gate
 runtime managed command-center bulk viewing-space controls: present via delegated runtime gate
@@ -121,10 +128,10 @@ weakening the authority model:
 | Managed profile selection | See each protected profile, owner relationship, current lock state, verified-device readiness, and last policy revision. | Child/protected views still hide admin controls and detailed history. |
 | Protection scan strip | Quickly see protected profile count, sync-ready profiles, profiles needing re-pairing, and remote conflicts before acting. | Strip values are aggregate status only; they do not include rule text, policy payloads, keys, or mutation authority. |
 | Rule editing | Command-center row actions still enter the existing managed protected-profile editor, and selected-profile bulk controls can hand off one selected protected profile to the same editor. | Writes must use the same validated local/remote managed-policy paths as current FilterTube controls; multi-profile direct rule writes remain future work. |
-| Remote send | Parent can send one protected profile or selected protected profiles to saved verified devices. | Delivery links are not authority; each envelope still requires Source -> Replica trust, fixed target profile, allowed scope, signature/integrity proof, and newer revision/hash. |
+| Remote send | Parent can send one protected profile or selected protected profiles to saved verified devices and see whether the next attempt is live, later via LAN/mailbox provider, blocked by conflict, blocked by stale/revoked pairing, or missing a verified device. | Delivery links and preview labels are not authority; each envelope still requires Source -> Replica trust, fixed target profile, allowed scope, signature/integrity proof, and newer revision/hash. |
 | Viewing spaces | Show Main, Kids, both, or neither per protected profile; row actions still change policy and selected-profile bulk actions can apply Main + Kids, Kids only, or Main only locally. | UI choice is not authority; runtime route gate remains the enforcement layer; every selected target gets its own redacted revision/history row after parent re-auth. |
 | Time limits | Show daily YouTube budget state; command-center row actions still set/disable one profile and bulk selected-profile actions can apply the same daily budget or disable existing limits. | Runtime budget accounting remains background-owned; every target gets its own revision/history row after parent re-auth. |
-| Sync status | Show trusted device, local-network provider, Nanah open-sync, and mailbox status. | Reachability is never authorization; offline state keeps the last valid policy active. |
+| Sync status | Show trusted device, delivery preview, local-network provider, Nanah open-sync, and mailbox status. | Reachability is never authorization; offline state keeps the last valid policy active. |
 | Action history | Show accepted, rejected, conflict, failed-auth, and expired-session counts/latest labels; detailed history remains gated by the History action. | History stays redacted, protected by parent/account re-auth, and never becomes policy authority. |
 | Multi-profile apply | Present for selected-profile rule editor handoff, same-budget local time-limit changes, same-access local viewing-space changes, and selected-profile signed-policy sends on selected protected profiles. | Direct local rule bulk writes remain absent; every remote target still needs its own target profile, trusted link, scope, revision, hash, and signature/integrity proof. |
 

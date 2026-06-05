@@ -537,10 +537,11 @@ replica child device over Nanah/P2P or same-network transport.
   managed signing keypair, mark active Source -> Replica child-device links as
   `keyRevoked`, purge provider/open-sync/LAN/source-ack state for those old
   links, and add protected target-profile history rows. Offline
-  mailbox/local-network delivery, cross-device fanout, compromise-recovery
-  proof, and richer per-target preview controls remain later slices. Local
-  selected-profile time-limit and viewing-space bulk writes are already
-  dashboard-gated.
+  mailbox/local-network delivery, cross-device fanout, and compromise-recovery
+  proof remain later slices. Redacted per-target delivery preview controls are
+  now present in the command center so parents can see live/later/re-pair/no-target
+  status before sending. Local selected-profile time-limit and viewing-space
+  bulk writes are already dashboard-gated.
 - **Acceptance Criteria**:
   - The public descriptor is separated from the private keypair.
   - The private JWK is not placed in the Nanah hello descriptor or trusted link
@@ -704,8 +705,8 @@ the current extension dashboard.
   surface keeps a compact operational layout, uses one protected-profile row
   per manageable target, exposes per-row Send Update and selected-profile Send
   selected updates actions, shows compact status chips for access, limits, sync
-  readiness, and remote conflict state, and records protected redacted history
-  for send success/failure/provider-pending cases. The implementation
+  readiness, redacted delivery preview, and remote conflict state, and records
+  protected redacted history for send success/failure/provider-pending cases. The implementation
   intentionally avoids a separate oversized remote-management page until
   app/server provider work exists. Bulk time-limit and viewing-space actions now use the same
   protected-profile authority predicate as the command-center rows, so

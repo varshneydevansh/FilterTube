@@ -9384,7 +9384,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     readyCount: 0,
                     revokedCount,
                     staleCount,
-                    totalCount
+                    totalCount,
+                    liveReady: false,
+                    mailboxReady: false,
+                    localNetworkReady: false
                 };
             }
             if (staleCount > 0) {
@@ -9394,7 +9397,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     readyCount: 0,
                     revokedCount,
                     staleCount,
-                    totalCount
+                    totalCount,
+                    liveReady: false,
+                    mailboxReady: false,
+                    localNetworkReady: false
                 };
             }
             return {
@@ -9403,7 +9409,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 readyCount: 0,
                 revokedCount,
                 staleCount,
-                totalCount
+                totalCount,
+                liveReady: false,
+                mailboxReady: false,
+                localNetworkReady: false
             };
         }
         const transports = [
@@ -9419,7 +9428,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             readyCount,
             revokedCount,
             staleCount,
-            totalCount
+            totalCount,
+            liveReady,
+            mailboxReady,
+            localNetworkReady: localReady
         };
     }
 

@@ -328,8 +328,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   const tabViewHtml = read('html/tab-view.html');
 
   assert.match(doc, /Status\*\*: Spec, dashboard protected-profile status, command-center overview/);
-  assert.match(doc, /parent-facing protection strip plus labeled Device\/History row details/);
-  assert.match(doc, /Direct rule bulk writes remain intentionally absent/);
+  assert.match(doc, /parent-facing protection strip plus labeled Delivery\/Device\/History row details/);
+  assert.match(doc, /Direct rule bulk\s+writes remain intentionally absent/);
   assert.match(doc, /Parent-Facing States/);
   assert.match(doc, /UI Boundaries/);
   assert.match(doc, /Current Runtime Binding/);
@@ -339,7 +339,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(doc, /runtime status plaintext rule value exposure: absent/);
   assert.match(doc, /runtime managed command-center overview: present/);
   assert.match(doc, /runtime managed command-center protection strip: present/);
-  assert.match(doc, /runtime managed command-center labeled device\/history details: present/);
+  assert.match(doc, /runtime managed command-center labeled delivery\/device\/history details: present/);
+  assert.match(doc, /runtime managed command-center redacted delivery preview: present/);
   assert.match(doc, /runtime managed command-center delegated action intents: present/);
   assert.match(doc, /runtime managed command-center bulk time-limit controls: present via delegated runtime gate/);
   assert.match(doc, /runtime managed command-center bulk viewing-space controls: present via delegated runtime gate/);
@@ -359,6 +360,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /function buildManagedCommandCenterSummary\(profilesV4, \{ revealDetails = false, helpers = \{\} \} = \{\}\)/);
   assert.match(helperSource, /function buildManagedCommandCenterActionIntents\(profileId, timePolicy, policySummary = \{\}\)/);
   assert.match(helperSource, /function buildManagedCommandCenterBulkActionIntents\(rows = \[\]\)/);
+  assert.match(helperSource, /function resolveManagedCommandCenterDeliveryPreview\(item = \{\}\)/);
   assert.match(helperSource, /function renderManagedCommandCenter\(profilesV4, \{ revealDetails = false, helpers = \{\} \} = \{\}\)/);
   assert.match(helperSource, /panel\.setAttribute\('aria-label', 'Managed parent command center'\)/);
   assert.match(helperSource, /Overview of protected profiles, policy sync, time limits, action history, and delegated actions/);
@@ -370,6 +372,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /bulk_allow_main_kids/);
   assert.match(helperSource, /bulk_kids_only/);
   assert.match(helperSource, /bulk_main_only/);
+  assert.match(helperSource, /resolveDeliveryPreview: resolveManagedCommandCenterDeliveryPreview/);
   assert.match(helperSource, /ft-managed-command-center__select/);
   assert.match(helperSource, /filtertubeManagedAction/);
   assert.match(helperSource, /delegated_runtime_gate/);
@@ -427,6 +430,8 @@ test('managed command-center spec pins parent workflow without making UI authori
   }
 
   assert.match(doc, /Command-center action buttons are action intents only/);
+  assert.match(doc, /The Delivery row preview is a redacted status summary only/);
+  assert.match(doc, /Delivery links and preview labels are not authority/);
   assert.match(doc, /UI choice is not authority; runtime route gate remains the enforcement layer/);
   assert.match(doc, /Runtime budget accounting remains background-owned/);
   assert.match(doc, /Reachability is never authorization/);
@@ -770,11 +775,27 @@ test('managed command-center helper emits delegated action intents without polic
       getProfileName,
       isProfileLocked,
       viewingAccessLabel,
-      managedTimeLimitLabel
+      managedTimeLimitLabel,
+      getManagedSyncTargetSummary: () => ({
+        label: '1 verified device | live ready',
+        targetCount: 1,
+        readyCount: 1,
+        revokedCount: 0,
+        staleCount: 0,
+        totalCount: 1,
+        liveReady: true,
+        mailboxReady: false,
+        localNetworkReady: false,
+        plaintextValue: 'spiders',
+        privateKey: 'not-summary'
+      })
     }
   });
 
   assert.equal(summary.profileCount, 1);
+  assert.equal(summary.rows[0].syncLiveReady, true);
+  assert.equal(summary.rows[0].deliveryPreview.label, 'Live now');
+  assert.equal(summary.rows[0].deliveryPreview.tone, 'success');
   assert.deepEqual(plain(summary.bulkActionIntents), [
     {
       action: 'bulk_edit_rules',
@@ -896,6 +917,7 @@ test('managed command-center helper emits delegated action intents without polic
   ]);
   const serialized = JSON.stringify(summary);
   assert.doesNotMatch(serialized, /spiders/);
+  assert.doesNotMatch(serialized, /not-summary/);
   assert.doesNotMatch(serialized, /secret-policy-hash/);
   assert.doesNotMatch(serialized, /operations/);
   assert.doesNotMatch(serialized, /payload/);
