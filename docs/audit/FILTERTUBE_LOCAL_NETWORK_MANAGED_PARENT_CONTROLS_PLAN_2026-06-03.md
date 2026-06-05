@@ -563,7 +563,11 @@ the current extension dashboard.
 - **Status**: Spec plus first dashboard child-row status increment present.
   Parent/account-authorized child rows can now show compact local revision,
   remote accepted-policy scope/link count, and protected history count status.
-  Child/protected views do not receive detailed managed status text.
+  Child/protected views do not receive detailed managed status text. The next
+  command-center slice is pinned as a dashboard/profile surface requirement for
+  managed profile selection, rule editing, viewing spaces, time limits, sync
+  status, action history, and multi-profile apply; the full command-center panel
+  remains pending.
 - **Acceptance Criteria**:
   - UI has empty, loading, error, locked, offline, and sync-conflict states.
   - Parent actions are clear and reversible where possible.

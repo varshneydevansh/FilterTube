@@ -2,6 +2,8 @@
 
 **Generated**: 2026-06-04
 **Status**: Spec plus first dashboard child-row status increment present.
+The next managed command-center surface requirements are pinned, but the full
+command-center panel is not implemented yet.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 
@@ -55,7 +57,52 @@ runtime child/protected detailed status suppression: present
 runtime status plaintext rule value exposure: absent
 runtime status admin mutation authority: absent
 runtime detailed history modal re-auth gate: present
+runtime full managed command-center panel: absent
 ```
+
+## Next Command-Center Slice
+
+The next UI increment should be a parent/caregiver command center inside the
+existing dashboard profile/settings surface. It should make managed control
+easy for a parent without weakening the authority model:
+
+| Area | Parent/caregiver needs | Boundary |
+| --- | --- | --- |
+| Managed profile selection | See each protected profile, owner relationship, current lock state, and last policy revision. | Child/protected views still hide admin controls and detailed history. |
+| Rule editing | Add or remove keyword, channel, and video rules for one or more protected profiles. | Writes must use the same validated local/remote managed-policy paths as current FilterTube controls. |
+| Viewing spaces | Set Main, Kids, both, or neither per protected profile. | UI choice is not authority; runtime route gate remains the enforcement layer. |
+| Time limits | Set daily YouTube budget, zero-budget timeout, reset timezone, and parent grant per protected profile. | Runtime budget accounting remains background-owned; UI cannot reset consumed time without parent re-auth. |
+| Sync status | Show trusted device, local-network provider, Nanah open-sync, and mailbox status. | Reachability is never authorization; offline state keeps the last valid policy active. |
+| Action history | Show accepted, rejected, conflict, failed-auth, and expired-session rows with filters. | History stays redacted, protected by parent/account re-auth, and never becomes policy authority. |
+| Multi-profile apply | Apply a rule or time-limit change to selected protected profiles in one explicit operation. | Each target needs its own target profile, trusted link, scope, revision, hash, and signature/integrity proof. |
+
+Required UI states for that slice:
+
+- empty managed profile list;
+- locked parent/account session;
+- successful local save;
+- pending P2P/local-network delivery;
+- offline trusted device;
+- rejected or conflicted remote update;
+- failed provider/mailbox pull;
+- time limit exhausted;
+- no-policy/no-work state.
+
+Design constraints:
+
+- Mobile-first layout with a single-column protected-profile list before any
+  wider dashboard grouping.
+- Touch targets for actions, toggles, and profile selectors must remain at
+  least 44px high.
+- Use segmented controls for Main/Kids access, switches for enablement, numeric
+  inputs or steppers for time budgets, and a dense table only for action
+  history.
+- Avoid nested cards and marketing-style hero sections; this is a working
+  control surface.
+- Avoid showing raw JSON, plaintext sensitive rule values, PINs, private keys,
+  mailbox ciphertext, or YouTube DOM/debug identifiers.
+- Do not add YouTube content-script observers, timers, DOM scans, or JSON work
+  for dashboard-only managed-control UI.
 
 ## Design Notes
 

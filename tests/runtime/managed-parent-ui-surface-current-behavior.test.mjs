@@ -114,13 +114,17 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   const source = read('js/tab-view.js');
 
   assert.match(doc, /Status\*\*: Spec plus first dashboard child-row status increment present/);
+  assert.match(doc, /full\s+command-center panel is not implemented yet/);
   assert.match(doc, /Parent-Facing States/);
   assert.match(doc, /UI Boundaries/);
   assert.match(doc, /Current Runtime Binding/);
+  assert.match(doc, /Next Command-Center Slice/);
   assert.match(doc, /runtime managed parent child-row status helper: present/);
   assert.match(doc, /runtime child\/protected detailed status suppression: present/);
   assert.match(doc, /runtime status plaintext rule value exposure: absent/);
+  assert.match(doc, /runtime full managed command-center panel: absent/);
   assert.match(plan, new RegExp(docPath));
+  assert.match(plan, /next\s+command-center slice is pinned as a dashboard\/profile surface requirement/);
   assert.match(inventory, new RegExp(docPath));
   assert.match(inventory, /compact,\s+read-only managed status line/);
   assert.match(inventory, /display evidence only/);
@@ -132,6 +136,48 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /ft-managed-profile-status/);
   assert.match(source, /historyBtn\.textContent = 'History'/);
   assert.match(source, /ensureProfileUnlocked\(fresh, currentActive, \{ sensitiveAction: true \}\)/);
+});
+
+test('managed command-center spec pins parent workflow without making UI authority', () => {
+  const doc = read(docPath);
+
+  for (const area of [
+    'Managed profile selection',
+    'Rule editing',
+    'Viewing spaces',
+    'Time limits',
+    'Sync status',
+    'Action history',
+    'Multi-profile apply'
+  ]) {
+    assert.match(doc, new RegExp(area));
+  }
+
+  for (const state of [
+    'empty managed profile list',
+    'locked parent/account session',
+    'successful local save',
+    'pending P2P/local-network delivery',
+    'offline trusted device',
+    'rejected or conflicted remote update',
+    'failed provider/mailbox pull',
+    'time limit exhausted',
+    'no-policy/no-work state'
+  ]) {
+    assert.match(doc, new RegExp(state));
+  }
+
+  assert.match(doc, /UI choice is not authority; runtime route gate remains the enforcement layer/);
+  assert.match(doc, /Runtime budget accounting remains background-owned/);
+  assert.match(doc, /Reachability is never authorization/);
+  assert.match(doc, /Each target needs its own target profile, trusted link, scope, revision, hash, and signature\/integrity proof/);
+  assert.match(doc, /Mobile-first layout with a single-column protected-profile list/);
+  assert.match(doc, /Touch targets .* at\s+least 44px high/);
+  assert.match(doc, /Use segmented controls for Main\/Kids access/);
+  assert.match(doc, /dense table only for action\s+history/);
+  assert.match(doc, /Avoid nested cards and marketing-style hero sections/);
+  assert.match(doc, /Do not add YouTube content-script observers, timers, DOM scans, or JSON work/);
+  assert.match(doc, /Avoid showing raw JSON, plaintext sensitive rule values, PINs, private keys,\s+mailbox ciphertext, or YouTube DOM\/debug identifiers/);
 });
 
 test('managed parent status summary shows revisions without plaintext rule values', () => {
