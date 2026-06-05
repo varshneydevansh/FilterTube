@@ -57,6 +57,13 @@ function managedActionHistoryRowIsProtected(row) {
     || ['trust_link.revoke', 'policy.time_limit.update', 'policy.viewing_space.update'].includes(actionType);
 }
 
+const MANAGED_ACTION_HISTORY_SAFE_LABELS = Object.freeze({
+  'remote_policy.reject': 'Remote policy rejected',
+  'remote_policy.source_push': 'Parent policy push',
+  'policy.time_limit.update': 'Time limit policy changed',
+  'policy.viewing_space.update': 'Viewing space policy changed'
+});
+
 function summarizeManagedPolicyStateForProfile(profile) {
   const managedState = safeObject(profile?.managedPolicyState);
   const localEdits = safeObject(managedState.localManagedEdits);
@@ -87,6 +94,10 @@ function summarizeManagedPolicyStateForProfile(profile) {
     : [];
   const protectedRows = historyRows.filter(managedActionHistoryRowIsProtected);
   const latestRow = safeObject(historyRows[historyRows.length - 1]);
+  const latestActionType = normalizeString(latestRow.actionType);
+  const latestSafeLabel = MANAGED_ACTION_HISTORY_SAFE_LABELS[latestActionType] || latestActionType || '';
+  const latestResult = normalizeString(latestRow.result);
+  const latestScope = normalizeString(latestRow.scope);
   return {
     localLabels,
     remoteLinkCount,
@@ -94,8 +105,11 @@ function summarizeManagedPolicyStateForProfile(profile) {
     latestRemoteRevision,
     historyRowCount: historyRows.length,
     protectedRowCount: protectedRows.length,
-    latestResult: normalizeString(latestRow.result),
-    latestScope: normalizeString(latestRow.scope)
+    latestResult,
+    latestScope,
+    latestActionLabel: latestSafeLabel && latestResult
+      ? `${latestResult} · ${latestSafeLabel}`
+      : (latestSafeLabel || (latestResult && latestScope ? `${latestResult}/${latestScope}` : ''))
   };
 }
 
@@ -113,8 +127,8 @@ function buildManagedProfileStatusText(profile, { revealDetails = false } = {}) 
   }
   if (summary.historyRowCount) {
     const rowLabel = summary.historyRowCount === 1 ? 'row' : 'rows';
-    const latest = summary.latestResult && summary.latestScope
-      ? `, latest ${summary.latestResult}/${summary.latestScope}`
+    const latest = summary.latestActionLabel
+      ? `, latest ${summary.latestActionLabel}`
       : '';
     parts.push(`History: ${summary.historyRowCount} ${rowLabel}, ${summary.protectedRowCount} protected${latest}`);
   }
@@ -271,7 +285,7 @@ function buildManagedCommandCenterSummary(profilesV4, { revealDetails = false } 
         remoteScopeCount: summary.remoteScopeCount,
         historyRowCount: summary.historyRowCount,
         protectedRowCount: summary.protectedRowCount,
-        latestActionLabel: summary.latestResult && summary.latestScope ? `${summary.latestResult}/${summary.latestScope}` : 'none',
+        latestActionLabel: summary.latestActionLabel || (summary.latestResult && summary.latestScope ? `${summary.latestResult}/${summary.latestScope}` : 'none'),
         actionIntents: [
           {
             action: 'edit_rules',
@@ -359,6 +373,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
 
   assert.match(source, /function buildManagedProfileStatusText\(profile, \{ revealDetails = false \} = \{\}\)/);
   assert.match(source, /function summarizeManagedPolicyStateForProfile\(profile\)/);
+  assert.match(source, /latestActionLabel/);
+  assert.match(source, /MANAGED_ACTION_HISTORY_SAFE_LABELS\[latestActionType\]/);
   assert.match(helperSource, /function buildManagedCommandCenterSummary\(profilesV4, \{ revealDetails = false, helpers = \{\} \} = \{\}\)/);
   assert.match(helperSource, /function buildManagedCommandCenterActionIntents\(profileId, timePolicy, policySummary = \{\}\)/);
   assert.match(helperSource, /function buildManagedCommandCenterBulkActionIntents\(rows = \[\]\)/);
@@ -571,7 +587,7 @@ test('managed command-center overview aggregates parent-visible profiles without
   assert.equal(summary.rows[0].viewingAccess, 'Main only');
   assert.equal(summary.rows[0].timeLimit, '2h/day');
   assert.equal(summary.rows[0].syncLabel, 'Remote r4');
-  assert.equal(summary.rows[0].latestActionLabel, 'rejected/channels');
+  assert.equal(summary.rows[0].latestActionLabel, 'rejected · Remote policy rejected');
   assert.deepEqual(plain(summary.bulkActionIntents), [
     {
       action: 'bulk_set_time_limit',
@@ -729,7 +745,7 @@ test('managed parent status summary shows revisions without plaintext rule value
   assert.match(status, /^Managed status: /);
   assert.match(status, /Local edits: Main r3, .*, Kids r1/);
   assert.match(status, /Remote sync: 2 scopes across 1 link, latest r5/);
-  assert.match(status, /History: 2 rows, 1 protected, latest rejected\/keywords/);
+  assert.match(status, /History: 2 rows, 1 protected, latest rejected · Remote policy rejected/);
   assert.doesNotMatch(status, /spiders/);
   assert.doesNotMatch(status, /UC-secret/);
   assert.doesNotMatch(status, /video-secret/);

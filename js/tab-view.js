@@ -5210,6 +5210,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const historyRows = getManagedActionHistoryRows(profile);
         const protectedRows = historyRows.filter(managedActionHistoryRowIsProtected);
         const latestRow = safeObject(historyRows[historyRows.length - 1]);
+        const latestActionType = normalizeString(latestRow.actionType);
+        const latestSafeLabel = MANAGED_ACTION_HISTORY_SAFE_LABELS[latestActionType] || latestActionType || '';
+        const latestResult = normalizeString(latestRow.result);
+        const latestScope = normalizeString(latestRow.scope);
         const conflictRows = Object.values(remotePolicyConflicts)
             .map(safeObject)
             .filter(row => row.schema === MANAGED_REMOTE_POLICY_CONFLICT_SCHEMA);
@@ -5221,8 +5225,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             historyRowCount: historyRows.length,
             protectedRowCount: protectedRows.length,
             remoteConflictCount: conflictRows.length,
-            latestResult: normalizeString(latestRow.result),
-            latestScope: normalizeString(latestRow.scope)
+            latestResult,
+            latestScope,
+            latestActionLabel: latestSafeLabel && latestResult
+                ? `${latestResult} · ${latestSafeLabel}`
+                : (latestSafeLabel || (latestResult && latestScope ? `${latestResult}/${latestScope}` : ''))
         };
     }
 
@@ -5240,8 +5247,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (summary.historyRowCount) {
             const rowLabel = summary.historyRowCount === 1 ? 'row' : 'rows';
-            const latest = summary.latestResult && summary.latestScope
-                ? `, latest ${summary.latestResult}/${summary.latestScope}`
+            const latest = summary.latestActionLabel
+                ? `, latest ${summary.latestActionLabel}`
                 : '';
             parts.push(`History: ${summary.historyRowCount} ${rowLabel}, ${summary.protectedRowCount} protected${latest}`);
         }

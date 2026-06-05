@@ -711,8 +711,8 @@ the current extension dashboard.
   per manageable target, exposes per-row Send Update, select-all/clear bulk
   controls, and selected-profile Send selected updates actions, shows compact
   status chips for access, limits, sync readiness, redacted delivery preview,
-  delivery-path detail, and remote conflict state, and records protected
-  redacted history for send
+  delivery-path detail, safe latest-action labels, and remote conflict state,
+  and records protected redacted history for send
   success/failure/provider-pending cases. The implementation
   intentionally avoids a separate oversized remote-management page until
   app/server provider work exists. Bulk keyword/channel/video rule additions

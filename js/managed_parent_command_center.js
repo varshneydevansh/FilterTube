@@ -380,9 +380,9 @@
             const summary = h.summarizeManagedPolicyStateForProfile(profile);
             const syncTarget = h.getManagedSyncTargetSummary(profileId);
             const timePolicy = h.getManagedTimeLimitPolicy(profile);
-            const latestActionLabel = summary.latestResult && summary.latestScope
-                ? `${summary.latestResult}/${summary.latestScope}`
-                : 'none';
+            const latestActionLabel = typeof summary.latestActionLabel === 'string' && summary.latestActionLabel.trim()
+                ? summary.latestActionLabel.trim()
+                : (summary.latestResult && summary.latestScope ? `${summary.latestResult}/${summary.latestScope}` : 'none');
             const syncLabel = summary.remoteScopeCount
                 ? `Remote r${summary.latestRemoteRevision}`
                 : (summary.localLabels.length ? 'Local managed' : 'No policy yet');
