@@ -86,7 +86,8 @@ extension authority code.
 - [x] Dashboard command center lists protected profiles, time-limit state,
   viewing-space state, protected history count, verified-device readiness,
   re-pairing status for revoked/stale managed links, compact delivery-path
-  detail, and delegated actions.
+  detail, delegated actions, and grouped Rules/Send/Time/Access selected-profile
+  bulk action rails.
 - [x] Command center can send signed active managed-policy updates to currently
   connected verified replica devices over Nanah P2P.
 - [x] Command center can hand ciphertext mailbox items or signed LAN candidates

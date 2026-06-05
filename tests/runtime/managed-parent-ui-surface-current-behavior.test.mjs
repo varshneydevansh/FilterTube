@@ -366,7 +366,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(doc, /runtime YouTube hot-path work from command-center UI: absent/);
   assert.match(plan, new RegExp(docPath));
   assert.match(plan, /command-center\s+overview for protected profiles/);
-  assert.match(plan, /Dashboard command center lists protected profiles, time-limit state,\s+viewing-space state, protected history count, verified-device readiness,\s+re-pairing status for revoked\/stale managed links, compact delivery-path\s+detail, and delegated actions/);
+  assert.match(plan, /Dashboard command center lists protected profiles, time-limit state,\s+viewing-space state, protected history count, verified-device readiness,\s+re-pairing status for revoked\/stale managed links, compact delivery-path\s+detail, delegated actions, and grouped Rules\/Send\/Time\/Access selected-profile\s+bulk action rails/);
   assert.match(inventory, new RegExp(docPath));
   assert.match(inventory, /read-only\s+managed status line on that child row plus a command center overview/);
   assert.match(inventory, /selected-profile verified-device send actions/);
