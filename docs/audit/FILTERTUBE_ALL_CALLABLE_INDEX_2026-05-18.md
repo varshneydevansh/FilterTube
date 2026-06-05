@@ -21,9 +21,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 73
-method semantic proof gap lexical callables covered: 6282
+method semantic proof gap lexical callables covered: 6296
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6282
+lexical callables requiring semantic proof before behavior changes: 6296
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -68,14 +68,14 @@ changes remain blocked by the implementation gate.
 
 ```text
 tracked JS/JSX/MJS files: 73
-repo-wide lexical callables: 6282
+repo-wide lexical callables: 6296
 ```
 
 | Family | Files | Lexical callables | Boundary |
 | --- | ---: | ---: | --- |
 | Hot page/background runtime | 9 | 3173 | Already has detailed first-pass hot runtime table in `FILTERTUBE_FUNCTION_COVERAGE_2026-05-17.md`. |
 | Content helper runtime | 9 | 348 | First-pass helper surface audit exists, but behavior fixtures remain incomplete. |
-| UI/settings runtime | 14 | 2074 | First-pass UI/settings audit exists, but action-level fixtures remain incomplete. |
+| UI/settings runtime | 14 | 2088 | First-pass UI/settings audit exists, but action-level fixtures remain incomplete. |
 | Generated/quarantined UI | 6 | 147 | Generated source/output and `js/layout.js`; freshness and quarantine checks required. |
 | Vendor bundles | 2 | 279 | API/provenance boundary, not product-owned method behavior. |
 | Build/sync scripts | 4 | 58 | Release/package/native-sync behavior; separate release fixtures required. |
@@ -108,7 +108,7 @@ repo-wide lexical callables: 6282
 | `js/layout.js` | Generated/quarantined UI | 52 | quarantined/generated boundary |
 | `js/managed_admin_authority.js` | UI/settings runtime | 18 | UI/settings counted |
 | `js/managed_parent_command_center.js` | UI/settings runtime | 14 | UI/settings counted |
-| `js/nanah_managed_live_policy.js` | UI/settings runtime | 87 | UI/settings counted |
+| `js/nanah_managed_live_policy.js` | UI/settings runtime | 97 | UI/settings counted |
 | `js/nanah_managed_open_sync.js` | UI/settings runtime | 33 | UI/settings counted |
 | `js/nanah_sync_adapter.js` | UI/settings runtime | 166 | UI/settings counted |
 | `js/popup.js` | UI/settings runtime | 131 | UI/settings counted |
@@ -118,7 +118,7 @@ repo-wide lexical callables: 6282
 | `js/settings_shared.js` | UI/settings runtime | 43 | UI/settings counted |
 | `js/shared/identity.js` | Content helper runtime | 92 | helper counted |
 | `js/state_manager.js` | UI/settings runtime | 155 | UI/settings counted |
-| `js/tab-view.js` | UI/settings runtime | 1097 | UI/settings counted |
+| `js/tab-view.js` | UI/settings runtime | 1101 | UI/settings counted |
 | `js/ui-shell/popup-shell.js` | Generated/quarantined UI | 42 | generated output boundary |
 | `js/ui-shell/tab-view-decor.js` | Generated/quarantined UI | 41 | generated output boundary |
 | `js/ui_components.js` | UI/settings runtime | 64 | UI/settings counted |
@@ -168,13 +168,13 @@ repo-wide lexical callables: 6282
    one behavior surface.
 
 2. **`js/tab-view.js` is the largest UI surface.**
-   The broad parser finds 1,078 callable forms. Any dashboard change can cross
+   The broad parser finds 1,101 callable forms. Any dashboard change can cross
    profiles, filters, Kids, Nanah, import/export, release notes, settings, and
    app-card flows.
 
 3. **The hot runtime is not the whole product.**
    Hot runtime has 3,173 lexical callables, but UI/settings, content helpers,
-   generated shell, vendor, build scripts, and website add another 3,109
+   generated shell, vendor, build scripts, and website add another 3,123
    lexical callable forms.
 
 4. **Vendor and generated files must stay explicitly bounded.**
@@ -209,5 +209,5 @@ That fixture pins:
 
 - all tracked JS/JSX/MJS files are listed,
 - documented callable counts match current lexical source,
-- documented family totals sum to 6,282,
+- documented family totals sum to 6,296,
 - no ignored raw captures or generated package output are part of this index.

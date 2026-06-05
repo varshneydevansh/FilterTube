@@ -8736,6 +8736,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         return true;
     }
 
+    function getNanahManagedMailboxProvider() {
+        return safeObject(window.FilterTubeManagedPolicyMailbox);
+    }
+
+    async function purgeNanahManagedMailboxQueueForTrustedLink(link, { reason = 'trusted_link_removed' } = {}) {
+        const trusted = normalizeNanahTrustedLink(link);
+        if (!trusted || trusted.linkType !== 'managed_link' || trusted.localRole !== 'source' || trusted.remoteRole !== 'replica') {
+            return { ok: false, reason: 'not_source_managed_link', purgedMailboxItemCount: 0 };
+        }
+        if (!nanahManagedLivePolicy || typeof nanahManagedLivePolicy.purgeMailboxItemsForTrustedLink !== 'function') {
+            return { ok: false, reason: 'managed_mailbox_purge_unavailable', purgedMailboxItemCount: 0 };
+        }
+        const now = Date.now();
+        try {
+            return await nanahManagedLivePolicy.purgeMailboxItemsForTrustedLink(
+                trusted,
+                getNanahManagedMailboxProvider(),
+                {
+                    reason,
+                    requestedAt: now,
+                    revokedAt: now
+                }
+            );
+        } catch (error) {
+            return {
+                ok: false,
+                reason: normalizeString(error?.message) || 'mailbox_purge_provider_failed',
+                purgedMailboxItemCount: 0
+            };
+        }
+    }
+
     async function saveNanahTrustedLink(entry) {
         const deviceId = normalizeString(entry?.remoteDeviceId);
         if (!deviceId) return;
@@ -8772,13 +8804,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function removeNanahTrustedLink(linkId) {
         const normalized = normalizeString(linkId);
-        if (!normalized) return;
+        if (!normalized) return { mailboxPurgeResult: null };
+        const removedLink = normalizeNanahTrustedLink(
+            nanahTrustedLinks.find((entry) => normalizeString(entry?.linkId) === normalized)
+        );
+        const mailboxPurgeResult = await purgeNanahManagedMailboxQueueForTrustedLink(removedLink);
         nanahTrustedLinks = nanahTrustedLinks.filter((entry) => normalizeString(entry?.linkId) !== normalized);
         await purgeNanahManagedPolicyStateForTrustedLink(normalized);
         await purgeNanahManagedOpenSyncStateForTrustedLink(normalized);
         await purgeNanahManagedLocalNetworkSyncStateForTrustedLink(normalized);
         await persistNanahTrustedLinks();
         renderNanahTrustedLinks();
+        return { mailboxPurgeResult };
     }
 
     async function updateNanahTrustedLinkPolicy(linkId, updates = {}) {

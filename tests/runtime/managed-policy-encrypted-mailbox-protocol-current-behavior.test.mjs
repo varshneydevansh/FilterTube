@@ -261,8 +261,8 @@ test('managed mailbox protocol is docs-backed and linked from plan and inventory
   const plan = read(planPath);
   const inventory = read(inventoryPath);
 
-  assert.match(doc, /Status\*\*: Protocol, proof fixture, source-side WebCrypto mailbox seal\/open\s+helpers, source-side server-safe mailbox storage item builder, local decrypted\s+mailbox-item intake, source-side mailbox upload-provider handoff,\s+provider-gated dashboard\/profile-open pull hook, provider ack handoff,\s+protected target-profile ack-handoff evidence, and revoked queued-delivery\s+local apply guard proof are present/);
-  assert.match(doc, /Runtime built-in\s+server upload\/pull clients\s+are not implemented/);
+  assert.match(doc, /Status\*\*: Protocol, proof fixture, source-side WebCrypto mailbox seal\/open\s+helpers, source-side server-safe mailbox storage item builder, local decrypted\s+mailbox-item intake, source-side mailbox upload-provider handoff,\s+source-side mailbox purge-provider handoff,\s+provider-gated dashboard\/profile-open pull hook, provider ack handoff,\s+protected target-profile ack-handoff evidence, and revoked queued-delivery\s+local apply guard proof are present/);
+  assert.match(doc, /Runtime built-in\s+server upload\/pull clients\s+and purge clients\s+are not implemented/);
   assert.match(doc, /The mailbox server is storage and relay only/);
   assert.match(doc, /must never receive plaintext rules, keywords, channel names,\s+video ids, viewing-space settings, time budgets, PIN values, or action-history\s+summaries/);
   assert.match(doc, /filtertube_managed_mailbox_item/);
@@ -283,7 +283,9 @@ test('managed mailbox protocol is docs-backed and linked from plan and inventory
   assert.match(doc, /runtime revoked queued-delivery local apply guard: present/);
   assert.match(doc, /runtime mailbox encryption client: present for local seal helper only/);
   assert.match(doc, /runtime source-side mailbox upload-provider handoff: present/);
+  assert.match(doc, /runtime source-side mailbox purge-provider handoff: present/);
   assert.match(doc, /runtime built-in mailbox server upload client: absent/);
+  assert.match(doc, /runtime built-in mailbox server purge client: absent/);
   assert.match(doc, /runtime mailbox decryption client: present for local open helper only/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));

@@ -4,10 +4,11 @@
 **Status**: Protocol, proof fixture, source-side WebCrypto mailbox seal/open
 helpers, source-side server-safe mailbox storage item builder, local decrypted
 mailbox-item intake, source-side mailbox upload-provider handoff,
+source-side mailbox purge-provider handoff,
 provider-gated dashboard/profile-open pull hook, provider ack handoff,
 protected target-profile ack-handoff evidence, and revoked queued-delivery
 local apply guard proof are present. Runtime built-in server upload/pull clients
-are not implemented.
+and purge clients are not implemented.
 **Related plan**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`  
 **Related inventory**:
@@ -198,6 +199,17 @@ hands optional providers only `filtertube_managed_mailbox_item` rows with
 ciphertext metadata. It records source-side sent revision/hash state only for
 mailbox item ids the provider reports as accepted.
 
+Source-side mailbox purge-provider handoff is now present through
+`buildMailboxPurgeRequestForTrustedLink(...)` and
+`purgeMailboxItemsForTrustedLink(...)` in
+`js/nanah_managed_live_policy.js`, with dashboard wiring through
+`purgeNanahManagedMailboxQueueForTrustedLink(...)`. When a parent/source removes
+a trusted child/replica link, the dashboard can ask an optional provider to
+purge pending ciphertext rows for that link after sensitive parent/account
+re-auth. The purge request includes only link, device, profile, scope, pending
+state, and revocation metadata. It does not include mailbox items, plaintext
+rules, decrypted envelopes, or private keys.
+
 Local mailbox encryption/decryption helpers are now present through
 `sealManagedMailboxEnvelope(...)` and `openManagedMailboxStorageItem(...)`.
 The seal helper encrypts a signed managed-policy envelope with AES-GCM,
@@ -209,8 +221,9 @@ ciphertext hash mismatch, authenticated-metadata tampering, wrong wrapping
 keys, and decrypted envelope/metadata binding mismatches before it returns a
 local/decrypted mailbox item.
 
-The runtime still does not implement a built-in server mailbox upload client or
-server mailbox pull scheduler. The mailbox server cannot become policy authority. The
+The runtime still does not implement a built-in server mailbox upload client,
+server mailbox pull scheduler, or server mailbox purge client. The mailbox
+server cannot become policy authority. The
 first pull-on-open hook now exists only as a provider-gated
 dashboard/profile-open bridge for local/decrypted mailbox items, and the same
 provider can receive redacted ack records after extension-side
@@ -224,7 +237,10 @@ Revoked queued delivery now has an executable local apply guard: direct signed
 managed envelopes and already-decrypted mailbox items both return
 `link_revoked` before any profile save when the local trusted link has been
 revoked. Mailbox apply reports `ackState: revoked` for that local decision. This
-is not server queue purge; no built-in mailbox server queue exists yet.
+is not built-in server queue purge; no built-in mailbox server queue exists yet.
+Source-side trust removal can now hand an optional provider a redacted purge
+request for pending ciphertext rows, but the extension still does not own a
+server queue.
 
 Current runtime status:
 
@@ -233,6 +249,7 @@ runtime mailbox item schema intake: present for local/decrypted items
 runtime mailbox seal/open encryption helper: present
 runtime source-side server-safe mailbox storage item builder: present
 runtime source-side mailbox upload-provider handoff: present
+runtime source-side mailbox purge-provider handoff: present
 runtime mailbox item metadata-to-envelope binding: present
 runtime mailbox item signature gate reuse: present
 runtime mailbox item managed-policy apply wrapper: present
@@ -244,7 +261,8 @@ runtime provider failure fail-closed apply guard: present
 runtime revoked queued-delivery local apply guard: present
 runtime mailbox encryption client: present for local seal helper only
 runtime built-in mailbox server upload client: absent
+runtime built-in mailbox server purge client: absent
 runtime built-in mailbox server pull client: absent
 runtime mailbox decryption client: present for local open helper only
-runtime behavior changed by this slice: yes, for local mailbox seal/open helpers, source-side server-safe mailbox storage item building, source-side mailbox upload-provider handoff, local/decrypted mailbox item intake, provider-gated dashboard/profile-open pull status, provider ack handoff, and protected target-profile ack-handoff evidence only
+runtime behavior changed by this slice: yes, for local mailbox seal/open helpers, source-side server-safe mailbox storage item building, source-side mailbox upload-provider handoff, source-side mailbox purge-provider handoff, local/decrypted mailbox item intake, provider-gated dashboard/profile-open pull status, provider ack handoff, and protected target-profile ack-handoff evidence only
 ```

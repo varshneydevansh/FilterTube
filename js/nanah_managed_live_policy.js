@@ -9,6 +9,7 @@
     const MANAGED_LOCAL_NETWORK_CANDIDATE_SCHEMA = 'filtertube_managed_local_network_candidate';
     const MANAGED_LOCAL_NETWORK_DELIVERY_REQUEST_SCHEMA = 'filtertube_managed_local_network_delivery_request';
     const MANAGED_MAILBOX_UPLOAD_REQUEST_SCHEMA = 'filtertube_managed_mailbox_upload_request';
+    const MANAGED_MAILBOX_PURGE_REQUEST_SCHEMA = 'filtertube_managed_mailbox_purge_request';
     const MANAGED_LIVE_ACK_HISTORY_SCHEMA = 'filtertube_managed_live_ack_history';
     const MANAGED_REMOTE_DELIVERY_ACK_HISTORY_SCHEMA = 'filtertube_managed_remote_delivery_ack_history';
     const MANAGED_OUTBOUND_HISTORY_SCHEMA = 'filtertube_managed_outbound_policy_history';
@@ -405,7 +406,7 @@
             const proof = safeObject(root.auth || root.adminAuth || root.authorization);
             if (root.providerDeliveryAuthorized === true || root.adminAuthorized === true || proof.ok === true || proof.valid === true || proof.authorized === true) return { ok: true };
             if (typeof deps.ensureManagedProviderDeliveryAuthorized !== 'function') return { ok: false, reason: 'managed_provider_delivery_reauth_required' };
-            const result = await deps.ensureManagedProviderDeliveryAuthorized({ transport, reason: normalizeString(root.reason) || 'manual_send', sensitiveAction: true, ...safeObject(context) });
+            const result = await deps.ensureManagedProviderDeliveryAuthorized({ ...safeObject(context), transport, reason: normalizeString(root.reason) || 'manual_send', sensitiveAction: true });
             const normalized = safeObject(result);
             if (result === true || normalized.ok === true || normalized.valid === true || normalized.authorized === true) return { ok: true };
             return { ok: false, reason: normalizeString(normalized.reason || normalized.error) || 'managed_provider_delivery_reauth_required' };
@@ -716,6 +717,121 @@
             return uploadMailboxItems(items, provider, { ...safeObject(options), providerDeliveryAuthorized: true });
         }
 
+        function resolveTrustedLinkProviderScopes(trustedLink) {
+            const trusted = deps.normalizeTrustedLink(trustedLink);
+            const policy = safeObject(trusted?.policy);
+            const allowedScopes = deps.getAllowedScopeList(policy.allowedScopes || policy.defaultScope)
+                .map(scope => normalizeScope(scope))
+                .filter(Boolean);
+            const outgoingScopes = Object.keys(safeObject(policy.outgoingManagedPolicies))
+                .map(scope => normalizeScope(scope))
+                .filter(Boolean);
+            return Array.from(new Set([...allowedScopes, ...outgoingScopes]));
+        }
+
+        function buildMailboxPurgeRequestForTrustedLink(trustedLink, options = {}) {
+            const trusted = deps.normalizeTrustedLink(trustedLink);
+            const optionRoot = safeObject(options);
+            if (!trusted || trusted.linkType !== 'managed_link') {
+                throw new Error('Mailbox purge requests require a saved managed link.');
+            }
+            if (trusted.localRole !== 'source' || trusted.remoteRole !== 'replica') {
+                throw new Error('Mailbox purge requests require Source -> Replica roles.');
+            }
+            const linkId = normalizeString(trusted.linkId || trusted.id);
+            if (!linkId) {
+                throw new Error('Mailbox purge requests require a trusted link id.');
+            }
+
+            const policy = safeObject(trusted.policy);
+            const localContext = deps.getLocalProfileContext();
+            const requestedAt = normalizeNonNegativeInteger(optionRoot.requestedAt) || deps.now();
+            return {
+                schema: MANAGED_MAILBOX_PURGE_REQUEST_SCHEMA,
+                version: 1,
+                transport: 'encrypted_mailbox',
+                reason: normalizeString(optionRoot.reason) || 'trusted_link_removed',
+                requestedAt,
+                linkId,
+                remoteDeviceId: normalizeString(trusted.remoteDeviceId),
+                sourceDeviceId: normalizeString(trusted.sourceDeviceId || policy.sourceDeviceId) || normalizeString(deps.getStableDeviceId()),
+                sourceProfileId: normalizeString(trusted.sourceProfileId || policy.sourceProfileId) || normalizeString(localContext.profileId),
+                targetProfileId: normalizeString(policy.targetProfileId),
+                targetProfileName: normalizeString(policy.targetProfileName),
+                scopes: resolveTrustedLinkProviderScopes(trusted),
+                purgeStates: ['pending'],
+                revokedAt: normalizeNonNegativeInteger(optionRoot.revokedAt) || requestedAt
+            };
+        }
+
+        function getMailboxPurgeWriter(provider) {
+            const root = safeObject(provider);
+            return root.purgeManagedMailboxItems
+                || root.deleteManagedMailboxItems
+                || root.revokeManagedMailboxItems
+                || root.markManagedMailboxItemsRevoked
+                || null;
+        }
+
+        function normalizePurgedMailboxItemCount(result, ok) {
+            const root = safeObject(result);
+            const count = Number(root.purgedMailboxItemCount ?? root.deletedMailboxItemCount ?? root.revokedMailboxItemCount ?? root.mailboxItemCount);
+            return Number.isFinite(count)
+                ? Math.max(0, Math.floor(count))
+                : (ok ? 0 : 0);
+        }
+
+        async function purgeMailboxItemsForTrustedLink(trustedLink, provider, options = {}) {
+            let request = null;
+            try {
+                request = buildMailboxPurgeRequestForTrustedLink(trustedLink, options);
+            } catch (error) {
+                return {
+                    ok: false,
+                    reason: normalizeString(error?.message) || 'mailbox_purge_request_invalid',
+                    purgedMailboxItemCount: 0,
+                    request: null
+                };
+            }
+            const auth = await ensureProviderDeliveryAuthorized('encrypted_mailbox_purge', options, request);
+            if (!auth.ok) {
+                return {
+                    ok: false,
+                    reason: auth.reason,
+                    purgedMailboxItemCount: 0,
+                    request
+                };
+            }
+
+            const writer = getMailboxPurgeWriter(provider);
+            if (!writer) {
+                return {
+                    ok: false,
+                    reason: 'mailbox_purge_provider_unavailable',
+                    purgedMailboxItemCount: 0,
+                    request
+                };
+            }
+
+            try {
+                const rawResult = safeObject(await writer.call(provider, request));
+                const ok = rawResult.ok !== false;
+                return {
+                    ok,
+                    reason: normalizeString(rawResult.reason),
+                    purgedMailboxItemCount: normalizePurgedMailboxItemCount(rawResult, ok),
+                    request
+                };
+            } catch (error) {
+                return {
+                    ok: false,
+                    reason: normalizeString(error?.message) || 'mailbox_purge_provider_failed',
+                    purgedMailboxItemCount: 0,
+                    request
+                };
+            }
+        }
+
         function normalizeAckState(value) {
             const normalized = normalizeString(value).toLowerCase();
             if (normalized === 'accepted' || normalized === 'applied') return 'delivered';
@@ -983,6 +1099,8 @@
             buildMailboxUploadRequest,
             uploadMailboxItems,
             uploadMailboxPolicyBatch,
+            buildMailboxPurgeRequestForTrustedLink,
+            purgeMailboxItemsForTrustedLink,
             buildOutboundHistoryRow,
             buildLiveAckPayload,
             recordLiveAckPayload,

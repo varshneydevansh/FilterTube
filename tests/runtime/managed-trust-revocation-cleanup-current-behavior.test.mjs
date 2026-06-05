@@ -85,7 +85,7 @@ function purgeRemoteManagedPolicyStateForTrustedLinkFixture(profilesV4, linkId, 
   };
 }
 
-test('managed trust revocation cleanup is runtime-backed and documented as local cleanup only', () => {
+test('managed trust revocation cleanup is runtime-backed with provider-gated mailbox purge handoff', () => {
   const tabView = read('js/tab-view.js');
   const inventory = read(inventoryPath);
   const plan = read(planPath);
@@ -97,12 +97,16 @@ test('managed trust revocation cleanup is runtime-backed and documented as local
   assert.match(tabView, /removedScopeCount: removedScopes\.length/);
   assert.match(tabView, /async function purgeNanahManagedOpenSyncStateForTrustedLink\(linkId\)/);
   assert.match(tabView, /reasonCode: 'trusted_link_removed'/);
+  assert.match(tabView, /async function purgeNanahManagedMailboxQueueForTrustedLink\(link, \{ reason = 'trusted_link_removed' \} = \{\}\)/);
+  assert.match(tabView, /nanahManagedLivePolicy\.purgeMailboxItemsForTrustedLink/);
+  assert.match(tabView, /await purgeNanahManagedMailboxQueueForTrustedLink\(removedLink\)/);
   assert.match(tabView, /await purgeNanahManagedPolicyStateForTrustedLink\(normalized\)/);
   assert.match(tabView, /await purgeNanahManagedOpenSyncStateForTrustedLink\(normalized\)/);
   assert.match(tabView, /removeBtn\.disabled = childManagedReplicaLink/);
 
   assert.match(inventory, /trusted-link removal now purges\s+target-local accepted managed-policy revision state/i);
-  assert.match(inventory, /server mailbox queue\s+purge remains pending/i);
+  assert.match(inventory, /provider-gated source-side mailbox purge request/i);
+  assert.match(inventory, /built-in server\s+mailbox purge client remains absent/i);
   assert.match(plan, /trusted-link removal cleanup: present/i);
   assert.match(history, /trusted-link removal history writer\s+now records protected `trust_link\.revoke`\s+rows/i);
 });

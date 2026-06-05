@@ -93,7 +93,7 @@ test('generated local output dependency surface doc is audit-only and scoped to 
 test('ignored generated output and dependency cache footprints are pinned', () => {
   const doc = read(docPath);
   const expected = {
-    dist: { files: 192, bytes: 62868003, ignore: /\.gitignore:6:dist\// },
+    dist: { files: 192, bytes: 62891886, ignore: /\.gitignore:6:dist\// },
     node_modules: { files: 956, bytes: 26325623, ignore: /\.gitignore:2:node_modules\// },
     'website/.next': { files: 2468, bytes: 388755617, ignore: /\.gitignore:12:website\/\.next\// },
     'website/.vercel': { files: 291, bytes: 29815128, ignore: /website\/\.gitignore:1:\.vercel/ },
@@ -129,15 +129,15 @@ test('dist package trees and zip artifacts are current local output not package 
   };
   const expectedBrowsers = {
     chrome: {
-      bytes: 12201800,
+      bytes: 12208974,
       manifestHash: '282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734',
     },
     firefox: {
-      bytes: 12201890,
+      bytes: 12209064,
       manifestHash: 'a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0',
     },
     opera: {
-      bytes: 12201805,
+      bytes: 12208979,
       manifestHash: '0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b',
     },
   };
@@ -154,9 +154,9 @@ test('dist package trees and zip artifacts are current local output not package 
   }
 
   for (const [zip, bytes, hash] of [
-    ['dist/filtertube-chrome-v3.3.2.zip', 8754149, '19ca90838396af020b11510a15cefd9b9210b2757122e0cd72a26e92cb101b93'],
-    ['dist/filtertube-firefox-v3.3.2.zip', 8754208, 'cff85434dc9405f8f1beb80e3fbb2f56502bd85d907e9c4761cd2a90676ec713'],
-    ['dist/filtertube-opera-v3.3.2.zip', 8754151, '2b7d011a748944b1736c78750914690335f1f35b3e0ecbe4b94c14d35b4132ec'],
+    ['dist/filtertube-chrome-v3.3.2.zip', 8754936, 'e58373d8c1d7488fc1bbc0b3f556d860b9248bb7afa5fe25b31a521fb02b032b'],
+    ['dist/filtertube-firefox-v3.3.2.zip', 8754995, '28e6ad4bf06764bf289da48797b7fc47868d32feeaeba07ad82d0043f163f25e'],
+    ['dist/filtertube-opera-v3.3.2.zip', 8754938, 'e61007bb3a65f453a917e80c7bd56065b4ab0cc3c9a1ba5055bd43eb1f5fb2ba'],
   ]) {
     assert.equal(byteCount(zip), bytes, `${zip} size drifted`);
     assert.equal(sha256(zip), hash, `${zip} hash drifted`);

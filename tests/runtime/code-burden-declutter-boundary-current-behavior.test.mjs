@@ -49,12 +49,12 @@ const largeProductOwnedSourceFiles = [
   'js/settings_shared.js',
   'js/content/dom_extractors.js',
   'js/seed.js',
-  'js/content/bridge_settings.js'
+  'js/content/bridge_settings.js',
+  'js/nanah_managed_live_policy.js'
 ];
 
 const nearThresholdProductOwnedSourceFiles = [
   'js/ui_components.js',
-  'js/nanah_managed_live_policy.js',
   'website/components/route-content.js'
 ];
 

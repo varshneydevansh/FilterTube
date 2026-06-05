@@ -346,6 +346,10 @@ test('dashboard builds signed managed envelopes only after source link scope tar
   assert.match(source, /async function ensureProviderDeliveryAuthorized/);
   assert.match(source, /managed_provider_delivery_reauth_required/);
   assert.match(source, /providerDeliveryAuthorized: true/);
+  assert.match(source, /function buildMailboxPurgeRequestForTrustedLink\(trustedLink, options = \{\}\)/);
+  assert.match(source, /async function purgeMailboxItemsForTrustedLink\(trustedLink, provider, options = \{\}\)/);
+  assert.match(source, /encrypted_mailbox_purge/);
+  assert.match(source, /mailbox_purge_provider_unavailable/);
 });
 
 test('managed source send uses signed envelope before proposal fallback and records outbound revision state', () => {
@@ -726,6 +730,79 @@ test('managed live signed-send helper uploads mailbox ciphertext items and marks
   assert.equal(unavailable.markedSentCount, 0);
 });
 
+test('managed live signed-send helper purges mailbox queue through redacted provider request', async () => {
+  const { helper, trustedLink, policyUpdates, providerDeliveryAuthCalls } = createManagedLivePolicyHarness();
+  trustedLink.policy.outgoingManagedPolicies = {
+    keywords: {
+      revision: 2,
+      policyHash: 'hash-keywords-2',
+      plaintextValue: 'shakira'
+    }
+  };
+
+  const request = helper.buildMailboxPurgeRequestForTrustedLink(trustedLink, {
+    reason: 'trusted_link_removed',
+    requestedAt: 1779301000000,
+    revokedAt: 1779301000000
+  });
+
+  assert.equal(request.schema, 'filtertube_managed_mailbox_purge_request');
+  assert.equal(request.transport, 'encrypted_mailbox');
+  assert.equal(request.reason, 'trusted_link_removed');
+  assert.equal(request.linkId, 'link-parent-child-1');
+  assert.equal(request.sourceDeviceId, 'parent-device-1');
+  assert.equal(request.sourceProfileId, 'parent-profile-1');
+  assert.equal(request.targetProfileId, 'child-profile-1');
+  assert.deepEqual(plain(request.purgeStates), ['pending']);
+  assert.deepEqual(plain(request.scopes), [
+    'main',
+    'kids',
+    'keywords',
+    'channels',
+    'videos',
+    'viewing_space',
+    'time_limits'
+  ]);
+  assert.equal(JSON.stringify(request).includes('"payload":'), false);
+  assert.equal(JSON.stringify(request).includes('"items":'), false);
+  assert.equal(JSON.stringify(request).includes('"envelope":'), false);
+  assert.equal(JSON.stringify(request).includes('privateKeyJwk'), false);
+  assert.equal(JSON.stringify(request).includes('shakira'), false);
+  assert.equal(JSON.stringify(request).includes('UC-shakira'), false);
+
+  let capturedRequest = null;
+  const provider = {
+    async purgeManagedMailboxItems(providerRequest) {
+      capturedRequest = plain(providerRequest);
+      return { ok: true, purgedMailboxItemCount: 4 };
+    }
+  };
+
+  const result = await helper.purgeMailboxItemsForTrustedLink(trustedLink, provider, {
+    reason: 'trusted_link_removed',
+    requestedAt: 1779301000000,
+    revokedAt: 1779301000000
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.purgedMailboxItemCount, 4);
+  assert.equal(capturedRequest.schema, 'filtertube_managed_mailbox_purge_request');
+  assert.equal(capturedRequest.linkId, 'link-parent-child-1');
+  assert.equal(capturedRequest.targetProfileId, 'child-profile-1');
+  assert.deepEqual(plain(capturedRequest.purgeStates), ['pending']);
+  assert.equal(JSON.stringify(capturedRequest).includes('shakira'), false);
+  assert.equal(providerDeliveryAuthCalls[0].transport, 'encrypted_mailbox_purge');
+  assert.equal(providerDeliveryAuthCalls[0].sensitiveAction, true);
+  assert.equal(policyUpdates.length, 0);
+
+  const unavailable = await helper.purgeMailboxItemsForTrustedLink(trustedLink, {}, {
+    reason: 'trusted_link_removed'
+  });
+  assert.equal(unavailable.ok, false);
+  assert.equal(unavailable.reason, 'mailbox_purge_provider_unavailable');
+  assert.equal(unavailable.purgedMailboxItemCount, 0);
+});
+
 test('managed live signed-send helper requires admin auth before mailbox upload provider delivery', async () => {
   const { helper, trustedLink, signCalls, providerDeliveryAuthCalls, policyUpdates } = createManagedLivePolicyHarness({
     providerDeliveryAuthorized: false
@@ -784,6 +861,32 @@ test('managed live signed-send helper requires admin auth before mailbox upload 
   assert.equal(signCalls.length, 0);
   assert.equal(policyUpdates.length, 0);
   assert.equal(providerDeliveryAuthCalls[0].transport, 'encrypted_mailbox');
+});
+
+test('managed live signed-send helper requires admin auth before mailbox purge provider delivery', async () => {
+  const { helper, trustedLink, signCalls, providerDeliveryAuthCalls, policyUpdates } = createManagedLivePolicyHarness({
+    providerDeliveryAuthorized: false
+  });
+  let providerCalls = 0;
+  const provider = {
+    async purgeManagedMailboxItems() {
+      providerCalls += 1;
+      return { ok: true, purgedMailboxItemCount: 1 };
+    }
+  };
+
+  const result = await helper.purgeMailboxItemsForTrustedLink(trustedLink, provider, {
+    reason: 'trusted_link_removed'
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, 'sensitive_reauth_required');
+  assert.equal(result.purgedMailboxItemCount, 0);
+  assert.equal(providerCalls, 0);
+  assert.equal(signCalls.length, 0);
+  assert.equal(policyUpdates.length, 0);
+  assert.equal(providerDeliveryAuthCalls[0].transport, 'encrypted_mailbox_purge');
+  assert.equal(providerDeliveryAuthCalls[0].sensitiveAction, true);
 });
 
 test('managed live signed-send helper records matching live ack history without plaintext values', async () => {
