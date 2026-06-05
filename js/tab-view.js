@@ -6497,6 +6497,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         return normalizeString(rawValue);
     }
 
+    function managedBulkRuleTypeLabel(ruleType) {
+        const type = ruleType === 'video' ? 'video' : (ruleType === 'channel' ? 'channel' : 'keyword');
+        if (type === 'video') return 'video ID';
+        if (type === 'channel') return 'channel';
+        return 'keyword';
+    }
+
     async function addManagedBulkRuleToProfiles(profileIds, ruleType) {
         const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
         const type = ruleType === 'video' ? 'video' : (ruleType === 'channel' ? 'channel' : 'keyword');
@@ -6532,7 +6539,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!surface) return;
         const value = await promptManagedBulkRuleValue(type);
         if (!value) {
-            UIComponents.showToast(type === 'channel' ? 'Enter a channel to add' : 'Enter a keyword to add', 'error');
+            UIComponents.showToast(
+                type === 'video' ? 'Enter a video ID to add' : (type === 'channel' ? 'Enter a channel to add' : 'Enter a keyword to add'),
+                'error'
+            );
             return;
         }
         if (type === 'channel' && !normalizeProfileChannel(value)) {
@@ -6547,6 +6557,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             UIComponents.showToast('Enter a valid keyword', 'error');
             return;
         }
+
+        const confirmBulk = await showConfirmModal({
+            title: `Add ${managedBulkRuleTypeLabel(type)} to selected profiles?`,
+            message: `This will add one ${managedBulkRuleTypeLabel(type)} to ${eligibleIds.length} protected ${eligibleIds.length === 1 ? 'profile' : 'profiles'} on ${surface === 'kids' ? 'YouTube Kids' : 'Main YouTube'} after parent/account re-auth.`,
+            confirmText: `Add to ${eligibleIds.length} ${eligibleIds.length === 1 ? 'profile' : 'profiles'}`,
+            cancelText: 'Cancel'
+        });
+        if (!confirmBulk) return;
 
         const okAdmin = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
         if (!okAdmin) {
@@ -6594,7 +6612,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         profilesV4Cache = { ...fresh, schemaVersion: 4, profiles };
         await StateManager.loadSettings({ notify: false, resetEnrichment: false, scheduleEnrichment: false });
         await refreshProfilesUI();
-        UIComponents.showToast(`${changedCount} profiles updated with managed ${type}`, 'success');
+        UIComponents.showToast(`${changedCount} ${changedCount === 1 ? 'profile' : 'profiles'} updated with managed ${managedBulkRuleTypeLabel(type)}`, 'success');
     }
 
     function isUiLocked() {
@@ -7242,6 +7260,80 @@ document.addEventListener('DOMContentLoaded', async () => {
                 } catch (e) {
                 }
             }, 0);
+        });
+    }
+
+    async function showConfirmModal({ eyebrow = '', title, message, confirmText = 'Confirm', cancelText = 'Cancel' }) {
+        return new Promise((resolve) => {
+            const overlay = document.createElement('div');
+            overlay.className = 'ft-modal-overlay';
+
+            const card = document.createElement('div');
+            card.className = 'card ft-modal';
+
+            const header = document.createElement('div');
+            header.className = 'card-header';
+            if (eyebrow) {
+                const eyebrowEl = document.createElement('div');
+                eyebrowEl.className = 'ft-modal-eyebrow';
+                eyebrowEl.textContent = eyebrow;
+                header.appendChild(eyebrowEl);
+            }
+            const titleEl = document.createElement('h3');
+            titleEl.className = 'ft-modal-title';
+            titleEl.textContent = title;
+            header.appendChild(titleEl);
+
+            const body = document.createElement('div');
+            body.className = 'card-body ft-modal-body';
+            if (message) {
+                const msg = document.createElement('div');
+                msg.className = 'import-export-hint';
+                msg.textContent = message;
+                body.appendChild(msg);
+            }
+
+            const actions = document.createElement('div');
+            actions.className = 'ft-modal-actions';
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'btn-secondary';
+            cancelBtn.type = 'button';
+            cancelBtn.textContent = cancelText;
+            const okBtn = document.createElement('button');
+            okBtn.className = 'btn-primary';
+            okBtn.type = 'button';
+            okBtn.textContent = confirmText;
+
+            const onKeydown = (e) => {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    cancelBtn.click();
+                }
+            };
+            const cleanup = () => {
+                document.removeEventListener('keydown', onKeydown);
+                try {
+                    overlay.remove();
+                } catch (e) {
+                }
+            };
+            const closeWith = (value) => {
+                cleanup();
+                resolve(value);
+            };
+            cancelBtn.addEventListener('click', () => closeWith(false));
+            okBtn.addEventListener('click', () => closeWith(true));
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) cancelBtn.click();
+            });
+            document.addEventListener('keydown', onKeydown);
+
+            actions.append(cancelBtn, okBtn);
+            body.appendChild(actions);
+            card.append(header, body);
+            overlay.appendChild(card);
+            document.body.appendChild(overlay);
+            okBtn.focus();
         });
     }
 

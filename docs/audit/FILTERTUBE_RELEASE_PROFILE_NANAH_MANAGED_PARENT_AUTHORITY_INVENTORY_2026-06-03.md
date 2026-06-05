@@ -118,7 +118,7 @@ managed-policy envelopes to a currently connected verified replica over Nanah
 P2P, can hand ciphertext mailbox rows or signed local-network candidates to
 optional providers when those hooks are present, and can add the same
 video/keyword/channel rule to selected protected profiles after parent/account
-re-auth.
+re-auth and a review-confirmation step.
 The extension still does not ship a built-in server mailbox client or LAN
 peer-discovery transport; those are downstream app/server/provider integration
 surfaces. Built-in server upload/pull/purge clients, built-in local-network

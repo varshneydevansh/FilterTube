@@ -13,7 +13,8 @@ so parents can scan live delivery, later-delivery provider readiness,
 re-pairing, conflicts, and history without reading raw policy state. Bulk local
 time-limit and viewing-space actions cover all manageable protected profiles,
 including Default/Master-managed independent account profiles. Direct rule bulk
-writes remain intentionally absent.
+writes for keyword, channel, and video ID rules are now present behind a
+review-confirmation step and parent/account re-auth.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 
@@ -106,13 +107,13 @@ runtime managed command-center bulk time-limit controls: present via delegated r
 runtime managed command-center bulk viewing-space controls: present via delegated runtime gate
 runtime managed command-center per-profile signed policy push: present
 runtime managed command-center selected-profile signed policy push: present
+runtime managed command-center direct rule bulk writes: present via confirmation plus delegated runtime gate
 runtime connected verified-device live P2P managed policy send: present
 runtime provider-gated mailbox/LAN delivery handoff from command center: present
 runtime protected redacted push-attempt history rows: present
 runtime built-in server mailbox upload/pull client: absent
 runtime built-in LAN discovery/transport client: absent
 runtime managed command-center direct policy writes: absent
-runtime managed command-center direct rule bulk writes: absent
 runtime YouTube hot-path work from command-center UI: absent
 ```
 
@@ -127,13 +128,13 @@ weakening the authority model:
 | --- | --- | --- |
 | Managed profile selection | See each protected profile, owner relationship, current lock state, verified-device readiness, and last policy revision. | Child/protected views still hide admin controls and detailed history. |
 | Protection scan strip | Quickly see protected profile count, sync-ready profiles, profiles needing re-pairing, and remote conflicts before acting. | Strip values are aggregate status only; they do not include rule text, policy payloads, keys, or mutation authority. |
-| Rule editing | Command-center row actions still enter the existing managed protected-profile editor, and selected-profile bulk controls can hand off one selected protected profile to the same editor. | Writes must use the same validated local/remote managed-policy paths as current FilterTube controls; multi-profile direct rule writes remain future work. |
+| Rule editing | Command-center row actions still enter the existing managed protected-profile editor, selected-profile bulk controls can hand off one selected protected profile to the same editor, and selected-profile bulk keyword/channel/video-ID additions can apply one reviewed rule to selected protected profiles. | Writes must use the same validated local/remote managed-policy paths as current FilterTube controls; bulk rule writes require review confirmation, parent/account re-auth, per-target revision/history rows, and no child authority. |
 | Remote send | Parent can send one protected profile or selected protected profiles to saved verified devices and see whether the next attempt is live, later via LAN/mailbox provider, blocked by conflict, blocked by stale/revoked pairing, or missing a verified device. | Delivery links and preview labels are not authority; each envelope still requires Source -> Replica trust, fixed target profile, allowed scope, signature/integrity proof, and newer revision/hash. |
 | Viewing spaces | Show Main, Kids, both, or neither per protected profile; row actions still change policy and selected-profile bulk actions can apply Main + Kids, Kids only, or Main only locally. | UI choice is not authority; runtime route gate remains the enforcement layer; every selected target gets its own redacted revision/history row after parent re-auth. |
 | Time limits | Show daily YouTube budget state; command-center row actions still set/disable one profile and bulk selected-profile actions can apply the same daily budget or disable existing limits. | Runtime budget accounting remains background-owned; every target gets its own revision/history row after parent re-auth. |
 | Sync status | Show trusted device, delivery preview, local-network provider, Nanah open-sync, and mailbox status. | Reachability is never authorization; offline state keeps the last valid policy active. |
 | Action history | Show accepted, rejected, conflict, failed-auth, and expired-session counts/latest labels; detailed history remains gated by the History action. | History stays redacted, protected by parent/account re-auth, and never becomes policy authority. |
-| Multi-profile apply | Present for selected-profile rule editor handoff, same-budget local time-limit changes, same-access local viewing-space changes, and selected-profile signed-policy sends on selected protected profiles. | Direct local rule bulk writes remain absent; every remote target still needs its own target profile, trusted link, scope, revision, hash, and signature/integrity proof. |
+| Multi-profile apply | Present for selected-profile rule editor handoff, same-budget local time-limit changes, same-access local viewing-space changes, selected-profile keyword/channel/video-ID rule additions, and selected-profile signed-policy sends on selected protected profiles. | Local bulk rule writes are one reviewed rule at a time and every local or remote target still needs its own target profile, revision/history row, and authority gate; remote sends additionally require trusted link, scope, revision, hash, and signature/integrity proof. |
 
 Required UI states for that slice:
 
@@ -188,6 +189,8 @@ For the current feature-first slice, manual verification should cover:
 - `Send Update` works for a connected verified Source -> Replica Nanah session.
 - `Send selected updates` records redacted history for success, no-link, and
   provider-pending cases.
+- Selected-profile Add keyword/channel/video ID shows a review confirmation,
+  requires parent/account re-auth, and writes redacted per-target history.
 - A receiving protected profile applies only trusted, signed, newer policy for
   its fixed target profile.
 - YouTube hot paths stay idle when the dashboard command center is open.

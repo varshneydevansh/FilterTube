@@ -708,7 +708,9 @@ the current extension dashboard.
   readiness, redacted delivery preview, and remote conflict state, and records
   protected redacted history for send success/failure/provider-pending cases. The implementation
   intentionally avoids a separate oversized remote-management page until
-  app/server provider work exists. Bulk time-limit and viewing-space actions now use the same
+  app/server provider work exists. Bulk keyword/channel/video rule additions
+  now show a review confirmation, require parent/account re-auth, and write one
+  redacted revision/history row per changed target. Bulk time-limit and viewing-space actions now use the same
   protected-profile authority predicate as the command-center rows, so
   Default/Master-managed independent account profiles are not silently skipped.
 - **Complexity**: 7/10

@@ -329,7 +329,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
 
   assert.match(doc, /Status\*\*: Spec, dashboard protected-profile status, command-center overview/);
   assert.match(doc, /parent-facing protection strip plus labeled Delivery\/Device\/History row details/);
-  assert.match(doc, /Direct rule bulk\s+writes remain intentionally absent/);
+  assert.match(doc, /Direct rule bulk\s+writes for keyword, channel, and video ID rules are now present/);
   assert.match(doc, /Parent-Facing States/);
   assert.match(doc, /UI Boundaries/);
   assert.match(doc, /Current Runtime Binding/);
@@ -345,7 +345,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(doc, /runtime managed command-center bulk time-limit controls: present via delegated runtime gate/);
   assert.match(doc, /runtime managed command-center bulk viewing-space controls: present via delegated runtime gate/);
   assert.match(doc, /runtime managed command-center direct policy writes: absent/);
-  assert.match(doc, /runtime managed command-center direct rule bulk writes: absent/);
+  assert.match(doc, /runtime managed command-center direct rule bulk writes: present via confirmation plus delegated runtime gate/);
   assert.match(doc, /runtime YouTube hot-path work from command-center UI: absent/);
   assert.match(plan, new RegExp(docPath));
   assert.match(plan, /command-center\s+overview for protected profiles/);
@@ -391,6 +391,9 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /action === 'bulk_allow_main_kids' \|\| action === 'bulk_kids_only' \|\| action === 'bulk_main_only'/);
   assert.match(source, /function updateMultipleProfileTimeLimitPolicies\(profileIds, action\)/);
   assert.match(source, /function updateMultipleProfileViewingAccess\(profileIds, accessMode\)/);
+  assert.match(source, /async function addManagedBulkRuleToProfiles\(profileIds, ruleType\)/);
+  assert.match(source, /const confirmBulk = await showConfirmModal\(/);
+  assert.match(source, /function managedBulkRuleTypeLabel\(ruleType\)/);
   assert.match(source, /bulk_time_limit_unlock_failed/);
   assert.match(source, /bulk_viewing_space_unlock_failed/);
   assert.match(source, /confirmText: 'Save Limits'/);
@@ -435,8 +438,8 @@ test('managed command-center spec pins parent workflow without making UI authori
   assert.match(doc, /UI choice is not authority; runtime route gate remains the enforcement layer/);
   assert.match(doc, /Runtime budget accounting remains background-owned/);
   assert.match(doc, /Reachability is never authorization/);
-  assert.match(doc, /Present for selected-profile rule editor handoff, same-budget local time-limit changes, same-access local viewing-space changes, and selected-profile signed-policy sends on selected protected profiles/);
-  assert.match(doc, /Direct local rule bulk writes remain absent; every remote target still needs its own target profile, trusted link, scope, revision, hash, and signature\/integrity proof/);
+  assert.match(doc, /Present for selected-profile rule editor handoff, same-budget local time-limit changes, same-access local viewing-space changes, selected-profile keyword\/channel\/video-ID rule additions, and selected-profile signed-policy sends on selected protected profiles/);
+  assert.match(doc, /Local bulk rule writes are one reviewed rule at a time/);
   assert.match(doc, /Mobile-first layout with a single-column protected-profile list/);
   assert.match(doc, /Touch targets .* at\s+least 44px high/);
   assert.match(doc, /Use segmented controls for Main\/Kids access/);
