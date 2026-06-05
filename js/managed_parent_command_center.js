@@ -521,6 +521,11 @@
             selectAllButton.type = 'button';
             selectAllButton.textContent = 'Select all';
             selectAllButton.title = 'Select every protected profile shown in this command center.';
+            const selectReadyButton = document.createElement('button');
+            selectReadyButton.className = 'btn-secondary';
+            selectReadyButton.type = 'button';
+            selectReadyButton.textContent = 'Select ready';
+            selectReadyButton.title = 'Select protected profiles that already have a verified delivery path.';
             const clearSelectionButton = document.createElement('button');
             clearSelectionButton.className = 'btn-secondary';
             clearSelectionButton.type = 'button';
@@ -551,6 +556,9 @@
                 });
                 clearSelectionButton.disabled = count === 0;
                 selectAllButton.disabled = selectedProfileInputs.length > 0 && count === selectedProfileInputs.length;
+                const readyInputs = selectedProfileInputs.filter(input => input.dataset.filtertubeSyncReady === 'true');
+                const selectedReadyCount = readyInputs.filter(input => input.checked).length;
+                selectReadyButton.disabled = readyInputs.length === 0 || selectedReadyCount === readyInputs.length;
             };
             selectAllButton.addEventListener('click', (event) => {
                 event.preventDefault();
@@ -558,6 +566,21 @@
                     input.checked = true;
                     const profileId = typeof input.dataset.filtertubeProfileId === 'string' ? input.dataset.filtertubeProfileId.trim() : '';
                     if (profileId) selectedProfiles.add(profileId);
+                });
+                updateBulkState();
+            });
+            selectReadyButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                selectedProfileInputs.forEach((input) => {
+                    const ready = input.dataset.filtertubeSyncReady === 'true';
+                    input.checked = ready;
+                    const profileId = typeof input.dataset.filtertubeProfileId === 'string' ? input.dataset.filtertubeProfileId.trim() : '';
+                    if (!profileId) return;
+                    if (ready) {
+                        selectedProfiles.add(profileId);
+                    } else {
+                        selectedProfiles.delete(profileId);
+                    }
                 });
                 updateBulkState();
             });
@@ -569,7 +592,7 @@
                 selectedProfiles.clear();
                 updateBulkState();
             });
-            bulkSelectControls.append(selectAllButton, clearSelectionButton);
+            bulkSelectControls.append(selectAllButton, selectReadyButton, clearSelectionButton);
             bulkBar.append(bulkStatus, bulkSelectControls, ...bulkButtons);
             panel.appendChild(bulkBar);
             panel.__filtertubeUpdateManagedBulkState = updateBulkState;
@@ -591,6 +614,7 @@
             selector.type = 'checkbox';
             selector.setAttribute('aria-label', `Select ${item.profileName} for bulk managed update`);
             selector.dataset.filtertubeProfileId = item.profileId;
+            selector.dataset.filtertubeSyncReady = item.syncReadyCount > 0 ? 'true' : 'false';
             selectedProfileInputs.push(selector);
             selector.addEventListener('change', () => {
                 if (selector.checked) {

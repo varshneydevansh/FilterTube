@@ -398,6 +398,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /ft-managed-command-center__select/);
   assert.match(helperSource, /ft-managed-command-center__bulk-select/);
   assert.match(helperSource, /Select all/);
+  assert.match(helperSource, /Select ready/);
+  assert.match(helperSource, /filtertubeSyncReady/);
   assert.match(helperSource, /selectedProfileInputs/);
   assert.match(helperSource, /filtertubeManagedAction/);
   assert.match(helperSource, /delegated_runtime_gate/);
