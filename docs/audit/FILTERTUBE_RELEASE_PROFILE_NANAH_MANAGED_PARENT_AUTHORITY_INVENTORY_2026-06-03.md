@@ -21,6 +21,7 @@ an explicit Main/Kids rule-source picker plus Rule bundle send for granular
 sends, plus a
 provider-gated dashboard/profile-open pull hook for already-decrypted mailbox
 items, redacted provider ack handoff for mailbox apply/reject outcomes,
+protected target-profile mailbox ack-handoff evidence,
 trusted-link removal cleanup for target-local accepted managed-policy state,
 sanitized local-network candidate receive/history handling, plus an
 optional provider-gated dashboard/profile-open local-network candidate
@@ -66,8 +67,10 @@ mailbox metadata to the decrypted managed envelope before calling the same
 managed-policy validation/apply path. The dashboard/profile-open hook can ask a
 trusted local provider for already-decrypted mailbox items when an opted-in
 managed replica link opens and can return redacted ack records to that provider
-after each local apply/reject decision. Provider rejection or provider failure
-now fails closed without applying or acknowledging returned mailbox items.
+after each local apply/reject decision. The protected target profile now also
+keeps redacted mailbox ack-handoff evidence for the provider ack attempt.
+Provider rejection or provider failure now fails closed without applying or
+acknowledging returned mailbox items.
 Trusted-link removal now purges
 target-local accepted managed-policy revision state for that link and clears
 matching open-sync status rows before the removed trust can be reused as local

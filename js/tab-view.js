@@ -8405,6 +8405,93 @@ document.addEventListener('DOMContentLoaded', async () => {
         await writeNanahStorage(NANAH_MANAGED_OPEN_SYNC_STATE_KEY, nanahManagedOpenSyncState);
     }
 
+    async function recordManagedOpenSyncAckHistory(details = {}) {
+        const root = safeObject(details);
+        const request = safeObject(root.request);
+        const candidate = safeObject(root.candidate);
+        const ackResult = safeObject(root.ackResult);
+        const records = safeArray(root.records);
+        const targetProfileId = normalizeString(request.targetProfileId || candidate.targetProfileId);
+        if (!targetProfileId || records.length === 0) {
+            return { ok: false, reason: 'missing_ack_history_target', recordedCount: 0, failedCount: records.length };
+        }
+
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
+            return { ok: false, reason: 'profiles_unavailable', recordedCount: 0, failedCount: records.length };
+        }
+
+        const fresh = await io.loadProfilesV4();
+        const profiles = { ...safeObject(fresh.profiles) };
+        const profile = safeObject(profiles[targetProfileId]);
+        if (!profile || Object.keys(profile).length === 0) {
+            return { ok: false, reason: 'target_profile_missing', recordedCount: 0, failedCount: records.length };
+        }
+
+        const now = Date.now();
+        const ackedCount = Math.max(0, Math.floor(Number(ackResult.ackedItemCount) || 0));
+        const failedCount = Math.max(0, Math.floor(Number(ackResult.failedAckCount) || 0));
+        const providerAcceptedAll = ackResult.ok !== false && failedCount === 0 && ackedCount >= records.length;
+        const historyRows = [];
+        records.forEach((record, index) => {
+            const ackRecord = safeObject(record);
+            const scope = normalizeString(ackRecord.scope).toLowerCase() || 'sync_policy';
+            const revision = normalizeNonNegativeInteger(ackRecord.revision) || null;
+            const policyHash = normalizeString(ackRecord.policyHash) || null;
+            if (!scope || !revision || !policyHash) return;
+            const mailboxItemId = normalizeString(ackRecord.mailboxItemId);
+            const result = providerAcceptedAll ? 'accepted' : 'rejected';
+            const reason = providerAcceptedAll
+                ? null
+                : (normalizeString(ackResult.reason) || 'ack_handoff_failed');
+            historyRows.push({
+                rowId: `remote-mailbox-ack-${scope}-${revision}-${mailboxItemId || 'item'}-${now}-${index}`,
+                schema: MANAGED_ACTION_HISTORY_SCHEMA,
+                version: 1,
+                actorProfileId: normalizeString(ackRecord.sourceProfileId || request.sourceProfileId || candidate.sourceProfileId) || null,
+                actorDeviceId: normalizeString(ackRecord.sourceDeviceId || request.sourceDeviceId || candidate.sourceDeviceId) || 'unknown-source-device',
+                targetProfileId,
+                trustedLinkId: normalizeString(ackRecord.linkId || request.linkId || candidate.linkId),
+                actionType: 'remote_policy.mailbox.ack',
+                scope,
+                revision,
+                policyHash,
+                result,
+                reason,
+                receivedAt: now,
+                issuedAt: normalizeNonNegativeInteger(ackRecord.ackedAt || request.ackedAt) || now,
+                orderKey: `ack:${String(revision).padStart(6, '0')}:${now}:${index}`,
+                summary: {
+                    redacted: true,
+                    label: providerAcceptedAll ? 'Mailbox ack delivered' : 'Mailbox ack handoff failed',
+                    transport: 'mailbox',
+                    mailboxItemId: mailboxItemId || null,
+                    ackState: normalizeString(ackRecord.ackState) || null,
+                    providerAckedItemCount: ackedCount,
+                    providerFailedAckCount: failedCount
+                },
+                sensitive: true
+            });
+        });
+
+        if (historyRows.length === 0) {
+            return { ok: false, reason: 'no_recordable_ack_history_rows', recordedCount: 0, failedCount: records.length };
+        }
+
+        const existingRows = getManagedActionHistoryRows(profile);
+        profiles[targetProfileId] = {
+            ...profile,
+            managedActionHistory: [...existingRows, ...historyRows].slice(-MANAGED_ACTION_HISTORY_LIMIT)
+        };
+        await io.saveProfilesV4({
+            ...fresh,
+            schemaVersion: 4,
+            profiles
+        });
+        profilesV4Cache = { ...fresh, schemaVersion: 4, profiles };
+        return { ok: true, reason: '', recordedCount: historyRows.length, failedCount: 0 };
+    }
+
     function createNanahManagedOpenSyncHelper() {
         const factory = window.FilterTubeNanahManagedOpenSync?.create;
         return typeof factory === 'function' ? factory({ normalizeString, safeObject, safeArray }) : null;
@@ -8426,6 +8513,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             profilesV4: localProfilesV4,
             reason,
             applyMailboxItem: (item) => handleNanahIncomingManagedMailboxItem(item),
+            recordAckHistory: (details) => recordManagedOpenSyncAckHistory(details),
             writeState: persistNanahManagedOpenSyncState
         });
         renderNanahTrustedLinks();

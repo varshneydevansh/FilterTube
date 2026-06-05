@@ -451,10 +451,12 @@ replica child device over Nanah/P2P or same-network transport.
   separate signed keyword/channel/video envelopes. The dashboard can now choose
   multiple eligible fixed targets on the connected replica and use the
   per-target envelope batcher for that live same-replica send. Redacted outbound
-  send history and redacted live ack history are present per trusted link/scope;
-  active/full sends, offline mailbox/local-network delivery, mailbox/local-network
-  accepted/rejected ack history, and richer viewing-space/time-limit or
-  multi-device bulk outbound controls remain later slices.
+  send history and redacted live ack history are present per trusted link/scope.
+  Pull-on-open mailbox ack handoff now writes protected redacted target-profile
+  history after the provider ack attempt. Active/full sends, offline
+  mailbox/local-network delivery, source-side mailbox/local-network ack
+  summaries, and richer viewing-space/time-limit or multi-device bulk outbound
+  controls remain later slices.
 - **Acceptance Criteria**:
   - The public descriptor is separated from the private keypair.
   - The private JWK is not placed in the Nanah hello descriptor or trusted link
@@ -486,10 +488,12 @@ replica child device over Nanah/P2P or same-network transport.
   multi-target sends can choose eligible fixed targets before signing, and each
   successful live send appends redacted outbound history to the trusted link.
   Connected replicas now return redacted live acks that the source records only
-  when they match a prior sent revision/hash. Active/full proposal sends,
-  mailbox delivery, local-network delivery, mailbox/local-network ack history,
-  and richer viewing-space/time-limit or multi-device bulk outbound controls
-  remain pending.
+  when they match a prior sent revision/hash. Pull-on-open mailbox ack handoff
+  now writes protected redacted target-profile history after the provider ack
+  attempt. Active/full proposal sends, mailbox delivery, local-network delivery,
+  source-side mailbox/local-network ack summaries, and richer
+  viewing-space/time-limit or multi-device bulk outbound controls remain
+  pending.
 - **Acceptance Criteria**:
   - Existing proposal sends still work for unsupported active/full scopes.
   - Signed sends require saved managed link, Source -> Replica roles, allowed
@@ -520,8 +524,9 @@ replica child device over Nanah/P2P or same-network transport.
   can build per-target signed envelope batches for explicit saved links, and
   the dashboard uses it for selected eligible fixed targets on the connected
   replica. Redacted per-target outbound send history and live ack history are
-  now present; mailbox/local-network fanout and offline accepted/rejected ack
-  history summary remain pending.
+  now present. Pull-on-open mailbox ack handoff now writes protected redacted
+  target-profile history after the provider ack attempt; mailbox/local-network
+  fanout and source-side offline accepted/rejected ack summaries remain pending.
 - **Acceptance Criteria**:
   - The doc names the profile-scoped trusted-link behavior.
   - The doc requires device plus target-profile binding before multi-child

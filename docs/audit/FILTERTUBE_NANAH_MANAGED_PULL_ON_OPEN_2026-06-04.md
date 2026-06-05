@@ -1,9 +1,9 @@
 # Audit: Nanah Managed Pull-On-Open Hook
 
 **Generated**: 2026-06-04
-**Status**: Provider-gated dashboard/profile-open hook and provider ack handoff
-are present. Server mailbox client, mailbox decryption client, and
-local-network discovery are still absent.
+**Status**: Provider-gated dashboard/profile-open hook, provider ack handoff,
+and protected ack-handoff history writer are present. Server mailbox client,
+mailbox decryption client, and local-network discovery are still absent.
 **Related plan**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`
 **Related inventory**:
@@ -17,7 +17,10 @@ This slice adds the first safe runtime steps toward parent/caregiver
 pull-on-open sync. When the FilterTube dashboard opens or the active profile is
 switched, a protected replica profile can check eligible trusted managed links,
 ask an optional local provider for already-decrypted mailbox items, and hand
-redacted delivery acknowledgements back to the same provider.
+redacted delivery acknowledgements back to the same provider. It also records a
+protected redacted ack-handoff history row on the target profile so the parent
+or caregiver can later see whether the protected device reported the mailbox
+outcome back to the provider.
 
 The hook is intentionally not a mailbox server client. It does not poll from
 YouTube pages, does not add a service-worker scheduler, and does not make
@@ -44,6 +47,7 @@ flowchart TD
   J -->|No| L["Reject and keep last valid policy"]
   K --> M["Send redacted provider ack"]
   L --> M
+  M --> N["Write protected ack-handoff history"]
 ```
 
 ## Runtime Hooks Added
@@ -58,6 +62,7 @@ js/tab-view.js
   NANAH_MANAGED_OPEN_SYNC_STATE_KEY = ftNanahManagedOpenSyncState
   loadNanahManagedOpenSyncState()
   persistNanahManagedOpenSyncState(...)
+  recordManagedOpenSyncAckHistory(...)
   formatNanahManagedOpenSyncStatus(...)
   runNanahManagedOpenSync(...)
 ```
@@ -129,6 +134,7 @@ This is feedback/status only. It does not grant authority.
 runtime pull-on-open candidate gate: present
 runtime provider-gated decrypted item pull: present
 runtime provider-gated mailbox ack handoff: present
+runtime protected mailbox ack-handoff history writer: present
 runtime provider failure fail-closed item apply guard: present
 runtime mailbox item apply reuse: present
 runtime pull status persistence: present
@@ -153,6 +159,9 @@ runtime YouTube page hot-path work from this slice: absent
   revision/hash checks, and protected action-history recording.
 - Ack records are result metadata only. They never include decrypted payload
   contents and are sent only when the same local provider offers an ack method.
+- Ack-handoff history rows store only redacted link/profile/scope/revision/hash
+  and provider ack counts on the protected profile. They do not contain
+  plaintext rule values, and they do not authorize future policy changes.
 - This does not replace manual live Nanah sessions. It only creates the
   extension-side hook that downstream app/local-network/mailbox providers can
   use safely later.

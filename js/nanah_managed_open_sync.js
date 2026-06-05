@@ -281,6 +281,7 @@
             profilesV4 = {},
             reason = 'dashboard_open',
             applyMailboxItem = null,
+            recordAckHistory = null,
             writeState = null
         } = {}) {
             const startedAt = now();
@@ -300,6 +301,8 @@
                 ackAttemptedCount: 0,
                 ackedItemCount: 0,
                 ackFailedCount: 0,
+                ackHistoryRecordedCount: 0,
+                ackHistoryFailedCount: 0,
                 linkResults: []
             };
 
@@ -331,7 +334,10 @@
                     ackAttemptedCount: 0,
                     ackedItemCount: 0,
                     ackFailedCount: 0,
-                    ackReason: null
+                    ackReason: null,
+                    ackHistoryRecordedCount: 0,
+                    ackHistoryFailedCount: 0,
+                    ackHistoryReason: null
                 };
                 state.pulledItemCount += result.items.length;
                 const ackRecords = [];
@@ -366,6 +372,34 @@
                 state.ackAttemptedCount += ackRecords.length;
                 state.ackedItemCount += ackResult.ackedItemCount;
                 state.ackFailedCount += ackResult.failedAckCount;
+                if (ackRecords.length > 0 && typeof recordAckHistory === 'function') {
+                    try {
+                        const historyResult = await recordAckHistory({
+                            request,
+                            candidate,
+                            records: ackRecords,
+                            ackResult,
+                            linkResult: linkRow,
+                            reason
+                        });
+                        const historyRoot = safeObject(historyResult);
+                        const recorded = Number(historyRoot.recordedCount ?? historyRoot.writtenCount);
+                        const failed = Number(historyRoot.failedCount ?? historyRoot.failedHistoryCount);
+                        linkRow.ackHistoryRecordedCount = Number.isFinite(recorded)
+                            ? Math.max(0, recorded)
+                            : (historyResult === true ? ackRecords.length : 0);
+                        linkRow.ackHistoryFailedCount = Number.isFinite(failed)
+                            ? Math.max(0, failed)
+                            : (historyRoot.ok === false ? ackRecords.length : 0);
+                        linkRow.ackHistoryReason = normalizeString(historyRoot.reason) || null;
+                    } catch (error) {
+                        linkRow.ackHistoryRecordedCount = 0;
+                        linkRow.ackHistoryFailedCount = ackRecords.length;
+                        linkRow.ackHistoryReason = normalizeString(error?.message) || 'ack_history_failed';
+                    }
+                    state.ackHistoryRecordedCount += linkRow.ackHistoryRecordedCount;
+                    state.ackHistoryFailedCount += linkRow.ackHistoryFailedCount;
+                }
                 state.linkResults.push(linkRow);
             }
 

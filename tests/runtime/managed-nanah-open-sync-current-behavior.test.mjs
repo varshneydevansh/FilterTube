@@ -92,21 +92,23 @@ test('managed open-sync audit is docs-backed and linked from plan inventory and 
   const plan = read(planPath);
   const inventory = read(inventoryPath);
 
-  assert.match(doc, /Provider-gated dashboard\/profile-open hook and provider ack handoff\s+are present/);
-  assert.match(doc, /provider ack handoff\s+are present/);
-  assert.match(doc, /Server\s+mailbox client, mailbox decryption client, and\s+local-network discovery are still absent/);
+  assert.match(doc, /Provider-gated dashboard\/profile-open hook, provider ack handoff,\s+and protected ack-handoff history writer are present/);
+  assert.match(doc, /protected ack-handoff history writer are present/);
+  assert.match(doc, /Server\s+mailbox client,\s+mailbox decryption client, and\s+local-network discovery are still absent/);
   assert.match(doc, /runtime pull-on-open candidate gate: present/);
   assert.match(doc, /runtime provider-gated decrypted item pull: present/);
   assert.match(doc, /runtime provider-gated mailbox ack handoff: present/);
+  assert.match(doc, /runtime protected mailbox ack-handoff history writer: present/);
   assert.match(doc, /runtime provider failure fail-closed item apply guard: present/);
   assert.match(doc, /Provider failures and thrown provider errors do not apply or ack returned\s+items/);
   assert.match(doc, /runtime YouTube page hot-path work from this slice: absent/);
   assert.match(mailboxDoc, /provider-gated ack handoff: present/);
+  assert.match(mailboxDoc, /runtime protected mailbox ack-handoff history rows: present/);
   assert.match(mailboxDoc, /provider failure fail-closed apply guard: present/);
   assert.match(mailboxDoc, /provider-gated dashboard\/profile-open pull hook: present/);
   assert.match(plan, /Provider rejection or provider failure now fails closed without applying or\s+acknowledging any returned items/);
   assert.match(plan, /Provider `ok: false` responses and provider exceptions do not apply or ack\s+returned items and leave the last accepted policy active/);
-  assert.match(inventory, /Provider rejection or provider failure\s+now fails closed without applying or acknowledging returned mailbox items/);
+  assert.match(inventory, /Provider rejection or provider failure\s+now fails closed without applying or\s+acknowledging returned mailbox items/);
   assert.match(inventory, /Provider rejection or provider failure fails closed without applying or acknowledging returned items/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
@@ -120,6 +122,9 @@ test('dashboard loads open-sync helper and wires policy toggle status and open/p
   assert.match(tabView, /const NANAH_MANAGED_OPEN_SYNC_STATE_KEY = 'ftNanahManagedOpenSyncState'/);
   assert.match(tabView, /function formatNanahManagedOpenSyncStatus\(link\)/);
   assert.match(tabView, /async function runNanahManagedOpenSync\(\{ reason = 'dashboard_open' \} = \{\}\)/);
+  assert.match(tabView, /async function recordManagedOpenSyncAckHistory\(details = \{\}\)/);
+  assert.match(tabView, /actionType: 'remote_policy\.mailbox\.ack'/);
+  assert.match(tabView, /recordAckHistory: \(details\) => recordManagedOpenSyncAckHistory\(details\)/);
   assert.match(tabView, /window\.FilterTubeNanahManagedOpenSync\?\.create/);
   assert.match(tabView, /syncOnProfileOpen: linkType === 'managed_link' && syncOnProfileOpen/);
   assert.match(tabView, /Check for parent updates when this profile opens/);
@@ -245,6 +250,7 @@ test('open-sync provider throw fails closed without applying or acknowledging it
 
 test('open-sync provider applies only returned decrypted mailbox items and emits redacted ack records', async () => {
   const ackPayloads = [];
+  const historyCalls = [];
   const provider = {
     async pullDecryptedMailboxItems(request) {
       assert.equal(request.schema, 'filtertube_nanah_managed_open_sync_request');
@@ -271,6 +277,10 @@ test('open-sync provider applies only returned decrypted mailbox items and emits
     applyMailboxItem: async (item) => item.mailboxItemId === 'accepted-item'
       ? { accepted: true, applied: true }
       : { accepted: false, reason: 'wrong_target_profile' },
+    recordAckHistory: async (details) => {
+      historyCalls.push(details);
+      return { ok: true, recordedCount: details.records.length, failedCount: 0 };
+    },
     writeState: async () => {}
   });
 
@@ -282,9 +292,13 @@ test('open-sync provider applies only returned decrypted mailbox items and emits
   assert.equal(state.ackAttemptedCount, 2);
   assert.equal(state.ackedItemCount, 2);
   assert.equal(state.ackFailedCount, 0);
+  assert.equal(state.ackHistoryRecordedCount, 2);
+  assert.equal(state.ackHistoryFailedCount, 0);
   assert.equal(state.linkResults[0].appliedItemCount, 1);
   assert.equal(state.linkResults[0].rejectedItemCount, 1);
   assert.equal(state.linkResults[0].ackedItemCount, 2);
+  assert.equal(state.linkResults[0].ackHistoryRecordedCount, 2);
+  assert.equal(state.linkResults[0].ackHistoryFailedCount, 0);
 
   assert.equal(ackPayloads.length, 1);
   assert.equal(ackPayloads[0].schema, 'filtertube_nanah_managed_open_sync_ack');
@@ -297,6 +311,17 @@ test('open-sync provider applies only returned decrypted mailbox items and emits
     ]
   );
   assert.doesNotMatch(JSON.stringify(ackPayloads[0]), /spiders|keywordValue|channelName|videoTitle|plaintext/i);
+  assert.equal(historyCalls.length, 1);
+  assert.equal(historyCalls[0].request.schema, 'filtertube_nanah_managed_open_sync_request');
+  assert.equal(historyCalls[0].candidate.linkId, 'link-parent-child-1');
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(historyCalls[0].records.map(row => [row.mailboxItemId, row.ackState, row.accepted, row.applied]))),
+    [
+      ['accepted-item', 'delivered', true, true],
+      ['rejected-item', 'rejected', false, false]
+    ]
+  );
+  assert.doesNotMatch(JSON.stringify(historyCalls[0]), /spiders|keywordValue|channelName|videoTitle|plaintext/i);
 });
 
 test('open-sync provider pull without ack writer records ack-unavailable without retrying YouTube hot paths', async () => {
@@ -330,6 +355,8 @@ test('open-sync helper does not add page hot-path observers timers or network cl
   const helperSource = read(helperPath);
 
   assert.match(helperSource, /filtertube_nanah_managed_open_sync_ack/);
+  assert.match(helperSource, /recordAckHistory/);
+  assert.match(helperSource, /ackHistoryRecordedCount/);
   assert.match(helperSource, /ackDecryptedMailboxItems/);
   assert.match(helperSource, /ackMailboxItems/);
   assert.match(helperSource, /items: ok \? safeArray\(result\?\.items\) : \[\]/);

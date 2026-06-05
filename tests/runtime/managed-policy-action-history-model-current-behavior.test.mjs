@@ -30,6 +30,7 @@ const approvedActionTypes = new Set([
   'remote_policy.mailbox.conflict',
   'remote_policy.mailbox.expire',
   'remote_policy.mailbox.revoke',
+  'remote_policy.mailbox.ack',
   'history.clear'
 ]);
 
@@ -154,6 +155,28 @@ function validRemoteRateLimitedRow(overrides = {}) {
   });
 }
 
+function validMailboxAckRow(overrides = {}) {
+  return validAcceptedRow({
+    rowId: 'history-row-mailbox-ack-1',
+    actionType: 'remote_policy.mailbox.ack',
+    scope: 'keywords',
+    revision: 9,
+    policyHash: 'hash-keyword-9',
+    result: 'accepted',
+    reason: null,
+    summary: {
+      redacted: true,
+      label: 'Mailbox ack delivered',
+      transport: 'mailbox',
+      mailboxItemId: 'mailbox-item-1',
+      ackState: 'delivered',
+      providerAckedItemCount: 1,
+      providerFailedAckCount: 0
+    },
+    ...overrides
+  });
+}
+
 function nextRemoteFailedAttemptState(existing = null, { now = 1780520500000, reason = 'missing_signature_verifier' } = {}) {
   const resetAt = Number(existing?.resetAt);
   const activeWindow = existing?.schema === 'filtertube_managed_remote_failed_attempt_rate_limit'
@@ -256,6 +279,7 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(doc, /local\/decrypted `filtertube_managed_mailbox_item` outcomes/);
   assert.match(doc, /local-network candidate\s+`filtertube_managed_local_network_candidate`\s+outcomes/);
   assert.match(doc, /remote failed-attempt rate-limit\s+state/);
+  assert.match(doc, /Pull-on-open mailbox ack handoff now records redacted protected/);
   assert.match(doc, /validated remote accepted apply history can now be recorded/);
   assert.match(doc, /Required History Row Shape/);
   assert.match(doc, /Approved Action Types/);
@@ -294,6 +318,11 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(source, /remote_policy\.mailbox\.expire/);
   assert.match(source, /remote_policy\.mailbox\.revoke/);
   assert.match(source, /function handleNanahIncomingManagedMailboxItem\(item\)/);
+  assert.match(source, /function recordManagedOpenSyncAckHistory\(details = \{\}\)/);
+  assert.match(source, /remote_policy\.mailbox\.ack/);
+  assert.match(source, /Mailbox ack delivered/);
+  assert.match(source, /Mailbox ack handoff failed/);
+  assert.match(source, /recordAckHistory: \(details\) => recordManagedOpenSyncAckHistory\(details\)/);
   assert.match(source, /function handleNanahIncomingManagedLocalNetworkCandidate\(candidate\)/);
   assert.match(source, /function handleNanahIncomingManagedPolicyEnvelope\(envelope\)/);
   assert.match(source, /root\.type === 'filtertube_managed_policy'/);
@@ -342,6 +371,10 @@ test('managed policy action-history row fixture requires actor target revision r
   assert.deepEqual(validateHistoryRow(validClearRow({ reason: null })), { ok: false, reason: 'missing_rejection_reason' });
   assert.deepEqual(validateHistoryRow(validRemoteRateLimitedRow()), { ok: true });
   assert.deepEqual(validateHistoryRow(validRemoteRateLimitedRow({ summary: { plaintextValue: 'spiders' } })), { ok: false, reason: 'sensitive_plaintext_value' });
+  assert.deepEqual(validateHistoryRow(validMailboxAckRow()), { ok: true });
+  assert.deepEqual(validateHistoryRow(validMailboxAckRow({ result: 'rejected', reason: 'ack_provider_unavailable' })), { ok: true });
+  assert.deepEqual(validateHistoryRow(validMailboxAckRow({ result: 'rejected', reason: null })), { ok: false, reason: 'missing_rejection_reason' });
+  assert.deepEqual(validateHistoryRow(validMailboxAckRow({ summary: { plaintextValue: 'spiders' } })), { ok: false, reason: 'sensitive_plaintext_value' });
 });
 
 test('managed action history access is parent/caregiver authority not child PIN authority', () => {
@@ -382,6 +415,7 @@ test('managed action history required outcomes cover accepted rejected conflict 
     'rejected_equal_revision_conflict',
     'rejected_after_trust_revocation',
     'rate_limited_remote_policy_attempt',
+    'acked_mailbox_policy_result',
     'failed_parent_unlock',
     'cleared_by_parent'
   ];
@@ -403,6 +437,7 @@ test('managed action history required outcomes cover accepted rejected conflict 
   assert.match(doc, /runtime remote managed validation\/apply history writer: present/);
   assert.match(doc, /runtime remote managed accepted apply history writer: present behind validated managed apply wrapper/);
   assert.match(doc, /runtime mailbox managed validation\/apply history writer: present/);
+  assert.match(doc, /runtime mailbox ack-handoff history writer: present on protected target profiles/);
   assert.match(doc, /runtime local-network candidate validation\/apply history writer: present/);
   assert.match(doc, /runtime remote managed failed-attempt rate-limit state: present under profile\.managedPolicyState\.remoteFailedAttemptRateLimits/);
   assert.match(doc, /runtime managed outbound live send history writer: present on trusted link policy rows/);

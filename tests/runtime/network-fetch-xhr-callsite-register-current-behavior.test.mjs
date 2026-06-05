@@ -14,7 +14,7 @@ const sourceFingerprints = {
   'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
   'js/injector.js': [3593, 155830, '634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04'],
   'js/seed.js': [1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
-  'js/tab-view.js': [14061, 652278, '9680daae674c909f44f9d860e8b5cd9a7957047c8f93f6eff2a84fb380bb8430']
+  'js/tab-view.js': [14149, 656960, '88b782a1b2ccbc0dab91dbdf5b0331e8cb37ef6108cbe71684d75f10bb9c1489']
 };
 
 function read(file) {

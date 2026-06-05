@@ -1,8 +1,9 @@
 # Audit: Managed Policy Encrypted Mailbox Protocol
 
 **Generated**: 2026-06-04  
-**Status**: Protocol, proof fixture, local decrypted mailbox-item intake, and a
-provider-gated dashboard/profile-open pull hook are present. Runtime server
+**Status**: Protocol, proof fixture, local decrypted mailbox-item intake,
+provider-gated dashboard/profile-open pull hook, provider ack handoff, and
+protected target-profile ack-handoff evidence are present. Runtime server
 mailbox pull is not implemented.
 **Related plan**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`  
@@ -135,6 +136,7 @@ summary data by default:
 
 ```text
 actionType: remote_policy.mailbox.accept|reject|expire|revoke|conflict
+ack handoff actionType: remote_policy.mailbox.ack
 trustedLinkId
 sourceDeviceId
 targetProfileId
@@ -149,7 +151,10 @@ receivedAt
 
 The row must not contain plaintext blocked keywords, channel names, video ids,
 or viewing history. Protected users cannot clear rejected, revoked, conflict,
-or failed-delivery evidence.
+or failed-delivery evidence. Ack-handoff rows record only redacted
+link/profile/scope/revision/hash, mailbox item id metadata, ack state, and
+provider ack counts after the protected device reports accepted/rejected
+mailbox outcomes back to the provider.
 
 ## Non-Negotiables
 
@@ -177,7 +182,8 @@ storage client, or mailbox decryption client. The mailbox server cannot become
 policy authority. The first pull-on-open hook now exists only as a
 provider-gated dashboard/profile-open bridge for local/decrypted mailbox items,
 and the same provider can receive redacted ack records after extension-side
-validation/apply/reject.
+validation/apply/reject. The target profile also records redacted
+ack-handoff evidence after the provider ack attempt completes.
 If that provider returns `ok: false` or throws while pulling, the open-sync hook
 discards any returned mailbox items, does not apply or acknowledge them, and
 keeps the last valid accepted policy active.
@@ -192,8 +198,9 @@ runtime mailbox item managed-policy apply wrapper: present
 runtime mailbox protected history rows: present
 runtime provider-gated dashboard/profile-open pull hook: present
 runtime provider-gated ack handoff: present
+runtime protected mailbox ack-handoff history rows: present
 runtime provider failure fail-closed apply guard: present
 runtime mailbox server pull client: absent
 runtime mailbox decryption client: absent
-runtime behavior changed by this slice: yes, for local/decrypted mailbox item intake, provider-gated dashboard/profile-open pull status, and provider ack handoff only
+runtime behavior changed by this slice: yes, for local/decrypted mailbox item intake, provider-gated dashboard/profile-open pull status, provider ack handoff, and protected target-profile ack-handoff evidence only
 ```
