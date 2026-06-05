@@ -20,7 +20,9 @@ provider-gated dashboard/profile-open pull hook and redacted provider ack
 handoff are present for already-decrypted mailbox items, and the adapter now
 has a source-side server-safe mailbox storage item builder for already-encrypted
 payloads plus local WebCrypto seal/open helpers that keep plaintext policy out
-of mailbox storage. A provider-gated dashboard/profile-open local-network
+of mailbox storage. Source-side mailbox upload-provider handoff can now publish
+ciphertext-only mailbox items while marking sent revision/hash state only for
+provider-accepted mailbox item ids. A provider-gated dashboard/profile-open local-network
 candidate discovery hook plus redacted provider candidate ack handoff are
 present for already trusted managed replica links, and source-side
 local-network provider delivery handoff can now publish signed candidates while
@@ -29,8 +31,8 @@ extension-owned managed app policy contract artifact and app manifest copy row
 are now present so downstream app parity can be tested before native
 enforcement changes. Active/full signed managed sends now expand into concrete
 Main, Kids, viewing-space, and optional time-limit envelopes for eligible fixed
-targets. Built-in local-network peer discovery, LAN transport, server mailbox
-upload/pull, app native enforcement proofs, offline later delivery UI, and
+targets. Built-in local-network peer discovery, LAN transport, built-in server
+mailbox upload/pull clients, app native enforcement proofs, offline later delivery UI, and
 built-in multi-device fanout remain gated. The adapter now exposes a
 local-network candidate authority gate for future LAN providers, and the
 dashboard has a sanitized receive bridge that records accepted/rejected
@@ -763,12 +765,13 @@ where parent and child devices are not reachable at the same time.
 - **Dependencies**: Sprint 3.
 - **Status**: Protocol doc, executable proof fixture, source-side WebCrypto
   mailbox seal/open helpers, source-side server-safe mailbox storage item
-  builder, and local/decrypted mailbox-item validation/apply intake added. A
-  provider-gated dashboard/profile-open hook can request already-decrypted
-  mailbox items from a trusted local provider and send redacted ack records
-  after apply/reject. Provider rejection or provider failure now fails closed
-  without applying or acknowledging any returned items. Runtime server
-  upload/pull clients remain absent by design.
+  builder, source-side mailbox upload-provider handoff, and local/decrypted
+  mailbox-item validation/apply intake added. A provider-gated
+  dashboard/profile-open hook can request already-decrypted mailbox items from
+  a trusted local provider and send redacted ack records after apply/reject.
+  Provider rejection or provider failure now fails closed without applying or
+  acknowledging any returned items. Runtime built-in server upload/pull clients
+  remain absent by design.
 - **Acceptance Criteria**:
   - Server cannot read rules.
   - Replay, stale, revoked, wrong-target, and duplicate delivery behavior is
@@ -777,6 +780,8 @@ where parent and child devices are not reachable at the same time.
     envelope before validation/apply.
   - Source-side storage items contain only ciphertext metadata until the local
     open helper or a trusted local provider supplies a decrypted envelope.
+  - Source-side upload handoff gives optional providers only ciphertext
+    mailbox items and marks sent state only for provider-accepted item ids.
   - Pull-on-open does no work unless the trusted link opted into
     `syncOnProfileOpen` and a local provider is available.
   - Provider `ok: false` responses and provider exceptions do not apply or ack

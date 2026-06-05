@@ -10,6 +10,7 @@ const tabViewHtmlPath = 'html/tab-view.html';
 const managedLivePolicyPath = 'js/nanah_managed_live_policy.js';
 const docPath = 'docs/audit/FILTERTUBE_NANAH_MANAGED_LIVE_SIGNED_SEND_2026-06-04.md';
 const sourceDeliveryDocPath = 'docs/audit/FILTERTUBE_MANAGED_LOCAL_NETWORK_SOURCE_DELIVERY_2026-06-05.md';
+const mailboxSourceDeliveryDocPath = 'docs/audit/FILTERTUBE_MANAGED_MAILBOX_SOURCE_UPLOAD_HANDOFF_2026-06-05.md';
 const signingDocPath = 'docs/audit/FILTERTUBE_NANAH_MANAGED_SIGNING_KEYPAIR_2026-06-04.md';
 const planPath = 'docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md';
 const inventoryPath = 'docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md';
@@ -166,6 +167,31 @@ function createManagedLivePolicyHarness({ activeSurface = 'main', sourceProfile 
             }
           }
         };
+      },
+      buildManagedMailboxStorageItem(envelope, sealedPayload, options = {}) {
+        return {
+          schema: 'filtertube_managed_mailbox_item',
+          version: 1,
+          mailboxItemId: options.mailboxItemId || `mbx-${envelope.linkId}-${envelope.scope}-${envelope.revision}`,
+          linkId: envelope.linkId,
+          targetProfileId: envelope.targetProfileId,
+          sourceDeviceId: envelope.sourceDeviceId,
+          sourceProfileId: envelope.sourceProfileId,
+          scope: envelope.scope,
+          revision: envelope.revision,
+          policyHash: envelope.policyHash,
+          sourcePublicKeyId: envelope.sourcePublicKeyId,
+          keyVersion: envelope.keyVersion,
+          cipherSuite: sealedPayload.cipherSuite,
+          keyAgreementId: sealedPayload.keyAgreementId,
+          encryptedDek: sealedPayload.encryptedDek,
+          nonce: sealedPayload.nonce,
+          ciphertext: sealedPayload.ciphertext,
+          ciphertextHash: sealedPayload.ciphertextHash,
+          createdAtMs: options.createdAtMs || 1779300000000,
+          expiresAtMs: options.expiresAtMs || 1779303600000,
+          ackState: 'pending'
+        };
       }
     }),
     now: () => 1779300000000
@@ -176,6 +202,7 @@ function createManagedLivePolicyHarness({ activeSurface = 'main', sourceProfile 
 test('managed live signed-send audit is linked without claiming mailbox runtime', () => {
   const doc = read(docPath);
   const sourceDeliveryDoc = read(sourceDeliveryDocPath);
+  const mailboxSourceDeliveryDoc = read(mailboxSourceDeliveryDocPath);
   const signingDoc = read(signingDocPath);
   const plan = read(planPath);
   const inventory = read(inventoryPath);
@@ -188,12 +215,16 @@ test('managed live signed-send audit is linked without claiming mailbox runtime'
   assert.match(doc, /not a mailbox runtime, built-in local-network discovery runtime,\s+key-rotation system, or complete offline later-delivery UI/);
   assert.match(sourceDeliveryDoc, /Source-side local-network managed policy delivery handoff/);
   assert.match(sourceDeliveryDoc, /Built-in LAN peer\s+discovery, LAN transport, server mailbox upload\/pull, and dashboard offline-send\s+UI remain absent/);
+  assert.match(mailboxSourceDeliveryDoc, /Source-side mailbox upload-provider handoff is present/);
+  assert.match(mailboxSourceDeliveryDoc, /runtime built-in mailbox server upload client: absent/);
+  assert.match(mailboxSourceDeliveryDoc, /runtime mailbox plaintext policy upload: absent/);
   assert.match(doc, new RegExp(sourceDeliveryDocPath));
+  assert.match(doc, new RegExp(mailboxSourceDeliveryDocPath));
   assert.match(signingDoc, new RegExp(docPath));
   assert.match(plan, new RegExp(docPath));
   assert.match(plan, new RegExp(sourceDeliveryDocPath));
   assert.match(plan, /Active\/full signed managed sends now expand into concrete\s+Main, Kids,\s+viewing-space, and optional time-limit envelopes for eligible fixed\s+targets/);
-  assert.match(plan, /Built-in local-network peer discovery, LAN transport, server mailbox\s+upload\/pull, app native enforcement proofs,\s+offline later delivery UI, and\s+built-in multi-device fanout remain gated/);
+  assert.match(plan, /Built-in local-network peer discovery, LAN transport, built-in server\s+mailbox upload\/pull clients, app native enforcement proofs,\s+offline later delivery UI, and\s+built-in multi-device fanout remain gated/);
   assert.doesNotMatch(plan, /active\/full signed managed sends\s+remain gated/);
   assert.match(inventory, /fixed-target active\/full profile-policy bundles, Main\/Kids, keyword,\s+channel, video, viewing-space, and time-limit live sends can now build signed/);
   assert.match(inventory, new RegExp(sourceDeliveryDocPath));
@@ -498,6 +529,90 @@ test('managed live signed-send helper publishes local-network candidates and mar
   const unavailable = await helper.deliverLocalNetworkCandidates(candidates, {}, { reason: 'manual_source_send' });
   assert.equal(unavailable.ok, false);
   assert.equal(unavailable.reason, 'local_network_delivery_provider_unavailable');
+  assert.equal(unavailable.markedSentCount, 0);
+});
+
+test('managed live signed-send helper uploads mailbox ciphertext items and marks only accepted uploads', async () => {
+  const { helper, trustedLink, policyUpdates } = createManagedLivePolicyHarness();
+  const sealedPayloadForEnvelope = (envelope, index) => ({
+    cipherSuite: 'aes-kw+a256gcm',
+    keyAgreementId: `link-parent-child-1:child-profile-1:managed-key-1:${index + 1}`,
+    encryptedDek: `sealed-dek-${index + 1}`,
+    nonce: `nonce-${index + 1}`,
+    ciphertext: `ciphertext-${index + 1}`,
+    ciphertextHash: `sha256:ciphertext-${index + 1}`
+  });
+  const items = await helper.buildMailboxStorageItemBatchForTrustedLinks(
+    { scope: 'rules_bundle', linkType: 'managed_link', authorityMode: 'managed' },
+    [trustedLink],
+    { mailboxItemId: 'mbx-item', sealedPayloadForEnvelope }
+  );
+
+  assert.deepEqual(plain(items.map((item) => item.schema)), [
+    'filtertube_managed_mailbox_item',
+    'filtertube_managed_mailbox_item',
+    'filtertube_managed_mailbox_item'
+  ]);
+  assert.deepEqual(plain(items.map((item) => item.scope)), ['keywords', 'channels', 'videos']);
+  assert.deepEqual(plain(items.map((item) => item.mailboxItemId)), ['mbx-item-1', 'mbx-item-2', 'mbx-item-3']);
+  assert.equal(items[0].cipherSuite, 'aes-kw+a256gcm');
+  assert.equal(items[0].ciphertext, 'ciphertext-1');
+  assert.equal(JSON.stringify(items).includes('"payload":'), false);
+  assert.equal(JSON.stringify(items).includes('"envelope":'), false);
+  assert.equal(JSON.stringify(items).includes('"managedPolicyEnvelope":'), false);
+  assert.equal(JSON.stringify(items).includes('shakira'), false);
+  assert.equal(JSON.stringify(items).includes('UC-shakira'), false);
+  assert.equal(JSON.stringify(items).includes('privateKeyJwk'), false);
+
+  let capturedRequest = null;
+  const provider = {
+    async uploadManagedMailboxItems(request) {
+      capturedRequest = plain(request);
+      return {
+        ok: true,
+        uploadedMailboxItemIds: [items[0].mailboxItemId, items[2].mailboxItemId]
+      };
+    }
+  };
+
+  const result = await helper.uploadMailboxItems(items, provider, { reason: 'manual_offline_send' });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.mailboxItemCount, 3);
+  assert.equal(result.uploadedMailboxItemCount, 2);
+  assert.equal(result.failedMailboxItemCount, 1);
+  assert.equal(result.markedSentCount, 2);
+  assert.equal(capturedRequest.schema, 'filtertube_managed_mailbox_upload_request');
+  assert.equal(capturedRequest.transport, 'encrypted_mailbox');
+  assert.equal(capturedRequest.reason, 'manual_offline_send');
+  assert.deepEqual(capturedRequest.scopes, ['keywords', 'channels', 'videos']);
+  assert.equal(capturedRequest.items.length, 3);
+  assert.equal(JSON.stringify(capturedRequest).includes('"payload":'), false);
+  assert.equal(JSON.stringify(capturedRequest).includes('shakira'), false);
+  assert.deepEqual(plain(policyUpdates.map((entry) => entry.patch.policy.outboundManagedPolicyHistory[0].summary.delivery)), [
+    'encrypted_mailbox_provider',
+    'encrypted_mailbox_provider'
+  ]);
+  assert.deepEqual(plain(policyUpdates.map((entry) => entry.patch.policy.outgoingManagedPolicies)), [
+    {
+      keywords: {
+        revision: items[0].revision,
+        policyHash: items[0].policyHash,
+        sentAt: 1779300000000
+      }
+    },
+    {
+      videos: {
+        revision: items[2].revision,
+        policyHash: items[2].policyHash,
+        sentAt: 1779300000000
+      }
+    }
+  ]);
+
+  const unavailable = await helper.uploadMailboxItems(items, {}, { reason: 'manual_offline_send' });
+  assert.equal(unavailable.ok, false);
+  assert.equal(unavailable.reason, 'mailbox_upload_provider_unavailable');
   assert.equal(unavailable.markedSentCount, 0);
 });
 

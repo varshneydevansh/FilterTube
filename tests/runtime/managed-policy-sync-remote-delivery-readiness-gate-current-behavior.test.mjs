@@ -55,8 +55,9 @@ test('managed remote delivery readiness gate is docs-backed and linked to curren
   assert.match(doc, /release claim for complete remote management: NO-GO/);
   assert.match(doc, /built-in LAN peer discovery: NO-GO/);
   assert.match(doc, /mailbox encryption client: PARTIAL local helper/);
-  assert.match(doc, /server mailbox upload client: NO-GO/);
-  assert.match(doc, /server mailbox pull client: NO-GO/);
+  assert.match(doc, /source-side mailbox upload-provider handoff: PARTIAL/);
+  assert.match(doc, /built-in server mailbox upload client: NO-GO/);
+  assert.match(doc, /built-in server mailbox pull client: NO-GO/);
   assert.match(doc, /mailbox decryption client: PARTIAL local helper/);
   assert.match(doc, /flowchart TD/);
   assert.match(doc, /node --test tests\/runtime\/managed-policy-sync-remote-delivery-readiness-gate-current-behavior\.test\.mjs/);
@@ -68,8 +69,9 @@ test('managed remote delivery readiness gate is docs-backed and linked to curren
   assert.match(mailboxDoc, /runtime mailbox seal\/open encryption helper: present/);
   assert.match(mailboxDoc, /runtime source-side server-safe mailbox storage item builder: present/);
   assert.match(mailboxDoc, /runtime mailbox encryption client: present for local seal helper only/);
-  assert.match(mailboxDoc, /runtime mailbox server upload client: absent/);
-  assert.match(mailboxDoc, /runtime mailbox server pull client: absent/);
+  assert.match(mailboxDoc, /runtime source-side mailbox upload-provider handoff: present/);
+  assert.match(mailboxDoc, /runtime built-in mailbox server upload client: absent/);
+  assert.match(mailboxDoc, /runtime built-in mailbox server pull client: absent/);
   assert.match(mailboxDoc, /runtime mailbox decryption client: present for local open helper only/);
   assert.match(boundaryDoc, /runtime built-in local-network peer discovery: absent/);
   assert.match(inventory, /built-in local-network peer discovery\/LAN delivery runtime/);

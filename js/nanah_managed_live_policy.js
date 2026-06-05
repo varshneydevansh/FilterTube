@@ -23,6 +23,7 @@
     const MANAGED_LOCAL_NETWORK_ACK_SCHEMA = 'filtertube_managed_local_network_candidate_ack';
     const MANAGED_LOCAL_NETWORK_CANDIDATE_SCHEMA = 'filtertube_managed_local_network_candidate';
     const MANAGED_LOCAL_NETWORK_DELIVERY_REQUEST_SCHEMA = 'filtertube_managed_local_network_delivery_request';
+    const MANAGED_MAILBOX_UPLOAD_REQUEST_SCHEMA = 'filtertube_managed_mailbox_upload_request';
     const MANAGED_LIVE_ACK_HISTORY_SCHEMA = 'filtertube_managed_live_ack_history';
     const MANAGED_REMOTE_DELIVERY_ACK_HISTORY_SCHEMA = 'filtertube_managed_remote_delivery_ack_history';
     const MANAGED_OUTBOUND_HISTORY_SCHEMA = 'filtertube_managed_outbound_policy_history';
@@ -571,6 +572,149 @@
             return deliverLocalNetworkCandidates(candidates, provider, options);
         }
 
+        async function buildMailboxStorageItemFromEnvelope(envelope, options = {}) {
+            const root = safeObject(envelope);
+            const optionRoot = safeObject(options);
+            const adapter = deps.getAdapter();
+            if (!adapter) {
+                throw new Error('Managed mailbox upload handoff requires the Nanah adapter.');
+            }
+            const mailboxItemId = normalizeString(optionRoot.mailboxItemId);
+            const itemOptions = {
+                ...optionRoot,
+                ...(optionRoot.mailboxWrappingKey || optionRoot.wrappingKey
+                    ? { mailboxWrappingKey: optionRoot.mailboxWrappingKey || optionRoot.wrappingKey }
+                    : {}),
+                ...(mailboxItemId ? { mailboxItemId } : {})
+            };
+            if (typeof adapter.sealManagedMailboxEnvelope === 'function' && (optionRoot.seal === true || optionRoot.mailboxWrappingKey || optionRoot.wrappingKey)) {
+                return adapter.sealManagedMailboxEnvelope(root, itemOptions);
+            }
+            if (typeof adapter.buildManagedMailboxStorageItem === 'function') {
+                const sealedPayload = typeof optionRoot.sealedPayloadForEnvelope === 'function'
+                    ? safeObject(await optionRoot.sealedPayloadForEnvelope(root, optionRoot.index || 0))
+                    : safeObject(optionRoot.sealedPayload);
+                return adapter.buildManagedMailboxStorageItem(root, sealedPayload, itemOptions);
+            }
+            throw new Error('Managed mailbox upload handoff requires mailbox seal/build helpers.');
+        }
+
+        async function buildMailboxStorageItemBatchForTrustedLinks(policy, trustedLinks, options = {}) {
+            const envelopes = await buildEnvelopeBatchForTrustedLinks(policy, trustedLinks);
+            const optionRoot = safeObject(options);
+            const items = [];
+            for (let index = 0; index < envelopes.length; index += 1) {
+                const mailboxItemId = normalizeString(optionRoot.mailboxItemId)
+                    ? `${normalizeString(optionRoot.mailboxItemId)}-${index + 1}`
+                    : '';
+                items.push(await buildMailboxStorageItemFromEnvelope(envelopes[index], {
+                    ...optionRoot,
+                    index,
+                    ...(mailboxItemId ? { mailboxItemId } : {})
+                }));
+            }
+            return items;
+        }
+
+        function buildMailboxUploadRequest(items, options = {}) {
+            const optionRoot = safeObject(options);
+            const rows = safeArray(items).map(row => safeObject(row)).filter(row => normalizeString(row.mailboxItemId));
+            return {
+                schema: MANAGED_MAILBOX_UPLOAD_REQUEST_SCHEMA,
+                version: 1,
+                transport: 'encrypted_mailbox',
+                reason: normalizeString(optionRoot.reason) || 'manual_send',
+                requestedAt: normalizeNonNegativeInteger(optionRoot.requestedAt) || deps.now(),
+                mailboxItemCount: rows.length,
+                targetProfileIds: Array.from(new Set(rows.map(row => normalizeString(row.targetProfileId)).filter(Boolean))),
+                scopes: Array.from(new Set(rows.map(row => normalizeScope(row.scope)).filter(Boolean))),
+                items: rows
+            };
+        }
+
+        function getMailboxUploadWriter(provider) {
+            const root = safeObject(provider);
+            if (typeof root.uploadManagedMailboxItems === 'function') return root.uploadManagedMailboxItems;
+            if (typeof root.publishManagedMailboxItems === 'function') return root.publishManagedMailboxItems;
+            if (typeof root.putManagedMailboxItems === 'function') return root.putManagedMailboxItems;
+            if (typeof root.enqueueManagedMailboxItems === 'function') return root.enqueueManagedMailboxItems;
+            return null;
+        }
+
+        function normalizeUploadedMailboxItemIds(result, items, ok) {
+            const root = safeObject(result);
+            const itemRows = safeArray(items);
+            const explicit = safeArray(root.uploadedMailboxItemIds || root.acceptedMailboxItemIds || root.mailboxItemIds)
+                .map(item => normalizeString(item))
+                .filter(Boolean);
+            if (explicit.length > 0) return new Set(explicit);
+            const count = Number(root.uploadedMailboxItemCount ?? root.acceptedMailboxItemCount ?? root.queuedMailboxItemCount);
+            const uploadedCount = Number.isFinite(count)
+                ? Math.max(0, Math.min(itemRows.length, Math.floor(count)))
+                : (ok ? itemRows.length : 0);
+            return new Set(itemRows.slice(0, uploadedCount).map(row => normalizeString(row.mailboxItemId)).filter(Boolean));
+        }
+
+        async function uploadMailboxItems(items, provider, options = {}) {
+            const rows = safeArray(items).map(row => safeObject(row)).filter(row => normalizeString(row.mailboxItemId));
+            const writer = getMailboxUploadWriter(provider);
+            const request = buildMailboxUploadRequest(rows, options);
+            if (!writer) {
+                return {
+                    ok: false,
+                    reason: 'mailbox_upload_provider_unavailable',
+                    mailboxItemCount: rows.length,
+                    uploadedMailboxItemCount: 0,
+                    failedMailboxItemCount: rows.length,
+                    markedSentCount: 0,
+                    request
+                };
+            }
+
+            try {
+                const rawResult = safeObject(await writer.call(provider, request));
+                const ok = rawResult.ok !== false;
+                const uploadedIds = normalizeUploadedMailboxItemIds(rawResult, rows, ok);
+                let markedSentCount = 0;
+                for (const row of rows) {
+                    if (!uploadedIds.has(normalizeString(row.mailboxItemId))) continue;
+                    const marked = await markSent(row.linkId, row.scope, row.revision, row.policyHash, {
+                        targetProfileId: row.targetProfileId,
+                        sourceProfileId: row.sourceProfileId,
+                        sourceDeviceId: row.sourceDeviceId,
+                        issuedAt: row.createdAtMs,
+                        delivery: 'encrypted_mailbox_provider'
+                    });
+                    if (marked) markedSentCount += 1;
+                }
+                const uploadedMailboxItemCount = uploadedIds.size;
+                return {
+                    ok,
+                    reason: normalizeString(rawResult.reason),
+                    mailboxItemCount: rows.length,
+                    uploadedMailboxItemCount,
+                    failedMailboxItemCount: Math.max(0, rows.length - uploadedMailboxItemCount),
+                    markedSentCount,
+                    request
+                };
+            } catch (error) {
+                return {
+                    ok: false,
+                    reason: normalizeString(error?.message) || 'mailbox_upload_provider_failed',
+                    mailboxItemCount: rows.length,
+                    uploadedMailboxItemCount: 0,
+                    failedMailboxItemCount: rows.length,
+                    markedSentCount: 0,
+                    request
+                };
+            }
+        }
+
+        async function uploadMailboxPolicyBatch(policy, trustedLinks, provider, options = {}) {
+            const items = await buildMailboxStorageItemBatchForTrustedLinks(policy, trustedLinks, options);
+            return uploadMailboxItems(items, provider, options);
+        }
+
         function normalizeAckState(value) {
             const normalized = normalizeString(value).toLowerCase();
             if (normalized === 'accepted' || normalized === 'applied') return 'delivered';
@@ -833,6 +977,11 @@
             buildLocalNetworkDeliveryRequest,
             deliverLocalNetworkCandidates,
             deliverLocalNetworkPolicyBatch,
+            buildMailboxStorageItemFromEnvelope,
+            buildMailboxStorageItemBatchForTrustedLinks,
+            buildMailboxUploadRequest,
+            uploadMailboxItems,
+            uploadMailboxPolicyBatch,
             buildOutboundHistoryRow,
             buildLiveAckPayload,
             recordLiveAckPayload,

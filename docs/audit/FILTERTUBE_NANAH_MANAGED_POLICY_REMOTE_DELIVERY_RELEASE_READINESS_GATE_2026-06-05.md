@@ -148,11 +148,12 @@ FT-MANAGED-REMOTE-09-no-work-idle
 remote policy authority: GO
 live same-session Nanah send: PARTIAL
 provider-gated mailbox/local-network intake: PARTIAL
+source-side mailbox upload-provider handoff: PARTIAL
 built-in LAN peer discovery: NO-GO
 built-in LAN delivery: NO-GO
 mailbox encryption client: PARTIAL local helper
-server mailbox upload client: NO-GO
-server mailbox pull client: NO-GO
+built-in server mailbox upload client: NO-GO
+built-in server mailbox pull client: NO-GO
 mailbox decryption client: PARTIAL local helper
 release claim for complete remote management: NO-GO
 ```

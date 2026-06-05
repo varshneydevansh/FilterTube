@@ -13,6 +13,8 @@ envelope construction or live send.
 `docs/audit/FILTERTUBE_NANAH_MANAGED_MULTI_TARGET_FANOUT_BOUNDARY_2026-06-04.md`
 **Local-network source delivery**:
 `docs/audit/FILTERTUBE_MANAGED_LOCAL_NETWORK_SOURCE_DELIVERY_2026-06-05.md`
+**Mailbox source upload handoff**:
+`docs/audit/FILTERTUBE_MANAGED_MAILBOX_SOURCE_UPLOAD_HANDOFF_2026-06-05.md`
 
 ## Scope
 
@@ -138,6 +140,14 @@ provider accepted, and the protected replica still validates the signed
 envelope before any policy write. This is a provider handoff, not built-in LAN
 discovery or built-in LAN transport.
 
+The source helper can also prepare ciphertext-only
+`filtertube_managed_mailbox_item` rows and hand them to an optional mailbox
+upload provider through a `filtertube_managed_mailbox_upload_request`. Provider
+acceptance is only queued-delivery feedback: `markSent(...)` is called only for
+mailbox item ids the provider accepted, and the protected replica still opens,
+validates, and applies the mailbox item through the managed-policy validator.
+This is a provider handoff, not a built-in mailbox server client.
+
 This is not a mailbox runtime, built-in local-network discovery runtime,
 key-rotation system, or complete offline later-delivery UI.
 
@@ -149,6 +159,7 @@ Still pending:
   clearly for every protected profile;
 - installed-extension two-device smoke proof;
 - key rotation/revocation UI;
+- built-in server mailbox upload/pull client and dashboard offline-send UI;
 - encrypted private-key-at-rest storage.
 
 ## Proof Commands
