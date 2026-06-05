@@ -2,14 +2,20 @@ import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import vm from 'node:vm';
 
 const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_MANAGED_POLICY_ENCRYPTED_MAILBOX_PROTOCOL_2026-06-04.md';
 const planPath = 'docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md';
 const inventoryPath = 'docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md';
+const adapterPath = 'js/nanah_sync_adapter.js';
 
 function read(relativePath) {
   return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
+}
+
+function plain(value) {
+  return JSON.parse(JSON.stringify(value));
 }
 
 function runtimeSource() {
@@ -21,6 +27,12 @@ function runtimeSource() {
     'js/state_manager.js',
     'js/tab-view.js'
   ].map(read).join('\n');
+}
+
+function loadNanahAdapter() {
+  const context = { window: {} };
+  vm.runInNewContext(read(adapterPath), context);
+  return context.window.FilterTubeNanahAdapter;
 }
 
 function trustedLink(overrides = {}) {
@@ -61,6 +73,57 @@ function managedEnvelope(overrides = {}) {
       operations: [{ op: 'add_keyword', valueHash: 'sha256:redacted-keyword' }]
     },
     ...overrides
+  };
+}
+
+function adapterValidManagedEnvelope(adapter, overrides = {}) {
+  const envelope = managedEnvelope({
+    policyHash: '',
+    integrity: {},
+    ...overrides
+  });
+  envelope.policyHash = adapter.buildManagedPolicyPayloadHash(envelope);
+  envelope.integrity = {
+    algorithm: 'ed25519',
+    signature: 'signature-7',
+    signedFields: {
+      linkId: envelope.linkId,
+      scope: envelope.scope,
+      targetProfileId: envelope.targetProfileId,
+      sourceDeviceId: envelope.sourceDeviceId,
+      revision: envelope.revision,
+      policyHash: envelope.policyHash,
+      payloadScope: 'keywords'
+    }
+  };
+  return envelope;
+}
+
+function sealedMailboxPayload(overrides = {}) {
+  return {
+    cipherSuite: 'x25519-hkdf-chacha20poly1305',
+    keyAgreementId: 'link-parent-child-1:key-3',
+    encryptedDek: 'sealed-dek',
+    nonce: 'nonce-7',
+    ciphertext: 'ciphertext-7',
+    ciphertextHash: 'sha256:ciphertext-hash-7',
+    ...overrides
+  };
+}
+
+function adapterMailboxContext() {
+  return {
+    trustedLink: trustedLink(),
+    nowMs: 1770100000000,
+    signatureVerified: true,
+    profiles: {
+      'parent-profile-1': { type: 'parent', name: 'Parent' },
+      'child-profile-1': { type: 'child', name: 'Child', parentProfileId: 'parent-profile-1' }
+    },
+    accepted: {
+      revision: 6,
+      policyHash: 'sha256:accepted-policy-6'
+    }
   };
 }
 
@@ -190,8 +253,8 @@ test('managed mailbox protocol is docs-backed and linked from plan and inventory
   const plan = read(planPath);
   const inventory = read(inventoryPath);
 
-  assert.match(doc, /Status\*\*: Protocol, proof fixture, local decrypted mailbox-item intake,\s+provider-gated dashboard\/profile-open pull hook, provider ack handoff, and\s+protected target-profile ack-handoff evidence are present/);
-  assert.match(doc, /Runtime\s+server\s+mailbox pull is not\s+implemented/);
+  assert.match(doc, /Status\*\*: Protocol, proof fixture, source-side server-safe mailbox storage\s+item builder, local decrypted mailbox-item intake, provider-gated\s+dashboard\/profile-open pull hook, provider ack handoff, and protected\s+target-profile ack-handoff evidence are present/);
+  assert.match(doc, /Runtime mailbox encryption,\s+server upload\/pull, and decryption clients are not implemented/);
   assert.match(doc, /The mailbox server is storage and relay only/);
   assert.match(doc, /must never receive plaintext rules, keywords, channel names,\s+video ids, viewing-space settings, time budgets, PIN values, or action-history\s+summaries/);
   assert.match(doc, /filtertube_managed_mailbox_item/);
@@ -205,8 +268,11 @@ test('managed mailbox protocol is docs-backed and linked from plan and inventory
   assert.match(doc, /Server metadata is not enough to apply policy/);
   assert.match(doc, /No-policy\/no-work YouTube runtime performance remains a release gate/);
   assert.match(doc, /runtime provider-gated dashboard\/profile-open pull hook: present/);
+  assert.match(doc, /runtime source-side server-safe mailbox storage item builder: present/);
   assert.match(doc, /runtime provider-gated ack handoff: present/);
   assert.match(doc, /runtime protected mailbox ack-handoff history rows: present/);
+  assert.match(doc, /runtime mailbox encryption client: absent/);
+  assert.match(doc, /runtime mailbox server upload client: absent/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
 });
@@ -218,6 +284,7 @@ test('managed mailbox runtime intake validates decrypted items without adding se
   assert.match(source, /async function applyManagedPolicyEnvelope\(envelope, context = \{\}\)/);
   assert.match(source, /Managed policy envelopes require validated managed apply flow/);
   assert.match(source, /function validateManagedMailboxItem\(item, context = \{\}\)/);
+  assert.match(source, /function buildManagedMailboxStorageItem\(envelope, sealedPayload = \{\}, options = \{\}\)/);
   assert.match(source, /async function applyManagedMailboxItem\(item, context = \{\}\)/);
   assert.match(source, /function handleNanahIncomingManagedMailboxItem\(item\)/);
   assert.match(source, /root\.schema === 'filtertube_managed_mailbox_item'/);
@@ -230,6 +297,84 @@ test('managed mailbox runtime intake validates decrypted items without adding se
   assert.match(source, /ackDecryptedMailboxItems/);
   assert.doesNotMatch(source, /FilterTubeManagedMailbox/);
   assert.doesNotMatch(source, /managedMailboxPull/);
+});
+
+test('managed mailbox storage builder emits server-safe ciphertext metadata only', () => {
+  const adapter = loadNanahAdapter();
+  const envelope = adapterValidManagedEnvelope(adapter);
+  const item = adapter.buildManagedMailboxStorageItem(envelope, sealedMailboxPayload(), {
+    createdAtMs: 1770000000000,
+    expiresAtMs: 1770604800000
+  });
+
+  assert.equal(item.schema, 'filtertube_managed_mailbox_item');
+  assert.equal(item.version, 1);
+  assert.equal(item.linkId, envelope.linkId);
+  assert.equal(item.targetProfileId, envelope.targetProfileId);
+  assert.equal(item.sourceDeviceId, envelope.sourceDeviceId);
+  assert.equal(item.sourceProfileId, envelope.sourceProfileId);
+  assert.equal(item.scope, envelope.scope);
+  assert.equal(item.revision, envelope.revision);
+  assert.equal(item.policyHash, envelope.policyHash);
+  assert.equal(item.sourcePublicKeyId, envelope.sourcePublicKeyId);
+  assert.equal(item.keyVersion, envelope.keyVersion);
+  assert.equal(item.ackState, 'pending');
+  assert.equal(item.cipherSuite, 'x25519-hkdf-chacha20poly1305');
+  assert.equal(item.keyAgreementId, 'link-parent-child-1:key-3');
+  assert.equal(item.encryptedDek, 'sealed-dek');
+  assert.equal(item.nonce, 'nonce-7');
+  assert.equal(item.ciphertext, 'ciphertext-7');
+  assert.equal(item.ciphertextHash, 'sha256:ciphertext-hash-7');
+
+  const serialized = JSON.stringify(item);
+  assert.doesNotMatch(serialized, /"payload"\s*:/);
+  assert.doesNotMatch(serialized, /"operations"\s*:/);
+  assert.doesNotMatch(serialized, /"decryptedEnvelope"\s*:/);
+  assert.doesNotMatch(serialized, /"managedPolicyEnvelope"\s*:/);
+  assert.doesNotMatch(serialized, /"envelope"\s*:/);
+  assert.doesNotMatch(serialized, /"privateKeyJwk"\s*:/);
+
+  assert.deepEqual(
+    plain(adapter.validateManagedMailboxItem(item, adapterMailboxContext())),
+    { accepted: false, reason: 'missing_managed_policy_envelope', ackState: 'rejected' }
+  );
+
+  const decrypted = { ...item, decryptedEnvelope: envelope };
+  assert.deepEqual(
+    plain(adapter.validateManagedMailboxItem(decrypted, adapterMailboxContext())),
+    {
+      accepted: true,
+      decision: 'accept_newer_revision',
+      scope: 'keywords',
+      targetProfileId: 'child-profile-1',
+      revision: envelope.revision,
+      policyHash: envelope.policyHash,
+      ackState: 'delivered',
+      mailboxItemId: item.mailboxItemId,
+      envelope
+    }
+  );
+});
+
+test('managed mailbox storage builder fails closed on missing crypto or stale expiry', () => {
+  const adapter = loadNanahAdapter();
+  const envelope = adapterValidManagedEnvelope(adapter);
+
+  assert.throws(
+    () => adapter.buildManagedMailboxStorageItem(envelope, sealedMailboxPayload({ ciphertext: '' })),
+    /requires ciphertext/
+  );
+  assert.throws(
+    () => adapter.buildManagedMailboxStorageItem(envelope, sealedMailboxPayload({ encryptedDek: '' })),
+    /requires encryptedDek/
+  );
+  assert.throws(
+    () => adapter.buildManagedMailboxStorageItem(envelope, sealedMailboxPayload(), {
+      createdAtMs: 1770000000000,
+      expiresAtMs: 1769999999999
+    }),
+    /expiry must be after creation/
+  );
 });
 
 test('managed mailbox delivery accepts only newer trusted ciphertext-backed policy', () => {

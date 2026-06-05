@@ -187,7 +187,7 @@ test('managed live signed-send audit is linked without claiming mailbox runtime'
   assert.match(signingDoc, new RegExp(docPath));
   assert.match(plan, new RegExp(docPath));
   assert.match(plan, /Active\/full signed managed sends now expand into concrete Main, Kids,\s+viewing-space, and optional time-limit envelopes for eligible fixed targets/);
-  assert.match(plan, /Built-in local-network peer discovery, LAN delivery, server mailbox pull,\s+mailbox decryption, app native enforcement proofs, offline later delivery, and\s+multi-device fanout remain gated/);
+  assert.match(plan, /Built-in local-network peer discovery, LAN delivery, mailbox encryption,\s+server mailbox upload\/pull, mailbox decryption, app native enforcement proofs,\s+offline later delivery, and multi-device fanout remain gated/);
   assert.doesNotMatch(plan, /active\/full signed managed sends\s+remain gated/);
   assert.match(inventory, /fixed-target active\/full profile-policy bundles, Main\/Kids, keyword,\s+channel, video, viewing-space, and time-limit live sends can now build signed/);
 });

@@ -1,10 +1,11 @@
 # Audit: Managed Policy Encrypted Mailbox Protocol
 
 **Generated**: 2026-06-04  
-**Status**: Protocol, proof fixture, local decrypted mailbox-item intake,
-provider-gated dashboard/profile-open pull hook, provider ack handoff, and
-protected target-profile ack-handoff evidence are present. Runtime server
-mailbox pull is not implemented.
+**Status**: Protocol, proof fixture, source-side server-safe mailbox storage
+item builder, local decrypted mailbox-item intake, provider-gated
+dashboard/profile-open pull hook, provider ack handoff, and protected
+target-profile ack-handoff evidence are present. Runtime mailbox encryption,
+server upload/pull, and decryption clients are not implemented.
 **Related plan**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`  
 **Related inventory**:
@@ -177,13 +178,24 @@ metadata to the decrypted `filtertube_managed_policy` envelope, verify the
 trusted managed signature context, apply through `applyManagedPolicyEnvelope(...)`,
 and write protected redacted action-history evidence.
 
-The runtime still does not implement a server mailbox pull scheduler, mailbox
-storage client, or mailbox decryption client. The mailbox server cannot become
-policy authority. The first pull-on-open hook now exists only as a
-provider-gated dashboard/profile-open bridge for local/decrypted mailbox items,
-and the same provider can receive redacted ack records after extension-side
-validation/apply/reject. The target profile also records redacted
-ack-handoff evidence after the provider ack attempt completes.
+Source-side mailbox storage preparation is now present through
+`buildManagedMailboxStorageItem(...)`. The helper accepts an already-signed
+managed policy envelope plus already-encrypted payload fields and emits only
+server-safe ciphertext metadata. It refuses missing crypto metadata, stale
+expiry, and plaintext policy keys such as payload, operations, keyword/channel
+lists, video ids, private keys, or decrypted envelopes. A storage item produced
+by this helper is not directly applicable; after local decryption, a provider
+must supply the decrypted envelope before `validateManagedMailboxItem(...)` can
+accept it.
+
+The runtime still does not implement a mailbox encryption client, server
+mailbox upload client, server mailbox pull scheduler, or mailbox decryption
+client. The mailbox server cannot become policy authority. The first
+pull-on-open hook now exists only as a provider-gated dashboard/profile-open
+bridge for local/decrypted mailbox items, and the same provider can receive
+redacted ack records after extension-side validation/apply/reject. The target
+profile also records redacted ack-handoff evidence after the provider ack
+attempt completes.
 If that provider returns `ok: false` or throws while pulling, the open-sync hook
 discards any returned mailbox items, does not apply or acknowledge them, and
 keeps the last valid accepted policy active.
@@ -192,6 +204,7 @@ Current runtime status:
 
 ```text
 runtime mailbox item schema intake: present for local/decrypted items
+runtime source-side server-safe mailbox storage item builder: present
 runtime mailbox item metadata-to-envelope binding: present
 runtime mailbox item signature gate reuse: present
 runtime mailbox item managed-policy apply wrapper: present
@@ -200,7 +213,9 @@ runtime provider-gated dashboard/profile-open pull hook: present
 runtime provider-gated ack handoff: present
 runtime protected mailbox ack-handoff history rows: present
 runtime provider failure fail-closed apply guard: present
+runtime mailbox encryption client: absent
+runtime mailbox server upload client: absent
 runtime mailbox server pull client: absent
 runtime mailbox decryption client: absent
-runtime behavior changed by this slice: yes, for local/decrypted mailbox item intake, provider-gated dashboard/profile-open pull status, provider ack handoff, and protected target-profile ack-handoff evidence only
+runtime behavior changed by this slice: yes, for source-side server-safe mailbox storage item building, local/decrypted mailbox item intake, provider-gated dashboard/profile-open pull status, provider ack handoff, and protected target-profile ack-handoff evidence only
 ```

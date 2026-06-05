@@ -106,10 +106,10 @@ test('managed open-sync audit is docs-backed and linked from plan inventory and 
   assert.match(mailboxDoc, /runtime protected mailbox ack-handoff history rows: present/);
   assert.match(mailboxDoc, /provider failure fail-closed apply guard: present/);
   assert.match(mailboxDoc, /provider-gated dashboard\/profile-open pull hook: present/);
-  assert.match(plan, /Provider rejection or provider failure now fails closed without applying or\s+acknowledging any returned items/);
-  assert.match(plan, /Provider `ok: false` responses and provider exceptions do not apply or ack\s+returned items and leave the last accepted policy active/);
-  assert.match(inventory, /Provider rejection or provider failure\s+now fails closed without applying or\s+acknowledging returned mailbox items/);
-  assert.match(inventory, /Provider rejection or provider failure fails closed without applying or acknowledging returned items/);
+  assert.match(plan, /Provider rejection or provider\s+failure now fails closed without applying or\s+acknowledging any returned\s+items/);
+  assert.match(plan, /Provider `ok: false` responses and provider exceptions do not apply or ack\s+returned\s+items and leave the last accepted policy active/);
+  assert.match(inventory, /Provider rejection\s+or provider\s+failure\s+now fails closed without applying or\s+acknowledging returned\s+mailbox items/);
+  assert.match(inventory, /Provider rejection or provider\s+failure fails closed without applying or acknowledging returned items/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
 });

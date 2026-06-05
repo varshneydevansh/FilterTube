@@ -2,9 +2,11 @@
 
 **Generated**: 2026-06-05
 **Status**: Remote policy authority, validation, local apply, action history,
-provider-gated mailbox intake, and provider-gated local-network candidate intake
-are present. Complete remote delivery is still blocked on transport proof.
-**Runtime behavior changed**: no.
+source-side server-safe mailbox storage preparation, provider-gated mailbox
+intake, and provider-gated local-network candidate intake are present. Complete
+remote delivery is still blocked on transport proof.
+**Runtime behavior changed**: yes, source-side mailbox storage item building
+only; no YouTube hot-path or built-in transport runtime changed.
 **Goal slice**: Implementation order items 2, 10, 11, 14, and the transport
 side of "Trusted parent/caregiver devices can update protected-device policy
 through Nanah P2P or local-network management."
@@ -32,6 +34,7 @@ and release language honest until the transport layer has its own proof.
 ```text
 parent policy editor
   -> signed managed-policy envelope
+  -> optional server-safe mailbox storage item from already-encrypted payload
   -> live Nanah same-session send when available
   -> provider-gated mailbox/local-network intake when a trusted provider exists
   -> validated managed apply
@@ -44,12 +47,14 @@ Mermaid:
 flowchart TD
   A["Parent/caregiver policy edit"] --> B["Signed managed-policy envelope"]
   B --> C["Live Nanah same-session send"]
-  B --> D["Provider-gated mailbox or LAN candidate intake"]
+  B --> D["Server-safe mailbox item builder for encrypted payload"]
+  D --> I["Blocked: server upload/pull/decryption client"]
+  B --> J["Provider-gated mailbox or LAN candidate intake"]
   C --> E["Managed validation and apply"]
-  D --> E
+  J --> E
   E --> F["Protected action history"]
   B --> G["Blocked: built-in LAN discovery/delivery"]
-  B --> H["Blocked: server mailbox pull/decryption client"]
+  B --> H["Blocked: mailbox encryption client"]
 ```
 
 ## What Can Be Claimed Now
@@ -61,6 +66,8 @@ Allowed release wording:
 - live Nanah managed-policy sends are available only for eligible connected
   sessions;
 - protected devices keep the last accepted policy when delivery is unavailable;
+- source-side mailbox storage items can be prepared without plaintext policy
+  fields after payload encryption is already complete;
 - provider-gated local-network candidate intake exists;
 - provider-gated pull-on-open intake exists for already-decrypted mailbox
   items;
@@ -141,6 +148,8 @@ live same-session Nanah send: PARTIAL
 provider-gated mailbox/local-network intake: PARTIAL
 built-in LAN peer discovery: NO-GO
 built-in LAN delivery: NO-GO
+mailbox encryption client: NO-GO
+server mailbox upload client: NO-GO
 server mailbox pull client: NO-GO
 mailbox decryption client: NO-GO
 release claim for complete remote management: NO-GO

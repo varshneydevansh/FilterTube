@@ -451,6 +451,95 @@
         return null;
     }
 
+    function safeManagedMailboxIdPart(value) {
+        const normalized = normalizeString(value)
+            .replace(/[^a-zA-Z0-9_-]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+        return normalized.slice(0, 64) || 'unknown';
+    }
+
+    function assertNoManagedMailboxPlaintextKeys(item) {
+        const serialized = stableManagedNanahJson(item);
+        const plaintextKeyPattern = /"(?:payload|operations|keywords|blockedKeywords|whitelistKeywords|channels|blockedChannels|whitelistChannels|videoIds|privateKeyJwk|decryptedEnvelope|managedPolicyEnvelope|envelope)"\s*:/;
+        if (plaintextKeyPattern.test(serialized)) {
+            throw new Error('Managed mailbox storage item refused plaintext policy fields.');
+        }
+    }
+
+    function buildManagedMailboxStorageItem(envelope, sealedPayload = {}, options = {}) {
+        const root = safeObject(envelope);
+        const sealed = safeObject(sealedPayload);
+        const optionRoot = safeObject(options);
+        if (!root || Object.keys(root).length === 0) {
+            throw new Error('Managed mailbox storage item requires a signed envelope.');
+        }
+        if (root.type !== MANAGED_POLICY_ENVELOPE_TYPE) {
+            throw new Error('Managed mailbox storage item requires a managed policy envelope.');
+        }
+        const scope = normalizeManagedPolicyScope(root.scope);
+        if (!scope) {
+            throw new Error('Managed mailbox storage item requires a managed policy scope.');
+        }
+        const revision = normalizeNonNegativeInteger(root.revision);
+        if (revision === null) {
+            throw new Error('Managed mailbox storage item requires a revision.');
+        }
+        const keyVersion = normalizeNonNegativeInteger(root.keyVersion);
+        if (!keyVersion) {
+            throw new Error('Managed mailbox storage item requires a key version.');
+        }
+        for (const field of ['linkId', 'targetProfileId', 'sourceDeviceId', 'sourceProfileId', 'policyHash', 'sourcePublicKeyId']) {
+            if (!normalizeString(root[field])) {
+                throw new Error(`Managed mailbox storage item requires ${field}.`);
+            }
+        }
+        for (const field of ['cipherSuite', 'keyAgreementId', 'encryptedDek', 'nonce', 'ciphertext', 'ciphertextHash']) {
+            if (!normalizeString(sealed[field])) {
+                throw new Error(`Managed mailbox storage item requires ${field}.`);
+            }
+        }
+
+        const createdAtMs = normalizeMailboxTimestampMs(optionRoot.createdAtMs ?? optionRoot.createdAt) ?? Date.now();
+        const expiresAtMs = normalizeMailboxTimestampMs(optionRoot.expiresAtMs ?? optionRoot.expiresAt);
+        if (expiresAtMs !== null && expiresAtMs <= createdAtMs) {
+            throw new Error('Managed mailbox storage item expiry must be after creation.');
+        }
+
+        const item = {
+            schema: MANAGED_MAILBOX_ITEM_SCHEMA,
+            version: 1,
+            mailboxItemId: normalizeString(optionRoot.mailboxItemId || sealed.mailboxItemId)
+                || [
+                    'mbx',
+                    safeManagedMailboxIdPart(root.linkId),
+                    safeManagedMailboxIdPart(root.targetProfileId),
+                    safeManagedMailboxIdPart(scope),
+                    safeManagedMailboxIdPart(String(revision)),
+                    safeManagedMailboxIdPart(root.policyHash)
+                ].join('_'),
+            linkId: normalizeString(root.linkId),
+            targetProfileId: normalizeString(root.targetProfileId),
+            sourceDeviceId: normalizeString(root.sourceDeviceId),
+            sourceProfileId: normalizeString(root.sourceProfileId),
+            scope,
+            revision,
+            policyHash: normalizeString(root.policyHash),
+            sourcePublicKeyId: normalizeString(root.sourcePublicKeyId),
+            keyVersion,
+            cipherSuite: normalizeString(sealed.cipherSuite),
+            keyAgreementId: normalizeString(sealed.keyAgreementId),
+            encryptedDek: normalizeString(sealed.encryptedDek),
+            nonce: normalizeString(sealed.nonce),
+            ciphertext: normalizeString(sealed.ciphertext),
+            ciphertextHash: normalizeString(sealed.ciphertextHash),
+            createdAtMs,
+            ackState: 'pending'
+        };
+        if (expiresAtMs !== null) item.expiresAtMs = expiresAtMs;
+        assertNoManagedMailboxPlaintextKeys(item);
+        return item;
+    }
+
     function validateManagedMailboxItem(item, context = {}) {
         const root = safeObject(item);
         const trustedLink = safeObject(context.trustedLink);
@@ -1455,6 +1544,7 @@
         buildControlProposal,
         validateManagedPolicyEnvelope,
         validateManagedMailboxItem,
+        buildManagedMailboxStorageItem,
         validateManagedLocalNetworkCandidate,
         buildManagedPolicyPayloadHash,
         verifyManagedNanahPolicyIntegritySignature,
