@@ -106,6 +106,18 @@
         if (scope === 'videos' && operations.some(operation => !normalizeString(operation?.op).toLowerCase().includes('video'))) {
             return validationResult('payload_scope_mismatch');
         }
+        if (scope === 'keywords') {
+            const decision = validateManagedRulePayload(root, ['keywords', 'blockedKeywords', 'whitelistKeywords'], hasManagedKeywordRuleValue, 'invalid_keyword_payload');
+            if (decision) return decision;
+        }
+        if (scope === 'channels') {
+            const decision = validateManagedRulePayload(root, ['channels', 'blockedChannels', 'whitelistChannels'], hasManagedChannelRuleValue, 'invalid_channel_payload');
+            if (decision) return decision;
+        }
+        if (scope === 'videos') {
+            const decision = validateManagedRulePayload(root, ['videoIds', 'videos'], hasManagedVideoRuleValue, 'invalid_video_payload');
+            if (decision) return decision;
+        }
         if (
             scope === 'time_limits'
             && !(Number.isInteger(root.dailyBudgetMinutes) && root.dailyBudgetMinutes >= 0)
@@ -123,6 +135,50 @@
             return validationResult('invalid_viewing_space_payload');
         }
         return null;
+    }
+
+    function validateManagedRulePayload(payload, listFields, hasRuleValue, invalidReason) {
+        const root = safeObject(payload);
+        const operations = safeArray(root.operations);
+        if (operations.some(operation => !hasRuleValue(operation))) {
+            return validationResult(invalidReason);
+        }
+        const directFields = listFields.filter(field => Object.prototype.hasOwnProperty.call(root, field));
+        const directEntries = directFields.flatMap(field => safeArray(root[field]));
+        if (directEntries.some(entry => !hasRuleValue(entry))) {
+            return validationResult(invalidReason);
+        }
+        if (operations.length > 0 || directEntries.length > 0) return null;
+        if (managedRulePayloadIsReplace(root)) return null;
+        return validationResult('empty_rule_payload');
+    }
+
+    function managedRulePayloadIsReplace(payload) {
+        const root = safeObject(payload);
+        const raw = normalizeString(root.strategy || root.applyMode || root.mode).toLowerCase();
+        return root.replace === true || raw === 'replace';
+    }
+
+    function hasManagedKeywordRuleValue(value) {
+        const root = safeObject(value);
+        const candidate = safeObject(root.keyword || root.entry);
+        return !!normalizeString(candidate.word || root.word || root.value);
+    }
+
+    function hasManagedChannelRuleValue(value) {
+        const root = safeObject(value);
+        const candidate = safeObject(root.channel || root.entry);
+        return !!(
+            normalizeString(candidate.id || root.id || root.channelId)
+            || normalizeString(candidate.handle || root.handle)
+            || normalizeString(candidate.customUrl || root.customUrl)
+            || normalizeString(candidate.name || root.name || root.value)
+        );
+    }
+
+    function hasManagedVideoRuleValue(value) {
+        const root = safeObject(value);
+        return !!normalizeString(root.videoId || root.id || root.value);
     }
 
     function validateManagedIntegrityBinding(envelope) {

@@ -169,6 +169,18 @@ function validatePayloadScope(scope, payload) {
   if (scope === 'videos' && operations.some((operation) => !String(operation?.op || '').toLowerCase().includes('video'))) {
     return validationResult('payload_scope_mismatch');
   }
+  if (scope === 'keywords') {
+    const decision = validateRulePayload(root, ['keywords', 'blockedKeywords', 'whitelistKeywords'], hasKeywordRuleValue, 'invalid_keyword_payload');
+    if (decision) return decision;
+  }
+  if (scope === 'channels') {
+    const decision = validateRulePayload(root, ['channels', 'blockedChannels', 'whitelistChannels'], hasChannelRuleValue, 'invalid_channel_payload');
+    if (decision) return decision;
+  }
+  if (scope === 'videos') {
+    const decision = validateRulePayload(root, ['videoIds', 'videos'], hasVideoRuleValue, 'invalid_video_payload');
+    if (decision) return decision;
+  }
   if (scope === 'time_limits' && !(
     Number.isInteger(root.dailyBudgetMinutes) && root.dailyBudgetMinutes >= 0
   ) && !root.timeLimitPolicy) {
@@ -178,6 +190,46 @@ function validatePayloadScope(scope, payload) {
     return validationResult('invalid_viewing_space_payload');
   }
   return null;
+}
+
+function validateRulePayload(payload, listFields, hasRuleValue, invalidReason) {
+  const root = safeObject(payload);
+  const operations = Array.isArray(root.operations) ? root.operations : [];
+  if (operations.some((operation) => !hasRuleValue(operation))) {
+    return validationResult(invalidReason);
+  }
+  const directFields = listFields.filter(field => Object.prototype.hasOwnProperty.call(root, field));
+  const directEntries = directFields.flatMap(field => Array.isArray(root[field]) ? root[field] : []);
+  if (directEntries.some((entry) => !hasRuleValue(entry))) {
+    return validationResult(invalidReason);
+  }
+  if (operations.length > 0 || directEntries.length > 0) return null;
+  const mode = String(root.strategy || root.applyMode || root.mode || '').trim().toLowerCase();
+  if (root.replace === true || mode === 'replace') return null;
+  return validationResult('empty_rule_payload');
+}
+
+function hasKeywordRuleValue(value) {
+  const root = safeObject(value);
+  const candidate = safeObject(root.keyword || root.entry);
+  return !!String(candidate.word || root.word || root.value || '').trim();
+}
+
+function hasChannelRuleValue(value) {
+  const root = safeObject(value);
+  const candidate = safeObject(root.channel || root.entry);
+  return !!String(
+    candidate.id || root.id || root.channelId
+    || candidate.handle || root.handle
+    || candidate.customUrl || root.customUrl
+    || candidate.name || root.name || root.value
+    || ''
+  ).trim();
+}
+
+function hasVideoRuleValue(value) {
+  const root = safeObject(value);
+  return !!String(root.videoId || root.id || root.value || '').trim();
 }
 
 function validateIntegrityBinding(envelope) {
@@ -452,6 +504,29 @@ test('managed policy payload family must match the envelope scope before trusted
       dailyBudgetMinutes: -1
     }
   }), baseContext()), { accepted: false, reason: 'invalid_time_limit_payload' });
+
+  assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope({
+    scope: 'keywords',
+    payload: {
+      scope: 'keywords',
+      operations: [{ op: 'add_keyword' }]
+    }
+  }), baseContext()), { accepted: false, reason: 'invalid_keyword_payload' });
+
+  assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope({
+    scope: 'channels',
+    payload: {
+      scope: 'channels'
+    }
+  }), baseContext()), { accepted: false, reason: 'empty_rule_payload' });
+
+  assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope({
+    scope: 'videos',
+    payload: {
+      scope: 'videos',
+      replace: true
+    }
+  }), baseContext()), { accepted: true, decision: 'accept_newer_revision' });
 
   assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope({
     scope: 'viewing_space',

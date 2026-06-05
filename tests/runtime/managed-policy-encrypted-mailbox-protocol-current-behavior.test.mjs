@@ -78,7 +78,7 @@ function managedEnvelope(overrides = {}) {
       signature: 'signature-7'
     },
     payload: {
-      operations: [{ op: 'add_keyword', valueHash: 'sha256:redacted-keyword' }]
+      operations: [{ op: 'add_keyword', value: 'calm mailbox keyword', valueHash: 'sha256:redacted-keyword' }]
     },
     ...overrides
   };

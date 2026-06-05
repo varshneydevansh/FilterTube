@@ -86,7 +86,7 @@ function managedEnvelope(overrides = {}) {
     keyVersion: 3,
     payload: {
       scope: 'keywords',
-      operations: [{ op: 'add_keyword', valueHash: 'sha256:keyword-hash' }]
+      operations: [{ op: 'add_keyword', value: 'calm keyword', valueHash: 'sha256:keyword-hash' }]
     },
     ...overrides
   };
@@ -319,7 +319,7 @@ test('local-network policy authority still rejects wrong target scope replay and
       revision: 4,
       payload: {
         scope: 'keywords',
-        operations: [{ op: 'add_keyword', valueHash: 'sha256:other-keyword-hash' }]
+        operations: [{ op: 'add_keyword', value: 'other keyword', valueHash: 'sha256:other-keyword-hash' }]
       }
     })
   }), reject('equal_revision_hash_conflict'));

@@ -223,6 +223,64 @@ test('managed policy apply writes keyword policy only to fixed child profile and
   );
 });
 
+test('managed policy apply rejects malformed or empty remote rule payloads before revision state changes', async () => {
+  const harness = createAdapterHarness();
+  const malformed = await harness.adapter.applyManagedPolicyEnvelope(
+    signedEnvelope({
+      revision: 6,
+      payload: {
+        scope: 'keywords',
+        surface: 'main',
+        operations: [{ op: 'add_keyword' }]
+      }
+    }),
+    validationContext(harness.profiles)
+  );
+  assert.deepEqual(plain(malformed), { accepted: false, reason: 'invalid_keyword_payload' });
+  assert.equal(harness.saveCount, 0);
+
+  const empty = await harness.adapter.applyManagedPolicyEnvelope(
+    signedEnvelope({
+      revision: 6,
+      payload: {
+        scope: 'keywords',
+        surface: 'main'
+      }
+    }),
+    validationContext(harness.profiles)
+  );
+  assert.deepEqual(plain(empty), { accepted: false, reason: 'empty_rule_payload' });
+  assert.equal(harness.saveCount, 0);
+  assert.equal(
+    harness.profiles.profiles['child-profile-1'].managedPolicyState?.remoteManagedPolicies,
+    undefined
+  );
+});
+
+test('managed policy apply allows explicit remote replace clear for child rule lists', async () => {
+  const harness = createAdapterHarness();
+  const envelope = signedEnvelope({
+    revision: 6,
+    payload: {
+      scope: 'keywords',
+      surface: 'main',
+      replace: true
+    }
+  });
+  const result = await harness.adapter.applyManagedPolicyEnvelope(
+    envelope,
+    validationContext(harness.profiles)
+  );
+
+  assert.equal(result.accepted, true);
+  assert.equal(result.applied, true);
+  assert.deepEqual(plain(harness.profiles.profiles['child-profile-1'].main.keywords), []);
+  assert.equal(
+    harness.profiles.profiles['child-profile-1'].managedPolicyState.remoteManagedPolicies['link-parent-child-1'].keywords.policyHash,
+    envelope.policyHash
+  );
+});
+
 test('managed policy apply blocks stale replay after accepted revision has been persisted', async () => {
   const harness = createAdapterHarness();
   await harness.adapter.applyManagedPolicyEnvelope(

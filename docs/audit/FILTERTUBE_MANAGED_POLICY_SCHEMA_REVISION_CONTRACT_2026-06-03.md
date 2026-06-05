@@ -112,14 +112,18 @@ write:
 
 | Scope | Required payload family proof |
 | --- | --- |
-| `keywords` | Keyword operation payload only. |
-| `channels` | Channel operation payload only. |
-| `videos` | Video operation payload only. |
+| `keywords` | Keyword operation payload only, with a keyword value unless the payload is an explicit replace/clear. |
+| `channels` | Channel operation payload only, with channel identity unless the payload is an explicit replace/clear. |
+| `videos` | Video operation payload only, with a video id unless the payload is an explicit replace/clear. |
 | `viewing_space` | Main/Kids route policy fields. |
 | `time_limits` | Non-negative budget or structured time-limit policy. |
 
 This prevents a parent/caregiver update that is approved for one scope from
-carrying a different policy family under the same signed-looking envelope.
+carrying a different policy family under the same signed-looking envelope. It
+also prevents malformed or empty remote rule payloads from advancing accepted
+revision/hash state and action history without changing the protected profile's
+rules. Empty list clears are still allowed only when the parent/caregiver sends
+an explicit replace payload.
 
 ## Authority Rules
 
@@ -202,6 +206,7 @@ runtime filtertube_managed_policy envelope support: validation helper plus valid
 runtime filtertube_managed_policy receive path: parses envelope, builds validation context, applies only accepted envelopes, records protected evidence
 runtime managed policy persistent accepted-revision writer: present under target profile managedPolicyState.remoteManagedPolicies
 runtime managed policy canonical payload hash recomputation: present; mismatches fail closed with policy_hash_mismatch before trust/revision acceptance
+runtime managed rule payload non-empty guard: present for keyword/channel/video scopes, with explicit replace/clear allowed
 runtime managed policy signature verifier gate: present in js/nanah_sync_adapter.js
 runtime Nanah adapter key-verification context: WebCrypto Ed25519 helper present; dashboard receive path passes result; missing sourcePublicKeyJwk fails closed before apply
 runtime remote profile write from filtertube_managed_policy: enabled only through applyManagedPolicyEnvelope after validation context accepts
