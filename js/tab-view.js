@@ -9282,19 +9282,77 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
     }
 
+    function getNanahSourceManagedLinkInventoryForTargetProfile(profileId) {
+        const targetId = normalizeString(profileId);
+        if (!targetId) {
+            return { activeLinks: [], revokedLinks: [], staleLinks: [], totalLinks: [] };
+        }
+        const totalLinks = safeArray(nanahTrustedLinks)
+            .map((link) => normalizeNanahTrustedLink(link))
+            .filter((trusted) => {
+                if (!trusted) return false;
+                if (trusted.linkType !== 'managed_link') return false;
+                if (trusted.localRole !== 'source' || trusted.remoteRole !== 'replica') return false;
+                return getNanahTrustedLinkTargetProfileId(trusted) === targetId;
+            });
+        const revokedLinks = [];
+        const staleLinks = [];
+        const activeLinks = [];
+        totalLinks.forEach((trusted) => {
+            const policy = safeObject(trusted.policy);
+            if (trusted.revoked === true || policy.revoked === true || trusted.keyRevoked === true || policy.keyRevoked === true) {
+                revokedLinks.push(trusted);
+                return;
+            }
+            if (trusted.stalePairing === true || policy.stalePairing === true) {
+                staleLinks.push(trusted);
+                return;
+            }
+            activeLinks.push(trusted);
+        });
+        return { activeLinks, revokedLinks, staleLinks, totalLinks };
+    }
+
     function getManagedSyncTargetSummary(profileId) {
         const profile = safeObject(safeObject(profilesV4Cache).profiles)[normalizeString(profileId)];
+        const inventory = getNanahSourceManagedLinkInventoryForTargetProfile(profileId);
         const links = getNanahSourceManagedLinksForTargetProfile(profileId, 'active', profile);
         const targetCount = links.length;
+        const revokedCount = safeArray(inventory.revokedLinks).length;
+        const staleCount = safeArray(inventory.staleLinks).length;
+        const totalCount = safeArray(inventory.totalLinks).length;
         const liveReady = links.some(isNanahManagedLinkLiveConnected);
         const mailboxReady = hasNanahManagedMailboxUploadWriter();
         const localReady = hasNanahManagedLocalNetworkDeliveryWriter();
         const readyCount = (liveReady || mailboxReady || localReady) ? targetCount : 0;
         if (!targetCount) {
+            if (revokedCount > 0) {
+                return {
+                    label: `${revokedCount} device${revokedCount === 1 ? '' : 's'} need re-pairing`,
+                    targetCount: 0,
+                    readyCount: 0,
+                    revokedCount,
+                    staleCount,
+                    totalCount
+                };
+            }
+            if (staleCount > 0) {
+                return {
+                    label: `${staleCount} stale device link${staleCount === 1 ? '' : 's'}`,
+                    targetCount: 0,
+                    readyCount: 0,
+                    revokedCount,
+                    staleCount,
+                    totalCount
+                };
+            }
             return {
                 label: 'No verified device',
                 targetCount: 0,
-                readyCount: 0
+                readyCount: 0,
+                revokedCount,
+                staleCount,
+                totalCount
             };
         }
         const transports = [
@@ -9307,7 +9365,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ? `${targetCount} verified device${targetCount === 1 ? '' : 's'} | ${transports} ready`
                 : `${targetCount} verified device${targetCount === 1 ? '' : 's'} | provider pending`,
             targetCount,
-            readyCount
+            readyCount,
+            revokedCount,
+            staleCount,
+            totalCount
         };
     }
 

@@ -29,7 +29,7 @@
             managedTimeLimitLabel: typeof helpers.managedTimeLimitLabel === 'function' ? helpers.managedTimeLimitLabel : () => 'No limit',
             getManagedSyncTargetSummary: typeof helpers.getManagedSyncTargetSummary === 'function'
                 ? helpers.getManagedSyncTargetSummary
-                : () => ({ label: 'No verified device', targetCount: 0, readyCount: 0 }),
+                : () => ({ label: 'No verified device', targetCount: 0, readyCount: 0, revokedCount: 0, staleCount: 0, totalCount: 0 }),
             onAction: typeof helpers.onAction === 'function' ? helpers.onAction : null
         };
     }
@@ -96,6 +96,22 @@
         }
         const targetCount = Number(item.syncTargetCount) || 0;
         const readyCount = Number(item.syncReadyCount) || 0;
+        const revokedCount = Number(item.syncRevokedCount) || 0;
+        const staleCount = Number(item.syncStaleCount) || 0;
+        if (targetCount <= 0 && revokedCount > 0) {
+            return {
+                key: 'repair',
+                label: `${revokedCount} need re-pairing`,
+                tone: 'warning'
+            };
+        }
+        if (targetCount <= 0 && staleCount > 0) {
+            return {
+                key: 'stale',
+                label: `${staleCount} stale link${staleCount === 1 ? '' : 's'}`,
+                tone: 'warning'
+            };
+        }
         if (targetCount <= 0) {
             return {
                 key: 'no_device',
@@ -255,6 +271,9 @@
                 syncTargetLabel: syncTarget.label,
                 syncTargetCount: syncTarget.targetCount,
                 syncReadyCount: syncTarget.readyCount,
+                syncRevokedCount: syncTarget.revokedCount || 0,
+                syncStaleCount: syncTarget.staleCount || 0,
+                syncTotalCount: syncTarget.totalCount || syncTarget.targetCount || 0,
                 remoteScopeCount: summary.remoteScopeCount,
                 historyRowCount: summary.historyRowCount,
                 protectedRowCount: summary.protectedRowCount,

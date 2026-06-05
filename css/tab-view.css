@@ -542,6 +542,11 @@ html[data-theme="dark"] body::after {
     border-color: color-mix(in srgb, var(--ft-color-sem-danger, #ef4444) 60%, var(--ft-color-sem-neutral-border));
 }
 
+.ft-managed-command-center__row.is-sync-repair,
+.ft-managed-command-center__row.is-sync-stale {
+    border-color: color-mix(in srgb, var(--ft-color-sem-warning, #f59e0b) 55%, var(--ft-color-sem-neutral-border));
+}
+
 .ft-managed-command-center__profile {
     display: grid;
     grid-template-columns: 28px minmax(0, 1fr);

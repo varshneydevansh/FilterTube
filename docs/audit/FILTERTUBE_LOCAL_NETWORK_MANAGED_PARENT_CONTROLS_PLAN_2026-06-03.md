@@ -42,7 +42,9 @@ remain gated. Source-side managed signing-key rotation is now an explicit
 parent/admin action: it regenerates the local source keypair, key-revokes active
 managed child-device links, purges pending provider/open-sync/LAN/source-ack
 state for those links, and writes protected history so the affected devices must
-be paired again. The adapter now exposes a
+be paired again. The parent command center now distinguishes usable verified
+devices from revoked/stale managed links so rotated devices show as needing
+re-pairing instead of disappearing into a generic missing-device state. The adapter now exposes a
 local-network candidate authority gate for future LAN providers, and the
 dashboard has a sanitized receive bridge that records accepted/rejected
 local-network candidate outcomes through protected managed action history. This
@@ -74,8 +76,8 @@ metadata, not plaintext rules or authority.
 - [x] Local selected-profile video/keyword/channel rule additions work for manageable
   protected profiles through parent/account re-auth.
 - [x] Dashboard command center lists protected profiles, time-limit state,
-  viewing-space state, protected history count, verified-device readiness, and
-  delegated actions.
+  viewing-space state, protected history count, verified-device readiness,
+  re-pairing status for revoked/stale managed links, and delegated actions.
 - [x] Command center can send signed active managed-policy updates to currently
   connected verified replica devices over Nanah P2P.
 - [x] Command center can hand ciphertext mailbox items or signed LAN candidates
