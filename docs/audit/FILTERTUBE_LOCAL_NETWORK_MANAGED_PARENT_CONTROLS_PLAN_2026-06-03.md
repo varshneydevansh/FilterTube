@@ -715,7 +715,9 @@ the current extension dashboard.
   delivery-path detail, redacted source-side delivery ack status, safe
   latest-action labels, and remote conflict state, refreshes bulk selection
   state after row construction so ready-device
-  selection is usable on first render, and records protected redacted history for send
+  selection is usable on first render, groups selected-profile bulk actions into
+  Rules, Send, Time, and Access rails so parent/caregiver work stays scannable
+  without creating a separate remote-management page, and records protected redacted history for send
   success/failure/provider-pending cases. The implementation
   intentionally avoids a separate oversized remote-management page until
   app/server provider work exists. Bulk keyword/channel/video rule additions

@@ -362,6 +362,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(doc, /runtime managed command-center post-viewing\/time-limit verified-device push: present/);
   assert.match(doc, /runtime managed command-center direct policy writes: absent/);
   assert.match(doc, /runtime managed command-center direct rule bulk writes: present via confirmation plus delegated runtime gate/);
+  assert.match(doc, /runtime managed command-center grouped bulk action rail: present/);
   assert.match(doc, /runtime YouTube hot-path work from command-center UI: absent/);
   assert.match(plan, new RegExp(docPath));
   assert.match(plan, /command-center\s+overview for protected profiles/);
@@ -399,6 +400,14 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /ft-managed-command-center__detail-note/);
   assert.match(helperSource, /ft-managed-command-center__select/);
   assert.match(helperSource, /ft-managed-command-center__bulk-select/);
+  assert.match(helperSource, /ft-managed-command-center__bulk-actions/);
+  assert.match(helperSource, /ft-managed-command-center__bulk-group/);
+  assert.match(helperSource, /ft-managed-command-center__bulk-group-label/);
+  assert.match(helperSource, /group: 'rules'/);
+  assert.match(helperSource, /group: 'send'/);
+  assert.match(helperSource, /group: 'time'/);
+  assert.match(helperSource, /group: 'access'/);
+  assert.match(helperSource, /label\.textContent = group\.label/);
   assert.match(helperSource, /Select all/);
   assert.match(helperSource, /Select ready/);
   assert.match(helperSource, /filtertubeSyncReady/);
@@ -490,7 +499,10 @@ test('managed command-center spec pins parent workflow without making UI authori
   assert.match(doc, /post-rule-write granular verified-device push: present with selected surface binding/);
   assert.match(doc, /post-viewing\/time-limit verified-device push: present/);
   assert.match(doc, /Present for selected-profile rule editor handoff, same-budget local time-limit changes, same-access local viewing-space changes, selected-profile keyword\/channel\/video-ID rule additions, and selected-profile signed-policy sends on selected protected profiles/);
+  assert.match(doc, /groups selected-profile actions into Rules, Send, Time, and Access/);
   assert.match(doc, /Local bulk rule writes are one reviewed rule at a time/);
+  assert.match(doc, /Group labels are navigation aids only and do not create authority/);
+  assert.match(doc, /Selected-profile bulk actions must be grouped by parent task area/);
   assert.match(doc, /selected Main\/Kids surface binding for granular sends/);
   assert.match(doc, /Viewing-space and time-limit saves offer scoped verified-device pushes only\s+for changed profiles with delivery ready/);
   assert.match(doc, /Mobile-first layout with a single-column protected-profile list/);
@@ -504,12 +516,16 @@ test('managed command-center spec pins parent workflow without making UI authori
   assert.match(css, /\.ft-managed-command-center\s*\{/);
   assert.match(css, /\.ft-managed-command-center__bulk\s*\{/);
   assert.match(css, /\.ft-managed-command-center__bulk-select\s*\{/);
+  assert.match(css, /\.ft-managed-command-center__bulk-actions\s*\{/);
+  assert.match(css, /\.ft-managed-command-center__bulk-group\s*\{/);
+  assert.match(css, /\.ft-managed-command-center__bulk-group-label\s*\{/);
   assert.match(css, /\.ft-managed-command-center__row\s*\{/);
   assert.match(css, /\.ft-managed-command-center__profile\s*\{/);
   assert.match(css, /\.ft-managed-command-center__select\s*\{/);
   assert.match(css, /\.ft-managed-command-center__actions\s*\{/);
   assert.match(css, /min-height:\s*44px/);
   assert.match(css, /@media \(max-width: 768px\)/);
+  assert.match(css, /\.ft-managed-command-center__bulk-actions\s*\{\s*grid-template-columns: 1fr;/s);
   assert.match(css, /\.ft-managed-command-center__heading,\s*\.ft-managed-command-center__row\s*\{\s*grid-template-columns: 1fr;/s);
 });
 
@@ -858,6 +874,7 @@ test('managed command-center helper emits delegated action intents without polic
     {
       action: 'bulk_edit_rules',
       label: 'Edit selected rules',
+      group: 'rules',
       profileIds: ['childA'],
       scope: 'main_kids',
       authority: 'delegated_runtime_gate',
@@ -866,6 +883,7 @@ test('managed command-center helper emits delegated action intents without polic
     {
       action: 'bulk_add_keyword',
       label: 'Add keyword',
+      group: 'rules',
       profileIds: ['childA'],
       scope: 'main_kids_rules',
       authority: 'delegated_runtime_gate',
@@ -874,6 +892,7 @@ test('managed command-center helper emits delegated action intents without polic
     {
       action: 'bulk_add_channel',
       label: 'Add channel',
+      group: 'rules',
       profileIds: ['childA'],
       scope: 'main_kids_rules',
       authority: 'delegated_runtime_gate',
@@ -882,6 +901,7 @@ test('managed command-center helper emits delegated action intents without polic
     {
       action: 'bulk_add_video',
       label: 'Add video ID',
+      group: 'rules',
       profileIds: ['childA'],
       scope: 'main_kids_rules',
       authority: 'delegated_runtime_gate',
@@ -890,6 +910,7 @@ test('managed command-center helper emits delegated action intents without polic
     {
       action: 'bulk_send_managed_policy',
       label: 'Send selected updates',
+      group: 'send',
       profileIds: ['childA'],
       scope: 'active',
       authority: 'managed_policy_provider_delivery',
@@ -898,6 +919,7 @@ test('managed command-center helper emits delegated action intents without polic
     {
       action: 'bulk_set_time_limit',
       label: 'Set selected limit',
+      group: 'time',
       profileIds: ['childA'],
       scope: 'time_limits',
       authority: 'delegated_runtime_gate',
@@ -906,6 +928,7 @@ test('managed command-center helper emits delegated action intents without polic
     {
       action: 'bulk_disable_time_limit',
       label: 'Disable selected limits',
+      group: 'time',
       profileIds: ['childA'],
       scope: 'time_limits',
       authority: 'delegated_runtime_gate',
@@ -914,6 +937,7 @@ test('managed command-center helper emits delegated action intents without polic
     {
       action: 'bulk_grant_extra_time',
       label: 'Add selected time',
+      group: 'time',
       profileIds: ['childA'],
       scope: 'time_limits',
       authority: 'delegated_runtime_gate',
@@ -922,6 +946,7 @@ test('managed command-center helper emits delegated action intents without polic
     {
       action: 'bulk_allow_main_kids',
       label: 'Allow Main + Kids',
+      group: 'access',
       profileIds: ['childA'],
       scope: 'viewing_space',
       viewingAccess: 'main_kids',
@@ -931,6 +956,7 @@ test('managed command-center helper emits delegated action intents without polic
     {
       action: 'bulk_kids_only',
       label: 'Kids only',
+      group: 'access',
       profileIds: ['childA'],
       scope: 'viewing_space',
       viewingAccess: 'kids_only',
@@ -940,6 +966,7 @@ test('managed command-center helper emits delegated action intents without polic
     {
       action: 'bulk_main_only',
       label: 'Main only',
+      group: 'access',
       profileIds: ['childA'],
       scope: 'viewing_space',
       viewingAccess: 'main_only',

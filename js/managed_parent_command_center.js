@@ -263,6 +263,7 @@
             {
                 action: 'bulk_edit_rules',
                 label: 'Edit selected rules',
+                group: 'rules',
                 profileIds,
                 scope: 'main_kids',
                 authority: 'delegated_runtime_gate',
@@ -271,6 +272,7 @@
             {
                 action: 'bulk_add_keyword',
                 label: 'Add keyword',
+                group: 'rules',
                 profileIds,
                 scope: 'main_kids_rules',
                 authority: 'delegated_runtime_gate',
@@ -279,6 +281,7 @@
             {
                 action: 'bulk_add_channel',
                 label: 'Add channel',
+                group: 'rules',
                 profileIds,
                 scope: 'main_kids_rules',
                 authority: 'delegated_runtime_gate',
@@ -287,6 +290,7 @@
             {
                 action: 'bulk_add_video',
                 label: 'Add video ID',
+                group: 'rules',
                 profileIds,
                 scope: 'main_kids_rules',
                 authority: 'delegated_runtime_gate',
@@ -295,6 +299,7 @@
             {
                 action: 'bulk_send_managed_policy',
                 label: 'Send selected updates',
+                group: 'send',
                 profileIds,
                 scope: 'active',
                 authority: 'managed_policy_provider_delivery',
@@ -303,6 +308,7 @@
             {
                 action: 'bulk_set_time_limit',
                 label: 'Set selected limit',
+                group: 'time',
                 profileIds,
                 scope: 'time_limits',
                 authority: 'delegated_runtime_gate',
@@ -311,6 +317,7 @@
             {
                 action: 'bulk_disable_time_limit',
                 label: 'Disable selected limits',
+                group: 'time',
                 profileIds,
                 scope: 'time_limits',
                 authority: 'delegated_runtime_gate',
@@ -319,6 +326,7 @@
             {
                 action: 'bulk_grant_extra_time',
                 label: 'Add selected time',
+                group: 'time',
                 profileIds,
                 scope: 'time_limits',
                 authority: 'delegated_runtime_gate',
@@ -327,6 +335,7 @@
             {
                 action: 'bulk_allow_main_kids',
                 label: 'Allow Main + Kids',
+                group: 'access',
                 profileIds,
                 scope: 'viewing_space',
                 viewingAccess: 'main_kids',
@@ -336,6 +345,7 @@
             {
                 action: 'bulk_kids_only',
                 label: 'Kids only',
+                group: 'access',
                 profileIds,
                 scope: 'viewing_space',
                 viewingAccess: 'kids_only',
@@ -345,6 +355,7 @@
             {
                 action: 'bulk_main_only',
                 label: 'Main only',
+                group: 'access',
                 profileIds,
                 scope: 'viewing_space',
                 viewingAccess: 'main_only',
@@ -533,7 +544,14 @@
             clearSelectionButton.type = 'button';
             clearSelectionButton.textContent = 'Clear';
             clearSelectionButton.title = 'Clear selected protected profiles.';
-            const bulkButtons = bulkIntents.map((intent) => {
+            const bulkActionGroups = [
+                { key: 'rules', label: 'Rules' },
+                { key: 'send', label: 'Send' },
+                { key: 'time', label: 'Time' },
+                { key: 'access', label: 'Access' }
+            ];
+            const bulkButtons = [];
+            const createBulkButton = (intent) => {
                 const button = document.createElement('button');
                 button.className = 'btn-secondary';
                 button.type = 'button';
@@ -546,7 +564,24 @@
                     if (!profileIds.length) return;
                     Promise.resolve(h.onAction({ ...intent, profileIds })).catch(() => {});
                 });
+                bulkButtons.push(button);
                 return button;
+            };
+            const bulkActionWrap = document.createElement('div');
+            bulkActionWrap.className = 'ft-managed-command-center__bulk-actions';
+            bulkActionGroups.forEach((group) => {
+                const groupIntents = bulkIntents.filter(intent => intent.group === group.key);
+                if (!groupIntents.length) return;
+                const groupEl = document.createElement('div');
+                groupEl.className = `ft-managed-command-center__bulk-group is-${group.key}`;
+                const label = document.createElement('span');
+                label.className = 'ft-managed-command-center__bulk-group-label';
+                label.textContent = group.label;
+                groupEl.appendChild(label);
+                groupIntents.forEach(intent => {
+                    groupEl.appendChild(createBulkButton(intent));
+                });
+                bulkActionWrap.appendChild(groupEl);
             });
             const updateBulkState = () => {
                 const count = selectedProfiles.size;
@@ -595,7 +630,7 @@
                 updateBulkState();
             });
             bulkSelectControls.append(selectAllButton, selectReadyButton, clearSelectionButton);
-            bulkBar.append(bulkStatus, bulkSelectControls, ...bulkButtons);
+            bulkBar.append(bulkStatus, bulkSelectControls, bulkActionWrap);
             panel.appendChild(bulkBar);
             panel.__filtertubeUpdateManagedBulkState = updateBulkState;
         }

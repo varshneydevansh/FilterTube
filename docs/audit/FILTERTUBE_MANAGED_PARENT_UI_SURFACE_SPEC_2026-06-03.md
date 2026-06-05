@@ -126,6 +126,7 @@ runtime managed command-center bulk viewing-space controls: present via delegate
 runtime managed command-center per-profile signed policy push: present
 runtime managed command-center selected-profile signed policy push: present
 runtime managed command-center direct rule bulk writes: present via confirmation plus delegated runtime gate
+runtime managed command-center grouped bulk action rail: present
 runtime managed command-center post-rule-write granular verified-device push: present with selected surface binding
 runtime managed command-center post-viewing/time-limit verified-device push: present
 runtime connected verified-device live P2P managed policy send: present
@@ -154,7 +155,7 @@ weakening the authority model:
 | Time limits | Show daily YouTube budget state; command-center row actions still set/disable one profile, can add temporary extra time to one active limit, and bulk selected-profile actions can apply the same daily budget, disable existing limits, or add temporary extra time to selected active limits, then offer a scoped verified-device push when delivery exists. | Runtime budget accounting remains background-owned; every target gets its own revision/history row after parent re-auth, and extra-time grants are bounded by expiry. |
 | Sync status | Show trusted device, delivery preview, local-network provider, Nanah open-sync, and mailbox status. | Reachability is never authorization; offline state keeps the last valid policy active. |
 | Action history | Show accepted, rejected, conflict, failed-auth, and expired-session counts/latest labels; detailed history remains gated by the History action. | History stays redacted, protected by parent/account re-auth, and never becomes policy authority. |
-| Multi-profile apply | Present for selected-profile rule editor handoff, same-budget local time-limit changes, same-access local viewing-space changes, selected-profile keyword/channel/video-ID rule additions, and selected-profile signed-policy sends on selected protected profiles. | Local bulk rule writes are one reviewed rule at a time and every local or remote target still needs its own target profile, revision/history row, and authority gate; remote sends additionally require trusted link, scope, revision, hash, and signature/integrity proof. |
+| Multi-profile apply | Present for selected-profile rule editor handoff, same-budget local time-limit changes, same-access local viewing-space changes, selected-profile keyword/channel/video-ID rule additions, and selected-profile signed-policy sends on selected protected profiles. The command center groups selected-profile actions into Rules, Send, Time, and Access so parent/caregiver bulk work stays scannable without adding a separate page. | Local bulk rule writes are one reviewed rule at a time and every local or remote target still needs its own target profile, revision/history row, and authority gate; remote sends additionally require trusted link, scope, revision, hash, and signature/integrity proof. Group labels are navigation aids only and do not create authority. |
 
 Required UI states for that slice:
 
@@ -175,6 +176,9 @@ Design constraints:
 
 - Mobile-first layout with a single-column protected-profile list before any
   wider dashboard grouping.
+- Selected-profile bulk actions must be grouped by parent task area so rule
+  edits, delivery sends, time budgets, and viewing-space access do not become
+  one flat command cluster.
 - Touch targets for actions, toggles, and profile selectors must remain at
   least 44px high.
 - Use segmented controls for Main/Kids access, switches for enablement, numeric
