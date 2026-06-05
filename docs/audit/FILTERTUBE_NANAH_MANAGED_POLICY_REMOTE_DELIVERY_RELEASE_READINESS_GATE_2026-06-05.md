@@ -151,6 +151,7 @@ FT-MANAGED-REMOTE-09-command-center-conflict-review
 FT-MANAGED-REMOTE-10-key-rotation-repair-status
 FT-MANAGED-REMOTE-11-no-work-idle
 FT-MANAGED-REMOTE-12-encrypted-history-summary-boundary
+FT-MANAGED-REMOTE-13-command-center-delivery-path-detail
 ```
 
 Row `FT-MANAGED-REMOTE-10-key-rotation-repair-status` covers the
@@ -165,6 +166,13 @@ encrypted-history summary sanitizer slice: installed smoke evidence can prove
 that ciphertext-shaped summary metadata survives as a privacy-marked token, but
 the smoke artifact itself must not contain plaintext rules, raw policy JSON,
 decrypted payloads, raw ciphertext, private keys, PINs, or passwords.
+
+Row `FT-MANAGED-REMOTE-13-command-center-delivery-path-detail` covers the
+parent command-center delivery-state slice: before release, manual evidence
+must show that the Delivery detail separates live P2P, LAN provider,
+mailbox-later, paired-but-provider-pending, revoked, stale, and no-device
+states so parents know whether to wait, connect a provider, or re-pair a
+device without exposing plaintext rules or private key material.
 
 ## Current Decision
 

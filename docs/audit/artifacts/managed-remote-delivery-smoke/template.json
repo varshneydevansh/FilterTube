@@ -132,6 +132,11 @@
       "id": "FT-MANAGED-REMOTE-12-encrypted-history-summary-boundary",
       "requiredObservation": "Managed action history may preserve only sanitizer-accepted encrypted summary metadata and privacy markers; the artifact must not record plaintext rules, raw policy JSON, decrypted payloads, raw ciphertext, private keys, PINs, or passwords.",
       "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-REMOTE-13-command-center-delivery-path-detail",
+      "requiredObservation": "The parent command center Delivery detail distinguishes live P2P, LAN provider, mailbox-later, paired-but-provider-pending, revoked, stale, and no-device states without exposing plaintext rules or private key material.",
+      "status": "missing"
     }
   ],
   "completionRules": {
