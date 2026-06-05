@@ -820,9 +820,16 @@
         const envelope = safeObject(root.envelope || root.managedPolicyEnvelope || root.policy);
         const duplicateDeviceIds = safeArray(context.duplicateDeviceIds);
         const source = normalizeString(peer.source || root.source).toLowerCase();
+        const expiresAt = root.expiresAt === null
+            ? null
+            : normalizeNonNegativeInteger(root.expiresAt ?? root.expiresAtMs);
+        const nowMs = normalizeNonNegativeInteger(context.nowMs ?? context.now) || Date.now();
 
         if (peer.networkReachable === false || root.networkReachable === false) {
             return validationResult('peer_unreachable', { decision: 'keep_last_valid_policy' });
+        }
+        if (expiresAt !== null && expiresAt <= nowMs) {
+            return validationResult('candidate_expired', { ackState: 'expired', decision: 'keep_last_valid_policy' });
         }
         if (source === 'page_message' || source === 'content_script' || source === 'postmessage') {
             return validationResult('untrusted_message_source');

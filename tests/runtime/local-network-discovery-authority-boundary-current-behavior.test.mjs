@@ -210,6 +210,8 @@ test('local-network discovery authority boundary is validation-backed and linked
   assert.match(source, /transport: 'local_network'/);
   assert.match(source, /const sanitizedCandidate = \{\s*peer,\s*envelope,\s*source: normalizeString\(root\.source\),\s*networkReachable: root\.networkReachable\s*\}/s);
   assert.match(source, /validateManagedLocalNetworkCandidate\(sanitizedCandidate, context\)/);
+  assert.match(source, /const expiresAt = root\.expiresAt === null/);
+  assert.match(source, /candidate_expired/);
   assert.match(source, /Managed policy envelopes require validated managed apply flow/);
   assert.match(source, /remoteManagedPolicies/);
   assert.match(source, /applyManagedPolicyEnvelope/);
@@ -270,6 +272,28 @@ test('network reachability and address changes do not weaken last valid managed 
     peer: discoveredPeer({ networkReachable: false })
   }), { accepted: false, decision: 'keep_last_valid_policy', reason: 'peer_unreachable' });
 
+  const unexpired = evaluateLocalNetworkPolicy({
+    state: context({ nowMs: 1779300000000 }),
+    envelope: managedEnvelope({ revision: 5 }),
+    peer: discoveredPeer({}),
+    link: trustedLink()
+  });
+  assert.equal(unexpired.accepted, true);
+  assert.equal(unexpired.decision, 'accept_newer_revision');
+  assert.equal(unexpired.targetProfileId, 'child-profile-1');
+
+  assert.deepEqual(plain(nanahAdapter().validateManagedLocalNetworkCandidate({
+    peer: discoveredPeer({}),
+    trustedLink: trustedLink(),
+    envelope: managedEnvelope({ revision: 5 }),
+    expiresAt: 1779299999999
+  }, context({ nowMs: 1779300000000 }))), {
+    accepted: false,
+    reason: 'candidate_expired',
+    ackState: 'expired',
+    decision: 'keep_last_valid_policy'
+  });
+
   const accepted = evaluateLocalNetworkPolicy({
     peer: discoveredPeer({ networkAddress: '192.168.1.45' })
   });
@@ -326,6 +350,7 @@ test('rejected local-network attempts produce protected redacted history rows no
     'lan_page_message_spoof',
     'lan_revoked_trust_reappears',
     'lan_mailbox_after_revocation',
+    'lan_expired_candidate_replay',
     'lan_reachability_loss'
   ]) {
     assert.match(doc, new RegExp(`\\\`${fixture}\\\``));

@@ -56,6 +56,7 @@ A local-network policy update is accepted only when all of these are true:
 8. The key id and key version match current trusted key state.
 9. The envelope integrity proof verifies.
 10. The link and key are not revoked, stale, duplicated, or quarantined.
+11. Any local-network provider candidate TTL has not expired.
 
 Anything else is rejected before the low-level Nanah scoped apply path can
 write a profile.
@@ -73,6 +74,7 @@ write a profile.
 | `lan_page_message_spoof` | A YouTube page or content script tries to send a local-network policy message. | Reject because page messages are not managed transport authority. |
 | `lan_revoked_trust_reappears` | A previously revoked trusted device becomes reachable again. | Reject; discovery cannot un-revoke trust. |
 | `lan_mailbox_after_revocation` | A queued encrypted mailbox update arrives after trust revocation. | Reject even if ciphertext delivery succeeds. |
+| `lan_expired_candidate_replay` | A previously signed local-network provider candidate is delivered after its TTL. | Reject as expired and keep the last valid policy active. |
 | `lan_reachability_loss` | Parent/caregiver device is offline or no LAN peer is found. | Keep last valid policy; do not weaken rules or time limits. |
 
 ## No-Work And Performance Boundary
@@ -89,6 +91,7 @@ Current product runtime state:
 
 ```text
 runtime local-network candidate authority gate: present in js/nanah_sync_adapter.js
+runtime local-network candidate expiry gate: present in js/nanah_sync_adapter.js
 runtime local-network candidate receive bridge: present in js/tab-view.js
 runtime provider-gated local-network candidate discovery hook: present in js/tab-view.js
 runtime source-side local-network provider delivery handoff: present in js/nanah_managed_live_policy.js

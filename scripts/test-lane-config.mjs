@@ -697,6 +697,11 @@ export const FILE_LANE_RULES = Object.freeze([
     lanes: ['whitelist', 'blocking', 'json', 'dom', 'performance']
   },
   {
+    id: 'audit-managed-local-network-proof-doc',
+    patterns: [/^docs\/audit\/.*(?:LOCAL_NETWORK|LAN).*MANAGED.*\.md$/i, /^docs\/audit\/.*MANAGED.*(?:LOCAL_NETWORK|LAN).*\.md$/i],
+    lanes: ['settings']
+  },
+  {
     id: 'audit-network-transport-proof-doc',
     patterns: [/^docs\/audit\/.*(?:NETWORK|FETCH|XHR|CREDENTIAL).*\.md$/i],
     lanes: ['json', 'performance']
