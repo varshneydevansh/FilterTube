@@ -179,6 +179,39 @@
       },
       "evidence": {},
       "durationMs": 0
+    },
+    {
+      "id": "FT-MANAGED-APP-12-keyword-rule-apply",
+      "requiredObservation": "A parent/caregiver managed keyword update reaches the installed app policy model and blocks matching content through the same validated rule semantics as extension-local keyword controls.",
+      "status": "pending",
+      "observation": {
+        "pass": false,
+        "summary": ""
+      },
+      "evidence": {},
+      "durationMs": 0
+    },
+    {
+      "id": "FT-MANAGED-APP-13-channel-rule-apply",
+      "requiredObservation": "A parent/caregiver managed channel update reaches the installed app policy model and blocks matching channels through the same validated rule semantics as extension-local channel controls.",
+      "status": "pending",
+      "observation": {
+        "pass": false,
+        "summary": ""
+      },
+      "evidence": {},
+      "durationMs": 0
+    },
+    {
+      "id": "FT-MANAGED-APP-14-video-rule-apply",
+      "requiredObservation": "A parent/caregiver managed video update reaches the installed app policy model and blocks matching videos through the same validated rule semantics as extension-local video controls.",
+      "status": "pending",
+      "observation": {
+        "pass": false,
+        "summary": ""
+      },
+      "evidence": {},
+      "durationMs": 0
     }
   ],
   "completionRules": {

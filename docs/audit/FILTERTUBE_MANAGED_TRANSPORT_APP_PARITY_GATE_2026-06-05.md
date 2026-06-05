@@ -61,6 +61,7 @@ flowchart TD
 | Policy apply | Saved link, target profile, scope, revision, policy hash, key id, and signature are required. | Apps must reject stale, revoked, wrong-target, or unsigned policies before native enforcement. | Present. |
 | Main/Kids access | Extension route gate exists for active child profiles. | App shell must gate Main and Kids before opening web/native content. | Android partial, iOS pending. |
 | Time limits | Extension active-tab budget and timeout overlay exist. | App shell must enforce startup, resume, heartbeat, pause, and reduced-budget behavior. | Android partial, iOS pending. |
+| Managed rules | Extension can send/apply signed keyword, channel, and video policy scopes through validated managed paths. | Apps must preserve those rule scopes and apply them through the same local rule semantics as extension-owned keyword/channel/video controls. | Pending installed app smoke. |
 | Action history | Protected redacted local, remote, mailbox, ack, and failure rows exist. | Apps may display history only to parent/account authority and must not expose plaintext values. | Partial. |
 
 ## Required Proof Before Claiming Complete Remote Management
@@ -81,9 +82,9 @@ public release wording review: required
 A valid managed app parity artifact proves one installed app platform smoke,
 not complete cross-platform remote-management readiness. Android and iOS must
 each provide platform-specific adapter proof, settings-lock proof, Main/Kids
-route-gate proof, time-limit proof, protected history proof, and no-policy
-no-work proof before public release copy can claim cross-platform managed
-parent/caregiver control.
+route-gate proof, time-limit proof, managed keyword/channel/video rule proof,
+protected history proof, and no-policy no-work proof before public release copy
+can claim cross-platform managed parent/caregiver control.
 
 ## Allowed Wording
 

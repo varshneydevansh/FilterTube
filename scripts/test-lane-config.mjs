@@ -78,7 +78,10 @@ export const MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS = Object.freeze([
   'FT-MANAGED-APP-08-timeout-surface',
   'FT-MANAGED-APP-09-history-redaction',
   'FT-MANAGED-APP-10-no-policy-no-work',
-  'FT-MANAGED-APP-11-native-settings-lock'
+  'FT-MANAGED-APP-11-native-settings-lock',
+  'FT-MANAGED-APP-12-keyword-rule-apply',
+  'FT-MANAGED-APP-13-channel-rule-apply',
+  'FT-MANAGED-APP-14-video-rule-apply'
 ]);
 
 export const RUNTIME_FIXTURE_LANE_REASONS = Object.freeze({
