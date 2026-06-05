@@ -841,6 +841,10 @@ T1 + T2 + T3
     in `ftManagedTimeUsageV1`, caps heartbeat deltas, avoids double-counting
     recently active tabs for the same profile/date, and returns exhausted
     budget state to the content bridge.
+  - 2026-06-05: Background now treats content heartbeats as liveness signals
+    and re-resolves the compiled active child profile policy before counting,
+    so stale or mismatched content payloads cannot own the profile id,
+    revision, hash, budget, or timeout decision.
 - **files edited/created**:
   - `js/background.js`
   - `js/content/bridge_settings.js`

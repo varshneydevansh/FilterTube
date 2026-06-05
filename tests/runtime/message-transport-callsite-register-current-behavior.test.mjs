@@ -9,7 +9,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_MESSAGE_TRANSPORT_CALLSITE_REGISTER_CURRENT_BEHAVIOR_2026-05-22.md';
 
 const sourceFingerprints = {
-  'js/background.js': [6773, 305166, 'b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5'],
+  'js/background.js': [6789, 306239, '618e41011a6031c7a4eb3d022c4612536942a7a58a3c41eb0fd7e31c29a60311'],
   'js/content/bridge_injection.js': [127, 4741, 'd1b84cf4c43ec5ff5cdc3bd607d8f3d3bf448c12829780b0d05fb9fc14fb5d3e'],
   'js/content/bridge_settings.js': [1113, 44087, 'f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853'],
   'js/content/collab_dialog.js': [393, 14623, 'dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a'],

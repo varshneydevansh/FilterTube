@@ -1588,8 +1588,8 @@ function pruneManagedTimeUsageRows(rows, limit = 240) {
 async function handleManagedTimeLimitHeartbeat(request, sender, sendResponse) {
     try {
         const now = nowTs();
-        const policy = normalizeManagedTimeLimitPolicy(request?.policy);
-        if (!policy || policy.enabled !== true) {
+        const requestPolicy = normalizeManagedTimeLimitPolicy(request?.policy);
+        if (!requestPolicy || requestPolicy.enabled !== true) {
             sendResponse?.({ ok: true, enforced: false, reason: 'disabled_policy_no_work' });
             return;
         }
@@ -1600,11 +1600,23 @@ async function handleManagedTimeLimitHeartbeat(request, sender, sendResponse) {
             return;
         }
 
-        const profileId = normalizeString(request?.profileId) || normalizeString(request?.policy?.profileId);
+        const compiledSettings = await getCompiledSettings(sender, route.surface, false);
+        const compiledPolicy = normalizeManagedTimeLimitPolicy(compiledSettings?.managedTimeLimitPolicy);
+        if (compiledSettings?.activeProfileKind !== 'child' || !compiledPolicy || compiledPolicy.enabled !== true) {
+            sendResponse?.({ ok: true, enforced: false, reason: 'active_child_policy_absent_no_work' });
+            return;
+        }
+
+        const profileId = normalizeString(compiledSettings.activeProfileId) || normalizeString(compiledSettings.managedTimeLimitPolicy?.profileId);
         if (!profileId) {
             sendResponse?.({ ok: false, enforced: false, error: 'missing_profile_id' });
             return;
         }
+
+        const requestedProfileId = normalizeString(request?.profileId) || normalizeString(request?.policy?.profileId);
+        const requestPolicyMatched = (!requestedProfileId || requestedProfileId === profileId)
+            && JSON.stringify(requestPolicy) === JSON.stringify(compiledPolicy);
+        const policy = compiledPolicy;
 
         if (policy.validFrom != null && now < policy.validFrom) {
             sendResponse?.({ ok: true, enforced: false, reason: 'future_policy_not_active' });
@@ -1620,10 +1632,12 @@ async function handleManagedTimeLimitHeartbeat(request, sender, sendResponse) {
                 totalBudgetSeconds: 0,
                 reason: 'expired_policy_requires_parent_revalidation',
                 profileId,
-                profileName: normalizeString(request?.policy?.profileName) || 'Protected profile',
+                profileName: normalizeString(compiledSettings.managedTimeLimitPolicy?.profileName) || 'Protected profile',
                 surface: route.surface,
                 policyRevision: policy.policyRevision,
-                policyHash: policy.policyHash
+                policyHash: policy.policyHash,
+                policySource: 'compiled_active_profile',
+                requestPolicyMatched
             });
             return;
         }
@@ -1716,10 +1730,12 @@ async function handleManagedTimeLimitHeartbeat(request, sender, sendResponse) {
             countDecision,
             dateKey,
             profileId,
-            profileName: normalizeString(request?.policy?.profileName) || 'Protected profile',
+            profileName: normalizeString(compiledSettings.managedTimeLimitPolicy?.profileName) || 'Protected profile',
             surface: route.surface,
             policyRevision: policy.policyRevision,
-            policyHash: policy.policyHash
+            policyHash: policy.policyHash,
+            policySource: 'compiled_active_profile',
+            requestPolicyMatched
         });
     } catch (e) {
         sendResponse?.({ ok: false, enforced: false, error: e?.message || 'managed_time_limit_failed' });

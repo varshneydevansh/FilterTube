@@ -473,6 +473,9 @@ Current behavior:
   `settings.timeLimitPolicy` into `managedTimeLimitPolicy`.
 - The content bridge sends active/focused YouTube heartbeats only while that
   policy is enabled on a YouTube-owned route.
+- Background re-resolves the active child compiled policy for each accepted
+  heartbeat and uses that compiled profile id, revision, hash, budget, and
+  timeout state instead of trusting stale content-side policy payloads.
 - Background runtime stores whole-profile daily usage in `ftManagedTimeUsageV1`
   and clamps remaining budget by policy timezone date, revision, and hash.
 - The child/protected timeout overlay appears only after the background reports

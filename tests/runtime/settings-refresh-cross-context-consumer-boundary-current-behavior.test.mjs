@@ -10,7 +10,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_SETTINGS_REFRESH_CROSS_CONTEXT_CONSUMER_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/background.js': [6773, 305166, 'b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5'],
+  'js/background.js': [6789, 306239, '618e41011a6031c7a4eb3d022c4612536942a7a58a3c41eb0fd7e31c29a60311'],
   'js/content/bridge_settings.js': [1113, 44087, 'f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853'],
   'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
   'js/injector.js': [3593, 155830, '634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04'],
@@ -24,7 +24,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: '    } else if (request.action === "FilterTube_ApplySettings" && request.settings) {',
     end: '    } else if (request.action === "updateChannelMap") {',
-    startLine: 4848,
+    startLine: 4864,
     lines: 28,
     bytes: 1487,
     hash: 'b585d94cc410f7acd929db780840f7cb02b44bb9819b34eb34985b713485e3d6'
@@ -33,7 +33,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: '// Listen for storage changes to re-compile settings\n',
     end: '/**\n * Fetch channel name and handle from YouTube by scraping the channel page',
-    startLine: 4937,
+    startLine: 4953,
     lines: 41,
     bytes: 1464,
     hash: 'e5c76f714f31a1d325385b3eaa051c0eb73e6a29ec1c69b1493cc4bb7f796de2'

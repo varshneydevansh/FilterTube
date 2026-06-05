@@ -158,6 +158,7 @@ local managed time-limit parent UI: present
 local managed time-limit protected history row writer: present
 runtime managed time-limit policy compiler: present
 runtime managed active-tab budget counter: present
+runtime managed heartbeat active-policy revalidation: present
 runtime managed timeout overlay: present
 runtime managed Main/Kids time gate: present
 YouTube runtime behavior changed by this contract: yes, for child profiles with enabled time-limit policy
@@ -169,6 +170,10 @@ The first runtime path is intentionally lazy:
   profiles with a valid `settings.timeLimitPolicy`.
 - Content bridge arms heartbeat listeners and a timer only when that policy is
   enabled on a YouTube-owned route.
+- Background treats those heartbeats as liveness signals, then re-resolves the
+  compiled active child profile policy before counting or timing out the route.
+  Stale or mismatched content policy payloads do not own the profile id,
+  revision, hash, budget, or timeout decision.
 - The background owns the persisted `ftManagedTimeUsageV1` counter and clamps
   elapsed time by active/focused tab heartbeat, policy date, revision, and hash.
 - The content overlay does not mark videos hidden, does not click YouTube, and

@@ -9,7 +9,7 @@ const docPath = 'docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_
 
 const sourceFingerprints = {
   'build.js': [740, 26978, 'c8485cb2600aad89f44015cd7e49ebe4746ebcc35c91c1ff2bf29aec2f087a04'],
-  'js/background.js': [6773, 305166, 'b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5'],
+  'js/background.js': [6789, 306239, '618e41011a6031c7a4eb3d022c4612536942a7a58a3c41eb0fd7e31c29a60311'],
   'js/content/block_channel.js': [3189, 127857, 'c040b57e0b107fd7b6fb0a18bc4ca014e5a22fbb82755f81e51a497eee387dba'],
   'js/content/bridge_settings.js': [1113, 44087, 'f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853'],
   'js/content/collab_dialog.js': [393, 14623, 'dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a'],
@@ -489,7 +489,7 @@ function assertProductionConsoleResidualHotPathPreflight(doc) {
 
   assert.equal(routineConsoleSites('js/background.js').length, 62);
   assert.equal(lineNumberForToken(read('js/background.js'), 'installFilterTubeBackgroundConsoleGate();'), 12);
-  assert.equal(routineConsoleSites('js/background.js')[0], 2187);
+  assert.equal(routineConsoleSites('js/background.js')[0], 2203);
 
   const isolatedGateFiles = new Set();
   for (const manifestFile of activeManifestFiles) {

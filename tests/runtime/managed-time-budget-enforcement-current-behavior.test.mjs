@@ -131,10 +131,29 @@ test('managed time-budget runtime is compiled background-owned and documented as
 
   assert.match(contract, /runtime managed time-limit policy compiler: present/);
   assert.match(contract, /runtime managed active-tab budget counter: present/);
+  assert.match(contract, /runtime managed heartbeat active-policy revalidation: present/);
   assert.match(contract, /runtime managed timeout overlay: present/);
   assert.match(contract, /Missing, disabled, malformed, non-child, or external-route policies remain\s+no-work states/);
   assert.match(plan, /ftManagedTimeUsageV1/);
+  assert.match(plan, /re-resolves the compiled active child profile policy before counting/);
   assert.match(inventory, /Extension runtime now compiles a valid active child profile/);
+  assert.match(inventory, /Background re-resolves the active child compiled policy for each accepted\s+heartbeat/);
+});
+
+test('managed time-budget background heartbeats use compiled active child policy authority', () => {
+  const background = read('js/background.js');
+  const heartbeatBlock = block(background, 'async function handleManagedTimeLimitHeartbeat(request, sender, sendResponse)', 'function isKidsUrl(url)');
+
+  assert.match(heartbeatBlock, /const requestPolicy = normalizeManagedTimeLimitPolicy\(request\?\.policy\)/);
+  assert.match(heartbeatBlock, /const compiledSettings = await getCompiledSettings\(sender, route\.surface, false\)/);
+  assert.match(heartbeatBlock, /const compiledPolicy = normalizeManagedTimeLimitPolicy\(compiledSettings\?\.managedTimeLimitPolicy\)/);
+  assert.match(heartbeatBlock, /compiledSettings\?\.activeProfileKind !== 'child'/);
+  assert.match(heartbeatBlock, /active_child_policy_absent_no_work/);
+  assert.match(heartbeatBlock, /const profileId = normalizeString\(compiledSettings\.activeProfileId\)/);
+  assert.match(heartbeatBlock, /const policy = compiledPolicy/);
+  assert.match(heartbeatBlock, /policySource: 'compiled_active_profile'/);
+  assert.match(heartbeatBlock, /requestPolicyMatched/);
+  assert.doesNotMatch(heartbeatBlock, /const profileId = normalizeString\(request\?\.profileId\)/);
 });
 
 test('managed time-budget overlay is a lock surface and not a content-hide writer', () => {

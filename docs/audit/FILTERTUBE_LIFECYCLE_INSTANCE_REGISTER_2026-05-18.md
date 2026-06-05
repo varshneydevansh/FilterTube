@@ -70,7 +70,7 @@ side-effect audits.
 | `js/content/block_channel.js` | 71 | Quick-block, normal 3-dot, Kids passive listener, dropdown observers, resize/orientation work. |
 | `js/popup.js` | 33 | Popup filter/profile/list-mode mutation controls. |
 | `js/ui_components.js` | 26 | Shared UI component listener surface. |
-| `js/background.js` | 6773 | Background timers, flushers, backup scheduling, and message/broadcast timing. |
+| `js/background.js` | 6789 | Background timers, flushers, backup scheduling, and message/broadcast timing. |
 | `js/content/dom_fallback.js` | 14 | DOM fallback delayed passes, continuation nudges, playlist guard work, and synthetic playlist navigation timing. |
 | `js/injector.js` | 12 | Page-world message/import/readiness lifecycle. |
 | `js/content/bridge_settings.js` | 22 | Runtime settings bridge lifecycle, including managed time-limit revalidation and heartbeat teardown. |
@@ -4075,7 +4075,7 @@ settings refresh regressions.
 | `release_lifecycle_fallback_menu_mutation_observer` | `js/content_bridge.js:7159:MutationObserver` | Fallback menu button observer. Active only when `shouldEagerFallbackMenuScan()` is true and native overlay quiet mode is false. | Schedules root-scoped scans; not an always-on empty-install body scan when eager scan is false. |
 | `release_lifecycle_fallback_menu_hover_click_listeners` | `js/content_bridge.js:7216-7218:addEventListener` | Hover/focus/click fallback-menu discovery. | Schedules scans from user-near surfaces; still page-lifetime listeners once installed. |
 | `release_lifecycle_fallback_menu_warmup_interval` | `js/content_bridge.js:7263:setInterval` | Startup warmup scans for fallback menu buttons. Active only when eager fallback menu scan is true. | Clears itself after 8 scans; remains a lifecycle risk if eager scan is enabled without real menu need. |
-| `release_lifecycle_video_identity_flush_timers` | `js/background.js:2051,2059:setTimeout` | Background video-channel/video-meta map flush debounce. | Batches storage writes after learned identity/meta updates; timers clear before flush. |
+| `release_lifecycle_video_identity_flush_timers` | `js/background.js:2067,2075:setTimeout` | Background video-channel/video-meta map flush debounce. | Batches storage writes after learned identity/meta updates; timers clear before flush. |
 
 Current semantic status after this addendum:
 

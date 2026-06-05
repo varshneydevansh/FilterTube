@@ -14,9 +14,9 @@ runtime background script injection trust fixtures: 8
 ## Evidence Inputs
 
 - `js/background.js`
-  - lines: 6773
-  - bytes: 305166
-  - sha256: `b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5`
+  - lines: 6789
+  - bytes: 306239
+  - sha256: `618e41011a6031c7a4eb3d022c4612536942a7a58a3c41eb0fd7e31c29a60311`
 - `js/content/bridge_injection.js`
   - lines: 127
   - bytes: 4741
@@ -25,8 +25,8 @@ runtime background script injection trust fixtures: 8
 
 ## Selected Source Metrics
 
-- background lines: 6773
-- background bytes: 305166
+- background lines: 6789
+- background bytes: 306239
 - bridge_injection lines: 127
 - bridge_injection bytes: 4741
 - injectScripts block lines: 47

@@ -62,7 +62,7 @@ file.text() reads an uploaded/imported local File and is not a network response.
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6,773 | 305,166 | `b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5` |
+| `js/background.js` | 6,789 | 306,239 | `618e41011a6031c7a4eb3d022c4612536942a7a58a3c41eb0fd7e31c29a60311` |
 | `js/content/handle_resolver.js` | 282 | 9,785 | `67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff` |
 | `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
 | `js/injector.js` | 3,593 | 155,830 | `634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04` |
@@ -93,19 +93,19 @@ file.text() reads an uploaded/imported local File and is not a network response.
 ## Network Fetch/XHR Rows
 
 ```text
-js/background.js:2140:fetch:releaseNotesExtensionResource
-js/background.js:2142:response.json:releaseNotesJsonDecode
-js/background.js:3341:fetch:shortsIdentityBackgroundHtmlFetch
-js/background.js:3352:response.body.getReader:shortsIdentityStreamReader
-js/background.js:3457:fetch:kidsWatchIdentityHtmlFetch
-js/background.js:3468:response.body.getReader:kidsWatchIdentityStreamReader
-js/background.js:3550:fetch:watchIdentityHtmlFetch
-js/background.js:3561:response.body.getReader:watchIdentityStreamReader
-js/background.js:5096:fetch:channelInfoPrimaryHtmlFetch
-js/background.js:5110:fetch:channelInfoHandleFallbackHtmlFetch
-js/background.js:5124:response.text:channelInfoPrimaryHtmlDecode
-js/background.js:5263:fetch:channelInfoPublicFallbackHtmlFetch
-js/background.js:5272:response.text:channelInfoPublicFallbackHtmlDecode
+js/background.js:2156:fetch:releaseNotesExtensionResource
+js/background.js:2158:response.json:releaseNotesJsonDecode
+js/background.js:3357:fetch:shortsIdentityBackgroundHtmlFetch
+js/background.js:3368:response.body.getReader:shortsIdentityStreamReader
+js/background.js:3473:fetch:kidsWatchIdentityHtmlFetch
+js/background.js:3484:response.body.getReader:kidsWatchIdentityStreamReader
+js/background.js:3566:fetch:watchIdentityHtmlFetch
+js/background.js:3577:response.body.getReader:watchIdentityStreamReader
+js/background.js:5112:fetch:channelInfoPrimaryHtmlFetch
+js/background.js:5126:fetch:channelInfoHandleFallbackHtmlFetch
+js/background.js:5140:response.text:channelInfoPrimaryHtmlDecode
+js/background.js:5279:fetch:channelInfoPublicFallbackHtmlFetch
+js/background.js:5288:response.text:channelInfoPublicFallbackHtmlDecode
 js/content/handle_resolver.js:239:fetch:directHandleHtmlFetch
 js/content/handle_resolver.js:255:response.text:directHandleHtmlDecode
 js/content_bridge.js:1943:fetch:watchMetaDirectHtmlFetch

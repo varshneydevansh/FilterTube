@@ -142,7 +142,7 @@ test('YouTube Music surface identity boundary audit is audit-only and source pin
   }
 
   for (const [file, lines, bytes, hash] of [
-    ['js/background.js', 6773, 305166, 'b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5'],
+    ['js/background.js', 6789, 306239, '618e41011a6031c7a4eb3d022c4612536942a7a58a3c41eb0fd7e31c29a60311'],
     ['js/content/bridge_settings.js',  1113,  44087, 'f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853'],
     ['js/content/dom_extractors.js', 1137, 46896, 'adf2c04f14f0f3bb44556e216af25aca8ff182dfa569c248ddb150d0cca38a4e'],
     ['js/filter_logic.js', 3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'],

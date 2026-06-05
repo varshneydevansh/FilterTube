@@ -50,7 +50,7 @@ rows; command-center buttons delegate to existing dashboard runtime gates.
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6773 | 305166 | `b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5` |
+| `js/background.js` | 6789 | 306239 | `618e41011a6031c7a4eb3d022c4612536942a7a58a3c41eb0fd7e31c29a60311` |
 | `js/content/bridge_injection.js` | 127 | 4741 | `d1b84cf4c43ec5ff5cdc3bd607d8f3d3bf448c12829780b0d05fb9fc14fb5d3e` |
 | `js/content/bridge_settings.js` | 1113 | 44087 | `f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853` |
 | `js/content/collab_dialog.js` | 393 | 14623 | `dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a` |
@@ -97,8 +97,8 @@ rows; command-center buttons delegate to existing dashboard runtime gates.
 
 ```text
 js/background.js:115:tabs.sendMessage:quietTabBroadcast
-js/background.js:3618:runtime.onMessage.addListener:primaryBackgroundActionReceiver
-js/background.js:5688:runtime.onMessage.addListener:secondaryBackgroundTypeReceiver
+js/background.js:3634:runtime.onMessage.addListener:primaryBackgroundActionReceiver
+js/background.js:5704:runtime.onMessage.addListener:secondaryBackgroundTypeReceiver
 js/content/bridge_injection.js:38:runtime.sendMessage:backgroundScriptInjectionRequest
 js/content/bridge_settings.js:130:window.postMessage:subscriptionImportRequestToMainWorld
 js/content/bridge_settings.js:148:window.addEventListener(message):subscriptionImportResponseListener

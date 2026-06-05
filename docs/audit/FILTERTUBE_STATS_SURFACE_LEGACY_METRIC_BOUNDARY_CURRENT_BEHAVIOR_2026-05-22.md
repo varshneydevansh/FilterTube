@@ -39,7 +39,7 @@ dashboard display all have local rules.
 | --- | ---: | ---: | --- |
 | `js/content/dom_helpers.js` | 206 | 8,292 | `a8c6ebfc10394f67254fbe5d324090ba9d01bead7efbb61d44e63dda4b52c242` |
 | `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
-| `js/background.js` | 6773 | 305166 | `b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5` |
+| `js/background.js` | 6789 | 306239 | `618e41011a6031c7a4eb3d022c4612536942a7a58a3c41eb0fd7e31c29a60311` |
 | `js/settings_shared.js` | 1,181 | 57,535 | `9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c` |
 | `js/state_manager.js` | 2,491 | 99,780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
 | `js/tab-view.js` | 14,584 | 676,581 | `7f3de6750e95adb81bfdec5df53425427be86b08044a833bc0288bfe8cbe6e58` |

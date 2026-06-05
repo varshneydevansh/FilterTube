@@ -10,7 +10,7 @@ const docPath = 'docs/audit/FILTERTUBE_SECURITY_CRYPTO_PAYLOAD_BOUNDARY_CURRENT_
 
 const sourceFingerprints = {
   'js/security_manager.js': [198, 6374, '1fb1ec9c8339cbdad57107c5b596d893a025af68870ae7928083977a8d29ebd3'],
-  'js/background.js': [6773, 305166, 'b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5'],
+  'js/background.js': [6789, 306239, '618e41011a6031c7a4eb3d022c4612536942a7a58a3c41eb0fd7e31c29a60311'],
   'js/io_manager.js': [2097, 100479, 'f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62'],
   'js/tab-view.js': [12437, 564952, 'b7174155f23ee5b006a9f37be921a1aad0506030af56f96695710ac10d436066'],
   'js/popup.js': [1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a']

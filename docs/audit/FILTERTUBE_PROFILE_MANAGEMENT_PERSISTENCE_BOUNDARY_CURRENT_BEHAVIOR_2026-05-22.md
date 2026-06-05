@@ -21,7 +21,7 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 | `js/tab-view.js` | 14584 | 676581 | `7f3de6750e95adb81bfdec5df53425427be86b08044a833bc0288bfe8cbe6e58` |
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/io_manager.js` | 2097 | 100479 | `f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62` |
-| `js/background.js` | 6773 | 305166 | `b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5` |
+| `js/background.js` | 6789 | 306239 | `618e41011a6031c7a4eb3d022c4612536942a7a58a3c41eb0fd7e31c29a60311` |
 
 ## Source / Effect Blocks
 
@@ -68,7 +68,7 @@ popup unlockedProfiles tokens: 5
 io_manager FT_PROFILES_V4_KEY tokens: 10
 io_manager writeStorage tokens: 8
 background compiledSettingsCache tokens: 39
-background getCompiledSettings tokens: 8
+background getCompiledSettings tokens: 9
 background FT_PROFILES_V4_KEY tokens: 37
 ```
 

@@ -820,7 +820,7 @@ const affectedCallableSemanticFiles = [
     id: 'FT-WLCACHE-SEMANTIC-GAP-03-background',
     file: 'js/background.js',
     family: 'Hot page/background runtime',
-    lexicalCallables: 469,
+    lexicalCallables: 470,
     semanticStatus: 'semantic proof incomplete'
   },
   {
@@ -1200,9 +1200,9 @@ const affectedCallableAnchorChecks = [
   ['js/content_bridge.js', 5962, "} else if (type === 'FilterTube_UpdateVideoMetaMap') {"],
   ['js/content/bridge_settings.js', 1019, 'function scheduleSettingsRefreshFromStorage({ forceReprocess = true } = {}) {'],
   ['js/content/bridge_settings.js', 1051, 'function handleStorageChanges(changes, area) {'],
-  ['js/background.js', 2065, 'function enqueueVideoChannelMapUpdate(videoId, channelId) {'],
-  ['js/background.js', 2090, 'function enqueueVideoMetaMapUpdate(videoId, meta) {'],
-  ['js/background.js', 2191, 'async function getCompiledSettings(sender = null, profileType = null, forceRefresh = false) {'],
+  ['js/background.js', 2081, 'function enqueueVideoChannelMapUpdate(videoId, channelId) {'],
+  ['js/background.js', 2106, 'function enqueueVideoMetaMapUpdate(videoId, meta) {'],
+  ['js/background.js', 2207, 'async function getCompiledSettings(sender = null, profileType = null, forceRefresh = false) {'],
   ['js/content/dom_fallback.js', 2219, 'async function applyDOMFallback(settings, options = {}) {'],
   ['js/content/dom_fallback.js', 4139, "if (onlyWhitelistPending && listMode === 'whitelist') {"],
   ['js/content/handle_resolver.js', 136, 'function scheduleDomFallbackRerun() {'],
