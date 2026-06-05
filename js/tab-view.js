@@ -6129,6 +6129,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function managedRuleListKeyFor(surface, ruleType, target) {
         const mode = safeObject(target).mode === 'whitelist' ? 'whitelist' : 'blocklist';
+        if (ruleType === 'video') return 'videoIds';
         if (ruleType === 'channel') {
             if (surface === 'kids') return mode === 'whitelist' ? 'whitelistChannels' : 'blockedChannels';
             return mode === 'whitelist' ? 'whitelistChannels' : 'channels';
@@ -6137,11 +6138,51 @@ document.addEventListener('DOMContentLoaded', async () => {
         return mode === 'whitelist' ? 'whitelistKeywords' : 'keywords';
     }
 
+    function normalizeManagedVideoIdInput(input) {
+        const raw = normalizeString(input);
+        if (!raw) return '';
+        const bare = raw.match(/^[a-zA-Z0-9_-]{11}$/);
+        if (bare) return raw;
+        try {
+            const withProtocol = raw.startsWith('http://') || raw.startsWith('https://')
+                ? raw
+                : (raw.startsWith('youtu.be/') || raw.startsWith('youtube.com/') || raw.startsWith('www.youtube.com/')
+                    ? `https://${raw}`
+                    : raw);
+            const url = new URL(withProtocol);
+            const host = url.hostname.replace(/^www\./i, '').toLowerCase();
+            const watchId = url.searchParams.get('v');
+            if (watchId && /^[a-zA-Z0-9_-]{11}$/.test(watchId)) return watchId;
+            if (host === 'youtu.be') {
+                const id = url.pathname.split('/').filter(Boolean)[0] || '';
+                if (/^[a-zA-Z0-9_-]{11}$/.test(id)) return id;
+            }
+            const parts = url.pathname.split('/').filter(Boolean);
+            const markerIndex = parts.findIndex(part => part === 'shorts' || part === 'embed' || part === 'watch');
+            if (markerIndex >= 0) {
+                const id = parts[markerIndex + 1] || '';
+                if (/^[a-zA-Z0-9_-]{11}$/.test(id)) return id;
+            }
+        } catch (e) {
+        }
+        const fallback = raw.match(/(?:v=|shorts\/|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
+        return fallback ? fallback[1] : '';
+    }
+
     function addManagedRuleToSurface(target, surface, ruleType, value) {
         const item = safeObject(target);
-        const type = ruleType === 'channel' ? 'channel' : 'keyword';
+        const type = ruleType === 'video' ? 'video' : (ruleType === 'channel' ? 'channel' : 'keyword');
         const listKey = managedRuleListKeyFor(surface, type, item);
         const list = Array.isArray(item[listKey]) ? item[listKey] : [];
+
+        if (type === 'video') {
+            const videoId = normalizeManagedVideoIdInput(value);
+            if (!videoId) return { changed: false, error: 'invalid_video' };
+            const exists = list.some(row => normalizeString(row) === videoId);
+            if (exists) return { changed: false, duplicate: true };
+            item[listKey] = [videoId, ...list];
+            return { changed: true };
+        }
 
         if (type === 'channel') {
             const channel = normalizeProfileChannel(value);
@@ -6163,9 +6204,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function promptManagedBulkRuleSurface(ruleType) {
-        const type = ruleType === 'channel' ? 'channel' : 'keyword';
+        const type = ruleType === 'video' ? 'video' : (ruleType === 'channel' ? 'channel' : 'keyword');
         const rawSurface = await showPromptModal({
-            title: type === 'channel' ? 'Add Channel To Selected Profiles' : 'Add Keyword To Selected Profiles',
+            title: type === 'video'
+                ? 'Add Video ID To Selected Profiles'
+                : (type === 'channel' ? 'Add Channel To Selected Profiles' : 'Add Keyword To Selected Profiles'),
             message: 'Enter main or kids. The rule is added using each profile surface current Blocklist/Whitelist mode.',
             placeholder: 'main or kids',
             confirmText: 'Choose Surface',
@@ -6181,14 +6224,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function promptManagedBulkRuleValue(ruleType) {
-        const type = ruleType === 'channel' ? 'channel' : 'keyword';
+        const type = ruleType === 'video' ? 'video' : (ruleType === 'channel' ? 'channel' : 'keyword');
         const rawValue = await showPromptModal({
-            title: type === 'channel' ? 'Channel To Add' : 'Keyword To Add',
-            message: type === 'channel'
-                ? 'Use @handle, Channel ID, c/ChannelName, user/ChannelName, or a YouTube URL.'
-                : 'Enter the keyword to add to selected protected profiles.',
-            placeholder: type === 'channel' ? '@channel or UC...' : 'keyword',
-            confirmText: type === 'channel' ? 'Add Channel' : 'Add Keyword'
+            title: type === 'video' ? 'Video ID To Add' : (type === 'channel' ? 'Channel To Add' : 'Keyword To Add'),
+            message: type === 'video'
+                ? 'Paste a YouTube watch/Shorts URL or an 11-character video ID.'
+                : (type === 'channel'
+                    ? 'Use @handle, Channel ID, c/ChannelName, user/ChannelName, or a YouTube URL.'
+                    : 'Enter the keyword to add to selected protected profiles.'),
+            placeholder: type === 'video' ? 'watch URL or video ID' : (type === 'channel' ? '@channel or UC...' : 'keyword'),
+            confirmText: type === 'video' ? 'Add Video' : (type === 'channel' ? 'Add Channel' : 'Add Keyword')
         });
         if (rawValue === null) return null;
         return normalizeString(rawValue);
@@ -6196,7 +6241,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function addManagedBulkRuleToProfiles(profileIds, ruleType) {
         const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
-        const type = ruleType === 'channel' ? 'channel' : 'keyword';
+        const type = ruleType === 'video' ? 'video' : (ruleType === 'channel' ? 'channel' : 'keyword');
         if (!targetIds.length) {
             UIComponents.showToast('Select at least one protected profile', 'error');
             return;
@@ -6234,6 +6279,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (type === 'channel' && !normalizeProfileChannel(value)) {
             UIComponents.showToast('Invalid format. Use @handle, Channel ID, c/ChannelName, or YouTube URL', 'error');
+            return;
+        }
+        if (type === 'video' && !normalizeManagedVideoIdInput(value)) {
+            UIComponents.showToast('Enter a valid YouTube watch/Shorts URL or 11-character video ID', 'error');
             return;
         }
         if (type === 'keyword' && !normalizeProfileKeyword(value, { comments: surface !== 'kids' })) {
@@ -12284,10 +12333,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                             return;
                         }
                         await startManagedChildEdit(profileIds[0]);
-                    } else if (action === 'bulk_add_keyword' || action === 'bulk_add_channel') {
+                    } else if (action === 'bulk_add_keyword' || action === 'bulk_add_channel' || action === 'bulk_add_video') {
                         await addManagedBulkRuleToProfiles(
                             safeArray(intent?.profileIds),
-                            action === 'bulk_add_channel' ? 'channel' : 'keyword'
+                            action === 'bulk_add_video' ? 'video' : (action === 'bulk_add_channel' ? 'channel' : 'keyword')
                         );
                     } else if (action === 'bulk_set_time_limit' || action === 'bulk_disable_time_limit') {
                         await updateMultipleProfileTimeLimitPolicies(

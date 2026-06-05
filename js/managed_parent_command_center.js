@@ -105,6 +105,14 @@
                 sensitiveAction: true
             },
             {
+                action: 'bulk_add_video',
+                label: 'Add video ID',
+                profileIds,
+                scope: 'main_kids_rules',
+                authority: 'delegated_runtime_gate',
+                sensitiveAction: true
+            },
+            {
                 action: 'bulk_send_managed_policy',
                 label: 'Send selected updates',
                 profileIds,

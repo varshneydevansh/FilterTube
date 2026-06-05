@@ -67,7 +67,7 @@ metadata, not plaintext rules or authority.
   protected profiles.
 - [x] Local same-access bulk viewing-space changes work for selected manageable
   protected profiles.
-- [x] Local selected-profile keyword/channel rule additions work for manageable
+- [x] Local selected-profile video/keyword/channel rule additions work for manageable
   protected profiles through parent/account re-auth.
 - [x] Dashboard command center lists protected profiles, time-limit state,
   viewing-space state, protected history count, verified-device readiness, and
@@ -651,9 +651,9 @@ the current extension dashboard.
   plus a selected-profile rule editor handoff, local selected-profile bulk
   time-limit and viewing-space actions, and selected-profile signed-policy
   sends. Child/protected views do not receive detailed managed status text or
-  command-center controls. Direct local selected-profile keyword/channel rule
-  additions are present. Direct local video-ID bulk writes and built-in server
-  mailbox/LAN transports remain pending.
+  command-center controls. Direct local selected-profile video/keyword/channel
+  rule additions are present. Built-in server mailbox/LAN transports remain
+  pending.
 - **Acceptance Criteria**:
   - UI has empty, loading, error, locked, offline, and sync-conflict states.
   - Parent actions are clear and reversible where possible.
