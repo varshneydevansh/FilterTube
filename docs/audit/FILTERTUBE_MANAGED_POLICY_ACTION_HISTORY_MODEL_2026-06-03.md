@@ -33,7 +33,9 @@ instead of rendering free-form sensitive summary labels. Runtime history
 appends now prune expired rows with the documented retention windows: accepted
 actions are retained for 30 days, rejected/conflict/failed-auth/expired/clear
 evidence is retained for 90 days, and each protected profile remains capped at
-500 rows.
+500 rows. The central sanitizer now also preserves optional encrypted summary
+evidence only when it is already ciphertext-shaped and rejects plaintext-like
+summary keys before storing protected history rows.
 **Goal slice**: Implementation order item 4, "Add action-history/log model and
 access-control tests".
 **Primary inputs**:
@@ -72,6 +74,9 @@ now also writes protected redacted target-profile rows that show whether the
 protected device handed the accepted/rejected mailbox result back to the local
 provider. Same-device parent time-limit set/change/disable actions now write
 protected `time_limits` rows with only budget/timezone counts, not rule values.
+Optional encrypted history summaries are accepted only as ciphertext metadata
+under the central sanitizer and do not change display labels or policy
+authority.
 
 Action history is protected evidence and parent/caregiver UX. It is not policy
 authority. Runtime policy must still come from the current accepted managed
@@ -162,7 +167,7 @@ default rejected-attempt retention days: 90
 default accepted-action retention days: 30
 plaintext sensitive rule values: no
 central safe-count/status summary sanitizer: yes
-local encryption for sensitive summaries: future-compatible
+local encryption for sensitive summaries: ciphertext-only encryptedSummary metadata accepted
 clear rejected evidence without parent authority: no
 remote upload or telemetry: no
 ```
@@ -175,6 +180,12 @@ Suggested summary behavior:
   metadata.
 - Sensitive rows rendered in the dashboard should use fixed action labels and
   normalized machine-readable reason codes instead of free-form summary labels.
+- Optional encrypted summaries are allowed only under
+  `summary.encryptedSummary` with schema
+  `filtertube_managed_action_history_encrypted_summary`; the sanitizer keeps
+  ciphertext, nonce, cipher suite, key id, ciphertext hash, and created time,
+  and rejects plaintext-like keys such as `payload`, `operations`, `keywords`,
+  `channels`, `videoIds`, `plaintextValue`, `ruleValue`, `summary`, or `label`.
 - Rejected hostile-LAN rows should keep source device id, trusted link id,
   target profile id, rejection reason, revision, and policy hash when available.
 - Wall-clock timestamps are diagnostic only. Stable ordering should prefer

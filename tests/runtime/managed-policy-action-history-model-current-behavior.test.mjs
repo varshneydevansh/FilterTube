@@ -177,6 +177,32 @@ function validMailboxAckRow(overrides = {}) {
   });
 }
 
+function validEncryptedSummary(overrides = {}) {
+  return {
+    schema: 'filtertube_managed_action_history_encrypted_summary',
+    version: 1,
+    cipherSuite: 'AES-GCM-256',
+    keyId: 'managed-history-key-1',
+    nonce: 'nonce_base64url_1',
+    ciphertext: 'ciphertext_base64url_1',
+    ciphertextHash: 'sha256:encrypted-history-summary-hash',
+    createdAt: 1780480800000,
+    ...overrides
+  };
+}
+
+function validateEncryptedSummary(summary) {
+  const root = summary && typeof summary === 'object' ? summary : {};
+  if (root.schema !== 'filtertube_managed_action_history_encrypted_summary') return { ok: false, reason: 'wrong_schema' };
+  for (const key of ['payload', 'operations', 'keywords', 'channels', 'videoIds', 'plaintextValue', 'ruleValue', 'summary', 'label']) {
+    if (Object.prototype.hasOwnProperty.call(root, key)) return { ok: false, reason: `plaintext_${key}` };
+  }
+  for (const field of ['cipherSuite', 'keyId', 'nonce', 'ciphertext', 'ciphertextHash']) {
+    if (!String(root[field] || '').trim()) return { ok: false, reason: `missing_${field}` };
+  }
+  return { ok: true };
+}
+
 const safeHistoryDisplayLabels = Object.freeze({
   'remote_policy.reject': 'Remote policy rejected',
   'policy.time_limit.update': 'Time limit policy changed'
@@ -320,6 +346,8 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(doc, /Approved Action Types/);
   assert.match(doc, /Access Control/);
   assert.match(doc, /Retention, Redaction, And Local Storage/);
+  assert.match(doc, /ciphertext-only encryptedSummary metadata accepted/);
+  assert.match(doc, /filtertube_managed_action_history_encrypted_summary/);
   assert.match(doc, /Required Recorded Outcomes/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
@@ -361,6 +389,10 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(source, /\$\{transportLabel\} ack handoff failed/);
   assert.match(source, /recordAckHistory: \(details\) => recordManagedOpenSyncAckHistory\(details\)/);
   assert.match(source, /MANAGED_ACTION_HISTORY_SAFE_LABELS = Object\.freeze/);
+  assert.match(source, /MANAGED_ACTION_HISTORY_ENCRYPTED_SUMMARY_SCHEMA/);
+  assert.match(source, /function sanitizeManagedActionHistoryEncryptedSummary\(value\)/);
+  assert.match(source, /safe_counts_status_transport_and_ciphertext_only/);
+  assert.match(source, /MANAGED_ACTION_HISTORY_ENCRYPTED_SUMMARY_FORBIDDEN_KEYS/);
   assert.match(source, /function formatManagedActionHistoryRow\(row\)/);
   assert.match(source, /item\.sensitive === true \? safeLabel/);
   assert.ok(source.includes("replace(/[^a-z0-9_.:-]+/g, '_')"));
@@ -379,6 +411,23 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(source, /function getNanahManagedPolicyScopeList\(value\)/);
   assert.match(source, /historyBtn\.textContent = 'History'/);
   assert.doesNotMatch(source, /managedActionHistoryStore/);
+});
+
+test('managed action history encrypted summary fixture is ciphertext-only and not policy authority', () => {
+  const doc = read(docPath);
+  const inventory = read(inventoryPath);
+  const source = read('js/tab-view.js');
+
+  assert.deepEqual(validateEncryptedSummary(validEncryptedSummary()), { ok: true });
+  assert.deepEqual(validateEncryptedSummary(validEncryptedSummary({ plaintextValue: 'spiders' })), { ok: false, reason: 'plaintext_plaintextValue' });
+  assert.deepEqual(validateEncryptedSummary(validEncryptedSummary({ keywords: ['spiders'] })), { ok: false, reason: 'plaintext_keywords' });
+  assert.deepEqual(validateEncryptedSummary(validEncryptedSummary({ label: 'Blocked keyword spiders' })), { ok: false, reason: 'plaintext_label' });
+  assert.deepEqual(validateEncryptedSummary(validEncryptedSummary({ ciphertext: '' })), { ok: false, reason: 'missing_ciphertext' });
+  assert.match(doc, /Optional encrypted summaries are allowed only under\s+`summary\.encryptedSummary`/);
+  assert.match(doc, /rejects plaintext-like keys such as `payload`, `operations`, `keywords`,\s+`channels`, `videoIds`, `plaintextValue`, `ruleValue`, `summary`, or `label`/);
+  assert.match(inventory, /ciphertext-only encrypted summary metadata preservation/);
+  assert.match(source, /next\.encryptedSummary = encryptedSummary/);
+  assert.doesNotMatch(source, /encryptedSummaryStore/);
 });
 
 test('managed history display redacts sensitive labels and normalizes visible reason codes', () => {

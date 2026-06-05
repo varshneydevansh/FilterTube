@@ -3060,6 +3060,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const MANAGED_ACTION_HISTORY_PROTECTED_RESULTS = new Set(['rejected', 'conflict', 'failed_auth', 'expired_session', 'cleared_by_admin']);
     const MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set(['trust_link.revoke', 'trust_link.key_revoke', 'managed_signing_key.rotate', 'policy.time_limit.update', 'policy.viewing_space.update', 'remote_policy.source_push']);
     const MANAGED_ACTION_HISTORY_SUMMARY_PRIVACY_SCHEMA = 'filtertube_managed_action_history_summary_privacy';
+    const MANAGED_ACTION_HISTORY_ENCRYPTED_SUMMARY_SCHEMA = 'filtertube_managed_action_history_encrypted_summary';
     const MANAGED_ACTION_HISTORY_SAFE_LABELS = Object.freeze({
         'rule.video.block': 'Video rule changed',
         'rule.keyword.add': 'Keyword rule changed',
@@ -3132,6 +3133,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const MANAGED_ACTION_HISTORY_SUMMARY_SAFE_STRING_ARRAY_KEYS = new Set([
         'removedScopes',
         'transports'
+    ]);
+    const MANAGED_ACTION_HISTORY_ENCRYPTED_SUMMARY_FORBIDDEN_KEYS = new Set([
+        'channels',
+        'keywords',
+        'label',
+        'operations',
+        'payload',
+        'plaintext',
+        'plaintextValue',
+        'ruleValue',
+        'summary',
+        'videoIds'
     ]);
     const MANAGED_ADMIN_SESSION_TTL_MS = 15 * 60 * 1000;
     const MANAGED_ADMIN_REAUTH_TTL_MS = 5 * 60 * 1000;
@@ -5014,6 +5027,37 @@ document.addEventListener('DOMContentLoaded', async () => {
         return null;
     }
 
+    function sanitizeManagedEncryptedSummaryToken(value, maxLength) {
+        const normalized = normalizeString(value);
+        if (!normalized || normalized.length > maxLength) return '';
+        return /^[a-zA-Z0-9_.:+/=-]+$/.test(normalized) ? normalized : '';
+    }
+
+    function sanitizeManagedActionHistoryEncryptedSummary(value) {
+        const root = safeObject(value);
+        if (root.schema !== MANAGED_ACTION_HISTORY_ENCRYPTED_SUMMARY_SCHEMA) return null;
+        for (const key of Object.keys(root)) {
+            if (MANAGED_ACTION_HISTORY_ENCRYPTED_SUMMARY_FORBIDDEN_KEYS.has(key)) return null;
+        }
+        const cipherSuite = sanitizeManagedEncryptedSummaryToken(root.cipherSuite || root.algorithm, 80);
+        const keyId = sanitizeManagedEncryptedSummaryToken(root.keyId || root.wrappingKeyId, 128);
+        const nonce = sanitizeManagedEncryptedSummaryToken(root.nonce || root.iv, 256);
+        const ciphertext = sanitizeManagedEncryptedSummaryToken(root.ciphertext, 4096);
+        const ciphertextHash = sanitizeManagedEncryptedSummaryToken(root.ciphertextHash || root.hash, 160);
+        if (!cipherSuite || !keyId || !nonce || !ciphertext || !ciphertextHash) return null;
+        const createdAt = normalizeNonNegativeInteger(root.createdAt);
+        return {
+            schema: MANAGED_ACTION_HISTORY_ENCRYPTED_SUMMARY_SCHEMA,
+            version: 1,
+            cipherSuite,
+            keyId,
+            nonce,
+            ciphertext,
+            ciphertextHash,
+            ...(createdAt ? { createdAt } : {})
+        };
+    }
+
     function sanitizeManagedActionHistorySummary(summary, actionType, sensitive) {
         const root = safeObject(summary);
         const safeLabel = MANAGED_ACTION_HISTORY_SAFE_LABELS[actionType] || actionType || 'Managed action';
@@ -5022,16 +5066,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             label: sensitive === true ? safeLabel : (normalizeString(root.label) || safeLabel).slice(0, 160)
         };
         Object.entries(root).forEach(([key, value]) => {
-            if (key === 'label' || key === 'redacted' || key === 'summaryPrivacy') return;
+            if (key === 'label' || key === 'redacted' || key === 'summaryPrivacy' || key === 'encryptedSummary') return;
             const sanitized = sanitizeManagedActionHistorySummaryValue(key, value);
             if (sanitized == null) return;
             next[key] = sanitized;
         });
+        const encryptedSummary = sanitizeManagedActionHistoryEncryptedSummary(root.encryptedSummary);
+        if (encryptedSummary) {
+            next.encryptedSummary = encryptedSummary;
+        }
         next.summaryPrivacy = {
             schema: MANAGED_ACTION_HISTORY_SUMMARY_PRIVACY_SCHEMA,
             version: 1,
             redacted: true,
-            plaintextPolicy: 'safe_counts_status_and_transport_only'
+            encrypted: !!encryptedSummary,
+            plaintextPolicy: encryptedSummary
+                ? 'safe_counts_status_transport_and_ciphertext_only'
+                : 'safe_counts_status_and_transport_only'
         };
         return next;
     }

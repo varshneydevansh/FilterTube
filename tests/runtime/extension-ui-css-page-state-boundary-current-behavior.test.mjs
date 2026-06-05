@@ -30,7 +30,7 @@ const selectedSourceRows = [
   ['js/ui-shell/popup-shell.js', 374, 21080, 'dc750d44dd4b9fde63b85b4dfc9f5ce9ba76964afbd6dfcedc7b3b7cce084b05'],
   ['js/ui-shell/tab-view-decor.js', 323, 18289, '234171091e523aa5de4c3c0f97e7341c55893bdd31b3e25a075490170fa9742f'],
   ['js/popup.js', 1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
-  ['js/tab-view.js', 16101, 752366, '686b49c01b987a814875501728555e45c46ca37919cd7fdd560e5d9dab2bb656'],
+  ['js/tab-view.js', 16152, 754711, 'b723d16dfd4b05406caba7f1a5f89f53c28cae63d2929a840c353d09346c5b80'],
   ['js/managed_parent_command_center.js', 507, 23999, 'f4d51473d415e833e0026dbf369e34fc7974a40d02c6b49eb9a53570e49bdd84']
 ];
 

@@ -41,7 +41,7 @@ test('local parent child edit authority remains source-backed by active-profile 
   assert.match(tabView, /async function saveManagedChildSurface\(surface, mutator\)/);
   assert.match(tabView, /if \(!canActiveProfileManageProfile\(fresh, profileId\)\)/);
   assert.match(tabView, /async function startManagedChildEdit\(profileId, surface\)/);
-  assert.match(tabView, /getProfileType\(fresh, targetId\) !== 'child'/);
+  assert.match(tabView, /const allowedManager = currentActive === targetId \|\| canActiveProfileManageProfile\(fresh, targetId\)/);
   assert.match(tabView, /const ok = await ensureProfileUnlocked\(fresh, currentActive, \{ sensitiveAction: true \}\)/);
   assert.match(tabView, /async function recordManagedAdminAuthFailureHistory\(profilesV4, targetProfileId, reason = 'unlock_failed'\)/);
   assert.match(tabView, /admin_session\.failed_unlock/);
