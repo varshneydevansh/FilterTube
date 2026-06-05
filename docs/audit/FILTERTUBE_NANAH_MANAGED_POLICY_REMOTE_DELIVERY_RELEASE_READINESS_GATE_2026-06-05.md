@@ -13,6 +13,7 @@ through Nanah P2P or local-network management."
 `docs/audit/FILTERTUBE_NANAH_MANAGED_PULL_ON_OPEN_2026-06-04.md`,
 `docs/audit/FILTERTUBE_MANAGED_POLICY_ENCRYPTED_MAILBOX_PROTOCOL_2026-06-04.md`,
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_DISCOVERY_AUTHORITY_BOUNDARY_2026-06-03.md`,
+`docs/audit/FILTERTUBE_MANAGED_TRANSPORT_APP_PARITY_GATE_2026-06-05.md`,
 and
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`.
 
@@ -148,6 +149,8 @@ release claim for complete remote management: NO-GO
 This gate intentionally favors a staged rollout. The extension can keep using
 the validated provider hooks and live Nanah path while the product waits for
 transport-specific proof before claiming complete remote management.
+The companion transport/app parity gate keeps downstream Android/iOS claims on
+the same staged boundary.
 
 ## Verification
 
