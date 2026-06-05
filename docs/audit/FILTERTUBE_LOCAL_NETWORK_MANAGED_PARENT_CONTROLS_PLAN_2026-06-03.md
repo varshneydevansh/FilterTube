@@ -21,8 +21,8 @@ handoff are present for already-decrypted mailbox items, and the adapter now
 has a source-side server-safe mailbox storage item builder for already-encrypted
 payloads plus local WebCrypto seal/open helpers that keep plaintext policy out
 of mailbox storage. A provider-gated dashboard/profile-open local-network candidate
-discovery hook is present for already trusted managed replica links. An
-extension-owned
+discovery hook plus redacted provider candidate ack handoff are present for
+already trusted managed replica links. An extension-owned
 managed app policy contract artifact and app manifest copy row are now present
 so downstream app parity can be tested before native enforcement changes.
 Active/full signed managed sends now expand into concrete Main, Kids,
@@ -33,7 +33,9 @@ offline later delivery, and multi-device fanout remain gated. The adapter now
 exposes a local-network candidate authority gate for future LAN providers, and
 the dashboard has a sanitized receive bridge that records accepted/rejected
 local-network candidate outcomes through protected managed action history. This
-does not add built-in peer discovery or LAN delivery.
+does not add built-in peer discovery or LAN delivery. Local-network provider
+acks are feedback only and record redacted scope/revision/hash/result metadata,
+not plaintext rules or authority.
 **Primary audit input**:
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
 **Current pull-on-open proof**:

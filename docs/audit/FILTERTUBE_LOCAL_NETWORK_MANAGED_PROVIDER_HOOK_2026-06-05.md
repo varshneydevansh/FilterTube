@@ -1,9 +1,10 @@
 # Audit: Local-Network Managed Provider Hook
 
 **Generated**: 2026-06-05
-**Status**: Dashboard/profile-open provider hook is present for local-network
-managed-policy candidates. Built-in LAN peer discovery, LAN transport, server
-mailbox pull, and server mailbox decrypt transport remain absent.
+**Status**: Dashboard/profile-open provider hook and redacted provider ack
+handoff are present for local-network managed-policy candidates. Built-in LAN
+peer discovery, LAN transport, server mailbox pull, and server mailbox decrypt
+transport remain absent.
 **Related plan**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`
 **Related authority boundary**:
@@ -29,12 +30,16 @@ scope, revision, policy hash, device binding, and signature/integrity evidence.
 window.FilterTubeManagedPolicyLocalNetwork = {
   async discoverManagedPolicyCandidates(request) {
     return { ok: true, candidates: [/* filtertube_managed_local_network_candidate */] };
+  },
+  async ackManagedPolicyCandidates(ack) {
+    return { ok: true, ackedCandidateCount: ack.records.length };
   }
 };
 ```
 
 Providers may also expose `discoverLocalNetworkCandidates(request)` with the
-same result shape. A provider can return an array directly, or an object with:
+same result shape, and `ackLocalNetworkCandidates(ack)` with the same ack
+result shape. A provider can return an array directly, or an object with:
 
 ```text
 ok: boolean
@@ -43,6 +48,19 @@ candidates: array
 ```
 
 If `ok` is `false` or the provider throws, no candidate is applied.
+
+The ack payload is redacted metadata only:
+
+```text
+schema: filtertube_managed_local_network_candidate_ack
+linkId, sourceDeviceId, sourceProfileId, targetProfileId
+records[].scope, revision, policyHash, ackState, accepted, applied, reason
+```
+
+It does not include plaintext keywords, channel names, video titles, PINs,
+viewing history, or full action-history rows. If the ack writer is missing or
+throws, local policy apply/reject history remains intact and the sync state
+records the failed ack handoff.
 
 ## Runtime Hooks Added
 
@@ -56,6 +74,8 @@ js/tab-view.js
   getNanahManagedLocalNetworkEligibleLinks(...)
   pullNanahManagedLocalNetworkCandidates(...)
   runNanahManagedLocalNetworkSync(...)
+  local-network ack handoff via ackManagedPolicyCandidates(...)
+  protected ack-history rows via recordManagedOpenSyncAckHistory(...)
 ```
 
 The dashboard trusted-link card now shows a `Local network` status row for
@@ -97,6 +117,8 @@ runtime provider-gated local-network discovery hook: present
 runtime local-network candidate receive bridge: present
 runtime local-network candidate authority validator: present
 runtime local-network provider failure fail-closed apply guard: present
+runtime local-network provider ack handoff: present
+runtime protected local-network ack-handoff history writer: present
 runtime local-network status persistence: present
 runtime built-in LAN peer discovery: absent
 runtime built-in LAN delivery: absent

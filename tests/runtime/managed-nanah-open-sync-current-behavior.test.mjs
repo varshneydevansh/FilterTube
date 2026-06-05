@@ -123,7 +123,7 @@ test('dashboard loads open-sync helper and wires policy toggle status and open/p
   assert.match(tabView, /function formatNanahManagedOpenSyncStatus\(link\)/);
   assert.match(tabView, /async function runNanahManagedOpenSync\(\{ reason = 'dashboard_open' \} = \{\}\)/);
   assert.match(tabView, /async function recordManagedOpenSyncAckHistory\(details = \{\}\)/);
-  assert.match(tabView, /actionType: 'remote_policy\.mailbox\.ack'/);
+  assert.match(tabView, /transport === 'local_network' \? 'remote_policy\.local_network\.ack' : 'remote_policy\.mailbox\.ack'/);
   assert.match(tabView, /recordAckHistory: \(details\) => recordManagedOpenSyncAckHistory\(details\)/);
   assert.match(tabView, /window\.FilterTubeNanahManagedOpenSync\?\.create/);
   assert.match(tabView, /syncOnProfileOpen: linkType === 'managed_link' && syncOnProfileOpen/);

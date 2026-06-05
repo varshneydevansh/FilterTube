@@ -8,7 +8,7 @@ This slice narrows the broad lifecycle and DOM-selector audit to the largest ext
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/tab-view.js` | 14584 | 676581 | `7f3de6750e95adb81bfdec5df53425427be86b08044a833bc0288bfe8cbe6e58` |
+| `js/tab-view.js` | 14702 | 684139 | `6ffc4f25bb294dfc7cc95a445611f8d31c9ee507bbc7facbcce7d03cb1ad304c` |
 | `html/tab-view.html` | 1577 | 133585 | `e33ef1e0d1f2c3d607cb58c3275137df54c1c82ed06cf5cd03c053690fedb0b6` |
 
 The runtime proof is `tests/runtime/tab-view-lifecycle-selector-boundary-current-behavior.test.mjs`.

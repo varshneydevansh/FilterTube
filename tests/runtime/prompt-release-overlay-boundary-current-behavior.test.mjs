@@ -17,7 +17,7 @@ const sourceFingerprints = {
   'js/content/first_run_prompt.js': [190, 7453, '5672d9060d29b08550ecfc3add54245212a5094ee5137f025b6f788f12e50409'],
   'js/content/release_notes_prompt.js': [250, 9866, '30b624cbbda1004f354f98dbf3b4513f8ebc298adecbceb4358782f248f80474'],
   'js/background.js': [6789, 306239, '618e41011a6031c7a4eb3d022c4612536942a7a58a3c41eb0fd7e31c29a60311'],
-  'js/tab-view.js': [14584, 676581, '7f3de6750e95adb81bfdec5df53425427be86b08044a833bc0288bfe8cbe6e58']
+  'js/tab-view.js': [14702, 684139, '6ffc4f25bb294dfc7cc95a445611f8d31c9ee507bbc7facbcce7d03cb1ad304c']
 };
 
 const blockSpecs = {

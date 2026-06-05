@@ -11,7 +11,7 @@ const sourceFingerprints = {
   'js/background.js': [6789, 306239, '618e41011a6031c7a4eb3d022c4612536942a7a58a3c41eb0fd7e31c29a60311'],
   'js/io_manager.js': [2030, 96914, 'd04bfd75d061ee405c1dfa4cab8c9d0fa6a2f072d046add33e4b6782b1f58a21'],
   'js/nanah_sync_adapter.js': [433, 17072, '8094261e6fb9fa72a86e6e79e8614bf18b93134f54dcca7327114b5410447824'],
-  'js/tab-view.js': [14584, 676581, '7f3de6750e95adb81bfdec5df53425427be86b08044a833bc0288bfe8cbe6e58'],
+  'js/tab-view.js': [14702, 684139, '6ffc4f25bb294dfc7cc95a445611f8d31c9ee507bbc7facbcce7d03cb1ad304c'],
   'js/state_manager.js': [2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6']
 };
 

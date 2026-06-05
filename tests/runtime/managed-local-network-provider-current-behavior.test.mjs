@@ -74,7 +74,13 @@ function eligibleLinks(links, activeProfileId, profiles) {
   });
 }
 
-async function runProviderModel({ provider, links = [managedLink()], applyCandidate = async () => ({ accepted: true }) } = {}) {
+async function runProviderModel({
+  provider,
+  links = [managedLink()],
+  applyCandidate = async () => ({ accepted: true }),
+  ackCandidates = null,
+  recordAckHistory = null
+} = {}) {
   const activeProfileId = 'child-profile-1';
   const candidates = eligibleLinks(links, activeProfileId, profilesV4());
   const state = {
@@ -83,6 +89,10 @@ async function runProviderModel({ provider, links = [managedLink()], applyCandid
     candidateCount: 0,
     acceptedCandidateCount: 0,
     rejectedCandidateCount: 0,
+    ackAttemptedCount: 0,
+    ackedCandidateCount: 0,
+    ackFailedCount: 0,
+    ackHistoryRecordedCount: 0,
     linkResults: []
   };
   if (!provider || candidates.length === 0) return state;
@@ -105,9 +115,14 @@ async function runProviderModel({ provider, links = [managedLink()], applyCandid
       ok: result?.ok !== false,
       candidateCount: items.length,
       acceptedCandidateCount: 0,
-      rejectedCandidateCount: 0
+      rejectedCandidateCount: 0,
+      ackAttemptedCount: 0,
+      ackedCandidateCount: 0,
+      ackFailedCount: 0,
+      ackHistoryRecordedCount: 0
     };
     state.candidateCount += items.length;
+    const ackRecords = [];
     if (row.ok) {
       for (const [index, item] of items.entries()) {
         const decision = await applyCandidate(item, index);
@@ -118,6 +133,44 @@ async function runProviderModel({ provider, links = [managedLink()], applyCandid
           row.rejectedCandidateCount += 1;
           state.rejectedCandidateCount += 1;
         }
+        ackRecords.push({
+          linkId: link.linkId,
+          localNetworkCandidateId: item.candidateId || `candidate-${index}`,
+          sourceDeviceId: link.sourceDeviceId,
+          sourceProfileId: link.sourceProfileId,
+          targetProfileId: activeProfileId,
+          scope: item.envelope?.scope || 'keywords',
+          revision: item.envelope?.revision || 5 + index,
+          policyHash: item.envelope?.policyHash || `sha256:policy-${index}`,
+          ackState: decision?.accepted === true || decision?.applied === true ? 'accepted' : 'rejected',
+          accepted: decision?.accepted === true || decision?.applied === true,
+          applied: decision?.applied !== false && (decision?.accepted === true || decision?.applied === true),
+          reason: decision?.accepted === true || decision?.applied === true ? null : (decision?.reason || 'local_network_candidate_rejected')
+        });
+      }
+    }
+    if (ackRecords.length > 0) {
+      const ackPayload = {
+        schema: 'filtertube_managed_local_network_candidate_ack',
+        linkId: link.linkId,
+        sourceDeviceId: link.sourceDeviceId,
+        sourceProfileId: link.sourceProfileId,
+        targetProfileId: activeProfileId,
+        records: ackRecords
+      };
+      const ackResult = ackCandidates
+        ? await ackCandidates(ackPayload)
+        : { ok: false, reason: 'ack_provider_unavailable', ackedCandidateCount: 0, failedAckCount: ackRecords.length };
+      row.ackAttemptedCount = ackRecords.length;
+      row.ackedCandidateCount = ackResult.ackedCandidateCount || 0;
+      row.ackFailedCount = ackResult.failedAckCount || 0;
+      state.ackAttemptedCount += row.ackAttemptedCount;
+      state.ackedCandidateCount += row.ackedCandidateCount;
+      state.ackFailedCount += row.ackFailedCount;
+      if (recordAckHistory) {
+        const history = await recordAckHistory({ request: ackPayload, records: ackRecords, ackResult, transport: 'local_network' });
+        row.ackHistoryRecordedCount = history.recordedCount || 0;
+        state.ackHistoryRecordedCount += row.ackHistoryRecordedCount;
       }
     }
     state.linkResults.push(row);
@@ -131,14 +184,19 @@ test('local-network provider hook is docs-backed and linked from managed parent 
   const plan = read(planPath);
   const inventory = read(inventoryPath);
 
-  assert.match(doc, /Dashboard\/profile-open provider hook is present/);
-  assert.match(doc, /Built-in LAN peer discovery, LAN transport, server\s+mailbox pull, and server mailbox decrypt transport remain absent/);
+  assert.match(doc, /Dashboard\/profile-open provider hook and redacted provider ack\s+handoff are present/);
+  assert.match(doc, /Built-in LAN\s+peer discovery, LAN transport, server mailbox pull, and server mailbox decrypt\s+transport remain absent/);
   assert.match(doc, /window\.FilterTubeManagedPolicyLocalNetwork/);
   assert.match(doc, /discoverManagedPolicyCandidates/);
+  assert.match(doc, /ackManagedPolicyCandidates/);
+  assert.match(doc, /filtertube_managed_local_network_candidate_ack/);
   assert.match(doc, /runtime provider-gated local-network discovery hook: present/);
+  assert.match(doc, /runtime local-network provider ack handoff: present/);
+  assert.match(doc, /runtime protected local-network ack-handoff history writer: present/);
   assert.match(doc, /runtime built-in LAN peer discovery: absent/);
   assert.match(doc, /runtime YouTube page hot-path work from this slice: absent/);
   assert.match(boundary, /provider-gated local-network candidate discovery hook/);
+  assert.match(boundary, /redacted provider ack handoff/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
 });
@@ -155,8 +213,14 @@ test('dashboard source wires provider-gated local-network discovery without YouT
   assert.match(source, /async function pullNanahManagedLocalNetworkCandidates\(provider, request\)/);
   assert.match(source, /discoverManagedPolicyCandidates/);
   assert.match(source, /discoverLocalNetworkCandidates/);
+  assert.match(source, /filtertube_managed_local_network_candidate_ack/);
+  assert.match(source, /ackManagedPolicyCandidates/);
+  assert.match(source, /ackLocalNetworkCandidates/);
+  assert.match(source, /remote_policy\.local_network\.ack/);
+  assert.match(source, /Local-network ack recorded/);
   assert.match(source, /async function runNanahManagedLocalNetworkSync\(\{ reason = 'dashboard_open' \} = \{\}\)/);
   assert.match(source, /handleNanahIncomingManagedLocalNetworkCandidate\(candidate\)/);
+  assert.match(source, /recordManagedOpenSyncAckHistory\(\{\s*request,\s*records: ackRecords,\s*ackResult,\s*transport: 'local_network'/s);
   assert.match(source, /await runNanahManagedLocalNetworkSync\(\{ reason: 'dashboard_open' \}\)/);
   assert.match(source, /await runNanahManagedLocalNetworkSync\(\{ reason: 'profile_switch' \}\)/);
   assert.match(source, /Local network/);
@@ -201,27 +265,49 @@ test('local-network provider failure fails closed without applying returned cand
 
 test('local-network provider applies only validated candidates and keeps request/records redacted', async () => {
   const requests = [];
+  const ackPayloads = [];
+  const historyPayloads = [];
   const state = await runProviderModel({
     provider: async (request) => {
       requests.push(request);
       return {
         ok: true,
         candidates: [
-          { schema: 'filtertube_managed_local_network_candidate', envelope: { linkId: 'link-parent-child-1' } },
-          { schema: 'filtertube_managed_local_network_candidate', envelope: { linkId: 'link-parent-child-1' } }
+          { schema: 'filtertube_managed_local_network_candidate', candidateId: 'candidate-a', envelope: { linkId: 'link-parent-child-1', scope: 'keywords', revision: 5, policyHash: 'sha256:policy-a' } },
+          { schema: 'filtertube_managed_local_network_candidate', candidateId: 'candidate-b', envelope: { linkId: 'link-parent-child-1', scope: 'channels', revision: 6, policyHash: 'sha256:policy-b' } }
         ]
       };
     },
-    applyCandidate: async (_candidate, index = 0) => ({ accepted: index === 0 })
+    applyCandidate: async (_candidate, index = 0) => ({ accepted: index === 0, reason: index === 0 ? '' : 'wrong_key' }),
+    ackCandidates: async (ack) => {
+      ackPayloads.push(ack);
+      return { ok: true, ackedCandidateCount: ack.records.length, failedAckCount: 0 };
+    },
+    recordAckHistory: async (details) => {
+      historyPayloads.push(details);
+      return { ok: true, recordedCount: details.records.length, failedCount: 0 };
+    }
   });
 
   assert.equal(state.candidateCount, 2);
   assert.equal(state.acceptedCandidateCount, 1);
   assert.equal(state.rejectedCandidateCount, 1);
+  assert.equal(state.ackAttemptedCount, 2);
+  assert.equal(state.ackedCandidateCount, 2);
+  assert.equal(state.ackFailedCount, 0);
+  assert.equal(state.ackHistoryRecordedCount, 2);
   assert.equal(requests[0].schema, 'filtertube_managed_local_network_discovery_request');
   assert.equal(requests[0].targetProfileId, 'child-profile-1');
   assert.deepEqual(requests[0].allowedScopes, ['keywords', 'channels']);
+  assert.equal(ackPayloads[0].schema, 'filtertube_managed_local_network_candidate_ack');
+  assert.deepEqual(ackPayloads[0].records.map(record => [record.localNetworkCandidateId, record.scope, record.revision, record.policyHash, record.ackState]), [
+    ['candidate-a', 'keywords', 5, 'sha256:policy-a', 'accepted'],
+    ['candidate-b', 'channels', 6, 'sha256:policy-b', 'rejected']
+  ]);
+  assert.equal(historyPayloads[0].transport, 'local_network');
   assert.doesNotMatch(JSON.stringify(requests), /spiders|keywordValue|channelName|videoTitle|plaintext|pin/i);
+  assert.doesNotMatch(JSON.stringify(ackPayloads), /spiders|keywordValue|channelName|videoTitle|plaintext|pin/i);
+  assert.doesNotMatch(JSON.stringify(historyPayloads), /spiders|keywordValue|channelName|videoTitle|plaintext|pin/i);
 });
 
 test('local-network provider hook does not add direct page/network runtime primitives', () => {

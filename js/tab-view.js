@@ -3076,6 +3076,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'remote_policy.mailbox.expire': 'Mailbox policy expired',
         'remote_policy.mailbox.revoke': 'Mailbox policy revoked',
         'remote_policy.mailbox.ack': 'Mailbox ack recorded',
+        'remote_policy.local_network.ack': 'Local-network ack recorded',
         'history.clear': 'History cleared'
     });
     const MANAGED_ADMIN_SESSION_TTL_MS = 15 * 60 * 1000;
@@ -8834,6 +8835,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const ackResult = safeObject(root.ackResult);
         const records = safeArray(root.records);
         const targetProfileId = normalizeString(request.targetProfileId || candidate.targetProfileId);
+        const transport = normalizeString(root.transport || ackResult.transport || request.transport).toLowerCase() === 'local_network'
+            ? 'local_network'
+            : 'mailbox';
         if (!targetProfileId || records.length === 0) {
             return { ok: false, reason: 'missing_ack_history_target', recordedCount: 0, failedCount: records.length };
         }
@@ -8851,8 +8855,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const now = Date.now();
-        const ackedCount = Math.max(0, Math.floor(Number(ackResult.ackedItemCount) || 0));
-        const failedCount = Math.max(0, Math.floor(Number(ackResult.failedAckCount) || 0));
+        const ackedCount = Math.max(0, Math.floor(Number(ackResult.ackedItemCount ?? ackResult.ackedCandidateCount) || 0));
+        const failedCount = Math.max(0, Math.floor(Number(ackResult.failedAckCount ?? ackResult.failedCandidateCount) || 0));
         const providerAcceptedAll = ackResult.ok !== false && failedCount === 0 && ackedCount >= records.length;
         const historyRows = [];
         records.forEach((record, index) => {
@@ -8862,19 +8866,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             const policyHash = normalizeString(ackRecord.policyHash) || null;
             if (!scope || !revision || !policyHash) return;
             const mailboxItemId = normalizeString(ackRecord.mailboxItemId);
+            const localNetworkCandidateId = normalizeString(ackRecord.localNetworkCandidateId || ackRecord.candidateId);
+            const itemId = transport === 'local_network' ? localNetworkCandidateId : mailboxItemId;
+            const transportLabel = transport === 'local_network' ? 'Local-network' : 'Mailbox';
             const result = providerAcceptedAll ? 'accepted' : 'rejected';
             const reason = providerAcceptedAll
                 ? null
                 : (normalizeString(ackResult.reason) || 'ack_handoff_failed');
             historyRows.push({
-                rowId: `remote-mailbox-ack-${scope}-${revision}-${mailboxItemId || 'item'}-${now}-${index}`,
+                rowId: `remote-${transport.replace('_', '-')}-ack-${scope}-${revision}-${itemId || 'item'}-${now}-${index}`,
                 schema: MANAGED_ACTION_HISTORY_SCHEMA,
                 version: 1,
                 actorProfileId: normalizeString(ackRecord.sourceProfileId || request.sourceProfileId || candidate.sourceProfileId) || null,
                 actorDeviceId: normalizeString(ackRecord.sourceDeviceId || request.sourceDeviceId || candidate.sourceDeviceId) || 'unknown-source-device',
                 targetProfileId,
                 trustedLinkId: normalizeString(ackRecord.linkId || request.linkId || candidate.linkId),
-                actionType: 'remote_policy.mailbox.ack',
+                actionType: transport === 'local_network' ? 'remote_policy.local_network.ack' : 'remote_policy.mailbox.ack',
                 scope,
                 revision,
                 policyHash,
@@ -8885,12 +8892,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 orderKey: `ack:${String(revision).padStart(6, '0')}:${now}:${index}`,
                 summary: {
                     redacted: true,
-                    label: providerAcceptedAll ? 'Mailbox ack delivered' : 'Mailbox ack handoff failed',
-                    transport: 'mailbox',
+                    label: providerAcceptedAll ? `${transportLabel} ack delivered` : `${transportLabel} ack handoff failed`,
+                    transport,
                     mailboxItemId: mailboxItemId || null,
+                    localNetworkCandidateId: localNetworkCandidateId || null,
                     ackState: normalizeString(ackRecord.ackState) || null,
                     providerAckedItemCount: ackedCount,
-                    providerFailedAckCount: failedCount
+                    providerFailedAckCount: failedCount,
+                    providerAckedCandidateCount: transport === 'local_network' ? ackedCount : null,
+                    providerFailedCandidateCount: transport === 'local_network' ? failedCount : null
                 },
                 sensitive: true
             });
@@ -9068,6 +9078,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             candidateCount: 0,
             acceptedCandidateCount: 0,
             rejectedCandidateCount: 0,
+            ackAttemptedCount: 0,
+            ackedCandidateCount: 0,
+            ackFailedCount: 0,
+            ackProviderAvailable: false,
+            ackHistoryRecordedCount: 0,
+            ackHistoryFailedCount: 0,
             linkResults: []
         };
         if (!state.providerAvailable || eligibleLinks.length === 0) {
@@ -9086,12 +9102,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                 reason: result.reason || null,
                 candidateCount: result.candidates.length,
                 acceptedCandidateCount: 0,
-                rejectedCandidateCount: 0
+                rejectedCandidateCount: 0,
+                ackAttemptedCount: 0,
+                ackedCandidateCount: 0,
+                ackFailedCount: 0,
+                ackReason: null,
+                ackHistoryRecordedCount: 0,
+                ackHistoryFailedCount: 0,
+                ackHistoryReason: null
             };
             state.candidateCount += result.candidates.length;
+            const ackRecords = [];
             if (result.ok === true) {
                 for (const candidate of result.candidates) {
                     const decision = await handleNanahIncomingManagedLocalNetworkCandidate(candidate);
+                    const envelope = safeObject(candidate?.envelope || candidate?.managedPolicyEnvelope || candidate?.policy);
+                    const accepted = decision?.accepted === true || decision?.applied === true;
                     if (decision?.accepted === true || decision?.applied === true) {
                         linkRow.acceptedCandidateCount += 1;
                         state.acceptedCandidateCount += 1;
@@ -9099,7 +9125,99 @@ document.addEventListener('DOMContentLoaded', async () => {
                         linkRow.rejectedCandidateCount += 1;
                         state.rejectedCandidateCount += 1;
                     }
+                    const scope = normalizeString(decision?.scope || envelope.scope).toLowerCase();
+                    const revision = normalizeNonNegativeInteger(decision?.revision || envelope.revision) || null;
+                    const policyHash = normalizeString(decision?.policyHash || envelope.policyHash);
+                    if (scope && revision && policyHash) {
+                        ackRecords.push({
+                            linkId: request.linkId,
+                            localNetworkCandidateId: normalizeString(candidate?.candidateId || candidate?.localNetworkCandidateId || envelope.candidateId) || `${scope}-${revision}`,
+                            sourceDeviceId: normalizeString(decision?.sourceDeviceId || envelope.sourceDeviceId || request.sourceDeviceId),
+                            sourceProfileId: normalizeString(decision?.sourceProfileId || envelope.sourceProfileId || request.sourceProfileId),
+                            targetProfileId: normalizeString(decision?.targetProfileId || envelope.targetProfileId || request.targetProfileId),
+                            scope,
+                            revision,
+                            policyHash,
+                            ackState: accepted ? (normalizeString(decision?.decision) || 'accepted') : 'rejected',
+                            accepted,
+                            applied: accepted && decision?.applied !== false,
+                            reason: accepted ? null : (normalizeString(decision?.reason) || 'local_network_candidate_rejected'),
+                            ackedAt: Date.now()
+                        });
+                    }
                 }
+            }
+            if (ackRecords.length > 0) {
+                const ackWriter = provider && (
+                    typeof provider.ackManagedPolicyCandidates === 'function'
+                        ? provider.ackManagedPolicyCandidates
+                        : (typeof provider.ackLocalNetworkCandidates === 'function' ? provider.ackLocalNetworkCandidates : null)
+                );
+                const ackPayload = {
+                    schema: 'filtertube_managed_local_network_candidate_ack',
+                    version: 1,
+                    ackedAt: Date.now(),
+                    linkId: request.linkId,
+                    remoteDeviceId: request.remoteDeviceId,
+                    sourceDeviceId: request.sourceDeviceId,
+                    sourceProfileId: request.sourceProfileId,
+                    targetProfileId: request.targetProfileId,
+                    records: ackRecords
+                };
+                let ackResult = {
+                    ok: false,
+                    reason: 'ack_provider_unavailable',
+                    ackedCandidateCount: 0,
+                    failedAckCount: ackRecords.length,
+                    providerAvailable: false,
+                    transport: 'local_network'
+                };
+                if (ackWriter) {
+                    try {
+                        const rawAck = safeObject(await ackWriter.call(provider, ackPayload));
+                        const ok = rawAck.ok !== false;
+                        const acked = Number(rawAck.ackedCandidateCount ?? rawAck.acknowledgedCandidateCount ?? rawAck.ackedItemCount ?? rawAck.ackedCount);
+                        const failed = Number(rawAck.failedAckCount ?? rawAck.failedCandidateCount ?? rawAck.failedItemCount);
+                        ackResult = {
+                            ok,
+                            reason: normalizeString(rawAck.reason),
+                            ackedCandidateCount: Number.isFinite(acked) ? Math.max(0, acked) : (ok ? ackRecords.length : 0),
+                            failedAckCount: Number.isFinite(failed) ? Math.max(0, failed) : (ok ? 0 : ackRecords.length),
+                            providerAvailable: true,
+                            transport: 'local_network'
+                        };
+                    } catch (error) {
+                        ackResult = {
+                            ok: false,
+                            reason: normalizeString(error?.message) || 'ack_failed',
+                            ackedCandidateCount: 0,
+                            failedAckCount: ackRecords.length,
+                            providerAvailable: true,
+                            transport: 'local_network'
+                        };
+                    }
+                }
+                linkRow.ackAttemptedCount = ackRecords.length;
+                linkRow.ackedCandidateCount = ackResult.ackedCandidateCount;
+                linkRow.ackFailedCount = ackResult.failedAckCount;
+                linkRow.ackReason = ackResult.reason || null;
+                state.ackProviderAvailable = state.ackProviderAvailable || ackResult.providerAvailable === true;
+                state.ackAttemptedCount += ackRecords.length;
+                state.ackedCandidateCount += ackResult.ackedCandidateCount;
+                state.ackFailedCount += ackResult.failedAckCount;
+                const historyResult = await recordManagedOpenSyncAckHistory({
+                    request,
+                    records: ackRecords,
+                    ackResult,
+                    transport: 'local_network',
+                    reason
+                });
+                const historyRoot = safeObject(historyResult);
+                linkRow.ackHistoryRecordedCount = Number(historyRoot.recordedCount ?? historyRoot.writtenCount) || 0;
+                linkRow.ackHistoryFailedCount = Number(historyRoot.failedCount) || 0;
+                linkRow.ackHistoryReason = normalizeString(historyRoot.reason) || null;
+                state.ackHistoryRecordedCount += linkRow.ackHistoryRecordedCount;
+                state.ackHistoryFailedCount += linkRow.ackHistoryFailedCount;
             }
             state.linkResults.push(linkRow);
         }

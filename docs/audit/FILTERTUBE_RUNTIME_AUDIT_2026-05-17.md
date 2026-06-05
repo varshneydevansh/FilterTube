@@ -38,7 +38,7 @@ Measured on 2026-05-17:
 | `js/filter_logic.js` | 3,498 |
 | `js/injector.js` | 3,536 |
 | `js/content/block_channel.js` | 2,397 |
-| `js/tab-view.js` | 14,584 |
+| `js/tab-view.js` | 14,702 |
 | Core docs inspected | 9,851+ |
 
 The runtime is large enough that feature-level gates and a source-of-truth map are required. Small local edits without a call-flow map are risky.
@@ -50,7 +50,7 @@ Current high-impact source files by size:
 | File | Lines | Current audit status |
 | --- | ---: | --- |
 | `js/content_bridge.js` | 12,985 | Full method-family ledger complete for `3-12985`; needs instrumentation/tests before any source behavior changes. |
-| `js/tab-view.js` | 14,584 | UI-state ledger expanded for category/video filters, mode switch, managed-child edits, active-list rendering, add/remove flows, and import/list-mode copy drift. Needs executable UI mutation fixtures. |
+| `js/tab-view.js` | 14,702 | UI-state ledger expanded for category/video filters, mode switch, managed-child edits, active-list rendering, add/remove flows, and import/list-mode copy drift. Needs executable UI mutation fixtures. |
 | `js/background.js` | 6,270 | Deep method-family and action-registry ledger complete for compiled settings, mode switch, storage listeners, fetch resolvers, map/cache writers, message mutation/provenance, and add/toggle channel families. Needs executable action schema. |
 | `js/content/dom_fallback.js` | 4,838 | Initial method-family ledger complete for active gate, CSS controls, main card pass, metadata pending, playlist side effects, and hide/restore gaps. Needs executable DOM fixtures. |
 | `js/injector.js` | 3,536 | Method-family ledger complete for subscriptions import, main-world runtime startup, collaborator/channel lookup, backup `ytInitialData` hook, seed settings relay, and high-cost import expansion. Needs executable capability-token/settings-revision fixtures. |

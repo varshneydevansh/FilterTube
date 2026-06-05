@@ -5,8 +5,9 @@
 intake, revision state, protected history evidence, adapter-level
 local-network candidate validation, dashboard local-network candidate receive
 handling, and a provider-gated dashboard/profile-open local-network candidate
-discovery hook are present for trusted managed-policy paths. Runtime built-in
-LAN peer discovery and LAN delivery are still absent.
+discovery hook plus redacted provider ack handoff are present for trusted
+managed-policy paths. Runtime built-in LAN peer discovery and LAN delivery are
+still absent.
 **Goal slice**: Implementation order item 2, "Add local-network/P2P
 managed-control plan and hostile-LAN threat model".  
 **Primary inputs**:
@@ -99,7 +100,9 @@ runtime managed accepted-apply action-history writer: present behind validated a
 runtime managed signature verifier gate: present with dashboard/WebCrypto key verifier context
 runtime signed live Nanah managed-policy send: present for fixed-target active/full profile-policy bundles, Main/Kids, keyword, channel, video, viewing-space, and time-limit scopes
 runtime local/decrypted mailbox item intake: present after caller-provided decryption
-runtime behavior changed by this contract family: managed policy validation/apply/signing/history paths are live, and explicitly delivered or provider-returned local-network candidates must pass trusted-link/device/key/envelope validation before history/apply; provider-gated candidate discovery does not add built-in LAN peer discovery or LAN delivery
+runtime provider-gated local-network ack handoff: present with redacted candidate outcome metadata
+runtime protected local-network ack-handoff history writer: present on protected target profiles
+runtime behavior changed by this contract family: managed policy validation/apply/signing/history paths are live, and explicitly delivered or provider-returned local-network candidates must pass trusted-link/device/key/envelope validation before history/apply; provider-gated candidate discovery and ack handoff do not add built-in LAN peer discovery or LAN delivery
 ```
 
 Existing Nanah profile-scoped `app_sync` and `control_proposal` paths are not
@@ -118,8 +121,11 @@ managed link, then the validated `filtertube_managed_policy` envelope can use
 the same managed apply/history path that is already exercised by live Nanah and
 local/decrypted mailbox paths. The dashboard can now ask an optional
 `window.FilterTubeManagedPolicyLocalNetwork` provider for candidates on
-dashboard/profile open, but that provider handoff is not authority and no
-built-in LAN peer discovery or LAN delivery runtime exists in the extension.
+dashboard/profile open, and can return redacted accepted/rejected candidate ack
+records to that provider. provider handoff is not authority; those ack records
+are feedback only, not policy
+authority, and no built-in LAN peer discovery or LAN delivery runtime exists in
+the extension.
 
 ## Verification
 

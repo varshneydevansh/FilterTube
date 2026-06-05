@@ -175,8 +175,8 @@ test('local-network discovery authority boundary is validation-backed and linked
   const inventory = read(inventoryPath);
   const source = runtimeSource();
 
-  assert.match(doc, /Status\*\*: Managed-policy validation\/apply, signed live Nanah send, mailbox\s+intake, revision state, protected history evidence, adapter-level\s+local-network candidate validation, dashboard local-network candidate receive\s+handling, and a provider-gated dashboard\/profile-open local-network candidate\s+discovery hook are present/);
-  assert.match(doc, /Runtime built-in\s+LAN peer discovery and LAN delivery are still absent/);
+  assert.match(doc, /Status\*\*: Managed-policy validation\/apply, signed live Nanah send, mailbox\s+intake, revision state, protected history evidence, adapter-level\s+local-network candidate validation, dashboard local-network candidate receive\s+handling, and a provider-gated dashboard\/profile-open local-network candidate\s+discovery hook plus redacted provider ack handoff are present/);
+  assert.match(doc, /Runtime built-in\s+LAN peer discovery and LAN delivery are\s+still absent/);
   assert.match(doc, /Local-network discovery is convenience only/);
   assert.match(doc, /Boundary Rows/);
   assert.match(doc, /Hostile LAN Threat Model/);
@@ -193,8 +193,10 @@ test('local-network discovery authority boundary is validation-backed and linked
   assert.match(doc, /runtime managed signature verifier gate: present with dashboard\/WebCrypto key verifier context/);
   assert.match(doc, /runtime signed live Nanah managed-policy send: present/);
   assert.match(doc, /runtime local\/decrypted mailbox item intake: present/);
-  assert.match(doc, /provider-gated candidate discovery does not add built-in LAN peer discovery or LAN delivery/);
-  assert.match(doc, /no\s+built-in LAN peer discovery or LAN delivery runtime exists in the extension/);
+  assert.match(doc, /runtime provider-gated local-network ack handoff: present/);
+  assert.match(doc, /runtime protected local-network ack-handoff history writer: present/);
+  assert.match(doc, /provider-gated candidate discovery and ack handoff do not add built-in LAN peer discovery or LAN delivery/);
+  assert.match(doc, /no\s+built-in LAN peer discovery or LAN delivery runtime exists in\s+the extension/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
 

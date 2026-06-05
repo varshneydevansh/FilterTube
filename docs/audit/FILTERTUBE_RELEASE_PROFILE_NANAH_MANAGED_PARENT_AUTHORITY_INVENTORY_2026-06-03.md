@@ -29,7 +29,8 @@ payloads, local WebCrypto mailbox seal/open helpers,
 trusted-link removal cleanup for target-local accepted managed-policy state,
 sanitized local-network candidate receive/history handling, plus an
 optional provider-gated dashboard/profile-open local-network candidate
-discovery hook, plus an
+discovery hook with redacted provider candidate ack handoff and protected
+ack-handoff history, plus an
 extension-owned downstream app policy contract artifact wired
 into the app sync manifest. Local same-budget bulk time-limit controls and
 local same-access bulk viewing-space controls are now delegated through the
@@ -96,7 +97,10 @@ from local managed-link state, and record protected apply/reject history through
 the same managed-policy path. The dashboard can also ask an optional local
 provider for local-network candidates on dashboard/profile open, but returned
 candidates still enter that same sanitized receive/validation path and provider
-failure applies nothing. Server upload/pull clients, server mailbox queue purge, richer rule/remote-delivery and multi-target
+failure applies nothing. The child/protected device can now return redacted
+local-network candidate ack records to that provider and store protected
+ack-handoff history without exposing plaintext rules. Server upload/pull
+clients, server mailbox queue purge, richer rule/remote-delivery and multi-target
 bulk outbound controls, built-in local-network peer discovery/LAN delivery runtime, and
 remote admin session semantics remain separate
 required slices.

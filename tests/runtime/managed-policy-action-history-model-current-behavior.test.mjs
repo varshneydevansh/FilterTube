@@ -314,6 +314,7 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(doc, /local-network candidate\s+`filtertube_managed_local_network_candidate`\s+outcomes/);
   assert.match(doc, /remote failed-attempt rate-limit\s+state/);
   assert.match(doc, /Pull-on-open mailbox ack handoff now records redacted protected/);
+  assert.match(doc, /Provider-gated local-network candidate ack handoff now records\s+redacted protected `remote_policy\.local_network\.ack` rows/);
   assert.match(doc, /validated remote accepted apply history can now be recorded/);
   assert.match(doc, /Required History Row Shape/);
   assert.match(doc, /Approved Action Types/);
@@ -354,8 +355,10 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(source, /function handleNanahIncomingManagedMailboxItem\(item\)/);
   assert.match(source, /function recordManagedOpenSyncAckHistory\(details = \{\}\)/);
   assert.match(source, /remote_policy\.mailbox\.ack/);
-  assert.match(source, /Mailbox ack delivered/);
-  assert.match(source, /Mailbox ack handoff failed/);
+  assert.match(source, /remote_policy\.local_network\.ack/);
+  assert.match(source, /const transportLabel = transport === 'local_network' \? 'Local-network' : 'Mailbox'/);
+  assert.match(source, /\$\{transportLabel\} ack delivered/);
+  assert.match(source, /\$\{transportLabel\} ack handoff failed/);
   assert.match(source, /recordAckHistory: \(details\) => recordManagedOpenSyncAckHistory\(details\)/);
   assert.match(source, /MANAGED_ACTION_HISTORY_SAFE_LABELS = Object\.freeze/);
   assert.match(source, /function formatManagedActionHistoryRow\(row\)/);
@@ -504,6 +507,7 @@ test('managed action history required outcomes cover accepted rejected conflict 
   assert.match(doc, /runtime mailbox managed validation\/apply history writer: present/);
   assert.match(doc, /runtime mailbox ack-handoff history writer: present on protected target profiles/);
   assert.match(doc, /runtime local-network candidate validation\/apply history writer: present/);
+  assert.match(doc, /runtime local-network ack-handoff history writer: present on protected target profiles/);
   assert.match(doc, /runtime remote managed failed-attempt rate-limit state: present under profile\.managedPolicyState\.remoteFailedAttemptRateLimits/);
   assert.match(doc, /runtime managed outbound live send history writer: present on trusted link policy rows/);
   assert.match(doc, /runtime managed inbound live ack history writer: present on trusted link policy rows/);

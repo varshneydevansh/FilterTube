@@ -18,7 +18,9 @@ Trusted-link removal history writer now records protected `trust_link.revoke`
 rows when local accepted managed policy state is purged for a removed link.
 Pull-on-open mailbox ack handoff now records redacted protected
 `remote_policy.mailbox.ack` rows on the target profile after the provider ack
-attempt completes. Local parent-set time-limit changes now also record protected
+attempt completes. Provider-gated local-network candidate ack handoff now records
+redacted protected `remote_policy.local_network.ack` rows on the target profile
+after the provider ack attempt completes. Local parent-set time-limit changes now also record protected
 redacted `policy.time_limit.update` rows on the target profile.
 Parent-side live sends now record redacted outbound trusted-link history rows
 without storing policy payload plaintext, and connected replicas now return
@@ -118,6 +120,7 @@ remote_policy.mailbox.conflict
 remote_policy.mailbox.expire
 remote_policy.mailbox.revoke
 remote_policy.mailbox.ack
+remote_policy.local_network.ack
 history.clear
 ```
 
@@ -180,6 +183,7 @@ The following events must produce action-history rows in future implementation:
 | `rejected_after_trust_revocation` | Queued mailbox/P2P update arrives after link revocation. | `rejected` with `reason: trust_revoked`. |
 | `rate_limited_remote_policy_attempt` | Repeated rejected/conflict remote policy attempts arrive for the same transport, link, source, target, and scope. | `rejected` or `conflict` row with redacted rate-limit metadata and no policy authority. |
 | `acked_mailbox_policy_result` | Protected device reports a pulled mailbox apply/reject result back to the local provider. | `accepted` when the provider records every ack, otherwise `rejected` with the provider ack failure reason; never stores plaintext rule values. |
+| `acked_local_network_candidate_result` | Protected device reports a local-network candidate apply/reject result back to the local provider. | `accepted` when the provider records every ack, otherwise `rejected` with the provider ack failure reason; never stores plaintext rule values. |
 | `accepted_local_time_limit_policy` | Same-device parent/account sets, changes, or disables a protected profile's daily YouTube time limit. | `accepted` with local time-limit revision, policy hash, and redacted budget/timezone counts. |
 | `failed_parent_unlock` | Admin PIN/password attempt fails. | `failed_auth` and rate-limit metadata. |
 | `cleared_by_parent` | Parent/account clears viewable accepted-action history. | `cleared_by_admin`; rejected evidence may remain until retention expiry. |
@@ -210,6 +214,7 @@ runtime remote managed accepted apply history writer: present behind validated m
 runtime mailbox managed validation/apply history writer: present for local/decrypted mailbox item intake outcomes
 runtime mailbox ack-handoff history writer: present on protected target profiles
 runtime local-network candidate validation/apply history writer: present for sanitized local-network candidate outcomes without adding discovery or LAN delivery
+runtime local-network ack-handoff history writer: present on protected target profiles
 runtime remote managed failed-attempt rate-limit state: present under profile.managedPolicyState.remoteFailedAttemptRateLimits
 runtime managed outbound live send history writer: present on trusted link policy rows as redacted parent-side send evidence
 runtime managed inbound live ack history writer: present on trusted link policy rows as redacted parent-side applied/rejected feedback
