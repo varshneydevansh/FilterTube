@@ -6,8 +6,8 @@ failed-unlock history, protected history access, time-limit enforcement, and
 receive-side managed-policy validation/history proofs updated, with encrypted
 mailbox protocol proof specified, managed pairing public-key descriptor
 persistence added, source-side managed signing keypair provisioning plus
-adapter signing helper added, and eligible fixed-target Main/Kids plus granular
-managed live send added, with local/decrypted mailbox-item intake added for the
+adapter signing helper added, and eligible fixed-target active/full
+profile-policy bundles, Main/Kids, plus granular managed live send added, with local/decrypted mailbox-item intake added for the
 same managed-policy validator/apply path. Runtime behavior changed for protected child Main/Kids denial, accepted same-device
 parent-managed child saves, protected parent unlock-failure evidence,
 parent/account history viewing, accepted-row history clearing, dashboard and
@@ -16,9 +16,9 @@ profile-persisted managed/admin failed-attempt rate limiting while the
 background PIN cache remains memory-only, child time-budget enforcement,
 managed-envelope validation/classification, managed-policy receive/apply
 evidence, managed public-key descriptor pairing, source signing-key
-provisioning, eligible signed Main/Kids/granular live managed-policy sends, and
-an explicit Main/Kids rule-source picker plus Rule bundle send for granular
-sends, plus a
+provisioning, eligible signed active/full profile-policy bundle,
+Main/Kids/granular live managed-policy sends, and an explicit Main/Kids
+rule-source picker plus Rule bundle send for granular sends, plus a
 provider-gated dashboard/profile-open pull hook for already-decrypted mailbox
 items, redacted provider ack handoff for mailbox apply/reject outcomes,
 protected target-profile mailbox ack-handoff evidence,
@@ -27,8 +27,8 @@ sanitized local-network candidate receive/history handling, plus an
 optional provider-gated dashboard/profile-open local-network candidate
 discovery hook, plus an
 extension-owned downstream app policy contract artifact wired
-into the app sync manifest. Active/full signed conversion, richer viewing-space/time-limit
-and multi-target bulk outbound controls, server mailbox pull/decryption runtime, server mailbox queue purge,
+into the app sync manifest. Richer viewing-space/time-limit and multi-target
+bulk outbound controls, server mailbox pull/decryption runtime, server mailbox queue purge,
 built-in local-network peer discovery/LAN delivery runtime, and app native settings/iOS enforcement proofs
 remain pending.
 **Goal slice**: Implementation order item 1 plus first runtime viewing-space
@@ -46,7 +46,8 @@ viewing-space denial, local protected history access, active child time-budget
 enforcement from local profile settings, receive-side managed-policy
 validation history, managed pairing public-key descriptor persistence,
 source-side managed signing keypair provisioning with an adapter signing helper,
-and eligible fixed-target Main/Kids plus granular live signed-send support.
+and eligible fixed-target active/full profile-policy bundles, Main/Kids, plus
+granular live signed-send support.
 
 This document still does not approve remote policy writes by itself. The first
 managed-envelope validator, validated apply wrapper, receive-side
@@ -55,13 +56,16 @@ and the validator requires signature-verification evidence. Dashboard
 WebCrypto verifier plumbing now exists when a trusted link carries source
 public-key material. Pairing-time public-key descriptor persistence exists, and
 source/parent Nanah sessions can provision local managed signing key material.
-Eligible fixed-target Main/Kids, keyword, channel, video, viewing-space, and
-time-limit live sends can now build signed managed-policy envelopes. Granular
-rule sends use an explicit Main/Kids rule-source picker that defaults from the
-dashboard's active surface, and Rule bundle expands into separate signed
-keyword, channel, and video envelopes instead of creating a new receive-side
-scope. Parent-managed child edit mode can provide the child-policy payload
-source while the parent profile remains signing authority.
+Eligible fixed-target active/full profile-policy bundles, Main/Kids, keyword,
+channel, video, viewing-space, and time-limit live sends can now build signed
+managed-policy envelopes. Active/full expand into existing concrete Main, Kids,
+viewing-space, and optional time-limit envelopes instead of creating a new
+receive-side scope or sending an account-wide backup tree. Granular rule sends
+use an explicit Main/Kids rule-source picker that defaults from the dashboard's
+active surface, and Rule bundle expands into separate signed keyword, channel,
+and video envelopes instead of creating a new receive-side scope. Parent-managed
+child edit mode can provide the child-policy payload source while the parent
+profile remains signing authority.
 Local/decrypted mailbox items can now bind
 mailbox metadata to the decrypted managed envelope before calling the same
 managed-policy validation/apply path. The dashboard/profile-open hook can ask a
@@ -81,8 +85,8 @@ the same managed-policy path. The dashboard can also ask an optional local
 provider for local-network candidates on dashboard/profile open, but returned
 candidates still enter that same sanitized receive/validation path and provider
 failure applies nothing. Server mailbox pull, mailbox decryption client,
-server mailbox queue purge, active/full signed conversion, richer viewing-space/time-limit
-and multi-target bulk outbound controls, built-in local-network peer discovery/LAN delivery runtime, and
+server mailbox queue purge, richer viewing-space/time-limit and multi-target
+bulk outbound controls, built-in local-network peer discovery/LAN delivery runtime, and
 remote admin session semantics remain separate
 required slices.
 
@@ -327,8 +331,9 @@ Authority meaning:
       `sourcePublicKeyJwk` material exists, validated apply dispatch, and
       accepted/rejected apply history.
     - The dashboard send path can now build signed `filtertube_managed_policy`
-      envelopes for fixed-target Main/Kids, keyword, channel, video,
-      viewing-space, and time-limit Source -> Replica managed links.
+      envelopes for fixed-target active/full profile-policy bundles,
+      Main/Kids, keyword, channel, video, viewing-space, and time-limit Source
+      -> Replica managed links.
 
 Current gap:
 
@@ -340,17 +345,17 @@ Current gap:
     - The signature verifier gate and adapter verifier helper exist. Pairing can
       persist source public-key descriptor material, source sessions can now
       provision a local managed signing keypair plus public descriptor, and
-      eligible fixed-target Main/Kids and granular managed live sends now use
-      signed envelopes, with explicit Main/Kids rule-source selection for
-      granular sends, plus Rule bundle expansion into separate signed
-      keyword/channel/video envelopes. Managed trusted-link identity is now
+      eligible fixed-target active/full profile-policy bundles, Main/Kids, and
+      granular managed live sends now use signed envelopes, with explicit
+      Main/Kids rule-source selection for granular sends, plus Rule bundle
+      expansion into separate signed keyword/channel/video envelopes. Managed trusted-link identity is now
       profile-scoped for fixed child/profile targets on the same remote device,
       so receive lookup and stored-link replacement no longer collapse every
       target under one device-level row. The dashboard can now select multiple
       eligible fixed targets on the connected replica and send per-target signed
       envelopes. Per-target accepted/rejected ack history, mailbox/local-network
-      fanout, active/full signed conversion, and richer viewing-space/time-limit
-      bulk outbound controls remain pending.
+      fanout, and richer viewing-space/time-limit bulk outbound controls remain
+      pending.
       Without trusted stored public-key material, the receive path still rejects
       otherwise well-shaped managed envelopes rather than treating them as valid.
 - The adapter's validated apply wrapper now recomputes canonical payload hashes,
@@ -485,9 +490,9 @@ Current gap:
 |---|---|---|
 | Validated managed policy apply wrapper | Remote apply can now persist a durable accepted-revision object for a fixed child target, but only when a caller supplies accepted validation context. | Key-store/WebCrypto verifier plumbing and live Nanah/local-network receive tests before automatic remote apply. |
 | Target-local remote revision store | Stale or replayed remote updates can now be rejected per target profile/link/scope after the first accepted write, and trusted-link removal now purges accepted state plus open-sync status for the removed link. There is still no server mailbox queue or multi-device conflict-resolution layer yet. | Multi-parent, revoked-link, equal-revision/different-hash, mailbox-delivery, and server-queue-purge fixtures. |
-| Pairing public-key descriptor, source keypair provisioning, eligible live signed send, and profile-scoped trusted-link identity present | The helper now requires verifier evidence, adapter WebCrypto verification is wired, Nanah pairing can persist advertised source public-key descriptors, source sessions can provision local managed signing keypairs, fixed-target Main/Kids, keyword, channel, video, viewing-space, and time-limit managed live sends build signed `filtertube_managed_policy` envelopes, granular rule sends expose an explicit Main/Kids rule-source picker, Rule bundle expands into separate signed keyword/channel/video envelopes, trusted-link storage/lookup distinguishes fixed managed target profiles on one remote device, the dashboard can select multiple eligible fixed targets on the connected replica for live same-replica signed sends, each successful live send records redacted outbound history on the trusted link, and connected replicas can return redacted live accepted/rejected ack history that is stored only for matching sent revision/hash rows. Active/full sends, offline delivery, mailbox/local-network accepted/rejected ack history, and richer viewing-space/time-limit or multi-device bulk outbound controls still remain proposal/spec work. | Authenticated two-device live-delivery smoke, signed granular live-delivery smoke, rotation/revocation, mailbox/local-network accepted/rejected ack history, mailbox/local-network delivery, and active/full conversion policy. |
+| Pairing public-key descriptor, source keypair provisioning, eligible live signed send, and profile-scoped trusted-link identity present | The helper now requires verifier evidence, adapter WebCrypto verification is wired, Nanah pairing can persist advertised source public-key descriptors, source sessions can provision local managed signing keypairs, fixed-target active/full profile-policy bundles, Main/Kids, keyword, channel, video, viewing-space, and time-limit managed live sends build signed `filtertube_managed_policy` envelopes, granular rule sends expose an explicit Main/Kids rule-source picker, Rule bundle expands into separate signed keyword/channel/video envelopes, trusted-link storage/lookup distinguishes fixed managed target profiles on one remote device, the dashboard can select multiple eligible fixed targets on the connected replica for live same-replica signed sends, each successful live send records redacted outbound history on the trusted link, and connected replicas can return redacted live accepted/rejected ack history that is stored only for matching sent revision/hash rows. Offline delivery, mailbox/local-network accepted/rejected ack history, and richer viewing-space/time-limit or multi-device bulk outbound controls still remain proposal/spec work. | Authenticated two-device live-delivery smoke, signed granular live-delivery smoke, rotation/revocation, mailbox/local-network accepted/rejected ack history, and mailbox/local-network delivery. |
 | Canonical payload/integrity binding present | The helper checks binding fields, recomputes the `remote-managed-policy` canonical payload hash from link/scope/source/target/payload, and rejects mismatches before trust/revision acceptance. | Keep binding-tuple fixtures passing and add installed live-delivery smoke before broad remote rollout. |
-| Signed remote managed-policy gate is partially live | Fixed-target Main/Kids, keyword, channel, video, viewing-space, and time-limit managed Nanah sends can now travel as signed envelopes and receive-side code validates before apply. Granular keyword/channel/video sends can choose Main or Kids local rule source explicitly, Rule bundle sends those three granular scopes as separate signed envelopes, profile-scoped trusted-link identity now exists for fixed managed targets, selected eligible fixed targets on the connected replica can receive live same-replica per-target signed envelopes, source-side redacted outbound send history is stored per trusted link/scope, and source-side redacted live ack history is stored only for matching sent revision/hash rows. Active/full signed conversion, mailbox/local-network delivery, mailbox/local-network ack history, and richer viewing-space/time-limit bulk outbound controls are still pending. | Installed two-device Main/Kids and granular smoke plus dedicated signed route/time policy fixtures, mailbox/local-network ack fixtures, mailbox/local-network delivery fixtures, and active/full conversion policy. |
+| Signed remote managed-policy gate is partially live | Fixed-target active/full profile-policy bundles, Main/Kids, keyword, channel, video, viewing-space, and time-limit managed Nanah sends can now travel as signed envelopes and receive-side code validates before apply. Active/full expand into concrete Main, Kids, viewing-space, and optional time-limit envelopes; granular keyword/channel/video sends can choose Main or Kids local rule source explicitly; Rule bundle sends those three granular scopes as separate signed envelopes; profile-scoped trusted-link identity now exists for fixed managed targets; selected eligible fixed targets on the connected replica can receive live same-replica per-target signed envelopes; source-side redacted outbound send history is stored per trusted link/scope; and source-side redacted live ack history is stored only for matching sent revision/hash rows. Mailbox/local-network delivery, mailbox/local-network ack history, and richer viewing-space/time-limit bulk outbound controls are still pending. | Installed two-device Main/Kids, active/full, granular, route, and time-policy smoke plus mailbox/local-network ack and delivery fixtures. |
 | Remote time-limit policy apply is wrapper-backed and live-send eligible | Local child time-budget enforcement exists and accepted managed envelopes can write runtime-compatible time-limit policy; the source send path can now emit signed live time-limit envelopes when the profile has a saved time limit. | Installed two-device signed remote time-limit smoke through Nanah/local-network receive. |
 | Adapter depends on caller trust context | `validateManagedPolicyEnvelope(...)` depends on caller-supplied trusted-link/profile/revision/signature context; the wrapper rechecks stored profiles before writing but does not fetch trust keys itself. | Keep dashboard receive context and add pairing key lookup/revocation fixtures before automatic apply. |
 | Locked-child legacy proposal bypass is revision-gated | `allow_trusted_updates` no longer lets legacy `control_proposal` or `app_sync` payloads skip a locked child unlock; only signed revision-bound `filtertube_managed_policy` details can satisfy the bypass predicate, and signed envelopes still go through managed validation/apply. | Keep locked-child managed-policy fixtures passing and add installed live Nanah smoke before broad remote rollout. |

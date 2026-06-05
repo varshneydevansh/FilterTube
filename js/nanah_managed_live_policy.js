@@ -2,6 +2,8 @@
     'use strict';
 
     const MANAGED_LIVE_POLICY_SCOPES = [
+        'active',
+        'full',
         'main',
         'kids',
         'videos',
@@ -12,6 +14,8 @@
         'rules_bundle'
     ];
     const MANAGED_LIVE_BUNDLE_SCOPES = {
+        active: ['main', 'kids', 'viewing_space', 'time_limits'],
+        full: ['main', 'kids', 'viewing_space', 'time_limits'],
         rules_bundle: ['keywords', 'channels', 'videos']
     };
     const MANAGED_LIVE_ACK_SCHEMA = 'filtertube_nanah_managed_live_ack';
@@ -37,6 +41,11 @@
         function expandScope(scope) {
             const normalizedScope = normalizeScope(scope);
             return MANAGED_LIVE_BUNDLE_SCOPES[normalizedScope] || (normalizedScope ? [normalizedScope] : []);
+        }
+
+        function isProfilePolicyBundle(scope) {
+            const normalizedScope = normalizeScope(scope);
+            return normalizedScope === 'active' || normalizedScope === 'full';
         }
 
         function cloneList(value) {
@@ -139,6 +148,19 @@
                 validFrom: policy.validFrom == null ? null : normalizeNonNegativeInteger(policy.validFrom),
                 validUntil: policy.validUntil == null ? null : normalizeNonNegativeInteger(policy.validUntil)
             };
+        }
+
+        function resolveConcreteSendScopes(scope) {
+            const normalizedScope = normalizeScope(scope);
+            const scopes = expandScope(normalizedScope);
+            if (!isProfilePolicyBundle(normalizedScope)) return scopes;
+
+            const source = resolvePolicySourceProfile();
+            const profile = safeObject(source.profile);
+            const timeLimitPolicy = typeof deps.getManagedTimeLimitPolicy === 'function'
+                ? deps.getManagedTimeLimitPolicy(profile)
+                : null;
+            return scopes.filter((item) => item !== 'time_limits' || !!timeLimitPolicy);
         }
 
         function buildPayload(scope) {
@@ -303,7 +325,7 @@
         }
 
         async function buildEnvelopeBatchForLiveSend(policy) {
-            const scopes = expandScope(policy.scope);
+            const scopes = resolveConcreteSendScopes(policy.scope);
             if (scopes.length === 0) {
                 throw new Error('Signed managed sends require Main, Kids, keyword, channel, video, viewing-space, or time-limit scope.');
             }
@@ -321,7 +343,7 @@
             if (links.length === 0) {
                 throw new Error('Managed fanout sends require at least one saved profile-scoped trusted link.');
             }
-            const scopes = expandScope(policy.scope);
+            const scopes = resolveConcreteSendScopes(policy.scope);
             if (scopes.length === 0) {
                 throw new Error('Signed managed sends require Main, Kids, keyword, channel, video, viewing-space, or time-limit scope.');
             }
@@ -575,6 +597,7 @@
         return {
             normalizeScope,
             expandScope,
+            resolveConcreteSendScopes,
             buildPayload,
             buildEnvelopeForLiveSend,
             buildEnvelopeBatchForLiveSend,

@@ -97,7 +97,7 @@ runtime managed policy revision store: present on target profile remoteManagedPo
 runtime managed validation-history writer: present for Nanah, mailbox, and local-network candidate managed-policy receive events
 runtime managed accepted-apply action-history writer: present behind validated apply wrappers
 runtime managed signature verifier gate: present with dashboard/WebCrypto key verifier context
-runtime signed live Nanah managed-policy send: present for fixed-target Main/Kids, keyword, channel, video, viewing-space, and time-limit scopes
+runtime signed live Nanah managed-policy send: present for fixed-target active/full profile-policy bundles, Main/Kids, keyword, channel, video, viewing-space, and time-limit scopes
 runtime local/decrypted mailbox item intake: present after caller-provided decryption
 runtime behavior changed by this contract family: managed policy validation/apply/signing/history paths are live, and explicitly delivered or provider-returned local-network candidates must pass trusted-link/device/key/envelope validation before history/apply; provider-gated candidate discovery does not add built-in LAN peer discovery or LAN delivery
 ```

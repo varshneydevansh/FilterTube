@@ -29,6 +29,27 @@ function loadManagedLivePolicyFactory() {
   return context.window.FilterTubeNanahManagedLivePolicy.create;
 }
 
+function expandManagedAllowedScopes(value) {
+  const list = Array.isArray(value) ? value : [value];
+  const normalized = list
+    .map((item) => String(item || '').trim().toLowerCase())
+    .flatMap((item) => {
+      if (item === 'rules_bundle') return ['keywords', 'channels', 'videos'];
+      if (item === 'active' || item === 'full') return ['main', 'kids', 'viewing_space', 'time_limits'];
+      return [item];
+    })
+    .filter((item) => [
+      'main',
+      'kids',
+      'videos',
+      'keywords',
+      'channels',
+      'viewing_space',
+      'time_limits'
+    ].includes(item));
+  return Array.from(new Set(normalized));
+}
+
 function createManagedLivePolicyHarness({ activeSurface = 'main', sourceProfile = null, allowedScopes = ['main', 'kids', 'keywords', 'channels', 'videos', 'viewing_space', 'time_limits'] } = {}) {
   const parentProfile = sourceProfile || {
     settings: {
@@ -113,7 +134,7 @@ function createManagedLivePolicyHarness({ activeSurface = 'main', sourceProfile 
     getRemoteTargetProfile: () => null,
     buildLocalPolicyHash: (prefix, seed) => `${prefix}-${String(seed).length}`,
     getCurrentTrustedLink: () => trustedLink,
-    getAllowedScopeList: (value) => Array.isArray(value) ? value : [value],
+    getAllowedScopeList: expandManagedAllowedScopes,
     getScopeLabel: (scope) => scope,
     ensureSigningKeyPair: async () => ({
       managedPublicKeyId: 'managed-key-1',
@@ -158,14 +179,14 @@ test('managed live signed-send audit is linked without claiming mailbox runtime'
   const inventory = read(inventoryPath);
 
   assert.match(doc, /Eligible live-session source send runtime slice/);
-  assert.match(doc, /fixed-target Main\/Kids and granular managed live sends/);
-  assert.match(doc, /explicit Main\/Kids rule-source picker/);
+  assert.match(doc, /fixed-target Main\/Kids, active\/full profile bundles, and granular\s+managed live sends/);
+  assert.match(doc, /explicit Main\/Kids\s+rule-source\s+picker/);
   assert.match(doc, /Rule bundle/);
   assert.match(doc, /All unsupported live sends continue through the existing proposal path/);
   assert.match(doc, /not a mailbox runtime, local-network discovery runtime, key-rotation\s+system, or offline later-delivery mechanism/);
   assert.match(signingDoc, new RegExp(docPath));
   assert.match(plan, new RegExp(docPath));
-  assert.match(inventory, /fixed-target Main\/Kids, keyword, channel, video, viewing-space, and time-limit managed live sends build signed `filtertube_managed_policy` envelopes/);
+  assert.match(inventory, /fixed-target active\/full profile-policy bundles, Main\/Kids, keyword,\s+channel, video, viewing-space, and time-limit live sends can now build signed/);
 });
 
 test('managed trusted links are profile scoped and connected target fanout is bounded', () => {
@@ -244,6 +265,9 @@ test('dashboard builds signed managed envelopes only after source link scope tar
   assert.match(source, /global\.FilterTubeNanahManagedLivePolicy = \{ create \}/);
   assert.match(source, /function normalizeScope\(scope\)/);
   assert.match(source, /MANAGED_LIVE_POLICY_SCOPES\.includes\(normalized\)/);
+  assert.match(source, /active: \['main', 'kids', 'viewing_space', 'time_limits'\]/);
+  assert.match(source, /full: \['main', 'kids', 'viewing_space', 'time_limits'\]/);
+  assert.match(source, /function resolveConcreteSendScopes\(scope\)/);
   assert.match(source, /function resolveTargetProfile\(trustedLink\)/);
   assert.match(source, /function buildListPayload\(scope, profile, surface\)/);
   assert.match(source, /function buildViewingSpacePayload\(profile\)/);
@@ -518,6 +542,71 @@ test('managed live signed-send helper expands rule bundle into individual signed
     () => limited.buildEnvelopeBatchForLiveSend({ scope: 'rules_bundle' }),
     /does not allow signed channels policy sends/
   );
+});
+
+test('managed live signed-send helper expands active and full into concrete signed profile policy envelopes', async () => {
+  const { helper } = createManagedLivePolicyHarness({ allowedScopes: ['active'] });
+
+  assert.deepEqual(plain(helper.expandScope('active')), ['main', 'kids', 'viewing_space', 'time_limits']);
+  assert.deepEqual(plain(helper.expandScope('full')), ['main', 'kids', 'viewing_space', 'time_limits']);
+  assert.throws(() => helper.buildPayload('active'), /expand into individual policy payloads/);
+  assert.throws(() => helper.buildPayload('full'), /expand into individual policy payloads/);
+
+  const activeEnvelopes = await helper.buildEnvelopeBatchForLiveSend({ scope: 'active' });
+  assert.deepEqual(plain(activeEnvelopes.map((envelope) => envelope.scope)), ['main', 'kids', 'viewing_space', 'time_limits']);
+  assert.deepEqual(plain(activeEnvelopes.map((envelope) => envelope.targetProfileId)), [
+    'child-profile-1',
+    'child-profile-1',
+    'child-profile-1',
+    'child-profile-1'
+  ]);
+  assert.deepEqual(plain(activeEnvelopes.map((envelope) => envelope.integrity.signedFields.payloadScope)), [
+    'main',
+    'kids',
+    'viewing_space',
+    'time_limits'
+  ]);
+  assert.equal(activeEnvelopes[0].payload.scope, 'main');
+  assert.equal(activeEnvelopes[1].payload.scope, 'kids');
+  assert.equal(activeEnvelopes[2].payload.scope, 'viewing_space');
+  assert.equal(activeEnvelopes[3].payload.scope, 'time_limits');
+
+  const fullEnvelopes = await helper.buildEnvelopeBatchForTrustedLinks(
+    { scope: 'full', linkType: 'managed_link', authorityMode: 'managed' },
+    [createManagedLivePolicyHarness({ allowedScopes: ['full'] }).trustedLink]
+  );
+  assert.deepEqual(plain(fullEnvelopes.map((envelope) => envelope.scope)), ['main', 'kids', 'viewing_space', 'time_limits']);
+});
+
+test('managed active and full bundle sends skip time-limit envelope when no policy exists', async () => {
+  const sourceProfile = {
+    settings: {
+      allowMainViewing: true,
+      allowKidsViewing: true
+    },
+    main: {
+      mode: 'blocklist',
+      keywords: [],
+      channels: [],
+      whitelistKeywords: [],
+      whitelistChannels: [],
+      videoIds: []
+    },
+    kids: {
+      mode: 'blocklist',
+      blockedKeywords: [],
+      blockedChannels: [],
+      whitelistKeywords: [],
+      whitelistChannels: [],
+      videoIds: []
+    }
+  };
+  const { helper } = createManagedLivePolicyHarness({ sourceProfile, allowedScopes: ['full'] });
+
+  assert.deepEqual(plain(helper.resolveConcreteSendScopes('full')), ['main', 'kids', 'viewing_space']);
+
+  const envelopes = await helper.buildEnvelopeBatchForLiveSend({ scope: 'full' });
+  assert.deepEqual(plain(envelopes.map((envelope) => envelope.scope)), ['main', 'kids', 'viewing_space']);
 });
 
 test('managed live signed-send helper uses Kids surface for granular scopes when selected', () => {

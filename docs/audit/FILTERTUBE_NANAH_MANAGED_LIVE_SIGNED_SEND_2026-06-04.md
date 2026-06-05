@@ -1,10 +1,10 @@
 # Audit: Nanah Managed Live Signed Send
 
 **Generated**: 2026-06-04
-**Status**: Eligible live-session source send runtime slice with explicit
-Main/Kids granular rule-source selection and connected-replica managed target
-selection plus redacted outbound send and live ack history per target
-link/scope.
+**Status**: Eligible live-session source send runtime slice with signed
+active/full profile-policy bundle conversion, explicit Main/Kids granular
+rule-source selection, connected-replica managed target selection, and redacted
+outbound send/live ack history per target link/scope.
 **Related**:
 `docs/audit/FILTERTUBE_NANAH_MANAGED_SIGNING_KEYPAIR_2026-06-04.md`
 **Multi-target boundary**:
@@ -20,15 +20,18 @@ path from an unsigned managed `control_proposal` into a signed
 - the remote role is `replica`;
 - a saved `managed_link` exists;
 - the link allows the selected scope;
-- the selected scope is `main`, `kids`, `keywords`, `channels`, `videos`,
-  `rules_bundle`, `viewing_space`, or `time_limits`;
+- the selected scope is `active`, `full`, `main`, `kids`, `keywords`,
+  `channels`, `videos`, `rules_bundle`, `viewing_space`, or `time_limits`;
 - the replica side has saved a fixed child target profile;
 - the source has a complete local managed signing keypair.
 
-All unsupported live sends continue through the existing proposal path. This avoids
-silently widening older `active` or `full` trusted-link policy into multiple
-signed child-policy writes, while allowing focused parent-control rule,
-viewing-space, and time-limit updates to travel as signed managed policy.
+All unsupported live sends continue through the existing proposal path.
+`active` and `full` are now signed managed-policy bundle aliases only: they
+expand into the existing concrete receive-side scopes `main`, `kids`,
+`viewing_space`, and `time_limits` when a saved time-limit policy exists. If no
+time-limit policy exists, that concrete envelope is skipped instead of failing
+the whole profile-policy send. These aliases do not create a new receive-side
+scope and do not send an account-wide backup tree.
 
 ## Source Boundary
 
@@ -61,14 +64,18 @@ flowchart TD
 
 ## Behavior Boundary
 
-Eligible fixed-target Main/Kids and granular managed live sends are now present
-for managed policy snapshots. Granular keyword, channel, video, and Rule bundle
-payloads use an explicit Main/Kids rule-source picker in the Nanah advanced
-panel. The picker defaults to the dashboard's active Main/Kids surface when the
-user first selects a granular scope, so existing active-view behavior stays
-intact until the parent chooses a different source. When parent-managed child
-edit mode is active, the payload source is the edited child profile while the
-envelope authority remains the parent source profile.
+Eligible fixed-target Main/Kids, active/full profile bundles, and granular
+managed live sends are now present for managed policy snapshots. Active/full
+bundle sends expand into separate signed `main`, `kids`, `viewing_space`, and
+optional `time_limits` envelopes, each with its own revision, hash, signature
+binding, send call, and `outgoingManagedPolicies` row. Granular keyword,
+channel, video, and Rule bundle payloads use an explicit Main/Kids rule-source
+picker in the Nanah advanced panel. The picker defaults to the dashboard's
+active Main/Kids surface when the user first selects a granular scope, so
+existing active-view behavior stays intact until the parent chooses a different
+source. When parent-managed child edit mode is active, the payload source is
+the edited child profile while the envelope authority remains the parent source
+profile.
 
 `rules_bundle` is only a parent UI convenience. It does not create a new
 receive-side scope and does not weaken the managed-policy envelope validator.
@@ -110,7 +117,6 @@ Still pending:
   selectable Main+Kids dual-surface sends, and clearer per-target previews;
 - installed-extension two-device smoke proof that live ack status renders
   clearly for every protected profile;
-- active/full proposal conversion policy;
 - installed-extension two-device smoke proof;
 - key rotation/revocation UI;
 - encrypted private-key-at-rest storage.

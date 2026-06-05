@@ -6615,7 +6615,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const list = Array.isArray(value) ? value : [value];
         const normalized = list
             .map((item) => normalizeString(item).toLowerCase())
-            .flatMap((item) => item === 'rules_bundle' ? ['keywords', 'channels', 'videos'] : [item])
+            .flatMap((item) => {
+                if (item === 'rules_bundle') return ['keywords', 'channels', 'videos'];
+                if (item === 'active' || item === 'full') return ['main', 'kids', 'viewing_space', 'time_limits'];
+                return [item];
+            })
             .filter((item) => [
                 'main',
                 'kids',
@@ -6776,6 +6780,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function expandNanahManagedSendScope(scope) {
         const normalized = normalizeString(scope).toLowerCase();
         if (normalized === 'rules_bundle') return ['keywords', 'channels', 'videos'];
+        if (normalized === 'active' || normalized === 'full') return ['main', 'kids', 'viewing_space', 'time_limits'];
         return normalized ? [normalized] : [];
     }
 
@@ -10015,8 +10020,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (isTrustedManagedSender) {
             const allowedScopes = getNanahManagedSendScopeList(managedPolicy.allowedScopes);
+            const allowedConcreteScopes = getNanahManagedPolicyScopeList(managedPolicy.allowedScopes);
             const requiredScopes = expandNanahManagedSendScope(selectedScope);
-            const missingScopes = requiredScopes.filter((item) => !allowedScopes.includes(item));
+            const missingScopes = requiredScopes.filter((item) => !allowedConcreteScopes.includes(item));
             if (missingScopes.length > 0) {
                 throw new Error(`This managed link only allows ${allowedScopes.map(getNanahScopeLabel).join(', ')} syncs`);
             }

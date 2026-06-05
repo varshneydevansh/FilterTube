@@ -444,19 +444,19 @@ replica child device over Nanah/P2P or same-network transport.
   sending the Nanah hello, public descriptors are mirrored into
   `ftNanahManagedSigningPublicKey`, private JWK material stays under
   `ftNanahManagedSigningKeyPair`, and source-side managed link saves require a
-  local signing key. Eligible fixed-target Main/Kids plus keyword, channel,
-  video, viewing-space, and time-limit dashboard live sends now build signed
-  `filtertube_managed_policy` envelopes; granular keyword/channel/video sends
-  expose an explicit Main/Kids rule-source picker, and Rule bundle expands into
-  separate signed keyword/channel/video envelopes. The dashboard can now choose
-  multiple eligible fixed targets on the connected replica and use the
-  per-target envelope batcher for that live same-replica send. Redacted outbound
-  send history and redacted live ack history are present per trusted link/scope.
-  Pull-on-open mailbox ack handoff now writes protected redacted target-profile
-  history after the provider ack attempt. Active/full sends, offline
-  mailbox/local-network delivery, source-side mailbox/local-network ack
-  summaries, and richer viewing-space/time-limit or multi-device bulk outbound
-  controls remain later slices.
+  local signing key. Eligible fixed-target active/full profile-policy bundles,
+  Main/Kids plus keyword, channel, video, viewing-space, and time-limit
+  dashboard live sends now build signed `filtertube_managed_policy` envelopes;
+  granular keyword/channel/video sends expose an explicit Main/Kids rule-source
+  picker, and Rule bundle expands into separate signed keyword/channel/video
+  envelopes. The dashboard can now choose multiple eligible fixed targets on
+  the connected replica and use the per-target envelope batcher for that live
+  same-replica send. Redacted outbound send history and redacted live ack
+  history are present per trusted link/scope. Pull-on-open mailbox ack handoff
+  now writes protected redacted target-profile history after the provider ack
+  attempt. Offline mailbox/local-network delivery, source-side
+  mailbox/local-network ack summaries, and richer viewing-space/time-limit or
+  multi-device bulk outbound controls remain later slices.
 - **Acceptance Criteria**:
   - The public descriptor is separated from the private keypair.
   - The private JWK is not placed in the Nanah hello descriptor or trusted link

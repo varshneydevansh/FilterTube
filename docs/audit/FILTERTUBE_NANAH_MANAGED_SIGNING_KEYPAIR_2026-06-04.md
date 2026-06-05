@@ -29,11 +29,13 @@ runtime boundary:
   can be saved as managed authority;
 - the adapter can sign a `filtertube_managed_policy` envelope using the same
   canonical signed-field shape that receive-side validation verifies;
-- eligible fixed-target Main/Kids, keyword, channel, video, viewing-space, and
-  time-limit managed sends now use signed managed-policy envelopes instead of
-  managed `control_proposal` envelopes;
+- eligible fixed-target Main/Kids, active/full profile-policy bundles, keyword,
+  channel, video, viewing-space, and time-limit managed sends now use signed
+  managed-policy envelopes instead of managed `control_proposal` envelopes;
 - Rule bundle sends expand into separate signed keyword, channel, and video
   managed-policy envelopes instead of creating a new receive-side scope;
+- active/full sync conversion into signed managed-policy envelopes expands to
+  concrete receive scopes instead of introducing a broad receive scope;
 - fixed-target managed live policy construction is isolated in
   `js/nanah_managed_live_policy.js` instead of growing the dashboard file with
   policy-build internals.
@@ -118,15 +120,16 @@ flowchart TD
 
 This slice enables live signed send only for saved Source / Parent -> Replica
 managed links where the replica has a fixed child target profile and the sender
-chooses `main`, `kids`, `keywords`, `channels`, `videos`, `viewing_space`, or
-`time_limits`. Granular rule scopes use the dashboard's active Main/Kids
-surface, Rule bundle fans out to keyword/channel/video envelopes from that same
-selected surface, and parent-managed child edit mode can provide the payload
-source while the parent/source profile remains envelope authority.
+chooses `active`, `full`, `main`, `kids`, `keywords`, `channels`, `videos`,
+`viewing_space`, or `time_limits`. Active/full profile-policy bundles expand
+into the existing concrete `main`, `kids`, `viewing_space`, and optional
+`time_limits` receive scopes. Granular rule scopes use the dashboard's active
+Main/Kids surface, Rule bundle fans out to keyword/channel/video envelopes from
+that same selected surface, and parent-managed child edit mode can provide the
+payload source while the parent/source profile remains envelope authority.
 
 Still pending:
 
-- active/full sync conversion into signed managed-policy envelopes;
 - richer viewing-space/time-limit bundle controls and multi-child fanout;
 - local-network or mailbox delivery runtime;
 - key rotation and revocation UI;

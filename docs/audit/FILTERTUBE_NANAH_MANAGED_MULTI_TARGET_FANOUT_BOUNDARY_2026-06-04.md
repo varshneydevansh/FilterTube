@@ -22,7 +22,9 @@ to one or more saved fixed child/profile targets on the currently connected
 replica device. Trusted-link storage and lookup can distinguish fixed targets on
 the same remote device, and the dashboard now exposes a bounded target chooser
 only when at least two saved profile-scoped targets on that connected replica
-are eligible for the selected scope.
+are eligible for the selected concrete scope set. Active/full aliases expand
+into concrete Main, Kids, viewing-space, and optional time-limit envelopes
+before that target eligibility check.
 
 The runtime still must not claim offline or cross-device fanout. A live Nanah
 data channel reaches the current remote session only. Other saved devices need a
@@ -85,7 +87,7 @@ resolveTargetProfile(trustedLink)
 
 buildEnvelopeBatchForTrustedLinks(policy, trustedLinks)
   -> accepts explicit saved managed links
-  -> expands selected scope or Rule bundle per target
+  -> expands active/full aliases, selected concrete scope, or Rule bundle per target
   -> signs each envelope with its own linkId, targetProfileId, scope,
      revision, hash, and integrity binding
   -> is now used by the dashboard for selected targets on the connected replica

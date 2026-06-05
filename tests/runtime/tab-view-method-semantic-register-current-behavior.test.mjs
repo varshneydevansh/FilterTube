@@ -49,26 +49,27 @@ function groupForLine(line) {
   if (line <= 1375) return 'mainFiltersContentControls';
   if (line <= 2542) return 'kidsFiltersContentControls';
   if (line <= 2656) return 'routeIntentAndReleaseNotes';
-  if (line >= 3141 && line <= 3263) return 'profileAccessAndManagedChild';
-  if (line <= 3430) return 'runtimeMessagingBrowserTabs';
-  if (line <= 3817) return 'subscriptionsImportBridge';
-  if (line <= 4105) return 'profileDropdownAndBackupControls';
-  if (line <= 5634) return 'profileAccessAndManagedChild';
-  if (line <= 6046) return 'lockNavigationAndSubscriptionFlow';
-  if (line <= 6310) return 'modalDialogHelpers';
-  if (line <= 7278) return 'nanahModeScopePolicyModal';
-  if (line <= 7880) return 'nanahTargetProfileDevicePolicy';
-  if (line <= 8435) return 'nanahTrustedLinkStorage';
-  if (line <= 9256) return 'nanahSessionUiAndEnvelope';
-  if (line <= 10216) return 'nanahApplyProposalTransport';
-  if (line <= 10812) return 'pinProfilesManager';
-  if (line <= 11230) return 'importExportDownload';
-  if (line <= 11948) return 'settingsSyncAccountPolicyHandlers';
-  if (line >= 12274 && line <= 12295) return 'dateFilterHelpers';
-  if (line <= 12548) return 'managedRowsListModeRender';
-  if (line <= 12905) return 'dashboardStatsFiltering';
-  if (line <= 13357) return 'dateFilterHelpers';
-  if (line <= 13631) return 'navigationAndToasts';
+  if (line <= 3151) return 'runtimeMessagingBrowserTabs';
+  if (line >= 3172 && line <= 3297) return 'profileAccessAndManagedChild';
+  if (line <= 3480) return 'runtimeMessagingBrowserTabs';
+  if (line <= 3867) return 'subscriptionsImportBridge';
+  if (line <= 4155) return 'profileDropdownAndBackupControls';
+  if (line <= 5826) return 'profileAccessAndManagedChild';
+  if (line <= 6238) return 'lockNavigationAndSubscriptionFlow';
+  if (line <= 6502) return 'modalDialogHelpers';
+  if (line <= 7475) return 'nanahModeScopePolicyModal';
+  if (line <= 8077) return 'nanahTargetProfileDevicePolicy';
+  if (line <= 8903) return 'nanahTrustedLinkStorage';
+  if (line <= 9751) return 'nanahSessionUiAndEnvelope';
+  if (line <= 10823) return 'nanahApplyProposalTransport';
+  if (line <= 11445) return 'pinProfilesManager';
+  if (line <= 11864) return 'importExportDownload';
+  if (line <= 12591) return 'settingsSyncAccountPolicyHandlers';
+  if (line <= 12925) return 'dateFilterHelpers';
+  if (line <= 13182) return 'managedRowsListModeRender';
+  if (line <= 13507) return 'dashboardStatsFiltering';
+  if (line <= 14000) return 'dateFilterHelpers';
+  if (line <= 14267) return 'navigationAndToasts';
   return 'UNCLASSIFIED';
 }
 
@@ -195,9 +196,9 @@ test('tab-view method semantic register is audit-only and scoped to current beha
   assert.match(text, /Status: audit-only current-behavior register/);
   assert.match(text, /Runtime behavior changed: profile-scoped Nanah managed trusted-link lookup, storage, connected target chooser, and signed fanout./);
   assert.match(text, /source file: js\/tab-view\.js/);
-  assert.match(text, /named declarations: 380/);
-  assert.match(text, /plain function declarations: 259/);
-  assert.match(text, /async function declarations: 88/);
+  assert.match(text, /named declarations: 397/);
+  assert.match(text, /plain function declarations: 267/);
+  assert.match(text, /async function declarations: 97/);
   assert.match(text, /const arrow helper declarations: 31/);
   assert.match(text, /async const arrow helper declarations: 2/);
   assert.match(text, /semantic method groups: 22/);
@@ -219,33 +220,33 @@ test('tab-view register pins source fingerprint and broad callable reconciliatio
   const text = doc();
 
   assert.deepEqual(stats, {
-    bytes: 628942,
-    sha256: '572c30cc72b123920342348827cab704a79083bb4b92e8ab57eceea8969a4de4',
-    splitLines: 13632,
-    wcLines: 13631
+    bytes: 662735,
+    sha256: 'abeca29c0ab0d356e0755f1d0e91f469b020ab0491ee3d08cb453f9bd79f2152',
+    splitLines: 14268,
+    wcLines: 14267
   });
-  assert.equal(broadRows.length, 1008);
-  assert.equal(controlArtifacts, 628);
+  assert.equal(broadRows.length, 1048);
+  assert.equal(controlArtifacts, 651);
   assert.equal(heldOutsideRegister, 0);
   assert.deepEqual({
     if: broadCounts.if,
     for: broadCounts.for,
     while: broadCounts.while
   }, {
-    if: 623,
-    for: 3,
+    if: 644,
+    for: 5,
     while: 2
   });
 
   for (const expected of [
-    'source split lines: 13632',
-    'source wc -l: 13631',
-    'source bytes: 628942',
-    'source sha256: 572c30cc72b123920342348827cab704a79083bb4b92e8ab57eceea8969a4de4',
-    'broad lexical callable matches: 1008',
-    'accepted named declaration rows: 380',
-    'semantic method rows promoted: 380',
-    'control-flow lexical artifacts: 628 (`if`: 623, `for`: 3, `while`: 2)',
+    'source split lines: 14268',
+    'source wc -l: 14267',
+    'source bytes: 662735',
+    'source sha256: abeca29c0ab0d356e0755f1d0e91f469b020ab0491ee3d08cb453f9bd79f2152',
+    'broad lexical callable matches: 1048',
+    'accepted named declaration rows: 397',
+    'semantic method rows promoted: 397',
+    'control-flow lexical artifacts: 651 (`if`: 644, `for`: 5, `while`: 2)',
     'local/listener/timer callbacks held outside this named method register: 0',
     'executable current-behavior probes: 6'
   ]) {
@@ -256,35 +257,35 @@ test('tab-view register pins source fingerprint and broad callable reconciliatio
 test('tab-view register accounts for every current named declaration', () => {
   const rows = methodRows();
 
-  assert.equal(rows.length, 380);
+  assert.equal(rows.length, 397);
   assert.deepEqual(countBy(rows, 'kind'), {
     'async const arrow': 2,
-    'async function': 88,
+    'async function': 97,
     'const arrow': 31,
-    function: 259
+    function: 267
   });
   assert.deepEqual(countBy(rows, 'group'), {
     dashboardStatsFiltering: 10,
-    dateFilterHelpers: 6,
+    dateFilterHelpers: 7,
     importExportDownload: 8,
     kidsFiltersContentControls: 18,
     lockNavigationAndSubscriptionFlow: 7,
     mainFiltersContentControls: 20,
-    managedRowsListModeRender: 16,
+    managedRowsListModeRender: 15,
     modalDialogHelpers: 7,
-    nanahApplyProposalTransport: 17,
+    nanahApplyProposalTransport: 20,
     nanahModeScopePolicyModal: 47,
-    nanahSessionUiAndEnvelope: 11,
+    nanahSessionUiAndEnvelope: 12,
     nanahTargetProfileDevicePolicy: 37,
-    nanahTrustedLinkStorage: 25,
-    navigationAndToasts: 4,
+    nanahTrustedLinkStorage: 36,
+    navigationAndToasts: 3,
     pinProfilesManager: 8,
-    profileAccessAndManagedChild: 84,
+    profileAccessAndManagedChild: 86,
     profileDropdownAndBackupControls: 11,
     responsiveNavigationShell: 3,
     routeIntentAndReleaseNotes: 4,
     runtimeMessagingBrowserTabs: 17,
-    settingsSyncAccountPolicyHandlers: 2,
+    settingsSyncAccountPolicyHandlers: 3,
     subscriptionsImportBridge: 18
   });
 
@@ -319,7 +320,7 @@ test('tab-view register pins current DOM listener timer and dependency surface',
   assert.equal((source.match(/document\.getElementById\(/g) || []).length, 248);
   assert.equal((source.match(/\.querySelector\(/g) || []).length, 33);
   assert.equal((source.match(/\.querySelectorAll\(/g) || []).length, 28);
-  assert.equal((source.match(/document\.createElement\(/g) || []).length, 351);
+  assert.equal((source.match(/document\.createElement\(/g) || []).length, 354);
   assert.equal((source.match(/\.innerHTML\s*=/g) || []).length, 40);
   assert.equal((source.match(/\.setAttribute\(/g) || []).length, 61);
   assert.equal((source.match(/\.dataset\.[A-Za-z_$][\w$]*\s*=/g) || []).length, 15);
@@ -331,7 +332,7 @@ test('tab-view register pins current DOM listener timer and dependency surface',
     'document.getElementById calls: 248',
     'querySelector calls: 33',
     'querySelectorAll calls: 28',
-    'document.createElement calls: 351',
+    'document.createElement calls: 354',
     'innerHTML writes: 40',
     'dataset writes: 15',
     'setAttribute calls: 61',
@@ -558,7 +559,7 @@ test('tab-view executable probes date helpers and Nanah policy normalization', (
   assert.equal(helpers.extractNanahCodeFromInput('nanah://pair?code=abc23456'), 'ABC23456');
   assert.deepEqual(plain(helpers.getNanahScopeList(['full', 'kids', 'bad', 'kids'])), ['full', 'kids']);
   assert.deepEqual(plain(helpers.getNanahScopeList([])), ['active']);
-  assert.deepEqual(plain(helpers.getNanahManagedPolicyScopeList(['keywords', 'channels', 'full', 'keywords'])), ['keywords', 'channels']);
+  assert.deepEqual(plain(helpers.getNanahManagedPolicyScopeList(['keywords', 'channels', 'full', 'keywords'])), ['keywords', 'channels', 'main', 'kids', 'viewing_space', 'time_limits']);
   assert.deepEqual(plain(helpers.getNanahManagedSendScopeList(['keywords', 'channels', 'full', 'keywords'])), ['keywords', 'channels', 'full']);
   assert.equal(helpers.classifyNanahTrustedLink('source', 'replica'), 'managed_link');
   assert.equal(helpers.classifyNanahTrustedLink('peer', 'peer'), 'peer_link');
