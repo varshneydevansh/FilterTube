@@ -401,6 +401,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /Select ready/);
   assert.match(helperSource, /filtertubeSyncReady/);
   assert.match(helperSource, /selectedProfileInputs/);
+  assert.match(helperSource, /panel\.appendChild\(list\);[\s\S]*panel\.__filtertubeUpdateManagedBulkState\(\);/);
   assert.match(helperSource, /filtertubeManagedAction/);
   assert.match(helperSource, /delegated_runtime_gate/);
   assert.match(helperSource, /global\.FilterTubeManagedParentCommandCenter = \{/);

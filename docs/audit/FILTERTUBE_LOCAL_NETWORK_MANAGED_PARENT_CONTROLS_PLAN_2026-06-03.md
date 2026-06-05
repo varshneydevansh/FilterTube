@@ -713,7 +713,8 @@ the current extension dashboard.
   shows compact
   status chips for access, limits, sync readiness, redacted delivery preview,
   delivery-path detail, safe latest-action labels, and remote conflict state,
-  and records protected redacted history for send
+  refreshes bulk selection state after row construction so ready-device
+  selection is usable on first render, and records protected redacted history for send
   success/failure/provider-pending cases. The implementation
   intentionally avoids a separate oversized remote-management page until
   app/server provider work exists. Bulk keyword/channel/video rule additions

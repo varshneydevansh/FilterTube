@@ -596,7 +596,6 @@
             bulkBar.append(bulkStatus, bulkSelectControls, ...bulkButtons);
             panel.appendChild(bulkBar);
             panel.__filtertubeUpdateManagedBulkState = updateBulkState;
-            updateBulkState();
         }
 
         const list = document.createElement('div');
@@ -694,6 +693,9 @@
             list.appendChild(row);
         });
         panel.appendChild(list);
+        if (typeof panel.__filtertubeUpdateManagedBulkState === 'function') {
+            panel.__filtertubeUpdateManagedBulkState();
+        }
         return panel;
     }
 
