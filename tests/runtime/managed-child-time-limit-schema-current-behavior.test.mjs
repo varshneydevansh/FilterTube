@@ -178,6 +178,7 @@ test('managed child time-limit schema contract documents local UI store and runt
   assert.match(doc, /Current Local UI And Store Boundary/);
   assert.match(doc, /local managed time-limit profile store: present/);
   assert.match(doc, /local managed time-limit parent UI: present/);
+  assert.match(doc, /local managed time-limit protected history row writer: present/);
   assert.match(doc, /runtime managed time-limit policy compiler: present/);
   assert.match(doc, /runtime managed active-tab budget counter: present/);
   assert.match(doc, /runtime managed timeout overlay: present/);
@@ -201,7 +202,12 @@ test('local parent UI writes time-limit policy through profile settings and admi
   assert.match(tabView, /ensureProfileUnlocked\(fresh, currentActive, \{ sensitiveAction: true \}\)/);
   assert.match(tabView, /const nextPolicy = buildManagedTimeLimitPolicy/);
   assert.match(tabView, /if \(!nextPolicy\)/);
+  assert.match(tabView, /function buildManagedTimeLimitLocalEditReport\(\{ actorProfileId, targetProfileId, nextPolicy \}\)/);
+  assert.match(tabView, /actionType: 'policy\.time_limit\.update'/);
+  assert.match(tabView, /scope: 'time_limits'/);
+  assert.match(tabView, /summary: summarizeManagedTimeLimitPolicy\(policy\)/);
   assert.match(tabView, /timeLimitPolicy: nextPolicy/);
+  assert.match(tabView, /recordManagedChildLocalEditHistory\(nextProfile, report\)/);
   assert.match(tabView, /Time limit:/);
   assert.match(tabView, /Child profiles cannot change time limits here/);
 

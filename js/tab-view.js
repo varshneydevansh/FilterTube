@@ -4585,6 +4585,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
+    function summarizeManagedTimeLimitPolicy(policy) {
+        const item = safeObject(policy);
+        const dailyBudgetSeconds = normalizeNonNegativeInteger(item.dailyBudgetSeconds) || 0;
+        const surfaceBudgets = safeObject(item.surfaceBudgets);
+        const surfaceBudgetCount = ['main', 'kids'].filter(surface => normalizeNonNegativeInteger(surfaceBudgets[surface]) != null).length;
+        return {
+            redacted: true,
+            label: item.enabled === true ? 'Updated time limit' : 'Disabled time limit',
+            enabled: item.enabled === true,
+            dailyBudgetSeconds,
+            dailyBudgetMinutes: Math.floor(dailyBudgetSeconds / 60),
+            timezone: normalizeString(item.timezone) || 'Etc/UTC',
+            surfaceBudgetCount
+        };
+    }
+
     function buildManagedChildLocalEditReport({ actorProfileId, targetProfileId, surface, priorProfile, nextSurface }) {
         const scope = surface === 'kids' ? 'kids' : 'main';
         const priorState = localManagedEditPolicyRevisionStore(priorProfile, scope);
@@ -4633,6 +4649,55 @@ document.addEventListener('DOMContentLoaded', async () => {
             sensitive: true
         };
         return { scope, policyState, historyRow };
+    }
+
+    function buildManagedTimeLimitLocalEditReport({ actorProfileId, targetProfileId, nextPolicy }) {
+        const policy = safeObject(nextPolicy);
+        const revision = normalizeNonNegativeInteger(policy.policyRevision) || 1;
+        const now = Date.now();
+        const actorId = normalizeString(actorProfileId) || 'default';
+        const targetId = normalizeString(targetProfileId);
+        const actorDeviceId = normalizeString(nanahStableDeviceId) || 'local-extension-device';
+        const policyHash = normalizeString(policy.policyHash) || buildManagedTimeLimitPolicyHash({
+            enabled: policy.enabled === true,
+            timezone: normalizeString(policy.timezone) || 'Etc/UTC',
+            dailyBudgetSeconds: normalizeNonNegativeInteger(policy.dailyBudgetSeconds) || 0,
+            surfaceBudgets: safeObject(policy.surfaceBudgets),
+            policyRevision: revision
+        });
+        const policyState = {
+            schema: MANAGED_LOCAL_EDIT_POLICY_SCHEMA,
+            version: 1,
+            source: 'local_parent_time_limit_policy',
+            scope: 'time_limits',
+            targetProfileId: targetId,
+            actorProfileId: actorId,
+            actorDeviceId,
+            policyRevision: revision,
+            policyHash,
+            updatedAt: now
+        };
+        const historyRow = {
+            rowId: `local-time-limit-${revision}-${now}`,
+            schema: MANAGED_ACTION_HISTORY_SCHEMA,
+            version: 1,
+            actorProfileId: actorId,
+            actorDeviceId,
+            targetProfileId: targetId,
+            trustedLinkId: null,
+            actionType: 'policy.time_limit.update',
+            scope: 'time_limits',
+            revision,
+            policyHash,
+            result: 'accepted',
+            reason: null,
+            receivedAt: now,
+            issuedAt: normalizeNonNegativeInteger(policy.issuedAt) || now,
+            orderKey: `${String(revision).padStart(6, '0')}:${now}`,
+            summary: summarizeManagedTimeLimitPolicy(policy),
+            sensitive: true
+        };
+        return { scope: 'time_limits', policyState, historyRow };
     }
 
     function recordManagedChildLocalEditHistory(profile, report) {
@@ -5637,13 +5702,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        profiles[targetId] = {
+        const nextProfile = {
             ...profile,
             settings: {
                 ...settings,
                 timeLimitPolicy: nextPolicy
             }
         };
+        const report = buildManagedTimeLimitLocalEditReport({
+            actorProfileId: currentActive,
+            targetProfileId: targetId,
+            nextPolicy
+        });
+        profiles[targetId] = recordManagedChildLocalEditHistory(nextProfile, report);
         await io.saveProfilesV4({
             ...fresh,
             schemaVersion: 4,

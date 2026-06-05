@@ -416,6 +416,7 @@ test('managed action history required outcomes cover accepted rejected conflict 
     'rejected_after_trust_revocation',
     'rate_limited_remote_policy_attempt',
     'acked_mailbox_policy_result',
+    'accepted_local_time_limit_policy',
     'failed_parent_unlock',
     'cleared_by_parent'
   ];
@@ -430,7 +431,9 @@ test('managed action history required outcomes cover accepted rejected conflict 
   assert.match(doc, /plaintext sensitive rule values: no/);
   assert.match(doc, /remote upload or telemetry: no/);
   assert.match(doc, /runtime managed action history store: profile-local managed child rows/);
-  assert.match(doc, /runtime managed action history row writer: local managed child edit plus failed parent unlock plus Nanah managed-policy validation\/apply outcomes/);
+  assert.match(doc, /runtime managed action history row writer: local managed child edit plus local time-limit policy edit plus failed parent unlock plus Nanah managed-policy validation\/apply outcomes/);
+  assert.match(read('js/tab-view.js'), /function buildManagedTimeLimitLocalEditReport\(\{ actorProfileId, targetProfileId, nextPolicy \}\)/);
+  assert.match(read('js/tab-view.js'), /actionType: 'policy\.time_limit\.update'/);
   assert.match(doc, /runtime managed action history access gate: present for parent\/account authority/);
   assert.match(doc, /runtime managed action history clear path: present for accepted rows only/);
   assert.match(doc, /runtime managed action history clear event writer: present as protected `history.clear` evidence/);

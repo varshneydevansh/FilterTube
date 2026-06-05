@@ -135,6 +135,9 @@ Current extension UI can now create or disable a profile-owned
   viewing-space edits: active child profiles are rejected, the active manager
   must be allowed to manage the target profile, and the manager profile must
   have a fresh sensitive admin session.
+- Accepted parent/account set, change, and disable actions now append protected
+  redacted `policy.time_limit.update` rows to the target profile's
+  `managedActionHistory`.
 - Import/profile sanitation preserves only valid `filtertube_managed_time_limit`
   policies and drops malformed payloads.
 - Disabling a limit writes a disabled policy revision; disabled policy remains a
@@ -148,6 +151,7 @@ extension runtime path:
 ```text
 local managed time-limit profile store: present
 local managed time-limit parent UI: present
+local managed time-limit protected history row writer: present
 runtime managed time-limit policy compiler: present
 runtime managed active-tab budget counter: present
 runtime managed timeout overlay: present

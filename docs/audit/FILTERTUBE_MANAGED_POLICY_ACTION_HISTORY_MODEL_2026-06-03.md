@@ -18,7 +18,8 @@ Trusted-link removal history writer now records protected `trust_link.revoke`
 rows when local accepted managed policy state is purged for a removed link.
 Pull-on-open mailbox ack handoff now records redacted protected
 `remote_policy.mailbox.ack` rows on the target profile after the provider ack
-attempt completes.
+attempt completes. Local parent-set time-limit changes now also record protected
+redacted `policy.time_limit.update` rows on the target profile.
 Parent-side live sends now record redacted outbound trusted-link history rows
 without storing policy payload plaintext, and connected replicas now return
 redacted live ack rows that the source stores only when they match a prior sent
@@ -57,7 +58,8 @@ same trusted link after a connected replica reports accepted, rejected, or
 conflict status for that exact revision/hash. Pull-on-open mailbox ack handoff
 now also writes protected redacted target-profile rows that show whether the
 protected device handed the accepted/rejected mailbox result back to the local
-provider.
+provider. Same-device parent time-limit set/change/disable actions now write
+protected `time_limits` rows with only budget/timezone counts, not rule values.
 
 Action history is protected evidence and parent/caregiver UX. It is not policy
 authority. Runtime policy must still come from the current accepted managed
@@ -174,6 +176,7 @@ The following events must produce action-history rows in future implementation:
 | `rejected_after_trust_revocation` | Queued mailbox/P2P update arrives after link revocation. | `rejected` with `reason: trust_revoked`. |
 | `rate_limited_remote_policy_attempt` | Repeated rejected/conflict remote policy attempts arrive for the same transport, link, source, target, and scope. | `rejected` or `conflict` row with redacted rate-limit metadata and no policy authority. |
 | `acked_mailbox_policy_result` | Protected device reports a pulled mailbox apply/reject result back to the local provider. | `accepted` when the provider records every ack, otherwise `rejected` with the provider ack failure reason; never stores plaintext rule values. |
+| `accepted_local_time_limit_policy` | Same-device parent/account sets, changes, or disables a protected profile's daily YouTube time limit. | `accepted` with local time-limit revision, policy hash, and redacted budget/timezone counts. |
 | `failed_parent_unlock` | Admin PIN/password attempt fails. | `failed_auth` and rate-limit metadata. |
 | `cleared_by_parent` | Parent/account clears viewable accepted-action history. | `cleared_by_admin`; rejected evidence may remain until retention expiry. |
 
@@ -193,7 +196,7 @@ profile when a row can be attached to a known protected profile:
 
 ```text
 runtime managed action history store: profile-local managed child rows
-runtime managed action history row writer: local managed child edit plus failed parent unlock plus Nanah managed-policy validation/apply outcomes
+runtime managed action history row writer: local managed child edit plus local time-limit policy edit plus failed parent unlock plus Nanah managed-policy validation/apply outcomes
 runtime managed action history access gate: present for parent/account authority
 runtime managed action history clear path: present for accepted rows only while retaining protected evidence
 runtime managed action history clear event writer: present as protected `history.clear` evidence
@@ -205,11 +208,13 @@ runtime local-network candidate validation/apply history writer: present for san
 runtime remote managed failed-attempt rate-limit state: present under profile.managedPolicyState.remoteFailedAttemptRateLimits
 runtime managed outbound live send history writer: present on trusted link policy rows as redacted parent-side send evidence
 runtime managed inbound live ack history writer: present on trusted link policy rows as redacted parent-side applied/rejected feedback
-runtime behavior changed by this contract: yes, for accepted local managed child saves, protected failed-auth rows, parent/account history access, Nanah managed-policy receive evidence, validated remote apply history, local/decrypted mailbox item evidence, pull-on-open mailbox ack-handoff evidence, sanitized local-network candidate evidence, remote failed-attempt rate-limit metadata, parent-side outbound live send evidence, and parent-side live ack feedback
+runtime behavior changed by this contract: yes, for accepted local managed child saves, accepted local time-limit policy edits, protected failed-auth rows, parent/account history access, Nanah managed-policy receive evidence, validated remote apply history, local/decrypted mailbox item evidence, pull-on-open mailbox ack-handoff evidence, sanitized local-network candidate evidence, remote failed-attempt rate-limit metadata, parent-side outbound live send evidence, and parent-side live ack feedback
 ```
 
 The current local writer stores redacted count summaries under
-`profile.managedActionHistory[]`. The local access gate uses active
+`profile.managedActionHistory[]`; local time-limit rows store only enabled
+state, daily budget counts, timezone, and surface-budget count. The local access
+gate uses active
 parent/account authority, not child PIN authority, and `clearManagedActionHistory`
 preserves rows that are rejected, conflict, failed-auth, expired-session, trust
 revocation, time-limit, viewing-space, or prior clear evidence.
