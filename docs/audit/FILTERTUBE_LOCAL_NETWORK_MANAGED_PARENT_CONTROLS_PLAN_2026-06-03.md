@@ -822,8 +822,8 @@ contract before wiring more native app runtime behavior.
 
 **Demo/Validation**:
 
-- App contract lists profile, viewing-space, time-limit, envelope, and history
-  fields.
+- App contract lists profile, viewing-space, time-limit, envelope,
+  keyword/channel/video rule, and history fields.
 - Contract excludes extension runtime APIs from downstream authority payloads.
 - Current app sync manifest copies the dedicated contract artifact before
   native app enforcement changes.
@@ -837,7 +837,10 @@ contract before wiring more native app runtime behavior.
   app adapters must preserve while keeping native route/time/app-open locks as
   app-shell responsibilities.
 - **Status**: Contract doc, JSON artifact, app sync manifest row, and focused
-  settings/native-sync proof added. The extension-side
+  settings/native-sync proof added. The contract now also makes managed
+  keyword/channel/video rule scopes first-class app policy surfaces so native
+  app parity cannot claim remote rule control without consuming the shared rule
+  contract. The extension-side
   `verify:managed-app-policy` command now checks that the Markdown contract,
   JSON artifact, declared helper sources, and available app sync manifest copy
   rows stay aligned before a native runtime sync/release handoff. Product
@@ -847,11 +850,13 @@ contract before wiring more native app runtime behavior.
 - **Dependencies**: Sprint 1 policy schema, Sprint 5 viewing-space/time-limit
   runtime contracts.
 - **Acceptance Criteria**:
-  - Apps consume profile, envelope, viewing-space, time-limit, and history
-    contracts.
+  - Apps consume profile, envelope, managed keyword/channel/video rule,
+    viewing-space, time-limit, and history contracts.
   - Apps do not treat extension background/session cache, content-script DOM
     state, YouTube selectors, or page-message state as native authority.
   - Main/Kids remain viewing spaces, not separate child profiles.
+  - Remote keyword/channel/video app parity reuses the same validated mutation
+    paths as local controls.
   - Native app shell owns app-open lock, Main/Kids route gate, and time budget
     gate before managed web content opens.
   - The current app sync manifest contract-copy row exists and remains

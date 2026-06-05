@@ -25,9 +25,9 @@ contract, but they must not copy extension background authority, Chrome APIs, or
 YouTube DOM assumptions as native app authority.
 
 This proof defines the shared profile, viewing-space, time-limit, managed
-envelope, and action-history contract that apps must preserve when syncing from
-the extension. It does not claim full Android settings-lock, rich timeout UI,
-or iOS enforcement is complete yet.
+envelope, managed keyword/channel/video rule, and action-history contract that
+apps must preserve when syncing from the extension. It does not claim full
+Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
 
 ## Contract Snapshot JSON
 
@@ -182,6 +182,36 @@ or iOS enforcement is complete yet.
       "signature_invalid"
     ]
   },
+  "managedRules": {
+    "schema": "filtertube_managed_rule_policy",
+    "requiredScopes": [
+      "keywords",
+      "channels",
+      "videos"
+    ],
+    "requiredSurfaces": [
+      "main",
+      "kids"
+    ],
+    "requiredFields": [
+      "scope",
+      "surface",
+      "targetProfileId",
+      "revision",
+      "policyHash",
+      "payload"
+    ],
+    "requiredDecisions": [
+      "keyword_rule_apply",
+      "channel_rule_apply",
+      "video_rule_apply",
+      "same_validated_rule_paths_as_local_controls",
+      "wrong_scope_rejected",
+      "wrong_surface_rejected",
+      "protected_user_cannot_mutate_rules"
+    ],
+    "runtimeBoundary": "remote managed rule updates are accepted only as validated policy payloads and must reuse local keyword channel and video mutation paths before app sync claims parity"
+  },
   "actionHistory": {
     "store": "profile.managedActionHistory",
     "requiredRows": [
@@ -202,6 +232,7 @@ or iOS enforcement is complete yet.
     "appsMustConsume": [
       "profile_contract",
       "managed_policy_envelope_contract",
+      "managed_rule_policy_contract",
       "viewing_space_policy_contract",
       "time_limit_policy_contract",
       "action_history_contract"
@@ -216,6 +247,9 @@ or iOS enforcement is complete yet.
       "app_open_lock",
       "native_main_surface_route_gate",
       "native_kids_surface_route_gate",
+      "native_keyword_rule_apply",
+      "native_channel_rule_apply",
+      "native_video_rule_apply",
       "native_time_budget_gate_before_web_content",
       "native_settings_sync_lock"
     ],
@@ -267,6 +301,7 @@ device binding, and signature checks pass.
 | Parent authority | Default/account profiles can manage bound child profiles. | Native admin mode must map to the same parent/account authority. |
 | Child PIN | Child unlock does not become admin authority. | Child app unlock must not open sync/settings/admin mutation paths. |
 | Main/Kids | `allowMainViewing` and `allowKidsViewing` route-gate YouTube surfaces. | App shell must block disallowed Main/Kids spaces before web content opens. |
+| Rules | Managed keyword/channel/video payloads reuse local validated mutation paths. | Apps must apply the same keyword, channel, and video rule scopes without turning remote payloads into native-only authority. |
 | Time limits | Active child policy emits runtime budget gate and timeout overlay. | App shell must enforce daily budget at app/surface entry and while active. |
 | Remote policy | Signed `filtertube_managed_policy` envelopes validate before apply. | Apps must reject stale, revoked, wrong-target, or unsigned policies. |
 | History | Action rows are protected evidence, not policy authority. | Apps may display history only to admin authority and must redact child views. |
@@ -278,6 +313,11 @@ The extension contract is now explicit and available as a JSON artifact at
 `docs/audit/artifacts/managed-app-policy-contract-v1.json`. The app runtime
 sync manifest declares the copy target
 `packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json`.
+The contract also now names `filtertube_managed_rule_policy` as a first-class
+app parity surface. Keyword, channel, and video rule updates are still delivered
+through signed managed-policy envelopes, but downstream apps must treat those
+scopes as shared policy data and route them through the same validated mutation
+paths used by local FilterTube controls before claiming installed app parity.
 The extension-owned handoff verifier
 `scripts/verify-managed-app-policy-contract.mjs` checks that the Markdown
 contract snapshot and JSON artifact are byte-equivalent as parsed data, all

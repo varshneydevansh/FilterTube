@@ -239,6 +239,29 @@ test('managed app contract preserves profile viewing time envelope and history f
     assert.ok(contract.managedEnvelope.scopes.includes(scope), `missing managed scope ${scope}`);
   }
 
+  assert.equal(contract.managedRules.schema, 'filtertube_managed_rule_policy');
+  for (const scope of ['keywords', 'channels', 'videos']) {
+    assert.ok(contract.managedRules.requiredScopes.includes(scope), `missing managed rule scope ${scope}`);
+  }
+  for (const surface of ['main', 'kids']) {
+    assert.ok(contract.managedRules.requiredSurfaces.includes(surface), `missing managed rule surface ${surface}`);
+  }
+  for (const field of ['scope', 'surface', 'targetProfileId', 'revision', 'policyHash', 'payload']) {
+    assert.ok(contract.managedRules.requiredFields.includes(field), `missing managed rule field ${field}`);
+  }
+  for (const decision of [
+    'keyword_rule_apply',
+    'channel_rule_apply',
+    'video_rule_apply',
+    'same_validated_rule_paths_as_local_controls',
+    'wrong_scope_rejected',
+    'wrong_surface_rejected',
+    'protected_user_cannot_mutate_rules'
+  ]) {
+    assert.ok(contract.managedRules.requiredDecisions.includes(decision), `missing managed rule decision ${decision}`);
+  }
+  assert.match(contract.managedRules.runtimeBoundary, /validated policy payloads/);
+
   for (const row of [
     'local_managed_save_accepted',
     'remote_policy_rejected',
@@ -276,10 +299,24 @@ test('managed app contract excludes extension runtime APIs from downstream autho
     'app_open_lock',
     'native_main_surface_route_gate',
     'native_kids_surface_route_gate',
+    'native_keyword_rule_apply',
+    'native_channel_rule_apply',
+    'native_video_rule_apply',
     'native_time_budget_gate_before_web_content',
     'native_settings_sync_lock'
   ]) {
     assert.ok(contract.appBoundary.nativeOwnedResponsibilities.includes(nativeResponsibility));
+  }
+
+  for (const appContract of [
+    'profile_contract',
+    'managed_policy_envelope_contract',
+    'managed_rule_policy_contract',
+    'viewing_space_policy_contract',
+    'time_limit_policy_contract',
+    'action_history_contract'
+  ]) {
+    assert.ok(contract.appBoundary.appsMustConsume.includes(appContract), `missing app contract ${appContract}`);
   }
 });
 
