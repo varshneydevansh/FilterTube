@@ -28,13 +28,13 @@
     {
       "sourcePath": "js/managed_admin_authority.js",
       "appDestination": "packages/extension-source/upstream/js/managed_admin_authority.js",
-      "manifestSyncMode": "extension_source_mirror_pending_explicit_manifest",
+      "manifestSyncMode": "extension_source_mirror",
       "boundary": "managed admin session and sensitive-action authority helper; native settings locks must preserve the contract without copying extension UI state as authority"
     },
     {
       "sourcePath": "js/managed_parent_command_center.js",
       "appDestination": "packages/extension-source/upstream/js/managed_parent_command_center.js",
-      "manifestSyncMode": "extension_source_mirror_pending_explicit_manifest",
+      "manifestSyncMode": "extension_source_mirror",
       "boundary": "managed parent command-center summary/action-intent helper; native UI may mirror interaction shape but runtime policy authority remains signed envelope and profile gate owned"
     }
   ],

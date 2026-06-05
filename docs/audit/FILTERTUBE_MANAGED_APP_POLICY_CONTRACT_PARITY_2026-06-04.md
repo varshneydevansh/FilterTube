@@ -62,13 +62,13 @@ or iOS enforcement is complete yet.
     {
       "sourcePath": "js/managed_admin_authority.js",
       "appDestination": "packages/extension-source/upstream/js/managed_admin_authority.js",
-      "manifestSyncMode": "extension_source_mirror_pending_explicit_manifest",
+      "manifestSyncMode": "extension_source_mirror",
       "boundary": "managed admin session and sensitive-action authority helper; native settings locks must preserve the contract without copying extension UI state as authority"
     },
     {
       "sourcePath": "js/managed_parent_command_center.js",
       "appDestination": "packages/extension-source/upstream/js/managed_parent_command_center.js",
-      "manifestSyncMode": "extension_source_mirror_pending_explicit_manifest",
+      "manifestSyncMode": "extension_source_mirror",
       "boundary": "managed parent command-center summary/action-intent helper; native UI may mirror interaction shape but runtime policy authority remains signed envelope and profile gate owned"
     }
   ],
@@ -287,8 +287,10 @@ the exact helper contracts without treating them as native runtime authority.
 The extension source mirror also carries the managed admin authority helper and
 managed parent command-center helper. Those are contract inputs for native
 settings locks and parent UI ergonomics, not standalone policy authority, and
-they still need an explicit native sync/manifest pass before app parity can be
-claimed current.
+they are mirrored through `tools/sync-runtime-from-extension.mjs` broad
+`js/html/css` source mirroring rather than direct manifest copy rows. App parity
+still cannot be claimed current until the sibling app sync output is committed
+and platform smoke evidence is attached.
 
 The contract now treats protected profiles as child profiles plus independent
 account profiles when Default/Master is the managing authority. Downstream apps

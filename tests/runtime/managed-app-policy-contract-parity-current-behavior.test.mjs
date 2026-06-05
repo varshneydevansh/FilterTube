@@ -98,7 +98,7 @@ test('managed app policy parity doc records extension-owned app contract artifac
     Object.keys(appManagedUiMirrorDestinations)
   );
   for (const helper of contract.uiHelperMirror) {
-    assert.equal(helper.manifestSyncMode, 'extension_source_mirror_pending_explicit_manifest');
+    assert.equal(helper.manifestSyncMode, 'extension_source_mirror');
     assert.equal(helper.appDestination, appManagedUiMirrorDestinations[helper.sourcePath].replace('/Users/devanshvarshney/FilterTubeApp/', ''));
     assert.match(helper.boundary, /native|policy authority|settings locks/);
   }
