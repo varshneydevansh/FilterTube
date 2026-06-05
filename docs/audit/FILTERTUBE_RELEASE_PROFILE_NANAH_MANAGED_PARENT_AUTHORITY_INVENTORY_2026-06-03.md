@@ -33,12 +33,15 @@ discovery hook with redacted provider candidate ack handoff and protected
 ack-handoff history, revoked queued-delivery direct/mailbox local apply proof,
 plus an
 extension-owned downstream app policy contract artifact wired
-into the app sync manifest. Local same-budget bulk time-limit controls and
-local same-access bulk viewing-space controls are now delegated through the
-existing parent re-auth gate. Richer rule, remote-delivery, and multi-target
-built-in server mailbox upload/pull/purge runtime,
-built-in local-network peer discovery/LAN delivery runtime, and app native settings/iOS enforcement proofs
-remain pending.
+into the app sync manifest. A selected-profile rule editor handoff, local
+same-budget bulk time-limit controls, local same-access bulk viewing-space
+controls, per-profile and selected-profile verified-device send actions,
+connected-replica live P2P signed managed-policy push, optional provider-gated
+mailbox/LAN delivery handoff, and protected redacted parent-side push history
+rows are now delegated through the existing runtime gates. Direct local rule
+bulk writes, built-in server mailbox upload/pull/purge runtime, built-in
+local-network peer discovery/LAN delivery runtime, and app native
+settings/iOS enforcement proofs remain pending.
 **Goal slice**: Implementation order item 1 plus first runtime viewing-space
 enforcement slice.
 **Lane proof**: `test:settings` for profile/Nanah authority and `test:release`
@@ -54,8 +57,9 @@ viewing-space denial, local protected history access, active child time-budget
 enforcement from local profile settings, receive-side managed-policy
 validation history, managed pairing public-key descriptor persistence,
 source-side managed signing keypair provisioning with an adapter signing helper,
-and eligible fixed-target active/full profile-policy bundles, Main/Kids, plus
-granular live signed-send support.
+eligible fixed-target active/full profile-policy bundles, Main/Kids, plus
+granular live signed-send support, and command-center verified-device parent
+push support.
 
 This document still does not approve remote policy writes by itself. The first
 managed-envelope validator, validated apply wrapper, receive-side
@@ -72,8 +76,10 @@ receive-side scope or sending an account-wide backup tree. Granular rule sends
 use an explicit Main/Kids rule-source picker that defaults from the dashboard's
 active surface, and Rule bundle expands into separate signed keyword, channel,
 and video envelopes instead of creating a new receive-side scope. Parent-managed
-child edit mode can provide the child-policy payload source while the parent
-profile remains signing authority.
+protected-profile edit mode can provide the protected profile policy payload
+source while the parent/master profile remains signing authority. This covers
+child profiles and independent protected account profiles that Default/Master
+is allowed to manage.
 Local/decrypted mailbox items can now bind mailbox metadata to the decrypted
 managed envelope before calling the same managed-policy validation/apply path.
 The source side can also build a server-safe mailbox storage item from a signed
@@ -103,11 +109,15 @@ local-network candidate ack records to that provider and store protected
 ack-handoff history without exposing plaintext rules. Direct signed-envelope
 apply and already-decrypted mailbox item apply now also reject revoked trusted
 links before any profile save, and mailbox apply marks that local decision as
-`ackState: revoked`. Built-in server upload/pull/purge
-clients, richer rule/remote-delivery and multi-target
-bulk outbound controls, built-in local-network peer discovery/LAN delivery runtime, and
-remote admin session semantics remain separate
-required slices.
+`ackState: revoked`. Command-center `Send Update` and `Send selected updates`
+can now send signed managed-policy envelopes to a currently connected verified
+replica over Nanah P2P and can hand ciphertext mailbox rows or signed
+local-network candidates to optional providers when those hooks are present.
+The extension still does not ship a built-in server mailbox client or LAN
+peer-discovery transport; those are downstream app/server/provider integration
+surfaces. Direct local rule bulk writes, built-in server upload/pull/purge
+clients, built-in local-network peer discovery/LAN delivery runtime, and remote
+admin session semantics remain separate required slices.
 
 ## Issue 60 Local-Network Caregiver Addendum
 
@@ -237,8 +247,10 @@ Current local-write boundary:
   spaces, time limits, local Main/Kids revision state, accepted remote policy
   scope/link counts, and protected history counts without exposing rule values
   or raw policy data. Command-center row buttons are delegated action intents
-  for existing gated Edit Rules, History, and Time Limit paths; they do not carry
-  policy payloads or direct mutation authority.
+  for existing gated Edit Rules, History, and Time Limit paths. The selected
+  rule editor handoff can open exactly one selected protected profile in the
+  same managed child editor; it does not carry policy payloads or direct
+  mutation authority.
 - Child/protected admin surfaces do not receive the detailed managed status
   text and still gate Edit Rules, History, viewing-space, and time-limit
   controls.
@@ -248,7 +260,8 @@ Current local-write boundary:
   a global revision that all extension contexts can compare against.
 - The profile-row status line is display evidence only. Command-center actions
   are delegated runtime intents only; they do not weaken or replace the
-  save-time authority checks, and they do not add direct or bulk write authority.
+  save-time authority checks, and they do not add direct policy write
+  authority.
 
 ### PIN/session authority
 

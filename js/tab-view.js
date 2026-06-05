@@ -3007,6 +3007,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let profilesV4Cache = null;
     let isHandlingProfileSwitch = false;
     let managedChildEdit = null;
+    let nanahManagedPolicySourceOverride = null;
     let sessionMasterPin = '';
     const unlockedProfiles = new Set();
     const NANAH_TRUSTED_LINKS_KEY = 'ftNanahTrustedLinks';
@@ -3054,7 +3055,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const MANAGED_ACTION_HISTORY_SCHEMA = 'filtertube_managed_action_history';
     const MANAGED_ACTION_HISTORY_LIMIT = 500;
     const MANAGED_ACTION_HISTORY_PROTECTED_RESULTS = new Set(['rejected', 'conflict', 'failed_auth', 'expired_session', 'cleared_by_admin']);
-    const MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set(['trust_link.revoke', 'policy.time_limit.update', 'policy.viewing_space.update']);
+    const MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set(['trust_link.revoke', 'policy.time_limit.update', 'policy.viewing_space.update', 'remote_policy.source_push']);
     const MANAGED_ACTION_HISTORY_SAFE_LABELS = Object.freeze({
         'rule.video.block': 'Video rule changed',
         'rule.keyword.add': 'Keyword rule changed',
@@ -3079,6 +3080,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'remote_policy.mailbox.revoke': 'Mailbox policy revoked',
         'remote_policy.mailbox.ack': 'Mailbox ack recorded',
         'remote_policy.local_network.ack': 'Local-network ack recorded',
+        'remote_policy.source_push': 'Parent policy push',
         'history.clear': 'History cleared'
     });
     const MANAGED_ADMIN_SESSION_TTL_MS = 15 * 60 * 1000;
@@ -5437,14 +5439,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const profiles = safeObject(fresh.profiles);
         const targetExists = Object.prototype.hasOwnProperty.call(profiles, profileId);
         const profile = safeObject(profiles[profileId]);
-        if (!targetExists || getProfileType(fresh, profileId) !== 'child') {
+        if (!targetExists || profileId === 'default') {
             managedChildEdit = null;
-            UIComponents.showToast('Managed child target is no longer available', 'error');
+            UIComponents.showToast('Managed protected profile target is no longer available', 'error');
             return false;
         }
         if (!canActiveProfileManageProfile(fresh, profileId)) {
             managedChildEdit = null;
-            UIComponents.showToast('Switch to the parent account to edit this child profile', 'error');
+            UIComponents.showToast('Switch to the master or parent account to edit this protected profile', 'error');
             return false;
         }
         const nextSurface = getProfileSurface(profile, surface);
@@ -5548,16 +5550,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         const copy = document.createElement('div');
         copy.className = 'ft-managed-child-global__copy';
         const title = document.createElement('strong');
-        title.textContent = `Editing child: ${normalizeString(profile.name) || 'Child'}`;
+        title.textContent = `Editing protected profile: ${normalizeString(profile.name) || 'Profile'}`;
         const body = document.createElement('span');
-        body.textContent = 'Parent-managed child edit mode. Dashboard, Filters, Kids Mode, Settings, and Semantic ML stay scoped to this child where editing is supported.';
+        body.textContent = 'Parent-managed profile edit mode. Dashboard, Filters, Kids Mode, Settings, and Semantic ML stay scoped to this protected profile where editing is supported.';
         copy.appendChild(title);
         copy.appendChild(body);
 
         const doneBtn = document.createElement('button');
         doneBtn.type = 'button';
         doneBtn.className = 'btn-primary';
-        doneBtn.textContent = `Done editing ${normalizeString(profile.name) || 'child'}`;
+        doneBtn.textContent = `Done editing ${normalizeString(profile.name) || 'profile'}`;
         doneBtn.addEventListener('click', endManagedChildEdit);
 
         banner.appendChild(copy);
@@ -5588,12 +5590,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const io = window.FilterTubeIO || {};
         if (!targetId || typeof io.loadProfilesV4 !== 'function') return;
         const fresh = await io.loadProfilesV4();
-        if (getProfileType(fresh, targetId) !== 'child') {
-            UIComponents.showToast('Managed editing is for child profiles', 'error');
+        if (targetId === 'default' || !Object.prototype.hasOwnProperty.call(safeObject(fresh.profiles), targetId)) {
+            UIComponents.showToast('Managed editing is for protected profiles below the master account', 'error');
             return;
         }
         if (!canActiveProfileManageProfile(fresh, targetId)) {
-            UIComponents.showToast('Switch to the parent account to edit this child profile', 'error');
+            UIComponents.showToast('Switch to the master or parent account to edit this protected profile', 'error');
             return;
         }
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
@@ -8754,6 +8756,86 @@ document.addEventListener('DOMContentLoaded', async () => {
         return safeObject(window.FilterTubeManagedPolicyMailbox);
     }
 
+    function hasNanahManagedMailboxUploadWriter(provider = getNanahManagedMailboxProvider()) {
+        const root = safeObject(provider);
+        return typeof root.uploadManagedMailboxItems === 'function'
+            || typeof root.publishManagedMailboxItems === 'function'
+            || typeof root.putManagedMailboxItems === 'function'
+            || typeof root.enqueueManagedMailboxItems === 'function';
+    }
+
+    function hasNanahManagedLocalNetworkDeliveryWriter(provider = getNanahManagedLocalNetworkProvider()) {
+        const root = safeObject(provider);
+        return typeof root.publishManagedPolicyCandidates === 'function'
+            || typeof root.deliverManagedPolicyCandidates === 'function'
+            || typeof root.publishLocalNetworkCandidates === 'function'
+            || typeof root.putManagedPolicyCandidates === 'function';
+    }
+
+    function getConcreteManagedPolicyScopesForProfile(scope, profile) {
+        const requiredScopes = expandNanahManagedSendScope(scope);
+        if (!requiredScopes.includes('time_limits')) return requiredScopes;
+        const timePolicy = getManagedTimeLimitPolicy(profile);
+        return requiredScopes.filter((requiredScope) => requiredScope !== 'time_limits' || !!timePolicy);
+    }
+
+    function isNanahManagedLinkLiveConnected(link) {
+        const trusted = normalizeNanahTrustedLink(link);
+        if (!trusted || trusted.linkType !== 'managed_link') return false;
+        if (!nanahClient || !nanahSessionState.connected || !nanahSessionState.sasConfirmed) return false;
+        if (getNanahRole() !== 'source' || normalizeString(nanahSessionState.remoteRole) !== 'replica') return false;
+        return normalizeString(trusted.remoteDeviceId) === normalizeString(safeObject(nanahSessionState.remoteDevice).deviceId);
+    }
+
+    function getNanahSourceManagedLinksForTargetProfile(profileId, scope = 'active', profile = null) {
+        const targetId = normalizeString(profileId);
+        if (!targetId) return [];
+        const requiredScopes = getConcreteManagedPolicyScopesForProfile(scope, profile);
+        return safeArray(nanahTrustedLinks)
+            .map((link) => normalizeNanahTrustedLink(link))
+            .filter((trusted) => {
+                if (!trusted) return false;
+                const policy = safeObject(trusted.policy);
+                if (trusted.linkType !== 'managed_link') return false;
+                if (trusted.localRole !== 'source' || trusted.remoteRole !== 'replica') return false;
+                if (trusted.revoked === true || policy.revoked === true || trusted.keyRevoked === true || policy.keyRevoked === true) return false;
+                if (trusted.stalePairing === true || policy.stalePairing === true) return false;
+                if (!normalizeString(trusted.linkId || trusted.id)) return false;
+                if (getNanahTrustedLinkTargetProfileId(trusted) !== targetId) return false;
+                const allowedScopes = getNanahManagedPolicyScopeList(policy.allowedScopes || policy.defaultScope);
+                return requiredScopes.length === 0 || requiredScopes.every((requiredScope) => allowedScopes.includes(requiredScope));
+            });
+    }
+
+    function getManagedSyncTargetSummary(profileId) {
+        const profile = safeObject(safeObject(profilesV4Cache).profiles)[normalizeString(profileId)];
+        const links = getNanahSourceManagedLinksForTargetProfile(profileId, 'active', profile);
+        const targetCount = links.length;
+        const liveReady = links.some(isNanahManagedLinkLiveConnected);
+        const mailboxReady = hasNanahManagedMailboxUploadWriter();
+        const localReady = hasNanahManagedLocalNetworkDeliveryWriter();
+        const readyCount = (liveReady || mailboxReady || localReady) ? targetCount : 0;
+        if (!targetCount) {
+            return {
+                label: 'No verified child device',
+                targetCount: 0,
+                readyCount: 0
+            };
+        }
+        const transports = [
+            liveReady ? 'live' : '',
+            localReady ? 'LAN' : '',
+            mailboxReady ? 'mailbox' : ''
+        ].filter(Boolean).join(' + ');
+        return {
+            label: transports
+                ? `${targetCount} verified device${targetCount === 1 ? '' : 's'} | ${transports} ready`
+                : `${targetCount} verified device${targetCount === 1 ? '' : 's'} | provider pending`,
+            targetCount,
+            readyCount
+        };
+    }
+
     async function purgeNanahManagedMailboxQueueForTrustedLink(link, { reason = 'trusted_link_removed' } = {}) {
         const trusted = normalizeNanahTrustedLink(link);
         if (!trusted || trusted.linkType !== 'managed_link' || trusted.localRole !== 'source' || trusted.remoteRole !== 'replica') {
@@ -8780,6 +8862,268 @@ document.addEventListener('DOMContentLoaded', async () => {
                 purgedMailboxItemCount: 0
             };
         }
+    }
+
+    async function recordManagedParentPolicyPushHistory(profileId, details = {}) {
+        const targetId = normalizeString(profileId);
+        const rootDetails = safeObject(details);
+        if (!targetId) return false;
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') return false;
+        const fresh = await io.loadProfilesV4();
+        const profiles = { ...safeObject(fresh.profiles) };
+        const profile = safeObject(profiles[targetId]);
+        if (!profile || Object.keys(profile).length === 0) return false;
+        if (!canActiveProfileManageProfile(fresh, targetId)) return false;
+
+        const now = Date.now();
+        const linkCount = normalizeNonNegativeInteger(rootDetails.linkCount) || 0;
+        const deliveredCount = normalizeNonNegativeInteger(rootDetails.deliveredCount) || 0;
+        const failedCount = normalizeNonNegativeInteger(rootDetails.failedCount) || 0;
+        const result = deliveredCount > 0 ? 'sent' : 'rejected';
+        const row = {
+            rowId: `managed-parent-push-${targetId}-${now}`,
+            schema: MANAGED_ACTION_HISTORY_SCHEMA,
+            version: 1,
+            actorProfileId: normalizeString(fresh.activeProfileId) || activeProfileId || 'default',
+            actorDeviceId: normalizeString(nanahStableDeviceId) || 'local-extension-device',
+            targetProfileId: targetId,
+            trustedLinkId: linkCount === 1 ? normalizeString(rootDetails.firstLinkId) : null,
+            actionType: 'remote_policy.source_push',
+            scope: normalizeString(rootDetails.scope) || 'active',
+            revision: null,
+            policyHash: null,
+            result,
+            reason: result === 'sent' ? null : (normalizeString(rootDetails.reason) || 'managed_policy_delivery_failed'),
+            receivedAt: now,
+            issuedAt: now,
+            orderKey: `push:${now}`,
+            summary: {
+                redacted: true,
+                label: result === 'sent' ? 'Sent parent policy update' : 'Parent policy update failed',
+                linkCount,
+                deliveredCount,
+                failedCount,
+                mailboxUploadedCount: normalizeNonNegativeInteger(rootDetails.mailboxUploadedCount) || 0,
+                localNetworkDeliveredCount: normalizeNonNegativeInteger(rootDetails.localNetworkDeliveredCount) || 0,
+                liveSentCount: normalizeNonNegativeInteger(rootDetails.liveSentCount) || 0,
+                transports: safeArray(rootDetails.transports).map(item => normalizeString(item)).filter(Boolean)
+            },
+            sensitive: true
+        };
+        const existingRows = getManagedActionHistoryRows(profile);
+        profiles[targetId] = {
+            ...profile,
+            managedActionHistory: [...existingRows, row].slice(-MANAGED_ACTION_HISTORY_LIMIT)
+        };
+        const nextRoot = {
+            ...fresh,
+            schemaVersion: 4,
+            profiles
+        };
+        await io.saveProfilesV4(nextRoot);
+        profilesV4Cache = nextRoot;
+        return true;
+    }
+
+    async function sendManagedParentPolicyToVerifiedDevices(profileIds, { scope = 'active' } = {}) {
+        const targetIds = Array.from(new Set(safeArray(profileIds).map(id => normalizeString(id)).filter(Boolean)));
+        if (!targetIds.length) {
+            UIComponents.showToast('Select at least one protected profile first', 'info');
+            return null;
+        }
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function') {
+            UIComponents.showToast('Profiles unavailable', 'error');
+            return null;
+        }
+        if (!nanahManagedLivePolicy) {
+            UIComponents.showToast('Managed policy delivery helpers are unavailable', 'error');
+            return null;
+        }
+
+        const fresh = await io.loadProfilesV4();
+        const currentActive = normalizeString(fresh.activeProfileId) || activeProfileId || 'default';
+        if (getProfileType(fresh, currentActive) === 'child') {
+            UIComponents.showToast('Switch to the master or parent account before sending managed updates', 'error');
+            return null;
+        }
+        const okAdmin = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
+        if (!okAdmin) {
+            for (const targetId of targetIds) {
+                await recordManagedAdminAuthFailureHistory(fresh, targetId, 'managed_policy_push_unlock_failed');
+            }
+            return null;
+        }
+
+        await ensureNanahManagedSigningKeyPair({ required: true });
+        const normalizedScope = normalizeString(scope) || 'active';
+        const mailboxProvider = getNanahManagedMailboxProvider();
+        const localNetworkProvider = getNanahManagedLocalNetworkProvider();
+        const mailboxReady = hasNanahManagedMailboxUploadWriter(mailboxProvider);
+        const localReady = hasNanahManagedLocalNetworkDeliveryWriter(localNetworkProvider);
+        const profiles = safeObject(fresh.profiles);
+        const allowedTargets = targetIds.filter((targetId) => {
+            const profile = safeObject(profiles[targetId]);
+            return Object.keys(profile).length > 0 && canActiveProfileManageProfile(fresh, targetId);
+        });
+        if (!allowedTargets.length) {
+            UIComponents.showToast('No selected protected profile is manageable from this account', 'error');
+            return null;
+        }
+
+        const summary = {
+            targetCount: allowedTargets.length,
+            linkCount: 0,
+            deliveredCount: 0,
+            failedCount: 0,
+            liveSentCount: 0,
+            mailboxUploadedCount: 0,
+            localNetworkDeliveredCount: 0,
+            providerMissingCount: 0,
+            noLinkCount: 0
+        };
+
+        for (const targetId of allowedTargets) {
+            const targetProfile = safeObject(profiles[targetId]);
+            const links = getNanahSourceManagedLinksForTargetProfile(targetId, normalizedScope, targetProfile);
+            summary.linkCount += links.length;
+            if (!links.length) {
+                summary.noLinkCount += 1;
+                await recordManagedParentPolicyPushHistory(targetId, {
+                    scope: normalizedScope,
+                    linkCount: 0,
+                    deliveredCount: 0,
+                    failedCount: 1,
+                    reason: 'no_verified_child_device'
+                });
+                continue;
+            }
+            const liveLinks = links.filter(isNanahManagedLinkLiveConnected);
+            const liveReady = liveLinks.length > 0;
+            if (!liveReady && !mailboxReady && !localReady) {
+                summary.providerMissingCount += 1;
+                await recordManagedParentPolicyPushHistory(targetId, {
+                    scope: normalizedScope,
+                    linkCount: links.length,
+                    firstLinkId: links[0]?.linkId,
+                    deliveredCount: 0,
+                    failedCount: links.length,
+                    reason: 'managed_delivery_provider_unavailable'
+                });
+                continue;
+            }
+
+            const policy = {
+                linkType: 'managed_link',
+                authorityMode: 'managed',
+                scope: normalizedScope,
+                strategy: 'merge',
+                allowedScopes: [normalizedScope]
+            };
+            const transports = [];
+            let targetDelivered = 0;
+            let targetFailed = 0;
+            let liveSent = 0;
+            let mailboxUploaded = 0;
+            let localNetworkDelivered = 0;
+            let failureReason = '';
+            nanahManagedPolicySourceOverride = {
+                profileId: targetId,
+                profile: targetProfile,
+                sourceKind: 'command_center_protected_profile'
+            };
+            try {
+                if (liveReady && typeof nanahManagedLivePolicy.buildEnvelopeBatchForTrustedLinks === 'function') {
+                    const liveEnvelopes = await nanahManagedLivePolicy.buildEnvelopeBatchForTrustedLinks(policy, liveLinks);
+                    for (const signedEnvelope of liveEnvelopes) {
+                        await nanahClient.send(signedEnvelope);
+                        await nanahManagedLivePolicy.markSent(
+                            signedEnvelope.linkId,
+                            signedEnvelope.scope,
+                            signedEnvelope.revision,
+                            signedEnvelope.policyHash,
+                            {
+                                targetProfileId: signedEnvelope.targetProfileId,
+                                targetProfileName: signedEnvelope.targetProfileName,
+                                sourceProfileId: signedEnvelope.sourceProfileId,
+                                sourceDeviceId: signedEnvelope.sourceDeviceId,
+                                issuedAt: signedEnvelope.issuedAt,
+                                delivery: 'command_center_live_session'
+                            }
+                        );
+                    }
+                    liveSent = liveEnvelopes.length;
+                    if (liveSent > 0) transports.push('live_nanah_session');
+                    targetDelivered += liveSent;
+                }
+                if (localReady && typeof nanahManagedLivePolicy.deliverLocalNetworkPolicyBatch === 'function') {
+                    const localResult = await nanahManagedLivePolicy.deliverLocalNetworkPolicyBatch(
+                        policy,
+                        links,
+                        localNetworkProvider,
+                        {
+                            reason: 'command_center_parent_push',
+                            requestedAt: Date.now()
+                        }
+                    );
+                    localNetworkDelivered = normalizeNonNegativeInteger(localResult?.deliveredCandidateCount) || 0;
+                    if (localNetworkDelivered > 0) transports.push('local_network');
+                    targetDelivered += localNetworkDelivered;
+                    targetFailed += normalizeNonNegativeInteger(localResult?.failedCandidateCount) || 0;
+                    failureReason = failureReason || normalizeString(localResult?.reason);
+                }
+                if (mailboxReady && typeof nanahManagedLivePolicy.uploadMailboxPolicyBatch === 'function') {
+                    const mailboxResult = await nanahManagedLivePolicy.uploadMailboxPolicyBatch(
+                        policy,
+                        links,
+                        mailboxProvider,
+                        {
+                            reason: 'command_center_parent_push',
+                            requestedAt: Date.now()
+                        }
+                    );
+                    mailboxUploaded = normalizeNonNegativeInteger(mailboxResult?.uploadedMailboxItemCount) || 0;
+                    if (mailboxUploaded > 0) transports.push('encrypted_mailbox');
+                    targetDelivered += mailboxUploaded;
+                    targetFailed += normalizeNonNegativeInteger(mailboxResult?.failedMailboxItemCount) || 0;
+                    failureReason = failureReason || normalizeString(mailboxResult?.reason);
+                }
+            } catch (error) {
+                targetFailed += links.length;
+                failureReason = normalizeString(error?.message) || 'managed_policy_delivery_failed';
+            } finally {
+                nanahManagedPolicySourceOverride = null;
+            }
+            summary.deliveredCount += targetDelivered;
+            summary.failedCount += targetFailed;
+            summary.liveSentCount += liveSent;
+            summary.mailboxUploadedCount += mailboxUploaded;
+            summary.localNetworkDeliveredCount += localNetworkDelivered;
+            await recordManagedParentPolicyPushHistory(targetId, {
+                scope: normalizedScope,
+                linkCount: links.length,
+                firstLinkId: links[0]?.linkId,
+                deliveredCount: targetDelivered,
+                failedCount: targetFailed,
+                liveSentCount: liveSent,
+                mailboxUploadedCount: mailboxUploaded,
+                localNetworkDeliveredCount: localNetworkDelivered,
+                transports,
+                reason: targetDelivered > 0 ? '' : (failureReason || 'managed_policy_delivery_failed')
+            });
+        }
+
+        await loadNanahTrustedLinks();
+        await refreshProfilesUI();
+        if (summary.deliveredCount > 0) {
+            UIComponents.showToast(`Sent managed updates to ${summary.deliveredCount} verified policy queue${summary.deliveredCount === 1 ? '' : 's'}`, 'success');
+        } else if (summary.noLinkCount > 0) {
+            UIComponents.showToast('No selected profile has a verified child device link yet', 'error');
+        } else {
+            UIComponents.showToast('No delivery provider is available for verified-device updates yet', 'error');
+        }
+        return summary;
     }
 
     async function saveNanahTrustedLink(entry) {
@@ -10775,6 +11119,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function getNanahManagedPolicySourceProfile() {
+        const override = safeObject(nanahManagedPolicySourceOverride);
+        if (normalizeString(override.profileId) && Object.keys(safeObject(override.profile)).length > 0) {
+            return {
+                profileId: normalizeString(override.profileId),
+                profile: safeObject(override.profile),
+                sourceKind: normalizeString(override.sourceKind) || 'command_center_protected_profile'
+            };
+        }
         const managedProfile = getManagedChildProfile();
         const managedProfileId = normalizeString(managedChildEdit?.profileId);
         if (managedProfileId && managedProfile && Object.keys(safeObject(managedProfile)).length > 0) {
@@ -11711,6 +12063,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 isProfileLocked,
                 viewingAccessLabel,
                 managedTimeLimitLabel,
+                getManagedSyncTargetSummary,
                 onAction: async (intent) => {
                     const targetId = normalizeString(intent?.profileId);
                     const action = normalizeString(intent?.action);
@@ -11721,10 +12074,29 @@ document.addEventListener('DOMContentLoaded', async () => {
                         await showManagedActionHistory(targetId);
                     } else if (action === 'set_time_limit' || action === 'change_time_limit') {
                         await updateProfileTimeLimitPolicy(targetId, 'set');
+                    } else if (action === 'send_managed_policy') {
+                        await sendManagedParentPolicyToVerifiedDevices(
+                            [targetId],
+                            { scope: normalizeString(intent?.scope) || 'active' }
+                        );
+                    } else if (action === 'bulk_edit_rules') {
+                        const profileIds = safeArray(intent?.profileIds)
+                            .map(id => normalizeString(id))
+                            .filter(Boolean);
+                        if (profileIds.length !== 1) {
+                            UIComponents.showToast('Select one protected profile to edit rules from the command center.', 'info');
+                            return;
+                        }
+                        await startManagedChildEdit(profileIds[0]);
                     } else if (action === 'bulk_set_time_limit' || action === 'bulk_disable_time_limit') {
                         await updateMultipleProfileTimeLimitPolicies(
                             safeArray(intent?.profileIds),
                             action === 'bulk_disable_time_limit' ? 'disable' : 'set'
+                        );
+                    } else if (action === 'bulk_send_managed_policy') {
+                        await sendManagedParentPolicyToVerifiedDevices(
+                            safeArray(intent?.profileIds),
+                            { scope: normalizeString(intent?.scope) || 'active' }
                         );
                     } else if (action === 'bulk_allow_main_kids' || action === 'bulk_kids_only' || action === 'bulk_main_only') {
                         await updateMultipleProfileViewingAccess(
@@ -11769,7 +12141,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             body.className = 'help-item-body';
             body.textContent = `Viewing access: ${viewingAccessLabel(profiles[profileId])} | Time limit: ${managedTimeLimitLabel(profiles[profileId])}`;
             const canManageTarget = canActiveProfileManageProfile(profilesV4, profileId);
-            const managedStatusText = type === 'child'
+            const managedStatusText = profileId !== 'default'
                 ? buildManagedProfileStatusText(profiles[profileId], { revealDetails: canManageTarget && !childAdminRestricted })
                 : '';
             if (managedStatusText) {

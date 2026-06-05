@@ -31,9 +31,14 @@ extension-owned managed app policy contract artifact and app manifest copy row
 are now present so downstream app parity can be tested before native
 enforcement changes. Active/full signed managed sends now expand into concrete
 Main, Kids, viewing-space, and optional time-limit envelopes for eligible fixed
-targets. Built-in local-network peer discovery, LAN transport, built-in server
-mailbox upload/pull clients, app native enforcement proofs, offline later delivery UI, and
-built-in multi-device fanout remain gated. The adapter now exposes a
+targets. The dashboard command center now supports per-profile and
+selected-profile verified-device sends: connected verified replicas receive
+signed managed-policy envelopes over live Nanah P2P, and optional mailbox/LAN
+providers can receive ciphertext mailbox rows or signed local-network
+candidates when those provider hooks are installed. Built-in local-network peer
+discovery, LAN transport, built-in server mailbox upload/pull clients, app
+native enforcement proofs, and built-in app/server later-delivery providers
+remain gated. The adapter now exposes a
 local-network candidate authority gate for future LAN providers, and the
 dashboard has a sanitized receive bridge that records accepted/rejected
 local-network candidate outcomes through protected managed action history. This
@@ -541,7 +546,9 @@ replica child device over Nanah/P2P or same-network transport.
 - **Complexity**: 4/10
 - **Dependencies**: Task 3.6.
 - **Status**: Boundary proof, identity foundation, and connected-replica target
-  chooser added.
+  chooser added. Command-center per-profile and selected-profile send actions
+  now reuse the profile-scoped trusted-link behavior for verified-device
+  pushes.
   `saveNanahTrustedLink(...)`, `findNanahTrustedLink(...)`, and
   `getNanahCurrentTrustedLink(...)` now distinguish fixed managed target
   profiles on the same remote device. `buildEnvelopeBatchForTrustedLinks(...)`
@@ -549,8 +556,10 @@ replica child device over Nanah/P2P or same-network transport.
   the dashboard uses it for selected eligible fixed targets on the connected
   replica. Redacted per-target outbound send history and live ack history are
   now present. Pull-on-open mailbox ack handoff now writes protected redacted
-  target-profile history after the provider ack attempt; mailbox/local-network
-  fanout and source-side offline accepted/rejected ack summaries remain pending.
+  target-profile history after the provider ack attempt. Command-center sends
+  can also hand ciphertext mailbox items or signed local-network candidates to
+  optional providers when those hooks are installed. Built-in server mailbox
+  and LAN discovery/transports remain pending app/server/provider work.
 - **Acceptance Criteria**:
   - The doc names the profile-scoped trusted-link behavior.
   - The doc requires device plus target-profile binding before multi-child
@@ -591,17 +600,20 @@ the current extension dashboard.
   recent action history.
 - **Complexity**: 4/10
 - **Dependencies**: Sprints 1 and 2.
-- **Status**: Spec plus first dashboard child-row status increment present.
-  Parent/account-authorized child rows can now show compact local revision,
-  remote accepted-policy scope/link count, and protected history count status.
+- **Status**: Spec plus dashboard protected-profile status increment present.
+  Parent/account-authorized protected rows can now show compact local revision,
+  remote accepted-policy scope/link count, verified-device readiness, and
+  protected history count status. Default/Master can include independent
+  protected account profiles; parent accounts can include their child profiles.
   Parent/account-authorized profile manager views now also show a command-center
   overview for protected profiles, viewing spaces, time limits, sync status,
   and protected history. Command-center row buttons are delegated action intents
-  for existing gated Edit Rules, History, and Time Limit paths, plus local
-  selected-profile bulk time-limit and viewing-space actions; they do not carry
-  policy payloads or direct mutation authority. Child/protected views do not
-  receive detailed managed status text or command-center controls. Remote-rule,
-  mailbox, LAN, and multi-device bulk command-center writes remain pending.
+  for existing gated Edit Rules, History, Time Limit, and Send Update paths,
+  plus a selected-profile rule editor handoff, local selected-profile bulk
+  time-limit and viewing-space actions, and selected-profile signed-policy
+  sends. Child/protected views do not receive detailed managed status text or
+  command-center controls. Direct local rule bulk writes and built-in server
+  mailbox/LAN transports remain pending.
 - **Acceptance Criteria**:
   - UI has empty, loading, error, locked, offline, and sync-conflict states.
   - Parent actions are clear and reversible where possible.
@@ -618,6 +630,13 @@ the current extension dashboard.
   - matching UI/runtime tests
 - **Description**: Add the smallest runnable UI increment after the spec is
   accepted: managed profile status and action-history read-only panel.
+- **Status**: Implemented for the extension dashboard command center. The
+  surface keeps a compact operational layout, uses one protected-profile row
+  per manageable target, exposes per-row Send Update and selected-profile Send
+  selected updates actions, and records protected redacted history for send
+  success/failure/provider-pending cases. The implementation intentionally
+  avoids a separate oversized remote-management page until app/server provider
+  work exists.
 - **Complexity**: 7/10
 - **Dependencies**: Task 4.1 and action-history model.
 - **Acceptance Criteria**:

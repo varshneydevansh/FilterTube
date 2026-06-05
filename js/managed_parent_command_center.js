@@ -27,6 +27,9 @@
             isProfileLocked: typeof helpers.isProfileLocked === 'function' ? helpers.isProfileLocked : () => false,
             viewingAccessLabel: typeof helpers.viewingAccessLabel === 'function' ? helpers.viewingAccessLabel : () => 'Main + Kids',
             managedTimeLimitLabel: typeof helpers.managedTimeLimitLabel === 'function' ? helpers.managedTimeLimitLabel : () => 'No limit',
+            getManagedSyncTargetSummary: typeof helpers.getManagedSyncTargetSummary === 'function'
+                ? helpers.getManagedSyncTargetSummary
+                : () => ({ label: 'No verified device', targetCount: 0, readyCount: 0 }),
             onAction: typeof helpers.onAction === 'function' ? helpers.onAction : null
         };
     }
@@ -53,6 +56,14 @@
                 sensitiveAction: true
             },
             {
+                action: 'send_managed_policy',
+                label: 'Send Update',
+                profileId: targetId,
+                scope: 'active',
+                authority: 'managed_policy_provider_delivery',
+                sensitiveAction: true
+            },
+            {
                 action: timeLimitActive ? 'change_time_limit' : 'set_time_limit',
                 label: timeLimitActive ? 'Change Limit' : 'Set Limit',
                 profileId: targetId,
@@ -69,6 +80,22 @@
             .filter(Boolean);
         if (!profileIds.length) return [];
         return [
+            {
+                action: 'bulk_edit_rules',
+                label: 'Edit selected rules',
+                profileIds,
+                scope: 'main_kids',
+                authority: 'delegated_runtime_gate',
+                sensitiveAction: false
+            },
+            {
+                action: 'bulk_send_managed_policy',
+                label: 'Send selected updates',
+                profileIds,
+                scope: 'active',
+                authority: 'managed_policy_provider_delivery',
+                sensitiveAction: true
+            },
             {
                 action: 'bulk_set_time_limit',
                 label: 'Set selected limit',
@@ -131,33 +158,45 @@
         const root = h.safeObject(profilesV4);
         const profiles = h.safeObject(root.profiles);
         const rows = [];
+        const seen = new Set();
+        const activeProfileId = typeof root.activeProfileId === 'string' ? root.activeProfileId.trim() : 'default';
+        const addRow = (profileId, parentId) => {
+            if (!profileId || profileId === 'default' || profileId === activeProfileId || seen.has(profileId)) return;
+            if (!h.canActiveProfileManageProfile(root, profileId)) return;
+            seen.add(profileId);
+            const profile = h.safeObject(profiles[profileId]);
+            const summary = h.summarizeManagedPolicyStateForProfile(profile);
+            const syncTarget = h.getManagedSyncTargetSummary(profileId);
+            const timePolicy = h.getManagedTimeLimitPolicy(profile);
+            const latestActionLabel = summary.latestResult && summary.latestScope
+                ? `${summary.latestResult}/${summary.latestScope}`
+                : 'none';
+            const syncLabel = summary.remoteScopeCount
+                ? `Remote r${summary.latestRemoteRevision}`
+                : (summary.localLabels.length ? 'Local managed' : 'No policy yet');
+            rows.push({
+                profileId,
+                profileName: h.getProfileName(root, profileId),
+                parentName: h.getProfileName(root, parentId || 'default'),
+                locked: h.isProfileLocked(root, profileId),
+                viewingAccess: h.viewingAccessLabel(profile),
+                timeLimit: h.managedTimeLimitLabel(profile),
+                timeLimited: !!timePolicy?.enabled,
+                syncLabel,
+                syncTargetLabel: syncTarget.label,
+                syncTargetCount: syncTarget.targetCount,
+                syncReadyCount: syncTarget.readyCount,
+                remoteScopeCount: summary.remoteScopeCount,
+                historyRowCount: summary.historyRowCount,
+                protectedRowCount: summary.protectedRowCount,
+                latestActionLabel,
+                actionIntents: buildManagedCommandCenterActionIntents(profileId, timePolicy)
+            });
+        };
         h.getAccountIds(root).forEach((accountId) => {
+            addRow(accountId, 'default');
             h.getChildrenForAccount(root, accountId).forEach((profileId) => {
-                if (!h.canActiveProfileManageProfile(root, profileId)) return;
-                const profile = h.safeObject(profiles[profileId]);
-                const summary = h.summarizeManagedPolicyStateForProfile(profile);
-                const timePolicy = h.getManagedTimeLimitPolicy(profile);
-                const latestActionLabel = summary.latestResult && summary.latestScope
-                    ? `${summary.latestResult}/${summary.latestScope}`
-                    : 'none';
-                const syncLabel = summary.remoteScopeCount
-                    ? `Remote r${summary.latestRemoteRevision}`
-                    : (summary.localLabels.length ? 'Local managed' : 'No policy yet');
-                rows.push({
-                    profileId,
-                    profileName: h.getProfileName(root, profileId),
-                    parentName: h.getProfileName(root, accountId),
-                    locked: h.isProfileLocked(root, profileId),
-                    viewingAccess: h.viewingAccessLabel(profile),
-                    timeLimit: h.managedTimeLimitLabel(profile),
-                    timeLimited: !!timePolicy?.enabled,
-                    syncLabel,
-                    remoteScopeCount: summary.remoteScopeCount,
-                    historyRowCount: summary.historyRowCount,
-                    protectedRowCount: summary.protectedRowCount,
-                    latestActionLabel,
-                    actionIntents: buildManagedCommandCenterActionIntents(profileId, timePolicy)
-                });
+                addRow(profileId, accountId);
             });
         });
         return rows.reduce((acc, row) => ({
@@ -280,6 +319,7 @@
             for (const text of [
                 item.viewingAccess,
                 item.timeLimit,
+                item.syncTargetLabel,
                 `${item.syncLabel} | ${item.historyRowCount} history rows | latest ${item.latestActionLabel}`
             ]) {
                 const cell = document.createElement('span');
