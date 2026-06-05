@@ -214,7 +214,7 @@ Near-threshold product-owned source files:
 | File | Current lines | Boundary |
 | --- | ---: | --- |
 | `js/ui_components.js` | 998 | One small edit can cross 1000 lines; split or add proof before growth. |
-| `js/nanah_managed_live_policy.js` | 994 | Managed live-send, local-network delivery, and mailbox upload handoff helper. Any further growth should split delivery helpers or add explicit owner/decomposition proof before crossing 1000 lines. |
+| `js/nanah_managed_live_policy.js` | 999 | Managed live-send, local-network delivery, and mailbox upload handoff helper. Any further growth should split delivery helpers or add explicit owner/decomposition proof before crossing 1000 lines. |
 | `website/components/route-content.js` | 903 | Website route copy/components are close enough to require review before broadening. |
 
 Large vendor bundle files recorded separately:

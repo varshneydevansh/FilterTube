@@ -146,7 +146,11 @@ upload provider through a `filtertube_managed_mailbox_upload_request`. Provider
 acceptance is only queued-delivery feedback: `markSent(...)` is called only for
 mailbox item ids the provider accepted, and the protected replica still opens,
 validates, and applies the mailbox item through the managed-policy validator.
-This is a provider handoff, not a built-in mailbox server client.
+Before the upload provider sees the request, provider-facing mailbox items are
+rebuilt from an allowlist of ciphertext/index fields so stray local envelope,
+payload, decrypted-envelope, private-key, or plaintext metadata fields cannot
+cross the upload boundary. This is a provider handoff, not a built-in mailbox
+server client.
 
 This is not a mailbox runtime, built-in local-network discovery runtime,
 key-rotation system, or complete offline later-delivery UI.

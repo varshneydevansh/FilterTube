@@ -576,27 +576,22 @@
             const root = safeObject(envelope);
             const optionRoot = safeObject(options);
             const adapter = deps.getAdapter();
-            if (!adapter) {
-                throw new Error('Managed mailbox upload handoff requires the Nanah adapter.');
-            }
+            if (!adapter) throw new Error('Managed mailbox upload handoff requires the Nanah adapter.');
             const mailboxItemId = normalizeString(optionRoot.mailboxItemId);
+            const mailboxWrappingKey = optionRoot.mailboxWrappingKey || optionRoot.wrappingKey;
             const itemOptions = {
                 ...optionRoot,
-                ...(optionRoot.mailboxWrappingKey || optionRoot.wrappingKey
-                    ? { mailboxWrappingKey: optionRoot.mailboxWrappingKey || optionRoot.wrappingKey }
-                    : {}),
+                ...(mailboxWrappingKey ? { mailboxWrappingKey } : {}),
                 ...(mailboxItemId ? { mailboxItemId } : {})
             };
-            if (typeof adapter.sealManagedMailboxEnvelope === 'function' && (optionRoot.seal === true || optionRoot.mailboxWrappingKey || optionRoot.wrappingKey)) {
+            if (typeof adapter.sealManagedMailboxEnvelope === 'function' && (optionRoot.seal === true || mailboxWrappingKey)) {
                 return adapter.sealManagedMailboxEnvelope(root, itemOptions);
             }
-            if (typeof adapter.buildManagedMailboxStorageItem === 'function') {
-                const sealedPayload = typeof optionRoot.sealedPayloadForEnvelope === 'function'
-                    ? safeObject(await optionRoot.sealedPayloadForEnvelope(root, optionRoot.index || 0))
-                    : safeObject(optionRoot.sealedPayload);
-                return adapter.buildManagedMailboxStorageItem(root, sealedPayload, itemOptions);
-            }
-            throw new Error('Managed mailbox upload handoff requires mailbox seal/build helpers.');
+            if (typeof adapter.buildManagedMailboxStorageItem !== 'function') throw new Error('Managed mailbox upload handoff requires mailbox seal/build helpers.');
+            const sealedPayload = safeObject(typeof optionRoot.sealedPayloadForEnvelope === 'function'
+                ? await optionRoot.sealedPayloadForEnvelope(root, optionRoot.index || 0)
+                : optionRoot.sealedPayload);
+            return adapter.buildManagedMailboxStorageItem(root, sealedPayload, itemOptions);
         }
 
         async function buildMailboxStorageItemBatchForTrustedLinks(policy, trustedLinks, options = {}) {
@@ -604,21 +599,31 @@
             const optionRoot = safeObject(options);
             const items = [];
             for (let index = 0; index < envelopes.length; index += 1) {
-                const mailboxItemId = normalizeString(optionRoot.mailboxItemId)
-                    ? `${normalizeString(optionRoot.mailboxItemId)}-${index + 1}`
-                    : '';
-                items.push(await buildMailboxStorageItemFromEnvelope(envelopes[index], {
-                    ...optionRoot,
-                    index,
-                    ...(mailboxItemId ? { mailboxItemId } : {})
-                }));
+                const mailboxItemId = normalizeString(optionRoot.mailboxItemId) ? `${normalizeString(optionRoot.mailboxItemId)}-${index + 1}` : '';
+                items.push(await buildMailboxStorageItemFromEnvelope(envelopes[index], { ...optionRoot, index, ...(mailboxItemId ? { mailboxItemId } : {}) }));
             }
             return items;
         }
-
         function buildMailboxUploadRequest(items, options = {}) {
             const optionRoot = safeObject(options);
-            const rows = safeArray(items).map(row => safeObject(row)).filter(row => normalizeString(row.mailboxItemId));
+            const rows = safeArray(items).map((row) => {
+                const root = safeObject(row);
+                const mailboxItemId = normalizeString(root.mailboxItemId);
+                if (!mailboxItemId) return null;
+                const clean = {
+                    schema: normalizeString(root.schema) || 'filtertube_managed_mailbox_item',
+                    version: normalizeNonNegativeInteger(root.version) || 1, mailboxItemId,
+                    revision: normalizeNonNegativeInteger(root.revision), keyVersion: normalizeNonNegativeInteger(root.keyVersion) || 0,
+                    createdAtMs: normalizeNonNegativeInteger(root.createdAtMs) || deps.now(),
+                    expiresAtMs: root.expiresAtMs === null ? null : normalizeNonNegativeInteger(root.expiresAtMs),
+                    ackState: normalizeString(root.ackState) || 'pending'
+                };
+                for (const field of ['linkId', 'targetProfileId', 'sourceDeviceId', 'sourceProfileId', 'policyHash', 'sourcePublicKeyId', 'cipherSuite', 'keyAgreementId', 'encryptedDek', 'nonce', 'ciphertext', 'ciphertextHash']) {
+                    clean[field] = normalizeString(root[field]);
+                }
+                clean.scope = normalizeScope(root.scope);
+                return clean;
+            }).filter(Boolean);
             return {
                 schema: MANAGED_MAILBOX_UPLOAD_REQUEST_SCHEMA,
                 version: 1,

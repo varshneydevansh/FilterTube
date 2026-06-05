@@ -218,6 +218,7 @@ test('managed live signed-send audit is linked without claiming mailbox runtime'
   assert.match(mailboxSourceDeliveryDoc, /Source-side mailbox upload-provider handoff is present/);
   assert.match(mailboxSourceDeliveryDoc, /runtime built-in mailbox server upload client: absent/);
   assert.match(mailboxSourceDeliveryDoc, /runtime mailbox plaintext policy upload: absent/);
+  assert.match(doc, /provider-facing mailbox items are\s+rebuilt from an allowlist of ciphertext\/index fields/);
   assert.match(doc, new RegExp(sourceDeliveryDocPath));
   assert.match(doc, new RegExp(mailboxSourceDeliveryDocPath));
   assert.match(signingDoc, new RegExp(docPath));
@@ -564,6 +565,15 @@ test('managed live signed-send helper uploads mailbox ciphertext items and marks
   assert.equal(JSON.stringify(items).includes('UC-shakira'), false);
   assert.equal(JSON.stringify(items).includes('privateKeyJwk'), false);
 
+  Object.assign(items[1], {
+    payload: { keywords: ['shakira'], channels: ['UC-shakira'] },
+    envelope: { payload: { keywords: ['spiders'] } },
+    managedPolicyEnvelope: { payload: { channels: ['UC-leak'] } },
+    decryptedEnvelope: { payload: { videoIds: ['video-leak'] } },
+    privateKeyJwk: { d: 'private' },
+    channelName: 'Shakira'
+  });
+
   let capturedRequest = null;
   const provider = {
     async uploadManagedMailboxItems(request) {
@@ -588,7 +598,35 @@ test('managed live signed-send helper uploads mailbox ciphertext items and marks
   assert.deepEqual(capturedRequest.scopes, ['keywords', 'channels', 'videos']);
   assert.equal(capturedRequest.items.length, 3);
   assert.equal(JSON.stringify(capturedRequest).includes('"payload":'), false);
+  assert.equal(JSON.stringify(capturedRequest).includes('"envelope":'), false);
+  assert.equal(JSON.stringify(capturedRequest).includes('"managedPolicyEnvelope":'), false);
+  assert.equal(JSON.stringify(capturedRequest).includes('"decryptedEnvelope":'), false);
+  assert.equal(JSON.stringify(capturedRequest).includes('privateKeyJwk'), false);
   assert.equal(JSON.stringify(capturedRequest).includes('shakira'), false);
+  assert.equal(JSON.stringify(capturedRequest).includes('UC-leak'), false);
+  assert.deepEqual(Object.keys(capturedRequest.items[1]).sort(), [
+    'ackState',
+    'cipherSuite',
+    'ciphertext',
+    'ciphertextHash',
+    'createdAtMs',
+    'encryptedDek',
+    'expiresAtMs',
+    'keyAgreementId',
+    'keyVersion',
+    'linkId',
+    'mailboxItemId',
+    'nonce',
+    'policyHash',
+    'revision',
+    'schema',
+    'scope',
+    'sourceDeviceId',
+    'sourceProfileId',
+    'sourcePublicKeyId',
+    'targetProfileId',
+    'version'
+  ]);
   assert.deepEqual(plain(policyUpdates.map((entry) => entry.patch.policy.outboundManagedPolicyHistory[0].summary.delivery)), [
     'encrypted_mailbox_provider',
     'encrypted_mailbox_provider'

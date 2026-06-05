@@ -89,6 +89,11 @@ The upload request must not include `payload`, `operations`, `envelope`,
 `managedPolicyEnvelope`, `decryptedEnvelope`, private keys, keyword values,
 channel names, video ids, PINs, or plaintext policy JSON.
 
+The runtime rebuilds provider-facing `items[]` from that allowlist before
+calling the upload provider. This keeps source-side sent-state marking able to
+use the local mailbox item while preventing accidental adapter/provider
+metadata fields from crossing the mailbox upload boundary.
+
 ## Runtime Hooks Added
 
 ```text
@@ -107,6 +112,7 @@ js/nanah_managed_live_policy.js
 ```text
 runtime source-side mailbox storage item builder handoff: present
 runtime source-side mailbox upload-provider helper: present
+runtime provider upload item allowlist sanitizer: present
 runtime partial provider acceptance handling: present
 runtime sent revision/hash marking only for provider-accepted items: present
 runtime signed envelope authority unchanged: present

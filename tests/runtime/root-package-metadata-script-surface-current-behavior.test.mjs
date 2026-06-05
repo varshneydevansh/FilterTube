@@ -11,7 +11,7 @@ const rootMetadataRows = [
   ['.gitignore', 153, 2197, 'c90a7834297cf0a7b65493f41a21947fd5d85d1e14740b902cb3a3664028e3ca'],
   ['CHANGELOG.md', 591, 40124, 'e22a87ce7eeb88d171587d4b0f4676881a2c3081a7fbf15978d7e8d8582cdfdd'],
   ['LICENSE', 21, 1073, 'd0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d'],
-  ['README.md', 401, 22476, 'd006e9add205de3340dfae956b5566d7d397e950cfefe6400120c0ef123cbe43'],
+  ['README.md', 401, 22476, '422f098ade6dc2a1ee60505491579915b710894fa034df4dbbc01afab3c9a63a'],
   ['channel-identity-watch-mix-collab-recovery-plan.md', 262, 16023, '01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a'],
   ['package.json', 61, 2405, '36053d322780ce787de403be574cc400936ef2a994b4c8eca62561154fe81aec'],
   ['package-lock.json', 1461, 49916, 'f52d6482693be9cd4edacdc1f1491b4d2cda796522bfd0e4dcf86e0c879ad974'],
@@ -236,7 +236,7 @@ test('root public docs expose release and JSON-first claims that still need pari
 
   assert.match(readme, /version-3\.3\.2-blue\.svg/);
   assert.match(readme, /license-MIT-green\.svg/);
-  assert.match(readme, /total%20lines-534\.3k-brightgreen\.svg/);
+  assert.match(readme, /total%20lines-534\.5k-brightgreen\.svg/);
   assert.match(readme, /javascript-81\.9k%20lines-yellow\.svg/);
   assert.match(readme, /filtertube\.in\/downloads/);
   assert.match(readme, /Large Blocklist Matching \(v3\.3\.1\)/);
