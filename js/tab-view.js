@@ -3058,7 +3058,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const MANAGED_ACTION_HISTORY_ACCEPTED_RETENTION_MS = 30 * MANAGED_ACTION_HISTORY_DAY_MS;
     const MANAGED_ACTION_HISTORY_PROTECTED_RETENTION_MS = 90 * MANAGED_ACTION_HISTORY_DAY_MS;
     const MANAGED_ACTION_HISTORY_PROTECTED_RESULTS = new Set(['rejected', 'conflict', 'failed_auth', 'expired_session', 'cleared_by_admin']);
-    const MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set(['trust_link.revoke', 'policy.time_limit.update', 'policy.viewing_space.update', 'remote_policy.source_push']);
+    const MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set(['trust_link.revoke', 'trust_link.key_revoke', 'managed_signing_key.rotate', 'policy.time_limit.update', 'policy.viewing_space.update', 'remote_policy.source_push']);
     const MANAGED_ACTION_HISTORY_SUMMARY_PRIVACY_SCHEMA = 'filtertube_managed_action_history_summary_privacy';
     const MANAGED_ACTION_HISTORY_SAFE_LABELS = Object.freeze({
         'rule.video.block': 'Video rule changed',
@@ -3071,6 +3071,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         'policy.sync_policy.update': 'Sync policy changed',
         'trust_link.create': 'Trusted link created',
         'trust_link.revoke': 'Trusted link removed',
+        'trust_link.key_revoke': 'Trusted link key revoked',
+        'managed_signing_key.rotate': 'Managed signing key rotated',
         'admin_session.unlock': 'Admin session unlocked',
         'admin_session.failed_unlock': 'Admin unlock failed',
         'local_policy.update': 'Local policy changed',
@@ -3097,10 +3099,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         'localNetworkDeliveredCount',
         'mainRuleCount',
         'mailboxUploadedCount',
+        'mailboxPurgedCount',
+        'nextKeyVersion',
+        'previousKeyVersion',
         'protectedRows',
         'remoteFailedAttemptLimit',
         'remoteFailedAttempts',
         'removedScopeCount',
+        'revokedLinkCount',
         'retainedProtectedRows',
         'retryAt',
         'ruleCount',
@@ -9048,11 +9054,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         return normalizeNanahManagedSigningPublicDescriptor(await persistNanahManagedSigningKeyPair(keyPair));
     }
 
-    async function ensureNanahManagedSigningKeyPair({ required = false } = {}) {
+    async function ensureNanahManagedSigningKeyPair({ required = false, rotate = false } = {}) {
         const existing = normalizeNanahManagedSigningKeyPair(
             await readNanahStorage(NANAH_MANAGED_SIGNING_KEYPAIR_KEY)
         );
-        if (existing) {
+        if (existing && rotate !== true) {
             await persistNanahManagedSigningKeyPair(existing);
             return existing;
         }
@@ -9061,8 +9067,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (required) throw new Error('Managed signing key generation is unavailable');
             return null;
         }
+        const existingKeyVersion = normalizeNonNegativeInteger(existing?.managedKeyVersion || existing?.keyVersion || existing?.sourceKeyVersion) || 0;
         const generated = await adapter.createManagedNanahSigningKeyPair({
-            managedKeyVersion: 1
+            managedKeyVersion: rotate === true ? Math.max(1, existingKeyVersion + 1) : 1
         });
         return persistNanahManagedSigningKeyPair(generated);
     }
@@ -9080,7 +9087,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         await writeNanahStorage(NANAH_TRUSTED_LINKS_KEY, nanahTrustedLinks);
     }
 
-    function buildManagedTrustRevocationHistoryRow({ profileId, linkId, removedScopes, reason, now }) {
+    function buildManagedTrustRevocationHistoryRow({ profileId, linkId, removedScopes, reason, now, actionType = 'trust_link.revoke', label = 'Trusted parent link removed' }) {
         return {
             rowId: `managed-trust-revoke-${profileId}-${linkId}-${now}`,
             schema: MANAGED_ACTION_HISTORY_SCHEMA,
@@ -9089,7 +9096,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             actorDeviceId: nanahStableDeviceId || null,
             targetProfileId: profileId,
             trustedLinkId: linkId,
-            actionType: 'trust_link.revoke',
+            actionType,
             scope: 'trust_link',
             revision: null,
             policyHash: null,
@@ -9100,7 +9107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             orderKey: `revoke:${now}:${linkId}`,
             summary: {
                 redacted: true,
-                label: 'Trusted parent link removed',
+                label,
                 reason,
                 removedScopeCount: removedScopes.length,
                 removedScopes
@@ -9109,7 +9116,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
-    async function purgeNanahManagedPolicyStateForTrustedLink(linkId, { reason = 'trusted_link_removed' } = {}) {
+    async function purgeNanahManagedPolicyStateForTrustedLink(linkId, { reason = 'trusted_link_removed', actionType = 'trust_link.revoke', label = 'Trusted parent link removed' } = {}) {
         const normalized = normalizeString(linkId);
         if (!normalized) return { profilesTouched: 0, scopesRemoved: 0 };
         const io = window.FilterTubeIO || {};
@@ -9122,6 +9129,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         let changed = false;
         let profilesTouched = 0;
         let scopesRemoved = 0;
+        const touchedProfileIds = [];
         const now = Date.now();
 
         Object.entries(profiles).forEach(([profileId, profile]) => {
@@ -9145,7 +9153,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 linkId: normalized,
                 removedScopes,
                 reason,
-                now
+                now,
+                actionType,
+                label
             });
             profiles[profileId] = {
                 ...profile,
@@ -9154,10 +9164,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
             changed = true;
             profilesTouched += 1;
+            touchedProfileIds.push(profileId);
             scopesRemoved += removedScopes.length;
         });
 
-        if (!changed) return { profilesTouched: 0, scopesRemoved: 0 };
+        if (!changed) return { profilesTouched: 0, scopesRemoved: 0, touchedProfileIds: [] };
         const nextProfilesV4 = {
             ...fresh,
             schemaVersion: 4,
@@ -9165,7 +9176,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
         await io.saveProfilesV4(nextProfilesV4);
         profilesV4Cache = nextProfilesV4;
-        return { profilesTouched, scopesRemoved };
+        return { profilesTouched, scopesRemoved, touchedProfileIds };
     }
 
     async function purgeNanahManagedOpenSyncStateForTrustedLink(linkId) {
@@ -9194,6 +9205,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             ...state,
             checkedAt: Date.now(),
             reasonCode: 'trusted_link_removed',
+            purgedLinkId: normalized,
+            linkResults: linkResults.filter(row => normalizeString(row?.linkId) !== normalized)
+        });
+        return true;
+    }
+
+    async function purgeNanahManagedSourceAckSyncStateForTrustedLink(linkId) {
+        const normalized = normalizeString(linkId);
+        if (!normalized) return false;
+        const state = safeObject(nanahManagedSourceAckSyncState);
+        const linkResults = safeArray(state.linkResults);
+        if (!linkResults.some(row => normalizeString(row?.linkId) === normalized)) return false;
+        await persistNanahManagedSourceAckSyncState({
+            ...state,
+            checkedAt: Date.now(),
+            reasonCode: 'trusted_link_key_revoked',
             purgedLinkId: normalized,
             linkResults: linkResults.filter(row => normalizeString(row?.linkId) !== normalized)
         });
@@ -9356,6 +9383,61 @@ document.addEventListener('DOMContentLoaded', async () => {
                 localNetworkDeliveredCount: normalizeNonNegativeInteger(rootDetails.localNetworkDeliveredCount) || 0,
                 liveSentCount: normalizeNonNegativeInteger(rootDetails.liveSentCount) || 0,
                 transports: safeArray(rootDetails.transports).map(item => normalizeString(item)).filter(Boolean)
+            },
+            sensitive: true
+        };
+        profiles[targetId] = {
+            ...profile,
+            managedActionHistory: appendManagedActionHistoryRow(profile, row)
+        };
+        const nextRoot = {
+            ...fresh,
+            schemaVersion: 4,
+            profiles
+        };
+        await io.saveProfilesV4(nextRoot);
+        profilesV4Cache = nextRoot;
+        return true;
+    }
+
+    async function recordManagedSigningKeyRotationHistoryForLink(link, details = {}) {
+        const trusted = normalizeNanahTrustedLink(link);
+        const rootDetails = safeObject(details);
+        const targetId = getNanahTrustedLinkTargetProfileId(trusted);
+        const linkId = normalizeString(trusted?.linkId);
+        if (!targetId || !linkId) return false;
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') return false;
+        const fresh = await io.loadProfilesV4();
+        if (!canActiveProfileManageProfile(fresh, targetId)) return false;
+        const profiles = { ...safeObject(fresh.profiles) };
+        const profile = safeObject(profiles[targetId]);
+        if (!profile || Object.keys(profile).length === 0) return false;
+        const now = Date.now();
+        const row = {
+            rowId: `managed-signing-key-rotate-${targetId}-${linkId}-${now}`,
+            schema: MANAGED_ACTION_HISTORY_SCHEMA,
+            version: 1,
+            actorProfileId: normalizeString(fresh.activeProfileId) || activeProfileId || 'default',
+            actorDeviceId: normalizeString(nanahStableDeviceId) || 'local-extension-device',
+            targetProfileId: targetId,
+            trustedLinkId: linkId,
+            actionType: 'trust_link.key_revoke',
+            scope: 'trust_link',
+            revision: null,
+            policyHash: null,
+            result: 'accepted',
+            reason: 'source_signing_key_rotated',
+            receivedAt: now,
+            issuedAt: now,
+            orderKey: `key-rotate:${now}:${linkId}`,
+            summary: {
+                redacted: true,
+                label: 'Managed signing key rotated',
+                revokedLinkCount: 1,
+                mailboxPurgedCount: normalizeNonNegativeInteger(rootDetails.mailboxPurgedCount) || 0,
+                previousKeyVersion: normalizeNonNegativeInteger(rootDetails.previousKeyVersion) || 0,
+                nextKeyVersion: normalizeNonNegativeInteger(rootDetails.nextKeyVersion) || 0
             },
             sensitive: true
         };
@@ -9621,6 +9703,123 @@ document.addEventListener('DOMContentLoaded', async () => {
         await persistNanahTrustedLinks();
         renderNanahTrustedLinks();
         return { mailboxPurgeResult };
+    }
+
+    function isActiveNanahSourceManagedLink(link) {
+        const trusted = normalizeNanahTrustedLink(link);
+        if (!trusted || trusted.linkType !== 'managed_link') return false;
+        const policy = safeObject(trusted.policy);
+        if (trusted.localRole !== 'source' || trusted.remoteRole !== 'replica') return false;
+        if (trusted.revoked === true || policy.revoked === true) return false;
+        if (trusted.keyRevoked === true || policy.keyRevoked === true) return false;
+        return true;
+    }
+
+    async function rotateNanahManagedSourceSigningKey() {
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function') {
+            UIComponents.showToast('Profiles unavailable', 'error');
+            return null;
+        }
+        const fresh = await io.loadProfilesV4();
+        const currentActive = normalizeString(fresh.activeProfileId) || activeProfileId || 'default';
+        if (getProfileType(fresh, currentActive) === 'child') {
+            UIComponents.showToast('Switch to the master or parent account before rotating managed trust keys', 'error');
+            return null;
+        }
+        const sourceLinks = safeArray(nanahTrustedLinks)
+            .map((entry) => normalizeNanahTrustedLink(entry))
+            .filter(isActiveNanahSourceManagedLink);
+        if (!sourceLinks.length) {
+            UIComponents.showToast('No active managed child-device links need key rotation', 'info');
+            return null;
+        }
+        const confirmed = window.confirm(
+            'Rotate the managed signing key for this parent device? This revokes existing managed child-device links and those devices must be paired again before they can receive new managed updates.'
+        );
+        if (!confirmed) return null;
+        const okAdmin = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
+        if (!okAdmin) {
+            for (const link of sourceLinks) {
+                const targetId = getNanahTrustedLinkTargetProfileId(link);
+                if (targetId) await recordManagedAdminAuthFailureHistory(fresh, targetId, 'managed_signing_key_rotate_unlock_failed');
+            }
+            return null;
+        }
+
+        const previousKey = normalizeNanahManagedSigningKeyPair(
+            await readNanahStorage(NANAH_MANAGED_SIGNING_KEYPAIR_KEY)
+        );
+        const previousKeyVersion = normalizeNonNegativeInteger(previousKey?.managedKeyVersion || previousKey?.keyVersion || previousKey?.sourceKeyVersion) || 0;
+        const nextKey = await ensureNanahManagedSigningKeyPair({ required: true, rotate: true });
+        if (!nextKey) {
+            UIComponents.showToast('Managed signing key rotation failed', 'error');
+            return null;
+        }
+        const nextKeyVersion = normalizeNonNegativeInteger(nextKey.managedKeyVersion || nextKey.keyVersion || nextKey.sourceKeyVersion) || 0;
+
+        const now = Date.now();
+        const affectedIds = new Set(sourceLinks.map(link => normalizeString(link.linkId)).filter(Boolean));
+        nanahTrustedLinks = safeArray(nanahTrustedLinks).map((entry) => {
+            const trusted = normalizeNanahTrustedLink(entry);
+            const linkId = normalizeString(trusted?.linkId);
+            if (!trusted || !affectedIds.has(linkId)) return entry;
+            const currentPolicy = safeObject(trusted.policy);
+            return {
+                ...trusted,
+                keyRevoked: true,
+                revokedAt: now,
+                keyRevokedAt: now,
+                revocationReason: 'source_signing_key_rotated',
+                policy: {
+                    ...currentPolicy,
+                    keyRevoked: true,
+                    revokedAt: now,
+                    keyRevokedAt: now,
+                    revocationReason: 'source_signing_key_rotated'
+                }
+            };
+        });
+
+        let mailboxPurgedCount = 0;
+        for (const link of sourceLinks) {
+            const purge = await purgeNanahManagedMailboxQueueForTrustedLink(link, { reason: 'source_signing_key_rotated' });
+            const linkMailboxPurgedCount = normalizeNonNegativeInteger(purge?.purgedMailboxItemCount) || 0;
+            mailboxPurgedCount += linkMailboxPurgedCount;
+            const linkId = normalizeString(link.linkId);
+            const policyPurge = await purgeNanahManagedPolicyStateForTrustedLink(linkId, {
+                reason: 'source_signing_key_rotated',
+                actionType: 'trust_link.key_revoke',
+                label: 'Managed signing key rotated'
+            });
+            const targetId = getNanahTrustedLinkTargetProfileId(link);
+            if (!safeArray(policyPurge?.touchedProfileIds).includes(targetId)) {
+                await recordManagedSigningKeyRotationHistoryForLink(link, {
+                    previousKeyVersion,
+                    nextKeyVersion,
+                    mailboxPurgedCount: linkMailboxPurgedCount
+                });
+            }
+            await purgeNanahManagedOpenSyncStateForTrustedLink(linkId);
+            await purgeNanahManagedLocalNetworkSyncStateForTrustedLink(linkId);
+            await purgeNanahManagedSourceAckSyncStateForTrustedLink(linkId);
+        }
+
+        await persistNanahTrustedLinks();
+        renderNanahTrustedLinks();
+        await loadNanahManagedSigningKeyDescriptor();
+        await refreshProfilesUI();
+        UIComponents.showToast(
+            `Managed signing key rotated. ${sourceLinks.length} child-device link${sourceLinks.length === 1 ? '' : 's'} must be paired again.`,
+            'success'
+        );
+        return {
+            rotated: true,
+            previousKeyVersion,
+            nextKeyVersion,
+            revokedLinkCount: sourceLinks.length,
+            mailboxPurgedCount
+        };
     }
 
     async function updateNanahTrustedLinkPolicy(linkId, updates = {}) {
@@ -10419,6 +10618,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 meta.appendChild(policyPill);
             }
 
+            if (entry?.keyRevoked === true || safeObject(entry?.policy).keyRevoked === true) {
+                const revokedPill = document.createElement('span');
+                revokedPill.className = 'nanah-trusted-link__pill';
+                revokedPill.textContent = 'key revoked';
+                meta.appendChild(revokedPill);
+            }
+
             if (safeObject(entry?.policy).autoApplyControlProposals === true) {
                 const autoPill = document.createElement('span');
                 autoPill.className = 'nanah-trusted-link__pill';
@@ -10476,6 +10682,33 @@ document.addEventListener('DOMContentLoaded', async () => {
                     await configureNanahTrustedLink(entry);
                 });
                 actions.appendChild(editBtn);
+            }
+
+            if (
+                safeObject(entry?.policy).linkType === 'managed_link'
+                && normalizeString(entry?.localRole) === 'source'
+                && normalizeString(entry?.remoteRole) === 'replica'
+                && isActiveNanahSourceManagedLink(entry)
+            ) {
+                const rotateKeyBtn = document.createElement('button');
+                rotateKeyBtn.type = 'button';
+                rotateKeyBtn.className = 'btn-secondary';
+                rotateKeyBtn.textContent = 'Rotate Key';
+                rotateKeyBtn.title = 'Regenerate this parent device signing key and require managed child devices to pair again.';
+                rotateKeyBtn.disabled = childAdminRestricted;
+                rotateKeyBtn.addEventListener('click', async () => {
+                    if (childAdminRestricted) {
+                        UIComponents.showToast('Child profiles cannot rotate managed trust keys', 'error');
+                        return;
+                    }
+                    try {
+                        await rotateNanahManagedSourceSigningKey();
+                    } catch (error) {
+                        console.error('FilterTube: managed signing key rotation failed', error);
+                        UIComponents.showToast(error?.message || 'Managed signing key rotation failed', 'error');
+                    }
+                });
+                actions.appendChild(rotateKeyBtn);
             }
 
             const removeBtn = document.createElement('button');

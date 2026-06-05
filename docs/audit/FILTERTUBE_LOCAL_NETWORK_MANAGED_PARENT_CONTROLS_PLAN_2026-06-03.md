@@ -38,7 +38,11 @@ providers can receive ciphertext mailbox rows or signed local-network
 candidates when those provider hooks are installed. Built-in local-network peer
 discovery, LAN transport, built-in server mailbox upload/pull clients, app
 native enforcement proofs, and built-in app/server later-delivery providers
-remain gated. The adapter now exposes a
+remain gated. Source-side managed signing-key rotation is now an explicit
+parent/admin action: it regenerates the local source keypair, key-revokes active
+managed child-device links, purges pending provider/open-sync/LAN/source-ack
+state for those links, and writes protected history so the affected devices must
+be paired again. The adapter now exposes a
 local-network candidate authority gate for future LAN providers, and the
 dashboard has a sanitized receive bridge that records accepted/rejected
 local-network candidate outcomes through protected managed action history. This
@@ -78,6 +82,8 @@ metadata, not plaintext rules or authority.
   to optional trusted providers when those provider hooks are installed.
 - [x] Parent-side push attempts write redacted protected history rows for sent,
   missing-link, provider-pending, and failed cases.
+- [x] Parent-side managed signing-key rotation can revoke active child-device
+  managed links, purge queued provider/status state, and force re-pairing.
 - [x] Child/protected-device open-sync path can apply only validated signed
   managed-policy envelopes from trusted links and keeps the last accepted policy
   while offline.
@@ -130,8 +136,8 @@ until these authority details are specified and tested:
   profile, scope, and revision.
 - **Signature/integrity**: a policy must be signed or authenticated before the
   child/replica device accepts it.
-- **Rotation and revocation**: key rotation, trust revocation, and compromised
-  device recovery must be explicit.
+- **Rotation and revocation**: source-side key rotation and trust revocation are
+  explicit; compromised device recovery still requires installed-device proof.
 - **Hostile LAN safety**: peer discovery must tolerate spoofed announcements,
   duplicate device ids, stale pairing records, NAT/reconnect identity drift,
   and MITM attempts.
@@ -515,14 +521,21 @@ replica child device over Nanah/P2P or same-network transport.
   attempt. Source-side provider-fed mailbox/local-network delivery ack summaries
   are now present under
   `docs/audit/FILTERTUBE_MANAGED_SOURCE_DELIVERY_ACK_STATUS_2026-06-05.md`.
-  Offline mailbox/local-network delivery, cross-device fanout, and richer
-  per-target preview controls remain later slices. Local selected-profile
-  time-limit and viewing-space bulk writes are already dashboard-gated.
+  Source-side parent/admin key rotation can now force-generate a new local
+  managed signing keypair, mark active Source -> Replica child-device links as
+  `keyRevoked`, purge provider/open-sync/LAN/source-ack state for those old
+  links, and add protected target-profile history rows. Offline
+  mailbox/local-network delivery, cross-device fanout, compromise-recovery
+  proof, and richer per-target preview controls remain later slices. Local
+  selected-profile time-limit and viewing-space bulk writes are already
+  dashboard-gated.
 - **Acceptance Criteria**:
   - The public descriptor is separated from the private keypair.
   - The private JWK is not placed in the Nanah hello descriptor or trusted link
     policy.
   - The signing helper refuses malformed signed-field bindings.
+  - Source-side rotation is parent/admin gated and old child-device links cannot
+    be reused for future managed sends.
   - Docs do not claim encrypted-at-rest private key storage, mailbox runtime,
     or broad active/full managed-policy transport.
 - **Validation**:
