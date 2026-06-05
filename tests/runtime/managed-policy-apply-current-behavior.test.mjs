@@ -243,6 +243,48 @@ test('managed policy apply blocks stale replay after accepted revision has been 
   assert.equal(harness.saveCount, 1);
 });
 
+test('managed policy apply refuses revoked queued delivery without mutating the child profile', async () => {
+  const harness = createAdapterHarness();
+  const before = plain(harness.profiles.profiles['child-profile-1']);
+  const envelope = signedEnvelope({ revision: 6 });
+
+  const directResult = await harness.adapter.applyManagedPolicyEnvelope(
+    envelope,
+    validationContext(harness.profiles, {
+      trustedLink: {
+        ...validationContext(harness.profiles).trustedLink,
+        revoked: true
+      }
+    })
+  );
+
+  assert.deepEqual(plain(directResult), { accepted: false, reason: 'link_revoked' });
+  assert.equal(harness.saveCount, 0);
+  assert.deepEqual(plain(harness.profiles.profiles['child-profile-1']), before);
+
+  const mailboxResult = await harness.adapter.applyManagedMailboxItem(
+    {
+      schema: 'filtertube_managed_mailbox_item',
+      version: 1,
+      decryptedEnvelope: envelope
+    },
+    validationContext(harness.profiles, {
+      trustedLink: {
+        ...validationContext(harness.profiles).trustedLink,
+        revoked: true
+      }
+    })
+  );
+
+  assert.deepEqual(plain(mailboxResult), {
+    accepted: false,
+    reason: 'link_revoked',
+    ackState: 'revoked'
+  });
+  assert.equal(harness.saveCount, 0);
+  assert.deepEqual(plain(harness.profiles.profiles['child-profile-1']), before);
+});
+
 test('managed policy apply supports channel and video blocking on child kids surface', async () => {
   const harness = createAdapterHarness();
   await harness.adapter.applyManagedPolicyEnvelope(

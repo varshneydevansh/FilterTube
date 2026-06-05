@@ -102,9 +102,9 @@ test('managed trust revocation cleanup is runtime-backed and documented as local
   assert.match(tabView, /removeBtn\.disabled = childManagedReplicaLink/);
 
   assert.match(inventory, /trusted-link removal now purges\s+target-local accepted managed-policy revision state/i);
-  assert.match(inventory, /server mailbox queue purge remains pending/i);
+  assert.match(inventory, /server mailbox queue\s+purge remains pending/i);
   assert.match(plan, /trusted-link removal cleanup: present/i);
-  assert.match(history, /trusted-link removal history writer\s+now records protected `trust_link\.revoke` rows/i);
+  assert.match(history, /trusted-link removal history writer\s+now records protected `trust_link\.revoke`\s+rows/i);
 });
 
 test('managed trust revocation fixture removes only the revoked link state and keeps protected evidence', () => {

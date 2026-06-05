@@ -4,9 +4,10 @@
 **Status**: Protocol, proof fixture, source-side WebCrypto mailbox seal/open
 helpers, source-side server-safe mailbox storage item builder, local decrypted
 mailbox-item intake, source-side mailbox upload-provider handoff,
-provider-gated dashboard/profile-open pull hook, provider ack handoff, and
-protected target-profile ack-handoff evidence are present. Runtime built-in
-server upload/pull clients are not implemented.
+provider-gated dashboard/profile-open pull hook, provider ack handoff,
+protected target-profile ack-handoff evidence, and revoked queued-delivery
+local apply guard proof are present. Runtime built-in server upload/pull clients
+are not implemented.
 **Related plan**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`  
 **Related inventory**:
@@ -219,6 +220,12 @@ If that provider returns `ok: false` or throws while pulling, the open-sync hook
 discards any returned mailbox items, does not apply or acknowledge them, and
 keeps the last valid accepted policy active.
 
+Revoked queued delivery now has an executable local apply guard: direct signed
+managed envelopes and already-decrypted mailbox items both return
+`link_revoked` before any profile save when the local trusted link has been
+revoked. Mailbox apply reports `ackState: revoked` for that local decision. This
+is not server queue purge; no built-in mailbox server queue exists yet.
+
 Current runtime status:
 
 ```text
@@ -234,6 +241,7 @@ runtime provider-gated dashboard/profile-open pull hook: present
 runtime provider-gated ack handoff: present
 runtime protected mailbox ack-handoff history rows: present
 runtime provider failure fail-closed apply guard: present
+runtime revoked queued-delivery local apply guard: present
 runtime mailbox encryption client: present for local seal helper only
 runtime built-in mailbox server upload client: absent
 runtime built-in mailbox server pull client: absent
