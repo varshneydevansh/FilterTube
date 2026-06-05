@@ -34,11 +34,11 @@
         };
     }
 
-    function buildManagedCommandCenterActionIntents(profileId, timePolicy) {
+    function buildManagedCommandCenterActionIntents(profileId, timePolicy, policySummary = {}) {
         const targetId = typeof profileId === 'string' ? profileId.trim() : '';
         if (!targetId) return [];
         const timeLimitActive = timePolicy?.enabled === true;
-        return [
+        const intents = [
             {
                 action: 'edit_rules',
                 label: 'Edit Rules',
@@ -72,6 +72,49 @@
                 sensitiveAction: true
             }
         ];
+        if ((Number(policySummary.remoteConflictCount) || 0) > 0) {
+            intents.splice(2, 0, {
+                action: 'review_conflicts',
+                label: 'Review Conflict',
+                profileId: targetId,
+                scope: 'admin_history',
+                authority: 'delegated_runtime_gate',
+                sensitiveAction: true
+            });
+        }
+        return intents;
+    }
+
+    function resolveManagedCommandCenterSyncState(item = {}) {
+        const conflictCount = Number(item.remoteConflictCount) || 0;
+        if (conflictCount > 0) {
+            return {
+                key: 'conflict',
+                label: `${conflictCount} conflict${conflictCount === 1 ? '' : 's'}`,
+                tone: 'danger'
+            };
+        }
+        const targetCount = Number(item.syncTargetCount) || 0;
+        const readyCount = Number(item.syncReadyCount) || 0;
+        if (targetCount <= 0) {
+            return {
+                key: 'no_device',
+                label: 'No verified device',
+                tone: 'muted'
+            };
+        }
+        if (readyCount <= 0) {
+            return {
+                key: 'provider_pending',
+                label: 'Provider pending',
+                tone: 'warning'
+            };
+        }
+        return {
+            key: 'ready',
+            label: 'Sync ready',
+            tone: 'success'
+        };
     }
 
     function buildManagedCommandCenterBulkActionIntents(rows = []) {
@@ -199,6 +242,7 @@
             const syncLabel = summary.remoteScopeCount
                 ? `Remote r${summary.latestRemoteRevision}`
                 : (summary.localLabels.length ? 'Local managed' : 'No policy yet');
+            const remoteConflictCount = summary.remoteConflictCount || 0;
             rows.push({
                 profileId,
                 profileName: h.getProfileName(root, profileId),
@@ -214,9 +258,11 @@
                 remoteScopeCount: summary.remoteScopeCount,
                 historyRowCount: summary.historyRowCount,
                 protectedRowCount: summary.protectedRowCount,
-                remoteConflictCount: summary.remoteConflictCount || 0,
+                remoteConflictCount,
                 latestActionLabel,
-                actionIntents: buildManagedCommandCenterActionIntents(profileId, timePolicy)
+                actionIntents: buildManagedCommandCenterActionIntents(profileId, timePolicy, {
+                    remoteConflictCount
+                })
             });
         };
         h.getAccountIds(root).forEach((accountId) => {
@@ -318,8 +364,13 @@
         const list = document.createElement('div');
         list.className = 'ft-managed-command-center__list';
         summary.rows.forEach((item) => {
+            const syncState = resolveManagedCommandCenterSyncState(item);
             const row = document.createElement('div');
-            row.className = `ft-managed-command-center__row${item.locked ? ' is-locked' : ''}`;
+            row.className = [
+                'ft-managed-command-center__row',
+                item.locked ? 'is-locked' : '',
+                syncState.key ? `is-sync-${syncState.key}` : ''
+            ].filter(Boolean).join(' ');
             const selector = document.createElement('input');
             selector.className = 'ft-managed-command-center__select';
             selector.type = 'checkbox';
@@ -344,11 +395,23 @@
             const labelWrap = document.createElement('div');
             labelWrap.append(name, owner);
             profileCell.append(selector, labelWrap);
+            const statusCell = document.createElement('div');
+            statusCell.className = 'ft-managed-command-center__status';
+            [
+                { label: item.viewingAccess, tone: 'neutral' },
+                { label: item.timeLimit, tone: item.timeLimited ? 'warning' : 'neutral' },
+                { label: syncState.label, tone: syncState.tone },
+                { label: item.syncLabel, tone: item.remoteScopeCount ? 'success' : 'neutral' }
+            ].forEach((chip) => {
+                const status = document.createElement('span');
+                status.className = `ft-managed-command-center__chip is-${chip.tone}`;
+                status.textContent = chip.label;
+                statusCell.appendChild(status);
+            });
+            row.appendChild(statusCell);
             for (const text of [
-                item.viewingAccess,
-                item.timeLimit,
                 item.syncTargetLabel,
-                `${item.syncLabel} | ${item.historyRowCount} history rows | ${item.remoteConflictCount || 0} conflicts | latest ${item.latestActionLabel}`
+                `${item.historyRowCount} history rows | latest ${item.latestActionLabel}`
             ]) {
                 const cell = document.createElement('span');
                 cell.textContent = text;

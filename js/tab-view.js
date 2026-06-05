@@ -12516,7 +12516,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (!targetId && !action.startsWith('bulk_')) return;
                     if (action === 'edit_rules') {
                         await startManagedChildEdit(targetId);
-                    } else if (action === 'view_history') {
+                    } else if (action === 'view_history' || action === 'review_conflicts') {
                         await showManagedActionHistory(targetId);
                     } else if (action === 'set_time_limit' || action === 'change_time_limit') {
                         await updateProfileTimeLimitPolicy(targetId, 'set');

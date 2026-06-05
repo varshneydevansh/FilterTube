@@ -525,7 +525,7 @@ html[data-theme="dark"] body::after {
 .ft-managed-command-center__row {
     min-height: 44px;
     display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(90px, 0.6fr) minmax(90px, 0.6fr) minmax(110px, 0.75fr) minmax(0, 1fr) minmax(160px, 0.9fr);
+    grid-template-columns: minmax(0, 1.1fr) minmax(160px, 1fr) minmax(110px, 0.7fr) minmax(0, 0.95fr) minmax(170px, 0.9fr);
     gap: 10px;
     align-items: center;
     padding: 9px 10px;
@@ -536,6 +536,10 @@ html[data-theme="dark"] body::after {
 
 .ft-managed-command-center__row.is-locked {
     border-style: dashed;
+}
+
+.ft-managed-command-center__row.is-sync-conflict {
+    border-color: color-mix(in srgb, var(--ft-color-sem-danger, #ef4444) 60%, var(--ft-color-sem-neutral-border));
 }
 
 .ft-managed-command-center__profile {
@@ -569,6 +573,44 @@ html[data-theme="dark"] body::after {
     color: var(--ft-color-text-secondary);
     font-size: 12px;
     line-height: 1.35;
+}
+
+.ft-managed-command-center__status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    min-width: 0;
+}
+
+.ft-managed-command-center__chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    max-width: 100%;
+    padding: 3px 7px;
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    border-radius: 8px;
+    background-color: var(--ft-color-bg-panel);
+    color: var(--ft-color-text-secondary);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+
+.ft-managed-command-center__chip.is-success {
+    border-color: color-mix(in srgb, var(--ft-color-sem-success, #22c55e) 55%, var(--ft-color-sem-neutral-border));
+    color: var(--ft-color-sem-success, #22c55e);
+}
+
+.ft-managed-command-center__chip.is-warning {
+    border-color: color-mix(in srgb, var(--ft-color-sem-warning, #f59e0b) 55%, var(--ft-color-sem-neutral-border));
+    color: var(--ft-color-sem-warning, #f59e0b);
+}
+
+.ft-managed-command-center__chip.is-danger {
+    border-color: color-mix(in srgb, var(--ft-color-sem-danger, #ef4444) 55%, var(--ft-color-sem-neutral-border));
+    color: var(--ft-color-sem-danger, #ef4444);
 }
 
 .ft-managed-command-center__actions {

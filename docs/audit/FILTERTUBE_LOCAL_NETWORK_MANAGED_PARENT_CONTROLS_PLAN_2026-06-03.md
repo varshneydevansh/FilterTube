@@ -655,9 +655,10 @@ the current extension dashboard.
   time-limit and viewing-space actions, and selected-profile signed-policy
   sends. Child/protected views do not receive detailed managed status text or
   command-center controls. Direct local selected-profile video/keyword/channel
-  rule additions are present. Command-center rows show remote conflict counts
-  for parent/admin inspection. Built-in server mailbox/LAN transports remain
-  pending.
+  rule additions are present. Command-center rows now separate sync readiness
+  into compact status chips, mark remote conflict rows visually, and expose a
+  protected Review Conflict action that opens the parent/account history gate.
+  Built-in server mailbox/LAN transports remain pending.
 - **Acceptance Criteria**:
   - UI has empty, loading, error, locked, offline, and sync-conflict states.
   - Parent actions are clear and reversible where possible.
@@ -677,10 +678,11 @@ the current extension dashboard.
 - **Status**: Implemented for the extension dashboard command center. The
   surface keeps a compact operational layout, uses one protected-profile row
   per manageable target, exposes per-row Send Update and selected-profile Send
-  selected updates actions, and records protected redacted history for send
-  success/failure/provider-pending cases. The implementation intentionally
-  avoids a separate oversized remote-management page until app/server provider
-  work exists. Bulk time-limit and viewing-space actions now use the same
+  selected updates actions, shows compact status chips for access, limits, sync
+  readiness, and remote conflict state, and records protected redacted history
+  for send success/failure/provider-pending cases. The implementation
+  intentionally avoids a separate oversized remote-management page until
+  app/server provider work exists. Bulk time-limit and viewing-space actions now use the same
   protected-profile authority predicate as the command-center rows, so
   Default/Master-managed independent account profiles are not silently skipped.
 - **Complexity**: 7/10
