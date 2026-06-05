@@ -27,7 +27,7 @@ covered by the CSS load/style surface and style-hide authority audits.
 | `css/design_tokens.css` | active extension token CSS | 301 | 10,361 | `7da73da79df23e6325c921e45fd786270488ee8ad212b57b7e634b63898c27dc` |
 | `css/components.css` | active extension component CSS | 1,686 | 45,567 | `db01d30c717e34c108e48d92807ce3df4bcafccace62a1808d86d03ed7047ebc` |
 | `css/popup.css` | active popup CSS | 1,151 | 29,731 | `812cb4ba8b4c9be732bd8a2a6f7b06b5d8d0a8c3fb7416f391f475ae627d45fa` |
-| `css/tab-view.css` | active dashboard CSS | 2,986 | 72,211 | `3d07057381c63e2d3d117b6be466eb31eeb35df80f00747403f79fb0f28efdce` |
+| `css/tab-view.css` | active dashboard CSS | 3,097 | 75,457 | `79976656ce086984edb87de3aea13c1820b1b690a3c4e5a63417a66fecf891ff` |
 | `css/serene-shell.css` | active generated-shell CSS | 3,414 | 87,230 | `785e988dd0176b16defcc08f77925de8eaa60ea831d53cd57147eb601c490f0a` |
 | `html/popup.html` | popup loader shell | 31 | 1,213 | `c5e03a38b2737dbd01e2cd0c243b37754936e2e349e9d2275b195350159aea31` |
 | `html/tab-view.html` | dashboard loader shell | 1,600 | 136,305 | `5124626e39cd3879da6593bc9bfa8287f0ad5b9ae29dcbb075d9e5bce0389d0b` |
@@ -37,19 +37,19 @@ covered by the CSS load/style surface and style-hide authority audits.
 | `js/ui-shell/popup-shell.js` | generated popup shell output | 374 | 21,080 | `dc750d44dd4b9fde63b85b4dfc9f5ce9ba76964afbd6dfcedc7b3b7cce084b05` |
 | `js/ui-shell/tab-view-decor.js` | generated dashboard ambient output | 323 | 18,289 | `234171091e523aa5de4c3c0f97e7341c55893bdd31b3e25a075490170fa9742f` |
 | `js/popup.js` | hand-owned popup runtime | 1,841 | 75,587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
-| `js/tab-view.js` | hand-owned dashboard runtime | 14,926 | 695,872 | `5cdae945aca165b11af3c3f9fc246e89da3ce6780939013081e5d035b4163323` |
-| `js/managed_parent_command_center.js` | hand-owned managed parent command-center runtime | 296 | 14,757 | `23138da6164f82b507f355cae5cd4d594d78222cec3023f0f5c98d5fcd6514a6` |
+| `js/tab-view.js` | hand-owned dashboard runtime | 16,101 | 752,366 | `686b49c01b987a814875501728555e45c46ca37919cd7fdd560e5d9dab2bb656` |
+| `js/managed_parent_command_center.js` | hand-owned managed parent command-center runtime | 507 | 23,999 | `f4d51473d415e833e0026dbf369e34fc7974a40d02c6b49eb9a53570e49bdd84` |
 
 ## Active CSS State Counters
 
-The 5 active extension UI CSS files currently total 9,538 counted source lines,
-245,100 bytes, 1,372 lexical rule blocks, 115 `!important` declarations, 25
+The 5 active extension UI CSS files currently total 9,649 counted source lines,
+248,346 bytes, 1,390 lexical rule blocks, 115 `!important` declarations, 25
 `display:none` declarations, 36 `@media` blocks, 6 `@keyframes` blocks, 3
 `[hidden]` selectors, 16 `:focus-visible` selectors, 134 `:hover` selectors,
 255 dark-theme selector prefixes, 331 `data-theme` tokens, 54 `data-surface`
 tokens, 7 `data-scene` tokens, 12 `aria-` selector tokens, 47 `.active`
 selectors, 1 `.show` selector, 0 `.hidden` selectors, 56 `transition`
-declarations, 91 `transform` declarations, 38 `z-index` declarations, 26
+declarations, 92 `transform` declarations, 38 `z-index` declarations, 26
 `pointer-events:none` declarations, 32 overflow-hidden declarations, and 1
 `prefers-reduced-motion` token.
 
@@ -58,7 +58,7 @@ declarations, 91 `transform` declarations, 38 `z-index` declarations, 26
 | `css/design_tokens.css` | 12 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 5 | 0 |
 | `css/components.css` | 240 | 47 | 1 | 5 | 1 | 0 | 1 | 49 | 53 | 53 | 0 |
 | `css/popup.css` | 182 | 5 | 3 | 2 | 0 | 1 | 3 | 23 | 52 | 75 | 0 |
-| `css/tab-view.css` | 444 | 24 | 14 | 12 | 4 | 2 | 1 | 28 | 26 | 74 | 0 |
+| `css/tab-view.css` | 462 | 24 | 14 | 12 | 4 | 2 | 1 | 28 | 26 | 74 | 0 |
 | `css/serene-shell.css` | 494 | 39 | 7 | 16 | 1 | 0 | 11 | 34 | 124 | 124 | 54 |
 
 ## Loader And Shell Coupling

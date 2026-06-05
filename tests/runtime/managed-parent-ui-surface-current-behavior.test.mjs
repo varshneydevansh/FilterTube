@@ -327,40 +327,45 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   const helperSource = read('js/managed_parent_command_center.js');
   const tabViewHtml = read('html/tab-view.html');
 
-  assert.match(doc, /Status\*\*: Spec, dashboard child-row status, command-center overview,\s+delegated command-center action intents, delegated same-budget bulk\s+time-limit controls, and delegated local bulk viewing-space controls are\s+present/);
-  assert.match(doc, /Rule and remote-delivery bulk\s+writes are not implemented yet/);
+  assert.match(doc, /Status\*\*: Spec, dashboard protected-profile status, command-center overview/);
+  assert.match(doc, /parent-facing protection strip plus labeled Device\/History row details/);
+  assert.match(doc, /Direct rule bulk writes remain intentionally absent/);
   assert.match(doc, /Parent-Facing States/);
   assert.match(doc, /UI Boundaries/);
   assert.match(doc, /Current Runtime Binding/);
   assert.match(doc, /Command-Center Slice/);
-  assert.match(doc, /runtime managed parent child-row status helper: present/);
+  assert.match(doc, /runtime managed parent protected-row status helper: present/);
   assert.match(doc, /runtime child\/protected detailed status suppression: present/);
   assert.match(doc, /runtime status plaintext rule value exposure: absent/);
   assert.match(doc, /runtime managed command-center overview: present/);
+  assert.match(doc, /runtime managed command-center protection strip: present/);
+  assert.match(doc, /runtime managed command-center labeled device\/history details: present/);
   assert.match(doc, /runtime managed command-center delegated action intents: present/);
   assert.match(doc, /runtime managed command-center bulk time-limit controls: present via delegated runtime gate/);
   assert.match(doc, /runtime managed command-center bulk viewing-space controls: present via delegated runtime gate/);
   assert.match(doc, /runtime managed command-center direct policy writes: absent/);
-  assert.match(doc, /runtime managed command-center rule\/remote bulk writes: absent/);
+  assert.match(doc, /runtime managed command-center direct rule bulk writes: absent/);
   assert.match(doc, /runtime YouTube hot-path work from command-center UI: absent/);
   assert.match(plan, new RegExp(docPath));
   assert.match(plan, /command-center\s+overview for protected profiles/);
-  assert.match(plan, /delegated action intents\s+for existing gated Edit Rules, History, and Time Limit paths/);
+  assert.match(plan, /Dashboard command center lists protected profiles, time-limit state,\s+viewing-space state, protected history count, verified-device readiness,\s+re-pairing status for revoked\/stale managed links, and delegated actions/);
   assert.match(inventory, new RegExp(docPath));
   assert.match(inventory, /read-only\s+managed status line on that child row plus a command center overview/);
-  assert.match(inventory, /delegated action intents\s+for existing gated Edit Rules, History, and Time Limit paths/);
+  assert.match(inventory, /selected-profile verified-device send actions/);
   assert.match(inventory, /delegated runtime intents only/);
 
   assert.match(source, /function buildManagedProfileStatusText\(profile, \{ revealDetails = false \} = \{\}\)/);
   assert.match(source, /function summarizeManagedPolicyStateForProfile\(profile\)/);
   assert.match(helperSource, /function buildManagedCommandCenterSummary\(profilesV4, \{ revealDetails = false, helpers = \{\} \} = \{\}\)/);
-  assert.match(helperSource, /function buildManagedCommandCenterActionIntents\(profileId, timePolicy\)/);
+  assert.match(helperSource, /function buildManagedCommandCenterActionIntents\(profileId, timePolicy, policySummary = \{\}\)/);
   assert.match(helperSource, /function buildManagedCommandCenterBulkActionIntents\(rows = \[\]\)/);
   assert.match(helperSource, /function renderManagedCommandCenter\(profilesV4, \{ revealDetails = false, helpers = \{\} \} = \{\}\)/);
   assert.match(helperSource, /panel\.setAttribute\('aria-label', 'Managed parent command center'\)/);
   assert.match(helperSource, /Overview of protected profiles, policy sync, time limits, action history, and delegated actions/);
-  assert.match(helperSource, /actionIntents: buildManagedCommandCenterActionIntents\(profileId, timePolicy\)/);
+  assert.match(helperSource, /actionIntents: buildManagedCommandCenterActionIntents\(profileId, timePolicy, \{/);
   assert.match(helperSource, /bulk_set_time_limit/);
+  assert.match(helperSource, /bulk_edit_rules/);
+  assert.match(helperSource, /bulk_send_managed_policy/);
   assert.match(helperSource, /bulk_disable_time_limit/);
   assert.match(helperSource, /bulk_allow_main_kids/);
   assert.match(helperSource, /bulk_kids_only/);
@@ -370,7 +375,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /delegated_runtime_gate/);
   assert.match(helperSource, /global\.FilterTubeManagedParentCommandCenter = \{/);
   assert.match(tabViewHtml, /managed_parent_command_center\.js[\s\S]*tab-view\.js/);
-  assert.match(source, /const managedStatusText = type === 'child'/);
+  assert.match(source, /const managedStatusText = profileId !== 'default'/);
+  assert.match(source, /buildManagedProfileStatusText\(profiles\[profileId\], \{ revealDetails: canManageTarget && !childAdminRestricted \}\)/);
   assert.match(source, /revealDetails: canManageTarget && !childAdminRestricted/);
   assert.match(source, /FilterTubeManagedParentCommandCenter\?\.render\?\.\(profilesV4/);
   assert.match(source, /helpers:\s*\{[\s\S]*safeObject,[\s\S]*getAccountIds,/);
@@ -424,8 +430,8 @@ test('managed command-center spec pins parent workflow without making UI authori
   assert.match(doc, /UI choice is not authority; runtime route gate remains the enforcement layer/);
   assert.match(doc, /Runtime budget accounting remains background-owned/);
   assert.match(doc, /Reachability is never authorization/);
-  assert.match(doc, /Present for same-budget local time-limit changes and same-access local viewing-space changes on selected protected profiles/);
-  assert.match(doc, /Future rule, remote, mailbox, or LAN bulk writes require each target to have its own target profile, trusted link, scope, revision, hash, and signature\/integrity proof/);
+  assert.match(doc, /Present for selected-profile rule editor handoff, same-budget local time-limit changes, same-access local viewing-space changes, and selected-profile signed-policy sends on selected protected profiles/);
+  assert.match(doc, /Direct local rule bulk writes remain absent; every remote target still needs its own target profile, trusted link, scope, revision, hash, and signature\/integrity proof/);
   assert.match(doc, /Mobile-first layout with a single-column protected-profile list/);
   assert.match(doc, /Touch targets .* at\s+least 44px high/);
   assert.match(doc, /Use segmented controls for Main\/Kids access/);
@@ -771,6 +777,46 @@ test('managed command-center helper emits delegated action intents without polic
   assert.equal(summary.profileCount, 1);
   assert.deepEqual(plain(summary.bulkActionIntents), [
     {
+      action: 'bulk_edit_rules',
+      label: 'Edit selected rules',
+      profileIds: ['childA'],
+      scope: 'main_kids',
+      authority: 'delegated_runtime_gate',
+      sensitiveAction: false
+    },
+    {
+      action: 'bulk_add_keyword',
+      label: 'Add keyword',
+      profileIds: ['childA'],
+      scope: 'main_kids_rules',
+      authority: 'delegated_runtime_gate',
+      sensitiveAction: true
+    },
+    {
+      action: 'bulk_add_channel',
+      label: 'Add channel',
+      profileIds: ['childA'],
+      scope: 'main_kids_rules',
+      authority: 'delegated_runtime_gate',
+      sensitiveAction: true
+    },
+    {
+      action: 'bulk_add_video',
+      label: 'Add video ID',
+      profileIds: ['childA'],
+      scope: 'main_kids_rules',
+      authority: 'delegated_runtime_gate',
+      sensitiveAction: true
+    },
+    {
+      action: 'bulk_send_managed_policy',
+      label: 'Send selected updates',
+      profileIds: ['childA'],
+      scope: 'active',
+      authority: 'managed_policy_provider_delivery',
+      sensitiveAction: true
+    },
+    {
       action: 'bulk_set_time_limit',
       label: 'Set selected limit',
       profileIds: ['childA'],
@@ -829,6 +875,14 @@ test('managed command-center helper emits delegated action intents without polic
       profileId: 'childA',
       scope: 'admin_history',
       authority: 'delegated_runtime_gate',
+      sensitiveAction: true
+    },
+    {
+      action: 'send_managed_policy',
+      label: 'Send Update',
+      profileId: 'childA',
+      scope: 'active',
+      authority: 'managed_policy_provider_delivery',
       sensitiveAction: true
     },
     {

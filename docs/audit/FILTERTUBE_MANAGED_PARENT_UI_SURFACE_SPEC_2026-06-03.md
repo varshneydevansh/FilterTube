@@ -7,8 +7,11 @@ handoff, delegated same-budget bulk time-limit controls, delegated local
 bulk viewing-space controls, command-center verified-device send actions,
 live P2P signed managed-policy push for connected verified replica devices,
 provider-gated mailbox/LAN delivery handoff, and protected redacted push
-history rows are present. Bulk local time-limit and viewing-space actions cover
-all manageable protected profiles, including Default/Master-managed independent
+history rows are present. The command center now includes a compact
+parent-facing protection strip plus labeled Device/History row details so
+parents can scan readiness, re-pairing, conflicts, and history without reading
+raw policy state. Bulk local time-limit and viewing-space actions cover all
+manageable protected profiles, including Default/Master-managed independent
 account profiles. Direct rule bulk writes remain intentionally absent.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
@@ -88,6 +91,8 @@ runtime status plaintext rule value exposure: absent
 runtime status admin mutation authority: absent
 runtime detailed history modal re-auth gate: present
 runtime managed command-center overview: present
+runtime managed command-center protection strip: present
+runtime managed command-center labeled device/history details: present
 runtime managed command-center delegated action intents: present
 runtime managed command-center selected-profile rule editor handoff: present via delegated runtime gate
 runtime managed command-center bulk time-limit controls: present via delegated runtime gate
@@ -114,6 +119,7 @@ weakening the authority model:
 | Area | Parent/caregiver needs | Boundary |
 | --- | --- | --- |
 | Managed profile selection | See each protected profile, owner relationship, current lock state, verified-device readiness, and last policy revision. | Child/protected views still hide admin controls and detailed history. |
+| Protection scan strip | Quickly see protected profile count, sync-ready profiles, profiles needing re-pairing, and remote conflicts before acting. | Strip values are aggregate status only; they do not include rule text, policy payloads, keys, or mutation authority. |
 | Rule editing | Command-center row actions still enter the existing managed protected-profile editor, and selected-profile bulk controls can hand off one selected protected profile to the same editor. | Writes must use the same validated local/remote managed-policy paths as current FilterTube controls; multi-profile direct rule writes remain future work. |
 | Remote send | Parent can send one protected profile or selected protected profiles to saved verified devices. | Delivery links are not authority; each envelope still requires Source -> Replica trust, fixed target profile, allowed scope, signature/integrity proof, and newer revision/hash. |
 | Viewing spaces | Show Main, Kids, both, or neither per protected profile; row actions still change policy and selected-profile bulk actions can apply Main + Kids, Kids only, or Main only locally. | UI choice is not authority; runtime route gate remains the enforcement layer; every selected target gets its own redacted revision/history row after parent re-auth. |

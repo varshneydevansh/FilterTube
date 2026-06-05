@@ -12,7 +12,7 @@ const activeCssRows = [
   ['css/design_tokens.css', 301, 10361, '7da73da79df23e6325c921e45fd786270488ee8ad212b57b7e634b63898c27dc', 12, 0, 0, 1, 0, 0, 0, 0, 0, 5, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   ['css/components.css', 1686, 45567, 'db01d30c717e34c108e48d92807ce3df4bcafccace62a1808d86d03ed7047ebc', 240, 47, 1, 5, 1, 0, 1, 49, 53, 53, 0, 0, 2, 18, 1, 0, 19, 20, 5, 3, 4, 0],
   ['css/popup.css', 1151, 29731, '812cb4ba8b4c9be732bd8a2a6f7b06b5d8d0a8c3fb7416f391f475ae627d45fa', 182, 5, 3, 2, 0, 1, 3, 23, 52, 75, 0, 0, 5, 6, 0, 0, 8, 8, 1, 1, 2, 0],
-  ['css/tab-view.css', 2986, 72211, '3d07057381c63e2d3d117b6be466eb31eeb35df80f00747403f79fb0f28efdce', 444, 24, 14, 12, 4, 2, 1, 28, 26, 74, 0, 0, 1, 20, 0, 0, 17, 17, 15, 12, 12, 1],
+  ['css/tab-view.css', 3097, 75457, '79976656ce086984edb87de3aea13c1820b1b690a3c4e5a63417a66fecf891ff', 462, 24, 14, 12, 4, 2, 1, 28, 26, 74, 0, 0, 1, 20, 0, 0, 17, 18, 15, 12, 12, 1],
   ['css/serene-shell.css', 3414, 87230, '785e988dd0176b16defcc08f77925de8eaa60ea831d53cd57147eb601c490f0a', 494, 39, 7, 16, 1, 0, 11, 34, 124, 124, 54, 0, 4, 3, 0, 0, 12, 46, 17, 10, 14, 0]
 ];
 
@@ -20,7 +20,7 @@ const selectedSourceRows = [
   ['css/design_tokens.css', 301, 10361, '7da73da79df23e6325c921e45fd786270488ee8ad212b57b7e634b63898c27dc'],
   ['css/components.css', 1686, 45567, 'db01d30c717e34c108e48d92807ce3df4bcafccace62a1808d86d03ed7047ebc'],
   ['css/popup.css', 1151, 29731, '812cb4ba8b4c9be732bd8a2a6f7b06b5d8d0a8c3fb7416f391f475ae627d45fa'],
-  ['css/tab-view.css', 2986, 72211, '3d07057381c63e2d3d117b6be466eb31eeb35df80f00747403f79fb0f28efdce'],
+  ['css/tab-view.css', 3097, 75457, '79976656ce086984edb87de3aea13c1820b1b690a3c4e5a63417a66fecf891ff'],
   ['css/serene-shell.css', 3414, 87230, '785e988dd0176b16defcc08f77925de8eaa60ea831d53cd57147eb601c490f0a'],
   ['html/popup.html', 31, 1213, 'c5e03a38b2737dbd01e2cd0c243b37754936e2e349e9d2275b195350159aea31'],
   ['html/tab-view.html', 1600, 136305, '5124626e39cd3879da6593bc9bfa8287f0ad5b9ae29dcbb075d9e5bce0389d0b'],
@@ -30,8 +30,8 @@ const selectedSourceRows = [
   ['js/ui-shell/popup-shell.js', 374, 21080, 'dc750d44dd4b9fde63b85b4dfc9f5ce9ba76964afbd6dfcedc7b3b7cce084b05'],
   ['js/ui-shell/tab-view-decor.js', 323, 18289, '234171091e523aa5de4c3c0f97e7341c55893bdd31b3e25a075490170fa9742f'],
   ['js/popup.js', 1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
-  ['js/tab-view.js', 14926, 695872, '5cdae945aca165b11af3c3f9fc246e89da3ce6780939013081e5d035b4163323'],
-  ['js/managed_parent_command_center.js', 296, 14757, '23138da6164f82b507f355cae5cd4d594d78222cec3023f0f5c98d5fcd6514a6']
+  ['js/tab-view.js', 16101, 752366, '686b49c01b987a814875501728555e45c46ca37919cd7fdd560e5d9dab2bb656'],
+  ['js/managed_parent_command_center.js', 507, 23999, 'f4d51473d415e833e0026dbf369e34fc7974a40d02c6b49eb9a53570e49bdd84']
 ];
 
 function read(file) {
@@ -170,9 +170,9 @@ test('active extension UI CSS state counters match current source', () => {
   }
 
   assert.deepEqual(totals, {
-    lines: 9538,
-    bytes: 245100,
-    rules: 1372,
+    lines: 9649,
+    bytes: 248346,
+    rules: 1390,
     important: 115,
     displayNone: 25,
     media: 36,
@@ -189,21 +189,21 @@ test('active extension UI CSS state counters match current source', () => {
     show: 1,
     hiddenClass: 0,
     transition: 56,
-    transform: 91,
+    transform: 92,
     zIndex: 38,
     pointerNone: 26,
     overflowHidden: 32,
     reducedMotion: 1
   });
 
-  assert.match(doc, /9,538 counted source lines/);
-  assert.match(doc, /245,100 bytes, 1,372 lexical rule blocks/);
+  assert.match(doc, /9,649 counted source lines/);
+  assert.match(doc, /248,346 bytes, 1,390 lexical rule blocks/);
   assert.match(doc, /115 `!important` declarations, 25\s+`display:none` declarations/);
   assert.match(doc, /36 `@media` blocks, 6 `@keyframes` blocks, 3\s+`\[hidden\]` selectors/);
   assert.match(doc, /16 `:focus-visible` selectors, 134 `:hover` selectors/);
   assert.match(doc, /255 dark-theme selector prefixes, 331 `data-theme` tokens, 54 `data-surface`\s+tokens, 7 `data-scene` tokens/);
   assert.match(doc, /47 `\.active`\s+selectors, 1 `\.show` selector, 0 `\.hidden` selectors/);
-  assert.match(doc, /56 `transition`\s+declarations, 91 `transform` declarations, 38 `z-index` declarations/);
+  assert.match(doc, /56 `transition`\s+declarations, 92 `transform` declarations, 38 `z-index` declarations/);
   assert.match(doc, /26\s+`pointer-events:none` declarations, 32 overflow-hidden declarations, and 1\s+`prefers-reduced-motion` token/);
 });
 

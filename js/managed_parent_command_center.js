@@ -294,6 +294,11 @@
             ...acc,
             profileCount: acc.profileCount + 1,
             limitedCount: acc.limitedCount + (row.timeLimited ? 1 : 0),
+            syncReadyProfileCount: acc.syncReadyProfileCount + (row.syncReadyCount > 0 ? 1 : 0),
+            syncRepairProfileCount: acc.syncRepairProfileCount + (row.syncTargetCount <= 0 && row.syncRevokedCount > 0 ? 1 : 0),
+            syncStaleProfileCount: acc.syncStaleProfileCount + (row.syncTargetCount <= 0 && row.syncStaleCount > 0 ? 1 : 0),
+            syncPendingProfileCount: acc.syncPendingProfileCount + (row.syncTargetCount > 0 && row.syncReadyCount <= 0 ? 1 : 0),
+            noDeviceProfileCount: acc.noDeviceProfileCount + (row.syncTotalCount <= 0 ? 1 : 0),
             remoteScopeCount: acc.remoteScopeCount + row.remoteScopeCount,
             historyRowCount: acc.historyRowCount + row.historyRowCount,
             protectedRowCount: acc.protectedRowCount + row.protectedRowCount,
@@ -303,6 +308,11 @@
             bulkActionIntents: buildManagedCommandCenterBulkActionIntents(rows),
             profileCount: 0,
             limitedCount: 0,
+            syncReadyProfileCount: 0,
+            syncRepairProfileCount: 0,
+            syncStaleProfileCount: 0,
+            syncPendingProfileCount: 0,
+            noDeviceProfileCount: 0,
             remoteScopeCount: 0,
             historyRowCount: 0,
             protectedRowCount: 0,
@@ -334,6 +344,25 @@
         titleWrap.append(title, body);
         heading.append(titleWrap, meta);
         panel.appendChild(heading);
+
+        const strip = document.createElement('div');
+        strip.className = 'ft-managed-command-center__strip';
+        [
+            { label: 'Protected', value: summary.profileCount, tone: 'neutral' },
+            { label: 'Ready', value: summary.syncReadyProfileCount, tone: summary.syncReadyProfileCount ? 'success' : 'neutral' },
+            { label: 'Needs re-pair', value: summary.syncRepairProfileCount, tone: summary.syncRepairProfileCount ? 'warning' : 'neutral' },
+            { label: 'Conflicts', value: summary.remoteConflictCount, tone: summary.remoteConflictCount ? 'danger' : 'neutral' }
+        ].forEach((item) => {
+            const card = document.createElement('div');
+            card.className = `ft-managed-command-center__strip-item is-${item.tone}`;
+            const value = document.createElement('strong');
+            value.textContent = String(Number(item.value) || 0);
+            const label = document.createElement('span');
+            label.textContent = item.label;
+            card.append(value, label);
+            strip.appendChild(card);
+        });
+        panel.appendChild(strip);
 
         if (!summary.rows.length) {
             const empty = document.createElement('div');
@@ -428,14 +457,19 @@
                 statusCell.appendChild(status);
             });
             row.appendChild(statusCell);
-            for (const text of [
-                item.syncTargetLabel,
-                `${item.historyRowCount} history rows | latest ${item.latestActionLabel}`
-            ]) {
-                const cell = document.createElement('span');
-                cell.textContent = text;
+            [
+                ['Device', item.syncTargetLabel],
+                ['History', `${item.historyRowCount} rows | latest ${item.latestActionLabel}`]
+            ].forEach(([label, value]) => {
+                const cell = document.createElement('div');
+                cell.className = 'ft-managed-command-center__detail';
+                const detailLabel = document.createElement('span');
+                detailLabel.textContent = label;
+                const detailValue = document.createElement('strong');
+                detailValue.textContent = value;
+                cell.append(detailLabel, detailValue);
                 row.appendChild(cell);
-            }
+            });
             if (h.onAction && Array.isArray(item.actionIntents) && item.actionIntents.length) {
                 const actionWrap = document.createElement('div');
                 actionWrap.className = 'ft-managed-command-center__actions';
