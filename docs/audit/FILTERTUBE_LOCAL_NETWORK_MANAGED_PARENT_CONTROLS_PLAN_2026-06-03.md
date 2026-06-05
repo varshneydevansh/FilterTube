@@ -833,8 +833,12 @@ contract before wiring more native app runtime behavior.
   app adapters must preserve while keeping native route/time/app-open locks as
   app-shell responsibilities.
 - **Status**: Contract doc, JSON artifact, app sync manifest row, and focused
-  settings/native-sync proof added. Product runtime behavior is unchanged;
-  native Android/iOS enforcement remains pending.
+  settings/native-sync proof added. The extension-side
+  `verify:managed-app-policy` command now checks that the Markdown contract,
+  JSON artifact, declared helper sources, and available app sync manifest copy
+  rows stay aligned before a native runtime sync/release handoff. Product
+  runtime behavior is unchanged; native Android/iOS enforcement remains
+  pending.
 - **Complexity**: 4/10
 - **Dependencies**: Sprint 1 policy schema, Sprint 5 viewing-space/time-limit
   runtime contracts.
@@ -849,6 +853,7 @@ contract before wiring more native app runtime behavior.
   - The current app sync manifest contract-copy row exists and remains
     byte-identical to the extension artifact.
 - **Validation**:
+  - `npm run verify:managed-app-policy`
   - `node --test tests/runtime/managed-app-policy-contract-parity-current-behavior.test.mjs`
   - `node --test tests/runtime/native-runtime-sync-authority-current-behavior.test.mjs`
   - `npm run test:settings`

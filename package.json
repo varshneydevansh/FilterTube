@@ -26,6 +26,7 @@
     "lanes:changed": "node scripts/run-test-lane.mjs --changed",
     "test:changed": "node scripts/run-test-lane.mjs --run-changed",
     "test:audit-drift": "node scripts/audit-proof-drift.mjs --lane-owned",
+    "verify:managed-app-policy": "node scripts/verify-managed-app-policy-contract.mjs",
     "smoke:youtube": "node docs/audit/artifacts/release-live-youtube-spa-smoke/run-live-smoke.mjs",
     "smoke:youtube:verify": "node docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs",
     "dev:chrome": "cp manifest.chrome.json manifest.json",

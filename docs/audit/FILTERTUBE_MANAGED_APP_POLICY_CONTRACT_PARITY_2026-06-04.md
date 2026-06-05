@@ -278,6 +278,13 @@ The extension contract is now explicit and available as a JSON artifact at
 `docs/audit/artifacts/managed-app-policy-contract-v1.json`. The app runtime
 sync manifest declares the copy target
 `packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json`.
+The extension-owned handoff verifier
+`scripts/verify-managed-app-policy-contract.mjs` checks that the Markdown
+contract snapshot and JSON artifact are byte-equivalent as parsed data, all
+declared extension helper sources exist, and, when the sibling app repo is
+available, the app runtime sync manifest still copies the contract artifact and
+managed Nanah helper sources to the expected destinations. This verifier is a
+pre-sync/pre-release guard; it does not write into the app repo.
 After this protected-account contract update, the sibling app repo must run the
 native runtime sync before any app parity claim uses the copied artifact as
 current. The same manifest also copies the extension-owned managed Nanah
@@ -337,6 +344,7 @@ platform.
 Focused test:
 
 ```bash
+node scripts/verify-managed-app-policy-contract.mjs
 node --test tests/runtime/managed-app-policy-contract-parity-current-behavior.test.mjs
 node --test tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs
 node --test tests/runtime/native-runtime-sync-authority-current-behavior.test.mjs \
