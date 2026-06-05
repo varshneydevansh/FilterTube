@@ -3,7 +3,8 @@
 **Generated**: 2026-06-04
 **Status**: Provider-gated dashboard/profile-open hook, provider ack handoff,
 and protected ack-handoff history writer are present. Server mailbox client,
-mailbox decryption client, and local-network discovery are still absent.
+server mailbox pull/decrypt transport, and local-network discovery are still
+absent. Adapter-level local mailbox seal/open helpers are covered separately.
 **Related plan**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`
 **Related inventory**:
@@ -139,7 +140,7 @@ runtime provider failure fail-closed item apply guard: present
 runtime mailbox item apply reuse: present
 runtime pull status persistence: present
 runtime server mailbox pull client: absent
-runtime mailbox decryption client: absent
+runtime server mailbox decrypt transport: absent
 runtime local-network discovery: absent
 runtime background scheduler: absent
 runtime YouTube page hot-path work from this slice: absent

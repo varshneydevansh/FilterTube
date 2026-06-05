@@ -27,9 +27,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 73
-method semantic proof gap lexical callables covered: 6208
+method semantic proof gap lexical callables covered: 6227
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6208
+lexical callables requiring semantic proof before behavior changes: 6227
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -59,10 +59,10 @@ lexical callables requiring semantic proof before behavior changes: 5836
 
 ```text
 tracked JS/JSX/MJS files: 73
-repo-wide lexical callables: 6208
+repo-wide lexical callables: 6227
 files with lexical accounting: 73
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6208
+lexical callables requiring semantic proof before behavior changes: 6227
 required semantic proof fields: 8
 selected release hot-path semantic triage rows: 13
 selected visual-writer semantic triage rows: 8
@@ -215,7 +215,7 @@ have all of these fields pinned:
 | --- | ---: | ---: | --- |
 | Hot page/background runtime | 9 | 3172 | `semantic proof incomplete` |
 | Content helper runtime | 9 | 348 | `semantic proof incomplete` |
-| UI/settings runtime | 14 | 2001 | `semantic proof incomplete` |
+| UI/settings runtime | 14 | 2020 | `semantic proof incomplete` |
 | Generated/quarantined UI | 6 | 147 | `semantic proof incomplete` |
 | Vendor bundles | 2 | 279 | `semantic proof incomplete` |
 | Build/sync scripts | 4 | 58 | `semantic proof incomplete` |
@@ -250,7 +250,7 @@ have all of these fields pinned:
 | `js/managed_parent_command_center.js` | UI/settings runtime | 14 | `semantic proof incomplete` | Managed parent command-center summary/action-intent and bulk-intent rendering, delegated UI action gates, and no-payload/no-write proof remain incomplete. |
 | `js/nanah_managed_live_policy.js` | UI/settings runtime | 55 | `semantic proof incomplete` | Managed policy live-send payload, signing, scope, revision, trusted-link writes, and outbound send-history proof remain incomplete. |
 | `js/nanah_managed_open_sync.js` | UI/settings runtime | 33 | `semantic proof incomplete` | Provider-gated managed pull-on-open policy checks, trusted-link eligibility, mailbox apply reporting, and no-hot-path proof remain incomplete. |
-| `js/nanah_sync_adapter.js` | UI/settings runtime | 147 | `semantic proof incomplete` | Nanah envelope, canonical payload-hash verification, trust, replay, profile target, signing-key authority, mailbox intake, local-network candidate validation, and sync parity proof remain incomplete. |
+| `js/nanah_sync_adapter.js` | UI/settings runtime | 166 | `semantic proof incomplete` | Nanah envelope, canonical payload-hash verification, trust, replay, profile target, signing-key authority, mailbox intake, local-network candidate validation, and sync parity proof remain incomplete. |
 | `js/popup.js` | UI/settings runtime | 131 | `semantic proof incomplete` | Popup render/action lifecycle, settings mutation, and selector proof remain incomplete. |
 | `js/render_engine.js` | UI/settings runtime | 126 | `semantic proof incomplete` | Dashboard render ownership, empty-state, list-mode, and row-action proof remain incomplete. |
 | `js/security_manager.js` | UI/settings runtime | 18 | `semantic proof incomplete` | PIN/session lock, crypto payload, storage mutation, and failure proof remain incomplete. |
@@ -784,7 +784,7 @@ triage rows as complete per-callable authority.
 ```text
 current-source method gap freshness date: 2026-05-30
 tracked JS/JSX/MJS files still covered: 73
-repo-wide lexical callables still requiring semantic proof: 6208
+repo-wide lexical callables still requiring semantic proof: 6227
 files with complete per-callable semantic proof: 0
 latest full runtime proof: broad audit backlog 4754 tests, 4661 pass, 93 fail
 method semantic completion from freshness rerun: NO-GO

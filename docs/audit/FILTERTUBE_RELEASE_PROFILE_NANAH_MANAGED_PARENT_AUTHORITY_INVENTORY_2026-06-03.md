@@ -25,7 +25,7 @@ provider-gated dashboard/profile-open pull hook for already-decrypted mailbox
 items, redacted provider ack handoff for mailbox apply/reject outcomes,
 protected target-profile mailbox ack-handoff evidence,
 source-side server-safe mailbox storage item building for already-encrypted
-payloads,
+payloads, local WebCrypto mailbox seal/open helpers,
 trusted-link removal cleanup for target-local accepted managed-policy state,
 sanitized local-network candidate receive/history handling, plus an
 optional provider-gated dashboard/profile-open local-network candidate
@@ -34,7 +34,7 @@ extension-owned downstream app policy contract artifact wired
 into the app sync manifest. Local same-budget bulk time-limit controls and
 local same-access bulk viewing-space controls are now delegated through the
 existing parent re-auth gate. Richer rule, remote-delivery, and multi-target
-built-in mailbox encryption, server mailbox upload/pull/decryption runtime, server mailbox queue purge,
+server mailbox upload/pull runtime, server mailbox queue purge,
 built-in local-network peer discovery/LAN delivery runtime, and app native settings/iOS enforcement proofs
 remain pending.
 **Goal slice**: Implementation order item 1 plus first runtime viewing-space
@@ -76,12 +76,16 @@ Local/decrypted mailbox items can now bind mailbox metadata to the decrypted
 managed envelope before calling the same managed-policy validation/apply path.
 The source side can also build a server-safe mailbox storage item from a signed
 envelope plus already-encrypted payload fields without including plaintext
-policy fields. The dashboard/profile-open hook can ask a trusted local provider
-for already-decrypted mailbox items when an opted-in managed replica link opens
-and can return redacted ack records to that provider after each local
-apply/reject decision. The protected target profile now also keeps redacted
-mailbox ack-handoff evidence for the provider ack attempt. Provider rejection
-or provider failure now fails closed without applying or acknowledging returned
+policy fields. The adapter can now also locally seal a signed envelope into an
+AES-GCM ciphertext with an AES-KW wrapped data-encryption key, and locally open
+that storage item back into a decrypted mailbox item only after ciphertext hash,
+authenticated metadata, wrapping-key, and envelope/metadata binding checks pass.
+The dashboard/profile-open hook can ask a trusted local provider for
+already-decrypted mailbox items when an opted-in managed replica link opens and
+can return redacted ack records to that provider after each local apply/reject
+decision. The protected target profile now also keeps redacted mailbox
+ack-handoff evidence for the provider ack attempt. Provider rejection or
+provider failure now fails closed without applying or acknowledging returned
 mailbox items.
 Trusted-link removal now purges
 target-local accepted managed-policy revision state for that link and clears
@@ -92,8 +96,7 @@ from local managed-link state, and record protected apply/reject history through
 the same managed-policy path. The dashboard can also ask an optional local
 provider for local-network candidates on dashboard/profile open, but returned
 candidates still enter that same sanitized receive/validation path and provider
-failure applies nothing. Mailbox encryption, server upload/pull, mailbox
-decryption client, server mailbox queue purge, richer rule/remote-delivery and multi-target
+failure applies nothing. Server upload/pull clients, server mailbox queue purge, richer rule/remote-delivery and multi-target
 bulk outbound controls, built-in local-network peer discovery/LAN delivery runtime, and
 remote admin session semantics remain separate
 required slices.
@@ -505,7 +508,7 @@ Current gap:
 | Remote time-limit policy apply is wrapper-backed and live-send eligible | Local child time-budget enforcement exists and accepted managed envelopes can write runtime-compatible time-limit policy; the source send path can now emit signed live time-limit envelopes when the profile has a saved time limit. | Installed two-device signed remote time-limit smoke through Nanah/local-network receive. |
 | Adapter depends on caller trust context | `validateManagedPolicyEnvelope(...)` depends on caller-supplied trusted-link/profile/revision/signature context; the wrapper rechecks stored profiles before writing but does not fetch trust keys itself. | Keep dashboard receive context and add pairing key lookup/revocation fixtures before automatic apply. |
 | Locked-child legacy proposal bypass is revision-gated | `allow_trusted_updates` no longer lets legacy `control_proposal` or `app_sync` payloads skip a locked child unlock; only signed revision-bound `filtertube_managed_policy` details can satisfy the bypass predicate, and signed envelopes still go through managed validation/apply. | Keep locked-child managed-policy fixtures passing and add installed live Nanah smoke before broad remote rollout. |
-| Mailbox protocol specified, runtime partially hooked | Offline later delivery now has a ciphertext-only protocol, source-side server-safe storage item builder, and replay/ack proof fixture. The dashboard/profile-open hook can ask a trusted local provider for already-decrypted mailbox items and return redacted ack records after local apply/reject. Provider rejection or provider failure fails closed without applying or acknowledging returned items, but no mailbox encryption client, server upload/pull client, decryption client, or server path exists. | Pairing key persistence plus signed live-delivery tests before mailbox transport work. |
+| Mailbox protocol specified, runtime partially hooked | Offline later delivery now has a ciphertext-only protocol, local WebCrypto seal/open helpers, source-side server-safe storage item builder, and replay/ack proof fixture. The dashboard/profile-open hook can ask a trusted local provider for already-decrypted mailbox items and return redacted ack records after local apply/reject. Provider rejection or provider failure fails closed without applying or acknowledging returned items, but no server upload/pull client, queue purge, or server path exists. | Pairing key persistence plus signed live-delivery tests before mailbox transport work. |
 | Local-network candidate authority gate, sanitized receive/history bridge, and provider-gated candidate handoff are present; built-in peer discovery/delivery absent | Same-network discovery can no longer be promoted by future callers without passing trusted-link, discovered-device, key, target, scope, revision, signature, and envelope validation. Explicit and provider-returned local-network candidate messages are sanitized before validation so caller-provided trust objects are ignored, and accepted/rejected outcomes can be written as protected history. The dashboard/profile-open hook can ask an optional local provider for candidates, but no built-in peer discovery or LAN delivery runtime exists yet. | Installed/local two-device LAN delivery smoke plus mailbox/local-network ack fixtures before claiming local-network management. |
 | Partial protected-user action history | Accepted local managed child saves, local parent/account history access, accepted-row clearing, protected failed unlock rows, dashboard/background session expiry, sensitive managed-action re-auth, profile-persisted local/background failed-attempt rate limiting, and remote managed validation/apply rows exist. | Retention expiry, encrypted summary fixtures, and live remote apply smoke. |
 | Live remote-management admin lock present; offline delivery locks still pending | Signed live Source -> Replica managed sends now require the active parent/account profile to pass a sensitive-action unlock before envelopes are built or sent. Mailbox/local-network delivery and future bulk UI writes still need their own equivalent admin-lock fixtures before writes. | Keep live-send re-auth fixtures passing; add mailbox/local-network and bulk-command admin-lock fixtures before exposing those writes. |

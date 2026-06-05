@@ -21,9 +21,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 73
-method semantic proof gap lexical callables covered: 6208
+method semantic proof gap lexical callables covered: 6227
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6208
+lexical callables requiring semantic proof before behavior changes: 6227
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -68,14 +68,14 @@ changes remain blocked by the implementation gate.
 
 ```text
 tracked JS/JSX/MJS files: 73
-repo-wide lexical callables: 6208
+repo-wide lexical callables: 6227
 ```
 
 | Family | Files | Lexical callables | Boundary |
 | --- | ---: | ---: | --- |
 | Hot page/background runtime | 9 | 3172 | Already has detailed first-pass hot runtime table in `FILTERTUBE_FUNCTION_COVERAGE_2026-05-17.md`. |
 | Content helper runtime | 9 | 348 | First-pass helper surface audit exists, but behavior fixtures remain incomplete. |
-| UI/settings runtime | 14 | 2001 | First-pass UI/settings audit exists, but action-level fixtures remain incomplete. |
+| UI/settings runtime | 14 | 2020 | First-pass UI/settings audit exists, but action-level fixtures remain incomplete. |
 | Generated/quarantined UI | 6 | 147 | Generated source/output and `js/layout.js`; freshness and quarantine checks required. |
 | Vendor bundles | 2 | 279 | API/provenance boundary, not product-owned method behavior. |
 | Build/sync scripts | 4 | 58 | Release/package/native-sync behavior; separate release fixtures required. |
@@ -110,7 +110,7 @@ repo-wide lexical callables: 6208
 | `js/managed_parent_command_center.js` | UI/settings runtime | 14 | UI/settings counted |
 | `js/nanah_managed_live_policy.js` | UI/settings runtime | 55 | UI/settings counted |
 | `js/nanah_managed_open_sync.js` | UI/settings runtime | 33 | UI/settings counted |
-| `js/nanah_sync_adapter.js` | UI/settings runtime | 147 | UI/settings counted |
+| `js/nanah_sync_adapter.js` | UI/settings runtime | 166 | UI/settings counted |
 | `js/popup.js` | UI/settings runtime | 131 | UI/settings counted |
 | `js/render_engine.js` | UI/settings runtime | 126 | UI/settings counted |
 | `js/security_manager.js` | UI/settings runtime | 18 | UI/settings counted |

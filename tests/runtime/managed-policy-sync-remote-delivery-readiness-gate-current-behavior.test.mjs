@@ -45,8 +45,8 @@ test('managed remote delivery readiness gate is docs-backed and linked to curren
   const boundaryDoc = read(boundaryDocPath);
   const inventory = read(inventoryDocPath);
 
-  assert.match(doc, /Remote policy authority, validation, local apply, action history,\s+source-side server-safe mailbox storage preparation, provider-gated mailbox\s+intake, and provider-gated local-network candidate intake are present/);
-  assert.match(doc, /Complete\s+remote delivery is still blocked on transport proof/);
+  assert.match(doc, /Remote policy authority, validation, local apply, action history,\s+source-side mailbox seal\/open encryption helpers, source-side server-safe\s+mailbox storage preparation, provider-gated mailbox intake, and provider-gated\s+local-network candidate intake are present/);
+  assert.match(doc, /Complete\s+remote delivery is still\s+blocked on upload\/pull and transport proof/);
   assert.match(doc, new RegExp(providerDocPath));
   assert.match(doc, new RegExp(openSyncDocPath));
   assert.match(doc, new RegExp(mailboxDocPath));
@@ -54,22 +54,23 @@ test('managed remote delivery readiness gate is docs-backed and linked to curren
   assert.match(doc, new RegExp(inventoryDocPath));
   assert.match(doc, /release claim for complete remote management: NO-GO/);
   assert.match(doc, /built-in LAN peer discovery: NO-GO/);
-  assert.match(doc, /mailbox encryption client: NO-GO/);
+  assert.match(doc, /mailbox encryption client: PARTIAL local helper/);
   assert.match(doc, /server mailbox upload client: NO-GO/);
   assert.match(doc, /server mailbox pull client: NO-GO/);
-  assert.match(doc, /mailbox decryption client: NO-GO/);
+  assert.match(doc, /mailbox decryption client: PARTIAL local helper/);
   assert.match(doc, /flowchart TD/);
   assert.match(doc, /node --test tests\/runtime\/managed-policy-sync-remote-delivery-readiness-gate-current-behavior\.test\.mjs/);
 
   assert.match(providerDoc, /runtime built-in LAN peer discovery: absent/);
   assert.match(providerDoc, /runtime built-in LAN delivery: absent/);
   assert.match(openSyncDoc, /runtime server mailbox pull client: absent/);
-  assert.match(openSyncDoc, /runtime mailbox decryption client: absent/);
+  assert.match(openSyncDoc, /runtime server mailbox decrypt transport: absent/);
+  assert.match(mailboxDoc, /runtime mailbox seal\/open encryption helper: present/);
   assert.match(mailboxDoc, /runtime source-side server-safe mailbox storage item builder: present/);
-  assert.match(mailboxDoc, /runtime mailbox encryption client: absent/);
+  assert.match(mailboxDoc, /runtime mailbox encryption client: present for local seal helper only/);
   assert.match(mailboxDoc, /runtime mailbox server upload client: absent/);
   assert.match(mailboxDoc, /runtime mailbox server pull client: absent/);
-  assert.match(mailboxDoc, /runtime mailbox decryption client: absent/);
+  assert.match(mailboxDoc, /runtime mailbox decryption client: present for local open helper only/);
   assert.match(boundaryDoc, /runtime built-in local-network peer discovery: absent/);
   assert.match(inventory, /built-in local-network peer discovery\/LAN delivery runtime/);
 });

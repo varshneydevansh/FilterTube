@@ -3,6 +3,7 @@ import path from 'node:path';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
+import { webcrypto } from 'node:crypto';
 
 const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_MANAGED_POLICY_ENCRYPTED_MAILBOX_PROTOCOL_2026-06-04.md';
@@ -30,7 +31,14 @@ function runtimeSource() {
 }
 
 function loadNanahAdapter() {
-  const context = { window: {} };
+  const window = {
+    crypto: webcrypto,
+    TextEncoder,
+    TextDecoder,
+    btoa: value => Buffer.from(value, 'binary').toString('base64'),
+    atob: value => Buffer.from(value, 'base64').toString('binary')
+  };
+  const context = { window };
   vm.runInNewContext(read(adapterPath), context);
   return context.window.FilterTubeNanahAdapter;
 }
@@ -101,8 +109,8 @@ function adapterValidManagedEnvelope(adapter, overrides = {}) {
 
 function sealedMailboxPayload(overrides = {}) {
   return {
-    cipherSuite: 'x25519-hkdf-chacha20poly1305',
-    keyAgreementId: 'link-parent-child-1:key-3',
+    cipherSuite: 'aes-kw+a256gcm',
+    keyAgreementId: 'link-parent-child-1:child-profile-1:parent-key-3:3',
     encryptedDek: 'sealed-dek',
     nonce: 'nonce-7',
     ciphertext: 'ciphertext-7',
@@ -253,8 +261,8 @@ test('managed mailbox protocol is docs-backed and linked from plan and inventory
   const plan = read(planPath);
   const inventory = read(inventoryPath);
 
-  assert.match(doc, /Status\*\*: Protocol, proof fixture, source-side server-safe mailbox storage\s+item builder, local decrypted mailbox-item intake, provider-gated\s+dashboard\/profile-open pull hook, provider ack handoff, and protected\s+target-profile ack-handoff evidence are present/);
-  assert.match(doc, /Runtime mailbox encryption,\s+server upload\/pull, and decryption clients are not implemented/);
+  assert.match(doc, /Status\*\*: Protocol, proof fixture, source-side WebCrypto mailbox seal\/open\s+helpers, source-side server-safe mailbox storage item builder, local decrypted\s+mailbox-item intake, provider-gated dashboard\/profile-open pull hook, provider\s+ack handoff, and protected target-profile ack-handoff evidence are present/);
+  assert.match(doc, /Runtime server upload\/pull clients are not implemented/);
   assert.match(doc, /The mailbox server is storage and relay only/);
   assert.match(doc, /must never receive plaintext rules, keywords, channel names,\s+video ids, viewing-space settings, time budgets, PIN values, or action-history\s+summaries/);
   assert.match(doc, /filtertube_managed_mailbox_item/);
@@ -268,11 +276,13 @@ test('managed mailbox protocol is docs-backed and linked from plan and inventory
   assert.match(doc, /Server metadata is not enough to apply policy/);
   assert.match(doc, /No-policy\/no-work YouTube runtime performance remains a release gate/);
   assert.match(doc, /runtime provider-gated dashboard\/profile-open pull hook: present/);
+  assert.match(doc, /runtime mailbox seal\/open encryption helper: present/);
   assert.match(doc, /runtime source-side server-safe mailbox storage item builder: present/);
   assert.match(doc, /runtime provider-gated ack handoff: present/);
   assert.match(doc, /runtime protected mailbox ack-handoff history rows: present/);
-  assert.match(doc, /runtime mailbox encryption client: absent/);
+  assert.match(doc, /runtime mailbox encryption client: present for local seal helper only/);
   assert.match(doc, /runtime mailbox server upload client: absent/);
+  assert.match(doc, /runtime mailbox decryption client: present for local open helper only/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
 });
@@ -285,6 +295,8 @@ test('managed mailbox runtime intake validates decrypted items without adding se
   assert.match(source, /Managed policy envelopes require validated managed apply flow/);
   assert.match(source, /function validateManagedMailboxItem\(item, context = \{\}\)/);
   assert.match(source, /function buildManagedMailboxStorageItem\(envelope, sealedPayload = \{\}, options = \{\}\)/);
+  assert.match(source, /async function sealManagedMailboxEnvelope\(envelope, options = \{\}\)/);
+  assert.match(source, /async function openManagedMailboxStorageItem\(item, options = \{\}\)/);
   assert.match(source, /async function applyManagedMailboxItem\(item, context = \{\}\)/);
   assert.match(source, /function handleNanahIncomingManagedMailboxItem\(item\)/);
   assert.match(source, /root\.schema === 'filtertube_managed_mailbox_item'/);
@@ -297,6 +309,92 @@ test('managed mailbox runtime intake validates decrypted items without adding se
   assert.match(source, /ackDecryptedMailboxItems/);
   assert.doesNotMatch(source, /FilterTubeManagedMailbox/);
   assert.doesNotMatch(source, /managedMailboxPull/);
+});
+
+test('managed mailbox seal and open use WebCrypto without storing plaintext policy', async () => {
+  const adapter = loadNanahAdapter();
+  const wrappingKey = await webcrypto.subtle.generateKey({ name: 'AES-KW', length: 256 }, true, ['wrapKey', 'unwrapKey']);
+  const envelope = adapterValidManagedEnvelope(adapter);
+  const storageItem = await adapter.sealManagedMailboxEnvelope(envelope, {
+    mailboxWrappingKey: wrappingKey,
+    trustedLink: trustedLink(),
+    createdAtMs: 1770000000000,
+    expiresAtMs: 1770604800000,
+    nonceBytes: new Uint8Array([1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23])
+  });
+
+  assert.equal(storageItem.schema, 'filtertube_managed_mailbox_item');
+  assert.equal(storageItem.cipherSuite, 'aes-kw+a256gcm');
+  assert.equal(storageItem.keyAgreementId, 'link-parent-child-1:child-profile-1:parent-key-3:3');
+  assert.match(storageItem.encryptedDek, /^[A-Za-z0-9_-]+$/);
+  assert.match(storageItem.nonce, /^[A-Za-z0-9_-]+$/);
+  assert.match(storageItem.ciphertext, /^[A-Za-z0-9_-]+$/);
+  assert.match(storageItem.ciphertextHash, /^sha256:[A-Za-z0-9_-]+$/);
+
+  const serialized = JSON.stringify(storageItem);
+  assert.doesNotMatch(serialized, /"payload"\s*:/);
+  assert.doesNotMatch(serialized, /"operations"\s*:/);
+  assert.doesNotMatch(serialized, /"decryptedEnvelope"\s*:/);
+  assert.doesNotMatch(serialized, /"managedPolicyEnvelope"\s*:/);
+  assert.doesNotMatch(serialized, /"envelope"\s*:/);
+  assert.doesNotMatch(serialized, /"privateKeyJwk"\s*:/);
+  assert.doesNotMatch(serialized, /redacted-keyword/);
+
+  assert.deepEqual(
+    plain(adapter.validateManagedMailboxItem(storageItem, adapterMailboxContext())),
+    { accepted: false, reason: 'missing_managed_policy_envelope', ackState: 'rejected' }
+  );
+
+  const opened = await adapter.openManagedMailboxStorageItem(storageItem, {
+    mailboxWrappingKey: wrappingKey
+  });
+  assert.deepEqual(plain(opened.decryptedEnvelope), envelope);
+  assert.deepEqual(
+    plain(adapter.validateManagedMailboxItem(opened, adapterMailboxContext())),
+    {
+      accepted: true,
+      decision: 'accept_newer_revision',
+      scope: 'keywords',
+      targetProfileId: 'child-profile-1',
+      revision: envelope.revision,
+      policyHash: envelope.policyHash,
+      ackState: 'delivered',
+      mailboxItemId: storageItem.mailboxItemId,
+      envelope
+    }
+  );
+});
+
+test('managed mailbox open fails closed on tamper wrong key and missing crypto', async () => {
+  const adapter = loadNanahAdapter();
+  const wrappingKey = await webcrypto.subtle.generateKey({ name: 'AES-KW', length: 256 }, true, ['wrapKey', 'unwrapKey']);
+  const wrongWrappingKey = await webcrypto.subtle.generateKey({ name: 'AES-KW', length: 256 }, true, ['wrapKey', 'unwrapKey']);
+  const envelope = adapterValidManagedEnvelope(adapter);
+  const storageItem = await adapter.sealManagedMailboxEnvelope(envelope, {
+    mailboxWrappingKey: wrappingKey,
+    createdAtMs: 1770000000000,
+    expiresAtMs: 1770604800000
+  });
+
+  await assert.rejects(
+    adapter.openManagedMailboxStorageItem({ ...storageItem, ciphertextHash: 'sha256:tampered' }, { mailboxWrappingKey: wrappingKey }),
+    /hash mismatch/
+  );
+  await assert.rejects(
+    adapter.openManagedMailboxStorageItem({ ...storageItem, targetProfileId: 'sibling-profile-1' }, { mailboxWrappingKey: wrappingKey }),
+    /failed to decrypt/
+  );
+  await assert.rejects(
+    adapter.openManagedMailboxStorageItem(storageItem, { mailboxWrappingKey: wrongWrappingKey }),
+    /failed to decrypt/
+  );
+
+  const context = { window: {} };
+  vm.runInNewContext(read(adapterPath), context);
+  await assert.rejects(
+    context.window.FilterTubeNanahAdapter.sealManagedMailboxEnvelope(envelope, { mailboxWrappingKey: wrappingKey }),
+    /requires WebCrypto/
+  );
 });
 
 test('managed mailbox storage builder emits server-safe ciphertext metadata only', () => {
@@ -319,8 +417,8 @@ test('managed mailbox storage builder emits server-safe ciphertext metadata only
   assert.equal(item.sourcePublicKeyId, envelope.sourcePublicKeyId);
   assert.equal(item.keyVersion, envelope.keyVersion);
   assert.equal(item.ackState, 'pending');
-  assert.equal(item.cipherSuite, 'x25519-hkdf-chacha20poly1305');
-  assert.equal(item.keyAgreementId, 'link-parent-child-1:key-3');
+  assert.equal(item.cipherSuite, 'aes-kw+a256gcm');
+  assert.equal(item.keyAgreementId, 'link-parent-child-1:child-profile-1:parent-key-3:3');
   assert.equal(item.encryptedDek, 'sealed-dek');
   assert.equal(item.nonce, 'nonce-7');
   assert.equal(item.ciphertext, 'ciphertext-7');

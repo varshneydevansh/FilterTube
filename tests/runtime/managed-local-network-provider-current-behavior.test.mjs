@@ -132,7 +132,7 @@ test('local-network provider hook is docs-backed and linked from managed parent 
   const inventory = read(inventoryPath);
 
   assert.match(doc, /Dashboard\/profile-open provider hook is present/);
-  assert.match(doc, /Built-in LAN peer discovery, LAN transport, server\s+mailbox pull, and mailbox decryption remain absent/);
+  assert.match(doc, /Built-in LAN peer discovery, LAN transport, server\s+mailbox pull, and server mailbox decrypt transport remain absent/);
   assert.match(doc, /window\.FilterTubeManagedPolicyLocalNetwork/);
   assert.match(doc, /discoverManagedPolicyCandidates/);
   assert.match(doc, /runtime provider-gated local-network discovery hook: present/);

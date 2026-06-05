@@ -94,7 +94,7 @@ test('managed open-sync audit is docs-backed and linked from plan inventory and 
 
   assert.match(doc, /Provider-gated dashboard\/profile-open hook, provider ack handoff,\s+and protected ack-handoff history writer are present/);
   assert.match(doc, /protected ack-handoff history writer are present/);
-  assert.match(doc, /Server\s+mailbox client,\s+mailbox decryption client, and\s+local-network discovery are still absent/);
+  assert.match(doc, /Server\s+mailbox client,\s+server mailbox pull\/decrypt transport, and local-network discovery are still\s+absent/);
   assert.match(doc, /runtime pull-on-open candidate gate: present/);
   assert.match(doc, /runtime provider-gated decrypted item pull: present/);
   assert.match(doc, /runtime provider-gated mailbox ack handoff: present/);
@@ -106,9 +106,9 @@ test('managed open-sync audit is docs-backed and linked from plan inventory and 
   assert.match(mailboxDoc, /runtime protected mailbox ack-handoff history rows: present/);
   assert.match(mailboxDoc, /provider failure fail-closed apply guard: present/);
   assert.match(mailboxDoc, /provider-gated dashboard\/profile-open pull hook: present/);
-  assert.match(plan, /Provider rejection or provider\s+failure now fails closed without applying or\s+acknowledging any returned\s+items/);
+  assert.match(plan, /Provider rejection or provider\s+failure now fails closed\s+without applying or\s+acknowledging any returned\s+items/);
   assert.match(plan, /Provider `ok: false` responses and provider exceptions do not apply or ack\s+returned\s+items and leave the last accepted policy active/);
-  assert.match(inventory, /Provider rejection\s+or provider\s+failure\s+now fails closed without applying or\s+acknowledging returned\s+mailbox items/);
+  assert.match(inventory, /Provider rejection\s+or\s+provider\s+failure\s+now fails closed\s+without applying or\s+acknowledging returned\s+mailbox items/);
   assert.match(inventory, /Provider rejection or provider\s+failure fails closed without applying or acknowledging returned items/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));

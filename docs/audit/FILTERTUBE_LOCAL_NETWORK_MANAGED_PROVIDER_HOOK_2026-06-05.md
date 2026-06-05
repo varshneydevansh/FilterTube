@@ -3,7 +3,7 @@
 **Generated**: 2026-06-05
 **Status**: Dashboard/profile-open provider hook is present for local-network
 managed-policy candidates. Built-in LAN peer discovery, LAN transport, server
-mailbox pull, and mailbox decryption remain absent.
+mailbox pull, and server mailbox decrypt transport remain absent.
 **Related plan**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`
 **Related authority boundary**:

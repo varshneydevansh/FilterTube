@@ -1,11 +1,11 @@
 # Audit: Managed Policy Encrypted Mailbox Protocol
 
 **Generated**: 2026-06-04  
-**Status**: Protocol, proof fixture, source-side server-safe mailbox storage
-item builder, local decrypted mailbox-item intake, provider-gated
-dashboard/profile-open pull hook, provider ack handoff, and protected
-target-profile ack-handoff evidence are present. Runtime mailbox encryption,
-server upload/pull, and decryption clients are not implemented.
+**Status**: Protocol, proof fixture, source-side WebCrypto mailbox seal/open
+helpers, source-side server-safe mailbox storage item builder, local decrypted
+mailbox-item intake, provider-gated dashboard/profile-open pull hook, provider
+ack handoff, and protected target-profile ack-handoff evidence are present.
+Runtime server upload/pull clients are not implemented.
 **Related plan**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`  
 **Related inventory**:
@@ -71,8 +71,8 @@ names, not a runtime implementation:
   "policyHash": "sha256:policy-hash-7",
   "sourcePublicKeyId": "parent-key-3",
   "keyVersion": 3,
-  "cipherSuite": "x25519-hkdf-chacha20poly1305",
-  "keyAgreementId": "link-parent-child-1:key-3",
+  "cipherSuite": "aes-kw+a256gcm",
+  "keyAgreementId": "link-parent-child-1:child-profile-1:parent-key-3:3",
   "encryptedDek": "base64url(...)",
   "nonce": "base64url(...)",
   "ciphertext": "base64url(...)",
@@ -188,14 +188,24 @@ by this helper is not directly applicable; after local decryption, a provider
 must supply the decrypted envelope before `validateManagedMailboxItem(...)` can
 accept it.
 
-The runtime still does not implement a mailbox encryption client, server
-mailbox upload client, server mailbox pull scheduler, or mailbox decryption
-client. The mailbox server cannot become policy authority. The first
-pull-on-open hook now exists only as a provider-gated dashboard/profile-open
-bridge for local/decrypted mailbox items, and the same provider can receive
-redacted ack records after extension-side validation/apply/reject. The target
-profile also records redacted ack-handoff evidence after the provider ack
-attempt completes.
+Local mailbox encryption/decryption helpers are now present through
+`sealManagedMailboxEnvelope(...)` and `openManagedMailboxStorageItem(...)`.
+The seal helper encrypts a signed managed-policy envelope with AES-GCM,
+wraps the data-encryption key with an AES-KW mailbox wrapping key, binds the
+metadata as AES-GCM authenticated data, writes a SHA-256 ciphertext hash, and
+returns a storage item that contains no plaintext policy fields. The open
+helper refuses unsupported cipher suites, missing ciphertext metadata,
+ciphertext hash mismatch, authenticated-metadata tampering, wrong wrapping
+keys, and decrypted envelope/metadata binding mismatches before it returns a
+local/decrypted mailbox item.
+
+The runtime still does not implement a server mailbox upload client or server
+mailbox pull scheduler. The mailbox server cannot become policy authority. The
+first pull-on-open hook now exists only as a provider-gated
+dashboard/profile-open bridge for local/decrypted mailbox items, and the same
+provider can receive redacted ack records after extension-side
+validation/apply/reject. The target profile also records redacted ack-handoff
+evidence after the provider ack attempt completes.
 If that provider returns `ok: false` or throws while pulling, the open-sync hook
 discards any returned mailbox items, does not apply or acknowledge them, and
 keeps the last valid accepted policy active.
@@ -204,6 +214,7 @@ Current runtime status:
 
 ```text
 runtime mailbox item schema intake: present for local/decrypted items
+runtime mailbox seal/open encryption helper: present
 runtime source-side server-safe mailbox storage item builder: present
 runtime mailbox item metadata-to-envelope binding: present
 runtime mailbox item signature gate reuse: present
@@ -213,9 +224,9 @@ runtime provider-gated dashboard/profile-open pull hook: present
 runtime provider-gated ack handoff: present
 runtime protected mailbox ack-handoff history rows: present
 runtime provider failure fail-closed apply guard: present
-runtime mailbox encryption client: absent
+runtime mailbox encryption client: present for local seal helper only
 runtime mailbox server upload client: absent
 runtime mailbox server pull client: absent
-runtime mailbox decryption client: absent
-runtime behavior changed by this slice: yes, for source-side server-safe mailbox storage item building, local/decrypted mailbox item intake, provider-gated dashboard/profile-open pull status, provider ack handoff, and protected target-profile ack-handoff evidence only
+runtime mailbox decryption client: present for local open helper only
+runtime behavior changed by this slice: yes, for local mailbox seal/open helpers, source-side server-safe mailbox storage item building, local/decrypted mailbox item intake, provider-gated dashboard/profile-open pull status, provider ack handoff, and protected target-profile ack-handoff evidence only
 ```

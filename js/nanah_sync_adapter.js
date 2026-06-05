@@ -5,6 +5,7 @@
     const PAYLOAD_VERSION = 'v3';
     const MANAGED_POLICY_ENVELOPE_TYPE = 'filtertube_managed_policy';
     const MANAGED_MAILBOX_ITEM_SCHEMA = 'filtertube_managed_mailbox_item';
+    const MANAGED_MAILBOX_CIPHER_SUITE = 'aes-kw+a256gcm';
     const MANAGED_POLICY_ALLOWED_SCOPES = [
         'main',
         'kids',
@@ -311,6 +312,100 @@
         return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
     }
 
+    function getManagedMailboxCrypto() {
+        const cryptoApi = global.crypto;
+        const subtle = cryptoApi?.subtle;
+        if (!cryptoApi || typeof cryptoApi.getRandomValues !== 'function' || !subtle) {
+            throw new Error('Managed mailbox encryption requires WebCrypto.');
+        }
+        if (typeof global.TextEncoder !== 'function' || typeof global.TextDecoder !== 'function') {
+            throw new Error('Managed mailbox encryption requires TextEncoder/TextDecoder.');
+        }
+        return { cryptoApi, subtle };
+    }
+
+    function getManagedMailboxWrappingKeySource(options = {}) {
+        const root = safeObject(options);
+        const trustedLink = safeObject(root.trustedLink);
+        const policy = safeObject(trustedLink.policy);
+        return {
+            cryptoKey: root.mailboxWrappingKey || root.wrappingKey || trustedLink.mailboxWrappingKey || policy.mailboxWrappingKey || null,
+            jwk: safeObject(root.mailboxWrappingKeyJwk || root.wrappingKeyJwk || trustedLink.mailboxWrappingKeyJwk || policy.mailboxWrappingKeyJwk),
+            rawBase64Url: normalizeString(
+                root.mailboxWrappingKeyBase64Url
+                || root.wrappingKeyBase64Url
+                || trustedLink.mailboxWrappingKeyBase64Url
+                || policy.mailboxWrappingKeyBase64Url
+            )
+        };
+    }
+
+    async function importManagedMailboxWrappingKey(options = {}, usages = ['wrapKey']) {
+        const { subtle } = getManagedMailboxCrypto();
+        const source = getManagedMailboxWrappingKeySource(options);
+        if (source.cryptoKey && typeof source.cryptoKey === 'object' && source.cryptoKey.type && source.cryptoKey.algorithm) {
+            return source.cryptoKey;
+        }
+        if (Object.keys(source.jwk).length > 0) {
+            return subtle.importKey('jwk', source.jwk, { name: 'AES-KW' }, false, usages);
+        }
+        const rawBytes = decodeManagedNanahBase64Url(source.rawBase64Url);
+        if (rawBytes) {
+            return subtle.importKey('raw', rawBytes, { name: 'AES-KW' }, false, usages);
+        }
+        throw new Error('Managed mailbox encryption requires a mailbox wrapping key.');
+    }
+
+    function buildManagedMailboxAdditionalData(source) {
+        const root = safeObject(source);
+        return {
+            schema: MANAGED_MAILBOX_ITEM_SCHEMA,
+            version: 1,
+            linkId: normalizeString(root.linkId),
+            targetProfileId: normalizeString(root.targetProfileId),
+            sourceDeviceId: normalizeString(root.sourceDeviceId),
+            sourceProfileId: normalizeString(root.sourceProfileId),
+            scope: normalizeManagedPolicyScope(root.scope),
+            revision: normalizeNonNegativeInteger(root.revision) || 0,
+            policyHash: normalizeString(root.policyHash),
+            sourcePublicKeyId: normalizeString(root.sourcePublicKeyId),
+            keyVersion: normalizeNonNegativeInteger(root.keyVersion) || 0
+        };
+    }
+
+    function managedMailboxKeyAgreementId(envelope, options = {}) {
+        const root = safeObject(envelope);
+        const optionRoot = safeObject(options);
+        const trustedLink = safeObject(optionRoot.trustedLink);
+        return normalizeString(optionRoot.keyAgreementId || optionRoot.mailboxKeyAgreementId || trustedLink.mailboxKeyAgreementId)
+            || [
+                safeManagedMailboxIdPart(root.linkId || trustedLink.id || trustedLink.linkId),
+                safeManagedMailboxIdPart(root.targetProfileId || trustedLink.targetProfileId),
+                safeManagedMailboxIdPart(root.sourcePublicKeyId || trustedLink.sourcePublicKeyId),
+                safeManagedMailboxIdPart(String(root.keyVersion || trustedLink.keyVersion || 1))
+            ].join(':');
+    }
+
+    async function digestManagedMailboxCiphertextHash(bytes) {
+        const { subtle } = getManagedMailboxCrypto();
+        if (typeof subtle.digest !== 'function') {
+            throw new Error('Managed mailbox encryption requires digest support.');
+        }
+        const digest = await subtle.digest('SHA-256', bytes);
+        return `sha256:${encodeManagedNanahBase64Url(digest)}`;
+    }
+
+    function constantTimeStringEqual(left, right) {
+        const a = normalizeString(left);
+        const b = normalizeString(right);
+        let diff = a.length ^ b.length;
+        const maxLength = Math.max(a.length, b.length);
+        for (let index = 0; index < maxLength; index += 1) {
+            diff |= (a.charCodeAt(index) || 0) ^ (b.charCodeAt(index) || 0);
+        }
+        return diff === 0;
+    }
+
     function validateManagedPolicyEnvelope(envelope, context = {}) {
         const root = safeObject(envelope);
         const trustedLink = safeObject(context.trustedLink);
@@ -538,6 +633,92 @@
         if (expiresAtMs !== null) item.expiresAtMs = expiresAtMs;
         assertNoManagedMailboxPlaintextKeys(item);
         return item;
+    }
+
+    async function sealManagedMailboxEnvelope(envelope, options = {}) {
+        const root = safeObject(envelope);
+        if (!root || Object.keys(root).length === 0) {
+            throw new Error('Managed mailbox seal requires a signed envelope.');
+        }
+        const { cryptoApi, subtle } = getManagedMailboxCrypto();
+        const wrappingKey = await importManagedMailboxWrappingKey(options, ['wrapKey']);
+        const dataKey = await subtle.generateKey({ name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']);
+        const nonce = options.nonceBytes
+            ? new Uint8Array(options.nonceBytes)
+            : cryptoApi.getRandomValues(new Uint8Array(12));
+        if (nonce.length !== 12) {
+            throw new Error('Managed mailbox seal requires a 12 byte nonce.');
+        }
+
+        const additionalData = new global.TextEncoder().encode(stableManagedNanahJson(buildManagedMailboxAdditionalData(root)));
+        const plaintext = new global.TextEncoder().encode(stableManagedNanahJson(root));
+        const ciphertext = new Uint8Array(await subtle.encrypt(
+            { name: 'AES-GCM', iv: nonce, additionalData },
+            dataKey,
+            plaintext
+        ));
+        const encryptedDek = new Uint8Array(await subtle.wrapKey('raw', dataKey, wrappingKey, 'AES-KW'));
+        return buildManagedMailboxStorageItem(root, {
+            cipherSuite: MANAGED_MAILBOX_CIPHER_SUITE,
+            keyAgreementId: managedMailboxKeyAgreementId(root, options),
+            encryptedDek: encodeManagedNanahBase64Url(encryptedDek),
+            nonce: encodeManagedNanahBase64Url(nonce),
+            ciphertext: encodeManagedNanahBase64Url(ciphertext),
+            ciphertextHash: await digestManagedMailboxCiphertextHash(ciphertext)
+        }, options);
+    }
+
+    async function openManagedMailboxStorageItem(item, options = {}) {
+        const root = safeObject(item);
+        if (root.schema !== MANAGED_MAILBOX_ITEM_SCHEMA) {
+            throw new Error('Managed mailbox open requires a mailbox storage item.');
+        }
+        if (normalizeString(root.cipherSuite) !== MANAGED_MAILBOX_CIPHER_SUITE) {
+            throw new Error('Managed mailbox open refused unsupported cipher suite.');
+        }
+        const { subtle } = getManagedMailboxCrypto();
+        const wrappingKey = await importManagedMailboxWrappingKey(options, ['unwrapKey']);
+        const encryptedDek = decodeManagedNanahBase64Url(root.encryptedDek);
+        const nonce = decodeManagedNanahBase64Url(root.nonce);
+        const ciphertext = decodeManagedNanahBase64Url(root.ciphertext);
+        if (!encryptedDek || !nonce || nonce.length !== 12 || !ciphertext) {
+            throw new Error('Managed mailbox open requires complete ciphertext metadata.');
+        }
+        const expectedHash = normalizeString(root.ciphertextHash);
+        const actualHash = await digestManagedMailboxCiphertextHash(ciphertext);
+        if (!expectedHash || !constantTimeStringEqual(expectedHash, actualHash)) {
+            throw new Error('Managed mailbox open refused ciphertext hash mismatch.');
+        }
+
+        try {
+            const dataKey = await subtle.unwrapKey(
+                'raw',
+                encryptedDek,
+                wrappingKey,
+                'AES-KW',
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['decrypt']
+            );
+            const additionalData = new global.TextEncoder().encode(stableManagedNanahJson(buildManagedMailboxAdditionalData(root)));
+            const plaintext = await subtle.decrypt(
+                { name: 'AES-GCM', iv: nonce, additionalData },
+                dataKey,
+                ciphertext
+            );
+            const decryptedEnvelope = safeObject(JSON.parse(new global.TextDecoder().decode(plaintext)));
+            const bindingDecision = validateManagedMailboxBinding(root, decryptedEnvelope);
+            if (bindingDecision) {
+                throw new Error(`Managed mailbox open refused ${bindingDecision.reason}.`);
+            }
+            return {
+                ...root,
+                decryptedEnvelope
+            };
+        } catch (e) {
+            if (normalizeString(e?.message).startsWith('Managed mailbox open refused')) throw e;
+            throw new Error('Managed mailbox open failed to decrypt item.');
+        }
     }
 
     function validateManagedMailboxItem(item, context = {}) {
@@ -1545,6 +1726,8 @@
         validateManagedPolicyEnvelope,
         validateManagedMailboxItem,
         buildManagedMailboxStorageItem,
+        sealManagedMailboxEnvelope,
+        openManagedMailboxStorageItem,
         validateManagedLocalNetworkCandidate,
         buildManagedPolicyPayloadHash,
         verifyManagedNanahPolicyIntegritySignature,
