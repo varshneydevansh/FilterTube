@@ -351,7 +351,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(doc, /runtime YouTube hot-path work from command-center UI: absent/);
   assert.match(plan, new RegExp(docPath));
   assert.match(plan, /command-center\s+overview for protected profiles/);
-  assert.match(plan, /Dashboard command center lists protected profiles, time-limit state,\s+viewing-space state, protected history count, verified-device readiness,\s+re-pairing status for revoked\/stale managed links, and delegated actions/);
+  assert.match(plan, /Dashboard command center lists protected profiles, time-limit state,\s+viewing-space state, protected history count, verified-device readiness,\s+re-pairing status for revoked\/stale managed links, compact delivery-path\s+detail, and delegated actions/);
   assert.match(inventory, new RegExp(docPath));
   assert.match(inventory, /read-only\s+managed status line on that child row plus a command center overview/);
   assert.match(inventory, /selected-profile verified-device send actions/);
@@ -363,6 +363,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /function buildManagedCommandCenterActionIntents\(profileId, timePolicy, policySummary = \{\}\)/);
   assert.match(helperSource, /function buildManagedCommandCenterBulkActionIntents\(rows = \[\]\)/);
   assert.match(helperSource, /function resolveManagedCommandCenterDeliveryPreview\(item = \{\}\)/);
+  assert.match(helperSource, /function describeManagedCommandCenterDeliveryPath\(item = \{\}\)/);
   assert.match(helperSource, /function renderManagedCommandCenter\(profilesV4, \{ revealDetails = false, helpers = \{\} \} = \{\}\)/);
   assert.match(helperSource, /panel\.setAttribute\('aria-label', 'Managed parent command center'\)/);
   assert.match(helperSource, /Overview of protected profiles, policy sync, time limits, action history, and delegated actions/);
@@ -376,6 +377,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /bulk_kids_only/);
   assert.match(helperSource, /bulk_main_only/);
   assert.match(helperSource, /resolveDeliveryPreview: resolveManagedCommandCenterDeliveryPreview/);
+  assert.match(helperSource, /describeDeliveryPath: describeManagedCommandCenterDeliveryPath/);
+  assert.match(helperSource, /ft-managed-command-center__detail-note/);
   assert.match(helperSource, /ft-managed-command-center__select/);
   assert.match(helperSource, /filtertubeManagedAction/);
   assert.match(helperSource, /delegated_runtime_gate/);

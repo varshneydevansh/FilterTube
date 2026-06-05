@@ -223,6 +223,36 @@
         };
     }
 
+    function describeManagedCommandCenterDeliveryPath(item = {}) {
+        const targetCount = Number(item.syncTargetCount) || 0;
+        const readyCount = Number(item.syncReadyCount) || 0;
+        const revokedCount = Number(item.syncRevokedCount) || 0;
+        const staleCount = Number(item.syncStaleCount) || 0;
+        const totalCount = Number(item.syncTotalCount) || 0;
+        if ((Number(item.remoteConflictCount) || 0) > 0) {
+            return 'Resolve protected history conflict before pushing new policy.';
+        }
+        if (targetCount <= 0 && revokedCount > 0) {
+            return 'Old trusted link was revoked; pair this device again.';
+        }
+        if (targetCount <= 0 && staleCount > 0) {
+            return 'Saved link is stale; refresh trust before sending.';
+        }
+        if (targetCount <= 0 || totalCount <= 0) {
+            return 'No child/protected device is paired for this profile.';
+        }
+        if (readyCount <= 0) {
+            return `${targetCount} verified ${targetCount === 1 ? 'device is' : 'devices are'} paired; install or connect live/LAN/mailbox delivery.`;
+        }
+        const paths = [];
+        if (item.syncLiveReady === true) paths.push('live P2P');
+        if (item.syncLocalNetworkReady === true) paths.push('LAN');
+        if (item.syncMailboxReady === true) paths.push('mailbox later');
+        return paths.length
+            ? `${targetCount} verified ${targetCount === 1 ? 'device' : 'devices'} via ${paths.join(' + ')}.`
+            : `${readyCount} verified ${readyCount === 1 ? 'queue is' : 'queues are'} ready.`;
+    }
+
     function buildManagedCommandCenterBulkActionIntents(rows = []) {
         const profileIds = (Array.isArray(rows) ? rows : [])
             .map(row => typeof row?.profileId === 'string' ? row.profileId.trim() : '')
@@ -385,6 +415,7 @@
                 })
             };
             row.deliveryPreview = resolveManagedCommandCenterDeliveryPreview(row);
+            row.deliveryPathDetail = describeManagedCommandCenterDeliveryPath(row);
             rows.push(row);
         };
         h.getAccountIds(root).forEach((accountId) => {
@@ -561,17 +592,23 @@
             });
             row.appendChild(statusCell);
             [
-                ['Delivery', item.deliveryPreview?.label || 'Pair verified device'],
-                ['Device', item.syncTargetLabel],
-                ['History', `${item.historyRowCount} rows | latest ${item.latestActionLabel}`]
-            ].forEach(([label, value]) => {
+                { label: 'Delivery', value: item.deliveryPreview?.label || 'Pair verified device', note: item.deliveryPathDetail },
+                { label: 'Device', value: item.syncTargetLabel },
+                { label: 'History', value: `${item.historyRowCount} rows | latest ${item.latestActionLabel}` }
+            ].forEach((detail) => {
                 const cell = document.createElement('div');
                 cell.className = 'ft-managed-command-center__detail';
                 const detailLabel = document.createElement('span');
-                detailLabel.textContent = label;
+                detailLabel.textContent = detail.label;
                 const detailValue = document.createElement('strong');
-                detailValue.textContent = value;
+                detailValue.textContent = detail.value;
                 cell.append(detailLabel, detailValue);
+                if (detail.note) {
+                    const note = document.createElement('small');
+                    note.className = 'ft-managed-command-center__detail-note';
+                    note.textContent = detail.note;
+                    cell.appendChild(note);
+                }
                 row.appendChild(cell);
             });
             if (h.onAction && Array.isArray(item.actionIntents) && item.actionIntents.length) {
@@ -607,6 +644,7 @@
         buildActionIntents: buildManagedCommandCenterActionIntents,
         buildBulkActionIntents: buildManagedCommandCenterBulkActionIntents,
         resolveDeliveryPreview: resolveManagedCommandCenterDeliveryPreview,
+        describeDeliveryPath: describeManagedCommandCenterDeliveryPath,
         render: renderManagedCommandCenter
     };
 })(typeof globalThis !== 'undefined' ? globalThis : window);

@@ -640,6 +640,15 @@ html[data-theme="dark"] body::after {
     line-height: 1.35;
 }
 
+.ft-managed-command-center__detail-note {
+    display: block;
+    color: var(--ft-color-text-secondary);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
 .ft-managed-command-center__status {
     display: flex;
     flex-wrap: wrap;

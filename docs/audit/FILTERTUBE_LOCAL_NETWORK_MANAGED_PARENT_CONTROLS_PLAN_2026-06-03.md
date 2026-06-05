@@ -85,7 +85,8 @@ extension authority code.
   protected profiles through parent/account re-auth.
 - [x] Dashboard command center lists protected profiles, time-limit state,
   viewing-space state, protected history count, verified-device readiness,
-  re-pairing status for revoked/stale managed links, and delegated actions.
+  re-pairing status for revoked/stale managed links, compact delivery-path
+  detail, and delegated actions.
 - [x] Command center can send signed active managed-policy updates to currently
   connected verified replica devices over Nanah P2P.
 - [x] Command center can hand ciphertext mailbox items or signed LAN candidates
@@ -542,8 +543,10 @@ replica child device over Nanah/P2P or same-network transport.
   mailbox/local-network delivery, cross-device fanout, and compromise-recovery
   proof remain later slices. Redacted per-target delivery preview controls are
   now present in the command center so parents can see live/later/re-pair/no-target
-  status before sending. Local selected-profile time-limit and viewing-space
-  bulk writes are already dashboard-gated.
+  status before sending, and the Delivery detail line now distinguishes live
+  P2P, LAN provider, mailbox-later, paired-but-provider-pending, revoked, stale,
+  and no-device cases. Local selected-profile time-limit and viewing-space bulk
+  writes are already dashboard-gated.
 - **Acceptance Criteria**:
   - The public descriptor is separated from the private keypair.
   - The private JWK is not placed in the Nanah hello descriptor or trusted link
@@ -707,8 +710,9 @@ the current extension dashboard.
   surface keeps a compact operational layout, uses one protected-profile row
   per manageable target, exposes per-row Send Update and selected-profile Send
   selected updates actions, shows compact status chips for access, limits, sync
-  readiness, redacted delivery preview, and remote conflict state, and records
-  protected redacted history for send success/failure/provider-pending cases. The implementation
+  readiness, redacted delivery preview, delivery-path detail, and remote conflict
+  state, and records protected redacted history for send
+  success/failure/provider-pending cases. The implementation
   intentionally avoids a separate oversized remote-management page until
   app/server provider work exists. Bulk keyword/channel/video rule additions
   now show a review confirmation, require parent/account re-auth, and write one
