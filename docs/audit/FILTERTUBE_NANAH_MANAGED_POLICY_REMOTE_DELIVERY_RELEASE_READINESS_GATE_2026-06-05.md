@@ -147,7 +147,8 @@ FT-MANAGED-REMOTE-05-time-limit-policy
 FT-MANAGED-REMOTE-06-offline-last-policy
 FT-MANAGED-REMOTE-07-revoked-replay-reject
 FT-MANAGED-REMOTE-08-action-history-redaction
-FT-MANAGED-REMOTE-09-no-work-idle
+FT-MANAGED-REMOTE-09-command-center-conflict-review
+FT-MANAGED-REMOTE-10-no-work-idle
 ```
 
 ## Current Decision

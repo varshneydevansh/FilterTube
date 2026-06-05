@@ -114,7 +114,12 @@
       "status": "missing"
     },
     {
-      "id": "FT-MANAGED-REMOTE-09-no-work-idle",
+      "id": "FT-MANAGED-REMOTE-09-command-center-conflict-review",
+      "requiredObservation": "The parent command center shows sync readiness and remote conflict state as compact status chips, visually marks conflict rows, and Review Conflict opens protected history only after parent/account authority.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-REMOTE-10-no-work-idle",
       "requiredObservation": "With no eligible provider or no pending policy, YouTube pages remain in no-work state: no added observers, timers, DOM scans, JSON work, or LAN fetch loops.",
       "status": "missing"
     }
