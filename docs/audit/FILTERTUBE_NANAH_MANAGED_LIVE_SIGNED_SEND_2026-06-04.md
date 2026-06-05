@@ -11,6 +11,8 @@ envelope construction or live send.
 `docs/audit/FILTERTUBE_NANAH_MANAGED_SIGNING_KEYPAIR_2026-06-04.md`
 **Multi-target boundary**:
 `docs/audit/FILTERTUBE_NANAH_MANAGED_MULTI_TARGET_FANOUT_BOUNDARY_2026-06-04.md`
+**Local-network source delivery**:
+`docs/audit/FILTERTUBE_MANAGED_LOCAL_NETWORK_SOURCE_DELIVERY_2026-06-05.md`
 
 ## Scope
 
@@ -127,8 +129,17 @@ They are accepted only when the ack matches a prior sent link/scope/revision/has
 row, and the stored summary keeps mailbox item ids or local-network candidate
 ids as metadata without plaintext rule values.
 
-This is not a mailbox runtime, local-network discovery runtime, key-rotation
-system, or offline later-delivery mechanism.
+The source helper can now also wrap signed envelopes as
+`filtertube_managed_local_network_candidate` rows and publish them to an
+optional local provider through a
+`filtertube_managed_local_network_delivery_request`. Provider acceptance is
+only delivery feedback: `markSent(...)` is called only for candidate ids the
+provider accepted, and the protected replica still validates the signed
+envelope before any policy write. This is a provider handoff, not built-in LAN
+discovery or built-in LAN transport.
+
+This is not a mailbox runtime, built-in local-network discovery runtime,
+key-rotation system, or complete offline later-delivery UI.
 
 Still pending:
 

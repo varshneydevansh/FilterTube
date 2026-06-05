@@ -9,6 +9,7 @@ const tabViewPath = 'js/tab-view.js';
 const tabViewHtmlPath = 'html/tab-view.html';
 const managedLivePolicyPath = 'js/nanah_managed_live_policy.js';
 const docPath = 'docs/audit/FILTERTUBE_NANAH_MANAGED_LIVE_SIGNED_SEND_2026-06-04.md';
+const sourceDeliveryDocPath = 'docs/audit/FILTERTUBE_MANAGED_LOCAL_NETWORK_SOURCE_DELIVERY_2026-06-05.md';
 const signingDocPath = 'docs/audit/FILTERTUBE_NANAH_MANAGED_SIGNING_KEYPAIR_2026-06-04.md';
 const planPath = 'docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md';
 const inventoryPath = 'docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md';
@@ -174,6 +175,7 @@ function createManagedLivePolicyHarness({ activeSurface = 'main', sourceProfile 
 
 test('managed live signed-send audit is linked without claiming mailbox runtime', () => {
   const doc = read(docPath);
+  const sourceDeliveryDoc = read(sourceDeliveryDocPath);
   const signingDoc = read(signingDocPath);
   const plan = read(planPath);
   const inventory = read(inventoryPath);
@@ -183,13 +185,18 @@ test('managed live signed-send audit is linked without claiming mailbox runtime'
   assert.match(doc, /explicit Main\/Kids\s+rule-source\s+picker/);
   assert.match(doc, /Rule bundle/);
   assert.match(doc, /All unsupported live sends continue through the existing proposal path/);
-  assert.match(doc, /not a mailbox runtime, local-network discovery runtime, key-rotation\s+system, or offline later-delivery mechanism/);
+  assert.match(doc, /not a mailbox runtime, built-in local-network discovery runtime,\s+key-rotation system, or complete offline later-delivery UI/);
+  assert.match(sourceDeliveryDoc, /Source-side local-network managed policy delivery handoff/);
+  assert.match(sourceDeliveryDoc, /Built-in LAN peer\s+discovery, LAN transport, server mailbox upload\/pull, and dashboard offline-send\s+UI remain absent/);
+  assert.match(doc, new RegExp(sourceDeliveryDocPath));
   assert.match(signingDoc, new RegExp(docPath));
   assert.match(plan, new RegExp(docPath));
-  assert.match(plan, /Active\/full signed managed sends now expand into concrete Main, Kids,\s+viewing-space, and optional time-limit envelopes for eligible fixed targets/);
-  assert.match(plan, /Built-in local-network peer discovery, LAN delivery, server mailbox\s+upload\/pull, app native enforcement proofs,\s+offline later delivery, and multi-device fanout remain gated/);
+  assert.match(plan, new RegExp(sourceDeliveryDocPath));
+  assert.match(plan, /Active\/full signed managed sends now expand into concrete\s+Main, Kids,\s+viewing-space, and optional time-limit envelopes for eligible fixed\s+targets/);
+  assert.match(plan, /Built-in local-network peer discovery, LAN transport, server mailbox\s+upload\/pull, app native enforcement proofs,\s+offline later delivery UI, and\s+built-in multi-device fanout remain gated/);
   assert.doesNotMatch(plan, /active\/full signed managed sends\s+remain gated/);
   assert.match(inventory, /fixed-target active\/full profile-policy bundles, Main\/Kids, keyword,\s+channel, video, viewing-space, and time-limit live sends can now build signed/);
+  assert.match(inventory, new RegExp(sourceDeliveryDocPath));
 });
 
 test('managed trusted links are profile scoped and connected target fanout is bounded', () => {
@@ -418,6 +425,80 @@ test('managed live signed-send helper records redacted outbound history per targ
   assert.equal(row.summary.delivery, 'live_nanah_session');
   assert.equal(JSON.stringify(row).includes('shakira'), false);
   assert.equal(JSON.stringify(row).includes('UC-shakira'), false);
+});
+
+test('managed live signed-send helper publishes local-network candidates and marks only accepted deliveries', async () => {
+  const { helper, trustedLink, policyUpdates } = createManagedLivePolicyHarness();
+  const candidates = await helper.buildLocalNetworkCandidateBatchForTrustedLinks(
+    { scope: 'rules_bundle', linkType: 'managed_link', authorityMode: 'managed' },
+    [trustedLink],
+    { candidateId: 'ln-candidate', ttlSeconds: 120 }
+  );
+
+  assert.deepEqual(plain(candidates.map((candidate) => candidate.schema)), [
+    'filtertube_managed_local_network_candidate',
+    'filtertube_managed_local_network_candidate',
+    'filtertube_managed_local_network_candidate'
+  ]);
+  assert.deepEqual(plain(candidates.map((candidate) => candidate.scope)), ['keywords', 'channels', 'videos']);
+  assert.deepEqual(plain(candidates.map((candidate) => candidate.candidateId)), [
+    'ln-candidate-1',
+    'ln-candidate-2',
+    'ln-candidate-3'
+  ]);
+  assert.equal(candidates[0].envelope.type, 'filtertube_managed_policy');
+  assert.equal(candidates[0].envelope.integrity.signedFields.payloadScope, 'keywords');
+  assert.equal(candidates[0].expiresAt, 1779300120000);
+  assert.equal(JSON.stringify(candidates).includes('privateKeyJwk'), false);
+  assert.equal(JSON.stringify(candidates).includes('"d":"'), false);
+
+  let capturedRequest = null;
+  const provider = {
+    async publishManagedPolicyCandidates(request) {
+      capturedRequest = plain(request);
+      return {
+        ok: true,
+        deliveredCandidateIds: [candidates[0].candidateId, candidates[2].candidateId]
+      };
+    }
+  };
+
+  const result = await helper.deliverLocalNetworkCandidates(candidates, provider, { reason: 'manual_source_send' });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.candidateCount, 3);
+  assert.equal(result.deliveredCandidateCount, 2);
+  assert.equal(result.failedCandidateCount, 1);
+  assert.equal(result.markedSentCount, 2);
+  assert.equal(capturedRequest.schema, 'filtertube_managed_local_network_delivery_request');
+  assert.equal(capturedRequest.reason, 'manual_source_send');
+  assert.deepEqual(capturedRequest.scopes, ['keywords', 'channels', 'videos']);
+  assert.equal(capturedRequest.candidates.length, 3);
+  assert.deepEqual(plain(policyUpdates.map((entry) => entry.patch.policy.outboundManagedPolicyHistory[0].summary.delivery)), [
+    'local_network_provider',
+    'local_network_provider'
+  ]);
+  assert.deepEqual(plain(policyUpdates.map((entry) => entry.patch.policy.outgoingManagedPolicies)), [
+    {
+      keywords: {
+        revision: candidates[0].revision,
+        policyHash: candidates[0].policyHash,
+        sentAt: 1779300000000
+      }
+    },
+    {
+      videos: {
+        revision: candidates[2].revision,
+        policyHash: candidates[2].policyHash,
+        sentAt: 1779300000000
+      }
+    }
+  ]);
+
+  const unavailable = await helper.deliverLocalNetworkCandidates(candidates, {}, { reason: 'manual_source_send' });
+  assert.equal(unavailable.ok, false);
+  assert.equal(unavailable.reason, 'local_network_delivery_provider_unavailable');
+  assert.equal(unavailable.markedSentCount, 0);
 });
 
 test('managed live signed-send helper records matching live ack history without plaintext values', async () => {

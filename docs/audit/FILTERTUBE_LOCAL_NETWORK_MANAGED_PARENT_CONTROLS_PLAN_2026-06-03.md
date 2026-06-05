@@ -20,22 +20,24 @@ provider-gated dashboard/profile-open pull hook and redacted provider ack
 handoff are present for already-decrypted mailbox items, and the adapter now
 has a source-side server-safe mailbox storage item builder for already-encrypted
 payloads plus local WebCrypto seal/open helpers that keep plaintext policy out
-of mailbox storage. A provider-gated dashboard/profile-open local-network candidate
-discovery hook plus redacted provider candidate ack handoff are present for
-already trusted managed replica links. An extension-owned
-managed app policy contract artifact and app manifest copy row are now present
-so downstream app parity can be tested before native enforcement changes.
-Active/full signed managed sends now expand into concrete Main, Kids,
-viewing-space, and optional time-limit envelopes for eligible fixed targets.
-Built-in local-network peer discovery, LAN delivery, server mailbox
-upload/pull, app native enforcement proofs,
-offline later delivery, and multi-device fanout remain gated. The adapter now
-exposes a local-network candidate authority gate for future LAN providers, and
-the dashboard has a sanitized receive bridge that records accepted/rejected
+of mailbox storage. A provider-gated dashboard/profile-open local-network
+candidate discovery hook plus redacted provider candidate ack handoff are
+present for already trusted managed replica links, and source-side
+local-network provider delivery handoff can now publish signed candidates while
+marking sent revision/hash state only for provider-accepted candidate ids. An
+extension-owned managed app policy contract artifact and app manifest copy row
+are now present so downstream app parity can be tested before native
+enforcement changes. Active/full signed managed sends now expand into concrete
+Main, Kids, viewing-space, and optional time-limit envelopes for eligible fixed
+targets. Built-in local-network peer discovery, LAN transport, server mailbox
+upload/pull, app native enforcement proofs, offline later delivery UI, and
+built-in multi-device fanout remain gated. The adapter now exposes a
+local-network candidate authority gate for future LAN providers, and the
+dashboard has a sanitized receive bridge that records accepted/rejected
 local-network candidate outcomes through protected managed action history. This
-does not add built-in peer discovery or LAN delivery. Local-network provider
-acks are feedback only and record redacted scope/revision/hash/result metadata,
-not plaintext rules or authority.
+does not add built-in peer discovery or built-in LAN transport. Local-network
+provider acks are feedback only and record redacted scope/revision/hash/result
+metadata, not plaintext rules or authority.
 **Primary audit input**:
 `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
 **Current pull-on-open proof**:
@@ -482,7 +484,9 @@ replica child device over Nanah/P2P or same-network transport.
 
 - **Location**:
   - `js/tab-view.js`
+  - `js/nanah_managed_live_policy.js`
   - `docs/audit/FILTERTUBE_NANAH_MANAGED_LIVE_SIGNED_SEND_2026-06-04.md`
+  - `docs/audit/FILTERTUBE_MANAGED_LOCAL_NETWORK_SOURCE_DELIVERY_2026-06-05.md`
   - `tests/runtime/managed-nanah-live-signed-send-current-behavior.test.mjs`
 - **Description**: Convert saved Source -> Replica managed Main/Kids and
   granular rule/viewing/time-limit sends to signed `filtertube_managed_policy`
@@ -505,9 +509,13 @@ replica child device over Nanah/P2P or same-network transport.
   after the provider ack attempt. Source-side provider-fed mailbox/local-network
   delivery ack summaries are now present under
   `docs/audit/FILTERTUBE_MANAGED_SOURCE_DELIVERY_ACK_STATUS_2026-06-05.md`.
-  Mailbox delivery, local-network delivery, cross-device fanout, and richer
-  per-target preview controls remain pending. Local selected-profile time-limit
-  and viewing-space bulk writes are already dashboard-gated.
+  Source-side local-network provider delivery handoff can now publish signed
+  local-network candidates and mark sent revision/hash state only for
+  provider-accepted candidate ids. Built-in local-network peer discovery, LAN
+  transport, server mailbox upload/pull, app native enforcement proofs,
+  offline later delivery UI, and built-in multi-device fanout remain gated.
+  Local selected-profile time-limit and viewing-space bulk writes are already
+  dashboard-gated.
 - **Acceptance Criteria**:
   - Existing proposal sends still work for non-managed peer scopes.
   - Signed sends require saved managed link, Source -> Replica roles, allowed

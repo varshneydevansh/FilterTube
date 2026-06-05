@@ -203,7 +203,7 @@ test('local-network provider hook is docs-backed and linked from managed parent 
   assert.match(sourceAckDoc, /runtime source-side provider-gated ack pull: present/);
   assert.match(sourceAckDoc, /runtime YouTube page hot-path work from this slice: absent/);
   assert.match(boundary, /provider-gated local-network candidate discovery hook/);
-  assert.match(boundary, /redacted provider ack handoff/);
+  assert.match(boundary, /redacted\s+provider ack handoff/);
   assert.match(plan, new RegExp(docPath));
   assert.match(plan, new RegExp(sourceAckDocPath));
   assert.match(inventory, new RegExp(docPath));

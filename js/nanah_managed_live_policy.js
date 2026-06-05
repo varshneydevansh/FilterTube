@@ -21,6 +21,8 @@
     const MANAGED_LIVE_ACK_SCHEMA = 'filtertube_nanah_managed_live_ack';
     const MANAGED_MAILBOX_ACK_SCHEMA = 'filtertube_nanah_managed_open_sync_ack';
     const MANAGED_LOCAL_NETWORK_ACK_SCHEMA = 'filtertube_managed_local_network_candidate_ack';
+    const MANAGED_LOCAL_NETWORK_CANDIDATE_SCHEMA = 'filtertube_managed_local_network_candidate';
+    const MANAGED_LOCAL_NETWORK_DELIVERY_REQUEST_SCHEMA = 'filtertube_managed_local_network_delivery_request';
     const MANAGED_LIVE_ACK_HISTORY_SCHEMA = 'filtertube_managed_live_ack_history';
     const MANAGED_REMOTE_DELIVERY_ACK_HISTORY_SCHEMA = 'filtertube_managed_remote_delivery_ack_history';
     const MANAGED_OUTBOUND_HISTORY_SCHEMA = 'filtertube_managed_outbound_policy_history';
@@ -242,6 +244,17 @@
             return deps.buildLocalPolicyHash('remote-managed-policy', stablePolicyJson(seed));
         }
 
+        function stripEnvelopePrivateFields(envelope) {
+            const clean = {
+                ...safeObject(envelope)
+            };
+            delete clean.privateKeyJwk;
+            delete clean.privateKey;
+            delete clean.secretKey;
+            delete clean.signingKey;
+            return clean;
+        }
+
         function getOutgoingPolicyState(trustedLink, scope) {
             const trusted = deps.normalizeTrustedLink(trustedLink);
             const state = safeObject(safeObject(safeObject(trusted?.policy).outgoingManagedPolicies)[normalizeString(scope).toLowerCase()]);
@@ -301,7 +314,7 @@
                 ? prior.revision
                 : Math.max(0, prior?.revision || 0) + 1;
 
-            return adapter.signManagedPolicyEnvelope({
+            const signedEnvelope = await adapter.signManagedPolicyEnvelope({
                 type: 'filtertube_managed_policy',
                 linkId: normalizeString(trustedLink.linkId),
                 scope: normalizedScope,
@@ -317,6 +330,7 @@
                 payload,
                 privateKeyJwk: keyPair.privateKeyJwk
             });
+            return stripEnvelopePrivateFields(signedEnvelope);
         }
 
         async function buildEnvelopeForLiveSend(policy) {
@@ -394,10 +408,167 @@
                 summary: {
                     redacted: true,
                     label: 'Sent signed managed policy',
-                    delivery: 'live_nanah_session'
+                    delivery: normalizeString(optionRoot.delivery) || 'live_nanah_session'
                 },
                 sensitive: true
             };
+        }
+
+        function buildLocalNetworkCandidateFromEnvelope(envelope, options = {}) {
+            const root = safeObject(envelope);
+            const optionRoot = safeObject(options);
+            const scope = normalizeScope(root.scope);
+            const revision = normalizeNonNegativeInteger(root.revision);
+            const policyHash = normalizeString(root.policyHash);
+            const linkId = normalizeString(root.linkId);
+            if (!scope || !revision || !policyHash || !linkId) {
+                throw new Error('Local-network managed candidates require link, scope, revision, and policy hash.');
+            }
+
+            const createdAt = normalizeNonNegativeInteger(optionRoot.createdAt) || deps.now();
+            const ttlSeconds = normalizeNonNegativeInteger(optionRoot.ttlSeconds) || 3600;
+            const expiresAt = optionRoot.expiresAt === null
+                ? null
+                : (normalizeNonNegativeInteger(optionRoot.expiresAt) || (createdAt + (ttlSeconds * 1000)));
+            const candidateId = normalizeString(optionRoot.candidateId)
+                || `managed-ln-${linkId}-${scope}-${revision}-${policyHash.slice(0, 16)}-${createdAt}`;
+            return {
+                schema: MANAGED_LOCAL_NETWORK_CANDIDATE_SCHEMA,
+                version: 1,
+                candidateId,
+                transport: 'local_network',
+                linkId,
+                sourceDeviceId: normalizeString(root.sourceDeviceId),
+                sourceProfileId: normalizeString(root.sourceProfileId),
+                targetProfileId: normalizeString(root.targetProfileId),
+                targetProfileName: normalizeString(root.targetProfileName),
+                scope,
+                revision,
+                policyHash,
+                sourcePublicKeyId: normalizeString(root.sourcePublicKeyId),
+                keyVersion: normalizeNonNegativeInteger(root.keyVersion) || 0,
+                issuedAt: normalizeNonNegativeInteger(root.issuedAt) || createdAt,
+                createdAt,
+                expiresAt,
+                envelope: root,
+                summary: {
+                    redacted: true,
+                    label: 'Signed local-network managed policy candidate',
+                    scope,
+                    revision
+                },
+                sensitive: true
+            };
+        }
+
+        async function buildLocalNetworkCandidateBatchForTrustedLinks(policy, trustedLinks, options = {}) {
+            const envelopes = await buildEnvelopeBatchForTrustedLinks(policy, trustedLinks);
+            return envelopes.map((envelope, index) => buildLocalNetworkCandidateFromEnvelope(envelope, {
+                ...safeObject(options),
+                candidateId: normalizeString(safeObject(options).candidateId)
+                    ? `${normalizeString(safeObject(options).candidateId)}-${index + 1}`
+                    : ''
+            }));
+        }
+
+        function buildLocalNetworkDeliveryRequest(candidates, options = {}) {
+            const optionRoot = safeObject(options);
+            const rows = safeArray(candidates).map(row => safeObject(row)).filter(row => normalizeString(row.candidateId));
+            return {
+                schema: MANAGED_LOCAL_NETWORK_DELIVERY_REQUEST_SCHEMA,
+                version: 1,
+                transport: 'local_network',
+                reason: normalizeString(optionRoot.reason) || 'manual_send',
+                requestedAt: normalizeNonNegativeInteger(optionRoot.requestedAt) || deps.now(),
+                candidateCount: rows.length,
+                targetProfileIds: Array.from(new Set(rows.map(row => normalizeString(row.targetProfileId)).filter(Boolean))),
+                scopes: Array.from(new Set(rows.map(row => normalizeScope(row.scope)).filter(Boolean))),
+                candidates: rows
+            };
+        }
+
+        function getLocalNetworkDeliveryWriter(provider) {
+            const root = safeObject(provider);
+            if (typeof root.publishManagedPolicyCandidates === 'function') return root.publishManagedPolicyCandidates;
+            if (typeof root.deliverManagedPolicyCandidates === 'function') return root.deliverManagedPolicyCandidates;
+            if (typeof root.publishLocalNetworkCandidates === 'function') return root.publishLocalNetworkCandidates;
+            if (typeof root.putManagedPolicyCandidates === 'function') return root.putManagedPolicyCandidates;
+            return null;
+        }
+
+        function normalizeDeliveredCandidateIds(result, candidates, ok) {
+            const root = safeObject(result);
+            const candidateRows = safeArray(candidates);
+            const explicit = safeArray(root.deliveredCandidateIds || root.acceptedCandidateIds || root.candidateIds)
+                .map(item => normalizeString(item))
+                .filter(Boolean);
+            if (explicit.length > 0) return new Set(explicit);
+            const count = Number(root.deliveredCandidateCount ?? root.acceptedCandidateCount ?? root.queuedCandidateCount);
+            const deliveredCount = Number.isFinite(count)
+                ? Math.max(0, Math.min(candidateRows.length, Math.floor(count)))
+                : (ok ? candidateRows.length : 0);
+            return new Set(candidateRows.slice(0, deliveredCount).map(row => normalizeString(row.candidateId)).filter(Boolean));
+        }
+
+        async function deliverLocalNetworkCandidates(candidates, provider, options = {}) {
+            const rows = safeArray(candidates).map(row => safeObject(row)).filter(row => normalizeString(row.candidateId));
+            const writer = getLocalNetworkDeliveryWriter(provider);
+            const request = buildLocalNetworkDeliveryRequest(rows, options);
+            if (!writer) {
+                return {
+                    ok: false,
+                    reason: 'local_network_delivery_provider_unavailable',
+                    candidateCount: rows.length,
+                    deliveredCandidateCount: 0,
+                    failedCandidateCount: rows.length,
+                    markedSentCount: 0,
+                    request
+                };
+            }
+
+            try {
+                const rawResult = safeObject(await writer.call(provider, request));
+                const ok = rawResult.ok !== false;
+                const deliveredIds = normalizeDeliveredCandidateIds(rawResult, rows, ok);
+                let markedSentCount = 0;
+                for (const row of rows) {
+                    if (!deliveredIds.has(normalizeString(row.candidateId))) continue;
+                    const marked = await markSent(row.linkId, row.scope, row.revision, row.policyHash, {
+                        targetProfileId: row.targetProfileId,
+                        targetProfileName: row.targetProfileName,
+                        sourceProfileId: row.sourceProfileId,
+                        sourceDeviceId: row.sourceDeviceId,
+                        issuedAt: row.issuedAt,
+                        delivery: 'local_network_provider'
+                    });
+                    if (marked) markedSentCount += 1;
+                }
+                const deliveredCandidateCount = deliveredIds.size;
+                return {
+                    ok,
+                    reason: normalizeString(rawResult.reason),
+                    candidateCount: rows.length,
+                    deliveredCandidateCount,
+                    failedCandidateCount: Math.max(0, rows.length - deliveredCandidateCount),
+                    markedSentCount,
+                    request
+                };
+            } catch (error) {
+                return {
+                    ok: false,
+                    reason: normalizeString(error?.message) || 'local_network_delivery_provider_failed',
+                    candidateCount: rows.length,
+                    deliveredCandidateCount: 0,
+                    failedCandidateCount: rows.length,
+                    markedSentCount: 0,
+                    request
+                };
+            }
+        }
+
+        async function deliverLocalNetworkPolicyBatch(policy, trustedLinks, provider, options = {}) {
+            const candidates = await buildLocalNetworkCandidateBatchForTrustedLinks(policy, trustedLinks, options);
+            return deliverLocalNetworkCandidates(candidates, provider, options);
         }
 
         function normalizeAckState(value) {
@@ -657,6 +828,11 @@
             buildEnvelopeForLiveSend,
             buildEnvelopeBatchForLiveSend,
             buildEnvelopeBatchForTrustedLinks,
+            buildLocalNetworkCandidateFromEnvelope,
+            buildLocalNetworkCandidateBatchForTrustedLinks,
+            buildLocalNetworkDeliveryRequest,
+            deliverLocalNetworkCandidates,
+            deliverLocalNetworkPolicyBatch,
             buildOutboundHistoryRow,
             buildLiveAckPayload,
             recordLiveAckPayload,

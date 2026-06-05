@@ -175,8 +175,8 @@ test('local-network discovery authority boundary is validation-backed and linked
   const inventory = read(inventoryPath);
   const source = runtimeSource();
 
-  assert.match(doc, /Status\*\*: Managed-policy validation\/apply, signed live Nanah send, mailbox\s+intake, revision state, protected history evidence, adapter-level\s+local-network candidate validation, dashboard local-network candidate receive\s+handling, and a provider-gated dashboard\/profile-open local-network candidate\s+discovery hook plus redacted provider ack handoff are present/);
-  assert.match(doc, /Runtime built-in\s+LAN peer discovery and LAN delivery are\s+still absent/);
+  assert.match(doc, /Status\*\*: Managed-policy validation\/apply, signed live Nanah send, mailbox\s+intake, revision state, protected history evidence, adapter-level\s+local-network candidate validation, dashboard local-network candidate receive\s+handling, source-side provider delivery handoff, and a provider-gated\s+dashboard\/profile-open local-network candidate discovery hook plus redacted\s+provider ack handoff are present/);
+  assert.match(doc, /Runtime\s+built-in LAN peer discovery and built-in LAN transport are still absent/);
   assert.match(doc, /Local-network discovery is convenience only/);
   assert.match(doc, /Boundary Rows/);
   assert.match(doc, /Hostile LAN Threat Model/);
@@ -185,7 +185,7 @@ test('local-network discovery authority boundary is validation-backed and linked
   assert.match(doc, /runtime local-network candidate receive bridge: present in js\/tab-view\.js/);
   assert.match(doc, /runtime provider-gated local-network candidate discovery hook: present in js\/tab-view\.js/);
   assert.match(doc, /runtime built-in local-network peer discovery: absent/);
-  assert.match(doc, /runtime built-in LAN delivery: absent/);
+  assert.match(doc, /runtime built-in LAN transport: absent/);
   assert.match(doc, /runtime filtertube_managed_policy envelope validator: present/);
   assert.match(doc, /runtime managed policy revision store: present on target profile remoteManagedPolicies/);
   assert.match(doc, /runtime managed validation-history writer: present for Nanah, mailbox, and local-network candidate managed-policy receive events/);
@@ -195,8 +195,8 @@ test('local-network discovery authority boundary is validation-backed and linked
   assert.match(doc, /runtime local\/decrypted mailbox item intake: present/);
   assert.match(doc, /runtime provider-gated local-network ack handoff: present/);
   assert.match(doc, /runtime protected local-network ack-handoff history writer: present/);
-  assert.match(doc, /provider-gated candidate discovery and ack handoff do not add built-in LAN peer discovery or LAN delivery/);
-  assert.match(doc, /no\s+built-in LAN peer discovery or LAN delivery runtime exists in\s+the extension/);
+  assert.match(doc, /provider-gated candidate discovery, delivery handoff, and ack handoff do not add built-in LAN peer discovery or built-in LAN transport/);
+  assert.match(doc, /no\s+built-in LAN peer discovery or LAN transport runtime exists in\s+the extension/);
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
 

@@ -4,10 +4,10 @@
 **Status**: Managed-policy validation/apply, signed live Nanah send, mailbox
 intake, revision state, protected history evidence, adapter-level
 local-network candidate validation, dashboard local-network candidate receive
-handling, and a provider-gated dashboard/profile-open local-network candidate
-discovery hook plus redacted provider ack handoff are present for trusted
-managed-policy paths. Runtime built-in LAN peer discovery and LAN delivery are
-still absent.
+handling, source-side provider delivery handoff, and a provider-gated
+dashboard/profile-open local-network candidate discovery hook plus redacted
+provider ack handoff are present for trusted managed-policy paths. Runtime
+built-in LAN peer discovery and built-in LAN transport are still absent.
 **Goal slice**: Implementation order item 2, "Add local-network/P2P
 managed-control plan and hostile-LAN threat model".  
 **Primary inputs**:
@@ -91,8 +91,9 @@ Current product runtime state:
 runtime local-network candidate authority gate: present in js/nanah_sync_adapter.js
 runtime local-network candidate receive bridge: present in js/tab-view.js
 runtime provider-gated local-network candidate discovery hook: present in js/tab-view.js
+runtime source-side local-network provider delivery handoff: present in js/nanah_managed_live_policy.js
 runtime built-in local-network peer discovery: absent
-runtime built-in LAN delivery: absent
+runtime built-in LAN transport: absent
 runtime filtertube_managed_policy envelope validator: present in js/nanah_sync_adapter.js
 runtime managed policy revision store: present on target profile remoteManagedPolicies
 runtime managed validation-history writer: present for Nanah, mailbox, and local-network candidate managed-policy receive events
@@ -102,7 +103,7 @@ runtime signed live Nanah managed-policy send: present for fixed-target active/f
 runtime local/decrypted mailbox item intake: present after caller-provided decryption
 runtime provider-gated local-network ack handoff: present with redacted candidate outcome metadata
 runtime protected local-network ack-handoff history writer: present on protected target profiles
-runtime behavior changed by this contract family: managed policy validation/apply/signing/history paths are live, and explicitly delivered or provider-returned local-network candidates must pass trusted-link/device/key/envelope validation before history/apply; provider-gated candidate discovery and ack handoff do not add built-in LAN peer discovery or LAN delivery
+runtime behavior changed by this contract family: managed policy validation/apply/signing/history paths are live, source-side provider delivery can publish signed local-network candidates, and explicitly delivered or provider-returned local-network candidates must pass trusted-link/device/key/envelope validation before history/apply; provider-gated candidate discovery, delivery handoff, and ack handoff do not add built-in LAN peer discovery or built-in LAN transport
 ```
 
 Existing Nanah profile-scoped `app_sync` and `control_proposal` paths are not
@@ -124,7 +125,7 @@ local/decrypted mailbox paths. The dashboard can now ask an optional
 dashboard/profile open, and can return redacted accepted/rejected candidate ack
 records to that provider. provider handoff is not authority; those ack records
 are feedback only, not policy
-authority, and no built-in LAN peer discovery or LAN delivery runtime exists in
+authority, and no built-in LAN peer discovery or LAN transport runtime exists in
 the extension.
 
 ## Verification
