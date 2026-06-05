@@ -375,6 +375,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /function summarizeManagedPolicyStateForProfile\(profile\)/);
   assert.match(source, /latestActionLabel/);
   assert.match(source, /MANAGED_ACTION_HISTORY_SAFE_LABELS\[latestActionType\]/);
+  assert.match(source, /sourceAckLabel/);
+  assert.match(source, /formatNanahManagedSourceAckSyncStatus/);
   assert.match(helperSource, /function buildManagedCommandCenterSummary\(profilesV4, \{ revealDetails = false, helpers = \{\} \} = \{\}\)/);
   assert.match(helperSource, /function buildManagedCommandCenterActionIntents\(profileId, timePolicy, policySummary = \{\}\)/);
   assert.match(helperSource, /function buildManagedCommandCenterBulkActionIntents\(rows = \[\]\)/);
@@ -402,6 +404,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /filtertubeSyncReady/);
   assert.match(helperSource, /selectedProfileInputs/);
   assert.match(helperSource, /panel\.appendChild\(list\);[\s\S]*panel\.__filtertubeUpdateManagedBulkState\(\);/);
+  assert.match(helperSource, /syncSourceAckLabel/);
+  assert.match(helperSource, /Ack: \$\{item\.syncSourceAckLabel\}/);
   assert.match(helperSource, /filtertubeManagedAction/);
   assert.match(helperSource, /delegated_runtime_gate/);
   assert.match(helperSource, /global\.FilterTubeManagedParentCommandCenter = \{/);
@@ -466,6 +470,7 @@ test('managed command-center spec pins parent workflow without making UI authori
     'locked parent/account session',
     'successful local save',
     'pending P2P/local-network delivery',
+    'redacted source-side delivery ack status',
     'offline trusted device',
     'rejected or conflicted remote update',
     'failed provider/mailbox pull',
@@ -477,7 +482,7 @@ test('managed command-center spec pins parent workflow without making UI authori
 
   assert.match(doc, /Command-center action buttons are action intents only/);
   assert.match(doc, /The Delivery row preview is a redacted status summary only/);
-  assert.match(doc, /Delivery links and preview labels are not authority/);
+  assert.match(doc, /Delivery links, preview labels, and ack labels are not authority/);
   assert.match(doc, /UI choice is not authority; runtime route gate remains the enforcement layer/);
   assert.match(doc, /Runtime budget accounting remains background-owned/);
   assert.match(doc, /Add Time and Add selected time/);
@@ -835,6 +840,7 @@ test('managed command-center helper emits delegated action intents without polic
         revokedCount: 0,
         staleCount: 0,
         totalCount: 1,
+        sourceAckLabel: '1 recorded, 0 ignored',
         liveReady: true,
         mailboxReady: false,
         localNetworkReady: false,

@@ -9696,6 +9696,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const mailboxReady = hasNanahManagedMailboxUploadWriter();
         const localReady = hasNanahManagedLocalNetworkDeliveryWriter();
         const readyCount = (liveReady || mailboxReady || localReady) ? targetCount : 0;
+        const sourceAckLabels = links
+            .map(formatNanahManagedSourceAckSyncStatus)
+            .map(label => normalizeString(label))
+            .filter(Boolean);
+        const sourceAckLabel = sourceAckLabels.length
+            ? Array.from(new Set(sourceAckLabels)).slice(0, 2).join(' | ')
+            : '';
         if (!targetCount) {
             if (revokedCount > 0) {
                 return {
@@ -9705,6 +9712,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     revokedCount,
                     staleCount,
                     totalCount,
+                    sourceAckLabel: '',
                     liveReady: false,
                     mailboxReady: false,
                     localNetworkReady: false
@@ -9718,6 +9726,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     revokedCount,
                     staleCount,
                     totalCount,
+                    sourceAckLabel: '',
                     liveReady: false,
                     mailboxReady: false,
                     localNetworkReady: false
@@ -9730,6 +9739,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 revokedCount,
                 staleCount,
                 totalCount,
+                sourceAckLabel: '',
                 liveReady: false,
                 mailboxReady: false,
                 localNetworkReady: false
@@ -9749,6 +9759,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             revokedCount,
             staleCount,
             totalCount,
+            sourceAckLabel,
             liveReady,
             mailboxReady,
             localNetworkReady: localReady

@@ -36,6 +36,7 @@
                     revokedCount: 0,
                     staleCount: 0,
                     totalCount: 0,
+                    sourceAckLabel: '',
                     liveReady: false,
                     localNetworkReady: false,
                     mailboxReady: false
@@ -402,6 +403,7 @@
                 syncRevokedCount: syncTarget.revokedCount || 0,
                 syncStaleCount: syncTarget.staleCount || 0,
                 syncTotalCount: syncTarget.totalCount || syncTarget.targetCount || 0,
+                syncSourceAckLabel: typeof syncTarget.sourceAckLabel === 'string' ? syncTarget.sourceAckLabel.trim() : '',
                 syncLiveReady: syncTarget.liveReady === true,
                 syncMailboxReady: syncTarget.mailboxReady === true,
                 syncLocalNetworkReady: syncTarget.localNetworkReady === true,
@@ -640,8 +642,9 @@
                 { label: item.viewingAccess, tone: 'neutral' },
                 { label: item.timeLimit, tone: item.timeLimited ? 'warning' : 'neutral' },
                 { label: syncState.label, tone: syncState.tone },
-                { label: item.syncLabel, tone: item.remoteScopeCount ? 'success' : 'neutral' }
-            ].forEach((chip) => {
+                { label: item.syncLabel, tone: item.remoteScopeCount ? 'success' : 'neutral' },
+                item.syncSourceAckLabel ? { label: `Ack: ${item.syncSourceAckLabel}`, tone: 'neutral' } : null
+            ].filter(Boolean).forEach((chip) => {
                 const status = document.createElement('span');
                 status.className = `ft-managed-command-center__chip is-${chip.tone}`;
                 status.textContent = chip.label;

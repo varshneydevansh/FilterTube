@@ -118,6 +118,7 @@ runtime managed command-center protection strip: present
 runtime managed command-center labeled delivery/device/history details: present
 runtime managed command-center delegated action intents: present
 runtime managed command-center redacted delivery preview: present
+runtime managed command-center redacted delivery-ack status: present
 runtime managed command-center selected-profile rule editor handoff: present via delegated runtime gate
 runtime managed command-center bulk time-limit controls: present via delegated runtime gate
 runtime managed command-center parent extra-time grants: present via delegated runtime gate
@@ -148,7 +149,7 @@ weakening the authority model:
 | Managed profile selection | See each protected profile, owner relationship, current lock state, verified-device readiness, and last policy revision. | Child/protected views still hide admin controls and detailed history. |
 | Protection scan strip | Quickly see protected profile count, sync-ready profiles, profiles needing re-pairing, and remote conflicts before acting. | Strip values are aggregate status only; they do not include rule text, policy payloads, keys, or mutation authority. |
 | Rule editing | Command-center row actions still enter the existing managed protected-profile editor, selected-profile bulk controls can hand off one selected protected profile to the same editor, and selected-profile bulk keyword/channel/video-ID additions can apply one reviewed rule to selected protected profiles. Changed profiles with verified delivery can then push the matching rule scope immediately. | Writes must use the same validated local/remote managed-policy paths as current FilterTube controls; bulk rule writes require review confirmation, parent/account re-auth, per-target revision/history rows, selected Main/Kids surface binding for granular sends, and no child authority. |
-| Remote send | Parent can send one protected profile or selected protected profiles to saved verified devices and see whether the next attempt is live, later via LAN/mailbox provider, blocked by conflict, blocked by stale/revoked pairing, or missing a verified device. | Delivery links and preview labels are not authority; each envelope still requires Source -> Replica trust, fixed target profile, allowed scope, signature/integrity proof, and newer revision/hash. |
+| Remote send | Parent can send one protected profile or selected protected profiles to saved verified devices and see whether the next attempt is live, later via LAN/mailbox provider, blocked by conflict, blocked by stale/revoked pairing, missing a verified device, or has redacted source-side delivery ack feedback. | Delivery links, preview labels, and ack labels are not authority; each envelope still requires Source -> Replica trust, fixed target profile, allowed scope, signature/integrity proof, and newer revision/hash. |
 | Viewing spaces | Show Main, Kids, both, or neither per protected profile; row actions still change policy and selected-profile bulk actions can apply Main + Kids, Kids only, or Main only locally, then offer a scoped verified-device push when delivery exists. | UI choice is not authority; runtime route gate remains the enforcement layer; every selected target gets its own redacted revision/history row after parent re-auth. |
 | Time limits | Show daily YouTube budget state; command-center row actions still set/disable one profile, can add temporary extra time to one active limit, and bulk selected-profile actions can apply the same daily budget, disable existing limits, or add temporary extra time to selected active limits, then offer a scoped verified-device push when delivery exists. | Runtime budget accounting remains background-owned; every target gets its own revision/history row after parent re-auth, and extra-time grants are bounded by expiry. |
 | Sync status | Show trusted device, delivery preview, local-network provider, Nanah open-sync, and mailbox status. | Reachability is never authorization; offline state keeps the last valid policy active. |
@@ -162,6 +163,7 @@ Required UI states for that slice:
 - successful local save status through row summaries/history;
 - pending P2P/local-network delivery;
 - connected verified-device send success;
+- redacted source-side delivery ack status;
 - provider pending when the extension has no mailbox/LAN provider hook;
 - offline trusted device;
 - rejected or conflicted remote update;
