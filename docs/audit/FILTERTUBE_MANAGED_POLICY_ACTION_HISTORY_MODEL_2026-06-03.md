@@ -15,7 +15,9 @@ state and copy redacted rate-limit metadata into the protected history row.
 Parent/caregiver history clearing now records its own protected
 `history.clear` evidence row instead of silently removing accepted rows.
 Trusted-link removal history writer now records protected `trust_link.revoke`
-rows when local accepted managed policy state is purged for a removed link.
+rows when local accepted managed policy state is purged for a removed link, and
+source-side signing-key rotation now records protected `trust_link.key_revoke`
+rows for affected child-device links that must be paired again.
 Pull-on-open mailbox ack handoff now records redacted protected
 `remote_policy.mailbox.ack` rows on the target profile after the provider ack
 attempt completes. Provider-gated local-network candidate ack handoff now records
@@ -59,7 +61,9 @@ failed-auth rows when parent/admin unlock fails while opening managed child
 edit, viewing/clearing protected history, changing viewing space, or changing
 time limits, records a protected clear row when accepted history is cleared, and
 records a protected `trust_link.revoke` row when trusted-link removal purges
-target-local remote managed-policy state for that link. It also records
+target-local remote managed-policy state for that link. Source-side managed
+signing-key rotation also records protected `trust_link.key_revoke` rows so
+parents can see which child-device links need re-pairing. It also records
 redacted outbound live-send evidence on the parent/source trusted link after a
 signed Nanah envelope is sent, and redacted inbound live-ack evidence on the
 same trusted link after a connected replica reports accepted, rejected, or
@@ -112,6 +116,7 @@ policy.time_limit.update
 policy.sync_policy.update
 trust_link.create
 trust_link.revoke
+trust_link.key_revoke
 admin_session.unlock
 admin_session.failed_unlock
 local_policy.update
@@ -188,6 +193,7 @@ The following events must produce action-history rows in future implementation:
 | `rejected_spoofed_lan_policy` | Local-network discovery claims parent device without trusted key. | `rejected` with `reason: untrusted_discovery`. |
 | `rejected_equal_revision_conflict` | Same revision arrives with different policy hash. | `conflict` with old/new hashes redacted or hashed. |
 | `rejected_after_trust_revocation` | Queued mailbox/P2P update arrives after link revocation. | `rejected` with `reason: trust_revoked`. |
+| `revoked_after_key_rotation` | Parent/source rotates the managed signing key and old child-device links can no longer receive updates. | `accepted` protected trust-link evidence with `reason: source_signing_key_rotated`; no plaintext rule values. |
 | `rate_limited_remote_policy_attempt` | Repeated rejected/conflict remote policy attempts arrive for the same transport, link, source, target, and scope. | `rejected` or `conflict` row with redacted rate-limit metadata and no policy authority. |
 | `acked_mailbox_policy_result` | Protected device reports a pulled mailbox apply/reject result back to the local provider. | `accepted` when the provider records every ack, otherwise `rejected` with the provider ack failure reason; never stores plaintext rule values. |
 | `acked_local_network_candidate_result` | Protected device reports a local-network candidate apply/reject result back to the local provider. | `accepted` when the provider records every ack, otherwise `rejected` with the provider ack failure reason; never stores plaintext rule values. |
@@ -226,7 +232,8 @@ runtime local-network ack-handoff history writer: present on protected target pr
 runtime remote managed failed-attempt rate-limit state: present under profile.managedPolicyState.remoteFailedAttemptRateLimits
 runtime managed outbound live send history writer: present on trusted link policy rows as redacted parent-side send evidence
 runtime managed inbound live ack history writer: present on trusted link policy rows as redacted parent-side applied/rejected feedback
-runtime behavior changed by this contract: yes, for accepted local managed child saves, accepted local time-limit policy edits, protected failed-auth rows, parent/account history access, Nanah managed-policy receive evidence, validated remote apply history, local/decrypted mailbox item evidence, pull-on-open mailbox ack-handoff evidence, sanitized local-network candidate evidence, remote failed-attempt rate-limit metadata, parent-side outbound live send evidence, and parent-side live ack feedback
+runtime managed source key-rotation history writer: present on protected target profiles as redacted `trust_link.key_revoke` evidence
+runtime behavior changed by this contract: yes, for accepted local managed child saves, accepted local time-limit policy edits, protected failed-auth rows, parent/account history access, Nanah managed-policy receive evidence, validated remote apply history, local/decrypted mailbox item evidence, pull-on-open mailbox ack-handoff evidence, sanitized local-network candidate evidence, remote failed-attempt rate-limit metadata, parent-side outbound live send evidence, parent-side live ack feedback, and source key-rotation re-pairing evidence
 ```
 
 The current local writer stores redacted count/status summaries under
