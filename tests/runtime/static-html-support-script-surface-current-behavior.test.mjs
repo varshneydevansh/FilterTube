@@ -74,7 +74,7 @@ test('static html support script surface doc is audit-only and source pinned', (
 
   for (const [file, lines, byteCount, hash] of [
     ['html/popup.html', 31, 1213, 'c5e03a38b2737dbd01e2cd0c243b37754936e2e349e9d2275b195350159aea31'],
-    ['html/tab-view.html', 1577, 133585, 'e33ef1e0d1f2c3d607cb58c3275137df54c1c82ed06cf5cd03c053690fedb0b6'],
+    ['html/tab-view.html', 1600, 136305, '5124626e39cd3879da6593bc9bfa8287f0ad5b9ae29dcbb075d9e5bce0389d0b'],
     ['html/troubleshoot.html', 0, 0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'],
     ['scripts/compress-video.swift', 97, 3339, '196c1ebf918b94e3d36fd2bd04658c4fa4762a85ad5657b49ede7aaa93e2e36b']
   ]) {
@@ -125,15 +125,19 @@ test('popup and dashboard html loader order is current source not authority back
   assert.deepEqual(scriptSources(tabView), [
     '../js/settings_shared.js',
     '../js/security_manager.js',
+    '../js/managed_admin_authority.js',
     '../js/io_manager.js',
     '../js/vendor/qrcode.bundle.js',
     '../js/vendor/nanah.bundle.js',
     '../js/nanah_sync_adapter.js',
+    '../js/nanah_managed_live_policy.js',
+    '../js/nanah_managed_open_sync.js',
     '../js/content_controls_catalog.js',
     '../js/ui_components.js',
     '../js/state_manager.js',
     '../js/render_engine.js',
     '../js/ui-shell/tab-view-decor.js',
+    '../js/managed_parent_command_center.js',
     '../js/tab-view.js'
   ]);
 
@@ -165,8 +169,8 @@ test('dashboard external navigation and route surface remain explicit current so
   const urls = externalUrls(tabView);
   const anchors = targetBlankAnchors(tabView);
 
-  assert.equal(tabIds.length, 100);
-  assert.equal(new Set(tabIds).size, 100);
+  assert.equal(tabIds.length, 106);
+  assert.equal(new Set(tabIds).size, 106);
   assert.deepEqual(tabs, [
     'dashboard',
     'filters',

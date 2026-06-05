@@ -16,7 +16,7 @@ Swift video compression helper.
 | Path | Current role | Lines | Bytes | SHA-256 |
 | --- | --- | ---: | ---: | --- |
 | `html/popup.html` | Browser action popup shell | 31 | 1,213 | `c5e03a38b2737dbd01e2cd0c243b37754936e2e349e9d2275b195350159aea31` |
-| `html/tab-view.html` | Dashboard/settings/help/What New shell | 1,577 | 133,585 | `e33ef1e0d1f2c3d607cb58c3275137df54c1c82ed06cf5cd03c053690fedb0b6` |
+| `html/tab-view.html` | Dashboard/settings/help/What New shell | 1,600 | 136,305 | `5124626e39cd3879da6593bc9bfa8287f0ad5b9ae29dcbb075d9e5bce0389d0b` |
 | `html/troubleshoot.html` | Tracked support HTML placeholder | 0 | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
 | `scripts/compress-video.swift` | Manual website/release video compression helper | 97 | 3,339 | `196c1ebf918b94e3d36fd2bd04658c4fa4762a85ad5657b49ede7aaa93e2e36b` |
 
@@ -41,7 +41,7 @@ script order:
 `html/tab-view.html` is opened by current runtime source through
 `html/tab-view.html`, `html/tab-view.html?view=kids&section=content`,
 `html/tab-view.html?view=filters&section=categories`, and
-`html/tab-view.html?view=whatsnew`. It has 100 source `id` attributes, all
+`html/tab-view.html?view=whatsnew`. It has 106 source `id` attributes, all
 unique in the current file, and these `data-tab` values:
 
 `dashboard`, `filters`, `semantic`, `kids`, `settings`, `sync`, `whatsnew`,
@@ -60,16 +60,20 @@ download cards use `rel="noreferrer"`, and four support/Nanah links use
 
 1. `../js/settings_shared.js`
 2. `../js/security_manager.js`
-3. `../js/io_manager.js`
-4. `../js/vendor/qrcode.bundle.js`
-5. `../js/vendor/nanah.bundle.js`
-6. `../js/nanah_sync_adapter.js`
-7. `../js/content_controls_catalog.js`
-8. `../js/ui_components.js`
-9. `../js/state_manager.js`
-10. `../js/render_engine.js`
-11. `../js/ui-shell/tab-view-decor.js`
-12. `../js/tab-view.js`
+3. `../js/managed_admin_authority.js`
+4. `../js/io_manager.js`
+5. `../js/vendor/qrcode.bundle.js`
+6. `../js/vendor/nanah.bundle.js`
+7. `../js/nanah_sync_adapter.js`
+8. `../js/nanah_managed_live_policy.js`
+9. `../js/nanah_managed_open_sync.js`
+10. `../js/content_controls_catalog.js`
+11. `../js/ui_components.js`
+12. `../js/state_manager.js`
+13. `../js/render_engine.js`
+14. `../js/ui-shell/tab-view-decor.js`
+15. `../js/managed_parent_command_center.js`
+16. `../js/tab-view.js`
 
 `html/troubleshoot.html` is an empty tracked file. Current product source does
 not reference `html/troubleshoot.html` from manifests, `build.js`,

@@ -12,7 +12,7 @@ const activeCssRows = [
   ['css/design_tokens.css', 301, 10361, '7da73da79df23e6325c921e45fd786270488ee8ad212b57b7e634b63898c27dc', 12, 0, 0, 1, 0, 0, 0, 0, 0, 5, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   ['css/components.css', 1686, 45567, 'db01d30c717e34c108e48d92807ce3df4bcafccace62a1808d86d03ed7047ebc', 240, 47, 1, 5, 1, 0, 1, 49, 53, 53, 0, 0, 2, 18, 1, 0, 19, 20, 5, 3, 4, 0],
   ['css/popup.css', 1151, 29731, '812cb4ba8b4c9be732bd8a2a6f7b06b5d8d0a8c3fb7416f391f475ae627d45fa', 182, 5, 3, 2, 0, 1, 3, 23, 52, 75, 0, 0, 5, 6, 0, 0, 8, 8, 1, 1, 2, 0],
-  ['css/tab-view.css', 2834, 68789, 'e328965f44468e90cca22bb11b25103b1821ed2037775fbe312e2025c241c7c9', 422, 24, 14, 12, 4, 2, 1, 28, 26, 74, 0, 0, 1, 20, 0, 0, 17, 17, 15, 12, 12, 1],
+  ['css/tab-view.css', 2922, 70854, '355c9c8f69d4714aff9042b7988d5606634ec6bc413224e2bb4511950b8bf282', 435, 24, 14, 12, 4, 2, 1, 28, 26, 74, 0, 0, 1, 20, 0, 0, 17, 17, 15, 12, 12, 1],
   ['css/serene-shell.css', 3414, 87230, '785e988dd0176b16defcc08f77925de8eaa60ea831d53cd57147eb601c490f0a', 494, 39, 7, 16, 1, 0, 11, 34, 124, 124, 54, 0, 4, 3, 0, 0, 12, 46, 17, 10, 14, 0]
 ];
 
@@ -20,17 +20,18 @@ const selectedSourceRows = [
   ['css/design_tokens.css', 301, 10361, '7da73da79df23e6325c921e45fd786270488ee8ad212b57b7e634b63898c27dc'],
   ['css/components.css', 1686, 45567, 'db01d30c717e34c108e48d92807ce3df4bcafccace62a1808d86d03ed7047ebc'],
   ['css/popup.css', 1151, 29731, '812cb4ba8b4c9be732bd8a2a6f7b06b5d8d0a8c3fb7416f391f475ae627d45fa'],
-  ['css/tab-view.css', 2834, 68789, 'e328965f44468e90cca22bb11b25103b1821ed2037775fbe312e2025c241c7c9'],
+  ['css/tab-view.css', 2922, 70854, '355c9c8f69d4714aff9042b7988d5606634ec6bc413224e2bb4511950b8bf282'],
   ['css/serene-shell.css', 3414, 87230, '785e988dd0176b16defcc08f77925de8eaa60ea831d53cd57147eb601c490f0a'],
   ['html/popup.html', 31, 1213, 'c5e03a38b2737dbd01e2cd0c243b37754936e2e349e9d2275b195350159aea31'],
-  ['html/tab-view.html', 1599, 136238, '7533a194eb509f340ec80894f34280e79ba0a17b40b59bf9c98dc49c92ce716d'],
+  ['html/tab-view.html', 1600, 136305, '5124626e39cd3879da6593bc9bfa8287f0ad5b9ae29dcbb075d9e5bce0389d0b'],
   ['src/extension-shell/popup.jsx', 113, 3864, '3a3772e7d77f8466fea609a80c1d4f09873e47022aee17f3b8b09858397b298c'],
   ['src/extension-shell/tab-view-decor.jsx', 34, 1101, '354cd36fa62b215a415e88b8b0c84bd43725196613766d6af921eac44d1f63f1'],
   ['src/extension-shell/shared/runtime.js', 52, 1462, 'd54cc87b8f48736df6ca063fa79e37b2439b580710746e215e8b428fc7207ec8'],
   ['js/ui-shell/popup-shell.js', 374, 21080, 'dc750d44dd4b9fde63b85b4dfc9f5ce9ba76964afbd6dfcedc7b3b7cce084b05'],
   ['js/ui-shell/tab-view-decor.js', 323, 18289, '234171091e523aa5de4c3c0f97e7341c55893bdd31b3e25a075490170fa9742f'],
   ['js/popup.js', 1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
-  ['js/tab-view.js', 13695, 632194, 'b0c71608c02a00a74920f780b7c958cc58b42703cd301a946c748cb894ab1279']
+  ['js/tab-view.js', 13983, 648765, '644aca26efd9d36c62ad8f899ec7902167ebbc226f2a93e9801a0cef1bd37e1a'],
+  ['js/managed_parent_command_center.js', 156, 8083, 'b33906478fb6d57631da82262562ac65267238b16d33049290ecf76fbd2a45a9']
 ];
 
 function read(file) {
@@ -74,7 +75,7 @@ test('extension UI CSS page-state boundary doc is audit-only and source pinned',
   assert.match(doc, /Status: audit-only current-behavior proof/);
   assert.match(doc, /Runtime behavior is unchanged/);
   assert.match(doc, /not a CSS cleanup, UI redesign, generated-shell rebuild, manifest change, or\s+visual-regression approval/);
-  assert.match(doc, /This slice covers 14 selected source files/);
+  assert.match(doc, /This slice covers 15 selected source files/);
 
   for (const [file, lines, bytes, hash] of selectedSourceRows) {
     const text = read(file);
@@ -169,9 +170,9 @@ test('active extension UI CSS state counters match current source', () => {
   }
 
   assert.deepEqual(totals, {
-    lines: 9386,
-    bytes: 241678,
-    rules: 1350,
+    lines: 9474,
+    bytes: 243743,
+    rules: 1363,
     important: 115,
     displayNone: 25,
     media: 36,
@@ -195,8 +196,8 @@ test('active extension UI CSS state counters match current source', () => {
     reducedMotion: 1
   });
 
-  assert.match(doc, /9,386 counted source lines/);
-  assert.match(doc, /241,678 bytes, 1,350 lexical rule blocks/);
+  assert.match(doc, /9,474 counted source lines/);
+  assert.match(doc, /243,743 bytes, 1,363 lexical rule blocks/);
   assert.match(doc, /115 `!important` declarations, 25\s+`display:none` declarations/);
   assert.match(doc, /36 `@media` blocks, 6 `@keyframes` blocks, 3\s+`\[hidden\]` selectors/);
   assert.match(doc, /16 `:focus-visible` selectors, 134 `:hover` selectors/);
@@ -229,16 +230,17 @@ test('popup and tab-view CSS loader order is tied to generated shell before hand
   const popupScripts = tagAttrValues(popupHtml, 'script', 'src');
   const tabScripts = tagAttrValues(tabHtml, 'script', 'src');
   assert.equal(popupScripts.length, 9);
-  assert.equal(tabScripts.length, 15);
+  assert.equal(tabScripts.length, 16);
   assert.ok(popupScripts.indexOf('../js/ui-shell/popup-shell.js') < popupScripts.indexOf('../js/popup.js'));
   assert.ok(tabScripts.indexOf('../js/ui-shell/tab-view-decor.js') < tabScripts.indexOf('../js/tab-view.js'));
   assert.ok(tabScripts.indexOf('../js/managed_admin_authority.js') < tabScripts.indexOf('../js/tab-view.js'));
+  assert.ok(tabScripts.indexOf('../js/managed_parent_command_center.js') < tabScripts.indexOf('../js/tab-view.js'));
   assert.deepEqual(tagAttrValues(popupHtml, 'div', 'id'), ['popupRoot']);
   assert.equal([...tabHtml.matchAll(/id="([^"]+)"/g)].length, 106);
   assert.equal([...tabHtml.matchAll(/data-tab="([^"]+)"/g)].length, 9);
 
   assert.match(doc, /`html\/popup\.html` loads 9 scripts and places `\.\.\/js\/ui-shell\/popup-shell\.js`\s+before `\.\.\/js\/popup\.js`/);
-  assert.match(doc, /`html\/tab-view\.html` loads 15 scripts and places\s+`\.\.\/js\/ui-shell\/tab-view-decor\.js` and\s+`\.\.\/js\/managed_admin_authority\.js` before `\.\.\/js\/tab-view\.js`/);
+  assert.match(doc, /`html\/tab-view\.html` loads 16 scripts and places\s+`\.\.\/js\/ui-shell\/tab-view-decor\.js`,\s+`\.\.\/js\/managed_admin_authority\.js`, and\s+`\.\.\/js\/managed_parent_command_center\.js` before `\.\.\/js\/tab-view\.js`/);
   assert.match(doc, /It has 1 static id: `popupRoot`/);
   assert.match(doc, /It has 106 static ids\s+and 9 `data-tab` values/);
 });

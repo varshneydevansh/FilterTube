@@ -390,7 +390,7 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
     data: 1,
     html: 3,
     icons: 7,
-    js: 36,
+    js: 37,
     manifest: 1,
     'top-level-common': 3
   };
@@ -401,8 +401,8 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
       contentScriptEntries: 2,
       contentScriptJsRefs: 15,
       webAccessibleResourceRefs: 5,
-      zipBytes: 8738408,
-      zipSha256: '3f36b42f448eae648114d7c569d8bdf94f5cf830a23e3e4493c7d1b510ff5ab4'
+      zipBytes: 8740815,
+      zipSha256: '8b80e053c7574bd28207b488b9f2ea8edfcd20daeaca724aa3f06ec2a902af6a'
     }],
     ['firefox', {
       manifestBytes: 2603,
@@ -410,8 +410,8 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
       contentScriptEntries: 1,
       contentScriptJsRefs: 14,
       webAccessibleResourceRefs: 5,
-      zipBytes: 8738467,
-      zipSha256: '134efccd1d93ecc970d4c22b5f0aef49a44e6416170da54d668bcd4787ad8b12'
+      zipBytes: 8740874,
+      zipSha256: '03ade584abb4c0d33a28c8545f2da42bfeae94447e2b66864199715fde960487'
     }],
     ['opera', {
       manifestBytes: 2518,
@@ -419,19 +419,19 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
       contentScriptEntries: 2,
       contentScriptJsRefs: 15,
       webAccessibleResourceRefs: 4,
-      zipBytes: 8738410,
-      zipSha256: 'a891b40403c6ac6cc5df8c669001804455c1445ca926c0f972b8f3f8d2b3ad57'
+      zipBytes: 8740817,
+      zipSha256: 'a033711a7537143e11ac0ca17aab0429f5e859a051959f11b79394fed149584f'
     }]
   ]);
 
   assert.match(doc, /Current Local Dist Package Snapshot - 2026-06-05/);
   assert.match(doc, /dist snapshot source: existing ignored local dist tree/);
   assert.match(doc, /browser staged directories: 3/);
-  assert.match(doc, /browser staged files per directory: 62/);
+  assert.match(doc, /browser staged files per directory: 63/);
   assert.match(doc, /dist zip artifacts: 3/);
-  assert.match(doc, /total dist files including zips: 189/);
-  assert.match(doc, /source-backed staged files per browser excluding manifest: 61/);
-  assert.match(doc, /byte-identical source-backed staged files per browser excluding manifest: 61/);
+  assert.match(doc, /total dist files including zips: 192/);
+  assert.match(doc, /source-backed staged files per browser excluding manifest: 62/);
+  assert.match(doc, /byte-identical source-backed staged files per browser excluding manifest: 62/);
   assert.match(doc, /committed package manifest: absent/);
   assert.match(doc, /zip checksum manifest: absent/);
   assert.match(doc, /reproducible build proof: absent/);
@@ -446,7 +446,7 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
   assert.match(doc, /reproducible package build authority: NO-GO/);
   assert.match(doc, /loaded-browser package\/runtime parity authority: NO-GO/);
 
-  assert.equal(stats.distFiles.length, 189);
+  assert.equal(stats.distFiles.length, 192);
   assert.deepEqual(stats.zipFiles, [
     'dist/filtertube-chrome-v3.3.2.zip',
     'dist/filtertube-firefox-v3.3.2.zip',
@@ -457,10 +457,10 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
     assert.deepEqual(stats.groupCountsByBrowser.get(browser), expectedGroupCounts);
     const actual = stats.browserStats.get(browser);
     const expected = expectedBrowserStats.get(browser);
-    assert.equal(actual.stagedFiles, 62);
+    assert.equal(actual.stagedFiles, 63);
     assert.equal(actual.version, '3.3.2');
-    assert.equal(actual.sourceBackedFiles, 61);
-    assert.equal(actual.byteIdenticalSourceBackedFiles, 61);
+    assert.equal(actual.sourceBackedFiles, 62);
+    assert.equal(actual.byteIdenticalSourceBackedFiles, 62);
     assert.equal(actual.manifestBytes, expected.manifestBytes);
     assert.equal(actual.manifestSha256, expected.manifestSha256);
     assert.equal(actual.contentScriptEntries, expected.contentScriptEntries);
@@ -469,7 +469,7 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
     assert.equal(actual.zipBytes, expected.zipBytes);
     assert.equal(actual.zipSha256, expected.zipSha256);
     assert.ok(
-      doc.includes(`| \`${browser}\` | 62 | ${expected.manifestBytes} | \`${expected.manifestSha256}\` | \`3.3.2\` | ${expected.contentScriptEntries} | ${expected.contentScriptJsRefs} | ${expected.webAccessibleResourceRefs} | ${expected.zipBytes} | \`${expected.zipSha256}\` |`),
+      doc.includes(`| \`${browser}\` | 63 | ${expected.manifestBytes} | \`${expected.manifestSha256}\` | \`3.3.2\` | ${expected.contentScriptEntries} | ${expected.contentScriptJsRefs} | ${expected.webAccessibleResourceRefs} | ${expected.zipBytes} | \`${expected.zipSha256}\` |`),
       `${browser} dist snapshot row missing from doc`
     );
   }

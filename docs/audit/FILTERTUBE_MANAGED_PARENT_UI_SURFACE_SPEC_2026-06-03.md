@@ -1,9 +1,9 @@
 # Spec: Managed Parent UI Surface
 
 **Generated**: 2026-06-04
-**Status**: Spec plus first dashboard child-row status increment present.
-The next managed command-center surface requirements are pinned, but the full
-command-center panel is not implemented yet.
+**Status**: Spec, dashboard child-row status, and a read-only parent command
+center overview are present. Write controls still use the existing gated child
+row actions; bulk/multi-profile command-center writes are not implemented yet.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 
@@ -14,13 +14,15 @@ the extension. The dashboard must therefore show a parent what is happening
 without turning protected profiles into an admin surface for the child.
 
 The first increment is deliberately compact: the existing Accounts & Sync
-profile manager gets a read-only managed status line on child profile rows when
-the active parent/account profile can manage that child. The line summarizes
-policy state without exposing plaintext rule values:
+profile manager gets a read-only managed status line on child profile rows and
+a read-only parent command-center overview when the active parent/account
+profile can manage protected profiles. These surfaces summarize policy state
+without exposing plaintext rule values:
 
 - local parent-managed Main/Kids revisions;
 - remote accepted managed-policy scope/link counts and latest revision;
-- protected action-history row counts and latest result/scope.
+- protected action-history row counts and latest result/scope;
+- viewing-space and time-limit status.
 
 ## Parent-Facing States
 
@@ -57,35 +59,37 @@ runtime child/protected detailed status suppression: present
 runtime status plaintext rule value exposure: absent
 runtime status admin mutation authority: absent
 runtime detailed history modal re-auth gate: present
-runtime full managed command-center panel: absent
+runtime read-only managed command-center overview: present
+runtime managed command-center write/bulk apply controls: absent
+runtime YouTube hot-path work from command-center UI: absent
 ```
 
-## Next Command-Center Slice
+## Command-Center Slice
 
-The next UI increment should be a parent/caregiver command center inside the
-existing dashboard profile/settings surface. It should make managed control
-easy for a parent without weakening the authority model:
+The current command-center increment is a read-only parent/caregiver overview
+inside the existing dashboard profile/settings surface. It makes managed state
+easier to scan without weakening the authority model:
 
 | Area | Parent/caregiver needs | Boundary |
 | --- | --- | --- |
 | Managed profile selection | See each protected profile, owner relationship, current lock state, and last policy revision. | Child/protected views still hide admin controls and detailed history. |
-| Rule editing | Add or remove keyword, channel, and video rules for one or more protected profiles. | Writes must use the same validated local/remote managed-policy paths as current FilterTube controls. |
-| Viewing spaces | Set Main, Kids, both, or neither per protected profile. | UI choice is not authority; runtime route gate remains the enforcement layer. |
-| Time limits | Set daily YouTube budget, zero-budget timeout, reset timezone, and parent grant per protected profile. | Runtime budget accounting remains background-owned; UI cannot reset consumed time without parent re-auth. |
+| Rule editing | Row actions still enter the existing managed child editor. | Writes must use the same validated local/remote managed-policy paths as current FilterTube controls. |
+| Viewing spaces | Show Main, Kids, both, or neither per protected profile; row actions still change policy. | UI choice is not authority; runtime route gate remains the enforcement layer. |
+| Time limits | Show daily YouTube budget state; row actions still set/disable the policy. | Runtime budget accounting remains background-owned; UI cannot reset consumed time without parent re-auth. |
 | Sync status | Show trusted device, local-network provider, Nanah open-sync, and mailbox status. | Reachability is never authorization; offline state keeps the last valid policy active. |
-| Action history | Show accepted, rejected, conflict, failed-auth, and expired-session rows with filters. | History stays redacted, protected by parent/account re-auth, and never becomes policy authority. |
-| Multi-profile apply | Apply a rule or time-limit change to selected protected profiles in one explicit operation. | Each target needs its own target profile, trusted link, scope, revision, hash, and signature/integrity proof. |
+| Action history | Show accepted, rejected, conflict, failed-auth, and expired-session counts/latest labels; detailed history remains gated by the History button. | History stays redacted, protected by parent/account re-auth, and never becomes policy authority. |
+| Multi-profile apply | Not implemented in this slice. | Future bulk writes require each target to have its own target profile, trusted link, scope, revision, hash, and signature/integrity proof. |
 
 Required UI states for that slice:
 
 - empty managed profile list;
 - locked parent/account session;
-- successful local save;
+- successful local save status through row summaries/history;
 - pending P2P/local-network delivery;
 - offline trusted device;
 - rejected or conflicted remote update;
-- failed provider/mailbox pull;
-- time limit exhausted;
+- failed provider/mailbox pull through protected history/status labels;
+- time limit exhausted via the existing runtime timeout overlay;
 - no-policy/no-work state.
 
 Design constraints:
@@ -111,9 +115,9 @@ existing compact profile row layout, keeps labels literal, and avoids adding a
 new card stack. The text must be able to wrap inside the dashboard profile row
 without becoming a button-like element.
 
-Future UI slices can add a dedicated managed-control panel, but the same rules
-hold: parent/caregiver authority must be explicit, protected-user views must
-not expose admin details, and status/history cannot become policy authority.
+Future UI slices can add bulk write controls, but the same rules hold:
+parent/caregiver authority must be explicit, protected-user views must not
+expose admin details, and status/history cannot become policy authority.
 
 ## Verification
 

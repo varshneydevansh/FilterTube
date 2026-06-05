@@ -169,7 +169,7 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['js/settings_shared.js'], lanes: ['test:whitelist', 'test:blocking', 'test:settings'] },
     { files: ['js/state_manager.js', 'js/io_manager.js'], lanes: ['test:settings'] },
     { files: ['js/content_controls_catalog.js'], lanes: ['test:whitelist', 'test:blocking', 'test:json', 'test:dom', 'test:menu', 'test:performance', 'test:settings'] },
-    { files: ['js/popup.js', 'js/tab-view.js', 'js/render_engine.js', 'js/ui_components.js'], lanes: ['test:release', 'test:whitelist', 'test:blocking', 'test:menu', 'test:settings', 'test:smoke'] },
+    { files: ['js/popup.js', 'js/tab-view.js', 'js/render_engine.js', 'js/ui_components.js', 'js/managed_parent_command_center.js'], lanes: ['test:release', 'test:whitelist', 'test:blocking', 'test:menu', 'test:settings', 'test:smoke'] },
     { files: ['js/nanah_sync_adapter.js', 'js/nanah_managed_open_sync.js', 'js/security_manager.js'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
     { files: ['js/layout.js'], lanes: ['test:release', 'test:dom', 'test:smoke'] },
     { files: ['js/shared/identity.js', 'js/content/dom_extractors.js', 'js/content/handle_resolver.js'], lanes: ['test:whitelist', 'test:blocking', 'test:menu'] },
@@ -500,6 +500,7 @@ test('executable classifier maps high-risk paths to required lanes', () => {
   assert.deepEqual(classifyPaths(['js/state_manager.js', 'js/io_manager.js']).lanes, ['settings']);
   assert.deepEqual(classifyPaths(['js/content_controls_catalog.js']).lanes, ['whitelist', 'blocking', 'json', 'dom', 'menu', 'performance', 'settings']);
   assert.deepEqual(classifyPaths(['js/tab-view.js']).lanes, ['release', 'whitelist', 'blocking', 'menu', 'settings', 'smoke']);
+  assert.deepEqual(classifyPaths(['js/managed_parent_command_center.js']).lanes, ['release', 'whitelist', 'blocking', 'menu', 'settings', 'smoke']);
   assert.deepEqual(classifyPaths(['js/layout.js']).lanes, ['release', 'dom', 'smoke']);
   assert.deepEqual(classifyPaths(['css/content.css', 'css/filter.css', 'css/layout.css']).lanes, ['release', 'dom', 'smoke']);
   assert.deepEqual(classifyPaths(['js/vendor/nanah.bundle.js']).lanes, ['release', 'settings', 'smoke']);

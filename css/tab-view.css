@@ -451,6 +451,84 @@ html[data-theme="dark"] body::after {
     background-color: var(--ft-color-bg-panel);
 }
 
+.ft-managed-command-center {
+    display: grid;
+    gap: 12px;
+    border-left: 3px solid var(--ft-color-primary);
+}
+
+.ft-managed-command-center__heading {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: start;
+}
+
+.ft-managed-command-center__title-wrap {
+    min-width: 0;
+}
+
+.ft-managed-command-center__meta {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    border-radius: 8px;
+    color: var(--ft-color-text-secondary);
+    font-size: 12px;
+    font-weight: 700;
+    text-align: right;
+    background-color: var(--ft-color-bg-panel);
+}
+
+.ft-managed-command-center__empty {
+    padding: 10px 12px;
+    border: 1px dashed var(--ft-color-sem-neutral-border);
+    border-radius: 8px;
+    color: var(--ft-color-text-secondary);
+    background-color: var(--ft-color-bg-panel);
+}
+
+.ft-managed-command-center__list {
+    display: grid;
+    gap: 6px;
+}
+
+.ft-managed-command-center__row {
+    min-height: 44px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(96px, 0.7fr) minmax(96px, 0.7fr) minmax(0, 1.25fr);
+    gap: 10px;
+    align-items: center;
+    padding: 9px 10px;
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    border-radius: 8px;
+    background-color: var(--ft-color-bg-surface);
+}
+
+.ft-managed-command-center__row.is-locked {
+    border-style: dashed;
+}
+
+.ft-managed-command-center__row strong,
+.ft-managed-command-center__row span {
+    display: block;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.ft-managed-command-center__row strong {
+    color: var(--ft-color-text-primary);
+    font-size: 13px;
+}
+
+.ft-managed-command-center__row span {
+    color: var(--ft-color-text-secondary);
+    font-size: 12px;
+    line-height: 1.35;
+}
+
 .help-item.ft-profile-child {
     margin-left: 14px;
     border-left-color: var(--ft-color-collab-border, #facc15);
@@ -942,6 +1020,16 @@ body:not(.ft-managed-child-editor-view) .ft-managed-child-global {
 @media (max-width: 768px) {
     .app-container {
         grid-template-columns: 1fr;
+    }
+
+    .ft-managed-command-center__heading,
+    .ft-managed-command-center__row {
+        grid-template-columns: 1fr;
+    }
+
+    .ft-managed-command-center__meta {
+        justify-content: flex-start;
+        text-align: left;
     }
 
     .nav-toggle {

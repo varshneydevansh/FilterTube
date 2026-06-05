@@ -107,32 +107,160 @@ function buildManagedProfileStatusText(profile, { revealDetails = false } = {}) 
     : 'Managed status: no parent-managed policy revisions yet.';
 }
 
+function getProfileType(profilesV4, profileId) {
+  if (profileId === 'default') return 'account';
+  const profile = safeObject(profilesV4?.profiles?.[profileId]);
+  const rawType = normalizeString(profile.type).toLowerCase();
+  if (rawType === 'account' || rawType === 'child') return rawType;
+  return normalizeString(profile.parentProfileId) ? 'child' : 'account';
+}
+
+function getParentAccountId(profilesV4, profileId) {
+  const profile = safeObject(profilesV4?.profiles?.[profileId]);
+  return getProfileType(profilesV4, profileId) === 'child'
+    ? normalizeString(profile.parentProfileId) || 'default'
+    : profileId;
+}
+
+function getAccountIds(profilesV4) {
+  return Object.keys(safeObject(profilesV4?.profiles))
+    .filter(profileId => getProfileType(profilesV4, profileId) === 'account')
+    .sort();
+}
+
+function getChildrenForAccount(profilesV4, accountId) {
+  return Object.keys(safeObject(profilesV4?.profiles))
+    .filter(profileId => getProfileType(profilesV4, profileId) === 'child' && getParentAccountId(profilesV4, profileId) === accountId)
+    .sort();
+}
+
+function getProfileName(profilesV4, profileId) {
+  return normalizeString(profilesV4?.profiles?.[profileId]?.name) || (profileId === 'default' ? 'Default' : 'Profile');
+}
+
+function isProfileLocked(profilesV4, profileId) {
+  const security = safeObject(profilesV4?.profiles?.[profileId]?.security);
+  return !!(security.profilePinVerifier || security.pinVerifier || (profileId === 'default' && (security.masterPinVerifier || security.masterPin)));
+}
+
+function canActiveProfileManageProfile(profilesV4, targetProfileId) {
+  const targetId = normalizeString(targetProfileId);
+  const currentActive = normalizeString(profilesV4?.activeProfileId) || 'default';
+  if (!targetId || getProfileType(profilesV4, currentActive) === 'child') return false;
+  return currentActive === 'default' || currentActive === targetId || getParentAccountId(profilesV4, targetId) === currentActive;
+}
+
+function viewingAccessLabel(profile) {
+  const settings = safeObject(profile?.settings);
+  const main = settings.allowMainViewing !== false;
+  const kids = settings.allowKidsViewing !== false;
+  if (main && kids) return 'Main + Kids';
+  if (main) return 'Main only';
+  if (kids) return 'Kids only';
+  return 'No viewing spaces';
+}
+
+function managedTimeLimitLabel(profile) {
+  const policy = safeObject(safeObject(profile?.settings).timeLimitPolicy);
+  if (policy.schema !== 'filtertube_managed_time_limit' || policy.enabled !== true) return 'No limit';
+  const seconds = normalizeNonNegativeInteger(policy.dailyBudgetSeconds);
+  if (!seconds) return '0m/day';
+  const minutes = Math.round(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  return hours && remainingMinutes ? `${hours}h ${remainingMinutes}m/day` : (hours ? `${hours}h/day` : `${minutes}m/day`);
+}
+
+function buildManagedCommandCenterSummary(profilesV4, { revealDetails = false } = {}) {
+  if (!revealDetails) {
+    return {
+      rows: [],
+      profileCount: 0,
+      limitedCount: 0,
+      remoteScopeCount: 0,
+      historyRowCount: 0,
+      protectedRowCount: 0
+    };
+  }
+  const profiles = safeObject(profilesV4?.profiles);
+  const rows = [];
+  getAccountIds(profilesV4).forEach((accountId) => {
+    getChildrenForAccount(profilesV4, accountId).forEach((profileId) => {
+      if (!canActiveProfileManageProfile(profilesV4, profileId)) return;
+      const profile = safeObject(profiles[profileId]);
+      const summary = summarizeManagedPolicyStateForProfile(profile);
+      const timeLimit = managedTimeLimitLabel(profile);
+      rows.push({
+        profileId,
+        profileName: getProfileName(profilesV4, profileId),
+        parentName: getProfileName(profilesV4, accountId),
+        locked: isProfileLocked(profilesV4, profileId),
+        viewingAccess: viewingAccessLabel(profile),
+        timeLimit,
+        timeLimited: timeLimit !== 'No limit',
+        syncLabel: summary.remoteScopeCount ? `Remote r${summary.latestRemoteRevision}` : (summary.localLabels.length ? 'Local managed' : 'No policy yet'),
+        remoteScopeCount: summary.remoteScopeCount,
+        historyRowCount: summary.historyRowCount,
+        protectedRowCount: summary.protectedRowCount,
+        latestActionLabel: summary.latestResult && summary.latestScope ? `${summary.latestResult}/${summary.latestScope}` : 'none'
+      });
+    });
+  });
+  return rows.reduce((acc, row) => ({
+    ...acc,
+    profileCount: acc.profileCount + 1,
+    limitedCount: acc.limitedCount + (row.timeLimited ? 1 : 0),
+    remoteScopeCount: acc.remoteScopeCount + row.remoteScopeCount,
+    historyRowCount: acc.historyRowCount + row.historyRowCount,
+    protectedRowCount: acc.protectedRowCount + row.protectedRowCount
+  }), {
+    rows,
+    profileCount: 0,
+    limitedCount: 0,
+    remoteScopeCount: 0,
+    historyRowCount: 0,
+    protectedRowCount: 0
+  });
+}
+
 test('managed parent UI surface docs and runtime binding are linked', () => {
   const doc = read(docPath);
   const plan = read(planPath);
   const inventory = read(inventoryPath);
   const source = read('js/tab-view.js');
+  const helperSource = read('js/managed_parent_command_center.js');
+  const tabViewHtml = read('html/tab-view.html');
 
-  assert.match(doc, /Status\*\*: Spec plus first dashboard child-row status increment present/);
-  assert.match(doc, /full\s+command-center panel is not implemented yet/);
+  assert.match(doc, /Status\*\*: Spec, dashboard child-row status, and a read-only parent command\s+center overview are present/);
+  assert.match(doc, /bulk\/multi-profile command-center writes are not implemented yet/);
   assert.match(doc, /Parent-Facing States/);
   assert.match(doc, /UI Boundaries/);
   assert.match(doc, /Current Runtime Binding/);
-  assert.match(doc, /Next Command-Center Slice/);
+  assert.match(doc, /Command-Center Slice/);
   assert.match(doc, /runtime managed parent child-row status helper: present/);
   assert.match(doc, /runtime child\/protected detailed status suppression: present/);
   assert.match(doc, /runtime status plaintext rule value exposure: absent/);
-  assert.match(doc, /runtime full managed command-center panel: absent/);
+  assert.match(doc, /runtime read-only managed command-center overview: present/);
+  assert.match(doc, /runtime managed command-center write\/bulk apply controls: absent/);
+  assert.match(doc, /runtime YouTube hot-path work from command-center UI: absent/);
   assert.match(plan, new RegExp(docPath));
-  assert.match(plan, /next\s+command-center slice is pinned as a dashboard\/profile surface requirement/);
+  assert.match(plan, /read-only\s+command-center overview for protected profiles/);
   assert.match(inventory, new RegExp(docPath));
-  assert.match(inventory, /compact,\s+read-only managed status line/);
-  assert.match(inventory, /display evidence only/);
+  assert.match(inventory, /read-only\s+managed status line on that child row plus a read-only command\s+center overview/);
+  assert.match(inventory, /display evidence\s+only/);
 
   assert.match(source, /function buildManagedProfileStatusText\(profile, \{ revealDetails = false \} = \{\}\)/);
   assert.match(source, /function summarizeManagedPolicyStateForProfile\(profile\)/);
+  assert.match(helperSource, /function buildManagedCommandCenterSummary\(profilesV4, \{ revealDetails = false, helpers = \{\} \} = \{\}\)/);
+  assert.match(helperSource, /function renderManagedCommandCenter\(profilesV4, \{ revealDetails = false, helpers = \{\} \} = \{\}\)/);
+  assert.match(helperSource, /panel\.setAttribute\('aria-label', 'Managed parent command center'\)/);
+  assert.match(helperSource, /Read-only overview of protected profiles, policy sync, time limits, and action history/);
+  assert.match(helperSource, /global\.FilterTubeManagedParentCommandCenter = \{/);
+  assert.match(tabViewHtml, /managed_parent_command_center\.js[\s\S]*tab-view\.js/);
   assert.match(source, /const managedStatusText = type === 'child'/);
   assert.match(source, /revealDetails: canManageTarget && !childAdminRestricted/);
+  assert.match(source, /FilterTubeManagedParentCommandCenter\?\.render\?\.\(profilesV4/);
+  assert.match(source, /helpers:\s*\{\s*safeObject, getAccountIds,/);
   assert.match(source, /ft-managed-profile-status/);
   assert.match(source, /historyBtn\.textContent = 'History'/);
   assert.match(source, /ensureProfileUnlocked\(fresh, currentActive, \{ sensitiveAction: true \}\)/);
@@ -140,6 +268,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
 
 test('managed command-center spec pins parent workflow without making UI authority', () => {
   const doc = read(docPath);
+  const css = read('css/tab-view.css');
 
   for (const area of [
     'Managed profile selection',
@@ -170,7 +299,7 @@ test('managed command-center spec pins parent workflow without making UI authori
   assert.match(doc, /UI choice is not authority; runtime route gate remains the enforcement layer/);
   assert.match(doc, /Runtime budget accounting remains background-owned/);
   assert.match(doc, /Reachability is never authorization/);
-  assert.match(doc, /Each target needs its own target profile, trusted link, scope, revision, hash, and signature\/integrity proof/);
+  assert.match(doc, /Future bulk writes require each target to have its own target profile, trusted link, scope, revision, hash, and signature\/integrity proof/);
   assert.match(doc, /Mobile-first layout with a single-column protected-profile list/);
   assert.match(doc, /Touch targets .* at\s+least 44px high/);
   assert.match(doc, /Use segmented controls for Main\/Kids access/);
@@ -178,6 +307,112 @@ test('managed command-center spec pins parent workflow without making UI authori
   assert.match(doc, /Avoid nested cards and marketing-style hero sections/);
   assert.match(doc, /Do not add YouTube content-script observers, timers, DOM scans, or JSON work/);
   assert.match(doc, /Avoid showing raw JSON, plaintext sensitive rule values, PINs, private keys,\s+mailbox ciphertext, or YouTube DOM\/debug identifiers/);
+
+  assert.match(css, /\.ft-managed-command-center\s*\{/);
+  assert.match(css, /\.ft-managed-command-center__row\s*\{/);
+  assert.match(css, /min-height:\s*44px/);
+  assert.match(css, /@media \(max-width: 768px\)/);
+  assert.match(css, /\.ft-managed-command-center__heading,\s*\.ft-managed-command-center__row\s*\{\s*grid-template-columns: 1fr;/s);
+});
+
+test('managed command-center overview aggregates parent-visible profiles without plaintext rule leaks', () => {
+  const fixture = {
+    activeProfileId: 'parentA',
+    profiles: {
+      default: { id: 'default', type: 'account', name: 'Default' },
+      parentA: { id: 'parentA', type: 'account', name: 'Parent A' },
+      parentB: { id: 'parentB', type: 'account', name: 'Parent B' },
+      childA: {
+        id: 'childA',
+        type: 'child',
+        name: 'Child A',
+        parentProfileId: 'parentA',
+        security: { profilePinVerifier: { salt: 'salt' } },
+        settings: {
+          allowMainViewing: true,
+          allowKidsViewing: false,
+          timeLimitPolicy: {
+            schema: 'filtertube_managed_time_limit',
+            version: 1,
+            enabled: true,
+            dailyBudgetSeconds: 7200
+          }
+        },
+        managedPolicyState: {
+          localManagedEdits: {
+            main: { policyRevision: 2, updatedAt: Date.UTC(2026, 5, 4), plaintextValue: 'spiders' }
+          },
+          remoteManagedPolicies: {
+            'link-parent-child-1': {
+              keywords: { revision: 4, policyHash: 'hash-keyword', plaintextValue: 'spiders' },
+              channels: { revision: 3, policyHash: 'hash-channel', channelName: 'UC-secret' }
+            }
+          }
+        },
+        managedActionHistory: [
+          {
+            schema: 'filtertube_managed_action_history',
+            result: 'accepted',
+            actionType: 'remote_policy.accept',
+            scope: 'keywords',
+            summary: { plaintextValue: 'spiders', label: 'Added keyword' }
+          },
+          {
+            schema: 'filtertube_managed_action_history',
+            result: 'rejected',
+            actionType: 'remote_policy.reject',
+            scope: 'channels',
+            reason: 'signature_invalid',
+            summary: { ciphertext: 'mailbox-secret', label: 'Rejected channel' }
+          }
+        ]
+      },
+      childB: {
+        id: 'childB',
+        type: 'child',
+        name: 'Child B',
+        parentProfileId: 'parentB',
+        settings: {
+          allowMainViewing: true,
+          allowKidsViewing: true
+        },
+        managedPolicyState: {
+          localManagedEdits: {
+            main: { policyRevision: 9 }
+          }
+        }
+      }
+    }
+  };
+
+  const summary = buildManagedCommandCenterSummary(fixture, { revealDetails: true });
+  assert.equal(summary.profileCount, 1);
+  assert.equal(summary.limitedCount, 1);
+  assert.equal(summary.remoteScopeCount, 2);
+  assert.equal(summary.historyRowCount, 2);
+  assert.equal(summary.protectedRowCount, 1);
+  assert.deepEqual(summary.rows.map(row => row.profileName), ['Child A']);
+  assert.equal(summary.rows[0].parentName, 'Parent A');
+  assert.equal(summary.rows[0].locked, true);
+  assert.equal(summary.rows[0].viewingAccess, 'Main only');
+  assert.equal(summary.rows[0].timeLimit, '2h/day');
+  assert.equal(summary.rows[0].syncLabel, 'Remote r4');
+  assert.equal(summary.rows[0].latestActionLabel, 'rejected/channels');
+
+  const serialized = JSON.stringify(summary);
+  assert.doesNotMatch(serialized, /spiders/);
+  assert.doesNotMatch(serialized, /UC-secret/);
+  assert.doesNotMatch(serialized, /mailbox-secret/);
+  assert.doesNotMatch(serialized, /privateKey/i);
+  assert.doesNotMatch(serialized, /pin/i);
+
+  const childView = buildManagedCommandCenterSummary({ ...fixture, activeProfileId: 'childA' }, { revealDetails: true });
+  assert.equal(childView.profileCount, 0);
+  assert.deepEqual(childView.rows, []);
+
+  const hidden = buildManagedCommandCenterSummary(fixture, { revealDetails: false });
+  assert.equal(hidden.profileCount, 0);
+  assert.deepEqual(hidden.rows, []);
 });
 
 test('managed parent status summary shows revisions without plaintext rule values', () => {

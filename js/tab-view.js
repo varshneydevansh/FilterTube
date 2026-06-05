@@ -10734,11 +10734,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         ftProfilesManager.innerHTML = '';
 
-        const accountIds = getAccountIds(profilesV4);
         const ids = [];
-        accountIds.forEach(accountId => {
-            ids.push(accountId, ...getChildrenForAccount(profilesV4, accountId));
-        });
+        getAccountIds(profilesV4).forEach(accountId => ids.push(accountId, ...getChildrenForAccount(profilesV4, accountId)));
+
+        const commandCenter = window.FilterTubeManagedParentCommandCenter?.render?.(profilesV4, { revealDetails: !childAdminRestricted, helpers: { safeObject, getAccountIds, getChildrenForAccount, canActiveProfileManageProfile, summarizeManagedPolicyStateForProfile, getManagedTimeLimitPolicy, getProfileName, isProfileLocked, viewingAccessLabel, managedTimeLimitLabel } });
+        if (commandCenter) ftProfilesManager.appendChild(commandCenter);
 
         let lastAccount = null;
         ids.forEach((profileId) => {

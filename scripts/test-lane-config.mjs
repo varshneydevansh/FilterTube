@@ -433,7 +433,7 @@ export const FILE_LANE_RULES = Object.freeze([
   },
   {
     id: 'extension-ui-runtime',
-    patterns: [/^js\/(?:popup|tab-view|render_engine|ui_components)\.js$/],
+    patterns: [/^js\/(?:popup|tab-view|render_engine|ui_components|managed_parent_command_center)\.js$/],
     lanes: ['release', 'whitelist', 'blocking', 'menu', 'settings', 'smoke']
   },
   {

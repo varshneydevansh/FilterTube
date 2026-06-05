@@ -256,7 +256,7 @@ test('Nanah vendor build register pins script counts hashes and generated output
     'js/vendor/qrcode.bundle.js': [2085, 66965],
     'package.json': [61, 2405],
     'package-lock.json': [1461, 49916],
-    'html/tab-view.html': [1577, 133585]
+    'html/tab-view.html': [1600, 136305]
   })) {
     const [lines, bytes] = expected;
     assert.equal(sourceLineCount(read(file)), lines);

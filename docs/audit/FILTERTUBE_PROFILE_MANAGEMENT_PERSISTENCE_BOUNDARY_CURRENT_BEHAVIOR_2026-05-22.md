@@ -18,7 +18,7 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/tab-view.js` | 13983 | 648380 | `9be470a5d3e13c962ab3a07111eb9d600819375887d034f6380a6c484f42b013` |
+| `js/tab-view.js` | 13983 | 648765 | `644aca26efd9d36c62ad8f899ec7902167ebbc226f2a93e9801a0cef1bd37e1a` |
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/io_manager.js` | 2097 | 100479 | `f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62` |
 | `js/background.js` | 6773 | 305166 | `b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5` |
@@ -28,7 +28,7 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 ```text
 4 profile management persistence source files
 source/effect blocks: 9
-tab-view renderProfilesManager block: 411 lines, 20884 bytes
+tab-view renderProfilesManager block: 411 lines, 21269 bytes
 tab-view refreshProfilesUI block: 24 lines, 954 bytes
 tab-view switchToProfile block: 46 lines, 1749 bytes
 popup switchToProfile block: 48 lines, 1659 bytes
