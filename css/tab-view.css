@@ -503,6 +503,13 @@ html[data-theme="dark"] body::after {
     overflow-wrap: anywhere;
 }
 
+.ft-managed-command-center__bulk-select {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    min-width: 0;
+}
+
 .ft-managed-command-center__bulk .btn-secondary {
     min-height: 44px;
     padding: 8px 10px;

@@ -708,10 +708,11 @@ the current extension dashboard.
   accepted: managed profile status and action-history read-only panel.
 - **Status**: Implemented for the extension dashboard command center. The
   surface keeps a compact operational layout, uses one protected-profile row
-  per manageable target, exposes per-row Send Update and selected-profile Send
-  selected updates actions, shows compact status chips for access, limits, sync
-  readiness, redacted delivery preview, delivery-path detail, and remote conflict
-  state, and records protected redacted history for send
+  per manageable target, exposes per-row Send Update, select-all/clear bulk
+  controls, and selected-profile Send selected updates actions, shows compact
+  status chips for access, limits, sync readiness, redacted delivery preview,
+  delivery-path detail, and remote conflict state, and records protected
+  redacted history for send
   success/failure/provider-pending cases. The implementation
   intentionally avoids a separate oversized remote-management page until
   app/server provider work exists. Bulk keyword/channel/video rule additions

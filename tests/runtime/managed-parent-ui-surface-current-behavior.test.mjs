@@ -380,6 +380,9 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /describeDeliveryPath: describeManagedCommandCenterDeliveryPath/);
   assert.match(helperSource, /ft-managed-command-center__detail-note/);
   assert.match(helperSource, /ft-managed-command-center__select/);
+  assert.match(helperSource, /ft-managed-command-center__bulk-select/);
+  assert.match(helperSource, /Select all/);
+  assert.match(helperSource, /selectedProfileInputs/);
   assert.match(helperSource, /filtertubeManagedAction/);
   assert.match(helperSource, /delegated_runtime_gate/);
   assert.match(helperSource, /global\.FilterTubeManagedParentCommandCenter = \{/);
@@ -476,6 +479,7 @@ test('managed command-center spec pins parent workflow without making UI authori
 
   assert.match(css, /\.ft-managed-command-center\s*\{/);
   assert.match(css, /\.ft-managed-command-center__bulk\s*\{/);
+  assert.match(css, /\.ft-managed-command-center__bulk-select\s*\{/);
   assert.match(css, /\.ft-managed-command-center__row\s*\{/);
   assert.match(css, /\.ft-managed-command-center__profile\s*\{/);
   assert.match(css, /\.ft-managed-command-center__select\s*\{/);

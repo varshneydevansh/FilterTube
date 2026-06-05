@@ -507,12 +507,25 @@
         }
 
         const selectedProfiles = new Set();
+        const selectedProfileInputs = [];
         const bulkIntents = buildManagedCommandCenterBulkActionIntents(summary.rows);
         if (h.onAction && bulkIntents.length) {
             const bulkBar = document.createElement('div');
             bulkBar.className = 'ft-managed-command-center__bulk';
             const bulkStatus = document.createElement('span');
             bulkStatus.className = 'ft-managed-command-center__bulk-status';
+            const bulkSelectControls = document.createElement('div');
+            bulkSelectControls.className = 'ft-managed-command-center__bulk-select';
+            const selectAllButton = document.createElement('button');
+            selectAllButton.className = 'btn-secondary';
+            selectAllButton.type = 'button';
+            selectAllButton.textContent = 'Select all';
+            selectAllButton.title = 'Select every protected profile shown in this command center.';
+            const clearSelectionButton = document.createElement('button');
+            clearSelectionButton.className = 'btn-secondary';
+            clearSelectionButton.type = 'button';
+            clearSelectionButton.textContent = 'Clear';
+            clearSelectionButton.title = 'Clear selected protected profiles.';
             const bulkButtons = bulkIntents.map((intent) => {
                 const button = document.createElement('button');
                 button.className = 'btn-secondary';
@@ -536,8 +549,28 @@
                 bulkButtons.forEach(button => {
                     button.disabled = count === 0;
                 });
+                clearSelectionButton.disabled = count === 0;
+                selectAllButton.disabled = selectedProfileInputs.length > 0 && count === selectedProfileInputs.length;
             };
-            bulkBar.append(bulkStatus, ...bulkButtons);
+            selectAllButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                selectedProfileInputs.forEach((input) => {
+                    input.checked = true;
+                    const profileId = typeof input.dataset.filtertubeProfileId === 'string' ? input.dataset.filtertubeProfileId.trim() : '';
+                    if (profileId) selectedProfiles.add(profileId);
+                });
+                updateBulkState();
+            });
+            clearSelectionButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                selectedProfileInputs.forEach((input) => {
+                    input.checked = false;
+                });
+                selectedProfiles.clear();
+                updateBulkState();
+            });
+            bulkSelectControls.append(selectAllButton, clearSelectionButton);
+            bulkBar.append(bulkStatus, bulkSelectControls, ...bulkButtons);
             panel.appendChild(bulkBar);
             panel.__filtertubeUpdateManagedBulkState = updateBulkState;
             updateBulkState();
@@ -558,6 +591,7 @@
             selector.type = 'checkbox';
             selector.setAttribute('aria-label', `Select ${item.profileName} for bulk managed update`);
             selector.dataset.filtertubeProfileId = item.profileId;
+            selectedProfileInputs.push(selector);
             selector.addEventListener('change', () => {
                 if (selector.checked) {
                     selectedProfiles.add(item.profileId);
