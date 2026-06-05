@@ -131,10 +131,10 @@ test('profile management persistence audit document records current boundary and
     assert.ok(doc.includes(marker), `missing marker: ${marker}`);
   }
 
-  assert.match(methodGap, /repo-wide lexical callables: 6153/);
+  assert.match(methodGap, /repo-wide lexical callables: 6154/);
   assert.match(methodGap, /files with lexical accounting: 73/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 6153/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 6154/);
 
   assert.equal(profileSettingsUiFamilyDocs.length, 12);
   for (const familyDocPath of profileSettingsUiFamilyDocs) {
@@ -142,9 +142,9 @@ test('profile management persistence audit document records current boundary and
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 73/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 6153/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 6154/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 6153/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 6154/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     assert.match(familyDoc, /runtime behavior changed: no/);
     assert.match(familyDoc, /do not approve runtime\s+optimization/);
@@ -154,7 +154,7 @@ test('profile management persistence audit document records current boundary and
 test('profile management source fingerprints stay pinned', () => {
   const doc = read(auditDocPath);
   const expected = [
-    ['js/tab-view.js', 14009, 649653, '81a897cfc518a4b635e21133d21475dbf1765a9c7bbc3b9771f4b8cdd33942ff'],
+    ['js/tab-view.js', 14061, 652278, '9680daae674c909f44f9d860e8b5cd9a7957047c8f93f6eff2a84fb380bb8430'],
     ['js/popup.js', 1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
     ['js/io_manager.js', 2097, 100479, 'f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62'],
     ['js/background.js', 6773, 305166, 'b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5']

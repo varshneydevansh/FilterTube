@@ -678,7 +678,7 @@ export const FILE_LANE_RULES = Object.freeze([
   },
   {
     id: 'audit-settings-proof-doc',
-    patterns: [/^docs\/audit\/.*(?:SETTING|PROFILE|STORAGE|IMPORT|EXPORT|SYNC|COMPILED|BACKUP|NANAH|ALIAS).*\.md$/i],
+    patterns: [/^docs\/audit\/.*(?:SETTING|PROFILE|STORAGE|IMPORT|EXPORT|SYNC|COMPILED|BACKUP|NANAH|ALIAS|MANAGED_POLICY|ACTION_HISTORY).*\.md$/i],
     lanes: ['settings']
   },
   {

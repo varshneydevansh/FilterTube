@@ -176,7 +176,7 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['release-notes JSON version-gate audit docs under `docs/audit/`'], lanes: ['test:release', 'test:smoke'] },
     { files: ['identity, resolver, handle, or waterfall audit docs under `docs/audit/`'], lanes: ['test:whitelist', 'test:blocking', 'test:menu', 'test:smoke'] },
     { files: ['alias, list-mode, settings source/effect, claim-register, or row-list-mode audit docs under `docs/audit/`'], lanes: ['test:whitelist', 'test:blocking', 'test:settings', 'test:smoke'] },
-    { files: ['backup or Nanah audit docs under `docs/audit/`'], lanes: ['test:settings', 'test:smoke'] },
+    { files: ['backup, Nanah, managed-policy, or action-history audit docs under `docs/audit/`'], lanes: ['test:settings', 'test:smoke'] },
     { files: ['renderer, watch, search, Shorts, end-screen, autoplay, playlist, or Kids browse audit docs under `docs/audit/`'], lanes: ['test:whitelist', 'test:blocking', 'test:json', 'test:dom', 'test:smoke'] },
     { files: ['menu, quick-block, collaborator, or dropdown audit docs under `docs/audit/`'], lanes: ['test:menu', 'test:smoke'] },
     { files: ['filter-logic method, direct renderer, rule-field, or rule-path audit docs under `docs/audit/`'], lanes: ['test:whitelist', 'test:blocking', 'test:json', 'test:dom', 'test:performance', 'test:smoke'] },
@@ -367,6 +367,15 @@ test('executable classifier maps high-risk paths to required lanes', () => {
   assert.deepEqual(classifyPaths([
     'docs/audit/FILTERTUBE_BACKUP_NANAH_TRUSTED_STATE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md'
   ]).lanes, ['settings', 'smoke']);
+  const managedPolicyActionHistoryDoc = classifyPaths([
+    'docs/audit/FILTERTUBE_MANAGED_POLICY_ACTION_HISTORY_MODEL_2026-06-03.md'
+  ]);
+  assert.deepEqual(managedPolicyActionHistoryDoc.lanes, ['settings', 'smoke']);
+  assert.deepEqual(managedPolicyActionHistoryDoc.unmatched, []);
+  assert.equal(
+    managedPolicyActionHistoryDoc.classifications[0].matched.some(match => match.id === 'audit-settings-proof-doc'),
+    true
+  );
   const claimRegisterAuditDoc = classifyPaths([
     ['docs/audit/FILTERTUBE_SOURCE', 'OF', 'TRUTH_CLAIM_REGISTER_2026-05-20.md'].join('_'),
     ['tests/runtime/source', 'of', 'truth-claim-register-current-behavior.test.mjs'].join('-')

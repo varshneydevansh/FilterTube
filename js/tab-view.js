@@ -3058,6 +3058,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const MANAGED_ADMIN_FAILED_UNLOCK_LIMIT = 5;
     const MANAGED_ADMIN_FAILED_UNLOCK_WINDOW_MS = 10 * 60 * 1000;
     const MANAGED_ADMIN_FAILED_UNLOCK_SCHEMA = 'filtertube_managed_admin_failed_unlock_rate_limit';
+    const MANAGED_REMOTE_FAILED_ATTEMPT_SCHEMA = 'filtertube_managed_remote_failed_attempt_rate_limit';
+    const MANAGED_REMOTE_FAILED_ATTEMPT_LIMIT = 20;
+    const MANAGED_REMOTE_FAILED_ATTEMPT_WINDOW_MS = 10 * 60 * 1000;
     const ManagedAdminAuthority = window.FilterTubeManagedAdminAuthority || null;
     const profileUnlockSessions = new Map();
     const managedAdminFailedUnlocks = new Map();
@@ -5087,6 +5090,48 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         const trustedLink = safeObject(context.trustedLink);
         const trustedLinkId = normalizeString(root.linkId || trustedLink.linkId || trustedLink.id);
+        const transport = normalizeString(context.transport) || 'nanah';
+        let remoteFailedAttempt = null;
+        const managedPolicyState = { ...safeObject(profile.managedPolicyState) };
+        if (!accepted) {
+            const attemptKey = [
+                transport,
+                trustedLinkId || 'unknown_link',
+                normalizeString(root.sourceDeviceId) || 'unknown_device',
+                targetProfileId,
+                scope
+            ].join(':');
+            const existingAttempts = safeObject(managedPolicyState.remoteFailedAttemptRateLimits);
+            const existingAttempt = safeObject(existingAttempts[attemptKey]);
+            const existingResetAt = Number(existingAttempt.resetAt);
+            const activeWindow = existingAttempt.schema === MANAGED_REMOTE_FAILED_ATTEMPT_SCHEMA
+                && Number.isFinite(existingResetAt)
+                && now < existingResetAt;
+            const priorCount = activeWindow
+                ? Math.max(0, Math.floor(Number(existingAttempt.failedAttempts) || 0))
+                : 0;
+            const failedAttempts = priorCount + 1;
+            remoteFailedAttempt = {
+                schema: MANAGED_REMOTE_FAILED_ATTEMPT_SCHEMA,
+                version: 1,
+                key: attemptKey,
+                transport,
+                trustedLinkId,
+                sourceDeviceId: normalizeString(root.sourceDeviceId) || null,
+                targetProfileId,
+                scope,
+                failedAttempts,
+                limit: MANAGED_REMOTE_FAILED_ATTEMPT_LIMIT,
+                resetAt: activeWindow ? existingResetAt : now + MANAGED_REMOTE_FAILED_ATTEMPT_WINDOW_MS,
+                updatedAt: now,
+                rateLimited: failedAttempts >= MANAGED_REMOTE_FAILED_ATTEMPT_LIMIT,
+                lastReason: reason || 'validation_failed'
+            };
+            managedPolicyState.remoteFailedAttemptRateLimits = {
+                ...existingAttempts,
+                [attemptKey]: remoteFailedAttempt
+            };
+        }
         const row = {
             rowId: `remote-managed-${normalizeString(context.transport) || 'nanah'}-${scope}-${revision || 'none'}-${now}`,
             schema: MANAGED_ACTION_HISTORY_SCHEMA,
@@ -5106,8 +5151,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             orderKey: `${String(revision || 0).padStart(6, '0')}:${now}`,
             summary: {
                 ...summarizeManagedNanahPolicyEnvelope(root, decision),
-                transport: normalizeString(context.transport) || 'nanah',
-                mailboxItemId: normalizeString(context.mailboxItemId || decision?.mailboxItemId) || null
+                transport,
+                mailboxItemId: normalizeString(context.mailboxItemId || decision?.mailboxItemId) || null,
+                ...(remoteFailedAttempt ? {
+                    remoteFailedAttempts: remoteFailedAttempt.failedAttempts,
+                    remoteFailedAttemptLimit: remoteFailedAttempt.limit,
+                    rateLimited: remoteFailedAttempt.rateLimited,
+                    retryAt: remoteFailedAttempt.resetAt
+                } : {})
             },
             sensitive: true
         };
@@ -5116,6 +5167,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             : [];
         profiles[targetProfileId] = {
             ...profile,
+            ...(remoteFailedAttempt ? { managedPolicyState } : {}),
             managedActionHistory: [...existingRows, row].slice(-MANAGED_ACTION_HISTORY_LIMIT)
         };
         await io.saveProfilesV4({

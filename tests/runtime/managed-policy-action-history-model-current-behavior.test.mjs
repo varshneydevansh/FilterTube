@@ -135,6 +135,50 @@ function validClearRow(overrides = {}) {
   });
 }
 
+function validRemoteRateLimitedRow(overrides = {}) {
+  return validAcceptedRow({
+    rowId: 'history-row-remote-rate-limited-1',
+    actionType: 'remote_policy.reject',
+    result: 'rejected',
+    reason: 'missing_signature_verifier',
+    summary: {
+      redacted: true,
+      label: 'Rejected remote keywords policy',
+      transport: 'local_network',
+      remoteFailedAttempts: 20,
+      remoteFailedAttemptLimit: 20,
+      rateLimited: true,
+      retryAt: 1780521100000
+    },
+    ...overrides
+  });
+}
+
+function nextRemoteFailedAttemptState(existing = null, { now = 1780520500000, reason = 'missing_signature_verifier' } = {}) {
+  const resetAt = Number(existing?.resetAt);
+  const activeWindow = existing?.schema === 'filtertube_managed_remote_failed_attempt_rate_limit'
+    && Number.isFinite(resetAt)
+    && now < resetAt;
+  const priorCount = activeWindow ? Math.max(0, Math.floor(Number(existing.failedAttempts) || 0)) : 0;
+  const failedAttempts = priorCount + 1;
+  return {
+    schema: 'filtertube_managed_remote_failed_attempt_rate_limit',
+    version: 1,
+    key: 'local_network:link-parent-child-1:parent-device-1:child-profile-1:keywords',
+    transport: 'local_network',
+    trustedLinkId: 'link-parent-child-1',
+    sourceDeviceId: 'parent-device-1',
+    targetProfileId: 'child-profile-1',
+    scope: 'keywords',
+    failedAttempts,
+    limit: 20,
+    resetAt: activeWindow ? resetAt : now + (10 * 60 * 1000),
+    updatedAt: now,
+    rateLimited: failedAttempts >= 20,
+    lastReason: reason
+  };
+}
+
 function validateHistoryRow(row) {
   if (!row || typeof row !== 'object') return { ok: false, reason: 'missing_row' };
   for (const field of [
@@ -211,6 +255,7 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(doc, /Nanah receive\s+path now also parses\s+`filtertube_managed_policy` envelopes/);
   assert.match(doc, /local\/decrypted `filtertube_managed_mailbox_item` outcomes/);
   assert.match(doc, /local-network candidate\s+`filtertube_managed_local_network_candidate`\s+outcomes/);
+  assert.match(doc, /remote failed-attempt rate-limit\s+state/);
   assert.match(doc, /validated remote accepted apply history can now be recorded/);
   assert.match(doc, /Required History Row Shape/);
   assert.match(doc, /Approved Action Types/);
@@ -234,6 +279,14 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(source, /admin_session\.failed_unlock/);
   assert.match(source, /failed_auth/);
   assert.match(source, /function recordManagedNanahPolicyValidationHistory\(envelope, decision, context = \{\}\)/);
+  assert.match(source, /MANAGED_REMOTE_FAILED_ATTEMPT_SCHEMA/);
+  assert.match(source, /filtertube_managed_remote_failed_attempt_rate_limit/);
+  assert.match(source, /MANAGED_REMOTE_FAILED_ATTEMPT_LIMIT = 20/);
+  assert.match(source, /remoteFailedAttemptRateLimits/);
+  assert.match(source, /remoteFailedAttempts: remoteFailedAttempt\.failedAttempts/);
+  assert.match(source, /remoteFailedAttemptLimit: remoteFailedAttempt\.limit/);
+  assert.match(source, /rateLimited: remoteFailedAttempt\.rateLimited/);
+  assert.match(source, /retryAt: remoteFailedAttempt\.resetAt/);
   assert.match(source, /function resolveManagedRemoteHistoryActionType\(\{ accepted, conflict, reason, transport \}\)/);
   assert.match(source, /remote_policy\.mailbox\.accept/);
   assert.match(source, /remote_policy\.mailbox\.reject/);
@@ -287,6 +340,8 @@ test('managed policy action-history row fixture requires actor target revision r
   assert.deepEqual(validateHistoryRow(validFailedAuthRow({ reason: null })), { ok: false, reason: 'missing_rejection_reason' });
   assert.deepEqual(validateHistoryRow(validClearRow()), { ok: true });
   assert.deepEqual(validateHistoryRow(validClearRow({ reason: null })), { ok: false, reason: 'missing_rejection_reason' });
+  assert.deepEqual(validateHistoryRow(validRemoteRateLimitedRow()), { ok: true });
+  assert.deepEqual(validateHistoryRow(validRemoteRateLimitedRow({ summary: { plaintextValue: 'spiders' } })), { ok: false, reason: 'sensitive_plaintext_value' });
 });
 
 test('managed action history access is parent/caregiver authority not child PIN authority', () => {
@@ -326,6 +381,7 @@ test('managed action history required outcomes cover accepted rejected conflict 
     'rejected_spoofed_lan_policy',
     'rejected_equal_revision_conflict',
     'rejected_after_trust_revocation',
+    'rate_limited_remote_policy_attempt',
     'failed_parent_unlock',
     'cleared_by_parent'
   ];
@@ -348,9 +404,38 @@ test('managed action history required outcomes cover accepted rejected conflict 
   assert.match(doc, /runtime remote managed accepted apply history writer: present behind validated managed apply wrapper/);
   assert.match(doc, /runtime mailbox managed validation\/apply history writer: present/);
   assert.match(doc, /runtime local-network candidate validation\/apply history writer: present/);
+  assert.match(doc, /runtime remote managed failed-attempt rate-limit state: present under profile\.managedPolicyState\.remoteFailedAttemptRateLimits/);
   assert.match(doc, /runtime managed outbound live send history writer: present on trusted link policy rows/);
   assert.match(doc, /runtime managed inbound live ack history writer: present on trusted link policy rows/);
   assert.match(doc, /The current failed-auth writer records protected evidence rows on the target\s+protected profile/);
   assert.match(doc, /profile\.managedPolicyState\.adminFailedUnlockRateLimit/);
   assert.match(doc, /background PIN cache\s+remains memory-only while failed-attempt rate-limit state is profile-persisted/);
+  assert.match(doc, /remoteFailedAttempts/);
+  assert.match(doc, /rateLimited/);
+});
+
+test('managed remote failed-attempt rate-limit fixture resets by window and never grants authority', () => {
+  const first = nextRemoteFailedAttemptState(null);
+  assert.equal(first.failedAttempts, 1);
+  assert.equal(first.rateLimited, false);
+  assert.equal(first.resetAt, 1780521100000);
+
+  const twentieth = Array.from({ length: 19 }).reduce(
+    (state) => nextRemoteFailedAttemptState(state, { now: state.updatedAt + 1 }),
+    first
+  );
+  assert.equal(twentieth.failedAttempts, 20);
+  assert.equal(twentieth.rateLimited, true);
+  assert.equal(twentieth.lastReason, 'missing_signature_verifier');
+
+  const reset = nextRemoteFailedAttemptState(twentieth, { now: twentieth.resetAt + 1, reason: 'wrong_public_key' });
+  assert.equal(reset.failedAttempts, 1);
+  assert.equal(reset.rateLimited, false);
+  assert.equal(reset.lastReason, 'wrong_public_key');
+
+  const row = validRemoteRateLimitedRow();
+  assert.equal(row.result, 'rejected');
+  assert.equal(row.summary.rateLimited, true);
+  assert.notEqual(row.result, 'accepted');
+  assert.notEqual(row.actionType, 'remote_policy.accept');
 });

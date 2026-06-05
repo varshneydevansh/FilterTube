@@ -257,8 +257,10 @@ revision and action-history entry.
   preserving protected evidence, records dashboard local failed-attempt
   rate-limit state on the managing profile, and records Nanah managed-policy
   validation rows for rejected, conflict, idempotent, and accepted
-  validated-apply receive outcomes. Rate-limited remote failed-attempt rows
-  remain pending.
+  validated-apply receive outcomes. Rejected/conflict live, mailbox, and
+  local-network receive attempts now persist profile-local remote
+  failed-attempt rate-limit state and include redacted rate-limit metadata in
+  protected history rows.
 - **Acceptance Criteria**:
   - Rows include actor profile, actor device, target profile, action type,
     policy revision, timestamp, result, and redacted summary.

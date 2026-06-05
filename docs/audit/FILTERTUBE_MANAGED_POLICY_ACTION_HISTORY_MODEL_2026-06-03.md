@@ -9,14 +9,17 @@ apply wrapper succeeds. Local/decrypted mailbox-item intake now writes distinct
 mailbox action-history rows through the same protected model, and explicitly
 delivered local-network candidate `filtertube_managed_local_network_candidate`
 outcomes now reuse the remote validation/apply history writer with
-`transport: local_network`. Parent/caregiver history clearing now records its
-own protected `history.clear` evidence row instead of silently removing
-accepted rows. Trusted-link removal history writer now records protected
-`trust_link.revoke` rows when local accepted managed policy state is purged for
-a removed link. Parent-side live sends now record redacted outbound
-trusted-link history rows without storing policy payload plaintext, and
-connected replicas now return redacted live ack rows that the source stores only
-when they match a prior sent revision/hash.
+`transport: local_network`. Rejected/conflict live, mailbox, and local-network
+receive attempts now persist profile-local remote failed-attempt rate-limit
+state and copy redacted rate-limit metadata into the protected history row.
+Parent/caregiver history clearing now records its own protected
+`history.clear` evidence row instead of silently removing accepted rows.
+Trusted-link removal history writer now records protected `trust_link.revoke`
+rows when local accepted managed policy state is purged for a removed link.
+Parent-side live sends now record redacted outbound trusted-link history rows
+without storing policy payload plaintext, and connected replicas now return
+redacted live ack rows that the source stores only when they match a prior sent
+revision/hash.
 **Goal slice**: Implementation order item 4, "Add action-history/log model and
 access-control tests".
 **Primary inputs**:
@@ -162,6 +165,7 @@ The following events must produce action-history rows in future implementation:
 | `rejected_spoofed_lan_policy` | Local-network discovery claims parent device without trusted key. | `rejected` with `reason: untrusted_discovery`. |
 | `rejected_equal_revision_conflict` | Same revision arrives with different policy hash. | `conflict` with old/new hashes redacted or hashed. |
 | `rejected_after_trust_revocation` | Queued mailbox/P2P update arrives after link revocation. | `rejected` with `reason: trust_revoked`. |
+| `rate_limited_remote_policy_attempt` | Repeated rejected/conflict remote policy attempts arrive for the same transport, link, source, target, and scope. | `rejected` or `conflict` row with redacted rate-limit metadata and no policy authority. |
 | `failed_parent_unlock` | Admin PIN/password attempt fails. | `failed_auth` and rate-limit metadata. |
 | `cleared_by_parent` | Parent/account clears viewable accepted-action history. | `cleared_by_admin`; rejected evidence may remain until retention expiry. |
 
@@ -189,9 +193,10 @@ runtime remote managed validation/apply history writer: present for rejected, co
 runtime remote managed accepted apply history writer: present behind validated managed apply wrapper
 runtime mailbox managed validation/apply history writer: present for local/decrypted mailbox item intake outcomes
 runtime local-network candidate validation/apply history writer: present for sanitized local-network candidate outcomes without adding discovery or LAN delivery
+runtime remote managed failed-attempt rate-limit state: present under profile.managedPolicyState.remoteFailedAttemptRateLimits
 runtime managed outbound live send history writer: present on trusted link policy rows as redacted parent-side send evidence
 runtime managed inbound live ack history writer: present on trusted link policy rows as redacted parent-side applied/rejected feedback
-runtime behavior changed by this contract: yes, for accepted local managed child saves, protected failed-auth rows, parent/account history access, Nanah managed-policy receive evidence, validated remote apply history, local/decrypted mailbox item evidence, sanitized local-network candidate evidence, parent-side outbound live send evidence, and parent-side live ack feedback
+runtime behavior changed by this contract: yes, for accepted local managed child saves, protected failed-auth rows, parent/account history access, Nanah managed-policy receive evidence, validated remote apply history, local/decrypted mailbox item evidence, sanitized local-network candidate evidence, remote failed-attempt rate-limit metadata, parent-side outbound live send evidence, and parent-side live ack feedback
 ```
 
 The current local writer stores redacted count summaries under
@@ -226,6 +231,13 @@ Local-network candidate rows use the same `remote_policy.accept`,
 `summary.transport: local_network`. The transport marker is diagnostic only;
 authority still comes from the locally saved managed link, signature evidence,
 target profile, scope, revision, and policy hash.
+Rejected/conflict remote attempts also update
+`profile.managedPolicyState.remoteFailedAttemptRateLimits` for the
+transport/link/source/target/scope tuple and include redacted
+`remoteFailedAttempts`, `remoteFailedAttemptLimit`, `rateLimited`, and
+`retryAt` metadata in the row summary. This helps parents/caregivers diagnose
+provider or hostile-LAN spam without accepting, blocking, or applying policy
+from the history log itself.
 Outbound live-send rows use `filtertube_managed_outbound_policy_history` under a
 trusted link policy row because the parent/source may not have the remote child
 profile locally. Those rows are feedback evidence for the parent only; the
