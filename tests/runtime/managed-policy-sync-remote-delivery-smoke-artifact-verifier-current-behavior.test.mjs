@@ -124,6 +124,12 @@ function validArtifact({ transportMode = 'live_nanah' } = {}) {
         verdict: 'GO'
       }
     },
+    manualInstalledEvidence: {
+      parentDashboardArtifact: 'docs/audit/artifacts/managed-remote-delivery-smoke/manual/parent-dashboard-proof.png',
+      childYouTubeArtifact: 'docs/audit/artifacts/managed-remote-delivery-smoke/manual/child-youtube-proof.png',
+      managedActionHistoryArtifact: 'docs/audit/artifacts/managed-remote-delivery-smoke/manual/action-history-proof.json',
+      notes: 'Manual installed-extension smoke observed parent dashboard send, child YouTube behavior, and redacted managed action history.'
+    },
     requiredRows: REQUIRED_MANAGED_REMOTE_DELIVERY_ROWS.map((id, index) => ({
       id,
       requiredObservation: `row ${index} observed`,
@@ -162,8 +168,9 @@ test('managed remote delivery smoke verifier is wired into release settings and 
   assert.ok(boundaryDoc.includes(verifierPath));
   assert.match(
     boundaryDoc,
-    /A valid artifact proves one\s+transport slice, not complete remote-management release readiness/
+    /valid artifact proves one\s+transport slice, not complete remote-management\s+release readiness/
   );
+  assert.match(boundaryDoc, /manual installed-extension evidence/);
 });
 
 test('classifier treats managed remote smoke artifact files as release settings and smoke proof', () => {
@@ -188,6 +195,10 @@ test('verifier rejects the non-executed template and missing installed parity', 
   assert.ok(errors.includes('recordingFields.transportMode is required'));
   assert.ok(errors.includes('installedExtensionParity.parent.verdict must be GO'));
   assert.ok(errors.includes('installedExtensionParity.child.verdict must be GO'));
+  assert.ok(errors.includes('manualInstalledEvidence.parentDashboardArtifact is required'));
+  assert.ok(errors.includes('manualInstalledEvidence.childYouTubeArtifact is required'));
+  assert.ok(errors.includes('manualInstalledEvidence.managedActionHistoryArtifact is required'));
+  assert.ok(errors.includes('manualInstalledEvidence.notes is required'));
   assert.ok(errors.includes('FT-MANAGED-REMOTE-00-trust-link-preflight.status must be passed'));
 });
 
@@ -207,6 +218,16 @@ test('verifier rejects row order mismatches and incomplete installed extension p
   assert.ok(errors.includes('requiredRows must exactly match the required managed remote delivery rows'));
   assert.ok(errors.includes('installedExtensionParity.parent.sourceHashes must not be empty'));
   assert.ok(errors.includes('installedExtensionParity.child.missingFields must be empty'));
+});
+
+test('verifier rejects missing manual installed-extension evidence', () => {
+  const artifact = validArtifact();
+  artifact.manualInstalledEvidence.childYouTubeArtifact = '';
+  artifact.manualInstalledEvidence.managedActionHistoryArtifact = [];
+
+  const errors = validateManagedRemoteDeliverySmokeArtifact(artifact);
+  assert.ok(errors.includes('manualInstalledEvidence.childYouTubeArtifact is required'));
+  assert.ok(errors.includes('manualInstalledEvidence.managedActionHistoryArtifact is required'));
 });
 
 test('verifier rejects failed observations and missing policy evidence', () => {

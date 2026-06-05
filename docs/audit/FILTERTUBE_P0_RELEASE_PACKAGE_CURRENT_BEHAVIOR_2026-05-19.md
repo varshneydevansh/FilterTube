@@ -673,7 +673,7 @@ browser staged files per directory: 63
 dist zip artifacts: 3
 total dist files including zips: 192
 source-backed staged files per browser excluding manifest: 62
-byte-identical source-backed staged files per browser excluding manifest: 62
+byte-identical source-backed staged files per browser excluding manifest: 61
 committed package manifest: absent
 zip checksum manifest: absent
 reproducible build proof: absent
@@ -716,7 +716,7 @@ workspace source paths
 ```mermaid
 flowchart TD
   A["Workspace source paths"] --> B["Existing ignored dist browser directories"]
-  B --> C["62 of 62 source-backed staged files match source per browser"]
+  B --> C["61 of 62 source-backed staged files match source per browser"]
   B --> D["dist browser manifest.json files"]
   B --> E["Existing local ZIP files"]
   C --> F["Local snapshot proof only"]
@@ -731,7 +731,7 @@ flowchart TD
 ```
 
 This closes a local-artifact inventory gap, not the release gate. The staged
-browser directories currently match workspace source bytes for 62 of 62 source-backed
+browser directories currently match workspace source bytes for 61 of 62 source-backed
 non-manifest files, and the three local ZIPs have recorded hashes. The package
 still lacks a committed per-file manifest, a clean rebuild record, ZIP content
 attestation tied to source revision, upload proof, public-claim proof, and
@@ -739,7 +739,7 @@ loaded-browser byte proof.
 
 ```text
 local dist snapshot proof: PARTIAL
-source-backed staged byte parity: local complete, release authority partial
+source-backed staged byte parity: local partial, release authority partial
 zip checksum snapshot: yes
 committed release package manifest authority: NO-GO
 reproducible package build authority: NO-GO
@@ -820,9 +820,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 73
-method semantic proof gap lexical callables covered: 6306
+method semantic proof gap lexical callables covered: 6315
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6306
+lexical callables requiring semantic proof before behavior changes: 6315
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

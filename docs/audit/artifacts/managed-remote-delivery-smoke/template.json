@@ -61,6 +61,12 @@
       "verdict": "NO-GO"
     }
   },
+  "manualInstalledEvidence": {
+    "parentDashboardArtifact": "",
+    "childYouTubeArtifact": "",
+    "managedActionHistoryArtifact": "",
+    "notes": ""
+  },
   "requiredRows": [
     {
       "id": "FT-MANAGED-REMOTE-00-trust-link-preflight",

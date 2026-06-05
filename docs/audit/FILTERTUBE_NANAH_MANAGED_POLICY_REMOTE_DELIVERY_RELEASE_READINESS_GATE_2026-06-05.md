@@ -127,10 +127,13 @@ docs/audit/artifacts/managed-remote-delivery-smoke/verify-managed-smoke-artifact
 ```
 
 The verifier accepts only executed artifacts with parent and child installed
-extension parity, passed automated lane evidence, one explicit transport mode,
-and all managed remote-delivery rows passed. A valid artifact proves one
-transport slice, not complete remote-management release readiness across all
-transport modes.
+extension parity, manual installed-extension evidence, passed automated lane
+evidence, one explicit transport mode, and all managed remote-delivery rows
+passed. Manual evidence records the already-tested parent dashboard surface,
+child YouTube surface, and redacted managed action-history surface so a human
+smoke pass becomes repeatable release proof instead of an informal memory. A
+valid artifact proves one transport slice, not complete remote-management
+release readiness across all transport modes.
 
 Required smoke rows:
 

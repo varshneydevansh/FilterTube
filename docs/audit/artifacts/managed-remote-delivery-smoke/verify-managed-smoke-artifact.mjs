@@ -51,6 +51,13 @@ const REQUIRED_LANE_EVIDENCE_FIELDS = Object.freeze([
   'summary'
 ]);
 
+const REQUIRED_MANUAL_INSTALLED_EVIDENCE_FIELDS = Object.freeze([
+  'parentDashboardArtifact',
+  'childYouTubeArtifact',
+  'managedActionHistoryArtifact',
+  'notes'
+]);
+
 const FORBIDDEN_SENSITIVE_KEYS = new Set([
   'plaintextRuleValue',
   'plaintextRuleValues',
@@ -174,6 +181,19 @@ function validateInstalledParity(errors, parity, role) {
   }
 }
 
+function validateManualInstalledEvidence(errors, evidence) {
+  if (!isPlainObject(evidence)) {
+    errors.push('manualInstalledEvidence must be an object');
+    return;
+  }
+  addMissingFieldErrors(
+    errors,
+    evidence,
+    REQUIRED_MANUAL_INSTALLED_EVIDENCE_FIELDS,
+    'manualInstalledEvidence'
+  );
+}
+
 function collectForbiddenSensitiveKeys(value, prefix = '') {
   if (Array.isArray(value)) {
     return value.flatMap((entry, index) => collectForbiddenSensitiveKeys(entry, `${prefix}[${index}]`));
@@ -236,6 +256,8 @@ export function validateManagedRemoteDeliverySmokeArtifact(artifact) {
     validateInstalledParity(errors, parity.parent, 'parent');
     validateInstalledParity(errors, parity.child, 'child');
   }
+
+  validateManualInstalledEvidence(errors, artifact.manualInstalledEvidence);
 
   const rows = Array.isArray(artifact.requiredRows) ? artifact.requiredRows : [];
   if (!sameItems(rows.map(row => row?.id), REQUIRED_MANAGED_REMOTE_DELIVERY_ROWS)) {
