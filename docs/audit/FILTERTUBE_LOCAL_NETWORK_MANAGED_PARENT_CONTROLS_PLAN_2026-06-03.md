@@ -374,8 +374,9 @@ replica child device over Nanah/P2P or same-network transport.
 - **Status**: Runtime validation helper, receive-side validation
   context/history plumbing, adapter WebCrypto signature verifier helper,
   validated apply wrapper, target child profile writes, and persisted accepted
-  revision/hash state are present. Pairing-time public-key storage and
-  live local-network/P2P transport remain pending.
+  revision/hash state are present. Pairing-time public-key storage, source
+  signing-key provisioning, and live Nanah P2P signed sends are present; built-in
+  local-network transport remains provider/server work.
 - **Acceptance Criteria**:
   - Trusted source to fixed child target passes.
   - Peer mode, sibling target, missing fixed target, stale revision, wrong
@@ -411,8 +412,9 @@ replica child device over Nanah/P2P or same-network transport.
   target-local accepted managed-policy revision state and matching open-sync
   status rows. Pairing-time public-key descriptor persistence, source-side
   signing keypair provisioning, canonical outbound payload hashing, and
-  receive-side canonical payload-hash recomputation now exist, while server
-  mailbox queue purge and local-network/P2P delivery remain pending.
+  receive-side canonical payload-hash recomputation now exist. Live Nanah P2P
+  signed delivery is present; server mailbox queue purge and built-in
+  local-network delivery remain pending provider work.
 - **Acceptance Criteria**:
   - Existing `app_sync` and `control_proposal` behavior remains compatible.
   - New managed policy applies only to target profile and target surface.
@@ -704,7 +706,8 @@ YouTube budgets, then document app parity.
   active-tab counting, reduced budget, and override fields.
 - **Status**: Local profile UI/store, contract fixture, background-owned daily
   usage counter, active-tab heartbeat, route gate, and timeout overlay are
-  present. Remote parent-device time-limit delivery remains pending.
+  present. Saved time-limit policies can be included in signed managed-policy
+  sends; installed two-device smoke and native app parity remain pending.
 - **Complexity**: 6/10
 - **Dependencies**: Sprint 1 for local schema; Sprints 2 and 3 for remote
   managed time-limit updates.
@@ -724,7 +727,8 @@ YouTube budgets, then document app parity.
   `youtubekids.com` per profile policy.
 - **Status**: Contract/proof fixture, runtime route blocking, denied-route
   overlay, and SPA/open-tab revalidation are present for active child profiles.
-  Remote parent-device viewing-space delivery remains pending.
+  Viewing-space policy can be included in signed managed-policy sends; installed
+  two-device smoke and native app parity remain pending.
 - **Complexity**: 5/10
 - **Dependencies**: Sprint 1.
 - **Acceptance Criteria**:
