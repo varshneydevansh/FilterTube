@@ -697,9 +697,9 @@ Current local package artifact rows:
 
 | Target | Staged files | Manifest bytes | Manifest sha256 | Version | Content script entries | Content script JS refs | WAR refs | ZIP bytes | ZIP sha256 |
 | --- | ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | --- |
-| `chrome` | 63 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | `3.3.2` | 2 | 15 | 5 | 8740815 | `8b80e053c7574bd28207b488b9f2ea8edfcd20daeaca724aa3f06ec2a902af6a` |
-| `firefox` | 63 | 2603 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` | `3.3.2` | 1 | 14 | 5 | 8740874 | `03ade584abb4c0d33a28c8545f2da42bfeae94447e2b66864199715fde960487` |
-| `opera` | 63 | 2518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | `3.3.2` | 2 | 15 | 4 | 8740817 | `a033711a7537143e11ac0ca17aab0429f5e859a051959f11b79394fed149584f` |
+| `chrome` | 63 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | `3.3.2` | 2 | 15 | 5 | 8741553 | `1adbf722ae3cd42035abfcd552ef21bc665373a2c403acae3899a14108dd0c72` |
+| `firefox` | 63 | 2603 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` | `3.3.2` | 1 | 14 | 5 | 8741612 | `a064cf3ca73feeb84d240004e93145115c0ac98c8de43934e4434b07c4e1c03c` |
+| `opera` | 63 | 2518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | `3.3.2` | 2 | 15 | 4 | 8741555 | `85ba51ab1256767fdbe854ce9298f2c609be1657e222db1e018a3aafefdaf03f` |
 
 ASCII boundary:
 
@@ -819,10 +819,10 @@ is a required source input before this release/package/public-claim surface can
 support runtime optimization. Current proof pins:
 
 ```text
-method semantic proof gap files covered: 72
-method semantic proof gap lexical callables covered: 6143
+method semantic proof gap files covered: 73
+method semantic proof gap lexical callables covered: 6153
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6143
+lexical callables requiring semantic proof before behavior changes: 6153
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

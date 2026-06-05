@@ -23,7 +23,7 @@ const sourceFingerprints = {
   'js/popup.js': [1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
   'js/seed.js': [1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
   'js/state_manager.js': [2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6'],
-  'js/tab-view.js': [13983, 648765, '644aca26efd9d36c62ad8f899ec7902167ebbc226f2a93e9801a0cef1bd37e1a']
+  'js/tab-view.js': [14009, 649653, '81a897cfc518a4b635e21133d21475dbf1765a9c7bbc3b9771f4b8cdd33942ff']
 };
 
 function read(file) {
@@ -164,7 +164,8 @@ test('message transport callsite register is audit-only and source pinned', () =
 
   assert.match(text, /Status: audit-only current-behavior register/);
   assert.match(text, /Runtime behavior is unchanged/);
-  assert.match(text, /tracked product JS\/JSX\/MJS files scanned: 70/);
+  assert.match(text, /tracked product JS\/JSX\/MJS files scanned: 71/);
+  assert.match(text, /js\/managed_parent_command_center\.js.*zero message\s+transport\s+rows/s);
   assert.match(text, /js\/managed_admin_authority\.js.*zero message\s+transport rows/s);
   assert.match(text, /js\/nanah_managed_live_policy\.js.*zero message\s+transport rows/s);
   assert.match(text, /js\/nanah_managed_open_sync\.js.*zero message\s+transport rows/s);
@@ -195,7 +196,7 @@ test('message transport callsite counts remain source-derived', () => {
   const rows = transportRows();
   const text = doc();
 
-  assert.equal(productScriptFiles().length, 70);
+  assert.equal(productScriptFiles().length, 71);
   assert.equal(rows.length, 65);
   assert.deepEqual(countBy(rows, 'operation'), {
     'runtime.onMessage.addListener': 4,

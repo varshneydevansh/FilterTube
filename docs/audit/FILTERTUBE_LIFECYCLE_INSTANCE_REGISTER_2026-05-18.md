@@ -29,7 +29,7 @@ family, source family, and owner class.
 
 | Primitive family | Current count | Why it matters |
 | --- | ---: | --- |
-| `addEventListener` | 301 | Listener install surface. |
+| `addEventListener` | 302 | Listener install surface. |
 | `removeEventListener` | 18 | Explicit listener teardown surface. |
 | `MutationObserver` | 16 | DOM mutation observation surface. |
 | `IntersectionObserver` | 4 | Visibility/identity observation surface. |
@@ -39,7 +39,7 @@ family, source family, and owner class.
 | `clearTimeout` | 34 | Delayed work teardown surface. |
 | `requestAnimationFrame` | 31 | Paint-frame scheduling surface. |
 | `cancelAnimationFrame` | 4 | Paint-frame teardown surface. |
-| **Total lifecycle instances** | **541** | Observer/listener/timer/frame lifecycle surface. |
+| **Total lifecycle instances** | **542** | Observer/listener/timer/frame lifecycle surface. |
 
 This register intentionally does not include direct `fetch`, message,
 display/class, click, or dispatch side effects. Those remain covered by the
@@ -50,7 +50,7 @@ side-effect audits.
 
 | Source family | Lifecycle instances | Current interpretation |
 | --- | ---: | --- |
-| `extension-ui-background-js` | 275 | Dashboard, popup, background, StateManager, UI components, and import/export/Nanah lifecycle work. |
+| `extension-ui-background-js` | 276 | Dashboard, popup, background, StateManager, UI components, managed parent command-center action intents, and import/export/Nanah lifecycle work. |
 | `content-runtime-js` | 231 | YouTube page-runtime work: seed, bridge, quick/menu, DOM fallback, injector, prompts, managed time-limit heartbeat work, and helper listeners. |
 | `website-components` | 23 | Website client lifecycle, including theme/scene controls plus hero/footer decorative motion. |
 | `vendor-bundles` | 8 | Packaged vendor transport listeners, especially Nanah. |
@@ -80,36 +80,36 @@ side-effect audits.
 
 | Finding | Evidence | Risk |
 | --- | --- | --- |
-| Lifecycle installs greatly exceed explicit teardown. | 301 listener installs vs 18 listener removals; 124 timeouts vs 34 clears. | Cleanup or route changes cannot rely on teardown being already represented everywhere. |
-| UI/background lifecycle is larger than page runtime. | `extension-ui-background-js` has 275 lifecycle instances, while `content-runtime-js` has 231. | YouTube lag fixes still need settings/profile/import/Nanah lifecycle proof because UI can create stale state and broadcasts. |
+| Lifecycle installs greatly exceed explicit teardown. | 302 listener installs vs 18 listener removals; 124 timeouts vs 34 clears. | Cleanup or route changes cannot rely on teardown being already represented everywhere. |
+| UI/background lifecycle is larger than page runtime. | `extension-ui-background-js` has 276 lifecycle instances, while `content-runtime-js` has 231. | YouTube lag fixes still need settings/profile/import/Nanah lifecycle proof because UI can create stale state and broadcasts. |
 | Page runtime has several independent owners. | `js/content_bridge.js`, `js/content/block_channel.js`, `js/content/dom_fallback.js`, `js/injector.js`, prompts, and helpers all own lifecycle instances. | Empty-install, fullscreen, native overlay, and route changes can wake unrelated owners unless one lifecycle budget exists. |
 | Vendor and generated lifecycle instances are packaged but not product source. | `vendor-bundles` has 8; `generated-ui-output` has 4. | These need source/freshness/hash proof, not manual edits. |
 | No shared registry exists today. | Current tracked source still lacks `lifecycleRegistry`, `registerLifecycle`, `observerRegistry`, `timerRegistry`, `disposeAll`, or `teardownAll`. | A cleanup can remove one visible symptom while another owner keeps equivalent work alive. |
 
 ## Install/Teardown Imbalance Addendum - 2026-05-27
 
-This addendum classifies the 541 lifecycle instances by whether they install or
+This addendum classifies the 542 lifecycle instances by whether they install or
 schedule work versus explicitly tear down a primitive covered by this register.
 It is source-derived proof only; it does not approve lifecycle cleanup, route
 teardown, listener removal, observer disconnect changes, or timer rewrites.
 
 | Lifecycle role | Primitive families | Instances | Current interpretation |
 | --- | --- | ---: | --- |
-| `install-or-schedule` | `addEventListener`, `MutationObserver`, `IntersectionObserver`, `setInterval`, `setTimeout`, `requestAnimationFrame` | 480 | Work can be installed, observed, repeated, delayed, or framed. |
+| `install-or-schedule` | `addEventListener`, `MutationObserver`, `IntersectionObserver`, `setInterval`, `setTimeout`, `requestAnimationFrame` | 481 | Work can be installed, observed, repeated, delayed, or framed. |
 | `explicit-teardown` | `removeEventListener`, `clearInterval`, `clearTimeout`, `cancelAnimationFrame` | 61 | Only the teardown/clear/cancel primitives counted by this register; observer `disconnect()` and owner-specific cleanup still need semantic proof. |
 
 Source-family imbalance:
 
 | Source family | Install/schedule instances | Explicit teardown instances | Total lifecycle instances | Current risk |
 | --- | ---: | ---: | ---: | --- |
-| `extension-ui-background-js` | 261 | 14 | 275 | Dashboard/popup/background/state lifecycle has the largest unmatched install surface. |
+| `extension-ui-background-js` | 262 | 14 | 276 | Dashboard/popup/background/state lifecycle has the largest unmatched install surface. |
 | `content-runtime-js` | 196 | 35 | 231 | YouTube page runtime still has many page-lifetime listeners, observers, timers, and frame callbacks. |
 | `vendor-bundles` | 8 | 0 | 8 | Vendor lifecycle requires source/hash/freshness proof rather than local edits. |
 | `website-components` | 13 | 10 | 23 | Website client lifecycle grew from hero/footer motion work; it remains outside YouTube page-runtime filtering but still needs website unmount proof. |
 | `generated-ui-output` | 2 | 2 | 4 | Generated shell output needs freshness proof before hand edits. |
 
 ```text
-install-or-schedule lifecycle instances: 480
+install-or-schedule lifecycle instances: 481
 explicit-teardown lifecycle instances: 61
 install-to-teardown ratio: 7.9:1
 shared lifecycle registry in product source: absent
@@ -119,7 +119,7 @@ runtime behavior changed by this addendum: no
 
 ```mermaid
 flowchart TD
-  A["541 lifecycle instances"] --> B["480 install or schedule work"]
+  A["542 lifecycle instances"] --> B["481 install or schedule work"]
   A --> C["61 explicit teardown primitives"]
   B --> D["Listeners, observers, timers, frames"]
   C --> E["remove, clear, cancel"]

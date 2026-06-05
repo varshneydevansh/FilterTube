@@ -12,7 +12,7 @@ const activeCssRows = [
   ['css/design_tokens.css', 301, 10361, '7da73da79df23e6325c921e45fd786270488ee8ad212b57b7e634b63898c27dc', 12, 0, 0, 1, 0, 0, 0, 0, 0, 5, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   ['css/components.css', 1686, 45567, 'db01d30c717e34c108e48d92807ce3df4bcafccace62a1808d86d03ed7047ebc', 240, 47, 1, 5, 1, 0, 1, 49, 53, 53, 0, 0, 2, 18, 1, 0, 19, 20, 5, 3, 4, 0],
   ['css/popup.css', 1151, 29731, '812cb4ba8b4c9be732bd8a2a6f7b06b5d8d0a8c3fb7416f391f475ae627d45fa', 182, 5, 3, 2, 0, 1, 3, 23, 52, 75, 0, 0, 5, 6, 0, 0, 8, 8, 1, 1, 2, 0],
-  ['css/tab-view.css', 2922, 70854, '355c9c8f69d4714aff9042b7988d5606634ec6bc413224e2bb4511950b8bf282', 435, 24, 14, 12, 4, 2, 1, 28, 26, 74, 0, 0, 1, 20, 0, 0, 17, 17, 15, 12, 12, 1],
+  ['css/tab-view.css', 2940, 71227, '4b080ea7a91f5fa8a1b555ddc40184b298151d99de7dfa03859fcf6a43510767', 438, 24, 14, 12, 4, 2, 1, 28, 26, 74, 0, 0, 1, 20, 0, 0, 17, 17, 15, 12, 12, 1],
   ['css/serene-shell.css', 3414, 87230, '785e988dd0176b16defcc08f77925de8eaa60ea831d53cd57147eb601c490f0a', 494, 39, 7, 16, 1, 0, 11, 34, 124, 124, 54, 0, 4, 3, 0, 0, 12, 46, 17, 10, 14, 0]
 ];
 
@@ -20,7 +20,7 @@ const selectedSourceRows = [
   ['css/design_tokens.css', 301, 10361, '7da73da79df23e6325c921e45fd786270488ee8ad212b57b7e634b63898c27dc'],
   ['css/components.css', 1686, 45567, 'db01d30c717e34c108e48d92807ce3df4bcafccace62a1808d86d03ed7047ebc'],
   ['css/popup.css', 1151, 29731, '812cb4ba8b4c9be732bd8a2a6f7b06b5d8d0a8c3fb7416f391f475ae627d45fa'],
-  ['css/tab-view.css', 2922, 70854, '355c9c8f69d4714aff9042b7988d5606634ec6bc413224e2bb4511950b8bf282'],
+  ['css/tab-view.css', 2940, 71227, '4b080ea7a91f5fa8a1b555ddc40184b298151d99de7dfa03859fcf6a43510767'],
   ['css/serene-shell.css', 3414, 87230, '785e988dd0176b16defcc08f77925de8eaa60ea831d53cd57147eb601c490f0a'],
   ['html/popup.html', 31, 1213, 'c5e03a38b2737dbd01e2cd0c243b37754936e2e349e9d2275b195350159aea31'],
   ['html/tab-view.html', 1600, 136305, '5124626e39cd3879da6593bc9bfa8287f0ad5b9ae29dcbb075d9e5bce0389d0b'],
@@ -30,8 +30,8 @@ const selectedSourceRows = [
   ['js/ui-shell/popup-shell.js', 374, 21080, 'dc750d44dd4b9fde63b85b4dfc9f5ce9ba76964afbd6dfcedc7b3b7cce084b05'],
   ['js/ui-shell/tab-view-decor.js', 323, 18289, '234171091e523aa5de4c3c0f97e7341c55893bdd31b3e25a075490170fa9742f'],
   ['js/popup.js', 1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
-  ['js/tab-view.js', 13983, 648765, '644aca26efd9d36c62ad8f899ec7902167ebbc226f2a93e9801a0cef1bd37e1a'],
-  ['js/managed_parent_command_center.js', 156, 8083, 'b33906478fb6d57631da82262562ac65267238b16d33049290ecf76fbd2a45a9']
+  ['js/tab-view.js', 14009, 649653, '81a897cfc518a4b635e21133d21475dbf1765a9c7bbc3b9771f4b8cdd33942ff'],
+  ['js/managed_parent_command_center.js', 213, 10823, '3e0c5ada457e19502e9fd7ab946ef464817d3b2ee8c0fa44713435f98a49351f']
 ];
 
 function read(file) {
@@ -196,8 +196,8 @@ test('active extension UI CSS state counters match current source', () => {
     reducedMotion: 1
   });
 
-  assert.match(doc, /9,474 counted source lines/);
-  assert.match(doc, /243,743 bytes, 1,363 lexical rule blocks/);
+  assert.match(doc, /9,492 counted source lines/);
+  assert.match(doc, /244,116 bytes, 1,366 lexical rule blocks/);
   assert.match(doc, /115 `!important` declarations, 25\s+`display:none` declarations/);
   assert.match(doc, /36 `@media` blocks, 6 `@keyframes` blocks, 3\s+`\[hidden\]` selectors/);
   assert.match(doc, /16 `:focus-visible` selectors, 134 `:hover` selectors/);

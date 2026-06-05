@@ -205,11 +205,13 @@ Current local-write boundary:
 - Parent/account profiles that can manage a child can now open that child's
   local protected action history from the profile row.
 - Parent/account profiles that can manage a child can now see a compact,
-  read-only managed status line on that child row plus a read-only command
-  center overview above the profile rows. These surfaces summarize protected
-  profiles, viewing spaces, time limits, local Main/Kids revision state,
-  accepted remote policy scope/link counts, and protected history counts
-  without exposing rule values or raw policy data.
+  read-only managed status line on that child row plus a command center overview
+  above the profile rows. These surfaces summarize protected profiles, viewing
+  spaces, time limits, local Main/Kids revision state, accepted remote policy
+  scope/link counts, and protected history counts without exposing rule values
+  or raw policy data. Command-center row buttons are delegated action intents
+  for existing gated Edit Rules, History, and Time Limit paths; they do not carry
+  policy payloads or direct mutation authority.
 - Child/protected admin surfaces do not receive the detailed managed status
   text and still gate Edit Rules, History, viewing-space, and time-limit
   controls.
@@ -217,9 +219,9 @@ Current local-write boundary:
   failed-auth, expired-session, trust, time-limit, and viewing-space evidence.
 - These local rows are not signed remote-policy authority and do not yet create
   a global revision that all extension contexts can compare against.
-- The profile-row status line and command-center overview are display evidence
-  only; they do not weaken or replace the save-time authority checks, and they
-  do not add bulk write authority.
+- The profile-row status line is display evidence only. Command-center actions
+  are delegated runtime intents only; they do not weaken or replace the
+  save-time authority checks, and they do not add direct or bulk write authority.
 
 ### PIN/session authority
 

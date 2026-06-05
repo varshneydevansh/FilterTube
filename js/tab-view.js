@@ -10737,7 +10737,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         const ids = [];
         getAccountIds(profilesV4).forEach(accountId => ids.push(accountId, ...getChildrenForAccount(profilesV4, accountId)));
 
-        const commandCenter = window.FilterTubeManagedParentCommandCenter?.render?.(profilesV4, { revealDetails: !childAdminRestricted, helpers: { safeObject, getAccountIds, getChildrenForAccount, canActiveProfileManageProfile, summarizeManagedPolicyStateForProfile, getManagedTimeLimitPolicy, getProfileName, isProfileLocked, viewingAccessLabel, managedTimeLimitLabel } });
+        const commandCenter = window.FilterTubeManagedParentCommandCenter?.render?.(profilesV4, {
+            revealDetails: !childAdminRestricted,
+            helpers: {
+                safeObject,
+                getAccountIds,
+                getChildrenForAccount,
+                canActiveProfileManageProfile,
+                summarizeManagedPolicyStateForProfile,
+                getManagedTimeLimitPolicy,
+                getProfileName,
+                isProfileLocked,
+                viewingAccessLabel,
+                managedTimeLimitLabel,
+                onAction: async (intent) => {
+                    const targetId = normalizeString(intent?.profileId);
+                    const action = normalizeString(intent?.action);
+                    if (!targetId) return;
+                    if (action === 'edit_rules') {
+                        await startManagedChildEdit(targetId);
+                    } else if (action === 'view_history') {
+                        await showManagedActionHistory(targetId);
+                    } else if (action === 'set_time_limit' || action === 'change_time_limit') {
+                        await updateProfileTimeLimitPolicy(targetId, 'set');
+                    }
+                }
+            }
+        });
         if (commandCenter) ftProfilesManager.appendChild(commandCenter);
 
         let lastAccount = null;

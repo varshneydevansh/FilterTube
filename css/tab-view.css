@@ -498,7 +498,7 @@ html[data-theme="dark"] body::after {
 .ft-managed-command-center__row {
     min-height: 44px;
     display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(96px, 0.7fr) minmax(96px, 0.7fr) minmax(0, 1.25fr);
+    grid-template-columns: minmax(0, 1.25fr) minmax(90px, 0.65fr) minmax(90px, 0.65fr) minmax(0, 1fr) minmax(160px, 0.9fr);
     gap: 10px;
     align-items: center;
     padding: 9px 10px;
@@ -527,6 +527,20 @@ html[data-theme="dark"] body::after {
     color: var(--ft-color-text-secondary);
     font-size: 12px;
     line-height: 1.35;
+}
+
+.ft-managed-command-center__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-end;
+    min-width: 0;
+}
+
+.ft-managed-command-center__actions .btn-secondary {
+    min-height: 44px;
+    padding: 8px 10px;
+    font-size: 12px;
 }
 
 .help-item.ft-profile-child {
@@ -1030,6 +1044,10 @@ body:not(.ft-managed-child-editor-view) .ft-managed-child-global {
     .ft-managed-command-center__meta {
         justify-content: flex-start;
         text-align: left;
+    }
+
+    .ft-managed-command-center__actions {
+        justify-content: flex-start;
     }
 
     .nav-toggle {

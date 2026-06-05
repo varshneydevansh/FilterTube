@@ -111,7 +111,7 @@ Current artifact hashes:
 | `package-lock.json` | Dependency lock source | `f52d6482693be9cd4edacdc1f1491b4d2cda796522bfd0e4dcf86e0c879ad974` |
 | `html/tab-view.html` | Dashboard load surface | `5124626e39cd3879da6593bc9bfa8287f0ad5b9ae29dcbb075d9e5bce0389d0b` |
 | `js/nanah_sync_adapter.js` | Nanah envelope adapter consumer | `a0318295532fad3204bb155bb661119f26b48ca3cfaa1e44c32ec5895de6e66a` |
-| `js/tab-view.js` | Nanah UI/session consumer | `644aca26efd9d36c62ad8f899ec7902167ebbc226f2a93e9801a0cef1bd37e1a` |
+| `js/tab-view.js` | Nanah UI/session consumer | `81a897cfc518a4b635e21133d21475dbf1765a9c7bbc3b9771f4b8cdd33942ff` |
 
 Current QR dependency facts:
 

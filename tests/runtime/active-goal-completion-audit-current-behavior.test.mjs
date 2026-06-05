@@ -9071,7 +9071,7 @@ test('active goal completion audit records design token JSON CSS parity without 
   assert.match(source, /10,361 bytes/);
   assert.match(source, /80 base `--ft-\*` definitions/);
   assert.match(source, /192 total CSS variable declarations/);
-  assert.match(source, /715 selected active `var\(--ft-\.\.\.\)` references/);
+  assert.match(source, /726 selected active `var\(--ft-\.\.\.\)` references/);
   assert.match(source, /82 unique referenced variables/);
   assert.match(source, /29 undefined referenced variables/);
   assert.match(source, /27 unreferenced CSS token definitions/);

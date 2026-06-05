@@ -8823,7 +8823,7 @@ test('objective coverage ledger records design token JSON CSS parity boundary as
   assert.match(doc, /10,361 bytes/);
   assert.match(doc, /80 base `--ft-\*` definitions/);
   assert.match(doc, /192 total CSS variable declarations/);
-  assert.match(doc, /715 selected active `var\(--ft-\.\.\.\)` references/);
+  assert.match(doc, /726 selected active `var\(--ft-\.\.\.\)` references/);
   assert.match(doc, /82 unique referenced variables/);
   assert.match(doc, /29 undefined referenced variables/);
   assert.match(doc, /27 unreferenced CSS token definitions/);

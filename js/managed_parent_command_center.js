@@ -26,8 +26,41 @@
             getProfileName: typeof helpers.getProfileName === 'function' ? helpers.getProfileName : fallbackGetProfileName,
             isProfileLocked: typeof helpers.isProfileLocked === 'function' ? helpers.isProfileLocked : () => false,
             viewingAccessLabel: typeof helpers.viewingAccessLabel === 'function' ? helpers.viewingAccessLabel : () => 'Main + Kids',
-            managedTimeLimitLabel: typeof helpers.managedTimeLimitLabel === 'function' ? helpers.managedTimeLimitLabel : () => 'No limit'
+            managedTimeLimitLabel: typeof helpers.managedTimeLimitLabel === 'function' ? helpers.managedTimeLimitLabel : () => 'No limit',
+            onAction: typeof helpers.onAction === 'function' ? helpers.onAction : null
         };
+    }
+
+    function buildManagedCommandCenterActionIntents(profileId, timePolicy) {
+        const targetId = typeof profileId === 'string' ? profileId.trim() : '';
+        if (!targetId) return [];
+        const timeLimitActive = timePolicy?.enabled === true;
+        return [
+            {
+                action: 'edit_rules',
+                label: 'Edit Rules',
+                profileId: targetId,
+                scope: 'main_kids',
+                authority: 'delegated_runtime_gate',
+                sensitiveAction: false
+            },
+            {
+                action: 'view_history',
+                label: 'History',
+                profileId: targetId,
+                scope: 'admin_history',
+                authority: 'delegated_runtime_gate',
+                sensitiveAction: true
+            },
+            {
+                action: timeLimitActive ? 'change_time_limit' : 'set_time_limit',
+                label: timeLimitActive ? 'Change Limit' : 'Set Limit',
+                profileId: targetId,
+                scope: 'time_limits',
+                authority: 'delegated_runtime_gate',
+                sensitiveAction: true
+            }
+        ];
     }
 
     function buildManagedCommandCenterSummary(profilesV4, { revealDetails = false, helpers = {} } = {}) {
@@ -69,7 +102,8 @@
                     remoteScopeCount: summary.remoteScopeCount,
                     historyRowCount: summary.historyRowCount,
                     protectedRowCount: summary.protectedRowCount,
-                    latestActionLabel
+                    latestActionLabel,
+                    actionIntents: buildManagedCommandCenterActionIntents(profileId, timePolicy)
                 });
             });
         });
@@ -92,6 +126,7 @@
 
     function renderManagedCommandCenter(profilesV4, { revealDetails = false, helpers = {} } = {}) {
         if (!revealDetails || !global.document) return null;
+        const h = makeHelpers(helpers);
         const summary = buildManagedCommandCenterSummary(profilesV4, { revealDetails, helpers });
         const panel = document.createElement('section');
         panel.className = 'help-item ft-managed-command-center';
@@ -106,7 +141,7 @@
         title.textContent = 'Managed Parent Controls';
         const body = document.createElement('div');
         body.className = 'help-item-body';
-        body.textContent = 'Read-only overview of protected profiles, policy sync, time limits, and action history.';
+        body.textContent = 'Overview of protected profiles, policy sync, time limits, action history, and delegated actions.';
         const meta = document.createElement('div');
         meta.className = 'ft-managed-command-center__meta';
         meta.textContent = `${summary.profileCount} protected profiles | ${summary.limitedCount} time limits | ${summary.remoteScopeCount} remote scopes | ${summary.protectedRowCount} protected history`;
@@ -142,6 +177,27 @@
                 cell.textContent = text;
                 row.appendChild(cell);
             }
+            if (h.onAction && Array.isArray(item.actionIntents) && item.actionIntents.length) {
+                const actionWrap = document.createElement('div');
+                actionWrap.className = 'ft-managed-command-center__actions';
+                item.actionIntents.forEach((intent) => {
+                    const button = document.createElement('button');
+                    button.className = 'btn-secondary';
+                    button.type = 'button';
+                    button.textContent = intent.label;
+                    button.dataset.filtertubeManagedAction = intent.action;
+                    button.dataset.filtertubeProfileId = intent.profileId;
+                    button.title = intent.sensitiveAction
+                        ? 'Requires parent/account re-auth before protected details or policy changes.'
+                        : 'Uses the existing parent-managed runtime gate.';
+                    button.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        Promise.resolve(h.onAction({ ...intent })).catch(() => {});
+                    });
+                    actionWrap.appendChild(button);
+                });
+                row.appendChild(actionWrap);
+            }
             row.prepend(profileCell);
             list.appendChild(row);
         });
@@ -151,6 +207,7 @@
 
     global.FilterTubeManagedParentCommandCenter = {
         buildSummary: buildManagedCommandCenterSummary,
+        buildActionIntents: buildManagedCommandCenterActionIntents,
         render: renderManagedCommandCenter
     };
 })(typeof globalThis !== 'undefined' ? globalThis : window);

@@ -1,9 +1,10 @@
 # Spec: Managed Parent UI Surface
 
 **Generated**: 2026-06-04
-**Status**: Spec, dashboard child-row status, and a read-only parent command
-center overview are present. Write controls still use the existing gated child
-row actions; bulk/multi-profile command-center writes are not implemented yet.
+**Status**: Spec, dashboard child-row status, command-center overview,
+and delegated command-center action intents are present. Write controls still
+use the existing gated child row actions; bulk/multi-profile command-center
+writes are not implemented yet.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 
@@ -15,9 +16,11 @@ without turning protected profiles into an admin surface for the child.
 
 The first increment is deliberately compact: the existing Accounts & Sync
 profile manager gets a read-only managed status line on child profile rows and
-a read-only parent command-center overview when the active parent/account
-profile can manage protected profiles. These surfaces summarize policy state
-without exposing plaintext rule values:
+a parent command-center overview when the active parent/account profile can
+manage protected profiles. The command-center row buttons are delegated action
+intents; they call the same gated runtime paths as the existing child row
+actions and do not write policy from the overview itself. These surfaces
+summarize policy state without exposing plaintext rule values:
 
 - local parent-managed Main/Kids revisions;
 - remote accepted managed-policy scope/link counts and latest revision;
@@ -39,6 +42,8 @@ without exposing plaintext rule values:
 ## UI Boundaries
 
 - The status line is read-only.
+- Command-center action buttons are action intents only. They do not carry
+  payloads, rule values, policy JSON, private keys, or direct mutation authority.
 - The status line must not include keyword text, channel names, video ids, PINs,
   mailbox ciphertext, decrypted payloads, or raw policy JSON.
 - The status line appears only when `canActiveProfileManageProfile(...)`
@@ -59,25 +64,28 @@ runtime child/protected detailed status suppression: present
 runtime status plaintext rule value exposure: absent
 runtime status admin mutation authority: absent
 runtime detailed history modal re-auth gate: present
-runtime read-only managed command-center overview: present
-runtime managed command-center write/bulk apply controls: absent
+runtime managed command-center overview: present
+runtime managed command-center delegated action intents: present
+runtime managed command-center direct policy writes: absent
+runtime managed command-center bulk apply controls: absent
 runtime YouTube hot-path work from command-center UI: absent
 ```
 
 ## Command-Center Slice
 
-The current command-center increment is a read-only parent/caregiver overview
-inside the existing dashboard profile/settings surface. It makes managed state
-easier to scan without weakening the authority model:
+The current command-center increment is a parent/caregiver overview inside the
+existing dashboard profile/settings surface. It makes managed state easier to
+scan and gives parents a shorter path to existing guarded actions without
+weakening the authority model:
 
 | Area | Parent/caregiver needs | Boundary |
 | --- | --- | --- |
 | Managed profile selection | See each protected profile, owner relationship, current lock state, and last policy revision. | Child/protected views still hide admin controls and detailed history. |
-| Rule editing | Row actions still enter the existing managed child editor. | Writes must use the same validated local/remote managed-policy paths as current FilterTube controls. |
+| Rule editing | Command-center and row actions still enter the existing managed child editor. | Writes must use the same validated local/remote managed-policy paths as current FilterTube controls. |
 | Viewing spaces | Show Main, Kids, both, or neither per protected profile; row actions still change policy. | UI choice is not authority; runtime route gate remains the enforcement layer. |
-| Time limits | Show daily YouTube budget state; row actions still set/disable the policy. | Runtime budget accounting remains background-owned; UI cannot reset consumed time without parent re-auth. |
+| Time limits | Show daily YouTube budget state; command-center and row actions still set/disable the policy through the existing runtime gate. | Runtime budget accounting remains background-owned; UI cannot reset consumed time without parent re-auth. |
 | Sync status | Show trusted device, local-network provider, Nanah open-sync, and mailbox status. | Reachability is never authorization; offline state keeps the last valid policy active. |
-| Action history | Show accepted, rejected, conflict, failed-auth, and expired-session counts/latest labels; detailed history remains gated by the History button. | History stays redacted, protected by parent/account re-auth, and never becomes policy authority. |
+| Action history | Show accepted, rejected, conflict, failed-auth, and expired-session counts/latest labels; detailed history remains gated by the History action. | History stays redacted, protected by parent/account re-auth, and never becomes policy authority. |
 | Multi-profile apply | Not implemented in this slice. | Future bulk writes require each target to have its own target profile, trusted link, scope, revision, hash, and signature/integrity proof. |
 
 Required UI states for that slice:

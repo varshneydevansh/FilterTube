@@ -6668,9 +6668,9 @@ test('tracked_file_obligation_index_links_extension_ui_css_page_state_boundary_w
   assert.match(doc, /3 selected generated-shell source files/);
   assert.match(doc, /2 selected generated-shell output files/);
   assert.match(doc, /2 selected hand-owned UI runtime files/);
-  assert.match(doc, /9,386 selected active CSS lines/);
-  assert.match(doc, /241,678 selected active CSS bytes/);
-  assert.match(doc, /1,350 selected lexical rule blocks/);
+  assert.match(doc, /9,492 selected active CSS lines/);
+  assert.match(doc, /244,116 selected active CSS bytes/);
+  assert.match(doc, /1,366 selected lexical rule blocks/);
   assert.match(doc, /115 selected `!important` declarations/);
   assert.match(doc, /25 selected `display:none` declarations/);
   assert.match(doc, /36 selected `@media` blocks/);
@@ -7365,7 +7365,7 @@ test('tracked_file_obligation_index_links_design_token_json_css_parity_boundary_
   assert.match(doc, /10,361 bytes/);
   assert.match(doc, /80 base `--ft-\*` definitions/);
   assert.match(doc, /192 total CSS variable declarations/);
-  assert.match(doc, /715 selected active `var\(--ft-\.\.\.\)` references/);
+  assert.match(doc, /726 selected active `var\(--ft-\.\.\.\)` references/);
   assert.match(doc, /82 unique referenced variables/);
   assert.match(doc, /29 undefined referenced variables/);
   assert.match(doc, /27 unreferenced CSS token definitions/);

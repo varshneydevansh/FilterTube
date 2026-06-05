@@ -306,10 +306,10 @@ is a required source input before this release/package/public-claim surface can
 support runtime optimization. Current proof pins:
 
 ```text
-method semantic proof gap files covered: 72
-method semantic proof gap lexical callables covered: 6143
+method semantic proof gap files covered: 73
+method semantic proof gap lexical callables covered: 6153
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6143
+lexical callables requiring semantic proof before behavior changes: 6153
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

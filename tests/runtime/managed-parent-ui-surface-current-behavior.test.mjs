@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import vm from 'node:vm';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -10,6 +11,21 @@ const inventoryPath = 'docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PAREN
 
 function read(relativePath) {
   return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
+}
+
+function plain(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function loadCommandCenter() {
+  const context = {};
+  context.globalThis = context;
+  context.window = context;
+  vm.createContext(context);
+  vm.runInContext(read('js/managed_parent_command_center.js'), context, {
+    filename: 'js/managed_parent_command_center.js'
+  });
+  return context.FilterTubeManagedParentCommandCenter;
 }
 
 function safeObject(value) {
@@ -202,7 +218,33 @@ function buildManagedCommandCenterSummary(profilesV4, { revealDetails = false } 
         remoteScopeCount: summary.remoteScopeCount,
         historyRowCount: summary.historyRowCount,
         protectedRowCount: summary.protectedRowCount,
-        latestActionLabel: summary.latestResult && summary.latestScope ? `${summary.latestResult}/${summary.latestScope}` : 'none'
+        latestActionLabel: summary.latestResult && summary.latestScope ? `${summary.latestResult}/${summary.latestScope}` : 'none',
+        actionIntents: [
+          {
+            action: 'edit_rules',
+            label: 'Edit Rules',
+            profileId,
+            scope: 'main_kids',
+            authority: 'delegated_runtime_gate',
+            sensitiveAction: false
+          },
+          {
+            action: 'view_history',
+            label: 'History',
+            profileId,
+            scope: 'admin_history',
+            authority: 'delegated_runtime_gate',
+            sensitiveAction: true
+          },
+          {
+            action: timeLimit === 'No limit' ? 'set_time_limit' : 'change_time_limit',
+            label: timeLimit === 'No limit' ? 'Set Limit' : 'Change Limit',
+            profileId,
+            scope: 'time_limits',
+            authority: 'delegated_runtime_gate',
+            sensitiveAction: true
+          }
+        ]
       });
     });
   });
@@ -231,8 +273,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   const helperSource = read('js/managed_parent_command_center.js');
   const tabViewHtml = read('html/tab-view.html');
 
-  assert.match(doc, /Status\*\*: Spec, dashboard child-row status, and a read-only parent command\s+center overview are present/);
-  assert.match(doc, /bulk\/multi-profile command-center writes are not implemented yet/);
+  assert.match(doc, /Status\*\*: Spec, dashboard child-row status, command-center overview,\s+and delegated command-center action intents are present/);
+  assert.match(doc, /bulk\/multi-profile command-center\s+writes are not implemented yet/);
   assert.match(doc, /Parent-Facing States/);
   assert.match(doc, /UI Boundaries/);
   assert.match(doc, /Current Runtime Binding/);
@@ -240,27 +282,39 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(doc, /runtime managed parent child-row status helper: present/);
   assert.match(doc, /runtime child\/protected detailed status suppression: present/);
   assert.match(doc, /runtime status plaintext rule value exposure: absent/);
-  assert.match(doc, /runtime read-only managed command-center overview: present/);
-  assert.match(doc, /runtime managed command-center write\/bulk apply controls: absent/);
+  assert.match(doc, /runtime managed command-center overview: present/);
+  assert.match(doc, /runtime managed command-center delegated action intents: present/);
+  assert.match(doc, /runtime managed command-center direct policy writes: absent/);
+  assert.match(doc, /runtime managed command-center bulk apply controls: absent/);
   assert.match(doc, /runtime YouTube hot-path work from command-center UI: absent/);
   assert.match(plan, new RegExp(docPath));
-  assert.match(plan, /read-only\s+command-center overview for protected profiles/);
+  assert.match(plan, /command-center\s+overview for protected profiles/);
+  assert.match(plan, /delegated action intents\s+for existing gated Edit Rules, History, and Time Limit paths/);
   assert.match(inventory, new RegExp(docPath));
-  assert.match(inventory, /read-only\s+managed status line on that child row plus a read-only command\s+center overview/);
-  assert.match(inventory, /display evidence\s+only/);
+  assert.match(inventory, /read-only\s+managed status line on that child row plus a command center overview/);
+  assert.match(inventory, /delegated action intents\s+for existing gated Edit Rules, History, and Time Limit paths/);
+  assert.match(inventory, /delegated runtime intents only/);
 
   assert.match(source, /function buildManagedProfileStatusText\(profile, \{ revealDetails = false \} = \{\}\)/);
   assert.match(source, /function summarizeManagedPolicyStateForProfile\(profile\)/);
   assert.match(helperSource, /function buildManagedCommandCenterSummary\(profilesV4, \{ revealDetails = false, helpers = \{\} \} = \{\}\)/);
+  assert.match(helperSource, /function buildManagedCommandCenterActionIntents\(profileId, timePolicy\)/);
   assert.match(helperSource, /function renderManagedCommandCenter\(profilesV4, \{ revealDetails = false, helpers = \{\} \} = \{\}\)/);
   assert.match(helperSource, /panel\.setAttribute\('aria-label', 'Managed parent command center'\)/);
-  assert.match(helperSource, /Read-only overview of protected profiles, policy sync, time limits, and action history/);
+  assert.match(helperSource, /Overview of protected profiles, policy sync, time limits, action history, and delegated actions/);
+  assert.match(helperSource, /actionIntents: buildManagedCommandCenterActionIntents\(profileId, timePolicy\)/);
+  assert.match(helperSource, /filtertubeManagedAction/);
+  assert.match(helperSource, /delegated_runtime_gate/);
   assert.match(helperSource, /global\.FilterTubeManagedParentCommandCenter = \{/);
   assert.match(tabViewHtml, /managed_parent_command_center\.js[\s\S]*tab-view\.js/);
   assert.match(source, /const managedStatusText = type === 'child'/);
   assert.match(source, /revealDetails: canManageTarget && !childAdminRestricted/);
   assert.match(source, /FilterTubeManagedParentCommandCenter\?\.render\?\.\(profilesV4/);
-  assert.match(source, /helpers:\s*\{\s*safeObject, getAccountIds,/);
+  assert.match(source, /helpers:\s*\{[\s\S]*safeObject,[\s\S]*getAccountIds,/);
+  assert.match(source, /onAction:\s*async \(intent\) =>/);
+  assert.match(source, /action === 'edit_rules'/);
+  assert.match(source, /action === 'view_history'/);
+  assert.match(source, /action === 'set_time_limit' \|\| action === 'change_time_limit'/);
   assert.match(source, /ft-managed-profile-status/);
   assert.match(source, /historyBtn\.textContent = 'History'/);
   assert.match(source, /ensureProfileUnlocked\(fresh, currentActive, \{ sensitiveAction: true \}\)/);
@@ -296,6 +350,7 @@ test('managed command-center spec pins parent workflow without making UI authori
     assert.match(doc, new RegExp(state));
   }
 
+  assert.match(doc, /Command-center action buttons are action intents only/);
   assert.match(doc, /UI choice is not authority; runtime route gate remains the enforcement layer/);
   assert.match(doc, /Runtime budget accounting remains background-owned/);
   assert.match(doc, /Reachability is never authorization/);
@@ -310,6 +365,7 @@ test('managed command-center spec pins parent workflow without making UI authori
 
   assert.match(css, /\.ft-managed-command-center\s*\{/);
   assert.match(css, /\.ft-managed-command-center__row\s*\{/);
+  assert.match(css, /\.ft-managed-command-center__actions\s*\{/);
   assert.match(css, /min-height:\s*44px/);
   assert.match(css, /@media \(max-width: 768px\)/);
   assert.match(css, /\.ft-managed-command-center__heading,\s*\.ft-managed-command-center__row\s*\{\s*grid-template-columns: 1fr;/s);
@@ -398,11 +454,39 @@ test('managed command-center overview aggregates parent-visible profiles without
   assert.equal(summary.rows[0].timeLimit, '2h/day');
   assert.equal(summary.rows[0].syncLabel, 'Remote r4');
   assert.equal(summary.rows[0].latestActionLabel, 'rejected/channels');
+  assert.deepEqual(plain(summary.rows[0].actionIntents), [
+    {
+      action: 'edit_rules',
+      label: 'Edit Rules',
+      profileId: 'childA',
+      scope: 'main_kids',
+      authority: 'delegated_runtime_gate',
+      sensitiveAction: false
+    },
+    {
+      action: 'view_history',
+      label: 'History',
+      profileId: 'childA',
+      scope: 'admin_history',
+      authority: 'delegated_runtime_gate',
+      sensitiveAction: true
+    },
+    {
+      action: 'change_time_limit',
+      label: 'Change Limit',
+      profileId: 'childA',
+      scope: 'time_limits',
+      authority: 'delegated_runtime_gate',
+      sensitiveAction: true
+    }
+  ]);
 
   const serialized = JSON.stringify(summary);
   assert.doesNotMatch(serialized, /spiders/);
   assert.doesNotMatch(serialized, /UC-secret/);
   assert.doesNotMatch(serialized, /mailbox-secret/);
+  assert.doesNotMatch(serialized, /policyHash/);
+  assert.doesNotMatch(serialized, /payload/);
   assert.doesNotMatch(serialized, /privateKey/i);
   assert.doesNotMatch(serialized, /pin/i);
 
@@ -512,4 +596,89 @@ test('managed parent status is suppressed for protected child views and empty st
     buildManagedProfileStatusText({}, { revealDetails: true }),
     'Managed status: no parent-managed policy revisions yet.'
   );
+});
+
+test('managed command-center helper emits delegated action intents without policy payload authority', () => {
+  const CommandCenter = loadCommandCenter();
+  const fixture = {
+    activeProfileId: 'parentA',
+    profiles: {
+      parentA: { id: 'parentA', type: 'account', name: 'Parent A' },
+      childA: {
+        id: 'childA',
+        type: 'child',
+        name: 'Child A',
+        parentProfileId: 'parentA',
+        settings: {
+          allowMainViewing: true,
+          allowKidsViewing: true,
+          timeLimitPolicy: {
+            schema: 'filtertube_managed_time_limit',
+            version: 1,
+            enabled: false,
+            dailyBudgetSeconds: 0
+          }
+        },
+        managedPolicyState: {
+          localManagedEdits: {
+            main: {
+              policyRevision: 1,
+              policyHash: 'secret-policy-hash',
+              plaintextValue: 'spiders'
+            }
+          }
+        }
+      }
+    }
+  };
+
+  const summary = CommandCenter.buildSummary(fixture, {
+    revealDetails: true,
+    helpers: {
+      safeObject,
+      getAccountIds,
+      getChildrenForAccount,
+      canActiveProfileManageProfile,
+      summarizeManagedPolicyStateForProfile,
+      getManagedTimeLimitPolicy: profile => safeObject(safeObject(profile.settings).timeLimitPolicy),
+      getProfileName,
+      isProfileLocked,
+      viewingAccessLabel,
+      managedTimeLimitLabel
+    }
+  });
+
+  assert.equal(summary.profileCount, 1);
+  assert.deepEqual(plain(summary.rows[0].actionIntents), [
+    {
+      action: 'edit_rules',
+      label: 'Edit Rules',
+      profileId: 'childA',
+      scope: 'main_kids',
+      authority: 'delegated_runtime_gate',
+      sensitiveAction: false
+    },
+    {
+      action: 'view_history',
+      label: 'History',
+      profileId: 'childA',
+      scope: 'admin_history',
+      authority: 'delegated_runtime_gate',
+      sensitiveAction: true
+    },
+    {
+      action: 'set_time_limit',
+      label: 'Set Limit',
+      profileId: 'childA',
+      scope: 'time_limits',
+      authority: 'delegated_runtime_gate',
+      sensitiveAction: true
+    }
+  ]);
+  const serialized = JSON.stringify(summary);
+  assert.doesNotMatch(serialized, /spiders/);
+  assert.doesNotMatch(serialized, /secret-policy-hash/);
+  assert.doesNotMatch(serialized, /operations/);
+  assert.doesNotMatch(serialized, /payload/);
+  assert.doesNotMatch(serialized, /privateKey/i);
 });

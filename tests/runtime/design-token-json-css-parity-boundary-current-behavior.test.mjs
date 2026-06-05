@@ -269,11 +269,11 @@ test('CSS token definitions theme scene blocks and references remain source-deri
   );
   assert.equal(perFileRefCounts['css/components.css'], 176);
   assert.equal(perFileRefCounts['css/popup.css'], 199);
-  assert.equal(perFileRefCounts['css/tab-view.css'], 336);
+  assert.equal(perFileRefCounts['css/tab-view.css'], 347);
   assert.equal(perFileRefCounts['html/tab-view.html'], 4);
 
   const audit = doc();
-  assert.match(audit, /715 `var\(--ft-\.\.\.\)` references/);
+  assert.match(audit, /726 `var\(--ft-\.\.\.\)` references/);
   assert.match(audit, /29 unique referenced variables are not defined/);
   assert.match(audit, /27 unique CSS token definitions are not referenced/);
 });
