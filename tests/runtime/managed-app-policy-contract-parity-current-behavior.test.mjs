@@ -19,6 +19,10 @@ const appManagedHelperDestinations = Object.freeze({
   'js/nanah_managed_live_policy.js': '/Users/devanshvarshney/FilterTubeApp/packages/extension-source/upstream/js/nanah_managed_live_policy.js',
   'js/nanah_managed_open_sync.js': '/Users/devanshvarshney/FilterTubeApp/packages/extension-source/upstream/js/nanah_managed_open_sync.js'
 });
+const appManagedUiMirrorDestinations = Object.freeze({
+  'js/managed_admin_authority.js': '/Users/devanshvarshney/FilterTubeApp/packages/extension-source/upstream/js/managed_admin_authority.js',
+  'js/managed_parent_command_center.js': '/Users/devanshvarshney/FilterTubeApp/packages/extension-source/upstream/js/managed_parent_command_center.js'
+});
 const APP_SYNC_PENDING_STATUSES = new Set([
   'extension_contract_updated_native_sync_pending'
 ]);
@@ -88,6 +92,15 @@ test('managed app policy parity doc records extension-owned app contract artifac
     assert.equal(helper.manifestSyncMode, 'copy');
     assert.equal(helper.appDestination, appManagedHelperDestinations[helper.sourcePath].replace('/Users/devanshvarshney/FilterTubeApp/', ''));
     assert.match(helper.boundary, /native|server mailbox|local-network/);
+  }
+  assert.deepEqual(
+    contract.uiHelperMirror.map(row => row.sourcePath),
+    Object.keys(appManagedUiMirrorDestinations)
+  );
+  for (const helper of contract.uiHelperMirror) {
+    assert.equal(helper.manifestSyncMode, 'extension_source_mirror_pending_explicit_manifest');
+    assert.equal(helper.appDestination, appManagedUiMirrorDestinations[helper.sourcePath].replace('/Users/devanshvarshney/FilterTubeApp/', ''));
+    assert.match(helper.boundary, /native|policy authority|settings locks/);
   }
   assert.match(doc, /Runtime behavior changed\*\*: extension no; Android app yes/);
   assert.match(doc, /Android native\s+model and Activity runtime proof/);
@@ -324,5 +337,12 @@ test('current app sync manifest copies runtime sources dedicated contract artifa
     assert.equal(helperEntry.syncMode, 'copy');
     assert.equal(fs.existsSync(destination), true);
     assert.equal(read(source), readAbsolute(destination));
+  }
+  for (const [source, destination] of Object.entries(appManagedUiMirrorDestinations)) {
+    assert.equal(fs.existsSync(path.join(repoRoot, source)), true, `missing managed UI helper source ${source}`);
+    if (!APP_SYNC_PENDING_STATUSES.has(contractFromArtifact().appSyncStatus)) {
+      assert.equal(fs.existsSync(destination), true, `missing managed UI helper mirror ${destination}`);
+      assert.equal(read(source), readAbsolute(destination));
+    }
   }
 });

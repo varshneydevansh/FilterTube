@@ -58,6 +58,20 @@ or iOS enforcement is complete yet.
       "boundary": "managed pull-on-open helper source parity; server mailbox and local-network runtime remain absent"
     }
   ],
+  "uiHelperMirror": [
+    {
+      "sourcePath": "js/managed_admin_authority.js",
+      "appDestination": "packages/extension-source/upstream/js/managed_admin_authority.js",
+      "manifestSyncMode": "extension_source_mirror_pending_explicit_manifest",
+      "boundary": "managed admin session and sensitive-action authority helper; native settings locks must preserve the contract without copying extension UI state as authority"
+    },
+    {
+      "sourcePath": "js/managed_parent_command_center.js",
+      "appDestination": "packages/extension-source/upstream/js/managed_parent_command_center.js",
+      "manifestSyncMode": "extension_source_mirror_pending_explicit_manifest",
+      "boundary": "managed parent command-center summary/action-intent helper; native UI may mirror interaction shape but runtime policy authority remains signed envelope and profile gate owned"
+    }
+  ],
   "profileAuthority": {
     "stores": [
       "ftProfilesV4",
@@ -270,6 +284,11 @@ current. The same manifest also copies the extension-owned managed Nanah
 signed-send and pull-on-open helper sources into
 `packages/extension-source/upstream/js/` so the downstream app repo can track
 the exact helper contracts without treating them as native runtime authority.
+The extension source mirror also carries the managed admin authority helper and
+managed parent command-center helper. Those are contract inputs for native
+settings locks and parent UI ergonomics, not standalone policy authority, and
+they still need an explicit native sync/manifest pass before app parity can be
+claimed current.
 
 The contract now treats protected profiles as child profiles plus independent
 account profiles when Default/Master is the managing authority. Downstream apps
