@@ -710,7 +710,10 @@ the current extension dashboard.
   intentionally avoids a separate oversized remote-management page until
   app/server provider work exists. Bulk keyword/channel/video rule additions
   now show a review confirmation, require parent/account re-auth, and write one
-  redacted revision/history row per changed target. Bulk time-limit and viewing-space actions now use the same
+  redacted revision/history row per changed target. When changed profiles have
+  verified delivery, the dashboard offers to send the matching granular
+  keyword/channel/video scope immediately and binds the parent-selected Main/Kids
+  surface into the signed send path. Bulk time-limit and viewing-space actions now use the same
   protected-profile authority predicate as the command-center rows, so
   Default/Master-managed independent account profiles are not silently skipped.
 - **Complexity**: 7/10

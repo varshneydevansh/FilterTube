@@ -6504,6 +6504,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         return 'keyword';
     }
 
+    function managedBulkRuleRemoteScope(ruleType) {
+        const type = ruleType === 'video' ? 'video' : (ruleType === 'channel' ? 'channel' : 'keyword');
+        if (type === 'video') return 'videos';
+        if (type === 'channel') return 'channels';
+        return 'keywords';
+    }
+
     async function addManagedBulkRuleToProfiles(profileIds, ruleType) {
         const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
         const type = ruleType === 'video' ? 'video' : (ruleType === 'channel' ? 'channel' : 'keyword');
@@ -6576,6 +6583,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         let changedCount = 0;
         let duplicateCount = 0;
+        const changedProfileIds = [];
         for (const targetId of eligibleIds) {
             const profile = safeObject(profiles[targetId]);
             const nextSurface = getProfileSurface(profile, surface);
@@ -6594,6 +6602,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             profiles[targetId] = recordManagedChildLocalEditHistory(nextProfile, report);
             changedCount += 1;
+            changedProfileIds.push(targetId);
         }
 
         if (!changedCount) {
@@ -6613,6 +6622,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         await StateManager.loadSettings({ notify: false, resetEnrichment: false, scheduleEnrichment: false });
         await refreshProfilesUI();
         UIComponents.showToast(`${changedCount} ${changedCount === 1 ? 'profile' : 'profiles'} updated with managed ${managedBulkRuleTypeLabel(type)}`, 'success');
+
+        const remoteScope = managedBulkRuleRemoteScope(type);
+        const mailboxReady = hasNanahManagedMailboxUploadWriter();
+        const localReady = hasNanahManagedLocalNetworkDeliveryWriter();
+        const readyProfileCount = changedProfileIds.filter((targetId) => {
+            const profile = safeObject(safeObject(profilesV4Cache).profiles)[targetId];
+            const links = getNanahSourceManagedLinksForTargetProfile(targetId, remoteScope, profile);
+            if (!links.length) return false;
+            return links.some(isNanahManagedLinkLiveConnected) || mailboxReady || localReady;
+        }).length;
+        if (readyProfileCount > 0) {
+            const sendNow = await showConfirmModal({
+                title: `Send ${managedBulkRuleTypeLabel(type)} update now?`,
+                message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send the ${surface === 'kids' ? 'YouTube Kids' : 'Main YouTube'} ${managedBulkRuleTypeLabel(type)} rule update to those devices now.`,
+                confirmText: 'Send update',
+                cancelText: 'Not now'
+            });
+            if (sendNow) {
+                await sendManagedParentPolicyToVerifiedDevices(changedProfileIds, {
+                    scope: remoteScope,
+                    surface
+                });
+            }
+        }
     }
 
     function isUiLocked() {
@@ -9671,7 +9704,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return true;
     }
 
-    async function sendManagedParentPolicyToVerifiedDevices(profileIds, { scope = 'active' } = {}) {
+    async function sendManagedParentPolicyToVerifiedDevices(profileIds, { scope = 'active', surface = '' } = {}) {
         const targetIds = Array.from(new Set(safeArray(profileIds).map(id => normalizeString(id)).filter(Boolean)));
         if (!targetIds.length) {
             UIComponents.showToast('Select at least one protected profile first', 'info');
@@ -9703,6 +9736,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         await ensureNanahManagedSigningKeyPair({ required: true });
         const normalizedScope = normalizeString(scope) || 'active';
+        const normalizedSurface = (() => {
+            const value = normalizeString(surface).toLowerCase();
+            return value === 'kids' || value === 'main' ? value : '';
+        })();
         const mailboxProvider = getNanahManagedMailboxProvider();
         const localNetworkProvider = getNanahManagedLocalNetworkProvider();
         const mailboxReady = hasNanahManagedMailboxUploadWriter(mailboxProvider);
@@ -9776,7 +9813,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             nanahManagedPolicySourceOverride = {
                 profileId: targetId,
                 profile: targetProfile,
-                sourceKind: 'command_center_protected_profile'
+                sourceKind: 'command_center_protected_profile',
+                surface: normalizedSurface
             };
             try {
                 if (liveReady && typeof nanahManagedLivePolicy.buildEnvelopeBatchForTrustedLinks === 'function') {
@@ -12002,6 +12040,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function getNanahActiveManagedSurface() {
+        const overrideSurface = normalizeString(safeObject(nanahManagedPolicySourceOverride).surface).toLowerCase();
+        if (overrideSurface === 'main' || overrideSurface === 'kids') {
+            return overrideSurface;
+        }
         const scope = getNanahScope();
         const selectedSurface = normalizeString(ftNanahGranularSurface?.value).toLowerCase();
         if (['keywords', 'channels', 'videos', 'rules_bundle'].includes(scope) && (selectedSurface === 'main' || selectedSurface === 'kids')) {

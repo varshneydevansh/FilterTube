@@ -394,6 +394,12 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /async function addManagedBulkRuleToProfiles\(profileIds, ruleType\)/);
   assert.match(source, /const confirmBulk = await showConfirmModal\(/);
   assert.match(source, /function managedBulkRuleTypeLabel\(ruleType\)/);
+  assert.match(source, /function managedBulkRuleRemoteScope\(ruleType\)/);
+  assert.match(source, /Send \$\{managedBulkRuleTypeLabel\(type\)\} update now\?/);
+  assert.match(source, /const remoteScope = managedBulkRuleRemoteScope\(type\)/);
+  assert.match(source, /getNanahSourceManagedLinksForTargetProfile\(targetId, remoteScope, profile\)/);
+  assert.match(source, /sendManagedParentPolicyToVerifiedDevices\(changedProfileIds, \{\s+scope: remoteScope,\s+surface\s+\}\)/);
+  assert.match(source, /const overrideSurface = normalizeString\(safeObject\(nanahManagedPolicySourceOverride\)\.surface\)\.toLowerCase\(\)/);
   assert.match(source, /bulk_time_limit_unlock_failed/);
   assert.match(source, /bulk_viewing_space_unlock_failed/);
   assert.match(source, /confirmText: 'Save Limits'/);
@@ -438,8 +444,10 @@ test('managed command-center spec pins parent workflow without making UI authori
   assert.match(doc, /UI choice is not authority; runtime route gate remains the enforcement layer/);
   assert.match(doc, /Runtime budget accounting remains background-owned/);
   assert.match(doc, /Reachability is never authorization/);
+  assert.match(doc, /post-rule-write granular verified-device push: present with selected surface binding/);
   assert.match(doc, /Present for selected-profile rule editor handoff, same-budget local time-limit changes, same-access local viewing-space changes, selected-profile keyword\/channel\/video-ID rule additions, and selected-profile signed-policy sends on selected protected profiles/);
   assert.match(doc, /Local bulk rule writes are one reviewed rule at a time/);
+  assert.match(doc, /selected Main\/Kids surface binding for granular sends/);
   assert.match(doc, /Mobile-first layout with a single-column protected-profile list/);
   assert.match(doc, /Touch targets .* at\s+least 44px high/);
   assert.match(doc, /Use segmented controls for Main\/Kids access/);

@@ -14,7 +14,9 @@ re-pairing, conflicts, and history without reading raw policy state. Bulk local
 time-limit and viewing-space actions cover all manageable protected profiles,
 including Default/Master-managed independent account profiles. Direct rule bulk
 writes for keyword, channel, and video ID rules are now present behind a
-review-confirmation step and parent/account re-auth.
+review-confirmation step and parent/account re-auth, and changed profiles with
+verified delivery can immediately push the matching Main/Kids rule scope to
+their saved devices.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 
@@ -65,6 +67,10 @@ state without exposing plaintext rule values:
 - Bulk command-center buttons carry only selected protected profile ids, action
   name, scope, and `sensitiveAction: true`; the dashboard runtime still prompts
   for parent/account re-auth and builds one policy revision per target.
+- After a selected-profile keyword/channel/video-ID bulk write, the runtime can
+  offer an immediate verified-device push for only the matching granular rule
+  scope. That send binds the parent-selected Main/Kids surface instead of
+  reading the visible Nanah granular-surface selector.
 - `Send Update` and `Send selected updates` use saved managed Source -> Replica
   links only. A live connected verified replica receives signed envelopes over
   Nanah immediately. Optional mailbox/LAN providers receive ciphertext items or
@@ -108,6 +114,7 @@ runtime managed command-center bulk viewing-space controls: present via delegate
 runtime managed command-center per-profile signed policy push: present
 runtime managed command-center selected-profile signed policy push: present
 runtime managed command-center direct rule bulk writes: present via confirmation plus delegated runtime gate
+runtime managed command-center post-rule-write granular verified-device push: present with selected surface binding
 runtime connected verified-device live P2P managed policy send: present
 runtime provider-gated mailbox/LAN delivery handoff from command center: present
 runtime protected redacted push-attempt history rows: present
@@ -128,7 +135,7 @@ weakening the authority model:
 | --- | --- | --- |
 | Managed profile selection | See each protected profile, owner relationship, current lock state, verified-device readiness, and last policy revision. | Child/protected views still hide admin controls and detailed history. |
 | Protection scan strip | Quickly see protected profile count, sync-ready profiles, profiles needing re-pairing, and remote conflicts before acting. | Strip values are aggregate status only; they do not include rule text, policy payloads, keys, or mutation authority. |
-| Rule editing | Command-center row actions still enter the existing managed protected-profile editor, selected-profile bulk controls can hand off one selected protected profile to the same editor, and selected-profile bulk keyword/channel/video-ID additions can apply one reviewed rule to selected protected profiles. | Writes must use the same validated local/remote managed-policy paths as current FilterTube controls; bulk rule writes require review confirmation, parent/account re-auth, per-target revision/history rows, and no child authority. |
+| Rule editing | Command-center row actions still enter the existing managed protected-profile editor, selected-profile bulk controls can hand off one selected protected profile to the same editor, and selected-profile bulk keyword/channel/video-ID additions can apply one reviewed rule to selected protected profiles. Changed profiles with verified delivery can then push the matching rule scope immediately. | Writes must use the same validated local/remote managed-policy paths as current FilterTube controls; bulk rule writes require review confirmation, parent/account re-auth, per-target revision/history rows, selected Main/Kids surface binding for granular sends, and no child authority. |
 | Remote send | Parent can send one protected profile or selected protected profiles to saved verified devices and see whether the next attempt is live, later via LAN/mailbox provider, blocked by conflict, blocked by stale/revoked pairing, or missing a verified device. | Delivery links and preview labels are not authority; each envelope still requires Source -> Replica trust, fixed target profile, allowed scope, signature/integrity proof, and newer revision/hash. |
 | Viewing spaces | Show Main, Kids, both, or neither per protected profile; row actions still change policy and selected-profile bulk actions can apply Main + Kids, Kids only, or Main only locally. | UI choice is not authority; runtime route gate remains the enforcement layer; every selected target gets its own redacted revision/history row after parent re-auth. |
 | Time limits | Show daily YouTube budget state; command-center row actions still set/disable one profile and bulk selected-profile actions can apply the same daily budget or disable existing limits. | Runtime budget accounting remains background-owned; every target gets its own revision/history row after parent re-auth. |
@@ -191,6 +198,9 @@ For the current feature-first slice, manual verification should cover:
   provider-pending cases.
 - Selected-profile Add keyword/channel/video ID shows a review confirmation,
   requires parent/account re-auth, and writes redacted per-target history.
+- If verified delivery is available after a selected-profile rule write, the
+  follow-up Send update confirmation pushes only the matching keyword/channel/video
+  scope for the selected Main/Kids surface.
 - A receiving protected profile applies only trusted, signed, newer policy for
   its fixed target profile.
 - YouTube hot paths stay idle when the dashboard command center is open.

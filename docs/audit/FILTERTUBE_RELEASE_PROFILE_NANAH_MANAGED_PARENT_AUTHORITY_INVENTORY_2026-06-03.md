@@ -118,7 +118,10 @@ managed-policy envelopes to a currently connected verified replica over Nanah
 P2P, can hand ciphertext mailbox rows or signed local-network candidates to
 optional providers when those hooks are present, and can add the same
 video/keyword/channel rule to selected protected profiles after parent/account
-re-auth and a review-confirmation step.
+re-auth and a review-confirmation step. A successful local selected-profile
+rule addition can now offer an immediate verified-device push for only the
+matching keyword/channel/video scope, and that granular send uses the
+parent-selected Main/Kids surface rather than the visible Nanah surface picker.
 The extension still does not ship a built-in server mailbox client or LAN
 peer-discovery transport; those are downstream app/server/provider integration
 surfaces. Built-in server upload/pull/purge clients, built-in local-network
