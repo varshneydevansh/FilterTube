@@ -63,10 +63,36 @@
         ];
     }
 
+    function buildManagedCommandCenterBulkActionIntents(rows = []) {
+        const profileIds = (Array.isArray(rows) ? rows : [])
+            .map(row => typeof row?.profileId === 'string' ? row.profileId.trim() : '')
+            .filter(Boolean);
+        if (!profileIds.length) return [];
+        return [
+            {
+                action: 'bulk_set_time_limit',
+                label: 'Set selected limit',
+                profileIds,
+                scope: 'time_limits',
+                authority: 'delegated_runtime_gate',
+                sensitiveAction: true
+            },
+            {
+                action: 'bulk_disable_time_limit',
+                label: 'Disable selected limits',
+                profileIds,
+                scope: 'time_limits',
+                authority: 'delegated_runtime_gate',
+                sensitiveAction: true
+            }
+        ];
+    }
+
     function buildManagedCommandCenterSummary(profilesV4, { revealDetails = false, helpers = {} } = {}) {
         if (!revealDetails) {
             return {
                 rows: [],
+                bulkActionIntents: [],
                 profileCount: 0,
                 limitedCount: 0,
                 remoteScopeCount: 0,
@@ -116,6 +142,7 @@
             protectedRowCount: acc.protectedRowCount + row.protectedRowCount
         }), {
             rows,
+            bulkActionIntents: buildManagedCommandCenterBulkActionIntents(rows),
             profileCount: 0,
             limitedCount: 0,
             remoteScopeCount: 0,
@@ -157,17 +184,72 @@
             return panel;
         }
 
+        const selectedProfiles = new Set();
+        const bulkIntents = buildManagedCommandCenterBulkActionIntents(summary.rows);
+        if (h.onAction && bulkIntents.length) {
+            const bulkBar = document.createElement('div');
+            bulkBar.className = 'ft-managed-command-center__bulk';
+            const bulkStatus = document.createElement('span');
+            bulkStatus.className = 'ft-managed-command-center__bulk-status';
+            const bulkButtons = bulkIntents.map((intent) => {
+                const button = document.createElement('button');
+                button.className = 'btn-secondary';
+                button.type = 'button';
+                button.textContent = intent.label;
+                button.disabled = true;
+                button.title = 'Select one or more protected profiles first. Requires parent/account re-auth.';
+                button.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const profileIds = Array.from(selectedProfiles);
+                    if (!profileIds.length) return;
+                    Promise.resolve(h.onAction({ ...intent, profileIds })).catch(() => {});
+                });
+                return button;
+            });
+            const updateBulkState = () => {
+                const count = selectedProfiles.size;
+                bulkStatus.textContent = count
+                    ? `${count} selected for time-limit update`
+                    : 'Select protected profiles for same time limit';
+                bulkButtons.forEach(button => {
+                    button.disabled = count === 0;
+                });
+            };
+            bulkBar.append(bulkStatus, ...bulkButtons);
+            panel.appendChild(bulkBar);
+            panel.__filtertubeUpdateManagedBulkState = updateBulkState;
+            updateBulkState();
+        }
+
         const list = document.createElement('div');
         list.className = 'ft-managed-command-center__list';
         summary.rows.forEach((item) => {
             const row = document.createElement('div');
             row.className = `ft-managed-command-center__row${item.locked ? ' is-locked' : ''}`;
+            const selector = document.createElement('input');
+            selector.className = 'ft-managed-command-center__select';
+            selector.type = 'checkbox';
+            selector.setAttribute('aria-label', `Select ${item.profileName} for bulk time-limit update`);
+            selector.dataset.filtertubeProfileId = item.profileId;
+            selector.addEventListener('change', () => {
+                if (selector.checked) {
+                    selectedProfiles.add(item.profileId);
+                } else {
+                    selectedProfiles.delete(item.profileId);
+                }
+                if (typeof panel.__filtertubeUpdateManagedBulkState === 'function') {
+                    panel.__filtertubeUpdateManagedBulkState();
+                }
+            });
             const name = document.createElement('strong');
             name.textContent = item.profileName;
             const owner = document.createElement('span');
             owner.textContent = `${item.parentName} parent | ${item.locked ? 'locked' : 'unlocked'}`;
             const profileCell = document.createElement('div');
-            profileCell.append(name, owner);
+            profileCell.className = 'ft-managed-command-center__profile';
+            const labelWrap = document.createElement('div');
+            labelWrap.append(name, owner);
+            profileCell.append(selector, labelWrap);
             for (const text of [
                 item.viewingAccess,
                 item.timeLimit,
@@ -208,6 +290,7 @@
     global.FilterTubeManagedParentCommandCenter = {
         buildSummary: buildManagedCommandCenterSummary,
         buildActionIntents: buildManagedCommandCenterActionIntents,
+        buildBulkActionIntents: buildManagedCommandCenterBulkActionIntents,
         render: renderManagedCommandCenter
     };
 })(typeof globalThis !== 'undefined' ? globalThis : window);

@@ -138,6 +138,10 @@ Current extension UI can now create or disable a profile-owned
 - Accepted parent/account set, change, and disable actions now append protected
   redacted `policy.time_limit.update` rows to the target profile's
   `managedActionHistory`.
+- Command-center same-budget bulk apply can target selected protected profiles,
+  but it still builds one policy revision, policy hash, and protected
+  `policy.time_limit.update` history row per child profile after parent/account
+  re-auth.
 - Import/profile sanitation preserves only valid `filtertube_managed_time_limit`
   policies and drops malformed payloads.
 - Disabling a limit writes a disabled policy revision; disabled policy remains a

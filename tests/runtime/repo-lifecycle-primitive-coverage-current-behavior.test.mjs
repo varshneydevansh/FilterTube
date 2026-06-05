@@ -210,7 +210,7 @@ test('every tracked JS JSX and MJS file is lifecycle-classified', () => {
 test('repo-wide lifecycle primitive totals match current tracked source', () => {
   const { totals } = aggregate();
   assert.deepEqual(totals, {
-    addEventListener: 302,
+    addEventListener: 304,
     removeEventListener: 18,
     mutationObserver: 16,
     intersectionObserver: 4,
@@ -229,8 +229,8 @@ test('repo-wide lifecycle primitive totals match current tracked source', () => 
     styleDisplay: 96,
     classListMutation: 110
   });
-  assert.equal(Object.values(totals).reduce((sum, value) => sum + value, 0), 891);
-  assert.match(coverageDoc, /\*\*Total\*\* \| \*\*891\*\*/);
+  assert.equal(Object.values(totals).reduce((sum, value) => sum + value, 0), 893);
+  assert.match(coverageDoc, /\*\*Total\*\* \| \*\*893\*\*/);
 });
 
 test('lifecycle primitive family totals pin page runtime UI website vendor and quarantine burden', () => {
@@ -241,7 +241,7 @@ test('lifecycle primitive family totals pin page runtime UI website vendor and q
   assert.deepEqual(familyTotals, {
     'build-release-sync-scripts': 0,
     'content-runtime-js': 389,
-    'extension-ui-background-js': 422,
+    'extension-ui-background-js': 424,
     'generated-ui-output': 8,
     'generated-ui-source': 2,
     'quarantined-legacy-js': 37,

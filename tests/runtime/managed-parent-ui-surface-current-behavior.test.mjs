@@ -187,10 +187,36 @@ function managedTimeLimitLabel(profile) {
   return hours && remainingMinutes ? `${hours}h ${remainingMinutes}m/day` : (hours ? `${hours}h/day` : `${minutes}m/day`);
 }
 
+function buildManagedCommandCenterBulkActionIntents(rows = []) {
+  const profileIds = (Array.isArray(rows) ? rows : [])
+    .map(row => normalizeString(row.profileId))
+    .filter(Boolean);
+  if (!profileIds.length) return [];
+  return [
+    {
+      action: 'bulk_set_time_limit',
+      label: 'Set selected limit',
+      profileIds,
+      scope: 'time_limits',
+      authority: 'delegated_runtime_gate',
+      sensitiveAction: true
+    },
+    {
+      action: 'bulk_disable_time_limit',
+      label: 'Disable selected limits',
+      profileIds,
+      scope: 'time_limits',
+      authority: 'delegated_runtime_gate',
+      sensitiveAction: true
+    }
+  ];
+}
+
 function buildManagedCommandCenterSummary(profilesV4, { revealDetails = false } = {}) {
   if (!revealDetails) {
     return {
       rows: [],
+      bulkActionIntents: [],
       profileCount: 0,
       limitedCount: 0,
       remoteScopeCount: 0,
@@ -257,6 +283,7 @@ function buildManagedCommandCenterSummary(profilesV4, { revealDetails = false } 
     protectedRowCount: acc.protectedRowCount + row.protectedRowCount
   }), {
     rows,
+    bulkActionIntents: buildManagedCommandCenterBulkActionIntents(rows),
     profileCount: 0,
     limitedCount: 0,
     remoteScopeCount: 0,
@@ -273,8 +300,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   const helperSource = read('js/managed_parent_command_center.js');
   const tabViewHtml = read('html/tab-view.html');
 
-  assert.match(doc, /Status\*\*: Spec, dashboard child-row status, command-center overview,\s+and delegated command-center action intents are present/);
-  assert.match(doc, /bulk\/multi-profile command-center\s+writes are not implemented yet/);
+  assert.match(doc, /Status\*\*: Spec, dashboard child-row status, command-center overview,\s+delegated command-center action intents, and delegated same-budget bulk\s+time-limit controls are present/);
+  assert.match(doc, /Rule, viewing-space, and remote-delivery bulk\s+writes are not implemented yet/);
   assert.match(doc, /Parent-Facing States/);
   assert.match(doc, /UI Boundaries/);
   assert.match(doc, /Current Runtime Binding/);
@@ -284,8 +311,9 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(doc, /runtime status plaintext rule value exposure: absent/);
   assert.match(doc, /runtime managed command-center overview: present/);
   assert.match(doc, /runtime managed command-center delegated action intents: present/);
+  assert.match(doc, /runtime managed command-center bulk time-limit controls: present via delegated runtime gate/);
   assert.match(doc, /runtime managed command-center direct policy writes: absent/);
-  assert.match(doc, /runtime managed command-center bulk apply controls: absent/);
+  assert.match(doc, /runtime managed command-center rule\/viewing-space\/remote bulk writes: absent/);
   assert.match(doc, /runtime YouTube hot-path work from command-center UI: absent/);
   assert.match(plan, new RegExp(docPath));
   assert.match(plan, /command-center\s+overview for protected profiles/);
@@ -299,10 +327,14 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /function summarizeManagedPolicyStateForProfile\(profile\)/);
   assert.match(helperSource, /function buildManagedCommandCenterSummary\(profilesV4, \{ revealDetails = false, helpers = \{\} \} = \{\}\)/);
   assert.match(helperSource, /function buildManagedCommandCenterActionIntents\(profileId, timePolicy\)/);
+  assert.match(helperSource, /function buildManagedCommandCenterBulkActionIntents\(rows = \[\]\)/);
   assert.match(helperSource, /function renderManagedCommandCenter\(profilesV4, \{ revealDetails = false, helpers = \{\} \} = \{\}\)/);
   assert.match(helperSource, /panel\.setAttribute\('aria-label', 'Managed parent command center'\)/);
   assert.match(helperSource, /Overview of protected profiles, policy sync, time limits, action history, and delegated actions/);
   assert.match(helperSource, /actionIntents: buildManagedCommandCenterActionIntents\(profileId, timePolicy\)/);
+  assert.match(helperSource, /bulk_set_time_limit/);
+  assert.match(helperSource, /bulk_disable_time_limit/);
+  assert.match(helperSource, /ft-managed-command-center__select/);
   assert.match(helperSource, /filtertubeManagedAction/);
   assert.match(helperSource, /delegated_runtime_gate/);
   assert.match(helperSource, /global\.FilterTubeManagedParentCommandCenter = \{/);
@@ -315,6 +347,10 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /action === 'edit_rules'/);
   assert.match(source, /action === 'view_history'/);
   assert.match(source, /action === 'set_time_limit' \|\| action === 'change_time_limit'/);
+  assert.match(source, /action === 'bulk_set_time_limit' \|\| action === 'bulk_disable_time_limit'/);
+  assert.match(source, /function updateMultipleProfileTimeLimitPolicies\(profileIds, action\)/);
+  assert.match(source, /bulk_time_limit_unlock_failed/);
+  assert.match(source, /confirmText: 'Save Limits'/);
   assert.match(source, /ft-managed-profile-status/);
   assert.match(source, /historyBtn\.textContent = 'History'/);
   assert.match(source, /ensureProfileUnlocked\(fresh, currentActive, \{ sensitiveAction: true \}\)/);
@@ -354,7 +390,8 @@ test('managed command-center spec pins parent workflow without making UI authori
   assert.match(doc, /UI choice is not authority; runtime route gate remains the enforcement layer/);
   assert.match(doc, /Runtime budget accounting remains background-owned/);
   assert.match(doc, /Reachability is never authorization/);
-  assert.match(doc, /Future bulk writes require each target to have its own target profile, trusted link, scope, revision, hash, and signature\/integrity proof/);
+  assert.match(doc, /Present only for same-budget local time-limit changes on selected protected profiles/);
+  assert.match(doc, /Future rule, viewing-space, remote, mailbox, or LAN bulk writes require each target to have its own target profile, trusted link, scope, revision, hash, and signature\/integrity proof/);
   assert.match(doc, /Mobile-first layout with a single-column protected-profile list/);
   assert.match(doc, /Touch targets .* at\s+least 44px high/);
   assert.match(doc, /Use segmented controls for Main\/Kids access/);
@@ -364,7 +401,10 @@ test('managed command-center spec pins parent workflow without making UI authori
   assert.match(doc, /Avoid showing raw JSON, plaintext sensitive rule values, PINs, private keys,\s+mailbox ciphertext, or YouTube DOM\/debug identifiers/);
 
   assert.match(css, /\.ft-managed-command-center\s*\{/);
+  assert.match(css, /\.ft-managed-command-center__bulk\s*\{/);
   assert.match(css, /\.ft-managed-command-center__row\s*\{/);
+  assert.match(css, /\.ft-managed-command-center__profile\s*\{/);
+  assert.match(css, /\.ft-managed-command-center__select\s*\{/);
   assert.match(css, /\.ft-managed-command-center__actions\s*\{/);
   assert.match(css, /min-height:\s*44px/);
   assert.match(css, /@media \(max-width: 768px\)/);
@@ -454,6 +494,24 @@ test('managed command-center overview aggregates parent-visible profiles without
   assert.equal(summary.rows[0].timeLimit, '2h/day');
   assert.equal(summary.rows[0].syncLabel, 'Remote r4');
   assert.equal(summary.rows[0].latestActionLabel, 'rejected/channels');
+  assert.deepEqual(plain(summary.bulkActionIntents), [
+    {
+      action: 'bulk_set_time_limit',
+      label: 'Set selected limit',
+      profileIds: ['childA'],
+      scope: 'time_limits',
+      authority: 'delegated_runtime_gate',
+      sensitiveAction: true
+    },
+    {
+      action: 'bulk_disable_time_limit',
+      label: 'Disable selected limits',
+      profileIds: ['childA'],
+      scope: 'time_limits',
+      authority: 'delegated_runtime_gate',
+      sensitiveAction: true
+    }
+  ]);
   assert.deepEqual(plain(summary.rows[0].actionIntents), [
     {
       action: 'edit_rules',
@@ -497,6 +555,7 @@ test('managed command-center overview aggregates parent-visible profiles without
   const hidden = buildManagedCommandCenterSummary(fixture, { revealDetails: false });
   assert.equal(hidden.profileCount, 0);
   assert.deepEqual(hidden.rows, []);
+  assert.deepEqual(hidden.bulkActionIntents, []);
 });
 
 test('managed parent status summary shows revisions without plaintext rule values', () => {
@@ -649,6 +708,24 @@ test('managed command-center helper emits delegated action intents without polic
   });
 
   assert.equal(summary.profileCount, 1);
+  assert.deepEqual(plain(summary.bulkActionIntents), [
+    {
+      action: 'bulk_set_time_limit',
+      label: 'Set selected limit',
+      profileIds: ['childA'],
+      scope: 'time_limits',
+      authority: 'delegated_runtime_gate',
+      sensitiveAction: true
+    },
+    {
+      action: 'bulk_disable_time_limit',
+      label: 'Disable selected limits',
+      profileIds: ['childA'],
+      scope: 'time_limits',
+      authority: 'delegated_runtime_gate',
+      sensitiveAction: true
+    }
+  ]);
   assert.deepEqual(plain(summary.rows[0].actionIntents), [
     {
       action: 'edit_rules',

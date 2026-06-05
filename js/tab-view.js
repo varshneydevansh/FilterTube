@@ -5765,6 +5765,113 @@ document.addEventListener('DOMContentLoaded', async () => {
         UIComponents.showToast(enabled ? 'Time limit updated' : 'Time limit disabled', 'success');
     }
 
+    async function updateMultipleProfileTimeLimitPolicies(profileIds, action) {
+        const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
+        if (!targetIds.length) {
+            UIComponents.showToast('Select at least one protected profile', 'error');
+            return;
+        }
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
+            UIComponents.showToast('Profiles unavailable', 'error');
+            return;
+        }
+
+        const fresh = await io.loadProfilesV4();
+        const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
+        if (getProfileType(fresh, currentActive) === 'child') {
+            UIComponents.showToast('Child profiles cannot change time limits', 'error');
+            return;
+        }
+
+        const profiles = { ...safeObject(fresh.profiles) };
+        const eligibleIds = targetIds.filter((targetId) => {
+            const profile = safeObject(profiles[targetId]);
+            return !!profile && Object.keys(profile).length > 0
+                && getProfileType(fresh, targetId) === 'child'
+                && canActiveProfileManageProfile(fresh, targetId);
+        });
+        if (!eligibleIds.length) {
+            UIComponents.showToast('No selected child profiles can be managed by this account', 'error');
+            return;
+        }
+
+        const okAdmin = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
+        if (!okAdmin) {
+            for (const targetId of eligibleIds) {
+                await recordManagedAdminAuthFailureHistory(fresh, targetId, 'bulk_time_limit_unlock_failed');
+            }
+            return;
+        }
+
+        const enabled = action !== 'disable';
+        let budgetSeconds = 7200;
+        if (enabled) {
+            const firstPolicy = getManagedTimeLimitPolicy(profiles[eligibleIds[0]]);
+            const currentMinutes = Math.max(0, Math.floor((firstPolicy?.dailyBudgetSeconds || 7200) / 60));
+            const rawMinutes = await showPromptModal({
+                title: 'Set YouTube Time Limit',
+                message: 'Daily YouTube minutes for selected protected profiles. Use 0 to require parent approval before viewing.',
+                placeholder: 'Minutes per day',
+                inputType: 'number',
+                confirmText: 'Save Limits',
+                initialValue: String(currentMinutes)
+            });
+            if (rawMinutes === null) return;
+            const minutes = normalizeNonNegativeInteger(rawMinutes);
+            if (minutes == null) {
+                UIComponents.showToast('Enter whole minutes, 0 or higher', 'error');
+                return;
+            }
+            budgetSeconds = minutes * 60;
+        }
+
+        let changedCount = 0;
+        for (const targetId of eligibleIds) {
+            const profile = safeObject(profiles[targetId]);
+            const existingPolicy = getManagedTimeLimitPolicy(profile);
+            if (!enabled && !existingPolicy) continue;
+            const nextPolicy = buildManagedTimeLimitPolicy(existingPolicy, {
+                enabled,
+                dailyBudgetSeconds: enabled ? budgetSeconds : (existingPolicy?.dailyBudgetSeconds || 0)
+            });
+            if (!nextPolicy) continue;
+            const nextProfile = {
+                ...profile,
+                settings: {
+                    ...safeObject(profile.settings),
+                    timeLimitPolicy: nextPolicy
+                }
+            };
+            const report = buildManagedTimeLimitLocalEditReport({
+                actorProfileId: currentActive,
+                targetProfileId: targetId,
+                nextPolicy
+            });
+            profiles[targetId] = recordManagedChildLocalEditHistory(nextProfile, report);
+            changedCount += 1;
+        }
+
+        if (!changedCount) {
+            UIComponents.showToast(enabled ? 'No selected profiles changed' : 'No selected profiles had active limits', 'info');
+            return;
+        }
+
+        await io.saveProfilesV4({
+            ...fresh,
+            schemaVersion: 4,
+            profiles
+        });
+        profilesV4Cache = { ...fresh, schemaVersion: 4, profiles };
+        await refreshProfilesUI();
+        UIComponents.showToast(
+            enabled
+                ? `${changedCount} time limits updated`
+                : `${changedCount} time limits disabled`,
+            'success'
+        );
+    }
+
     function isUiLocked() {
         const profilesV4 = profilesV4Cache;
         if (!profilesV4) {
@@ -11012,13 +11119,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 onAction: async (intent) => {
                     const targetId = normalizeString(intent?.profileId);
                     const action = normalizeString(intent?.action);
-                    if (!targetId) return;
+                    if (!targetId && !action.startsWith('bulk_')) return;
                     if (action === 'edit_rules') {
                         await startManagedChildEdit(targetId);
                     } else if (action === 'view_history') {
                         await showManagedActionHistory(targetId);
                     } else if (action === 'set_time_limit' || action === 'change_time_limit') {
                         await updateProfileTimeLimitPolicy(targetId, 'set');
+                    } else if (action === 'bulk_set_time_limit' || action === 'bulk_disable_time_limit') {
+                        await updateMultipleProfileTimeLimitPolicies(
+                            safeArray(intent?.profileIds),
+                            action === 'bulk_disable_time_limit' ? 'disable' : 'set'
+                        );
                     }
                 }
             }

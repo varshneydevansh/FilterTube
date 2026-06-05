@@ -482,6 +482,33 @@ html[data-theme="dark"] body::after {
     background-color: var(--ft-color-bg-panel);
 }
 
+.ft-managed-command-center__bulk {
+    min-height: 44px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    border-radius: 8px;
+    background-color: var(--ft-color-bg-panel);
+}
+
+.ft-managed-command-center__bulk-status {
+    flex: 1 1 180px;
+    min-width: 0;
+    color: var(--ft-color-text-secondary);
+    font-size: 12px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.ft-managed-command-center__bulk .btn-secondary {
+    min-height: 44px;
+    padding: 8px 10px;
+    font-size: 12px;
+}
+
 .ft-managed-command-center__empty {
     padding: 10px 12px;
     border: 1px dashed var(--ft-color-sem-neutral-border);
@@ -509,6 +536,21 @@ html[data-theme="dark"] body::after {
 
 .ft-managed-command-center__row.is-locked {
     border-style: dashed;
+}
+
+.ft-managed-command-center__profile {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 8px;
+    align-items: center;
+    min-width: 0;
+}
+
+.ft-managed-command-center__select {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    accent-color: var(--ft-color-primary);
 }
 
 .ft-managed-command-center__row strong,
@@ -1048,6 +1090,10 @@ body:not(.ft-managed-child-editor-view) .ft-managed-child-global {
 
     .ft-managed-command-center__actions {
         justify-content: flex-start;
+    }
+
+    .ft-managed-command-center__bulk {
+        align-items: stretch;
     }
 
     .nav-toggle {

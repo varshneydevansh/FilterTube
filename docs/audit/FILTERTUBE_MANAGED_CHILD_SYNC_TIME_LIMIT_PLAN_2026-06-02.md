@@ -788,11 +788,18 @@ T1 + T2 + T3
 - **status**: Partially Completed
 - **log**:
 - 2026-06-04: Profile rows now expose parent-only per-profile time-limit
-  controls. Bulk apply and parent extension-grant UX remain pending.
+  controls. Parent extension-grant UX remains pending.
+- 2026-06-05: Command-center selected-profile bulk time-limit controls now
+  apply one same-budget local policy to each selected protected child after
+  parent/account re-auth, with one revision/history row per child.
 - **files edited/created**:
   - `js/tab-view.js`
+  - `js/managed_parent_command_center.js`
+  - `css/tab-view.css`
   - `tests/runtime/managed-child-time-limit-schema-current-behavior.test.mjs`
+  - `tests/runtime/managed-parent-ui-surface-current-behavior.test.mjs`
   - `docs/audit/FILTERTUBE_MANAGED_CHILD_TIME_LIMIT_SCHEMA_CONTRACT_2026-06-03.md`
+  - `docs/audit/FILTERTUBE_MANAGED_PARENT_UI_SURFACE_SPEC_2026-06-03.md`
 
 ### Sprint 3: Extension time-limit enforcement
 

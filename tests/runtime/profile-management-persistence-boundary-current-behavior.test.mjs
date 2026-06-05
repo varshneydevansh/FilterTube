@@ -131,10 +131,10 @@ test('profile management persistence audit document records current boundary and
     assert.ok(doc.includes(marker), `missing marker: ${marker}`);
   }
 
-  assert.match(methodGap, /repo-wide lexical callables: 6166/);
+  assert.match(methodGap, /repo-wide lexical callables: 6181/);
   assert.match(methodGap, /files with lexical accounting: 73/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 6166/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 6181/);
 
   assert.equal(profileSettingsUiFamilyDocs.length, 12);
   for (const familyDocPath of profileSettingsUiFamilyDocs) {
@@ -154,7 +154,7 @@ test('profile management persistence audit document records current boundary and
 test('profile management source fingerprints stay pinned', () => {
   const doc = read(auditDocPath);
   const expected = [
-    ['js/tab-view.js', 14269, 663047, '7515fbce26e7718b820e35bc5b77bc2d8298cb7dacc3aa1421e671894028d867'],
+    ['js/tab-view.js', 14381, 667956, '0f1ead56240490d51a895a22203b0298dc4c3d8813a976d0c70f1a66f153660f'],
     ['js/popup.js', 1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
     ['js/io_manager.js', 2097, 100479, 'f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62'],
     ['js/background.js', 6773, 305166, 'b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5']
@@ -173,7 +173,7 @@ test('profile management source/effect block metrics stay pinned in the doc', ()
   const doc = read(auditDocPath);
   const currentBlocks = blocks();
   const expected = {
-    tabRenderProfilesManager: ['tab-view renderProfilesManager block', 437, 22157],
+    tabRenderProfilesManager: ['tab-view renderProfilesManager block', 442, 22536],
     tabRefreshProfilesUI: ['tab-view refreshProfilesUI block', 24, 954],
     tabSwitchToProfile: ['tab-view switchToProfile block', 46, 1749],
     popupSwitchToProfile: ['popup switchToProfile block', 48, 1659],
@@ -193,12 +193,12 @@ test('profile management source/effect block metrics stay pinned in the doc', ()
 test('selected profile management token counts stay pinned', () => {
   const doc = read(auditDocPath);
   const selected = [
-    ['tab-view ensureProfileUnlocked tokens: 18', sources.tabView, 'ensureProfileUnlocked', 18],
-    ['tab-view saveProfilesV4 tokens: 43', sources.tabView, 'saveProfilesV4', 43],
-    ['tab-view loadProfilesV4 tokens: 78', sources.tabView, 'loadProfilesV4', 78],
-    ['tab-view activeProfileId tokens: 85', sources.tabView, 'activeProfileId', 85],
+    ['tab-view ensureProfileUnlocked tokens: 19', sources.tabView, 'ensureProfileUnlocked', 19],
+    ['tab-view saveProfilesV4 tokens: 45', sources.tabView, 'saveProfilesV4', 45],
+    ['tab-view loadProfilesV4 tokens: 80', sources.tabView, 'loadProfilesV4', 80],
+    ['tab-view activeProfileId tokens: 86', sources.tabView, 'activeProfileId', 86],
     ['tab-view StateManager.loadSettings tokens: 8', sources.tabView, 'StateManager.loadSettings', 8],
-    ['tab-view refreshProfilesUI tokens: 21', sources.tabView, 'refreshProfilesUI', 21],
+    ['tab-view refreshProfilesUI tokens: 22', sources.tabView, 'refreshProfilesUI', 22],
     ['tab-view applyLockGateIfNeeded tokens: 4', sources.tabView, 'applyLockGateIfNeeded', 4],
     ['tab-view scheduleAutoBackup tokens: 6', sources.tabView, 'scheduleAutoBackup', 6],
     ['tab-view profile_created tokens: 2', sources.tabView, 'profile_created', 2],
@@ -207,7 +207,7 @@ test('selected profile management token counts stay pinned', () => {
     ['tab-view clearProfileUnlockSession tokens: 7', sources.tabView, 'clearProfileUnlockSession', 7],
     ['tab-view allowMainViewing tokens: 4', sources.tabView, 'allowMainViewing', 4],
     ['tab-view allowKidsViewing tokens: 4', sources.tabView, 'allowKidsViewing', 4],
-    ['tab-view schemaVersion tokens: 26', sources.tabView, 'schemaVersion', 26],
+    ['tab-view schemaVersion tokens: 28', sources.tabView, 'schemaVersion', 28],
     ['popup ensureProfileUnlocked tokens: 3', sources.popup, 'ensureProfileUnlocked', 3],
     ['popup saveProfilesV4 tokens: 2', sources.popup, 'saveProfilesV4', 2],
     ['popup loadProfilesV4 tokens: 4', sources.popup, 'loadProfilesV4', 4],

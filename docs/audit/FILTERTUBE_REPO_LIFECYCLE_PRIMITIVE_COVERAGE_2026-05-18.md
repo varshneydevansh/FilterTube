@@ -48,7 +48,7 @@ changing any owner.
 
 | Primitive | Count | Audit meaning |
 | --- | ---: | --- |
-| `addEventListener` | 302 | Listener lifecycle surface. |
+| `addEventListener` | 304 | Listener lifecycle surface. |
 | `removeEventListener` | 18 | Explicit listener teardown surface. |
 | `MutationObserver` | 16 | DOM mutation observation surface. |
 | `IntersectionObserver` | 4 | Visibility/identity prefetch observation surface. |
@@ -66,14 +66,14 @@ changing any owner.
 | `.click(` | 33 | Synthetic click/navigation surface. |
 | `.style.display =` | 96 | Direct visual hide/show side-effect surface. |
 | `.classList.add/remove/toggle(` | 110 | Class-based visual/state side-effect surface. |
-| **Total** | **891** | Conservative lifecycle/side-effect primitive count. |
+| **Total** | **893** | Conservative lifecycle/side-effect primitive count. |
 
 ## Family Breakdown
 
 | Audit family | Files | Primitive count | Current interpretation |
 | --- | ---: | ---: | --- |
 | `content-runtime-js` | 17 | 389 | Page-resident filtering, JSON interception, DOM fallback, quick/menu surfaces, learned identity, managed time-limit heartbeats, and bridge work. |
-| `extension-ui-background-js` | 15 | 422 | Dashboard/popup/background settings, import/export, Nanah, row actions, profile/PIN, managed policy live-send/open-sync helpers, managed admin authority helper, managed parent command-center action intents, and UI state work. |
+| `extension-ui-background-js` | 15 | 424 | Dashboard/popup/background settings, import/export, Nanah, row actions, profile/PIN, managed policy live-send/open-sync helpers, managed admin authority helper, managed parent command-center action intents, and UI state work. |
 | `quarantined-legacy-js` | 1 | 37 | `js/layout.js`; direct style/class mutation risk if ever reactivated. |
 | `website-components` | 15 | 24 | Website client components with theme/scene and hero/footer lifecycle; separate from extension runtime filtering. |
 | `generated-ui-output` | 2 | 8 | Generated shell output; freshness proof required rather than hand edits. |
@@ -117,7 +117,7 @@ effects` is dispatch/click/display/class mutation.
 | `js/injector.js` | `content-runtime-js` | 2 | 0 | 10 | 11 | 3 | 26 |
 | `js/io_manager.js` | `extension-ui-background-js` | 0 | 0 | 3 | 0 | 0 | 3 |
 | `js/managed_admin_authority.js` | `extension-ui-background-js` | 0 | 0 | 0 | 0 | 0 | 0 |
-| `js/managed_parent_command_center.js` | `extension-ui-background-js` | 1 | 0 | 0 | 0 | 0 | 1 |
+| `js/managed_parent_command_center.js` | `extension-ui-background-js` | 3 | 0 | 0 | 0 | 0 | 3 |
 | `js/layout.js` | `quarantined-legacy-js` | 0 | 0 | 0 | 0 | 37 | 37 |
 | `js/nanah_managed_live_policy.js` | `extension-ui-background-js` | 0 | 0 | 0 | 0 | 0 | 0 |
 | `js/nanah_managed_open_sync.js` | `extension-ui-background-js` | 0 | 0 | 0 | 0 | 0 | 0 |
@@ -189,7 +189,7 @@ effects` is dispatch/click/display/class mutation.
 
 | Finding | Evidence | Risk |
 | --- | --- | --- |
-| Listener teardown is much smaller than listener install surface. | 302 `addEventListener` vs 18 `removeEventListener` lexical hits. | Listeners can become page-lifetime or UI-lifetime by default unless explicitly justified. |
+| Listener teardown is much smaller than listener install surface. | 304 `addEventListener` vs 18 `removeEventListener` lexical hits. | Listeners can become page-lifetime or UI-lifetime by default unless explicitly justified. |
 | Delayed work teardown is smaller than delayed work setup. | 124 `setTimeout` vs 34 `clearTimeout`. | Debounced/retry work can outlive route, profile, or feature state. |
 | Direct visual side effects are broad. | 96 `.style.display =` and 110 class mutations. | False-hide recovery requires a structured hide reason/restore contract. |
 | Page-runtime work is not the only burden. | Extension UI/background files have 422 primitives, more than content runtime's 389. | Settings/profile/import/Nanah/UI work can still create stale or conflicting runtime state. |
