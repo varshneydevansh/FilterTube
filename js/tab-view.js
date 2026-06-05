@@ -4362,6 +4362,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    function isValidManagedTimeLimitTimezone(timezone) {
+        const value = normalizeString(timezone);
+        if (!value) return false;
+        try {
+            if (typeof Intl === 'undefined' || typeof Intl.DateTimeFormat !== 'function') {
+                return value === 'UTC' || value === 'Etc/UTC';
+            }
+            new Intl.DateTimeFormat('en-US', { timeZone: value }).format(0);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
     function getManagedTimeLimitPolicy(profile) {
         const raw = safeObject(safeObject(profile?.settings).timeLimitPolicy);
         if (normalizeString(raw.schema) !== MANAGED_TIME_LIMIT_SCHEMA || raw.version !== 1) return null;
@@ -4370,7 +4384,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const issuedAt = normalizeNonNegativeInteger(raw.issuedAt);
         const policyHash = normalizeString(raw.policyHash);
         const timezone = normalizeString(raw.timezone);
-        if (dailyBudgetSeconds == null || !policyRevision || issuedAt == null || !policyHash || !timezone) return null;
+        if (dailyBudgetSeconds == null || !policyRevision || issuedAt == null || !policyHash || !isValidManagedTimeLimitTimezone(timezone)) return null;
         return {
             schema: MANAGED_TIME_LIMIT_SCHEMA,
             version: 1,

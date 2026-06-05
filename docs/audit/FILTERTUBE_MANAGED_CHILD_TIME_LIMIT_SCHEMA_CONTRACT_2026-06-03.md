@@ -14,10 +14,9 @@ and
 ## Purpose
 
 This contract defines the first protected-profile YouTube time-limit policy
-shape and the current local parent UI/store boundary before background
-counters, route gates, or timeout overlays are added. The schema must work for
-same-device parent edits, Nanah P2P updates, local-network managed updates, and
-downstream mobile/tablet app parity.
+shape and the current local parent UI/store plus extension runtime boundary.
+The schema must work for same-device parent edits, Nanah P2P updates,
+local-network managed updates, and downstream mobile/tablet app parity.
 
 The policy is profile-owned. It is not granted by a child/protected-user PIN,
 LAN discovery, open YouTube tab state, or action-history row.
@@ -58,6 +57,7 @@ Initial extension behavior should use these decisions:
 | `reject_negative_daily_budget` | Negative `dailyBudgetSeconds`. | Reject before policy write. |
 | `reject_negative_surface_budget` | Negative `surfaceBudgets.main` or `.kids`. | Reject before policy write. |
 | `reject_negative_grace_or_grant` | Negative grace or parent grant. | Reject before policy write. |
+| `reject_invalid_timezone` | Missing, non-IANA, or unsupported timezone. | Reject before import, remote apply, runtime compile, or content heartbeat work. |
 | `trusted_reduced_budget_newer_revision` | Parent lowers daily budget in a newer signed policy. | Accept and clamp remaining time immediately. |
 | `stale_reduced_budget_rejected` | Lower budget arrives with stale revision. | Reject as replay/stale; keep current policy. |
 | `equal_revision_different_hash_conflict` | Same revision, different policy hash. | Reject and log conflict. |
@@ -70,6 +70,11 @@ Initial extension behavior should use these decisions:
 Reset authority belongs to the policy timezone, not the device's current
 timezone. Device timezone changes should create a revalidation event, not a
 larger budget.
+
+Invalid timezone strings fail closed. Runtime compile, import sanitation,
+content heartbeat arming, dashboard policy reads, and Nanah managed
+time-limit apply all validate the timezone with `Intl.DateTimeFormat` before
+the policy can count time or reset the daily budget.
 
 Sleep and restart handling must be conservative:
 

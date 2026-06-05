@@ -21,10 +21,10 @@ download, storage, Nanah restore, or import/export behavior changes.
 
 ```text
 source file: js/io_manager.js
-line count: 2097
-named declarations: 55
-IIFE-scoped function declarations: 49
-plain function declarations: 33
+line count: 2111
+named declarations: 56
+IIFE-scoped function declarations: 50
+plain function declarations: 34
 async function declarations: 16
 local const arrow helper declarations: 6
 public FilterTubeIO entries: 11
@@ -64,7 +64,7 @@ importFormatParsing: 3
 importMergeAndPersistence: 1
 keywordChannelNormalization: 10
 legacyProfileDerivationAndV3Persistence: 5
-primitiveDefensiveHelpers: 8
+primitiveDefensiveHelpers: 9
 profileScopeAndSecurity: 4
 profilesV4MigrationAndSanitization: 8
 storageAccessWrappers: 2
@@ -74,7 +74,7 @@ storageAccessWrappers: 2
 
 | Semantic group | Declarations | Current owner/effect shape | Missing proof before behavior changes |
 | --- | ---: | --- | --- |
-| `primitiveDefensiveHelpers` | 8 | Supplies timestamp, object/array/string/bool/number/integer/list-mode coercion used by import, export, profile, time-limit, and backup flows. | Caller-specific fallback policy, malformed input fixtures, and proof that fallback defaults do not widen hide/leak state. |
+| `primitiveDefensiveHelpers` | 9 | Supplies timestamp, object/array/string/bool/number/integer/list-mode coercion used by import, export, profile, time-limit, and backup flows. | Caller-specific fallback policy, malformed input fixtures, and proof that fallback defaults do not widen hide/leak state. |
 | `downloadRuntimeHelpers` | 3 | Wraps Chrome/Firefox download APIs, normalizes callback/promise results, and schedules blob URL revocation. | Download lifecycle budget, blob cleanup proof, Firefox/Chrome parity, and failure-path user notification contract. |
 | `keywordChannelNormalization` | 10 | Sanitizes keyword/channel rows, parses channel-derived keyword sources, dedupes imports, preserves collaboration metadata, mirrors Main blocklist aliases, and merges string/video/subscription lists. | Duplicate policy, channel identity confidence, collaboration fixture proof, stale alias interaction, and false-hide negative fixtures. |
 | `profileScopeAndSecurity` | 4 | Resolves full versus active export/import scope and checks local or incoming master PIN verifiers through `FilterTubeSecurity`. | Scope permission contract, PIN retry/error policy, active child profile fixture, and auth bypass negative tests. |
@@ -97,55 +97,56 @@ storageAccessWrappers: 2
 | 40 | `function` | `safeObject` | `primitiveDefensiveHelpers` |
 | 44 | `function` | `normalizeString` | `primitiveDefensiveHelpers` |
 | 48 | `function` | `normalizeNonNegativeInteger` | `primitiveDefensiveHelpers` |
-| 54 | `function` | `normalizeManagedTimeLimitPolicy` | `profilesV4MigrationAndSanitization` |
-| 112 | `function` | `revokeDownloadBlobUrlLater` | `downloadRuntimeHelpers` |
-| 122 | `function` | `downloadWithRuntimeApi` | `downloadRuntimeHelpers` |
-| 130 | `const arrow` | `finish` | `downloadRuntimeHelpers` |
-| 169 | `function` | `normalizeBool` | `primitiveDefensiveHelpers` |
-| 173 | `function` | `normalizeNumber` | `primitiveDefensiveHelpers` |
-| 177 | `function` | `normalizeListMode` | `primitiveDefensiveHelpers` |
-| 188 | `function` | `keywordKey` | `keywordChannelNormalization` |
-| 200 | `function` | `sanitizeKeywordEntry` | `keywordChannelNormalization` |
-| 246 | `function` | `resolveProfileScope` | `profileScopeAndSecurity` |
-| 254 | `function` | `extractMasterPinVerifier` | `profileScopeAndSecurity` |
-| 263 | `async function` | `verifyPinAgainstVerifier` | `profileScopeAndSecurity` |
-| 271 | `async function` | `requirePinOrThrow` | `profileScopeAndSecurity` |
-| 278 | `function` | `deriveProfilesV3FromV4` | `legacyProfileDerivationAndV3Persistence` |
-| 287 | `const arrow` | `sanitizeChannels` | `legacyProfileDerivationAndV3Persistence` |
-| 290 | `const arrow` | `sanitizeKeywords` | `legacyProfileDerivationAndV3Persistence` |
-| 320 | `function` | `channelKey` | `keywordChannelNormalization` |
-| 331 | `function` | `mergeChannelEntries` | `keywordChannelNormalization` |
-| 385 | `function` | `sanitizeChannelEntry` | `keywordChannelNormalization` |
-| 473 | `async function` | `readStorage` | `storageAccessWrappers` |
-| 485 | `async function` | `writeStorage` | `storageAccessWrappers` |
-| 503 | `async function` | `loadProfilesV3` | `legacyProfileDerivationAndV3Persistence` |
-| 534 | `async function` | `saveProfilesV3` | `legacyProfileDerivationAndV3Persistence` |
-| 541 | `function` | `isValidProfilesV4` | `profilesV4MigrationAndSanitization` |
-| 554 | `function` | `buildDefaultProfilesV4FromLegacyStorage` | `profilesV4MigrationAndSanitization` |
-| 625 | `async function` | `loadProfilesV4` | `profilesV4MigrationAndSanitization` |
-| 684 | `async function` | `saveProfilesV4` | `profilesV4MigrationAndSanitization` |
-| 691 | `function` | `sanitizeProfilesV4` | `profilesV4MigrationAndSanitization` |
-| 704 | `const arrow` | `sanitizeMainKeywords` | `profilesV4MigrationAndSanitization` |
-| 710 | `const arrow` | `sanitizeMainChannels` | `profilesV4MigrationAndSanitization` |
-| 793 | `function` | `mergeKeywordLists` | `keywordChannelNormalization` |
-| 825 | `function` | `mergeChannelLists` | `keywordChannelNormalization` |
-| 848 | `function` | `normalizeMainProfileAliasFields` | `keywordChannelNormalization` |
-| 867 | `function` | `mergeStringList` | `keywordChannelNormalization` |
-| 885 | `function` | `detectFormat` | `importFormatParsing` |
-| 901 | `function` | `parseBlockTube` | `importFormatParsing` |
-| 999 | `function` | `buildV3Export` | `exportSerialization` |
-| 1093 | `function` | `normalizeNanahBackupState` | `encryptedAndNanahState` |
-| 1112 | `function` | `normalizeIncomingV3` | `importFormatParsing` |
-| 1213 | `async function` | `exportV3` | `exportSerialization` |
-| 1308 | `async function` | `importV3` | `importMergeAndPersistence` |
-| 1796 | `async function` | `exportV3Encrypted` | `encryptedAndNanahState` |
-| 1826 | `async function` | `importV3Encrypted` | `encryptedAndNanahState` |
-| 1849 | `async function` | `createAutoBackup` | `autoBackupDownloadRotation` |
-| 1906 | `const arrow` | `safePart` | `autoBackupDownloadRotation` |
-| 1942 | `async function` | `getBackupDirectory` | `autoBackupDownloadRotation` |
-| 1989 | `async function` | `saveBackupFile` | `autoBackupDownloadRotation` |
-| 2023 | `async function` | `rotateBackups` | `autoBackupDownloadRotation` |
-| 2063 | `function` | `scheduleAutoBackup` | `autoBackupDownloadRotation` |
+| 54 | `function` | `isValidManagedTimeLimitTimezone` | `primitiveDefensiveHelpers` |
+| 68 | `function` | `normalizeManagedTimeLimitPolicy` | `profilesV4MigrationAndSanitization` |
+| 126 | `function` | `revokeDownloadBlobUrlLater` | `downloadRuntimeHelpers` |
+| 136 | `function` | `downloadWithRuntimeApi` | `downloadRuntimeHelpers` |
+| 144 | `const arrow` | `finish` | `downloadRuntimeHelpers` |
+| 183 | `function` | `normalizeBool` | `primitiveDefensiveHelpers` |
+| 187 | `function` | `normalizeNumber` | `primitiveDefensiveHelpers` |
+| 191 | `function` | `normalizeListMode` | `primitiveDefensiveHelpers` |
+| 202 | `function` | `keywordKey` | `keywordChannelNormalization` |
+| 214 | `function` | `sanitizeKeywordEntry` | `keywordChannelNormalization` |
+| 260 | `function` | `resolveProfileScope` | `profileScopeAndSecurity` |
+| 268 | `function` | `extractMasterPinVerifier` | `profileScopeAndSecurity` |
+| 277 | `async function` | `verifyPinAgainstVerifier` | `profileScopeAndSecurity` |
+| 285 | `async function` | `requirePinOrThrow` | `profileScopeAndSecurity` |
+| 292 | `function` | `deriveProfilesV3FromV4` | `legacyProfileDerivationAndV3Persistence` |
+| 301 | `const arrow` | `sanitizeChannels` | `legacyProfileDerivationAndV3Persistence` |
+| 304 | `const arrow` | `sanitizeKeywords` | `legacyProfileDerivationAndV3Persistence` |
+| 334 | `function` | `channelKey` | `keywordChannelNormalization` |
+| 345 | `function` | `mergeChannelEntries` | `keywordChannelNormalization` |
+| 399 | `function` | `sanitizeChannelEntry` | `keywordChannelNormalization` |
+| 487 | `async function` | `readStorage` | `storageAccessWrappers` |
+| 499 | `async function` | `writeStorage` | `storageAccessWrappers` |
+| 517 | `async function` | `loadProfilesV3` | `legacyProfileDerivationAndV3Persistence` |
+| 548 | `async function` | `saveProfilesV3` | `legacyProfileDerivationAndV3Persistence` |
+| 555 | `function` | `isValidProfilesV4` | `profilesV4MigrationAndSanitization` |
+| 568 | `function` | `buildDefaultProfilesV4FromLegacyStorage` | `profilesV4MigrationAndSanitization` |
+| 639 | `async function` | `loadProfilesV4` | `profilesV4MigrationAndSanitization` |
+| 698 | `async function` | `saveProfilesV4` | `profilesV4MigrationAndSanitization` |
+| 705 | `function` | `sanitizeProfilesV4` | `profilesV4MigrationAndSanitization` |
+| 718 | `const arrow` | `sanitizeMainKeywords` | `profilesV4MigrationAndSanitization` |
+| 724 | `const arrow` | `sanitizeMainChannels` | `profilesV4MigrationAndSanitization` |
+| 807 | `function` | `mergeKeywordLists` | `keywordChannelNormalization` |
+| 839 | `function` | `mergeChannelLists` | `keywordChannelNormalization` |
+| 862 | `function` | `normalizeMainProfileAliasFields` | `keywordChannelNormalization` |
+| 881 | `function` | `mergeStringList` | `keywordChannelNormalization` |
+| 899 | `function` | `detectFormat` | `importFormatParsing` |
+| 915 | `function` | `parseBlockTube` | `importFormatParsing` |
+| 1013 | `function` | `buildV3Export` | `exportSerialization` |
+| 1107 | `function` | `normalizeNanahBackupState` | `encryptedAndNanahState` |
+| 1126 | `function` | `normalizeIncomingV3` | `importFormatParsing` |
+| 1227 | `async function` | `exportV3` | `exportSerialization` |
+| 1322 | `async function` | `importV3` | `importMergeAndPersistence` |
+| 1810 | `async function` | `exportV3Encrypted` | `encryptedAndNanahState` |
+| 1840 | `async function` | `importV3Encrypted` | `encryptedAndNanahState` |
+| 1863 | `async function` | `createAutoBackup` | `autoBackupDownloadRotation` |
+| 1920 | `const arrow` | `safePart` | `autoBackupDownloadRotation` |
+| 1956 | `async function` | `getBackupDirectory` | `autoBackupDownloadRotation` |
+| 2003 | `async function` | `saveBackupFile` | `autoBackupDownloadRotation` |
+| 2037 | `async function` | `rotateBackups` | `autoBackupDownloadRotation` |
+| 2077 | `function` | `scheduleAutoBackup` | `autoBackupDownloadRotation` |
 
 ## Current Public API
 

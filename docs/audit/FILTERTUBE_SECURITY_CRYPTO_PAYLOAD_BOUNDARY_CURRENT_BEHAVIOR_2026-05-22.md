@@ -22,7 +22,7 @@ tests/runtime/security-crypto-payload-boundary-current-behavior.test.mjs
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `js/security_manager.js` | 198 | 6,374 | `1fb1ec9c8339cbdad57107c5b596d893a025af68870ae7928083977a8d29ebd3` |
-| `js/background.js` | 6,711 | 301,840 | `618e41011a6031c7a4eb3d022c4612536942a7a58a3c41eb0fd7e31c29a60311` |
+| `js/background.js` | 6,711 | 301,840 | `57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7` |
 | `js/io_manager.js` | 2,097 | 100,479 | `f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62` |
 | `js/tab-view.js` | 12,437 | 564,952 | `b7174155f23ee5b006a9f37be921a1aad0506030af56f96695710ac10d436066` |
 | `js/popup.js` | 1,841 | 75,587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |

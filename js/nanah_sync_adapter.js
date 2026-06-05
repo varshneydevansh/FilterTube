@@ -52,6 +52,20 @@
         return num >= 0 ? num : null;
     }
 
+    function isValidManagedTimeLimitTimezone(timezone) {
+        const value = normalizeString(timezone);
+        if (!value) return false;
+        try {
+            if (typeof Intl === 'undefined' || typeof Intl.DateTimeFormat !== 'function') {
+                return value === 'UTC' || value === 'Etc/UTC';
+            }
+            new Intl.DateTimeFormat('en-US', { timeZone: value }).format(0);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
     function validationResult(reason, extra = {}) {
         return { accepted: false, reason, ...extra };
     }
@@ -1387,6 +1401,7 @@
                 };
             })();
         if (!normalizeString(nextPolicy.policyHash)) throw new Error('Managed time-limit policy requires policyHash');
+        if (!isValidManagedTimeLimitTimezone(nextPolicy.timezone)) throw new Error('Managed time-limit policy requires a valid timezone');
         return {
             ...profile,
             settings: {

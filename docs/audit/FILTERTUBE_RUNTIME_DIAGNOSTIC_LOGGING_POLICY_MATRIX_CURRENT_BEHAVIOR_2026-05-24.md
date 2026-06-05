@@ -30,9 +30,9 @@ and website code. Lines whose trimmed text begins with `//` are excluded.
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `build.js` | 740 | 26978 | `c8485cb2600aad89f44015cd7e49ebe4746ebcc35c91c1ff2bf29aec2f087a04` |
-| `js/background.js` | 6789 | 306239 | `618e41011a6031c7a4eb3d022c4612536942a7a58a3c41eb0fd7e31c29a60311` |
+| `js/background.js` | 6803 | 306710 | `57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7` |
 | `js/content/block_channel.js` | 3189 | 127857 | `c040b57e0b107fd7b6fb0a18bc4ca014e5a22fbb82755f81e51a497eee387dba` |
-| `js/content/bridge_settings.js` | 1113 | 44087 | `f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853` |
+| `js/content/bridge_settings.js` | 1127 | 44545 | `fad07aba48391021d5e42096b34f32c58a6337a1a4d303a8706927c541d47f71` |
 | `js/content/collab_dialog.js` | 393 | 14623 | `dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a` |
 | `js/content/dom_extractors.js` | 1137 | 46896 | `adf2c04f14f0f3bb44556e216af25aca8ff182dfa569c248ddb150d0cca38a4e` |
 | `js/content/dom_fallback.js` | 5030 | 235555 | `fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5` |
@@ -40,13 +40,13 @@ and website code. Lines whose trimmed text begins with `//` are excluded.
 | `js/content_bridge.js` | 13636 | 604184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
 | `js/filter_logic.js` | 3652 | 172174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 | `js/injector.js` | 3593 | 155830 | `634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04` |
-| `js/io_manager.js` | 2097 | 100479 | `f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62` |
+| `js/io_manager.js` | 2111 | 101002 | `bed520852b47c0c36994017414d721f0a5baa2c375387098379ab88cc3138669` |
 | `js/layout.js` | 680 | 30604 | `48831ccdc2d62c75818d9c6a153d7bfacec9d7be9f2408485f74b1a7c13c57c7` |
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/seed.js` | 1136 | 50026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
 | `js/settings_shared.js` | 1181 | 57535 | `9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c` |
 | `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
-| `js/tab-view.js` | 14970 | 697970 | `7be559f02d50e0c5353487ef684a57679b417860a38c5067aed30a3b9fe90ad1` |
+| `js/tab-view.js` | 14984 | 698493 | `82345bda27253dc5c5644c36dd97c2cfafb442d2ecb391818c38f6ea5dad5c65` |
 | `scripts/build-extension-ui.mjs` | 50 | 1188 | `6326362ebf90f448ccdbf68945b3fb522b7b215edaf9b3e28589a4e166239cf3` |
 | `scripts/build-nanah-vendor.mjs` | 65 | 1818 | `dae8d3ef29c4cd44b0bf975090e9d53f3bb05b523355f5038930fc03b27e921c` |
 | `scripts/sync-native-runtime.mjs` | 34 | 1070 | `4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6` |
@@ -344,7 +344,7 @@ flowchart TD
 | `diagnostic_flow_bridge_request_response` | `js/content_bridge.js:5424-5524`, `js/content_bridge.js:5780-5986` | Isolated-world bridge logs collaborator/channel request timeouts, sent requests, responses, custom URL mapping persistence, and DOM stamping effects directly to console. | Same-window message owner, request reason, identity payload redaction, pending-request budget, and stale-card negative proof. |
 | `diagnostic_flow_bridge_menu_identity` | `js/content_bridge.js:7303-7452`, `js/content_bridge.js:10010-10630`, `js/content_bridge.js:12237-13151` | Menu fallback, extraction, collaborator blocking, watch/Shorts recovery, and immediate-hide diagnostics are direct console paths on user-action hot flows. | Menu action reason, route/surface/list-mode budget, channel/collaborator privacy class, outside-click parity, and no-work proof. |
 | `diagnostic_flow_background_settings_identity` | `js/background.js:2609-2674`, `js/background.js:2720-3321` | Background logs compiled settings, install/update prompts, watch/Shorts/Kids identity fetch failures, subscription import progress, and settings compilation requests. | Background log owner, profile/list-mode redaction, identity-network reason, credential policy link, and storage/write metric artifact. |
-| `diagnostic_flow_import_export_backup` | `js/io_manager.js:1670-1987`, `js/tab-view.js:9275-9525` | Import/export, encrypted backup, auto-backup, download fallback, and backup-rotation diagnostics are direct console paths in user-data workflows. | Payload privacy class, encrypted/unencrypted backup redaction, trusted Nanah state policy, and machine-readable import/export report. |
+| `diagnostic_flow_import_export_backup` | `js/io_manager.js:1684-2001`, `js/tab-view.js:9289-9539` | Import/export, encrypted backup, auto-backup, download fallback, and backup-rotation diagnostics are direct console paths in user-data workflows. | Payload privacy class, encrypted/unencrypted backup redaction, trusted Nanah state policy, and machine-readable import/export report. |
 | `diagnostic_flow_content_helper_menu` | `js/content/block_channel.js:7-14`, `js/content/block_channel.js:1744-2858`, `js/content/block_channel.js:3130-3130` | Quick-block/menu helper has one debug-gated wrapper plus warn/error paths for quick action, dropdown handling, Kids native block messages, and injection failure. | Menu helper owner, native dropdown state policy, Kids action reason, and route/surface no-work budget. |
 | `diagnostic_flow_build_release_scripts` | `build.js:75-190`, `build.js:536-716`, `scripts/build-extension-ui.mjs:47-48`, `scripts/build-nanah-vendor.mjs:62-63`, `scripts/sync-native-runtime.mjs:12-30` | Build/release/native-sync scripts write human console output for artifact creation, badge updates, release publishing, and sync failures. | CI-readable release artifact manifest, build log policy, native sync parity report, and upload/release provenance artifact. |
 
@@ -677,10 +677,10 @@ flowchart TD
 | --- | --- | --- | --- |
 | `production_console_residual_bridge_preface` | `js/content_bridge.js:11-37`; `js/content_bridge.js:13596-13630` | `content_bridge.js` has 126 textual routine rows before the backup gate install, but only one top-level executed routine log before that gate and it is locally debug-gated; the helper definition also checks debug before logging. | Live installed-tab proof that debug-disabled startup emits no content-bridge log/debug output. |
 | `production_console_residual_bridge_function_bodies` | `js/content_bridge.js:702-13594`; `js/content_bridge.js:13608-13628` | The remaining 124 content-bridge routine rows are function-body diagnostics; the backup gate installs before `message` listener registration and the `initialize()` timer. | Route/profile/list-mode sampling proving menu, collaborator, fallback, quick-block, and identity paths stay quiet with debug disabled. |
-| `production_console_residual_background_gate` | `js/background.js:12`; `js/background.js:2203-6772` | The background console gate is invoked at startup before 62 routine background `log/debug/info` rows. | Service-worker sample showing routine logs stay suppressed while warnings/errors still surface. |
+| `production_console_residual_background_gate` | `js/background.js:12`; `js/background.js:2217-6786` | The background console gate is invoked at startup before 62 routine background `log/debug/info` rows. | Service-worker sample showing routine logs stay suppressed while warnings/errors still surface. |
 | `production_console_residual_isolated_shared_gate` | `js/content/dom_fallback.js:5`; active manifest isolated script order; `js/content/dom_fallback.js:4559-4706` | Active manifests load `dom_fallback` before helper and bridge scripts, so 135 manifest-isolated routine rows are behind the shared isolated console gate. | Installed manifest/order byte proof plus live YouTube page sampling after reload. |
 | `production_console_residual_main_world_local_debug` | `js/seed.js:11-153`; `js/filter_logic.js:11-1590`; `js/injector.js:97` | MAIN-world code has 7 routine rows behind local debug checks, but no global MAIN-world console override. | Endpoint/route fixture proving no unconditional MAIN-world routine log is added before JSON-first promotion. |
-| `production_console_residual_non_hotpath_ui_layout` | `js/popup.js:1544`; `js/tab-view.js:10030`; `js/layout.js:71-483` | Popup/tab-view routine rows are extension UI diagnostics, and `layout.js` routine rows are not active-manifest loaded. | Release cleanup decision for UI diagnostics and inactive layout package burden. |
+| `production_console_residual_non_hotpath_ui_layout` | `js/popup.js:1544`; `js/tab-view.js:12270`; `js/layout.js:71-483` | Popup/tab-view routine rows are extension UI diagnostics, and `layout.js` routine rows are not active-manifest loaded. | Release cleanup decision for UI diagnostics and inactive layout package burden. |
 | `production_console_residual_release_gate` | this addendum; coverage reconciliation above | Static source proof is not a production console sampling artifact. | `diagnosticProductionConsoleRuntimeSample`, route/mode console budget, installed-byte freshness, rollback packet, and release/public-claim approval. |
 
 ```text

@@ -10,18 +10,18 @@ This slice covers the background-side receiver for `message.type === 'addFiltere
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6789 | 306239 | `618e41011a6031c7a4eb3d022c4612536942a7a58a3c41eb0fd7e31c29a60311` |
+| `js/background.js` | 6803 | 306710 | `57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7` |
 
 ## Pinned Source And Effect Blocks
 
 | Block | Source lines | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | ---: | --- |
-| `backgroundAddFilteredChannelReceiver` | `js/background.js:5713` | 39 | 1579 | `f681057e88e4c6aef657464bca124f8d3ae4d59f4d11ca5f05e1135dcf1615f2` |
-| `backgroundHandleAddFilteredChannelFull` | `js/background.js:5778` | 893 | 45226 | `e69e660d0af0dd0d523932f733a5de04108cbfb69ef99a155be4466a7527ce25` |
-| `backgroundHandleAddFilteredChannelSignatureAndInput` | `js/background.js:5778` | 158 | 6464 | `60f9b6d40d808f02f822e74a0a9f967844a1d1ef4c956e911ad2ee5265891b80` |
-| `backgroundHandleAddFilteredChannelIdentityRepair` | `js/background.js:5935` | 358 | 19385 | `dc7ccd71be5cb375ac50245617889449621246504390a4a0162c59c3cef6740d` |
-| `backgroundHandleAddFilteredChannelExistingAndWrite` | `js/background.js:6292` | 352 | 18483 | `0f2661d0a32990528ebf6704aa4cfb90cab8f55dcf4567e37852910704966027` |
-| `backgroundHandleAddFilteredChannelCommitAndReturn` | `js/background.js:6643` | 28 | 894 | `ba67796a03d083bf072ac4ef971365f165f0c836dd2eae56c64912729a45be66` |
+| `backgroundAddFilteredChannelReceiver` | `js/background.js:5727` | 39 | 1579 | `f681057e88e4c6aef657464bca124f8d3ae4d59f4d11ca5f05e1135dcf1615f2` |
+| `backgroundHandleAddFilteredChannelFull` | `js/background.js:5792` | 893 | 45226 | `e69e660d0af0dd0d523932f733a5de04108cbfb69ef99a155be4466a7527ce25` |
+| `backgroundHandleAddFilteredChannelSignatureAndInput` | `js/background.js:5792` | 158 | 6464 | `60f9b6d40d808f02f822e74a0a9f967844a1d1ef4c956e911ad2ee5265891b80` |
+| `backgroundHandleAddFilteredChannelIdentityRepair` | `js/background.js:5949` | 358 | 19385 | `dc7ccd71be5cb375ac50245617889449621246504390a4a0162c59c3cef6740d` |
+| `backgroundHandleAddFilteredChannelExistingAndWrite` | `js/background.js:6306` | 352 | 18483 | `0f2661d0a32990528ebf6704aa4cfb90cab8f55dcf4567e37852910704966027` |
+| `backgroundHandleAddFilteredChannelCommitAndReturn` | `js/background.js:6657` | 28 | 894 | `ba67796a03d083bf072ac4ef971365f165f0c836dd2eae56c64912729a45be66` |
 
 ## Selected Token Counts
 

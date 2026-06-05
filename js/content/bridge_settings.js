@@ -562,6 +562,20 @@ function normalizeManagedTimeLimitInteger(value) {
     return num >= 0 ? num : null;
 }
 
+function isValidManagedTimeLimitTimezone(timezone) {
+    const value = typeof timezone === 'string' ? timezone.trim() : '';
+    if (!value) return false;
+    try {
+        if (typeof Intl === 'undefined' || typeof Intl.DateTimeFormat !== 'function') {
+            return value === 'UTC' || value === 'Etc/UTC';
+        }
+        new Intl.DateTimeFormat('en-US', { timeZone: value }).format(0);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
 function getManagedTimeLimitPolicy(settings) {
     try {
         if (!settings || typeof settings !== 'object') return null;
@@ -572,7 +586,7 @@ function getManagedTimeLimitPolicy(settings) {
         if (policy.version !== 1) return null;
         if (policy.enabled !== true) return null;
         if (!policy.profileId || typeof policy.profileId !== 'string') return null;
-        if (!policy.timezone || typeof policy.timezone !== 'string') return null;
+        if (!isValidManagedTimeLimitTimezone(policy.timezone)) return null;
         if (normalizeManagedTimeLimitInteger(policy.dailyBudgetSeconds) == null) return null;
         if (normalizeManagedTimeLimitInteger(policy.policyRevision) == null) return null;
         if (!policy.policyHash || typeof policy.policyHash !== 'string') return null;

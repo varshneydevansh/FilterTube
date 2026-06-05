@@ -10,8 +10,8 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_SETTINGS_REFRESH_CROSS_CONTEXT_CONSUMER_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/background.js': [6789, 306239, '618e41011a6031c7a4eb3d022c4612536942a7a58a3c41eb0fd7e31c29a60311'],
-  'js/content/bridge_settings.js': [1113, 44087, 'f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853'],
+  'js/background.js': [6803, 306710, '57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7'],
+  'js/content/bridge_settings.js': [1127, 44545, 'fad07aba48391021d5e42096b34f32c58a6337a1a4d303a8706927c541d47f71'],
   'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
   'js/injector.js': [3593, 155830, '634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04'],
   'js/seed.js': [1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
@@ -24,7 +24,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: '    } else if (request.action === "FilterTube_ApplySettings" && request.settings) {',
     end: '    } else if (request.action === "updateChannelMap") {',
-    startLine: 4864,
+    startLine: 4878,
     lines: 28,
     bytes: 1487,
     hash: 'b585d94cc410f7acd929db780840f7cb02b44bb9819b34eb34985b713485e3d6'
@@ -33,7 +33,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: '// Listen for storage changes to re-compile settings\n',
     end: '/**\n * Fetch channel name and handle from YouTube by scraping the channel page',
-    startLine: 4953,
+    startLine: 4967,
     lines: 41,
     bytes: 1464,
     hash: 'e5c76f714f31a1d325385b3eaa051c0eb73e6a29ec1c69b1493cc4bb7f796de2'
@@ -51,7 +51,7 @@ const blockSpecs = {
     file: 'js/content/bridge_settings.js',
     start: 'function requestSettingsFromBackground(options = {}) {',
     end: 'function tryApplySettingsToSeed(settings)',
-    startLine: 807,
+    startLine: 821,
     lines: 115,
     bytes: 5333,
     hash: '10e99aaff431ece732d33435b7ea618f9c2333ededd839ec07d4b164b8f45227'
@@ -60,7 +60,7 @@ const blockSpecs = {
     file: 'js/content/bridge_settings.js',
     start: 'function tryApplySettingsToSeed(settings)',
     end: 'let pendingStorageRefreshTimer = 0;',
-    startLine: 922,
+    startLine: 936,
     lines: 59,
     bytes: 1531,
     hash: '15627c0c528d75636e9954d0b0ff5d0b4b03e4792e37514423654ea4d4d16c2f'
@@ -69,7 +69,7 @@ const blockSpecs = {
     file: 'js/content/bridge_settings.js',
     start: 'function scheduleSettingsRefreshFromStorage({ forceReprocess = true } = {}) {',
     end: 'try {\n    browserAPI_BRIDGE.storage.onChanged.addListener(handleStorageChanges);',
-    startLine: 1019,
+    startLine: 1033,
     lines: 92,
     bytes: 3395,
     hash: '6f65d55d5d8dcf9c5ad753df10d9a9f45ca5548787b949b6576bf8c310975dbf'

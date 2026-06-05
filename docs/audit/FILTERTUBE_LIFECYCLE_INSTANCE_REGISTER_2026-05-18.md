@@ -4059,7 +4059,7 @@ settings refresh regressions.
 
 | Lifecycle row | Instance | Owner / trigger / active gate | Side-effect and teardown status |
 | --- | --- | --- | --- |
-| `release_lifecycle_storage_refresh_debounce` | `js/content/bridge_settings.js:1037:setTimeout` | Storage-change debounce after relevant local-storage changes. `forceReprocess` is upgraded before an existing timer is reused. | Re-fetches settings and applies DOM fallback once per debounce window; timer clears itself. |
+| `release_lifecycle_storage_refresh_debounce` | `js/content/bridge_settings.js:1051:setTimeout` | Storage-change debounce after relevant local-storage changes. `forceReprocess` is upgraded before an existing timer is reused. | Re-fetches settings and applies DOM fallback once per debounce window; timer clears itself. |
 | `release_lifecycle_quick_hover_intent_timer` | `js/content/block_channel.js:423:setTimeout` | Quick-block hover/focus intent. Active only while quick-block is enabled and a candidate card remains targeted. | Creates delayed quick-cross affordance; cleared by `cancelQuickBlockHoverIntent()` when disabled or retargeted. |
 | `release_lifecycle_quick_viewport_observer` | `js/content/block_channel.js:951:IntersectionObserver` | Quick-block visible-card tracking. Active after lazy quick-block setup. | Tracks bounded viewport hosts; no broad periodic sweep authority. |
 | `release_lifecycle_quick_sweep_timer` | `js/content/block_channel.js:1976:setTimeout` | Coalesced quick-block scan for queued roots. Gated by quick-block enabled/eager or visible-card state. | Runs once after 80ms and clears queued roots; old periodic timer remains absent. |
@@ -4075,7 +4075,7 @@ settings refresh regressions.
 | `release_lifecycle_fallback_menu_mutation_observer` | `js/content_bridge.js:7159:MutationObserver` | Fallback menu button observer. Active only when `shouldEagerFallbackMenuScan()` is true and native overlay quiet mode is false. | Schedules root-scoped scans; not an always-on empty-install body scan when eager scan is false. |
 | `release_lifecycle_fallback_menu_hover_click_listeners` | `js/content_bridge.js:7216-7218:addEventListener` | Hover/focus/click fallback-menu discovery. | Schedules scans from user-near surfaces; still page-lifetime listeners once installed. |
 | `release_lifecycle_fallback_menu_warmup_interval` | `js/content_bridge.js:7263:setInterval` | Startup warmup scans for fallback menu buttons. Active only when eager fallback menu scan is true. | Clears itself after 8 scans; remains a lifecycle risk if eager scan is enabled without real menu need. |
-| `release_lifecycle_video_identity_flush_timers` | `js/background.js:2067,2075:setTimeout` | Background video-channel/video-meta map flush debounce. | Batches storage writes after learned identity/meta updates; timers clear before flush. |
+| `release_lifecycle_video_identity_flush_timers` | `js/background.js:2081,2089:setTimeout` | Background video-channel/video-meta map flush debounce. | Batches storage writes after learned identity/meta updates; timers clear before flush. |
 
 Current semantic status after this addendum:
 

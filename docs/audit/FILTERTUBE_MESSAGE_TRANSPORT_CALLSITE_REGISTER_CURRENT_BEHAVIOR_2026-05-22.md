@@ -50,9 +50,9 @@ rows; command-center buttons delegate to existing dashboard runtime gates.
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6789 | 306239 | `618e41011a6031c7a4eb3d022c4612536942a7a58a3c41eb0fd7e31c29a60311` |
+| `js/background.js` | 6803 | 306710 | `57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7` |
 | `js/content/bridge_injection.js` | 127 | 4741 | `d1b84cf4c43ec5ff5cdc3bd607d8f3d3bf448c12829780b0d05fb9fc14fb5d3e` |
-| `js/content/bridge_settings.js` | 1113 | 44087 | `f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853` |
+| `js/content/bridge_settings.js` | 1127 | 44545 | `fad07aba48391021d5e42096b34f32c58a6337a1a4d303a8706927c541d47f71` |
 | `js/content/collab_dialog.js` | 393 | 14623 | `dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a` |
 | `js/content/first_run_prompt.js` | 190 | 7453 | `5672d9060d29b08550ecfc3add54245212a5094ee5137f025b6f788f12e50409` |
 | `js/content/handle_resolver.js` | 282 | 9785 | `67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff` |
@@ -64,7 +64,7 @@ rows; command-center buttons delegate to existing dashboard runtime gates.
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/seed.js` | 1136 | 50026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
 | `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
-| `js/tab-view.js` | 14970 | 697970 | `7be559f02d50e0c5353487ef684a57679b417860a38c5067aed30a3b9fe90ad1` |
+| `js/tab-view.js` | 14984 | 698493 | `82345bda27253dc5c5644c36dd97c2cfafb442d2ecb391818c38f6ea5dad5c65` |
 
 ## File And Operation Counts
 
@@ -96,17 +96,18 @@ rows; command-center buttons delegate to existing dashboard runtime gates.
 ## Message Transport Rows
 
 ```text
-js/background.js:115:tabs.sendMessage:quietTabBroadcast
-js/background.js:3634:runtime.onMessage.addListener:primaryBackgroundActionReceiver
-js/background.js:5704:runtime.onMessage.addListener:secondaryBackgroundTypeReceiver
+js/background.js:129:tabs.sendMessage:quietTabBroadcast
+js/background.js:3648:runtime.onMessage.addListener:primaryBackgroundActionReceiver
+js/background.js:5718:runtime.onMessage.addListener:secondaryBackgroundTypeReceiver
 js/content/bridge_injection.js:38:runtime.sendMessage:backgroundScriptInjectionRequest
 js/content/bridge_settings.js:130:window.postMessage:subscriptionImportRequestToMainWorld
 js/content/bridge_settings.js:148:window.addEventListener(message):subscriptionImportResponseListener
 js/content/bridge_settings.js:200:runtime.onMessage.addListener:contentRuntimeActionReceiver
 js/content/bridge_settings.js:257:runtime.sendMessage:settingsFetchOrActionRuntimeRequest
-js/content/bridge_settings.js:756:runtime.sendMessage:managedTimeLimitHeartbeatRuntimeRequest
-js/content/bridge_settings.js:818:runtime.sendMessage:compiledSettingsRuntimeRequest
+js/content/bridge_settings.js:770:runtime.sendMessage:managedTimeLimitHeartbeatRuntimeRequest
+js/content/bridge_settings.js:832:runtime.sendMessage:compiledSettingsRuntimeRequest
 js/content/bridge_settings.js:966:window.postMessage:settingsRelayToMainWorld
+js/content/bridge_settings.js:980:window.postMessage:settingsRelayToMainWorld
 js/content/collab_dialog.js:244:window.postMessage:collabDialogDataToIsolatedWorld
 js/content/first_run_prompt.js:174:runtime.sendMessage:firstRunCompleteAck
 js/content/first_run_prompt.js:178:runtime.sendMessage:firstRunCheckRequest
@@ -160,7 +161,7 @@ js/state_manager.js:1636:runtime.sendMessage:kidsWhitelistRuntimeMutation
 js/state_manager.js:1808:runtime.sendMessage:whitelistTransferRuntimeMutation
 js/tab-view.js:3104:runtime.sendMessage:dashboardRuntimeRequest
 js/tab-view.js:3498:tabs.sendMessage:dashboardTabRuntimeRequest
-js/tab-view.js:14325:runtime.onMessage.addListener:dashboardRuntimeMessageReceiver
+js/tab-view.js:14339:runtime.onMessage.addListener:dashboardRuntimeMessageReceiver
 ```
 
 ## Current Behavior Boundaries
@@ -168,7 +169,7 @@ js/tab-view.js:14325:runtime.onMessage.addListener:dashboardRuntimeMessageReceiv
 - Background has two runtime receivers: the primary `request.action` /
   `request.type` router and a secondary `message.type` router.
 - Content/dashboard code has two more runtime receivers:
-  `js/content/bridge_settings.js:200` and `js/tab-view.js:14325`.
+  `js/content/bridge_settings.js:200` and `js/tab-view.js:14339`.
 - Runtime sender rows cover settings fetches, prompt acknowledgements, list-mode
   mutations, whitelist/Kids mutations, identity fetches, learned-map writes,
   script injection, browser info, stats/backup scheduling, and popup/dashboard

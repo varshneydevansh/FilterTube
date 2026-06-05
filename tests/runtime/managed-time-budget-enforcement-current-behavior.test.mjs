@@ -119,11 +119,15 @@ test('managed time-budget runtime is compiled background-owned and documented as
   assert.match(background, /action === 'FilterTube_ManagedTimeLimitHeartbeat'/);
   assert.match(background, /normalizeManagedTimeLimitPolicy\(activeSettings\.timeLimitPolicy\)/);
   assert.match(background, /compiledSettings\.managedTimeLimitPolicy/);
+  assert.match(background, /function isValidManagedTimeLimitTimezone\(timezone\)/);
+  assert.match(background, /if \(!isValidManagedTimeLimitTimezone\(timezone\)/);
   assert.match(background, /MANAGED_TIME_MAX_HEARTBEAT_DELTA_SECONDS/);
   assert.match(background, /managedTimeActiveScopes/);
 
   assert.match(bridge, /const MANAGED_TIME_LIMIT_OVERLAY_ID = 'filtertube-managed-timeout-overlay'/);
   assert.match(bridge, /function applyManagedTimeLimitRuntime\(settings, options = \{\}\)/);
+  assert.match(bridge, /function isValidManagedTimeLimitTimezone\(timezone\)/);
+  assert.match(bridge, /isValidManagedTimeLimitTimezone\(policy\.timezone\)/);
   assert.match(bridge, /function sendManagedTimeLimitHeartbeat\(\)/);
   assert.match(bridge, /function showManagedTimeoutOverlay\(state\)/);
   assert.match(bridge, /FilterTube_ManagedTimeLimitHeartbeat/);

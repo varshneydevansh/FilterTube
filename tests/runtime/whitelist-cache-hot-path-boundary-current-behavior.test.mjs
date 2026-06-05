@@ -9,8 +9,8 @@ const docPath = 'docs/audit/FILTERTUBE_WHITELIST_CACHE_HOT_PATH_BOUNDARY_CURRENT
 
 const sourceRows = [
   ['js/content_bridge.js', 13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
-  ['js/background.js', 6789, 306239, '618e41011a6031c7a4eb3d022c4612536942a7a58a3c41eb0fd7e31c29a60311'],
-  ['js/content/bridge_settings.js',  1113,  44087, 'f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853'],
+  ['js/background.js', 6803, 306710, '57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7'],
+  ['js/content/bridge_settings.js', 1127, 44545, 'fad07aba48391021d5e42096b34f32c58a6337a1a4d303a8706927c541d47f71'],
   ['js/content/handle_resolver.js', 282, 9785, '67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff'],
   ['js/filter_logic.js', 3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5']
 ];
@@ -56,7 +56,7 @@ const blockRows = [
     'js/background.js',
     'let releaseNotesCache = null;',
     'let autoBackupTimer = null;',
-    1487,
+    1501,
     21,
     686,
     'f82fd7936485f08734bf18b4da304978f428be0e36b2eef434007116a9cc53ec'
@@ -66,7 +66,7 @@ const blockRows = [
     'js/background.js',
     'function ensureChannelMapCache() {',
     '/**\n * Lazy-loads the curated release_notes.json file',
-    1885,
+    1899,
     263,
     8987,
     'de1705105e239ce4de8c79d5e4ab3e135ed7133fcbc17f00ce5c1074230b493a'
@@ -76,7 +76,7 @@ const blockRows = [
     'js/content/bridge_settings.js',
     'let pendingStorageRefreshTimer = 0;',
     'try {\n    browserAPI_BRIDGE.storage.onChanged.addListener(handleStorageChanges);',
-    981,
+    995,
     130,
     4506,
     'f3802437cd0f5bee44ac10378fd4b5156ad87cf3f5db3ee142702c0e7a4fed38'

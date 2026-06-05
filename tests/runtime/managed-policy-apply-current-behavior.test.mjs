@@ -378,6 +378,24 @@ test('managed policy apply supports viewing-space and time-limit child policy up
     validUntil: null
   });
 
+  const saveCountBeforeInvalidTimezone = harness.saveCount;
+  await assert.rejects(
+    () => harness.adapter.applyManagedPolicyEnvelope(
+      signedEnvelope({
+        scope: 'time_limits',
+        revision: 10,
+        payload: {
+          scope: 'time_limits',
+          dailyBudgetMinutes: 60,
+          timezone: 'Local'
+        }
+      }),
+      validationContext(harness.profiles)
+    ),
+    /requires a valid timezone/
+  );
+  assert.equal(harness.saveCount, saveCountBeforeInvalidTimezone);
+
   await assert.rejects(
     () => harness.adapter.applyManagedPolicyEnvelope(
       signedEnvelope({

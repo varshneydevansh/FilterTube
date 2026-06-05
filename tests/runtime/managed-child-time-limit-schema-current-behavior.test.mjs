@@ -189,6 +189,9 @@ test('managed child time-limit schema contract documents local UI store and runt
   assert.match(source, /filtertube_managed_time_limit/);
   assert.match(source, /timeLimitPolicy/);
   assert.match(source, /managedTimeLimitTotalBudgetSeconds/);
+  assert.match(source, /function isValidManagedTimeLimitTimezone\(timezone\)/);
+  assert.match(source, /isValidManagedTimeLimitTimezone\(timezone\)/);
+  assert.match(source, /isValidManagedTimeLimitTimezone\(policy\.timezone\)/);
   assert.match(source, /showManagedTimeoutOverlay/);
 });
 

@@ -813,14 +813,14 @@ const affectedCallableSemanticFiles = [
     id: 'FT-WLCACHE-SEMANTIC-GAP-02-bridge-settings',
     file: 'js/content/bridge_settings.js',
     family: 'Hot page/background runtime',
-    lexicalCallables: 102,
+    lexicalCallables: 104,
     semanticStatus: 'semantic proof incomplete'
   },
   {
     id: 'FT-WLCACHE-SEMANTIC-GAP-03-background',
     file: 'js/background.js',
     family: 'Hot page/background runtime',
-    lexicalCallables: 470,
+    lexicalCallables: 472,
     semanticStatus: 'semantic proof incomplete'
   },
   {
@@ -1198,11 +1198,11 @@ const affectedCallableAnchorChecks = [
   ['js/content_bridge.js', 1714, 'function scheduleVideoMetaDomRerun() {'],
   ['js/content_bridge.js', 5913, "} else if (type === 'FilterTube_UpdateVideoChannelMap') {"],
   ['js/content_bridge.js', 5962, "} else if (type === 'FilterTube_UpdateVideoMetaMap') {"],
-  ['js/content/bridge_settings.js', 1019, 'function scheduleSettingsRefreshFromStorage({ forceReprocess = true } = {}) {'],
-  ['js/content/bridge_settings.js', 1051, 'function handleStorageChanges(changes, area) {'],
-  ['js/background.js', 2081, 'function enqueueVideoChannelMapUpdate(videoId, channelId) {'],
-  ['js/background.js', 2106, 'function enqueueVideoMetaMapUpdate(videoId, meta) {'],
-  ['js/background.js', 2207, 'async function getCompiledSettings(sender = null, profileType = null, forceRefresh = false) {'],
+  ['js/content/bridge_settings.js', 1033, 'function scheduleSettingsRefreshFromStorage({ forceReprocess = true } = {}) {'],
+  ['js/content/bridge_settings.js', 1065, 'function handleStorageChanges(changes, area) {'],
+  ['js/background.js', 2095, 'function enqueueVideoChannelMapUpdate(videoId, channelId) {'],
+  ['js/background.js', 2120, 'function enqueueVideoMetaMapUpdate(videoId, meta) {'],
+  ['js/background.js', 2221, 'async function getCompiledSettings(sender = null, profileType = null, forceRefresh = false) {'],
   ['js/content/dom_fallback.js', 2219, 'async function applyDOMFallback(settings, options = {}) {'],
   ['js/content/dom_fallback.js', 4139, "if (onlyWhitelistPending && listMode === 'whitelist') {"],
   ['js/content/handle_resolver.js', 136, 'function scheduleDomFallbackRerun() {'],

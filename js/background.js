@@ -47,6 +47,20 @@ function normalizeNonNegativeInteger(value) {
     return num >= 0 ? num : null;
 }
 
+function isValidManagedTimeLimitTimezone(timezone) {
+    const value = normalizeString(timezone);
+    if (!value) return false;
+    try {
+        if (typeof Intl === 'undefined' || typeof Intl.DateTimeFormat !== 'function') {
+            return value === 'UTC' || value === 'Etc/UTC';
+        }
+        new Intl.DateTimeFormat('en-US', { timeZone: value }).format(0);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
 function normalizeManagedTimeLimitPolicy(value) {
     if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
     const raw = safeObject(value);
@@ -59,7 +73,7 @@ function normalizeManagedTimeLimitPolicy(value) {
     const policyRevision = normalizeNonNegativeInteger(raw.policyRevision);
     const policyHash = normalizeString(raw.policyHash);
     const issuedAt = normalizeNonNegativeInteger(raw.issuedAt);
-    if (!timezone || dailyBudgetSeconds == null || !policyRevision || !policyHash || issuedAt == null) return null;
+    if (!isValidManagedTimeLimitTimezone(timezone) || dailyBudgetSeconds == null || !policyRevision || !policyHash || issuedAt == null) return null;
 
     const parentGrantRaw = safeObject(raw.parentGrant);
     const out = {

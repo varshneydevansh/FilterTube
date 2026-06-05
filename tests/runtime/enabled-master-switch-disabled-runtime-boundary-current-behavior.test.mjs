@@ -14,9 +14,9 @@ const sourceFingerprints = {
   'js/seed.js': [1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
   'js/filter_logic.js': [3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'],
   'js/content/dom_fallback.js': [5030, 235555, 'fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5'],
-  'js/background.js': [6789, 306239, '618e41011a6031c7a4eb3d022c4612536942a7a58a3c41eb0fd7e31c29a60311'],
+  'js/background.js': [6803, 306710, '57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7'],
   'js/settings_shared.js': [1181, 57535, '9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c'],
-  'js/content/bridge_settings.js': [1113, 44087, 'f29e6fab216e80cfd3ae9735088f79b36240331429aadbe85db52467be921853'],
+  'js/content/bridge_settings.js': [1127, 44545, 'fad07aba48391021d5e42096b34f32c58a6337a1a4d303a8706927c541d47f71'],
   'js/state_manager.js': [2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6']
 };
 
@@ -81,7 +81,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: '            const enabledFromV4 = (() => {',
     end: '            const hideCommentsFromV4 = boolFromV4',
-    startLine: 353,
+    startLine: 367,
     lines: 10,
     bytes: 359
   },
@@ -89,7 +89,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: '            // Pass through boolean flags',
     end: '            const profileSettings = activeProfile?.settings || {};',
-    startLine: 2942,
+    startLine: 2956,
     lines: 34,
     bytes: 3529
   },
@@ -97,7 +97,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: '        const relevantKeys = [',
     end: '        let settingsChanged = false;',
-    startLine: 4956,
+    startLine: 4970,
     lines: 16,
     bytes: 461
   },
@@ -121,7 +121,7 @@ const blockSpecs = {
     file: 'js/content/bridge_settings.js',
     start: '    const relevantKeys = [',
     end: '    if (Object.keys(changes).some',
-    startLine: 1061,
+    startLine: 1075,
     lines: 44,
     bytes: 1263
   },

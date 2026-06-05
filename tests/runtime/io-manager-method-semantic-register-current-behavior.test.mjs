@@ -32,7 +32,8 @@ function groupForMethod(name) {
     'normalizeBool',
     'normalizeNumber',
     'normalizeListMode',
-    'normalizeNonNegativeInteger'
+    'normalizeNonNegativeInteger',
+    'isValidManagedTimeLimitTimezone'
   ].includes(name)) return 'primitiveDefensiveHelpers';
   if (['revokeDownloadBlobUrlLater', 'downloadWithRuntimeApi', 'finish'].includes(name)) {
     return 'downloadRuntimeHelpers';
@@ -154,10 +155,10 @@ test('io manager method semantic register is audit-only and scoped to current be
   assert.match(text, /Status: audit-only current-behavior register/);
   assert.match(text, /Runtime behavior is unchanged/);
   assert.match(text, /source file: js\/io_manager\.js/);
-  assert.match(text, /line count: 2097/);
-  assert.match(text, /named declarations: 55/);
-  assert.match(text, /IIFE-scoped function declarations: 49/);
-  assert.match(text, /plain function declarations: 33/);
+  assert.match(text, /line count: 2111/);
+  assert.match(text, /named declarations: 56/);
+  assert.match(text, /IIFE-scoped function declarations: 50/);
+  assert.match(text, /plain function declarations: 34/);
   assert.match(text, /async function declarations: 16/);
   assert.match(text, /local const arrow helper declarations: 6/);
   assert.match(text, /public FilterTubeIO entries: 11/);
@@ -169,11 +170,11 @@ test('io manager method semantic register is audit-only and scoped to current be
 test('io manager register accounts for every current named declaration', () => {
   const rows = methodRows();
 
-  assert.equal(rows.length, 55);
+  assert.equal(rows.length, 56);
   assert.deepEqual(countBy(rows, 'kind'), {
     'async function': 16,
     'const arrow': 6,
-    function: 33
+    function: 34
   });
   assert.deepEqual(countBy(rows, 'group'), {
     autoBackupDownloadRotation: 6,
@@ -184,7 +185,7 @@ test('io manager register accounts for every current named declaration', () => {
     importMergeAndPersistence: 1,
     keywordChannelNormalization: 10,
     legacyProfileDerivationAndV3Persistence: 5,
-    primitiveDefensiveHelpers: 8,
+    primitiveDefensiveHelpers: 9,
     profileScopeAndSecurity: 4,
     profilesV4MigrationAndSanitization: 8,
     storageAccessWrappers: 2
