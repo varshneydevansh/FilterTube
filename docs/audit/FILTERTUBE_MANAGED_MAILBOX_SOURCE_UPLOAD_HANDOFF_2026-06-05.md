@@ -2,9 +2,10 @@
 
 **Generated**: 2026-06-05
 **Status**: Source-side mailbox upload-provider handoff is present for
-ciphertext-only managed mailbox items. Built-in mailbox server upload client,
-built-in mailbox server pull client, dashboard offline-send UI, and mailbox
-server authority remain absent.
+ciphertext-only managed mailbox items and requires sensitive parent/account
+re-auth before provider upload. Built-in mailbox server upload client, built-in
+mailbox server pull client, dashboard offline-send UI, and mailbox server
+authority remain absent.
 **Related live-send proof**:
 `docs/audit/FILTERTUBE_NANAH_MANAGED_LIVE_SIGNED_SEND_2026-06-04.md`
 **Related mailbox protocol**:
@@ -21,7 +22,8 @@ mailbox pull, and provider ack handoff.
 This slice adds the source-side handoff primitive for delayed delivery: a
 parent/source runtime can build signed managed-policy envelopes, turn them into
 ciphertext-only mailbox storage items through the Nanah adapter, and hand those
-items to an optional upload provider.
+items to an optional upload provider after the active parent/account profile
+passes the same sensitive-action unlock used by live managed sends.
 
 The upload provider is transport only. It does not create authority, choose
 scopes, decrypt payloads, or mark policy accepted on the protected profile. The
@@ -33,7 +35,8 @@ signature before applying any policy.
 
 ```mermaid
 flowchart TD
-  A["Parent/source builds managed policy send"] --> B["Build signed envelope batch"]
+  A["Parent/source builds managed policy send"] --> R["Sensitive parent/account re-auth"]
+  R --> B["Build signed envelope batch"]
   B --> C["Build ciphertext-only mailbox storage items"]
   C --> D{"Optional upload provider has upload method?"}
   D -->|No| E["Fail closed: no sent state recorded"]
@@ -112,6 +115,7 @@ js/nanah_managed_live_policy.js
 ```text
 runtime source-side mailbox storage item builder handoff: present
 runtime source-side mailbox upload-provider helper: present
+runtime source-side mailbox upload admin re-auth gate: present
 runtime provider upload item allowlist sanitizer: present
 runtime partial provider acceptance handling: present
 runtime sent revision/hash marking only for provider-accepted items: present
@@ -124,7 +128,9 @@ runtime dashboard offline-send UI: absent
 runtime YouTube page hot-path work from this slice: absent
 ```
 
-If the provider is unavailable, throws, or rejects an item, the helper does not
+If sensitive parent/account re-auth fails, the helper does not sign a batch,
+build upload items, call the provider, or mark sent state. If the provider is
+unavailable, throws, or rejects an item after authorization, the helper does not
 call `markSent(...)` for that item. This preserves source-side ack matching: a
 later mailbox ack can be recorded only when a trusted link already has matching
 `outgoingManagedPolicies[scope].revision` and `policyHash`.

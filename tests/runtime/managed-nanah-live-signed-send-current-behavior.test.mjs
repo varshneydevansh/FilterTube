@@ -52,7 +52,12 @@ function expandManagedAllowedScopes(value) {
   return Array.from(new Set(normalized));
 }
 
-function createManagedLivePolicyHarness({ activeSurface = 'main', sourceProfile = null, allowedScopes = ['main', 'kids', 'keywords', 'channels', 'videos', 'viewing_space', 'time_limits'] } = {}) {
+function createManagedLivePolicyHarness({
+  activeSurface = 'main',
+  sourceProfile = null,
+  allowedScopes = ['main', 'kids', 'keywords', 'channels', 'videos', 'viewing_space', 'time_limits'],
+  providerDeliveryAuthorized = true
+} = {}) {
   const parentProfile = sourceProfile || {
     settings: {
       allowMainViewing: false,
@@ -107,6 +112,8 @@ function createManagedLivePolicyHarness({ activeSurface = 'main', sourceProfile 
     }
   };
   const policyUpdates = [];
+  const signCalls = [];
+  const providerDeliveryAuthCalls = [];
   const create = loadManagedLivePolicyFactory();
   const helper = create({
     normalizeString(value) {
@@ -149,8 +156,13 @@ function createManagedLivePolicyHarness({ activeSurface = 'main', sourceProfile 
       policyUpdates.push({ linkId, patch: plain(patch) });
       return true;
     },
+    ensureManagedProviderDeliveryAuthorized: async (context) => {
+      providerDeliveryAuthCalls.push(plain(context));
+      return providerDeliveryAuthorized ? { ok: true } : { ok: false, reason: 'sensitive_reauth_required' };
+    },
     getAdapter: () => ({
       async signManagedPolicyEnvelope(envelope) {
+        signCalls.push(plain(envelope));
         return {
           ...envelope,
           integrity: {
@@ -196,7 +208,7 @@ function createManagedLivePolicyHarness({ activeSurface = 'main', sourceProfile 
     }),
     now: () => 1779300000000
   });
-  return { helper, parentProfile, trustedLink, policyUpdates };
+  return { helper, parentProfile, trustedLink, policyUpdates, signCalls, providerDeliveryAuthCalls };
 }
 
 test('managed live signed-send audit is linked without claiming mailbox runtime', () => {
@@ -214,11 +226,14 @@ test('managed live signed-send audit is linked without claiming mailbox runtime'
   assert.match(doc, /All unsupported live sends continue through the existing proposal path/);
   assert.match(doc, /not a mailbox runtime, built-in local-network discovery runtime,\s+key-rotation system, or complete offline later-delivery UI/);
   assert.match(sourceDeliveryDoc, /Source-side local-network managed policy delivery handoff/);
-  assert.match(sourceDeliveryDoc, /Built-in LAN peer\s+discovery, LAN transport, server mailbox upload\/pull, and dashboard offline-send\s+UI remain absent/);
+  assert.match(sourceDeliveryDoc, /Built-in LAN peer\s+discovery,\s+LAN transport, server mailbox upload\/pull, and dashboard offline-send\s+UI remain\s+absent/);
+  assert.match(sourceDeliveryDoc, /runtime source-side local-network provider admin re-auth gate: present/);
   assert.match(mailboxSourceDeliveryDoc, /Source-side mailbox upload-provider handoff is present/);
   assert.match(mailboxSourceDeliveryDoc, /runtime built-in mailbox server upload client: absent/);
   assert.match(mailboxSourceDeliveryDoc, /runtime mailbox plaintext policy upload: absent/);
+  assert.match(mailboxSourceDeliveryDoc, /runtime source-side mailbox upload admin re-auth gate: present/);
   assert.match(doc, /provider-facing mailbox items are\s+rebuilt from an allowlist of ciphertext\/index fields/);
+  assert.match(doc, /Provider delivery handoffs also use the same sensitive parent\/account re-auth\s+gate/);
   assert.match(doc, new RegExp(sourceDeliveryDocPath));
   assert.match(doc, new RegExp(mailboxSourceDeliveryDocPath));
   assert.match(signingDoc, new RegExp(docPath));
@@ -328,6 +343,9 @@ test('dashboard builds signed managed envelopes only after source link scope tar
   assert.match(source, /deps\.ensureSigningKeyPair\(\{ required: true \}\)/);
   assert.match(source, /privateKeyJwk: keyPair\.privateKeyJwk/);
   assert.match(source, /adapter\.signManagedPolicyEnvelope/);
+  assert.match(source, /async function ensureProviderDeliveryAuthorized/);
+  assert.match(source, /managed_provider_delivery_reauth_required/);
+  assert.match(source, /providerDeliveryAuthorized: true/);
 });
 
 test('managed source send uses signed envelope before proposal fallback and records outbound revision state', () => {
@@ -341,6 +359,8 @@ test('managed source send uses signed envelope before proposal fallback and reco
   assert.match(source, /const sensitiveAction = safeObject\(options\)\.sensitiveAction === true/);
   assert.match(source, /ensureProfileUnlocked\(profilesV4, activeId, \{ sensitiveAction \}\)/);
   assert.match(source, /ensureAdminUnlocked\(profilesV4, \{ sensitiveAction \}\)/);
+  assert.match(source, /ensureManagedProviderDeliveryAuthorized: async \(context = \{\}\)/);
+  assert.match(source, /ensureNanahOutgoingAuth\(scope, \{ sensitiveAction: true \}\)/);
   assert.match(sendButtonBlock, /const requiresManagedAdminReauth = policy\.linkType === 'managed_link' && policy\.authorityMode === 'managed'/);
   assert.match(sendButtonBlock, /ensureNanahOutgoingAuth\(policy\.scope, \{ sensitiveAction: requiresManagedAdminReauth \}\)/);
   assert.match(sendButtonBlock, /policy\.linkType === 'managed_link' && policy\.authorityMode === 'managed' && getNanahRole\(\) === 'source'/);
@@ -533,6 +553,58 @@ test('managed live signed-send helper publishes local-network candidates and mar
   assert.equal(unavailable.markedSentCount, 0);
 });
 
+test('managed live signed-send helper requires admin auth before local-network provider delivery', async () => {
+  const { helper, trustedLink, signCalls, providerDeliveryAuthCalls, policyUpdates } = createManagedLivePolicyHarness({
+    providerDeliveryAuthorized: false
+  });
+  let providerCalls = 0;
+  const provider = {
+    async publishManagedPolicyCandidates() {
+      providerCalls += 1;
+      return { ok: true };
+    }
+  };
+
+  const batchResult = await helper.deliverLocalNetworkPolicyBatch(
+    { scope: 'keywords', linkType: 'managed_link', authorityMode: 'managed' },
+    [trustedLink],
+    provider,
+    { reason: 'manual_source_send' }
+  );
+
+  assert.equal(batchResult.ok, false);
+  assert.equal(batchResult.reason, 'sensitive_reauth_required');
+  assert.equal(batchResult.candidateCount, 0);
+  assert.equal(batchResult.markedSentCount, 0);
+  assert.equal(batchResult.request, null);
+  assert.equal(providerCalls, 0);
+  assert.equal(signCalls.length, 0);
+  assert.equal(policyUpdates.length, 0);
+  assert.equal(providerDeliveryAuthCalls[0].transport, 'local_network');
+  assert.equal(providerDeliveryAuthCalls[0].sensitiveAction, true);
+
+  const candidates = await helper.buildLocalNetworkCandidateBatchForTrustedLinks(
+    { scope: 'keywords', linkType: 'managed_link', authorityMode: 'managed' },
+    [trustedLink],
+    { candidateId: 'ln-candidate-auth-blocked' }
+  );
+  signCalls.length = 0;
+  providerDeliveryAuthCalls.length = 0;
+
+  const directResult = await helper.deliverLocalNetworkCandidates(candidates, provider, { reason: 'manual_source_send' });
+
+  assert.equal(directResult.ok, false);
+  assert.equal(directResult.reason, 'sensitive_reauth_required');
+  assert.equal(directResult.candidateCount, 1);
+  assert.equal(directResult.deliveredCandidateCount, 0);
+  assert.equal(directResult.failedCandidateCount, 1);
+  assert.equal(directResult.markedSentCount, 0);
+  assert.equal(providerCalls, 0);
+  assert.equal(signCalls.length, 0);
+  assert.equal(policyUpdates.length, 0);
+  assert.equal(providerDeliveryAuthCalls[0].transport, 'local_network');
+});
+
 test('managed live signed-send helper uploads mailbox ciphertext items and marks only accepted uploads', async () => {
   const { helper, trustedLink, policyUpdates } = createManagedLivePolicyHarness();
   const sealedPayloadForEnvelope = (envelope, index) => ({
@@ -652,6 +724,66 @@ test('managed live signed-send helper uploads mailbox ciphertext items and marks
   assert.equal(unavailable.ok, false);
   assert.equal(unavailable.reason, 'mailbox_upload_provider_unavailable');
   assert.equal(unavailable.markedSentCount, 0);
+});
+
+test('managed live signed-send helper requires admin auth before mailbox upload provider delivery', async () => {
+  const { helper, trustedLink, signCalls, providerDeliveryAuthCalls, policyUpdates } = createManagedLivePolicyHarness({
+    providerDeliveryAuthorized: false
+  });
+  let providerCalls = 0;
+  const provider = {
+    async uploadManagedMailboxItems() {
+      providerCalls += 1;
+      return { ok: true };
+    }
+  };
+
+  const batchResult = await helper.uploadMailboxPolicyBatch(
+    { scope: 'keywords', linkType: 'managed_link', authorityMode: 'managed' },
+    [trustedLink],
+    provider,
+    { reason: 'manual_offline_send' }
+  );
+
+  assert.equal(batchResult.ok, false);
+  assert.equal(batchResult.reason, 'sensitive_reauth_required');
+  assert.equal(batchResult.mailboxItemCount, 0);
+  assert.equal(batchResult.markedSentCount, 0);
+  assert.equal(batchResult.request, null);
+  assert.equal(providerCalls, 0);
+  assert.equal(signCalls.length, 0);
+  assert.equal(policyUpdates.length, 0);
+  assert.equal(providerDeliveryAuthCalls[0].transport, 'encrypted_mailbox');
+  assert.equal(providerDeliveryAuthCalls[0].sensitiveAction, true);
+
+  const sealedPayloadForEnvelope = (envelope, index) => ({
+    cipherSuite: 'aes-kw+a256gcm',
+    keyAgreementId: `link-parent-child-1:child-profile-1:managed-key-1:${index + 1}`,
+    encryptedDek: `sealed-dek-${index + 1}`,
+    nonce: `nonce-${index + 1}`,
+    ciphertext: `ciphertext-${index + 1}`,
+    ciphertextHash: `sha256:ciphertext-${index + 1}`
+  });
+  const items = await helper.buildMailboxStorageItemBatchForTrustedLinks(
+    { scope: 'keywords', linkType: 'managed_link', authorityMode: 'managed' },
+    [trustedLink],
+    { mailboxItemId: 'mbx-auth-blocked', sealedPayloadForEnvelope }
+  );
+  signCalls.length = 0;
+  providerDeliveryAuthCalls.length = 0;
+
+  const directResult = await helper.uploadMailboxItems(items, provider, { reason: 'manual_offline_send' });
+
+  assert.equal(directResult.ok, false);
+  assert.equal(directResult.reason, 'sensitive_reauth_required');
+  assert.equal(directResult.mailboxItemCount, 1);
+  assert.equal(directResult.uploadedMailboxItemCount, 0);
+  assert.equal(directResult.failedMailboxItemCount, 1);
+  assert.equal(directResult.markedSentCount, 0);
+  assert.equal(providerCalls, 0);
+  assert.equal(signCalls.length, 0);
+  assert.equal(policyUpdates.length, 0);
+  assert.equal(providerDeliveryAuthCalls[0].transport, 'encrypted_mailbox');
 });
 
 test('managed live signed-send helper records matching live ack history without plaintext values', async () => {

@@ -1,23 +1,8 @@
 (function initNanahManagedLivePolicy(global) {
     'use strict';
 
-    const MANAGED_LIVE_POLICY_SCOPES = [
-        'active',
-        'full',
-        'main',
-        'kids',
-        'videos',
-        'keywords',
-        'channels',
-        'viewing_space',
-        'time_limits',
-        'rules_bundle'
-    ];
-    const MANAGED_LIVE_BUNDLE_SCOPES = {
-        active: ['main', 'kids', 'viewing_space', 'time_limits'],
-        full: ['main', 'kids', 'viewing_space', 'time_limits'],
-        rules_bundle: ['keywords', 'channels', 'videos']
-    };
+    const MANAGED_LIVE_POLICY_SCOPES = ['active', 'full', 'main', 'kids', 'videos', 'keywords', 'channels', 'viewing_space', 'time_limits', 'rules_bundle'];
+    const MANAGED_LIVE_BUNDLE_SCOPES = { active: ['main', 'kids', 'viewing_space', 'time_limits'], full: ['main', 'kids', 'viewing_space', 'time_limits'], rules_bundle: ['keywords', 'channels', 'videos'] };
     const MANAGED_LIVE_ACK_SCHEMA = 'filtertube_nanah_managed_live_ack';
     const MANAGED_MAILBOX_ACK_SCHEMA = 'filtertube_nanah_managed_open_sync_ack';
     const MANAGED_LOCAL_NETWORK_ACK_SCHEMA = 'filtertube_managed_local_network_candidate_ack';
@@ -415,6 +400,17 @@
             };
         }
 
+        async function ensureProviderDeliveryAuthorized(transport, options = {}, context = {}) {
+            const root = safeObject(options);
+            const proof = safeObject(root.auth || root.adminAuth || root.authorization);
+            if (root.providerDeliveryAuthorized === true || root.adminAuthorized === true || proof.ok === true || proof.valid === true || proof.authorized === true) return { ok: true };
+            if (typeof deps.ensureManagedProviderDeliveryAuthorized !== 'function') return { ok: false, reason: 'managed_provider_delivery_reauth_required' };
+            const result = await deps.ensureManagedProviderDeliveryAuthorized({ transport, reason: normalizeString(root.reason) || 'manual_send', sensitiveAction: true, ...safeObject(context) });
+            const normalized = safeObject(result);
+            if (result === true || normalized.ok === true || normalized.valid === true || normalized.authorized === true) return { ok: true };
+            return { ok: false, reason: normalizeString(normalized.reason || normalized.error) || 'managed_provider_delivery_reauth_required' };
+        }
+
         function buildLocalNetworkCandidateFromEnvelope(envelope, options = {}) {
             const root = safeObject(envelope);
             const optionRoot = safeObject(options);
@@ -490,11 +486,7 @@
 
         function getLocalNetworkDeliveryWriter(provider) {
             const root = safeObject(provider);
-            if (typeof root.publishManagedPolicyCandidates === 'function') return root.publishManagedPolicyCandidates;
-            if (typeof root.deliverManagedPolicyCandidates === 'function') return root.deliverManagedPolicyCandidates;
-            if (typeof root.publishLocalNetworkCandidates === 'function') return root.publishLocalNetworkCandidates;
-            if (typeof root.putManagedPolicyCandidates === 'function') return root.putManagedPolicyCandidates;
-            return null;
+            return root.publishManagedPolicyCandidates || root.deliverManagedPolicyCandidates || root.publishLocalNetworkCandidates || root.putManagedPolicyCandidates || null;
         }
 
         function normalizeDeliveredCandidateIds(result, candidates, ok) {
@@ -515,6 +507,8 @@
             const rows = safeArray(candidates).map(row => safeObject(row)).filter(row => normalizeString(row.candidateId));
             const writer = getLocalNetworkDeliveryWriter(provider);
             const request = buildLocalNetworkDeliveryRequest(rows, options);
+            const auth = await ensureProviderDeliveryAuthorized('local_network', options, request);
+            if (!auth.ok) return { ok: false, reason: auth.reason, candidateCount: rows.length, deliveredCandidateCount: 0, failedCandidateCount: rows.length, markedSentCount: 0, request };
             if (!writer) {
                 return {
                     ok: false,
@@ -568,8 +562,10 @@
         }
 
         async function deliverLocalNetworkPolicyBatch(policy, trustedLinks, provider, options = {}) {
+            const auth = await ensureProviderDeliveryAuthorized('local_network', options, { policy, trustedLinkCount: safeArray(trustedLinks).length });
+            if (!auth.ok) return { ok: false, reason: auth.reason, candidateCount: 0, deliveredCandidateCount: 0, failedCandidateCount: 0, markedSentCount: 0, request: null };
             const candidates = await buildLocalNetworkCandidateBatchForTrustedLinks(policy, trustedLinks, options);
-            return deliverLocalNetworkCandidates(candidates, provider, options);
+            return deliverLocalNetworkCandidates(candidates, provider, { ...safeObject(options), providerDeliveryAuthorized: true });
         }
 
         async function buildMailboxStorageItemFromEnvelope(envelope, options = {}) {
@@ -639,11 +635,7 @@
 
         function getMailboxUploadWriter(provider) {
             const root = safeObject(provider);
-            if (typeof root.uploadManagedMailboxItems === 'function') return root.uploadManagedMailboxItems;
-            if (typeof root.publishManagedMailboxItems === 'function') return root.publishManagedMailboxItems;
-            if (typeof root.putManagedMailboxItems === 'function') return root.putManagedMailboxItems;
-            if (typeof root.enqueueManagedMailboxItems === 'function') return root.enqueueManagedMailboxItems;
-            return null;
+            return root.uploadManagedMailboxItems || root.publishManagedMailboxItems || root.putManagedMailboxItems || root.enqueueManagedMailboxItems || null;
         }
 
         function normalizeUploadedMailboxItemIds(result, items, ok) {
@@ -664,6 +656,8 @@
             const rows = safeArray(items).map(row => safeObject(row)).filter(row => normalizeString(row.mailboxItemId));
             const writer = getMailboxUploadWriter(provider);
             const request = buildMailboxUploadRequest(rows, options);
+            const auth = await ensureProviderDeliveryAuthorized('encrypted_mailbox', options, request);
+            if (!auth.ok) return { ok: false, reason: auth.reason, mailboxItemCount: rows.length, uploadedMailboxItemCount: 0, failedMailboxItemCount: rows.length, markedSentCount: 0, request };
             if (!writer) {
                 return {
                     ok: false,
@@ -716,8 +710,10 @@
         }
 
         async function uploadMailboxPolicyBatch(policy, trustedLinks, provider, options = {}) {
+            const auth = await ensureProviderDeliveryAuthorized('encrypted_mailbox', options, { policy, trustedLinkCount: safeArray(trustedLinks).length });
+            if (!auth.ok) return { ok: false, reason: auth.reason, mailboxItemCount: 0, uploadedMailboxItemCount: 0, failedMailboxItemCount: 0, markedSentCount: 0, request: null };
             const items = await buildMailboxStorageItemBatchForTrustedLinks(policy, trustedLinks, options);
-            return uploadMailboxItems(items, provider, options);
+            return uploadMailboxItems(items, provider, { ...safeObject(options), providerDeliveryAuthorized: true });
         }
 
         function normalizeAckState(value) {

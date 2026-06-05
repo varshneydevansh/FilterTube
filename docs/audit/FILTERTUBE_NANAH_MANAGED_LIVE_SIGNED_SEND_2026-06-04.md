@@ -137,8 +137,10 @@ optional local provider through a
 `filtertube_managed_local_network_delivery_request`. Provider acceptance is
 only delivery feedback: `markSent(...)` is called only for candidate ids the
 provider accepted, and the protected replica still validates the signed
-envelope before any policy write. This is a provider handoff, not built-in LAN
-discovery or built-in LAN transport.
+envelope before any policy write. Source-side provider delivery also requires
+the same sensitive parent/account re-auth gate before a batch is signed or a
+provider is called. This is a provider handoff, not built-in LAN discovery or
+built-in LAN transport.
 
 The source helper can also prepare ciphertext-only
 `filtertube_managed_mailbox_item` rows and hand them to an optional mailbox
@@ -151,6 +153,11 @@ rebuilt from an allowlist of ciphertext/index fields so stray local envelope,
 payload, decrypted-envelope, private-key, or plaintext metadata fields cannot
 cross the upload boundary. This is a provider handoff, not a built-in mailbox
 server client.
+
+Provider delivery handoffs also use the same sensitive parent/account re-auth
+gate as live managed sends. If re-auth fails, the source helper fails closed
+before batch signing/upload-item construction, provider calls, or sent-state
+marking.
 
 This is not a mailbox runtime, built-in local-network discovery runtime,
 key-rotation system, or complete offline later-delivery UI.

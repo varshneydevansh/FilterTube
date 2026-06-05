@@ -10764,6 +10764,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         getStableDeviceId: () => nanahStableDeviceId,
         findTrustedLinkById: (linkId) => nanahTrustedLinks.find((entry) => normalizeString(entry?.linkId) === linkId),
         updateTrustedLinkPolicy: updateNanahTrustedLinkPolicy,
+        ensureManagedProviderDeliveryAuthorized: async (context = {}) => {
+            const root = safeObject(context);
+            const scopes = Array.isArray(root.scopes) ? root.scopes : [];
+            const scope = normalizeString(root.scope) || normalizeString(scopes[0]) || 'active';
+            await ensureNanahOutgoingAuth(scope, { sensitiveAction: true });
+            return { ok: true };
+        },
         getAdapter: () => window.FilterTubeNanahAdapter || {},
         now: () => Date.now()
     }) || null;

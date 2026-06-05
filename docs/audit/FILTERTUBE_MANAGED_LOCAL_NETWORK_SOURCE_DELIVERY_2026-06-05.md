@@ -2,9 +2,10 @@
 
 **Generated**: 2026-06-05
 **Status**: Source-side local-network managed policy delivery handoff is
-present as a provider-gated signed-candidate publisher. Built-in LAN peer
-discovery, LAN transport, server mailbox upload/pull, and dashboard offline-send
-UI remain absent.
+present as a provider-gated signed-candidate publisher that requires sensitive
+parent/account re-auth before provider delivery. Built-in LAN peer discovery,
+LAN transport, server mailbox upload/pull, and dashboard offline-send UI remain
+absent.
 **Related live-send proof**:
 `docs/audit/FILTERTUBE_NANAH_MANAGED_LIVE_SIGNED_SEND_2026-06-04.md`
 **Related receive hook**:
@@ -21,7 +22,8 @@ candidate intake, protected apply/reject history, provider ack handoff, and
 source-side delivery-ack status. This slice adds the missing source-side
 handoff primitive: a parent/source runtime can package signed managed-policy
 envelopes as `filtertube_managed_local_network_candidate` rows and publish them
-to an optional local provider.
+to an optional local provider after the active parent/account profile passes the
+same sensitive-action unlock used by live managed sends.
 
 The provider is transport only. It does not create authority, choose scopes,
 or mark policy accepted on the protected profile. The protected replica must
@@ -32,7 +34,8 @@ policy hash, key identity, and signature before applying any candidate.
 
 ```mermaid
 flowchart TD
-  A["Parent/source builds managed policy send"] --> B["Build signed envelope batch"]
+  A["Parent/source builds managed policy send"] --> R["Sensitive parent/account re-auth"]
+  R --> B["Build signed envelope batch"]
   B --> C["Wrap each envelope as local-network candidate"]
   C --> D{"Optional local provider has publish method?"}
   D -->|No| E["Fail closed: no sent state recorded"]
@@ -107,6 +110,7 @@ js/nanah_managed_live_policy.js
 ```text
 runtime source-side local-network candidate builder: present
 runtime source-side local-network provider publish helper: present
+runtime source-side local-network provider admin re-auth gate: present
 runtime partial provider acceptance handling: present
 runtime sent revision/hash marking only for provider-accepted candidates: present
 runtime signed envelope authority unchanged: present
@@ -118,10 +122,12 @@ runtime dashboard offline-send UI: absent
 runtime YouTube page hot-path work from this slice: absent
 ```
 
-If the provider is unavailable, throws, or rejects a candidate, the helper does
-not call `markSent(...)` for that candidate. This preserves source-side ack
-matching: a later delivery ack can be recorded only when a trusted link already
-has matching `outgoingManagedPolicies[scope].revision` and `policyHash`.
+If sensitive parent/account re-auth fails, the helper does not sign a batch,
+call the provider, or mark sent state. If the provider is unavailable, throws,
+or rejects a candidate after authorization, the helper does not call
+`markSent(...)` for that candidate. This preserves source-side ack matching: a
+later delivery ack can be recorded only when a trusted link already has matching
+`outgoingManagedPolicies[scope].revision` and `policyHash`.
 
 ## Verification
 
