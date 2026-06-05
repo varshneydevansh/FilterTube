@@ -19,10 +19,10 @@ navigation, lock, or list-mode behavior changes.
 
 ```text
 source file: js/tab-view.js
-source split lines: 14268
-source wc -l: 14267
-source bytes: 662735
-source sha256: abeca29c0ab0d356e0755f1d0e91f469b020ab0491ee3d08cb453f9bd79f2152
+source split lines: 14270
+source wc -l: 14269
+source bytes: 663047
+source sha256: 7515fbce26e7718b820e35bc5b77bc2d8298cb7dacc3aa1421e671894028d867
 broad lexical callable matches: 1048
 named declarations: 397
 plain function declarations: 267

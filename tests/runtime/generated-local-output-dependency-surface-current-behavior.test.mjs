@@ -93,7 +93,7 @@ test('generated local output dependency surface doc is audit-only and scoped to 
 test('ignored generated output and dependency cache footprints are pinned', () => {
   const doc = read(docPath);
   const expected = {
-    dist: { files: 186, bytes: 62334390, ignore: /\.gitignore:6:dist\// },
+    dist: { files: 192, bytes: 62608887, ignore: /\.gitignore:6:dist\// },
     node_modules: { files: 956, bytes: 26325623, ignore: /\.gitignore:2:node_modules\// },
     'website/.next': { files: 2468, bytes: 388755617, ignore: /\.gitignore:12:website\/\.next\// },
     'website/.vercel': { files: 291, bytes: 29815128, ignore: /website\/\.gitignore:1:\.vercel/ },
@@ -124,20 +124,20 @@ test('dist package trees and zip artifacts are current local output not package 
     data: 1,
     html: 3,
     icons: 7,
-    js: 35,
+    js: 37,
     'manifest.json': 1,
   };
   const expectedBrowsers = {
     chrome: {
-      bytes: 12047135,
+      bytes: 12125312,
       manifestHash: '282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734',
     },
     firefox: {
-      bytes: 12047225,
+      bytes: 12125402,
       manifestHash: 'a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0',
     },
     opera: {
-      bytes: 12047140,
+      bytes: 12125317,
       manifestHash: '0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b',
     },
   };
@@ -145,7 +145,7 @@ test('dist package trees and zip artifacts are current local output not package 
   for (const [browser, info] of Object.entries(expectedBrowsers)) {
     const dir = `dist/${browser}`;
     const files = walk(dir);
-    assert.equal(files.length, 61);
+    assert.equal(files.length, 63);
     assert.equal(totalBytes(files), info.bytes);
     assert.deepEqual(topLevelBreakdown(files, filePath(dir)), expectedBreakdown);
     assert.equal(sha256(`${dir}/manifest.json`), info.manifestHash);
@@ -154,9 +154,9 @@ test('dist package trees and zip artifacts are current local output not package 
   }
 
   for (const [zip, bytes, hash] of [
-    ['dist/filtertube-chrome-v3.3.2.zip', 8730943, 'ea63f1d46b9bd9cf914281c5759cd9b75fb7f48517f71983d41c6ff44585b93a'],
-    ['dist/filtertube-firefox-v3.3.2.zip', 8731002, '815e2de2eddb98bca5b87a01eecd27c75d5cc02437ef196c427cda2a0653bf83'],
-    ['dist/filtertube-opera-v3.3.2.zip', 8730945, 'e6552669ef06bd7329bc0fdcd84e827dc6d66a80d75d03c286139da05454e329'],
+    ['dist/filtertube-chrome-v3.3.2.zip', 8744265, 'eebce0f32f2faf9cccd03b249f83b96dd9d861340ab9bd968af1d77ba7a558cc'],
+    ['dist/filtertube-firefox-v3.3.2.zip', 8744324, 'e4ee2d10ebf2e4cffa44a5bdf688b47018bd6d7495248b75a343f02fc739d9ed'],
+    ['dist/filtertube-opera-v3.3.2.zip', 8744267, '5a39f14dc23e885539e0cc19423eae6f6858756077ec3f1c9bc5b99986e84259'],
   ]) {
     assert.equal(byteCount(zip), bytes, `${zip} size drifted`);
     assert.equal(sha256(zip), hash, `${zip} hash drifted`);

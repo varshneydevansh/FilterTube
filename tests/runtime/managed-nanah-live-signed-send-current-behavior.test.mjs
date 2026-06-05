@@ -294,6 +294,12 @@ test('managed source send uses signed envelope before proposal fallback and reco
   const listenerEnd = source.indexOf('if (ftNanahTrustBtn) {', listenerStart);
   assert.notEqual(listenerEnd, -1);
   const sendButtonBlock = source.slice(listenerStart, listenerEnd);
+  assert.match(source, /async function ensureNanahOutgoingAuth\(scope, options = \{\}\)/);
+  assert.match(source, /const sensitiveAction = safeObject\(options\)\.sensitiveAction === true/);
+  assert.match(source, /ensureProfileUnlocked\(profilesV4, activeId, \{ sensitiveAction \}\)/);
+  assert.match(source, /ensureAdminUnlocked\(profilesV4, \{ sensitiveAction \}\)/);
+  assert.match(sendButtonBlock, /const requiresManagedAdminReauth = policy\.linkType === 'managed_link' && policy\.authorityMode === 'managed'/);
+  assert.match(sendButtonBlock, /ensureNanahOutgoingAuth\(policy\.scope, \{ sensitiveAction: requiresManagedAdminReauth \}\)/);
   assert.match(sendButtonBlock, /policy\.linkType === 'managed_link' && policy\.authorityMode === 'managed' && getNanahRole\(\) === 'source'/);
   assert.match(sendButtonBlock, /const selectedTargetLinks = getNanahSelectedManagedTargetLinks\(policy\.scope\)/);
   assert.match(sendButtonBlock, /buildEnvelopeBatchForTrustedLinks\(policy, selectedTargetLinks\)/);

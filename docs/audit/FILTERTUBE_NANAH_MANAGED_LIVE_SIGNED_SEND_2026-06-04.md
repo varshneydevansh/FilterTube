@@ -4,7 +4,9 @@
 **Status**: Eligible live-session source send runtime slice with signed
 active/full profile-policy bundle conversion, explicit Main/Kids granular
 rule-source selection, connected-replica managed target selection, and redacted
-outbound send/live ack history per target link/scope.
+outbound send/live ack history per target link/scope. Managed source sends now
+require the dashboard's sensitive parent/account re-auth gate before signed
+envelope construction or live send.
 **Related**:
 `docs/audit/FILTERTUBE_NANAH_MANAGED_SIGNING_KEYPAIR_2026-06-04.md`
 **Multi-target boundary**:
@@ -23,6 +25,7 @@ path from an unsigned managed `control_proposal` into a signed
 - the selected scope is `active`, `full`, `main`, `kids`, `keywords`,
   `channels`, `videos`, `rules_bundle`, `viewing_space`, or `time_limits`;
 - the replica side has saved a fixed child target profile;
+- the parent/account source session passes a sensitive-action re-auth check;
 - the source has a complete local managed signing keypair.
 
 All unsupported live sends continue through the existing proposal path.
@@ -44,22 +47,24 @@ session state dependency injection, and success/error UI.
 
 ```mermaid
 flowchart TD
-  A["Parent selects Send"] --> B["Existing profile unlock/auth gate"]
+  A["Parent selects Send"] --> B["Build outgoing policy decision"]
   B --> C{"Saved managed Source -> Replica link?"}
-  C -->|No| D["Send existing control_proposal"]
-  C -->|Yes| E{"Scope is managed policy scope?"}
-  E -->|No| D
-  E -->|Yes| F{"Replica fixed child target known?"}
-  F -->|No| D
-  F -->|Yes| G["Build surface, rule, viewing-space, or time-limit payload"]
-  G --> H["Compute outbound policy hash and revision"]
-  H --> I["Sign envelope with managed keypair"]
-  I --> J["Send filtertube_managed_policy"]
-  J --> K["Store last sent revision/hash on trusted link"]
-  K --> L["Append redacted outbound send history"]
-  L --> M["Replica validates signature/trust/revision before apply"]
-  M --> N["Replica sends redacted live ack"]
-  N --> O["Source stores matching trusted-link ack history"]
+  C -->|No| D["Existing profile unlock/auth gate"]
+  D --> E["Send existing control_proposal"]
+  C -->|Yes| F["Sensitive parent/account re-auth gate"]
+  F --> G{"Scope is managed policy scope?"}
+  G -->|No| E
+  G -->|Yes| H{"Replica fixed child target known?"}
+  H -->|No| E
+  H -->|Yes| I["Build surface, rule, viewing-space, or time-limit payload"]
+  I --> J["Compute outbound policy hash and revision"]
+  J --> K["Sign envelope with managed keypair"]
+  K --> L["Send filtertube_managed_policy"]
+  L --> M["Store last sent revision/hash on trusted link"]
+  M --> N["Append redacted outbound send history"]
+  N --> O["Replica validates signature/trust/revision before apply"]
+  O --> P["Replica sends redacted live ack"]
+  P --> Q["Source stores matching trusted-link ack history"]
 ```
 
 ## Behavior Boundary
@@ -76,6 +81,12 @@ existing active-view behavior stays intact until the parent chooses a different
 source. When parent-managed child edit mode is active, the payload source is
 the edited child profile while the envelope authority remains the parent source
 profile.
+
+Before any managed Source -> Replica live send builds signed envelopes, the
+send handler calls `ensureNanahOutgoingAuth(policy.scope, { sensitiveAction:
+true })`. That forces a fresh sensitive-action unlock for the active
+parent/account source profile when it is locked or its sensitive re-auth window
+has expired. Peer sends still use the ordinary outgoing profile unlock path.
 
 `rules_bundle` is only a parent UI convenience. It does not create a new
 receive-side scope and does not weaken the managed-policy envelope validator.

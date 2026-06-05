@@ -9567,8 +9567,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         nanahSessionState.helloSent = true;
     }
 
-    async function ensureNanahOutgoingAuth(scope) {
+    async function ensureNanahOutgoingAuth(scope, options = {}) {
         const normalizedScope = normalizeString(scope).toLowerCase();
+        const sensitiveAction = safeObject(options).sensitiveAction === true;
         const io = window.FilterTubeIO || {};
         const profilesV4 = profilesV4Cache || (typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null);
         const activeId = normalizeString(profilesV4?.activeProfileId) || 'default';
@@ -9580,7 +9581,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (profilesV4) {
-            const okUnlocked = await ensureProfileUnlocked(profilesV4, activeId);
+            const okUnlocked = await ensureProfileUnlocked(profilesV4, activeId, { sensitiveAction });
             if (!okUnlocked) {
                 throw new Error(requiresWholeAccount ? 'Master unlock cancelled' : 'Profile unlock cancelled');
             }
@@ -9588,7 +9589,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (activeId === 'default' && masterVerifier) {
             if (!sessionMasterPin) {
-                const okAdmin = await ensureAdminUnlocked(profilesV4);
+                const okAdmin = await ensureAdminUnlocked(profilesV4, { sensitiveAction });
                 if (!okAdmin) {
                     throw new Error('Master unlock cancelled');
                 }
@@ -12292,10 +12293,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                     const selectionStrategy = getNanahStrategy();
                     const policy = buildNanahOutgoingProposalPolicy(selectionScope, selectionStrategy);
+                    const requiresManagedAdminReauth = policy.linkType === 'managed_link' && policy.authorityMode === 'managed';
+                    const auth = await ensureNanahOutgoingAuth(policy.scope, { sensitiveAction: requiresManagedAdminReauth });
                     if (policy.linkType === 'managed_link' && getNanahRole() === 'source') {
                         await ensureNanahManagedSigningKeyPair({ required: true });
                     }
-                    const auth = await ensureNanahOutgoingAuth(policy.scope);
                     if (policy.linkType === 'managed_link' && policy.authorityMode === 'managed' && getNanahRole() === 'source') {
                         if (!nanahManagedLivePolicy) {
                             throw new Error('Managed policy live-send helpers are unavailable');
