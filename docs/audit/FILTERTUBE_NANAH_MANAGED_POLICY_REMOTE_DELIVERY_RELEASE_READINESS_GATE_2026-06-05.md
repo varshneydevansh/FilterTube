@@ -150,6 +150,7 @@ FT-MANAGED-REMOTE-08-action-history-redaction
 FT-MANAGED-REMOTE-09-command-center-conflict-review
 FT-MANAGED-REMOTE-10-key-rotation-repair-status
 FT-MANAGED-REMOTE-11-no-work-idle
+FT-MANAGED-REMOTE-12-encrypted-history-summary-boundary
 ```
 
 Row `FT-MANAGED-REMOTE-10-key-rotation-repair-status` covers the
@@ -158,6 +159,12 @@ rotates the managed source signing key, active child-device managed links become
 key-revoked, the command center keeps those profiles visible as needing
 re-pairing, and protected history records `trust_link.key_revoke` without
 plaintext rules, mailbox ciphertext, or private key material.
+
+Row `FT-MANAGED-REMOTE-12-encrypted-history-summary-boundary` covers the
+encrypted-history summary sanitizer slice: installed smoke evidence can prove
+that ciphertext-shaped summary metadata survives as a privacy-marked token, but
+the smoke artifact itself must not contain plaintext rules, raw policy JSON,
+decrypted payloads, raw ciphertext, private keys, PINs, or passwords.
 
 ## Current Decision
 

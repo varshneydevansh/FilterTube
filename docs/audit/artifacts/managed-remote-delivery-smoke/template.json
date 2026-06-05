@@ -127,6 +127,11 @@
       "id": "FT-MANAGED-REMOTE-11-no-work-idle",
       "requiredObservation": "With no eligible provider or no pending policy, YouTube pages remain in no-work state: no added observers, timers, DOM scans, JSON work, or LAN fetch loops.",
       "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-REMOTE-12-encrypted-history-summary-boundary",
+      "requiredObservation": "Managed action history may preserve only sanitizer-accepted encrypted summary metadata and privacy markers; the artifact must not record plaintext rules, raw policy JSON, decrypted payloads, raw ciphertext, private keys, PINs, or passwords.",
+      "status": "missing"
     }
   ],
   "completionRules": {

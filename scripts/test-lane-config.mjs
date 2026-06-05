@@ -62,7 +62,8 @@ export const MANAGED_REMOTE_DELIVERY_SMOKE_REQUIRED_ROWS = Object.freeze([
   'FT-MANAGED-REMOTE-08-action-history-redaction',
   'FT-MANAGED-REMOTE-09-command-center-conflict-review',
   'FT-MANAGED-REMOTE-10-key-rotation-repair-status',
-  'FT-MANAGED-REMOTE-11-no-work-idle'
+  'FT-MANAGED-REMOTE-11-no-work-idle',
+  'FT-MANAGED-REMOTE-12-encrypted-history-summary-boundary'
 ]);
 export const MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS = Object.freeze([
   'FT-MANAGED-APP-00-contract-sync',
