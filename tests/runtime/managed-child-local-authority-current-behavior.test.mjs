@@ -1,9 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import vm from 'node:vm';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
 const repoRoot = process.cwd();
+const helperPath = 'js/managed_admin_authority.js';
 const docPath = 'docs/audit/FILTERTUBE_MANAGED_CHILD_LOCAL_AUTHORITY_CONTRACT_2026-06-03.md';
 const planPath = 'docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md';
 const inventoryPath = 'docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md';
@@ -12,6 +14,15 @@ const managedAdminFailedUnlockSchema = 'filtertube_managed_admin_failed_unlock_r
 
 function read(relativePath) {
   return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
+}
+
+function loadAuthority() {
+  const context = {};
+  context.globalThis = context;
+  context.window = context;
+  vm.createContext(context);
+  vm.runInContext(read(helperPath), context, { filename: helperPath });
+  return context.FilterTubeManagedAdminAuthority;
 }
 
 function runtimeSource() {
@@ -44,17 +55,14 @@ function profileType(profilesV4, profileId) {
   return profileId === 'default' ? 'default' : 'account';
 }
 
-function parentProfileId(profilesV4, profileId) {
-  return profilesV4.profiles?.[profileId]?.parentProfileId || '';
-}
-
 function canActiveProfileManageProfile(profilesV4, targetProfileId) {
   const targetId = String(targetProfileId || '');
   const currentActive = String(profilesV4?.activeProfileId || 'default');
-  if (!targetId || profileType(profilesV4, currentActive) === 'child') return false;
-  return currentActive === 'default'
-    || currentActive === targetId
-    || parentProfileId(profilesV4, targetId) === currentActive;
+  const Authority = loadAuthority();
+  return Authority.canActorManageProfile(profilesV4, {
+    actorProfileId: currentActive,
+    targetProfileId: targetId
+  }).allowed === true;
 }
 
 function isProfileLocked(profilesV4, profileId) {
@@ -79,10 +87,16 @@ function startManagedChildEditDecision({ profilesV4, targetProfileId, unlockedPr
 function saveManagedChildSurfaceDecision({ freshProfilesV4, managedChildEdit }) {
   const profileId = String(managedChildEdit?.profileId || '');
   if (!profileId) return { allowed: false, reason: 'no_managed_child_target' };
+  const profiles = freshProfilesV4.profiles || {};
+  if (!Object.prototype.hasOwnProperty.call(profiles, profileId)) {
+    return { allowed: false, reason: 'target_missing' };
+  }
+  if (profileType(freshProfilesV4, profileId) !== 'child') {
+    return { allowed: false, reason: 'fresh_target_not_child' };
+  }
   if (!canActiveProfileManageProfile(freshProfilesV4, profileId)) {
     return { allowed: false, reason: 'fresh_authority_recheck_failed' };
   }
-  if (!freshProfilesV4.profiles?.[profileId]) return { allowed: false, reason: 'target_missing' };
   return { allowed: true, decision: 'save_child_surface_with_revision_history' };
 }
 
@@ -264,6 +278,9 @@ test('managed child local authority contract is source-backed with accepted-save
   assert.match(tabView, /getProfileType\(fresh, targetId\) !== 'child'/);
   assert.match(tabView, /const ok = await ensureProfileUnlocked\(fresh, currentActive, \{ sensitiveAction: true \}\)/);
   assert.match(tabView, /async function saveManagedChildSurface\(surface, mutator\)/);
+  assert.match(tabView, /Object\.prototype\.hasOwnProperty\.call\(profiles, profileId\)/);
+  assert.match(tabView, /getProfileType\(fresh, profileId\) !== 'child'/);
+  assert.match(tabView, /Managed child target is no longer available/);
   assert.match(tabView, /if \(!canActiveProfileManageProfile\(fresh, profileId\)\)/);
   assert.match(tabView, /function localManagedEditPolicyRevisionStore\(profile, scope\)/);
   assert.match(tabView, /function buildManagedChildLocalEditReport/);
@@ -297,6 +314,9 @@ test('managed child local authority contract is source-backed with accepted-save
   assert.match(tabView, /viewing_space_unlock_failed/);
   assert.match(tabView, /time_limit_unlock_failed/);
   assert.match(source, /filtertube_managed_action_history/);
+  assert.match(source, /function hasProfile\(profilesV4, profileId\)/);
+  assert.match(source, /target_profile_missing/);
+  assert.match(source, /actor_profile_missing/);
   assert.match(source, /const SESSION_PIN_FAILED_ATTEMPT_LIMIT = 5/);
   assert.match(source, /const SESSION_PIN_FAILED_ATTEMPT_WINDOW_MS = 10 \* 60 \* 1000/);
   assert.match(source, /const sessionPinFailedAttempts = new Map\(\)/);
@@ -371,6 +391,24 @@ test('local managed child edit requires parent unlock and save-time fresh author
       managedChildEdit: { profileId: 'childA', surface: 'kids' }
     }),
     { allowed: false, reason: 'fresh_authority_recheck_failed' }
+  );
+
+  assert.deepEqual(
+    saveManagedChildSurfaceDecision({
+      freshProfilesV4: profilesFixture('default'),
+      managedChildEdit: { profileId: 'missingChild', surface: 'main' }
+    }),
+    { allowed: false, reason: 'target_missing' }
+  );
+
+  const targetBecameAccount = profilesFixture('parentA');
+  targetBecameAccount.profiles.childA = { id: 'childA', type: 'account', name: 'Former Child' };
+  assert.deepEqual(
+    saveManagedChildSurfaceDecision({
+      freshProfilesV4: targetBecameAccount,
+      managedChildEdit: { profileId: 'childA', surface: 'main' }
+    }),
+    { allowed: false, reason: 'fresh_target_not_child' }
   );
 });
 

@@ -41,10 +41,14 @@ function profilesFixture(activeProfileId = 'default') {
 test('managed admin authority helper is loaded before the dashboard runtime and documented', () => {
   const html = read('html/tab-view.html');
   const tabView = read('js/tab-view.js');
+  const helper = read(helperPath);
   const doc = read(authorityDocPath);
   const laneConfig = read('scripts/test-lane-config.mjs');
 
   assert.ok(html.indexOf('../js/managed_admin_authority.js') < html.indexOf('../js/tab-view.js'));
+  assert.match(helper, /function hasProfile\(profilesV4, profileId\)/);
+  assert.match(helper, /target_profile_missing/);
+  assert.match(helper, /actor_profile_missing/);
   assert.match(tabView, /const ManagedAdminAuthority = window\.FilterTubeManagedAdminAuthority \|\| null/);
   assert.match(tabView, /ManagedAdminAuthority\.canActorManageProfile/);
   assert.match(tabView, /ManagedAdminAuthority\.checkAdminUnlockSession/);
@@ -73,6 +77,19 @@ test('managed admin authority allows master and parent edits but rejects child a
   assert.deepEqual(
     plain(Authority.canActorManageProfile(profilesFixture('parentA'), { targetProfileId: 'parentA' })),
     { allowed: true, decision: 'self_account_admin', actorProfileId: 'parentA', targetProfileId: 'parentA' }
+  );
+});
+
+test('managed admin authority rejects missing target or actor profiles before broad admin decisions', () => {
+  const Authority = loadAuthority();
+
+  assert.deepEqual(
+    plain(Authority.canActorManageProfile(profilesFixture('default'), { targetProfileId: 'missingChild' })),
+    { allowed: false, reason: 'target_profile_missing', actorProfileId: 'default', targetProfileId: 'missingChild' }
+  );
+  assert.deepEqual(
+    plain(Authority.canActorManageProfile(profilesFixture('missingParent'), { targetProfileId: 'childA' })),
+    { allowed: false, reason: 'actor_profile_missing', actorProfileId: 'missingParent', targetProfileId: 'childA' }
   );
 });
 

@@ -28,6 +28,13 @@
         return safeObject(getProfiles(profilesV4)[normalizeString(profileId)]);
     }
 
+    function hasProfile(profilesV4, profileId) {
+        const id = normalizeString(profileId);
+        if (!id) return false;
+        if (id === 'default') return true;
+        return Object.prototype.hasOwnProperty.call(getProfiles(profilesV4), id);
+    }
+
     function getProfileType(profilesV4, profileId) {
         const id = normalizeString(profileId);
         if (id === 'default') return 'account';
@@ -53,6 +60,12 @@
         }
         if (!actorId) {
             return { allowed: false, reason: 'missing_actor_profile', actorProfileId: actorId, targetProfileId: targetId };
+        }
+        if (!hasProfile(profilesV4, targetId)) {
+            return { allowed: false, reason: 'target_profile_missing', actorProfileId: actorId, targetProfileId: targetId };
+        }
+        if (!hasProfile(profilesV4, actorId)) {
+            return { allowed: false, reason: 'actor_profile_missing', actorProfileId: actorId, targetProfileId: targetId };
         }
         if (getProfileType(profilesV4, actorId) === 'child') {
             return { allowed: false, reason: 'child_actor_not_admin', actorProfileId: actorId, targetProfileId: targetId };
@@ -147,6 +160,7 @@
         }),
         getProfileType,
         getParentProfileId,
+        hasProfile,
         resolveActorProfileId,
         canActorManageProfile,
         checkAdminUnlockSession,

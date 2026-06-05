@@ -33,10 +33,10 @@ Current source evidence in `js/managed_admin_authority.js` and
 
 | Source function | Current authority behavior |
 | --- | --- |
-| `FilterTubeManagedAdminAuthority.canActorManageProfile(profilesV4, options)` | Shared runtime authority helper. Rejects child actors, missing targets, and sibling/unowned targets. Allows Default, a non-child actor managing itself, or an account whose id matches the target child's `parentProfileId`. |
+| `FilterTubeManagedAdminAuthority.canActorManageProfile(profilesV4, options)` | Shared runtime authority helper. Rejects child actors, missing target profiles, missing actor profiles, and sibling/unowned targets. Allows Default, a non-child actor managing itself, or an account whose id matches the target child's `parentProfileId`. |
 | `canActiveProfileManageProfile(profilesV4, targetProfileId)` | Dashboard wrapper that delegates to `FilterTubeManagedAdminAuthority.canActorManageProfile(...)` when the helper is loaded, preserving the prior inline fallback. |
 | `startManagedChildEdit(profileId, surface)` | Loads fresh profiles, requires the target to be a child profile, requires `canActiveProfileManageProfile(...)`, then requires `ensureProfileUnlocked(...)` for the active parent/account profile. |
-| `saveManagedChildSurface(surface, mutator)` | Requires an active managed-child edit target, reloads fresh profiles, reruns `canActiveProfileManageProfile(...)`, writes only the target child's selected surface, records local revision/history metadata, then reloads UI state. |
+| `saveManagedChildSurface(surface, mutator)` | Requires an active managed-child edit target, reloads fresh profiles, rejects a missing or non-child fresh target, reruns `canActiveProfileManageProfile(...)`, writes only the target child's selected surface, records local revision/history metadata, then reloads UI state. |
 | `localManagedEditPolicyRevisionStore(profile, scope)` | Reads the target child's last local managed edit revision for `main` or `kids`. |
 | `recordManagedChildLocalEditHistory(profile, report)` | Stores the accepted local edit revision and a protected redacted action-history row on the target child profile in the same V4 profile write. |
 | `recordManagedAdminAuthFailureHistory(profilesV4, targetProfileId, reason)` | Stores a protected `admin_session.failed_unlock` row on the target child profile when parent/admin unlock fails for managed child edit, history view/clear, viewing-space, or time-limit changes. |
@@ -57,6 +57,7 @@ Current source evidence in `js/managed_admin_authority.js` and
 | `non_child_self_edit_is_not_child_manage_mode` | Account profile | Same account profile | Not a child managed-edit target; use normal account settings paths. |
 | `locked_parent_requires_unlock` | Locked parent/account | Owned child profile | Rejected until parent/account unlock succeeds. |
 | `save_rechecks_fresh_authority` | Parent switched or child ownership changed after editor opened | Previous child target | Rejected during save. |
+| `save_rechecks_fresh_child_target` | Parent/admin save from stale edit state | Missing target or target that is no longer a child profile | Rejected during save before any profile surface mutation. |
 
 ## Hardening Requirements
 
@@ -99,6 +100,7 @@ runtime local managed edit sensitive-action re-auth gate: present for managed ch
 runtime local managed edit failed-attempt rate limit: present for tab-view unlock prompts and background session PIN auth
 runtime local managed edit failed-attempt rate limit durability: present for tab-view managed unlock prompts and background session PIN auth through profile.managedPolicyState.adminFailedUnlockRateLimit
 runtime managed-admin authority helper: present for local dashboard actor/target decisions, admin-session TTL, sensitive reauth, and dashboard failed-unlock window normalization
+runtime local managed edit fresh child target gate: present for saveManagedChildSurface before target surface mutation
 runtime behavior changed by this contract: yes
 ```
 
@@ -135,6 +137,12 @@ history, or a child PIN as authority. It only answers:
 
 This reduces the risk that extension UI, local-network management, and
 downstream app sync fork the parent/caregiver authority contract.
+
+The 2026-06-05 follow-up hardening also closes stale edit-state gaps before
+later local-network/P2P work relies on this helper. The shared helper rejects
+missing target and actor profiles before broad Default/admin decisions, and the
+dashboard save path rejects missing or no-longer-child targets after reloading
+fresh profile state and before mutating any child surface.
 
 The same 2026-06-05 hardening slice also makes background
 `FilterTube_SessionPinAuth` failed-attempt rate limiting durable. The verified

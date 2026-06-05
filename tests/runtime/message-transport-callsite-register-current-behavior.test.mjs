@@ -19,11 +19,11 @@ const sourceFingerprints = {
   'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
   'js/filter_logic.js': [3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'],
   'js/injector.js': [3593, 155830, '634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04'],
-  'js/managed_admin_authority.js': [157, 6669, '89e50ee150fe5dc6e069a8c52b39fab243a6563888d283e15f091775975ecfc2'],
+  'js/managed_admin_authority.js': [171, 7314, 'c9355520ba9779c0b94b67cf67a68c446b84ea4532995d83ef52a3e708a975aa'],
   'js/popup.js': [1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
   'js/seed.js': [1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
   'js/state_manager.js': [2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6'],
-  'js/tab-view.js': [14256, 662043, '2627d062b48e2cbaf5471bb72e1236852e351ef271e2c750c0abfa7faeb49674']
+  'js/tab-view.js': [14261, 662325, 'f7e2ee01219489d1e36af2fc9af06e09329a90be4c41caf1bcba0ce42be43ebb']
 };
 
 function read(file) {

@@ -5338,14 +5338,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             return false;
         }
         const fresh = await io.loadProfilesV4();
+        const profiles = safeObject(fresh.profiles);
+        const targetExists = Object.prototype.hasOwnProperty.call(profiles, profileId);
+        const profile = safeObject(profiles[profileId]);
+        if (!targetExists || getProfileType(fresh, profileId) !== 'child') {
+            managedChildEdit = null;
+            UIComponents.showToast('Managed child target is no longer available', 'error');
+            return false;
+        }
         if (!canActiveProfileManageProfile(fresh, profileId)) {
             managedChildEdit = null;
             UIComponents.showToast('Switch to the parent account to edit this child profile', 'error');
             return false;
         }
-        const profiles = safeObject(fresh.profiles);
-        const profile = safeObject(profiles[profileId]);
-        if (!profiles[profileId]) return false;
         const nextSurface = getProfileSurface(profile, surface);
         const result = await mutator(nextSurface, profile);
         if (result === false) return false;

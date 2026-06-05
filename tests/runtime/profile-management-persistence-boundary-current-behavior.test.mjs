@@ -131,10 +131,10 @@ test('profile management persistence audit document records current boundary and
     assert.ok(doc.includes(marker), `missing marker: ${marker}`);
   }
 
-  assert.match(methodGap, /repo-wide lexical callables: 6161/);
+  assert.match(methodGap, /repo-wide lexical callables: 6162/);
   assert.match(methodGap, /files with lexical accounting: 73/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 6161/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 6162/);
 
   assert.equal(profileSettingsUiFamilyDocs.length, 12);
   for (const familyDocPath of profileSettingsUiFamilyDocs) {
@@ -142,9 +142,9 @@ test('profile management persistence audit document records current boundary and
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 73/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 6161/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 6162/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 6161/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 6162/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     assert.match(familyDoc, /runtime behavior changed: no/);
     assert.match(familyDoc, /do not approve runtime\s+optimization/);
@@ -154,7 +154,7 @@ test('profile management persistence audit document records current boundary and
 test('profile management source fingerprints stay pinned', () => {
   const doc = read(auditDocPath);
   const expected = [
-    ['js/tab-view.js', 14256, 662043, '2627d062b48e2cbaf5471bb72e1236852e351ef271e2c750c0abfa7faeb49674'],
+    ['js/tab-view.js', 14261, 662325, 'f7e2ee01219489d1e36af2fc9af06e09329a90be4c41caf1bcba0ce42be43ebb'],
     ['js/popup.js', 1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
     ['js/io_manager.js', 2097, 100479, 'f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62'],
     ['js/background.js', 6773, 305166, 'b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5']
@@ -179,7 +179,7 @@ test('profile management source/effect block metrics stay pinned in the doc', ()
     popupSwitchToProfile: ['popup switchToProfile block', 48, 1659],
     tabCreateAccountHandler: ['tab-view create account handler block', 120, 5004],
     tabCreateChildHandler: ['tab-view create child handler block', 107, 4589],
-    tabSaveManagedChildSurface: ['tab-view saveManagedChildSurface block', 61, 2716],
+    tabSaveManagedChildSurface: ['tab-view saveManagedChildSurface block', 66, 2998],
     ioLoadSaveProfiles: ['io_manager load/save profiles block', 67, 2563],
     backgroundProfileStorageInvalidation: ['background profile storage invalidation block', 42, 1464]
   };
@@ -202,7 +202,7 @@ test('selected profile management token counts stay pinned', () => {
     ['tab-view applyLockGateIfNeeded tokens: 4', sources.tabView, 'applyLockGateIfNeeded', 4],
     ['tab-view scheduleAutoBackup tokens: 6', sources.tabView, 'scheduleAutoBackup', 6],
     ['tab-view profile_created tokens: 2', sources.tabView, 'profile_created', 2],
-    ['tab-view managedChildEdit tokens: 13', sources.tabView, 'managedChildEdit', 13],
+    ['tab-view managedChildEdit tokens: 14', sources.tabView, 'managedChildEdit', 14],
     ['tab-view unlockedProfiles tokens: 5', sources.tabView, 'unlockedProfiles', 5],
     ['tab-view clearProfileUnlockSession tokens: 7', sources.tabView, 'clearProfileUnlockSession', 7],
     ['tab-view allowMainViewing tokens: 4', sources.tabView, 'allowMainViewing', 4],
@@ -305,6 +305,9 @@ test('managed child save writes target surface locally with local revision histo
   const { tabSaveManagedChildSurface: block } = blocks();
 
   assert.match(block, /const profileId = normalizeString\(managedChildEdit\?\.profileId\)/);
+  assert.match(block, /const targetExists = Object\.prototype\.hasOwnProperty\.call\(profiles, profileId\)/);
+  assert.match(block, /getProfileType\(fresh, profileId\) !== 'child'/);
+  assert.match(block, /Managed child target is no longer available/);
   assert.match(block, /canActiveProfileManageProfile\(fresh, profileId\)/);
   assert.match(block, /const nextSurface = getProfileSurface\(profile, surface\)/);
   assert.match(block, /const nextProfile = setProfileSurface\(profile, surface, nextSurface\)/);

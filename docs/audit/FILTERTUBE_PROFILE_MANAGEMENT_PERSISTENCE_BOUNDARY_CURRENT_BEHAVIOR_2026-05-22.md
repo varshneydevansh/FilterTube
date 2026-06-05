@@ -18,7 +18,7 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/tab-view.js` | 14256 | 662043 | `2627d062b48e2cbaf5471bb72e1236852e351ef271e2c750c0abfa7faeb49674` |
+| `js/tab-view.js` | 14261 | 662325 | `f7e2ee01219489d1e36af2fc9af06e09329a90be4c41caf1bcba0ce42be43ebb` |
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/io_manager.js` | 2097 | 100479 | `f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62` |
 | `js/background.js` | 6773 | 305166 | `b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5` |
@@ -34,7 +34,7 @@ tab-view switchToProfile block: 46 lines, 1749 bytes
 popup switchToProfile block: 48 lines, 1659 bytes
 tab-view create account handler block: 120 lines, 5004 bytes
 tab-view create child handler block: 107 lines, 4589 bytes
-tab-view saveManagedChildSurface block: 61 lines, 2716 bytes
+tab-view saveManagedChildSurface block: 66 lines, 2998 bytes
 io_manager load/save profiles block: 67 lines, 2563 bytes
 background profile storage invalidation block: 42 lines, 1464 bytes
 ```
@@ -51,7 +51,7 @@ tab-view refreshProfilesUI tokens: 21
 tab-view applyLockGateIfNeeded tokens: 4
 tab-view scheduleAutoBackup tokens: 6
 tab-view profile_created tokens: 2
-tab-view managedChildEdit tokens: 13
+tab-view managedChildEdit tokens: 14
 tab-view unlockedProfiles tokens: 5
 tab-view clearProfileUnlockSession tokens: 7
 tab-view allowMainViewing tokens: 4
@@ -136,9 +136,9 @@ runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 73
-method semantic proof gap lexical callables covered: 6161
+method semantic proof gap lexical callables covered: 6162
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6161
+lexical callables requiring semantic proof before behavior changes: 6162
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
