@@ -241,7 +241,20 @@ Manual smoke scope by touched behavior:
 | settings/profile/storage | Mode/profile changes reprocess already-rendered cards without requiring a refresh; import/export and storage migration preserve list authority. |
 | release packaging | Built Chrome/Firefox/Opera packages include the intended source, manifests, UI shells, release notes, and optional Android mobile/tablet artifacts only when explicitly attached. |
 
-The `test:release` and `test:smoke` lanes keep this handoff visible by running
+Managed parent/caregiver transport changes also receive a second handoff from
+`npm run lanes:changed`:
+
+```text
+docs/audit/artifacts/managed-remote-delivery-smoke/template.json
+docs/audit/artifacts/managed-remote-delivery-smoke/verify-managed-smoke-artifact.mjs
+```
+
+This handoff is intentionally scoped to managed/Nanah/parent/time-limit/mailbox
+or local-network surfaces. One passing managed remote-delivery artifact proves
+only one transport slice; complete remote management remains gated until the
+readiness gate is satisfied across the required transport and app-parity rows.
+
+The `test:release` and `test:smoke` lanes keep the live YouTube handoff visible by running
 `tests/runtime/release-live-youtube-spa-smoke-boundary-current-behavior.test.mjs`.
 That test does not claim the manual smoke has passed; it prevents the template,
 runner, and missing-live-proof boundary from silently disappearing.
@@ -309,6 +322,7 @@ or uncovered required lanes remain `NO-GO`.
 | `LICENSE`, root `*.md` | `test:release`, `test:smoke` | Covers root legal text and top-level planning/recovery docs that can affect release review context or public project claims. |
 | `docs/*.md` outside `docs/audit/` | `test:release`, `test:smoke` | Covers product docs, release-facing architecture/behavior claims, and the audit-doc boundary that keeps proof files inside `docs/audit/`. |
 | `docs/audit/artifacts/release-live-youtube-spa-smoke/*.{json,mjs}` | `test:release`, `test:smoke` | Covers live-smoke templates, runners, verifiers, and future dated smoke artifacts. |
+| `docs/audit/artifacts/managed-remote-delivery-smoke/*.{json,mjs}` | `test:release`, `test:settings`, `test:smoke` | Covers managed parent/caregiver remote-delivery smoke templates, verifiers, and future dated transport-slice artifacts. |
 | `docs/audit/artifacts/empty-install-idle-probe.mjs` | `test:performance`, `test:smoke` | Covers the no-rule/no-work idle observer probe used as performance evidence. |
 | diagnostic, logging, console, no-work, cache, SPA, lag, active-work, active-rule, disabled-runtime, master-switch, or performance audit docs under `docs/audit/` | `test:performance`, `test:smoke` | Covers audit proof for production console gates, diagnostic logging budgets, empty-rule/no-work behavior, cache/SPA lag, active-rule gates, disabled-mode gates, and performance-risk boundaries even when only the proof doc changes. Match these as filename tokens only, so `SPA` does not accidentally classify unrelated words such as `DISPATCH`. |
 | code-burden, declutter, structural-burden, large-file, or large-source audit docs/tests under `docs/audit/` or `tests/runtime/` | `test:performance`, `test:smoke` | Covers maintainability pressure that can turn into runtime lag or risky optimizations, including the large-file guard for product-owned source files and workflow-owned lane files crossing 1000 lines. |
@@ -331,7 +345,7 @@ or uncovered required lanes remain `NO-GO`.
 | other YouTube surface fixtures under `tests/runtime/fixtures/` | `test:smoke` | Fixture changes must state which behavior changed and whether old behavior remains intentional; add a focused classifier row when a fixture belongs to a runtime lane not covered above. |
 
 The executable mapping in `scripts/test-lane-config.mjs` and
-`scripts/run-test-lane.mjs` is the source of truth.
+`scripts/run-test-lane.mjs` is the authoritative classifier.
 This table is the human-readable review copy.
 
 ## Objective Matrix Examples

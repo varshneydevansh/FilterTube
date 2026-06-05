@@ -16,6 +16,9 @@ import {
   LIVE_SMOKE_RUNNER_COMMAND,
   LIVE_SMOKE_REQUIRED_ROWS,
   LIVE_SMOKE_VERIFY_COMMAND,
+  MANAGED_REMOTE_DELIVERY_SMOKE_ARTIFACT_TEMPLATE,
+  MANAGED_REMOTE_DELIVERY_SMOKE_ARTIFACT_VERIFIER,
+  MANAGED_REMOTE_DELIVERY_SMOKE_REQUIRED_ROWS,
   MANUAL_YOUTUBE_SMOKE_LANE_REASONS,
   NON_PROOF_LANE,
   RUNTIME_FIXTURE_LANE_REASONS,
@@ -252,6 +255,17 @@ function formatLaneList(lanes) {
   return lanes.length ? lanes.map(lane => `test:${lane}`).join(', ') : 'none';
 }
 
+function requiresManagedRemoteDeliveryHandoff(result) {
+  const hasManagedLane = result.lanes.some(lane => lane === 'settings' || lane === 'release' || lane === 'smoke');
+  if (!hasManagedLane) return false;
+
+  return result.classifications.some(entry => (
+    /(?:^|\/)(?:js\/)?nanah/i.test(entry.file)
+    || /managed|parent|caregiver|time-limit|time_limit|local-network|local_network|mailbox/i.test(entry.file)
+    || entry.file.startsWith('docs/audit/artifacts/managed-remote-delivery-smoke/')
+  ));
+}
+
 function runLane(lane) {
   const config = LANES[lane];
   if (!config) {
@@ -311,6 +325,13 @@ function printClassification(result) {
     console.log(`    verifier: ${LIVE_SMOKE_ARTIFACT_VERIFIER}`);
     console.log(`    changeContext env: ${LIVE_SMOKE_CHANGE_CONTEXT_ENV.join(', ')}`);
     console.log(`    required rows: ${LIVE_SMOKE_REQUIRED_ROWS.join(', ')}`);
+    if (requiresManagedRemoteDeliveryHandoff(result)) {
+      console.log('  Managed remote delivery smoke artifact handoff:');
+      console.log(`    template: ${MANAGED_REMOTE_DELIVERY_SMOKE_ARTIFACT_TEMPLATE}`);
+      console.log(`    verifier: ${MANAGED_REMOTE_DELIVERY_SMOKE_ARTIFACT_VERIFIER}`);
+      console.log(`    required rows: ${MANAGED_REMOTE_DELIVERY_SMOKE_REQUIRED_ROWS.join(', ')}`);
+      console.log('    readiness: one passing transport artifact proves only that transport slice; complete remote management remains gated.');
+    }
   }
 
   const {

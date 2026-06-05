@@ -56,6 +56,10 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(runner, /LIVE_SMOKE_ARTIFACT_VERIFIER/);
   assert.match(runner, /LIVE_SMOKE_REQUIRED_ROWS/);
   assert.match(runner, /Live smoke artifact handoff/);
+  assert.match(runner, /MANAGED_REMOTE_DELIVERY_SMOKE_ARTIFACT_TEMPLATE/);
+  assert.match(runner, /MANAGED_REMOTE_DELIVERY_SMOKE_ARTIFACT_VERIFIER/);
+  assert.match(runner, /MANAGED_REMOTE_DELIVERY_SMOKE_REQUIRED_ROWS/);
+  assert.match(runner, /Managed remote delivery smoke artifact handoff/);
   assert.match(runner, /RUNTIME_FIXTURE_LANE_REASONS/);
   assert.match(runner, /function runtimeFixtureRequirement\(result\)/);
   assert.match(runner, /Runtime fixture\/test proof files in this change/);
@@ -93,6 +97,9 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
     matrix,
     /includes the npm runner command, npm verifier command, structured\s+live-smoke template, lower-level verifier command, and required SPA row ids/
   );
+  assert.match(matrix, /Managed parent\/caregiver transport changes also receive a second handoff/);
+  assert.match(matrix, /docs\/audit\/artifacts\/managed-remote-delivery-smoke\/template\.json/);
+  assert.match(matrix, /[Oo]ne passing managed remote-delivery artifact proves\s+only one transport slice/);
   assert.match(matrix, /reports whether a changed\s+`docs\/audit\/` proof file is present/);
   assert.match(matrix, /fails\s+when source, release, asset, or product-doc paths changed without a matching\s+`docs\/audit\/` proof file/);
   assert.match(matrix, /fails when changed\s+`docs\/audit\/` proof does not share\s+at least one non-smoke lane/);
@@ -195,6 +202,7 @@ test('classifier output surfaces manual YouTube smoke for user-facing runtime an
   assert.match(runtime.stdout, /changeContext env: FILTERTUBE_LOGICAL_CHANGE_TYPE, FILTERTUBE_REQUIRED_LANES, FILTERTUBE_AUTOMATED_PROOF_COMMAND, FILTERTUBE_AUTOMATED_PROOF_STATUS=passed, FILTERTUBE_AUTOMATED_PROOF_SUMMARY, FILTERTUBE_AUTOMATED_PROOF_LANES/);
   assert.match(runtime.stdout, /FT-LIVE-SPA-00-home-to-search/);
   assert.match(runtime.stdout, /FT-LIVE-SPA-05-cache-repeat-navigation/);
+  assert.doesNotMatch(runtime.stdout, /Managed remote delivery smoke artifact handoff:/);
   assert.match(runtime.stdout, /Audit proof update expected before commit:/);
   assert.match(runtime.stdout, /Add or update a relevant docs\/audit\/ proof file for:/);
   assert.match(runtime.stdout, /- js\/seed\.js/);
@@ -214,7 +222,37 @@ test('classifier output surfaces manual YouTube smoke for user-facing runtime an
   assert.match(releaseOnly.stdout, /Live smoke artifact handoff:/);
   assert.match(releaseOnly.stdout, /runner: npm run smoke:youtube/);
   assert.match(releaseOnly.stdout, /verify: npm run smoke:youtube:verify/);
+  assert.doesNotMatch(releaseOnly.stdout, /Managed remote delivery smoke artifact handoff:/);
   assert.doesNotMatch(releaseOnly.stdout, /Runtime fixture proof expected when behavior changes:/);
+});
+
+test('classifier output surfaces managed remote delivery smoke handoff for Nanah and managed artifacts', () => {
+  const nanahRuntime = spawnSync(process.execPath, [
+    'scripts/run-test-lane.mjs',
+    '--classify',
+    'js/nanah_sync_adapter.js'
+  ], {
+    cwd: repoRoot,
+    encoding: 'utf8'
+  });
+  const managedArtifact = spawnSync(process.execPath, [
+    'scripts/run-test-lane.mjs',
+    '--classify',
+    'docs/audit/artifacts/managed-remote-delivery-smoke/template.json'
+  ], {
+    cwd: repoRoot,
+    encoding: 'utf8'
+  });
+
+  for (const result of [nanahRuntime, managedArtifact]) {
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /Managed remote delivery smoke artifact handoff:/);
+    assert.match(result.stdout, /template: docs\/audit\/artifacts\/managed-remote-delivery-smoke\/template\.json/);
+    assert.match(result.stdout, /verifier: node docs\/audit\/artifacts\/managed-remote-delivery-smoke\/verify-managed-smoke-artifact\.mjs docs\/audit\/artifacts\/managed-remote-delivery-smoke\/<artifact>\.json/);
+    assert.match(result.stdout, /FT-MANAGED-REMOTE-00-trust-link-preflight/);
+    assert.match(result.stdout, /FT-MANAGED-REMOTE-09-no-work-idle/);
+    assert.match(result.stdout, /one passing transport artifact proves only that transport slice/);
+  }
 });
 
 test('classifier output surfaces runtime fixture proof lane relevance', () => {

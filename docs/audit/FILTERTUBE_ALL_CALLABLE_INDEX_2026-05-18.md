@@ -21,9 +21,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 73
-method semantic proof gap lexical callables covered: 6162
+method semantic proof gap lexical callables covered: 6163
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6162
+lexical callables requiring semantic proof before behavior changes: 6163
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -68,7 +68,7 @@ changes remain blocked by the implementation gate.
 
 ```text
 tracked JS/JSX/MJS files: 73
-repo-wide lexical callables: 6162
+repo-wide lexical callables: 6163
 ```
 
 | Family | Files | Lexical callables | Boundary |
@@ -79,7 +79,7 @@ repo-wide lexical callables: 6162
 | Generated/quarantined UI | 6 | 147 | Generated source/output and `js/layout.js`; freshness and quarantine checks required. |
 | Vendor bundles | 2 | 279 | API/provenance boundary, not product-owned method behavior. |
 | Build/sync scripts | 4 | 58 | Release/package/native-sync behavior; separate release fixtures required. |
-| Audit/test lane scripts | 3 | 78 | Change-safety classifier, drift guard, and lane runner proof; workflow behavior, not product runtime. |
+| Audit/test lane scripts | 3 | 79 | Change-safety classifier, drift guard, and lane runner proof; workflow behavior, not product runtime. |
 | Website routes/components/config | 26 | 123 | Public website callable surface; public-claim and asset-budget fixtures required. |
 
 ## File-Level Index
@@ -127,7 +127,7 @@ repo-wide lexical callables: 6162
 | `scripts/audit-proof-drift.mjs` | Audit/test lane scripts | 19 | audit lane counted |
 | `scripts/build-extension-ui.mjs` | Build/sync scripts | 2 | build/website counted |
 | `scripts/build-nanah-vendor.mjs` | Build/sync scripts | 4 | build/website counted |
-| `scripts/run-test-lane.mjs` | Audit/test lane scripts | 59 | audit lane counted |
+| `scripts/run-test-lane.mjs` | Audit/test lane scripts | 60 | audit lane counted |
 | `scripts/sync-native-runtime.mjs` | Build/sync scripts | 1 | build/website counted |
 | `scripts/test-lane-config.mjs` | Audit/test lane scripts | 0 | audit lane counted |
 | `src/extension-shell/popup.jsx` | Generated/quarantined UI | 3 | generated source boundary |
@@ -209,5 +209,5 @@ That fixture pins:
 
 - all tracked JS/JSX/MJS files are listed,
 - documented callable counts match current lexical source,
-- documented family totals sum to 6,162,
+- documented family totals sum to 6,163,
 - no ignored raw captures or generated package output are part of this index.

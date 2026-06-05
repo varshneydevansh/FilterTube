@@ -27,9 +27,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 73
-method semantic proof gap lexical callables covered: 6162
+method semantic proof gap lexical callables covered: 6163
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6162
+lexical callables requiring semantic proof before behavior changes: 6163
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -59,10 +59,10 @@ lexical callables requiring semantic proof before behavior changes: 5836
 
 ```text
 tracked JS/JSX/MJS files: 73
-repo-wide lexical callables: 6162
+repo-wide lexical callables: 6163
 files with lexical accounting: 73
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6162
+lexical callables requiring semantic proof before behavior changes: 6163
 required semantic proof fields: 8
 selected release hot-path semantic triage rows: 13
 selected visual-writer semantic triage rows: 8
@@ -114,8 +114,8 @@ Source inputs:
 
 | Convergence row | Current source-backed finding | Risk if treated as implementation-ready now |
 | --- | --- | --- |
-| `method_convergence_repo_census` | 73 tracked JS/JSX/MJS files and 6,162 lexical callables are visible to the audit. | Visibility can be mistaken for behavior proof. |
-| `method_convergence_zero_complete_files` | 0 files have complete per-callable semantic proof; 6,162 lexical callables still require proof before behavior changes. | A behavior patch can touch an unproved callable path while tests only cover a selected slice. |
+| `method_convergence_repo_census` | 73 tracked JS/JSX/MJS files and 6,163 lexical callables are visible to the audit. | Visibility can be mistaken for behavior proof. |
+| `method_convergence_zero_complete_files` | 0 files have complete per-callable semantic proof; 6,163 lexical callables still require proof before behavior changes. | A behavior patch can touch an unproved callable path while tests only cover a selected slice. |
 | `method_convergence_family_weight` | 8 families are represented: hot page/background runtime, content helper runtime, UI/settings runtime, generated/quarantined UI, vendor bundles, build/sync scripts, and website routes/components/config. | Runtime, build, vendor, website, and generated-output methods need different proof types and cannot share one cleanup assumption. |
 | `method_convergence_hot_runtime_dominance` | Hot page/background runtime owns 3,172 lexical callables, including 1,203 in `content_bridge.js`, 469 in `background.js`, and 431 in `dom_fallback.js`. | YouTube lag and false-hide regressions are concentrated in hot files with many interacting callables. |
 | `method_convergence_selected_triage_not_closure` | 149 selected semantic triage rows cover release hot paths, visual writers, collaborator cache/writer/menu guards, native dropdowns, JSON active-work predicates, content/category fields, mutation persistence, DOM fallback traversal, content-bridge lifecycle, background cache refresh, and quick-block lifecycle. | Selected hot-path proof can hide the fact that repo-wide semantic closure is still 0 files. |
@@ -128,7 +128,7 @@ Source inputs:
 ```text
 73 tracked JS/JSX/MJS files
         |
-        +--> 6,162 lexical callables
+        +--> 6,163 lexical callables
         |       +--> 3,172 hot page/background runtime
         |       +--> 2,990 UI, helper, generated, vendor, build, audit-lane, website
         |
@@ -146,7 +146,7 @@ parity, rollback, native/release, and public-claim boundaries.
 
 ```mermaid
 flowchart TD
-  A["73 tracked JS/JSX/MJS files"] --> B["6,162 lexical callables"]
+  A["73 tracked JS/JSX/MJS files"] --> B["6,163 lexical callables"]
   B --> C["3,172 hot page/background runtime callables"]
   B --> D["2,990 UI, helper, generated, vendor, build, audit-lane, website callables"]
   A --> E["149 selected semantic triage rows"]
@@ -267,7 +267,7 @@ have all of these fields pinned:
 | `scripts/audit-proof-drift.mjs` | Audit/test lane scripts | 19 | `semantic proof incomplete` | Audit drift source-fingerprint scope, lane ownership, and stale-proof negative fixtures remain incomplete. |
 | `scripts/build-extension-ui.mjs` | Build/sync scripts | 2 | `semantic proof incomplete` | UI shell build freshness, stale-output, and failure contract proof remain incomplete. |
 | `scripts/build-nanah-vendor.mjs` | Build/sync scripts | 4 | `semantic proof incomplete` | Vendor build source/version/hash and stale-output proof remain incomplete. |
-| `scripts/run-test-lane.mjs` | Audit/test lane scripts | 59 | `semantic proof incomplete` | Changed-path classification, audit-proof relevance, manual-smoke handoff, and dirty-path guard proof remain incomplete. |
+| `scripts/run-test-lane.mjs` | Audit/test lane scripts | 60 | `semantic proof incomplete` | Changed-path classification, audit-proof relevance, manual-smoke handoff, managed remote-delivery smoke handoff, and dirty-path guard proof remain incomplete. |
 | `scripts/sync-native-runtime.mjs` | Build/sync scripts | 1 | `semantic proof incomplete` | Native app repo contract, manifest freshness, and status propagation proof remain incomplete. |
 | `scripts/test-lane-config.mjs` | Audit/test lane scripts | 0 | `semantic proof incomplete` | Lane ownership taxonomy, future file-family drift, and unclassified-path negative proof remain incomplete. |
 | `src/extension-shell/popup.jsx` | Generated/quarantined UI | 3 | `semantic proof incomplete` | Authoring-to-generated popup parity and package freshness proof remain incomplete. |
@@ -784,7 +784,7 @@ triage rows as complete per-callable authority.
 ```text
 current-source method gap freshness date: 2026-05-30
 tracked JS/JSX/MJS files still covered: 73
-repo-wide lexical callables still requiring semantic proof: 6162
+repo-wide lexical callables still requiring semantic proof: 6163
 files with complete per-callable semantic proof: 0
 latest full runtime proof: broad audit backlog 4754 tests, 4661 pass, 93 fail
 method semantic completion from freshness rerun: NO-GO

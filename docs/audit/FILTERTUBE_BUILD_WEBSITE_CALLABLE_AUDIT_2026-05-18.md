@@ -21,10 +21,10 @@ surfaces even when they do not contain callables.
 
 | Family | Files | Lexical callables | Public authority |
 | --- | ---: | ---: | --- |
-| Build and sync scripts | 7 | 68 | Extension ZIPs, generated UI shell, vendor Nanah/QR bundles, native app runtime sync, GitHub release body/assets, focused test-lane runner, declarative test-lane config, lane-owned audit proof drift guard |
+| Build and sync scripts | 7 | 69 | Extension ZIPs, generated UI shell, vendor Nanah/QR bundles, native app runtime sync, GitHub release body/assets, focused test-lane runner, declarative test-lane config, lane-owned audit proof drift guard |
 | Website app routes | 9 | 19 | Public metadata, downloads page, privacy/terms policy, sitemap, robots, platform detail pages |
 | Website components | 15 | 54 | Public platform copy, browser links, footer/header/navigation, theme/scene runtime, animation/reveal behavior, hero media control |
-| Total | 31 | 141 | Public release and website truth boundary |
+| Total | 31 | 142 | Public release and website truth boundary |
 
 ## Accounted Files
 
@@ -34,7 +34,7 @@ surfaces even when they do not contain callables.
 | `scripts/audit-proof-drift.mjs` | 12 | `currentSourceProofs`, `laneOwnedProofFiles`, `defaultAuditProofFiles`, `collectProofDrift`, `main` |
 | `scripts/build-extension-ui.mjs` | 2 | `ensureOutputDirectories`, `bundleAll` |
 | `scripts/build-nanah-vendor.mjs` | 4 | `buildQrcodeBundle`, `buildNanahBundle`, `main` |
-| `scripts/run-test-lane.mjs` | 21 | `classifyPaths`, `auditProofRequirement`, `runtimeFixtureRequirement`, `changedPathsFromGit`, `newChangedPaths`, `changedPathContentSnapshot`, `changedPathsWithSnapshotDrift`, `snapshotFileContent`, `formatLaneList`, `laneNames`, `validateLaneFiles`, `runNode`, `runLane`, `runAuditDrift`, `printClassification`, `printList`, `main` |
+| `scripts/run-test-lane.mjs` | 22 | `classifyPaths`, `auditProofRequirement`, `runtimeFixtureRequirement`, `changedPathsFromGit`, `newChangedPaths`, `changedPathContentSnapshot`, `changedPathsWithSnapshotDrift`, `snapshotFileContent`, `formatLaneList`, `requiresManagedRemoteDeliveryHandoff`, `laneNames`, `validateLaneFiles`, `runNode`, `runLane`, `runAuditDrift`, `printClassification`, `printList`, `main` |
 | `scripts/sync-native-runtime.mjs` | 0 | top-level native repo sync authority |
 | `scripts/test-lane-config.mjs` | 0 | declarative lane matrix and file classification data |
 | `website/app/[slug]/page.js` | 3 | `generateStaticParams`, `generateMetadata`, `DetailPage` |
@@ -216,7 +216,7 @@ tests/runtime/build-website-callable-current-behavior.test.mjs
 They pin:
 
 - 31 accounted build/website files.
-- 141 lexical build/website callables.
+- 142 lexical build/website callables.
 - public surfaces for release scripts, vendor/native sync, website app routes,
   website components, and public claim data.
 - high-risk source patterns for README mutation, non-atomic GitHub release,
