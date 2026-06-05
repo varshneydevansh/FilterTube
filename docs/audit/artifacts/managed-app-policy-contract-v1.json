@@ -4,7 +4,7 @@
   "generated": "2026-06-04",
   "owner": "extension_upstream_policy_contract",
   "runtimeBehaviorChanged": false,
-  "appSyncStatus": "app_manifest_contract_helpers_and_android_time_entry_wiring_present_ios_pending",
+  "appSyncStatus": "extension_contract_updated_native_sync_pending",
   "artifact": {
     "sourcePath": "docs/audit/artifacts/managed-app-policy-contract-v1.json",
     "appDestination": "packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json",
@@ -36,12 +36,14 @@
       "account"
     ],
     "protectedProfileTypes": [
-      "child"
+      "child",
+      "account_when_managed_by_default"
     ],
     "requiredBoundaries": [
       "child_pin_is_not_admin_authority",
       "sibling_profiles_cannot_manage_each_other",
-      "parent_account_must_be_bound_to_target_child",
+      "parent_account_must_be_bound_to_child_target",
+      "default_master_may_manage_independent_protected_accounts",
       "admin_session_ttl_required_for_sensitive_actions"
     ]
   },

@@ -38,7 +38,7 @@ or iOS enforcement is complete yet.
   "generated": "2026-06-04",
   "owner": "extension_upstream_policy_contract",
   "runtimeBehaviorChanged": false,
-  "appSyncStatus": "app_manifest_contract_helpers_and_android_time_entry_wiring_present_ios_pending",
+  "appSyncStatus": "extension_contract_updated_native_sync_pending",
   "artifact": {
     "sourcePath": "docs/audit/artifacts/managed-app-policy-contract-v1.json",
     "appDestination": "packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json",
@@ -70,12 +70,14 @@ or iOS enforcement is complete yet.
       "account"
     ],
     "protectedProfileTypes": [
-      "child"
+      "child",
+      "account_when_managed_by_default"
     ],
     "requiredBoundaries": [
       "child_pin_is_not_admin_authority",
       "sibling_profiles_cannot_manage_each_other",
-      "parent_account_must_be_bound_to_target_child",
+      "parent_account_must_be_bound_to_child_target",
+      "default_master_may_manage_independent_protected_accounts",
       "admin_session_ttl_required_for_sensitive_actions"
     ]
   },
@@ -258,14 +260,22 @@ device binding, and signature checks pass.
 
 ## Current Gap
 
-The extension contract is now explicit, test-pinned, and available as a JSON
-artifact at `docs/audit/artifacts/managed-app-policy-contract-v1.json`. The app
-runtime sync manifest copies that artifact into
+The extension contract is now explicit and available as a JSON artifact at
+`docs/audit/artifacts/managed-app-policy-contract-v1.json`. The app runtime
+sync manifest declares the copy target
 `packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json`.
-The same manifest also copies the extension-owned managed Nanah signed-send and
-pull-on-open helper sources into `packages/extension-source/upstream/js/` so the
-downstream app repo can track the exact helper contracts without treating them
-as native runtime authority.
+After this protected-account contract update, the sibling app repo must run the
+native runtime sync before any app parity claim uses the copied artifact as
+current. The same manifest also copies the extension-owned managed Nanah
+signed-send and pull-on-open helper sources into
+`packages/extension-source/upstream/js/` so the downstream app repo can track
+the exact helper contracts without treating them as native runtime authority.
+
+The contract now treats protected profiles as child profiles plus independent
+account profiles when Default/Master is the managing authority. Downstream apps
+must preserve that distinction: a parent account can manage its bound child
+profiles, while Default/Master can manage independent protected accounts
+without turning a child PIN or sibling account into admin authority.
 
 Android now has a native model and Activity runtime proof that preserves
 `managedPolicyState`, `managedActionHistory`, and `settings.timeLimitPolicy`
