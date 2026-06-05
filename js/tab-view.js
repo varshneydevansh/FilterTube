@@ -9341,6 +9341,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         return null;
     }
 
+    function hasRevisionBoundManagedPolicyDetails(details) {
+        const root = safeObject(details);
+        const envelope = safeObject(root.managedEnvelope);
+        const signedFields = safeObject(safeObject(envelope.integrity).signedFields);
+        return root.type === 'managed_policy'
+            && envelope.type === 'filtertube_managed_policy'
+            && Number.isInteger(envelope.revision)
+            && envelope.revision > 0
+            && normalizeString(envelope.policyHash)
+            && normalizeString(envelope.integrity?.signature)
+            && signedFields.revision === envelope.revision
+            && signedFields.policyHash === envelope.policyHash;
+    }
+
     async function ensureNanahIncomingAuth(portable, scope, { trustedLink = null, details = null, targetProfile = null } = {}) {
         const normalizedScope = normalizeString(scope).toLowerCase();
         const io = window.FilterTubeIO || {};
@@ -9361,9 +9375,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             && trusted
             && trusted.linkType === 'managed_link'
             && normalizeString(trusted.localRole) === 'replica'
+            && normalizeString(trusted.remoteRole) === 'source'
             && (normalizeString(nanahSessionState.remoteRole) || normalizeString(trusted.remoteRole)) === 'source'
-            && normalizeString(safeObject(details).authorityMode || safeObject(trusted.policy).decisionMode) !== 'peer'
+            && normalizeString(safeObject(details).authorityMode) !== 'peer'
+            && normalizeString(safeObject(trusted.policy).decisionMode) !== 'peer'
             && getNanahLockedChildMode(safeObject(trusted.policy).lockedChildMode, 'require_unlock') === 'allow_trusted_updates'
+            && hasRevisionBoundManagedPolicyDetails(details)
         );
 
         if (requiresWholeAccount && localActiveId !== 'default') {

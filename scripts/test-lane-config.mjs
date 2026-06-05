@@ -297,6 +297,7 @@ export const LANES = Object.freeze({
       'tests/runtime/list-mode-transition-persistence-boundary-current-behavior.test.mjs',
       'tests/runtime/import-export-nanah-authority-current-behavior.test.mjs',
       'tests/runtime/managed-parent-authority-inventory-current-behavior.test.mjs',
+      'tests/runtime/managed-locked-child-revision-gate-current-behavior.test.mjs',
       'tests/runtime/managed-policy-schema-revision-contract-current-behavior.test.mjs',
       'tests/runtime/managed-child-local-authority-current-behavior.test.mjs',
       'tests/runtime/local-network-discovery-authority-boundary-current-behavior.test.mjs',

@@ -184,7 +184,7 @@ the surface connected to a focused lane.
 | code-burden growth | `test:performance` keeps the code-burden declutter boundary in lane, including the 1000-line product-owned source guard and near-threshold file list. |
 | source-locus optimization proof | `test:performance` keeps `first-optimization-source-locus-callable-anchor-boundary-current-behavior` in lane, so stale anchors cannot silently approve optimization or metric-collector work. |
 | repo-wide callable/method census | `test:smoke` keeps `all-callable-index-current-behavior` in lane so broad callable count drift, method semantic proof-gap counts, and generated/build/test-lane callable deltas stay visible before release. |
-| settings | `test:settings` keeps settings-mode, settings source/effect, claim-register authority, compiled-settings field/register proof, content-control alias mutation, refresh fanout, cross-context consumers, dirty-key/key-parity/join proof, settings-refresh optimization readiness/candidate/evidence proof, compiled-cache, import/export, and state-manager tests in lane. |
+| settings | `test:settings` keeps settings-mode, settings source/effect, claim-register authority, compiled-settings field/register proof, content-control alias mutation, refresh fanout, cross-context consumers, dirty-key/key-parity/join proof, settings-refresh optimization readiness/candidate/evidence proof, compiled-cache, import/export, state-manager, and managed locked-child revision-gate tests in lane. |
 | release packaging | `test:release` keeps package parity, public release surface, audit proof directory boundary, live-smoke boundary, and artifact claim tests in lane. |
 
 ## User-Reported Regression Anchors

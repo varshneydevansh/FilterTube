@@ -27,9 +27,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 72
-method semantic proof gap lexical callables covered: 6142
+method semantic proof gap lexical callables covered: 6143
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6142
+lexical callables requiring semantic proof before behavior changes: 6143
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -59,10 +59,10 @@ lexical callables requiring semantic proof before behavior changes: 5836
 
 ```text
 tracked JS/JSX/MJS files: 72
-repo-wide lexical callables: 6142
+repo-wide lexical callables: 6143
 files with lexical accounting: 72
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6142
+lexical callables requiring semantic proof before behavior changes: 6143
 required semantic proof fields: 8
 selected release hot-path semantic triage rows: 13
 selected visual-writer semantic triage rows: 8
@@ -130,7 +130,7 @@ Source inputs:
         |
         +--> 6,142 lexical callables
         |       +--> 3,172 hot page/background runtime
-        |       +--> 2,970 UI, helper, generated, vendor, build, audit-lane, website
+        |       +--> 2,971 UI, helper, generated, vendor, build, audit-lane, website
         |
         +--> 149 selected semantic triage rows
         +--> 4 rejected closure candidates
@@ -148,7 +148,7 @@ parity, rollback, native/release, and public-claim boundaries.
 flowchart TD
   A["72 tracked JS/JSX/MJS files"] --> B["6,142 lexical callables"]
   B --> C["3,172 hot page/background runtime callables"]
-  B --> D["2,970 UI, helper, generated, vendor, build, audit-lane, website callables"]
+  B --> D["2,971 UI, helper, generated, vendor, build, audit-lane, website callables"]
   A --> E["149 selected semantic triage rows"]
   A --> F["4 rejected closure candidates"]
   C --> G["0 complete per-callable proof files"]
@@ -215,7 +215,7 @@ have all of these fields pinned:
 | --- | ---: | ---: | --- |
 | Hot page/background runtime | 9 | 3172 | `semantic proof incomplete` |
 | Content helper runtime | 9 | 348 | `semantic proof incomplete` |
-| UI/settings runtime | 13 | 1937 | `semantic proof incomplete` |
+| UI/settings runtime | 13 | 1938 | `semantic proof incomplete` |
 | Generated/quarantined UI | 6 | 147 | `semantic proof incomplete` |
 | Vendor bundles | 2 | 279 | `semantic proof incomplete` |
 | Build/sync scripts | 4 | 58 | `semantic proof incomplete` |
@@ -257,7 +257,7 @@ have all of these fields pinned:
 | `js/settings_shared.js` | UI/settings runtime | 43 | `semantic proof incomplete` | Shared save/refresh semantics, profile/list-mode inputs, and caller proof remain incomplete. |
 | `js/shared/identity.js` | Content helper runtime | 92 | `semantic proof incomplete` | Identity normalization, handle/name/UC confidence, and JSON/DOM fallback parity proof remain incomplete. |
 | `js/state_manager.js` | UI/settings runtime | 155 | `semantic proof incomplete` | Settings save, profile mutation, cache revision, backup, and broadcast proof remain incomplete. |
-| `js/tab-view.js` | UI/settings runtime | 1039 | `semantic proof incomplete` | Dashboard profile/list-mode/Nanah/import/export/release-note action proof remains incomplete. |
+| `js/tab-view.js` | UI/settings runtime | 1040 | `semantic proof incomplete` | Dashboard profile/list-mode/Nanah/import/export/release-note action proof remains incomplete. |
 | `js/ui-shell/popup-shell.js` | Generated/quarantined UI | 42 | `semantic proof incomplete` | Generated output freshness, mount failure, package parity, and source/output hash proof remain incomplete. |
 | `js/ui-shell/tab-view-decor.js` | Generated/quarantined UI | 41 | `semantic proof incomplete` | Generated output freshness, ambient UI behavior, and package parity proof remain incomplete. |
 | `js/ui_components.js` | UI/settings runtime | 64 | `semantic proof incomplete` | Modal/portal lifecycle, row controls, and DOM ownership proof remain incomplete. |
@@ -783,7 +783,7 @@ triage rows as complete per-callable authority.
 ```text
 current-source method gap freshness date: 2026-05-30
 tracked JS/JSX/MJS files still covered: 72
-repo-wide lexical callables still requiring semantic proof: 6142
+repo-wide lexical callables still requiring semantic proof: 6143
 files with complete per-callable semantic proof: 0
 latest full runtime proof: broad audit backlog 4754 tests, 4661 pass, 93 fail
 method semantic completion from freshness rerun: NO-GO
