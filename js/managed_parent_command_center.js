@@ -175,7 +175,8 @@
                 limitedCount: 0,
                 remoteScopeCount: 0,
                 historyRowCount: 0,
-                protectedRowCount: 0
+                protectedRowCount: 0,
+                remoteConflictCount: 0
             };
         }
         const h = makeHelpers(helpers);
@@ -213,6 +214,7 @@
                 remoteScopeCount: summary.remoteScopeCount,
                 historyRowCount: summary.historyRowCount,
                 protectedRowCount: summary.protectedRowCount,
+                remoteConflictCount: summary.remoteConflictCount || 0,
                 latestActionLabel,
                 actionIntents: buildManagedCommandCenterActionIntents(profileId, timePolicy)
             });
@@ -229,7 +231,8 @@
             limitedCount: acc.limitedCount + (row.timeLimited ? 1 : 0),
             remoteScopeCount: acc.remoteScopeCount + row.remoteScopeCount,
             historyRowCount: acc.historyRowCount + row.historyRowCount,
-            protectedRowCount: acc.protectedRowCount + row.protectedRowCount
+            protectedRowCount: acc.protectedRowCount + row.protectedRowCount,
+            remoteConflictCount: acc.remoteConflictCount + row.remoteConflictCount
         }), {
             rows,
             bulkActionIntents: buildManagedCommandCenterBulkActionIntents(rows),
@@ -237,7 +240,8 @@
             limitedCount: 0,
             remoteScopeCount: 0,
             historyRowCount: 0,
-            protectedRowCount: 0
+            protectedRowCount: 0,
+            remoteConflictCount: 0
         });
     }
 
@@ -344,7 +348,7 @@
                 item.viewingAccess,
                 item.timeLimit,
                 item.syncTargetLabel,
-                `${item.syncLabel} | ${item.historyRowCount} history rows | latest ${item.latestActionLabel}`
+                `${item.syncLabel} | ${item.historyRowCount} history rows | ${item.remoteConflictCount || 0} conflicts | latest ${item.latestActionLabel}`
             ]) {
                 const cell = document.createElement('span');
                 cell.textContent = text;

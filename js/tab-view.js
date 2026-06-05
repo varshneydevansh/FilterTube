@@ -3094,6 +3094,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const MANAGED_REMOTE_FAILED_ATTEMPT_SCHEMA = 'filtertube_managed_remote_failed_attempt_rate_limit';
     const MANAGED_REMOTE_FAILED_ATTEMPT_LIMIT = 20;
     const MANAGED_REMOTE_FAILED_ATTEMPT_WINDOW_MS = 10 * 60 * 1000;
+    const MANAGED_REMOTE_POLICY_CONFLICT_SCHEMA = 'filtertube_managed_remote_policy_conflict';
+    const MANAGED_REMOTE_POLICY_CONFLICT_LIMIT = 100;
+    const MANAGED_REMOTE_POLICY_CONFLICT_REASONS = new Set([
+        'equal_revision_hash_conflict',
+        'stale_revision',
+        'link_revoked',
+        'key_revoked',
+        'stale_pairing',
+        'duplicate_source_device_id'
+    ]);
     const ManagedAdminAuthority = window.FilterTubeManagedAdminAuthority || null;
     const profileUnlockSessions = new Map();
     const managedAdminFailedUnlocks = new Map();
@@ -5000,6 +5010,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const managedState = safeObject(profile?.managedPolicyState);
         const localEdits = safeObject(managedState.localManagedEdits);
         const remotePolicies = safeObject(managedState.remoteManagedPolicies);
+        const remotePolicyConflicts = safeObject(managedState.remotePolicyConflicts);
         const localLabels = ['main', 'kids']
             .map(scope => managedPolicyRevisionLabel(localEdits[scope], scope === 'kids' ? 'Kids' : 'Main'))
             .filter(Boolean);
@@ -5021,6 +5032,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const historyRows = getManagedActionHistoryRows(profile);
         const protectedRows = historyRows.filter(managedActionHistoryRowIsProtected);
         const latestRow = safeObject(historyRows[historyRows.length - 1]);
+        const conflictRows = Object.values(remotePolicyConflicts)
+            .map(safeObject)
+            .filter(row => row.schema === MANAGED_REMOTE_POLICY_CONFLICT_SCHEMA);
         return {
             localLabels,
             remoteLinkCount,
@@ -5028,6 +5042,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             latestRemoteRevision,
             historyRowCount: historyRows.length,
             protectedRowCount: protectedRows.length,
+            remoteConflictCount: conflictRows.length,
             latestResult: normalizeString(latestRow.result),
             latestScope: normalizeString(latestRow.scope)
         };
@@ -5051,6 +5066,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ? `, latest ${summary.latestResult}/${summary.latestScope}`
                 : '';
             parts.push(`History: ${summary.historyRowCount} ${rowLabel}, ${summary.protectedRowCount} protected${latest}`);
+        }
+        if (summary.remoteConflictCount) {
+            parts.push(`Remote conflicts: ${summary.remoteConflictCount}`);
         }
         return parts.length
             ? `Managed status: ${parts.join(' | ')}`
@@ -5304,6 +5322,74 @@ document.addEventListener('DOMContentLoaded', async () => {
         return accepted ? 'remote_policy.accept' : (conflict ? 'remote_policy.conflict' : 'remote_policy.reject');
     }
 
+    function isManagedRemotePolicyConflictReason(reason) {
+        return MANAGED_REMOTE_POLICY_CONFLICT_REASONS.has(normalizeString(reason));
+    }
+
+    function buildManagedRemotePolicyConflictRecord({ envelope, reason, transport, trustedLinkId, targetProfileId, scope, now }) {
+        const root = safeObject(envelope);
+        const normalizedReason = normalizeString(reason) || 'validation_failed';
+        if (!isManagedRemotePolicyConflictReason(normalizedReason)) return null;
+        const linkId = normalizeString(trustedLinkId || root.linkId) || 'unknown_link';
+        const sourceDeviceId = normalizeString(root.sourceDeviceId) || 'unknown_device';
+        const normalizedTargetId = normalizeString(targetProfileId || root.targetProfileId) || 'unknown_target';
+        const normalizedScope = normalizeString(scope || root.scope).toLowerCase() || 'sync_policy';
+        const normalizedTransport = normalizeString(transport) || 'nanah';
+        const key = [
+            normalizedTransport,
+            linkId,
+            sourceDeviceId,
+            normalizedTargetId,
+            normalizedScope,
+            normalizedReason
+        ].join(':');
+        return {
+            schema: MANAGED_REMOTE_POLICY_CONFLICT_SCHEMA,
+            version: 1,
+            key,
+            transport: normalizedTransport,
+            trustedLinkId: linkId === 'unknown_link' ? null : linkId,
+            sourceDeviceId: sourceDeviceId === 'unknown_device' ? null : sourceDeviceId,
+            sourceProfileId: normalizeString(root.sourceProfileId) || null,
+            targetProfileId: normalizedTargetId === 'unknown_target' ? null : normalizedTargetId,
+            scope: normalizedScope,
+            revision: normalizeNonNegativeInteger(root.revision) || null,
+            policyHash: normalizeString(root.policyHash) || null,
+            reason: normalizedReason,
+            lastSeenAt: now,
+            count: 1,
+            redacted: true
+        };
+    }
+
+    function appendManagedRemotePolicyConflict(managedPolicyState, record) {
+        if (!record) return managedPolicyState;
+        const state = { ...safeObject(managedPolicyState) };
+        const existing = safeObject(state.remotePolicyConflicts);
+        const prior = safeObject(existing[record.key]);
+        const nextRecord = prior.schema === MANAGED_REMOTE_POLICY_CONFLICT_SCHEMA
+            ? {
+                ...prior,
+                ...record,
+                firstSeenAt: normalizeNonNegativeInteger(prior.firstSeenAt) || record.lastSeenAt,
+                count: Math.max(0, normalizeNonNegativeInteger(prior.count) || 0) + 1
+            }
+            : {
+                ...record,
+                firstSeenAt: record.lastSeenAt
+            };
+        const entries = Object.entries({
+            ...existing,
+            [record.key]: nextRecord
+        }).sort((a, b) => {
+            const at = normalizeNonNegativeInteger(safeObject(a[1]).lastSeenAt) || 0;
+            const bt = normalizeNonNegativeInteger(safeObject(b[1]).lastSeenAt) || 0;
+            return bt - at;
+        }).slice(0, MANAGED_REMOTE_POLICY_CONFLICT_LIMIT);
+        state.remotePolicyConflicts = Object.fromEntries(entries);
+        return state;
+    }
+
     async function recordManagedNanahPolicyValidationHistory(envelope, decision, context = {}) {
         const root = safeObject(envelope);
         const io = window.FilterTubeIO || {};
@@ -5376,6 +5462,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 [attemptKey]: remoteFailedAttempt
             };
         }
+        const conflictRecord = buildManagedRemotePolicyConflictRecord({
+            envelope: root,
+            reason,
+            transport,
+            trustedLinkId,
+            targetProfileId,
+            scope,
+            now
+        });
+        const nextManagedPolicyState = appendManagedRemotePolicyConflict(managedPolicyState, conflictRecord);
         const row = {
             rowId: `remote-managed-${normalizeString(context.transport) || 'nanah'}-${scope}-${revision || 'none'}-${now}`,
             schema: MANAGED_ACTION_HISTORY_SCHEMA,
@@ -5408,7 +5504,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
         profiles[targetProfileId] = {
             ...profile,
-            ...(remoteFailedAttempt ? { managedPolicyState } : {}),
+            ...(remoteFailedAttempt || conflictRecord ? { managedPolicyState: nextManagedPolicyState } : {}),
             managedActionHistory: appendManagedActionHistoryRow(profile, row)
         };
         await io.saveProfilesV4({

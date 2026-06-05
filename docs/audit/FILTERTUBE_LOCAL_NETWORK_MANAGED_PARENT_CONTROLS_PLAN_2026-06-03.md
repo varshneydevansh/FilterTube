@@ -244,8 +244,11 @@ without changing runtime behavior.
   mismatched, revoked, corrupted, and wrong-target revisions.
 - **Complexity**: 4/10
 - **Dependencies**: Task 1.2.
-- **Status**: Revision/replay matrix added inside the schema contract.
-  Product runtime behavior remains unchanged.
+- **Status**: Revision/replay matrix added inside the schema contract. Runtime
+  receive/apply paths now record bounded redacted conflict state for
+  equal-revision hash conflicts, stale revisions, revoked keys/links, stale
+  pairings, and duplicate source devices while keeping the last valid accepted
+  policy active.
 - **Acceptance Criteria**:
   - Every revision decision has a fixture name.
   - Offline child behavior is explicit: last valid policy remains active.
@@ -652,7 +655,8 @@ the current extension dashboard.
   time-limit and viewing-space actions, and selected-profile signed-policy
   sends. Child/protected views do not receive detailed managed status text or
   command-center controls. Direct local selected-profile video/keyword/channel
-  rule additions are present. Built-in server mailbox/LAN transports remain
+  rule additions are present. Command-center rows show remote conflict counts
+  for parent/admin inspection. Built-in server mailbox/LAN transports remain
   pending.
 - **Acceptance Criteria**:
   - UI has empty, loading, error, locked, offline, and sync-conflict states.
