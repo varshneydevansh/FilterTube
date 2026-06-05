@@ -401,8 +401,8 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
       contentScriptEntries: 2,
       contentScriptJsRefs: 15,
       webAccessibleResourceRefs: 5,
-      zipBytes: 8743457,
-      zipSha256: 'aab43a6d47fe58f8f51a57e9cd010cc7f524d63569d8f564377c0294c92236a9'
+      zipBytes: 8743854,
+      zipSha256: '01239b50365714791f17f848e81ad728d0ccfe35f44c48d8017261a96b00db51'
     }],
     ['firefox', {
       manifestBytes: 2603,
@@ -410,8 +410,8 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
       contentScriptEntries: 1,
       contentScriptJsRefs: 14,
       webAccessibleResourceRefs: 5,
-      zipBytes: 8743516,
-      zipSha256: 'bd83c2124000943ecf35f48a8e8f70c6622d80632d1dfa26c4444c7605f8f1f6'
+      zipBytes: 8743913,
+      zipSha256: '94167f97dfcdfe3ba27862da3b93ceaebbee3f3ccf0def0bcd174a9f2b4f87a8'
     }],
     ['opera', {
       manifestBytes: 2518,
@@ -419,8 +419,8 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
       contentScriptEntries: 2,
       contentScriptJsRefs: 15,
       webAccessibleResourceRefs: 4,
-      zipBytes: 8743459,
-      zipSha256: 'e8b0bed5adeacf627de6e6ba1680002ed9c5d0bcf52891ab09c34aaabb980e0d'
+      zipBytes: 8743856,
+      zipSha256: '36fa6d7346cbe2e0b600afcffc398a34f0a803b02e8a634c855cd6aec5331cf1'
     }]
   ]);
 

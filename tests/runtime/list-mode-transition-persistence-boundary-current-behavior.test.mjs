@@ -119,7 +119,7 @@ test('list-mode transition source fingerprints stay pinned', () => {
   const expected = [
     ['js/background.js', 6773, 305166, 'b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5'],
     ['js/popup.js', 1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
-    ['js/tab-view.js', 14220, 660153, '0ef076cf9cafcbbd43648762ecf05e3eeb4b542334bfe875750ff6acdf6c4eea'],
+    ['js/tab-view.js', 14256, 662043, '2627d062b48e2cbaf5471bb72e1236852e351ef271e2c750c0abfa7faeb49674'],
     ['js/state_manager.js', 2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6']
   ];
 

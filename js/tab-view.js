@@ -3053,6 +3053,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     const MANAGED_ACTION_HISTORY_LIMIT = 500;
     const MANAGED_ACTION_HISTORY_PROTECTED_RESULTS = new Set(['rejected', 'conflict', 'failed_auth', 'expired_session', 'cleared_by_admin']);
     const MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set(['trust_link.revoke', 'policy.time_limit.update', 'policy.viewing_space.update']);
+    const MANAGED_ACTION_HISTORY_SAFE_LABELS = Object.freeze({
+        'rule.video.block': 'Video rule changed',
+        'rule.keyword.add': 'Keyword rule changed',
+        'rule.keyword.remove': 'Keyword rule changed',
+        'rule.channel.block': 'Channel rule changed',
+        'rule.channel.unblock': 'Channel rule changed',
+        'policy.viewing_space.update': 'Viewing space policy changed',
+        'policy.time_limit.update': 'Time limit policy changed',
+        'policy.sync_policy.update': 'Sync policy changed',
+        'trust_link.create': 'Trusted link created',
+        'trust_link.revoke': 'Trusted link removed',
+        'admin_session.unlock': 'Admin session unlocked',
+        'admin_session.failed_unlock': 'Admin unlock failed',
+        'local_policy.update': 'Local policy changed',
+        'remote_policy.accept': 'Remote policy accepted',
+        'remote_policy.reject': 'Remote policy rejected',
+        'remote_policy.conflict': 'Remote policy conflict',
+        'remote_policy.mailbox.accept': 'Mailbox policy accepted',
+        'remote_policy.mailbox.reject': 'Mailbox policy rejected',
+        'remote_policy.mailbox.conflict': 'Mailbox policy conflict',
+        'remote_policy.mailbox.expire': 'Mailbox policy expired',
+        'remote_policy.mailbox.revoke': 'Mailbox policy revoked',
+        'remote_policy.mailbox.ack': 'Mailbox ack recorded',
+        'history.clear': 'History cleared'
+    });
     const MANAGED_ADMIN_SESSION_TTL_MS = 15 * 60 * 1000;
     const MANAGED_ADMIN_REAUTH_TTL_MS = 5 * 60 * 1000;
     const MANAGED_ADMIN_FAILED_UNLOCK_LIMIT = 5;
@@ -4799,10 +4824,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         const date = Number.isFinite(Number(item.receivedAt))
             ? new Date(Number(item.receivedAt)).toLocaleString()
             : 'Unknown time';
-        const scope = normalizeString(item.scope) || 'policy';
-        const result = normalizeString(item.result) || 'unknown';
-        const label = normalizeString(summary.label) || normalizeString(item.actionType) || 'Managed action';
-        const reason = normalizeString(item.reason);
+        const scope = normalizeString(item.scope)
+            .toLowerCase()
+            .replace(/[^a-z0-9_.:-]+/g, '_')
+            .slice(0, 96) || 'policy';
+        const result = normalizeString(item.result)
+            .toLowerCase()
+            .replace(/[^a-z0-9_.:-]+/g, '_')
+            .slice(0, 96) || 'unknown';
+        const actionType = normalizeString(item.actionType);
+        const safeLabel = MANAGED_ACTION_HISTORY_SAFE_LABELS[actionType] || actionType || 'Managed action';
+        const label = item.sensitive === true ? safeLabel : (normalizeString(summary.label) || safeLabel);
+        const reason = normalizeString(item.reason)
+            .toLowerCase()
+            .replace(/[^a-z0-9_.:-]+/g, '_')
+            .slice(0, 96);
         return reason
             ? `${date} - ${result} - ${scope} - ${label} (${reason})`
             : `${date} - ${result} - ${scope} - ${label}`;

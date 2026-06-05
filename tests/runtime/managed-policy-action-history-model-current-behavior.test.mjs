@@ -177,6 +177,40 @@ function validMailboxAckRow(overrides = {}) {
   });
 }
 
+const safeHistoryDisplayLabels = Object.freeze({
+  'remote_policy.reject': 'Remote policy rejected',
+  'policy.time_limit.update': 'Time limit policy changed'
+});
+
+function formatHistoryDisplayFixture(row) {
+  const item = row && typeof row === 'object' ? row : {};
+  const summary = item.summary && typeof item.summary === 'object' ? item.summary : {};
+  const date = Number.isFinite(Number(item.receivedAt))
+    ? new Date(Number(item.receivedAt)).toLocaleString()
+    : 'Unknown time';
+  const scope = String(item.scope || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_.:-]+/g, '_')
+    .slice(0, 96) || 'policy';
+  const result = String(item.result || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_.:-]+/g, '_')
+    .slice(0, 96) || 'unknown';
+  const actionType = String(item.actionType || '').trim();
+  const safeLabel = safeHistoryDisplayLabels[actionType] || actionType || 'Managed action';
+  const label = item.sensitive === true ? safeLabel : (String(summary.label || '').trim() || safeLabel);
+  const reason = String(item.reason || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_.:-]+/g, '_')
+    .slice(0, 96);
+  return reason
+    ? `${date} - ${result} - ${scope} - ${label} (${reason})`
+    : `${date} - ${result} - ${scope} - ${label}`;
+}
+
 function nextRemoteFailedAttemptState(existing = null, { now = 1780520500000, reason = 'missing_signature_verifier' } = {}) {
   const resetAt = Number(existing?.resetAt);
   const activeWindow = existing?.schema === 'filtertube_managed_remote_failed_attempt_rate_limit'
@@ -323,6 +357,10 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(source, /Mailbox ack delivered/);
   assert.match(source, /Mailbox ack handoff failed/);
   assert.match(source, /recordAckHistory: \(details\) => recordManagedOpenSyncAckHistory\(details\)/);
+  assert.match(source, /MANAGED_ACTION_HISTORY_SAFE_LABELS = Object\.freeze/);
+  assert.match(source, /function formatManagedActionHistoryRow\(row\)/);
+  assert.match(source, /item\.sensitive === true \? safeLabel/);
+  assert.ok(source.includes("replace(/[^a-z0-9_.:-]+/g, '_')"));
   assert.match(source, /function handleNanahIncomingManagedLocalNetworkCandidate\(candidate\)/);
   assert.match(source, /function handleNanahIncomingManagedPolicyEnvelope\(envelope\)/);
   assert.match(source, /root\.type === 'filtertube_managed_policy'/);
@@ -338,6 +376,29 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(source, /function getNanahManagedPolicyScopeList\(value\)/);
   assert.match(source, /historyBtn\.textContent = 'History'/);
   assert.doesNotMatch(source, /managedActionHistoryStore/);
+});
+
+test('managed history display redacts sensitive labels and normalizes visible reason codes', () => {
+  const sensitiveDisplay = formatHistoryDisplayFixture(validRemoteRateLimitedRow({
+    reason: 'Missing Signature Verifier',
+    summary: {
+      redacted: true,
+      label: 'Blocked keyword: spiders http://example.invalid'
+    }
+  }));
+
+  assert.match(sensitiveDisplay, /Remote policy rejected/);
+  assert.match(sensitiveDisplay, /missing_signature_verifier/);
+  assert.doesNotMatch(sensitiveDisplay, /Blocked keyword|spiders|example\.invalid/);
+
+  const parentVisibleDisplay = formatHistoryDisplayFixture(validAcceptedRow({
+    sensitive: false,
+    summary: {
+      redacted: false,
+      label: 'Parent-visible local note'
+    }
+  }));
+  assert.match(parentVisibleDisplay, /Parent-visible local note/);
 });
 
 test('managed policy action-history row fixture requires actor target revision result and redacted summary', () => {
@@ -435,6 +496,7 @@ test('managed action history required outcomes cover accepted rejected conflict 
   assert.match(read('js/tab-view.js'), /function buildManagedTimeLimitLocalEditReport\(\{ actorProfileId, targetProfileId, nextPolicy \}\)/);
   assert.match(read('js/tab-view.js'), /actionType: 'policy\.time_limit\.update'/);
   assert.match(doc, /runtime managed action history access gate: present for parent\/account authority/);
+  assert.match(doc, /runtime managed action history display redaction: present for sensitive rows through fixed labels and normalized reason codes/);
   assert.match(doc, /runtime managed action history clear path: present for accepted rows only/);
   assert.match(doc, /runtime managed action history clear event writer: present as protected `history.clear` evidence/);
   assert.match(doc, /runtime remote managed validation\/apply history writer: present/);

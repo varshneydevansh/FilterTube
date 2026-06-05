@@ -697,9 +697,9 @@ Current local package artifact rows:
 
 | Target | Staged files | Manifest bytes | Manifest sha256 | Version | Content script entries | Content script JS refs | WAR refs | ZIP bytes | ZIP sha256 |
 | --- | ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | --- |
-| `chrome` | 63 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | `3.3.2` | 2 | 15 | 5 | 8743457 | `aab43a6d47fe58f8f51a57e9cd010cc7f524d63569d8f564377c0294c92236a9` |
-| `firefox` | 63 | 2603 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` | `3.3.2` | 1 | 14 | 5 | 8743516 | `bd83c2124000943ecf35f48a8e8f70c6622d80632d1dfa26c4444c7605f8f1f6` |
-| `opera` | 63 | 2518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | `3.3.2` | 2 | 15 | 4 | 8743459 | `e8b0bed5adeacf627de6e6ba1680002ed9c5d0bcf52891ab09c34aaabb980e0d` |
+| `chrome` | 63 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | `3.3.2` | 2 | 15 | 5 | 8743854 | `01239b50365714791f17f848e81ad728d0ccfe35f44c48d8017261a96b00db51` |
+| `firefox` | 63 | 2603 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` | `3.3.2` | 1 | 14 | 5 | 8743913 | `94167f97dfcdfe3ba27862da3b93ceaebbee3f3ccf0def0bcd174a9f2b4f87a8` |
+| `opera` | 63 | 2518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | `3.3.2` | 2 | 15 | 4 | 8743856 | `36fa6d7346cbe2e0b600afcffc398a34f0a803b02e8a634c855cd6aec5331cf1` |
 
 ASCII boundary:
 

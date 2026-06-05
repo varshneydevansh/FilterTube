@@ -23,7 +23,9 @@ redacted `policy.time_limit.update` rows on the target profile.
 Parent-side live sends now record redacted outbound trusted-link history rows
 without storing policy payload plaintext, and connected replicas now return
 redacted live ack rows that the source stores only when they match a prior sent
-revision/hash.
+revision/hash. The dashboard history renderer now treats sensitive rows as
+protected display data: it uses fixed action labels and normalized reason codes
+instead of rendering free-form sensitive summary labels.
 **Goal slice**: Implementation order item 4, "Add action-history/log model and
 access-control tests".
 **Primary inputs**:
@@ -156,6 +158,8 @@ Suggested summary behavior:
 
 - Keyword/video/channel values can be shown to the parent/caregiver in the UI,
   but stored rows should support redacted or encrypted summaries.
+- Sensitive rows rendered in the dashboard should use fixed action labels and
+  normalized machine-readable reason codes instead of free-form summary labels.
 - Rejected hostile-LAN rows should keep source device id, trusted link id,
   target profile id, rejection reason, revision, and policy hash when available.
 - Wall-clock timestamps are diagnostic only. Stable ordering should prefer
@@ -198,6 +202,7 @@ profile when a row can be attached to a known protected profile:
 runtime managed action history store: profile-local managed child rows
 runtime managed action history row writer: local managed child edit plus local time-limit policy edit plus failed parent unlock plus Nanah managed-policy validation/apply outcomes
 runtime managed action history access gate: present for parent/account authority
+runtime managed action history display redaction: present for sensitive rows through fixed labels and normalized reason codes
 runtime managed action history clear path: present for accepted rows only while retaining protected evidence
 runtime managed action history clear event writer: present as protected `history.clear` evidence
 runtime remote managed validation/apply history writer: present for rejected, conflict, idempotent, and accepted apply outcomes
