@@ -156,6 +156,7 @@ default retention rows per protected profile: 500
 default rejected-attempt retention days: 90
 default accepted-action retention days: 30
 plaintext sensitive rule values: no
+central safe-count/status summary sanitizer: yes
 local encryption for sensitive summaries: future-compatible
 clear rejected evidence without parent authority: no
 remote upload or telemetry: no
@@ -163,8 +164,10 @@ remote upload or telemetry: no
 
 Suggested summary behavior:
 
-- Keyword/video/channel values can be shown to the parent/caregiver in the UI,
-  but stored rows should support redacted or encrypted summaries.
+- Keyword/video/channel values can be shown to the parent/caregiver during the
+  active action, but stored rows are normalized through a central redacted
+  summary sanitizer and keep only safe counts, status, scope, and transport
+  metadata.
 - Sensitive rows rendered in the dashboard should use fixed action labels and
   normalized machine-readable reason codes instead of free-form summary labels.
 - Rejected hostile-LAN rows should keep source device id, trusted link id,
@@ -226,12 +229,13 @@ runtime managed inbound live ack history writer: present on trusted link policy 
 runtime behavior changed by this contract: yes, for accepted local managed child saves, accepted local time-limit policy edits, protected failed-auth rows, parent/account history access, Nanah managed-policy receive evidence, validated remote apply history, local/decrypted mailbox item evidence, pull-on-open mailbox ack-handoff evidence, sanitized local-network candidate evidence, remote failed-attempt rate-limit metadata, parent-side outbound live send evidence, and parent-side live ack feedback
 ```
 
-The current local writer stores redacted count summaries under
+The current local writer stores redacted count/status summaries under
 `profile.managedActionHistory[]`; local time-limit rows store only enabled
 state, daily budget counts, timezone, and surface-budget count. Every runtime
-append path now prunes expired rows before saving, using the documented 30-day
-accepted-action window, 90-day protected-evidence window, and 500-row cap. The
-local access gate uses active
+append and read path now normalizes rows through
+`sanitizeManagedActionHistoryRow`, drops unapproved summary keys, and prunes
+expired rows before saving, using the documented 30-day accepted-action window,
+90-day protected-evidence window, and 500-row cap. The local access gate uses active
 parent/account authority, not child PIN authority, and `clearManagedActionHistory`
 preserves rows that are rejected, conflict, failed-auth, expired-session, trust
 revocation, time-limit, viewing-space, or prior clear evidence.
