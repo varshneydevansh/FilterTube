@@ -591,13 +591,29 @@
             return adapter.buildManagedMailboxStorageItem(root, sealedPayload, itemOptions);
         }
 
+        function findTrustedLinkForMailboxEnvelope(envelope, trustedLinks) {
+            const root = safeObject(envelope);
+            const linkId = normalizeString(root.linkId);
+            if (!linkId) return null;
+            return safeArray(trustedLinks)
+                .map(link => deps.normalizeTrustedLink(link))
+                .find(link => normalizeString(link?.linkId || link?.id) === linkId) || null;
+        }
+
         async function buildMailboxStorageItemBatchForTrustedLinks(policy, trustedLinks, options = {}) {
-            const envelopes = await buildEnvelopeBatchForTrustedLinks(policy, trustedLinks);
+            const links = safeArray(trustedLinks).map(link => deps.normalizeTrustedLink(link)).filter(Boolean);
+            const envelopes = await buildEnvelopeBatchForTrustedLinks(policy, links);
             const optionRoot = safeObject(options);
             const items = [];
             for (let index = 0; index < envelopes.length; index += 1) {
                 const mailboxItemId = normalizeString(optionRoot.mailboxItemId) ? `${normalizeString(optionRoot.mailboxItemId)}-${index + 1}` : '';
-                items.push(await buildMailboxStorageItemFromEnvelope(envelopes[index], { ...optionRoot, index, ...(mailboxItemId ? { mailboxItemId } : {}) }));
+                const trustedLink = findTrustedLinkForMailboxEnvelope(envelopes[index], links);
+                items.push(await buildMailboxStorageItemFromEnvelope(envelopes[index], {
+                    ...optionRoot,
+                    index,
+                    trustedLink,
+                    ...(mailboxItemId ? { mailboxItemId } : {})
+                }));
             }
             return items;
         }
@@ -713,8 +729,12 @@
         async function uploadMailboxPolicyBatch(policy, trustedLinks, provider, options = {}) {
             const auth = await ensureProviderDeliveryAuthorized('encrypted_mailbox', options, { policy, trustedLinkCount: safeArray(trustedLinks).length });
             if (!auth.ok) return { ok: false, reason: auth.reason, mailboxItemCount: 0, uploadedMailboxItemCount: 0, failedMailboxItemCount: 0, markedSentCount: 0, request: null };
-            const items = await buildMailboxStorageItemBatchForTrustedLinks(policy, trustedLinks, options);
-            return uploadMailboxItems(items, provider, { ...safeObject(options), providerDeliveryAuthorized: true });
+            const uploadOptions = {
+                ...safeObject(options),
+                seal: safeObject(provider).requiresSealedMailboxItems === true || safeObject(options).seal === true
+            };
+            const items = await buildMailboxStorageItemBatchForTrustedLinks(policy, trustedLinks, uploadOptions);
+            return uploadMailboxItems(items, provider, { ...uploadOptions, providerDeliveryAuthorized: true });
         }
 
         function resolveTrustedLinkProviderScopes(trustedLink) {

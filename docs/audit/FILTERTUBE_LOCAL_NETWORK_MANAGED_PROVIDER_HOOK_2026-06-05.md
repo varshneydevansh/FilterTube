@@ -3,8 +3,9 @@
 **Generated**: 2026-06-05
 **Status**: Dashboard/profile-open provider hook and redacted provider ack
 handoff are present for local-network managed-policy candidates. Built-in LAN
-peer discovery, LAN transport, server mailbox pull, and server mailbox decrypt
-transport remain absent.
+peer discovery and LAN transport remain absent. Browser HTTPS mailbox
+pull/decrypt is handled by the separate configured mailbox client and does not
+grant local-network authority.
 **Related plan**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`
 **Related authority boundary**:

@@ -74,7 +74,7 @@ test('static html support script surface doc is audit-only and source pinned', (
 
   for (const [file, lines, byteCount, hash] of [
     ['html/popup.html', 31, 1213, 'c5e03a38b2737dbd01e2cd0c243b37754936e2e349e9d2275b195350159aea31'],
-    ['html/tab-view.html', 1600, 136305, '5124626e39cd3879da6593bc9bfa8287f0ad5b9ae29dcbb075d9e5bce0389d0b'],
+    ['html/tab-view.html', 1601, 136371, 'accda6df396aea61d154936bd3b885e0db18e543cd34fa9945f31d536601219d'],
     ['html/troubleshoot.html', 0, 0, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'],
     ['scripts/compress-video.swift', 97, 3339, '196c1ebf918b94e3d36fd2bd04658c4fa4762a85ad5657b49ede7aaa93e2e36b']
   ]) {
@@ -130,6 +130,7 @@ test('popup and dashboard html loader order is current source not authority back
     '../js/vendor/qrcode.bundle.js',
     '../js/vendor/nanah.bundle.js',
     '../js/nanah_sync_adapter.js',
+    '../js/nanah_managed_mailbox_client.js',
     '../js/nanah_managed_live_policy.js',
     '../js/nanah_managed_open_sync.js',
     '../js/content_controls_catalog.js',

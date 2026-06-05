@@ -90,9 +90,9 @@ state without exposing plaintext rule values:
   sending, Refresh stale link, Review conflict first, or Pair verified device;
   it does not contain rule text, policy JSON, hashes, keys, ciphertext, or
   mutation authority.
-- The extension does not currently include a built-in server mailbox client or
-  LAN peer-discovery transport. Those remain provider/app/server integration
-  surfaces, not hidden extension authority.
+- The extension includes a browser-side HTTPS mailbox client only when an
+  endpoint is explicitly configured. LAN peer-discovery transport remains a
+  provider/app/server integration surface, not hidden extension authority.
 - The status line must not include keyword text, channel names, video ids, PINs,
   mailbox ciphertext, decrypted payloads, or raw policy JSON.
 - The status line appears only when `canActiveProfileManageProfile(...)`
@@ -132,7 +132,8 @@ runtime managed command-center post-viewing/time-limit verified-device push: pre
 runtime connected verified-device live P2P managed policy send: present
 runtime provider-gated mailbox/LAN delivery handoff from command center: present
 runtime protected redacted push-attempt history rows: present
-runtime built-in server mailbox upload/pull client: absent
+runtime browser HTTPS mailbox upload/pull client: present behind explicit config
+runtime mailbox server authority: absent
 runtime built-in LAN discovery/transport client: absent
 runtime managed command-center direct policy writes: absent
 runtime YouTube hot-path work from command-center UI: absent

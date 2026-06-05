@@ -94,25 +94,27 @@
             const profiles = safeObject(safeObject(profilesV4).profiles);
             return safeArray(links)
                 .map((link) => {
+                    const root = safeObject(link);
                     const reason = explainIneligibleLink(link, { activeProfileId, profilesV4 });
                     if (reason) return null;
-                    const policy = getPolicy(link);
-                    const targetProfileId = resolveTargetProfileId(link, activeProfileId);
+                    const policy = getPolicy(root);
+                    const targetProfileId = resolveTargetProfileId(root, activeProfileId);
                     const allowedScopes = normalizeAllowedScopes(policy.allowedScopes || policy.defaultScope);
-                    const sourceDeviceId = normalizeString(link.sourceDeviceId || policy.sourceDeviceId) || normalizeString(link.remoteDeviceId);
-                    const sourceProfileId = normalizeString(link.sourceProfileId || policy.sourceProfileId);
-                    const sourcePublicKeyId = normalizeString(link.sourcePublicKeyId || policy.sourcePublicKeyId);
+                    const sourceDeviceId = normalizeString(root.sourceDeviceId || policy.sourceDeviceId) || normalizeString(root.remoteDeviceId);
+                    const sourceProfileId = normalizeString(root.sourceProfileId || policy.sourceProfileId);
+                    const sourcePublicKeyId = normalizeString(root.sourcePublicKeyId || policy.sourcePublicKeyId);
                     return {
-                        linkId: normalizeString(link.linkId || link.id),
-                        remoteDeviceId: normalizeString(link.remoteDeviceId),
+                        linkId: normalizeString(root.linkId || root.id),
+                        remoteDeviceId: normalizeString(root.remoteDeviceId),
                         sourceDeviceId,
                         sourceProfileId,
                         targetProfileId,
                         targetProfileName: normalizeString(policy.targetProfileName),
                         allowedScopes,
                         sourcePublicKeyId,
-                        keyVersion: Number(link.keyVersion || policy.keyVersion) || 0,
-                        accepted: getAcceptedStateByScope(safeObject(profiles[targetProfileId]), link.linkId || link.id, allowedScopes)
+                        keyVersion: Number(root.keyVersion || policy.keyVersion) || 0,
+                        trustedLink: root,
+                        accepted: getAcceptedStateByScope(safeObject(profiles[targetProfileId]), root.linkId || root.id, allowedScopes)
                     };
                 })
                 .filter(Boolean);
@@ -132,6 +134,7 @@
                 allowedScopes: candidate.allowedScopes,
                 sourcePublicKeyId: candidate.sourcePublicKeyId,
                 keyVersion: candidate.keyVersion,
+                trustedLink: candidate.trustedLink,
                 accepted: candidate.accepted
             };
         }

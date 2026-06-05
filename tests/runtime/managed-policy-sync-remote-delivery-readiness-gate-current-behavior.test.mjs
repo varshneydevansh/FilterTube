@@ -45,8 +45,8 @@ test('managed remote delivery readiness gate is docs-backed and linked to curren
   const boundaryDoc = read(boundaryDocPath);
   const inventory = read(inventoryDocPath);
 
-  assert.match(doc, /Remote policy authority, validation, local apply, action history,\s+source-side mailbox seal\/open encryption helpers, source-side server-safe\s+mailbox storage preparation, source-side mailbox upload\/purge provider\s+handoffs, provider-gated mailbox intake, and provider-gated local-network\s+candidate intake are present/);
-  assert.match(doc, /Complete\s+remote delivery is still\s+blocked on upload\/pull and transport proof/);
+  assert.match(doc, /Remote policy authority, validation, local apply, action history,\s+source-side mailbox seal\/open encryption helpers, source-side server-safe\s+mailbox storage preparation, source-side mailbox upload\/purge provider\s+handoffs, explicitly configured browser HTTPS mailbox upload\/pull\/purge client,\s+provider-gated mailbox intake, and provider-gated local-network candidate intake\s+are present/);
+  assert.match(doc, /Complete remote delivery is still blocked on server deployment,\s+LAN transport proof, native parity, and installed two-device smoke/);
   assert.match(doc, new RegExp(providerDocPath));
   assert.match(doc, new RegExp(openSyncDocPath));
   assert.match(doc, new RegExp(mailboxDocPath));
@@ -54,29 +54,29 @@ test('managed remote delivery readiness gate is docs-backed and linked to curren
   assert.match(doc, new RegExp(inventoryDocPath));
   assert.match(doc, /release claim for complete remote management: NO-GO/);
   assert.match(doc, /built-in LAN peer discovery: NO-GO/);
-  assert.match(doc, /mailbox encryption client: PARTIAL local helper/);
+  assert.match(doc, /mailbox encryption client: READY local helper and configured HTTPS upload/);
   assert.match(doc, /source-side mailbox upload-provider handoff: PARTIAL/);
   assert.match(doc, /source-side mailbox purge-provider handoff: PARTIAL/);
-  assert.match(doc, /built-in server mailbox upload client: NO-GO/);
-  assert.match(doc, /built-in server mailbox purge client: NO-GO/);
-  assert.match(doc, /built-in server mailbox pull client: NO-GO/);
-  assert.match(doc, /mailbox decryption client: PARTIAL local helper/);
+  assert.match(doc, /built-in browser HTTPS mailbox upload client: READY explicit config only/);
+  assert.match(doc, /built-in browser HTTPS mailbox purge client: READY explicit config only/);
+  assert.match(doc, /built-in browser HTTPS mailbox pull client: READY explicit config only/);
+  assert.match(doc, /mailbox decryption client: READY local helper and configured HTTPS pull/);
   assert.match(doc, /flowchart TD/);
   assert.match(doc, /node --test tests\/runtime\/managed-policy-sync-remote-delivery-readiness-gate-current-behavior\.test\.mjs/);
 
   assert.match(providerDoc, /runtime built-in LAN peer discovery: absent/);
   assert.match(providerDoc, /runtime built-in LAN delivery: absent/);
-  assert.match(openSyncDoc, /runtime server mailbox pull client: absent/);
-  assert.match(openSyncDoc, /runtime server mailbox decrypt transport: absent/);
+  assert.match(openSyncDoc, /runtime browser HTTPS mailbox pull\/decrypt client: present behind explicit config/);
+  assert.match(openSyncDoc, /runtime mailbox server authority: absent/);
   assert.match(mailboxDoc, /runtime mailbox seal\/open encryption helper: present/);
   assert.match(mailboxDoc, /runtime source-side server-safe mailbox storage item builder: present/);
-  assert.match(mailboxDoc, /runtime mailbox encryption client: present for local seal helper only/);
+  assert.match(mailboxDoc, /runtime mailbox encryption client: present for local seal helper and configured HTTPS mailbox upload/);
   assert.match(mailboxDoc, /runtime source-side mailbox upload-provider handoff: present/);
   assert.match(mailboxDoc, /runtime source-side mailbox purge-provider handoff: present/);
-  assert.match(mailboxDoc, /runtime built-in mailbox server upload client: absent/);
-  assert.match(mailboxDoc, /runtime built-in mailbox server purge client: absent/);
-  assert.match(mailboxDoc, /runtime built-in mailbox server pull client: absent/);
-  assert.match(mailboxDoc, /runtime mailbox decryption client: present for local open helper only/);
+  assert.match(mailboxDoc, /runtime browser HTTPS mailbox upload client: present behind explicit config/);
+  assert.match(mailboxDoc, /runtime browser HTTPS mailbox purge client: present behind explicit config/);
+  assert.match(mailboxDoc, /runtime browser HTTPS mailbox pull client: present behind explicit config/);
+  assert.match(mailboxDoc, /runtime mailbox decryption client: present for local open helper and configured HTTPS mailbox pull/);
   assert.match(boundaryDoc, /runtime built-in local-network peer discovery: absent/);
   assert.match(inventory, /built-in local-network peer discovery\/LAN delivery runtime/);
 });
@@ -115,6 +115,10 @@ test('remote delivery runtime remains provider-gated without adding hot-path net
   assert.match(tabView, /handleNanahIncomingManagedLocalNetworkCandidate\(candidate\)/);
   assert.match(openSync, /global\.FilterTubeManagedPolicyOpenSync/);
   assert.match(openSync, /pullDecryptedMailboxItems/);
+  const mailboxClient = read('js/nanah_managed_mailbox_client.js');
+  assert.match(mailboxClient, /requiresSealedMailboxItems: true/);
+  assert.match(mailboxClient, /credentials: 'omit'/);
+  assert.match(mailboxClient, /openManagedMailboxStorageItem/);
   assert.match(adapter, /function validateManagedLocalNetworkCandidate\(candidate, context = \{\}\)/);
   assert.match(adapter, /function validateManagedMailboxItem\(item, context = \{\}\)/);
 
@@ -147,7 +151,7 @@ test('readiness gate keeps allowed and blocked product claims separate', () => {
   for (const blocked of [
     'complete remote local-network management',
     'always-on parent-to-child sync',
-    'server mailbox delivery',
+    'mailbox server delivery without explicit endpoint configuration',
     'automatic LAN peer discovery',
     'guaranteed later delivery after the parent device goes offline',
     'remote management across desktop and apps without installed two-device smoke'

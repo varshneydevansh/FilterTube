@@ -6,9 +6,10 @@ helpers, source-side server-safe mailbox storage item builder, local decrypted
 mailbox-item intake, source-side mailbox upload-provider handoff,
 source-side mailbox purge-provider handoff,
 provider-gated dashboard/profile-open pull hook, provider ack handoff,
-protected target-profile ack-handoff evidence, and revoked queued-delivery
-local apply guard proof are present. Runtime built-in server upload/pull clients
-and purge clients are not implemented.
+protected target-profile ack-handoff evidence, revoked queued-delivery local
+apply guard proof, and an explicitly configured browser HTTPS mailbox client are
+present. Mailbox server deployment and mailbox server authority are not
+implemented.
 **Related plan**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`  
 **Related inventory**:
@@ -221,14 +222,14 @@ ciphertext hash mismatch, authenticated-metadata tampering, wrong wrapping
 keys, and decrypted envelope/metadata binding mismatches before it returns a
 local/decrypted mailbox item.
 
-The runtime still does not implement a built-in server mailbox upload client,
-server mailbox pull scheduler, or server mailbox purge client. The mailbox
-server cannot become policy authority. The
-first pull-on-open hook now exists only as a provider-gated
-dashboard/profile-open bridge for local/decrypted mailbox items, and the same
-provider can receive redacted ack records after extension-side
-validation/apply/reject. The target profile also records redacted ack-handoff
-evidence after the provider ack attempt completes.
+The runtime now implements a dashboard-configured browser HTTPS mailbox client,
+but it still does not implement mailbox server deployment, background polling,
+or mailbox server authority. The mailbox server cannot become policy authority.
+The first pull-on-open hook exists as a provider-gated or configured HTTPS
+dashboard/profile-open bridge for encrypted mailbox items, and the same provider
+or configured mailbox endpoint can receive redacted ack records after
+extension-side validation/apply/reject. The target profile also records
+redacted ack-handoff evidence after the provider ack attempt completes.
 If that provider returns `ok: false` or throws while pulling, the open-sync hook
 discards any returned mailbox items, does not apply or acknowledge them, and
 keeps the last valid accepted policy active.
@@ -237,7 +238,7 @@ Revoked queued delivery now has an executable local apply guard: direct signed
 managed envelopes and already-decrypted mailbox items both return
 `link_revoked` before any profile save when the local trusted link has been
 revoked. Mailbox apply reports `ackState: revoked` for that local decision. This
-is not built-in server queue purge; no built-in mailbox server queue exists yet.
+is not mailbox server authority; server queue deployment remains external.
 Source-side trust removal can now hand an optional provider a redacted purge
 request for pending ciphertext rows, but the extension still does not own a
 server queue.
@@ -259,10 +260,11 @@ runtime provider-gated ack handoff: present
 runtime protected mailbox ack-handoff history rows: present
 runtime provider failure fail-closed apply guard: present
 runtime revoked queued-delivery local apply guard: present
-runtime mailbox encryption client: present for local seal helper only
-runtime built-in mailbox server upload client: absent
-runtime built-in mailbox server purge client: absent
-runtime built-in mailbox server pull client: absent
-runtime mailbox decryption client: present for local open helper only
+runtime mailbox encryption client: present for local seal helper and configured HTTPS mailbox upload
+runtime browser HTTPS mailbox upload client: present behind explicit config
+runtime browser HTTPS mailbox purge client: present behind explicit config
+runtime browser HTTPS mailbox pull client: present behind explicit config
+runtime mailbox decryption client: present for local open helper and configured HTTPS mailbox pull
+runtime mailbox server deployment/authority: absent
 runtime behavior changed by this slice: yes, for local mailbox seal/open helpers, source-side server-safe mailbox storage item building, source-side mailbox upload-provider handoff, source-side mailbox purge-provider handoff, local/decrypted mailbox item intake, provider-gated dashboard/profile-open pull status, provider ack handoff, and protected target-profile ack-handoff evidence only
 ```

@@ -35,10 +35,11 @@ targets. The dashboard command center now supports per-profile and
 selected-profile verified-device sends: connected verified replicas receive
 signed managed-policy envelopes over live Nanah P2P, and optional mailbox/LAN
 providers can receive ciphertext mailbox rows or signed local-network
-candidates when those provider hooks are installed. Built-in local-network peer
-discovery, LAN transport, built-in server mailbox upload/pull clients, app
-native enforcement proofs, and built-in app/server later-delivery providers
-remain gated. Source-side managed signing-key rotation is now an explicit
+candidates when those provider hooks are installed. A browser-side HTTPS mailbox
+client is now available behind explicit configuration and encrypted-item gates.
+Built-in local-network peer discovery, LAN transport, app native enforcement
+proofs, and built-in app/server later-delivery providers remain gated.
+Source-side managed signing-key rotation is now an explicit
 parent/admin action: it regenerates the local source keypair, key-revokes active
 managed child-device links, purges pending provider/open-sync/LAN/source-ack
 state for those links, and writes protected history so the affected devices must
@@ -103,8 +104,9 @@ extension authority code.
   while offline.
 - [x] Runtime Main/Kids route gate, background-owned time-budget accounting, and
   protected timeout overlay exist for active protected profiles.
-- [ ] Built-in server mailbox upload/pull/purge client. This remains app/server
-  provider work, not extension-owned runtime.
+- [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
+  explicit dashboard configuration and encrypted-item gates. Server deployment,
+  provider endpoint ownership, and native app parity remain separate lanes.
 - [ ] Built-in LAN peer discovery and LAN transport. This remains app/provider
   work, with extension authority hooks already gated.
 - [ ] Native Android/iOS settings-lock and timeout UI parity. This belongs in
@@ -632,8 +634,10 @@ replica child device over Nanah/P2P or same-network transport.
   now present. Pull-on-open mailbox ack handoff now writes protected redacted
   target-profile history after the provider ack attempt. Command-center sends
   can also hand ciphertext mailbox items or signed local-network candidates to
-  optional providers when those hooks are installed. Built-in server mailbox
-  and LAN discovery/transports remain pending app/server/provider work.
+  optional providers when those hooks are installed. A browser-side HTTPS
+  mailbox upload/pull/purge client now exists behind explicit configuration and
+  encrypted-item gates. Built-in LAN discovery/transports and native app parity
+  remain pending app/server/provider work.
 - **Acceptance Criteria**:
   - The doc names the profile-scoped trusted-link behavior.
   - The doc requires device plus target-profile binding before multi-child
@@ -690,7 +694,9 @@ the current extension dashboard.
   rule additions are present. Command-center rows now separate sync readiness
   into compact status chips, mark remote conflict rows visually, and expose a
   protected Review Conflict action that opens the parent/account history gate.
-  Built-in server mailbox/LAN transports remain pending.
+  Built-in LAN transports remain pending. The browser-side HTTPS mailbox client
+  is available only when explicitly configured and does not add mailbox server
+  authority.
 - **Acceptance Criteria**:
   - UI has empty, loading, error, locked, offline, and sync-conflict states.
   - Parent actions are clear and reversible where possible.
@@ -898,8 +904,9 @@ where parent and child devices are not reachable at the same time.
   dashboard/profile-open hook can request already-decrypted mailbox items from
   a trusted local provider and send redacted ack records after apply/reject.
   Provider rejection or provider failure now fails closed without applying or
-  acknowledging any returned items. Runtime built-in server upload/pull clients
-  remain absent by design.
+  acknowledging any returned items. Runtime browser HTTPS mailbox upload/pull
+  is present behind explicit configuration; mailbox server deployment and
+  authority remain absent by design.
 - **Acceptance Criteria**:
   - Server cannot read rules.
   - Replay, stale, revoked, wrong-target, and duplicate delivery behavior is

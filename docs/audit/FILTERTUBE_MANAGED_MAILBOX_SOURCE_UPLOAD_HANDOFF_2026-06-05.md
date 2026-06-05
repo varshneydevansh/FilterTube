@@ -4,9 +4,10 @@
 **Status**: Source-side mailbox upload-provider handoff is present for
 ciphertext-only managed mailbox items, and source-side mailbox purge-provider
 handoff is present for trusted-link removal. Both require sensitive
-parent/account re-auth before provider calls. Built-in mailbox server upload,
-pull, and purge clients, dashboard offline-send UI, and mailbox server
-authority remain absent.
+parent/account re-auth before provider calls. A browser-side HTTPS mailbox
+upload/pull/purge client is present behind explicit dashboard configuration and
+encrypted-item gates. Dashboard offline-send UI, mailbox server deployment, and
+mailbox server authority remain absent.
 **Related live-send proof**:
 `docs/audit/FILTERTUBE_NANAH_MANAGED_LIVE_SIGNED_SEND_2026-06-04.md`
 **Related mailbox protocol**:
@@ -96,6 +97,17 @@ revokeManagedMailboxItems
 markManagedMailboxItemsRevoked
 ```
 
+When a browser mailbox endpoint is explicitly configured, the dashboard loads
+`js/nanah_managed_mailbox_client.js`. The client installs
+`window.FilterTubeManagedPolicyMailbox` only when
+`ftManagedMailboxServerConfig` or `window.FilterTubeManagedMailboxServerConfig`
+contains a valid HTTPS endpoint. It refuses unconfigured, non-HTTPS,
+localhost, loopback, `.local`, and private-LAN endpoints; omits browser
+credentials; sends only redacted JSON; and requires sealed mailbox items before
+upload. It also exposes `pullDecryptedMailboxItems(...)` and decrypts returned
+storage items locally with the saved trusted-link wrapping key before the
+existing mailbox validator can apply anything.
+
 The request uses this schema:
 
 ```text
@@ -176,9 +188,10 @@ runtime sent revision/hash marking only for provider-accepted items: present
 runtime signed envelope authority unchanged: present
 runtime mailbox plaintext policy upload: absent
 runtime mailbox provider authority: absent
-runtime built-in mailbox server upload client: absent
-runtime built-in mailbox server purge client: absent
-runtime built-in mailbox server pull client: absent
+runtime browser HTTPS mailbox upload client: present behind explicit config
+runtime browser HTTPS mailbox purge client: present behind explicit config
+runtime browser HTTPS mailbox pull/decrypt client: present behind explicit config
+runtime mailbox server deployment/authority: absent
 runtime dashboard offline-send UI: absent
 runtime YouTube page hot-path work from this slice: absent
 ```

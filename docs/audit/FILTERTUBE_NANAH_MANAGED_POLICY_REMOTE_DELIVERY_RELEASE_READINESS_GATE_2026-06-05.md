@@ -4,12 +4,14 @@
 **Status**: Remote policy authority, validation, local apply, action history,
 source-side mailbox seal/open encryption helpers, source-side server-safe
 mailbox storage preparation, source-side mailbox upload/purge provider
-handoffs, provider-gated mailbox intake, and provider-gated local-network
-candidate intake are present. Complete remote delivery is still
-blocked on upload/pull and transport proof.
+handoffs, explicitly configured browser HTTPS mailbox upload/pull/purge client,
+provider-gated mailbox intake, and provider-gated local-network candidate intake
+are present. Complete remote delivery is still blocked on server deployment,
+LAN transport proof, native parity, and installed two-device smoke.
 **Runtime behavior changed**: yes, source-side mailbox seal/open helpers,
-storage item building, upload-provider handoff, and purge-provider handoff
-only; no YouTube hot-path or built-in transport runtime changed.
+storage item building, upload-provider handoff, purge-provider handoff, and
+configured dashboard HTTPS mailbox client only; no YouTube hot-path runtime
+changed.
 **Goal slice**: Implementation order items 2, 10, 11, 14, and the transport
 side of "Trusted parent/caregiver devices can update protected-device policy
 through Nanah P2P or local-network management."
@@ -39,8 +41,8 @@ parent policy editor
   -> signed managed-policy envelope
   -> optional local WebCrypto seal into server-safe mailbox storage item
   -> live Nanah same-session send when available
-  -> optional provider upload/purge handoff for encrypted mailbox metadata
-  -> provider-gated mailbox/local-network intake when a trusted provider exists
+  -> optional provider or configured HTTPS mailbox upload/purge handoff for encrypted mailbox metadata
+  -> provider-gated or configured HTTPS mailbox/local-network intake
   -> validated managed apply
   -> protected action history
 ```
@@ -53,8 +55,8 @@ flowchart TD
   B --> C["Live Nanah same-session send"]
   B --> D["Local mailbox seal/open helper"]
   D --> K["Server-safe mailbox item builder"]
-  K --> L["Provider upload/purge handoff"]
-  L --> I["Blocked: built-in server upload/pull/purge client"]
+  K --> L["Provider or configured HTTPS mailbox upload/purge handoff"]
+  L --> I["Blocked: mailbox server deployment/native parity"]
   B --> J["Provider-gated mailbox or LAN candidate intake"]
   C --> E["Managed validation and apply"]
   J --> E
@@ -84,7 +86,8 @@ Blocked release wording until this gate turns green:
 
 - complete remote local-network management;
 - always-on parent-to-child sync;
-- server mailbox delivery;
+- mailbox server delivery without explicit endpoint configuration and installed
+  smoke proof;
 - automatic LAN peer discovery;
 - guaranteed later delivery after the parent device goes offline;
 - remote management across desktop and apps without installed two-device smoke.
@@ -184,11 +187,11 @@ source-side mailbox upload-provider handoff: PARTIAL
 source-side mailbox purge-provider handoff: PARTIAL
 built-in LAN peer discovery: NO-GO
 built-in LAN delivery: NO-GO
-mailbox encryption client: PARTIAL local helper
-built-in server mailbox upload client: NO-GO
-built-in server mailbox purge client: NO-GO
-built-in server mailbox pull client: NO-GO
-mailbox decryption client: PARTIAL local helper
+mailbox encryption client: READY local helper and configured HTTPS upload
+built-in browser HTTPS mailbox upload client: READY explicit config only
+built-in browser HTTPS mailbox purge client: READY explicit config only
+built-in browser HTTPS mailbox pull client: READY explicit config only
+mailbox decryption client: READY local helper and configured HTTPS pull
 release claim for complete remote management: NO-GO
 ```
 

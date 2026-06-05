@@ -92,9 +92,8 @@ test('managed open-sync audit is docs-backed and linked from plan inventory and 
   const plan = read(planPath);
   const inventory = read(inventoryPath);
 
-  assert.match(doc, /Provider-gated dashboard\/profile-open hook, provider ack handoff,\s+and protected ack-handoff history writer are present/);
-  assert.match(doc, /protected ack-handoff history writer are present/);
-  assert.match(doc, /Server\s+mailbox client,\s+server mailbox pull\/decrypt transport, and local-network discovery are still\s+absent/);
+  assert.match(doc, /Provider-gated dashboard\/profile-open hook, provider ack handoff,\s+protected ack-handoff history writer, and explicitly configured browser HTTPS\s+mailbox pull\/decrypt client are present/);
+  assert.match(doc, /Local-network discovery and mailbox\s+server authority are still absent/);
   assert.match(doc, /runtime pull-on-open candidate gate: present/);
   assert.match(doc, /runtime provider-gated decrypted item pull: present/);
   assert.match(doc, /runtime provider-gated mailbox ack handoff: present/);
@@ -118,6 +117,7 @@ test('dashboard loads open-sync helper and wires policy toggle status and open/p
   const tabView = read(tabViewPath);
   const html = read(tabHtmlPath);
 
+  assert.match(html, /js\/nanah_managed_mailbox_client\.js/);
   assert.match(html, /js\/nanah_managed_open_sync\.js/);
   assert.match(tabView, /const NANAH_MANAGED_OPEN_SYNC_STATE_KEY = 'ftNanahManagedOpenSyncState'/);
   assert.match(tabView, /function formatNanahManagedOpenSyncStatus\(link\)/);

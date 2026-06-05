@@ -2,9 +2,10 @@
 
 **Generated**: 2026-06-05
 **Status**: Source-side mailbox/local-network delivery ack intake and dashboard
-status are present through an optional local provider. Built-in mailbox server
-pull, LAN discovery, LAN delivery, background polling, and YouTube page hot-path
-work remain absent.
+status are present through an optional local provider. The browser HTTPS mailbox
+client can submit redacted mailbox acks when explicitly configured. LAN
+discovery, LAN delivery, background polling, mailbox server authority, and
+YouTube page hot-path work remain absent.
 **Related provider hook**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PROVIDER_HOOK_2026-06-05.md`
 **Related mailbox protocol**:
@@ -101,11 +102,11 @@ runtime source-side mailbox/local-network ack record helper: present
 runtime source-side provider-gated ack pull: present
 runtime source-side trusted-link status persistence: present
 runtime parent-visible Remote delivery row: present
+runtime browser HTTPS mailbox ack client: present behind explicit config
 runtime provider authority: absent
 runtime unmatched ack payload apply: absent
 runtime plaintext rule storage in ack rows: absent
-runtime mailbox server upload client: absent
-runtime mailbox server pull client: absent
+runtime mailbox server authority: absent
 runtime built-in LAN peer discovery: absent
 runtime built-in LAN delivery: absent
 runtime YouTube page hot-path work from this slice: absent

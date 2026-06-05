@@ -229,7 +229,8 @@ test('managed live signed-send audit is linked without claiming mailbox runtime'
   assert.match(sourceDeliveryDoc, /Built-in LAN peer\s+discovery,\s+LAN transport, server mailbox upload\/pull, and dashboard offline-send\s+UI remain\s+absent/);
   assert.match(sourceDeliveryDoc, /runtime source-side local-network provider admin re-auth gate: present/);
   assert.match(mailboxSourceDeliveryDoc, /Source-side mailbox upload-provider handoff is present/);
-  assert.match(mailboxSourceDeliveryDoc, /runtime built-in mailbox server upload client: absent/);
+  assert.match(mailboxSourceDeliveryDoc, /runtime browser HTTPS mailbox upload client: present behind explicit config/);
+  assert.match(mailboxSourceDeliveryDoc, /runtime mailbox server deployment\/authority: absent/);
   assert.match(mailboxSourceDeliveryDoc, /runtime mailbox plaintext policy upload: absent/);
   assert.match(mailboxSourceDeliveryDoc, /runtime source-side mailbox upload admin re-auth gate: present/);
   assert.match(doc, /provider-facing mailbox items are\s+rebuilt from an allowlist of ciphertext\/index fields/);
@@ -240,7 +241,7 @@ test('managed live signed-send audit is linked without claiming mailbox runtime'
   assert.match(plan, new RegExp(docPath));
   assert.match(plan, new RegExp(sourceDeliveryDocPath));
   assert.match(plan, /Active\/full signed managed sends now expand into concrete\s+Main, Kids,\s+viewing-space, and optional time-limit envelopes for eligible fixed\s+targets/);
-  assert.match(plan, /Built-in local-network peer discovery, LAN transport, built-in server\s+mailbox upload\/pull clients, app native enforcement proofs,\s+offline later delivery UI, and\s+built-in multi-device fanout remain gated/);
+  assert.match(plan, /Built-in local-network peer discovery, LAN transport, app native enforcement\s+proofs, and built-in app\/server later-delivery providers remain gated/);
   assert.doesNotMatch(plan, /active\/full signed managed sends\s+remain gated/);
   assert.match(inventory, /fixed-target active\/full profile-policy bundles, Main\/Kids, keyword,\s+channel, video, viewing-space, and time-limit live sends can now build signed/);
   assert.match(inventory, new RegExp(sourceDeliveryDocPath));

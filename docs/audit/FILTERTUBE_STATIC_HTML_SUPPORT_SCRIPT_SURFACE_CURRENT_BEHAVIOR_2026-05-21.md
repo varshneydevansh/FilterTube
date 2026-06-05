@@ -16,7 +16,7 @@ Swift video compression helper.
 | Path | Current role | Lines | Bytes | SHA-256 |
 | --- | --- | ---: | ---: | --- |
 | `html/popup.html` | Browser action popup shell | 31 | 1,213 | `c5e03a38b2737dbd01e2cd0c243b37754936e2e349e9d2275b195350159aea31` |
-| `html/tab-view.html` | Dashboard/settings/help/What New shell | 1,600 | 136,305 | `5124626e39cd3879da6593bc9bfa8287f0ad5b9ae29dcbb075d9e5bce0389d0b` |
+| `html/tab-view.html` | Dashboard/settings/help/What New shell | 1,601 | 136,371 | `accda6df396aea61d154936bd3b885e0db18e543cd34fa9945f31d536601219d` |
 | `html/troubleshoot.html` | Tracked support HTML placeholder | 0 | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
 | `scripts/compress-video.swift` | Manual website/release video compression helper | 97 | 3,339 | `196c1ebf918b94e3d36fd2bd04658c4fa4762a85ad5657b49ede7aaa93e2e36b` |
 
@@ -65,15 +65,16 @@ download cards use `rel="noreferrer"`, and four support/Nanah links use
 5. `../js/vendor/qrcode.bundle.js`
 6. `../js/vendor/nanah.bundle.js`
 7. `../js/nanah_sync_adapter.js`
-8. `../js/nanah_managed_live_policy.js`
-9. `../js/nanah_managed_open_sync.js`
-10. `../js/content_controls_catalog.js`
-11. `../js/ui_components.js`
-12. `../js/state_manager.js`
-13. `../js/render_engine.js`
-14. `../js/ui-shell/tab-view-decor.js`
-15. `../js/managed_parent_command_center.js`
-16. `../js/tab-view.js`
+8. `../js/nanah_managed_mailbox_client.js`
+9. `../js/nanah_managed_live_policy.js`
+10. `../js/nanah_managed_open_sync.js`
+11. `../js/content_controls_catalog.js`
+12. `../js/ui_components.js`
+13. `../js/state_manager.js`
+14. `../js/render_engine.js`
+15. `../js/ui-shell/tab-view-decor.js`
+16. `../js/managed_parent_command_center.js`
+17. `../js/tab-view.js`
 
 `html/troubleshoot.html` is an empty tracked file. Current product source does
 not reference `html/troubleshoot.html` from manifests, `build.js`,
