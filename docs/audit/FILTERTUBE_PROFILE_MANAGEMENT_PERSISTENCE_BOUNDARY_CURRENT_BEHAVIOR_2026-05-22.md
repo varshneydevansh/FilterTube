@@ -18,7 +18,7 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/tab-view.js` | 14381 | 667956 | `0f1ead56240490d51a895a22203b0298dc4c3d8813a976d0c70f1a66f153660f` |
+| `js/tab-view.js` | 14584 | 676581 | `7f3de6750e95adb81bfdec5df53425427be86b08044a833bc0288bfe8cbe6e58` |
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/io_manager.js` | 2097 | 100479 | `f6f4119992f63a92dd984cd5eb9d5d5c946c839f63abef070ad0dace77474d62` |
 | `js/background.js` | 6773 | 305166 | `b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5` |
@@ -28,7 +28,7 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 ```text
 4 profile management persistence source files
 source/effect blocks: 9
-tab-view renderProfilesManager block: 442 lines, 22536 bytes
+tab-view renderProfilesManager block: 447 lines, 22917 bytes
 tab-view refreshProfilesUI block: 24 lines, 954 bytes
 tab-view switchToProfile block: 46 lines, 1749 bytes
 popup switchToProfile block: 48 lines, 1659 bytes
@@ -42,21 +42,21 @@ background profile storage invalidation block: 42 lines, 1464 bytes
 ## Selected Token Counts
 
 ```text
-tab-view ensureProfileUnlocked tokens: 19
-tab-view saveProfilesV4 tokens: 45
-tab-view loadProfilesV4 tokens: 80
-tab-view activeProfileId tokens: 86
+tab-view ensureProfileUnlocked tokens: 20
+tab-view saveProfilesV4 tokens: 47
+tab-view loadProfilesV4 tokens: 82
+tab-view activeProfileId tokens: 87
 tab-view StateManager.loadSettings tokens: 8
-tab-view refreshProfilesUI tokens: 22
+tab-view refreshProfilesUI tokens: 23
 tab-view applyLockGateIfNeeded tokens: 4
 tab-view scheduleAutoBackup tokens: 6
 tab-view profile_created tokens: 2
 tab-view managedChildEdit tokens: 14
 tab-view unlockedProfiles tokens: 5
 tab-view clearProfileUnlockSession tokens: 7
-tab-view allowMainViewing tokens: 4
-tab-view allowKidsViewing tokens: 4
-tab-view schemaVersion tokens: 28
+tab-view allowMainViewing tokens: 23
+tab-view allowKidsViewing tokens: 22
+tab-view schemaVersion tokens: 30
 popup ensureProfileUnlocked tokens: 3
 popup saveProfilesV4 tokens: 2
 popup loadProfilesV4 tokens: 4

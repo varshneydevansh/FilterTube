@@ -23,7 +23,9 @@ ftProfilesV4.activeProfileId
 
 Important current boundary:
   allowMainViewing / allowKidsViewing are UI/admin policy fields today.
-  They are not a background/runtime enforcement authority for content scripts.
+  For child profiles, background compile now emits a managed route-gate
+  contract for Main/Kids access. The broader profileViewingAuthority object
+  remains future work.
 ```
 
 ## Source Evidence
@@ -33,7 +35,7 @@ Important current boundary:
 | V4 profile validity and legacy migration | `js/settings_shared.js:89-116`; `js/background.js:60-88` | A V4 profile tree is valid if it has a non-empty `activeProfileId` and a `profiles` object. Legacy migration creates Default with Main and Kids surfaces. |
 | Shared settings load | `js/settings_shared.js:567-705` | Reads active V4 Main settings and can write generated/missing V4 profile settings during a load path. |
 | StateManager profile state | `js/state_manager.js:190-455` | Loads active profile Main/Kids lists, modes, content filters, category filters, and `syncKidsToMain` into UI state. |
-| Main/Kids compile authority | `js/background.js:1974-2555`; `js/background.js:3238-3258` | `getCompiledSettings` chooses `main` or `kids` from request/sender URL, then compiles the active V4 profile for that surface. |
+| Main/Kids compile authority | `js/background.js:1974-2555`; `js/background.js:3238-3258` | `getCompiledSettings` chooses `main` or `kids` from request/sender URL, compiles the active V4 profile for that surface, and emits `managedViewingRouteGate` for child profiles. |
 | Runtime cache | `js/background.js:3244-3258`; `js/background.js:4458-4494` | `compiledSettingsCache` is keyed by `main` and `kids`; `ftProfilesV4` changes invalidate both caches and trigger safe recompiles. |
 | Profile dropdown switching | `js/tab-view.js:3780-3860`, `8830-8915`; `js/popup.js:1378-1510` | Dropdowns unlock the target profile, write `activeProfileId`, reload UI state, and refresh local UI. |
 | Viewing-space policy UI | `js/tab-view.js:4088-4098`, `4543-4578`, `8516-8665`; `html/tab-view.html:1436-1437` | Profile manager stores and labels `allowMainViewing` and `allowKidsViewing`; it prevents saving a profile with both spaces disabled. |
@@ -42,13 +44,12 @@ Important current boundary:
 
 ## Findings
 
-1. **Viewing-space flags are not runtime route enforcement.**
+1. **Viewing-space flags now feed runtime route enforcement for child profiles.**
    `allowMainViewing` and `allowKidsViewing` are created, displayed, and edited in
-   tab-view profile management, but `js/background.js` and `js/settings_shared.js`
-   do not use those fields to reject `getCompiledSettings`, suppress content
-   scripts, or refuse Main/Kids runtime settings. This may be acceptable if
-   viewing-space enforcement belongs only in native apps, but the extension help
-   copy currently presents the flags as profile policy.
+   tab-view profile management. `js/background.js` compiles those fields into a
+   `filtertube_managed_viewing_space_route_gate` payload for child profiles; the
+   route gate/overlay is the enforcement boundary, not list-mode selection or a
+   reusable profileViewingAuthority object.
 
 2. **Profile selection and surface selection are separate authorities.**
    `activeProfileId` chooses the profile. The background then chooses Main/Kids

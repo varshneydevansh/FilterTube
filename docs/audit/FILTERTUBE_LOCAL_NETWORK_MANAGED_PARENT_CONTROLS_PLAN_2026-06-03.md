@@ -455,8 +455,9 @@ replica child device over Nanah/P2P or same-network transport.
   history are present per trusted link/scope. Pull-on-open mailbox ack handoff
   now writes protected redacted target-profile history after the provider ack
   attempt. Offline mailbox/local-network delivery, source-side
-  mailbox/local-network ack summaries, and richer viewing-space/time-limit or
-  multi-device bulk outbound controls remain later slices.
+  mailbox/local-network ack summaries, and richer remote-rule or multi-device
+  bulk outbound controls remain later slices. Local selected-profile time-limit
+  and viewing-space bulk writes are already dashboard-gated.
 - **Acceptance Criteria**:
   - The public descriptor is separated from the private keypair.
   - The private JWK is not placed in the Nanah hello descriptor or trusted link
@@ -491,9 +492,9 @@ replica child device over Nanah/P2P or same-network transport.
   when they match a prior sent revision/hash. Pull-on-open mailbox ack handoff
   now writes protected redacted target-profile history after the provider ack
   attempt. Active/full proposal sends, mailbox delivery, local-network delivery,
-  source-side mailbox/local-network ack summaries, and richer
-  viewing-space/time-limit or multi-device bulk outbound controls remain
-  pending.
+  source-side mailbox/local-network ack summaries, and richer remote-rule or
+  multi-device bulk outbound controls remain pending. Local selected-profile
+  time-limit and viewing-space bulk writes are already dashboard-gated.
 - **Acceptance Criteria**:
   - Existing proposal sends still work for unsupported active/full scopes.
   - Signed sends require saved managed link, Source -> Replica roles, allowed
@@ -573,10 +574,11 @@ the current extension dashboard.
   Parent/account-authorized profile manager views now also show a command-center
   overview for protected profiles, viewing spaces, time limits, sync status,
   and protected history. Command-center row buttons are delegated action intents
-  for existing gated Edit Rules, History, and Time Limit paths; they do not
-  carry policy payloads or direct mutation authority. Child/protected views do
-  not receive detailed managed status text or command-center controls.
-  Bulk/multi-profile command-center writes remain pending.
+  for existing gated Edit Rules, History, and Time Limit paths, plus local
+  selected-profile bulk time-limit and viewing-space actions; they do not carry
+  policy payloads or direct mutation authority. Child/protected views do not
+  receive detailed managed status text or command-center controls. Remote-rule,
+  mailbox, LAN, and multi-device bulk command-center writes remain pending.
 - **Acceptance Criteria**:
   - UI has empty, loading, error, locked, offline, and sync-conflict states.
   - Parent actions are clear and reversible where possible.

@@ -65,7 +65,7 @@ test('mode surface effect matrix doc treats waterfall as source priority not eff
   }
 });
 
-test('background compile chooses surface from request or sender without viewing-space denial', () => {
+test('background compile chooses surface and emits child viewing-space route gate', () => {
   const background = read('js/background.js');
   const messageBlock = sliceBetween(
     background,
@@ -81,7 +81,11 @@ test('background compile chooses surface from request or sender without viewing-
   assert.match(messageBlock, /isKidsUrl\(senderUrl\) \? 'kids' : 'main'/);
   assert.match(compileBlock, /compiledSettings\.listMode = shouldUseKidsProfile \? kidsModeFromV4 : mainModeFromV4/);
   assert.match(compileBlock, /compiledSettings\.profileType = targetProfile/);
-  assert.doesNotMatch(`${messageBlock}\n${compileBlock}`, /allowMainViewing|allowKidsViewing|runtimeAllowed|modeSurfaceEffectAuthority/);
+  assert.match(compileBlock, /const allowMainViewing = activeSettings\.allowMainViewing !== false/);
+  assert.match(compileBlock, /const allowKidsViewing = activeSettings\.allowKidsViewing !== false/);
+  assert.match(compileBlock, /compiledSettings\.managedViewingRouteGate = \{/);
+  assert.match(compileBlock, /schema: 'filtertube_managed_viewing_space_route_gate'/);
+  assert.doesNotMatch(`${messageBlock}\n${compileBlock}`, /runtimeAllowed|modeSurfaceEffectAuthority/);
 });
 
 test('profile UI owns viewing-space flags while runtime source lacks enforcement authority token', () => {

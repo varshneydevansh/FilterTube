@@ -64,7 +64,7 @@ rows; command-center buttons delegate to existing dashboard runtime gates.
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/seed.js` | 1136 | 50026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
 | `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
-| `js/tab-view.js` | 14381 | 667956 | `0f1ead56240490d51a895a22203b0298dc4c3d8813a976d0c70f1a66f153660f` |
+| `js/tab-view.js` | 14584 | 676581 | `7f3de6750e95adb81bfdec5df53425427be86b08044a833bc0288bfe8cbe6e58` |
 
 ## File And Operation Counts
 
@@ -160,7 +160,7 @@ js/state_manager.js:1636:runtime.sendMessage:kidsWhitelistRuntimeMutation
 js/state_manager.js:1808:runtime.sendMessage:whitelistTransferRuntimeMutation
 js/tab-view.js:3101:runtime.sendMessage:dashboardRuntimeRequest
 js/tab-view.js:3495:tabs.sendMessage:dashboardTabRuntimeRequest
-js/tab-view.js:13736:runtime.onMessage.addListener:dashboardRuntimeMessageReceiver
+js/tab-view.js:13939:runtime.onMessage.addListener:dashboardRuntimeMessageReceiver
 ```
 
 ## Current Behavior Boundaries
@@ -168,7 +168,7 @@ js/tab-view.js:13736:runtime.onMessage.addListener:dashboardRuntimeMessageReceiv
 - Background has two runtime receivers: the primary `request.action` /
   `request.type` router and a secondary `message.type` router.
 - Content/dashboard code has two more runtime receivers:
-  `js/content/bridge_settings.js:200` and `js/tab-view.js:13735`.
+  `js/content/bridge_settings.js:200` and `js/tab-view.js:13938`.
 - Runtime sender rows cover settings fetches, prompt acknowledgements, list-mode
   mutations, whitelist/Kids mutations, identity fetches, learned-map writes,
   script injection, browser info, stats/backup scheduling, and popup/dashboard

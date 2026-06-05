@@ -4572,10 +4572,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
-    function localManagedEditPolicyRevisionStore(profile, scope) {
+    function localManagedPolicyRevisionStore(profile, scope) {
         const policyState = safeObject(profile?.managedPolicyState);
         const localEdits = safeObject(policyState.localManagedEdits);
-        return safeObject(localEdits[scope === 'kids' ? 'kids' : 'main']);
+        return safeObject(localEdits[scope]);
+    }
+
+    function localManagedEditPolicyRevisionStore(profile, scope) {
+        return localManagedPolicyRevisionStore(profile, scope === 'kids' ? 'kids' : 'main');
     }
 
     function countEnabledFlags(value) {
@@ -4623,6 +4627,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             dailyBudgetMinutes: Math.floor(dailyBudgetSeconds / 60),
             timezone: normalizeString(item.timezone) || 'Etc/UTC',
             surfaceBudgetCount
+        };
+    }
+
+    function summarizeManagedViewingSpacePolicy(policy) {
+        const item = safeObject(policy);
+        const allowMainViewing = item.allowMainViewing === true;
+        const allowKidsViewing = item.allowKidsViewing === true;
+        const defaultLaunchTarget = normalizeString(item.defaultLaunchTarget);
+        return {
+            redacted: true,
+            label: 'Updated viewing access',
+            allowMainViewing,
+            allowKidsViewing,
+            accessLabel: allowMainViewing && allowKidsViewing
+                ? 'Main + Kids'
+                : (allowMainViewing ? 'Main only' : 'Kids only'),
+            ...(defaultLaunchTarget ? { defaultLaunchTarget } : {})
         };
     }
 
@@ -4674,6 +4695,64 @@ document.addEventListener('DOMContentLoaded', async () => {
             sensitive: true
         };
         return { scope, policyState, historyRow };
+    }
+
+    function buildManagedViewingSpaceLocalEditReport({ actorProfileId, targetProfileId, priorProfile, nextAccess }) {
+        const access = safeObject(nextAccess);
+        const allowMainViewing = access.allowMainViewing === true;
+        const allowKidsViewing = access.allowKidsViewing === true;
+        const defaultLaunchTarget = normalizeString(access.defaultLaunchTarget);
+        const priorState = localManagedPolicyRevisionStore(priorProfile, 'viewing_space');
+        const revision = Math.max(0, normalizeNonNegativeInteger(priorState.policyRevision) || 0) + 1;
+        const now = Date.now();
+        const actorId = normalizeString(actorProfileId) || 'default';
+        const targetId = normalizeString(targetProfileId);
+        const actorDeviceId = normalizeString(nanahStableDeviceId) || 'local-extension-device';
+        const policyHash = buildManagedLocalEditPolicyHash({
+            scope: 'viewing_space',
+            targetProfileId: targetId,
+            policyRevision: revision,
+            allowMainViewing,
+            allowKidsViewing,
+            defaultLaunchTarget
+        });
+        const policyState = {
+            schema: MANAGED_LOCAL_EDIT_POLICY_SCHEMA,
+            version: 1,
+            source: 'local_parent_viewing_space_policy',
+            scope: 'viewing_space',
+            targetProfileId: targetId,
+            actorProfileId: actorId,
+            actorDeviceId,
+            policyRevision: revision,
+            policyHash,
+            updatedAt: now
+        };
+        const historyRow = {
+            rowId: `local-viewing-space-${revision}-${now}`,
+            schema: MANAGED_ACTION_HISTORY_SCHEMA,
+            version: 1,
+            actorProfileId: actorId,
+            actorDeviceId,
+            targetProfileId: targetId,
+            trustedLinkId: null,
+            actionType: 'policy.viewing_space.update',
+            scope: 'viewing_space',
+            revision,
+            policyHash,
+            result: 'accepted',
+            reason: null,
+            receivedAt: now,
+            issuedAt: now,
+            orderKey: `${String(revision).padStart(6, '0')}:${now}`,
+            summary: summarizeManagedViewingSpacePolicy({
+                allowMainViewing,
+                allowKidsViewing,
+                defaultLaunchTarget
+            }),
+            sensitive: true
+        };
+        return { scope: 'viewing_space', policyState, historyRow };
     }
 
     function buildManagedTimeLimitLocalEditReport({ actorProfileId, targetProfileId, nextPolicy }) {
@@ -5664,7 +5743,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             UIComponents.showToast('A profile needs at least one viewing space', 'error');
             return;
         }
-        profiles[targetId] = {
+        let nextProfile = {
             ...profile,
             settings: {
                 ...settings,
@@ -5672,6 +5751,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 allowKidsViewing: nextKids
             }
         };
+        if (getProfileType(fresh, targetId) === 'child') {
+            const report = buildManagedViewingSpaceLocalEditReport({
+                actorProfileId: currentActive,
+                targetProfileId: targetId,
+                priorProfile: profile,
+                nextAccess: {
+                    allowMainViewing: nextMain,
+                    allowKidsViewing: nextKids,
+                    defaultLaunchTarget: settings.defaultLaunchTarget
+                }
+            });
+            nextProfile = recordManagedChildLocalEditHistory(nextProfile, report);
+        }
+        profiles[targetId] = nextProfile;
         await io.saveProfilesV4({
             ...fresh,
             schemaVersion: 4,
@@ -5679,6 +5772,111 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         await refreshProfilesUI();
         UIComponents.showToast('Viewing access updated', 'success');
+    }
+
+    function managedViewingAccessPatchForMode(accessMode) {
+        const mode = normalizeString(accessMode).toLowerCase();
+        if (mode === 'main_kids' || mode === 'allow_main_kids' || mode === 'both') {
+            return { allowMainViewing: true, allowKidsViewing: true, label: 'Main + Kids' };
+        }
+        if (mode === 'kids_only') {
+            return { allowMainViewing: false, allowKidsViewing: true, label: 'Kids only' };
+        }
+        if (mode === 'main_only') {
+            return { allowMainViewing: true, allowKidsViewing: false, label: 'Main only' };
+        }
+        return null;
+    }
+
+    async function updateMultipleProfileViewingAccess(profileIds, accessMode) {
+        const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
+        const patch = managedViewingAccessPatchForMode(accessMode);
+        if (!targetIds.length) {
+            UIComponents.showToast('Select at least one protected profile', 'error');
+            return;
+        }
+        if (!patch) {
+            UIComponents.showToast('Choose a valid viewing-space policy', 'error');
+            return;
+        }
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
+            UIComponents.showToast('Profiles unavailable', 'error');
+            return;
+        }
+
+        const fresh = await io.loadProfilesV4();
+        const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
+        if (getProfileType(fresh, currentActive) === 'child') {
+            UIComponents.showToast('Child profiles cannot change viewing access', 'error');
+            return;
+        }
+
+        const profiles = { ...safeObject(fresh.profiles) };
+        const eligibleIds = targetIds.filter((targetId) => {
+            const profile = safeObject(profiles[targetId]);
+            return !!profile && Object.keys(profile).length > 0
+                && getProfileType(fresh, targetId) === 'child'
+                && canActiveProfileManageProfile(fresh, targetId);
+        });
+        if (!eligibleIds.length) {
+            UIComponents.showToast('No selected child profiles can be managed by this account', 'error');
+            return;
+        }
+
+        const okAdmin = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
+        if (!okAdmin) {
+            for (const targetId of eligibleIds) {
+                await recordManagedAdminAuthFailureHistory(fresh, targetId, 'bulk_viewing_space_unlock_failed');
+            }
+            return;
+        }
+
+        let changedCount = 0;
+        for (const targetId of eligibleIds) {
+            const profile = safeObject(profiles[targetId]);
+            const settings = safeObject(profile.settings);
+            if (
+                settings.allowMainViewing === patch.allowMainViewing
+                && settings.allowKidsViewing === patch.allowKidsViewing
+            ) {
+                continue;
+            }
+            const nextProfile = {
+                ...profile,
+                settings: {
+                    ...settings,
+                    allowMainViewing: patch.allowMainViewing,
+                    allowKidsViewing: patch.allowKidsViewing
+                }
+            };
+            const report = buildManagedViewingSpaceLocalEditReport({
+                actorProfileId: currentActive,
+                targetProfileId: targetId,
+                priorProfile: profile,
+                nextAccess: {
+                    allowMainViewing: patch.allowMainViewing,
+                    allowKidsViewing: patch.allowKidsViewing,
+                    defaultLaunchTarget: settings.defaultLaunchTarget
+                }
+            });
+            profiles[targetId] = recordManagedChildLocalEditHistory(nextProfile, report);
+            changedCount += 1;
+        }
+
+        if (!changedCount) {
+            UIComponents.showToast('Selected profiles already use that viewing access', 'info');
+            return;
+        }
+
+        await io.saveProfilesV4({
+            ...fresh,
+            schemaVersion: 4,
+            profiles
+        });
+        profilesV4Cache = { ...fresh, schemaVersion: 4, profiles };
+        await refreshProfilesUI();
+        UIComponents.showToast(`${changedCount} profiles set to ${patch.label}`, 'success');
     }
 
     async function updateProfileTimeLimitPolicy(profileId, action) {
@@ -11130,6 +11328,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                         await updateMultipleProfileTimeLimitPolicies(
                             safeArray(intent?.profileIds),
                             action === 'bulk_disable_time_limit' ? 'disable' : 'set'
+                        );
+                    } else if (action === 'bulk_allow_main_kids' || action === 'bulk_kids_only' || action === 'bulk_main_only') {
+                        await updateMultipleProfileViewingAccess(
+                            safeArray(intent?.profileIds),
+                            normalizeString(intent?.viewingAccess) || action.replace(/^bulk_/, '')
                         );
                     }
                 }

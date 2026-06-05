@@ -18,13 +18,14 @@ function sliceBetween(text, startNeedle, endNeedle) {
   return text.slice(start, end);
 }
 
-test('profile viewing-space audit documents UI policy and runtime authority gap', () => {
+test('profile viewing-space audit documents UI policy and runtime route-gate boundary', () => {
   const doc = read(auditDocPath);
 
   for (const marker of [
     'profileViewingAuthority',
     'allowMainViewing / allowKidsViewing are UI/admin policy fields today',
-    'Viewing-space flags are not runtime route enforcement',
+    'Viewing-space flags now feed runtime route enforcement for child profiles',
+    'filtertube_managed_viewing_space_route_gate',
     'Profile selection and surface selection are separate authorities',
     'Compiled settings cache is surface-keyed',
     'Managed child editing bypasses active-profile switching by design',
@@ -79,7 +80,7 @@ test('tab-view owns viewing access labels and writes allowMainViewing allowKidsV
   assert.match(managerBlock, /Kids allowed/);
 });
 
-test('background compile currently chooses active profile and surface without viewing access fields', () => {
+test('background compile emits child viewing route gate without broad profile authority object', () => {
   const source = read('js/background.js');
   const compileBlock = sliceBetween(
     source,
@@ -96,13 +97,17 @@ test('background compile currently chooses active profile and surface without vi
   assert.match(compileBlock, /const activeProfile = safeObject\(safeObject\(effectiveProfilesV4\?\.profiles\)\?\.\[activeProfileId\]\)/);
   assert.match(compileBlock, /compiledSettings\.listMode = shouldUseKidsProfile \? kidsModeFromV4 : mainModeFromV4/);
   assert.match(compileBlock, /compiledSettings\.profileType = targetProfile/);
-  assert.doesNotMatch(compileBlock, /allowMainViewing|allowKidsViewing|viewingAccess|profileViewingAuthority/);
+  assert.match(compileBlock, /const allowMainViewing = activeSettings\.allowMainViewing !== false/);
+  assert.match(compileBlock, /const allowKidsViewing = activeSettings\.allowKidsViewing !== false/);
+  assert.match(compileBlock, /compiledSettings\.managedViewingRouteGate = \{/);
+  assert.match(compileBlock, /schema: 'filtertube_managed_viewing_space_route_gate'/);
+  assert.doesNotMatch(compileBlock, /profileViewingAuthority/);
 
   assert.match(messageBlock, /const requestedProfile = request\.profileType/);
   assert.match(messageBlock, /isKidsUrl\(senderUrl\) \? 'kids' : 'main'/);
   assert.match(messageBlock, /compiledSettingsCache\[profileType\]/);
   assert.match(messageBlock, /getCompiledSettings\(sender, profileType, !!request\.forceRefresh\)/);
-  assert.doesNotMatch(messageBlock, /allowMainViewing|allowKidsViewing|viewingAccess|profileViewingAuthority/);
+  assert.doesNotMatch(messageBlock, /profileViewingAuthority/);
 });
 
 test('background cache invalidates on ftProfilesV4 but cache identity is still only main and kids', () => {
@@ -182,12 +187,13 @@ test('managed child edit writes target profile surfaces directly through V4 save
 
   assert.match(editBlock, /getProfileType\(fresh, targetId\) !== 'child'/);
   assert.match(editBlock, /canActiveProfileManageProfile\(fresh, targetId\)/);
-  assert.match(editBlock, /ensureProfileUnlocked\(fresh, currentActive\)/);
+  assert.match(editBlock, /ensureProfileUnlocked\(fresh, currentActive, \{ sensitiveAction: true \}\)/);
   assert.match(editBlock, /managedChildEdit = targetSurface \? \{ profileId: targetId, surface: targetSurface \}/);
 
   assert.match(saveBlock, /canActiveProfileManageProfile\(fresh, profileId\)/);
   assert.match(saveBlock, /const nextSurface = getProfileSurface\(profile, surface\)/);
-  assert.match(saveBlock, /profiles\[profileId\] = setProfileSurface\(profile, surface, nextSurface\)/);
+  assert.match(saveBlock, /const nextProfile = setProfileSurface\(profile, surface, nextSurface\)/);
+  assert.match(saveBlock, /recordManagedChildLocalEditHistory\(nextProfile, report\)/);
   assert.match(saveBlock, /await io\.saveProfilesV4/);
   assert.match(saveBlock, /await StateManager\.loadSettings/);
   assert.doesNotMatch(saveBlock, /profileViewingAuthority|compiledSettingsRevision|FilterTube_RefreshNow/);

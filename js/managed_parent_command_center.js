@@ -84,6 +84,33 @@
                 scope: 'time_limits',
                 authority: 'delegated_runtime_gate',
                 sensitiveAction: true
+            },
+            {
+                action: 'bulk_allow_main_kids',
+                label: 'Allow Main + Kids',
+                profileIds,
+                scope: 'viewing_space',
+                viewingAccess: 'main_kids',
+                authority: 'delegated_runtime_gate',
+                sensitiveAction: true
+            },
+            {
+                action: 'bulk_kids_only',
+                label: 'Kids only',
+                profileIds,
+                scope: 'viewing_space',
+                viewingAccess: 'kids_only',
+                authority: 'delegated_runtime_gate',
+                sensitiveAction: true
+            },
+            {
+                action: 'bulk_main_only',
+                label: 'Main only',
+                profileIds,
+                scope: 'viewing_space',
+                viewingAccess: 'main_only',
+                authority: 'delegated_runtime_gate',
+                sensitiveAction: true
             }
         ];
     }
@@ -209,8 +236,8 @@
             const updateBulkState = () => {
                 const count = selectedProfiles.size;
                 bulkStatus.textContent = count
-                    ? `${count} selected for time-limit update`
-                    : 'Select protected profiles for same time limit';
+                    ? `${count} selected for managed updates`
+                    : 'Select protected profiles for bulk updates';
                 bulkButtons.forEach(button => {
                     button.disabled = count === 0;
                 });
@@ -229,7 +256,7 @@
             const selector = document.createElement('input');
             selector.className = 'ft-managed-command-center__select';
             selector.type = 'checkbox';
-            selector.setAttribute('aria-label', `Select ${item.profileName} for bulk time-limit update`);
+            selector.setAttribute('aria-label', `Select ${item.profileName} for bulk managed update`);
             selector.dataset.filtertubeProfileId = item.profileId;
             selector.addEventListener('change', () => {
                 if (selector.checked) {

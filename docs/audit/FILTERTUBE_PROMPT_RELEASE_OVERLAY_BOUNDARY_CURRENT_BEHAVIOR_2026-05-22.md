@@ -48,7 +48,7 @@ release-note data file, and the dashboard renderer.
 | `js/content/first_run_prompt.js` | 190 | 7,453 | `5672d9060d29b08550ecfc3add54245212a5094ee5137f025b6f788f12e50409` |
 | `js/content/release_notes_prompt.js` | 250 | 9,866 | `30b624cbbda1004f354f98dbf3b4513f8ebc298adecbceb4358782f248f80474` |
 | `js/background.js` | 6773 | 305166 | `b1fa9334a6559d7be77a071f9b55a172f2eceb096f5b471247f6142c63f729a5` |
-| `js/tab-view.js` | 11,617 | 526,763 | `1b7f621d48d16247aecc4c7ee57cbc3db9efd3e597e6f0a4fc188228470648f7` |
+| `js/tab-view.js` | 14,584 | 676,581 | `7f3de6750e95adb81bfdec5df53425427be86b08044a833bc0288bfe8cbe6e58` |
 
 ## Source/Effect Blocks
 
@@ -155,9 +155,9 @@ support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 73
-method semantic proof gap lexical callables covered: 6181
+method semantic proof gap lexical callables covered: 6198
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 6181
+lexical callables requiring semantic proof before behavior changes: 6198
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

@@ -2,9 +2,9 @@
 
 **Generated**: 2026-06-04
 **Status**: Spec, dashboard child-row status, command-center overview,
-delegated command-center action intents, and delegated same-budget bulk
-time-limit controls are present. Rule, viewing-space, and remote-delivery bulk
-writes are not implemented yet.
+delegated command-center action intents, delegated same-budget bulk
+time-limit controls, and delegated local bulk viewing-space controls are
+present. Rule and remote-delivery bulk writes are not implemented yet.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 
@@ -17,11 +17,12 @@ without turning protected profiles into an admin surface for the child.
 The first increment is deliberately compact: the existing Accounts & Sync
 profile manager gets a read-only managed status line on child profile rows and
 a parent command-center overview when the active parent/account profile can
-manage protected profiles. The command-center row buttons and selected-profile
-bulk time-limit buttons are delegated action intents; they call the same gated
-runtime paths as the existing child row actions and do not write policy from the
-overview helper itself. These surfaces summarize policy state without exposing
-plaintext rule values:
+manage protected profiles. The command-center row buttons, selected-profile
+bulk time-limit buttons, and selected-profile bulk viewing-space buttons are
+delegated action intents; they call the same gated runtime paths as the
+existing child row actions and do not write policy from the overview helper
+itself. These surfaces summarize policy state without exposing plaintext rule
+values:
 
 - local parent-managed Main/Kids revisions;
 - remote accepted managed-policy scope/link counts and latest revision;
@@ -71,8 +72,9 @@ runtime detailed history modal re-auth gate: present
 runtime managed command-center overview: present
 runtime managed command-center delegated action intents: present
 runtime managed command-center bulk time-limit controls: present via delegated runtime gate
+runtime managed command-center bulk viewing-space controls: present via delegated runtime gate
 runtime managed command-center direct policy writes: absent
-runtime managed command-center rule/viewing-space/remote bulk writes: absent
+runtime managed command-center rule/remote bulk writes: absent
 runtime YouTube hot-path work from command-center UI: absent
 ```
 
@@ -87,11 +89,11 @@ weakening the authority model:
 | --- | --- | --- |
 | Managed profile selection | See each protected profile, owner relationship, current lock state, and last policy revision. | Child/protected views still hide admin controls and detailed history. |
 | Rule editing | Command-center and row actions still enter the existing managed child editor. | Writes must use the same validated local/remote managed-policy paths as current FilterTube controls. |
-| Viewing spaces | Show Main, Kids, both, or neither per protected profile; row actions still change policy. | UI choice is not authority; runtime route gate remains the enforcement layer. |
+| Viewing spaces | Show Main, Kids, both, or neither per protected profile; row actions still change policy and selected-profile bulk actions can apply Main + Kids, Kids only, or Main only locally. | UI choice is not authority; runtime route gate remains the enforcement layer; every selected target gets its own redacted revision/history row after parent re-auth. |
 | Time limits | Show daily YouTube budget state; command-center row actions still set/disable one profile and bulk selected-profile actions can apply the same daily budget or disable existing limits. | Runtime budget accounting remains background-owned; every target gets its own revision/history row after parent re-auth. |
 | Sync status | Show trusted device, local-network provider, Nanah open-sync, and mailbox status. | Reachability is never authorization; offline state keeps the last valid policy active. |
 | Action history | Show accepted, rejected, conflict, failed-auth, and expired-session counts/latest labels; detailed history remains gated by the History action. | History stays redacted, protected by parent/account re-auth, and never becomes policy authority. |
-| Multi-profile apply | Present only for same-budget local time-limit changes on selected protected profiles. | Future rule, viewing-space, remote, mailbox, or LAN bulk writes require each target to have its own target profile, trusted link, scope, revision, hash, and signature/integrity proof. |
+| Multi-profile apply | Present for same-budget local time-limit changes and same-access local viewing-space changes on selected protected profiles. | Future rule, remote, mailbox, or LAN bulk writes require each target to have its own target profile, trusted link, scope, revision, hash, and signature/integrity proof. |
 
 Required UI states for that slice:
 

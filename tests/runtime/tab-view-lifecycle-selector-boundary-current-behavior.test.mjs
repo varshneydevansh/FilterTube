@@ -80,9 +80,9 @@ test('tab-view lifecycle selector boundary audit is audit-only and source pinned
   assert.match(doc, /This is not an implementation patch/);
   assert.match(doc, /tests\/runtime\/tab-view-lifecycle-selector-boundary-current-behavior\.test\.mjs/);
   assert.deepEqual(fingerprint(tabViewPath), {
-    lines: 11617,
-    bytes: 526763,
-    sha256: '1b7f621d48d16247aecc4c7ee57cbc3db9efd3e597e6f0a4fc188228470648f7',
+    lines: 14584,
+    bytes: 676581,
+    sha256: '7f3de6750e95adb81bfdec5df53425427be86b08044a833bc0288bfe8cbe6e58',
   });
   assert.deepEqual(fingerprint(htmlPath), {
     lines: 1577,

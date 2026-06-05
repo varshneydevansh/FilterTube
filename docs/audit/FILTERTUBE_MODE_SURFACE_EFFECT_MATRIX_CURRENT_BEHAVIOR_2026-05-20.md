@@ -31,7 +31,7 @@ deleted." The current source does not support either conclusion.
 | Dimension | Current behavior | Risk |
 | --- | --- | --- |
 | Profile choice | Background chooses `main` or `kids` from explicit request or sender URL. | The compile payload does not include one profile/viewing-space authority report. |
-| Viewing-space flags | `allowMainViewing` and `allowKidsViewing` are edited in profile UI. | They are not runtime compile denial gates today. |
+| Viewing-space flags | `allowMainViewing` and `allowKidsViewing` are edited in profile UI and compiled into a child-profile route gate. | Route denial is owned by `managedViewingRouteGate`; list-mode source selection is still not the permission model. |
 | Main blocklist empty state | Empty canonical rows should mean no blocklist rule work. | Stale `blocked*` aliases, content controls, lifecycle setup, endpoint harvest, and learned maps can still create work or active rules. |
 | Main whitelist empty state | Empty whitelist is fail-closed for video/card surfaces. | It must not share the empty-blocklist no-work path. |
 | Kids surface | Background compiles Kids lists when the sender/request is Kids. | Kids has separate public-web DOM/JSON behavior and cannot inherit all Main route assumptions. |
