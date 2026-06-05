@@ -166,6 +166,7 @@ test('managed remote delivery smoke verifier is wired into release settings and 
   assert.deepEqual(MANAGED_REMOTE_DELIVERY_SMOKE_REQUIRED_ROWS, REQUIRED_MANAGED_REMOTE_DELIVERY_ROWS);
   assert.ok(boundaryDoc.includes(templatePath));
   assert.ok(boundaryDoc.includes(verifierPath));
+  assert.ok(boundaryDoc.includes('FT-MANAGED-REMOTE-10-key-rotation-repair-status'));
   assert.match(
     boundaryDoc,
     /valid artifact proves one\s+transport slice, not complete remote-management\s+release readiness/

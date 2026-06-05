@@ -258,7 +258,8 @@ test('classifier output surfaces managed remote delivery smoke handoff for Nanah
     assert.match(result.stdout, /verifier: node docs\/audit\/artifacts\/managed-remote-delivery-smoke\/verify-managed-smoke-artifact\.mjs docs\/audit\/artifacts\/managed-remote-delivery-smoke\/<artifact>\.json/);
     assert.match(result.stdout, /FT-MANAGED-REMOTE-00-trust-link-preflight/);
     assert.match(result.stdout, /FT-MANAGED-REMOTE-09-command-center-conflict-review/);
-    assert.match(result.stdout, /FT-MANAGED-REMOTE-10-no-work-idle/);
+    assert.match(result.stdout, /FT-MANAGED-REMOTE-10-key-rotation-repair-status/);
+    assert.match(result.stdout, /FT-MANAGED-REMOTE-11-no-work-idle/);
     assert.match(result.stdout, /one passing transport artifact proves only that transport slice/);
   }
 });

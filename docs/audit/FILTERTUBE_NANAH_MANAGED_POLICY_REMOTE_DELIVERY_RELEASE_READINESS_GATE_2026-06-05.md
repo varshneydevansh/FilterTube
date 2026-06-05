@@ -148,8 +148,16 @@ FT-MANAGED-REMOTE-06-offline-last-policy
 FT-MANAGED-REMOTE-07-revoked-replay-reject
 FT-MANAGED-REMOTE-08-action-history-redaction
 FT-MANAGED-REMOTE-09-command-center-conflict-review
-FT-MANAGED-REMOTE-10-no-work-idle
+FT-MANAGED-REMOTE-10-key-rotation-repair-status
+FT-MANAGED-REMOTE-11-no-work-idle
 ```
+
+Row `FT-MANAGED-REMOTE-10-key-rotation-repair-status` covers the
+source-side key-rotation slice added after this gate was created: a parent/admin
+rotates the managed source signing key, active child-device managed links become
+key-revoked, the command center keeps those profiles visible as needing
+re-pairing, and protected history records `trust_link.key_revoke` without
+plaintext rules, mailbox ciphertext, or private key material.
 
 ## Current Decision
 

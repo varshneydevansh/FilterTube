@@ -86,6 +86,8 @@ metadata, not plaintext rules or authority.
   missing-link, provider-pending, and failed cases.
 - [x] Parent-side managed signing-key rotation can revoke active child-device
   managed links, purge queued provider/status state, and force re-pairing.
+- [x] Manual managed remote-delivery smoke now includes key-rotation,
+  re-pairing status, and redacted `trust_link.key_revoke` history proof.
 - [x] Child/protected-device open-sync path can apply only validated signed
   managed-policy envelopes from trusted links and keeps the last accepted policy
   while offline.
