@@ -1,13 +1,14 @@
 # Contract: Managed App Policy Parity
 
-**Generated**: 2026-06-04
+**Generated**: 2026-06-06
 **Status**: Extension-owned app policy artifact plus managed Nanah helper
 source copies are wired into the app runtime sync manifest. Android native
 model and Activity runtime proof now persist managed profile state, action
 history, and time-budget decisions, and gate managed web content at startup,
-resume, heartbeat, and pause. The configured HTTPS mailbox helper is now part
-of the extension-owned runtime contract, with downstream app manifest/runtime
-sync still pending for that new helper. iOS parity remains pending.
+resume, heartbeat, and pause. The configured HTTPS mailbox helper and
+configured local-network gateway helper are now part of the extension-owned
+runtime contract, with downstream app manifest/runtime sync expected to copy
+both as transport inputs. iOS parity remains pending.
 **Runtime behavior changed**: extension no; Android app yes.
 **Goal slice**: Implementation order item 12, "Sync shared policy contract to
 apps", and item 13, "Add app viewing-space/time-limit parity tests".
@@ -37,10 +38,10 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
 {
   "schema": "filtertube_managed_app_policy_contract",
   "version": 1,
-  "generated": "2026-06-04",
+  "generated": "2026-06-06",
   "owner": "extension_upstream_policy_contract",
   "runtimeBehaviorChanged": false,
-  "appSyncStatus": "extension_contract_updated_native_sync_pending",
+  "appSyncStatus": "extension_contract_synced_to_native_runtime",
   "artifact": {
     "sourcePath": "docs/audit/artifacts/managed-app-policy-contract-v1.json",
     "appDestination": "packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json",
@@ -57,13 +58,19 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
       "sourcePath": "js/nanah_managed_open_sync.js",
       "appDestination": "packages/extension-source/upstream/js/nanah_managed_open_sync.js",
       "manifestSyncMode": "copy",
-      "boundary": "managed pull-on-open helper source parity; server mailbox and local-network runtime remain absent"
+      "boundary": "managed pull-on-open helper source parity; mailbox and configured local-network providers remain transport inputs, not policy authority"
     },
     {
       "sourcePath": "js/nanah_managed_mailbox_client.js",
       "appDestination": "packages/extension-source/upstream/js/nanah_managed_mailbox_client.js",
       "manifestSyncMode": "copy",
-      "boundary": "configured HTTPS encrypted-mailbox helper source parity; provider endpoint, native UI, and LAN transport authority remain app-owned"
+      "boundary": "configured HTTPS encrypted-mailbox helper source parity; provider endpoint and native UI remain app-owned, mailbox storage remains ciphertext-only transport"
+    },
+    {
+      "sourcePath": "js/nanah_managed_local_network_client.js",
+      "appDestination": "packages/extension-source/upstream/js/nanah_managed_local_network_client.js",
+      "manifestSyncMode": "copy",
+      "boundary": "configured local-network gateway helper source parity; LAN reachability and discovery are transport only, local trusted-link and signature validation remain authority"
     }
   ],
   "uiHelperMirror": [
@@ -220,6 +227,38 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
     ],
     "runtimeBoundary": "remote managed rule updates are accepted only as validated policy payloads and must reuse local keyword channel and video mutation paths before app sync claims parity"
   },
+  "managedDelivery": {
+    "transports": [
+      "live_nanah",
+      "encrypted_mailbox",
+      "configured_local_network_gateway"
+    ],
+    "requiredBoundaries": [
+      "transport_is_not_policy_authority",
+      "local_network_reachability_is_not_authority",
+      "mailbox_server_cannot_read_plaintext_policy",
+      "configured_gateway_cannot_choose_target_profile_or_rules",
+      "trusted_link_target_scope_revision_hash_signature_validation_required_before_apply"
+    ],
+    "configuredLocalNetworkProvider": {
+      "sourcePath": "js/nanah_managed_local_network_client.js",
+      "requiredMethods": [
+        "publishManagedPolicyCandidates",
+        "discoverManagedPolicyCandidates",
+        "ackLocalNetworkCandidates"
+      ],
+      "allowedEndpointClasses": [
+        "https",
+        "private_or_local_http"
+      ],
+      "forbiddenAuthority": [
+        "lan_reachability",
+        "provider_selected_profile",
+        "provider_selected_scope",
+        "unsigned_candidate"
+      ]
+    }
+  },
   "actionHistory": {
     "store": "profile.managedActionHistory",
     "requiredRows": [
@@ -333,15 +372,19 @@ declared extension helper sources exist, and, when the sibling app repo is
 available, the app runtime sync manifest still copies the contract artifact and
 managed Nanah helper sources to the expected destinations. The current
 extension-owned contract also declares `js/nanah_managed_mailbox_client.js` so
-apps can mirror the configured HTTPS encrypted-mailbox client after the native
-runtime sync lane updates the sibling manifest/output. This verifier is a
-pre-sync/pre-release guard; it does not write into the app repo.
+apps can mirror the configured HTTPS encrypted-mailbox client, and
+`js/nanah_managed_local_network_client.js` so apps can mirror the configured
+local-network gateway client. This verifier is a pre-release guard; it does
+not write into the app repo.
 After this protected-account contract update, the sibling app repo must run the
 native runtime sync before any app parity claim uses the copied artifact as
 current. The same manifest also copies the extension-owned managed Nanah
-signed-send, pull-on-open, and configured mailbox helper sources into
-`packages/extension-source/upstream/js/` so the downstream app repo can track
-the exact helper contracts without treating them as native runtime authority.
+signed-send, pull-on-open, configured mailbox, and configured local-network
+helper sources into `packages/extension-source/upstream/js/` so the downstream
+app repo can track the exact helper contracts without treating them as native
+runtime authority. LAN reachability, provider discovery, and mailbox delivery
+remain transport evidence only; trusted-link target, scope, revision, hash, and
+signature validation remain the authority boundary.
 The extension source mirror also carries the managed admin authority helper and
 managed parent command-center helper. Those are contract inputs for native
 settings locks and parent UI ergonomics, not standalone policy authority, and
