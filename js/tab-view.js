@@ -10264,6 +10264,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    function getManageableProtectedProfileIds(profilesV4) {
+        const root = safeObject(profilesV4);
+        const profiles = safeObject(root.profiles);
+        const activeId = normalizeString(root.activeProfileId) || activeProfileId || 'default';
+        return Object.keys(profiles)
+            .map(id => normalizeString(id))
+            .filter(Boolean)
+            .filter(id => id !== 'default' && id !== activeId)
+            .filter(id => canActiveProfileManageProfile(root, id));
+    }
+
     async function recordManagedMailboxProviderConfigHistory(details = {}) {
         const rootDetails = safeObject(details);
         const io = window.FilterTubeIO || {};
@@ -10272,11 +10283,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const actorId = normalizeString(fresh.activeProfileId) || activeProfileId || 'default';
         if (getProfileType(fresh, actorId) === 'child') return 0;
         const profiles = { ...safeObject(fresh.profiles) };
-        const targetIds = Object.keys(profiles)
-            .map(id => normalizeString(id))
-            .filter(Boolean)
-            .filter(id => getProfileType(fresh, id) === 'child')
-            .filter(id => canActiveProfileManageProfile(fresh, id));
+        const targetIds = getManageableProtectedProfileIds(fresh);
         if (!targetIds.length) return 0;
 
         const now = Date.now();
@@ -10335,11 +10342,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const actorId = normalizeString(fresh.activeProfileId) || activeProfileId || 'default';
         if (getProfileType(fresh, actorId) === 'child') return 0;
         const profiles = { ...safeObject(fresh.profiles) };
-        const targetIds = Object.keys(profiles)
-            .map(id => normalizeString(id))
-            .filter(Boolean)
-            .filter(id => getProfileType(fresh, id) === 'child')
-            .filter(id => canActiveProfileManageProfile(fresh, id));
+        const targetIds = getManageableProtectedProfileIds(fresh);
         if (!targetIds.length) return 0;
 
         const now = Date.now();

@@ -126,6 +126,9 @@ state without exposing plaintext rule values:
   items, or policy payloads. When no protected profiles exist yet, there is no
   protected target history to write and the mailbox status row remains the
   feedback surface.
+- Provider configure/disable history covers child profiles under the active
+  parent/account and independent account profiles that Default/Master can
+  manage. It excludes Default/Master itself and the active actor profile.
 - The status line must not include keyword text, channel names, video ids, PINs,
   mailbox ciphertext, decrypted payloads, or raw policy JSON.
 - The status line appears only when `canActiveProfileManageProfile(...)`
@@ -162,9 +165,9 @@ runtime managed command-center selected-profile signed policy push: present
 runtime managed command-center direct rule bulk writes: present via confirmation plus delegated runtime gate
 runtime managed command-center grouped bulk action rail: present
 runtime managed command-center encrypted mailbox provider configuration: present via parent re-auth
-runtime managed command-center mailbox provider config history: present as redacted per-protected-profile rows
+runtime managed command-center mailbox provider config history: present as redacted per-protected-profile rows, including Master-managed independent account profiles
 runtime managed command-center local-network provider configuration: present via parent re-auth
-runtime managed command-center local-network provider config history: present as redacted per-protected-profile rows
+runtime managed command-center local-network provider config history: present as redacted per-protected-profile rows, including Master-managed independent account profiles
 runtime managed command-center post-rule-write granular verified-device push: present with selected surface binding
 runtime managed command-center post-viewing/time-limit verified-device push: present
 runtime connected verified-device live P2P managed policy send: present
