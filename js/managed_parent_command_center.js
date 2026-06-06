@@ -543,7 +543,9 @@
         const mailboxTitle = document.createElement('strong');
         mailboxTitle.textContent = mailbox.label || (mailbox.configured ? 'Mailbox configured' : 'Mailbox not configured');
         const mailboxDetail = document.createElement('span');
-        mailboxDetail.textContent = mailbox.detail || 'Later delivery needs a configured encrypted mailbox provider.';
+        mailboxDetail.textContent = summary.profileCount > 0
+            ? (mailbox.detail || 'Later delivery needs a configured encrypted mailbox provider.')
+            : 'Create a protected profile first. Mailbox delivery is optional and only useful after a protected device is paired.';
         mailboxCopy.append(mailboxTitle, mailboxDetail);
         mailboxPanel.appendChild(mailboxCopy);
         if (h.onAction) {
@@ -573,7 +575,9 @@
         const localTitle = document.createElement('strong');
         localTitle.textContent = localNetwork.label || (localNetwork.configured ? 'LAN provider configured' : 'LAN provider not configured');
         const localDetail = document.createElement('span');
-        localDetail.textContent = localNetwork.detail || 'Same-network delivery needs a configured local provider.';
+        localDetail.textContent = summary.profileCount > 0
+            ? (localNetwork.detail || 'Same-network delivery needs a configured local provider.')
+            : 'Create a protected profile first. Local-network delivery is optional and does not replace signed trusted-link validation.';
         localCopy.append(localTitle, localDetail);
         localPanel.appendChild(localCopy);
         if (h.onAction) {
@@ -605,7 +609,7 @@
                 setup.className = 'ft-managed-command-center__setup';
                 const setupCopy = document.createElement('div');
                 setupCopy.className = 'help-item-body';
-                setupCopy.textContent = 'Create a child profile, then set viewing spaces, time limits, rules, and verified-device delivery from this panel.';
+                setupCopy.textContent = 'Start by creating a protected child/user profile. After that, set Main/Kids access, daily YouTube time, rules, and verified-device delivery from this panel.';
                 setup.appendChild(setupCopy);
 
                 const setupActions = document.createElement('div');

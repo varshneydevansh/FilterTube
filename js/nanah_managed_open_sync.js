@@ -416,6 +416,25 @@
                 .find(row => normalizeString(row?.linkId) === normalized) || null;
         }
 
+        function formatCheckedAge(checkedAt) {
+            const ts = Number(checkedAt);
+            if (!Number.isFinite(ts) || ts <= 0) return '';
+            const elapsedMs = Math.max(0, now() - ts);
+            const elapsedSeconds = Math.floor(elapsedMs / 1000);
+            if (elapsedSeconds < 60) return 'just now';
+            const elapsedMinutes = Math.floor(elapsedSeconds / 60);
+            if (elapsedMinutes < 60) return `${elapsedMinutes}m ago`;
+            const elapsedHours = Math.floor(elapsedMinutes / 60);
+            if (elapsedHours < 24) return `${elapsedHours}h ago`;
+            const elapsedDays = Math.floor(elapsedHours / 24);
+            return `${elapsedDays}d ago`;
+        }
+
+        function appendCheckedAge(label, state) {
+            const age = formatCheckedAge(safeObject(state).checkedAt);
+            return age ? `${label} (${age})` : label;
+        }
+
         function formatStatus(link, state, activeProfileId = '') {
             const root = safeObject(link);
             if (normalizeString(root.linkType) !== 'managed_link' || normalizeString(root.localRole) !== 'replica' || normalizeString(root.remoteRole) !== 'source') {
@@ -425,19 +444,26 @@
             if (policy.syncOnProfileOpen !== true) return 'Off';
             const openState = safeObject(state);
             if (normalizeString(openState.profileId) && normalizeString(openState.profileId) !== normalizeString(activeProfileId)) return 'Ready';
-            if (normalizeString(openState.reasonCode) === 'pull_provider_unavailable') return 'Waiting for provider';
-            if (normalizeString(openState.reasonCode) === 'mailbox_apply_unavailable') return 'Apply unavailable';
+            if (normalizeString(openState.reasonCode) === 'pull_provider_unavailable') {
+                return appendCheckedAge('Provider unavailable', openState);
+            }
+            if (normalizeString(openState.reasonCode) === 'mailbox_apply_unavailable') {
+                return appendCheckedAge('Apply unavailable', openState);
+            }
+            if (normalizeString(openState.reasonCode) === 'no_eligible_links') {
+                return appendCheckedAge('No eligible open-sync link', openState);
+            }
             const result = getLinkResult(openState, root.linkId || root.id);
-            if (!result) return openState.checkedAt ? 'Checked' : 'Ready';
+            if (!result) return openState.checkedAt ? appendCheckedAge('Checked', openState) : 'Ready';
             const applied = Number(result.appliedItemCount) || 0;
             const rejected = Number(result.rejectedItemCount) || 0;
             const pulled = Number(result.pulledItemCount) || 0;
             const ackFailed = Number(result.ackFailedCount) || 0;
-            if (ackFailed > 0) return `${applied} applied, ${rejected} rejected, ${ackFailed} ack failed`;
-            if (applied || rejected) return `${applied} applied, ${rejected} rejected`;
-            if (result.ok === false) return 'Rejected by provider';
-            if (pulled === 0) return 'Checked, no updates';
-            return 'Checked';
+            if (ackFailed > 0) return appendCheckedAge(`${applied} applied, ${rejected} rejected, ${ackFailed} ack failed`, openState);
+            if (applied || rejected) return appendCheckedAge(`${applied} applied, ${rejected} rejected`, openState);
+            if (result.ok === false) return appendCheckedAge('Provider rejected pull', openState);
+            if (pulled === 0) return appendCheckedAge('No updates', openState);
+            return appendCheckedAge('Checked', openState);
         }
 
         return {

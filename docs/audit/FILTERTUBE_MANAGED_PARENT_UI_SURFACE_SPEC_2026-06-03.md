@@ -28,6 +28,9 @@ use the same post-save verified-device push offer for their matching scopes.
 When no protected profile is available yet, the command center now shows setup
 handoffs for creating a child profile and, for Default/Master, creating an
 independent account profile through the existing gated profile-creation flows.
+The empty provider rows now explicitly tell the parent to create a protected
+profile first; mailbox and local-network delivery remain optional transport
+setup after a protected device/profile exists.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 
@@ -127,6 +130,9 @@ state without exposing plaintext rule values:
   devices are connected and that providers are delivery paths only; local
   trusted-link, target-profile, scope, revision, hash, and signature validation
   remains the authority.
+- When there are zero manageable protected profiles, provider rows do not imply
+  mailbox or LAN setup is the first step. They say to create a protected
+  profile first, then pair/configure delivery if later updates are needed.
 - Accepted mailbox provider configure/disable actions write redacted history
   rows to every currently manageable protected profile. Those rows include only
   configured/disabled state, target count, and endpoint host when configured;

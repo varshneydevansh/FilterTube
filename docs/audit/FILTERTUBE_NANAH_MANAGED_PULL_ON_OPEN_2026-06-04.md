@@ -120,15 +120,20 @@ states:
 Off
 Ready
 Checked
-Checked, no updates
-Waiting for provider
-Apply unavailable
-Rejected by provider
-N applied, M rejected
-N applied, M rejected, A ack failed
+Checked (Xm ago)
+No updates (Xm ago)
+Provider unavailable (Xm ago)
+Apply unavailable (Xm ago)
+No eligible open-sync link (Xm ago)
+Provider rejected pull (Xm ago)
+N applied, M rejected (Xm ago)
+N applied, M rejected, A ack failed (Xm ago)
 ```
 
-This is feedback/status only. It does not grant authority.
+This is feedback/status only. It does not grant authority. The recency/counts
+are redacted operational feedback; they do not include rule text, policy JSON,
+decrypted mailbox payloads, keys, tokens, PINs, video titles, channel names, or
+mailbox ciphertext.
 
 ## Remaining Boundaries
 
