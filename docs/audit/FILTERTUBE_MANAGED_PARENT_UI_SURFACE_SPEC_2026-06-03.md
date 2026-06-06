@@ -94,10 +94,20 @@ state without exposing plaintext rule values:
 - The extension includes a browser-side HTTPS mailbox client only when an
   endpoint is explicitly configured. LAN peer-discovery transport remains a
   provider/app/server integration surface, not hidden extension authority.
+- The extension includes a browser-side local-network provider client only when
+  a parent/account profile explicitly configures an endpoint. The client can
+  publish/discover signed local-network candidates through HTTPS or private
+  local HTTP gateways, but discovery remains transport only; target trust,
+  source key, scope, revision, hash, and signature validation still happen in
+  the local managed-policy apply path.
 - `Configure Mailbox` and `Edit Mailbox` save or clear only the encrypted
   mailbox endpoint configuration after parent/account re-auth. They do not
   create a sync account, publish rules, expose tokens in the UI, or turn the
   mailbox server into policy authority.
+- `Configure LAN` and `Edit LAN` save or clear only the local-network gateway
+  endpoint configuration after parent/account re-auth. They do not create
+  authority from network reachability, expose tokens in the UI, or let a LAN
+  gateway choose profiles/rules.
 - Accepted mailbox provider configure/disable actions write redacted history
   rows to every currently manageable protected profile. Those rows include only
   configured/disabled state, target count, and endpoint host when configured;
@@ -141,14 +151,17 @@ runtime managed command-center direct rule bulk writes: present via confirmation
 runtime managed command-center grouped bulk action rail: present
 runtime managed command-center encrypted mailbox provider configuration: present via parent re-auth
 runtime managed command-center mailbox provider config history: present as redacted per-protected-profile rows
+runtime managed command-center local-network provider configuration: present via parent re-auth
+runtime managed command-center local-network provider config history: present as redacted per-protected-profile rows
 runtime managed command-center post-rule-write granular verified-device push: present with selected surface binding
 runtime managed command-center post-viewing/time-limit verified-device push: present
 runtime connected verified-device live P2P managed policy send: present
 runtime provider-gated mailbox/LAN delivery handoff from command center: present
 runtime protected redacted push-attempt history rows: present
 runtime browser HTTPS mailbox upload/pull client: present behind explicit config
+runtime browser local-network gateway publish/discover/ack client: present behind explicit config
 runtime mailbox server authority: absent
-runtime built-in LAN discovery/transport client: absent
+runtime automatic LAN peer discovery authority: absent
 runtime managed command-center direct policy writes: absent
 runtime YouTube hot-path work from command-center UI: absent
 ```

@@ -107,8 +107,13 @@ extension authority code.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.
-- [ ] Built-in LAN peer discovery and LAN transport. This remains app/provider
-  work, with extension authority hooks already gated.
+- [ ] Automatic LAN peer discovery authority. This remains app/provider work,
+  with extension authority hooks already gated.
+- [x] Configured local-network gateway transport. The extension can install an
+  explicit parent-configured provider for publishing, discovering, and
+  acknowledging signed local-network candidates through HTTPS or private local
+  HTTP endpoints. Discovery remains non-authoritative; local validation still
+  gates every apply.
 - [ ] Native Android/iOS settings-lock and timeout UI parity. This belongs in
   the downstream app sync/runtime lane.
 
@@ -442,8 +447,10 @@ replica child device over Nanah/P2P or same-network transport.
   status rows. Pairing-time public-key descriptor persistence, source-side
   signing keypair provisioning, canonical outbound payload hashing, and
   receive-side canonical payload-hash recomputation now exist. Live Nanah P2P
-  signed delivery is present; server mailbox queue purge and built-in
-  local-network delivery remain pending provider work.
+  signed delivery is present; server mailbox queue purge and automatic
+  local-network peer discovery remain pending provider/app work. Configured
+  gateway delivery can now be enabled explicitly from the managed command
+  center after parent/account re-auth.
 - **Acceptance Criteria**:
   - Existing `app_sync` and `control_proposal` behavior remains compatible.
   - New managed policy applies only to target profile and target surface.
@@ -465,8 +472,9 @@ replica child device over Nanah/P2P or same-network transport.
 - **Dependencies**: Task 3.1.
 - **Status**: Boundary contract and hostile-LAN proof fixture added. A
   provider-gated dashboard/profile-open local-network candidate discovery hook
-  is present for already trusted managed replica links, while built-in peer
-  discovery and LAN delivery remain absent. Managed-policy envelope
+  is present for already trusted managed replica links, while automatic peer
+  discovery remains absent. Configured LAN gateway delivery can publish and
+  discover signed candidates, but managed-policy envelope
   validation, adapter-level local-network candidate validation, and dashboard
   sanitized local-network candidate receive/history handling are present, but
   they do not make LAN reachability authority.

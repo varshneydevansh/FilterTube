@@ -3088,6 +3088,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'remote_policy.mailbox.ack': 'Mailbox ack recorded',
         'remote_policy.local_network.ack': 'Local-network ack recorded',
         'delivery.mailbox.configure': 'Mailbox provider changed',
+        'delivery.local_network.configure': 'Local-network provider changed',
         'remote_policy.source_push': 'Parent policy push',
         'history.clear': 'History cleared'
     });
@@ -3122,6 +3123,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'hasPolicy',
         'hasTimeLimit',
         'kidsEnabled',
+        'localNetworkConfigured',
         'mainEnabled',
         'mailboxConfigured',
         'rateLimited',
@@ -9739,6 +9741,73 @@ document.addEventListener('DOMContentLoaded', async () => {
         UIComponents.showToast('Managed mailbox provider saved', 'success');
     }
 
+    async function configureNanahManagedLocalNetworkProvider() {
+        const root = safeObject(profilesV4Cache);
+        const currentActiveProfileId = normalizeString(root.activeProfileId) || 'default';
+        if (getProfileType(root, currentActiveProfileId) === 'child') {
+            UIComponents.showToast('Child profiles cannot configure managed delivery providers', 'error');
+            return;
+        }
+        const okAdmin = await ensureProfileUnlocked(root, currentActiveProfileId, { sensitiveAction: true });
+        if (!okAdmin) return;
+        const current = readNanahManagedLocalNetworkProviderConfig();
+        const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
+        const endpoint = await showPromptModal({
+            title: 'Configure Local-Network Provider',
+            message: 'Enter the local-network gateway endpoint for same-network managed updates. Leave blank to disable LAN delivery.',
+            placeholder: 'http://192.168.1.10:4177/filtertube',
+            inputType: 'url',
+            confirmText: currentEndpoint ? 'Save Endpoint' : 'Enable LAN',
+            initialValue: currentEndpoint
+        });
+        if (endpoint === null) return;
+        const endpointUrl = normalizeString(endpoint);
+        if (!endpointUrl) {
+            writeNanahManagedLocalNetworkProviderConfig({});
+            await recordManagedLocalNetworkProviderConfigHistory({
+                configured: false,
+                endpointHost: ''
+            });
+            await refreshProfilesUI();
+            UIComponents.showToast('Managed local-network delivery disabled', 'success');
+            return;
+        }
+        const token = await showPromptModal({
+            title: 'Local-Network Access Token',
+            message: 'Optional bearer token for this gateway. Leave blank to keep the saved token. Enter a single dash to clear it.',
+            placeholder: 'Optional token',
+            inputType: 'password',
+            confirmText: 'Save Provider',
+            initialValue: ''
+        });
+        if (token === null) return;
+        const rawToken = normalizeString(token);
+        const nextConfig = {
+            ...safeObject(current),
+            endpointUrl
+        };
+        if (rawToken === '-') {
+            delete nextConfig.authToken;
+        } else if (rawToken) {
+            nextConfig.authToken = rawToken;
+        }
+        const client = window.FilterTubeManagedLocalNetworkClient;
+        const provider = client && typeof client.createProvider === 'function'
+            ? client.createProvider(nextConfig)
+            : null;
+        if (!provider || provider.configured !== true || !hasNanahManagedLocalNetworkDeliveryWriter(provider)) {
+            UIComponents.showToast('LAN endpoint must be HTTPS or private/local HTTP and supported by the local-network provider client', 'error');
+            return;
+        }
+        writeNanahManagedLocalNetworkProviderConfig(nextConfig);
+        await recordManagedLocalNetworkProviderConfigHistory({
+            configured: true,
+            endpointHost: getManagedLocalNetworkEndpointHostFromConfig(nextConfig)
+        });
+        await refreshProfilesUI();
+        UIComponents.showToast('Managed local-network provider saved', 'success');
+    }
+
     function hasNanahManagedMailboxUploadWriter(provider = getNanahManagedMailboxProvider()) {
         const root = safeObject(provider);
         return typeof root.uploadManagedMailboxItems === 'function'
@@ -10045,6 +10114,69 @@ document.addEventListener('DOMContentLoaded', async () => {
                     label: mailboxConfigured ? 'Mailbox provider configured' : 'Mailbox provider disabled',
                     mailboxConfigured,
                     endpointHost: mailboxConfigured ? endpointHost : '',
+                    targetCount: targetIds.length
+                },
+                sensitive: true
+            };
+            profiles[targetId] = {
+                ...profile,
+                managedActionHistory: appendManagedActionHistoryRow(profile, row)
+            };
+        });
+
+        const nextRoot = {
+            ...fresh,
+            schemaVersion: 4,
+            profiles
+        };
+        await io.saveProfilesV4(nextRoot);
+        profilesV4Cache = nextRoot;
+        return targetIds.length;
+    }
+
+    async function recordManagedLocalNetworkProviderConfigHistory(details = {}) {
+        const rootDetails = safeObject(details);
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') return 0;
+        const fresh = await io.loadProfilesV4();
+        const actorId = normalizeString(fresh.activeProfileId) || activeProfileId || 'default';
+        if (getProfileType(fresh, actorId) === 'child') return 0;
+        const profiles = { ...safeObject(fresh.profiles) };
+        const targetIds = Object.keys(profiles)
+            .map(id => normalizeString(id))
+            .filter(Boolean)
+            .filter(id => getProfileType(fresh, id) === 'child')
+            .filter(id => canActiveProfileManageProfile(fresh, id));
+        if (!targetIds.length) return 0;
+
+        const now = Date.now();
+        const localNetworkConfigured = rootDetails.configured === true;
+        const endpointHost = normalizeString(rootDetails.endpointHost).slice(0, 160);
+        targetIds.forEach((targetId) => {
+            const profile = safeObject(profiles[targetId]);
+            if (!profile || Object.keys(profile).length === 0) return;
+            const row = {
+                rowId: `managed-local-network-config-${targetId}-${now}`,
+                schema: MANAGED_ACTION_HISTORY_SCHEMA,
+                version: 1,
+                actorProfileId: actorId,
+                actorDeviceId: normalizeString(nanahStableDeviceId) || 'local-extension-device',
+                targetProfileId: targetId,
+                trustedLinkId: null,
+                actionType: 'delivery.local_network.configure',
+                scope: 'local_network_provider',
+                revision: null,
+                policyHash: null,
+                result: 'accepted',
+                reason: localNetworkConfigured ? 'local_network_provider_configured' : 'local_network_provider_disabled',
+                receivedAt: now,
+                issuedAt: now,
+                orderKey: `local-network-config:${now}`,
+                summary: {
+                    redacted: true,
+                    label: localNetworkConfigured ? 'Local-network provider configured' : 'Local-network provider disabled',
+                    localNetworkConfigured,
+                    endpointHost: localNetworkConfigured ? endpointHost : '',
                     targetCount: targetIds.length
                 },
                 sensitive: true
@@ -10675,6 +10807,76 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function getNanahManagedLocalNetworkProvider() {
         return safeObject(window.FilterTubeManagedPolicyLocalNetwork);
+    }
+
+    const NANAH_MANAGED_LOCAL_NETWORK_CONFIG_KEY = 'ftManagedLocalNetworkProviderConfig';
+
+    function readNanahManagedLocalNetworkProviderConfig() {
+        try {
+            return safeObject(JSON.parse(localStorage.getItem(NANAH_MANAGED_LOCAL_NETWORK_CONFIG_KEY) || '{}'));
+        } catch (_) {
+            return {};
+        }
+    }
+
+    function getManagedLocalNetworkEndpointHostFromConfig(config) {
+        const endpoint = normalizeString(safeObject(config).endpointUrl || safeObject(config).url || safeObject(config).baseUrl);
+        if (!endpoint) return '';
+        try {
+            return normalizeString(new URL(endpoint).host);
+        } catch (_) {
+            return '';
+        }
+    }
+
+    function writeNanahManagedLocalNetworkProviderConfig(config) {
+        try {
+            const root = safeObject(config);
+            if (!normalizeString(root.endpointUrl || root.url || root.baseUrl)) {
+                localStorage.removeItem(NANAH_MANAGED_LOCAL_NETWORK_CONFIG_KEY);
+                delete window.FilterTubeManagedPolicyLocalNetwork;
+                return null;
+            }
+            localStorage.setItem(NANAH_MANAGED_LOCAL_NETWORK_CONFIG_KEY, JSON.stringify(root));
+            if (window.FilterTubeManagedLocalNetworkClient?.createProvider) {
+                window.FilterTubeManagedPolicyLocalNetwork = window.FilterTubeManagedLocalNetworkClient.createProvider(root);
+            } else {
+                delete window.FilterTubeManagedPolicyLocalNetwork;
+            }
+            return window.FilterTubeManagedPolicyLocalNetwork || null;
+        } catch (_) {
+            return null;
+        }
+    }
+
+    function summarizeManagedLocalNetworkProviderConfig() {
+        const config = readNanahManagedLocalNetworkProviderConfig();
+        const endpoint = normalizeString(config.endpointUrl || config.url || config.baseUrl);
+        const provider = getNanahManagedLocalNetworkProvider();
+        const configured = provider.configured === true && hasNanahManagedLocalNetworkDeliveryWriter(provider);
+        if (!endpoint) {
+            return {
+                configured: false,
+                label: 'LAN provider not configured',
+                detail: 'Live P2P and mailbox can still work. Configure a local gateway only for same-network managed delivery.',
+                tone: 'warning'
+            };
+        }
+        const host = normalizeString(provider.endpointHost) || getManagedLocalNetworkEndpointHostFromConfig(config) || endpoint;
+        if (!configured) {
+            return {
+                configured: false,
+                label: 'LAN endpoint needs review',
+                detail: `${host} is saved but not accepted by the local-network provider client.`,
+                tone: 'warning'
+            };
+        }
+        return {
+            configured: true,
+            label: `LAN provider ready: ${host}`,
+            detail: 'Same-network delivery can hand signed managed-policy candidates to the configured gateway; trust validation still happens locally.',
+            tone: 'success'
+        };
     }
 
     function resolveNanahManagedLocalNetworkTargetProfileId(link, activeId) {
@@ -13418,11 +13620,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 managedTimeLimitLabel,
                 getManagedSyncTargetSummary,
                 getManagedMailboxConfigSummary: summarizeManagedMailboxServerConfig,
+                getManagedLocalNetworkConfigSummary: summarizeManagedLocalNetworkProviderConfig,
                 onAction: async (intent) => {
                     const targetId = normalizeString(intent?.profileId);
                     const action = normalizeString(intent?.action);
                     if (action === 'configure_mailbox') {
                         await configureNanahManagedMailboxServer();
+                    } else if (action === 'configure_local_network') {
+                        await configureNanahManagedLocalNetworkProvider();
                     } else if (!targetId && !action.startsWith('bulk_')) {
                         return;
                     } else if (action === 'edit_rules') {

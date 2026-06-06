@@ -49,6 +49,14 @@
                     detail: 'Live P2P still works; later delivery needs a configured provider.',
                     tone: 'warning'
                 }),
+            getManagedLocalNetworkConfigSummary: typeof helpers.getManagedLocalNetworkConfigSummary === 'function'
+                ? helpers.getManagedLocalNetworkConfigSummary
+                : () => ({
+                    configured: false,
+                    label: 'LAN provider not configured',
+                    detail: 'Same-network delivery needs a configured local provider.',
+                    tone: 'warning'
+                }),
             onAction: typeof helpers.onAction === 'function' ? helpers.onAction : null
         };
     }
@@ -462,6 +470,7 @@
             rows,
             bulkActionIntents: buildManagedCommandCenterBulkActionIntents(rows),
             mailboxConfig: h.getManagedMailboxConfigSummary(),
+            localNetworkConfig: h.getManagedLocalNetworkConfigSummary(),
             profileCount: 0,
             limitedCount: 0,
             syncReadyProfileCount: 0,
@@ -549,6 +558,36 @@
             mailboxPanel.appendChild(mailboxButton);
         }
         panel.appendChild(mailboxPanel);
+
+        const localNetwork = h.safeObject(summary.localNetworkConfig);
+        const localPanel = document.createElement('div');
+        localPanel.className = `ft-managed-command-center__provider is-${localNetwork.tone || (localNetwork.configured ? 'success' : 'warning')}`;
+        const localCopy = document.createElement('div');
+        localCopy.className = 'ft-managed-command-center__provider-copy';
+        const localTitle = document.createElement('strong');
+        localTitle.textContent = localNetwork.label || (localNetwork.configured ? 'LAN provider configured' : 'LAN provider not configured');
+        const localDetail = document.createElement('span');
+        localDetail.textContent = localNetwork.detail || 'Same-network delivery needs a configured local provider.';
+        localCopy.append(localTitle, localDetail);
+        localPanel.appendChild(localCopy);
+        if (h.onAction) {
+            const localButton = document.createElement('button');
+            localButton.className = 'btn-secondary';
+            localButton.type = 'button';
+            localButton.textContent = localNetwork.configured ? 'Edit LAN' : 'Configure LAN';
+            localButton.title = 'Requires parent/account re-auth. Discovery is not authority; signed policy validation still happens locally.';
+            localButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                Promise.resolve(h.onAction({
+                    action: 'configure_local_network',
+                    scope: 'local_network_provider',
+                    authority: 'managed_policy_provider_delivery',
+                    sensitiveAction: true
+                })).catch(() => {});
+            });
+            localPanel.appendChild(localButton);
+        }
+        panel.appendChild(localPanel);
 
         if (!summary.rows.length) {
             const empty = document.createElement('div');
