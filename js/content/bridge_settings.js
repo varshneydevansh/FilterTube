@@ -415,6 +415,25 @@ function removeManagedViewingBlockedOverlay() {
     }
 }
 
+function openFilterTubeDashboardFromManagedOverlay(source) {
+    try {
+        pauseManagedTimeoutVideos();
+    } catch (e) {
+    }
+    try {
+        browserAPI_BRIDGE.runtime.sendMessage({
+            action: 'FilterTube_OpenDashboard',
+            source: source || 'managed_overlay'
+        }, () => {
+            try {
+                pauseManagedTimeoutVideos();
+            } catch (e) {
+            }
+        });
+    } catch (e) {
+    }
+}
+
 function showManagedViewingBlockedOverlay(decision) {
     try {
         globalThis.__filtertubeManagedViewingRouteDenied = true;
@@ -470,9 +489,29 @@ function showManagedViewingBlockedOverlay(decision) {
         copy.textContent = `${profileName} is using parent-managed viewing settings. Ask the parent or caregiver profile to change access.`;
         copy.style.cssText = 'font-size:14px;line-height:1.5;margin:0;color:#cbd5e1';
 
+        const dashboardButton = document.createElement('button');
+        dashboardButton.type = 'button';
+        dashboardButton.textContent = 'Open FilterTube';
+        dashboardButton.style.cssText = [
+            'min-height:44px',
+            'width:100%',
+            'margin-top:20px',
+            'border:1px solid rgba(148,163,184,.36)',
+            'border-radius:8px',
+            'background:#17202b',
+            'color:#e2e8f0',
+            'font-weight:800',
+            'font-size:14px',
+            'cursor:pointer'
+        ].join(';');
+        dashboardButton.addEventListener('click', () => {
+            openFilterTubeDashboardFromManagedOverlay('managed_viewing_route_gate');
+        });
+
         panel.appendChild(eyebrow);
         panel.appendChild(title);
         panel.appendChild(copy);
+        panel.appendChild(dashboardButton);
         overlay.appendChild(panel);
     } catch (e) {
     }
@@ -762,16 +801,7 @@ function showManagedTimeoutOverlay(state) {
             'cursor:pointer'
         ].join(';');
         dashboardButton.addEventListener('click', () => {
-            pauseManagedTimeoutVideos();
-            try {
-                browserAPI_BRIDGE.runtime.sendMessage({
-                    action: 'FilterTube_OpenDashboard',
-                    source: 'managed_time_limit_overlay'
-                }, () => {
-                    pauseManagedTimeoutVideos();
-                });
-            } catch (e) {
-            }
+            openFilterTubeDashboardFromManagedOverlay('managed_time_limit_overlay');
         });
 
         const instruction = document.createElement('p');

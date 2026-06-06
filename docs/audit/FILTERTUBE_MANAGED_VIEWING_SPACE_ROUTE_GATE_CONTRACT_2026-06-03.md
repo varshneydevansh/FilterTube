@@ -66,6 +66,10 @@ Runtime enforcement in this slice satisfies:
   and `hashchange`) and re-evaluate already-open tabs.
 - The visible denial UI is child-safe, accessible, and does not include a child
   dismiss or admin bypass.
+- The denial UI can open the FilterTube dashboard as a safe follow-up path, but
+  that action does not unlock the protected profile, change access, clear the
+  route gate, or mutate policy. Dashboard parent/account gates still own any
+  change.
 - Public docs must describe only extension/app-owned surfaces, not general
   internet-wide blocking.
 
@@ -78,8 +82,9 @@ runtime managed viewing-space route gate: present
 runtime managed Main route denial: present
 runtime managed Kids route denial: present
 runtime managed viewing-space deny overlay: present
+runtime managed viewing-space deny overlay Open FilterTube action: present
 runtime managed viewing-space SPA revalidation: present
-runtime managed time-limit budget counter: absent
+runtime managed time-limit budget counter: present in the separate managed time-limit contract
 runtime behavior changed by this contract: yes
 ```
 
@@ -94,11 +99,17 @@ The existing UI/storage behavior remains, with runtime enforcement now attached:
 - The content bridge applies the route gate before forwarding settings to the
   page-world JSON runtime.
 
+Related runtime boundaries:
+
+- The managed time-limit budget counter and timeout overlay now exist in
+  `docs/audit/FILTERTUBE_MANAGED_CHILD_TIME_LIMIT_SCHEMA_CONTRACT_2026-06-03.md`.
+  They are related managed-profile runtime gates, but they do not replace this
+  Main/Kids viewing-space route gate.
+
 Remaining boundaries:
 
 - This is local profile-setting enforcement, not a signed remote managed-policy
   envelope.
-- There is still no active-tab time-limit counter or timeout overlay.
 - Import/Nanah writes still need managed policy revision and integrity gates
   before remote route policy can be treated as authoritative.
 
