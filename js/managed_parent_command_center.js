@@ -66,6 +66,7 @@
         const targetId = typeof profileId === 'string' ? profileId.trim() : '';
         if (!targetId) return [];
         const timeLimitActive = timePolicy?.enabled === true;
+        const hasPendingExtraTimeRequest = policySummary.pendingExtraTimeRequest === true;
         const intents = [
             {
                 action: 'edit_rules',
@@ -103,7 +104,7 @@
         if (timeLimitActive) {
             intents.push({
                 action: 'grant_extra_time',
-                label: 'Add Time',
+                label: hasPendingExtraTimeRequest ? 'Grant Time' : 'Add Time',
                 profileId: targetId,
                 scope: 'time_limits',
                 authority: 'delegated_runtime_gate',
@@ -121,6 +122,44 @@
             });
         }
         return intents;
+    }
+
+    function normalizeCommandCenterNumber(value) {
+        const num = typeof value === 'number' ? value : Number(value);
+        return Number.isFinite(num) ? Math.max(0, Math.floor(num)) : 0;
+    }
+
+    function formatCommandCenterMinutes(seconds) {
+        const total = normalizeCommandCenterNumber(seconds);
+        if (total <= 0) return '0m';
+        const minutes = Math.max(1, Math.ceil(total / 60));
+        if (minutes < 60) return `${minutes}m`;
+        const hours = Math.floor(minutes / 60);
+        const remainder = minutes % 60;
+        return remainder ? `${hours}h ${remainder}m` : `${hours}h`;
+    }
+
+    function getLatestPendingExtraTimeRequest(profile) {
+        const rows = Array.isArray(profile?.managedActionHistory) ? profile.managedActionHistory : [];
+        for (let index = rows.length - 1; index >= 0; index -= 1) {
+            const row = fallbackSafeObject(rows[index]);
+            const actionType = typeof row.actionType === 'string' ? row.actionType.trim() : '';
+            const scope = typeof row.scope === 'string' ? row.scope.trim() : '';
+            if (scope !== 'time_limits') continue;
+            if (actionType === 'policy.time_limit.update') return null;
+            if (actionType !== 'policy.time_limit.request_extra') continue;
+            if ((typeof row.result === 'string' ? row.result.trim() : '') !== 'requested') continue;
+            const summary = fallbackSafeObject(row.summary);
+            const surface = typeof summary.surface === 'string' && summary.surface.trim() === 'kids' ? 'Kids' : 'Main';
+            const consumedSeconds = normalizeCommandCenterNumber(summary.consumedSeconds);
+            const dailyBudgetSeconds = normalizeCommandCenterNumber(summary.dailyBudgetSeconds);
+            return {
+                row,
+                label: `Time request: ${surface}`,
+                detail: `${formatCommandCenterMinutes(consumedSeconds)} used of ${formatCommandCenterMinutes(dailyBudgetSeconds)}`
+            };
+        }
+        return null;
     }
 
     function resolveManagedCommandCenterSyncState(item = {}) {
@@ -409,6 +448,7 @@
             const summary = h.summarizeManagedPolicyStateForProfile(profile);
             const syncTarget = h.getManagedSyncTargetSummary(profileId);
             const timePolicy = h.getManagedTimeLimitPolicy(profile);
+            const pendingExtraTimeRequest = getLatestPendingExtraTimeRequest(profile);
             const latestActionLabel = typeof summary.latestActionLabel === 'string' && summary.latestActionLabel.trim()
                 ? summary.latestActionLabel.trim()
                 : (summary.latestResult && summary.latestScope ? `${summary.latestResult}/${summary.latestScope}` : 'none');
@@ -442,8 +482,11 @@
                 latestActionLabel,
                 latestDeliveryLabel: typeof summary.latestDeliveryLabel === 'string' ? summary.latestDeliveryLabel.trim() : '',
                 latestDeliveryTone: typeof summary.latestDeliveryTone === 'string' ? summary.latestDeliveryTone.trim() : '',
+                pendingExtraTimeRequestLabel: pendingExtraTimeRequest?.label || '',
+                pendingExtraTimeRequestDetail: pendingExtraTimeRequest?.detail || '',
                 actionIntents: buildManagedCommandCenterActionIntents(profileId, timePolicy, {
-                    remoteConflictCount
+                    remoteConflictCount,
+                    pendingExtraTimeRequest: !!pendingExtraTimeRequest
                 })
             };
             row.deliveryPreview = resolveManagedCommandCenterDeliveryPreview(row);
@@ -817,6 +860,7 @@
                 { label: item.timeLimit, tone: item.timeLimited ? 'warning' : 'neutral' },
                 { label: syncState.label, tone: syncState.tone },
                 { label: item.syncLabel, tone: item.remoteScopeCount ? 'success' : 'neutral' },
+                item.pendingExtraTimeRequestLabel ? { label: item.pendingExtraTimeRequestLabel, tone: 'warning' } : null,
                 item.latestDeliveryLabel ? { label: item.latestDeliveryLabel, tone: item.latestDeliveryTone || 'neutral' } : null,
                 item.syncSourceAckLabel ? { label: `Ack: ${item.syncSourceAckLabel}`, tone: 'neutral' } : null
             ].filter(Boolean).forEach((chip) => {
@@ -829,8 +873,9 @@
             [
                 { label: 'Delivery', value: item.deliveryPreview?.label || 'Pair verified device', note: item.deliveryPathDetail },
                 { label: 'Device', value: item.syncTargetLabel },
+                item.pendingExtraTimeRequestDetail ? { label: 'Request', value: item.pendingExtraTimeRequestDetail } : null,
                 { label: 'History', value: `${item.historyRowCount} rows | latest ${item.latestActionLabel}` }
-            ].forEach((detail) => {
+            ].filter(Boolean).forEach((detail) => {
                 const cell = document.createElement('div');
                 cell.className = 'ft-managed-command-center__detail';
                 const detailLabel = document.createElement('span');
