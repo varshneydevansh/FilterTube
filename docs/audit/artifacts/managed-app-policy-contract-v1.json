@@ -22,6 +22,12 @@
       "appDestination": "packages/extension-source/upstream/js/nanah_managed_open_sync.js",
       "manifestSyncMode": "copy",
       "boundary": "managed pull-on-open helper source parity; server mailbox and local-network runtime remain absent"
+    },
+    {
+      "sourcePath": "js/nanah_managed_mailbox_client.js",
+      "appDestination": "packages/extension-source/upstream/js/nanah_managed_mailbox_client.js",
+      "manifestSyncMode": "copy",
+      "boundary": "configured HTTPS encrypted-mailbox helper source parity; provider endpoint, native UI, and LAN transport authority remain app-owned"
     }
   ],
   "uiHelperMirror": [

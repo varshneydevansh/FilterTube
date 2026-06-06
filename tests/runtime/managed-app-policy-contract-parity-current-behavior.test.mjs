@@ -17,7 +17,8 @@ const appProfilePolicyGateTestPath = '/Users/devanshvarshney/FilterTubeApp/apps/
 const appManagedWebViewActivityPath = '/Users/devanshvarshney/FilterTubeApp/apps/android/app/src/main/java/com/filtertube/app/ManagedWebViewActivity.kt';
 const appManagedHelperDestinations = Object.freeze({
   'js/nanah_managed_live_policy.js': '/Users/devanshvarshney/FilterTubeApp/packages/extension-source/upstream/js/nanah_managed_live_policy.js',
-  'js/nanah_managed_open_sync.js': '/Users/devanshvarshney/FilterTubeApp/packages/extension-source/upstream/js/nanah_managed_open_sync.js'
+  'js/nanah_managed_open_sync.js': '/Users/devanshvarshney/FilterTubeApp/packages/extension-source/upstream/js/nanah_managed_open_sync.js',
+  'js/nanah_managed_mailbox_client.js': '/Users/devanshvarshney/FilterTubeApp/packages/extension-source/upstream/js/nanah_managed_mailbox_client.js'
 });
 const appManagedUiMirrorDestinations = Object.freeze({
   'js/managed_admin_authority.js': '/Users/devanshvarshney/FilterTubeApp/packages/extension-source/upstream/js/managed_admin_authority.js',
@@ -91,7 +92,7 @@ test('managed app policy parity doc records extension-owned app contract artifac
   for (const helper of contract.runtimeHelperSync) {
     assert.equal(helper.manifestSyncMode, 'copy');
     assert.equal(helper.appDestination, appManagedHelperDestinations[helper.sourcePath].replace('/Users/devanshvarshney/FilterTubeApp/', ''));
-    assert.match(helper.boundary, /native|server mailbox|local-network/);
+    assert.match(helper.boundary, /native|server mailbox|local-network|encrypted-mailbox/);
   }
   assert.deepEqual(
     contract.uiHelperMirror.map(row => row.sourcePath),
@@ -351,6 +352,7 @@ test('current app sync manifest copies runtime sources dedicated contract artifa
     'js/nanah_sync_adapter.js',
     'js/nanah_managed_live_policy.js',
     'js/nanah_managed_open_sync.js',
+    'js/nanah_managed_mailbox_client.js',
     'js/content_bridge.js',
     'js/injector.js',
     'js/seed.js'

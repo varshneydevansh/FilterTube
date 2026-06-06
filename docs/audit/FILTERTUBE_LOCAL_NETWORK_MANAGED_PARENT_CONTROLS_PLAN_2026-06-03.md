@@ -858,7 +858,9 @@ contract before wiring more native app runtime behavior.
   JSON artifact, declared helper sources, and available app sync manifest copy
   rows stay aligned before a native runtime sync/release handoff. Product
   runtime behavior is unchanged; native Android/iOS enforcement remains
-  pending.
+  pending. The configured HTTPS mailbox helper is now declared in the
+  extension-owned app policy contract so downstream app sync has an explicit
+  source row to mirror before claiming mailbox parity.
 - **Complexity**: 4/10
 - **Dependencies**: Sprint 1 policy schema, Sprint 5 viewing-space/time-limit
   runtime contracts.
