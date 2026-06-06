@@ -718,10 +718,55 @@ function showManagedTimeoutOverlay(state) {
             facts.append(dt, dd);
         });
 
+        const actionArea = document.createElement('div');
+        actionArea.style.cssText = [
+            'display:flex',
+            'flex-direction:column',
+            'gap:10px',
+            'margin-top:20px'
+        ].join(';');
+
+        const askButton = document.createElement('button');
+        askButton.type = 'button';
+        askButton.textContent = 'Ask parent for more time';
+        askButton.style.cssText = [
+            'min-height:44px',
+            'border:0',
+            'border-radius:8px',
+            'background:#ef4444',
+            'color:#fff',
+            'font-weight:800',
+            'font-size:14px',
+            'cursor:pointer'
+        ].join(';');
+
+        const instruction = document.createElement('p');
+        instruction.textContent = 'A parent or caregiver can grant extra time from FilterTube Managed Parent Controls on a trusted profile or paired device.';
+        instruction.style.cssText = [
+            'display:none',
+            'margin:0',
+            'padding:10px 12px',
+            'border:1px solid rgba(148,163,184,.24)',
+            'border-radius:8px',
+            'background:rgba(15,23,42,.72)',
+            'color:#cbd5e1',
+            'font-size:13px',
+            'line-height:1.45'
+        ].join(';');
+
+        askButton.addEventListener('click', () => {
+            instruction.style.display = 'block';
+            askButton.textContent = 'Waiting for parent approval';
+            askButton.style.background = '#475569';
+            pauseManagedTimeoutVideos();
+        });
+        actionArea.append(askButton, instruction);
+
         panel.appendChild(eyebrow);
         panel.appendChild(title);
         panel.appendChild(copy);
         panel.appendChild(facts);
+        panel.appendChild(actionArea);
         overlay.appendChild(panel);
     } catch (e) {
     }

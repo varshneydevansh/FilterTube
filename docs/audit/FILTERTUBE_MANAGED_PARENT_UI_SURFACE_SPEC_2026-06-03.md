@@ -207,7 +207,9 @@ Required UI states for that slice:
 - offline trusted device;
 - rejected or conflicted remote update;
 - failed provider/mailbox pull through protected history/status labels;
-- time limit exhausted via the existing runtime timeout overlay;
+- time limit exhausted via the existing runtime timeout overlay, including the
+  protected-user "Ask parent for more time" guidance state that does not grant
+  authority or dismiss the lock;
 - no-policy/no-work state.
 
 Design constraints:

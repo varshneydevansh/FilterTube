@@ -169,7 +169,8 @@ local managed time-limit protected history row writer: present
 runtime managed time-limit policy compiler: present
 runtime managed active-tab budget counter: present
 runtime managed heartbeat active-policy revalidation: present
-runtime managed timeout overlay: present with budget, usage, and reset context
+runtime managed timeout overlay: present with budget, usage, reset context, and
+protected-user ask-parent guidance that does not grant time or dismiss the lock
 runtime managed Main/Kids time gate: present
 YouTube runtime behavior changed by this contract: yes, for child profiles with enabled time-limit policy
 ```
