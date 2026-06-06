@@ -1525,6 +1525,9 @@ let pendingAutoBackupOptions = null;
 
 const MANAGED_TIME_USAGE_STORAGE_KEY = 'ftManagedTimeUsageV1';
 const MANAGED_TIME_USAGE_SCHEMA = 'filtertube_managed_time_usage';
+const MANAGED_ACTION_HISTORY_SCHEMA = 'filtertube_managed_action_history';
+const MANAGED_ACTION_HISTORY_LIMIT = 500;
+const MANAGED_TIME_PARENT_REQUEST_COOLDOWN_MS = 5 * 60 * 1000;
 const MANAGED_TIME_HEARTBEAT_STALE_MS = 8000;
 const MANAGED_TIME_MAX_HEARTBEAT_DELTA_SECONDS = 10;
 const managedTimeActiveScopes = new Map();
@@ -1597,6 +1600,100 @@ function pruneManagedTimeUsageRows(rows, limit = 240) {
             .sort((a, b) => (normalizeNonNegativeInteger(safeObject(b[1]).updatedAt) || 0) - (normalizeNonNegativeInteger(safeObject(a[1]).updatedAt) || 0))
             .slice(0, limit)
     );
+}
+
+function appendManagedActionHistoryRowsForBackground(profile, rows) {
+    return [
+        ...safeArray(profile?.managedActionHistory)
+            .filter(row => safeObject(row).schema === MANAGED_ACTION_HISTORY_SCHEMA),
+        ...safeArray(rows)
+            .filter(row => safeObject(row).schema === MANAGED_ACTION_HISTORY_SCHEMA)
+    ].slice(-MANAGED_ACTION_HISTORY_LIMIT);
+}
+
+function shouldSuppressManagedTimeParentRequest(profile, { now, dateKey, policyRevision, policyHash }) {
+    const rows = safeArray(profile?.managedActionHistory);
+    for (let index = rows.length - 1; index >= 0; index -= 1) {
+        const row = safeObject(rows[index]);
+        if (normalizeString(row.schema) !== MANAGED_ACTION_HISTORY_SCHEMA) continue;
+        if (normalizeString(row.actionType) !== 'policy.time_limit.request_extra') continue;
+        if (normalizeString(row.scope) !== 'time_limits') continue;
+        if (normalizeString(row.result) !== 'requested') continue;
+        if ((normalizeNonNegativeInteger(row.revision) || 0) !== policyRevision) continue;
+        if (normalizeString(row.policyHash) !== policyHash) continue;
+        const summary = safeObject(row.summary);
+        if (normalizeString(summary.dateKey) !== dateKey) continue;
+        const receivedAt = normalizeNonNegativeInteger(row.receivedAt) || 0;
+        return receivedAt > 0 && now - receivedAt < MANAGED_TIME_PARENT_REQUEST_COOLDOWN_MS;
+    }
+    return false;
+}
+
+async function recordManagedTimeLimitParentRequest({ profileId, profileName, policy, route, dateKey, consumedSeconds, totalBudgetSeconds, remainingSeconds }) {
+    const targetProfileId = normalizeString(profileId);
+    if (!targetProfileId || !policy) return { ok: false, reason: 'missing_request_target' };
+    const storage = await storageGet([FT_PROFILES_V4_KEY]);
+    let profilesV4 = storage?.[FT_PROFILES_V4_KEY];
+    if (!isValidProfilesV4(profilesV4)) {
+        try {
+            profilesV4 = buildProfilesV4FromLegacyState(storage, {});
+        } catch (e) {
+            profilesV4 = null;
+        }
+    }
+    if (!isValidProfilesV4(profilesV4)) return { ok: false, reason: 'profiles_unavailable' };
+    const profiles = { ...safeObject(profilesV4.profiles) };
+    const profile = safeObject(profiles[targetProfileId]);
+    if (!profile || Object.keys(profile).length === 0) return { ok: false, reason: 'target_profile_missing' };
+    const now = nowTs();
+    const revision = normalizeNonNegativeInteger(policy.policyRevision) || 0;
+    const policyHash = normalizeString(policy.policyHash);
+    if (!revision || !policyHash) return { ok: false, reason: 'missing_policy_identity' };
+    if (shouldSuppressManagedTimeParentRequest(profile, { now, dateKey, policyRevision: revision, policyHash })) {
+        return { ok: true, recorded: false, reason: 'recent_request_already_recorded' };
+    }
+    const safeSurface = normalizeString(route?.surface) === 'kids' ? 'kids' : 'main';
+    const row = {
+        rowId: `managed-time-request-${targetProfileId}-${revision}-${dateKey}-${now}`,
+        schema: MANAGED_ACTION_HISTORY_SCHEMA,
+        version: 1,
+        actorProfileId: targetProfileId,
+        actorDeviceId: 'protected-runtime',
+        targetProfileId,
+        trustedLinkId: null,
+        actionType: 'policy.time_limit.request_extra',
+        scope: 'time_limits',
+        revision,
+        policyHash,
+        result: 'requested',
+        reason: 'protected_user_timeout_request',
+        receivedAt: now,
+        issuedAt: now,
+        orderKey: `request:${String(revision).padStart(6, '0')}:${dateKey}:${now}`,
+        summary: {
+            redacted: true,
+            label: 'Extra time requested',
+            dateKey,
+            surface: safeSurface,
+            profileName: normalizeString(profileName) || 'Protected profile',
+            dailyBudgetSeconds: normalizeNonNegativeInteger(totalBudgetSeconds) || 0,
+            consumedSeconds: normalizeNonNegativeInteger(consumedSeconds) || 0,
+            remainingSeconds: normalizeNonNegativeInteger(remainingSeconds) || 0
+        },
+        sensitive: true
+    };
+    profiles[targetProfileId] = {
+        ...profile,
+        managedActionHistory: appendManagedActionHistoryRowsForBackground(profile, [row])
+    };
+    await browserAPI.storage.local.set({
+        [FT_PROFILES_V4_KEY]: {
+            ...profilesV4,
+            schemaVersion: 4,
+            profiles
+        }
+    });
+    return { ok: true, recorded: true, reason: '' };
 }
 
 async function handleManagedTimeLimitHeartbeat(request, sender, sendResponse) {
@@ -1757,6 +1854,70 @@ async function handleManagedTimeLimitHeartbeat(request, sender, sendResponse) {
         });
     } catch (e) {
         sendResponse?.({ ok: false, enforced: false, error: e?.message || 'managed_time_limit_failed' });
+    }
+}
+
+async function handleManagedTimeLimitParentRequest(request, sender, sendResponse) {
+    try {
+        const now = nowTs();
+        const requestPolicy = normalizeManagedTimeLimitPolicy(request?.policy);
+        const route = classifyManagedTimeLimitRoute(sender?.tab?.url || sender?.url || request?.href || '');
+        if (!requestPolicy || route.surface === 'external') {
+            sendResponse?.({ ok: false, recorded: false, reason: 'invalid_request_context' });
+            return;
+        }
+
+        const compiledSettings = await getCompiledSettings(sender, route.surface, false);
+        const compiledPolicy = normalizeManagedTimeLimitPolicy(compiledSettings?.managedTimeLimitPolicy);
+        if (compiledSettings?.activeProfileKind !== 'child' || !compiledPolicy || compiledPolicy.enabled !== true) {
+            sendResponse?.({ ok: false, recorded: false, reason: 'active_child_policy_absent' });
+            return;
+        }
+
+        const profileId = normalizeString(compiledSettings.activeProfileId) || normalizeString(compiledSettings.managedTimeLimitPolicy?.profileId);
+        const requestedProfileId = normalizeString(request?.profileId) || normalizeString(request?.policy?.profileId);
+        if (!profileId || (requestedProfileId && requestedProfileId !== profileId)) {
+            sendResponse?.({ ok: false, recorded: false, reason: 'profile_mismatch' });
+            return;
+        }
+        if (JSON.stringify(requestPolicy) !== JSON.stringify(compiledPolicy)) {
+            sendResponse?.({ ok: false, recorded: false, reason: 'policy_mismatch' });
+            return;
+        }
+
+        const dateKey = managedTimeLimitDateKey(now, compiledPolicy.timezone);
+        const usageKey = managedTimeLimitUsageKey(profileId, dateKey);
+        const totalBudgetSeconds = managedTimeLimitTotalBudgetSeconds(compiledPolicy, now);
+        const data = await storageGet([MANAGED_TIME_USAGE_STORAGE_KEY]);
+        const usageStore = normalizeManagedTimeUsageStore(data?.[MANAGED_TIME_USAGE_STORAGE_KEY]);
+        const existing = safeObject(safeObject(usageStore.rows)[usageKey]);
+        const consumedSeconds = normalizeNonNegativeInteger(existing.consumedSeconds) || 0;
+        const remainingSeconds = Math.max(0, totalBudgetSeconds - consumedSeconds);
+        const expiredPolicy = compiledPolicy.validUntil != null && now > compiledPolicy.validUntil;
+        if (remainingSeconds > 0 && !expiredPolicy) {
+            sendResponse?.({ ok: false, recorded: false, reason: 'time_remaining' });
+            return;
+        }
+
+        const result = await recordManagedTimeLimitParentRequest({
+            profileId,
+            profileName: normalizeString(compiledSettings.managedTimeLimitPolicy?.profileName) || 'Protected profile',
+            policy: compiledPolicy,
+            route,
+            dateKey,
+            consumedSeconds,
+            totalBudgetSeconds,
+            remainingSeconds
+        });
+        sendResponse?.({
+            ok: result.ok === true,
+            recorded: result.recorded === true,
+            reason: result.reason || '',
+            profileId,
+            dateKey
+        });
+    } catch (e) {
+        sendResponse?.({ ok: false, recorded: false, reason: e?.message || 'managed_time_parent_request_failed' });
     }
 }
 
@@ -3727,6 +3888,9 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         return false;
     } else if (action === 'FilterTube_ManagedTimeLimitHeartbeat') {
         handleManagedTimeLimitHeartbeat(request, sender, sendResponse);
+        return true;
+    } else if (action === 'FilterTube_ManagedTimeLimitParentRequest') {
+        handleManagedTimeLimitParentRequest(request, sender, sendResponse);
         return true;
     } else if (action === "getCompiledSettings") {
         const senderUrl = sender?.tab?.url || sender?.url || '';

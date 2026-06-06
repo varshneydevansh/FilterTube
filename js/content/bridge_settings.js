@@ -371,6 +371,7 @@ let managedTimeLimitListenersAttached = false;
 let managedTimeLimitRouteHandler = null;
 let managedTimeLimitRuntimeGeneration = 0;
 let managedTimeLimitPolicyKey = '';
+let managedTimeLimitParentRequestKey = '';
 
 function classifyManagedViewingRoute(rawUrl) {
     try {
@@ -758,7 +759,40 @@ function showManagedTimeoutOverlay(state) {
             instruction.style.display = 'block';
             askButton.textContent = 'Waiting for parent approval';
             askButton.style.background = '#475569';
+            askButton.disabled = true;
+            askButton.style.cursor = 'default';
             pauseManagedTimeoutVideos();
+            const requestKey = [
+                String(state?.profileId || ''),
+                String(state?.policyRevision || ''),
+                String(state?.policyHash || ''),
+                String(state?.dateKey || '')
+            ].join(':');
+            if (requestKey && requestKey !== managedTimeLimitParentRequestKey) {
+                managedTimeLimitParentRequestKey = requestKey;
+                try {
+                    const policy = getManagedTimeLimitPolicy(currentSettings);
+                    browserAPI_BRIDGE.runtime.sendMessage({
+                        action: 'FilterTube_ManagedTimeLimitParentRequest',
+                        profileId: String(state?.profileId || ''),
+                        policy,
+                        href: location.href,
+                        surface: state?.surface || classifyManagedViewingRoute(location.href).surface
+                    }, response => {
+                        const err = browserAPI_BRIDGE.runtime?.lastError;
+                        if (!err && response?.ok === true) {
+                            instruction.textContent = response.recorded === true
+                                ? 'Request saved. A parent or caregiver can review it from FilterTube Managed Parent Controls and grant extra time from a trusted profile or paired device.'
+                                : 'A recent request is already saved. A parent or caregiver can review it from FilterTube Managed Parent Controls.';
+                        } else {
+                            instruction.textContent = 'A parent or caregiver can grant extra time from FilterTube Managed Parent Controls on a trusted profile or paired device.';
+                        }
+                        pauseManagedTimeoutVideos();
+                    });
+                } catch (e) {
+                    instruction.textContent = 'A parent or caregiver can grant extra time from FilterTube Managed Parent Controls on a trusted profile or paired device.';
+                }
+            }
         });
         actionArea.append(askButton, instruction);
 
@@ -792,6 +826,7 @@ function clearManagedTimeLimitHeartbeatTimer() {
 function releaseManagedTimeLimitRuntime() {
     managedTimeLimitRuntimeGeneration += 1;
     managedTimeLimitPolicyKey = '';
+    managedTimeLimitParentRequestKey = '';
     clearManagedTimeLimitHeartbeatTimer();
     if (managedTimeLimitListenersAttached && managedTimeLimitRouteHandler) {
         try {

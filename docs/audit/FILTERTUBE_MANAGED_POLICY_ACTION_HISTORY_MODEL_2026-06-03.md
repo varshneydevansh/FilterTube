@@ -216,6 +216,7 @@ The following events must produce action-history rows in future implementation:
 | `accepted_mailbox_provider_config` | Parent/account enables, changes, or disables encrypted mailbox delivery. | `accepted` on every currently manageable protected profile, including Master-managed independent account profiles, with redacted configured state, target count, and endpoint host only. |
 | `accepted_local_network_provider_config` | Parent/account enables, changes, or disables local-network gateway delivery. | `accepted` on every currently manageable protected profile, including Master-managed independent account profiles, with redacted configured state, target count, and endpoint host only. |
 | `accepted_local_time_limit_policy` | Same-device parent/account sets, changes, or disables a protected profile's daily YouTube time limit. | `accepted` with local time-limit revision, policy hash, and redacted budget/timezone counts. |
+| `requested_extra_time_after_timeout` | Protected user clicks the timeout overlay's ask-parent action after the background confirms the active child profile budget is exhausted or the policy needs revalidation. | `requested` protected `policy.time_limit.request_extra` evidence with redacted date/surface/budget/used counts only; it does not grant time, dismiss the overlay, or mutate policy. |
 | `failed_parent_unlock` | Admin PIN/password attempt fails. | `failed_auth` and rate-limit metadata. |
 | `cleared_by_parent` | Parent/account clears viewable accepted-action history. | `cleared_by_admin`; rejected evidence may remain until retention expiry. |
 
@@ -241,6 +242,7 @@ runtime managed action history display redaction: present for sensitive rows thr
 runtime managed action history retention pruning: present for 30-day accepted rows, 90-day protected evidence rows, and 500-row profile cap
 runtime managed action history clear path: present for accepted rows only while retaining protected evidence
 runtime managed action history clear event writer: present as protected `history.clear` evidence
+runtime managed timeout ask-parent request writer: present as protected `policy.time_limit.request_extra` evidence after background policy/budget revalidation
 runtime remote managed validation/apply history writer: present for rejected, conflict, idempotent, and accepted apply outcomes
 runtime remote managed accepted apply history writer: present behind validated managed apply wrapper
 runtime mailbox managed validation/apply history writer: present for local/decrypted mailbox item intake outcomes
@@ -254,7 +256,7 @@ runtime managed mailbox provider config history writer: present on every current
 runtime managed local-network provider config history writer: present on every currently manageable protected profile, including Master-managed independent account profiles
 runtime managed inbound live ack history writer: present on trusted link policy rows as redacted parent-side applied/rejected feedback
 runtime managed source key-rotation history writer: present on protected target profiles as redacted `trust_link.key_revoke` evidence
-runtime behavior changed by this contract: yes, for accepted local managed child saves, accepted local time-limit policy edits, protected failed-auth rows, parent/account history access, Nanah managed-policy receive evidence, validated remote apply history, local/decrypted mailbox item evidence, pull-on-open mailbox ack-handoff evidence, sanitized local-network candidate evidence, remote failed-attempt rate-limit metadata, parent-side outbound live send evidence, command-center delivery feedback history, provider configuration history, parent-side live ack feedback, and source key-rotation re-pairing evidence
+runtime behavior changed by this contract: yes, for accepted local managed child saves, accepted local time-limit policy edits, protected timeout ask-parent request rows, protected failed-auth rows, parent/account history access, Nanah managed-policy receive evidence, validated remote apply history, local/decrypted mailbox item evidence, pull-on-open mailbox ack-handoff evidence, sanitized local-network candidate evidence, remote failed-attempt rate-limit metadata, parent-side outbound live send evidence, command-center delivery feedback history, provider configuration history, parent-side live ack feedback, and source key-rotation re-pairing evidence
 ```
 
 The current local writer stores redacted count/status summaries under

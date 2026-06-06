@@ -170,7 +170,8 @@ runtime managed time-limit policy compiler: present
 runtime managed active-tab budget counter: present
 runtime managed heartbeat active-policy revalidation: present
 runtime managed timeout overlay: present with budget, usage, reset context, and
-protected-user ask-parent guidance that does not grant time or dismiss the lock
+protected-user ask-parent guidance plus protected request history that does not
+grant time or dismiss the lock
 runtime managed Main/Kids time gate: present
 YouTube runtime behavior changed by this contract: yes, for child profiles with enabled time-limit policy
 ```
@@ -190,6 +191,13 @@ The first runtime path is intentionally lazy:
   shows the daily limit, used time, and reset timing from the background-owned
   decision. It does not redirect to another site and does not use content-filter
   hide markers or hidden-content statistics.
+- The overlay's `Ask parent for more time` action sends a background request
+  only after the timeout surface is visible. Background revalidates the active
+  compiled child profile, profile id, policy revision/hash, YouTube route, and
+  exhausted budget or expired-policy state before appending a redacted
+  `policy.time_limit.request_extra` history row. The request is cooldown-limited
+  per profile/date/policy, does not grant extra time, does not dismiss the
+  overlay, and does not let protected-user authority mutate policy.
 - The background owns the persisted `ftManagedTimeUsageV1` counter and clamps
   elapsed time by active/focused tab heartbeat, policy date, revision, and hash.
 - The content overlay does not mark videos hidden, does not click YouTube, and

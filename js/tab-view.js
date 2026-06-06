@@ -3058,7 +3058,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const MANAGED_ACTION_HISTORY_ACCEPTED_RETENTION_MS = 30 * MANAGED_ACTION_HISTORY_DAY_MS;
     const MANAGED_ACTION_HISTORY_PROTECTED_RETENTION_MS = 90 * MANAGED_ACTION_HISTORY_DAY_MS;
     const MANAGED_ACTION_HISTORY_PROTECTED_RESULTS = new Set(['rejected', 'conflict', 'failed_auth', 'expired_session', 'cleared_by_admin']);
-    const MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set(['trust_link.revoke', 'trust_link.key_revoke', 'managed_signing_key.rotate', 'policy.time_limit.update', 'policy.viewing_space.update', 'remote_policy.source_push']);
+    const MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set(['trust_link.revoke', 'trust_link.key_revoke', 'managed_signing_key.rotate', 'policy.time_limit.update', 'policy.time_limit.request_extra', 'policy.viewing_space.update', 'remote_policy.source_push']);
     const MANAGED_ACTION_HISTORY_SUMMARY_PRIVACY_SCHEMA = 'filtertube_managed_action_history_summary_privacy';
     const MANAGED_ACTION_HISTORY_ENCRYPTED_SUMMARY_SCHEMA = 'filtertube_managed_action_history_encrypted_summary';
     const MANAGED_ACTION_HISTORY_SAFE_LABELS = Object.freeze({
@@ -3069,6 +3069,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'rule.channel.unblock': 'Channel rule changed',
         'policy.viewing_space.update': 'Viewing space policy changed',
         'policy.time_limit.update': 'Time limit policy changed',
+        'policy.time_limit.request_extra': 'Extra time requested',
         'policy.sync_policy.update': 'Sync policy changed',
         'trust_link.create': 'Trusted link created',
         'trust_link.revoke': 'Trusted link removed',
@@ -3094,6 +3095,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     const MANAGED_ACTION_HISTORY_SUMMARY_SAFE_NUMBER_KEYS = new Set([
         'clearedAcceptedRows',
+        'consumedSeconds',
+        'dailyBudgetSeconds',
         'deliveredCount',
         'failedCount',
         'kidsRuleCount',
@@ -3114,6 +3117,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'revokedLinkCount',
         'retainedProtectedRows',
         'retryAt',
+        'remainingSeconds',
         'ruleCount',
         'selectedProfileCount',
         'sentCount',
@@ -3136,6 +3140,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         'label',
         'scope',
         'deliveryStatus',
+        'dateKey',
+        'profileName',
+        'surface',
         'transport'
     ]);
     const MANAGED_ACTION_HISTORY_SUMMARY_SAFE_STRING_ARRAY_KEYS = new Set([
