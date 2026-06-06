@@ -132,7 +132,9 @@ flowchart TD
 Current extension UI can now create or disable a profile-owned
 `settings.timeLimitPolicy` from Accounts & Sync profile rows:
 
-- Parents/account profiles can set a daily limit in whole minutes.
+- Parents/account profiles can set a daily limit from preset choices for
+  30 minutes, 1 hour, 2 hours, parent-approval/0 minutes, or custom whole
+  minutes.
 - `0` minutes is valid and stores an immediate-timeout policy for future
   runtime enforcement.
 - Child/protected active profiles cannot set, change, or disable time limits.
@@ -144,9 +146,12 @@ Current extension UI can now create or disable a profile-owned
   redacted `policy.time_limit.update` rows to the target profile's
   `managedActionHistory`.
 - Command-center same-budget bulk apply can target selected protected profiles,
-  but it still builds one policy revision, policy hash, and protected
-  `policy.time_limit.update` history row per child profile after parent/account
-  re-auth.
+  but it still uses the same preset/custom-minute choice surface and builds one
+  policy revision, policy hash, and protected `policy.time_limit.update`
+  history row per child profile after parent/account re-auth.
+- Temporary extra-time grants use preset choices for 15 minutes, 30 minutes,
+  1 hour, or custom whole minutes greater than zero; grants remain bounded by
+  expiry.
 - Import/profile sanitation preserves only valid `filtertube_managed_time_limit`
   policies and drops malformed payloads.
 - Disabling a limit writes a disabled policy revision; disabled policy remains a

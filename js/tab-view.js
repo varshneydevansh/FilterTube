@@ -6366,6 +6366,89 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    async function promptManagedTimeLimitMinutes({
+        title,
+        message,
+        presets = [],
+        customTitle = 'Custom YouTube Time Limit',
+        customMessage = 'Enter whole minutes for this daily YouTube budget.',
+        customPlaceholder = 'Minutes per day',
+        customConfirmText = 'Use Custom Limit',
+        initialMinutes = 120,
+        allowZero = true,
+        errorMessage = 'Enter whole minutes, 0 or higher'
+    } = {}) {
+        const presetChoices = safeArray(presets)
+            .map((preset) => ({
+                value: normalizeString(preset.value),
+                label: normalizeString(preset.label),
+                className: preset.className
+            }))
+            .filter((preset) => preset.value && preset.label);
+        const choice = await showChoiceModal({
+            title: title || 'Set YouTube Time Limit',
+            message: message || 'Choose a daily YouTube budget for this protected profile.',
+            choices: [
+                ...presetChoices,
+                {
+                    value: 'custom',
+                    label: 'Custom minutes',
+                    className: 'btn-secondary'
+                }
+            ],
+            cancelText: 'Cancel'
+        });
+        if (choice === null) return null;
+        if (choice !== 'custom') {
+            const presetMinutes = normalizeNonNegativeInteger(choice);
+            if (presetMinutes == null || (!allowZero && presetMinutes <= 0)) {
+                UIComponents.showToast(errorMessage, 'error');
+                return null;
+            }
+            return presetMinutes;
+        }
+
+        const rawMinutes = await showPromptModal({
+            title: customTitle,
+            message: customMessage,
+            placeholder: customPlaceholder,
+            inputType: 'number',
+            confirmText: customConfirmText,
+            initialValue: String(Math.max(0, normalizeNonNegativeInteger(initialMinutes) || 0))
+        });
+        if (rawMinutes === null) return null;
+        const minutes = normalizeNonNegativeInteger(rawMinutes);
+        if (minutes == null || (!allowZero && minutes <= 0)) {
+            UIComponents.showToast(errorMessage, 'error');
+            return null;
+        }
+        return minutes;
+    }
+
+    async function promptManagedDailyTimeLimitMinutes({ selectedCount = 1, initialMinutes = 120 } = {}) {
+        return promptManagedTimeLimitMinutes({
+            title: 'Set YouTube Time Limit',
+            message: selectedCount > 1
+                ? 'Choose the same daily YouTube budget for selected protected profiles. Use 0 minutes to require parent approval before viewing.'
+                : 'Choose the daily YouTube budget for this protected profile. Use 0 minutes to require parent approval before viewing.',
+            presets: [
+                { value: '30', label: '30 min', className: 'btn-secondary' },
+                { value: '60', label: '1 hour', className: 'btn-secondary' },
+                { value: '120', label: '2 hours', className: 'btn-primary' },
+                { value: '0', label: 'Require approval', className: 'btn-secondary' }
+            ],
+            customTitle: selectedCount > 1 ? 'Custom Selected Time Limit' : 'Custom YouTube Time Limit',
+            customMessage: selectedCount > 1
+                ? 'Daily YouTube minutes for selected protected profiles. Use 0 to require parent approval before viewing.'
+                : 'Daily YouTube minutes for this profile. Use 0 to require parent approval before viewing.',
+            customPlaceholder: 'Minutes per day',
+            customConfirmText: selectedCount > 1 ? 'Save Limits' : 'Save Limit',
+            initialMinutes,
+            allowZero: true,
+            errorMessage: 'Enter whole minutes, 0 or higher'
+        });
+    }
+
     async function updateProfileTimeLimitPolicy(profileId, action) {
         const targetId = normalizeString(profileId);
         if (!targetId) return;
@@ -6402,20 +6485,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             enabled = false;
         } else {
             const currentMinutes = Math.max(0, Math.floor((existingPolicy?.dailyBudgetSeconds || 7200) / 60));
-            const rawMinutes = await showPromptModal({
-                title: 'Set YouTube Time Limit',
-                message: 'Daily YouTube minutes for this profile. Use 0 to require parent approval before viewing.',
-                placeholder: 'Minutes per day',
-                inputType: 'number',
-                confirmText: 'Save Limit',
-                initialValue: String(currentMinutes)
+            const minutes = await promptManagedDailyTimeLimitMinutes({
+                selectedCount: 1,
+                initialMinutes: currentMinutes
             });
-            if (rawMinutes === null) return;
-            const minutes = normalizeNonNegativeInteger(rawMinutes);
-            if (minutes == null) {
-                UIComponents.showToast('Enter whole minutes, 0 or higher', 'error');
-                return;
-            }
+            if (minutes === null) return;
             budgetSeconds = minutes * 60;
         }
 
@@ -6495,20 +6569,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (enabled) {
             const firstPolicy = getManagedTimeLimitPolicy(profiles[eligibleIds[0]]);
             const currentMinutes = Math.max(0, Math.floor((firstPolicy?.dailyBudgetSeconds || 7200) / 60));
-            const rawMinutes = await showPromptModal({
-                title: 'Set YouTube Time Limit',
-                message: 'Daily YouTube minutes for selected protected profiles. Use 0 to require parent approval before viewing.',
-                placeholder: 'Minutes per day',
-                inputType: 'number',
-                confirmText: 'Save Limits',
-                initialValue: String(currentMinutes)
+            const minutes = await promptManagedDailyTimeLimitMinutes({
+                selectedCount: eligibleIds.length,
+                initialMinutes: currentMinutes
             });
-            if (rawMinutes === null) return;
-            const minutes = normalizeNonNegativeInteger(rawMinutes);
-            if (minutes == null) {
-                UIComponents.showToast('Enter whole minutes, 0 or higher', 'error');
-                return;
-            }
+            if (minutes === null) return;
             budgetSeconds = minutes * 60;
         }
 
@@ -6562,21 +6627,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function promptManagedExtraTimeMinutes({ selectedCount = 1 } = {}) {
-        const rawMinutes = await showPromptModal({
+        return promptManagedTimeLimitMinutes({
             title: selectedCount > 1 ? 'Add Time To Selected Profiles' : 'Add Extra YouTube Time',
-            message: 'Extra parent-approved YouTube minutes. The grant expires automatically in 2 hours.',
-            placeholder: 'Extra minutes',
-            inputType: 'number',
-            confirmText: 'Add Time',
-            initialValue: '15'
+            message: 'Choose temporary parent-approved YouTube time. The grant expires automatically in 2 hours.',
+            presets: [
+                { value: '15', label: '15 min', className: 'btn-primary' },
+                { value: '30', label: '30 min', className: 'btn-secondary' },
+                { value: '60', label: '1 hour', className: 'btn-secondary' }
+            ],
+            customTitle: selectedCount > 1 ? 'Custom Extra Time For Selected Profiles' : 'Custom Extra YouTube Time',
+            customMessage: 'Extra parent-approved YouTube minutes. The grant expires automatically in 2 hours.',
+            customPlaceholder: 'Extra minutes',
+            customConfirmText: 'Add Time',
+            initialMinutes: 15,
+            allowZero: false,
+            errorMessage: 'Enter whole extra minutes greater than 0'
         });
-        if (rawMinutes === null) return null;
-        const minutes = normalizeNonNegativeInteger(rawMinutes);
-        if (minutes == null || minutes <= 0) {
-            UIComponents.showToast('Enter whole extra minutes greater than 0', 'error');
-            return null;
-        }
-        return minutes;
     }
 
     async function offerManagedTimeLimitPushForChangedProfiles(profileIds) {
