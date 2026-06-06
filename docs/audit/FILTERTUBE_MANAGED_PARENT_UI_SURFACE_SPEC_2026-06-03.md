@@ -132,9 +132,10 @@ state without exposing plaintext rule values:
 - `Configure Mailbox` and `Edit Mailbox` save or clear only the encrypted
   mailbox endpoint configuration after parent/account re-auth. They do not
   create a sync account, publish rules, expose tokens in the UI, or turn the
-  mailbox server into policy authority. The setup flow now first asks parents
-  to Configure/Edit or explicitly Disable Mailbox; an empty endpoint no longer
-  acts as the disable command.
+  mailbox server into policy authority. The setup flow first asks parents to
+  Configure/Edit or explicitly Disable Mailbox, and the endpoint prompt also
+  treats a blank endpoint as disabling mailbox delivery so the visible prompt
+  matches runtime behavior.
 - `Configure LAN` and `Edit LAN` save or clear only the local-network gateway
   endpoint configuration after parent/account re-auth. They do not create
   authority from network reachability, expose tokens in the UI, or let a LAN
@@ -198,6 +199,7 @@ runtime managed command-center encrypted mailbox provider configuration: present
 runtime managed command-center mailbox provider config history: present as redacted per-protected-profile rows, including Master-managed independent account profiles
 runtime managed command-center local-network provider configuration: present via parent re-auth and explicit configure/disable choice
 runtime managed command-center local-network provider config history: present as redacted per-protected-profile rows, including Master-managed independent account profiles
+runtime managed command-center blank mailbox endpoint disables provider config: present after parent re-auth
 runtime managed command-center post-rule-write granular verified-device push: present with selected surface binding
 runtime managed command-center post-viewing/time-limit verified-device push: present
 runtime connected verified-device live P2P managed policy send: present

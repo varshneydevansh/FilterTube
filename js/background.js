@@ -1491,6 +1491,7 @@ function syncStoredMainKeywordsWithChannels(existingKeywords, channels) {
 
 // Deep link into the tab-view dashboard; query param avoids hash-only navigation
 // so we can reliably parse intent even when hash stripping occurs.
+const DASHBOARD_PAGE_URL = browserAPI.runtime.getURL('html/tab-view.html');
 const WHATS_NEW_PAGE_URL = browserAPI.runtime.getURL('html/tab-view.html?view=whatsnew');
 const RELEASE_NOTES_TEMPLATE = {
     headline: 'FilterTube just updated',
@@ -3871,6 +3872,16 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         browserAPI.tabs.create({ url: url, active: true }, (tab) => {
             if (browserAPI.runtime.lastError) {
                 console.warn('FilterTube Background: failed to open What\'s New tab', browserAPI.runtime.lastError);
+                sendResponse?.({ ok: false, error: browserAPI.runtime.lastError.message });
+            } else {
+                sendResponse?.({ ok: true, tabId: tab.id });
+            }
+        });
+        return true;
+    } else if (action === 'FilterTube_OpenDashboard') {
+        browserAPI.tabs.create({ url: DASHBOARD_PAGE_URL, active: true }, (tab) => {
+            if (browserAPI.runtime.lastError) {
+                console.warn('FilterTube Background: failed to open dashboard tab', browserAPI.runtime.lastError);
                 sendResponse?.({ ok: false, error: browserAPI.runtime.lastError.message });
             } else {
                 sendResponse?.({ ok: true, tabId: tab.id });

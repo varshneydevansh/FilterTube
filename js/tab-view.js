@@ -9943,7 +9943,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const endpoint = await showPromptModal({
             title: 'Configure Encrypted Mailbox',
-            message: 'Enter the HTTPS mailbox endpoint for later managed updates.',
+            message: 'Enter the HTTPS mailbox endpoint for later managed updates. Leave blank to disable mailbox delivery.',
             placeholder: 'https://example.com/filtertube',
             inputType: 'url',
             confirmText: currentEndpoint ? 'Save Endpoint' : 'Enable Mailbox',
@@ -9952,7 +9952,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (endpoint === null) return;
         const endpointUrl = normalizeString(endpoint);
         if (!endpointUrl) {
-            UIComponents.showToast('Enter a mailbox endpoint or use Disable Mailbox', 'error');
+            writeNanahManagedMailboxServerConfig({});
+            await recordManagedMailboxProviderConfigHistory({
+                configured: false,
+                endpointHost: ''
+            });
+            await refreshProfilesUI();
+            UIComponents.showToast('Managed mailbox delivery disabled', 'success');
             return;
         }
         const token = await showPromptModal({

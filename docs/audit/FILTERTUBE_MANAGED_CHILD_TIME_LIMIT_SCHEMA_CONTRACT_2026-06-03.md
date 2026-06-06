@@ -169,9 +169,9 @@ local managed time-limit protected history row writer: present
 runtime managed time-limit policy compiler: present
 runtime managed active-tab budget counter: present
 runtime managed heartbeat active-policy revalidation: present
-runtime managed timeout overlay: present with budget, usage, reset context, and
-protected-user ask-parent guidance plus protected request history that does not
-grant time or dismiss the lock
+runtime managed timeout overlay: present with budget, usage, reset context,
+protected-user ask-parent guidance, a safe Open FilterTube dashboard action,
+and protected request history that does not grant time or dismiss the lock
 runtime managed Main/Kids time gate: present
 YouTube runtime behavior changed by this contract: yes, for child profiles with enabled time-limit policy
 ```
@@ -191,6 +191,10 @@ The first runtime path is intentionally lazy:
   shows the daily limit, used time, and reset timing from the background-owned
   decision. It does not redirect to another site and does not use content-filter
   hide markers or hidden-content statistics.
+- The timeout surface offers `Open FilterTube` as a safe extension-dashboard
+  route for parent/admin follow-up. Opening the dashboard does not unlock the
+  protected profile, grant time, clear the overlay, or mutate policy; the
+  existing dashboard parent/account gates still own any change.
 - The overlay's `Ask parent for more time` action sends a background request
   only after the timeout surface is visible. Background revalidates the active
   compiled child profile, profile id, policy revision/hash, YouTube route, and

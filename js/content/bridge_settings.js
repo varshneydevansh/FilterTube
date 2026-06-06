@@ -727,6 +727,13 @@ function showManagedTimeoutOverlay(state) {
             'margin-top:20px'
         ].join(';');
 
+        const buttonRow = document.createElement('div');
+        buttonRow.style.cssText = [
+            'display:grid',
+            'grid-template-columns:1fr 1fr',
+            'gap:10px'
+        ].join(';');
+
         const askButton = document.createElement('button');
         askButton.type = 'button';
         askButton.textContent = 'Ask parent for more time';
@@ -740,6 +747,32 @@ function showManagedTimeoutOverlay(state) {
             'font-size:14px',
             'cursor:pointer'
         ].join(';');
+
+        const dashboardButton = document.createElement('button');
+        dashboardButton.type = 'button';
+        dashboardButton.textContent = 'Open FilterTube';
+        dashboardButton.style.cssText = [
+            'min-height:44px',
+            'border:1px solid rgba(148,163,184,.36)',
+            'border-radius:8px',
+            'background:#17202b',
+            'color:#e2e8f0',
+            'font-weight:800',
+            'font-size:14px',
+            'cursor:pointer'
+        ].join(';');
+        dashboardButton.addEventListener('click', () => {
+            pauseManagedTimeoutVideos();
+            try {
+                browserAPI_BRIDGE.runtime.sendMessage({
+                    action: 'FilterTube_OpenDashboard',
+                    source: 'managed_time_limit_overlay'
+                }, () => {
+                    pauseManagedTimeoutVideos();
+                });
+            } catch (e) {
+            }
+        });
 
         const instruction = document.createElement('p');
         instruction.textContent = 'A parent or caregiver can grant extra time from FilterTube Managed Parent Controls on a trusted profile or paired device.';
@@ -794,7 +827,8 @@ function showManagedTimeoutOverlay(state) {
                 }
             }
         });
-        actionArea.append(askButton, instruction);
+        buttonRow.append(askButton, dashboardButton);
+        actionArea.append(buttonRow, instruction);
 
         panel.appendChild(eyebrow);
         panel.appendChild(title);
