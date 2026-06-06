@@ -1160,7 +1160,9 @@
                                                 <ul>
                                                     <li>Locked profiles disable toggles and auto-backup controls until unlocked.</li>
                                                     <li>Encrypted exports/backups need the profile’s PIN; Master unlock is required for admin actions.</li>
-                                                    <li>Child PINs protect profile switching and can open receive-only Accounts &amp; Sync; parent/admin PIN still controls rules, backups, trusted-link policy, and settings.</li>
+                                                    <li>Child/profile PINs protect switching into that profile and can open receive-only Accounts &amp; Sync; they do not grant parent/admin authority.</li>
+                                                    <li>Parent/account or Master PIN controls rule edits, allowed viewing spaces, time limits, backups, trusted-link policy, and settings.</li>
+                                                    <li>Parents can set or remove a child profile’s switching PIN from the parent/account profile row after parent/account unlock.</li>
                                                     <li>Opening receive-only Accounts &amp; Sync with a child PIN does not unlock Dashboard, Filters, Kids Mode, Settings, or parent controls after you return to the viewing surface.</li>
                                                     <li>Unlock is per-session in both Popup and New Tab.</li>
                                                 </ul>
@@ -1445,7 +1447,11 @@
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Child PIN vs parent PIN</div>
-                                            <div class="help-item-body">A child profile PIN protects switching into that child profile and can open receive-only Accounts &amp; Sync. Parent or account PIN controls rule editing, allowed viewing spaces, profile management, sync policy, trusted links, and backups.</div>
+                                            <div class="help-item-body">A child profile PIN protects switching into that child profile, so siblings or other users cannot casually open it. It can open receive-only Accounts &amp; Sync, but it does not grant parent/admin authority. Parent, account, or Master PIN controls rule editing, allowed viewing spaces, time limits, profile management, sync policy, trusted links, and backups.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Who sets a child PIN</div>
+                                            <div class="help-item-body">A parent/account profile can set, change, or remove a child profile’s switching PIN from the child row after parent/account unlock. The child surface cannot use that PIN to change policy, pair trusted devices, send updates, or remove parent controls.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Where parents edit child rules</div>

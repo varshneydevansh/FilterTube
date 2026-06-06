@@ -13954,7 +13954,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const root = safeObject(profilesV4);
         const profiles = safeObject(root.profiles);
         const childAdminRestricted = isChildProfileAdminSurface();
-        const childAdminTitle = 'Child profiles cannot manage profile names, deletion, PIN rules, viewing spaces, or time limits from this surface.';
+        const childAdminTitle = 'Child profiles cannot manage profile names, deletion, PIN rules, viewing spaces, time limits, or profile switching PINs from this surface.';
 
         ftProfilesManager.innerHTML = '';
 
@@ -14310,10 +14310,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 pinBtn.type = 'button';
                 pinBtn.textContent = isProfileLocked(profilesV4, profileId) ? 'Change PIN' : 'Set PIN';
                 pinBtn.disabled = childAdminRestricted;
-                pinBtn.title = childAdminRestricted ? childAdminTitle : '';
+                pinBtn.title = childAdminRestricted
+                    ? childAdminTitle
+                    : 'Set the profile switching PIN. This protects entry into this profile; it does not grant parent/admin authority.';
                 pinBtn.addEventListener('click', async () => {
                     if (childAdminRestricted) {
-                        UIComponents.showToast('Child profiles cannot manage profile PIN rules here', 'error');
+                        UIComponents.showToast('Child profiles cannot manage profile switching PINs here', 'error');
                         return;
                     }
                     const io = window.FilterTubeIO || {};
@@ -14321,31 +14323,37 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const fresh = await io.loadProfilesV4();
 
                     const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
-                    if (currentActive !== 'default' && currentActive !== profileId) {
-                        UIComponents.showToast('Switch to this profile (or Default) to manage its PIN', 'error');
+                    const canManagePin = currentActive === 'default'
+                        || currentActive === profileId
+                        || canActiveProfileManageProfile(fresh, profileId);
+                    if (!canManagePin) {
+                        UIComponents.showToast('Switch to the parent/account profile to manage this profile PIN', 'error');
                         return;
                     }
 
                     if (currentActive === 'default') {
                         const okAdmin = await ensureAdminUnlocked(fresh);
                         if (!okAdmin) return;
-                    } else {
+                    } else if (currentActive === profileId) {
                         const okSelf = await ensureProfileUnlocked(fresh, profileId);
                         if (!okSelf) return;
+                    } else {
+                        const okParent = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
+                        if (!okParent) return;
                     }
 
                     const pin1 = await showPromptModal({
-                        title: 'Set Profile PIN',
-                        message: 'Enter a PIN for this profile.',
-                        placeholder: 'PIN',
+                        title: 'Set Profile Switching PIN',
+                        message: 'Enter the PIN used only for switching into this profile. Parent/admin authority stays separate.',
+                        placeholder: 'Profile switching PIN',
                         inputType: 'password',
                         confirmText: 'Continue'
                     });
                     if (pin1 === null) return;
                     const pin2 = await showPromptModal({
-                        title: 'Confirm Profile PIN',
-                        message: 'Re-enter the PIN to confirm.',
-                        placeholder: 'PIN',
+                        title: 'Confirm Profile Switching PIN',
+                        message: 'Re-enter the profile switching PIN to confirm.',
+                        placeholder: 'Profile switching PIN',
                         inputType: 'password',
                         confirmText: 'Save'
                     });
@@ -14379,7 +14387,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     });
                     clearProfileUnlockSession.run(profileId);
                     await refreshProfilesUI();
-                    UIComponents.showToast('Profile PIN updated', 'success');
+                    UIComponents.showToast('Profile switching PIN updated', 'success');
                 });
 
                 const clearPinBtn = document.createElement('button');
@@ -14387,10 +14395,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 clearPinBtn.type = 'button';
                 clearPinBtn.textContent = 'Remove PIN';
                 clearPinBtn.disabled = !isProfileLocked(profilesV4, profileId) || childAdminRestricted;
-                clearPinBtn.title = childAdminRestricted ? childAdminTitle : '';
+                clearPinBtn.title = childAdminRestricted
+                    ? childAdminTitle
+                    : 'Remove the profile switching PIN. Parent/admin authority is not changed.';
                 clearPinBtn.addEventListener('click', async () => {
                     if (childAdminRestricted) {
-                        UIComponents.showToast('Child profiles cannot manage profile PIN rules here', 'error');
+                        UIComponents.showToast('Child profiles cannot manage profile switching PINs here', 'error');
                         return;
                     }
                     const io = window.FilterTubeIO || {};
@@ -14398,19 +14408,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const fresh = await io.loadProfilesV4();
 
                     const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
-                    if (currentActive !== 'default' && currentActive !== profileId) {
-                        UIComponents.showToast('Switch to this profile (or Default) to manage its PIN', 'error');
+                    const canManagePin = currentActive === 'default'
+                        || currentActive === profileId
+                        || canActiveProfileManageProfile(fresh, profileId);
+                    if (!canManagePin) {
+                        UIComponents.showToast('Switch to the parent/account profile to manage this profile PIN', 'error');
                         return;
                     }
 
                     if (currentActive === 'default') {
                         const okAdmin = await ensureAdminUnlocked(fresh);
                         if (!okAdmin) return;
-                    } else {
+                    } else if (currentActive === profileId) {
                         const okSelf = await ensureProfileUnlocked(fresh, profileId);
                         if (!okSelf) return;
+                    } else {
+                        const okParent = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
+                        if (!okParent) return;
                     }
-                    const confirmed = window.confirm('Remove the profile PIN?');
+                    const confirmed = window.confirm('Remove the profile switching PIN?');
                     if (!confirmed) return;
 
                     const profiles = safeObject(fresh.profiles);
@@ -14431,7 +14447,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     clearProfileUnlockSession.run(profileId);
                     await notifyBackgroundLocked(profileId);
                     await refreshProfilesUI();
-                    UIComponents.showToast('Profile PIN removed', 'success');
+                    UIComponents.showToast('Profile switching PIN removed', 'success');
                 });
 
                 actions.appendChild(pinBtn);
