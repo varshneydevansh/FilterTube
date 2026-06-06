@@ -24,6 +24,7 @@
                 : () => ({ localLabels: [], remoteScopeCount: 0, historyRowCount: 0, protectedRowCount: 0 }),
             getManagedTimeLimitPolicy: typeof helpers.getManagedTimeLimitPolicy === 'function' ? helpers.getManagedTimeLimitPolicy : () => null,
             getProfileName: typeof helpers.getProfileName === 'function' ? helpers.getProfileName : fallbackGetProfileName,
+            getProfileType: typeof helpers.getProfileType === 'function' ? helpers.getProfileType : () => 'account',
             isProfileLocked: typeof helpers.isProfileLocked === 'function' ? helpers.isProfileLocked : () => false,
             viewingAccessLabel: typeof helpers.viewingAccessLabel === 'function' ? helpers.viewingAccessLabel : () => 'Main + Kids',
             managedTimeLimitLabel: typeof helpers.managedTimeLimitLabel === 'function' ? helpers.managedTimeLimitLabel : () => 'No limit',
@@ -599,6 +600,57 @@
             empty.className = 'ft-managed-command-center__empty';
             empty.textContent = 'No protected profiles are available for this parent/account profile yet.';
             panel.appendChild(empty);
+            if (h.onAction) {
+                const setup = document.createElement('div');
+                setup.className = 'ft-managed-command-center__setup';
+                const setupCopy = document.createElement('div');
+                setupCopy.className = 'help-item-body';
+                setupCopy.textContent = 'Create a child profile, then set viewing spaces, time limits, rules, and verified-device delivery from this panel.';
+                setup.appendChild(setupCopy);
+
+                const setupActions = document.createElement('div');
+                setupActions.className = 'ft-managed-command-center__setup-actions';
+                const activeProfileId = typeof summary.activeProfileId === 'string' && summary.activeProfileId.trim()
+                    ? summary.activeProfileId.trim()
+                    : (typeof profilesV4?.activeProfileId === 'string' && profilesV4.activeProfileId.trim() ? profilesV4.activeProfileId.trim() : 'default');
+                const activeType = h.getProfileType(profilesV4, activeProfileId);
+                if (activeType === 'account') {
+                    const createChildBtn = document.createElement('button');
+                    createChildBtn.className = 'btn-primary';
+                    createChildBtn.type = 'button';
+                    createChildBtn.textContent = 'Create Child Profile';
+                    createChildBtn.title = 'Creates a protected profile owned by the active parent/account profile.';
+                    createChildBtn.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        Promise.resolve(h.onAction({
+                            action: 'create_child_profile',
+                            scope: 'managed_profile_setup',
+                            authority: 'delegated_runtime_gate',
+                            sensitiveAction: true
+                        })).catch(() => {});
+                    });
+                    setupActions.appendChild(createChildBtn);
+                }
+                if (activeProfileId === 'default') {
+                    const createAccountBtn = document.createElement('button');
+                    createAccountBtn.className = 'btn-secondary';
+                    createAccountBtn.type = 'button';
+                    createAccountBtn.textContent = 'Create Account';
+                    createAccountBtn.title = 'Creates an independent account profile that Master can later manage.';
+                    createAccountBtn.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        Promise.resolve(h.onAction({
+                            action: 'create_account',
+                            scope: 'managed_profile_setup',
+                            authority: 'delegated_runtime_gate',
+                            sensitiveAction: true
+                        })).catch(() => {});
+                    });
+                    setupActions.appendChild(createAccountBtn);
+                }
+                if (setupActions.children.length) setup.appendChild(setupActions);
+                panel.appendChild(setup);
+            }
             return panel;
         }
 

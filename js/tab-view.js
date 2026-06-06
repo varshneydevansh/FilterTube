@@ -13810,6 +13810,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 summarizeManagedPolicyStateForProfile,
                 getManagedTimeLimitPolicy,
                 getProfileName,
+                getProfileType,
                 isProfileLocked,
                 viewingAccessLabel,
                 managedTimeLimitLabel,
@@ -13823,6 +13824,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                         await configureNanahManagedMailboxServer();
                     } else if (action === 'configure_local_network') {
                         await configureNanahManagedLocalNetworkProvider();
+                    } else if (action === 'create_child_profile') {
+                        if (ftCreateChildBtn && !ftCreateChildBtn.disabled) {
+                            ftCreateChildBtn.click();
+                        } else {
+                            UIComponents.showToast('Switch to a parent/account profile to create a child profile', 'error');
+                        }
+                    } else if (action === 'create_account') {
+                        if (ftCreateAccountBtn && !ftCreateAccountBtn.disabled) {
+                            ftCreateAccountBtn.click();
+                        } else {
+                            UIComponents.showToast('Switch to Default to create an account profile', 'error');
+                        }
                     } else if (!targetId && !action.startsWith('bulk_')) {
                         return;
                     } else if (action === 'edit_rules') {

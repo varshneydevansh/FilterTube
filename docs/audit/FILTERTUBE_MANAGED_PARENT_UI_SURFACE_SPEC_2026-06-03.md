@@ -25,6 +25,9 @@ their saved devices. Parents can also grant temporary extra YouTube time to
 profiles with active limits and optionally push the updated `time_limits`
 policy to verified devices. Local viewing-space and normal time-limit edits now
 use the same post-save verified-device push offer for their matching scopes.
+When no protected profile is available yet, the command center now shows setup
+handoffs for creating a child profile and, for Default/Master, creating an
+independent account profile through the existing gated profile-creation flows.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 
@@ -58,7 +61,7 @@ state without exposing plaintext rule values:
 
 | State | Parent/account surface | Protected child surface |
 | --- | --- | --- |
-| Empty | Show `Managed status: no parent-managed policy revisions yet.` | No detailed status line. |
+| Empty | Show `Managed status: no parent-managed policy revisions yet.` and, when the command center has no protected rows, setup handoffs for creating the first child/protected profile through existing gated flows. | No detailed status line. |
 | Local edit present | Show local Main/Kids revision and date. | No detailed status line. |
 | Remote policy present | Show remote accepted scope count, link count, and latest revision. | No detailed status line. |
 | Recent actions present | Show total/protected row counts and latest result/scope. | No detailed status line. |
@@ -73,6 +76,9 @@ state without exposing plaintext rule values:
 - The status line is read-only.
 - Command-center action buttons are action intents only. They do not carry
   payloads, rule values, policy JSON, private keys, or direct mutation authority.
+- Empty-state setup buttons are also action intents only. They route to the
+  existing Create Child Profile or Create Account flows, which keep their
+  current parent/account or Master unlock requirements.
 - Bulk command-center buttons carry only selected protected profile ids, action
   name, scope, and `sensitiveAction: true`; the dashboard runtime still prompts
   for parent/account re-auth and builds one policy revision per target.
