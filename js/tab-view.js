@@ -3108,6 +3108,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'mailboxPurgedCount',
         'noLinkCount',
         'nextKeyVersion',
+        'parentGrantSeconds',
         'providerMissingCount',
         'previousKeyVersion',
         'protectedRows',
@@ -3143,6 +3144,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'dateKey',
         'profileName',
         'surface',
+        'timezone',
         'transport'
     ]);
     const MANAGED_ACTION_HISTORY_SUMMARY_SAFE_STRING_ARRAY_KEYS = new Set([
@@ -5194,11 +5196,51 @@ document.addEventListener('DOMContentLoaded', async () => {
             : `${date} - ${result} - ${scope} - ${label}${detailSuffix}`;
     }
 
+    function formatManagedHistoryDuration(seconds) {
+        const totalSeconds = normalizeNonNegativeInteger(seconds) || 0;
+        if (totalSeconds <= 0) return '0m';
+        const totalMinutes = Math.max(1, Math.ceil(totalSeconds / 60));
+        if (totalMinutes < 60) return `${totalMinutes}m`;
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        return minutes ? `${hours}h ${minutes}m` : `${hours}h`;
+    }
+
     function buildManagedActionHistoryDisplayDetails(row, summary) {
         const item = safeObject(row);
         const root = safeObject(summary);
         const parts = [];
         const actionType = normalizeString(item.actionType);
+        if (actionType === 'policy.time_limit.request_extra') {
+            const surface = normalizeString(root.surface);
+            const dateKey = normalizeString(root.dateKey);
+            const consumedSeconds = normalizeNonNegativeInteger(root.consumedSeconds);
+            const dailyBudgetSeconds = normalizeNonNegativeInteger(root.dailyBudgetSeconds);
+            const remainingSeconds = normalizeNonNegativeInteger(root.remainingSeconds);
+            if (surface) parts.push(`surface ${surface === 'kids' ? 'Kids' : 'Main'}`);
+            if (dateKey) parts.push(`date ${dateKey}`);
+            if (consumedSeconds != null && dailyBudgetSeconds != null) {
+                parts.push(`used ${formatManagedHistoryDuration(consumedSeconds)} of ${formatManagedHistoryDuration(dailyBudgetSeconds)}`);
+            }
+            if (remainingSeconds != null) {
+                parts.push(`remaining ${formatManagedHistoryDuration(remainingSeconds)}`);
+            }
+        } else if (actionType === 'policy.time_limit.update') {
+            const enabled = root.enabled === true;
+            const dailyBudgetSeconds = normalizeNonNegativeInteger(root.dailyBudgetSeconds);
+            const parentGrantSeconds = normalizeNonNegativeInteger(root.parentGrantSeconds);
+            const timezone = normalizeString(root.timezone);
+            parts.push(enabled ? 'limit enabled' : 'limit disabled');
+            if (dailyBudgetSeconds != null) {
+                parts.push(`daily ${formatManagedHistoryDuration(dailyBudgetSeconds)}`);
+            }
+            if (parentGrantSeconds != null && parentGrantSeconds > 0) {
+                parts.push(`extra ${formatManagedHistoryDuration(parentGrantSeconds)}`);
+            }
+            if (timezone) {
+                parts.push(`timezone ${timezone}`);
+            }
+        }
         if (actionType === 'remote_policy.source_push') {
             const deliveryStatus = normalizeString(root.deliveryStatus);
             const liveSent = normalizeNonNegativeInteger(root.liveSentCount) || 0;

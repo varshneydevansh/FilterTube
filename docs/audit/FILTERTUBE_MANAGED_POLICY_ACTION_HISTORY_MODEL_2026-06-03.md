@@ -238,7 +238,7 @@ profile when a row can be attached to a known protected profile:
 runtime managed action history store: profile-local managed child rows
 runtime managed action history row writer: local managed child edit plus local time-limit policy edit plus failed parent unlock plus Nanah managed-policy validation/apply outcomes
 runtime managed action history access gate: present for parent/account authority
-runtime managed action history display redaction: present for sensitive rows through fixed labels and normalized reason codes
+runtime managed action history display redaction: present for sensitive rows through fixed labels, normalized reason codes, and redacted time-limit/request counts
 runtime managed action history retention pruning: present for 30-day accepted rows, 90-day protected evidence rows, and 500-row profile cap
 runtime managed action history clear path: present for accepted rows only while retaining protected evidence
 runtime managed action history clear event writer: present as protected `history.clear` evidence
@@ -261,8 +261,13 @@ runtime behavior changed by this contract: yes, for accepted local managed child
 
 The current local writer stores redacted count/status summaries under
 `profile.managedActionHistory[]`; local time-limit rows store only enabled
-state, daily budget counts, timezone, and surface-budget count. Parent policy
-push rows store only safe delivery status/counts and transport labels, never
+state, daily budget counts, timezone, parent-grant seconds, and surface-budget
+count. Protected timeout request rows store only date, Main/Kids surface,
+daily budget, used time, and remaining-time counts after background
+revalidation. The parent/account history modal renders those time-limit and
+request facts as redacted operational details so caregivers can understand what
+happened without exposing rules or making the log authority. Parent policy push
+rows store only safe delivery status/counts and transport labels, never
 keyword/channel/video values or policy payload plaintext. Every runtime
 append and read path now normalizes rows through
 `sanitizeManagedActionHistoryRow`, drops unapproved summary keys, and prunes
