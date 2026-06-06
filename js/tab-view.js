@@ -9893,7 +9893,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return {
                 configured: false,
                 label: 'Mailbox not configured',
-                detail: 'Live P2P can still send now. Configure HTTPS mailbox delivery when child devices need later updates.',
+                detail: 'Live P2P can send now. Configure HTTPS mailbox delivery only when protected devices need encrypted updates later while offline.',
                 tone: 'warning'
             };
         }
@@ -9916,7 +9916,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return {
             configured: true,
             label: `Mailbox ready: ${host}`,
-            detail: 'Later delivery can queue encrypted policy updates; server state stays ciphertext plus revision metadata.',
+            detail: 'Encrypted later delivery is available; server state stays ciphertext plus revision metadata and local validation still decides apply.',
             tone: 'success'
         };
     }
@@ -9946,8 +9946,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             title: title || 'Configure Managed Delivery',
             message: message || 'Choose how this managed delivery provider should be used.',
             details: [
-                'Live P2P can still send immediately when both devices are connected.',
-                'Providers are delivery paths only; trusted link, target profile, scope, revision, hash, and signature validation still happen locally.'
+                'Live P2P sends immediately when both devices are connected.',
+                'Mailbox is for encrypted later delivery when the protected device is offline.',
+                'Local-network gateway is for same-network delivery only; discovery is never authority.',
+                'Every delivery path still needs trusted link, target profile, scope, revision, hash, and signature validation locally.'
             ],
             choices,
             cancelText: 'Cancel'
@@ -9967,7 +9969,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
             title: 'Encrypted Mailbox Delivery',
-            message: 'Mailbox delivery is for later managed updates when a protected device is offline. The mailbox stores encrypted policy items and revision metadata, not plaintext rules.',
+            message: 'Mailbox delivery is for later managed updates when a protected device is offline. The mailbox stores encrypted policy items and revision metadata, not plaintext rules or PINs.',
             configured: !!currentEndpoint,
             configureLabel: currentEndpoint ? 'Edit Mailbox' : 'Configure Mailbox',
             disableLabel: 'Disable Mailbox'
@@ -11168,7 +11170,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return {
                 configured: false,
                 label: 'LAN provider not configured',
-                detail: 'Live P2P and mailbox can still work. Configure a local gateway only for same-network managed delivery.',
+                detail: 'Live P2P and mailbox can still work. Configure a local gateway only for trusted same-network managed delivery.',
                 tone: 'warning'
             };
         }
@@ -11184,7 +11186,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return {
             configured: true,
             label: `LAN provider ready: ${host}`,
-            detail: 'Same-network delivery can hand signed managed-policy candidates to the configured gateway; trust validation still happens locally.',
+            detail: 'Same-network delivery can hand signed candidates to the gateway; trusted-link and signature validation still happen locally.',
             tone: 'success'
         };
     }

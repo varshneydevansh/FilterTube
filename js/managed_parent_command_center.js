@@ -47,7 +47,7 @@
                 : () => ({
                     configured: false,
                     label: 'Mailbox not configured',
-                    detail: 'Live P2P still works; later delivery needs a configured provider.',
+                    detail: 'Live P2P can send now. Mailbox is only for encrypted later delivery when the protected device is offline.',
                     tone: 'warning'
                 }),
             getManagedLocalNetworkConfigSummary: typeof helpers.getManagedLocalNetworkConfigSummary === 'function'
@@ -55,7 +55,7 @@
                 : () => ({
                     configured: false,
                     label: 'LAN provider not configured',
-                    detail: 'Same-network delivery needs a configured local provider.',
+                    detail: 'Same-network delivery needs an explicit local gateway; LAN discovery is never authority.',
                     tone: 'warning'
                 }),
             onAction: typeof helpers.onAction === 'function' ? helpers.onAction : null
@@ -592,9 +592,13 @@
         mailboxTitle.textContent = mailbox.label || (mailbox.configured ? 'Mailbox configured' : 'Mailbox not configured');
         const mailboxDetail = document.createElement('span');
         mailboxDetail.textContent = summary.profileCount > 0
-            ? (mailbox.detail || 'Later delivery needs a configured encrypted mailbox provider.')
+            ? (mailbox.detail || 'Live P2P can send now. Mailbox is only for encrypted later delivery when the protected device is offline.')
             : 'Create a protected profile first. Mailbox delivery is optional and only useful after a protected device is paired.';
-        mailboxCopy.append(mailboxTitle, mailboxDetail);
+        const mailboxRoute = document.createElement('span');
+        mailboxRoute.textContent = mailbox.configured
+            ? 'Offline updates can be picked up later; local trusted-link and signature checks still decide whether they apply.'
+            : 'Leave this off for live-only control; configure it when parent changes must wait for the child device to open later.';
+        mailboxCopy.append(mailboxTitle, mailboxDetail, mailboxRoute);
         mailboxPanel.appendChild(mailboxCopy);
         if (h.onAction) {
             const mailboxButton = document.createElement('button');
@@ -624,9 +628,13 @@
         localTitle.textContent = localNetwork.label || (localNetwork.configured ? 'LAN provider configured' : 'LAN provider not configured');
         const localDetail = document.createElement('span');
         localDetail.textContent = summary.profileCount > 0
-            ? (localNetwork.detail || 'Same-network delivery needs a configured local provider.')
+            ? (localNetwork.detail || 'Same-network delivery needs an explicit local gateway; LAN discovery is never authority.')
             : 'Create a protected profile first. Local-network delivery is optional and does not replace signed trusted-link validation.';
-        localCopy.append(localTitle, localDetail);
+        const localRoute = document.createElement('span');
+        localRoute.textContent = localNetwork.configured
+            ? 'The gateway moves signed candidates only; the protected profile still rejects stale, spoofed, or untrusted updates.'
+            : 'Use this only for a trusted same-network gateway; ordinary network reachability never grants control.';
+        localCopy.append(localTitle, localDetail, localRoute);
         localPanel.appendChild(localCopy);
         if (h.onAction) {
             const localButton = document.createElement('button');

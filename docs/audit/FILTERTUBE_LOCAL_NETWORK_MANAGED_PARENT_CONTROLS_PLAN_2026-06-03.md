@@ -706,6 +706,12 @@ the current extension dashboard.
   encrypted-mailbox endpoint row that can configure, edit, or disable the
   browser-side HTTPS mailbox client after parent/account re-auth. This does not
   add mailbox server authority or a standalone offline-send page.
+  Provider setup rows now explain the route split in parent language: live P2P
+  is the immediate path while both devices are connected, mailbox is encrypted
+  later delivery for offline protected devices, and local-network delivery is
+  only an explicit same-network gateway. The UI still states that trusted-link,
+  target-profile, scope, revision, hash, and signature validation remain local
+  authority.
 - **Acceptance Criteria**:
   - UI has empty, loading, error, locked, offline, and sync-conflict states.
   - Parent actions are clear and reversible where possible.

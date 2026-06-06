@@ -39,6 +39,11 @@ independent account profile through the existing gated profile-creation flows.
 The empty provider rows now explicitly tell the parent to create a protected
 profile first; mailbox and local-network delivery remain optional transport
 setup after a protected device/profile exists.
+The provider rows now use parent-facing delivery language: live P2P is
+immediate when both devices are connected, mailbox is encrypted later delivery
+for offline protected devices, and LAN is same-network gateway delivery only.
+The copy explicitly says transport does not replace local trusted-link and
+signature validation.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 
@@ -122,6 +127,10 @@ state without exposing plaintext rule values:
   links only. A live connected verified replica receives signed envelopes over
   Nanah immediately. Optional mailbox/LAN providers receive ciphertext items or
   signed local-network candidates only when those provider hooks exist.
+- Mailbox and LAN setup rows are explanatory transport controls only. Mailbox
+  means encrypted later delivery for offline devices; LAN means an explicit
+  trusted same-network gateway. Neither label grants authority, discovers trust,
+  or bypasses target-profile/signature/revision validation.
 - The Delivery row preview is a redacted status summary only. It can say Live
   now, LAN provider ready, Mailbox later, Provider setup needed, Re-pair before
   sending, Refresh stale link, Review conflict first, or Pair verified device;
@@ -206,6 +215,7 @@ runtime managed command-center encrypted mailbox provider configuration: present
 runtime managed command-center mailbox provider config history: present as redacted per-protected-profile rows, including Master-managed independent account profiles
 runtime managed command-center local-network provider configuration: present via parent re-auth and explicit configure/disable choice
 runtime managed command-center local-network provider config history: present as redacted per-protected-profile rows, including Master-managed independent account profiles
+runtime managed command-center parent-facing provider route guidance: present for live P2P, encrypted later mailbox delivery, and same-network gateway delivery
 runtime managed command-center blank mailbox endpoint disables provider config: present after parent re-auth
 runtime managed command-center post-rule-write granular verified-device push: present with selected surface binding
 runtime managed command-center post-viewing/time-limit verified-device push: present
