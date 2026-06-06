@@ -98,6 +98,13 @@ state without exposing plaintext rule values:
   mailbox endpoint configuration after parent/account re-auth. They do not
   create a sync account, publish rules, expose tokens in the UI, or turn the
   mailbox server into policy authority.
+- Accepted mailbox provider configure/disable actions write redacted history
+  rows to every currently manageable protected profile. Those rows include only
+  configured/disabled state, target count, and endpoint host when configured;
+  they never include bearer tokens, full URLs, ciphertext, decrypted mailbox
+  items, or policy payloads. When no protected profiles exist yet, there is no
+  protected target history to write and the mailbox status row remains the
+  feedback surface.
 - The status line must not include keyword text, channel names, video ids, PINs,
   mailbox ciphertext, decrypted payloads, or raw policy JSON.
 - The status line appears only when `canActiveProfileManageProfile(...)`
@@ -133,6 +140,7 @@ runtime managed command-center selected-profile signed policy push: present
 runtime managed command-center direct rule bulk writes: present via confirmation plus delegated runtime gate
 runtime managed command-center grouped bulk action rail: present
 runtime managed command-center encrypted mailbox provider configuration: present via parent re-auth
+runtime managed command-center mailbox provider config history: present as redacted per-protected-profile rows
 runtime managed command-center post-rule-write granular verified-device push: present with selected surface binding
 runtime managed command-center post-viewing/time-limit verified-device push: present
 runtime connected verified-device live P2P managed policy send: present

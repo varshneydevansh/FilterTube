@@ -258,6 +258,7 @@ runtime mailbox protected history rows: present
 runtime provider-gated dashboard/profile-open pull hook: present
 runtime provider-gated ack handoff: present
 runtime protected mailbox ack-handoff history rows: present
+runtime protected mailbox provider config history rows: present as redacted per-protected-profile evidence
 runtime provider failure fail-closed apply guard: present
 runtime revoked queued-delivery local apply guard: present
 runtime mailbox encryption client: present for local seal helper and configured HTTPS mailbox upload

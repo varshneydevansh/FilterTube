@@ -3087,6 +3087,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'remote_policy.mailbox.revoke': 'Mailbox policy revoked',
         'remote_policy.mailbox.ack': 'Mailbox ack recorded',
         'remote_policy.local_network.ack': 'Local-network ack recorded',
+        'delivery.mailbox.configure': 'Mailbox provider changed',
         'remote_policy.source_push': 'Parent policy push',
         'history.clear': 'History cleared'
     });
@@ -3122,10 +3123,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         'hasTimeLimit',
         'kidsEnabled',
         'mainEnabled',
+        'mailboxConfigured',
         'rateLimited',
         'redacted'
     ]);
     const MANAGED_ACTION_HISTORY_SUMMARY_SAFE_STRING_KEYS = new Set([
+        'endpointHost',
         'label',
         'scope',
         'transport'
@@ -9692,6 +9695,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const endpointUrl = normalizeString(endpoint);
         if (!endpointUrl) {
             writeNanahManagedMailboxServerConfig({});
+            await recordManagedMailboxProviderConfigHistory({
+                configured: false,
+                endpointHost: ''
+            });
             await refreshProfilesUI();
             UIComponents.showToast('Managed mailbox delivery disabled', 'success');
             return;
@@ -9724,6 +9731,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         writeNanahManagedMailboxServerConfig(nextConfig);
+        await recordManagedMailboxProviderConfigHistory({
+            configured: true,
+            endpointHost: getManagedMailboxEndpointHostFromConfig(nextConfig)
+        });
         await refreshProfilesUI();
         UIComponents.showToast('Managed mailbox provider saved', 'success');
     }
@@ -9979,6 +9990,79 @@ document.addEventListener('DOMContentLoaded', async () => {
         await io.saveProfilesV4(nextRoot);
         profilesV4Cache = nextRoot;
         return true;
+    }
+
+    function getManagedMailboxEndpointHostFromConfig(config) {
+        const endpoint = normalizeString(safeObject(config).endpointUrl || safeObject(config).url || safeObject(config).baseUrl);
+        if (!endpoint) return '';
+        try {
+            return normalizeString(new URL(endpoint).host);
+        } catch (_) {
+            return '';
+        }
+    }
+
+    async function recordManagedMailboxProviderConfigHistory(details = {}) {
+        const rootDetails = safeObject(details);
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') return 0;
+        const fresh = await io.loadProfilesV4();
+        const actorId = normalizeString(fresh.activeProfileId) || activeProfileId || 'default';
+        if (getProfileType(fresh, actorId) === 'child') return 0;
+        const profiles = { ...safeObject(fresh.profiles) };
+        const targetIds = Object.keys(profiles)
+            .map(id => normalizeString(id))
+            .filter(Boolean)
+            .filter(id => getProfileType(fresh, id) === 'child')
+            .filter(id => canActiveProfileManageProfile(fresh, id));
+        if (!targetIds.length) return 0;
+
+        const now = Date.now();
+        const mailboxConfigured = rootDetails.configured === true;
+        const endpointHost = normalizeString(rootDetails.endpointHost).slice(0, 160);
+        targetIds.forEach((targetId) => {
+            const profile = safeObject(profiles[targetId]);
+            if (!profile || Object.keys(profile).length === 0) return;
+            const row = {
+                rowId: `managed-mailbox-config-${targetId}-${now}`,
+                schema: MANAGED_ACTION_HISTORY_SCHEMA,
+                version: 1,
+                actorProfileId: actorId,
+                actorDeviceId: normalizeString(nanahStableDeviceId) || 'local-extension-device',
+                targetProfileId: targetId,
+                trustedLinkId: null,
+                actionType: 'delivery.mailbox.configure',
+                scope: 'mailbox_provider',
+                revision: null,
+                policyHash: null,
+                result: 'accepted',
+                reason: mailboxConfigured ? 'mailbox_provider_configured' : 'mailbox_provider_disabled',
+                receivedAt: now,
+                issuedAt: now,
+                orderKey: `mailbox-config:${now}`,
+                summary: {
+                    redacted: true,
+                    label: mailboxConfigured ? 'Mailbox provider configured' : 'Mailbox provider disabled',
+                    mailboxConfigured,
+                    endpointHost: mailboxConfigured ? endpointHost : '',
+                    targetCount: targetIds.length
+                },
+                sensitive: true
+            };
+            profiles[targetId] = {
+                ...profile,
+                managedActionHistory: appendManagedActionHistoryRow(profile, row)
+            };
+        });
+
+        const nextRoot = {
+            ...fresh,
+            schemaVersion: 4,
+            profiles
+        };
+        await io.saveProfilesV4(nextRoot);
+        profilesV4Cache = nextRoot;
+        return targetIds.length;
     }
 
     async function recordManagedSigningKeyRotationHistoryForLink(link, details = {}) {
