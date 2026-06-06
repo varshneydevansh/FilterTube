@@ -29,7 +29,10 @@ When a protected user asks for more time from the timeout overlay, the command
 center now surfaces the latest unresolved redacted request as a warning chip and
 Request detail, the overview strip counts pending requests, the bulk selector
 can select only requesting profiles, and the row's extra-time action reads
-`Grant Time`.
+`Grant Time`. When selected profiles include unresolved time requests, the bulk
+status also shows the selected request count and the bulk extra-time action
+reads `Grant selected time` while still using the same parent/account re-auth
+grant path.
 When no protected profile is available yet, the command center now shows setup
 handoffs for creating a child profile and, for Default/Master, creating an
 independent account profile through the existing gated profile-creation flows.
@@ -109,6 +112,10 @@ state without exposing plaintext rule values:
   selection aids only. They select profiles whose latest time-limit history row
   is an unresolved protected request; they do not grant time, expose history, or
   mutate policy without the existing parent/account re-auth grant path.
+- The selected-profile bulk status and extra-time button may change wording to
+  show how many selected profiles are asking for more time. This is only a
+  parent-facing affordance; the same re-authenticated `time_limits` grant path
+  remains the only policy mutation route.
 - Normal viewing-space and time-limit saves also offer the same scoped
   verified-device push when the changed protected profiles have delivery ready.
 - `Send Update` and `Send selected updates` use saved managed Source -> Replica
@@ -189,7 +196,7 @@ runtime managed command-center redacted delivery-ack status: present
 runtime managed command-center selected-profile rule editor handoff: present via delegated runtime gate
 runtime managed command-center bulk time-limit controls: present via delegated runtime gate
 runtime managed command-center parent extra-time grants: present via delegated runtime gate
-runtime managed command-center pending extra-time request chip/detail/count/select: present as redacted status and delegated grant handoff
+runtime managed command-center pending extra-time request chip/detail/count/select/bulk grant label: present as redacted status and delegated grant handoff
 runtime managed command-center bulk viewing-space controls: present via delegated runtime gate
 runtime managed command-center per-profile signed policy push: present
 runtime managed command-center selected-profile signed policy push: present

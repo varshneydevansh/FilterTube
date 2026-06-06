@@ -748,6 +748,8 @@
                 button.className = 'btn-secondary';
                 button.type = 'button';
                 button.textContent = intent.label;
+                button.dataset.filtertubeBulkAction = intent.action || '';
+                button.dataset.filtertubeDefaultLabel = intent.label || '';
                 button.disabled = true;
                 button.title = 'Select one or more protected profiles first. Requires parent/account re-auth.';
                 button.addEventListener('click', (event) => {
@@ -777,19 +779,30 @@
             });
             const updateBulkState = () => {
                 const count = selectedProfiles.size;
+                const requestInputs = selectedProfileInputs.filter(input => input.dataset.filtertubePendingTimeRequest === 'true');
+                const selectedRequestCount = requestInputs.filter(input => input.checked).length;
                 bulkStatus.textContent = count
-                    ? `${count} selected for managed updates`
+                    ? `${count} selected${selectedRequestCount ? ` | ${selectedRequestCount} time ${selectedRequestCount === 1 ? 'request' : 'requests'}` : ''}`
                     : 'Select protected profiles for bulk updates';
                 bulkButtons.forEach(button => {
                     button.disabled = count === 0;
+                    if (button.dataset.filtertubeBulkAction === 'bulk_grant_extra_time') {
+                        const label = selectedRequestCount
+                            ? 'Grant selected time'
+                            : (button.dataset.filtertubeDefaultLabel || 'Add selected time');
+                        button.textContent = label;
+                        button.title = count === 0
+                            ? 'Select one or more protected profiles first. Requires parent/account re-auth.'
+                            : selectedRequestCount
+                                ? `Grant temporary parent-approved YouTube time to selected profiles. ${selectedRequestCount} selected ${selectedRequestCount === 1 ? 'profile has' : 'profiles have'} asked for more time. Requires parent/account re-auth.`
+                                : 'Add temporary parent-approved YouTube time to selected profiles with active limits. Requires parent/account re-auth.';
+                    }
                 });
                 clearSelectionButton.disabled = count === 0;
                 selectAllButton.disabled = selectedProfileInputs.length > 0 && count === selectedProfileInputs.length;
                 const readyInputs = selectedProfileInputs.filter(input => input.dataset.filtertubeSyncReady === 'true');
                 const selectedReadyCount = readyInputs.filter(input => input.checked).length;
                 selectReadyButton.disabled = readyInputs.length === 0 || selectedReadyCount === readyInputs.length;
-                const requestInputs = selectedProfileInputs.filter(input => input.dataset.filtertubePendingTimeRequest === 'true');
-                const selectedRequestCount = requestInputs.filter(input => input.checked).length;
                 selectRequestsButton.disabled = requestInputs.length === 0 || selectedRequestCount === requestInputs.length;
             };
             selectAllButton.addEventListener('click', (event) => {
