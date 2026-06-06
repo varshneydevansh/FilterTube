@@ -701,7 +701,8 @@ the current extension dashboard.
   command-center controls. Direct local selected-profile video/keyword/channel
   rule additions are present. Command-center rows now separate sync readiness
   into compact status chips, mark remote conflict rows visually, and expose a
-  protected Review Conflict action that opens the parent/account history gate.
+  protected Review Conflict action that opens a parent/account re-authed
+  conflict/rejected remote-policy history filter.
   Built-in LAN transports remain pending. The command center now has a compact
   encrypted-mailbox endpoint row that can configure, edit, or disable the
   browser-side HTTPS mailbox client after parent/account re-auth. This does not

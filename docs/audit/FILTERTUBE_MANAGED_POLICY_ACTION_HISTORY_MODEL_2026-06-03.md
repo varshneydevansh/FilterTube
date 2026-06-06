@@ -276,6 +276,10 @@ expired rows before saving, using the documented 30-day accepted-action window,
 parent/account authority, not child PIN authority, and `clearManagedActionHistory`
 preserves rows that are rejected, conflict, failed-auth, expired-session, trust
 revocation, time-limit, viewing-space, or prior clear evidence.
+The command-center `Review Conflict` action uses the same parent/account
+re-auth gate but filters the modal to conflict and rejected remote-policy rows
+first. This is a read-only triage view over protected evidence; it does not
+clear, merge, retry, accept, or otherwise mutate policy.
 
 The current failed-auth writer records protected evidence rows on the target
 protected profile. The dashboard unlock gate and background `FilterTube_SessionPinAuth`

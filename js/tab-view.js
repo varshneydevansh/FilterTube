@@ -5196,6 +5196,26 @@ document.addEventListener('DOMContentLoaded', async () => {
             : `${date} - ${result} - ${scope} - ${label}${detailSuffix}`;
     }
 
+    function isManagedRemoteConflictHistoryRow(row) {
+        const item = safeObject(row);
+        const actionType = normalizeString(item.actionType);
+        const result = normalizeString(item.result);
+        if (result === 'conflict') return true;
+        return actionType === 'remote_policy.conflict'
+            || actionType === 'remote_policy.mailbox.conflict';
+    }
+
+    function isManagedRemoteRejectedHistoryRow(row) {
+        const item = safeObject(row);
+        const actionType = normalizeString(item.actionType);
+        const result = normalizeString(item.result);
+        if (result !== 'rejected') return false;
+        return actionType === 'remote_policy.reject'
+            || actionType === 'remote_policy.mailbox.reject'
+            || actionType === 'remote_policy.mailbox.revoke'
+            || actionType === 'remote_policy.mailbox.expire';
+    }
+
     function formatManagedHistoryDuration(seconds) {
         const totalSeconds = normalizeNonNegativeInteger(seconds) || 0;
         if (totalSeconds <= 0) return '0m';
@@ -5442,9 +5462,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             : 'Managed status: no parent-managed policy revisions yet.';
     }
 
-    async function showManagedActionHistory(profileId) {
+    async function showManagedActionHistory(profileId, options = {}) {
         const targetId = normalizeString(profileId);
         if (!targetId) return;
+        const mode = normalizeString(options?.mode);
         const io = window.FilterTubeIO || {};
         if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
             UIComponents.showToast('Profiles unavailable', 'error');
@@ -5467,19 +5488,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         const profiles = safeObject(fresh.profiles);
         const profile = safeObject(profiles[targetId]);
         const rows = getManagedActionHistoryRows(profile);
-        const latestRows = rows.slice(-12).reverse();
+        const reviewConflicts = mode === 'conflicts';
+        const conflictRows = reviewConflicts
+            ? rows.filter(row => isManagedRemoteConflictHistoryRow(row) || isManagedRemoteRejectedHistoryRow(row))
+            : [];
+        const displayRows = reviewConflicts ? conflictRows : rows;
+        const latestRows = displayRows.slice(-12).reverse();
         const profileName = getProfileName(fresh, targetId);
         const details = latestRows.length
             ? latestRows.map(formatManagedActionHistoryRow)
-            : ['No parent-managed actions have been recorded for this profile yet.'];
+            : [
+                reviewConflicts
+                    ? 'No remote conflicts or rejected managed-policy rows are currently recorded for this profile.'
+                    : 'No parent-managed actions have been recorded for this profile yet.'
+            ];
         const protectedCount = rows.filter(managedActionHistoryRowIsProtected).length;
         const choice = await showChoiceModal({
-            title: `${profileName} History`,
-            message: protectedCount
-                ? `${rows.length} rows recorded. ${protectedCount} protected rows are retained until parent re-auth and retention rules allow clearing.`
-                : `${rows.length} parent-managed rows recorded.`,
+            title: reviewConflicts ? `${profileName} Conflict Review` : `${profileName} History`,
+            message: reviewConflicts
+                ? `${conflictRows.length} conflict/rejected remote rows shown from ${rows.length} total history rows. Protected evidence remains read-only.`
+                : protectedCount
+                    ? `${rows.length} rows recorded. ${protectedCount} protected rows are retained until parent re-auth and retention rules allow clearing.`
+                    : `${rows.length} parent-managed rows recorded.`,
             details,
-            choices: rows.length ? [
+            choices: (!reviewConflicts && rows.length) ? [
                 {
                     value: 'clear',
                     label: protectedCount ? 'Clear Accepted Only' : 'Clear History',
@@ -13957,8 +13989,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                         return;
                     } else if (action === 'edit_rules') {
                         await startManagedChildEdit(targetId);
-                    } else if (action === 'view_history' || action === 'review_conflicts') {
+                    } else if (action === 'view_history') {
                         await showManagedActionHistory(targetId);
+                    } else if (action === 'review_conflicts') {
+                        await showManagedActionHistory(targetId, { mode: 'conflicts' });
                     } else if (action === 'set_time_limit' || action === 'change_time_limit') {
                         await updateProfileTimeLimitPolicy(targetId, 'set');
                     } else if (action === 'grant_extra_time') {
