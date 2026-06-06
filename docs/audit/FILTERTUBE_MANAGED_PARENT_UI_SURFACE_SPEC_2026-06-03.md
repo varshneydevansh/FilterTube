@@ -27,7 +27,9 @@ policy to verified devices. Local viewing-space and normal time-limit edits now
 use the same post-save verified-device push offer for their matching scopes.
 When a protected user asks for more time from the timeout overlay, the command
 center now surfaces the latest unresolved redacted request as a warning chip and
-Request detail, and the row's extra-time action reads `Grant Time`.
+Request detail, the overview strip counts pending requests, the bulk selector
+can select only requesting profiles, and the row's extra-time action reads
+`Grant Time`.
 When no protected profile is available yet, the command center now shows setup
 handoffs for creating a child profile and, for Default/Master, creating an
 independent account profile through the existing gated profile-creation flows.
@@ -103,6 +105,10 @@ state without exposing plaintext rule values:
   `policy.time_limit.update` row clears the pending presentation. This status
   changes button wording only; granting still routes through the existing
   parent/account re-auth extra-time path.
+- The overview `Requests` count and `Select requests` bulk control are
+  selection aids only. They select profiles whose latest time-limit history row
+  is an unresolved protected request; they do not grant time, expose history, or
+  mutate policy without the existing parent/account re-auth grant path.
 - Normal viewing-space and time-limit saves also offer the same scoped
   verified-device push when the changed protected profiles have delivery ready.
 - `Send Update` and `Send selected updates` use saved managed Source -> Replica
@@ -182,7 +188,7 @@ runtime managed command-center redacted delivery-ack status: present
 runtime managed command-center selected-profile rule editor handoff: present via delegated runtime gate
 runtime managed command-center bulk time-limit controls: present via delegated runtime gate
 runtime managed command-center parent extra-time grants: present via delegated runtime gate
-runtime managed command-center pending extra-time request chip/detail: present as redacted status and delegated grant handoff
+runtime managed command-center pending extra-time request chip/detail/count/select: present as redacted status and delegated grant handoff
 runtime managed command-center bulk viewing-space controls: present via delegated runtime gate
 runtime managed command-center per-profile signed policy push: present
 runtime managed command-center selected-profile signed policy push: present

@@ -431,6 +431,7 @@
                 remoteScopeCount: 0,
                 historyRowCount: 0,
                 protectedRowCount: 0,
+                pendingExtraTimeRequestCount: 0,
                 remoteConflictCount: 0
             };
         }
@@ -484,6 +485,7 @@
                 latestDeliveryTone: typeof summary.latestDeliveryTone === 'string' ? summary.latestDeliveryTone.trim() : '',
                 pendingExtraTimeRequestLabel: pendingExtraTimeRequest?.label || '',
                 pendingExtraTimeRequestDetail: pendingExtraTimeRequest?.detail || '',
+                pendingExtraTimeRequest: !!pendingExtraTimeRequest,
                 actionIntents: buildManagedCommandCenterActionIntents(profileId, timePolicy, {
                     remoteConflictCount,
                     pendingExtraTimeRequest: !!pendingExtraTimeRequest
@@ -514,6 +516,7 @@
             remoteScopeCount: acc.remoteScopeCount + row.remoteScopeCount,
             historyRowCount: acc.historyRowCount + row.historyRowCount,
             protectedRowCount: acc.protectedRowCount + row.protectedRowCount,
+            pendingExtraTimeRequestCount: acc.pendingExtraTimeRequestCount + (row.pendingExtraTimeRequest ? 1 : 0),
             remoteConflictCount: acc.remoteConflictCount + row.remoteConflictCount
         }), {
             rows,
@@ -530,6 +533,7 @@
             remoteScopeCount: 0,
             historyRowCount: 0,
             protectedRowCount: 0,
+            pendingExtraTimeRequestCount: 0,
             remoteConflictCount: 0
         });
     }
@@ -554,7 +558,7 @@
         body.textContent = 'Overview of protected profiles, policy sync, time limits, action history, and delegated actions.';
         const meta = document.createElement('div');
         meta.className = 'ft-managed-command-center__meta';
-        meta.textContent = `${summary.profileCount} protected profiles | ${summary.limitedCount} time limits | ${summary.remoteScopeCount} remote scopes | ${summary.protectedRowCount} protected history`;
+        meta.textContent = `${summary.profileCount} protected profiles | ${summary.limitedCount} time limits | ${summary.pendingExtraTimeRequestCount} requests | ${summary.remoteScopeCount} remote scopes | ${summary.protectedRowCount} protected history`;
         titleWrap.append(title, body);
         heading.append(titleWrap, meta);
         panel.appendChild(heading);
@@ -564,6 +568,7 @@
         [
             { label: 'Protected', value: summary.profileCount, tone: 'neutral' },
             { label: 'Ready', value: summary.syncReadyProfileCount, tone: summary.syncReadyProfileCount ? 'success' : 'neutral' },
+            { label: 'Requests', value: summary.pendingExtraTimeRequestCount, tone: summary.pendingExtraTimeRequestCount ? 'warning' : 'neutral' },
             { label: 'Needs re-pair', value: summary.syncRepairProfileCount, tone: summary.syncRepairProfileCount ? 'warning' : 'neutral' },
             { label: 'Conflicts', value: summary.remoteConflictCount, tone: summary.remoteConflictCount ? 'danger' : 'neutral' }
         ].forEach((item) => {
@@ -721,6 +726,11 @@
             selectReadyButton.type = 'button';
             selectReadyButton.textContent = 'Select ready';
             selectReadyButton.title = 'Select protected profiles that already have a verified delivery path.';
+            const selectRequestsButton = document.createElement('button');
+            selectRequestsButton.className = 'btn-secondary';
+            selectRequestsButton.type = 'button';
+            selectRequestsButton.textContent = 'Select requests';
+            selectRequestsButton.title = 'Select protected profiles with pending extra-time requests.';
             const clearSelectionButton = document.createElement('button');
             clearSelectionButton.className = 'btn-secondary';
             clearSelectionButton.type = 'button';
@@ -778,6 +788,9 @@
                 const readyInputs = selectedProfileInputs.filter(input => input.dataset.filtertubeSyncReady === 'true');
                 const selectedReadyCount = readyInputs.filter(input => input.checked).length;
                 selectReadyButton.disabled = readyInputs.length === 0 || selectedReadyCount === readyInputs.length;
+                const requestInputs = selectedProfileInputs.filter(input => input.dataset.filtertubePendingTimeRequest === 'true');
+                const selectedRequestCount = requestInputs.filter(input => input.checked).length;
+                selectRequestsButton.disabled = requestInputs.length === 0 || selectedRequestCount === requestInputs.length;
             };
             selectAllButton.addEventListener('click', (event) => {
                 event.preventDefault();
@@ -785,6 +798,21 @@
                     input.checked = true;
                     const profileId = typeof input.dataset.filtertubeProfileId === 'string' ? input.dataset.filtertubeProfileId.trim() : '';
                     if (profileId) selectedProfiles.add(profileId);
+                });
+                updateBulkState();
+            });
+            selectRequestsButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                selectedProfileInputs.forEach((input) => {
+                    const requested = input.dataset.filtertubePendingTimeRequest === 'true';
+                    input.checked = requested;
+                    const profileId = typeof input.dataset.filtertubeProfileId === 'string' ? input.dataset.filtertubeProfileId.trim() : '';
+                    if (!profileId) return;
+                    if (requested) {
+                        selectedProfiles.add(profileId);
+                    } else {
+                        selectedProfiles.delete(profileId);
+                    }
                 });
                 updateBulkState();
             });
@@ -811,7 +839,7 @@
                 selectedProfiles.clear();
                 updateBulkState();
             });
-            bulkSelectControls.append(selectAllButton, selectReadyButton, clearSelectionButton);
+            bulkSelectControls.append(selectAllButton, selectReadyButton, selectRequestsButton, clearSelectionButton);
             bulkBar.append(bulkStatus, bulkSelectControls, bulkActionWrap);
             panel.appendChild(bulkBar);
             panel.__filtertubeUpdateManagedBulkState = updateBulkState;
@@ -833,6 +861,7 @@
             selector.setAttribute('aria-label', `Select ${item.profileName} for bulk managed update`);
             selector.dataset.filtertubeProfileId = item.profileId;
             selector.dataset.filtertubeSyncReady = item.syncReadyCount > 0 ? 'true' : 'false';
+            selector.dataset.filtertubePendingTimeRequest = item.pendingExtraTimeRequest ? 'true' : 'false';
             selectedProfileInputs.push(selector);
             selector.addEventListener('change', () => {
                 if (selector.checked) {
