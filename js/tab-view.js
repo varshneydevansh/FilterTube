@@ -5308,6 +5308,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const historyRows = getManagedActionHistoryRows(profile);
         const protectedRows = historyRows.filter(managedActionHistoryRowIsProtected);
         const latestRow = safeObject(historyRows[historyRows.length - 1]);
+        const latestDeliverySummary = summarizeLatestManagedDeliveryHistory(historyRows);
         const latestActionType = normalizeString(latestRow.actionType);
         const latestSafeLabel = MANAGED_ACTION_HISTORY_SAFE_LABELS[latestActionType] || latestActionType || '';
         const latestResult = normalizeString(latestRow.result);
@@ -5325,10 +5326,44 @@ document.addEventListener('DOMContentLoaded', async () => {
             remoteConflictCount: conflictRows.length,
             latestResult,
             latestScope,
+            latestDeliveryLabel: latestDeliverySummary.label,
+            latestDeliveryTone: latestDeliverySummary.tone,
             latestActionLabel: latestSafeLabel && latestResult
                 ? `${latestResult} · ${latestSafeLabel}`
                 : (latestSafeLabel || (latestResult && latestScope ? `${latestResult}/${latestScope}` : ''))
         };
+    }
+
+    function summarizeLatestManagedDeliveryHistory(historyRows) {
+        const rows = safeArray(historyRows);
+        for (let index = rows.length - 1; index >= 0; index -= 1) {
+            const row = safeObject(rows[index]);
+            if (normalizeString(row.actionType) !== 'remote_policy.source_push') continue;
+            const summary = safeObject(row.summary);
+            const status = normalizeString(summary.deliveryStatus || row.result).replace(/_/g, ' ');
+            const liveSent = normalizeNonNegativeInteger(summary.liveSentCount) || 0;
+            const lanSent = normalizeNonNegativeInteger(summary.localNetworkDeliveredCount) || 0;
+            const mailboxSent = normalizeNonNegativeInteger(summary.mailboxUploadedCount) || 0;
+            const failed = normalizeNonNegativeInteger(summary.failedCount) || 0;
+            const noLinks = normalizeNonNegativeInteger(summary.noLinkCount) || 0;
+            const providerMissing = normalizeNonNegativeInteger(summary.providerMissingCount) || 0;
+            const bits = [];
+            if (liveSent) bits.push(`live ${liveSent}`);
+            if (lanSent) bits.push(`LAN ${lanSent}`);
+            if (mailboxSent) bits.push(`mailbox ${mailboxSent}`);
+            if (failed) bits.push(`failed ${failed}`);
+            if (noLinks) bits.push(`no-link ${noLinks}`);
+            if (providerMissing) bits.push(`provider-missing ${providerMissing}`);
+            const label = bits.length
+                ? `Last send: ${status || 'recorded'} (${bits.join(', ')})`
+                : `Last send: ${status || normalizeString(row.result) || 'recorded'}`;
+            const result = normalizeString(row.result);
+            const tone = result === 'rejected' || failed > 0 || noLinks > 0 || providerMissing > 0
+                ? (liveSent || lanSent || mailboxSent ? 'warning' : 'danger')
+                : 'success';
+            return { label, tone };
+        }
+        return { label: '', tone: '' };
     }
 
     function buildManagedProfileStatusText(profile, { revealDetails = false } = {}) {

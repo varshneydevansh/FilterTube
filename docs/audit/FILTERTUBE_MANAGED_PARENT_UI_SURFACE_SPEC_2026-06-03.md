@@ -8,7 +8,10 @@ bulk viewing-space controls, delegated parent extra-time grants, command-center
 verified-device send actions,
 live P2P signed managed-policy push for connected verified replica devices,
 provider-gated mailbox/LAN delivery handoff, and protected redacted push
-history rows are present. The command center now includes a compact
+history rows are present. The command center now also surfaces the latest
+redacted delivery attempt in each protected profile row so parents can see
+whether the last send went live, LAN, mailbox, partial, no-link, or
+provider-missing without opening raw policy state. The command center now includes a compact
 parent-facing protection strip, a parent-reauthed encrypted mailbox endpoint
 configuration row, plus labeled Delivery/Device/History row details so parents
 can scan live delivery, later-delivery provider readiness, re-pairing,
@@ -46,6 +49,7 @@ state without exposing plaintext rule values:
 - local parent-managed Main/Kids revisions;
 - remote accepted managed-policy scope/link counts and latest revision;
 - protected action-history row counts and latest result/scope;
+- latest redacted delivery attempt status/counts;
 - viewing-space and time-limit status.
 - verified child/protected-device link readiness for live P2P, LAN provider,
   or mailbox provider delivery.
@@ -140,6 +144,7 @@ runtime managed command-center protection strip: present
 runtime managed command-center labeled delivery/device/history details: present
 runtime managed command-center delegated action intents: present
 runtime managed command-center redacted delivery preview: present
+runtime managed command-center latest delivery attempt summary: present as protected redacted history feedback
 runtime managed command-center redacted delivery-ack status: present
 runtime managed command-center selected-profile rule editor handoff: present via delegated runtime gate
 runtime managed command-center bulk time-limit controls: present via delegated runtime gate
@@ -158,6 +163,7 @@ runtime managed command-center post-viewing/time-limit verified-device push: pre
 runtime connected verified-device live P2P managed policy send: present
 runtime provider-gated mailbox/LAN delivery handoff from command center: present
 runtime protected redacted push-attempt history rows: present
+runtime protected redacted push-attempt row feedback in command center: present
 runtime browser HTTPS mailbox upload/pull client: present behind explicit config
 runtime browser local-network gateway publish/discover/ack client: present behind explicit config
 runtime mailbox server authority: absent
@@ -178,7 +184,7 @@ weakening the authority model:
 | Managed profile selection | See each protected profile, owner relationship, current lock state, verified-device readiness, and last policy revision. | Child/protected views still hide admin controls and detailed history. |
 | Protection scan strip | Quickly see protected profile count, sync-ready profiles, profiles needing re-pairing, and remote conflicts before acting. | Strip values are aggregate status only; they do not include rule text, policy payloads, keys, or mutation authority. |
 | Rule editing | Command-center row actions still enter the existing managed protected-profile editor, selected-profile bulk controls can hand off one selected protected profile to the same editor, and selected-profile bulk keyword/channel/video-ID additions can apply one reviewed rule to selected protected profiles. Changed profiles with verified delivery can then push the matching rule scope immediately. | Writes must use the same validated local/remote managed-policy paths as current FilterTube controls; bulk rule writes require review confirmation, parent/account re-auth, per-target revision/history rows, selected Main/Kids surface binding for granular sends, and no child authority. |
-| Remote send | Parent can send one protected profile or selected protected profiles to saved verified devices and see whether the next attempt is live, later via LAN/mailbox provider, blocked by conflict, blocked by stale/revoked pairing, missing a verified device, or has redacted source-side delivery ack feedback. | Delivery links, preview labels, and ack labels are not authority; each envelope still requires Source -> Replica trust, fixed target profile, allowed scope, signature/integrity proof, and newer revision/hash. |
+| Remote send | Parent can send one protected profile or selected protected profiles to saved verified devices and see whether the next attempt is live, later via LAN/mailbox provider, blocked by conflict, blocked by stale/revoked pairing, missing a verified device, or has redacted source-side delivery ack feedback. The row also shows the latest redacted send attempt from protected history so parents can see success, partial delivery, no-link, and provider-missing outcomes without opening the detailed history modal. | Delivery links, preview labels, latest-attempt labels, and ack labels are not authority; each envelope still requires Source -> Replica trust, fixed target profile, allowed scope, signature/integrity proof, and newer revision/hash. |
 | Mailbox provider | Parent can configure, edit, or clear the HTTPS encrypted-mailbox endpoint from the command center after parent/account re-auth. | The endpoint stores only encrypted mailbox rows and metadata; it cannot read policy, choose targets, bypass trust, or become authority. |
 | Viewing spaces | Show Main, Kids, both, or neither per protected profile; row actions still change policy and selected-profile bulk actions can apply Main + Kids, Kids only, or Main only locally, then offer a scoped verified-device push when delivery exists. | UI choice is not authority; runtime route gate remains the enforcement layer; every selected target gets its own redacted revision/history row after parent re-auth. |
 | Time limits | Show daily YouTube budget state; command-center row actions still set/disable one profile, can add temporary extra time to one active limit, and bulk selected-profile actions can apply the same daily budget, disable existing limits, or add temporary extra time to selected active limits, then offer a scoped verified-device push when delivery exists. | Runtime budget accounting remains background-owned; every target gets its own revision/history row after parent re-auth, and extra-time grants are bounded by expiry. |
@@ -193,6 +199,7 @@ Required UI states for that slice:
 - successful local save status through row summaries/history;
 - pending P2P/local-network delivery;
 - connected verified-device send success;
+- redacted latest delivery attempt feedback for live/LAN/mailbox/partial/no-link/provider-missing;
 - redacted source-side delivery ack status;
 - provider pending when the extension has no mailbox/LAN provider hook;
 - configured, invalid, and disabled mailbox endpoint states;

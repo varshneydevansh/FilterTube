@@ -439,12 +439,17 @@
                 protectedRowCount: summary.protectedRowCount,
                 remoteConflictCount,
                 latestActionLabel,
+                latestDeliveryLabel: typeof summary.latestDeliveryLabel === 'string' ? summary.latestDeliveryLabel.trim() : '',
+                latestDeliveryTone: typeof summary.latestDeliveryTone === 'string' ? summary.latestDeliveryTone.trim() : '',
                 actionIntents: buildManagedCommandCenterActionIntents(profileId, timePolicy, {
                     remoteConflictCount
                 })
             };
             row.deliveryPreview = resolveManagedCommandCenterDeliveryPreview(row);
-            row.deliveryPathDetail = describeManagedCommandCenterDeliveryPath(row);
+            row.deliveryPathDetail = [
+                describeManagedCommandCenterDeliveryPath(row),
+                row.latestDeliveryLabel
+            ].filter(Boolean).join(' ');
             rows.push(row);
         };
         h.getAccountIds(root).forEach((accountId) => {
@@ -756,6 +761,7 @@
                 { label: item.timeLimit, tone: item.timeLimited ? 'warning' : 'neutral' },
                 { label: syncState.label, tone: syncState.tone },
                 { label: item.syncLabel, tone: item.remoteScopeCount ? 'success' : 'neutral' },
+                item.latestDeliveryLabel ? { label: item.latestDeliveryLabel, tone: item.latestDeliveryTone || 'neutral' } : null,
                 item.syncSourceAckLabel ? { label: `Ack: ${item.syncSourceAckLabel}`, tone: 'neutral' } : null
             ].filter(Boolean).forEach((chip) => {
                 const status = document.createElement('span');
