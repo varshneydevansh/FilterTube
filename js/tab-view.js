@@ -9872,6 +9872,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
+    async function promptManagedProviderSetupAction({
+        title,
+        message,
+        configured = false,
+        configureLabel,
+        disableLabel
+    } = {}) {
+        const choices = [
+            {
+                value: 'configure',
+                label: configureLabel || (configured ? 'Edit Provider' : 'Configure Provider'),
+                className: configured ? 'btn-secondary' : 'btn-primary'
+            }
+        ];
+        if (configured) {
+            choices.push({
+                value: 'disable',
+                label: disableLabel || 'Disable Provider',
+                className: 'btn-secondary'
+            });
+        }
+        return showChoiceModal({
+            title: title || 'Configure Managed Delivery',
+            message: message || 'Choose how this managed delivery provider should be used.',
+            details: [
+                'Live P2P can still send immediately when both devices are connected.',
+                'Providers are delivery paths only; trusted link, target profile, scope, revision, hash, and signature validation still happen locally.'
+            ],
+            choices,
+            cancelText: 'Cancel'
+        });
+    }
+
     async function configureNanahManagedMailboxServer() {
         const root = safeObject(profilesV4Cache);
         const activeProfileId = normalizeString(root.activeProfileId) || 'default';
@@ -9883,9 +9916,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!okAdmin) return;
         const current = readNanahManagedMailboxServerConfig();
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
+        const action = await promptManagedProviderSetupAction({
+            title: 'Encrypted Mailbox Delivery',
+            message: 'Mailbox delivery is for later managed updates when a protected device is offline. The mailbox stores encrypted policy items and revision metadata, not plaintext rules.',
+            configured: !!currentEndpoint,
+            configureLabel: currentEndpoint ? 'Edit Mailbox' : 'Configure Mailbox',
+            disableLabel: 'Disable Mailbox'
+        });
+        if (action === null) return;
+        if (action === 'disable') {
+            writeNanahManagedMailboxServerConfig({});
+            await recordManagedMailboxProviderConfigHistory({
+                configured: false,
+                endpointHost: ''
+            });
+            await refreshProfilesUI();
+            UIComponents.showToast('Managed mailbox delivery disabled', 'success');
+            return;
+        }
         const endpoint = await showPromptModal({
             title: 'Configure Encrypted Mailbox',
-            message: 'Enter the HTTPS mailbox endpoint for later managed updates. Leave blank to disable mailbox delivery.',
+            message: 'Enter the HTTPS mailbox endpoint for later managed updates.',
             placeholder: 'https://example.com/filtertube',
             inputType: 'url',
             confirmText: currentEndpoint ? 'Save Endpoint' : 'Enable Mailbox',
@@ -9894,13 +9945,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (endpoint === null) return;
         const endpointUrl = normalizeString(endpoint);
         if (!endpointUrl) {
-            writeNanahManagedMailboxServerConfig({});
-            await recordManagedMailboxProviderConfigHistory({
-                configured: false,
-                endpointHost: ''
-            });
-            await refreshProfilesUI();
-            UIComponents.showToast('Managed mailbox delivery disabled', 'success');
+            UIComponents.showToast('Enter a mailbox endpoint or use Disable Mailbox', 'error');
             return;
         }
         const token = await showPromptModal({
@@ -9950,9 +9995,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!okAdmin) return;
         const current = readNanahManagedLocalNetworkProviderConfig();
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
+        const action = await promptManagedProviderSetupAction({
+            title: 'Local-Network Delivery',
+            message: 'Local-network delivery is for same-network managed updates through a configured gateway. Discovery is not authority; every candidate still has to validate locally.',
+            configured: !!currentEndpoint,
+            configureLabel: currentEndpoint ? 'Edit LAN' : 'Configure LAN',
+            disableLabel: 'Disable LAN'
+        });
+        if (action === null) return;
+        if (action === 'disable') {
+            writeNanahManagedLocalNetworkProviderConfig({});
+            await recordManagedLocalNetworkProviderConfigHistory({
+                configured: false,
+                endpointHost: ''
+            });
+            await refreshProfilesUI();
+            UIComponents.showToast('Managed local-network delivery disabled', 'success');
+            return;
+        }
         const endpoint = await showPromptModal({
             title: 'Configure Local-Network Provider',
-            message: 'Enter the local-network gateway endpoint for same-network managed updates. Leave blank to disable LAN delivery.',
+            message: 'Enter the local-network gateway endpoint for same-network managed updates.',
             placeholder: 'http://192.168.1.10:4177/filtertube',
             inputType: 'url',
             confirmText: currentEndpoint ? 'Save Endpoint' : 'Enable LAN',
@@ -9961,13 +10024,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (endpoint === null) return;
         const endpointUrl = normalizeString(endpoint);
         if (!endpointUrl) {
-            writeNanahManagedLocalNetworkProviderConfig({});
-            await recordManagedLocalNetworkProviderConfigHistory({
-                configured: false,
-                endpointHost: ''
-            });
-            await refreshProfilesUI();
-            UIComponents.showToast('Managed local-network delivery disabled', 'success');
+            UIComponents.showToast('Enter a LAN endpoint or use Disable LAN', 'error');
             return;
         }
         const token = await showPromptModal({

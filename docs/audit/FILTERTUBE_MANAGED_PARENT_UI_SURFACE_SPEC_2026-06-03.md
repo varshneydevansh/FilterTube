@@ -114,11 +114,19 @@ state without exposing plaintext rule values:
 - `Configure Mailbox` and `Edit Mailbox` save or clear only the encrypted
   mailbox endpoint configuration after parent/account re-auth. They do not
   create a sync account, publish rules, expose tokens in the UI, or turn the
-  mailbox server into policy authority.
+  mailbox server into policy authority. The setup flow now first asks parents
+  to Configure/Edit or explicitly Disable Mailbox; an empty endpoint no longer
+  acts as the disable command.
 - `Configure LAN` and `Edit LAN` save or clear only the local-network gateway
   endpoint configuration after parent/account re-auth. They do not create
   authority from network reachability, expose tokens in the UI, or let a LAN
-  gateway choose profiles/rules.
+  gateway choose profiles/rules. The setup flow now first asks parents to
+  Configure/Edit or explicitly Disable LAN; an empty endpoint no longer acts
+  as the disable command.
+- Provider setup copy states that live P2P can still send immediately when
+  devices are connected and that providers are delivery paths only; local
+  trusted-link, target-profile, scope, revision, hash, and signature validation
+  remains the authority.
 - Accepted mailbox provider configure/disable actions write redacted history
   rows to every currently manageable protected profile. Those rows include only
   configured/disabled state, target count, and endpoint host when configured;
@@ -164,9 +172,9 @@ runtime managed command-center per-profile signed policy push: present
 runtime managed command-center selected-profile signed policy push: present
 runtime managed command-center direct rule bulk writes: present via confirmation plus delegated runtime gate
 runtime managed command-center grouped bulk action rail: present
-runtime managed command-center encrypted mailbox provider configuration: present via parent re-auth
+runtime managed command-center encrypted mailbox provider configuration: present via parent re-auth and explicit configure/disable choice
 runtime managed command-center mailbox provider config history: present as redacted per-protected-profile rows, including Master-managed independent account profiles
-runtime managed command-center local-network provider configuration: present via parent re-auth
+runtime managed command-center local-network provider configuration: present via parent re-auth and explicit configure/disable choice
 runtime managed command-center local-network provider config history: present as redacted per-protected-profile rows, including Master-managed independent account profiles
 runtime managed command-center post-rule-write granular verified-device push: present with selected surface binding
 runtime managed command-center post-viewing/time-limit verified-device push: present
