@@ -9602,6 +9602,132 @@ document.addEventListener('DOMContentLoaded', async () => {
         return safeObject(window.FilterTubeManagedPolicyMailbox);
     }
 
+    const NANAH_MANAGED_MAILBOX_CONFIG_KEY = 'ftManagedMailboxServerConfig';
+
+    function readNanahManagedMailboxServerConfig() {
+        try {
+            return safeObject(JSON.parse(localStorage.getItem(NANAH_MANAGED_MAILBOX_CONFIG_KEY) || '{}'));
+        } catch (_) {
+            return {};
+        }
+    }
+
+    function writeNanahManagedMailboxServerConfig(config) {
+        try {
+            const root = safeObject(config);
+            if (!normalizeString(root.endpointUrl || root.url || root.baseUrl)) {
+                localStorage.removeItem(NANAH_MANAGED_MAILBOX_CONFIG_KEY);
+                delete window.FilterTubeManagedPolicyMailbox;
+                return null;
+            }
+            localStorage.setItem(NANAH_MANAGED_MAILBOX_CONFIG_KEY, JSON.stringify(root));
+            if (window.FilterTubeManagedMailboxClient?.createProvider) {
+                window.FilterTubeManagedPolicyMailbox = window.FilterTubeManagedMailboxClient.createProvider(root);
+            } else {
+                delete window.FilterTubeManagedPolicyMailbox;
+            }
+            return window.FilterTubeManagedPolicyMailbox || null;
+        } catch (_) {
+            return null;
+        }
+    }
+
+    function summarizeManagedMailboxServerConfig() {
+        const config = readNanahManagedMailboxServerConfig();
+        const endpoint = normalizeString(config.endpointUrl || config.url || config.baseUrl);
+        const provider = getNanahManagedMailboxProvider();
+        const configured = provider.configured === true && hasNanahManagedMailboxUploadWriter(provider);
+        if (!endpoint) {
+            return {
+                configured: false,
+                label: 'Mailbox not configured',
+                detail: 'Live P2P can still send now. Configure HTTPS mailbox delivery when child devices need later updates.',
+                tone: 'warning'
+            };
+        }
+        let host = normalizeString(provider.endpointHost);
+        if (!host) {
+            try {
+                host = new URL(endpoint).host;
+            } catch (_) {
+                host = endpoint;
+            }
+        }
+        if (!configured) {
+            return {
+                configured: false,
+                label: 'Mailbox endpoint needs review',
+                detail: `${host} is saved but not accepted by the encrypted mailbox client.`,
+                tone: 'warning'
+            };
+        }
+        return {
+            configured: true,
+            label: `Mailbox ready: ${host}`,
+            detail: 'Later delivery can queue encrypted policy updates; server state stays ciphertext plus revision metadata.',
+            tone: 'success'
+        };
+    }
+
+    async function configureNanahManagedMailboxServer() {
+        const root = safeObject(profilesV4Cache);
+        const activeProfileId = normalizeString(root.activeProfileId) || 'default';
+        if (getProfileType(root, activeProfileId) === 'child') {
+            UIComponents.showToast('Child profiles cannot configure managed delivery providers', 'error');
+            return;
+        }
+        const okAdmin = await ensureProfileUnlocked(root, activeProfileId, { sensitiveAction: true });
+        if (!okAdmin) return;
+        const current = readNanahManagedMailboxServerConfig();
+        const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
+        const endpoint = await showPromptModal({
+            title: 'Configure Encrypted Mailbox',
+            message: 'Enter the HTTPS mailbox endpoint for later managed updates. Leave blank to disable mailbox delivery.',
+            placeholder: 'https://example.com/filtertube',
+            inputType: 'url',
+            confirmText: currentEndpoint ? 'Save Endpoint' : 'Enable Mailbox',
+            initialValue: currentEndpoint
+        });
+        if (endpoint === null) return;
+        const endpointUrl = normalizeString(endpoint);
+        if (!endpointUrl) {
+            writeNanahManagedMailboxServerConfig({});
+            await refreshProfilesUI();
+            UIComponents.showToast('Managed mailbox delivery disabled', 'success');
+            return;
+        }
+        const token = await showPromptModal({
+            title: 'Mailbox Access Token',
+            message: 'Optional bearer token for this endpoint. Leave blank to keep the saved token. Enter a single dash to clear it.',
+            placeholder: 'Optional token',
+            inputType: 'password',
+            confirmText: 'Save Provider',
+            initialValue: ''
+        });
+        if (token === null) return;
+        const rawToken = normalizeString(token);
+        const nextConfig = {
+            ...safeObject(current),
+            endpointUrl
+        };
+        if (rawToken === '-') {
+            delete nextConfig.authToken;
+        } else if (rawToken) {
+            nextConfig.authToken = rawToken;
+        }
+        const client = window.FilterTubeManagedMailboxClient;
+        const provider = client && typeof client.createProvider === 'function'
+            ? client.createProvider(nextConfig)
+            : null;
+        if (!provider || provider.configured !== true || !hasNanahManagedMailboxUploadWriter(provider)) {
+            UIComponents.showToast('Mailbox endpoint must be public HTTPS and supported by the encrypted mailbox client', 'error');
+            return;
+        }
+        writeNanahManagedMailboxServerConfig(nextConfig);
+        await refreshProfilesUI();
+        UIComponents.showToast('Managed mailbox provider saved', 'success');
+    }
+
     function hasNanahManagedMailboxUploadWriter(provider = getNanahManagedMailboxProvider()) {
         const root = safeObject(provider);
         return typeof root.uploadManagedMailboxItems === 'function'
@@ -13207,11 +13333,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 viewingAccessLabel,
                 managedTimeLimitLabel,
                 getManagedSyncTargetSummary,
+                getManagedMailboxConfigSummary: summarizeManagedMailboxServerConfig,
                 onAction: async (intent) => {
                     const targetId = normalizeString(intent?.profileId);
                     const action = normalizeString(intent?.action);
-                    if (!targetId && !action.startsWith('bulk_')) return;
-                    if (action === 'edit_rules') {
+                    if (action === 'configure_mailbox') {
+                        await configureNanahManagedMailboxServer();
+                    } else if (!targetId && !action.startsWith('bulk_')) {
+                        return;
+                    } else if (action === 'edit_rules') {
                         await startManagedChildEdit(targetId);
                     } else if (action === 'view_history' || action === 'review_conflicts') {
                         await showManagedActionHistory(targetId);

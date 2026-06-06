@@ -41,6 +41,14 @@
                     localNetworkReady: false,
                     mailboxReady: false
                 }),
+            getManagedMailboxConfigSummary: typeof helpers.getManagedMailboxConfigSummary === 'function'
+                ? helpers.getManagedMailboxConfigSummary
+                : () => ({
+                    configured: false,
+                    label: 'Mailbox not configured',
+                    detail: 'Live P2P still works; later delivery needs a configured provider.',
+                    tone: 'warning'
+                }),
             onAction: typeof helpers.onAction === 'function' ? helpers.onAction : null
         };
     }
@@ -453,6 +461,7 @@
         }), {
             rows,
             bulkActionIntents: buildManagedCommandCenterBulkActionIntents(rows),
+            mailboxConfig: h.getManagedMailboxConfigSummary(),
             profileCount: 0,
             limitedCount: 0,
             syncReadyProfileCount: 0,
@@ -510,6 +519,36 @@
             strip.appendChild(card);
         });
         panel.appendChild(strip);
+
+        const mailbox = h.safeObject(summary.mailboxConfig);
+        const mailboxPanel = document.createElement('div');
+        mailboxPanel.className = `ft-managed-command-center__provider is-${mailbox.tone || (mailbox.configured ? 'success' : 'warning')}`;
+        const mailboxCopy = document.createElement('div');
+        mailboxCopy.className = 'ft-managed-command-center__provider-copy';
+        const mailboxTitle = document.createElement('strong');
+        mailboxTitle.textContent = mailbox.label || (mailbox.configured ? 'Mailbox configured' : 'Mailbox not configured');
+        const mailboxDetail = document.createElement('span');
+        mailboxDetail.textContent = mailbox.detail || 'Later delivery needs a configured encrypted mailbox provider.';
+        mailboxCopy.append(mailboxTitle, mailboxDetail);
+        mailboxPanel.appendChild(mailboxCopy);
+        if (h.onAction) {
+            const mailboxButton = document.createElement('button');
+            mailboxButton.className = 'btn-secondary';
+            mailboxButton.type = 'button';
+            mailboxButton.textContent = mailbox.configured ? 'Edit Mailbox' : 'Configure Mailbox';
+            mailboxButton.title = 'Requires parent/account re-auth. The provider stores only encrypted mailbox items.';
+            mailboxButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                Promise.resolve(h.onAction({
+                    action: 'configure_mailbox',
+                    scope: 'mailbox_provider',
+                    authority: 'managed_policy_provider_delivery',
+                    sensitiveAction: true
+                })).catch(() => {});
+            });
+            mailboxPanel.appendChild(mailboxButton);
+        }
+        panel.appendChild(mailboxPanel);
 
         if (!summary.rows.length) {
             const empty = document.createElement('div');

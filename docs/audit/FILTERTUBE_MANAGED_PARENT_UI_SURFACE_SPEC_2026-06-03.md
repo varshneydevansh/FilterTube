@@ -9,12 +9,13 @@ verified-device send actions,
 live P2P signed managed-policy push for connected verified replica devices,
 provider-gated mailbox/LAN delivery handoff, and protected redacted push
 history rows are present. The command center now includes a compact
-parent-facing protection strip plus labeled Delivery/Device/History row details
-so parents can scan live delivery, later-delivery provider readiness,
-re-pairing, conflicts, and history without reading raw policy state. Bulk local
-time-limit and viewing-space actions cover all manageable protected profiles,
-including Default/Master-managed independent account profiles. Direct rule bulk
-writes for keyword, channel, and video ID rules are now present behind a
+parent-facing protection strip, a parent-reauthed encrypted mailbox endpoint
+configuration row, plus labeled Delivery/Device/History row details so parents
+can scan live delivery, later-delivery provider readiness, re-pairing,
+conflicts, and history without reading raw policy state. Bulk local time-limit
+and viewing-space actions cover all manageable protected profiles, including
+Default/Master-managed independent account profiles. Direct rule bulk writes
+for keyword, channel, and video ID rules are now present behind a
 review-confirmation step and parent/account re-auth, and changed profiles with
 verified delivery can immediately push the matching Main/Kids rule scope to
 their saved devices. Parents can also grant temporary extra YouTube time to
@@ -93,6 +94,10 @@ state without exposing plaintext rule values:
 - The extension includes a browser-side HTTPS mailbox client only when an
   endpoint is explicitly configured. LAN peer-discovery transport remains a
   provider/app/server integration surface, not hidden extension authority.
+- `Configure Mailbox` and `Edit Mailbox` save or clear only the encrypted
+  mailbox endpoint configuration after parent/account re-auth. They do not
+  create a sync account, publish rules, expose tokens in the UI, or turn the
+  mailbox server into policy authority.
 - The status line must not include keyword text, channel names, video ids, PINs,
   mailbox ciphertext, decrypted payloads, or raw policy JSON.
 - The status line appears only when `canActiveProfileManageProfile(...)`
@@ -127,6 +132,7 @@ runtime managed command-center per-profile signed policy push: present
 runtime managed command-center selected-profile signed policy push: present
 runtime managed command-center direct rule bulk writes: present via confirmation plus delegated runtime gate
 runtime managed command-center grouped bulk action rail: present
+runtime managed command-center encrypted mailbox provider configuration: present via parent re-auth
 runtime managed command-center post-rule-write granular verified-device push: present with selected surface binding
 runtime managed command-center post-viewing/time-limit verified-device push: present
 runtime connected verified-device live P2P managed policy send: present
@@ -152,6 +158,7 @@ weakening the authority model:
 | Protection scan strip | Quickly see protected profile count, sync-ready profiles, profiles needing re-pairing, and remote conflicts before acting. | Strip values are aggregate status only; they do not include rule text, policy payloads, keys, or mutation authority. |
 | Rule editing | Command-center row actions still enter the existing managed protected-profile editor, selected-profile bulk controls can hand off one selected protected profile to the same editor, and selected-profile bulk keyword/channel/video-ID additions can apply one reviewed rule to selected protected profiles. Changed profiles with verified delivery can then push the matching rule scope immediately. | Writes must use the same validated local/remote managed-policy paths as current FilterTube controls; bulk rule writes require review confirmation, parent/account re-auth, per-target revision/history rows, selected Main/Kids surface binding for granular sends, and no child authority. |
 | Remote send | Parent can send one protected profile or selected protected profiles to saved verified devices and see whether the next attempt is live, later via LAN/mailbox provider, blocked by conflict, blocked by stale/revoked pairing, missing a verified device, or has redacted source-side delivery ack feedback. | Delivery links, preview labels, and ack labels are not authority; each envelope still requires Source -> Replica trust, fixed target profile, allowed scope, signature/integrity proof, and newer revision/hash. |
+| Mailbox provider | Parent can configure, edit, or clear the HTTPS encrypted-mailbox endpoint from the command center after parent/account re-auth. | The endpoint stores only encrypted mailbox rows and metadata; it cannot read policy, choose targets, bypass trust, or become authority. |
 | Viewing spaces | Show Main, Kids, both, or neither per protected profile; row actions still change policy and selected-profile bulk actions can apply Main + Kids, Kids only, or Main only locally, then offer a scoped verified-device push when delivery exists. | UI choice is not authority; runtime route gate remains the enforcement layer; every selected target gets its own redacted revision/history row after parent re-auth. |
 | Time limits | Show daily YouTube budget state; command-center row actions still set/disable one profile, can add temporary extra time to one active limit, and bulk selected-profile actions can apply the same daily budget, disable existing limits, or add temporary extra time to selected active limits, then offer a scoped verified-device push when delivery exists. | Runtime budget accounting remains background-owned; every target gets its own revision/history row after parent re-auth, and extra-time grants are bounded by expiry. |
 | Sync status | Show trusted device, delivery preview, local-network provider, Nanah open-sync, and mailbox status. | Reachability is never authorization; offline state keeps the last valid policy active. |
@@ -167,6 +174,7 @@ Required UI states for that slice:
 - connected verified-device send success;
 - redacted source-side delivery ack status;
 - provider pending when the extension has no mailbox/LAN provider hook;
+- configured, invalid, and disabled mailbox endpoint states;
 - offline trusted device;
 - rejected or conflicted remote update;
 - failed provider/mailbox pull through protected history/status labels;

@@ -4,8 +4,8 @@
 **Status**: Source-side local-network managed policy delivery handoff is
 present as a provider-gated signed-candidate publisher that requires sensitive
 parent/account re-auth before provider delivery. Built-in LAN peer discovery,
-LAN transport, server mailbox upload/pull, and dashboard offline-send UI remain
-absent.
+LAN transport, LAN-owned server mailbox upload/pull, and a standalone
+offline-send page remain absent.
 **Related live-send proof**:
 `docs/audit/FILTERTUBE_NANAH_MANAGED_LIVE_SIGNED_SEND_2026-06-04.md`
 **Related receive hook**:
@@ -117,8 +117,8 @@ runtime signed envelope authority unchanged: present
 runtime provider authority: absent
 runtime built-in LAN peer discovery: absent
 runtime built-in LAN transport: absent
-runtime server mailbox upload/pull client: absent
-runtime dashboard offline-send UI: absent
+runtime LAN-owned server mailbox upload/pull client: absent
+runtime standalone offline-send page: absent
 runtime YouTube page hot-path work from this slice: absent
 ```
 

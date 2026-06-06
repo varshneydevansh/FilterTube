@@ -342,8 +342,9 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   const tabViewHtml = read('html/tab-view.html');
 
   assert.match(doc, /Status\*\*: Spec, dashboard protected-profile status, command-center overview/);
-  assert.match(doc, /parent-facing protection strip plus labeled Delivery\/Device\/History row details/);
-  assert.match(doc, /Direct rule bulk\s+writes for keyword, channel, and video ID rules are now present/);
+  assert.match(doc, /parent-facing protection strip, a parent-reauthed encrypted mailbox endpoint\s+configuration row, plus labeled Delivery\/Device\/History row details/);
+  assert.match(doc, /parent-reauthed encrypted mailbox endpoint\s+configuration row/);
+  assert.match(doc, /Direct rule bulk\s+writes\s+for keyword, channel, and video ID rules are now present/);
   assert.match(doc, /Parent-Facing States/);
   assert.match(doc, /UI Boundaries/);
   assert.match(doc, /Current Runtime Binding/);
@@ -363,6 +364,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(doc, /runtime managed command-center direct policy writes: absent/);
   assert.match(doc, /runtime managed command-center direct rule bulk writes: present via confirmation plus delegated runtime gate/);
   assert.match(doc, /runtime managed command-center grouped bulk action rail: present/);
+  assert.match(doc, /runtime managed command-center encrypted mailbox provider configuration: present via parent re-auth/);
   assert.match(doc, /runtime YouTube hot-path work from command-center UI: absent/);
   assert.match(plan, new RegExp(docPath));
   assert.match(plan, /command-center\s+overview for protected profiles/);
@@ -381,6 +383,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /function buildManagedCommandCenterSummary\(profilesV4, \{ revealDetails = false, helpers = \{\} \} = \{\}\)/);
   assert.match(helperSource, /function buildManagedCommandCenterActionIntents\(profileId, timePolicy, policySummary = \{\}\)/);
   assert.match(helperSource, /function buildManagedCommandCenterBulkActionIntents\(rows = \[\]\)/);
+  assert.match(helperSource, /getManagedMailboxConfigSummary/);
   assert.match(helperSource, /function resolveManagedCommandCenterDeliveryPreview\(item = \{\}\)/);
   assert.match(helperSource, /function describeManagedCommandCenterDeliveryPath\(item = \{\}\)/);
   assert.match(helperSource, /function renderManagedCommandCenter\(profilesV4, \{ revealDetails = false, helpers = \{\} \} = \{\}\)/);
@@ -403,6 +406,10 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /ft-managed-command-center__bulk-actions/);
   assert.match(helperSource, /ft-managed-command-center__bulk-group/);
   assert.match(helperSource, /ft-managed-command-center__bulk-group-label/);
+  assert.match(helperSource, /ft-managed-command-center__provider/);
+  assert.match(helperSource, /Configure Mailbox/);
+  assert.match(helperSource, /Edit Mailbox/);
+  assert.match(helperSource, /configure_mailbox/);
   assert.match(helperSource, /group: 'rules'/);
   assert.match(helperSource, /group: 'send'/);
   assert.match(helperSource, /group: 'time'/);
@@ -425,6 +432,10 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /FilterTubeManagedParentCommandCenter\?\.render\?\.\(profilesV4/);
   assert.match(source, /helpers:\s*\{[\s\S]*safeObject,[\s\S]*getAccountIds,/);
   assert.match(source, /onAction:\s*async \(intent\) =>/);
+  assert.match(source, /function summarizeManagedMailboxServerConfig\(\)/);
+  assert.match(source, /async function configureNanahManagedMailboxServer\(\)/);
+  assert.match(source, /NANAH_MANAGED_MAILBOX_CONFIG_KEY = 'ftManagedMailboxServerConfig'/);
+  assert.match(source, /action === 'configure_mailbox'/);
   assert.match(source, /action === 'edit_rules'/);
   assert.match(source, /action === 'view_history'/);
   assert.match(source, /action === 'set_time_limit' \|\| action === 'change_time_limit'/);
@@ -518,6 +529,8 @@ test('managed command-center spec pins parent workflow without making UI authori
   assert.match(css, /\.ft-managed-command-center__bulk-select\s*\{/);
   assert.match(css, /\.ft-managed-command-center__bulk-actions\s*\{/);
   assert.match(css, /\.ft-managed-command-center__bulk-group\s*\{/);
+  assert.match(css, /\.ft-managed-command-center__provider\s*\{/);
+  assert.match(css, /\.ft-managed-command-center__provider-copy\s*\{/);
   assert.match(css, /\.ft-managed-command-center__bulk-group-label\s*\{/);
   assert.match(css, /\.ft-managed-command-center__row\s*\{/);
   assert.match(css, /\.ft-managed-command-center__profile\s*\{/);

@@ -6,8 +6,9 @@ ciphertext-only managed mailbox items, and source-side mailbox purge-provider
 handoff is present for trusted-link removal. Both require sensitive
 parent/account re-auth before provider calls. A browser-side HTTPS mailbox
 upload/pull/purge client is present behind explicit dashboard configuration and
-encrypted-item gates. Dashboard offline-send UI, mailbox server deployment, and
-mailbox server authority remain absent.
+encrypted-item gates. Dashboard mailbox endpoint configuration is present
+behind parent/account re-auth. A standalone offline-send page, mailbox server
+deployment, and mailbox server authority remain absent.
 **Related live-send proof**:
 `docs/audit/FILTERTUBE_NANAH_MANAGED_LIVE_SIGNED_SEND_2026-06-04.md`
 **Related mailbox protocol**:
@@ -191,8 +192,9 @@ runtime mailbox provider authority: absent
 runtime browser HTTPS mailbox upload client: present behind explicit config
 runtime browser HTTPS mailbox purge client: present behind explicit config
 runtime browser HTTPS mailbox pull/decrypt client: present behind explicit config
+runtime dashboard mailbox endpoint configuration UI: present behind parent/account re-auth
 runtime mailbox server deployment/authority: absent
-runtime dashboard offline-send UI: absent
+runtime standalone offline-send page: absent
 runtime YouTube page hot-path work from this slice: absent
 ```
 

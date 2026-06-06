@@ -211,7 +211,7 @@ function createManagedLivePolicyHarness({
   return { helper, parentProfile, trustedLink, policyUpdates, signCalls, providerDeliveryAuthCalls };
 }
 
-test('managed live signed-send audit is linked without claiming mailbox runtime', () => {
+test('managed live signed-send audit is linked without claiming mailbox server authority', () => {
   const doc = read(docPath);
   const sourceDeliveryDoc = read(sourceDeliveryDocPath);
   const mailboxSourceDeliveryDoc = read(mailboxSourceDeliveryDocPath);
@@ -224,9 +224,10 @@ test('managed live signed-send audit is linked without claiming mailbox runtime'
   assert.match(doc, /explicit Main\/Kids\s+rule-source\s+picker/);
   assert.match(doc, /Rule bundle/);
   assert.match(doc, /All unsupported live sends continue through the existing proposal path/);
-  assert.match(doc, /not a mailbox runtime, built-in local-network discovery runtime,\s+key-rotation system, or complete offline later-delivery UI/);
+  assert.match(doc, /not mailbox server authority, built-in local-network discovery runtime,\s+key-rotation system, or a complete standalone offline later-delivery UI/);
   assert.match(sourceDeliveryDoc, /Source-side local-network managed policy delivery handoff/);
-  assert.match(sourceDeliveryDoc, /Built-in LAN peer\s+discovery,\s+LAN transport, server mailbox upload\/pull, and dashboard offline-send\s+UI remain\s+absent/);
+  assert.match(sourceDeliveryDoc, /LAN transport, LAN-owned server mailbox upload\/pull, and a standalone\s+offline-send page remain absent/);
+  assert.match(mailboxSourceDeliveryDoc, /Dashboard mailbox endpoint configuration is present\s+behind parent\/account re-auth/);
   assert.match(sourceDeliveryDoc, /runtime source-side local-network provider admin re-auth gate: present/);
   assert.match(mailboxSourceDeliveryDoc, /Source-side mailbox upload-provider handoff is present/);
   assert.match(mailboxSourceDeliveryDoc, /runtime browser HTTPS mailbox upload client: present behind explicit config/);

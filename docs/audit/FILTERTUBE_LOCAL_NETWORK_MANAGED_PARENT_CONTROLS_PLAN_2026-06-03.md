@@ -694,9 +694,10 @@ the current extension dashboard.
   rule additions are present. Command-center rows now separate sync readiness
   into compact status chips, mark remote conflict rows visually, and expose a
   protected Review Conflict action that opens the parent/account history gate.
-  Built-in LAN transports remain pending. The browser-side HTTPS mailbox client
-  is available only when explicitly configured and does not add mailbox server
-  authority.
+  Built-in LAN transports remain pending. The command center now has a compact
+  encrypted-mailbox endpoint row that can configure, edit, or disable the
+  browser-side HTTPS mailbox client after parent/account re-auth. This does not
+  add mailbox server authority or a standalone offline-send page.
 - **Acceptance Criteria**:
   - UI has empty, loading, error, locked, offline, and sync-conflict states.
   - Parent actions are clear and reversible where possible.
@@ -907,8 +908,9 @@ where parent and child devices are not reachable at the same time.
   a trusted local provider and send redacted ack records after apply/reject.
   Provider rejection or provider failure now fails closed without applying or
   acknowledging any returned items. Runtime browser HTTPS mailbox upload/pull
-  is present behind explicit configuration; mailbox server deployment and
-  authority remain absent by design.
+  is present behind explicit dashboard configuration and parent/account re-auth
+  for endpoint changes; mailbox server deployment and authority remain absent
+  by design.
 - **Acceptance Criteria**:
   - Server cannot read rules.
   - Replay, stale, revoked, wrong-target, and duplicate delivery behavior is

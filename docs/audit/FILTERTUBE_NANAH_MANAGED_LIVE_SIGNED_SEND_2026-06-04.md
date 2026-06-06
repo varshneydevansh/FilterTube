@@ -159,8 +159,8 @@ gate as live managed sends. If re-auth fails, the source helper fails closed
 before batch signing/upload-item construction, provider calls, or sent-state
 marking.
 
-This is not a mailbox runtime, built-in local-network discovery runtime,
-key-rotation system, or complete offline later-delivery UI.
+This is not mailbox server authority, built-in local-network discovery runtime,
+key-rotation system, or a complete standalone offline later-delivery UI.
 
 Still pending:
 
@@ -170,7 +170,7 @@ Still pending:
   clearly for every protected profile;
 - installed-extension two-device smoke proof;
 - key rotation/revocation UI;
-- built-in server mailbox upload/pull client and dashboard offline-send UI;
+- mailbox server deployment and a standalone offline-send page;
 - encrypted private-key-at-rest storage.
 
 ## Proof Commands
