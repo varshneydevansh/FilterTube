@@ -620,6 +620,16 @@ function pauseManagedTimeoutVideos() {
     }
 }
 
+function formatManagedTimeoutDuration(seconds) {
+    const total = Math.max(0, Math.floor(Number(seconds) || 0));
+    if (!total) return '0m';
+    const hours = Math.floor(total / 3600);
+    const minutes = Math.floor((total % 3600) / 60);
+    if (hours && minutes) return `${hours}h ${minutes}m`;
+    if (hours) return `${hours}h`;
+    return `${Math.max(1, minutes)}m`;
+}
+
 function showManagedTimeoutOverlay(state) {
     try {
         globalThis.__filtertubeManagedTimeLimitTimedOut = true;
@@ -652,6 +662,13 @@ function showManagedTimeoutOverlay(state) {
 
         const profileName = String(state?.profileName || 'This profile').trim() || 'This profile';
         const surfaceLabel = state?.surface === 'kids' ? 'YouTube Kids' : 'YouTube';
+        const timezone = String(state?.timezone || '').trim();
+        const resetCopy = timezone
+            ? `Resets at midnight (${timezone}).`
+            : 'Resets at the next daily policy reset.';
+        const totalBudgetCopy = formatManagedTimeoutDuration(state?.totalBudgetSeconds);
+        const usedCopy = formatManagedTimeoutDuration(state?.consumedSeconds);
+        const policyExpired = state?.reason === 'expired_policy_requires_parent_revalidation';
         overlay.innerHTML = '';
 
         const panel = document.createElement('section');
@@ -669,16 +686,42 @@ function showManagedTimeoutOverlay(state) {
         eyebrow.style.cssText = 'color:#f87171;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0;margin-bottom:10px';
 
         const title = document.createElement('h1');
-        title.textContent = `${surfaceLabel} time is finished for today`;
+        title.textContent = policyExpired ? `${surfaceLabel} needs parent approval` : `${surfaceLabel} time is finished for today`;
         title.style.cssText = 'font-size:22px;line-height:1.2;margin:0 0 10px;font-weight:800;color:#fff';
 
         const copy = document.createElement('p');
-        copy.textContent = `${profileName} has used today's parent-managed YouTube time. Ask the parent or caregiver profile for more time.`;
+        copy.textContent = policyExpired
+            ? `${profileName} has a time policy that needs the parent or caregiver profile to approve again.`
+            : `${profileName} has used today's parent-managed YouTube time. Ask the parent or caregiver profile for more time.`;
         copy.style.cssText = 'font-size:14px;line-height:1.5;margin:0;color:#cbd5e1';
+
+        const facts = document.createElement('dl');
+        facts.style.cssText = [
+            'display:grid',
+            'grid-template-columns:auto 1fr',
+            'gap:8px 14px',
+            'margin:18px 0 0',
+            'font-size:13px',
+            'line-height:1.35'
+        ].join(';');
+        [
+            ['Daily limit', totalBudgetCopy],
+            ['Used today', usedCopy],
+            ['Reset', resetCopy]
+        ].forEach(([label, value]) => {
+            const dt = document.createElement('dt');
+            dt.textContent = label;
+            dt.style.cssText = 'margin:0;color:#94a3b8;font-weight:700';
+            const dd = document.createElement('dd');
+            dd.textContent = value;
+            dd.style.cssText = 'margin:0;color:#e2e8f0';
+            facts.append(dt, dd);
+        });
 
         panel.appendChild(eyebrow);
         panel.appendChild(title);
         panel.appendChild(copy);
+        panel.appendChild(facts);
         overlay.appendChild(panel);
     } catch (e) {
     }

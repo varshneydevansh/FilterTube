@@ -815,7 +815,10 @@ YouTube budgets, then document app parity.
 - **Status**: First runtime slice implemented for enabled child/protected
   profile policies through compiled `managedTimeLimitPolicy`, background
   `ftManagedTimeUsageV1`, content heartbeats, and protected timeout overlay.
-  Installed-extension fake-clock and live multi-tab smoke remain manual.
+  The timeout overlay now carries background-owned daily limit, used time, and
+  reset context while covering the YouTube surface instead of redirecting the
+  protected user elsewhere. Installed-extension fake-clock and live multi-tab
+  smoke remain manual.
 - **Complexity**: 9/10
 - **Dependencies**: Tasks 5.1 and 5.2.
 - **Acceptance Criteria**:

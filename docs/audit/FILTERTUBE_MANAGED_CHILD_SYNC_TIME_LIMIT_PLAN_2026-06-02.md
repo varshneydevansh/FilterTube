@@ -875,6 +875,9 @@ T1 + T2 + T3
     background reports `timedOut: true`; the overlay covers the page, pauses
     visible videos, survives SPA revalidation through the heartbeat loop, and
     does not use content-filter hide markers or hidden-content stats.
+  - 2026-06-06: Timeout decisions now include reset timezone/policy context from
+    the background heartbeat, and the child/protected-user overlay shows daily
+    limit, used time, and reset timing instead of redirecting away from YouTube.
 - **files edited/created**:
   - `js/content/bridge_settings.js`
   - `tests/runtime/managed-time-budget-enforcement-current-behavior.test.mjs`

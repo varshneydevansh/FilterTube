@@ -529,7 +529,9 @@ Current behavior:
 - Background runtime stores whole-profile daily usage in `ftManagedTimeUsageV1`
   and clamps remaining budget by policy timezone date, revision, and hash.
 - The child/protected timeout overlay appears only after the background reports
-  an exhausted budget, and it does not write hidden-content stats.
+  an exhausted budget, pauses visible videos, covers the YouTube surface instead
+  of redirecting elsewhere, shows daily limit, used time, and reset timing, and
+  does not write hidden-content stats.
 - The audit contract
   `docs/audit/FILTERTUBE_MANAGED_CHILD_TIME_LIMIT_SCHEMA_CONTRACT_2026-06-03.md`
   now pins the schema, local UI/store boundary, runtime heartbeat service, and
