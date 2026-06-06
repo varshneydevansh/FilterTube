@@ -3103,7 +3103,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         'mainRuleCount',
         'mailboxUploadedCount',
         'mailboxPurgedCount',
+        'noLinkCount',
         'nextKeyVersion',
+        'providerMissingCount',
         'previousKeyVersion',
         'protectedRows',
         'remoteFailedAttemptLimit',
@@ -3133,6 +3135,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'endpointHost',
         'label',
         'scope',
+        'deliveryStatus',
         'transport'
     ]);
     const MANAGED_ACTION_HISTORY_SUMMARY_SAFE_STRING_ARRAY_KEYS = new Set([
@@ -5006,7 +5009,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     function getManagedActionHistoryRetentionMs(row) {
         const item = safeObject(row);
         const result = normalizeString(item.result);
-        if (MANAGED_ACTION_HISTORY_PROTECTED_RESULTS.has(result)) {
+        const actionType = normalizeString(item.actionType);
+        if (MANAGED_ACTION_HISTORY_PROTECTED_RESULTS.has(result) ||
+            MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS.has(actionType)) {
             return MANAGED_ACTION_HISTORY_PROTECTED_RETENTION_MS;
         }
         return MANAGED_ACTION_HISTORY_ACCEPTED_RETENTION_MS;
@@ -5175,9 +5180,97 @@ document.addEventListener('DOMContentLoaded', async () => {
             .toLowerCase()
             .replace(/[^a-z0-9_.:-]+/g, '_')
             .slice(0, 96);
+        const detailParts = buildManagedActionHistoryDisplayDetails(item, summary);
+        const detailSuffix = detailParts.length ? ` | ${detailParts.join(' | ')}` : '';
         return reason
-            ? `${date} - ${result} - ${scope} - ${label} (${reason})`
-            : `${date} - ${result} - ${scope} - ${label}`;
+            ? `${date} - ${result} - ${scope} - ${label} (${reason})${detailSuffix}`
+            : `${date} - ${result} - ${scope} - ${label}${detailSuffix}`;
+    }
+
+    function buildManagedActionHistoryDisplayDetails(row, summary) {
+        const item = safeObject(row);
+        const root = safeObject(summary);
+        const parts = [];
+        const actionType = normalizeString(item.actionType);
+        if (actionType === 'remote_policy.source_push') {
+            const deliveryStatus = normalizeString(root.deliveryStatus);
+            const liveSent = normalizeNonNegativeInteger(root.liveSentCount) || 0;
+            const lanSent = normalizeNonNegativeInteger(root.localNetworkDeliveredCount) || 0;
+            const mailboxSent = normalizeNonNegativeInteger(root.mailboxUploadedCount) || 0;
+            const failed = normalizeNonNegativeInteger(root.failedCount) || 0;
+            const noLinks = normalizeNonNegativeInteger(root.noLinkCount) || 0;
+            const missingProvider = normalizeNonNegativeInteger(root.providerMissingCount) || 0;
+            const deliveryBits = [];
+            if (liveSent) deliveryBits.push(`live ${liveSent}`);
+            if (lanSent) deliveryBits.push(`LAN ${lanSent}`);
+            if (mailboxSent) deliveryBits.push(`mailbox ${mailboxSent}`);
+            if (failed) deliveryBits.push(`failed ${failed}`);
+            if (noLinks) deliveryBits.push(`no-link ${noLinks}`);
+            if (missingProvider) deliveryBits.push(`provider-missing ${missingProvider}`);
+            if (deliveryStatus) parts.push(`status ${deliveryStatus}`);
+            if (deliveryBits.length) parts.push(`delivery ${deliveryBits.join(', ')}`);
+        }
+        const transports = safeArray(root.transports)
+            .map(item => normalizeString(item))
+            .filter(Boolean);
+        if (transports.length) {
+            parts.push(`transports ${transports.join(', ')}`);
+        }
+        return parts;
+    }
+
+    function resolveManagedPolicyPushResult(deliveredCount, failedCount) {
+        if (deliveredCount > 0 && failedCount > 0) return 'partial_sent';
+        if (deliveredCount > 0) return 'sent';
+        return 'rejected';
+    }
+
+    function resolveManagedPolicyPushDeliveryStatus(details) {
+        const root = safeObject(details);
+        const deliveredCount = normalizeNonNegativeInteger(root.deliveredCount) || 0;
+        const failedCount = normalizeNonNegativeInteger(root.failedCount) || 0;
+        const liveSent = normalizeNonNegativeInteger(root.liveSentCount) || 0;
+        const mailboxUploaded = normalizeNonNegativeInteger(root.mailboxUploadedCount) || 0;
+        const localNetworkDelivered = normalizeNonNegativeInteger(root.localNetworkDeliveredCount) || 0;
+        const noLinkCount = normalizeNonNegativeInteger(root.noLinkCount) || 0;
+        const providerMissingCount = normalizeNonNegativeInteger(root.providerMissingCount) || 0;
+        if (deliveredCount > 0 && failedCount > 0) return 'partial_delivery';
+        if (liveSent > 0 && mailboxUploaded === 0 && localNetworkDelivered === 0) return 'live_sent';
+        if (localNetworkDelivered > 0 && liveSent === 0 && mailboxUploaded === 0) return 'local_network_sent';
+        if (mailboxUploaded > 0 && liveSent === 0 && localNetworkDelivered === 0) return 'mailbox_queued';
+        if (deliveredCount > 0) return 'multi_transport_sent';
+        if (noLinkCount > 0) return 'no_verified_device';
+        if (providerMissingCount > 0) return 'provider_unavailable';
+        if (failedCount > 0) return 'delivery_failed';
+        return 'no_delivery_attempt';
+    }
+
+    function normalizeManagedTransportLabels(values) {
+        return Array.from(new Set(safeArray(values)
+            .map(item => normalizeString(item))
+            .filter(Boolean)
+            .map(item => item.replace(/[^a-zA-Z0-9_.:-]+/g, '_').slice(0, 64))
+            .filter(Boolean)))
+            .slice(0, 12);
+    }
+
+    function summarizeManagedDeliveryHistory(details) {
+        const root = safeObject(details);
+        const deliveredCount = normalizeNonNegativeInteger(root.deliveredCount) || 0;
+        const failedCount = normalizeNonNegativeInteger(root.failedCount) || 0;
+        const transports = normalizeManagedTransportLabels(root.transports);
+        return {
+            linkCount: normalizeNonNegativeInteger(root.linkCount) || 0,
+            deliveredCount,
+            failedCount,
+            mailboxUploadedCount: normalizeNonNegativeInteger(root.mailboxUploadedCount) || 0,
+            localNetworkDeliveredCount: normalizeNonNegativeInteger(root.localNetworkDeliveredCount) || 0,
+            liveSentCount: normalizeNonNegativeInteger(root.liveSentCount) || 0,
+            noLinkCount: normalizeNonNegativeInteger(root.noLinkCount) || 0,
+            providerMissingCount: normalizeNonNegativeInteger(root.providerMissingCount) || 0,
+            transports,
+            deliveryStatus: resolveManagedPolicyPushDeliveryStatus(root)
+        };
     }
 
     function managedPolicyRevisionLabel(state, label) {
@@ -10016,7 +10109,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const linkCount = normalizeNonNegativeInteger(rootDetails.linkCount) || 0;
         const deliveredCount = normalizeNonNegativeInteger(rootDetails.deliveredCount) || 0;
         const failedCount = normalizeNonNegativeInteger(rootDetails.failedCount) || 0;
-        const result = deliveredCount > 0 ? 'sent' : 'rejected';
+        const deliverySummary = summarizeManagedDeliveryHistory(rootDetails);
+        const result = resolveManagedPolicyPushResult(deliveredCount, failedCount);
         const row = {
             rowId: `managed-parent-push-${targetId}-${now}`,
             schema: MANAGED_ACTION_HISTORY_SCHEMA,
@@ -10036,14 +10130,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             orderKey: `push:${now}`,
             summary: {
                 redacted: true,
-                label: result === 'sent' ? 'Sent parent policy update' : 'Parent policy update failed',
-                linkCount,
-                deliveredCount,
-                failedCount,
-                mailboxUploadedCount: normalizeNonNegativeInteger(rootDetails.mailboxUploadedCount) || 0,
-                localNetworkDeliveredCount: normalizeNonNegativeInteger(rootDetails.localNetworkDeliveredCount) || 0,
-                liveSentCount: normalizeNonNegativeInteger(rootDetails.liveSentCount) || 0,
-                transports: safeArray(rootDetails.transports).map(item => normalizeString(item)).filter(Boolean)
+                label: deliveredCount > 0 ? 'Sent parent policy update' : 'Parent policy update failed',
+                ...deliverySummary
             },
             sensitive: true
         };
@@ -10325,6 +10413,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     linkCount: 0,
                     deliveredCount: 0,
                     failedCount: 1,
+                    noLinkCount: 1,
                     reason: 'no_verified_device'
                 });
                 continue;
@@ -10339,6 +10428,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     firstLinkId: links[0]?.linkId,
                     deliveredCount: 0,
                     failedCount: links.length,
+                    providerMissingCount: 1,
                     reason: 'managed_delivery_provider_unavailable'
                 });
                 continue;

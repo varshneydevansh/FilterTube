@@ -29,11 +29,15 @@ without storing policy payload plaintext, and connected replicas now return
 redacted live ack rows that the source stores only when they match a prior sent
 revision/hash. The dashboard history renderer now treats sensitive rows as
 protected display data: it uses fixed action labels and normalized reason codes
-instead of rendering free-form sensitive summary labels. Runtime history
+instead of rendering free-form sensitive summary labels. Source-side parent
+policy push rows now also preserve redacted delivery feedback: delivery status,
+live send count, LAN candidate count, mailbox queued count, failed count,
+no-link count, provider-missing count, and transport labels. Runtime history
 appends now prune expired rows with the documented retention windows: accepted
-actions are retained for 30 days, rejected/conflict/failed-auth/expired/clear
-evidence is retained for 90 days, and each protected profile remains capped at
-500 rows. The central sanitizer now also preserves optional encrypted summary
+actions are retained for 30 days, while rejected/conflict/failed-auth/expired,
+clear, trust, time/viewing-policy, and source-push evidence is retained for 90
+days, and each protected profile remains capped at 500 rows. The central
+sanitizer now also preserves optional encrypted summary
 evidence only when it is already ciphertext-shaped and rejects plaintext-like
 summary keys before storing protected history rows.
 **Goal slice**: Implementation order item 4, "Add action-history/log model and
@@ -100,7 +104,7 @@ minimum shape:
 | `scope` | Rule/policy surface. | `main`, `kids`, `videos`, `keywords`, `channels`, `viewing_space`, `time_limits`, `sync_policy`, `admin_session`, `trust_link`. |
 | `revision` | Managed policy revision involved. | Required for managed-policy rows; local failed unlock can be `null`. |
 | `policyHash` | Canonical policy hash involved. | Required for accepted managed-policy rows and replay/conflict diagnostics. |
-| `result` | Outcome. | `accepted`, `rejected`, `conflict`, `failed_auth`, `expired_session`, `cleared_by_admin`. |
+| `result` | Outcome. | `accepted`, `sent`, `partial_sent`, `rejected`, `conflict`, `failed_auth`, `expired_session`, `cleared_by_admin`. |
 | `reason` | Machine-readable reason. | Required when result is not `accepted`. |
 | `receivedAt` | Local receive/write timestamp. | Required for ordering, but not sufficient alone under clock skew. |
 | `issuedAt` | Parent/caregiver policy timestamp, if present. | Optional diagnostic only; not authority. |
@@ -208,6 +212,7 @@ The following events must produce action-history rows in future implementation:
 | `rate_limited_remote_policy_attempt` | Repeated rejected/conflict remote policy attempts arrive for the same transport, link, source, target, and scope. | `rejected` or `conflict` row with redacted rate-limit metadata and no policy authority. |
 | `acked_mailbox_policy_result` | Protected device reports a pulled mailbox apply/reject result back to the local provider. | `accepted` when the provider records every ack, otherwise `rejected` with the provider ack failure reason; never stores plaintext rule values. |
 | `acked_local_network_candidate_result` | Protected device reports a local-network candidate apply/reject result back to the local provider. | `accepted` when the provider records every ack, otherwise `rejected` with the provider ack failure reason; never stores plaintext rule values. |
+| `partial_parent_policy_push` | Parent/source sends to multiple delivery paths and at least one path fails. | `partial_sent` with redacted delivery counts for live, LAN, mailbox, failed, no-link, provider-missing, and transport labels. |
 | `accepted_local_time_limit_policy` | Same-device parent/account sets, changes, or disables a protected profile's daily YouTube time limit. | `accepted` with local time-limit revision, policy hash, and redacted budget/timezone counts. |
 | `failed_parent_unlock` | Admin PIN/password attempt fails. | `failed_auth` and rate-limit metadata. |
 | `cleared_by_parent` | Parent/account clears viewable accepted-action history. | `cleared_by_admin`; rejected evidence may remain until retention expiry. |
@@ -242,18 +247,21 @@ runtime local-network candidate validation/apply history writer: present for san
 runtime local-network ack-handoff history writer: present on protected target profiles
 runtime remote managed failed-attempt rate-limit state: present under profile.managedPolicyState.remoteFailedAttemptRateLimits
 runtime managed outbound live send history writer: present on trusted link policy rows as redacted parent-side send evidence
+runtime managed parent command-center delivery history writer: present on protected target profiles with redacted per-transport delivery counts and status
 runtime managed inbound live ack history writer: present on trusted link policy rows as redacted parent-side applied/rejected feedback
 runtime managed source key-rotation history writer: present on protected target profiles as redacted `trust_link.key_revoke` evidence
-runtime behavior changed by this contract: yes, for accepted local managed child saves, accepted local time-limit policy edits, protected failed-auth rows, parent/account history access, Nanah managed-policy receive evidence, validated remote apply history, local/decrypted mailbox item evidence, pull-on-open mailbox ack-handoff evidence, sanitized local-network candidate evidence, remote failed-attempt rate-limit metadata, parent-side outbound live send evidence, parent-side live ack feedback, and source key-rotation re-pairing evidence
+runtime behavior changed by this contract: yes, for accepted local managed child saves, accepted local time-limit policy edits, protected failed-auth rows, parent/account history access, Nanah managed-policy receive evidence, validated remote apply history, local/decrypted mailbox item evidence, pull-on-open mailbox ack-handoff evidence, sanitized local-network candidate evidence, remote failed-attempt rate-limit metadata, parent-side outbound live send evidence, command-center delivery feedback history, parent-side live ack feedback, and source key-rotation re-pairing evidence
 ```
 
 The current local writer stores redacted count/status summaries under
 `profile.managedActionHistory[]`; local time-limit rows store only enabled
-state, daily budget counts, timezone, and surface-budget count. Every runtime
+state, daily budget counts, timezone, and surface-budget count. Parent policy
+push rows store only safe delivery status/counts and transport labels, never
+keyword/channel/video values or policy payload plaintext. Every runtime
 append and read path now normalizes rows through
 `sanitizeManagedActionHistoryRow`, drops unapproved summary keys, and prunes
 expired rows before saving, using the documented 30-day accepted-action window,
-90-day protected-evidence window, and 500-row cap. The local access gate uses active
+90-day protected-result/protected-action evidence window, and 500-row cap. The local access gate uses active
 parent/account authority, not child PIN authority, and `clearManagedActionHistory`
 preserves rows that are rejected, conflict, failed-auth, expired-session, trust
 revocation, time-limit, viewing-space, or prior clear evidence.
