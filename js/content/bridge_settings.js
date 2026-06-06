@@ -434,6 +434,84 @@ function openFilterTubeDashboardFromManagedOverlay(source) {
     }
 }
 
+function getFilterTubeManagedOverlayHeroUrl() {
+    try {
+        const runtime = browserAPI_BRIDGE && browserAPI_BRIDGE.runtime;
+        if (runtime && typeof runtime.getURL === 'function') {
+            return runtime.getURL('assets/images/homepage_hero_day.mp4');
+        }
+    } catch (e) {
+    }
+    return '';
+}
+
+function applyManagedOverlayShell(overlay) {
+    if (!overlay) return;
+    overlay.style.cssText = [
+        'position:fixed',
+        'inset:0',
+        'z-index:2147483647',
+        'display:flex',
+        'align-items:center',
+        'justify-content:center',
+        'padding:24px',
+        'background:linear-gradient(180deg,#dcebf4 0%,#edf5f1 52%,#f7f4ec 100%)',
+        'color:#f8fafc',
+        'font-family:Roboto,Arial,sans-serif',
+        'pointer-events:auto',
+        'overflow:hidden'
+    ].join(';');
+}
+
+function appendManagedOverlayBackground(overlay) {
+    if (!overlay) return;
+    const heroUrl = getFilterTubeManagedOverlayHeroUrl();
+    if (heroUrl) {
+        const video = document.createElement('video');
+        video.setAttribute('aria-hidden', 'true');
+        video.muted = true;
+        video.autoplay = true;
+        video.loop = true;
+        video.playsInline = true;
+        video.src = heroUrl;
+        video.style.cssText = [
+            'position:absolute',
+            'inset:0',
+            'width:100%',
+            'height:100%',
+            'object-fit:cover',
+            'opacity:.58',
+            'filter:saturate(.82) brightness(.8)',
+            'pointer-events:none'
+        ].join(';');
+        overlay.appendChild(video);
+    }
+    const scrim = document.createElement('div');
+    scrim.setAttribute('aria-hidden', 'true');
+    scrim.style.cssText = [
+        'position:absolute',
+        'inset:0',
+        'background:linear-gradient(135deg,rgba(8,13,18,.78),rgba(15,23,42,.62) 45%,rgba(27,38,48,.72))',
+        'pointer-events:none'
+    ].join(';');
+    overlay.appendChild(scrim);
+}
+
+function createManagedOverlayPanel() {
+    const panel = document.createElement('section');
+    panel.style.cssText = [
+        'position:relative',
+        'width:min(460px,100%)',
+        'border:1px solid rgba(255,255,255,.28)',
+        'border-radius:10px',
+        'background:rgba(12,18,25,.82)',
+        'box-shadow:0 28px 90px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.08)',
+        'backdrop-filter:blur(18px)',
+        'padding:26px'
+    ].join(';');
+    return panel;
+}
+
 function showManagedViewingBlockedOverlay(decision) {
     try {
         globalThis.__filtertubeManagedViewingRouteDenied = true;
@@ -447,46 +525,27 @@ function showManagedViewingBlockedOverlay(decision) {
             overlay.id = MANAGED_VIEWING_ROUTE_GATE_OVERLAY_ID;
             overlay.setAttribute('role', 'alertdialog');
             overlay.setAttribute('aria-modal', 'true');
-            overlay.style.cssText = [
-                'position:fixed',
-                'inset:0',
-                'z-index:2147483647',
-                'display:flex',
-                'align-items:center',
-                'justify-content:center',
-                'padding:24px',
-                'background:rgba(8,13,18,.92)',
-                'color:#f8fafc',
-                'font-family:Inter,Roboto,Arial,sans-serif',
-                'pointer-events:auto'
-            ].join(';');
+            applyManagedOverlayShell(overlay);
             host.appendChild(overlay);
         }
 
         const profileName = String(decision.profileName || 'This profile').trim() || 'This profile';
         const surfaceLabel = decision.surface === 'kids' ? 'YouTube Kids' : 'YouTube';
         overlay.innerHTML = '';
+        appendManagedOverlayBackground(overlay);
 
-        const panel = document.createElement('section');
-        panel.style.cssText = [
-            'width:min(420px,100%)',
-            'border:1px solid rgba(148,163,184,.32)',
-            'border-radius:8px',
-            'background:#101820',
-            'box-shadow:0 24px 80px rgba(0,0,0,.45)',
-            'padding:24px'
-        ].join(';');
+        const panel = createManagedOverlayPanel();
 
         const eyebrow = document.createElement('div');
         eyebrow.textContent = 'FilterTube managed profile';
-        eyebrow.style.cssText = 'color:#f87171;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0;margin-bottom:10px';
+        eyebrow.style.cssText = 'color:#fca5a5;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0;margin-bottom:10px';
 
         const title = document.createElement('h1');
         title.textContent = `${surfaceLabel} is not available for this profile`;
-        title.style.cssText = 'font-size:22px;line-height:1.2;margin:0 0 10px;font-weight:800;color:#fff';
+        title.style.cssText = 'font-size:23px;line-height:1.2;margin:0 0 10px;font-weight:800;color:#fff';
 
         const copy = document.createElement('p');
-        copy.textContent = `${profileName} is using parent-managed viewing settings. Ask the parent or caregiver profile to change access.`;
+        copy.textContent = `${profileName} can use only the viewing spaces approved by the parent or caregiver profile.`;
         copy.style.cssText = 'font-size:14px;line-height:1.5;margin:0;color:#cbd5e1';
 
         const dashboardButton = document.createElement('button');
@@ -496,9 +555,9 @@ function showManagedViewingBlockedOverlay(decision) {
             'min-height:44px',
             'width:100%',
             'margin-top:20px',
-            'border:1px solid rgba(148,163,184,.36)',
+            'border:1px solid rgba(255,255,255,.22)',
             'border-radius:8px',
-            'background:#17202b',
+            'background:rgba(18,27,38,.82)',
             'color:#e2e8f0',
             'font-weight:800',
             'font-size:14px',
@@ -692,11 +751,13 @@ function showManagedTimeoutOverlay(state) {
                 'align-items:center',
                 'justify-content:center',
                 'padding:24px',
-                'background:rgba(8,13,18,.94)',
+                'background:linear-gradient(180deg,#dcebf4 0%,#edf5f1 52%,#f7f4ec 100%)',
                 'color:#f8fafc',
-                'font-family:Inter,Roboto,Arial,sans-serif',
-                'pointer-events:auto'
+                'font-family:Roboto,Arial,sans-serif',
+                'pointer-events:auto',
+                'overflow:hidden'
             ].join(';');
+            applyManagedOverlayShell(overlay);
             host.appendChild(overlay);
         }
 
@@ -710,29 +771,22 @@ function showManagedTimeoutOverlay(state) {
         const usedCopy = formatManagedTimeoutDuration(state?.consumedSeconds);
         const policyExpired = state?.reason === 'expired_policy_requires_parent_revalidation';
         overlay.innerHTML = '';
+        appendManagedOverlayBackground(overlay);
 
-        const panel = document.createElement('section');
-        panel.style.cssText = [
-            'width:min(420px,100%)',
-            'border:1px solid rgba(148,163,184,.32)',
-            'border-radius:8px',
-            'background:#101820',
-            'box-shadow:0 24px 80px rgba(0,0,0,.45)',
-            'padding:24px'
-        ].join(';');
+        const panel = createManagedOverlayPanel();
 
         const eyebrow = document.createElement('div');
-        eyebrow.textContent = 'FilterTube managed profile';
-        eyebrow.style.cssText = 'color:#f87171;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0;margin-bottom:10px';
+        eyebrow.textContent = 'FilterTube quiet time';
+        eyebrow.style.cssText = 'color:#fca5a5;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0;margin-bottom:10px';
 
         const title = document.createElement('h1');
         title.textContent = policyExpired ? `${surfaceLabel} needs parent approval` : `${surfaceLabel} time is finished for today`;
-        title.style.cssText = 'font-size:22px;line-height:1.2;margin:0 0 10px;font-weight:800;color:#fff';
+        title.style.cssText = 'font-size:23px;line-height:1.2;margin:0 0 10px;font-weight:800;color:#fff';
 
         const copy = document.createElement('p');
         copy.textContent = policyExpired
             ? `${profileName} has a time policy that needs the parent or caregiver profile to approve again.`
-            : `${profileName} has used today's parent-managed YouTube time. Ask the parent or caregiver profile for more time.`;
+            : `${profileName} has used today's YouTube time. Come back after the daily reset, or ask a parent for more time.`;
         copy.style.cssText = 'font-size:14px;line-height:1.5;margin:0;color:#cbd5e1';
 
         const facts = document.createElement('dl');
@@ -780,7 +834,7 @@ function showManagedTimeoutOverlay(state) {
             'min-height:44px',
             'border:0',
             'border-radius:8px',
-            'background:#ef4444',
+            'background:#b44339',
             'color:#fff',
             'font-weight:800',
             'font-size:14px',
@@ -792,9 +846,9 @@ function showManagedTimeoutOverlay(state) {
         dashboardButton.textContent = 'Open FilterTube';
         dashboardButton.style.cssText = [
             'min-height:44px',
-            'border:1px solid rgba(148,163,184,.36)',
+            'border:1px solid rgba(255,255,255,.22)',
             'border-radius:8px',
-            'background:#17202b',
+            'background:rgba(18,27,38,.82)',
             'color:#e2e8f0',
             'font-weight:800',
             'font-size:14px',

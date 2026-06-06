@@ -36,14 +36,15 @@ grant path.
 When no protected profile is available yet, the command center now shows setup
 handoffs for creating a child profile and, for Default/Master, creating an
 independent account profile through the existing gated profile-creation flows.
-The empty provider rows now explicitly tell the parent to create a protected
-profile first; mailbox and local-network delivery remain optional transport
-setup after a protected device/profile exists.
-The provider rows now use parent-facing delivery language: live P2P is
-immediate when both devices are connected, mailbox is encrypted later delivery
-for offline protected devices, and LAN is same-network gateway delivery only.
-The copy explicitly says transport does not replace local trusted-link and
-signature validation.
+The zero-profile state now hides optional delivery-provider rows and shows a
+short parent setup checklist first. The normal one-profile state hides bulk
+controls, hides unconfigured mailbox/LAN setup, and uses row-level actions so
+parents are not forced through advanced transport choices. Provider modals use
+parent-facing wording only when an existing provider is being edited. The Help
+page now includes plain-language Managed Parent Controls, time-finished, and
+remote-update cards under Profiles/PINs. The runtime timeout and viewing-space
+blocked overlays now reuse the bundled serene FilterTube hero video background
+with a dark calm scrim while preserving the same lock/request authority.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 
@@ -127,10 +128,11 @@ state without exposing plaintext rule values:
   links only. A live connected verified replica receives signed envelopes over
   Nanah immediately. Optional mailbox/LAN providers receive ciphertext items or
   signed local-network candidates only when those provider hooks exist.
-- Mailbox and LAN setup rows are explanatory transport controls only. Mailbox
-  means encrypted later delivery for offline devices; LAN means an explicit
-  trusted same-network gateway. Neither label grants authority, discovers trust,
-  or bypasses target-profile/signature/revision validation.
+- Mailbox and LAN setup rows are explanatory transport controls only and remain
+  hidden from the normal parent command center unless a provider is already
+  configured. The visible parent workflow is protected profile -> rules/access/
+  time -> verified-device/live P2P. Later-update and same-network providers
+  remain optional advanced delivery hooks, not the default parent path.
 - The Delivery row preview is a redacted status summary only. It can say Live
   now, LAN provider ready, Mailbox later, Provider setup needed, Re-pair before
   sending, Refresh stale link, Review conflict first, or Pair verified device;
@@ -145,26 +147,26 @@ state without exposing plaintext rule values:
   local HTTP gateways, but discovery remains transport only; target trust,
   source key, scope, revision, hash, and signature validation still happen in
   the local managed-policy apply path.
-- `Configure Mailbox` and `Edit Mailbox` save or clear only the encrypted
+- `Configure Mailbox`/`Edit Mailbox` and their parent-facing Later Updates
+  labels save or clear only the encrypted
   mailbox endpoint configuration after parent/account re-auth. They do not
   create a sync account, publish rules, expose tokens in the UI, or turn the
   mailbox server into policy authority. The setup flow first asks parents to
   Configure/Edit or explicitly Disable Mailbox, and the endpoint prompt also
   treats a blank endpoint as disabling mailbox delivery so the visible prompt
   matches runtime behavior.
-- `Configure LAN` and `Edit LAN` save or clear only the local-network gateway
+- `Configure LAN`/`Edit LAN` and their parent-facing Same-Network labels save or clear only the local-network gateway
   endpoint configuration after parent/account re-auth. They do not create
   authority from network reachability, expose tokens in the UI, or let a LAN
   gateway choose profiles/rules. The setup flow now first asks parents to
   Configure/Edit or explicitly Disable LAN; an empty endpoint no longer acts
   as the disable command.
-- Provider setup copy states that live P2P can still send immediately when
-  devices are connected and that providers are delivery paths only; local
-  trusted-link, target-profile, scope, revision, hash, and signature validation
-  remains the authority.
-- When there are zero manageable protected profiles, provider rows do not imply
-  mailbox or LAN setup is the first step. They say to create a protected
-  profile first, then pair/configure delivery if later updates are needed.
+- Provider setup copy uses parent/user language and avoids presenting revision,
+  hash, or signature details in the decision modal. Audit docs retain those
+  proof details; the product surface says that protected devices accept only
+  trusted parent updates.
+- When there are zero manageable protected profiles, provider rows are hidden
+  so mailbox or LAN setup cannot look like the first step.
 - Accepted mailbox provider configure/disable actions write redacted history
   rows to every currently manageable protected profile. Those rows include only
   configured/disabled state, target count, and endpoint host when configured;
@@ -267,9 +269,9 @@ Required UI states for that slice:
 - offline trusted device;
 - rejected or conflicted remote update;
 - failed provider/mailbox pull through protected history/status labels;
-- time limit exhausted via the existing runtime timeout overlay, including the
-  protected-user "Ask parent for more time" guidance state that does not grant
-  authority or dismiss the lock;
+- time limit exhausted via the runtime timeout overlay, including the serene
+  video background and protected-user "Ask parent for more time" guidance state
+  that does not grant authority or dismiss the lock;
 - no-policy/no-work state.
 
 Design constraints:

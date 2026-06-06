@@ -555,119 +555,63 @@
         title.textContent = 'Managed Parent Controls';
         const body = document.createElement('div');
         body.className = 'help-item-body';
-        body.textContent = 'Overview of protected profiles, policy sync, time limits, action history, and delegated actions.';
+        body.textContent = summary.profileCount > 0
+            ? 'Manage protected profiles, daily YouTube time, Main/Kids access, rules, and verified-device delivery.'
+            : 'Start with one protected child/user profile. Delivery options appear after there is a protected profile to manage.';
         const meta = document.createElement('div');
         meta.className = 'ft-managed-command-center__meta';
-        meta.textContent = `${summary.profileCount} protected profiles | ${summary.limitedCount} time limits | ${summary.pendingExtraTimeRequestCount} requests | ${summary.remoteScopeCount} remote scopes | ${summary.protectedRowCount} protected history`;
+        meta.textContent = summary.profileCount > 0
+            ? `${summary.profileCount} protected | ${summary.limitedCount} limits | ${summary.pendingExtraTimeRequestCount} requests | ${summary.syncReadyProfileCount} ready`
+            : 'Setup needed';
+        meta.title = summary.profileCount > 0
+            ? 'Protected profiles shown here can be managed only by the current parent/account authority.'
+            : 'Create a protected profile first; optional mailbox and LAN delivery are hidden until a protected profile exists.';
         titleWrap.append(title, body);
         heading.append(titleWrap, meta);
         panel.appendChild(heading);
 
-        const strip = document.createElement('div');
-        strip.className = 'ft-managed-command-center__strip';
-        [
-            { label: 'Protected', value: summary.profileCount, tone: 'neutral' },
-            { label: 'Ready', value: summary.syncReadyProfileCount, tone: summary.syncReadyProfileCount ? 'success' : 'neutral' },
-            { label: 'Requests', value: summary.pendingExtraTimeRequestCount, tone: summary.pendingExtraTimeRequestCount ? 'warning' : 'neutral' },
-            { label: 'Needs re-pair', value: summary.syncRepairProfileCount, tone: summary.syncRepairProfileCount ? 'warning' : 'neutral' },
-            { label: 'Conflicts', value: summary.remoteConflictCount, tone: summary.remoteConflictCount ? 'danger' : 'neutral' }
-        ].forEach((item) => {
-            const card = document.createElement('div');
-            card.className = `ft-managed-command-center__strip-item is-${item.tone}`;
-            const value = document.createElement('strong');
-            value.textContent = String(Number(item.value) || 0);
-            const label = document.createElement('span');
-            label.textContent = item.label;
-            card.append(value, label);
-            strip.appendChild(card);
-        });
-        panel.appendChild(strip);
-
-        const mailbox = h.safeObject(summary.mailboxConfig);
-        const mailboxPanel = document.createElement('div');
-        mailboxPanel.className = `ft-managed-command-center__provider is-${mailbox.tone || (mailbox.configured ? 'success' : 'warning')}`;
-        const mailboxCopy = document.createElement('div');
-        mailboxCopy.className = 'ft-managed-command-center__provider-copy';
-        const mailboxTitle = document.createElement('strong');
-        mailboxTitle.textContent = mailbox.label || (mailbox.configured ? 'Mailbox configured' : 'Mailbox not configured');
-        const mailboxDetail = document.createElement('span');
-        mailboxDetail.textContent = summary.profileCount > 0
-            ? (mailbox.detail || 'Live P2P can send now. Mailbox is only for encrypted later delivery when the protected device is offline.')
-            : 'Create a protected profile first. Mailbox delivery is optional and only useful after a protected device is paired.';
-        const mailboxRoute = document.createElement('span');
-        mailboxRoute.textContent = mailbox.configured
-            ? 'Offline updates can be picked up later; local trusted-link and signature checks still decide whether they apply.'
-            : 'Leave this off for live-only control; configure it when parent changes must wait for the child device to open later.';
-        mailboxCopy.append(mailboxTitle, mailboxDetail, mailboxRoute);
-        mailboxPanel.appendChild(mailboxCopy);
-        if (h.onAction) {
-            const mailboxButton = document.createElement('button');
-            mailboxButton.className = 'btn-secondary';
-            mailboxButton.type = 'button';
-            mailboxButton.textContent = mailbox.configured ? 'Edit Mailbox' : 'Configure Mailbox';
-            mailboxButton.title = 'Requires parent/account re-auth. The provider stores only encrypted mailbox items.';
-            mailboxButton.addEventListener('click', (event) => {
-                event.preventDefault();
-                Promise.resolve(h.onAction({
-                    action: 'configure_mailbox',
-                    scope: 'mailbox_provider',
-                    authority: 'managed_policy_provider_delivery',
-                    sensitiveAction: true
-                })).catch(() => {});
-            });
-            mailboxPanel.appendChild(mailboxButton);
-        }
-        panel.appendChild(mailboxPanel);
-
-        const localNetwork = h.safeObject(summary.localNetworkConfig);
-        const localPanel = document.createElement('div');
-        localPanel.className = `ft-managed-command-center__provider is-${localNetwork.tone || (localNetwork.configured ? 'success' : 'warning')}`;
-        const localCopy = document.createElement('div');
-        localCopy.className = 'ft-managed-command-center__provider-copy';
-        const localTitle = document.createElement('strong');
-        localTitle.textContent = localNetwork.label || (localNetwork.configured ? 'LAN provider configured' : 'LAN provider not configured');
-        const localDetail = document.createElement('span');
-        localDetail.textContent = summary.profileCount > 0
-            ? (localNetwork.detail || 'Same-network delivery needs an explicit local gateway; LAN discovery is never authority.')
-            : 'Create a protected profile first. Local-network delivery is optional and does not replace signed trusted-link validation.';
-        const localRoute = document.createElement('span');
-        localRoute.textContent = localNetwork.configured
-            ? 'The gateway moves signed candidates only; the protected profile still rejects stale, spoofed, or untrusted updates.'
-            : 'Use this only for a trusted same-network gateway; ordinary network reachability never grants control.';
-        localCopy.append(localTitle, localDetail, localRoute);
-        localPanel.appendChild(localCopy);
-        if (h.onAction) {
-            const localButton = document.createElement('button');
-            localButton.className = 'btn-secondary';
-            localButton.type = 'button';
-            localButton.textContent = localNetwork.configured ? 'Edit LAN' : 'Configure LAN';
-            localButton.title = 'Requires parent/account re-auth. Discovery is not authority; signed policy validation still happens locally.';
-            localButton.addEventListener('click', (event) => {
-                event.preventDefault();
-                Promise.resolve(h.onAction({
-                    action: 'configure_local_network',
-                    scope: 'local_network_provider',
-                    authority: 'managed_policy_provider_delivery',
-                    sensitiveAction: true
-                })).catch(() => {});
-            });
-            localPanel.appendChild(localButton);
-        }
-        panel.appendChild(localPanel);
-
         if (!summary.rows.length) {
-            const empty = document.createElement('div');
-            empty.className = 'ft-managed-command-center__empty';
-            empty.textContent = 'No protected profiles are available for this parent/account profile yet.';
-            panel.appendChild(empty);
-            if (h.onAction) {
-                const setup = document.createElement('div');
-                setup.className = 'ft-managed-command-center__setup';
-                const setupCopy = document.createElement('div');
-                setupCopy.className = 'help-item-body';
-                setupCopy.textContent = 'Start by creating a protected child/user profile. After that, set Main/Kids access, daily YouTube time, rules, and verified-device delivery from this panel.';
-                setup.appendChild(setupCopy);
+            const setup = document.createElement('div');
+            setup.className = 'ft-managed-command-center__setup is-empty';
 
+            const setupTitle = document.createElement('strong');
+            setupTitle.className = 'ft-managed-command-center__setup-title';
+            setupTitle.textContent = 'First setup';
+            setupTitle.title = 'Use this from the parent/master profile. Child profiles do not receive admin controls.';
+
+            const setupCopy = document.createElement('div');
+            setupCopy.className = 'help-item-body';
+            setupCopy.textContent = 'Create a protected profile, set what it can watch, then pair a verified device if updates need to reach another device.';
+
+            const steps = document.createElement('ol');
+            steps.className = 'ft-managed-command-center__setup-steps';
+            [
+                {
+                    text: 'Create a protected child/user profile',
+                    title: 'The profile gets its own Main and Kids rules. The parent/account keeps policy authority.'
+                },
+                {
+                    text: 'Set Main/Kids access and daily YouTube time',
+                    title: 'The runtime gate enforces access and time limits on YouTube surfaces for that profile.'
+                },
+                {
+                    text: 'Add keywords, channels, whitelist, or blocklist rules',
+                    title: 'Rules are edited from the parent/account surface, not from the child surface.'
+                },
+                {
+                    text: 'Pair a verified device only when remote delivery is needed',
+                    title: 'Live P2P, mailbox, and LAN delivery appear after a protected profile exists.'
+                }
+            ].forEach((item) => {
+                const step = document.createElement('li');
+                step.textContent = item.text;
+                step.title = item.title;
+                steps.appendChild(step);
+            });
+
+            setup.append(setupTitle, setupCopy, steps);
+
+            if (h.onAction) {
                 const setupActions = document.createElement('div');
                 setupActions.className = 'ft-managed-command-center__setup-actions';
                 const activeProfileId = typeof summary.activeProfileId === 'string' && summary.activeProfileId.trim()
@@ -709,15 +653,134 @@
                     setupActions.appendChild(createAccountBtn);
                 }
                 if (setupActions.children.length) setup.appendChild(setupActions);
-                panel.appendChild(setup);
             }
+
+            const setupNote = document.createElement('div');
+            setupNote.className = 'ft-managed-command-center__setup-note';
+            setupNote.textContent = 'Mailbox and LAN setup are optional delivery tools. They are not needed for local-only control.';
+            setupNote.title = 'Those options do not grant authority; a trusted profile link and local validation still decide whether an update applies.';
+            setup.appendChild(setupNote);
+            panel.appendChild(setup);
             return panel;
+        }
+
+        const strip = document.createElement('div');
+        strip.className = 'ft-managed-command-center__strip';
+        [
+            { label: 'Protected', value: summary.profileCount, tone: 'neutral', title: 'Profiles this parent/account can manage.', always: true },
+            { label: 'Ready', value: summary.syncReadyProfileCount, tone: summary.syncReadyProfileCount ? 'success' : 'neutral', title: 'Profiles with a verified delivery path available now or through a configured provider.', always: true },
+            { label: 'Pairing needed', value: summary.noDeviceProfileCount + summary.syncRepairProfileCount + summary.syncStaleProfileCount, tone: 'warning', title: 'Profiles that need a verified device, refreshed trust, or re-pairing before remote updates.' },
+            { label: 'Requests', value: summary.pendingExtraTimeRequestCount, tone: 'warning', title: 'Protected profiles asking for more YouTube time.' },
+            { label: 'Conflicts', value: summary.remoteConflictCount, tone: 'danger', title: 'Rejected or conflicting remote-policy history rows that need parent review.' }
+        ].filter(item => item.always || (Number(item.value) || 0) > 0).forEach((item) => {
+            const card = document.createElement('div');
+            card.className = `ft-managed-command-center__strip-item is-${item.tone}`;
+            card.title = item.title;
+            const value = document.createElement('strong');
+            value.textContent = String(Number(item.value) || 0);
+            const label = document.createElement('span');
+            label.textContent = item.label;
+            card.append(value, label);
+            strip.appendChild(card);
+        });
+        panel.appendChild(strip);
+
+        const mailbox = h.safeObject(summary.mailboxConfig);
+        const localNetwork = h.safeObject(summary.localNetworkConfig);
+        const shouldShowProviderSetup = mailbox.configured === true || localNetwork.configured === true;
+        if (shouldShowProviderSetup) {
+            const providerIntro = document.createElement('div');
+            providerIntro.className = 'ft-managed-command-center__provider-intro';
+            providerIntro.textContent = 'Optional delivery';
+            providerIntro.title = 'Live P2P is the normal path. These options are only for later or same-network delivery.';
+            panel.appendChild(providerIntro);
+        }
+
+        if (shouldShowProviderSetup && mailbox.configured === true) {
+        const mailboxPanel = document.createElement('div');
+        mailboxPanel.className = `ft-managed-command-center__provider is-${mailbox.tone || (mailbox.configured ? 'success' : 'warning')}`;
+        mailboxPanel.title = 'Optional: use this only when parent updates must wait for an offline protected device to open later.';
+        const mailboxCopy = document.createElement('div');
+        mailboxCopy.className = 'ft-managed-command-center__provider-copy';
+        const mailboxTitle = document.createElement('strong');
+        mailboxTitle.textContent = mailbox.configured
+            ? (mailbox.label || 'Later updates ready')
+            : 'Later updates off';
+        const mailboxDetail = document.createElement('span');
+        mailboxDetail.textContent = summary.profileCount > 0
+            ? (mailbox.detail || 'Use this when parent changes should wait for a protected device to open later.')
+            : 'Create a protected profile first. Later delivery is optional and only useful after a protected device is paired.';
+        const mailboxRoute = document.createElement('span');
+        mailboxRoute.textContent = mailbox.configured
+            ? 'The protected device still accepts only trusted parent updates.'
+            : 'Leave this off when live P2P is enough.';
+        mailboxCopy.append(mailboxTitle, mailboxDetail, mailboxRoute);
+        mailboxPanel.appendChild(mailboxCopy);
+        if (h.onAction) {
+            const mailboxButton = document.createElement('button');
+            mailboxButton.className = 'btn-secondary';
+            mailboxButton.type = 'button';
+            mailboxButton.textContent = mailbox.configured ? 'Edit Later Updates' : 'Set Up Later Updates';
+            mailboxButton.title = 'Requires parent/account re-auth. Use only when updates must wait for the protected device to open later.';
+            mailboxButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                Promise.resolve(h.onAction({
+                    action: 'configure_mailbox',
+                    scope: 'mailbox_provider',
+                    authority: 'managed_policy_provider_delivery',
+                    sensitiveAction: true
+                })).catch(() => {});
+            });
+            mailboxPanel.appendChild(mailboxButton);
+        }
+        panel.appendChild(mailboxPanel);
+        }
+
+        if (shouldShowProviderSetup && localNetwork.configured === true) {
+        const localPanel = document.createElement('div');
+        localPanel.className = `ft-managed-command-center__provider is-${localNetwork.tone || (localNetwork.configured ? 'success' : 'warning')}`;
+        localPanel.title = 'Optional: use this only for an explicitly configured same-network provider. Network reachability is not authority.';
+        const localCopy = document.createElement('div');
+        localCopy.className = 'ft-managed-command-center__provider-copy';
+        const localTitle = document.createElement('strong');
+        localTitle.textContent = localNetwork.configured
+            ? (localNetwork.label || 'Same-network updates ready')
+            : 'Same-network updates off';
+        const localDetail = document.createElement('span');
+        localDetail.textContent = summary.profileCount > 0
+            ? (localNetwork.detail || 'Use this only with a trusted FilterTube-compatible home/local gateway.')
+            : 'Create a protected profile first. Same-network delivery is optional and never replaces parent trust.';
+        const localRoute = document.createElement('span');
+        localRoute.textContent = localNetwork.configured
+            ? 'The protected device still accepts only trusted parent updates.'
+            : 'Leave this off unless you run a trusted local gateway.';
+        localCopy.append(localTitle, localDetail, localRoute);
+        localPanel.appendChild(localCopy);
+        if (h.onAction) {
+            const localButton = document.createElement('button');
+            localButton.className = 'btn-secondary';
+            localButton.type = 'button';
+            localButton.textContent = localNetwork.configured ? 'Edit Same-Network' : 'Set Up Same-Network';
+            localButton.title = 'Requires parent/account re-auth. Same-network reachability alone cannot change protected rules.';
+            localButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                Promise.resolve(h.onAction({
+                    action: 'configure_local_network',
+                    scope: 'local_network_provider',
+                    authority: 'managed_policy_provider_delivery',
+                    sensitiveAction: true
+                })).catch(() => {});
+            });
+            localPanel.appendChild(localButton);
+        }
+        panel.appendChild(localPanel);
         }
 
         const selectedProfiles = new Set();
         const selectedProfileInputs = [];
         const bulkIntents = buildManagedCommandCenterBulkActionIntents(summary.rows);
-        if (h.onAction && bulkIntents.length) {
+        const showBulkControls = h.onAction && bulkIntents.length && summary.rows.length > 1;
+        if (showBulkControls) {
             const bulkBar = document.createElement('div');
             bulkBar.className = 'ft-managed-command-center__bulk';
             const bulkStatus = document.createElement('span');
@@ -899,19 +962,25 @@
             const owner = document.createElement('span');
             owner.textContent = `${item.parentName} parent | ${item.locked ? 'locked' : 'unlocked'}`;
             const profileCell = document.createElement('div');
-            profileCell.className = 'ft-managed-command-center__profile';
+            profileCell.className = showBulkControls
+                ? 'ft-managed-command-center__profile'
+                : 'ft-managed-command-center__profile has-no-selection';
             const labelWrap = document.createElement('div');
             labelWrap.append(name, owner);
-            profileCell.append(selector, labelWrap);
+            if (showBulkControls) {
+                profileCell.append(selector, labelWrap);
+            } else {
+                profileCell.appendChild(labelWrap);
+            }
             const statusCell = document.createElement('div');
             statusCell.className = 'ft-managed-command-center__status';
             [
                 { label: item.viewingAccess, tone: 'neutral' },
                 { label: item.timeLimit, tone: item.timeLimited ? 'warning' : 'neutral' },
                 { label: syncState.label, tone: syncState.tone },
-                { label: item.syncLabel, tone: item.remoteScopeCount ? 'success' : 'neutral' },
+                item.remoteScopeCount ? { label: item.syncLabel, tone: 'success' } : null,
                 item.pendingExtraTimeRequestLabel ? { label: item.pendingExtraTimeRequestLabel, tone: 'warning' } : null,
-                item.latestDeliveryLabel ? { label: item.latestDeliveryLabel, tone: item.latestDeliveryTone || 'neutral' } : null,
+                item.syncTargetCount > 0 && item.latestDeliveryLabel ? { label: item.latestDeliveryLabel, tone: item.latestDeliveryTone || 'neutral' } : null,
                 item.syncSourceAckLabel ? { label: `Ack: ${item.syncSourceAckLabel}`, tone: 'neutral' } : null
             ].filter(Boolean).forEach((chip) => {
                 const status = document.createElement('span');
@@ -920,11 +989,14 @@
                 statusCell.appendChild(status);
             });
             row.appendChild(statusCell);
+            const hasVerifiedDevice = item.syncTargetCount > 0;
             [
-                { label: 'Delivery', value: item.deliveryPreview?.label || 'Pair verified device', note: item.deliveryPathDetail },
-                { label: 'Device', value: item.syncTargetLabel },
+                hasVerifiedDevice
+                    ? { label: 'Delivery', value: item.deliveryPreview?.label || 'Send when ready', note: item.deliveryPathDetail }
+                    : { label: 'Next step', value: 'Pair a verified device', note: 'Use live P2P when the parent and protected device are both open.' },
+                hasVerifiedDevice ? { label: 'Device', value: item.syncTargetLabel } : null,
                 item.pendingExtraTimeRequestDetail ? { label: 'Request', value: item.pendingExtraTimeRequestDetail } : null,
-                { label: 'History', value: `${item.historyRowCount} rows | latest ${item.latestActionLabel}` }
+                item.remoteConflictCount > 0 ? { label: 'Conflict', value: `${item.remoteConflictCount} needs review` } : null
             ].filter(Boolean).forEach((detail) => {
                 const cell = document.createElement('div');
                 cell.className = 'ft-managed-command-center__detail';
@@ -944,7 +1016,9 @@
             if (h.onAction && Array.isArray(item.actionIntents) && item.actionIntents.length) {
                 const actionWrap = document.createElement('div');
                 actionWrap.className = 'ft-managed-command-center__actions';
-                item.actionIntents.forEach((intent) => {
+                item.actionIntents
+                    .filter(intent => !(intent.action === 'send_managed_policy' && !hasVerifiedDevice))
+                    .forEach((intent) => {
                     const button = document.createElement('button');
                     button.className = 'btn-secondary';
                     button.type = 'button';

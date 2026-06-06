@@ -67,7 +67,8 @@
                 "js/injector.js",
                 "js/filter_logic.js",
                 "js/seed.js",
-                "js/shared/identity.js"
+                "js/shared/identity.js",
+                "assets/images/homepage_hero_day.mp4"
             ],
             "matches": [
                 "*://*.youtube.com/*",

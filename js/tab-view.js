@@ -9924,8 +9924,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!endpoint) {
             return {
                 configured: false,
-                label: 'Mailbox not configured',
-                detail: 'Live P2P can send now. Configure HTTPS mailbox delivery only when protected devices need encrypted updates later while offline.',
+                label: 'Later updates off',
+                detail: 'Live P2P can send now. Set up later updates only when protected devices need offline pickup.',
                 tone: 'warning'
             };
         }
@@ -9940,15 +9940,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!configured) {
             return {
                 configured: false,
-                label: 'Mailbox endpoint needs review',
-                detail: `${host} is saved but not accepted by the encrypted mailbox client.`,
+                label: 'Later updates need review',
+                detail: `${host} is saved but is not ready for offline pickup.`,
                 tone: 'warning'
             };
         }
         return {
             configured: true,
-            label: `Mailbox ready: ${host}`,
-            detail: 'Encrypted later delivery is available; server state stays ciphertext plus revision metadata and local validation still decides apply.',
+            label: `Later updates ready: ${host}`,
+            detail: 'Offline pickup is available. The protected device still accepts only trusted parent updates.',
             tone: 'success'
         };
     }
@@ -9956,6 +9956,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function promptManagedProviderSetupAction({
         title,
         message,
+        details,
         configured = false,
         configureLabel,
         disableLabel
@@ -9977,11 +9978,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         return showChoiceModal({
             title: title || 'Configure Managed Delivery',
             message: message || 'Choose how this managed delivery provider should be used.',
-            details: [
-                'Live P2P sends immediately when both devices are connected.',
-                'Mailbox is for encrypted later delivery when the protected device is offline.',
-                'Local-network gateway is for same-network delivery only; discovery is never authority.',
-                'Every delivery path still needs trusted link, target profile, scope, revision, hash, and signature validation locally.'
+            details: Array.isArray(details) ? details : [
+                'Use live P2P first when both devices are open.',
+                'Only add another delivery method when live P2P is not enough.',
+                'Child/protected profiles still cannot change parent rules from their own surface.'
             ],
             choices,
             cancelText: 'Cancel'
@@ -10000,11 +10000,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         const current = readNanahManagedMailboxServerConfig();
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
-            title: 'Encrypted Mailbox Delivery',
-            message: 'Mailbox delivery is for later managed updates when a protected device is offline. The mailbox stores encrypted policy items and revision metadata, not plaintext rules or PINs.',
+            title: 'Save Updates For Later',
+            message: 'Use this only when a parent may change rules while the protected device is offline. The child device can pick up the update next time it opens.',
+            details: [
+                'Skip this if both devices are usually open together.',
+                'The server is only a waiting room for unreadable updates.',
+                'Parent approval and the saved trusted device still decide what applies.'
+            ],
             configured: !!currentEndpoint,
-            configureLabel: currentEndpoint ? 'Edit Mailbox' : 'Configure Mailbox',
-            disableLabel: 'Disable Mailbox'
+            configureLabel: currentEndpoint ? 'Edit Later Updates' : 'Set Up Later Updates',
+            disableLabel: 'Turn Off Later Updates'
         });
         if (action === null) return;
         if (action === 'disable') {
@@ -10018,11 +10023,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const endpoint = await showPromptModal({
-            title: 'Configure Encrypted Mailbox',
-            message: 'Enter the HTTPS mailbox endpoint for later managed updates. Leave blank to disable mailbox delivery.',
+            title: 'Later Update Service',
+            message: 'Enter the HTTPS service that stores unreadable updates until the protected device opens. Leave blank to turn this off.',
             placeholder: 'https://example.com/filtertube',
             inputType: 'url',
-            confirmText: currentEndpoint ? 'Save Endpoint' : 'Enable Mailbox',
+            confirmText: currentEndpoint ? 'Save Service' : 'Enable Later Updates',
             initialValue: currentEndpoint
         });
         if (endpoint === null) return;
@@ -10038,11 +10043,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const token = await showPromptModal({
-            title: 'Mailbox Access Token',
-            message: 'Optional bearer token for this endpoint. Leave blank to keep the saved token. Enter a single dash to clear it.',
+            title: 'Service Password',
+            message: 'Optional. Leave blank to keep the saved password. Enter a single dash to clear it.',
             placeholder: 'Optional token',
             inputType: 'password',
-            confirmText: 'Save Provider',
+            confirmText: 'Save',
             initialValue: ''
         });
         if (token === null) return;
@@ -10085,11 +10090,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         const current = readNanahManagedLocalNetworkProviderConfig();
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
-            title: 'Local-Network Delivery',
-            message: 'Local-network delivery is for same-network managed updates through a configured gateway. Discovery is not authority; every candidate still has to validate locally.',
+            title: 'Same-Network Updates',
+            message: 'Use this only when you have a trusted home/local gateway that can pass parent updates to protected devices on the same network.',
+            details: [
+                'Skip this for normal live P2P control.',
+                'Being on the same network is not enough to change rules.',
+                'The protected device still accepts only trusted parent updates.'
+            ],
             configured: !!currentEndpoint,
-            configureLabel: currentEndpoint ? 'Edit LAN' : 'Configure LAN',
-            disableLabel: 'Disable LAN'
+            configureLabel: currentEndpoint ? 'Edit Same-Network Updates' : 'Set Up Same-Network Updates',
+            disableLabel: 'Turn Off Same-Network Updates'
         });
         if (action === null) return;
         if (action === 'disable') {
@@ -10103,11 +10113,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const endpoint = await showPromptModal({
-            title: 'Configure Local-Network Provider',
-            message: 'Enter the local-network gateway endpoint for same-network managed updates.',
+            title: 'Same-Network Gateway',
+            message: 'Enter the trusted local gateway endpoint. Leave this unset unless you run a FilterTube-compatible gateway.',
             placeholder: 'http://192.168.1.10:4177/filtertube',
             inputType: 'url',
-            confirmText: currentEndpoint ? 'Save Endpoint' : 'Enable LAN',
+            confirmText: currentEndpoint ? 'Save Gateway' : 'Enable Same-Network Updates',
             initialValue: currentEndpoint
         });
         if (endpoint === null) return;
@@ -10117,11 +10127,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const token = await showPromptModal({
-            title: 'Local-Network Access Token',
-            message: 'Optional bearer token for this gateway. Leave blank to keep the saved token. Enter a single dash to clear it.',
+            title: 'Gateway Password',
+            message: 'Optional. Leave blank to keep the saved password. Enter a single dash to clear it.',
             placeholder: 'Optional token',
             inputType: 'password',
-            confirmText: 'Save Provider',
+            confirmText: 'Save',
             initialValue: ''
         });
         if (token === null) return;
@@ -11201,8 +11211,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!endpoint) {
             return {
                 configured: false,
-                label: 'LAN provider not configured',
-                detail: 'Live P2P and mailbox can still work. Configure a local gateway only for trusted same-network managed delivery.',
+                label: 'Same-network updates off',
+                detail: 'Live P2P and later updates can still work. Set this up only if you run a trusted local gateway.',
                 tone: 'warning'
             };
         }
@@ -11210,15 +11220,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!configured) {
             return {
                 configured: false,
-                label: 'LAN endpoint needs review',
-                detail: `${host} is saved but not accepted by the local-network provider client.`,
+                label: 'Same-network updates need review',
+                detail: `${host} is saved but is not ready for local delivery.`,
                 tone: 'warning'
             };
         }
         return {
             configured: true,
-            label: `LAN provider ready: ${host}`,
-            detail: 'Same-network delivery can hand signed candidates to the gateway; trusted-link and signature validation still happen locally.',
+            label: `Same-network ready: ${host}`,
+            detail: 'Local delivery is available. The protected device still accepts only trusted parent updates.',
             tone: 'success'
         };
     }
