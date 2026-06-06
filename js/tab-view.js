@@ -6791,22 +6791,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function promptManagedBulkRuleSurface(ruleType) {
         const type = ruleType === 'video' ? 'video' : (ruleType === 'channel' ? 'channel' : 'keyword');
-        const rawSurface = await showPromptModal({
+        const surface = await showChoiceModal({
             title: type === 'video'
                 ? 'Add Video ID To Selected Profiles'
                 : (type === 'channel' ? 'Add Channel To Selected Profiles' : 'Add Keyword To Selected Profiles'),
-            message: 'Enter main or kids. The rule is added using each profile surface current Blocklist/Whitelist mode.',
-            placeholder: 'main or kids',
-            confirmText: 'Choose Surface',
-            initialValue: 'main'
+            message: 'Choose where this rule should be applied. FilterTube will use each protected profile surface current Blocklist/Whitelist mode.',
+            choices: [
+                {
+                    value: 'main',
+                    label: 'YouTube Main',
+                    className: 'btn-primary'
+                },
+                {
+                    value: 'kids',
+                    label: 'YouTube Kids',
+                    className: 'btn-secondary'
+                }
+            ],
+            cancelText: 'Cancel'
         });
-        if (rawSurface === null) return null;
-        const surface = normalizeString(rawSurface).toLowerCase();
-        if (surface !== 'main' && surface !== 'kids') {
-            UIComponents.showToast('Use main or kids for the managed rule surface', 'error');
-            return null;
-        }
-        return surface;
+        return surface === 'kids' ? 'kids' : (surface === 'main' ? 'main' : null);
     }
 
     async function promptManagedBulkRuleValue(ruleType) {
