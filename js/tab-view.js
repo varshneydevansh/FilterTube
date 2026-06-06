@@ -6038,7 +6038,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function isManagedChildEditorView(viewId) {
-        return ['dashboard', 'filters', 'semantic', 'kids', 'settings'].includes(normalizeString(viewId));
+        return ['dashboard', 'filters', 'semantic', 'kids', 'settings', 'sync'].includes(normalizeString(viewId));
     }
 
     function endManagedChildEdit() {
@@ -6089,7 +6089,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const title = document.createElement('strong');
         title.textContent = `Editing protected profile: ${normalizeString(profile.name) || 'Profile'}`;
         const body = document.createElement('span');
-        body.textContent = 'Parent-managed profile edit mode. Dashboard, Filters, Kids Mode, Settings, and Semantic ML stay scoped to this protected profile where editing is supported.';
+        body.textContent = currentViewId === 'sync'
+            ? 'Accounts & Sync stays under the parent/account authority. Use this protected profile row or command center to pair devices, review history, and send parent-approved updates.'
+            : 'Parent-managed profile edit mode. Dashboard, Filters, Kids Mode, Settings, and Semantic ML stay scoped to this protected profile where editing is supported.';
         copy.appendChild(title);
         copy.appendChild(body);
 

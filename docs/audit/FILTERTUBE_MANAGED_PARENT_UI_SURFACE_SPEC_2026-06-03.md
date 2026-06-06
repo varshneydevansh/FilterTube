@@ -45,6 +45,10 @@ page now includes plain-language Managed Parent Controls, time-finished, and
 remote-update cards under Profiles/PINs. The runtime timeout and viewing-space
 blocked overlays now reuse the bundled serene FilterTube hero video background
 with a dark calm scrim while preserving the same lock/request authority.
+Accounts & Sync is allowed while a parent is editing a protected profile, but
+the banner now makes clear that this remains the parent/account authority
+surface for pairing, history, and sending parent-approved updates; it is not a
+child-authorized sync page.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 
