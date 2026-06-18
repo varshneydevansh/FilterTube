@@ -7828,8 +7828,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }));
         if (!choices.length) return null;
         const selected = await showChoiceModal({
-            title: 'Refresh Imported List',
-            message: 'Choose the URL-backed list to refresh. FilterTube will load the saved public HTTPS source, then require parent/account unlock before changing protected profiles.',
+            title: 'Check Imported List URL',
+            message: 'Choose the URL-backed list to check. FilterTube loads the saved public HTTPS source first; changed content can refresh rules after parent/account unlock.',
             details: urlBacked.slice(0, 5).map((summary) => {
                 const surfaces = summary.surfaces.includes('main') && summary.surfaces.includes('kids')
                     ? 'Main + Kids'
@@ -7947,6 +7947,121 @@ document.addEventListener('DOMContentLoaded', async () => {
         return {
             changed: changedCount > 0,
             changedCount
+        };
+    }
+
+    function buildManagedChannelListCheckedMetadataPatch(selectedList, loaded, parsed, checkedAt) {
+        const sourceMetadata = safeObject(parsed?.sourceMetadata);
+        return {
+            managedListSourceLabel: normalizeString(loaded?.sourceLabel) || normalizeString(selectedList?.sourceLabel) || 'Imported list',
+            managedListSourceUrl: normalizeManagedChannelListSourceUrl(loaded?.url || selectedList?.sourceUrl),
+            managedListLastCheckedAt: checkedAt,
+            managedListContentHash: normalizeString(parsed?.contentHash || selectedList?.contentHash),
+            managedListSourceTitle: normalizeManagedChannelListMetadataValue(sourceMetadata.title),
+            managedListSourceVersion: normalizeManagedChannelListMetadataValue(sourceMetadata.sourceVersion),
+            managedListSourceUpdatedLabel: normalizeManagedChannelListMetadataValue(sourceMetadata.sourceUpdatedLabel),
+            managedListSourceHomepage: normalizeManagedChannelListMetadataValue(sourceMetadata.homepage, 240)
+        };
+    }
+
+    function applyManagedChannelListCheckedMetadataToSurface(target, surface, selectedList, loaded, parsed, checkedAt) {
+        const item = safeObject(target);
+        const listId = normalizeString(selectedList?.listId);
+        if (!listId) return { changed: false, changedCount: 0 };
+        const metadata = buildManagedChannelListCheckedMetadataPatch(selectedList, loaded, parsed, checkedAt);
+        let changedCount = 0;
+        getManagedChannelListSurfaceKeys(surface).forEach((listKey) => {
+            const list = Array.isArray(item[listKey]) ? item[listKey] : [];
+            if (!list.length) return;
+            let listChanged = false;
+            const next = list.map((row) => {
+                if (normalizeString(row?.managedListId) !== listId || !row || typeof row !== 'object') return row;
+                changedCount += 1;
+                listChanged = true;
+                const nextRow = {
+                    ...row,
+                    managedListSourceLabel: metadata.managedListSourceLabel,
+                    managedListSourceUrl: metadata.managedListSourceUrl,
+                    managedListLastCheckedAt: metadata.managedListLastCheckedAt,
+                    managedListContentHash: metadata.managedListContentHash
+                };
+                ['managedListSourceTitle', 'managedListSourceVersion', 'managedListSourceUpdatedLabel', 'managedListSourceHomepage'].forEach((field) => {
+                    if (normalizeString(metadata[field])) {
+                        nextRow[field] = metadata[field];
+                    } else {
+                        delete nextRow[field];
+                    }
+                });
+                return nextRow;
+            });
+            if (listChanged) item[listKey] = next;
+        });
+        return {
+            changed: changedCount > 0,
+            changedCount
+        };
+    }
+
+    function applyLoadedManagedChannelListCheckToProfiles({
+        profiles,
+        eligibleIds,
+        currentActive,
+        selectedList,
+        loaded,
+        parsed,
+        checkedAt
+    }) {
+        const checkedProfileIds = [];
+        const checkedSurfaces = new Set();
+        let checkedCount = 0;
+
+        for (const targetId of safeArray(eligibleIds)) {
+            const profile = safeObject(profiles[targetId]);
+            let nextProfile = profile;
+            let profileChanged = false;
+            let profileCheckedCount = 0;
+
+            for (const surface of ['main', 'kids']) {
+                const priorForReport = nextProfile;
+                const nextSurface = getProfileSurface(nextProfile, surface);
+                const result = applyManagedChannelListCheckedMetadataToSurface(nextSurface, surface, selectedList, loaded, parsed, checkedAt);
+                if (!result.changed) continue;
+                nextProfile = setProfileSurface(nextProfile, surface, nextSurface);
+                const report = buildManagedChildLocalEditReport({
+                    actorProfileId: currentActive,
+                    targetProfileId: targetId,
+                    surface,
+                    priorProfile: priorForReport,
+                    nextSurface
+                });
+                report.historyRow = {
+                    ...report.historyRow,
+                    actionType: 'policy.channel_list.check',
+                    summary: {
+                        ...safeObject(report.historyRow.summary),
+                        label: 'Channel list checked',
+                        surface,
+                        checkedCount: result.changedCount || 0,
+                        listEntryCount: safeArray(parsed?.channels).length,
+                        contentChanged: false
+                    }
+                };
+                nextProfile = recordManagedChildLocalEditHistory(nextProfile, report);
+                profileChanged = true;
+                profileCheckedCount += result.changedCount || 0;
+                checkedSurfaces.add(surface);
+            }
+
+            if (!profileChanged) continue;
+            profiles[targetId] = nextProfile;
+            checkedCount += profileCheckedCount;
+            checkedProfileIds.push(targetId);
+        }
+
+        return {
+            checkedCount,
+            checkedProfileIds,
+            checkedSurfaces
         };
     }
 
@@ -8701,18 +8816,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const parsed = refreshCandidate.parsed;
+        const unchangedContentHash = normalizeString(selectedList.contentHash)
+            && normalizeString(selectedList.contentHash) === normalizeString(parsed.contentHash);
 
         const confirmRefresh = await showChoiceModal({
-            title: `Refresh ${selectedList.listName}?`,
-            message: `This will replace the current list-derived rows for ${selectedList.profileIds.length} selected ${pluralize(selectedList.profileIds.length, 'profile')} with the latest channels from the saved URL.`,
+            title: unchangedContentHash ? `Check ${selectedList.listName}?` : `Refresh ${selectedList.listName}?`,
+            message: unchangedContentHash
+                ? `The saved URL content matches the current source hash. FilterTube will update checked/source metadata only after parent/account unlock.`
+                : `This will replace the current list-derived rows for ${selectedList.profileIds.length} selected ${pluralize(selectedList.profileIds.length, 'profile')} with the latest channels from the saved URL.`,
             details: [
-                `${selectedList.channelCount} current ${pluralize(selectedList.channelCount, 'channel')} will be replaced where this list is present`,
+                unchangedContentHash
+                    ? `${selectedList.channelCount} current ${pluralize(selectedList.channelCount, 'channel')} stay unchanged`
+                    : `${selectedList.channelCount} current ${pluralize(selectedList.channelCount, 'channel')} will be replaced where this list is present`,
                 `${parsed.channels.length} valid ${pluralize(parsed.channels.length, 'channel')} found in the latest URL content`,
+                unchangedContentHash ? 'No channel rows will be replaced because the source hash is unchanged' : 'Changed source content will replace matching list-derived rows',
                 parsed.skippedCount ? `${parsed.skippedCount} ${pluralize(parsed.skippedCount, 'row')} skipped for safety` : 'No rows skipped',
                 'Parent/account re-auth is required before anything changes.'
             ],
             choices: [
-                { value: 'refresh', label: 'Refresh List', className: 'btn-primary' }
+                { value: 'refresh', label: unchangedContentHash ? 'Update Checked Time' : 'Refresh List', className: 'btn-primary' }
             ],
             cancelText: 'Cancel'
         });
@@ -8727,15 +8849,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const refreshedAt = Date.now();
-        const refreshResult = applyLoadedManagedChannelListRefreshToProfiles({
-            profiles,
-            eligibleIds,
-            currentActive,
-            selectedList,
-            loaded: refreshCandidate.loaded,
-            parsed,
-            refreshedAt
-        });
+        const refreshResult = unchangedContentHash
+            ? {
+                ...applyLoadedManagedChannelListCheckToProfiles({
+                    profiles,
+                    eligibleIds,
+                    currentActive,
+                    selectedList,
+                    loaded: refreshCandidate.loaded,
+                    parsed,
+                    checkedAt: refreshedAt
+                }),
+                changedCount: 0,
+                addedCount: 0,
+                removedCount: 0,
+                duplicateCount: 0,
+                changedProfileIds: [],
+                changedSurfaces: new Set()
+            }
+            : applyLoadedManagedChannelListRefreshToProfiles({
+                profiles,
+                eligibleIds,
+                currentActive,
+                selectedList,
+                loaded: refreshCandidate.loaded,
+                parsed,
+                refreshedAt
+            });
         const {
             changedCount,
             addedCount,
@@ -8745,7 +8885,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             changedSurfaces
         } = refreshResult;
 
-        if (!changedCount) {
+        if (!changedCount && !refreshResult.checkedProfileIds?.length) {
             UIComponents.showToast('No selected profiles had that URL-backed list', 'info');
             return;
         }
@@ -8760,6 +8900,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         await refreshProfilesUI();
         renderChannels();
         renderKidsChannels();
+        if (unchangedContentHash) {
+            UIComponents.showToast(
+                `Checked ${selectedList.listName}: no channel changes`,
+                'success'
+            );
+            return;
+        }
         UIComponents.showToast(
             `Refreshed ${selectedList.listName}: ${addedCount} added, ${removedCount} replaced${duplicateCount ? `, ${duplicateCount} already present` : ''}`,
             'success'
@@ -8853,21 +9000,28 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
+        const contentChangedCandidates = loadedCandidates.filter((item) => {
+            const priorHash = normalizeString(item?.selectedList?.contentHash);
+            const nextHash = normalizeString(item?.parsed?.contentHash);
+            return !priorHash || priorHash !== nextHash;
+        });
+        const unchangedCandidates = loadedCandidates.filter(item => !contentChangedCandidates.includes(item));
         const totalValidChannels = loadedCandidates.reduce((total, item) => total + safeArray(item?.parsed?.channels).length, 0);
         const totalSkippedRows = loadedCandidates.reduce((total, item) => total + (Number(item?.parsed?.skippedCount) || 0), 0);
         const confirmRefresh = await showChoiceModal({
             title: staleOnly
-                ? `Refresh ${loadedCandidates.length} stale URL ${pluralize(loadedCandidates.length, 'list')}?`
-                : `Refresh ${loadedCandidates.length} URL-backed ${pluralize(loadedCandidates.length, 'list')}?`,
-            message: `FilterTube loaded ${loadedCandidates.length} ${staleOnly ? 'stale ' : ''}URL-backed ${pluralize(loadedCandidates.length, 'list')} for ${eligibleIds.length} selected protected ${pluralize(eligibleIds.length, 'profile')}.`,
+                ? `Check ${loadedCandidates.length} stale URL ${pluralize(loadedCandidates.length, 'list')}?`
+                : `Check ${loadedCandidates.length} URL-backed ${pluralize(loadedCandidates.length, 'list')}?`,
+            message: `FilterTube loaded ${loadedCandidates.length} ${staleOnly ? 'stale ' : ''}URL-backed ${pluralize(loadedCandidates.length, 'list')} for ${eligibleIds.length} selected protected ${pluralize(eligibleIds.length, 'profile')}. Changed sources will refresh channel rows; unchanged sources only update checked metadata.`,
             details: [
                 `${totalValidChannels} valid ${pluralize(totalValidChannels, 'channel')} found across loaded lists`,
+                `${contentChangedCandidates.length} ${pluralize(contentChangedCandidates.length, 'list')} changed | ${unchangedCandidates.length} unchanged`,
                 totalSkippedRows ? `${totalSkippedRows} ${pluralize(totalSkippedRows, 'row')} skipped for safety` : 'No rows skipped',
                 failedCandidates.length ? `${failedCandidates.length} ${pluralize(failedCandidates.length, 'list')} could not be loaded and will be left unchanged` : 'All URL-backed lists loaded',
                 'Parent/account re-auth is required before anything changes.'
             ],
             choices: [
-                { value: 'refresh_all', label: 'Refresh Loaded Lists', className: 'btn-primary' }
+                { value: 'refresh_all', label: contentChangedCandidates.length ? 'Refresh Changed Lists' : 'Update Checked Time', className: 'btn-primary' }
             ],
             cancelText: 'Cancel'
         });
@@ -8883,13 +9037,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const refreshedAt = Date.now();
         const changedProfileIdsSet = new Set();
+        const checkedProfileIdsSet = new Set();
         const changedSurfaces = new Set();
         let changedListCount = 0;
+        let checkedListCount = 0;
+        let checkedRowCount = 0;
         let addedCount = 0;
         let removedCount = 0;
         let duplicateCount = 0;
 
-        for (const candidate of loadedCandidates) {
+        for (const candidate of contentChangedCandidates) {
             const result = applyLoadedManagedChannelListRefreshToProfiles({
                 profiles,
                 eligibleIds,
@@ -8908,8 +9065,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             result.changedSurfaces.forEach(surface => changedSurfaces.add(surface));
         }
 
-        if (!changedProfileIdsSet.size) {
-            UIComponents.showToast('Loaded URL-backed lists did not change selected protected profiles', 'info');
+        for (const candidate of unchangedCandidates) {
+            const result = applyLoadedManagedChannelListCheckToProfiles({
+                profiles,
+                eligibleIds,
+                currentActive,
+                selectedList: candidate.selectedList,
+                loaded: candidate.loaded,
+                parsed: candidate.parsed,
+                checkedAt: refreshedAt
+            });
+            if (!result.checkedProfileIds.length) continue;
+            checkedListCount += 1;
+            checkedRowCount += result.checkedCount;
+            safeArray(result.checkedProfileIds).forEach(id => checkedProfileIdsSet.add(id));
+        }
+
+        if (!changedProfileIdsSet.size && !checkedProfileIdsSet.size) {
+            UIComponents.showToast('Loaded URL-backed lists were not present on selected protected profiles', 'info');
             return;
         }
 
@@ -8923,10 +9096,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         await refreshProfilesUI();
         renderChannels();
         renderKidsChannels();
-        UIComponents.showToast(
-            `Refreshed ${changedListCount} ${pluralize(changedListCount, 'list')}: ${addedCount} added, ${removedCount} replaced${duplicateCount ? `, ${duplicateCount} already present` : ''}`,
-            'success'
-        );
+        if (changedListCount) {
+            UIComponents.showToast(
+                `Refreshed ${changedListCount} ${pluralize(changedListCount, 'list')}: ${addedCount} added, ${removedCount} replaced${duplicateCount ? `, ${duplicateCount} already present` : ''}${checkedListCount ? `; checked ${checkedListCount} unchanged` : ''}`,
+                'success'
+            );
+        } else {
+            UIComponents.showToast(
+                `Checked ${checkedListCount} ${pluralize(checkedListCount, 'list')}: no channel changes${checkedRowCount ? ` across ${checkedRowCount} rows` : ''}`,
+                'success'
+            );
+            return;
+        }
 
         const changedProfileIds = Array.from(changedProfileIdsSet);
         const remoteScope = changedSurfaces.size === 1 ? 'channels' : 'rules_bundle';
@@ -9006,9 +9187,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             { value: 'import', label: 'Import List', className: 'btn-primary' },
             ...(activeListCount ? [{ value: 'pause', label: 'Pause List', className: 'btn-secondary' }] : []),
             ...(pausedListCount ? [{ value: 'resume', label: 'Resume List', className: 'btn-secondary' }] : []),
-            ...(urlBackedCount ? [{ value: 'refresh', label: 'Refresh List', className: 'btn-secondary' }] : []),
-            ...(staleUrlBackedCount ? [{ value: 'refresh_stale', label: 'Refresh Stale URLs', className: 'btn-secondary' }] : []),
-            ...(urlBackedCount > 1 ? [{ value: 'refresh_all', label: 'Refresh All URLs', className: 'btn-secondary' }] : []),
+            ...(urlBackedCount ? [{ value: 'refresh', label: 'Check URL', className: 'btn-secondary' }] : []),
+            ...(staleUrlBackedCount ? [{ value: 'refresh_stale', label: 'Check Stale URLs', className: 'btn-secondary' }] : []),
+            ...(urlBackedCount > 1 ? [{ value: 'refresh_all', label: 'Check All URLs', className: 'btn-secondary' }] : []),
             ...(summaries.length ? [{ value: 'remove', label: 'Remove List', className: 'btn-secondary' }] : [])
         ];
         const selected = await showChoiceModal({

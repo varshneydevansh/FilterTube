@@ -166,6 +166,11 @@ extension authority code.
     is preserved as compact display metadata so parents can see which upstream
     list revision they imported or refreshed, while the URL/list still has no
     policy authority by itself.
+  - [x] First subscription-check slice: parent/account profiles can check
+    URL-backed lists from the `Lists` action. Changed source hashes refresh
+    materialized channel rows after parent re-auth; unchanged source hashes only
+    update checked/source metadata and protected history, avoiding unnecessary
+    channel-row churn or remote policy sends.
   - [ ] Scheduled subscription refresh remains a future slice.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
@@ -226,6 +231,12 @@ The advanced details, such as source URL, revision hash, stale refresh state,
 and signed-device delivery, belong behind compact status labels and history
 rows. The main job is to let a parent/caregiver control several protected
 profiles without hand-entering hundreds of channels.
+
+URL-backed lists now behave like manual subscriptions: the parent can check the
+saved source URL, FilterTube compares the source hash, and only changed content
+refreshes materialized channel rows. If the hash is unchanged, the dashboard
+updates checked/source metadata and history only. There is still no silent
+background mutation.
 
 The implementation should stay extension-first because this repository owns the
 upstream profile/settings/policy contract that downstream mobile and tablet
