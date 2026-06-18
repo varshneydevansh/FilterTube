@@ -48,16 +48,16 @@
                 ? helpers.getManagedMailboxConfigSummary
                 : () => ({
                     configured: false,
-                    label: 'Mailbox not configured',
-                    detail: 'Live P2P can send now. Mailbox is only for encrypted later delivery when the protected device is offline.',
+                    label: 'Later updates off',
+                    detail: 'Live P2P can send now. Later delivery is only for encrypted pickup when the protected device is offline.',
                     tone: 'warning'
                 }),
             getManagedLocalNetworkConfigSummary: typeof helpers.getManagedLocalNetworkConfigSummary === 'function'
                 ? helpers.getManagedLocalNetworkConfigSummary
                 : () => ({
                     configured: false,
-                    label: 'LAN provider not configured',
-                    detail: 'Same-network delivery needs an explicit local gateway; LAN discovery is never authority.',
+                    label: 'Same-network updates off',
+                    detail: 'Same-network delivery needs an explicit trusted gateway; network discovery is never authority.',
                     tone: 'warning'
                 }),
             onAction: typeof helpers.onAction === 'function' ? helpers.onAction : null
@@ -743,7 +743,7 @@
             : 'Setup needed';
         meta.title = summary.profileCount > 0
             ? 'Protected profiles shown here can be managed only by the current parent/account authority.'
-            : 'Create a protected profile first; optional mailbox and LAN delivery are hidden until a protected profile exists.';
+            : 'Create a protected profile first; optional later and same-network delivery are hidden until a protected profile exists.';
         titleWrap.append(title, body);
         heading.append(titleWrap, meta);
         panel.appendChild(heading);
@@ -778,7 +778,7 @@
                 },
                 {
                     text: 'Pair a verified device only when remote delivery is needed',
-                    title: 'Live P2P, mailbox, and LAN delivery appear after a protected profile exists.'
+                    title: 'Live P2P, later pickup, and same-network delivery appear after a protected profile exists.'
                 }
             ].forEach((item) => {
                 const step = document.createElement('li');
@@ -835,7 +835,7 @@
 
             const setupNote = document.createElement('div');
             setupNote.className = 'ft-managed-command-center__setup-note';
-            setupNote.textContent = 'Mailbox and LAN setup are optional delivery tools. They are not needed for local-only control.';
+            setupNote.textContent = 'Later pickup and same-network setup are optional delivery tools. They are not needed for local-only control.';
             setupNote.title = 'Those options do not grant authority; a trusted profile link and local validation still decide whether an update applies.';
             setup.appendChild(setupNote);
             panel.appendChild(setup);

@@ -11019,9 +11019,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function getNanahRoleLabel(role = getNanahRole()) {
         const normalized = normalizeString(role).toLowerCase();
-        if (normalized === 'source') return 'Source / Parent';
-        if (normalized === 'replica') return 'Replica / Kids device';
-        return 'Peer';
+        if (normalized === 'source') return 'This device controls another profile';
+        if (normalized === 'replica') return 'This device receives protected updates';
+        return 'My other device';
     }
 
     function getNanahScope() {
@@ -11192,14 +11192,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function getNanahLinkTypeLabel(linkType) {
-        return normalizeString(linkType) === 'managed_link' ? 'managed link' : 'peer link';
+        return normalizeString(linkType) === 'managed_link' ? 'parent trust link' : 'device trust link';
     }
 
     function getNanahRoleLabel(role) {
         const normalized = normalizeString(role).toLowerCase();
-        if (normalized === 'source') return 'Source / Parent';
-        if (normalized === 'replica') return 'Replica / Kids device';
-        return 'Peer';
+        if (normalized === 'source') return 'This device controls another profile';
+        if (normalized === 'replica') return 'This device receives protected updates';
+        return 'My other device';
     }
 
     function isActiveChildNanahProfile() {
@@ -12190,7 +12190,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (ftNanahManagedTargetsHint) {
-            ftNanahManagedTargetsHint.textContent = `Choose which saved protected-profile targets on ${getNanahRemoteLabel()} receive this live policy. Offline devices still need mailbox or local-network delivery later.`;
+            ftNanahManagedTargetsHint.textContent = `Choose which saved protected profiles on ${getNanahRemoteLabel()} receive this live update. Offline devices still need optional later pickup or same-network delivery.`;
         }
         return eligibleLinks;
     }
@@ -12326,7 +12326,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return `This live session is set to write into ${explicitRemoteTarget.profileName} on ${getNanahRemoteLabel()}, even if another remote profile is active right now.`;
         }
         if (remoteTargetProfile.behavior === 'fixed_profile' && normalizeString(remoteTargetProfile.profileName)) {
-            return `${getNanahRemoteLabel()} saved this managed link to write into ${remoteTargetProfile.profileName}, even if another profile is active there later.`;
+            return `${getNanahRemoteLabel()} saved parent trust to write into ${remoteTargetProfile.profileName}, even if another profile is active there later.`;
         }
         const remoteProfile = normalizeNanahProfileContext(nanahSessionState.remoteProfile);
         const localProfile = getNanahLocalProfileContext();
@@ -12335,17 +12335,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             try {
                 const targetProfile = resolveNanahLocalTargetProfile(trusted);
                 if (targetProfile.behavior === 'fixed_profile') {
-                    return `Managed updates from ${getNanahRemoteLabel()} will write into ${targetProfile.profileName} on this device, even if another local profile is active later.`;
+                    return `Parent updates from ${getNanahRemoteLabel()} will write into ${targetProfile.profileName} on this device, even if another local profile is active later.`;
                 }
             } catch (error) {
-                return error?.message || 'This managed link points to a profile that is no longer available on this device.';
+                return error?.message || 'This parent trust link points to a profile that is no longer available on this device.';
             }
         }
         if (localProfile.profileType === 'child' && normalizeString(remoteProfile.profileName)) {
-            return `This child profile will not safely target ${remoteProfile.profileName} on ${getNanahRemoteLabel()} unless that device saves a fixed managed target for this child first.`;
+            return `This child profile will not safely target ${remoteProfile.profileName} on ${getNanahRemoteLabel()} unless that device saves a fixed protected-profile target for this child first.`;
         }
         if (normalizeString(remoteProfile.profileName)) {
-            return `${getNanahScopeLabel(normalizedScope)} will write into ${remoteProfile.profileName} on ${getNanahRemoteLabel()}. Inactive remote profiles are only targeted when you choose an explicit remote target or save a fixed managed target there.`;
+            return `${getNanahScopeLabel(normalizedScope)} will write into ${remoteProfile.profileName} on ${getNanahRemoteLabel()}. Inactive remote profiles are only targeted when you choose an explicit remote target or save a fixed protected-profile target there.`;
         }
         return 'Updates write into the receiver\'s active profile by default, or a fixed profile if one was chosen. Saved links remember trust and policy, not a live background connection.';
     }
@@ -12449,8 +12449,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ftNanahModeSendOnce.hidden = false;
                 ftNanahModeSendOnce.disabled = true;
             }
-            ftNanahChildBannerTitle.textContent = "Child receive-only sync";
-            ftNanahChildBannerBody.textContent = "This child profile can join a parent/source pairing code and receive updates for its own rules. Sending, backups, trusted-link policy, and profile management stay parent-controlled.";
+            ftNanahChildBannerTitle.textContent = "Protected profile receive-only";
+            ftNanahChildBannerBody.textContent = "This child profile can join a parent pairing code and receive updates for its own rules. Sending, backups, trusted-link policy, and profile management stay parent-controlled.";
             if (ftNanahHostBtn) ftNanahHostBtn.disabled = true;
             if (ftNanahSendBtn) ftNanahSendBtn.disabled = true;
             if (ftNanahTrustBtn) ftNanahTrustBtn.disabled = true;
@@ -12564,7 +12564,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 message: `You are sending ${getNanahScopeLabel(normalizedScope).toLowerCase()} from ${formatNanahProfileContext(localProfile)}, but ${getNanahRemoteLabel()} currently has ${formatNanahProfileContext(remoteProfile)} active.`,
                 details: [
                     'For child profiles, FilterTube now blocks "send anyway" in this situation so the update does not land in the wrong remote profile.',
-                    'To manage that child profile reliably, save a Source -> Replica managed link on the other device while its child profile is active once.',
+                    'To manage that child profile reliably, save parent trust on the other device while its child profile is active once.',
                     'After that, choose "Always this local profile" on the receiving device so future parent updates can land there without switching profiles each time.'
                 ],
                 choices: [
@@ -14741,8 +14741,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const currentPolicy = safeObject(trusted.policy);
         const nextPolicyDecision = await showNanahManagedLinkModal({
-            title: 'Edit Managed Link',
-            message: `Adjust what ${normalizeString(trusted.deviceLabel) || 'this device'} may receive through this managed link.`,
+            title: 'Edit Parent Trust',
+            message: `Adjust what ${normalizeString(trusted.deviceLabel) || 'this device'} may receive through this parent trust link.`,
             intro: `Current link: ${getNanahStrategyLabel(currentPolicy.applyMode || 'merge')} on ${describeNanahScopeList(currentPolicy.allowedScopes || currentPolicy.defaultScope || 'active')}.`,
             initialPolicy: currentPolicy,
             allowApplyOnce: false,
@@ -14773,7 +14773,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 targetProfileName: nextPolicyDecision.policy.targetProfileName
             }
         });
-        UIComponents.showToast('Managed link updated', 'success');
+        UIComponents.showToast('Parent trust updated', 'success');
     }
 
     async function startNanahTrustedReconnect(link) {
@@ -14781,7 +14781,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!trusted) return;
 
         if (isNanahChildReplicaOnly() && trusted.localRole !== 'replica') {
-            UIComponents.showToast('Locked child profiles can only reconnect as managed replicas. Unlock the child profile first to reconnect as a sender.', 'error');
+            UIComponents.showToast('Locked child profiles can only reconnect as protected receivers. Unlock the child profile first to reconnect as a sender.', 'error');
             return;
         }
 
@@ -14932,7 +14932,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 editBtn.textContent = 'Edit Policy';
                 editBtn.disabled = childManagedReplicaLink;
                 editBtn.title = childManagedReplicaLink
-                    ? 'Child profiles cannot edit a trusted parent/source policy from this surface.'
+                    ? 'Child profiles cannot edit trusted parent policy from this surface.'
                     : '';
                 editBtn.addEventListener('click', async () => {
                     if (childManagedReplicaLink) {
@@ -14977,7 +14977,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             removeBtn.textContent = 'Remove';
             removeBtn.disabled = childManagedReplicaLink;
             removeBtn.title = childManagedReplicaLink
-                ? 'Child profiles cannot remove a trusted parent/source link from this surface.'
+                ? 'Child profiles cannot remove a trusted parent link from this surface.'
                 : '';
             removeBtn.addEventListener('click', async () => {
                 if (childManagedReplicaLink) {
@@ -15092,7 +15092,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 const note = document.createElement('div');
                 note.className = 'nanah-trusted-link__note';
-                note.textContent = `This managed link defaults to ${getNanahScopeLabel(safeObject(entry?.policy).defaultScope)} and uses ${getNanahStrategyLabel(safeObject(entry?.policy).applyMode).toLowerCase()} for allowed scopes. ${entry?.localRole === 'replica' && entry?.remoteRole === 'source'
+                note.textContent = `This parent trust link defaults to ${getNanahScopeLabel(safeObject(entry?.policy).defaultScope)} and uses ${getNanahStrategyLabel(safeObject(entry?.policy).applyMode).toLowerCase()} for allowed scopes. ${entry?.localRole === 'replica' && entry?.remoteRole === 'source'
                     ? `Targeting is ${getNanahTargetProfileBehaviorLabel(safeObject(entry?.policy).targetProfileBehavior).toLowerCase()}, new sessions are ${getNanahReconnectModeLabel(safeObject(entry?.policy).reconnectMode).toLowerCase()}, and locked child handling is ${getNanahLockedChildModeLabel(safeObject(entry?.policy).lockedChildMode).toLowerCase()}.`
                     : `New sessions are ${getNanahReconnectModeLabel(safeObject(entry?.policy).reconnectMode).toLowerCase()}.`}`;
                 card.appendChild(note);
@@ -15157,11 +15157,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const configs = {
             send_once: {
-                eyebrow: 'Simplest path',
-                title: 'Send this profile once',
-                body: 'Use this for one-off copies between your own devices. Pair, verify the phrase, send, and let the other device review the update.',
+                eyebrow: 'Copy once',
+                title: 'Send this profile',
+                body: 'Use this for your own second device or a one-time setup. Pair, verify the phrase, send, and let the other device review the update.',
                 steps: [
-                    'Leave the default peer flow in place.',
+                    'Leave the simple device-copy flow in place.',
                     'Start pairing here or join a code from the other device.',
                     'Confirm the same phrase and send once.'
                 ],
@@ -15170,28 +15170,28 @@ document.addEventListener('DOMContentLoaded', async () => {
                 trustLabel: 'Trust Device'
             },
             parent_control: {
-                eyebrow: 'Parent path',
-                title: childReplicaOnly ? 'Child profile is locked here' : 'Parent controls child',
+                eyebrow: 'Family control',
+                title: childReplicaOnly ? 'Protected profile is locked here' : 'Update protected device',
                 body: childReplicaOnly
-                    ? 'This child profile is still locked on this device, so it stays replica-only here. Unlock it locally if you need to send this child profile somewhere else.'
-                    : 'Use this when a parent or source device should keep a child or replica profile aligned. The receiving device saves that authority once, then later live sessions become much simpler.',
+                    ? 'This protected profile is still locked on this device, so it can only receive approved parent updates here. Unlock it locally if you need to send from it.'
+                    : 'Use this when a parent or caregiver should keep a child, family, or protected profile aligned on another device.',
                 steps: childReplicaOnly
                     ? [
-                        'Unlock this child profile locally first if you need to send from it.',
-                        'Use a parent profile as the sender if you only want to control the child device.',
-                        'Save a managed link on the receiving device once.'
+                        'Unlock this protected profile locally first if you need to send from it.',
+                        'Use the parent profile as the sender when you want to control this device.',
+                        'Save parent trust on the receiving device once.'
                     ]
                     : [
-                        'Connect to the child or replica device and confirm the safety phrase.',
-                        'Choose the remote child profile in the target dropdown.',
-                        'Send once, then save parent control so later sessions reuse the target and policy.'
+                        'Connect to the child or protected device and confirm the safety phrase.',
+                        'Choose the remote protected profile in the target dropdown.',
+                        'Send once, then save parent trust so later live sessions reuse the target and policy.'
                     ],
-                hostLabel: 'Start Parent Pairing',
-                sendLabel: 'Send Parent Update',
-                trustLabel: 'Save Parent Control'
+                hostLabel: 'Pair Protected Device',
+                sendLabel: 'Send Protected Update',
+                trustLabel: 'Save Parent Trust'
             },
             full_account: {
-                eyebrow: 'Migration path',
+                eyebrow: 'Move account',
                 title: 'Move full account',
                 body: getActiveProfileType() === 'child'
                     ? 'Full account migration is not available from a child profile. FilterTube will keep this scoped to the active child profile instead.'
@@ -15211,11 +15211,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? {
                 eyebrow: 'Receive-only',
                 title: 'Join parent update',
-                body: 'Use the code from a parent/source device to receive updates for this child profile. This child profile cannot send settings, save trust policy, or move backups from here.',
+                body: 'Use the code from the parent device to receive updates for this protected profile. This profile cannot send settings, save trust policy, or move backups from here.',
                 steps: [
-                    'Ask the parent/source device to start pairing.',
+                    'Ask the parent device to start pairing.',
                     'Join the 4-character code here and confirm the same safety phrase.',
-                    'Trusted parent/source links can then send allowed updates into this child profile.'
+                    'Trusted parent links can then send allowed updates into this protected profile.'
                 ],
                 hostLabel: 'Parent Starts Pairing',
                 sendLabel: 'Receive Only',
@@ -15298,41 +15298,41 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (ftNanahStrategyLabel) {
             ftNanahStrategyLabel.textContent = (trustedManaged && linkType === 'managed_link' && localRole === 'source' && !childReplicaOnly)
-                ? 'Managed sync policy'
+                ? 'Saved parent policy'
                 : (childReceiveOnly ? 'Receive policy' : 'Suggested action');
         }
         if (ftNanahStrategyHint) {
             if (childReceiveOnly) {
-                ftNanahStrategyHint.textContent = 'Child profiles stay receive-only here. Parent/source devices choose what to send, and this profile reviews or receives the allowed update.';
+                ftNanahStrategyHint.textContent = 'Protected profiles stay receive-only here. Parent devices choose what to send, and this profile reviews or receives the allowed update.';
             } else if (childReplicaOnly) {
-                ftNanahStrategyHint.textContent = 'This child profile is still locked, so it stays replica-only here. Unlock it locally if you need to send this child profile to another device.';
+                ftNanahStrategyHint.textContent = 'This protected profile is still locked, so it can only receive updates here. Unlock it locally if you need to send from it.';
             } else if (trustedManaged && linkType === 'managed_link' && localRole === 'source') {
-                ftNanahStrategyHint.textContent = 'Trusted replicas follow this saved merge or replace policy for allowed scopes.';
+                ftNanahStrategyHint.textContent = 'Trusted protected devices follow this saved merge or replace policy for allowed scopes.';
             } else if (linkType === 'managed_link') {
-                ftNanahStrategyHint.textContent = 'Until this managed link is trusted, the receiving device still chooses merge or replace.';
+                ftNanahStrategyHint.textContent = 'Until parent trust is saved, the receiving device still chooses merge or replace.';
             } else {
-                ftNanahStrategyHint.textContent = 'Peer and first-time sessions let the receiver choose merge or replace.';
+                ftNanahStrategyHint.textContent = 'One-time device copies let the receiver choose merge or replace.';
             }
         }
         if (ftNanahTrustBtn) {
             ftNanahTrustBtn.textContent = childReceiveOnly
                 ? 'Parent Managed'
-                : ((childReplicaOnly || linkType === 'managed_link') ? 'Save Managed Link' : 'Trust Connected Device');
+                : ((childReplicaOnly || linkType === 'managed_link') ? 'Save Parent Trust' : 'Trust Connected Device');
         }
         if (ftNanahScope) {
             ftNanahScope.disabled = childReceiveOnly || childReplicaOnly || !!nanahClient;
             ftNanahScope.title = childReceiveOnly
-                ? 'Child profiles receive updates here; they do not choose an outgoing send scope.'
+                ? 'Protected profiles receive updates here; they do not choose an outgoing send scope.'
                 : (childReplicaOnly
-                    ? 'This child profile is locked, so scope sending is unavailable until you unlock it locally.'
+                    ? 'This protected profile is locked, so scope sending is unavailable until you unlock it locally.'
                     : (nanahClient ? 'Scope is locked for the current Nanah session.' : ''));
         }
         if (ftNanahStrategy) {
             ftNanahStrategy.disabled = childReceiveOnly || childReplicaOnly || !!nanahClient;
             ftNanahStrategy.title = childReceiveOnly
-                ? 'Child profiles receive parent/source updates here; trust policy stays parent-managed.'
+                ? 'Protected profiles receive parent updates here; trust policy stays parent-managed.'
                 : (childReplicaOnly
-                    ? 'This child profile is locked, so outgoing merge/replace behavior stays unavailable until you unlock it locally.'
+                    ? 'This protected profile is locked, so outgoing merge/replace behavior stays unavailable until you unlock it locally.'
                     : (nanahClient ? 'Suggested action is locked for the current Nanah session.' : ''));
         }
         if (ftNanahRemoteTarget) {
@@ -15346,16 +15346,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahRemoteTarget.disabled = !canTargetRemoteProfiles;
             ftNanahRemoteTarget.title = canTargetRemoteProfiles
                 ? ''
-                : 'Connect to a replica device first to choose a specific remote profile.';
+                : 'Connect to the protected device first to choose a specific remote profile.';
         }
         if (ftNanahRemoteTargetHint) {
             const selectedTarget = getNanahSelectedRemoteTargetProfile();
             if (selectedTarget) {
                 ftNanahRemoteTargetHint.textContent = `This session will target ${selectedTarget.profileName} on ${getNanahRemoteLabel()} instead of following the remote active profile.`;
             } else if (getNanahRole() === 'source' && normalizeString(nanahSessionState.remoteRole) === 'replica') {
-                ftNanahRemoteTargetHint.textContent = 'No fixed remote target is selected for this live session yet, so updates will follow the receiver’s current active profile unless you choose one here.';
+                ftNanahRemoteTargetHint.textContent = 'No protected profile is selected yet, so updates will follow the receiver’s current active profile unless you choose one here.';
             } else {
-                ftNanahRemoteTargetHint.textContent = 'After the secure handshake, choose a specific remote profile here if you want this update to land somewhere other than the receiver’s currently active profile.';
+                ftNanahRemoteTargetHint.textContent = 'After pairing, choose the child or protected profile on the other device that should receive this update.';
             }
         }
         syncNanahManagedTargetOptions(scope);
@@ -15429,9 +15429,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             ftNanahRole.disabled = !!nanahClient || childReceiveOnly || childReplicaOnly;
             ftNanahRole.title = childReceiveOnly
-                ? 'Child profiles stay replica/receive-only in Nanah.'
+                ? 'Protected profiles stay receive-only in Nanah.'
                 : (childReplicaOnly
-                    ? 'This child profile is locked, so it is replica-only in Nanah until you unlock it locally.'
+                    ? 'This protected profile is locked, so it is receive-only in Nanah until you unlock it locally.'
                     : (nanahClient
                         ? 'Relationship is locked for the current Nanah session. End the session to change it.'
                         : ''));
@@ -15455,15 +15455,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const trustedPolicy = safeObject(trusted?.policy);
                 ftNanahStatusHint.textContent = isNanahChildReplicaOnly()
                     ? (trusted
-                        ? 'Child profile connected as a managed replica. Saved parent/source links can keep this device aligned without turning the child into a sender.'
-                        : 'Locked child profile connected. This device stays replica-only until the local child profile is unlocked.')
+                        ? 'Protected profile connected as a receiver. Saved parent links can keep this device aligned without turning the child into a sender.'
+                        : 'Locked protected profile connected. This device stays receive-only until the local child profile is unlocked.')
                     : trusted
                     ? (trustedPolicy.linkType === 'managed_link'
-                        ? 'Managed link connected. Replica updates now follow the saved trusted policy for allowed scopes.'
+                        ? 'Parent trust connected. Protected-device updates now follow the saved trusted policy for allowed scopes.'
                         : 'Trusted peer connected. New proposals still stay reviewable on the receiving device.')
                     : (classifyNanahTrustedLink(getNanahRole(), normalizeString(nanahSessionState.remoteRole) || 'peer') === 'managed_link'
-                        ? 'Connected as a source/replica pair. Until you save a managed link, the receiving device still reviews and chooses merge or replace.'
-                        : 'Connected. You can now send settings or save this device as a trusted peer or managed link.');
+                        ? 'Connected as a parent-to-protected-device pair. Until you save parent trust, the receiving device still reviews and chooses merge or replace.'
+                        : 'Connected. You can now send settings or save this device as trusted.');
             } else {
                 ftNanahStatusHint.textContent = 'Waiting for the second device to join and complete the secure handshake.';
             }
@@ -15976,7 +15976,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function buildNanahOutgoingProposalPolicy(scope, strategy) {
         if (isNanahChildReceiveOnly()) {
-            throw new Error('Child profiles are receive-only in Accounts & Sync. Use a parent/source profile to send updates.');
+            throw new Error('Child profiles are receive-only in Accounts & Sync. Use a parent profile to send updates.');
         }
         if (isNanahChildReplicaOnly()) {
             throw new Error('Unlock this child profile first if you want to send its settings to another device.');
@@ -16011,7 +16011,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (['videos', 'keywords', 'channels', 'rules_bundle', 'viewing_space', 'time_limits'].includes(selectedScope)) {
-            throw new Error('Keyword, channel, video, viewing-space, and time-limit sends require a saved Source -> Replica managed link.');
+            throw new Error('Keyword, channel, video, viewing-space, and time-limit sends require saved parent trust with the protected device.');
         }
 
         return {
@@ -16467,7 +16467,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             );
             UIComponents.showToast(
                 managedApproval.action === 'save'
-                    ? `Applied ${details.scope} settings and saved a managed link`
+                    ? `Applied ${details.scope} settings and saved parent trust`
                     : `Applied ${details.scope} settings once`,
                 'success'
             );
@@ -16482,7 +16482,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 `${details.senderStrategySuggested ? 'Suggested action' : 'Managed policy'}: ${details.strategy === 'replace' ? 'Replace this scope' : 'Merge into this scope'}`,
                 `Remote role: ${normalizeString(nanahSessionState.remoteRole) || 'peer'}`,
                 ...(classifyNanahTrustedLink(getNanahRole(), normalizeString(nanahSessionState.remoteRole) || 'peer') === 'managed_link'
-                    ? ['This source/replica pairing is not trusted yet, so this device still decides how to apply the update.']
+                    ? ['This parent-to-protected-device pairing is not trusted yet, so this device still decides how to apply the update.']
                     : []),
                 details.summary || 'FilterTube settings'
             ],
@@ -16696,7 +16696,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function trustConnectedNanahDevice() {
         if (isNanahChildReceiveOnly()) {
-            UIComponents.showToast('Child profiles can receive parent/source updates, but trusted-link policy is parent-controlled.', 'error');
+            UIComponents.showToast('Child profiles can receive parent updates, but trusted-link policy is parent-controlled.', 'error');
             return;
         }
         const remote = safeObject(nanahSessionState.remoteDevice);
@@ -16711,13 +16711,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const linkType = classifyNanahTrustedLink(localRole, remoteRole);
         if (!linkType) {
             UIComponents.showToast(
-                `${getNanahRoleLabel(localRole)} + ${getNanahRoleLabel(remoteRole)} can pair temporarily, but only Peer + Peer or Source + Replica can be saved as a trusted link.`,
+                `${getNanahRoleLabel(localRole)} + ${getNanahRoleLabel(remoteRole)} can pair temporarily, but only matching device-copy or parent/protected roles can be saved as a trusted link.`,
                 'error'
             );
             return;
         }
         if (isNanahChildReplicaOnly() && (localRole !== 'replica' || remoteRole !== 'source' || linkType !== 'managed_link')) {
-            UIComponents.showToast('Locked child profiles can only save managed Source -> Replica links. Unlock the child profile first to send from it.', 'error');
+            UIComponents.showToast('Locked child profiles can only save parent trust links. Unlock the child profile first to send from it.', 'error');
             return;
         }
         if (linkType === 'managed_link' && localRole === 'source') {
@@ -16774,17 +16774,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (linkType === 'managed_link') {
             const trustPolicy = await showNanahManagedLinkModal({
-                title: localRole === 'replica' ? 'Save Parent Control Link' : 'Save Managed Link',
+                title: localRole === 'replica' ? 'Save Parent Trust' : 'Save Protected-Device Policy',
                 message: localRole === 'replica'
-                    ? `${getNanahRemoteLabel()} is connected as a parent/caregiver source.`
-                    : `${getNanahRemoteLabel()} is connected as a replica device.`,
+                    ? `${getNanahRemoteLabel()} is connected as a parent/caregiver device.`
+                    : `${getNanahRemoteLabel()} is connected as a protected receiving device.`,
                 intro: localRole === 'replica'
                     ? 'Save what this parent/caregiver can update later. Matching signed updates still have to pass the saved profile, scope, revision, and device checks.'
-                    : 'Save the source-side managed policy now. The replica still chooses locally whether to trust and auto-apply on its own side.',
+                    : 'Save the parent-side policy now. The protected device still chooses locally whether to trust and auto-apply on its own side.',
                 initialPolicy: policy,
                 allowApplyOnce: false,
                 allowSave: true,
-                saveLabel: 'Save Managed Link',
+                saveLabel: localRole === 'replica' ? 'Save Parent Trust' : 'Save Protected-Device Policy',
                 cancelLabel: 'Cancel',
                 showAutoApply: localRole === 'replica' && remoteRole === 'source',
                 showReconnectMode: localRole === 'replica' && remoteRole === 'source',
@@ -18254,7 +18254,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ftNanahHostBtn) {
             ftNanahHostBtn.addEventListener('click', async () => {
                 if (isNanahChildReceiveOnly()) {
-                    UIComponents.showToast('Start pairing from a parent/source profile, then join the code here.', 'info');
+                    UIComponents.showToast('Start pairing from a parent profile, then join the code here.', 'info');
                     return;
                 }
                 try {

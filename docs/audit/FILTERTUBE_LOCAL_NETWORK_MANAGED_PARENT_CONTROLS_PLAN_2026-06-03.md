@@ -111,6 +111,12 @@ extension authority code.
   rules/time/history/send, generic device pairing remains parent-owned, and
   global account policy, create-profile, and Master PIN controls are paused
   until editing ends.
+- [x] Device Trust & Sync simplification slice: the Nanah panel now presents
+  parent-facing choices first (`Send this profile`, `Update protected device`,
+  `Move full account`) and moves source/replica/provider vocabulary into
+  advanced/runtime internals. The runtime roles, signed managed-link authority,
+  target-profile validation, and provider gates are unchanged; only the parent
+  mental model and high-visibility labels changed.
 
 ### Parent/Caregiver Simplification Tracker
 
@@ -123,6 +129,11 @@ parent tool instead of a sync/debug console.
   setup when no protected profile exists or when providers are not configured.
 - [x] Imported rule lists are treated as parent-approved rule sources, not as
   transport authority or executable filter code.
+- [x] Imported rule lists are explicitly connected to managed-device delivery:
+  parents import/preview/apply a list into Main, Kids, or both, then use the
+  existing verified-device send path when that protected profile also lives on
+  another device. CSV/text/URL/rule-list JSON never decide target profile,
+  PIN/admin authority, trusted devices, viewing access, or time limits.
 - [x] List-derived channel and keyword rules preserve source metadata, source
   format, source hash, last checked time, pause state, and Manual-vs-list
   separation.
