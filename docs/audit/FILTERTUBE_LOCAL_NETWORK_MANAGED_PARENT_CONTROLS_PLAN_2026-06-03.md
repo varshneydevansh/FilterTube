@@ -97,6 +97,10 @@ extension authority code.
   `Set rules and time`, and `Pair or send` so parents understand that local
   control works first and verified-device delivery is only needed for another
   device.
+- [x] Family Controls row copy and feedback were simplified for parent use:
+  `Pair to sync` means remote device setup only, profile ownership reads as
+  `Parent: ...`, status chips have explanatory titles, and neutral detail cards
+  no longer look like warning/error states when nothing is wrong.
 
 ### Parent/Caregiver Simplification Tracker
 
@@ -120,7 +124,7 @@ parent tool instead of a sync/debug console.
 - [ ] YouTube Kids channel management can choose which imported lists apply to
   Kids, instead of forcing parents to manage Kids list coverage only through the
   Family Controls modal.
-- [ ] Family Controls row details show list status without crowding the profile
+- [x] Family Controls row details show list status without crowding the profile
   name, action buttons, or parent workflow.
 - [ ] Managed action history clearly answers who changed a rule, whether it was
   manual or list-derived, and whether it was sent to a verified device, without

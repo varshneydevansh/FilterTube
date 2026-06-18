@@ -333,7 +333,7 @@
         if (targetCount <= 0) {
             return {
                 key: 'no_device',
-                label: 'Pair device',
+                label: 'Pair to sync',
                 tone: 'muted'
             };
         }
@@ -382,7 +382,7 @@
         if (targetCount <= 0 || totalCount <= 0) {
             return {
                 key: 'pair_device',
-                label: 'Pair verified device',
+                label: 'Pair when syncing',
                 tone: 'muted'
             };
         }
@@ -437,10 +437,10 @@
             return 'Saved link is stale; refresh trust before sending.';
         }
         if (targetCount <= 0 || totalCount <= 0) {
-            return 'No child/protected device is paired for this profile.';
+            return 'Local control works now. Pair only when updates need to reach another device.';
         }
         if (readyCount <= 0) {
-            return `${targetCount} verified ${targetCount === 1 ? 'device is' : 'devices are'} paired; install or connect live/LAN/mailbox delivery.`;
+            return `${targetCount} verified ${targetCount === 1 ? 'device is' : 'devices are'} paired; open both devices for live P2P or enable a later delivery provider.`;
         }
         const paths = [];
         if (item.syncLiveReady === true) paths.push('live P2P');
@@ -730,8 +730,12 @@
             : 'Create one protected child/user profile first. After that you can set rules, time, Main/Kids access, and device delivery.';
         const meta = document.createElement('div');
         meta.className = 'ft-managed-command-center__meta';
+        const setupNeeds = summary.noDeviceProfileCount
+            + summary.syncRepairProfileCount
+            + summary.syncStaleProfileCount
+            + summary.syncPendingProfileCount;
         meta.textContent = summary.profileCount > 0
-            ? `${summary.profileCount} managed | ${summary.syncReadyProfileCount} ready | ${summary.pendingExtraTimeRequestCount} requests`
+            ? `${summary.profileCount} ${summary.profileCount === 1 ? 'profile' : 'profiles'} | ${summary.syncReadyProfileCount} ready${setupNeeds ? ` | ${setupNeeds} need setup` : ''}${summary.pendingExtraTimeRequestCount ? ` | ${summary.pendingExtraTimeRequestCount} requests` : ''}`
             : 'Setup needed';
         meta.title = summary.profileCount > 0
             ? 'Protected profiles shown here can be managed only by the current parent/account authority.'
@@ -1177,7 +1181,7 @@
             const name = document.createElement('strong');
             name.textContent = item.profileName;
             const owner = document.createElement('span');
-            owner.textContent = `Managed by ${item.parentName} | ${item.locked ? 'locked' : 'unlocked'}`;
+            owner.textContent = `Parent: ${item.parentName}${item.locked ? ' | profile PIN on' : ''}`;
             const profileCell = document.createElement('div');
             profileCell.className = showBulkControls
                 ? 'ft-managed-command-center__profile'
@@ -1192,18 +1196,19 @@
             const statusCell = document.createElement('div');
             statusCell.className = 'ft-managed-command-center__status';
             [
-                { label: item.viewingAccess, tone: 'neutral' },
-                { label: item.timeLimit, tone: item.timeLimited ? 'warning' : 'neutral' },
-                item.managedChannelListLabel ? { label: item.managedChannelListLabel, tone: 'success' } : null,
-                { label: syncState.label, tone: syncState.tone },
-                item.remoteScopeCount ? { label: item.syncLabel, tone: 'success' } : null,
-                item.pendingExtraTimeRequestLabel ? { label: item.pendingExtraTimeRequestLabel, tone: 'warning' } : null,
-                item.syncTargetCount > 0 && item.latestDeliveryLabel ? { label: item.latestDeliveryLabel, tone: item.latestDeliveryTone || 'neutral' } : null,
-                item.syncSourceAckLabel ? { label: `Ack: ${item.syncSourceAckLabel}`, tone: 'neutral' } : null
+                { label: item.viewingAccess, tone: 'neutral', title: 'Allowed YouTube space for this protected profile.' },
+                { label: item.timeLimit, tone: item.timeLimited ? 'warning' : 'neutral', title: 'Daily YouTube time for this protected profile.' },
+                item.managedChannelListLabel ? { label: item.managedChannelListLabel, tone: 'success', title: item.managedChannelListDetail || 'Imported channel lists attached to this profile.' } : null,
+                { label: syncState.label, tone: syncState.tone, title: item.deliveryPathDetail || 'Device delivery status.' },
+                item.remoteScopeCount ? { label: item.syncLabel, tone: 'success', title: 'Latest accepted managed policy revision.' } : null,
+                item.pendingExtraTimeRequestLabel ? { label: item.pendingExtraTimeRequestLabel, tone: 'warning', title: item.pendingExtraTimeRequestDetail || 'This profile asked for more time.' } : null,
+                item.syncTargetCount > 0 && item.latestDeliveryLabel ? { label: item.latestDeliveryLabel, tone: item.latestDeliveryTone || 'neutral', title: 'Latest protected delivery attempt.' } : null,
+                item.syncSourceAckLabel ? { label: `Ack: ${item.syncSourceAckLabel}`, tone: 'neutral', title: 'Latest redacted acknowledgement from a protected device.' } : null
             ].filter(Boolean).forEach((chip) => {
                 const status = document.createElement('span');
                 status.className = `ft-managed-command-center__chip is-${chip.tone}`;
                 status.textContent = chip.label;
+                if (chip.title) status.title = chip.title;
                 statusCell.appendChild(status);
             });
             row.appendChild(statusCell);
@@ -1213,7 +1218,7 @@
             [
                 hasVerifiedDevice
                     ? { label: 'Delivery', value: item.deliveryPreview?.label || 'Send when ready', note: item.deliveryPathDetail }
-                    : { label: 'Next step', value: 'Pair a verified device', note: 'Use live P2P when the parent and protected device are both open.' },
+                    : { label: 'Next step', value: 'Pair only for another device', note: 'This profile can still be controlled locally. Use live P2P when parent and protected devices are both open.' },
                 item.managedChannelListDetail ? { label: 'Lists', value: item.managedChannelListDetail } : null,
                 hasVerifiedDevice ? { label: 'Device', value: item.syncTargetLabel } : null,
                 item.pendingExtraTimeRequestDetail ? { label: 'Request', value: item.pendingExtraTimeRequestDetail } : null,
