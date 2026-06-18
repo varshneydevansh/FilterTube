@@ -6408,8 +6408,7 @@ async function initializeDOMFallback(settings) {
                     'ytd-shelf-renderer',
                     'ytd-item-section-renderer',
                     'ytd-guide-entry-renderer',
-                    'ytd-comment-thread-renderer',
-                    'yt-chip-cloud-chip-renderer'
+                    'ytd-comment-thread-renderer'
                 ].join(',');
             } catch (e) {
                 return 'ytd-rich-item-renderer,ytd-video-renderer,ytd-compact-video-renderer,yt-lockup-view-model';
