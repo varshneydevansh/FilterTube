@@ -11,9 +11,9 @@ runtime contract, with downstream app manifest/runtime sync expected to copy
 both as transport inputs. The shared contract now separates parent-facing
 delivery labels (`Send Now`, `Pick Up Later`, `Home Bridge`) from technical
 transport identifiers so apps and future bridge software can stay simple
-without weakening local signature/target/revision validation. The extension
-contract is updated and native runtime sync is now pending for this contract
-revision. iOS parity remains pending.
+without weakening local signature/target/revision validation. The app sync
+manifest/runtime copy now includes this contract revision; installed iOS parity
+remains pending.
 **Runtime behavior changed**: extension no; Android app yes.
 **Goal slice**: Implementation order item 12, "Sync shared policy contract to
 apps", and item 13, "Add app viewing-space/time-limit parity tests".
@@ -46,7 +46,7 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
   "generated": "2026-06-18",
   "owner": "extension_upstream_policy_contract",
   "runtimeBehaviorChanged": false,
-  "appSyncStatus": "extension_contract_updated_native_sync_pending",
+  "appSyncStatus": "app_manifest_contract_helpers_and_parent_delivery_terms_synced_ios_pending",
   "artifact": {
     "sourcePath": "docs/audit/artifacts/managed-app-policy-contract-v1.json",
     "appDestination": "packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json",

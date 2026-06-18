@@ -78,6 +78,7 @@ test('managed app policy parity doc records extension-owned app contract artifac
   assert.ok(
     [
       'app_manifest_contract_helpers_and_android_time_entry_wiring_present_ios_pending',
+      'app_manifest_contract_helpers_and_parent_delivery_terms_synced_ios_pending',
       'extension_contract_updated_native_sync_pending'
     ].includes(contract.appSyncStatus),
     `unexpected app sync status ${contract.appSyncStatus}`
@@ -106,7 +107,7 @@ test('managed app policy parity doc records extension-owned app contract artifac
   }
   assert.match(doc, /Runtime behavior changed\*\*: extension no; Android app yes/);
   assert.match(doc, /Android native\s+model and Activity runtime proof/);
-  assert.match(doc, /iOS parity remains\s+pending/);
+  assert.match(doc, /installed iOS parity\s+remains pending/);
   assert.match(doc, /App Sync Boundary/);
   assert.match(doc, /Required Parity Decisions/);
   assert.match(doc, /Current Gap/);
