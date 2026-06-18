@@ -148,17 +148,18 @@ parent tool instead of a sync/debug console.
 - [x] Channel rows show compact imported-list source badges while keeping rule
   contents editable through the existing parent/account authority path. Manual
   rows remain unbadged as the default parent-authored source.
-- [ ] YouTube Kids channel management can choose which imported lists apply to
-  Kids, instead of forcing parents to manage Kids list coverage only through the
-  Family Controls modal.
+- [x] YouTube Kids channel management can choose which imported lists apply to
+  Kids: `kidsChannelSourceFilter` feeds the shared channel renderer with
+  `profile: 'kids'`, so parents can view `Manual`, `Imported lists`, or one
+  saved Kids list after importing approved rules into Kids or both surfaces.
 - [x] Family Controls row details show list status without crowding the profile
   name, action buttons, or parent workflow.
 - [ ] Managed action history clearly answers who changed a rule, whether it was
   manual or list-derived, and whether it was sent to a verified device, without
   exposing raw policy JSON or sensitive rule payloads to protected users.
-- [ ] Downstream app UI contract documents the same rule-list source filter,
-  Kids list selection, and source badges so mobile/tablet surfaces do not fork
-  the parent mental model.
+- [ ] Downstream app UI contract documents the same Main/Kids rule-list source
+  filter, Kids list selection, and source badges so mobile/tablet surfaces do
+  not fork the parent mental model.
 - [x] Command center can send signed active managed-policy updates to currently
   connected verified replica devices over Nanah P2P.
 - [x] Command center can hand ciphertext mailbox items or signed LAN candidates

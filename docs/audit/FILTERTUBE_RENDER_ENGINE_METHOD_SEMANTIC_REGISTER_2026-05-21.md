@@ -45,8 +45,8 @@ document.createDocumentFragment calls: 1
 innerHTML writes: 10
 setAttribute calls: 12
 querySelector calls: 0
-executable current-behavior probes: 7
-runtime behavior changed: yes - channel source filter and managed-list badge visibility
+executable current-behavior probes: 8
+runtime behavior changed: yes - Main and Kids channel source filter and managed-list badge visibility
 ```
 
 ## Method Group Counts

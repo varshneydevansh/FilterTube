@@ -529,7 +529,7 @@ test('render engine register pins source fingerprint and broad callable reconcil
     'semantic method rows promoted: 35',
     'control-flow lexical artifacts: 86 (`if`: 85, `while`: 1)',
     'local/render callback declarations held outside this IIFE method register: 6',
-    'executable current-behavior probes: 7'
+    'executable current-behavior probes: 8'
   ]) {
     assert.ok(text.includes(expected), `missing source reconciliation line ${expected}`);
   }
@@ -826,6 +826,66 @@ test('render engine executable probes channel source filter and managed list bad
   });
   assert.equal(container.children.length, 1);
   assert.ok(container.textContent.includes('Manual Channel'));
+  assert.ok(!container.textContent.includes('List:'));
+});
+
+test('render engine executable probes Kids channel source filter and managed list badge', () => {
+  const manual = {
+    id: 'UCkidsmanual000000000000',
+    name: 'Kids Manual Channel',
+    addedAt: 3
+  };
+  const listA = {
+    id: 'UCkidslista0000000000000',
+    name: 'Kids List A Channel',
+    managedListId: 'kids-family-list',
+    managedListName: 'Kids Family List',
+    addedAt: 2
+  };
+  const listB = {
+    id: 'UCkidslistb0000000000000',
+    name: 'Kids List B Channel',
+    managedListId: 'kids-study-list',
+    managedListName: 'Kids Study List',
+    addedAt: 1
+  };
+  const runtime = loadRenderEngineRuntime({
+    state: baseRenderState({
+      kids: {
+        mode: 'blocklist',
+        blockedKeywords: [],
+        blockedChannels: [manual, listA, listB],
+        whitelistKeywords: [],
+        whitelistChannels: []
+      }
+    })
+  });
+  const container = runtime.document.createElement('div');
+
+  runtime.RenderEngine.renderChannelList(container, {
+    profile: 'kids',
+    sourceFilter: 'lists'
+  });
+  assert.equal(container.children.length, 2);
+  assert.ok(container.textContent.includes('Kids List A Channel'));
+  assert.ok(container.textContent.includes('Kids List B Channel'));
+  assert.ok(!container.textContent.includes('Kids Manual Channel'));
+  assert.ok(container.textContent.includes('List: Kids Family List'));
+
+  runtime.RenderEngine.renderChannelList(container, {
+    profile: 'kids',
+    sourceFilter: 'list:kids-study-list'
+  });
+  assert.equal(container.children.length, 1);
+  assert.ok(container.textContent.includes('Kids List B Channel'));
+  assert.ok(!container.textContent.includes('Kids List A Channel'));
+
+  runtime.RenderEngine.renderChannelList(container, {
+    profile: 'kids',
+    sourceFilter: 'manual'
+  });
+  assert.equal(container.children.length, 1);
+  assert.ok(container.textContent.includes('Kids Manual Channel'));
   assert.ok(!container.textContent.includes('List:'));
 });
 
