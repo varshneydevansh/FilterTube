@@ -360,6 +360,7 @@ export const LANES = Object.freeze({
       'tests/runtime/managed-nanah-signing-keypair-current-behavior.test.mjs',
       'tests/runtime/managed-nanah-live-signed-send-current-behavior.test.mjs',
       'tests/runtime/managed-nanah-open-sync-current-behavior.test.mjs',
+      'tests/runtime/managed-transport-provider-clients-current-behavior.test.mjs',
       'tests/runtime/managed-policy-sync-remote-delivery-readiness-gate-current-behavior.test.mjs',
       'tests/runtime/managed-remote-transport-app-parity-gate-current-behavior.test.mjs',
       'tests/runtime/managed-policy-sync-remote-delivery-smoke-artifact-verifier-current-behavior.test.mjs',

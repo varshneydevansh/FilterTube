@@ -130,6 +130,7 @@ runtime local-network provider failure fail-closed apply guard: present
 runtime local-network provider ack handoff: present
 runtime protected local-network ack-handoff history writer: present
 runtime local-network status persistence: present
+runtime local-network provider client response allowlist sanitizer: present
 runtime built-in LAN peer discovery: absent
 runtime built-in LAN delivery: absent
 runtime background local-network scheduler: absent
@@ -148,6 +149,7 @@ Focused test:
 
 ```bash
 node --test tests/runtime/managed-local-network-provider-current-behavior.test.mjs
+node --test tests/runtime/managed-transport-provider-clients-current-behavior.test.mjs
 ```
 
 Settings lane:

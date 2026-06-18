@@ -6,7 +6,8 @@ source-side mailbox seal/open encryption helpers, source-side server-safe
 mailbox storage preparation, source-side mailbox upload/purge provider
 handoffs, explicitly configured browser HTTPS mailbox upload/pull/purge client,
 provider-gated mailbox intake, and provider-gated local-network candidate intake
-are present. Complete remote delivery is still blocked on server deployment,
+are present. Configured mailbox/Home Bridge provider clients now have executable
+request/response sanitization proof. Complete remote delivery is still blocked on server deployment,
 LAN transport proof, native parity, and installed two-device smoke.
 **Runtime behavior changed**: yes, source-side mailbox seal/open helpers,
 storage item building, upload-provider handoff, purge-provider handoff, and

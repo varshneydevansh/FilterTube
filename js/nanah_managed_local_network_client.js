@@ -95,15 +95,61 @@
         return { ...fallback, ...safeObject(result), ok: safeObject(result).ok !== false };
     }
 
+    function sanitizePeer(value) {
+        const root = safeObject(value);
+        const clean = {};
+        for (const key of [
+            'deviceId',
+            'sourceDeviceId',
+            'targetDeviceId',
+            'publicKeyId',
+            'sourcePublicKeyId',
+            'managedPublicKeyId',
+            'keyVersion',
+            'networkReachable',
+            'duplicateDeviceId',
+            'source'
+        ]) {
+            if (root[key] !== undefined) clean[key] = root[key];
+        }
+        return clean;
+    }
+
+    function sanitizeEnvelopeCandidate(value) {
+        const root = safeObject(value);
+        if (!root || Object.keys(root).length === 0) return {};
+        if (containsPrivateKey(root)) return {};
+        return root;
+    }
+
     function sanitizeCandidate(candidate) {
         const root = safeObject(candidate);
-        const envelope = safeObject(root.envelope);
-        return {
-            ...root,
-            envelope,
+        const envelope = sanitizeEnvelopeCandidate(root.envelope || root.managedPolicyEnvelope || root.policy);
+        const clean = {
             schema: normalizeString(root.schema) || 'filtertube_managed_local_network_candidate',
-            transport: 'local_network'
+            version: Number(root.version) || 1,
+            transport: 'local_network',
+            candidateId: normalizeString(root.candidateId || root.localNetworkCandidateId),
+            localNetworkCandidateId: normalizeString(root.localNetworkCandidateId || root.candidateId),
+            linkId: normalizeString(root.linkId),
+            targetProfileId: normalizeString(root.targetProfileId),
+            sourceDeviceId: normalizeString(root.sourceDeviceId),
+            sourceProfileId: normalizeString(root.sourceProfileId),
+            scope: normalizeString(root.scope).toLowerCase(),
+            revision: Number(root.revision) || null,
+            policyHash: normalizeString(root.policyHash),
+            sourcePublicKeyId: normalizeString(root.sourcePublicKeyId),
+            keyVersion: Number(root.keyVersion) || 0,
+            source: normalizeString(root.source),
+            networkReachable: root.networkReachable,
+            expiresAt: root.expiresAt ?? null,
+            expiresAtMs: root.expiresAtMs ?? null,
+            createdAtMs: root.createdAtMs ?? null
         };
+        if (Object.keys(envelope).length > 0) clean.envelope = envelope;
+        const peer = sanitizePeer(root.peer || root.discoveredPeer || root.discovery);
+        if (Object.keys(peer).length > 0) clean.peer = peer;
+        return clean;
     }
 
     function sanitizeDeliveryRequest(request) {
@@ -214,6 +260,7 @@
         }
 
         async function publishManagedPolicyCandidates(request) {
+            if (containsPrivateKey(request)) return unavailable('local_network_private_secret_refused');
             return postJson(publishPath, sanitizeDeliveryRequest(request));
         }
 

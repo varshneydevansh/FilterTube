@@ -155,6 +155,11 @@ calling the upload provider. This keeps source-side sent-state marking able to
 use the local mailbox item while preventing accidental adapter/provider
 metadata fields from crossing the mailbox upload boundary.
 
+The configured provider client is covered by executable VM tests for explicit
+HTTPS endpoint handling, credential omission, plaintext refusal, sealed-item
+upload allowlisting, pull-request trusted-link stripping, and adapter-owned
+local decrypt/open behavior.
+
 ## Runtime Hooks Added
 
 ```text
@@ -173,6 +178,11 @@ js/nanah_managed_live_policy.js
 js/tab-view.js
   purgeNanahManagedMailboxQueueForTrustedLink(...)
   removeNanahTrustedLink(...) captures removed link metadata before local removal
+
+tests/runtime/managed-transport-provider-clients-current-behavior.test.mjs
+  configured HTTPS mailbox client upload/pull/purge boundary
+  configured Home Bridge client publish/discover/ack boundary
+  provider response sanitization and outbound secret refusal
 ```
 
 ## Safety Boundary
