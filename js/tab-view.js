@@ -174,6 +174,11 @@ function initializeFiltersTabs() {
                     <option value="oldest">Oldest First</option>
                     <option value="az">A-Z</option>
                 </select>
+                <select id="channelSourceFilter" class="select-input channel-source-filter" title="Show manual channels, imported-list channels, or one saved list">
+                    <option value="all">All sources</option>
+                    <option value="manual">Manual</option>
+                    <option value="lists">Imported lists</option>
+                </select>
             </div>
         </div>
 
@@ -1503,6 +1508,11 @@ function initializeKidsTabs() {
                     <option value="oldest">Oldest First</option>
                     <option value="az">A-Z</option>
                 </select>
+                <select id="kidsChannelSourceFilter" class="select-input channel-source-filter" title="Show manual Kids channels, imported-list channels, or one saved list">
+                    <option value="all">All sources</option>
+                    <option value="manual">Manual</option>
+                    <option value="lists">Imported lists</option>
+                </select>
             </div>
         </div>
 
@@ -2790,6 +2800,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const channelListEl = document.getElementById('channelListEl');
     const searchChannels = document.getElementById('searchChannels');
     const channelSort = document.getElementById('channelSort');
+    const channelSourceFilter = document.getElementById('channelSourceFilter');
 
     const channelDatePreset = document.getElementById('channelDatePreset');
     const channelDateFrom = document.getElementById('channelDateFrom');
@@ -2891,6 +2902,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let keywordSortValue = 'newest';
     let channelSearchValue = '';
     let channelSortValue = 'newest';
+    let channelSourceFilterValue = 'all';
 
     let keywordDateFromTs = null;
     let keywordDateToTs = null;
@@ -18199,6 +18211,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const kidsChannelListEl = document.getElementById('kidsChannelListEl');
     const kidsSearchChannels = document.getElementById('kidsSearchChannels');
     const kidsChannelSort = document.getElementById('kidsChannelSort');
+    const kidsChannelSourceFilter = document.getElementById('kidsChannelSourceFilter');
     const kidsChannelDatePreset = document.getElementById('kidsChannelDatePreset');
     const kidsChannelDateFrom = document.getElementById('kidsChannelDateFrom');
     const kidsChannelDateTo = document.getElementById('kidsChannelDateTo');
@@ -18210,6 +18223,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let kidsKeywordDateToTs = null;
     let kidsChannelSearchValue = '';
     let kidsChannelSortValue = 'newest';
+    let kidsChannelSourceFilterValue = 'all';
     let kidsChannelDateFromTs = null;
     let kidsChannelDateToTs = null;
 
@@ -18390,8 +18404,80 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderManagedChildEditorBanner();
     }
 
+    function getChannelSourceFilterRows(surface = 'main') {
+        const state = isManagedChildEditFor(surface) ? buildManagedChildState(surface) : StateManager.getState();
+        const mode = surface === 'kids'
+            ? (state?.kids?.mode === 'whitelist' ? 'whitelist' : 'blocklist')
+            : (state?.mode === 'whitelist' ? 'whitelist' : 'blocklist');
+        if (surface === 'kids') {
+            if (mode === 'whitelist') return Array.isArray(state?.kids?.whitelistChannels) ? state.kids.whitelistChannels : [];
+            return Array.isArray(state?.kids?.blockedChannels) ? state.kids.blockedChannels : [];
+        }
+        if (mode === 'whitelist') return Array.isArray(state?.whitelistChannels) ? state.whitelistChannels : [];
+        return Array.isArray(state?.channels) ? state.channels : [];
+    }
+
+    function collectChannelSourceFilterOptions(surface = 'main') {
+        const summaries = new Map();
+        getChannelSourceFilterRows(surface).forEach((row) => {
+            const listId = normalizeString(row?.managedListId);
+            if (!listId) return;
+            const listName = normalizeString(row?.managedListName)
+                || normalizeString(row?.managedListSourceLabel)
+                || 'Imported list';
+            if (!summaries.has(listId)) {
+                summaries.set(listId, {
+                    id: listId,
+                    name: listName,
+                    count: 0
+                });
+            }
+            const summary = summaries.get(listId);
+            summary.count += 1;
+            if (summary.name === 'Imported list' && listName !== 'Imported list') {
+                summary.name = listName;
+            }
+        });
+        return Array.from(summaries.values()).sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    function truncateChannelSourceFilterLabel(value, maxLength = 44) {
+        const normalized = normalizeString(value);
+        if (normalized.length <= maxLength) return normalized;
+        return `${normalized.slice(0, Math.max(0, maxLength - 3))}...`;
+    }
+
+    function updateChannelSourceFilterOptions(selectEl, surface, currentValue) {
+        if (!selectEl) return currentValue || 'all';
+        const summaries = collectChannelSourceFilterOptions(surface);
+        const allowed = new Set(['all', 'manual', 'lists']);
+        summaries.forEach(summary => allowed.add(`list:${summary.id}`));
+        const nextValue = allowed.has(currentValue) ? currentValue : 'all';
+        selectEl.innerHTML = '';
+        [
+            { value: 'all', label: 'All sources' },
+            { value: 'manual', label: 'Manual' },
+            { value: 'lists', label: summaries.length ? `Imported lists (${summaries.reduce((sum, item) => sum + item.count, 0)})` : 'Imported lists' }
+        ].forEach((item) => {
+            const option = document.createElement('option');
+            option.value = item.value;
+            option.textContent = item.label;
+            selectEl.appendChild(option);
+        });
+        summaries.forEach((summary) => {
+            const option = document.createElement('option');
+            option.value = `list:${summary.id}`;
+            option.textContent = `List: ${truncateChannelSourceFilterLabel(summary.name)} (${summary.count})`;
+            option.title = summary.name;
+            selectEl.appendChild(option);
+        });
+        selectEl.value = nextValue;
+        return nextValue;
+    }
+
     function renderChannels() {
         if (!channelListEl) return;
+        channelSourceFilterValue = updateChannelSourceFilterOptions(channelSourceFilter, 'main', channelSourceFilterValue);
         RenderEngine.renderChannelList(channelListEl, {
             minimal: false,
             showSearch: true,
@@ -18399,6 +18485,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             showNodeMapping: true,
             searchValue: channelSearchValue,
             sortValue: channelSortValue,
+            sourceFilter: channelSourceFilterValue,
             dateFrom: channelDateFromTs,
             dateTo: channelDateToTs,
             stateOverride: isManagedChildEditFor('main') ? buildManagedChildState('main') : null,
@@ -18429,6 +18516,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function renderKidsChannels() {
         if (!kidsChannelListEl) return;
+        kidsChannelSourceFilterValue = updateChannelSourceFilterOptions(kidsChannelSourceFilter, 'kids', kidsChannelSourceFilterValue);
         RenderEngine.renderChannelList(kidsChannelListEl, {
             minimal: false,
             showSearch: true,
@@ -18436,6 +18524,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             showNodeMapping: true,
             searchValue: kidsChannelSearchValue,
             sortValue: kidsChannelSortValue,
+            sourceFilter: kidsChannelSourceFilterValue,
             dateFrom: kidsChannelDateFromTs,
             dateTo: kidsChannelDateToTs,
             profile: 'kids',
@@ -19137,6 +19226,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    if (channelSourceFilter) {
+        channelSourceFilter.addEventListener('change', (e) => {
+            channelSourceFilterValue = normalizeString(e.target.value) || 'all';
+            renderChannels();
+        });
+    }
+
     function updateChannelDateFilterFromInputs() {
         channelDateFromTs = parseDateInput(channelDateFrom?.value || '', false);
         channelDateToTs = parseDateInput(channelDateTo?.value || '', true);
@@ -19296,6 +19392,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (kidsChannelSort) {
         kidsChannelSort.addEventListener('change', (e) => {
             kidsChannelSortValue = e.target.value;
+            renderKidsChannels();
+        });
+    }
+
+    if (kidsChannelSourceFilter) {
+        kidsChannelSourceFilter.addEventListener('change', (e) => {
+            kidsChannelSourceFilterValue = normalizeString(e.target.value) || 'all';
             renderKidsChannels();
         });
     }

@@ -562,6 +562,7 @@ const RenderEngine = (() => {
             sortValue = 'newest',
             dateFrom = null,
             dateTo = null,
+            sourceFilter = 'all',
             profile = 'main',
             stateOverride = null,
             onDelete = null,
@@ -617,6 +618,16 @@ const RenderEngine = (() => {
         const { groups: collaborationGroups } = groupChannelsByCollaboration(state.channels);
 
         let displayChannels = [...channelsSource];
+
+        const normalizedSourceFilter = typeof sourceFilter === 'string' ? sourceFilter.trim() : '';
+        displayChannels = displayChannels.filter((ch) => {
+            if (!normalizedSourceFilter || normalizedSourceFilter === 'all') return true;
+            const listId = typeof ch?.managedListId === 'string' ? ch.managedListId.trim() : '';
+            if (normalizedSourceFilter === 'manual') return !listId;
+            if (normalizedSourceFilter === 'lists') return !!listId;
+            if (normalizedSourceFilter.startsWith('list:')) return listId === normalizedSourceFilter.slice(5);
+            return true;
+        });
 
         if (showSearch && searchValue) {
             const search = searchValue.toLowerCase();
@@ -1019,6 +1030,18 @@ const RenderEngine = (() => {
             infoGroup.appendChild(createSourceBadge({
                 sourceKey: 'comments',
                 title: 'This channel was blocked from the YouTube comments menu'
+            }));
+        }
+
+        const managedListId = typeof channel?.managedListId === 'string' ? channel.managedListId.trim() : '';
+        if (managedListId) {
+            const managedListName = (typeof channel?.managedListName === 'string' && channel.managedListName.trim())
+                || (typeof channel?.managedListSourceLabel === 'string' && channel.managedListSourceLabel.trim())
+                || 'Imported list';
+            infoGroup.appendChild(createPillBadge({
+                text: `List: ${managedListName}`,
+                title: 'This channel came from an imported parent-approved channel list',
+                variantClass: 'badge-variant-managed-list'
             }));
         }
 

@@ -150,6 +150,13 @@ source hash, Family Controls updates last-checked/source metadata and writes a
 protected history row, but leaves channel rows and remote send prompts alone.
 When the source hash changes, the existing parent re-auth refresh path replaces
 only matching list-derived rows and can offer the verified-device send path.
+The channel-source visibility slice adds Main and Kids channel-management source
+dropdowns for `All sources`, `Manual`, `Imported lists`, and individual saved
+managed lists. List-derived channel rows now show a compact `List: ...` badge so
+parents can see where an entry came from without opening Family Controls or
+reading raw metadata. This is a visibility/filtering aid only; edits, deletes,
+pause/resume, Kids application, and verified-device sends still use the existing
+parent/account authority paths.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 

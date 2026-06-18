@@ -474,11 +474,11 @@ async function fire(element, type, eventInit = {}) {
   return event;
 }
 
-test('render engine method semantic register is audit-only and scoped to current behavior', () => {
+test('render engine method semantic register is scoped to current behavior', () => {
   const text = doc();
 
-  assert.match(text, /Status: audit-only current-behavior register/);
-  assert.match(text, /Runtime behavior is unchanged/);
+  assert.match(text, /Status: current-behavior register/);
+  assert.match(text, /Runtime behavior now includes channel source\s+filtering and managed-list source badges/);
   assert.match(text, /source file: js\/render_engine\.js/);
   assert.match(text, /IIFE-scoped declarations: 35/);
   assert.match(text, /plain function declarations: 30/);
@@ -503,33 +503,33 @@ test('render engine register pins source fingerprint and broad callable reconcil
   const text = doc();
 
   assert.deepEqual(stats, {
-    bytes: 59073,
-    sha256: 'ceb77f3e50a17affb726f099b15b52fdce311cd027b8f0903174b8d1433cbfa0',
-    splitLines: 1390,
-    wcLines: 1389
+    bytes: 60425,
+    sha256: 'b649683b280482864cabc5d5ee1099aa660d6e864a1606307409a22c95e75800',
+    splitLines: 1413,
+    wcLines: 1412
   });
-  assert.equal(broadRows.length, 126);
-  assert.equal(controlArtifacts, 85);
+  assert.equal(broadRows.length, 127);
+  assert.equal(controlArtifacts, 86);
   assert.equal(heldOutsideRegister, 6);
   assert.deepEqual({
     if: broadCounts.if,
     while: broadCounts.while
   }, {
-    if: 84,
+    if: 85,
     while: 1
   });
 
   for (const expected of [
-    'source split lines: 1390',
-    'source wc -l: 1389',
-    'source bytes: 59073',
-    'source sha256: ceb77f3e50a17affb726f099b15b52fdce311cd027b8f0903174b8d1433cbfa0',
-    'broad lexical callable matches: 126',
+    'source split lines: 1413',
+    'source wc -l: 1412',
+    'source bytes: 60425',
+    'source sha256: b649683b280482864cabc5d5ee1099aa660d6e864a1606307409a22c95e75800',
+    'broad lexical callable matches: 127',
     'accepted IIFE-scoped declaration rows: 35',
     'semantic method rows promoted: 35',
-    'control-flow lexical artifacts: 85 (`if`: 84, `while`: 1)',
+    'control-flow lexical artifacts: 86 (`if`: 85, `while`: 1)',
     'local/render callback declarations held outside this IIFE method register: 6',
-    'executable current-behavior probes: 6'
+    'executable current-behavior probes: 7'
   ]) {
     assert.ok(text.includes(expected), `missing source reconciliation line ${expected}`);
   }
@@ -775,6 +775,58 @@ test('render engine executable probes channel row actions, outbound link safety,
   assert.equal(spacer.style.visibility, 'hidden');
   assert.equal((spacer.eventListeners.get('click') || []).length, 0);
   assert.match(doc(), /Fallback Filter All currently bypasses `onToggleFilterAll` and dispatches to\s+`StateManager`/);
+});
+
+test('render engine executable probes channel source filter and managed list badge', () => {
+  const manual = {
+    id: 'UCmanual0000000000000000',
+    name: 'Manual Channel',
+    addedAt: 3
+  };
+  const listA = {
+    id: 'UClista00000000000000000',
+    name: 'List A Channel',
+    managedListId: 'family-list',
+    managedListName: 'Family List',
+    addedAt: 2
+  };
+  const listB = {
+    id: 'UClistb00000000000000000',
+    name: 'List B Channel',
+    managedListId: 'study-list',
+    managedListName: 'Study List',
+    addedAt: 1
+  };
+  const runtime = loadRenderEngineRuntime({
+    state: baseRenderState({ channels: [manual, listA, listB] })
+  });
+  const container = runtime.document.createElement('div');
+
+  runtime.RenderEngine.renderChannelList(container, {
+    profile: 'main',
+    sourceFilter: 'lists'
+  });
+  assert.equal(container.children.length, 2);
+  assert.ok(container.textContent.includes('List A Channel'));
+  assert.ok(container.textContent.includes('List B Channel'));
+  assert.ok(!container.textContent.includes('Manual Channel'));
+  assert.ok(container.textContent.includes('List: Family List'));
+
+  runtime.RenderEngine.renderChannelList(container, {
+    profile: 'main',
+    sourceFilter: 'list:study-list'
+  });
+  assert.equal(container.children.length, 1);
+  assert.ok(container.textContent.includes('List B Channel'));
+  assert.ok(!container.textContent.includes('List A Channel'));
+
+  runtime.RenderEngine.renderChannelList(container, {
+    profile: 'main',
+    sourceFilter: 'manual'
+  });
+  assert.equal(container.children.length, 1);
+  assert.ok(container.textContent.includes('Manual Channel'));
+  assert.ok(!container.textContent.includes('List:'));
 });
 
 test('render engine executable probes channel idle batching and stale task cancellation', () => {

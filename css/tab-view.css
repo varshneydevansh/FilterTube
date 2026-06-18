@@ -2344,6 +2344,11 @@ padding: var(--ft-space-xs) var(--ft-space-sm);
     font-weight: 500;
 }
 
+.channel-source-filter {
+    min-width: 10.5rem;
+    max-width: 16rem;
+}
+
 .date-filter-controls {
     display: flex;
     align-items: center;

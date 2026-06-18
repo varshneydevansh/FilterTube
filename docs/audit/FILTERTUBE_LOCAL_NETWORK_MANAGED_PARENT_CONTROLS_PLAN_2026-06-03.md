@@ -111,12 +111,12 @@ parent tool instead of a sync/debug console.
   transport authority or executable filter code.
 - [x] List-derived channel rules preserve source metadata, source format,
   source hash, last checked time, pause state, and Manual-vs-list separation.
-- [ ] Channels page exposes a source filter/dropdown so parents can view
+- [x] Channels page exposes a source filter/dropdown so parents can view
   `Manual`, `Imported lists`, and individual managed lists without guessing
   where a channel entry came from.
-- [ ] Channel rows show compact source badges such as `Manual`, list name,
-  `Main`, `Kids`, or `Both`, while keeping rule contents editable through the
-  existing parent/account authority path.
+- [x] Channel rows show compact imported-list source badges while keeping rule
+  contents editable through the existing parent/account authority path. Manual
+  rows remain unbadged as the default parent-authored source.
 - [ ] YouTube Kids channel management can choose which imported lists apply to
   Kids, instead of forcing parents to manage Kids list coverage only through the
   Family Controls modal.

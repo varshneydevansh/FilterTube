@@ -1,6 +1,7 @@
 # FilterTube Render Engine Method Semantic Register - Current Behavior - 2026-05-21
 
-Status: audit-only current-behavior register. Runtime behavior is unchanged.
+Status: current-behavior register. Runtime behavior now includes channel source
+filtering and managed-list source badges for parent-facing channel visibility.
 
 This register promotes `js/render_engine.js` from representative UI/render
 tokens to a source-derived method inventory. It covers the popup/tab-view list
@@ -19,11 +20,11 @@ list-mode, or performance behavior changes.
 
 ```text
 source file: js/render_engine.js
-source split lines: 1390
-source wc -l: 1389
-source bytes: 59073
-source sha256: ceb77f3e50a17affb726f099b15b52fdce311cd027b8f0903174b8d1433cbfa0
-broad lexical callable matches: 126
+source split lines: 1413
+source wc -l: 1412
+source bytes: 60425
+source sha256: b649683b280482864cabc5d5ee1099aa660d6e864a1606307409a22c95e75800
+broad lexical callable matches: 127
 IIFE-scoped declarations: 35
 plain function declarations: 30
 const arrow helper declarations: 5
@@ -32,7 +33,7 @@ public API entries: 4
 semantic method groups: 6
 accepted IIFE-scoped declaration rows: 35
 semantic method rows promoted: 35
-control-flow lexical artifacts: 85 (`if`: 84, `while`: 1)
+control-flow lexical artifacts: 86 (`if`: 85, `while`: 1)
 local/render callback declarations held outside this IIFE method register: 6
 row-action listener sites: 7
 direct StateManager optional calls: 26
@@ -44,8 +45,8 @@ document.createDocumentFragment calls: 1
 innerHTML writes: 10
 setAttribute calls: 12
 querySelector calls: 0
-executable current-behavior probes: 6
-runtime behavior changed: no
+executable current-behavior probes: 7
+runtime behavior changed: yes - channel source filter and managed-list badge visibility
 ```
 
 ## Method Group Counts
@@ -93,22 +94,22 @@ keywordRenderingAndRowActions: 5
 | 169 | `function` | `renderKeywordList` | `keywordRenderingAndRowActions` |
 | 312 | `function` | `createKeywordListItem` | `keywordRenderingAndRowActions` |
 | 548 | `function` | `renderChannelList` | `channelRenderingAndRowActions` |
-| 767 | `function` | `groupChannelsByCollaboration` | `collaborationGrouping` |
-| 785 | `function` | `buildCollaborationMeta` | `collaborationGrouping` |
-| 832 | `function` | `matchesCollaborator` | `collaborationGrouping` |
-| 845 | `function` | `createCollaborationBadge` | `badgeAndSourceDecoration` |
-| 872 | `function` | `createChannelListItem` | `channelRenderingAndRowActions` |
-| 895 | `function` | `createMinimalChannelItem` | `channelRenderingAndRowActions` |
-| 959 | `function` | `createFullChannelItem` | `channelRenderingAndRowActions` |
-| 1074 | `function` | `createNodeMapping` | `channelRenderingAndRowActions` |
-| 1121 | `function` | `createFilterAllToggle` | `channelRenderingAndRowActions` |
-| 1168 | `function` | `createFallbackFilterAllToggle` | `channelRenderingAndRowActions` |
-| 1203 | `function` | `isTopicChannel` | `channelDisplayIdentityHelpers` |
-| 1214 | `function` | `getTopicChannelTooltip` | `channelDisplayIdentityHelpers` |
-| 1222 | `function` | `findChannelByRef` | `keywordRenderingAndRowActions` |
-| 1241 | `function` | `deriveChannelMapping` | `channelDisplayIdentityHelpers` |
-| 1334 | `function` | `createFallbackExactToggle` | `keywordRenderingAndRowActions` |
-| 1366 | `function` | `createFallbackDeleteButton` | `keywordRenderingAndRowActions` |
+| 778 | `function` | `groupChannelsByCollaboration` | `collaborationGrouping` |
+| 796 | `function` | `buildCollaborationMeta` | `collaborationGrouping` |
+| 843 | `function` | `matchesCollaborator` | `collaborationGrouping` |
+| 856 | `function` | `createCollaborationBadge` | `badgeAndSourceDecoration` |
+| 883 | `function` | `createChannelListItem` | `channelRenderingAndRowActions` |
+| 906 | `function` | `createMinimalChannelItem` | `channelRenderingAndRowActions` |
+| 970 | `function` | `createFullChannelItem` | `channelRenderingAndRowActions` |
+| 1097 | `function` | `createNodeMapping` | `channelRenderingAndRowActions` |
+| 1144 | `function` | `createFilterAllToggle` | `channelRenderingAndRowActions` |
+| 1191 | `function` | `createFallbackFilterAllToggle` | `channelRenderingAndRowActions` |
+| 1226 | `function` | `isTopicChannel` | `channelDisplayIdentityHelpers` |
+| 1237 | `function` | `getTopicChannelTooltip` | `channelDisplayIdentityHelpers` |
+| 1245 | `function` | `findChannelByRef` | `keywordRenderingAndRowActions` |
+| 1264 | `function` | `deriveChannelMapping` | `channelDisplayIdentityHelpers` |
+| 1357 | `function` | `createFallbackExactToggle` | `keywordRenderingAndRowActions` |
+| 1389 | `function` | `createFallbackDeleteButton` | `keywordRenderingAndRowActions` |
 
 ## Current Public API
 
