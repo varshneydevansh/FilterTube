@@ -136,6 +136,13 @@ date, stale hint, and content hash. The metadata helps a parent recognize the
 upstream list revision they imported or refreshed; it is not policy authority
 and does not remove the preview, re-auth, profile selection, or verified-device
 send requirements.
+The parent-clarity row layout slice renames the dashboard panel to `Family
+Controls`, shortens transport-heavy status labels, and groups each profile's
+delivery/list/request details into one stable details column. This keeps the
+parent model direct: choose a managed profile, set rules/time/access, pair a
+device only when another device needs updates, and send. The change does not
+add authority; it only reduces copy and layout pressure in the Accounts & Sync
+surface.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 
@@ -373,7 +380,7 @@ weakening the authority model:
 
 | Area | Parent/caregiver needs | Boundary |
 | --- | --- | --- |
-| Managed profile selection | See each protected profile, owner relationship, current lock state, verified-device readiness, and last policy revision. | Child/protected views still hide admin controls and detailed history. |
+| Managed profile selection | See each protected profile, owner relationship, current lock state, verified-device readiness, last policy revision, and one stable details column for delivery/list/request status. | Child/protected views still hide admin controls and detailed history. The `Family Controls` label is parent-facing copy only; authority remains the existing managed-profile gates. |
 | Protection scan strip | Quickly see protected profile count, sync-ready profiles, profiles needing re-pairing, and remote conflicts before acting. | Strip values are aggregate status only; they do not include rule text, policy payloads, keys, or mutation authority. |
 | Rule editing | Command-center row actions still enter the existing managed protected-profile editor, selected-profile bulk controls can hand off one selected protected profile to the same editor, and selected-profile bulk keyword/channel/video-ID additions can apply one reviewed rule to selected protected profiles. Parent/caregiver bulk rule writes choose YouTube Main or YouTube Kids with explicit buttons before value entry. Changed profiles with verified delivery can then push the matching rule scope immediately. | Writes must use the same validated local/remote managed-policy paths as current FilterTube controls; bulk rule writes require review confirmation, parent/account re-auth, per-target revision/history rows, selected Main/Kids surface binding for granular sends, and no child authority. |
 | Managed filter lists | Parent can use one `Lists` action to view imported-list summaries with title/version/last-checked/hash metadata, import pasted/file/public-HTTPS channel lists, preview valid rows, apply them to selected protected profiles and Main/Kids surfaces, see compact list status, pause/resume saved lists, see stale URL-backed list hints, refresh one/stale/all saved URL-backed lists manually, remove list-derived rows without touching manual rules, and push the resulting channel policy to verified devices. Future UI should add scheduled subscription refresh. | A list URL/file is only a rule source. It must not become authority, executable code, or an invisible global block. Parent/admin approval, source labeling, display-only source metadata, revision/hash metadata, disable/revert behavior, and protected action history are required. |

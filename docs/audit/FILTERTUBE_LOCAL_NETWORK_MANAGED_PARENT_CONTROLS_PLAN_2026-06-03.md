@@ -89,6 +89,10 @@ extension authority code.
   re-pairing status for revoked/stale managed links, compact delivery-path
   detail, delegated actions, and grouped Rules/Send/Time/Access selected-profile
   bulk action rails.
+- [x] Dashboard command center clarity slice: the panel now uses the
+  parent-facing `Family Controls` label, shorter delivery labels, and one stable
+  per-profile details column so profile names and next actions do not collapse
+  under provider/status copy.
 - [x] Command center can send signed active managed-policy updates to currently
   connected verified replica devices over Nanah P2P.
 - [x] Command center can hand ciphertext mailbox items or signed LAN candidates

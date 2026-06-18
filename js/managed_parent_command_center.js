@@ -33,7 +33,7 @@
             getManagedSyncTargetSummary: typeof helpers.getManagedSyncTargetSummary === 'function'
                 ? helpers.getManagedSyncTargetSummary
                 : () => ({
-                    label: 'No verified device',
+                    label: 'Pair device',
                     targetCount: 0,
                     readyCount: 0,
                     revokedCount: 0,
@@ -333,20 +333,20 @@
         if (targetCount <= 0) {
             return {
                 key: 'no_device',
-                label: 'No verified device',
+                label: 'Pair device',
                 tone: 'muted'
             };
         }
         if (readyCount <= 0) {
             return {
                 key: 'provider_pending',
-                label: 'Provider pending',
+                label: 'Waiting delivery',
                 tone: 'warning'
             };
         }
         return {
             key: 'ready',
-            label: 'Sync ready',
+            label: 'Ready to send',
             tone: 'success'
         };
     }
@@ -722,16 +722,16 @@
         titleWrap.className = 'ft-managed-command-center__title-wrap';
         const title = document.createElement('div');
         title.className = 'help-item-title';
-        title.textContent = 'Managed Parent Controls';
+        title.textContent = 'Family Controls';
         const body = document.createElement('div');
         body.className = 'help-item-body';
         body.textContent = summary.profileCount > 0
-            ? 'Manage protected profiles, daily YouTube time, Main/Kids access, rules, and verified-device delivery.'
-            : 'Start with one protected child/user profile. Delivery options appear after there is a protected profile to manage.';
+            ? 'Set what each protected profile can watch, how long YouTube is available, and where updates should be sent.'
+            : 'Create one protected child/user profile first. After that you can set rules, time, Main/Kids access, and device delivery.';
         const meta = document.createElement('div');
         meta.className = 'ft-managed-command-center__meta';
         meta.textContent = summary.profileCount > 0
-            ? `${summary.profileCount} protected | ${summary.limitedCount} limits | ${summary.pendingExtraTimeRequestCount} requests | ${summary.syncReadyProfileCount} ready`
+            ? `${summary.profileCount} managed | ${summary.syncReadyProfileCount} ready | ${summary.pendingExtraTimeRequestCount} requests`
             : 'Setup needed';
         meta.title = summary.profileCount > 0
             ? 'Protected profiles shown here can be managed only by the current parent/account authority.'
@@ -837,10 +837,10 @@
         const strip = document.createElement('div');
         strip.className = 'ft-managed-command-center__strip';
         [
-            { label: 'Protected', value: summary.profileCount, tone: 'neutral', title: 'Profiles this parent/account can manage.', always: true },
+            { label: 'Managed profiles', value: summary.profileCount, tone: 'neutral', title: 'Profiles this parent/account can manage.', always: true },
             { label: 'Ready', value: summary.syncReadyProfileCount, tone: summary.syncReadyProfileCount ? 'success' : 'neutral', title: 'Profiles with a verified delivery path available now or through a configured provider.', always: true },
             { label: 'Lists active', value: summary.managedChannelListProfileCount, tone: 'success', title: 'Protected profiles with imported channel-list rules.' },
-            { label: 'Pairing needed', value: summary.noDeviceProfileCount + summary.syncRepairProfileCount + summary.syncStaleProfileCount, tone: 'warning', title: 'Profiles that need a verified device, refreshed trust, or re-pairing before remote updates.' },
+            { label: 'Needs setup', value: summary.noDeviceProfileCount + summary.syncRepairProfileCount + summary.syncStaleProfileCount, tone: 'warning', title: 'Profiles that need a verified device, refreshed trust, or re-pairing before remote updates.' },
             { label: 'Requests', value: summary.pendingExtraTimeRequestCount, tone: 'warning', title: 'Protected profiles asking for more YouTube time.' },
             { label: 'Conflicts', value: summary.remoteConflictCount, tone: 'danger', title: 'Rejected or conflicting remote-policy history rows that need parent review.' }
         ].filter(item => item.always || (Number(item.value) || 0) > 0).forEach((item) => {
@@ -1131,7 +1131,7 @@
             const name = document.createElement('strong');
             name.textContent = item.profileName;
             const owner = document.createElement('span');
-            owner.textContent = `${item.parentName} parent | ${item.locked ? 'locked' : 'unlocked'}`;
+            owner.textContent = `Managed by ${item.parentName} | ${item.locked ? 'locked' : 'unlocked'}`;
             const profileCell = document.createElement('div');
             profileCell.className = showBulkControls
                 ? 'ft-managed-command-center__profile'
@@ -1162,6 +1162,8 @@
             });
             row.appendChild(statusCell);
             const hasVerifiedDevice = item.syncTargetCount > 0;
+            const detailsWrap = document.createElement('div');
+            detailsWrap.className = 'ft-managed-command-center__details';
             [
                 hasVerifiedDevice
                     ? { label: 'Delivery', value: item.deliveryPreview?.label || 'Send when ready', note: item.deliveryPathDetail }
@@ -1184,8 +1186,9 @@
                     note.textContent = detail.note;
                     cell.appendChild(note);
                 }
-                row.appendChild(cell);
+                detailsWrap.appendChild(cell);
             });
+            row.appendChild(detailsWrap);
             if (h.onAction && Array.isArray(item.actionIntents) && item.actionIntents.length) {
                 const actionWrap = document.createElement('div');
                 actionWrap.className = 'ft-managed-command-center__actions';
