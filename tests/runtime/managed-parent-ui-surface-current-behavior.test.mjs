@@ -507,6 +507,9 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /const remoteScope = managedBulkRuleRemoteScope\(type\)/);
   assert.match(source, /getNanahSourceManagedLinksForTargetProfile\(targetId, remoteScope, profile\)/);
   assert.match(source, /sendManagedParentPolicyToVerifiedDevices\(changedProfileIds, \{\s+scope: remoteScope,\s+surface\s+\}\)/);
+  assert.match(source, /Send checked list status now\?/);
+  assert.match(source, /Rule rows are unchanged/);
+  assert.match(doc, /send checked freshness\/status metadata to verified devices even when rule rows are unchanged/);
   assert.match(source, /const overrideSurface = normalizeString\(safeObject\(nanahManagedPolicySourceOverride\)\.surface\)\.toLowerCase\(\)/);
   assert.match(source, /bulk_time_limit_unlock_failed/);
   assert.match(source, /extra_time_unlock_failed/);
