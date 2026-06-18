@@ -7200,8 +7200,114 @@ document.addEventListener('DOMContentLoaded', async () => {
         return result;
     }
 
+    function normalizeManagedChannelListJsonMetadata(root) {
+        const item = safeObject(root);
+        return {
+            title: normalizeManagedChannelListMetadataValue(item.title || item.name || item.listName),
+            description: normalizeManagedChannelListMetadataValue(item.description),
+            homepage: normalizeManagedChannelListMetadataValue(item.homepage || item.home || item.sourceHomepage, 240),
+            license: normalizeManagedChannelListMetadataValue(item.license),
+            sourceVersion: normalizeManagedChannelListMetadataValue(item.version || item.revision || item.sourceVersion),
+            sourceUpdatedLabel: normalizeManagedChannelListMetadataValue(item.lastModified || item.lastUpdated || item.updated || item.sourceUpdatedLabel)
+        };
+    }
+
+    function getManagedChannelListJsonItems(root) {
+        if (Array.isArray(root)) return root;
+        const item = safeObject(root);
+        const candidateKeys = [
+            'channels',
+            'items',
+            'entries',
+            'blockedChannels',
+            'channelIds',
+            'handles'
+        ];
+        for (const key of candidateKeys) {
+            if (Array.isArray(item[key])) return item[key];
+        }
+        return [];
+    }
+
+    function extractManagedChannelListJsonToken(entry) {
+        if (typeof entry === 'string' || typeof entry === 'number') {
+            return extractManagedChannelListToken(String(entry));
+        }
+        const item = safeObject(entry);
+        const candidateKeys = [
+            'id',
+            'channelId',
+            'channel_id',
+            'ucId',
+            'handle',
+            'customUrl',
+            'custom_url',
+            'url',
+            'channelUrl',
+            'channel_url',
+            'youtubeUrl',
+            'value',
+            'text'
+        ];
+        for (const key of candidateKeys) {
+            const token = extractManagedChannelListToken(item[key]);
+            if (token) return token;
+        }
+        return '';
+    }
+
+    function parseManagedChannelListJson(text, { listName = '' } = {}) {
+        const parsedRoot = JSON.parse(text);
+        const listId = buildManagedChannelListId(listName || 'Imported list', text);
+        const items = getManagedChannelListJsonItems(parsedRoot);
+        const seen = new Set();
+        const channels = [];
+        let skippedCount = 0;
+
+        items.forEach((entry) => {
+            const token = extractManagedChannelListJsonToken(entry);
+            if (!token) {
+                skippedCount += 1;
+                return;
+            }
+            const channel = normalizeProfileChannel(token);
+            if (!channel) {
+                skippedCount += 1;
+                return;
+            }
+            const key = managedChannelEntryKey(channel);
+            if (!key || seen.has(key)) return;
+            seen.add(key);
+            channels.push({
+                ...channel,
+                source: 'managed_channel_list',
+                managedListId: listId,
+                managedListName: normalizeString(listName) || 'Imported channel list'
+            });
+        });
+
+        return {
+            listId,
+            contentHash: buildManagedChannelListContentHash(text),
+            sourceMetadata: normalizeManagedChannelListJsonMetadata(parsedRoot),
+            channels,
+            skippedCount,
+            totalLineCount: items.length
+        };
+    }
+
     function parseManagedChannelListText(rawText, { listName = '' } = {}) {
         const text = normalizeString(rawText);
+        if (/^\s*[\[{]/.test(text)) {
+            try {
+                const parsedJson = parseManagedChannelListJson(text, { listName });
+                if (parsedJson.channels.length || parsedJson.totalLineCount > 0) {
+                    return parsedJson;
+                }
+            } catch (e) {
+                // Fall through to line parsing so pasted mixed text still works.
+            }
+        }
         const listId = buildManagedChannelListId(listName || 'Imported list', text);
         const lines = text.split(/\r?\n/);
         const seen = new Set();
@@ -7270,8 +7376,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const intro = document.createElement('div');
             intro.className = 'import-export-hint';
             intro.textContent = selectedCount > 1
-                ? `Paste or choose a channel list, then apply it to ${selectedCount} selected protected profiles.`
-                : 'Paste or choose a channel list, then apply it to this protected profile.';
+                ? `Paste or choose a text/JSON channel list, then apply it to ${selectedCount} selected protected profiles.`
+                : 'Paste or choose a text/JSON channel list, then apply it to this protected profile.';
             body.appendChild(intro);
 
             const nameGroup = document.createElement('label');
@@ -7328,7 +7434,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const help = document.createElement('div');
             help.className = 'managed-channel-list-modal__help';
-            help.textContent = 'Name-only rows are skipped for safety. A URL is only a source for previewed channel rules; it does not get control over protected profiles.';
+            help.textContent = 'Text rows or JSON channels need @handle, UC id, /c/name, /user/name, or a YouTube channel URL. Name-only rows are skipped for safety. A URL is only a source for previewed channel rules; it does not get control over protected profiles.';
             body.appendChild(help);
 
             const errorEl = document.createElement('div');

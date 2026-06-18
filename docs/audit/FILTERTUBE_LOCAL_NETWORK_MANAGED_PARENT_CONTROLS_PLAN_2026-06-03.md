@@ -169,6 +169,11 @@ extension authority code.
     is preserved as compact display metadata so parents can see which upstream
     list revision they imported or refreshed, while the URL/list still has no
     policy authority by itself.
+  - [x] First structured-list compatibility slice: parents can paste or choose
+    a simple JSON channel list (`channels`, `items`, `entries`,
+    `blockedChannels`, `channelIds`, or `handles`) and the entries still
+    normalize through the same preview, parent re-auth, materialized channel
+    rows, list metadata, and verified-device delivery path as text lists.
   - [x] First subscription-check slice: parent/account profiles can check
     URL-backed lists from the `Lists` action. Changed source hashes refresh
     materialized channel rows after parent re-auth; unchanged source hashes only
@@ -346,7 +351,7 @@ Add list -> Preview -> Choose profiles -> Apply -> Send update
 
 **Current extension-owned scope**:
 
-- Parents can add a list from a file, pasted text, or URL.
+- Parents can add a list from a file, pasted text, simple JSON, or URL.
 - Each list has a clear name, source URL/file label, last checked time, item
   count, revision/hash, and enabled/disabled state.
 - Lists can be enabled separately for Main/Kids and per protected profile.
@@ -427,8 +432,9 @@ URL is treated as a way to fetch data, not as a remote admin.
 
 - Whether the first release should store list entries as a reversible overlay
   or materialize them into normal channel rows with source metadata.
-- Which formats to support first: plain URLs/text, JSON, uBlock-style comments,
-  CSV, or a simple FilterTube list JSON schema.
+- Which formats to support next after plain text, simple JSON, URL rows,
+  uBlock-style comments, and CSV-like rows: a stricter FilterTube list JSON
+  schema with export/import versioning, or broader third-party list formats.
 - Whether refresh should be manual-only first, then scheduled later after
   no-work/performance gates are proven.
 
