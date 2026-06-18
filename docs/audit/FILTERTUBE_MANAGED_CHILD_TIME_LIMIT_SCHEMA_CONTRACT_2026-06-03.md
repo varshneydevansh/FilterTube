@@ -169,6 +169,8 @@ local managed time-limit protected history row writer: present
 runtime managed time-limit policy compiler: present
 runtime managed active-tab budget counter: present
 runtime managed heartbeat active-policy revalidation: present
+runtime managed time-left status: present while an active child/protected
+profile has enforced time remaining
 runtime managed timeout overlay: present with budget, usage, reset context,
 protected-user ask-parent guidance, a safe Open FilterTube dashboard action,
 and protected request history that does not grant time or dismiss the lock
@@ -186,6 +188,11 @@ The first runtime path is intentionally lazy:
   compiled active child profile policy before counting or timing out the route.
   Stale or mismatched content policy payloads do not own the profile id,
   revision, hash, budget, timezone, reset policy, or exhausted-budget decision.
+- While budget remains, the content bridge shows a compact passive
+  `YouTube time left` status only after background reports an enforced policy
+  and positive remaining time. It uses `pointer-events:none`, does not click or
+  block YouTube controls, and is removed for no-policy, external-route, error,
+  or timed-out states.
 - When budget is exhausted, the content overlay pauses visible videos and covers
   the YouTube surface with a non-dismissible child/protected-user message. It
   shows the daily limit, used time, and reset timing from the background-owned

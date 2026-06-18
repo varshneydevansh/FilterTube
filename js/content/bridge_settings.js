@@ -352,6 +352,7 @@ function normalizeSettingsForHost(settings) {
 
 const MANAGED_VIEWING_ROUTE_GATE_OVERLAY_ID = 'filtertube-managed-viewing-route-gate';
 const MANAGED_TIME_LIMIT_OVERLAY_ID = 'filtertube-managed-timeout-overlay';
+const MANAGED_TIME_LIMIT_STATUS_ID = 'filtertube-managed-time-status';
 const MANAGED_TIME_LIMIT_HEARTBEAT_MS = 5000;
 const MANAGED_TIME_LIMIT_REVALIDATION_EVENTS = [
     'yt-navigate-finish',
@@ -729,9 +730,74 @@ function formatManagedTimeoutDuration(seconds) {
     return `${Math.max(1, minutes)}m`;
 }
 
+function removeManagedTimeLimitStatus() {
+    try {
+        const existing = document.getElementById(MANAGED_TIME_LIMIT_STATUS_ID);
+        if (existing) existing.remove();
+    } catch (e) {
+    }
+}
+
+function showManagedTimeLimitStatus(state) {
+    try {
+        if (!state || state.enforced !== true || state.timedOut === true) {
+            removeManagedTimeLimitStatus();
+            return;
+        }
+        const remainingSeconds = Number(state.remainingSeconds);
+        const totalBudgetSeconds = Number(state.totalBudgetSeconds);
+        if (!Number.isFinite(remainingSeconds) || remainingSeconds <= 0 || !Number.isFinite(totalBudgetSeconds) || totalBudgetSeconds <= 0) {
+            removeManagedTimeLimitStatus();
+            return;
+        }
+
+        const host = document.body || document.documentElement;
+        if (!host) return;
+
+        let status = document.getElementById(MANAGED_TIME_LIMIT_STATUS_ID);
+        if (!status) {
+            status = document.createElement('div');
+            status.id = MANAGED_TIME_LIMIT_STATUS_ID;
+            status.setAttribute('role', 'status');
+            status.setAttribute('aria-live', 'polite');
+            status.style.cssText = [
+                'position:fixed',
+                'right:16px',
+                'bottom:16px',
+                'z-index:2147483645',
+                'max-width:calc(100vw - 32px)',
+                'box-sizing:border-box',
+                'display:flex',
+                'align-items:center',
+                'gap:8px',
+                'padding:9px 12px',
+                'border:1px solid rgba(180,67,57,.26)',
+                'border-radius:8px',
+                'background:rgba(17,24,39,.92)',
+                'box-shadow:0 14px 34px rgba(15,23,42,.18)',
+                'color:#f8fafc',
+                'font-family:Roboto,Arial,sans-serif',
+                'font-size:12px',
+                'font-weight:800',
+                'line-height:1.25',
+                'pointer-events:none'
+            ].join(';');
+            host.appendChild(status);
+        }
+
+        const profileName = String(state.profileName || 'Protected profile').trim() || 'Protected profile';
+        const surfaceLabel = state.surface === 'kids' ? 'YouTube Kids' : 'YouTube';
+        const timeLeft = formatManagedTimeoutDuration(remainingSeconds);
+        status.textContent = `${surfaceLabel} time left: ${timeLeft}`;
+        status.title = `${profileName} has ${timeLeft} left today.`;
+    } catch (e) {
+    }
+}
+
 function showManagedTimeoutOverlay(state) {
     try {
         globalThis.__filtertubeManagedTimeLimitTimedOut = true;
+        removeManagedTimeLimitStatus();
         pauseManagedTimeoutVideos();
 
         const host = document.body || document.documentElement;
@@ -958,6 +1024,7 @@ function releaseManagedTimeLimitRuntime() {
     managedTimeLimitRouteHandler = null;
     managedTimeLimitHeartbeatInFlight = false;
     managedTimeLimitPendingHeartbeat = false;
+    removeManagedTimeLimitStatus();
     removeManagedTimeoutOverlay();
 }
 
@@ -1021,7 +1088,14 @@ function sendManagedTimeLimitHeartbeat() {
             const err = browserAPI_BRIDGE.runtime?.lastError;
             if (!err && response?.enforced === true && response.timedOut === true) {
                 showManagedTimeoutOverlay(response);
+            } else if (!err && response?.enforced === true && response?.timedOut !== true) {
+                removeManagedTimeoutOverlay();
+                showManagedTimeLimitStatus(response);
             } else if (!err && response?.timedOut !== true) {
+                removeManagedTimeLimitStatus();
+                removeManagedTimeoutOverlay();
+            } else {
+                removeManagedTimeLimitStatus();
                 removeManagedTimeoutOverlay();
             }
             if (managedTimeLimitPendingHeartbeat) {

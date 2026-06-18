@@ -532,7 +532,8 @@ Follow the existing mobile spec's calm "Signal Rail" direction. This should feel
 
 ### Child surfaces
 
-- Time remaining indicator.
+- Time remaining indicator while a managed child/protected profile still has
+  budget left.
 - Calm locked page when daily budget is exhausted:
   - "YouTube time is finished for today"
   - next reset time
@@ -845,6 +846,10 @@ T1 + T2 + T3
     and re-resolves the compiled active child profile policy before counting,
     so stale or mismatched content payloads cannot own the profile id,
     revision, hash, budget, or timeout decision.
+  - 2026-06-18: Content bridge now renders a compact passive `YouTube time left`
+    status only after the background confirms an enforced child/protected
+    policy with positive remaining time. The status uses `pointer-events:none`
+    and is removed for no-policy, external-route, error, and timed-out states.
 - **files edited/created**:
   - `js/background.js`
   - `js/content/bridge_settings.js`

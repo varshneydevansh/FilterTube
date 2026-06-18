@@ -125,10 +125,12 @@ test('managed time-budget runtime is compiled background-owned and documented as
   assert.match(background, /managedTimeActiveScopes/);
 
   assert.match(bridge, /const MANAGED_TIME_LIMIT_OVERLAY_ID = 'filtertube-managed-timeout-overlay'/);
+  assert.match(bridge, /const MANAGED_TIME_LIMIT_STATUS_ID = 'filtertube-managed-time-status'/);
   assert.match(bridge, /function applyManagedTimeLimitRuntime\(settings, options = \{\}\)/);
   assert.match(bridge, /function isValidManagedTimeLimitTimezone\(timezone\)/);
   assert.match(bridge, /isValidManagedTimeLimitTimezone\(policy\.timezone\)/);
   assert.match(bridge, /function sendManagedTimeLimitHeartbeat\(\)/);
+  assert.match(bridge, /function showManagedTimeLimitStatus\(state\)/);
   assert.match(bridge, /function showManagedTimeoutOverlay\(state\)/);
   assert.match(bridge, /FilterTube_ManagedTimeLimitHeartbeat/);
   assert.match(bridge, /applyManagedTimeLimitRuntime\(settings\)/);
@@ -169,6 +171,22 @@ test('managed time-budget overlay is a lock surface and not a content-hide write
   assert.match(overlayBlock, /pauseManagedTimeoutVideos\(\)/);
   assert.match(overlayBlock, /today's parent-managed YouTube time/);
   assert.doesNotMatch(overlayBlock, /recordTimeSaved|hidden-content|filtertube-hidden|data-filtertube-processed/);
+});
+
+test('managed time-budget status is passive and appears only for active governed time', () => {
+  const bridge = read('js/content/bridge_settings.js');
+  const statusBlock = block(bridge, 'function showManagedTimeLimitStatus(state)', 'function showManagedTimeoutOverlay(state)');
+  const heartbeatBlock = block(bridge, 'function sendManagedTimeLimitHeartbeat()', 'function applyManagedTimeLimitRuntime(settings, options = {})');
+
+  assert.match(statusBlock, /role', 'status'/);
+  assert.match(statusBlock, /aria-live', 'polite'/);
+  assert.match(statusBlock, /pointer-events:none/);
+  assert.match(statusBlock, /time left/);
+  assert.match(statusBlock, /remainingSeconds <= 0/);
+  assert.match(statusBlock, /removeManagedTimeLimitStatus\(\)/);
+  assert.match(heartbeatBlock, /response\?\.enforced === true && response\?\.timedOut !== true/);
+  assert.match(heartbeatBlock, /showManagedTimeLimitStatus\(response\)/);
+  assert.doesNotMatch(statusBlock, /recordTimeSaved|hidden-content|filtertube-hidden|data-filtertube-processed/);
 });
 
 test('managed time-budget no-policy states do not arm runtime work', () => {
