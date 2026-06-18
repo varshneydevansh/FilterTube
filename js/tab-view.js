@@ -13056,11 +13056,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const endpoint = await showPromptModal({
-            title: 'Pick Up Later Service',
+            title: 'Pick Up Later',
             message: 'Advanced only. This is not the Nanah signal server. Enter a compatible HTTPS pickup service only if you run one; leave blank to keep Send Now only.',
             placeholder: 'https://your-filtertube-pickup-service',
             inputType: 'url',
-            confirmText: currentEndpoint ? 'Save Service' : 'Enable Offline Pickup',
+            confirmText: currentEndpoint ? 'Save Pick Up Later' : 'Enable Pick Up Later',
             initialValue: currentEndpoint
         });
         if (endpoint === null) return;
@@ -13123,7 +13123,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const current = readNanahManagedLocalNetworkProviderConfig();
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
-            title: 'Home Network Bridge',
+            title: 'Home Bridge',
             message: 'Use this only when you have a trusted FilterTube bridge that can pass parent updates to protected devices on your home or school network.',
             details: [
                 'This is advanced and separate from normal Send Now.',
@@ -13147,7 +13147,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const endpoint = await showPromptModal({
-            title: 'Home Network Bridge',
+            title: 'Home Bridge',
             message: 'Advanced only. Enter a trusted bridge endpoint only if you run a FilterTube-compatible bridge. Normal parent control uses Send Now.',
             placeholder: 'http://192.168.1.10:4177/filtertube',
             inputType: 'url',

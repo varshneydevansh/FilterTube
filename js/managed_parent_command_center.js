@@ -964,7 +964,7 @@
         if (shouldShowProviderSetup && localNetwork.configured === true) {
         const localPanel = document.createElement('div');
         localPanel.className = `ft-managed-command-center__provider is-${localNetwork.tone || (localNetwork.configured ? 'success' : 'warning')}`;
-        localPanel.title = 'Optional: use this only for an explicitly configured home network bridge. Network reachability is not authority.';
+        localPanel.title = 'Optional: use this only for an explicitly configured Home Bridge. Being on the same network is not authority.';
         const localCopy = document.createElement('div');
         localCopy.className = 'ft-managed-command-center__provider-copy';
         const localTitle = document.createElement('strong');
@@ -974,7 +974,7 @@
         const localDetail = document.createElement('span');
         localDetail.textContent = summary.profileCount > 0
             ? (localNetwork.detail || 'Use this only with a trusted FilterTube-compatible bridge on your home or school network.')
-            : 'Create a protected profile first. A home network bridge is optional and never replaces parent trust.';
+            : 'Create a protected profile first. Home Bridge is optional and never replaces parent trust.';
         const localRoute = document.createElement('span');
         localRoute.textContent = localNetwork.configured
             ? 'The protected device still accepts only trusted parent updates.'
