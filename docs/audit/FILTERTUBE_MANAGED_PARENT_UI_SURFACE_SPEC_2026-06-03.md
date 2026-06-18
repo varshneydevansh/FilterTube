@@ -120,6 +120,10 @@ shows the parent counts before any write, leaves failed sources unchanged,
 replaces only matching list-derived rows after parent/account re-auth, records
 `policy.channel_list.refresh` history, and can use the existing verified-device
 send offer for changed profiles.
+The app-contract parity slice now records managed channel lists in
+`managed-app-policy-contract-v1.json` so downstream apps preserve list-derived
+row metadata, skip paused list rows during native channel enforcement, keep
+manual channel rules separate, and do not treat public list URLs as authority.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 

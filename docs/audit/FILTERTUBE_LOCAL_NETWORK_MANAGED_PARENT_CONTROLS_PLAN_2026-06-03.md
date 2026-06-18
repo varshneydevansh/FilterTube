@@ -148,6 +148,10 @@ extension authority code.
     parent-approved pass. Failed sources are left unchanged, matching
     list-derived rows are replaced through the existing channel-rule path, and
     changed profiles can use the existing verified-device send offer.
+  - [x] First app-contract parity slice: the managed app policy contract now
+    names managed channel lists as a rule-source contract, including list row
+    metadata, pause enforcement, manual-rule separation, refresh behavior, and
+    native parity requirements.
   - [ ] Scheduled subscription refresh remains a future slice.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
@@ -352,6 +356,7 @@ Add list -> Preview -> Choose profiles -> Apply -> Send update
 12. Pause/resume imported lists without deleting manual or list-derived rows [done]
 13. Show last-checked and compact hash metadata for imported/refreshed lists [done]
 14. Refresh all URL-backed lists in one parent-approved pass [done]
+15. Document managed channel-list parity in the shared app policy contract [done]
 ```
 
 Scheduled subscriptions and automatic background refresh remain future work. A

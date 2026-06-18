@@ -190,6 +190,50 @@
     ],
     "runtimeBoundary": "remote managed rule updates are accepted only as validated policy payloads and must reuse local keyword channel and video mutation paths before app sync claims parity"
   },
+  "managedChannelLists": {
+    "schema": "filtertube_managed_channel_list_rule_source",
+    "issue": 62,
+    "identity": "channel lists are parent-approved rule sources, not transport authority or executable filter code",
+    "materializedRowFields": [
+      "managedListId",
+      "managedListName",
+      "managedListSourceLabel",
+      "managedListSourceUrl",
+      "managedListImportedAt",
+      "managedListLastCheckedAt",
+      "managedListContentHash",
+      "managedListPaused"
+    ],
+    "requiredActions": [
+      "import_pasted_or_file_list",
+      "import_public_https_url_after_preview",
+      "view_saved_list_summary",
+      "pause_saved_list_without_deleting_rows",
+      "resume_saved_list",
+      "refresh_one_url_backed_list_after_parent_reauth",
+      "refresh_all_loaded_url_backed_lists_after_parent_reauth",
+      "remove_list_derived_rows_without_deleting_manual_rules",
+      "send_channel_policy_to_verified_devices"
+    ],
+    "requiredDecisions": [
+      "list_url_is_data_source_only",
+      "parent_preview_before_write",
+      "parent_reauth_before_protected_profile_write",
+      "malformed_or_name_only_rows_skipped_for_safety",
+      "manual_channel_rows_remain_distinguishable",
+      "paused_list_rows_do_not_compile_into_channel_blocking",
+      "paused_list_rows_do_not_compile_into_channel_filter_all_keywords",
+      "failed_refresh_source_leaves_existing_rows_unchanged",
+      "history_rows_are_redacted_and_not_policy_authority"
+    ],
+    "nativeParityRequirements": [
+      "preserve_materialized_row_metadata_during_import_export_and_sync",
+      "skip_paused_list_rows_in_native_channel_enforcement",
+      "show_list_status_without_exposing_raw_rule_contents_to_protected_users",
+      "keep_manual_channel_rules_separate_from_list_derived_rows",
+      "do_not_treat_public_list_url_or_lan_provider_as_admin_authority"
+    ]
+  },
   "managedDelivery": {
     "transports": [
       "live_nanah",
@@ -243,6 +287,7 @@
       "profile_contract",
       "managed_policy_envelope_contract",
       "managed_rule_policy_contract",
+      "managed_channel_list_contract",
       "viewing_space_policy_contract",
       "time_limit_policy_contract",
       "action_history_contract"
@@ -259,6 +304,8 @@
       "native_kids_surface_route_gate",
       "native_keyword_rule_apply",
       "native_channel_rule_apply",
+      "native_managed_channel_list_metadata_preservation",
+      "native_managed_channel_list_pause_enforcement",
       "native_video_rule_apply",
       "native_time_budget_gate_before_web_content",
       "native_settings_sync_lock"
