@@ -3297,6 +3297,62 @@
             }
         } catch (e) {
         }
+        try {
+            if (candidates.length === 0) {
+                const hrefAnchors = document.querySelectorAll('a[href]');
+                for (const anchor of Array.from(hrefAnchors)) {
+                    const href = anchor.getAttribute('href') || anchor.href || '';
+                    if (!href || !href.includes(videoId)) continue;
+                    let matched = false;
+                    try {
+                        const url = new URL(href, window.location?.origin || 'https://www.youtube.com');
+                        matched = url.searchParams.get('v') === videoId ||
+                            url.pathname === `/shorts/${videoId}` ||
+                            url.pathname.endsWith(`/watch/${videoId}`);
+                    } catch (err) {
+                        matched = href.includes(`v=${videoId}`) ||
+                            href.includes(`/shorts/${videoId}`) ||
+                            href.includes(`/watch/${videoId}`);
+                    }
+                    if (!matched) continue;
+                    addElementAndContext(anchor);
+                    if (candidates.length >= 8) break;
+                }
+            }
+        } catch (e) {
+        }
+        try {
+            if (candidates.length === 0) {
+                const contentNodes = document.querySelectorAll('[class*="content-id-"]');
+                for (const node of Array.from(contentNodes)) {
+                    const className = typeof node.className === 'string'
+                        ? node.className
+                        : (node.getAttribute?.('class') || '');
+                    if (!className.includes(`content-id-${videoId}`)) continue;
+                    addElementAndContext(node);
+                    if (candidates.length >= 8) break;
+                }
+            }
+        } catch (e) {
+        }
+        try {
+            if (candidates.length === 0) {
+                const scanCards = document.querySelectorAll(cardSelector);
+                for (const card of Array.from(scanCards).slice(0, 80)) {
+                    const className = card.getAttribute?.('class') || '';
+                    if (className.includes(`content-id-${videoId}`)) {
+                        addElementAndContext(card);
+                        break;
+                    }
+                    const href = card.querySelector?.('a[href*="watch"], a[href*="/shorts/"]')?.getAttribute('href') || '';
+                    if (href && (href.includes(`v=${videoId}`) || href.includes(`/shorts/${videoId}`) || href.includes(`/watch/${videoId}`))) {
+                        addElementAndContext(card);
+                        break;
+                    }
+                }
+            }
+        } catch (e) {
+        }
         const baseElement = candidates[0] || null;
         if (!baseElement) {
             postLog('warn', `❌ Could not find DOM element for ${videoId}`);

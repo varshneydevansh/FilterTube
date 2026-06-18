@@ -3573,6 +3573,79 @@ function requestCollaboratorEnrichment(element, videoId, partialCollaborators = 
             clearTemporaryCollaboratorLookupToken(card || element, lookupToken);
         });
 }
+
+function findVideoCardsByVideoId(videoId, extraCards = []) {
+    const normalizedVideoId = typeof videoId === 'string' ? videoId.trim() : '';
+    if (!normalizedVideoId) return [];
+
+    const cards = new Set();
+    const addCard = (candidate) => {
+        if (!candidate || !(candidate instanceof Element)) return;
+        const card = findVideoCardElement(candidate) || candidate;
+        if (!card || !(card instanceof Element)) return;
+        if (!shouldStampCardForVideoId(card, normalizedVideoId)) return;
+        try {
+            if (!card.getAttribute('data-filtertube-video-id')) {
+                card.setAttribute('data-filtertube-video-id', normalizedVideoId);
+            }
+        } catch (e) {
+        }
+        cards.add(card);
+    };
+
+    try {
+        document.querySelectorAll(`[data-filtertube-video-id="${normalizedVideoId}"]`).forEach(addCard);
+    } catch (e) {
+    }
+
+    (Array.isArray(extraCards) ? extraCards : [extraCards]).forEach(addCard);
+
+    try {
+        const selectors = [
+            `a[href*="watch?v=${normalizedVideoId}"]`,
+            `a[href*="/watch?v=${normalizedVideoId}"]`,
+            `a[href*="%3Fv%3D${normalizedVideoId}"]`,
+            `a[href*="%2Fwatch%3Fv%3D${normalizedVideoId}"]`,
+            `a[href*="/shorts/${normalizedVideoId}"]`,
+            `a[href*="/watch/${normalizedVideoId}"]`
+        ];
+        document.querySelectorAll(selectors.join(',')).forEach(addCard);
+    } catch (e) {
+    }
+
+    try {
+        document.querySelectorAll('a[href]').forEach(anchor => {
+            const href = anchor.getAttribute('href') || anchor.href || '';
+            if (!href || !href.includes(normalizedVideoId)) return;
+            let matched = false;
+            try {
+                const url = new URL(href, window.location?.origin || 'https://www.youtube.com');
+                matched = url.searchParams.get('v') === normalizedVideoId ||
+                    url.pathname === `/shorts/${normalizedVideoId}` ||
+                    url.pathname.endsWith(`/watch/${normalizedVideoId}`);
+            } catch (err) {
+                matched = href.includes(`v=${normalizedVideoId}`) ||
+                    href.includes(`/shorts/${normalizedVideoId}`) ||
+                    href.includes(`/watch/${normalizedVideoId}`);
+            }
+            if (matched) addCard(anchor);
+        });
+    } catch (e) {
+    }
+
+    try {
+        document.querySelectorAll('[class*="content-id-"]').forEach(node => {
+            const className = typeof node.className === 'string'
+                ? node.className
+                : (node.getAttribute?.('class') || '');
+            if (className.includes(`content-id-${normalizedVideoId}`)) addCard(node);
+        });
+    } catch (e) {
+    }
+
+    return Array.from(cards);
+}
+
 function applyResolvedCollaborators(videoId, collaborators, options = {}) {
     if (!videoId || !Array.isArray(collaborators) || collaborators.length === 0) return false;
     const sanitized = sanitizeCollaboratorList(collaborators);
@@ -3589,9 +3662,8 @@ function applyResolvedCollaborators(videoId, collaborators, options = {}) {
     const sourceCard = options.sourceCard || null;
     const sourceLabel = options.sourceLabel || '';
     const timestamp = Date.now();
-    const cards = document.querySelectorAll(`[data-filtertube-video-id="${videoId}"]`);
+    const cards = findVideoCardsByVideoId(videoId, sourceCard);
     const writerCandidates = Array.from(cards);
-    if (sourceCard) writerCandidates.push(sourceCard);
     if (typeof rejectAmpersandTopicCollaboratorWrite === 'function' && rejectAmpersandTopicCollaboratorWrite(videoId, sanitized, writerCandidates)) {
         return false;
     }
@@ -3638,16 +3710,11 @@ function applyResolvedCollaborators(videoId, collaborators, options = {}) {
             applyToCard(card);
         });
         updated = true;
-    } else if (sourceCard) {
-        applyToCard(sourceCard);
-        updated = true;
     }
 
     resolvedCollaboratorsByVideoId.set(videoId, sanitized);
 
-    const expectedAttr = cards[0]?.getAttribute('data-filtertube-expected-collaborators') ||
-        sourceCard?.getAttribute?.('data-filtertube-expected-collaborators') ||
-        '';
+    const expectedAttr = cards[0]?.getAttribute('data-filtertube-expected-collaborators') || '';
     const expectedCount = resolveExpectedCollaboratorCount(
         collaborators,
         sanitized,
@@ -6120,7 +6187,8 @@ function handleMainWorldMessages(event) {
 
         if (videoId && Array.isArray(collaborators) && collaborators.length > 0) {
             const sanitizedResponse = sanitizeCollaboratorList(collaborators);
-            const expectedAttr = document.querySelector(`[data-filtertube-video-id="${videoId}"]`)?.getAttribute('data-filtertube-expected-collaborators') || '';
+            const cards = findVideoCardsByVideoId(videoId);
+            const expectedAttr = cards[0]?.getAttribute('data-filtertube-expected-collaborators') || '';
             const expectedCount = resolveExpectedCollaboratorCount(
                 collaborators,
                 sanitizedResponse,
@@ -6166,27 +6234,9 @@ function handleMainWorldMessages(event) {
 
         // Ensure matching cards are stamped with data-filtertube-video-id so applyResolvedCollaborators
         // can locate/refresh their menus.
-        const foundCards = new Set();
-        try {
-            const selectors = [
-                `a[href*="watch?v=${videoId}"]`,
-                `a[href*="/watch?v=${videoId}"]`,
-                `a[href*="/shorts/${videoId}"]`,
-                `a[href*="/watch/${videoId}"]`
-            ];
-            const anchors = document.querySelectorAll(selectors.join(','));
-            anchors.forEach(anchor => {
-                const card = findVideoCardElement(anchor);
-                if (!card || !card.getAttribute) return;
-                if (!card.getAttribute('data-filtertube-video-id')) {
-                    card.setAttribute('data-filtertube-video-id', videoId);
-                }
-                foundCards.add(card);
-            });
-        } catch (e) {
-        }
+        const foundCards = findVideoCardsByVideoId(videoId);
 
-        const expectedFromCard = Array.from(foundCards)[0]?.getAttribute?.('data-filtertube-expected-collaborators') || '';
+        const expectedFromCard = foundCards[0]?.getAttribute?.('data-filtertube-expected-collaborators') || '';
         const expectedCount = Math.max(
             parseInt(expectedFromCard || '0', 10) || 0,
             collaborators.length
@@ -6196,7 +6246,7 @@ function handleMainWorldMessages(event) {
             expectedCount,
             force: true,
             sourceLabel: 'xhr',
-            sourceCard: Array.from(foundCards)[0] || null
+            sourceCard: foundCards[0] || null
         });
     } else if (type === 'FilterTube_ChannelInfoResponse') {
         // Handle response from Main World with single-channel info

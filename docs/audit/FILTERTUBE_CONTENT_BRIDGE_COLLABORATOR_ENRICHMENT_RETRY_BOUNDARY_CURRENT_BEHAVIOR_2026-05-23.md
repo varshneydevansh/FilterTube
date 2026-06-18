@@ -94,6 +94,21 @@ This boundary is where passive or menu-driven collaborator discovery becomes DOM
 
 Current behavior is intentionally broad: enrichment can mark a card pending before the request is sent, retry after empty or failed main-world lookups, cache collaborator rosters even when no visible card is updated, and rerun DOM fallback after collaborator application. This audit slice does not approve changing those semantics; it makes their current side effects explicit before optimization work.
 
+## 2026-06-19 Recovery Note
+
+YouTube's desktop lockup/menu rollout can open collaborator menus from newer
+`yt-lockup-view-model` and `button-view-model` wrappers before FilterTube has
+stamped the visible card with `data-filtertube-video-id`. The retry boundary now
+documents a targeted recovery rule: collaborator application must locate cards
+by stamped video id, watch/shorts anchors, parsed URL matches, and
+`content-id-<videoId>` lockup classes before treating a main-world collaborator
+response as detached from the visible card.
+
+This is not a looser collaborator detector. The existing false-collab gates,
+ampersand-topic rejection, expected-collaborator count checks, and roster
+quality comparison remain in force. The change only hardens card lookup and menu
+refresh after collaborator identity has already been requested or returned.
+
 ## Missing Future Proof
 
 No product runtime symbol exists yet for:

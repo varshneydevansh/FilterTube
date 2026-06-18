@@ -67,7 +67,7 @@ These counts are over the four pinned blocks, not the whole product.
 - Main-world merge copies the first collaborator into the primary `handle`, `id`, `name`, and `customUrl` fields when the primary entry has usable data.
 - Main-world merge recomputes `needsEnrichment` from identifier completeness after mutation.
 - Main-world enrichment is inactive without collaboration identity or video id.
-- Main-world enrichment queries `[data-filtertube-video-id="..."]`, builds lookup options with the source card, partial collaborators, and channel info, requests collaborators, then merges non-empty responses.
+- Main-world enrichment queries the source card first, then falls back through stamped video-id attributes, watch/shorts anchors, parsed URL matches, and `content-id-<videoId>` lockup classes before requesting collaborators and merging non-empty responses.
 
 ## Risk Boundary
 
