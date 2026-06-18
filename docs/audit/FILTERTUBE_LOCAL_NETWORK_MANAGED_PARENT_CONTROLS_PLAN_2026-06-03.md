@@ -152,6 +152,10 @@ extension authority code.
     names managed channel lists as a rule-source contract, including list row
     metadata, pause enforcement, manual-rule separation, refresh behavior, and
     native parity requirements.
+  - [x] First stale-source parent hint slice: URL-backed lists older than seven
+    days now show a parent-facing needs-refresh status in the command center
+    and list library. Parents can refresh only stale URL-backed lists in one
+    approved pass; this is not a background scheduler.
   - [ ] Scheduled subscription refresh remains a future slice.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
@@ -357,6 +361,7 @@ Add list -> Preview -> Choose profiles -> Apply -> Send update
 13. Show last-checked and compact hash metadata for imported/refreshed lists [done]
 14. Refresh all URL-backed lists in one parent-approved pass [done]
 15. Document managed channel-list parity in the shared app policy contract [done]
+16. Show stale URL-backed list status and refresh only stale lists [done]
 ```
 
 Scheduled subscriptions and automatic background refresh remain future work. A

@@ -1,6 +1,8 @@
 (function (global) {
     'use strict';
 
+    const MANAGED_CHANNEL_LIST_STALE_AFTER_MS = 7 * 24 * 60 * 60 * 1000;
+
     function fallbackSafeObject(value) {
         return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
     }
@@ -215,6 +217,7 @@
         addRows(main.whitelistChannels, 'Main');
         addRows(kids.blockedChannels, 'Kids');
         addRows(kids.whitelistChannels, 'Kids');
+        const now = Date.now();
         const items = Array.from(lists.values()).map((item) => ({
             id: item.id,
             name: item.name,
@@ -224,18 +227,25 @@
             sourceUrlCount: item.sourceUrlCount,
             lastCheckedAt: item.lastCheckedAt,
             contentHash: item.contentHash,
-            surfaces: Array.from(item.surfaces)
+            surfaces: Array.from(item.surfaces),
+            urlBacked: item.sourceUrlCount > 0,
+            stale: item.sourceUrlCount > 0
+                && (!item.lastCheckedAt || (now - item.lastCheckedAt) >= MANAGED_CHANNEL_LIST_STALE_AFTER_MS)
         }));
         const rowCount = items.reduce((total, item) => total + item.rowCount, 0);
         const activeRowCount = items.reduce((total, item) => total + item.activeRowCount, 0);
         const pausedRowCount = items.reduce((total, item) => total + item.pausedRowCount, 0);
         const sourceUrlCount = items.reduce((total, item) => total + item.sourceUrlCount, 0);
+        const staleListCount = items.filter(item => item.stale).length;
+        const urlBackedListCount = items.filter(item => item.urlBacked).length;
         return {
             listCount: items.length,
             rowCount,
             activeRowCount,
             pausedRowCount,
             sourceUrlCount,
+            urlBackedListCount,
+            staleListCount,
             items
         };
     }
@@ -246,7 +256,9 @@
         const rowCount = normalizeCommandCenterNumber(summary.rowCount);
         const activeRowCount = normalizeCommandCenterNumber(summary.activeRowCount);
         const pausedRowCount = normalizeCommandCenterNumber(summary.pausedRowCount);
+        const staleListCount = normalizeCommandCenterNumber(summary.staleListCount);
         const listLabel = listCount === 1 ? 'list' : 'lists';
+        if (staleListCount > 0) return `${staleListCount} ${staleListCount === 1 ? 'list' : 'lists'} need refresh`;
         if (pausedRowCount > 0 && activeRowCount <= 0) return `${listCount} ${listLabel} paused`;
         if (pausedRowCount > 0) return `${listCount} ${listLabel} (${activeRowCount} on)`;
         return rowCount > 0 ? `${listCount} ${listLabel} (${rowCount})` : `${listCount} ${listLabel}`;
@@ -262,7 +274,9 @@
         const more = listCount > names.length ? ` +${listCount - names.length} more` : '';
         const latestChecked = summary.items.reduce((latest, item) => Math.max(latest, Number(item?.lastCheckedAt) || 0), 0);
         const checked = latestChecked ? `, checked ${new Date(latestChecked).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}` : '';
-        return names.length ? `${names.join(', ')}${more}${checked}` : `${listCount} imported ${listCount === 1 ? 'list' : 'lists'}${checked}`;
+        const staleListCount = normalizeCommandCenterNumber(summary.staleListCount);
+        const stale = staleListCount ? `, ${staleListCount} need refresh` : '';
+        return names.length ? `${names.join(', ')}${more}${checked}${stale}` : `${listCount} imported ${listCount === 1 ? 'list' : 'lists'}${checked}${stale}`;
     }
 
     function resolveManagedCommandCenterSyncState(item = {}) {
@@ -546,6 +560,7 @@
                 managedChannelListProfileCount: 0,
                 managedChannelListCount: 0,
                 managedChannelListRowCount: 0,
+                managedChannelListStaleCount: 0,
                 pendingExtraTimeRequestCount: 0,
                 remoteConflictCount: 0
             };
@@ -602,6 +617,7 @@
                 managedChannelListCount: managedChannelLists.listCount,
                 managedChannelListRowCount: managedChannelLists.rowCount,
                 managedChannelListUrlCount: managedChannelLists.sourceUrlCount,
+                managedChannelListStaleCount: managedChannelLists.staleListCount,
                 managedChannelListLabel: formatManagedChannelListChip(managedChannelLists),
                 managedChannelListDetail: formatManagedChannelListDetail(managedChannelLists),
                 pendingExtraTimeRequestLabel: pendingExtraTimeRequest?.label || '',
@@ -638,6 +654,7 @@
             managedChannelListProfileCount: acc.managedChannelListProfileCount + (row.managedChannelListCount > 0 ? 1 : 0),
             managedChannelListCount: acc.managedChannelListCount + row.managedChannelListCount,
             managedChannelListRowCount: acc.managedChannelListRowCount + row.managedChannelListRowCount,
+            managedChannelListStaleCount: acc.managedChannelListStaleCount + row.managedChannelListStaleCount,
             remoteScopeCount: acc.remoteScopeCount + row.remoteScopeCount,
             historyRowCount: acc.historyRowCount + row.historyRowCount,
             protectedRowCount: acc.protectedRowCount + row.protectedRowCount,
@@ -658,6 +675,7 @@
             managedChannelListProfileCount: 0,
             managedChannelListCount: 0,
             managedChannelListRowCount: 0,
+            managedChannelListStaleCount: 0,
             remoteScopeCount: 0,
             historyRowCount: 0,
             protectedRowCount: 0,

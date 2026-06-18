@@ -7611,6 +7611,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    function isManagedChannelListSummaryUrlBacked(summary) {
+        return !!normalizeManagedChannelListSourceUrl(summary?.sourceUrl);
+    }
+
+    function isManagedChannelListSummaryStale(summary, now = Date.now()) {
+        if (!isManagedChannelListSummaryUrlBacked(summary)) return false;
+        const checkedAt = Number(summary?.lastCheckedAt) || 0;
+        const staleAfterMs = 7 * 24 * 60 * 60 * 1000;
+        return !checkedAt || (Number(now) - checkedAt) >= staleAfterMs;
+    }
+
     function formatManagedChannelListShortHash(contentHash) {
         const normalized = normalizeString(contentHash);
         if (!normalized) return '';
@@ -7671,8 +7682,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 source.className = 'managed-channel-list-modal__library-source';
                 const sourceBits = [
                     normalizeString(summary.sourceLabel) || 'Imported list',
-                    normalizeManagedChannelListSourceUrl(summary.sourceUrl) ? 'URL-backed' : 'Local/pasted',
+                    isManagedChannelListSummaryUrlBacked(summary) ? 'URL-backed' : 'Local/pasted',
                     formatManagedChannelListCheckedAt(summary.lastCheckedAt),
+                    isManagedChannelListSummaryStale(summary) ? 'needs refresh' : '',
                     formatManagedChannelListShortHash(summary.contentHash)
                 ];
                 source.textContent = sourceBits.filter(Boolean).join(' | ');
@@ -8709,7 +8721,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    async function refreshAllManagedChannelListsForProfiles(profileIds) {
+    async function refreshAllManagedChannelListsForProfiles(profileIds, options = {}) {
+        const staleOnly = safeObject(options).staleOnly === true;
         const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
         if (!targetIds.length) {
             UIComponents.showToast('Select at least one protected profile', 'error');
@@ -8740,15 +8753,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const summaries = collectManagedChannelListSummaries(profiles, eligibleIds);
-        const urlBacked = summaries.filter(summary => normalizeManagedChannelListSourceUrl(summary?.sourceUrl));
+        const urlBacked = summaries.filter(summary => isManagedChannelListSummaryUrlBacked(summary));
+        const refreshTargets = staleOnly
+            ? urlBacked.filter(summary => isManagedChannelListSummaryStale(summary))
+            : urlBacked;
         if (!urlBacked.length) {
             UIComponents.showToast('No URL-backed imported lists found for the selected protected profiles', 'info');
+            return;
+        }
+        if (!refreshTargets.length) {
+            UIComponents.showToast('No stale URL-backed lists found for the selected protected profiles', 'info');
             return;
         }
 
         const loadedCandidates = [];
         const failedCandidates = [];
-        for (const summary of urlBacked) {
+        for (const summary of refreshTargets) {
             try {
                 loadedCandidates.push(await loadManagedChannelListRefreshCandidate(summary));
             } catch (error) {
@@ -8766,8 +8786,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const totalValidChannels = loadedCandidates.reduce((total, item) => total + safeArray(item?.parsed?.channels).length, 0);
         const totalSkippedRows = loadedCandidates.reduce((total, item) => total + (Number(item?.parsed?.skippedCount) || 0), 0);
         const confirmRefresh = await showChoiceModal({
-            title: `Refresh ${loadedCandidates.length} URL-backed ${pluralize(loadedCandidates.length, 'list')}?`,
-            message: `FilterTube loaded ${loadedCandidates.length} URL-backed ${pluralize(loadedCandidates.length, 'list')} for ${eligibleIds.length} selected protected ${pluralize(eligibleIds.length, 'profile')}.`,
+            title: staleOnly
+                ? `Refresh ${loadedCandidates.length} stale URL ${pluralize(loadedCandidates.length, 'list')}?`
+                : `Refresh ${loadedCandidates.length} URL-backed ${pluralize(loadedCandidates.length, 'list')}?`,
+            message: `FilterTube loaded ${loadedCandidates.length} ${staleOnly ? 'stale ' : ''}URL-backed ${pluralize(loadedCandidates.length, 'list')} for ${eligibleIds.length} selected protected ${pluralize(eligibleIds.length, 'profile')}.`,
             details: [
                 `${totalValidChannels} valid ${pluralize(totalValidChannels, 'channel')} found across loaded lists`,
                 totalSkippedRows ? `${totalSkippedRows} ${pluralize(totalSkippedRows, 'row')} skipped for safety` : 'No rows skipped',
@@ -8849,7 +8871,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }).length;
         if (readyProfileCount > 0) {
             const sendNow = await showConfirmModal({
-                title: 'Send refreshed lists now?',
+                title: staleOnly ? 'Send refreshed stale lists now?' : 'Send refreshed lists now?',
                 message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send these refreshed list updates to those devices now.`,
                 confirmText: 'Send update',
                 cancelText: 'Not now'
@@ -8894,13 +8916,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const summaries = collectManagedChannelListSummaries(profiles, eligibleIds);
-        const urlBackedCount = summaries.filter(summary => normalizeManagedChannelListSourceUrl(summary?.sourceUrl)).length;
+        const urlBackedCount = summaries.filter(summary => isManagedChannelListSummaryUrlBacked(summary)).length;
+        const staleUrlBackedCount = summaries.filter(summary => isManagedChannelListSummaryStale(summary)).length;
         const activeListCount = summaries.filter(summary => (Number(summary.activeChannelCount) || 0) > 0).length;
         const pausedListCount = summaries.filter(summary => (Number(summary.pausedChannelCount) || 0) > 0).length;
         const details = summaries.length
             ? [
                 `${summaries.length} imported ${pluralize(summaries.length, 'list')} across ${eligibleIds.length} selected ${pluralize(eligibleIds.length, 'profile')}`,
                 `${activeListCount} active | ${pausedListCount} paused`,
+                staleUrlBackedCount ? `${staleUrlBackedCount} URL-backed ${pluralize(staleUrlBackedCount, 'list')} need refresh` : 'No stale URL-backed lists',
                 urlBackedCount ? `${urlBackedCount} URL-backed ${pluralize(urlBackedCount, 'list')} can be refreshed` : 'No URL-backed lists to refresh yet'
             ]
             : [
@@ -8913,6 +8937,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ...(activeListCount ? [{ value: 'pause', label: 'Pause List', className: 'btn-secondary' }] : []),
             ...(pausedListCount ? [{ value: 'resume', label: 'Resume List', className: 'btn-secondary' }] : []),
             ...(urlBackedCount ? [{ value: 'refresh', label: 'Refresh List', className: 'btn-secondary' }] : []),
+            ...(staleUrlBackedCount ? [{ value: 'refresh_stale', label: 'Refresh Stale URLs', className: 'btn-secondary' }] : []),
             ...(urlBackedCount > 1 ? [{ value: 'refresh_all', label: 'Refresh All URLs', className: 'btn-secondary' }] : []),
             ...(summaries.length ? [{ value: 'remove', label: 'Remove List', className: 'btn-secondary' }] : [])
         ];
@@ -8933,6 +8958,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             await setManagedChannelListPausedForProfiles(eligibleIds, false);
         } else if (selected === 'refresh') {
             await refreshManagedChannelListForProfiles(eligibleIds);
+        } else if (selected === 'refresh_stale') {
+            await refreshAllManagedChannelListsForProfiles(eligibleIds, { staleOnly: true });
         } else if (selected === 'refresh_all') {
             await refreshAllManagedChannelListsForProfiles(eligibleIds);
         } else if (selected === 'remove') {
