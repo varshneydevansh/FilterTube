@@ -1213,10 +1213,11 @@ the current extension dashboard.
   into compact status chips, mark remote conflict rows visually, and expose a
   protected Review Conflict action that opens a parent/account re-authed
   conflict/rejected remote-policy history filter.
-  Built-in LAN transports remain pending. The command center now has a compact
-  encrypted-mailbox endpoint row that can configure, edit, or disable the
-  browser-side HTTPS mailbox client after parent/account re-auth. This does not
-  add mailbox server authority or a standalone offline-send page.
+  Automatic LAN peer discovery remains pending. The command center now has
+  compact Pick Up Later and Home Bridge setup rows that can configure, edit, or
+  disable the browser-side HTTPS mailbox client and local-network configured
+  provider after parent/account re-auth. This does not add mailbox server
+  authority, discovery-as-authority, or a standalone offline-send page.
   The parent UI now keeps the normal flow live-P2P first: create/select the
   protected profile, edit rules/access/time, pair a verified device, then send
   when both sides are available. Unconfigured mailbox and local-network provider
