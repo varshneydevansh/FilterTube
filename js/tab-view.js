@@ -7253,6 +7253,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const normalized = normalizeString(value).toLowerCase();
         const allowed = new Set([
             'plain_text_rows',
+            'typed_text_rows',
             'csv_like_text_rows',
             'csv_channel_keyword_rows',
             'simple_json_array',
@@ -7269,6 +7270,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (normalized === 'blocktube_json_rules') return 'BlockTube JSON';
         if (normalized === 'public_https_text_or_json_url') return 'URL source';
         if (normalized === 'csv_channel_keyword_rows') return 'CSV rules';
+        if (normalized === 'typed_text_rows') return 'TXT rules';
         if (normalized === 'csv_like_text_rows') return 'CSV-like text';
         if (normalized === 'plain_text_rows') return 'text list';
         return '';
@@ -7645,23 +7647,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         const listId = buildManagedChannelListId(listName || 'Imported list', text);
         const lines = text.split(/\r?\n/);
         const seen = new Set();
+        const seenKeywords = new Set();
         const channels = [];
         const keywords = [];
         let skippedCount = 0;
+        let typedRowCount = 0;
 
-        lines.forEach((line) => {
-            const token = extractManagedChannelListToken(line);
-            if (!token) {
-                if (normalizeString(line) && !/^(#|!|\/\/|\[)/.test(normalizeString(line))) skippedCount += 1;
-                return;
-            }
-            const channel = normalizeProfileChannel(token);
-            if (!channel) {
-                skippedCount += 1;
-                return;
-            }
+        const addTextKeyword = (token) => {
+            const keyword = normalizeProfileKeyword(token, { comments: true });
+            if (!keyword) return false;
+            const key = normalizeString(keyword.word).toLowerCase();
+            if (!key || seenKeywords.has(key)) return true;
+            seenKeywords.add(key);
+            keywords.push({
+                ...keyword,
+                source: 'managed_channel_list',
+                managedListId: listId,
+                managedListName: normalizeString(listName) || 'Imported rule list'
+            });
+            return true;
+        };
+
+        const addTextChannel = (token) => {
+            const extracted = extractManagedChannelListToken(token);
+            if (!extracted) return false;
+            const channel = normalizeProfileChannel(extracted);
+            if (!channel) return false;
             const key = managedChannelEntryKey(channel);
-            if (!key || seen.has(key)) return;
+            if (!key || seen.has(key)) return true;
             seen.add(key);
             channels.push({
                 ...channel,
@@ -7669,12 +7682,37 @@ document.addEventListener('DOMContentLoaded', async () => {
                 managedListId: listId,
                 managedListName: normalizeString(listName) || 'Imported rule list'
             });
+            return true;
+        };
+
+        lines.forEach((line) => {
+            const trimmed = normalizeString(line);
+            if (!trimmed || /^(#|!|\/\/|\[)/.test(trimmed)) return;
+            const typedMatch = trimmed.match(/^([A-Za-z][A-Za-z0-9 _-]{1,24})\s*[:=]\s*(.+)$/);
+            if (typedMatch) {
+                const type = normalizeManagedChannelListCsvHeader(typedMatch[1]);
+                const value = normalizeString(typedMatch[2]);
+                if (['keyword', 'keywords', 'term', 'terms', 'phrase', 'phrases'].includes(type)) {
+                    typedRowCount += 1;
+                    if (!addTextKeyword(value)) skippedCount += 1;
+                    return;
+                }
+                if (['channel', 'channels', 'channelid', 'handle', 'url', 'ucid', 'customurl'].includes(type)) {
+                    typedRowCount += 1;
+                    if (!addTextChannel(value)) skippedCount += 1;
+                    return;
+                }
+            }
+            if (!addTextChannel(trimmed)) {
+                skippedCount += 1;
+                return;
+            }
         });
 
         return {
             listId,
             contentHash: buildManagedChannelListContentHash(text),
-            sourceFormat: 'plain_text_rows',
+            sourceFormat: typedRowCount > 0 ? 'typed_text_rows' : 'plain_text_rows',
             sourceMetadata: parseManagedChannelListSourceMetadata(text),
             channels,
             keywords,
@@ -7707,6 +7745,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         channels: [
             '@SomeChannel',
             'UCxxxxxxxxxxxxxxxxxxxxxx',
+            'c/ChannelURL',
             'https://www.youtube.com/@AnotherChannel'
         ],
         keywords: [
@@ -7788,8 +7827,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 : 'CSV needs channel_id and/or keyword headers, or type,value rows.';
         }
         return skipped
-            ? `${skipped} ${pluralize(skipped, 'row')} skipped. TXT accepts YouTube channel IDs, handles, custom URLs, or channel URLs only.`
-            : 'TXT accepts one YouTube channel ID, handle, custom URL, or channel URL per line.';
+            ? `${skipped} ${pluralize(skipped, 'row')} skipped. TXT accepts channel: rows for YouTube channel IDs, handles, custom URLs, or URLs, and keyword: rows for keywords.`
+            : 'TXT accepts channel: rows for channel IDs, handles, custom URLs, or URLs, and keyword: rows for keywords.';
     }
 
     function buildManagedRuleListParseErrorMessage(text) {
@@ -7800,7 +7839,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (trimmed.includes(',')) {
             return 'CSV could not be read as rules. Use channel_id, keyword, notes headers, or type, value, notes rows.';
         }
-        return 'FilterTube could not read supported rules from this text. TXT rows must be YouTube channel IDs, handles, custom URLs, or channel URLs.';
+        return 'FilterTube could not read supported rules from this text. TXT can use channel: @SomeChannel and keyword: brainrot rows; bare rows are treated as channels.';
     }
 
     function formatManagedRuleListCount(counts = {}) {
@@ -7874,8 +7913,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             formatGuide.className = 'managed-channel-list-modal__formats';
             formatGuide.innerHTML = `
                 <span><b>CSV</b><code>channel_id,keyword,notes</code></span>
-                <span><b>TXT</b><code>@SomeChannel</code></span>
-                <span><b>JSON</b><code>{"channels":["@SomeChannel"],"keywords":["brainrot"]}</code></span>
+                <span><b>TXT</b><code>channel: @SomeChannel</code><code>keyword: brainrot</code></span>
+                <span><b>JSON</b><code>{"channels":["@SomeChannel","c/ChannelURL"],"keywords":["brainrot"]}</code></span>
                 <span><b>BlockTube</b><code>filterData.channelId + filterData.title</code></span>
                 <span><b>Public list</b>raw HTTPS CSV, TXT, or JSON</span>
             `;
@@ -7968,7 +8007,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const help = document.createElement('div');
             help.className = 'managed-channel-list-modal__help';
-            help.textContent = 'TXT stays channel-only for safety. CSV and supported JSON can add channels and keywords. FilterTube shows parsed rows before any profile is changed.';
+            help.textContent = 'TXT bare rows stay channel-only; use keyword: for TXT keywords. CSV and supported JSON can add channels and keywords. FilterTube shows parsed rows before any profile is changed.';
             body.appendChild(help);
 
             const previewEl = document.createElement('div');
@@ -19825,7 +19864,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 message: 'Rule lists add channels and keywords only. Full FilterTube backups and legacy BlockTube export migration still belong under Choose JSON.',
                 details: [
                     'CSV: channel_id,keyword,notes or type,value,notes.',
-                    'Text: one YouTube channel ID, handle, custom URL, or URL per line.',
+                    'Text: bare rows are channels; typed rows can use channel: @SomeChannel or keyword: brainrot.',
                     'Rule-list JSON: channels and keywords arrays.',
                     'BlockTube JSON: filterData channel/title arrays are supported here for previewed rule-list import too.',
                     'Public URLs: raw HTTPS CSV, text, or JSON files can be loaded into the preview.'

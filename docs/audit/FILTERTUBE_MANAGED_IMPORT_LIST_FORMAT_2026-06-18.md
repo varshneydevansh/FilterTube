@@ -309,7 +309,7 @@ Current completion rule:
 Supported source shapes in this slice:
 
 - CSV: `channel_id,keyword,notes`, `channel,keyword,notes`, or typed rows such as `type,value,notes`.
-- Text: one YouTube channel ID, handle, custom URL, or URL per line. Text stays channel-only for safety.
+- Text: bare rows are treated as channel IDs/handles/custom URLs/URLs. Explicit typed rows are also accepted: `channel: @SomeChannel`, `channel: UC...`, `channel: c/Name`, and `keyword: brainrot`.
 - Simple JSON: `channels` and/or `keywords` arrays.
 - BlockTube-style JSON: `filterData.channelId`, `filterData.channelName`, and `filterData.title` arrays are read as rule-list channels/keywords.
 - Raw HTTPS source URL: public CSV, text, or JSON fetched into the same preview before apply.

@@ -680,6 +680,27 @@ body[data-surface="popup"] .input-group {
     align-items: stretch;
 }
 
+.import-backup-format-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.42rem;
+    margin-top: 0.45rem;
+}
+
+.import-backup-format-strip span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.85rem;
+    padding: 0.32rem 0.62rem;
+    border: 1px solid rgba(74, 157, 127, 0.22);
+    border-radius: 999px;
+    background: rgba(74, 157, 127, 0.08);
+    color: #12643e;
+    font-size: 0.76rem;
+    font-weight: 820;
+    line-height: 1.1;
+}
+
 .rule-list-sheet-example {
     display: grid;
     gap: 0;
@@ -724,6 +745,8 @@ body[data-surface="popup"] .input-group {
 }
 
 .rule-list-sheet-example__examples {
+    display: grid;
+    grid-template-columns: 1fr;
     align-items: stretch;
     justify-content: stretch;
     border-top: 1px solid rgba(15, 23, 42, 0.08);
@@ -732,7 +755,6 @@ body[data-surface="popup"] .input-group {
 
 .rule-list-sheet-example__examples div {
     display: grid;
-    flex: 1 1 14rem;
     gap: 0.28rem;
     min-width: 0;
     padding: 0.58rem 0.68rem;
@@ -751,6 +773,7 @@ body[data-surface="popup"] .input-group {
 
 .rule-list-sheet-example__examples pre {
     max-width: 100%;
+    max-height: 8.8rem;
     margin: 0;
     overflow: auto;
     color: var(--ft-color-text-secondary);
@@ -942,6 +965,12 @@ html[data-theme="dark"] .rule-list-sheet-example {
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.04),
         0 18px 30px -26px rgba(0, 0, 0, 0.42);
+}
+
+html[data-theme="dark"] .import-backup-format-strip span {
+    border-color: rgba(74, 222, 128, 0.2);
+    background: rgba(22, 101, 52, 0.14);
+    color: #9af0be;
 }
 
 html[data-theme="dark"] .rule-list-sheet-example__bar {

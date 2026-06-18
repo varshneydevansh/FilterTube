@@ -465,6 +465,11 @@
                                                         <span class="import-export-hint">
                                                             Use this for complete settings restore or legacy BlockTube export migration. For previewed channel/keyword-only lists, use Rule list imports below.
                                                         </span>
+                                                        <div class="import-backup-format-strip" aria-label="Supported backup imports">
+                                                            <span>FilterTube backup JSON</span>
+                                                            <span>BlockTube export JSON</span>
+                                                            <span>Full restore or migration</span>
+                                                        </div>
                                                         <span class="info-hint" title="Bring in data from FilterTube backups, BlockTube exports, or other structured JSON tools. Matching channels/keywords are merged; everything else is appended.">
                                                             Details
                                                         </span>
@@ -514,20 +519,25 @@
                                                             </div>
                                                             <div class="rule-list-sheet-example__formats">
                                                                 <span>CSV headers: <code>channel_id,keyword,notes</code></span>
-                                                                <span>TXT: one channel ID, handle, or URL per line</span>
+                                                                <span>TXT: <code>channel:</code> and <code>keyword:</code> rows</span>
                                                                 <span>JSON: <code>channels</code> + <code>keywords</code> arrays</span>
                                                                 <span>BlockTube JSON: <code>filterData</code></span>
                                                             </div>
                                                             <div class="rule-list-sheet-example__examples" aria-label="TXT and JSON examples">
                                                                 <div>
                                                                     <b>TXT example</b>
-                                                                    <pre>@SomeChannel
-UCxxxxxxxxxxxxxxxxxxxxxx
-https://www.youtube.com/@AnotherChannel</pre>
+                                                                    <pre>channel: @SomeChannel
+channel: UCxxxxxxxxxxxxxxxxxxxxxx
+channel: c/ChannelURL
+channel: https://www.youtube.com/@AnotherChannel
+keyword: brainrot</pre>
                                                                 </div>
                                                                 <div>
                                                                     <b>JSON example</b>
-                                                                    <pre>{"channels":["@SomeChannel"],"keywords":["brainrot"]}</pre>
+                                                                    <pre>{
+  "channels": ["@SomeChannel", "UCxxxxxxxxxxxxxxxxxxxxxx", "c/ChannelURL"],
+  "keywords": ["brainrot", "scary thumbnail"]
+}</pre>
                                                                 </div>
                                                             </div>
                                                         </div>
