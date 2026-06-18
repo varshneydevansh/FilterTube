@@ -108,12 +108,15 @@ extension authority code.
   while offline.
 - [x] Runtime Main/Kids route gate, background-owned time-budget accounting, and
   protected timeout overlay exist for active protected profiles.
-- [ ] Managed channel filter-list subscriptions/imports. Issue 62 asks for
+- [x] Managed channel filter-list imports and parent-triggered URL subscriptions
+  are now part of the managed parent/caregiver goal. Issue 62 asks for
   content-blocker-style channel lists that can be imported, enabled, disabled,
-  and synced. This should become a parent/caregiver rule-source feature, not an
-  untrusted URL authority path. The parent-facing flow should stay simple:
-  paste/import a list, preview channels, choose protected profiles, apply, then
-  send to verified devices when delivery is ready.
+  and synced instead of forcing parents to add channels one at a time. The
+  extension-owned manual/check/refresh/pause/remove path is present. This is a
+  parent/caregiver rule-source feature, not an untrusted URL authority path. The
+  parent-facing flow stays simple: import or check a list, preview channels,
+  choose protected profiles, apply, then send to verified devices when delivery
+  is ready. Silent scheduled refresh remains deferred.
   - [x] First local import slice: parent/account profiles can paste or choose a
     text file, preview valid channel identifiers, apply the list to selected
     protected profiles on Main/Kids/both, write protected redacted history, and
@@ -171,7 +174,9 @@ extension authority code.
     materialized channel rows after parent re-auth; unchanged source hashes only
     update checked/source metadata and protected history, avoiding unnecessary
     channel-row churn or remote policy sends.
-  - [ ] Scheduled subscription refresh remains a future slice.
+  - [ ] Scheduled subscription refresh remains a future slice. Until then,
+    list updates happen only after a parent/account profile chooses Check or
+    Refresh and approves the result.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.
@@ -327,7 +332,7 @@ Before accepting remote policy updates, fixtures must cover:
   must be parent/admin-approved rule sources with preview, local enable/disable,
   and protected history.
 
-## Issue 62: Managed Channel Filter-List Subscriptions
+## Issue 62: Managed Channel Filter-List Imports And Subscriptions
 
 **Goal**: Let parents/caregivers import or subscribe to channel filter lists in
 a way that feels as simple as enabling a content-blocker list, while preserving
@@ -339,7 +344,7 @@ FilterTube's profile, PIN, managed-policy, and local-first authority model.
 Add list -> Preview -> Choose profiles -> Apply -> Send update
 ```
 
-**Planned requirements**:
+**Current extension-owned scope**:
 
 - Parents can add a list from a file, pasted text, or URL.
 - Each list has a clear name, source URL/file label, last checked time, item
@@ -359,6 +364,16 @@ Add list -> Preview -> Choose profiles -> Apply -> Send update
   contents.
 - Protected users cannot add, remove, refresh, enable, disable, or weaken
   parent-approved lists.
+- URL-backed list checks are parent-triggered. If the hash is unchanged,
+  FilterTube updates checked/source metadata and protected history only. If the
+  hash changed, the parent re-approves the refreshed materialized channel rows
+  before verified-device delivery is offered.
+
+**Deferred scope**:
+
+- Silent scheduled list refresh remains future work and must keep the same
+  parent/admin authority, source-hash proof, protected history, and verified
+  delivery boundaries.
 
 **Caregiver-first UI shape**:
 
