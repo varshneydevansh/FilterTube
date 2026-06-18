@@ -317,6 +317,14 @@ Supported source shapes in this slice:
 - BlockTube-style JSON: `filterData.channelId`, `filterData.channelName`, and `filterData.title` arrays are read as rule-list channels/keywords.
 - Raw HTTPS source URL: public CSV, text, or JSON fetched into the same preview before apply.
 
+Current modal shape:
+
+- The format guide is a pill selector: CSV, TXT, JSON, BlockTube, and URL.
+- Each pill shows one concrete import shape before the parent chooses a file.
+- The editable area accepts paste, local file, raw HTTPS URL, CSV template, TXT template, or JSON template.
+- The preview shows channel count, keyword count, skipped count, and a sheet-style row sample before apply.
+- The apply step remains local profile mutation first; verified-device delivery is the next explicit action.
+
 Current UI wording boundary:
 
 - "Parent-approved list" means the parent/account profile reviewed parsed rows

@@ -2243,6 +2243,70 @@ html[data-theme="dark"] .card::after {
     background: rgba(74, 157, 127, 0.08);
 }
 
+.managed-channel-list-modal__format-card {
+    display: grid;
+    gap: 0.65rem;
+    padding: 0.78rem;
+    border: 1px solid rgba(180, 87, 73, 0.16);
+    border-radius: 0.95rem;
+    background: linear-gradient(180deg, rgba(255, 249, 239, 0.86), rgba(255, 255, 255, 0.72));
+}
+
+.managed-channel-list-modal__format-header {
+    display: grid;
+    gap: 0.18rem;
+}
+
+.managed-channel-list-modal__format-header strong {
+    color: var(--ft-color-text-primary);
+    font-size: 0.9rem;
+    font-weight: 850;
+}
+
+.managed-channel-list-modal__format-header span {
+    color: var(--ft-color-text-secondary);
+    font-size: 0.84rem;
+    line-height: 1.36;
+}
+
+.managed-channel-list-modal__format-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+.managed-channel-list-modal__format-tab {
+    min-height: 2.2rem;
+    padding: 0.48rem 0.78rem;
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    border-radius: 999px;
+    color: var(--ft-color-text-secondary);
+    background: rgba(255, 255, 255, 0.74);
+    cursor: pointer;
+    font-size: 0.78rem;
+    font-weight: 850;
+}
+
+.managed-channel-list-modal__format-tab.is-active {
+    border-color: rgba(180, 87, 73, 0.48);
+    color: #fff;
+    background: linear-gradient(180deg, rgba(193, 104, 91, 0.96), rgba(174, 72, 60, 0.96));
+    box-shadow: 0 0.55rem 1.2rem rgba(180, 87, 73, 0.16);
+}
+
+.managed-channel-list-modal__format-example {
+    max-height: 160px;
+    margin: 0;
+    overflow: auto;
+    padding: 0.68rem 0.75rem;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 0.82rem;
+    color: var(--ft-color-text-primary);
+    background: rgba(255, 255, 255, 0.78);
+    font: 0.78rem/1.48 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    white-space: pre;
+}
+
 .managed-channel-list-modal__formats {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2444,6 +2508,29 @@ html[data-theme="dark"] .card::after {
 :root[data-theme="dark"] .managed-channel-list-modal__template {
     border-color: rgba(74, 222, 128, 0.22);
     background: rgba(22, 101, 52, 0.14);
+}
+
+:root[data-theme="dark"] .managed-channel-list-modal__format-card {
+    border-color: rgba(193, 104, 91, 0.22);
+    background: linear-gradient(180deg, rgba(48, 34, 30, 0.9), rgba(31, 28, 25, 0.88));
+}
+
+:root[data-theme="dark"] .managed-channel-list-modal__format-tab {
+    border-color: rgba(255, 255, 255, 0.08);
+    color: var(--ft-color-text-secondary-dark);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+:root[data-theme="dark"] .managed-channel-list-modal__format-tab.is-active {
+    border-color: rgba(248, 113, 113, 0.34);
+    color: #fff;
+    background: linear-gradient(180deg, rgba(181, 89, 76, 0.95), rgba(145, 64, 54, 0.95));
+}
+
+:root[data-theme="dark"] .managed-channel-list-modal__format-example {
+    border-color: rgba(255, 255, 255, 0.08);
+    color: var(--ft-color-text-primary);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 :root[data-theme="dark"] .managed-channel-list-modal__formats span,

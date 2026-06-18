@@ -7779,6 +7779,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         '# ,brainrot,keyword or phrase example; remove # and replace before import'
     ].join('\n');
 
+    const MANAGED_RULE_LIST_TXT_TEMPLATE = [
+        '# One rule per line. Use channel: or keyword: so the preview is exact.',
+        'channel: @SomeChannel',
+        'channel: UCxxxxxxxxxxxxxxxxxxxxxx',
+        'channel: c/ChannelURL',
+        'channel: https://www.youtube.com/@AnotherChannel',
+        'keyword: brainrot',
+        'keyword: scary thumbnail'
+    ].join('\n');
+
     const MANAGED_RULE_LIST_JSON_TEMPLATE = JSON.stringify({
         title: 'Family rule list',
         description: 'Channels and keywords only. This is not a full FilterTube backup.',
@@ -7950,14 +7960,72 @@ document.addEventListener('DOMContentLoaded', async () => {
             body.appendChild(intro);
 
             const formatGuide = document.createElement('div');
-            formatGuide.className = 'managed-channel-list-modal__formats';
-            formatGuide.innerHTML = `
-                <span><b>CSV</b><code>channel_id,keyword,notes</code></span>
-                <span><b>TXT</b><code>channel: @SomeChannel</code><code>keyword: brainrot</code></span>
-                <span><b>JSON</b><code>{"channels":["@SomeChannel","c/ChannelURL"],"keywords":["brainrot"]}</code></span>
-                <span><b>BlockTube</b><code>filterData.channelId + filterData.title</code></span>
-                <span><b>Public list</b>raw HTTPS CSV, TXT, or JSON</span>
-            `;
+            formatGuide.className = 'managed-channel-list-modal__format-card';
+            const formatHeader = document.createElement('div');
+            formatHeader.className = 'managed-channel-list-modal__format-header';
+            const formatTitle = document.createElement('strong');
+            formatTitle.textContent = 'Supported list structure';
+            const formatHint = document.createElement('span');
+            formatHint.textContent = 'Channels can be handles, UC IDs, /c names, or YouTube URLs. Keywords are words or phrases.';
+            formatHeader.append(formatTitle, formatHint);
+
+            const formatTabs = document.createElement('div');
+            formatTabs.className = 'managed-channel-list-modal__format-tabs';
+            const formatExample = document.createElement('pre');
+            formatExample.className = 'managed-channel-list-modal__format-example';
+            const formatExamples = {
+                csv: {
+                    label: 'CSV',
+                    body: [
+                        'channel_id,keyword,notes',
+                        '@SomeChannel,,channel handle',
+                        'UCxxxxxxxxxxxxxxxxxxxxxx,,channel id',
+                        'c/ChannelURL,,custom channel URL',
+                        ',brainrot,keyword phrase'
+                    ].join('\n')
+                },
+                txt: {
+                    label: 'TXT',
+                    body: MANAGED_RULE_LIST_TXT_TEMPLATE
+                },
+                json: {
+                    label: 'JSON',
+                    body: MANAGED_RULE_LIST_JSON_TEMPLATE
+                },
+                blocktube: {
+                    label: 'BlockTube',
+                    body: [
+                        '{',
+                        '  "filterData": {',
+                        '    "channelId": ["UCxxxxxxxxxxxxxxxxxxxxxx"],',
+                        '    "title": ["brainrot"]',
+                        '  }',
+                        '}'
+                    ].join('\n')
+                },
+                url: {
+                    label: 'URL',
+                    body: 'Paste a raw HTTPS URL that serves CSV, TXT, or JSON. FilterTube loads it into this preview first.'
+                }
+            };
+            const setFormatExample = (key) => {
+                const entry = formatExamples[key] || formatExamples.csv;
+                formatTabs.querySelectorAll('button').forEach((button) => {
+                    button.classList.toggle('is-active', button.dataset.format === key);
+                    button.setAttribute('aria-pressed', button.dataset.format === key ? 'true' : 'false');
+                });
+                formatExample.textContent = entry.body;
+            };
+            Object.entries(formatExamples).forEach(([key, entry]) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'managed-channel-list-modal__format-tab';
+                button.dataset.format = key;
+                button.textContent = entry.label;
+                button.addEventListener('click', () => setFormatExample(key));
+                formatTabs.appendChild(button);
+            });
+            formatGuide.append(formatHeader, formatTabs, formatExample);
             body.appendChild(formatGuide);
 
             const nameGroup = document.createElement('label');
@@ -8031,6 +8099,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             useJsonTemplateBtn.type = 'button';
             useJsonTemplateBtn.textContent = 'Use JSON';
             useJsonTemplateBtn.title = 'Puts the JSON rule-list template into the preview box so you can edit it.';
+            const useTxtTemplateBtn = document.createElement('button');
+            useTxtTemplateBtn.className = 'btn-secondary';
+            useTxtTemplateBtn.type = 'button';
+            useTxtTemplateBtn.textContent = 'Use TXT';
+            useTxtTemplateBtn.title = 'Puts the TXT rule-list template into the preview box so you can edit it.';
             const downloadTemplateBtn = document.createElement('button');
             downloadTemplateBtn.className = 'btn-secondary';
             downloadTemplateBtn.type = 'button';
@@ -8041,7 +8114,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             downloadJsonTemplateBtn.type = 'button';
             downloadJsonTemplateBtn.textContent = 'Download JSON';
             downloadJsonTemplateBtn.title = 'Downloads a JSON rule-list template.';
-            templateActions.append(useTemplateBtn, useJsonTemplateBtn, downloadTemplateBtn, downloadJsonTemplateBtn);
+            templateActions.append(useTemplateBtn, useTxtTemplateBtn, useJsonTemplateBtn, downloadTemplateBtn, downloadJsonTemplateBtn);
             templateBox.append(templateTitle, templateText, templateActions);
             body.appendChild(templateBox);
 
@@ -8161,6 +8234,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 renderPreview();
                 textArea.focus();
             });
+            useTxtTemplateBtn.addEventListener('click', () => {
+                textArea.value = MANAGED_RULE_LIST_TXT_TEMPLATE;
+                setLoadedSource();
+                setError('');
+                renderPreview();
+                textArea.focus();
+            });
             downloadTemplateBtn.addEventListener('click', () => {
                 downloadManagedRuleListCsvTemplate();
             });
@@ -8241,6 +8321,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             card.append(header, body);
             overlay.appendChild(card);
             document.body.appendChild(overlay);
+            setFormatExample('csv');
             renderPreview();
             setTimeout(() => {
                 try {
