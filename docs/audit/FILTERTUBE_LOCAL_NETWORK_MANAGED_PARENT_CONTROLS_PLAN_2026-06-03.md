@@ -130,6 +130,9 @@ extension authority code.
     imported lists on selected protected profiles, preserving the
     parent-approved `managedListId`, replacing only matching list-derived rows,
     recording protected redacted history, and offering verified-device send.
+  - [x] First library UX slice: command-center rows and selected-profile bulk
+    controls expose one `Lists` action that routes to import, refresh, or remove
+    choices instead of showing separate list-management buttons.
   - [ ] Reversible list library, enable/disable overlays, and scheduled
     subscription refresh remain future slices.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
@@ -330,6 +333,7 @@ Add list -> Preview -> Choose profiles -> Apply -> Send update
 7. Remove a materialized imported list without touching manual rows [done]
 8. Load a public HTTPS URL into the same preview/apply flow [done]
 9. Refresh a URL-backed materialized list after parent/account re-auth [done]
+10. Consolidate row/bulk list management behind one parent-facing Lists action [done]
 ```
 
 Scheduled subscriptions, automatic background refresh, and enable/disable

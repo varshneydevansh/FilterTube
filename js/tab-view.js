@@ -8273,6 +8273,68 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    async function manageManagedChannelListsForProfiles(profileIds) {
+        const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
+        if (!targetIds.length) {
+            UIComponents.showToast('Select at least one protected profile', 'error');
+            return;
+        }
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function') {
+            UIComponents.showToast('Profiles unavailable', 'error');
+            return;
+        }
+
+        const fresh = await io.loadProfilesV4();
+        const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
+        if (getProfileType(fresh, currentActive) === 'child') {
+            UIComponents.showToast('Child profiles cannot manage lists', 'error');
+            return;
+        }
+
+        const profiles = safeObject(fresh.profiles);
+        const eligibleIds = targetIds.filter((targetId) => {
+            const profile = safeObject(profiles[targetId]);
+            return !!profile && Object.keys(profile).length > 0
+                && canActiveProfileManageProfile(fresh, targetId);
+        });
+        if (!eligibleIds.length) {
+            UIComponents.showToast('No selected protected profiles can be managed by this account', 'error');
+            return;
+        }
+
+        const summaries = collectManagedChannelListSummaries(profiles, eligibleIds);
+        const urlBackedCount = summaries.filter(summary => normalizeManagedChannelListSourceUrl(summary?.sourceUrl)).length;
+        const details = summaries.length
+            ? [
+                `${summaries.length} imported ${pluralize(summaries.length, 'list')} across ${eligibleIds.length} selected ${pluralize(eligibleIds.length, 'profile')}`,
+                urlBackedCount ? `${urlBackedCount} URL-backed ${pluralize(urlBackedCount, 'list')} can be refreshed` : 'No URL-backed lists to refresh yet'
+            ]
+            : [
+                `No imported lists yet for ${eligibleIds.length} selected ${pluralize(eligibleIds.length, 'profile')}`,
+                'Start by importing a pasted, file, or public HTTPS channel list.'
+            ];
+        const choices = [
+            { value: 'import', label: 'Import List', className: 'btn-primary' },
+            ...(urlBackedCount ? [{ value: 'refresh', label: 'Refresh List', className: 'btn-secondary' }] : []),
+            ...(summaries.length ? [{ value: 'remove', label: 'Remove List', className: 'btn-secondary' }] : [])
+        ];
+        const selected = await showChoiceModal({
+            title: 'Channel Lists',
+            message: 'Choose what to do with imported channel lists for the selected protected profiles.',
+            details,
+            choices,
+            cancelText: 'Cancel'
+        });
+        if (selected === 'import') {
+            await importManagedChannelListToProfiles(eligibleIds);
+        } else if (selected === 'refresh') {
+            await refreshManagedChannelListForProfiles(eligibleIds);
+        } else if (selected === 'remove') {
+            await removeManagedChannelListFromProfiles(eligibleIds);
+        }
+    }
+
     function isUiLocked() {
         const profilesV4 = profilesV4Cache;
         if (!profilesV4) {
@@ -15174,6 +15236,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                             return;
                         }
                         await startManagedChildEdit(profileIds[0]);
+                    } else if (action === 'manage_channel_lists') {
+                        await manageManagedChannelListsForProfiles([targetId]);
                     } else if (action === 'import_channel_list') {
                         await importManagedChannelListToProfiles([targetId]);
                     } else if (action === 'remove_channel_list') {
@@ -15191,6 +15255,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         await removeManagedChannelListFromProfiles(safeArray(intent?.profileIds));
                     } else if (action === 'bulk_refresh_channel_list') {
                         await refreshManagedChannelListForProfiles(safeArray(intent?.profileIds));
+                    } else if (action === 'bulk_manage_channel_lists') {
+                        await manageManagedChannelListsForProfiles(safeArray(intent?.profileIds));
                     } else if (action === 'bulk_set_time_limit' || action === 'bulk_disable_time_limit') {
                         await updateMultipleProfileTimeLimitPolicies(
                             safeArray(intent?.profileIds),

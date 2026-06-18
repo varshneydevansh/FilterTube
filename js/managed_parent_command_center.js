@@ -77,29 +77,13 @@
                 sensitiveAction: false
             },
             {
-                action: 'import_channel_list',
-                label: 'Import List',
+                action: 'manage_channel_lists',
+                label: 'Lists',
                 profileId: targetId,
                 scope: 'channels',
                 authority: 'delegated_runtime_gate',
                 sensitiveAction: true
             },
-            {
-                action: 'remove_channel_list',
-                label: 'Remove List',
-                profileId: targetId,
-                scope: 'channels',
-                authority: 'delegated_runtime_gate',
-                sensitiveAction: true
-            },
-            ...(policySummary.hasUrlManagedChannelList === true ? [{
-                action: 'refresh_channel_list',
-                label: 'Refresh List',
-                profileId: targetId,
-                scope: 'channels',
-                authority: 'delegated_runtime_gate',
-                sensitiveAction: true
-            }] : []),
             {
                 action: 'view_history',
                 label: 'History',
@@ -435,32 +419,14 @@
                 sensitiveAction: true
             },
             {
-                action: 'bulk_import_channel_list',
-                label: 'Import list',
+                action: 'bulk_manage_channel_lists',
+                label: 'Lists',
                 group: 'rules',
                 profileIds,
                 scope: 'channels',
                 authority: 'delegated_runtime_gate',
                 sensitiveAction: true
             },
-            {
-                action: 'bulk_remove_channel_list',
-                label: 'Remove list',
-                group: 'rules',
-                profileIds,
-                scope: 'channels',
-                authority: 'delegated_runtime_gate',
-                sensitiveAction: true
-            },
-            ...((Array.isArray(rows) ? rows : []).some(row => (Number(row?.managedChannelListUrlCount) || 0) > 0) ? [{
-                action: 'bulk_refresh_channel_list',
-                label: 'Refresh list',
-                group: 'rules',
-                profileIds,
-                scope: 'channels',
-                authority: 'delegated_runtime_gate',
-                sensitiveAction: true
-            }] : []),
             {
                 action: 'bulk_add_video',
                 label: 'Add video ID',
