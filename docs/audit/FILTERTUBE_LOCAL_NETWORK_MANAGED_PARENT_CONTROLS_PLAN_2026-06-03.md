@@ -281,6 +281,15 @@ parent tool instead of a sync/debug console.
     profile is making the authority decision. This is copy/UI framing only;
     parser support, materialized row metadata, pause/refresh semantics, and
     verified-device send behavior are unchanged.
+  - [x] Rule-list import preview simplification slice: Settings now shows the
+    supported CSV/TXT/JSON/URL shapes as a compact sheet-style preview before
+    the Import Rule List action. The visible card explains channel handles,
+    UCIDs, custom URLs, full URLs, TXT keyword prefixes, simple JSON arrays,
+    BlockTube migration, and raw HTTPS lists without requiring Help first.
+    Runtime parser support and authority remain unchanged: imported files can
+    add only channel/keyword rules, previewed invalid rows do not apply, and a
+    protected profile still needs parent/account approval before verified-device
+    delivery.
   - [x] Optional delivery discovery slice: after at least one protected profile
     exists and no optional provider is configured, Family Controls now shows one
     compact prompt for `Set Up Pick Up Later` and `Set Up Home Bridge`. First

@@ -704,7 +704,7 @@ body[data-surface="popup"] .input-group {
 .rule-list-sheet-example {
     display: grid;
     gap: 0;
-    max-width: 44rem;
+    max-width: min(100%, 50rem);
     margin-top: 0.25rem;
     overflow: hidden;
     border: 1px solid rgba(15, 23, 42, 0.09);
@@ -740,7 +740,7 @@ body[data-surface="popup"] .input-group {
 
 .rule-list-sheet-example__format-cards {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     align-items: stretch;
     justify-content: stretch;
     border-top: 1px solid rgba(15, 23, 42, 0.08);
@@ -790,7 +790,7 @@ body[data-surface="popup"] .input-group {
 
 .rule-list-sheet-example__row {
     display: grid;
-    grid-template-columns: minmax(5.5rem, 0.55fr) minmax(9rem, 1fr) minmax(8rem, 1fr);
+    grid-template-columns: minmax(5.5rem, 0.42fr) minmax(12rem, 1.05fr) minmax(10rem, 0.95fr);
     min-width: 0;
 }
 
@@ -800,13 +800,14 @@ body[data-surface="popup"] .input-group {
 
 .rule-list-sheet-example__row span {
     min-width: 0;
-    padding: 0.48rem 0.65rem;
-    overflow: hidden;
+    padding: 0.54rem 0.68rem;
+    overflow: visible;
     color: var(--ft-color-text-secondary);
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
+    white-space: normal;
     border-right: 1px solid rgba(15, 23, 42, 0.06);
     font-size: 0.8rem;
+    line-height: 1.35;
 }
 
 .rule-list-sheet-example__row span:last-child {
@@ -827,7 +828,7 @@ body[data-surface="popup"] .input-group {
     flex-wrap: wrap;
     align-items: center;
     gap: 0.45rem;
-    max-width: 44rem;
+    max-width: min(100%, 50rem);
     margin: 0.1rem 0 0;
     padding: 0;
     border: 0;
@@ -1546,6 +1547,23 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     .dashboard-app-release__title {
         max-width: 20ch;
     }
+
+    .rule-list-sheet-example__format-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .rule-list-sheet-example__row {
+        grid-template-columns: minmax(4.75rem, 0.42fr) minmax(0, 1fr);
+    }
+
+    .rule-list-sheet-example__row span:nth-child(3) {
+        grid-column: 2;
+        border-top: 1px solid rgba(15, 23, 42, 0.06);
+    }
+
+    .rule-list-sheet-example__row--head span:nth-child(3) {
+        display: none;
+    }
 }
 
 @media (max-width: 640px) {
@@ -1572,6 +1590,15 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
 
     .dashboard-app-card__art {
         width: min(39%, 10rem);
+    }
+
+    .rule-list-sheet-example__format-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .rule-list-sheet-example__bar {
+        align-items: flex-start;
+        flex-direction: column;
     }
 }
 
