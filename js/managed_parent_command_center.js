@@ -73,7 +73,7 @@
         const intents = [
             {
                 action: 'edit_rules',
-                label: 'Rules',
+                label: 'Edit Rules',
                 profileId: targetId,
                 scope: 'main_kids',
                 authority: 'delegated_runtime_gate',
@@ -81,7 +81,7 @@
             },
             {
                 action: 'manage_channel_lists',
-                label: 'Lists',
+                label: 'Rule Lists',
                 profileId: targetId,
                 scope: 'channels',
                 authority: 'delegated_runtime_gate',
@@ -105,7 +105,7 @@
             },
             {
                 action: 'send_managed_policy',
-                label: 'Send',
+                label: 'Send Update',
                 profileId: targetId,
                 scope: 'active',
                 authority: 'managed_policy_provider_delivery',
@@ -346,20 +346,20 @@
         if (targetCount <= 0) {
             return {
                 key: 'no_device',
-                label: 'Pair to sync',
+                label: 'This device only',
                 tone: 'muted'
             };
         }
         if (readyCount <= 0) {
             return {
                 key: 'provider_pending',
-                label: 'Waiting delivery',
+                label: 'Open both devices',
                 tone: 'warning'
             };
         }
         return {
             key: 'ready',
-            label: 'Ready to send',
+            label: 'Ready',
             tone: 'success'
         };
     }
@@ -395,7 +395,7 @@
         if (targetCount <= 0 || totalCount <= 0) {
             return {
                 key: 'pair_device',
-                label: 'Pair when syncing',
+                label: 'Pair only if needed',
                 tone: 'muted'
             };
         }
@@ -429,7 +429,7 @@
         }
         return {
             key: 'ready',
-            label: 'Delivery ready',
+            label: 'Ready',
             tone: 'success'
         };
     }
@@ -472,7 +472,7 @@
         return [
             {
                 action: 'bulk_edit_rules',
-                label: 'Edit selected rules',
+                label: 'Edit rules',
                 group: 'rules',
                 profileIds,
                 scope: 'main_kids',
@@ -499,7 +499,7 @@
             },
             {
                 action: 'bulk_manage_channel_lists',
-                label: 'Lists',
+                label: 'Rule lists',
                 group: 'rules',
                 profileIds,
                 scope: 'channels',
@@ -517,7 +517,7 @@
             },
             {
                 action: 'bulk_send_managed_policy',
-                label: 'Send selected updates',
+                label: 'Send update',
                 group: 'send',
                 profileIds,
                 scope: 'active',
@@ -740,8 +740,8 @@
         const body = document.createElement('div');
         body.className = 'help-item-body';
         body.textContent = summary.profileCount > 0
-            ? 'Pick a profile, set what it can watch and for how long, then send only when another device needs the update.'
-            : 'Create one protected child/user profile first. After that you can set rules, time, Main/Kids access, and device delivery.';
+            ? 'Pick a profile, set what it can watch, set daily time, and send the update only when another verified device needs it.'
+            : 'Create one protected child/user profile first. Then set rules, daily time, Main/Kids access, and optional device updates.';
         const meta = document.createElement('div');
         meta.className = 'ft-managed-command-center__meta';
         const setupNeeds = summary.noDeviceProfileCount
@@ -855,11 +855,11 @@
         const strip = document.createElement('div');
         strip.className = 'ft-managed-command-center__strip';
         [
-            { label: 'Managed profiles', value: summary.profileCount, tone: 'neutral', title: 'Profiles this parent/account can manage.', always: true },
-            { label: 'Ready to send', value: summary.syncReadyProfileCount, tone: summary.syncReadyProfileCount ? 'success' : 'neutral', title: 'Profiles with a verified delivery path available now.', always: true },
-            { label: 'Lists active', value: summary.managedChannelListProfileCount, tone: 'success', title: 'Protected profiles with parent-approved channel or keyword lists.' },
-            { label: 'Needs device', value: summary.noDeviceProfileCount + summary.syncRepairProfileCount + summary.syncStaleProfileCount, tone: 'warning', title: 'Profiles that need a verified device, refreshed trust, or re-pairing before remote updates.' },
-            { label: 'Requests', value: summary.pendingExtraTimeRequestCount, tone: 'warning', title: 'Protected profiles asking for more YouTube time.' },
+            { label: 'Profiles', value: summary.profileCount, tone: 'neutral', title: 'Profiles this parent/account can manage.', always: true },
+            { label: 'Ready devices', value: summary.syncReadyProfileCount, tone: summary.syncReadyProfileCount ? 'success' : 'neutral', title: 'Profiles with a verified device path available now.', always: true },
+            { label: 'Rule lists', value: summary.managedChannelListProfileCount, tone: 'success', title: 'Protected profiles with parent-approved channel or keyword lists.' },
+            { label: 'Needs pairing', value: summary.noDeviceProfileCount + summary.syncRepairProfileCount + summary.syncStaleProfileCount, tone: 'warning', title: 'Profiles that need a verified device, refreshed trust, or re-pairing before remote updates.' },
+            { label: 'Time requests', value: summary.pendingExtraTimeRequestCount, tone: 'warning', title: 'Protected profiles asking for more YouTube time.' },
             { label: 'Conflicts', value: summary.remoteConflictCount, tone: 'danger', title: 'Rejected or conflicting remote-policy history rows that need parent review.' }
         ].filter(item => item.always || (Number(item.value) || 0) > 0).forEach((item) => {
             const card = document.createElement('div');
@@ -887,7 +887,7 @@
             },
             {
                 step: '2',
-                label: 'Set guardrails',
+                label: 'Set rules & time',
                 detail: summary.managedChannelListProfileCount > 0
                     ? 'Rules, lists, access, and time are ready to review'
                     : 'Use Rules, Lists, Set Time, and Main/Kids controls',
@@ -896,7 +896,7 @@
             },
             {
                 step: '3',
-                label: 'Sync when needed',
+                label: 'Send to device',
                 detail: summary.syncReadyProfileCount > 0
                     ? `${summary.syncReadyProfileCount} ${summary.syncReadyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path`
                     : 'Pair only when this profile also lives on another device',
@@ -945,9 +945,9 @@
             const promptCopy = document.createElement('div');
             promptCopy.className = 'ft-managed-command-center__provider-copy';
             const promptTitle = document.createElement('strong');
-            promptTitle.textContent = 'Advanced delivery';
+            promptTitle.textContent = 'Need updates without both devices open?';
             const promptDetail = document.createElement('span');
-            promptDetail.textContent = 'Use this only if Send Now is not enough for this family or care setup.';
+            promptDetail.textContent = 'Optional. Most families can use Send Now and skip this.';
             promptCopy.append(promptTitle, promptDetail);
             providerSummary.appendChild(promptCopy);
             const promptActions = document.createElement('div');
@@ -955,7 +955,7 @@
             const promptBody = document.createElement('div');
             promptBody.className = 'ft-managed-command-center__provider-prompt-body';
             const promptBodyText = document.createElement('span');
-            promptBodyText.textContent = 'Send Now is the normal path. Pick Up Later lets a protected device collect waiting updates when it opens. Home Bridge is for a trusted FilterTube bridge you run on your network.';
+            promptBodyText.textContent = 'Send Now is the normal path: open both devices, pair, verify, send. Pick Up Later and Home Bridge are only for families or schools that run an extra delivery service.';
             [
                 {
                     label: 'Set Up Pick Up Later',

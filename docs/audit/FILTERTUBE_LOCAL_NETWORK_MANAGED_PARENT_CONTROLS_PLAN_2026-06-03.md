@@ -304,10 +304,17 @@ parent tool instead of a sync/debug console.
     discoverable path for families/caregivers who need offline pickup or a
     trusted home/school bridge.
   - [x] Optional delivery disclosure slice: the unconfigured Pick Up Later/Home
-    Bridge prompt is collapsed under `Advanced delivery` so ordinary parents
-    see Send Now as the default flow. Opening the disclosure explains the two
-    advanced paths in plain language before exposing setup buttons, preserving
-    provider capability without making optional transport look required.
+    Bridge prompt is collapsed under `Need updates without both devices open?`
+    so ordinary parents see Send Now as the default flow. Opening the disclosure
+    explains the two advanced paths in plain language before exposing setup
+    buttons, preserving provider capability without making optional transport
+    look required.
+  - [x] 2026-06-19 command-center wording pass: the profile rows and bulk
+    actions now use direct parent verbs (`Edit Rules`, `Rule Lists`, `Send
+    Update`) and the overview strip uses plain states (`Profiles`, `Ready
+    devices`, `Needs pairing`, `Time requests`). This is UI/copy only; managed
+    policy authority, revision handling, transport validation, and runtime gates
+    are unchanged.
   - [x] Optional delivery setup modals use parent-facing `address` and `key`
     labels instead of raw provider/password language, and explicitly say Pick Up
     Later is not the Nanah signal server and cannot change rules by itself.
