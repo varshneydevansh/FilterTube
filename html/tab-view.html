@@ -463,7 +463,7 @@
                                                             Merge a full FilterTube backup or compatible backup JSON.<br />
                                                         </span>
                                                         <span class="import-export-hint">
-                                                            Use this for complete settings restore. For channel/keyword lists, use Rule list imports below.
+                                                            Use this for complete settings restore or legacy BlockTube export migration. For previewed channel/keyword-only lists, use Rule list imports below.
                                                         </span>
                                                         <span class="info-hint" title="Bring in data from FilterTube backups, BlockTube exports, or other structured JSON tools. Matching channels/keywords are merged; everything else is appended.">
                                                             Details
@@ -518,6 +518,18 @@
                                                                 <span>JSON: <code>channels</code> + <code>keywords</code> arrays</span>
                                                                 <span>BlockTube JSON: <code>filterData</code></span>
                                                             </div>
+                                                            <div class="rule-list-sheet-example__examples" aria-label="TXT and JSON examples">
+                                                                <div>
+                                                                    <b>TXT example</b>
+                                                                    <pre>@SomeChannel
+UCxxxxxxxxxxxxxxxxxxxxxx
+https://www.youtube.com/@AnotherChannel</pre>
+                                                                </div>
+                                                                <div>
+                                                                    <b>JSON example</b>
+                                                                    <pre>{"channels":["@SomeChannel"],"keywords":["brainrot"]}</pre>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                         <fieldset class="rule-list-target-picker" aria-label="Where to apply imported rule list">
                                                             <legend>Apply imported rules to</legend>
@@ -541,6 +553,9 @@
                                                         </button>
                                                         <button id="ftDownloadRuleListTemplateBtn" class="btn-secondary" type="button" title="Download the safe CSV template for spreadsheet editing.">
                                                             Download CSV Template
+                                                        </button>
+                                                        <button id="ftDownloadRuleListJsonTemplateBtn" class="btn-secondary" type="button" title="Download the simple JSON rule-list template.">
+                                                            Download JSON Template
                                                         </button>
                                                         <button id="ftRuleListFormatsBtn" class="btn-secondary" type="button" title="Show supported rule-list input formats.">
                                                             Supported Formats

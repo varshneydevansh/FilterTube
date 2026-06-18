@@ -2834,6 +2834,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftImportSyncDeviceBtn = document.getElementById('ftImportSyncDeviceBtn');
     const ftImportRuleListBtn = document.getElementById('ftImportRuleListBtn');
     const ftDownloadRuleListTemplateBtn = document.getElementById('ftDownloadRuleListTemplateBtn');
+    const ftDownloadRuleListJsonTemplateBtn = document.getElementById('ftDownloadRuleListJsonTemplateBtn');
     const ftRuleListFormatsBtn = document.getElementById('ftRuleListFormatsBtn');
 
     const ftProfilesManager = document.getElementById('ftProfilesManager');
@@ -7700,6 +7701,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         '# ,brainrot,keyword or phrase example; remove # and replace before import'
     ].join('\n');
 
+    const MANAGED_RULE_LIST_JSON_TEMPLATE = JSON.stringify({
+        title: 'Family rule list',
+        description: 'Channels and keywords only. This is not a full FilterTube backup.',
+        channels: [
+            '@SomeChannel',
+            'UCxxxxxxxxxxxxxxxxxxxxxx',
+            'https://www.youtube.com/@AnotherChannel'
+        ],
+        keywords: [
+            'brainrot',
+            'scary thumbnail'
+        ]
+    }, null, 2);
+
     function countManagedRuleListRows(parsed = {}) {
         return {
             channels: safeArray(parsed.channels).length,
@@ -7759,6 +7774,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
     }
 
+    function buildManagedRuleListEmptyPreviewNote(text, parsed = {}) {
+        const trimmed = normalizeString(text);
+        const skipped = Number(parsed.skippedCount) || 0;
+        if (/^[\[{]/.test(trimmed)) {
+            return skipped
+                ? 'JSON was readable, but no supported channel or keyword rows were found. Use channels and keywords arrays, or BlockTube filterData arrays.'
+                : 'JSON was readable, but it did not contain supported channels or keywords arrays.';
+        }
+        if (trimmed.includes(',')) {
+            return skipped
+                ? `${skipped} ${pluralize(skipped, 'row')} skipped. CSV should include channel_id and/or keyword columns, or type,value rows.`
+                : 'CSV needs channel_id and/or keyword headers, or type,value rows.';
+        }
+        return skipped
+            ? `${skipped} ${pluralize(skipped, 'row')} skipped. TXT accepts YouTube channel IDs, handles, custom URLs, or channel URLs only.`
+            : 'TXT accepts one YouTube channel ID, handle, custom URL, or channel URL per line.';
+    }
+
+    function buildManagedRuleListParseErrorMessage(text) {
+        const trimmed = normalizeString(text);
+        if (/^[\[{]/.test(trimmed)) {
+            return 'JSON could not be parsed. Check braces, brackets, commas, and quoted keys, then preview again.';
+        }
+        if (trimmed.includes(',')) {
+            return 'CSV could not be read as rules. Use channel_id, keyword, notes headers, or type, value, notes rows.';
+        }
+        return 'FilterTube could not read supported rules from this text. TXT rows must be YouTube channel IDs, handles, custom URLs, or channel URLs.';
+    }
+
     function formatManagedRuleListCount(counts = {}) {
         const channelCount = Number(counts.channels) || 0;
         const keywordCount = Number(counts.keywords) || 0;
@@ -7781,6 +7825,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             setTimeout(() => URL.revokeObjectURL(url), 1000);
         } catch (error) {
             UIComponents.showToast('Unable to download CSV template', 'error');
+        }
+    }
+
+    function downloadManagedRuleListJsonTemplate() {
+        try {
+            const blob = new Blob([MANAGED_RULE_LIST_JSON_TEMPLATE], { type: 'application/json;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const anchor = document.createElement('a');
+            anchor.href = url;
+            anchor.download = 'filtertube-rule-list-template.json';
+            document.body.appendChild(anchor);
+            anchor.click();
+            anchor.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        } catch (error) {
+            UIComponents.showToast('Unable to download JSON template', 'error');
         }
     }
 
@@ -7814,10 +7874,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             formatGuide.className = 'managed-channel-list-modal__formats';
             formatGuide.innerHTML = `
                 <span><b>CSV</b><code>channel_id,keyword,notes</code></span>
-                <span><b>TXT</b>one channel ID, handle, custom URL, or URL per line</span>
-                <span><b>JSON</b><code>channels</code> + <code>keywords</code></span>
-                <span><b>BlockTube</b><code>filterData.channelId</code> + <code>filterData.title</code></span>
-                <span><b>Public list</b>raw HTTPS CSV, text, or JSON</span>
+                <span><b>TXT</b><code>@SomeChannel</code></span>
+                <span><b>JSON</b><code>{"channels":["@SomeChannel"],"keywords":["brainrot"]}</code></span>
+                <span><b>BlockTube</b><code>filterData.channelId + filterData.title</code></span>
+                <span><b>Public list</b>raw HTTPS CSV, TXT, or JSON</span>
             `;
             body.appendChild(formatGuide);
 
@@ -7885,14 +7945,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             const useTemplateBtn = document.createElement('button');
             useTemplateBtn.className = 'btn-secondary';
             useTemplateBtn.type = 'button';
-            useTemplateBtn.textContent = 'Use Template';
+            useTemplateBtn.textContent = 'Use CSV';
             useTemplateBtn.title = 'Puts the CSV template into the preview box so you can edit it.';
+            const useJsonTemplateBtn = document.createElement('button');
+            useJsonTemplateBtn.className = 'btn-secondary';
+            useJsonTemplateBtn.type = 'button';
+            useJsonTemplateBtn.textContent = 'Use JSON';
+            useJsonTemplateBtn.title = 'Puts the JSON rule-list template into the preview box so you can edit it.';
             const downloadTemplateBtn = document.createElement('button');
             downloadTemplateBtn.className = 'btn-secondary';
             downloadTemplateBtn.type = 'button';
             downloadTemplateBtn.textContent = 'Download CSV';
             downloadTemplateBtn.title = 'Downloads a CSV template for spreadsheet editing.';
-            templateActions.append(useTemplateBtn, downloadTemplateBtn);
+            const downloadJsonTemplateBtn = document.createElement('button');
+            downloadJsonTemplateBtn.className = 'btn-secondary';
+            downloadJsonTemplateBtn.type = 'button';
+            downloadJsonTemplateBtn.textContent = 'Download JSON';
+            downloadJsonTemplateBtn.title = 'Downloads a JSON rule-list template.';
+            templateActions.append(useTemplateBtn, useJsonTemplateBtn, downloadTemplateBtn, downloadJsonTemplateBtn);
             templateBox.append(templateTitle, templateText, templateActions);
             body.appendChild(templateBox);
 
@@ -7957,12 +8027,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <div class="managed-channel-list-modal__preview-stat"><strong>${parsed.skippedCount || 0}</strong><span>Skipped</span></div>
                         </div>
                         ${renderManagedRuleListPreviewSheet(parsed)}
-                        <div class="managed-channel-list-modal__preview-note">${counts.total ? 'Ready to review. Confirming will apply only these rule values.' : 'No valid rules found yet. Use channel_id for channels and keyword for words or phrases.'}</div>
+                        <div class="managed-channel-list-modal__preview-note">${counts.total ? 'Ready to review. Confirming will apply only these rule values.' : buildManagedRuleListEmptyPreviewNote(text, parsed)}</div>
                     `;
                 } catch (error) {
                     previewEl.innerHTML = `
                         <div class="managed-channel-list-modal__preview-title">Preview</div>
-                        <div class="managed-channel-list-modal__preview-empty">FilterTube could not read this list yet. Check the CSV headers or paste plain channel rows.</div>
+                        <div class="managed-channel-list-modal__preview-empty">${escapeManagedRuleListPreviewCell(buildManagedRuleListParseErrorMessage(text))}</div>
                     `;
                 }
             };
@@ -8005,8 +8075,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 renderPreview();
                 textArea.focus();
             });
+            useJsonTemplateBtn.addEventListener('click', () => {
+                textArea.value = MANAGED_RULE_LIST_JSON_TEMPLATE;
+                setLoadedSource();
+                setError('');
+                renderPreview();
+                textArea.focus();
+            });
             downloadTemplateBtn.addEventListener('click', () => {
                 downloadManagedRuleListCsvTemplate();
+            });
+            downloadJsonTemplateBtn.addEventListener('click', () => {
+                downloadManagedRuleListJsonTemplate();
             });
             loadUrlBtn.addEventListener('click', async (event) => {
                 event.preventDefault();
@@ -19725,6 +19805,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    if (ftDownloadRuleListJsonTemplateBtn) {
+        ftDownloadRuleListJsonTemplateBtn.addEventListener('click', () => {
+            downloadManagedRuleListJsonTemplate();
+        });
+    }
+
     if (ftImportRuleListBtn) {
         ftImportRuleListBtn.addEventListener('click', async () => {
             if (isUiLocked()) return;
@@ -19736,19 +19822,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         ftRuleListFormatsBtn.addEventListener('click', async () => {
             const action = await showChoiceModal({
                 title: 'Supported Rule List Formats',
-                message: 'Rule lists add channels and keywords only. Full FilterTube backup JSON still belongs under Choose JSON.',
+                message: 'Rule lists add channels and keywords only. Full FilterTube backups and legacy BlockTube export migration still belong under Choose JSON.',
                 details: [
                     'CSV: channel_id,keyword,notes or type,value,notes.',
                     'Text: one YouTube channel ID, handle, custom URL, or URL per line.',
-                    'JSON: channels and keywords arrays, or BlockTube filterData channel/title arrays.',
+                    'Rule-list JSON: channels and keywords arrays.',
+                    'BlockTube JSON: filterData channel/title arrays are supported here for previewed rule-list import too.',
                     'Public URLs: raw HTTPS CSV, text, or JSON files can be loaded into the preview.'
                 ],
                 choices: [
-                    { value: 'template', label: 'Download CSV Template', className: 'btn-primary' }
+                    { value: 'csv-template', label: 'Download CSV Template', className: 'btn-primary' },
+                    { value: 'json-template', label: 'Download JSON Template', className: 'btn-secondary' }
                 ],
                 cancelText: 'Close'
             });
-            if (action === 'template') downloadManagedRuleListCsvTemplate();
+            if (action === 'csv-template') downloadManagedRuleListCsvTemplate();
+            if (action === 'json-template') downloadManagedRuleListJsonTemplate();
         });
     }
 

@@ -2271,10 +2271,10 @@ html[data-theme="dark"] .card::after {
 }
 
 .managed-channel-list-modal__formats code {
-    overflow: hidden;
+    overflow: visible;
     color: var(--ft-color-text-primary);
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
+    white-space: normal;
     font-size: 0.84em;
 }
 
