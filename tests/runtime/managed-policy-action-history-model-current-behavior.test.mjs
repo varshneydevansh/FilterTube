@@ -16,9 +16,18 @@ const approvedActionTypes = new Set([
   'rule.channel.unblock',
   'policy.viewing_space.update',
   'policy.time_limit.update',
+  'policy.time_limit.request_extra',
+  'policy.channel_list.import',
+  'policy.channel_list.remove',
+  'policy.channel_list.check',
+  'policy.channel_list.refresh',
+  'policy.channel_list.pause',
+  'policy.channel_list.resume',
   'policy.sync_policy.update',
   'trust_link.create',
   'trust_link.revoke',
+  'trust_link.key_revoke',
+  'managed_signing_key.rotate',
   'admin_session.unlock',
   'admin_session.failed_unlock',
   'local_policy.update',
@@ -177,6 +186,28 @@ function validMailboxAckRow(overrides = {}) {
   });
 }
 
+function validChannelListCheckRow(overrides = {}) {
+  return validAcceptedRow({
+    rowId: 'history-row-channel-list-check-1',
+    trustedLinkId: null,
+    actionType: 'policy.channel_list.check',
+    scope: 'channels',
+    revision: 12,
+    policyHash: 'hash-channel-list-check-12',
+    result: 'accepted',
+    reason: null,
+    summary: {
+      redacted: true,
+      label: 'Channel list checked',
+      surface: 'main',
+      checkedCount: 24,
+      listEntryCount: 312,
+      contentChanged: false
+    },
+    ...overrides
+  });
+}
+
 function validEncryptedSummary(overrides = {}) {
   return {
     schema: 'filtertube_managed_action_history_encrypted_summary',
@@ -314,7 +345,20 @@ function historyAccessDecision({ actor, target, operation, hasRecentAdminAuth = 
     'conflict',
     'failed_auth',
     'expired_session'
-  ].includes(row.result) || ['trust_link.revoke', 'policy.time_limit.update', 'policy.viewing_space.update'].includes(row.actionType));
+  ].includes(row.result) || [
+    'trust_link.revoke',
+    'trust_link.key_revoke',
+    'managed_signing_key.rotate',
+    'policy.time_limit.update',
+    'policy.time_limit.request_extra',
+    'policy.viewing_space.update',
+    'policy.channel_list.import',
+    'policy.channel_list.remove',
+    'policy.channel_list.check',
+    'policy.channel_list.refresh',
+    'policy.channel_list.pause',
+    'policy.channel_list.resume'
+  ].includes(row.actionType));
 
   if (protectedRows.length > 0 && !hasRecentAdminAuth) {
     return { allowed: false, reason: 'reauth_required_for_protected_evidence' };
@@ -356,7 +400,7 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(source, /function getManagedActionHistoryRows\(profile\)/);
   assert.match(source, /function managedActionHistoryRowIsProtected\(row\)/);
   assert.match(source, /function canViewManagedActionHistory\(profilesV4, targetProfileId\)/);
-  assert.match(source, /function showManagedActionHistory\(profileId\)/);
+  assert.match(source, /function showManagedActionHistory\(profileId, options = \{\}\)/);
   assert.match(source, /function clearManagedActionHistory\(profileId\)/);
   assert.match(source, /actionType: 'history\.clear'/);
   assert.match(source, /result: 'cleared_by_admin'/);
@@ -389,6 +433,10 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(source, /\$\{transportLabel\} ack handoff failed/);
   assert.match(source, /recordAckHistory: \(details\) => recordManagedOpenSyncAckHistory\(details\)/);
   assert.match(source, /MANAGED_ACTION_HISTORY_SAFE_LABELS = Object\.freeze/);
+  assert.match(source, /'policy\.channel_list\.check': 'Channel list checked'/);
+  assert.match(source, /MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set\(\[/);
+  assert.match(source, /'policy\.channel_list\.check'/);
+  assert.match(source, /actionType === 'policy\.channel_list\.check'/);
   assert.match(source, /MANAGED_ACTION_HISTORY_ENCRYPTED_SUMMARY_SCHEMA/);
   assert.match(source, /function sanitizeManagedActionHistoryEncryptedSummary\(value\)/);
   assert.match(source, /safe_counts_status_transport_and_ciphertext_only/);
@@ -483,6 +531,7 @@ test('managed policy action-history row fixture requires actor target revision r
   assert.deepEqual(validateHistoryRow(validClearRow()), { ok: true });
   assert.deepEqual(validateHistoryRow(validClearRow({ reason: null })), { ok: false, reason: 'missing_rejection_reason' });
   assert.deepEqual(validateHistoryRow(validRemoteRateLimitedRow()), { ok: true });
+  assert.deepEqual(validateHistoryRow(validChannelListCheckRow()), { ok: true });
   assert.deepEqual(validateHistoryRow(validRemoteRateLimitedRow({ summary: { plaintextValue: 'spiders' } })), { ok: false, reason: 'sensitive_plaintext_value' });
   assert.deepEqual(validateHistoryRow(validMailboxAckRow()), { ok: true });
   assert.deepEqual(validateHistoryRow(validMailboxAckRow({ result: 'rejected', reason: 'ack_provider_unavailable' })), { ok: true });
@@ -504,6 +553,7 @@ test('managed action history access is parent/caregiver authority not child PIN 
       actionType: 'remote_policy.reject'
     })
   ];
+  const protectedChannelListRows = [validChannelListCheckRow()];
 
   assert.deepEqual(historyAccessDecision({ actor: parent, target: child, operation: 'view' }), { allowed: true, decision: 'view_allowed' });
   assert.deepEqual(historyAccessDecision({ actor: defaultProfile, target: child, operation: 'view' }), { allowed: true, decision: 'view_allowed' });
@@ -512,6 +562,11 @@ test('managed action history access is parent/caregiver authority not child PIN 
   assert.deepEqual(historyAccessDecision({ actor: parent, target: child, operation: 'clear', rows: acceptedRows }), { allowed: true, decision: 'clear_allowed' });
   assert.deepEqual(historyAccessDecision({ actor: parent, target: child, operation: 'clear', rows: protectedRows }), { allowed: false, reason: 'reauth_required_for_protected_evidence' });
   assert.deepEqual(historyAccessDecision({ actor: parent, target: child, operation: 'clear', rows: protectedRows, hasRecentAdminAuth: true }), {
+    allowed: true,
+    decision: 'clear_accepted_rows_only_preserve_protected_evidence'
+  });
+  assert.deepEqual(historyAccessDecision({ actor: parent, target: child, operation: 'clear', rows: protectedChannelListRows }), { allowed: false, reason: 'reauth_required_for_protected_evidence' });
+  assert.deepEqual(historyAccessDecision({ actor: parent, target: child, operation: 'clear', rows: protectedChannelListRows, hasRecentAdminAuth: true }), {
     allowed: true,
     decision: 'clear_accepted_rows_only_preserve_protected_evidence'
   });
@@ -530,6 +585,8 @@ test('managed action history required outcomes cover accepted rejected conflict 
     'rate_limited_remote_policy_attempt',
     'acked_mailbox_policy_result',
     'accepted_local_time_limit_policy',
+    'checked_channel_list_no_row_churn',
+    'refreshed_channel_list_source_changed',
     'failed_parent_unlock',
     'cleared_by_parent'
   ];
@@ -544,11 +601,11 @@ test('managed action history required outcomes cover accepted rejected conflict 
   assert.match(doc, /plaintext sensitive rule values: no/);
   assert.match(doc, /remote upload or telemetry: no/);
   assert.match(doc, /runtime managed action history store: profile-local managed child rows/);
-  assert.match(doc, /runtime managed action history row writer: local managed child edit plus local time-limit policy edit plus failed parent unlock plus Nanah managed-policy validation\/apply outcomes/);
+  assert.match(doc, /runtime managed action history row writer: local managed child edit plus local time-limit policy edit plus managed channel-list import\/remove\/check\/refresh\/pause\/resume plus failed parent unlock plus Nanah managed-policy validation\/apply outcomes/);
   assert.match(read('js/tab-view.js'), /function buildManagedTimeLimitLocalEditReport\(\{ actorProfileId, targetProfileId, nextPolicy \}\)/);
   assert.match(read('js/tab-view.js'), /actionType: 'policy\.time_limit\.update'/);
   assert.match(doc, /runtime managed action history access gate: present for parent\/account authority/);
-  assert.match(doc, /runtime managed action history display redaction: present for sensitive rows through fixed labels and normalized reason codes/);
+  assert.match(doc, /runtime managed action history display redaction: present for sensitive rows through fixed labels, normalized reason codes, and redacted time-limit\/request counts/);
   assert.match(doc, /runtime managed action history clear path: present for accepted rows only/);
   assert.match(doc, /runtime managed action history clear event writer: present as protected `history.clear` evidence/);
   assert.match(doc, /runtime remote managed validation\/apply history writer: present/);

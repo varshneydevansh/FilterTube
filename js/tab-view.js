@@ -3058,7 +3058,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const MANAGED_ACTION_HISTORY_ACCEPTED_RETENTION_MS = 30 * MANAGED_ACTION_HISTORY_DAY_MS;
     const MANAGED_ACTION_HISTORY_PROTECTED_RETENTION_MS = 90 * MANAGED_ACTION_HISTORY_DAY_MS;
     const MANAGED_ACTION_HISTORY_PROTECTED_RESULTS = new Set(['rejected', 'conflict', 'failed_auth', 'expired_session', 'cleared_by_admin']);
-    const MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set(['trust_link.revoke', 'trust_link.key_revoke', 'managed_signing_key.rotate', 'policy.time_limit.update', 'policy.time_limit.request_extra', 'policy.viewing_space.update', 'policy.channel_list.import', 'policy.channel_list.remove', 'policy.channel_list.refresh', 'policy.channel_list.pause', 'policy.channel_list.resume', 'remote_policy.source_push']);
+    const MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set(['trust_link.revoke', 'trust_link.key_revoke', 'managed_signing_key.rotate', 'policy.time_limit.update', 'policy.time_limit.request_extra', 'policy.viewing_space.update', 'policy.channel_list.import', 'policy.channel_list.remove', 'policy.channel_list.check', 'policy.channel_list.refresh', 'policy.channel_list.pause', 'policy.channel_list.resume', 'remote_policy.source_push']);
     const MANAGED_ACTION_HISTORY_SUMMARY_PRIVACY_SCHEMA = 'filtertube_managed_action_history_summary_privacy';
     const MANAGED_ACTION_HISTORY_ENCRYPTED_SUMMARY_SCHEMA = 'filtertube_managed_action_history_encrypted_summary';
     const MANAGED_ACTION_HISTORY_SAFE_LABELS = Object.freeze({
@@ -3072,6 +3072,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'policy.time_limit.request_extra': 'Extra time requested',
         'policy.channel_list.import': 'Channel list imported',
         'policy.channel_list.remove': 'Channel list removed',
+        'policy.channel_list.check': 'Channel list checked',
         'policy.channel_list.refresh': 'Channel list refreshed',
         'policy.channel_list.pause': 'Channel list paused',
         'policy.channel_list.resume': 'Channel list resumed',
@@ -5272,6 +5273,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         } else if (actionType === 'policy.channel_list.import'
             || actionType === 'policy.channel_list.remove'
+            || actionType === 'policy.channel_list.check'
             || actionType === 'policy.channel_list.refresh'
             || actionType === 'policy.channel_list.pause'
             || actionType === 'policy.channel_list.resume') {

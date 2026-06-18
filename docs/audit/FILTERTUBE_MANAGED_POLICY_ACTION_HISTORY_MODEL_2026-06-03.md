@@ -18,6 +18,10 @@ Trusted-link removal history writer now records protected `trust_link.revoke`
 rows when local accepted managed policy state is purged for a removed link, and
 source-side signing-key rotation now records protected `trust_link.key_revoke`
 rows for affected child-device links that must be paired again.
+Managed channel-list import, remove, check, refresh, pause, and resume actions
+now render through the protected action-history label/detail path, including
+unchanged URL-backed checks that update last-checked/source metadata without
+replacing channel rows or sending a remote policy.
 Pull-on-open mailbox ack handoff now records redacted protected
 `remote_policy.mailbox.ack` rows on the target profile after the provider ack
 attempt completes. Provider-gated local-network candidate ack handoff now records
@@ -122,10 +126,18 @@ rule.channel.block
 rule.channel.unblock
 policy.viewing_space.update
 policy.time_limit.update
+policy.time_limit.request_extra
+policy.channel_list.import
+policy.channel_list.remove
+policy.channel_list.check
+policy.channel_list.refresh
+policy.channel_list.pause
+policy.channel_list.resume
 policy.sync_policy.update
 trust_link.create
 trust_link.revoke
 trust_link.key_revoke
+managed_signing_key.rotate
 admin_session.unlock
 admin_session.failed_unlock
 local_policy.update
@@ -217,6 +229,8 @@ The following events must produce action-history rows in future implementation:
 | `accepted_local_network_provider_config` | Parent/account enables, changes, or disables local-network gateway delivery. | `accepted` on every currently manageable protected profile, including Master-managed independent account profiles, with redacted configured state, target count, and endpoint host only. |
 | `accepted_local_time_limit_policy` | Same-device parent/account sets, changes, or disables a protected profile's daily YouTube time limit. | `accepted` with local time-limit revision, policy hash, and redacted budget/timezone counts. |
 | `requested_extra_time_after_timeout` | Protected user clicks the timeout overlay's ask-parent action after the background confirms the active child profile budget is exhausted or the policy needs revalidation. | `requested` protected `policy.time_limit.request_extra` evidence with redacted date/surface/budget/used counts only; it does not grant time, dismiss the overlay, or mutate policy. |
+| `checked_channel_list_no_row_churn` | Parent checks a URL-backed managed channel list and the source hash is unchanged. | `accepted` protected `policy.channel_list.check` evidence with checked/source metadata and counts only; no channel rows are replaced and no remote send is prompted. |
+| `refreshed_channel_list_source_changed` | Parent refreshes a URL-backed managed channel list and the source hash changes. | `accepted` protected `policy.channel_list.refresh` evidence with redacted counts, followed by the normal verified-device send offer when the protected profile has an eligible delivery path. |
 | `failed_parent_unlock` | Admin PIN/password attempt fails. | `failed_auth` and rate-limit metadata. |
 | `cleared_by_parent` | Parent/account clears viewable accepted-action history. | `cleared_by_admin`; rejected evidence may remain until retention expiry. |
 
@@ -236,7 +250,7 @@ profile when a row can be attached to a known protected profile:
 
 ```text
 runtime managed action history store: profile-local managed child rows
-runtime managed action history row writer: local managed child edit plus local time-limit policy edit plus failed parent unlock plus Nanah managed-policy validation/apply outcomes
+runtime managed action history row writer: local managed child edit plus local time-limit policy edit plus managed channel-list import/remove/check/refresh/pause/resume plus failed parent unlock plus Nanah managed-policy validation/apply outcomes
 runtime managed action history access gate: present for parent/account authority
 runtime managed action history display redaction: present for sensitive rows through fixed labels, normalized reason codes, and redacted time-limit/request counts
 runtime managed action history retention pruning: present for 30-day accepted rows, 90-day protected evidence rows, and 500-row profile cap
