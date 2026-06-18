@@ -104,6 +104,10 @@ extension authority code.
   while offline.
 - [x] Runtime Main/Kids route gate, background-owned time-budget accounting, and
   protected timeout overlay exist for active protected profiles.
+- [ ] Managed channel filter-list subscriptions/imports. Issue 62 asks for
+  content-blocker-style channel lists that can be imported, enabled, disabled,
+  and synced. This should become a parent/caregiver rule-source feature, not an
+  untrusted URL authority path.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.
@@ -131,6 +135,14 @@ exposure to destabilizing or harmful content. The first managed-control MVP
 should therefore prioritize local-network or P2P remote management, protected
 admin authority, remote rule edits, and visible action history.
 
+Issue 62 feedback from DanWaLes adds a second parent/caregiver convenience
+requirement: channel filter-list subscriptions/imports. Parents should not have
+to add every channel manually when a trusted community, caregiver, school, or
+family list already exists. This belongs in the same managed-control direction
+because parents can choose a list once, enable or disable it per protected
+profile, and then push the resulting policy to verified child/protected
+devices.
+
 The implementation should stay extension-first because this repository owns the
 upstream profile/settings/policy contract that downstream mobile and tablet
 apps should follow.
@@ -142,6 +154,7 @@ apps should follow.
 | Local-network or P2P management | A trusted parent/caregiver device can manage a child or protected profile on the same network when reachable. | Remote writes cannot be accepted from page messages, untrusted peers, sibling profiles, or stale links. |
 | Password/PIN protected admin mode | The protected end user cannot change managed rules or disable controls. | Child PIN never becomes admin authority; parent/account PIN gates writes. |
 | Remote video, keyword, and channel rules | Parent can block specific videos, keywords, and channels just like local app controls. | All remote writes must reuse the same validated rule mutation paths as local writes. |
+| Managed channel filter lists | Parent/caregiver can import or subscribe to channel lists, enable/disable each list, and apply selected lists to protected profiles instead of adding channels one at a time. | A URL or list file is data, not authority. Imports need preview, source label, revision/hash, per-profile enablement, parent/admin approval, and the same validated channel-rule mutation path. |
 | Action history/logs | Parent/caregiver can see what changed, when, and from which trusted device. | Logs must not leak sensitive plaintext unnecessarily and must not become the policy authority. |
 | Offline safety | Child device keeps the last valid parent policy when the parent device is not reachable. | Stale, replayed, revoked, mismatched, or downgraded policy revisions are rejected. |
 | Future app parity | Mobile/tablet apps consume the same policy model as the extension. | Extension and apps must not fork authority semantics. |
@@ -214,6 +227,62 @@ Before accepting remote policy updates, fixtures must cover:
 - No child-device override that can weaken parent policy.
 - No remote route/time-limit policy apply before schema, fixtures, signature
   evidence, and trusted delivery gates exist.
+- No automatic trust of arbitrary public filter-list URLs. List subscriptions
+  must be parent/admin-approved rule sources with preview, local enable/disable,
+  and protected history.
+
+## Issue 62: Managed Channel Filter-List Subscriptions
+
+**Goal**: Let parents/caregivers import or subscribe to channel filter lists in
+a way that feels as simple as enabling a content-blocker list, while preserving
+FilterTube's profile, PIN, managed-policy, and local-first authority model.
+
+**Parent-facing model**:
+
+```text
+Add list -> Preview -> Enable for profiles/surfaces -> Apply -> Push to verified devices
+```
+
+**Planned requirements**:
+
+- Parents can add a list from a file, pasted text, or URL.
+- Each list has a clear name, source URL/file label, last checked time, item
+  count, revision/hash, and enabled/disabled state.
+- Lists can be enabled separately for Main/Kids and per protected profile.
+- Imported list entries normalize into the existing channel rule shape before
+  enforcement: channel name, handle/custom URL, UC id when present, source tag,
+  added/revision metadata, and optional list id.
+- The UI previews additions/removals before applying a list update.
+- List updates can be merged into current rules or treated as a managed list
+  overlay that can be disabled without deleting manual rules.
+- Managed parent sends can include list-derived channel rules through the same
+  signed `channels` or `rules_bundle` scopes already used for manual channel
+  updates.
+- Action history records list import/update/disable events with list id, source
+  label, revision/hash, counts, and result, but not unnecessary plaintext list
+  contents.
+- Protected users cannot add, remove, refresh, enable, disable, or weaken
+  parent-approved lists.
+
+**Safety boundaries**:
+
+- Remote list content is never executable code.
+- A public list URL does not get trusted-device authority.
+- A list update cannot bypass parent/account re-auth for protected profiles.
+- Unknown or malformed entries are skipped or quarantined for review instead of
+  silently broadening the blocklist.
+- Existing manual channel blocks remain distinguishable from list-derived rows.
+- A disabled list should stop contributing its rows without deleting unrelated
+  manual channel rules.
+
+**Open design questions**:
+
+- Whether the first release should store list entries as a reversible overlay
+  or materialize them into normal channel rows with source metadata.
+- Which formats to support first: plain URLs/text, JSON, uBlock-style comments,
+  CSV, or a simple FilterTube list JSON schema.
+- Whether refresh should be manual-only first, then scheduled later after
+  no-work/performance gates are proven.
 
 ## Sprint 1: Authority Contract And Proof Baseline
 
