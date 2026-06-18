@@ -134,6 +134,11 @@ parent tool instead of a sync/debug console.
   existing verified-device send path when that protected profile also lives on
   another device. CSV/text/URL/rule-list JSON never decide target profile,
   PIN/admin authority, trusted devices, viewing access, or time limits.
+- [x] Issue 62 wording slice: user-facing list management now uses
+  `Parent-approved lists` for the import/library/manage flow. This keeps the
+  parent mental model clear: lists are reviewed data sources that become normal
+  local channel/keyword rules first, and only the resulting protected-profile
+  policy is sent to verified devices.
 - [x] List-derived channel and keyword rules preserve source metadata, source
   format, source hash, last checked time, pause state, and Manual-vs-list
   separation.
@@ -249,6 +254,12 @@ parent tool instead of a sync/debug console.
     materialized channel rows after parent re-auth; unchanged source hashes only
     update checked/source metadata and protected history, avoiding unnecessary
     channel-row churn or remote policy sends.
+  - [x] Parent-approved wording slice: Settings, the import modal, the read-only
+    library modal, remove/check/pause/resume prompts, and Family Controls
+    details now say parent-approved lists instead of generic imported/rule lists
+    where the parent is making an approval decision. This is copy/UI framing
+    only; parser support, materialized row metadata, pause/refresh semantics,
+    and verified-device send behavior are unchanged.
   - [ ] Scheduled subscription refresh remains a future slice. Until then,
     list updates happen only after a parent/account profile chooses Check or
     Refresh and approves the result.
@@ -321,6 +332,143 @@ background mutation.
 The implementation should stay extension-first because this repository owns the
 upstream profile/settings/policy contract that downstream mobile and tablet
 apps should follow.
+
+## Internet/Intranet Sync Model
+
+Nanah live P2P and Dat-like later pickup are related product experiences, but
+they are different transport guarantees.
+
+Current live Nanah behavior:
+
+```text
+Parent opens FilterTube
+Child/protected device opens FilterTube
+Both devices pair and verify the same phrase
+Parent sends the selected signed policy now
+Protected device validates locally and applies if newer
+```
+
+That path needs both devices reachable during the same session. It is the
+simplest and safest default for ordinary parent/caregiver control.
+
+Dat-like later delivery requires a persistent transport layer:
+
+```text
+Parent appends signed profile policy revision N
+Transport stores or announces unreadable/signed update metadata
+Protected device opens later
+Protected device fetches latest candidate revision
+Protected device validates source link, target profile, scope, revision, hash,
+and signature/integrity locally
+Protected device applies only if the candidate is newer and trusted
+```
+
+Supported future transports can include:
+
+- **Internet mailbox**: stores unreadable encrypted pending updates and revision
+  metadata until the protected device opens.
+- **Intranet/local gateway**: stores or announces signed candidates on a trusted
+  home/school network so devices can meet without the public mailbox.
+- **Live Nanah P2P**: sends immediately when both devices are online and
+  reachable.
+
+Transport is never authority. Mailbox, LAN gateway, relay, and discovery are
+only delivery paths. The protected device keeps the last valid parent policy
+while offline and rejects stale, replayed, revoked, wrong-target, wrong-scope,
+or unsigned candidates.
+
+The richer long-term architecture should therefore be a signed per-profile
+policy feed:
+
+```text
+profileId = pushy
+revision 41 = rules + viewing space + time budget
+revision 42 = new parent-approved list rows
+revision 43 = time limit reduced to 2h
+
+Any transport may deliver revision 43.
+Only the protected device validator decides whether revision 43 applies.
+```
+
+This gives the parent/caregiver a Dat-like mental model without turning the
+server, relay, LAN gateway, URL list, or discovery layer into the policy owner.
+
+### Parent-Facing Language Boundary
+
+Do not expose transport names as the first-run mental model. Parents and
+caregivers are trying to answer one question: "How do I get this approved
+profile update onto the protected device?"
+
+Use these labels in normal UI:
+
+| Parent-facing label | Technical meaning |
+| --- | --- |
+| Send now / Live send | Live Nanah P2P while both devices are open. |
+| Pick Up Later | Encrypted internet pending-update service. |
+| Home Bridge | Trusted same-network bridge/gateway. |
+| Protected device | Child/family/caregiver-managed target profile/device. |
+| Parent-approved list | Reviewed channel/keyword list materialized into profile rules. |
+
+Keep these words in Advanced details, docs, telemetry, or code identifiers:
+
+```text
+mailbox
+LAN
+provider
+gateway
+candidate
+ciphertext item
+local-network discovery
+```
+
+This reduces setup anxiety without weakening the design. The copy can be simple
+while the runtime still validates trusted link, target profile, scope, revision,
+hash, and signature/integrity before applying anything.
+
+## Future Network-Level Product Boundary
+
+FilterTube can grow into a network or school/home product, but the feature must
+be described honestly because YouTube video data travels over HTTPS and is
+personalized inside the browser/app session.
+
+Practical product layers:
+
+| Layer | What it can do well | What it must not claim |
+| --- | --- | --- |
+| Extension/app policy | Video, channel, keyword, whitelist, time-limit, Main/Kids, and menu behavior on the device where FilterTube runs. | Whole-network coverage for unmanaged devices. |
+| Managed policy feed | Keep several family/caregiver devices aligned with signed parent policy revisions. | Server-side plaintext rule control. |
+| Internet encrypted mailbox | Let a child/protected device pick up pending signed updates after the parent device is offline. | Authority over rules, PINs, profiles, or trust. |
+| Intranet/local gateway | Help same-network devices exchange signed updates without relying on the public mailbox. | Automatic trust for every device on the Wi-Fi. |
+| Router/DNS blocking | Block or allow entire domains/services such as YouTube or YouTube Kids. | Per-video, per-channel, per-keyword YouTube filtering. |
+| School/organization deployment | Enforce FilterTube extension/app installation and shared managed policies through device management. | Filtering unmanaged personal devices without an installed agent. |
+
+Network-wide video-level filtering is not a realistic first-class promise with
+plain DNS/router controls. For specific YouTube videos, channels, keywords,
+comments, Shorts, end screens, and whitelists, FilterTube needs an endpoint
+agent: browser extension, native app, managed WebView, or an explicitly managed
+device profile. HTTPS interception/MITM proxy filtering should not be the MVP
+because it is fragile, privacy-heavy, and likely to break modern YouTube/app
+traffic.
+
+The monetizable network direction should be:
+
+```text
+Family/caregiver plan
+  -> hosted encrypted mailbox
+  -> signed per-profile policy feed
+  -> parent dashboard
+  -> device health/history
+
+School/clinic plan
+  -> managed list catalog
+  -> local gateway option
+  -> organization policy templates
+  -> deployment guides for extension/app/device management
+```
+
+This keeps the current extension and apps as the precise filtering layer while
+adding paid infrastructure for reliable delivery, audit history, templates, and
+multi-device administration.
 
 ## Requirements Added From Issue 60
 
@@ -453,7 +601,7 @@ Add list -> Preview -> Choose profiles -> Apply -> Send update
 **Caregiver-first UI shape**:
 
 - Avoid "subscription provider" language in the normal workflow.
-- Use one clear action label: `Import List`.
+- Use one clear action label: `Import Approved List`.
 - Show a preview with counts first: `312 channels found`, `24 already present`,
   `288 will be added`, `6 skipped`.
 - Let the parent choose Main, Kids, or both using buttons, not free-text scope

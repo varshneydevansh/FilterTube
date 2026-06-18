@@ -463,7 +463,7 @@
                                                             Merge a full FilterTube backup or compatible backup JSON.<br />
                                                         </span>
                                                         <span class="import-export-hint">
-                                                            Use this for complete settings restore or legacy BlockTube export migration. For previewed channel/keyword-only lists, use Rule list imports below.
+                                                            Use this for complete settings restore or legacy BlockTube export migration. For previewed channel/keyword-only lists, use Parent-approved list imports below.
                                                         </span>
                                                         <div class="import-backup-format-strip" aria-label="Supported backup imports">
                                                             <span>FilterTube backup JSON</span>
@@ -486,14 +486,14 @@
                                                 </div>
                                             </div>
                                             <div class="help-item import-export-rule-list">
-                                                <div class="help-item-title">Rule list imports</div>
+                                                <div class="help-item-title">Parent-approved list imports</div>
                                                 <div class="help-item-body import-export-row">
                                                     <div class="import-export-text">
                                                         <span class="import-export-summary">
-                                                            Import channel and keyword lists into the current profile.<br />
+                                                            Import channel and keyword lists into this profile, then send the profile update to verified devices when needed.<br />
                                                         </span>
                                                         <span class="import-export-hint">
-                                                            Use CSV, text, raw HTTPS lists, or rule-list JSON. FilterTube previews parsed rows before anything changes.
+                                                            Use CSV, text, raw HTTPS lists, or rule-list JSON. FilterTube previews parsed rows before anything changes; files never decide PINs, profiles, trust, time limits, or Main/Kids access.
                                                         </span>
                                                         <div class="rule-list-sheet-example" aria-label="Supported rule list structure preview">
                                                             <div class="rule-list-sheet-example__bar">
@@ -558,8 +558,8 @@ keyword: brainrot</pre>
                                                         </fieldset>
                                                     </div>
                                                     <div class="import-export-actions">
-                                                        <button id="ftImportRuleListBtn" class="btn-primary" type="button" title="Preview and import a channel/keyword rule list into Main, Kids, or both for the current profile.">
-                                                            Import Rule List
+                                                        <button id="ftImportRuleListBtn" class="btn-primary" type="button" title="Preview and import a parent-approved channel/keyword list into Main, Kids, or both for the current profile.">
+                                                            Import Approved List
                                                         </button>
                                                         <button id="ftDownloadRuleListTemplateBtn" class="btn-secondary" type="button" title="Download the safe CSV template for spreadsheet editing.">
                                                             Download CSV Template
@@ -757,7 +757,7 @@ keyword: brainrot</pre>
                                                     <span>Use the parent profile here, join from the child or family device, choose the target profile, then save parent trust once.</span>
                                                 </article>
                                                 <article class="nanah-sync-principles__item">
-                                                    <strong>Send imported lists too</strong>
+                                                    <strong>Send approved lists too</strong>
                                                     <span>CSV, text, URL, and rule-list JSON imports become normal profile rules first, then travel through the same verified-device update path.</span>
                                                 </article>
                                             </div>
@@ -1141,8 +1141,8 @@ keyword: brainrot</pre>
                                             <div class="help-item-body">Add a channel by <b><code>UC...</code></b> or <b><code>@handle</code></b> or <b><code>/c/Name</code></b> or <b><code>/user/Name</code></b>. <br/>Channels blocked from the YouTube 3-dot menu will appear here automatically.</div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">Rule list imports</div>
-                                            <div class="help-item-body">Open Settings &gt; Import / Export &gt; Rule list imports. Choose Main YouTube, YouTube Kids, or Both, then preview a CSV, text, raw HTTPS list, or rule-list JSON before applying it. Imported rows are then reviewed and edited from the normal Main/Kids rule pages.</div>
+                                            <div class="help-item-title">Parent-approved list imports</div>
+                                            <div class="help-item-body">Open Settings &gt; Import / Export &gt; Parent-approved list imports. Choose Main YouTube, YouTube Kids, or Both, then preview a CSV, text, raw HTTPS list, or rule-list JSON before applying it. Imported rows are then reviewed and edited from the normal Main/Kids rule pages.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Filter All Content (per-channel)</div>
@@ -1567,9 +1567,9 @@ keyword: brainrot</pre>
                                             </div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">Import a rule list for protected profiles</div>
+                                            <div class="help-item-title">Import a parent-approved list for protected profiles</div>
                                             <div class="help-item-body">
-                                                From the parent/account profile, open a child row and choose <b>Edit Rules</b>. Then use Settings &gt; Import / Export &gt; Rule list imports and choose Main, Kids, or Both. Imported files only add channel/keyword rules; they cannot change PINs, trusted devices, viewing spaces, or sync targets. After import, use the protected profile row to send the updated policy to a verified device.
+                                                From the parent/account profile, open a child row and choose <b>Edit Rules</b>. Then use Settings &gt; Import / Export &gt; Parent-approved list imports and choose Main, Kids, or Both. Imported files only add channel/keyword rules; they cannot change PINs, trusted devices, viewing spaces, or sync targets. After import, use the protected profile row to send the updated policy to a verified device.
                                             </div>
                                         </div>
                                         <div class="help-item">
@@ -1581,7 +1581,7 @@ keyword: brainrot</pre>
                                         <div class="help-item">
                                             <div class="help-item-title">Remote updates in plain words</div>
                                             <div class="help-item-body">
-                                                Normal parent control is live P2P: open parent and protected devices, pair, verify the phrase, then send the selected profile update. Saved trust remembers the verified parent-child relationship and target profile for the next live session. Offline pickup and same-network gateways are advanced optional delivery tools only if you run a compatible service; they are not required for ordinary parent control and they never let a protected profile edit its own rules.
+                                                Normal parent control is live send: open parent and protected devices, pair, verify the phrase, then send the selected profile update. Saved trust remembers the verified parent-child relationship and target profile for the next live session. Pick Up Later and Home Bridge are advanced optional delivery tools only if you run a compatible service; they are not required for ordinary parent control and they never let a protected profile edit its own rules.
                                             </div>
                                         </div>
                                     </div>

@@ -304,7 +304,7 @@
         const version = sourceVersion ? `, ${sourceVersion}` : '';
         const staleListCount = normalizeCommandCenterNumber(summary.staleListCount);
         const stale = staleListCount ? `, ${staleListCount} need refresh` : '';
-        return names.length ? `${names.join(', ')}${more}${checked}${version}${stale}` : `${listCount} imported ${listCount === 1 ? 'list' : 'lists'}${checked}${version}${stale}`;
+        return names.length ? `${names.join(', ')}${more}${checked}${version}${stale}` : `${listCount} parent-approved ${listCount === 1 ? 'list' : 'lists'}${checked}${version}${stale}`;
     }
 
     function resolveManagedCommandCenterSyncState(item = {}) {
@@ -847,7 +847,7 @@
         [
             { label: 'Managed profiles', value: summary.profileCount, tone: 'neutral', title: 'Profiles this parent/account can manage.', always: true },
             { label: 'Ready to send', value: summary.syncReadyProfileCount, tone: summary.syncReadyProfileCount ? 'success' : 'neutral', title: 'Profiles with a verified delivery path available now.', always: true },
-            { label: 'Lists active', value: summary.managedChannelListProfileCount, tone: 'success', title: 'Protected profiles with imported rule lists.' },
+            { label: 'Lists active', value: summary.managedChannelListProfileCount, tone: 'success', title: 'Protected profiles with parent-approved channel or keyword lists.' },
             { label: 'Needs device', value: summary.noDeviceProfileCount + summary.syncRepairProfileCount + summary.syncStaleProfileCount, tone: 'warning', title: 'Profiles that need a verified device, refreshed trust, or re-pairing before remote updates.' },
             { label: 'Requests', value: summary.pendingExtraTimeRequestCount, tone: 'warning', title: 'Protected profiles asking for more YouTube time.' },
             { label: 'Conflicts', value: summary.remoteConflictCount, tone: 'danger', title: 'Rejected or conflicting remote-policy history rows that need parent review.' }
@@ -916,8 +916,8 @@
         if (shouldShowProviderSetup) {
             const providerIntro = document.createElement('div');
             providerIntro.className = 'ft-managed-command-center__provider-intro';
-            providerIntro.textContent = 'Optional delivery';
-            providerIntro.title = 'Live P2P is the normal path. These options are only for later or same-network delivery.';
+            providerIntro.textContent = 'Optional ways to send';
+            providerIntro.title = 'Live send is the normal path. These options are only for pick-up-later or a trusted home network bridge.';
             panel.appendChild(providerIntro);
         }
 
@@ -929,23 +929,23 @@
         mailboxCopy.className = 'ft-managed-command-center__provider-copy';
         const mailboxTitle = document.createElement('strong');
         mailboxTitle.textContent = mailbox.configured
-            ? (mailbox.label || 'Later updates ready')
-            : 'Later updates off';
+            ? (mailbox.label || 'Pick up later is ready')
+            : 'Pick up later is off';
         const mailboxDetail = document.createElement('span');
         mailboxDetail.textContent = summary.profileCount > 0
-            ? (mailbox.detail || 'Use this when parent changes should wait for a protected device to open later.')
-            : 'Create a protected profile first. Later delivery is optional and only useful after a protected device is paired.';
+            ? (mailbox.detail || 'Use this when a parent update should wait until the protected device opens.')
+            : 'Create a protected profile first. Pick-up-later is optional and only useful after a protected device is paired.';
         const mailboxRoute = document.createElement('span');
         mailboxRoute.textContent = mailbox.configured
             ? 'The protected device still accepts only trusted parent updates.'
-            : 'Leave this off when live P2P is enough.';
+            : 'Leave this off when live send is enough.';
         mailboxCopy.append(mailboxTitle, mailboxDetail, mailboxRoute);
         mailboxPanel.appendChild(mailboxCopy);
         if (h.onAction) {
             const mailboxButton = document.createElement('button');
             mailboxButton.className = 'btn-secondary';
             mailboxButton.type = 'button';
-            mailboxButton.textContent = mailbox.configured ? 'Edit Later Updates' : 'Set Up Later Updates';
+            mailboxButton.textContent = mailbox.configured ? 'Edit Pick Up Later' : 'Set Up Pick Up Later';
             mailboxButton.title = 'Requires parent/account re-auth. Use only when updates must wait for the protected device to open later.';
             mailboxButton.addEventListener('click', (event) => {
                 event.preventDefault();
@@ -964,29 +964,29 @@
         if (shouldShowProviderSetup && localNetwork.configured === true) {
         const localPanel = document.createElement('div');
         localPanel.className = `ft-managed-command-center__provider is-${localNetwork.tone || (localNetwork.configured ? 'success' : 'warning')}`;
-        localPanel.title = 'Optional: use this only for an explicitly configured same-network provider. Network reachability is not authority.';
+        localPanel.title = 'Optional: use this only for an explicitly configured home network bridge. Network reachability is not authority.';
         const localCopy = document.createElement('div');
         localCopy.className = 'ft-managed-command-center__provider-copy';
         const localTitle = document.createElement('strong');
         localTitle.textContent = localNetwork.configured
-            ? (localNetwork.label || 'Same-network updates ready')
-            : 'Same-network updates off';
+            ? (localNetwork.label || 'Home network bridge is ready')
+            : 'Home network bridge is off';
         const localDetail = document.createElement('span');
         localDetail.textContent = summary.profileCount > 0
-            ? (localNetwork.detail || 'Use this only with a trusted FilterTube-compatible home/local gateway.')
-            : 'Create a protected profile first. Same-network delivery is optional and never replaces parent trust.';
+            ? (localNetwork.detail || 'Use this only with a trusted FilterTube-compatible bridge on your home or school network.')
+            : 'Create a protected profile first. A home network bridge is optional and never replaces parent trust.';
         const localRoute = document.createElement('span');
         localRoute.textContent = localNetwork.configured
             ? 'The protected device still accepts only trusted parent updates.'
-            : 'Leave this off unless you run a trusted local gateway.';
+            : 'Leave this off unless you run a trusted FilterTube bridge.';
         localCopy.append(localTitle, localDetail, localRoute);
         localPanel.appendChild(localCopy);
         if (h.onAction) {
             const localButton = document.createElement('button');
             localButton.className = 'btn-secondary';
             localButton.type = 'button';
-            localButton.textContent = localNetwork.configured ? 'Edit Same-Network' : 'Set Up Same-Network';
-            localButton.title = 'Requires parent/account re-auth. Same-network reachability alone cannot change protected rules.';
+            localButton.textContent = localNetwork.configured ? 'Edit Home Bridge' : 'Set Up Home Bridge';
+            localButton.title = 'Requires parent/account re-auth. Being on the same network alone cannot change protected rules.';
             localButton.addEventListener('click', (event) => {
                 event.preventDefault();
                 Promise.resolve(h.onAction({
@@ -1202,7 +1202,7 @@
             [
                 { label: item.viewingAccess, tone: 'neutral', title: 'Allowed YouTube space for this protected profile.' },
                 { label: item.timeLimit, tone: item.timeLimited ? 'warning' : 'neutral', title: 'Daily YouTube time for this protected profile.' },
-                item.managedChannelListLabel ? { label: item.managedChannelListLabel, tone: 'success', title: item.managedChannelListDetail || 'Imported rule lists attached to this profile.' } : null,
+                item.managedChannelListLabel ? { label: item.managedChannelListLabel, tone: 'success', title: item.managedChannelListDetail || 'Parent-approved lists attached to this profile.' } : null,
                 { label: syncState.label, tone: syncState.tone, title: item.deliveryPathDetail || 'Device delivery status.' },
                 item.remoteScopeCount ? { label: item.syncLabel, tone: 'success', title: 'Latest accepted managed policy revision.' } : null,
                 item.pendingExtraTimeRequestLabel ? { label: item.pendingExtraTimeRequestLabel, tone: 'warning', title: item.pendingExtraTimeRequestDetail || 'This profile asked for more time.' } : null,

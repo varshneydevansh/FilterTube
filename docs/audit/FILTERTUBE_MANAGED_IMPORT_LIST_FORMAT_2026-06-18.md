@@ -18,7 +18,8 @@ The file must not decide parent authority, target child profile, PIN behavior, s
 
 ## User-Facing Name
 
-Use `Import List` in the UI.
+Use `Parent-approved lists` for the feature name and `Import Approved List`
+for the primary action in the UI.
 
 Avoid making parents choose between many importer types. The importer can accept:
 
@@ -171,7 +172,7 @@ Reason: a downloaded list should never become authority. It is only a source of 
 Parent UI owns the final choices:
 
 ```text
-Import List
+Import Approved List
   -> preview channels/keywords/skipped rows
   -> choose protected profiles
   -> choose Main / Kids / Both
@@ -186,7 +187,7 @@ Import List
 flowchart TD
     A["Parent opens Accounts and Sync"] --> B["Choose protected profile or selected profiles"]
     B --> C["Open Lists"]
-    C --> D["Import List"]
+    C --> D["Import Approved List"]
     D --> E["Paste, choose file, load HTTPS URL, or download CSV template"]
     E --> F["FilterTube previews channels, keywords, skipped rows"]
     F --> G{"Parent accepts preview?"}
@@ -222,9 +223,9 @@ flowchart TD
 
 ### Verified-Device Sync Flow
 
-Imported list rows do not create a second sync protocol. After rules are applied
-to a protected profile, FilterTube sends the changed policy through the existing
-managed-policy JSON path when the parent chooses to send now.
+Parent-approved list rows do not create a second sync protocol. After rules are
+applied to a protected profile, FilterTube sends the changed policy through the
+existing managed-policy JSON path when the parent chooses to send now.
 
 ```mermaid
 sequenceDiagram
@@ -233,7 +234,7 @@ sequenceDiagram
     participant Nanah as Nanah verified path
     participant Child as Protected device/profile
 
-    Parent->>Runtime: Apply imported rule list after unlock
+    Parent->>Runtime: Apply parent-approved list after unlock
     Runtime->>Runtime: Update protected profile channels/keywords
     Runtime->>Runtime: Record protected action history
     Runtime->>Parent: Offer Send Update when verified path exists
@@ -296,11 +297,13 @@ The first parser slice was not complete from a user-flow standpoint because CSV 
 
 Current completion rule:
 
-- Primary entry point: Settings -> Import / Export -> Rule list imports.
+- Product-facing name: Parent-approved lists. Parser/internal docs may still
+  say rule-list formats because the accepted files are plain rule data.
+- Primary entry point: Settings -> Import / Export -> Parent-approved list imports.
 - Target choice: Main YouTube, YouTube Kids, or Both. This works for the active profile or the protected profile currently being edited by a parent/account profile.
 - Main/Kids rule pages remain the place to review, edit, pause, resume, and remove the imported rows after import.
 - The Settings card shows a sheet-like structure preview instead of dense prose: `type`, `value`, `notes`, plus supported CSV/JSON shapes.
-- The modal shows supported formats, CSV template, file/URL/paste inputs, live preview counts, skipped row counts, a spreadsheet-like parsed-row preview, and the final Apply confirmation.
+- The modal says parent-approved list, shows supported formats, CSV template, file/URL/paste inputs, live preview counts, skipped row counts, a spreadsheet-like parsed-row preview, and the final Apply confirmation.
 - Rule-list JSON is intentionally narrower than a full FilterTube backup JSON. It may add channels and keywords only; it does not change profile structure, PINs, trusted devices, viewing spaces, or sync targets.
 - The Settings card and import modal expose both CSV and JSON rule-list templates. The CSV template is the spreadsheet path; the JSON template is the lightweight rule-list shape, not the full FilterTube backup/export structure.
 - Import backup remains the full restore/migration lane for FilterTube backup JSON and legacy BlockTube export JSON.
@@ -313,6 +316,15 @@ Supported source shapes in this slice:
 - Simple JSON: `channels` and/or `keywords` arrays.
 - BlockTube-style JSON: `filterData.channelId`, `filterData.channelName`, and `filterData.title` arrays are read as rule-list channels/keywords.
 - Raw HTTPS source URL: public CSV, text, or JSON fetched into the same preview before apply.
+
+Current UI wording boundary:
+
+- "Parent-approved list" means the parent/account profile reviewed parsed rows
+  and chose to apply them.
+- It does not mean the URL, file author, or JSON shape has authority.
+- The list can add only channel and keyword rows to Main, Kids, or both.
+- Sending those changes to another device still uses the verified-device
+  managed-policy path, not the file/list parser.
 
 Not shipped in this CSV PR:
 

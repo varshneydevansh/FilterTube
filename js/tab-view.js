@@ -3087,12 +3087,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         'policy.viewing_space.update': 'Viewing space policy changed',
         'policy.time_limit.update': 'Time limit policy changed',
         'policy.time_limit.request_extra': 'Extra time requested',
-        'policy.channel_list.import': 'Rule list imported',
-        'policy.channel_list.remove': 'Rule list removed',
-        'policy.channel_list.check': 'Rule list checked',
-        'policy.channel_list.refresh': 'Rule list refreshed',
-        'policy.channel_list.pause': 'Rule list paused',
-        'policy.channel_list.resume': 'Rule list resumed',
+        'policy.channel_list.import': 'Approved list imported',
+        'policy.channel_list.remove': 'Approved list removed',
+        'policy.channel_list.check': 'Approved list checked',
+        'policy.channel_list.refresh': 'Approved list refreshed',
+        'policy.channel_list.pause': 'Approved list paused',
+        'policy.channel_list.resume': 'Approved list resumed',
         'policy.sync_policy.update': 'Sync policy changed',
         'trust_link.create': 'Trusted link created',
         'trust_link.revoke': 'Trusted link removed',
@@ -7796,7 +7796,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return '<div class="managed-channel-list-modal__preview-empty">No readable rows yet. Use channel_id for channels and keyword for words or phrases.</div>';
         }
         return `
-            <div class="managed-channel-list-modal__sheet" role="table" aria-label="Rule list preview rows">
+            <div class="managed-channel-list-modal__sheet" role="table" aria-label="Parent-approved list preview rows">
                 <div class="managed-channel-list-modal__sheet-row managed-channel-list-modal__sheet-head" role="row">
                     <span role="columnheader">Type</span>
                     <span role="columnheader">Value</span>
@@ -7895,7 +7895,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             header.className = 'card-header';
             const titleEl = document.createElement('h3');
             titleEl.className = 'ft-modal-title';
-            titleEl.textContent = 'Import List';
+            titleEl.textContent = 'Import Parent-Approved List';
             header.appendChild(titleEl);
 
             const body = document.createElement('div');
@@ -7906,7 +7906,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const targetCopy = normalizeString(targetLabel) || (selectedCount > 1
                 ? `${selectedCount} selected protected profiles`
                 : 'this profile');
-            intro.textContent = `Import a channel/keyword list, review the parsed rows, then apply it to ${targetCopy}. Rule lists never change profiles, PINs, trusted devices, or viewing access.`;
+            intro.textContent = `Import a channel/keyword list, review what FilterTube understood, then apply it to ${targetCopy}. Lists become ordinary profile rules first; they never change profiles, PINs, trusted devices, viewing access, or time limits.`;
             body.appendChild(intro);
 
             const formatGuide = document.createElement('div');
@@ -7923,19 +7923,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             const nameGroup = document.createElement('label');
             nameGroup.className = 'managed-channel-list-modal__field';
             const nameLabel = document.createElement('span');
-            nameLabel.textContent = 'List name';
+            nameLabel.textContent = 'Parent label';
             const nameInput = document.createElement('input');
             nameInput.className = 'text-input';
             nameInput.type = 'text';
             nameInput.placeholder = 'Family block list';
-            nameInput.value = 'Imported rule list';
+            nameInput.value = 'Parent-approved list';
             nameGroup.append(nameLabel, nameInput);
             body.appendChild(nameGroup);
 
             const urlGroup = document.createElement('label');
             urlGroup.className = 'managed-channel-list-modal__field';
             const urlLabel = document.createElement('span');
-            urlLabel.textContent = 'Optional list URL';
+            urlLabel.textContent = 'Public list URL (optional)';
             const urlRow = document.createElement('div');
             urlRow.className = 'managed-channel-list-modal__url-row';
             const urlInput = document.createElement('input');
@@ -7954,7 +7954,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const fileGroup = document.createElement('label');
             fileGroup.className = 'managed-channel-list-modal__field';
             const fileLabel = document.createElement('span');
-            fileLabel.textContent = 'Optional list file';
+            fileLabel.textContent = 'List file (optional)';
             const fileInput = document.createElement('input');
             fileInput.className = 'managed-channel-list-modal__file';
             fileInput.type = 'file';
@@ -7965,7 +7965,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const listGroup = document.createElement('label');
             listGroup.className = 'managed-channel-list-modal__field';
             const listLabel = document.createElement('span');
-            listLabel.textContent = 'Channels and keywords';
+            listLabel.textContent = 'Paste list or edit template';
             const textArea = document.createElement('textarea');
             textArea.className = 'text-input managed-channel-list-modal__textarea';
             textArea.placeholder = MANAGED_RULE_LIST_CSV_TEMPLATE;
@@ -8007,7 +8007,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const help = document.createElement('div');
             help.className = 'managed-channel-list-modal__help';
-            help.textContent = 'TXT bare rows stay channel-only; use keyword: for TXT keywords. CSV and supported JSON can add channels and keywords. FilterTube shows parsed rows before any profile is changed.';
+            help.textContent = 'TXT bare rows stay channel-only; use keyword: for TXT keywords. CSV and supported JSON can add channels and keywords. After import, send the protected profile update from Family Controls if another verified device needs the same rules.';
             body.appendChild(help);
 
             const previewEl = document.createElement('div');
@@ -8477,7 +8477,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function showManagedChannelListLibraryModal(summaries) {
         const rows = safeArray(summaries);
         if (!rows.length) {
-            UIComponents.showToast('No imported rule lists found for the selected protected profiles', 'info');
+            UIComponents.showToast('No parent-approved lists found for the selected protected profiles', 'info');
             return;
         }
         return new Promise((resolve) => {
@@ -8491,7 +8491,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             header.className = 'card-header';
             const titleEl = document.createElement('h3');
             titleEl.className = 'ft-modal-title';
-            titleEl.textContent = 'Imported Rule Lists';
+            titleEl.textContent = 'Parent-Approved Lists';
             header.appendChild(titleEl);
 
             const body = document.createElement('div');
@@ -8499,7 +8499,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const intro = document.createElement('div');
             intro.className = 'import-export-hint';
-            intro.textContent = 'These are list-derived channel and keyword rules on the selected protected profiles. This view is read-only.';
+            intro.textContent = 'These lists are already materialized as channel and keyword rules on the selected protected profiles. View the source, surfaces, and refresh state here; use the Lists menu to pause, check, refresh, remove, or import more.';
             body.appendChild(intro);
 
             const list = document.createElement('div');
@@ -8584,8 +8584,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }));
         if (!choices.length) return null;
         const selected = await showChoiceModal({
-            title: 'Remove Imported List',
-            message: 'Choose the imported rule list to remove from selected protected profiles. Manual rules are kept.',
+            title: 'Remove Parent-Approved List',
+            message: 'Choose the list-derived rules to remove from selected protected profiles. Manual rules are kept.',
             details: safeArray(summaries).slice(0, 5).map((summary) => {
                 const surfaces = summary.surfaces.includes('main') && summary.surfaces.includes('kids')
                     ? 'Main + Kids'
@@ -8608,8 +8608,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }));
         if (!choices.length) return null;
         const selected = await showChoiceModal({
-            title: 'Check Imported List URL',
-            message: 'Choose the URL-backed list to check. FilterTube loads the saved public HTTPS source first; changed content can refresh rules after parent/account unlock.',
+            title: 'Check List URL',
+            message: 'Choose the public URL-backed list to check. FilterTube previews changed content before replacing list-derived rules after parent/account unlock.',
             details: urlBacked.slice(0, 5).map((summary) => {
                 const surfaces = summary.surfaces.includes('main') && summary.surfaces.includes('kids')
                     ? 'Main + Kids'
@@ -8654,10 +8654,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }));
         if (!choices.length) return null;
         const selected = await showChoiceModal({
-            title: paused ? 'Pause Imported List' : 'Resume Imported List',
+            title: paused ? 'Pause Parent-Approved List' : 'Resume Parent-Approved List',
             message: paused
-                ? 'Choose the imported list to pause. The list remains saved and visible, but its channels stop affecting protected profiles until resumed.'
-                : 'Choose the imported list to resume. Its saved channels will become active again after parent/account unlock.',
+                ? 'Choose the list to pause. It remains saved and visible, but its channels and keywords stop affecting protected profiles until resumed.'
+                : 'Choose the list to resume. Its saved channels and keywords become active again after parent/account unlock.',
             details: candidates.slice(0, 5).map((summary) => {
                 const activeCount = Number(summary.activeRuleCount ?? summary.activeChannelCount) || 0;
                 const pausedCount = Number(summary.pausedRuleCount ?? summary.pausedChannelCount) || 0;
@@ -8823,7 +8823,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     actionType: 'policy.channel_list.check',
                     summary: {
                         ...safeObject(report.historyRow.summary),
-                        label: 'Rule list checked',
+                        label: 'Approved list checked',
                         surface,
                         checkedCount: result.changedCount || 0,
                         listEntryCount: countManagedRuleListRows(parsed).total,
@@ -8903,7 +8903,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     actionType: 'policy.channel_list.refresh',
                     summary: {
                         ...safeObject(report.historyRow.summary),
-                        label: 'Rule list refreshed',
+                        label: 'Approved list refreshed',
                         surface,
                         addedCount: applyResult.addedCount || 0,
                         removedCount: removeResult.removedCount || 0,
@@ -9126,7 +9126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!surfaces.length) return;
         const surfaceLabel = surfaces.length > 1 ? 'Main + Kids' : (surfaces[0] === 'kids' ? 'YouTube Kids' : 'Main YouTube');
         const confirmImport = await showChoiceModal({
-            title: 'Apply Rule List?',
+            title: 'Apply Parent-Approved List?',
             message: `${formatManagedRuleListCount(parsedCounts)} found. Apply this list to ${eligibleIds.length} protected ${eligibleIds.length === 1 ? 'profile' : 'profiles'} on ${surfaceLabel}.`,
             details: [
                 `${formatManagedRuleListCount(parsedCounts)} ready`,
@@ -9134,7 +9134,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 'Parent/account re-auth is required before anything changes.'
             ],
             choices: [
-                { value: 'apply', label: 'Apply List', className: 'btn-primary' }
+                { value: 'apply', label: 'Apply Approved List', className: 'btn-primary' }
             ],
             cancelText: 'Cancel'
         });
@@ -9187,7 +9187,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     actionType: 'policy.channel_list.import',
                     summary: {
                         ...safeObject(report.historyRow.summary),
-                        label: 'Rule list imported',
+                        label: 'Approved list imported',
                         surface: surfaces.length > 1 ? 'both' : surface,
                         addedCount: result.addedCount || 0,
                         channelAddedCount: result.channelAddedCount || 0,
@@ -9423,7 +9423,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const summaries = collectManagedChannelListSummaries(profiles, eligibleIds);
         if (!summaries.length) {
-            UIComponents.showToast('No imported rule lists found for the selected protected profiles', 'info');
+            UIComponents.showToast('No parent-approved lists found for the selected protected profiles', 'info');
             return;
         }
 
@@ -9475,7 +9475,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     actionType: 'policy.channel_list.remove',
                     summary: {
                         ...safeObject(report.historyRow.summary),
-                        label: 'Rule list removed',
+                        label: 'Approved list removed',
                         surface,
                         removedCount: result.removedCount || 0,
                         listEntryCount: selectedList.ruleCount || selectedList.channelCount || 0
@@ -9495,7 +9495,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (!changedCount) {
-            UIComponents.showToast('No selected profiles had that imported list', 'info');
+            UIComponents.showToast('No selected profiles had that parent-approved list', 'info');
             return;
         }
 
@@ -9577,8 +9577,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!selectedList) {
             UIComponents.showToast(
                 paused
-                    ? 'No active imported lists found for the selected protected profiles'
-                    : 'No paused imported lists found for the selected protected profiles',
+                    ? 'No active parent-approved lists found for the selected protected profiles'
+                    : 'No paused parent-approved lists found for the selected protected profiles',
                 'info'
             );
             return;
@@ -9631,7 +9631,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     actionType: paused ? 'policy.channel_list.pause' : 'policy.channel_list.resume',
                     summary: {
                         ...safeObject(report.historyRow.summary),
-                        label: paused ? 'Rule list paused' : 'Rule list resumed',
+                        label: paused ? 'Approved list paused' : 'Approved list resumed',
                         surface,
                         changedCount: result.changedCount || 0,
                         listEntryCount: selectedList.ruleCount || selectedList.channelCount || 0
@@ -9732,7 +9732,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const selectedList = await promptManagedChannelListToRefresh(summaries);
         if (!selectedList) {
             if (!summaries.some(summary => normalizeManagedChannelListSourceUrl(summary?.sourceUrl))) {
-                UIComponents.showToast('No URL-backed imported lists found for the selected protected profiles', 'info');
+                UIComponents.showToast('No URL-backed parent-approved lists found for the selected protected profiles', 'info');
             }
             return;
         }
@@ -9908,7 +9908,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? urlBacked.filter(summary => isManagedChannelListSummaryStale(summary))
             : urlBacked;
         if (!urlBacked.length) {
-            UIComponents.showToast('No URL-backed imported lists found for the selected protected profiles', 'info');
+            UIComponents.showToast('No URL-backed parent-approved lists found for the selected protected profiles', 'info');
             return;
         }
         if (!refreshTargets.length) {
@@ -10108,18 +10108,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         const pausedListCount = summaries.filter(summary => (Number(summary.pausedRuleCount ?? summary.pausedChannelCount) || 0) > 0).length;
         const details = summaries.length
             ? [
-                `${summaries.length} imported ${pluralize(summaries.length, 'list')} across ${eligibleIds.length} selected ${pluralize(eligibleIds.length, 'profile')}`,
+                `${summaries.length} parent-approved ${pluralize(summaries.length, 'list')} across ${eligibleIds.length} selected ${pluralize(eligibleIds.length, 'profile')}`,
                 `${activeListCount} active | ${pausedListCount} paused`,
                 staleUrlBackedCount ? `${staleUrlBackedCount} URL-backed ${pluralize(staleUrlBackedCount, 'list')} need refresh` : 'No stale URL-backed lists',
                 urlBackedCount ? `${urlBackedCount} URL-backed ${pluralize(urlBackedCount, 'list')} can be refreshed` : 'No URL-backed lists to refresh yet'
             ]
             : [
-                `No imported lists yet for ${eligibleIds.length} selected ${pluralize(eligibleIds.length, 'profile')}`,
-                'Start by importing a pasted, file, or public HTTPS rule list.'
+                `No parent-approved lists yet for ${eligibleIds.length} selected ${pluralize(eligibleIds.length, 'profile')}`,
+                'Start by importing a pasted list, a file, or a public HTTPS channel/keyword list.'
             ];
         const choices = [
             ...(summaries.length ? [{ value: 'view', label: 'View Lists', className: 'btn-secondary' }] : []),
-            { value: 'import', label: 'Import List', className: 'btn-primary' },
+            { value: 'import', label: 'Import Approved List', className: 'btn-primary' },
             ...(activeListCount ? [{ value: 'pause', label: 'Pause List', className: 'btn-secondary' }] : []),
             ...(pausedListCount ? [{ value: 'resume', label: 'Resume List', className: 'btn-secondary' }] : []),
             ...(urlBackedCount ? [{ value: 'refresh', label: 'Check URL', className: 'btn-secondary' }] : []),
@@ -10128,8 +10128,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             ...(summaries.length ? [{ value: 'remove', label: 'Remove List', className: 'btn-secondary' }] : [])
         ];
         const selected = await showChoiceModal({
-            title: 'Rule Lists',
-            message: 'Choose what to do with imported rule lists for the selected protected profiles.',
+            title: 'Parent-Approved Lists',
+            message: 'Choose what to do with channel/keyword lists for the selected protected profiles. List changes apply locally first; verified-device sending is offered after a protected profile changes.',
             details,
             choices,
             cancelText: 'Cancel'
@@ -13008,10 +13008,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
         return showChoiceModal({
-            title: title || 'Configure Managed Delivery',
-            message: message || 'Choose how this managed delivery provider should be used.',
+            title: title || 'Choose How Updates Are Sent',
+            message: message || 'Choose how parent-approved updates should reach a protected device.',
             details: Array.isArray(details) ? details : [
-                'Use live P2P first when both devices are open.',
+                'Use live send first when both devices are open.',
                 'Only add another delivery method when live P2P is not enough.',
                 'Child/protected profiles still cannot change parent rules from their own surface.'
             ],
@@ -13024,7 +13024,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const root = safeObject(profilesV4Cache);
         const activeProfileId = normalizeString(root.activeProfileId) || 'default';
         if (getProfileType(root, activeProfileId) === 'child') {
-            UIComponents.showToast('Child profiles cannot configure managed delivery providers', 'error');
+            UIComponents.showToast('Child profiles cannot configure update delivery', 'error');
             return;
         }
         const okAdmin = await ensureProfileUnlocked(root, activeProfileId, { sensitiveAction: true });
@@ -13032,17 +13032,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         const current = readNanahManagedMailboxServerConfig();
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
-            title: 'Save Updates For Later',
+            title: 'Pick Up Updates Later',
             message: 'Use this only when a parent may change rules while the protected device is offline. The child device can pick up the update next time it opens.',
             details: [
                 'This is advanced and separate from normal Nanah live P2P.',
                 'Skip this if parent and protected devices can be opened together.',
-                'A compatible service is only a waiting room for unreadable updates.',
+                'A compatible pickup service is only a waiting room for unreadable updates.',
                 'Parent approval and the saved trusted device still decide what applies.'
             ],
             configured: !!currentEndpoint,
-            configureLabel: currentEndpoint ? 'Edit Later Updates' : 'Set Up Later Updates',
-            disableLabel: 'Turn Off Later Updates'
+            configureLabel: currentEndpoint ? 'Edit Pick Up Later' : 'Set Up Pick Up Later',
+            disableLabel: 'Turn Off Pick Up Later'
         });
         if (action === null) return;
         if (action === 'disable') {
@@ -13056,7 +13056,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const endpoint = await showPromptModal({
-            title: 'Offline Pickup Service',
+            title: 'Pick Up Later Service',
             message: 'Advanced only. This is not the Nanah signal server. Enter a compatible HTTPS pickup service only if you run one; leave blank to keep live P2P only.',
             placeholder: 'https://your-filtertube-pickup-service',
             inputType: 'url',
@@ -13115,7 +13115,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const root = safeObject(profilesV4Cache);
         const currentActiveProfileId = normalizeString(root.activeProfileId) || 'default';
         if (getProfileType(root, currentActiveProfileId) === 'child') {
-            UIComponents.showToast('Child profiles cannot configure managed delivery providers', 'error');
+            UIComponents.showToast('Child profiles cannot configure update delivery', 'error');
             return;
         }
         const okAdmin = await ensureProfileUnlocked(root, currentActiveProfileId, { sensitiveAction: true });
@@ -13123,8 +13123,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const current = readNanahManagedLocalNetworkProviderConfig();
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
-            title: 'Same-Network Updates',
-            message: 'Use this only when you have a trusted home/local gateway that can pass parent updates to protected devices on the same network.',
+            title: 'Home Network Bridge',
+            message: 'Use this only when you have a trusted FilterTube bridge that can pass parent updates to protected devices on your home or school network.',
             details: [
                 'This is advanced and separate from normal Nanah live P2P.',
                 'Skip this for normal live P2P control.',
@@ -13132,8 +13132,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 'The protected device still accepts only trusted parent updates.'
             ],
             configured: !!currentEndpoint,
-            configureLabel: currentEndpoint ? 'Edit Same-Network Updates' : 'Set Up Same-Network Updates',
-            disableLabel: 'Turn Off Same-Network Updates'
+            configureLabel: currentEndpoint ? 'Edit Home Bridge' : 'Set Up Home Bridge',
+            disableLabel: 'Turn Off Home Bridge'
         });
         if (action === null) return;
         if (action === 'disable') {
@@ -13147,17 +13147,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const endpoint = await showPromptModal({
-            title: 'Same-Network Gateway',
-            message: 'Advanced only. Enter a trusted local gateway endpoint only if you run a FilterTube-compatible gateway. Normal parent control uses live P2P.',
+            title: 'Home Network Bridge',
+            message: 'Advanced only. Enter a trusted bridge endpoint only if you run a FilterTube-compatible bridge. Normal parent control uses live P2P.',
             placeholder: 'http://192.168.1.10:4177/filtertube',
             inputType: 'url',
-            confirmText: currentEndpoint ? 'Save Gateway' : 'Enable Same-Network Updates',
+            confirmText: currentEndpoint ? 'Save Bridge' : 'Enable Home Bridge',
             initialValue: currentEndpoint
         });
         if (endpoint === null) return;
         const endpointUrl = normalizeString(endpoint);
         if (!endpointUrl) {
-            UIComponents.showToast('Enter a LAN endpoint or use Disable LAN', 'error');
+            UIComponents.showToast('Enter a bridge endpoint or turn off Home Bridge', 'error');
             return;
         }
         const token = await showPromptModal({
@@ -14245,8 +14245,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!endpoint) {
             return {
                 configured: false,
-                label: 'Same-network updates off',
-                detail: 'Live P2P and later updates can still work. Set this up only if you run a trusted local gateway.',
+                label: 'Home bridge off',
+                detail: 'Live send and pick-up-later can still work. Set this up only if you run a trusted FilterTube bridge.',
                 tone: 'warning'
             };
         }
@@ -14254,8 +14254,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!configured) {
             return {
                 configured: false,
-                label: 'Same-network updates need review',
-                detail: `${host} is saved but is not ready for local delivery.`,
+                label: 'Home bridge needs review',
+                detail: `${host} is saved but is not ready to deliver protected updates.`,
                 tone: 'warning'
             };
         }
@@ -19860,8 +19860,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (ftRuleListFormatsBtn) {
         ftRuleListFormatsBtn.addEventListener('click', async () => {
             const action = await showChoiceModal({
-                title: 'Supported Rule List Formats',
-                message: 'Rule lists add channels and keywords only. Full FilterTube backups and legacy BlockTube export migration still belong under Choose JSON.',
+                title: 'Supported Parent-Approved List Formats',
+                message: 'Parent-approved lists add channels and keywords only. Full FilterTube backups and legacy BlockTube export migration still belong under Choose JSON.',
                 details: [
                     'CSV: channel_id,keyword,notes or type,value,notes.',
                     'Text: bare rows are channels; typed rows can use channel: @SomeChannel or keyword: brainrot.',
