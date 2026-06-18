@@ -2743,6 +2743,15 @@ function isFilterTubeHomeRoute() {
     }
 }
 
+function isFilterTubeChipFilterRoute() {
+    try {
+        const path = document.location?.pathname || '';
+        return path === '/' || path === '/results';
+    } catch (e) {
+        return false;
+    }
+}
+
 function getFilterTubeHomeChipRails() {
     try {
         if (!isFilterTubeHomeRoute()) return [];
@@ -3233,7 +3242,7 @@ async function applyDOMFallback(settings, options = {}) {
             });
         }
 
-        if (effectiveSettings.hideMixPlaylists) {
+        if (effectiveSettings.hideMixPlaylists && isFilterTubeChipFilterRoute()) {
             // Hide the "Mixes" filter chip on Home when mixes are hidden.
             const chips = document.querySelectorAll('yt-chip-cloud-chip-renderer, ytm-chip-cloud-chip-renderer');
             chips.forEach(chip => {
@@ -3243,7 +3252,7 @@ async function applyDOMFallback(settings, options = {}) {
                     chip.setAttribute('data-filtertube-hidden', 'true');
                 }
             });
-        } else {
+        } else if (isFilterTubeChipFilterRoute()) {
             // Restore any previously hidden Mixes chip when the toggle is off.
             const hiddenMixChips = document.querySelectorAll('yt-chip-cloud-chip-renderer[data-filtertube-hidden], ytm-chip-cloud-chip-renderer[data-filtertube-hidden]');
             hiddenMixChips.forEach(chip => {
@@ -4966,27 +4975,29 @@ async function applyDOMFallback(settings, options = {}) {
     }
 
     // 2. Chip Filtering (Home/Search chip bars)
-    try {
-        const chips = document.querySelectorAll('yt-chip-cloud-chip-renderer, ytm-chip-cloud-chip-renderer');
-        for (let i = 0; i < chips.length; i++) {
-            const chip = chips[i];
-            const label = chip.textContent?.trim() || '';
-            const normalizedLabel = label.replace(/\s+/g, ' ').trim().toLowerCase();
-            if (effectiveSettings.hideMixPlaylists && normalizedLabel === 'mixes') {
-                toggleVisibility(chip, true, 'Chip: Mixes', true);
-                continue;
+    if (isFilterTubeChipFilterRoute()) {
+        try {
+            const chips = document.querySelectorAll('yt-chip-cloud-chip-renderer, ytm-chip-cloud-chip-renderer');
+            for (let i = 0; i < chips.length; i++) {
+                const chip = chips[i];
+                const label = chip.textContent?.trim() || '';
+                const normalizedLabel = label.replace(/\s+/g, ' ').trim().toLowerCase();
+                if (effectiveSettings.hideMixPlaylists && normalizedLabel === 'mixes') {
+                    toggleVisibility(chip, true, 'Chip: Mixes', true);
+                    continue;
+                }
+                if (listMode === 'whitelist') {
+                    toggleVisibility(chip, false, '', true);
+                    continue;
+                }
+                const hideChip = shouldHideContent(label, '', effectiveSettings);
+                toggleVisibility(chip, hideChip, `Chip: ${label}`);
+                if (i > 0 && i % 60 === 0) {
+                    await yieldToMain();
+                }
             }
-            if (listMode === 'whitelist') {
-                toggleVisibility(chip, false, '', true);
-                continue;
-            }
-            const hideChip = shouldHideContent(label, '', effectiveSettings);
-            toggleVisibility(chip, hideChip, `Chip: ${label}`);
-            if (i > 0 && i % 60 === 0) {
-                await yieldToMain();
-            }
+        } catch (e) {
         }
-    } catch (e) {
     }
 
     // Hide any rich items that ended up empty after filtering to avoid blank cards
