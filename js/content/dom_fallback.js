@@ -2735,8 +2735,17 @@ function installFilterTubeHomeChannelTapTargetHandler() {
     }
 }
 
+function isFilterTubeHomeRoute() {
+    try {
+        return (document.location?.pathname || '') === '/';
+    } catch (e) {
+        return false;
+    }
+}
+
 function getFilterTubeHomeChipRails() {
     try {
+        if (!isFilterTubeHomeRoute()) return [];
         return Array.from(document.querySelectorAll(
             'ytm-chip-cloud-renderer, ytm-feed-filter-chip-bar-renderer, yt-chip-cloud-renderer, ytd-feed-filter-chip-bar-renderer'
         ));
@@ -2793,6 +2802,7 @@ function getFilterTubeHomeChipFromEvent(event) {
 
 function restoreFilterTubeHomeChipRailPosition() {
     try {
+        if (!isFilterTubeHomeRoute()) return;
         const state = window.__filtertubeHomeChipRailState;
         if (!state) return;
         const rails = getFilterTubeHomeChipRails();
@@ -2834,6 +2844,7 @@ function restoreFilterTubeHomeChipRailPosition() {
 
 function scheduleFilterTubeHomeChipRailRestore() {
     try {
+        if (!isFilterTubeHomeRoute()) return;
         const state = window.__filtertubeHomeChipRailState || (window.__filtertubeHomeChipRailState = {});
         if (state.restoreTimer) clearTimeout(state.restoreTimer);
         restoreFilterTubeHomeChipRailPosition();
@@ -2866,6 +2877,7 @@ function installFilterTubeHomeChipRailReveal() {
         };
         const rememberChipRailPosition = event => {
             try {
+                if (!isFilterTubeHomeRoute()) return;
                 const rail = event.target?.closest?.(
                     'ytm-chip-cloud-renderer, ytm-feed-filter-chip-bar-renderer, yt-chip-cloud-renderer, ytd-feed-filter-chip-bar-renderer'
                 );
@@ -2890,6 +2902,7 @@ function installFilterTubeHomeChipRailReveal() {
         };
         const bindChipRailScrollMemory = () => {
             try {
+                if (!isFilterTubeHomeRoute()) return;
                 getFilterTubeHomeChipRails().forEach(rail => {
                     if (!rail) return;
                     const scroller = getFilterTubeHorizontalScroller(rail);
@@ -2952,6 +2965,13 @@ function installFilterTubeHomeChipRailReveal() {
 }
 
 function applyFilterTubeHomeFeedPolish() {
+    if (!isFilterTubeHomeRoute()) {
+        try {
+            document.documentElement?.removeAttribute?.('data-filtertube-home-chip-rail-reveal');
+        } catch (e) {
+        }
+        return;
+    }
     installFilterTubeHomeFeedPolish();
     installFilterTubeHomeChannelTapTargetHandler();
     installFilterTubeHomeChipRailReveal();
