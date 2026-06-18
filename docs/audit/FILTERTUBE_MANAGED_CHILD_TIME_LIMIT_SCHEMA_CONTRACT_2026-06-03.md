@@ -191,6 +191,9 @@ The first runtime path is intentionally lazy:
   shows the daily limit, used time, and reset timing from the background-owned
   decision. It does not redirect to another site and does not use content-filter
   hide markers or hidden-content statistics.
+- The timeout copy uses plain parent/caregiver language: asking for more time
+  creates a request for the parent profile to review, but never unlocks YouTube
+  by itself.
 - The timeout surface offers `Open FilterTube` as a safe extension-dashboard
   route for parent/admin follow-up. Opening the dashboard does not unlock the
   protected profile, grant time, clear the overlay, or mutate policy; the

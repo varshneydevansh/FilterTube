@@ -776,7 +776,7 @@ function showManagedTimeoutOverlay(state) {
         const panel = createManagedOverlayPanel();
 
         const eyebrow = document.createElement('div');
-        eyebrow.textContent = 'FilterTube quiet time';
+        eyebrow.textContent = 'FilterTube parent-managed time';
         eyebrow.style.cssText = 'color:#fca5a5;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0;margin-bottom:10px';
 
         const title = document.createElement('h1');
@@ -785,8 +785,8 @@ function showManagedTimeoutOverlay(state) {
 
         const copy = document.createElement('p');
         copy.textContent = policyExpired
-            ? `${profileName} has a time policy that needs the parent or caregiver profile to approve again.`
-            : `${profileName} has used today's YouTube time. Come back after the daily reset, or ask a parent for more time.`;
+            ? `${profileName} needs a parent or caregiver to review this time rule before ${surfaceLabel} can continue.`
+            : `${profileName} has used today's parent-managed YouTube time. Come back after the daily reset, or ask a parent for more time.`;
         copy.style.cssText = 'font-size:14px;line-height:1.5;margin:0;color:#cbd5e1';
 
         const facts = document.createElement('dl');
@@ -823,7 +823,7 @@ function showManagedTimeoutOverlay(state) {
         const buttonRow = document.createElement('div');
         buttonRow.style.cssText = [
             'display:grid',
-            'grid-template-columns:1fr 1fr',
+            'grid-template-columns:repeat(auto-fit,minmax(160px,1fr))',
             'gap:10px'
         ].join(';');
 
@@ -859,7 +859,7 @@ function showManagedTimeoutOverlay(state) {
         });
 
         const instruction = document.createElement('p');
-        instruction.textContent = 'A parent or caregiver can grant extra time from FilterTube Managed Parent Controls on a trusted profile or paired device.';
+        instruction.textContent = 'Request saved here only tells the parent profile that more time is needed. It does not unlock YouTube by itself.';
         instruction.style.cssText = [
             'display:none',
             'margin:0',
@@ -899,15 +899,15 @@ function showManagedTimeoutOverlay(state) {
                         const err = browserAPI_BRIDGE.runtime?.lastError;
                         if (!err && response?.ok === true) {
                             instruction.textContent = response.recorded === true
-                                ? 'Request saved. A parent or caregiver can review it from FilterTube Managed Parent Controls and grant extra time from a trusted profile or paired device.'
-                                : 'A recent request is already saved. A parent or caregiver can review it from FilterTube Managed Parent Controls.';
+                                ? 'Request saved. A parent or caregiver can open FilterTube, review the request, and grant more time from a trusted profile.'
+                                : 'A recent request is already saved. A parent or caregiver can review it from FilterTube.';
                         } else {
-                            instruction.textContent = 'A parent or caregiver can grant extra time from FilterTube Managed Parent Controls on a trusted profile or paired device.';
+                            instruction.textContent = 'A parent or caregiver can still open FilterTube and grant more time from a trusted profile.';
                         }
                         pauseManagedTimeoutVideos();
                     });
                 } catch (e) {
-                    instruction.textContent = 'A parent or caregiver can grant extra time from FilterTube Managed Parent Controls on a trusted profile or paired device.';
+                    instruction.textContent = 'A parent or caregiver can still open FilterTube and grant more time from a trusted profile.';
                 }
             }
         });

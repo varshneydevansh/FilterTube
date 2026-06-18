@@ -855,9 +855,8 @@ T1 + T2 + T3
 
 - **depends_on**: [T9]
 - **location**:
-  - `js/content_bridge.js`
-  - `css/content.css`
-  - `tests/runtime/time-limit-overlay-current-behavior.test.mjs`
+  - `js/content/bridge_settings.js`
+  - `tests/runtime/managed-time-budget-enforcement-current-behavior.test.mjs`
 - **description**: Show a calm lock overlay on YouTube surfaces when budget expires. The overlay must not hide cards as if they matched content filters.
 - **acceptance criteria**:
   - Overlay does not increment hidden-content stats.
@@ -869,7 +868,8 @@ T1 + T2 + T3
   - `npm run test:performance`
   - `npm run test:settings`
   - manual YouTube smoke
-- **status**: Partially Completed
+- **status**: Completed for the extension runtime. Installed app parity and rich
+  native timeout UI remain app-side release proof.
 - **log**:
   - 2026-06-04: Content bridge now shows a managed timeout overlay only after
     background reports `timedOut: true`; the overlay covers the page, pauses
@@ -878,6 +878,10 @@ T1 + T2 + T3
   - 2026-06-06: Timeout decisions now include reset timezone/policy context from
     the background heartbeat, and the child/protected-user overlay shows daily
     limit, used time, and reset timing instead of redirecting away from YouTube.
+  - 2026-06-18: Timeout overlay copy now uses plain parent/caregiver language,
+    keeps the Open FilterTube route non-authoritative, states that requesting
+    more time does not unlock YouTube by itself, and uses a responsive button
+    grid so the lock screen stays readable on narrow surfaces.
 - **files edited/created**:
   - `js/content/bridge_settings.js`
   - `tests/runtime/managed-time-budget-enforcement-current-behavior.test.mjs`
