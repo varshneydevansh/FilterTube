@@ -9959,7 +9959,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             removedCount,
             duplicateCount,
             changedProfileIds,
-            changedSurfaces
+            changedSurfaces,
+            checkedProfileIds = [],
+            checkedSurfaces = new Set()
         } = refreshResult;
 
         if (!changedCount && !refreshResult.checkedProfileIds?.length) {
@@ -9984,6 +9986,30 @@ document.addEventListener('DOMContentLoaded', async () => {
                 `Checked ${selectedList.listName}: no rule changes`,
                 'success'
             );
+            const remoteScope = 'rules_bundle';
+            const surface = checkedSurfaces.size === 1 ? Array.from(checkedSurfaces)[0] : '';
+            const mailboxReady = hasNanahManagedMailboxUploadWriter();
+            const localReady = hasNanahManagedLocalNetworkDeliveryWriter();
+            const readyProfileCount = checkedProfileIds.filter((targetId) => {
+                const profile = safeObject(safeObject(profilesV4Cache).profiles)[targetId];
+                const links = getNanahSourceManagedLinksForTargetProfile(targetId, remoteScope, profile);
+                if (!links.length) return false;
+                return links.some(isNanahManagedLinkLiveConnected) || mailboxReady || localReady;
+            }).length;
+            if (readyProfileCount > 0) {
+                const sendNow = await showConfirmModal({
+                    title: 'Send checked list status now?',
+                    message: `${readyProfileCount} checked ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send the updated list freshness/status to those devices now. Rule rows are unchanged.`,
+                    confirmText: 'Send update',
+                    cancelText: 'Not now'
+                });
+                if (sendNow) {
+                    await sendManagedParentPolicyToVerifiedDevices(checkedProfileIds, {
+                        scope: remoteScope,
+                        ...(surface ? { surface } : {})
+                    });
+                }
+            }
             return;
         }
         UIComponents.showToast(
@@ -10187,6 +10213,29 @@ document.addEventListener('DOMContentLoaded', async () => {
                 `Checked ${checkedListCount} ${pluralize(checkedListCount, 'list')}: no rule changes${checkedRowCount ? ` across ${checkedRowCount} rows` : ''}`,
                 'success'
             );
+            const checkedProfileIds = Array.from(checkedProfileIdsSet);
+            const remoteScope = 'rules_bundle';
+            const mailboxReady = hasNanahManagedMailboxUploadWriter();
+            const localReady = hasNanahManagedLocalNetworkDeliveryWriter();
+            const readyProfileCount = checkedProfileIds.filter((targetId) => {
+                const profile = safeObject(safeObject(profilesV4Cache).profiles)[targetId];
+                const links = getNanahSourceManagedLinksForTargetProfile(targetId, remoteScope, profile);
+                if (!links.length) return false;
+                return links.some(isNanahManagedLinkLiveConnected) || mailboxReady || localReady;
+            }).length;
+            if (readyProfileCount > 0) {
+                const sendNow = await showConfirmModal({
+                    title: staleOnly ? 'Send checked stale-list status now?' : 'Send checked list status now?',
+                    message: `${readyProfileCount} checked ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send the updated list freshness/status to those devices now. Rule rows are unchanged.`,
+                    confirmText: 'Send update',
+                    cancelText: 'Not now'
+                });
+                if (sendNow) {
+                    await sendManagedParentPolicyToVerifiedDevices(checkedProfileIds, {
+                        scope: remoteScope
+                    });
+                }
+            }
             return;
         }
 
