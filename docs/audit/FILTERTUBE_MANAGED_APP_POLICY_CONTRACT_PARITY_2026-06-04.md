@@ -566,7 +566,11 @@ runtime from extension`. The newer managed list UI contract revision has also
 been synced and committed as `/Users/devanshvarshney/FilterTubeApp` commit
 `2994f91a Sync managed list UI contract from extension`, followed by
 `01b7e695 Mirror synced managed list contract status` for the final
-contract-status byte mirror. The same manifest copies the extension-owned managed
+contract-status byte mirror. The managed timeout overlay/copy/status runtime
+updates were then synced as `/Users/devanshvarshney/FilterTubeApp` commits
+`cc5d24f3 Sync managed timeout overlay runtime`, `88a7a39d Sync optional
+delivery setup copy`, and `f13b03c7 Sync managed time remaining runtime`. The
+same manifest copies the extension-owned managed
 Nanah signed-send, pull-on-open, Pick Up Later, and Home Bridge helper sources
 into `packages/extension-source/upstream/js/` so the downstream app repo can
 track the exact helper contracts without treating them as native runtime

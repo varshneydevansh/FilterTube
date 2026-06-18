@@ -116,6 +116,9 @@ test('managed app policy parity doc records extension-owned app contract artifac
   assert.match(doc, /cb8e1516 Sync managed delivery\s+runtime from extension/);
   assert.match(doc, /2994f91a Sync managed list UI contract from extension/);
   assert.match(doc, /01b7e695 Mirror synced managed list contract status/);
+  assert.match(doc, /cc5d24f3 Sync managed timeout overlay runtime/);
+  assert.match(doc, /88a7a39d Sync optional\s+delivery setup copy/);
+  assert.match(doc, /f13b03c7 Sync managed time remaining runtime/);
   assert.match(doc, /Installed\s+app parity still cannot be claimed current until platform smoke evidence is\s+attached/);
   assert.deepEqual(
     contract.managedDelivery.parentFacingTransports.map(row => row.label),

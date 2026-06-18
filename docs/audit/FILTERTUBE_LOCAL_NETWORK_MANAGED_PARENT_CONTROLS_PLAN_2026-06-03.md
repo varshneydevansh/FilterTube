@@ -1350,7 +1350,10 @@ contract before wiring more native app runtime behavior.
   `cb8e1516 Sync managed delivery runtime from extension`; the managed list UI
   contract was synced in `2994f91a Sync managed list UI contract from
   extension`, and the final synced app-contract status mirror is
-  `01b7e695 Mirror synced managed list contract status`. Product runtime
+  `01b7e695 Mirror synced managed list contract status`. Managed timeout and
+  delivery-copy runtime mirrors were later synced as `cc5d24f3 Sync managed
+  timeout overlay runtime`, `88a7a39d Sync optional delivery setup copy`, and
+  `f13b03c7 Sync managed time remaining runtime`. Product runtime
   behavior is unchanged; installed Android/iOS smoke and iOS enforcement remain
   pending. The configured HTTPS mailbox helper is now declared in the
   extension-owned app policy contract so downstream app sync has an explicit
