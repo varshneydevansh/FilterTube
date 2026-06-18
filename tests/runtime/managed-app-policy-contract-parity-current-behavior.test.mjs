@@ -18,7 +18,8 @@ const appManagedWebViewActivityPath = '/Users/devanshvarshney/FilterTubeApp/apps
 const appManagedHelperDestinations = Object.freeze({
   'js/nanah_managed_live_policy.js': '/Users/devanshvarshney/FilterTubeApp/packages/extension-source/upstream/js/nanah_managed_live_policy.js',
   'js/nanah_managed_open_sync.js': '/Users/devanshvarshney/FilterTubeApp/packages/extension-source/upstream/js/nanah_managed_open_sync.js',
-  'js/nanah_managed_mailbox_client.js': '/Users/devanshvarshney/FilterTubeApp/packages/extension-source/upstream/js/nanah_managed_mailbox_client.js'
+  'js/nanah_managed_mailbox_client.js': '/Users/devanshvarshney/FilterTubeApp/packages/extension-source/upstream/js/nanah_managed_mailbox_client.js',
+  'js/nanah_managed_local_network_client.js': '/Users/devanshvarshney/FilterTubeApp/packages/extension-source/upstream/js/nanah_managed_local_network_client.js'
 });
 const appManagedUiMirrorDestinations = Object.freeze({
   'js/managed_admin_authority.js': '/Users/devanshvarshney/FilterTubeApp/packages/extension-source/upstream/js/managed_admin_authority.js',
@@ -263,6 +264,34 @@ test('managed app contract preserves profile viewing time envelope and history f
   }
   assert.match(contract.managedRules.runtimeBoundary, /validated policy payloads/);
 
+  assert.equal(contract.managedChannelLists.schema, 'filtertube_managed_channel_list_rule_source');
+  for (const format of [
+    'plain_text_rows',
+    'csv_like_text_rows',
+    'simple_json_array',
+    'simple_json_object_channels',
+    'public_https_text_or_json_url'
+  ]) {
+    assert.ok(contract.managedChannelLists.acceptedInputFormats.includes(format), `missing managed channel list input format ${format}`);
+  }
+  for (const action of [
+    'import_pasted_or_file_list',
+    'import_simple_json_list_after_preview',
+    'import_public_https_url_after_preview',
+    'send_channel_policy_to_verified_devices'
+  ]) {
+    assert.ok(contract.managedChannelLists.requiredActions.includes(action), `missing managed channel list action ${action}`);
+  }
+  for (const decision of [
+    'list_url_is_data_source_only',
+    'json_document_is_data_source_only',
+    'parent_preview_before_write',
+    'parent_reauth_before_protected_profile_write',
+    'manual_channel_rows_remain_distinguishable'
+  ]) {
+    assert.ok(contract.managedChannelLists.requiredDecisions.includes(decision), `missing managed channel list decision ${decision}`);
+  }
+
   for (const row of [
     'local_managed_save_accepted',
     'remote_policy_rejected',
@@ -353,6 +382,7 @@ test('current app sync manifest copies runtime sources dedicated contract artifa
     'js/nanah_managed_live_policy.js',
     'js/nanah_managed_open_sync.js',
     'js/nanah_managed_mailbox_client.js',
+    'js/nanah_managed_local_network_client.js',
     'js/content_bridge.js',
     'js/injector.js',
     'js/seed.js'

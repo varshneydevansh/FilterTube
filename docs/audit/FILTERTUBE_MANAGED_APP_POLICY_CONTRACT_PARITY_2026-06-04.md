@@ -41,7 +41,7 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
   "generated": "2026-06-06",
   "owner": "extension_upstream_policy_contract",
   "runtimeBehaviorChanged": false,
-  "appSyncStatus": "extension_contract_synced_to_native_runtime",
+  "appSyncStatus": "app_manifest_contract_helpers_and_android_time_entry_wiring_present_ios_pending",
   "artifact": {
     "sourcePath": "docs/audit/artifacts/managed-app-policy-contract-v1.json",
     "appDestination": "packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json",
@@ -227,6 +227,71 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
     ],
     "runtimeBoundary": "remote managed rule updates are accepted only as validated policy payloads and must reuse local keyword channel and video mutation paths before app sync claims parity"
   },
+  "managedChannelLists": {
+    "schema": "filtertube_managed_channel_list_rule_source",
+    "issue": 62,
+    "identity": "channel lists are parent-approved rule sources, not transport authority or executable filter code",
+    "acceptedInputFormats": [
+      "plain_text_rows",
+      "csv_like_text_rows",
+      "simple_json_array",
+      "simple_json_object_channels",
+      "public_https_text_or_json_url"
+    ],
+    "materializedRowFields": [
+      "managedListId",
+      "managedListName",
+      "managedListSourceLabel",
+      "managedListSourceUrl",
+      "managedListSourceTitle",
+      "managedListSourceVersion",
+      "managedListSourceUpdatedLabel",
+      "managedListSourceHomepage",
+      "managedListImportedAt",
+      "managedListLastCheckedAt",
+      "managedListContentHash",
+      "managedListPaused"
+    ],
+    "requiredActions": [
+      "import_pasted_or_file_list",
+      "import_simple_json_list_after_preview",
+      "import_public_https_url_after_preview",
+      "view_saved_list_summary",
+      "pause_saved_list_without_deleting_rows",
+      "resume_saved_list",
+      "check_url_backed_list_after_parent_reauth",
+      "refresh_one_url_backed_list_after_parent_reauth",
+      "refresh_stale_url_backed_lists_after_parent_reauth",
+      "refresh_all_loaded_url_backed_lists_after_parent_reauth",
+      "remove_list_derived_rows_without_deleting_manual_rules",
+      "send_channel_policy_to_verified_devices"
+    ],
+    "requiredDecisions": [
+      "list_url_is_data_source_only",
+      "json_document_is_data_source_only",
+      "parent_preview_before_write",
+      "parent_reauth_before_protected_profile_write",
+      "malformed_or_name_only_rows_skipped_for_safety",
+      "manual_channel_rows_remain_distinguishable",
+      "paused_list_rows_do_not_compile_into_channel_blocking",
+      "paused_list_rows_do_not_compile_into_channel_filter_all_keywords",
+      "source_version_metadata_is_display_only",
+      "unchanged_source_hash_updates_checked_metadata_without_replacing_rows",
+      "stale_status_is_parent_hint_not_background_authority",
+      "failed_refresh_source_leaves_existing_rows_unchanged",
+      "history_rows_are_redacted_and_not_policy_authority"
+    ],
+    "nativeParityRequirements": [
+      "preserve_materialized_row_metadata_during_import_export_and_sync",
+      "parse_supported_list_inputs_only_after_parent_preview",
+      "skip_paused_list_rows_in_native_channel_enforcement",
+      "show_list_status_without_exposing_raw_rule_contents_to_protected_users",
+      "show_source_version_metadata_to_parent_when_available",
+      "show_stale_url_backed_list_status_as_parent_hint_only",
+      "keep_manual_channel_rules_separate_from_list_derived_rows",
+      "do_not_treat_public_list_url_or_lan_provider_as_admin_authority"
+    ]
+  },
   "managedDelivery": {
     "transports": [
       "live_nanah",
@@ -280,6 +345,7 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
       "profile_contract",
       "managed_policy_envelope_contract",
       "managed_rule_policy_contract",
+      "managed_channel_list_contract",
       "viewing_space_policy_contract",
       "time_limit_policy_contract",
       "action_history_contract"
@@ -296,6 +362,8 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
       "native_kids_surface_route_gate",
       "native_keyword_rule_apply",
       "native_channel_rule_apply",
+      "native_managed_channel_list_metadata_preservation",
+      "native_managed_channel_list_pause_enforcement",
       "native_video_rule_apply",
       "native_time_budget_gate_before_web_content",
       "native_settings_sync_lock"
@@ -365,6 +433,10 @@ app parity surface. Keyword, channel, and video rule updates are still delivered
 through signed managed-policy envelopes, but downstream apps must treat those
 scopes as shared policy data and route them through the same validated mutation
 paths used by local FilterTube controls before claiming installed app parity.
+The contract also names managed channel lists as parent-approved rule sources:
+plain text, CSV-like rows, simple JSON arrays/objects, and public HTTPS
+text/JSON URLs are accepted inputs only after preview and parent approval, and
+apps must preserve list metadata, pause state, and manual-rule separation.
 The extension-owned handoff verifier
 `scripts/verify-managed-app-policy-contract.mjs` checks that the Markdown
 contract snapshot and JSON artifact are byte-equivalent as parsed data, all
