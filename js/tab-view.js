@@ -7760,6 +7760,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         return urlBacked.find(summary => summary.listId === selected) || null;
     }
 
+    async function loadManagedChannelListRefreshCandidate(summary) {
+        const selectedList = safeObject(summary);
+        const loaded = await fetchManagedChannelListSourceUrl(selectedList.sourceUrl);
+        const parsedRaw = parseManagedChannelListText(loaded.text, { listName: selectedList.listName });
+        if (!parsedRaw.channels.length) {
+            throw new Error('No valid channel identifiers found');
+        }
+        return {
+            selectedList,
+            loaded,
+            parsed: {
+                ...parsedRaw,
+                listId: selectedList.listId
+            }
+        };
+    }
+
     async function promptManagedChannelListToPauseState(summaries, paused) {
         const candidates = safeArray(summaries).filter((summary) => {
             const activeCount = Number(summary?.activeChannelCount) || 0;
@@ -7848,6 +7865,96 @@ document.addEventListener('DOMContentLoaded', async () => {
         return {
             changed: changedCount > 0,
             changedCount
+        };
+    }
+
+    function applyLoadedManagedChannelListRefreshToProfiles({
+        profiles,
+        eligibleIds,
+        currentActive,
+        selectedList,
+        loaded,
+        parsed,
+        refreshedAt
+    }) {
+        const changedProfileIds = [];
+        const changedSurfaces = new Set();
+        let changedCount = 0;
+        let addedCount = 0;
+        let removedCount = 0;
+        let duplicateCount = 0;
+
+        for (const targetId of safeArray(eligibleIds)) {
+            const profile = safeObject(profiles[targetId]);
+            let nextProfile = profile;
+            let profileChanged = false;
+            let profileAddedCount = 0;
+            let profileRemovedCount = 0;
+            let profileDuplicateCount = 0;
+
+            for (const surface of ['main', 'kids']) {
+                const currentSurface = getProfileSurface(nextProfile, surface);
+                if (!hasManagedChannelListOnSurface(currentSurface, surface, selectedList.listId)) continue;
+                const priorForReport = nextProfile;
+                const nextSurface = getProfileSurface(nextProfile, surface);
+                const removeResult = removeManagedChannelListFromSurface(nextSurface, surface, selectedList.listId);
+                const applyResult = applyManagedChannelListToSurface(nextSurface, surface, parsed, {
+                    listName: selectedList.listName,
+                    sourceLabel: loaded.sourceLabel || selectedList.sourceLabel,
+                    sourceUrl: loaded.url,
+                    importedAt: refreshedAt,
+                    lastCheckedAt: refreshedAt,
+                    contentHash: parsed.contentHash,
+                    paused: (Number(selectedList.pausedChannelCount) || 0) > 0
+                        && (Number(selectedList.activeChannelCount) || 0) <= 0
+                });
+                if (!removeResult.changed && !applyResult.changed) continue;
+                nextProfile = setProfileSurface(nextProfile, surface, nextSurface);
+                const report = buildManagedChildLocalEditReport({
+                    actorProfileId: currentActive,
+                    targetProfileId: targetId,
+                    surface,
+                    priorProfile: priorForReport,
+                    nextSurface
+                });
+                report.historyRow = {
+                    ...report.historyRow,
+                    actionType: 'policy.channel_list.refresh',
+                    summary: {
+                        ...safeObject(report.historyRow.summary),
+                        label: 'Channel list refreshed',
+                        surface,
+                        addedCount: applyResult.addedCount || 0,
+                        removedCount: removeResult.removedCount || 0,
+                        duplicateCount: applyResult.duplicateCount || 0,
+                        skippedCount: parsed.skippedCount || 0,
+                        listEntryCount: parsed.channels.length
+                    }
+                };
+                nextProfile = recordManagedChildLocalEditHistory(nextProfile, report);
+                profileChanged = true;
+                profileAddedCount += applyResult.addedCount || 0;
+                profileRemovedCount += removeResult.removedCount || 0;
+                profileDuplicateCount += applyResult.duplicateCount || 0;
+                changedSurfaces.add(surface);
+            }
+
+            duplicateCount += profileDuplicateCount;
+            if (!profileChanged) continue;
+            profiles[targetId] = nextProfile;
+            changedCount += 1;
+            addedCount += profileAddedCount;
+            removedCount += profileRemovedCount;
+            changedProfileIds.push(targetId);
+        }
+
+        return {
+            changedCount,
+            addedCount,
+            removedCount,
+            duplicateCount,
+            changedProfileIds,
+            changedSurfaces
         };
     }
 
@@ -8503,23 +8610,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        let loaded;
+        let refreshCandidate;
         try {
-            loaded = await fetchManagedChannelListSourceUrl(selectedList.sourceUrl);
+            refreshCandidate = await loadManagedChannelListRefreshCandidate(selectedList);
         } catch (error) {
             UIComponents.showToast(error?.message || 'Unable to load this list URL', 'error');
             return;
         }
 
-        const parsedRaw = parseManagedChannelListText(loaded.text, { listName: selectedList.listName });
-        if (!parsedRaw.channels.length) {
-            UIComponents.showToast('The refreshed list did not contain valid channel identifiers', 'error');
-            return;
-        }
-        const parsed = {
-            ...parsedRaw,
-            listId: selectedList.listId
-        };
+        const parsed = refreshCandidate.parsed;
 
         const confirmRefresh = await showChoiceModal({
             title: `Refresh ${selectedList.listName}?`,
@@ -8546,76 +8645,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const refreshedAt = Date.now();
-        let changedCount = 0;
-        let addedCount = 0;
-        let removedCount = 0;
-        let duplicateCount = 0;
-        const changedProfileIds = [];
-        const changedSurfaces = new Set();
-
-        for (const targetId of eligibleIds) {
-            const profile = safeObject(profiles[targetId]);
-            let nextProfile = profile;
-            let profileChanged = false;
-            let profileAddedCount = 0;
-            let profileRemovedCount = 0;
-            let profileDuplicateCount = 0;
-
-            for (const surface of ['main', 'kids']) {
-                const currentSurface = getProfileSurface(nextProfile, surface);
-                if (!hasManagedChannelListOnSurface(currentSurface, surface, selectedList.listId)) continue;
-                const priorForReport = nextProfile;
-                const nextSurface = getProfileSurface(nextProfile, surface);
-                const removeResult = removeManagedChannelListFromSurface(nextSurface, surface, selectedList.listId);
-                const applyResult = applyManagedChannelListToSurface(nextSurface, surface, parsed, {
-                    listName: selectedList.listName,
-                    sourceLabel: loaded.sourceLabel || selectedList.sourceLabel,
-                    sourceUrl: loaded.url,
-                    importedAt: refreshedAt,
-                    lastCheckedAt: refreshedAt,
-                    contentHash: parsed.contentHash,
-                    paused: (Number(selectedList.pausedChannelCount) || 0) > 0
-                        && (Number(selectedList.activeChannelCount) || 0) <= 0
-                });
-                if (!removeResult.changed && !applyResult.changed) continue;
-                nextProfile = setProfileSurface(nextProfile, surface, nextSurface);
-                const report = buildManagedChildLocalEditReport({
-                    actorProfileId: currentActive,
-                    targetProfileId: targetId,
-                    surface,
-                    priorProfile: priorForReport,
-                    nextSurface
-                });
-                report.historyRow = {
-                    ...report.historyRow,
-                    actionType: 'policy.channel_list.refresh',
-                    summary: {
-                        ...safeObject(report.historyRow.summary),
-                        label: 'Channel list refreshed',
-                        surface,
-                        addedCount: applyResult.addedCount || 0,
-                        removedCount: removeResult.removedCount || 0,
-                        duplicateCount: applyResult.duplicateCount || 0,
-                        skippedCount: parsed.skippedCount || 0,
-                        listEntryCount: parsed.channels.length
-                    }
-                };
-                nextProfile = recordManagedChildLocalEditHistory(nextProfile, report);
-                profileChanged = true;
-                profileAddedCount += applyResult.addedCount || 0;
-                profileRemovedCount += removeResult.removedCount || 0;
-                profileDuplicateCount += applyResult.duplicateCount || 0;
-                changedSurfaces.add(surface);
-            }
-
-            duplicateCount += profileDuplicateCount;
-            if (!profileChanged) continue;
-            profiles[targetId] = nextProfile;
-            changedCount += 1;
-            addedCount += profileAddedCount;
-            removedCount += profileRemovedCount;
-            changedProfileIds.push(targetId);
-        }
+        const refreshResult = applyLoadedManagedChannelListRefreshToProfiles({
+            profiles,
+            eligibleIds,
+            currentActive,
+            selectedList,
+            loaded: refreshCandidate.loaded,
+            parsed,
+            refreshedAt
+        });
+        const {
+            changedCount,
+            addedCount,
+            removedCount,
+            duplicateCount,
+            changedProfileIds,
+            changedSurfaces
+        } = refreshResult;
 
         if (!changedCount) {
             UIComponents.showToast('No selected profiles had that URL-backed list', 'info');
@@ -8651,6 +8697,160 @@ document.addEventListener('DOMContentLoaded', async () => {
             const sendNow = await showConfirmModal({
                 title: 'Send refreshed list now?',
                 message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send this refreshed list update to those devices now.`,
+                confirmText: 'Send update',
+                cancelText: 'Not now'
+            });
+            if (sendNow) {
+                await sendManagedParentPolicyToVerifiedDevices(changedProfileIds, {
+                    scope: remoteScope,
+                    ...(surface ? { surface } : {})
+                });
+            }
+        }
+    }
+
+    async function refreshAllManagedChannelListsForProfiles(profileIds) {
+        const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
+        if (!targetIds.length) {
+            UIComponents.showToast('Select at least one protected profile', 'error');
+            return;
+        }
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
+            UIComponents.showToast('Profiles unavailable', 'error');
+            return;
+        }
+
+        const fresh = await io.loadProfilesV4();
+        const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
+        if (getProfileType(fresh, currentActive) === 'child') {
+            UIComponents.showToast('Child profiles cannot refresh managed lists', 'error');
+            return;
+        }
+
+        const profiles = { ...safeObject(fresh.profiles) };
+        const eligibleIds = targetIds.filter((targetId) => {
+            const profile = safeObject(profiles[targetId]);
+            return !!profile && Object.keys(profile).length > 0
+                && canActiveProfileManageProfile(fresh, targetId);
+        });
+        if (!eligibleIds.length) {
+            UIComponents.showToast('No selected protected profiles can be managed by this account', 'error');
+            return;
+        }
+
+        const summaries = collectManagedChannelListSummaries(profiles, eligibleIds);
+        const urlBacked = summaries.filter(summary => normalizeManagedChannelListSourceUrl(summary?.sourceUrl));
+        if (!urlBacked.length) {
+            UIComponents.showToast('No URL-backed imported lists found for the selected protected profiles', 'info');
+            return;
+        }
+
+        const loadedCandidates = [];
+        const failedCandidates = [];
+        for (const summary of urlBacked) {
+            try {
+                loadedCandidates.push(await loadManagedChannelListRefreshCandidate(summary));
+            } catch (error) {
+                failedCandidates.push({
+                    listName: normalizeString(summary?.listName) || 'Imported channel list',
+                    error: error?.message || 'Unable to load'
+                });
+            }
+        }
+        if (!loadedCandidates.length) {
+            UIComponents.showToast('No URL-backed lists could be loaded for refresh', 'error');
+            return;
+        }
+
+        const totalValidChannels = loadedCandidates.reduce((total, item) => total + safeArray(item?.parsed?.channels).length, 0);
+        const totalSkippedRows = loadedCandidates.reduce((total, item) => total + (Number(item?.parsed?.skippedCount) || 0), 0);
+        const confirmRefresh = await showChoiceModal({
+            title: `Refresh ${loadedCandidates.length} URL-backed ${pluralize(loadedCandidates.length, 'list')}?`,
+            message: `FilterTube loaded ${loadedCandidates.length} URL-backed ${pluralize(loadedCandidates.length, 'list')} for ${eligibleIds.length} selected protected ${pluralize(eligibleIds.length, 'profile')}.`,
+            details: [
+                `${totalValidChannels} valid ${pluralize(totalValidChannels, 'channel')} found across loaded lists`,
+                totalSkippedRows ? `${totalSkippedRows} ${pluralize(totalSkippedRows, 'row')} skipped for safety` : 'No rows skipped',
+                failedCandidates.length ? `${failedCandidates.length} ${pluralize(failedCandidates.length, 'list')} could not be loaded and will be left unchanged` : 'All URL-backed lists loaded',
+                'Parent/account re-auth is required before anything changes.'
+            ],
+            choices: [
+                { value: 'refresh_all', label: 'Refresh Loaded Lists', className: 'btn-primary' }
+            ],
+            cancelText: 'Cancel'
+        });
+        if (confirmRefresh !== 'refresh_all') return;
+
+        const okAdmin = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
+        if (!okAdmin) {
+            for (const targetId of eligibleIds) {
+                await recordManagedAdminAuthFailureHistory(fresh, targetId, 'channel_list_refresh_all_unlock_failed');
+            }
+            return;
+        }
+
+        const refreshedAt = Date.now();
+        const changedProfileIdsSet = new Set();
+        const changedSurfaces = new Set();
+        let changedListCount = 0;
+        let addedCount = 0;
+        let removedCount = 0;
+        let duplicateCount = 0;
+
+        for (const candidate of loadedCandidates) {
+            const result = applyLoadedManagedChannelListRefreshToProfiles({
+                profiles,
+                eligibleIds,
+                currentActive,
+                selectedList: candidate.selectedList,
+                loaded: candidate.loaded,
+                parsed: candidate.parsed,
+                refreshedAt
+            });
+            if (!result.changedCount) continue;
+            changedListCount += 1;
+            addedCount += result.addedCount;
+            removedCount += result.removedCount;
+            duplicateCount += result.duplicateCount;
+            safeArray(result.changedProfileIds).forEach(id => changedProfileIdsSet.add(id));
+            result.changedSurfaces.forEach(surface => changedSurfaces.add(surface));
+        }
+
+        if (!changedProfileIdsSet.size) {
+            UIComponents.showToast('Loaded URL-backed lists did not change selected protected profiles', 'info');
+            return;
+        }
+
+        await io.saveProfilesV4({
+            ...fresh,
+            schemaVersion: 4,
+            profiles
+        });
+        profilesV4Cache = { ...fresh, schemaVersion: 4, profiles };
+        await StateManager.loadSettings({ notify: false, resetEnrichment: false, scheduleEnrichment: false });
+        await refreshProfilesUI();
+        renderChannels();
+        renderKidsChannels();
+        UIComponents.showToast(
+            `Refreshed ${changedListCount} ${pluralize(changedListCount, 'list')}: ${addedCount} added, ${removedCount} replaced${duplicateCount ? `, ${duplicateCount} already present` : ''}`,
+            'success'
+        );
+
+        const changedProfileIds = Array.from(changedProfileIdsSet);
+        const remoteScope = changedSurfaces.size === 1 ? 'channels' : 'rules_bundle';
+        const surface = changedSurfaces.size === 1 ? Array.from(changedSurfaces)[0] : '';
+        const mailboxReady = hasNanahManagedMailboxUploadWriter();
+        const localReady = hasNanahManagedLocalNetworkDeliveryWriter();
+        const readyProfileCount = changedProfileIds.filter((targetId) => {
+            const profile = safeObject(safeObject(profilesV4Cache).profiles)[targetId];
+            const links = getNanahSourceManagedLinksForTargetProfile(targetId, remoteScope, profile);
+            if (!links.length) return false;
+            return links.some(isNanahManagedLinkLiveConnected) || mailboxReady || localReady;
+        }).length;
+        if (readyProfileCount > 0) {
+            const sendNow = await showConfirmModal({
+                title: 'Send refreshed lists now?',
+                message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send these refreshed list updates to those devices now.`,
                 confirmText: 'Send update',
                 cancelText: 'Not now'
             });
@@ -8713,6 +8913,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ...(activeListCount ? [{ value: 'pause', label: 'Pause List', className: 'btn-secondary' }] : []),
             ...(pausedListCount ? [{ value: 'resume', label: 'Resume List', className: 'btn-secondary' }] : []),
             ...(urlBackedCount ? [{ value: 'refresh', label: 'Refresh List', className: 'btn-secondary' }] : []),
+            ...(urlBackedCount > 1 ? [{ value: 'refresh_all', label: 'Refresh All URLs', className: 'btn-secondary' }] : []),
             ...(summaries.length ? [{ value: 'remove', label: 'Remove List', className: 'btn-secondary' }] : [])
         ];
         const selected = await showChoiceModal({
@@ -8732,6 +8933,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             await setManagedChannelListPausedForProfiles(eligibleIds, false);
         } else if (selected === 'refresh') {
             await refreshManagedChannelListForProfiles(eligibleIds);
+        } else if (selected === 'refresh_all') {
+            await refreshAllManagedChannelListsForProfiles(eligibleIds);
         } else if (selected === 'remove') {
             await removeManagedChannelListFromProfiles(eligibleIds);
         }

@@ -143,6 +143,11 @@ extension authority code.
     store compact last-checked and content-hash metadata on list-derived rows,
     and the parent library can show that version metadata without exposing raw
     list contents.
+  - [x] First parent-triggered batch refresh slice: when multiple URL-backed
+    lists exist, `Lists` can refresh all loaded URL sources in one
+    parent-approved pass. Failed sources are left unchanged, matching
+    list-derived rows are replaced through the existing channel-rule path, and
+    changed profiles can use the existing verified-device send offer.
   - [ ] Scheduled subscription refresh remains a future slice.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
@@ -346,6 +351,7 @@ Add list -> Preview -> Choose profiles -> Apply -> Send update
 11. Show read-only imported-list summaries from the Lists chooser [done]
 12. Pause/resume imported lists without deleting manual or list-derived rows [done]
 13. Show last-checked and compact hash metadata for imported/refreshed lists [done]
+14. Refresh all URL-backed lists in one parent-approved pass [done]
 ```
 
 Scheduled subscriptions and automatic background refresh remain future work. A
