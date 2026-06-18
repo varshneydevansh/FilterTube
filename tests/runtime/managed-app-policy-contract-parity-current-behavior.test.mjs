@@ -107,7 +107,7 @@ test('managed app policy parity doc records extension-owned app contract artifac
   }
   assert.match(doc, /Runtime behavior changed\*\*: extension no; Android app yes/);
   assert.match(doc, /Android native\s+model and Activity runtime proof/);
-  assert.match(doc, /installed iOS parity\s+remains pending/);
+  assert.match(doc, /Installed iOS parity\s+remains pending/);
   assert.match(doc, /App Sync Boundary/);
   assert.match(doc, /Required Parity Decisions/);
   assert.match(doc, /Current Gap/);
@@ -323,6 +323,37 @@ test('managed app contract preserves profile viewing time envelope and history f
     contract.managedChannelLists.nativeParityRequirements.includes('preserve_managed_list_source_format_metadata'),
     'native apps must preserve managed list source format metadata'
   );
+  assert.deepEqual(contract.managedChannelLists.nativeUiParity.applyTargets, ['main', 'kids', 'both']);
+  assert.deepEqual(contract.managedChannelLists.nativeUiParity.sourceFilters, ['all_sources', 'manual', 'imported_lists', 'one_saved_list']);
+  for (const surface of [
+    'main_channel_management',
+    'kids_channel_management',
+    'settings_import_export_rule_lists',
+    'family_controls_profile_rows'
+  ]) {
+    assert.ok(contract.managedChannelLists.nativeUiParity.requiredParentSurfaces.includes(surface), `missing managed list UI surface ${surface}`);
+  }
+  for (const control of [
+    'preview_before_import',
+    'choose_main_kids_or_both_before_write',
+    'filter_channel_rows_by_manual_or_imported_source',
+    'filter_kids_channel_rows_by_manual_or_imported_source',
+    'show_imported_list_source_badge_on_rows',
+    'show_saved_list_summary_before_send',
+    'send_verified_device_update_after_list_change'
+  ]) {
+    assert.ok(contract.managedChannelLists.nativeUiParity.requiredParentControls.includes(control), `missing managed list UI control ${control}`);
+  }
+  for (const boundary of [
+    'protected_user_cannot_import_rule_lists',
+    'protected_user_cannot_change_list_apply_target',
+    'protected_user_cannot_pause_resume_refresh_or_remove_lists',
+    'protected_user_may_see_only_enforced_result_not_source_catalog'
+  ]) {
+    assert.ok(contract.managedChannelLists.nativeUiParity.protectedUserBoundaries.includes(boundary), `missing managed list UI boundary ${boundary}`);
+  }
+  assert.match(contract.managedChannelLists.nativeUiParity.copyContract, /Main YouTube/);
+  assert.match(contract.managedChannelLists.nativeUiParity.copyContract, /YouTube Kids/);
 
   for (const row of [
     'local_managed_save_accepted',
@@ -374,6 +405,8 @@ test('managed app contract excludes extension runtime APIs from downstream autho
     'profile_contract',
     'managed_policy_envelope_contract',
     'managed_rule_policy_contract',
+    'managed_channel_list_contract',
+    'managed_channel_list_ui_contract',
     'viewing_space_policy_contract',
     'time_limit_policy_contract',
     'action_history_contract'

@@ -158,9 +158,10 @@ parent tool instead of a sync/debug console.
   parent edit, approved list, remote update, Send update, Pick Up Later,
   Home Bridge, trusted-device action, admin access, or history action while
   keeping raw policy JSON and sensitive rule payloads out of protected views.
-- [ ] Downstream app UI contract documents the same Main/Kids rule-list source
-  filter, Kids list selection, and source badges so mobile/tablet surfaces do
-  not fork the parent mental model.
+- [x] Downstream app UI contract documents the same Main/Kids/Both rule-list
+  apply target, manual/imported source filters, Kids list selection, source
+  badges, saved-list summaries, and protected-user boundaries so mobile/tablet
+  surfaces do not fork the parent mental model.
 - [x] Command center can send signed active managed-policy updates to currently
   connected verified replica devices over Nanah P2P.
 - [x] Command center can hand ciphertext mailbox items or signed LAN candidates

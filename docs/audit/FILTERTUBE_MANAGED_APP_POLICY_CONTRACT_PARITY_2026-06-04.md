@@ -12,8 +12,13 @@ both as transport inputs. The shared contract now separates parent-facing
 delivery labels (`Send Now`, `Pick Up Later`, `Home Bridge`) from technical
 transport identifiers so apps and future bridge software can stay simple
 without weakening local signature/target/revision validation. The app sync
-manifest/runtime copy now includes this contract revision; installed iOS parity
-remains pending.
+manifest/runtime copy previously included the parent delivery contract, and this
+extension contract revision now needs a follow-up native runtime sync before app
+byte parity can be claimed. Installed iOS parity remains pending. The managed
+list contract now also pins the downstream app UI
+shape for Main/Kids/Both apply targets, manual/imported-list source filters,
+row badges, saved-list summaries, and protected-user boundaries so mobile/tablet
+surfaces do not fork the parent mental model from the extension.
 **Runtime behavior changed**: extension no; Android app yes.
 **Goal slice**: Implementation order item 12, "Sync shared policy contract to
 apps", and item 13, "Add app viewing-space/time-limit parity tests".
@@ -46,7 +51,7 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
   "generated": "2026-06-18",
   "owner": "extension_upstream_policy_contract",
   "runtimeBehaviorChanged": false,
-  "appSyncStatus": "app_manifest_contract_helpers_and_parent_delivery_terms_synced_ios_pending",
+  "appSyncStatus": "extension_contract_updated_native_sync_pending",
   "artifact": {
     "sourcePath": "docs/audit/artifacts/managed-app-policy-contract-v1.json",
     "appDestination": "packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json",
@@ -297,7 +302,42 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
       "show_stale_url_backed_list_status_as_parent_hint_only",
       "keep_manual_channel_rules_separate_from_list_derived_rows",
       "do_not_treat_public_list_url_or_lan_provider_as_admin_authority"
-    ]
+    ],
+    "nativeUiParity": {
+      "applyTargets": [
+        "main",
+        "kids",
+        "both"
+      ],
+      "sourceFilters": [
+        "all_sources",
+        "manual",
+        "imported_lists",
+        "one_saved_list"
+      ],
+      "requiredParentSurfaces": [
+        "main_channel_management",
+        "kids_channel_management",
+        "settings_import_export_rule_lists",
+        "family_controls_profile_rows"
+      ],
+      "requiredParentControls": [
+        "preview_before_import",
+        "choose_main_kids_or_both_before_write",
+        "filter_channel_rows_by_manual_or_imported_source",
+        "filter_kids_channel_rows_by_manual_or_imported_source",
+        "show_imported_list_source_badge_on_rows",
+        "show_saved_list_summary_before_send",
+        "send_verified_device_update_after_list_change"
+      ],
+      "protectedUserBoundaries": [
+        "protected_user_cannot_import_rule_lists",
+        "protected_user_cannot_change_list_apply_target",
+        "protected_user_cannot_pause_resume_refresh_or_remove_lists",
+        "protected_user_may_see_only_enforced_result_not_source_catalog"
+      ],
+      "copyContract": "Use parent-facing terms such as Lists, Main YouTube, YouTube Kids, Send Now, Pick Up Later, and Home Bridge. Advanced transport terms may appear only in details."
+    }
   },
   "managedDelivery": {
     "transports": [
@@ -399,6 +439,7 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
       "managed_policy_envelope_contract",
       "managed_rule_policy_contract",
       "managed_channel_list_contract",
+      "managed_channel_list_ui_contract",
       "viewing_space_policy_contract",
       "time_limit_policy_contract",
       "action_history_contract"
@@ -416,6 +457,7 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
       "native_keyword_rule_apply",
       "native_channel_rule_apply",
       "native_managed_channel_list_metadata_preservation",
+      "native_managed_channel_list_source_filter_ui",
       "native_managed_channel_list_pause_enforcement",
       "native_video_rule_apply",
       "native_time_budget_gate_before_web_content",
@@ -517,10 +559,12 @@ apps can mirror the Pick Up Later helper, and
 `js/nanah_managed_local_network_client.js` so apps can mirror the Home Bridge
 helper. This verifier is a pre-release guard; it does not write into the app
 repo.
-The sibling app repo has now run native runtime sync for this contract
-revision, and the generated app-side output is committed as
+The sibling app repo previously ran native runtime sync for the parent-delivery
+contract revision, and the generated app-side output is committed as
 `/Users/devanshvarshney/FilterTubeApp` commit `cb8e1516 Sync managed delivery
-runtime from extension`. The same manifest copies the extension-owned managed
+runtime from extension`. This newer managed list UI contract revision is marked
+`extension_contract_updated_native_sync_pending` until the native runtime sync is
+run again. The same manifest copies the extension-owned managed
 Nanah signed-send, pull-on-open, Pick Up Later, and Home Bridge helper sources
 into `packages/extension-source/upstream/js/` so the downstream app repo can
 track the exact helper contracts without treating them as native runtime
