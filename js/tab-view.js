@@ -13203,8 +13203,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
         return showChoiceModal({
-            title: title || 'Choose Update Delivery',
-            message: message || 'Choose how parent-approved updates should reach a protected device.',
+            title: title || 'Send Updates Later',
+            message: message || 'Choose whether parent-approved updates need an optional waiting path for another device.',
             details: Array.isArray(details) ? details : [
                 'Use Send Now for normal parent control.',
                 'Add an optional send path only when both devices cannot be open together.',
@@ -13232,7 +13232,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             details: [
                 'Normal parent control is Send Now: open both devices, pair, verify, and send.',
                 'Pick Up Later is optional and advanced; skip it when both devices can be open together.',
-                'A compatible pickup service stores unreadable waiting updates only.',
+                'A FilterTube-compatible Pick Up Later service stores unreadable waiting updates only.',
                 'The saved trusted parent link still decides what applies.'
             ],
             configured: !!currentEndpoint,
@@ -13251,8 +13251,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const endpoint = await showPromptModal({
-            title: 'Pick Up Later',
-            message: 'Advanced only. This is not the Nanah signal server. Enter a compatible HTTPS pickup service only if you run one; leave blank to keep Send Now only.',
+            title: 'Pick Up Later Address',
+            message: 'Advanced only. Enter a FilterTube-compatible pickup service only if you run or trust one. It is not the Nanah signal server, and it cannot change rules by itself. Leave blank for Send Now only.',
             placeholder: 'https://your-filtertube-pickup-service',
             inputType: 'url',
             confirmText: currentEndpoint ? 'Save Pick Up Later' : 'Enable Pick Up Later',
@@ -13271,9 +13271,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const token = await showPromptModal({
-            title: 'Service Password',
-            message: 'Optional. Leave blank to keep the saved password. Enter a single dash to clear it.',
-            placeholder: 'Optional token',
+            title: 'Pick Up Later Key',
+            message: 'Optional service key. Leave blank to keep the saved key. Enter a single dash to clear it.',
+            placeholder: 'Optional service key',
             inputType: 'password',
             confirmText: 'Save',
             initialValue: ''
@@ -13294,7 +13294,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? client.createProvider(nextConfig)
             : null;
         if (!provider || provider.configured !== true || !hasNanahManagedMailboxUploadWriter(provider)) {
-            UIComponents.showToast('Pick Up Later endpoint must be public HTTPS and supported by FilterTube', 'error');
+            UIComponents.showToast('Pick Up Later address must be public HTTPS and supported by FilterTube', 'error');
             return;
         }
         writeNanahManagedMailboxServerConfig(nextConfig);
@@ -13342,8 +13342,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const endpoint = await showPromptModal({
-            title: 'Home Bridge',
-            message: 'Advanced only. Enter a trusted bridge endpoint only if you run a FilterTube-compatible bridge. Normal parent control uses Send Now.',
+            title: 'Home Bridge Address',
+            message: 'Advanced only. Enter a trusted Home Bridge address only if you run a FilterTube-compatible bridge. Normal parent control uses Send Now.',
             placeholder: 'http://192.168.1.10:4177/filtertube',
             inputType: 'url',
             confirmText: currentEndpoint ? 'Save Bridge' : 'Enable Home Bridge',
@@ -13356,9 +13356,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const token = await showPromptModal({
-            title: 'Bridge Password',
-            message: 'Optional. Leave blank to keep the saved password. Enter a single dash to clear it.',
-            placeholder: 'Optional token',
+            title: 'Home Bridge Key',
+            message: 'Optional bridge key. Leave blank to keep the saved key. Enter a single dash to clear it.',
+            placeholder: 'Optional bridge key',
             inputType: 'password',
             confirmText: 'Save',
             initialValue: ''
@@ -13379,7 +13379,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? client.createProvider(nextConfig)
             : null;
         if (!provider || provider.configured !== true || !hasNanahManagedLocalNetworkDeliveryWriter(provider)) {
-            UIComponents.showToast('Home Bridge endpoint must be HTTPS or private/local HTTP and supported by FilterTube', 'error');
+            UIComponents.showToast('Home Bridge address must be HTTPS or private/local HTTP and supported by FilterTube', 'error');
             return;
         }
         writeNanahManagedLocalNetworkProviderConfig(nextConfig);

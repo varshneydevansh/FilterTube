@@ -281,6 +281,9 @@ parent tool instead of a sync/debug console.
     setup still leads with Send Now and local controls; the prompt is only a
     discoverable path for families/caregivers who need offline pickup or a
     trusted home/school bridge.
+  - [x] Optional delivery setup modals use parent-facing `address` and `key`
+    labels instead of raw provider/password language, and explicitly say Pick Up
+    Later is not the Nanah signal server and cannot change rules by itself.
   - [ ] Scheduled subscription refresh remains a future slice. Until then,
     list updates happen only after a parent/account profile chooses Check or
     Refresh and approves the result.
@@ -1174,9 +1177,11 @@ the current extension dashboard.
   when both sides are available. Unconfigured mailbox and local-network provider
   setup is hidden from the normal command center so parents are not asked to
   bring infrastructure. If a provider is already configured, the UI labels it as
-  Offline Pickup or Same-Network and uses plain parent/user language while audit
+  Pick Up Later or Home Bridge and uses plain parent/user language while audit
   docs retain the trusted-link, target-profile, scope, revision, hash, and
-  signature authority proof.
+  signature authority proof. The setup modals now ask for an address and an
+  optional key, not a vague provider/password, and state that those paths do not
+  become policy authority.
 - **Acceptance Criteria**:
   - UI has empty, loading, error, locked, offline, and sync-conflict states.
   - Parent actions are clear and reversible where possible.
