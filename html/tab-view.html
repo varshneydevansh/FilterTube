@@ -1048,8 +1048,8 @@
                                             <div class="help-item-body">Add a channel by <b><code>UC...</code></b> or <b><code>@handle</code></b> or <b><code>/c/Name</code></b> or <b><code>/user/Name</code></b>. <br/>Channels blocked from the YouTube 3-dot menu will appear here automatically.</div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">Channel list imports</div>
-                                            <div class="help-item-body">Parent/account profiles can use Lists in Family Controls to view, import, pause, resume, check, refresh, or remove channel lists for protected profiles. URL lists load into the same preview box before anything changes. FilterTube previews valid channel identifiers, skips name-only rows for safety, applies the list to selected protected profiles, and can send changed rules to verified devices. Paused lists stay saved but stop contributing channel rules. URL-backed lists show source title/version when a list provides it, last-checked and hash metadata, show when they need refresh, can be checked one at a time, only when stale, or together from the Lists menu. If the source hash is unchanged, FilterTube updates checked metadata without replacing channel rows.</div>
+                                            <div class="help-item-title">Rule list imports</div>
+                                            <div class="help-item-body">Parent/account profiles can use Lists in Family Controls to view, import, pause, resume, check, refresh, or remove channel and keyword rule lists for protected profiles. CSV lists can use <code>channel_id,keyword,notes</code>; plain text stays channel-only for safety; JSON can provide <code>channels</code> and <code>keywords</code>. FilterTube previews what it understood, then the parent chooses protected profiles plus Main YouTube, YouTube Kids, or both. A file never decides PINs, profiles, sync targets, or viewing spaces.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Filter All Content (per-channel)</div>
@@ -1304,7 +1304,7 @@
                                                     <li>A live Nanah session is not meant to survive a page refresh, browser restart, or tab close. Refresh ends the live pairing session.</li>
                                                     <li>Trusted links are saved locally so you do not lose the remembered relationship, but today you still start a fresh live session when reconnecting.</li>
                                                     <li>The trusted-device card now has a <strong>Start New Session</strong> shortcut that starts the next fresh session with the saved role/policy defaults.</li>
-                                                    <li>Saved trust means a faster next session. If a later-update service is available, a protected profile can check for signed parent updates when it opens without adding YouTube page background work.</li>
+                                                    <li>Saved trust means a faster next live P2P session. If an advanced offline-pickup service is separately configured, a protected profile can check for signed parent updates when it opens without adding YouTube page background work.</li>
                                                     <li>If you try to reuse the same pairing code on the same active device session, FilterTube now blocks that locally instead of silently burning the code.</li>
                                                     <li>If no fixed target is saved on the managed replica link, non-<code>full</code> sync still writes into the receiver's current active profile at receive time.</li>
                                                     <li>If a managed replica link is saved with <strong>Always this local profile</strong>, future managed updates land in that pinned local profile even when some other profile is active on the receiving device.</li>
@@ -1351,7 +1351,7 @@
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">What the relay does</div>
-                                            <div class="help-item-body">Nanah’s relay is only there to help both devices meet and exchange connection setup data. It is not meant to be a place where FilterTube reads your synced rules. After the secure handshake, your settings are meant to move directly device-to-device. The underlying project is open here: <a href="https://github.com/varshneydevansh/nanah" target="_blank" rel="noopener noreferrer">github.com/varshneydevansh/nanah</a>.</div>
+                                            <div class="help-item-body">Nanah’s relay is only there to help both devices meet and exchange connection setup data. It is not a mailbox and it is not meant to read or store synced rules. In the normal parent flow, open both devices, pair, verify the phrase, and send directly device-to-device. The underlying project is open here: <a href="https://github.com/varshneydevansh/nanah" target="_blank" rel="noopener noreferrer">github.com/varshneydevansh/nanah</a>.</div>
                                         </div>
                                     </div>
                                 </div>
@@ -1474,9 +1474,9 @@
                                             </div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">Import a channel list for protected profiles</div>
+                                            <div class="help-item-title">Import a rule list for protected profiles</div>
                                             <div class="help-item-body">
-                                                In Accounts &amp; Sync, use Lists on a protected profile or selected protected profiles. View existing imported lists first, or choose Import List, paste a list, load a public HTTPS list URL, or choose a text file, preview the valid channels, choose Main YouTube, YouTube Kids, or both, then apply after parent/account unlock. Family Controls shows which protected profiles have imported lists, when they were last checked, and a compact source hash. URL-backed lists also show when they need refresh. Use Lists again to pause or resume a list, check one URL-backed list, check only stale URL-backed lists, check all URL-backed lists in one parent-approved pass, or remove an imported list; manual rules stay untouched. Unchanged source hashes only update checked metadata.
+                                                In Accounts &amp; Sync, use Lists on a protected profile or selected protected profiles. View existing imported lists first, or choose Import List, paste a list, load a public HTTPS list URL, choose a file, or download the CSV template. FilterTube previews valid channels, valid keywords, and skipped rows, then the parent chooses Main YouTube, YouTube Kids, or both and applies after parent/account unlock. Use Lists again to pause, resume, check, refresh, or remove imported rules; manual rules stay untouched. Changed profiles can then be sent to verified devices through the normal managed-policy JSON sync path.
                                             </div>
                                         </div>
                                         <div class="help-item">
@@ -1488,7 +1488,7 @@
                                         <div class="help-item">
                                             <div class="help-item-title">Remote updates in plain words</div>
                                             <div class="help-item-body">
-                                                Use live P2P when both devices are open. Use Later Updates only when a protected device should receive parent changes after it opens later. Use Same-Network only when you run a trusted local gateway. None of these options lets a protected profile edit its own rules.
+                                                Normal parent control is live P2P: open parent and protected devices, pair, verify the phrase, then send the selected profile update. Saved trust remembers the verified parent-child relationship and target profile for the next live session. Offline pickup and same-network gateways are advanced optional delivery tools only if you run a compatible service; they are not required for ordinary parent control and they never let a protected profile edit its own rules.
                                             </div>
                                         </div>
                                     </div>
