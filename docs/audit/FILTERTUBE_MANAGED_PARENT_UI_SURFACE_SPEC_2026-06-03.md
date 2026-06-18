@@ -10,12 +10,12 @@ live P2P signed managed-policy push for connected verified replica devices,
 provider-gated Pick Up Later/Home Bridge delivery handoff, and protected redacted push
 history rows are present. The command center now also surfaces the latest
 redacted delivery attempt in each protected profile row so parents can see
-whether the last send went by Live Send, Home Bridge, Pick Up Later, partial
+whether the last send went by Send Now, Home Bridge, Pick Up Later, partial
 delivery, no-link, or unavailable send path without opening raw policy state.
 The command center now includes a compact parent-facing protection strip, a
 parent-reauthed Pick Up Later endpoint
 configuration row, plus labeled Delivery/Device/History row details so parents
-can scan live delivery, later pickup readiness, Home Bridge readiness,
+can scan Send Now delivery, later pickup readiness, Home Bridge readiness,
 re-pairing, conflicts, and history without reading raw policy state. Bulk local time-limit
 and viewing-space actions cover all manageable protected profiles, including
 Default/Master-managed independent account profiles. Direct rule bulk writes
@@ -273,10 +273,10 @@ state without exposing plaintext rule values:
 - Pick Up Later and Home Bridge setup rows are explanatory transport controls only and remain
   hidden from the normal parent command center unless a provider is already
   configured. The visible parent workflow is protected profile -> rules/access/
-  time -> verified-device/live send. Pick Up Later and Home Bridge providers
+  time -> verified-device Send Now. Pick Up Later and Home Bridge providers
   remain optional advanced delivery hooks, not the default parent path.
-- The Delivery row preview is a redacted status summary only. It can say Live
-  Send, Home Bridge ready, Pick Up Later ready, Send path unavailable, Re-pair
+- The Delivery row preview is a redacted status summary only. It can say Send
+  Now, Home Bridge ready, Pick Up Later ready, Send path unavailable, Re-pair
   before sending, Refresh stale link, Review conflict first, or Pair verified device;
   it does not contain rule text, policy JSON, hashes, keys, ciphertext, or
   mutation authority.
@@ -375,7 +375,7 @@ runtime managed command-center encrypted mailbox provider configuration: present
 runtime managed command-center mailbox provider config history: present as redacted per-protected-profile rows, including Master-managed independent account profiles
 runtime managed command-center local-network provider configuration: present via parent re-auth and explicit configure/disable choice
 runtime managed command-center local-network provider config history: present as redacted per-protected-profile rows, including Master-managed independent account profiles
-runtime managed command-center parent-facing provider route guidance: present for live P2P, encrypted later mailbox delivery, and same-network gateway delivery
+runtime managed command-center parent-facing provider route guidance: present for Send Now, encrypted later mailbox delivery, and same-network gateway delivery
 runtime managed command-center focused conflict review: present as parent-reauthed redacted history filter
 runtime managed command-center blank mailbox endpoint disables provider config: present after parent re-auth
 runtime managed command-center post-rule-write granular verified-device push: present with selected surface binding
@@ -422,7 +422,7 @@ Required UI states for that slice:
 - successful local save status through row summaries/history;
 - pending P2P/local-network delivery;
 - connected verified-device send success;
-- redacted latest delivery attempt feedback for Live Send/Home Bridge/Pick Up Later/partial/no-link/unavailable-send-path;
+- redacted latest delivery attempt feedback for Send Now/Home Bridge/Pick Up Later/partial/no-link/unavailable-send-path;
 - redacted source-side delivery ack status;
 - unavailable send path when the extension has no Pick Up Later/Home Bridge provider hook;
 - configured, invalid, and disabled mailbox endpoint states;

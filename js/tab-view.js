@@ -5318,7 +5318,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const noLinks = normalizeNonNegativeInteger(root.noLinkCount) || 0;
             const missingProvider = normalizeNonNegativeInteger(root.providerMissingCount) || 0;
             const deliveryBits = [];
-            if (liveSent) deliveryBits.push(`Live Send ${liveSent}`);
+            if (liveSent) deliveryBits.push(`Send Now ${liveSent}`);
             if (lanSent) deliveryBits.push(`Home Bridge ${lanSent}`);
             if (mailboxSent) deliveryBits.push(`Pick Up Later ${mailboxSent}`);
             if (failed) deliveryBits.push(`failed ${failed}`);
@@ -5465,7 +5465,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const noLinks = normalizeNonNegativeInteger(summary.noLinkCount) || 0;
             const providerMissing = normalizeNonNegativeInteger(summary.providerMissingCount) || 0;
             const bits = [];
-            if (liveSent) bits.push(`Live Send ${liveSent}`);
+            if (liveSent) bits.push(`Send Now ${liveSent}`);
             if (lanSent) bits.push(`Home Bridge ${lanSent}`);
             if (mailboxSent) bits.push(`Pick Up Later ${mailboxSent}`);
             if (failed) bits.push(`failed ${failed}`);
@@ -12145,7 +12145,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!showChooser) {
             if (ftNanahManagedTargetsHint) {
                 ftNanahManagedTargetsHint.textContent = eligibleLinks.length === 1
-                    ? `This live send will target ${getNanahManagedTargetLabel(eligibleLinks[0])} on ${getNanahRemoteLabel()}.`
+                    ? `Send Now will target ${getNanahManagedTargetLabel(eligibleLinks[0])} on ${getNanahRemoteLabel()}.`
                     : 'Save fixed managed protected-profile targets on the connected replica before using multi-target sends.';
             }
             return eligibleLinks;
@@ -13011,8 +13011,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             title: title || 'Choose How Updates Are Sent',
             message: message || 'Choose how parent-approved updates should reach a protected device.',
             details: Array.isArray(details) ? details : [
-                'Use live send first when both devices are open.',
-                'Only add another delivery method when live send is not enough.',
+                'Use Send Now first when both devices are open.',
+                'Only add another delivery method when Send Now is not enough.',
                 'Child/protected profiles still cannot change parent rules from their own surface.'
             ],
             choices,
@@ -13035,7 +13035,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             title: 'Pick Up Later',
             message: 'Use this only when a parent may change rules while the protected device is offline. The child device can pick up the update next time it opens.',
             details: [
-                'This is advanced and separate from normal live send.',
+                'This is advanced and separate from normal Send Now.',
                 'Skip this if parent and protected devices can be opened together.',
                 'A compatible pickup service is only a waiting room for unreadable updates.',
                 'Parent approval and the saved trusted device still decide what applies.'
@@ -13057,7 +13057,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const endpoint = await showPromptModal({
             title: 'Pick Up Later Service',
-            message: 'Advanced only. This is not the Nanah signal server. Enter a compatible HTTPS pickup service only if you run one; leave blank to keep live send only.',
+            message: 'Advanced only. This is not the Nanah signal server. Enter a compatible HTTPS pickup service only if you run one; leave blank to keep Send Now only.',
             placeholder: 'https://your-filtertube-pickup-service',
             inputType: 'url',
             confirmText: currentEndpoint ? 'Save Service' : 'Enable Offline Pickup',
@@ -13126,8 +13126,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             title: 'Home Network Bridge',
             message: 'Use this only when you have a trusted FilterTube bridge that can pass parent updates to protected devices on your home or school network.',
             details: [
-                'This is advanced and separate from normal live send.',
-                'Skip this for normal live-send control.',
+                'This is advanced and separate from normal Send Now.',
+                'Skip this for normal Send Now control.',
                 'Being on the same network is not enough to change rules.',
                 'The protected device still accepts only trusted parent updates.'
             ],
@@ -13148,7 +13148,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const endpoint = await showPromptModal({
             title: 'Home Network Bridge',
-            message: 'Advanced only. Enter a trusted bridge endpoint only if you run a FilterTube-compatible bridge. Normal parent control uses live send.',
+            message: 'Advanced only. Enter a trusted bridge endpoint only if you run a FilterTube-compatible bridge. Normal parent control uses Send Now.',
             placeholder: 'http://192.168.1.10:4177/filtertube',
             inputType: 'url',
             confirmText: currentEndpoint ? 'Save Bridge' : 'Enable Home Bridge',
@@ -18394,7 +18394,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                     if (policy.linkType === 'managed_link' && policy.authorityMode === 'managed' && getNanahRole() === 'source') {
                         if (!nanahManagedLivePolicy) {
-                            throw new Error('Managed policy live-send helpers are unavailable');
+                            throw new Error('Managed policy Send Now helpers are unavailable');
                         }
                         const selectedTargetLinks = getNanahSelectedManagedTargetLinks(policy.scope);
                         if (ftNanahManagedTargetsField && !ftNanahManagedTargetsField.hidden && selectedTargetLinks.length === 0) {

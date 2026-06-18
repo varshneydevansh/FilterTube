@@ -49,7 +49,7 @@
                 : () => ({
                     configured: false,
                     label: 'Pick Up Later off',
-                    detail: 'Live Send works when both devices are open. Pick Up Later is only for updates a protected device should collect after it opens.',
+                    detail: 'Send Now works when both devices are open. Pick Up Later is only for updates a protected device should collect after it opens.',
                     tone: 'warning'
                 }),
             getManagedLocalNetworkConfigSummary: typeof helpers.getManagedLocalNetworkConfigSummary === 'function'
@@ -444,10 +444,10 @@
             return 'Local control works now. Pair only when updates need to reach another device.';
         }
         if (readyCount <= 0) {
-            return `${targetCount} verified ${targetCount === 1 ? 'device is' : 'devices are'} paired; open parent and protected devices together for live send.`;
+            return `${targetCount} verified ${targetCount === 1 ? 'device is' : 'devices are'} paired; open parent and protected devices together to Send Now.`;
         }
         const paths = [];
-        if (item.syncLiveReady === true) paths.push('Live Send');
+        if (item.syncLiveReady === true) paths.push('Send Now');
         if (item.syncLocalNetworkReady === true) paths.push('Home Bridge');
         if (item.syncMailboxReady === true) paths.push('Pick Up Later');
         return paths.length
@@ -938,7 +938,7 @@
         const mailboxRoute = document.createElement('span');
         mailboxRoute.textContent = mailbox.configured
             ? 'The protected device still accepts only trusted parent updates.'
-            : 'Leave this off when live send is enough.';
+            : 'Leave this off when Send Now is enough.';
         mailboxCopy.append(mailboxTitle, mailboxDetail, mailboxRoute);
         mailboxPanel.appendChild(mailboxCopy);
         if (h.onAction) {
