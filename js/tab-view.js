@@ -165,23 +165,6 @@ function initializeFiltersTabs() {
         </div>
         <div id="managedChildFiltersChannelBanner" class="ft-managed-child-editor" hidden></div>
 
-        <section class="rule-list-import-entry" aria-labelledby="mainRuleListImportTitle">
-            <div class="rule-list-import-entry__copy">
-                <span class="rule-list-import-entry__eyebrow">CSV and rule lists</span>
-                <h3 id="mainRuleListImportTitle">Import channels and keywords</h3>
-                <p>Use a CSV file with <code>channel_id</code> and <code>keyword</code> columns. FilterTube previews the list before it changes this profile.</p>
-            </div>
-            <div class="rule-list-import-entry__sample" aria-label="CSV structure preview">
-                <span>channel_id,keyword,notes</span>
-                <span>@SomeChannel,,channel handle</span>
-                <span>,brainrot,keyword phrase</span>
-            </div>
-            <div class="rule-list-import-entry__actions">
-                <button id="importMainRuleListBtn" class="btn-primary" type="button">Import CSV</button>
-                <button id="downloadMainRuleListTemplateBtn" class="btn-secondary" type="button">Download Template</button>
-            </div>
-        </section>
-
         <div class="filter-controls">
             <input type="text" id="searchChannels" class="search-input" placeholder="Search channels..." />
             <div class="sort-controls">
@@ -1516,23 +1499,6 @@ function initializeKidsTabs() {
         </div>
         <div id="managedChildKidsChannelBanner" class="ft-managed-child-editor" hidden></div>
 
-        <section class="rule-list-import-entry rule-list-import-entry--kids" aria-labelledby="kidsRuleListImportTitle">
-            <div class="rule-list-import-entry__copy">
-                <span class="rule-list-import-entry__eyebrow">Kids rule lists</span>
-                <h3 id="kidsRuleListImportTitle">Import Kids channels and keywords</h3>
-                <p>Use the same CSV template for YouTube Kids rules. Parents can import while editing a protected profile.</p>
-            </div>
-            <div class="rule-list-import-entry__sample" aria-label="Kids CSV structure preview">
-                <span>channel_id,keyword,notes</span>
-                <span>@LearningChannel,,safe source</span>
-                <span>,scary thumbnail,keyword phrase</span>
-            </div>
-            <div class="rule-list-import-entry__actions">
-                <button id="importKidsRuleListBtn" class="btn-primary" type="button">Import CSV</button>
-                <button id="downloadKidsRuleListTemplateBtn" class="btn-secondary" type="button">Download Template</button>
-            </div>
-        </section>
-
         <div class="filter-controls">
             <input type="text" id="kidsSearchChannels" class="search-input" placeholder="Search channels..." />
             <div class="sort-controls">
@@ -2829,8 +2795,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const addChannelBtn = document.getElementById('addChannelBtn');
     const importSubscriptionsNotice = document.getElementById('importSubscriptionsNotice');
     const importSubscriptionsBtn = document.getElementById('importSubscriptionsBtn');
-    const importMainRuleListBtn = document.getElementById('importMainRuleListBtn');
-    const downloadMainRuleListTemplateBtn = document.getElementById('downloadMainRuleListTemplateBtn');
     const importSubscriptionsStatus = document.getElementById('importSubscriptionsStatus');
     const importSubscriptionsActions = document.getElementById('importSubscriptionsActions');
     const channelListEl = document.getElementById('channelListEl');
@@ -2868,6 +2832,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftImportV3Btn = document.getElementById('ftImportV3Btn');
     const ftImportV3File = document.getElementById('ftImportV3File');
     const ftImportSyncDeviceBtn = document.getElementById('ftImportSyncDeviceBtn');
+    const ftImportRuleListBtn = document.getElementById('ftImportRuleListBtn');
+    const ftDownloadRuleListTemplateBtn = document.getElementById('ftDownloadRuleListTemplateBtn');
+    const ftRuleListFormatsBtn = document.getElementById('ftRuleListFormatsBtn');
 
     const ftProfilesManager = document.getElementById('ftProfilesManager');
     const managedChildSyncBoundary = document.getElementById('managedChildSyncBoundary');
@@ -7289,6 +7256,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             'csv_channel_keyword_rows',
             'simple_json_array',
             'simple_json_object_channels',
+            'blocktube_json_rules',
             'public_https_text_or_json_url'
         ]);
         return allowed.has(normalized) ? normalized : '';
@@ -7297,6 +7265,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function formatManagedChannelListSourceFormat(value) {
         const normalized = normalizeManagedChannelListSourceFormat(value);
         if (normalized === 'simple_json_array' || normalized === 'simple_json_object_channels') return 'JSON';
+        if (normalized === 'blocktube_json_rules') return 'BlockTube JSON';
         if (normalized === 'public_https_text_or_json_url') return 'URL source';
         if (normalized === 'csv_channel_keyword_rows') return 'CSV rules';
         if (normalized === 'csv_like_text_rows') return 'CSV-like text';
@@ -7479,6 +7448,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     function getManagedChannelListJsonItems(root) {
         if (Array.isArray(root)) return root;
         const item = safeObject(root);
+        const filterData = safeObject(item.filterData);
+        if (Array.isArray(filterData.channelId) || Array.isArray(filterData.channelName)) {
+            return [
+                ...safeArray(filterData.channelId),
+                ...safeArray(filterData.channelName)
+            ];
+        }
         const candidateKeys = [
             'channels',
             'items',
@@ -7496,6 +7472,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     function getManagedChannelListJsonKeywordItems(root) {
         if (Array.isArray(root)) return [];
         const item = safeObject(root);
+        const filterData = safeObject(item.filterData);
+        if (Array.isArray(filterData.title)) return filterData.title;
         const candidateKeys = [
             'keywords',
             'blockedKeywords',
@@ -7512,6 +7490,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     function getManagedChannelListJsonEntryType(entry) {
         const item = safeObject(entry);
         return normalizeString(item.type || item.kind || item.ruleType || item.rule_type).toLowerCase();
+    }
+
+    function normalizeManagedChannelListJsonChannel(entry) {
+        const token = extractManagedChannelListJsonToken(entry);
+        if (token) return normalizeProfileChannel(token);
+        const item = safeObject(entry);
+        const candidateName = typeof entry === 'string' || typeof entry === 'number'
+            ? normalizeString(entry)
+            : normalizeString(item.name || item.channelName || item.title || item.label);
+        if (!candidateName || /^(#|!|\/\/|\[)/.test(candidateName)) return null;
+        return {
+            name: candidateName,
+            id: '',
+            handle: null,
+            customUrl: null,
+            originalInput: candidateName,
+            source: 'managed_channel_list',
+            filterAll: false,
+            addedAt: Date.now()
+        };
     }
 
     function extractManagedChannelListJsonToken(entry) {
@@ -7566,7 +7564,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const listId = buildManagedChannelListId(listName || 'Imported list', text);
         const items = getManagedChannelListJsonItems(parsedRoot);
         const keywordItems = getManagedChannelListJsonKeywordItems(parsedRoot);
-        const sourceFormat = Array.isArray(parsedRoot) ? 'simple_json_array' : 'simple_json_object_channels';
+        const sourceFormat = safeObject(parsedRoot).filterData
+            ? 'blocktube_json_rules'
+            : (Array.isArray(parsedRoot) ? 'simple_json_array' : 'simple_json_object_channels');
         const seen = new Set();
         const seenKeywords = new Set();
         const channels = [];
@@ -7594,12 +7594,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (!addKeyword(entry)) skippedCount += 1;
                 return;
             }
-            const token = extractManagedChannelListJsonToken(entry);
-            if (!token) {
-                skippedCount += 1;
-                return;
-            }
-            const channel = normalizeProfileChannel(token);
+            const channel = normalizeManagedChannelListJsonChannel(entry);
             if (!channel) {
                 skippedCount += 1;
                 return;
@@ -7713,6 +7708,57 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
+    function escapeManagedRuleListPreviewCell(value) {
+        return normalizeString(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function formatManagedRuleListChannelValue(channel = {}) {
+        return normalizeString(channel.handle || channel.id || channel.customUrl || channel.name || channel.originalInput);
+    }
+
+    function buildManagedRuleListPreviewRows(parsed = {}) {
+        const source = formatManagedChannelListSourceFormat(parsed.sourceFormat) || 'Imported list';
+        const channels = safeArray(parsed.channels).slice(0, 5).map((channel) => ({
+            type: 'Channel',
+            value: formatManagedRuleListChannelValue(channel),
+            source
+        }));
+        const keywords = safeArray(parsed.keywords).slice(0, 5).map((keyword) => ({
+            type: 'Keyword',
+            value: normalizeString(keyword?.word || keyword),
+            source
+        }));
+        return [...channels, ...keywords].filter(row => row.value).slice(0, 8);
+    }
+
+    function renderManagedRuleListPreviewSheet(parsed = {}) {
+        const rows = buildManagedRuleListPreviewRows(parsed);
+        if (!rows.length) {
+            return '<div class="managed-channel-list-modal__preview-empty">No readable rows yet. Use channel_id for channels and keyword for words or phrases.</div>';
+        }
+        return `
+            <div class="managed-channel-list-modal__sheet" role="table" aria-label="Rule list preview rows">
+                <div class="managed-channel-list-modal__sheet-row managed-channel-list-modal__sheet-head" role="row">
+                    <span role="columnheader">Type</span>
+                    <span role="columnheader">Value</span>
+                    <span role="columnheader">Source</span>
+                </div>
+                ${rows.map(row => `
+                    <div class="managed-channel-list-modal__sheet-row" role="row">
+                        <span role="cell">${escapeManagedRuleListPreviewCell(row.type)}</span>
+                        <span role="cell">${escapeManagedRuleListPreviewCell(row.value)}</span>
+                        <span role="cell">${escapeManagedRuleListPreviewCell(row.source)}</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
     function formatManagedRuleListCount(counts = {}) {
         const channelCount = Number(counts.channels) || 0;
         const keywordCount = Number(counts.keywords) || 0;
@@ -7761,8 +7807,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             const targetCopy = normalizeString(targetLabel) || (selectedCount > 1
                 ? `${selectedCount} selected protected profiles`
                 : 'this profile');
-            intro.textContent = `Paste or choose a CSV, text, or JSON rule list, preview it, then apply it to ${targetCopy}.`;
+            intro.textContent = `Import a channel/keyword list, review the parsed rows, then apply it to ${targetCopy}. Rule lists never change profiles, PINs, trusted devices, or viewing access.`;
             body.appendChild(intro);
+
+            const formatGuide = document.createElement('div');
+            formatGuide.className = 'managed-channel-list-modal__formats';
+            formatGuide.innerHTML = `
+                <span><b>CSV</b><code>channel_id,keyword,notes</code></span>
+                <span><b>JSON</b><code>channels</code> + <code>keywords</code></span>
+                <span><b>BlockTube</b><code>filterData.channelId</code> + <code>filterData.title</code></span>
+                <span><b>Public list</b>raw HTTPS CSV, text, or JSON</span>
+            `;
+            body.appendChild(formatGuide);
 
             const nameGroup = document.createElement('label');
             nameGroup.className = 'managed-channel-list-modal__field';
@@ -7841,7 +7897,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const help = document.createElement('div');
             help.className = 'managed-channel-list-modal__help';
-            help.textContent = 'CSV can include channel_id and keyword columns. Plain text stays channel-only for safety. The file only supplies rule values; parent/profile, Main/Kids, and device sync choices stay in FilterTube.';
+            help.textContent = 'Plain text stays channel-only for safety. CSV and supported JSON can add channels and keywords. FilterTube shows this preview before any profile is changed.';
             body.appendChild(help);
 
             const previewEl = document.createElement('div');
@@ -7884,7 +7940,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (!text) {
                     previewEl.innerHTML = `
                         <div class="managed-channel-list-modal__preview-title">Preview</div>
-                        <div class="managed-channel-list-modal__preview-empty">Paste CSV, load a URL, choose a file, or use the template. No profile changes happen here.</div>
+                        <div class="managed-channel-list-modal__preview-empty">Paste CSV, load a URL, choose a file, or use the template. The preview will show Type, Value, and Source before anything is applied.</div>
                     `;
                     return;
                 }
@@ -7899,7 +7955,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <div class="managed-channel-list-modal__preview-stat"><strong>${counts.keywords}</strong><span>Keywords</span></div>
                             <div class="managed-channel-list-modal__preview-stat"><strong>${parsed.skippedCount || 0}</strong><span>Skipped</span></div>
                         </div>
-                        <div class="managed-channel-list-modal__preview-note">${counts.total ? 'Ready to review. You will still choose the target before applying.' : 'No valid rules found yet. Use channel_id for channels and keyword for words or phrases.'}</div>
+                        ${renderManagedRuleListPreviewSheet(parsed)}
+                        <div class="managed-channel-list-modal__preview-note">${counts.total ? 'Ready to review. Confirming will apply only these rule values.' : 'No valid rules found yet. Use channel_id for channels and keyword for words or phrases.'}</div>
                     `;
                 } catch (error) {
                     previewEl.innerHTML = `
@@ -9087,13 +9144,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    async function importManagedRuleListToActiveProfileSurface(surface) {
-        const targetSurface = surface === 'kids' ? 'kids' : 'main';
+    function formatRuleListSurfaceLabel(surfaces) {
+        const items = [...new Set(safeArray(surfaces).map(surface => surface === 'kids' ? 'kids' : (surface === 'main' ? 'main' : '')).filter(Boolean))];
+        if (items.length > 1) return 'Main YouTube + YouTube Kids';
+        return items[0] === 'kids' ? 'YouTube Kids' : 'Main YouTube';
+    }
+
+    function getSettingsRuleListImportSurfaces() {
+        const selected = document.querySelector('input[name="ftRuleListImportTarget"]:checked');
+        const value = normalizeString(selected?.value).toLowerCase();
+        if (value === 'kids') return ['kids'];
+        if (value === 'both') return ['main', 'kids'];
+        return ['main'];
+    }
+
+    async function importManagedRuleListToActiveProfileSurfaces(surfaces) {
+        const targetSurfaces = [...new Set(safeArray(surfaces)
+            .map(surface => surface === 'kids' ? 'kids' : (surface === 'main' ? 'main' : ''))
+            .filter(Boolean))];
+        if (!targetSurfaces.length) targetSurfaces.push('main');
+        const surfaceLabel = formatRuleListSurfaceLabel(targetSurfaces);
         const managedProfileId = normalizeString(managedChildEdit?.profileId);
-        if (managedProfileId && isManagedChildEditFor(targetSurface)) {
+        if (managedProfileId && targetSurfaces.every(surface => isManagedChildEditFor(surface))) {
             await importManagedChannelListToProfiles([managedProfileId], {
-                surfaces: [targetSurface],
-                targetLabel: `${getProfileName(profilesV4Cache, managedProfileId)} ${targetSurface === 'kids' ? 'YouTube Kids' : 'Main YouTube'} rules`
+                surfaces: targetSurfaces,
+                targetLabel: `${getProfileName(profilesV4Cache, managedProfileId)} ${surfaceLabel} rules`
             });
             return;
         }
@@ -9120,7 +9195,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const importPayload = await showManagedChannelListImportModal({
             selectedCount: 1,
-            targetLabel: `${getProfileName(fresh, currentActive)} ${targetSurface === 'kids' ? 'YouTube Kids' : 'Main YouTube'} rules`
+            targetLabel: `${getProfileName(fresh, currentActive)} ${surfaceLabel} rules`
         });
         if (!importPayload) return;
 
@@ -9131,7 +9206,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        const surfaceLabel = targetSurface === 'kids' ? 'YouTube Kids' : 'Main YouTube';
         const confirmImport = await showChoiceModal({
             title: `Apply CSV to ${surfaceLabel}?`,
             message: `${formatManagedRuleListCount(parsedCounts)} found. Apply this list to ${getProfileName(fresh, currentActive)} on ${surfaceLabel}.`,
@@ -9151,25 +9225,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!okAdmin) return;
 
         const importedAt = Date.now();
-        const nextSurface = getProfileSurface(profile, targetSurface);
-        const result = applyManagedChannelListToSurface(nextSurface, targetSurface, parsed, {
-            listName: importPayload.name,
-            sourceLabel: importPayload.sourceLabel,
-            sourceUrl: importPayload.sourceUrl,
-            importedAt,
-            lastCheckedAt: importedAt,
-            contentHash: parsed.contentHash
-        });
+        let nextProfile = profile;
+        let changed = false;
+        let addedCount = 0;
+        let duplicateCount = 0;
+        for (const targetSurface of targetSurfaces) {
+            const nextSurface = getProfileSurface(nextProfile, targetSurface);
+            const result = applyManagedChannelListToSurface(nextSurface, targetSurface, parsed, {
+                listName: importPayload.name,
+                sourceLabel: importPayload.sourceLabel,
+                sourceUrl: importPayload.sourceUrl,
+                importedAt,
+                lastCheckedAt: importedAt,
+                contentHash: parsed.contentHash
+            });
+            duplicateCount += result.duplicateCount || 0;
+            if (!result.changed) continue;
+            nextProfile = setProfileSurface(nextProfile, targetSurface, nextSurface);
+            changed = true;
+            addedCount += result.addedCount || 0;
+        }
 
-        if (!result.changed) {
+        if (!changed) {
             UIComponents.showToast(
-                result.duplicateCount ? 'This profile already has that list' : 'No profile rules were changed',
+                duplicateCount ? 'This profile already has that list' : 'No profile rules were changed',
                 'info'
             );
             return;
         }
 
-        profiles[currentActive] = setProfileSurface(profile, targetSurface, nextSurface);
+        profiles[currentActive] = nextProfile;
         await io.saveProfilesV4({
             ...fresh,
             schemaVersion: 4,
@@ -9183,7 +9268,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderKidsChannels();
         renderKeywords();
         renderKidsKeywords();
-        UIComponents.showToast(`Imported ${result.addedCount || 0} ${pluralize(result.addedCount || 0, 'rule')} into ${surfaceLabel}`, 'success');
+        UIComponents.showToast(`Imported ${addedCount} ${pluralize(addedCount, 'rule')} into ${surfaceLabel}`, 'success');
     }
 
     async function removeManagedChannelListFromProfiles(profileIds) {
@@ -18784,8 +18869,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const kidsChannelInput = document.getElementById('kidsChannelInput');
     const kidsAddChannelBtn = document.getElementById('kidsAddChannelBtn');
-    const importKidsRuleListBtn = document.getElementById('importKidsRuleListBtn');
-    const downloadKidsRuleListTemplateBtn = document.getElementById('downloadKidsRuleListTemplateBtn');
     const kidsChannelListEl = document.getElementById('kidsChannelListEl');
     const kidsSearchChannels = document.getElementById('kidsSearchChannels');
     const kidsChannelSort = document.getElementById('kidsChannelSort');
@@ -19635,16 +19718,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    if (downloadMainRuleListTemplateBtn) {
-        downloadMainRuleListTemplateBtn.addEventListener('click', () => {
+    if (ftDownloadRuleListTemplateBtn) {
+        ftDownloadRuleListTemplateBtn.addEventListener('click', () => {
             downloadManagedRuleListCsvTemplate();
         });
     }
 
-    if (importMainRuleListBtn) {
-        importMainRuleListBtn.addEventListener('click', async () => {
+    if (ftImportRuleListBtn) {
+        ftImportRuleListBtn.addEventListener('click', async () => {
             if (isUiLocked()) return;
-            await importManagedRuleListToActiveProfileSurface('main');
+            await importManagedRuleListToActiveProfileSurfaces(getSettingsRuleListImportSurfaces());
+        });
+    }
+
+    if (ftRuleListFormatsBtn) {
+        ftRuleListFormatsBtn.addEventListener('click', async () => {
+            const action = await showChoiceModal({
+                title: 'Supported Rule List Formats',
+                message: 'Rule lists add channels and keywords only. Full FilterTube backup JSON still belongs under Choose JSON.',
+                details: [
+                    'CSV: channel_id,keyword,notes or type,value,notes.',
+                    'Text: one YouTube channel ID, handle, custom URL, or URL per line.',
+                    'JSON: channels and keywords arrays, or BlockTube filterData channel/title arrays.',
+                    'Public URLs: raw HTTPS CSV, text, or JSON files can be loaded into the preview.'
+                ],
+                choices: [
+                    { value: 'template', label: 'Download CSV Template', className: 'btn-primary' }
+                ],
+                cancelText: 'Close'
+            });
+            if (action === 'template') downloadManagedRuleListCsvTemplate();
         });
     }
 
@@ -19970,19 +20073,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (e.key === 'Enter' && kidsAddChannelBtn) {
                 kidsAddChannelBtn.click();
             }
-        });
-    }
-
-    if (downloadKidsRuleListTemplateBtn) {
-        downloadKidsRuleListTemplateBtn.addEventListener('click', () => {
-            downloadManagedRuleListCsvTemplate();
-        });
-    }
-
-    if (importKidsRuleListBtn) {
-        importKidsRuleListBtn.addEventListener('click', async () => {
-            if (isUiLocked()) return;
-            await importManagedRuleListToActiveProfileSurface('kids');
         });
     }
 

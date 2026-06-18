@@ -292,13 +292,31 @@ Avoid showing mailbox/LAN/provider wording inside the import flow. Import is loc
 
 ## 2026-06-18 UX Completion Note
 
-The first parser slice was not complete from a user-flow standpoint because CSV import was only reachable through protected-profile list actions and Help text. Release-ready CSV import needs a visible entry point where users manage rules.
+The first parser slice was not complete from a user-flow standpoint because CSV import was only reachable through protected-profile list actions and Help text. A second pass briefly placed separate import affordances inside Main Filters and YouTube Kids channel management, but that split the mental model: Filters/Kids pages are rule-editing surfaces, while external files and backup/list imports belong in Settings.
 
 Current completion rule:
 
-- Main YouTube: Filters -> Channel Management -> Import CSV.
-- YouTube Kids: Kids Mode -> Channel Management -> Import CSV.
-- Parent editing a protected profile: the same Main/Kids channel screens import into the protected profile being edited.
-- Ordinary parent/account profile: the same buttons import into the active profile surface.
-- The modal shows the CSV template, file/URL/paste inputs, live preview counts, skipped row counts, and the final Apply confirmation.
+- Primary entry point: Settings -> Import / Export -> Rule list imports.
+- Target choice: Main YouTube, YouTube Kids, or Both. This works for the active profile or the protected profile currently being edited by a parent/account profile.
+- Main/Kids rule pages remain the place to review, edit, pause, resume, and remove the imported rows after import.
+- The Settings card shows a sheet-like structure preview instead of dense prose: `type`, `value`, `notes`, plus supported CSV/JSON shapes.
+- The modal shows supported formats, CSV template, file/URL/paste inputs, live preview counts, skipped row counts, a spreadsheet-like parsed-row preview, and the final Apply confirmation.
+- Rule-list JSON is intentionally narrower than a full FilterTube backup JSON. It may add channels and keywords only; it does not change profile structure, PINs, trusted devices, viewing spaces, or sync targets.
 - Help text should stay short and point to the UI path; this audit file owns the detailed format contract.
+
+Supported source shapes in this slice:
+
+- CSV: `channel_id,keyword,notes`, `channel,keyword,notes`, or typed rows such as `type,value,notes`.
+- Text: one YouTube channel ID, handle, custom URL, or URL per line. Text stays channel-only for safety.
+- Simple JSON: `channels` and/or `keywords` arrays.
+- BlockTube-style JSON: `filterData.channelId`, `filterData.channelName`, and `filterData.title` arrays are read as rule-list channels/keywords.
+- Raw HTTPS source URL: public CSV, text, or JSON fetched into the same preview before apply.
+
+Not shipped in this CSV PR:
+
+- Built-in global/public list catalog.
+- Automatic subscriptions to third-party lists.
+- Parent/community moderation workflow for shared "good" or "bad" channel lists.
+- Silent application across profiles or devices.
+
+Those are compatible with this foundation, but they need a separate catalog and governance design: source URL, maintainer, scope, last checked, content hash, update policy, enable/disable state, user review, and per-profile Main/Kids target selection.

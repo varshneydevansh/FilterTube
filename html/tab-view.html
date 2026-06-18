@@ -460,10 +460,10 @@
                                                 <div class="help-item-body import-export-row">
                                                     <div class="import-export-text">
                                                         <span class="import-export-summary">
-                                                            Merge a saved FilterTube export or compatible JSON.</br>
+                                                            Merge a full FilterTube backup or compatible backup JSON.<br />
                                                         </span>
                                                         <span class="import-export-hint">
-                                                            Existing entries stay put; matching channels/keywords are merged
+                                                            Use this for complete settings restore. For channel/keyword lists, use Rule list imports below.
                                                         </span>
                                                         <span class="info-hint" title="Bring in data from FilterTube backups, BlockTube exports, or other structured JSON tools. Matching channels/keywords are merged; everything else is appended.">
                                                             Details
@@ -476,6 +476,73 @@
                                                         </button>
                                                         <button id="ftImportSyncDeviceBtn" class="btn-secondary" type="button" title="Open Accounts &amp; Sync for QR/code device-to-device setup">
                                                             Sync from other device
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="help-item import-export-rule-list">
+                                                <div class="help-item-title">Rule list imports</div>
+                                                <div class="help-item-body import-export-row">
+                                                    <div class="import-export-text">
+                                                        <span class="import-export-summary">
+                                                            Import channel and keyword lists into the current profile.<br />
+                                                        </span>
+                                                        <span class="import-export-hint">
+                                                            Use CSV, text, raw HTTPS lists, or rule-list JSON. FilterTube previews parsed rows before anything changes.
+                                                        </span>
+                                                        <div class="rule-list-sheet-example" aria-label="Supported rule list structure preview">
+                                                            <div class="rule-list-sheet-example__bar">
+                                                                <span>Supported list structure</span>
+                                                                <code>.csv .txt .json</code>
+                                                            </div>
+                                                            <div class="rule-list-sheet-example__grid" role="table" aria-label="Example rule list columns">
+                                                                <div class="rule-list-sheet-example__row rule-list-sheet-example__row--head" role="row">
+                                                                    <span role="columnheader">type</span>
+                                                                    <span role="columnheader">value</span>
+                                                                    <span role="columnheader">notes</span>
+                                                                </div>
+                                                                <div class="rule-list-sheet-example__row" role="row">
+                                                                    <span role="cell">channel</span>
+                                                                    <span role="cell">@SomeChannel</span>
+                                                                    <span role="cell">handle, ID, or URL</span>
+                                                                </div>
+                                                                <div class="rule-list-sheet-example__row" role="row">
+                                                                    <span role="cell">keyword</span>
+                                                                    <span role="cell">brainrot</span>
+                                                                    <span role="cell">word or phrase</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="rule-list-sheet-example__formats">
+                                                                <span>CSV headers: <code>channel_id,keyword,notes</code></span>
+                                                                <span>JSON: <code>channels</code> + <code>keywords</code></span>
+                                                                <span>BlockTube JSON: <code>filterData</code></span>
+                                                            </div>
+                                                        </div>
+                                                        <fieldset class="rule-list-target-picker" aria-label="Where to apply imported rule list">
+                                                            <legend>Apply imported rules to</legend>
+                                                            <label>
+                                                                <input type="radio" name="ftRuleListImportTarget" value="main" checked />
+                                                                <span>Main YouTube</span>
+                                                            </label>
+                                                            <label>
+                                                                <input type="radio" name="ftRuleListImportTarget" value="kids" />
+                                                                <span>YouTube Kids</span>
+                                                            </label>
+                                                            <label>
+                                                                <input type="radio" name="ftRuleListImportTarget" value="both" />
+                                                                <span>Both</span>
+                                                            </label>
+                                                        </fieldset>
+                                                    </div>
+                                                    <div class="import-export-actions">
+                                                        <button id="ftImportRuleListBtn" class="btn-primary" type="button" title="Preview and import a channel/keyword rule list into Main, Kids, or both for the current profile.">
+                                                            Import Rule List
+                                                        </button>
+                                                        <button id="ftDownloadRuleListTemplateBtn" class="btn-secondary" type="button" title="Download the safe CSV template for spreadsheet editing.">
+                                                            Download CSV Template
+                                                        </button>
+                                                        <button id="ftRuleListFormatsBtn" class="btn-secondary" type="button" title="Show supported rule-list input formats.">
+                                                            Supported Formats
                                                         </button>
                                                     </div>
                                                 </div>
@@ -1049,7 +1116,7 @@
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Rule list imports</div>
-                                            <div class="help-item-body">Open Filters &gt; Channel Management and choose <b>Import CSV</b>. The simple CSV shape is <code>channel_id,keyword,notes</code>. FilterTube previews valid channels, valid keywords, and skipped rows before anything is applied.</div>
+                                            <div class="help-item-body">Open Settings &gt; Import / Export &gt; Rule list imports. Choose Main YouTube, YouTube Kids, or Both, then preview a CSV, text, raw HTTPS list, or rule-list JSON before applying it. Imported rows are then reviewed and edited from the normal Main/Kids rule pages.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Filter All Content (per-channel)</div>
@@ -1476,7 +1543,7 @@
                                         <div class="help-item">
                                             <div class="help-item-title">Import a rule list for protected profiles</div>
                                             <div class="help-item-body">
-                                                From the parent/account profile, open a child row and choose <b>Edit Rules</b>. In Main or Kids Channel Management, choose <b>Import CSV</b>. The CSV only adds rules; it cannot change PINs, trusted devices, viewing spaces, or sync targets. After import, use the protected profile row to send the updated policy to a verified device.
+                                                From the parent/account profile, open a child row and choose <b>Edit Rules</b>. Then use Settings &gt; Import / Export &gt; Rule list imports and choose Main, Kids, or Both. Imported files only add channel/keyword rules; they cannot change PINs, trusted devices, viewing spaces, or sync targets. After import, use the protected profile row to send the updated policy to a verified device.
                                             </div>
                                         </div>
                                         <div class="help-item">
