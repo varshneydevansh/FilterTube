@@ -937,18 +937,25 @@
         }
 
         if (shouldShowProviderPrompt) {
-            const providerPrompt = document.createElement('div');
+            const providerPrompt = document.createElement('details');
             providerPrompt.className = 'ft-managed-command-center__provider-prompt';
             providerPrompt.title = 'Most parents can skip this. Use only when Send Now is not enough.';
+            const providerSummary = document.createElement('summary');
+            providerSummary.className = 'ft-managed-command-center__provider-summary';
             const promptCopy = document.createElement('div');
             promptCopy.className = 'ft-managed-command-center__provider-copy';
             const promptTitle = document.createElement('strong');
-            promptTitle.textContent = 'Need updates when devices are not open together?';
+            promptTitle.textContent = 'Advanced delivery';
             const promptDetail = document.createElement('span');
-            promptDetail.textContent = 'Send Now is the normal path. Pick Up Later and Home Bridge are optional setup paths for advanced family or care setups.';
+            promptDetail.textContent = 'Use this only if Send Now is not enough for this family or care setup.';
             promptCopy.append(promptTitle, promptDetail);
+            providerSummary.appendChild(promptCopy);
             const promptActions = document.createElement('div');
             promptActions.className = 'ft-managed-command-center__provider-prompt-actions';
+            const promptBody = document.createElement('div');
+            promptBody.className = 'ft-managed-command-center__provider-prompt-body';
+            const promptBodyText = document.createElement('span');
+            promptBodyText.textContent = 'Send Now is the normal path. Pick Up Later lets a protected device collect waiting updates when it opens. Home Bridge is for a trusted FilterTube bridge you run on your network.';
             [
                 {
                     label: 'Set Up Pick Up Later',
@@ -979,7 +986,8 @@
                 });
                 promptActions.appendChild(button);
             });
-            providerPrompt.append(promptCopy, promptActions);
+            promptBody.append(promptBodyText, promptActions);
+            providerPrompt.append(providerSummary, promptBody);
             panel.appendChild(providerPrompt);
         }
 

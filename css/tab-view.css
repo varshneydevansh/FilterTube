@@ -688,15 +688,59 @@ html[data-theme="dark"] body::after {
 
 .ft-managed-command-center__provider-prompt {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 10px;
-    align-items: center;
-    padding: 10px;
     border: 1px dashed color-mix(in srgb, var(--ft-color-brand-primary) 32%, var(--ft-color-sem-neutral-border));
     border-radius: 8px;
     background:
         linear-gradient(180deg, rgba(255, 249, 241, 0.72), rgba(255, 255, 255, 0.76)),
         var(--ft-color-bg-panel);
+    overflow: hidden;
+}
+
+.ft-managed-command-center__provider-summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+    min-height: 54px;
+    padding: 10px;
+    cursor: pointer;
+    list-style: none;
+}
+
+.ft-managed-command-center__provider-summary::-webkit-details-marker {
+    display: none;
+}
+
+.ft-managed-command-center__provider-summary::after {
+    content: "+";
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid color-mix(in srgb, var(--ft-color-brand-primary) 28%, var(--ft-color-sem-neutral-border));
+    border-radius: 999px;
+    color: var(--ft-color-brand-primary);
+    font-size: 14px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.ft-managed-command-center__provider-prompt[open] .ft-managed-command-center__provider-summary::after {
+    content: "-";
+}
+
+.ft-managed-command-center__provider-prompt-body {
+    display: grid;
+    gap: 10px;
+    padding: 0 10px 10px;
+}
+
+.ft-managed-command-center__provider-prompt-body > span {
+    color: var(--ft-color-text-secondary);
+    font-size: 12px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
 }
 
 .ft-managed-command-center__provider-prompt-actions {
