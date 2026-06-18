@@ -10,7 +10,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_CONTENT_BRIDGE_COLLABORATOR_IDENTITY_PROMOTION_HANDOFF_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d']
+  'js/content_bridge.js': [13641, 604583, '7af23f4ee2b07ef24f3e0a2459ef2f4a7237df661f7c8163067800f2913265d1']
 };
 
 const blockSpecs = {
@@ -63,7 +63,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: '        // PRIORITY: Check for collaboration videos (Search attributed-channel-name, Home metadata rows, Avatar stack)',
     end: '        // Method 2: Check for data attributes (added by FilterTube',
-    startLine: 9980,
+    startLine: 9985,
     lines: 32,
     bytes: 1622,
     hash: '8e2087627598bda37bb8814981dd27df4a44f9970fd0165a8829d390ecfcbfe4'
@@ -72,7 +72,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: '        // Method 5: Homepage Lockup / Modern Metadata fallback',
     end: '                const avatarImg = lockupMetadata.querySelector',
-    startLine: 10447,
+    startLine: 10452,
     lines: 24,
     bytes: 1290,
     hash: '163574a088d8e8bd725e9b668974e39da9e85d17a578dbb834bd6d451a8d0bae'

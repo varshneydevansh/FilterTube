@@ -12,7 +12,7 @@ The paired verifier is `tests/runtime/content-bridge-collaborator-identity-promo
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
+| `js/content_bridge.js` | 13,641 | 604,583 | `7af23f4ee2b07ef24f3e0a2459ef2f4a7237df661f7c8163067800f2913265d1` |
 
 ## Pinned Blocks
 
@@ -23,8 +23,8 @@ The paired verifier is `tests/runtime/content-bridge-collaborator-identity-promo
 | Collaboration DOM signal classifier | `js/content_bridge.js:4944` through `js/content_bridge.js:5063` | 120 | 5285 | `9a17597d1f08ebb5c4e4ed9bdd74dcdae28dd00135e3151e0e6575f682aca32a` | Detects avatar stack, attributed collaborator markup, byline, distinct channel-link signals, and the ampersand Topic guard helpers plus the writer-side rejection helper. |
 | Collaborator channel-info normalization | `js/content_bridge.js:5064` through `js/content_bridge.js:5217` | 154 | 6370 | `a1b488fd8228fa830e2914f872e3911cb9b8b6e092a7201540867e6b31cf94d0` | Chooses card, resolved-cache, and avatar-stack collaborator rosters; demotes literal ampersand Topic name-only stale state; can write collaborator cache attrs and expected count. |
 | Generic collaborator signal promotion | `js/content_bridge.js:5218` through `js/content_bridge.js:5303` | 86 | 3081 | `55ff41d06a422df35dd5c241198978dbd19df3428f0969e06193860652a8a31d` | Calls collaborator extraction for ordinary cards, compares with resolved cache through the guard, and returns collaboration-shaped channel info. |
-| `extractChannelFromCard()` collaboration priority handoff | `js/content_bridge.js:9980` through `js/content_bridge.js:10011` | 32 | 1622 | `8e2087627598bda37bb8814981dd27df4a44f9970fd0165a8829d390ecfcbfe4` | Runs collaborator extraction before data-attribute channel identity and returns a collaboration channel-info object when signals pass. |
-| `extractChannelFromCard()` lockup collaboration handoff | `js/content_bridge.js:10447` through `js/content_bridge.js:10470` | 24 | 1290 | `163574a088d8e8bd725e9b668974e39da9e85d17a578dbb834bd6d451a8d0bae` | Runs collaborator extraction inside modern lockup fallback before avatar/link channel extraction. |
+| `extractChannelFromCard()` collaboration priority handoff | `js/content_bridge.js:9985` through `js/content_bridge.js:10016` | 32 | 1622 | `8e2087627598bda37bb8814981dd27df4a44f9970fd0165a8829d390ecfcbfe4` | Runs collaborator extraction before data-attribute channel identity and returns a collaboration channel-info object when signals pass. |
+| `extractChannelFromCard()` lockup collaboration handoff | `js/content_bridge.js:10452` through `js/content_bridge.js:10475` | 24 | 1290 | `163574a088d8e8bd725e9b668974e39da9e85d17a578dbb834bd6d451a8d0bae` | Runs collaborator extraction inside modern lockup fallback before avatar/link channel extraction. |
 
 ## Selected Token Counts
 
