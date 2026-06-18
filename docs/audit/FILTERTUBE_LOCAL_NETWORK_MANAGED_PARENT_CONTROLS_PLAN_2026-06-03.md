@@ -1324,7 +1324,10 @@ contract before wiring more native app runtime behavior.
   rows stay aligned before a native runtime sync/release handoff. The latest
   parent-facing delivery contract and runtime mirror were synced into the
   sibling app repo in `/Users/devanshvarshney/FilterTubeApp` commit
-  `cb8e1516 Sync managed delivery runtime from extension`. Product runtime
+  `cb8e1516 Sync managed delivery runtime from extension`; the managed list UI
+  contract was synced in `2994f91a Sync managed list UI contract from
+  extension`, and the final synced app-contract status mirror is
+  `01b7e695 Mirror synced managed list contract status`. Product runtime
   behavior is unchanged; installed Android/iOS smoke and iOS enforcement remain
   pending. The configured HTTPS mailbox helper is now declared in the
   extension-owned app policy contract so downstream app sync has an explicit

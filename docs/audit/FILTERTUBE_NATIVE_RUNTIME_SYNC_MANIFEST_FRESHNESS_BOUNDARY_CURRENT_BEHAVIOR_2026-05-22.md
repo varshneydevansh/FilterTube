@@ -24,8 +24,8 @@ changes.
 ## Current Manifest And Copy Facts
 
 ```text
-public repo HEAD: 505c7b7cd1c8147c8b16f87486252ef67938bdb6
-app repo HEAD: cb8e1516d1287c0721ca7c58358bfc22620d75e6
+public repo HEAD: 51f07881d1ac80cd655d350e530f6e5d019a1868
+app repo HEAD: 01b7e695fb0a83cb51e080931deea5040b117c22
 app dirty state authority: not pinned by this contract-copy slice
 app dirty paths: out-of-scope native app changes may exist and are not release freshness proof
 runtime sync manifest entries: 34
