@@ -13461,9 +13461,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
         }
         const transports = [
-            liveReady ? 'live' : '',
-            localReady ? 'LAN' : '',
-            mailboxReady ? 'mailbox' : ''
+            liveReady ? 'Send Now' : '',
+            localReady ? 'Home Bridge' : '',
+            mailboxReady ? 'Pick Up Later' : ''
         ].filter(Boolean).join(' + ');
         return {
             label: transports
