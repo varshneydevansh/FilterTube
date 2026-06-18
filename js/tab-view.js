@@ -7170,6 +7170,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         return !!(row && typeof row === 'object' && row.managedListPaused === true);
     }
 
+    function normalizeManagedChannelListMetadataValue(value, maxLength = 160) {
+        const normalized = normalizeString(value).replace(/\s+/g, ' ');
+        return normalized ? normalized.slice(0, maxLength) : '';
+    }
+
+    function parseManagedChannelListSourceMetadata(rawText) {
+        const result = {};
+        normalizeString(rawText).split(/\r?\n/).slice(0, 120).forEach((line) => {
+            const trimmed = normalizeString(line);
+            if (!trimmed || !/^(#|!|\/\/)/.test(trimmed)) return;
+            const body = normalizeString(trimmed.replace(/^(#|!|\/\/)+\s*/, ''));
+            const match = body.match(/^([A-Za-z][A-Za-z -]{1,32})\s*:\s*(.+)$/);
+            if (!match) return;
+            const key = match[1].toLowerCase().replace(/[^a-z]/g, '');
+            const value = normalizeManagedChannelListMetadataValue(match[2]);
+            if (!value) return;
+            if (key === 'title' && !result.title) result.title = value;
+            if (key === 'description' && !result.description) result.description = value;
+            if ((key === 'homepage' || key === 'home') && !result.homepage) result.homepage = value;
+            if (key === 'license' && !result.license) result.license = value;
+            if ((key === 'version' || key === 'revision') && !result.sourceVersion) result.sourceVersion = value;
+            if ((key === 'lastmodified' || key === 'updated' || key === 'lastupdated') && !result.sourceUpdatedLabel) {
+                result.sourceUpdatedLabel = value;
+            }
+        });
+        return result;
+    }
+
     function parseManagedChannelListText(rawText, { listName = '' } = {}) {
         const text = normalizeString(rawText);
         const listId = buildManagedChannelListId(listName || 'Imported list', text);
@@ -7203,6 +7231,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return {
             listId,
             contentHash: buildManagedChannelListContentHash(text),
+            sourceMetadata: parseManagedChannelListSourceMetadata(text),
             channels,
             skippedCount,
             totalLineCount: lines.filter(line => normalizeString(line)).length
@@ -7465,6 +7494,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const seen = new Set(existing.map(managedChannelEntryKey).filter(Boolean));
         const toAdd = [];
         let duplicateCount = 0;
+        const sourceMetadata = {
+            ...safeObject(parsed?.sourceMetadata),
+            ...safeObject(metadata.sourceMetadata)
+        };
         safeArray(parsed?.channels).forEach((channel) => {
             const key = managedChannelEntryKey(channel);
             if (!key || seen.has(key)) {
@@ -7482,6 +7515,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 managedListImportedAt: metadata.importedAt || Date.now(),
                 managedListLastCheckedAt: metadata.lastCheckedAt || metadata.importedAt || Date.now(),
                 managedListContentHash: normalizeString(metadata.contentHash || parsed?.contentHash),
+                ...(normalizeString(sourceMetadata.title) ? { managedListSourceTitle: normalizeManagedChannelListMetadataValue(sourceMetadata.title) } : {}),
+                ...(normalizeString(sourceMetadata.sourceVersion) ? { managedListSourceVersion: normalizeManagedChannelListMetadataValue(sourceMetadata.sourceVersion) } : {}),
+                ...(normalizeString(sourceMetadata.sourceUpdatedLabel) ? { managedListSourceUpdatedLabel: normalizeManagedChannelListMetadataValue(sourceMetadata.sourceUpdatedLabel) } : {}),
+                ...(normalizeString(sourceMetadata.homepage) ? { managedListSourceHomepage: normalizeManagedChannelListMetadataValue(sourceMetadata.homepage, 240) } : {}),
                 ...(metadata.paused === true ? { managedListPaused: true } : {}),
                 addedAt: metadata.importedAt || Date.now()
             });
@@ -7515,6 +7552,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                         sourceLabel: normalizeString(row?.managedListSourceLabel) || 'Imported list',
                         sourceUrl: normalizeManagedChannelListSourceUrl(row?.managedListSourceUrl),
                         contentHash: normalizeString(row?.managedListContentHash),
+                        sourceTitle: normalizeString(row?.managedListSourceTitle),
+                        sourceVersion: normalizeString(row?.managedListSourceVersion),
+                        sourceUpdatedLabel: normalizeString(row?.managedListSourceUpdatedLabel),
+                        sourceHomepage: normalizeString(row?.managedListSourceHomepage),
                         lastCheckedAt: 0,
                         profileIds: new Set(),
                         surfaces: new Set(),
@@ -7530,6 +7571,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (!current.contentHash && normalizeString(row?.managedListContentHash)) {
                         current.contentHash = normalizeString(row.managedListContentHash);
                     }
+                    if (!current.sourceTitle && normalizeString(row?.managedListSourceTitle)) current.sourceTitle = normalizeString(row.managedListSourceTitle);
+                    if (!current.sourceVersion && normalizeString(row?.managedListSourceVersion)) current.sourceVersion = normalizeString(row.managedListSourceVersion);
+                    if (!current.sourceUpdatedLabel && normalizeString(row?.managedListSourceUpdatedLabel)) current.sourceUpdatedLabel = normalizeString(row.managedListSourceUpdatedLabel);
+                    if (!current.sourceHomepage && normalizeString(row?.managedListSourceHomepage)) current.sourceHomepage = normalizeString(row.managedListSourceHomepage);
                     if (isManagedChannelListRowPaused(row)) {
                         current.pausedChannelCount += 1;
                     } else {
@@ -7545,6 +7590,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             sourceLabel: item.sourceLabel,
             sourceUrl: item.sourceUrl,
             contentHash: item.contentHash,
+            sourceTitle: item.sourceTitle,
+            sourceVersion: item.sourceVersion,
+            sourceUpdatedLabel: item.sourceUpdatedLabel,
+            sourceHomepage: item.sourceHomepage,
             lastCheckedAt: item.lastCheckedAt,
             profileIds: Array.from(item.profileIds).filter(Boolean),
             surfaces: Array.from(item.surfaces).filter(Boolean),
@@ -7567,6 +7616,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     sourceLabel: summary.sourceLabel,
                     sourceUrl: summary.sourceUrl,
                     contentHash: summary.contentHash,
+                    sourceTitle: summary.sourceTitle,
+                    sourceVersion: summary.sourceVersion,
+                    sourceUpdatedLabel: summary.sourceUpdatedLabel,
+                    sourceHomepage: summary.sourceHomepage,
                     lastCheckedAt: Number(summary.lastCheckedAt) || 0,
                     profileIds: new Set(),
                     surfaces: new Set(),
@@ -7581,6 +7634,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 current.pausedChannelCount += Number(summary.pausedChannelCount) || 0;
                 current.lastCheckedAt = Math.max(current.lastCheckedAt || 0, Number(summary.lastCheckedAt) || 0);
                 if (!current.contentHash && normalizeString(summary.contentHash)) current.contentHash = normalizeString(summary.contentHash);
+                if (!current.sourceTitle && normalizeString(summary.sourceTitle)) current.sourceTitle = normalizeString(summary.sourceTitle);
+                if (!current.sourceVersion && normalizeString(summary.sourceVersion)) current.sourceVersion = normalizeString(summary.sourceVersion);
+                if (!current.sourceUpdatedLabel && normalizeString(summary.sourceUpdatedLabel)) current.sourceUpdatedLabel = normalizeString(summary.sourceUpdatedLabel);
+                if (!current.sourceHomepage && normalizeString(summary.sourceHomepage)) current.sourceHomepage = normalizeString(summary.sourceHomepage);
                 merged.set(key, current);
             });
         });
@@ -7591,6 +7648,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 sourceLabel: item.sourceLabel,
                 sourceUrl: item.sourceUrl,
                 contentHash: item.contentHash,
+                sourceTitle: item.sourceTitle,
+                sourceVersion: item.sourceVersion,
+                sourceUpdatedLabel: item.sourceUpdatedLabel,
+                sourceHomepage: item.sourceHomepage,
                 lastCheckedAt: item.lastCheckedAt,
                 profileIds: Array.from(item.profileIds).filter(Boolean),
                 surfaces: Array.from(item.surfaces).filter(Boolean),
@@ -7627,6 +7688,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!normalized) return '';
         const token = normalized.includes(':') ? normalized.split(':').pop() : normalized;
         return token ? `hash ${token.slice(0, 8)}` : '';
+    }
+
+    function formatManagedChannelListSourceVersion(summary) {
+        const version = normalizeString(summary?.sourceVersion);
+        if (version) return `version ${version}`;
+        const updated = normalizeString(summary?.sourceUpdatedLabel);
+        return updated ? `updated ${updated}` : '';
     }
 
     async function showManagedChannelListLibraryModal(summaries) {
@@ -7682,8 +7750,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 source.className = 'managed-channel-list-modal__library-source';
                 const sourceBits = [
                     normalizeString(summary.sourceLabel) || 'Imported list',
+                    normalizeString(summary.sourceTitle),
                     isManagedChannelListSummaryUrlBacked(summary) ? 'URL-backed' : 'Local/pasted',
                     formatManagedChannelListCheckedAt(summary.lastCheckedAt),
+                    formatManagedChannelListSourceVersion(summary),
                     isManagedChannelListSummaryStale(summary) ? 'needs refresh' : '',
                     formatManagedChannelListShortHash(summary.contentHash)
                 ];

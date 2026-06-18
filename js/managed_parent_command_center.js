@@ -191,6 +191,9 @@
                     sourceUrlCount: 0,
                     lastCheckedAt: 0,
                     contentHash: '',
+                    sourceVersion: '',
+                    sourceUpdatedLabel: '',
+                    sourceTitle: '',
                     surfaces: new Set()
                 };
                 existing.rowCount += 1;
@@ -206,6 +209,15 @@
                 if (checkedAt > existing.lastCheckedAt) existing.lastCheckedAt = checkedAt;
                 if (!existing.contentHash && typeof item.managedListContentHash === 'string' && item.managedListContentHash.trim()) {
                     existing.contentHash = item.managedListContentHash.trim();
+                }
+                if (!existing.sourceVersion && typeof item.managedListSourceVersion === 'string' && item.managedListSourceVersion.trim()) {
+                    existing.sourceVersion = item.managedListSourceVersion.trim();
+                }
+                if (!existing.sourceUpdatedLabel && typeof item.managedListSourceUpdatedLabel === 'string' && item.managedListSourceUpdatedLabel.trim()) {
+                    existing.sourceUpdatedLabel = item.managedListSourceUpdatedLabel.trim();
+                }
+                if (!existing.sourceTitle && typeof item.managedListSourceTitle === 'string' && item.managedListSourceTitle.trim()) {
+                    existing.sourceTitle = item.managedListSourceTitle.trim();
                 }
                 if (surfaceLabel) existing.surfaces.add(surfaceLabel);
                 lists.set(listId, existing);
@@ -227,6 +239,9 @@
             sourceUrlCount: item.sourceUrlCount,
             lastCheckedAt: item.lastCheckedAt,
             contentHash: item.contentHash,
+            sourceVersion: item.sourceVersion,
+            sourceUpdatedLabel: item.sourceUpdatedLabel,
+            sourceTitle: item.sourceTitle,
             surfaces: Array.from(item.surfaces),
             urlBacked: item.sourceUrlCount > 0,
             stale: item.sourceUrlCount > 0
@@ -274,9 +289,18 @@
         const more = listCount > names.length ? ` +${listCount - names.length} more` : '';
         const latestChecked = summary.items.reduce((latest, item) => Math.max(latest, Number(item?.lastCheckedAt) || 0), 0);
         const checked = latestChecked ? `, checked ${new Date(latestChecked).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}` : '';
+        const sourceVersion = summary.items
+            .map((item) => {
+                const version = typeof item?.sourceVersion === 'string' ? item.sourceVersion.trim() : '';
+                if (version) return `version ${version}`;
+                const updated = typeof item?.sourceUpdatedLabel === 'string' ? item.sourceUpdatedLabel.trim() : '';
+                return updated ? `updated ${updated}` : '';
+            })
+            .find(Boolean);
+        const version = sourceVersion ? `, ${sourceVersion}` : '';
         const staleListCount = normalizeCommandCenterNumber(summary.staleListCount);
         const stale = staleListCount ? `, ${staleListCount} need refresh` : '';
-        return names.length ? `${names.join(', ')}${more}${checked}${stale}` : `${listCount} imported ${listCount === 1 ? 'list' : 'lists'}${checked}${stale}`;
+        return names.length ? `${names.join(', ')}${more}${checked}${version}${stale}` : `${listCount} imported ${listCount === 1 ? 'list' : 'lists'}${checked}${version}${stale}`;
     }
 
     function resolveManagedCommandCenterSyncState(item = {}) {

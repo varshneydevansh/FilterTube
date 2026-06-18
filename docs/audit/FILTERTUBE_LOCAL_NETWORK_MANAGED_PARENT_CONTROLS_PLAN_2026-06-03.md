@@ -156,6 +156,12 @@ extension authority code.
     days now show a parent-facing needs-refresh status in the command center
     and list library. Parents can refresh only stale URL-backed lists in one
     approved pass; this is not a background scheduler.
+  - [x] First external-list compatibility slice: Issue 62 style lists such as
+    AiSList plain-text channel lists are treated as trusted parent-selected
+    rule sources. Comment metadata like title, version, and last-modified labels
+    is preserved as compact display metadata so parents can see which upstream
+    list revision they imported or refreshed, while the URL/list still has no
+    policy authority by itself.
   - [ ] Scheduled subscription refresh remains a future slice.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
@@ -192,6 +198,14 @@ because parents can choose a list once, enable or disable it per protected
 profile, and then push the resulting policy to verified child/protected
 devices.
 
+This is now explicitly part of the goal/plan. The parent-facing feature name is
+`Lists` or `Trusted Lists`, not a network or provider term. The first supported
+shape is plain text with one YouTube channel identifier per line and optional
+comment metadata. External community lists, including AI-generated-content
+channel lists, are useful inputs, but FilterTube must always preview and
+materialize the accepted channels into local profile policy before they affect a
+protected profile.
+
 This should not feel like a network-provider setup screen. For parents, the
 mental model is a small rule library:
 
@@ -221,6 +235,7 @@ apps should follow.
 | Password/PIN protected admin mode | The protected end user cannot change managed rules or disable controls. | Child PIN never becomes admin authority; parent/account PIN gates writes. |
 | Remote video, keyword, and channel rules | Parent can block specific videos, keywords, and channels just like local app controls. | All remote writes must reuse the same validated rule mutation paths as local writes. |
 | Managed channel filter lists | Parent/caregiver can import or subscribe to channel lists, enable/disable each list, and apply selected lists to protected profiles instead of adding channels one at a time. | A URL or list file is data, not authority. Imports need preview, source label, revision/hash, per-profile enablement, parent/admin approval, and the same validated channel-rule mutation path. |
+| List source metadata | Parent/caregiver can see compact upstream title/version/last-modified metadata when a list provides it. | Metadata is display/audit context only. It cannot grant authority, change target profiles, hide rule contents from admin history, or bypass preview/re-auth. |
 | Action history/logs | Parent/caregiver can see what changed, when, and from which trusted device. | Logs must not leak sensitive plaintext unnecessarily and must not become the policy authority. |
 | Offline safety | Child device keeps the last valid parent policy when the parent device is not reachable. | Stale, replayed, revoked, mismatched, or downgraded policy revisions are rejected. |
 | Future app parity | Mobile/tablet apps consume the same policy model as the extension. | Extension and apps must not fork authority semantics. |
