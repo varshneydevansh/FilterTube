@@ -12,10 +12,10 @@ both as transport inputs. The shared contract now separates parent-facing
 delivery labels (`Send Now`, `Pick Up Later`, `Home Bridge`) from technical
 transport identifiers so apps and future bridge software can stay simple
 without weakening local signature/target/revision validation. The app sync
-manifest/runtime copy previously included the parent delivery contract, and this
-extension contract revision now needs a follow-up native runtime sync before app
-byte parity can be claimed. Installed iOS parity remains pending. The managed
-list contract now also pins the downstream app UI
+manifest/runtime copy now includes the parent delivery and managed list UI
+contract revision, so extension/app contract byte parity is current for the
+manifest-owned artifact and mirrored helper sources. Installed iOS parity
+remains pending. The managed list contract now also pins the downstream app UI
 shape for Main/Kids/Both apply targets, manual/imported-list source filters,
 row badges, saved-list summaries, and protected-user boundaries so mobile/tablet
 surfaces do not fork the parent mental model from the extension.
@@ -51,7 +51,7 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
   "generated": "2026-06-18",
   "owner": "extension_upstream_policy_contract",
   "runtimeBehaviorChanged": false,
-  "appSyncStatus": "extension_contract_updated_native_sync_pending",
+  "appSyncStatus": "app_manifest_contract_helpers_parent_delivery_and_list_ui_synced_ios_pending",
   "artifact": {
     "sourcePath": "docs/audit/artifacts/managed-app-policy-contract-v1.json",
     "appDestination": "packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json",
@@ -559,12 +559,13 @@ apps can mirror the Pick Up Later helper, and
 `js/nanah_managed_local_network_client.js` so apps can mirror the Home Bridge
 helper. This verifier is a pre-release guard; it does not write into the app
 repo.
-The sibling app repo previously ran native runtime sync for the parent-delivery
-contract revision, and the generated app-side output is committed as
+The sibling app repo ran native runtime sync for the parent-delivery
+contract revision, and the generated app-side output was committed as
 `/Users/devanshvarshney/FilterTubeApp` commit `cb8e1516 Sync managed delivery
-runtime from extension`. This newer managed list UI contract revision is marked
-`extension_contract_updated_native_sync_pending` until the native runtime sync is
-run again. The same manifest copies the extension-owned managed
+runtime from extension`. The newer managed list UI contract revision has also
+been synced and committed as `/Users/devanshvarshney/FilterTubeApp` commit
+`2994f91a Sync managed list UI contract from extension`. The same manifest
+copies the extension-owned managed
 Nanah signed-send, pull-on-open, Pick Up Later, and Home Bridge helper sources
 into `packages/extension-source/upstream/js/` so the downstream app repo can
 track the exact helper contracts without treating them as native runtime
