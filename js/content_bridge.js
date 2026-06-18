@@ -6435,6 +6435,12 @@ async function initializeDOMFallback(settings) {
                 if (tagName === 'script' || tagName === 'style' || tagName === 'link' || tagName === 'svg' || tagName === 'path') {
                     return false;
                 }
+                const path = document.location?.pathname || '';
+                const shouldObserveChipFilters = path === '/' || path === '/results';
+                if (shouldObserveChipFilters) {
+                    if (node.matches?.('yt-chip-cloud-chip-renderer, ytm-chip-cloud-chip-renderer')) return true;
+                    if (node.querySelector?.('yt-chip-cloud-chip-renderer, ytm-chip-cloud-chip-renderer')) return true;
+                }
                 if (node.matches?.(fallbackRelevantContentSelector)) return true;
                 if (node.querySelector?.(fallbackRelevantContentSelector)) return true;
                 if (

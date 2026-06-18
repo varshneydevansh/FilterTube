@@ -169,7 +169,23 @@ function isTopicChannel(channel) {
 | `<yt-collection-thumbnail-view-model>` / `<yt-collections-stack>` | Visual mix thumbnail stack | ℹ️ Visual only; no keyword-bearing text | No filtering required unless we hide thumbnails later |
 | `<yt-thumbnail-view-model>` | Thumbnail container | ℹ️ Covered indirectly when we hide filtered cards |
 | `<yt-thumbnail-overlay-badge-view-model>` (Mix badge) | Badge text like “Mix” | ⚠️ Not parsed; consider adding to keyword scan if badges become relevant |
-| `yt-chip-cloud-chip-renderer` (filter chips) | DOM-only | ✅ Mixes chip hidden when `hideMixPlaylists` is enabled |
+| `yt-chip-cloud-chip-renderer` (Home/Search filter chips) | DOM-only | ✅ Route-scoped | Mixes/topic chip hiding is intentionally limited to Home (`/`) and Search (`/results`) so Watch related chips do not wake fallback work or move scroll |
+
+### Route-specific chip clouds (2026-06-18)
+
+YouTube reuses the same chip tags on multiple surfaces, but FilterTube should not treat all chip clouds as filterable content.
+
+| Surface | DOM parent / shell | Chip children | FilterTube behavior | Reason |
+| --- | --- | --- | --- | --- |
+| Home feed | Home feed chip cloud / feed filter chip bar | `<yt-chip-cloud-renderer>` -> `<yt-chip-cloud-chip-renderer>` / `<chip-shape>` | ✅ DOM chip filtering and `hideMixPlaylists` are allowed | Home chips can expose feed topics and the Mixes chip the user asked us to hide |
+| Search results | `<ytd-search-header-renderer has-chip-bar>` with `#chip-bar` | `<yt-chip-cloud-renderer>` -> `<yt-chip-cloud-chip-renderer>` / `<chip-shape>` | ✅ DOM chip filtering and `hideMixPlaylists` are allowed on `/results` | Search chips are user-facing refinements and can be filtered without disturbing Watch scroll |
+| Watch related rail | `<yt-related-chip-cloud-renderer>` inside the Watch item section | `<yt-chip-cloud-renderer>` -> `<yt-chip-cloud-chip-renderer>` / `<chip-shape>` | 🚫 DOM fallback chip filtering and chip mutation wake-ups are disabled on `/watch` | These chips are navigation refinements for recommendations; processing them caused unnecessary fallback runs and could fight Watch page scroll |
+
+Runtime boundary:
+
+- `js/content/dom_fallback.js` gates DOM chip filtering to `/` and `/results`.
+- `js/content_bridge.js` treats chip mutations as fallback-relevant only on `/` and `/results`.
+- Keyword/channel/video filtering still applies to actual video cards, comments, shelves, playlist rows, and JSON renderer payloads. Chip route gating does not disable normal content filtering.
 
 ### Home shelf: “Latest YouTube posts” (2025-11-18 sample, NEW)
 | DOM tag / component | Underlying renderer / data source | Status | Notes |
@@ -471,13 +487,13 @@ On **search page** (`ytd-video-renderer`):
 | `<ytd-structured-description-content-renderer>` | Structured description rows | ❌ **NEW** – not parsed | Add rules if product links/chapters require filtering |
 | `<ytd-subscribe-button-renderer>` | DOM-only | ℹ️ **NEW** – UI only | No filtering required |
 
-### Watch Next chip cloud (2025-11-18 sample)
+### Watch Next chip cloud (2025-11-18 sample; route boundary updated 2026-06-18)
 | DOM tag / component | Underlying renderer / data source | Status | Notes |
 | --- | --- | --- | --- |
-| `<yt-related-chip-cloud-renderer>` | `relatedChipCloudRenderer` | ✅ Covered | Container metadata now parsed for chip subtitles; keyword filtering can suppress chip groups |
-| `<yt-chip-cloud-renderer>` | `chipCloudRenderer` | ℹ️ Layout | Hosts chip list; parser now recurses into child chips |
-| `<yt-chip-cloud-chip-renderer>` | `chipCloudChipRenderer` | ✅ Covered | Chip labels & navigation endpoints feed into keyword + channel handle filtering |
-| `<chip-shape>` button label | DOM-only | ⚠️ Fallback | Still monitor if chips ship DOM-only text without JSON |
+| `<yt-related-chip-cloud-renderer>` | `relatedChipCloudRenderer` | ℹ️ Layout / JSON traversal only | Watch related chips are inventoried but should not be DOM-hidden by keyword rules |
+| `<yt-chip-cloud-renderer>` | `chipCloudRenderer` | ℹ️ Layout | Hosts the Watch related chip list; do not use as a DOM fallback wake-up target on `/watch` |
+| `<yt-chip-cloud-chip-renderer>` | `chipCloudChipRenderer` | ℹ️ Watch UI refinement | Labels like `All`, `From the series`, `Recently uploaded`, and `Watched`; not content cards |
+| `<chip-shape>` button label | DOM-only | 🚫 No Watch DOM fallback filtering | Watch chip labels should not be hidden by keyword/channel rules because they are YouTube refinement controls, not recommendations themselves |
 
 ### New DOM notes
 - Provided HTML did not include right-rail markup; request additional samples (expect `<ytd-compact-video-renderer>` with `compactAutoplayRenderer`).
@@ -622,15 +638,16 @@ Fallback contract:
 | `<ytd-comment-engagement-bar>` | DOM-only | ℹ️ **NEW** | Buttons only; no filterable text |
 | `<ytd-continuation-item-renderer>` | `continuationItemRenderer` | ⚠️ **NEW** | Ensure continuation tokens filtered so hidden threads stay hidden |
 
-## Feed Filter Chips (New Sample)
+## Feed/Search Filter Chips
 
 | DOM tag / component | Associated data | Coverage | Notes |
 | --- | --- | --- | --- |
-| `<ytd-feed-filter-chip-bar-renderer>` | Horizontal chip bar | ❌ Not targeted |
-| `<yt-chip-cloud-chip-renderer>` | Individual chips ("Music", "Mixes") | ❌ Not targeted |
-| `<chip-shape>` button text | Visible string we might want to filter | ⚠️ Consider parsing if chips drive exposure to undesired topics |
+| `<ytd-feed-filter-chip-bar-renderer>` | Horizontal chip bar | ✅ Route-scoped DOM support | Home/feed chip bars can be processed on `/` |
+| `<ytd-search-header-renderer has-chip-bar>` | Search results chip bar | ✅ Route-scoped DOM support | Search chips can be processed on `/results` |
+| `<yt-chip-cloud-chip-renderer>` | Individual chips (`Music`, `Mixes`, `Shorts`, `Unwatched`, etc.) | ✅ Route-scoped | DOM fallback may hide matching chips on Home/Search only |
+| `<chip-shape>` button text | Visible chip label | ⚠️ Label source only | Use the containing `yt-chip-cloud-chip-renderer` for DOM fallback; do not target Watch related chips |
 
-These chips originate from the YouTube UI rather than API payloads we currently filter; we may need DOM-level observers if we want to auto-select or hide them.
+These chips originate from the YouTube UI rather than content cards. FilterTube may filter Home/Search chip labels, but actual keyword/channel blocking still depends on video/card/comment/playlist renderers and JSON-first payload filtering.
 
 ## Notifications (Bell / Inbox)
 
