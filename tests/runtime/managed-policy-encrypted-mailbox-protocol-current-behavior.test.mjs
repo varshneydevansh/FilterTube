@@ -313,7 +313,9 @@ test('managed mailbox runtime intake validates decrypted items without adding se
   assert.match(source, /remote_policy\.mailbox\.revoke/);
   assert.match(source, /filtertube_nanah_managed_open_sync_ack/);
   assert.match(source, /ackDecryptedMailboxItems/);
-  assert.doesNotMatch(source, /FilterTubeManagedMailbox/);
+  assert.match(source, /FilterTubeManagedMailboxClient/);
+  assert.match(source, /FilterTubeManagedPolicyMailbox/);
+  assert.doesNotMatch(source, /FilterTubeManagedMailboxServer\s*=/);
   assert.doesNotMatch(source, /managedMailboxPull/);
 });
 

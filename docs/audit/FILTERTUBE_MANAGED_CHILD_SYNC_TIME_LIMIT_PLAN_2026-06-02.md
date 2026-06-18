@@ -505,7 +505,11 @@ Sequence matters. The safe path is:
 
 Useful future product features:
 
-- child "ask parent for more time" request, sent as metadata without exposing browsing contents
+- richer child "ask parent for more time" workflows, such as optional message
+  choices or parent notification. The current extension timeout overlay already
+  records a redacted extra-time request without exposing browsing contents, and
+  the parent Family Controls panel can grant temporary extra time from that
+  request.
 - parent diff preview before each apply
 - co-parent roles: owner, parent/admin, caregiver read-only
 - safe fallback profile if managed policy is stale beyond a parent-defined maximum age
@@ -918,9 +922,27 @@ T1 + T2 + T3
 - **validation**:
   - `npm run test:settings`
   - `npm run test:release`
-- **status**: Not Completed
+- **status**: Completed for extension runtime; installed two-device smoke remains.
 - **log**:
+  - 2026-06-04 through 2026-06-18: Nanah managed policy envelopes now use the
+    `filtertube_managed_policy` type, bind source device/profile, target
+    profile, scope, revision, policy hash, key id/version, and signature
+    evidence, and reject stale, replayed, wrong-target, wrong-scope, revoked,
+    stale-pairing, or unsigned payloads before profile mutation.
+  - Receive-side dashboard handling routes signed managed envelopes through
+    adapter validation and the validated apply wrapper, then records protected
+    accepted/rejected history and live delivery acks.
+  - Source-side live sends can build signed managed envelopes for Main, Kids,
+    keyword, channel, video, viewing-space, time-limit, active/full bundles, and
+    rules-bundle expansion for eligible fixed protected targets.
 - **files edited/created**:
+  - `js/nanah_sync_adapter.js`
+  - `js/nanah_managed_live_policy.js`
+  - `js/tab-view.js`
+  - `tests/runtime/managed-nanah-live-signed-send-current-behavior.test.mjs`
+  - `tests/runtime/managed-policy-action-history-model-current-behavior.test.mjs`
+  - `tests/runtime/managed-locked-child-revision-gate-current-behavior.test.mjs`
+  - `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
 
 #### T12: Add pull-on-open check
 
@@ -940,9 +962,26 @@ T1 + T2 + T3
   - `npm run test:settings`
   - `npm run test:performance`
   - manual two-device Nanah smoke
-- **status**: Not Completed
+- **status**: Completed for provider-gated extension hook; built-in server and
+  installed two-device proof remain.
 - **log**:
+  - 2026-06-04: `js/nanah_managed_open_sync.js` added the dashboard/profile-open
+    open-sync helper. It collects only opted-in replica -> source managed links
+    for the active protected target profile, asks an optional provider for
+    already-decrypted mailbox items, applies each item through the same managed
+    mailbox validation path, and records redacted ack handoff rows.
+  - 2026-06-04 through 2026-06-18: Dashboard open and profile switch call
+    `runNanahManagedOpenSync(...)`; no provider, provider failure, wrong target,
+    stale trust, revoked trust, or disabled `syncOnProfileOpen` leaves the last
+    valid policy active and performs no YouTube hot-path work.
 - **files edited/created**:
+  - `js/nanah_managed_open_sync.js`
+  - `js/nanah_managed_mailbox_client.js`
+  - `js/tab-view.js`
+  - `html/tab-view.html`
+  - `tests/runtime/managed-nanah-open-sync-current-behavior.test.mjs`
+  - `tests/runtime/managed-policy-sync-remote-delivery-readiness-gate-current-behavior.test.mjs`
+  - `docs/audit/FILTERTUBE_NANAH_MANAGED_PULL_ON_OPEN_2026-06-04.md`
 
 #### T13: Spec encrypted pending-update mailbox
 
@@ -960,9 +999,28 @@ T1 + T2 + T3
 - **validation**:
   - doc review
   - no runtime implementation until protocol review is accepted
-- **status**: Not Completed
+- **status**: Completed for protocol plus extension-side provider hooks;
+  mailbox server deployment remains.
 - **log**:
+  - 2026-06-04: Encrypted mailbox protocol doc and fixtures define
+    ciphertext-only server rows, local decryption, managed envelope validation,
+    ack states, replay/stale/revoked rejection, and last-valid-policy behavior
+    when the provider is offline.
+  - 2026-06-04 through 2026-06-18: Adapter helpers can build server-safe mailbox
+    storage items, seal/open mailbox payloads with WebCrypto, validate
+    decrypted mailbox items, apply accepted managed mailbox items, upload
+    provider-accepted mailbox batches from the source side, purge queued
+    provider rows when trust is removed or keys rotate, and process provider
+    pull/ack handoff from the protected side.
 - **files edited/created**:
+  - `js/nanah_sync_adapter.js`
+  - `js/nanah_managed_live_policy.js`
+  - `js/nanah_managed_mailbox_client.js`
+  - `js/nanah_managed_open_sync.js`
+  - `js/tab-view.js`
+  - `tests/runtime/managed-policy-encrypted-mailbox-protocol-current-behavior.test.mjs`
+  - `tests/runtime/managed-remote-transport-app-parity-gate-current-behavior.test.mjs`
+  - `docs/audit/FILTERTUBE_MANAGED_POLICY_ENCRYPTED_MAILBOX_PROTOCOL_2026-06-04.md`
 
 ### Sprint 5: Downstream app parity
 
@@ -989,9 +1047,27 @@ T1 + T2 + T3
 - **validation**:
   - `npm run sync:native-runtime`
   - app-side compile/test lane when available
-- **status**: Not Completed
+- **status**: Partially Completed. Extension-owned contract and runtime sync are
+  present; rich native enforcement parity remains app-side work.
 - **log**:
+  - 2026-06-04 through 2026-06-18: Extension sync manifest now includes the
+    managed app policy contract and managed Nanah/helper runtime files needed by
+    downstream apps.
+  - App mirror commits recorded in the authority inventory include
+    `cb8e1516`, `2994f91a`, `01b7e695`, `cc5d24f3`, `88a7a39d`, and
+    `f13b03c7`, covering managed delivery runtime, list UI contract/status,
+    timeout overlay runtime, optional delivery copy, and passive time-left
+    runtime.
+  - Native app proof still needs installed Android/iOS route gates, settings
+    locks, and native lock-screen parity before release claims can say app
+    parity is complete.
 - **files edited/created**:
+  - `data/native-runtime-sync-manifest.json`
+  - `docs/audit/FILTERTUBE_MANAGED_APP_POLICY_CONTRACT_PARITY_2026-06-04.md`
+  - `tests/runtime/managed-app-policy-contract-parity-current-behavior.test.mjs`
+  - `/Users/devanshvarshney/FilterTubeApp/packages/extension-source/upstream/`
+  - `/Users/devanshvarshney/FilterTubeApp/apps/android/app/src/main/assets/filtertube_runtime_full.js`
+  - `/Users/devanshvarshney/FilterTubeApp/apps/ios/FilterTube/Resources/filtertube_runtime_full.js`
 
 #### T15: Add app viewing-space and time-limit parity tests
 
