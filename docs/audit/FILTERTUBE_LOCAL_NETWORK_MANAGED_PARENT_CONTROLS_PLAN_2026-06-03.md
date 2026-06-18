@@ -174,6 +174,9 @@ extension authority code.
     `blockedChannels`, `channelIds`, or `handles`) and the entries still
     normalize through the same preview, parent re-auth, materialized channel
     rows, list metadata, and verified-device delivery path as text lists.
+    Materialized rows now also preserve compact source-format metadata so apps
+    can distinguish text rows from JSON sources without treating either format
+    as policy authority.
   - [x] First subscription-check slice: parent/account profiles can check
     URL-backed lists from the `Lists` action. Changed source hashes refresh
     materialized channel rows after parent re-auth; unchanged source hashes only
@@ -353,7 +356,7 @@ Add list -> Preview -> Choose profiles -> Apply -> Send update
 
 - Parents can add a list from a file, pasted text, simple JSON, or URL.
 - Each list has a clear name, source URL/file label, last checked time, item
-  count, revision/hash, and enabled/disabled state.
+  count, revision/hash, input-format label, and enabled/disabled state.
 - Lists can be enabled separately for Main/Kids and per protected profile.
 - Imported list entries normalize into the existing channel rule shape before
   enforcement: channel name, handle/custom URL, UC id when present, source tag,

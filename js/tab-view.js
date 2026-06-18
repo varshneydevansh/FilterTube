@@ -7177,6 +7177,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         return normalized ? normalized.slice(0, maxLength) : '';
     }
 
+    function normalizeManagedChannelListSourceFormat(value) {
+        const normalized = normalizeString(value).toLowerCase();
+        const allowed = new Set([
+            'plain_text_rows',
+            'csv_like_text_rows',
+            'simple_json_array',
+            'simple_json_object_channels',
+            'public_https_text_or_json_url'
+        ]);
+        return allowed.has(normalized) ? normalized : '';
+    }
+
+    function formatManagedChannelListSourceFormat(value) {
+        const normalized = normalizeManagedChannelListSourceFormat(value);
+        if (normalized === 'simple_json_array' || normalized === 'simple_json_object_channels') return 'JSON';
+        if (normalized === 'public_https_text_or_json_url') return 'URL source';
+        if (normalized === 'csv_like_text_rows') return 'CSV-like text';
+        if (normalized === 'plain_text_rows') return 'text list';
+        return '';
+    }
+
     function parseManagedChannelListSourceMetadata(rawText) {
         const result = {};
         normalizeString(rawText).split(/\r?\n/).slice(0, 120).forEach((line) => {
@@ -7260,6 +7281,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const parsedRoot = JSON.parse(text);
         const listId = buildManagedChannelListId(listName || 'Imported list', text);
         const items = getManagedChannelListJsonItems(parsedRoot);
+        const sourceFormat = Array.isArray(parsedRoot) ? 'simple_json_array' : 'simple_json_object_channels';
         const seen = new Set();
         const channels = [];
         let skippedCount = 0;
@@ -7289,6 +7311,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return {
             listId,
             contentHash: buildManagedChannelListContentHash(text),
+            sourceFormat,
             sourceMetadata: normalizeManagedChannelListJsonMetadata(parsedRoot),
             channels,
             skippedCount,
@@ -7339,6 +7362,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return {
             listId,
             contentHash: buildManagedChannelListContentHash(text),
+            sourceFormat: 'plain_text_rows',
             sourceMetadata: parseManagedChannelListSourceMetadata(text),
             channels,
             skippedCount,
@@ -7620,6 +7644,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 managedListName: normalizeString(metadata.listName) || normalizeString(channel.managedListName) || 'Imported channel list',
                 managedListSourceLabel: normalizeString(metadata.sourceLabel) || 'Imported list',
                 managedListSourceUrl: normalizeManagedChannelListSourceUrl(metadata.sourceUrl),
+                managedListSourceFormat: normalizeManagedChannelListSourceFormat(metadata.sourceFormat || parsed?.sourceFormat),
                 managedListImportedAt: metadata.importedAt || Date.now(),
                 managedListLastCheckedAt: metadata.lastCheckedAt || metadata.importedAt || Date.now(),
                 managedListContentHash: normalizeString(metadata.contentHash || parsed?.contentHash),
@@ -7659,6 +7684,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         listName: normalizeString(row?.managedListName) || 'Imported channel list',
                         sourceLabel: normalizeString(row?.managedListSourceLabel) || 'Imported list',
                         sourceUrl: normalizeManagedChannelListSourceUrl(row?.managedListSourceUrl),
+                        sourceFormat: normalizeManagedChannelListSourceFormat(row?.managedListSourceFormat),
                         contentHash: normalizeString(row?.managedListContentHash),
                         sourceTitle: normalizeString(row?.managedListSourceTitle),
                         sourceVersion: normalizeString(row?.managedListSourceVersion),
@@ -7679,6 +7705,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (!current.contentHash && normalizeString(row?.managedListContentHash)) {
                         current.contentHash = normalizeString(row.managedListContentHash);
                     }
+                    if (!current.sourceFormat && normalizeManagedChannelListSourceFormat(row?.managedListSourceFormat)) {
+                        current.sourceFormat = normalizeManagedChannelListSourceFormat(row.managedListSourceFormat);
+                    }
                     if (!current.sourceTitle && normalizeString(row?.managedListSourceTitle)) current.sourceTitle = normalizeString(row.managedListSourceTitle);
                     if (!current.sourceVersion && normalizeString(row?.managedListSourceVersion)) current.sourceVersion = normalizeString(row.managedListSourceVersion);
                     if (!current.sourceUpdatedLabel && normalizeString(row?.managedListSourceUpdatedLabel)) current.sourceUpdatedLabel = normalizeString(row.managedListSourceUpdatedLabel);
@@ -7697,6 +7726,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             listName: item.listName,
             sourceLabel: item.sourceLabel,
             sourceUrl: item.sourceUrl,
+            sourceFormat: item.sourceFormat,
             contentHash: item.contentHash,
             sourceTitle: item.sourceTitle,
             sourceVersion: item.sourceVersion,
@@ -7723,6 +7753,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     listName: summary.listName,
                     sourceLabel: summary.sourceLabel,
                     sourceUrl: summary.sourceUrl,
+                    sourceFormat: summary.sourceFormat,
                     contentHash: summary.contentHash,
                     sourceTitle: summary.sourceTitle,
                     sourceVersion: summary.sourceVersion,
@@ -7742,6 +7773,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 current.pausedChannelCount += Number(summary.pausedChannelCount) || 0;
                 current.lastCheckedAt = Math.max(current.lastCheckedAt || 0, Number(summary.lastCheckedAt) || 0);
                 if (!current.contentHash && normalizeString(summary.contentHash)) current.contentHash = normalizeString(summary.contentHash);
+                if (!current.sourceFormat && normalizeManagedChannelListSourceFormat(summary.sourceFormat)) current.sourceFormat = normalizeManagedChannelListSourceFormat(summary.sourceFormat);
                 if (!current.sourceTitle && normalizeString(summary.sourceTitle)) current.sourceTitle = normalizeString(summary.sourceTitle);
                 if (!current.sourceVersion && normalizeString(summary.sourceVersion)) current.sourceVersion = normalizeString(summary.sourceVersion);
                 if (!current.sourceUpdatedLabel && normalizeString(summary.sourceUpdatedLabel)) current.sourceUpdatedLabel = normalizeString(summary.sourceUpdatedLabel);
@@ -7755,6 +7787,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 listName: item.listName,
                 sourceLabel: item.sourceLabel,
                 sourceUrl: item.sourceUrl,
+                sourceFormat: item.sourceFormat,
                 contentHash: item.contentHash,
                 sourceTitle: item.sourceTitle,
                 sourceVersion: item.sourceVersion,
@@ -7859,6 +7892,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const sourceBits = [
                     normalizeString(summary.sourceLabel) || 'Imported list',
                     normalizeString(summary.sourceTitle),
+                    formatManagedChannelListSourceFormat(summary.sourceFormat),
                     isManagedChannelListSummaryUrlBacked(summary) ? 'URL-backed' : 'Local/pasted',
                     formatManagedChannelListCheckedAt(summary.lastCheckedAt),
                     formatManagedChannelListSourceVersion(summary),
@@ -8063,6 +8097,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return {
             managedListSourceLabel: normalizeString(loaded?.sourceLabel) || normalizeString(selectedList?.sourceLabel) || 'Imported list',
             managedListSourceUrl: normalizeManagedChannelListSourceUrl(loaded?.url || selectedList?.sourceUrl),
+            managedListSourceFormat: normalizeManagedChannelListSourceFormat(parsed?.sourceFormat || selectedList?.sourceFormat),
             managedListLastCheckedAt: checkedAt,
             managedListContentHash: normalizeString(parsed?.contentHash || selectedList?.contentHash),
             managedListSourceTitle: normalizeManagedChannelListMetadataValue(sourceMetadata.title),
@@ -8090,6 +8125,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ...row,
                     managedListSourceLabel: metadata.managedListSourceLabel,
                     managedListSourceUrl: metadata.managedListSourceUrl,
+                    managedListSourceFormat: metadata.managedListSourceFormat,
                     managedListLastCheckedAt: metadata.managedListLastCheckedAt,
                     managedListContentHash: metadata.managedListContentHash
                 };

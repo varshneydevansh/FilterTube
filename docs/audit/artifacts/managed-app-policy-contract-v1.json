@@ -206,6 +206,7 @@
       "managedListName",
       "managedListSourceLabel",
       "managedListSourceUrl",
+      "managedListSourceFormat",
       "managedListSourceTitle",
       "managedListSourceVersion",
       "managedListSourceUpdatedLabel",
@@ -246,6 +247,7 @@
     ],
     "nativeParityRequirements": [
       "preserve_materialized_row_metadata_during_import_export_and_sync",
+      "preserve_managed_list_source_format_metadata",
       "parse_supported_list_inputs_only_after_parent_preview",
       "skip_paused_list_rows_in_native_channel_enforcement",
       "show_list_status_without_exposing_raw_rule_contents_to_protected_users",

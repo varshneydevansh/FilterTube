@@ -282,6 +282,10 @@ test('managed app contract preserves profile viewing time envelope and history f
   ]) {
     assert.ok(contract.managedChannelLists.requiredActions.includes(action), `missing managed channel list action ${action}`);
   }
+  assert.ok(
+    contract.managedChannelLists.materializedRowFields.includes('managedListSourceFormat'),
+    'managed list source format must be preserved on materialized rows'
+  );
   for (const decision of [
     'list_url_is_data_source_only',
     'json_document_is_data_source_only',
@@ -291,6 +295,10 @@ test('managed app contract preserves profile viewing time envelope and history f
   ]) {
     assert.ok(contract.managedChannelLists.requiredDecisions.includes(decision), `missing managed channel list decision ${decision}`);
   }
+  assert.ok(
+    contract.managedChannelLists.nativeParityRequirements.includes('preserve_managed_list_source_format_metadata'),
+    'native apps must preserve managed list source format metadata'
+  );
 
   for (const row of [
     'local_managed_save_accepted',
