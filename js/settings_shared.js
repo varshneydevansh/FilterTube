@@ -339,6 +339,8 @@
             ...(typeof entry.managedListSourceLabel === 'string' && entry.managedListSourceLabel.trim() ? { managedListSourceLabel: entry.managedListSourceLabel.trim() } : {}),
             ...(typeof entry.managedListSourceUrl === 'string' && entry.managedListSourceUrl.trim() ? { managedListSourceUrl: entry.managedListSourceUrl.trim() } : {}),
             ...(typeof entry.managedListImportedAt === 'number' && Number.isFinite(entry.managedListImportedAt) ? { managedListImportedAt: entry.managedListImportedAt } : {}),
+            ...(typeof entry.managedListLastCheckedAt === 'number' && Number.isFinite(entry.managedListLastCheckedAt) ? { managedListLastCheckedAt: entry.managedListLastCheckedAt } : {}),
+            ...(typeof entry.managedListContentHash === 'string' && entry.managedListContentHash.trim() ? { managedListContentHash: entry.managedListContentHash.trim() } : {}),
             ...(entry.managedListPaused === true ? { managedListPaused: true } : {}),
             collaborationGroupId,
             collaborationWith,

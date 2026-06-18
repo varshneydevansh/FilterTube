@@ -482,6 +482,8 @@
             ...(normalizeString(entry.managedListSourceLabel) ? { managedListSourceLabel: normalizeString(entry.managedListSourceLabel) } : {}),
             ...(normalizeString(entry.managedListSourceUrl) ? { managedListSourceUrl: normalizeString(entry.managedListSourceUrl) } : {}),
             ...(typeof entry.managedListImportedAt === 'number' && Number.isFinite(entry.managedListImportedAt) ? { managedListImportedAt: entry.managedListImportedAt } : {}),
+            ...(typeof entry.managedListLastCheckedAt === 'number' && Number.isFinite(entry.managedListLastCheckedAt) ? { managedListLastCheckedAt: entry.managedListLastCheckedAt } : {}),
+            ...(normalizeString(entry.managedListContentHash) ? { managedListContentHash: normalizeString(entry.managedListContentHash) } : {}),
             ...(entry.managedListPaused === true ? { managedListPaused: true } : {}),
             ...(collaborationGroupId ? { collaborationGroupId } : {}),
             ...(Array.isArray(collaborationWith) ? { collaborationWith } : {}),

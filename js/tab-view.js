@@ -7023,12 +7023,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function buildManagedChannelListId(name, text) {
         const source = `${normalizeString(name)}\n${normalizeString(text)}`;
+        return `managed-list-${hashManagedChannelListSource(source)}`;
+    }
+
+    function hashManagedChannelListSource(source) {
+        const input = normalizeString(source);
         let hash = 2166136261;
-        for (let i = 0; i < source.length; i += 1) {
-            hash ^= source.charCodeAt(i);
+        for (let i = 0; i < input.length; i += 1) {
+            hash ^= input.charCodeAt(i);
             hash = Math.imul(hash, 16777619);
         }
-        return `managed-list-${(hash >>> 0).toString(36)}`;
+        return (hash >>> 0).toString(36);
+    }
+
+    function buildManagedChannelListContentHash(text) {
+        return `fnv1a:${hashManagedChannelListSource(text)}`;
     }
 
     function normalizeManagedChannelListSourceUrl(rawValue) {
@@ -7193,6 +7202,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         return {
             listId,
+            contentHash: buildManagedChannelListContentHash(text),
             channels,
             skippedCount,
             totalLineCount: lines.filter(line => normalizeString(line)).length
@@ -7470,6 +7480,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 managedListSourceLabel: normalizeString(metadata.sourceLabel) || 'Imported list',
                 managedListSourceUrl: normalizeManagedChannelListSourceUrl(metadata.sourceUrl),
                 managedListImportedAt: metadata.importedAt || Date.now(),
+                managedListLastCheckedAt: metadata.lastCheckedAt || metadata.importedAt || Date.now(),
+                managedListContentHash: normalizeString(metadata.contentHash || parsed?.contentHash),
                 ...(metadata.paused === true ? { managedListPaused: true } : {}),
                 addedAt: metadata.importedAt || Date.now()
             });
@@ -7502,6 +7514,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         listName: normalizeString(row?.managedListName) || 'Imported channel list',
                         sourceLabel: normalizeString(row?.managedListSourceLabel) || 'Imported list',
                         sourceUrl: normalizeManagedChannelListSourceUrl(row?.managedListSourceUrl),
+                        contentHash: normalizeString(row?.managedListContentHash),
+                        lastCheckedAt: 0,
                         profileIds: new Set(),
                         surfaces: new Set(),
                         channelCount: 0,
@@ -7511,6 +7525,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     current.profileIds.add(normalizeString(profileId));
                     current.surfaces.add(surface);
                     current.channelCount += 1;
+                    const checkedAt = Number(row?.managedListLastCheckedAt || row?.managedListImportedAt) || 0;
+                    if (checkedAt > current.lastCheckedAt) current.lastCheckedAt = checkedAt;
+                    if (!current.contentHash && normalizeString(row?.managedListContentHash)) {
+                        current.contentHash = normalizeString(row.managedListContentHash);
+                    }
                     if (isManagedChannelListRowPaused(row)) {
                         current.pausedChannelCount += 1;
                     } else {
@@ -7525,6 +7544,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             listName: item.listName,
             sourceLabel: item.sourceLabel,
             sourceUrl: item.sourceUrl,
+            contentHash: item.contentHash,
+            lastCheckedAt: item.lastCheckedAt,
             profileIds: Array.from(item.profileIds).filter(Boolean),
             surfaces: Array.from(item.surfaces).filter(Boolean),
             channelCount: item.channelCount,
@@ -7545,6 +7566,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     listName: summary.listName,
                     sourceLabel: summary.sourceLabel,
                     sourceUrl: summary.sourceUrl,
+                    contentHash: summary.contentHash,
+                    lastCheckedAt: Number(summary.lastCheckedAt) || 0,
                     profileIds: new Set(),
                     surfaces: new Set(),
                     channelCount: 0,
@@ -7556,6 +7579,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 current.channelCount += Number(summary.channelCount) || 0;
                 current.activeChannelCount += Number(summary.activeChannelCount) || 0;
                 current.pausedChannelCount += Number(summary.pausedChannelCount) || 0;
+                current.lastCheckedAt = Math.max(current.lastCheckedAt || 0, Number(summary.lastCheckedAt) || 0);
+                if (!current.contentHash && normalizeString(summary.contentHash)) current.contentHash = normalizeString(summary.contentHash);
                 merged.set(key, current);
             });
         });
@@ -7565,6 +7590,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 listName: item.listName,
                 sourceLabel: item.sourceLabel,
                 sourceUrl: item.sourceUrl,
+                contentHash: item.contentHash,
+                lastCheckedAt: item.lastCheckedAt,
                 profileIds: Array.from(item.profileIds).filter(Boolean),
                 surfaces: Array.from(item.surfaces).filter(Boolean),
                 channelCount: item.channelCount,
@@ -7572,6 +7599,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 pausedChannelCount: item.pausedChannelCount
             }))
             .sort((a, b) => (a.listName || '').localeCompare(b.listName || ''));
+    }
+
+    function formatManagedChannelListCheckedAt(timestamp) {
+        const value = Number(timestamp) || 0;
+        if (!value) return 'not checked yet';
+        try {
+            return `checked ${new Date(value).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`;
+        } catch (e) {
+            return 'checked';
+        }
+    }
+
+    function formatManagedChannelListShortHash(contentHash) {
+        const normalized = normalizeString(contentHash);
+        if (!normalized) return '';
+        const token = normalized.includes(':') ? normalized.split(':').pop() : normalized;
+        return token ? `hash ${token.slice(0, 8)}` : '';
     }
 
     async function showManagedChannelListLibraryModal(summaries) {
@@ -7627,9 +7671,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 source.className = 'managed-channel-list-modal__library-source';
                 const sourceBits = [
                     normalizeString(summary.sourceLabel) || 'Imported list',
-                    normalizeManagedChannelListSourceUrl(summary.sourceUrl) ? 'URL-backed' : 'Local/pasted'
+                    normalizeManagedChannelListSourceUrl(summary.sourceUrl) ? 'URL-backed' : 'Local/pasted',
+                    formatManagedChannelListCheckedAt(summary.lastCheckedAt),
+                    formatManagedChannelListShortHash(summary.contentHash)
                 ];
-                source.textContent = sourceBits.join(' | ');
+                source.textContent = sourceBits.filter(Boolean).join(' | ');
 
                 item.append(title, meta, source);
                 list.appendChild(item);
@@ -8027,7 +8073,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     listName: importPayload.name,
                     sourceLabel: importPayload.sourceLabel,
                     sourceUrl: importPayload.sourceUrl,
-                    importedAt
+                    importedAt,
+                    lastCheckedAt: importedAt,
+                    contentHash: parsed.contentHash
                 });
                 profileDuplicateCount += result.duplicateCount || 0;
                 if (!result.changed) continue;
@@ -8524,6 +8572,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     sourceLabel: loaded.sourceLabel || selectedList.sourceLabel,
                     sourceUrl: loaded.url,
                     importedAt: refreshedAt,
+                    lastCheckedAt: refreshedAt,
+                    contentHash: parsed.contentHash,
                     paused: (Number(selectedList.pausedChannelCount) || 0) > 0
                         && (Number(selectedList.activeChannelCount) || 0) <= 0
                 });

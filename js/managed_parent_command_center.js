@@ -187,6 +187,8 @@
                     activeRowCount: 0,
                     pausedRowCount: 0,
                     sourceUrlCount: 0,
+                    lastCheckedAt: 0,
+                    contentHash: '',
                     surfaces: new Set()
                 };
                 existing.rowCount += 1;
@@ -197,6 +199,11 @@
                 }
                 if (typeof item.managedListSourceUrl === 'string' && item.managedListSourceUrl.trim()) {
                     existing.sourceUrlCount += 1;
+                }
+                const checkedAt = Number(item.managedListLastCheckedAt || item.managedListImportedAt) || 0;
+                if (checkedAt > existing.lastCheckedAt) existing.lastCheckedAt = checkedAt;
+                if (!existing.contentHash && typeof item.managedListContentHash === 'string' && item.managedListContentHash.trim()) {
+                    existing.contentHash = item.managedListContentHash.trim();
                 }
                 if (surfaceLabel) existing.surfaces.add(surfaceLabel);
                 lists.set(listId, existing);
@@ -215,6 +222,8 @@
             activeRowCount: item.activeRowCount,
             pausedRowCount: item.pausedRowCount,
             sourceUrlCount: item.sourceUrlCount,
+            lastCheckedAt: item.lastCheckedAt,
+            contentHash: item.contentHash,
             surfaces: Array.from(item.surfaces)
         }));
         const rowCount = items.reduce((total, item) => total + item.rowCount, 0);
@@ -251,7 +260,9 @@
             .filter(Boolean)
             .slice(0, 2);
         const more = listCount > names.length ? ` +${listCount - names.length} more` : '';
-        return names.length ? `${names.join(', ')}${more}` : `${listCount} imported ${listCount === 1 ? 'list' : 'lists'}`;
+        const latestChecked = summary.items.reduce((latest, item) => Math.max(latest, Number(item?.lastCheckedAt) || 0), 0);
+        const checked = latestChecked ? `, checked ${new Date(latestChecked).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}` : '';
+        return names.length ? `${names.join(', ')}${more}${checked}` : `${listCount} imported ${listCount === 1 ? 'list' : 'lists'}${checked}`;
     }
 
     function resolveManagedCommandCenterSyncState(item = {}) {

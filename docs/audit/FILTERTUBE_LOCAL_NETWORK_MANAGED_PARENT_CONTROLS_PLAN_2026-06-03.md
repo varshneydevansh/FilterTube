@@ -139,6 +139,10 @@ extension authority code.
     imported lists on selected protected profiles. Paused list-derived rows stay
     visible and removable but do not compile into channel blocking or
     channel-derived `filterAll` keywords.
+  - [x] First source-version visibility slice: imported and refreshed lists now
+    store compact last-checked and content-hash metadata on list-derived rows,
+    and the parent library can show that version metadata without exposing raw
+    list contents.
   - [ ] Scheduled subscription refresh remains a future slice.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
@@ -341,6 +345,7 @@ Add list -> Preview -> Choose profiles -> Apply -> Send update
 10. Consolidate row/bulk list management behind one parent-facing Lists action [done]
 11. Show read-only imported-list summaries from the Lists chooser [done]
 12. Pause/resume imported lists without deleting manual or list-derived rows [done]
+13. Show last-checked and compact hash metadata for imported/refreshed lists [done]
 ```
 
 Scheduled subscriptions and automatic background refresh remain future work. A
