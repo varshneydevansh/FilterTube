@@ -732,9 +732,13 @@
                                                 <span class="nanah-sync-flow__body">Send the reviewed update now. Save parent trust only for devices that should keep receiving approved changes.</span>
                                             </article>
                                         </div>
-                                        <div class="nanah-sync-principles-block">
-                                            <div class="nanah-sync-principles-label">What stays protected</div>
-                                            <div class="nanah-sync-principles" aria-label="Nanah Sync privacy and trust notes">
+                                        <div class="nanah-sync-guidance-grid">
+                                            <details class="nanah-sync-guidance">
+                                                <summary>
+                                                    <span>What stays protected</span>
+                                                    <small>Rules, PINs, and trust stay local.</small>
+                                                </summary>
+                                                <div class="nanah-sync-principles" aria-label="Family Device Updates privacy and trust notes">
                                                 <article class="nanah-sync-principles__item nanah-sync-principles__item--trust">
                                                     <strong>No account server reads the rules</strong>
                                                     <span>The meeting service helps devices find each other; parent rules and PINs are not stored there.</span>
@@ -747,11 +751,14 @@
                                                     <strong>Open both devices is the normal path</strong>
                                                     <span>Saved trust makes the next live session easier. Later pickup and Home Bridge stay optional.</span>
                                                 </article>
-                                            </div>
-                                        </div>
-                                        <div class="nanah-sync-principles-block">
-                                            <div class="nanah-sync-principles-label">Common parent flows</div>
-                                            <div class="nanah-sync-principles nanah-sync-principles--guide" aria-label="Nanah Sync quick start">
+                                                </div>
+                                            </details>
+                                            <details class="nanah-sync-guidance">
+                                                <summary>
+                                                    <span>Which path should I use?</span>
+                                                    <small>Choose one-time copy, family control, or full migration.</small>
+                                                </summary>
+                                                <div class="nanah-sync-principles nanah-sync-principles--guide" aria-label="Family Device Updates quick start">
                                                 <article class="nanah-sync-principles__item">
                                                     <strong>Your own device</strong>
                                                     <span>Use this for your own laptop, browser, or phone when you only want to copy one profile.</span>
@@ -764,7 +771,8 @@
                                                     <strong>Imported lists travel as rules</strong>
                                                     <span>CSV, text, URL, and rule-list JSON imports become normal profile rules first, then travel through the same verified-device update path.</span>
                                                 </article>
-                                            </div>
+                                                </div>
+                                            </details>
                                         </div>
                                     </div>
 

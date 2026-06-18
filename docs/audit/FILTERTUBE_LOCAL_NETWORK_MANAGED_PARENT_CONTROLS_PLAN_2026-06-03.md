@@ -134,6 +134,13 @@ extension authority code.
   behind a `Technical relay page` disclosure, and the main privacy banner says
   the practical rule first: keep both devices open for Send Now; the meeting
   step does not store rules or PINs.
+- [x] Accounts & Sync guidance simplification slice: the Family Device Updates
+  intro now keeps the three-step live update path visible and moves protection
+  notes plus path-selection guidance into compact disclosures. This keeps the
+  parent/caregiver first screen focused on choosing the profile, pairing, and
+  sending an update while still exposing the local-trust model, imported-list
+  delivery path, and optional later-delivery concepts when the user asks for
+  more detail.
 
 ### Parent/Caregiver Simplification Tracker
 

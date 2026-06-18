@@ -1017,6 +1017,17 @@ html[data-theme="dark"] .rule-list-target-picker input:checked + span {
     color: #fffaf7;
 }
 
+html[data-theme="dark"] .nanah-sync-guidance {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+html[data-theme="dark"] .nanah-sync-guidance summary::after {
+    border-color: rgba(195, 90, 75, 0.34);
+    color: #f7c7bd;
+}
+
 html[data-theme="dark"] #ftExportV3EncryptedBtn.btn-secondary {
     background: rgba(112, 82, 36, 0.28);
     color: #e7ca92;
@@ -1564,6 +1575,10 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     .rule-list-sheet-example__row--head span:nth-child(3) {
         display: none;
     }
+
+    .nanah-sync-guidance-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 640px) {
@@ -1709,6 +1724,80 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     display: grid;
     gap: 0.8rem;
     grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+
+.nanah-sync-guidance-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.nanah-sync-guidance {
+    min-width: 0;
+    border: 1px solid rgba(96, 120, 145, 0.14);
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.62);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+    overflow: hidden;
+}
+
+.nanah-sync-guidance summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    align-items: center;
+    min-height: 4.15rem;
+    padding: 0.84rem 0.95rem;
+    cursor: pointer;
+    list-style: none;
+}
+
+.nanah-sync-guidance summary::-webkit-details-marker {
+    display: none;
+}
+
+.nanah-sync-guidance summary::after {
+    content: "+";
+    width: 1.55rem;
+    height: 1.55rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(171, 68, 56, 0.18);
+    border-radius: 999px;
+    color: var(--ft-color-brand-primary);
+    font-weight: 900;
+    line-height: 1;
+}
+
+.nanah-sync-guidance[open] summary::after {
+    content: "-";
+}
+
+.nanah-sync-guidance summary span,
+.nanah-sync-guidance summary small {
+    display: block;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.nanah-sync-guidance summary span {
+    color: var(--ft-color-text-primary);
+    font-size: 0.88rem;
+    font-weight: 850;
+    line-height: 1.25;
+}
+
+.nanah-sync-guidance summary small {
+    margin-top: 0.18rem;
+    color: var(--ft-color-text-secondary);
+    font-size: 0.78rem;
+    font-weight: 650;
+    line-height: 1.35;
+}
+
+.nanah-sync-guidance[open] .nanah-sync-principles {
+    padding: 0 0.75rem 0.75rem;
 }
 
 .nanah-sync-principles-block {
