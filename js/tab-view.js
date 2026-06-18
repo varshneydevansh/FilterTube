@@ -2834,6 +2834,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftImportSyncDeviceBtn = document.getElementById('ftImportSyncDeviceBtn');
     const ftImportRuleListBtn = document.getElementById('ftImportRuleListBtn');
     const ftManageRuleListsBtn = document.getElementById('ftManageRuleListsBtn');
+    const ftCheckStaleRuleListsBtn = document.getElementById('ftCheckStaleRuleListsBtn');
     const ftDownloadRuleListTemplateBtn = document.getElementById('ftDownloadRuleListTemplateBtn');
     const ftDownloadRuleListJsonTemplateBtn = document.getElementById('ftDownloadRuleListJsonTemplateBtn');
     const ftRuleListFormatsBtn = document.getElementById('ftRuleListFormatsBtn');
@@ -20060,6 +20061,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (isUiLocked()) return;
             const currentProfileId = normalizeString(profilesV4Cache?.activeProfileId) || activeProfileId || 'default';
             await manageManagedChannelListsForProfiles([currentProfileId]);
+        });
+    }
+
+    if (ftCheckStaleRuleListsBtn) {
+        ftCheckStaleRuleListsBtn.addEventListener('click', async () => {
+            if (isUiLocked()) return;
+            const currentProfileId = normalizeString(profilesV4Cache?.activeProfileId) || activeProfileId || 'default';
+            await refreshAllManagedChannelListsForProfiles([currentProfileId], { staleOnly: true });
         });
     }
 

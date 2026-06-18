@@ -303,6 +303,11 @@ parent tool instead of a sync/debug console.
     stale sources, or remove list-derived rules from the active profile without
     hunting through protected-profile rows. It reuses the same authority checks
     and list-library/refresh engine as Family Controls.
+  - [x] 2026-06-19 active-profile stale-list shortcut: Settings now exposes
+    `Check Stale URLs` for the active profile. It calls the same stale-only
+    URL-backed list checker used by Family Controls, still previews loaded
+    sources, records protected history, and requires parent/account approval
+    before replacing any list-derived rule rows.
   - [x] Optional delivery discovery slice: after at least one protected profile
     exists and no optional provider is configured, Family Controls now shows one
     compact prompt for `Set Up Pick Up Later` and `Set Up Home Bridge`. First
