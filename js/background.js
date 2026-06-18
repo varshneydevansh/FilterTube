@@ -2796,6 +2796,7 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                 const out = [];
                 for (const ch of Array.isArray(channels) ? channels : []) {
                     if (!ch) continue;
+                    if (typeof ch === 'object' && ch.managedListPaused === true) continue;
                     if (typeof ch === 'string') {
                         const trimmed = ch.trim();
                         if (!trimmed) continue;
@@ -2895,6 +2896,7 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                             originalInput: trimmed
                         };
                     } else if (ch && typeof ch === 'object') {
+                        if (ch.managedListPaused === true) return null;
                         // New object format - preserve the original case for IDs and handles
                         // canonicalHandle should only come from actual handle sources, not channel name
                         const candidateCanonical = (ch.canonicalHandle || ch.handle || '').trim();

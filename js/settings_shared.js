@@ -334,6 +334,12 @@
             source,
             originalInput,
             addedAt,
+            ...(typeof entry.managedListId === 'string' && entry.managedListId.trim() ? { managedListId: entry.managedListId.trim() } : {}),
+            ...(typeof entry.managedListName === 'string' && entry.managedListName.trim() ? { managedListName: entry.managedListName.trim() } : {}),
+            ...(typeof entry.managedListSourceLabel === 'string' && entry.managedListSourceLabel.trim() ? { managedListSourceLabel: entry.managedListSourceLabel.trim() } : {}),
+            ...(typeof entry.managedListSourceUrl === 'string' && entry.managedListSourceUrl.trim() ? { managedListSourceUrl: entry.managedListSourceUrl.trim() } : {}),
+            ...(typeof entry.managedListImportedAt === 'number' && Number.isFinite(entry.managedListImportedAt) ? { managedListImportedAt: entry.managedListImportedAt } : {}),
+            ...(entry.managedListPaused === true ? { managedListPaused: true } : {}),
             collaborationGroupId,
             collaborationWith,
             allCollaborators
@@ -412,7 +418,10 @@
     function syncFilterAllKeywords(keywords, channels) {
         // Existing keywords (user + channel-derived)
         const existing = Array.isArray(keywords) ? keywords : [];
-        const sanitizedChannels = sanitizeChannelsList(channels);
+        const sanitizedChannels = sanitizeChannelsList(
+            (Array.isArray(channels) ? channels : [])
+                .filter(channel => !(channel && typeof channel === 'object' && channel.managedListPaused === true))
+        );
 
         // Create a set of channel keys that should have keywords
         const activeChannelKeys = new Set();

@@ -135,8 +135,11 @@ extension authority code.
     choices instead of showing separate list-management buttons.
   - [x] First read-only library slice: `Lists` can show imported-list summaries
     before a parent chooses import, refresh, or remove.
-  - [ ] Reversible list library, enable/disable overlays, and scheduled
-    subscription refresh remain future slices.
+  - [x] First enable/disable slice: parent/account profiles can pause or resume
+    imported lists on selected protected profiles. Paused list-derived rows stay
+    visible and removable but do not compile into channel blocking or
+    channel-derived `filterAll` keywords.
+  - [ ] Scheduled subscription refresh remains a future slice.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.
@@ -337,11 +340,11 @@ Add list -> Preview -> Choose profiles -> Apply -> Send update
 9. Refresh a URL-backed materialized list after parent/account re-auth [done]
 10. Consolidate row/bulk list management behind one parent-facing Lists action [done]
 11. Show read-only imported-list summaries from the Lists chooser [done]
+12. Pause/resume imported lists without deleting manual or list-derived rows [done]
 ```
 
-Scheduled subscriptions, automatic background refresh, and enable/disable
-library overlays remain future work. A URL is treated as a way to fetch data,
-not as a remote admin.
+Scheduled subscriptions and automatic background refresh remain future work. A
+URL is treated as a way to fetch data, not as a remote admin.
 
 **Safety boundaries**:
 

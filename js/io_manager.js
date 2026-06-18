@@ -477,6 +477,12 @@
             source,
             originalInput,
             addedAt,
+            ...(normalizeString(entry.managedListId) ? { managedListId: normalizeString(entry.managedListId) } : {}),
+            ...(normalizeString(entry.managedListName) ? { managedListName: normalizeString(entry.managedListName) } : {}),
+            ...(normalizeString(entry.managedListSourceLabel) ? { managedListSourceLabel: normalizeString(entry.managedListSourceLabel) } : {}),
+            ...(normalizeString(entry.managedListSourceUrl) ? { managedListSourceUrl: normalizeString(entry.managedListSourceUrl) } : {}),
+            ...(typeof entry.managedListImportedAt === 'number' && Number.isFinite(entry.managedListImportedAt) ? { managedListImportedAt: entry.managedListImportedAt } : {}),
+            ...(entry.managedListPaused === true ? { managedListPaused: true } : {}),
             ...(collaborationGroupId ? { collaborationGroupId } : {}),
             ...(Array.isArray(collaborationWith) ? { collaborationWith } : {}),
             ...(Array.isArray(allCollaborators) ? { allCollaborators } : {})

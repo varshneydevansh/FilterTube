@@ -3058,7 +3058,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const MANAGED_ACTION_HISTORY_ACCEPTED_RETENTION_MS = 30 * MANAGED_ACTION_HISTORY_DAY_MS;
     const MANAGED_ACTION_HISTORY_PROTECTED_RETENTION_MS = 90 * MANAGED_ACTION_HISTORY_DAY_MS;
     const MANAGED_ACTION_HISTORY_PROTECTED_RESULTS = new Set(['rejected', 'conflict', 'failed_auth', 'expired_session', 'cleared_by_admin']);
-    const MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set(['trust_link.revoke', 'trust_link.key_revoke', 'managed_signing_key.rotate', 'policy.time_limit.update', 'policy.time_limit.request_extra', 'policy.viewing_space.update', 'policy.channel_list.import', 'policy.channel_list.remove', 'policy.channel_list.refresh', 'remote_policy.source_push']);
+    const MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set(['trust_link.revoke', 'trust_link.key_revoke', 'managed_signing_key.rotate', 'policy.time_limit.update', 'policy.time_limit.request_extra', 'policy.viewing_space.update', 'policy.channel_list.import', 'policy.channel_list.remove', 'policy.channel_list.refresh', 'policy.channel_list.pause', 'policy.channel_list.resume', 'remote_policy.source_push']);
     const MANAGED_ACTION_HISTORY_SUMMARY_PRIVACY_SCHEMA = 'filtertube_managed_action_history_summary_privacy';
     const MANAGED_ACTION_HISTORY_ENCRYPTED_SUMMARY_SCHEMA = 'filtertube_managed_action_history_encrypted_summary';
     const MANAGED_ACTION_HISTORY_SAFE_LABELS = Object.freeze({
@@ -3073,6 +3073,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         'policy.channel_list.import': 'Channel list imported',
         'policy.channel_list.remove': 'Channel list removed',
         'policy.channel_list.refresh': 'Channel list refreshed',
+        'policy.channel_list.pause': 'Channel list paused',
+        'policy.channel_list.resume': 'Channel list resumed',
         'policy.sync_policy.update': 'Sync policy changed',
         'trust_link.create': 'Trusted link created',
         'trust_link.revoke': 'Trusted link removed',
@@ -3102,6 +3104,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'dailyBudgetSeconds',
         'deliveredCount',
         'failedCount',
+        'changedCount',
         'addedCount',
         'duplicateCount',
         'kidsRuleCount',
@@ -7148,6 +7151,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             .toLowerCase();
     }
 
+    function isManagedChannelListRowPaused(row) {
+        return !!(row && typeof row === 'object' && row.managedListPaused === true);
+    }
+
     function parseManagedChannelListText(rawText, { listName = '' } = {}) {
         const text = normalizeString(rawText);
         const listId = buildManagedChannelListId(listName || 'Imported list', text);
@@ -7457,6 +7464,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 managedListSourceLabel: normalizeString(metadata.sourceLabel) || 'Imported list',
                 managedListSourceUrl: normalizeManagedChannelListSourceUrl(metadata.sourceUrl),
                 managedListImportedAt: metadata.importedAt || Date.now(),
+                ...(metadata.paused === true ? { managedListPaused: true } : {}),
                 addedAt: metadata.importedAt || Date.now()
             });
         });
@@ -7490,11 +7498,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                         sourceUrl: normalizeManagedChannelListSourceUrl(row?.managedListSourceUrl),
                         profileIds: new Set(),
                         surfaces: new Set(),
-                        channelCount: 0
+                        channelCount: 0,
+                        activeChannelCount: 0,
+                        pausedChannelCount: 0
                     };
                     current.profileIds.add(normalizeString(profileId));
                     current.surfaces.add(surface);
                     current.channelCount += 1;
+                    if (isManagedChannelListRowPaused(row)) {
+                        current.pausedChannelCount += 1;
+                    } else {
+                        current.activeChannelCount += 1;
+                    }
                     summaries.set(listId, current);
                 });
             });
@@ -7506,7 +7521,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             sourceUrl: item.sourceUrl,
             profileIds: Array.from(item.profileIds).filter(Boolean),
             surfaces: Array.from(item.surfaces).filter(Boolean),
-            channelCount: item.channelCount
+            channelCount: item.channelCount,
+            activeChannelCount: item.activeChannelCount,
+            pausedChannelCount: item.pausedChannelCount
         }));
     }
 
@@ -7524,11 +7541,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                     sourceUrl: summary.sourceUrl,
                     profileIds: new Set(),
                     surfaces: new Set(),
-                    channelCount: 0
+                    channelCount: 0,
+                    activeChannelCount: 0,
+                    pausedChannelCount: 0
                 };
                 safeArray(summary.profileIds).forEach(id => current.profileIds.add(id));
                 safeArray(summary.surfaces).forEach(surface => current.surfaces.add(surface));
                 current.channelCount += Number(summary.channelCount) || 0;
+                current.activeChannelCount += Number(summary.activeChannelCount) || 0;
+                current.pausedChannelCount += Number(summary.pausedChannelCount) || 0;
                 merged.set(key, current);
             });
         });
@@ -7540,7 +7561,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 sourceUrl: item.sourceUrl,
                 profileIds: Array.from(item.profileIds).filter(Boolean),
                 surfaces: Array.from(item.surfaces).filter(Boolean),
-                channelCount: item.channelCount
+                channelCount: item.channelCount,
+                activeChannelCount: item.activeChannelCount,
+                pausedChannelCount: item.pausedChannelCount
             }))
             .sort((a, b) => (a.listName || '').localeCompare(b.listName || ''));
     }
@@ -7587,7 +7610,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const surfaces = summary.surfaces.includes('main') && summary.surfaces.includes('kids')
                     ? 'Main + Kids'
                     : (summary.surfaces.includes('kids') ? 'Kids' : 'Main');
-                meta.textContent = `${summary.channelCount || 0} ${pluralize(summary.channelCount || 0, 'channel')} | ${summary.profileIds.length} ${pluralize(summary.profileIds.length, 'profile')} | ${surfaces}`;
+                const activeCount = Number(summary.activeChannelCount) || 0;
+                const pausedCount = Number(summary.pausedChannelCount) || 0;
+                const stateBits = pausedCount
+                    ? `${activeCount} active, ${pausedCount} paused`
+                    : `${activeCount || summary.channelCount || 0} active`;
+                meta.textContent = `${summary.channelCount || 0} ${pluralize(summary.channelCount || 0, 'channel')} | ${stateBits} | ${summary.profileIds.length} ${pluralize(summary.profileIds.length, 'profile')} | ${surfaces}`;
 
                 const source = document.createElement('small');
                 source.className = 'managed-channel-list-modal__library-source';
@@ -7680,6 +7708,37 @@ document.addEventListener('DOMContentLoaded', async () => {
         return urlBacked.find(summary => summary.listId === selected) || null;
     }
 
+    async function promptManagedChannelListToPauseState(summaries, paused) {
+        const candidates = safeArray(summaries).filter((summary) => {
+            const activeCount = Number(summary?.activeChannelCount) || 0;
+            const pausedCount = Number(summary?.pausedChannelCount) || 0;
+            return paused ? activeCount > 0 : pausedCount > 0;
+        });
+        const choices = candidates.slice(0, 10).map((summary) => ({
+            value: summary.listId,
+            label: `${summary.listName} (${paused ? (Number(summary.activeChannelCount) || 0) : (Number(summary.pausedChannelCount) || 0)})`,
+            className: paused ? 'btn-secondary' : 'btn-primary'
+        }));
+        if (!choices.length) return null;
+        const selected = await showChoiceModal({
+            title: paused ? 'Pause Imported List' : 'Resume Imported List',
+            message: paused
+                ? 'Choose the imported list to pause. The list remains saved and visible, but its channels stop affecting protected profiles until resumed.'
+                : 'Choose the imported list to resume. Its saved channels will become active again after parent/account unlock.',
+            details: candidates.slice(0, 5).map((summary) => {
+                const activeCount = Number(summary.activeChannelCount) || 0;
+                const pausedCount = Number(summary.pausedChannelCount) || 0;
+                const surfaces = summary.surfaces.includes('main') && summary.surfaces.includes('kids')
+                    ? 'Main + Kids'
+                    : (summary.surfaces.includes('kids') ? 'Kids' : 'Main');
+                return `${summary.listName}: ${activeCount} active, ${pausedCount} paused across ${summary.profileIds.length} ${pluralize(summary.profileIds.length, 'profile')} (${surfaces})`;
+            }),
+            choices,
+            cancelText: 'Cancel'
+        });
+        return candidates.find(summary => summary.listId === selected) || null;
+    }
+
     function hasManagedChannelListOnSurface(target, surface, listId) {
         const item = safeObject(target);
         const normalizedListId = normalizeString(listId);
@@ -7708,6 +7767,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         return {
             changed: removedCount > 0,
             removedCount
+        };
+    }
+
+    function setManagedChannelListPausedOnSurface(target, surface, listId, paused) {
+        const item = safeObject(target);
+        let changedCount = 0;
+        getManagedChannelListSurfaceKeys(surface).forEach((listKey) => {
+            const list = Array.isArray(item[listKey]) ? item[listKey] : [];
+            if (!list.length) return;
+            let listChanged = false;
+            const next = list.map((row) => {
+                if (normalizeString(row?.managedListId) !== listId || !row || typeof row !== 'object') return row;
+                const currentlyPaused = isManagedChannelListRowPaused(row);
+                if (currentlyPaused === paused) return row;
+                changedCount += 1;
+                listChanged = true;
+                const nextRow = { ...row };
+                if (paused) {
+                    nextRow.managedListPaused = true;
+                } else {
+                    delete nextRow.managedListPaused;
+                }
+                return nextRow;
+            });
+            if (listChanged) item[listKey] = next;
+        });
+        return {
+            changed: changedCount > 0,
+            changedCount
         };
     }
 
@@ -8168,6 +8256,160 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    async function setManagedChannelListPausedForProfiles(profileIds, paused) {
+        const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
+        if (!targetIds.length) {
+            UIComponents.showToast('Select at least one protected profile', 'error');
+            return;
+        }
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
+            UIComponents.showToast('Profiles unavailable', 'error');
+            return;
+        }
+
+        const fresh = await io.loadProfilesV4();
+        const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
+        if (getProfileType(fresh, currentActive) === 'child') {
+            UIComponents.showToast('Child profiles cannot change managed lists', 'error');
+            return;
+        }
+
+        const profiles = { ...safeObject(fresh.profiles) };
+        const eligibleIds = targetIds.filter((targetId) => {
+            const profile = safeObject(profiles[targetId]);
+            return !!profile && Object.keys(profile).length > 0
+                && canActiveProfileManageProfile(fresh, targetId);
+        });
+        if (!eligibleIds.length) {
+            UIComponents.showToast('No selected protected profiles can be managed by this account', 'error');
+            return;
+        }
+
+        const summaries = collectManagedChannelListSummaries(profiles, eligibleIds);
+        const selectedList = await promptManagedChannelListToPauseState(summaries, paused);
+        if (!selectedList) {
+            UIComponents.showToast(
+                paused
+                    ? 'No active imported lists found for the selected protected profiles'
+                    : 'No paused imported lists found for the selected protected profiles',
+                'info'
+            );
+            return;
+        }
+
+        const confirmChange = await showConfirmModal({
+            title: `${paused ? 'Pause' : 'Resume'} ${selectedList.listName}?`,
+            message: paused
+                ? `This keeps ${selectedList.listName} saved, but stops its list-derived channels from affecting ${selectedList.profileIds.length} selected ${pluralize(selectedList.profileIds.length, 'profile')}. Manual channel rules stay active.`
+                : `This turns ${selectedList.listName} back on for ${selectedList.profileIds.length} selected ${pluralize(selectedList.profileIds.length, 'profile')}.`,
+            confirmText: paused ? 'Pause List' : 'Resume List',
+            cancelText: 'Cancel'
+        });
+        if (!confirmChange) return;
+
+        const okAdmin = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
+        if (!okAdmin) {
+            for (const targetId of eligibleIds) {
+                await recordManagedAdminAuthFailureHistory(fresh, targetId, paused ? 'channel_list_pause_unlock_failed' : 'channel_list_resume_unlock_failed');
+            }
+            return;
+        }
+
+        let changedProfileCount = 0;
+        let changedRowCount = 0;
+        const changedProfileIds = [];
+        const changedSurfaces = new Set();
+
+        for (const targetId of eligibleIds) {
+            const profile = safeObject(profiles[targetId]);
+            let nextProfile = profile;
+            let profileChanged = false;
+            let profileRowCount = 0;
+
+            for (const surface of ['main', 'kids']) {
+                const priorForReport = nextProfile;
+                const nextSurface = getProfileSurface(nextProfile, surface);
+                const result = setManagedChannelListPausedOnSurface(nextSurface, surface, selectedList.listId, paused);
+                if (!result.changed) continue;
+                nextProfile = setProfileSurface(nextProfile, surface, nextSurface);
+                const report = buildManagedChildLocalEditReport({
+                    actorProfileId: currentActive,
+                    targetProfileId: targetId,
+                    surface,
+                    priorProfile: priorForReport,
+                    nextSurface
+                });
+                report.historyRow = {
+                    ...report.historyRow,
+                    actionType: paused ? 'policy.channel_list.pause' : 'policy.channel_list.resume',
+                    summary: {
+                        ...safeObject(report.historyRow.summary),
+                        label: paused ? 'Channel list paused' : 'Channel list resumed',
+                        surface,
+                        changedCount: result.changedCount || 0,
+                        listEntryCount: selectedList.channelCount || 0
+                    }
+                };
+                nextProfile = recordManagedChildLocalEditHistory(nextProfile, report);
+                profileChanged = true;
+                profileRowCount += result.changedCount || 0;
+                changedSurfaces.add(surface);
+            }
+
+            if (!profileChanged) continue;
+            profiles[targetId] = nextProfile;
+            changedProfileCount += 1;
+            changedRowCount += profileRowCount;
+            changedProfileIds.push(targetId);
+        }
+
+        if (!changedProfileCount) {
+            UIComponents.showToast(`No selected profiles needed that list ${paused ? 'paused' : 'resumed'}`, 'info');
+            return;
+        }
+
+        await io.saveProfilesV4({
+            ...fresh,
+            schemaVersion: 4,
+            profiles
+        });
+        profilesV4Cache = { ...fresh, schemaVersion: 4, profiles };
+        await StateManager.loadSettings({ notify: false, resetEnrichment: false, scheduleEnrichment: false });
+        await refreshProfilesUI();
+        renderChannels();
+        renderKidsChannels();
+        UIComponents.showToast(
+            `${paused ? 'Paused' : 'Resumed'} ${changedRowCount} list-derived ${pluralize(changedRowCount, 'channel')} across ${changedProfileCount} protected ${pluralize(changedProfileCount, 'profile')}`,
+            'success'
+        );
+
+        const remoteScope = changedSurfaces.size === 1 ? 'channels' : 'rules_bundle';
+        const surface = changedSurfaces.size === 1 ? Array.from(changedSurfaces)[0] : '';
+        const mailboxReady = hasNanahManagedMailboxUploadWriter();
+        const localReady = hasNanahManagedLocalNetworkDeliveryWriter();
+        const readyProfileCount = changedProfileIds.filter((targetId) => {
+            const profile = safeObject(safeObject(profilesV4Cache).profiles)[targetId];
+            const links = getNanahSourceManagedLinksForTargetProfile(targetId, remoteScope, profile);
+            if (!links.length) return false;
+            return links.some(isNanahManagedLinkLiveConnected) || mailboxReady || localReady;
+        }).length;
+        if (readyProfileCount > 0) {
+            const sendNow = await showConfirmModal({
+                title: `Send ${paused ? 'pause' : 'resume'} update now?`,
+                message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send this list ${paused ? 'pause' : 'resume'} update to those devices now.`,
+                confirmText: 'Send update',
+                cancelText: 'Not now'
+            });
+            if (sendNow) {
+                await sendManagedParentPolicyToVerifiedDevices(changedProfileIds, {
+                    scope: remoteScope,
+                    ...(surface ? { surface } : {})
+                });
+            }
+        }
+    }
+
     async function refreshManagedChannelListForProfiles(profileIds) {
         const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
         if (!targetIds.length) {
@@ -8275,7 +8517,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     listName: selectedList.listName,
                     sourceLabel: loaded.sourceLabel || selectedList.sourceLabel,
                     sourceUrl: loaded.url,
-                    importedAt: refreshedAt
+                    importedAt: refreshedAt,
+                    paused: (Number(selectedList.pausedChannelCount) || 0) > 0
+                        && (Number(selectedList.activeChannelCount) || 0) <= 0
                 });
                 if (!removeResult.changed && !applyResult.changed) continue;
                 nextProfile = setProfileSurface(nextProfile, surface, nextSurface);
@@ -8395,9 +8639,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const summaries = collectManagedChannelListSummaries(profiles, eligibleIds);
         const urlBackedCount = summaries.filter(summary => normalizeManagedChannelListSourceUrl(summary?.sourceUrl)).length;
+        const activeListCount = summaries.filter(summary => (Number(summary.activeChannelCount) || 0) > 0).length;
+        const pausedListCount = summaries.filter(summary => (Number(summary.pausedChannelCount) || 0) > 0).length;
         const details = summaries.length
             ? [
                 `${summaries.length} imported ${pluralize(summaries.length, 'list')} across ${eligibleIds.length} selected ${pluralize(eligibleIds.length, 'profile')}`,
+                `${activeListCount} active | ${pausedListCount} paused`,
                 urlBackedCount ? `${urlBackedCount} URL-backed ${pluralize(urlBackedCount, 'list')} can be refreshed` : 'No URL-backed lists to refresh yet'
             ]
             : [
@@ -8407,6 +8654,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const choices = [
             ...(summaries.length ? [{ value: 'view', label: 'View Lists', className: 'btn-secondary' }] : []),
             { value: 'import', label: 'Import List', className: 'btn-primary' },
+            ...(activeListCount ? [{ value: 'pause', label: 'Pause List', className: 'btn-secondary' }] : []),
+            ...(pausedListCount ? [{ value: 'resume', label: 'Resume List', className: 'btn-secondary' }] : []),
             ...(urlBackedCount ? [{ value: 'refresh', label: 'Refresh List', className: 'btn-secondary' }] : []),
             ...(summaries.length ? [{ value: 'remove', label: 'Remove List', className: 'btn-secondary' }] : [])
         ];
@@ -8421,6 +8670,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             await showManagedChannelListLibraryModal(summaries);
         } else if (selected === 'import') {
             await importManagedChannelListToProfiles(eligibleIds);
+        } else if (selected === 'pause') {
+            await setManagedChannelListPausedForProfiles(eligibleIds, true);
+        } else if (selected === 'resume') {
+            await setManagedChannelListPausedForProfiles(eligibleIds, false);
         } else if (selected === 'refresh') {
             await refreshManagedChannelListForProfiles(eligibleIds);
         } else if (selected === 'remove') {

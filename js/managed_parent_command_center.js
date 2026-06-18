@@ -184,10 +184,17 @@
                         ? item.managedListName.trim()
                         : 'Imported channel list',
                     rowCount: 0,
+                    activeRowCount: 0,
+                    pausedRowCount: 0,
                     sourceUrlCount: 0,
                     surfaces: new Set()
                 };
                 existing.rowCount += 1;
+                if (item.managedListPaused === true) {
+                    existing.pausedRowCount += 1;
+                } else {
+                    existing.activeRowCount += 1;
+                }
                 if (typeof item.managedListSourceUrl === 'string' && item.managedListSourceUrl.trim()) {
                     existing.sourceUrlCount += 1;
                 }
@@ -205,14 +212,20 @@
             id: item.id,
             name: item.name,
             rowCount: item.rowCount,
+            activeRowCount: item.activeRowCount,
+            pausedRowCount: item.pausedRowCount,
             sourceUrlCount: item.sourceUrlCount,
             surfaces: Array.from(item.surfaces)
         }));
         const rowCount = items.reduce((total, item) => total + item.rowCount, 0);
+        const activeRowCount = items.reduce((total, item) => total + item.activeRowCount, 0);
+        const pausedRowCount = items.reduce((total, item) => total + item.pausedRowCount, 0);
         const sourceUrlCount = items.reduce((total, item) => total + item.sourceUrlCount, 0);
         return {
             listCount: items.length,
             rowCount,
+            activeRowCount,
+            pausedRowCount,
             sourceUrlCount,
             items
         };
@@ -222,7 +235,11 @@
         const listCount = normalizeCommandCenterNumber(summary.listCount);
         if (!listCount) return '';
         const rowCount = normalizeCommandCenterNumber(summary.rowCount);
+        const activeRowCount = normalizeCommandCenterNumber(summary.activeRowCount);
+        const pausedRowCount = normalizeCommandCenterNumber(summary.pausedRowCount);
         const listLabel = listCount === 1 ? 'list' : 'lists';
+        if (pausedRowCount > 0 && activeRowCount <= 0) return `${listCount} ${listLabel} paused`;
+        if (pausedRowCount > 0) return `${listCount} ${listLabel} (${activeRowCount} on)`;
         return rowCount > 0 ? `${listCount} ${listLabel} (${rowCount})` : `${listCount} ${listLabel}`;
     }
 
