@@ -7814,6 +7814,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             formatGuide.className = 'managed-channel-list-modal__formats';
             formatGuide.innerHTML = `
                 <span><b>CSV</b><code>channel_id,keyword,notes</code></span>
+                <span><b>TXT</b>one channel ID, handle, custom URL, or URL per line</span>
                 <span><b>JSON</b><code>channels</code> + <code>keywords</code></span>
                 <span><b>BlockTube</b><code>filterData.channelId</code> + <code>filterData.title</code></span>
                 <span><b>Public list</b>raw HTTPS CSV, text, or JSON</span>
@@ -7897,7 +7898,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const help = document.createElement('div');
             help.className = 'managed-channel-list-modal__help';
-            help.textContent = 'Plain text stays channel-only for safety. CSV and supported JSON can add channels and keywords. FilterTube shows this preview before any profile is changed.';
+            help.textContent = 'TXT stays channel-only for safety. CSV and supported JSON can add channels and keywords. FilterTube shows parsed rows before any profile is changed.';
             body.appendChild(help);
 
             const previewEl = document.createElement('div');
