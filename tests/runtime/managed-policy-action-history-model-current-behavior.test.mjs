@@ -602,10 +602,14 @@ test('managed action history required outcomes cover accepted rejected conflict 
   assert.match(doc, /remote upload or telemetry: no/);
   assert.match(doc, /runtime managed action history store: profile-local managed child rows/);
   assert.match(doc, /runtime managed action history row writer: local managed child edit plus local time-limit policy edit plus managed channel-list import\/remove\/check\/refresh\/pause\/resume plus failed parent unlock plus Nanah managed-policy validation\/apply outcomes/);
-  assert.match(read('js/tab-view.js'), /function buildManagedTimeLimitLocalEditReport\(\{ actorProfileId, targetProfileId, nextPolicy \}\)/);
-  assert.match(read('js/tab-view.js'), /actionType: 'policy\.time_limit\.update'/);
+  const tabViewSource = read('js/tab-view.js');
+  assert.match(tabViewSource, /function buildManagedTimeLimitLocalEditReport\(\{ actorProfileId, targetProfileId, nextPolicy, summaryExtras = null \}\)/);
+  assert.match(tabViewSource, /actionType: 'policy\.time_limit\.update'/);
+  assert.match(tabViewSource, /function hasUnresolvedManagedExtraTimeRequest\(profile\)/);
+  assert.match(tabViewSource, /resolvedRequestCount/);
   assert.match(doc, /runtime managed action history access gate: present for parent\/account authority/);
   assert.match(doc, /runtime managed action history display redaction: present for sensitive rows through fixed labels, safe source-category labels, normalized reason codes, and redacted time-limit\/request counts/);
+  assert.match(doc, /runtime managed extra-time grant request resolution marker: present as redacted `resolvedRequestCount`/);
   assert.match(doc, /runtime managed action history clear path: present for accepted rows only/);
   assert.match(doc, /runtime managed action history clear event writer: present as protected `history.clear` evidence/);
   assert.match(doc, /runtime remote managed validation\/apply history writer: present/);

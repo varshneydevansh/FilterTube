@@ -263,6 +263,7 @@ runtime managed action history retention pruning: present for 30-day accepted ro
 runtime managed action history clear path: present for accepted rows only while retaining protected evidence
 runtime managed action history clear event writer: present as protected `history.clear` evidence
 runtime managed timeout ask-parent request writer: present as protected `policy.time_limit.request_extra` evidence after background policy/budget revalidation
+runtime managed extra-time grant request resolution marker: present as redacted `resolvedRequestCount` on the parent grant's `policy.time_limit.update` history row
 runtime remote managed validation/apply history writer: present for rejected, conflict, idempotent, and accepted apply outcomes
 runtime remote managed accepted apply history writer: present behind validated managed apply wrapper
 runtime mailbox managed validation/apply history writer: present for local/decrypted mailbox item intake outcomes

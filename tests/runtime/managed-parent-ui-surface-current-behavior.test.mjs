@@ -397,6 +397,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(doc, /runtime managed command-center delegated action intents: present/);
   assert.match(doc, /runtime managed command-center bulk time-limit controls: present via delegated runtime gate/);
   assert.match(doc, /runtime managed command-center parent extra-time grants: present via delegated runtime gate/);
+  assert.match(doc, /parent grant answered a pending request/);
   assert.match(doc, /runtime managed command-center bulk viewing-space controls: present via delegated runtime gate/);
   assert.match(doc, /runtime managed command-center post-viewing\/time-limit verified-device push: present/);
   assert.match(doc, /runtime managed command-center direct policy writes: absent/);
@@ -518,6 +519,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /bulk_viewing_space_unlock_failed/);
   assert.match(source, /customConfirmText: selectedCount > 1 \? 'Save Limits' : 'Save Limit'/);
   assert.match(source, /ft-managed-profile-status/);
+  assert.match(source, /hasUnresolvedManagedExtraTimeRequest\(profile\)/);
+  assert.match(source, /answered \$\{resolvedRequestCount\} time/);
   assert.match(source, /historyBtn\.textContent = 'History'/);
   assert.match(source, /ensureProfileUnlocked\(fresh, currentActive, \{ sensitiveAction: true \}\)/);
 });

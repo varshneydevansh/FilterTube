@@ -4783,6 +4783,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
+    function hasUnresolvedManagedExtraTimeRequest(profile) {
+        const rows = Array.isArray(profile?.managedActionHistory) ? profile.managedActionHistory : [];
+        for (let index = rows.length - 1; index >= 0; index -= 1) {
+            const row = safeObject(rows[index]);
+            if (normalizeString(row.scope) !== 'time_limits') continue;
+            const actionType = normalizeString(row.actionType);
+            if (actionType === 'policy.time_limit.update') return false;
+            if (actionType === 'policy.time_limit.request_extra' && normalizeString(row.result) === 'requested') {
+                return true;
+            }
+        }
+        return false;
+    }
+
     function summarizeManagedViewingSpacePolicy(policy) {
         const item = safeObject(policy);
         const allowMainViewing = item.allowMainViewing === true;
@@ -4908,7 +4922,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return { scope: 'viewing_space', policyState, historyRow };
     }
 
-    function buildManagedTimeLimitLocalEditReport({ actorProfileId, targetProfileId, nextPolicy }) {
+    function buildManagedTimeLimitLocalEditReport({ actorProfileId, targetProfileId, nextPolicy, summaryExtras = null }) {
         const policy = safeObject(nextPolicy);
         const revision = normalizeNonNegativeInteger(policy.policyRevision) || 1;
         const now = Date.now();
@@ -4951,7 +4965,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             receivedAt: now,
             issuedAt: normalizeNonNegativeInteger(policy.issuedAt) || now,
             orderKey: `${String(revision).padStart(6, '0')}:${now}`,
-            summary: summarizeManagedTimeLimitPolicy(policy),
+            summary: {
+                ...summarizeManagedTimeLimitPolicy(policy),
+                ...safeObject(summaryExtras)
+            },
             sensitive: true
         };
         return { scope: 'time_limits', policyState, historyRow };
@@ -5319,6 +5336,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const enabled = root.enabled === true;
             const dailyBudgetSeconds = normalizeNonNegativeInteger(root.dailyBudgetSeconds);
             const parentGrantSeconds = normalizeNonNegativeInteger(root.parentGrantSeconds);
+            const resolvedRequestCount = normalizeNonNegativeInteger(root.resolvedRequestCount);
             const timezone = normalizeString(root.timezone);
             parts.push(enabled ? 'limit enabled' : 'limit disabled');
             if (dailyBudgetSeconds != null) {
@@ -5326,6 +5344,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             if (parentGrantSeconds != null && parentGrantSeconds > 0) {
                 parts.push(`extra ${formatManagedHistoryDuration(parentGrantSeconds)}`);
+            }
+            if (resolvedRequestCount != null && resolvedRequestCount > 0) {
+                parts.push(`answered ${resolvedRequestCount} time ${resolvedRequestCount === 1 ? 'request' : 'requests'}`);
             }
             if (timezone) {
                 parts.push(`timezone ${timezone}`);
@@ -6980,10 +7001,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                     timeLimitPolicy: nextPolicy
                 }
             };
+            const resolvedRequestCount = hasUnresolvedManagedExtraTimeRequest(profile) ? 1 : 0;
             const report = buildManagedTimeLimitLocalEditReport({
                 actorProfileId: currentActive,
                 targetProfileId: targetId,
-                nextPolicy
+                nextPolicy,
+                summaryExtras: resolvedRequestCount > 0
+                    ? { resolvedRequestCount }
+                    : null
             });
             profiles[targetId] = recordManagedChildLocalEditHistory(nextProfile, report);
             changedProfileIds.push(targetId);

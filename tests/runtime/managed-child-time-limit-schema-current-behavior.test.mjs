@@ -205,10 +205,11 @@ test('local parent UI writes time-limit policy through profile settings and admi
   assert.match(tabView, /ensureProfileUnlocked\(fresh, currentActive, \{ sensitiveAction: true \}\)/);
   assert.match(tabView, /const nextPolicy = buildManagedTimeLimitPolicy/);
   assert.match(tabView, /if \(!nextPolicy\)/);
-  assert.match(tabView, /function buildManagedTimeLimitLocalEditReport\(\{ actorProfileId, targetProfileId, nextPolicy \}\)/);
+  assert.match(tabView, /function buildManagedTimeLimitLocalEditReport\(\{ actorProfileId, targetProfileId, nextPolicy, summaryExtras = null \}\)/);
   assert.match(tabView, /actionType: 'policy\.time_limit\.update'/);
   assert.match(tabView, /scope: 'time_limits'/);
-  assert.match(tabView, /summary: summarizeManagedTimeLimitPolicy\(policy\)/);
+  assert.match(tabView, /\.\.\.summarizeManagedTimeLimitPolicy\(policy\)/);
+  assert.match(tabView, /\.\.\.safeObject\(summaryExtras\)/);
   assert.match(tabView, /timeLimitPolicy: nextPolicy/);
   assert.match(tabView, /recordManagedChildLocalEditHistory\(nextProfile, report\)/);
   assert.match(tabView, /Time limit:/);
