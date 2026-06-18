@@ -112,6 +112,8 @@ test('managed app policy parity doc records extension-owned app contract artifac
   assert.match(doc, /Required Parity Decisions/);
   assert.match(doc, /Current Gap/);
   assert.match(doc, /flowchart TD/);
+  assert.match(doc, /cb8e1516 Sync managed delivery\s+runtime from extension/);
+  assert.match(doc, /Installed\s+app parity still cannot be claimed current until platform smoke evidence is\s+attached/);
   assert.deepEqual(
     contract.managedDelivery.parentFacingTransports.map(row => row.label),
     ['Send Now', 'Pick Up Later', 'Home Bridge']

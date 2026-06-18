@@ -517,22 +517,23 @@ apps can mirror the Pick Up Later helper, and
 `js/nanah_managed_local_network_client.js` so apps can mirror the Home Bridge
 helper. This verifier is a pre-release guard; it does not write into the app
 repo.
-After this protected-account contract update, the sibling app repo must run the
-native runtime sync before any app parity claim uses the copied artifact as
-current. The same manifest also copies the extension-owned managed Nanah
-signed-send, pull-on-open, Pick Up Later, and Home Bridge
-helper sources into `packages/extension-source/upstream/js/` so the downstream
-app repo can track the exact helper contracts without treating them as native
-runtime authority. Same-network reachability, provider discovery, and
-encrypted later delivery remain transport evidence only; trusted-link target,
-scope, revision, hash, and signature validation remain the authority boundary.
+The sibling app repo has now run native runtime sync for this contract
+revision, and the generated app-side output is committed as
+`/Users/devanshvarshney/FilterTubeApp` commit `cb8e1516 Sync managed delivery
+runtime from extension`. The same manifest copies the extension-owned managed
+Nanah signed-send, pull-on-open, Pick Up Later, and Home Bridge helper sources
+into `packages/extension-source/upstream/js/` so the downstream app repo can
+track the exact helper contracts without treating them as native runtime
+authority. Same-network reachability, provider discovery, and encrypted later
+delivery remain transport evidence only; trusted-link target, scope, revision,
+hash, and signature validation remain the authority boundary.
 The extension source mirror also carries the managed admin authority helper and
 managed parent command-center helper. Those are contract inputs for native
 settings locks and parent UI ergonomics, not standalone policy authority, and
 they are mirrored through `tools/sync-runtime-from-extension.mjs` broad
-`js/html/css` source mirroring rather than direct manifest copy rows. App parity
-still cannot be claimed current until the sibling app sync output is committed
-and platform smoke evidence is attached.
+`js/html/css` source mirroring rather than direct manifest copy rows. Installed
+app parity still cannot be claimed current until platform smoke evidence is
+attached for the relevant Android or iOS surface.
 
 The contract now treats protected profiles as child profiles plus independent
 account profiles when Default/Master is the managing authority. Downstream apps

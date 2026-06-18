@@ -37,7 +37,7 @@ test('managed transport app parity gate is linked to current remote delivery pro
   assert.match(localNetwork, /runtime built-in LAN peer discovery: absent/);
   assert.match(openSync, /runtime browser HTTPS mailbox pull\/decrypt client: present behind explicit config/);
   assert.match(openSync, /runtime mailbox server authority: absent/);
-  assert.match(appParity, /iOS parity remains pending/);
+  assert.match(appParity, /installed iOS parity\s+remains pending/);
   assert.match(discoveryBoundary, /Local-network discovery is convenience only/);
   assert.match(discoveryBoundary, /provider handoff is not authority/);
 });

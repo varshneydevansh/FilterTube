@@ -1318,8 +1318,11 @@ contract before wiring more native app runtime behavior.
   contract. The extension-side
   `verify:managed-app-policy` command now checks that the Markdown contract,
   JSON artifact, declared helper sources, and available app sync manifest copy
-  rows stay aligned before a native runtime sync/release handoff. Product
-  runtime behavior is unchanged; native Android/iOS enforcement remains
+  rows stay aligned before a native runtime sync/release handoff. The latest
+  parent-facing delivery contract and runtime mirror were synced into the
+  sibling app repo in `/Users/devanshvarshney/FilterTubeApp` commit
+  `cb8e1516 Sync managed delivery runtime from extension`. Product runtime
+  behavior is unchanged; installed Android/iOS smoke and iOS enforcement remain
   pending. The configured HTTPS mailbox helper is now declared in the
   extension-owned app policy contract so downstream app sync has an explicit
   source row to mirror before claiming mailbox parity.
