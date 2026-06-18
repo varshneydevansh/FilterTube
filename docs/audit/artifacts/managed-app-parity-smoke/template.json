@@ -212,6 +212,17 @@
       },
       "evidence": {},
       "durationMs": 0
+    },
+    {
+      "id": "FT-MANAGED-APP-15-managed-list-policy-apply",
+      "requiredObservation": "A parent/caregiver managed channel-list import or refresh reaches the installed app policy model as list-derived channel rules with source metadata, pause state, manual-rule separation, and the same channel blocking semantics as extension-owned controls.",
+      "status": "pending",
+      "observation": {
+        "pass": false,
+        "summary": ""
+      },
+      "evidence": {},
+      "durationMs": 0
     }
   ],
   "completionRules": {

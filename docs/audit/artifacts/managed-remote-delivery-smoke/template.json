@@ -137,6 +137,11 @@
       "id": "FT-MANAGED-REMOTE-13-command-center-delivery-path-detail",
       "requiredObservation": "The parent command center Delivery detail distinguishes live P2P, LAN provider, mailbox-later, paired-but-provider-pending, revoked, stale, and no-device states without exposing plaintext rules or private key material.",
       "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-REMOTE-14-managed-list-policy-apply",
+      "requiredObservation": "Parent imports, checks, or refreshes a managed channel list, applies only parent-approved list-derived channel rules to the protected profile, and sends the resulting signed channel policy through the same verified-device delivery path as manual channel edits.",
+      "status": "missing"
     }
   ],
   "completionRules": {

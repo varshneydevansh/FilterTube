@@ -163,6 +163,31 @@ The detailed phased plan is:
 docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md
 ```
 
+## Issue 62 Managed Channel List Addendum
+
+DanWaLes's Issue 62 suggestion adds a parent/caregiver convenience layer:
+families should be able to import or subscribe to curated channel filter lists
+instead of adding every channel by hand.
+
+This fits the managed-control direction, but it must stay a rule-source feature
+rather than a new authority path:
+
+- Parent/account authority chooses the list source, previews the rows, selects
+  protected profiles, and applies the result.
+- List-derived channels enter the same channel-rule arrays and managed-policy
+  send scopes as manually added channel rules.
+- Source URL, title/version metadata, last-checked timestamp, content hash,
+  pause state, and `managedListId` are metadata for review, refresh, and
+  removal. They are not executable code and do not grant permission to mutate a
+  protected profile without parent approval.
+- Unchanged URL-backed checks update source metadata and protected redacted
+  history without replacing rows or prompting verified-device sends.
+- Downstream apps must preserve list metadata and pause/manual-rule separation
+  while enforcing the resulting channel rules through the same policy contract.
+
+The active UI wording should stay simple: `Import List`, `Check URL`,
+`Refresh List`, `Pause List`, `Resume List`, and `Remove List`.
+
 ## Evidence Files
 
 | Area | Current evidence |

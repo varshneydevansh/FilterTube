@@ -154,7 +154,8 @@ test('readiness gate keeps allowed and blocked product claims separate', () => {
     'mailbox server delivery without explicit endpoint configuration',
     'automatic LAN peer discovery',
     'guaranteed later delivery after the parent device goes offline',
-    'remote management across desktop and apps without installed two-device smoke'
+    'remote management across desktop and apps without installed two-device smoke',
+    'managed list subscriptions/imports without parent approval'
   ]) {
     assert.ok(doc.includes(blocked), `missing blocked claim ${blocked}`);
   }

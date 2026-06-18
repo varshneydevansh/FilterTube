@@ -90,7 +90,9 @@ Blocked release wording until this gate turns green:
   smoke proof;
 - automatic LAN peer discovery;
 - guaranteed later delivery after the parent device goes offline;
-- remote management across desktop and apps without installed two-device smoke.
+- remote management across desktop and apps without installed two-device smoke;
+- managed list subscriptions/imports without parent approval, source metadata,
+  revision/hash evidence, and installed delivery proof.
 
 ## Manifest And Permission Boundary
 
@@ -155,6 +157,7 @@ FT-MANAGED-REMOTE-10-key-rotation-repair-status
 FT-MANAGED-REMOTE-11-no-work-idle
 FT-MANAGED-REMOTE-12-encrypted-history-summary-boundary
 FT-MANAGED-REMOTE-13-command-center-delivery-path-detail
+FT-MANAGED-REMOTE-14-managed-list-policy-apply
 ```
 
 Row `FT-MANAGED-REMOTE-10-key-rotation-repair-status` covers the
@@ -176,6 +179,16 @@ must show that the Delivery detail separates live P2P, LAN provider,
 mailbox-later, paired-but-provider-pending, revoked, stale, and no-device
 states so parents know whether to wait, connect a provider, or re-pair a
 device without exposing plaintext rules or private key material.
+
+Row `FT-MANAGED-REMOTE-14-managed-list-policy-apply` covers Issue 62 style
+managed channel filter lists. A parent/caregiver can import, check, or refresh
+a list source, preview/apply only parent-approved list-derived channel rows,
+and send the resulting signed channel policy to a verified protected device.
+The list source itself is not authority: the smoke proof must show source
+metadata, revision/hash evidence, protected history, manual-rule separation,
+and the same verified-device delivery path used by hand-added channel rules.
+An unchanged URL-backed source check should update last-checked/source metadata
+and redacted history without replacing channel rows or prompting a remote send.
 
 ## Current Decision
 

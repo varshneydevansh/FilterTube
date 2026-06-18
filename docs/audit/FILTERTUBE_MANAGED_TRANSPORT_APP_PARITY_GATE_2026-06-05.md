@@ -61,7 +61,8 @@ flowchart TD
 | Policy apply | Saved link, target profile, scope, revision, policy hash, key id, and signature are required. | Apps must reject stale, revoked, wrong-target, or unsigned policies before native enforcement. | Present. |
 | Main/Kids access | Extension route gate exists for active child profiles. | App shell must gate Main and Kids before opening web/native content. | Android partial, iOS pending. |
 | Time limits | Extension active-tab budget and timeout overlay exist. | App shell must enforce startup, resume, heartbeat, pause, and reduced-budget behavior. | Android partial, iOS pending. |
-| Managed rules | Extension can send/apply signed keyword, channel, and video policy scopes through validated managed paths. | Apps must preserve those rule scopes and apply them through the same local rule semantics as extension-owned keyword/channel/video controls. | Pending installed app smoke. |
+| Managed rules | Extension can send/apply signed keyword, channel, video, and managed channel-list policy scopes through validated managed paths. | Apps must preserve those rule scopes and apply them through the same local rule semantics as extension-owned keyword/channel/video controls. | Pending installed app smoke. |
+| Managed channel lists | Extension can import, check, pause/resume, refresh, and remove list-derived channel rules with source metadata, revision/hash evidence, manual-rule separation, and protected history. | Apps must treat list rows as channel-rule source metadata, not as URL authority or executable list code, and must preserve pause/source/version semantics when applying synced policy. | Pending installed app smoke. |
 | Action history | Protected redacted local, remote, mailbox, ack, and failure rows exist. | Apps may display history only to parent/account authority and must not expose plaintext values. | Partial. |
 
 ## Required Proof Before Claiming Complete Remote Management
@@ -76,6 +77,7 @@ no-policy/no-provider no-work proof: required
 installed two-device smoke: required
 Android installed smoke: required
 iOS parity proof: required
+managed channel-list source metadata and pause semantics: required
 public release wording review: required
 ```
 
@@ -84,7 +86,10 @@ not complete cross-platform remote-management readiness. Android and iOS must
 each provide platform-specific adapter proof, settings-lock proof, Main/Kids
 route-gate proof, time-limit proof, managed keyword/channel/video rule proof,
 protected history proof, and no-policy no-work proof before public release copy
-can claim cross-platform managed parent/caregiver control.
+can claim cross-platform managed parent/caregiver control. Issue 62 style
+channel-list subscriptions/imports also need installed app proof that
+list-derived rows remain ordinary channel rules with source/version metadata,
+manual-rule separation, pause enforcement, and no URL-based authority.
 
 ## Allowed Wording
 

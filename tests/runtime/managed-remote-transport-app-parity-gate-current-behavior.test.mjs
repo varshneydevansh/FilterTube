@@ -78,6 +78,8 @@ test('transport app parity matrix preserves extension app ownership split', () =
     'Policy apply',
     'Main/Kids access',
     'Time limits',
+    'Managed rules',
+    'Managed channel lists',
     'Action history'
   ]) {
     assert.ok(doc.includes(area), `missing matrix area ${area}`);
@@ -93,6 +95,7 @@ test('transport app parity matrix preserves extension app ownership split', () =
     'installed two-device smoke: required',
     'Android installed smoke: required',
     'iOS parity proof: required',
+    'managed channel-list source metadata and pause semantics: required',
     'public release wording review: required'
   ]) {
     assert.ok(doc.includes(proof), `missing required proof ${proof}`);
@@ -102,6 +105,7 @@ test('transport app parity matrix preserves extension app ownership split', () =
   assert.match(doc, /Native app\/provider may own LAN discovery, but discovery must never grant authority/);
   assert.match(doc, /App shell must gate Main and Kids before opening web\/native content/);
   assert.match(doc, /App shell must enforce startup, resume, heartbeat, pause, and reduced-budget behavior/);
+  assert.match(doc, /list-derived rows remain ordinary channel rules/);
 });
 
 test('settings lane owns managed transport app parity gate', () => {

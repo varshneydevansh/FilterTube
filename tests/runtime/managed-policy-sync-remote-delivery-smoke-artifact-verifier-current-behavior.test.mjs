@@ -169,6 +169,8 @@ test('managed remote delivery smoke verifier is wired into release settings and 
   assert.ok(boundaryDoc.includes('FT-MANAGED-REMOTE-10-key-rotation-repair-status'));
   assert.ok(boundaryDoc.includes('FT-MANAGED-REMOTE-12-encrypted-history-summary-boundary'));
   assert.ok(boundaryDoc.includes('FT-MANAGED-REMOTE-13-command-center-delivery-path-detail'));
+  assert.ok(boundaryDoc.includes('FT-MANAGED-REMOTE-14-managed-list-policy-apply'));
+  assert.match(boundaryDoc, /Issue 62 style\s+managed channel filter lists/);
   assert.match(boundaryDoc, /Delivery detail separates live P2P, LAN provider/);
   assert.match(
     boundaryDoc,

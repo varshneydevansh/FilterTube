@@ -160,6 +160,8 @@ test('managed app parity smoke verifier is wired into release settings and smoke
   assert.ok(MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS.includes('FT-MANAGED-APP-12-keyword-rule-apply'));
   assert.ok(MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS.includes('FT-MANAGED-APP-13-channel-rule-apply'));
   assert.ok(MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS.includes('FT-MANAGED-APP-14-video-rule-apply'));
+  assert.ok(MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS.includes('FT-MANAGED-APP-15-managed-list-policy-apply'));
+  assert.match(boundaryDoc, /Issue 62 style\s+channel-list subscriptions\/imports/);
   assert.match(boundaryDoc, /A valid managed app parity artifact proves one\s+installed app platform smoke/);
 });
 

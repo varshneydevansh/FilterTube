@@ -65,7 +65,8 @@ export const MANAGED_REMOTE_DELIVERY_SMOKE_REQUIRED_ROWS = Object.freeze([
   'FT-MANAGED-REMOTE-10-key-rotation-repair-status',
   'FT-MANAGED-REMOTE-11-no-work-idle',
   'FT-MANAGED-REMOTE-12-encrypted-history-summary-boundary',
-  'FT-MANAGED-REMOTE-13-command-center-delivery-path-detail'
+  'FT-MANAGED-REMOTE-13-command-center-delivery-path-detail',
+  'FT-MANAGED-REMOTE-14-managed-list-policy-apply'
 ]);
 export const MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS = Object.freeze([
   'FT-MANAGED-APP-00-contract-sync',
@@ -82,7 +83,8 @@ export const MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS = Object.freeze([
   'FT-MANAGED-APP-11-native-settings-lock',
   'FT-MANAGED-APP-12-keyword-rule-apply',
   'FT-MANAGED-APP-13-channel-rule-apply',
-  'FT-MANAGED-APP-14-video-rule-apply'
+  'FT-MANAGED-APP-14-video-rule-apply',
+  'FT-MANAGED-APP-15-managed-list-policy-apply'
 ]);
 
 export const RUNTIME_FIXTURE_LANE_REASONS = Object.freeze({
