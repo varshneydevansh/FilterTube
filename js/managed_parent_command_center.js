@@ -726,7 +726,7 @@
         const body = document.createElement('div');
         body.className = 'help-item-body';
         body.textContent = summary.profileCount > 0
-            ? 'Set what each protected profile can watch, how long YouTube is available, and where updates should be sent.'
+            ? 'Pick a profile, set what it can watch and for how long, then send only when another device needs the update.'
             : 'Create one protected child/user profile first. After that you can set rules, time, Main/Kids access, and device delivery.';
         const meta = document.createElement('div');
         meta.className = 'ft-managed-command-center__meta';
@@ -855,6 +855,52 @@
             strip.appendChild(card);
         });
         panel.appendChild(strip);
+
+        const workflow = document.createElement('div');
+        workflow.className = 'ft-managed-command-center__workflow';
+        workflow.setAttribute('aria-label', 'Family Controls workflow');
+        [
+            {
+                step: '1',
+                label: 'Choose profile',
+                detail: `${summary.profileCount} protected ${summary.profileCount === 1 ? 'profile' : 'profiles'} available`,
+                tone: 'neutral',
+                title: 'Start by choosing the protected child/user profile you want to manage.'
+            },
+            {
+                step: '2',
+                label: 'Set rules and time',
+                detail: summary.managedChannelListProfileCount > 0
+                    ? 'Rules, lists, access, and time are ready to review'
+                    : 'Use Edit Rules, Lists, Set Limit, and Main/Kids controls',
+                tone: summary.managedChannelListProfileCount > 0 || summary.limitedCount > 0 ? 'success' : 'neutral',
+                title: 'These actions change the selected protected profile after parent/account approval.'
+            },
+            {
+                step: '3',
+                label: 'Pair or send',
+                detail: summary.syncReadyProfileCount > 0
+                    ? `${summary.syncReadyProfileCount} ${summary.syncReadyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path`
+                    : 'Pair a verified device only when updates must reach another device',
+                tone: summary.syncReadyProfileCount > 0 ? 'success' : 'warning',
+                title: 'Local control works without remote delivery. Pairing is only needed for another device.'
+            }
+        ].forEach((item) => {
+            const workflowItem = document.createElement('div');
+            workflowItem.className = `ft-managed-command-center__workflow-item is-${item.tone}`;
+            workflowItem.title = item.title;
+            const step = document.createElement('strong');
+            step.textContent = item.step;
+            const copy = document.createElement('div');
+            const label = document.createElement('span');
+            label.textContent = item.label;
+            const detail = document.createElement('small');
+            detail.textContent = item.detail;
+            copy.append(label, detail);
+            workflowItem.append(step, copy);
+            workflow.appendChild(workflowItem);
+        });
+        panel.appendChild(workflow);
 
         const mailbox = h.safeObject(summary.mailboxConfig);
         const localNetwork = h.safeObject(summary.localNetworkConfig);

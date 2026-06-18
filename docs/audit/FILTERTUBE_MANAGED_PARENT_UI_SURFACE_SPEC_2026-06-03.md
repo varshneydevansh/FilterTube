@@ -138,11 +138,12 @@ and does not remove the preview, re-auth, profile selection, or verified-device
 send requirements.
 The parent-clarity row layout slice renames the dashboard panel to `Family
 Controls`, shortens transport-heavy status labels, and groups each profile's
-delivery/list/request details into one stable details column. This keeps the
-parent model direct: choose a managed profile, set rules/time/access, pair a
-device only when another device needs updates, and send. The change does not
-add authority; it only reduces copy and layout pressure in the Accounts & Sync
-surface.
+delivery/list/request details into one stable details column. The follow-up
+workflow strip now makes the parent path explicit: choose a profile, set rules
+and time, then pair or send only when another device needs the update. This
+keeps the parent model direct and prevents mailbox/LAN/provider language from
+becoming the first mental model. The change does not add authority; it only
+reduces copy and layout pressure in the Accounts & Sync surface.
 The subscription-check slice changes URL-backed list refresh semantics from
 blind replacement to hash-aware checking. When a checked URL returns the same
 source hash, Family Controls updates last-checked/source metadata and writes a

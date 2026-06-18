@@ -388,7 +388,11 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /function describeManagedCommandCenterDeliveryPath\(item = \{\}\)/);
   assert.match(helperSource, /function renderManagedCommandCenter\(profilesV4, \{ revealDetails = false, helpers = \{\} \} = \{\}\)/);
   assert.match(helperSource, /panel\.setAttribute\('aria-label', 'Managed parent command center'\)/);
-  assert.match(helperSource, /Overview of protected profiles, policy sync, time limits, action history, and delegated actions/);
+  assert.match(helperSource, /Pick a profile, set what it can watch and for how long, then send only when another device needs the update/);
+  assert.match(helperSource, /Family Controls workflow/);
+  assert.match(helperSource, /Choose profile/);
+  assert.match(helperSource, /Set rules and time/);
+  assert.match(helperSource, /Pair or send/);
   assert.match(helperSource, /actionIntents: buildManagedCommandCenterActionIntents\(profileId, timePolicy, \{/);
   assert.match(helperSource, /bulk_set_time_limit/);
   assert.match(helperSource, /bulk_edit_rules/);
@@ -407,8 +411,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /ft-managed-command-center__bulk-group/);
   assert.match(helperSource, /ft-managed-command-center__bulk-group-label/);
   assert.match(helperSource, /ft-managed-command-center__provider/);
-  assert.match(helperSource, /Configure Mailbox/);
-  assert.match(helperSource, /Edit Mailbox/);
+  assert.match(helperSource, /Set Up Later Updates/);
+  assert.match(helperSource, /Edit Later Updates/);
   assert.match(helperSource, /configure_mailbox/);
   assert.match(helperSource, /group: 'rules'/);
   assert.match(helperSource, /group: 'send'/);
@@ -463,7 +467,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /offerManagedPolicyPushForChangedProfiles\(changedProfileIds, \{\s+scope: 'viewing_space'/);
   assert.match(source, /offerManagedTimeLimitPushForChangedProfiles\(\[targetId\]\)/);
   assert.match(source, /bulk_viewing_space_unlock_failed/);
-  assert.match(source, /confirmText: 'Save Limits'/);
+  assert.match(source, /customConfirmText: selectedCount > 1 \? 'Save Limits' : 'Save Limit'/);
   assert.match(source, /ft-managed-profile-status/);
   assert.match(source, /historyBtn\.textContent = 'History'/);
   assert.match(source, /ensureProfileUnlocked\(fresh, currentActive, \{ sensitiveAction: true \}\)/);
@@ -502,10 +506,10 @@ test('managed command-center spec pins parent workflow without making UI authori
 
   assert.match(doc, /Command-center action buttons are action intents only/);
   assert.match(doc, /The Delivery row preview is a redacted status summary only/);
-  assert.match(doc, /Delivery links, preview labels, and ack labels are not authority/);
+  assert.match(doc, /Delivery links, preview labels, latest-attempt labels, and ack labels are not authority/);
   assert.match(doc, /UI choice is not authority; runtime route gate remains the enforcement layer/);
   assert.match(doc, /Runtime budget accounting remains background-owned/);
-  assert.match(doc, /Add Time and Add selected time/);
+  assert.match(doc, /Add Time, and Add selected time/);
   assert.match(doc, /Reachability is never authorization/);
   assert.match(doc, /post-rule-write granular verified-device push: present with selected surface binding/);
   assert.match(doc, /post-viewing\/time-limit verified-device push: present/);
@@ -912,6 +916,15 @@ test('managed command-center helper emits delegated action intents without polic
       sensitiveAction: true
     },
     {
+      action: 'bulk_manage_channel_lists',
+      label: 'Lists',
+      group: 'rules',
+      profileIds: ['childA'],
+      scope: 'channels',
+      authority: 'delegated_runtime_gate',
+      sensitiveAction: true
+    },
+    {
       action: 'bulk_add_video',
       label: 'Add video ID',
       group: 'rules',
@@ -995,6 +1008,14 @@ test('managed command-center helper emits delegated action intents without polic
       scope: 'main_kids',
       authority: 'delegated_runtime_gate',
       sensitiveAction: false
+    },
+    {
+      action: 'manage_channel_lists',
+      label: 'Lists',
+      profileId: 'childA',
+      scope: 'channels',
+      authority: 'delegated_runtime_gate',
+      sensitiveAction: true
     },
     {
       action: 'view_history',

@@ -93,6 +93,41 @@ extension authority code.
   parent-facing `Family Controls` label, shorter delivery labels, and one stable
   per-profile details column so profile names and next actions do not collapse
   under provider/status copy.
+- [x] Parent workflow strip: Family Controls now leads with `Choose profile`,
+  `Set rules and time`, and `Pair or send` so parents understand that local
+  control works first and verified-device delivery is only needed for another
+  device.
+
+### Parent/Caregiver Simplification Tracker
+
+This tracker is the working checklist for making managed controls feel like a
+parent tool instead of a sync/debug console.
+
+- [x] Family Controls uses a plain parent workflow: choose profile, set rules
+  and time, then pair/send only when another device needs the update.
+- [x] Optional mailbox/LAN provider rows are not shown as first-run required
+  setup when no protected profile exists or when providers are not configured.
+- [x] Imported channel lists are treated as parent-approved rule sources, not as
+  transport authority or executable filter code.
+- [x] List-derived channel rules preserve source metadata, source format,
+  source hash, last checked time, pause state, and Manual-vs-list separation.
+- [ ] Channels page exposes a source filter/dropdown so parents can view
+  `Manual`, `Imported lists`, and individual managed lists without guessing
+  where a channel entry came from.
+- [ ] Channel rows show compact source badges such as `Manual`, list name,
+  `Main`, `Kids`, or `Both`, while keeping rule contents editable through the
+  existing parent/account authority path.
+- [ ] YouTube Kids channel management can choose which imported lists apply to
+  Kids, instead of forcing parents to manage Kids list coverage only through the
+  Family Controls modal.
+- [ ] Family Controls row details show list status without crowding the profile
+  name, action buttons, or parent workflow.
+- [ ] Managed action history clearly answers who changed a rule, whether it was
+  manual or list-derived, and whether it was sent to a verified device, without
+  exposing raw policy JSON or sensitive rule payloads to protected users.
+- [ ] Downstream app UI contract documents the same channel-list source filter,
+  Kids list selection, and source badges so mobile/tablet surfaces do not fork
+  the parent mental model.
 - [x] Command center can send signed active managed-policy updates to currently
   connected verified replica devices over Nanah P2P.
 - [x] Command center can hand ciphertext mailbox items or signed LAN candidates
