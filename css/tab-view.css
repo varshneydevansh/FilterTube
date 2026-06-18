@@ -2050,6 +2050,29 @@ html[data-theme="dark"] .card::after {
     background: rgba(74, 157, 127, 0.08);
 }
 
+.managed-channel-list-modal__library {
+    display: grid;
+    gap: 0.65rem;
+    max-height: 360px;
+    overflow: auto;
+}
+
+.managed-channel-list-modal__library-item {
+    display: grid;
+    gap: 0.28rem;
+    padding: 0.78rem 0.88rem;
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    border-radius: 0.9rem;
+    background: var(--ft-color-bg-panel);
+}
+
+.managed-channel-list-modal__library-meta,
+.managed-channel-list-modal__library-source {
+    color: var(--ft-color-text-secondary);
+    font-size: 0.86rem;
+    line-height: 1.4;
+}
+
 .managed-channel-list-modal__error {
     border: 1px solid rgba(180, 67, 57, 0.3);
     color: var(--ft-color-sem-danger, #b44339);
@@ -2101,6 +2124,11 @@ html[data-theme="dark"] .card::after {
 :root[data-theme="dark"] .managed-channel-list-modal__help {
     border-color: rgba(74, 222, 128, 0.22);
     background: rgba(22, 101, 52, 0.16);
+}
+
+:root[data-theme="dark"] .managed-channel-list-modal__library-item {
+    border-color: var(--ft-color-sem-neutral-border);
+    background: var(--ft-color-bg-card);
 }
 
 :root[data-theme="dark"] .managed-channel-list-modal__error {

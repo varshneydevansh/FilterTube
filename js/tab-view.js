@@ -7545,6 +7545,96 @@ document.addEventListener('DOMContentLoaded', async () => {
             .sort((a, b) => (a.listName || '').localeCompare(b.listName || ''));
     }
 
+    async function showManagedChannelListLibraryModal(summaries) {
+        const rows = safeArray(summaries);
+        if (!rows.length) {
+            UIComponents.showToast('No imported channel lists found for the selected protected profiles', 'info');
+            return;
+        }
+        return new Promise((resolve) => {
+            const overlay = document.createElement('div');
+            overlay.className = 'ft-modal-overlay';
+
+            const card = document.createElement('div');
+            card.className = 'card ft-modal managed-channel-list-modal';
+
+            const header = document.createElement('div');
+            header.className = 'card-header';
+            const titleEl = document.createElement('h3');
+            titleEl.className = 'ft-modal-title';
+            titleEl.textContent = 'Imported Channel Lists';
+            header.appendChild(titleEl);
+
+            const body = document.createElement('div');
+            body.className = 'card-body ft-modal-body managed-channel-list-modal__body';
+
+            const intro = document.createElement('div');
+            intro.className = 'import-export-hint';
+            intro.textContent = 'These are list-derived channel rules on the selected protected profiles. This view is read-only.';
+            body.appendChild(intro);
+
+            const list = document.createElement('div');
+            list.className = 'managed-channel-list-modal__library';
+            rows.forEach((summary) => {
+                const item = document.createElement('div');
+                item.className = 'managed-channel-list-modal__library-item';
+
+                const title = document.createElement('strong');
+                title.textContent = summary.listName || 'Imported channel list';
+
+                const meta = document.createElement('div');
+                meta.className = 'managed-channel-list-modal__library-meta';
+                const surfaces = summary.surfaces.includes('main') && summary.surfaces.includes('kids')
+                    ? 'Main + Kids'
+                    : (summary.surfaces.includes('kids') ? 'Kids' : 'Main');
+                meta.textContent = `${summary.channelCount || 0} ${pluralize(summary.channelCount || 0, 'channel')} | ${summary.profileIds.length} ${pluralize(summary.profileIds.length, 'profile')} | ${surfaces}`;
+
+                const source = document.createElement('small');
+                source.className = 'managed-channel-list-modal__library-source';
+                const sourceBits = [
+                    normalizeString(summary.sourceLabel) || 'Imported list',
+                    normalizeManagedChannelListSourceUrl(summary.sourceUrl) ? 'URL-backed' : 'Local/pasted'
+                ];
+                source.textContent = sourceBits.join(' | ');
+
+                item.append(title, meta, source);
+                list.appendChild(item);
+            });
+            body.appendChild(list);
+
+            const actions = document.createElement('div');
+            actions.className = 'ft-modal-actions';
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'btn-secondary';
+            closeBtn.type = 'button';
+            closeBtn.textContent = 'Close';
+            const cleanup = () => {
+                try {
+                    overlay.remove();
+                } catch (e) {
+                }
+            };
+            closeBtn.addEventListener('click', () => {
+                cleanup();
+                resolve();
+            });
+            overlay.addEventListener('click', (event) => {
+                if (event.target === overlay) closeBtn.click();
+            });
+            actions.appendChild(closeBtn);
+            body.appendChild(actions);
+            card.append(header, body);
+            overlay.appendChild(card);
+            document.body.appendChild(overlay);
+            requestAnimationFrame(() => {
+                try {
+                    closeBtn.focus();
+                } catch (e) {
+                }
+            });
+        });
+    }
+
     async function promptManagedChannelListToRemove(summaries) {
         const choices = safeArray(summaries).slice(0, 10).map((summary) => ({
             value: summary.listId,
@@ -8315,6 +8405,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 'Start by importing a pasted, file, or public HTTPS channel list.'
             ];
         const choices = [
+            ...(summaries.length ? [{ value: 'view', label: 'View Lists', className: 'btn-secondary' }] : []),
             { value: 'import', label: 'Import List', className: 'btn-primary' },
             ...(urlBackedCount ? [{ value: 'refresh', label: 'Refresh List', className: 'btn-secondary' }] : []),
             ...(summaries.length ? [{ value: 'remove', label: 'Remove List', className: 'btn-secondary' }] : [])
@@ -8326,7 +8417,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             choices,
             cancelText: 'Cancel'
         });
-        if (selected === 'import') {
+        if (selected === 'view') {
+            await showManagedChannelListLibraryModal(summaries);
+        } else if (selected === 'import') {
             await importManagedChannelListToProfiles(eligibleIds);
         } else if (selected === 'refresh') {
             await refreshManagedChannelListForProfiles(eligibleIds);
