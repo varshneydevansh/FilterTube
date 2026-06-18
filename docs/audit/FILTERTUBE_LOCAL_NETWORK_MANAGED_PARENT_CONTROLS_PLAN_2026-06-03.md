@@ -101,6 +101,11 @@ extension authority code.
   `Pair to sync` means remote device setup only, profile ownership reads as
   `Parent: ...`, status chips have explanatory titles, and neutral detail cards
   no longer look like warning/error states when nothing is wrong.
+- [x] Accounts & Sync now shows a protected-edit boundary when a parent is
+  editing a protected profile: Family Controls remains the target surface for
+  rules/time/history/send, generic device pairing remains parent-owned, and
+  global account policy, create-profile, and Master PIN controls are paused
+  until editing ends.
 
 ### Parent/Caregiver Simplification Tracker
 

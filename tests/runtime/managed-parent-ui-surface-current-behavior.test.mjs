@@ -366,6 +366,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(doc, /runtime managed command-center grouped bulk action rail: present/);
   assert.match(doc, /runtime managed command-center encrypted mailbox provider configuration: present via parent re-auth/);
   assert.match(doc, /runtime YouTube hot-path work from command-center UI: absent/);
+  assert.match(plan, /Accounts & Sync now shows a protected-edit boundary/);
+  assert.match(doc, /Protected edit on Accounts & Sync/);
   assert.match(plan, new RegExp(docPath));
   assert.match(plan, /command-center\s+overview for protected profiles/);
   assert.match(plan, /Dashboard command center lists protected profiles, time-limit state,\s+viewing-space state, protected history count, verified-device readiness,\s+re-pairing status for revoked\/stale managed links, compact delivery-path\s+detail, delegated actions, and grouped Rules\/Send\/Time\/Access selected-profile\s+bulk action rails/);
@@ -428,6 +430,12 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /Ack: \$\{item\.syncSourceAckLabel\}/);
   assert.match(helperSource, /filtertubeManagedAction/);
   assert.match(helperSource, /delegated_runtime_gate/);
+  assert.match(tabViewHtml, /id="managedChildSyncBoundary"/);
+  assert.match(source, /function renderManagedChildSyncBoundary\(\)/);
+  assert.match(source, /Global account policy and Master PIN controls are paused until you finish editing/);
+  assert.match(source, /Finish protected-profile editing before changing global account policy/);
+  assert.match(source, /Finish protected-profile editing before changing global account, Master PIN, or create-profile controls/);
+  assert.match(source, /ft-managed-child-sync-boundary__chips/);
   assert.match(helperSource, /global\.FilterTubeManagedParentCommandCenter = \{/);
   assert.match(tabViewHtml, /managed_parent_command_center\.js[\s\S]*tab-view\.js/);
   assert.match(source, /const managedStatusText = profileId !== 'default'/);
@@ -540,6 +548,8 @@ test('managed command-center spec pins parent workflow without making UI authori
   assert.match(css, /\.ft-managed-command-center__profile\s*\{/);
   assert.match(css, /\.ft-managed-command-center__select\s*\{/);
   assert.match(css, /\.ft-managed-command-center__actions\s*\{/);
+  assert.match(css, /\.ft-managed-child-sync-boundary\s*\{/);
+  assert.match(css, /\.ft-managed-child-sync-boundary__chips\s*\{/);
   assert.match(css, /min-height:\s*44px/);
   assert.match(css, /@media \(max-width: 768px\)/);
   assert.match(css, /\.ft-managed-command-center__bulk-actions\s*\{\s*grid-template-columns: 1fr;/s);

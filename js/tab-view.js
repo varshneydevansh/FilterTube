@@ -2834,6 +2834,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftImportSyncDeviceBtn = document.getElementById('ftImportSyncDeviceBtn');
 
     const ftProfilesManager = document.getElementById('ftProfilesManager');
+    const managedChildSyncBoundary = document.getElementById('managedChildSyncBoundary');
     const ftCreateAccountBtn = document.getElementById('ftCreateAccountBtn');
     const ftCreateChildBtn = document.getElementById('ftCreateChildBtn');
     const ftSetMasterPinBtn = document.getElementById('ftSetMasterPinBtn');
@@ -6084,6 +6085,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         return ['dashboard', 'filters', 'semantic', 'kids', 'settings', 'sync'].includes(normalizeString(viewId));
     }
 
+    function isManagedChildEditActive() {
+        return !!managedChildEdit && !!getManagedChildProfile();
+    }
+
     function endManagedChildEdit() {
         managedChildEdit = null;
         renderManagedChildEditorBanner();
@@ -6148,8 +6153,51 @@ document.addEventListener('DOMContentLoaded', async () => {
         banner.appendChild(doneBtn);
     }
 
+    function renderManagedChildSyncBoundary() {
+        if (!managedChildSyncBoundary) return;
+        managedChildSyncBoundary.innerHTML = '';
+        const profile = getManagedChildProfile();
+        const active = !!managedChildEdit && !!profile;
+        managedChildSyncBoundary.hidden = !active;
+        if (!active) return;
+
+        const profileName = normalizeString(profile.name) || 'this profile';
+        const copy = document.createElement('div');
+        copy.className = 'ft-managed-child-sync-boundary__copy';
+        const title = document.createElement('strong');
+        title.textContent = `Protected edit session: ${profileName}`;
+        const body = document.createElement('span');
+        body.textContent = 'Family Controls targets this protected profile. Global account policy and Master PIN controls are paused until you finish editing, while device pairing and Send Update remain parent-owned.';
+        copy.append(title, body);
+
+        const chips = document.createElement('div');
+        chips.className = 'ft-managed-child-sync-boundary__chips';
+        [
+            {
+                label: 'Rules and time target protected profile',
+                title: 'Edit Rules, Set Limit, History, Lists, and Send Update act through parent-managed controls.'
+            },
+            {
+                label: 'Device trust stays parent-owned',
+                title: 'Pairing or sending still requires the current parent/account authority.'
+            },
+            {
+                label: 'Profile PIN is only a switch lock',
+                title: 'A profile switching PIN does not grant parent/admin authority.'
+            }
+        ].forEach((item) => {
+            const chip = document.createElement('span');
+            chip.textContent = item.label;
+            chip.title = item.title;
+            chips.appendChild(chip);
+        });
+
+        managedChildSyncBoundary.append(copy, chips);
+    }
+
     function renderManagedChildEditorBanner() {
         renderManagedChildGlobalBanner();
+        renderManagedChildSyncBoundary();
         const ids = {
             main: ['managedChildFiltersBanner', 'managedChildFiltersChannelBanner', 'managedChildFiltersContentBanner'],
             kids: ['managedChildKidsBanner', 'managedChildKidsChannelBanner', 'managedChildKidsContentBanner']
@@ -6164,6 +6212,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
         renderFor('main');
         renderFor('kids');
+        updateAdminPolicyControls();
+        updateChildProfileCapabilityControls();
     }
 
     async function startManagedChildEdit(profileId, surface) {
@@ -6215,8 +6265,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!ftAllowAccountCreation || !ftMaxAccounts) return;
         const profilesV4 = profilesV4Cache;
         const isAdmin = activeProfileId === 'default';
-        ftAllowAccountCreation.disabled = !isAdmin;
-        ftMaxAccounts.disabled = !isAdmin;
+        const scopedProtectedEdit = isManagedChildEditActive();
+        const scopedTitle = 'Finish protected-profile editing before changing global account policy.';
+        ftAllowAccountCreation.disabled = !isAdmin || scopedProtectedEdit;
+        ftMaxAccounts.disabled = !isAdmin || scopedProtectedEdit;
+        ftAllowAccountCreation.title = scopedProtectedEdit ? scopedTitle : (!isAdmin ? 'Switch to Default to change account policy.' : '');
+        ftMaxAccounts.title = scopedProtectedEdit ? scopedTitle : (!isAdmin ? 'Switch to Default to change account policy.' : '');
 
         if (!profilesV4) return;
         const policy = getAccountPolicy(profilesV4);
@@ -6226,7 +6280,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function updateChildProfileCapabilityControls() {
         const isChild = getActiveProfileType() === 'child';
+        const scopedProtectedEdit = isManagedChildEditActive();
         const childTitle = 'Child profiles cannot manage backup, import/export, or account-admin actions here.';
+        const scopedTitle = 'Finish protected-profile editing before changing global account, Master PIN, or create-profile controls.';
         const syncKidsToMainToggle = document.getElementById('setting_syncKidsToMain');
 
         if (ftExportV3Btn) {
@@ -6265,20 +6321,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 : (locked ? 'Unlock this profile to change auto-backup preferences.' : (autoBackupEnabled ? '' : 'Enable Auto Backup to change format.'));
         }
         if (ftCreateAccountBtn) {
-            ftCreateAccountBtn.disabled = isChild;
-            ftCreateAccountBtn.title = isChild ? childTitle : '';
+            ftCreateAccountBtn.disabled = isChild || scopedProtectedEdit;
+            ftCreateAccountBtn.title = isChild ? childTitle : (scopedProtectedEdit ? scopedTitle : '');
         }
         if (ftCreateChildBtn) {
-            ftCreateChildBtn.disabled = isChild;
-            ftCreateChildBtn.title = isChild ? childTitle : '';
+            ftCreateChildBtn.disabled = isChild || scopedProtectedEdit;
+            ftCreateChildBtn.title = isChild ? childTitle : (scopedProtectedEdit ? scopedTitle : '');
         }
         if (ftSetMasterPinBtn) {
-            ftSetMasterPinBtn.disabled = isChild;
-            ftSetMasterPinBtn.title = isChild ? childTitle : '';
+            ftSetMasterPinBtn.disabled = isChild || scopedProtectedEdit;
+            ftSetMasterPinBtn.title = isChild ? childTitle : (scopedProtectedEdit ? scopedTitle : '');
         }
         if (ftClearMasterPinBtn) {
-            ftClearMasterPinBtn.disabled = isChild;
-            ftClearMasterPinBtn.title = isChild ? childTitle : '';
+            ftClearMasterPinBtn.disabled = isChild || scopedProtectedEdit;
+            ftClearMasterPinBtn.title = isChild ? childTitle : (scopedProtectedEdit ? scopedTitle : '');
         }
         if (syncKidsToMainToggle) {
             syncKidsToMainToggle.disabled = isChild;
