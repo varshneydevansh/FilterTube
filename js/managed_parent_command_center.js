@@ -72,7 +72,7 @@
         const intents = [
             {
                 action: 'edit_rules',
-                label: 'Edit Rules',
+                label: 'Rules',
                 profileId: targetId,
                 scope: 'main_kids',
                 authority: 'delegated_runtime_gate',
@@ -96,7 +96,7 @@
             },
             {
                 action: 'send_managed_policy',
-                label: 'Send Update',
+                label: 'Send',
                 profileId: targetId,
                 scope: 'active',
                 authority: 'managed_policy_provider_delivery',
@@ -104,7 +104,7 @@
             },
             {
                 action: timeLimitActive ? 'change_time_limit' : 'set_time_limit',
-                label: timeLimitActive ? 'Change Limit' : 'Set Limit',
+                label: timeLimitActive ? 'Change Time' : 'Set Time',
                 profileId: targetId,
                 scope: 'time_limits',
                 authority: 'delegated_runtime_gate',
@@ -184,7 +184,7 @@
                     id: listId,
                     name: typeof item.managedListName === 'string' && item.managedListName.trim()
                         ? item.managedListName.trim()
-                        : 'Imported channel list',
+                        : 'Imported rule list',
                     rowCount: 0,
                     activeRowCount: 0,
                     pausedRowCount: 0,
@@ -227,8 +227,12 @@
         const kids = safeObject(profile?.kids);
         addRows(main.channels, 'Main');
         addRows(main.whitelistChannels, 'Main');
+        addRows(main.keywords, 'Main');
+        addRows(main.whitelistKeywords, 'Main');
         addRows(kids.blockedChannels, 'Kids');
         addRows(kids.whitelistChannels, 'Kids');
+        addRows(kids.blockedKeywords, 'Kids');
+        addRows(kids.whitelistKeywords, 'Kids');
         const now = Date.now();
         const items = Array.from(lists.values()).map((item) => ({
             id: item.id,
@@ -389,7 +393,7 @@
         if (readyCount <= 0) {
             return {
                 key: 'provider_needed',
-                label: 'Provider setup needed',
+                label: 'Open both devices',
                 tone: 'warning'
             };
         }
@@ -403,14 +407,14 @@
         if (item.syncLocalNetworkReady === true) {
             return {
                 key: 'local_network',
-                label: 'LAN provider ready',
+                label: 'Same-network ready',
                 tone: 'success'
             };
         }
         if (item.syncMailboxReady === true) {
             return {
                 key: 'mailbox',
-                label: 'Mailbox later',
+                label: 'Offline pickup ready',
                 tone: 'success'
             };
         }
@@ -440,12 +444,12 @@
             return 'Local control works now. Pair only when updates need to reach another device.';
         }
         if (readyCount <= 0) {
-            return `${targetCount} verified ${targetCount === 1 ? 'device is' : 'devices are'} paired; open both devices for live P2P or enable a later delivery provider.`;
+            return `${targetCount} verified ${targetCount === 1 ? 'device is' : 'devices are'} paired; open parent and protected devices together for live P2P.`;
         }
         const paths = [];
         if (item.syncLiveReady === true) paths.push('live P2P');
-        if (item.syncLocalNetworkReady === true) paths.push('LAN');
-        if (item.syncMailboxReady === true) paths.push('mailbox later');
+        if (item.syncLocalNetworkReady === true) paths.push('same-network');
+        if (item.syncMailboxReady === true) paths.push('offline pickup');
         return paths.length
             ? `${targetCount} verified ${targetCount === 1 ? 'device' : 'devices'} via ${paths.join(' + ')}.`
             : `${readyCount} verified ${readyCount === 1 ? 'queue is' : 'queues are'} ready.`;
@@ -842,9 +846,9 @@
         strip.className = 'ft-managed-command-center__strip';
         [
             { label: 'Managed profiles', value: summary.profileCount, tone: 'neutral', title: 'Profiles this parent/account can manage.', always: true },
-            { label: 'Ready', value: summary.syncReadyProfileCount, tone: summary.syncReadyProfileCount ? 'success' : 'neutral', title: 'Profiles with a verified delivery path available now or through a configured provider.', always: true },
-            { label: 'Lists active', value: summary.managedChannelListProfileCount, tone: 'success', title: 'Protected profiles with imported channel-list rules.' },
-            { label: 'Needs setup', value: summary.noDeviceProfileCount + summary.syncRepairProfileCount + summary.syncStaleProfileCount, tone: 'warning', title: 'Profiles that need a verified device, refreshed trust, or re-pairing before remote updates.' },
+            { label: 'Ready to send', value: summary.syncReadyProfileCount, tone: summary.syncReadyProfileCount ? 'success' : 'neutral', title: 'Profiles with a verified delivery path available now.', always: true },
+            { label: 'Lists active', value: summary.managedChannelListProfileCount, tone: 'success', title: 'Protected profiles with imported rule lists.' },
+            { label: 'Needs device', value: summary.noDeviceProfileCount + summary.syncRepairProfileCount + summary.syncStaleProfileCount, tone: 'warning', title: 'Profiles that need a verified device, refreshed trust, or re-pairing before remote updates.' },
             { label: 'Requests', value: summary.pendingExtraTimeRequestCount, tone: 'warning', title: 'Protected profiles asking for more YouTube time.' },
             { label: 'Conflicts', value: summary.remoteConflictCount, tone: 'danger', title: 'Rejected or conflicting remote-policy history rows that need parent review.' }
         ].filter(item => item.always || (Number(item.value) || 0) > 0).forEach((item) => {
@@ -869,23 +873,23 @@
                 label: 'Choose profile',
                 detail: `${summary.profileCount} protected ${summary.profileCount === 1 ? 'profile' : 'profiles'} available`,
                 tone: 'neutral',
-                title: 'Start by choosing the protected child/user profile you want to manage.'
+                title: 'Choose the child, family member, or other protected profile you want to manage.'
             },
             {
                 step: '2',
-                label: 'Set rules and time',
+                label: 'Set guardrails',
                 detail: summary.managedChannelListProfileCount > 0
                     ? 'Rules, lists, access, and time are ready to review'
-                    : 'Use Edit Rules, Lists, Set Limit, and Main/Kids controls',
+                    : 'Use Rules, Lists, Set Time, and Main/Kids controls',
                 tone: summary.managedChannelListProfileCount > 0 || summary.limitedCount > 0 ? 'success' : 'neutral',
                 title: 'These actions change the selected protected profile after parent/account approval.'
             },
             {
                 step: '3',
-                label: 'Pair or send',
+                label: 'Sync when needed',
                 detail: summary.syncReadyProfileCount > 0
                     ? `${summary.syncReadyProfileCount} ${summary.syncReadyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path`
-                    : 'Pair a verified device only when updates must reach another device',
+                    : 'Pair only when this profile also lives on another device',
                 tone: summary.syncReadyProfileCount > 0 ? 'success' : 'warning',
                 title: 'Local control works without remote delivery. Pairing is only needed for another device.'
             }
@@ -1198,7 +1202,7 @@
             [
                 { label: item.viewingAccess, tone: 'neutral', title: 'Allowed YouTube space for this protected profile.' },
                 { label: item.timeLimit, tone: item.timeLimited ? 'warning' : 'neutral', title: 'Daily YouTube time for this protected profile.' },
-                item.managedChannelListLabel ? { label: item.managedChannelListLabel, tone: 'success', title: item.managedChannelListDetail || 'Imported channel lists attached to this profile.' } : null,
+                item.managedChannelListLabel ? { label: item.managedChannelListLabel, tone: 'success', title: item.managedChannelListDetail || 'Imported rule lists attached to this profile.' } : null,
                 { label: syncState.label, tone: syncState.tone, title: item.deliveryPathDetail || 'Device delivery status.' },
                 item.remoteScopeCount ? { label: item.syncLabel, tone: 'success', title: 'Latest accepted managed policy revision.' } : null,
                 item.pendingExtraTimeRequestLabel ? { label: item.pendingExtraTimeRequestLabel, tone: 'warning', title: item.pendingExtraTimeRequestDetail || 'This profile asked for more time.' } : null,
@@ -1217,10 +1221,10 @@
             detailsWrap.className = 'ft-managed-command-center__details';
             [
                 hasVerifiedDevice
-                    ? { label: 'Delivery', value: item.deliveryPreview?.label || 'Send when ready', note: item.deliveryPathDetail }
-                    : { label: 'Next step', value: 'Pair only for another device', note: 'This profile can still be controlled locally. Use live P2P when parent and protected devices are both open.' },
+                    ? { label: 'Device sync', value: item.deliveryPreview?.label || 'Send when ready', note: item.deliveryPathDetail }
+                    : { label: 'Device sync', value: 'Not paired', note: 'Local rules and time limits work here. Pair only when this profile must also update another device.' },
                 item.managedChannelListDetail ? { label: 'Lists', value: item.managedChannelListDetail } : null,
-                hasVerifiedDevice ? { label: 'Device', value: item.syncTargetLabel } : null,
+                hasVerifiedDevice ? { label: 'Verified device', value: item.syncTargetLabel } : null,
                 item.pendingExtraTimeRequestDetail ? { label: 'Request', value: item.pendingExtraTimeRequestDetail } : null,
                 item.remoteConflictCount > 0 ? { label: 'Conflict', value: `${item.remoteConflictCount} needs review` } : null
             ].filter(Boolean).forEach((detail) => {

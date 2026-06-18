@@ -289,7 +289,7 @@ function buildManagedCommandCenterSummary(profilesV4, { revealDetails = false } 
         actionIntents: [
           {
             action: 'edit_rules',
-            label: 'Edit Rules',
+            label: 'Rules',
             profileId,
             scope: 'main_kids',
             authority: 'delegated_runtime_gate',
@@ -305,7 +305,7 @@ function buildManagedCommandCenterSummary(profilesV4, { revealDetails = false } 
           },
           {
             action: timeLimit === 'No limit' ? 'set_time_limit' : 'change_time_limit',
-            label: timeLimit === 'No limit' ? 'Set Limit' : 'Change Limit',
+            label: timeLimit === 'No limit' ? 'Set Time' : 'Change Time',
             profileId,
             scope: 'time_limits',
             authority: 'delegated_runtime_gate',
@@ -393,8 +393,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /Pick a profile, set what it can watch and for how long, then send only when another device needs the update/);
   assert.match(helperSource, /Family Controls workflow/);
   assert.match(helperSource, /Choose profile/);
-  assert.match(helperSource, /Set rules and time/);
-  assert.match(helperSource, /Pair or send/);
+  assert.match(helperSource, /Set guardrails/);
+  assert.match(helperSource, /Sync when needed/);
   assert.match(helperSource, /actionIntents: buildManagedCommandCenterActionIntents\(profileId, timePolicy, \{/);
   assert.match(helperSource, /bulk_set_time_limit/);
   assert.match(helperSource, /bulk_edit_rules/);
@@ -687,7 +687,7 @@ test('managed command-center overview aggregates parent-visible profiles without
   assert.deepEqual(plain(summary.rows[0].actionIntents), [
     {
       action: 'edit_rules',
-      label: 'Edit Rules',
+      label: 'Rules',
       profileId: 'childA',
       scope: 'main_kids',
       authority: 'delegated_runtime_gate',
@@ -703,7 +703,7 @@ test('managed command-center overview aggregates parent-visible profiles without
     },
     {
       action: 'change_time_limit',
-      label: 'Change Limit',
+      label: 'Change Time',
       profileId: 'childA',
       scope: 'time_limits',
       authority: 'delegated_runtime_gate',
@@ -1013,7 +1013,7 @@ test('managed command-center helper emits delegated action intents without polic
   assert.deepEqual(plain(summary.rows[0].actionIntents), [
     {
       action: 'edit_rules',
-      label: 'Edit Rules',
+      label: 'Rules',
       profileId: 'childA',
       scope: 'main_kids',
       authority: 'delegated_runtime_gate',
@@ -1037,7 +1037,7 @@ test('managed command-center helper emits delegated action intents without polic
     },
     {
       action: 'send_managed_policy',
-      label: 'Send Update',
+      label: 'Send',
       profileId: 'childA',
       scope: 'active',
       authority: 'managed_policy_provider_delivery',
@@ -1045,7 +1045,7 @@ test('managed command-center helper emits delegated action intents without polic
     },
     {
       action: 'change_time_limit',
-      label: 'Change Limit',
+      label: 'Change Time',
       profileId: 'childA',
       scope: 'time_limits',
       authority: 'delegated_runtime_gate',

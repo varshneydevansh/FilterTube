@@ -94,13 +94,18 @@ extension authority code.
   per-profile details column so profile names and next actions do not collapse
   under provider/status copy.
 - [x] Parent workflow strip: Family Controls now leads with `Choose profile`,
-  `Set rules and time`, and `Pair or send` so parents understand that local
-  control works first and verified-device delivery is only needed for another
-  device.
+  `Set guardrails`, and `Sync when needed` so parents understand that local
+  control works first and verified-device delivery is only needed when the same
+  protected profile must update another device.
 - [x] Family Controls row copy and feedback were simplified for parent use:
-  `Pair to sync` means remote device setup only, profile ownership reads as
-  `Parent: ...`, status chips have explanatory titles, and neutral detail cards
-  no longer look like warning/error states when nothing is wrong.
+  rows now say `Device sync: Not paired` for local-only profiles, saved
+  verified devices say `open both devices` when live P2P is needed, profile
+  ownership reads as `Parent: ...`, status chips have explanatory titles, and
+  neutral detail cards no longer look like warning/error states when nothing is
+  wrong.
+- [x] Family Controls row layout now keeps profile/status/actions on the first
+  line and moves details underneath, so parent names, device state, list source,
+  and action buttons do not squeeze each other on desktop or mobile.
 - [x] Accounts & Sync now shows a protected-edit boundary when a parent is
   editing a protected profile: Family Controls remains the target surface for
   rules/time/history/send, generic device pairing remains parent-owned, and
@@ -116,10 +121,11 @@ parent tool instead of a sync/debug console.
   and time, then pair/send only when another device needs the update.
 - [x] Optional mailbox/LAN provider rows are not shown as first-run required
   setup when no protected profile exists or when providers are not configured.
-- [x] Imported channel lists are treated as parent-approved rule sources, not as
+- [x] Imported rule lists are treated as parent-approved rule sources, not as
   transport authority or executable filter code.
-- [x] List-derived channel rules preserve source metadata, source format,
-  source hash, last checked time, pause state, and Manual-vs-list separation.
+- [x] List-derived channel and keyword rules preserve source metadata, source
+  format, source hash, last checked time, pause state, and Manual-vs-list
+  separation.
 - [x] Channels page exposes a source filter/dropdown so parents can view
   `Manual`, `Imported lists`, and individual managed lists without guessing
   where a channel entry came from.
@@ -134,7 +140,7 @@ parent tool instead of a sync/debug console.
 - [ ] Managed action history clearly answers who changed a rule, whether it was
   manual or list-derived, and whether it was sent to a verified device, without
   exposing raw policy JSON or sensitive rule payloads to protected users.
-- [ ] Downstream app UI contract documents the same channel-list source filter,
+- [ ] Downstream app UI contract documents the same rule-list source filter,
   Kids list selection, and source badges so mobile/tablet surfaces do not fork
   the parent mental model.
 - [x] Command center can send signed active managed-policy updates to currently
@@ -152,15 +158,21 @@ parent tool instead of a sync/debug console.
   while offline.
 - [x] Runtime Main/Kids route gate, background-owned time-budget accounting, and
   protected timeout overlay exist for active protected profiles.
-- [x] Managed channel filter-list imports and parent-triggered URL subscriptions
+- [x] Managed rule-list imports and parent-triggered URL subscriptions
   are now part of the managed parent/caregiver goal. Issue 62 asks for
-  content-blocker-style channel lists that can be imported, enabled, disabled,
-  and synced instead of forcing parents to add channels one at a time. The
+  content-blocker-style lists that can be imported, enabled, disabled,
+  and synced instead of forcing parents to add channels or keywords one at a time. The
   extension-owned manual/check/refresh/pause/remove path is present. This is a
   parent/caregiver rule-source feature, not an untrusted URL authority path. The
   parent-facing flow stays simple: import or check a list, preview channels,
-  choose protected profiles, apply, then send to verified devices when delivery
-  is ready. Silent scheduled refresh remains deferred.
+  keywords, and skipped rows, choose protected profiles, apply, then send to
+  verified devices when delivery is ready. Silent scheduled refresh remains
+  deferred.
+  - [x] First CSV rule-list slice: parents can use a visible CSV template with
+    `channel_id,keyword,notes`, paste or load CSV, preview explicit channels and
+    explicit keywords separately, apply them to Main/Kids/both under the target
+    profile current Blocklist/Whitelist mode, and send the changed profile
+    policy through the existing managed-policy JSON path.
   - [x] First local import slice: parent/account profiles can paste or choose a
     text file, preview valid channel identifiers, apply the list to selected
     protected profiles on Main/Kids/both, write protected redacted history, and
@@ -214,13 +226,13 @@ parent tool instead of a sync/debug console.
     list revision they imported or refreshed, while the URL/list still has no
     policy authority by itself.
   - [x] First structured-list compatibility slice: parents can paste or choose
-    a simple JSON channel list (`channels`, `items`, `entries`,
-    `blockedChannels`, `channelIds`, or `handles`) and the entries still
-    normalize through the same preview, parent re-auth, materialized channel
-    rows, list metadata, and verified-device delivery path as text lists.
-    Materialized rows now also preserve compact source-format metadata so apps
-    can distinguish text rows from JSON sources without treating either format
-    as policy authority.
+    a simple JSON rule list (`channels`, `items`, `entries`, `blockedChannels`,
+    `channelIds`, `handles`, and explicit `keywords`) and the entries still
+    normalize through the same preview, parent re-auth, materialized rule rows,
+    list metadata, and verified-device delivery path as text lists. Materialized
+    rows now also preserve compact source-format metadata so apps can
+    distinguish text rows from JSON/CSV sources without treating any format as
+    policy authority.
   - [x] First subscription-check slice: parent/account profiles can check
     URL-backed lists from the `Lists` action. Changed source hashes refresh
     materialized channel rows after parent re-auth; unchanged source hashes only
@@ -964,7 +976,7 @@ the current extension dashboard.
   Parent/account-authorized profile manager views now also show a command-center
   overview for protected profiles, viewing spaces, time limits, sync status,
   and protected history. Command-center row buttons are delegated action intents
-  for existing gated Edit Rules, History, Time Limit, and Send Update paths,
+  for existing gated Rules, History, Time Limit, and Send paths,
   plus a selected-profile rule editor handoff, local selected-profile bulk
   time-limit and viewing-space actions, and selected-profile signed-policy
   sends. Child/protected views do not receive detailed managed status text or
@@ -982,7 +994,7 @@ the current extension dashboard.
   when both sides are available. Unconfigured mailbox and local-network provider
   setup is hidden from the normal command center so parents are not asked to
   bring infrastructure. If a provider is already configured, the UI labels it as
-  Later Updates or Same-Network and uses plain parent/user language while audit
+  Offline Pickup or Same-Network and uses plain parent/user language while audit
   docs retain the trusted-link, target-profile, scope, revision, hash, and
   signature authority proof.
 - **Acceptance Criteria**:
