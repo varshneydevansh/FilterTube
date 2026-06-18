@@ -5196,6 +5196,44 @@ document.addEventListener('DOMContentLoaded', async () => {
         return canActiveProfileManageProfile(profilesV4, targetProfileId);
     }
 
+    function resolveManagedActionHistorySourceLabel(row, summary = null) {
+        const item = safeObject(row);
+        const root = safeObject(summary || item.summary);
+        const actionType = normalizeString(item.actionType);
+        const transport = normalizeString(root.transport);
+        if (actionType.startsWith('policy.channel_list.')) return 'Approved list';
+        if (actionType === 'remote_policy.source_push') return 'Send update';
+        if (actionType.startsWith('remote_policy.mailbox.')) return 'Pick Up Later';
+        if (actionType.startsWith('remote_policy.local_network.')) return 'Home Bridge';
+        if (actionType.startsWith('remote_policy.')) {
+            if (transport === 'local_network') return 'Home Bridge';
+            if (transport === 'mailbox') return 'Pick Up Later';
+            return 'Remote update';
+        }
+        if (actionType === 'local_policy.update'
+            || actionType === 'policy.viewing_space.update'
+            || actionType === 'policy.time_limit.update'
+            || actionType.startsWith('rule.')) {
+            return 'Parent edit';
+        }
+        if (actionType === 'policy.time_limit.request_extra') return 'Time request';
+        if (actionType.startsWith('delivery.')) return 'Delivery setting';
+        if (actionType.startsWith('trust_link.') || actionType === 'managed_signing_key.rotate') return 'Trusted device';
+        if (actionType.startsWith('admin_session.')) return 'Admin access';
+        if (actionType === 'history.clear') return 'History';
+        return '';
+    }
+
+    function buildManagedActionHistoryLatestLabel(row) {
+        const item = safeObject(row);
+        const actionType = normalizeString(item.actionType);
+        const result = normalizeString(item.result);
+        const safeLabel = MANAGED_ACTION_HISTORY_SAFE_LABELS[actionType] || actionType || '';
+        const sourceLabel = resolveManagedActionHistorySourceLabel(item);
+        const parts = [result, sourceLabel, safeLabel].filter(Boolean);
+        return parts.join(' · ');
+    }
+
     function formatManagedActionHistoryRow(row) {
         const item = safeObject(row);
         const summary = safeObject(item.summary);
@@ -5259,6 +5297,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const root = safeObject(summary);
         const parts = [];
         const actionType = normalizeString(item.actionType);
+        const sourceLabel = resolveManagedActionHistorySourceLabel(item, root);
+        if (sourceLabel) {
+            parts.push(`from ${sourceLabel}`);
+        }
         if (actionType === 'policy.time_limit.request_extra') {
             const surface = normalizeString(root.surface);
             const dateKey = normalizeString(root.dateKey);
@@ -5427,9 +5469,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const latestRow = safeObject(historyRows[historyRows.length - 1]);
         const latestDeliverySummary = summarizeLatestManagedDeliveryHistory(historyRows);
         const latestActionType = normalizeString(latestRow.actionType);
-        const latestSafeLabel = MANAGED_ACTION_HISTORY_SAFE_LABELS[latestActionType] || latestActionType || '';
         const latestResult = normalizeString(latestRow.result);
         const latestScope = normalizeString(latestRow.scope);
+        const latestActionLabel = buildManagedActionHistoryLatestLabel(latestRow);
         const conflictRows = Object.values(remotePolicyConflicts)
             .map(safeObject)
             .filter(row => row.schema === MANAGED_REMOTE_POLICY_CONFLICT_SCHEMA);
@@ -5445,9 +5487,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             latestScope,
             latestDeliveryLabel: latestDeliverySummary.label,
             latestDeliveryTone: latestDeliverySummary.tone,
-            latestActionLabel: latestSafeLabel && latestResult
-                ? `${latestResult} · ${latestSafeLabel}`
-                : (latestSafeLabel || (latestResult && latestScope ? `${latestResult}/${latestScope}` : ''))
+            latestActionLabel: latestActionLabel || (latestResult && latestScope ? `${latestResult}/${latestScope}` : '')
         };
     }
 

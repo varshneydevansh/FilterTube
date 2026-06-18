@@ -154,9 +154,10 @@ parent tool instead of a sync/debug console.
   saved Kids list after importing approved rules into Kids or both surfaces.
 - [x] Family Controls row details show list status without crowding the profile
   name, action buttons, or parent workflow.
-- [ ] Managed action history clearly answers who changed a rule, whether it was
-  manual or list-derived, and whether it was sent to a verified device, without
-  exposing raw policy JSON or sensitive rule payloads to protected users.
+- [x] Managed action history clearly answers whether the latest row came from a
+  parent edit, approved list, remote update, Send update, Pick Up Later,
+  Home Bridge, trusted-device action, admin access, or history action while
+  keeping raw policy JSON and sensitive rule payloads out of protected views.
 - [ ] Downstream app UI contract documents the same Main/Kids rule-list source
   filter, Kids list selection, and source badges so mobile/tablet surfaces do
   not fork the parent mental model.

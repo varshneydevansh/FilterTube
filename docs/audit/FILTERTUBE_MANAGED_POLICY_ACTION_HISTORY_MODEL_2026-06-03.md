@@ -14,6 +14,12 @@ receive attempts now persist profile-local remote failed-attempt rate-limit
 state and copy redacted rate-limit metadata into the protected history row.
 Parent/caregiver history clearing now records its own protected
 `history.clear` evidence row instead of silently removing accepted rows.
+History display now adds a safe source-category label derived from action type
+and sanitized transport metadata: Parent edit, Approved list, Remote update,
+Send update, Pick Up Later, Home Bridge, trusted-device, admin-access, time
+request, delivery setting, or history. These labels help parents understand
+manual/list-derived/remote/sent changes but remain display context only, not
+policy authority.
 Trusted-link removal history writer now records protected `trust_link.revoke`
 rows when local accepted managed policy state is purged for a removed link, and
 source-side signing-key rotation now records protected `trust_link.key_revoke`
@@ -252,7 +258,7 @@ profile when a row can be attached to a known protected profile:
 runtime managed action history store: profile-local managed child rows
 runtime managed action history row writer: local managed child edit plus local time-limit policy edit plus managed channel-list import/remove/check/refresh/pause/resume plus failed parent unlock plus Nanah managed-policy validation/apply outcomes
 runtime managed action history access gate: present for parent/account authority
-runtime managed action history display redaction: present for sensitive rows through fixed labels, normalized reason codes, and redacted time-limit/request counts
+runtime managed action history display redaction: present for sensitive rows through fixed labels, safe source-category labels, normalized reason codes, and redacted time-limit/request counts
 runtime managed action history retention pruning: present for 30-day accepted rows, 90-day protected evidence rows, and 500-row profile cap
 runtime managed action history clear path: present for accepted rows only while retaining protected evidence
 runtime managed action history clear event writer: present as protected `history.clear` evidence

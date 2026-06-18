@@ -428,12 +428,12 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(source, /function recordManagedOpenSyncAckHistory\(details = \{\}\)/);
   assert.match(source, /remote_policy\.mailbox\.ack/);
   assert.match(source, /remote_policy\.local_network\.ack/);
-  assert.match(source, /const transportLabel = transport === 'local_network' \? 'Local-network' : 'Mailbox'/);
+  assert.match(source, /const transportLabel = transport === 'local_network' \? 'Home Bridge' : 'Pick Up Later'/);
   assert.match(source, /\$\{transportLabel\} ack delivered/);
   assert.match(source, /\$\{transportLabel\} ack handoff failed/);
   assert.match(source, /recordAckHistory: \(details\) => recordManagedOpenSyncAckHistory\(details\)/);
   assert.match(source, /MANAGED_ACTION_HISTORY_SAFE_LABELS = Object\.freeze/);
-  assert.match(source, /'policy\.channel_list\.check': 'Channel list checked'/);
+  assert.match(source, /'policy\.channel_list\.check': 'Approved list checked'/);
   assert.match(source, /MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set\(\[/);
   assert.match(source, /'policy\.channel_list\.check'/);
   assert.match(source, /actionType === 'policy\.channel_list\.check'/);
@@ -605,7 +605,7 @@ test('managed action history required outcomes cover accepted rejected conflict 
   assert.match(read('js/tab-view.js'), /function buildManagedTimeLimitLocalEditReport\(\{ actorProfileId, targetProfileId, nextPolicy \}\)/);
   assert.match(read('js/tab-view.js'), /actionType: 'policy\.time_limit\.update'/);
   assert.match(doc, /runtime managed action history access gate: present for parent\/account authority/);
-  assert.match(doc, /runtime managed action history display redaction: present for sensitive rows through fixed labels, normalized reason codes, and redacted time-limit\/request counts/);
+  assert.match(doc, /runtime managed action history display redaction: present for sensitive rows through fixed labels, safe source-category labels, normalized reason codes, and redacted time-limit\/request counts/);
   assert.match(doc, /runtime managed action history clear path: present for accepted rows only/);
   assert.match(doc, /runtime managed action history clear event writer: present as protected `history.clear` evidence/);
   assert.match(doc, /runtime remote managed validation\/apply history writer: present/);

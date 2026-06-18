@@ -59,10 +59,50 @@ function managedActionHistoryRowIsProtected(row) {
 
 const MANAGED_ACTION_HISTORY_SAFE_LABELS = Object.freeze({
   'remote_policy.reject': 'Remote policy rejected',
+  'remote_policy.accept': 'Remote policy accepted',
   'remote_policy.source_push': 'Parent policy push',
   'policy.time_limit.update': 'Time limit policy changed',
-  'policy.viewing_space.update': 'Viewing space policy changed'
+  'policy.viewing_space.update': 'Viewing space policy changed',
+  'policy.channel_list.import': 'Approved list imported',
+  'local_policy.update': 'Local policy changed'
 });
+
+function resolveManagedActionHistorySourceLabel(row, summary = null) {
+  const item = safeObject(row);
+  const root = safeObject(summary || item.summary);
+  const actionType = normalizeString(item.actionType);
+  const transport = normalizeString(root.transport);
+  if (actionType.startsWith('policy.channel_list.')) return 'Approved list';
+  if (actionType === 'remote_policy.source_push') return 'Send update';
+  if (actionType.startsWith('remote_policy.mailbox.')) return 'Pick Up Later';
+  if (actionType.startsWith('remote_policy.local_network.')) return 'Home Bridge';
+  if (actionType.startsWith('remote_policy.')) {
+    if (transport === 'local_network') return 'Home Bridge';
+    if (transport === 'mailbox') return 'Pick Up Later';
+    return 'Remote update';
+  }
+  if (actionType === 'local_policy.update'
+    || actionType === 'policy.viewing_space.update'
+    || actionType === 'policy.time_limit.update'
+    || actionType.startsWith('rule.')) {
+    return 'Parent edit';
+  }
+  if (actionType === 'policy.time_limit.request_extra') return 'Time request';
+  if (actionType.startsWith('delivery.')) return 'Delivery setting';
+  if (actionType.startsWith('trust_link.') || actionType === 'managed_signing_key.rotate') return 'Trusted device';
+  if (actionType.startsWith('admin_session.')) return 'Admin access';
+  if (actionType === 'history.clear') return 'History';
+  return '';
+}
+
+function buildManagedActionHistoryLatestLabel(row) {
+  const item = safeObject(row);
+  const actionType = normalizeString(item.actionType);
+  const result = normalizeString(item.result);
+  const safeLabel = MANAGED_ACTION_HISTORY_SAFE_LABELS[actionType] || actionType || '';
+  const sourceLabel = resolveManagedActionHistorySourceLabel(item);
+  return [result, sourceLabel, safeLabel].filter(Boolean).join(' · ');
+}
 
 function summarizeManagedPolicyStateForProfile(profile) {
   const managedState = safeObject(profile?.managedPolicyState);
@@ -95,9 +135,9 @@ function summarizeManagedPolicyStateForProfile(profile) {
   const protectedRows = historyRows.filter(managedActionHistoryRowIsProtected);
   const latestRow = safeObject(historyRows[historyRows.length - 1]);
   const latestActionType = normalizeString(latestRow.actionType);
-  const latestSafeLabel = MANAGED_ACTION_HISTORY_SAFE_LABELS[latestActionType] || latestActionType || '';
   const latestResult = normalizeString(latestRow.result);
   const latestScope = normalizeString(latestRow.scope);
+  const latestActionLabel = buildManagedActionHistoryLatestLabel(latestRow);
   return {
     localLabels,
     remoteLinkCount,
@@ -107,9 +147,7 @@ function summarizeManagedPolicyStateForProfile(profile) {
     protectedRowCount: protectedRows.length,
     latestResult,
     latestScope,
-    latestActionLabel: latestSafeLabel && latestResult
-      ? `${latestResult} · ${latestSafeLabel}`
-      : (latestSafeLabel || (latestResult && latestScope ? `${latestResult}/${latestScope}` : ''))
+    latestActionLabel: latestActionLabel || (latestResult && latestScope ? `${latestResult}/${latestScope}` : '')
   };
 }
 
@@ -378,8 +416,10 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
 
   assert.match(source, /function buildManagedProfileStatusText\(profile, \{ revealDetails = false \} = \{\}\)/);
   assert.match(source, /function summarizeManagedPolicyStateForProfile\(profile\)/);
+  assert.match(source, /function resolveManagedActionHistorySourceLabel\(row, summary = null\)/);
+  assert.match(source, /function buildManagedActionHistoryLatestLabel\(row\)/);
   assert.match(source, /latestActionLabel/);
-  assert.match(source, /MANAGED_ACTION_HISTORY_SAFE_LABELS\[latestActionType\]/);
+  assert.match(source, /buildManagedActionHistoryLatestLabel\(latestRow\)/);
   assert.match(source, /sourceAckLabel/);
   assert.match(source, /formatNanahManagedSourceAckSyncStatus/);
   assert.match(helperSource, /function buildManagedCommandCenterSummary\(profilesV4, \{ revealDetails = false, helpers = \{\} \} = \{\}\)/);
@@ -639,7 +679,7 @@ test('managed command-center overview aggregates parent-visible profiles without
   assert.equal(summary.rows[0].viewingAccess, 'Main only');
   assert.equal(summary.rows[0].timeLimit, '2h/day');
   assert.equal(summary.rows[0].syncLabel, 'Remote r4');
-  assert.equal(summary.rows[0].latestActionLabel, 'rejected · Remote policy rejected');
+  assert.equal(summary.rows[0].latestActionLabel, 'rejected · Remote update · Remote policy rejected');
   assert.deepEqual(plain(summary.bulkActionIntents), [
     {
       action: 'bulk_set_time_limit',
@@ -797,7 +837,7 @@ test('managed parent status summary shows revisions without plaintext rule value
   assert.match(status, /^Managed status: /);
   assert.match(status, /Local edits: Main r3, .*, Kids r1/);
   assert.match(status, /Remote sync: 2 scopes across 1 link, latest r5/);
-  assert.match(status, /History: 2 rows, 1 protected, latest rejected · Remote policy rejected/);
+  assert.match(status, /History: 2 rows, 1 protected, latest rejected · Remote update · Remote policy rejected/);
   assert.doesNotMatch(status, /spiders/);
   assert.doesNotMatch(status, /UC-secret/);
   assert.doesNotMatch(status, /video-secret/);
