@@ -126,8 +126,12 @@ extension authority code.
     normalization, no broad host-permission expansion, saved
     `managedListSourceUrl` row metadata, and the same parent unlock plus
     verified-device send offer.
-  - [ ] Reversible list library, enable/disable overlays, URL refresh, and
-    scheduled subscription refresh remain future slices.
+  - [x] First refresh slice: parent/account profiles can refresh URL-backed
+    imported lists on selected protected profiles, preserving the
+    parent-approved `managedListId`, replacing only matching list-derived rows,
+    recording protected redacted history, and offering verified-device send.
+  - [ ] Reversible list library, enable/disable overlays, and scheduled
+    subscription refresh remain future slices.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.

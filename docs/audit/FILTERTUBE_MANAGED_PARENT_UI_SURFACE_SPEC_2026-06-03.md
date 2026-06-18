@@ -90,6 +90,12 @@ host permissions, and the row metadata records `managedListSourceUrl` for later
 refresh/subscription work. A URL source is still only data: the parent must
 preview, choose protected profiles/surfaces, unlock, and apply before any rule
 changes.
+The URL refresh slice now exposes `Refresh List` only for imported lists that
+have saved `managedListSourceUrl` metadata. Refresh loads the saved public HTTPS
+source, preserves the parent-approved `managedListId`, replaces only matching
+list-derived rows on selected protected profiles, writes protected redacted
+`policy.channel_list.refresh` history rows, and can offer the existing
+verified-device send path. It is not a background subscription scheduler yet.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 

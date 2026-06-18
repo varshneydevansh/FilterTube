@@ -92,6 +92,14 @@
                 authority: 'delegated_runtime_gate',
                 sensitiveAction: true
             },
+            ...(policySummary.hasUrlManagedChannelList === true ? [{
+                action: 'refresh_channel_list',
+                label: 'Refresh List',
+                profileId: targetId,
+                scope: 'channels',
+                authority: 'delegated_runtime_gate',
+                sensitiveAction: true
+            }] : []),
             {
                 action: 'view_history',
                 label: 'History',
@@ -192,9 +200,13 @@
                         ? item.managedListName.trim()
                         : 'Imported channel list',
                     rowCount: 0,
+                    sourceUrlCount: 0,
                     surfaces: new Set()
                 };
                 existing.rowCount += 1;
+                if (typeof item.managedListSourceUrl === 'string' && item.managedListSourceUrl.trim()) {
+                    existing.sourceUrlCount += 1;
+                }
                 if (surfaceLabel) existing.surfaces.add(surfaceLabel);
                 lists.set(listId, existing);
             });
@@ -209,12 +221,15 @@
             id: item.id,
             name: item.name,
             rowCount: item.rowCount,
+            sourceUrlCount: item.sourceUrlCount,
             surfaces: Array.from(item.surfaces)
         }));
         const rowCount = items.reduce((total, item) => total + item.rowCount, 0);
+        const sourceUrlCount = items.reduce((total, item) => total + item.sourceUrlCount, 0);
         return {
             listCount: items.length,
             rowCount,
+            sourceUrlCount,
             items
         };
     }
@@ -437,6 +452,15 @@
                 authority: 'delegated_runtime_gate',
                 sensitiveAction: true
             },
+            ...((Array.isArray(rows) ? rows : []).some(row => (Number(row?.managedChannelListUrlCount) || 0) > 0) ? [{
+                action: 'bulk_refresh_channel_list',
+                label: 'Refresh list',
+                group: 'rules',
+                profileIds,
+                scope: 'channels',
+                authority: 'delegated_runtime_gate',
+                sensitiveAction: true
+            }] : []),
             {
                 action: 'bulk_add_video',
                 label: 'Add video ID',
@@ -583,6 +607,7 @@
                 latestDeliveryTone: typeof summary.latestDeliveryTone === 'string' ? summary.latestDeliveryTone.trim() : '',
                 managedChannelListCount: managedChannelLists.listCount,
                 managedChannelListRowCount: managedChannelLists.rowCount,
+                managedChannelListUrlCount: managedChannelLists.sourceUrlCount,
                 managedChannelListLabel: formatManagedChannelListChip(managedChannelLists),
                 managedChannelListDetail: formatManagedChannelListDetail(managedChannelLists),
                 pendingExtraTimeRequestLabel: pendingExtraTimeRequest?.label || '',
@@ -590,7 +615,8 @@
                 pendingExtraTimeRequest: !!pendingExtraTimeRequest,
                 actionIntents: buildManagedCommandCenterActionIntents(profileId, timePolicy, {
                     remoteConflictCount,
-                    pendingExtraTimeRequest: !!pendingExtraTimeRequest
+                    pendingExtraTimeRequest: !!pendingExtraTimeRequest,
+                    hasUrlManagedChannelList: managedChannelLists.sourceUrlCount > 0
                 })
             };
             row.deliveryPreview = resolveManagedCommandCenterDeliveryPreview(row);

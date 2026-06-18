@@ -3058,7 +3058,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const MANAGED_ACTION_HISTORY_ACCEPTED_RETENTION_MS = 30 * MANAGED_ACTION_HISTORY_DAY_MS;
     const MANAGED_ACTION_HISTORY_PROTECTED_RETENTION_MS = 90 * MANAGED_ACTION_HISTORY_DAY_MS;
     const MANAGED_ACTION_HISTORY_PROTECTED_RESULTS = new Set(['rejected', 'conflict', 'failed_auth', 'expired_session', 'cleared_by_admin']);
-    const MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set(['trust_link.revoke', 'trust_link.key_revoke', 'managed_signing_key.rotate', 'policy.time_limit.update', 'policy.time_limit.request_extra', 'policy.viewing_space.update', 'policy.channel_list.import', 'policy.channel_list.remove', 'remote_policy.source_push']);
+    const MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set(['trust_link.revoke', 'trust_link.key_revoke', 'managed_signing_key.rotate', 'policy.time_limit.update', 'policy.time_limit.request_extra', 'policy.viewing_space.update', 'policy.channel_list.import', 'policy.channel_list.remove', 'policy.channel_list.refresh', 'remote_policy.source_push']);
     const MANAGED_ACTION_HISTORY_SUMMARY_PRIVACY_SCHEMA = 'filtertube_managed_action_history_summary_privacy';
     const MANAGED_ACTION_HISTORY_ENCRYPTED_SUMMARY_SCHEMA = 'filtertube_managed_action_history_encrypted_summary';
     const MANAGED_ACTION_HISTORY_SAFE_LABELS = Object.freeze({
@@ -3072,6 +3072,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'policy.time_limit.request_extra': 'Extra time requested',
         'policy.channel_list.import': 'Channel list imported',
         'policy.channel_list.remove': 'Channel list removed',
+        'policy.channel_list.refresh': 'Channel list refreshed',
         'policy.sync_policy.update': 'Sync policy changed',
         'trust_link.create': 'Trusted link created',
         'trust_link.revoke': 'Trusted link removed',
@@ -5266,7 +5267,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (timezone) {
                 parts.push(`timezone ${timezone}`);
             }
-        } else if (actionType === 'policy.channel_list.import' || actionType === 'policy.channel_list.remove') {
+        } else if (actionType === 'policy.channel_list.import' || actionType === 'policy.channel_list.remove' || actionType === 'policy.channel_list.refresh') {
             const surface = normalizeString(root.surface);
             const addedCount = normalizeNonNegativeInteger(root.addedCount);
             const duplicateCount = normalizeNonNegativeInteger(root.duplicateCount);
@@ -7566,6 +7567,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         return safeArray(summaries).find(summary => summary.listId === selected) || null;
     }
 
+    async function promptManagedChannelListToRefresh(summaries) {
+        const urlBacked = safeArray(summaries).filter(summary => normalizeManagedChannelListSourceUrl(summary?.sourceUrl));
+        const choices = urlBacked.slice(0, 10).map((summary) => ({
+            value: summary.listId,
+            label: `${summary.listName} (${summary.channelCount})`,
+            className: 'btn-secondary'
+        }));
+        if (!choices.length) return null;
+        const selected = await showChoiceModal({
+            title: 'Refresh Imported List',
+            message: 'Choose the URL-backed list to refresh. FilterTube will load the saved public HTTPS source, then require parent/account unlock before changing protected profiles.',
+            details: urlBacked.slice(0, 5).map((summary) => {
+                const surfaces = summary.surfaces.includes('main') && summary.surfaces.includes('kids')
+                    ? 'Main + Kids'
+                    : (summary.surfaces.includes('kids') ? 'Kids' : 'Main');
+                return `${summary.listName}: ${summary.channelCount} current ${pluralize(summary.channelCount, 'channel')} across ${summary.profileIds.length} ${pluralize(summary.profileIds.length, 'profile')} (${surfaces})`;
+            }),
+            choices,
+            cancelText: 'Cancel'
+        });
+        return urlBacked.find(summary => summary.listId === selected) || null;
+    }
+
+    function hasManagedChannelListOnSurface(target, surface, listId) {
+        const item = safeObject(target);
+        const normalizedListId = normalizeString(listId);
+        if (!normalizedListId) return false;
+        return getManagedChannelListSurfaceKeys(surface).some((listKey) => {
+            const list = Array.isArray(item[listKey]) ? item[listKey] : [];
+            return list.some(row => normalizeString(row?.managedListId) === normalizedListId);
+        });
+    }
+
     function removeManagedChannelListFromSurface(target, surface, listId) {
         const item = safeObject(target);
         let removedCount = 0;
@@ -8032,6 +8066,201 @@ document.addEventListener('DOMContentLoaded', async () => {
             const sendNow = await showConfirmModal({
                 title: 'Send removal update now?',
                 message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send this list-removal update to those devices now.`,
+                confirmText: 'Send update',
+                cancelText: 'Not now'
+            });
+            if (sendNow) {
+                await sendManagedParentPolicyToVerifiedDevices(changedProfileIds, {
+                    scope: remoteScope,
+                    ...(surface ? { surface } : {})
+                });
+            }
+        }
+    }
+
+    async function refreshManagedChannelListForProfiles(profileIds) {
+        const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
+        if (!targetIds.length) {
+            UIComponents.showToast('Select at least one protected profile', 'error');
+            return;
+        }
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
+            UIComponents.showToast('Profiles unavailable', 'error');
+            return;
+        }
+
+        const fresh = await io.loadProfilesV4();
+        const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
+        if (getProfileType(fresh, currentActive) === 'child') {
+            UIComponents.showToast('Child profiles cannot refresh managed lists', 'error');
+            return;
+        }
+
+        const profiles = { ...safeObject(fresh.profiles) };
+        const eligibleIds = targetIds.filter((targetId) => {
+            const profile = safeObject(profiles[targetId]);
+            return !!profile && Object.keys(profile).length > 0
+                && canActiveProfileManageProfile(fresh, targetId);
+        });
+        if (!eligibleIds.length) {
+            UIComponents.showToast('No selected protected profiles can be managed by this account', 'error');
+            return;
+        }
+
+        const summaries = collectManagedChannelListSummaries(profiles, eligibleIds);
+        const selectedList = await promptManagedChannelListToRefresh(summaries);
+        if (!selectedList) {
+            if (!summaries.some(summary => normalizeManagedChannelListSourceUrl(summary?.sourceUrl))) {
+                UIComponents.showToast('No URL-backed imported lists found for the selected protected profiles', 'info');
+            }
+            return;
+        }
+
+        let loaded;
+        try {
+            loaded = await fetchManagedChannelListSourceUrl(selectedList.sourceUrl);
+        } catch (error) {
+            UIComponents.showToast(error?.message || 'Unable to load this list URL', 'error');
+            return;
+        }
+
+        const parsedRaw = parseManagedChannelListText(loaded.text, { listName: selectedList.listName });
+        if (!parsedRaw.channels.length) {
+            UIComponents.showToast('The refreshed list did not contain valid channel identifiers', 'error');
+            return;
+        }
+        const parsed = {
+            ...parsedRaw,
+            listId: selectedList.listId
+        };
+
+        const confirmRefresh = await showChoiceModal({
+            title: `Refresh ${selectedList.listName}?`,
+            message: `This will replace the current list-derived rows for ${selectedList.profileIds.length} selected ${pluralize(selectedList.profileIds.length, 'profile')} with the latest channels from the saved URL.`,
+            details: [
+                `${selectedList.channelCount} current ${pluralize(selectedList.channelCount, 'channel')} will be replaced where this list is present`,
+                `${parsed.channels.length} valid ${pluralize(parsed.channels.length, 'channel')} found in the latest URL content`,
+                parsed.skippedCount ? `${parsed.skippedCount} ${pluralize(parsed.skippedCount, 'row')} skipped for safety` : 'No rows skipped',
+                'Parent/account re-auth is required before anything changes.'
+            ],
+            choices: [
+                { value: 'refresh', label: 'Refresh List', className: 'btn-primary' }
+            ],
+            cancelText: 'Cancel'
+        });
+        if (confirmRefresh !== 'refresh') return;
+
+        const okAdmin = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
+        if (!okAdmin) {
+            for (const targetId of eligibleIds) {
+                await recordManagedAdminAuthFailureHistory(fresh, targetId, 'channel_list_refresh_unlock_failed');
+            }
+            return;
+        }
+
+        const refreshedAt = Date.now();
+        let changedCount = 0;
+        let addedCount = 0;
+        let removedCount = 0;
+        let duplicateCount = 0;
+        const changedProfileIds = [];
+        const changedSurfaces = new Set();
+
+        for (const targetId of eligibleIds) {
+            const profile = safeObject(profiles[targetId]);
+            let nextProfile = profile;
+            let profileChanged = false;
+            let profileAddedCount = 0;
+            let profileRemovedCount = 0;
+            let profileDuplicateCount = 0;
+
+            for (const surface of ['main', 'kids']) {
+                const currentSurface = getProfileSurface(nextProfile, surface);
+                if (!hasManagedChannelListOnSurface(currentSurface, surface, selectedList.listId)) continue;
+                const priorForReport = nextProfile;
+                const nextSurface = getProfileSurface(nextProfile, surface);
+                const removeResult = removeManagedChannelListFromSurface(nextSurface, surface, selectedList.listId);
+                const applyResult = applyManagedChannelListToSurface(nextSurface, surface, parsed, {
+                    listName: selectedList.listName,
+                    sourceLabel: loaded.sourceLabel || selectedList.sourceLabel,
+                    sourceUrl: loaded.url,
+                    importedAt: refreshedAt
+                });
+                if (!removeResult.changed && !applyResult.changed) continue;
+                nextProfile = setProfileSurface(nextProfile, surface, nextSurface);
+                const report = buildManagedChildLocalEditReport({
+                    actorProfileId: currentActive,
+                    targetProfileId: targetId,
+                    surface,
+                    priorProfile: priorForReport,
+                    nextSurface
+                });
+                report.historyRow = {
+                    ...report.historyRow,
+                    actionType: 'policy.channel_list.refresh',
+                    summary: {
+                        ...safeObject(report.historyRow.summary),
+                        label: 'Channel list refreshed',
+                        surface,
+                        addedCount: applyResult.addedCount || 0,
+                        removedCount: removeResult.removedCount || 0,
+                        duplicateCount: applyResult.duplicateCount || 0,
+                        skippedCount: parsed.skippedCount || 0,
+                        listEntryCount: parsed.channels.length
+                    }
+                };
+                nextProfile = recordManagedChildLocalEditHistory(nextProfile, report);
+                profileChanged = true;
+                profileAddedCount += applyResult.addedCount || 0;
+                profileRemovedCount += removeResult.removedCount || 0;
+                profileDuplicateCount += applyResult.duplicateCount || 0;
+                changedSurfaces.add(surface);
+            }
+
+            duplicateCount += profileDuplicateCount;
+            if (!profileChanged) continue;
+            profiles[targetId] = nextProfile;
+            changedCount += 1;
+            addedCount += profileAddedCount;
+            removedCount += profileRemovedCount;
+            changedProfileIds.push(targetId);
+        }
+
+        if (!changedCount) {
+            UIComponents.showToast('No selected profiles had that URL-backed list', 'info');
+            return;
+        }
+
+        await io.saveProfilesV4({
+            ...fresh,
+            schemaVersion: 4,
+            profiles
+        });
+        profilesV4Cache = { ...fresh, schemaVersion: 4, profiles };
+        await StateManager.loadSettings({ notify: false, resetEnrichment: false, scheduleEnrichment: false });
+        await refreshProfilesUI();
+        renderChannels();
+        renderKidsChannels();
+        UIComponents.showToast(
+            `Refreshed ${selectedList.listName}: ${addedCount} added, ${removedCount} replaced${duplicateCount ? `, ${duplicateCount} already present` : ''}`,
+            'success'
+        );
+
+        const remoteScope = changedSurfaces.size === 1 ? 'channels' : 'rules_bundle';
+        const surface = changedSurfaces.size === 1 ? Array.from(changedSurfaces)[0] : '';
+        const mailboxReady = hasNanahManagedMailboxUploadWriter();
+        const localReady = hasNanahManagedLocalNetworkDeliveryWriter();
+        const readyProfileCount = changedProfileIds.filter((targetId) => {
+            const profile = safeObject(safeObject(profilesV4Cache).profiles)[targetId];
+            const links = getNanahSourceManagedLinksForTargetProfile(targetId, remoteScope, profile);
+            if (!links.length) return false;
+            return links.some(isNanahManagedLinkLiveConnected) || mailboxReady || localReady;
+        }).length;
+        if (readyProfileCount > 0) {
+            const sendNow = await showConfirmModal({
+                title: 'Send refreshed list now?',
+                message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send this refreshed list update to those devices now.`,
                 confirmText: 'Send update',
                 cancelText: 'Not now'
             });
@@ -14949,6 +15178,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         await importManagedChannelListToProfiles([targetId]);
                     } else if (action === 'remove_channel_list') {
                         await removeManagedChannelListFromProfiles([targetId]);
+                    } else if (action === 'refresh_channel_list') {
+                        await refreshManagedChannelListForProfiles([targetId]);
                     } else if (action === 'bulk_add_keyword' || action === 'bulk_add_channel' || action === 'bulk_add_video') {
                         await addManagedBulkRuleToProfiles(
                             safeArray(intent?.profileIds),
@@ -14958,6 +15189,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         await importManagedChannelListToProfiles(safeArray(intent?.profileIds));
                     } else if (action === 'bulk_remove_channel_list') {
                         await removeManagedChannelListFromProfiles(safeArray(intent?.profileIds));
+                    } else if (action === 'bulk_refresh_channel_list') {
+                        await refreshManagedChannelListForProfiles(safeArray(intent?.profileIds));
                     } else if (action === 'bulk_set_time_limit' || action === 'bulk_disable_time_limit') {
                         await updateMultipleProfileTimeLimitPolicies(
                             safeArray(intent?.profileIds),
