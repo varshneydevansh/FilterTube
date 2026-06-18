@@ -117,6 +117,11 @@ extension authority code.
   advanced/runtime internals. The runtime roles, signed managed-link authority,
   target-profile validation, and provider gates are unchanged; only the parent
   mental model and high-visibility labels changed.
+- [x] Advanced delivery copy now treats `Send Now` as the normal parent flow and
+  explains `Pick Up Later` and `Home Bridge` as optional send paths only. The
+  Help relay section now separates Nanah's live meeting-place role from
+  advanced later/home delivery, without implying those transports can become
+  policy authority.
 
 ### Parent/Caregiver Simplification Tracker
 

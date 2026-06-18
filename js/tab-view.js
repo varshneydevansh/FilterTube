@@ -13129,12 +13129,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
         return showChoiceModal({
-            title: title || 'Choose How Updates Are Sent',
+            title: title || 'Choose Update Delivery',
             message: message || 'Choose how parent-approved updates should reach a protected device.',
             details: Array.isArray(details) ? details : [
-                'Use Send Now first when both devices are open.',
-                'Only add another delivery method when Send Now is not enough.',
-                'Child/protected profiles still cannot change parent rules from their own surface.'
+                'Use Send Now for normal parent control.',
+                'Add an optional send path only when both devices cannot be open together.',
+                'Protected profiles still cannot change parent rules from their own surface.'
             ],
             choices,
             cancelText: 'Cancel'
@@ -13154,12 +13154,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
             title: 'Pick Up Later',
-            message: 'Use this only when a parent may change rules while the protected device is offline. The child device can pick up the update next time it opens.',
+            message: 'Use this only when a parent changes rules while the protected device is offline. The protected device can pick up the update next time it opens.',
             details: [
-                'This is advanced and separate from normal Send Now.',
-                'Skip this if parent and protected devices can be opened together.',
-                'A compatible pickup service is only a waiting room for unreadable updates.',
-                'Parent approval and the saved trusted device still decide what applies.'
+                'Normal parent control is Send Now: open both devices, pair, verify, and send.',
+                'Pick Up Later is optional and advanced; skip it when both devices can be open together.',
+                'A compatible pickup service stores unreadable waiting updates only.',
+                'The saved trusted parent link still decides what applies.'
             ],
             configured: !!currentEndpoint,
             configureLabel: currentEndpoint ? 'Edit Pick Up Later' : 'Set Up Pick Up Later',
@@ -13245,10 +13245,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
             title: 'Home Bridge',
-            message: 'Use this only when you have a trusted FilterTube bridge that can pass parent updates to protected devices on your home or school network.',
+            message: 'Use this only when you run a trusted FilterTube bridge for protected devices on your home or school network.',
             details: [
-                'This is advanced and separate from normal Send Now.',
-                'Skip this for normal Send Now control.',
+                'Normal parent control is Send Now: open both devices, pair, verify, and send.',
+                'Home Bridge is optional and advanced; skip it unless you run a compatible bridge.',
                 'Being on the same network is not enough to change rules.',
                 'The protected device still accepts only trusted parent updates.'
             ],
