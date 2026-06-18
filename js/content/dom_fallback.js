@@ -2215,6 +2215,758 @@ function clearStaleDOMFallbackVisibility() {
     }
 }
 
+function installFilterTubeHomeFeedPolish() {
+    try {
+        if (document.getElementById('filtertube-home-feed-polish-style')) return;
+        const style = document.createElement('style');
+        style.id = 'filtertube-home-feed-polish-style';
+        style.textContent = `
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-video-with-context-renderer:not([data-filtertube-short="true"]) h3,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-compact-video-renderer:not([data-filtertube-short="true"]) h3,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item:not([data-filtertube-short="true"]) h3,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-rich-item-renderer:not([data-filtertube-short="true"]) h3,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-video-with-context-renderer:not([data-filtertube-short="true"]) .compact-media-item-headline,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-compact-video-renderer:not([data-filtertube-short="true"]) .compact-media-item-headline,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item:not([data-filtertube-short="true"]) .compact-media-item-headline,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] :not([data-filtertube-short="true"]) > .yt-lockup-metadata-view-model__title {
+            font-size: 13px !important;
+            line-height: 1.28 !important;
+            letter-spacing: 0 !important;
+            overflow-wrap: anywhere !important;
+        }
+
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-video-with-context-renderer .subhead,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-compact-video-renderer .subhead,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item .subhead,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-badge-and-byline-renderer,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .yt-lockup-metadata-view-model__metadata {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 2px !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+        }
+
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-video-with-context-renderer .YtmCompactMediaItemByline,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-compact-video-renderer .YtmCompactMediaItemByline,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item .YtmCompactMediaItemByline,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item .compact-media-item-byline,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .yt-content-metadata-view-model__metadata-row,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .yt-lockup-metadata-view-model__metadata .yt-core-attributed-string {
+            display: block !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            white-space: normal !important;
+            overflow: visible !important;
+            text-overflow: clip !important;
+        }
+
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-video-with-context-renderer .YtmCompactMediaItemByline:first-child,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-compact-video-renderer .YtmCompactMediaItemByline:first-child,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item .YtmCompactMediaItemByline:first-child,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item .compact-media-item-byline:first-child,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .yt-content-metadata-view-model__metadata-row:first-child {
+            color: var(--yt-spec-text-primary, currentColor) !important;
+        }
+
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] [data-filtertube-channel-row-clickable="true"] {
+            min-height: 44px !important;
+            width: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            justify-content: center !important;
+            gap: 2px !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            cursor: pointer !important;
+            border-radius: 8px !important;
+            padding: 2px 0 !important;
+            touch-action: manipulation !important;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0.08) !important;
+        }
+
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] [data-filtertube-channel-row-clickable="true"]:active {
+            opacity: 0.72 !important;
+        }
+
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-video-with-context-renderer .YtmCompactMediaItemByline:not(:first-child),
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-compact-video-renderer .YtmCompactMediaItemByline:not(:first-child),
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item .YtmCompactMediaItemByline:not(:first-child),
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item .compact-media-item-byline:not(:first-child),
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .yt-content-metadata-view-model__metadata-row:not(:first-child) {
+            opacity: 0.84 !important;
+        }
+
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-video-with-context-renderer .subhead,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-compact-video-renderer .subhead,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item .subhead,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-video-with-context-renderer .details,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-compact-video-renderer .details,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item .details,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-video-with-context-renderer .metadata,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-compact-video-renderer .metadata,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item .metadata,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .yt-lockup-metadata-view-model__metadata,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] #metadata-line {
+            font-size: 11.2px !important;
+            line-height: 1.34 !important;
+            white-space: normal !important;
+            overflow: visible !important;
+            text-overflow: clip !important;
+            letter-spacing: 0 !important;
+        }
+
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .filtertube-home-byline-split {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 1px !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            white-space: normal !important;
+        }
+
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .filtertube-home-inline-byline-text {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 1px !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            white-space: normal !important;
+        }
+
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .filtertube-home-channel-line {
+            max-width: 100% !important;
+            display: -webkit-box !important;
+            -webkit-box-orient: vertical !important;
+            -webkit-line-clamp: 1 !important;
+            color: var(--yt-spec-text-primary, currentColor) !important;
+            font-size: 12px !important;
+            line-height: 1.28 !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            white-space: normal !important;
+            overflow-wrap: anywhere !important;
+        }
+
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .filtertube-home-meta-line {
+            max-width: 100% !important;
+            display: -webkit-box !important;
+            -webkit-box-orient: vertical !important;
+            -webkit-line-clamp: 2 !important;
+            color: var(--yt-spec-text-secondary, currentColor) !important;
+            font-size: 11px !important;
+            line-height: 1.28 !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            white-space: normal !important;
+            overflow-wrap: anywhere !important;
+            opacity: 0.86 !important;
+        }
+
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-post-renderer,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-backstage-post-renderer,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytd-post-renderer {
+            display: block !important;
+            padding: 10px 12px 12px !important;
+            margin: 8px 0 !important;
+            border-radius: 14px !important;
+            background: var(--yt-spec-base-background, Canvas) !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+        }
+
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-post-renderer #home-content-text,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-post-renderer #content-text,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-backstage-post-renderer #home-content-text,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-backstage-post-renderer #content-text,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytd-post-renderer #home-content-text,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytd-post-renderer #content-text {
+            font-size: 13px !important;
+            line-height: 1.38 !important;
+            letter-spacing: 0 !important;
+            color: var(--yt-spec-text-primary, currentColor) !important;
+            overflow-wrap: anywhere !important;
+        }
+
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-post-renderer img,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-backstage-post-renderer img,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytd-post-renderer img {
+            border-radius: 12px !important;
+        }
+
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-chip-cloud-renderer,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-feed-filter-chip-bar-renderer,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] yt-chip-cloud-renderer,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytd-feed-filter-chip-bar-renderer {
+            transition: transform 160ms ease, opacity 160ms ease !important;
+            will-change: transform, opacity !important;
+        }
+
+        html[data-filtertube-home-chip-rail-reveal="true"][data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-chip-cloud-renderer,
+        html[data-filtertube-home-chip-rail-reveal="true"][data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-feed-filter-chip-bar-renderer,
+        html[data-filtertube-home-chip-rail-reveal="true"][data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] yt-chip-cloud-renderer,
+        html[data-filtertube-home-chip-rail-reveal="true"][data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytd-feed-filter-chip-bar-renderer {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            width: 100vw !important;
+            max-width: 100vw !important;
+            z-index: 1200 !important;
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+            box-sizing: border-box !important;
+            padding: 8px 12px !important;
+            background: var(--yt-spec-base-background, Canvas) !important;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18) !important;
+            backdrop-filter: saturate(1.25) blur(14px) !important;
+            -webkit-backdrop-filter: saturate(1.25) blur(14px) !important;
+        }
+
+        html[data-filtertube-home-chip-rail-reveal="true"][data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-chip-cloud-chip-renderer,
+        html[data-filtertube-home-chip-rail-reveal="true"][data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] yt-chip-cloud-chip-renderer,
+        html[data-filtertube-home-chip-rail-reveal="true"][data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] chip-shape,
+        html[data-filtertube-home-chip-rail-reveal="true"][data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] chip-shape button,
+        html[data-filtertube-home-chip-rail-reveal="true"][data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-chip-cloud-chip-renderer button,
+        html[data-filtertube-home-chip-rail-reveal="true"][data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] yt-chip-cloud-chip-renderer button {
+            min-height: 44px !important;
+            align-items: center !important;
+        }`;
+        document.head?.appendChild(style);
+    } catch (e) {
+    }
+}
+
+function getFilterTubeChannelHrefFromCard(card) {
+    try {
+        const anchor = card?.querySelector?.(
+            'ytm-channel-thumbnail-with-link-renderer a[href^="/@"], ' +
+            'ytm-channel-thumbnail-with-link-renderer a[href^="/channel/"], ' +
+            'ytm-channel-thumbnail-with-link-renderer a[href^="/c/"], ' +
+            'ytm-channel-thumbnail-with-link-renderer a[href^="/user/"], ' +
+            'ytm-media-item a[href^="/@"], ytm-media-item a[href^="/channel/"], ytm-media-item a[href^="/c/"], ytm-media-item a[href^="/user/"], ' +
+            '.subhead a[href^="/@"], .subhead a[href^="/channel/"], .subhead a[href^="/c/"], .subhead a[href^="/user/"], ' +
+            'ytm-badge-and-byline-renderer a[href^="/@"], ytm-badge-and-byline-renderer a[href^="/channel/"], ' +
+            'ytm-badge-and-byline-renderer a[href^="/c/"], ytm-badge-and-byline-renderer a[href^="/user/"], ' +
+            '.yt-content-metadata-view-model__metadata-row a[href^="/@"], ' +
+            '.yt-content-metadata-view-model__metadata-row a[href^="/channel/"], ' +
+            '.yt-content-metadata-view-model__metadata-row a[href^="/c/"], ' +
+            '.yt-content-metadata-view-model__metadata-row a[href^="/user/"], ' +
+            '.yt-lockup-metadata-view-model__metadata a[href^="/@"], ' +
+            '.yt-lockup-metadata-view-model__metadata a[href^="/channel/"], ' +
+            '.yt-lockup-metadata-view-model__metadata a[href^="/c/"], ' +
+            '.yt-lockup-metadata-view-model__metadata a[href^="/user/"]'
+        );
+        const href = anchor?.getAttribute?.('href') || '';
+        if (/^\/(@|channel\/|c\/|user\/)/.test(href)) return href;
+    } catch (e) {
+    }
+    return '';
+}
+
+function getFilterTubeHomeChannelRow(card) {
+    try {
+        return card?.querySelector?.(
+            '.subhead .YtmCompactMediaItemByline:first-child, ' +
+            '.YtmCompactMediaItemByline:first-child, ' +
+            '.compact-media-item-byline:first-child, ' +
+            'ytm-badge-and-byline-renderer, ' +
+            '.yt-content-metadata-view-model__metadata-row:first-child, ' +
+            '.yt-lockup-metadata-view-model__metadata .yt-core-attributed-string:first-child'
+        ) || null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function getFilterTubeHomeBylineRows(card) {
+    try {
+        return Array.from(card?.querySelectorAll?.(
+            '.subhead .YtmCompactMediaItemByline, ' +
+            '.YtmCompactMediaItemByline, ' +
+            '.compact-media-item-byline, ' +
+            '.subhead, ' +
+            'ytm-badge-and-byline-renderer, ' +
+            '.yt-content-metadata-view-model__metadata-row, ' +
+            'yt-content-metadata-view-model, ' +
+            '.yt-lockup-metadata-view-model__metadata, ' +
+            '.yt-lockup-metadata-view-model__metadata .yt-core-attributed-string'
+        ) || []);
+    } catch (e) {
+        return [];
+    }
+}
+
+function getFilterTubeHomeTitleNode(card) {
+    try {
+        return card?.querySelector?.(
+            'h3 a, h3, ' +
+            '.compact-media-item-headline, .media-item-headline, ' +
+            '.yt-lockup-metadata-view-model__title, ' +
+            '.yt-lockup-metadata-view-model-wiz__title'
+        ) || null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function normalizeFilterTubeHomeText(value) {
+    return (value || '')
+        .replace(/\u00a0/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function filterTubeHomeVideoMetadataPattern() {
+    return '(?:no\\s+views?|[\\d,.]+\\s*(?:k|m|b|thousand|million|billion|lakh|lakhs|crore|crores)?\\s*(?:views?|v(?:iews?)?(?:\\.{1,3}|…)?|watching)|[\\d,.]+\\s*(?:k|m|b|thousand|million|billion|lakh|lakhs|crore|crores)?\\s+(?:views?|watching)|streamed|premiered)';
+}
+
+function filterTubeHomePublishedAgePattern() {
+    return '(?:\\d+\\s*(?:seconds?|secs?|minutes?|mins?|hours?|hrs?|days?|weeks?|months?|years?|sec|min|hr|s|m|h|d|w|mo|y)(?:\\s+ago)?|yesterday|today|live)';
+}
+
+function filterTubeEscapeRegex(value) {
+    return String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function filterTubeHomeVisibleChannelText(card) {
+    try {
+        const channel = normalizeFilterTubeHomeText(
+            card?.querySelector?.('.filtertube-home-channel-line')?.textContent ||
+            getFilterTubeHomeChannelRow(card)?.textContent ||
+            ''
+        );
+        if (!channel) return '';
+        return channel
+            .replace(/\s*[•·|]\s*.*$/, '')
+            .trim();
+    } catch (e) {
+        return '';
+    }
+}
+
+function filterTubeHomeVisibleMetadataText(card) {
+    try {
+        return normalizeFilterTubeHomeText(
+            card?.querySelector?.('.filtertube-home-meta-line')?.textContent || ''
+        );
+    } catch (e) {
+        return '';
+    }
+}
+
+function cleanFilterTubeHomeVideoTitle(card) {
+    try {
+        const titleNode = getFilterTubeHomeTitleNode(card);
+        if (!titleNode) return;
+        const rawText = normalizeFilterTubeHomeText(titleNode.textContent);
+        if (!rawText) return;
+        if (
+            titleNode.getAttribute('data-filtertube-home-title-cleaned') === 'true' &&
+            titleNode.getAttribute('data-filtertube-home-title-source') === rawText
+        ) {
+            return;
+        }
+
+        const metadata = filterTubeHomeVideoMetadataPattern();
+        const age = filterTubeHomePublishedAgePattern();
+        const channelText = filterTubeHomeVisibleChannelText(card);
+        const metaText = filterTubeHomeVisibleMetadataText(card);
+        const exactChannelTail = channelText ?
+            new RegExp(`\\s+by\\s+${filterTubeEscapeRegex(channelText)}\\s+.*(?:${metadata}|${age}).*$`, 'i') :
+            null;
+        const exactChannelNoByTail = channelText && metaText ?
+            new RegExp(`\\s+${filterTubeEscapeRegex(channelText)}\\s+${filterTubeEscapeRegex(metaText)}\\s*$`, 'i') :
+            null;
+        const bylineTail = new RegExp(`\\s+by\\s+\\S.*?\\s+${metadata}(?:\\s*[•·|]?\\s*${age})?.*$`, 'i');
+        const bylineTruncatedCountTail = new RegExp('\\s+by\\s+\\S.*?\\s+[\\d,.]{4,}\\s*(?:\\.{2,3}|…)?\\s*$', 'i');
+        const looseMetadataTail = new RegExp(`\\s+(?:${metadata}\\s*[•·|]?\\s*${age}|${metadata}(?:\\.{2,3}|…)?)\\s*$`, 'i');
+        let cleaned = rawText;
+        if (exactChannelTail?.test(cleaned)) cleaned = cleaned.replace(exactChannelTail, '');
+        if (exactChannelNoByTail?.test(cleaned)) cleaned = cleaned.replace(exactChannelNoByTail, '');
+        cleaned = cleaned
+            .replace(bylineTail, '')
+            .replace(bylineTruncatedCountTail, '')
+            .replace(looseMetadataTail, '')
+            .trim();
+        if (!cleaned || cleaned === rawText || cleaned.length < 4) return;
+        titleNode.textContent = cleaned;
+        titleNode.setAttribute('data-filtertube-home-title-cleaned', 'true');
+        titleNode.setAttribute('data-filtertube-home-title-source', cleaned);
+    } catch (e) {
+    }
+}
+
+function splitFilterTubeHomeCombinedByline(row) {
+    try {
+        if (!row || row.getAttribute('data-filtertube-home-byline-split') === 'true') return;
+        if (row.querySelector?.('img, ytm-channel-thumbnail-with-link-renderer, yt-img-shadow')) {
+            let splitChild = false;
+            row.querySelectorAll?.(
+                '.YtmCompactMediaItemByline, ' +
+                '.compact-media-item-byline, ' +
+                '.yt-content-metadata-view-model__metadata-row, ' +
+                '.yt-lockup-metadata-view-model__metadata .yt-core-attributed-string'
+            )?.forEach(child => {
+                if (child !== row && !child.querySelector?.('img, ytm-channel-thumbnail-with-link-renderer, yt-img-shadow')) {
+                    splitFilterTubeHomeCombinedByline(child);
+                    splitChild = splitChild || child.getAttribute('data-filtertube-home-byline-split') === 'true';
+                }
+            });
+            if (splitChild) return;
+            const rawText = normalizeFilterTubeHomeText(row.textContent);
+            if (rawText) {
+                const textHost = document.createElement('span');
+                textHost.className = 'filtertube-home-inline-byline-text';
+                textHost.textContent = rawText;
+                row.appendChild(textHost);
+                splitFilterTubeHomeCombinedByline(textHost);
+                if (textHost.getAttribute('data-filtertube-home-byline-split') === 'true') {
+                    row.setAttribute('data-filtertube-channel-label', textHost.getAttribute('data-filtertube-channel-label') || '');
+                    return;
+                }
+                textHost.remove?.();
+            }
+            return;
+        }
+            if (row.querySelector?.('.filtertube-home-byline-split')) return;
+        const rawText = normalizeFilterTubeHomeText(row.textContent);
+        if (!rawText) return;
+        const metadata = filterTubeHomeVideoMetadataPattern();
+        const age = filterTubeHomePublishedAgePattern();
+        const metaMatch = rawText.match(new RegExp(`(?:^|\\s|[•·|])${metadata}\\b.*$`, 'i')) ||
+            rawText.match(new RegExp(`(?:[•·|]\\s*|\\s{2,})(${age})\\b.*$`, 'i'));
+        if (!metaMatch || metaMatch.index == null || metaMatch.index <= 0) return;
+        const channelText = rawText.slice(0, metaMatch.index).replace(/\s*[•·|]\s*$/, '').trim();
+        const metaText = rawText.slice(metaMatch.index).replace(/^\s*[•·|]\s*/, '').trim();
+        if (!channelText || !metaText || channelText.length > 90) return;
+
+        row.setAttribute('data-filtertube-home-byline-split', 'true');
+        row.classList?.add('filtertube-home-byline-split');
+        row.setAttribute('aria-label', `${channelText}. ${metaText}`);
+        row.textContent = '';
+
+        const channelLine = document.createElement('span');
+        channelLine.className = 'filtertube-home-channel-line';
+        channelLine.textContent = channelText;
+
+        const metaLine = document.createElement('span');
+        metaLine.className = 'filtertube-home-meta-line';
+        metaLine.textContent = metaText;
+
+        row.appendChild(channelLine);
+        row.appendChild(metaLine);
+        row.setAttribute('data-filtertube-channel-label', channelText);
+    } catch (e) {
+    }
+}
+
+function applyFilterTubeHomeChannelTapTargets() {
+    try {
+        const cards = document.querySelectorAll(
+            'html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-video-with-context-renderer, ' +
+            'html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-compact-video-renderer, ' +
+            'html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item, ' +
+            'html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-rich-item-renderer'
+        );
+        cards.forEach(card => {
+            try {
+                const href = getFilterTubeChannelHrefFromCard(card);
+                const row = getFilterTubeHomeChannelRow(card);
+                getFilterTubeHomeBylineRows(card).forEach(splitFilterTubeHomeCombinedByline);
+                cleanFilterTubeHomeVideoTitle(card);
+                if (!row) return;
+                splitFilterTubeHomeCombinedByline(row);
+                cleanFilterTubeHomeVideoTitle(card);
+                if (!href) return;
+                row.setAttribute('data-filtertube-channel-row-clickable', 'true');
+                row.setAttribute('data-filtertube-channel-href', href);
+                row.setAttribute('role', 'link');
+                row.setAttribute('tabindex', '0');
+                const label = (
+                    row.getAttribute('data-filtertube-channel-label') ||
+                    row.querySelector?.('.filtertube-home-channel-line')?.textContent ||
+                    row.textContent ||
+                    ''
+                ).replace(/\s+/g, ' ').trim();
+                if (label) row.setAttribute('aria-label', `Open ${label} channel`);
+            } catch (e) {
+            }
+        });
+    } catch (e) {
+    }
+}
+
+function installFilterTubeHomeChannelTapTargetHandler() {
+    try {
+        const root = document.documentElement;
+        if (!root || root.hasAttribute('data-filtertube-home-channel-handler-bound')) return;
+        root.setAttribute('data-filtertube-home-channel-handler-bound', 'true');
+        const openChannel = event => {
+            try {
+                const row = event.target?.closest?.('[data-filtertube-channel-row-clickable="true"]');
+                if (!row) return;
+                if (event.target?.closest?.('a, button, ytm-menu, ytd-menu-renderer, [role="button"]')) return;
+                const href = row.getAttribute('data-filtertube-channel-href') || '';
+                if (!href) return;
+                event.preventDefault?.();
+                event.stopPropagation?.();
+                window.location.assign(href);
+            } catch (e) {
+            }
+        };
+        const openChannelFromKeyboard = event => {
+            try {
+                if (event.key !== 'Enter' && event.key !== ' ') return;
+                openChannel(event);
+            } catch (e) {
+            }
+        };
+        document.addEventListener('click', openChannel, true);
+        document.addEventListener('keydown', openChannelFromKeyboard, true);
+    } catch (e) {
+    }
+}
+
+function getFilterTubeHomeChipRails() {
+    try {
+        return Array.from(document.querySelectorAll(
+            'ytm-chip-cloud-renderer, ytm-feed-filter-chip-bar-renderer, yt-chip-cloud-renderer, ytd-feed-filter-chip-bar-renderer'
+        ));
+    } catch (e) {
+        return [];
+    }
+}
+
+function getFilterTubeHorizontalScroller(root) {
+    try {
+        if (!root) return null;
+        const preferred = [
+            root,
+            ...Array.from(root.querySelectorAll(
+                '[role="tablist"], ' +
+                '#scroll-container, ' +
+                '#chips, ' +
+                '.chip-container, ' +
+                '.chip-cloud-chip-container, ' +
+                '.yt-chip-cloud-renderer, ' +
+                '.ytm-chip-cloud-renderer'
+            ))
+        ];
+        const candidates = preferred.concat(Array.from(root.querySelectorAll('*')));
+        for (let i = 0; i < candidates.length; i++) {
+            const candidate = candidates[i];
+            if (!candidate) continue;
+            if ((candidate.scrollWidth || 0) > (candidate.clientWidth || 0) + 8) {
+                return candidate;
+            }
+        }
+    } catch (e) {
+    }
+    return root || null;
+}
+
+function normalizeFilterTubeHomeChipLabel(chip) {
+    try {
+        return (chip?.textContent || '')
+            .replace(/\s+/g, ' ')
+            .trim();
+    } catch (e) {
+        return '';
+    }
+}
+
+function getFilterTubeHomeChipFromEvent(event) {
+    try {
+        return event?.target?.closest?.('yt-chip-cloud-chip-renderer, ytm-chip-cloud-chip-renderer, [role="tab"], chip-shape') || null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function restoreFilterTubeHomeChipRailPosition() {
+    try {
+        const state = window.__filtertubeHomeChipRailState;
+        if (!state) return;
+        const rails = getFilterTubeHomeChipRails();
+        rails.forEach(rail => {
+            try {
+                const scroller = getFilterTubeHorizontalScroller(rail);
+                if (scroller && Number.isFinite(state.chipScrollLeft)) {
+                    scroller.scrollLeft = state.chipScrollLeft;
+                }
+                const selectedChip = rail.querySelector?.(
+                    'yt-chip-cloud-chip-renderer[selected], ' +
+                    'ytm-chip-cloud-chip-renderer[selected], ' +
+                    'yt-chip-cloud-chip-renderer[aria-selected="true"], ' +
+                    'ytm-chip-cloud-chip-renderer[aria-selected="true"], ' +
+                    '[role="tab"][aria-selected="true"], ' +
+                    'chip-shape[aria-selected="true"]'
+                );
+                const rememberedLabel = (state.selectedChipLabel || '').toLowerCase();
+                const rememberedChip = rememberedLabel ? Array.from(rail.querySelectorAll(
+                    'yt-chip-cloud-chip-renderer, ytm-chip-cloud-chip-renderer, [role="tab"], chip-shape'
+                )).find(chip => normalizeFilterTubeHomeChipLabel(chip).toLowerCase() === rememberedLabel) : null;
+                const targetChip = selectedChip || rememberedChip;
+                if (targetChip && Number.isFinite(state.chipScrollLeft) && scroller) {
+                    scroller.scrollLeft = state.chipScrollLeft;
+                }
+                targetChip?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+                if (scroller && Number.isFinite(state.chipScrollLeft)) {
+                    const current = Number(scroller.scrollLeft) || 0;
+                    if (Math.abs(current - state.chipScrollLeft) > 48) {
+                        scroller.scrollLeft = state.chipScrollLeft;
+                    }
+                }
+            } catch (e) {
+            }
+        });
+    } catch (e) {
+    }
+}
+
+function scheduleFilterTubeHomeChipRailRestore() {
+    try {
+        const state = window.__filtertubeHomeChipRailState || (window.__filtertubeHomeChipRailState = {});
+        if (state.restoreTimer) clearTimeout(state.restoreTimer);
+        restoreFilterTubeHomeChipRailPosition();
+        state.restoreTimer = setTimeout(() => {
+            state.restoreTimer = 0;
+            restoreFilterTubeHomeChipRailPosition();
+        }, 90);
+        setTimeout(restoreFilterTubeHomeChipRailPosition, 240);
+        setTimeout(restoreFilterTubeHomeChipRailPosition, 520);
+    } catch (e) {
+    }
+}
+
+function installFilterTubeHomeChipRailReveal() {
+    try {
+        const root = document.documentElement;
+        if (!root || root.hasAttribute('data-filtertube-home-chip-rail-bound')) return;
+        root.setAttribute('data-filtertube-home-chip-rail-bound', 'true');
+        const state = window.__filtertubeHomeChipRailState || (window.__filtertubeHomeChipRailState = {
+            lastTop: 0,
+            hideTimer: 0
+        });
+        const rememberChipRailPositionFromRail = rail => {
+            try {
+                const scroller = getFilterTubeHorizontalScroller(rail);
+                if (!scroller) return;
+                state.chipScrollLeft = Number(scroller.scrollLeft) || 0;
+            } catch (e) {
+            }
+        };
+        const rememberChipRailPosition = event => {
+            try {
+                const rail = event.target?.closest?.(
+                    'ytm-chip-cloud-renderer, ytm-feed-filter-chip-bar-renderer, yt-chip-cloud-renderer, ytd-feed-filter-chip-bar-renderer'
+                );
+                if (rail) {
+                    rememberChipRailPositionFromRail(rail);
+                    const chip = getFilterTubeHomeChipFromEvent(event);
+                    const label = normalizeFilterTubeHomeChipLabel(chip);
+                    if (label) state.selectedChipLabel = label;
+                    scheduleFilterTubeHomeChipRailRestore();
+                    return;
+                }
+                const chip = getFilterTubeHomeChipFromEvent(event);
+                if (!chip) return;
+                const label = normalizeFilterTubeHomeChipLabel(chip);
+                if (label) state.selectedChipLabel = label;
+                rememberChipRailPositionFromRail(chip.closest?.(
+                    'ytm-chip-cloud-renderer, ytm-feed-filter-chip-bar-renderer, yt-chip-cloud-renderer, ytd-feed-filter-chip-bar-renderer'
+                ));
+                scheduleFilterTubeHomeChipRailRestore();
+            } catch (e) {
+            }
+        };
+        const bindChipRailScrollMemory = () => {
+            try {
+                getFilterTubeHomeChipRails().forEach(rail => {
+                    if (!rail) return;
+                    const scroller = getFilterTubeHorizontalScroller(rail);
+                    if (!scroller) return;
+                    if (scroller.getAttribute?.('data-filtertube-chip-scroll-bound') !== 'true') {
+                        scroller.setAttribute?.('data-filtertube-chip-scroll-bound', 'true');
+                        scroller.addEventListener('scroll', () => rememberChipRailPositionFromRail(rail), { passive: true });
+                    }
+                    rail.setAttribute('data-filtertube-chip-rail-scroll-bound', 'true');
+                });
+                scheduleFilterTubeHomeChipRailRestore();
+            } catch (e) {
+            }
+        };
+        const update = () => {
+            try {
+                const scrollingElement = document.scrollingElement || document.documentElement || document.body;
+                const top = Number(scrollingElement?.scrollTop) || Number(window.pageYOffset) || 0;
+                const isHome = (document.location?.pathname || '') === '/';
+                const previousTop = state.lastTop || 0;
+                const goingUp = top + 8 < previousTop;
+                const goingDown = top > previousTop + 16;
+                state.lastTop = top;
+                if (!isHome || top < 96) {
+                    root.removeAttribute('data-filtertube-home-chip-rail-reveal');
+                    return;
+                }
+                if (goingUp) {
+                    root.setAttribute('data-filtertube-home-chip-rail-reveal', 'true');
+                    if (state.hideTimer) clearTimeout(state.hideTimer);
+                    state.hideTimer = setTimeout(() => {
+                        root.removeAttribute('data-filtertube-home-chip-rail-reveal');
+                        state.hideTimer = 0;
+                    }, 2400);
+                    return;
+                }
+                if (goingDown) {
+                    root.removeAttribute('data-filtertube-home-chip-rail-reveal');
+                }
+            } catch (e) {
+            }
+        };
+        document.addEventListener('pointerdown', rememberChipRailPosition, { passive: true, capture: true });
+        document.addEventListener('click', rememberChipRailPosition, { passive: true, capture: true });
+        window.addEventListener('scroll', update, { passive: true, capture: true });
+        document.addEventListener('touchmove', update, { passive: true, capture: true });
+        try {
+            const observer = new MutationObserver(() => {
+                bindChipRailScrollMemory();
+            });
+            observer.observe(document.documentElement, { childList: true, subtree: true });
+            state.chipRailObserver = observer;
+        } catch (e) {
+        }
+        bindChipRailScrollMemory();
+        setTimeout(bindChipRailScrollMemory, 120);
+        setTimeout(bindChipRailScrollMemory, 360);
+    } catch (e) {
+    }
+}
+
+function applyFilterTubeHomeFeedPolish() {
+    installFilterTubeHomeFeedPolish();
+    installFilterTubeHomeChannelTapTargetHandler();
+    installFilterTubeHomeChipRailReveal();
+    applyFilterTubeHomeChannelTapTargets();
+    restoreFilterTubeHomeChipRailPosition();
+    try {
+        setTimeout(applyFilterTubeHomeChannelTapTargets, 80);
+        setTimeout(applyFilterTubeHomeChannelTapTargets, 240);
+        setTimeout(restoreFilterTubeHomeChipRailPosition, 80);
+        setTimeout(restoreFilterTubeHomeChipRailPosition, 240);
+        setTimeout(restoreFilterTubeHomeChipRailPosition, 520);
+    } catch (e) {
+    }
+}
+
 // DOM fallback function that processes already-rendered content
 async function applyDOMFallback(settings, options = {}) {
     const effectiveSettings = settings || currentSettings;
@@ -2256,6 +3008,7 @@ async function applyDOMFallback(settings, options = {}) {
     currentSettings = effectiveSettings;
     const { forceReprocess = false, preserveScroll = true, onlyWhitelistPending = false } = options;
     syncRouteScopedContentControls(effectiveSettings);
+    applyFilterTubeHomeFeedPolish();
 
     const hasActiveFallbackWork = hasActiveDOMFallbackWork(effectiveSettings);
     if (!hasActiveFallbackWork && !onlyWhitelistPending) {
@@ -2462,7 +3215,7 @@ async function applyDOMFallback(settings, options = {}) {
 
         if (effectiveSettings.hideMixPlaylists) {
             // Hide the "Mixes" filter chip on Home when mixes are hidden.
-            const chips = document.querySelectorAll('yt-chip-cloud-chip-renderer');
+            const chips = document.querySelectorAll('yt-chip-cloud-chip-renderer, ytm-chip-cloud-chip-renderer');
             chips.forEach(chip => {
                 const txt = (chip.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
                 if (txt === 'mixes') {
@@ -2472,7 +3225,7 @@ async function applyDOMFallback(settings, options = {}) {
             });
         } else {
             // Restore any previously hidden Mixes chip when the toggle is off.
-            const hiddenMixChips = document.querySelectorAll('yt-chip-cloud-chip-renderer[data-filtertube-hidden]');
+            const hiddenMixChips = document.querySelectorAll('yt-chip-cloud-chip-renderer[data-filtertube-hidden], ytm-chip-cloud-chip-renderer[data-filtertube-hidden]');
             hiddenMixChips.forEach(chip => {
                 const txt = (chip.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
                 if (txt === 'mixes') {
@@ -2846,7 +3599,8 @@ async function applyDOMFallback(settings, options = {}) {
                 '.media-item-headline .yt-core-attributed-string, .compact-media-item-headline .yt-core-attributed-string, ' +
                 '.large-media-item-headline .yt-core-attributed-string, .YtmCompactMediaItemHeadline .yt-core-attributed-string, ' +
                 'ytm-media-item h3, ytm-compact-video-renderer h3, ytm-video-with-context-renderer h3, ' +
-                'yt-dynamic-text-view-model h1, .yt-page-header-view-model__page-header-title, .dynamicTextViewModelH1'
+                'yt-dynamic-text-view-model h1, .yt-page-header-view-model__page-header-title, .dynamicTextViewModelH1, ' +
+                '#home-content-text, #content-text, #contentText, ytd-expander#expander, ytm-expander'
             );
             const isPlaylistPanelRow = isPlaylistPanelRowElement(element);
             let channelElement = null;
@@ -2911,6 +3665,12 @@ async function applyDOMFallback(settings, options = {}) {
                 );
             }
             if (!channelElement && (
+                elementTag === 'ytd-post-renderer' ||
+                elementTag === 'ytd-backstage-post-renderer' ||
+                elementTag === 'ytd-backstage-post-thread-renderer' ||
+                elementTag === 'ytm-post-renderer' ||
+                elementTag === 'ytm-backstage-post-renderer' ||
+                elementTag === 'ytm-backstage-post-thread-renderer' ||
                 elementTag === 'ytm-rich-item-renderer' ||
                 elementTag === 'ytm-video-with-context-renderer' ||
                 elementTag === 'ytm-compact-video-renderer' ||
@@ -2924,6 +3684,15 @@ async function applyDOMFallback(settings, options = {}) {
                 elementTag === 'ytm-universal-watch-card-renderer'
             )) {
                 channelElement = element.querySelector(
+                    '#author-text a[href^="/@"], ' +
+                    '#author-text a[href^="/channel/"], ' +
+                    '#author-text a[href^="/c/"], ' +
+                    '#author-text a[href^="/user/"], ' +
+                    'a#author-text[href^="/@"], ' +
+                    'a#author-text[href^="/channel/"], ' +
+                    '#author-name a[href^="/@"], ' +
+                    '#author-name a[href^="/channel/"], ' +
+                    '#author-name, #author-text, ' +
                     'ytm-channel-thumbnail-with-link-renderer a[href^="/@"], ' +
                     'ytm-channel-thumbnail-with-link-renderer a[href^="/channel/"], ' +
                     'ytm-channel-thumbnail-with-link-renderer a[href^="/c/"], ' +
@@ -3027,6 +3796,12 @@ async function applyDOMFallback(settings, options = {}) {
                 }
             }
             if (!title && (
+                elementTag === 'ytd-post-renderer' ||
+                elementTag === 'ytd-backstage-post-renderer' ||
+                elementTag === 'ytd-backstage-post-thread-renderer' ||
+                elementTag === 'ytm-post-renderer' ||
+                elementTag === 'ytm-backstage-post-renderer' ||
+                elementTag === 'ytm-backstage-post-thread-renderer' ||
                 elementTag === 'ytm-rich-item-renderer' ||
                 elementTag === 'ytm-video-with-context-renderer' ||
                 elementTag === 'ytm-compact-video-renderer'
@@ -3130,6 +3905,7 @@ async function applyDOMFallback(settings, options = {}) {
                     '.metadata-snippet-container, ' +
                     'ytd-text-inline-expander#description, ' +
                     'ytd-text-inline-expander #expanded, ' +
+                    '#home-content-text, #content-text, #contentText, ytd-expander#expander, ytm-expander, ' +
                     '.yt-lockup-metadata-view-model-wiz__description, ' +
                     '.yt-lockup-metadata-view-model__description'
                 );
@@ -4171,7 +4947,7 @@ async function applyDOMFallback(settings, options = {}) {
 
     // 2. Chip Filtering (Home/Search chip bars)
     try {
-        const chips = document.querySelectorAll('yt-chip-cloud-chip-renderer');
+        const chips = document.querySelectorAll('yt-chip-cloud-chip-renderer, ytm-chip-cloud-chip-renderer');
         for (let i = 0; i < chips.length; i++) {
             const chip = chips[i];
             const label = chip.textContent?.trim() || '';
