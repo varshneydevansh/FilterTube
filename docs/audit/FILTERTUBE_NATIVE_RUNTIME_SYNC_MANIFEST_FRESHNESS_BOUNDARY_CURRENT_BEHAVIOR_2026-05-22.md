@@ -16,7 +16,7 @@ changes.
 | --- | ---: | ---: | --- |
 | `scripts/sync-native-runtime.mjs` | 34 | 1070 | `4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6` |
 | `/Users/devanshvarshney/FilterTubeApp/tools/sync-runtime-from-extension.mjs` | 2288 | 109519 | `1cd84715cb370b0935abeadc88bbb7285a16a097561e510d1eb3572928a394ae` |
-| `/Users/devanshvarshney/FilterTubeApp/tools/runtime-sync-manifest.json` | 226 | 9654 | `f08e48f7e329fd7ac22b9c3b990f3c53771f356d6f8cbe2ebe5fe51226b5b540` |
+| `/Users/devanshvarshney/FilterTubeApp/tools/runtime-sync-manifest.json` | 240 | 10565 | `136900ff78d869464f7101ab0addccf879f7dd9983f77a7464555f58e96673f2` |
 | `data/release_notes.json` | 317 | 23020 | `a8d59b18e9bffd1c828538ee58b3b8e9be7c641fea3ff064220311485a3b1c6b` |
 | `/Users/devanshvarshney/FilterTubeApp/apps/android/app/src/main/assets/extension_shell/data/release_notes.json` | 301 | 21095 | `911628cbd7f6354c58aa82064f3ef1f29cda3904a87e3ea263534600a0880737` |
 | `/Users/devanshvarshney/FilterTubeApp/apps/ios/FilterTube/Resources/release_notes.json` | 301 | 21095 | `911628cbd7f6354c58aa82064f3ef1f29cda3904a87e3ea263534600a0880737` |
@@ -24,27 +24,27 @@ changes.
 ## Current Manifest And Copy Facts
 
 ```text
-public repo HEAD: 7f0e66641aa576fb264085baf59949244ea32291
-app repo HEAD: cfc651cd4294e528c2c371778d7698ce82e94a71
+public repo HEAD: 505c7b7cd1c8147c8b16f87486252ef67938bdb6
+app repo HEAD: cb8e1516d1287c0721ca7c58358bfc22620d75e6
 app dirty state authority: not pinned by this contract-copy slice
 app dirty paths: out-of-scope native app changes may exist and are not release freshness proof
-runtime sync manifest entries: 32
+runtime sync manifest entries: 34
 manifest source repos: /Users/devanshvarshney/FilterTube
 manifest sync modes: copy
 manifest destinationKind fields present: 0
-manifest entries missing destinationKind: 32
+manifest entries missing destinationKind: 34
 manifest includes js/layout.js: yes
 manifest includes data/release_notes.json: no
 runtimeBundleOrder entries: 16
 runtimeBundleOrder includes js/layout.js: yes
 source mirror dirs: js, html, css
-direct manifest copy sources present: 32
-direct manifest copy destinations present: 32
-direct manifest source/destination hash matches: 32
+direct manifest copy sources present: 34
+direct manifest copy destinations present: 34
+direct manifest source/destination hash matches: 34
 direct manifest source/destination hash mismatches: 0
-extension-source mirror files compared: 46
-extension-source mirror files present: 46
-extension-source mirror hash matches: 46
+extension-source mirror files compared: 50
+extension-source mirror files present: 50
+extension-source mirror hash matches: 50
 extension-source mirror missing files: 0
 extension-source mirror hash mismatches: 0
 runtime behavior changed: no
@@ -55,7 +55,7 @@ Manifest destination roots:
 | Destination root | Entries |
 | --- | ---: |
 | `apps/android` | 3 |
-| `packages/extension-source` | 2 |
+| `packages/extension-source` | 4 |
 | `packages/extension-ui` | 8 |
 | `packages/managed-policy-contract` | 1 |
 | `packages/runtime-adapters` | 12 |
@@ -66,9 +66,9 @@ Manifest destination roots:
 
 | Artifact | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `apps/android/app/src/main/assets/filtertube_runtime_full.js` | 37213 | 1634163 | `4b0681ed60b3c9f80be10a0e46582e3c832ea9d287e6909995b3a9a5b79692d7` |
+| `apps/android/app/src/main/assets/filtertube_runtime_full.js` | 38286 | 1686114 | `50fa47448a3ba905d66c697574f4f34f5af39f9bb5c4b8949ae3d04331c889db` |
 | `apps/android/app/src/main/assets/filtertube_kids_runtime.js` | 370 | 13153 | `05b47e2310222a68ba5356cbf6dca24b507aa225bfbe6e971c2a4819d647b711` |
-| `apps/ios/FilterTube/Resources/filtertube_runtime_full.js` | 37213 | 1632501 | `6955e1934822b49222555fb201be9f18976610ddcc1855b0159e7bb3d7da567a` |
+| `apps/ios/FilterTube/Resources/filtertube_runtime_full.js` | 38286 | 1684452 | `cba4980c83050bc43ee02f831dea9c6801383a118fed5b8caf5f16451d7398b7` |
 | `apps/ios/FilterTube/Resources/filtertube_kids_runtime.js` | 575 | 20835 | `3f279f275bf93cca6385df6c8d0422a51c533c26cbd29ddd5d9ea5655efc7340` |
 | `apps/android/app/src/main/assets/filtertube_nanah_engine.html` | 875 | 34907 | `e63d29f43a5c94790a665bfda985071b26b530dd7b532cdb66f0cd3d27a1a93e` |
 | `apps/ios/FilterTube/Resources/filtertube_nanah_engine.html` | 875 | 34899 | `84df57dacdaaf394e47864cc7a70ed5185e7547b693afbe69a363811f787112d` |

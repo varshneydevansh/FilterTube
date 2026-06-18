@@ -115,7 +115,7 @@ test('public wrapper delegates to the sibling or env-selected app sync script', 
 test('app sync manifest sources exist and are owned by the public repo path', () => {
   const manifest = readJson('tools/runtime-sync-manifest.json', appRoot);
 
-  assert.equal(manifest.length, 32);
+  assert.equal(manifest.length, 34);
   assert.deepEqual([...new Set(manifest.map(entry => entry.sourceRepo))], [repoRoot]);
 
   const missing = manifest.filter(entry => !fs.existsSync(path.join(entry.sourceRepo, entry.source)));
@@ -166,10 +166,10 @@ test('generated main runtime assets are large app outputs and not byte-identical
   const androidPath = path.join(appRoot, 'apps/android/app/src/main/assets/filtertube_runtime_full.js');
   const iosPath = path.join(appRoot, 'apps/ios/FilterTube/Resources/filtertube_runtime_full.js');
 
-  assert.equal(fs.statSync(androidPath).size, 1634621);
-  assert.equal(fs.statSync(iosPath).size, 1632959);
-  assert.equal(sha256(androidPath), '9cd4153bd713a9f43da81ae53ee92be5b566eddbc7d6902ed41a7a1e6551f05c');
-  assert.equal(sha256(iosPath), '697152093a134068ae08e9da094a31afd36b0957975b60ff483935914a743a7f');
+  assert.equal(fs.statSync(androidPath).size, 1686114);
+  assert.equal(fs.statSync(iosPath).size, 1684452);
+  assert.equal(sha256(androidPath), '50fa47448a3ba905d66c697574f4f34f5af39f9bb5c4b8949ae3d04331c889db');
+  assert.equal(sha256(iosPath), 'cba4980c83050bc43ee02f831dea9c6801383a118fed5b8caf5f16451d7398b7');
   assert.notEqual(sha256(androidPath), sha256(iosPath));
   assert.match(read(auditDocPath), /Generated app runtime assets are not source authority/);
 });
