@@ -56,8 +56,8 @@
                 ? helpers.getManagedLocalNetworkConfigSummary
                 : () => ({
                     configured: false,
-                    label: 'Same-network updates off',
-                    detail: 'Same-network delivery needs an explicit trusted gateway; network discovery is never authority.',
+                    label: 'Home bridge off',
+                    detail: 'A Home Bridge needs an explicit trusted FilterTube bridge; network discovery is never authority.',
                     tone: 'warning'
                 }),
             onAction: typeof helpers.onAction === 'function' ? helpers.onAction : null
@@ -407,14 +407,14 @@
         if (item.syncLocalNetworkReady === true) {
             return {
                 key: 'local_network',
-                label: 'Same-network ready',
+                label: 'Home Bridge ready',
                 tone: 'success'
             };
         }
         if (item.syncMailboxReady === true) {
             return {
                 key: 'mailbox',
-                label: 'Offline pickup ready',
+                label: 'Pick Up Later ready',
                 tone: 'success'
             };
         }
@@ -444,12 +444,12 @@
             return 'Local control works now. Pair only when updates need to reach another device.';
         }
         if (readyCount <= 0) {
-            return `${targetCount} verified ${targetCount === 1 ? 'device is' : 'devices are'} paired; open parent and protected devices together for live P2P.`;
+            return `${targetCount} verified ${targetCount === 1 ? 'device is' : 'devices are'} paired; open parent and protected devices together for live send.`;
         }
         const paths = [];
-        if (item.syncLiveReady === true) paths.push('live P2P');
-        if (item.syncLocalNetworkReady === true) paths.push('same-network');
-        if (item.syncMailboxReady === true) paths.push('offline pickup');
+        if (item.syncLiveReady === true) paths.push('Live Send');
+        if (item.syncLocalNetworkReady === true) paths.push('Home Bridge');
+        if (item.syncMailboxReady === true) paths.push('Pick Up Later');
         return paths.length
             ? `${targetCount} verified ${targetCount === 1 ? 'device' : 'devices'} via ${paths.join(' + ')}.`
             : `${readyCount} verified ${readyCount === 1 ? 'queue is' : 'queues are'} ready.`;

@@ -3104,15 +3104,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         'remote_policy.accept': 'Remote policy accepted',
         'remote_policy.reject': 'Remote policy rejected',
         'remote_policy.conflict': 'Remote policy conflict',
-        'remote_policy.mailbox.accept': 'Mailbox policy accepted',
-        'remote_policy.mailbox.reject': 'Mailbox policy rejected',
-        'remote_policy.mailbox.conflict': 'Mailbox policy conflict',
-        'remote_policy.mailbox.expire': 'Mailbox policy expired',
-        'remote_policy.mailbox.revoke': 'Mailbox policy revoked',
-        'remote_policy.mailbox.ack': 'Mailbox ack recorded',
-        'remote_policy.local_network.ack': 'Local-network ack recorded',
-        'delivery.mailbox.configure': 'Mailbox provider changed',
-        'delivery.local_network.configure': 'Local-network provider changed',
+        'remote_policy.mailbox.accept': 'Pick Up Later update accepted',
+        'remote_policy.mailbox.reject': 'Pick Up Later update rejected',
+        'remote_policy.mailbox.conflict': 'Pick Up Later update conflict',
+        'remote_policy.mailbox.expire': 'Pick Up Later update expired',
+        'remote_policy.mailbox.revoke': 'Pick Up Later update revoked',
+        'remote_policy.mailbox.ack': 'Pick Up Later receipt recorded',
+        'remote_policy.local_network.ack': 'Home Bridge receipt recorded',
+        'delivery.mailbox.configure': 'Pick Up Later setting changed',
+        'delivery.local_network.configure': 'Home Bridge setting changed',
         'remote_policy.source_push': 'Parent policy push',
         'history.clear': 'History cleared'
     });
@@ -5318,12 +5318,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             const noLinks = normalizeNonNegativeInteger(root.noLinkCount) || 0;
             const missingProvider = normalizeNonNegativeInteger(root.providerMissingCount) || 0;
             const deliveryBits = [];
-            if (liveSent) deliveryBits.push(`live ${liveSent}`);
-            if (lanSent) deliveryBits.push(`LAN ${lanSent}`);
-            if (mailboxSent) deliveryBits.push(`mailbox ${mailboxSent}`);
+            if (liveSent) deliveryBits.push(`Live Send ${liveSent}`);
+            if (lanSent) deliveryBits.push(`Home Bridge ${lanSent}`);
+            if (mailboxSent) deliveryBits.push(`Pick Up Later ${mailboxSent}`);
             if (failed) deliveryBits.push(`failed ${failed}`);
             if (noLinks) deliveryBits.push(`no-link ${noLinks}`);
-            if (missingProvider) deliveryBits.push(`provider-missing ${missingProvider}`);
+            if (missingProvider) deliveryBits.push(`send path unavailable ${missingProvider}`);
             if (deliveryStatus) parts.push(`status ${deliveryStatus}`);
             if (deliveryBits.length) parts.push(`delivery ${deliveryBits.join(', ')}`);
         }
@@ -5465,12 +5465,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             const noLinks = normalizeNonNegativeInteger(summary.noLinkCount) || 0;
             const providerMissing = normalizeNonNegativeInteger(summary.providerMissingCount) || 0;
             const bits = [];
-            if (liveSent) bits.push(`live ${liveSent}`);
-            if (lanSent) bits.push(`LAN ${lanSent}`);
-            if (mailboxSent) bits.push(`mailbox ${mailboxSent}`);
+            if (liveSent) bits.push(`Live Send ${liveSent}`);
+            if (lanSent) bits.push(`Home Bridge ${lanSent}`);
+            if (mailboxSent) bits.push(`Pick Up Later ${mailboxSent}`);
             if (failed) bits.push(`failed ${failed}`);
             if (noLinks) bits.push(`no-link ${noLinks}`);
-            if (providerMissing) bits.push(`provider-missing ${providerMissing}`);
+            if (providerMissing) bits.push(`send path unavailable ${providerMissing}`);
             const label = bits.length
                 ? `Last send: ${status || 'recorded'} (${bits.join(', ')})`
                 : `Last send: ${status || normalizeString(row.result) || 'recorded'}`;
@@ -12996,14 +12996,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const choices = [
             {
                 value: 'configure',
-                label: configureLabel || (configured ? 'Edit Provider' : 'Configure Provider'),
+                label: configureLabel || (configured ? 'Edit Send Path' : 'Set Up Send Path'),
                 className: configured ? 'btn-secondary' : 'btn-primary'
             }
         ];
         if (configured) {
             choices.push({
                 value: 'disable',
-                label: disableLabel || 'Disable Provider',
+                label: disableLabel || 'Turn Off Send Path',
                 className: 'btn-secondary'
             });
         }
@@ -13012,7 +13012,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             message: message || 'Choose how parent-approved updates should reach a protected device.',
             details: Array.isArray(details) ? details : [
                 'Use live send first when both devices are open.',
-                'Only add another delivery method when live P2P is not enough.',
+                'Only add another delivery method when live send is not enough.',
                 'Child/protected profiles still cannot change parent rules from their own surface.'
             ],
             choices,
@@ -13035,7 +13035,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             title: 'Pick Up Updates Later',
             message: 'Use this only when a parent may change rules while the protected device is offline. The child device can pick up the update next time it opens.',
             details: [
-                'This is advanced and separate from normal Nanah live P2P.',
+                'This is advanced and separate from normal live send.',
                 'Skip this if parent and protected devices can be opened together.',
                 'A compatible pickup service is only a waiting room for unreadable updates.',
                 'Parent approval and the saved trusted device still decide what applies.'
@@ -13057,7 +13057,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const endpoint = await showPromptModal({
             title: 'Pick Up Later Service',
-            message: 'Advanced only. This is not the Nanah signal server. Enter a compatible HTTPS pickup service only if you run one; leave blank to keep live P2P only.',
+            message: 'Advanced only. This is not the Nanah signal server. Enter a compatible HTTPS pickup service only if you run one; leave blank to keep live send only.',
             placeholder: 'https://your-filtertube-pickup-service',
             inputType: 'url',
             confirmText: currentEndpoint ? 'Save Service' : 'Enable Offline Pickup',
@@ -13126,8 +13126,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             title: 'Home Network Bridge',
             message: 'Use this only when you have a trusted FilterTube bridge that can pass parent updates to protected devices on your home or school network.',
             details: [
-                'This is advanced and separate from normal Nanah live P2P.',
-                'Skip this for normal live P2P control.',
+                'This is advanced and separate from normal live send.',
+                'Skip this for normal live-send control.',
                 'Being on the same network is not enough to change rules.',
                 'The protected device still accepts only trusted parent updates.'
             ],
@@ -13143,12 +13143,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 endpointHost: ''
             });
             await refreshProfilesUI();
-            UIComponents.showToast('Same-network updates disabled', 'success');
+        UIComponents.showToast('Home Bridge disabled', 'success');
             return;
         }
         const endpoint = await showPromptModal({
             title: 'Home Network Bridge',
-            message: 'Advanced only. Enter a trusted bridge endpoint only if you run a FilterTube-compatible bridge. Normal parent control uses live P2P.',
+            message: 'Advanced only. Enter a trusted bridge endpoint only if you run a FilterTube-compatible bridge. Normal parent control uses live send.',
             placeholder: 'http://192.168.1.10:4177/filtertube',
             inputType: 'url',
             confirmText: currentEndpoint ? 'Save Bridge' : 'Enable Home Bridge',
@@ -13161,7 +13161,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const token = await showPromptModal({
-            title: 'Gateway Password',
+            title: 'Bridge Password',
             message: 'Optional. Leave blank to keep the saved password. Enter a single dash to clear it.',
             placeholder: 'Optional token',
             inputType: 'password',
@@ -13184,7 +13184,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? client.createProvider(nextConfig)
             : null;
         if (!provider || provider.configured !== true || !hasNanahManagedLocalNetworkDeliveryWriter(provider)) {
-            UIComponents.showToast('Same-network endpoint must be HTTPS or private/local HTTP and supported by FilterTube', 'error');
+            UIComponents.showToast('Home Bridge endpoint must be HTTPS or private/local HTTP and supported by FilterTube', 'error');
             return;
         }
         writeNanahManagedLocalNetworkProviderConfig(nextConfig);
@@ -13193,7 +13193,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             endpointHost: getManagedLocalNetworkEndpointHostFromConfig(nextConfig)
         });
         await refreshProfilesUI();
-        UIComponents.showToast('Same-network updates saved', 'success');
+        UIComponents.showToast('Home Bridge saved', 'success');
     }
 
     function hasNanahManagedMailboxUploadWriter(provider = getNanahManagedMailboxProvider()) {
@@ -13501,7 +13501,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 orderKey: `mailbox-config:${now}`,
                 summary: {
                     redacted: true,
-                    label: mailboxConfigured ? 'Mailbox provider configured' : 'Mailbox provider disabled',
+                    label: mailboxConfigured ? 'Pick Up Later configured' : 'Pick Up Later disabled',
                     mailboxConfigured,
                     endpointHost: mailboxConfigured ? endpointHost : '',
                     targetCount: targetIds.length
@@ -13560,7 +13560,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 orderKey: `local-network-config:${now}`,
                 summary: {
                     redacted: true,
-                    label: localNetworkConfigured ? 'Local-network provider configured' : 'Local-network provider disabled',
+                    label: localNetworkConfigured ? 'Home Bridge configured' : 'Home Bridge disabled',
                     localNetworkConfigured,
                     endpointHost: localNetworkConfigured ? endpointHost : '',
                     targetCount: targetIds.length
@@ -13840,7 +13840,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else if (summary.noLinkCount > 0) {
             UIComponents.showToast('No selected protected profile has a verified device link yet', 'error');
         } else {
-            UIComponents.showToast('No delivery provider is available for verified-device updates yet', 'error');
+            UIComponents.showToast('No send path is available for verified-device updates yet', 'error');
         }
         return summary;
     }
@@ -14101,7 +14101,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const mailboxItemId = normalizeString(ackRecord.mailboxItemId);
             const localNetworkCandidateId = normalizeString(ackRecord.localNetworkCandidateId || ackRecord.candidateId);
             const itemId = transport === 'local_network' ? localNetworkCandidateId : mailboxItemId;
-            const transportLabel = transport === 'local_network' ? 'Local-network' : 'Mailbox';
+            const transportLabel = transport === 'local_network' ? 'Home Bridge' : 'Pick Up Later';
             const result = providerAcceptedAll ? 'accepted' : 'rejected';
             const reason = providerAcceptedAll
                 ? null
@@ -14261,8 +14261,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         return {
             configured: true,
-            label: `Same-network ready: ${host}`,
-            detail: 'Local delivery is available. The protected device still accepts only trusted parent updates.',
+            label: `Home Bridge ready: ${host}`,
+            detail: 'Home Bridge delivery is available. The protected device still accepts only trusted parent updates.',
             tone: 'success'
         };
     }
@@ -14350,14 +14350,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (policy.syncOnProfileOpen !== true) return 'Off';
         const state = safeObject(nanahManagedLocalNetworkSyncState);
         if (normalizeString(state.profileId) && normalizeString(state.profileId) !== activeProfileId) return 'Ready';
-        if (normalizeString(state.reasonCode) === 'local_network_provider_unavailable') return 'Waiting for provider';
+        if (normalizeString(state.reasonCode) === 'local_network_provider_unavailable') return 'Waiting for Home Bridge';
         const row = safeArray(state.linkResults).find(result => normalizeString(result?.linkId) === normalizeString(trusted.linkId || trusted.id));
         if (!row) return state.checkedAt ? 'Checked' : 'Ready';
         const accepted = Number(row.acceptedCandidateCount) || 0;
         const rejected = Number(row.rejectedCandidateCount) || 0;
         const candidates = Number(row.candidateCount) || 0;
         if (accepted || rejected) return `${accepted} accepted, ${rejected} rejected`;
-        if (row.ok === false) return 'Rejected by provider';
+        if (row.ok === false) return 'Rejected by Home Bridge';
         if (candidates === 0) return 'Checked, no candidates';
         return 'Checked';
     }
@@ -14639,14 +14639,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const policy = safeObject(trusted.policy);
         if (getNanahOutgoingManagedPolicyStateByScope(policy).length === 0) return 'No sent policy';
         const state = safeObject(nanahManagedSourceAckSyncState);
-        if (normalizeString(state.reasonCode) === 'delivery_ack_provider_unavailable') return 'Waiting for provider';
+        if (normalizeString(state.reasonCode) === 'delivery_ack_provider_unavailable') return 'Waiting for send receipt';
         const row = safeArray(state.linkResults).find(result => normalizeString(result?.linkId) === normalizeString(trusted.linkId || trusted.id));
         if (!row) return state.checkedAt ? 'Checked' : 'Ready';
         const recorded = Number(row.recordedAckCount) || 0;
         const rejected = Number(row.rejectedAckCount) || 0;
         const payloads = Number(row.ackPayloadCount) || 0;
         if (recorded || rejected) return `${recorded} recorded, ${rejected} ignored`;
-        if (row.ok === false) return 'Rejected by provider';
+        if (row.ok === false) return 'Rejected by send path';
         if (payloads === 0) return 'Checked, no acks';
         return 'Checked';
     }
@@ -15872,7 +15872,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const validation = adapter.validateManagedMailboxItem(item, context);
         if (validation.accepted === true && validation.decision === 'idempotent_same_hash') {
             await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
-            UIComponents.showToast('Managed mailbox policy already matches the last accepted revision', 'info');
+            UIComponents.showToast('Pick Up Later update already matches the last accepted revision', 'info');
             return validation;
         }
         if (validation.accepted === true) {
@@ -15883,25 +15883,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                     mailboxItemId: validation.mailboxItemId
                 };
                 await recordManagedNanahPolicyValidationHistory(envelope, decision, context);
-                UIComponents.showToast('Managed mailbox apply is unavailable', 'error');
+                UIComponents.showToast('Pick Up Later apply is unavailable', 'error');
                 return decision;
             }
             const result = await adapter.applyManagedMailboxItem(item, context);
             await recordManagedNanahPolicyValidationHistory(envelope, result.accepted === true ? validation : result, context);
             if (result.accepted === true && result.applied !== false) {
                 await refreshFilterTubeUiAfterNanahImport();
-                UIComponents.showToast(`Applied managed mailbox ${normalizeString(validation.scope) || 'policy'} update`, 'success');
+                UIComponents.showToast(`Applied Pick Up Later ${normalizeString(validation.scope) || 'policy'} update`, 'success');
                 return result;
             }
             if (result.accepted === true && result.decision === 'idempotent_same_hash') {
-                UIComponents.showToast('Managed mailbox policy already matches the last accepted revision', 'info');
+                UIComponents.showToast('Pick Up Later update already matches the last accepted revision', 'info');
                 return result;
             }
-            UIComponents.showToast(`Managed mailbox policy rejected: ${normalizeString(result.reason) || 'apply failed'}`, 'error');
+            UIComponents.showToast(`Pick Up Later update rejected: ${normalizeString(result.reason) || 'apply failed'}`, 'error');
             return result;
         }
         await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
-        UIComponents.showToast(`Managed mailbox policy rejected: ${normalizeString(validation.reason) || 'validation failed'}`, 'error');
+        UIComponents.showToast(`Pick Up Later update rejected: ${normalizeString(validation.reason) || 'validation failed'}`, 'error');
         return validation;
     }
 
@@ -15941,7 +15941,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const validation = adapter.validateManagedLocalNetworkCandidate(sanitizedCandidate, context);
         if (validation.accepted === true && validation.decision === 'idempotent_same_hash') {
             await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
-            UIComponents.showToast('Managed local-network policy already matches the last accepted revision', 'info');
+            UIComponents.showToast('Home Bridge update already matches the last accepted revision', 'info');
             return validation;
         }
         if (validation.accepted === true) {
@@ -15952,25 +15952,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                     validationDecision: validation.decision
                 };
                 await recordManagedNanahPolicyValidationHistory(envelope, decision, context);
-                UIComponents.showToast('Managed local-network apply is unavailable', 'error');
+                UIComponents.showToast('Home Bridge apply is unavailable', 'error');
                 return decision;
             }
             const result = await adapter.applyManagedPolicyEnvelope(envelope, context);
             await recordManagedNanahPolicyValidationHistory(envelope, result.accepted === true ? validation : result, context);
             if (result.accepted === true && result.applied !== false) {
                 await refreshFilterTubeUiAfterNanahImport();
-                UIComponents.showToast(`Applied managed local-network ${normalizeString(validation.scope) || 'policy'} update`, 'success');
+                UIComponents.showToast(`Applied Home Bridge ${normalizeString(validation.scope) || 'policy'} update`, 'success');
                 return result;
             }
             if (result.accepted === true && result.decision === 'idempotent_same_hash') {
-                UIComponents.showToast('Managed local-network policy already matches the last accepted revision', 'info');
+                UIComponents.showToast('Home Bridge update already matches the last accepted revision', 'info');
                 return result;
             }
-            UIComponents.showToast(`Managed local-network policy rejected: ${normalizeString(result.reason) || 'apply failed'}`, 'error');
+            UIComponents.showToast(`Home Bridge update rejected: ${normalizeString(result.reason) || 'apply failed'}`, 'error');
             return result;
         }
         await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
-        UIComponents.showToast(`Managed local-network policy rejected: ${normalizeString(validation.reason) || 'validation failed'}`, 'error');
+        UIComponents.showToast(`Home Bridge update rejected: ${normalizeString(validation.reason) || 'validation failed'}`, 'error');
         return validation;
     }
 
