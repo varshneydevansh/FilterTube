@@ -5270,15 +5270,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (timezone) {
                 parts.push(`timezone ${timezone}`);
             }
-        } else if (actionType === 'policy.channel_list.import' || actionType === 'policy.channel_list.remove' || actionType === 'policy.channel_list.refresh') {
+        } else if (actionType === 'policy.channel_list.import'
+            || actionType === 'policy.channel_list.remove'
+            || actionType === 'policy.channel_list.refresh'
+            || actionType === 'policy.channel_list.pause'
+            || actionType === 'policy.channel_list.resume') {
             const surface = normalizeString(root.surface);
             const addedCount = normalizeNonNegativeInteger(root.addedCount);
+            const changedCount = normalizeNonNegativeInteger(root.changedCount);
             const duplicateCount = normalizeNonNegativeInteger(root.duplicateCount);
             const removedCount = normalizeNonNegativeInteger(root.removedCount);
             const skippedCount = normalizeNonNegativeInteger(root.skippedCount);
             const listEntryCount = normalizeNonNegativeInteger(root.listEntryCount);
             if (surface) parts.push(`surface ${surface === 'kids' ? 'Kids' : (surface === 'both' ? 'Main + Kids' : 'Main')}`);
             if (listEntryCount != null) parts.push(`list ${listEntryCount}`);
+            if (changedCount != null) parts.push(`changed ${changedCount}`);
             if (addedCount != null) parts.push(`added ${addedCount}`);
             if (removedCount != null) parts.push(`removed ${removedCount}`);
             if (duplicateCount != null) parts.push(`already present ${duplicateCount}`);
