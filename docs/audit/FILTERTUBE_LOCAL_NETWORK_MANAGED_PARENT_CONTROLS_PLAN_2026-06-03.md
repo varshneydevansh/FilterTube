@@ -114,6 +114,10 @@ extension authority code.
     text file, preview valid channel identifiers, apply the list to selected
     protected profiles on Main/Kids/both, write protected redacted history, and
     offer the existing verified-device send path.
+  - [x] First reversible slice: parent/account profiles can remove a previously
+    imported materialized list by `managedListId` from selected protected
+    profiles without deleting manual channel rules, with protected redacted
+    history and the existing verified-device send offer.
   - [ ] Reversible list library, enable/disable overlays, URL refresh, and
     scheduled subscription refresh remain future slices.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
@@ -311,6 +315,7 @@ Add list -> Preview -> Choose profiles -> Apply -> Send update
 4. Store source metadata on list-derived channel rows where the channel schema allows [done]
 5. Write redacted managed action-history row [done]
 6. Offer signed verified-device push through existing channels/rules_bundle path [done]
+7. Remove a materialized imported list without touching manual rows [done]
 ```
 
 URL refresh and scheduled subscriptions can come after the local import path is

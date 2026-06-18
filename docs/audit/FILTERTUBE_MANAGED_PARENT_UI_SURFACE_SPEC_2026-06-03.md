@@ -72,6 +72,11 @@ imports from the command center. It skips name-only rows for safety, applies
 valid channel identifiers through the existing profile channel-rule arrays,
 writes protected redacted `policy.channel_list.import` history rows, and can
 offer the same signed verified-device send used by manual channel edits.
+The reversible materialized-row slice now supports `Remove List` from the same
+command center. It removes only rows tagged with the imported list's
+`managedListId`, keeps manual channel rules intact, writes protected redacted
+`policy.channel_list.remove` history rows, and can offer the existing
+verified-device send path.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 
@@ -141,6 +146,9 @@ state without exposing plaintext rule values:
   It normalizes `UC...`, `@handle`, `/channel/UC...`, `/c/name`, `/user/name`,
   and YouTube channel URLs. Rows that only provide display names are skipped
   because they are weaker identity and could false-hide content.
+- `Remove List` is the first undo path for list imports. It is not yet the final
+  subscribed-list enable/disable overlay, but it gives parents a one-action
+  reversal for materialized imports and prevents hundreds of manual deletes.
 - The list UI should feel like a small library, not a transport console:
   `Add list`, `Preview`, `Apply to profiles`, `Send update`. Source URL,
   revision hash, stale refresh state, skipped malformed rows, and delivery

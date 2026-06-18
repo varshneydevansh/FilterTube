@@ -85,6 +85,14 @@
                 sensitiveAction: true
             },
             {
+                action: 'remove_channel_list',
+                label: 'Remove List',
+                profileId: targetId,
+                scope: 'channels',
+                authority: 'delegated_runtime_gate',
+                sensitiveAction: true
+            },
+            {
                 action: 'view_history',
                 label: 'History',
                 profileId: targetId,
@@ -354,6 +362,15 @@
             {
                 action: 'bulk_import_channel_list',
                 label: 'Import list',
+                group: 'rules',
+                profileIds,
+                scope: 'channels',
+                authority: 'delegated_runtime_gate',
+                sensitiveAction: true
+            },
+            {
+                action: 'bulk_remove_channel_list',
+                label: 'Remove list',
                 group: 'rules',
                 profileIds,
                 scope: 'channels',
