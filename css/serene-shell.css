@@ -2327,6 +2327,29 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     color: var(--ft-color-text-secondary);
 }
 
+.nanah-sync-technical {
+    margin-top: 0.15rem;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: var(--ft-color-text-secondary);
+}
+
+.nanah-sync-technical summary {
+    width: max-content;
+    max-width: 100%;
+    cursor: pointer;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ft-color-accent, #b35248);
+}
+
+.nanah-sync-technical a {
+    color: var(--ft-color-accent, #b35248);
+    word-break: break-all;
+}
+
 .nanah-sync-note {
     font-size: 0.9rem;
     line-height: 1.6;

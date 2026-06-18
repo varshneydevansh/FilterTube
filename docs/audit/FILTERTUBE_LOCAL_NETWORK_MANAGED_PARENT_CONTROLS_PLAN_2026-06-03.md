@@ -128,6 +128,12 @@ extension authority code.
   service only in supporting copy, keeps `More controls` collapsed for role and
   scope details, and keeps the normal parent path as open both devices, pair,
   verify, send, then save parent trust only for approved protected profiles.
+- [x] Family Device Updates wording slice: the visible Accounts & Sync card and
+  Help section now use parent-facing `Family Device Updates` language instead
+  of leading with the Nanah implementation name. The raw relay URL is tucked
+  behind a `Technical relay page` disclosure, and the main privacy banner says
+  the practical rule first: keep both devices open for Send Now; the meeting
+  step does not store rules or PINs.
 
 ### Parent/Caregiver Simplification Tracker
 

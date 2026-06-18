@@ -691,7 +691,7 @@
 
                         <div class="card settings-card settings-card--featured nanah-sync-card">
                             <div class="card-header">
-                                <h3>Device Trust &amp; Sync</h3>
+                                <h3>Family Device Updates</h3>
                             </div>
                             <div class="card-body settings-card__body">
                                 <div class="nanah-sync-shell">
@@ -701,7 +701,7 @@
                                             <p class="nanah-sync-intro__title">Send approved rules to a child, family, or personal device.</p>
                                             <p class="nanah-sync-intro__body">For everyday control, open both devices, pair with a short code or QR, confirm the same safety phrase, then send the selected profile update. Save trust only when that device should keep receiving parent-approved changes.</p>
                                         </div>
-                                        <div class="nanah-sync-flow" aria-label="Nanah Sync steps">
+                                        <div class="nanah-sync-flow" aria-label="Family device update steps">
                                             <article class="nanah-sync-flow__step nanah-sync-flow__step--trust">
                                                 <div class="nanah-sync-flow__step-head">
                                                     <span class="nanah-sync-flow__index">Step 1</span>
@@ -778,7 +778,7 @@
 
                                             <div class="nanah-sync-panel__content nanah-sync-panel__content--setup">
                                                 <div class="nanah-sync-panel__stack nanah-sync-panel__stack--setup">
-                                                    <div class="nanah-sync-mode-switch" role="tablist" aria-label="Choose Nanah sync mode">
+                                                    <div class="nanah-sync-mode-switch" role="tablist" aria-label="Choose device update mode">
                                                         <button id="ftNanahModeSendOnce" class="nanah-sync-mode" type="button" data-mode="send_once" aria-pressed="true">
                                                             <span class="nanah-sync-mode__eyebrow">Copy once</span>
                                                             <strong class="nanah-sync-mode__title">Send this profile</strong>
@@ -943,7 +943,11 @@
                                             <div class="nanah-sync-stack">
                                                 <div class="nanah-sync-privacy-banner">
                                                     <strong>Private after the handshake</strong>
-                                                    <span>The meeting service only helps the two open devices connect. After the safety phrase matches, the selected update is meant to move directly between those devices. Technical relay page: <a href="https://nanah-signaling.varshney-devansh614.workers.dev/" target="_blank" rel="noopener noreferrer">nanah-signaling.varshney-devansh614.workers.dev</a>.</span>
+                                                    <span>For Send Now, keep both devices open. The meeting step helps them find each other; it does not store rules or PINs.</span>
+                                                    <details class="nanah-sync-technical">
+                                                        <summary>Technical relay page</summary>
+                                                        <span><a href="https://nanah-signaling.varshney-devansh614.workers.dev/" target="_blank" rel="noopener noreferrer">nanah-signaling.varshney-devansh614.workers.dev</a></span>
+                                                    </details>
                                                 </div>
                                                 <label class="nanah-sync-field">
                                                     <span>Enter pairing code</span>
@@ -1289,12 +1293,12 @@
                         <div class="help-cluster help-cluster--support">
                             <div class="card">
                                 <div class="card-header">
-                                    <h3>Nanah Sync</h3>
+                                    <h3>Family Device Updates</h3>
                                 </div>
                                 <div class="card-body">
                                     <div class="help-list">
                                         <div class="help-item">
-                                            <div class="help-item-title">Three simple ways to use Nanah</div>
+                                            <div class="help-item-title">Three simple ways to send updates</div>
                                             <div class="help-item-body">
                                                 <ul>
                                                     <li><strong>Send this profile:</strong> Best default for your own second device. Pair, verify, send, and let the other device review the update.</li>
