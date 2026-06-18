@@ -1796,6 +1796,7 @@
             allowRosterFallbackForCollabMarkup,
             expectedCollaboratorCount,
             handleCount: handleSet.size,
+            lookupToken: typeof payload?.lookupToken === 'string' ? payload.lookupToken.trim() : '',
             matchesAny(collaborator) {
                 if (!hasAny) return true;
                 if (!collaborator || typeof collaborator !== 'object') return false;
@@ -3215,43 +3216,89 @@
         let bestDomCandidate = null;
         let bestDomScore = -1;
         const candidates = [];
-        const selector = `[data-filtertube-video-id="${videoId}"]`;
-        const baseElement = document.querySelector(selector);
-        if (baseElement) {
-            candidates.push(baseElement);
-            const wrapper = baseElement.closest(
-                'ytd-rich-item-renderer, ' +
-                'ytd-grid-video-renderer, ' +
-                'ytd-compact-video-renderer, ' +
-                'ytd-playlist-video-renderer, ' +
-                'ytd-playlist-panel-video-renderer, ' +
-                'ytd-playlist-panel-video-wrapper-renderer, ' +
-                'ytm-playlist-panel-video-renderer, ' +
-                'ytm-playlist-panel-video-wrapper-renderer, ' +
-                'ytd-video-renderer'
-            );
-            if (wrapper && wrapper !== baseElement) {
-                candidates.push(wrapper);
-            }
-
-            // Late-loaded lockup cards often keep the collaborator endpoints on nested avatar-stack elements.
+        const seenCandidates = new Set();
+        const cssEscape = (value) => {
             try {
-                const avatarStack = baseElement.querySelector('yt-avatar-stack-view-model, .yt-avatar-stack-view-model');
-                if (avatarStack) {
-                    candidates.push(avatarStack);
-                }
-                const nestedAvatarStacks = baseElement.querySelectorAll?.('yt-avatar-stack-view-model, .yt-avatar-stack-view-model');
-                if (nestedAvatarStacks && nestedAvatarStacks.length > 1) {
-                    for (const node of Array.from(nestedAvatarStacks).slice(0, 3)) {
-                        if (node && !candidates.includes(node)) {
-                            candidates.push(node);
-                        }
-                    }
+                if (typeof CSS !== 'undefined' && typeof CSS.escape === 'function') {
+                    return CSS.escape(value);
                 }
             } catch (e) {
-                // ignore
             }
-        } else {
+            return String(value || '').replace(/["\\]/g, '\\$&');
+        };
+        const cardSelector =
+            'yt-lockup-view-model, ' +
+            'yt-lockup-metadata-view-model, ' +
+            'ytd-rich-item-renderer, ' +
+            'ytd-video-renderer, ' +
+            'ytd-grid-video-renderer, ' +
+            'ytd-compact-video-renderer, ' +
+            'ytd-playlist-video-renderer, ' +
+            'ytd-playlist-panel-video-renderer, ' +
+            'ytd-playlist-panel-video-wrapper-renderer, ' +
+            'ytm-playlist-panel-video-renderer, ' +
+            'ytm-playlist-panel-video-wrapper-renderer, ' +
+            'ytm-video-with-context-renderer, ' +
+            'ytm-compact-video-renderer';
+        const addCandidate = (node) => {
+            if (!node || seenCandidates.has(node)) return;
+            seenCandidates.add(node);
+            candidates.push(node);
+        };
+        const addElementAndContext = (node) => {
+            if (!node) return;
+            addCandidate(node);
+            try {
+                const wrapper = node.closest?.(cardSelector);
+                if (wrapper && wrapper !== node) addCandidate(wrapper);
+            } catch (e) {
+            }
+            try {
+                const avatarStacks = node.querySelectorAll?.('yt-avatar-stack-view-model, .ytAvatarStackViewModelHost, .yt-avatar-stack-view-model') || [];
+                for (const stack of Array.from(avatarStacks).slice(0, 4)) {
+                    addCandidate(stack);
+                }
+            } catch (e) {
+            }
+        };
+        const safeVideoId = cssEscape(videoId);
+        const lookupToken = typeof matcher?.lookupToken === 'string' ? matcher.lookupToken.trim() : '';
+        if (lookupToken) {
+            try {
+                addElementAndContext(document.querySelector(`[data-filtertube-collab-lookup-token="${cssEscape(lookupToken)}"]`));
+            } catch (e) {
+            }
+        }
+        try {
+            const directSelectors = [
+                `[data-filtertube-video-id="${safeVideoId}"]`,
+                `[data-filtertube-unique-id="${safeVideoId}"]`,
+                `.content-id-${safeVideoId}`,
+                `[class*="content-id-${String(videoId).replace(/["\\]/g, '\\$&')}"]`
+            ];
+            for (const selector of directSelectors) {
+                const node = document.querySelector(selector);
+                if (node) addElementAndContext(node);
+            }
+        } catch (e) {
+        }
+        try {
+            const linkSelectors = [
+                `a[href*="watch?v=${videoId}"]`,
+                `a[href*="/watch?v=${videoId}"]`,
+                `a[href*="%3Fv%3D${videoId}"]`,
+                `a[href*="%2Fwatch%3Fv%3D${videoId}"]`,
+                `a[href*="/shorts/${videoId}"]`,
+                `a[href*="/watch/${videoId}"]`
+            ];
+            const anchors = document.querySelectorAll(linkSelectors.join(','));
+            for (const anchor of Array.from(anchors).slice(0, 8)) {
+                addElementAndContext(anchor);
+            }
+        } catch (e) {
+        }
+        const baseElement = candidates[0] || null;
+        if (!baseElement) {
             postLog('warn', `❌ Could not find DOM element for ${videoId}`);
         }
 

@@ -1021,6 +1021,45 @@ function needsIdentityPrefetchWork(settings) {
     }
 }
 
+function needsCollaboratorWarmupWork(settings) {
+    try {
+        if (isFilterTubeManagedViewingRouteDenied()) return false;
+        if (!settings || typeof settings !== 'object') return false;
+        return settings.enabled !== false;
+    } catch (e) {
+        return true;
+    }
+}
+
+function hasCollaboratorWarmupSignal(card) {
+    if (!card || typeof card.querySelector !== 'function') return false;
+    try {
+        if (isMixCardElement(card)) return false;
+    } catch (e) {
+    }
+    try {
+        if (card.querySelector('yt-avatar-stack-view-model, .ytAvatarStackViewModelHost, [aria-label*="Collaboration channels" i]')) {
+            return true;
+        }
+        const attributed = card.querySelector('#attributed-channel-name, [id="attributed-channel-name"]');
+        if (hasAttributedCollaboratorSignal(attributed)) return true;
+        const metadataText = card.querySelector(
+            '.ytContentMetadataViewModelMetadataText, ' +
+            '#text.ytd-channel-name, ' +
+            'ytd-channel-name #text, ' +
+            '.yt-lockup-metadata-view-model__metadata, ' +
+            'yt-content-metadata-view-model'
+        )?.textContent || '';
+        return /\b(and|&)\b/i.test(metadataText) && /\bmore\b/i.test(metadataText);
+    } catch (e) {
+        return false;
+    }
+}
+
+function needsAnyPrefetchObserverWork(settings) {
+    return needsIdentityPrefetchWork(settings) || needsCollaboratorWarmupWork(settings);
+}
+
 function hasBridgeEnabledContentFilters(settings) {
     return Boolean(
         settings
@@ -1093,7 +1132,7 @@ async function ensureMainWorldRuntimeForBridgeRequest() {
 }
 
 function schedulePrefetchScan() {
-    if (!needsIdentityPrefetchWork(currentSettings)) return;
+    if (!needsAnyPrefetchObserverWork(currentSettings)) return;
     if (!prefetchObserver) {
         try {
             startCardPrefetchObserver();
@@ -1115,7 +1154,7 @@ function schedulePrefetchScan() {
 
 function attachPrefetchObservers() {
     if (!prefetchObserver || typeof document.querySelectorAll !== 'function') return;
-    if (!needsIdentityPrefetchWork(currentSettings)) return;
+    if (!needsAnyPrefetchObserverWork(currentSettings)) return;
     const list = [];
 
     try {
@@ -1145,10 +1184,10 @@ function attachPrefetchObservers() {
 
 function startCardPrefetchObserver() {
     if (prefetchObserver || typeof IntersectionObserver !== 'function') return;
-    if (!needsIdentityPrefetchWork(currentSettings)) return;
+    if (!needsAnyPrefetchObserverWork(currentSettings)) return;
 
     prefetchObserver = new IntersectionObserver((entries) => {
-        if (!needsIdentityPrefetchWork(currentSettings)) return;
+        if (!needsAnyPrefetchObserverWork(currentSettings)) return;
         for (const entry of entries) {
             if (!entry.isIntersecting) continue;
             queuePrefetchForCard(entry.target);
@@ -1172,7 +1211,7 @@ let playlistPanelPrefetchHookInstalled = false;
 let rightRailWhitelistObserverInstalled = false;
 
 function installPlaylistPanelPrefetchHook() {
-    if (!needsIdentityPrefetchWork(currentSettings)) return;
+    if (!needsAnyPrefetchObserverWork(currentSettings)) return;
     if (playlistPanelPrefetchHookInstalled) return;
     playlistPanelPrefetchHookInstalled = true;
 
@@ -1280,7 +1319,7 @@ function installRightRailWhitelistObserver() {
 
 function refreshFilterTubeRuntimeObservers() {
     try {
-        if (needsIdentityPrefetchWork(currentSettings)) {
+        if (needsAnyPrefetchObserverWork(currentSettings)) {
             startCardPrefetchObserver();
             installPlaylistPanelPrefetchHook();
             schedulePrefetchScan();
@@ -1315,7 +1354,9 @@ try {
 }
 
 function queuePrefetchForCard(card) {
-    if (!needsIdentityPrefetchWork(currentSettings)) return;
+    const needsIdentity = needsIdentityPrefetchWork(currentSettings);
+    const needsCollaboratorWarmup = needsCollaboratorWarmupWork(currentSettings) && hasCollaboratorWarmupSignal(card);
+    if (!needsIdentity && !needsCollaboratorWarmup) return;
     const priorCachedVideoId = card?.getAttribute?.('data-filtertube-video-id') || '';
     const videoId = extractVideoIdFromCard(card) || '';
     if (!videoId) return;
@@ -1323,6 +1364,21 @@ function queuePrefetchForCard(card) {
     resetCardIdentityIfStale(card, videoId);
     // Also clear stale collaborator metadata if this DOM node was recycled
     getValidatedCachedCollaborators(card);
+
+    if (!needsIdentity && needsCollaboratorWarmup) {
+        const key = `collab:${videoId}`;
+        const lastSeen = prefetchSeenAt.get(key) || 0;
+        if (prefetchSeen.has(key) && (Date.now() - lastSeen) < 12 * 1000) return;
+        prefetchSeen.add(key);
+        prefetchSeenAt.set(key, Date.now());
+
+        prefetchQueue.push({ videoId, card, collabOnly: true });
+        if (prefetchQueue.length > PREFETCH_MAX_QUEUE) {
+            prefetchQueue.shift();
+        }
+        drainPrefetchQueue();
+        return;
+    }
 
     // If YouTube recycled a DOM node without our video-id attribute, any existing channel
     // attrs on it are untrusted. Clear them to avoid persisting a wrong mapping.
@@ -1388,9 +1444,20 @@ function withTimeout(promise, ms) {
     ]);
 }
 
-async function prefetchIdentityForCard({ videoId, card }) {
+async function prefetchIdentityForCard({ videoId, card, collabOnly = false }) {
     try {
         if (!card || !card.isConnected) return;
+
+        if (collabOnly) {
+            try {
+                await prefetchCollaboratorsForCard(card, {
+                    timeoutMs: 1200,
+                    reason: 'visible-collaborator-card'
+                });
+            } catch (e) {
+            }
+            return;
+        }
 
         if (typeof location !== 'undefined' && String(location.hostname || '').includes('youtubekids.com')) {
             if (currentSettings?.videoChannelMap && currentSettings.videoChannelMap[videoId]) {
@@ -3467,6 +3534,11 @@ function requestCollaboratorEnrichment(element, videoId, partialCollaborators = 
         element.setAttribute('data-filtertube-collab-retries', '0');
     }
 
+    const lookupToken = createTemporaryCollaboratorLookupToken(card || element, videoId);
+    if (lookupToken) {
+        lookupOptions.lookupToken = lookupToken;
+    }
+
     requestCollaboratorInfoFromMainWorld(videoId, lookupOptions)
         .then(collaborators => {
             const sanitizedResponse = sanitizeCollaboratorList(collaborators);
@@ -3496,6 +3568,9 @@ function requestCollaboratorEnrichment(element, videoId, partialCollaborators = 
                 partialCollaborators: enrichmentSeed,
                 delayMs: 1000
             });
+        })
+        .finally(() => {
+            clearTemporaryCollaboratorLookupToken(card || element, lookupToken);
         });
 }
 function applyResolvedCollaborators(videoId, collaborators, options = {}) {
@@ -5512,6 +5587,7 @@ function requestCollaboratorInfoFromMainWorld(videoId, options = {}) {
         const expectedHandles = Array.isArray(options.expectedHandles) ? options.expectedHandles : [];
         const expectedCollaboratorCount = parseInt(options.expectedCollaboratorCount || '0', 10) || 0;
         const allowRosterFallbackForCollabMarkup = Boolean(options.allowRosterFallbackForCollabMarkup);
+        const lookupToken = typeof options.lookupToken === 'string' ? options.lookupToken.trim() : '';
         const requestId = ++window.collaboratorRequestId;
         const timeoutMs = 2000; // 2 second timeout
 
@@ -5536,7 +5612,8 @@ function requestCollaboratorInfoFromMainWorld(videoId, options = {}) {
                     expectedNames,
                     expectedHandles,
                     expectedCollaboratorCount,
-                    allowRosterFallbackForCollabMarkup
+                    allowRosterFallbackForCollabMarkup,
+                    lookupToken
                 },
                 source: 'content_bridge'
             }, '*');
@@ -5803,6 +5880,30 @@ function mergeCollaboratorsWithMainWorld(initialChannelInfo, mainWorldCollaborat
     );
 }
 
+function createTemporaryCollaboratorLookupToken(card, videoId = '') {
+    if (!card || typeof card.setAttribute !== 'function') return '';
+    try {
+        const token = `ftc-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+        card.setAttribute('data-filtertube-collab-lookup-token', token);
+        if (videoId && !card.getAttribute('data-filtertube-video-id')) {
+            card.setAttribute('data-filtertube-video-id', videoId);
+        }
+        return token;
+    } catch (e) {
+        return '';
+    }
+}
+
+function clearTemporaryCollaboratorLookupToken(card, token) {
+    if (!card || !token || typeof card.getAttribute !== 'function') return;
+    try {
+        if (card.getAttribute('data-filtertube-collab-lookup-token') === token) {
+            card.removeAttribute('data-filtertube-collab-lookup-token');
+        }
+    } catch (e) {
+    }
+}
+
 /**
  * Ensure collaborator data is enriched from ytInitialData (Main World)
  * @param {Object} initialChannelInfo
@@ -5814,13 +5915,20 @@ async function enrichCollaboratorsWithMainWorld(initialChannelInfo) {
     }
 
     try {
-        const sourceCard = document.querySelector?.(`[data-filtertube-video-id="${initialChannelInfo.videoId}"]`) || null;
+        const sourceCard = initialChannelInfo.sourceCard ||
+            document.querySelector?.(`[data-filtertube-video-id="${initialChannelInfo.videoId}"]`) ||
+            null;
         const lookupOptions = buildCollaboratorLookupRequestOptions({
             card: sourceCard,
             partialCollaborators: initialChannelInfo.allCollaborators,
             channelInfo: initialChannelInfo
         });
-        const mainWorldCollaborators = await requestCollaboratorInfoFromMainWorld(initialChannelInfo.videoId, lookupOptions);
+        const lookupToken = createTemporaryCollaboratorLookupToken(sourceCard, initialChannelInfo.videoId);
+        if (lookupToken) {
+            lookupOptions.lookupToken = lookupToken;
+        }
+        const mainWorldCollaborators = await requestCollaboratorInfoFromMainWorld(initialChannelInfo.videoId, lookupOptions)
+            .finally(() => clearTemporaryCollaboratorLookupToken(sourceCard, lookupToken));
         if (mainWorldCollaborators && mainWorldCollaborators.length > 0) {
             console.log('FilterTube: Received collaborator info from Main World:', mainWorldCollaborators);
             mergeCollaboratorsWithMainWorld(initialChannelInfo, mainWorldCollaborators);
@@ -11164,7 +11272,10 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
         ? getWatchLikeCollaborationWarmup(videoCard)
         : { collaborators: [], expectedCount: 0 };
     if (initialChannelInfo.isCollaboration && initialChannelInfo.videoId) {
-        collaboratorEnrichmentPromise = enrichCollaboratorsWithMainWorld(initialChannelInfo);
+        collaboratorEnrichmentPromise = enrichCollaboratorsWithMainWorld({
+            ...initialChannelInfo,
+            sourceCard: videoCard
+        });
     } else if (isWarmableWatchLikeCard) {
         let provisionalCollaborators = sanitizeCollaboratorList(extractCollaboratorMetadataFromElement(videoCard) || []);
         if (provisionalCollaborators.length === 0 && warmupCollaborationInfo.collaborators.length > 0) {
@@ -11184,7 +11295,8 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
                 allCollaborators: provisionalCollaborators,
                 needsEnrichment: true,
                 expectedCollaboratorCount: provisionalExpectedCount,
-                videoId
+                videoId,
+                sourceCard: videoCard
             }, videoCard);
             initialChannelInfo = provisionalInfo;
             normalizedMenuInfo = normalizeCollaboratorChannelInfoForCard(initialChannelInfo, videoCard, {
