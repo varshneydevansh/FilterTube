@@ -17253,6 +17253,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         await startManagedChildEdit(profileIds[0]);
                     } else if (action === 'manage_channel_lists') {
                         await manageManagedChannelListsForProfiles([targetId]);
+                    } else if (action === 'check_stale_lists') {
+                        await refreshAllManagedChannelListsForProfiles([targetId], { staleOnly: true });
                     } else if (action === 'import_channel_list') {
                         await importManagedChannelListToProfiles([targetId]);
                     } else if (action === 'remove_channel_list') {

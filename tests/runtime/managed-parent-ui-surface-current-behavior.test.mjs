@@ -445,6 +445,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /bulk_allow_main_kids/);
   assert.match(helperSource, /bulk_kids_only/);
   assert.match(helperSource, /bulk_main_only/);
+  assert.match(helperSource, /hasStaleManagedChannelList/);
+  assert.match(helperSource, /action: 'check_stale_lists'/);
   assert.match(helperSource, /resolveDeliveryPreview: resolveManagedCommandCenterDeliveryPreview/);
   assert.match(helperSource, /describeDeliveryPath: describeManagedCommandCenterDeliveryPath/);
   assert.match(helperSource, /ft-managed-command-center__detail-note/);
@@ -491,6 +493,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /NANAH_MANAGED_MAILBOX_CONFIG_KEY = 'ftManagedMailboxServerConfig'/);
   assert.match(source, /action === 'configure_mailbox'/);
   assert.match(source, /action === 'edit_rules'/);
+  assert.match(source, /action === 'check_stale_lists'/);
+  assert.match(source, /refreshAllManagedChannelListsForProfiles\(\[targetId\], \{ staleOnly: true \}\)/);
   assert.match(source, /action === 'view_history'/);
   assert.match(source, /action === 'set_time_limit' \|\| action === 'change_time_limit'/);
   assert.match(source, /action === 'grant_extra_time'/);
@@ -574,6 +578,7 @@ test('managed command-center spec pins parent workflow without making UI authori
   assert.match(doc, /Group labels are navigation aids only and do not create authority/);
   assert.match(doc, /Selected-profile bulk actions must be grouped by parent task area/);
   assert.match(doc, /selected Main\/Kids surface binding for granular sends/);
+  assert.match(doc, /row-level `Check Lists` action/);
   assert.match(doc, /Viewing-space and time-limit saves offer scoped verified-device pushes only\s+for changed profiles with delivery ready/);
   assert.match(doc, /Mobile-first layout with a single-column protected-profile list/);
   assert.match(doc, /Touch targets .* at\s+least 44px high/);
@@ -878,6 +883,34 @@ test('managed parent status is suppressed for protected child views and empty st
 
 test('managed command-center helper emits delegated action intents without policy payload authority', () => {
   const CommandCenter = loadCommandCenter();
+  assert.deepEqual(plain(CommandCenter.buildActionIntents('childA', null, {
+    hasStaleManagedChannelList: true
+  }).slice(0, 3)), [
+    {
+      action: 'edit_rules',
+      label: 'Rules',
+      profileId: 'childA',
+      scope: 'main_kids',
+      authority: 'delegated_runtime_gate',
+      sensitiveAction: false
+    },
+    {
+      action: 'manage_channel_lists',
+      label: 'Lists',
+      profileId: 'childA',
+      scope: 'channels',
+      authority: 'delegated_runtime_gate',
+      sensitiveAction: true
+    },
+    {
+      action: 'check_stale_lists',
+      label: 'Check Lists',
+      profileId: 'childA',
+      scope: 'channels',
+      authority: 'delegated_runtime_gate',
+      sensitiveAction: true
+    }
+  ]);
   const fixture = {
     activeProfileId: 'parentA',
     profiles: {

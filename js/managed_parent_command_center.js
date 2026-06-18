@@ -69,6 +69,7 @@
         if (!targetId) return [];
         const timeLimitActive = timePolicy?.enabled === true;
         const hasPendingExtraTimeRequest = policySummary.pendingExtraTimeRequest === true;
+        const hasStaleManagedChannelList = policySummary.hasStaleManagedChannelList === true;
         const intents = [
             {
                 action: 'edit_rules',
@@ -86,6 +87,14 @@
                 authority: 'delegated_runtime_gate',
                 sensitiveAction: true
             },
+            ...(hasStaleManagedChannelList ? [{
+                action: 'check_stale_lists',
+                label: 'Check Lists',
+                profileId: targetId,
+                scope: 'channels',
+                authority: 'delegated_runtime_gate',
+                sensitiveAction: true
+            }] : []),
             {
                 action: 'view_history',
                 label: 'History',
@@ -654,7 +663,8 @@
                 actionIntents: buildManagedCommandCenterActionIntents(profileId, timePolicy, {
                     remoteConflictCount,
                     pendingExtraTimeRequest: !!pendingExtraTimeRequest,
-                    hasUrlManagedChannelList: managedChannelLists.sourceUrlCount > 0
+                    hasUrlManagedChannelList: managedChannelLists.sourceUrlCount > 0,
+                    hasStaleManagedChannelList: managedChannelLists.staleListCount > 0
                 })
             };
             row.deliveryPreview = resolveManagedCommandCenterDeliveryPreview(row);
