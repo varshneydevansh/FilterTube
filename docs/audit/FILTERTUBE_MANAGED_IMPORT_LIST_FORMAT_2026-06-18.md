@@ -18,8 +18,10 @@ The file must not decide parent authority, target child profile, PIN behavior, s
 
 ## User-Facing Name
 
-Use `Parent-approved lists` for the feature name and `Import Approved List`
-for the primary action in the UI.
+Use `Rule list imports` for the Settings entry point and `Import Rule List`
+for the primary action in the UI. Use `parent-approved` only when explaining
+that a parent/account profile reviewed the list before sending it to a
+protected device.
 
 Avoid making parents choose between many importer types. The importer can accept:
 
@@ -172,7 +174,7 @@ Reason: a downloaded list should never become authority. It is only a source of 
 Parent UI owns the final choices:
 
 ```text
-Import Approved List
+Import Rule List
   -> preview channels/keywords/skipped rows
   -> choose protected profiles
   -> choose Main / Kids / Both
@@ -187,7 +189,7 @@ Import Approved List
 flowchart TD
     A["Parent opens Accounts and Sync"] --> B["Choose protected profile or selected profiles"]
     B --> C["Open Lists"]
-    C --> D["Import Approved List"]
+    C --> D["Import Rule List"]
     D --> E["Paste, choose file, load HTTPS URL, or download CSV template"]
     E --> F["FilterTube previews channels, keywords, skipped rows"]
     F --> G{"Parent accepts preview?"}
@@ -223,9 +225,9 @@ flowchart TD
 
 ### Verified-Device Sync Flow
 
-Parent-approved list rows do not create a second sync protocol. After rules are
-applied to a protected profile, FilterTube sends the changed policy through the
-existing managed-policy JSON path when the parent chooses to send now.
+Rule list rows do not create a second sync protocol. After rules are applied to
+a protected profile, FilterTube sends the changed policy through the existing
+managed-policy JSON path when the parent chooses to send now.
 
 ```mermaid
 sequenceDiagram
@@ -297,13 +299,13 @@ The first parser slice was not complete from a user-flow standpoint because CSV 
 
 Current completion rule:
 
-- Product-facing name: Parent-approved lists. Parser/internal docs may still
-  say rule-list formats because the accepted files are plain rule data.
-- Primary entry point: Settings -> Import / Export -> Parent-approved list imports.
+- Product-facing name: Rule list imports. Parser/internal docs may still say
+  rule-list formats because the accepted files are plain rule data.
+- Primary entry point: Settings -> Import / Export -> Rule list imports.
 - Target choice: Main YouTube, YouTube Kids, or Both. This works for the active profile or the protected profile currently being edited by a parent/account profile.
 - Main/Kids rule pages remain the place to review, edit, pause, resume, and remove the imported rows after import.
-- The Settings card shows a sheet-like structure preview instead of dense prose: `type`, `value`, `notes`, plus supported CSV/JSON shapes.
-- The modal says parent-approved list, shows supported formats, CSV template, file/URL/paste inputs, live preview counts, skipped row counts, a spreadsheet-like parsed-row preview, and the final Apply confirmation.
+- The Settings card shows a sheet-like structure preview instead of dense prose: `type`, `value`, `notes`, plus compact CSV/TXT/JSON/BlockTube format cards.
+- The modal says rule list, shows supported formats, CSV template, file/URL/paste inputs, live preview counts, skipped row counts, a spreadsheet-like parsed-row preview, and the final Apply confirmation.
 - Rule-list JSON is intentionally narrower than a full FilterTube backup JSON. It may add channels and keywords only; it does not change profile structure, PINs, trusted devices, viewing spaces, or sync targets.
 - The Settings card and import modal expose both CSV and JSON rule-list templates. The CSV template is the spreadsheet path; the JSON template is the lightweight rule-list shape, not the full FilterTube backup/export structure.
 - Import backup remains the full restore/migration lane for FilterTube backup JSON and legacy BlockTube export JSON.

@@ -268,12 +268,13 @@ parent tool instead of a sync/debug console.
     materialized channel rows after parent re-auth; unchanged source hashes only
     update checked/source metadata and protected history, avoiding unnecessary
     channel-row churn or remote policy sends.
-  - [x] Parent-approved wording slice: Settings, the import modal, the read-only
-    library modal, remove/check/pause/resume prompts, and Family Controls
-    details now say parent-approved lists instead of generic imported/rule lists
-    where the parent is making an approval decision. This is copy/UI framing
-    only; parser support, materialized row metadata, pause/refresh semantics,
-    and verified-device send behavior are unchanged.
+  - [x] Rule-list wording slice: Settings and Help now use `Rule list imports`
+    and `Import Rule List` so independent users, parents, and caregivers can
+    find the feature without decoding parent-only copy. Protected-profile
+    delivery and history still describe parent approval where the parent/account
+    profile is making the authority decision. This is copy/UI framing only;
+    parser support, materialized row metadata, pause/refresh semantics, and
+    verified-device send behavior are unchanged.
   - [ ] Scheduled subscription refresh remains a future slice. Until then,
     list updates happen only after a parent/account profile chooses Check or
     Refresh and approves the result.
@@ -615,7 +616,7 @@ Add list -> Preview -> Choose profiles -> Apply -> Send update
 **Caregiver-first UI shape**:
 
 - Avoid "subscription provider" language in the normal workflow.
-- Use one clear action label: `Import Approved List`.
+- Use one clear action label: `Import Rule List`.
 - Show a preview with counts first: `312 channels found`, `24 already present`,
   `288 will be added`, `6 skipped`.
 - Let the parent choose Main, Kids, or both using buttons, not free-text scope

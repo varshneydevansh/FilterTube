@@ -7871,7 +7871,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return '<div class="managed-channel-list-modal__preview-empty">No readable rows yet. Use channel_id for channels and keyword for words or phrases.</div>';
         }
         return `
-            <div class="managed-channel-list-modal__sheet" role="table" aria-label="Parent-approved list preview rows">
+            <div class="managed-channel-list-modal__sheet" role="table" aria-label="Rule list preview rows">
                 <div class="managed-channel-list-modal__sheet-row managed-channel-list-modal__sheet-head" role="row">
                     <span role="columnheader">Type</span>
                     <span role="columnheader">Value</span>
@@ -7970,7 +7970,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             header.className = 'card-header';
             const titleEl = document.createElement('h3');
             titleEl.className = 'ft-modal-title';
-            titleEl.textContent = 'Import Parent-Approved List';
+            titleEl.textContent = 'Import Rule List';
             header.appendChild(titleEl);
 
             const body = document.createElement('div');
@@ -7989,7 +7989,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const formatHeader = document.createElement('div');
             formatHeader.className = 'managed-channel-list-modal__format-header';
             const formatTitle = document.createElement('strong');
-            formatTitle.textContent = 'Supported list structure';
+            formatTitle.textContent = 'Supported rule list formats';
             const formatHint = document.createElement('span');
             formatHint.textContent = 'Channels can be handles, UC IDs, /c names, or YouTube URLs. Keywords are words or phrases.';
             formatHeader.append(formatTitle, formatHint);
@@ -8061,7 +8061,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             nameInput.className = 'text-input';
             nameInput.type = 'text';
             nameInput.placeholder = 'Family block list';
-            nameInput.value = 'Parent-approved list';
+            nameInput.value = 'Rule list import';
             nameGroup.append(nameLabel, nameInput);
             body.appendChild(nameGroup);
 
@@ -8145,7 +8145,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const help = document.createElement('div');
             help.className = 'managed-channel-list-modal__help';
-            help.textContent = 'TXT bare rows stay channel-only; use keyword: for TXT keywords. CSV and supported JSON can add channels and keywords. After import, send the protected profile update from Family Controls if another verified device needs the same rules.';
+            help.textContent = 'TXT bare rows stay channel-only; use keyword: for TXT keywords. CSV and supported JSON can add channels and keywords. If this is a protected profile, send the updated policy from Family Controls when another verified device needs the same rules.';
             body.appendChild(help);
 
             const previewEl = document.createElement('div');
@@ -8623,7 +8623,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function showManagedChannelListLibraryModal(summaries) {
         const rows = safeArray(summaries);
         if (!rows.length) {
-            UIComponents.showToast('No parent-approved lists found for the selected protected profiles', 'info');
+            UIComponents.showToast('No rule lists found for the selected protected profiles', 'info');
             return;
         }
         return new Promise((resolve) => {
@@ -9569,7 +9569,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const summaries = collectManagedChannelListSummaries(profiles, eligibleIds);
         if (!summaries.length) {
-            UIComponents.showToast('No parent-approved lists found for the selected protected profiles', 'info');
+            UIComponents.showToast('No rule lists found for the selected protected profiles', 'info');
             return;
         }
 
@@ -9641,7 +9641,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (!changedCount) {
-            UIComponents.showToast('No selected profiles had that parent-approved list', 'info');
+            UIComponents.showToast('No selected profiles had that rule list', 'info');
             return;
         }
 
@@ -9723,8 +9723,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!selectedList) {
             UIComponents.showToast(
                 paused
-                    ? 'No active parent-approved lists found for the selected protected profiles'
-                    : 'No paused parent-approved lists found for the selected protected profiles',
+                    ? 'No active rule lists found for the selected protected profiles'
+                    : 'No paused rule lists found for the selected protected profiles',
                 'info'
             );
             return;
@@ -9878,7 +9878,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const selectedList = await promptManagedChannelListToRefresh(summaries);
         if (!selectedList) {
             if (!summaries.some(summary => normalizeManagedChannelListSourceUrl(summary?.sourceUrl))) {
-                UIComponents.showToast('No URL-backed parent-approved lists found for the selected protected profiles', 'info');
+                UIComponents.showToast('No URL-backed rule lists found for the selected protected profiles', 'info');
             }
             return;
         }
@@ -10080,7 +10080,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? urlBacked.filter(summary => isManagedChannelListSummaryStale(summary))
             : urlBacked;
         if (!urlBacked.length) {
-            UIComponents.showToast('No URL-backed parent-approved lists found for the selected protected profiles', 'info');
+            UIComponents.showToast('No URL-backed rule lists found for the selected protected profiles', 'info');
             return;
         }
         if (!refreshTargets.length) {
@@ -10303,18 +10303,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         const pausedListCount = summaries.filter(summary => (Number(summary.pausedRuleCount ?? summary.pausedChannelCount) || 0) > 0).length;
         const details = summaries.length
             ? [
-                `${summaries.length} parent-approved ${pluralize(summaries.length, 'list')} across ${eligibleIds.length} selected ${pluralize(eligibleIds.length, 'profile')}`,
+                `${summaries.length} rule ${pluralize(summaries.length, 'list')} across ${eligibleIds.length} selected ${pluralize(eligibleIds.length, 'profile')}`,
                 `${activeListCount} active | ${pausedListCount} paused`,
                 staleUrlBackedCount ? `${staleUrlBackedCount} URL-backed ${pluralize(staleUrlBackedCount, 'list')} need refresh` : 'No stale URL-backed lists',
                 urlBackedCount ? `${urlBackedCount} URL-backed ${pluralize(urlBackedCount, 'list')} can be refreshed` : 'No URL-backed lists to refresh yet'
             ]
             : [
-                `No parent-approved lists yet for ${eligibleIds.length} selected ${pluralize(eligibleIds.length, 'profile')}`,
+                `No rule lists yet for ${eligibleIds.length} selected ${pluralize(eligibleIds.length, 'profile')}`,
                 'Start by importing a pasted list, a file, or a public HTTPS channel/keyword list.'
             ];
         const choices = [
             ...(summaries.length ? [{ value: 'view', label: 'View Lists', className: 'btn-secondary' }] : []),
-            { value: 'import', label: 'Import Approved List', className: 'btn-primary' },
+            { value: 'import', label: 'Import Rule List', className: 'btn-primary' },
             ...(activeListCount ? [{ value: 'pause', label: 'Pause List', className: 'btn-secondary' }] : []),
             ...(pausedListCount ? [{ value: 'resume', label: 'Resume List', className: 'btn-secondary' }] : []),
             ...(urlBackedCount ? [{ value: 'refresh', label: 'Check URL', className: 'btn-secondary' }] : []),
@@ -20057,8 +20057,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (ftRuleListFormatsBtn) {
         ftRuleListFormatsBtn.addEventListener('click', async () => {
             const action = await showChoiceModal({
-                title: 'Supported Parent-Approved List Formats',
-                message: 'Parent-approved lists add channels and keywords only. Full FilterTube backups and legacy BlockTube export migration still belong under Choose JSON.',
+                title: 'Supported Rule List Formats',
+                message: 'Rule list imports add channels and keywords only. Full FilterTube backups and legacy BlockTube export migration still belong under Choose JSON.',
                 details: [
                     'CSV: channel_id,keyword,notes or type,value,notes.',
                     'Text: bare rows are channels; typed rows can use channel: @SomeChannel or keyword: brainrot.',

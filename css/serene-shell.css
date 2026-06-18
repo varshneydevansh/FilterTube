@@ -718,8 +718,7 @@ body[data-surface="popup"] .input-group {
 }
 
 .rule-list-sheet-example__bar,
-.rule-list-sheet-example__formats,
-.rule-list-sheet-example__examples {
+.rule-list-sheet-example__format-cards {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -739,31 +738,27 @@ body[data-surface="popup"] .input-group {
     letter-spacing: 0.08em;
 }
 
-.rule-list-sheet-example__formats {
+.rule-list-sheet-example__format-cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: stretch;
+    justify-content: stretch;
     border-top: 1px solid rgba(15, 23, 42, 0.08);
     background: rgba(255, 249, 241, 0.72);
 }
 
-.rule-list-sheet-example__examples {
+.rule-list-sheet-example__format-cards div {
     display: grid;
-    grid-template-columns: 1fr;
-    align-items: stretch;
-    justify-content: stretch;
-    border-top: 1px solid rgba(15, 23, 42, 0.08);
-    background: rgba(255, 255, 255, 0.52);
-}
-
-.rule-list-sheet-example__examples div {
-    display: grid;
-    gap: 0.28rem;
+    align-content: start;
+    gap: 0.24rem;
     min-width: 0;
-    padding: 0.58rem 0.68rem;
+    padding: 0.62rem 0.68rem;
     border: 1px solid rgba(15, 23, 42, 0.07);
     border-radius: 0.75rem;
     background: rgba(255, 255, 255, 0.72);
 }
 
-.rule-list-sheet-example__examples b {
+.rule-list-sheet-example__format-cards b {
     color: var(--ft-color-brand-primary);
     font-size: 0.68rem;
     font-weight: 900;
@@ -771,14 +766,12 @@ body[data-surface="popup"] .input-group {
     text-transform: uppercase;
 }
 
-.rule-list-sheet-example__examples pre {
-    max-width: 100%;
-    max-height: 8.8rem;
-    margin: 0;
-    overflow: auto;
+.rule-list-sheet-example__format-cards span {
+    min-width: 0;
     color: var(--ft-color-text-secondary);
-    white-space: pre;
-    font: 0.74rem/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.76rem;
+    line-height: 1.36;
+    overflow-wrap: anywhere;
 }
 
 .rule-list-sheet-example code {
@@ -978,23 +971,14 @@ html[data-theme="dark"] .rule-list-sheet-example__bar {
     background: rgba(255, 255, 255, 0.04);
 }
 
-html[data-theme="dark"] .rule-list-sheet-example__formats {
+html[data-theme="dark"] .rule-list-sheet-example__format-cards {
     border-top-color: rgba(255, 255, 255, 0.08);
     background: rgba(255, 255, 255, 0.035);
 }
 
-html[data-theme="dark"] .rule-list-sheet-example__examples {
-    border-top-color: rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.025);
-}
-
-html[data-theme="dark"] .rule-list-sheet-example__examples div {
+html[data-theme="dark"] .rule-list-sheet-example__format-cards div {
     border-color: rgba(255, 255, 255, 0.08);
     background: rgba(255, 255, 255, 0.04);
-}
-
-html[data-theme="dark"] .rule-list-sheet-example__examples pre {
-    color: var(--ft-color-text-secondary-dark);
 }
 
 html[data-theme="dark"] .rule-list-sheet-example code {
@@ -3697,6 +3681,10 @@ body.ft-extension-surface .ft-profile-dropdown.ft-select-dropdown {
 
     .view-container {
         padding: 0.72rem !important;
+    }
+
+    .rule-list-sheet-example__format-cards {
+        grid-template-columns: 1fr;
     }
 
     .view-hero {
