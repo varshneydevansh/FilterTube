@@ -54,6 +54,13 @@ switching PIN from the child row after parent/account unlock. This PIN protects
 entry into that child profile and sibling privacy only; it does not become
 parent/admin authority for policy, trusted links, time limits, rule edits, or
 remote sends.
+The first protected-device managed-link setup now defaults to a parent-facing
+`Parent managed` behavior instead of a strict ask-every-time behavior: a saved
+parent/caregiver source link uses fast reconnect, fixed protected-profile
+targeting where required, matching signed updates while locked, and
+profile-open update checks when a later-update provider exists. The stricter
+`Ask on this device first` behavior remains available for families or
+caregivers who want each later update to require local approval/unlock.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 
@@ -174,6 +181,15 @@ state without exposing plaintext rule values:
   hash, or signature details in the decision modal. Audit docs retain those
   proof details; the product surface says that protected devices accept only
   trusted parent updates.
+- First-time and manual managed replica/source link setup use parent-facing
+  wording: `Save Parent Control Link`, `Parent managed`, and `Ask on this
+  device first`. The default protected-device policy is `Parent managed`, which
+  still writes only a trusted-link policy and does not bypass trusted link,
+  target profile, scope, revision, device binding, or signature validation.
+- Checking for parent updates on profile open now writes an eligible protected
+  profile policy even when the target is an independent protected account
+  rather than a child profile; the policy stores `allow_trusted_updates` only
+  when the profile-open check is enabled.
 - When there are zero manageable protected profiles, provider rows are hidden
   so mailbox or LAN setup cannot look like the first step.
 - Accepted mailbox provider configure/disable actions write redacted history

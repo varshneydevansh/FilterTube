@@ -5,7 +5,10 @@
 protected ack-handoff history writer, and explicitly configured browser HTTPS
 mailbox pull/decrypt client are present. Local-network discovery and mailbox
 server authority are still absent. Adapter-level local mailbox seal/open helpers
-are covered separately.
+are covered separately. Protected-device managed-link setup now defaults to
+parent-managed open checks and writes an eligible `allow_trusted_updates`
+policy when profile-open checking is enabled, including independent protected
+account profiles as well as child profiles.
 **Related plan**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`
 **Related inventory**:
@@ -112,6 +115,11 @@ The managed link modal now includes:
 ```text
 Check for parent updates when this profile opens
 ```
+
+First-time protected-device setup now presents this as part of the normal
+`Parent managed` behavior. The stricter `Ask on this device first` behavior is
+still available, but it deliberately disables profile-open pulls until the
+protected device is locally approved/unlocked.
 
 The trusted-link card now shows an `Open sync` row with one of the visible
 states:

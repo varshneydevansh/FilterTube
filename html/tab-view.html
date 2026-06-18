@@ -1229,8 +1229,8 @@
                                                     <li>Choose <strong>Parent controls child</strong> on the sender.</li>
                                                     <li>Connect once and confirm the same safety phrase.</li>
                                                     <li>Pick the child profile in <strong>Remote target profile</strong> on the sender side.</li>
-                                                    <li>On the first managed connection, the child device may still need one local parent PIN/unlock step to authorize that locked child profile.</li>
-                                                    <li>After you choose <strong>Apply + Save Parent Control</strong>, later sessions can reuse that target and policy instead of asking the child to reconfigure everything again.</li>
+                                                    <li>On the first managed connection, the protected device may still need one local unlock step to save the parent link for that profile.</li>
+                                                    <li>After you choose <strong>Apply + Save Parent Link</strong>, later signed parent updates can reuse that target and policy instead of asking the protected user to reconfigure everything again.</li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -1251,8 +1251,8 @@
                                             <div class="help-item-body">
                                                 <ul>
                                                     <li><strong>Peer:</strong> Best for one-off syncing between your own equal devices.</li>
-                                                    <li><strong>Source / Parent:</strong> Can become the trusted sender for future replica updates.</li>
-                                                    <li><strong>Replica / Kids device:</strong> Receives proposals and can optionally auto-apply from trusted source devices.</li>
+                                                    <li><strong>Source / Parent:</strong> Can become the trusted sender for future protected-device updates.</li>
+                                                    <li><strong>Replica / protected device:</strong> Receives proposals and can apply matching signed updates from saved parent/caregiver links.</li>
                                                     <li><strong>Saved trust:</strong> A trusted link does not create always-on background sync. It remembers the relationship and policy for the next live session.</li>
                                                 </ul>
                                             </div>
@@ -1274,7 +1274,7 @@
                                                     <li>Each trusted managed link can allow one or more scopes: <code>active</code>, <code>main</code>, <code>kids</code>, or <code>full</code>.</li>
                                                     <li>The default scope and the merge/replace policy live on the trusted link itself, not only in the live session.</li>
                                                     <li>If an incoming managed update does not match the saved allowed scopes, FilterTube blocks it instead of applying the wrong scope.</li>
-                                                    <li>Managed replica links can now choose a target mode on the receiving device: <strong>Current active profile</strong> or <strong>Always this local profile</strong>.</li>
+                                                    <li>Managed replica links can choose a target mode on the receiving device: <strong>Current active profile</strong> or <strong>Always this local profile</strong>.</li>
                                                     <li>The fixed target mode is the safe way to make <code>B -&gt; B</code> work across devices without guessing by profile name.</li>
                                                 </ul>
                                             </div>
@@ -1299,7 +1299,7 @@
                                                     <li>A live Nanah session is not meant to survive a page refresh, browser restart, or tab close. Refresh ends the live pairing session.</li>
                                                     <li>Trusted links are saved locally so you do not lose the remembered relationship, but today you still start a fresh live session when reconnecting.</li>
                                                     <li>The trusted-device card now has a <strong>Start New Session</strong> shortcut that starts the next fresh session with the saved role/policy defaults.</li>
-                                                    <li>Saved trust means a faster next session. Optional open sync checks can run only when a trusted local provider is available; they do not make YouTube pages do background work.</li>
+                                                    <li>Saved trust means a faster next session. If a later-update service is available, a protected profile can check for signed parent updates when it opens without adding YouTube page background work.</li>
                                                     <li>If you try to reuse the same pairing code on the same active device session, FilterTube now blocks that locally instead of silently burning the code.</li>
                                                     <li>If no fixed target is saved on the managed replica link, non-<code>full</code> sync still writes into the receiver's current active profile at receive time.</li>
                                                     <li>If a managed replica link is saved with <strong>Always this local profile</strong>, future managed updates land in that pinned local profile even when some other profile is active on the receiving device.</li>
@@ -1328,7 +1328,8 @@
                                                     <li><strong>Parent editing:</strong> Parent/account surfaces can edit a child’s Main or Kids rule list directly from the child row, so parents do not need to hand children the parent PIN.</li>
                                                     <li><strong>Targeting today:</strong> Child managed links should usually save a fixed local target so parent updates stay tied to that child profile.</li>
                                                     <li><strong>Parent-safe child targeting:</strong> FilterTube blocks send-anyway paths from child profiles when the other device has a different profile active. The intended parent flow is to save one managed <strong>Source -> Replica</strong> link on the receiving child profile and choose <strong>Always this local profile</strong>.</li>
-                                                    <li><strong>Strict child protection:</strong> Managed child links can now force approval-needed reconnect, no auto-apply, fixed local target, and local unlock required as one higher-safety preset.</li>
+                                                    <li><strong>Parent managed:</strong> The normal protected-device preset saves a fixed target, allows matching signed parent updates while locked, and checks for later updates when the profile opens.</li>
+                                                    <li><strong>Ask first:</strong> A stricter option can require local approval/unlock before later parent updates apply.</li>
                                                     <li>Child profiles do not expose broad backup/import/export/account-admin actions in Settings and cannot rename/delete profiles, mutate PIN policy, or edit trusted parent links from the child surface.</li>
                                                 </ul>
                                             </div>
@@ -1338,8 +1339,8 @@
                                             <div class="help-item-body">
                                                 <ul>
                                                     <li>Kids should not learn or type the parent PIN for normal managed updates.</li>
-                                                    <li>The right model is local authorization on the child device: trust the parent/source link once, then allow only the saved managed scopes and policies.</li>
-                                                    <li>FilterTube already keeps PIN values local. Trusted child links can now choose either <strong>Require local unlock</strong> or <strong>Allow trusted updates while locked</strong>, and that permission is saved only on the child device.</li>
+                                                    <li>The right model is local authorization on the protected device: trust the parent/source link once, then allow only the saved managed scopes and policies.</li>
+                                                    <li>FilterTube keeps PIN values local. A trusted protected-device link can either let matching parent updates apply while locked or ask on this device first, and that permission is saved only on the protected device.</li>
                                                 </ul>
                                             </div>
                                         </div>
