@@ -3058,7 +3058,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const MANAGED_ACTION_HISTORY_ACCEPTED_RETENTION_MS = 30 * MANAGED_ACTION_HISTORY_DAY_MS;
     const MANAGED_ACTION_HISTORY_PROTECTED_RETENTION_MS = 90 * MANAGED_ACTION_HISTORY_DAY_MS;
     const MANAGED_ACTION_HISTORY_PROTECTED_RESULTS = new Set(['rejected', 'conflict', 'failed_auth', 'expired_session', 'cleared_by_admin']);
-    const MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set(['trust_link.revoke', 'trust_link.key_revoke', 'managed_signing_key.rotate', 'policy.time_limit.update', 'policy.time_limit.request_extra', 'policy.viewing_space.update', 'remote_policy.source_push']);
+    const MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set(['trust_link.revoke', 'trust_link.key_revoke', 'managed_signing_key.rotate', 'policy.time_limit.update', 'policy.time_limit.request_extra', 'policy.viewing_space.update', 'policy.channel_list.import', 'remote_policy.source_push']);
     const MANAGED_ACTION_HISTORY_SUMMARY_PRIVACY_SCHEMA = 'filtertube_managed_action_history_summary_privacy';
     const MANAGED_ACTION_HISTORY_ENCRYPTED_SUMMARY_SCHEMA = 'filtertube_managed_action_history_encrypted_summary';
     const MANAGED_ACTION_HISTORY_SAFE_LABELS = Object.freeze({
@@ -3070,6 +3070,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'policy.viewing_space.update': 'Viewing space policy changed',
         'policy.time_limit.update': 'Time limit policy changed',
         'policy.time_limit.request_extra': 'Extra time requested',
+        'policy.channel_list.import': 'Channel list imported',
         'policy.sync_policy.update': 'Sync policy changed',
         'trust_link.create': 'Trusted link created',
         'trust_link.revoke': 'Trusted link removed',
@@ -3099,7 +3100,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         'dailyBudgetSeconds',
         'deliveredCount',
         'failedCount',
+        'addedCount',
+        'duplicateCount',
         'kidsRuleCount',
+        'listEntryCount',
         'linkCount',
         'liveSentCount',
         'localNetworkDeliveredCount',
@@ -5260,6 +5264,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (timezone) {
                 parts.push(`timezone ${timezone}`);
             }
+        } else if (actionType === 'policy.channel_list.import') {
+            const surface = normalizeString(root.surface);
+            const addedCount = normalizeNonNegativeInteger(root.addedCount);
+            const duplicateCount = normalizeNonNegativeInteger(root.duplicateCount);
+            const skippedCount = normalizeNonNegativeInteger(root.skippedCount);
+            const listEntryCount = normalizeNonNegativeInteger(root.listEntryCount);
+            if (surface) parts.push(`surface ${surface === 'kids' ? 'Kids' : (surface === 'both' ? 'Main + Kids' : 'Main')}`);
+            if (listEntryCount != null) parts.push(`list ${listEntryCount}`);
+            if (addedCount != null) parts.push(`added ${addedCount}`);
+            if (duplicateCount != null) parts.push(`already present ${duplicateCount}`);
+            if (skippedCount != null) parts.push(`skipped ${skippedCount}`);
         }
         if (actionType === 'remote_policy.source_push') {
             const deliveryStatus = normalizeString(root.deliveryStatus);
@@ -6992,6 +7007,318 @@ document.addEventListener('DOMContentLoaded', async () => {
         return 'keywords';
     }
 
+    function buildManagedChannelListId(name, text) {
+        const source = `${normalizeString(name)}\n${normalizeString(text)}`;
+        let hash = 2166136261;
+        for (let i = 0; i < source.length; i += 1) {
+            hash ^= source.charCodeAt(i);
+            hash = Math.imul(hash, 16777619);
+        }
+        return `managed-list-${(hash >>> 0).toString(36)}`;
+    }
+
+    function extractManagedChannelListUrlToken(rawValue) {
+        const raw = normalizeString(rawValue);
+        if (!raw) return '';
+        const candidate = raw.startsWith('http://') || raw.startsWith('https://')
+            ? raw
+            : (/^(www\.)?youtube\.com\//i.test(raw) || /^m\.youtube\.com\//i.test(raw)
+                ? `https://${raw}`
+                : raw);
+        try {
+            const url = new URL(candidate);
+            const host = url.hostname.replace(/^www\./i, '').toLowerCase();
+            if (!['youtube.com', 'm.youtube.com', 'music.youtube.com'].includes(host)) return '';
+            const parts = url.pathname.split('/').filter(Boolean);
+            if (!parts.length) return '';
+            const first = decodeURIComponent(parts[0] || '');
+            const second = decodeURIComponent(parts[1] || '');
+            if (first === 'channel' && /^UC[a-zA-Z0-9_-]+$/.test(second)) return second;
+            if (/^@[A-Za-z0-9._-]+$/.test(first)) return first;
+            if ((first === 'c' || first === 'user') && second) return `${first}/${second}`;
+        } catch (e) {
+        }
+        return '';
+    }
+
+    function extractManagedChannelListToken(line) {
+        const raw = normalizeString(line);
+        if (!raw) return '';
+        if (/^(#|!|\/\/|\[)/.test(raw)) return '';
+
+        const urlMatch = raw.match(/https?:\/\/[^\s,;'"<>]+|(?:www\.)?youtube\.com\/[^\s,;'"<>]+|m\.youtube\.com\/[^\s,;'"<>]+/i);
+        if (urlMatch) {
+            const urlToken = extractManagedChannelListUrlToken(urlMatch[0]);
+            if (urlToken) return urlToken;
+        }
+
+        const ucMatch = raw.match(/(?:^|[\s,;'"(])(?:channel\/)?(UC[a-zA-Z0-9_-]{12,})(?=$|[\s,;)'"])/);
+        if (ucMatch) return ucMatch[1];
+
+        const handleMatch = raw.match(/(?:^|[\s,;'"(])(@[A-Za-z0-9._-]{2,})(?=$|[\s,;)'"])/);
+        if (handleMatch) return handleMatch[1];
+
+        const customMatch = raw.match(/(?:^|[\s,;'"(\/])((?:c|user)\/[A-Za-z0-9._%-]+)(?=$|[\s,;)'"])/i);
+        if (customMatch) return customMatch[1].replace(/^\/+/, '');
+
+        return normalizeProfileChannel(raw) ? raw : '';
+    }
+
+    function managedChannelEntryKey(channel) {
+        return normalizeString(channel?.id || channel?.handle || channel?.customUrl || channel?.originalInput || channel?.name)
+            .toLowerCase();
+    }
+
+    function parseManagedChannelListText(rawText, { listName = '' } = {}) {
+        const text = normalizeString(rawText);
+        const listId = buildManagedChannelListId(listName || 'Imported list', text);
+        const lines = text.split(/\r?\n/);
+        const seen = new Set();
+        const channels = [];
+        let skippedCount = 0;
+
+        lines.forEach((line) => {
+            const token = extractManagedChannelListToken(line);
+            if (!token) {
+                if (normalizeString(line) && !/^(#|!|\/\/|\[)/.test(normalizeString(line))) skippedCount += 1;
+                return;
+            }
+            const channel = normalizeProfileChannel(token);
+            if (!channel) {
+                skippedCount += 1;
+                return;
+            }
+            const key = managedChannelEntryKey(channel);
+            if (!key || seen.has(key)) return;
+            seen.add(key);
+            channels.push({
+                ...channel,
+                source: 'managed_channel_list',
+                managedListId: listId,
+                managedListName: normalizeString(listName) || 'Imported channel list'
+            });
+        });
+
+        return {
+            listId,
+            channels,
+            skippedCount,
+            totalLineCount: lines.filter(line => normalizeString(line)).length
+        };
+    }
+
+    function readManagedChannelListFile(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : '');
+            reader.onerror = () => reject(reader.error || new Error('Unable to read file'));
+            reader.readAsText(file);
+        });
+    }
+
+    async function showManagedChannelListImportModal({ selectedCount = 1 } = {}) {
+        return new Promise((resolve) => {
+            const overlay = document.createElement('div');
+            overlay.className = 'ft-modal-overlay';
+
+            const card = document.createElement('div');
+            card.className = 'card ft-modal managed-channel-list-modal';
+
+            const header = document.createElement('div');
+            header.className = 'card-header';
+            const titleEl = document.createElement('h3');
+            titleEl.className = 'ft-modal-title';
+            titleEl.textContent = 'Import Channel List';
+            header.appendChild(titleEl);
+
+            const body = document.createElement('div');
+            body.className = 'card-body ft-modal-body managed-channel-list-modal__body';
+
+            const intro = document.createElement('div');
+            intro.className = 'import-export-hint';
+            intro.textContent = selectedCount > 1
+                ? `Paste or choose a channel list, then apply it to ${selectedCount} selected protected profiles.`
+                : 'Paste or choose a channel list, then apply it to this protected profile.';
+            body.appendChild(intro);
+
+            const nameGroup = document.createElement('label');
+            nameGroup.className = 'managed-channel-list-modal__field';
+            const nameLabel = document.createElement('span');
+            nameLabel.textContent = 'List name';
+            const nameInput = document.createElement('input');
+            nameInput.className = 'text-input';
+            nameInput.type = 'text';
+            nameInput.placeholder = 'Family block list';
+            nameInput.value = 'Imported channel list';
+            nameGroup.append(nameLabel, nameInput);
+            body.appendChild(nameGroup);
+
+            const fileGroup = document.createElement('label');
+            fileGroup.className = 'managed-channel-list-modal__field';
+            const fileLabel = document.createElement('span');
+            fileLabel.textContent = 'Optional text file';
+            const fileInput = document.createElement('input');
+            fileInput.className = 'managed-channel-list-modal__file';
+            fileInput.type = 'file';
+            fileInput.accept = '.txt,.csv,.list,.md,.json,text/plain,text/csv,application/json';
+            fileGroup.append(fileLabel, fileInput);
+            body.appendChild(fileGroup);
+
+            const listGroup = document.createElement('label');
+            listGroup.className = 'managed-channel-list-modal__field';
+            const listLabel = document.createElement('span');
+            listLabel.textContent = 'Channels';
+            const textArea = document.createElement('textarea');
+            textArea.className = 'text-input managed-channel-list-modal__textarea';
+            textArea.placeholder = 'Paste one channel per line: @handle, UC..., /channel/UC..., /c/name, /user/name, or a YouTube channel URL';
+            listGroup.append(listLabel, textArea);
+            body.appendChild(listGroup);
+
+            const help = document.createElement('div');
+            help.className = 'managed-channel-list-modal__help';
+            help.textContent = 'Name-only rows are skipped for safety. FilterTube uses stable channel identifiers when possible.';
+            body.appendChild(help);
+
+            const errorEl = document.createElement('div');
+            errorEl.className = 'managed-channel-list-modal__error';
+            errorEl.hidden = true;
+            body.appendChild(errorEl);
+
+            const actions = document.createElement('div');
+            actions.className = 'ft-modal-actions';
+
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'btn-secondary';
+            cancelBtn.type = 'button';
+            cancelBtn.textContent = 'Cancel';
+
+            const okBtn = document.createElement('button');
+            okBtn.className = 'btn-primary';
+            okBtn.type = 'button';
+            okBtn.textContent = 'Preview List';
+
+            const cleanup = () => {
+                try {
+                    overlay.remove();
+                } catch (e) {
+                }
+            };
+
+            const setError = (message) => {
+                errorEl.textContent = message;
+                errorEl.hidden = !message;
+            };
+
+            const closeWith = (value) => {
+                cleanup();
+                resolve(value);
+            };
+
+            cancelBtn.addEventListener('click', () => closeWith(null));
+            okBtn.addEventListener('click', () => {
+                const name = normalizeString(nameInput.value) || 'Imported channel list';
+                const text = normalizeString(textArea.value);
+                if (!text) {
+                    setError('Paste channels or choose a text file first.');
+                    return;
+                }
+                closeWith({
+                    name,
+                    text,
+                    sourceLabel: fileInput.files?.[0]?.name || 'Pasted list'
+                });
+            });
+            fileInput.addEventListener('change', async () => {
+                const file = fileInput.files?.[0];
+                if (!file) return;
+                try {
+                    const text = await readManagedChannelListFile(file);
+                    textArea.value = text;
+                    if (!normalizeString(nameInput.value) || nameInput.value === 'Imported channel list') {
+                        nameInput.value = file.name.replace(/\.[^.]+$/, '') || 'Imported channel list';
+                    }
+                    setError('');
+                    textArea.focus();
+                } catch (error) {
+                    setError(error?.message || 'Unable to read this file.');
+                }
+            });
+            textArea.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    cancelBtn.click();
+                }
+            });
+            overlay.addEventListener('click', (event) => {
+                if (event.target === overlay) cancelBtn.click();
+            });
+
+            actions.append(cancelBtn, okBtn);
+            body.appendChild(actions);
+            card.append(header, body);
+            overlay.appendChild(card);
+            document.body.appendChild(overlay);
+            setTimeout(() => {
+                try {
+                    nameInput.focus();
+                    nameInput.select();
+                } catch (e) {
+                }
+            }, 0);
+        });
+    }
+
+    async function promptManagedChannelListSurface() {
+        const surface = await showChoiceModal({
+            title: 'Where Should This List Apply?',
+            message: 'Choose the YouTube space for these channels. FilterTube will respect each protected profile current Blocklist/Whitelist mode.',
+            choices: [
+                { value: 'main', label: 'Main YouTube', className: 'btn-primary' },
+                { value: 'kids', label: 'YouTube Kids', className: 'btn-secondary' },
+                { value: 'both', label: 'Main + Kids', className: 'btn-secondary' }
+            ],
+            cancelText: 'Cancel'
+        });
+        if (surface === 'both') return ['main', 'kids'];
+        if (surface === 'kids') return ['kids'];
+        if (surface === 'main') return ['main'];
+        return [];
+    }
+
+    function applyManagedChannelListToSurface(target, surface, parsed, metadata = {}) {
+        const item = safeObject(target);
+        const listKey = managedRuleListKeyFor(surface, 'channel', item);
+        const existing = Array.isArray(item[listKey]) ? item[listKey] : [];
+        const seen = new Set(existing.map(managedChannelEntryKey).filter(Boolean));
+        const toAdd = [];
+        let duplicateCount = 0;
+        safeArray(parsed?.channels).forEach((channel) => {
+            const key = managedChannelEntryKey(channel);
+            if (!key || seen.has(key)) {
+                duplicateCount += 1;
+                return;
+            }
+            seen.add(key);
+            toAdd.push({
+                ...channel,
+                source: 'managed_channel_list',
+                managedListId: normalizeString(parsed?.listId),
+                managedListName: normalizeString(metadata.listName) || normalizeString(channel.managedListName) || 'Imported channel list',
+                managedListSourceLabel: normalizeString(metadata.sourceLabel) || 'Imported list',
+                managedListImportedAt: metadata.importedAt || Date.now(),
+                addedAt: metadata.importedAt || Date.now()
+            });
+        });
+        if (toAdd.length) {
+            item[listKey] = [...toAdd, ...existing];
+        }
+        return {
+            changed: toAdd.length > 0,
+            addedCount: toAdd.length,
+            duplicateCount
+        };
+    }
+
     async function addManagedBulkRuleToProfiles(profileIds, ruleType) {
         const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
         const type = ruleType === 'video' ? 'video' : (ruleType === 'channel' ? 'channel' : 'keyword');
@@ -7124,6 +7451,176 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await sendManagedParentPolicyToVerifiedDevices(changedProfileIds, {
                     scope: remoteScope,
                     surface
+                });
+            }
+        }
+    }
+
+    async function importManagedChannelListToProfiles(profileIds) {
+        const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
+        if (!targetIds.length) {
+            UIComponents.showToast('Select at least one protected profile', 'error');
+            return;
+        }
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
+            UIComponents.showToast('Profiles unavailable', 'error');
+            return;
+        }
+
+        const fresh = await io.loadProfilesV4();
+        const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
+        if (getProfileType(fresh, currentActive) === 'child') {
+            UIComponents.showToast('Child profiles cannot import managed lists', 'error');
+            return;
+        }
+
+        const profiles = { ...safeObject(fresh.profiles) };
+        const eligibleIds = targetIds.filter((targetId) => {
+            const profile = safeObject(profiles[targetId]);
+            return !!profile && Object.keys(profile).length > 0
+                && canActiveProfileManageProfile(fresh, targetId);
+        });
+        if (!eligibleIds.length) {
+            UIComponents.showToast('No selected protected profiles can be managed by this account', 'error');
+            return;
+        }
+
+        const importPayload = await showManagedChannelListImportModal({ selectedCount: eligibleIds.length });
+        if (!importPayload) return;
+
+        const parsed = parseManagedChannelListText(importPayload.text, { listName: importPayload.name });
+        if (!parsed.channels.length) {
+            UIComponents.showToast('No valid channel identifiers found. Use @handle, UC ID, /c/name, /user/name, or channel URLs.', 'error');
+            return;
+        }
+
+        const surfaces = await promptManagedChannelListSurface();
+        if (!surfaces.length) return;
+        const surfaceLabel = surfaces.length > 1 ? 'Main + Kids' : (surfaces[0] === 'kids' ? 'YouTube Kids' : 'Main YouTube');
+        const confirmImport = await showChoiceModal({
+            title: 'Apply Channel List?',
+            message: `${parsed.channels.length} channel ${parsed.channels.length === 1 ? 'identifier was' : 'identifiers were'} found. Apply this list to ${eligibleIds.length} protected ${eligibleIds.length === 1 ? 'profile' : 'profiles'} on ${surfaceLabel}.`,
+            details: [
+                `${parsed.channels.length} valid ${parsed.channels.length === 1 ? 'channel' : 'channels'} ready`,
+                parsed.skippedCount ? `${parsed.skippedCount} ${parsed.skippedCount === 1 ? 'row was' : 'rows were'} skipped` : 'No rows skipped',
+                'Parent/account re-auth is required before anything changes.'
+            ],
+            choices: [
+                { value: 'apply', label: 'Apply List', className: 'btn-primary' }
+            ],
+            cancelText: 'Cancel'
+        });
+        if (confirmImport !== 'apply') return;
+
+        const okAdmin = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
+        if (!okAdmin) {
+            for (const targetId of eligibleIds) {
+                await recordManagedAdminAuthFailureHistory(fresh, targetId, 'channel_list_import_unlock_failed');
+            }
+            return;
+        }
+
+        const importedAt = Date.now();
+        let changedCount = 0;
+        let addedCount = 0;
+        let duplicateCount = 0;
+        const changedProfileIds = [];
+
+        for (const targetId of eligibleIds) {
+            const profile = safeObject(profiles[targetId]);
+            let nextProfile = profile;
+            let profileChanged = false;
+            let profileAddedCount = 0;
+            let profileDuplicateCount = 0;
+
+            for (const surface of surfaces) {
+                const priorForReport = nextProfile;
+                const nextSurface = getProfileSurface(nextProfile, surface);
+                const result = applyManagedChannelListToSurface(nextSurface, surface, parsed, {
+                    listName: importPayload.name,
+                    sourceLabel: importPayload.sourceLabel,
+                    importedAt
+                });
+                profileDuplicateCount += result.duplicateCount || 0;
+                if (!result.changed) continue;
+                nextProfile = setProfileSurface(nextProfile, surface, nextSurface);
+                const report = buildManagedChildLocalEditReport({
+                    actorProfileId: currentActive,
+                    targetProfileId: targetId,
+                    surface,
+                    priorProfile: priorForReport,
+                    nextSurface
+                });
+                report.historyRow = {
+                    ...report.historyRow,
+                    actionType: 'policy.channel_list.import',
+                    summary: {
+                        ...safeObject(report.historyRow.summary),
+                        label: 'Channel list imported',
+                        surface: surfaces.length > 1 ? 'both' : surface,
+                        addedCount: result.addedCount || 0,
+                        duplicateCount: result.duplicateCount || 0,
+                        skippedCount: parsed.skippedCount || 0,
+                        listEntryCount: parsed.channels.length
+                    }
+                };
+                nextProfile = recordManagedChildLocalEditHistory(nextProfile, report);
+                profileChanged = true;
+                profileAddedCount += result.addedCount || 0;
+            }
+
+            duplicateCount += profileDuplicateCount;
+            if (!profileChanged) continue;
+            profiles[targetId] = nextProfile;
+            changedCount += 1;
+            addedCount += profileAddedCount;
+            changedProfileIds.push(targetId);
+        }
+
+        if (!changedCount) {
+            UIComponents.showToast(
+                duplicateCount ? 'Selected profiles already have this list' : 'No selected profiles were changed',
+                'info'
+            );
+            return;
+        }
+
+        await io.saveProfilesV4({
+            ...fresh,
+            schemaVersion: 4,
+            profiles
+        });
+        profilesV4Cache = { ...fresh, schemaVersion: 4, profiles };
+        await StateManager.loadSettings({ notify: false, resetEnrichment: false, scheduleEnrichment: false });
+        await refreshProfilesUI();
+        renderChannels();
+        renderKidsChannels();
+        UIComponents.showToast(
+            `Imported ${addedCount} ${addedCount === 1 ? 'channel' : 'channels'} into ${changedCount} protected ${changedCount === 1 ? 'profile' : 'profiles'}`,
+            'success'
+        );
+
+        const remoteScope = surfaces.length > 1 ? 'rules_bundle' : 'channels';
+        const mailboxReady = hasNanahManagedMailboxUploadWriter();
+        const localReady = hasNanahManagedLocalNetworkDeliveryWriter();
+        const readyProfileCount = changedProfileIds.filter((targetId) => {
+            const profile = safeObject(safeObject(profilesV4Cache).profiles)[targetId];
+            const links = getNanahSourceManagedLinksForTargetProfile(targetId, remoteScope, profile);
+            if (!links.length) return false;
+            return links.some(isNanahManagedLinkLiveConnected) || mailboxReady || localReady;
+        }).length;
+        if (readyProfileCount > 0) {
+            const sendNow = await showConfirmModal({
+                title: 'Send list update now?',
+                message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send this channel-list update to those devices now.`,
+                confirmText: 'Send update',
+                cancelText: 'Not now'
+            });
+            if (sendNow) {
+                await sendManagedParentPolicyToVerifiedDevices(changedProfileIds, {
+                    scope: remoteScope,
+                    ...(surfaces.length === 1 ? { surface: surfaces[0] } : {})
                 });
             }
         }
@@ -14030,11 +14527,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                             return;
                         }
                         await startManagedChildEdit(profileIds[0]);
+                    } else if (action === 'import_channel_list') {
+                        await importManagedChannelListToProfiles([targetId]);
                     } else if (action === 'bulk_add_keyword' || action === 'bulk_add_channel' || action === 'bulk_add_video') {
                         await addManagedBulkRuleToProfiles(
                             safeArray(intent?.profileIds),
                             action === 'bulk_add_video' ? 'video' : (action === 'bulk_add_channel' ? 'channel' : 'keyword')
                         );
+                    } else if (action === 'bulk_import_channel_list') {
+                        await importManagedChannelListToProfiles(safeArray(intent?.profileIds));
                     } else if (action === 'bulk_set_time_limit' || action === 'bulk_disable_time_limit') {
                         await updateMultipleProfileTimeLimitPolicies(
                             safeArray(intent?.profileIds),

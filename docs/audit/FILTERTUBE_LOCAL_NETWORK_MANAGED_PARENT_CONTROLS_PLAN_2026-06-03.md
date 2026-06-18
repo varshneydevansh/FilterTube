@@ -110,6 +110,12 @@ extension authority code.
   untrusted URL authority path. The parent-facing flow should stay simple:
   paste/import a list, preview channels, choose protected profiles, apply, then
   send to verified devices when delivery is ready.
+  - [x] First local import slice: parent/account profiles can paste or choose a
+    text file, preview valid channel identifiers, apply the list to selected
+    protected profiles on Main/Kids/both, write protected redacted history, and
+    offer the existing verified-device send path.
+  - [ ] Reversible list library, enable/disable overlays, URL refresh, and
+    scheduled subscription refresh remain future slices.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.
@@ -299,12 +305,12 @@ Add list -> Preview -> Choose profiles -> Apply -> Send update
 **First implementation slice**:
 
 ```text
-1. Local pasted/file list import
-2. Preview and normalize entries
-3. Apply to selected protected profiles and Main/Kids surface
-4. Store source metadata on list-derived channel rows where the channel schema allows
-5. Write redacted managed action-history row
-6. Offer signed verified-device push through existing channels/rules_bundle path
+1. Local pasted/file list import [done]
+2. Preview and normalize entries [done]
+3. Apply to selected protected profiles and Main/Kids surface [done]
+4. Store source metadata on list-derived channel rows where the channel schema allows [done]
+5. Write redacted managed action-history row [done]
+6. Offer signed verified-device push through existing channels/rules_bundle path [done]
 ```
 
 URL refresh and scheduled subscriptions can come after the local import path is

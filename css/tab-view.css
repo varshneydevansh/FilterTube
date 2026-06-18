@@ -1994,6 +1994,61 @@ html[data-theme="dark"] .card::after {
     flex-wrap: wrap;
 }
 
+.managed-channel-list-modal {
+    width: min(100%, 680px);
+}
+
+.managed-channel-list-modal__body {
+    gap: 0.9rem;
+}
+
+.managed-channel-list-modal__field {
+    display: grid;
+    gap: 0.45rem;
+}
+
+.managed-channel-list-modal__field > span {
+    color: var(--ft-color-text-primary);
+    font-size: 0.86rem;
+    font-weight: 800;
+}
+
+.managed-channel-list-modal__file {
+    min-height: 44px;
+    width: 100%;
+    padding: 0.62rem 0.75rem;
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    border-radius: 0.9rem;
+    color: var(--ft-color-text-secondary);
+    background: var(--ft-color-bg-panel);
+}
+
+.managed-channel-list-modal__textarea {
+    min-height: 190px;
+    resize: vertical;
+    line-height: 1.45;
+}
+
+.managed-channel-list-modal__help,
+.managed-channel-list-modal__error {
+    padding: 0.68rem 0.78rem;
+    border-radius: 0.9rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.managed-channel-list-modal__help {
+    border: 1px solid rgba(74, 157, 127, 0.22);
+    color: var(--ft-color-text-secondary);
+    background: rgba(74, 157, 127, 0.08);
+}
+
+.managed-channel-list-modal__error {
+    border: 1px solid rgba(180, 67, 57, 0.3);
+    color: var(--ft-color-sem-danger, #b44339);
+    background: rgba(180, 67, 57, 0.08);
+}
+
 @keyframes ft-subscriptions-import-spin {
     to {
         transform: rotate(360deg);
@@ -2029,6 +2084,22 @@ html[data-theme="dark"] .card::after {
     border-color: rgba(176, 135, 70, 0.22);
     background: rgba(255, 255, 255, 0.04);
     color: var(--ft-color-text-secondary-dark);
+}
+
+:root[data-theme="dark"] .managed-channel-list-modal__file {
+    border-color: var(--ft-color-sem-neutral-border);
+    background: var(--ft-color-bg-card);
+}
+
+:root[data-theme="dark"] .managed-channel-list-modal__help {
+    border-color: rgba(74, 222, 128, 0.22);
+    background: rgba(22, 101, 52, 0.16);
+}
+
+:root[data-theme="dark"] .managed-channel-list-modal__error {
+    border-color: rgba(248, 113, 113, 0.3);
+    color: var(--ft-color-sem-danger, #f87171);
+    background: rgba(127, 29, 29, 0.2);
 }
 
 @media (prefers-reduced-motion: reduce) {

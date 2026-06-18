@@ -77,6 +77,14 @@
                 sensitiveAction: false
             },
             {
+                action: 'import_channel_list',
+                label: 'Import List',
+                profileId: targetId,
+                scope: 'channels',
+                authority: 'delegated_runtime_gate',
+                sensitiveAction: true
+            },
+            {
                 action: 'view_history',
                 label: 'History',
                 profileId: targetId,
@@ -340,6 +348,15 @@
                 group: 'rules',
                 profileIds,
                 scope: 'main_kids_rules',
+                authority: 'delegated_runtime_gate',
+                sensitiveAction: true
+            },
+            {
+                action: 'bulk_import_channel_list',
+                label: 'Import list',
+                group: 'rules',
+                profileIds,
+                scope: 'channels',
                 authority: 'delegated_runtime_gate',
                 sensitiveAction: true
             },

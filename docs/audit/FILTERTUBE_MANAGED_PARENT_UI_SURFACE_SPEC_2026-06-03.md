@@ -67,6 +67,11 @@ channel lists, preview the channels, apply a list to selected protected
 profiles and Main/Kids surfaces, then send the resulting rule update to verified
 devices through the existing managed-policy path. The normal dashboard wording
 should say `Import List`, not expose provider/subscription authority language.
+The first implementation slice now supports local pasted/text-file channel list
+imports from the command center. It skips name-only rows for safety, applies
+valid channel identifiers through the existing profile channel-rule arrays,
+writes protected redacted `policy.channel_list.import` history rows, and can
+offer the same signed verified-device send used by manual channel edits.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 
@@ -132,6 +137,10 @@ state without exposing plaintext rule values:
   selected profile ids and action intent metadata. The dashboard runtime still
   parses/previews the list, prompts for parent/account re-auth, writes one
   profile revision per target, and offers a normal verified-device send.
+- The first local import slice accepts pasted text or a local text-like file.
+  It normalizes `UC...`, `@handle`, `/channel/UC...`, `/c/name`, `/user/name`,
+  and YouTube channel URLs. Rows that only provide display names are skipped
+  because they are weaker identity and could false-hide content.
 - The list UI should feel like a small library, not a transport console:
   `Add list`, `Preview`, `Apply to profiles`, `Send update`. Source URL,
   revision hash, stale refresh state, skipped malformed rows, and delivery
