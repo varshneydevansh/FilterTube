@@ -7021,6 +7021,80 @@ document.addEventListener('DOMContentLoaded', async () => {
         return `managed-list-${(hash >>> 0).toString(36)}`;
     }
 
+    function normalizeManagedChannelListSourceUrl(rawValue) {
+        const raw = normalizeString(rawValue);
+        if (!raw) return '';
+        const candidate = raw.startsWith('http://') || raw.startsWith('https://') ? raw : `https://${raw}`;
+        try {
+            const url = new URL(candidate);
+            if (url.protocol !== 'https:') return '';
+            url.username = '';
+            url.password = '';
+            if (url.hostname.replace(/^www\./i, '').toLowerCase() === 'github.com') {
+                const parts = url.pathname.split('/').filter(Boolean);
+                if (parts.length >= 5 && parts[2] === 'blob') {
+                    const rawUrl = new URL(`https://raw.githubusercontent.com/${parts[0]}/${parts[1]}/${parts[3]}/${parts.slice(4).join('/')}`);
+                    return rawUrl.toString();
+                }
+            }
+            return url.toString();
+        } catch (e) {
+            return '';
+        }
+    }
+
+    function managedChannelListSourceLabelFromUrl(sourceUrl) {
+        const normalized = normalizeManagedChannelListSourceUrl(sourceUrl);
+        if (!normalized) return 'List URL';
+        try {
+            const url = new URL(normalized);
+            const parts = url.pathname.split('/').filter(Boolean);
+            const tail = parts.slice(-2).join('/');
+            return tail ? `${url.hostname}/${tail}` : url.hostname;
+        } catch (e) {
+            return 'List URL';
+        }
+    }
+
+    async function fetchManagedChannelListSourceUrl(rawUrl) {
+        const url = normalizeManagedChannelListSourceUrl(rawUrl);
+        if (!url) {
+            throw new Error('Enter a public HTTPS text URL.');
+        }
+        const controller = typeof AbortController === 'function' ? new AbortController() : null;
+        const timeout = controller ? setTimeout(() => controller.abort(), 15000) : null;
+        try {
+            const response = await fetch(url, {
+                cache: 'no-store',
+                credentials: 'omit',
+                signal: controller?.signal
+            });
+            if (!response.ok) {
+                throw new Error(`Unable to load list (${response.status})`);
+            }
+            const length = Number(response.headers.get('content-length')) || 0;
+            if (length > 1024 * 1024) {
+                throw new Error('List is too large. Use a smaller text file.');
+            }
+            const text = await response.text();
+            if (text.length > 1024 * 1024) {
+                throw new Error('List is too large. Use a smaller text file.');
+            }
+            return {
+                url,
+                text,
+                sourceLabel: managedChannelListSourceLabelFromUrl(url)
+            };
+        } catch (error) {
+            if (error?.name === 'AbortError') {
+                throw new Error('List URL took too long to respond.');
+            }
+            throw error;
+        } finally {
+            if (timeout) clearTimeout(timeout);
+        }
+    }
+
     function extractManagedChannelListUrlToken(rawValue) {
         const raw = normalizeString(rawValue);
         if (!raw) return '';
@@ -7157,6 +7231,25 @@ document.addEventListener('DOMContentLoaded', async () => {
             nameGroup.append(nameLabel, nameInput);
             body.appendChild(nameGroup);
 
+            const urlGroup = document.createElement('label');
+            urlGroup.className = 'managed-channel-list-modal__field';
+            const urlLabel = document.createElement('span');
+            urlLabel.textContent = 'Optional list URL';
+            const urlRow = document.createElement('div');
+            urlRow.className = 'managed-channel-list-modal__url-row';
+            const urlInput = document.createElement('input');
+            urlInput.className = 'text-input';
+            urlInput.type = 'url';
+            urlInput.placeholder = 'https://raw.githubusercontent.com/user/list/main/channels.txt';
+            const loadUrlBtn = document.createElement('button');
+            loadUrlBtn.className = 'btn-secondary';
+            loadUrlBtn.type = 'button';
+            loadUrlBtn.textContent = 'Load URL';
+            loadUrlBtn.title = 'Loads a public HTTPS text list into the preview box. If the host blocks browser fetches, download the file and choose it below.';
+            urlRow.append(urlInput, loadUrlBtn);
+            urlGroup.append(urlLabel, urlRow);
+            body.appendChild(urlGroup);
+
             const fileGroup = document.createElement('label');
             fileGroup.className = 'managed-channel-list-modal__field';
             const fileLabel = document.createElement('span');
@@ -7180,7 +7273,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const help = document.createElement('div');
             help.className = 'managed-channel-list-modal__help';
-            help.textContent = 'Name-only rows are skipped for safety. FilterTube uses stable channel identifiers when possible.';
+            help.textContent = 'Name-only rows are skipped for safety. A URL is only a source for previewed channel rules; it does not get control over protected profiles.';
             body.appendChild(help);
 
             const errorEl = document.createElement('div');
@@ -7212,6 +7305,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 errorEl.textContent = message;
                 errorEl.hidden = !message;
             };
+            let loadedSourceUrl = '';
+            let loadedSourceLabel = '';
+            let loadedSourceText = '';
+
+            const setLoadedSource = ({ url = '', label = '', text = '' } = {}) => {
+                loadedSourceUrl = normalizeManagedChannelListSourceUrl(url);
+                loadedSourceLabel = normalizeString(label);
+                loadedSourceText = normalizeString(text);
+            };
 
             const closeWith = (value) => {
                 cleanup();
@@ -7226,11 +7328,47 @@ document.addEventListener('DOMContentLoaded', async () => {
                     setError('Paste channels or choose a text file first.');
                     return;
                 }
+                const loadedSourceMatches = loadedSourceUrl && text === loadedSourceText;
                 closeWith({
                     name,
                     text,
-                    sourceLabel: fileInput.files?.[0]?.name || 'Pasted list'
+                    sourceLabel: fileInput.files?.[0]?.name || (loadedSourceMatches ? loadedSourceLabel : 'Pasted list'),
+                    sourceUrl: loadedSourceMatches ? loadedSourceUrl : ''
                 });
+            });
+            loadUrlBtn.addEventListener('click', async (event) => {
+                event.preventDefault();
+                const rawUrl = normalizeString(urlInput.value);
+                if (!rawUrl) {
+                    setError('Enter a public HTTPS list URL first.');
+                    return;
+                }
+                const previousLabel = loadUrlBtn.textContent;
+                loadUrlBtn.disabled = true;
+                loadUrlBtn.textContent = 'Loading...';
+                setError('');
+                try {
+                    const loaded = await fetchManagedChannelListSourceUrl(rawUrl);
+                    textArea.value = loaded.text;
+                    fileInput.value = '';
+                    setLoadedSource({
+                        url: loaded.url,
+                        label: loaded.sourceLabel,
+                        text: loaded.text
+                    });
+                    urlInput.value = loaded.url;
+                    if (!normalizeString(nameInput.value) || nameInput.value === 'Imported channel list') {
+                        nameInput.value = loaded.sourceLabel || 'Imported channel list';
+                    }
+                    help.textContent = 'URL loaded into the preview box. Parent/account unlock is still required before any protected profile changes.';
+                    textArea.focus();
+                } catch (error) {
+                    setLoadedSource();
+                    setError(error?.message || 'Unable to load this URL. Download it and choose the file instead.');
+                } finally {
+                    loadUrlBtn.disabled = false;
+                    loadUrlBtn.textContent = previousLabel;
+                }
             });
             fileInput.addEventListener('change', async () => {
                 const file = fileInput.files?.[0];
@@ -7238,13 +7376,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 try {
                     const text = await readManagedChannelListFile(file);
                     textArea.value = text;
+                    setLoadedSource();
                     if (!normalizeString(nameInput.value) || nameInput.value === 'Imported channel list') {
                         nameInput.value = file.name.replace(/\.[^.]+$/, '') || 'Imported channel list';
                     }
+                    help.textContent = 'File loaded into the preview box. Parent/account unlock is still required before any protected profile changes.';
                     setError('');
                     textArea.focus();
                 } catch (error) {
                     setError(error?.message || 'Unable to read this file.');
+                }
+            });
+            textArea.addEventListener('input', () => {
+                if (loadedSourceUrl && normalizeString(textArea.value) !== loadedSourceText) {
+                    setLoadedSource();
                 }
             });
             textArea.addEventListener('keydown', (event) => {
@@ -7309,6 +7454,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 managedListId: normalizeString(parsed?.listId),
                 managedListName: normalizeString(metadata.listName) || normalizeString(channel.managedListName) || 'Imported channel list',
                 managedListSourceLabel: normalizeString(metadata.sourceLabel) || 'Imported list',
+                managedListSourceUrl: normalizeManagedChannelListSourceUrl(metadata.sourceUrl),
                 managedListImportedAt: metadata.importedAt || Date.now(),
                 addedAt: metadata.importedAt || Date.now()
             });
@@ -7340,6 +7486,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         listId,
                         listName: normalizeString(row?.managedListName) || 'Imported channel list',
                         sourceLabel: normalizeString(row?.managedListSourceLabel) || 'Imported list',
+                        sourceUrl: normalizeManagedChannelListSourceUrl(row?.managedListSourceUrl),
                         profileIds: new Set(),
                         surfaces: new Set(),
                         channelCount: 0
@@ -7355,6 +7502,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             listId: item.listId,
             listName: item.listName,
             sourceLabel: item.sourceLabel,
+            sourceUrl: item.sourceUrl,
             profileIds: Array.from(item.profileIds).filter(Boolean),
             surfaces: Array.from(item.surfaces).filter(Boolean),
             channelCount: item.channelCount
@@ -7372,6 +7520,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     listId: key,
                     listName: summary.listName,
                     sourceLabel: summary.sourceLabel,
+                    sourceUrl: summary.sourceUrl,
                     profileIds: new Set(),
                     surfaces: new Set(),
                     channelCount: 0
@@ -7387,6 +7536,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 listId: item.listId,
                 listName: item.listName,
                 sourceLabel: item.sourceLabel,
+                sourceUrl: item.sourceUrl,
                 profileIds: Array.from(item.profileIds).filter(Boolean),
                 surfaces: Array.from(item.surfaces).filter(Boolean),
                 channelCount: item.channelCount
@@ -7658,6 +7808,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const result = applyManagedChannelListToSurface(nextSurface, surface, parsed, {
                     listName: importPayload.name,
                     sourceLabel: importPayload.sourceLabel,
+                    sourceUrl: importPayload.sourceUrl,
                     importedAt
                 });
                 profileDuplicateCount += result.duplicateCount || 0;

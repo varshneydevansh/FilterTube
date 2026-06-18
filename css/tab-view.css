@@ -2013,6 +2013,13 @@ html[data-theme="dark"] .card::after {
     font-weight: 800;
 }
 
+.managed-channel-list-modal__url-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.6rem;
+    align-items: center;
+}
+
 .managed-channel-list-modal__file {
     min-height: 44px;
     width: 100%;
@@ -2100,6 +2107,16 @@ html[data-theme="dark"] .card::after {
     border-color: rgba(248, 113, 113, 0.3);
     color: var(--ft-color-sem-danger, #f87171);
     background: rgba(127, 29, 29, 0.2);
+}
+
+@media (max-width: 640px) {
+    .managed-channel-list-modal__url-row {
+        grid-template-columns: 1fr;
+    }
+
+    .managed-channel-list-modal__url-row .btn-secondary {
+        width: 100%;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {

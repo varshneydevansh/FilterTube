@@ -121,6 +121,11 @@ extension authority code.
   - [x] First visibility slice: protected profile rows now show compact imported
     list status from saved `managedListId` row metadata, so parents can see
     which profiles have list-derived rules before removing or sending updates.
+  - [x] First URL source slice: parent/account profiles can load a public HTTPS
+    list URL into the same preview/apply flow, with GitHub `blob` URL
+    normalization, no broad host-permission expansion, saved
+    `managedListSourceUrl` row metadata, and the same parent unlock plus
+    verified-device send offer.
   - [ ] Reversible list library, enable/disable overlays, URL refresh, and
     scheduled subscription refresh remain future slices.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind

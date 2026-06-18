@@ -83,6 +83,13 @@ protected profile rows: each profile with materialized list rows gets a compact
 lists. This is display-only and derives from saved row metadata; it does not
 change blocking, whitelisting, import, remove, or verified-device send
 authority.
+The URL source slice now lets a parent/account profile load a public HTTPS list
+URL into the same import preview box. GitHub `blob` URLs are normalized to raw
+content URLs, CORS-capable hosts can be fetched without adding broad extension
+host permissions, and the row metadata records `managedListSourceUrl` for later
+refresh/subscription work. A URL source is still only data: the parent must
+preview, choose protected profiles/surfaces, unlock, and apply before any rule
+changes.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 
