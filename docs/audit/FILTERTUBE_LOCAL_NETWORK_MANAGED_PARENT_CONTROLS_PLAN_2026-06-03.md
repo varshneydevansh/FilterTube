@@ -328,10 +328,13 @@ Add list -> Preview -> Choose profiles -> Apply -> Send update
 5. Write redacted managed action-history row [done]
 6. Offer signed verified-device push through existing channels/rules_bundle path [done]
 7. Remove a materialized imported list without touching manual rows [done]
+8. Load a public HTTPS URL into the same preview/apply flow [done]
+9. Refresh a URL-backed materialized list after parent/account re-auth [done]
 ```
 
-URL refresh and scheduled subscriptions can come after the local import path is
-solid. A URL should be treated as a way to fetch data, not as a remote admin.
+Scheduled subscriptions, automatic background refresh, and enable/disable
+library overlays remain future work. A URL is treated as a way to fetch data,
+not as a remote admin.
 
 **Safety boundaries**:
 

@@ -86,8 +86,8 @@ authority.
 The URL source slice now lets a parent/account profile load a public HTTPS list
 URL into the same import preview box. GitHub `blob` URLs are normalized to raw
 content URLs, CORS-capable hosts can be fetched without adding broad extension
-host permissions, and the row metadata records `managedListSourceUrl` for later
-refresh/subscription work. A URL source is still only data: the parent must
+host permissions, and the row metadata records `managedListSourceUrl` for
+manual refresh plus later subscription work. A URL source is still only data: the parent must
 preview, choose protected profiles/surfaces, unlock, and apply before any rule
 changes.
 The URL refresh slice now exposes `Refresh List` only for imported lists that
@@ -174,9 +174,10 @@ state without exposing plaintext rule values:
   details belong in compact preview/history details rather than first-screen
   copy.
 - URL-based channel lists are data sources only. They do not create authority,
-  trusted devices, or remote admin rights. The first UI slice should prefer
-  local pasted/file import, then add manual URL refresh once parsing and
-  no-work behavior are stable.
+  trusted devices, or remote admin rights. The current UI supports local
+  pasted/file import, public HTTPS URL load into preview, and parent-approved
+  manual refresh for saved URL-backed lists. Scheduled subscription refresh and
+  enable/disable overlays remain future work.
 - `Add Time` and `Add selected time` are delegated actions for profiles with
   active time limits. They require parent/account re-auth, write a revisioned
   redacted time-limit history row, and can offer an immediate verified-device
@@ -335,7 +336,7 @@ weakening the authority model:
 | Managed profile selection | See each protected profile, owner relationship, current lock state, verified-device readiness, and last policy revision. | Child/protected views still hide admin controls and detailed history. |
 | Protection scan strip | Quickly see protected profile count, sync-ready profiles, profiles needing re-pairing, and remote conflicts before acting. | Strip values are aggregate status only; they do not include rule text, policy payloads, keys, or mutation authority. |
 | Rule editing | Command-center row actions still enter the existing managed protected-profile editor, selected-profile bulk controls can hand off one selected protected profile to the same editor, and selected-profile bulk keyword/channel/video-ID additions can apply one reviewed rule to selected protected profiles. Parent/caregiver bulk rule writes choose YouTube Main or YouTube Kids with explicit buttons before value entry. Changed profiles with verified delivery can then push the matching rule scope immediately. | Writes must use the same validated local/remote managed-policy paths as current FilterTube controls; bulk rule writes require review confirmation, parent/account re-auth, per-target revision/history rows, selected Main/Kids surface binding for granular sends, and no child authority. |
-| Managed filter lists | Future UI should let a parent add a channel list once, preview it, enable/disable it per protected profile and Main/Kids surface, then push the resulting channel policy to verified devices. | A list URL/file is only a rule source. It must not become authority, executable code, or an invisible global block. Parent/admin approval, source labeling, revision/hash metadata, disable/revert behavior, and protected action history are required. |
+| Managed filter lists | Parent can import pasted/file/public-HTTPS channel lists, preview valid rows, apply them to selected protected profiles and Main/Kids surfaces, see compact list status, refresh saved URL-backed lists manually, remove list-derived rows without touching manual rules, and push the resulting channel policy to verified devices. Future UI should add enable/disable overlays and scheduled subscription refresh. | A list URL/file is only a rule source. It must not become authority, executable code, or an invisible global block. Parent/admin approval, source labeling, revision/hash metadata, disable/revert behavior, and protected action history are required. |
 | Remote send | Parent can send one protected profile or selected protected profiles to saved verified devices and see whether the next attempt is live, later via LAN/mailbox provider, blocked by conflict, blocked by stale/revoked pairing, missing a verified device, or has redacted source-side delivery ack feedback. The row also shows the latest redacted send attempt from protected history so parents can see success, partial delivery, no-link, and provider-missing outcomes without opening the detailed history modal. | Delivery links, preview labels, latest-attempt labels, and ack labels are not authority; each envelope still requires Source -> Replica trust, fixed target profile, allowed scope, signature/integrity proof, and newer revision/hash. |
 | Conflict review | `Review Conflict` opens a parent/account re-authed conflict review modal that filters history to conflict and rejected remote-policy rows first. | This is read-only redacted history triage; it does not resolve, clear, merge, retry, or accept policy. |
 | Mailbox provider | Parent can configure, edit, or clear the HTTPS encrypted-mailbox endpoint from the command center after parent/account re-auth. | The endpoint stores only encrypted mailbox rows and metadata; it cannot read policy, choose targets, bypass trust, or become authority. |
