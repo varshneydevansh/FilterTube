@@ -456,6 +456,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /ft-managed-command-center__bulk-group/);
   assert.match(helperSource, /ft-managed-command-center__bulk-group-label/);
   assert.match(helperSource, /ft-managed-command-center__provider/);
+  assert.match(helperSource, /ft-managed-command-center__provider-prompt/);
   assert.match(helperSource, /Set Up Pick Up Later/);
   assert.match(helperSource, /Edit Pick Up Later/);
   assert.match(doc, /visible card says `Pick Up Later`, `Home Bridge`, and `Delivery receipts`/);
@@ -603,6 +604,7 @@ test('managed command-center spec pins parent workflow without making UI authori
   assert.match(css, /\.ft-managed-command-center__bulk-actions\s*\{/);
   assert.match(css, /\.ft-managed-command-center__bulk-group\s*\{/);
   assert.match(css, /\.ft-managed-command-center__provider\s*\{/);
+  assert.match(css, /\.ft-managed-command-center__provider-prompt\s*\{/);
   assert.match(css, /\.ft-managed-command-center__provider-copy\s*\{/);
   assert.match(css, /\.ft-managed-command-center__bulk-group-label\s*\{/);
   assert.match(css, /\.ft-managed-command-center__row\s*\{/);

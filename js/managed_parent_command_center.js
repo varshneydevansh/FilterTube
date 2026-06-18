@@ -922,8 +922,13 @@
 
         const mailbox = h.safeObject(summary.mailboxConfig);
         const localNetwork = h.safeObject(summary.localNetworkConfig);
-        const shouldShowProviderSetup = mailbox.configured === true || localNetwork.configured === true;
-        if (shouldShowProviderSetup) {
+        const hasProviderAction = typeof h.onAction === 'function';
+        const shouldShowConfiguredProviderSetup = mailbox.configured === true || localNetwork.configured === true;
+        const shouldShowProviderPrompt = summary.profileCount > 0
+            && hasProviderAction
+            && mailbox.configured !== true
+            && localNetwork.configured !== true;
+        if (shouldShowConfiguredProviderSetup || shouldShowProviderPrompt) {
             const providerIntro = document.createElement('div');
             providerIntro.className = 'ft-managed-command-center__provider-intro';
             providerIntro.textContent = 'Optional delivery';
@@ -931,84 +936,131 @@
             panel.appendChild(providerIntro);
         }
 
-        if (shouldShowProviderSetup && mailbox.configured === true) {
-        const mailboxPanel = document.createElement('div');
-        mailboxPanel.className = `ft-managed-command-center__provider is-${mailbox.tone || (mailbox.configured ? 'success' : 'warning')}`;
-        mailboxPanel.title = 'Optional: use this only when parent updates must wait for an offline protected device to open later.';
-        const mailboxCopy = document.createElement('div');
-        mailboxCopy.className = 'ft-managed-command-center__provider-copy';
-        const mailboxTitle = document.createElement('strong');
-        mailboxTitle.textContent = mailbox.configured
-            ? (mailbox.label || 'Pick up later is ready')
-            : 'Pick up later is off';
-        const mailboxDetail = document.createElement('span');
-        mailboxDetail.textContent = summary.profileCount > 0
-            ? (mailbox.detail || 'Use this when a parent update should wait until the protected device opens.')
-            : 'Create a protected profile first. Pick-up-later is optional and only useful after a protected device is paired.';
-        const mailboxRoute = document.createElement('span');
-        mailboxRoute.textContent = mailbox.configured
-            ? 'The protected device still accepts only trusted parent updates.'
-            : 'Leave this off when Send Now is enough.';
-        mailboxCopy.append(mailboxTitle, mailboxDetail, mailboxRoute);
-        mailboxPanel.appendChild(mailboxCopy);
-        if (h.onAction) {
-            const mailboxButton = document.createElement('button');
-            mailboxButton.className = 'btn-secondary';
-            mailboxButton.type = 'button';
-            mailboxButton.textContent = mailbox.configured ? 'Edit Pick Up Later' : 'Set Up Pick Up Later';
-            mailboxButton.title = 'Requires parent/account re-auth. Use only when updates must wait for the protected device to open later.';
-            mailboxButton.addEventListener('click', (event) => {
-                event.preventDefault();
-                Promise.resolve(h.onAction({
+        if (shouldShowProviderPrompt) {
+            const providerPrompt = document.createElement('div');
+            providerPrompt.className = 'ft-managed-command-center__provider-prompt';
+            providerPrompt.title = 'Most parents can skip this. Use only when Send Now is not enough.';
+            const promptCopy = document.createElement('div');
+            promptCopy.className = 'ft-managed-command-center__provider-copy';
+            const promptTitle = document.createElement('strong');
+            promptTitle.textContent = 'Need updates when devices are not open together?';
+            const promptDetail = document.createElement('span');
+            promptDetail.textContent = 'Send Now is the normal path. Pick Up Later and Home Bridge are optional setup paths for advanced family or care setups.';
+            promptCopy.append(promptTitle, promptDetail);
+            const promptActions = document.createElement('div');
+            promptActions.className = 'ft-managed-command-center__provider-prompt-actions';
+            [
+                {
+                    label: 'Set Up Pick Up Later',
+                    title: 'For protected devices that should collect waiting updates next time they open.',
                     action: 'configure_mailbox',
-                    scope: 'mailbox_provider',
-                    authority: 'managed_policy_provider_delivery',
-                    sensitiveAction: true
-                })).catch(() => {});
+                    scope: 'mailbox_provider'
+                },
+                {
+                    label: 'Set Up Home Bridge',
+                    title: 'For a trusted FilterTube bridge you run on your home or school network.',
+                    action: 'configure_local_network',
+                    scope: 'local_network_provider'
+                }
+            ].forEach((item) => {
+                const button = document.createElement('button');
+                button.className = 'btn-secondary';
+                button.type = 'button';
+                button.textContent = item.label;
+                button.title = item.title;
+                button.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    Promise.resolve(h.onAction({
+                        action: item.action,
+                        scope: item.scope,
+                        authority: 'managed_policy_provider_delivery',
+                        sensitiveAction: true
+                    })).catch(() => {});
+                });
+                promptActions.appendChild(button);
             });
-            mailboxPanel.appendChild(mailboxButton);
-        }
-        panel.appendChild(mailboxPanel);
+            providerPrompt.append(promptCopy, promptActions);
+            panel.appendChild(providerPrompt);
         }
 
-        if (shouldShowProviderSetup && localNetwork.configured === true) {
-        const localPanel = document.createElement('div');
-        localPanel.className = `ft-managed-command-center__provider is-${localNetwork.tone || (localNetwork.configured ? 'success' : 'warning')}`;
-        localPanel.title = 'Optional: use this only for an explicitly configured Home Bridge. Being on the same network is not authority.';
-        const localCopy = document.createElement('div');
-        localCopy.className = 'ft-managed-command-center__provider-copy';
-        const localTitle = document.createElement('strong');
-        localTitle.textContent = localNetwork.configured
-            ? (localNetwork.label || 'Home Bridge is ready')
-            : 'Home Bridge is off';
-        const localDetail = document.createElement('span');
-        localDetail.textContent = summary.profileCount > 0
-            ? (localNetwork.detail || 'Use this only with a trusted FilterTube-compatible bridge on your home or school network.')
-            : 'Create a protected profile first. Home Bridge is optional and never replaces parent trust.';
-        const localRoute = document.createElement('span');
-        localRoute.textContent = localNetwork.configured
-            ? 'The protected device still accepts only trusted parent updates.'
-            : 'Leave this off unless you run a trusted FilterTube bridge.';
-        localCopy.append(localTitle, localDetail, localRoute);
-        localPanel.appendChild(localCopy);
-        if (h.onAction) {
-            const localButton = document.createElement('button');
-            localButton.className = 'btn-secondary';
-            localButton.type = 'button';
-            localButton.textContent = localNetwork.configured ? 'Edit Home Bridge' : 'Set Up Home Bridge';
-            localButton.title = 'Requires parent/account re-auth. Being on the same network alone cannot change protected rules.';
-            localButton.addEventListener('click', (event) => {
-                event.preventDefault();
-                Promise.resolve(h.onAction({
-                    action: 'configure_local_network',
-                    scope: 'local_network_provider',
-                    authority: 'managed_policy_provider_delivery',
-                    sensitiveAction: true
-                })).catch(() => {});
-            });
-            localPanel.appendChild(localButton);
+        if (shouldShowConfiguredProviderSetup && mailbox.configured === true) {
+            const mailboxPanel = document.createElement('div');
+            mailboxPanel.className = `ft-managed-command-center__provider is-${mailbox.tone || (mailbox.configured ? 'success' : 'warning')}`;
+            mailboxPanel.title = 'Optional: use this only when parent updates must wait for an offline protected device to open later.';
+            const mailboxCopy = document.createElement('div');
+            mailboxCopy.className = 'ft-managed-command-center__provider-copy';
+            const mailboxTitle = document.createElement('strong');
+            mailboxTitle.textContent = mailbox.configured
+                ? (mailbox.label || 'Pick up later is ready')
+                : 'Pick up later is off';
+            const mailboxDetail = document.createElement('span');
+            mailboxDetail.textContent = summary.profileCount > 0
+                ? (mailbox.detail || 'Use this when a parent update should wait until the protected device opens.')
+                : 'Create a protected profile first. Pick-up-later is optional and only useful after a protected device is paired.';
+            const mailboxRoute = document.createElement('span');
+            mailboxRoute.textContent = mailbox.configured
+                ? 'The protected device still accepts only trusted parent updates.'
+                : 'Leave this off when Send Now is enough.';
+            mailboxCopy.append(mailboxTitle, mailboxDetail, mailboxRoute);
+            mailboxPanel.appendChild(mailboxCopy);
+            if (h.onAction) {
+                const mailboxButton = document.createElement('button');
+                mailboxButton.className = 'btn-secondary';
+                mailboxButton.type = 'button';
+                mailboxButton.textContent = mailbox.configured ? 'Edit Pick Up Later' : 'Set Up Pick Up Later';
+                mailboxButton.title = 'Requires parent/account re-auth. Use only when updates must wait for the protected device to open later.';
+                mailboxButton.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    Promise.resolve(h.onAction({
+                        action: 'configure_mailbox',
+                        scope: 'mailbox_provider',
+                        authority: 'managed_policy_provider_delivery',
+                        sensitiveAction: true
+                    })).catch(() => {});
+                });
+                mailboxPanel.appendChild(mailboxButton);
+            }
+            panel.appendChild(mailboxPanel);
         }
-        panel.appendChild(localPanel);
+
+        if (shouldShowConfiguredProviderSetup && localNetwork.configured === true) {
+            const localPanel = document.createElement('div');
+            localPanel.className = `ft-managed-command-center__provider is-${localNetwork.tone || (localNetwork.configured ? 'success' : 'warning')}`;
+            localPanel.title = 'Optional: use this only for an explicitly configured Home Bridge. Being on the same network is not authority.';
+            const localCopy = document.createElement('div');
+            localCopy.className = 'ft-managed-command-center__provider-copy';
+            const localTitle = document.createElement('strong');
+            localTitle.textContent = localNetwork.configured
+                ? (localNetwork.label || 'Home Bridge is ready')
+                : 'Home Bridge is off';
+            const localDetail = document.createElement('span');
+            localDetail.textContent = summary.profileCount > 0
+                ? (localNetwork.detail || 'Use this only with a trusted FilterTube-compatible bridge on your home or school network.')
+                : 'Create a protected profile first. Home Bridge is optional and never replaces parent trust.';
+            const localRoute = document.createElement('span');
+            localRoute.textContent = localNetwork.configured
+                ? 'The protected device still accepts only trusted parent updates.'
+                : 'Leave this off unless you run a trusted FilterTube bridge.';
+            localCopy.append(localTitle, localDetail, localRoute);
+            localPanel.appendChild(localCopy);
+            if (h.onAction) {
+                const localButton = document.createElement('button');
+                localButton.className = 'btn-secondary';
+                localButton.type = 'button';
+                localButton.textContent = localNetwork.configured ? 'Edit Home Bridge' : 'Set Up Home Bridge';
+                localButton.title = 'Requires parent/account re-auth. Being on the same network alone cannot change protected rules.';
+                localButton.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    Promise.resolve(h.onAction({
+                        action: 'configure_local_network',
+                        scope: 'local_network_provider',
+                        authority: 'managed_policy_provider_delivery',
+                        sensitiveAction: true
+                    })).catch(() => {});
+                });
+                localPanel.appendChild(localButton);
+            }
+            panel.appendChild(localPanel);
         }
 
         const selectedProfiles = new Set();

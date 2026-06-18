@@ -275,6 +275,12 @@ parent tool instead of a sync/debug console.
     profile is making the authority decision. This is copy/UI framing only;
     parser support, materialized row metadata, pause/refresh semantics, and
     verified-device send behavior are unchanged.
+  - [x] Optional delivery discovery slice: after at least one protected profile
+    exists and no optional provider is configured, Family Controls now shows one
+    compact prompt for `Set Up Pick Up Later` and `Set Up Home Bridge`. First
+    setup still leads with Send Now and local controls; the prompt is only a
+    discoverable path for families/caregivers who need offline pickup or a
+    trusted home/school bridge.
   - [ ] Scheduled subscription refresh remains a future slice. Until then,
     list updates happen only after a parent/account profile chooses Check or
     Refresh and approves the result.

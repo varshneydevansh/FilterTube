@@ -686,6 +686,32 @@ html[data-theme="dark"] body::after {
     border-color: color-mix(in srgb, var(--ft-color-sem-warning, #f59e0b) 55%, var(--ft-color-sem-neutral-border));
 }
 
+.ft-managed-command-center__provider-prompt {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    border: 1px dashed color-mix(in srgb, var(--ft-color-brand-primary) 32%, var(--ft-color-sem-neutral-border));
+    border-radius: 8px;
+    background:
+        linear-gradient(180deg, rgba(255, 249, 241, 0.72), rgba(255, 255, 255, 0.76)),
+        var(--ft-color-bg-panel);
+}
+
+.ft-managed-command-center__provider-prompt-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.ft-managed-command-center__provider-prompt .btn-secondary {
+    min-height: 38px;
+    padding: 8px 10px;
+    font-size: 12px;
+}
+
 .ft-managed-command-center__provider-copy {
     display: grid;
     gap: 2px;
@@ -1541,6 +1567,14 @@ body:not(.ft-managed-child-editor-view) .ft-managed-child-global {
 
     .ft-managed-command-center__provider {
         grid-template-columns: 1fr;
+    }
+
+    .ft-managed-command-center__provider-prompt {
+        grid-template-columns: 1fr;
+    }
+
+    .ft-managed-command-center__provider-prompt-actions {
+        justify-content: stretch;
     }
 
     .ft-managed-command-center__actions {
