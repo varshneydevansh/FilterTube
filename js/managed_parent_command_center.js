@@ -178,6 +178,66 @@
         return null;
     }
 
+    function getManagedChannelListSummary(profile, safeObject = fallbackSafeObject) {
+        const lists = new Map();
+        const addRows = (rows, surfaceLabel) => {
+            if (!Array.isArray(rows)) return;
+            rows.forEach((row) => {
+                const item = safeObject(row);
+                const listId = typeof item.managedListId === 'string' ? item.managedListId.trim() : '';
+                if (!listId) return;
+                const existing = lists.get(listId) || {
+                    id: listId,
+                    name: typeof item.managedListName === 'string' && item.managedListName.trim()
+                        ? item.managedListName.trim()
+                        : 'Imported channel list',
+                    rowCount: 0,
+                    surfaces: new Set()
+                };
+                existing.rowCount += 1;
+                if (surfaceLabel) existing.surfaces.add(surfaceLabel);
+                lists.set(listId, existing);
+            });
+        };
+        const main = safeObject(profile?.main);
+        const kids = safeObject(profile?.kids);
+        addRows(main.channels, 'Main');
+        addRows(main.whitelistChannels, 'Main');
+        addRows(kids.blockedChannels, 'Kids');
+        addRows(kids.whitelistChannels, 'Kids');
+        const items = Array.from(lists.values()).map((item) => ({
+            id: item.id,
+            name: item.name,
+            rowCount: item.rowCount,
+            surfaces: Array.from(item.surfaces)
+        }));
+        const rowCount = items.reduce((total, item) => total + item.rowCount, 0);
+        return {
+            listCount: items.length,
+            rowCount,
+            items
+        };
+    }
+
+    function formatManagedChannelListChip(summary = {}) {
+        const listCount = normalizeCommandCenterNumber(summary.listCount);
+        if (!listCount) return '';
+        const rowCount = normalizeCommandCenterNumber(summary.rowCount);
+        const listLabel = listCount === 1 ? 'list' : 'lists';
+        return rowCount > 0 ? `${listCount} ${listLabel} (${rowCount})` : `${listCount} ${listLabel}`;
+    }
+
+    function formatManagedChannelListDetail(summary = {}) {
+        const listCount = normalizeCommandCenterNumber(summary.listCount);
+        if (!listCount || !Array.isArray(summary.items)) return '';
+        const names = summary.items
+            .map(item => typeof item?.name === 'string' ? item.name.trim() : '')
+            .filter(Boolean)
+            .slice(0, 2);
+        const more = listCount > names.length ? ` +${listCount - names.length} more` : '';
+        return names.length ? `${names.join(', ')}${more}` : `${listCount} imported ${listCount === 1 ? 'list' : 'lists'}`;
+    }
+
     function resolveManagedCommandCenterSyncState(item = {}) {
         const conflictCount = Number(item.remoteConflictCount) || 0;
         if (conflictCount > 0) {
@@ -465,6 +525,9 @@
                 remoteScopeCount: 0,
                 historyRowCount: 0,
                 protectedRowCount: 0,
+                managedChannelListProfileCount: 0,
+                managedChannelListCount: 0,
+                managedChannelListRowCount: 0,
                 pendingExtraTimeRequestCount: 0,
                 remoteConflictCount: 0
             };
@@ -484,6 +547,7 @@
             const syncTarget = h.getManagedSyncTargetSummary(profileId);
             const timePolicy = h.getManagedTimeLimitPolicy(profile);
             const pendingExtraTimeRequest = getLatestPendingExtraTimeRequest(profile);
+            const managedChannelLists = getManagedChannelListSummary(profile, h.safeObject);
             const latestActionLabel = typeof summary.latestActionLabel === 'string' && summary.latestActionLabel.trim()
                 ? summary.latestActionLabel.trim()
                 : (summary.latestResult && summary.latestScope ? `${summary.latestResult}/${summary.latestScope}` : 'none');
@@ -517,6 +581,10 @@
                 latestActionLabel,
                 latestDeliveryLabel: typeof summary.latestDeliveryLabel === 'string' ? summary.latestDeliveryLabel.trim() : '',
                 latestDeliveryTone: typeof summary.latestDeliveryTone === 'string' ? summary.latestDeliveryTone.trim() : '',
+                managedChannelListCount: managedChannelLists.listCount,
+                managedChannelListRowCount: managedChannelLists.rowCount,
+                managedChannelListLabel: formatManagedChannelListChip(managedChannelLists),
+                managedChannelListDetail: formatManagedChannelListDetail(managedChannelLists),
                 pendingExtraTimeRequestLabel: pendingExtraTimeRequest?.label || '',
                 pendingExtraTimeRequestDetail: pendingExtraTimeRequest?.detail || '',
                 pendingExtraTimeRequest: !!pendingExtraTimeRequest,
@@ -547,6 +615,9 @@
             syncStaleProfileCount: acc.syncStaleProfileCount + (row.syncTargetCount <= 0 && row.syncStaleCount > 0 ? 1 : 0),
             syncPendingProfileCount: acc.syncPendingProfileCount + (row.syncTargetCount > 0 && row.syncReadyCount <= 0 ? 1 : 0),
             noDeviceProfileCount: acc.noDeviceProfileCount + (row.syncTotalCount <= 0 ? 1 : 0),
+            managedChannelListProfileCount: acc.managedChannelListProfileCount + (row.managedChannelListCount > 0 ? 1 : 0),
+            managedChannelListCount: acc.managedChannelListCount + row.managedChannelListCount,
+            managedChannelListRowCount: acc.managedChannelListRowCount + row.managedChannelListRowCount,
             remoteScopeCount: acc.remoteScopeCount + row.remoteScopeCount,
             historyRowCount: acc.historyRowCount + row.historyRowCount,
             protectedRowCount: acc.protectedRowCount + row.protectedRowCount,
@@ -564,6 +635,9 @@
             syncStaleProfileCount: 0,
             syncPendingProfileCount: 0,
             noDeviceProfileCount: 0,
+            managedChannelListProfileCount: 0,
+            managedChannelListCount: 0,
+            managedChannelListRowCount: 0,
             remoteScopeCount: 0,
             historyRowCount: 0,
             protectedRowCount: 0,
@@ -703,6 +777,7 @@
         [
             { label: 'Protected', value: summary.profileCount, tone: 'neutral', title: 'Profiles this parent/account can manage.', always: true },
             { label: 'Ready', value: summary.syncReadyProfileCount, tone: summary.syncReadyProfileCount ? 'success' : 'neutral', title: 'Profiles with a verified delivery path available now or through a configured provider.', always: true },
+            { label: 'Lists active', value: summary.managedChannelListProfileCount, tone: 'success', title: 'Protected profiles with imported channel-list rules.' },
             { label: 'Pairing needed', value: summary.noDeviceProfileCount + summary.syncRepairProfileCount + summary.syncStaleProfileCount, tone: 'warning', title: 'Profiles that need a verified device, refreshed trust, or re-pairing before remote updates.' },
             { label: 'Requests', value: summary.pendingExtraTimeRequestCount, tone: 'warning', title: 'Protected profiles asking for more YouTube time.' },
             { label: 'Conflicts', value: summary.remoteConflictCount, tone: 'danger', title: 'Rejected or conflicting remote-policy history rows that need parent review.' }
@@ -1011,6 +1086,7 @@
             [
                 { label: item.viewingAccess, tone: 'neutral' },
                 { label: item.timeLimit, tone: item.timeLimited ? 'warning' : 'neutral' },
+                item.managedChannelListLabel ? { label: item.managedChannelListLabel, tone: 'success' } : null,
                 { label: syncState.label, tone: syncState.tone },
                 item.remoteScopeCount ? { label: item.syncLabel, tone: 'success' } : null,
                 item.pendingExtraTimeRequestLabel ? { label: item.pendingExtraTimeRequestLabel, tone: 'warning' } : null,
@@ -1028,6 +1104,7 @@
                 hasVerifiedDevice
                     ? { label: 'Delivery', value: item.deliveryPreview?.label || 'Send when ready', note: item.deliveryPathDetail }
                     : { label: 'Next step', value: 'Pair a verified device', note: 'Use live P2P when the parent and protected device are both open.' },
+                item.managedChannelListDetail ? { label: 'Lists', value: item.managedChannelListDetail } : null,
                 hasVerifiedDevice ? { label: 'Device', value: item.syncTargetLabel } : null,
                 item.pendingExtraTimeRequestDetail ? { label: 'Request', value: item.pendingExtraTimeRequestDetail } : null,
                 item.remoteConflictCount > 0 ? { label: 'Conflict', value: `${item.remoteConflictCount} needs review` } : null

@@ -77,6 +77,12 @@ command center. It removes only rows tagged with the imported list's
 `managedListId`, keeps manual channel rules intact, writes protected redacted
 `policy.channel_list.remove` history rows, and can offer the existing
 verified-device send path.
+The command-center visibility slice now shows imported list status directly on
+protected profile rows: each profile with materialized list rows gets a compact
+`N lists (rows)` chip and a `Lists` detail line naming the first imported
+lists. This is display-only and derives from saved row metadata; it does not
+change blocking, whitelisting, import, remove, or verified-device send
+authority.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 
