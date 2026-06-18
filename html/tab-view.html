@@ -629,8 +629,8 @@ keyword: brainrot</pre>
                         <section class="view-hero settings-hero sync-hero">
                             <div class="view-hero__copy">
                                 <p class="view-hero__eyebrow">Accounts, security, and device trust</p>
-                                <h2 class="view-hero__title">Manage profiles, protect them with PIN rules, and connect trusted devices without making the control model harder to understand.</h2>
-                                <p class="view-hero__body">This page combines profiles, PINs, and device updates. Parents can edit a protected profile here, then pair a child or family device only when those approved settings need to reach another screen.</p>
+                                <h2 class="view-hero__title">Manage profiles, PINs, trusted devices, and family updates from one parent-controlled place.</h2>
+                                <p class="view-hero__body">Create protected profiles, set what each profile can watch, then send approved changes to another device only when that profile needs to stay aligned there.</p>
                             </div>
                             <div class="view-hero__meta">
                                 <span class="view-meta-pill">Profiles</span>
@@ -701,17 +701,17 @@ keyword: brainrot</pre>
                                 <div class="nanah-sync-shell">
                                     <div class="nanah-sync-intro">
                                         <div class="nanah-sync-intro__copy">
-                                            <span class="nanah-sync-intro__eyebrow">Private device updates</span>
-                                            <p class="nanah-sync-intro__title">Send approved FilterTube settings to another trusted device.</p>
-                                            <p class="nanah-sync-intro__body">Open both devices, pair with a short code or QR, confirm the same safety phrase, then send the selected profile rules. FilterTube uses the relay only as a meeting place so the devices can find each other.</p>
+                                            <span class="nanah-sync-intro__eyebrow">Family device updates</span>
+                                            <p class="nanah-sync-intro__title">Send approved rules to a child, family, or personal device.</p>
+                                            <p class="nanah-sync-intro__body">For everyday control, open both devices, pair with a short code or QR, confirm the same safety phrase, then send the selected profile update. Save trust only when that device should keep receiving parent-approved changes.</p>
                                         </div>
                                         <div class="nanah-sync-flow" aria-label="Nanah Sync steps">
                                             <article class="nanah-sync-flow__step nanah-sync-flow__step--trust">
                                                 <div class="nanah-sync-flow__step-head">
                                                     <span class="nanah-sync-flow__index">Step 1</span>
-                                                    <strong>Choose</strong>
+                                                    <strong>Pick profile</strong>
                                                 </div>
-                                                <span class="nanah-sync-flow__body">Pick whether this is a one-time copy, a protected-device update, or a full migration.</span>
+                                                <span class="nanah-sync-flow__body">Choose whether you are copying your own profile, updating a protected device, or moving a full account.</span>
                                             </article>
                                             <article class="nanah-sync-flow__step">
                                                 <div class="nanah-sync-flow__step-head">
@@ -723,25 +723,25 @@ keyword: brainrot</pre>
                                             <article class="nanah-sync-flow__step">
                                                 <div class="nanah-sync-flow__step-head">
                                                     <span class="nanah-sync-flow__index">Step 3</span>
-                                                    <strong>Send</strong>
+                                                    <strong>Send update</strong>
                                                 </div>
-                                                <span class="nanah-sync-flow__body">Send the selected rules now. Save parent trust only when this protected device should receive future approved updates.</span>
+                                                <span class="nanah-sync-flow__body">Send the reviewed update now. Save parent trust only for devices that should keep receiving approved changes.</span>
                                             </article>
                                         </div>
                                         <div class="nanah-sync-principles-block">
                                             <div class="nanah-sync-principles-label">What stays protected</div>
                                             <div class="nanah-sync-principles" aria-label="Nanah Sync privacy and trust notes">
                                                 <article class="nanah-sync-principles__item nanah-sync-principles__item--trust">
-                                                    <strong>The relay is only a meeting place</strong>
-                                                    <span>It helps devices connect. It is not where parent rules or PINs live.</span>
+                                                    <strong>No account server reads the rules</strong>
+                                                    <span>The meeting service helps devices find each other; parent rules and PINs are not stored there.</span>
                                                 </article>
                                                 <article class="nanah-sync-principles__item nanah-sync-principles__item--trust">
-                                                    <strong>The child device stays protected</strong>
-                                                    <span>It accepts only approved updates that match the saved parent link, target profile, and allowed scope.</span>
+                                                    <strong>A saved parent link is required</strong>
+                                                    <span>The protected device accepts only updates that match its trusted parent, target profile, and allowed rule scope.</span>
                                                 </article>
                                                 <article class="nanah-sync-principles__item">
-                                                    <strong>Send Now is the normal path</strong>
-                                                    <span>Saved trust makes the next live session easier. Pick Up Later and Home Bridge are optional advanced paths.</span>
+                                                    <strong>Open both devices is the normal path</strong>
+                                                    <span>Saved trust makes the next live session easier. Later pickup and Home Bridge stay optional.</span>
                                                 </article>
                                             </div>
                                         </div>
@@ -749,15 +749,15 @@ keyword: brainrot</pre>
                                             <div class="nanah-sync-principles-label">Common parent flows</div>
                                             <div class="nanah-sync-principles nanah-sync-principles--guide" aria-label="Nanah Sync quick start">
                                                 <article class="nanah-sync-principles__item">
-                                                    <strong>Copy once</strong>
+                                                    <strong>Your own device</strong>
                                                     <span>Use this for your own laptop, browser, or phone when you only want to copy one profile.</span>
                                                 </article>
                                                 <article class="nanah-sync-principles__item">
-                                                    <strong>Control a protected device</strong>
+                                                    <strong>Child or caregiving device</strong>
                                                     <span>Use the parent profile here, join from the child or family device, choose the target profile, then save parent trust once.</span>
                                                 </article>
                                                 <article class="nanah-sync-principles__item">
-                                                    <strong>Send approved lists too</strong>
+                                                    <strong>Imported lists travel as rules</strong>
                                                     <span>CSV, text, URL, and rule-list JSON imports become normal profile rules first, then travel through the same verified-device update path.</span>
                                                 </article>
                                             </div>
@@ -774,10 +774,10 @@ keyword: brainrot</pre>
                                             <div class="nanah-sync-panel__header">
                                                 <div>
                                                     <span class="nanah-sync-panel__eyebrow">Device update</span>
-                                                    <h4 class="nanah-sync-panel__title">Choose the update you want to send</h4>
-                                                    <p class="nanah-sync-panel__body">Start with the simple choice. Advanced role and scope controls stay available for migrations, rule bundles, and protected-device repair.</p>
+                                                    <h4 class="nanah-sync-panel__title">Pick what this device should send</h4>
+                                                    <p class="nanah-sync-panel__body">Most parents only need the protected-device option. Extra role and scope controls stay tucked away for migration, repair, or one-scope updates.</p>
                                                 </div>
-                                                <span class="nanah-sync-panel__badge">Parent approved</span>
+                                                <span class="nanah-sync-panel__badge">Parent reviewed</span>
                                             </div>
 
                                             <div class="nanah-sync-panel__content nanah-sync-panel__content--setup">
@@ -823,13 +823,13 @@ keyword: brainrot</pre>
                                                             <select id="ftNanahRemoteTarget" class="select-input">
                                                                 <option value="">Use remote active profile</option>
                                                             </select>
-                                                            <small id="ftNanahRemoteTargetHint" class="nanah-sync-field__hint">After pairing, choose the child or protected profile on the other device that should receive this update.</small>
+                                                            <small id="ftNanahRemoteTargetHint" class="nanah-sync-field__hint">After pairing, choose exactly which child or protected profile on the other device should receive this update.</small>
                                                         </label>
                                                     </div>
 
                                                     <details class="nanah-sync-advanced" id="ftNanahAdvancedDetails">
                                                         <summary class="nanah-sync-advanced__summary">
-                                                            <span class="nanah-sync-advanced__title">Advanced</span>
+                                                            <span class="nanah-sync-advanced__title">More controls</span>
                                                             <span id="ftNanahAdvancedSummary" class="nanah-sync-advanced__value">Peer · Active profile · Merge</span>
                                                         </summary>
                                                         <div class="nanah-sync-advanced__body">
@@ -841,7 +841,7 @@ keyword: brainrot</pre>
                                                                         <option value="source">This device controls another profile</option>
                                                                         <option value="replica">This device receives protected updates</option>
                                                                     </select>
-                                                                    <small class="nanah-sync-field__hint">Most parents can leave this to the mode above. Use controls another profile on the parent device and receives updates on the protected device.</small>
+                                                                    <small class="nanah-sync-field__hint">Most parents can use the mode buttons above. Use controls another profile on the parent device and receives updates on the protected device.</small>
                                                                 </label>
                                                                 <label class="nanah-sync-field">
                                                                     <span>Scope to send</span>
@@ -869,7 +869,7 @@ keyword: brainrot</pre>
                                                                 <fieldset class="nanah-sync-field nanah-managed-targets" id="ftNanahManagedTargetsField" hidden>
                                                                     <legend>Managed targets</legend>
                                                                     <div id="ftNanahManagedTargets" class="nanah-managed-targets__list"></div>
-                                                                    <small id="ftNanahManagedTargetsHint" class="nanah-sync-field__hint">Saved fixed-profile targets on the connected replica can be selected here.</small>
+                                                                    <small id="ftNanahManagedTargetsHint" class="nanah-sync-field__hint">Saved protected profiles on the connected device can be selected here.</small>
                                                                 </fieldset>
                                                                 <label class="nanah-sync-field">
                                                                     <span id="ftNanahStrategyLabel">How update applies</span>
@@ -921,10 +921,10 @@ keyword: brainrot</pre>
                                                             <strong id="ftNanahSasPhrase">Waiting</strong>
                                                         </div>
                                                         <div class="nanah-sync-status__hint" id="ftNanahStatusHint">
-                                                            Create a pairing code on one device, then join from the other device using the same 4-character code.
+                                                            Start pairing on one device, then join from the other device using the same short code.
                                                         </div>
                                                         <div class="nanah-sync-status__hint" id="ftNanahTargetHint">
-                                                            Updates write into the receiver's active profile by default, or a fixed profile if one was chosen. Saved links remember trust and policy, not a live background connection.
+                                                            Updates write into the receiver's active profile by default, or a fixed protected profile if one was chosen. Saved links remember trust and allowed policy, not a live background connection.
                                                         </div>
                                                         <div class="nanah-sync-sas-actions">
                                                             <button id="ftNanahConfirmSasBtn" class="btn-primary" type="button" disabled>Confirm Matching Phrase</button>
@@ -938,16 +938,16 @@ keyword: brainrot</pre>
                                             <div class="nanah-sync-panel__header">
                                                 <div>
                                                     <span class="nanah-sync-panel__eyebrow">Other device</span>
-                                                    <h4 class="nanah-sync-panel__title">Bring another device into the session</h4>
+                                                    <h4 class="nanah-sync-panel__title">Connect the other device</h4>
                                                     <p class="nanah-sync-panel__body">Type the code shown on the other device, or scan the QR code from the mobile or tablet app. Nothing applies until the safety phrase matches.</p>
                                                 </div>
-                                                <span class="nanah-sync-panel__badge">Receive setup</span>
+                                                <span class="nanah-sync-panel__badge">Pair here</span>
                                             </div>
 
                                             <div class="nanah-sync-stack">
                                                 <div class="nanah-sync-privacy-banner">
-                                                    <strong>Completely P2P after handshake</strong>
-                                                    <span>FilterTube only helps both devices meet. After the secure handshake, your settings are meant to go straight from one device to the other, with no middle sync server reading them. You can open the public relay page here: <a href="https://nanah-signaling.varshney-devansh614.workers.dev/" target="_blank" rel="noopener noreferrer">nanah-signaling.varshney-devansh614.workers.dev</a>.</span>
+                                                    <strong>Private after the handshake</strong>
+                                                    <span>The meeting service only helps the two open devices connect. After the safety phrase matches, the selected update is meant to move directly between those devices. Technical relay page: <a href="https://nanah-signaling.varshney-devansh614.workers.dev/" target="_blank" rel="noopener noreferrer">nanah-signaling.varshney-devansh614.workers.dev</a>.</span>
                                                 </div>
                                                 <label class="nanah-sync-field">
                                                     <span>Enter pairing code</span>
@@ -971,7 +971,7 @@ keyword: brainrot</pre>
                                             <div class="nanah-sync-trusted">
                                                 <div class="nanah-sync-trusted__header">
                                                     <div class="help-item-title">Trusted devices</div>
-                                                    <div class="nanah-sync-note">Saved links remember trust and policy. Starting a new session uses those saved defaults — it is not hidden background sync.</div>
+                                                    <div class="nanah-sync-note">Saved links remember which parent can send which profile update. They are not hidden background sync.</div>
                                                 </div>
                                                 <div id="ftNanahTrustedLinks" class="nanah-trusted-links">
                                                     <div class="nanah-trusted-links__empty">No trusted devices yet.</div>

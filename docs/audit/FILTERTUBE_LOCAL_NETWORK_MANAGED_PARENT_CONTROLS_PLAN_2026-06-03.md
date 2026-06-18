@@ -122,6 +122,12 @@ extension authority code.
   Help relay section now separates Nanah's live meeting-place role from
   advanced later/home delivery, without implying those transports can become
   policy authority.
+- [x] Device Trust & Sync copy was tightened again for parent/caregiver use:
+  the first-read panel now says `Family device updates`, `Pick profile`, and
+  `Connect the other device`; it describes the relay as a technical meeting
+  service only in supporting copy, keeps `More controls` collapsed for role and
+  scope details, and keeps the normal parent path as open both devices, pair,
+  verify, send, then save parent trust only for approved protected profiles.
 
 ### Parent/Caregiver Simplification Tracker
 
