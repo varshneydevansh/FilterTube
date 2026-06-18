@@ -1,10 +1,10 @@
 {
   "schema": "filtertube_managed_app_policy_contract",
   "version": 1,
-  "generated": "2026-06-06",
+  "generated": "2026-06-18",
   "owner": "extension_upstream_policy_contract",
   "runtimeBehaviorChanged": false,
-  "appSyncStatus": "app_manifest_contract_helpers_and_android_time_entry_wiring_present_ios_pending",
+  "appSyncStatus": "extension_contract_updated_native_sync_pending",
   "artifact": {
     "sourcePath": "docs/audit/artifacts/managed-app-policy-contract-v1.json",
     "appDestination": "packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json",
@@ -21,19 +21,19 @@
       "sourcePath": "js/nanah_managed_open_sync.js",
       "appDestination": "packages/extension-source/upstream/js/nanah_managed_open_sync.js",
       "manifestSyncMode": "copy",
-      "boundary": "managed pull-on-open helper source parity; mailbox and configured local-network providers remain transport inputs, not policy authority"
+      "boundary": "managed pull-on-open helper source parity; Pick Up Later and Home Bridge providers remain transport inputs, not policy authority"
     },
     {
       "sourcePath": "js/nanah_managed_mailbox_client.js",
       "appDestination": "packages/extension-source/upstream/js/nanah_managed_mailbox_client.js",
       "manifestSyncMode": "copy",
-      "boundary": "configured HTTPS encrypted-mailbox helper source parity; provider endpoint and native UI remain app-owned, mailbox storage remains ciphertext-only transport"
+      "boundary": "Pick Up Later helper source parity; provider endpoint and native UI remain app-owned, pending-update storage remains ciphertext-only transport"
     },
     {
       "sourcePath": "js/nanah_managed_local_network_client.js",
       "appDestination": "packages/extension-source/upstream/js/nanah_managed_local_network_client.js",
       "manifestSyncMode": "copy",
-      "boundary": "configured local-network gateway helper source parity; LAN reachability and discovery are transport only, local trusted-link and signature validation remain authority"
+      "boundary": "Home Bridge helper source parity; same-network reachability and discovery are transport only, local trusted-link and signature validation remain authority"
     }
   ],
   "uiHelperMirror": [
@@ -263,12 +263,35 @@
       "encrypted_mailbox",
       "configured_local_network_gateway"
     ],
+    "parentFacingTransports": [
+      {
+        "label": "Send Now",
+        "transport": "live_nanah",
+        "meaning": "send the approved profile update while both devices are open and connected"
+      },
+      {
+        "label": "Pick Up Later",
+        "transport": "encrypted_mailbox",
+        "meaning": "store unreadable signed updates so the protected device can collect them when it opens"
+      },
+      {
+        "label": "Home Bridge",
+        "transport": "configured_local_network_gateway",
+        "meaning": "help trusted same-network devices exchange signed updates without making the network the authority"
+      }
+    ],
     "requiredBoundaries": [
       "transport_is_not_policy_authority",
       "local_network_reachability_is_not_authority",
       "mailbox_server_cannot_read_plaintext_policy",
       "configured_gateway_cannot_choose_target_profile_or_rules",
       "trusted_link_target_scope_revision_hash_signature_validation_required_before_apply"
+    ],
+    "requiredUiBoundaries": [
+      "normal_parent_ui_uses_send_now_pick_up_later_home_bridge_labels",
+      "advanced_details_may_show_mailbox_lan_provider_gateway_terms",
+      "protected_user_ui_never_exposes_delivery_setup_controls",
+      "apps_and_bridge_software_must_not_treat_delivery_labels_as_authority"
     ],
     "configuredLocalNetworkProvider": {
       "sourcePath": "js/nanah_managed_local_network_client.js",
@@ -288,6 +311,29 @@
         "unsigned_candidate"
       ]
     }
+  },
+  "networkProductBoundary": {
+    "sameProductSeparateRuntime": true,
+    "preciseYouTubeFilteringRequiresEndpointAgent": true,
+    "endpointAgents": [
+      "browser_extension",
+      "native_mobile_app",
+      "managed_webview",
+      "managed_device_profile"
+    ],
+    "bridgeSoftwareResponsibilities": [
+      "distribute_signed_policy_revisions",
+      "host_or_relay_encrypted_pick_up_later_items",
+      "support_same_network_home_bridge_delivery",
+      "record_parent_visible_delivery_health_and_redacted_history",
+      "publish_parent_approved_list_catalogs"
+    ],
+    "bridgeSoftwareMustNotClaim": [
+      "per_video_youtube_filtering_without_endpoint_agent",
+      "server_plaintext_rule_authority",
+      "automatic_trust_from_same_wifi_or_lan",
+      "bypass_of_local_signature_target_scope_revision_hash_validation"
+    ]
   },
   "actionHistory": {
     "store": "profile.managedActionHistory",

@@ -1,6 +1,6 @@
 # Contract: Managed App Policy Parity
 
-**Generated**: 2026-06-06
+**Generated**: 2026-06-18
 **Status**: Extension-owned app policy artifact plus managed Nanah helper
 source copies are wired into the app runtime sync manifest. Android native
 model and Activity runtime proof now persist managed profile state, action
@@ -8,7 +8,12 @@ history, and time-budget decisions, and gate managed web content at startup,
 resume, heartbeat, and pause. The configured HTTPS mailbox helper and
 configured local-network gateway helper are now part of the extension-owned
 runtime contract, with downstream app manifest/runtime sync expected to copy
-both as transport inputs. iOS parity remains pending.
+both as transport inputs. The shared contract now separates parent-facing
+delivery labels (`Send Now`, `Pick Up Later`, `Home Bridge`) from technical
+transport identifiers so apps and future bridge software can stay simple
+without weakening local signature/target/revision validation. The extension
+contract is updated and native runtime sync is now pending for this contract
+revision. iOS parity remains pending.
 **Runtime behavior changed**: extension no; Android app yes.
 **Goal slice**: Implementation order item 12, "Sync shared policy contract to
 apps", and item 13, "Add app viewing-space/time-limit parity tests".
@@ -38,10 +43,10 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
 {
   "schema": "filtertube_managed_app_policy_contract",
   "version": 1,
-  "generated": "2026-06-06",
+  "generated": "2026-06-18",
   "owner": "extension_upstream_policy_contract",
   "runtimeBehaviorChanged": false,
-  "appSyncStatus": "app_manifest_contract_helpers_and_android_time_entry_wiring_present_ios_pending",
+  "appSyncStatus": "extension_contract_updated_native_sync_pending",
   "artifact": {
     "sourcePath": "docs/audit/artifacts/managed-app-policy-contract-v1.json",
     "appDestination": "packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json",
@@ -58,19 +63,19 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
       "sourcePath": "js/nanah_managed_open_sync.js",
       "appDestination": "packages/extension-source/upstream/js/nanah_managed_open_sync.js",
       "manifestSyncMode": "copy",
-      "boundary": "managed pull-on-open helper source parity; mailbox and configured local-network providers remain transport inputs, not policy authority"
+      "boundary": "managed pull-on-open helper source parity; Pick Up Later and Home Bridge providers remain transport inputs, not policy authority"
     },
     {
       "sourcePath": "js/nanah_managed_mailbox_client.js",
       "appDestination": "packages/extension-source/upstream/js/nanah_managed_mailbox_client.js",
       "manifestSyncMode": "copy",
-      "boundary": "configured HTTPS encrypted-mailbox helper source parity; provider endpoint and native UI remain app-owned, mailbox storage remains ciphertext-only transport"
+      "boundary": "Pick Up Later helper source parity; provider endpoint and native UI remain app-owned, pending-update storage remains ciphertext-only transport"
     },
     {
       "sourcePath": "js/nanah_managed_local_network_client.js",
       "appDestination": "packages/extension-source/upstream/js/nanah_managed_local_network_client.js",
       "manifestSyncMode": "copy",
-      "boundary": "configured local-network gateway helper source parity; LAN reachability and discovery are transport only, local trusted-link and signature validation remain authority"
+      "boundary": "Home Bridge helper source parity; same-network reachability and discovery are transport only, local trusted-link and signature validation remain authority"
     }
   ],
   "uiHelperMirror": [
@@ -300,12 +305,35 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
       "encrypted_mailbox",
       "configured_local_network_gateway"
     ],
+    "parentFacingTransports": [
+      {
+        "label": "Send Now",
+        "transport": "live_nanah",
+        "meaning": "send the approved profile update while both devices are open and connected"
+      },
+      {
+        "label": "Pick Up Later",
+        "transport": "encrypted_mailbox",
+        "meaning": "store unreadable signed updates so the protected device can collect them when it opens"
+      },
+      {
+        "label": "Home Bridge",
+        "transport": "configured_local_network_gateway",
+        "meaning": "help trusted same-network devices exchange signed updates without making the network the authority"
+      }
+    ],
     "requiredBoundaries": [
       "transport_is_not_policy_authority",
       "local_network_reachability_is_not_authority",
       "mailbox_server_cannot_read_plaintext_policy",
       "configured_gateway_cannot_choose_target_profile_or_rules",
       "trusted_link_target_scope_revision_hash_signature_validation_required_before_apply"
+    ],
+    "requiredUiBoundaries": [
+      "normal_parent_ui_uses_send_now_pick_up_later_home_bridge_labels",
+      "advanced_details_may_show_mailbox_lan_provider_gateway_terms",
+      "protected_user_ui_never_exposes_delivery_setup_controls",
+      "apps_and_bridge_software_must_not_treat_delivery_labels_as_authority"
     ],
     "configuredLocalNetworkProvider": {
       "sourcePath": "js/nanah_managed_local_network_client.js",
@@ -325,6 +353,29 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
         "unsigned_candidate"
       ]
     }
+  },
+  "networkProductBoundary": {
+    "sameProductSeparateRuntime": true,
+    "preciseYouTubeFilteringRequiresEndpointAgent": true,
+    "endpointAgents": [
+      "browser_extension",
+      "native_mobile_app",
+      "managed_webview",
+      "managed_device_profile"
+    ],
+    "bridgeSoftwareResponsibilities": [
+      "distribute_signed_policy_revisions",
+      "host_or_relay_encrypted_pick_up_later_items",
+      "support_same_network_home_bridge_delivery",
+      "record_parent_visible_delivery_health_and_redacted_history",
+      "publish_parent_approved_list_catalogs"
+    ],
+    "bridgeSoftwareMustNotClaim": [
+      "per_video_youtube_filtering_without_endpoint_agent",
+      "server_plaintext_rule_authority",
+      "automatic_trust_from_same_wifi_or_lan",
+      "bypass_of_local_signature_target_scope_revision_hash_validation"
+    ]
   },
   "actionHistory": {
     "store": "profile.managedActionHistory",
@@ -439,6 +490,22 @@ The contract also names managed channel lists as parent-approved rule sources:
 plain text, CSV-like rows, simple JSON arrays/objects, and public HTTPS
 text/JSON URLs are accepted inputs only after preview and parent approval, and
 apps must preserve list metadata, pause state, and manual-rule separation.
+The contract now also names the parent-facing delivery vocabulary that apps and
+future bridge software should mirror: `Send Now` for live Nanah delivery,
+`Pick Up Later` for encrypted later pickup, and `Home Bridge` for same-network
+bridge delivery. These labels are only interaction language. Technical
+transport identifiers such as mailbox, LAN, provider, gateway, candidate, and
+ciphertext item remain valid in advanced details, logs, code, and protocol
+docs, but they must not become the first-run parent model or a policy authority
+shortcut.
+
+The network product boundary is explicit in the contract: a future
+FilterTube Home/School Bridge can distribute signed policy revisions, relay
+encrypted pickup items, report delivery health, and publish parent-approved
+list catalogs. It still cannot claim precise per-video, per-channel, or
+per-keyword YouTube filtering without an endpoint agent such as the extension,
+native mobile app, managed WebView, or managed device profile.
+
 The extension-owned handoff verifier
 `scripts/verify-managed-app-policy-contract.mjs` checks that the Markdown
 contract snapshot and JSON artifact are byte-equivalent as parsed data, all
@@ -446,19 +513,19 @@ declared extension helper sources exist, and, when the sibling app repo is
 available, the app runtime sync manifest still copies the contract artifact and
 managed Nanah helper sources to the expected destinations. The current
 extension-owned contract also declares `js/nanah_managed_mailbox_client.js` so
-apps can mirror the configured HTTPS encrypted-mailbox client, and
-`js/nanah_managed_local_network_client.js` so apps can mirror the configured
-local-network gateway client. This verifier is a pre-release guard; it does
-not write into the app repo.
+apps can mirror the Pick Up Later helper, and
+`js/nanah_managed_local_network_client.js` so apps can mirror the Home Bridge
+helper. This verifier is a pre-release guard; it does not write into the app
+repo.
 After this protected-account contract update, the sibling app repo must run the
 native runtime sync before any app parity claim uses the copied artifact as
 current. The same manifest also copies the extension-owned managed Nanah
-signed-send, pull-on-open, configured mailbox, and configured local-network
+signed-send, pull-on-open, Pick Up Later, and Home Bridge
 helper sources into `packages/extension-source/upstream/js/` so the downstream
 app repo can track the exact helper contracts without treating them as native
-runtime authority. LAN reachability, provider discovery, and mailbox delivery
-remain transport evidence only; trusted-link target, scope, revision, hash, and
-signature validation remain the authority boundary.
+runtime authority. Same-network reachability, provider discovery, and
+encrypted later delivery remain transport evidence only; trusted-link target,
+scope, revision, hash, and signature validation remain the authority boundary.
 The extension source mirror also carries the managed admin authority helper and
 managed parent command-center helper. Those are contract inputs for native
 settings locks and parent UI ergonomics, not standalone policy authority, and

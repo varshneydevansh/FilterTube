@@ -93,7 +93,7 @@ test('managed app policy parity doc records extension-owned app contract artifac
   for (const helper of contract.runtimeHelperSync) {
     assert.equal(helper.manifestSyncMode, 'copy');
     assert.equal(helper.appDestination, appManagedHelperDestinations[helper.sourcePath].replace('/Users/devanshvarshney/FilterTubeApp/', ''));
-    assert.match(helper.boundary, /native|server mailbox|local-network|encrypted-mailbox/);
+    assert.match(helper.boundary, /native|Pick Up Later|Home Bridge|same-network|transport|ciphertext/);
   }
   assert.deepEqual(
     contract.uiHelperMirror.map(row => row.sourcePath),
@@ -111,6 +111,27 @@ test('managed app policy parity doc records extension-owned app contract artifac
   assert.match(doc, /Required Parity Decisions/);
   assert.match(doc, /Current Gap/);
   assert.match(doc, /flowchart TD/);
+  assert.deepEqual(
+    contract.managedDelivery.parentFacingTransports.map(row => row.label),
+    ['Send Now', 'Pick Up Later', 'Home Bridge']
+  );
+  assert.deepEqual(
+    contract.managedDelivery.parentFacingTransports.map(row => row.transport),
+    ['live_nanah', 'encrypted_mailbox', 'configured_local_network_gateway']
+  );
+  assert.deepEqual(
+    contract.managedDelivery.requiredUiBoundaries,
+    [
+      'normal_parent_ui_uses_send_now_pick_up_later_home_bridge_labels',
+      'advanced_details_may_show_mailbox_lan_provider_gateway_terms',
+      'protected_user_ui_never_exposes_delivery_setup_controls',
+      'apps_and_bridge_software_must_not_treat_delivery_labels_as_authority'
+    ]
+  );
+  assert.equal(contract.networkProductBoundary.sameProductSeparateRuntime, true);
+  assert.equal(contract.networkProductBoundary.preciseYouTubeFilteringRequiresEndpointAgent, true);
+  assert.ok(contract.networkProductBoundary.endpointAgents.includes('browser_extension'));
+  assert.ok(contract.networkProductBoundary.bridgeSoftwareMustNotClaim.includes('per_video_youtube_filtering_without_endpoint_agent'));
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
 });
