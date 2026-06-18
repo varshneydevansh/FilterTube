@@ -60,6 +60,7 @@ test('external navigation audit documents runtime static website and future auth
     'Current Extension Runtime Navigation Counts',
     'Static Extension HTML Link Surfaces',
     'Website Link Surfaces',
+    'Background Dashboard Open',
     'Ignored Raw Capture Boundary',
     'Future token: `externalNavigationAuthority`',
     'extension_internal',
@@ -78,7 +79,7 @@ test('current extension runtime navigation primitive counts match the audit', ()
   assert.deepEqual(counts['js/background.js'], {
     windowOpen: 0,
     locationHref: 0,
-    browserTabsCreate: 1,
+    browserTabsCreate: 2,
     tabsApiCreate: 0,
     runtimeTabsCreate: 0,
     createBrowserTab: 0

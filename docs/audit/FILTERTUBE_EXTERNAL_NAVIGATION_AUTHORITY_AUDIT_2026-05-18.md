@@ -80,7 +80,7 @@ Current counts:
 
 ```text
 js/background.js:
-  browserAPI.tabs.create: 1
+  browserAPI.tabs.create: 2
 
 js/popup.js:
   tabsApi.create: 2
@@ -103,7 +103,7 @@ js/content/release_notes_prompt.js:
 The background `FilterTube_OpenWhatsNew` branch opens
 `request.url || WHATS_NEW_PAGE_URL` with `browserAPI.tabs.create`.
 
-Source: `js/background.js:3221-3225`.
+Source: `js/background.js:3871-3875`.
 
 The content release banner computes `targetLink = WHATS_NEW_URL || payload.link`,
 delegates to `FilterTube_OpenWhatsNew`, then falls back to `window.open` and
@@ -114,6 +114,17 @@ Source: `js/content/release_notes_prompt.js:147-170`.
 Risk: the packaged payload currently uses the extension What’s New URL, but the
 background action still accepts caller-supplied `request.url`. That belongs
 with message-trust and allowlist fixtures before any release prompt changes.
+
+### Background Dashboard Open
+
+The background `FilterTube_OpenDashboard` branch opens the fixed
+`DASHBOARD_PAGE_URL` with `browserAPI.tabs.create`.
+
+Source: `js/background.js:3883-3885`.
+
+Risk: this is extension-owned navigation, but it is still a privileged
+background tab-open side effect and should stay tied to trusted extension UI or
+explicit extension actions.
 
 ### Popup Internal Dashboard Opens
 

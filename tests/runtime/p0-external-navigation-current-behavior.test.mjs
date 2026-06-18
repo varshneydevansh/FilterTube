@@ -88,7 +88,7 @@ test('external_navigation_authority_counts_extension_runtime_open_surfaces pins 
   assert.deepEqual(counts['js/background.js'], {
     windowOpen: 0,
     locationHref: 0,
-    browserTabsCreate: 1,
+    browserTabsCreate: 2,
     tabsApiCreate: 0,
     runtimeTabsCreate: 0,
     createBrowserTab: 0
