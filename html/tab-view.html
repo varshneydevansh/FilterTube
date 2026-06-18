@@ -1049,7 +1049,7 @@
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Rule list imports</div>
-                                            <div class="help-item-body">Parent/account profiles can use Lists in Family Controls to view, import, pause, resume, check, refresh, or remove channel and keyword rule lists for protected profiles. CSV lists can use <code>channel_id,keyword,notes</code>; plain text stays channel-only for safety; JSON can provide <code>channels</code> and <code>keywords</code>. FilterTube previews what it understood, then the parent chooses protected profiles plus Main YouTube, YouTube Kids, or both. A file never decides PINs, profiles, sync targets, or viewing spaces.</div>
+                                            <div class="help-item-body">Open Filters &gt; Channel Management and choose <b>Import CSV</b>. The simple CSV shape is <code>channel_id,keyword,notes</code>. FilterTube previews valid channels, valid keywords, and skipped rows before anything is applied.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Filter All Content (per-channel)</div>
@@ -1476,7 +1476,7 @@
                                         <div class="help-item">
                                             <div class="help-item-title">Import a rule list for protected profiles</div>
                                             <div class="help-item-body">
-                                                In Accounts &amp; Sync, use Lists on a protected profile or selected protected profiles. View existing imported lists first, or choose Import List, paste a list, load a public HTTPS list URL, choose a file, or download the CSV template. FilterTube previews valid channels, valid keywords, and skipped rows, then the parent chooses Main YouTube, YouTube Kids, or both and applies after parent/account unlock. Use Lists again to pause, resume, check, refresh, or remove imported rules; manual rules stay untouched. Changed profiles can then be sent to verified devices through the normal managed-policy JSON sync path.
+                                                From the parent/account profile, open a child row and choose <b>Edit Rules</b>. In Main or Kids Channel Management, choose <b>Import CSV</b>. The CSV only adds rules; it cannot change PINs, trusted devices, viewing spaces, or sync targets. After import, use the protected profile row to send the updated policy to a verified device.
                                             </div>
                                         </div>
                                         <div class="help-item">

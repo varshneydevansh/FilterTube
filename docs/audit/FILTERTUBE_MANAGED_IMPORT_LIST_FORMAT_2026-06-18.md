@@ -289,3 +289,16 @@ Use one modal with four clear areas:
 ```
 
 Avoid showing mailbox/LAN/provider wording inside the import flow. Import is local first; delivery is the next optional step.
+
+## 2026-06-18 UX Completion Note
+
+The first parser slice was not complete from a user-flow standpoint because CSV import was only reachable through protected-profile list actions and Help text. Release-ready CSV import needs a visible entry point where users manage rules.
+
+Current completion rule:
+
+- Main YouTube: Filters -> Channel Management -> Import CSV.
+- YouTube Kids: Kids Mode -> Channel Management -> Import CSV.
+- Parent editing a protected profile: the same Main/Kids channel screens import into the protected profile being edited.
+- Ordinary parent/account profile: the same buttons import into the active profile surface.
+- The modal shows the CSV template, file/URL/paste inputs, live preview counts, skipped row counts, and the final Apply confirmation.
+- Help text should stay short and point to the UI path; this audit file owns the detailed format contract.
