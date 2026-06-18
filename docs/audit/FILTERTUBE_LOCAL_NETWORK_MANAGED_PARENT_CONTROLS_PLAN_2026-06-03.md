@@ -107,7 +107,9 @@ extension authority code.
 - [ ] Managed channel filter-list subscriptions/imports. Issue 62 asks for
   content-blocker-style channel lists that can be imported, enabled, disabled,
   and synced. This should become a parent/caregiver rule-source feature, not an
-  untrusted URL authority path.
+  untrusted URL authority path. The parent-facing flow should stay simple:
+  paste/import a list, preview channels, choose protected profiles, apply, then
+  send to verified devices when delivery is ready.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.
@@ -142,6 +144,23 @@ family list already exists. This belongs in the same managed-control direction
 because parents can choose a list once, enable or disable it per protected
 profile, and then push the resulting policy to verified child/protected
 devices.
+
+This should not feel like a network-provider setup screen. For parents, the
+mental model is a small rule library:
+
+```text
+My Lists
+  -> AI slop channels
+  -> School-safe science channels
+  -> Family block list
+
+Choose list -> Preview -> Apply to Pushy + Aanya -> Send update
+```
+
+The advanced details, such as source URL, revision hash, stale refresh state,
+and signed-device delivery, belong behind compact status labels and history
+rows. The main job is to let a parent/caregiver control several protected
+profiles without hand-entering hundreds of channels.
 
 The implementation should stay extension-first because this repository owns the
 upstream profile/settings/policy contract that downstream mobile and tablet
@@ -240,7 +259,7 @@ FilterTube's profile, PIN, managed-policy, and local-first authority model.
 **Parent-facing model**:
 
 ```text
-Add list -> Preview -> Enable for profiles/surfaces -> Apply -> Push to verified devices
+Add list -> Preview -> Choose profiles -> Apply -> Send update
 ```
 
 **Planned requirements**:
@@ -263,6 +282,33 @@ Add list -> Preview -> Enable for profiles/surfaces -> Apply -> Push to verified
   contents.
 - Protected users cannot add, remove, refresh, enable, disable, or weaken
   parent-approved lists.
+
+**Caregiver-first UI shape**:
+
+- Avoid "subscription provider" language in the normal workflow.
+- Use one clear action label: `Import List`.
+- Show a preview with counts first: `312 channels found`, `24 already present`,
+  `288 will be added`, `6 skipped`.
+- Let the parent choose Main, Kids, or both using buttons, not free-text scope
+  names.
+- Let the parent choose one or more protected profiles from the same command
+  center selection model used by bulk rules.
+- After apply, reuse the existing verified-device send offer so parents do not
+  have to understand Nanah internals.
+
+**First implementation slice**:
+
+```text
+1. Local pasted/file list import
+2. Preview and normalize entries
+3. Apply to selected protected profiles and Main/Kids surface
+4. Store source metadata on list-derived channel rows where the channel schema allows
+5. Write redacted managed action-history row
+6. Offer signed verified-device push through existing channels/rules_bundle path
+```
+
+URL refresh and scheduled subscriptions can come after the local import path is
+solid. A URL should be treated as a way to fetch data, not as a remote admin.
 
 **Safety boundaries**:
 

@@ -61,6 +61,12 @@ targeting where required, matching signed updates while locked, and
 profile-open update checks when a later-update provider exists. The stricter
 `Ask on this device first` behavior remains available for families or
 caregivers who want each later update to require local approval/unlock.
+Issue 62 is now part of the managed-parent plan as a parent rule-library
+feature: parents/caregivers should be able to import or subscribe to trusted
+channel lists, preview the channels, apply a list to selected protected
+profiles and Main/Kids surfaces, then send the resulting rule update to verified
+devices through the existing managed-policy path. The normal dashboard wording
+should say `Import List`, not expose provider/subscription authority language.
 **Goal slice**: Implementation order item 1 and Sprint 4 Task 4.1 from
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`.
 
@@ -120,6 +126,21 @@ state without exposing plaintext rule values:
   scope. The parent chooses Main or Kids through an explicit button choice, not
   a typed prompt. That send binds the parent-selected Main/Kids surface instead
   of reading the visible Nanah granular-surface selector.
+- Managed channel-list imports should use the same delegated action model as
+  selected-profile channel writes. The command center may expose `Import List`
+  for one or more selected protected profiles, but the helper must pass only
+  selected profile ids and action intent metadata. The dashboard runtime still
+  parses/previews the list, prompts for parent/account re-auth, writes one
+  profile revision per target, and offers a normal verified-device send.
+- The list UI should feel like a small library, not a transport console:
+  `Add list`, `Preview`, `Apply to profiles`, `Send update`. Source URL,
+  revision hash, stale refresh state, skipped malformed rows, and delivery
+  details belong in compact preview/history details rather than first-screen
+  copy.
+- URL-based channel lists are data sources only. They do not create authority,
+  trusted devices, or remote admin rights. The first UI slice should prefer
+  local pasted/file import, then add manual URL refresh once parsing and
+  no-work behavior are stable.
 - `Add Time` and `Add selected time` are delegated actions for profiles with
   active time limits. They require parent/account re-auth, write a revisioned
   redacted time-limit history row, and can offer an immediate verified-device
