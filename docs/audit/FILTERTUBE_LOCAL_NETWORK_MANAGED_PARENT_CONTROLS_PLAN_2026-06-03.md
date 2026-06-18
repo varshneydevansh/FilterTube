@@ -297,6 +297,12 @@ parent tool instead of a sync/debug console.
     add only channel/keyword rules, previewed invalid rows do not apply, and a
     protected profile still needs parent/account approval before verified-device
     delivery.
+  - [x] 2026-06-19 active-profile list management entry point: Settings now
+    exposes `Manage Lists` beside `Import Rule List` so a default/account user
+    can view imported lists, pause/resume them, check URL-backed sources, refresh
+    stale sources, or remove list-derived rules from the active profile without
+    hunting through protected-profile rows. It reuses the same authority checks
+    and list-library/refresh engine as Family Controls.
   - [x] Optional delivery discovery slice: after at least one protected profile
     exists and no optional provider is configured, Family Controls now shows one
     compact prompt for `Set Up Pick Up Later` and `Set Up Home Bridge`. First
