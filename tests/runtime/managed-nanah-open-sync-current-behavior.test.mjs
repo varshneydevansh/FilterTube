@@ -128,7 +128,7 @@ test('dashboard loads open-sync helper and wires policy toggle status and open/p
   assert.match(tabView, /window\.FilterTubeNanahManagedOpenSync\?\.create/);
   assert.match(tabView, /syncOnProfileOpen: linkType === 'managed_link' && syncOnProfileOpen/);
   assert.match(tabView, /Check for parent updates when this profile opens/);
-  assert.match(tabView, /Open sync/);
+  assert.match(tabView, /Pick Up Later/);
   assert.match(tabView, /await runNanahManagedOpenSync\(\{ reason: 'dashboard_open' \}\)/);
   assert.match(tabView, /await runNanahManagedOpenSync\(\{ reason: 'profile_switch' \}\)/);
 });
@@ -215,7 +215,7 @@ test('open-sync provider failure never applies or acknowledges returned mailbox 
   assert.equal(state.linkResults[0].ok, false);
   assert.equal(state.linkResults[0].reason, 'parent_offline');
   assert.equal(state.linkResults[0].pulledItemCount, 0);
-  assert.equal(helper.formatStatus(managedLink(), state, 'child-profile-1'), 'Rejected by provider');
+  assert.equal(helper.formatStatus(managedLink(), state, 'child-profile-1'), 'Provider rejected pull (just now)');
 });
 
 test('open-sync provider throw fails closed without applying or acknowledging items', async () => {
@@ -245,7 +245,7 @@ test('open-sync provider throw fails closed without applying or acknowledging it
   assert.equal(state.linkResults[0].ok, false);
   assert.equal(state.linkResults[0].reason, 'local provider unavailable');
   assert.equal(state.ackAttemptedCount, 0);
-  assert.equal(helper.formatStatus(managedLink(), state, 'child-profile-1'), 'Rejected by provider');
+  assert.equal(helper.formatStatus(managedLink(), state, 'child-profile-1'), 'Provider rejected pull (just now)');
 });
 
 test('open-sync provider applies only returned decrypted mailbox items and emits redacted ack records', async () => {
@@ -348,7 +348,7 @@ test('open-sync provider pull without ack writer records ack-unavailable without
   assert.equal(state.ackedItemCount, 0);
   assert.equal(state.ackFailedCount, 1);
   assert.equal(state.linkResults[0].ackReason, 'ack_provider_unavailable');
-  assert.equal(helper.formatStatus(managedLink(), state, 'child-profile-1'), '1 applied, 0 rejected, 1 ack failed');
+  assert.equal(helper.formatStatus(managedLink(), state, 'child-profile-1'), '1 applied, 0 rejected, 1 ack failed (just now)');
 });
 
 test('open-sync helper does not add page hot-path observers timers or network clients', () => {

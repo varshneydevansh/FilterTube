@@ -145,6 +145,12 @@ and time, then pair or send only when another device needs the update. This
 keeps the parent model direct and prevents mailbox/LAN/provider language from
 becoming the first mental model. The change does not add authority; it only
 reduces copy and layout pressure in the Accounts & Sync surface.
+The trusted-device status wording now follows that same parent model: the
+visible card says `Pick Up Later`, `Home Bridge`, and `Delivery receipts`
+instead of `Open sync`, `Local network`, and `Remote delivery`. Protocol names
+such as mailbox, local-network, provider, candidate, and ack remain in code,
+advanced docs, and tests where they describe exact transport boundaries; they
+are no longer the first label a parent has to understand.
 The subscription-check slice changes URL-backed list refresh semantics from
 blind replacement to hash-aware checking. When a checked URL returns the same
 source hash, Family Controls updates last-checked/source metadata and writes a
@@ -184,7 +190,7 @@ state without exposing plaintext rule values:
 - protected action-history row counts and latest result/scope;
 - latest redacted delivery attempt status/counts;
 - viewing-space and time-limit status.
-- verified child/protected-device link readiness for Live Send, Home Bridge,
+- verified child/protected-device link readiness for Send Now, Home Bridge,
   or Pick Up Later delivery.
 
 ## Parent-Facing States

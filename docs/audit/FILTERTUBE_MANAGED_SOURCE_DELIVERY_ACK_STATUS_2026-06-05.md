@@ -92,7 +92,7 @@ js/tab-view.js
   buildNanahManagedSourceAckRequest(...)
   pullNanahManagedSourceDeliveryAcks(...)
   runNanahManagedSourceAckSync(...)
-  Remote delivery trusted-link status row
+  Delivery receipts trusted-link status row
 ```
 
 ## Safety Boundary
@@ -101,7 +101,7 @@ js/tab-view.js
 runtime source-side mailbox/local-network ack record helper: present
 runtime source-side provider-gated ack pull: present
 runtime source-side trusted-link status persistence: present
-runtime parent-visible Remote delivery row: present
+runtime parent-visible Delivery receipts row: present
 runtime browser HTTPS mailbox ack client: present behind explicit config
 runtime provider authority: absent
 runtime unmatched ack payload apply: absent

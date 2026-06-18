@@ -187,7 +187,8 @@ test('local-network provider hook is docs-backed and linked from managed parent 
   const inventory = read(inventoryPath);
 
   assert.match(doc, /Dashboard\/profile-open provider hook and redacted provider ack\s+handoff are present/);
-  assert.match(doc, /Built-in LAN\s+peer discovery, LAN transport, server mailbox pull, and server mailbox decrypt\s+transport remain absent/);
+  assert.match(doc, /Built-in LAN\s+peer discovery and LAN transport remain absent/);
+  assert.match(doc, /Browser HTTPS mailbox\s+pull\/decrypt is handled by the separate configured mailbox client and does not\s+grant local-network authority/);
   assert.match(doc, /window\.FilterTubeManagedPolicyLocalNetwork/);
   assert.match(doc, /discoverManagedPolicyCandidates/);
   assert.match(doc, /ackManagedPolicyCandidates/);
@@ -226,13 +227,13 @@ test('dashboard source wires provider-gated local-network discovery without YouT
   assert.match(source, /ackManagedPolicyCandidates/);
   assert.match(source, /ackLocalNetworkCandidates/);
   assert.match(source, /remote_policy\.local_network\.ack/);
-  assert.match(source, /Local-network ack recorded/);
+  assert.match(source, /Home Bridge receipt recorded/);
   assert.match(source, /async function runNanahManagedLocalNetworkSync\(\{ reason = 'dashboard_open' \} = \{\}\)/);
   assert.match(source, /handleNanahIncomingManagedLocalNetworkCandidate\(candidate\)/);
   assert.match(source, /recordManagedOpenSyncAckHistory\(\{\s*request,\s*records: ackRecords,\s*ackResult,\s*transport: 'local_network'/s);
   assert.match(source, /await runNanahManagedLocalNetworkSync\(\{ reason: 'dashboard_open' \}\)/);
   assert.match(source, /await runNanahManagedLocalNetworkSync\(\{ reason: 'profile_switch' \}\)/);
-  assert.match(source, /Local network/);
+  assert.match(source, /Home Bridge/);
 });
 
 test('dashboard source wires provider-gated parent delivery ack status without YouTube hot-path primitives', () => {
@@ -252,7 +253,7 @@ test('dashboard source wires provider-gated parent delivery ack status without Y
   assert.match(source, /handleNanahIncomingManagedRemoteDeliveryAck\(ackPayload, \{ silent: true \}\)/);
   assert.match(source, /await runNanahManagedSourceAckSync\(\{ reason: 'dashboard_open' \}\)/);
   assert.match(source, /await runNanahManagedSourceAckSync\(\{ reason: 'profile_switch' \}\)/);
-  assert.match(source, /Remote delivery/);
+  assert.match(source, /Delivery receipts/);
 
   const sliceStart = source.indexOf('function getNanahManagedSourceAckProvider()');
   const sliceEnd = source.indexOf('async function configureNanahTrustedLink(link)', sliceStart);

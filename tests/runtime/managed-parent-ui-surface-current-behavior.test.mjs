@@ -342,8 +342,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   const tabViewHtml = read('html/tab-view.html');
 
   assert.match(doc, /Status\*\*: Spec, dashboard protected-profile status, command-center overview/);
-  assert.match(doc, /parent-facing protection strip, a parent-reauthed encrypted mailbox endpoint\s+configuration row, plus labeled Delivery\/Device\/History row details/);
-  assert.match(doc, /parent-reauthed encrypted mailbox endpoint\s+configuration row/);
+  assert.match(doc, /parent-facing protection strip, a\s+parent-reauthed Pick Up Later endpoint\s+configuration row, plus labeled Delivery\/Device\/History row details/);
+  assert.match(doc, /parent-reauthed Pick Up Later endpoint\s+configuration row/);
   assert.match(doc, /Direct rule bulk\s+writes\s+for keyword, channel, and video ID rules are now present/);
   assert.match(doc, /Parent-Facing States/);
   assert.match(doc, /UI Boundaries/);
@@ -413,8 +413,9 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /ft-managed-command-center__bulk-group/);
   assert.match(helperSource, /ft-managed-command-center__bulk-group-label/);
   assert.match(helperSource, /ft-managed-command-center__provider/);
-  assert.match(helperSource, /Set Up Later Updates/);
-  assert.match(helperSource, /Edit Later Updates/);
+  assert.match(helperSource, /Set Up Pick Up Later/);
+  assert.match(helperSource, /Edit Pick Up Later/);
+  assert.match(doc, /visible card says `Pick Up Later`, `Home Bridge`, and `Delivery receipts`/);
   assert.match(helperSource, /configure_mailbox/);
   assert.match(helperSource, /group: 'rules'/);
   assert.match(helperSource, /group: 'send'/);

@@ -48,15 +48,15 @@
                 ? helpers.getManagedMailboxConfigSummary
                 : () => ({
                     configured: false,
-                    label: 'Later updates off',
-                    detail: 'Live P2P can send now. Later delivery is only for encrypted pickup when the protected device is offline.',
+                    label: 'Pick Up Later off',
+                    detail: 'Live Send works when both devices are open. Pick Up Later is only for updates a protected device should collect after it opens.',
                     tone: 'warning'
                 }),
             getManagedLocalNetworkConfigSummary: typeof helpers.getManagedLocalNetworkConfigSummary === 'function'
                 ? helpers.getManagedLocalNetworkConfigSummary
                 : () => ({
                     configured: false,
-                    label: 'Home bridge off',
+                    label: 'Home Bridge off',
                     detail: 'A Home Bridge needs an explicit trusted FilterTube bridge; network discovery is never authority.',
                     tone: 'warning'
                 }),
@@ -778,7 +778,7 @@
                 },
                 {
                     text: 'Pair a verified device only when remote delivery is needed',
-                    title: 'Live P2P, later pickup, and same-network delivery appear after a protected profile exists.'
+                    title: 'Send Now, Pick Up Later, and Home Bridge delivery appear after a protected profile exists.'
                 }
             ].forEach((item) => {
                 const step = document.createElement('li');
@@ -916,8 +916,8 @@
         if (shouldShowProviderSetup) {
             const providerIntro = document.createElement('div');
             providerIntro.className = 'ft-managed-command-center__provider-intro';
-            providerIntro.textContent = 'Optional ways to send';
-            providerIntro.title = 'Live send is the normal path. These options are only for pick-up-later or a trusted home network bridge.';
+            providerIntro.textContent = 'Optional delivery';
+            providerIntro.title = 'Send Now is the normal path. These options are only for Pick Up Later or a trusted Home Bridge.';
             panel.appendChild(providerIntro);
         }
 
@@ -969,8 +969,8 @@
         localCopy.className = 'ft-managed-command-center__provider-copy';
         const localTitle = document.createElement('strong');
         localTitle.textContent = localNetwork.configured
-            ? (localNetwork.label || 'Home network bridge is ready')
-            : 'Home network bridge is off';
+            ? (localNetwork.label || 'Home Bridge is ready')
+            : 'Home Bridge is off';
         const localDetail = document.createElement('span');
         localDetail.textContent = summary.profileCount > 0
             ? (localNetwork.detail || 'Use this only with a trusted FilterTube-compatible bridge on your home or school network.')

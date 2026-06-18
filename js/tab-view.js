@@ -12956,8 +12956,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!endpoint) {
             return {
                 configured: false,
-                label: 'Later updates off',
-                detail: 'Live P2P can send now. Set up later updates only when protected devices need offline pickup.',
+                label: 'Pick Up Later off',
+                detail: 'Send Now works when both devices are open. Set up Pick Up Later only when protected devices need to collect updates after opening.',
                 tone: 'warning'
             };
         }
@@ -12972,15 +12972,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!configured) {
             return {
                 configured: false,
-                label: 'Later updates need review',
-                detail: `${host} is saved but is not ready for offline pickup.`,
+                label: 'Pick Up Later needs review',
+                detail: `${host} is saved but is not ready for protected devices to pick up updates.`,
                 tone: 'warning'
             };
         }
         return {
             configured: true,
-            label: `Later updates ready: ${host}`,
-            detail: 'Offline pickup is available. The protected device still accepts only trusted parent updates.',
+            label: `Pick Up Later ready: ${host}`,
+            detail: 'Pick Up Later is available. The protected device still accepts only trusted parent updates.',
             tone: 'success'
         };
     }
@@ -13032,7 +13032,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const current = readNanahManagedMailboxServerConfig();
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
-            title: 'Pick Up Updates Later',
+            title: 'Pick Up Later',
             message: 'Use this only when a parent may change rules while the protected device is offline. The child device can pick up the update next time it opens.',
             details: [
                 'This is advanced and separate from normal live send.',
@@ -13052,7 +13052,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 endpointHost: ''
             });
             await refreshProfilesUI();
-            UIComponents.showToast('Offline pickup disabled', 'success');
+            UIComponents.showToast('Pick Up Later disabled', 'success');
             return;
         }
         const endpoint = await showPromptModal({
@@ -13072,7 +13072,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 endpointHost: ''
             });
             await refreshProfilesUI();
-            UIComponents.showToast('Offline pickup disabled', 'success');
+            UIComponents.showToast('Pick Up Later disabled', 'success');
             return;
         }
         const token = await showPromptModal({
@@ -13099,7 +13099,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? client.createProvider(nextConfig)
             : null;
         if (!provider || provider.configured !== true || !hasNanahManagedMailboxUploadWriter(provider)) {
-            UIComponents.showToast('Offline pickup endpoint must be public HTTPS and supported by FilterTube', 'error');
+            UIComponents.showToast('Pick Up Later endpoint must be public HTTPS and supported by FilterTube', 'error');
             return;
         }
         writeNanahManagedMailboxServerConfig(nextConfig);
@@ -13108,7 +13108,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             endpointHost: getManagedMailboxEndpointHostFromConfig(nextConfig)
         });
         await refreshProfilesUI();
-        UIComponents.showToast('Offline pickup saved', 'success');
+        UIComponents.showToast('Pick Up Later saved', 'success');
     }
 
     async function configureNanahManagedLocalNetworkProvider() {
@@ -14245,8 +14245,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!endpoint) {
             return {
                 configured: false,
-                label: 'Home bridge off',
-                detail: 'Live send and pick-up-later can still work. Set this up only if you run a trusted FilterTube bridge.',
+                label: 'Home Bridge off',
+                detail: 'Send Now and Pick Up Later can still work. Set this up only if you run a trusted FilterTube bridge.',
                 tone: 'warning'
             };
         }
@@ -15058,7 +15058,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const openSyncRow = document.createElement('div');
                     openSyncRow.className = 'nanah-trusted-link__policy-row';
                     const openSyncLabel = document.createElement('span');
-                    openSyncLabel.textContent = 'Open sync';
+                    openSyncLabel.textContent = 'Pick Up Later';
                     const openSyncValue = document.createElement('strong');
                     openSyncValue.textContent = formatNanahManagedOpenSyncStatus(entry);
                     openSyncRow.appendChild(openSyncLabel);
@@ -15068,7 +15068,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const localNetworkRow = document.createElement('div');
                     localNetworkRow.className = 'nanah-trusted-link__policy-row';
                     const localNetworkLabel = document.createElement('span');
-                    localNetworkLabel.textContent = 'Local network';
+                    localNetworkLabel.textContent = 'Home Bridge';
                     const localNetworkValue = document.createElement('strong');
                     localNetworkValue.textContent = formatNanahManagedLocalNetworkSyncStatus(entry);
                     localNetworkRow.appendChild(localNetworkLabel);
@@ -15080,7 +15080,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const deliveryAckRow = document.createElement('div');
                     deliveryAckRow.className = 'nanah-trusted-link__policy-row';
                     const deliveryAckLabel = document.createElement('span');
-                    deliveryAckLabel.textContent = 'Remote delivery';
+                    deliveryAckLabel.textContent = 'Delivery receipts';
                     const deliveryAckValue = document.createElement('strong');
                     deliveryAckValue.textContent = formatNanahManagedSourceAckSyncStatus(entry);
                     deliveryAckRow.appendChild(deliveryAckLabel);

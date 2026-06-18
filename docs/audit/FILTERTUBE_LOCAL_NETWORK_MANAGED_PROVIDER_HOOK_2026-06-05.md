@@ -86,8 +86,10 @@ js/tab-view.js
   protected ack-history rows via recordManagedOpenSyncAckHistory(...)
 ```
 
-The dashboard trusted-link card now shows a `Local network` status row for
-managed replica links. Visible states are feedback only:
+The dashboard trusted-link card now shows a parent-facing `Home Bridge` status
+row for managed replica links. Earlier proof called the same row `Local
+network`; that remains a transport/helper term, not the normal parent label.
+Visible states are feedback only:
 
 ```text
 Off

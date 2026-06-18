@@ -121,8 +121,10 @@ First-time protected-device setup now presents this as part of the normal
 still available, but it deliberately disables profile-open pulls until the
 protected device is locally approved/unlocked.
 
-The trusted-link card now shows an `Open sync` row with one of the visible
-states:
+The trusted-link card now shows a parent-facing `Pick Up Later` row for this
+status. Earlier proof called the same visible row `Open sync`; that remains the
+technical helper name, not the parent-facing label. The row can show one of
+these states:
 
 ```text
 Off
