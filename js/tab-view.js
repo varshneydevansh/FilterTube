@@ -13216,8 +13216,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!endpoint) {
             return {
                 configured: false,
-                label: 'Saved updates off',
-                detail: 'Send Update works when both devices are open. Set up saved updates only when protected devices need to collect parent-approved updates after opening.',
+                label: 'Opens later off',
+                detail: 'Send Update works when both devices are open. Set this up only when a verified protected device must collect a parent-approved update after opening later.',
                 tone: 'warning'
             };
         }
@@ -13232,15 +13232,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!configured) {
             return {
                 configured: false,
-                label: 'Saved updates need review',
+                label: 'Later updates need review',
                 detail: `${host} is saved but is not ready for protected devices to collect updates.`,
                 tone: 'warning'
             };
         }
         return {
             configured: true,
-            label: `Saved updates ready: ${host}`,
-            detail: 'Saved updates are available. The protected device still accepts only trusted parent updates.',
+            label: `Opens later ready: ${host}`,
+            detail: 'A verified protected device can check for signed parent updates after opening. It still accepts only trusted parent updates.',
             tone: 'success'
         };
     }
@@ -13276,7 +13276,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahDeliveryMailboxDetail.textContent = mailbox.configured
                 ? mailbox.detail
                 : (!hasProtectedProfiles
-                    ? 'Create a protected profile first. Internet Pickup is only for verified devices that open later.'
+                    ? 'Create a protected profile first. Later updates are only for verified protected devices.'
                     : (!hasVerifiedDevice
                         ? 'Pair a verified device first. Most families can use live Send Update.'
                         : mailbox.detail));
@@ -13285,8 +13285,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahDeliveryMailboxBtn.textContent = mailbox.configured ? 'Edit' : 'Set Up';
             ftNanahDeliveryMailboxBtn.disabled = !mailboxCanConfigure;
             ftNanahDeliveryMailboxBtn.title = mailboxCanConfigure
-                ? 'Optional advanced path for signed parent updates that protected devices collect after opening.'
-                : 'Create a protected profile and pair a verified device before setting up saved updates.';
+                ? 'Optional advanced path for signed parent updates that protected devices collect after opening later.'
+                : 'Create a protected profile and pair a verified device before setting up later updates.';
         }
 
         const local = summarizeManagedLocalNetworkProviderConfig();
@@ -13302,7 +13302,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahDeliveryLocalDetail.textContent = local.configured
                 ? local.detail
                 : (!hasProtectedProfiles
-                    ? 'Create a protected profile first. Home Bridge is only for verified devices on your network.'
+                    ? 'Create a protected profile first. Same-network delivery is only for verified protected devices.'
                     : (!hasVerifiedDevice
                         ? 'Pair a verified device first. Same-network reachability is never authority.'
                         : local.detail));
@@ -13312,7 +13312,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahDeliveryLocalBtn.disabled = !localCanConfigure;
             ftNanahDeliveryLocalBtn.title = localCanConfigure
                 ? 'Optional advanced path for a trusted FilterTube bridge on your own network.'
-                : 'Create a protected profile and pair a verified device before setting up a home bridge.';
+                : 'Create a protected profile and pair a verified device before setting up same-network delivery.';
         }
     }
 
@@ -14614,8 +14614,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!endpoint) {
             return {
                 configured: false,
-                label: 'Home Bridge off',
-                detail: 'Send Update and saved updates can still work. Set this up only if you run a trusted FilterTube bridge.',
+                label: 'Home/school network off',
+                detail: 'Send Update can still work. Set this up only if you run a trusted FilterTube bridge on your own network.',
                 tone: 'warning'
             };
         }
@@ -14623,15 +14623,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!configured) {
             return {
                 configured: false,
-                label: 'Home bridge needs review',
+                label: 'Home/school network needs review',
                 detail: `${host} is saved but is not ready to deliver protected updates.`,
                 tone: 'warning'
             };
         }
         return {
             configured: true,
-            label: `Home Bridge ready: ${host}`,
-            detail: 'Home Bridge delivery is available. The protected device still accepts only trusted parent updates.',
+            label: `Home/school network ready: ${host}`,
+            detail: 'Same-network delivery is available. The protected device still accepts only trusted parent updates.',
             tone: 'success'
         };
     }

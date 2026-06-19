@@ -480,6 +480,14 @@ parent tool instead of a sync/debug console.
     history, and protocol boundaries need precision. This is copy/UI state only;
     trusted-link, target-profile, signature/hash/revision, provider, and runtime
     validation gates are unchanged.
+  - [x] 2026-06-19 Family Device Updates later-delivery wording slice: the
+    first-read strip now says `If the other device opens later`, `Later over
+    internet`, and `Same network`/`Home/school network` so parents see the task
+    before transport names. Internet Pickup and Home Bridge remain the precise
+    provider names in setup dialogs, history, audit docs, and app contract
+    boundaries. This is copy/UI state only; trusted-link, target-profile,
+    signature/hash/revision, provider, and runtime validation gates are
+    unchanged.
   - [x] Family Device Updates default-mode slice: the first-run Accounts & Sync
     mode is now `Update protected device` / `parent_control` instead of
     `Copy once`. A previously saved user mode is still respected, child

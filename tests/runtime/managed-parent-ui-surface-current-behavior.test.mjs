@@ -493,11 +493,12 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /<strong id="ftNanahModeTitle" class="nanah-sync-mode-spotlight__title">Update a protected device<\/strong>/);
   assert.match(tabViewHtml, /How parent updates can reach verified devices/);
   assert.match(tabViewHtml, /Live update/);
-  assert.match(tabViewHtml, /Saved updates/);
-  assert.match(tabViewHtml, /Home Bridge/);
+  assert.match(tabViewHtml, /If the other device opens later/);
+  assert.match(tabViewHtml, /Later over internet/);
+  assert.match(tabViewHtml, /Same network/);
+  assert.match(tabViewHtml, /Home\/school network off/);
   assert.match(tabViewHtml, /id="ftNanahDeliveryAdvanced"/);
-  assert.match(tabViewHtml, /Optional saved updates/);
-  assert.match(tabViewHtml, /Use this only when the protected device should collect a parent-approved update after it opens/);
+  assert.match(tabViewHtml, /Advanced delivery for families or schools that run a compatible pickup or home-network bridge/);
   assert.match(tabViewHtml, /Advanced options/);
   assert.match(tabViewHtml, /Meeting service link/);
   assert.match(tabViewHtml, /keep both devices open/);
@@ -558,8 +559,9 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /function renderNanahDeliveryPathStrip\(\)/);
   assert.match(source, /function getNanahFamilyDeliveryReadinessSummary\(/);
   assert.match(source, /ftNanahDeliveryAdvanced && \(mailbox\.configured === true \|\| local\.configured === true\)/);
-  assert.match(doc, /runtime Family Device Updates optional delivery disclosure: present and auto-opens only for configured Internet Pickup\/Home Bridge providers/);
+  assert.match(doc, /runtime Family Device Updates later-delivery disclosure: present and auto-opens only for configured Internet Pickup\/Home Bridge providers/);
   assert.match(plan, /Family Device Updates optional delivery collapse/);
+  assert.match(plan, /Family Device Updates later-delivery wording slice/);
   assert.match(source, /ftNanahDeliveryMailboxBtn\.disabled = !mailboxCanConfigure/);
   assert.match(source, /ftNanahDeliveryLocalBtn\.disabled = !localCanConfigure/);
   assert.match(source, /ftNanahDeliveryMailboxBtn/);

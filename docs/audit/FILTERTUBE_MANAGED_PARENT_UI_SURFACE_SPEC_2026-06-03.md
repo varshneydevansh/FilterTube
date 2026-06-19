@@ -155,12 +155,12 @@ code, advanced docs, and tests where they describe exact transport boundaries;
 they are no longer the first label a parent has to understand.
 The Family Device Updates delivery-path strip now keeps the same parent model on
 the pairing surface itself: `Live update` is the default path when both devices
-are open. `Saved updates` and `Home Bridge` now sit behind an `Optional
-saved updates` disclosure so families first see the normal live Send Update
-path. If Internet Pickup or Home Bridge is already configured, the disclosure
-opens automatically to keep that existing send path visible. The strip is status
-and setup navigation only; it does not create hidden background sync, LAN
-discovery authority, or YouTube runtime work.
+are open. The first screen now says `If the other device opens later`, `Later
+over internet`, and `Same network` instead of leading with provider names. If
+Internet Pickup or Home Bridge is already configured, the disclosure opens
+automatically to keep that existing send path visible. The strip is status and
+setup navigation only; it does not create hidden background sync, LAN discovery
+authority, or YouTube runtime work.
 The subscription-check slice changes URL-backed list refresh semantics from
 blind replacement to hash-aware checking. When a checked URL returns the same
 source hash, Family Controls updates last-checked/source metadata and writes a
@@ -397,7 +397,7 @@ runtime managed command-center post-rule-write granular verified-device push: pr
 runtime managed command-center post-viewing/time-limit verified-device push: present
 runtime connected verified-device live P2P managed policy send: present
 runtime provider-gated Internet Pickup/Home Bridge delivery handoff from command center: present
-runtime Family Device Updates optional delivery disclosure: present and auto-opens only for configured Internet Pickup/Home Bridge providers
+runtime Family Device Updates later-delivery disclosure: present and auto-opens only for configured Internet Pickup/Home Bridge providers
 runtime protected redacted push-attempt history rows: present
 runtime protected redacted push-attempt row feedback in command center: present
 runtime browser HTTPS mailbox upload/pull client: present behind explicit config
