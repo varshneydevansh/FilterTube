@@ -13244,39 +13244,70 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function renderNanahDeliveryPathStrip() {
+        const deliverySummary = getNanahFamilyDeliveryReadinessSummary();
+        const hasProtectedProfiles = deliverySummary.protectedProfileCount > 0;
+        const hasVerifiedDevice = deliverySummary.verifiedProfileCount > 0;
         const liveReady = nanahSessionState.connected === true && nanahSessionState.sasConfirmed === true && !!nanahClient;
         if (ftNanahDeliveryLiveCard) {
             ftNanahDeliveryLiveCard.dataset.tone = liveReady ? 'success' : 'neutral';
         }
         if (ftNanahDeliveryLiveLabel) {
-            ftNanahDeliveryLiveLabel.textContent = liveReady ? 'Ready to send now' : 'Open both devices';
+            ftNanahDeliveryLiveLabel.textContent = liveReady
+                ? 'Ready to send now'
+                : (hasProtectedProfiles ? 'Open both devices' : 'Create a protected profile');
         }
         if (ftNanahDeliveryLiveDetail) {
             ftNanahDeliveryLiveDetail.textContent = liveReady
                 ? 'Use Send Update after reviewing the selected profile and allowed area.'
-                : 'Best default for parents: pair, verify, then send while both devices are open.';
+                : (hasProtectedProfiles
+                    ? 'Best default for parents: pair, verify, then send while both devices are open.'
+                    : 'Start with one child/user profile, then pair only if another device needs the same rules.');
         }
 
         const mailbox = summarizeManagedMailboxServerConfig();
+        const mailboxCanConfigure = mailbox.configured === true || hasVerifiedDevice;
         if (ftNanahDeliveryMailboxCard) {
-            ftNanahDeliveryMailboxCard.dataset.tone = mailbox.configured ? 'success' : 'optional';
+            ftNanahDeliveryMailboxCard.dataset.tone = mailbox.configured ? 'success' : (mailboxCanConfigure ? 'optional' : 'neutral');
         }
         if (ftNanahDeliveryMailboxLabel) ftNanahDeliveryMailboxLabel.textContent = mailbox.label;
-        if (ftNanahDeliveryMailboxDetail) ftNanahDeliveryMailboxDetail.textContent = mailbox.detail;
+        if (ftNanahDeliveryMailboxDetail) {
+            ftNanahDeliveryMailboxDetail.textContent = mailbox.configured
+                ? mailbox.detail
+                : (!hasProtectedProfiles
+                    ? 'Create a protected profile first. Internet Pickup is only for verified devices that open later.'
+                    : (!hasVerifiedDevice
+                        ? 'Pair a verified device first. Most families can use live Send Update.'
+                        : mailbox.detail));
+        }
         if (ftNanahDeliveryMailboxBtn) {
             ftNanahDeliveryMailboxBtn.textContent = mailbox.configured ? 'Edit' : 'Set Up';
-            ftNanahDeliveryMailboxBtn.title = 'Optional advanced path for signed parent updates that protected devices collect after opening.';
+            ftNanahDeliveryMailboxBtn.disabled = !mailboxCanConfigure;
+            ftNanahDeliveryMailboxBtn.title = mailboxCanConfigure
+                ? 'Optional advanced path for signed parent updates that protected devices collect after opening.'
+                : 'Create a protected profile and pair a verified device before setting up automatic pickup.';
         }
 
         const local = summarizeManagedLocalNetworkProviderConfig();
+        const localCanConfigure = local.configured === true || hasVerifiedDevice;
         if (ftNanahDeliveryLocalCard) {
-            ftNanahDeliveryLocalCard.dataset.tone = local.configured ? 'success' : 'optional';
+            ftNanahDeliveryLocalCard.dataset.tone = local.configured ? 'success' : (localCanConfigure ? 'optional' : 'neutral');
         }
         if (ftNanahDeliveryLocalLabel) ftNanahDeliveryLocalLabel.textContent = local.label;
-        if (ftNanahDeliveryLocalDetail) ftNanahDeliveryLocalDetail.textContent = local.detail;
+        if (ftNanahDeliveryLocalDetail) {
+            ftNanahDeliveryLocalDetail.textContent = local.configured
+                ? local.detail
+                : (!hasProtectedProfiles
+                    ? 'Create a protected profile first. Home Bridge is only for verified devices on your network.'
+                    : (!hasVerifiedDevice
+                        ? 'Pair a verified device first. Same-network reachability is never authority.'
+                        : local.detail));
+        }
         if (ftNanahDeliveryLocalBtn) {
             ftNanahDeliveryLocalBtn.textContent = local.configured ? 'Edit' : 'Set Up';
-            ftNanahDeliveryLocalBtn.title = 'Optional advanced path for a trusted FilterTube bridge on your own network.';
+            ftNanahDeliveryLocalBtn.disabled = !localCanConfigure;
+            ftNanahDeliveryLocalBtn.title = localCanConfigure
+                ? 'Optional advanced path for a trusted FilterTube bridge on your own network.'
+                : 'Create a protected profile and pair a verified device before setting up a home bridge.';
         }
     }
 
@@ -13658,6 +13689,39 @@ document.addEventListener('DOMContentLoaded', async () => {
             mailboxReady,
             localNetworkReady: localReady
         };
+    }
+
+    function getNanahFamilyDeliveryReadinessSummary(profilesV4 = profilesV4Cache) {
+        const root = safeObject(profilesV4);
+        const profiles = safeObject(root.profiles);
+        const activeProfileId = normalizeString(root.activeProfileId) || 'default';
+        const seen = new Set();
+        const ids = [];
+        const addId = (profileId) => {
+            const targetId = normalizeString(profileId);
+            if (!targetId || targetId === 'default' || targetId === activeProfileId || seen.has(targetId)) return;
+            if (!safeObject(profiles)[targetId]) return;
+            if (!canActiveProfileManageProfile(root, targetId)) return;
+            seen.add(targetId);
+            ids.push(targetId);
+        };
+        getAccountIds(root).forEach((accountId) => {
+            addId(accountId);
+            getChildrenForAccount(root, accountId).forEach(addId);
+        });
+        return ids.reduce((acc, profileId) => {
+            const summary = getManagedSyncTargetSummary(profileId);
+            acc.protectedProfileCount += 1;
+            if (summary.totalCount > 0 || summary.targetCount > 0) acc.verifiedProfileCount += 1;
+            if (summary.readyCount > 0) acc.readyProfileCount += 1;
+            if (summary.openCheckCount > 0) acc.automaticProfileCount += 1;
+            return acc;
+        }, {
+            protectedProfileCount: 0,
+            verifiedProfileCount: 0,
+            readyProfileCount: 0,
+            automaticProfileCount: 0
+        });
     }
 
     async function purgeNanahManagedMailboxQueueForTrustedLink(link, { reason = 'trusted_link_removed' } = {}) {

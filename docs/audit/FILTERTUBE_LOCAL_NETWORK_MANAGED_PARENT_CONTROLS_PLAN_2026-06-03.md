@@ -463,6 +463,11 @@ parent tool instead of a sync/debug console.
     and `Same network` paths. The strip is status-only plus optional setup
     buttons for Internet Pickup/Home Bridge; it does not create policy
     authority, background sync, LAN discovery, or YouTube page hot-path work.
+  - [x] Delivery-path readiness gating slice: the same strip now derives a
+    parent-scoped protected-profile/verified-device summary before enabling new
+    Internet Pickup or Home Bridge setup. Already configured providers remain
+    editable, but first-time setup waits until a protected profile has a verified
+    device link, keeping the parent flow profile -> pair -> optional pickup.
   - [x] Trusted-device card wording slice: saved managed links now show
     `Allowed areas`, `Usual area`, `Update behavior`, `Matching parent updates`,
     `Next connection`, `Everyday protection`, `Where updates land`, and

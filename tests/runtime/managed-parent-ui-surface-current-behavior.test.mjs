@@ -510,6 +510,9 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /function summarizeManagedMailboxServerConfig\(\)/);
   assert.match(source, /async function configureNanahManagedMailboxServer\(\)/);
   assert.match(source, /function renderNanahDeliveryPathStrip\(\)/);
+  assert.match(source, /function getNanahFamilyDeliveryReadinessSummary\(/);
+  assert.match(source, /ftNanahDeliveryMailboxBtn\.disabled = !mailboxCanConfigure/);
+  assert.match(source, /ftNanahDeliveryLocalBtn\.disabled = !localCanConfigure/);
   assert.match(source, /ftNanahDeliveryMailboxBtn/);
   assert.match(source, /ftNanahDeliveryLocalBtn/);
   assert.match(source, /NANAH_MANAGED_MAILBOX_CONFIG_KEY = 'ftManagedMailboxServerConfig'/);

@@ -1047,6 +1047,11 @@ html[data-theme="dark"] .nanah-delivery-card[data-tone="optional"] {
         linear-gradient(180deg, rgba(91, 66, 28, 0.26), rgba(54, 43, 27, 0.24));
 }
 
+html[data-theme="dark"] .nanah-delivery-card[data-tone="neutral"] {
+    border-color: rgba(148, 163, 184, 0.14);
+    background: rgba(16, 22, 31, 0.58);
+}
+
 html[data-theme="dark"] .nanah-delivery-card__eyebrow {
     color: #f3b7aa;
 }
@@ -1894,6 +1899,11 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
         linear-gradient(180deg, rgba(255, 251, 241, 0.9), rgba(250, 246, 235, 0.82));
 }
 
+.nanah-delivery-card[data-tone="neutral"] {
+    border-color: rgba(96, 120, 145, 0.12);
+    background: rgba(255, 255, 255, 0.58);
+}
+
 .nanah-delivery-card > div {
     display: grid;
     gap: 0.22rem;
@@ -1930,6 +1940,11 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     min-height: 2.25rem;
     padding-inline: 0.9rem;
     white-space: nowrap;
+}
+
+.nanah-delivery-card > button:disabled {
+    cursor: not-allowed;
+    opacity: 0.52;
 }
 
 .nanah-sync-intro__eyebrow,
