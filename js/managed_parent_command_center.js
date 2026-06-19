@@ -766,7 +766,7 @@
             : 'Setup needed';
         meta.title = summary.profileCount > 0
             ? 'Protected profiles shown here can be managed only by the current parent/account authority.'
-            : 'Create a protected profile first; optional later and same-network delivery are hidden until a protected profile exists.';
+            : 'Create a protected profile first; verified-device update options appear after there is a profile to protect.';
         titleWrap.append(title, body);
         heading.append(titleWrap, meta);
         panel.appendChild(heading);
@@ -800,8 +800,8 @@
                     title: 'Rules are edited from the parent/account surface, not from the child surface.'
                 },
                 {
-                    text: 'Pair a verified device only when remote delivery is needed',
-                    title: 'Send Update, Internet Pickup, and Home Bridge delivery appear after a protected profile exists.'
+                    text: 'Pair another device only when it also needs these rules',
+                    title: 'Send Update appears after a protected profile exists. Internet Pickup and Home Bridge stay optional.'
                 }
             ].forEach((item) => {
                 const step = document.createElement('li');
@@ -858,7 +858,7 @@
 
             const setupNote = document.createElement('div');
             setupNote.className = 'ft-managed-command-center__setup-note';
-            setupNote.textContent = 'Later pickup and same-network setup are optional delivery tools. They are not needed for local-only control.';
+            setupNote.textContent = 'If the protected profile stays on this device, no device pairing is needed. Pair only when another verified device should receive the same parent-approved rules.';
             setupNote.title = 'Those options do not grant authority; a trusted profile link and local validation still decide whether an update applies.';
             setup.appendChild(setupNote);
             panel.appendChild(setup);

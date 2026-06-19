@@ -403,6 +403,11 @@ parent tool instead of a sync/debug console.
     options` plus `Meeting service link` instead of making parent-facing copy
     read like a protocol console. Runtime trust, provider gates, and
     source/replica policy validation are unchanged.
+  - [x] Empty Family Controls setup wording slice: the first setup note now says
+    no device pairing is needed when the protected profile stays on the current
+    device, and asks parents to pair only when another verified device should
+    receive the same approved rules. Optional Internet Pickup/Home Bridge
+    provider hooks remain hidden until a protected profile exists.
   - [x] Protected-target wording slice: the Accounts & Sync send panel now says
     `Protected profile on other device` and `Use the profile open there`
     instead of `Remote target profile` and `remote active profile`. This is a
