@@ -364,11 +364,12 @@ parent tool instead of a sync/debug console.
     keys and older audit terminology remain unchanged so existing history rows
     and transport validation do not drift.
   - [x] Settings handoff wording slice: the Settings import/export shortcut now
-    says `Send to Device` instead of `Sync from other device` or a transport
-    label, and its title points to Accounts & Sync > Family Device Updates for
-    pairing a verified device or sending reviewed profile updates. This keeps
-    backup import, rule-list import, and verified-device update flows visually
-    separate.
+    says `Device Updates` instead of `Sync from other device`, `Send to Device`,
+    or a transport label, and its title points to Accounts & Sync > Family
+    Device Updates for pairing a verified device or sending reviewed profile
+    updates. This keeps backup import, rule-list import, and verified-device
+    update flows visually separate without implying that the button sends
+    immediately.
   - [x] Settings-to-device-updates navigation slice: the Settings `Device
     Updates` shortcut now switches to Accounts & Sync, scrolls directly to the
     Family Device Updates card, gives that card programmatic focus, and applies
