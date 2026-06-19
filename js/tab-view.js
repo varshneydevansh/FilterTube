@@ -11719,7 +11719,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 reconnectFastInput.checked = getNanahReconnectMode(initialPolicy.reconnectMode, 'fast') === 'fast';
                 const fastCard = document.createElement('span');
                 fastCard.className = 'nanah-managed-modal__mode-card';
-                fastCard.innerHTML = '<strong>Reconnect quickly</strong><span>The parent link is saved. Future live sessions reopen faster and still follow this policy.</span>';
+                fastCard.innerHTML = '<strong>Reconnect quickly</strong><span>The parent link is saved. Future live sessions reopen faster and still follow these saved rules.</span>';
                 fastLabel.appendChild(reconnectFastInput);
                 fastLabel.appendChild(fastCard);
 
@@ -11752,9 +11752,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 syncOnOpenInput.checked = safeObject(initialPolicy).syncOnProfileOpen === true;
                 const openSyncCopy = document.createElement('div');
                 const openSyncTitle = document.createElement('strong');
-                openSyncTitle.textContent = 'Saved update check';
+                openSyncTitle.textContent = 'Automatic saved updates';
                 const openSyncBody = document.createElement('span');
-                openSyncBody.textContent = 'When this profile opens, check optional Internet Pickup or Home Bridge for newer signed updates from this saved parent link. If nothing is reachable, current rules stay active.';
+                openSyncBody.textContent = 'When this protected profile opens, it can look for newer signed parent updates from the saved parent link. If no approved update is reachable, current rules stay active.';
                 openSyncCopy.appendChild(openSyncTitle);
                 openSyncCopy.appendChild(openSyncBody);
                 openSyncToggle.appendChild(syncOnOpenInput);
@@ -11926,7 +11926,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const readPolicy = () => {
                 const allowedScopes = scopeOptions.filter((scope) => scopeInputs.get(scope)?.checked || lockedScopes.includes(scope));
                 if (allowedScopes.length === 0) {
-                    errorEl.textContent = 'Pick at least one allowed scope before saving this managed link.';
+                    errorEl.textContent = 'Pick at least one allowed area before saving this parent link.';
                     errorEl.dataset.visible = 'true';
                     return null;
                 }
@@ -13387,7 +13387,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 endpointHost: ''
             });
             await refreshProfilesUI();
-        UIComponents.showToast('Home Bridge disabled', 'success');
+            UIComponents.showToast('Home Bridge disabled', 'success');
             return;
         }
         const endpoint = await showPromptModal({
@@ -15331,9 +15331,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                     const updateCheckRow = document.createElement('div');
                     updateCheckRow.className = 'nanah-trusted-link__policy-row';
-                    updateCheckRow.title = 'When enabled, this protected profile checks trusted Internet Pickup and Home Bridge paths as it opens.';
+                    updateCheckRow.title = 'When enabled, this protected profile checks for newer signed parent updates as it opens.';
                     const updateCheckLabel = document.createElement('span');
-                    updateCheckLabel.textContent = 'Saved update check';
+                    updateCheckLabel.textContent = 'Automatic saved updates';
                     const updateCheckValue = document.createElement('strong');
                     updateCheckValue.textContent = formatNanahProtectedUpdateCheckStatus(entry);
                     updateCheckRow.appendChild(updateCheckLabel);

@@ -418,6 +418,13 @@ parent tool instead of a sync/debug console.
     and `Everyday protection` instead of reading like a policy schema editor.
     The saved policy fields, device binding, profile target, allowed scopes,
     revision checks, and signature validation are unchanged.
+  - [x] Automatic saved-updates wording slice: the modal, trusted-device card,
+    and Family Controls row now say `Automatic saved updates` for the existing
+    `syncOnProfileOpen` behavior. The copy explains that a protected profile
+    can check for newer signed parent updates when it opens, while current rules
+    stay active if no approved update is reachable. No storage field, provider,
+    signature/hash/revision gate, target-profile rule, or live Send Update
+    behavior changed.
   - [x] Trusted-device card wording slice: saved managed links now show
     `Allowed areas`, `Usual area`, `Update behavior`, `Matching parent updates`,
     `Next connection`, `Everyday protection`, `Where updates land`, and

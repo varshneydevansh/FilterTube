@@ -459,10 +459,10 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /ft-managed-command-center__provider-prompt/);
   assert.match(helperSource, /Set Up Internet Pickup/);
   assert.match(helperSource, /Edit Internet Pickup/);
-  assert.match(doc, /visible card says `Control`, `Saved update check`, and `Last delivery`/);
+  assert.match(doc, /visible card says `Control`, `Automatic saved updates`, and `Last delivery`/);
   assert.match(source, /function getNanahTrustedLinkDirectionSummary\(entry\)/);
   assert.match(source, /function formatNanahProtectedUpdateCheckStatus\(link\)/);
-  assert.match(source, /Saved update check/);
+  assert.match(source, /Automatic saved updates/);
   assert.match(helperSource, /configure_mailbox/);
   assert.match(helperSource, /group: 'rules'/);
   assert.match(helperSource, /group: 'send'/);

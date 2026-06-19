@@ -146,10 +146,10 @@ keeps the parent model direct and prevents mailbox/LAN/provider language from
 becoming the first mental model. The change does not add authority; it only
 reduces copy and layout pressure in the Accounts & Sync surface.
 The trusted-device status wording now follows that same parent model: the
-visible card says `Control`, `Saved update check`, and `Last delivery` instead
-of `Direction`, separate `Open sync`/`Local network` rows, and raw remote
-delivery wording. `Saved update check` can still report `Internet Pickup` and
-`Home Bridge` details when those optional providers are involved. Protocol
+visible card says `Control`, `Automatic saved updates`, and `Last delivery`
+instead of `Direction`, separate `Open sync`/`Local network` rows, and raw
+remote delivery wording. `Automatic saved updates` can still report `Internet
+Pickup` and `Home Bridge` details when those optional providers are involved. Protocol
 names such as mailbox, local-network, provider, candidate, and ack remain in
 code, advanced docs, and tests where they describe exact transport boundaries;
 they are no longer the first label a parent has to understand.
