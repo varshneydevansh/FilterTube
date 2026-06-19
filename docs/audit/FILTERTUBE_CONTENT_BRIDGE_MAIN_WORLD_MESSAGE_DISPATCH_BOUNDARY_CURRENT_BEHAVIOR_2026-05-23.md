@@ -21,14 +21,14 @@ message dispatch executable approval: NO-GO
 ## Evidence Inputs
 
 - `js/content_bridge.js`
-  - lines: 13636
-  - bytes: 604184
-  - sha256: `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d`
+  - lines: 13803
+  - bytes: 610592
+  - sha256: `cc838f9f12fc6941bba04b7a0244a14ef60581461bcc24dbb8ba7a9bce8e287b`
 
 ## Selected Source Metrics
 
-- handler lines: 237
-- handler bytes: 11125
+- handler lines: 220
+- handler bytes: 10389
 - handler FilterTube type branches: 12
 - handler startsWith FilterTube tokens: 1
 - handler source content_bridge guard tokens: 1
@@ -50,11 +50,12 @@ message dispatch executable approval: NO-GO
 - handler stampChannelIdentity tokens: 2
 - handler applyResolvedCollaborators tokens: 4
 - handler sanitizeCollaboratorList tokens: 2
-- handler document.querySelectorAll tokens: 3
-- handler document.querySelector tokens: 4
+- handler document.querySelectorAll tokens: 2
+- handler document.querySelector tokens: 2
+- handler findVideoCardsByVideoId tokens: 2
 - handler sourceLabel tokens: 2
 - handler force true tokens: 3
-- handler return statements: 11
+- handler return statements: 10
 - handler browserAPI_BRIDGE tokens: 2
 
 ## Current Message Inventory

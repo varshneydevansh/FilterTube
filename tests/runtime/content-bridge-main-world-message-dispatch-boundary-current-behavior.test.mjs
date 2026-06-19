@@ -132,6 +132,7 @@ test('content bridge main-world dispatch audit is audit-only and source counted'
     'handler sanitizeCollaboratorList tokens': count(handler, /sanitizeCollaboratorList/g),
     'handler document.querySelectorAll tokens': count(handler, /document\.querySelectorAll/g),
     'handler document.querySelector tokens': count(handler, /document\.querySelector/g),
+    'handler findVideoCardsByVideoId tokens': count(handler, /findVideoCardsByVideoId/g),
     'handler sourceLabel tokens': count(handler, /sourceLabel/g),
     'handler force true tokens': count(handler, /force: true/g),
     'handler return statements': count(handler, /\breturn\b/g),
@@ -266,10 +267,12 @@ test('cache and dialog collaborator messages can apply collaborators without pen
   const dialog = sliceBetween(handler, "type === 'FilterTube_CollabDialogData'", '\n    }\n}\n');
 
   assert.match(cache, /const videoId = payload\?\.videoId/);
-  assert.match(cache, /document\.querySelectorAll\(selectors\.join\(','\)\)/);
-  assert.match(cache, /card\.setAttribute\('data-filtertube-video-id', videoId\)/);
+  assert.match(cache, /const foundCards = findVideoCardsByVideoId\(videoId\)/);
+  assert.doesNotMatch(cache, /document\.querySelectorAll\(selectors\.join\(','\)\)/);
+  assert.doesNotMatch(cache, /card\.setAttribute\('data-filtertube-video-id', videoId\)/);
   assert.match(cache, /applyResolvedCollaborators\(videoId, collaborators, \{/);
   assert.match(cache, /sourceLabel: 'xhr'/);
+  assert.match(cache, /sourceCard: foundCards\[0\] \|\| null/);
   assert.doesNotMatch(cache, /pending[A-Za-z]+Requests|get\(requestId\)|requestId|nonce|contentBridgeUnsolicitedCollaboratorPolicy/);
 
   assert.match(dialog, /window\.pendingCollabCards\.has\(collabKey\)/);

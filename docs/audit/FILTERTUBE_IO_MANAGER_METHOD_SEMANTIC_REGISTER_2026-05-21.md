@@ -117,36 +117,36 @@ storageAccessWrappers: 2
 | 334 | `function` | `channelKey` | `keywordChannelNormalization` |
 | 345 | `function` | `mergeChannelEntries` | `keywordChannelNormalization` |
 | 399 | `function` | `sanitizeChannelEntry` | `keywordChannelNormalization` |
-| 487 | `async function` | `readStorage` | `storageAccessWrappers` |
-| 499 | `async function` | `writeStorage` | `storageAccessWrappers` |
-| 517 | `async function` | `loadProfilesV3` | `legacyProfileDerivationAndV3Persistence` |
-| 548 | `async function` | `saveProfilesV3` | `legacyProfileDerivationAndV3Persistence` |
-| 555 | `function` | `isValidProfilesV4` | `profilesV4MigrationAndSanitization` |
-| 568 | `function` | `buildDefaultProfilesV4FromLegacyStorage` | `profilesV4MigrationAndSanitization` |
-| 639 | `async function` | `loadProfilesV4` | `profilesV4MigrationAndSanitization` |
-| 698 | `async function` | `saveProfilesV4` | `profilesV4MigrationAndSanitization` |
-| 705 | `function` | `sanitizeProfilesV4` | `profilesV4MigrationAndSanitization` |
-| 718 | `const arrow` | `sanitizeMainKeywords` | `profilesV4MigrationAndSanitization` |
-| 724 | `const arrow` | `sanitizeMainChannels` | `profilesV4MigrationAndSanitization` |
-| 807 | `function` | `mergeKeywordLists` | `keywordChannelNormalization` |
-| 839 | `function` | `mergeChannelLists` | `keywordChannelNormalization` |
-| 862 | `function` | `normalizeMainProfileAliasFields` | `keywordChannelNormalization` |
-| 881 | `function` | `mergeStringList` | `keywordChannelNormalization` |
-| 899 | `function` | `detectFormat` | `importFormatParsing` |
-| 915 | `function` | `parseBlockTube` | `importFormatParsing` |
-| 1013 | `function` | `buildV3Export` | `exportSerialization` |
-| 1107 | `function` | `normalizeNanahBackupState` | `encryptedAndNanahState` |
-| 1126 | `function` | `normalizeIncomingV3` | `importFormatParsing` |
-| 1227 | `async function` | `exportV3` | `exportSerialization` |
-| 1322 | `async function` | `importV3` | `importMergeAndPersistence` |
-| 1810 | `async function` | `exportV3Encrypted` | `encryptedAndNanahState` |
-| 1840 | `async function` | `importV3Encrypted` | `encryptedAndNanahState` |
-| 1863 | `async function` | `createAutoBackup` | `autoBackupDownloadRotation` |
-| 1920 | `const arrow` | `safePart` | `autoBackupDownloadRotation` |
-| 1956 | `async function` | `getBackupDirectory` | `autoBackupDownloadRotation` |
-| 2003 | `async function` | `saveBackupFile` | `autoBackupDownloadRotation` |
-| 2037 | `async function` | `rotateBackups` | `autoBackupDownloadRotation` |
-| 2077 | `function` | `scheduleAutoBackup` | `autoBackupDownloadRotation` |
+| 495 | `async function` | `readStorage` | `storageAccessWrappers` |
+| 507 | `async function` | `writeStorage` | `storageAccessWrappers` |
+| 525 | `async function` | `loadProfilesV3` | `legacyProfileDerivationAndV3Persistence` |
+| 556 | `async function` | `saveProfilesV3` | `legacyProfileDerivationAndV3Persistence` |
+| 563 | `function` | `isValidProfilesV4` | `profilesV4MigrationAndSanitization` |
+| 576 | `function` | `buildDefaultProfilesV4FromLegacyStorage` | `profilesV4MigrationAndSanitization` |
+| 647 | `async function` | `loadProfilesV4` | `profilesV4MigrationAndSanitization` |
+| 706 | `async function` | `saveProfilesV4` | `profilesV4MigrationAndSanitization` |
+| 713 | `function` | `sanitizeProfilesV4` | `profilesV4MigrationAndSanitization` |
+| 726 | `const arrow` | `sanitizeMainKeywords` | `profilesV4MigrationAndSanitization` |
+| 732 | `const arrow` | `sanitizeMainChannels` | `profilesV4MigrationAndSanitization` |
+| 815 | `function` | `mergeKeywordLists` | `keywordChannelNormalization` |
+| 847 | `function` | `mergeChannelLists` | `keywordChannelNormalization` |
+| 870 | `function` | `normalizeMainProfileAliasFields` | `keywordChannelNormalization` |
+| 889 | `function` | `mergeStringList` | `keywordChannelNormalization` |
+| 907 | `function` | `detectFormat` | `importFormatParsing` |
+| 923 | `function` | `parseBlockTube` | `importFormatParsing` |
+| 1021 | `function` | `buildV3Export` | `exportSerialization` |
+| 1115 | `function` | `normalizeNanahBackupState` | `encryptedAndNanahState` |
+| 1134 | `function` | `normalizeIncomingV3` | `importFormatParsing` |
+| 1235 | `async function` | `exportV3` | `exportSerialization` |
+| 1330 | `async function` | `importV3` | `importMergeAndPersistence` |
+| 1818 | `async function` | `exportV3Encrypted` | `encryptedAndNanahState` |
+| 1848 | `async function` | `importV3Encrypted` | `encryptedAndNanahState` |
+| 1871 | `async function` | `createAutoBackup` | `autoBackupDownloadRotation` |
+| 1928 | `const arrow` | `safePart` | `autoBackupDownloadRotation` |
+| 1964 | `async function` | `getBackupDirectory` | `autoBackupDownloadRotation` |
+| 2011 | `async function` | `saveBackupFile` | `autoBackupDownloadRotation` |
+| 2045 | `async function` | `rotateBackups` | `autoBackupDownloadRotation` |
+| 2085 | `function` | `scheduleAutoBackup` | `autoBackupDownloadRotation` |
 
 ## Current Public API
 

@@ -43,12 +43,12 @@ runtime content-control alias mutation fixtures: 5
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `js/content_controls_catalog.js` | 222 | 7822 | `780b35c8aa33161ccd6e489b0843f01d805620409715a50aaca0a0bf6cff7e10` |
-| `js/settings_shared.js` | 1181 | 57535 | `9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c` |
+| `js/settings_shared.js` | 1196 | 59725 | `2d4458a87dce945bf560123e54534854c52fe1de20ac5dae3e3b019bf7a37311` |
 | `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
-| `js/background.js` | 6803 | 306710 | `57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7` |
+| `js/background.js` | 6984 | 315747 | `080d15907b26314873138c5dcc5d9653a2a27e933049be10361dfe0047f0a7cc` |
 | `js/seed.js` | 1136 | 50026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
 | `js/filter_logic.js` | 3652 | 172174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
-| `js/content/dom_fallback.js` | 5030 | 235555 | `fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5` |
+| `js/content/dom_fallback.js` | 5837 | 276985 | `5162d14abdd6c7769d495d9157d9772cfef4f15e529b7dea885b2887be60d066` |
 
 ## Pinned Source Counts
 
@@ -84,9 +84,9 @@ state_manager external reload keys block lines: 41
 
 state_manager external reload keys block bytes: 1604
 
-background main compile alias block lines: 454
+background main compile alias block lines: 456
 
-background main compile alias block bytes: 28209
+background main compile alias block bytes: 28372
 
 background storage refresh keys block lines: 16
 
