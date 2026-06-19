@@ -8031,6 +8031,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             intro.textContent = `Import a channel/keyword list, review what FilterTube understood, then apply it to ${targetCopy}. Lists become ordinary profile rules first; they never change profiles, PINs, trusted devices, viewing access, or time limits.`;
             body.appendChild(intro);
 
+            const modalLayout = document.createElement('div');
+            modalLayout.className = 'managed-channel-list-modal__layout';
+            body.appendChild(modalLayout);
+
+            const formColumn = document.createElement('div');
+            formColumn.className = 'managed-channel-list-modal__form';
+
             const formatGuide = document.createElement('div');
             formatGuide.className = 'managed-channel-list-modal__format-card';
             formatGuide.innerHTML = `
@@ -8114,7 +8121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="managed-channel-list-modal__format-note">
                     Files only add channel and keyword rules. They cannot change profiles, PINs, trusted devices, time limits, Main/Kids access, or sync targets.
                 </div>`;
-            body.appendChild(formatGuide);
+            modalLayout.append(formatGuide, formColumn);
 
             const nameGroup = document.createElement('label');
             nameGroup.className = 'managed-channel-list-modal__field';
@@ -8126,7 +8133,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             nameInput.placeholder = 'Family block list';
             nameInput.value = 'Rule list import';
             nameGroup.append(nameLabel, nameInput);
-            body.appendChild(nameGroup);
+            formColumn.appendChild(nameGroup);
 
             const urlGroup = document.createElement('label');
             urlGroup.className = 'managed-channel-list-modal__field';
@@ -8145,7 +8152,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             loadUrlBtn.title = 'Loads a public HTTPS text list into the preview box. If the host blocks browser fetches, download the file and choose it below.';
             urlRow.append(urlInput, loadUrlBtn);
             urlGroup.append(urlLabel, urlRow);
-            body.appendChild(urlGroup);
+            formColumn.appendChild(urlGroup);
 
             const fileGroup = document.createElement('label');
             fileGroup.className = 'managed-channel-list-modal__field';
@@ -8156,7 +8163,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             fileInput.type = 'file';
             fileInput.accept = '.txt,.csv,.list,.md,.json,text/plain,text/csv,application/json';
             fileGroup.append(fileLabel, fileInput);
-            body.appendChild(fileGroup);
+            formColumn.appendChild(fileGroup);
 
             const listGroup = document.createElement('label');
             listGroup.className = 'managed-channel-list-modal__field';
@@ -8166,7 +8173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             textArea.className = 'text-input managed-channel-list-modal__textarea';
             textArea.placeholder = MANAGED_RULE_LIST_CSV_TEMPLATE;
             listGroup.append(listLabel, textArea);
-            body.appendChild(listGroup);
+            formColumn.appendChild(listGroup);
 
             const templateBox = document.createElement('div');
             templateBox.className = 'managed-channel-list-modal__template';
@@ -8204,22 +8211,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             downloadJsonTemplateBtn.title = 'Downloads a JSON rule-list template.';
             templateActions.append(useTemplateBtn, useTxtTemplateBtn, useJsonTemplateBtn, downloadTemplateBtn, downloadJsonTemplateBtn);
             templateBox.append(templateTitle, templateText, templateActions);
-            body.appendChild(templateBox);
+            formColumn.appendChild(templateBox);
 
             const help = document.createElement('div');
             help.className = 'managed-channel-list-modal__help';
             help.textContent = 'TXT bare rows stay channel-only; use keyword: for TXT keywords. CSV and supported JSON can add channels and keywords. If this is a protected profile, send the updated policy from Family Controls when another verified device needs the same rules.';
-            body.appendChild(help);
+            formColumn.appendChild(help);
 
             const previewEl = document.createElement('div');
             previewEl.className = 'managed-channel-list-modal__preview';
             previewEl.setAttribute('aria-live', 'polite');
-            body.appendChild(previewEl);
+            formColumn.appendChild(previewEl);
 
             const errorEl = document.createElement('div');
             errorEl.className = 'managed-channel-list-modal__error';
             errorEl.hidden = true;
-            body.appendChild(errorEl);
+            formColumn.appendChild(errorEl);
 
             const actions = document.createElement('div');
             actions.className = 'ft-modal-actions';

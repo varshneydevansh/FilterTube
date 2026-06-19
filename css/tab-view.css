@@ -2307,11 +2307,43 @@ html[data-theme="dark"] .card::after {
 }
 
 .managed-channel-list-modal {
-    width: min(100%, 680px);
+    display: flex;
+    flex-direction: column;
+    width: min(94vw, 1120px);
+    max-height: calc(100dvh - 2rem);
+    overflow: hidden;
 }
 
 .managed-channel-list-modal__body {
     gap: 0.9rem;
+    min-height: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    padding-bottom: 0;
+}
+
+.managed-channel-list-modal__layout {
+    display: grid;
+    grid-template-columns: minmax(18rem, 0.78fr) minmax(0, 1fr);
+    gap: 0.9rem;
+    align-items: start;
+    min-height: 0;
+}
+
+.managed-channel-list-modal__form {
+    display: grid;
+    gap: 0.82rem;
+    min-width: 0;
+}
+
+.managed-channel-list-modal .ft-modal-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    margin: 0 -0.05rem;
+    padding: 0.85rem 0 0.72rem;
+    border-top: 1px solid rgba(15, 23, 42, 0.08);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.58), var(--ft-color-bg-card) 42%);
 }
 
 .managed-channel-list-modal__field {
@@ -2343,7 +2375,7 @@ html[data-theme="dark"] .card::after {
 }
 
 .managed-channel-list-modal__textarea {
-    min-height: 190px;
+    min-height: clamp(8.5rem, 22vh, 13rem);
     resize: vertical;
     line-height: 1.45;
 }
@@ -2395,6 +2427,10 @@ html[data-theme="dark"] .card::after {
 .managed-channel-list-modal__format-card {
     display: grid;
     gap: 0.65rem;
+    align-self: start;
+    max-height: min(42rem, calc(100dvh - 11rem));
+    overflow: auto;
+    overscroll-behavior: contain;
     padding: 0.78rem;
     border: 1px solid rgba(180, 87, 73, 0.16);
     border-radius: 0.95rem;
@@ -2426,7 +2462,7 @@ html[data-theme="dark"] .card::after {
 
 .managed-channel-list-modal__format-gallery {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
     gap: 0.56rem;
     min-width: 0;
 }
@@ -2445,7 +2481,7 @@ html[data-theme="dark"] .card::after {
 
 .managed-channel-list-modal__format-panel--csv,
 .managed-channel-list-modal__format-panel--json {
-    grid-column: 1 / -1;
+    grid-column: auto;
 }
 
 .managed-channel-list-modal__format-panel-title {
@@ -2789,6 +2825,11 @@ html[data-theme="dark"] .card::after {
     background: linear-gradient(180deg, rgba(48, 34, 30, 0.9), rgba(31, 28, 25, 0.88));
 }
 
+:root[data-theme="dark"] .managed-channel-list-modal .ft-modal-actions {
+    border-top-color: rgba(255, 255, 255, 0.08);
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.22), var(--ft-color-bg-card) 42%);
+}
+
 :root[data-theme="dark"] .managed-channel-list-modal__format-panel,
 :root[data-theme="dark"] .managed-channel-list-modal__mini-sheet,
 :root[data-theme="dark"] .managed-channel-list-modal__mini-code,
@@ -2851,6 +2892,22 @@ html[data-theme="dark"] .card::after {
     border-color: rgba(248, 113, 113, 0.3);
     color: var(--ft-color-sem-danger, #f87171);
     background: rgba(127, 29, 29, 0.2);
+}
+
+@media (max-width: 900px) {
+    .managed-channel-list-modal {
+        width: min(100%, calc(100vw - 1rem));
+        max-height: calc(100dvh - 1rem);
+    }
+
+    .managed-channel-list-modal__layout {
+        grid-template-columns: 1fr;
+    }
+
+    .managed-channel-list-modal__format-card {
+        max-height: none;
+        overflow: visible;
+    }
 }
 
 @media (max-width: 640px) {
