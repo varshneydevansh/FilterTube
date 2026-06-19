@@ -889,15 +889,15 @@
                                             <div class="nanah-sync-panel__content nanah-sync-panel__content--setup">
                                                 <div class="nanah-sync-panel__stack nanah-sync-panel__stack--setup">
                                                     <div class="nanah-sync-mode-switch" role="tablist" aria-label="Choose device update mode">
-                                                        <button id="ftNanahModeSendOnce" class="nanah-sync-mode" type="button" data-mode="send_once" aria-pressed="true">
-                                                            <span class="nanah-sync-mode__eyebrow">Copy once</span>
-                                                            <strong class="nanah-sync-mode__title">Send this profile</strong>
-                                                            <span class="nanah-sync-mode__body">One-time copy for your own device.</span>
-                                                        </button>
-                                                        <button id="ftNanahModeParent" class="nanah-sync-mode" type="button" data-mode="parent_control" aria-pressed="false">
+                                                        <button id="ftNanahModeParent" class="nanah-sync-mode" type="button" data-mode="parent_control" aria-pressed="true">
                                                             <span class="nanah-sync-mode__eyebrow">Family control</span>
                                                             <strong class="nanah-sync-mode__title">Update protected device</strong>
                                                             <span class="nanah-sync-mode__body">Parent-approved rules for another device.</span>
+                                                        </button>
+                                                        <button id="ftNanahModeSendOnce" class="nanah-sync-mode" type="button" data-mode="send_once" aria-pressed="false">
+                                                            <span class="nanah-sync-mode__eyebrow">Copy once</span>
+                                                            <strong class="nanah-sync-mode__title">Send this profile</strong>
+                                                            <span class="nanah-sync-mode__body">One-time copy for your own device.</span>
                                                         </button>
                                                         <button id="ftNanahModeFull" class="nanah-sync-mode" type="button" data-mode="full_account" aria-pressed="false">
                                                             <span class="nanah-sync-mode__eyebrow">Move account</span>
@@ -908,14 +908,14 @@
 
                                                     <div class="nanah-sync-mode-spotlight" id="ftNanahModeSpotlight">
                                                         <div class="nanah-sync-mode-spotlight__head">
-                                                            <span id="ftNanahModeEyebrow" class="nanah-sync-guide__title">Copy once</span>
-                                                            <strong id="ftNanahModeTitle" class="nanah-sync-mode-spotlight__title">Send this profile once</strong>
+                                                            <span id="ftNanahModeEyebrow" class="nanah-sync-guide__title">Family control</span>
+                                                            <strong id="ftNanahModeTitle" class="nanah-sync-mode-spotlight__title">Update a protected device</strong>
                                                         </div>
-                                                        <p id="ftNanahModeBody" class="nanah-sync-mode-spotlight__body">Use this for one-off copies between your own devices. Pair, verify the phrase, send, and the other device reviews it.</p>
+                                                        <p id="ftNanahModeBody" class="nanah-sync-mode-spotlight__body">Use this to send parent-approved rules, time limits, and viewing access to a child, family, or protected device.</p>
                                                         <ol id="ftNanahModeSteps" class="nanah-sync-guide__list">
-                                                            <li>Leave this in the simple peer flow.</li>
-                                                            <li>Start pairing here or join a code from the other device.</li>
-                                                            <li>Confirm the same safety phrase and send once.</li>
+                                                            <li>Choose or create the protected profile you manage.</li>
+                                                            <li>Connect to the other device and confirm the safety phrase.</li>
+                                                            <li>Send now. Save parent trust only for devices that should keep receiving approved updates.</li>
                                                         </ol>
                                                     </div>
 

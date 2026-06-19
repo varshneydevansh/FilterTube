@@ -3085,7 +3085,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let nanahManagedOpenSyncState = null;
     let nanahManagedLocalNetworkSyncState = null;
     let nanahManagedSourceAckSyncState = null;
-    let nanahUiMode = 'send_once';
+    let nanahUiMode = 'parent_control';
     let isApplyingNanahModePreset = false;
     let nanahTrustedReconnectApprovalPromise = null;
     let nanahSessionState = {
@@ -12650,7 +12650,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function loadNanahUiModePreference() {
-        return normalizeNanahUiMode(await readNanahStorage(NANAH_UI_MODE_KEY));
+        const storedMode = normalizeString(await readNanahStorage(NANAH_UI_MODE_KEY));
+        return storedMode ? normalizeNanahUiMode(storedMode) : 'parent_control';
     }
 
     async function persistNanahUiModePreference(mode = getNanahUiMode()) {

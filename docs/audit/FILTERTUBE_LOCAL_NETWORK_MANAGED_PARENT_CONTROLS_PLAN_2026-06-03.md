@@ -473,6 +473,13 @@ parent tool instead of a sync/debug console.
     and `Same network` paths. The strip is status-only plus optional setup
     buttons for Internet Pickup/Home Bridge; it does not create policy
     authority, background sync, LAN discovery, or YouTube page hot-path work.
+  - [x] Family Device Updates default-mode slice: the first-run Accounts & Sync
+    mode is now `Update protected device` / `parent_control` instead of
+    `Copy once`. A previously saved user mode is still respected, child
+    receive-only surfaces are still forced back to receive-only behavior, and
+    this slice changes only the first-screen parent mental model. It does not
+    alter Nanah roles, target-profile validation, allowed scopes, signatures,
+    hashes, revisions, Internet Pickup, Home Bridge, or runtime policy gates.
   - [x] Delivery-path readiness gating slice: the same strip now derives a
     parent-scoped protected-profile/verified-device summary before enabling new
     Internet Pickup or Home Bridge setup. Already configured providers remain
