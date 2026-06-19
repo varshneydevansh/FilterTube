@@ -566,9 +566,12 @@ parent tool instead of a sync/debug console.
     `Remote rN`/`Remote sync`. This changes only visible wording; accepted
     revision state, remote conflict detection, and protected history semantics
     are unchanged.
-  - [ ] Scheduled subscription refresh remains a future slice. Until then,
-    list updates happen only after a parent/account profile chooses Check or
-    Refresh and approves the result.
+  - [x] 2026-06-19 dashboard-open scheduled list review slice: Settings now has
+    an opt-in `Auto-check URL Lists` control for URL-backed rule lists on the
+    active profile. The check only runs while the dashboard is open and due; it
+    opens the same parent-approved stale-list review flow and never silently
+    applies rows, sends device updates, runs on YouTube pages, or creates
+    background policy sync.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.

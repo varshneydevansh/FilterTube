@@ -2863,6 +2863,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftImportRuleListBtn = document.getElementById('ftImportRuleListBtn');
     const ftManageRuleListsBtn = document.getElementById('ftManageRuleListsBtn');
     const ftCheckStaleRuleListsBtn = document.getElementById('ftCheckStaleRuleListsBtn');
+    const ftToggleRuleListAutoCheckBtn = document.getElementById('ftToggleRuleListAutoCheckBtn');
+    const ftRuleListAutoCheckStatus = document.getElementById('ftRuleListAutoCheckStatus');
     const ftDownloadRuleListTemplateBtn = document.getElementById('ftDownloadRuleListTemplateBtn');
     const ftDownloadRuleListJsonTemplateBtn = document.getElementById('ftDownloadRuleListJsonTemplateBtn');
     const ftRuleListFormatsBtn = document.getElementById('ftRuleListFormatsBtn');
@@ -3069,6 +3071,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     let nanahManagedPolicySourceOverride = null;
     let sessionMasterPin = '';
     const unlockedProfiles = new Set();
+    const RULE_LIST_AUTO_CHECK_ENABLED_KEY = 'ftRuleListUrlAutoCheckEnabled';
+    const RULE_LIST_AUTO_CHECK_LAST_RUN_KEY = 'ftRuleListUrlAutoCheckLastRun';
+    const RULE_LIST_AUTO_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;
     const NANAH_TRUSTED_LINKS_KEY = 'ftNanahTrustedLinks';
     const NANAH_DEVICE_ID_KEY = 'ftNanahDeviceId';
     const NANAH_DEVICE_LABEL_KEY = 'ftNanahDeviceLabel';
@@ -8661,6 +8666,119 @@ document.addEventListener('DOMContentLoaded', async () => {
         const checkedAt = Number(summary?.lastCheckedAt) || 0;
         const staleAfterMs = 7 * 24 * 60 * 60 * 1000;
         return !checkedAt || (Number(now) - checkedAt) >= staleAfterMs;
+    }
+
+    function isRuleListAutoCheckEnabled() {
+        try {
+            return localStorage.getItem(RULE_LIST_AUTO_CHECK_ENABLED_KEY) === 'true';
+        } catch (_) {
+            return false;
+        }
+    }
+
+    function setRuleListAutoCheckEnabled(enabled) {
+        try {
+            if (enabled) {
+                localStorage.setItem(RULE_LIST_AUTO_CHECK_ENABLED_KEY, 'true');
+            } else {
+                localStorage.removeItem(RULE_LIST_AUTO_CHECK_ENABLED_KEY);
+            }
+        } catch (_) {
+        }
+        updateRuleListAutoCheckUi();
+    }
+
+    function getRuleListAutoCheckLastRun() {
+        try {
+            const value = Number(localStorage.getItem(RULE_LIST_AUTO_CHECK_LAST_RUN_KEY));
+            return Number.isFinite(value) && value > 0 ? value : 0;
+        } catch (_) {
+            return 0;
+        }
+    }
+
+    function setRuleListAutoCheckLastRun(timestamp = Date.now()) {
+        try {
+            localStorage.setItem(RULE_LIST_AUTO_CHECK_LAST_RUN_KEY, String(Number(timestamp) || Date.now()));
+        } catch (_) {
+        }
+    }
+
+    function formatRuleListAutoCheckStatus() {
+        if (!isRuleListAutoCheckEnabled()) return 'Off. Manual checks only.';
+        const lastRun = getRuleListAutoCheckLastRun();
+        if (!lastRun) return 'On. Will check stale URL lists when this dashboard opens.';
+        try {
+            return `On. Last checked ${new Date(lastRun).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}.`;
+        } catch (_) {
+            return 'On. Stale URL lists are checked from this dashboard.';
+        }
+    }
+
+    function updateRuleListAutoCheckUi() {
+        const enabled = isRuleListAutoCheckEnabled();
+        if (ftToggleRuleListAutoCheckBtn) {
+            ftToggleRuleListAutoCheckBtn.textContent = enabled ? 'Auto-check: On' : 'Auto-check URL Lists';
+            ftToggleRuleListAutoCheckBtn.classList.toggle('is-rule-list-auto-check-on', enabled);
+            ftToggleRuleListAutoCheckBtn.title = enabled
+                ? 'Turn off dashboard-open stale URL list checks. Existing imported rules stay unchanged.'
+                : 'Check stale URL-backed rule lists when this dashboard opens. FilterTube still asks before applying anything.';
+        }
+        if (ftRuleListAutoCheckStatus) {
+            ftRuleListAutoCheckStatus.textContent = formatRuleListAutoCheckStatus();
+        }
+    }
+
+    async function runRuleListAutoCheckIfDue({ force = false, reason = 'dashboard_open' } = {}) {
+        if (!isRuleListAutoCheckEnabled()) return false;
+        if (isUiLocked()) return false;
+        const now = Date.now();
+        const lastRun = getRuleListAutoCheckLastRun();
+        if (!force && lastRun && (now - lastRun) < RULE_LIST_AUTO_CHECK_INTERVAL_MS) {
+            updateRuleListAutoCheckUi();
+            return false;
+        }
+        const io = window.FilterTubeIO || {};
+        const root = profilesV4Cache || (typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null);
+        const currentProfileId = normalizeString(root?.activeProfileId) || activeProfileId || 'default';
+        if (!currentProfileId || getProfileType(root, currentProfileId) === 'child') {
+            updateRuleListAutoCheckUi();
+            return false;
+        }
+        const profiles = safeObject(root?.profiles);
+        const summaries = collectManagedChannelListSummaries(profiles, [currentProfileId]);
+        const staleCount = summaries.filter(summary => isManagedChannelListSummaryStale(summary, now)).length;
+        if (!staleCount) {
+            setRuleListAutoCheckLastRun(now);
+            updateRuleListAutoCheckUi();
+            return false;
+        }
+        const shouldReview = await showChoiceModal({
+            title: 'Review Stale URL Lists?',
+            message: `${staleCount} URL-backed ${pluralize(staleCount, 'rule list')} for this profile ${staleCount === 1 ? 'is' : 'are'} old enough to check.`,
+            details: [
+                'FilterTube will load the selected parent-approved URLs and preview the result.',
+                'Changed rows still require parent/account approval before anything applies.',
+                'This check runs only while the dashboard is open; it is not background sync.'
+            ],
+            choices: [
+                { value: 'review', label: 'Review Now', className: 'btn-primary' },
+                { value: 'skip', label: 'Later', className: 'btn-secondary' }
+            ],
+            cancelText: 'Later'
+        });
+        if (shouldReview !== 'review') {
+            updateRuleListAutoCheckUi();
+            return false;
+        }
+        setRuleListAutoCheckLastRun(now);
+        await refreshAllManagedChannelListsForProfiles([currentProfileId], {
+            staleOnly: true,
+            scheduledCheck: true,
+            reason
+        });
+        updateRuleListAutoCheckUi();
+        return true;
     }
 
     function formatManagedChannelListShortHash(contentHash) {
@@ -18099,6 +18217,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     applyLockGateIfNeeded();
+    await runRuleListAutoCheckIfDue({ reason: 'dashboard_open' });
 
     if (ftProfileSelector) {
         ftProfileSelector.addEventListener('change', async (e) => {
@@ -20384,6 +20503,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             await refreshAllManagedChannelListsForProfiles([currentProfileId], { staleOnly: true });
         });
     }
+
+    if (ftToggleRuleListAutoCheckBtn) {
+        ftToggleRuleListAutoCheckBtn.addEventListener('click', async () => {
+            if (isUiLocked()) return;
+            const nextEnabled = !isRuleListAutoCheckEnabled();
+            setRuleListAutoCheckEnabled(nextEnabled);
+            if (nextEnabled) {
+                UIComponents.showToast('URL list auto-check enabled for this dashboard', 'success');
+                await runRuleListAutoCheckIfDue({ force: true, reason: 'manual_enable' });
+            } else {
+                UIComponents.showToast('URL list auto-check disabled', 'info');
+            }
+        });
+    }
+    updateRuleListAutoCheckUi();
 
     if (ftRuleListFormatsBtn) {
         ftRuleListFormatsBtn.addEventListener('click', async () => {

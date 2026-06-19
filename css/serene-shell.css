@@ -1856,6 +1856,27 @@ body[data-surface="popup"] .input-group {
     margin-top: 0.45rem;
 }
 
+.rule-list-actions-more .is-rule-list-auto-check-on {
+    border-color: rgba(74, 157, 127, 0.34);
+    background:
+        linear-gradient(180deg, rgba(74, 157, 127, 0.14), rgba(74, 157, 127, 0.08)),
+        rgba(255, 255, 255, 0.8);
+    color: #12643e;
+}
+
+.rule-list-auto-check-status {
+    display: block;
+    margin: 0.4rem 0 0.45rem;
+    padding: 0.44rem 0.58rem;
+    border: 1px solid rgba(74, 157, 127, 0.18);
+    border-radius: 0.75rem;
+    background: rgba(74, 157, 127, 0.07);
+    color: var(--ft-color-text-secondary);
+    font-size: 0.74rem;
+    font-weight: 760;
+    line-height: 1.35;
+}
+
 #ftExportV3EncryptedBtn.btn-secondary {
     background: linear-gradient(180deg, rgba(196, 150, 72, 0.2), rgba(176, 126, 52, 0.14));
     color: #724c16;
@@ -2184,6 +2205,13 @@ html[data-theme="dark"] .rule-list-supported-formats summary:hover,
 html[data-theme="dark"] .rule-list-actions-more summary:hover,
 html[data-theme="dark"] .rule-list-supported-formats summary code {
     color: #f7c7bd;
+}
+
+html[data-theme="dark"] .rule-list-actions-more .is-rule-list-auto-check-on,
+html[data-theme="dark"] .rule-list-auto-check-status {
+    border-color: rgba(92, 190, 151, 0.28);
+    background: rgba(92, 190, 151, 0.1);
+    color: rgba(220, 253, 240, 0.86);
 }
 
 html[data-theme="dark"] #ftExportV3EncryptedBtn.btn-secondary {

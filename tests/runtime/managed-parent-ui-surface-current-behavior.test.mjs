@@ -561,6 +561,16 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /https:\/\/raw\.githubusercontent\.com\/list\.csv/);
   assert.match(tabViewHtml, /Files can add rules only; they cannot change PINs, time limits, viewing spaces, profiles, or trusted devices/);
   assert.match(tabViewHtml, /Templates &amp; checks/);
+  assert.match(tabViewHtml, /ftToggleRuleListAutoCheckBtn/);
+  assert.match(tabViewHtml, /Auto-check URL Lists/);
+  assert.match(tabViewHtml, /Off\. Manual checks only\./);
+  assert.match(source, /RULE_LIST_AUTO_CHECK_ENABLED_KEY = 'ftRuleListUrlAutoCheckEnabled'/);
+  assert.match(source, /async function runRuleListAutoCheckIfDue/);
+  assert.match(source, /runRuleListAutoCheckIfDue\(\{ reason: 'dashboard_open' \}\)/);
+  assert.match(source, /refreshAllManagedChannelListsForProfiles\(\[currentProfileId\], \{\s+staleOnly: true,\s+scheduledCheck: true,\s+reason\s+\}\)/);
+  assert.match(source, /This check runs only while the dashboard is open; it is not background sync/);
+  assert.match(plan, /dashboard-open scheduled list review slice/);
+  assert.match(plan, /never silently\s+applies rows, sends device updates, runs on YouTube pages, or creates\s+background policy sync/);
   assert.doesNotMatch(source, /managed-channel-list-modal__format-tabs/);
   assert.doesNotMatch(source, /managed-channel-list-modal__format-tab/);
   assert.match(source, /managed-channel-list-modal__format-gallery/);
