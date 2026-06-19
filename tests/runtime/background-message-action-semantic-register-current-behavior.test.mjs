@@ -48,7 +48,7 @@ test('background message action semantic register is audit-only and scoped to cu
   assert.match(source, /This is not an implementation patch/);
   assert.match(source, /Runtime behavior is unchanged/);
   assert.match(source, /runtime\.onMessage listeners: 2/);
-  assert.match(source, /current action\/type branches: 32/);
+  assert.match(source, /current action\/type branches: 34/);
   assert.match(source, /This is not completion proof for every background method/);
 });
 
@@ -56,8 +56,8 @@ test('background message action semantic register accounts for every current bac
   const source = doc();
   const actions = currentBackgroundActions();
 
-  assert.equal(actions.length, 32);
-  assert.equal(new Set(actions.map((row) => row.action)).size, 32);
+  assert.equal(actions.length, 34);
+  assert.equal(new Set(actions.map((row) => row.action)).size, 34);
 
   for (const { action, line } of actions) {
     assert.ok(source.includes(`| \`${action}\` |`), `missing action table row for ${action}`);

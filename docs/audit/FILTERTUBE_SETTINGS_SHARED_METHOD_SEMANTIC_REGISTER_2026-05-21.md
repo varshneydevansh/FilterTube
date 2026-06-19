@@ -90,23 +90,23 @@ themePreferenceAndChangeHelpers: 8
 | 204 | `function` | `normalizeKeywords` | `keywordNormalizationAndCompilation` |
 | 205 | `const arrow` | `parseCompiledKeyword` | `keywordNormalizationAndCompilation` |
 | 261 | `function` | `sanitizeChannelEntry` | `channelNormalization` |
-| 343 | `function` | `normalizeChannels` | `channelNormalization` |
-| 367 | `function` | `sanitizeChannelsList` | `channelNormalization` |
-| 372 | `function` | `extractUserKeywords` | `keywordNormalizationAndCompilation` |
-| 380 | `function` | `compileKeywords` | `keywordNormalizationAndCompilation` |
-| 395 | `function` | `getChannelDerivedKey` | `keywordNormalizationAndCompilation` |
-| 401 | `function` | `getChannelKeywordWord` | `keywordNormalizationAndCompilation` |
-| 412 | `function` | `syncFilterAllKeywords` | `keywordNormalizationAndCompilation` |
-| 484 | `function` | `buildCompiledSettings` | `compiledSettingsBuilder` |
-| 564 | `function` | `loadSettings` | `settingsLoadAndReadPathMigration` |
-| 595 | `const arrow` | `readBool` | `settingsLoadAndReadPathMigration` |
-| 742 | `function` | `saveSettings` | `settingsSaveAndStoragePersistence` |
-| 1121 | `function` | `applyThemePreference` | `themePreferenceAndChangeHelpers` |
-| 1129 | `function` | `getThemePreference` | `themePreferenceAndChangeHelpers` |
-| 1137 | `function` | `setThemePreference` | `themePreferenceAndChangeHelpers` |
-| 1144 | `function` | `isSettingsChange` | `storageChangeDetection` |
-| 1148 | `function` | `isThemeChange` | `themePreferenceAndChangeHelpers` |
-| 1152 | `function` | `getThemeFromChange` | `themePreferenceAndChangeHelpers` |
+| 355 | `function` | `normalizeChannels` | `channelNormalization` |
+| 379 | `function` | `sanitizeChannelsList` | `channelNormalization` |
+| 384 | `function` | `extractUserKeywords` | `keywordNormalizationAndCompilation` |
+| 392 | `function` | `compileKeywords` | `keywordNormalizationAndCompilation` |
+| 407 | `function` | `getChannelDerivedKey` | `keywordNormalizationAndCompilation` |
+| 413 | `function` | `getChannelKeywordWord` | `keywordNormalizationAndCompilation` |
+| 424 | `function` | `syncFilterAllKeywords` | `keywordNormalizationAndCompilation` |
+| 499 | `function` | `buildCompiledSettings` | `compiledSettingsBuilder` |
+| 579 | `function` | `loadSettings` | `settingsLoadAndReadPathMigration` |
+| 610 | `const arrow` | `readBool` | `settingsLoadAndReadPathMigration` |
+| 757 | `function` | `saveSettings` | `settingsSaveAndStoragePersistence` |
+| 1136 | `function` | `applyThemePreference` | `themePreferenceAndChangeHelpers` |
+| 1144 | `function` | `getThemePreference` | `themePreferenceAndChangeHelpers` |
+| 1152 | `function` | `setThemePreference` | `themePreferenceAndChangeHelpers` |
+| 1159 | `function` | `isSettingsChange` | `storageChangeDetection` |
+| 1163 | `function` | `isThemeChange` | `themePreferenceAndChangeHelpers` |
+| 1167 | `function` | `getThemeFromChange` | `themePreferenceAndChangeHelpers` |
 
 ## Current Public API
 

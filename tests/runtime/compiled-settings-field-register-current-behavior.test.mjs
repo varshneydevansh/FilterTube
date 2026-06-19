@@ -22,12 +22,12 @@ const productFieldFiles = [
 ];
 
 const sourceFingerprints = {
-  'js/background.js': [6803, 306710, '57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7'],
-  'js/settings_shared.js': [1181, 57535, '9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c'],
+  'js/background.js': [6984, 315747, '080d15907b26314873138c5dcc5d9653a2a27e933049be10361dfe0047f0a7cc'],
+  'js/settings_shared.js': [1196, 59725, '2d4458a87dce945bf560123e54534854c52fe1de20ac5dae3e3b019bf7a37311'],
   'js/filter_logic.js': [3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'],
   'js/seed.js': [1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
-  'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
-  'js/content/bridge_settings.js': [1127, 44545, 'fad07aba48391021d5e42096b34f32c58a6337a1a4d303a8706927c541d47f71']
+  'js/content_bridge.js': [13803, 610592, 'cc838f9f12fc6941bba04b7a0244a14ef60581461bcc24dbb8ba7a9bce8e287b'],
+  'js/content/bridge_settings.js': [1459, 57855, '6434bd16233044ebb4aaef69261126f3b1852213cffd24ce82b4ecf2bb7a4486']
 };
 
 function read(file) {
@@ -177,14 +177,14 @@ test('compiled settings field register counts and rows remain source-derived', (
   const text = doc();
   const actualRows = uniqueRows.map(row => `${row.file}:${row.line}:${row.operation}:${row.field}:${row.count}`);
 
-  assert.equal(rawRows.length, 317);
+  assert.equal(rawRows.length, 318);
   assert.equal(uniqueRows.length, 155);
   assert.deepEqual(countBy(rawRows, 'operation'), {
     cachedSettingsRead: 12,
     compiledAssign: 58,
     currentSettingsRead: 56,
     processedAssign: 7,
-    settingsRead: 148,
+    settingsRead: 149,
     sharedCompiledReturn: 36
 });
   assert.deepEqual(countBy(uniqueRows, 'operation'), {
