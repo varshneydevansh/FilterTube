@@ -146,13 +146,19 @@ keeps the parent model direct and prevents mailbox/LAN/provider language from
 becoming the first mental model. The change does not add authority; it only
 reduces copy and layout pressure in the Accounts & Sync surface.
 The trusted-device status wording now follows that same parent model: the
-visible card says `Control`, `Automatic saved updates`, and `Last delivery`
+visible card says `Control`, `Automatic saved updates`, and `Delivery receipts`
 instead of `Direction`, separate `Open sync`/`Local network` rows, and raw
 remote delivery wording. `Automatic saved updates` can still report `Internet
 Pickup` and `Home Bridge` details when those optional providers are involved. Protocol
 names such as mailbox, local-network, provider, candidate, and ack remain in
 code, advanced docs, and tests where they describe exact transport boundaries;
 they are no longer the first label a parent has to understand.
+The Family Device Updates delivery-path strip now keeps the same parent model on
+the pairing surface itself: `Live update` is the default path when both devices
+are open, while `Automatic pickup` and `Same network` are optional setup paths
+for verified devices that need later internet pickup or a trusted home/school
+bridge. The strip is status and setup navigation only; it does not create hidden
+background sync, LAN discovery authority, or YouTube runtime work.
 The subscription-check slice changes URL-backed list refresh semantics from
 blind replacement to hash-aware checking. When a checked URL returns the same
 source hash, Family Controls updates last-checked/source metadata and writes a

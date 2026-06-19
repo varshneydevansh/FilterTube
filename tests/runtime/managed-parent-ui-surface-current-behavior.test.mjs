@@ -459,7 +459,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /ft-managed-command-center__provider-prompt/);
   assert.match(helperSource, /Set Up Internet Pickup/);
   assert.match(helperSource, /Edit Internet Pickup/);
-  assert.match(doc, /visible card says `Control`, `Automatic saved updates`, and `Last delivery`/);
+  assert.match(doc, /visible card says `Control`, `Automatic saved updates`, and `Delivery receipts`/);
   assert.match(source, /function getNanahTrustedLinkDirectionSummary\(entry\)/);
   assert.match(source, /function formatNanahProtectedUpdateCheckStatus\(link\)/);
   assert.match(source, /Automatic saved updates/);
@@ -485,6 +485,10 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.doesNotMatch(tabViewHtml, />\s*Send to Device\s*</);
   assert.match(tabViewHtml, /Pick profile/);
   assert.match(tabViewHtml, /Connect the other device/);
+  assert.match(tabViewHtml, /How parent updates can reach verified devices/);
+  assert.match(tabViewHtml, /Live update/);
+  assert.match(tabViewHtml, /Automatic pickup/);
+  assert.match(tabViewHtml, /Same network/);
   assert.match(tabViewHtml, /Advanced options/);
   assert.match(tabViewHtml, /Meeting service link/);
   assert.match(tabViewHtml, /keep both devices open/);
@@ -505,6 +509,9 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /onAction:\s*async \(intent\) =>/);
   assert.match(source, /function summarizeManagedMailboxServerConfig\(\)/);
   assert.match(source, /async function configureNanahManagedMailboxServer\(\)/);
+  assert.match(source, /function renderNanahDeliveryPathStrip\(\)/);
+  assert.match(source, /ftNanahDeliveryMailboxBtn/);
+  assert.match(source, /ftNanahDeliveryLocalBtn/);
   assert.match(source, /NANAH_MANAGED_MAILBOX_CONFIG_KEY = 'ftManagedMailboxServerConfig'/);
   assert.match(source, /action === 'configure_mailbox'/);
   assert.match(source, /action === 'edit_rules'/);

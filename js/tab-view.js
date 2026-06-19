@@ -2928,6 +2928,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftNanahQrCanvas = document.getElementById('ftNanahQrCanvas');
     const ftNanahQrCaption = document.getElementById('ftNanahQrCaption');
     const ftNanahTrustedLinks = document.getElementById('ftNanahTrustedLinks');
+    const ftNanahDeliveryLiveCard = document.getElementById('ftNanahDeliveryLiveCard');
+    const ftNanahDeliveryLiveLabel = document.getElementById('ftNanahDeliveryLiveLabel');
+    const ftNanahDeliveryLiveDetail = document.getElementById('ftNanahDeliveryLiveDetail');
+    const ftNanahDeliveryMailboxCard = document.getElementById('ftNanahDeliveryMailboxCard');
+    const ftNanahDeliveryMailboxLabel = document.getElementById('ftNanahDeliveryMailboxLabel');
+    const ftNanahDeliveryMailboxDetail = document.getElementById('ftNanahDeliveryMailboxDetail');
+    const ftNanahDeliveryMailboxBtn = document.getElementById('ftNanahDeliveryMailboxBtn');
+    const ftNanahDeliveryLocalCard = document.getElementById('ftNanahDeliveryLocalCard');
+    const ftNanahDeliveryLocalLabel = document.getElementById('ftNanahDeliveryLocalLabel');
+    const ftNanahDeliveryLocalDetail = document.getElementById('ftNanahDeliveryLocalDetail');
+    const ftNanahDeliveryLocalBtn = document.getElementById('ftNanahDeliveryLocalBtn');
 
     const openKofiBtn = document.getElementById('openKofiBtn');
     const dashboardDonateBtn = document.getElementById('dashboardDonateBtn');
@@ -13232,6 +13243,43 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
+    function renderNanahDeliveryPathStrip() {
+        const liveReady = nanahSessionState.connected === true && nanahSessionState.sasConfirmed === true && !!nanahClient;
+        if (ftNanahDeliveryLiveCard) {
+            ftNanahDeliveryLiveCard.dataset.tone = liveReady ? 'success' : 'neutral';
+        }
+        if (ftNanahDeliveryLiveLabel) {
+            ftNanahDeliveryLiveLabel.textContent = liveReady ? 'Ready to send now' : 'Open both devices';
+        }
+        if (ftNanahDeliveryLiveDetail) {
+            ftNanahDeliveryLiveDetail.textContent = liveReady
+                ? 'Use Send Update after reviewing the selected profile and allowed area.'
+                : 'Best default for parents: pair, verify, then send while both devices are open.';
+        }
+
+        const mailbox = summarizeManagedMailboxServerConfig();
+        if (ftNanahDeliveryMailboxCard) {
+            ftNanahDeliveryMailboxCard.dataset.tone = mailbox.configured ? 'success' : 'optional';
+        }
+        if (ftNanahDeliveryMailboxLabel) ftNanahDeliveryMailboxLabel.textContent = mailbox.label;
+        if (ftNanahDeliveryMailboxDetail) ftNanahDeliveryMailboxDetail.textContent = mailbox.detail;
+        if (ftNanahDeliveryMailboxBtn) {
+            ftNanahDeliveryMailboxBtn.textContent = mailbox.configured ? 'Edit' : 'Set Up';
+            ftNanahDeliveryMailboxBtn.title = 'Optional advanced path for signed parent updates that protected devices collect after opening.';
+        }
+
+        const local = summarizeManagedLocalNetworkProviderConfig();
+        if (ftNanahDeliveryLocalCard) {
+            ftNanahDeliveryLocalCard.dataset.tone = local.configured ? 'success' : 'optional';
+        }
+        if (ftNanahDeliveryLocalLabel) ftNanahDeliveryLocalLabel.textContent = local.label;
+        if (ftNanahDeliveryLocalDetail) ftNanahDeliveryLocalDetail.textContent = local.detail;
+        if (ftNanahDeliveryLocalBtn) {
+            ftNanahDeliveryLocalBtn.textContent = local.configured ? 'Edit' : 'Set Up';
+            ftNanahDeliveryLocalBtn.title = 'Optional advanced path for a trusted FilterTube bridge on your own network.';
+        }
+    }
+
     async function promptManagedProviderSetupAction({
         title,
         message,
@@ -15788,6 +15836,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateNanahPolicyControls();
         refreshNanahAdvancedSummary();
         updateNanahModeUi();
+        renderNanahDeliveryPathStrip();
         renderNanahQr().catch(() => { });
     }
 
@@ -18472,6 +18521,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.querySelector('.nav-item[data-tab="sync"]')?.click();
             }
             focusFamilyDeviceUpdatesCard();
+        });
+    }
+
+    if (ftNanahDeliveryMailboxBtn) {
+        ftNanahDeliveryMailboxBtn.addEventListener('click', async () => {
+            await configureNanahManagedMailboxServer();
+            renderNanahDeliveryPathStrip();
+        });
+    }
+
+    if (ftNanahDeliveryLocalBtn) {
+        ftNanahDeliveryLocalBtn.addEventListener('click', async () => {
+            await configureNanahManagedLocalNetworkProvider();
+            renderNanahDeliveryPathStrip();
         });
     }
 

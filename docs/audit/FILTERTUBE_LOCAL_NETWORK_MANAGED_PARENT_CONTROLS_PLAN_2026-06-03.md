@@ -458,6 +458,11 @@ parent tool instead of a sync/debug console.
     lets parent/source rows update delivery receipt feedback for previously sent
     revisions without adding background polling, server authority, plaintext
     rule exposure, or YouTube page hot-path work.
+  - [x] Family Device Updates delivery-path strip slice: Accounts & Sync now
+    exposes a compact parent-facing strip for `Live update`, `Automatic pickup`,
+    and `Same network` paths. The strip is status-only plus optional setup
+    buttons for Internet Pickup/Home Bridge; it does not create policy
+    authority, background sync, LAN discovery, or YouTube page hot-path work.
   - [x] Trusted-device card wording slice: saved managed links now show
     `Allowed areas`, `Usual area`, `Update behavior`, `Matching parent updates`,
     `Next connection`, `Everyday protection`, `Where updates land`, and
