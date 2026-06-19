@@ -464,10 +464,10 @@
             return 'Local control works now. Pair only when updates need to reach another device.';
         }
         if (readyCount <= 0) {
-            return `${targetCount} verified ${targetCount === 1 ? 'device is' : 'devices are'} paired; open parent and protected devices together to Send Now.`;
+            return `${targetCount} verified ${targetCount === 1 ? 'device is' : 'devices are'} paired; open parent and protected devices together to Send Update.`;
         }
         const paths = [];
-        if (item.syncLiveReady === true) paths.push('Send Now');
+        if (item.syncLiveReady === true) paths.push('Send Update');
         if (item.syncLocalNetworkReady === true) paths.push('Home Bridge');
         if (item.syncMailboxReady === true) paths.push('Internet Pickup');
         return paths.length
@@ -528,7 +528,7 @@
             },
             {
                 action: 'bulk_send_managed_policy',
-                label: 'Send update',
+                label: 'Send Update',
                 group: 'send',
                 profileIds,
                 scope: 'active',
@@ -801,7 +801,7 @@
                 },
                 {
                     text: 'Pair a verified device only when remote delivery is needed',
-                    title: 'Send Now, Pick Up Later, and Home Bridge delivery appear after a protected profile exists.'
+                    title: 'Send Update, Internet Pickup, and Home Bridge delivery appear after a protected profile exists.'
                 }
             ].forEach((item) => {
                 const step = document.createElement('li');
@@ -952,7 +952,7 @@
         if (shouldShowProviderPrompt) {
             const providerPrompt = document.createElement('details');
             providerPrompt.className = 'ft-managed-command-center__provider-prompt';
-            providerPrompt.title = 'Most parents can skip this. Use only when Send Now is not enough.';
+            providerPrompt.title = 'Most parents can skip this. Use only when live Send Update is not enough.';
             const providerSummary = document.createElement('summary');
             providerSummary.className = 'ft-managed-command-center__provider-summary';
             const promptCopy = document.createElement('div');
@@ -1012,16 +1012,16 @@
             mailboxCopy.className = 'ft-managed-command-center__provider-copy';
             const mailboxTitle = document.createElement('strong');
             mailboxTitle.textContent = mailbox.configured
-                ? (mailbox.label || 'Pick up later is ready')
-                : 'Pick up later is off';
+                ? (mailbox.label || 'Internet Pickup is ready')
+                : 'Internet Pickup is off';
             const mailboxDetail = document.createElement('span');
             mailboxDetail.textContent = summary.profileCount > 0
                 ? (mailbox.detail || 'Use this when a parent update should wait until the protected device opens.')
-                : 'Create a protected profile first. Pick-up-later is optional and only useful after a protected device is paired.';
+                : 'Create a protected profile first. Internet Pickup is optional and only useful after a protected device is paired.';
             const mailboxRoute = document.createElement('span');
             mailboxRoute.textContent = mailbox.configured
                 ? 'The protected device still accepts only trusted parent updates.'
-                : 'Leave this off when Send Now is enough.';
+                : 'Leave this off when live Send Update is enough.';
             mailboxCopy.append(mailboxTitle, mailboxDetail, mailboxRoute);
             mailboxPanel.appendChild(mailboxCopy);
             if (h.onAction) {

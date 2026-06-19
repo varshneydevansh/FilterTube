@@ -5249,7 +5249,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const actionType = normalizeString(item.actionType);
         const transport = normalizeString(root.transport);
         if (actionType.startsWith('policy.channel_list.')) return 'Approved list';
-        if (actionType === 'remote_policy.source_push') return 'Send update';
+        if (actionType === 'remote_policy.source_push') return 'Send Update';
         if (actionType.startsWith('remote_policy.mailbox.')) return 'Internet Pickup';
         if (actionType.startsWith('remote_policy.local_network.')) return 'Home Bridge';
         if (actionType.startsWith('remote_policy.')) {
@@ -5411,7 +5411,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const noLinks = normalizeNonNegativeInteger(root.noLinkCount) || 0;
             const missingProvider = normalizeNonNegativeInteger(root.providerMissingCount) || 0;
             const deliveryBits = [];
-            if (liveSent) deliveryBits.push(`Send Now ${liveSent}`);
+            if (liveSent) deliveryBits.push(`Send Update ${liveSent}`);
             if (lanSent) deliveryBits.push(`Home Bridge ${lanSent}`);
             if (mailboxSent) deliveryBits.push(`Internet Pickup ${mailboxSent}`);
             if (failed) deliveryBits.push(`failed ${failed}`);
@@ -5556,7 +5556,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const noLinks = normalizeNonNegativeInteger(summary.noLinkCount) || 0;
             const providerMissing = normalizeNonNegativeInteger(summary.providerMissingCount) || 0;
             const bits = [];
-            if (liveSent) bits.push(`Send Now ${liveSent}`);
+            if (liveSent) bits.push(`Send Update ${liveSent}`);
             if (lanSent) bits.push(`Home Bridge ${lanSent}`);
             if (mailboxSent) bits.push(`Internet Pickup ${mailboxSent}`);
             if (failed) bits.push(`failed ${failed}`);
@@ -6948,7 +6948,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const sendNow = await showConfirmModal({
             title: title || 'Send managed update now?',
             message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send this ${normalizeString(label) || normalizedScope} update to those devices now.`,
-            confirmText: 'Send update',
+            confirmText: 'Send Update',
             cancelText: 'Not now'
         });
         if (sendNow) {
@@ -9240,7 +9240,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const sendNow = await showConfirmModal({
                 title: `Send ${managedBulkRuleTypeLabel(type)} update now?`,
                 message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send the ${surface === 'kids' ? 'YouTube Kids' : 'Main YouTube'} ${managedBulkRuleTypeLabel(type)} rule update to those devices now.`,
-                confirmText: 'Send update',
+                confirmText: 'Send Update',
                 cancelText: 'Not now'
             });
             if (sendNow) {
@@ -9428,7 +9428,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const sendNow = await showConfirmModal({
                 title: 'Send list update now?',
                 message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send this rule-list update to those devices now.`,
-                confirmText: 'Send update',
+                confirmText: 'Send Update',
                 cancelText: 'Not now'
             });
             if (sendNow) {
@@ -9706,7 +9706,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const sendNow = await showConfirmModal({
                 title: 'Send removal update now?',
                 message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send this list-removal update to those devices now.`,
-                confirmText: 'Send update',
+                confirmText: 'Send Update',
                 cancelText: 'Not now'
             });
             if (sendNow) {
@@ -9862,7 +9862,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const sendNow = await showConfirmModal({
                 title: `Send ${paused ? 'pause' : 'resume'} update now?`,
                 message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send this list ${paused ? 'pause' : 'resume'} update to those devices now.`,
-                confirmText: 'Send update',
+                confirmText: 'Send Update',
                 cancelText: 'Not now'
             });
             if (sendNow) {
@@ -10030,7 +10030,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const sendNow = await showConfirmModal({
                     title: 'Send checked list status now?',
                     message: `${readyProfileCount} checked ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send the updated list freshness/status to those devices now. Rule rows are unchanged.`,
-                    confirmText: 'Send update',
+                    confirmText: 'Send Update',
                     cancelText: 'Not now'
                 });
                 if (sendNow) {
@@ -10061,7 +10061,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const sendNow = await showConfirmModal({
                 title: 'Send refreshed list now?',
                 message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send this refreshed list update to those devices now.`,
-                confirmText: 'Send update',
+                confirmText: 'Send Update',
                 cancelText: 'Not now'
             });
             if (sendNow) {
@@ -10257,7 +10257,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const sendNow = await showConfirmModal({
                     title: staleOnly ? 'Send checked stale-list status now?' : 'Send checked list status now?',
                     message: `${readyProfileCount} checked ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send the updated list freshness/status to those devices now. Rule rows are unchanged.`,
-                    confirmText: 'Send update',
+                    confirmText: 'Send Update',
                     cancelText: 'Not now'
                 });
                 if (sendNow) {
@@ -10284,7 +10284,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const sendNow = await showConfirmModal({
                 title: staleOnly ? 'Send refreshed stale lists now?' : 'Send refreshed lists now?',
                 message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send these refreshed list updates to those devices now.`,
-                confirmText: 'Send update',
+                confirmText: 'Send Update',
                 cancelText: 'Not now'
             });
             if (sendNow) {
@@ -12381,7 +12381,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!showChooser) {
             if (ftNanahManagedTargetsHint) {
                 ftNanahManagedTargetsHint.textContent = eligibleLinks.length === 1
-                    ? `Send Now will target ${getNanahManagedTargetLabel(eligibleLinks[0])} on ${getNanahRemoteLabel()}.`
+                    ? `Send Update will target ${getNanahManagedTargetLabel(eligibleLinks[0])} on ${getNanahRemoteLabel()}.`
                     : 'Save fixed managed protected-profile targets on the connected replica before using multi-target sends.';
             }
             return eligibleLinks;
@@ -13247,7 +13247,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             title: title || 'Send Updates Later',
             message: message || 'Choose whether parent-approved updates need an optional waiting path for another device.',
             details: Array.isArray(details) ? details : [
-                'Use Send Now for normal parent control.',
+                'Use live Send Update for normal parent control.',
                 'Add an optional send path only when both devices cannot be open together.',
                 'Protected profiles still cannot change parent rules from their own surface.'
             ],
@@ -13384,7 +13384,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const endpoint = await showPromptModal({
             title: 'Home Bridge Address',
-            message: 'Advanced only. Enter a trusted Home Bridge address only if you run a FilterTube-compatible bridge. Normal parent control uses Send Now.',
+            message: 'Advanced only. Enter a trusted Home Bridge address only if you run a FilterTube-compatible bridge. Normal parent control uses live Send Update.',
             placeholder: 'http://192.168.1.10:4177/filtertube',
             inputType: 'url',
             confirmText: currentEndpoint ? 'Save Bridge' : 'Enable Home Bridge',
@@ -13580,7 +13580,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
         }
         const transports = [
-            liveReady ? 'Send Now' : '',
+            liveReady ? 'Send Update' : '',
             localReady ? 'Home Bridge' : '',
             mailboxReady ? 'Internet Pickup' : ''
         ].filter(Boolean).join(' + ');
@@ -18649,7 +18649,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                     if (policy.linkType === 'managed_link' && policy.authorityMode === 'managed' && getNanahRole() === 'source') {
                         if (!nanahManagedLivePolicy) {
-                            throw new Error('Managed policy Send Now helpers are unavailable');
+                            throw new Error('Managed policy Send Update helpers are unavailable');
                         }
                         const selectedTargetLinks = getNanahSelectedManagedTargetLinks(policy.scope);
                         if (ftNanahManagedTargetsField && !ftNanahManagedTargetsField.hidden && selectedTargetLinks.length === 0) {

@@ -117,7 +117,7 @@ extension authority code.
   advanced/runtime internals. The runtime roles, signed managed-link authority,
   target-profile validation, and provider gates are unchanged; only the parent
   mental model and high-visibility labels changed.
-- [x] Advanced delivery copy now treats `Send Now` as the normal parent flow and
+- [x] Advanced delivery copy now treats live `Send Update` as the normal parent flow and
   explains `Internet Pickup` and `Home Bridge` as optional send paths only. The
   Help relay section now separates Nanah's live meeting-place role from
   advanced later/home delivery, without implying those transports can become
@@ -127,7 +127,8 @@ extension authority code.
   `Connect the other device`; it describes the relay as a technical meeting
   service only in supporting copy, keeps `More controls` collapsed for role and
   scope details, and keeps the normal parent path as open both devices, pair,
-  verify, send, then save parent trust only for approved protected profiles.
+  verify, Send Update, then save parent trust only for approved protected
+  profiles.
 - [x] Accounts & Sync first-screen simplification slice: the Family Device
   Updates card now starts with one compact parent path (`choose what to
   manage`, `pair both devices`, `send approved changes`) instead of two
@@ -144,7 +145,7 @@ extension authority code.
   Help section now use parent-facing `Family Device Updates` language instead
   of leading with the Nanah implementation name. The raw relay URL is tucked
   behind a `Technical relay page` disclosure, and the main privacy banner says
-  the practical rule first: keep both devices open for Send Now; the meeting
+  the practical rule first: keep both devices open for live Send Update; the meeting
   step does not store rules or PINs.
 - [x] Accounts & Sync guidance simplification slice: the Family Device Updates
   intro now keeps the three-step live update path visible and moves protection
@@ -191,7 +192,7 @@ parent tool instead of a sync/debug console.
 - [x] Family Controls row details show list status without crowding the profile
   name, action buttons, or parent workflow.
 - [x] Managed action history clearly answers whether the latest row came from a
-  parent edit, approved list, remote update, Send update, Internet Pickup,
+  parent edit, approved list, remote update, Send Update, Internet Pickup,
   Home Bridge, trusted-device action, admin access, or history action while
   keeping raw policy JSON and sensitive rule payloads out of protected views.
 - [x] Downstream app UI contract documents the same Main/Kids/Both rule-list
@@ -386,7 +387,7 @@ parent tool instead of a sync/debug console.
     newer trusted parent updates when an optional waiting or home-network
     service is configured, and status strings say `not ready`, `cannot apply
     here`, or `no matching parent link` instead of raw provider errors. This is
-    UI/copy only; Send Now, profile targeting, signature/hash/revision
+    UI/copy only; live Send Update, profile targeting, signature/hash/revision
     validation, and offline last valid policy behavior are unchanged.
   - [x] Auto-check visibility slice: Family Controls now shows a read-only
     `Auto-check` detail for verified protected-profile devices. It reports
@@ -449,7 +450,7 @@ My Lists
   -> School-safe science channels
   -> Family block list
 
-Choose list -> Preview -> Apply to Pushy + Aanya -> Send update
+Choose list -> Preview -> Apply to Pushy + Aanya -> Send Update
 ```
 
 The advanced details, such as source URL, revision hash, stale refresh state,
@@ -698,7 +699,7 @@ FilterTube's profile, PIN, managed-policy, and local-first authority model.
 **Parent-facing model**:
 
 ```text
-Add list -> Preview -> Choose profiles -> Apply -> Send update
+Add list -> Preview -> Choose profiles -> Apply -> Send Update
 ```
 
 **Current extension-owned scope**:
