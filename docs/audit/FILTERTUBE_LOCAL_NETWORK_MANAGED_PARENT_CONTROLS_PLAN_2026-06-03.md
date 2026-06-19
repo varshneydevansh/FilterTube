@@ -431,6 +431,13 @@ parent tool instead of a sync/debug console.
     presented only as optional later-delivery setup for families or schools that
     run a compatible pickup service; transport authority and provider gates are
     unchanged.
+  - [x] Family Device Updates first-screen wording slice: the live update path
+    now says normal control is keeping both devices open and using Send Update,
+    while later pickup is optional and only for families or schools running a
+    compatible pickup service. The profile-update panel now says `Choose what
+    this device may send` so parents read the workflow as a reviewed send path,
+    not a required sync setup. Pairing, trust, scope, target-profile,
+    signature/hash/revision, and provider gates are unchanged.
   - [x] Internet Pickup open-check binding slice: a configured browser-side
     Internet Pickup provider is now installed under both the send/upload provider
     name and the profile-open pull provider name. This keeps `Send Update` later
