@@ -463,6 +463,11 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /function getNanahTrustedLinkDirectionSummary\(entry\)/);
   assert.match(source, /function formatNanahProtectedUpdateCheckStatus\(link\)/);
   assert.match(source, /Automatic saved updates/);
+  assert.match(source, /Check Saved Updates/);
+  assert.match(source, /manual_saved_update_check/);
+  assert.match(source, /await runNanahManagedOpenSync\(\{ reason: 'manual_saved_update_check' \}\)/);
+  assert.match(source, /await runNanahManagedLocalNetworkSync\(\{ reason: 'manual_saved_update_check' \}\)/);
+  assert.match(source, /Trusted-link validation still decides what can apply/);
   assert.match(helperSource, /configure_mailbox/);
   assert.match(helperSource, /group: 'rules'/);
   assert.match(helperSource, /group: 'send'/);

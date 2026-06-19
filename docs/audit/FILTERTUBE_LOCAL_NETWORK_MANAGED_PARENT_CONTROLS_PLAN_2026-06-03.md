@@ -465,6 +465,14 @@ parent tool instead of a sync/debug console.
     stay active if no approved update is reachable. No storage field, provider,
     signature/hash/revision gate, target-profile rule, or live Send Update
     behavior changed.
+  - [x] Manual saved-update check slice: trusted protected-device cards with
+    `Automatic saved updates` now expose `Check Saved Updates`. The action
+    explicitly runs the same Internet Pickup and Home Bridge profile-open
+    receive paths with a manual reason so caregivers can verify/update on
+    demand without waiting for another profile open. It does not add authority:
+    trusted-link validation, target-profile matching, scope, revision, hash,
+    signature checks, and local apply gates still decide whether anything can
+    apply.
   - [x] Later-delivery simplification slice: the Accounts & Sync first-read note
     and Family Controls provider prompt now say the normal path is still open
     both devices, pair, verify, and Send Update. Internet Pickup/Home Bridge are

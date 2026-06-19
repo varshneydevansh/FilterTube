@@ -15417,6 +15417,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (
                 safeObject(entry?.policy).linkType === 'managed_link'
+                && normalizeString(entry?.localRole) === 'replica'
+                && normalizeString(entry?.remoteRole) === 'source'
+                && safeObject(entry?.policy).syncOnProfileOpen === true
+            ) {
+                const checkSavedUpdatesBtn = document.createElement('button');
+                checkSavedUpdatesBtn.type = 'button';
+                checkSavedUpdatesBtn.className = 'btn-secondary';
+                checkSavedUpdatesBtn.textContent = 'Check Saved Updates';
+                checkSavedUpdatesBtn.title = 'Checks optional Internet Pickup and Home Bridge for newer signed parent updates. Trusted-link validation still decides what can apply.';
+                checkSavedUpdatesBtn.addEventListener('click', async () => {
+                    try {
+                        await runNanahManagedOpenSync({ reason: 'manual_saved_update_check' });
+                        await runNanahManagedLocalNetworkSync({ reason: 'manual_saved_update_check' });
+                        UIComponents.showToast('Checked saved parent updates', 'info');
+                    } catch (error) {
+                        console.error('FilterTube: saved parent update check failed', error);
+                        UIComponents.showToast(error?.message || 'Saved update check failed', 'error');
+                    }
+                });
+                actions.appendChild(checkSavedUpdatesBtn);
+            }
+
+            if (
+                safeObject(entry?.policy).linkType === 'managed_link'
                 && normalizeString(entry?.localRole) === 'source'
                 && normalizeString(entry?.remoteRole) === 'replica'
                 && isActiveNanahSourceManagedLink(entry)
