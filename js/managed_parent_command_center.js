@@ -57,7 +57,7 @@
                 ? helpers.getManagedLocalNetworkConfigSummary
                 : () => ({
                     configured: false,
-                    label: 'Home Bridge off',
+                    label: 'Bridge off',
                     detail: 'Same-network pickup needs an explicit FilterTube bridge; Wi-Fi discovery is never authority.',
                     tone: 'warning'
                 }),
@@ -1010,13 +1010,13 @@
             promptBodyText.textContent = 'Normal control is live: open both devices, pair, verify, send. Add one of these only if your family or school runs a compatible pickup service.';
             [
                 {
-                    label: 'Set Up Internet Pickup',
+                    label: 'Set Up Later Pickup',
                     title: 'For protected devices that should collect waiting approved updates next time they open.',
                     action: 'configure_mailbox',
                     scope: 'mailbox_provider'
                 },
                 {
-                    label: 'Set Up Home Bridge',
+                    label: 'Set Up Same-Network Bridge',
                     title: 'For an explicit FilterTube bridge you run on your home or school network. Wi-Fi alone never grants control.',
                     action: 'configure_local_network',
                     scope: 'local_network_provider'
@@ -1051,12 +1051,12 @@
             mailboxCopy.className = 'ft-managed-command-center__provider-copy';
             const mailboxTitle = document.createElement('strong');
             mailboxTitle.textContent = mailbox.configured
-                ? (mailbox.label || 'Internet Pickup is ready')
-                : 'Internet Pickup is off';
+                ? (mailbox.label || 'Later pickup is ready')
+                : 'Later pickup is off';
             const mailboxDetail = document.createElement('span');
             mailboxDetail.textContent = summary.profileCount > 0
                 ? (mailbox.detail || 'Use this when a parent update should wait until the protected device opens.')
-                : 'Create a protected profile first. Internet Pickup is optional and only useful after a protected device is paired.';
+                : 'Create a protected profile first. Later pickup is optional and only useful after a protected device is paired.';
             const mailboxRoute = document.createElement('span');
             mailboxRoute.textContent = mailbox.configured
                 ? 'The protected device still accepts only trusted parent updates.'
@@ -1067,7 +1067,7 @@
                 const mailboxButton = document.createElement('button');
                 mailboxButton.className = 'btn-secondary';
                 mailboxButton.type = 'button';
-                mailboxButton.textContent = mailbox.configured ? 'Edit Internet Pickup' : 'Set Up Internet Pickup';
+                mailboxButton.textContent = mailbox.configured ? 'Edit Later Pickup' : 'Set Up Later Pickup';
                 mailboxButton.title = 'Requires parent/account re-auth. Use only when updates must wait for the protected device to open later.';
                 mailboxButton.addEventListener('click', (event) => {
                     event.preventDefault();
@@ -1091,12 +1091,12 @@
             localCopy.className = 'ft-managed-command-center__provider-copy';
             const localTitle = document.createElement('strong');
             localTitle.textContent = localNetwork.configured
-                ? (localNetwork.label || 'Home Bridge is set up')
-                : 'Home Bridge is off';
+                ? (localNetwork.label || 'Bridge is set up')
+                : 'Bridge is off';
             const localDetail = document.createElement('span');
             localDetail.textContent = summary.profileCount > 0
                 ? (localNetwork.detail || 'Use this only with a trusted FilterTube-compatible bridge on your home or school network.')
-                : 'Create a protected profile first. Home Bridge is optional and never replaces parent trust.';
+                : 'Create a protected profile first. Same-network bridge is optional and never replaces parent trust.';
             const localRoute = document.createElement('span');
             localRoute.textContent = localNetwork.configured
                 ? 'The protected device still accepts only trusted parent updates.'
@@ -1107,7 +1107,7 @@
                 const localButton = document.createElement('button');
                 localButton.className = 'btn-secondary';
                 localButton.type = 'button';
-                localButton.textContent = localNetwork.configured ? 'Edit Home Bridge' : 'Set Up Home Bridge';
+                localButton.textContent = localNetwork.configured ? 'Edit Bridge' : 'Set Up Same-Network Bridge';
                 localButton.title = 'Requires parent/account re-auth. Being on the same network alone cannot change protected rules.';
                 localButton.addEventListener('click', (event) => {
                     event.preventDefault();

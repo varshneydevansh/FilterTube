@@ -233,8 +233,8 @@ test('dashboard source wires provider-gated local-network discovery without YouT
   assert.match(source, /discoverManagedPolicyCandidates/);
   assert.match(source, /discoverLocalNetworkCandidates/);
   assert.match(source, /checkManagedLocalNetworkBridge/);
-  assert.match(source, /Home Bridge saved and reachable/);
-  assert.match(source, /Home Bridge saved, but it did not answer the readiness check/);
+  assert.match(source, /Bridge saved and reachable/);
+  assert.match(source, /Bridge saved, but it did not answer the readiness check/);
   assert.match(source, /filtertube_managed_local_network_candidate_ack/);
   assert.match(source, /ackManagedPolicyCandidates/);
   assert.match(source, /ackLocalNetworkCandidates/);

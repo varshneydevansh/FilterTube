@@ -566,6 +566,13 @@ parent tool instead of a sync/debug console.
     boundaries. This is copy/UI state only; trusted-link, target-profile,
     signature/hash/revision, provider, and runtime validation gates are
     unchanged.
+  - [x] 2026-06-20 Family Device Updates setup-label slice: the setup entry
+    points now say `Set Up Later Pickup` and `Set Up Same-Network Bridge` /
+    `Edit Bridge`, while status/history/provider checks can still use Internet
+    Pickup and Home Bridge where those exact transport names clarify audit
+    evidence. This is copy/UI state only; trusted-link, target-profile,
+    signature/hash/revision, provider, and runtime validation gates are
+    unchanged.
   - [x] Family Device Updates default-mode slice: the first-run Accounts & Sync
     mode is now `Update protected device` / `parent_control` instead of
     `Copy once`. A previously saved user mode is still respected, child

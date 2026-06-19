@@ -156,11 +156,13 @@ they are no longer the first label a parent has to understand.
 The Family Device Updates delivery-path strip now keeps the same parent model on
 the pairing surface itself: `Live update` is the default path when both devices
 are open. The first screen now says `If the other device opens later`, `Later
-over internet`, and `Same network` instead of leading with provider names. If
-Internet Pickup or Home Bridge is already configured, the disclosure opens
-automatically to keep that existing send path visible. The strip is status and
-setup navigation only; it does not create hidden background sync, LAN discovery
-authority, or YouTube runtime work.
+over internet`, and `Same network` instead of leading with provider names. Setup
+buttons now use `Set Up Later Pickup` and `Set Up Same-Network Bridge` so the
+parent sees the task before the transport name. If Internet Pickup or Home
+Bridge is already configured, the disclosure opens automatically to keep that
+existing send path visible. The strip is status and setup navigation only; it
+does not create hidden background sync, LAN discovery authority, or YouTube
+runtime work.
 When Internet Pickup or Home Bridge is configured, the same disclosure can show
 `Check waiting parent updates` for a protected-device profile that has already
 saved a trusted parent link. That button only runs the existing manual
@@ -309,20 +311,18 @@ state without exposing plaintext rule values:
   local HTTP gateways, but discovery remains transport only; target trust,
   source key, scope, revision, hash, and signature validation still happen in
   the local managed-policy apply path.
-- `Set Up Internet Pickup`/`Edit Internet Pickup`
-  save or clear only the encrypted
-  pick-up-later endpoint configuration after parent/account re-auth. They do not
-  create a sync account, publish rules, expose tokens in the UI, or turn the
-  mailbox server into policy authority. The setup flow first asks parents to
-  set up/edit or explicitly turn off Internet Pickup, and the endpoint prompt also
-  treats a blank endpoint as disabling pick-up-later delivery so the visible prompt
-  matches runtime behavior.
-- `Set Up Home Bridge`/`Edit Home Bridge` save or clear only the home bridge
-  endpoint configuration after parent/account re-auth. They do not create
-  authority from network reachability, expose tokens in the UI, or let a LAN
-  gateway choose profiles/rules. The setup flow now first asks parents to
-  set up/edit or explicitly turn off Home Bridge; an empty endpoint no longer acts
-  as the disable command.
+- `Set Up Later Pickup`/`Edit Later Pickup`
+  save or clear only the encrypted pick-up-later endpoint configuration after
+  parent/account re-auth. They do not create a sync account, publish rules,
+  expose tokens in the UI, or turn the mailbox server into policy authority.
+  Status, history, and provider checks can still identify the precise transport
+  as Internet Pickup.
+- `Set Up Same-Network Bridge`/`Edit Bridge` save or clear only the explicit
+  same-network bridge endpoint configuration after parent/account re-auth. They
+  do not create authority from network reachability, expose tokens in the UI, or
+  let a LAN gateway choose profiles/rules. Status, history, and provider checks
+  can still identify the precise transport as Home Bridge where that precision is
+  useful.
 - Send-path setup copy uses parent/user language and avoids presenting revision,
   hash, or signature details in the decision modal. Audit docs retain those
   proof details; the product surface says that protected devices accept only
