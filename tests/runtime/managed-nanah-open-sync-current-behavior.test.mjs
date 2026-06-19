@@ -6,6 +6,7 @@ import vm from 'node:vm';
 
 const repoRoot = process.cwd();
 const helperPath = 'js/nanah_managed_open_sync.js';
+const mailboxClientPath = 'js/nanah_managed_mailbox_client.js';
 const tabViewPath = 'js/tab-view.js';
 const tabHtmlPath = 'html/tab-view.html';
 const docPath = 'docs/audit/FILTERTUBE_NANAH_MANAGED_PULL_ON_OPEN_2026-06-04.md';
@@ -116,6 +117,7 @@ test('managed open-sync audit is docs-backed and linked from plan inventory and 
 test('dashboard loads open-sync helper and wires policy toggle status and open/profile hooks', () => {
   const tabView = read(tabViewPath);
   const html = read(tabHtmlPath);
+  const mailboxClient = read(mailboxClientPath);
 
   assert.match(html, /js\/nanah_managed_mailbox_client\.js/);
   assert.match(html, /js\/nanah_managed_open_sync\.js/);
@@ -127,7 +129,9 @@ test('dashboard loads open-sync helper and wires policy toggle status and open/p
   assert.match(tabView, /recordAckHistory: \(details\) => recordManagedOpenSyncAckHistory\(details\)/);
   assert.match(tabView, /window\.FilterTubeNanahManagedOpenSync\?\.create/);
   assert.match(tabView, /syncOnProfileOpen: linkType === 'managed_link' && syncOnProfileOpen/);
-  assert.match(tabView, /Check for parent updates when this profile opens/);
+  assert.match(tabView, /Automatic saved updates/);
+  assert.match(tabView, /window\.FilterTubeManagedPolicyOpenSync = window\.FilterTubeManagedPolicyMailbox/);
+  assert.match(mailboxClient, /global\.FilterTubeManagedPolicyOpenSync = provider/);
   assert.match(tabView, /Internet Pickup/);
   assert.match(tabView, /await runNanahManagedOpenSync\(\{ reason: 'dashboard_open' \}\)/);
   assert.match(tabView, /await runNanahManagedOpenSync\(\{ reason: 'profile_switch' \}\)/);
@@ -215,7 +219,7 @@ test('open-sync provider failure never applies or acknowledges returned mailbox 
   assert.equal(state.linkResults[0].ok, false);
   assert.equal(state.linkResults[0].reason, 'parent_offline');
   assert.equal(state.linkResults[0].pulledItemCount, 0);
-  assert.equal(helper.formatStatus(managedLink(), state, 'child-profile-1'), 'Provider rejected pull (just now)');
+  assert.equal(helper.formatStatus(managedLink(), state, 'child-profile-1'), 'Update check rejected (just now)');
 });
 
 test('open-sync provider throw fails closed without applying or acknowledging items', async () => {
@@ -245,7 +249,7 @@ test('open-sync provider throw fails closed without applying or acknowledging it
   assert.equal(state.linkResults[0].ok, false);
   assert.equal(state.linkResults[0].reason, 'local provider unavailable');
   assert.equal(state.ackAttemptedCount, 0);
-  assert.equal(helper.formatStatus(managedLink(), state, 'child-profile-1'), 'Provider rejected pull (just now)');
+  assert.equal(helper.formatStatus(managedLink(), state, 'child-profile-1'), 'Update check rejected (just now)');
 });
 
 test('open-sync provider applies only returned decrypted mailbox items and emits redacted ack records', async () => {

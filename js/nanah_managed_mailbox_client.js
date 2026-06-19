@@ -287,10 +287,16 @@
     }
 
     function installConfiguredProvider() {
-        if (global.FilterTubeManagedPolicyMailbox) return global.FilterTubeManagedPolicyMailbox;
+        if (global.FilterTubeManagedPolicyMailbox) {
+            if (!global.FilterTubeManagedPolicyOpenSync) {
+                global.FilterTubeManagedPolicyOpenSync = global.FilterTubeManagedPolicyMailbox;
+            }
+            return global.FilterTubeManagedPolicyMailbox;
+        }
         const provider = readConfiguredProvider();
         if (provider && provider.configured) {
             global.FilterTubeManagedPolicyMailbox = provider;
+            global.FilterTubeManagedPolicyOpenSync = provider;
         }
         return global.FilterTubeManagedPolicyMailbox || null;
     }

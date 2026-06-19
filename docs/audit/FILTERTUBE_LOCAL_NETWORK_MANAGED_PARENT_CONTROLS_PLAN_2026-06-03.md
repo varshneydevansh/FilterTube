@@ -431,6 +431,12 @@ parent tool instead of a sync/debug console.
     presented only as optional later-delivery setup for families or schools that
     run a compatible pickup service; transport authority and provider gates are
     unchanged.
+  - [x] Internet Pickup open-check binding slice: a configured browser-side
+    Internet Pickup provider is now installed under both the send/upload provider
+    name and the profile-open pull provider name. This keeps `Send Update` later
+    delivery and `Automatic saved updates` on protected profile open wired to the
+    same explicitly configured pickup service without changing provider authority,
+    encryption, target-profile, scope, revision, hash, or signature validation.
   - [x] Trusted-device card wording slice: saved managed links now show
     `Allowed areas`, `Usual area`, `Update behavior`, `Matching parent updates`,
     `Next connection`, `Everyday protection`, `Where updates land`, and

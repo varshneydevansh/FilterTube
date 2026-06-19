@@ -13178,13 +13178,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!normalizeString(root.endpointUrl || root.url || root.baseUrl)) {
                 localStorage.removeItem(NANAH_MANAGED_MAILBOX_CONFIG_KEY);
                 delete window.FilterTubeManagedPolicyMailbox;
+                delete window.FilterTubeManagedPolicyOpenSync;
                 return null;
             }
             localStorage.setItem(NANAH_MANAGED_MAILBOX_CONFIG_KEY, JSON.stringify(root));
             if (window.FilterTubeManagedMailboxClient?.createProvider) {
                 window.FilterTubeManagedPolicyMailbox = window.FilterTubeManagedMailboxClient.createProvider(root);
+                window.FilterTubeManagedPolicyOpenSync = window.FilterTubeManagedPolicyMailbox;
             } else {
                 delete window.FilterTubeManagedPolicyMailbox;
+                delete window.FilterTubeManagedPolicyOpenSync;
             }
             return window.FilterTubeManagedPolicyMailbox || null;
         } catch (_) {
