@@ -2306,16 +2306,18 @@ html[data-theme="dark"] .card::after {
     flex-wrap: wrap;
 }
 
-.managed-channel-list-modal-overlay {
+.ft-modal-overlay.managed-channel-list-modal-overlay {
     --managed-rule-modal-gutter: clamp(0.55rem, 1.7vw, 1.25rem);
-    align-items: stretch;
     box-sizing: border-box;
+    display: grid;
+    align-items: center;
+    justify-items: center;
     overflow: hidden;
     padding: var(--managed-rule-modal-gutter);
 }
 
-.managed-channel-list-modal.ft-modal,
-.managed-channel-list-modal {
+.ft-modal-overlay.managed-channel-list-modal-overlay > .managed-channel-list-modal.ft-modal,
+.ft-modal-overlay.managed-channel-list-modal-overlay > .managed-channel-list-modal {
     box-sizing: border-box;
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
@@ -2337,6 +2339,9 @@ html[data-theme="dark"] .card::after {
 
 .managed-channel-list-modal > .card-header {
     min-width: 0;
+    position: relative;
+    z-index: 2;
+    background: linear-gradient(180deg, var(--ft-color-bg-card), rgba(255, 255, 255, 0.86));
 }
 
 .managed-channel-list-modal__body {
@@ -2344,7 +2349,7 @@ html[data-theme="dark"] .card::after {
     grid-template-rows: auto minmax(0, 1fr) auto;
     gap: 0.9rem;
     min-height: 0;
-    overflow: auto;
+    overflow: hidden;
     overscroll-behavior: contain;
     padding: var(--ft-space-lg);
 }
@@ -2355,6 +2360,7 @@ html[data-theme="dark"] .card::after {
     gap: 0.9rem;
     align-items: start;
     min-height: 0;
+    max-height: 100%;
     overflow: hidden;
     padding-right: 0.18rem;
 }
@@ -2930,15 +2936,18 @@ html[data-theme="dark"] .card::after {
 @media (max-width: 900px) {
     .managed-channel-list-modal-overlay {
         --managed-rule-modal-gutter: 0.5rem;
-        align-items: stretch;
     }
 
-    .managed-channel-list-modal.ft-modal,
-    .managed-channel-list-modal {
+    .ft-modal-overlay.managed-channel-list-modal-overlay > .managed-channel-list-modal.ft-modal,
+    .ft-modal-overlay.managed-channel-list-modal-overlay > .managed-channel-list-modal {
         width: calc(100vw - 1rem);
         max-width: calc(100vw - 1rem);
         height: calc(100dvh - 1rem);
         max-height: calc(100dvh - 1rem);
+    }
+
+    .managed-channel-list-modal__body {
+        overflow: auto;
     }
 
     .managed-channel-list-modal__layout {
