@@ -42,21 +42,23 @@ Profiles: Asha, Kabir
 
 ## Settings UI Format Gallery
 
-Settings -> Import / Export -> Rule list imports uses a format gallery rather
+Settings -> Import / Export -> Rule list imports uses a format showcase rather
 than one dense parser table. The first screen must answer one parent question:
-"What does my file need to look like before I import it?"
+"What does my file need to look like before I import it?" It should look like
+a small demo of the incoming artifact, not like developer documentation.
 
 Current visible previews:
 
-- CSV: a miniature spreadsheet preview with a filename bar, column letters,
-  row numbers, and `channel_id`, `keyword`, and `notes` columns. It shows
-  handles, UC channel IDs, `/c/Name`, and keyword rows without forcing parents
-  to read parser prose first.
-- JSON: a rule-list JSON preview with a field-map row for `channels` and
-  `keywords`, followed by the raw JSON snippet. It is explicitly not the full
-  FilterTube backup format.
+- CSV: a miniature spreadsheet preview with a filename bar, formula row,
+  column letters, row numbers, and `channel_id`, `keyword`, and `notes`
+  columns. It shows handles, UC channel IDs, `/c/Name`, and keyword rows
+  without forcing parents to read parser prose first.
+- JSON: a rule-list JSON preview with a field-map pane for `channels` and
+  `keywords` plus a raw JSON pane beside it on wide screens. It is explicitly
+  not the full FilterTube backup format.
 - TXT: a lined text-file preview with one row per rule, bare rows
-  channel-first, and `keyword:` required for keyword rows.
+  channel-first, `channel:` supported for explicit channel rows, and
+  `keyword:` required for keyword rows.
 - URL / BlockTube: separate source cards for raw HTTPS CSV/TXT/JSON lists and
   BlockTube `filterData` arrays. These still open a preview before applying.
 
@@ -328,13 +330,15 @@ Current completion rule:
 - Primary entry point: Settings -> Import / Export -> Rule list imports.
 - Target choice: Main YouTube, YouTube Kids, or Both. This works for the active profile or the protected profile currently being edited by a parent/account profile.
 - Main/Kids rule pages remain the place to review, edit, pause, resume, and remove the imported rows after import.
-- The Settings card shows a selectable format gallery instead of dense prose.
+- The Settings card shows a selectable format showcase instead of dense prose.
   CSV is the default and looks like a small spreadsheet with `channel_id`,
-  `keyword`, and `notes` columns. JSON looks like a field map plus a raw
-  snippet, TXT looks like a simple line list, and URL/BlockTube uses source
-  cards. Parents see one concrete artifact at a time instead of a crowded
-  combined explanation. Deeper supported formats, stale checks, and templates
-  sit behind disclosures so the default parent flow stays readable.
+  `keyword`, and `notes` columns plus a formula/header row. JSON looks like a
+  structured field map next to the raw snippet. TXT looks like a line-list
+  document and includes the explicit `channel:` and `keyword:` patterns. URL
+  and BlockTube use source cards. Parents see one concrete artifact at a time
+  instead of a crowded combined explanation. Deeper supported formats, stale
+  checks, and templates sit behind disclosures so the default parent flow stays
+  readable.
 - The modal says rule list, shows supported formats, CSV template, file/URL/paste inputs, live preview counts, skipped row counts, a spreadsheet-like parsed-row preview, and the final Apply confirmation.
 - Rule-list JSON is intentionally narrower than a full FilterTube backup JSON. It may add channels and keywords only; it does not change profile structure, PINs, trusted devices, viewing spaces, or sync targets.
 - The Settings card and import modal expose both CSV and JSON rule-list templates. The CSV template is the spreadsheet path; the JSON template is the lightweight rule-list shape, not the full FilterTube backup/export structure.

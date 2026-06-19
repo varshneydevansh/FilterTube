@@ -490,23 +490,23 @@
                                                 <div class="help-item-body import-export-row">
                                                     <div class="import-export-text">
                                                         <span class="import-export-summary">
-                                                            Add channel and keyword rules from a file or public list URL.<br />
+                                                            Bring in a channel or keyword list, then choose where it applies.<br />
                                                         </span>
                                                         <span class="import-export-hint">
-                                                            FilterTube previews channels, keywords, and skipped rows before anything changes. Imported lists cannot change PINs, time limits, viewing spaces, profiles, or trusted devices.
+                                                            FilterTube previews every understood row before anything changes. Files can add rules only; they cannot change PINs, time limits, viewing spaces, profiles, or trusted devices.
                                                         </span>
                                                         <div class="rule-list-import-flow" aria-label="Rule list import flow">
                                                             <div class="rule-list-import-flow__step">
-                                                                <strong>1. Choose source</strong>
-                                                                <span>CSV, TXT, JSON, BlockTube JSON, or raw HTTPS list URL.</span>
+                                                                <strong>Pick a list</strong>
+                                                                <span>Choose a file, paste rows, or load a raw HTTPS list.</span>
                                                             </div>
                                                             <div class="rule-list-import-flow__step">
-                                                                <strong>2. Review preview</strong>
-                                                                <span>See channels, keywords, skipped rows, and source before applying.</span>
+                                                                <strong>Check the preview</strong>
+                                                                <span>Confirm channels, keywords, skipped rows, and source.</span>
                                                             </div>
                                                             <div class="rule-list-import-flow__step">
-                                                                <strong>3. Apply rules</strong>
-                                                                <span>Choose Main, Kids, or both. Send Update only if another verified device needs it.</span>
+                                                                <strong>Apply with intent</strong>
+                                                                <span>Choose Main, Kids, or both. Send Update only for verified devices.</span>
                                                             </div>
                                                         </div>
                                                         <div class="rule-list-format-showcase" aria-label="Rule list format previews">
@@ -514,24 +514,40 @@
                                                             <input id="ftRulePreviewJson" class="rule-list-format-showcase__input" type="radio" name="ftRulePreviewFormat" />
                                                             <input id="ftRulePreviewTxt" class="rule-list-format-showcase__input" type="radio" name="ftRulePreviewFormat" />
                                                             <input id="ftRulePreviewUrl" class="rule-list-format-showcase__input" type="radio" name="ftRulePreviewFormat" />
+                                                            <div class="rule-list-format-showcase__header">
+                                                                <div>
+                                                                    <strong>Preview the file shape</strong>
+                                                                    <span>Pick a format to see what parents can import safely.</span>
+                                                                </div>
+                                                                <code>preview first</code>
+                                                            </div>
                                                             <div class="rule-list-format-tabs" role="tablist" aria-label="Preview a supported rule-list format">
-                                                                <label for="ftRulePreviewCsv" role="tab"><strong>CSV</strong><span>Sheet columns</span></label>
-                                                                <label for="ftRulePreviewJson" role="tab"><strong>JSON</strong><span>App list</span></label>
-                                                                <label for="ftRulePreviewTxt" role="tab"><strong>TXT</strong><span>Line list</span></label>
-                                                                <label for="ftRulePreviewUrl" role="tab"><strong>URL</strong><span>Web list</span></label>
+                                                                <label for="ftRulePreviewCsv" role="tab"><strong>CSV</strong><span>Spreadsheet</span></label>
+                                                                <label for="ftRulePreviewJson" role="tab"><strong>JSON</strong><span>Structured list</span></label>
+                                                                <label for="ftRulePreviewTxt" role="tab"><strong>TXT</strong><span>Line by line</span></label>
+                                                                <label for="ftRulePreviewUrl" role="tab"><strong>URL</strong><span>Public source</span></label>
                                                             </div>
                                                             <div class="rule-list-format-stage">
                                                                 <article class="rule-list-format-panel rule-list-format-panel--csv">
                                                                     <div class="rule-list-format-panel__copy">
                                                                         <span class="rule-list-format-panel__eyebrow">Spreadsheet file</span>
                                                                         <strong>CSV sheet preview</strong>
-                                                                        <span>Edit this in Numbers, Excel, or Sheets. Each row can add one channel, one keyword, or both.</span>
-                                                                        <span class="rule-list-format-panel__accepts">Use channel IDs, handles, channel URLs, <code>/c/Name</code>, <code>/user/Name</code>, or keywords.</span>
+                                                                        <span>Best when a parent or list maintainer edits rows in Numbers, Excel, or Sheets.</span>
+                                                                        <div class="rule-list-format-panel__facts">
+                                                                            <span>Channels: <code>UC...</code>, <code>@handle</code>, URL, <code>/c/Name</code>, or <code>/user/Name</code>.</span>
+                                                                            <span>Keywords: plain words or phrases in the <code>keyword</code> column.</span>
+                                                                            <span>Notes: shown to humans, ignored by runtime.</span>
+                                                                        </div>
                                                                     </div>
                                                                     <div class="rule-list-preview-sheet" role="table" aria-label="CSV spreadsheet-style rule list example">
                                                                         <div class="rule-list-preview-sheet__toolbar">
+                                                                            <span class="rule-list-preview-sheet__dot"></span>
                                                                             <strong>filtertube-rule-list.csv</strong>
-                                                                            <span>Previewed before import</span>
+                                                                            <span>Spreadsheet preview</span>
+                                                                        </div>
+                                                                        <div class="rule-list-preview-sheet__formula">
+                                                                            <span>A1</span>
+                                                                            <code>channel_id, keyword, notes</code>
                                                                         </div>
                                                                         <div class="rule-list-preview-sheet__letters" aria-hidden="true">
                                                                             <span></span>
@@ -575,25 +591,30 @@
                                                                     <div class="rule-list-format-panel__copy">
                                                                         <span class="rule-list-format-panel__eyebrow">Rule-list JSON</span>
                                                                         <strong>JSON rule-list preview</strong>
-                                                                        <span>Use this when a list maintainer publishes structured channel and keyword arrays.</span>
-                                                                        <span class="rule-list-format-panel__accepts">This is not a full FilterTube backup. It cannot change profiles, PINs, time limits, or trusted devices.</span>
+                                                                        <span>Best when a public list or another tool exports explicit arrays.</span>
+                                                                        <div class="rule-list-format-panel__facts">
+                                                                            <span><code>channels</code> adds channel IDs, handles, and channel URLs.</span>
+                                                                            <span><code>keywords</code> adds topic words or phrases.</span>
+                                                                            <span>This is not a full FilterTube backup and cannot edit profiles or sync trust.</span>
+                                                                        </div>
                                                                     </div>
                                                                     <div class="rule-list-preview-json" aria-label="Simple JSON rule list example">
                                                                         <div class="rule-list-preview-json__header">
                                                                             <span>{ }</span>
                                                                             <strong>filtertube-list.json</strong>
                                                                         </div>
-                                                                        <div class="rule-list-preview-json__map" aria-label="JSON fields accepted for rule-list imports">
-                                                                            <div>
-                                                                                <span>channels</span>
-                                                                                <code>["@SomeChannel", "UC...", "https://youtube.com/@AnotherChannel"]</code>
+                                                                        <div class="rule-list-preview-json__body">
+                                                                            <div class="rule-list-preview-json__map" aria-label="JSON fields accepted for rule-list imports">
+                                                                                <div>
+                                                                                    <span>channels</span>
+                                                                                    <code>["@SomeChannel", "UC...", "https://youtube.com/@AnotherChannel"]</code>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <span>keywords</span>
+                                                                                    <code>["brainrot", "scary thumbnail"]</code>
+                                                                                </div>
                                                                             </div>
-                                                                            <div>
-                                                                                <span>keywords</span>
-                                                                                <code>["brainrot", "scary thumbnail"]</code>
-                                                                            </div>
-                                                                        </div>
-                                                                        <pre class="rule-list-preview-code">{
+                                                                            <pre class="rule-list-preview-code">{
   "title": "Family safety starter list",
   "channels": [
     "@SomeChannel",
@@ -605,19 +626,24 @@
     "scary thumbnail"
   ]
 }</pre>
+                                                                        </div>
                                                                     </div>
                                                                 </article>
                                                                 <article class="rule-list-format-panel rule-list-format-panel--txt">
                                                                     <div class="rule-list-format-panel__copy">
                                                                         <span class="rule-list-format-panel__eyebrow">Plain text file</span>
                                                                         <strong>TXT row preview</strong>
-                                                                        <span>Good for pasted lists. Bare rows are treated as channels for safety.</span>
-                                                                        <span class="rule-list-format-panel__accepts">Use <code>keyword:</code> when a row should become a keyword rule.</span>
+                                                                        <span>Best for pasted channel lists and simple hand-written lists.</span>
+                                                                        <div class="rule-list-format-panel__facts">
+                                                                            <span>Bare rows are treated as channels for safety.</span>
+                                                                            <span>Use <code>channel:</code> to be explicit.</span>
+                                                                            <span>Use <code>keyword:</code> when a row should become a keyword rule.</span>
+                                                                        </div>
                                                                     </div>
                                                                     <div class="rule-list-preview-lines" aria-label="Plain text rule list rows">
                                                                         <div class="rule-list-preview-lines__title"><strong>family-starter-list.txt</strong><span>One rule per line</span></div>
                                                                         <div><span>comment</span><code># title: Family starter list</code></div>
-                                                                        <div><span>channel</span><code>@SomeChannel</code></div>
+                                                                        <div><span>channel</span><code>channel: @SomeChannel</code></div>
                                                                         <div><span>channel</span><code>UCxxxxxxxxxxxxxxxxxxxxxx</code></div>
                                                                         <div><span>channel</span><code>https://www.youtube.com/@AnotherChannel</code></div>
                                                                         <div><span>keyword</span><code>keyword: scary thumbnail</code></div>
@@ -627,8 +653,12 @@
                                                                     <div class="rule-list-format-panel__copy">
                                                                         <span class="rule-list-format-panel__eyebrow">External list</span>
                                                                         <strong>Public URL and BlockTube preview</strong>
-                                                                        <span>Use a raw HTTPS list URL or a BlockTube export when a community list already exists.</span>
-                                                                        <span class="rule-list-format-panel__accepts">FilterTube downloads the list, previews understood rows, then waits for parent approval.</span>
+                                                                        <span>Best when a community list already exists or a user is migrating from BlockTube.</span>
+                                                                        <div class="rule-list-format-panel__facts">
+                                                                            <span>Raw HTTPS lists are downloaded into the same preview.</span>
+                                                                            <span>BlockTube channel and title arrays are treated as channels and keywords.</span>
+                                                                            <span>Nothing applies until the parent approves the preview.</span>
+                                                                        </div>
                                                                     </div>
                                                                     <div class="rule-list-preview-split" aria-label="URL and BlockTube import examples">
                                                                         <div>
