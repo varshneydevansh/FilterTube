@@ -198,6 +198,10 @@ test('local-network provider hook is docs-backed and linked from managed parent 
   assert.match(doc, /runtime protected local-network ack-handoff history writer: present/);
   assert.match(doc, /runtime built-in LAN peer discovery: absent/);
   assert.match(doc, /runtime YouTube page hot-path work from this slice: absent/);
+  assert.match(doc, /No matching parent link \(age\)/);
+  assert.match(doc, /Waiting for Home Bridge \(age\)/);
+  assert.match(doc, /N accepted, M rejected, K ack failed \(age\)/);
+  assert.match(doc, /last provider-check timestamp/);
   assert.match(doc, new RegExp(sourceAckDocPath));
   assert.match(sourceAckDoc, /Source-side mailbox\/local-network delivery ack intake and dashboard\s+status are present/);
   assert.match(sourceAckDoc, /filtertube_managed_source_delivery_ack_request/);
@@ -230,6 +234,12 @@ test('dashboard source wires provider-gated local-network discovery without YouT
   assert.match(source, /remote_policy\.local_network\.ack/);
   assert.match(source, /Home Bridge receipt recorded/);
   assert.match(source, /async function runNanahManagedLocalNetworkSync\(\{ reason = 'dashboard_open' \} = \{\}\)/);
+  assert.match(source, /appendLocalNetworkCheckedAge/);
+  assert.match(source, /No matching parent link/);
+  assert.match(source, /Waiting for Home Bridge/);
+  assert.match(source, /\$\{accepted\} accepted, \$\{rejected\} rejected, \$\{ackFailed\} ack failed/);
+  assert.match(source, /Home Bridge rejected/);
+  assert.match(source, /No updates/);
   assert.match(source, /handleNanahIncomingManagedLocalNetworkCandidate\(candidate\)/);
   assert.match(source, /recordManagedOpenSyncAckHistory\(\{\s*request,\s*records: ackRecords,\s*ackResult,\s*transport: 'local_network'/s);
   assert.match(source, /await runNanahManagedLocalNetworkSync\(\{ reason: 'dashboard_open' \}\)/);

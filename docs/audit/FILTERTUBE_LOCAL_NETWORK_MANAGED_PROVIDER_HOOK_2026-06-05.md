@@ -95,11 +95,18 @@ Visible states are feedback only:
 Off
 Ready
 Checked
-Checked, no candidates
-Waiting for provider
-Rejected by provider
-N accepted, M rejected
+No updates (age)
+No matching parent link (age)
+Waiting for Home Bridge (age)
+Home Bridge rejected (age)
+N accepted, M rejected (age)
+N accepted, M rejected, K ack failed (age)
 ```
+
+The age suffix uses the last provider-check timestamp and exists only so a
+parent/caregiver can tell whether a protected profile actually checked for
+saved Home Bridge updates after opening. It does not grant authority and does
+not make the bridge a background scheduler.
 
 ## Eligibility Gates
 

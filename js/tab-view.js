@@ -14718,16 +14718,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (policy.syncOnProfileOpen !== true) return 'Off';
         const state = safeObject(nanahManagedLocalNetworkSyncState);
         if (normalizeString(state.profileId) && normalizeString(state.profileId) !== activeProfileId) return 'Ready';
-        if (normalizeString(state.reasonCode) === 'local_network_provider_unavailable') return 'Waiting for Home Bridge';
+        const appendLocalNetworkCheckedAge = (label) => {
+            const checkedAt = Number(state.checkedAt);
+            if (!Number.isFinite(checkedAt) || checkedAt <= 0) return label;
+            const elapsedMs = Math.max(0, Date.now() - checkedAt);
+            const elapsedSeconds = Math.floor(elapsedMs / 1000);
+            if (elapsedSeconds < 60) return `${label} (just now)`;
+            const elapsedMinutes = Math.floor(elapsedSeconds / 60);
+            if (elapsedMinutes < 60) return `${label} (${elapsedMinutes}m ago)`;
+            const elapsedHours = Math.floor(elapsedMinutes / 60);
+            if (elapsedHours < 24) return `${label} (${elapsedHours}h ago)`;
+            const elapsedDays = Math.floor(elapsedHours / 24);
+            return `${label} (${elapsedDays}d ago)`;
+        };
+        const reasonCode = normalizeString(state.reasonCode);
+        if (reasonCode === 'local_network_provider_unavailable') return appendLocalNetworkCheckedAge('Waiting for Home Bridge');
+        if (reasonCode === 'no_eligible_links') return appendLocalNetworkCheckedAge('No matching parent link');
         const row = safeArray(state.linkResults).find(result => normalizeString(result?.linkId) === normalizeString(trusted.linkId || trusted.id));
-        if (!row) return state.checkedAt ? 'Checked' : 'Ready';
+        if (!row) return state.checkedAt ? appendLocalNetworkCheckedAge('Checked') : 'Ready';
         const accepted = Number(row.acceptedCandidateCount) || 0;
         const rejected = Number(row.rejectedCandidateCount) || 0;
         const candidates = Number(row.candidateCount) || 0;
-        if (accepted || rejected) return `${accepted} accepted, ${rejected} rejected`;
-        if (row.ok === false) return 'Rejected by Home Bridge';
-        if (candidates === 0) return 'Checked, no candidates';
-        return 'Checked';
+        const ackFailed = Number(row.ackFailedCount) || 0;
+        if (ackFailed > 0) return appendLocalNetworkCheckedAge(`${accepted} accepted, ${rejected} rejected, ${ackFailed} ack failed`);
+        if (accepted || rejected) return appendLocalNetworkCheckedAge(`${accepted} accepted, ${rejected} rejected`);
+        if (row.ok === false) return appendLocalNetworkCheckedAge('Home Bridge rejected');
+        if (candidates === 0) return appendLocalNetworkCheckedAge('No updates');
+        return appendLocalNetworkCheckedAge('Checked');
     }
 
     function formatNanahProtectedUpdateCheckStatus(link) {
