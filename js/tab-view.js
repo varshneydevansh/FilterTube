@@ -11562,12 +11562,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             scopeSection.className = 'nanah-managed-modal__section';
             const scopeTitle = document.createElement('div');
             scopeTitle.className = 'nanah-managed-modal__section-title';
-            scopeTitle.textContent = 'What this parent can update';
+            scopeTitle.textContent = 'What this parent can change';
             const scopeCopy = document.createElement('div');
             scopeCopy.className = 'nanah-managed-modal__section-copy';
             scopeCopy.textContent = lockedScopes.length > 0
-                ? `Choose what this saved parent link can update later. ${describeNanahScopeList(lockedScopes)} must stay enabled for this approval.`
-                : 'Choose what this saved parent link can update later.';
+                ? `Choose which parts of this protected profile this saved parent link can change. ${describeNanahScopeList(lockedScopes)} must stay enabled for this approval.`
+                : 'Choose which parts of this protected profile this saved parent link can change.';
             const scopeGrid = document.createElement('div');
             scopeGrid.className = 'nanah-managed-modal__scope-grid';
             const scopeInputs = new Map();
@@ -11603,10 +11603,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             defaultSection.className = 'nanah-managed-modal__section';
             const defaultTitle = document.createElement('div');
             defaultTitle.className = 'nanah-managed-modal__section-title';
-            defaultTitle.textContent = 'Default update area';
+            defaultTitle.textContent = 'Usual update area';
             const defaultCopy = document.createElement('div');
             defaultCopy.className = 'nanah-managed-modal__section-copy';
-            defaultCopy.textContent = 'Choose the area FilterTube should treat as the main update target for this saved link.';
+            defaultCopy.textContent = 'Choose the area FilterTube should use first when this parent sends an update through the saved link.';
             const defaultGrid = document.createElement('div');
             defaultGrid.className = 'nanah-managed-modal__scope-grid';
             const defaultInputs = new Map();
@@ -11684,9 +11684,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 autoApplyInput.checked = safeObject(initialPolicy).autoApplyControlProposals === true;
                 const toggleCopy = document.createElement('div');
                 const toggleTitle = document.createElement('strong');
-                toggleTitle.textContent = 'Apply matching parent updates automatically';
+                toggleTitle.textContent = 'Allow matching parent updates';
                 const toggleBody = document.createElement('span');
-                toggleBody.textContent = 'Only signed updates from this saved parent link and allowed area can skip the approval step.';
+                toggleBody.textContent = 'Matching updates still need the saved parent link, profile target, allowed area, revision, and signature.';
                 toggleCopy.appendChild(toggleTitle);
                 toggleCopy.appendChild(toggleBody);
                 toggle.appendChild(autoApplyInput);
@@ -11703,10 +11703,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 reconnectSection.className = 'nanah-managed-modal__section';
                 const reconnectTitle = document.createElement('div');
                 reconnectTitle.className = 'nanah-managed-modal__section-title';
-                reconnectTitle.textContent = 'Next live session';
+                reconnectTitle.textContent = 'Next connection';
                 const reconnectCopy = document.createElement('div');
                 reconnectCopy.className = 'nanah-managed-modal__section-copy';
-                reconnectCopy.textContent = 'Choose whether this saved parent link can reconnect quickly or should ask again on this device.';
+                reconnectCopy.textContent = 'Choose whether this saved parent link can connect quickly next time or should ask again on this device.';
                 const reconnectGrid = document.createElement('div');
                 reconnectGrid.className = 'nanah-managed-modal__mode-grid';
 
@@ -11752,9 +11752,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 syncOnOpenInput.checked = safeObject(initialPolicy).syncOnProfileOpen === true;
                 const openSyncCopy = document.createElement('div');
                 const openSyncTitle = document.createElement('strong');
-                openSyncTitle.textContent = 'Check for saved parent updates when this profile opens';
+                openSyncTitle.textContent = 'Saved update check';
                 const openSyncBody = document.createElement('span');
-                openSyncBody.textContent = 'Turn this on when this protected device should pick up parent-approved changes through Internet Pickup or Home Bridge. If no service is reachable, the current rules stay active.';
+                openSyncBody.textContent = 'When this profile opens, check optional Internet Pickup or Home Bridge for newer signed updates from this saved parent link. If nothing is reachable, current rules stay active.';
                 openSyncCopy.appendChild(openSyncTitle);
                 openSyncCopy.appendChild(openSyncBody);
                 openSyncToggle.appendChild(syncOnOpenInput);
@@ -11770,12 +11770,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 targetSection.className = 'nanah-managed-modal__section';
                 const targetTitle = document.createElement('div');
                 targetTitle.className = 'nanah-managed-modal__section-title';
-                targetTitle.textContent = 'Profile to protect on this device';
+                targetTitle.textContent = 'Where parent updates land';
                 const targetCopy = document.createElement('div');
                 targetCopy.className = 'nanah-managed-modal__section-copy';
                 targetCopy.textContent = forceFixedTargetProfile
-                    ? `This parent link will always update ${localProfileContext.profileName} on this device. This keeps protected-profile sync predictable even if someone switches profiles later.`
-                    : 'Choose whether future parent updates follow the currently active profile or always land in this profile.';
+                    ? `This parent link will always update ${localProfileContext.profileName} on this device, even if someone switches profiles later.`
+                    : 'Choose whether future parent updates follow whichever profile is active or always land in this protected profile.';
                 const targetGrid = document.createElement('div');
                 targetGrid.className = 'nanah-managed-modal__mode-grid';
 
@@ -11789,7 +11789,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 targetCurrentInput.disabled = forceFixedTargetProfile;
                 const currentCard = document.createElement('span');
                 currentCard.className = 'nanah-managed-modal__mode-card';
-                currentCard.innerHTML = '<strong>Current active profile</strong><span>Future updates follow whichever profile is active on this device at receive time.</span>';
+                currentCard.innerHTML = '<strong>Current active profile</strong><span>Future updates follow whichever profile is active on this device at receive time. Use carefully for shared devices.</span>';
                 currentLabel.appendChild(targetCurrentInput);
                 currentLabel.appendChild(currentCard);
 
@@ -11802,7 +11802,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 targetFixedInput.checked = forceFixedTargetProfile || initialTargetProfileBehavior === 'fixed_profile';
                 const fixedCard = document.createElement('span');
                 fixedCard.className = 'nanah-managed-modal__mode-card';
-                fixedCard.innerHTML = `<strong>Always ${localProfileContext.profileName}</strong><span>Parent updates always land in this profile, even if another profile is active later.</span>`;
+                fixedCard.innerHTML = `<strong>Always ${localProfileContext.profileName}</strong><span>Best for protected profiles. Parent updates always land here, even if another profile is active later.</span>`;
                 fixedLabel.appendChild(targetFixedInput);
                 fixedLabel.appendChild(fixedCard);
 
@@ -11823,10 +11823,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 childProtectionSection.className = 'nanah-managed-modal__section';
                 const childProtectionTitle = document.createElement('div');
                 childProtectionTitle.className = 'nanah-managed-modal__section-title';
-                childProtectionTitle.textContent = 'Protected-profile control';
+                childProtectionTitle.textContent = 'Everyday protection';
                 const childProtectionCopy = document.createElement('div');
                 childProtectionCopy.className = 'nanah-managed-modal__section-copy';
-                childProtectionCopy.textContent = 'Choose the everyday behavior for this saved parent link. Parent managed is the normal setup for a caregiver-controlled protected profile.';
+                childProtectionCopy.textContent = 'Choose how this protected profile handles future parent updates. Parent managed is the normal caregiver setup.';
                 const childProtectionGrid = document.createElement('div');
                 childProtectionGrid.className = 'nanah-managed-modal__mode-grid';
 
@@ -11840,7 +11840,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 childProtectionStandardInput.checked = getNanahChildProtectionLevel(initialPolicy.childProtectionLevel, 'standard') !== 'strict';
                 const standardCard = document.createElement('span');
                 standardCard.className = 'nanah-managed-modal__mode-card';
-                standardCard.innerHTML = '<strong>Parent managed</strong><span>Let this trusted parent link send approved updates to this protected profile. Every update still validates device, profile, scope, revision, and signature.</span>';
+                standardCard.innerHTML = '<strong>Parent managed</strong><span>Let this trusted parent link send approved updates to this protected profile. Every update still validates device, profile, area, revision, and signature.</span>';
                 standardLabel.appendChild(childProtectionStandardInput);
                 standardLabel.appendChild(standardCard);
 
@@ -11853,7 +11853,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 childProtectionStrictInput.checked = getNanahChildProtectionLevel(initialPolicy.childProtectionLevel, 'standard') === 'strict';
                 const strictCard = document.createElement('span');
                 strictCard.className = 'nanah-managed-modal__mode-card';
-                strictCard.innerHTML = '<strong>Ask on this device first</strong><span>Require local approval/unlock before later updates can apply. Use this when the protected device should decide every time.</span>';
+                strictCard.innerHTML = '<strong>Review every update here</strong><span>Require local approval or unlock before later updates can apply. Use this when this device should decide every time.</span>';
                 strictLabel.appendChild(childProtectionStrictInput);
                 strictLabel.appendChild(strictCard);
 

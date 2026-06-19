@@ -412,6 +412,12 @@ parent tool instead of a sync/debug console.
     prompts now say `Service` / `Service Key` instead of raw address/key labels,
     and explicitly state that the service key is not the parent PIN. Runtime
     endpoint validation and provider authority gates are unchanged.
+  - [x] Saved parent-link modal simplification slice: the managed-link approval
+    modal now says `What this parent can change`, `Usual update area`, `Allow
+    matching parent updates`, `Saved update check`, `Where parent updates land`,
+    and `Everyday protection` instead of reading like a policy schema editor.
+    The saved policy fields, device binding, profile target, allowed scopes,
+    revision checks, and signature validation are unchanged.
   - [x] Protected-target wording slice: the Accounts & Sync send panel now says
     `Protected profile on other device` and `Use the profile open there`
     instead of `Remote target profile` and `remote active profile`. This is a
