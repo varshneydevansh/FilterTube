@@ -154,7 +154,7 @@ test('profile management persistence audit document records current boundary and
 test('profile management source fingerprints stay pinned', () => {
   const doc = read(auditDocPath);
   const expected = [
-    ['js/tab-view.js', 21165, 1003183, '7be6d42b9d725cb4a46351e7706b70c525c1465d3a1e97f71bf1a097a570db1a'],
+    ['js/tab-view.js', 21188, 1004211, 'b56d97bcfb0e1b8f21ac4e964de071919b6ed5f29227d4fd06c15fe5136abb25'],
     ['js/popup.js', 1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
     ['js/io_manager.js', 2119, 102123, 'd457bdcc4f7fc3acef401b48437fc707e2b9f2791e18ff4cafc1209f810bcc3c'],
     ['js/background.js', 6984, 315747, '080d15907b26314873138c5dcc5d9653a2a27e933049be10361dfe0047f0a7cc']

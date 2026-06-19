@@ -154,6 +154,12 @@ extension authority code.
   sending an update while still exposing the local-trust model, imported-list
   delivery path, and optional later-delivery concepts when the user asks for
   more detail.
+- [x] Home Bridge readiness slice: configured local-network providers now expose
+  a redacted `managed-local-network/health` check during setup. The check can
+  tell a parent whether their bridge answered after saving, but it is explicitly
+  non-authoritative: policy apply still depends on the trusted managed link,
+  target profile, scope, revision, policy hash, device binding, and signature
+  checks on each returned candidate.
 
 ### Parent/Caregiver Simplification Tracker
 

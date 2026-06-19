@@ -2308,33 +2308,42 @@ html[data-theme="dark"] .card::after {
 
 .managed-channel-list-modal-overlay {
     --managed-rule-modal-gutter: clamp(0.55rem, 1.7vw, 1.25rem);
-    align-items: flex-start;
-    overflow: auto;
+    align-items: center;
+    box-sizing: border-box;
+    overflow: hidden;
     padding: var(--managed-rule-modal-gutter);
 }
 
 .managed-channel-list-modal.ft-modal,
 .managed-channel-list-modal {
-    display: flex;
-    flex-direction: column;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
     width: min(1120px, calc(100vw - (var(--managed-rule-modal-gutter, 1rem) * 2)));
     max-width: calc(100vw - (var(--managed-rule-modal-gutter, 1rem) * 2));
+    height: min(860px, calc(100dvh - (var(--managed-rule-modal-gutter, 1rem) * 2)));
     max-height: calc(100dvh - (var(--managed-rule-modal-gutter, 1rem) * 2));
     min-height: 0;
     overflow: hidden;
+    transform: none;
+}
+
+.managed-channel-list-modal.card:hover {
+    transform: none;
 }
 
 .managed-channel-list-modal > .card-header {
-    flex: 0 0 auto;
+    min-width: 0;
 }
 
 .managed-channel-list-modal__body {
-    flex: 1 1 auto;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
     gap: 0.9rem;
     min-height: 0;
-    overflow: auto;
+    overflow: hidden;
     overscroll-behavior: contain;
-    padding-bottom: 0;
+    padding-bottom: var(--ft-space-lg);
 }
 
 .managed-channel-list-modal__layout {
@@ -2343,6 +2352,9 @@ html[data-theme="dark"] .card::after {
     gap: 0.9rem;
     align-items: start;
     min-height: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    padding-right: 0.18rem;
 }
 
 .managed-channel-list-modal__form {
@@ -2352,11 +2364,10 @@ html[data-theme="dark"] .card::after {
 }
 
 .managed-channel-list-modal .ft-modal-actions {
-    position: sticky;
-    bottom: 0;
+    align-self: end;
     z-index: 2;
     margin: 0 -0.05rem;
-    padding: 0.85rem 0 0.72rem;
+    padding: 0.85rem 0 0;
     border-top: 1px solid rgba(15, 23, 42, 0.08);
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.58), var(--ft-color-bg-card) 42%);
 }
@@ -2443,7 +2454,9 @@ html[data-theme="dark"] .card::after {
     display: grid;
     gap: 0.65rem;
     align-self: start;
-    max-height: calc(100dvh - (var(--managed-rule-modal-gutter, 1rem) * 2) - 7.8rem);
+    position: sticky;
+    top: 0;
+    max-height: 100%;
     overflow: auto;
     overscroll-behavior: contain;
     padding: 0.78rem;
@@ -2912,12 +2925,14 @@ html[data-theme="dark"] .card::after {
 @media (max-width: 900px) {
     .managed-channel-list-modal-overlay {
         --managed-rule-modal-gutter: 0.5rem;
+        align-items: stretch;
     }
 
     .managed-channel-list-modal.ft-modal,
     .managed-channel-list-modal {
         width: calc(100vw - 1rem);
         max-width: calc(100vw - 1rem);
+        height: calc(100dvh - 1rem);
         max-height: calc(100dvh - 1rem);
     }
 
@@ -2926,8 +2941,25 @@ html[data-theme="dark"] .card::after {
     }
 
     .managed-channel-list-modal__format-card {
+        position: static;
         max-height: none;
         overflow: visible;
+    }
+}
+
+@media (max-height: 760px) and (min-width: 901px) {
+    .managed-channel-list-modal__layout {
+        grid-template-columns: minmax(16rem, 0.82fr) minmax(0, 1.18fr);
+        gap: 0.72rem;
+    }
+
+    .managed-channel-list-modal__format-card,
+    .managed-channel-list-modal__form {
+        gap: 0.62rem;
+    }
+
+    .managed-channel-list-modal__textarea {
+        min-height: 7rem;
     }
 }
 

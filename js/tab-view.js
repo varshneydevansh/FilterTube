@@ -13664,6 +13664,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             endpointHost: getManagedLocalNetworkEndpointHostFromConfig(nextConfig)
         });
         await refreshProfilesUI();
+        try {
+            const savedProvider = getNanahManagedLocalNetworkProvider();
+            const checkBridge = savedProvider && (
+                savedProvider.checkManagedLocalNetworkBridge
+                || savedProvider.checkBridgeHealth
+                || savedProvider.healthCheck
+            );
+            if (typeof checkBridge === 'function') {
+                const health = await checkBridge.call(savedProvider, {
+                    reason: 'configure',
+                    requestedAt: Date.now()
+                });
+                if (health?.ok === false) {
+                    UIComponents.showToast('Home Bridge saved, but it did not answer the readiness check', 'warning');
+                    return;
+                }
+                UIComponents.showToast('Home Bridge saved and reachable', 'success');
+                return;
+            }
+        } catch (_) {
+            UIComponents.showToast('Home Bridge saved, but readiness could not be checked', 'warning');
+            return;
+        }
         UIComponents.showToast('Home Bridge saved', 'success');
     }
 

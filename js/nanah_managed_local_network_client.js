@@ -267,6 +267,17 @@
         };
     }
 
+    function sanitizeHealthRequest(request) {
+        const root = safeObject(request);
+        return {
+            schema: normalizeString(root.schema) || 'filtertube_managed_local_network_health_request',
+            version: Number(root.version) || 1,
+            transport: 'local_network',
+            reason: normalizeString(root.reason) || 'manual_check',
+            requestedAt: Number(root.requestedAt) || Date.now()
+        };
+    }
+
     function sanitizeDeliveryAckPayload(payload) {
         const root = safeObject(payload);
         if (containsPrivateKey(root) || containsDeliveryAckPlaintext(root)) return {};
@@ -365,6 +376,16 @@
             };
         }
 
+        async function checkManagedLocalNetworkBridge(request = {}) {
+            const healthPath = parsed.healthPath || parsed.statusPath || 'managed-local-network/health';
+            const result = await postJson(healthPath, sanitizeHealthRequest(request));
+            return {
+                ...result,
+                bridgeReachable: result.ok !== false,
+                endpointHost: endpointUrl?.host || ''
+            };
+        }
+
         return {
             schema: PROVIDER_SCHEMA,
             version: 1,
@@ -381,7 +402,10 @@
             ackManagedPolicyCandidates: ackLocalNetworkCandidates,
             pullManagedDeliveryAcks,
             pullRemoteDeliveryAcks: pullManagedDeliveryAcks,
-            getManagedDeliveryAcks: pullManagedDeliveryAcks
+            getManagedDeliveryAcks: pullManagedDeliveryAcks,
+            checkManagedLocalNetworkBridge,
+            checkBridgeHealth: checkManagedLocalNetworkBridge,
+            healthCheck: checkManagedLocalNetworkBridge
         };
     }
 

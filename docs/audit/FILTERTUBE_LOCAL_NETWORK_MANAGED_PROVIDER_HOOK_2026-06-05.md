@@ -52,6 +52,29 @@ candidates: array
 
 If `ok` is `false` or the provider throws, no candidate is applied.
 
+Configured browser clients may also expose a redacted readiness check:
+
+```js
+window.FilterTubeManagedPolicyLocalNetwork = {
+  async checkManagedLocalNetworkBridge(request) {
+    return { ok: true, bridgeReachable: true };
+  }
+};
+```
+
+The configured client posts that check to:
+
+```text
+managed-local-network/health
+```
+
+The health request contains only schema, version, transport, reason, and
+timestamp. It must not include trusted-link secrets, PINs, plaintext rules, or
+profile policy. A successful health response means only that the bridge endpoint
+answered. It is not authority to apply a policy and does not replace the
+managed-link, target-profile, scope, revision, hash, device-binding, and
+signature checks on each returned candidate.
+
 The ack payload is redacted metadata only:
 
 ```text
@@ -81,6 +104,7 @@ js/tab-view.js
   buildNanahManagedLocalNetworkDiscoveryRequest(...)
   getNanahManagedLocalNetworkEligibleLinks(...)
   pullNanahManagedLocalNetworkCandidates(...)
+  configured provider readiness check during Home Bridge setup
   runNanahManagedLocalNetworkSync(...)
   local-network ack handoff via ackManagedPolicyCandidates(...)
   protected ack-history rows via recordManagedOpenSyncAckHistory(...)
@@ -138,6 +162,7 @@ runtime local-network provider ack handoff: present
 runtime protected local-network ack-handoff history writer: present
 runtime local-network status persistence: present
 runtime local-network provider client response allowlist sanitizer: present
+runtime local-network provider readiness check: present and non-authoritative
 runtime built-in LAN peer discovery: absent
 runtime built-in LAN delivery: absent
 runtime background local-network scheduler: absent

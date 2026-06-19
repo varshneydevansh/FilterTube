@@ -214,6 +214,9 @@ test('configured local-network client allows explicit private bridge and sanitiz
   const calls = [];
   const fetchImpl = async (url, options) => {
     calls.push({ url, body: JSON.parse(options.body) });
+    if (url.endsWith('/managed-local-network/health')) {
+      return jsonResponse({ ok: true, service: 'filtertube-home-bridge' });
+    }
     return jsonResponse({
       ok: true,
       candidates: [{
@@ -247,6 +250,7 @@ test('configured local-network client allows explicit private bridge and sanitiz
 
   assert.equal(provider.configured, true);
   assert.equal(provider.transport, 'local_network');
+  assert.equal(typeof provider.checkManagedLocalNetworkBridge, 'function');
 
   const result = await provider.discoverManagedPolicyCandidates({
     linkId: 'link-1',
@@ -268,6 +272,16 @@ test('configured local-network client allows explicit private bridge and sanitiz
   assert.equal(Object.hasOwn(result.candidates[0], 'policy'), false);
   assert.equal(result.candidates[0].envelope.scope, 'keywords');
   assert.equal(result.candidates[0].peer.deviceId, 'parent-device');
+
+  const health = await provider.checkManagedLocalNetworkBridge({
+    reason: 'configure',
+    privateKey: 'must-not-cross'
+  });
+  assert.equal(health.ok, true);
+  assert.equal(health.bridgeReachable, true);
+  assert.equal(calls[1].url, 'http://192.168.1.10:8787/filtertube/managed-local-network/health');
+  assert.equal(calls[1].body.reason, 'configure');
+  assert.equal(Object.hasOwn(calls[1].body, 'privateKey'), false);
 });
 
 test('configured local-network client pulls redacted delivery receipts for source status', async () => {
