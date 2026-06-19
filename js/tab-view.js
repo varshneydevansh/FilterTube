@@ -13523,6 +13523,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const staleCount = safeArray(inventory.staleLinks).length;
         const totalCount = safeArray(inventory.totalLinks).length;
         const liveReady = links.some(isNanahManagedLinkLiveConnected);
+        const openCheckCount = links.filter((trusted) => safeObject(trusted.policy).syncOnProfileOpen === true).length;
         const mailboxReady = hasNanahManagedMailboxUploadWriter();
         const localReady = hasNanahManagedLocalNetworkDeliveryWriter();
         const readyCount = (liveReady || mailboxReady || localReady) ? targetCount : 0;
@@ -13542,6 +13543,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     revokedCount,
                     staleCount,
                     totalCount,
+                    openCheckCount: 0,
                     sourceAckLabel: '',
                     liveReady: false,
                     mailboxReady: false,
@@ -13556,6 +13558,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     revokedCount,
                     staleCount,
                     totalCount,
+                    openCheckCount: 0,
                     sourceAckLabel: '',
                     liveReady: false,
                     mailboxReady: false,
@@ -13569,6 +13572,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 revokedCount,
                 staleCount,
                 totalCount,
+                openCheckCount: 0,
                 sourceAckLabel: '',
                 liveReady: false,
                 mailboxReady: false,
@@ -13589,6 +13593,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             revokedCount,
             staleCount,
             totalCount,
+            openCheckCount,
             sourceAckLabel,
             liveReady,
             mailboxReady,

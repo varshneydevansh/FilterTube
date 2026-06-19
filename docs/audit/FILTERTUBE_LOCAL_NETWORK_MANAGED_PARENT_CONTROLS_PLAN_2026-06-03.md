@@ -388,6 +388,12 @@ parent tool instead of a sync/debug console.
     here`, or `no matching parent link` instead of raw provider errors. This is
     UI/copy only; Send Now, profile targeting, signature/hash/revision
     validation, and offline last valid policy behavior are unchanged.
+  - [x] Auto-check visibility slice: Family Controls now shows a read-only
+    `Auto-check` detail for verified protected-profile devices. It reports
+    whether saved parent links are set to check for trusted updates when the
+    protected profile opens, while keeping live Send Update, Internet Pickup,
+    Home Bridge, signature/hash/revision validation, and offline last-policy
+    behavior unchanged.
   - [ ] Scheduled subscription refresh remains a future slice. Until then,
     list updates happen only after a parent/account profile chooses Check or
     Refresh and approves the result.
