@@ -888,7 +888,7 @@ body[data-surface="popup"] .input-group {
 
 .rule-list-format-tabs {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 0.42rem;
     padding: 0.32rem;
     border: 1px solid rgba(15, 23, 42, 0.07);
@@ -948,7 +948,8 @@ body[data-surface="popup"] .input-group {
 #ftRulePreviewCsv:focus-visible ~ .rule-list-format-tabs label[for="ftRulePreviewCsv"],
 #ftRulePreviewJson:focus-visible ~ .rule-list-format-tabs label[for="ftRulePreviewJson"],
 #ftRulePreviewTxt:focus-visible ~ .rule-list-format-tabs label[for="ftRulePreviewTxt"],
-#ftRulePreviewUrl:focus-visible ~ .rule-list-format-tabs label[for="ftRulePreviewUrl"] {
+#ftRulePreviewUrl:focus-visible ~ .rule-list-format-tabs label[for="ftRulePreviewUrl"],
+#ftRulePreviewBlockTube:focus-visible ~ .rule-list-format-tabs label[for="ftRulePreviewBlockTube"] {
     border-color: rgba(171, 68, 56, 0.34);
     color: var(--ft-color-brand-primary);
     outline: 2px solid rgba(171, 68, 56, 0.16);
@@ -958,7 +959,8 @@ body[data-surface="popup"] .input-group {
 #ftRulePreviewCsv:checked ~ .rule-list-format-tabs label[for="ftRulePreviewCsv"],
 #ftRulePreviewJson:checked ~ .rule-list-format-tabs label[for="ftRulePreviewJson"],
 #ftRulePreviewTxt:checked ~ .rule-list-format-tabs label[for="ftRulePreviewTxt"],
-#ftRulePreviewUrl:checked ~ .rule-list-format-tabs label[for="ftRulePreviewUrl"] {
+#ftRulePreviewUrl:checked ~ .rule-list-format-tabs label[for="ftRulePreviewUrl"],
+#ftRulePreviewBlockTube:checked ~ .rule-list-format-tabs label[for="ftRulePreviewBlockTube"] {
     border-color: rgba(171, 68, 56, 0.34);
     background: linear-gradient(180deg, rgba(255, 250, 246, 0.98), rgba(248, 226, 218, 0.88));
     color: var(--ft-color-brand-primary);
@@ -969,10 +971,12 @@ body[data-surface="popup"] .input-group {
 #ftRulePreviewJson:checked ~ .rule-list-format-tabs label[for="ftRulePreviewJson"] strong,
 #ftRulePreviewTxt:checked ~ .rule-list-format-tabs label[for="ftRulePreviewTxt"] strong,
 #ftRulePreviewUrl:checked ~ .rule-list-format-tabs label[for="ftRulePreviewUrl"] strong,
+#ftRulePreviewBlockTube:checked ~ .rule-list-format-tabs label[for="ftRulePreviewBlockTube"] strong,
 #ftRulePreviewCsv:checked ~ .rule-list-format-tabs label[for="ftRulePreviewCsv"] span,
 #ftRulePreviewJson:checked ~ .rule-list-format-tabs label[for="ftRulePreviewJson"] span,
 #ftRulePreviewTxt:checked ~ .rule-list-format-tabs label[for="ftRulePreviewTxt"] span,
-#ftRulePreviewUrl:checked ~ .rule-list-format-tabs label[for="ftRulePreviewUrl"] span {
+#ftRulePreviewUrl:checked ~ .rule-list-format-tabs label[for="ftRulePreviewUrl"] span,
+#ftRulePreviewBlockTube:checked ~ .rule-list-format-tabs label[for="ftRulePreviewBlockTube"] span {
     color: var(--ft-color-brand-primary);
 }
 
@@ -998,7 +1002,8 @@ body[data-surface="popup"] .input-group {
 #ftRulePreviewCsv:checked ~ .rule-list-format-stage .rule-list-format-panel--csv,
 #ftRulePreviewJson:checked ~ .rule-list-format-stage .rule-list-format-panel--json,
 #ftRulePreviewTxt:checked ~ .rule-list-format-stage .rule-list-format-panel--txt,
-#ftRulePreviewUrl:checked ~ .rule-list-format-stage .rule-list-format-panel--url {
+#ftRulePreviewUrl:checked ~ .rule-list-format-stage .rule-list-format-panel--url,
+#ftRulePreviewBlockTube:checked ~ .rule-list-format-stage .rule-list-format-panel--blocktube {
     display: grid;
 }
 
@@ -1240,7 +1245,8 @@ body[data-surface="popup"] .input-group {
 
 .rule-list-preview-code,
 .rule-list-preview-lines,
-.rule-list-preview-split {
+.rule-list-preview-split,
+.rule-list-preview-source {
     min-width: 0;
     margin: 0;
     padding: 0.76rem;
@@ -1446,21 +1452,28 @@ body[data-surface="popup"] .input-group {
     gap: 0.62rem;
 }
 
-.rule-list-preview-split div {
+.rule-list-preview-source {
+    display: grid;
+}
+
+.rule-list-preview-split div,
+.rule-list-preview-source div {
     display: grid;
     align-content: start;
     gap: 0.38rem;
     min-width: 0;
 }
 
-.rule-list-preview-split div > span {
+.rule-list-preview-split div > span,
+.rule-list-preview-source div > span {
     color: var(--ft-color-text-secondary);
     font-size: 0.72rem;
     font-weight: 620;
     line-height: 1.38;
 }
 
-.rule-list-preview-split b {
+.rule-list-preview-split b,
+.rule-list-preview-source b {
     color: var(--ft-color-text-primary);
     font-size: 0.78rem;
     font-weight: 900;
@@ -1809,8 +1822,10 @@ html[data-theme="dark"] .rule-list-preview-json,
 html[data-theme="dark"] .rule-list-preview-code,
 html[data-theme="dark"] .rule-list-preview-lines,
 html[data-theme="dark"] .rule-list-preview-split,
+html[data-theme="dark"] .rule-list-preview-source,
 html[data-theme="dark"] .rule-list-preview-lines code,
 html[data-theme="dark"] .rule-list-preview-split code,
+html[data-theme="dark"] .rule-list-preview-source code,
 html[data-theme="dark"] .rule-list-preview-json__map code,
 html[data-theme="dark"] .rule-list-parser-notes {
     border-color: rgba(255, 255, 255, 0.08);
@@ -1837,6 +1852,7 @@ html[data-theme="dark"] .rule-list-format-panel__facts span,
 html[data-theme="dark"] .rule-list-preview-json__header strong,
 html[data-theme="dark"] .rule-list-preview-json__map code,
 html[data-theme="dark"] .rule-list-preview-split div > span,
+html[data-theme="dark"] .rule-list-preview-source div > span,
 html[data-theme="dark"] .rule-list-parser-notes span {
     color: var(--ft-color-text-secondary-dark);
 }
@@ -1844,7 +1860,8 @@ html[data-theme="dark"] .rule-list-parser-notes span {
 html[data-theme="dark"] #ftRulePreviewCsv:checked ~ .rule-list-format-tabs label[for="ftRulePreviewCsv"],
 html[data-theme="dark"] #ftRulePreviewJson:checked ~ .rule-list-format-tabs label[for="ftRulePreviewJson"],
 html[data-theme="dark"] #ftRulePreviewTxt:checked ~ .rule-list-format-tabs label[for="ftRulePreviewTxt"],
-html[data-theme="dark"] #ftRulePreviewUrl:checked ~ .rule-list-format-tabs label[for="ftRulePreviewUrl"] {
+html[data-theme="dark"] #ftRulePreviewUrl:checked ~ .rule-list-format-tabs label[for="ftRulePreviewUrl"],
+html[data-theme="dark"] #ftRulePreviewBlockTube:checked ~ .rule-list-format-tabs label[for="ftRulePreviewBlockTube"] {
     border-color: rgba(195, 90, 75, 0.28);
     background: rgba(195, 90, 75, 0.14);
     color: #f7c7bd;
@@ -1854,10 +1871,12 @@ html[data-theme="dark"] #ftRulePreviewCsv:checked ~ .rule-list-format-tabs label
 html[data-theme="dark"] #ftRulePreviewJson:checked ~ .rule-list-format-tabs label[for="ftRulePreviewJson"] strong,
 html[data-theme="dark"] #ftRulePreviewTxt:checked ~ .rule-list-format-tabs label[for="ftRulePreviewTxt"] strong,
 html[data-theme="dark"] #ftRulePreviewUrl:checked ~ .rule-list-format-tabs label[for="ftRulePreviewUrl"] strong,
+html[data-theme="dark"] #ftRulePreviewBlockTube:checked ~ .rule-list-format-tabs label[for="ftRulePreviewBlockTube"] strong,
 html[data-theme="dark"] #ftRulePreviewCsv:checked ~ .rule-list-format-tabs label[for="ftRulePreviewCsv"] span,
 html[data-theme="dark"] #ftRulePreviewJson:checked ~ .rule-list-format-tabs label[for="ftRulePreviewJson"] span,
 html[data-theme="dark"] #ftRulePreviewTxt:checked ~ .rule-list-format-tabs label[for="ftRulePreviewTxt"] span,
-html[data-theme="dark"] #ftRulePreviewUrl:checked ~ .rule-list-format-tabs label[for="ftRulePreviewUrl"] span {
+html[data-theme="dark"] #ftRulePreviewUrl:checked ~ .rule-list-format-tabs label[for="ftRulePreviewUrl"] span,
+html[data-theme="dark"] #ftRulePreviewBlockTube:checked ~ .rule-list-format-tabs label[for="ftRulePreviewBlockTube"] span {
     color: #f7c7bd;
 }
 

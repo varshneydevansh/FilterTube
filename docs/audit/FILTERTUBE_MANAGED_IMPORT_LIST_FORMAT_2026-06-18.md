@@ -53,14 +53,17 @@ Current visible previews:
   column letters, row numbers, and `channel_id`, `keyword`, and `notes`
   columns. It shows handles, UC channel IDs, `/c/Name`, and keyword rows
   without forcing parents to read parser prose first.
-- JSON: a rule-list JSON preview with a field-map pane for `channels` and
-  `keywords` plus a raw JSON pane beside it on wide screens. It is explicitly
-  not the full FilterTube backup format.
 - TXT: a lined text-file preview with one row per rule, bare rows
   channel-first, `channel:` supported for explicit channel rows, and
   `keyword:` required for keyword rows.
-- URL / BlockTube: separate source cards for raw HTTPS CSV/TXT/JSON lists and
-  BlockTube `filterData` arrays. These still open a preview before applying.
+- JSON: a rule-list JSON preview with a field-map pane for `channels` and
+  `keywords` plus a raw JSON pane beside it on wide screens. It is explicitly
+  not the full FilterTube backup format.
+- URL: a public raw-file preview for HTTPS CSV/TXT/JSON lists.
+- BlockTube: a separate migration JSON preview for `filterData.channelId`,
+  `filterData.channelName`, and `filterData.title` arrays. It is separated
+  from URL because migration is a different parent decision than subscribing to
+  a public source.
 
 The exact parser notes remain behind a disclosure named `Exact parser rules`.
 That keeps the normal parent flow short while still giving advanced users the
@@ -332,10 +335,11 @@ Current completion rule:
 - Main/Kids rule pages remain the place to review, edit, pause, resume, and remove the imported rows after import.
 - The Settings card shows a selectable format showcase instead of dense prose.
   CSV is the default and looks like a small spreadsheet with `channel_id`,
-  `keyword`, and `notes` columns plus a formula/header row. JSON looks like a
-  structured field map next to the raw snippet. TXT looks like a line-list
-  document and includes the explicit `channel:` and `keyword:` patterns. URL
-  and BlockTube use source cards. Parents see one concrete artifact at a time
+  `keyword`, and `notes` columns plus a formula/header row. TXT looks like a
+  line-list document and includes the explicit `channel:` and `keyword:`
+  patterns. JSON looks like a structured field map next to the raw snippet. URL
+  and BlockTube now have separate previews: URL is for raw HTTPS files,
+  BlockTube is for migration JSON. Parents see one concrete artifact at a time
   instead of a crowded combined explanation. Deeper supported formats, stale
   checks, and templates sit behind disclosures so the default parent flow stays
   readable.
@@ -355,7 +359,8 @@ Supported source shapes in this slice:
 
 Current modal shape:
 
-- The format guide is a pill selector: CSV, TXT, JSON, BlockTube, and URL.
+- The format guide is a pill selector: CSV sheet, TXT rows, JSON list, Public
+  URL, and BlockTube.
 - Each pill shows one concrete import shape before the parent chooses a file.
 - The editable area accepts paste, local file, raw HTTPS URL, CSV template, TXT template, or JSON template.
 - The preview shows channel count, keyword count, skipped count, and a sheet-style row sample before apply.

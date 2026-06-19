@@ -8042,7 +8042,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             formatExample.className = 'managed-channel-list-modal__format-example';
             const formatExamples = {
                 csv: {
-                    label: 'CSV',
+                    label: 'CSV sheet',
                     body: [
                         'channel_id,keyword,notes',
                         '@SomeChannel,,channel handle',
@@ -8052,11 +8052,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ].join('\n')
                 },
                 txt: {
-                    label: 'TXT',
+                    label: 'TXT rows',
                     body: MANAGED_RULE_LIST_TXT_TEMPLATE
                 },
                 json: {
-                    label: 'JSON',
+                    label: 'JSON list',
                     body: MANAGED_RULE_LIST_JSON_TEMPLATE
                 },
                 blocktube: {
@@ -8071,7 +8071,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ].join('\n')
                 },
                 url: {
-                    label: 'URL',
+                    label: 'Public URL',
                     body: 'Paste a raw HTTPS URL that serves CSV, TXT, or JSON. FilterTube loads it into this preview first.'
                 }
             };

@@ -514,18 +514,20 @@
                                                             <input id="ftRulePreviewJson" class="rule-list-format-showcase__input" type="radio" name="ftRulePreviewFormat" />
                                                             <input id="ftRulePreviewTxt" class="rule-list-format-showcase__input" type="radio" name="ftRulePreviewFormat" />
                                                             <input id="ftRulePreviewUrl" class="rule-list-format-showcase__input" type="radio" name="ftRulePreviewFormat" />
+                                                            <input id="ftRulePreviewBlockTube" class="rule-list-format-showcase__input" type="radio" name="ftRulePreviewFormat" />
                                                             <div class="rule-list-format-showcase__header">
                                                                 <div>
-                                                                    <strong>Preview the file shape</strong>
-                                                                    <span>Pick a format to see what parents can import safely.</span>
+                                                                    <strong>Choose the kind of list you have</strong>
+                                                                    <span>Each demo shows the exact shape FilterTube can preview before it adds rules.</span>
                                                                 </div>
                                                                 <code>preview first</code>
                                                             </div>
                                                             <div class="rule-list-format-tabs" role="tablist" aria-label="Preview a supported rule-list format">
-                                                                <label for="ftRulePreviewCsv" role="tab"><strong>CSV</strong><span>Spreadsheet</span></label>
-                                                                <label for="ftRulePreviewJson" role="tab"><strong>JSON</strong><span>Structured list</span></label>
-                                                                <label for="ftRulePreviewTxt" role="tab"><strong>TXT</strong><span>Line by line</span></label>
-                                                                <label for="ftRulePreviewUrl" role="tab"><strong>URL</strong><span>Public source</span></label>
+                                                                <label for="ftRulePreviewCsv" role="tab"><strong>CSV sheet</strong><span>Excel, Numbers, Sheets</span></label>
+                                                                <label for="ftRulePreviewTxt" role="tab"><strong>TXT rows</strong><span>Paste one rule per line</span></label>
+                                                                <label for="ftRulePreviewJson" role="tab"><strong>JSON list</strong><span>channels + keywords</span></label>
+                                                                <label for="ftRulePreviewUrl" role="tab"><strong>Public URL</strong><span>Raw HTTPS file</span></label>
+                                                                <label for="ftRulePreviewBlockTube" role="tab"><strong>BlockTube</strong><span>Migration JSON</span></label>
                                                             </div>
                                                             <div class="rule-list-format-stage">
                                                                 <article class="rule-list-format-panel rule-list-format-panel--csv">
@@ -607,11 +609,15 @@
                                                                             <div class="rule-list-preview-json__map" aria-label="JSON fields accepted for rule-list imports">
                                                                                 <div>
                                                                                     <span>channels</span>
-                                                                                    <code>["@SomeChannel", "UC...", "https://youtube.com/@AnotherChannel"]</code>
+                                                                                    <code>["@SomeChannel", "UC...", "/c/ChannelName"]</code>
                                                                                 </div>
                                                                                 <div>
                                                                                     <span>keywords</span>
                                                                                     <code>["brainrot", "scary thumbnail"]</code>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <span>ignored</span>
+                                                                                    <code>"notes", "title", "description"</code>
                                                                                 </div>
                                                                             </div>
                                                                             <pre class="rule-list-preview-code">{
@@ -619,6 +625,7 @@
   "channels": [
     "@SomeChannel",
     "UCxxxxxxxxxxxxxxxxxxxxxx",
+    "/c/ChannelName",
     "https://www.youtube.com/@AnotherChannel"
   ],
   "keywords": [
@@ -645,6 +652,7 @@
                                                                         <div><span>comment</span><code># title: Family starter list</code></div>
                                                                         <div><span>channel</span><code>channel: @SomeChannel</code></div>
                                                                         <div><span>channel</span><code>UCxxxxxxxxxxxxxxxxxxxxxx</code></div>
+                                                                        <div><span>channel</span><code>/user/LegacyChannelName</code></div>
                                                                         <div><span>channel</span><code>https://www.youtube.com/@AnotherChannel</code></div>
                                                                         <div><span>keyword</span><code>keyword: scary thumbnail</code></div>
                                                                     </div>
@@ -652,29 +660,62 @@
                                                                 <article class="rule-list-format-panel rule-list-format-panel--url">
                                                                     <div class="rule-list-format-panel__copy">
                                                                         <span class="rule-list-format-panel__eyebrow">External list</span>
-                                                                        <strong>Public URL and BlockTube preview</strong>
-                                                                        <span>Best when a community list already exists or a user is migrating from BlockTube.</span>
+                                                                        <strong>Public URL preview</strong>
+                                                                        <span>Best when a community list is published as a raw file.</span>
                                                                         <div class="rule-list-format-panel__facts">
                                                                             <span>Raw HTTPS lists are downloaded into the same preview.</span>
-                                                                            <span>BlockTube channel and title arrays are treated as channels and keywords.</span>
+                                                                            <span>The URL can point to CSV, TXT, or simple JSON.</span>
                                                                             <span>Nothing applies until the parent approves the preview.</span>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="rule-list-preview-split" aria-label="URL and BlockTube import examples">
+                                                                    <div class="rule-list-preview-source" aria-label="Public URL import example">
                                                                         <div>
                                                                             <span class="rule-list-preview-split__chip">Raw HTTPS</span>
-                                                                            <b>Public list URL</b>
+                                                                            <b>Load a public list</b>
                                                                             <code>https://raw.githubusercontent.com/list.csv</code>
                                                                             <code>https://example.org/filtertube-list.json</code>
-                                                                            <span>CSV, TXT, or simple JSON served as raw text.</span>
+                                                                            <span>FilterTube fetches the raw file, shows parsed rows, then waits for approval.</span>
                                                                         </div>
-                                                                        <div>
-                                                                            <span class="rule-list-preview-split__chip">Migration</span>
-                                                                            <b>BlockTube JSON</b>
-                                                                            <code>filterData.channelId[]</code>
-                                                                            <code>filterData.channelName[]</code>
-                                                                            <code>filterData.title[]</code>
-                                                                            <span>Channels and title filters are previewed before import.</span>
+                                                                    </div>
+                                                                </article>
+                                                                <article class="rule-list-format-panel rule-list-format-panel--blocktube">
+                                                                    <div class="rule-list-format-panel__copy">
+                                                                        <span class="rule-list-format-panel__eyebrow">Migration JSON</span>
+                                                                        <strong>BlockTube export preview</strong>
+                                                                        <span>Best when a parent is moving an existing BlockTube channel/title list into FilterTube.</span>
+                                                                        <div class="rule-list-format-panel__facts">
+                                                                            <span><code>filterData.channelId</code> and <code>channelName</code> become channel rules.</span>
+                                                                            <span><code>filterData.title</code> becomes keyword rules.</span>
+                                                                            <span>BlockTube JSON still cannot choose Main/Kids, PINs, profiles, or sync targets.</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="rule-list-preview-json rule-list-preview-json--blocktube" aria-label="BlockTube JSON rule list example">
+                                                                        <div class="rule-list-preview-json__header">
+                                                                            <span>{ }</span>
+                                                                            <strong>blocktube-export.json</strong>
+                                                                        </div>
+                                                                        <div class="rule-list-preview-json__body">
+                                                                            <div class="rule-list-preview-json__map" aria-label="BlockTube fields accepted for rule-list imports">
+                                                                                <div>
+                                                                                    <span>channelId</span>
+                                                                                    <code>["UCxxxxxxxxxxxxxxxxxxxxxx"]</code>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <span>channelName</span>
+                                                                                    <code>["@SomeChannel"]</code>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <span>title</span>
+                                                                                    <code>["brainrot"]</code>
+                                                                                </div>
+                                                                            </div>
+                                                                            <pre class="rule-list-preview-code">{
+  "filterData": {
+    "channelId": ["UCxxxxxxxxxxxxxxxxxxxxxx"],
+    "channelName": ["@SomeChannel"],
+    "title": ["brainrot", "scary thumbnail"]
+  }
+}</pre>
                                                                         </div>
                                                                     </div>
                                                                 </article>
