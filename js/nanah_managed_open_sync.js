@@ -445,13 +445,13 @@
             const openState = safeObject(state);
             if (normalizeString(openState.profileId) && normalizeString(openState.profileId) !== normalizeString(activeProfileId)) return 'Ready';
             if (normalizeString(openState.reasonCode) === 'pull_provider_unavailable') {
-                return appendCheckedAge('Provider unavailable', openState);
+                return appendCheckedAge('Pick Up Later not ready', openState);
             }
             if (normalizeString(openState.reasonCode) === 'mailbox_apply_unavailable') {
-                return appendCheckedAge('Apply unavailable', openState);
+                return appendCheckedAge('Cannot apply here', openState);
             }
             if (normalizeString(openState.reasonCode) === 'no_eligible_links') {
-                return appendCheckedAge('No eligible open-sync link', openState);
+                return appendCheckedAge('No matching parent link', openState);
             }
             const result = getLinkResult(openState, root.linkId || root.id);
             if (!result) return openState.checkedAt ? appendCheckedAge('Checked', openState) : 'Ready';
@@ -461,7 +461,7 @@
             const ackFailed = Number(result.ackFailedCount) || 0;
             if (ackFailed > 0) return appendCheckedAge(`${applied} applied, ${rejected} rejected, ${ackFailed} ack failed`, openState);
             if (applied || rejected) return appendCheckedAge(`${applied} applied, ${rejected} rejected`, openState);
-            if (result.ok === false) return appendCheckedAge('Provider rejected pull', openState);
+            if (result.ok === false) return appendCheckedAge('Update check rejected', openState);
             if (pulled === 0) return appendCheckedAge('No updates', openState);
             return appendCheckedAge('Checked', openState);
         }

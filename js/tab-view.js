@@ -11718,7 +11718,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const openSyncTitle = document.createElement('strong');
                 openSyncTitle.textContent = 'Check for parent updates when this profile opens';
                 const openSyncBody = document.createElement('span');
-                openSyncBody.textContent = 'When a later-update service is available, this profile checks for signed parent updates and keeps the last valid policy when offline.';
+                openSyncBody.textContent = 'When Pick Up Later or Home Bridge is configured, this protected profile checks for newer approved parent updates as it opens. It keeps the last valid policy when offline.';
                 openSyncCopy.appendChild(openSyncTitle);
                 openSyncCopy.appendChild(openSyncBody);
                 openSyncToggle.appendChild(syncOnOpenInput);
@@ -11804,7 +11804,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 childProtectionStandardInput.checked = getNanahChildProtectionLevel(initialPolicy.childProtectionLevel, 'standard') !== 'strict';
                 const standardCard = document.createElement('span');
                 standardCard.className = 'nanah-managed-modal__mode-card';
-                standardCard.innerHTML = '<strong>Parent managed</strong><span>Let this trusted parent link update this protected profile later, while still validating device, profile, scope, revision, and signature.</span>';
+                standardCard.innerHTML = '<strong>Parent managed</strong><span>Let this trusted parent link send approved updates to this protected profile. Every update still validates device, profile, scope, revision, and signature.</span>';
                 standardLabel.appendChild(childProtectionStandardInput);
                 standardLabel.appendChild(standardCard);
 
@@ -15270,7 +15270,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const openSyncRow = document.createElement('div');
                     openSyncRow.className = 'nanah-trusted-link__policy-row';
                     const openSyncLabel = document.createElement('span');
-                    openSyncLabel.textContent = 'Pick Up Later';
+                    openSyncLabel.textContent = 'Check on open';
                     const openSyncValue = document.createElement('strong');
                     openSyncValue.textContent = formatNanahManagedOpenSyncStatus(entry);
                     openSyncRow.appendChild(openSyncLabel);
