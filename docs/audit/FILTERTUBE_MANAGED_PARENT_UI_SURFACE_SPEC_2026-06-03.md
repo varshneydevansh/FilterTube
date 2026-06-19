@@ -405,6 +405,7 @@ runtime connected verified-device live P2P managed policy send: present
 runtime provider-gated Internet Pickup/Home Bridge delivery handoff from command center: present
 runtime Family Device Updates later-delivery disclosure: present and auto-opens only for configured Internet Pickup/Home Bridge providers
 runtime Family Device Updates manual waiting-update check: present through existing manual_saved_update_check receive helpers and saved trusted parent-link eligibility
+runtime automatic saved-update checks on dashboard/profile open: present through a non-blocking gated helper for matching protected-device receive targets or source-side delivery receipts
 runtime protected redacted push-attempt history rows: present
 runtime protected redacted push-attempt row feedback in command center: present
 runtime browser HTTPS mailbox upload/pull client: present behind explicit config

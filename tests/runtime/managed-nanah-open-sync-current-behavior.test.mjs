@@ -133,8 +133,11 @@ test('dashboard loads open-sync helper and wires policy toggle status and open/p
   assert.match(tabView, /window\.FilterTubeManagedPolicyOpenSync = window\.FilterTubeManagedPolicyMailbox/);
   assert.match(mailboxClient, /global\.FilterTubeManagedPolicyOpenSync = provider/);
   assert.match(tabView, /Internet Pickup/);
-  assert.match(tabView, /await runNanahManagedOpenSync\(\{ reason: 'dashboard_open' \}\)/);
-  assert.match(tabView, /await runNanahManagedOpenSync\(\{ reason: 'profile_switch' \}\)/);
+  assert.match(tabView, /function runNanahManagedBackgroundSync\(\{ reason = 'dashboard_open' \} = \{\}\)/);
+  assert.match(tabView, /if \(!hasReplicaUpdateTarget && !hasSourceAckTarget\) return Promise\.resolve\(null\)/);
+  assert.match(tabView, /void runNanahManagedBackgroundSync\(\{ reason: 'dashboard_open' \}\)/);
+  assert.match(tabView, /void runNanahManagedBackgroundSync\(\{ reason: 'profile_switch' \}\)/);
+  assert.doesNotMatch(tabView, /await runNanahManagedOpenSync\(\{ reason: 'profile_switch' \}\)/);
 });
 
 test('open-sync helper collects only opted-in trusted replica links for the active target profile', () => {

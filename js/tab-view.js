@@ -3093,6 +3093,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let nanahManagedOpenSyncState = null;
     let nanahManagedLocalNetworkSyncState = null;
     let nanahManagedSourceAckSyncState = null;
+    let nanahManagedBackgroundSyncPromise = null;
     let nanahUiMode = 'parent_control';
     let isApplyingNanahModePreset = false;
     let nanahTrustedReconnectApprovalPromise = null;
@@ -15393,6 +15394,41 @@ document.addEventListener('DOMContentLoaded', async () => {
         return state;
     }
 
+    function hasNanahManagedSourceAckSyncTarget() {
+        try {
+            return getNanahManagedSourceAckEligibleLinks().length > 0;
+        } catch (_) {
+            return false;
+        }
+    }
+
+    function runNanahManagedBackgroundSync({ reason = 'dashboard_open' } = {}) {
+        const normalizedReason = normalizeString(reason) || 'dashboard_open';
+        const hasReplicaUpdateTarget = hasNanahManagedSavedUpdateCheckTarget();
+        const hasSourceAckTarget = hasNanahManagedSourceAckSyncTarget();
+        if (!hasReplicaUpdateTarget && !hasSourceAckTarget) return Promise.resolve(null);
+        if (nanahManagedBackgroundSyncPromise) return nanahManagedBackgroundSyncPromise;
+
+        nanahManagedBackgroundSyncPromise = (async () => {
+            if (hasReplicaUpdateTarget) {
+                await runNanahManagedOpenSync({ reason: normalizedReason });
+                await runNanahManagedLocalNetworkSync({ reason: normalizedReason });
+            }
+            if (hasSourceAckTarget) {
+                await runNanahManagedSourceAckSync({ reason: normalizedReason });
+            }
+            renderNanahDeliveryPathStrip();
+            updateNanahUi();
+            return true;
+        })()
+            .catch(() => null)
+            .finally(() => {
+                nanahManagedBackgroundSyncPromise = null;
+            });
+
+        return nanahManagedBackgroundSyncPromise;
+    }
+
     async function configureNanahTrustedLink(link) {
         const trusted = normalizeNanahTrustedLink(link);
         if (!trusted) return;
@@ -18261,9 +18297,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             managedChildEdit = null;
             await StateManager.loadSettings();
             await refreshProfilesUI();
-            await runNanahManagedOpenSync({ reason: 'profile_switch' });
-            await runNanahManagedLocalNetworkSync({ reason: 'profile_switch' });
-            await runNanahManagedSourceAckSync({ reason: 'profile_switch' });
+            void runNanahManagedBackgroundSync({ reason: 'profile_switch' });
             updateStats();
             UIComponents.showToast('Profile switched', 'success');
         } catch (e) {
@@ -18898,12 +18932,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadNanahManagedOpenSyncState();
     await loadNanahManagedLocalNetworkSyncState();
     await loadNanahManagedSourceAckSyncState();
-    await runNanahManagedOpenSync({ reason: 'dashboard_open' });
-    await runNanahManagedLocalNetworkSync({ reason: 'dashboard_open' });
-    await runNanahManagedSourceAckSync({ reason: 'dashboard_open' });
     renderNanahTrustedLinks();
     setNanahMode(nanahUiMode, { persist: false, applyPreset: true });
     updateNanahUi();
+    void runNanahManagedBackgroundSync({ reason: 'dashboard_open' });
 
     [ftNanahRole, ftNanahScope, ftNanahGranularSurface, ftNanahStrategy, ftNanahRemoteTarget].forEach((element) => {
         if (!element) return;

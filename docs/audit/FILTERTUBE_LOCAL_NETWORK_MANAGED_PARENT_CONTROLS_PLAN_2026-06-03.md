@@ -504,6 +504,16 @@ parent tool instead of a sync/debug console.
     by trusted-link rows. It does not add provider authority; trusted-link
     validation, target profile, scope, revision, hash, signature, and local
     apply gates still decide whether anything can apply.
+  - [x] 2026-06-20 automatic saved-update responsiveness slice: dashboard-open
+    and profile-switch saved-update checks now use a gated background helper
+    instead of blocking profile switching while Internet Pickup, Home Bridge,
+    or source-side delivery receipts are checked. The helper runs only when the
+    current state has a matching protected-device saved-update target or a
+    parent/source delivery-receipt target. Manual `Check waiting parent updates`
+    still waits for the same receive helpers and shows explicit success/error
+    feedback. This changes scheduling only; trusted-link validation, target
+    profile, scope, revision, hash, signature, provider availability, and local
+    apply gates remain the authority.
   - [x] Later-delivery simplification slice: the Accounts & Sync first-read note
     and Family Controls provider prompt now say the normal path is still open
     both devices, pair, verify, and Send Update. Internet Pickup/Home Bridge are
