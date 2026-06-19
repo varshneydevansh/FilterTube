@@ -438,6 +438,12 @@ parent tool instead of a sync/debug console.
     this device may send` so parents read the workflow as a reviewed send path,
     not a required sync setup. Pairing, trust, scope, target-profile,
     signature/hash/revision, and provider gates are unchanged.
+  - [x] Protected-edit Accounts & Sync boundary wording slice: when a parent is
+    editing a protected profile and opens Accounts & Sync, the global banner now
+    says to use `Family Controls` for pairing, history, and approved sends
+    instead of the internal command-center name. Global account policy,
+    create-profile, and Master PIN controls remain disabled until the parent
+    ends the protected edit session.
   - [x] Internet Pickup open-check binding slice: a configured browser-side
     Internet Pickup provider is now installed under both the send/upload provider
     name and the profile-open pull provider name. This keeps `Send Update` later

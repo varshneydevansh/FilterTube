@@ -6233,7 +6233,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         title.textContent = `Editing protected profile: ${normalizeString(profile.name) || 'Profile'}`;
         const body = document.createElement('span');
         body.textContent = currentViewId === 'sync'
-            ? 'Accounts & Sync stays under the parent/account authority. Use this protected profile row or command center to pair devices, review history, and send parent-approved updates.'
+            ? 'Accounts & Sync stays under parent/account authority. Use Family Controls to pair devices, review history, and send approved updates for this protected profile.'
             : 'Parent-managed profile edit mode. Dashboard, Filters, Kids Mode, Settings, and Semantic ML stay scoped to this protected profile where editing is supported.';
         copy.appendChild(title);
         copy.appendChild(body);
