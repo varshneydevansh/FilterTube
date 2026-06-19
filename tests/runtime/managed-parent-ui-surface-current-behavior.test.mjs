@@ -584,6 +584,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(plan, /never silently\s+applies rows, sends device updates, runs on YouTube pages, or creates\s+background policy sync/);
   assert.doesNotMatch(source, /managed-channel-list-modal__format-tabs/);
   assert.doesNotMatch(source, /managed-channel-list-modal__format-tab/);
+  assert.match(source, /managed-channel-list-modal-overlay/);
   assert.match(source, /managed-channel-list-modal__format-gallery/);
   assert.match(source, /Choose the list shape you have/);
   assert.match(source, /managed-channel-list-modal__mini-sheet/);

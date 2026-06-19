@@ -2306,15 +2306,30 @@ html[data-theme="dark"] .card::after {
     flex-wrap: wrap;
 }
 
+.managed-channel-list-modal-overlay {
+    --managed-rule-modal-gutter: clamp(0.55rem, 1.7vw, 1.25rem);
+    align-items: flex-start;
+    overflow: auto;
+    padding: var(--managed-rule-modal-gutter);
+}
+
+.managed-channel-list-modal.ft-modal,
 .managed-channel-list-modal {
     display: flex;
     flex-direction: column;
-    width: min(94vw, 1120px);
-    max-height: calc(100dvh - 2rem);
+    width: min(1120px, calc(100vw - (var(--managed-rule-modal-gutter, 1rem) * 2)));
+    max-width: calc(100vw - (var(--managed-rule-modal-gutter, 1rem) * 2));
+    max-height: calc(100dvh - (var(--managed-rule-modal-gutter, 1rem) * 2));
+    min-height: 0;
     overflow: hidden;
 }
 
+.managed-channel-list-modal > .card-header {
+    flex: 0 0 auto;
+}
+
 .managed-channel-list-modal__body {
+    flex: 1 1 auto;
     gap: 0.9rem;
     min-height: 0;
     overflow: auto;
@@ -2324,7 +2339,7 @@ html[data-theme="dark"] .card::after {
 
 .managed-channel-list-modal__layout {
     display: grid;
-    grid-template-columns: minmax(18rem, 0.78fr) minmax(0, 1fr);
+    grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr);
     gap: 0.9rem;
     align-items: start;
     min-height: 0;
@@ -2428,7 +2443,7 @@ html[data-theme="dark"] .card::after {
     display: grid;
     gap: 0.65rem;
     align-self: start;
-    max-height: min(42rem, calc(100dvh - 11rem));
+    max-height: calc(100dvh - (var(--managed-rule-modal-gutter, 1rem) * 2) - 7.8rem);
     overflow: auto;
     overscroll-behavior: contain;
     padding: 0.78rem;
@@ -2895,8 +2910,14 @@ html[data-theme="dark"] .card::after {
 }
 
 @media (max-width: 900px) {
+    .managed-channel-list-modal-overlay {
+        --managed-rule-modal-gutter: 0.5rem;
+    }
+
+    .managed-channel-list-modal.ft-modal,
     .managed-channel-list-modal {
-        width: min(100%, calc(100vw - 1rem));
+        width: calc(100vw - 1rem);
+        max-width: calc(100vw - 1rem);
         max-height: calc(100dvh - 1rem);
     }
 

@@ -332,6 +332,15 @@ parent tool instead of a sync/debug console.
     only: parser support, preview-before-apply, Main/Kids/Both target choice,
     source metadata, parent/account approval, and verified-device delivery
     authority are unchanged.
+  - [x] 2026-06-20 rule-list import modal viewport slice: the `Import Rule
+    List` modal now has a dedicated overlay and viewport-bounded shell so the
+    format examples, file/URL inputs, paste box, preview, and actions scroll
+    inside the dialog instead of clipping at the top or bottom of the screen.
+    The desktop layout keeps examples in a bounded left column and the editable
+    fields in a fluid right column, then collapses to one column on smaller
+    screens. This is layout-only; parser behavior, preview-before-apply,
+    parent/account approval, Main/Kids/Both targeting, and verified-device
+    delivery are unchanged.
   - [x] 2026-06-19 Settings rule-list density slice: the Settings import card
     now keeps the parent path visible first and moves the full CSV/JSON/TXT/URL
     examples behind `Preview supported file shapes`. The Main/Kids/Both target

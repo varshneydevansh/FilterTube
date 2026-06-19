@@ -8008,7 +8008,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function showManagedChannelListImportModal({ selectedCount = 1, targetLabel = '' } = {}) {
         return new Promise((resolve) => {
             const overlay = document.createElement('div');
-            overlay.className = 'ft-modal-overlay';
+            overlay.className = 'ft-modal-overlay managed-channel-list-modal-overlay';
 
             const card = document.createElement('div');
             card.className = 'card ft-modal managed-channel-list-modal';
