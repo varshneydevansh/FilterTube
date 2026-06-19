@@ -197,7 +197,7 @@ test('dashboard provisions source keypairs and keeps private material out of pub
   assert.doesNotMatch(descriptorBlock, /privateKeyJwk/);
 });
 
-test('managed signing slice does not overclaim mailbox or broad signed-send runtime', () => {
+test('managed signing slice keeps provider delivery below local validation authority', () => {
   const source = [
     'js/nanah_sync_adapter.js',
     'js/nanah_managed_live_policy.js',
@@ -208,8 +208,12 @@ test('managed signing slice does not overclaim mailbox or broad signed-send runt
   assert.match(source, /createManagedNanahSigningKeyPair/);
   assert.match(source, /signManagedPolicyEnvelope/);
   assert.doesNotMatch(source, /managedPolicyOutbox/);
-  assert.doesNotMatch(source, /FilterTubeManagedMailbox/);
+  assert.match(source, /FilterTubeManagedPolicyMailbox/);
+  assert.match(source, /uploadMailboxPolicyBatch/);
+  assert.match(source, /FilterTubeManagedPolicyLocalNetwork/);
   assert.match(source, /buildEnvelopeForLiveSend/);
   assert.match(doc, /eligible fixed-target Main\/Kids, active\/full profile-policy bundles, keyword,\s+channel, video, viewing-space, and time-limit managed sends now use signed\s+managed-policy envelopes/);
-  assert.match(doc, /local-network or mailbox delivery runtime/);
+  assert.match(doc, /Provider reachability is still transport only/);
+  assert.match(doc, /FilterTube-hosted mailbox service/);
+  assert.match(doc, /automatic LAN peer discovery authority/);
 });

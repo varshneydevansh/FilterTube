@@ -1,9 +1,9 @@
 # Audit: Nanah Managed Pairing Key Descriptor
 
 **Generated**: 2026-06-04
-**Status**: Runtime descriptor persistence slice. A later same-day keypair
-provisioning slice now exists, but this document remains the public descriptor
-boundary and does not claim live outgoing managed-policy delivery.
+**Status**: Runtime descriptor persistence slice. Later same-day keypair,
+signed-send, mailbox provider, Home Bridge provider, and key-rotation slices now
+exist, but this document remains the public descriptor binding boundary.
 **Related plan**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`
 **Related inventory**:
@@ -13,11 +13,11 @@ boundary and does not claim live outgoing managed-policy delivery.
 
 ## Purpose
 
-Managed parent or caregiver policy envelopes already require trusted source
-device, source profile, target profile, scope, revision, hash, and signature
-evidence before apply. Before live P2P/local-network remote updates can become
-automatic, the replica must have a stable way to remember the source public key
-that belongs to a trusted managed link.
+Managed parent or caregiver policy envelopes require trusted source device,
+source profile, target profile, scope, revision, hash, and signature evidence
+before apply. Live P2P, Internet Pickup, and Home Bridge delivery all depend on
+one stable rule: the protected replica must remember the source public key that
+belongs to its trusted managed link.
 
 This slice adds the first public-key descriptor plumbing:
 
@@ -29,10 +29,10 @@ This slice adds the first public-key descriptor plumbing:
 - Receive-side validation can continue using the existing trusted-link
   `sourcePublicKeyJwk` verifier path.
 
-It intentionally does not add mailbox delivery, automatic remote admin
-sessions, signed live sends, key rotation, or key revocation. Keypair
-provisioning and an adapter signing helper are covered by the related
-same-day signing-key proof.
+It intentionally does not make reachability into authority. Keypair
+provisioning, signed live sends, provider-gated mailbox/Home Bridge delivery,
+and key rotation are covered by later linked proofs. This descriptor slice only
+records how public-key identity is advertised and persisted for trusted links.
 
 ## Runtime Shape
 
@@ -105,15 +105,15 @@ from either the trusted-link root or policy object.
 ## Boundaries
 
 This descriptor slice is not enough to enable automatic remote policy writes by
-itself.
+itself. The runtime has since added signed live sends and configured-provider
+handoffs, but those paths still validate the descriptor-bound trusted link
+before any protected profile write.
 The following remain pending:
 
 - protected or encrypted private-key storage
-- dashboard live send conversion from `control_proposal` to signed
-  `filtertube_managed_policy`
 - canonical payload hash recomputation
-- key rotation and revocation UI
-- mailbox pull/ack runtime
+- hosted mailbox service
+- automatic LAN peer discovery authority
 - live signed-envelope smoke through installed extension sessions
 
 If no public key descriptor exists, managed envelopes still fail closed through

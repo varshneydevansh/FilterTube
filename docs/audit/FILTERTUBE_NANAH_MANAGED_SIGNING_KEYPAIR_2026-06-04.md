@@ -127,12 +127,16 @@ into the existing concrete `main`, `kids`, `viewing_space`, and optional
 Main/Kids surface, Rule bundle fans out to keyword/channel/video envelopes from
 that same selected surface, and parent-managed child edit mode can provide the
 payload source while the parent/source profile remains envelope authority.
+Later slices added configured-provider Internet Pickup and Home Bridge handoff
+around the same signed envelopes. Provider reachability is still transport only;
+trusted-link, scope, revision, hash, and signature validation remain local
+authority.
 
 Still pending:
 
-- richer viewing-space/time-limit bundle controls and multi-child fanout;
-- local-network or mailbox delivery runtime;
-- key rotation and revocation UI;
+- richer installed multi-child fanout proof;
+- FilterTube-hosted mailbox service;
+- automatic LAN peer discovery authority;
 - encrypted-at-rest or non-extractable private-key storage;
 - installed-extension two-device signed managed-policy smoke.
 

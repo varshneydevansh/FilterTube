@@ -635,9 +635,9 @@ Before adding parent-managed runtime behavior:
     failed-attempt state behind parent/account authority, then add encryption
     proof for protected summaries.
 14. Keep mailbox delivery ciphertext-only and reuse validated managed-policy
-    apply; do not add a mailbox runtime path until source key provisioning,
-    trusted descriptor persistence, signed live-send construction, and live
-    signed-envelope tests exist.
+    apply. Configured-provider upload/pull/ack/purge helpers may move encrypted
+    items, but hosted service reachability never bypasses source key,
+    trusted-link, replay, and signature validation.
 
 ## Verification
 

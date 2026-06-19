@@ -41,7 +41,7 @@ test('managed pairing key descriptor audit is linked from plan and authority inv
   const inventory = read(inventoryPath);
 
   assert.match(doc, /Status\*\*: Runtime descriptor persistence slice/);
-  assert.match(doc, /related\s+same-day signing-key proof/);
+  assert.match(doc, /Later same-day keypair,\s+signed-send, mailbox provider, Home Bridge provider, and key-rotation slices now\s+exist/);
   assert.match(doc, /ftNanahManagedSigningPublicKey/);
   assert.match(doc, /managedPublicKeyId/);
   assert.match(doc, /sourcePublicKeyJwk/);
@@ -49,7 +49,7 @@ test('managed pairing key descriptor audit is linked from plan and authority inv
   assert.match(signingDoc, new RegExp(docPath));
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
-  assert.match(inventory, /Pairing public-key descriptor, source keypair provisioning, eligible live signed send, and profile-scoped trusted-link identity present/);
+  assert.match(inventory, /Pairing public-key descriptor, source keypair provisioning, eligible live signed send, profile-scoped trusted-link identity, and source-side key rotation present/);
 });
 
 test('Nanah device descriptor advertises managed public key aliases only when a complete descriptor exists', () => {
@@ -112,7 +112,7 @@ test('dashboard Nanah pairing preserves source key fields on managed trusted lin
   assert.doesNotMatch(tabView, /sourcePublicKeyJwk: [^\n]*undefined/);
 });
 
-test('managed pairing key descriptor slice does not overclaim outgoing signing or mailbox runtime', () => {
+test('managed pairing key descriptor slice stays a key-binding proof while later transports validate locally', () => {
   const source = runtimeSource();
   const doc = read(docPath);
 
@@ -122,6 +122,8 @@ test('managed pairing key descriptor slice does not overclaim outgoing signing o
   assert.match(source, /createManagedNanahSigningKeyPair/);
   assert.match(source, /signManagedPolicyEnvelope/);
   assert.doesNotMatch(source, /managedPolicyOutbox/);
-  assert.doesNotMatch(source, /FilterTubeManagedMailbox/);
-  assert.match(doc, /dashboard live send conversion from `control_proposal` to signed\s+`filtertube_managed_policy`/);
+  assert.match(source, /FilterTubeManagedPolicyMailbox/);
+  assert.match(doc, /This descriptor slice is not enough to enable automatic remote policy writes by\s+itself/);
+  assert.match(doc, /hosted mailbox service/);
+  assert.match(doc, /automatic LAN peer discovery authority/);
 });
