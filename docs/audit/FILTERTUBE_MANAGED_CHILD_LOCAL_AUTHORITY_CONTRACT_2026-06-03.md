@@ -13,18 +13,19 @@ and
 
 ## Purpose
 
-This contract pins the same-device parent-managed child edit authority and now
+This contract pins the same-device parent-managed protected-profile edit authority and now
 tracks the first runtime hardening slice. It separates three concerns:
 
-1. Who is allowed to enter virtual child edit mode.
-2. Which saved child surface writes must be rejected after profile/session
+1. Who is allowed to enter virtual protected-profile edit mode.
+2. Which saved protected-profile surface writes must be rejected after profile/session
    state changes.
 3. Which future metadata must be emitted when the write succeeds or fails.
 
 The current product source already blocks child profiles from becoming admins
-through this local edit path. The first runtime slice preserves that behavior
-and adds durable local policy revision plus protected redacted action-history
-metadata for successful parent-managed child surface saves.
+through this local edit path. The first runtime slice preserves that behavior,
+supports non-default protected profiles below a managing account, and adds
+durable local policy revision plus protected redacted action-history metadata
+for successful parent-managed protected-profile surface saves.
 
 ## Current Source-Backed Authority
 
@@ -35,8 +36,8 @@ Current source evidence in `js/managed_admin_authority.js` and
 | --- | --- |
 | `FilterTubeManagedAdminAuthority.canActorManageProfile(profilesV4, options)` | Shared runtime authority helper. Rejects child actors, missing target profiles, missing actor profiles, and sibling/unowned targets. Allows Default, a non-child actor managing itself, or an account whose id matches the target child's `parentProfileId`. |
 | `canActiveProfileManageProfile(profilesV4, targetProfileId)` | Dashboard wrapper that delegates to `FilterTubeManagedAdminAuthority.canActorManageProfile(...)` when the helper is loaded, preserving the prior inline fallback. |
-| `startManagedChildEdit(profileId, surface)` | Loads fresh profiles, requires the target to be a child profile, requires `canActiveProfileManageProfile(...)`, then requires `ensureProfileUnlocked(...)` for the active parent/account profile. |
-| `saveManagedChildSurface(surface, mutator)` | Requires an active managed-child edit target, reloads fresh profiles, rejects a missing or non-child fresh target, reruns `canActiveProfileManageProfile(...)`, writes only the target child's selected surface, records local revision/history metadata, then reloads UI state. |
+| `startManagedChildEdit(profileId, surface)` | Loads fresh profiles, rejects Default or missing targets, requires `canActiveProfileManageProfile(...)`, then requires `ensureProfileUnlocked(...)` for the active parent/account profile. |
+| `saveManagedChildSurface(surface, mutator)` | Requires an active managed-child edit target, reloads fresh profiles, rejects a missing target or Default, reruns `canActiveProfileManageProfile(...)`, writes only the protected target's selected surface, records local revision/history metadata, then reloads UI state. |
 | `localManagedEditPolicyRevisionStore(profile, scope)` | Reads the target child's last local managed edit revision for `main` or `kids`. |
 | `recordManagedChildLocalEditHistory(profile, report)` | Stores the accepted local edit revision and a protected redacted action-history row on the target child profile in the same V4 profile write. |
 | `recordManagedAdminAuthFailureHistory(profilesV4, targetProfileId, reason)` | Stores a protected `admin_session.failed_unlock` row on the target child profile when parent/admin unlock fails for managed child edit, history view/clear, viewing-space, or time-limit changes. |
@@ -54,10 +55,10 @@ Current source evidence in `js/managed_admin_authority.js` and
 | `parent_cannot_manage_unowned_child` | Account parent | Child owned by another account | Rejected before edit starts and before save. |
 | `child_cannot_manage_self_as_admin` | Child profile | Same child profile | Rejected; child PIN is not admin authority. |
 | `sibling_cannot_manage_sibling` | Child profile | Sibling child profile | Rejected; sibling profiles cannot mutate each other. |
-| `non_child_self_edit_is_not_child_manage_mode` | Account profile | Same account profile | Not a child managed-edit target; use normal account settings paths. |
+| `non_default_protected_self_edit_uses_admin_authority` | Account/protected profile | Same profile or a managed protected profile | Allowed only when `canActiveProfileManageProfile(...)` and parent/account unlock pass; Default is never edited through this virtual protected-profile path. |
 | `locked_parent_requires_unlock` | Locked parent/account | Owned child profile | Rejected until parent/account unlock succeeds. |
 | `save_rechecks_fresh_authority` | Parent switched or child ownership changed after editor opened | Previous child target | Rejected during save. |
-| `save_rechecks_fresh_child_target` | Parent/admin save from stale edit state | Missing target or target that is no longer a child profile | Rejected during save before any profile surface mutation. |
+| `save_rechecks_fresh_protected_target` | Parent/admin save from stale edit state | Missing target or Default profile | Rejected during save before any profile surface mutation. |
 
 ## Hardening Requirements
 
@@ -80,8 +81,8 @@ filtering behavior:
   sync-policy changes, trust-link changes, and history clearing, can require
   re-auth even inside an existing admin session.
 - Failed writes do not create successful history rows.
-- Local UI edit mode remains virtual: the parent edits the child profile
-  without making the child the active admin profile.
+- Local UI edit mode remains virtual: the parent edits the protected profile
+  without making that protected profile the active admin profile.
 
 ## Current Runtime Boundary
 
@@ -100,7 +101,7 @@ runtime local managed edit sensitive-action re-auth gate: present for managed ch
 runtime local managed edit failed-attempt rate limit: present for tab-view unlock prompts and background session PIN auth
 runtime local managed edit failed-attempt rate limit durability: present for tab-view managed unlock prompts and background session PIN auth through profile.managedPolicyState.adminFailedUnlockRateLimit
 runtime managed-admin authority helper: present for local dashboard actor/target decisions, admin-session TTL, sensitive reauth, and dashboard failed-unlock window normalization
-runtime local managed edit fresh child target gate: present for saveManagedChildSurface before target surface mutation
+runtime local managed edit fresh protected target gate: present for saveManagedChildSurface before target surface mutation
 runtime behavior changed by this contract: yes
 ```
 
@@ -117,6 +118,16 @@ they are not policy authority. Future implementation should reuse or lift this
 small local managed-write helper near the profile storage boundary so UI edits,
 local bulk apply, and later P2P applies do not each invent separate
 revision/history behavior.
+
+## Addendum - 2026-06-20
+
+The local editor now uses the broader protected-profile wording that the UI shows
+to parents and caregivers. Runtime entry still rejects Default and missing
+targets, and it still rejects child actors through the shared authority helper.
+The important safety boundary is no longer "target must literally be type
+child"; it is "target must be a non-Default profile that the active
+parent/account authority can manage, with fresh save-time recheck before any
+surface mutation."
 
 ## Addendum - 2026-06-05
 

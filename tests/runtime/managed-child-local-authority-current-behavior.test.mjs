@@ -263,7 +263,7 @@ test('managed child local authority contract is source-backed with accepted-save
   const source = runtimeSource();
 
   assert.match(doc, /Status\*\*: Runtime local managed-save, failed-unlock history, admin-session\s+TTL, sensitive-action re-auth, profile-persisted failed-attempt rate-limit\s+hardening, and a shared managed-admin authority helper are partially present/);
-  assert.match(doc, /Who is allowed to enter virtual child edit mode/);
+  assert.match(doc, /Who is allowed to enter virtual protected-profile edit mode/);
   assert.match(doc, /Required Local Authority Decisions/);
   assert.match(doc, /Hardening Requirements/);
   assert.match(doc, /Addendum - 2026-06-05/);
@@ -275,12 +275,12 @@ test('managed child local authority contract is source-backed with accepted-save
   assert.match(tabView, /ManagedAdminAuthority\.canActorManageProfile/);
   assert.match(tabView, /getProfileType\(profilesV4, currentActive\) === 'child'\) return false/);
   assert.match(tabView, /async function startManagedChildEdit\(profileId, surface\)/);
-  assert.match(tabView, /getProfileType\(fresh, targetId\) !== 'child'/);
+  assert.match(tabView, /targetId === 'default' \|\| !Object\.prototype\.hasOwnProperty\.call\(safeObject\(fresh\.profiles\), targetId\)/);
   assert.match(tabView, /const ok = await ensureProfileUnlocked\(fresh, currentActive, \{ sensitiveAction: true \}\)/);
   assert.match(tabView, /async function saveManagedChildSurface\(surface, mutator\)/);
   assert.match(tabView, /Object\.prototype\.hasOwnProperty\.call\(profiles, profileId\)/);
-  assert.match(tabView, /getProfileType\(fresh, profileId\) !== 'child'/);
-  assert.match(tabView, /Managed child target is no longer available/);
+  assert.match(tabView, /!targetExists \|\| profileId === 'default'/);
+  assert.match(tabView, /Managed protected profile target is no longer available/);
   assert.match(tabView, /if \(!canActiveProfileManageProfile\(fresh, profileId\)\)/);
   assert.match(tabView, /function localManagedEditPolicyRevisionStore\(profile, scope\)/);
   assert.match(tabView, /function buildManagedChildLocalEditReport/);
@@ -308,6 +308,8 @@ test('managed child local authority contract is source-backed with accepted-save
   assert.match(tabView, /ensureProfileUnlocked\(fresh, currentActive, \{ sensitiveAction: true \}\)/);
   assert.match(tabView, /actionType: 'admin_session\.failed_unlock'/);
   assert.match(tabView, /result: 'failed_auth'/);
+  assert.match(doc, /Addendum - 2026-06-20/);
+  assert.match(doc, /fresh save-time recheck before any\s+surface mutation/);
   assert.match(tabView, /managed_child_edit_unlock_failed/);
   assert.match(tabView, /history_view_unlock_failed/);
   assert.match(tabView, /history_clear_unlock_failed/);
