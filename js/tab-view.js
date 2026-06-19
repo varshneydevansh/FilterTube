@@ -15356,11 +15356,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             send_once: {
                 eyebrow: 'Copy once',
                 title: 'Send this profile',
-                body: 'Use this for your own second device or a one-time setup. Pair, verify the phrase, send once, and let the other device review the update.',
+                body: 'Use this for a one-time copy to your own device. Pair, verify the phrase, then send this profile once.',
                 steps: [
-                    'Keep the simple device-copy option selected.',
-                    'Start pairing here, or join the short code from the other device.',
-                    'Confirm the same phrase and send once.'
+                    'Leave this path selected for a normal one-time copy.',
+                    'Pair with the short code or QR and confirm the same phrase.',
+                    'Send once. The other device reviews the update before it applies.'
                 ],
                 hostLabel: 'Start Pairing',
                 sendLabel: getNanahScope() === 'full' ? 'Send Full Backup' : 'Send Once',
@@ -15371,17 +15371,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 title: childReplicaOnly ? 'Protected profile is locked here' : 'Update a protected device',
                 body: childReplicaOnly
                     ? 'This protected profile can receive approved parent updates here, but it cannot send settings or change parent trust while locked.'
-                    : 'Use this when a parent or caregiver should keep a child, family, or protected profile aligned on another device.',
+                    : 'Use this to send parent-approved rules, time limits, and viewing access to a child, family, or protected device.',
                 steps: childReplicaOnly
                     ? [
-                        'Use the parent profile as the sender when you want to manage this device.',
-                        'Join the parent code here and confirm the same safety phrase.',
-                        'Save parent trust only for the approved protected profile.'
+                        'Start from the parent or main profile on the managing device.',
+                        'Join the parent code here and confirm the same phrase.',
+                        'This profile receives only approved updates for itself.'
                     ]
                     : [
-                        'Use the parent profile as the sender when you want to control this device.',
-                        'Connect to the child or protected device and confirm the safety phrase.',
-                        'Choose the exact protected profile, send once, then save parent trust for future approved updates.'
+                        'Choose or create the protected profile you manage.',
+                        'Connect to the other device and confirm the safety phrase.',
+                        'Send now. Save parent trust only for devices that should keep receiving approved updates.'
                     ],
                 hostLabel: 'Pair Protected Device',
                 sendLabel: 'Send Protected Update',
@@ -15392,11 +15392,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 title: 'Move full account',
                 body: getActiveProfileType() === 'child'
                     ? 'Full account migration is not available from a child profile. FilterTube will keep this scoped to the active child profile instead.'
-                    : 'Use this only for reinstall, recovery, or moving the wider account tree. It is broader than normal parent updates.',
+                    : 'Use this only for reinstall, recovery, or moving the full account tree. It is broader than normal parent updates.',
                 steps: [
-                    'Use this only for reinstall, migration, or full account recovery.',
+                    'Use this only for reinstall, migration, or full recovery.',
                     'Pair and verify the phrase like any other Nanah session.',
-                    'Send the wider snapshot only when you mean to move the account tree.'
+                    'Send the wider snapshot only when you mean to move the account.'
                 ],
                 hostLabel: 'Start Migration Pairing',
                 sendLabel: getActiveProfileType() === 'child' ? 'Send This Child Profile' : 'Send Full Backup',

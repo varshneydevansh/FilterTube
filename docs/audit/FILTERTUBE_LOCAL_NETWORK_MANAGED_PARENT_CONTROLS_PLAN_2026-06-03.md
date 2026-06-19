@@ -128,6 +128,12 @@ extension authority code.
   service only in supporting copy, keeps `More controls` collapsed for role and
   scope details, and keeps the normal parent path as open both devices, pair,
   verify, send, then save parent trust only for approved protected profiles.
+- [x] Accounts & Sync first-screen simplification slice: the Family Device
+  Updates card now starts with one compact parent path (`choose what to
+  manage`, `pair both devices`, `send approved changes`) instead of two
+  expandable explanation blocks. The mode cards and runtime spotlight copy use
+  shorter parent/caregiver language, while relationship/scope/migration
+  controls remain collapsed under `More controls`.
 - [x] Family Device Updates wording slice: the visible Accounts & Sync card and
   Help section now use parent-facing `Family Device Updates` language instead
   of leading with the Nanah implementation name. The raw relay URL is tucked
