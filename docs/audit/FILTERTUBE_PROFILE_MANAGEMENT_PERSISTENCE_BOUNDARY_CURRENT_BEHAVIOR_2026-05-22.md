@@ -18,23 +18,23 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/tab-view.js` | 14984 | 698493 | `82345bda27253dc5c5644c36dd97c2cfafb442d2ecb391818c38f6ea5dad5c65` |
+| `js/tab-view.js` | 21158 | 1002771 | `4b1d3e58b0eebe9ac0756c4417daa8874e34a281027d8d7622f1556409df2e9b` |
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
-| `js/io_manager.js` | 2111 | 101002 | `bed520852b47c0c36994017414d721f0a5baa2c375387098379ab88cc3138669` |
-| `js/background.js` | 6803 | 306710 | `57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7` |
+| `js/io_manager.js` | 2119 | 102123 | `d457bdcc4f7fc3acef401b48437fc707e2b9f2791e18ff4cafc1209f810bcc3c` |
+| `js/background.js` | 6984 | 315747 | `080d15907b26314873138c5dcc5d9653a2a27e933049be10361dfe0047f0a7cc` |
 
 ## Source / Effect Blocks
 
 ```text
 4 profile management persistence source files
 source/effect blocks: 9
-tab-view renderProfilesManager block: 447 lines, 22917 bytes
+tab-view renderProfilesManager block: 539 lines, 29459 bytes
 tab-view refreshProfilesUI block: 24 lines, 954 bytes
 tab-view switchToProfile block: 47 lines, 1827 bytes
 popup switchToProfile block: 48 lines, 1659 bytes
 tab-view create account handler block: 120 lines, 5004 bytes
 tab-view create child handler block: 107 lines, 4589 bytes
-tab-view saveManagedChildSurface block: 66 lines, 2998 bytes
+tab-view saveManagedChildSurface block: 66 lines, 3003 bytes
 io_manager load/save profiles block: 67 lines, 2563 bytes
 background profile storage invalidation block: 42 lines, 1464 bytes
 ```
@@ -42,21 +42,21 @@ background profile storage invalidation block: 42 lines, 1464 bytes
 ## Selected Token Counts
 
 ```text
-tab-view ensureProfileUnlocked tokens: 20
-tab-view saveProfilesV4 tokens: 47
-tab-view loadProfilesV4 tokens: 82
-tab-view activeProfileId tokens: 87
-tab-view StateManager.loadSettings tokens: 8
-tab-view refreshProfilesUI tokens: 23
+tab-view ensureProfileUnlocked tokens: 34
+tab-view saveProfilesV4 tokens: 71
+tab-view loadProfilesV4 tokens: 114
+tab-view activeProfileId tokens: 127
+tab-view StateManager.loadSettings tokens: 15
+tab-view refreshProfilesUI tokens: 38
 tab-view applyLockGateIfNeeded tokens: 4
 tab-view scheduleAutoBackup tokens: 6
 tab-view profile_created tokens: 2
-tab-view managedChildEdit tokens: 14
+tab-view managedChildEdit tokens: 17
 tab-view unlockedProfiles tokens: 5
 tab-view clearProfileUnlockSession tokens: 7
 tab-view allowMainViewing tokens: 23
 tab-view allowKidsViewing tokens: 22
-tab-view schemaVersion tokens: 30
+tab-view schemaVersion tokens: 52
 popup ensureProfileUnlocked tokens: 3
 popup saveProfilesV4 tokens: 2
 popup loadProfilesV4 tokens: 4
@@ -68,8 +68,8 @@ popup unlockedProfiles tokens: 5
 io_manager FT_PROFILES_V4_KEY tokens: 10
 io_manager writeStorage tokens: 8
 background compiledSettingsCache tokens: 39
-background getCompiledSettings tokens: 9
-background FT_PROFILES_V4_KEY tokens: 37
+background getCompiledSettings tokens: 10
+background FT_PROFILES_V4_KEY tokens: 40
 ```
 
 ## Runtime Fixtures Pinned

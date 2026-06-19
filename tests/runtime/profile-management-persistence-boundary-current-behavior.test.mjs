@@ -154,10 +154,10 @@ test('profile management persistence audit document records current boundary and
 test('profile management source fingerprints stay pinned', () => {
   const doc = read(auditDocPath);
   const expected = [
-    ['js/tab-view.js', 14984, 698493, '82345bda27253dc5c5644c36dd97c2cfafb442d2ecb391818c38f6ea5dad5c65'],
+    ['js/tab-view.js', 21158, 1002771, '4b1d3e58b0eebe9ac0756c4417daa8874e34a281027d8d7622f1556409df2e9b'],
     ['js/popup.js', 1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
-    ['js/io_manager.js', 2111, 101002, 'bed520852b47c0c36994017414d721f0a5baa2c375387098379ab88cc3138669'],
-    ['js/background.js', 6803, 306710, '57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7']
+    ['js/io_manager.js', 2119, 102123, 'd457bdcc4f7fc3acef401b48437fc707e2b9f2791e18ff4cafc1209f810bcc3c'],
+    ['js/background.js', 6984, 315747, '080d15907b26314873138c5dcc5d9653a2a27e933049be10361dfe0047f0a7cc']
   ];
 
   for (const [file, lines, bytes, hash] of expected) {
@@ -173,13 +173,13 @@ test('profile management source/effect block metrics stay pinned in the doc', ()
   const doc = read(auditDocPath);
   const currentBlocks = blocks();
   const expected = {
-    tabRenderProfilesManager: ['tab-view renderProfilesManager block', 447, 22917],
+    tabRenderProfilesManager: ['tab-view renderProfilesManager block', 539, 29459],
     tabRefreshProfilesUI: ['tab-view refreshProfilesUI block', 24, 954],
     tabSwitchToProfile: ['tab-view switchToProfile block', 47, 1827],
     popupSwitchToProfile: ['popup switchToProfile block', 48, 1659],
     tabCreateAccountHandler: ['tab-view create account handler block', 120, 5004],
     tabCreateChildHandler: ['tab-view create child handler block', 107, 4589],
-    tabSaveManagedChildSurface: ['tab-view saveManagedChildSurface block', 66, 2998],
+    tabSaveManagedChildSurface: ['tab-view saveManagedChildSurface block', 66, 3003],
     ioLoadSaveProfiles: ['io_manager load/save profiles block', 67, 2563],
     backgroundProfileStorageInvalidation: ['background profile storage invalidation block', 42, 1464]
   };
@@ -193,21 +193,21 @@ test('profile management source/effect block metrics stay pinned in the doc', ()
 test('selected profile management token counts stay pinned', () => {
   const doc = read(auditDocPath);
   const selected = [
-    ['tab-view ensureProfileUnlocked tokens: 20', sources.tabView, 'ensureProfileUnlocked', 20],
-    ['tab-view saveProfilesV4 tokens: 47', sources.tabView, 'saveProfilesV4', 47],
-    ['tab-view loadProfilesV4 tokens: 82', sources.tabView, 'loadProfilesV4', 82],
-    ['tab-view activeProfileId tokens: 87', sources.tabView, 'activeProfileId', 87],
-    ['tab-view StateManager.loadSettings tokens: 8', sources.tabView, 'StateManager.loadSettings', 8],
-    ['tab-view refreshProfilesUI tokens: 23', sources.tabView, 'refreshProfilesUI', 23],
+    ['tab-view ensureProfileUnlocked tokens: 34', sources.tabView, 'ensureProfileUnlocked', 34],
+    ['tab-view saveProfilesV4 tokens: 71', sources.tabView, 'saveProfilesV4', 71],
+    ['tab-view loadProfilesV4 tokens: 114', sources.tabView, 'loadProfilesV4', 114],
+    ['tab-view activeProfileId tokens: 127', sources.tabView, 'activeProfileId', 127],
+    ['tab-view StateManager.loadSettings tokens: 15', sources.tabView, 'StateManager.loadSettings', 15],
+    ['tab-view refreshProfilesUI tokens: 38', sources.tabView, 'refreshProfilesUI', 38],
     ['tab-view applyLockGateIfNeeded tokens: 4', sources.tabView, 'applyLockGateIfNeeded', 4],
     ['tab-view scheduleAutoBackup tokens: 6', sources.tabView, 'scheduleAutoBackup', 6],
     ['tab-view profile_created tokens: 2', sources.tabView, 'profile_created', 2],
-    ['tab-view managedChildEdit tokens: 14', sources.tabView, 'managedChildEdit', 14],
+    ['tab-view managedChildEdit tokens: 17', sources.tabView, 'managedChildEdit', 17],
     ['tab-view unlockedProfiles tokens: 5', sources.tabView, 'unlockedProfiles', 5],
     ['tab-view clearProfileUnlockSession tokens: 7', sources.tabView, 'clearProfileUnlockSession', 7],
     ['tab-view allowMainViewing tokens: 23', sources.tabView, 'allowMainViewing', 23],
     ['tab-view allowKidsViewing tokens: 22', sources.tabView, 'allowKidsViewing', 22],
-    ['tab-view schemaVersion tokens: 30', sources.tabView, 'schemaVersion', 30],
+    ['tab-view schemaVersion tokens: 52', sources.tabView, 'schemaVersion', 52],
     ['popup ensureProfileUnlocked tokens: 3', sources.popup, 'ensureProfileUnlocked', 3],
     ['popup saveProfilesV4 tokens: 2', sources.popup, 'saveProfilesV4', 2],
     ['popup loadProfilesV4 tokens: 4', sources.popup, 'loadProfilesV4', 4],
@@ -219,8 +219,8 @@ test('selected profile management token counts stay pinned', () => {
     ['io_manager FT_PROFILES_V4_KEY tokens: 10', sources.ioManager, 'FT_PROFILES_V4_KEY', 10],
     ['io_manager writeStorage tokens: 8', sources.ioManager, 'writeStorage', 8],
     ['background compiledSettingsCache tokens: 39', sources.background, 'compiledSettingsCache', 39],
-    ['background getCompiledSettings tokens: 9', sources.background, 'getCompiledSettings', 9],
-    ['background FT_PROFILES_V4_KEY tokens: 37', sources.background, 'FT_PROFILES_V4_KEY', 37]
+    ['background getCompiledSettings tokens: 10', sources.background, 'getCompiledSettings', 10],
+    ['background FT_PROFILES_V4_KEY tokens: 40', sources.background, 'FT_PROFILES_V4_KEY', 40]
   ];
 
   for (const [docLine, source, token, expected] of selected) {
@@ -306,8 +306,8 @@ test('managed child save writes target surface locally with local revision histo
 
   assert.match(block, /const profileId = normalizeString\(managedChildEdit\?\.profileId\)/);
   assert.match(block, /const targetExists = Object\.prototype\.hasOwnProperty\.call\(profiles, profileId\)/);
-  assert.match(block, /getProfileType\(fresh, profileId\) !== 'child'/);
-  assert.match(block, /Managed child target is no longer available/);
+  assert.match(block, /profileId === 'default'/);
+  assert.match(block, /Managed protected profile target is no longer available/);
   assert.match(block, /canActiveProfileManageProfile\(fresh, profileId\)/);
   assert.match(block, /const nextSurface = getProfileSurface\(profile, surface\)/);
   assert.match(block, /const nextProfile = setProfileSurface\(profile, surface, nextSurface\)/);
