@@ -12312,7 +12312,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const defaultOption = document.createElement('option');
         defaultOption.value = '';
-        defaultOption.textContent = 'Use remote active profile';
+        defaultOption.textContent = 'Use the profile open there';
         ftNanahRemoteTarget.appendChild(defaultOption);
 
         inventory.forEach((entry) => {
@@ -12816,11 +12816,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const response = await showChoiceModal({
-            title: 'Remote active profile differs',
+            title: 'Other device has a different profile open',
             message: `You are sending ${getNanahScopeLabel(normalizedScope).toLowerCase()} from ${formatNanahProfileContext(localProfile)}, but ${getNanahRemoteLabel()} currently has ${formatNanahProfileContext(remoteProfile)} active.`,
             details: [
-                'This update will only follow the remote active profile unless you choose an explicit remote target or the receiving device already saved a fixed managed target.',
-                `${getNanahScopeLabel(normalizedScope)} will apply to the remote device\'s current active profile, not to an inactive matching profile.`,
+                'This update follows the profile currently open on the other device unless you choose a protected target or the receiving device already saved a fixed target.',
+                `${getNanahScopeLabel(normalizedScope)} will apply to the other device's currently open profile, not to an inactive matching profile.`,
                 'Switch the other device to the intended profile first, or use Full backup only if you really want the wider account tree.'
             ],
             choices: [
@@ -15596,9 +15596,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ftNanahRemoteTargetHint) {
             const selectedTarget = getNanahSelectedRemoteTargetProfile();
             if (selectedTarget) {
-                ftNanahRemoteTargetHint.textContent = `This session will target ${selectedTarget.profileName} on ${getNanahRemoteLabel()} instead of following the remote active profile.`;
+                ftNanahRemoteTargetHint.textContent = `This session will target ${selectedTarget.profileName} on ${getNanahRemoteLabel()} instead of following whichever profile is open there.`;
             } else if (getNanahRole() === 'source' && normalizeString(nanahSessionState.remoteRole) === 'replica') {
-                ftNanahRemoteTargetHint.textContent = 'No protected profile is selected yet, so updates will follow the receiver’s current active profile unless you choose one here.';
+                ftNanahRemoteTargetHint.textContent = 'No protected profile is selected yet, so updates will follow the profile currently open on the other device unless you choose one here.';
             } else {
                 ftNanahRemoteTargetHint.textContent = 'After pairing, choose the child or protected profile on the other device that should receive this update.';
             }

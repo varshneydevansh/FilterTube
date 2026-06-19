@@ -395,6 +395,11 @@ parent tool instead of a sync/debug console.
     protected profile opens, while keeping live Send Update, Internet Pickup,
     Home Bridge, signature/hash/revision validation, and offline last-policy
     behavior unchanged.
+  - [x] Protected-target wording slice: the Accounts & Sync send panel now says
+    `Protected profile on other device` and `Use the profile open there`
+    instead of `Remote target profile` and `remote active profile`. This is a
+    UI/copy-only parent-language change; selected target IDs, fixed target
+    policy, source/replica roles, and managed-link validation are unchanged.
   - [ ] Scheduled subscription refresh remains a future slice. Until then,
     list updates happen only after a parent/account profile chooses Check or
     Refresh and approves the result.
