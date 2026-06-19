@@ -510,24 +510,12 @@
                                                             </div>
                                                         </div>
                                                         <div class="rule-list-format-showcase" aria-label="Rule list format previews">
-                                                            <input id="ftRulePreviewCsv" class="rule-list-format-showcase__input" type="radio" name="ftRulePreviewFormat" checked />
-                                                            <input id="ftRulePreviewJson" class="rule-list-format-showcase__input" type="radio" name="ftRulePreviewFormat" />
-                                                            <input id="ftRulePreviewTxt" class="rule-list-format-showcase__input" type="radio" name="ftRulePreviewFormat" />
-                                                            <input id="ftRulePreviewUrl" class="rule-list-format-showcase__input" type="radio" name="ftRulePreviewFormat" />
-                                                            <input id="ftRulePreviewBlockTube" class="rule-list-format-showcase__input" type="radio" name="ftRulePreviewFormat" />
                                                             <div class="rule-list-format-showcase__header">
                                                                 <div>
-                                                                    <strong>Choose the kind of list you have</strong>
-                                                                    <span>Each demo shows the exact shape FilterTube can preview before it adds rules.</span>
+                                                                    <strong>Supported list examples</strong>
+                                                                    <span>Use the example that looks closest to your file. FilterTube still previews parsed rows before it adds anything.</span>
                                                                 </div>
-                                                                <code>preview first</code>
-                                                            </div>
-                                                            <div class="rule-list-format-tabs" role="tablist" aria-label="Preview a supported rule-list format">
-                                                                <label for="ftRulePreviewCsv" role="tab"><strong>CSV sheet</strong><span>Excel, Numbers, Sheets</span></label>
-                                                                <label for="ftRulePreviewTxt" role="tab"><strong>TXT rows</strong><span>Paste one rule per line</span></label>
-                                                                <label for="ftRulePreviewJson" role="tab"><strong>JSON list</strong><span>channels + keywords</span></label>
-                                                                <label for="ftRulePreviewUrl" role="tab"><strong>Public URL</strong><span>Raw HTTPS file</span></label>
-                                                                <label for="ftRulePreviewBlockTube" role="tab"><strong>BlockTube</strong><span>Migration JSON</span></label>
+                                                                <code>safe preview</code>
                                                             </div>
                                                             <div class="rule-list-format-stage">
                                                                 <article class="rule-list-format-panel rule-list-format-panel--csv">
@@ -594,6 +582,7 @@
                                                                         <span class="rule-list-format-panel__eyebrow">Rule-list JSON</span>
                                                                         <strong>JSON rule-list preview</strong>
                                                                         <span>Best when a public list or another tool exports explicit arrays.</span>
+                                                                        <span class="rule-list-format-panel__accepts">Supports channels + keywords arrays.</span>
                                                                         <div class="rule-list-format-panel__facts">
                                                                             <span><code>channels</code> adds channel IDs, handles, and channel URLs.</span>
                                                                             <span><code>keywords</code> adds topic words or phrases.</span>

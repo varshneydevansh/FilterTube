@@ -42,10 +42,11 @@ Profiles: Asha, Kabir
 
 ## Settings UI Format Gallery
 
-Settings -> Import / Export -> Rule list imports uses a format showcase rather
-than one dense parser table. The first screen must answer one parent question:
-"What does my file need to look like before I import it?" It should look like
-a small demo of the incoming artifact, not like developer documentation.
+Settings -> Import / Export -> Rule list imports uses an always-visible format
+gallery rather than one dense parser table or a hidden tab/radio selector. The
+first screen must answer one parent question: "What does my file need to look
+like before I import it?" It should look like small demos of the incoming
+artifacts, not like developer documentation.
 
 Current visible previews:
 
@@ -64,6 +65,12 @@ Current visible previews:
   `filterData.channelName`, and `filterData.title` arrays. It is separated
   from URL because migration is a different parent decision than subscribing to
   a public source.
+
+2026-06-19 UI simplification: the CSV, TXT, JSON, URL, and BlockTube examples
+are visible at once. CSV is the large spreadsheet-style preview because it is
+the most parent-friendly template path; JSON is still shown as field map plus
+raw JSON; TXT/URL/BlockTube stay compact. This avoids making parents choose a
+format preview before they even know which file shape they have.
 
 The exact parser notes remain behind a disclosure named `Exact parser rules`.
 That keeps the normal parent flow short while still giving advanced users the
