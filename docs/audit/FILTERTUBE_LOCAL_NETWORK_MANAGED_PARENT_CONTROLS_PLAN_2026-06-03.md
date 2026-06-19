@@ -119,13 +119,13 @@ extension authority code.
   mental model and high-visibility labels changed.
 - [x] Advanced delivery copy now treats live `Send Update` as the normal parent flow and
   explains `Internet Pickup` and `Home Bridge` as optional send paths only. The
-  Help relay section now separates Nanah's live meeting-place role from
+  Help meeting-service section now separates Nanah's live meeting-place role from
   advanced later/home delivery, without implying those transports can become
   policy authority.
 - [x] Device Trust & Sync copy was tightened again for parent/caregiver use:
   the first-read panel now says `Family device updates`, `Pick profile`, and
-  `Connect the other device`; it describes the relay as a technical meeting
-  service only in supporting copy, keeps `More controls` collapsed for role and
+  `Connect the other device`; it describes the connection helper as a meeting
+  service only in supporting copy, keeps `Advanced options` collapsed for role and
   scope details, and keeps the normal parent path as open both devices, pair,
   verify, Send Update, then save parent trust only for approved protected
   profiles.
@@ -134,7 +134,7 @@ extension authority code.
   manage`, `pair both devices`, `send approved changes`) instead of two
   expandable explanation blocks. The mode cards and runtime spotlight copy use
   shorter parent/caregiver language, while relationship/scope/migration
-  controls remain collapsed under `More controls`.
+  controls remain collapsed under `Advanced options`.
 - [x] Trusted-device row wording slice: saved Nanah links now show plain pills
   such as `Parent link`, `Sends approved updates`, and `Receives parent
   updates` instead of leading with source/replica vocabulary. Managed link
@@ -143,8 +143,8 @@ extension authority code.
   easier to scan.
 - [x] Family Device Updates wording slice: the visible Accounts & Sync card and
   Help section now use parent-facing `Family Device Updates` language instead
-  of leading with the Nanah implementation name. The raw relay URL is tucked
-  behind a `Technical relay page` disclosure, and the main privacy banner says
+  of leading with the Nanah implementation name. The raw service URL is tucked
+  behind a `Meeting service link` disclosure, and the main privacy banner says
   the practical rule first: keep both devices open for live Send Update; the meeting
   step does not store rules or PINs.
 - [x] Accounts & Sync guidance simplification slice: the Family Device Updates
@@ -397,6 +397,12 @@ parent tool instead of a sync/debug console.
     protected profile opens, while keeping live Send Update, Internet Pickup,
     Home Bridge, signature/hash/revision validation, and offline last-policy
     behavior unchanged.
+  - [x] Accounts & Sync wording follow-up: protected-profile command-center
+    rows now use `Saved update check` instead of `Check on open` / `Checks on
+    open`, and the Family Device Updates first screen now says `Advanced
+    options` plus `Meeting service link` instead of making parent-facing copy
+    read like a protocol console. Runtime trust, provider gates, and
+    source/replica policy validation are unchanged.
   - [x] Protected-target wording slice: the Accounts & Sync send panel now says
     `Protected profile on other device` and `Use the profile open there`
     instead of `Remote target profile` and `remote active profile`. This is a

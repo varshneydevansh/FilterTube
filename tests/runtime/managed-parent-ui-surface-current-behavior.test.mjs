@@ -481,10 +481,10 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /id="managedChildSyncBoundary"/);
   assert.match(tabViewHtml, /Family device updates/);
   assert.match(tabViewHtml, /<h3>Family Device Updates<\/h3>/);
-  assert.match(tabViewHtml, /Choose what to manage/);
+  assert.match(tabViewHtml, /Pick profile/);
   assert.match(tabViewHtml, /Connect the other device/);
-  assert.match(tabViewHtml, /More controls/);
-  assert.match(tabViewHtml, /Technical relay page/);
+  assert.match(tabViewHtml, /Advanced options/);
+  assert.match(tabViewHtml, /Meeting service link/);
   assert.match(tabViewHtml, /keep both devices open/);
   assert.doesNotMatch(tabViewHtml, /<h3>Device Trust &amp; Sync<\/h3>/);
   assert.doesNotMatch(tabViewHtml, /Completely P2P after handshake/);

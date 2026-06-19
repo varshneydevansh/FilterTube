@@ -1300,7 +1300,7 @@
                 { label: item.timeLimit, tone: item.timeLimited ? 'warning' : 'neutral', title: 'Daily YouTube time for this protected profile.' },
                 item.managedChannelListLabel ? { label: item.managedChannelListLabel, tone: 'success', title: item.managedChannelListDetail || 'Parent-approved lists attached to this profile.' } : null,
                 { label: syncState.label, tone: syncState.tone, title: item.deliveryPathDetail || 'Device delivery status.' },
-                item.syncTargetCount > 0 && item.syncOpenCheckCount > 0 ? { label: 'Checks on open', tone: 'success', title: 'This verified device can check for newer trusted parent updates when the protected profile opens.' } : null,
+                item.syncTargetCount > 0 && item.syncOpenCheckCount > 0 ? { label: 'Saved update check', tone: 'success', title: 'This verified device can check for newer trusted parent updates when the protected profile opens.' } : null,
                 item.remoteScopeCount ? { label: item.syncLabel, tone: 'success', title: 'Latest accepted protected-profile policy revision.' } : null,
                 item.pendingExtraTimeRequestLabel ? { label: item.pendingExtraTimeRequestLabel, tone: 'warning', title: item.pendingExtraTimeRequestDetail || 'This profile asked for more time.' } : null,
                 item.syncTargetCount > 0 && item.latestDeliveryLabel ? { label: item.latestDeliveryLabel, tone: item.latestDeliveryTone || 'neutral', title: 'Latest protected delivery attempt.' } : null,
@@ -1321,13 +1321,13 @@
                     ? { label: 'Device sync', value: item.deliveryPreview?.label || 'Send when ready', note: item.deliveryPathDetail }
                     : { label: 'Device sync', value: 'Not paired', note: 'Local rules and time limits work here. Pair only when this profile must also update another device.' },
                 hasVerifiedDevice ? {
-                    label: 'Check on open',
+                    label: 'Saved update check',
                     value: item.syncOpenCheckCount > 0
                         ? (item.syncOpenCheckCount >= item.syncTargetCount ? 'On when opened' : `On for ${item.syncOpenCheckCount}/${item.syncTargetCount}`)
                         : 'Off',
                     note: item.syncOpenCheckCount > 0
                         ? 'When Internet Pickup or Home Bridge is configured, this protected profile checks for newer trusted parent updates as it opens.'
-                        : 'Live Send Update still works. Open-time checks are only for optional later/home delivery.'
+                        : 'Live Send Update still works. Saved update checks are only for optional later/home delivery.'
                 } : null,
                 item.managedChannelListDetail ? { label: 'Lists', value: item.managedChannelListDetail } : null,
                 hasVerifiedDevice ? { label: 'Verified device', value: item.syncTargetLabel } : null,
