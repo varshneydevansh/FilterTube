@@ -408,6 +408,10 @@ parent tool instead of a sync/debug console.
     device, and asks parents to pair only when another verified device should
     receive the same approved rules. Optional Internet Pickup/Home Bridge
     provider hooks remain hidden until a protected profile exists.
+  - [x] Advanced service setup wording slice: Internet Pickup and Home Bridge
+    prompts now say `Service` / `Service Key` instead of raw address/key labels,
+    and explicitly state that the service key is not the parent PIN. Runtime
+    endpoint validation and provider authority gates are unchanged.
   - [x] Protected-target wording slice: the Accounts & Sync send panel now says
     `Protected profile on other device` and `Use the profile open there`
     instead of `Remote target profile` and `remote active profile`. This is a

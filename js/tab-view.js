@@ -13300,8 +13300,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const endpoint = await showPromptModal({
-            title: 'Internet Pickup Address',
-            message: 'Advanced only. Enter a FilterTube-compatible pickup service only if you run or trust one. It is not the Nanah signal server, and it cannot change rules by itself. Leave blank for live Send Update only.',
+            title: 'Internet Pickup Service',
+            message: 'Advanced only. Use this only if you run or trust a FilterTube-compatible internet pickup service. It is not the Nanah meeting service, and it cannot change rules by itself. Leave blank for live Send Update only.',
             placeholder: 'https://your-filtertube-pickup-service',
             inputType: 'url',
             confirmText: currentEndpoint ? 'Save Internet Pickup' : 'Enable Internet Pickup',
@@ -13320,8 +13320,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const token = await showPromptModal({
-            title: 'Internet Pickup Key',
-            message: 'Optional service key. Leave blank to keep the saved key. Enter a single dash to clear it.',
+            title: 'Internet Pickup Service Key',
+            message: 'Optional service key, not the parent PIN. Leave blank to keep the saved key. Enter a single dash to clear it.',
             placeholder: 'Optional service key',
             inputType: 'password',
             confirmText: 'Save',
@@ -13391,8 +13391,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const endpoint = await showPromptModal({
-            title: 'Home Bridge Address',
-            message: 'Advanced only. Enter a trusted Home Bridge address only if you run a FilterTube-compatible bridge. Normal parent control uses live Send Update.',
+            title: 'Home Bridge Service',
+            message: 'Advanced only. Use this only if you run a trusted FilterTube-compatible bridge on your own network. Normal parent control uses live Send Update.',
             placeholder: 'http://192.168.1.10:4177/filtertube',
             inputType: 'url',
             confirmText: currentEndpoint ? 'Save Bridge' : 'Enable Home Bridge',
@@ -13405,8 +13405,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const token = await showPromptModal({
-            title: 'Home Bridge Key',
-            message: 'Optional bridge key. Leave blank to keep the saved key. Enter a single dash to clear it.',
+            title: 'Home Bridge Service Key',
+            message: 'Optional bridge key, not the parent PIN. Leave blank to keep the saved key. Enter a single dash to clear it.',
             placeholder: 'Optional bridge key',
             inputType: 'password',
             confirmText: 'Save',
