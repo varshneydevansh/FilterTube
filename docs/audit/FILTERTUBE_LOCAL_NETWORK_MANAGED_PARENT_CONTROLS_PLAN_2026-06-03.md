@@ -346,6 +346,11 @@ parent tool instead of a sync/debug console.
     `Home Bridge` for the same-network bridge. The docs still map these to the
     underlying Pick Up Later/Home Bridge transports, but the first parent-facing
     labels now describe the outcome instead of the implementation.
+  - [x] Settings handoff wording slice: the Settings import/export shortcut now
+    says `Device Updates` instead of `Sync from other device`, and its title
+    points to Accounts & Sync > Family Device Updates for pair/send/receive
+    work. This keeps backup import, rule-list import, and verified-device
+    update flows visually separate.
   - [x] Verified-device pickup wording slice: trusted protected-profile links
     now describe `syncOnProfileOpen` as `Check on open` instead of a transport
     name. The modal explains that a protected profile checks for newer approved
