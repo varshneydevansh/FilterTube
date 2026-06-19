@@ -489,6 +489,9 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /Live update/);
   assert.match(tabViewHtml, /Automatic pickup/);
   assert.match(tabViewHtml, /Same network/);
+  assert.match(tabViewHtml, /id="ftNanahDeliveryAdvanced"/);
+  assert.match(tabViewHtml, /Optional later delivery/);
+  assert.match(tabViewHtml, /Use this only when the protected device cannot be open during Send Update/);
   assert.match(tabViewHtml, /Advanced options/);
   assert.match(tabViewHtml, /Meeting service link/);
   assert.match(tabViewHtml, /keep both devices open/);
@@ -520,6 +523,9 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /async function configureNanahManagedMailboxServer\(\)/);
   assert.match(source, /function renderNanahDeliveryPathStrip\(\)/);
   assert.match(source, /function getNanahFamilyDeliveryReadinessSummary\(/);
+  assert.match(source, /ftNanahDeliveryAdvanced && \(mailbox\.configured === true \|\| local\.configured === true\)/);
+  assert.match(doc, /runtime Family Device Updates optional delivery disclosure: present and auto-opens only for configured Internet Pickup\/Home Bridge providers/);
+  assert.match(plan, /Family Device Updates optional delivery collapse/);
   assert.match(source, /ftNanahDeliveryMailboxBtn\.disabled = !mailboxCanConfigure/);
   assert.match(source, /ftNanahDeliveryLocalBtn\.disabled = !localCanConfigure/);
   assert.match(source, /ftNanahDeliveryMailboxBtn/);

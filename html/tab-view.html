@@ -817,22 +817,33 @@
                                                     <small id="ftNanahDeliveryLiveDetail">Use Send Update when parent and protected devices are open together.</small>
                                                 </div>
                                             </article>
-                                            <article class="nanah-delivery-card" id="ftNanahDeliveryMailboxCard">
-                                                <div>
-                                                    <span class="nanah-delivery-card__eyebrow">Automatic pickup</span>
-                                                    <strong id="ftNanahDeliveryMailboxLabel">Internet Pickup off</strong>
-                                                    <small id="ftNanahDeliveryMailboxDetail">Optional waiting updates for protected devices that open later.</small>
+                                            <details id="ftNanahDeliveryAdvanced" class="nanah-delivery-advanced">
+                                                <summary>
+                                                    <span>
+                                                        <strong>Optional later delivery</strong>
+                                                        <small>Use this only when the protected device cannot be open during Send Update.</small>
+                                                    </span>
+                                                    <code>Advanced</code>
+                                                </summary>
+                                                <div class="nanah-delivery-advanced__cards">
+                                                    <article class="nanah-delivery-card" id="ftNanahDeliveryMailboxCard">
+                                                        <div>
+                                                            <span class="nanah-delivery-card__eyebrow">Automatic pickup</span>
+                                                            <strong id="ftNanahDeliveryMailboxLabel">Internet Pickup off</strong>
+                                                            <small id="ftNanahDeliveryMailboxDetail">Optional waiting updates for protected devices that open later.</small>
+                                                        </div>
+                                                        <button id="ftNanahDeliveryMailboxBtn" class="btn-secondary" type="button">Set Up</button>
+                                                    </article>
+                                                    <article class="nanah-delivery-card" id="ftNanahDeliveryLocalCard">
+                                                        <div>
+                                                            <span class="nanah-delivery-card__eyebrow">Same network</span>
+                                                            <strong id="ftNanahDeliveryLocalLabel">Home Bridge off</strong>
+                                                            <small id="ftNanahDeliveryLocalDetail">Optional local bridge for trusted home or school networks.</small>
+                                                        </div>
+                                                        <button id="ftNanahDeliveryLocalBtn" class="btn-secondary" type="button">Set Up</button>
+                                                    </article>
                                                 </div>
-                                                <button id="ftNanahDeliveryMailboxBtn" class="btn-secondary" type="button">Set Up</button>
-                                            </article>
-                                            <article class="nanah-delivery-card" id="ftNanahDeliveryLocalCard">
-                                                <div>
-                                                    <span class="nanah-delivery-card__eyebrow">Same network</span>
-                                                    <strong id="ftNanahDeliveryLocalLabel">Home Bridge off</strong>
-                                                    <small id="ftNanahDeliveryLocalDetail">Optional local bridge for trusted home or school networks.</small>
-                                                </div>
-                                                <button id="ftNanahDeliveryLocalBtn" class="btn-secondary" type="button">Set Up</button>
-                                            </article>
+                                            </details>
                                         </div>
                                     </div>
 

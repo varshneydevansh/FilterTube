@@ -330,6 +330,14 @@ parent tool instead of a sync/debug console.
     Update and local controls; the prompt is only a discoverable path for
     families/caregivers who need internet pickup after the protected device
     opens later or a trusted home/school bridge.
+  - [x] 2026-06-19 Family Device Updates optional delivery collapse: the
+    Accounts & Sync pairing surface now shows live `Send Update` as the only
+    first-level delivery path, with Internet Pickup and Home Bridge under an
+    `Optional later delivery` disclosure. Configured optional providers force
+    the disclosure open so existing families still see their active route. This
+    is UI simplification only; provider setup still requires parent/account
+    re-auth, saved trusted links, fixed target/scope checks, signed envelopes,
+    and local validation on the protected device.
   - [x] Optional delivery disclosure slice: the unconfigured prompt is
     collapsed under `Need updates when the other device opens later?` so
     ordinary parents see Send Update as the default flow. Opening the disclosure

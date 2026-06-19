@@ -1300,6 +1300,19 @@ html[data-theme="dark"] .nanah-delivery-card {
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
+html[data-theme="dark"] .nanah-delivery-advanced {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(18, 25, 34, 0.66);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+html[data-theme="dark"] .nanah-delivery-advanced > summary::after,
+html[data-theme="dark"] .nanah-delivery-advanced > summary code {
+    border-color: rgba(195, 90, 75, 0.24);
+    background: rgba(195, 90, 75, 0.12);
+    color: #f7c7bd;
+}
+
 html[data-theme="dark"] .nanah-delivery-card[data-tone="success"] {
     border-color: rgba(74, 222, 128, 0.24);
     background:
@@ -1866,6 +1879,10 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
         grid-template-columns: 1fr;
     }
 
+    .nanah-delivery-advanced__cards {
+        grid-template-columns: 1fr;
+    }
+
 }
 
 @media (max-width: 640px) {
@@ -1915,6 +1932,11 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
 
     .nanah-delivery-card {
         align-items: stretch;
+        flex-direction: column;
+    }
+
+    .nanah-delivery-advanced > summary {
+        align-items: flex-start;
         flex-direction: column;
     }
 
@@ -2150,8 +2172,95 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
 
 .nanah-delivery-strip {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     gap: 0.75rem;
+}
+
+.nanah-delivery-advanced {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid rgba(96, 120, 145, 0.14);
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.52);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.nanah-delivery-advanced > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.9rem;
+    min-width: 0;
+    min-height: 3.4rem;
+    padding: 0.82rem 0.9rem;
+    cursor: pointer;
+    list-style: none;
+}
+
+.nanah-delivery-advanced > summary::-webkit-details-marker {
+    display: none;
+}
+
+.nanah-delivery-advanced > summary::after {
+    content: '+';
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 1px solid rgba(171, 68, 56, 0.16);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--ft-color-brand-primary);
+    font-size: 1rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.nanah-delivery-advanced[open] > summary::after {
+    content: '-';
+}
+
+.nanah-delivery-advanced > summary span {
+    display: grid;
+    gap: 0.18rem;
+    min-width: 0;
+}
+
+.nanah-delivery-advanced > summary strong {
+    color: var(--ft-color-text-primary);
+    font-size: 0.88rem;
+    font-weight: 850;
+    line-height: 1.22;
+}
+
+.nanah-delivery-advanced > summary small {
+    color: var(--ft-color-text-secondary);
+    font-size: 0.76rem;
+    font-weight: 620;
+    line-height: 1.38;
+}
+
+.nanah-delivery-advanced > summary code {
+    flex: 0 0 auto;
+    padding: 0.18rem 0.48rem;
+    border: 1px solid rgba(171, 68, 56, 0.14);
+    border-radius: 999px;
+    background: rgba(171, 68, 56, 0.06);
+    color: var(--ft-color-brand-primary);
+    font-size: 0.64rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    line-height: 1.1;
+    text-transform: uppercase;
+}
+
+.nanah-delivery-advanced__cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    padding: 0 0.9rem 0.9rem;
 }
 
 .nanah-delivery-card {

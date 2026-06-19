@@ -2928,6 +2928,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftNanahQrCanvas = document.getElementById('ftNanahQrCanvas');
     const ftNanahQrCaption = document.getElementById('ftNanahQrCaption');
     const ftNanahTrustedLinks = document.getElementById('ftNanahTrustedLinks');
+    const ftNanahDeliveryAdvanced = document.getElementById('ftNanahDeliveryAdvanced');
     const ftNanahDeliveryLiveCard = document.getElementById('ftNanahDeliveryLiveCard');
     const ftNanahDeliveryLiveLabel = document.getElementById('ftNanahDeliveryLiveLabel');
     const ftNanahDeliveryLiveDetail = document.getElementById('ftNanahDeliveryLiveDetail');
@@ -13289,6 +13290,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const local = summarizeManagedLocalNetworkProviderConfig();
         const localCanConfigure = local.configured === true || hasVerifiedDevice;
+        if (ftNanahDeliveryAdvanced && (mailbox.configured === true || local.configured === true)) {
+            ftNanahDeliveryAdvanced.open = true;
+        }
         if (ftNanahDeliveryLocalCard) {
             ftNanahDeliveryLocalCard.dataset.tone = local.configured ? 'success' : (localCanConfigure ? 'optional' : 'neutral');
         }
