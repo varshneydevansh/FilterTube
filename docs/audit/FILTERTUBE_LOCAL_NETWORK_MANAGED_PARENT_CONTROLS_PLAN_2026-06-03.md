@@ -561,6 +561,14 @@ parent tool instead of a sync/debug console.
     instead of `Remote target profile` and `remote active profile`. This is a
     UI/copy-only parent-language change; selected target IDs, fixed target
     policy, source/replica roles, and managed-link validation are unchanged.
+  - [x] 2026-06-19 managed parent release-smoke checklist slice: release proof
+    now has a dedicated installed-extension checklist for Family Controls,
+    Family Device Updates, live Send Update, Internet Pickup, Home Bridge,
+    rule-list import, viewing-space gates, time limits, protected history, and
+    no-work performance. The checklist keeps local intranet/Home Bridge wording
+    honest: same-network pickup is delivery only, never authority, and built-in
+    automatic LAN peer discovery remains a NO-GO until a compatible provider
+    and installed smoke prove it.
   - [x] Protected-policy revision wording slice: Family Controls rows now show
     `Policy rN` and managed status says `Verified-device policy` instead of
     `Remote rN`/`Remote sync`. This changes only visible wording; accepted

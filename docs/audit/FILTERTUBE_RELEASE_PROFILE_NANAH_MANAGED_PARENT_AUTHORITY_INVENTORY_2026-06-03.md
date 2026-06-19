@@ -137,6 +137,8 @@ grants authority, and every received candidate still has to pass trusted-link,
 target, scope, revision, hash, and signature validation locally. A
 FilterTube-hosted mailbox service, automatic LAN peer discovery authority, app
 parity, and remote admin session semantics remain separate required slices.
+The built-in local-network peer discovery/LAN delivery runtime remains absent;
+Home Bridge is an explicit provider handoff, not automatic Wi-Fi authority.
 
 ## Issue 60 Local-Network Caregiver Addendum
 
