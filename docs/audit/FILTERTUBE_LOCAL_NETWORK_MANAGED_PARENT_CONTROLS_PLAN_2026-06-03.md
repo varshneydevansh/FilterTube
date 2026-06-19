@@ -338,6 +338,15 @@ parent tool instead of a sync/debug console.
     devices`, `Needs pairing`, `Time requests`). This is UI/copy only; managed
     policy authority, revision handling, transport validation, and runtime gates
     are unchanged.
+  - [x] 2026-06-19 bulk-action simplification slice: Family Controls now keeps
+    multi-profile actions inside a collapsed `Manage several profiles at once`
+    drawer. Selecting a protected-profile row opens the drawer automatically,
+    while single-profile row actions stay visible. The Family Device Updates
+    first-screen note now starts with live `Send Update` and moves later/offline
+    delivery into advanced optional setup language. This changes UI discovery
+    and wording only; it does not add trust, alter scopes, or change Nanah,
+    Internet Pickup, Home Bridge, signature, hash, revision, or runtime gate
+    behavior.
   - [x] Optional delivery setup modals use parent-facing `address` and `key`
     labels instead of raw provider/password language, and explicitly say Pick Up
     Later is not the Nanah signal server and cannot change rules by itself.

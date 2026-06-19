@@ -942,7 +942,7 @@
         if (shouldShowConfiguredProviderSetup || shouldShowProviderPrompt) {
             const providerIntro = document.createElement('div');
             providerIntro.className = 'ft-managed-command-center__provider-intro';
-            providerIntro.textContent = 'Advanced update pickup';
+            providerIntro.textContent = 'Optional advanced delivery';
             providerIntro.title = 'Send Update is the normal path. Add these only when updates must wait for the other device to open later.';
             panel.appendChild(providerIntro);
         }
@@ -956,9 +956,9 @@
             const promptCopy = document.createElement('div');
             promptCopy.className = 'ft-managed-command-center__provider-copy';
             const promptTitle = document.createElement('strong');
-            promptTitle.textContent = 'Need updates when the other device opens later?';
+            promptTitle.textContent = 'Need delivery when the other device opens later?';
             const promptDetail = document.createElement('span');
-            promptDetail.textContent = 'Optional. Most families can keep using Send Update.';
+            promptDetail.textContent = 'Optional. Keep using Send Update when both devices can be open together.';
             promptCopy.append(promptTitle, promptDetail);
             providerSummary.appendChild(promptCopy);
             const promptActions = document.createElement('div');
@@ -966,7 +966,7 @@
             const promptBody = document.createElement('div');
             promptBody.className = 'ft-managed-command-center__provider-prompt-body';
             const promptBodyText = document.createElement('span');
-            promptBodyText.textContent = 'Normal control is live: open both devices, pair, verify, send. Add a pickup path only if you run a compatible service for offline or same-network delivery.';
+            promptBodyText.textContent = 'Normal control is live: open both devices, pair, verify, send. Add one of these only if you run a compatible waiting or home-network service.';
             [
                 {
                     label: 'Internet Pickup',
@@ -1086,11 +1086,21 @@
         const selectedProfileInputs = [];
         const bulkIntents = buildManagedCommandCenterBulkActionIntents(summary.rows);
         const showBulkControls = h.onAction && bulkIntents.length && summary.rows.length > 1;
+        let bulkDetailsEl = null;
         if (showBulkControls) {
-            const bulkBar = document.createElement('div');
+            const bulkBar = document.createElement('details');
             bulkBar.className = 'ft-managed-command-center__bulk';
+            bulkDetailsEl = bulkBar;
+            const bulkSummary = document.createElement('summary');
+            bulkSummary.className = 'ft-managed-command-center__bulk-summary';
+            const bulkSummaryCopy = document.createElement('span');
+            bulkSummaryCopy.className = 'ft-managed-command-center__bulk-summary-copy';
+            bulkSummaryCopy.textContent = 'Manage several profiles at once';
             const bulkStatus = document.createElement('span');
             bulkStatus.className = 'ft-managed-command-center__bulk-status';
+            bulkSummary.append(bulkSummaryCopy, bulkStatus);
+            const bulkContent = document.createElement('div');
+            bulkContent.className = 'ft-managed-command-center__bulk-content';
             const bulkSelectControls = document.createElement('div');
             bulkSelectControls.className = 'ft-managed-command-center__bulk-select';
             const selectAllButton = document.createElement('button');
@@ -1101,12 +1111,12 @@
             const selectReadyButton = document.createElement('button');
             selectReadyButton.className = 'btn-secondary';
             selectReadyButton.type = 'button';
-            selectReadyButton.textContent = 'Select ready';
+            selectReadyButton.textContent = 'Select ready devices';
             selectReadyButton.title = 'Select protected profiles that already have a verified delivery path.';
             const selectRequestsButton = document.createElement('button');
             selectRequestsButton.className = 'btn-secondary';
             selectRequestsButton.type = 'button';
-            selectRequestsButton.textContent = 'Select requests';
+            selectRequestsButton.textContent = 'Select time requests';
             selectRequestsButton.title = 'Select protected profiles with pending extra-time requests.';
             const clearSelectionButton = document.createElement('button');
             clearSelectionButton.className = 'btn-secondary';
@@ -1160,13 +1170,14 @@
                 const selectedRequestCount = requestInputs.filter(input => input.checked).length;
                 bulkStatus.textContent = count
                     ? `${count} selected${selectedRequestCount ? ` | ${selectedRequestCount} time ${selectedRequestCount === 1 ? 'request' : 'requests'}` : ''}`
-                    : 'Select protected profiles for bulk updates';
+                    : 'Optional: select profiles below to edit or send together';
+                bulkBar.classList.toggle('has-selection', count > 0);
                 bulkButtons.forEach(button => {
                     button.disabled = count === 0;
                     if (button.dataset.filtertubeBulkAction === 'bulk_grant_extra_time') {
                         const label = selectedRequestCount
-                            ? 'Grant selected time'
-                            : (button.dataset.filtertubeDefaultLabel || 'Add selected time');
+                            ? 'Grant time requests'
+                            : 'Add extra time';
                         button.textContent = label;
                         button.title = count === 0
                             ? 'Select one or more protected profiles first. Requires parent/account re-auth.'
@@ -1230,7 +1241,8 @@
                 updateBulkState();
             });
             bulkSelectControls.append(selectAllButton, selectReadyButton, selectRequestsButton, clearSelectionButton);
-            bulkBar.append(bulkStatus, bulkSelectControls, bulkActionWrap);
+            bulkContent.append(bulkSelectControls, bulkActionWrap);
+            bulkBar.append(bulkSummary, bulkContent);
             panel.appendChild(bulkBar);
             panel.__filtertubeUpdateManagedBulkState = updateBulkState;
         }
@@ -1256,6 +1268,7 @@
             selector.addEventListener('change', () => {
                 if (selector.checked) {
                     selectedProfiles.add(item.profileId);
+                    if (bulkDetailsEl) bulkDetailsEl.open = true;
                 } else {
                     selectedProfiles.delete(item.profileId);
                 }
