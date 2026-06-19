@@ -48,15 +48,17 @@ than one dense parser table. The first screen must answer one parent question:
 
 Current visible previews:
 
-- CSV: a small spreadsheet-style example with `channel_id`, `keyword`, and
-  `notes` columns, including handles, UC channel IDs, `/c/Name`, and keyword
-  rows.
-- JSON: a simple rule-list JSON preview with `channels` and `keywords` arrays.
-  It is explicitly not the full FilterTube backup format.
-- TXT: one row per rule, with bare rows channel-first and `keyword:` required
-  for keyword rows.
-- URL / BlockTube: raw HTTPS CSV/TXT/JSON lists and BlockTube `filterData`
-  arrays. These still open a preview before applying.
+- CSV: a miniature spreadsheet preview with a filename bar, column letters,
+  row numbers, and `channel_id`, `keyword`, and `notes` columns. It shows
+  handles, UC channel IDs, `/c/Name`, and keyword rows without forcing parents
+  to read parser prose first.
+- JSON: a rule-list JSON preview with a field-map row for `channels` and
+  `keywords`, followed by the raw JSON snippet. It is explicitly not the full
+  FilterTube backup format.
+- TXT: a lined text-file preview with one row per rule, bare rows
+  channel-first, and `keyword:` required for keyword rows.
+- URL / BlockTube: separate source cards for raw HTTPS CSV/TXT/JSON lists and
+  BlockTube `filterData` arrays. These still open a preview before applying.
 
 The exact parser notes remain behind a disclosure named `Exact parser rules`.
 That keeps the normal parent flow short while still giving advanced users the
@@ -328,10 +330,11 @@ Current completion rule:
 - Main/Kids rule pages remain the place to review, edit, pause, resume, and remove the imported rows after import.
 - The Settings card shows a selectable format gallery instead of dense prose.
   CSV is the default and looks like a small spreadsheet with `channel_id`,
-  `keyword`, and `notes` columns. JSON, TXT, and URL/BlockTube each get their
-  own preview panel so parents see one concrete artifact at a time instead of a
-  crowded combined explanation. Deeper supported formats, stale checks, and
-  templates sit behind disclosures so the default parent flow stays readable.
+  `keyword`, and `notes` columns. JSON looks like a field map plus a raw
+  snippet, TXT looks like a simple line list, and URL/BlockTube uses source
+  cards. Parents see one concrete artifact at a time instead of a crowded
+  combined explanation. Deeper supported formats, stale checks, and templates
+  sit behind disclosures so the default parent flow stays readable.
 - The modal says rule list, shows supported formats, CSV template, file/URL/paste inputs, live preview counts, skipped row counts, a spreadsheet-like parsed-row preview, and the final Apply confirmation.
 - Rule-list JSON is intentionally narrower than a full FilterTube backup JSON. It may add channels and keywords only; it does not change profile structure, PINs, trusted devices, viewing spaces, or sync targets.
 - The Settings card and import modal expose both CSV and JSON rule-list templates. The CSV template is the spreadsheet path; the JSON template is the lightweight rule-list shape, not the full FilterTube backup/export structure.

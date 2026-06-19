@@ -515,19 +515,24 @@
                                                             <input id="ftRulePreviewTxt" class="rule-list-format-showcase__input" type="radio" name="ftRulePreviewFormat" />
                                                             <input id="ftRulePreviewUrl" class="rule-list-format-showcase__input" type="radio" name="ftRulePreviewFormat" />
                                                             <div class="rule-list-format-tabs" role="tablist" aria-label="Preview a supported rule-list format">
-                                                                <label for="ftRulePreviewCsv" role="tab"><strong>CSV</strong><span>Spreadsheet</span></label>
-                                                                <label for="ftRulePreviewJson" role="tab"><strong>JSON</strong><span>Rule list</span></label>
-                                                                <label for="ftRulePreviewTxt" role="tab"><strong>TXT</strong><span>Simple rows</span></label>
-                                                                <label for="ftRulePreviewUrl" role="tab"><strong>URL</strong><span>Public or BlockTube</span></label>
+                                                                <label for="ftRulePreviewCsv" role="tab"><strong>CSV</strong><span>Sheet columns</span></label>
+                                                                <label for="ftRulePreviewJson" role="tab"><strong>JSON</strong><span>App list</span></label>
+                                                                <label for="ftRulePreviewTxt" role="tab"><strong>TXT</strong><span>Line list</span></label>
+                                                                <label for="ftRulePreviewUrl" role="tab"><strong>URL</strong><span>Web list</span></label>
                                                             </div>
                                                             <div class="rule-list-format-stage">
                                                                 <article class="rule-list-format-panel rule-list-format-panel--csv">
                                                                     <div class="rule-list-format-panel__copy">
+                                                                        <span class="rule-list-format-panel__eyebrow">Spreadsheet file</span>
                                                                         <strong>CSV sheet preview</strong>
-                                                                        <span>Best when a parent wants to edit the list in Numbers, Excel, or Sheets before importing.</span>
-                                                                        <span class="rule-list-format-panel__accepts">Accepts channel IDs, handles, channel URLs, <code>/c/Name</code>, <code>/user/Name</code>, and keywords.</span>
+                                                                        <span>Edit this in Numbers, Excel, or Sheets. Each row can add one channel, one keyword, or both.</span>
+                                                                        <span class="rule-list-format-panel__accepts">Use channel IDs, handles, channel URLs, <code>/c/Name</code>, <code>/user/Name</code>, or keywords.</span>
                                                                     </div>
                                                                     <div class="rule-list-preview-sheet" role="table" aria-label="CSV spreadsheet-style rule list example">
+                                                                        <div class="rule-list-preview-sheet__toolbar">
+                                                                            <strong>filtertube-rule-list.csv</strong>
+                                                                            <span>Previewed before import</span>
+                                                                        </div>
                                                                         <div class="rule-list-preview-sheet__letters" aria-hidden="true">
                                                                             <span></span>
                                                                             <span>A</span>
@@ -568,14 +573,25 @@
                                                                 </article>
                                                                 <article class="rule-list-format-panel rule-list-format-panel--json">
                                                                     <div class="rule-list-format-panel__copy">
+                                                                        <span class="rule-list-format-panel__eyebrow">Rule-list JSON</span>
                                                                         <strong>JSON rule-list preview</strong>
-                                                                        <span>Use this when a list maintainer publishes structured channels and keywords.</span>
+                                                                        <span>Use this when a list maintainer publishes structured channel and keyword arrays.</span>
                                                                         <span class="rule-list-format-panel__accepts">This is not a full FilterTube backup. It cannot change profiles, PINs, time limits, or trusted devices.</span>
                                                                     </div>
                                                                     <div class="rule-list-preview-json" aria-label="Simple JSON rule list example">
                                                                         <div class="rule-list-preview-json__header">
                                                                             <span>{ }</span>
                                                                             <strong>filtertube-list.json</strong>
+                                                                        </div>
+                                                                        <div class="rule-list-preview-json__map" aria-label="JSON fields accepted for rule-list imports">
+                                                                            <div>
+                                                                                <span>channels</span>
+                                                                                <code>["@SomeChannel", "UC...", "https://youtube.com/@AnotherChannel"]</code>
+                                                                            </div>
+                                                                            <div>
+                                                                                <span>keywords</span>
+                                                                                <code>["brainrot", "scary thumbnail"]</code>
+                                                                            </div>
                                                                         </div>
                                                                         <pre class="rule-list-preview-code">{
   "title": "Family safety starter list",
@@ -593,11 +609,13 @@
                                                                 </article>
                                                                 <article class="rule-list-format-panel rule-list-format-panel--txt">
                                                                     <div class="rule-list-format-panel__copy">
+                                                                        <span class="rule-list-format-panel__eyebrow">Plain text file</span>
                                                                         <strong>TXT row preview</strong>
-                                                                        <span>Good for a quick copied list. Bare rows are treated as channels for safety.</span>
+                                                                        <span>Good for pasted lists. Bare rows are treated as channels for safety.</span>
                                                                         <span class="rule-list-format-panel__accepts">Use <code>keyword:</code> when a row should become a keyword rule.</span>
                                                                     </div>
                                                                     <div class="rule-list-preview-lines" aria-label="Plain text rule list rows">
+                                                                        <div class="rule-list-preview-lines__title"><strong>family-starter-list.txt</strong><span>One rule per line</span></div>
                                                                         <div><span>comment</span><code># title: Family starter list</code></div>
                                                                         <div><span>channel</span><code>@SomeChannel</code></div>
                                                                         <div><span>channel</span><code>UCxxxxxxxxxxxxxxxxxxxxxx</code></div>
@@ -607,18 +625,21 @@
                                                                 </article>
                                                                 <article class="rule-list-format-panel rule-list-format-panel--url">
                                                                     <div class="rule-list-format-panel__copy">
+                                                                        <span class="rule-list-format-panel__eyebrow">External list</span>
                                                                         <strong>Public URL and BlockTube preview</strong>
                                                                         <span>Use a raw HTTPS list URL or a BlockTube export when a community list already exists.</span>
                                                                         <span class="rule-list-format-panel__accepts">FilterTube downloads the list, previews understood rows, then waits for parent approval.</span>
                                                                     </div>
                                                                     <div class="rule-list-preview-split" aria-label="URL and BlockTube import examples">
                                                                         <div>
-                                                                            <b>Raw list URL</b>
+                                                                            <span class="rule-list-preview-split__chip">Raw HTTPS</span>
+                                                                            <b>Public list URL</b>
                                                                             <code>https://raw.githubusercontent.com/list.csv</code>
                                                                             <code>https://example.org/filtertube-list.json</code>
                                                                             <span>CSV, TXT, or simple JSON served as raw text.</span>
                                                                         </div>
                                                                         <div>
+                                                                            <span class="rule-list-preview-split__chip">Migration</span>
                                                                             <b>BlockTube JSON</b>
                                                                             <code>filterData.channelId[]</code>
                                                                             <code>filterData.channelName[]</code>

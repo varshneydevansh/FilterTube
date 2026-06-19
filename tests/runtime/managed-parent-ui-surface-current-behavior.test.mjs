@@ -508,11 +508,17 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /id="ftRulePreviewUrl"/);
   assert.match(tabViewHtml, /rule-list-format-stage/);
   assert.match(tabViewHtml, /rule-list-preview-sheet/);
+  assert.match(tabViewHtml, /filtertube-rule-list\.csv/);
+  assert.match(tabViewHtml, /Sheet columns/);
   assert.match(tabViewHtml, /CSV spreadsheet-style rule list example/);
   assert.match(tabViewHtml, /CSV sheet preview/);
   assert.match(tabViewHtml, /JSON rule-list preview/);
+  assert.match(tabViewHtml, /Rule-list JSON/);
+  assert.match(tabViewHtml, /rule-list-preview-json__map/);
   assert.match(tabViewHtml, /TXT row preview/);
+  assert.match(tabViewHtml, /family-starter-list\.txt/);
   assert.match(tabViewHtml, /Public URL and BlockTube preview/);
+  assert.match(tabViewHtml, /Public list URL/);
   assert.match(tabViewHtml, /filtertube-list\.json/);
   assert.match(tabViewHtml, /Exact parser rules/);
   assert.match(tabViewHtml, /https:\/\/raw\.githubusercontent\.com\/list\.csv/);
