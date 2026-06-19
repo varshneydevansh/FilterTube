@@ -445,7 +445,7 @@
             const openState = safeObject(state);
             if (normalizeString(openState.profileId) && normalizeString(openState.profileId) !== normalizeString(activeProfileId)) return 'Ready';
             if (normalizeString(openState.reasonCode) === 'pull_provider_unavailable') {
-                return appendCheckedAge('Pick Up Later not ready', openState);
+                return appendCheckedAge('Internet Pickup not ready', openState);
             }
             if (normalizeString(openState.reasonCode) === 'mailbox_apply_unavailable') {
                 return appendCheckedAge('Cannot apply here', openState);

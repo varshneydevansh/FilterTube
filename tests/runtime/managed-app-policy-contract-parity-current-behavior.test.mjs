@@ -95,7 +95,7 @@ test('managed app policy parity doc records extension-owned app contract artifac
   for (const helper of contract.runtimeHelperSync) {
     assert.equal(helper.manifestSyncMode, 'copy');
     assert.equal(helper.appDestination, appManagedHelperDestinations[helper.sourcePath].replace('/Users/devanshvarshney/FilterTubeApp/', ''));
-    assert.match(helper.boundary, /native|Pick Up Later|Home Bridge|same-network|transport|ciphertext/);
+    assert.match(helper.boundary, /native|Internet Pickup|Home Bridge|same-network|transport|ciphertext/);
   }
   assert.deepEqual(
     contract.uiHelperMirror.map(row => row.sourcePath),
@@ -122,7 +122,7 @@ test('managed app policy parity doc records extension-owned app contract artifac
   assert.match(doc, /Installed\s+app parity still cannot be claimed current until platform smoke evidence is\s+attached/);
   assert.deepEqual(
     contract.managedDelivery.parentFacingTransports.map(row => row.label),
-    ['Send Now', 'Pick Up Later', 'Home Bridge']
+    ['Send Update', 'Internet Pickup', 'Home Bridge']
   );
   assert.deepEqual(
     contract.managedDelivery.parentFacingTransports.map(row => row.transport),

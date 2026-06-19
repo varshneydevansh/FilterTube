@@ -944,7 +944,7 @@
 
         function ackLabelForTransport(transport, result) {
             if (transport === 'mailbox') {
-                return result === 'accepted' ? 'Pick Up Later update delivered' : 'Pick Up Later delivery failed';
+                return result === 'accepted' ? 'Internet Pickup update delivered' : 'Internet Pickup delivery failed';
             }
             if (transport === 'local_network') {
                 return result === 'accepted' ? 'Home Bridge update delivered' : 'Home Bridge delivery failed';

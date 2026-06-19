@@ -128,7 +128,7 @@ test('dashboard loads open-sync helper and wires policy toggle status and open/p
   assert.match(tabView, /window\.FilterTubeNanahManagedOpenSync\?\.create/);
   assert.match(tabView, /syncOnProfileOpen: linkType === 'managed_link' && syncOnProfileOpen/);
   assert.match(tabView, /Check for parent updates when this profile opens/);
-  assert.match(tabView, /Pick Up Later/);
+  assert.match(tabView, /Internet Pickup/);
   assert.match(tabView, /await runNanahManagedOpenSync\(\{ reason: 'dashboard_open' \}\)/);
   assert.match(tabView, /await runNanahManagedOpenSync\(\{ reason: 'profile_switch' \}\)/);
 });

@@ -428,7 +428,7 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(source, /function recordManagedOpenSyncAckHistory\(details = \{\}\)/);
   assert.match(source, /remote_policy\.mailbox\.ack/);
   assert.match(source, /remote_policy\.local_network\.ack/);
-  assert.match(source, /const transportLabel = transport === 'local_network' \? 'Home Bridge' : 'Pick Up Later'/);
+  assert.match(source, /const transportLabel = transport === 'local_network' \? 'Home Bridge' : 'Internet Pickup'/);
   assert.match(source, /\$\{transportLabel\} ack delivered/);
   assert.match(source, /\$\{transportLabel\} ack handoff failed/);
   assert.match(source, /recordAckHistory: \(details\) => recordManagedOpenSyncAckHistory\(details\)/);

@@ -16,7 +16,7 @@ Parent/caregiver history clearing now records its own protected
 `history.clear` evidence row instead of silently removing accepted rows.
 History display now adds a safe source-category label derived from action type
 and sanitized transport metadata: Parent edit, Approved list, Remote update,
-Send update, Pick Up Later, Home Bridge, trusted-device, admin-access, time
+Send Update, Internet Pickup, Home Bridge, trusted-device, admin-access, time
 request, delivery setting, or history. These labels help parents understand
 manual/list-derived/remote/sent changes but remain display context only, not
 policy authority.

@@ -73,12 +73,12 @@ function resolveManagedActionHistorySourceLabel(row, summary = null) {
   const actionType = normalizeString(item.actionType);
   const transport = normalizeString(root.transport);
   if (actionType.startsWith('policy.channel_list.')) return 'Approved list';
-  if (actionType === 'remote_policy.source_push') return 'Send update';
-  if (actionType.startsWith('remote_policy.mailbox.')) return 'Pick Up Later';
+  if (actionType === 'remote_policy.source_push') return 'Send Update';
+  if (actionType.startsWith('remote_policy.mailbox.')) return 'Internet Pickup';
   if (actionType.startsWith('remote_policy.local_network.')) return 'Home Bridge';
   if (actionType.startsWith('remote_policy.')) {
     if (transport === 'local_network') return 'Home Bridge';
-    if (transport === 'mailbox') return 'Pick Up Later';
+    if (transport === 'mailbox') return 'Internet Pickup';
     return 'Remote update';
   }
   if (actionType === 'local_policy.update'
@@ -380,8 +380,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   const tabViewHtml = read('html/tab-view.html');
 
   assert.match(doc, /Status\*\*: Spec, dashboard protected-profile status, command-center overview/);
-  assert.match(doc, /parent-facing protection strip, a\s+parent-reauthed Pick Up Later endpoint\s+configuration row, plus labeled Delivery\/Device\/History row details/);
-  assert.match(doc, /parent-reauthed Pick Up Later endpoint\s+configuration row/);
+  assert.match(doc, /parent-facing protection strip, a\s+parent-reauthed Internet Pickup endpoint\s+configuration row, plus labeled Delivery\/Device\/History row details/);
+  assert.match(doc, /parent-reauthed Internet Pickup endpoint\s+configuration row/);
   assert.match(doc, /Direct rule bulk\s+writes\s+for keyword, channel, and video ID rules are now present/);
   assert.match(doc, /Parent-Facing States/);
   assert.match(doc, /UI Boundaries/);
@@ -457,9 +457,9 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /ft-managed-command-center__bulk-group-label/);
   assert.match(helperSource, /ft-managed-command-center__provider/);
   assert.match(helperSource, /ft-managed-command-center__provider-prompt/);
-  assert.match(helperSource, /Set Up Pick Up Later/);
-  assert.match(helperSource, /Edit Pick Up Later/);
-  assert.match(doc, /visible card says `Pick Up Later`, `Home Bridge`, and `Delivery receipts`/);
+  assert.match(helperSource, /Set Up Internet Pickup/);
+  assert.match(helperSource, /Edit Internet Pickup/);
+  assert.match(doc, /visible card says `Internet Pickup`, `Home Bridge`, and `Delivery receipts`/);
   assert.match(helperSource, /configure_mailbox/);
   assert.match(helperSource, /group: 'rules'/);
   assert.match(helperSource, /group: 'send'/);

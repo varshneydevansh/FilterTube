@@ -41,7 +41,7 @@ mailbox/LAN delivery handoff, and protected redacted parent-side push history
 rows are now delegated through the existing runtime gates. Direct local
 video/keyword/channel rule additions for selected profiles now use the same
 parent/account re-auth path. Browser-side configured-provider clients now cover
-HTTPS Pick Up Later mailbox upload/pull/ack/purge and Home Bridge
+HTTPS Internet Pickup mailbox upload/pull/ack/purge and Home Bridge
 publish/discover/ack handoff after parent/account re-auth. A FilterTube-hosted
 mailbox service, automatic LAN peer discovery, and app native settings/iOS
 enforcement proofs remain pending.
@@ -130,7 +130,7 @@ to protected profiles with active time limits, persist that as a newer
 verified-device `time_limits` push. Local viewing-space and normal time-limit
 edits now use the same scoped post-save push offer for changed profiles when a
 verified delivery path exists.
-The extension now ships configured-provider clients for HTTPS Pick Up Later
+The extension now ships configured-provider clients for HTTPS Internet Pickup
 mailbox upload/pull/ack/purge and Home Bridge publish/discover/ack delivery
 handoff. Those clients are transport helpers only: provider reachability never
 grants authority, and every received candidate still has to pass trusted-link,
