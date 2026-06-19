@@ -492,6 +492,15 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /Advanced options/);
   assert.match(tabViewHtml, /Meeting service link/);
   assert.match(tabViewHtml, /keep both devices open/);
+  assert.match(tabViewHtml, /rule-list-format-showcase/);
+  assert.match(tabViewHtml, /CSV sheet/);
+  assert.match(tabViewHtml, /JSON list/);
+  assert.match(tabViewHtml, /TXT rows/);
+  assert.match(tabViewHtml, /URL \/ BlockTube/);
+  assert.match(tabViewHtml, /Imported lists cannot change PINs, time limits, viewing spaces, profiles, or trusted devices/);
+  assert.match(tabViewHtml, /Supported formats and templates/);
+  assert.match(tabViewHtml, /Templates &amp; checks/);
+  assert.match(tabViewHtml, /Apply imported rules to/);
   assert.doesNotMatch(tabViewHtml, /<h3>Device Trust &amp; Sync<\/h3>/);
   assert.doesNotMatch(tabViewHtml, /Completely P2P after handshake/);
   assert.match(source, /function renderManagedChildSyncBoundary\(\)/);

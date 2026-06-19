@@ -302,11 +302,13 @@ parent tool instead of a sync/debug console.
     parser support, materialized row metadata, pause/refresh semantics, and
     verified-device send behavior are unchanged.
   - [x] Rule-list import preview simplification slice: Settings now shows the
-    supported CSV/TXT/JSON/URL shapes as a compact sheet-style preview before
-    the Import Rule List action. The visible card explains channel handles,
-    UCIDs, custom URLs, full URLs, TXT keyword prefixes, simple JSON arrays,
-    BlockTube channel/title arrays, and raw HTTPS lists without requiring Help
-    first.
+    supported CSV/TXT/JSON/URL shapes as separate parent-facing previews before
+    the Import Rule List action. CSV appears as a small sheet, JSON appears as
+    the lightweight `channels`/`keywords` object, TXT shows one-row-per-rule
+    examples, and URL/BlockTube shows raw HTTPS plus `filterData` arrays. The
+    first screen keeps templates/checks behind a disclosure so a parent can
+    understand "choose source, review preview, apply to Main/Kids/Both" before
+    opening deeper format details.
     Runtime parser support and authority remain unchanged: imported files can
     add only channel/keyword rules, previewed invalid rows do not apply, and a
     protected profile still needs parent/account approval before verified-device

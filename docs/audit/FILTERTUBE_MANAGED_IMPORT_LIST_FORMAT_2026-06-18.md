@@ -304,7 +304,11 @@ Current completion rule:
 - Primary entry point: Settings -> Import / Export -> Rule list imports.
 - Target choice: Main YouTube, YouTube Kids, or Both. This works for the active profile or the protected profile currently being edited by a parent/account profile.
 - Main/Kids rule pages remain the place to review, edit, pause, resume, and remove the imported rows after import.
-- The Settings card shows a sheet-like structure preview instead of dense prose: `type`, `value`, `notes`, plus compact CSV/TXT/JSON/BlockTube format cards.
+- The Settings card shows separate lightweight previews instead of dense prose:
+  CSV looks like a small sheet, JSON shows the simple `channels`/`keywords`
+  object, TXT shows channel/keyword rows, and URL/BlockTube shows raw HTTPS plus
+  `filterData` array examples. Deeper supported formats, stale checks, and
+  templates sit behind disclosures so the default parent flow stays readable.
 - The modal says rule list, shows supported formats, CSV template, file/URL/paste inputs, live preview counts, skipped row counts, a spreadsheet-like parsed-row preview, and the final Apply confirmation.
 - Rule-list JSON is intentionally narrower than a full FilterTube backup JSON. It may add channels and keywords only; it does not change profile structure, PINs, trusted devices, viewing spaces, or sync targets.
 - The Settings card and import modal expose both CSV and JSON rule-list templates. The CSV template is the spreadsheet path; the JSON template is the lightweight rule-list shape, not the full FilterTube backup/export structure.

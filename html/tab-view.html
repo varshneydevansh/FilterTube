@@ -490,60 +490,81 @@
                                                 <div class="help-item-body import-export-row">
                                                     <div class="import-export-text">
                                                         <span class="import-export-summary">
-                                                            Import public or custom channel and keyword lists into the current profile. When editing a protected profile, use Device Updates after review if another device needs the same rules.<br />
+                                                            Add channel and keyword rules from a file or public list URL.<br />
                                                         </span>
                                                         <span class="import-export-hint">
-                                                            CSV, TXT, JSON, and raw HTTPS lists open in a preview first. Invalid rows are shown before anything changes, and files can only add channel/keyword rules.
+                                                            FilterTube previews channels, keywords, and skipped rows before anything changes. Imported lists cannot change PINs, time limits, viewing spaces, profiles, or trusted devices.
                                                         </span>
-                                                        <div class="rule-list-sheet-example" aria-label="Supported rule list structure preview">
-                                                            <div class="rule-list-sheet-example__bar">
-                                                                <span>Preview before import</span>
-                                                                <code>CSV · TXT · JSON · URL</code>
+                                                        <div class="rule-list-import-flow" aria-label="Rule list import flow">
+                                                            <div class="rule-list-import-flow__step">
+                                                                <strong>1. Choose source</strong>
+                                                                <span>CSV, TXT, JSON, BlockTube JSON, or raw HTTPS list URL.</span>
                                                             </div>
-                                                            <div class="rule-list-sheet-example__grid" role="table" aria-label="Example rule list columns">
-                                                                <div class="rule-list-sheet-example__row rule-list-sheet-example__row--head" role="row">
-                                                                    <span role="columnheader">format</span>
-                                                                    <span role="columnheader">channel row</span>
-                                                                    <span role="columnheader">keyword row</span>
-                                                                </div>
-                                                                <div class="rule-list-sheet-example__row" role="row">
-                                                                    <span role="cell">CSV</span>
-                                                                    <span role="cell"><code>channel_id</code>: <code>@SomeChannel</code>, <code>UC...</code>, <code>/c/Name</code>, or URL</span>
-                                                                    <span role="cell"><code>keyword</code>: word or phrase</span>
-                                                                </div>
-                                                                <div class="rule-list-sheet-example__row" role="row">
-                                                                    <span role="cell">TXT</span>
-                                                                    <span role="cell"><code>channel: @SomeChannel</code> or one channel per line</span>
-                                                                    <span role="cell"><code>keyword: brainrot</code></span>
-                                                                </div>
-                                                                <div class="rule-list-sheet-example__row" role="row">
-                                                                    <span role="cell">JSON</span>
-                                                                    <span role="cell"><code>"channels": ["@SomeChannel", "UC..."]</code></span>
-                                                                    <span role="cell"><code>"keywords": ["brainrot"]</code></span>
-                                                                </div>
+                                                            <div class="rule-list-import-flow__step">
+                                                                <strong>2. Review preview</strong>
+                                                                <span>See channels, keywords, skipped rows, and source before applying.</span>
                                                             </div>
-                                                            <div class="rule-list-sheet-example__format-cards" aria-label="Supported rule list examples">
-                                                                <div>
-                                                                    <b>CSV sheet</b>
-                                                                    <span><code>channel_id,keyword,notes</code> or <code>type,value,notes</code></span>
-                                                                </div>
-                                                                <div>
-                                                                    <b>TXT rows</b>
-                                                                    <span>Bare rows are channels. Use <code>keyword:</code> for keyword rows.</span>
-                                                                </div>
-                                                                <div>
-                                                                    <b>JSON arrays</b>
-                                                                    <span>Simple rule-list JSON can use <code>channels</code> and <code>keywords</code> arrays.</span>
-                                                                </div>
-                                                                <div>
-                                                                    <b>BlockTube</b>
-                                                                    <span>Channel/title arrays preview as channel and keyword rules before applying.</span>
-                                                                </div>
-                                                                <div>
-                                                                    <b>Public URL</b>
-                                                                    <span>Load raw HTTPS CSV, TXT, or JSON, then review rows before applying.</span>
-                                                                </div>
+                                                            <div class="rule-list-import-flow__step">
+                                                                <strong>3. Apply rules</strong>
+                                                                <span>Choose Main, Kids, or both. Send Update only if another verified device needs it.</span>
                                                             </div>
+                                                        </div>
+                                                        <div class="rule-list-format-showcase" aria-label="Rule list format previews">
+                                                            <article class="rule-list-format-showcase__card rule-list-format-showcase__card--sheet">
+                                                                <div class="rule-list-format-showcase__head">
+                                                                    <strong>CSV sheet</strong>
+                                                                    <span>.csv</span>
+                                                                </div>
+                                                                <div class="rule-list-mini-sheet" role="table" aria-label="CSV rule list example">
+                                                                    <div role="row">
+                                                                        <span role="columnheader">type</span>
+                                                                        <span role="columnheader">value</span>
+                                                                        <span role="columnheader">notes</span>
+                                                                    </div>
+                                                                    <div role="row">
+                                                                        <span role="cell">channel</span>
+                                                                        <span role="cell">@SomeChannel</span>
+                                                                        <span role="cell">source</span>
+                                                                    </div>
+                                                                    <div role="row">
+                                                                        <span role="cell">keyword</span>
+                                                                        <span role="cell">brainrot</span>
+                                                                        <span role="cell">phrase</span>
+                                                                    </div>
+                                                                </div>
+                                                            </article>
+                                                            <article class="rule-list-format-showcase__card">
+                                                                <div class="rule-list-format-showcase__head">
+                                                                    <strong>JSON list</strong>
+                                                                    <span>.json</span>
+                                                                </div>
+                                                                <pre class="rule-list-mini-code">{
+  "channels": ["@SomeChannel"],
+  "keywords": ["brainrot"]
+}</pre>
+                                                            </article>
+                                                            <article class="rule-list-format-showcase__card">
+                                                                <div class="rule-list-format-showcase__head">
+                                                                    <strong>TXT rows</strong>
+                                                                    <span>.txt</span>
+                                                                </div>
+                                                                <div class="rule-list-mini-lines">
+                                                                    <code>channel: UCxxxxxxxxxxxxxxxxxxxxxx</code>
+                                                                    <code>channel: /c/ChannelName</code>
+                                                                    <code>keyword: scary thumbnail</code>
+                                                                </div>
+                                                            </article>
+                                                            <article class="rule-list-format-showcase__card">
+                                                                <div class="rule-list-format-showcase__head">
+                                                                    <strong>URL / BlockTube</strong>
+                                                                    <span>https</span>
+                                                                </div>
+                                                                <div class="rule-list-mini-lines">
+                                                                    <code>raw.githubusercontent.com/list.csv</code>
+                                                                    <code>filterData.channelId[]</code>
+                                                                    <code>filterData.title[]</code>
+                                                                </div>
+                                                            </article>
                                                         </div>
                                                         <fieldset class="rule-list-target-picker" aria-label="Where to apply imported rule list">
                                                             <legend>Apply imported rules to</legend>
@@ -560,6 +581,58 @@
                                                                 <span>Both</span>
                                                             </label>
                                                         </fieldset>
+                                                        <details class="rule-list-supported-formats">
+                                                            <summary>
+                                                                <span>Supported formats and templates</span>
+                                                                <code>CSV · TXT · JSON · URL</code>
+                                                            </summary>
+                                                            <div class="rule-list-sheet-example" aria-label="Supported rule list structure preview">
+                                                                <div class="rule-list-sheet-example__grid" role="table" aria-label="Example rule list columns">
+                                                                    <div class="rule-list-sheet-example__row rule-list-sheet-example__row--head" role="row">
+                                                                        <span role="columnheader">format</span>
+                                                                        <span role="columnheader">channel row</span>
+                                                                        <span role="columnheader">keyword row</span>
+                                                                    </div>
+                                                                    <div class="rule-list-sheet-example__row" role="row">
+                                                                        <span role="cell">CSV</span>
+                                                                        <span role="cell"><code>channel_id</code>: <code>@SomeChannel</code>, <code>UC...</code>, <code>/c/Name</code>, or URL</span>
+                                                                        <span role="cell"><code>keyword</code>: word or phrase</span>
+                                                                    </div>
+                                                                    <div class="rule-list-sheet-example__row" role="row">
+                                                                        <span role="cell">TXT</span>
+                                                                        <span role="cell"><code>channel: @SomeChannel</code> or one channel per line</span>
+                                                                        <span role="cell"><code>keyword: brainrot</code></span>
+                                                                    </div>
+                                                                    <div class="rule-list-sheet-example__row" role="row">
+                                                                        <span role="cell">JSON</span>
+                                                                        <span role="cell"><code>"channels": ["@SomeChannel", "UC..."]</code></span>
+                                                                        <span role="cell"><code>"keywords": ["brainrot"]</code></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="rule-list-sheet-example__format-cards" aria-label="Supported rule list examples">
+                                                                    <div>
+                                                                        <b>CSV sheet</b>
+                                                                        <span><code>channel_id,keyword,notes</code> or <code>type,value,notes</code></span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <b>TXT rows</b>
+                                                                        <span>Bare rows are channels. Use <code>keyword:</code> for keyword rows.</span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <b>JSON arrays</b>
+                                                                        <span>Simple rule-list JSON can use <code>channels</code> and <code>keywords</code> arrays.</span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <b>BlockTube</b>
+                                                                        <span>Channel/title arrays preview as channel and keyword rules before applying.</span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <b>Public URL</b>
+                                                                        <span>Load raw HTTPS CSV, TXT, or JSON, then review rows before applying.</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </details>
                                                     </div>
                                                     <div class="import-export-actions">
                                                         <button id="ftImportRuleListBtn" class="btn-primary" type="button" title="Preview and import a channel/keyword rule list into Main, Kids, or both for the current profile.">
@@ -568,18 +641,21 @@
                                                         <button id="ftManageRuleListsBtn" class="btn-secondary" type="button" title="View, pause, refresh, or remove rule lists already imported into this profile.">
                                                             Manage Lists
                                                         </button>
-                                                        <button id="ftCheckStaleRuleListsBtn" class="btn-secondary" type="button" title="Check URL-backed rule lists that are old enough to refresh for this profile.">
-                                                            Check Stale URLs
-                                                        </button>
-                                                        <button id="ftDownloadRuleListTemplateBtn" class="btn-secondary" type="button" title="Download the safe CSV template for spreadsheet editing.">
-                                                            Download CSV Template
-                                                        </button>
-                                                        <button id="ftDownloadRuleListJsonTemplateBtn" class="btn-secondary" type="button" title="Download the simple JSON rule-list template.">
-                                                            Download JSON Template
-                                                        </button>
-                                                        <button id="ftRuleListFormatsBtn" class="btn-secondary" type="button" title="Show supported rule-list input formats.">
-                                                            Supported Formats
-                                                        </button>
+                                                        <details class="rule-list-actions-more">
+                                                            <summary>Templates &amp; checks</summary>
+                                                            <button id="ftCheckStaleRuleListsBtn" class="btn-secondary" type="button" title="Check URL-backed rule lists that are old enough to refresh for this profile.">
+                                                                Check Stale URLs
+                                                            </button>
+                                                            <button id="ftDownloadRuleListTemplateBtn" class="btn-secondary" type="button" title="Download the safe CSV template for spreadsheet editing.">
+                                                                Download CSV Template
+                                                            </button>
+                                                            <button id="ftDownloadRuleListJsonTemplateBtn" class="btn-secondary" type="button" title="Download the simple JSON rule-list template.">
+                                                                Download JSON Template
+                                                            </button>
+                                                            <button id="ftRuleListFormatsBtn" class="btn-secondary" type="button" title="Show supported rule-list input formats.">
+                                                                Supported Formats
+                                                            </button>
+                                                        </details>
                                                     </div>
                                                 </div>
                                             </div>
