@@ -383,26 +383,26 @@ parent tool instead of a sync/debug console.
     same safety phrase. It does not create trust, skip parent validation, or
     change policy delivery authority.
   - [x] Verified-device pickup wording slice: trusted protected-profile links
-    now describe `syncOnProfileOpen` as `Saved update check` instead of a
+    now describe `syncOnProfileOpen` as `Automatic saved updates` instead of a
     transport name. The modal explains that a protected profile can check for
     newer trusted parent updates when an optional waiting or home-network
     service is configured, and status strings say `not ready`, `cannot apply
     here`, or `no matching parent link` instead of raw provider errors. This is
     UI/copy only; live Send Update, profile targeting, signature/hash/revision
     validation, and offline last valid policy behavior are unchanged.
-  - [x] Saved-update-check visibility slice: Family Controls now shows a
-    single read-only `Saved update check` detail for verified protected-profile
-    devices instead of separate Internet Pickup and Home Bridge rows. It reports
-    whether saved parent links are set to check for trusted updates when the
-    protected profile opens, while keeping live Send Update, Internet Pickup,
-    Home Bridge, signature/hash/revision validation, and offline last-policy
-    behavior unchanged.
+  - [x] Automatic-saved-updates visibility slice: Family Controls now shows a
+    single read-only `Automatic saved updates` detail for verified
+    protected-profile devices instead of separate Internet Pickup and Home
+    Bridge rows. It reports whether saved parent links are set to check for
+    trusted updates when the protected profile opens, while keeping live Send
+    Update, Internet Pickup, Home Bridge, signature/hash/revision validation,
+    and offline last-policy behavior unchanged.
   - [x] Accounts & Sync wording follow-up: protected-profile command-center
-    rows now use `Saved update check` instead of `Check on open` / `Checks on
-    open`, and the Family Device Updates first screen now says `Advanced
-    options` plus `Meeting service link` instead of making parent-facing copy
-    read like a protocol console. Runtime trust, provider gates, and
-    source/replica policy validation are unchanged.
+    rows now use `Automatic saved updates` instead of `Check on open` /
+    `Checks on open`, and the Family Device Updates first screen now says
+    `Advanced options` plus `Meeting service link` instead of making
+    parent-facing copy read like a protocol console. Runtime trust, provider
+    gates, and source/replica policy validation are unchanged.
   - [x] Empty Family Controls setup wording slice: the first setup note now says
     no device pairing is needed when the protected profile stays on the current
     device, and asks parents to pair only when another verified device should
@@ -414,8 +414,8 @@ parent tool instead of a sync/debug console.
     endpoint validation and provider authority gates are unchanged.
   - [x] Saved parent-link modal simplification slice: the managed-link approval
     modal now says `What this parent can change`, `Usual update area`, `Allow
-    matching parent updates`, `Saved update check`, `Where parent updates land`,
-    and `Everyday protection` instead of reading like a policy schema editor.
+    matching parent updates`, `Automatic saved updates`, `Where parent updates
+    land`, and `Everyday protection` instead of reading like a policy schema editor.
     The saved policy fields, device binding, profile target, allowed scopes,
     revision checks, and signature validation are unchanged.
   - [x] Automatic saved-updates wording slice: the modal, trusted-device card,
