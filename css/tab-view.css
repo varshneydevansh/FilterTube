@@ -2321,7 +2321,9 @@ html[data-theme="dark"] .card::after {
     grid-template-rows: auto minmax(0, 1fr);
     width: min(1120px, calc(100vw - (var(--managed-rule-modal-gutter, 1rem) * 2)));
     max-width: calc(100vw - (var(--managed-rule-modal-gutter, 1rem) * 2));
-    height: min(860px, calc(100dvh - (var(--managed-rule-modal-gutter, 1rem) * 2)));
+    height: min(840px, calc(100vh - (var(--managed-rule-modal-gutter, 1rem) * 2)));
+    height: min(840px, calc(100dvh - (var(--managed-rule-modal-gutter, 1rem) * 2)));
+    max-height: calc(100vh - (var(--managed-rule-modal-gutter, 1rem) * 2));
     max-height: calc(100dvh - (var(--managed-rule-modal-gutter, 1rem) * 2));
     min-height: 0;
     overflow: hidden;
@@ -2338,22 +2340,21 @@ html[data-theme="dark"] .card::after {
 
 .managed-channel-list-modal__body {
     display: grid;
-    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-rows: auto auto auto;
     gap: 0.9rem;
     min-height: 0;
-    overflow: hidden;
+    overflow: auto;
     overscroll-behavior: contain;
     padding-bottom: var(--ft-space-lg);
 }
 
 .managed-channel-list-modal__layout {
     display: grid;
-    grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr);
+    grid-template-columns: minmax(19rem, 25rem) minmax(0, 1fr);
     gap: 0.9rem;
     align-items: start;
     min-height: 0;
-    overflow: auto;
-    overscroll-behavior: contain;
+    overflow: visible;
     padding-right: 0.18rem;
 }
 
@@ -2455,8 +2456,8 @@ html[data-theme="dark"] .card::after {
     gap: 0.65rem;
     align-self: start;
     position: sticky;
-    top: 0;
-    max-height: 100%;
+    top: 0.1rem;
+    max-height: calc(100dvh - 9.5rem);
     overflow: auto;
     overscroll-behavior: contain;
     padding: 0.78rem;
@@ -2960,6 +2961,10 @@ html[data-theme="dark"] .card::after {
 
     .managed-channel-list-modal__textarea {
         min-height: 7rem;
+    }
+
+    .managed-channel-list-modal__format-card {
+        max-height: calc(100dvh - 8rem);
     }
 }
 
