@@ -24,12 +24,12 @@ It does not prove that refreshes are safe to optimize. It records the current si
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6,803 | 306,710 | `57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7` |
-| `js/content/bridge_settings.js` | 1,127 | 44,545 | `fad07aba48391021d5e42096b34f32c58a6337a1a4d303a8706927c541d47f71` |
-| `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
-| `js/injector.js` | 3,593 | 155,830 | `634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04` |
+| `js/background.js` | 6,984 | 315,747 | `080d15907b26314873138c5dcc5d9653a2a27e933049be10361dfe0047f0a7cc` |
+| `js/content/bridge_settings.js` | 1,459 | 57,855 | `6434bd16233044ebb4aaef69261126f3b1852213cffd24ce82b4ecf2bb7a4486` |
+| `js/content_bridge.js` | 13,803 | 610,592 | `cc838f9f12fc6941bba04b7a0244a14ef60581461bcc24dbb8ba7a9bce8e287b` |
+| `js/injector.js` | 3,696 | 160,366 | `468e59a4749bbb8aa52723aaab51dbac44076885f211f05f0a73096d2e49d2b9` |
 | `js/seed.js` | 1,136 | 50,026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
-| `js/content/dom_fallback.js` | 5,030 | 235,555 | `fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5` |
+| `js/content/dom_fallback.js` | 5,837 | 276,985 | `5162d14abdd6c7769d495d9157d9772cfef4f15e529b7dea885b2887be60d066` |
 | `js/filter_logic.js` | 3,652 | 172,174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 
 settings refresh cross-context consumer source files pinned: 7
@@ -38,18 +38,18 @@ settings refresh cross-context consumer source files pinned: 7
 
 | Block | Source | Start line | Lines | Bytes | SHA-256 |
 | --- | --- | ---: | ---: | ---: | --- |
-| `backgroundApplySettingsBranch` | `js/background.js:4878` | 4,878 | 28 | 1,487 | `b585d94cc410f7acd929db780840f7cb02b44bb9819b34eb34985b713485e3d6` |
-| `backgroundStorageInvalidation` | `js/background.js:4967` | 4,967 | 41 | 1,464 | `e5c76f714f31a1d325385b3eaa051c0eb73e6a29ec1c69b1493cc4bb7f796de2` |
+| `backgroundApplySettingsBranch` | `js/background.js:5059` | 5,059 | 28 | 1,487 | `b585d94cc410f7acd929db780840f7cb02b44bb9819b34eb34985b713485e3d6` |
+| `backgroundStorageInvalidation` | `js/background.js:5148` | 5,148 | 41 | 1,464 | `e5c76f714f31a1d325385b3eaa051c0eb73e6a29ec1c69b1493cc4bb7f796de2` |
 | `bridgeRuntimeListener` | `js/content/bridge_settings.js:198` | 198 | 121 | 5,684 | `ba565d7340f7b7150423e5daaa87f400769b2ce13216ed8af6509e23e6a6085c` |
-| `bridgeRequestSettings` | `js/content/bridge_settings.js:821` | 821 | 115 | 5,333 | `10e99aaff431ece732d33435b7ea618f9c2333ededd839ec07d4b164b8f45227` |
-| `bridgeSeedDelivery` | `js/content/bridge_settings.js:936` | 936 | 59 | 1,531 | `15627c0c528d75636e9954d0b0ff5d0b4b03e4792e37514423654ea4d4d16c2f` |
-| `bridgeStorageRefresh` | `js/content/bridge_settings.js:1033` | 1,033 | 92 | 3,395 | `6f65d55d5d8dcf9c5ad753df10d9a9f45ca5548787b949b6576bf8c310975dbf` |
-| `contentBridgePageRefresh` | `js/content_bridge.js:5898` | 5,898 | 12 | 603 | `4674cde24c6350286c67ec26e28a75f0e360bdb0a42f89e4c78cc39a58257f5c` |
-| `injectorSettingsReceiver` | `js/injector.js:1924` | 1,924 | 23 | 871 | `8c0c9cdff9e9fa153eb8e0ed0528d2f7d431663b15ecebd951866870783a2bf1` |
-| `injectorSeedUpdate` | `js/injector.js:3383` | 3,383 | 21 | 1,003 | `07e4027d2e306ff9046594fc68609b34074526a5a229a31057e06b3a2b97ce0d` |
-| `injectorProcessQueue` | `js/injector.js:3405` | 3,405 | 60 | 2,108 | `d17bae535755636d9b51d10b3153650b7eed3ff0c0abf99ee988b9d44eb76233` |
+| `bridgeRequestSettings` | `js/content/bridge_settings.js:1153` | 1,153 | 115 | 5,333 | `10e99aaff431ece732d33435b7ea618f9c2333ededd839ec07d4b164b8f45227` |
+| `bridgeSeedDelivery` | `js/content/bridge_settings.js:1268` | 1,268 | 59 | 1,531 | `15627c0c528d75636e9954d0b0ff5d0b4b03e4792e37514423654ea4d4d16c2f` |
+| `bridgeStorageRefresh` | `js/content/bridge_settings.js:1365` | 1,365 | 92 | 3,395 | `6f65d55d5d8dcf9c5ad753df10d9a9f45ca5548787b949b6576bf8c310975dbf` |
+| `contentBridgePageRefresh` | `js/content_bridge.js:6073` | 6,073 | 12 | 603 | `4674cde24c6350286c67ec26e28a75f0e360bdb0a42f89e4c78cc39a58257f5c` |
+| `injectorSettingsReceiver` | `js/injector.js:1925` | 1,925 | 23 | 871 | `8c0c9cdff9e9fa153eb8e0ed0528d2f7d431663b15ecebd951866870783a2bf1` |
+| `injectorSeedUpdate` | `js/injector.js:3486` | 3,486 | 21 | 1,003 | `07e4027d2e306ff9046594fc68609b34074526a5a229a31057e06b3a2b97ce0d` |
+| `injectorProcessQueue` | `js/injector.js:3508` | 3,508 | 60 | 2,108 | `d17bae535755636d9b51d10b3153650b7eed3ff0c0abf99ee988b9d44eb76233` |
 | `seedUpdateSettings` | `js/seed.js:983` | 983 | 98 | 4,640 | `687d0cf2fcec26709486afb3b8c99cae3e79e8003e17c398ccf3cf214af06cf7` |
-| `domFallbackApplyHead` | `js/content/dom_fallback.js:2219` | 2,219 | 64 | 2,243 | `8e805dd33b290db7a08670645553b014a46341cb527c005f19b2c28f348dffba` |
+| `domFallbackApplyHead` | `js/content/dom_fallback.js:3000` | 3,000 | 65 | 2,280 | `2dc1a42c6ba1c0fbe3604d85969ec3656a0f51cf37b32ffe509c80d5b1c5376f` |
 | `filterLogicGlobalProcess` | `js/filter_logic.js:3588` | 3,588 | 34 | 1,247 | `2134623c293b2cddc6177a9a1732f6ca45e4014dc4ba3872ebe375c47e96e4d2` |
 
 settings refresh cross-context consumer source/effect blocks pinned: 13

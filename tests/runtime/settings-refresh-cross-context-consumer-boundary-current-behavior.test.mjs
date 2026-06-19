@@ -10,12 +10,12 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_SETTINGS_REFRESH_CROSS_CONTEXT_CONSUMER_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/background.js': [6803, 306710, '57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7'],
-  'js/content/bridge_settings.js': [1127, 44545, 'fad07aba48391021d5e42096b34f32c58a6337a1a4d303a8706927c541d47f71'],
-  'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
-  'js/injector.js': [3593, 155830, '634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04'],
+  'js/background.js': [6984, 315747, '080d15907b26314873138c5dcc5d9653a2a27e933049be10361dfe0047f0a7cc'],
+  'js/content/bridge_settings.js': [1459, 57855, '6434bd16233044ebb4aaef69261126f3b1852213cffd24ce82b4ecf2bb7a4486'],
+  'js/content_bridge.js': [13803, 610592, 'cc838f9f12fc6941bba04b7a0244a14ef60581461bcc24dbb8ba7a9bce8e287b'],
+  'js/injector.js': [3696, 160366, '468e59a4749bbb8aa52723aaab51dbac44076885f211f05f0a73096d2e49d2b9'],
   'js/seed.js': [1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
-  'js/content/dom_fallback.js': [5030, 235555, 'fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5'],
+  'js/content/dom_fallback.js': [5837, 276985, '5162d14abdd6c7769d495d9157d9772cfef4f15e529b7dea885b2887be60d066'],
   'js/filter_logic.js': [3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5']
 };
 
@@ -24,7 +24,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: '    } else if (request.action === "FilterTube_ApplySettings" && request.settings) {',
     end: '    } else if (request.action === "updateChannelMap") {',
-    startLine: 4878,
+    startLine: 5059,
     lines: 28,
     bytes: 1487,
     hash: 'b585d94cc410f7acd929db780840f7cb02b44bb9819b34eb34985b713485e3d6'
@@ -33,7 +33,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: '// Listen for storage changes to re-compile settings\n',
     end: '/**\n * Fetch channel name and handle from YouTube by scraping the channel page',
-    startLine: 4967,
+    startLine: 5148,
     lines: 41,
     bytes: 1464,
     hash: 'e5c76f714f31a1d325385b3eaa051c0eb73e6a29ec1c69b1493cc4bb7f796de2'
@@ -51,7 +51,7 @@ const blockSpecs = {
     file: 'js/content/bridge_settings.js',
     start: 'function requestSettingsFromBackground(options = {}) {',
     end: 'function tryApplySettingsToSeed(settings)',
-    startLine: 821,
+    startLine: 1153,
     lines: 115,
     bytes: 5333,
     hash: '10e99aaff431ece732d33435b7ea618f9c2333ededd839ec07d4b164b8f45227'
@@ -60,7 +60,7 @@ const blockSpecs = {
     file: 'js/content/bridge_settings.js',
     start: 'function tryApplySettingsToSeed(settings)',
     end: 'let pendingStorageRefreshTimer = 0;',
-    startLine: 936,
+    startLine: 1268,
     lines: 59,
     bytes: 1531,
     hash: '15627c0c528d75636e9954d0b0ff5d0b4b03e4792e37514423654ea4d4d16c2f'
@@ -69,7 +69,7 @@ const blockSpecs = {
     file: 'js/content/bridge_settings.js',
     start: 'function scheduleSettingsRefreshFromStorage({ forceReprocess = true } = {}) {',
     end: 'try {\n    browserAPI_BRIDGE.storage.onChanged.addListener(handleStorageChanges);',
-    startLine: 1033,
+    startLine: 1365,
     lines: 92,
     bytes: 3395,
     hash: '6f65d55d5d8dcf9c5ad753df10d9a9f45ca5548787b949b6576bf8c310975dbf'
@@ -78,7 +78,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function handleMainWorldMessages(event) {',
     end: "    } else if (type === 'FilterTube_UpdateChannelMap') {",
-    startLine: 5898,
+    startLine: 6073,
     lines: 12,
     bytes: 603,
     hash: '4674cde24c6350286c67ec26e28a75f0e360bdb0a42f89e4c78cc39a58257f5c'
@@ -87,7 +87,7 @@ const blockSpecs = {
     file: 'js/injector.js',
     start: "        if (type === 'FilterTube_SettingsToInjector' && source === 'content_bridge') {",
     end: '        // Handle collaboration data caching from filter_logic.js',
-    startLine: 1924,
+    startLine: 1925,
     lines: 23,
     bytes: 871,
     hash: '8c0c9cdff9e9fa153eb8e0ed0528d2f7d431663b15ecebd951866870783a2bf1'
@@ -96,7 +96,7 @@ const blockSpecs = {
     file: 'js/injector.js',
     start: '    function updateSeedSettings() {',
     end: '    // Process data with FilterTubeEngine',
-    startLine: 3383,
+    startLine: 3486,
     lines: 21,
     bytes: 1003,
     hash: '07e4027d2e306ff9046594fc68609b34074526a5a229a31057e06b3a2b97ce0d'
@@ -105,7 +105,7 @@ const blockSpecs = {
     file: 'js/injector.js',
     start: '    function processDataWithFilterLogic(data, dataName) {',
     end: "        postLog('log', 'Connecting to seed.js global object');",
-    startLine: 3405,
+    startLine: 3508,
     lines: 60,
     bytes: 2108,
     hash: 'd17bae535755636d9b51d10b3153650b7eed3ff0c0abf99ee988b9d44eb76233'
@@ -123,10 +123,10 @@ const blockSpecs = {
     file: 'js/content/dom_fallback.js',
     start: 'async function applyDOMFallback(settings, options = {}) {',
     end: '    const scrollState = window.__filtertubeScrollState',
-    startLine: 2219,
-    lines: 64,
-    bytes: 2243,
-    hash: '8e805dd33b290db7a08670645553b014a46341cb527c005f19b2c28f348dffba'
+    startLine: 3000,
+    lines: 65,
+    bytes: 2280,
+    hash: '2dc1a42c6ba1c0fbe3604d85969ec3656a0f51cf37b32ffe509c80d5b1c5376f'
   },
   filterLogicGlobalProcess: {
     file: 'js/filter_logic.js',

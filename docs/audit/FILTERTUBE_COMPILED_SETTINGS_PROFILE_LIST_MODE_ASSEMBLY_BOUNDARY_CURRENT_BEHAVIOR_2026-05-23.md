@@ -26,8 +26,8 @@ This is narrower than the compiled-settings field register and the list-mode mat
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6,803 | 306,710 | `57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7` |
-| `js/content/bridge_settings.js` | 1,127 | 44,545 | `fad07aba48391021d5e42096b34f32c58a6337a1a4d303a8706927c541d47f71` |
+| `js/background.js` | 6,984 | 315,747 | `080d15907b26314873138c5dcc5d9653a2a27e933049be10361dfe0047f0a7cc` |
+| `js/content/bridge_settings.js` | 1,459 | 57,855 | `6434bd16233044ebb4aaef69261126f3b1852213cffd24ce82b4ecf2bb7a4486` |
 | `js/filter_logic.js` | 3,652 | 172,174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 
 compiled settings profile/list-mode assembly source files pinned: 3
@@ -36,10 +36,10 @@ compiled settings profile/list-mode assembly source files pinned: 3
 
 | Block | Source | Start line | Lines | Bytes | SHA-256 |
 | --- | --- | ---: | ---: | ---: | --- |
-| `backgroundProfileListModeWhitelist` | `js/background.js:2428` | 2,428 | 88 | 5,201 | `fde880c68148975730478f0c0e768b9585168ab3e260e8f6ecd8f7fc1220f9b2` |
-| `backgroundWhitelistChannelCompiler` | `js/background.js:2629` | 2,629 | 65 | 3,878 | `433527aec588525d8f3747ce7ffe20b1d2d78905c6812a6fcf6703bbee507322` |
+| `backgroundProfileListModeWhitelist` | `js/background.js:2594` | 2,594 | 88 | 5,201 | `fde880c68148975730478f0c0e768b9585168ab3e260e8f6ecd8f7fc1220f9b2` |
+| `backgroundWhitelistChannelCompiler` | `js/background.js:2795` | 2,795 | 66 | 3,969 | `80d9282e43b2438227575eef96c3f8f529780713b25496f9b94fb31cb0bc6b50` |
 | `bridgeNormalizeSettingsForHost` | `js/content/bridge_settings.js:322` | 322 | 31 | 1,404 | `5f05ac1dba540e69103fe5725ad258d203f03e72762a1cc887d8c70e847988ac` |
-| `bridgeRequestProfileGate` | `js/content/bridge_settings.js:847` | 847 | 36 | 1,758 | `713d4c00573258982f7dbf77cc451307b24a421ad8916fed859445df88fdadb8` |
+| `bridgeRequestProfileGate` | `js/content/bridge_settings.js:1179` | 1,179 | 36 | 1,758 | `713d4c00573258982f7dbf77cc451307b24a421ad8916fed859445df88fdadb8` |
 | `filterProcessSettings` | `js/filter_logic.js:947` | 947 | 125 | 6,348 | `666c5725170dcd5eb01aa66cbfd27e64d33fa0ae937d1c5553665b4ede149e0f` |
 | `filterListModeIdentityAdmission` | `js/filter_logic.js:1715` | 1,715 | 268 | 12,855 | `3de047cd70f0734c2bdcf6ae481d23a3c78fe08f3aa280c2f59680cad04761af` |
 

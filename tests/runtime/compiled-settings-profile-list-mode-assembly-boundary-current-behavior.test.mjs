@@ -11,8 +11,8 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_COMPILED_SETTINGS_PROFILE_LIST_MODE_ASSEMBLY_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/background.js': [6803, 306710, '57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7'],
-  'js/content/bridge_settings.js': [1127, 44545, 'fad07aba48391021d5e42096b34f32c58a6337a1a4d303a8706927c541d47f71'],
+  'js/background.js': [6984, 315747, '080d15907b26314873138c5dcc5d9653a2a27e933049be10361dfe0047f0a7cc'],
+  'js/content/bridge_settings.js': [1459, 57855, '6434bd16233044ebb4aaef69261126f3b1852213cffd24ce82b4ecf2bb7a4486'],
   'js/filter_logic.js': [3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5']
 };
 
@@ -22,7 +22,7 @@ const blockSpecs = {
     from: 'async function getCompiledSettings(sender = null, profileType = null, forceRefresh = false) {',
     start: '            const activeSettings = safeObject(activeProfile.settings);',
     end: '            const boolFromV4 = (key, legacyValue) => {',
-    startLine: 2428,
+    startLine: 2594,
     lines: 88,
     bytes: 5201,
     hash: 'fde880c68148975730478f0c0e768b9585168ab3e260e8f6ecd8f7fc1220f9b2'
@@ -32,10 +32,10 @@ const blockSpecs = {
     from: 'async function getCompiledSettings(sender = null, profileType = null, forceRefresh = false) {',
     start: '            const compileWhitelistChannels = (channels = []) => {',
     end: '            const storedChannels = shouldUseKidsProfile',
-    startLine: 2629,
-    lines: 65,
-    bytes: 3878,
-    hash: '433527aec588525d8f3747ce7ffe20b1d2d78905c6812a6fcf6703bbee507322'
+    startLine: 2795,
+    lines: 66,
+    bytes: 3969,
+    hash: '80d9282e43b2438227575eef96c3f8f529780713b25496f9b94fb31cb0bc6b50'
   },
   bridgeNormalizeSettingsForHost: {
     file: 'js/content/bridge_settings.js',
@@ -50,7 +50,7 @@ const blockSpecs = {
     file: 'js/content/bridge_settings.js',
     start: '        const profileType = (() => {',
     end: '                try {\n                    const debugEnabled',
-    startLine: 847,
+    startLine: 1179,
     lines: 36,
     bytes: 1758,
     hash: '713d4c00573258982f7dbf77cc451307b24a421ad8916fed859445df88fdadb8'
