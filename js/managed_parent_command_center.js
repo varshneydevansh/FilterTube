@@ -58,7 +58,7 @@
                 : () => ({
                     configured: false,
                     label: 'Home Bridge off',
-                    detail: 'A Home Bridge needs an explicit trusted FilterTube bridge; network discovery is never authority.',
+                    detail: 'Same-network pickup needs an explicit FilterTube bridge; Wi-Fi discovery is never authority.',
                     tone: 'warning'
                 }),
             onAction: typeof helpers.onAction === 'function' ? helpers.onAction : null
@@ -1017,7 +1017,7 @@
                 },
                 {
                     label: 'Set Up Home Bridge',
-                    title: 'For a trusted FilterTube bridge you run on your home or school network.',
+                    title: 'For an explicit FilterTube bridge you run on your home or school network. Wi-Fi alone never grants control.',
                     action: 'configure_local_network',
                     scope: 'local_network_provider'
                 }
@@ -1100,7 +1100,7 @@
             const localRoute = document.createElement('span');
             localRoute.textContent = localNetwork.configured
                 ? 'The protected device still accepts only trusted parent updates.'
-                : 'Leave this off unless you run a trusted FilterTube bridge.';
+                : 'Leave this off unless you run a trusted FilterTube bridge; Wi-Fi alone never grants control.';
             localCopy.append(localTitle, localDetail, localRoute);
             localPanel.appendChild(localCopy);
             if (h.onAction) {

@@ -13435,7 +13435,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahDeliveryLocalDetail.textContent = local.configured
                 ? local.detail
                 : (!hasProtectedProfiles
-                    ? 'Create a protected profile first. Same-network delivery is only for verified protected devices.'
+                    ? 'Create a protected profile first. Home Bridge only helps verified protected devices.'
                     : (!hasVerifiedDevice
                         ? 'Pair a verified device first. Same-network reachability is never authority.'
                         : local.detail));
@@ -13591,8 +13591,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             message: 'Home Bridge lets protected devices collect approved updates through a FilterTube bridge you run on your own network.',
             details: [
                 'Normal parent control is Send Update: open both devices, pair, verify, and send.',
-                'Home Bridge is optional and advanced; skip it unless you run a compatible bridge.',
-                'Being on the same network is not enough to change rules.',
+                'Home Bridge is optional and advanced; skip it unless you run a compatible bridge on your own network.',
+                'It is not automatic Wi-Fi discovery. Being on the same network is not enough to change rules.',
                 'The protected device still accepts only trusted parent updates.'
             ],
             configured: !!currentEndpoint,
@@ -13612,7 +13612,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const endpoint = await showPromptModal({
             title: 'Home Bridge Service',
-            message: 'Advanced only. Use this only if you run a trusted FilterTube-compatible bridge on your own network. Normal parent control uses live Send Update.',
+            message: 'Advanced only. Use this only if you run a trusted FilterTube-compatible bridge on your own network. This is not automatic LAN discovery; normal parent control uses live Send Update.',
             placeholder: 'http://192.168.1.10:4177/filtertube',
             inputType: 'url',
             confirmText: currentEndpoint ? 'Save Bridge' : 'Enable Home Bridge',
@@ -14747,8 +14747,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!endpoint) {
             return {
                 configured: false,
-                label: 'Home/school network off',
-                detail: 'Send Update can still work. Set this up only if you run a trusted FilterTube bridge on your own network.',
+                label: 'Home Bridge off',
+                detail: 'Send Update can still work. Set this up only if you run an explicit FilterTube bridge on your home or school network.',
                 tone: 'warning'
             };
         }
@@ -14756,15 +14756,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!configured) {
             return {
                 configured: false,
-                label: 'Home/school network needs review',
+                label: 'Home Bridge needs review',
                 detail: `${host} is saved but is not ready to deliver protected updates.`,
                 tone: 'warning'
             };
         }
         return {
             configured: true,
-            label: `Home/school network ready: ${host}`,
-            detail: 'Same-network delivery is available. The protected device still accepts only trusted parent updates.',
+            label: `Home Bridge ready: ${host}`,
+            detail: 'Same-network pickup is available through your configured bridge. The protected device still accepts only trusted parent updates.',
             tone: 'success'
         };
     }

@@ -572,6 +572,12 @@ parent tool instead of a sync/debug console.
     opens the same parent-approved stale-list review flow and never silently
     applies rows, sends device updates, runs on YouTube pages, or creates
     background policy sync.
+  - [x] 2026-06-19 Home Bridge intranet clarity slice: Accounts & Sync and Help
+    now explain that same-network pickup requires an explicit
+    FilterTube-compatible Home Bridge, is not automatic Wi-Fi/LAN discovery, and
+    still applies only signed updates from the saved parent/caregiver link.
+    Runtime provider hooks, local candidate validation, and trusted-link
+    authority are unchanged.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.
