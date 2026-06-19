@@ -40,6 +40,28 @@ Applies to: Main + Kids
 Profiles: Asha, Kabir
 ```
 
+## Settings UI Format Gallery
+
+Settings -> Import / Export -> Rule list imports uses a format gallery rather
+than one dense parser table. The first screen must answer one parent question:
+"What does my file need to look like before I import it?"
+
+Current visible previews:
+
+- CSV: a small spreadsheet-style example with `channel_id`, `keyword`, and
+  `notes` columns, including handles, UC channel IDs, `/c/Name`, and keyword
+  rows.
+- JSON: a simple rule-list JSON preview with `channels` and `keywords` arrays.
+  It is explicitly not the full FilterTube backup format.
+- TXT: one row per rule, with bare rows channel-first and `keyword:` required
+  for keyword rows.
+- URL / BlockTube: raw HTTPS CSV/TXT/JSON lists and BlockTube `filterData`
+  arrays. These still open a preview before applying.
+
+The exact parser notes remain behind a disclosure named `Exact parser rules`.
+That keeps the normal parent flow short while still giving advanced users the
+channel identifier and keyword-row details they need.
+
 ## Recommended CSV Format
 
 CSV is for explicit channel identifiers and explicit keywords. It is not semantic inference.
