@@ -460,23 +460,23 @@
                                                 <div class="help-item-body import-export-row">
                                                     <div class="import-export-text">
                                                         <span class="import-export-summary">
-                                                            Merge a full FilterTube backup or compatible backup JSON.<br />
+                                                            Restore a full FilterTube backup JSON.<br />
                                                         </span>
                                                         <span class="import-export-hint">
-                                                            Use this for complete settings restore or legacy BlockTube export migration. For channel/keyword-only lists, use Rule list imports below.
+                                                            Use this for complete profile, settings, and backup restore. For channel/keyword-only CSV, TXT, JSON, URLs, or BlockTube channel/title lists, use Rule list imports below.
                                                         </span>
                                                         <div class="import-backup-format-strip" aria-label="Supported backup imports">
                                                             <span>FilterTube backup JSON</span>
-                                                            <span>BlockTube export JSON</span>
-                                                            <span>Full restore or migration</span>
+                                                            <span>Profiles + settings</span>
+                                                            <span>Full restore</span>
                                                         </div>
-                                                        <span class="info-hint" title="Bring in data from FilterTube backups, BlockTube exports, or other structured JSON tools. Matching channels/keywords are merged; everything else is appended.">
+                                                        <span class="info-hint" title="Bring in a full FilterTube backup. Matching channels/keywords are merged; profile and settings data follows the backup import rules. Use Rule list imports for channel/keyword-only files.">
                                                             Details
                                                         </span>
                                                     </div>
                                                     <div class="import-export-actions">
                                                         <input id="ftImportV3File" type="file" accept="application/json,.json" style="display:none;" />
-                                                        <button id="ftImportV3Btn" class="btn-secondary btn-import" type="button" title="Import a FilterTube export or any compatible JSON (BlockTube, other tools, etc.)">
+                                                        <button id="ftImportV3Btn" class="btn-secondary btn-import" type="button" title="Import a full FilterTube backup JSON. Use Rule list imports for channel/keyword-only JSON.">
                                                             Choose JSON
                                                         </button>
                                                         <button id="ftImportSyncDeviceBtn" class="btn-secondary" type="button" title="Open Accounts &amp; Sync > Family Device Updates to pair a verified device or send reviewed profile updates.">
@@ -537,7 +537,7 @@
                                                                 </div>
                                                                 <div>
                                                                     <b>BlockTube</b>
-                                                                    <span>Legacy export data stays supported for migration and previewed imports.</span>
+                                                                    <span>Channel/title arrays preview as channel and keyword rules before applying.</span>
                                                                 </div>
                                                                 <div>
                                                                     <b>Public URL</b>

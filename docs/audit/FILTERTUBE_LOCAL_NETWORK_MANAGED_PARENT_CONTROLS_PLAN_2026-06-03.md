@@ -305,7 +305,8 @@ parent tool instead of a sync/debug console.
     supported CSV/TXT/JSON/URL shapes as a compact sheet-style preview before
     the Import Rule List action. The visible card explains channel handles,
     UCIDs, custom URLs, full URLs, TXT keyword prefixes, simple JSON arrays,
-    BlockTube migration, and raw HTTPS lists without requiring Help first.
+    BlockTube channel/title arrays, and raw HTTPS lists without requiring Help
+    first.
     Runtime parser support and authority remain unchanged: imported files can
     add only channel/keyword rules, previewed invalid rows do not apply, and a
     protected profile still needs parent/account approval before verified-device

@@ -6390,7 +6390,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (ftImportV3Btn) {
             ftImportV3Btn.disabled = isChild;
-            ftImportV3Btn.title = isChild ? childTitle : 'Import a FilterTube export or any compatible JSON (BlockTube, other tools, etc.)';
+            ftImportV3Btn.title = isChild ? childTitle : 'Import a full FilterTube backup JSON. Use Rule list imports for channel/keyword-only files.';
         }
         if (ftImportV3File) {
             ftImportV3File.disabled = isChild;
@@ -20152,12 +20152,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         ftRuleListFormatsBtn.addEventListener('click', async () => {
             const action = await showChoiceModal({
                 title: 'Supported Rule List Formats',
-                message: 'Rule list imports add channels and keywords only. Full FilterTube backups and legacy BlockTube export migration still belong under Choose JSON.',
+                message: 'Rule list imports add channels and keywords only. Full FilterTube backups belong under Choose JSON; channel/title list files belong here.',
                 details: [
                     'CSV: channel_id,keyword,notes or type,value,notes.',
                     'Text: bare rows are channels; typed rows can use channel: @SomeChannel or keyword: brainrot.',
                     'Rule-list JSON: channels and keywords arrays.',
-                    'BlockTube JSON: filterData channel/title arrays are supported here for previewed rule-list import too.',
+                    'BlockTube JSON: filterData channel/title arrays can be previewed here as channel and keyword rules.',
                     'Public URLs: raw HTTPS CSV, text, or JSON files can be loaded into the preview.'
                 ],
                 choices: [
