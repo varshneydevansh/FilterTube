@@ -509,18 +509,23 @@
                                                                 <span>Choose Main, Kids, or both. Send Update only for verified devices.</span>
                                                             </div>
                                                         </div>
-                                                        <details class="rule-list-format-disclosure">
+                                                        <details class="rule-list-format-disclosure" open>
                                                             <summary>
-                                                                <span>Preview supported file shapes</span>
+                                                                <span>See examples before import</span>
                                                                 <code>CSV · JSON · TXT · URL</code>
                                                             </summary>
                                                             <div class="rule-list-format-showcase" aria-label="Rule list format previews">
                                                                 <div class="rule-list-format-showcase__header">
                                                                     <div>
-                                                                        <strong>Supported list examples</strong>
-                                                                        <span>Pick the file shape that looks closest to what you have. FilterTube still opens a real preview before it adds anything.</span>
+                                                                        <strong>Format examples parents can compare against</strong>
+                                                                        <span>Pick the file shape that looks closest to what you have. FilterTube still opens a row-by-row preview before it adds anything.</span>
                                                                     </div>
-                                                                    <code>safe preview</code>
+                                                                    <code>preview first</code>
+                                                                </div>
+                                                                <div class="rule-list-format-trust-strip" aria-label="Rule list import safety flow">
+                                                                    <span><b>1</b> Preview parsed rows</span>
+                                                                    <span><b>2</b> Choose Main, Kids, or both</span>
+                                                                    <span><b>3</b> Import only after parent approval</span>
                                                                 </div>
                                                                 <input class="rule-list-format-switcher__input" id="ftRuleListFormatCsvPreview" name="ftRuleListFormatPreview" type="radio" checked />
                                                                 <input class="rule-list-format-switcher__input" id="ftRuleListFormatJsonPreview" name="ftRuleListFormatPreview" type="radio" />
@@ -741,6 +746,16 @@
                                                                     </div>
                                                                 </article>
                                                                 </div>
+                                                                <div class="rule-list-preview-feedback" aria-label="How messy imports are reported">
+                                                                    <div>
+                                                                        <strong>Preview result</strong>
+                                                                        <span>4 channel rows, 2 keyword rows ready</span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <strong>Skipped rows</strong>
+                                                                        <span>Row 9 missing a channel ID or keyword. Nothing applies until you approve.</span>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </details>
                                                         <fieldset class="rule-list-target-picker" aria-label="Where to apply imported rule list">
@@ -767,7 +782,7 @@
                                                             <div class="rule-list-parser-notes" aria-label="Rule list parser boundaries">
                                                                 <span><b>Channels:</b> <code>UC...</code>, <code>@handle</code>, <code>/channel/UC...</code>, <code>/c/Name</code>, <code>/user/Name</code>, or YouTube channel URLs.</span>
                                                                 <span><b>Keywords:</b> CSV <code>keyword</code> cells, JSON <code>keywords</code>, or TXT rows starting with <code>keyword:</code>.</span>
-                                                                <span><b>Safety:</b> name-only channel rows and invalid rows are skipped and shown in preview before anything changes.</span>
+                                                                <span><b>Messy files:</b> invalid rows are skipped with row numbers and reasons in preview before anything changes.</span>
                                                                 <span><b>Authority:</b> files never choose profile, Main/Kids target, PIN, time limit, trusted device, or sync destination.</span>
                                                             </div>
                                                         </details>

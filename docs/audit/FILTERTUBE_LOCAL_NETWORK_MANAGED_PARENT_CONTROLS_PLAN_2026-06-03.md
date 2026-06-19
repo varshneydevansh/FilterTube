@@ -347,6 +347,13 @@ parent tool instead of a sync/debug console.
     still presentation-only: all files continue through the same safe preview,
     parent/account approval, Main/Kids/Both target selection, and verified
     device send path.
+  - [x] 2026-06-19 Settings rule-list import guide slice: the format examples
+    are open by default, include a three-step parent safety strip, and show a
+    skipped-row preview so messy CSV/TXT/JSON/URL files are framed as
+    reviewable rows rather than silent failures. This remains UI copy/styling
+    only: parser support, preview-before-apply, Main/Kids/Both target choice,
+    list metadata, parent/account approval, and verified-device delivery
+    authority are unchanged.
   - [x] Optional delivery discovery slice: after at least one protected profile
     exists and no optional provider is configured, Family Controls now shows one
     compact advanced pickup prompt. First setup still leads with live Send
