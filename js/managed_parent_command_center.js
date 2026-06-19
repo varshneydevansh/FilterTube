@@ -931,8 +931,8 @@
         if (shouldShowConfiguredProviderSetup || shouldShowProviderPrompt) {
             const providerIntro = document.createElement('div');
             providerIntro.className = 'ft-managed-command-center__provider-intro';
-            providerIntro.textContent = 'Optional delivery';
-            providerIntro.title = 'Send Now is the normal path. These options are only for Pick Up Later or a trusted Home Bridge.';
+            providerIntro.textContent = 'Advanced update pickup';
+            providerIntro.title = 'Send Update is the normal path. Add these only when updates must wait for the other device to open later.';
             panel.appendChild(providerIntro);
         }
 
@@ -945,9 +945,9 @@
             const promptCopy = document.createElement('div');
             promptCopy.className = 'ft-managed-command-center__provider-copy';
             const promptTitle = document.createElement('strong');
-            promptTitle.textContent = 'Need updates without both devices open?';
+            promptTitle.textContent = 'Need updates when the other device opens later?';
             const promptDetail = document.createElement('span');
-            promptDetail.textContent = 'Optional. Most families can use Send Now and skip this.';
+            promptDetail.textContent = 'Optional. Most families can keep using Send Update.';
             promptCopy.append(promptTitle, promptDetail);
             providerSummary.appendChild(promptCopy);
             const promptActions = document.createElement('div');
@@ -955,16 +955,16 @@
             const promptBody = document.createElement('div');
             promptBody.className = 'ft-managed-command-center__provider-prompt-body';
             const promptBodyText = document.createElement('span');
-            promptBodyText.textContent = 'Send Now is the normal path: open both devices, pair, verify, send. Pick Up Later and Home Bridge are only for families or schools that run an extra delivery service.';
+            promptBodyText.textContent = 'Normal control is live: open both devices, pair, verify, send. Add a pickup path only if you run a compatible service for offline or same-network delivery.';
             [
                 {
-                    label: 'Set Up Pick Up Later',
-                    title: 'For protected devices that should collect waiting updates next time they open.',
+                    label: 'Internet Pickup',
+                    title: 'For protected devices that should collect waiting approved updates next time they open.',
                     action: 'configure_mailbox',
                     scope: 'mailbox_provider'
                 },
                 {
-                    label: 'Set Up Home Bridge',
+                    label: 'Home Bridge',
                     title: 'For a trusted FilterTube bridge you run on your home or school network.',
                     action: 'configure_local_network',
                     scope: 'local_network_provider'
@@ -1015,7 +1015,7 @@
                 const mailboxButton = document.createElement('button');
                 mailboxButton.className = 'btn-secondary';
                 mailboxButton.type = 'button';
-                mailboxButton.textContent = mailbox.configured ? 'Edit Pick Up Later' : 'Set Up Pick Up Later';
+                mailboxButton.textContent = mailbox.configured ? 'Edit Internet Pickup' : 'Set Up Internet Pickup';
                 mailboxButton.title = 'Requires parent/account re-auth. Use only when updates must wait for the protected device to open later.';
                 mailboxButton.addEventListener('click', (event) => {
                     event.preventDefault();

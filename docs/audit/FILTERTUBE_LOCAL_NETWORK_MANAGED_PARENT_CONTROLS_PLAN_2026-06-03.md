@@ -322,14 +322,14 @@ parent tool instead of a sync/debug console.
     before replacing any list-derived rule rows.
   - [x] Optional delivery discovery slice: after at least one protected profile
     exists and no optional provider is configured, Family Controls now shows one
-    compact prompt for `Set Up Pick Up Later` and `Set Up Home Bridge`. First
-    setup still leads with Send Now and local controls; the prompt is only a
-    discoverable path for families/caregivers who need offline pickup or a
-    trusted home/school bridge.
-  - [x] Optional delivery disclosure slice: the unconfigured Pick Up Later/Home
-    Bridge prompt is collapsed under `Need updates without both devices open?`
-    so ordinary parents see Send Now as the default flow. Opening the disclosure
-    explains the two advanced paths in plain language before exposing setup
+    compact advanced pickup prompt. First setup still leads with live Send
+    Update and local controls; the prompt is only a discoverable path for
+    families/caregivers who need internet pickup after the protected device
+    opens later or a trusted home/school bridge.
+  - [x] Optional delivery disclosure slice: the unconfigured prompt is
+    collapsed under `Need updates when the other device opens later?` so
+    ordinary parents see Send Update as the default flow. Opening the disclosure
+    explains the advanced pickup paths in plain language before exposing setup
     buttons, preserving provider capability without making optional transport
     look required.
   - [x] 2026-06-19 command-center wording pass: the profile rows and bulk
@@ -341,6 +341,11 @@ parent tool instead of a sync/debug console.
   - [x] Optional delivery setup modals use parent-facing `address` and `key`
     labels instead of raw provider/password language, and explicitly say Pick Up
     Later is not the Nanah signal server and cannot change rules by itself.
+  - [x] Advanced pickup naming slice: the command center and provider setup
+    modal now present the internet waiting path as `Internet Pickup` and keep
+    `Home Bridge` for the same-network bridge. The docs still map these to the
+    underlying Pick Up Later/Home Bridge transports, but the first parent-facing
+    labels now describe the outcome instead of the implementation.
   - [x] Verified-device pickup wording slice: trusted protected-profile links
     now describe `syncOnProfileOpen` as `Check on open` instead of a transport
     name. The modal explains that a protected profile checks for newer approved

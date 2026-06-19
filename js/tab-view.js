@@ -13241,16 +13241,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
             title: 'Pick Up Later',
-            message: 'Use this only when a parent changes rules while the protected device is offline. The protected device can pick up the update next time it opens.',
+            message: 'Internet Pickup lets a protected device collect a waiting parent-approved update next time it opens.',
             details: [
-                'Normal parent control is Send Now: open both devices, pair, verify, and send.',
-                'Pick Up Later is optional and advanced; skip it when both devices can be open together.',
-                'A FilterTube-compatible Pick Up Later service stores unreadable waiting updates only.',
+                'Normal parent control is Send Update: open both devices, pair, verify, and send.',
+                'Internet Pickup is optional and advanced; skip it when both devices can be open together.',
+                'A FilterTube-compatible pickup service stores unreadable waiting updates only.',
                 'The saved trusted parent link still decides what applies.'
             ],
             configured: !!currentEndpoint,
-            configureLabel: currentEndpoint ? 'Edit Pick Up Later' : 'Set Up Pick Up Later',
-            disableLabel: 'Turn Off Pick Up Later'
+            configureLabel: currentEndpoint ? 'Edit Internet Pickup' : 'Set Up Internet Pickup',
+            disableLabel: 'Turn Off Internet Pickup'
         });
         if (action === null) return;
         if (action === 'disable') {
@@ -13264,11 +13264,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const endpoint = await showPromptModal({
-            title: 'Pick Up Later Address',
-            message: 'Advanced only. Enter a FilterTube-compatible pickup service only if you run or trust one. It is not the Nanah signal server, and it cannot change rules by itself. Leave blank for Send Now only.',
+            title: 'Internet Pickup Address',
+            message: 'Advanced only. Enter a FilterTube-compatible pickup service only if you run or trust one. It is not the Nanah signal server, and it cannot change rules by itself. Leave blank for live Send Update only.',
             placeholder: 'https://your-filtertube-pickup-service',
             inputType: 'url',
-            confirmText: currentEndpoint ? 'Save Pick Up Later' : 'Enable Pick Up Later',
+            confirmText: currentEndpoint ? 'Save Internet Pickup' : 'Enable Internet Pickup',
             initialValue: currentEndpoint
         });
         if (endpoint === null) return;
@@ -13284,7 +13284,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const token = await showPromptModal({
-            title: 'Pick Up Later Key',
+            title: 'Internet Pickup Key',
             message: 'Optional service key. Leave blank to keep the saved key. Enter a single dash to clear it.',
             placeholder: 'Optional service key',
             inputType: 'password',
@@ -13332,9 +13332,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
             title: 'Home Bridge',
-            message: 'Use this only when you run a trusted FilterTube bridge for protected devices on your home or school network.',
+            message: 'Home Bridge lets protected devices collect approved updates through a FilterTube bridge you run on your own network.',
             details: [
-                'Normal parent control is Send Now: open both devices, pair, verify, and send.',
+                'Normal parent control is Send Update: open both devices, pair, verify, and send.',
                 'Home Bridge is optional and advanced; skip it unless you run a compatible bridge.',
                 'Being on the same network is not enough to change rules.',
                 'The protected device still accepts only trusted parent updates.'
