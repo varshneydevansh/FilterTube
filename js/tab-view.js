@@ -11431,6 +11431,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         return 'Copies profiles';
     }
 
+    function getNanahTrustedLinkDirectionSummary(entry) {
+        const localRole = normalizeString(entry?.localRole).toLowerCase();
+        const remoteRole = normalizeString(entry?.remoteRole).toLowerCase();
+        if (localRole === 'source' && remoteRole === 'replica') return 'This device sends approved updates';
+        if (localRole === 'replica' && remoteRole === 'source') return 'This device receives parent updates';
+        return 'Two-way device copy';
+    }
+
     function getNanahRoleLabel(role) {
         const normalized = normalizeString(role).toLowerCase();
         if (normalized === 'source') return 'This device controls another profile';
@@ -14603,6 +14611,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         return 'Checked';
     }
 
+    function formatNanahProtectedUpdateCheckStatus(link) {
+        const trusted = safeObject(link);
+        const policy = safeObject(trusted.policy);
+        if (trusted.linkType !== 'managed_link' || trusted.localRole !== 'replica' || trusted.remoteRole !== 'source') return '';
+        if (policy.syncOnProfileOpen !== true) return 'Off';
+        const internetStatus = normalizeString(formatNanahManagedOpenSyncStatus(trusted));
+        const homeStatus = normalizeString(formatNanahManagedLocalNetworkSyncStatus(trusted));
+        const parts = [];
+        if (internetStatus && internetStatus !== 'Off') {
+            parts.push(internetStatus.toLowerCase().includes('internet pickup')
+                ? internetStatus
+                : `Internet Pickup: ${internetStatus}`);
+        }
+        if (homeStatus && homeStatus !== 'Off') {
+            parts.push(homeStatus.toLowerCase().includes('home bridge')
+                ? homeStatus
+                : `Home Bridge: ${homeStatus}`);
+        }
+        return parts.length ? parts.join(' | ') : 'Ready';
+    }
+
     async function runNanahManagedLocalNetworkSync({ reason = 'dashboard_open' } = {}) {
         const io = window.FilterTubeIO || {};
         const localProfilesV4 = profilesV4Cache || (typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null);
@@ -15252,7 +15281,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 const roleRow = document.createElement('div');
                 roleRow.className = 'nanah-trusted-link__policy-row';
-                roleRow.innerHTML = `<span>Direction</span><strong>${getNanahRoleLabel(entry?.localRole)} -> ${getNanahRoleLabel(entry?.remoteRole)}</strong>`;
+                roleRow.innerHTML = `<span>Control</span><strong>${getNanahTrustedLinkDirectionSummary(entry)}</strong>`;
                 policyRows.appendChild(roleRow);
 
                 const allowedRow = document.createElement('div');
@@ -15300,25 +15329,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                     lockedChildRow.innerHTML = `<span>Locked child profile</span><strong>${getNanahLockedChildModeLabel(safeObject(entry?.policy).lockedChildMode)}</strong>`;
                     policyRows.appendChild(lockedChildRow);
 
-                    const openSyncRow = document.createElement('div');
-                    openSyncRow.className = 'nanah-trusted-link__policy-row';
-                    const openSyncLabel = document.createElement('span');
-                    openSyncLabel.textContent = 'Check on open';
-                    const openSyncValue = document.createElement('strong');
-                    openSyncValue.textContent = formatNanahManagedOpenSyncStatus(entry);
-                    openSyncRow.appendChild(openSyncLabel);
-                    openSyncRow.appendChild(openSyncValue);
-                    policyRows.appendChild(openSyncRow);
-
-                    const localNetworkRow = document.createElement('div');
-                    localNetworkRow.className = 'nanah-trusted-link__policy-row';
-                    const localNetworkLabel = document.createElement('span');
-                    localNetworkLabel.textContent = 'Home Bridge';
-                    const localNetworkValue = document.createElement('strong');
-                    localNetworkValue.textContent = formatNanahManagedLocalNetworkSyncStatus(entry);
-                    localNetworkRow.appendChild(localNetworkLabel);
-                    localNetworkRow.appendChild(localNetworkValue);
-                    policyRows.appendChild(localNetworkRow);
+                    const updateCheckRow = document.createElement('div');
+                    updateCheckRow.className = 'nanah-trusted-link__policy-row';
+                    updateCheckRow.title = 'When enabled, this protected profile checks trusted Internet Pickup and Home Bridge paths as it opens.';
+                    const updateCheckLabel = document.createElement('span');
+                    updateCheckLabel.textContent = 'Saved update check';
+                    const updateCheckValue = document.createElement('strong');
+                    updateCheckValue.textContent = formatNanahProtectedUpdateCheckStatus(entry);
+                    updateCheckRow.appendChild(updateCheckLabel);
+                    updateCheckRow.appendChild(updateCheckValue);
+                    policyRows.appendChild(updateCheckRow);
                 }
 
                 if (entry?.localRole === 'source' && entry?.remoteRole === 'replica') {

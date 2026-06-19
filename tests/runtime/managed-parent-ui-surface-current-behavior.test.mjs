@@ -431,11 +431,11 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /function describeManagedCommandCenterDeliveryPath\(item = \{\}\)/);
   assert.match(helperSource, /function renderManagedCommandCenter\(profilesV4, \{ revealDetails = false, helpers = \{\} \} = \{\}\)/);
   assert.match(helperSource, /panel\.setAttribute\('aria-label', 'Managed parent command center'\)/);
-  assert.match(helperSource, /Pick a profile, set what it can watch and for how long, then send only when another device needs the update/);
+  assert.match(helperSource, /Pick a profile, set what it can watch, set daily time, and send the update only when another verified device needs it/);
   assert.match(helperSource, /Family Controls workflow/);
   assert.match(helperSource, /Choose profile/);
-  assert.match(helperSource, /Set guardrails/);
-  assert.match(helperSource, /Sync when needed/);
+  assert.match(helperSource, /Set rules & time/);
+  assert.match(helperSource, /Send to device/);
   assert.match(helperSource, /actionIntents: buildManagedCommandCenterActionIntents\(profileId, timePolicy, \{/);
   assert.match(helperSource, /bulk_set_time_limit/);
   assert.match(helperSource, /bulk_edit_rules/);
@@ -459,7 +459,10 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /ft-managed-command-center__provider-prompt/);
   assert.match(helperSource, /Set Up Internet Pickup/);
   assert.match(helperSource, /Edit Internet Pickup/);
-  assert.match(doc, /visible card says `Internet Pickup`, `Home Bridge`, and `Delivery receipts`/);
+  assert.match(doc, /visible card says `Control`, `Saved update check`, and `Last delivery`/);
+  assert.match(source, /function getNanahTrustedLinkDirectionSummary\(entry\)/);
+  assert.match(source, /function formatNanahProtectedUpdateCheckStatus\(link\)/);
+  assert.match(source, /Saved update check/);
   assert.match(helperSource, /configure_mailbox/);
   assert.match(helperSource, /group: 'rules'/);
   assert.match(helperSource, /group: 'send'/);
@@ -478,7 +481,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /id="managedChildSyncBoundary"/);
   assert.match(tabViewHtml, /Family device updates/);
   assert.match(tabViewHtml, /<h3>Family Device Updates<\/h3>/);
-  assert.match(tabViewHtml, /Pick profile/);
+  assert.match(tabViewHtml, /Choose what to manage/);
   assert.match(tabViewHtml, /Connect the other device/);
   assert.match(tabViewHtml, /More controls/);
   assert.match(tabViewHtml, /Technical relay page/);
@@ -903,7 +906,7 @@ test('managed command-center helper emits delegated action intents without polic
   }).slice(0, 3)), [
     {
       action: 'edit_rules',
-      label: 'Rules',
+      label: 'Edit Rules',
       profileId: 'childA',
       scope: 'main_kids',
       authority: 'delegated_runtime_gate',
@@ -911,7 +914,7 @@ test('managed command-center helper emits delegated action intents without polic
     },
     {
       action: 'manage_channel_lists',
-      label: 'Lists',
+      label: 'Rule Lists',
       profileId: 'childA',
       scope: 'channels',
       authority: 'delegated_runtime_gate',
@@ -995,7 +998,7 @@ test('managed command-center helper emits delegated action intents without polic
   assert.deepEqual(plain(summary.bulkActionIntents), [
     {
       action: 'bulk_edit_rules',
-      label: 'Edit selected rules',
+      label: 'Edit rules',
       group: 'rules',
       profileIds: ['childA'],
       scope: 'main_kids',
@@ -1022,7 +1025,7 @@ test('managed command-center helper emits delegated action intents without polic
     },
     {
       action: 'bulk_manage_channel_lists',
-      label: 'Lists',
+      label: 'Rule lists',
       group: 'rules',
       profileIds: ['childA'],
       scope: 'channels',
@@ -1040,7 +1043,7 @@ test('managed command-center helper emits delegated action intents without polic
     },
     {
       action: 'bulk_send_managed_policy',
-      label: 'Send selected updates',
+      label: 'Send Update',
       group: 'send',
       profileIds: ['childA'],
       scope: 'active',
@@ -1108,7 +1111,7 @@ test('managed command-center helper emits delegated action intents without polic
   assert.deepEqual(plain(summary.rows[0].actionIntents), [
     {
       action: 'edit_rules',
-      label: 'Rules',
+      label: 'Edit Rules',
       profileId: 'childA',
       scope: 'main_kids',
       authority: 'delegated_runtime_gate',
@@ -1116,7 +1119,7 @@ test('managed command-center helper emits delegated action intents without polic
     },
     {
       action: 'manage_channel_lists',
-      label: 'Lists',
+      label: 'Rule Lists',
       profileId: 'childA',
       scope: 'channels',
       authority: 'delegated_runtime_gate',
@@ -1132,7 +1135,7 @@ test('managed command-center helper emits delegated action intents without polic
     },
     {
       action: 'send_managed_policy',
-      label: 'Send',
+      label: 'Send Update',
       profileId: 'childA',
       scope: 'active',
       authority: 'managed_policy_provider_delivery',

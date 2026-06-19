@@ -121,10 +121,11 @@ First-time protected-device setup now presents this as part of the normal
 still available, but it deliberately disables profile-open pulls until the
 protected device is locally approved/unlocked.
 
-The trusted-link card now shows a parent-facing `Internet Pickup` row for this
-status. Earlier proof called the same visible row `Open sync`; that remains the
+The trusted-link card now folds this into a parent-facing `Saved update check`
+row. Earlier proof called the same visible row `Open sync`; that remains the
 technical helper name, not the parent-facing label. The row can show one of
-these states:
+these states, and may include `Internet Pickup`/`Home Bridge` detail when an
+optional delivery provider is involved:
 
 ```text
 Off
