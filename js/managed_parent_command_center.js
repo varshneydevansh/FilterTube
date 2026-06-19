@@ -70,6 +70,7 @@
         const timeLimitActive = timePolicy?.enabled === true;
         const hasPendingExtraTimeRequest = policySummary.pendingExtraTimeRequest === true;
         const hasStaleManagedChannelList = policySummary.hasStaleManagedChannelList === true;
+        const hasVerifiedDevice = (Number(policySummary.syncTargetCount) || 0) > 0;
         const intents = [
             {
                 action: 'edit_rules',
@@ -103,6 +104,15 @@
                 authority: 'delegated_runtime_gate',
                 sensitiveAction: true
             },
+            ...(!hasVerifiedDevice ? [{
+                action: 'pair_device',
+                label: 'Pair Device',
+                profileId: targetId,
+                scope: 'device_pairing',
+                authority: 'managed_pairing_navigation',
+                sensitiveAction: false,
+                title: 'Open Family Device Updates in protected-device mode. Trust is saved only after both devices pair and confirm the same phrase.'
+            }] : []),
             {
                 action: 'send_managed_policy',
                 label: 'Send Update',
@@ -664,7 +674,8 @@
                     remoteConflictCount,
                     pendingExtraTimeRequest: !!pendingExtraTimeRequest,
                     hasUrlManagedChannelList: managedChannelLists.sourceUrlCount > 0,
-                    hasStaleManagedChannelList: managedChannelLists.staleListCount > 0
+                    hasStaleManagedChannelList: managedChannelLists.staleListCount > 0,
+                    syncTargetCount: syncTarget.targetCount
                 })
             };
             row.deliveryPreview = resolveManagedCommandCenterDeliveryPreview(row);
@@ -1326,9 +1337,9 @@
                     button.textContent = intent.label;
                     button.dataset.filtertubeManagedAction = intent.action;
                     button.dataset.filtertubeProfileId = intent.profileId;
-                    button.title = intent.sensitiveAction
+                    button.title = intent.title || (intent.sensitiveAction
                         ? 'Requires parent/account re-auth before protected details or policy changes.'
-                        : 'Uses the existing parent-managed runtime gate.';
+                        : 'Uses the existing parent-managed runtime gate.');
                     button.addEventListener('click', (event) => {
                         event.preventDefault();
                         Promise.resolve(h.onAction({ ...intent })).catch(() => {});

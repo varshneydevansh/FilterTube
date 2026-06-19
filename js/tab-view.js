@@ -17278,6 +17278,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                         await showManagedActionHistory(targetId);
                     } else if (action === 'review_conflicts') {
                         await showManagedActionHistory(targetId, { mode: 'conflicts' });
+                    } else if (action === 'pair_device') {
+                        if (typeof window.switchView === 'function') {
+                            window.switchView('sync');
+                        }
+                        setNanahMode('parent_control', { persist: true, applyPreset: true });
+                        focusFamilyDeviceUpdatesCard();
+                        UIComponents.showToast('Pair the protected device here, then save parent trust after both devices confirm the same phrase.', 'info');
                     } else if (action === 'set_time_limit' || action === 'change_time_limit') {
                         await updateProfileTimeLimitPolicy(targetId, 'set');
                     } else if (action === 'grant_extra_time') {

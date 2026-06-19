@@ -363,6 +363,12 @@ parent tool instead of a sync/debug console.
     from navigation intent with `section=device-updates`, making help links and
     future deep links land on the actual send/receive workflow instead of the
     top of Accounts & Sync.
+  - [x] Unpaired protected-profile action slice: Family Controls rows with no
+    verified device now show `Pair Device`. The action switches to the existing
+    Family Device Updates card, selects the protected-device update preset, and
+    explains that trust is saved only after both devices pair and confirm the
+    same safety phrase. It does not create trust, skip parent validation, or
+    change policy delivery authority.
   - [x] Verified-device pickup wording slice: trusted protected-profile links
     now describe `syncOnProfileOpen` as `Check on open` instead of a transport
     name. The modal explains that a protected profile checks for newer approved
