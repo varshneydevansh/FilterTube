@@ -14763,8 +14763,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         return {
             configured: true,
-            label: `Home Bridge ready: ${host}`,
-            detail: 'Same-network pickup is available through your configured bridge. The protected device still accepts only trusted parent updates.',
+            label: `Home Bridge set up: ${host}`,
+            detail: 'Same-network pickup can use your configured bridge. Reachability is checked only when sending or checking saved updates; trust still decides what can apply.',
             tone: 'success'
         };
     }

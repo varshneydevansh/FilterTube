@@ -509,7 +509,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /Advanced delivery for families or schools that run a compatible pickup service or explicit home\/school bridge/);
   assert.match(source, /It is not automatic Wi-Fi discovery\. Being on the same network is not enough to change rules/);
   assert.match(source, /This is not automatic LAN discovery; normal parent control uses live Send Update/);
-  assert.match(source, /Home Bridge ready: \$\{host\}/);
+  assert.match(source, /Home Bridge set up: \$\{host\}/);
+  assert.match(source, /Reachability is checked only when sending or checking saved updates/);
   assert.match(helperSource, /Same-network pickup needs an explicit FilterTube bridge; Wi-Fi discovery is never authority/);
   assert.match(helperSource, /Wi-Fi alone never grants control/);
   assert.match(plan, /Home Bridge intranet clarity slice/);

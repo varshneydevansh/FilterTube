@@ -569,6 +569,11 @@ parent tool instead of a sync/debug console.
     honest: same-network pickup is delivery only, never authority, and built-in
     automatic LAN peer discovery remains a NO-GO until a compatible provider
     and installed smoke prove it.
+  - [x] 2026-06-19 Home Bridge configured-state wording slice: configured
+    Home Bridge UI now says `set up` instead of `ready`, because a saved
+    provider client only proves an explicit bridge address exists. Actual
+    delivery still requires send/check execution plus trusted-link, target,
+    scope, revision, hash, and signature validation on the protected device.
   - [x] Protected-policy revision wording slice: Family Controls rows now show
     `Policy rN` and managed status says `Verified-device policy` instead of
     `Remote rN`/`Remote sync`. This changes only visible wording; accepted

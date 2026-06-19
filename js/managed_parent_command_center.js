@@ -458,7 +458,7 @@
         if (item.syncLocalNetworkReady === true) {
             return {
                 key: 'local_network',
-                label: 'Home Bridge ready',
+                label: 'Home Bridge set up',
                 tone: 'success'
             };
         }
@@ -1091,7 +1091,7 @@
             localCopy.className = 'ft-managed-command-center__provider-copy';
             const localTitle = document.createElement('strong');
             localTitle.textContent = localNetwork.configured
-                ? (localNetwork.label || 'Home Bridge is ready')
+                ? (localNetwork.label || 'Home Bridge is set up')
                 : 'Home Bridge is off';
             const localDetail = document.createElement('span');
             localDetail.textContent = summary.profileCount > 0
