@@ -12,6 +12,15 @@ const repoRoot = path.resolve(artifactRoot, '../../../..');
 const cdpBase = process.env.FILTERTUBE_CDP_BASE || 'http://127.0.0.1:9222';
 const extensionPath = process.env.FILTERTUBE_EXTENSION_PATH || repoRoot;
 const KNOWN_TEST_LANES = new Set(Object.keys(LANES).map(lane => `test:${lane}`));
+const MANAGED_TIMEOUT_OVERLAY_ROW_ID = 'FT-MANAGED-LIVE-03-zero-budget-timeout-overlay';
+const REQUIRED_MANAGED_TIMEOUT_OVERLAY_EVIDENCE = Object.freeze([
+  'timeoutOverlayVisible',
+  'requestMoreTimeVisible',
+  'requestRecordedForParentReview',
+  'requestDoesNotUnlockYoutube',
+  'overlayStillVisibleAfterRequest',
+  'blocklistWhitelistNotAuthority'
+]);
 const smokeChannel = {
   name: 'Google Developers',
   id: 'UC_x5XG1OV2P6uZZ5FSM9Ttw',
@@ -285,6 +294,7 @@ function buildManagedControlSmokePlaceholder() {
       id,
       routeAction: 'Managed parent/caregiver manual row; not executed by the whitelist SPA runner.',
       requiredObservation: 'Mark applicable=true and record this row only when the logical change touches managed profile sync, viewing-space policy, time limits, Nanah, mailbox, or local-network controls.',
+      ...(id === MANAGED_TIMEOUT_OVERLAY_ROW_ID ? { requiredEvidence: [...REQUIRED_MANAGED_TIMEOUT_OVERLAY_EVIDENCE] } : {}),
       status: 'missing'
     }))
   };

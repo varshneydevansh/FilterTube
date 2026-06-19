@@ -62,7 +62,7 @@ same dated artifact:
 | `FT-MANAGED-LIVE-00-protected-profile-preflight` | Open the extension dashboard as a parent/account profile and confirm the protected target profile, managed link, and installed extension identity before touching YouTube. | Parent/account authority is active, the protected profile is not the admin authority, and the artifact records parent/protected profile ids without PINs or plaintext rule values. |
 | `FT-MANAGED-LIVE-01-main-kids-route-gate` | Apply a Main/Kids viewing-space policy for the protected profile and open the denied YouTube surface. | The denied surface is blocked by the managed route gate before usable YouTube content remains available, while the allowed surface still opens. |
 | `FT-MANAGED-LIVE-02-time-budget-active-tab` | Set a small protected-profile daily YouTube budget and keep an active YouTube tab open long enough to consume budget. | The background-owned active-tab budget decreases across SPA navigation/reload and does not count when no managed time policy is active. |
-| `FT-MANAGED-LIVE-03-zero-budget-timeout-overlay` | Set a zero or already-exhausted protected-profile budget and reload/open YouTube. | The protected timeout overlay appears, is not dismissible by child authority, and normal FilterTube blocklist/whitelist behavior is not used as the time-limit authority. |
+| `FT-MANAGED-LIVE-03-zero-budget-timeout-overlay` | Set a zero or already-exhausted protected-profile budget and reload/open YouTube. | The protected timeout overlay appears, `Request more time` is visible, the request is recorded for parent review, the request does not unlock YouTube, the overlay remains visible after the request, and normal FilterTube blocklist/whitelist behavior is not used as the time-limit authority. |
 | `FT-MANAGED-LIVE-04-parent-history-redaction` | Open protected action history after a managed policy accept/reject or time-limit change. | Parent-visible history shows accepted/rejected outcomes, policy scope, revision, and redacted labels without plaintext rules, PINs, private keys, ciphertext, or raw policy JSON. |
 | `FT-MANAGED-LIVE-05-command-center-bulk-rail` | Open the managed parent command center with one or more selected protected profiles. | Selected-profile actions are grouped into Rules, Send, Time, and Access rails, every action remains disabled until selection, and the grouping does not expose plaintext rules, PINs, keys, raw JSON, or new policy authority. |
 | `FT-MANAGED-LIVE-06-no-policy-no-work` | Switch to a profile with no managed policy/time limit and repeat one Home/Search/Watch navigation. | No managed provider pull loop, time-limit heartbeat, timeout overlay, or extra YouTube observer/timer work runs when no managed policy is applicable. |
@@ -139,7 +139,12 @@ automated lane evidence that does not cover every required lane, and missing
 installed byte parity.
 For managed-control logical changes, the verifier also rejects the artifact
 unless `managedControlSmoke.applicable=true` and every managed-control row
-passes with parent/protected profile evidence.
+passes with parent/protected profile evidence. The exhausted-budget timeout row
+has extra required booleans for `timeoutOverlayVisible`,
+`requestMoreTimeVisible`, `requestRecordedForParentReview`,
+`requestDoesNotUnlockYoutube`, `overlayStillVisibleAfterRequest`, and
+`blocklistWhitelistNotAuthority`, so a release artifact cannot pass by merely
+showing that a child clicked the request button.
 The runner uses the same known `test:*` lane vocabulary for its own
 `releaseReadiness` decision, so an artifact cannot self-report release smoke
 readiness from matching but invalid lane names.

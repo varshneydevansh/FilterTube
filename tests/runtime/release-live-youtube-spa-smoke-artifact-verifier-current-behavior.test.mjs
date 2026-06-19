@@ -8,6 +8,7 @@ import { LANES, classifyPaths } from '../../scripts/run-test-lane.mjs';
 import {
   LIVE_SMOKE_BOUNDARY_DOC,
   MANAGED_CONTROL_LIVE_SMOKE_ROWS,
+  REQUIRED_MANAGED_TIMEOUT_OVERLAY_EVIDENCE,
   REQUIRED_LIVE_SMOKE_ROWS,
   validateLiveSmokeArtifact
 } from '../../docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs';
@@ -57,22 +58,32 @@ function managedControlSmoke({ applicable = false } = {}) {
     observedPolicyRevision: applicable ? 'managed r7' : '',
     observedTimeBudgetState: applicable ? 'zero budget overlay plus active-tab budget observed' : '',
     observedHistoryState: applicable ? 'redacted accepted/rejected managed rows observed' : '',
-    requiredRows: MANAGED_CONTROL_LIVE_SMOKE_ROWS.map((id, index) => ({
-      id,
-      routeAction: `managed row ${index}`,
-      requiredObservation: `managed observation ${index}`,
-      status: applicable ? 'passed' : 'missing',
-      ...(applicable ? {
-        observation: { pass: true, summary: `${id} passed` },
-        evidence: {
+    requiredRows: MANAGED_CONTROL_LIVE_SMOKE_ROWS.map((id, index) => {
+      const evidence = applicable
+        ? {
           parentProfileId: 'parent-profile-01',
           protectedProfileId: 'child-profile-01',
           installedExtensionId: 'gkgjigdfdccckblmglboobikfcpeelio',
           policyRevision: 7
-        },
-        durationMs: 750 + index
-      } : {})
-    }))
+        }
+        : null;
+      if (evidence && id === 'FT-MANAGED-LIVE-03-zero-budget-timeout-overlay') {
+        for (const field of REQUIRED_MANAGED_TIMEOUT_OVERLAY_EVIDENCE) {
+          evidence[field] = true;
+        }
+      }
+      return {
+        id,
+        routeAction: `managed row ${index}`,
+        requiredObservation: `managed observation ${index}`,
+        status: applicable ? 'passed' : 'missing',
+        ...(applicable ? {
+          observation: { pass: true, summary: `${id} passed` },
+          evidence,
+          durationMs: 750 + index
+        } : {})
+      };
+    })
   };
 }
 
@@ -156,6 +167,9 @@ function validArtifact() {
 test('live smoke artifact verifier is wired into release and smoke lane proof', () => {
   const matrix = read(matrixPath);
   const boundaryDoc = read(boundaryDocPath);
+  const template = read(templatePath);
+  const verifier = read(verifierPath);
+  const runner = read('docs/audit/artifacts/release-live-youtube-spa-smoke/run-live-smoke.mjs');
 
   assert.ok(LANES.release.tests.includes('tests/runtime/release-live-youtube-spa-smoke-artifact-verifier-current-behavior.test.mjs'));
   assert.ok(LANES.smoke.tests.includes('tests/runtime/release-live-youtube-spa-smoke-artifact-verifier-current-behavior.test.mjs'));
@@ -163,6 +177,10 @@ test('live smoke artifact verifier is wired into release and smoke lane proof', 
   assert.ok(boundaryDoc.includes(verifierPath));
   assert.match(boundaryDoc, /live smoke artifact verifier status: defined/);
   assert.match(boundaryDoc, /A dated artifact is not release-ready until this verifier returns zero errors/);
+  assert.match(boundaryDoc, /requestDoesNotUnlockYoutube/);
+  assert.match(template, /requestDoesNotUnlockYoutube/);
+  assert.match(verifier, /REQUIRED_MANAGED_TIMEOUT_OVERLAY_EVIDENCE/);
+  assert.match(runner, /REQUIRED_MANAGED_TIMEOUT_OVERLAY_EVIDENCE/);
 });
 
 test('classifier treats live smoke artifact tools as release and smoke proof', () => {
@@ -217,6 +235,17 @@ test('verifier requires managed child sync and time-limit rows for managed-contr
   assert.ok(failedManagedRows.includes('FT-MANAGED-LIVE-02-time-budget-active-tab.status must be passed'));
   assert.ok(failedManagedRows.includes('FT-MANAGED-LIVE-02-time-budget-active-tab.observation.pass must be true'));
   assert.ok(failedManagedRows.includes('FT-MANAGED-LIVE-02-time-budget-active-tab.evidence.protectedProfileId is required'));
+
+  const missingTimeoutEvidence = validArtifact();
+  missingTimeoutEvidence.changeContext.logicalChangeType = 'managed parent time-limit change';
+  missingTimeoutEvidence.changeContext.requiredLanes = ['test:settings', 'test:smoke'];
+  missingTimeoutEvidence.changeContext.automatedLaneEvidence = managed.changeContext.automatedLaneEvidence;
+  missingTimeoutEvidence.managedControlSmoke = managedControlSmoke({ applicable: true });
+  const timeoutRow = missingTimeoutEvidence.managedControlSmoke.requiredRows.find(row => row.id === 'FT-MANAGED-LIVE-03-zero-budget-timeout-overlay');
+  delete timeoutRow.evidence.requestDoesNotUnlockYoutube;
+
+  const timeoutErrors = validateLiveSmokeArtifact(missingTimeoutEvidence);
+  assert.ok(timeoutErrors.includes('FT-MANAGED-LIVE-03-zero-budget-timeout-overlay.evidence.requestDoesNotUnlockYoutube must be true'));
 });
 
 test('verifier rejects row failures console issues and stale route order', () => {

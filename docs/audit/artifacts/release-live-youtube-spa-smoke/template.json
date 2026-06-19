@@ -143,7 +143,15 @@
       {
         "id": "FT-MANAGED-LIVE-03-zero-budget-timeout-overlay",
         "routeAction": "Set a zero or already-exhausted protected-profile budget and reload/open YouTube.",
-        "requiredObservation": "The protected timeout overlay appears, is not dismissible by child authority, and normal FilterTube blocklist/whitelist behavior is not used as the time-limit authority.",
+        "requiredObservation": "The protected timeout overlay appears, Request more time is visible, the request is recorded for parent review, the request does not unlock YouTube, the overlay remains visible after the request, and normal FilterTube blocklist/whitelist behavior is not used as the time-limit authority.",
+        "requiredEvidence": [
+          "timeoutOverlayVisible",
+          "requestMoreTimeVisible",
+          "requestRecordedForParentReview",
+          "requestDoesNotUnlockYoutube",
+          "overlayStillVisibleAfterRequest",
+          "blocklistWhitelistNotAuthority"
+        ],
         "status": "missing"
       },
       {

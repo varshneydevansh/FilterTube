@@ -19,6 +19,15 @@ export const REQUIRED_LIVE_SMOKE_ROWS = Object.freeze([
 export const MANAGED_CONTROL_LIVE_SMOKE_ROWS = LIVE_SMOKE_MANAGED_CONTROL_ROWS;
 
 const MANAGED_CONTROL_CHANGE_PATTERN = /managed|parent|caregiver|protected|child sync|time[- ]limit|viewing[- ]space|nanah|mailbox|local[- ]network/i;
+const MANAGED_TIMEOUT_OVERLAY_ROW_ID = 'FT-MANAGED-LIVE-03-zero-budget-timeout-overlay';
+export const REQUIRED_MANAGED_TIMEOUT_OVERLAY_EVIDENCE = Object.freeze([
+  'timeoutOverlayVisible',
+  'requestMoreTimeVisible',
+  'requestRecordedForParentReview',
+  'requestDoesNotUnlockYoutube',
+  'overlayStillVisibleAfterRequest',
+  'blocklistWhitelistNotAuthority'
+]);
 
 const REQUIRED_RECORDING_FIELDS = Object.freeze([
   'browserNameVersion',
@@ -184,6 +193,11 @@ function validateManagedControlSmoke(errors, managedControlSmoke, changeContext)
     if (isBlank(row?.evidence?.parentProfileId)) errors.push(`${rowId}.evidence.parentProfileId is required`);
     if (isBlank(row?.evidence?.protectedProfileId)) errors.push(`${rowId}.evidence.protectedProfileId is required`);
     if (isBlank(row?.evidence?.installedExtensionId)) errors.push(`${rowId}.evidence.installedExtensionId is required`);
+    if (rowId === MANAGED_TIMEOUT_OVERLAY_ROW_ID) {
+      for (const field of REQUIRED_MANAGED_TIMEOUT_OVERLAY_EVIDENCE) {
+        if (row?.evidence?.[field] !== true) errors.push(`${rowId}.evidence.${field} must be true`);
+      }
+    }
   }
 }
 
