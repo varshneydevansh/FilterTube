@@ -3134,14 +3134,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         'remote_policy.accept': 'Remote policy accepted',
         'remote_policy.reject': 'Remote policy rejected',
         'remote_policy.conflict': 'Remote policy conflict',
-        'remote_policy.mailbox.accept': 'Pick Up Later update accepted',
-        'remote_policy.mailbox.reject': 'Pick Up Later update rejected',
-        'remote_policy.mailbox.conflict': 'Pick Up Later update conflict',
-        'remote_policy.mailbox.expire': 'Pick Up Later update expired',
-        'remote_policy.mailbox.revoke': 'Pick Up Later update revoked',
-        'remote_policy.mailbox.ack': 'Pick Up Later receipt recorded',
+        'remote_policy.mailbox.accept': 'Internet Pickup update accepted',
+        'remote_policy.mailbox.reject': 'Internet Pickup update rejected',
+        'remote_policy.mailbox.conflict': 'Internet Pickup update conflict',
+        'remote_policy.mailbox.expire': 'Internet Pickup update expired',
+        'remote_policy.mailbox.revoke': 'Internet Pickup update revoked',
+        'remote_policy.mailbox.ack': 'Internet Pickup receipt recorded',
         'remote_policy.local_network.ack': 'Home Bridge receipt recorded',
-        'delivery.mailbox.configure': 'Pick Up Later setting changed',
+        'delivery.mailbox.configure': 'Internet Pickup setting changed',
         'delivery.local_network.configure': 'Home Bridge setting changed',
         'remote_policy.source_push': 'Parent policy push',
         'history.clear': 'History cleared'
@@ -5250,11 +5250,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const transport = normalizeString(root.transport);
         if (actionType.startsWith('policy.channel_list.')) return 'Approved list';
         if (actionType === 'remote_policy.source_push') return 'Send update';
-        if (actionType.startsWith('remote_policy.mailbox.')) return 'Pick Up Later';
+        if (actionType.startsWith('remote_policy.mailbox.')) return 'Internet Pickup';
         if (actionType.startsWith('remote_policy.local_network.')) return 'Home Bridge';
         if (actionType.startsWith('remote_policy.')) {
             if (transport === 'local_network') return 'Home Bridge';
-            if (transport === 'mailbox') return 'Pick Up Later';
+            if (transport === 'mailbox') return 'Internet Pickup';
             return 'Remote update';
         }
         if (actionType === 'local_policy.update'
@@ -5413,7 +5413,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const deliveryBits = [];
             if (liveSent) deliveryBits.push(`Send Now ${liveSent}`);
             if (lanSent) deliveryBits.push(`Home Bridge ${lanSent}`);
-            if (mailboxSent) deliveryBits.push(`Pick Up Later ${mailboxSent}`);
+            if (mailboxSent) deliveryBits.push(`Internet Pickup ${mailboxSent}`);
             if (failed) deliveryBits.push(`failed ${failed}`);
             if (noLinks) deliveryBits.push(`no-link ${noLinks}`);
             if (missingProvider) deliveryBits.push(`send path unavailable ${missingProvider}`);
@@ -5558,7 +5558,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const bits = [];
             if (liveSent) bits.push(`Send Now ${liveSent}`);
             if (lanSent) bits.push(`Home Bridge ${lanSent}`);
-            if (mailboxSent) bits.push(`Pick Up Later ${mailboxSent}`);
+            if (mailboxSent) bits.push(`Internet Pickup ${mailboxSent}`);
             if (failed) bits.push(`failed ${failed}`);
             if (noLinks) bits.push(`no-link ${noLinks}`);
             if (providerMissing) bits.push(`send path unavailable ${providerMissing}`);
@@ -13268,7 +13268,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const current = readNanahManagedMailboxServerConfig();
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
-            title: 'Pick Up Later',
+            title: 'Internet Pickup',
             message: 'Internet Pickup lets a protected device collect a waiting parent-approved update next time it opens.',
             details: [
                 'Normal parent control is Send Update: open both devices, pair, verify, and send.',
@@ -13335,7 +13335,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? client.createProvider(nextConfig)
             : null;
         if (!provider || provider.configured !== true || !hasNanahManagedMailboxUploadWriter(provider)) {
-            UIComponents.showToast('Pick Up Later address must be public HTTPS and supported by FilterTube', 'error');
+            UIComponents.showToast('Internet Pickup address must be public HTTPS and supported by FilterTube', 'error');
             return;
         }
         writeNanahManagedMailboxServerConfig(nextConfig);
@@ -13344,7 +13344,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             endpointHost: getManagedMailboxEndpointHostFromConfig(nextConfig)
         });
         await refreshProfilesUI();
-        UIComponents.showToast('Pick Up Later saved', 'success');
+        UIComponents.showToast('Internet Pickup saved', 'success');
     }
 
     async function configureNanahManagedLocalNetworkProvider() {
@@ -14337,7 +14337,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const mailboxItemId = normalizeString(ackRecord.mailboxItemId);
             const localNetworkCandidateId = normalizeString(ackRecord.localNetworkCandidateId || ackRecord.candidateId);
             const itemId = transport === 'local_network' ? localNetworkCandidateId : mailboxItemId;
-            const transportLabel = transport === 'local_network' ? 'Home Bridge' : 'Pick Up Later';
+            const transportLabel = transport === 'local_network' ? 'Home Bridge' : 'Internet Pickup';
             const result = providerAcceptedAll ? 'accepted' : 'rejected';
             const reason = providerAcceptedAll
                 ? null
@@ -16112,7 +16112,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const validation = adapter.validateManagedMailboxItem(item, context);
         if (validation.accepted === true && validation.decision === 'idempotent_same_hash') {
             await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
-            UIComponents.showToast('Pick Up Later update already matches the last accepted revision', 'info');
+            UIComponents.showToast('Internet Pickup update already matches the last accepted revision', 'info');
             return validation;
         }
         if (validation.accepted === true) {
@@ -16123,25 +16123,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                     mailboxItemId: validation.mailboxItemId
                 };
                 await recordManagedNanahPolicyValidationHistory(envelope, decision, context);
-                UIComponents.showToast('Pick Up Later apply is unavailable', 'error');
+                UIComponents.showToast('Internet Pickup apply is unavailable', 'error');
                 return decision;
             }
             const result = await adapter.applyManagedMailboxItem(item, context);
             await recordManagedNanahPolicyValidationHistory(envelope, result.accepted === true ? validation : result, context);
             if (result.accepted === true && result.applied !== false) {
                 await refreshFilterTubeUiAfterNanahImport();
-                UIComponents.showToast(`Applied Pick Up Later ${normalizeString(validation.scope) || 'policy'} update`, 'success');
+                UIComponents.showToast(`Applied Internet Pickup ${normalizeString(validation.scope) || 'policy'} update`, 'success');
                 return result;
             }
             if (result.accepted === true && result.decision === 'idempotent_same_hash') {
-                UIComponents.showToast('Pick Up Later update already matches the last accepted revision', 'info');
+                UIComponents.showToast('Internet Pickup update already matches the last accepted revision', 'info');
                 return result;
             }
-            UIComponents.showToast(`Pick Up Later update rejected: ${normalizeString(result.reason) || 'apply failed'}`, 'error');
+            UIComponents.showToast(`Internet Pickup update rejected: ${normalizeString(result.reason) || 'apply failed'}`, 'error');
             return result;
         }
         await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
-        UIComponents.showToast(`Pick Up Later update rejected: ${normalizeString(validation.reason) || 'validation failed'}`, 'error');
+        UIComponents.showToast(`Internet Pickup update rejected: ${normalizeString(validation.reason) || 'validation failed'}`, 'error');
         return validation;
     }
 

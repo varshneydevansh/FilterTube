@@ -118,7 +118,7 @@ extension authority code.
   target-profile validation, and provider gates are unchanged; only the parent
   mental model and high-visibility labels changed.
 - [x] Advanced delivery copy now treats `Send Now` as the normal parent flow and
-  explains `Pick Up Later` and `Home Bridge` as optional send paths only. The
+  explains `Internet Pickup` and `Home Bridge` as optional send paths only. The
   Help relay section now separates Nanah's live meeting-place role from
   advanced later/home delivery, without implying those transports can become
   policy authority.
@@ -191,7 +191,7 @@ parent tool instead of a sync/debug console.
 - [x] Family Controls row details show list status without crowding the profile
   name, action buttons, or parent workflow.
 - [x] Managed action history clearly answers whether the latest row came from a
-  parent edit, approved list, remote update, Send update, Pick Up Later,
+  parent edit, approved list, remote update, Send update, Internet Pickup,
   Home Bridge, trusted-device action, admin access, or history action while
   keeping raw policy JSON and sensitive rule payloads out of protected views.
 - [x] Downstream app UI contract documents the same Main/Kids/Both rule-list
@@ -348,12 +348,13 @@ parent tool instead of a sync/debug console.
     Internet Pickup, Home Bridge, signature, hash, revision, or runtime gate
     behavior.
   - [x] Optional delivery setup modals use parent-facing `address` and `key`
-    labels instead of raw provider/password language, and explicitly say Pick Up
-    Later is not the Nanah signal server and cannot change rules by itself.
+    labels instead of raw provider/password language, and explicitly say
+    Internet Pickup is not the Nanah signal server and cannot change rules by
+    itself.
   - [x] Advanced pickup naming slice: the command center and provider setup
     modal now present the internet waiting path as `Internet Pickup` and keep
     `Home Bridge` for the same-network bridge. The docs still map these to the
-    underlying Pick Up Later/Home Bridge transports, but the first parent-facing
+    underlying mailbox/Home Bridge transports, but the first parent-facing
     labels now describe the outcome instead of the implementation.
   - [x] Advanced pickup summary alignment slice: Family Controls status rows,
     Settings handoff summaries, provider setup toasts, and verified-device path
@@ -531,7 +532,7 @@ Use these labels in normal UI:
 | Parent-facing label | Technical meaning |
 | --- | --- |
 | Send now / Live send | Live Nanah P2P while both devices are open. |
-| Pick Up Later | Encrypted internet pending-update service. |
+| Internet Pickup | Encrypted internet pending-update service. |
 | Home Bridge | Trusted same-network bridge/gateway. |
 | Protected device | Child/family/caregiver-managed target profile/device. |
 | Parent-approved list | Reviewed channel/keyword list materialized into profile rules. |
@@ -1272,8 +1273,8 @@ the current extension dashboard.
   protected Review Conflict action that opens a parent/account re-authed
   conflict/rejected remote-policy history filter.
   Automatic LAN peer discovery remains pending. The command center now has
-  compact Pick Up Later and Home Bridge setup rows that can configure, edit, or
-  disable the browser-side HTTPS mailbox client and local-network configured
+  compact Internet Pickup and Home Bridge setup rows that can configure, edit,
+  or disable the browser-side HTTPS mailbox client and local-network configured
   provider after parent/account re-auth. This does not add mailbox server
   authority, discovery-as-authority, or a standalone offline-send page.
   The parent UI now keeps the normal flow live-P2P first: create/select the
@@ -1281,7 +1282,7 @@ the current extension dashboard.
   when both sides are available. Unconfigured mailbox and local-network provider
   setup is hidden from the normal command center so parents are not asked to
   bring infrastructure. If a provider is already configured, the UI labels it as
-  Pick Up Later or Home Bridge and uses plain parent/user language while audit
+  Internet Pickup or Home Bridge and uses plain parent/user language while audit
   docs retain the trusted-link, target-profile, scope, revision, hash, and
   signature authority proof. The setup modals now ask for an address and an
   optional key, not a vague provider/password, and state that those paths do not
