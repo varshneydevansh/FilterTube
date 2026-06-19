@@ -5584,7 +5584,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (summary.remoteScopeCount) {
             const linkLabel = summary.remoteLinkCount === 1 ? 'link' : 'links';
             const scopeLabel = summary.remoteScopeCount === 1 ? 'scope' : 'scopes';
-            parts.push(`Remote sync: ${summary.remoteScopeCount} ${scopeLabel} across ${summary.remoteLinkCount} ${linkLabel}, latest r${summary.latestRemoteRevision}`);
+            parts.push(`Verified-device policy: ${summary.remoteScopeCount} ${scopeLabel} across ${summary.remoteLinkCount} ${linkLabel}, latest r${summary.latestRemoteRevision}`);
         }
         if (summary.historyRowCount) {
             const rowLabel = summary.historyRowCount === 1 ? 'row' : 'rows';
@@ -5594,7 +5594,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             parts.push(`History: ${summary.historyRowCount} ${rowLabel}, ${summary.protectedRowCount} protected${latest}`);
         }
         if (summary.remoteConflictCount) {
-            parts.push(`Remote conflicts: ${summary.remoteConflictCount}`);
+            parts.push(`Policy conflicts: ${summary.remoteConflictCount}`);
         }
         return parts.length
             ? `Managed status: ${parts.join(' | ')}`

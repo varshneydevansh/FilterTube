@@ -633,7 +633,7 @@
                 ? summary.latestActionLabel.trim()
                 : (summary.latestResult && summary.latestScope ? `${summary.latestResult}/${summary.latestScope}` : 'none');
             const syncLabel = summary.remoteScopeCount
-                ? `Remote r${summary.latestRemoteRevision}`
+                ? `Policy r${summary.latestRemoteRevision}`
                 : (summary.localLabels.length ? 'Local managed' : 'No policy yet');
             const remoteConflictCount = summary.remoteConflictCount || 0;
             const row = {
@@ -1301,7 +1301,7 @@
                 item.managedChannelListLabel ? { label: item.managedChannelListLabel, tone: 'success', title: item.managedChannelListDetail || 'Parent-approved lists attached to this profile.' } : null,
                 { label: syncState.label, tone: syncState.tone, title: item.deliveryPathDetail || 'Device delivery status.' },
                 item.syncTargetCount > 0 && item.syncOpenCheckCount > 0 ? { label: 'Checks on open', tone: 'success', title: 'This verified device can check for newer trusted parent updates when the protected profile opens.' } : null,
-                item.remoteScopeCount ? { label: item.syncLabel, tone: 'success', title: 'Latest accepted managed policy revision.' } : null,
+                item.remoteScopeCount ? { label: item.syncLabel, tone: 'success', title: 'Latest accepted protected-profile policy revision.' } : null,
                 item.pendingExtraTimeRequestLabel ? { label: item.pendingExtraTimeRequestLabel, tone: 'warning', title: item.pendingExtraTimeRequestDetail || 'This profile asked for more time.' } : null,
                 item.syncTargetCount > 0 && item.latestDeliveryLabel ? { label: item.latestDeliveryLabel, tone: item.latestDeliveryTone || 'neutral', title: 'Latest protected delivery attempt.' } : null,
                 item.syncSourceAckLabel ? { label: `Ack: ${item.syncSourceAckLabel}`, tone: 'neutral', title: 'Latest redacted acknowledgement from a protected device.' } : null

@@ -400,6 +400,11 @@ parent tool instead of a sync/debug console.
     instead of `Remote target profile` and `remote active profile`. This is a
     UI/copy-only parent-language change; selected target IDs, fixed target
     policy, source/replica roles, and managed-link validation are unchanged.
+  - [x] Protected-policy revision wording slice: Family Controls rows now show
+    `Policy rN` and managed status says `Verified-device policy` instead of
+    `Remote rN`/`Remote sync`. This changes only visible wording; accepted
+    revision state, remote conflict detection, and protected history semantics
+    are unchanged.
   - [ ] Scheduled subscription refresh remains a future slice. Until then,
     list updates happen only after a parent/account profile chooses Check or
     Refresh and approves the result.
