@@ -2309,11 +2309,16 @@ html[data-theme="dark"] .card::after {
 .ft-modal-overlay.managed-channel-list-modal-overlay {
     --managed-rule-modal-gutter: clamp(0.55rem, 1.7vw, 1.25rem);
     box-sizing: border-box;
-    display: grid;
-    align-items: center;
-    justify-items: center;
-    overflow: hidden;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
     padding: var(--managed-rule-modal-gutter);
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
 }
 
 .ft-modal-overlay.managed-channel-list-modal-overlay > .managed-channel-list-modal.ft-modal,
@@ -2323,12 +2328,11 @@ html[data-theme="dark"] .card::after {
     grid-template-rows: auto minmax(0, 1fr);
     width: min(1120px, calc(100vw - (var(--managed-rule-modal-gutter, 1rem) * 2)));
     max-width: calc(100vw - (var(--managed-rule-modal-gutter, 1rem) * 2));
-    height: min(840px, calc(100vh - (var(--managed-rule-modal-gutter, 1rem) * 2)));
-    height: min(840px, calc(100dvh - (var(--managed-rule-modal-gutter, 1rem) * 2)));
+    height: auto;
     max-height: calc(100vh - (var(--managed-rule-modal-gutter, 1rem) * 2));
     max-height: calc(100dvh - (var(--managed-rule-modal-gutter, 1rem) * 2));
     min-height: 0;
-    margin: auto;
+    margin: auto 0;
     overflow: hidden;
     transform: none;
 }
@@ -2358,7 +2362,7 @@ html[data-theme="dark"] .card::after {
     display: grid;
     grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr);
     gap: 0.9rem;
-    align-items: start;
+    align-items: stretch;
     min-height: 0;
     max-height: 100%;
     overflow: hidden;
@@ -2466,7 +2470,7 @@ html[data-theme="dark"] .card::after {
 .managed-channel-list-modal__format-card {
     display: grid;
     gap: 0.65rem;
-    align-self: start;
+    align-self: stretch;
     max-height: 100%;
     overflow: auto;
     overscroll-behavior: contain;
@@ -2942,7 +2946,6 @@ html[data-theme="dark"] .card::after {
     .ft-modal-overlay.managed-channel-list-modal-overlay > .managed-channel-list-modal {
         width: calc(100vw - 1rem);
         max-width: calc(100vw - 1rem);
-        height: calc(100dvh - 1rem);
         max-height: calc(100dvh - 1rem);
     }
 
@@ -2984,7 +2987,7 @@ html[data-theme="dark"] .card::after {
     }
 
     .managed-channel-list-modal__format-card {
-        max-height: calc(100dvh - 8rem);
+        max-height: 100%;
     }
 }
 
