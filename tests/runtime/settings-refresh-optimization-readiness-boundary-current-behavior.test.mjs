@@ -194,10 +194,10 @@ test('seed and lifecycle readiness remain blocked without replay and fanout budg
   assert.match(bridge, /function scheduleSeedRetry\(\) \{[\s\S]*?setTimeout\(\(\) => \{[\s\S]*?scheduleSeedRetry\(\);[\s\S]*?\}, 250\);/);
   assert.match(bridge, /function refreshRuntimeObserversAfterSettingsUpdate\(\) \{[\s\S]*?refreshFilterTubeRuntimeObservers\(\)[\s\S]*?FilterTube_refreshRuntimeObservers[\s\S]*?FilterTube_refreshQuickBlockAvailability[\s\S]*?FilterTube_refreshDOMFallbackObserver[\s\S]*?schedulePrefetchScan\(\)/);
   assert.match(bridge, /refreshFilterTubeRuntimeObservers\(\);[\s\S]*?return;[\s\S]*?window\.FilterTube_refreshRuntimeObservers\(\);[\s\S]*?return;/);
-  assert.match(contentBridge, /function refreshFilterTubeRuntimeObservers\(\) \{[\s\S]*?needsIdentityPrefetchWork\(currentSettings\)[\s\S]*?startCardPrefetchObserver\(\);[\s\S]*?installPlaylistPanelPrefetchHook\(\);[\s\S]*?schedulePrefetchScan\(\);[\s\S]*?prefetchQueue = \[\];/);
+  assert.match(contentBridge, /function refreshFilterTubeRuntimeObservers\(\) \{[\s\S]*?needsAnyPrefetchObserverWork\(currentSettings\)[\s\S]*?startCardPrefetchObserver\(\);[\s\S]*?installPlaylistPanelPrefetchHook\(\);[\s\S]*?schedulePrefetchScan\(\);[\s\S]*?prefetchQueue = \[\];/);
   assert.match(contentBridge, /currentSettings\?\.listMode === 'whitelist'[\s\S]*?installRightRailWhitelistObserver\(\);/);
   assert.match(contentBridge, /window\.FilterTube_refreshQuickBlockAvailability\(\{ force: true \}\);[\s\S]*?window\.FilterTube_refreshDOMFallbackObserver\(\);/);
-  assert.match(contentBridge, /function schedulePrefetchScan\(\) \{[\s\S]*?if \(!needsIdentityPrefetchWork\(currentSettings\)\) return;[\s\S]*?startCardPrefetchObserver\(\);[\s\S]*?installPlaylistPanelPrefetchHook\(\);/);
+  assert.match(contentBridge, /function schedulePrefetchScan\(\) \{[\s\S]*?if \(!needsAnyPrefetchObserverWork\(currentSettings\)\) return;[\s\S]*?startCardPrefetchObserver\(\);[\s\S]*?installPlaylistPanelPrefetchHook\(\);/);
   assert.match(seed, /if \(!hasNetworkJsonWork\(cachedSettings\)\) \{[\s\S]*?pendingDataQueue = \[\];[\s\S]*?rawYtInitialData = null;[\s\S]*?rawYtInitialPlayerResponse = null;[\s\S]*?return;/);
   assert.match(seed, /pendingDataQueue\.length > 0[\s\S]*?processWithEngine\(sourceData, `\$\{item\.name\}-queued`\)[\s\S]*?window\.ytInitialData = processed;/);
   assert.match(seed, /sourceInitialData[\s\S]*?processWithEngine\(sourceInitialData, 'ytInitialData-reprocess'\)[\s\S]*?sourcePlayerResponse[\s\S]*?processWithEngine\(sourcePlayerResponse, 'ytInitialPlayerResponse-reprocess'\)/);

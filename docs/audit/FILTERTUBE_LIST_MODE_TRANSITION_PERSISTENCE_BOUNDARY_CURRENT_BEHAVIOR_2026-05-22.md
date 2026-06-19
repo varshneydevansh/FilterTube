@@ -15,7 +15,7 @@ separate list-mode transition path owns the destructive copy/clear behavior.
 | --- | ---: | ---: | --- |
 | `js/background.js` | 6984 | 315747 | `080d15907b26314873138c5dcc5d9653a2a27e933049be10361dfe0047f0a7cc` |
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
-| `js/tab-view.js` | 21165 | 1003148 | `22069c9a78b98d8654138590f3a84ad17e4bbd129296e716b04897ff86e35b59` |
+| `js/tab-view.js` | 21165 | 1003183 | `7be6d42b9d725cb4a46351e7706b70c525c1465d3a1e97f71bf1a097a570db1a` |
 | `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
 
 ## Source/Effect Blocks Pinned
