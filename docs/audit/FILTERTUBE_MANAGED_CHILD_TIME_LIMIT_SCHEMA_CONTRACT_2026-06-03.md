@@ -172,8 +172,9 @@ runtime managed heartbeat active-policy revalidation: present
 runtime managed time-left status: present while an active child/protected
 profile has enforced time remaining
 runtime managed timeout overlay: present with budget, usage, reset context,
-protected-user ask-parent guidance, a safe Open FilterTube dashboard action,
-and protected request history that does not grant time or dismiss the lock
+plain-language protected-user pause guidance, a Request more time action, a safe
+Open FilterTube dashboard action, and protected request history that does not
+grant time or dismiss the lock
 runtime managed Main/Kids time gate: present
 YouTube runtime behavior changed by this contract: yes, for child profiles with enabled time-limit policy
 ```
@@ -198,14 +199,15 @@ The first runtime path is intentionally lazy:
   shows the daily limit, used time, and reset timing from the background-owned
   decision. It does not redirect to another site and does not use content-filter
   hide markers or hidden-content statistics.
-- The timeout copy uses plain parent/caregiver language: asking for more time
-  creates a request for the parent profile to review, but never unlocks YouTube
+- The timeout copy uses plain parent/caregiver language: YouTube is paused until
+  the daily reset or until a parent grants more time, and a visible guidance box
+  says that a request is only saved for parent review and never unlocks YouTube
   by itself.
 - The timeout surface offers `Open FilterTube` as a safe extension-dashboard
   route for parent/admin follow-up. Opening the dashboard does not unlock the
   protected profile, grant time, clear the overlay, or mutate policy; the
   existing dashboard parent/account gates still own any change.
-- The overlay's `Ask parent for more time` action sends a background request
+- The overlay's `Request more time` action sends a background request
   only after the timeout surface is visible. Background revalidates the active
   compiled child profile, profile id, policy revision/hash, YouTube route, and
   exhausted budget or expired-policy state before appending a redacted

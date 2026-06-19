@@ -843,16 +843,16 @@ function showManagedTimeoutOverlay(state) {
 
         const eyebrow = document.createElement('div');
         eyebrow.textContent = 'FilterTube parent-managed time';
-        eyebrow.style.cssText = 'color:#fca5a5;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0;margin-bottom:10px';
+        eyebrow.style.cssText = 'color:#fecaca;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px';
 
         const title = document.createElement('h1');
-        title.textContent = policyExpired ? `${surfaceLabel} needs parent approval` : `${surfaceLabel} time is finished for today`;
-        title.style.cssText = 'font-size:23px;line-height:1.2;margin:0 0 10px;font-weight:800;color:#fff';
+        title.textContent = policyExpired ? `${surfaceLabel} needs parent approval` : `${surfaceLabel} is paused for today`;
+        title.style.cssText = 'font-size:25px;line-height:1.18;margin:0 0 10px;font-weight:850;color:#fff;letter-spacing:0';
 
         const copy = document.createElement('p');
         copy.textContent = policyExpired
             ? `${profileName} needs a parent or caregiver to review this time rule before ${surfaceLabel} can continue.`
-            : `${profileName} has used today's parent-managed YouTube time. Come back after the daily reset, or ask a parent for more time.`;
+            : `${profileName} has used today's parent-managed YouTube time. YouTube stays paused until the daily reset or until a parent approves more time.`;
         copy.style.cssText = 'font-size:14px;line-height:1.5;margin:0;color:#cbd5e1';
 
         const facts = document.createElement('dl');
@@ -878,6 +878,22 @@ function showManagedTimeoutOverlay(state) {
             facts.append(dt, dd);
         });
 
+        const guidance = document.createElement('div');
+        guidance.textContent = policyExpired
+            ? 'Open FilterTube from a parent or caregiver profile to review this rule. This screen cannot be dismissed by the protected profile.'
+            : 'You can ask for more time from here. The request is saved for the parent profile to review, but it does not unlock YouTube by itself.';
+        guidance.style.cssText = [
+            'margin-top:18px',
+            'padding:11px 12px',
+            'border:1px solid rgba(148,163,184,.22)',
+            'border-radius:8px',
+            'background:rgba(15,23,42,.58)',
+            'color:#dbeafe',
+            'font-size:13px',
+            'font-weight:700',
+            'line-height:1.45'
+        ].join(';');
+
         const actionArea = document.createElement('div');
         actionArea.style.cssText = [
             'display:flex',
@@ -895,7 +911,7 @@ function showManagedTimeoutOverlay(state) {
 
         const askButton = document.createElement('button');
         askButton.type = 'button';
-        askButton.textContent = 'Ask parent for more time';
+        askButton.textContent = 'Request more time';
         askButton.style.cssText = [
             'min-height:44px',
             'border:0',
@@ -940,7 +956,7 @@ function showManagedTimeoutOverlay(state) {
 
         askButton.addEventListener('click', () => {
             instruction.style.display = 'block';
-            askButton.textContent = 'Waiting for parent approval';
+            askButton.textContent = 'Request sent';
             askButton.style.background = '#475569';
             askButton.disabled = true;
             askButton.style.cursor = 'default';
@@ -965,15 +981,15 @@ function showManagedTimeoutOverlay(state) {
                         const err = browserAPI_BRIDGE.runtime?.lastError;
                         if (!err && response?.ok === true) {
                             instruction.textContent = response.recorded === true
-                                ? 'Request saved. A parent or caregiver can open FilterTube, review the request, and grant more time from a trusted profile.'
-                                : 'A recent request is already saved. A parent or caregiver can review it from FilterTube.';
+                                ? 'Request saved for parent review. YouTube stays paused until a parent or caregiver grants more time from FilterTube.'
+                                : 'A recent request is already saved for parent review. YouTube stays paused until more time is granted from FilterTube.';
                         } else {
-                            instruction.textContent = 'A parent or caregiver can still open FilterTube and grant more time from a trusted profile.';
+                            instruction.textContent = 'A parent or caregiver can still open FilterTube and grant more time from a trusted profile. This button did not unlock YouTube.';
                         }
                         pauseManagedTimeoutVideos();
                     });
                 } catch (e) {
-                    instruction.textContent = 'A parent or caregiver can still open FilterTube and grant more time from a trusted profile.';
+                    instruction.textContent = 'A parent or caregiver can still open FilterTube and grant more time from a trusted profile. This button did not unlock YouTube.';
                 }
             }
         });
@@ -984,6 +1000,7 @@ function showManagedTimeoutOverlay(state) {
         panel.appendChild(title);
         panel.appendChild(copy);
         panel.appendChild(facts);
+        panel.appendChild(guidance);
         panel.appendChild(actionArea);
         overlay.appendChild(panel);
     } catch (e) {
