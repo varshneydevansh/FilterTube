@@ -496,10 +496,18 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /Meeting service link/);
   assert.match(tabViewHtml, /keep both devices open/);
   assert.match(tabViewHtml, /rule-list-format-showcase/);
+  assert.match(tabViewHtml, /id="ftRulePreviewCsv"/);
+  assert.match(tabViewHtml, /id="ftRulePreviewJson"/);
+  assert.match(tabViewHtml, /id="ftRulePreviewTxt"/);
+  assert.match(tabViewHtml, /id="ftRulePreviewUrl"/);
+  assert.match(tabViewHtml, /rule-list-format-stage/);
+  assert.match(tabViewHtml, /rule-list-preview-sheet/);
+  assert.match(tabViewHtml, /CSV spreadsheet-style rule list example/);
   assert.match(tabViewHtml, /CSV sheet/);
   assert.match(tabViewHtml, /JSON list/);
   assert.match(tabViewHtml, /TXT rows/);
   assert.match(tabViewHtml, /URL \/ BlockTube/);
+  assert.match(tabViewHtml, /https:\/\/raw\.githubusercontent\.com\/list\.csv/);
   assert.match(tabViewHtml, /Imported lists cannot change PINs, time limits, viewing spaces, profiles, or trusted devices/);
   assert.match(tabViewHtml, /Supported formats and templates/);
   assert.match(tabViewHtml, /Templates &amp; checks/);
