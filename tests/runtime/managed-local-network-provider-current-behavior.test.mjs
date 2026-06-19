@@ -249,8 +249,11 @@ test('dashboard source wires provider-gated local-network discovery without YouT
   assert.match(source, /No updates/);
   assert.match(source, /handleNanahIncomingManagedLocalNetworkCandidate\(candidate\)/);
   assert.match(source, /recordManagedOpenSyncAckHistory\(\{\s*request,\s*records: ackRecords,\s*ackResult,\s*transport: 'local_network'/s);
-  assert.match(source, /await runNanahManagedLocalNetworkSync\(\{ reason: 'dashboard_open' \}\)/);
-  assert.match(source, /await runNanahManagedLocalNetworkSync\(\{ reason: 'profile_switch' \}\)/);
+  assert.match(source, /function runNanahManagedBackgroundSync\(\{ reason = 'dashboard_open' \} = \{\}\)/);
+  assert.match(source, /await runNanahManagedLocalNetworkSync\(\{ reason: normalizedReason \}\)/);
+  assert.match(source, /void runNanahManagedBackgroundSync\(\{ reason: 'dashboard_open' \}\)/);
+  assert.match(source, /void runNanahManagedBackgroundSync\(\{ reason: 'profile_switch' \}\)/);
+  assert.doesNotMatch(source, /await runNanahManagedLocalNetworkSync\(\{ reason: 'profile_switch' \}\)/);
   assert.match(source, /Home Bridge/);
 });
 
@@ -272,8 +275,11 @@ test('dashboard source wires provider-gated parent delivery ack status without Y
   assert.match(source, /getManagedDeliveryAcks/);
   assert.match(source, /async function runNanahManagedSourceAckSync\(\{ reason = 'dashboard_open' \} = \{\}\)/);
   assert.match(source, /handleNanahIncomingManagedRemoteDeliveryAck\(ackPayload, \{ silent: true \}\)/);
-  assert.match(source, /await runNanahManagedSourceAckSync\(\{ reason: 'dashboard_open' \}\)/);
-  assert.match(source, /await runNanahManagedSourceAckSync\(\{ reason: 'profile_switch' \}\)/);
+  assert.match(source, /function runNanahManagedBackgroundSync\(\{ reason = 'dashboard_open' \} = \{\}\)/);
+  assert.match(source, /await runNanahManagedSourceAckSync\(\{ reason: normalizedReason \}\)/);
+  assert.match(source, /void runNanahManagedBackgroundSync\(\{ reason: 'dashboard_open' \}\)/);
+  assert.match(source, /void runNanahManagedBackgroundSync\(\{ reason: 'profile_switch' \}\)/);
+  assert.doesNotMatch(source, /await runNanahManagedSourceAckSync\(\{ reason: 'profile_switch' \}\)/);
   assert.match(source, /Delivery receipts/);
 
   const sliceStart = source.indexOf('function getNanahManagedSourceAckProvider()');

@@ -3,12 +3,14 @@
 **Generated**: 2026-06-04
 **Status**: Provider-gated dashboard/profile-open hook, provider ack handoff,
 protected ack-handoff history writer, and explicitly configured browser HTTPS
-mailbox pull/decrypt client are present. Local-network discovery and mailbox
-server authority are still absent. Adapter-level local mailbox seal/open helpers
-are covered separately. Protected-device managed-link setup now defaults to
-parent-managed open checks and writes an eligible `allow_trusted_updates`
-policy when profile-open checking is enabled, including independent protected
-account profiles as well as child profiles.
+mailbox pull/decrypt client are present. Provider-gated Home Bridge candidate
+discovery is present through the configured local-network client; built-in LAN
+peer discovery, built-in LAN transport, and mailbox server authority are still
+absent. Adapter-level local mailbox seal/open helpers are covered separately.
+Protected-device managed-link setup now defaults to parent-managed open checks
+and writes an eligible `allow_trusted_updates` policy when profile-open
+checking is enabled, including independent protected account profiles as well
+as child profiles.
 **Related plan**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`
 **Related inventory**:
@@ -27,13 +29,15 @@ protected redacted ack-handoff history row on the target profile so the parent
 or caregiver can later see whether the protected device reported the mailbox
 outcome back to the provider.
 
-The hook is intentionally not mailbox server authority. It does not poll from
-YouTube pages, does not add a service-worker scheduler, and does not make
-network discovery authority. If no provider or configured HTTPS mailbox client
-is installed, it records a local status of `pull_provider_unavailable` and
-leaves the last valid policy active. If the provider reports `ok: false` or
-throws, returned items are discarded, no mailbox item is applied, no ack is
-sent, and the last valid policy remains active.
+The hook is intentionally not mailbox server or local-network authority. It
+does not poll from YouTube pages, does not add a service-worker scheduler, and
+does not make network discovery authority. Internet Pickup can ask an explicit
+HTTPS pickup client for decrypted mailbox items; Home Bridge can ask an explicit
+configured local-network client for signed candidates. If no matching provider
+is installed, the hook records a local unavailable/no-update status and leaves
+the last valid policy active. If a provider reports `ok: false` or throws,
+returned items are discarded, no policy item is applied, no ack is sent, and the
+last valid policy remains active.
 
 ## Runtime Shape
 
@@ -158,7 +162,9 @@ runtime mailbox item apply reuse: present
 runtime pull status persistence: present
 runtime browser HTTPS mailbox pull/decrypt client: present behind explicit config
 runtime mailbox server authority: absent
-runtime local-network discovery: absent
+runtime provider-gated Home Bridge candidate discovery: present
+runtime built-in LAN peer discovery: absent
+runtime built-in LAN transport: absent
 runtime background scheduler: absent
 runtime YouTube page hot-path work from this slice: absent
 ```
