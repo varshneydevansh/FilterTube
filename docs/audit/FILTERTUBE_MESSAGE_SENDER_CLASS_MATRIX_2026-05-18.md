@@ -50,8 +50,10 @@ Current branch inventory:
 | `FilterTube_FirstRunCheck` | Any extension sender with runtime access | Reads first-run state | `trustedUi` |
 | `FilterTube_FirstRunComplete` | Any extension sender with runtime access | Writes first-run state | `trustedUi` |
 | `FilterTube_OpenWhatsNew` | Any extension sender with runtime access | Opens a tab using caller URL fallback | `trustedUi` plus allowlisted URL |
+| `FilterTube_OpenDashboard` | Any extension sender with runtime access | Opens the FilterTube dashboard tab from managed timeout/profile flows | `trustedUi` or managed timeout child route proof |
 | `FilterTube_SubscriptionsImportProgress` | Any extension sender with runtime access | Logs import progress | `allowedYoutubeContentScript` with pending import request |
 | `FilterTube_ManagedTimeLimitHeartbeat` | Any extension sender with runtime access | Records managed profile time usage heartbeat and returns remaining budget or timeout state | `allowedYoutubeContentScript` with active profile, tab, route, and surface proof |
+| `FilterTube_ManagedTimeLimitParentRequest` | Any extension sender with runtime access | Records a protected profile request for parent review when the compiled time-limit policy is already exhausted | `allowedYoutubeContentScript` with active protected profile, matching policy hash/revision, tab, route, and surface proof |
 | `getCompiledSettings` | Any extension sender with runtime access | Compiles/caches settings for inferred/requested profile | `allowedYoutubeContentScript` |
 | `FilterTube_SessionPinAuth` | Guarded by `isTrustedUiSender(sender)` | Verifies and caches session PIN in memory; persists failed-attempt rate-limit state | `trustedUi` |
 | `FilterTube_ClearSessionPin` | Guarded by `isTrustedUiSender(sender)` | Clears cached session PIN | `trustedUi` |

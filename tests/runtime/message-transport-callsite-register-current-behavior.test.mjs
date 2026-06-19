@@ -9,21 +9,21 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_MESSAGE_TRANSPORT_CALLSITE_REGISTER_CURRENT_BEHAVIOR_2026-05-22.md';
 
 const sourceFingerprints = {
-  'js/background.js': [6803, 306710, '57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7'],
+  'js/background.js': [6984, 315747, '080d15907b26314873138c5dcc5d9653a2a27e933049be10361dfe0047f0a7cc'],
   'js/content/bridge_injection.js': [127, 4741, 'd1b84cf4c43ec5ff5cdc3bd607d8f3d3bf448c12829780b0d05fb9fc14fb5d3e'],
-  'js/content/bridge_settings.js': [1127, 44545, 'fad07aba48391021d5e42096b34f32c58a6337a1a4d303a8706927c541d47f71'],
+  'js/content/bridge_settings.js': [1459, 57855, '6434bd16233044ebb4aaef69261126f3b1852213cffd24ce82b4ecf2bb7a4486'],
   'js/content/collab_dialog.js': [393, 14623, 'dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a'],
   'js/content/first_run_prompt.js': [190, 7453, '5672d9060d29b08550ecfc3add54245212a5094ee5137f025b6f788f12e50409'],
   'js/content/handle_resolver.js': [282, 9785, '67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff'],
   'js/content/release_notes_prompt.js': [250, 9866, '30b624cbbda1004f354f98dbf3b4513f8ebc298adecbceb4358782f248f80474'],
-  'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
+  'js/content_bridge.js': [13803, 610592, 'cc838f9f12fc6941bba04b7a0244a14ef60581461bcc24dbb8ba7a9bce8e287b'],
   'js/filter_logic.js': [3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'],
-  'js/injector.js': [3593, 155830, '634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04'],
+  'js/injector.js': [3696, 160366, '468e59a4749bbb8aa52723aaab51dbac44076885f211f05f0a73096d2e49d2b9'],
   'js/managed_admin_authority.js': [171, 7314, 'c9355520ba9779c0b94b67cf67a68c446b84ea4532995d83ef52a3e708a975aa'],
   'js/popup.js': [1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
   'js/seed.js': [1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
   'js/state_manager.js': [2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6'],
-  'js/tab-view.js': [14984, 698493, '82345bda27253dc5c5644c36dd97c2cfafb442d2ecb391818c38f6ea5dad5c65']
+  'js/tab-view.js': [21158, 1002771, '4b1d3e58b0eebe9ac0756c4417daa8874e34a281027d8d7622f1556409df2e9b']
 };
 
 function read(file) {
@@ -117,37 +117,37 @@ function assertMessageSenderReceiverOwnerSnapshot(text) {
   const rows = transportRows();
 
   assert.match(text, /Message Sender\/Receiver and Owner Layer Addendum - 2026-05-27/);
-  assert.match(text, /message sender rows: 57/);
+  assert.match(text, /message sender rows: 59/);
   assert.match(text, /message receiver rows: 8/);
-  assert.match(text, /extension runtime transport rows: 32/);
+  assert.match(text, /extension runtime transport rows: 34/);
   assert.match(text, /page-message transport rows: 30/);
   assert.match(text, /tab-message transport rows: 3/);
-  assert.match(text, /owner-layer rows: isolated-content-runtime 33, main-world-page-runtime 19, extension-ui-state 10, background 3/);
+  assert.match(text, /owner-layer rows: isolated-content-runtime 35, main-world-page-runtime 19, extension-ui-state 10, background 3/);
   assert.match(text, /message sender\/receiver authority: NO-GO/);
   assert.match(text, /runtime behavior changed by this addendum: no/);
   assert.deepEqual(countBy(rows.map(row => ({ direction: messageDirection(row) })), 'direction'), {
     receiver: 8,
-    sender: 57
+    sender: 59
   });
   assert.deepEqual(countBy(rows.map(row => ({ boundary: messageBoundary(row) })), 'boundary'), {
-    'extension-runtime': 32,
+    'extension-runtime': 34,
     'page-message': 30,
     'tab-message': 3
   });
   assert.deepEqual(countBy(rows.map(row => ({ ownerLayer: messageOwnerLayer(row.file) })), 'ownerLayer'), {
     background: 3,
     'extension-ui-state': 10,
-    'isolated-content-runtime': 33,
+    'isolated-content-runtime': 35,
     'main-world-page-runtime': 19
   });
 
   for (const phrase of [
-    '| `sender` | 57 |',
+    '| `sender` | 59 |',
     '| `receiver` | 8 |',
-    '| `extension-runtime` | 32 |',
+    '| `extension-runtime` | 34 |',
     '| `page-message` | 30 |',
     '| `tab-message` | 3 |',
-    '| `isolated-content-runtime` | 33 |',
+    '| `isolated-content-runtime` | 35 |',
     '| `main-world-page-runtime` | 19 |',
     '| `extension-ui-state` | 10 |',
     '| `background` | 3 |',
@@ -164,15 +164,15 @@ test('message transport callsite register is audit-only and source pinned', () =
 
   assert.match(text, /Status: audit-only current-behavior register/);
   assert.match(text, /Runtime behavior is unchanged/);
-  assert.match(text, /tracked product JS\/JSX\/MJS files scanned: 71/);
+  assert.match(text, /tracked product JS\/JSX\/MJS files scanned: 74/);
   assert.match(text, /js\/managed_parent_command_center\.js.*zero message\s+transport\s+rows/s);
   assert.match(text, /js\/managed_admin_authority\.js.*zero message\s+transport rows/s);
   assert.match(text, /js\/nanah_managed_live_policy\.js.*zero message\s+transport rows/s);
   assert.match(text, /js\/nanah_managed_open_sync\.js.*zero message\s+transport rows/s);
   assert.match(text, /tracked product files with message transport rows: 14/);
-  assert.match(text, /message transport rows: 65/);
+  assert.match(text, /message transport rows: 67/);
   assert.match(text, /runtime.onMessage.addListener rows: 4/);
-  assert.match(text, /runtime.sendMessage rows: 28/);
+  assert.match(text, /runtime.sendMessage rows: 30/);
   assert.match(text, /tabs.sendMessage rows: 3/);
   assert.match(text, /window.addEventListener\("message"\) rows: 4/);
   assert.match(text, /window.postMessage rows: 26/);
@@ -196,11 +196,11 @@ test('message transport callsite counts remain source-derived', () => {
   const rows = transportRows();
   const text = doc();
 
-  assert.equal(productScriptFiles().length, 71);
-  assert.equal(rows.length, 65);
+  assert.equal(productScriptFiles().length, 74);
+  assert.equal(rows.length, 67);
   assert.deepEqual(countBy(rows, 'operation'), {
     'runtime.onMessage.addListener': 4,
-    'runtime.sendMessage': 28,
+    'runtime.sendMessage': 30,
     'tabs.sendMessage': 3,
     'window.addEventListener(message)': 4,
     'window.postMessage': 26
@@ -208,7 +208,7 @@ test('message transport callsite counts remain source-derived', () => {
   assert.deepEqual(countBy(rows, 'file'), {
     'js/background.js': 3,
     'js/content/bridge_injection.js': 1,
-    'js/content/bridge_settings.js': 7,
+    'js/content/bridge_settings.js': 9,
     'js/content/collab_dialog.js': 1,
     'js/content/first_run_prompt.js': 2,
     'js/content/handle_resolver.js': 4,
