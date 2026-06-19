@@ -509,15 +509,20 @@
                                                                 <span>Choose Main, Kids, or both. Send Update only for verified devices.</span>
                                                             </div>
                                                         </div>
-                                                        <div class="rule-list-format-showcase" aria-label="Rule list format previews">
-                                                            <div class="rule-list-format-showcase__header">
-                                                                <div>
-                                                                    <strong>Supported list examples</strong>
-                                                                    <span>Use the example that looks closest to your file. FilterTube still previews parsed rows before it adds anything.</span>
+                                                        <details class="rule-list-format-disclosure">
+                                                            <summary>
+                                                                <span>Preview supported file shapes</span>
+                                                                <code>CSV · JSON · TXT · URL</code>
+                                                            </summary>
+                                                            <div class="rule-list-format-showcase" aria-label="Rule list format previews">
+                                                                <div class="rule-list-format-showcase__header">
+                                                                    <div>
+                                                                        <strong>Supported list examples</strong>
+                                                                        <span>Use the example that looks closest to your file. FilterTube still previews parsed rows before it adds anything.</span>
+                                                                    </div>
+                                                                    <code>safe preview</code>
                                                                 </div>
-                                                                <code>safe preview</code>
-                                                            </div>
-                                                            <div class="rule-list-format-stage">
+                                                                <div class="rule-list-format-stage">
                                                                 <article class="rule-list-format-panel rule-list-format-panel--csv">
                                                                     <div class="rule-list-format-panel__copy">
                                                                         <span class="rule-list-format-panel__eyebrow">Spreadsheet file</span>
@@ -708,10 +713,12 @@
                                                                         </div>
                                                                     </div>
                                                                 </article>
+                                                                </div>
                                                             </div>
-                                                        </div>
+                                                        </details>
                                                         <fieldset class="rule-list-target-picker" aria-label="Where to apply imported rule list">
-                                                            <legend>Apply imported rules to</legend>
+                                                            <legend>Where should this list work?</legend>
+                                                            <p class="rule-list-target-picker__hint">Choose before import. The file can add rules here, but it cannot choose profiles, PINs, time limits, trusted devices, or sync destinations.</p>
                                                             <label>
                                                                 <input type="radio" name="ftRuleListImportTarget" value="main" checked />
                                                                 <span>Main YouTube</span>

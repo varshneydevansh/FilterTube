@@ -836,6 +836,81 @@ body[data-surface="popup"] .input-group {
         0 18px 36px -34px rgba(52, 26, 20, 0.48);
 }
 
+.rule-list-format-disclosure {
+    display: grid;
+    gap: 0.58rem;
+    max-width: min(100%, 50rem);
+}
+
+.rule-list-format-disclosure summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: 2.8rem;
+    padding: 0.58rem 0.72rem;
+    border: 1px solid rgba(171, 68, 56, 0.16);
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--ft-color-text-primary);
+    cursor: pointer;
+    list-style: none;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.76);
+    transition:
+        border-color 0.22s cubic-bezier(0.32, 0.72, 0, 1),
+        transform 0.22s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.rule-list-format-disclosure summary::-webkit-details-marker {
+    display: none;
+}
+
+.rule-list-format-disclosure summary::after {
+    content: '+';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 1.55rem;
+    height: 1.55rem;
+    border: 1px solid rgba(171, 68, 56, 0.2);
+    border-radius: 999px;
+    color: var(--ft-color-brand-primary);
+    font-size: 1rem;
+    font-weight: 850;
+    line-height: 1;
+}
+
+.rule-list-format-disclosure[open] summary::after {
+    content: '-';
+}
+
+.rule-list-format-disclosure summary:hover,
+.rule-list-format-disclosure summary:focus-visible {
+    border-color: rgba(171, 68, 56, 0.32);
+    transform: translateY(-1px);
+}
+
+.rule-list-format-disclosure summary span {
+    min-width: 0;
+    color: var(--ft-color-text-primary);
+    font-size: 0.86rem;
+    font-weight: 880;
+    line-height: 1.2;
+}
+
+.rule-list-format-disclosure summary code {
+    flex: 0 0 auto;
+    padding: 0.24rem 0.48rem;
+    border: 1px solid rgba(21, 128, 61, 0.18);
+    border-radius: 999px;
+    background: rgba(229, 246, 236, 0.78);
+    color: #14633a;
+    font-size: 0.68rem;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+}
+
 .rule-list-format-showcase__header {
     display: flex;
     align-items: center;
@@ -1489,6 +1564,16 @@ body[data-surface="popup"] .input-group {
     text-transform: uppercase;
 }
 
+.rule-list-target-picker__hint {
+    width: 100%;
+    max-width: 42rem;
+    margin: -0.02rem 0 0.16rem;
+    color: var(--ft-color-text-secondary);
+    font-size: 0.8rem;
+    font-weight: 620;
+    line-height: 1.42;
+}
+
 .rule-list-target-picker label {
     position: relative;
     min-width: 0;
@@ -1704,6 +1789,33 @@ html[data-theme="dark"] .rule-list-format-showcase {
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
+html[data-theme="dark"] .rule-list-format-disclosure summary {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--ft-color-text-primary-dark);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+html[data-theme="dark"] .rule-list-format-disclosure summary:hover,
+html[data-theme="dark"] .rule-list-format-disclosure summary:focus-visible {
+    border-color: rgba(195, 90, 75, 0.34);
+}
+
+html[data-theme="dark"] .rule-list-format-disclosure summary span {
+    color: var(--ft-color-text-primary-dark);
+}
+
+html[data-theme="dark"] .rule-list-format-disclosure summary code {
+    border-color: rgba(74, 222, 128, 0.16);
+    background: rgba(34, 197, 94, 0.1);
+    color: #b8f2ce;
+}
+
+html[data-theme="dark"] .rule-list-format-disclosure summary::after {
+    border-color: rgba(195, 90, 75, 0.34);
+    color: #f7c7bd;
+}
+
 html[data-theme="dark"] .rule-list-format-showcase__header strong {
     color: var(--ft-color-text-primary-dark);
 }
@@ -1829,6 +1941,10 @@ html[data-theme="dark"] .rule-list-target-picker span {
     background: rgba(255, 255, 255, 0.05);
     color: var(--ft-color-text-secondary-dark);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+html[data-theme="dark"] .rule-list-target-picker__hint {
+    color: var(--ft-color-text-secondary-dark);
 }
 
 html[data-theme="dark"] .rule-list-target-picker label:hover span,
@@ -2538,6 +2654,11 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
 
     .rule-list-format-showcase {
         padding: 0.52rem;
+    }
+
+    .rule-list-format-disclosure summary {
+        align-items: flex-start;
+        flex-direction: column;
     }
 
     .rule-list-format-showcase__header {

@@ -332,6 +332,13 @@ parent tool instead of a sync/debug console.
     only: parser support, preview-before-apply, Main/Kids/Both target choice,
     source metadata, parent/account approval, and verified-device delivery
     authority are unchanged.
+  - [x] 2026-06-19 Settings rule-list density slice: the Settings import card
+    now keeps the parent path visible first and moves the full CSV/JSON/TXT/URL
+    examples behind `Preview supported file shapes`. The Main/Kids/Both target
+    picker stays visible with explicit copy that imported files cannot choose
+    profiles, PINs, time limits, trusted devices, or sync destinations. Parser
+    behavior, preview-before-apply, and verified-device delivery authority are
+    unchanged.
   - [x] Optional delivery discovery slice: after at least one protected profile
     exists and no optional provider is configured, Family Controls now shows one
     compact advanced pickup prompt. First setup still leads with live Send

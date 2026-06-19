@@ -503,6 +503,9 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /Meeting service link/);
   assert.match(tabViewHtml, /keep both devices open/);
   assert.match(tabViewHtml, /rule-list-format-showcase/);
+  assert.match(tabViewHtml, /rule-list-format-disclosure/);
+  assert.match(tabViewHtml, /Preview supported file shapes/);
+  assert.match(tabViewHtml, /CSV · JSON · TXT · URL/);
   assert.doesNotMatch(tabViewHtml, /id="ftRulePreview/);
   assert.doesNotMatch(tabViewHtml, /rule-list-format-tabs/);
   assert.match(tabViewHtml, /Supported list examples/);
@@ -541,7 +544,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /managed-channel-list-modal__mini-code/);
   assert.match(source, /managed-channel-list-modal__mini-lines/);
   assert.match(source, /Files only add channel and keyword rules/);
-  assert.match(tabViewHtml, /Apply imported rules to/);
+  assert.match(tabViewHtml, /Where should this list work\?/);
+  assert.match(tabViewHtml, /The file can add rules here, but it cannot choose profiles, PINs, time limits, trusted devices, or sync destinations/);
   assert.doesNotMatch(tabViewHtml, /<h3>Device Trust &amp; Sync<\/h3>/);
   assert.doesNotMatch(tabViewHtml, /Completely P2P after handshake/);
   assert.match(source, /function renderManagedChildSyncBoundary\(\)/);
