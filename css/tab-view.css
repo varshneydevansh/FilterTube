@@ -2308,7 +2308,7 @@ html[data-theme="dark"] .card::after {
 
 .managed-channel-list-modal-overlay {
     --managed-rule-modal-gutter: clamp(0.55rem, 1.7vw, 1.25rem);
-    align-items: center;
+    align-items: stretch;
     box-sizing: border-box;
     overflow: hidden;
     padding: var(--managed-rule-modal-gutter);
@@ -2326,6 +2326,7 @@ html[data-theme="dark"] .card::after {
     max-height: calc(100vh - (var(--managed-rule-modal-gutter, 1rem) * 2));
     max-height: calc(100dvh - (var(--managed-rule-modal-gutter, 1rem) * 2));
     min-height: 0;
+    margin: auto;
     overflow: hidden;
     transform: none;
 }
@@ -2340,28 +2341,33 @@ html[data-theme="dark"] .card::after {
 
 .managed-channel-list-modal__body {
     display: grid;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto minmax(0, 1fr) auto;
     gap: 0.9rem;
     min-height: 0;
     overflow: auto;
     overscroll-behavior: contain;
-    padding-bottom: var(--ft-space-lg);
+    padding: var(--ft-space-lg);
 }
 
 .managed-channel-list-modal__layout {
     display: grid;
-    grid-template-columns: minmax(19rem, 25rem) minmax(0, 1fr);
+    grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr);
     gap: 0.9rem;
     align-items: start;
     min-height: 0;
-    overflow: visible;
+    overflow: hidden;
     padding-right: 0.18rem;
 }
 
 .managed-channel-list-modal__form {
     display: grid;
     gap: 0.82rem;
+    align-content: start;
     min-width: 0;
+    max-height: 100%;
+    overflow: auto;
+    overscroll-behavior: contain;
+    padding-right: 0.12rem;
 }
 
 .managed-channel-list-modal .ft-modal-actions {
@@ -2455,9 +2461,7 @@ html[data-theme="dark"] .card::after {
     display: grid;
     gap: 0.65rem;
     align-self: start;
-    position: sticky;
-    top: 0.1rem;
-    max-height: calc(100dvh - 9.5rem);
+    max-height: 100%;
     overflow: auto;
     overscroll-behavior: contain;
     padding: 0.78rem;
@@ -2939,12 +2943,19 @@ html[data-theme="dark"] .card::after {
 
     .managed-channel-list-modal__layout {
         grid-template-columns: 1fr;
+        overflow: visible;
     }
 
     .managed-channel-list-modal__format-card {
         position: static;
         max-height: none;
         overflow: visible;
+    }
+
+    .managed-channel-list-modal__form {
+        max-height: none;
+        overflow: visible;
+        padding-right: 0;
     }
 }
 

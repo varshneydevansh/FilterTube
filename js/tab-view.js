@@ -8422,9 +8422,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderPreview();
             setTimeout(() => {
                 try {
-                    nameInput.focus();
+                    nameInput.focus({ preventScroll: true });
                     nameInput.select();
                 } catch (e) {
+                    try {
+                        nameInput.focus();
+                        nameInput.select();
+                    } catch (innerError) {
+                    }
                 }
             }, 0);
         });
