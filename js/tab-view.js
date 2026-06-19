@@ -2645,6 +2645,11 @@ function handleNavigationIntent() {
                 }
             }
         }
+        if (viewId === 'sync' && (section || flow)) {
+            if (['device-updates', 'deviceupdates', 'family-device-updates', 'familyupdates', 'nanah'].includes(section) || flow === 'device-updates') {
+                focusFamilyDeviceUpdatesCard();
+            }
+        }
     } catch (e) {
     }
     if (viewId === 'whatsnew') {
@@ -2653,6 +2658,29 @@ function handleNavigationIntent() {
             requestAnimationFrame(() => view.scrollIntoView({ behavior: 'smooth', block: 'start' }));
         }
     }
+}
+
+function focusFamilyDeviceUpdatesCard() {
+    const target = document.getElementById('familyDeviceUpdatesCard') || document.querySelector('.nanah-sync-card');
+    if (!target) return;
+    requestAnimationFrame(() => {
+        try {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } catch (e) {
+            target.scrollIntoView();
+        }
+        try {
+            target.focus({ preventScroll: true });
+        } catch (e) {
+        }
+        target.classList.add('is-guided-focus');
+        window.setTimeout(() => {
+            try {
+                target.classList.remove('is-guided-focus');
+            } catch (e) {
+            }
+        }, 1800);
+    });
 }
 
 /**
@@ -18362,6 +18390,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else {
                 document.querySelector('.nav-item[data-tab="sync"]')?.click();
             }
+            focusFamilyDeviceUpdatesCard();
         });
     }
 

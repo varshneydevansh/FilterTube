@@ -356,6 +356,13 @@ parent tool instead of a sync/debug console.
     points to Accounts & Sync > Family Device Updates for pair/send/receive
     work. This keeps backup import, rule-list import, and verified-device
     update flows visually separate.
+  - [x] Settings-to-device-updates navigation slice: the Settings `Device
+    Updates` shortcut now switches to Accounts & Sync, scrolls directly to the
+    Family Device Updates card, gives that card programmatic focus, and applies
+    a temporary non-layout-shifting focus ring. The same card is addressable
+    from navigation intent with `section=device-updates`, making help links and
+    future deep links land on the actual send/receive workflow instead of the
+    top of Accounts & Sync.
   - [x] Verified-device pickup wording slice: trusted protected-profile links
     now describe `syncOnProfileOpen` as `Check on open` instead of a transport
     name. The modal explains that a protected profile checks for newer approved
