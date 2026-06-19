@@ -11,6 +11,18 @@
         'authSecret',
         'secret'
     ]);
+    const FORBIDDEN_DELIVERY_ACK_KEYS = new Set([
+        'payload',
+        'policy',
+        'keywords',
+        'channels',
+        'videos',
+        'videoIds',
+        'whitelistKeywords',
+        'whitelistChannels',
+        'blockedKeywords',
+        'blockedChannels'
+    ]);
 
     function normalizeString(value) {
         return typeof value === 'string' ? value.trim() : '';
@@ -86,6 +98,18 @@
         for (const [key, child] of Object.entries(value)) {
             if (PRIVATE_KEY_NAMES.has(key)) return true;
             if (containsPrivateKey(child, seen)) return true;
+        }
+        return false;
+    }
+
+    function containsDeliveryAckPlaintext(value, seen = new WeakSet()) {
+        if (!value || typeof value !== 'object') return false;
+        if (seen.has(value)) return false;
+        seen.add(value);
+        if (Array.isArray(value)) return value.some(item => containsDeliveryAckPlaintext(item, seen));
+        for (const [key, child] of Object.entries(value)) {
+            if (FORBIDDEN_DELIVERY_ACK_KEYS.has(key)) return true;
+            if (containsDeliveryAckPlaintext(child, seen)) return true;
         }
         return false;
     }
@@ -215,6 +239,58 @@
         };
     }
 
+    function sanitizeDeliveryAckPullRequest(request) {
+        const root = safeObject(request);
+        return {
+            schema: normalizeString(root.schema) || 'filtertube_managed_source_delivery_ack_request',
+            version: Number(root.version) || 1,
+            reason: normalizeString(root.reason) || 'dashboard_open',
+            requestedAt: Number(root.requestedAt) || Date.now(),
+            linkId: normalizeString(root.linkId),
+            remoteDeviceId: normalizeString(root.remoteDeviceId),
+            sourceDeviceId: normalizeString(root.sourceDeviceId),
+            sourceProfileId: normalizeString(root.sourceProfileId),
+            targetProfileId: normalizeString(root.targetProfileId),
+            allowedScopes: safeArray(root.allowedScopes).map(scope => normalizeString(scope).toLowerCase()).filter(Boolean),
+            sentPolicies: safeArray(root.sentPolicies).map((policy) => {
+                const row = safeObject(policy);
+                return {
+                    scope: normalizeString(row.scope).toLowerCase(),
+                    revision: Number(row.revision) || null,
+                    policyHash: normalizeString(row.policyHash),
+                    sentAt: Number(row.sentAt) || null,
+                    lastAckAt: Number(row.lastAckAt) || null,
+                    lastAckState: normalizeString(row.lastAckState) || null,
+                    lastAckResult: normalizeString(row.lastAckResult) || null
+                };
+            }).filter(row => row.scope && row.revision && row.policyHash)
+        };
+    }
+
+    function sanitizeDeliveryAckPayload(payload) {
+        const root = safeObject(payload);
+        if (containsPrivateKey(root) || containsDeliveryAckPlaintext(root)) return {};
+        return {
+            schema: normalizeString(root.schema) || 'filtertube_managed_local_network_candidate_ack',
+            version: Number(root.version) || 1,
+            ackedAt: Number(root.ackedAt) || Date.now(),
+            linkId: normalizeString(root.linkId),
+            localNetworkCandidateId: normalizeString(root.localNetworkCandidateId || root.candidateId),
+            candidateId: normalizeString(root.candidateId || root.localNetworkCandidateId),
+            targetProfileId: normalizeString(root.targetProfileId),
+            sourceDeviceId: normalizeString(root.sourceDeviceId),
+            sourceProfileId: normalizeString(root.sourceProfileId),
+            scope: normalizeString(root.scope).toLowerCase(),
+            revision: Number(root.revision) || null,
+            policyHash: normalizeString(root.policyHash),
+            ackState: normalizeString(root.ackState) || 'rejected',
+            accepted: root.accepted === true,
+            applied: root.applied === true,
+            decision: normalizeString(root.decision),
+            reason: normalizeString(root.reason) || null
+        };
+    }
+
     function createProvider(config = {}, deps = {}) {
         const parsed = parseConfig(config);
         const endpointUrl = resolveEndpointUrl(parsed.endpointUrl || parsed.url || parsed.baseUrl);
@@ -223,6 +299,7 @@
         const publishPath = parsed.publishPath || 'managed-local-network/publish';
         const discoverPath = parsed.discoverPath || 'managed-local-network/discover';
         const ackPath = parsed.ackPath || 'managed-local-network/ack';
+        const ackPullPath = parsed.ackPullPath || parsed.deliveryAckPath || 'managed-local-network/ack/pull';
 
         function unavailable(reason) {
             return { schema: PROVIDER_SCHEMA, version: 1, ok: false, reason };
@@ -277,6 +354,17 @@
             return postJson(ackPath, sanitizeAckRequest(request));
         }
 
+        async function pullManagedDeliveryAcks(request) {
+            const result = await postJson(ackPullPath, sanitizeDeliveryAckPullRequest(request));
+            if (result.ok === false) return { ...result, acks: [] };
+            return {
+                ...result,
+                acks: safeArray(result.acks || result.items || result.payloads)
+                    .map(sanitizeDeliveryAckPayload)
+                    .filter(row => row.linkId && row.scope && row.revision && row.policyHash)
+            };
+        }
+
         return {
             schema: PROVIDER_SCHEMA,
             version: 1,
@@ -290,7 +378,10 @@
             discoverManagedPolicyCandidates,
             discoverLocalNetworkCandidates: discoverManagedPolicyCandidates,
             ackLocalNetworkCandidates,
-            ackManagedPolicyCandidates: ackLocalNetworkCandidates
+            ackManagedPolicyCandidates: ackLocalNetworkCandidates,
+            pullManagedDeliveryAcks,
+            pullRemoteDeliveryAcks: pullManagedDeliveryAcks,
+            getManagedDeliveryAcks: pullManagedDeliveryAcks
         };
     }
 

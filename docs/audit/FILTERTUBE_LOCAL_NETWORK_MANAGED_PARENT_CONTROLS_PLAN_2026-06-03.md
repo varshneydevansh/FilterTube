@@ -451,6 +451,13 @@ parent tool instead of a sync/debug console.
     delivery and `Automatic saved updates` on protected profile open wired to the
     same explicitly configured pickup service without changing provider authority,
     encryption, target-profile, scope, revision, hash, or signature validation.
+  - [x] Built-in delivery receipt pull slice: the configured Internet Pickup and
+    Home Bridge clients now expose source-side redacted delivery receipt pull
+    methods, and the dashboard uses an explicit external receipt provider when
+    present or aggregates the built-in configured providers when absent. This
+    lets parent/source rows update delivery receipt feedback for previously sent
+    revisions without adding background polling, server authority, plaintext
+    rule exposure, or YouTube page hot-path work.
   - [x] Trusted-device card wording slice: saved managed links now show
     `Allowed areas`, `Usual area`, `Update behavior`, `Matching parent updates`,
     `Next connection`, `Everyday protection`, `Where updates land`, and

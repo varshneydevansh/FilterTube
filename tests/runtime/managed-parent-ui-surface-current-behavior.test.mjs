@@ -481,6 +481,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /id="managedChildSyncBoundary"/);
   assert.match(tabViewHtml, /Family device updates/);
   assert.match(tabViewHtml, /<h3>Family Device Updates<\/h3>/);
+  assert.match(tabViewHtml, />\s*Device Updates\s*</);
+  assert.doesNotMatch(tabViewHtml, />\s*Send to Device\s*</);
   assert.match(tabViewHtml, /Pick profile/);
   assert.match(tabViewHtml, /Connect the other device/);
   assert.match(tabViewHtml, /Advanced options/);
@@ -596,6 +598,7 @@ test('managed command-center spec pins parent workflow without making UI authori
   assert.match(doc, /Viewing-space and time-limit saves offer scoped verified-device pushes only\s+for changed profiles with delivery ready/);
   assert.match(plan, /Device Trust & Sync copy was tightened again for parent\/caregiver use/);
   assert.match(plan, /Family Device Updates wording slice/);
+  assert.match(plan, /says `Device Updates` instead of `Sync from other device`, `Send to Device`/);
   assert.match(plan, /the first-read panel now says `Family device updates`, `Pick profile`, and\s+`Connect the other device`/);
   assert.match(doc, /Mobile-first layout with a single-column protected-profile list/);
   assert.match(doc, /Touch targets .* at\s+least 44px high/);

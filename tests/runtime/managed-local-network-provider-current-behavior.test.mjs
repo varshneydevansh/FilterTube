@@ -202,6 +202,7 @@ test('local-network provider hook is docs-backed and linked from managed parent 
   assert.match(sourceAckDoc, /Source-side mailbox\/local-network delivery ack intake and dashboard\s+status are present/);
   assert.match(sourceAckDoc, /filtertube_managed_source_delivery_ack_request/);
   assert.match(sourceAckDoc, /runtime source-side provider-gated ack pull: present/);
+  assert.match(sourceAckDoc, /runtime built-in configured-provider delivery ack pull: present/);
   assert.match(sourceAckDoc, /runtime YouTube page hot-path work from this slice: absent/);
   assert.match(boundary, /provider-gated local-network candidate discovery hook/);
   assert.match(boundary, /redacted\s+provider ack handoff/);
@@ -242,6 +243,9 @@ test('dashboard source wires provider-gated parent delivery ack status without Y
   assert.match(source, /const NANAH_MANAGED_SOURCE_ACK_SYNC_STATE_KEY = 'ftNanahManagedSourceAckSyncState'/);
   assert.match(source, /function getNanahManagedSourceAckProvider\(\)/);
   assert.match(source, /window\.FilterTubeManagedPolicyDeliveryAcks/);
+  assert.match(source, /window\.FilterTubeManagedPolicyMailbox/);
+  assert.match(source, /window\.FilterTubeManagedPolicyLocalNetwork/);
+  assert.match(source, /filtertube_managed_delivery_ack_aggregate_provider/);
   assert.match(source, /function buildNanahManagedSourceAckRequest\(link, reason\)/);
   assert.match(source, /schema: 'filtertube_managed_source_delivery_ack_request'/);
   assert.match(source, /function getNanahManagedSourceAckEligibleLinks\(\)/);

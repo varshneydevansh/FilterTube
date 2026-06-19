@@ -2,10 +2,12 @@
 
 **Generated**: 2026-06-05
 **Status**: Source-side mailbox/local-network delivery ack intake and dashboard
-status are present through an optional local provider. The browser HTTPS mailbox
-client can submit redacted mailbox acks when explicitly configured. LAN
-discovery, LAN delivery, background polling, mailbox server authority, and
-YouTube page hot-path work remain absent.
+status are present through an optional local provider or the configured built-in
+Internet Pickup/Home Bridge provider clients. The browser HTTPS mailbox client
+can submit and pull redacted mailbox acks when explicitly configured, and the
+configured Home Bridge client can submit and pull redacted local-network
+candidate acks. LAN discovery, LAN delivery, background polling, mailbox server
+authority, and YouTube page hot-path work remain absent.
 **Related provider hook**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PROVIDER_HOOK_2026-06-05.md`
 **Related mailbox protocol**:
@@ -20,8 +22,9 @@ whether remote management was accepted or rejected. Earlier slices wrote
 protected child-side mailbox and local-network ack rows after the protected
 device handed results back to a provider. This slice adds the matching
 source-side status intake: a parent/source dashboard can ask an optional local
-provider for redacted mailbox or local-network ack payloads and record them on
-the matching trusted link.
+provider, or the configured built-in Internet Pickup/Home Bridge providers, for
+redacted mailbox or local-network ack payloads and record them on the matching
+trusted link.
 
 The provider is transport only. A delivery ack is recorded only when it matches
 a saved Source -> Replica managed link and the trusted link already has a sent
@@ -93,6 +96,18 @@ js/tab-view.js
   pullNanahManagedSourceDeliveryAcks(...)
   runNanahManagedSourceAckSync(...)
   Delivery receipts trusted-link status row
+
+js/nanah_managed_mailbox_client.js
+  pullManagedDeliveryAcks(...)
+  pullRemoteDeliveryAcks(...)
+  getManagedDeliveryAcks(...)
+  managed-mailbox/ack/pull
+
+js/nanah_managed_local_network_client.js
+  pullManagedDeliveryAcks(...)
+  pullRemoteDeliveryAcks(...)
+  getManagedDeliveryAcks(...)
+  managed-local-network/ack/pull
 ```
 
 ## Safety Boundary
@@ -100,9 +115,11 @@ js/tab-view.js
 ```text
 runtime source-side mailbox/local-network ack record helper: present
 runtime source-side provider-gated ack pull: present
+runtime built-in configured-provider delivery ack pull: present
 runtime source-side trusted-link status persistence: present
 runtime parent-visible Delivery receipts row: present
 runtime browser HTTPS mailbox ack client: present behind explicit config
+runtime browser local-network ack client: present behind explicit config
 runtime provider authority: absent
 runtime unmatched ack payload apply: absent
 runtime plaintext rule storage in ack rows: absent

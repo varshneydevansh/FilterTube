@@ -137,6 +137,59 @@ test('configured mailbox client pulls storage rows then decrypts through adapter
   assert.equal(adapterCalls[0].options.trustedLink.id, 'link-1');
 });
 
+test('configured mailbox client pulls redacted delivery receipts for source status', async () => {
+  const calls = [];
+  const fetchImpl = async (url, options) => {
+    calls.push({ url, body: JSON.parse(options.body) });
+    return jsonResponse({
+      ok: true,
+      acks: [{
+        schema: 'filtertube_nanah_managed_open_sync_ack',
+        linkId: 'bad-link',
+        scope: 'keywords',
+        revision: 7,
+        policyHash: 'sha256:policy',
+        payload: { keywords: ['must-not-cross'] }
+      }, {
+        schema: 'filtertube_nanah_managed_open_sync_ack',
+        linkId: 'link-1',
+        mailboxItemId: 'mbx-1',
+        targetProfileId: 'child-1',
+        sourceDeviceId: 'parent-device',
+        sourceProfileId: 'parent-profile',
+        scope: 'keywords',
+        revision: 7,
+        policyHash: 'sha256:policy',
+        ackState: 'delivered',
+        accepted: true
+      }]
+    });
+  };
+  const window = loadClient('js/nanah_managed_mailbox_client.js');
+  const provider = window.FilterTubeManagedMailboxClient.createProvider({
+    endpointUrl: 'https://mailbox.filtertube.example/root'
+  }, { fetch: fetchImpl });
+
+  const result = await provider.pullManagedDeliveryAcks({
+    linkId: 'link-1',
+    sourceDeviceId: 'parent-device',
+    sourceProfileId: 'parent-profile',
+    targetProfileId: 'child-1',
+    allowedScopes: ['keywords'],
+    sentPolicies: [{ scope: 'keywords', revision: 7, policyHash: 'sha256:policy' }],
+    trustedLink: { privateKey: 'must-not-cross' }
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.acks.length, 1);
+  assert.equal(result.acks[0].schema, 'filtertube_nanah_managed_open_sync_ack');
+  assert.equal(result.acks[0].mailboxItemId, 'mbx-1');
+  assert.equal(calls[0].url, 'https://mailbox.filtertube.example/root/managed-mailbox/ack/pull');
+  assert.equal(Object.hasOwn(calls[0].body, 'trustedLink'), false);
+  assert.equal(JSON.stringify(calls[0].body).includes('must-not-cross'), false);
+  assert.equal(JSON.stringify(result.acks[0]).includes('must-not-cross'), false);
+});
+
 test('mailbox client refuses unsafe endpoints before any fetch', async () => {
   const fetchImpl = async () => {
     throw new Error('fetch should not run');
@@ -215,6 +268,60 @@ test('configured local-network client allows explicit private bridge and sanitiz
   assert.equal(Object.hasOwn(result.candidates[0], 'policy'), false);
   assert.equal(result.candidates[0].envelope.scope, 'keywords');
   assert.equal(result.candidates[0].peer.deviceId, 'parent-device');
+});
+
+test('configured local-network client pulls redacted delivery receipts for source status', async () => {
+  const calls = [];
+  const fetchImpl = async (url, options) => {
+    calls.push({ url, body: JSON.parse(options.body) });
+    return jsonResponse({
+      ok: true,
+      acks: [{
+        schema: 'filtertube_managed_local_network_candidate_ack',
+        linkId: 'bad-link',
+        candidateId: 'bad-cand',
+        scope: 'channels',
+        revision: 9,
+        policyHash: 'sha256:policy',
+        privateKey: 'must-not-cross',
+        payload: { channels: ['UCmustNotCross'] }
+      }, {
+        schema: 'filtertube_managed_local_network_candidate_ack',
+        linkId: 'link-1',
+        candidateId: 'cand-1',
+        targetProfileId: 'child-1',
+        sourceDeviceId: 'parent-device',
+        sourceProfileId: 'parent-profile',
+        scope: 'channels',
+        revision: 9,
+        policyHash: 'sha256:policy',
+        ackState: 'delivered',
+        accepted: true
+      }]
+    });
+  };
+  const window = loadClient('js/nanah_managed_local_network_client.js');
+  const provider = window.FilterTubeManagedLocalNetworkClient.createProvider({
+    endpointUrl: 'http://192.168.1.10:8787/filtertube'
+  }, { fetch: fetchImpl });
+
+  const result = await provider.pullManagedDeliveryAcks({
+    linkId: 'link-1',
+    sourceDeviceId: 'parent-device',
+    sourceProfileId: 'parent-profile',
+    targetProfileId: 'child-1',
+    allowedScopes: ['channels'],
+    sentPolicies: [{ scope: 'channels', revision: 9, policyHash: 'sha256:policy' }],
+    privateKey: 'must-not-cross'
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.acks.length, 1);
+  assert.equal(result.acks[0].schema, 'filtertube_managed_local_network_candidate_ack');
+  assert.equal(result.acks[0].candidateId, 'cand-1');
+  assert.equal(calls[0].url, 'http://192.168.1.10:8787/filtertube/managed-local-network/ack/pull');
+  assert.equal(Object.hasOwn(calls[0].body, 'privateKey'), false);
+  assert.equal(JSON.stringify(result.acks[0]).includes('must-not-cross'), false);
 });
 
 test('local-network client refuses private outbound secrets and public http endpoints', async () => {

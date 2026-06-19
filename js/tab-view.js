@@ -14811,7 +14811,52 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function getNanahManagedSourceAckProvider() {
-        return safeObject(window.FilterTubeManagedPolicyDeliveryAcks);
+        const explicit = safeObject(window.FilterTubeManagedPolicyDeliveryAcks);
+        const hasPull = (provider) => {
+            const root = safeObject(provider);
+            return typeof root.pullManagedDeliveryAcks === 'function'
+                || typeof root.pullRemoteDeliveryAcks === 'function'
+                || typeof root.getManagedDeliveryAcks === 'function';
+        };
+        if (hasPull(explicit)) return explicit;
+        const providers = [
+            safeObject(window.FilterTubeManagedPolicyMailbox),
+            safeObject(window.FilterTubeManagedPolicyLocalNetwork)
+        ].filter(hasPull);
+        if (providers.length === 0) return {};
+        if (providers.length === 1) return providers[0];
+        return {
+            schema: 'filtertube_managed_delivery_ack_aggregate_provider',
+            version: 1,
+            async pullManagedDeliveryAcks(request) {
+                const acks = [];
+                const reasons = [];
+                for (const provider of providers) {
+                    const pull = typeof provider.pullManagedDeliveryAcks === 'function'
+                        ? provider.pullManagedDeliveryAcks
+                        : (typeof provider.pullRemoteDeliveryAcks === 'function'
+                            ? provider.pullRemoteDeliveryAcks
+                            : provider.getManagedDeliveryAcks);
+                    try {
+                        const result = await pull.call(provider, request);
+                        if (Array.isArray(result)) {
+                            acks.push(...result);
+                        } else {
+                            const root = safeObject(result);
+                            if (root.ok === false && normalizeString(root.reason)) reasons.push(normalizeString(root.reason));
+                            acks.push(...safeArray(root.acks || root.items || root.payloads));
+                        }
+                    } catch (error) {
+                        reasons.push(normalizeString(error?.message) || 'delivery_ack_provider_failed');
+                    }
+                }
+                return {
+                    ok: reasons.length === 0,
+                    reason: reasons.join('; '),
+                    acks
+                };
+            }
+        };
     }
 
     function getNanahOutgoingManagedPolicyStateByScope(policy) {
@@ -15347,8 +15392,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (entry?.localRole === 'source' && entry?.remoteRole === 'replica') {
                     const deliveryAckRow = document.createElement('div');
                     deliveryAckRow.className = 'nanah-trusted-link__policy-row';
+                    deliveryAckRow.title = 'Delivery receipts show whether a protected device reported back after receiving a saved parent update.';
                     const deliveryAckLabel = document.createElement('span');
-                    deliveryAckLabel.textContent = 'Last delivery';
+                    deliveryAckLabel.textContent = 'Delivery receipts';
                     const deliveryAckValue = document.createElement('strong');
                     deliveryAckValue.textContent = formatNanahManagedSourceAckSyncStatus(entry);
                     deliveryAckRow.appendChild(deliveryAckLabel);

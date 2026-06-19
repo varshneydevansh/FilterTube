@@ -170,6 +170,57 @@
         };
     }
 
+    function sanitizeDeliveryAckPullRequest(request) {
+        const root = safeObject(request);
+        return {
+            schema: normalizeString(root.schema) || 'filtertube_managed_source_delivery_ack_request',
+            version: Number(root.version) || 1,
+            reason: normalizeString(root.reason) || 'dashboard_open',
+            requestedAt: Number(root.requestedAt) || Date.now(),
+            linkId: normalizeString(root.linkId),
+            remoteDeviceId: normalizeString(root.remoteDeviceId),
+            sourceDeviceId: normalizeString(root.sourceDeviceId),
+            sourceProfileId: normalizeString(root.sourceProfileId),
+            targetProfileId: normalizeString(root.targetProfileId),
+            allowedScopes: safeArray(root.allowedScopes).map(scope => normalizeString(scope).toLowerCase()).filter(Boolean),
+            sentPolicies: safeArray(root.sentPolicies).map((policy) => {
+                const row = safeObject(policy);
+                return {
+                    scope: normalizeString(row.scope).toLowerCase(),
+                    revision: Number(row.revision) || null,
+                    policyHash: normalizeString(row.policyHash),
+                    sentAt: Number(row.sentAt) || null,
+                    lastAckAt: Number(row.lastAckAt) || null,
+                    lastAckState: normalizeString(row.lastAckState) || null,
+                    lastAckResult: normalizeString(row.lastAckResult) || null
+                };
+            }).filter(row => row.scope && row.revision && row.policyHash)
+        };
+    }
+
+    function sanitizeDeliveryAckPayload(payload) {
+        const root = safeObject(payload);
+        if (hasForbiddenPlaintextKey(root)) return {};
+        return {
+            schema: normalizeString(root.schema) || 'filtertube_nanah_managed_open_sync_ack',
+            version: Number(root.version) || 1,
+            ackedAt: Number(root.ackedAt) || Date.now(),
+            linkId: normalizeString(root.linkId),
+            mailboxItemId: normalizeString(root.mailboxItemId),
+            targetProfileId: normalizeString(root.targetProfileId),
+            sourceDeviceId: normalizeString(root.sourceDeviceId),
+            sourceProfileId: normalizeString(root.sourceProfileId),
+            scope: normalizeString(root.scope).toLowerCase(),
+            revision: Number(root.revision) || null,
+            policyHash: normalizeString(root.policyHash),
+            ackState: normalizeString(root.ackState) || 'rejected',
+            accepted: root.accepted === true,
+            applied: root.applied === true,
+            decision: normalizeString(root.decision),
+            reason: normalizeString(root.reason) || null
+        };
+    }
+
     function normalizeServerResult(result, fallback = {}) {
         if (Array.isArray(result)) return { ok: true, ...fallback, items: result };
         return { ...fallback, ...safeObject(result), ok: safeObject(result).ok !== false };
@@ -184,6 +235,7 @@
         const uploadPath = parsed.uploadPath || 'managed-mailbox/upload';
         const pullPath = parsed.pullPath || 'managed-mailbox/pull';
         const ackPath = parsed.ackPath || 'managed-mailbox/ack';
+        const ackPullPath = parsed.ackPullPath || parsed.deliveryAckPath || 'managed-mailbox/ack/pull';
         const purgePath = parsed.purgePath || 'managed-mailbox/purge';
 
         function unavailable(reason) {
@@ -234,6 +286,17 @@
             return postJson(ackPath, sanitizeAckRequest(request));
         }
 
+        async function pullManagedDeliveryAcks(request) {
+            const result = await postJson(ackPullPath, sanitizeDeliveryAckPullRequest(request));
+            if (result.ok === false) return { ...result, acks: [] };
+            return {
+                ...result,
+                acks: safeArray(result.acks || result.items || result.payloads)
+                    .map(sanitizeDeliveryAckPayload)
+                    .filter(row => row.linkId && row.scope && row.revision && row.policyHash)
+            };
+        }
+
         async function pullDecryptedMailboxItems(request) {
             const requestRoot = safeObject(request);
             const { trustedLink, link, ...serverRequest } = requestRoot;
@@ -268,6 +331,9 @@
             pullDecryptedMailboxItems,
             ackMailboxItems,
             ackDecryptedMailboxItems: ackMailboxItems,
+            pullManagedDeliveryAcks,
+            pullRemoteDeliveryAcks: pullManagedDeliveryAcks,
+            getManagedDeliveryAcks: pullManagedDeliveryAcks,
             purgeManagedMailboxItems
         };
     }
