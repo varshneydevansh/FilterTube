@@ -379,13 +379,13 @@ parent tool instead of a sync/debug console.
     same safety phrase. It does not create trust, skip parent validation, or
     change policy delivery authority.
   - [x] Verified-device pickup wording slice: trusted protected-profile links
-    now describe `syncOnProfileOpen` as `Check on open` instead of a transport
-    name. The modal explains that a protected profile checks for newer approved
-    parent updates only when Pick Up Later or Home Bridge is configured, and
-    status strings say `not ready`, `cannot apply here`, or `no matching parent
-    link` instead of raw provider errors. This is UI/copy only; Send Now,
-    profile targeting, signature/hash/revision validation, and offline last
-    valid policy behavior are unchanged.
+    now describe `syncOnProfileOpen` as `Auto-check on open` instead of a
+    transport name. The modal explains that a protected profile can check for
+    newer trusted parent updates when an optional waiting or home-network
+    service is configured, and status strings say `not ready`, `cannot apply
+    here`, or `no matching parent link` instead of raw provider errors. This is
+    UI/copy only; Send Now, profile targeting, signature/hash/revision
+    validation, and offline last valid policy behavior are unchanged.
   - [ ] Scheduled subscription refresh remains a future slice. Until then,
     list updates happen only after a parent/account profile chooses Check or
     Refresh and approves the result.
