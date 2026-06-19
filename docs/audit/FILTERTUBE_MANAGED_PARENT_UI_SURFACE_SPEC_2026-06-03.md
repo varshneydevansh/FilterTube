@@ -155,8 +155,8 @@ code, advanced docs, and tests where they describe exact transport boundaries;
 they are no longer the first label a parent has to understand.
 The Family Device Updates delivery-path strip now keeps the same parent model on
 the pairing surface itself: `Live update` is the default path when both devices
-are open. `Automatic pickup` and `Same network` now sit behind an `Optional
-later delivery` disclosure so families first see the normal live Send Update
+are open. `Saved updates` and `Home Bridge` now sit behind an `Optional
+saved updates` disclosure so families first see the normal live Send Update
 path. If Internet Pickup or Home Bridge is already configured, the disclosure
 opens automatically to keep that existing send path visible. The strip is status
 and setup navigation only; it does not create hidden background sync, LAN

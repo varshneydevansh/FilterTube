@@ -493,11 +493,11 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /<strong id="ftNanahModeTitle" class="nanah-sync-mode-spotlight__title">Update a protected device<\/strong>/);
   assert.match(tabViewHtml, /How parent updates can reach verified devices/);
   assert.match(tabViewHtml, /Live update/);
-  assert.match(tabViewHtml, /Automatic pickup/);
-  assert.match(tabViewHtml, /Same network/);
+  assert.match(tabViewHtml, /Saved updates/);
+  assert.match(tabViewHtml, /Home Bridge/);
   assert.match(tabViewHtml, /id="ftNanahDeliveryAdvanced"/);
-  assert.match(tabViewHtml, /Optional later delivery/);
-  assert.match(tabViewHtml, /Use this only when the protected device cannot be open during Send Update/);
+  assert.match(tabViewHtml, /Optional saved updates/);
+  assert.match(tabViewHtml, /Use this only when the protected device should collect a parent-approved update after it opens/);
   assert.match(tabViewHtml, /Advanced options/);
   assert.match(tabViewHtml, /Meeting service link/);
   assert.match(tabViewHtml, /keep both devices open/);

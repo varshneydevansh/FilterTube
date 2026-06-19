@@ -13216,8 +13216,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!endpoint) {
             return {
                 configured: false,
-                label: 'Internet Pickup off',
-                detail: 'Send Update works when both devices are open. Set up Internet Pickup only when protected devices need to collect updates after opening.',
+                label: 'Saved updates off',
+                detail: 'Send Update works when both devices are open. Set up saved updates only when protected devices need to collect parent-approved updates after opening.',
                 tone: 'warning'
             };
         }
@@ -13232,15 +13232,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!configured) {
             return {
                 configured: false,
-                label: 'Internet Pickup needs review',
-                detail: `${host} is saved but is not ready for protected devices to pick up updates.`,
+                label: 'Saved updates need review',
+                detail: `${host} is saved but is not ready for protected devices to collect updates.`,
                 tone: 'warning'
             };
         }
         return {
             configured: true,
-            label: `Internet Pickup ready: ${host}`,
-            detail: 'Internet Pickup is available. The protected device still accepts only trusted parent updates.',
+            label: `Saved updates ready: ${host}`,
+            detail: 'Saved updates are available. The protected device still accepts only trusted parent updates.',
             tone: 'success'
         };
     }
@@ -13286,7 +13286,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahDeliveryMailboxBtn.disabled = !mailboxCanConfigure;
             ftNanahDeliveryMailboxBtn.title = mailboxCanConfigure
                 ? 'Optional advanced path for signed parent updates that protected devices collect after opening.'
-                : 'Create a protected profile and pair a verified device before setting up automatic pickup.';
+                : 'Create a protected profile and pair a verified device before setting up saved updates.';
         }
 
         const local = summarizeManagedLocalNetworkProviderConfig();
@@ -14615,7 +14615,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return {
                 configured: false,
                 label: 'Home Bridge off',
-                detail: 'Send Update and Internet Pickup can still work. Set this up only if you run a trusted FilterTube bridge.',
+                detail: 'Send Update and saved updates can still work. Set this up only if you run a trusted FilterTube bridge.',
                 tone: 'warning'
             };
         }

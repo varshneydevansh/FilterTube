@@ -49,8 +49,8 @@
                 ? helpers.getManagedMailboxConfigSummary
                 : () => ({
                     configured: false,
-                    label: 'Internet Pickup off',
-                    detail: 'Send Update works when both devices are open. Internet Pickup is only for updates a protected device should collect after it opens.',
+                    label: 'Saved updates off',
+                    detail: 'Send Update works when both devices are open. Saved updates are only for updates a protected device should collect after it opens.',
                     tone: 'warning'
                 }),
             getManagedLocalNetworkConfigSummary: typeof helpers.getManagedLocalNetworkConfigSummary === 'function'
@@ -944,7 +944,7 @@
         if (shouldShowConfiguredProviderSetup || shouldShowProviderPrompt) {
             const providerIntro = document.createElement('div');
             providerIntro.className = 'ft-managed-command-center__provider-intro';
-            providerIntro.textContent = 'Optional later delivery';
+            providerIntro.textContent = 'Optional saved updates';
             providerIntro.title = 'Send Update is the normal path. Add this only when the other device cannot be open at the same time.';
             panel.appendChild(providerIntro);
         }

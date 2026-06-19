@@ -333,7 +333,7 @@ parent tool instead of a sync/debug console.
   - [x] 2026-06-19 Family Device Updates optional delivery collapse: the
     Accounts & Sync pairing surface now shows live `Send Update` as the only
     first-level delivery path, with Internet Pickup and Home Bridge under an
-    `Optional later delivery` disclosure. Configured optional providers force
+    `Optional saved updates` disclosure. Configured optional providers force
     the disclosure open so existing families still see their active route. This
     is UI simplification only; provider setup still requires parent/account
     re-auth, saved trusted links, fixed target/scope checks, signed envelopes,
@@ -469,10 +469,17 @@ parent tool instead of a sync/debug console.
     revisions without adding background polling, server authority, plaintext
     rule exposure, or YouTube page hot-path work.
   - [x] Family Device Updates delivery-path strip slice: Accounts & Sync now
-    exposes a compact parent-facing strip for `Live update`, `Automatic pickup`,
-    and `Same network` paths. The strip is status-only plus optional setup
+    exposes a compact parent-facing strip for `Live update`, `Saved updates`,
+    and `Home Bridge` paths. The strip is status-only plus optional setup
     buttons for Internet Pickup/Home Bridge; it does not create policy
     authority, background sync, LAN discovery, or YouTube page hot-path work.
+  - [x] 2026-06-19 Family Device Updates parent-language strip slice: the
+    first-read Accounts & Sync strip now says `Saved updates` and `Home Bridge`
+    instead of `Automatic pickup` and `Same network`. The advanced provider
+    names still map to Internet Pickup and Home Bridge where configuration,
+    history, and protocol boundaries need precision. This is copy/UI state only;
+    trusted-link, target-profile, signature/hash/revision, provider, and runtime
+    validation gates are unchanged.
   - [x] Family Device Updates default-mode slice: the first-run Accounts & Sync
     mode is now `Update protected device` / `parent_control` instead of
     `Copy once`. A previously saved user mode is still respected, child
