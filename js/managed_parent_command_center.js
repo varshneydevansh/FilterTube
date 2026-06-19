@@ -71,7 +71,8 @@
         const timeLimitActive = timePolicy?.enabled === true;
         const hasPendingExtraTimeRequest = policySummary.pendingExtraTimeRequest === true;
         const hasStaleManagedChannelList = policySummary.hasStaleManagedChannelList === true;
-        const hasVerifiedDevice = (Number(policySummary.syncTargetCount) || 0) > 0;
+        const deviceAction = getManagedCommandCenterDeviceAction(targetId, policySummary);
+        const hasReadyDeliveryPath = hasManagedCommandCenterReadyDeliveryPath(policySummary);
         const intents = [
             {
                 action: 'edit_rules',
@@ -105,23 +106,15 @@
                 authority: 'delegated_runtime_gate',
                 sensitiveAction: true
             },
-            ...(!hasVerifiedDevice ? [{
-                action: 'pair_device',
-                label: 'Pair Device',
-                profileId: targetId,
-                scope: 'device_pairing',
-                authority: 'managed_pairing_navigation',
-                sensitiveAction: false,
-                title: 'Open Family Device Updates in protected-device mode. Trust is saved only after both devices pair and confirm the same phrase.'
-            }] : []),
-            {
+            ...(deviceAction ? [deviceAction] : []),
+            ...(hasReadyDeliveryPath ? [{
                 action: 'send_managed_policy',
                 label: 'Send Update',
                 profileId: targetId,
                 scope: 'active',
                 authority: 'managed_policy_provider_delivery',
                 sensitiveAction: true
-            },
+            }] : []),
             {
                 action: timeLimitActive ? 'change_time_limit' : 'set_time_limit',
                 label: timeLimitActive ? 'Change Time' : 'Set Time',
@@ -152,6 +145,44 @@
             });
         }
         return intents;
+    }
+
+    function hasManagedCommandCenterReadyDeliveryPath(policySummary = {}) {
+        return (Number(policySummary.syncReadyCount ?? policySummary.readyCount) || 0) > 0
+            || policySummary.syncLiveReady === true
+            || policySummary.liveReady === true
+            || policySummary.syncMailboxReady === true
+            || policySummary.mailboxReady === true
+            || policySummary.syncLocalNetworkReady === true
+            || policySummary.localNetworkReady === true;
+    }
+
+    function getManagedCommandCenterDeviceAction(profileId, policySummary = {}) {
+        const targetId = typeof profileId === 'string' ? profileId.trim() : '';
+        if (!targetId || hasManagedCommandCenterReadyDeliveryPath(policySummary)) return null;
+        const targetCount = Number(policySummary.syncTargetCount ?? policySummary.targetCount) || 0;
+        const totalCount = Number(policySummary.syncTotalCount ?? policySummary.totalCount) || 0;
+        const revokedCount = Number(policySummary.syncRevokedCount ?? policySummary.revokedCount) || 0;
+        const staleCount = Number(policySummary.syncStaleCount ?? policySummary.staleCount) || 0;
+        const hasBrokenSavedLink = revokedCount > 0 || staleCount > 0;
+        const hasKnownDevice = targetCount > 0 || totalCount > 0 || hasBrokenSavedLink;
+        const label = hasBrokenSavedLink
+            ? 'Repair Pairing'
+            : (hasKnownDevice ? 'Open Devices' : 'Pair Device');
+        const title = hasBrokenSavedLink
+            ? 'Open Family Device Updates to refresh the trusted link before sending protected-profile updates.'
+            : (hasKnownDevice
+                ? 'Open Family Device Updates with both devices available, then send after the verified link is ready.'
+                : 'Open Family Device Updates to pair and verify another device before sending protected-profile updates.');
+        return {
+            action: 'pair_device',
+            label,
+            profileId: targetId,
+            scope: 'device_pairing',
+            authority: 'managed_pairing_navigation',
+            sensitiveAction: false,
+            title
+        };
     }
 
     function normalizeCommandCenterNumber(value) {
@@ -677,7 +708,15 @@
                     pendingExtraTimeRequest: !!pendingExtraTimeRequest,
                     hasUrlManagedChannelList: managedChannelLists.sourceUrlCount > 0,
                     hasStaleManagedChannelList: managedChannelLists.staleListCount > 0,
-                    syncTargetCount: syncTarget.targetCount
+                    syncTargetCount: syncTarget.targetCount,
+                    syncReadyCount: syncTarget.readyCount,
+                    syncOpenCheckCount: syncTarget.openCheckCount,
+                    syncRevokedCount: syncTarget.revokedCount,
+                    syncStaleCount: syncTarget.staleCount,
+                    syncTotalCount: syncTarget.totalCount,
+                    syncLiveReady: syncTarget.liveReady,
+                    syncMailboxReady: syncTarget.mailboxReady,
+                    syncLocalNetworkReady: syncTarget.localNetworkReady
                 })
             };
             row.deliveryPreview = resolveManagedCommandCenterDeliveryPreview(row);
@@ -1314,6 +1353,7 @@
             });
             row.appendChild(statusCell);
             const hasVerifiedDevice = item.syncTargetCount > 0;
+            const hasReadyDeliveryPath = hasManagedCommandCenterReadyDeliveryPath(item);
             const detailsWrap = document.createElement('div');
             detailsWrap.className = 'ft-managed-command-center__details';
             [
@@ -1354,7 +1394,7 @@
                 const actionWrap = document.createElement('div');
                 actionWrap.className = 'ft-managed-command-center__actions';
                 item.actionIntents
-                    .filter(intent => !(intent.action === 'send_managed_policy' && !hasVerifiedDevice))
+                    .filter(intent => !(intent.action === 'send_managed_policy' && !hasReadyDeliveryPath))
                     .forEach((intent) => {
                     const button = document.createElement('button');
                     button.className = 'btn-secondary';

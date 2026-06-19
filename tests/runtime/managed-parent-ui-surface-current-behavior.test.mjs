@@ -1233,3 +1233,35 @@ test('managed command-center helper emits delegated action intents without polic
   assert.doesNotMatch(serialized, /payload/);
   assert.doesNotMatch(serialized, /privateKey/i);
 });
+
+test('managed command center does not show Send Update until delivery is ready', () => {
+  const CommandCenter = loadCommandCenter();
+  const actionIntents = plain(CommandCenter.buildActionIntents('childA', null, {
+    syncTargetCount: 1,
+    syncReadyCount: 0,
+    syncRevokedCount: 0,
+    syncStaleCount: 0,
+    syncTotalCount: 1,
+    syncLiveReady: false,
+    syncMailboxReady: false,
+    syncLocalNetworkReady: false
+  }));
+  assert.ok(actionIntents.some(intent => intent.action === 'pair_device' && intent.label === 'Open Devices'));
+  assert.ok(!actionIntents.some(intent => intent.action === 'send_managed_policy'));
+});
+
+test('managed command center tells parents to repair stale verified links', () => {
+  const CommandCenter = loadCommandCenter();
+  const actionIntents = plain(CommandCenter.buildActionIntents('childA', null, {
+    syncTargetCount: 0,
+    syncReadyCount: 0,
+    syncRevokedCount: 0,
+    syncStaleCount: 1,
+    syncTotalCount: 1,
+    syncLiveReady: false,
+    syncMailboxReady: false,
+    syncLocalNetworkReady: false
+  }));
+  assert.ok(actionIntents.some(intent => intent.action === 'pair_device' && intent.label === 'Repair Pairing'));
+  assert.ok(!actionIntents.some(intent => intent.action === 'send_managed_policy'));
+});

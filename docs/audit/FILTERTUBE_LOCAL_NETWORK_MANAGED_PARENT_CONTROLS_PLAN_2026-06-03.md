@@ -358,6 +358,12 @@ parent tool instead of a sync/debug console.
     devices`, `Needs pairing`, `Time requests`). This is UI/copy only; managed
     policy authority, revision handling, transport validation, and runtime gates
     are unchanged.
+  - [x] 2026-06-19 command-center send-readiness slice: single-profile rows now
+    show `Send Update` only when that protected profile has a ready verified
+    delivery path. First setup shows `Pair Device`, paired-but-not-open devices
+    show `Open Devices`, and stale/revoked saved links show `Repair Pairing`.
+    This is UI intent gating only; Nanah trust, target profile, signature, hash,
+    revision, and runtime validation remain unchanged.
   - [x] 2026-06-19 bulk-action simplification slice: Family Controls now keeps
     multi-profile actions inside a collapsed `Manage several profiles at once`
     drawer. Selecting a protected-profile row opens the drawer automatically,
