@@ -8028,71 +8028,87 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const formatGuide = document.createElement('div');
             formatGuide.className = 'managed-channel-list-modal__format-card';
-            const formatHeader = document.createElement('div');
-            formatHeader.className = 'managed-channel-list-modal__format-header';
-            const formatTitle = document.createElement('strong');
-            formatTitle.textContent = 'Supported rule list formats';
-            const formatHint = document.createElement('span');
-            formatHint.textContent = 'Channels can be handles, UC IDs, /c names, or YouTube URLs. Keywords are words or phrases.';
-            formatHeader.append(formatTitle, formatHint);
-
-            const formatTabs = document.createElement('div');
-            formatTabs.className = 'managed-channel-list-modal__format-tabs';
-            const formatExample = document.createElement('pre');
-            formatExample.className = 'managed-channel-list-modal__format-example';
-            const formatExamples = {
-                csv: {
-                    label: 'CSV sheet',
-                    body: [
-                        'channel_id,keyword,notes',
-                        '@SomeChannel,,channel handle',
-                        'UCxxxxxxxxxxxxxxxxxxxxxx,,channel id',
-                        'c/ChannelURL,,custom channel URL',
-                        ',brainrot,keyword phrase'
-                    ].join('\n')
-                },
-                txt: {
-                    label: 'TXT rows',
-                    body: MANAGED_RULE_LIST_TXT_TEMPLATE
-                },
-                json: {
-                    label: 'JSON list',
-                    body: MANAGED_RULE_LIST_JSON_TEMPLATE
-                },
-                blocktube: {
-                    label: 'BlockTube',
-                    body: [
-                        '{',
-                        '  "filterData": {',
-                        '    "channelId": ["UCxxxxxxxxxxxxxxxxxxxxxx"],',
-                        '    "title": ["brainrot"]',
-                        '  }',
-                        '}'
-                    ].join('\n')
-                },
-                url: {
-                    label: 'Public URL',
-                    body: 'Paste a raw HTTPS URL that serves CSV, TXT, or JSON. FilterTube loads it into this preview first.'
-                }
-            };
-            const setFormatExample = (key) => {
-                const entry = formatExamples[key] || formatExamples.csv;
-                formatTabs.querySelectorAll('button').forEach((button) => {
-                    button.classList.toggle('is-active', button.dataset.format === key);
-                    button.setAttribute('aria-pressed', button.dataset.format === key ? 'true' : 'false');
-                });
-                formatExample.textContent = entry.body;
-            };
-            Object.entries(formatExamples).forEach(([key, entry]) => {
-                const button = document.createElement('button');
-                button.type = 'button';
-                button.className = 'managed-channel-list-modal__format-tab';
-                button.dataset.format = key;
-                button.textContent = entry.label;
-                button.addEventListener('click', () => setFormatExample(key));
-                formatTabs.appendChild(button);
-            });
-            formatGuide.append(formatHeader, formatTabs, formatExample);
+            formatGuide.innerHTML = `
+                <div class="managed-channel-list-modal__format-header">
+                    <strong>Choose the list shape you have</strong>
+                    <span>These are examples only. After you load or paste a file, FilterTube shows the real parsed channels, keywords, and skipped rows before anything changes.</span>
+                </div>
+                <div class="managed-channel-list-modal__format-gallery" aria-label="Supported rule list examples">
+                    <article class="managed-channel-list-modal__format-panel managed-channel-list-modal__format-panel--csv">
+                        <div class="managed-channel-list-modal__format-panel-title">
+                            <span>CSV</span>
+                            <strong>Spreadsheet</strong>
+                        </div>
+                        <div class="managed-channel-list-modal__mini-sheet" role="table" aria-label="CSV template example">
+                            <div class="managed-channel-list-modal__mini-row managed-channel-list-modal__mini-row--head" role="row">
+                                <span role="columnheader">channel_id</span>
+                                <span role="columnheader">keyword</span>
+                                <span role="columnheader">notes</span>
+                            </div>
+                            <div class="managed-channel-list-modal__mini-row" role="row">
+                                <span role="cell">@SomeChannel</span>
+                                <span role="cell"></span>
+                                <span role="cell">handle</span>
+                            </div>
+                            <div class="managed-channel-list-modal__mini-row" role="row">
+                                <span role="cell">UC...</span>
+                                <span role="cell"></span>
+                                <span role="cell">channel ID</span>
+                            </div>
+                            <div class="managed-channel-list-modal__mini-row" role="row">
+                                <span role="cell"></span>
+                                <span role="cell">brainrot</span>
+                                <span role="cell">keyword</span>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="managed-channel-list-modal__format-panel managed-channel-list-modal__format-panel--json">
+                        <div class="managed-channel-list-modal__format-panel-title">
+                            <span>JSON</span>
+                            <strong>Channels + keywords</strong>
+                        </div>
+                        <pre class="managed-channel-list-modal__mini-code">{
+  "channels": ["@SomeChannel", "UC..."],
+  "keywords": ["brainrot"]
+}</pre>
+                    </article>
+                    <article class="managed-channel-list-modal__format-panel managed-channel-list-modal__format-panel--txt">
+                        <div class="managed-channel-list-modal__format-panel-title">
+                            <span>TXT</span>
+                            <strong>One rule per line</strong>
+                        </div>
+                        <div class="managed-channel-list-modal__mini-lines">
+                            <code>channel: @SomeChannel</code>
+                            <code>channel: /c/ChannelName</code>
+                            <code>keyword: scary thumbnail</code>
+                        </div>
+                    </article>
+                    <article class="managed-channel-list-modal__format-panel managed-channel-list-modal__format-panel--url">
+                        <div class="managed-channel-list-modal__format-panel-title">
+                            <span>URL</span>
+                            <strong>Raw public list</strong>
+                        </div>
+                        <div class="managed-channel-list-modal__mini-lines">
+                            <code>raw.githubusercontent.com/.../list.csv</code>
+                            <small>CSV, TXT, or simple JSON loads into the same preview.</small>
+                        </div>
+                    </article>
+                    <article class="managed-channel-list-modal__format-panel managed-channel-list-modal__format-panel--blocktube">
+                        <div class="managed-channel-list-modal__format-panel-title">
+                            <span>BlockTube</span>
+                            <strong>Migration JSON</strong>
+                        </div>
+                        <pre class="managed-channel-list-modal__mini-code">{
+  "filterData": {
+    "channelId": ["UC..."],
+    "title": ["brainrot"]
+  }
+}</pre>
+                    </article>
+                </div>
+                <div class="managed-channel-list-modal__format-note">
+                    Files only add channel and keyword rules. They cannot change profiles, PINs, trusted devices, time limits, Main/Kids access, or sync targets.
+                </div>`;
             body.appendChild(formatGuide);
 
             const nameGroup = document.createElement('label');
@@ -8388,7 +8404,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             card.append(header, body);
             overlay.appendChild(card);
             document.body.appendChild(overlay);
-            setFormatExample('csv');
             renderPreview();
             setTimeout(() => {
                 try {

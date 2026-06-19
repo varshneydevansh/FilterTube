@@ -324,6 +324,14 @@ parent tool instead of a sync/debug console.
     URL-backed list checker used by Family Controls, still previews loaded
     sources, records protected history, and requires parent/account approval
     before replacing any list-derived rule rows.
+  - [x] 2026-06-19 rule-list import modal preview-gallery slice: the actual
+    `Import Rule List` modal now mirrors the Settings explanation instead of
+    reverting to format tabs and one technical code block. The modal shows
+    visible CSV sheet, JSON, TXT, public URL, and BlockTube examples before the
+    parent/caregiver chooses a file, URL, or pasted list. This is UI framing
+    only: parser support, preview-before-apply, Main/Kids/Both target choice,
+    source metadata, parent/account approval, and verified-device delivery
+    authority are unchanged.
   - [x] Optional delivery discovery slice: after at least one protected profile
     exists and no optional provider is configured, Family Controls now shows one
     compact advanced pickup prompt. First setup still leads with live Send

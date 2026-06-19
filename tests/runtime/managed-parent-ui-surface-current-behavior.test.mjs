@@ -533,6 +533,14 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /https:\/\/raw\.githubusercontent\.com\/list\.csv/);
   assert.match(tabViewHtml, /Files can add rules only; they cannot change PINs, time limits, viewing spaces, profiles, or trusted devices/);
   assert.match(tabViewHtml, /Templates &amp; checks/);
+  assert.doesNotMatch(source, /managed-channel-list-modal__format-tabs/);
+  assert.doesNotMatch(source, /managed-channel-list-modal__format-tab/);
+  assert.match(source, /managed-channel-list-modal__format-gallery/);
+  assert.match(source, /Choose the list shape you have/);
+  assert.match(source, /managed-channel-list-modal__mini-sheet/);
+  assert.match(source, /managed-channel-list-modal__mini-code/);
+  assert.match(source, /managed-channel-list-modal__mini-lines/);
+  assert.match(source, /Files only add channel and keyword rules/);
   assert.match(tabViewHtml, /Apply imported rules to/);
   assert.doesNotMatch(tabViewHtml, /<h3>Device Trust &amp; Sync<\/h3>/);
   assert.doesNotMatch(tabViewHtml, /Completely P2P after handshake/);

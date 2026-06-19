@@ -2418,48 +2418,173 @@ html[data-theme="dark"] .card::after {
     line-height: 1.36;
 }
 
-.managed-channel-list-modal__format-tabs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.45rem;
-}
-
-.managed-channel-list-modal__format-tab {
-    min-height: 2.2rem;
-    padding: 0.48rem 0.78rem;
-    border: 1px solid rgba(15, 23, 42, 0.1);
-    border-radius: 999px;
-    color: var(--ft-color-text-secondary);
-    background: rgba(255, 255, 255, 0.74);
-    cursor: pointer;
-    font-size: 0.78rem;
-    font-weight: 850;
-}
-
-.managed-channel-list-modal__format-tab.is-active {
-    border-color: rgba(180, 87, 73, 0.48);
-    color: #fff;
-    background: linear-gradient(180deg, rgba(193, 104, 91, 0.96), rgba(174, 72, 60, 0.96));
-    box-shadow: 0 0.55rem 1.2rem rgba(180, 87, 73, 0.16);
-}
-
-.managed-channel-list-modal__format-example {
-    max-height: 160px;
-    margin: 0;
-    overflow: auto;
-    padding: 0.68rem 0.75rem;
-    border: 1px solid rgba(15, 23, 42, 0.08);
-    border-radius: 0.82rem;
-    color: var(--ft-color-text-primary);
-    background: rgba(255, 255, 255, 0.78);
-    font: 0.78rem/1.48 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    white-space: pre;
-}
-
 .managed-channel-list-modal__formats {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.45rem;
+}
+
+.managed-channel-list-modal__format-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.56rem;
+    min-width: 0;
+}
+
+.managed-channel-list-modal__format-panel {
+    display: grid;
+    align-content: start;
+    gap: 0.52rem;
+    min-width: 0;
+    padding: 0.62rem;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 0.86rem;
+    background: rgba(255, 255, 255, 0.68);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.76);
+}
+
+.managed-channel-list-modal__format-panel--csv,
+.managed-channel-list-modal__format-panel--json {
+    grid-column: 1 / -1;
+}
+
+.managed-channel-list-modal__format-panel-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.7rem;
+    min-width: 0;
+}
+
+.managed-channel-list-modal__format-panel-title span {
+    flex: 0 0 auto;
+    padding: 0.2rem 0.48rem;
+    border: 1px solid rgba(180, 87, 73, 0.16);
+    border-radius: 999px;
+    background: rgba(255, 248, 244, 0.9);
+    color: var(--ft-color-brand-primary);
+    font-size: 0.62rem;
+    font-weight: 920;
+    letter-spacing: 0.08em;
+}
+
+.managed-channel-list-modal__format-panel-title strong {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--ft-color-text-primary);
+    font-size: 0.82rem;
+    font-weight: 880;
+    line-height: 1.2;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.managed-channel-list-modal__mini-sheet {
+    display: grid;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 0.72rem;
+    background: rgba(255, 255, 255, 0.78);
+}
+
+.managed-channel-list-modal__mini-row {
+    display: grid;
+    grid-template-columns: minmax(5.8rem, 1fr) minmax(5.3rem, 0.9fr) minmax(5.2rem, 0.78fr);
+    min-width: 0;
+}
+
+.managed-channel-list-modal__mini-row + .managed-channel-list-modal__mini-row {
+    border-top: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.managed-channel-list-modal__mini-row span {
+    min-width: 0;
+    padding: 0.42rem 0.5rem;
+    overflow: hidden;
+    border-right: 1px solid rgba(15, 23, 42, 0.055);
+    color: var(--ft-color-text-secondary);
+    font-size: 0.72rem;
+    font-weight: 680;
+    line-height: 1.24;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.managed-channel-list-modal__mini-row span:last-child {
+    border-right: 0;
+}
+
+.managed-channel-list-modal__mini-row--head span {
+    background: rgba(180, 87, 73, 0.08);
+    color: var(--ft-color-brand-primary);
+    font-size: 0.64rem;
+    font-weight: 920;
+    letter-spacing: 0.07em;
+}
+
+.managed-channel-list-modal__mini-code,
+.managed-channel-list-modal__mini-lines code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.managed-channel-list-modal__mini-code {
+    min-width: 0;
+    max-height: 8.8rem;
+    margin: 0;
+    overflow: auto;
+    padding: 0.58rem 0.64rem;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 0.72rem;
+    background: rgba(255, 255, 255, 0.78);
+    color: var(--ft-color-text-primary);
+    font-size: 0.72rem;
+    font-weight: 660;
+    line-height: 1.42;
+    white-space: pre;
+}
+
+.managed-channel-list-modal__mini-lines {
+    display: grid;
+    gap: 0.36rem;
+    min-width: 0;
+}
+
+.managed-channel-list-modal__mini-lines code,
+.managed-channel-list-modal__mini-lines small {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+}
+
+.managed-channel-list-modal__mini-lines code {
+    padding: 0.38rem 0.46rem;
+    border: 1px solid rgba(15, 23, 42, 0.07);
+    border-radius: 0.6rem;
+    background: rgba(255, 255, 255, 0.74);
+    color: var(--ft-color-text-secondary);
+    font-size: 0.72rem;
+    white-space: nowrap;
+}
+
+.managed-channel-list-modal__mini-lines small {
+    color: var(--ft-color-text-secondary);
+    font-size: 0.75rem;
+    font-weight: 620;
+}
+
+.managed-channel-list-modal__format-note {
+    padding: 0.54rem 0.64rem;
+    border: 1px solid rgba(74, 157, 127, 0.2);
+    border-radius: 0.76rem;
+    background: rgba(74, 157, 127, 0.08);
+    color: var(--ft-color-text-secondary);
+    font-size: 0.8rem;
+    font-weight: 680;
+    line-height: 1.36;
 }
 
 .managed-channel-list-modal__formats span {
@@ -2664,22 +2789,32 @@ html[data-theme="dark"] .card::after {
     background: linear-gradient(180deg, rgba(48, 34, 30, 0.9), rgba(31, 28, 25, 0.88));
 }
 
-:root[data-theme="dark"] .managed-channel-list-modal__format-tab {
+:root[data-theme="dark"] .managed-channel-list-modal__format-panel,
+:root[data-theme="dark"] .managed-channel-list-modal__mini-sheet,
+:root[data-theme="dark"] .managed-channel-list-modal__mini-code,
+:root[data-theme="dark"] .managed-channel-list-modal__mini-lines code,
+:root[data-theme="dark"] .managed-channel-list-modal__format-note {
     border-color: rgba(255, 255, 255, 0.08);
-    color: var(--ft-color-text-secondary-dark);
     background: rgba(255, 255, 255, 0.05);
 }
 
-:root[data-theme="dark"] .managed-channel-list-modal__format-tab.is-active {
-    border-color: rgba(248, 113, 113, 0.34);
-    color: #fff;
-    background: linear-gradient(180deg, rgba(181, 89, 76, 0.95), rgba(145, 64, 54, 0.95));
+:root[data-theme="dark"] .managed-channel-list-modal__format-panel-title span {
+    border-color: rgba(248, 113, 113, 0.2);
+    background: rgba(127, 29, 29, 0.22);
 }
 
-:root[data-theme="dark"] .managed-channel-list-modal__format-example {
-    border-color: rgba(255, 255, 255, 0.08);
+:root[data-theme="dark"] .managed-channel-list-modal__mini-row + .managed-channel-list-modal__mini-row,
+:root[data-theme="dark"] .managed-channel-list-modal__mini-row span {
+    border-color: rgba(255, 255, 255, 0.07);
+}
+
+:root[data-theme="dark"] .managed-channel-list-modal__mini-row--head span {
+    background: rgba(248, 113, 113, 0.12);
+}
+
+:root[data-theme="dark"] .managed-channel-list-modal__mini-code,
+:root[data-theme="dark"] .managed-channel-list-modal__mini-lines code {
     color: var(--ft-color-text-primary);
-    background: rgba(255, 255, 255, 0.05);
 }
 
 :root[data-theme="dark"] .managed-channel-list-modal__formats span,
@@ -2720,8 +2855,32 @@ html[data-theme="dark"] .card::after {
 
 @media (max-width: 640px) {
     .managed-channel-list-modal__formats,
+    .managed-channel-list-modal__format-gallery,
     .managed-channel-list-modal__preview-grid {
         grid-template-columns: 1fr;
+    }
+
+    .managed-channel-list-modal__format-panel--csv,
+    .managed-channel-list-modal__format-panel--json {
+        grid-column: auto;
+    }
+
+    .managed-channel-list-modal__format-panel-title {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .managed-channel-list-modal__format-panel-title strong {
+        text-align: left;
+        white-space: normal;
+    }
+
+    .managed-channel-list-modal__mini-sheet {
+        overflow-x: auto;
+    }
+
+    .managed-channel-list-modal__mini-row {
+        min-width: 26rem;
     }
 
     .managed-channel-list-modal__sheet {
