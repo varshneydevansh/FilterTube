@@ -518,12 +518,39 @@
                                                                 <div class="rule-list-format-showcase__header">
                                                                     <div>
                                                                         <strong>Supported list examples</strong>
-                                                                        <span>Use the example that looks closest to your file. FilterTube still previews parsed rows before it adds anything.</span>
+                                                                        <span>Pick the file shape that looks closest to what you have. FilterTube still opens a real preview before it adds anything.</span>
                                                                     </div>
                                                                     <code>safe preview</code>
                                                                 </div>
+                                                                <input class="rule-list-format-switcher__input" id="ftRuleListFormatCsvPreview" name="ftRuleListFormatPreview" type="radio" checked />
+                                                                <input class="rule-list-format-switcher__input" id="ftRuleListFormatJsonPreview" name="ftRuleListFormatPreview" type="radio" />
+                                                                <input class="rule-list-format-switcher__input" id="ftRuleListFormatTxtPreview" name="ftRuleListFormatPreview" type="radio" />
+                                                                <input class="rule-list-format-switcher__input" id="ftRuleListFormatUrlPreview" name="ftRuleListFormatPreview" type="radio" />
+                                                                <input class="rule-list-format-switcher__input" id="ftRuleListFormatBlockTubePreview" name="ftRuleListFormatPreview" type="radio" />
+                                                                <div class="rule-list-format-switcher" role="group" aria-label="Choose a rule list format preview">
+                                                                    <label for="ftRuleListFormatCsvPreview">
+                                                                        <strong>CSV</strong>
+                                                                        <span>Sheet columns</span>
+                                                                    </label>
+                                                                    <label for="ftRuleListFormatJsonPreview">
+                                                                        <strong>JSON</strong>
+                                                                        <span>Channels + keywords</span>
+                                                                    </label>
+                                                                    <label for="ftRuleListFormatTxtPreview">
+                                                                        <strong>TXT</strong>
+                                                                        <span>One row each</span>
+                                                                    </label>
+                                                                    <label for="ftRuleListFormatUrlPreview">
+                                                                        <strong>URL</strong>
+                                                                        <span>Raw public list</span>
+                                                                    </label>
+                                                                    <label for="ftRuleListFormatBlockTubePreview">
+                                                                        <strong>BlockTube</strong>
+                                                                        <span>Migration JSON</span>
+                                                                    </label>
+                                                                </div>
                                                                 <div class="rule-list-format-stage">
-                                                                <article class="rule-list-format-panel rule-list-format-panel--csv">
+                                                                <article class="rule-list-format-panel rule-list-format-panel--csv" aria-label="CSV rule list preview">
                                                                     <div class="rule-list-format-panel__copy">
                                                                         <span class="rule-list-format-panel__eyebrow">Spreadsheet file</span>
                                                                         <strong>CSV sheet preview</strong>
@@ -582,7 +609,7 @@
                                                                         </div>
                                                                     </div>
                                                                 </article>
-                                                                <article class="rule-list-format-panel rule-list-format-panel--json">
+                                                                <article class="rule-list-format-panel rule-list-format-panel--json" aria-label="JSON rule list preview">
                                                                     <div class="rule-list-format-panel__copy">
                                                                         <span class="rule-list-format-panel__eyebrow">Rule-list JSON</span>
                                                                         <strong>JSON rule-list preview</strong>
@@ -630,7 +657,7 @@
                                                                         </div>
                                                                     </div>
                                                                 </article>
-                                                                <article class="rule-list-format-panel rule-list-format-panel--txt">
+                                                                <article class="rule-list-format-panel rule-list-format-panel--txt" aria-label="Plain text rule list preview">
                                                                     <div class="rule-list-format-panel__copy">
                                                                         <span class="rule-list-format-panel__eyebrow">Plain text file</span>
                                                                         <strong>TXT row preview</strong>
@@ -651,7 +678,7 @@
                                                                         <div><span>keyword</span><code>keyword: scary thumbnail</code></div>
                                                                     </div>
                                                                 </article>
-                                                                <article class="rule-list-format-panel rule-list-format-panel--url">
+                                                                <article class="rule-list-format-panel rule-list-format-panel--url" aria-label="Public URL rule list preview">
                                                                     <div class="rule-list-format-panel__copy">
                                                                         <span class="rule-list-format-panel__eyebrow">External list</span>
                                                                         <strong>Public URL preview</strong>
@@ -672,7 +699,7 @@
                                                                         </div>
                                                                     </div>
                                                                 </article>
-                                                                <article class="rule-list-format-panel rule-list-format-panel--blocktube">
+                                                                <article class="rule-list-format-panel rule-list-format-panel--blocktube" aria-label="BlockTube rule list preview">
                                                                     <div class="rule-list-format-panel__copy">
                                                                         <span class="rule-list-format-panel__eyebrow">Migration JSON</span>
                                                                         <strong>BlockTube export preview</strong>

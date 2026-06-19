@@ -339,6 +339,14 @@ parent tool instead of a sync/debug console.
     profiles, PINs, time limits, trusted devices, or sync destinations. Parser
     behavior, preview-before-apply, and verified-device delivery authority are
     unchanged.
+  - [x] 2026-06-19 Settings rule-list format demo slice: the supported file
+    shapes disclosure now opens into a parent-readable preview switcher instead
+    of a stacked wall of examples. CSV is shown as a spreadsheet-style sheet;
+    JSON, TXT, public URL, and BlockTube each have their own one-at-a-time
+    preview with the accepted channel and keyword fields called out. This is
+    still presentation-only: all files continue through the same safe preview,
+    parent/account approval, Main/Kids/Both target selection, and verified
+    device send path.
   - [x] Optional delivery discovery slice: after at least one protected profile
     exists and no optional provider is configured, Family Controls now shows one
     compact advanced pickup prompt. First setup still leads with live Send
