@@ -418,6 +418,18 @@ parent tool instead of a sync/debug console.
     and `Everyday protection` instead of reading like a policy schema editor.
     The saved policy fields, device binding, profile target, allowed scopes,
     revision checks, and signature validation are unchanged.
+  - [x] Trusted-device card wording slice: saved managed links now show
+    `Allowed areas`, `Usual area`, `Update behavior`, `Matching parent updates`,
+    `Next connection`, `Everyday protection`, `Where updates land`, and
+    `While locked` instead of `Allowed scopes`, `Default scope`, `Apply mode`,
+    `Auto-apply`, `New session`, `Child protection`, `Target profile`, and
+    `Locked child profile`. This is UI copy only; the same policy fields are
+    still used for enforcement.
+  - [x] Saved reconnect approval wording slice: managed reconnect approval now
+    says `Approve Parent Connection`, `Allowed areas`, and `Saved update
+    behavior`; it no longer exposes `managed reconnect`, `allowed scopes`, or
+    `apply policy` in the parent-facing confirmation. Reconnect approval still
+    gates the same trusted-link session.
   - [x] Protected-target wording slice: the Accounts & Sync send panel now says
     `Protected profile on other device` and `Use the profile open there`
     instead of `Remote target profile` and `remote active profile`. This is a

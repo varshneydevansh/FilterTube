@@ -11374,7 +11374,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function getNanahReconnectModeLabel(mode) {
-        return getNanahReconnectMode(mode) === 'approval_needed' ? 'Approval needed' : 'Fast reconnect';
+        return getNanahReconnectMode(mode) === 'approval_needed' ? 'Ask first' : 'Quick connect';
     }
 
     function getNanahLockedChildMode(mode, fallback = 'require_unlock') {
@@ -11399,7 +11399,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function getNanahChildProtectionLevelLabel(value) {
         return getNanahChildProtectionLevel(value, 'standard') === 'strict'
-            ? 'Ask first'
+            ? 'Review here'
             : 'Parent managed';
     }
 
@@ -15144,7 +15144,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (safeObject(entry?.policy).linkType === 'managed_link') {
                 const policyPill = document.createElement('span');
                 policyPill.className = 'nanah-trusted-link__pill';
-                policyPill.textContent = `${getNanahStrategyLabel(safeObject(entry?.policy).applyMode)} allowed rules`;
+                policyPill.textContent = `${getNanahStrategyLabel(safeObject(entry?.policy).applyMode)} rules`;
                 meta.appendChild(policyPill);
             }
 
@@ -15286,33 +15286,33 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 const allowedRow = document.createElement('div');
                 allowedRow.className = 'nanah-trusted-link__policy-row';
-                allowedRow.innerHTML = `<span>Allowed scopes</span><strong>${describeNanahScopeList(safeObject(entry?.policy).allowedScopes)}</strong>`;
+                allowedRow.innerHTML = `<span>Allowed areas</span><strong>${describeNanahScopeList(safeObject(entry?.policy).allowedScopes)}</strong>`;
                 policyRows.appendChild(allowedRow);
 
                 const defaultRow = document.createElement('div');
                 defaultRow.className = 'nanah-trusted-link__policy-row';
-                defaultRow.innerHTML = `<span>Default scope</span><strong>${getNanahScopeLabel(safeObject(entry?.policy).defaultScope)}</strong>`;
+                defaultRow.innerHTML = `<span>Usual area</span><strong>${getNanahScopeLabel(safeObject(entry?.policy).defaultScope)}</strong>`;
                 policyRows.appendChild(defaultRow);
 
                 const applyRow = document.createElement('div');
                 applyRow.className = 'nanah-trusted-link__policy-row';
-                applyRow.innerHTML = `<span>Apply mode</span><strong>${getNanahStrategyLabel(safeObject(entry?.policy).applyMode)}</strong>`;
+                applyRow.innerHTML = `<span>Update behavior</span><strong>${getNanahStrategyLabel(safeObject(entry?.policy).applyMode)}</strong>`;
                 policyRows.appendChild(applyRow);
 
                 const autoRow = document.createElement('div');
                 autoRow.className = 'nanah-trusted-link__policy-row';
-                autoRow.innerHTML = `<span>Auto-apply</span><strong>${safeObject(entry?.policy).autoApplyControlProposals === true ? 'On' : 'Off'}</strong>`;
+                autoRow.innerHTML = `<span>Matching parent updates</span><strong>${safeObject(entry?.policy).autoApplyControlProposals === true ? 'Allowed' : 'Ask first'}</strong>`;
                 policyRows.appendChild(autoRow);
 
                 const reconnectRow = document.createElement('div');
                 reconnectRow.className = 'nanah-trusted-link__policy-row';
-                reconnectRow.innerHTML = `<span>New session</span><strong>${getNanahReconnectModeLabel(safeObject(entry?.policy).reconnectMode)}</strong>`;
+                reconnectRow.innerHTML = `<span>Next connection</span><strong>${getNanahReconnectModeLabel(safeObject(entry?.policy).reconnectMode)}</strong>`;
                 policyRows.appendChild(reconnectRow);
 
                 if (entry?.localRole === 'replica' && entry?.remoteRole === 'source') {
                     const childProtectionRow = document.createElement('div');
                     childProtectionRow.className = 'nanah-trusted-link__policy-row';
-                    childProtectionRow.innerHTML = `<span>Child protection</span><strong>${getNanahChildProtectionLevelLabel(safeObject(entry?.policy).childProtectionLevel)}</strong>`;
+                    childProtectionRow.innerHTML = `<span>Everyday protection</span><strong>${getNanahChildProtectionLevelLabel(safeObject(entry?.policy).childProtectionLevel)}</strong>`;
                     policyRows.appendChild(childProtectionRow);
 
                     const targetProfileBehavior = getNanahTargetProfileBehavior(safeObject(entry?.policy).targetProfileBehavior, 'current_active');
@@ -15321,12 +15321,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                         : 'Current active profile';
                     const targetRow = document.createElement('div');
                     targetRow.className = 'nanah-trusted-link__policy-row';
-                    targetRow.innerHTML = `<span>Target profile</span><strong>${targetProfileLabel}</strong>`;
+                    targetRow.innerHTML = `<span>Where updates land</span><strong>${targetProfileLabel}</strong>`;
                     policyRows.appendChild(targetRow);
 
                     const lockedChildRow = document.createElement('div');
                     lockedChildRow.className = 'nanah-trusted-link__policy-row';
-                    lockedChildRow.innerHTML = `<span>Locked child profile</span><strong>${getNanahLockedChildModeLabel(safeObject(entry?.policy).lockedChildMode)}</strong>`;
+                    lockedChildRow.innerHTML = `<span>While locked</span><strong>${getNanahLockedChildModeLabel(safeObject(entry?.policy).lockedChildMode)}</strong>`;
                     policyRows.appendChild(lockedChildRow);
 
                     const updateCheckRow = document.createElement('div');
@@ -15357,9 +15357,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 const note = document.createElement('div');
                 note.className = 'nanah-trusted-link__note';
-                note.textContent = `This parent trust link defaults to ${getNanahScopeLabel(safeObject(entry?.policy).defaultScope)} and uses ${getNanahStrategyLabel(safeObject(entry?.policy).applyMode).toLowerCase()} for allowed scopes. ${entry?.localRole === 'replica' && entry?.remoteRole === 'source'
-                    ? `Targeting is ${getNanahTargetProfileBehaviorLabel(safeObject(entry?.policy).targetProfileBehavior).toLowerCase()}, new sessions are ${getNanahReconnectModeLabel(safeObject(entry?.policy).reconnectMode).toLowerCase()}, and locked child handling is ${getNanahLockedChildModeLabel(safeObject(entry?.policy).lockedChildMode).toLowerCase()}.`
-                    : `New sessions are ${getNanahReconnectModeLabel(safeObject(entry?.policy).reconnectMode).toLowerCase()}.`}`;
+                note.textContent = `This saved parent link usually updates ${getNanahScopeLabel(safeObject(entry?.policy).defaultScope)} and will ${getNanahStrategyLabel(safeObject(entry?.policy).applyMode).toLowerCase()} matching allowed areas. ${entry?.localRole === 'replica' && entry?.remoteRole === 'source'
+                    ? `Updates land by ${getNanahTargetProfileBehaviorLabel(safeObject(entry?.policy).targetProfileBehavior).toLowerCase()}, the next connection is ${getNanahReconnectModeLabel(safeObject(entry?.policy).reconnectMode).toLowerCase()}, and locked behavior is ${getNanahLockedChildModeLabel(safeObject(entry?.policy).lockedChildMode).toLowerCase()}.`
+                    : `The next connection is ${getNanahReconnectModeLabel(safeObject(entry?.policy).reconnectMode).toLowerCase()}.`}`;
                 card.appendChild(note);
             }
 
@@ -15572,7 +15572,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else if (childReplicaOnly) {
                 ftNanahStrategyHint.textContent = 'This protected profile is still locked, so it can only receive updates here. Unlock it locally if you need to send from it.';
             } else if (trustedManaged && linkType === 'managed_link' && localRole === 'source') {
-                ftNanahStrategyHint.textContent = 'Trusted protected devices follow this saved merge or replace policy for allowed scopes.';
+                ftNanahStrategyHint.textContent = 'Trusted protected devices follow this saved merge or replace behavior for allowed areas.';
             } else if (linkType === 'managed_link') {
                 ftNanahStrategyHint.textContent = 'Until parent trust is saved, the receiving device still chooses merge or replace.';
             } else {
@@ -15724,7 +15724,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         : 'Locked protected profile connected. This device stays receive-only until the local child profile is unlocked.')
                     : trusted
                     ? (trustedPolicy.linkType === 'managed_link'
-                        ? 'Parent trust connected. Protected-device updates now follow the saved trusted policy for allowed scopes.'
+                        ? 'Parent trust connected. Protected-device updates now follow the saved trusted behavior for allowed areas.'
                         : 'Trusted peer connected. New proposals still stay reviewable on the receiving device.')
                     : (classifyNanahTrustedLink(getNanahRole(), normalizeString(nanahSessionState.remoteRole) || 'peer') === 'managed_link'
                         ? 'Connected as a parent-to-protected-device pair. Until you save parent trust, the receiving device still reviews and chooses merge or replace.'
@@ -16433,17 +16433,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         nanahTrustedReconnectApprovalPromise = (async () => {
             const policy = safeObject(trusted.policy);
             const response = await showChoiceModal({
-                title: 'Approve Managed Reconnect',
+                title: 'Approve Parent Connection',
                 message: `${getNanahRemoteLabel()} is reconnecting as a saved managed source for ${formatNanahProfileContext(getNanahLocalProfileContext())}.`,
                 details: [
-                    `Allowed scopes: ${describeNanahScopeList(policy.allowedScopes || policy.defaultScope || 'active')}`,
-                    `Saved apply policy: ${getNanahStrategyLabel(policy.applyMode || 'merge')}`,
-                    'No updates from this source will be accepted in this session until you approve this reconnect.'
+                    `Allowed areas: ${describeNanahScopeList(policy.allowedScopes || policy.defaultScope || 'active')}`,
+                    `Saved update behavior: ${getNanahStrategyLabel(policy.applyMode || 'merge')}`,
+                    'No updates from this parent link will be accepted in this session until you approve this connection.'
                 ],
                 choices: [
                     {
                         value: 'approve',
-                        label: 'Approve Reconnect',
+                        label: 'Approve Connection',
                         recommended: true
                     },
                     {
