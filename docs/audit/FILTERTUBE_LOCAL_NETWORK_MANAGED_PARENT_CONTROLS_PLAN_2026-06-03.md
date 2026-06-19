@@ -134,6 +134,12 @@ extension authority code.
   expandable explanation blocks. The mode cards and runtime spotlight copy use
   shorter parent/caregiver language, while relationship/scope/migration
   controls remain collapsed under `More controls`.
+- [x] Trusted-device row wording slice: saved Nanah links now show plain pills
+  such as `Parent link`, `Sends approved updates`, and `Receives parent
+  updates` instead of leading with source/replica vocabulary. Managed link
+  actions read as `Open Send Session`, `Edit Trust`, and `Reset Trust Key`,
+  preserving the same policy gates while making verified-device maintenance
+  easier to scan.
 - [x] Family Device Updates wording slice: the visible Accounts & Sync card and
   Help section now use parent-facing `Family Device Updates` language instead
   of leading with the Nanah implementation name. The raw relay URL is tucked

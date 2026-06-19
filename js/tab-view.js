@@ -11388,8 +11388,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             : 'Current active profile';
     }
 
-    function getNanahLinkTypeLabel(linkType) {
-        return normalizeString(linkType) === 'managed_link' ? 'parent trust link' : 'device trust link';
+    function getNanahTrustedLinkTypePill(entry) {
+        const raw = safeObject(entry);
+        return normalizeString(raw.linkType || safeObject(raw.policy).linkType) === 'managed_link'
+            ? 'Parent link'
+            : 'Device link';
+    }
+
+    function getNanahTrustedLinkRelationshipPill(entry) {
+        const localRole = normalizeString(entry?.localRole).toLowerCase();
+        const remoteRole = normalizeString(entry?.remoteRole).toLowerCase();
+        if (localRole === 'source' && remoteRole === 'replica') return 'Sends approved updates';
+        if (localRole === 'replica' && remoteRole === 'source') return 'Receives parent updates';
+        return 'Copies profiles';
     }
 
     function getNanahRoleLabel(role) {
@@ -15060,18 +15071,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const rolePill = document.createElement('span');
             rolePill.className = 'nanah-trusted-link__pill';
-            rolePill.textContent = getNanahLinkTypeLabel(entry?.linkType);
+            rolePill.textContent = getNanahTrustedLinkTypePill(entry);
             meta.appendChild(rolePill);
 
             const remoteRolePill = document.createElement('span');
             remoteRolePill.className = 'nanah-trusted-link__pill';
-            remoteRolePill.textContent = normalizeString(entry?.remoteRole) || 'peer';
+            remoteRolePill.textContent = getNanahTrustedLinkRelationshipPill(entry);
             meta.appendChild(remoteRolePill);
 
             if (safeObject(entry?.policy).linkType === 'managed_link') {
                 const policyPill = document.createElement('span');
                 policyPill.className = 'nanah-trusted-link__pill';
-                policyPill.textContent = `${getNanahStrategyLabel(safeObject(entry?.policy).applyMode)} policy`;
+                policyPill.textContent = `${getNanahStrategyLabel(safeObject(entry?.policy).applyMode)} allowed rules`;
                 meta.appendChild(policyPill);
             }
 
@@ -15106,7 +15117,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const reconnectBtn = document.createElement('button');
             reconnectBtn.type = 'button';
             reconnectBtn.className = 'btn-secondary';
-            reconnectBtn.textContent = 'Start New Session';
+            reconnectBtn.textContent = safeObject(entry?.policy).linkType === 'managed_link'
+                ? 'Open Send Session'
+                : 'Start New Session';
             reconnectBtn.addEventListener('click', async () => {
                 try {
                     await startNanahTrustedReconnect(entry);
@@ -15119,14 +15132,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const reconnectHint = document.createElement('small');
             reconnectHint.className = 'nanah-trusted-link__reconnect-hint';
-            reconnectHint.textContent = 'Uses saved trust and policy';
+            reconnectHint.textContent = safeObject(entry?.policy).linkType === 'managed_link'
+                ? 'Use when both devices are open'
+                : 'Uses saved trust and policy';
             actions.appendChild(reconnectHint);
 
             if (safeObject(entry?.policy).linkType === 'managed_link') {
                 const editBtn = document.createElement('button');
                 editBtn.type = 'button';
                 editBtn.className = 'btn-secondary';
-                editBtn.textContent = 'Edit Policy';
+                editBtn.textContent = 'Edit Trust';
                 editBtn.disabled = childManagedReplicaLink;
                 editBtn.title = childManagedReplicaLink
                     ? 'Child profiles cannot edit trusted parent policy from this surface.'
@@ -15150,7 +15165,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const rotateKeyBtn = document.createElement('button');
                 rotateKeyBtn.type = 'button';
                 rotateKeyBtn.className = 'btn-secondary';
-                rotateKeyBtn.textContent = 'Rotate Key';
+                rotateKeyBtn.textContent = 'Reset Trust Key';
                 rotateKeyBtn.title = 'Regenerate this parent device signing key and require managed child devices to pair again.';
                 rotateKeyBtn.disabled = childAdminRestricted;
                 rotateKeyBtn.addEventListener('click', async () => {
@@ -15277,7 +15292,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const deliveryAckRow = document.createElement('div');
                     deliveryAckRow.className = 'nanah-trusted-link__policy-row';
                     const deliveryAckLabel = document.createElement('span');
-                    deliveryAckLabel.textContent = 'Delivery receipts';
+                    deliveryAckLabel.textContent = 'Last delivery';
                     const deliveryAckValue = document.createElement('strong');
                     deliveryAckValue.textContent = formatNanahManagedSourceAckSyncStatus(entry);
                     deliveryAckRow.appendChild(deliveryAckLabel);
