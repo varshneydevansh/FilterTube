@@ -2266,6 +2266,11 @@ html[data-theme="dark"] .nanah-delivery-card__eyebrow {
     color: #f3b7aa;
 }
 
+html[data-theme="dark"] .nanah-delivery-check {
+    border-color: rgba(74, 222, 128, 0.18);
+    background: linear-gradient(180deg, rgba(23, 71, 45, 0.26), rgba(16, 46, 34, 0.22));
+}
+
 html[data-theme="dark"] .top-bar {
     background: rgba(12, 18, 26, 0.88);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -2993,12 +2998,18 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
         flex-direction: column;
     }
 
+    .nanah-delivery-check {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
     .nanah-delivery-advanced > summary {
         align-items: flex-start;
         flex-direction: column;
     }
 
-    .nanah-delivery-card > button {
+    .nanah-delivery-card > button,
+    .nanah-delivery-check > button {
         width: 100%;
     }
 }
@@ -3390,6 +3401,56 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
 }
 
 .nanah-delivery-card > button:disabled {
+    cursor: not-allowed;
+    opacity: 0.52;
+}
+
+.nanah-delivery-check {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    margin: 0 0.9rem 0.9rem;
+    padding: 0.82rem 0.9rem;
+    border: 1px solid rgba(62, 135, 92, 0.18);
+    border-radius: 1rem;
+    background: linear-gradient(180deg, rgba(242, 250, 245, 0.78), rgba(255, 255, 255, 0.68));
+}
+
+.nanah-delivery-check[hidden] {
+    display: none;
+}
+
+.nanah-delivery-check > div {
+    display: grid;
+    gap: 0.22rem;
+    min-width: 0;
+}
+
+.nanah-delivery-check strong {
+    min-width: 0;
+    color: var(--ft-color-text-primary);
+    font-size: 0.86rem;
+    font-weight: 850;
+    line-height: 1.25;
+}
+
+.nanah-delivery-check small {
+    min-width: 0;
+    color: var(--ft-color-text-secondary);
+    font-size: 0.76rem;
+    font-weight: 600;
+    line-height: 1.42;
+}
+
+.nanah-delivery-check > button {
+    flex: 0 0 auto;
+    min-height: 2.25rem;
+    padding-inline: 0.9rem;
+    white-space: nowrap;
+}
+
+.nanah-delivery-check > button:disabled {
     cursor: not-allowed;
     opacity: 0.52;
 }

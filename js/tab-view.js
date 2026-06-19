@@ -2942,6 +2942,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftNanahDeliveryLocalLabel = document.getElementById('ftNanahDeliveryLocalLabel');
     const ftNanahDeliveryLocalDetail = document.getElementById('ftNanahDeliveryLocalDetail');
     const ftNanahDeliveryLocalBtn = document.getElementById('ftNanahDeliveryLocalBtn');
+    const ftNanahDeliveryCheckRow = document.getElementById('ftNanahDeliveryCheckRow');
+    const ftNanahDeliveryCheckDetail = document.getElementById('ftNanahDeliveryCheckDetail');
+    const ftNanahDeliveryCheckBtn = document.getElementById('ftNanahDeliveryCheckBtn');
 
     const openKofiBtn = document.getElementById('openKofiBtn');
     const dashboardDonateBtn = document.getElementById('dashboardDonateBtn');
@@ -13385,6 +13388,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
+    function hasNanahManagedSavedUpdateCheckTarget() {
+        const root = safeObject(profilesV4Cache);
+        const activeId = normalizeString(root.activeProfileId) || activeProfileId || 'default';
+        const openSyncHelper = createNanahManagedOpenSyncHelper();
+        if (openSyncHelper && typeof openSyncHelper.collectManagedOpenSyncLinks === 'function') {
+            try {
+                const openSyncLinks = openSyncHelper.collectManagedOpenSyncLinks({
+                    links: nanahTrustedLinks,
+                    activeProfileId: activeId,
+                    profilesV4: root
+                });
+                if (openSyncLinks.length > 0) return true;
+            } catch (_) {
+                // Fall through to the local-network eligibility check.
+            }
+        }
+        try {
+            return getNanahManagedLocalNetworkEligibleLinks(activeId, root).length > 0;
+        } catch (_) {
+            return false;
+        }
+    }
+
     function renderNanahDeliveryPathStrip() {
         const deliverySummary = getNanahFamilyDeliveryReadinessSummary();
         const hasProtectedProfiles = deliverySummary.protectedProfileCount > 0;
@@ -13453,6 +13479,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahDeliveryLocalBtn.title = localCanConfigure
                 ? 'Optional advanced path for a trusted FilterTube bridge on your own network.'
                 : 'Create a protected profile and pair a verified device before setting up same-network delivery.';
+        }
+
+        const laterConfigured = mailbox.configured === true || local.configured === true;
+        const canCheckSavedUpdates = laterConfigured && hasNanahManagedSavedUpdateCheckTarget();
+        if (ftNanahDeliveryCheckRow) {
+            ftNanahDeliveryCheckRow.hidden = !laterConfigured;
+        }
+        if (ftNanahDeliveryCheckDetail) {
+            ftNanahDeliveryCheckDetail.textContent = canCheckSavedUpdates
+                ? 'Checks Internet Pickup and Home Bridge now. Signed parent-link validation still decides what can apply.'
+                : 'Use this on the protected device after it saves a trusted parent link.';
+        }
+        if (ftNanahDeliveryCheckBtn) {
+            ftNanahDeliveryCheckBtn.disabled = !canCheckSavedUpdates;
+            ftNanahDeliveryCheckBtn.title = canCheckSavedUpdates
+                ? 'Run the saved-update check now for this protected profile.'
+                : 'Available on a protected device with a saved trusted parent link and an optional delivery service configured.';
         }
     }
 
@@ -18809,6 +18852,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         ftNanahDeliveryLocalBtn.addEventListener('click', async () => {
             await configureNanahManagedLocalNetworkProvider();
             renderNanahDeliveryPathStrip();
+        });
+    }
+
+    if (ftNanahDeliveryCheckBtn) {
+        ftNanahDeliveryCheckBtn.addEventListener('click', async () => {
+            if (ftNanahDeliveryCheckBtn.disabled) return;
+            ftNanahDeliveryCheckBtn.disabled = true;
+            try {
+                await runNanahManagedOpenSync({ reason: 'manual_saved_update_check' });
+                await runNanahManagedLocalNetworkSync({ reason: 'manual_saved_update_check' });
+                renderNanahDeliveryPathStrip();
+                UIComponents.showToast('Checked waiting parent updates', 'info');
+            } catch (error) {
+                console.error('FilterTube: waiting parent update check failed', error);
+                UIComponents.showToast(error?.message || 'Waiting update check failed', 'error');
+            } finally {
+                renderNanahDeliveryPathStrip();
+            }
         });
     }
 

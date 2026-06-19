@@ -18,7 +18,7 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/tab-view.js` | 21188 | 1004211 | `b56d97bcfb0e1b8f21ac4e964de071919b6ed5f29227d4fd06c15fe5136abb25` |
+| `js/tab-view.js` | 21249 | 1007353 | `05e18faf7eb3ca300cd6c36e3aaae5ae548164b52006b45e41613750ace70482` |
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/io_manager.js` | 2119 | 102123 | `d457bdcc4f7fc3acef401b48437fc707e2b9f2791e18ff4cafc1209f810bcc3c` |
 | `js/background.js` | 6984 | 315747 | `080d15907b26314873138c5dcc5d9653a2a27e933049be10361dfe0047f0a7cc` |
@@ -45,7 +45,7 @@ background profile storage invalidation block: 42 lines, 1464 bytes
 tab-view ensureProfileUnlocked tokens: 34
 tab-view saveProfilesV4 tokens: 71
 tab-view loadProfilesV4 tokens: 114
-tab-view activeProfileId tokens: 127
+tab-view activeProfileId tokens: 130
 tab-view StateManager.loadSettings tokens: 15
 tab-view refreshProfilesUI tokens: 38
 tab-view applyLockGateIfNeeded tokens: 4

@@ -64,7 +64,7 @@ rows; command-center buttons delegate to existing dashboard runtime gates.
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/seed.js` | 1136 | 50026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
 | `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
-| `js/tab-view.js` | 21188 | 1004211 | `b56d97bcfb0e1b8f21ac4e964de071919b6ed5f29227d4fd06c15fe5136abb25` |
+| `js/tab-view.js` | 21249 | 1007353 | `05e18faf7eb3ca300cd6c36e3aaae5ae548164b52006b45e41613750ace70482` |
 
 ## File And Operation Counts
 
@@ -160,9 +160,9 @@ js/state_manager.js:914:runtime.sendMessage:kidsBlockChannelRuntimeMutation
 js/state_manager.js:1297:tabs.sendMessage:subscriptionsImportContentRequest
 js/state_manager.js:1636:runtime.sendMessage:kidsWhitelistRuntimeMutation
 js/state_manager.js:1808:runtime.sendMessage:whitelistTransferRuntimeMutation
-js/tab-view.js:3271:runtime.sendMessage:dashboardRuntimeRequest
-js/tab-view.js:3665:tabs.sendMessage:dashboardTabRuntimeRequest
-js/tab-view.js:20456:runtime.onMessage.addListener:dashboardRuntimeMessageReceiver
+js/tab-view.js:3274:runtime.sendMessage:dashboardRuntimeRequest
+js/tab-view.js:3668:tabs.sendMessage:dashboardTabRuntimeRequest
+js/tab-view.js:20517:runtime.onMessage.addListener:dashboardRuntimeMessageReceiver
 ```
 
 ## Current Behavior Boundaries

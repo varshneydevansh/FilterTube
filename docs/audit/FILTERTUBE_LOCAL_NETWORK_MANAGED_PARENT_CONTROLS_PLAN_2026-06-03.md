@@ -495,6 +495,15 @@ parent tool instead of a sync/debug console.
     trusted-link validation, target-profile matching, scope, revision, hash,
     signature checks, and local apply gates still decide whether anything can
     apply.
+  - [x] 2026-06-20 Family Device Updates waiting-update check slice: the
+    Accounts & Sync delivery strip now surfaces `Check waiting parent updates`
+    inside the later-delivery disclosure when Internet Pickup or Home Bridge is
+    configured. The button is enabled only on a protected-device profile with a
+    saved trusted parent link, and it calls the same manual
+    `manual_saved_update_check` Internet Pickup/Home Bridge receive paths used
+    by trusted-link rows. It does not add provider authority; trusted-link
+    validation, target profile, scope, revision, hash, signature, and local
+    apply gates still decide whether anything can apply.
   - [x] Later-delivery simplification slice: the Accounts & Sync first-read note
     and Family Controls provider prompt now say the normal path is still open
     both devices, pair, verify, and Send Update. Internet Pickup/Home Bridge are

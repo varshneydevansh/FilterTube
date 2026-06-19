@@ -161,6 +161,12 @@ Internet Pickup or Home Bridge is already configured, the disclosure opens
 automatically to keep that existing send path visible. The strip is status and
 setup navigation only; it does not create hidden background sync, LAN discovery
 authority, or YouTube runtime work.
+When Internet Pickup or Home Bridge is configured, the same disclosure can show
+`Check waiting parent updates` for a protected-device profile that has already
+saved a trusted parent link. That button only runs the existing manual
+`manual_saved_update_check` Internet Pickup/Home Bridge receive paths; it does
+not let the service, network, or UI bypass trusted-link validation, target
+profile matching, scope, revision, hash, signature, or local apply gates.
 The subscription-check slice changes URL-backed list refresh semantics from
 blind replacement to hash-aware checking. When a checked URL returns the same
 source hash, Family Controls updates last-checked/source metadata and writes a
@@ -398,6 +404,7 @@ runtime managed command-center post-viewing/time-limit verified-device push: pre
 runtime connected verified-device live P2P managed policy send: present
 runtime provider-gated Internet Pickup/Home Bridge delivery handoff from command center: present
 runtime Family Device Updates later-delivery disclosure: present and auto-opens only for configured Internet Pickup/Home Bridge providers
+runtime Family Device Updates manual waiting-update check: present through existing manual_saved_update_check receive helpers and saved trusted parent-link eligibility
 runtime protected redacted push-attempt history rows: present
 runtime protected redacted push-attempt row feedback in command center: present
 runtime browser HTTPS mailbox upload/pull client: present behind explicit config
