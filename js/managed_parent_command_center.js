@@ -48,8 +48,8 @@
                 ? helpers.getManagedMailboxConfigSummary
                 : () => ({
                     configured: false,
-                    label: 'Pick Up Later off',
-                    detail: 'Send Now works when both devices are open. Pick Up Later is only for updates a protected device should collect after it opens.',
+                    label: 'Internet Pickup off',
+                    detail: 'Send Update works when both devices are open. Internet Pickup is only for updates a protected device should collect after it opens.',
                     tone: 'warning'
                 }),
             getManagedLocalNetworkConfigSummary: typeof helpers.getManagedLocalNetworkConfigSummary === 'function'
@@ -423,7 +423,7 @@
         if (item.syncMailboxReady === true) {
             return {
                 key: 'mailbox',
-                label: 'Pick Up Later ready',
+                label: 'Internet Pickup ready',
                 tone: 'success'
             };
         }
@@ -458,7 +458,7 @@
         const paths = [];
         if (item.syncLiveReady === true) paths.push('Send Now');
         if (item.syncLocalNetworkReady === true) paths.push('Home Bridge');
-        if (item.syncMailboxReady === true) paths.push('Pick Up Later');
+        if (item.syncMailboxReady === true) paths.push('Internet Pickup');
         return paths.length
             ? `${targetCount} verified ${targetCount === 1 ? 'device' : 'devices'} via ${paths.join(' + ')}.`
             : `${readyCount} verified ${readyCount === 1 ? 'queue is' : 'queues are'} ready.`;

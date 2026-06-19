@@ -13164,8 +13164,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!endpoint) {
             return {
                 configured: false,
-                label: 'Pick Up Later off',
-                detail: 'Send Now works when both devices are open. Set up Pick Up Later only when protected devices need to collect updates after opening.',
+                label: 'Internet Pickup off',
+                detail: 'Send Update works when both devices are open. Set up Internet Pickup only when protected devices need to collect updates after opening.',
                 tone: 'warning'
             };
         }
@@ -13180,15 +13180,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!configured) {
             return {
                 configured: false,
-                label: 'Pick Up Later needs review',
+                label: 'Internet Pickup needs review',
                 detail: `${host} is saved but is not ready for protected devices to pick up updates.`,
                 tone: 'warning'
             };
         }
         return {
             configured: true,
-            label: `Pick Up Later ready: ${host}`,
-            detail: 'Pick Up Later is available. The protected device still accepts only trusted parent updates.',
+            label: `Internet Pickup ready: ${host}`,
+            detail: 'Internet Pickup is available. The protected device still accepts only trusted parent updates.',
             tone: 'success'
         };
     }
@@ -13260,7 +13260,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 endpointHost: ''
             });
             await refreshProfilesUI();
-            UIComponents.showToast('Pick Up Later disabled', 'success');
+            UIComponents.showToast('Internet Pickup disabled', 'success');
             return;
         }
         const endpoint = await showPromptModal({
@@ -13280,7 +13280,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 endpointHost: ''
             });
             await refreshProfilesUI();
-            UIComponents.showToast('Pick Up Later disabled', 'success');
+            UIComponents.showToast('Internet Pickup disabled', 'success');
             return;
         }
         const token = await showPromptModal({
@@ -13550,7 +13550,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const transports = [
             liveReady ? 'Send Now' : '',
             localReady ? 'Home Bridge' : '',
-            mailboxReady ? 'Pick Up Later' : ''
+            mailboxReady ? 'Internet Pickup' : ''
         ].filter(Boolean).join(' + ');
         return {
             label: transports
@@ -13709,7 +13709,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 orderKey: `mailbox-config:${now}`,
                 summary: {
                     redacted: true,
-                    label: mailboxConfigured ? 'Pick Up Later configured' : 'Pick Up Later disabled',
+                    label: mailboxConfigured ? 'Internet Pickup configured' : 'Internet Pickup disabled',
                     mailboxConfigured,
                     endpointHost: mailboxConfigured ? endpointHost : '',
                     targetCount: targetIds.length
@@ -14454,7 +14454,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return {
                 configured: false,
                 label: 'Home Bridge off',
-                detail: 'Send Now and Pick Up Later can still work. Set this up only if you run a trusted FilterTube bridge.',
+                detail: 'Send Update and Internet Pickup can still work. Set this up only if you run a trusted FilterTube bridge.',
                 tone: 'warning'
             };
         }

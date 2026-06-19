@@ -346,6 +346,11 @@ parent tool instead of a sync/debug console.
     `Home Bridge` for the same-network bridge. The docs still map these to the
     underlying Pick Up Later/Home Bridge transports, but the first parent-facing
     labels now describe the outcome instead of the implementation.
+  - [x] Advanced pickup summary alignment slice: Family Controls status rows,
+    Settings handoff summaries, provider setup toasts, and verified-device path
+    summaries now say `Internet Pickup` consistently. Stable internal action
+    keys and older audit terminology remain unchanged so existing history rows
+    and transport validation do not drift.
   - [x] Settings handoff wording slice: the Settings import/export shortcut now
     says `Device Updates` instead of `Sync from other device`, and its title
     points to Accounts & Sync > Family Device Updates for pair/send/receive
