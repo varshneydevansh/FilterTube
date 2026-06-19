@@ -382,15 +382,15 @@ parent tool instead of a sync/debug console.
     same safety phrase. It does not create trust, skip parent validation, or
     change policy delivery authority.
   - [x] Verified-device pickup wording slice: trusted protected-profile links
-    now describe `syncOnProfileOpen` as `Auto-check on open` instead of a
+    now describe `syncOnProfileOpen` as `Check on open` instead of a
     transport name. The modal explains that a protected profile can check for
     newer trusted parent updates when an optional waiting or home-network
     service is configured, and status strings say `not ready`, `cannot apply
     here`, or `no matching parent link` instead of raw provider errors. This is
     UI/copy only; live Send Update, profile targeting, signature/hash/revision
     validation, and offline last valid policy behavior are unchanged.
-  - [x] Auto-check visibility slice: Family Controls now shows a read-only
-    `Auto-check` detail for verified protected-profile devices. It reports
+  - [x] Check-on-open visibility slice: Family Controls now shows a read-only
+    `Check on open` detail for verified protected-profile devices. It reports
     whether saved parent links are set to check for trusted updates when the
     protected profile opens, while keeping live Send Update, Internet Pickup,
     Home Bridge, signature/hash/revision validation, and offline last-policy

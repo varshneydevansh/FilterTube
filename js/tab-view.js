@@ -11744,9 +11744,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 syncOnOpenInput.checked = safeObject(initialPolicy).syncOnProfileOpen === true;
                 const openSyncCopy = document.createElement('div');
                 const openSyncTitle = document.createElement('strong');
-                openSyncTitle.textContent = 'Auto-check for parent updates when this profile opens';
+                openSyncTitle.textContent = 'Check for saved parent updates when this profile opens';
                 const openSyncBody = document.createElement('span');
-                openSyncBody.textContent = 'When an optional waiting or home-network service is configured, this protected profile checks for newer trusted parent updates as it opens. It applies only matching signed updates and keeps the last valid policy when offline.';
+                openSyncBody.textContent = 'Turn this on when this protected device should pick up parent-approved changes through Internet Pickup or Home Bridge. If no service is reachable, the current rules stay active.';
                 openSyncCopy.appendChild(openSyncTitle);
                 openSyncCopy.appendChild(openSyncBody);
                 openSyncToggle.appendChild(syncOnOpenInput);
@@ -15303,7 +15303,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const openSyncRow = document.createElement('div');
                     openSyncRow.className = 'nanah-trusted-link__policy-row';
                     const openSyncLabel = document.createElement('span');
-                    openSyncLabel.textContent = 'Auto-check on open';
+                    openSyncLabel.textContent = 'Check on open';
                     const openSyncValue = document.createElement('strong');
                     openSyncValue.textContent = formatNanahManagedOpenSyncStatus(entry);
                     openSyncRow.appendChild(openSyncLabel);
