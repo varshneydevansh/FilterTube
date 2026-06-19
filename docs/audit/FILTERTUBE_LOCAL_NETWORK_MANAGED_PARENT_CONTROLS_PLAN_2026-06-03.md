@@ -425,6 +425,12 @@ parent tool instead of a sync/debug console.
     stay active if no approved update is reachable. No storage field, provider,
     signature/hash/revision gate, target-profile rule, or live Send Update
     behavior changed.
+  - [x] Later-delivery simplification slice: the Accounts & Sync first-read note
+    and Family Controls provider prompt now say the normal path is still open
+    both devices, pair, verify, and Send Update. Internet Pickup/Home Bridge are
+    presented only as optional later-delivery setup for families or schools that
+    run a compatible pickup service; transport authority and provider gates are
+    unchanged.
   - [x] Trusted-device card wording slice: saved managed links now show
     `Allowed areas`, `Usual area`, `Update behavior`, `Matching parent updates`,
     `Next connection`, `Everyday protection`, `Where updates land`, and

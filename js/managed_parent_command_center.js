@@ -944,8 +944,8 @@
         if (shouldShowConfiguredProviderSetup || shouldShowProviderPrompt) {
             const providerIntro = document.createElement('div');
             providerIntro.className = 'ft-managed-command-center__provider-intro';
-            providerIntro.textContent = 'Optional advanced delivery';
-            providerIntro.title = 'Send Update is the normal path. Add these only when updates must wait for the other device to open later.';
+            providerIntro.textContent = 'Optional later delivery';
+            providerIntro.title = 'Send Update is the normal path. Add this only when the other device cannot be open at the same time.';
             panel.appendChild(providerIntro);
         }
 
@@ -958,9 +958,9 @@
             const promptCopy = document.createElement('div');
             promptCopy.className = 'ft-managed-command-center__provider-copy';
             const promptTitle = document.createElement('strong');
-            promptTitle.textContent = 'Need delivery when the other device opens later?';
+            promptTitle.textContent = 'Need updates to arrive later?';
             const promptDetail = document.createElement('span');
-            promptDetail.textContent = 'Optional. Keep using Send Update when both devices can be open together.';
+            promptDetail.textContent = 'Optional. Use Send Update when both devices can be open together.';
             promptCopy.append(promptTitle, promptDetail);
             providerSummary.appendChild(promptCopy);
             const promptActions = document.createElement('div');
@@ -968,16 +968,16 @@
             const promptBody = document.createElement('div');
             promptBody.className = 'ft-managed-command-center__provider-prompt-body';
             const promptBodyText = document.createElement('span');
-            promptBodyText.textContent = 'Normal control is live: open both devices, pair, verify, send. Add one of these only if you run a compatible waiting or home-network service.';
+            promptBodyText.textContent = 'Normal control is live: open both devices, pair, verify, send. Add one of these only if your family or school runs a compatible pickup service.';
             [
                 {
-                    label: 'Internet Pickup',
+                    label: 'Set Up Internet Pickup',
                     title: 'For protected devices that should collect waiting approved updates next time they open.',
                     action: 'configure_mailbox',
                     scope: 'mailbox_provider'
                 },
                 {
-                    label: 'Home Bridge',
+                    label: 'Set Up Home Bridge',
                     title: 'For a trusted FilterTube bridge you run on your home or school network.',
                     action: 'configure_local_network',
                     scope: 'local_network_provider'
