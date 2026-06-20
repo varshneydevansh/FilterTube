@@ -727,6 +727,11 @@ parent tool instead of a sync/debug console.
     `Same-Home Pickup`, protected-profile time limits, receive-only protected
     sync, and the no-overclaim boundary that delivery paths never become
     authority without local trusted-link and policy validation.
+  - [x] 2026-06-20 Family Device Updates naming-alignment slice: parent-visible
+    command-center, history, status, and compass labels now consistently use
+    `Later Pickup` and `Same-Home Pickup` instead of mixing them with provider
+    terms like Internet Pickup or Home Bridge. Protocol variables and provider
+    scopes remain unchanged.
   - [x] 2026-06-20 saved-device summary slice: saved trusted-device cards now
     show a parent-readable summary band before the detailed policy rows:
     control direction, usual update area/behavior, next step, and whether

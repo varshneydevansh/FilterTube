@@ -3158,15 +3158,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         'remote_policy.accept': 'Remote policy accepted',
         'remote_policy.reject': 'Remote policy rejected',
         'remote_policy.conflict': 'Remote policy conflict',
-        'remote_policy.mailbox.accept': 'Internet Pickup update accepted',
-        'remote_policy.mailbox.reject': 'Internet Pickup update rejected',
-        'remote_policy.mailbox.conflict': 'Internet Pickup update conflict',
-        'remote_policy.mailbox.expire': 'Internet Pickup update expired',
-        'remote_policy.mailbox.revoke': 'Internet Pickup update revoked',
-        'remote_policy.mailbox.ack': 'Internet Pickup receipt recorded',
-        'remote_policy.local_network.ack': 'Home Bridge receipt recorded',
-        'delivery.mailbox.configure': 'Internet Pickup setting changed',
-        'delivery.local_network.configure': 'Home Bridge setting changed',
+        'remote_policy.mailbox.accept': 'Later Pickup update accepted',
+        'remote_policy.mailbox.reject': 'Later Pickup update rejected',
+        'remote_policy.mailbox.conflict': 'Later Pickup update conflict',
+        'remote_policy.mailbox.expire': 'Later Pickup update expired',
+        'remote_policy.mailbox.revoke': 'Later Pickup update revoked',
+        'remote_policy.mailbox.ack': 'Later Pickup receipt recorded',
+        'remote_policy.local_network.ack': 'Same-Home Pickup receipt recorded',
+        'delivery.mailbox.configure': 'Later Pickup setting changed',
+        'delivery.local_network.configure': 'Same-Home Pickup setting changed',
         'remote_policy.source_push': 'Parent policy push',
         'history.clear': 'History cleared'
     });
@@ -5274,11 +5274,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const transport = normalizeString(root.transport);
         if (actionType.startsWith('policy.channel_list.')) return 'Approved list';
         if (actionType === 'remote_policy.source_push') return 'Send Update';
-        if (actionType.startsWith('remote_policy.mailbox.')) return 'Internet Pickup';
-        if (actionType.startsWith('remote_policy.local_network.')) return 'Home Bridge';
+        if (actionType.startsWith('remote_policy.mailbox.')) return 'Later Pickup';
+        if (actionType.startsWith('remote_policy.local_network.')) return 'Same-Home Pickup';
         if (actionType.startsWith('remote_policy.')) {
-            if (transport === 'local_network') return 'Home Bridge';
-            if (transport === 'mailbox') return 'Internet Pickup';
+            if (transport === 'local_network') return 'Same-Home Pickup';
+            if (transport === 'mailbox') return 'Later Pickup';
             return 'Remote update';
         }
         if (actionType === 'local_policy.update'
@@ -5436,8 +5436,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const missingProvider = normalizeNonNegativeInteger(root.providerMissingCount) || 0;
             const deliveryBits = [];
             if (liveSent) deliveryBits.push(`Send Update ${liveSent}`);
-            if (lanSent) deliveryBits.push(`Home Bridge ${lanSent}`);
-            if (mailboxSent) deliveryBits.push(`Internet Pickup ${mailboxSent}`);
+            if (lanSent) deliveryBits.push(`Same-Home Pickup ${lanSent}`);
+            if (mailboxSent) deliveryBits.push(`Later Pickup ${mailboxSent}`);
             if (failed) deliveryBits.push(`failed ${failed}`);
             if (noLinks) deliveryBits.push(`no-link ${noLinks}`);
             if (missingProvider) deliveryBits.push(`send path unavailable ${missingProvider}`);
@@ -5581,8 +5581,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const providerMissing = normalizeNonNegativeInteger(summary.providerMissingCount) || 0;
             const bits = [];
             if (liveSent) bits.push(`Send Update ${liveSent}`);
-            if (lanSent) bits.push(`Home Bridge ${lanSent}`);
-            if (mailboxSent) bits.push(`Internet Pickup ${mailboxSent}`);
+            if (lanSent) bits.push(`Same-Home Pickup ${lanSent}`);
+            if (mailboxSent) bits.push(`Later Pickup ${mailboxSent}`);
             if (failed) bits.push(`failed ${failed}`);
             if (noLinks) bits.push(`no-link ${noLinks}`);
             if (providerMissing) bits.push(`send path unavailable ${providerMissing}`);
@@ -14214,7 +14214,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 orderKey: `mailbox-config:${now}`,
                 summary: {
                     redacted: true,
-                    label: mailboxConfigured ? 'Internet Pickup configured' : 'Internet Pickup disabled',
+                    label: mailboxConfigured ? 'Later Pickup configured' : 'Later Pickup disabled',
                     mailboxConfigured,
                     endpointHost: mailboxConfigured ? endpointHost : '',
                     targetCount: targetIds.length
@@ -14273,7 +14273,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 orderKey: `local-network-config:${now}`,
                 summary: {
                     redacted: true,
-                    label: localNetworkConfigured ? 'Home Bridge configured' : 'Home Bridge disabled',
+                    label: localNetworkConfigured ? 'Same-Home Pickup configured' : 'Same-Home Pickup disabled',
                     localNetworkConfigured,
                     endpointHost: localNetworkConfigured ? endpointHost : '',
                     targetCount: targetIds.length
@@ -14819,7 +14819,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const mailboxItemId = normalizeString(ackRecord.mailboxItemId);
             const localNetworkCandidateId = normalizeString(ackRecord.localNetworkCandidateId || ackRecord.candidateId);
             const itemId = transport === 'local_network' ? localNetworkCandidateId : mailboxItemId;
-            const transportLabel = transport === 'local_network' ? 'Home Bridge' : 'Internet Pickup';
+            const transportLabel = transport === 'local_network' ? 'Same-Home Pickup' : 'Later Pickup';
             const result = providerAcceptedAll ? 'accepted' : 'rejected';
             const reason = providerAcceptedAll
                 ? null
@@ -15167,12 +15167,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const homeStatus = normalizeString(formatNanahManagedLocalNetworkSyncStatus(trusted));
         const parts = [];
         if (internetStatus && internetStatus !== 'Off') {
-            parts.push(internetStatus.toLowerCase().includes('internet pickup')
+            parts.push(internetStatus.toLowerCase().includes('later pickup')
                 ? internetStatus
                 : `Later Pickup: ${internetStatus}`);
         }
         if (homeStatus && homeStatus !== 'Off') {
-            parts.push(homeStatus.toLowerCase().includes('home bridge')
+            parts.push(homeStatus.toLowerCase().includes('same-home pickup')
                 ? homeStatus
                 : `Same-Home Pickup: ${homeStatus}`);
         }
