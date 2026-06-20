@@ -4448,6 +4448,74 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     color: var(--ft-color-text-secondary);
 }
 
+.nanah-trusted-link__overview {
+    display: grid;
+    grid-template-columns: minmax(9rem, 0.46fr) minmax(0, 1fr);
+    gap: 0.7rem;
+    align-items: stretch;
+    padding: 0.72rem;
+    border: 1px solid rgba(62, 135, 92, 0.16);
+    border-radius: 0.95rem;
+    background:
+        radial-gradient(circle at 14% 32%, rgba(62, 135, 92, 0.10), transparent 38%),
+        linear-gradient(180deg, rgba(244, 251, 247, 0.84), rgba(255, 255, 255, 0.66));
+}
+
+.nanah-trusted-link__overview-status {
+    display: grid;
+    align-content: center;
+    gap: 0.16rem;
+    min-width: 0;
+    padding: 0.62rem 0.68rem;
+    border: 1px solid rgba(62, 135, 92, 0.16);
+    border-radius: 0.78rem;
+    background: rgba(255, 255, 255, 0.7);
+}
+
+.nanah-trusted-link__overview-status span,
+.nanah-trusted-link__overview-details small {
+    color: #36724f;
+    font-size: 0.64rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.nanah-trusted-link__overview-status strong {
+    color: var(--ft-color-text-primary);
+    font-size: 0.9rem;
+    font-weight: 880;
+    line-height: 1.25;
+}
+
+.nanah-trusted-link__overview-details {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.52rem;
+    min-width: 0;
+}
+
+.nanah-trusted-link__overview-details span {
+    display: grid;
+    align-content: center;
+    gap: 0.16rem;
+    min-width: 0;
+    padding: 0.56rem 0.62rem;
+    border: 1px solid rgba(96, 120, 145, 0.10);
+    border-radius: 0.76rem;
+    background: rgba(255, 255, 255, 0.56);
+}
+
+.nanah-trusted-link__overview-details b {
+    min-width: 0;
+    color: var(--ft-color-text-primary);
+    font-size: 0.78rem;
+    font-weight: 760;
+    line-height: 1.34;
+    overflow-wrap: anywhere;
+}
+
 .nanah-trusted-link__actions {
     display: flex;
     flex-wrap: wrap;
@@ -4981,6 +5049,24 @@ html[data-theme="dark"] .nanah-trusted-link__policy {
     border-color: rgba(255, 255, 255, 0.08);
 }
 
+html[data-theme="dark"] .nanah-trusted-link__overview {
+    background:
+        radial-gradient(circle at 14% 32%, rgba(74, 222, 128, 0.12), transparent 38%),
+        rgba(12, 26, 22, 0.78);
+    border-color: rgba(74, 222, 128, 0.16);
+}
+
+html[data-theme="dark"] .nanah-trusted-link__overview-status,
+html[data-theme="dark"] .nanah-trusted-link__overview-details span {
+    background: rgba(255, 255, 255, 0.045);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme="dark"] .nanah-trusted-link__overview-status span,
+html[data-theme="dark"] .nanah-trusted-link__overview-details small {
+    color: #9be7b8;
+}
+
 html[data-theme="dark"] .nanah-managed-modal__section-title {
     color: #f0b4a8;
 }
@@ -5392,6 +5478,14 @@ body.ft-extension-surface .ft-profile-dropdown.ft-select-dropdown {
     }
 
     .nanah-device-compass__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .nanah-trusted-link__overview {
+        grid-template-columns: 1fr;
+    }
+
+    .nanah-trusted-link__overview-details {
         grid-template-columns: 1fr;
     }
 

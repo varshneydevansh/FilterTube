@@ -709,6 +709,12 @@ parent tool instead of a sync/debug console.
     still requires phrase verification, and later pickup applies only after
     trusted setup. This adds no LAN peer discovery, no ambient device scanning,
     and no new policy authority.
+  - [x] 2026-06-20 saved-device summary slice: saved trusted-device cards now
+    show a parent-readable summary band before the detailed policy rows:
+    control direction, usual update area/behavior, next step, and whether
+    matching parent updates are allowed or ask-first. This is renderer-only and
+    uses existing trusted-link policy labels; it does not expose keys, PINs,
+    payloads, raw device IDs, or change Nanah authority.
   - [x] 2026-06-20 protected-profile setup wording slice: parent-facing setup
     actions now say `Create Protected Profile` instead of `Create Child Profile`
     in Family Controls, Settings, and the creation prompt. This keeps the UI

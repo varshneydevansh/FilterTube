@@ -15878,9 +15878,50 @@ document.addEventListener('DOMContentLoaded', async () => {
             card.appendChild(header);
 
             if (safeObject(entry?.policy).linkType === 'managed_link') {
+                const policy = safeObject(entry?.policy);
+                const overview = document.createElement('div');
+                overview.className = 'nanah-trusted-link__overview';
+
+                const overviewStatus = document.createElement('div');
+                overviewStatus.className = 'nanah-trusted-link__overview-status';
+                const overviewStatusLabel = document.createElement('span');
+                overviewStatusLabel.textContent = 'Control';
+                const overviewStatusValue = document.createElement('strong');
+                overviewStatusValue.textContent = getNanahTrustedLinkDirectionSummary(entry);
+                overviewStatus.append(overviewStatusLabel, overviewStatusValue);
+
+                const overviewDetails = document.createElement('div');
+                overviewDetails.className = 'nanah-trusted-link__overview-details';
+                [
+                    {
+                        label: 'Updates',
+                        value: `${getNanahScopeLabel(policy.defaultScope)} · ${getNanahStrategyLabel(policy.applyMode)}`
+                    },
+                    {
+                        label: 'Next step',
+                        value: normalizeString(entry?.localRole) === 'replica' && normalizeString(entry?.remoteRole) === 'source'
+                            ? formatNanahProtectedUpdateCheckStatus(entry)
+                            : getNanahReconnectModeLabel(policy.reconnectMode)
+                    },
+                    {
+                        label: 'Trust',
+                        value: policy.autoApplyControlProposals === true ? 'Matching parent updates allowed' : 'Ask before applying'
+                    }
+                ].forEach((item) => {
+                    const detail = document.createElement('span');
+                    const label = document.createElement('small');
+                    label.textContent = item.label;
+                    const value = document.createElement('b');
+                    value.textContent = item.value;
+                    detail.append(label, value);
+                    overviewDetails.appendChild(detail);
+                });
+                overview.append(overviewStatus, overviewDetails);
+                card.appendChild(overview);
+
                 const scopes = document.createElement('div');
                 scopes.className = 'nanah-trusted-link__scopes';
-                getNanahScopeList(safeObject(entry?.policy).allowedScopes).forEach((scope) => {
+                getNanahScopeList(policy.allowedScopes).forEach((scope) => {
                     const scopePill = document.createElement('span');
                     scopePill.className = 'nanah-trusted-link__pill';
                     scopePill.textContent = getNanahScopeLabel(scope);
