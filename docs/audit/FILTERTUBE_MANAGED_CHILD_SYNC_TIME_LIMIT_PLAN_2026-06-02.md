@@ -2,7 +2,12 @@
 
 **Generated**: 2026-06-02  
 **Estimated Complexity**: High  
-**Status**: Planning/spec only. Runtime behavior is unchanged.  
+**Status**: Extension implementation in progress. Local protected-profile
+authority, Main/Kids route gates, time-limit UI/enforcement, signed managed
+Nanah envelopes, provider-gated open-sync, encrypted mailbox hooks, and
+provider-gated Home Bridge hooks now exist. Remaining proof is concentrated in
+installed two-device smoke, deployed optional delivery services, downstream app
+parity, and release-smoke evidence.
 **Owner repo**: `/Users/devanshvarshney/FilterTube`
 
 ## Overview
@@ -618,9 +623,19 @@ T1 + T2 + T3
 - **validation**:
   - `npm run test:settings`
   - `npm run test:changed`
-- **status**: Not Completed
+- **status**: Completed for extension authority inventory.
 - **log**:
+  - 2026-06-03 through 2026-06-20: Authority proof now covers local
+    protected-profile edits, session PIN authority, protected history,
+    route-gate enforcement, time-limit policy/enforcement, signed managed
+    Nanah envelopes, trusted-link revocation cleanup, open-sync, mailbox hooks,
+    and local-network provider boundaries.
 - **files edited/created**:
+  - `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
+  - `docs/audit/FILTERTUBE_MANAGED_CHILD_LOCAL_AUTHORITY_CONTRACT_2026-06-03.md`
+  - `docs/audit/FILTERTUBE_MANAGED_POLICY_ACTION_HISTORY_MODEL_2026-06-03.md`
+  - `docs/audit/FILTERTUBE_LOCAL_NETWORK_DISCOVERY_AUTHORITY_BOUNDARY_2026-06-03.md`
+  - `tests/runtime/managed-parent-authority-inventory-current-behavior.test.mjs`
 
 #### T2: Time-limit platform feasibility audit
 
@@ -640,9 +655,20 @@ T1 + T2 + T3
 - **validation**:
   - `npm run test:release`
   - `npm run test:settings`
-- **status**: Not Completed
+- **status**: Completed for extension browser/API feasibility and current
+  no-work boundaries.
 - **log**:
+  - 2026-06-03 through 2026-06-18: Audit evidence records Chrome storage,
+    tabs, idle, alarms, content heartbeat, active-tab counting, sleep/restart
+    drift, multiple-tab no-double-count, timezone reset, no-policy/no-work, and
+    extension-only control boundaries. Time-limit enforcement uses existing
+    extension permissions and keeps YouTube hot-path work disabled when no
+    active policy exists.
 - **files edited/created**:
+  - `docs/audit/FILTERTUBE_MANAGED_CHILD_TIME_LIMIT_SCHEMA_CONTRACT_2026-06-03.md`
+  - `docs/audit/FILTERTUBE_MANAGED_TIME_LIMIT_SETTINGS_PERFORMANCE_BOUNDARY_2026-06-05.md`
+  - `tests/runtime/managed-child-time-limit-schema-current-behavior.test.mjs`
+  - `tests/runtime/managed-time-budget-enforcement-current-behavior.test.mjs`
 
 #### T3: Downstream app sync contract audit
 
@@ -660,9 +686,19 @@ T1 + T2 + T3
 - **validation**:
   - `npm run test:release`
   - `npm run sync:native-runtime` when app repo is available and user wants cross-repo sync.
-- **status**: Not Completed
+- **status**: Completed for extension-owned contract inventory; downstream
+  native parity remains tracked by T14/T15.
 - **log**:
+  - 2026-06-04 through 2026-06-18: The extension-owned managed app policy
+    contract and runtime sync manifest now list the upstream schemas/helpers
+    downstream apps consume. The contract keeps Chrome/background runtime APIs
+    out of app authority payloads and records app-side parity as a separate
+    proof lane.
 - **files edited/created**:
+  - `docs/audit/FILTERTUBE_MANAGED_APP_POLICY_CONTRACT_PARITY_2026-06-04.md`
+  - `docs/audit/artifacts/managed-app-policy-contract-v1.json`
+  - `data/native-runtime-sync-manifest.json`
+  - `tests/runtime/managed-app-policy-contract-parity-current-behavior.test.mjs`
 
 ### Sprint 1: Schema and revision foundation
 
@@ -692,9 +728,17 @@ T1 + T2 + T3
 - **validation**:
   - `npm run test:settings`
   - `npm run test:release`
-- **status**: Not Completed
+- **status**: Completed for extension managed policy schema helpers.
 - **log**:
+  - 2026-06-03 through 2026-06-18: Managed policy schema proof now covers
+    `filtertube_managed_policy`, allowed scopes, device/profile/link binding,
+    payload family checks, signature/integrity gates, time-limit payload shape,
+    rule payload validation, and the no-PIN-in-payload boundary.
 - **files edited/created**:
+  - `docs/audit/FILTERTUBE_MANAGED_POLICY_SCHEMA_REVISION_CONTRACT_2026-06-03.md`
+  - `js/nanah_sync_adapter.js`
+  - `tests/runtime/managed-policy-schema-revision-contract-current-behavior.test.mjs`
+  - `tests/runtime/managed-policy-apply-current-behavior.test.mjs`
 
 #### T5: Add policy revision store
 
@@ -711,9 +755,21 @@ T1 + T2 + T3
   - Rollback requires a new higher revision.
 - **validation**:
   - `npm run test:settings`
-- **status**: Not Completed
+- **status**: Completed for extension accepted-revision storage and stale
+  remote-policy rejection.
 - **log**:
+  - 2026-06-03 through 2026-06-18: Accepted managed-policy revision/hash state
+    is persisted under
+    `profile.managedPolicyState.remoteManagedPolicies[linkId][scope]` after
+    validated apply. Same revision/same hash is idempotent, same revision with a
+    different hash is rejected as conflict, lower revisions are rejected as
+    stale/replay, and rollback requires a newer revision.
 - **files edited/created**:
+  - `docs/audit/FILTERTUBE_MANAGED_POLICY_SCHEMA_REVISION_CONTRACT_2026-06-03.md`
+  - `docs/audit/FILTERTUBE_RELEASE_PROFILE_NANAH_MANAGED_PARENT_AUTHORITY_INVENTORY_2026-06-03.md`
+  - `js/nanah_sync_adapter.js`
+  - `tests/runtime/managed-policy-schema-revision-contract-current-behavior.test.mjs`
+  - `tests/runtime/managed-policy-apply-current-behavior.test.mjs`
 
 #### T6: Add time-limit schema tests
 
@@ -728,9 +784,23 @@ T1 + T2 + T3
   - Invalid negative budgets fail closed.
 - **validation**:
   - `npm run test:settings`
-- **status**: Not Completed
+- **status**: Completed for extension time-limit schema and settings/runtime
+  proof.
 - **log**:
+  - 2026-06-03 through 2026-06-18: Time-limit schema proof now pins
+    `filtertube_managed_time_limit`, `active_youtube_tab` counting mode,
+    `single_active_tab_no_double_count`, policy-timezone midnight reset,
+    zero-budget timeout, disabled-policy no-work behavior, parent grant fields,
+    invalid negative budget rejection, reduced-budget revision behavior, and
+    active child profile runtime compilation.
 - **files edited/created**:
+  - `docs/audit/FILTERTUBE_MANAGED_CHILD_TIME_LIMIT_SCHEMA_CONTRACT_2026-06-03.md`
+  - `js/tab-view.js`
+  - `js/io_manager.js`
+  - `js/background.js`
+  - `js/content/bridge_settings.js`
+  - `tests/runtime/managed-child-time-limit-schema-current-behavior.test.mjs`
+  - `tests/runtime/managed-time-budget-enforcement-current-behavior.test.mjs`
 
 ### Sprint 2: Local parent control hardening
 

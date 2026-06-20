@@ -146,6 +146,28 @@ test('managed time-budget runtime is compiled background-owned and documented as
   assert.match(inventory, /Background re-resolves the active child compiled policy for each accepted\s+heartbeat/);
 });
 
+test('managed child sync roadmap no longer reports completed schema and time-limit foundations as spec-only', () => {
+  const plan = read(planPath);
+  const t1 = block(plan, '#### T1: Current authority inventory', '#### T2: Time-limit platform feasibility audit');
+  const t2 = block(plan, '#### T2: Time-limit platform feasibility audit', '#### T3: Downstream app sync contract audit');
+  const t3 = block(plan, '#### T3: Downstream app sync contract audit', '### Sprint 1: Schema and revision foundation');
+  const t4 = block(plan, '#### T4: Add managed policy schema helpers', '#### T5: Add policy revision store');
+  const t5 = block(plan, '#### T5: Add policy revision store', '#### T6: Add time-limit schema tests');
+  const t6 = block(plan, '#### T6: Add time-limit schema tests', '### Sprint 2: Local parent control hardening');
+
+  assert.match(plan, /Status\*\*: Extension implementation in progress/);
+  assert.doesNotMatch(plan, /Planning\/spec only\. Runtime behavior is unchanged/);
+  assert.match(t1, /status\*\*: Completed for extension authority inventory/);
+  assert.match(t2, /status\*\*: Completed for extension browser\/API feasibility/);
+  assert.match(t3, /status\*\*: Completed for extension-owned contract inventory/);
+  assert.match(t4, /status\*\*: Completed for extension managed policy schema helpers/);
+  assert.match(t5, /status\*\*: Completed for extension accepted-revision storage/);
+  assert.match(t5, /profile\.managedPolicyState\.remoteManagedPolicies\[linkId\]\[scope\]/);
+  assert.match(t6, /status\*\*: Completed for extension time-limit schema/);
+  assert.match(t6, /active_youtube_tab/);
+  assert.match(t6, /single_active_tab_no_double_count/);
+});
+
 test('managed time-budget background heartbeats use compiled active child policy authority', () => {
   const background = read('js/background.js');
   const heartbeatBlock = block(background, 'async function handleManagedTimeLimitHeartbeat(request, sender, sendResponse)', 'function isKidsUrl(url)');
