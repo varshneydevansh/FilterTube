@@ -111,6 +111,7 @@ js/nanah_managed_live_policy.js
 runtime source-side local-network candidate builder: present
 runtime source-side local-network provider publish helper: present
 runtime source-side local-network provider admin re-auth gate: present
+runtime local-network provider internal auth marker: present
 runtime partial provider acceptance handling: present
 runtime sent revision/hash marking only for provider-accepted candidates: present
 runtime signed envelope authority unchanged: present

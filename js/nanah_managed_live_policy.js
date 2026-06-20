@@ -20,6 +20,7 @@
         const normalizeString = deps.normalizeString;
         const safeObject = deps.safeObject;
         const normalizeNonNegativeInteger = deps.normalizeNonNegativeInteger;
+        const providerDeliveryAuthMarker = Object.freeze({ purpose: 'filtertube-managed-provider-delivery-auth' });
 
         function normalizeScope(scope) {
             const normalized = normalizeString(scope).toLowerCase();
@@ -403,8 +404,7 @@
 
         async function ensureProviderDeliveryAuthorized(transport, options = {}, context = {}) {
             const root = safeObject(options);
-            const proof = safeObject(root.auth || root.adminAuth || root.authorization);
-            if (root.providerDeliveryAuthorized === true || root.adminAuthorized === true || proof.ok === true || proof.valid === true || proof.authorized === true) return { ok: true };
+            if (root.providerDeliveryAuthorization === providerDeliveryAuthMarker) return { ok: true };
             if (typeof deps.ensureManagedProviderDeliveryAuthorized !== 'function') return { ok: false, reason: 'managed_provider_delivery_reauth_required' };
             const result = await deps.ensureManagedProviderDeliveryAuthorized({ ...safeObject(context), transport, reason: normalizeString(root.reason) || 'manual_send', sensitiveAction: true });
             const normalized = safeObject(result);
@@ -566,7 +566,7 @@
             const auth = await ensureProviderDeliveryAuthorized('local_network', options, { policy, trustedLinkCount: safeArray(trustedLinks).length });
             if (!auth.ok) return { ok: false, reason: auth.reason, candidateCount: 0, deliveredCandidateCount: 0, failedCandidateCount: 0, markedSentCount: 0, request: null };
             const candidates = await buildLocalNetworkCandidateBatchForTrustedLinks(policy, trustedLinks, options);
-            return deliverLocalNetworkCandidates(candidates, provider, { ...safeObject(options), providerDeliveryAuthorized: true });
+            return deliverLocalNetworkCandidates(candidates, provider, { ...safeObject(options), providerDeliveryAuthorization: providerDeliveryAuthMarker });
         }
 
         async function buildMailboxStorageItemFromEnvelope(envelope, options = {}) {
@@ -734,7 +734,7 @@
                 seal: safeObject(provider).requiresSealedMailboxItems === true || safeObject(options).seal === true
             };
             const items = await buildMailboxStorageItemBatchForTrustedLinks(policy, trustedLinks, uploadOptions);
-            return uploadMailboxItems(items, provider, { ...uploadOptions, providerDeliveryAuthorized: true });
+            return uploadMailboxItems(items, provider, { ...uploadOptions, providerDeliveryAuthorization: providerDeliveryAuthMarker });
         }
 
         function resolveTrustedLinkProviderScopes(trustedLink) {

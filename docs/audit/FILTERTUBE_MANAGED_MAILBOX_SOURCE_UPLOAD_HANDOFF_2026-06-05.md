@@ -191,6 +191,7 @@ tests/runtime/managed-transport-provider-clients-current-behavior.test.mjs
 runtime source-side mailbox storage item builder handoff: present
 runtime source-side mailbox upload-provider helper: present
 runtime source-side mailbox upload admin re-auth gate: present
+runtime upload-provider internal auth marker: present
 runtime source-side mailbox purge-provider helper: present
 runtime source-side mailbox purge admin re-auth gate: present
 runtime provider upload item allowlist sanitizer: present
