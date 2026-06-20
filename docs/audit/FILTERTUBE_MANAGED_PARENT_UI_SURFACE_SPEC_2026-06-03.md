@@ -70,11 +70,16 @@ devices through the existing managed-policy path. The normal dashboard wording
 should say `Import List`, not expose provider/subscription authority language.
 
 2026-06-20 naming addendum: the parent-facing device UI uses one Family Device
-Map for ready-now, same-home, and away/later devices. The visible delivery
+Map for Send Update, Same-Home Pickup, and Later Pickup devices. The visible delivery
 states are `Send Update`, `Same-Home Pickup`, and `Later Pickup`. Older
 historical references to `Home Bridge`, `Internet Pickup`, `mailbox`, `LAN`, or
 provider setup map to those delivery states and must not become separate first
 run screens or authority labels.
+2026-06-20 runtime-copy addendum: Family Device Updates and the command-center
+trust map now use those same parent-facing labels in visible text, status rows,
+and screen-reader labels. `Later Pickup` covers internet later-delivery devices;
+`Same-Home Pickup` covers explicitly configured same-network bridge devices.
+Both remain delivery states only, not authority.
 The first implementation slice now supports local pasted/text-file channel list
 imports from the command center. It skips name-only rows for safety, applies
 valid channel identifiers through the existing profile channel-rule arrays,

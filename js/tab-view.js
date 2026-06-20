@@ -13413,7 +13413,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!endpoint) {
             return {
                 configured: false,
-                label: 'Later pickup off',
+                label: 'Later Pickup off',
                 detail: 'Send Now works when both devices are open. Set this up only when a verified protected device must collect a parent-approved update after opening later.',
                 tone: 'warning'
             };
@@ -13429,14 +13429,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!configured) {
             return {
                 configured: false,
-                label: 'Later pickup needs review',
+                label: 'Later Pickup needs review',
                 detail: `${host} is saved but is not ready for protected devices to collect updates.`,
                 tone: 'warning'
             };
         }
         return {
             configured: true,
-            label: `Later pickup ready: ${host}`,
+            label: `Later Pickup ready: ${host}`,
             detail: 'A verified protected device can check for signed parent updates after opening. It still accepts only trusted parent updates.',
             tone: 'success'
         };
@@ -13506,7 +13506,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     : (!hasVerifiedDevice
                         ? 'Pair a verified protected device before setting up Later Pickup.'
                         : 'Optional: set this up only when a verified protected device away from this network must collect an update after opening later.'));
-            ftNanahCompassLaterBtn.setAttribute('aria-label', `Pick up later. ${ftNanahCompassLaterBtn.title}`);
+            ftNanahCompassLaterBtn.setAttribute('aria-label', `Later Pickup. ${ftNanahCompassLaterBtn.title}`);
         }
         if (ftNanahDeliveryMailboxCard) {
             ftNanahDeliveryMailboxCard.dataset.tone = mailbox.configured ? 'success' : (mailboxCanConfigure ? 'optional' : 'neutral');
@@ -13540,7 +13540,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     : (!hasVerifiedDevice
                         ? 'Pair a verified protected device before setting up Same-Home Pickup.'
                         : 'Optional: set this up only if you run a trusted FilterTube bridge on your own network.'));
-            ftNanahCompassHomeBtn.setAttribute('aria-label', `Pick up at home. ${ftNanahCompassHomeBtn.title}`);
+            ftNanahCompassHomeBtn.setAttribute('aria-label', `Same-Home Pickup. ${ftNanahCompassHomeBtn.title}`);
         }
         if (ftNanahDeliveryAdvanced && (mailbox.configured === true || local.configured === true)) {
             ftNanahDeliveryAdvanced.open = true;
@@ -13553,7 +13553,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahDeliveryLocalDetail.textContent = local.configured
                 ? local.detail
                 : (!hasProtectedProfiles
-                    ? 'Create a protected profile first. Same-home pickup only helps verified protected devices.'
+                    ? 'Create a protected profile first. Same-Home Pickup only helps verified protected devices.'
                     : (!hasVerifiedDevice
                         ? 'Pair a verified device first. Being on the same network is never authority.'
                         : local.detail));
@@ -13563,7 +13563,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahDeliveryLocalBtn.disabled = !localCanConfigure;
             ftNanahDeliveryLocalBtn.title = localCanConfigure
                 ? 'Optional advanced path for a trusted FilterTube bridge on your own network.'
-                : 'Create a protected profile and pair a verified device before setting up same-home delivery.';
+                : 'Create a protected profile and pair a verified device before setting up Same-Home Pickup.';
         }
 
         const hasSavedUpdateReader = hasNanahManagedSavedUpdateReader();
@@ -15037,7 +15037,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!endpoint) {
             return {
                 configured: false,
-                label: 'Same-home pickup off',
+                label: 'Same-Home Pickup off',
                 detail: 'Send Now can still work. Set this up only if you run an explicit FilterTube bridge on your home or school network.',
                 tone: 'warning'
             };
@@ -15046,7 +15046,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!configured) {
             return {
                 configured: false,
-                label: 'Same-home pickup needs review',
+                label: 'Same-Home Pickup needs review',
                 detail: `${host} is saved but is not ready to deliver protected updates.`,
                 tone: 'warning'
             };
@@ -15056,12 +15056,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const sameHost = !normalizeString(health.endpointHost) || normalizeString(health.endpointHost) === host;
         const healthDetail = checkedAge && sameHost
             ? (health.ok === true
-                ? `Last same-home check passed ${checkedAge}.`
-                : `Last same-home check did not pass ${checkedAge}.`)
+                ? `Last Same-Home Pickup check passed ${checkedAge}.`
+                : `Last Same-Home Pickup check did not pass ${checkedAge}.`)
             : 'Run Check/Edit if you want to verify the pickup path is reachable now.';
         return {
             configured: true,
-            label: `Same-home pickup ready: ${host}`,
+            label: `Same-Home Pickup ready: ${host}`,
             detail: `${healthDetail} Reachability is only a send path check; trusted parent policy still decides what can apply.`,
             tone: 'success'
         };

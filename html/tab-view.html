@@ -945,9 +945,9 @@
                                         <div class="nanah-sync-intro__copy">
                                             <span class="nanah-sync-intro__eyebrow">Family device updates</span>
                                             <p class="nanah-sync-intro__title">Choose where each family device gets parent-approved changes.</p>
-                                            <p class="nanah-sync-intro__body">Use one map for devices that are ready now, at home, or away. Start with Send Now: open both devices, pair, match the phrase, and send. Same-home pickup and away/later pickup are optional paths for families that cannot keep both devices open at the same time.</p>
+                                            <p class="nanah-sync-intro__body">Use one map for devices that are ready now, at home, or away. Start with Send Now: open both devices, pair, match the phrase, and send. Same-Home Pickup and Later Pickup are optional paths for families that cannot keep both devices open at the same time.</p>
                                         </div>
-                                        <div class="nanah-device-compass" aria-label="Family device map for ready-now, same-home, and away devices">
+                                        <div class="nanah-device-compass" aria-label="Family device map for Send Now, Same-Home Pickup, and Later Pickup devices">
                                             <div class="nanah-device-compass__center">
                                                 <div class="nanah-device-compass__hub-mark" aria-hidden="true"><i></i></div>
                                                 <span>Parent device</span>
@@ -964,17 +964,17 @@
                                                 <button id="ftNanahCompassHomeBtn" class="nanah-device-compass__choice" type="button">
                                                     <div class="nanah-device-compass__device" aria-hidden="true"><i></i></div>
                                                     <span>Same home</span>
-                                                    <strong>Pick up at home</strong>
+                                                    <strong>Same-Home Pickup</strong>
                                                     <small>Requires your Same-Home Pickup setup.</small>
                                                 </button>
                                                 <button id="ftNanahCompassLaterBtn" class="nanah-device-compass__choice" type="button">
                                                     <div class="nanah-device-compass__device" aria-hidden="true"><i></i></div>
                                                     <span>Away or later</span>
-                                                    <strong>Pick up later</strong>
+                                                    <strong>Later Pickup</strong>
                                                     <small>Uses trusted Later Pickup setup.</small>
                                                 </button>
                                             </div>
-                                            <div class="nanah-device-compass__rule">Pair and verify first. Ready-now devices, Wi-Fi, home pickup, and away pickup can only carry signed updates; they never grant control.</div>
+                                            <div class="nanah-device-compass__rule">Pair and verify first. Send Now, Same-Home Pickup, and Later Pickup can only carry signed updates; they never grant control.</div>
                                         </div>
                                         <div class="nanah-sync-simple-path" aria-label="Family device update path">
                                             <article class="nanah-sync-simple-path__item">
@@ -1013,16 +1013,16 @@
                                                 <div class="nanah-delivery-advanced__cards">
                                                     <article class="nanah-delivery-card" id="ftNanahDeliveryMailboxCard">
                                                         <div>
-                                                            <span class="nanah-delivery-card__eyebrow">Pick up later</span>
-                                                            <strong id="ftNanahDeliveryMailboxLabel">Later pickup off</strong>
+                                                            <span class="nanah-delivery-card__eyebrow">Away or later</span>
+                                                            <strong id="ftNanahDeliveryMailboxLabel">Later Pickup off</strong>
                                                             <small id="ftNanahDeliveryMailboxDetail">Optional waiting updates for verified protected devices.</small>
                                                         </div>
                                                         <button id="ftNanahDeliveryMailboxBtn" class="btn-secondary" type="button">Set Up</button>
                                                     </article>
                                                     <article class="nanah-delivery-card" id="ftNanahDeliveryLocalCard">
                                                         <div>
-                                                            <span class="nanah-delivery-card__eyebrow">Pick up at home</span>
-                                                            <strong id="ftNanahDeliveryLocalLabel">Same-home pickup off</strong>
+                                                            <span class="nanah-delivery-card__eyebrow">Same home</span>
+                                                            <strong id="ftNanahDeliveryLocalLabel">Same-Home Pickup off</strong>
                                                             <small id="ftNanahDeliveryLocalDetail">Optional home/school pickup path. Wi-Fi alone never grants control.</small>
                                                         </div>
                                                         <button id="ftNanahDeliveryLocalBtn" class="btn-secondary" type="button">Set Up</button>
@@ -1727,11 +1727,11 @@
                                             <div class="help-item-body">Nanah’s meeting service only helps two open devices exchange connection setup data. It does not read parent rules, PINs, or profile data. In the normal parent flow, open both devices, pair, verify the phrase, and use Send Now. Later Pickup and Same-Home Pickup are optional delivery tools for advanced setups; they still cannot apply anything unless the protected device already trusts that parent link. The underlying project is open here: <a href="https://github.com/varshneydevansh/nanah" target="_blank" rel="noopener noreferrer">github.com/varshneydevansh/nanah</a>.</div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">Same-home pickup</div>
+                                            <div class="help-item-title">Same-Home Pickup</div>
                                             <div class="help-item-body">Same-Home Pickup is for homes, clinics, or schools that run their own FilterTube-compatible bridge on the local network. It is not automatic Wi-Fi discovery, and it does not trust every device on the network. The protected device still applies only signed updates from its saved parent/caregiver link.</div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">Away or later pickup</div>
+                                            <div class="help-item-title">Later Pickup</div>
                                             <div class="help-item-body">Later Pickup is for a verified protected device that may open later or away from the parent device. It needs a trusted online pickup setup that stores unreadable signed updates until the protected device checks in. The service cannot read rules, approve itself, change PINs, or pick a profile; the protected device still validates the saved parent link before applying anything.</div>
                                         </div>
                                     </div>
