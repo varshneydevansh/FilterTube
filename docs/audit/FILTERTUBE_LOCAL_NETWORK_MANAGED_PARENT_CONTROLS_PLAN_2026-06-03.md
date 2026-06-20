@@ -812,7 +812,7 @@ parent tool instead of a sync/debug console.
 FilterTube has already started the extension-side managed parent control work
 through the current authority audit of profiles, PIN/session gates, Nanah
 managed links, profile-scoped payloads, Main/Kids viewing-space policy, and
-future time-limit enforcement.
+the first extension runtime time-limit enforcement path.
 
 Issue 60 feedback from Dartsgame974 sharpens the product requirement:
 managed controls are not only parental controls. They also support caregivers
@@ -934,9 +934,9 @@ Use these labels in normal UI:
 
 | Parent-facing label | Technical meaning |
 | --- | --- |
-| Send now / Live send | Live Nanah P2P while both devices are open. |
-| Internet Pickup | Encrypted internet pending-update service. |
-| Home Bridge | Trusted same-network bridge/gateway. |
+| Send Now / Live send | Live Nanah P2P while both devices are open. |
+| Later Pickup | Encrypted internet pending-update service. |
+| Same-Home Pickup | Trusted same-network bridge/gateway. |
 | Protected device | Child/family/caregiver-managed target profile/device. |
 | Parent-approved list | Reviewed channel/keyword list materialized into profile rules. |
 
@@ -948,6 +948,8 @@ LAN
 provider
 gateway
 candidate
+Internet Pickup
+Home Bridge
 ciphertext item
 local-network discovery
 ```
