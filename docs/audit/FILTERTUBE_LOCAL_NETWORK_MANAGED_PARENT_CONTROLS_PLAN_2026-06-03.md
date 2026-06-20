@@ -750,6 +750,9 @@ parent tool instead of a sync/debug console.
     Same-Home Pickup is the explicitly configured home/school path and Send Now
     remains the normal live P2P flow. Public wording still avoids claiming a
     hosted provider or automatic remote authority.
+  - [x] 2026-06-20 release-note away-device wording slice: shared release notes
+    now describe Later Pickup as the away/opens-later path while avoiding claims
+    about hosted service ownership or automatic remote authority.
   - [x] 2026-06-20 saved-device summary slice: saved trusted-device cards now
     show a parent-readable summary band before the detailed policy rows:
     control direction, usual update area/behavior, next step, and whether
