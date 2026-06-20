@@ -56,6 +56,7 @@ That means:
 
 - child/protected profiles are receive-only in Accounts & Sync from the protected surface
 - a child/profile PIN can open receive-only sync but does not unlock parent controls, rule editing, backups, trusted-link policy, viewing access, or time-limit changes
+- parent/admin unlock is temporary; sensitive actions can require re-auth, repeated wrong PIN attempts are delayed, and failed unlock evidence is written to protected local history
 - parent/account profiles edit protected Main/Kids rules from the protected profile row without switching into that profile
 - parent/account profiles can send reviewed rules, viewing-space access, time-limit changes, and profile settings to verified devices
 - protected profiles keep their last valid policy while offline

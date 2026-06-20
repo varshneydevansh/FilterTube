@@ -83,6 +83,7 @@ Important protected-profile rules:
 - `Same-Home Pickup` is an explicitly configured bridge, not automatic Wi-Fi scanning
 - protected profiles keep their last valid policy when offline
 - a protected-profile PIN can open receive-only sync, but it cannot unlock parent/admin controls
+- parent/admin unlock is temporary; sensitive actions can re-check the PIN, repeated wrong PIN attempts are delayed, and failed-unlock evidence stays in protected local history
 
 Protected profile time limits:
 

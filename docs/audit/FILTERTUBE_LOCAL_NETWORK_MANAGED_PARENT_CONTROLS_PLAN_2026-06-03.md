@@ -757,6 +757,11 @@ parent tool instead of a sync/debug console.
     readiness checks now report `Same-Home Pickup` in parent-facing toasts
     instead of reverting to the lower-level bridge term. Internal provider
     names and authority checks are unchanged.
+  - [x] 2026-06-20 admin unlock safety docs slice: Help, README, and
+    Functionality now describe the existing temporary parent/admin unlock,
+    sensitive-action re-auth, delayed repeated wrong PIN attempts, and protected
+    local failed-unlock history without exposing PIN values or turning history
+    into policy authority.
   - [x] 2026-06-20 saved-device summary slice: saved trusted-device cards now
     show a parent-readable summary band before the detailed policy rows:
     control direction, usual update area/behavior, next step, and whether
