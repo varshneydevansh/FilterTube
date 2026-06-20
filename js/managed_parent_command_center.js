@@ -58,7 +58,7 @@
                 : () => ({
                     configured: false,
                     label: 'Bridge off',
-                    detail: 'Same-network pickup needs an explicit FilterTube bridge; Wi-Fi discovery is never authority.',
+                    detail: 'Home Bridge needs a FilterTube-compatible bridge you choose; Wi-Fi discovery is never authority.',
                     tone: 'warning'
                 }),
             onAction: typeof helpers.onAction === 'function' ? helpers.onAction : null

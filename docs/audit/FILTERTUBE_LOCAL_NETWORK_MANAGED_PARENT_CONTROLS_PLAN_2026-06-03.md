@@ -638,6 +638,13 @@ parent tool instead of a sync/debug console.
     still applies only signed updates from the saved parent/caregiver link.
     Runtime provider hooks, local candidate validation, and trusted-link
     authority are unchanged.
+  - [x] 2026-06-20 Family Device Updates saved-update wording slice: the
+    Accounts & Sync first-read copy now says saved updates need a compatible
+    Internet Pickup or Home Bridge service when the other device opens later.
+    This keeps live Send Update as the normal parent flow and avoids making
+    local network setup sound like automatic Wi-Fi control. Runtime provider
+    hooks, local candidate validation, trusted-link authority, and signed
+    policy apply gates are unchanged.
   - [x] 2026-06-20 no automatic Home Bridge probing proof: the local-network
     provider client is pinned to fail closed without an explicit endpoint.
     Dashboard/profile-open discovery and bridge health checks return

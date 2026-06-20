@@ -505,13 +505,13 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /Live update/);
   assert.match(tabViewHtml, /If the other device opens later/);
   assert.match(tabViewHtml, /Later over internet/);
-  assert.match(tabViewHtml, /Same-network pickup needs an explicit FilterTube bridge; Wi-Fi alone never grants control/);
+  assert.match(tabViewHtml, /saved updates need a compatible Internet Pickup or Home Bridge service; Wi-Fi alone never grants control/);
   assert.match(tabViewHtml, /Same network/);
   assert.match(tabViewHtml, /Bridge off/);
   assert.match(tabViewHtml, /Wi-Fi alone never grants control/);
   assert.match(tabViewHtml, /Home Bridge is for homes, clinics, or schools that run their own FilterTube-compatible bridge on the local network/);
   assert.match(tabViewHtml, /id="ftNanahDeliveryAdvanced"/);
-  assert.match(tabViewHtml, /Advanced delivery for families or schools that run a compatible pickup service or explicit same-network bridge/);
+  assert.match(tabViewHtml, /Advanced saved updates for families, clinics, or schools that run a compatible Internet Pickup or Home Bridge service/);
   assert.match(tabViewHtml, /id="ftNanahDeliveryCheckRow"/);
   assert.match(tabViewHtml, /Check waiting parent updates/);
   assert.match(tabViewHtml, /Available after this protected profile saves a trusted parent link/);
@@ -525,7 +525,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /Checks Internet Pickup and Home Bridge now\. Signed parent-link validation still decides what can apply/);
   assert.match(source, /ftNanahDeliveryCheckBtn\.addEventListener\('click'/);
   assert.match(source, /Checked waiting parent updates/);
-  assert.match(helperSource, /Same-network pickup needs an explicit FilterTube bridge; Wi-Fi discovery is never authority/);
+  assert.match(helperSource, /Home Bridge needs a FilterTube-compatible bridge you choose; Wi-Fi discovery is never authority/);
   assert.match(helperSource, /Wi-Fi alone never grants control/);
   assert.match(plan, /Home Bridge intranet clarity slice/);
   assert.match(plan, /not automatic Wi-Fi\/LAN discovery/);
