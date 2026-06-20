@@ -730,6 +730,12 @@ parent tool instead of a sync/debug console.
     `Request more time` when the time policy itself is expired and needs parent
     review, so the protected profile sees a single parent-review action instead
     of a request button that cannot repair an expired rule.
+  - [x] 2026-06-20 command-center family map slice: the Family Controls
+    trust-map now says `Family device map`, labels the center as the parent
+    device, treats surrounding tiles as protected profiles the parent manages,
+    and shows delivery state as a compact route chip. The safety note now says
+    Home Bridge is a delivery path only after setup, while Wi-Fi, LAN
+    visibility, and servers never become authority.
   - [x] 2026-06-20 protected-profile setup wording slice: parent-facing setup
     actions now say `Create Protected Profile` instead of `Create Child Profile`
     in Family Controls, Settings, and the creation prompt. This keeps the UI

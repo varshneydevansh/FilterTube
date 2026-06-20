@@ -784,9 +784,9 @@
         const copy = document.createElement('div');
         copy.className = 'ft-managed-command-center__trust-map-copy';
         const title = document.createElement('strong');
-        title.textContent = 'Trusted devices';
+        title.textContent = 'Family device map';
         const detail = document.createElement('span');
-        detail.textContent = 'Pair once, verify the phrase, then send parent-approved updates. Devices on the same network still need that trusted link.';
+        detail.textContent = 'Each tile is a protected profile you can manage. Pair and verify before any other device can receive parent-approved updates.';
         copy.append(title, detail);
 
         const ring = document.createElement('div');
@@ -795,9 +795,9 @@
         const parentNode = document.createElement('div');
         parentNode.className = 'ft-managed-command-center__trust-parent';
         const parentLabel = document.createElement('strong');
-        parentLabel.textContent = 'Parent';
+        parentLabel.textContent = 'Parent device';
         const parentDetail = document.createElement('span');
-        parentDetail.textContent = `${summary.profileCount} protected ${summary.profileCount === 1 ? 'profile' : 'profiles'}`;
+        parentDetail.textContent = `${summary.profileCount} managed ${summary.profileCount === 1 ? 'profile' : 'profiles'}`;
         parentNode.append(parentLabel, parentDetail);
         ring.appendChild(parentNode);
 
@@ -841,7 +841,7 @@
 
         const note = document.createElement('div');
         note.className = 'ft-managed-command-center__trust-note';
-        note.textContent = 'Same-network control uses a Home Bridge only when you configure one; automatic Wi-Fi discovery is intentionally not a trust source.';
+        note.textContent = 'Same-network control is a delivery path only after Home Bridge setup. Wi-Fi, LAN visibility, and servers never become authority.';
 
         map.append(copy, ring, note);
         return map;

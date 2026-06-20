@@ -714,13 +714,14 @@ html[data-theme="dark"] body::after {
 .ft-managed-command-center__trust-map {
     display: grid;
     grid-template-columns: minmax(210px, 0.74fr) minmax(0, 1.26fr);
-    gap: 10px;
+    gap: 12px;
     align-items: stretch;
-    padding: 10px;
+    padding: 12px;
     border: 1px solid color-mix(in srgb, var(--ft-color-primary) 22%, var(--ft-color-sem-neutral-border));
     border-radius: 8px;
     background:
         radial-gradient(circle at 18% 44%, color-mix(in srgb, var(--ft-color-primary) 12%, transparent), transparent 32%),
+        radial-gradient(circle at 68% 52%, color-mix(in srgb, var(--ft-color-sem-success, #22c55e) 10%, transparent), transparent 28%),
         linear-gradient(180deg, var(--ft-color-bg-card), color-mix(in srgb, var(--ft-color-bg-panel) 86%, var(--ft-color-bg-surface)));
 }
 
@@ -747,7 +748,7 @@ html[data-theme="dark"] body::after {
 
 .ft-managed-command-center__trust-ring {
     display: grid;
-    grid-template-columns: minmax(112px, 0.42fr) minmax(0, 1fr);
+    grid-template-columns: minmax(118px, 0.4fr) minmax(0, 1fr);
     gap: 10px;
     align-items: stretch;
     min-width: 0;
@@ -765,6 +766,9 @@ html[data-theme="dark"] body::after {
     background:
         radial-gradient(circle, color-mix(in srgb, var(--ft-color-primary) 14%, transparent), transparent 66%),
         var(--ft-color-bg-surface);
+    box-shadow:
+        0 20px 36px -32px color-mix(in srgb, var(--ft-color-primary) 60%, transparent),
+        0 0 0 7px color-mix(in srgb, var(--ft-color-bg-surface) 70%, transparent);
     text-align: center;
 }
 
@@ -793,11 +797,12 @@ html[data-theme="dark"] body::after {
     min-height: 76px;
     display: grid;
     align-content: center;
-    gap: 3px;
+    gap: 5px;
     padding: 9px 10px;
     border: 1px solid var(--ft-color-sem-neutral-border);
     border-radius: 8px;
     background-color: var(--ft-color-bg-panel);
+    box-shadow: 0 14px 30px -28px rgba(23, 31, 38, 0.42);
 }
 
 .ft-managed-command-center__trust-device strong,
@@ -815,11 +820,20 @@ html[data-theme="dark"] body::after {
 }
 
 .ft-managed-command-center__trust-device span {
-    color: var(--ft-color-text-secondary);
+    width: fit-content;
+    max-width: 100%;
+    padding: 3px 7px;
+    border: 1px solid color-mix(in srgb, var(--ft-color-primary) 22%, var(--ft-color-sem-neutral-border));
+    border-radius: 999px;
+    color: color-mix(in srgb, var(--ft-color-primary) 82%, var(--ft-color-text-secondary));
+    background: color-mix(in srgb, var(--ft-color-primary) 7%, var(--ft-color-bg-surface));
     font-size: 11px;
     font-weight: 850;
     line-height: 1.2;
     text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .ft-managed-command-center__trust-device small {
