@@ -43,6 +43,7 @@ This is easy to understand but it is not a complete parity proof.
 | Top-level docs | README, changelog, and license are copied after README badge mutation. | Build is not a pure package operation; it mutates a tracked file before packaging. |
 | Browser manifest | Selected `manifest.<browser>.json` is written as package `manifest.json`; build only repairs collaborator script order. | Browser parity is not validated beyond that one ordering repair. |
 | Android artifacts | Optional APK/AAB files are copied from a release-artifact directory and `.sha256` files are generated. | This is release-side staging, not proof that a public website/download claim is valid. |
+| Reference managed-delivery provider | `scripts/managed-delivery-provider.mjs` is runnable through `npm run managed:provider`, but `scripts/` is not a browser package root. | The reference provider proves Internet Pickup/Home Bridge endpoint shape only; it is not shipped as browser runtime and is not a hosted service claim. |
 
 ## High-Confidence Findings
 
@@ -81,6 +82,14 @@ This is easy to understand but it is not a complete parity proof.
    Ignored root HTML/JSON/TXT captures are not copied by `COMMON_DIRS` or
    `COMMON_FILES`. They are evidence inputs only and should only enter release
    proof as minimal committed fixtures.
+
+8. **Managed delivery reference provider stays outside browser ZIP roots.**
+   The reference provider script is a developer/proof tool under `scripts/`
+   and is exposed by the `managed:provider` package script. The browser build
+   does not copy `scripts/`, so the extension package cannot accidentally imply
+   that FilterTube ships a hosted Internet Pickup service or built-in Home
+   Bridge daemon. Internet Pickup and Home Bridge remain explicit provider
+   endpoints configured by the user/admin and validated by local policy gates.
 
 ## Missing Future Authority
 
@@ -122,6 +131,7 @@ release_package_parity_browser_manifest_validation_covers_permissions_and_resour
 release_package_parity_github_release_is_draft_until_all_assets_upload
 release_package_parity_mobile_artifacts_have_checksum_and_claim_gate
 release_package_parity_raw_captures_never_enter_package_contents
+release_package_parity_managed_delivery_reference_provider_not_packaged
 ```
 
 ## Safe Next Work

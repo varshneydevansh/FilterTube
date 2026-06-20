@@ -47,6 +47,17 @@ test('build script copies whole common directories and top-level common files', 
   }
 });
 
+test('managed delivery reference provider stays outside browser release package roots', () => {
+  const build = read('build.js');
+  const packageJson = readJson('package.json');
+
+  assert.ok(fs.existsSync(path.join(repoRoot, 'scripts/managed-delivery-provider.mjs')));
+  assert.match(packageJson.scripts?.['managed:provider'] || '', /scripts\/managed-delivery-provider\.mjs/);
+  assert.doesNotMatch(build, /const COMMON_DIRS = \[[^\]]*'scripts'/);
+  assert.doesNotMatch(build, /const COMMON_FILES = \[[^\]]*managed-delivery-provider\.mjs/);
+  assert.match(read(auditDocPath), /Managed delivery reference provider stays outside browser ZIP roots/);
+});
+
 test('quarantined YouTube CSS is packaged by directory copy but not manifest loaded', () => {
   const build = read('build.js');
   assert.match(build, /'css'/);
