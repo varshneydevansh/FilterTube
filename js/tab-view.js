@@ -15941,7 +15941,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 title: childReplicaOnly ? 'Protected profile is locked here' : 'Protected device',
                 body: childReplicaOnly
                     ? 'This protected profile can receive approved parent updates here, but it cannot send settings or change parent trust while locked.'
-                    : 'Send parent-approved rules, time limits, and viewing access to a child, family, or protected device.',
+                    : 'Send parent-approved rules, time limits, and viewing access to a protected profile or family device.',
                 steps: childReplicaOnly
                     ? [
                         'Start from the parent or main profile on the managing device.',

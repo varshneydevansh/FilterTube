@@ -501,6 +501,12 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /return storedMode \? normalizeNanahUiMode\(storedMode\) : 'parent_control'/);
   assert.match(tabViewHtml, /<span id="ftNanahModeEyebrow" class="nanah-sync-guide__title">Family control<\/span>/);
   assert.match(tabViewHtml, /<strong id="ftNanahModeTitle" class="nanah-sync-mode-spotlight__title">Protected device<\/strong>/);
+  assert.match(tabViewHtml, /send parent-approved rules, time limits, and viewing access to a protected profile or family device/);
+  assert.match(tabViewHtml, /choose exactly which protected profile on the other device should receive this update/);
+  assert.match(tabViewHtml, /Pick the protected profile in <strong>Profile to update<\/strong>/);
+  assert.match(tabViewHtml, /Use this on the protected profile or family device that should accept matching parent updates/);
+  assert.match(tabViewHtml, /The protected profile can watch within those rules/);
+  assert.match(tabViewHtml, /parent updates stay tied to that protected or family profile/);
   assert.match(tabViewHtml, /How parent updates can reach verified devices/);
   assert.match(tabViewHtml, /Live update/);
   assert.match(tabViewHtml, /Optional: device opens later/);

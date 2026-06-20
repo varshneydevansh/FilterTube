@@ -698,6 +698,11 @@ parent tool instead of a sync/debug console.
     profile instead of child/child-or-protected in the visible Family Device
     Updates flow. Internal child-profile role guards and receive-only authority
     checks remain unchanged.
+  - [x] 2026-06-20 protected-profile setup instruction wording slice: Family
+    Device Updates setup instructions now describe protected profiles/devices in
+    parent-facing terms for mode intro, remote target, protected-device steps,
+    and Help targeting. Internal child-profile storage and authority guards
+    remain unchanged.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.

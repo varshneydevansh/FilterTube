@@ -18,7 +18,7 @@ tests/runtime/profile-management-persistence-boundary-current-behavior.test.mjs
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/tab-view.js` | 21334 | 1011629 | `d510552426747824477506ea3ab70ce01ac42a80fb159524bb39e1464f86f363` |
+| `js/tab-view.js` | 21334 | 1011629 | `aa787752d3cf251e6d8bc29b74443b503f10e2eae19c36e169ab882bfd572cce` |
 | `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
 | `js/io_manager.js` | 2119 | 102123 | `d457bdcc4f7fc3acef401b48437fc707e2b9f2791e18ff4cafc1209f810bcc3c` |
 | `js/background.js` | 6984 | 315747 | `080d15907b26314873138c5dcc5d9653a2a27e933049be10361dfe0047f0a7cc` |
