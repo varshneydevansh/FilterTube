@@ -142,6 +142,9 @@ test('managed time-budget runtime is compiled background-owned and documented as
   assert.match(contract, /Missing, disabled, malformed, non-child, or external-route policies remain\s+no-work states/);
   assert.match(plan, /ftManagedTimeUsageV1/);
   assert.match(plan, /re-resolves the compiled active child profile policy before counting/);
+  assert.match(plan, /status\*\*: Completed for source-backed extension runtime\. Installed YouTube\s+active-tab smoke remains a T16 release-proof row/);
+  assert.match(plan, /competing active tabs do not double-count/);
+  assert.match(plan, /exhausted budget\s+decisions return `timedOut` for the content bridge lock overlay/);
   assert.match(inventory, /Extension runtime now compiles a valid active child profile/);
   assert.match(inventory, /Background re-resolves the active child compiled policy for each accepted\s+heartbeat/);
 });

@@ -919,7 +919,8 @@ T1 + T2 + T3
   - `npm run test:settings`
   - `npm run test:release`
   - manual YouTube active-tab smoke
-- **status**: Partially Completed
+- **status**: Completed for source-backed extension runtime. Installed YouTube
+  active-tab smoke remains a T16 release-proof row.
 - **log**:
   - 2026-06-04: Extension background now compiles active child
     `settings.timeLimitPolicy` into `managedTimeLimitPolicy`, accepts
@@ -935,6 +936,11 @@ T1 + T2 + T3
     status only after the background confirms an enforced child/protected
     policy with positive remaining time. The status uses `pointer-events:none`
     and is removed for no-policy, external-route, error, and timed-out states.
+  - 2026-06-20: Source-backed proof now covers T9 acceptance: no active
+    time-limit policy stays no-work, counters are profile/date scoped under
+    `ftManagedTimeUsageV1`, competing active tabs do not double-count, sleep
+    drift is capped by heartbeat deltas and revalidation, and exhausted budget
+    decisions return `timedOut` for the content bridge lock overlay.
 - **files edited/created**:
   - `js/background.js`
   - `js/content/bridge_settings.js`
