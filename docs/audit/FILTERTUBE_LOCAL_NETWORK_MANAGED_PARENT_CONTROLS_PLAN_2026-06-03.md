@@ -715,6 +715,12 @@ parent tool instead of a sync/debug console.
     at home` reveals/opens Same-Home Pickup setup. Disabled paths explain the
     next required setup step instead of suggesting that nearby devices, Wi-Fi,
     or servers grant authority.
+  - [x] 2026-06-20 Family Device Updates chooser readiness slice: the three
+    compass choices now inherit delivery readiness from the existing strip:
+    live send, Later Pickup, and Same-Home Pickup each expose parent-readable
+    hover/focus guidance and visual tones for ready, optional, or setup-needed
+    states. This is UI feedback only; trusted-link validation, target profile,
+    scope, revision, hash, and signature gates still decide what can apply.
   - [x] 2026-06-20 saved-device summary slice: saved trusted-device cards now
     show a parent-readable summary band before the detailed policy rows:
     control direction, usual update area/behavior, next step, and whether

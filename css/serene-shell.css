@@ -3367,6 +3367,26 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
         0 18px 36px -30px rgba(20, 33, 45, 0.72);
 }
 
+.nanah-device-compass__choice[data-tone="success"] {
+    border-color: rgba(60, 118, 92, 0.28);
+    background:
+        linear-gradient(180deg, rgba(246, 253, 248, 0.94), rgba(237, 249, 242, 0.78));
+}
+
+.nanah-device-compass__choice[data-tone="success"] strong {
+    color: #285f45;
+}
+
+.nanah-device-compass__choice[data-tone="optional"] {
+    border-color: rgba(202, 138, 4, 0.24);
+    background:
+        linear-gradient(180deg, rgba(255, 251, 235, 0.88), rgba(255, 247, 219, 0.64));
+}
+
+.nanah-device-compass__choice[data-tone="optional"] strong {
+    color: #8a4f12;
+}
+
 .nanah-device-compass__choice::before {
     content: "";
     width: 0.56rem;

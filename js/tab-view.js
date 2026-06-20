@@ -13451,6 +13451,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ftNanahDeliveryLiveCard) {
             ftNanahDeliveryLiveCard.dataset.tone = liveReady ? 'success' : 'neutral';
         }
+        if (ftNanahCompassLiveBtn) {
+            ftNanahCompassLiveBtn.dataset.tone = liveReady ? 'success' : (hasProtectedProfiles ? 'optional' : 'neutral');
+            ftNanahCompassLiveBtn.title = liveReady
+                ? 'Ready to send now after reviewing the selected profile and allowed area.'
+                : (hasProtectedProfiles
+                    ? 'Open both devices, pair, verify the phrase, then send the update.'
+                    : 'Create one protected profile before pairing another device.');
+            ftNanahCompassLiveBtn.setAttribute('aria-label', `Send now. ${ftNanahCompassLiveBtn.title}`);
+        }
         if (ftNanahDeliveryLiveLabel) {
             ftNanahDeliveryLiveLabel.textContent = liveReady
                 ? 'Ready to send now'
@@ -13466,6 +13475,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const mailbox = summarizeManagedMailboxServerConfig();
         const mailboxCanConfigure = mailbox.configured === true || hasVerifiedDevice;
+        if (ftNanahCompassLaterBtn) {
+            ftNanahCompassLaterBtn.dataset.tone = mailbox.configured ? 'success' : (mailboxCanConfigure ? 'optional' : 'neutral');
+            ftNanahCompassLaterBtn.title = mailbox.configured
+                ? mailbox.detail
+                : (!hasProtectedProfiles
+                    ? 'Create a protected profile before setting up Later Pickup.'
+                    : (!hasVerifiedDevice
+                        ? 'Pair a verified protected device before setting up Later Pickup.'
+                        : 'Optional: set this up only when a verified protected device must collect an update after opening later.'));
+            ftNanahCompassLaterBtn.setAttribute('aria-label', `Pick up later. ${ftNanahCompassLaterBtn.title}`);
+        }
         if (ftNanahDeliveryMailboxCard) {
             ftNanahDeliveryMailboxCard.dataset.tone = mailbox.configured ? 'success' : (mailboxCanConfigure ? 'optional' : 'neutral');
         }
@@ -13489,6 +13509,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const local = summarizeManagedLocalNetworkProviderConfig();
         const localCanConfigure = local.configured === true || hasVerifiedDevice;
+        if (ftNanahCompassHomeBtn) {
+            ftNanahCompassHomeBtn.dataset.tone = local.configured ? 'success' : (localCanConfigure ? 'optional' : 'neutral');
+            ftNanahCompassHomeBtn.title = local.configured
+                ? local.detail
+                : (!hasProtectedProfiles
+                    ? 'Create a protected profile before setting up Same-Home Pickup.'
+                    : (!hasVerifiedDevice
+                        ? 'Pair a verified protected device before setting up Same-Home Pickup.'
+                        : 'Optional: set this up only if you run a trusted FilterTube bridge on your own network.'));
+            ftNanahCompassHomeBtn.setAttribute('aria-label', `Pick up at home. ${ftNanahCompassHomeBtn.title}`);
+        }
         if (ftNanahDeliveryAdvanced && (mailbox.configured === true || local.configured === true)) {
             ftNanahDeliveryAdvanced.open = true;
         }
