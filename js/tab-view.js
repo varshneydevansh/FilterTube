@@ -13735,7 +13735,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ok: false,
                 reason: 'health_check_unavailable'
             });
-            if (!silent) UIComponents.showToast('Bridge saved, but readiness could not be checked', 'warning');
+            if (!silent) UIComponents.showToast('Same-Home Pickup saved, but readiness could not be checked', 'warning');
             return { ok: false, reason: 'health_check_unavailable' };
         }
         try {
@@ -13752,7 +13752,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             if (!silent) {
                 UIComponents.showToast(
-                    ok ? 'Bridge saved and reachable' : 'Bridge saved, but it did not answer the readiness check',
+                    ok ? 'Same-Home Pickup saved and reachable' : 'Same-Home Pickup saved, but it did not answer the readiness check',
                     ok ? 'success' : 'warning'
                 );
             }
@@ -13764,7 +13764,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ok: false,
                 reason: normalizeString(error?.message) || 'health_check_failed'
             });
-            if (!silent) UIComponents.showToast('Bridge saved, but readiness could not be checked', 'warning');
+            if (!silent) UIComponents.showToast('Same-Home Pickup saved, but readiness could not be checked', 'warning');
             return { ok: false, reason: normalizeString(error?.message) || 'health_check_failed' };
         }
     }
