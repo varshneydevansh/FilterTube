@@ -104,8 +104,8 @@ extension authority code.
   neutral detail cards no longer look like warning/error states when nothing is
   wrong.
 - [x] 2026-06-20 Family Controls delivery-status wording slice: per-profile
-  device rows now use task-oriented labels: `Send Update ready`, `Later Pickup
-  set up`, `Same-network bridge set up`, `Pair only for another device`,
+  device rows now use task-oriented labels: `Send Update ready`, `Internet
+  Pickup set up`, `Home Bridge set up`, `Pair only for another device`,
   `Re-pair trusted device`, and `Refresh trusted device`. This changes only
   redacted status wording/details; trusted-link, signature, revision, provider,
   and parent/account re-auth gates are unchanged.
@@ -584,12 +584,11 @@ parent tool instead of a sync/debug console.
     framed as optional provider-backed delivery rather than ordinary Wi-Fi or
     server authority.
   - [x] 2026-06-20 Family Device Updates setup-label slice: the setup entry
-    points now say `Set Up Later Pickup` and `Set Up Same-Network Bridge` /
-    `Edit Bridge`, while status/history/provider checks can still use Internet
-    Pickup and Home Bridge where those exact transport names clarify audit
-    evidence. This is copy/UI state only; trusted-link, target-profile,
-    signature/hash/revision, provider, and runtime validation gates are
-    unchanged.
+    points now say `Set Up Internet Pickup`, `Edit Internet Pickup`, `Set Up
+    Home Bridge`, and `Edit Home Bridge` so the optional delivery dialogs match
+    the first-read Accounts & Sync strip. This is copy/UI state only;
+    trusted-link, target-profile, signature/hash/revision, provider, and runtime
+    validation gates are unchanged.
   - [x] Family Device Updates default-mode slice: the first-run Accounts & Sync
     mode is now `Protected device` / `parent_control` instead of
     `Copy once`. A previously saved user mode is still respected, child

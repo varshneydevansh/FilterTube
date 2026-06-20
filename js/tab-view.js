@@ -12603,7 +12603,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (ftNanahManagedTargetsHint) {
-            ftNanahManagedTargetsHint.textContent = `Choose which saved protected profiles on ${getNanahRemoteLabel()} receive this live update. Offline devices still need optional later pickup or same-network delivery.`;
+            ftNanahManagedTargetsHint.textContent = `Choose which saved protected profiles on ${getNanahRemoteLabel()} receive this live update. Offline devices still need optional Internet Pickup or Home Bridge setup.`;
         }
         return eligibleLinks;
     }
@@ -13571,17 +13571,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         const current = readNanahManagedMailboxServerConfig();
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
-            title: 'Later Pickup',
-            message: 'Later Pickup lets a protected device collect a waiting parent-approved update next time it opens.',
+            title: 'Internet Pickup',
+            message: 'Internet Pickup lets a protected device collect a waiting parent-approved update next time it opens.',
             details: [
                 'Normal parent control is Send Update: open both devices, pair, verify, and send.',
-                'Later Pickup is optional and advanced; skip it when both devices can be open together.',
+                'Internet Pickup is optional and advanced; skip it when both devices can be open together.',
                 'A FilterTube-compatible pickup service stores unreadable waiting updates only.',
                 'The saved trusted parent link still decides what applies.'
             ],
             configured: !!currentEndpoint,
-            configureLabel: currentEndpoint ? 'Edit Later Pickup' : 'Set Up Later Pickup',
-            disableLabel: 'Turn Off Later Pickup'
+            configureLabel: currentEndpoint ? 'Edit Internet Pickup' : 'Set Up Internet Pickup',
+            disableLabel: 'Turn Off Internet Pickup'
         });
         if (action === null) return;
         if (action === 'disable') {
@@ -13591,15 +13591,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 endpointHost: ''
             });
             await refreshProfilesUI();
-            UIComponents.showToast('Later Pickup disabled', 'success');
+            UIComponents.showToast('Internet Pickup disabled', 'success');
             return;
         }
         const endpoint = await showPromptModal({
-            title: 'Later Pickup Address',
+            title: 'Internet Pickup Address',
             message: 'Advanced only. Use this only if you run or trust a FilterTube-compatible internet pickup service. It is not the Nanah meeting service, and it cannot change rules by itself. Leave blank for live Send Update only.',
             placeholder: 'https://your-filtertube-pickup-service',
             inputType: 'url',
-            confirmText: currentEndpoint ? 'Save Later Pickup' : 'Enable Later Pickup',
+            confirmText: currentEndpoint ? 'Save Internet Pickup' : 'Enable Internet Pickup',
             initialValue: currentEndpoint
         });
         if (endpoint === null) return;
@@ -13611,11 +13611,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 endpointHost: ''
             });
             await refreshProfilesUI();
-            UIComponents.showToast('Later Pickup disabled', 'success');
+            UIComponents.showToast('Internet Pickup disabled', 'success');
             return;
         }
         const token = await showPromptModal({
-            title: 'Later Pickup Service Key',
+            title: 'Internet Pickup Service Key',
             message: 'Optional service key, not the parent PIN. Leave blank to keep the saved key. Enter a single dash to clear it.',
             placeholder: 'Optional service key',
             inputType: 'password',
@@ -13638,7 +13638,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? client.createProvider(nextConfig)
             : null;
         if (!provider || provider.configured !== true || !hasNanahManagedMailboxUploadWriter(provider)) {
-            UIComponents.showToast('Later Pickup address must be public HTTPS and supported by FilterTube', 'error');
+            UIComponents.showToast('Internet Pickup address must be public HTTPS and supported by FilterTube', 'error');
             return;
         }
         writeNanahManagedMailboxServerConfig(nextConfig);
@@ -13647,7 +13647,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             endpointHost: getManagedMailboxEndpointHostFromConfig(nextConfig)
         });
         await refreshProfilesUI();
-        UIComponents.showToast('Later Pickup saved', 'success');
+        UIComponents.showToast('Internet Pickup saved', 'success');
     }
 
     async function checkNanahManagedLocalNetworkProviderHealth({ reason = 'manual_check', silent = false } = {}) {
@@ -13711,16 +13711,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         const current = readNanahManagedLocalNetworkProviderConfig();
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
-            title: 'Same-Network Bridge',
-            message: 'Same-Network Bridge lets protected devices collect approved updates through a FilterTube bridge you run on your own network.',
+            title: 'Home Bridge',
+            message: 'Home Bridge lets protected devices collect approved updates through a FilterTube-compatible bridge you run on your own network.',
             details: [
                 'Normal parent control is Send Update: open both devices, pair, verify, and send.',
-                'Same-Network Bridge is optional and advanced; skip it unless you run a compatible bridge on your own network.',
+                'Home Bridge is optional and advanced; skip it unless you run a compatible bridge on your own network.',
                 'It is not automatic Wi-Fi discovery. Being on the same network is not enough to change rules.',
                 'The protected device still accepts only trusted parent updates.'
             ],
             configured: !!currentEndpoint,
-            configureLabel: currentEndpoint ? 'Edit Bridge' : 'Set Up Same-Network Bridge',
+            configureLabel: currentEndpoint ? 'Edit Home Bridge' : 'Set Up Home Bridge',
             disableLabel: 'Turn Off Bridge',
             extraChoices: currentEndpoint ? [{ value: 'check', label: 'Check Bridge', className: 'btn-secondary' }] : []
         });
@@ -13741,7 +13741,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const endpoint = await showPromptModal({
-            title: 'Same-Network Bridge Address',
+            title: 'Home Bridge Address',
             message: 'Advanced only. Use this only if you run a trusted FilterTube-compatible bridge on your own network. This is not automatic LAN discovery; normal parent control uses live Send Update.',
             placeholder: 'http://192.168.1.10:4177/filtertube',
             inputType: 'url',
@@ -13755,7 +13755,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const token = await showPromptModal({
-            title: 'Same-Network Bridge Service Key',
+            title: 'Home Bridge Service Key',
             message: 'Optional bridge key, not the parent PIN. Leave blank to keep the saved key. Enter a single dash to clear it.',
             placeholder: 'Optional bridge key',
             inputType: 'password',

@@ -457,8 +457,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /ft-managed-command-center__bulk-group-label/);
   assert.match(helperSource, /ft-managed-command-center__provider/);
   assert.match(helperSource, /ft-managed-command-center__provider-prompt/);
-  assert.match(helperSource, /Set Up Later Pickup/);
-  assert.match(helperSource, /Edit Later Pickup/);
+  assert.match(helperSource, /Set Up Internet Pickup/);
+  assert.match(helperSource, /Edit Internet Pickup/);
   assert.match(doc, /visible card says `Control`, `Automatic saved updates`, and `Delivery receipts`/);
   assert.match(source, /function getNanahTrustedLinkDirectionSummary\(entry\)/);
   assert.match(source, /function formatNanahProtectedUpdateCheckStatus\(link\)/);
@@ -1396,7 +1396,7 @@ test('managed command center delivery preview uses parent-facing setup labels', 
     syncLocalNetworkReady: true
   })), {
     key: 'local_network',
-    label: 'Same-network bridge set up',
+    label: 'Home Bridge set up',
     tone: 'success'
   });
   assert.deepEqual(plain(CommandCenter.resolveDeliveryPreview({
@@ -1408,7 +1408,7 @@ test('managed command center delivery preview uses parent-facing setup labels', 
     syncMailboxReady: true
   })), {
     key: 'mailbox',
-    label: 'Later Pickup set up',
+    label: 'Internet Pickup set up',
     tone: 'success'
   });
   assert.equal(CommandCenter.describeDeliveryPath({
