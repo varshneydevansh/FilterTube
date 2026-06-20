@@ -76,12 +76,15 @@ function ensureUnlockedDecision(profilesV4, profileId, unlockedProfiles = new Se
 }
 
 function startManagedChildEditDecision({ profilesV4, targetProfileId, unlockedProfiles = new Set() }) {
-  if (profileType(profilesV4, targetProfileId) !== 'child') return { allowed: false, reason: 'target_not_child' };
+  const targetId = String(targetProfileId || '');
+  if (!targetId || targetId === 'default' || !Object.prototype.hasOwnProperty.call(profilesV4.profiles || {}, targetId)) {
+    return { allowed: false, reason: 'target_not_protected' };
+  }
   if (!canActiveProfileManageProfile(profilesV4, targetProfileId)) return { allowed: false, reason: 'not_parent_authority' };
   const activeId = profilesV4.activeProfileId || 'default';
   const unlock = ensureUnlockedDecision(profilesV4, activeId, unlockedProfiles);
   if (!unlock.allowed) return unlock;
-  return { allowed: true, decision: 'start_virtual_child_edit' };
+  return { allowed: true, decision: 'start_virtual_protected_profile_edit' };
 }
 
 function saveManagedChildSurfaceDecision({ freshProfilesV4, managedChildEdit }) {
@@ -91,13 +94,10 @@ function saveManagedChildSurfaceDecision({ freshProfilesV4, managedChildEdit }) 
   if (!Object.prototype.hasOwnProperty.call(profiles, profileId)) {
     return { allowed: false, reason: 'target_missing' };
   }
-  if (profileType(freshProfilesV4, profileId) !== 'child') {
-    return { allowed: false, reason: 'fresh_target_not_child' };
-  }
   if (!canActiveProfileManageProfile(freshProfilesV4, profileId)) {
     return { allowed: false, reason: 'fresh_authority_recheck_failed' };
   }
-  return { allowed: true, decision: 'save_child_surface_with_revision_history' };
+  return { allowed: true, decision: 'save_protected_surface_with_revision_history' };
 }
 
 function adminSessionDecision({ activeProfileId, sessionProfileId, now, expiresAt, sensitiveAction = false, reauthAt = 0 }) {
@@ -262,9 +262,10 @@ test('managed child local authority contract is source-backed with accepted-save
   const tabView = read('js/tab-view.js');
   const source = runtimeSource();
 
-  assert.match(doc, /Status\*\*: Runtime local managed-save, failed-unlock history, admin-session\s+TTL, sensitive-action re-auth, profile-persisted failed-attempt rate-limit\s+hardening, and a shared managed-admin authority helper are partially present/);
+  assert.match(doc, /Status\*\*: Runtime local managed-save, failed-unlock history, admin-session\s+TTL, sensitive-action re-auth, profile-persisted failed-attempt rate-limit\s+hardening, and a shared managed-admin authority helper are present for\s+protected-profile edits in the extension dashboard/);
   assert.match(doc, /Who is allowed to enter virtual protected-profile edit mode/);
   assert.match(doc, /Required Local Authority Decisions/);
+  assert.match(doc, /master_manages_independent_protected_profile/);
   assert.match(doc, /Hardening Requirements/);
   assert.match(doc, /Addendum - 2026-06-05/);
   assert.match(doc, /js\/managed_admin_authority\.js/);
@@ -331,8 +332,9 @@ test('managed child local authority contract is source-backed with accepted-save
   assert.doesNotMatch(source, /managedChildAdminSessionTtl/);
 });
 
-test('local managed child authority rejects child admin and sibling edits while allowing parent targets', () => {
+test('local managed child authority rejects child admin and sibling edits while allowing parent and master protected targets', () => {
   assert.equal(canActiveProfileManageProfile(profilesFixture('default'), 'childA'), true);
+  assert.equal(canActiveProfileManageProfile(profilesFixture('default'), 'parentA'), true);
   assert.equal(canActiveProfileManageProfile(profilesFixture('parentA'), 'childA'), true);
   assert.equal(canActiveProfileManageProfile(profilesFixture('parentA'), 'childB'), false);
   assert.equal(canActiveProfileManageProfile(profilesFixture('childA'), 'childA'), false);
@@ -341,11 +343,19 @@ test('local managed child authority rejects child admin and sibling edits while 
 
   assert.deepEqual(
     startManagedChildEditDecision({ profilesV4: profilesFixture('parentA'), targetProfileId: 'childA' }),
-    { allowed: true, decision: 'start_virtual_child_edit' }
+    { allowed: true, decision: 'start_virtual_protected_profile_edit' }
   );
   assert.deepEqual(
     startManagedChildEditDecision({ profilesV4: profilesFixture('parentA'), targetProfileId: 'parentA' }),
-    { allowed: false, reason: 'target_not_child' }
+    { allowed: true, decision: 'start_virtual_protected_profile_edit' }
+  );
+  assert.deepEqual(
+    startManagedChildEditDecision({ profilesV4: profilesFixture('default'), targetProfileId: 'parentA' }),
+    { allowed: true, decision: 'start_virtual_protected_profile_edit' }
+  );
+  assert.deepEqual(
+    startManagedChildEditDecision({ profilesV4: profilesFixture('default'), targetProfileId: 'default' }),
+    { allowed: false, reason: 'target_not_protected' }
   );
   assert.deepEqual(
     startManagedChildEditDecision({ profilesV4: profilesFixture('childA'), targetProfileId: 'childA' }),
@@ -367,7 +377,7 @@ test('local managed child edit requires parent unlock and save-time fresh author
       targetProfileId: 'childA',
       unlockedProfiles: new Set(['parentA'])
     }),
-    { allowed: true, decision: 'start_virtual_child_edit' }
+    { allowed: true, decision: 'start_virtual_protected_profile_edit' }
   );
 
   assert.deepEqual(
@@ -375,7 +385,7 @@ test('local managed child edit requires parent unlock and save-time fresh author
       freshProfilesV4: profilesFixture('parentA'),
       managedChildEdit: { profileId: 'childA', surface: 'main' }
     }),
-    { allowed: true, decision: 'save_child_surface_with_revision_history' }
+    { allowed: true, decision: 'save_protected_surface_with_revision_history' }
   );
   assert.deepEqual(
     saveManagedChildSurfaceDecision({
@@ -403,14 +413,22 @@ test('local managed child edit requires parent unlock and save-time fresh author
     { allowed: false, reason: 'target_missing' }
   );
 
-  const targetBecameAccount = profilesFixture('parentA');
-  targetBecameAccount.profiles.childA = { id: 'childA', type: 'account', name: 'Former Child' };
+  const targetBecameUnownedAccount = profilesFixture('parentA');
+  targetBecameUnownedAccount.profiles.childA = { id: 'childA', type: 'account', name: 'Former Child' };
   assert.deepEqual(
     saveManagedChildSurfaceDecision({
-      freshProfilesV4: targetBecameAccount,
+      freshProfilesV4: targetBecameUnownedAccount,
       managedChildEdit: { profileId: 'childA', surface: 'main' }
     }),
-    { allowed: false, reason: 'fresh_target_not_child' }
+    { allowed: false, reason: 'fresh_authority_recheck_failed' }
+  );
+
+  assert.deepEqual(
+    saveManagedChildSurfaceDecision({
+      freshProfilesV4: profilesFixture('parentA'),
+      managedChildEdit: { profileId: 'parentA', surface: 'main' }
+    }),
+    { allowed: true, decision: 'save_protected_surface_with_revision_history' }
   );
 });
 

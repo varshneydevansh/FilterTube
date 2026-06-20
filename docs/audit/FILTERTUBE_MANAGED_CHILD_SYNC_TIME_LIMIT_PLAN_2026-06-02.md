@@ -759,12 +759,17 @@ T1 + T2 + T3
 - **validation**:
   - `npm run test:settings`
   - manual Dashboard/Filters/Kids Mode child-edit smoke
-- **status**: Partially Completed
+- **status**: Completed for extension dashboard protected-profile edits. Native
+  app settings-lock parity remains a downstream app lane.
 - **log**:
 - 2026-06-04: Same-device parent-managed child edits now re-check
   parent/account authority at save time, record local managed edit revision
   metadata, write redacted local action-history rows, and expose a parent-only
   child History action that preserves protected evidence on clear.
+- 2026-06-20: The local authority proof now pins protected-profile semantics:
+  Default/Master can manage non-Default protected profiles, a parent/account can
+  manage itself or owned children, child actors and siblings remain rejected,
+  and save-time authority is rechecked before any protected surface mutation.
 - **files edited/created**:
   - `js/tab-view.js`
   - `tests/runtime/managed-child-local-authority-current-behavior.test.mjs`
