@@ -515,6 +515,11 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /id="ftNanahDeliveryCheckRow"/);
   assert.match(tabViewHtml, /Check waiting parent updates/);
   assert.match(tabViewHtml, /Available after this protected profile saves a trusted parent link/);
+  assert.match(tabViewHtml, /Profiles, PINs, and Protected Profiles/);
+  assert.match(tabViewHtml, /Protected profile authority/);
+  assert.match(tabViewHtml, /Profile PIN vs parent PIN/);
+  assert.match(tabViewHtml, /Who sets a protected profile PIN/);
+  assert.match(tabViewHtml, /Where parents edit protected rules/);
   assert.match(source, /It is not automatic Wi-Fi discovery\. Being on the same network is not enough to change rules/);
   assert.match(source, /This is not automatic LAN discovery; normal parent control uses live Send Update/);
   assert.match(source, /Bridge set up: \$\{host\}/);

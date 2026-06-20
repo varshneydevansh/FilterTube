@@ -682,6 +682,12 @@ parent tool instead of a sync/debug console.
     useful for children, dependents, neurodivergent users, and other protected
     user profiles while leaving the internal `child` profile type, unlock
     checks, sibling privacy PIN, and parent/account authority gates unchanged.
+  - [x] 2026-06-20 protected-profile Help wording slice: Help now says
+    `Profiles, PINs, and Protected Profiles`, `Protected profile authority`,
+    `Profile PIN vs parent PIN`, and `Where parents edit protected rules`.
+    The copy explains children, dependents, and other protected users without
+    changing the two-PIN model: the protected profile PIN is a switching/privacy
+    PIN only, while parent/account/Master unlock remains policy authority.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.

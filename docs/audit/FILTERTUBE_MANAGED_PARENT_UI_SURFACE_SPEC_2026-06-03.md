@@ -239,6 +239,10 @@ state without exposing plaintext rule values:
   label is `Create Protected Profile`, and it routes to the existing protected
   child-profile creation flow without changing its parent/account unlock
   requirements. `Create Account` keeps its Master/default unlock boundary.
+- Help uses protected-profile wording for the parent-facing model while keeping
+  the storage/runtime `child` type as an implementation detail. The profile PIN
+  is described as switching/privacy protection only; parent/account/Master
+  unlock remains the rule, sync, time-limit, and profile-management authority.
 - Bulk command-center buttons carry only selected protected profile ids, action
   name, scope, and `sensitiveAction: true`; the dashboard runtime still prompts
   for parent/account re-auth and builds one policy revision per target.
