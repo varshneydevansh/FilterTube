@@ -301,11 +301,13 @@ parent tool instead of a sync/debug console.
     list revision they imported or refreshed, while the URL/list still has no
     policy authority by itself.
   - [x] First structured-list compatibility slice: parents can paste or choose
-    a simple JSON rule list (`channels`, `items`, `entries`, `blockedChannels`,
-    `channelIds`, `handles`, and explicit `keywords`) and the entries still
-    normalize through the same preview, parent re-auth, materialized rule rows,
-    list metadata, and verified-device delivery path as text lists. Materialized
-    rows now also preserve compact source-format metadata so apps can
+    a FilterTube JSON rule list (`schema:"filtertube_rule_list"`, `version`,
+    `metadata`, and explicit `rules[]` entries), while simple
+    channels/keywords arrays remain accepted for compatibility. All structured
+    entries still normalize through the same preview, parent re-auth,
+    materialized rule rows, list metadata, and verified-device delivery path as
+    text lists. Materialized rows now also preserve compact source-format
+    metadata so apps can
     distinguish text rows from JSON/CSV sources without treating any format as
     policy authority.
   - [x] First subscription-check slice: parent/account profiles can check
@@ -1131,7 +1133,8 @@ Add list -> Preview -> Choose profiles -> Apply -> Send Update
 
 **Current extension-owned scope**:
 
-- Parents can add a list from a file, pasted text, simple JSON, or URL.
+- Parents can add a list from a file, pasted text, FilterTube JSON, compatibility
+  JSON, BlockTube JSON, or URL.
 - Each list has a clear name, source URL/file label, last checked time, item
   count, revision/hash, input-format label, and enabled/disabled state.
 - Lists can be enabled separately for Main/Kids and per protected profile.
@@ -1208,15 +1211,18 @@ URL is treated as a way to fetch data, not as a remote admin.
 - A disabled list should stop contributing its rows without deleting unrelated
   manual channel rules.
 
-**Open design questions**:
+**Resolved first-release list decisions**:
 
-- Whether the first release should store list entries as a reversible overlay
-  or materialize them into normal channel rows with source metadata.
-- Which formats to support next after plain text, simple JSON, URL rows,
-  uBlock-style comments, and CSV-like rows: a stricter FilterTube list JSON
-  schema with export/import versioning, or broader third-party list formats.
-- Whether refresh should be manual-only first, then scheduled later after
-  no-work/performance gates are proven.
+- The first release materializes imported list rows into normal channel and
+  keyword rows with `managedListId` and source metadata, so pause/resume/remove
+  can affect list-derived rows without touching manual rules.
+- FilterTube now has a first-class `filtertube_rule_list` JSON schema with
+  versioned `rules[]` rows. Simple channels/keywords JSON, text rows, CSV rows,
+  URL-backed raw files, and BlockTube migration JSON remain accepted for
+  compatibility.
+- Refresh remains manual/review-first. Dashboard-open stale checks can remind
+  parents that URL-backed lists are old, but no downloaded list silently applies
+  without parent/account review.
 
 ## Sprint 1: Authority Contract And Proof Baseline
 

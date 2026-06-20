@@ -57,8 +57,10 @@ Current visible previews:
 - TXT: a lined text-file preview with one row per rule, bare rows
   channel-first, `channel:` supported for explicit channel rows, and
   `keyword:` required for keyword rows.
-- JSON: a rule-list JSON preview with a field-map pane for `channels` and
-  `keywords` plus a raw JSON pane beside it on wide screens. It is explicitly
+- JSON: a first-class FilterTube rule-list JSON preview with
+  `schema:"filtertube_rule_list"` and explicit `rules[]` rows. Simple
+  `channels` / `keywords` arrays remain accepted for compatibility, but the
+  preferred template is now versioned and app-sync friendly. It is explicitly
   not the full FilterTube backup format.
 - URL: a public raw-file preview for HTTPS CSV/TXT/JSON lists.
 - BlockTube: a separate migration JSON preview for `filterData.channelId`,
@@ -160,22 +162,37 @@ Do not treat arbitrary plain text rows as keywords. A note like `bad thumbnails`
 
 ## JSON Format
 
-JSON can support both channels and keywords.
+JSON can support both channels and keywords. The preferred format is the
+FilterTube rule-list schema because it gives list maintainers one stable
+structure for extension and future app parity without giving the file any
+authority over profiles, PINs, sync targets, viewing spaces, or time limits.
+
+```json
+{
+  "schema": "filtertube_rule_list",
+  "version": 1,
+  "metadata": {
+    "title": "Family safety starter list",
+    "description": "Channels and keywords only.",
+    "homepage": "https://example.com/filtertube-list"
+  },
+  "rules": [
+    { "type": "channel", "value": "UCxxxxxxxxxxxxxxxxxxxxxx" },
+    { "type": "channel", "value": "@SomeChannel" },
+    { "type": "channel", "value": "https://www.youtube.com/@AnotherChannel" },
+    { "type": "keyword", "value": "spider" },
+    { "type": "keyword", "value": "brainrot" }
+  ]
+}
+```
+
+Compatibility JSON remains accepted:
 
 ```json
 {
   "title": "Family safety starter list",
-  "version": "2026.06.18",
-  "homepage": "https://example.com/filtertube-list",
-  "channels": [
-    "UCxxxxxxxxxxxxxxxxxxxxxx",
-    "@SomeChannel",
-    "https://www.youtube.com/@AnotherChannel"
-  ],
-  "keywords": [
-    "spider",
-    "brainrot"
-  ]
+  "channels": ["UCxxxxxxxxxxxxxxxxxxxxxx", "@SomeChannel"],
+  "keywords": ["spider", "brainrot"]
 }
 ```
 
@@ -244,7 +261,7 @@ flowchart TD
 ```mermaid
 flowchart TD
     A["Input text/file/URL"] --> B{"Looks like JSON?"}
-    B -- "Yes" --> C["Parse channels and keywords arrays"]
+    B -- "Yes" --> C["Parse FilterTube rules array, compatibility arrays, or BlockTube arrays"]
     B -- "No" --> D{"CSV headers found?"}
     D -- "Yes" --> E["Parse channel_id and keyword columns or type/value rows"]
     D -- "No" --> F["Plain text channel-only parser"]

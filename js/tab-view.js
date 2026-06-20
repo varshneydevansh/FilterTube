@@ -7383,6 +7383,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             'typed_text_rows',
             'csv_like_text_rows',
             'csv_channel_keyword_rows',
+            'filtertube_rule_list_json',
             'simple_json_array',
             'simple_json_object_channels',
             'blocktube_json_rules',
@@ -7393,6 +7394,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function formatManagedChannelListSourceFormat(value) {
         const normalized = normalizeManagedChannelListSourceFormat(value);
+        if (normalized === 'filtertube_rule_list_json') return 'FilterTube JSON';
         if (normalized === 'simple_json_array' || normalized === 'simple_json_object_channels') return 'JSON';
         if (normalized === 'blocktube_json_rules') return 'BlockTube JSON';
         if (normalized === 'public_https_text_or_json_url') return 'URL source';
@@ -7565,13 +7567,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function normalizeManagedChannelListJsonMetadata(root) {
         const item = safeObject(root);
+        const meta = safeObject(item.metadata || item.meta);
         return {
-            title: normalizeManagedChannelListMetadataValue(item.title || item.name || item.listName),
-            description: normalizeManagedChannelListMetadataValue(item.description),
-            homepage: normalizeManagedChannelListMetadataValue(item.homepage || item.home || item.sourceHomepage, 240),
-            license: normalizeManagedChannelListMetadataValue(item.license),
-            sourceVersion: normalizeManagedChannelListMetadataValue(item.version || item.revision || item.sourceVersion),
-            sourceUpdatedLabel: normalizeManagedChannelListMetadataValue(item.lastModified || item.lastUpdated || item.updated || item.sourceUpdatedLabel)
+            title: normalizeManagedChannelListMetadataValue(meta.title || item.title || item.name || item.listName),
+            description: normalizeManagedChannelListMetadataValue(meta.description || item.description),
+            homepage: normalizeManagedChannelListMetadataValue(meta.homepage || meta.home || item.homepage || item.home || item.sourceHomepage, 240),
+            license: normalizeManagedChannelListMetadataValue(meta.license || item.license),
+            sourceVersion: normalizeManagedChannelListMetadataValue(meta.version || meta.revision || item.version || item.revision || item.sourceVersion),
+            sourceUpdatedLabel: normalizeManagedChannelListMetadataValue(meta.lastModified || meta.lastUpdated || meta.updated || item.lastModified || item.lastUpdated || item.updated || item.sourceUpdatedLabel)
         };
     }
 
@@ -7585,6 +7588,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ...safeArray(filterData.channelName)
             ];
         }
+        const ruleRows = safeArray(item.rules).filter((entry) => {
+            const type = getManagedChannelListJsonEntryType(entry);
+            return !type || ['channel', 'channels', 'channelid', 'handle', 'url', 'ucid', 'customurl'].includes(type);
+        });
+        if (ruleRows.length) return ruleRows;
         const candidateKeys = [
             'channels',
             'items',
@@ -7604,6 +7612,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const item = safeObject(root);
         const filterData = safeObject(item.filterData);
         if (Array.isArray(filterData.title)) return filterData.title;
+        const ruleRows = safeArray(item.rules).filter((entry) => {
+            const type = getManagedChannelListJsonEntryType(entry);
+            return ['keyword', 'keywords', 'term', 'terms', 'phrase', 'phrases'].includes(type);
+        });
+        if (ruleRows.length) return ruleRows;
         const candidateKeys = [
             'keywords',
             'blockedKeywords',
@@ -7691,10 +7704,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function parseManagedChannelListJson(text, { listName = '' } = {}) {
         const parsedRoot = JSON.parse(text);
+        const parsedRootObject = safeObject(parsedRoot);
         const listId = buildManagedChannelListId(listName || 'Imported list', text);
         const items = getManagedChannelListJsonItems(parsedRoot);
         const keywordItems = getManagedChannelListJsonKeywordItems(parsedRoot);
-        const sourceFormat = safeObject(parsedRoot).filterData
+        const schema = normalizeString(parsedRootObject.schema || parsedRootObject.type).toLowerCase();
+        const sourceFormat = schema === 'filtertube_rule_list' || schema === 'filtertube_managed_rule_list'
+            ? 'filtertube_rule_list_json'
+            : parsedRootObject.filterData
             ? 'blocktube_json_rules'
             : (Array.isArray(parsedRoot) ? 'simple_json_array' : 'simple_json_object_channels');
         const seen = new Set();
@@ -7877,17 +7894,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     ].join('\n');
 
     const MANAGED_RULE_LIST_JSON_TEMPLATE = JSON.stringify({
-        title: 'Family rule list',
-        description: 'Channels and keywords only. This is not a full FilterTube backup.',
-        channels: [
-            '@SomeChannel',
-            'UCxxxxxxxxxxxxxxxxxxxxxx',
-            'c/ChannelURL',
-            'https://www.youtube.com/@AnotherChannel'
-        ],
-        keywords: [
-            'brainrot',
-            'scary thumbnail'
+        schema: 'filtertube_rule_list',
+        version: 1,
+        metadata: {
+            title: 'Family rule list',
+            description: 'Channels and keywords only. This is not a full FilterTube backup.'
+        },
+        rules: [
+            { type: 'channel', value: '@SomeChannel', notes: 'channel handle' },
+            { type: 'channel', value: 'UCxxxxxxxxxxxxxxxxxxxxxx', notes: 'channel ID' },
+            { type: 'channel', value: 'c/ChannelURL', notes: 'custom channel URL' },
+            { type: 'channel', value: 'https://www.youtube.com/@AnotherChannel', notes: 'channel URL' },
+            { type: 'keyword', value: 'brainrot', notes: 'keyword or phrase' },
+            { type: 'keyword', value: 'scary thumbnail', notes: 'keyword or phrase' }
         ]
     }, null, 2);
 
@@ -8092,11 +8111,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <article class="managed-channel-list-modal__format-panel managed-channel-list-modal__format-panel--json">
                         <div class="managed-channel-list-modal__format-panel-title">
                             <span>JSON</span>
-                            <strong>Channels + keywords</strong>
+                            <strong>FilterTube rule list</strong>
                         </div>
                         <pre class="managed-channel-list-modal__mini-code">{
-  "channels": ["@SomeChannel", "UC..."],
-  "keywords": ["brainrot"]
+  "schema": "filtertube_rule_list",
+  "rules": [
+    {"type": "channel", "value": "@SomeChannel"},
+    {"type": "keyword", "value": "brainrot"}
+  ]
 }</pre>
                     </article>
                     <article class="managed-channel-list-modal__format-panel managed-channel-list-modal__format-panel--txt">
@@ -8117,7 +8139,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         </div>
                         <div class="managed-channel-list-modal__mini-lines">
                             <code>raw.githubusercontent.com/.../list.csv</code>
-                            <small>CSV, TXT, or simple JSON loads into the same preview.</small>
+                            <small>CSV, TXT, FilterTube JSON, or BlockTube JSON loads into the same preview.</small>
                         </div>
                     </article>
                     <article class="managed-channel-list-modal__format-panel managed-channel-list-modal__format-panel--blocktube">

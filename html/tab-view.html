@@ -618,11 +618,11 @@
                                                                     <div class="rule-list-format-panel__copy">
                                                                         <span class="rule-list-format-panel__eyebrow">Rule-list JSON</span>
                                                                         <strong>JSON rule-list preview</strong>
-                                                                        <span>Best when a public list or another tool exports explicit arrays.</span>
-                                                                        <span class="rule-list-format-panel__accepts">Supports channels + keywords arrays.</span>
+                                                                        <span>Best when a public list or another tool can export a named rule file.</span>
+                                                                        <span class="rule-list-format-panel__accepts">Preferred schema: <code>filtertube_rule_list</code>.</span>
                                                                         <div class="rule-list-format-panel__facts">
-                                                                            <span><code>channels</code> adds channel IDs, handles, and channel URLs.</span>
-                                                                            <span><code>keywords</code> adds topic words or phrases.</span>
+                                                                            <span><code>rules[].type</code> is <code>channel</code> or <code>keyword</code>.</span>
+                                                                            <span><code>rules[].value</code> accepts UC IDs, handles, URLs, or phrases.</span>
                                                                             <span>This is not a full FilterTube backup and cannot edit profiles or sync trust.</span>
                                                                         </div>
                                                                     </div>
@@ -634,29 +634,28 @@
                                                                         <div class="rule-list-preview-json__body">
                                                                             <div class="rule-list-preview-json__map" aria-label="JSON fields accepted for rule-list imports">
                                                                                 <div>
-                                                                                    <span>channels</span>
-                                                                                    <code>["@SomeChannel", "UC...", "/c/ChannelName"]</code>
+                                                                                    <span>schema</span>
+                                                                                    <code>"filtertube_rule_list"</code>
                                                                                 </div>
                                                                                 <div>
-                                                                                    <span>keywords</span>
-                                                                                    <code>["brainrot", "scary thumbnail"]</code>
+                                                                                    <span>rules</span>
+                                                                                    <code>{"type":"channel","value":"@SomeChannel"}</code>
                                                                                 </div>
                                                                                 <div>
-                                                                                    <span>ignored</span>
-                                                                                    <code>"notes", "title", "description"</code>
+                                                                                    <span>also accepted</span>
+                                                                                    <code>simple channels/keywords arrays + BlockTube JSON</code>
                                                                                 </div>
                                                                             </div>
                                                                             <pre class="rule-list-preview-code">{
-  "title": "Family safety starter list",
-  "channels": [
-    "@SomeChannel",
-    "UCxxxxxxxxxxxxxxxxxxxxxx",
-    "/c/ChannelName",
-    "https://www.youtube.com/@AnotherChannel"
-  ],
-  "keywords": [
-    "brainrot",
-    "scary thumbnail"
+  "schema": "filtertube_rule_list",
+  "version": 1,
+  "metadata": {
+    "title": "Family safety starter list"
+  },
+  "rules": [
+    {"type": "channel", "value": "@SomeChannel"},
+    {"type": "channel", "value": "UCxxxxxxxxxxxxxxxxxxxxxx"},
+    {"type": "keyword", "value": "brainrot"}
   ]
 }</pre>
                                                                         </div>
@@ -690,7 +689,7 @@
                                                                         <span>Best when a community list is published as a raw file.</span>
                                                                         <div class="rule-list-format-panel__facts">
                                                                             <span>Raw HTTPS lists are downloaded into the same preview.</span>
-                                                                            <span>The URL can point to CSV, TXT, or simple JSON.</span>
+                                                                            <span>The URL can point to CSV, TXT, FilterTube JSON, or BlockTube JSON.</span>
                                                                             <span>Nothing applies until the parent approves the preview.</span>
                                                                         </div>
                                                                     </div>
@@ -806,7 +805,7 @@
                                                             <button id="ftDownloadRuleListTemplateBtn" class="btn-secondary" type="button" title="Download the safe CSV template for spreadsheet editing.">
                                                                 Download CSV Template
                                                             </button>
-                                                            <button id="ftDownloadRuleListJsonTemplateBtn" class="btn-secondary" type="button" title="Download the simple JSON rule-list template.">
+                                                            <button id="ftDownloadRuleListJsonTemplateBtn" class="btn-secondary" type="button" title="Download the FilterTube JSON rule-list template.">
                                                                 Download JSON Template
                                                             </button>
                                                             <button id="ftRuleListFormatsBtn" class="btn-secondary" type="button" title="Show supported rule-list input formats.">
@@ -1423,7 +1422,7 @@
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Rule list imports</div>
-                                            <div class="help-item-body">Open Settings &gt; Import / Export &gt; Rule list imports. Choose Main YouTube, YouTube Kids, or Both, then preview a CSV, TXT, raw HTTPS list, simple JSON, or BlockTube rule JSON before applying it. Imported rows are then reviewed and edited from the normal Main/Kids rule pages.</div>
+                                            <div class="help-item-body">Open Settings &gt; Import / Export &gt; Rule list imports. Choose Main YouTube, YouTube Kids, or Both, then preview a CSV, TXT, raw HTTPS list, FilterTube JSON rule list, or BlockTube rule JSON before applying it. Imported rows are then reviewed and edited from the normal Main/Kids rule pages.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Filter All Content (per-channel)</div>
