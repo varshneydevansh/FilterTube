@@ -745,6 +745,11 @@ parent tool instead of a sync/debug console.
     device path when a trusted online pickup provider is configured. The normal
     live P2P path still requires both devices open, and online pickup services
     still carry only signed updates after trusted-link validation.
+  - [x] 2026-06-20 away-device Help/docs slice: Help, README, and Functionality
+    now explain that Later Pickup is the away/opens-later device path, while
+    Same-Home Pickup is the explicitly configured home/school path and Send Now
+    remains the normal live P2P flow. Public wording still avoids claiming a
+    hosted provider or automatic remote authority.
   - [x] 2026-06-20 saved-device summary slice: saved trusted-device cards now
     show a parent-readable summary band before the detailed policy rows:
     control direction, usual update area/behavior, next step, and whether

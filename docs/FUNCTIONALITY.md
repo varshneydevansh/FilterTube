@@ -32,7 +32,7 @@ It also now includes `Accounts & Sync`, powered by Nanah, for device-to-device s
 - **Family Device Updates**
   - choose a protected child/user profile
   - use `Send Now` when both devices are open
-  - use optional `Later Pickup` only when a protected device should collect an unreadable pending update later
+  - use optional `Later Pickup` only when a verified protected device should collect an unreadable pending update later or away from the parent device
   - use optional `Same-Home Pickup` only when a home/school bridge has been explicitly configured
 - **Move full account**
   - use broader account snapshot for migration or reinstall recovery
