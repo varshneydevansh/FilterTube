@@ -17,6 +17,18 @@ const REQUIRED_TRANSPORT_MODES = new Set([
   'encrypted_mailbox'
 ]);
 
+const REQUIRED_PROVIDER_KINDS = new Set([
+  'none',
+  'reference_provider',
+  'external_provider'
+]);
+
+const REQUIRED_PROVIDER_ENDPOINT_CLASSES = Object.freeze({
+  live_nanah: new Set(['none']),
+  encrypted_mailbox: new Set(['public_https']),
+  local_network_provider: new Set(['private_or_local_http', 'https'])
+});
+
 const REQUIRED_RECORDING_FIELDS = Object.freeze([
   'manualTimestamp',
   'testerInitials',
@@ -57,6 +69,10 @@ const REQUIRED_MANUAL_INSTALLED_EVIDENCE_FIELDS = Object.freeze([
   'managedActionHistoryArtifact',
   'notes'
 ]);
+
+const REFERENCE_PROVIDER_SOURCE = 'scripts/managed-delivery-provider.mjs';
+const REFERENCE_PROVIDER_AUDIT_DOC =
+  'docs/audit/FILTERTUBE_MANAGED_DELIVERY_REFERENCE_PROVIDER_2026-06-20.md';
 
 const FORBIDDEN_SENSITIVE_KEYS = new Set([
   'plaintextRuleValue',
@@ -181,6 +197,57 @@ function validateInstalledParity(errors, parity, role) {
   }
 }
 
+function validateProviderProof(errors, providerProof, transportMode) {
+  const prefix = 'transport.providerProof';
+  if (!isPlainObject(providerProof)) {
+    errors.push(`${prefix} must be an object`);
+    return;
+  }
+
+  if (!REQUIRED_PROVIDER_KINDS.has(providerProof.providerKind)) {
+    errors.push(`${prefix}.providerKind must be one of none, reference_provider, external_provider`);
+  }
+  const endpointClasses = REQUIRED_PROVIDER_ENDPOINT_CLASSES[transportMode] || new Set();
+  if (!endpointClasses.has(providerProof.endpointClass)) {
+    errors.push(`${prefix}.endpointClass must match ${transportMode || 'the selected transport mode'}`);
+  }
+  if (providerProof.automaticDiscoveryObserved !== false) {
+    errors.push(`${prefix}.automaticDiscoveryObserved must be false`);
+  }
+  if (providerProof.hostedServiceClaimed !== false) {
+    errors.push(`${prefix}.hostedServiceClaimed must be false`);
+  }
+
+  if (transportMode === 'live_nanah') {
+    if (providerProof.providerKind !== 'none') errors.push(`${prefix}.providerKind must be none for live_nanah`);
+    if (providerProof.explicitEndpointConfigured !== false) errors.push(`${prefix}.explicitEndpointConfigured must be false for live_nanah`);
+    if (!isBlank(providerProof.referenceProviderScript)) errors.push(`${prefix}.referenceProviderScript must be blank for live_nanah`);
+    if (!isBlank(providerProof.referenceProviderAuditDoc)) errors.push(`${prefix}.referenceProviderAuditDoc must be blank for live_nanah`);
+    return;
+  }
+
+  if (!['reference_provider', 'external_provider'].includes(providerProof.providerKind)) {
+    errors.push(`${prefix}.providerKind must be reference_provider or external_provider for provider transports`);
+  }
+  if (providerProof.explicitEndpointConfigured !== true) {
+    errors.push(`${prefix}.explicitEndpointConfigured must be true for provider transports`);
+  }
+  if (isBlank(providerProof.providerHealthOrRoundTrip)) {
+    errors.push(`${prefix}.providerHealthOrRoundTrip is required for provider transports`);
+  }
+  if (transportMode === 'encrypted_mailbox' && providerProof.corsPreflightVerified !== true) {
+    errors.push(`${prefix}.corsPreflightVerified must be true for encrypted_mailbox`);
+  }
+  if (providerProof.providerKind === 'reference_provider') {
+    if (providerProof.referenceProviderScript !== REFERENCE_PROVIDER_SOURCE) {
+      errors.push(`${prefix}.referenceProviderScript must be ${REFERENCE_PROVIDER_SOURCE}`);
+    }
+    if (providerProof.referenceProviderAuditDoc !== REFERENCE_PROVIDER_AUDIT_DOC) {
+      errors.push(`${prefix}.referenceProviderAuditDoc must be ${REFERENCE_PROVIDER_AUDIT_DOC}`);
+    }
+  }
+}
+
 function validateManualInstalledEvidence(errors, evidence) {
   if (!isPlainObject(evidence)) {
     errors.push('manualInstalledEvidence must be an object');
@@ -236,6 +303,7 @@ export function validateManagedRemoteDeliverySmokeArtifact(artifact) {
     if (!REQUIRED_TRANSPORT_MODES.has(transport.mode)) {
       errors.push('transport.mode must be one of live_nanah, local_network_provider, encrypted_mailbox');
     }
+    validateProviderProof(errors, transport.providerProof, transport.mode);
     addMissingFieldErrors(errors, transport, ['providerName', 'networkContext', 'parentDeviceLabel', 'childDeviceLabel'], 'transport');
   }
 

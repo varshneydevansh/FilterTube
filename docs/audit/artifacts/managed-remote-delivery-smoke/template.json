@@ -15,6 +15,18 @@
     "mode": "",
     "providerName": "",
     "networkContext": "",
+    "providerProof": {
+      "providerKind": "",
+      "endpointClass": "",
+      "referenceProviderScript": "",
+      "referenceProviderAuditDoc": "",
+      "explicitEndpointConfigured": false,
+      "providerHealthOrRoundTrip": "",
+      "corsPreflightVerified": false,
+      "automaticDiscoveryObserved": false,
+      "hostedServiceClaimed": false,
+      "notes": ""
+    },
     "parentDeviceLabel": "",
     "childDeviceLabel": ""
   },

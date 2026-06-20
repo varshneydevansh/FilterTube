@@ -7,8 +7,11 @@ mailbox storage preparation, source-side mailbox upload/purge provider
 handoffs, explicitly configured browser HTTPS mailbox upload/pull/purge client,
 provider-gated mailbox intake, and provider-gated local-network candidate intake
 are present. Configured mailbox/Home Bridge provider clients now have executable
-request/response sanitization proof. Complete remote delivery is still blocked on server deployment,
-LAN transport proof, native parity, and installed two-device smoke.
+request/response sanitization proof. A self-hosted in-memory reference provider
+now exists to prove the explicit Internet Pickup/Home Bridge endpoint contract.
+Complete remote delivery is still blocked on server deployment,
+LAN transport proof, native parity, and installed two-device smoke. This includes
+the unresolved hosted service deployment and automatic LAN discovery design work.
 **Runtime behavior changed**: yes, source-side mailbox seal/open helpers,
 storage item building, upload-provider handoff, purge-provider handoff, and
 configured dashboard HTTPS mailbox client only; no YouTube hot-path runtime
@@ -141,6 +144,17 @@ child YouTube surface, and redacted managed action-history surface so a human
 smoke pass becomes repeatable release proof instead of an informal memory. A
 valid artifact proves one transport slice, not complete remote-management
 release readiness across all transport modes.
+
+Provider transports must also record a provider proof block. `live_nanah` must
+record `providerKind: none`; `encrypted_mailbox` must record an explicitly
+configured public HTTPS Internet Pickup endpoint plus CORS/preflight proof; and
+`local_network_provider` must record an explicitly configured Home Bridge
+endpoint using HTTPS or private/local HTTP. If the reference provider is used,
+the artifact must name `scripts/managed-delivery-provider.mjs` and
+`docs/audit/FILTERTUBE_MANAGED_DELIVERY_REFERENCE_PROVIDER_2026-06-20.md`.
+Every provider proof must show `automaticDiscoveryObserved: false` and
+`hostedServiceClaimed: false`, because the current extension still does not
+own automatic LAN discovery or a hosted Internet Pickup deployment.
 
 Required smoke rows:
 

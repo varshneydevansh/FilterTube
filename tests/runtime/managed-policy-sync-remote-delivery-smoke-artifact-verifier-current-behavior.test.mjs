@@ -72,6 +72,7 @@ function validArtifact({ transportMode = 'live_nanah' } = {}) {
       mode: transportMode,
       providerName: `${transportMode}-provider`,
       networkContext: `${transportMode}-controlled-test-context`,
+      providerProof: providerProofForTransport(transportMode),
       parentDeviceLabel: 'Parent Chrome profile',
       childDeviceLabel: 'Child Chrome profile'
     },
@@ -152,6 +153,38 @@ function validArtifact({ transportMode = 'live_nanah' } = {}) {
   };
 }
 
+function providerProofForTransport(transportMode) {
+  if (transportMode === 'live_nanah') {
+    return {
+      providerKind: 'none',
+      endpointClass: 'none',
+      referenceProviderScript: '',
+      referenceProviderAuditDoc: '',
+      explicitEndpointConfigured: false,
+      providerHealthOrRoundTrip: '',
+      corsPreflightVerified: false,
+      automaticDiscoveryObserved: false,
+      hostedServiceClaimed: false,
+      notes: 'Live Nanah same-session send; no provider endpoint used.'
+    };
+  }
+  const endpointClass = transportMode === 'encrypted_mailbox' ? 'public_https' : 'private_or_local_http';
+  return {
+    providerKind: 'reference_provider',
+    endpointClass,
+    referenceProviderScript: 'scripts/managed-delivery-provider.mjs',
+    referenceProviderAuditDoc: 'docs/audit/FILTERTUBE_MANAGED_DELIVERY_REFERENCE_PROVIDER_2026-06-20.md',
+    explicitEndpointConfigured: true,
+    providerHealthOrRoundTrip: transportMode === 'encrypted_mailbox'
+      ? 'upload/pull/purge and redacted ack round trip verified through configured endpoint'
+      : 'health, publish/discover, and redacted ack round trip verified through configured endpoint',
+    corsPreflightVerified: transportMode === 'encrypted_mailbox',
+    automaticDiscoveryObserved: false,
+    hostedServiceClaimed: false,
+    notes: 'Reference provider proves endpoint shape only; local runtime validation remains authority.'
+  };
+}
+
 test('managed remote delivery smoke verifier is wired into release settings and smoke lanes', () => {
   const boundaryDoc = read(boundaryDocPath);
 
@@ -198,6 +231,8 @@ test('verifier rejects the non-executed template and missing installed parity', 
   assert.ok(errors.includes('changeContext.requiredLanes must list required test lanes'));
   assert.ok(errors.includes('changeContext.automatedLaneEvidence must contain at least one passed lane command'));
   assert.ok(errors.includes('transport.mode must be one of live_nanah, local_network_provider, encrypted_mailbox'));
+  assert.ok(errors.includes('transport.providerProof.providerKind must be one of none, reference_provider, external_provider'));
+  assert.ok(errors.includes('transport.providerProof.endpointClass must match the selected transport mode'));
   assert.ok(errors.includes('recordingFields.transportMode is required'));
   assert.ok(errors.includes('installedExtensionParity.parent.verdict must be GO'));
   assert.ok(errors.includes('installedExtensionParity.child.verdict must be GO'));
@@ -206,6 +241,32 @@ test('verifier rejects the non-executed template and missing installed parity', 
   assert.ok(errors.includes('manualInstalledEvidence.managedActionHistoryArtifact is required'));
   assert.ok(errors.includes('manualInstalledEvidence.notes is required'));
   assert.ok(errors.includes('FT-MANAGED-REMOTE-00-trust-link-preflight.status must be passed'));
+});
+
+test('verifier rejects provider transport artifacts that imply discovery or hosted authority', () => {
+  const artifact = validArtifact({ transportMode: 'local_network_provider' });
+  artifact.transport.providerProof.automaticDiscoveryObserved = true;
+  artifact.transport.providerProof.hostedServiceClaimed = true;
+  artifact.transport.providerProof.explicitEndpointConfigured = false;
+  artifact.transport.providerProof.referenceProviderScript = 'scripts/other-provider.mjs';
+  artifact.transport.providerProof.referenceProviderAuditDoc = 'docs/audit/OTHER.md';
+
+  const errors = validateManagedRemoteDeliverySmokeArtifact(artifact);
+  assert.ok(errors.includes('transport.providerProof.automaticDiscoveryObserved must be false'));
+  assert.ok(errors.includes('transport.providerProof.hostedServiceClaimed must be false'));
+  assert.ok(errors.includes('transport.providerProof.explicitEndpointConfigured must be true for provider transports'));
+  assert.ok(errors.includes('transport.providerProof.referenceProviderScript must be scripts/managed-delivery-provider.mjs'));
+  assert.ok(errors.includes('transport.providerProof.referenceProviderAuditDoc must be docs/audit/FILTERTUBE_MANAGED_DELIVERY_REFERENCE_PROVIDER_2026-06-20.md'));
+});
+
+test('verifier rejects mailbox provider smoke without public HTTPS and CORS preflight proof', () => {
+  const artifact = validArtifact({ transportMode: 'encrypted_mailbox' });
+  artifact.transport.providerProof.endpointClass = 'private_or_local_http';
+  artifact.transport.providerProof.corsPreflightVerified = false;
+
+  const errors = validateManagedRemoteDeliverySmokeArtifact(artifact);
+  assert.ok(errors.includes('transport.providerProof.endpointClass must match encrypted_mailbox'));
+  assert.ok(errors.includes('transport.providerProof.corsPreflightVerified must be true for encrypted_mailbox'));
 });
 
 test('verifier accepts a complete executed artifact for each supported transport slice', () => {
