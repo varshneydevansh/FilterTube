@@ -13571,13 +13571,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const current = readNanahManagedMailboxServerConfig();
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
-            title: 'Internet Pickup',
-            message: 'Internet Pickup lets a protected device collect a waiting parent-approved update next time it opens.',
+            title: 'Internet Pickup (device opens later)',
+            message: 'Use this only when a protected device should collect an approved update after the parent device is no longer open.',
             details: [
-                'Normal parent control is Send Update: open both devices, pair, verify, and send.',
-                'Internet Pickup is optional and advanced; skip it when both devices can be open together.',
-                'A FilterTube-compatible pickup service stores unreadable waiting updates only.',
-                'The saved trusted parent link still decides what applies.'
+                'For normal family control, open both devices and use Send Update.',
+                'A pickup service can hold unreadable waiting updates, not PINs or plaintext rules.',
+                'The protected device still applies only newer signed updates from its saved parent link.'
             ],
             configured: !!currentEndpoint,
             configureLabel: currentEndpoint ? 'Edit Internet Pickup' : 'Set Up Internet Pickup',
@@ -13595,8 +13594,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const endpoint = await showPromptModal({
-            title: 'Internet Pickup Address',
-            message: 'Advanced only. Use this only if you run or trust a FilterTube-compatible internet pickup service. It is not the Nanah meeting service, and it cannot change rules by itself. Leave blank for live Send Update only.',
+            title: 'Internet Pickup Service',
+            message: 'Enter the HTTPS pickup service that will hold unreadable parent-approved updates until the protected device opens. Leave blank to use live Send Update only.',
             placeholder: 'https://your-filtertube-pickup-service',
             inputType: 'url',
             confirmText: currentEndpoint ? 'Save Internet Pickup' : 'Enable Internet Pickup',
@@ -13615,8 +13614,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const token = await showPromptModal({
-            title: 'Internet Pickup Service Key',
-            message: 'Optional service key, not the parent PIN. Leave blank to keep the saved key. Enter a single dash to clear it.',
+            title: 'Internet Pickup Key',
+            message: 'Optional service key for that pickup service. This is not the parent PIN. Leave blank to keep the saved key; enter a single dash to clear it.',
             placeholder: 'Optional service key',
             inputType: 'password',
             confirmText: 'Save',
@@ -13711,13 +13710,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const current = readNanahManagedLocalNetworkProviderConfig();
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
-            title: 'Home Bridge',
-            message: 'Home Bridge lets protected devices collect approved updates through a FilterTube-compatible bridge you run on your own network.',
+            title: 'Home Bridge (same network)',
+            message: 'Use this only when you run a FilterTube-compatible bridge on your home, clinic, or school network.',
             details: [
-                'Normal parent control is Send Update: open both devices, pair, verify, and send.',
-                'Home Bridge is optional and advanced; skip it unless you run a compatible bridge on your own network.',
-                'It is not automatic Wi-Fi discovery. Being on the same network is not enough to change rules.',
-                'The protected device still accepts only trusted parent updates.'
+                'For normal family control, open both devices and use Send Update.',
+                'Home Bridge can help a verified protected device pick up waiting updates on the same network.',
+                'It is not automatic Wi-Fi discovery; being nearby never grants control.',
+                'The protected device still accepts only newer signed updates from its saved parent link.'
             ],
             configured: !!currentEndpoint,
             configureLabel: currentEndpoint ? 'Edit Home Bridge' : 'Set Up Home Bridge',
@@ -13742,7 +13741,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const endpoint = await showPromptModal({
             title: 'Home Bridge Address',
-            message: 'Advanced only. Use this only if you run a trusted FilterTube-compatible bridge on your own network. This is not automatic LAN discovery; normal parent control uses live Send Update.',
+            message: 'Enter the local bridge address only if you run a trusted FilterTube-compatible bridge. This is not device scanning; live Send Update remains the normal path.',
             placeholder: 'http://192.168.1.10:4177/filtertube',
             inputType: 'url',
             confirmText: currentEndpoint ? 'Save Bridge' : 'Enable Bridge',
@@ -13755,8 +13754,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const token = await showPromptModal({
-            title: 'Home Bridge Service Key',
-            message: 'Optional bridge key, not the parent PIN. Leave blank to keep the saved key. Enter a single dash to clear it.',
+            title: 'Home Bridge Key',
+            message: 'Optional bridge key for that local bridge. This is not the parent PIN. Leave blank to keep the saved key; enter a single dash to clear it.',
             placeholder: 'Optional bridge key',
             inputType: 'password',
             confirmText: 'Save',

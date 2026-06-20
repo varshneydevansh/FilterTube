@@ -715,6 +715,13 @@ parent tool instead of a sync/debug console.
     matching parent updates are allowed or ask-first. This is renderer-only and
     uses existing trusted-link policy labels; it does not expose keys, PINs,
     payloads, raw device IDs, or change Nanah authority.
+  - [x] 2026-06-20 optional-delivery setup wording slice: Internet Pickup and
+    Home Bridge setup modals now describe the parent intent first: live Send
+    Update is normal, Internet Pickup is only for a protected device that opens
+    later, and Home Bridge is only for an explicitly run same-network bridge.
+    Endpoint/service-key prompts remain, but the copy says services store or
+    route unreadable waiting updates only and never replace trusted-link
+    signature validation.
   - [x] 2026-06-20 protected-profile setup wording slice: parent-facing setup
     actions now say `Create Protected Profile` instead of `Create Child Profile`
     in Family Controls, Settings, and the creation prompt. This keeps the UI
