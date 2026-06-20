@@ -779,7 +779,7 @@ T1 + T2 + T3
   - `js/tab-view.js`
   - `html/tab-view.html`
   - `js/ui-shell/tab-view-decor.js`
-  - `tests/runtime/managed-time-limit-ui-current-behavior.test.mjs`
+  - `tests/runtime/managed-parent-ui-surface-current-behavior.test.mjs`
 - **description**: Add parent-only controls for daily budget and extension grants on child profile cards.
 - **acceptance criteria**:
   - UI is hidden/disabled for child surfaces.
@@ -790,13 +790,19 @@ T1 + T2 + T3
   - `npm run build:ui`
   - `npm run test:settings`
   - `npm run test:release`
-- **status**: Partially Completed
+- **status**: Completed
 - **log**:
-- 2026-06-04: Profile rows now expose parent-only per-profile time-limit
-  controls. Parent extension-grant UX remains pending.
+- 2026-06-04: Profile rows began exposing parent-only per-profile time-limit
+  controls; parent extension-grant UX was still unresolved in that early slice.
 - 2026-06-05: Command-center selected-profile bulk time-limit controls now
   apply one same-budget local policy to each selected protected child after
   parent/account re-auth, with one revision/history row per child.
+- 2026-06-20: Parent extension-grant UX is present in Family Controls as
+  per-profile `Add Time` / pending-request `Grant Time`, selected-profile
+  `Add extra time` / `Grant time requests`, redacted request chips/counts, and
+  the existing parent/account re-authenticated `time_limits` grant path. The
+  older pending note is now resolved; native app parity remains a downstream
+  app lane.
 - **files edited/created**:
   - `js/tab-view.js`
   - `js/managed_parent_command_center.js`
