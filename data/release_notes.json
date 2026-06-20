@@ -14,6 +14,8 @@
       "Production extension contexts gate routine console logging behind explicit debug mode so normal browsing does not pay console overhead on YouTube hot paths.",
       "Whitelist release fixes cover Shorts creator fallback, list-target forwarding, and compact autoplay/watch-next endpoint filtering for end-screen controls.",
       "FilterTube DOM state attributes were hardened to reduce broad visible `data-filtertube-*` fingerprints while preserving necessary runtime state.",
+      "Accounts & Sync now documents Family Device Updates around Send Now, optional Later Pickup, and optional Same-Home Pickup so parents can understand what is live sync, what is delayed delivery, and what is not authority.",
+      "Protected profile time limits now have release-facing documentation for daily YouTube budgets, timeout screens, request-more-time history, and parent/caregiver approval.",
       "Nanah/import paths preserve channel-derived Filter All keyword ownership between extension and native app payloads, including row color, source-badge metadata, and pairing context."
     ],
     "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.2"

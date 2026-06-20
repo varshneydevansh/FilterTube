@@ -721,6 +721,12 @@ parent tool instead of a sync/debug console.
     hover/focus guidance and visual tones for ready, optional, or setup-needed
     states. This is UI feedback only; trusted-link validation, target profile,
     scope, revision, hash, and signature gates still decide what can apply.
+  - [x] 2026-06-20 public-docs alignment slice: README, Functionality,
+    Technical, and shared release notes now describe the current Family Device
+    Updates model with `Send Now`, optional `Later Pickup`, optional
+    `Same-Home Pickup`, protected-profile time limits, receive-only protected
+    sync, and the no-overclaim boundary that delivery paths never become
+    authority without local trusted-link and policy validation.
   - [x] 2026-06-20 saved-device summary slice: saved trusted-device cards now
     show a parent-readable summary band before the detailed policy rows:
     control direction, usual update area/behavior, next step, and whether

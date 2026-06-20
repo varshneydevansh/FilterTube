@@ -29,10 +29,11 @@ It also now includes `Accounts & Sync`, powered by Nanah, for device-to-device s
   - verify
   - send once
   - receiver reviews
-- **Parent controls child**
-  - connect parent/source to child/replica
-  - choose remote child profile
-  - save managed link once
+- **Family Device Updates**
+  - choose a protected child/user profile
+  - use `Send Now` when both devices are open
+  - use optional `Later Pickup` only when a protected device should collect an unreadable pending update later
+  - use optional `Same-Home Pickup` only when a home/school bridge has been explicitly configured
 - **Move full account**
   - use broader account snapshot for migration or reinstall recovery
 
@@ -49,21 +50,30 @@ That means:
 - the relay is the meeting place
 - FilterTube does not need a central sync account to read your settings
 - saved trust is not hidden background sync
+- pickup and bridge paths do not become authority; the receiving profile still validates trusted link, target profile, scope, revision, and payload integrity
 
-### Parent / child behavior
+### Parent / caregiver behavior
 
-- first managed parent -> child connection may require one local parent approval on the child device
-- after that, the child does **not** always need to press allow
-- later behavior depends on the saved managed-link policy
-- child profiles are receive-only in Accounts & Sync from the child surface
-- a child PIN can open receive-only sync but does not unlock parent controls, rule editing, backups, or trusted-link policy
-- parent/account profiles edit child Main/Kids rules from the child row without switching into that child profile
+- child/protected profiles are receive-only in Accounts & Sync from the protected surface
+- a child/profile PIN can open receive-only sync but does not unlock parent controls, rule editing, backups, trusted-link policy, viewing access, or time-limit changes
+- parent/account profiles edit protected Main/Kids rules from the protected profile row without switching into that profile
+- parent/account profiles can send reviewed rules, viewing-space access, time-limit changes, and profile settings to verified devices
+- protected profiles keep their last valid policy while offline
+- delivery failures and requests are recorded as protected history instead of silently changing policy
 
 ### Remote target profile
 
 - live sessions can now show the receiver's profile inventory
 - the sender can choose `Remote target profile`
 - managed links can save a fixed receiver-side target so later updates land in the right profile
+
+### Protected profile time limits
+
+- parent/account profiles can set a daily YouTube time budget per protected profile
+- the extension counts active YouTube use for that profile and blocks YouTube with a FilterTube timeout screen when the daily limit is reached
+- a protected user can request more time from the timeout screen
+- request-more-time does not grant access by itself; a parent/caregiver approval is required
+- reducing a time limit takes effect on the next runtime policy refresh and must not bypass blocklist, whitelist, Shorts, end-screen, quick-block, or menu behavior
 
 ## v3.3.0 Release Highlights
 

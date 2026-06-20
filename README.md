@@ -33,7 +33,7 @@ What it is:
 
 - private device-to-device settings transfer
 - no central sync account required
-- supports one-time send, parent-controls-child, and full-account migration
+- supports one-time send, family device updates, and full-account migration
 
 Plain-language model:
 
@@ -67,20 +67,28 @@ SEND THIS PROFILE ONCE
 ```
 
 ```text
-PARENT CONTROLS CHILD
+FAMILY DEVICE UPDATES
 
-[Parent / Source] == managed link == [Child / Replica]
+[Parent / Caregiver] -> choose protected profile
         |
-        +-- choose remote child profile
-        +-- send once
-        +-- save managed link for later sessions
+        +-- Send Now --------> pair, verify phrase, send while both devices are open
+        +-- Later Pickup ----> optional encrypted pickup service for a device that opens later
+        +-- Same-Home Pickup -> optional explicit home/school bridge
 ```
 
-Important child rule:
+Important protected-profile rules:
 
-- the first managed parent -> child connection may still need one local parent approval on the child device
-- after that, the child does **not** always need to press allow
-- that depends on the saved managed-link policy
+- delivery paths are not authority; trusted link, target profile, scope, revision, and local validation still decide what applies
+- `Later Pickup` can hold unreadable signed updates, but it cannot edit profiles, PINs, trusted links, viewing access, or time limits by itself
+- `Same-Home Pickup` is an explicitly configured bridge, not automatic Wi-Fi scanning
+- protected profiles keep their last valid policy when offline
+- a protected-profile PIN can open receive-only sync, but it cannot unlock parent/admin controls
+
+Protected profile time limits:
+
+- parent/account profiles can set daily YouTube time for protected profiles
+- the extension blocks YouTube with a calm FilterTube screen after the daily limit is reached
+- protected users can request more time, but the request is only a history row until a parent/caregiver approves it
 
 Docs:
 

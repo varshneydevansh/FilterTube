@@ -97,6 +97,10 @@ sequenceDiagram
 - refresh ends the live session but not the saved trust state
 - pairing codes are alphanumeric but limited to the Nanah safe alphabet `ABCDEFGHJKMNPQRSTUVWXYZ23456789`
 - Android/app packed channel keyword source strings are normalized back into canonical `source:"channel"` plus `channelRef` before import or Nanah apply
+- `Send Now` is the live WebRTC path: both devices must be open, paired, and phrase-verified before a payload is applied
+- `Later Pickup` is an optional configured pickup provider for unreadable signed pending updates; provider reachability never grants authority
+- `Same-Home Pickup` is an optional configured local/home bridge; local-network presence and discovery never grant authority
+- protected-profile time limits are runtime policy gates; reaching the limit blocks YouTube with the FilterTube timeout surface and records extra-time requests as protected history
 
 ## Runtime stabilization checkpoint
 
@@ -115,18 +119,20 @@ The latest runtime notes that were previously tracked in dated checkpoint files 
 - Whitelist pending-card hiding coalesces the follow-up pending-only DOM fallback pass and schedules it only after a mutation batch actually hides new pending cards. This preserves fail-closed whitelist behavior while avoiding repeated no-op scans during heavy YouTube DOM churn.
 - Firefox/Waterfox manual export, system-theme first paint, short-height dashboard sidebar scrolling, and large-blocklist indexed matching are release-note items, not separate dated docs.
 
-### Child approval rule
+### Protected profile authority rule
 
 ```text
-FIRST MANAGED PARENT -> CHILD CONNECTION
-    may require one local parent approval on child device
+SEND NOW
+    requires live pairing, phrase verification, trusted relationship, target profile, scope, revision, and payload validation
 
-LATER MATCHING UPDATES
-    depends on saved managed-link policy:
-      autoApply
-      reconnectMode
-      lockedChildMode
-      strict child protection preset
+LATER PICKUP / SAME-HOME PICKUP
+    can deliver unreadable signed pending policy updates
+    cannot become policy authority by itself
+    receiver applies only newer trusted payloads for the intended protected profile
+
+PROTECTED PROFILE PIN
+    can unlock that profile's receive-only surface
+    cannot edit parent/admin policy, trusted links, backups, viewing spaces, or time limits
 ```
 
 ## Typography System (v3.2.6)
