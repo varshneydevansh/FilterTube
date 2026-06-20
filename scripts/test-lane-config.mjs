@@ -509,7 +509,7 @@ export const FILE_LANE_RULES = Object.freeze([
   },
   {
     id: 'nanah-managed-policy-runtime',
-    patterns: [/^js\/nanah_managed_(?:live_policy|open_sync|mailbox_client)\.js$/],
+    patterns: [/^js\/nanah_managed_(?:live_policy|open_sync|mailbox_client|local_network_client)\.js$/],
     lanes: ['release', 'settings', 'smoke']
   },
   {
@@ -540,6 +540,11 @@ export const FILE_LANE_RULES = Object.freeze([
   {
     id: 'vendor-sync-build-helper-surface',
     patterns: [/^scripts\/build-nanah-vendor\.mjs$/],
+    lanes: ['release', 'settings', 'smoke']
+  },
+  {
+    id: 'managed-delivery-reference-provider-surface',
+    patterns: [/^scripts\/managed-delivery-provider\.mjs$/],
     lanes: ['release', 'settings', 'smoke']
   },
   {

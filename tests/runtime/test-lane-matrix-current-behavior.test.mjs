@@ -170,7 +170,8 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['js/state_manager.js', 'js/io_manager.js'], lanes: ['test:settings'] },
     { files: ['js/content_controls_catalog.js'], lanes: ['test:whitelist', 'test:blocking', 'test:json', 'test:dom', 'test:menu', 'test:performance', 'test:settings'] },
     { files: ['js/popup.js', 'js/tab-view.js', 'js/render_engine.js', 'js/ui_components.js', 'js/managed_parent_command_center.js'], lanes: ['test:release', 'test:whitelist', 'test:blocking', 'test:menu', 'test:settings', 'test:smoke'] },
-    { files: ['js/nanah_sync_adapter.js', 'js/nanah_managed_open_sync.js', 'js/nanah_managed_mailbox_client.js', 'js/security_manager.js'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
+    { files: ['js/nanah_sync_adapter.js', 'js/nanah_managed_open_sync.js', 'js/nanah_managed_mailbox_client.js', 'js/nanah_managed_local_network_client.js', 'js/security_manager.js'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
+    { files: ['scripts/managed-delivery-provider.mjs'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
     { files: ['js/layout.js'], lanes: ['test:release', 'test:dom', 'test:smoke'] },
     { files: ['js/shared/identity.js', 'js/content/dom_extractors.js', 'js/content/handle_resolver.js'], lanes: ['test:whitelist', 'test:blocking', 'test:menu'] },
     { files: ['release-notes JSON version-gate audit docs under `docs/audit/`'], lanes: ['test:release', 'test:smoke'] },
@@ -515,6 +516,8 @@ test('executable classifier maps high-risk paths to required lanes', () => {
   assert.deepEqual(classifyPaths(['js/vendor/nanah.bundle.js']).lanes, ['release', 'settings', 'smoke']);
   assert.deepEqual(classifyPaths(['js/nanah_managed_open_sync.js']).lanes, ['release', 'settings', 'smoke']);
   assert.deepEqual(classifyPaths(['js/nanah_managed_mailbox_client.js']).lanes, ['release', 'settings', 'smoke']);
+  assert.deepEqual(classifyPaths(['js/nanah_managed_local_network_client.js']).lanes, ['release', 'settings', 'smoke']);
+  assert.deepEqual(classifyPaths(['scripts/managed-delivery-provider.mjs']).lanes, ['release', 'settings', 'smoke']);
 
   const uiBuildHelper = classifyPaths(['scripts/build-extension-ui.mjs']);
   assert.deepEqual(uiBuildHelper.lanes, ['release', 'settings', 'smoke']);
