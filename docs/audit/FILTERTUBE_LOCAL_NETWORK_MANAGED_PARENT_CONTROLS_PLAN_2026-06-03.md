@@ -118,8 +118,8 @@ extension authority code.
   global account policy, create-profile, and Master PIN controls are paused
   until editing ends.
 - [x] Device Trust & Sync simplification slice: the Nanah panel now presents
-  parent-facing choices first (`Send this profile`, `Update protected device`,
-  `Move full account`) and moves source/replica/provider vocabulary into
+  parent-facing choices first (`This profile`, `Protected device`,
+  `Full account`) and moves source/replica/provider vocabulary into
   advanced/runtime internals. The runtime roles, signed managed-link authority,
   target-profile validation, and provider gates are unchanged; only the parent
   mental model and high-visibility labels changed.
@@ -129,9 +129,9 @@ extension authority code.
   advanced later/home delivery, without implying those transports can become
   policy authority.
 - [x] Device Trust & Sync copy was tightened again for parent/caregiver use:
-  the first-read panel now says `Family device updates`, `Pick profile`, and
+  the first-read panel now says `Family device updates`, `Choose profile`, and
   `Connect the other device`; it describes the connection helper as a meeting
-  service only in supporting copy, keeps `Advanced options` collapsed for role and
+  service only in supporting copy, keeps `More options` collapsed for role and
   scope details, and keeps the normal parent path as open both devices, pair,
   verify, Send Update, then save parent trust only for approved protected
   profiles.
@@ -140,7 +140,7 @@ extension authority code.
   manage`, `pair both devices`, `send approved changes`) instead of two
   expandable explanation blocks. The mode cards and runtime spotlight copy use
   shorter parent/caregiver language, while relationship/scope/migration
-  controls remain collapsed under `Advanced options`.
+  controls remain collapsed under `More options`.
 - [x] Trusted-device row wording slice: saved Nanah links now show plain pills
   such as `Parent link`, `Sends approved updates`, and `Receives parent
   updates` instead of leading with source/replica vocabulary. Managed link
@@ -160,6 +160,13 @@ extension authority code.
   sending an update while still exposing the local-trust model, imported-list
   delivery path, and optional later-delivery concepts when the user asks for
   more detail.
+- [x] 2026-06-20 Family Device Updates first-read simplification slice: the
+  card now says `Send parent-approved updates to another device`, keeps the
+  normal live path as the primary action, renames the visible mode choices to
+  `Protected device`, `This profile`, and `Full account`, and moves later-device
+  pickup behind `Optional: device opens later`. This is UI/copy and responsive
+  density only; trusted-link, target-profile, signature/hash/revision, provider,
+  and runtime policy gates are unchanged.
 - [x] Home Bridge readiness slice: configured local-network providers now expose
   a redacted `managed-local-network/health` check during setup. The check can
   tell a parent whether their bridge answered after saving, but it is explicitly
@@ -468,7 +475,7 @@ parent tool instead of a sync/debug console.
   - [x] Accounts & Sync wording follow-up: protected-profile command-center
     rows now use `Automatic saved updates` instead of `Check on open` /
     `Checks on open`, and the Family Device Updates first screen now says
-    `Advanced options` plus `Meeting service link` instead of making
+    `More options` plus `Meeting service link` instead of making
     parent-facing copy read like a protocol console. Runtime trust, provider
     gates, and source/replica policy validation are unchanged.
   - [x] Empty Family Controls setup wording slice: the first setup note now says
@@ -565,13 +572,17 @@ parent tool instead of a sync/debug console.
     trusted-link, target-profile, signature/hash/revision, provider, and runtime
     validation gates are unchanged.
   - [x] 2026-06-19 Family Device Updates later-delivery wording slice: the
-    first-read strip now says `If the other device opens later`, `Later over
-    internet`, and `Same network`/`Home/school network` so parents see the task
-    before transport names. Internet Pickup and Home Bridge remain the precise
-    provider names in setup dialogs, history, audit docs, and app contract
-    boundaries. This is copy/UI state only; trusted-link, target-profile,
-    signature/hash/revision, provider, and runtime validation gates are
-    unchanged.
+    first-read strip said `If the other device opens later`, `Later over
+    internet`, and `Same network`/`Home/school network` so parents saw the task
+    before transport names. The June 20 simplification keeps that intent with
+    shorter `Optional: device opens later`, `Internet pickup`, and `Home bridge`
+    labels. This is copy/UI state only; trusted-link, target-profile,
+    signature/hash/revision, provider, and runtime validation gates are unchanged.
+  - [x] 2026-06-20 Family Device Updates first-read simplification slice: the
+    visible strip now says `Optional: device opens later`, `Internet pickup`,
+    and `Home bridge`; the normal live path remains first, and later pickup is
+    framed as optional provider-backed delivery rather than ordinary Wi-Fi or
+    server authority.
   - [x] 2026-06-20 Family Device Updates setup-label slice: the setup entry
     points now say `Set Up Later Pickup` and `Set Up Same-Network Bridge` /
     `Edit Bridge`, while status/history/provider checks can still use Internet
@@ -580,7 +591,7 @@ parent tool instead of a sync/debug console.
     signature/hash/revision, provider, and runtime validation gates are
     unchanged.
   - [x] Family Device Updates default-mode slice: the first-run Accounts & Sync
-    mode is now `Update protected device` / `parent_control` instead of
+    mode is now `Protected device` / `parent_control` instead of
     `Copy once`. A previously saved user mode is still respected, child
     receive-only surfaces are still forced back to receive-only behavior, and
     this slice changes only the first-screen parent mental model. It does not
@@ -604,7 +615,7 @@ parent tool instead of a sync/debug console.
     `apply policy` in the parent-facing confirmation. Reconnect approval still
     gates the same trusted-link session.
   - [x] Protected-target wording slice: the Accounts & Sync send panel now says
-    `Protected profile on other device` and `Use the profile open there`
+    `Profile to update` and `Use the profile open there`
     instead of `Remote target profile` and `remote active profile`. This is a
     UI/copy-only parent-language change; selected target IDs, fixed target
     policy, source/replica roles, and managed-link validation are unchanged.

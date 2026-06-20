@@ -15898,12 +15898,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const configs = {
             send_once: {
                 eyebrow: 'Copy once',
-                title: 'Send this profile',
-                body: 'Use this for a one-time copy to your own device. Pair, verify the phrase, then send this profile once.',
+                title: 'This profile',
+                body: 'Copy the current profile to your own device once. Pair, verify the phrase, then send.',
                 steps: [
-                    'Leave this path selected for a normal one-time copy.',
-                    'Pair with the short code or QR and confirm the same phrase.',
-                    'Send once. The other device reviews the update before it applies.'
+                    'Use this for your own second device.',
+                    'Pair with the short code or QR and match the phrase.',
+                    'Send once; the other device reviews before applying.'
                 ],
                 hostLabel: 'Start Pairing',
                 sendLabel: getNanahScope() === 'full' ? 'Send Full Backup' : 'Send Once',
@@ -15911,10 +15911,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
             parent_control: {
                 eyebrow: 'Family control',
-                title: childReplicaOnly ? 'Protected profile is locked here' : 'Update a protected device',
+                title: childReplicaOnly ? 'Protected profile is locked here' : 'Protected device',
                 body: childReplicaOnly
                     ? 'This protected profile can receive approved parent updates here, but it cannot send settings or change parent trust while locked.'
-                    : 'Use this to send parent-approved rules, time limits, and viewing access to a child, family, or protected device.',
+                    : 'Send parent-approved rules, time limits, and viewing access to a child, family, or protected device.',
                 steps: childReplicaOnly
                     ? [
                         'Start from the parent or main profile on the managing device.',
@@ -15922,9 +15922,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                         'This profile receives only approved updates for itself.'
                     ]
                     : [
-                        'Choose or create the protected profile you manage.',
-                        'Connect to the other device and confirm the safety phrase.',
-                        'Send now. Save parent trust only for devices that should keep receiving approved updates.'
+                        'Choose the protected profile you manage.',
+                        'Pair the other device and match the safety phrase.',
+                        'Send now; save trust only for devices that should keep receiving approved updates.'
                     ],
                 hostLabel: 'Pair Protected Device',
                 sendLabel: 'Send Protected Update',
@@ -15932,10 +15932,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
             full_account: {
                 eyebrow: 'Move account',
-                title: 'Move full account',
+                title: 'Full account',
                 body: getActiveProfileType() === 'child'
                     ? 'Full account migration is not available from a child profile. FilterTube will keep this scoped to the active child profile instead.'
-                    : 'Use this only for reinstall, recovery, or moving the full account tree. It is broader than normal parent updates.',
+                    : 'Use only for reinstall, recovery, or moving the full account tree.',
                 steps: [
                     'Use this only for reinstall, migration, or full recovery.',
                     'Pair and verify the phrase like any other Nanah session.',
