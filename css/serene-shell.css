@@ -3295,7 +3295,7 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
 }
 
 .nanah-device-compass__center span,
-.nanah-device-compass__grid article span {
+.nanah-device-compass__choice span {
     color: #9f4a3d;
     font-size: 0.62rem;
     font-weight: 900;
@@ -3305,7 +3305,7 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
 }
 
 .nanah-device-compass__center strong,
-.nanah-device-compass__grid article strong {
+.nanah-device-compass__choice strong {
     color: var(--ft-color-text-primary);
     font-size: 0.86rem;
     font-weight: 880;
@@ -3313,7 +3313,7 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
 }
 
 .nanah-device-compass__center small,
-.nanah-device-compass__grid article small {
+.nanah-device-compass__choice small {
     color: var(--ft-color-text-secondary);
     font-size: 0.74rem;
     font-weight: 640;
@@ -3329,7 +3329,7 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     min-width: 0;
 }
 
-.nanah-device-compass__grid article {
+.nanah-device-compass__choice {
     position: relative;
     display: grid;
     align-content: center;
@@ -3341,9 +3341,33 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     border-radius: 0.82rem;
     background: rgba(255, 255, 255, 0.66);
     box-shadow: 0 16px 34px -32px rgba(20, 33, 45, 0.55);
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition:
+        transform 140ms ease,
+        border-color 140ms ease,
+        background 140ms ease,
+        box-shadow 140ms ease;
 }
 
-.nanah-device-compass__grid article::before {
+.nanah-device-compass__choice:hover,
+.nanah-device-compass__choice:focus-visible {
+    transform: translateY(-1px);
+    border-color: rgba(171, 68, 56, 0.24);
+    background: rgba(255, 255, 255, 0.84);
+    box-shadow: 0 18px 36px -30px rgba(20, 33, 45, 0.72);
+    outline: none;
+}
+
+.nanah-device-compass__choice:focus-visible {
+    box-shadow:
+        0 0 0 3px rgba(183, 83, 69, 0.16),
+        0 18px 36px -30px rgba(20, 33, 45, 0.72);
+}
+
+.nanah-device-compass__choice::before {
     content: "";
     width: 0.56rem;
     height: 0.56rem;
@@ -3352,12 +3376,12 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     box-shadow: 0 0 0 0.34rem rgba(183, 83, 69, 0.1);
 }
 
-.nanah-device-compass__grid article:nth-child(2)::before {
+.nanah-device-compass__choice:nth-child(2)::before {
     background: #3c765c;
     box-shadow: 0 0 0 0.34rem rgba(60, 118, 92, 0.1);
 }
 
-.nanah-device-compass__grid article:nth-child(3)::before {
+.nanah-device-compass__choice:nth-child(3)::before {
     background: #4f78b8;
     box-shadow: 0 0 0 0.34rem rgba(79, 120, 184, 0.1);
 }

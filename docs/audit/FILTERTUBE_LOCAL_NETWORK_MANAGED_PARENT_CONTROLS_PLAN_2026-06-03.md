@@ -709,6 +709,12 @@ parent tool instead of a sync/debug console.
     still requires phrase verification, and later pickup applies only after
     trusted setup. This adds no LAN peer discovery, no ambient device scanning,
     and no new policy authority.
+  - [x] 2026-06-20 Family Device Updates chooser slice: the compass choices are
+    now actionable. `Send now` switches to the parent-managed live send path and
+    focuses pairing; `Pick up later` reveals/opens Later Pickup setup; `Pick up
+    at home` reveals/opens Same-Home Pickup setup. Disabled paths explain the
+    next required setup step instead of suggesting that nearby devices, Wi-Fi,
+    or servers grant authority.
   - [x] 2026-06-20 saved-device summary slice: saved trusted-device cards now
     show a parent-readable summary band before the detailed policy rows:
     control direction, usual update area/behavior, next step, and whether

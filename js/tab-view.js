@@ -2930,6 +2930,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftNanahQrCanvas = document.getElementById('ftNanahQrCanvas');
     const ftNanahQrCaption = document.getElementById('ftNanahQrCaption');
     const ftNanahTrustedLinks = document.getElementById('ftNanahTrustedLinks');
+    const ftNanahCompassLiveBtn = document.getElementById('ftNanahCompassLiveBtn');
+    const ftNanahCompassHomeBtn = document.getElementById('ftNanahCompassHomeBtn');
+    const ftNanahCompassLaterBtn = document.getElementById('ftNanahCompassLaterBtn');
     const ftNanahDeliveryAdvanced = document.getElementById('ftNanahDeliveryAdvanced');
     const ftNanahDeliveryLiveCard = document.getElementById('ftNanahDeliveryLiveCard');
     const ftNanahDeliveryLiveLabel = document.getElementById('ftNanahDeliveryLiveLabel');
@@ -19091,6 +19094,59 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.querySelector('.nav-item[data-tab="sync"]')?.click();
             }
             focusFamilyDeviceUpdatesCard();
+        });
+    }
+
+    function focusNanahElement(element) {
+        if (!element) return;
+        requestAnimationFrame(() => {
+            try {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } catch (_) {
+                try {
+                    element.scrollIntoView();
+                } catch (e) {
+                }
+            }
+            try {
+                element.focus({ preventScroll: true });
+            } catch (e) {
+            }
+        });
+    }
+
+    if (ftNanahCompassLiveBtn) {
+        ftNanahCompassLiveBtn.addEventListener('click', () => {
+            setNanahMode('parent', { persist: true, applyPreset: true });
+            updateNanahUi();
+            focusNanahElement(ftNanahHostBtn || ftNanahStatusCard || ftNanahDeliveryLiveCard);
+            UIComponents.showToast('Open the protected device, pair, verify, then Send Update', 'info');
+        });
+    }
+
+    if (ftNanahCompassLaterBtn) {
+        ftNanahCompassLaterBtn.addEventListener('click', async () => {
+            if (ftNanahDeliveryAdvanced) ftNanahDeliveryAdvanced.open = true;
+            focusNanahElement(ftNanahDeliveryMailboxBtn || ftNanahDeliveryMailboxCard);
+            if (ftNanahDeliveryMailboxBtn?.disabled) {
+                UIComponents.showToast(ftNanahDeliveryMailboxBtn.title || 'Pair a verified protected device before setting up Later Pickup', 'warning');
+                return;
+            }
+            await configureNanahManagedMailboxServer();
+            renderNanahDeliveryPathStrip();
+        });
+    }
+
+    if (ftNanahCompassHomeBtn) {
+        ftNanahCompassHomeBtn.addEventListener('click', async () => {
+            if (ftNanahDeliveryAdvanced) ftNanahDeliveryAdvanced.open = true;
+            focusNanahElement(ftNanahDeliveryLocalBtn || ftNanahDeliveryLocalCard);
+            if (ftNanahDeliveryLocalBtn?.disabled) {
+                UIComponents.showToast(ftNanahDeliveryLocalBtn.title || 'Pair a verified protected device before setting up Same-Home Pickup', 'warning');
+                return;
+            }
+            await configureNanahManagedLocalNetworkProvider();
+            renderNanahDeliveryPathStrip();
         });
     }
 
