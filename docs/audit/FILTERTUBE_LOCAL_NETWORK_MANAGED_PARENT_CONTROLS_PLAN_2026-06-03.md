@@ -341,8 +341,8 @@ parent tool instead of a sync/debug console.
   - [x] 2026-06-20 rule-list import modal viewport slice: the `Import Rule
     List` modal now has a dedicated overlay and viewport-bounded shell so the
     format examples, file/URL inputs, paste box, preview, and actions scroll
-    inside the dialog instead of clipping at the top or bottom of the screen.
-    The desktop layout keeps examples in a bounded left column and the editable
+    inside one dialog scroll instead of clipping at the top or bottom of the
+    screen. The desktop layout keeps examples in the left column and editable
     fields in a fluid right column, then collapses to one column on smaller
     screens. This is layout-only; parser behavior, preview-before-apply,
     parent/account approval, Main/Kids/Both targeting, and verified-device
