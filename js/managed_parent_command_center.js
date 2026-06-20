@@ -774,6 +774,79 @@
         });
     }
 
+    function renderManagedCommandCenterTrustMap(summary = {}) {
+        const rows = Array.isArray(summary.rows) ? summary.rows : [];
+        if (!rows.length || !global.document) return null;
+        const map = document.createElement('div');
+        map.className = 'ft-managed-command-center__trust-map';
+        map.setAttribute('aria-label', 'Trusted device overview');
+
+        const copy = document.createElement('div');
+        copy.className = 'ft-managed-command-center__trust-map-copy';
+        const title = document.createElement('strong');
+        title.textContent = 'Trusted devices';
+        const detail = document.createElement('span');
+        detail.textContent = 'Pair once, verify the phrase, then send parent-approved updates. Devices on the same network still need that trusted link.';
+        copy.append(title, detail);
+
+        const ring = document.createElement('div');
+        ring.className = 'ft-managed-command-center__trust-ring';
+
+        const parentNode = document.createElement('div');
+        parentNode.className = 'ft-managed-command-center__trust-parent';
+        const parentLabel = document.createElement('strong');
+        parentLabel.textContent = 'Parent';
+        const parentDetail = document.createElement('span');
+        parentDetail.textContent = `${summary.profileCount} protected ${summary.profileCount === 1 ? 'profile' : 'profiles'}`;
+        parentNode.append(parentLabel, parentDetail);
+        ring.appendChild(parentNode);
+
+        const devices = document.createElement('div');
+        devices.className = 'ft-managed-command-center__trust-devices';
+        rows.slice(0, 6).forEach((item) => {
+            const syncState = resolveManagedCommandCenterSyncState(item);
+            const device = document.createElement('div');
+            device.className = `ft-managed-command-center__trust-device is-${syncState.tone || 'neutral'}`;
+            device.title = item.deliveryPathDetail || 'Protected profile device status.';
+
+            const name = document.createElement('strong');
+            name.textContent = item.profileName || 'Protected profile';
+            const route = document.createElement('span');
+            route.textContent = item.syncLocalNetworkReady === true
+                ? 'Home Bridge'
+                : item.syncMailboxReady === true
+                    ? 'Internet Pickup'
+                    : item.syncLiveReady === true
+                        ? 'Live now'
+                        : syncState.label;
+            const target = document.createElement('small');
+            target.textContent = item.syncTargetCount > 0
+                ? (item.syncTargetLabel || `${item.syncTargetCount} verified device${item.syncTargetCount === 1 ? '' : 's'}`)
+                : 'Pair only if this profile lives on another device';
+
+            device.append(name, route, target);
+            devices.appendChild(device);
+        });
+        if (rows.length > 6) {
+            const more = document.createElement('div');
+            more.className = 'ft-managed-command-center__trust-device is-neutral';
+            const moreTitle = document.createElement('strong');
+            moreTitle.textContent = `+${rows.length - 6} more`;
+            const moreRoute = document.createElement('span');
+            moreRoute.textContent = 'Shown below';
+            more.append(moreTitle, moreRoute);
+            devices.appendChild(more);
+        }
+        ring.appendChild(devices);
+
+        const note = document.createElement('div');
+        note.className = 'ft-managed-command-center__trust-note';
+        note.textContent = 'Same-network control uses a Home Bridge only when you configure one; automatic Wi-Fi discovery is intentionally not a trust source.';
+
+        map.append(copy, ring, note);
+        return map;
+    }
+
     function renderManagedCommandCenter(profilesV4, { revealDetails = false, helpers = {} } = {}) {
         if (!revealDetails || !global.document) return null;
         const h = makeHelpers(helpers);
@@ -971,6 +1044,9 @@
             workflow.appendChild(workflowItem);
         });
         panel.appendChild(workflow);
+
+        const trustMap = renderManagedCommandCenterTrustMap(summary);
+        if (trustMap) panel.appendChild(trustMap);
 
         const mailbox = h.safeObject(summary.mailboxConfig);
         const localNetwork = h.safeObject(summary.localNetworkConfig);

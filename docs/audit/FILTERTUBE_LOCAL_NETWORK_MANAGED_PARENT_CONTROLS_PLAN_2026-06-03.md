@@ -692,6 +692,15 @@ parent tool instead of a sync/debug console.
     pick an approved update up later only after setup, and that Wi-Fi/servers
     never become authority. Internet Pickup/Home Bridge names remain available
     on their optional setup cards and in audit/history wording.
+  - [x] 2026-06-20 trusted-device overview slice: Family Controls now shows a
+    compact trusted-device map before the profile rows. The parent node stays at
+    the center, protected profiles render as device tiles, and each tile uses the
+    existing managed-policy summary to show `Live now`, `Home Bridge`,
+    `Internet Pickup`, `Open both devices`, or pairing-needed status. This is
+    presentation-only: it adds no automatic LAN discovery, no background probe,
+    and no new policy authority. Same-network updates still require an explicitly
+    configured Home Bridge plus the existing trusted-link, target-profile, scope,
+    revision, hash, and signature validation.
   - [x] 2026-06-20 protected-profile setup wording slice: parent-facing setup
     actions now say `Create Protected Profile` instead of `Create Child Profile`
     in Family Controls, Settings, and the creation prompt. This keeps the UI
