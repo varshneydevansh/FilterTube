@@ -993,8 +993,13 @@ function showManagedTimeoutOverlay(state) {
                 }
             }
         });
-        buttonRow.append(askButton, dashboardButton);
-        actionArea.append(buttonRow, instruction);
+        if (!policyExpired) {
+            buttonRow.append(askButton, dashboardButton);
+            actionArea.append(buttonRow, instruction);
+        } else {
+            buttonRow.append(dashboardButton);
+            actionArea.append(buttonRow);
+        }
 
         panel.appendChild(eyebrow);
         panel.appendChild(title);

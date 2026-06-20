@@ -722,6 +722,14 @@ parent tool instead of a sync/debug console.
     Endpoint/service-key prompts remain, but the copy says services store or
     route unreadable waiting updates only and never replace trusted-link
     signature validation.
+  - [x] 2026-06-20 device-map and timeout clarity slice: the Accounts & Sync
+    Family Device Updates compass now reads like a small family device map:
+    parent device, live Send Update, Home Bridge, and Internet Pickup. The
+    visible safety line says pair and verify first because network/server
+    reachability never grants control. The protected timeout overlay now hides
+    `Request more time` when the time policy itself is expired and needs parent
+    review, so the protected profile sees a single parent-review action instead
+    of a request button that cannot repair an expired rule.
   - [x] 2026-06-20 protected-profile setup wording slice: parent-facing setup
     actions now say `Create Protected Profile` instead of `Create Child Profile`
     in Family Controls, Settings, and the creation prompt. This keeps the UI
