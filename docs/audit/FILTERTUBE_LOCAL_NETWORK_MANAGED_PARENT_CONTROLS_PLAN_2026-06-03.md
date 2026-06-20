@@ -676,6 +676,12 @@ parent tool instead of a sync/debug console.
     pick an approved update up later only after setup, and that Wi-Fi/servers
     never become authority. Internet Pickup/Home Bridge names remain available
     on their optional setup cards and in audit/history wording.
+  - [x] 2026-06-20 protected-profile setup wording slice: parent-facing setup
+    actions now say `Create Protected Profile` instead of `Create Child Profile`
+    in Family Controls, Settings, and the creation prompt. This keeps the UI
+    useful for children, dependents, neurodivergent users, and other protected
+    user profiles while leaving the internal `child` profile type, unlock
+    checks, sibling privacy PIN, and parent/account authority gates unchanged.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.

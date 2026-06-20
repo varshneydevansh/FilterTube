@@ -19482,8 +19482,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!okUnlocked) return;
 
             const nameRaw = await showPromptModal({
-                title: 'Create Child Profile',
-                message: 'Enter a name for the new child profile.',
+                title: 'Create Protected Profile',
+                message: 'Enter a name for the protected profile.',
                 placeholder: 'Profile name',
                 inputType: 'text',
                 confirmText: 'Create'
@@ -19552,7 +19552,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             await refreshProfilesUI();
-            UIComponents.showToast('Child profile created. Parent profile remains active so you can finish setup.', 'success');
+            UIComponents.showToast('Protected profile created. Parent profile remains active so you can finish setup.', 'success');
             try {
                 const fresh = profilesV4Cache;
                 const root = safeObject(fresh);

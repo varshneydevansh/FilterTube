@@ -154,7 +154,7 @@ test('profile management persistence audit document records current boundary and
 test('profile management source fingerprints stay pinned', () => {
   const doc = read(auditDocPath);
   const expected = [
-    ['js/tab-view.js', 21286, 1008674, '7793c32f8c6481a595e15840d1a0828b1cc3de8ec22d0b567afa331691ed9054'],
+    ['js/tab-view.js', 21334, 1011634, 'c1bfe9d61dcddd2e1619b04b4c538c1fee02465e35f6c9299e24aed344f68c1b'],
     ['js/popup.js', 1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
     ['js/io_manager.js', 2119, 102123, 'd457bdcc4f7fc3acef401b48437fc707e2b9f2791e18ff4cafc1209f810bcc3c'],
     ['js/background.js', 6984, 315747, '080d15907b26314873138c5dcc5d9653a2a27e933049be10361dfe0047f0a7cc']
@@ -178,7 +178,7 @@ test('profile management source/effect block metrics stay pinned in the doc', ()
     tabSwitchToProfile: ['tab-view switchToProfile block', 45, 1673],
     popupSwitchToProfile: ['popup switchToProfile block', 48, 1659],
     tabCreateAccountHandler: ['tab-view create account handler block', 120, 5004],
-    tabCreateChildHandler: ['tab-view create child handler block', 107, 4589],
+    tabCreateChildHandler: ['tab-view create child handler block', 107, 4597],
     tabSaveManagedChildSurface: ['tab-view saveManagedChildSurface block', 66, 3003],
     ioLoadSaveProfiles: ['io_manager load/save profiles block', 67, 2563],
     backgroundProfileStorageInvalidation: ['background profile storage invalidation block', 42, 1464]

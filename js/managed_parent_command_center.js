@@ -793,7 +793,7 @@
         body.className = 'help-item-body';
         body.textContent = summary.profileCount > 0
             ? 'Pick a profile, set what it can watch, set daily time, and send the update only when another verified device needs it.'
-            : 'Create one protected child/user profile first. Then set rules, daily time, Main/Kids access, and optional device updates.';
+            : 'Create one protected profile first. Then set rules, daily time, Main/Kids access, and optional device updates.';
         const meta = document.createElement('div');
         meta.className = 'ft-managed-command-center__meta';
         const setupNeeds = summary.noDeviceProfileCount
@@ -827,7 +827,7 @@
             steps.className = 'ft-managed-command-center__setup-steps';
             [
                 {
-                    text: 'Create a protected child/user profile',
+                    text: 'Create a protected profile',
                     title: 'The profile gets its own Main and Kids rules. The parent/account keeps policy authority.'
                 },
                 {
@@ -862,7 +862,7 @@
                     const createChildBtn = document.createElement('button');
                     createChildBtn.className = 'btn-primary';
                     createChildBtn.type = 'button';
-                    createChildBtn.textContent = 'Create Child Profile';
+                    createChildBtn.textContent = 'Create Protected Profile';
                     createChildBtn.title = 'Creates a protected profile owned by the active parent/account profile.';
                     createChildBtn.addEventListener('click', (event) => {
                         event.preventDefault();

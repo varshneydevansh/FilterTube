@@ -235,9 +235,10 @@ state without exposing plaintext rule values:
 - The status line is read-only.
 - Command-center action buttons are action intents only. They do not carry
   payloads, rule values, policy JSON, private keys, or direct mutation authority.
-- Empty-state setup buttons are also action intents only. They route to the
-  existing Create Child Profile or Create Account flows, which keep their
-  current parent/account or Master unlock requirements.
+- Empty-state setup buttons are also action intents only. The parent-facing
+  label is `Create Protected Profile`, and it routes to the existing protected
+  child-profile creation flow without changing its parent/account unlock
+  requirements. `Create Account` keeps its Master/default unlock boundary.
 - Bulk command-center buttons carry only selected protected profile ids, action
   name, scope, and `sensitiveAction: true`; the dashboard runtime still prompts
   for parent/account re-auth and builds one policy revision per target.
