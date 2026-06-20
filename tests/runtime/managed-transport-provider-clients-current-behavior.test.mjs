@@ -284,6 +284,48 @@ test('configured local-network client allows explicit private bridge and sanitiz
   assert.equal(Object.hasOwn(calls[1].body, 'privateKey'), false);
 });
 
+test('local-network client does not auto-discover or probe LAN without explicit bridge config', async () => {
+  const calls = [];
+  const fetchImpl = async (url, options) => {
+    calls.push({ url, body: options?.body ? JSON.parse(options.body) : null });
+    return jsonResponse({ ok: true, candidates: [{ candidateId: 'should-not-be-seen' }] });
+  };
+  const window = loadClient('js/nanah_managed_local_network_client.js', {
+    fetch: fetchImpl,
+    localStorage: {
+      getItem(key) {
+        assert.equal(key, 'ftManagedLocalNetworkProviderConfig');
+        return '';
+      }
+    }
+  });
+
+  assert.equal(window.FilterTubeManagedPolicyLocalNetwork, undefined);
+
+  const provider = window.FilterTubeManagedLocalNetworkClient.createProvider({}, { fetch: fetchImpl });
+  assert.equal(provider.configured, false);
+  assert.equal(provider.endpointHost, '');
+
+  const discover = await provider.discoverManagedPolicyCandidates({
+    reason: 'dashboard_open',
+    linkId: 'link-1',
+    targetProfileId: 'child-1',
+    sourceDeviceId: 'parent-device'
+  });
+  assert.equal(discover.ok, false);
+  assert.equal(discover.reason, 'local_network_endpoint_unconfigured');
+  assert.equal(Array.isArray(discover.candidates), true);
+  assert.equal(discover.candidates.length, 0);
+
+  const health = await provider.checkManagedLocalNetworkBridge({ reason: 'configure' });
+  assert.equal(health.ok, false);
+  assert.equal(health.reason, 'local_network_endpoint_unconfigured');
+  assert.equal(health.bridgeReachable, false);
+  assert.equal(health.endpointHost, '');
+
+  assert.equal(calls.length, 0);
+});
+
 test('configured local-network client pulls redacted delivery receipts for source status', async () => {
   const calls = [];
   const fetchImpl = async (url, options) => {

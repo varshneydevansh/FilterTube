@@ -163,6 +163,7 @@ runtime protected local-network ack-handoff history writer: present
 runtime local-network status persistence: present
 runtime local-network provider client response allowlist sanitizer: present
 runtime local-network provider readiness check: present and non-authoritative
+runtime unconfigured local-network provider network probe: absent
 runtime built-in LAN peer discovery: absent
 runtime built-in LAN delivery: absent
 runtime background local-network scheduler: absent
@@ -183,6 +184,13 @@ Focused test:
 node --test tests/runtime/managed-local-network-provider-current-behavior.test.mjs
 node --test tests/runtime/managed-transport-provider-clients-current-behavior.test.mjs
 ```
+
+The transport-provider client test also covers the unconfigured Home Bridge
+case: loading the local-network client with no explicit endpoint does not
+install `window.FilterTubeManagedPolicyLocalNetwork`, discovery and health
+checks fail closed with `local_network_endpoint_unconfigured`, and no fetch is
+made. This is the executable proof that the extension does not silently probe
+LAN addresses or turn same-network reachability into policy authority.
 
 Settings lane:
 

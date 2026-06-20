@@ -95,6 +95,7 @@ runtime local-network candidate expiry gate: present in js/nanah_sync_adapter.js
 runtime local-network candidate receive bridge: present in js/tab-view.js
 runtime provider-gated local-network candidate discovery hook: present in js/tab-view.js
 runtime source-side local-network provider delivery handoff: present in js/nanah_managed_live_policy.js
+runtime unconfigured local-network provider network probe: absent
 runtime built-in local-network peer discovery: absent
 runtime built-in LAN transport: absent
 runtime filtertube_managed_policy envelope validator: present in js/nanah_sync_adapter.js
@@ -130,6 +131,13 @@ records to that provider. provider handoff is not authority; those ack records
 are feedback only, not policy
 authority, and no built-in LAN peer discovery or LAN transport runtime exists in
 the extension.
+
+2026-06-20 proof update: the local-network provider client now has a focused
+unconfigured-provider regression. With no explicit Home Bridge endpoint, the
+client installs no global provider, `discoverManagedPolicyCandidates(...)` and
+`checkManagedLocalNetworkBridge(...)` fail closed, and the injected fetch spy is
+never called. That keeps ordinary dashboard/profile-open flows from becoming
+automatic Wi-Fi or LAN discovery.
 
 ## Verification
 

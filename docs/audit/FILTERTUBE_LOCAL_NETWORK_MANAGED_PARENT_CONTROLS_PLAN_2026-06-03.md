@@ -638,6 +638,12 @@ parent tool instead of a sync/debug console.
     still applies only signed updates from the saved parent/caregiver link.
     Runtime provider hooks, local candidate validation, and trusted-link
     authority are unchanged.
+  - [x] 2026-06-20 no automatic Home Bridge probing proof: the local-network
+    provider client is pinned to fail closed without an explicit endpoint.
+    Dashboard/profile-open discovery and bridge health checks return
+    `local_network_endpoint_unconfigured`, install no global provider, and make
+    zero network calls, so Home Bridge cannot silently scan LAN addresses or
+    become Wi-Fi authority.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.

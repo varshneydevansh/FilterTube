@@ -199,6 +199,7 @@ live same-session Nanah send: PARTIAL
 provider-gated mailbox/local-network intake: PARTIAL
 source-side mailbox upload-provider handoff: PARTIAL
 source-side mailbox purge-provider handoff: PARTIAL
+unconfigured Home Bridge network probing: NO-GO and guarded
 built-in LAN peer discovery: NO-GO
 built-in LAN delivery: NO-GO
 mailbox encryption client: READY local helper and configured HTTPS upload
