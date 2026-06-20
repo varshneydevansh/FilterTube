@@ -466,7 +466,7 @@ parent tool instead of a sync/debug console.
     UI/copy only; live Send Update, profile targeting, signature/hash/revision
     validation, and offline last valid policy behavior are unchanged.
   - [x] Automatic-saved-updates visibility slice: Family Controls now shows a
-    single read-only `Automatic saved updates` detail for verified
+    single read-only `Check when profile opens` detail for verified
     protected-profile devices instead of separate Internet Pickup and Home
     Bridge rows. It reports whether saved parent links are set to check for
     trusted updates when the protected profile opens, while keeping live Send
@@ -501,7 +501,7 @@ parent tool instead of a sync/debug console.
     signature/hash/revision gate, target-profile rule, or live Send Update
     behavior changed.
   - [x] Manual saved-update check slice: trusted protected-device cards with
-    `Automatic saved updates` now expose `Check Saved Updates`. The action
+    profile-open checking enabled now expose `Check Saved Updates`. The action
     explicitly runs the same Internet Pickup and Home Bridge profile-open
     receive paths with a manual reason so caregivers can verify/update on
     demand without waiting for another profile open. It does not add authority:
@@ -662,13 +662,21 @@ parent tool instead of a sync/debug console.
     zero network calls, so Home Bridge cannot silently scan LAN addresses or
     become Wi-Fi authority.
   - [x] 2026-06-20 saved-update reader readiness slice: trusted protected-device
-    cards now separate `Automatic saved updates` policy from actual pickup
+    cards now separate the `Check when profile opens` policy from actual pickup
     readiness. If no configured Internet Pickup pull provider or Home Bridge
     discovery provider is present, the row says `Needs pickup setup` and the
     manual check button is disabled as `Set Up Pickup First`. Live Send Update
     still works when both verified devices are open. This changes only
     availability wording and click gating; trusted-link, target-profile, scope,
     revision, hash, signature, provider, and local apply gates are unchanged.
+  - [x] 2026-06-20 profile-open check label slice: the parent-facing trust modal
+    and Family Controls row now describe `syncOnProfileOpen` as `Check when
+    profile opens` / `Checks when opened` instead of `Automatic saved updates`.
+    This keeps the feature understandable: a protected profile may look for
+    newer signed parent updates when it opens, but only configured Internet
+    Pickup or Home Bridge delivery can provide waiting updates. Storage fields,
+    trusted-link validation, target-profile matching, signature/hash/revision
+    gates, and live Send Update behavior are unchanged.
   - [x] 2026-06-20 Home Bridge parent-facing health state slice: configured
     Home Bridge setup now records a redacted last-check state and exposes a
     `Check Bridge` action from the same setup flow. The saved state contains

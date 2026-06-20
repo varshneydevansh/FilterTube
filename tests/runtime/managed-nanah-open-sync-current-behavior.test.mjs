@@ -132,7 +132,7 @@ test('dashboard loads open-sync helper and wires policy toggle status and open/p
   assert.match(tabView, /recordAckHistory: \(details\) => recordManagedOpenSyncAckHistory\(details\)/);
   assert.match(tabView, /window\.FilterTubeNanahManagedOpenSync\?\.create/);
   assert.match(tabView, /syncOnProfileOpen: linkType === 'managed_link' && syncOnProfileOpen/);
-  assert.match(tabView, /Automatic saved updates/);
+  assert.match(tabView, /Check when profile opens/);
   assert.match(tabView, /window\.FilterTubeManagedPolicyOpenSync = window\.FilterTubeManagedPolicyMailbox/);
   assert.match(mailboxClient, /global\.FilterTubeManagedPolicyOpenSync = provider/);
   assert.match(tabView, /Internet Pickup/);

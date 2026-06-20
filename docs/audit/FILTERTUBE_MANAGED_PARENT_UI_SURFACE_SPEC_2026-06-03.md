@@ -146,13 +146,13 @@ keeps the parent model direct and prevents mailbox/LAN/provider language from
 becoming the first mental model. The change does not add authority; it only
 reduces copy and layout pressure in the Accounts & Sync surface.
 The trusted-device status wording now follows that same parent model: the
-visible card says `Control`, `Automatic saved updates`, and `Delivery receipts`
+visible card says `Control`, `Check when profile opens`, and `Delivery receipts`
 instead of `Direction`, separate `Open sync`/`Local network` rows, and raw
-remote delivery wording. `Automatic saved updates` can still report `Internet
-Pickup` and `Home Bridge` details when those optional providers are involved. Protocol
-names such as mailbox, local-network, provider, candidate, and ack remain in
-code, advanced docs, and tests where they describe exact transport boundaries;
-they are no longer the first label a parent has to understand.
+remote delivery wording. The profile-open check can still report `Internet
+Pickup` and `Home Bridge` details when those optional providers are involved.
+Protocol names such as mailbox, local-network, provider, candidate, and ack
+remain in code, advanced docs, and tests where they describe exact transport
+boundaries; they are no longer the first label a parent has to understand.
 The Family Device Updates delivery-path strip now keeps the same parent model on
 the pairing surface itself: `Live update` is the default path when both devices
 are open. The first screen now says `If the other device opens later`, `Later
@@ -170,7 +170,7 @@ saved a trusted parent link. That button only runs the existing manual
 not let the service, network, or UI bypass trusted-link validation, target
 profile matching, scope, revision, hash, signature, or local apply gates.
 Trusted-device cards also keep policy and transport readiness separate:
-`Automatic saved updates` can be enabled on a saved parent link, but the manual
+`Check when profile opens` can be enabled on a saved parent link, but the manual
 check stays disabled as `Set Up Pickup First` and reports `Needs pickup setup`
 until a configured Internet Pickup reader or Home Bridge discovery provider is
 available. Live Send Update remains the normal path when both devices are open.
