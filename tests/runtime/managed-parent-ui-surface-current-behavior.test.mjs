@@ -505,13 +505,13 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /Live update/);
   assert.match(tabViewHtml, /Optional: device opens later/);
   assert.match(tabViewHtml, /Internet pickup/);
-  assert.match(tabViewHtml, /Saved pickup is optional for compatible Internet Pickup or Home Bridge services; it never makes Wi-Fi or a server the authority/);
+  assert.match(tabViewHtml, /If the other device must pick it up later, set that up in More options; Wi-Fi and servers never become the authority/);
   assert.match(tabViewHtml, /Home bridge/);
   assert.match(tabViewHtml, /Bridge off/);
   assert.match(tabViewHtml, /Wi-Fi alone never grants control/);
   assert.match(tabViewHtml, /Home Bridge is for homes, clinics, or schools that run their own FilterTube-compatible bridge on the local network/);
   assert.match(tabViewHtml, /id="ftNanahDeliveryAdvanced"/);
-  assert.match(tabViewHtml, /Use only when you run a compatible Internet Pickup or Home Bridge service/);
+  assert.match(tabViewHtml, /Use only when a verified device must collect an approved update later/);
   assert.match(tabViewHtml, /id="ftNanahDeliveryCheckRow"/);
   assert.match(tabViewHtml, /Check waiting parent updates/);
   assert.match(tabViewHtml, /Available after this protected profile saves a trusted parent link/);

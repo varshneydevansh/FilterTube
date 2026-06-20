@@ -670,6 +670,12 @@ parent tool instead of a sync/debug console.
     still works when both verified devices are open. This changes only
     availability wording and click gating; trusted-link, target-profile, scope,
     revision, hash, signature, provider, and local apply gates are unchanged.
+  - [x] 2026-06-20 Family Device Updates first-read copy slice: the Accounts &
+    Sync intro now keeps the normal live path in plain parent language and moves
+    later pickup under `More options`. The visible copy says the other device can
+    pick an approved update up later only after setup, and that Wi-Fi/servers
+    never become authority. Internet Pickup/Home Bridge names remain available
+    on their optional setup cards and in audit/history wording.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.
