@@ -846,6 +846,11 @@ parent tool instead of a sync/debug console.
     not ready` instead of the older `Internet Pickup not ready` label when a
     protected profile has saved-update checks enabled but no pull provider is
     available.
+  - [x] 2026-06-20 delivery-receipt wording slice: source-side managed delivery
+    ack history now reports `Later Pickup update delivered/failed` and
+    `Same-Home Pickup update delivered/failed` instead of the older provider
+    labels. Ack schemas, transport IDs, revision/hash records, and authority
+    validation remain unchanged.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.
