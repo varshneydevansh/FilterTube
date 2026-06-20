@@ -732,6 +732,12 @@ parent tool instead of a sync/debug console.
     `Later Pickup` and `Same-Home Pickup` instead of mixing them with provider
     terms like Internet Pickup or Home Bridge. Protocol variables and provider
     scopes remain unchanged.
+  - [x] 2026-06-20 family device-map visual slice: the Accounts & Sync compass
+    now uses explicit parent/protected-device markers and endpoint buttons so
+    same-device, same-home, and opens-later paths read more like a familiar
+    device-sharing picker. This is visual and copy-only; it adds no automatic
+    LAN discovery, no ambient nearby-device trust, and no new transport
+    authority.
   - [x] 2026-06-20 saved-device summary slice: saved trusted-device cards now
     show a parent-readable summary band before the detailed policy rows:
     control direction, usual update area/behavior, next step, and whether
