@@ -169,6 +169,11 @@ saved a trusted parent link. That button only runs the existing manual
 `manual_saved_update_check` Internet Pickup/Home Bridge receive paths; it does
 not let the service, network, or UI bypass trusted-link validation, target
 profile matching, scope, revision, hash, signature, or local apply gates.
+Trusted-device cards also keep policy and transport readiness separate:
+`Automatic saved updates` can be enabled on a saved parent link, but the manual
+check stays disabled as `Set Up Pickup First` and reports `Needs pickup setup`
+until a configured Internet Pickup reader or Home Bridge discovery provider is
+available. Live Send Update remains the normal path when both devices are open.
 The subscription-check slice changes URL-backed list refresh semantics from
 blind replacement to hash-aware checking. When a checked URL returns the same
 source hash, Family Controls updates last-checked/source metadata and writes a

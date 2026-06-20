@@ -662,6 +662,14 @@ parent tool instead of a sync/debug console.
     `local_network_endpoint_unconfigured`, install no global provider, and make
     zero network calls, so Home Bridge cannot silently scan LAN addresses or
     become Wi-Fi authority.
+  - [x] 2026-06-20 saved-update reader readiness slice: trusted protected-device
+    cards now separate `Automatic saved updates` policy from actual pickup
+    readiness. If no configured Internet Pickup pull provider or Home Bridge
+    discovery provider is present, the row says `Needs pickup setup` and the
+    manual check button is disabled as `Set Up Pickup First`. Live Send Update
+    still works when both verified devices are open. This changes only
+    availability wording and click gating; trusted-link, target-profile, scope,
+    revision, hash, signature, provider, and local apply gates are unchanged.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.

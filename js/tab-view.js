@@ -13487,21 +13487,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                 : 'Create a protected profile and pair a verified device before setting up same-network delivery.';
         }
 
-        const laterConfigured = mailbox.configured === true || local.configured === true;
-        const canCheckSavedUpdates = laterConfigured && hasNanahManagedSavedUpdateCheckTarget();
+        const hasSavedUpdateReader = hasNanahManagedSavedUpdateReader();
+        const canCheckSavedUpdates = hasSavedUpdateReader && hasNanahManagedSavedUpdateCheckTarget();
         if (ftNanahDeliveryCheckRow) {
-            ftNanahDeliveryCheckRow.hidden = !laterConfigured;
+            ftNanahDeliveryCheckRow.hidden = !hasSavedUpdateReader;
         }
         if (ftNanahDeliveryCheckDetail) {
             ftNanahDeliveryCheckDetail.textContent = canCheckSavedUpdates
                 ? 'Checks Internet Pickup and Home Bridge now. Signed parent-link validation still decides what can apply.'
-                : 'Use this on the protected device after it saves a trusted parent link.';
+                : 'Use this on the protected device after it saves a trusted parent link and a pickup path is set up.';
         }
         if (ftNanahDeliveryCheckBtn) {
             ftNanahDeliveryCheckBtn.disabled = !canCheckSavedUpdates;
             ftNanahDeliveryCheckBtn.title = canCheckSavedUpdates
                 ? 'Run the saved-update check now for this protected profile.'
-                : 'Available on a protected device with a saved trusted parent link and an optional delivery service configured.';
+                : 'Available on a protected device with a saved trusted parent link and a set-up Internet Pickup or Home Bridge path.';
         }
     }
 
@@ -13747,12 +13747,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             || typeof root.enqueueManagedMailboxItems === 'function';
     }
 
+    function hasNanahManagedMailboxOpenSyncReader(provider = window.FilterTubeManagedPolicyOpenSync || getNanahManagedMailboxProvider()) {
+        const root = safeObject(provider);
+        return root.configured === true && typeof root.pullDecryptedMailboxItems === 'function';
+    }
+
     function hasNanahManagedLocalNetworkDeliveryWriter(provider = getNanahManagedLocalNetworkProvider()) {
         const root = safeObject(provider);
         return typeof root.publishManagedPolicyCandidates === 'function'
             || typeof root.deliverManagedPolicyCandidates === 'function'
             || typeof root.publishLocalNetworkCandidates === 'function'
             || typeof root.putManagedPolicyCandidates === 'function';
+    }
+
+    function hasNanahManagedLocalNetworkDiscoveryReader(provider = getNanahManagedLocalNetworkProvider()) {
+        const root = safeObject(provider);
+        return root.configured === true && (
+            typeof root.discoverManagedPolicyCandidates === 'function'
+            || typeof root.discoverLocalNetworkCandidates === 'function'
+        );
+    }
+
+    function hasNanahManagedSavedUpdateReader() {
+        return hasNanahManagedMailboxOpenSyncReader() || hasNanahManagedLocalNetworkDiscoveryReader();
     }
 
     function getConcreteManagedPolicyScopesForProfile(scope, profile) {
@@ -14986,6 +15003,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const policy = safeObject(trusted.policy);
         if (trusted.linkType !== 'managed_link' || trusted.localRole !== 'replica' || trusted.remoteRole !== 'source') return '';
         if (policy.syncOnProfileOpen !== true) return 'Off';
+        if (!hasNanahManagedSavedUpdateReader()) return 'Needs pickup setup';
         const internetStatus = normalizeString(formatNanahManagedOpenSyncStatus(trusted));
         const homeStatus = normalizeString(formatNanahManagedLocalNetworkSyncStatus(trusted));
         const parts = [];
@@ -15674,12 +15692,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                 && normalizeString(entry?.remoteRole) === 'source'
                 && safeObject(entry?.policy).syncOnProfileOpen === true
             ) {
+                const savedUpdateReaderReady = hasNanahManagedSavedUpdateReader();
                 const checkSavedUpdatesBtn = document.createElement('button');
                 checkSavedUpdatesBtn.type = 'button';
                 checkSavedUpdatesBtn.className = 'btn-secondary';
-                checkSavedUpdatesBtn.textContent = 'Check Saved Updates';
-                checkSavedUpdatesBtn.title = 'Checks optional Internet Pickup and Home Bridge for newer signed parent updates. Trusted-link validation still decides what can apply.';
+                checkSavedUpdatesBtn.textContent = savedUpdateReaderReady ? 'Check Saved Updates' : 'Set Up Pickup First';
+                checkSavedUpdatesBtn.disabled = !savedUpdateReaderReady;
+                checkSavedUpdatesBtn.title = savedUpdateReaderReady
+                    ? 'Checks optional Internet Pickup and Home Bridge for newer signed parent updates. Trusted-link validation still decides what can apply.'
+                    : 'Set up Internet Pickup or Home Bridge before this protected device can check for waiting parent updates. Live Send Update still works when both devices are open.';
                 checkSavedUpdatesBtn.addEventListener('click', async () => {
+                    if (!hasNanahManagedSavedUpdateReader()) {
+                        UIComponents.showToast('Set up Internet Pickup or Home Bridge before checking waiting parent updates', 'warning');
+                        renderNanahTrustedLinks();
+                        return;
+                    }
                     try {
                         await runNanahManagedOpenSync({ reason: 'manual_saved_update_check' });
                         await runNanahManagedLocalNetworkSync({ reason: 'manual_saved_update_check' });

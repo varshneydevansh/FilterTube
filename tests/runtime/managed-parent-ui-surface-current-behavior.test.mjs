@@ -531,9 +531,12 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /deliverLocalNetworkPolicyBatch\([\s\S]*policy,[\s\S]*savedUpdateLinks,/);
   assert.match(source, /uploadMailboxPolicyBatch\([\s\S]*policy,[\s\S]*savedUpdateLinks,/);
   assert.match(source, /function hasNanahManagedSavedUpdateCheckTarget\(\)/);
+  assert.match(source, /function hasNanahManagedSavedUpdateReader\(\)/);
   assert.match(source, /collectManagedOpenSyncLinks\(\{[\s\S]*links: nanahTrustedLinks,[\s\S]*activeProfileId: activeId,[\s\S]*profilesV4: root/);
-  assert.match(source, /ftNanahDeliveryCheckRow\.hidden = !laterConfigured/);
+  assert.match(source, /ftNanahDeliveryCheckRow\.hidden = !hasSavedUpdateReader/);
   assert.match(source, /Checks Internet Pickup and Home Bridge now\. Signed parent-link validation still decides what can apply/);
+  assert.match(source, /Needs pickup setup/);
+  assert.match(source, /Set Up Pickup First/);
   assert.match(source, /ftNanahDeliveryCheckBtn\.addEventListener\('click'/);
   assert.match(source, /Checked waiting parent updates/);
   assert.match(helperSource, /Home Bridge needs a FilterTube-compatible bridge you choose; Wi-Fi discovery is never authority/);
