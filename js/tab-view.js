@@ -10579,6 +10579,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
+    function getNanahEffectivePolicySourceProfileContext() {
+        const managedProfile = getManagedChildProfile();
+        const managedProfileId = normalizeString(managedChildEdit?.profileId);
+        const profilesV4 = profilesV4Cache;
+        if (managedProfileId && managedProfile && Object.keys(safeObject(managedProfile)).length > 0) {
+            return {
+                profileId: managedProfileId,
+                profileName: normalizeString(managedProfile.name) || getProfileName(profilesV4, managedProfileId),
+                profileType: getProfileType(profilesV4, managedProfileId),
+                locked: isProfileLocked(profilesV4, managedProfileId) && !isProfileUnlockSessionValid.check(managedProfileId)
+            };
+        }
+        return getNanahLocalProfileContext();
+    }
+
     function getNanahProfileInventory(profilesV4 = profilesV4Cache) {
         const root = safeObject(profilesV4);
         const profiles = safeObject(root.profiles);
@@ -12959,7 +12974,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function confirmNanahRemoteTarget(scope) {
         const normalizedScope = normalizeString(scope).toLowerCase() || 'active';
         if (normalizedScope === 'full') return true;
-        const localProfile = getNanahLocalProfileContext();
+        const localProfile = getNanahEffectivePolicySourceProfileContext();
         const explicitRemoteTarget = getNanahSelectedRemoteTargetProfile();
         if (explicitRemoteTarget && normalizeString(explicitRemoteTarget.profileId)) {
             return true;

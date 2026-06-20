@@ -774,6 +774,12 @@ parent tool instead of a sync/debug console.
     Master PIN controls now reject the action even if a stale click or script
     bypasses disabled UI state. Protected-profile rules/time/history/send
     actions remain available through Family Controls.
+  - [x] 2026-06-20 protected-edit send-confirmation source slice: Nanah live
+    send target confirmation now uses the same effective protected-profile
+    source context as the signed managed-policy builder while parent-managed
+    edit mode is active. This prevents the confirmation dialog from describing
+    the parent/account profile when the outgoing rules, time limits, or viewing
+    access are actually sourced from the edited protected profile.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.
