@@ -147,7 +147,7 @@
     },
     {
       "id": "FT-MANAGED-REMOTE-13-command-center-delivery-path-detail",
-      "requiredObservation": "The parent command center Delivery detail distinguishes live P2P, LAN provider, mailbox-later, paired-but-provider-pending, revoked, stale, and no-device states without exposing plaintext rules or private key material.",
+      "requiredObservation": "The parent command center Delivery detail distinguishes Send Update, Same-Home Pickup, Later Pickup, paired-but-pickup-pending, revoked, stale, and no-device states without exposing plaintext rules or private key material.",
       "status": "missing"
     },
     {

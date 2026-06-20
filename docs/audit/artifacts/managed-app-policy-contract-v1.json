@@ -21,19 +21,19 @@
       "sourcePath": "js/nanah_managed_open_sync.js",
       "appDestination": "packages/extension-source/upstream/js/nanah_managed_open_sync.js",
       "manifestSyncMode": "copy",
-      "boundary": "managed pull-on-open helper source parity; Internet Pickup and Home Bridge providers remain transport inputs, not policy authority"
+      "boundary": "managed pull-on-open helper source parity; Later Pickup and Same-Home Pickup providers remain transport inputs, not policy authority"
     },
     {
       "sourcePath": "js/nanah_managed_mailbox_client.js",
       "appDestination": "packages/extension-source/upstream/js/nanah_managed_mailbox_client.js",
       "manifestSyncMode": "copy",
-      "boundary": "Internet Pickup helper source parity; provider endpoint and native UI remain app-owned, pending-update storage remains ciphertext-only transport"
+      "boundary": "Later Pickup helper source parity; provider endpoint and native UI remain app-owned, pending-update storage remains ciphertext-only transport"
     },
     {
       "sourcePath": "js/nanah_managed_local_network_client.js",
       "appDestination": "packages/extension-source/upstream/js/nanah_managed_local_network_client.js",
       "manifestSyncMode": "copy",
-      "boundary": "Home Bridge helper source parity; same-network reachability and discovery are transport only, local trusted-link and signature validation remain authority"
+      "boundary": "Same-Home Pickup helper source parity; same-network reachability and discovery are transport only, local trusted-link and signature validation remain authority"
     }
   ],
   "uiHelperMirror": [
@@ -289,7 +289,7 @@
         "protected_user_cannot_pause_resume_refresh_or_remove_lists",
         "protected_user_may_see_only_enforced_result_not_source_catalog"
       ],
-      "copyContract": "Use parent-facing terms such as Lists, Main YouTube, YouTube Kids, Send Update, Internet Pickup, and Home Bridge. Advanced transport terms may appear only in details."
+      "copyContract": "Use parent-facing terms such as Lists, Main YouTube, YouTube Kids, Send Update, Later Pickup, and Same-Home Pickup. Advanced transport terms may appear only in details."
     }
   },
   "managedDelivery": {
@@ -305,12 +305,12 @@
         "meaning": "send the approved profile update while both devices are open and connected"
       },
       {
-        "label": "Internet Pickup",
+        "label": "Later Pickup",
         "transport": "encrypted_mailbox",
         "meaning": "store unreadable signed updates so the protected device can collect them when it opens"
       },
       {
-        "label": "Home Bridge",
+        "label": "Same-Home Pickup",
         "transport": "configured_local_network_gateway",
         "meaning": "help trusted same-network devices exchange signed updates without making the network the authority"
       }

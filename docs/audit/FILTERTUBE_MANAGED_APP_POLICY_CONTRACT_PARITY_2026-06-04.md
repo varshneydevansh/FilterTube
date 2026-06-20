@@ -9,7 +9,7 @@ resume, heartbeat, and pause. The configured HTTPS mailbox helper and
 configured local-network gateway helper are now part of the extension-owned
 runtime contract, with downstream app manifest/runtime sync expected to copy
 both as transport inputs. The shared contract now separates parent-facing
-delivery labels (`Send Update`, `Internet Pickup`, `Home Bridge`) from technical
+delivery labels (`Send Update`, `Later Pickup`, `Same-Home Pickup`) from technical
 transport identifiers so apps and future bridge software can stay simple
 without weakening local signature/target/revision validation. The app sync
 manifest/runtime copy now includes the parent delivery and managed list UI
@@ -19,7 +19,7 @@ remains pending. The managed list contract now also pins the downstream app UI
 shape for Main/Kids/Both apply targets, manual/imported-list source filters,
 row badges, saved-list summaries, and protected-user boundaries so mobile/tablet
 surfaces do not fork the parent mental model from the extension. A runnable
-self-hosted reference provider now exists for Internet Pickup and Home Bridge
+self-hosted reference provider now exists for Later Pickup and Same-Home Pickup
 transport contracts; it is explicit-endpoint, in-memory, and transport-only,
 so it does not prove hosted service ownership, automatic LAN discovery, or
 native app parity.
@@ -72,19 +72,19 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
       "sourcePath": "js/nanah_managed_open_sync.js",
       "appDestination": "packages/extension-source/upstream/js/nanah_managed_open_sync.js",
       "manifestSyncMode": "copy",
-      "boundary": "managed pull-on-open helper source parity; Internet Pickup and Home Bridge providers remain transport inputs, not policy authority"
+      "boundary": "managed pull-on-open helper source parity; Later Pickup and Same-Home Pickup providers remain transport inputs, not policy authority"
     },
     {
       "sourcePath": "js/nanah_managed_mailbox_client.js",
       "appDestination": "packages/extension-source/upstream/js/nanah_managed_mailbox_client.js",
       "manifestSyncMode": "copy",
-      "boundary": "Internet Pickup helper source parity; provider endpoint and native UI remain app-owned, pending-update storage remains ciphertext-only transport"
+      "boundary": "Later Pickup helper source parity; provider endpoint and native UI remain app-owned, pending-update storage remains ciphertext-only transport"
     },
     {
       "sourcePath": "js/nanah_managed_local_network_client.js",
       "appDestination": "packages/extension-source/upstream/js/nanah_managed_local_network_client.js",
       "manifestSyncMode": "copy",
-      "boundary": "Home Bridge helper source parity; same-network reachability and discovery are transport only, local trusted-link and signature validation remain authority"
+      "boundary": "Same-Home Pickup helper source parity; same-network reachability and discovery are transport only, local trusted-link and signature validation remain authority"
     }
   ],
   "uiHelperMirror": [
@@ -340,7 +340,7 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
         "protected_user_cannot_pause_resume_refresh_or_remove_lists",
         "protected_user_may_see_only_enforced_result_not_source_catalog"
       ],
-      "copyContract": "Use parent-facing terms such as Lists, Main YouTube, YouTube Kids, Send Update, Internet Pickup, and Home Bridge. Advanced transport terms may appear only in details."
+      "copyContract": "Use parent-facing terms such as Lists, Main YouTube, YouTube Kids, Send Update, Later Pickup, and Same-Home Pickup. Advanced transport terms may appear only in details."
     }
   },
   "managedDelivery": {
@@ -356,12 +356,12 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
         "meaning": "send the approved profile update while both devices are open and connected"
       },
       {
-        "label": "Internet Pickup",
+        "label": "Later Pickup",
         "transport": "encrypted_mailbox",
         "meaning": "store unreadable signed updates so the protected device can collect them when it opens"
       },
       {
-        "label": "Home Bridge",
+        "label": "Same-Home Pickup",
         "transport": "configured_local_network_gateway",
         "meaning": "help trusted same-network devices exchange signed updates without making the network the authority"
       }
@@ -564,14 +564,14 @@ text/JSON URLs are accepted inputs only after preview and parent approval, and
 apps must preserve list metadata, pause state, and manual-rule separation.
 The contract now also names the parent-facing delivery vocabulary that apps and
 future bridge software should mirror: `Send Update` for live Nanah delivery,
-`Internet Pickup` for encrypted later pickup, and `Home Bridge` for same-network
-bridge delivery. These labels are only interaction language. Technical
+`Later Pickup` for encrypted internet pickup, and `Same-Home Pickup` for
+same-network bridge delivery. These labels are only interaction language. Technical
 transport identifiers such as mailbox, LAN, provider, gateway, candidate, and
 ciphertext item remain valid in advanced details, logs, code, and protocol
 docs, but they must not become the first-run parent model or a policy authority
 shortcut. The contract now also names the reference provider at
 `scripts/managed-delivery-provider.mjs`; this provider can exercise the
-mailbox/Home Bridge endpoint shapes locally, but it is not a hosted service,
+Later Pickup/Same-Home Pickup endpoint shapes locally, but it is not a hosted service,
 does not discover peers automatically, and cannot become profile, PIN,
 trusted-link, signature, or native-app authority.
 
@@ -589,8 +589,8 @@ declared extension helper sources exist, and, when the sibling app repo is
 available, the app runtime sync manifest still copies the contract artifact and
 managed Nanah helper sources to the expected destinations. The current
 extension-owned contract also declares `js/nanah_managed_mailbox_client.js` so
-apps can mirror the Internet Pickup helper, and
-`js/nanah_managed_local_network_client.js` so apps can mirror the Home Bridge
+apps can mirror the Later Pickup helper, and
+`js/nanah_managed_local_network_client.js` so apps can mirror the Same-Home Pickup
 helper. This verifier is a pre-release guard; it does not write into the app
 repo.
 The sibling app repo ran native runtime sync for the parent-delivery
@@ -605,7 +605,7 @@ updates were then synced as `/Users/devanshvarshney/FilterTubeApp` commits
 `cc5d24f3 Sync managed timeout overlay runtime`, `88a7a39d Sync optional
 delivery setup copy`, and `f13b03c7 Sync managed time remaining runtime`. The
 same manifest copies the extension-owned managed
-Nanah signed-send, pull-on-open, Internet Pickup, and Home Bridge helper sources
+Nanah signed-send, pull-on-open, Later Pickup, and Same-Home Pickup helper sources
 into `packages/extension-source/upstream/js/` so the downstream app repo can
 track the exact helper contracts without treating them as native runtime
 authority. Same-network reachability, provider discovery, and encrypted later
