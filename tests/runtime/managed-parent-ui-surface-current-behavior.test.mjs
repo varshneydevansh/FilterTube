@@ -411,7 +411,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(plan, /command-center\s+overview for protected profiles/);
   assert.match(plan, /Dashboard command center lists protected profiles, time-limit state,\s+viewing-space state, protected history count, verified-device readiness,\s+re-pairing status for revoked\/stale managed links, compact delivery-path\s+detail, delegated actions, and grouped Rules\/Send\/Time\/Access selected-profile\s+bulk action rails/);
   assert.match(inventory, new RegExp(docPath));
-  assert.match(inventory, /read-only\s+managed status line on that child row plus a command center overview/);
+  assert.match(inventory, /read-only\s+managed status line on that protected profile row plus a command center overview/);
   assert.match(inventory, /selected-profile verified-device send actions/);
   assert.match(inventory, /delegated runtime intents only/);
 
@@ -520,6 +520,12 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /Profile PIN vs parent PIN/);
   assert.match(tabViewHtml, /Who sets a protected profile PIN/);
   assert.match(tabViewHtml, /Where parents edit protected rules/);
+  assert.match(tabViewHtml, /Independent profile; can manage protected profiles/);
+  assert.match(tabViewHtml, /Parent-managed protected editing/);
+  assert.match(tabViewHtml, /Protected-profile PIN and parent authority are separate/);
+  assert.match(tabViewHtml, /Master, account, and protected behavior/);
+  assert.match(tabViewHtml, /New protected profiles start as Kids only/);
+  assert.match(tabViewHtml, /parents do not need to share the parent PIN/);
   assert.match(source, /It is not automatic Wi-Fi discovery\. Being on the same network is not enough to change rules/);
   assert.match(source, /This is not automatic LAN discovery; normal parent control uses live Send Update/);
   assert.match(source, /Bridge set up: \$\{host\}/);

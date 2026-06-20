@@ -688,6 +688,11 @@ parent tool instead of a sync/debug console.
     The copy explains children, dependents, and other protected users without
     changing the two-PIN model: the protected profile PIN is a switching/privacy
     PIN only, while parent/account/Master unlock remains policy authority.
+  - [x] 2026-06-20 protected-profile Help detail wording slice: remaining
+    visible Help/Nanah profile explanations now use protected-profile wording
+    for account ownership, parent-managed editing, switching PINs, viewing
+    spaces, and protected surfaces. Internal `child` type names and authority
+    gates remain unchanged.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.

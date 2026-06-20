@@ -50,9 +50,9 @@ Accounts & Sync is allowed while a parent is editing a protected profile, but
 the banner now makes clear that this remains the parent/account authority
 surface for pairing, history, and sending parent-approved updates; it is not a
 child-authorized sync page.
-Parent/account profiles can now set, change, or remove a child profile's
-switching PIN from the child row after parent/account unlock. This PIN protects
-entry into that child profile and sibling privacy only; it does not become
+Parent/account profiles can now set, change, or remove a protected profile's
+switching PIN from the protected profile row after parent/account unlock. This PIN protects
+entry into that protected profile and sibling privacy only; it does not become
 parent/admin authority for policy, trusted links, time limits, rule edits, or
 remote sends.
 The first protected-device managed-link setup now defaults to a parent-facing
@@ -363,13 +363,13 @@ state without exposing plaintext rule values:
 - The status line appears only when `canActiveProfileManageProfile(...)`
   accepts the active profile as parent/account authority and the dashboard is
   not currently acting as a child admin surface.
-- A child/profile PIN is a profile-switching lock. It may unlock entry into
-  that profile and the receive-only child Accounts & Sync surface, but it must
+- A protected-profile PIN is a profile-switching lock. It may unlock entry into
+  that profile and the receive-only protected Accounts & Sync surface, but it must
   not authorize rule edits, viewing-space changes, time-limit changes, trusted
   parent links, managed sends, backups, imports, exports, or provider config.
 - Parent/account or Master PIN is the policy-authority PIN for protected
-  profile edits. Parent/account profiles can set or remove a child profile's
-  switching PIN from the child row only after parent/account re-auth.
+  profile edits. Parent/account profiles can set or remove a protected profile's
+  switching PIN from the protected profile row only after parent/account re-auth.
 - Child profiles still cannot rename/delete profiles, change viewing space,
   change time limits, manage PIN rules, edit child rules, or view protected
   history from child authority.

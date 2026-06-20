@@ -1498,9 +1498,9 @@
                                             <div class="help-item-body">
                                                 <ul>
                                                     <li><strong>Default (Master):</strong> Admin for full exports, profile management, and account policy.</li>
-                                                    <li><strong>Account:</strong> Independent profile; can have child profiles.</li>
-                                                    <li><strong>Child:</strong> Private viewing profile with its own Main/Kids rules; rule editing and settings stay parent-managed.</li>
-                                                    <li><strong>Parent-managed child editing:</strong> A parent/account profile can use a child row’s <strong>Edit Rules</strong> action without switching into that child profile.</li>
+                                                    <li><strong>Account:</strong> Independent profile; can manage protected profiles.</li>
+                                                    <li><strong>Protected profile:</strong> Private viewing profile with its own Main/Kids rules; rule editing and settings stay parent-managed.</li>
+                                                    <li><strong>Parent-managed protected editing:</strong> A parent/account profile can use a protected profile row’s <strong>Edit Rules</strong> action without switching into that protected profile.</li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -1510,9 +1510,9 @@
                                                 <ul>
                                                     <li>Locked profiles disable toggles and auto-backup controls until unlocked.</li>
                                                     <li>Encrypted exports/backups need the profile’s PIN; Master unlock is required for admin actions.</li>
-                                                    <li>Child/profile PINs protect switching into that profile and can open receive-only Accounts &amp; Sync; they do not grant parent/admin authority.</li>
+                                                    <li>Protected-profile PINs protect switching into that profile and can open receive-only Accounts &amp; Sync; they do not grant parent/admin authority.</li>
                                                     <li>Parent/account or Master PIN controls rule edits, allowed viewing spaces, time limits, backups, trusted-link policy, and settings.</li>
-                                                    <li>Parents can set or remove a child profile’s switching PIN from the parent/account profile row after parent/account unlock.</li>
+                                                    <li>Parents can set or remove a protected profile’s switching PIN from the parent/account profile row after parent/account unlock.</li>
                                                     <li>Opening receive-only Accounts &amp; Sync with a child PIN does not unlock Dashboard, Filters, Kids Mode, Settings, or parent controls after you return to the viewing surface.</li>
                                                     <li>Unlock is per-session in both Popup and New Tab.</li>
                                                 </ul>
@@ -1634,7 +1634,7 @@
                                             <div class="help-item-body">
                                                 <ul>
                                                     <li>PIN checks stay local. Nanah can require the sender or receiver to unlock locally, but the PIN itself is not sent.</li>
-                                                    <li>Child PIN and parent authority are separate. A child PIN can open receive-only sync for that child, while parent/account PIN controls rule edits, backups, sync policy, and trusted links.</li>
+                                                    <li>Protected-profile PIN and parent authority are separate. A protected-profile PIN can open receive-only sync for that profile, while parent/account PIN controls rule edits, backups, sync policy, and trusted links.</li>
                                                     <li><strong>Encrypted backup</strong> is still the archive path. Nanah is the live device-to-device sync path.</li>
                                                     <li>Encrypted <strong>full-account</strong> backup can also carry trusted-device recovery data for same-device reinstall recovery, but normal/plain export does not.</li>
                                                     <li>Restoring trusted-device recovery data is explicit during encrypted import. It is not silently restored from ordinary backup files.</li>
@@ -1668,19 +1668,19 @@
                                             </div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">Master, account, and child behavior</div>
+                                            <div class="help-item-title">Master, account, and protected behavior</div>
                                             <div class="help-item-body">
                                                 <ul>
                                                     <li><strong>Default / Master:</strong> Owns full import/export, master policy, and the broadest account controls.</li>
-                                                    <li><strong>Independent account:</strong> Owns its own settings and can manage its own child profiles, but does not gain authority over parallel accounts.</li>
-                                                    <li><strong>Child profile:</strong> A private viewing surface with its own Main/Kids rules. The child PIN protects switching into it, but parent/account PIN controls policy and rule edits.</li>
-                                                    <li><strong>Viewing spaces:</strong> A parent can set each child to Kids only, Main only, or Main + Kids. New child profiles start as Kids only.</li>
-                                                    <li><strong>Parent editing:</strong> Parent/account surfaces can edit a child’s Main or Kids rule list directly from the child row, so parents do not need to hand children the parent PIN.</li>
+                                                    <li><strong>Independent account:</strong> Owns its own settings and can manage its own protected profiles, but does not gain authority over parallel accounts.</li>
+                                                    <li><strong>Protected profile:</strong> A private viewing surface with its own Main/Kids rules. The profile PIN protects switching into it, but parent/account PIN controls policy and rule edits.</li>
+                                                    <li><strong>Viewing spaces:</strong> A parent can set each protected profile to Kids only, Main only, or Main + Kids. New protected profiles start as Kids only.</li>
+                                                    <li><strong>Parent editing:</strong> Parent/account surfaces can edit a protected profile’s Main or Kids rule list directly from the protected profile row, so parents do not need to share the parent PIN.</li>
                                                     <li><strong>Targeting today:</strong> Protected-device links should usually save a fixed local target so parent updates stay tied to that child or family profile.</li>
                                                     <li><strong>Parent-safe targeting:</strong> FilterTube blocks send-anyway paths from child profiles when the other device has a different profile active. The intended parent flow is to save one parent trust link on the receiving protected profile and choose <strong>Always this local profile</strong>.</li>
                                                     <li><strong>Parent managed:</strong> The normal protected-device preset saves a fixed target, allows matching signed parent updates while locked, and checks for later updates when the profile opens.</li>
                                                     <li><strong>Ask first:</strong> A stricter option can require local approval/unlock before later parent updates apply.</li>
-                                                    <li>Child profiles do not expose broad backup/import/export/account-admin actions in Settings and cannot rename/delete profiles, mutate PIN policy, or edit trusted parent links from the child surface.</li>
+                                                    <li>Protected profiles do not expose broad backup/import/export/account-admin actions in Settings and cannot rename/delete profiles, mutate PIN policy, or edit trusted parent links from the protected surface.</li>
                                                 </ul>
                                             </div>
                                         </div>

@@ -285,10 +285,10 @@ Current local-write boundary:
 - Failed parent/account unlock attempts for managed child edit, protected
   history view/clear, viewing-space changes, and time-limit changes now emit
   protected `admin_session.failed_unlock` evidence rows.
-- Parent/account profiles that can manage a child can now open that child's
+- Parent/account profiles that can manage a protected profile can now open that profile's
   local protected action history from the profile row.
-- Parent/account profiles that can manage a child can now see a compact,
-  read-only managed status line on that child row plus a command center overview
+- Parent/account profiles that can manage a protected profile can now see a compact,
+  read-only managed status line on that protected profile row plus a command center overview
   above the profile rows. These surfaces summarize protected profiles, viewing
   spaces, time limits, local Main/Kids revision state, accepted remote policy
   scope/link counts, and protected history counts without exposing rule values
