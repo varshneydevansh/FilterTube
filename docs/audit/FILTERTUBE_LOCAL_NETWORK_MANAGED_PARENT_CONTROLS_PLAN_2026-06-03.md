@@ -693,6 +693,11 @@ parent tool instead of a sync/debug console.
     for account ownership, parent-managed editing, switching PINs, viewing
     spaces, and protected surfaces. Internal `child` type names and authority
     gates remain unchanged.
+  - [x] 2026-06-20 protected-profile receive-only wording slice: the Accounts &
+    Sync protected-profile banner and remote target hint now say protected
+    profile instead of child/child-or-protected in the visible Family Device
+    Updates flow. Internal child-profile role guards and receive-only authority
+    checks remain unchanged.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.

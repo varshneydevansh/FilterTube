@@ -12856,7 +12856,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ftNanahModeSendOnce.disabled = true;
             }
             ftNanahChildBannerTitle.textContent = "Protected profile receive-only";
-            ftNanahChildBannerBody.textContent = "This child profile can join a parent pairing code and receive updates for its own rules. Sending, backups, trusted-link policy, and profile management stay parent-controlled.";
+            ftNanahChildBannerBody.textContent = "This protected profile can join a parent pairing code and receive updates for its own rules. Sending, backups, trusted-link policy, and profile management stay parent-controlled.";
             if (ftNanahHostBtn) ftNanahHostBtn.disabled = true;
             if (ftNanahSendBtn) ftNanahSendBtn.disabled = true;
             if (ftNanahTrustBtn) ftNanahTrustBtn.disabled = true;
@@ -16122,7 +16122,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else if (getNanahRole() === 'source' && normalizeString(nanahSessionState.remoteRole) === 'replica') {
                 ftNanahRemoteTargetHint.textContent = 'No protected profile is selected yet, so updates will follow the profile currently open on the other device unless you choose one here.';
             } else {
-                ftNanahRemoteTargetHint.textContent = 'After pairing, choose the child or protected profile on the other device that should receive this update.';
+                ftNanahRemoteTargetHint.textContent = 'After pairing, choose the protected profile on the other device that should receive this update.';
             }
         }
         syncNanahManagedTargetOptions(scope);

@@ -544,6 +544,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /function hasNanahManagedSavedUpdateCheckTarget\(\)/);
   assert.match(source, /function hasNanahManagedSavedUpdateReader\(\)/);
   assert.match(source, /collectManagedOpenSyncLinks\(\{[\s\S]*links: nanahTrustedLinks,[\s\S]*activeProfileId: activeId,[\s\S]*profilesV4: root/);
+  assert.match(source, /This protected profile can join a parent pairing code and receive updates for its own rules/);
+  assert.match(source, /After pairing, choose the protected profile on the other device that should receive this update/);
   assert.match(source, /ftNanahDeliveryCheckRow\.hidden = !hasSavedUpdateReader/);
   assert.match(source, /Checks Internet Pickup and Home Bridge now\. Signed parent-link validation still decides what can apply/);
   assert.match(source, /Needs pickup setup/);
