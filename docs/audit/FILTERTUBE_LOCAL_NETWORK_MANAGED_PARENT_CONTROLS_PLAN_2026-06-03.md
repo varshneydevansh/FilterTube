@@ -840,6 +840,12 @@ parent tool instead of a sync/debug console.
     explicit home/school delivery state, and neither provider path becomes
     authority without local trusted-link, target, revision, device binding, hash,
     and signature validation.
+  - [x] 2026-06-20 profile-switch saved-update status slice: profile switching
+    was rechecked and already calls the provider-gated managed background sync
+    after a successful switch. The open-sync helper now reports `Later Pickup
+    not ready` instead of the older `Internet Pickup not ready` label when a
+    protected profile has saved-update checks enabled but no pull provider is
+    available.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.
