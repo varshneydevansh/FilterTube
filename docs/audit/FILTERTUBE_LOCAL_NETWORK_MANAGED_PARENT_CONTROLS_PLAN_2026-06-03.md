@@ -103,6 +103,12 @@ extension authority code.
   ownership reads as `Parent: ...`, status chips have explanatory titles, and
   neutral detail cards no longer look like warning/error states when nothing is
   wrong.
+- [x] 2026-06-20 Family Controls delivery-status wording slice: per-profile
+  device rows now use task-oriented labels: `Send Update ready`, `Later Pickup
+  set up`, `Same-network bridge set up`, `Pair only for another device`,
+  `Re-pair trusted device`, and `Refresh trusted device`. This changes only
+  redacted status wording/details; trusted-link, signature, revision, provider,
+  and parent/account re-auth gates are unchanged.
 - [x] Family Controls row layout now keeps profile/status/actions on the first
   line and moves details underneath, so parent names, device state, list source,
   and action buttons do not squeeze each other on desktop or mobile.

@@ -388,7 +388,7 @@
         if (targetCount <= 0) {
             return {
                 key: 'no_device',
-                label: 'This device only',
+                label: 'Pair to sync',
                 tone: 'muted'
             };
         }
@@ -423,21 +423,21 @@
         if (targetCount <= 0 && revokedCount > 0) {
             return {
                 key: 'repair',
-                label: 'Re-pair before sending',
+                label: 'Re-pair trusted device',
                 tone: 'warning'
             };
         }
         if (targetCount <= 0 && staleCount > 0) {
             return {
                 key: 'stale',
-                label: 'Refresh stale link',
+                label: 'Refresh trusted device',
                 tone: 'warning'
             };
         }
         if (targetCount <= 0 || totalCount <= 0) {
             return {
                 key: 'pair_device',
-                label: 'Pair only if needed',
+                label: 'Pair only for another device',
                 tone: 'muted'
             };
         }
@@ -451,21 +451,21 @@
         if (item.syncLiveReady === true) {
             return {
                 key: 'live',
-                label: readyCount > 1 ? `Live now (${readyCount})` : 'Live now',
+                label: readyCount > 1 ? `Send Update ready (${readyCount})` : 'Send Update ready',
                 tone: 'success'
             };
         }
         if (item.syncLocalNetworkReady === true) {
             return {
                 key: 'local_network',
-                label: 'Home Bridge set up',
+                label: 'Same-network bridge set up',
                 tone: 'success'
             };
         }
         if (item.syncMailboxReady === true) {
             return {
                 key: 'mailbox',
-                label: 'Internet Pickup ready',
+                label: 'Later Pickup set up',
                 tone: 'success'
             };
         }
@@ -486,23 +486,23 @@
             return 'Resolve protected history conflict before pushing new policy.';
         }
         if (targetCount <= 0 && revokedCount > 0) {
-            return 'Old trusted link was revoked; pair this device again.';
+            return 'This trusted link was revoked. Pair again before sending protected-profile updates.';
         }
         if (targetCount <= 0 && staleCount > 0) {
-            return 'Saved link is stale; refresh trust before sending.';
+            return 'This trusted link is stale. Refresh pairing before sending protected-profile updates.';
         }
         if (targetCount <= 0 || totalCount <= 0) {
-            return 'Local control works now. Pair only when updates need to reach another device.';
+            return 'Local rules and time limits work here. Pair only when this profile also needs to update another device.';
         }
         if (readyCount <= 0) {
-            return `${targetCount} verified ${targetCount === 1 ? 'device is' : 'devices are'} paired; open parent and protected devices together to Send Update.`;
+            return `${targetCount} verified ${targetCount === 1 ? 'device is' : 'devices are'} paired. Open parent and protected devices together, then Send Update.`;
         }
         const paths = [];
-        if (item.syncLiveReady === true) paths.push('Send Update');
-        if (item.syncLocalNetworkReady === true) paths.push('Home Bridge');
-        if (item.syncMailboxReady === true) paths.push('Internet Pickup');
+        if (item.syncLiveReady === true) paths.push('live Send Update');
+        if (item.syncLocalNetworkReady === true) paths.push('same-network bridge');
+        if (item.syncMailboxReady === true) paths.push('Later Pickup');
         return paths.length
-            ? `${targetCount} verified ${targetCount === 1 ? 'device' : 'devices'} via ${paths.join(' + ')}.`
+            ? `${targetCount} verified ${targetCount === 1 ? 'device can' : 'devices can'} receive by ${paths.join(' + ')}.`
             : `${readyCount} verified ${readyCount === 1 ? 'queue is' : 'queues are'} ready.`;
     }
 

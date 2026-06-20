@@ -1127,7 +1127,7 @@ test('managed command-center helper emits delegated action intents without polic
 
   assert.equal(summary.profileCount, 1);
   assert.equal(summary.rows[0].syncLiveReady, true);
-  assert.equal(summary.rows[0].deliveryPreview.label, 'Live now');
+  assert.equal(summary.rows[0].deliveryPreview.label, 'Send Update ready');
   assert.equal(summary.rows[0].deliveryPreview.tone, 'success');
   assert.deepEqual(plain(summary.bulkActionIntents), [
     {
@@ -1331,4 +1331,50 @@ test('managed command center tells parents to repair stale verified links', () =
   }));
   assert.ok(actionIntents.some(intent => intent.action === 'pair_device' && intent.label === 'Repair Pairing'));
   assert.ok(!actionIntents.some(intent => intent.action === 'send_managed_policy'));
+});
+
+test('managed command center delivery preview uses parent-facing setup labels', () => {
+  const CommandCenter = loadCommandCenter();
+  assert.deepEqual(plain(CommandCenter.resolveDeliveryPreview({
+    syncTargetCount: 0,
+    syncReadyCount: 0,
+    syncRevokedCount: 0,
+    syncStaleCount: 0,
+    syncTotalCount: 0
+  })), {
+    key: 'pair_device',
+    label: 'Pair only for another device',
+    tone: 'muted'
+  });
+  assert.deepEqual(plain(CommandCenter.resolveDeliveryPreview({
+    syncTargetCount: 1,
+    syncReadyCount: 1,
+    syncRevokedCount: 0,
+    syncStaleCount: 0,
+    syncTotalCount: 1,
+    syncLocalNetworkReady: true
+  })), {
+    key: 'local_network',
+    label: 'Same-network bridge set up',
+    tone: 'success'
+  });
+  assert.deepEqual(plain(CommandCenter.resolveDeliveryPreview({
+    syncTargetCount: 1,
+    syncReadyCount: 1,
+    syncRevokedCount: 0,
+    syncStaleCount: 0,
+    syncTotalCount: 1,
+    syncMailboxReady: true
+  })), {
+    key: 'mailbox',
+    label: 'Later Pickup set up',
+    tone: 'success'
+  });
+  assert.equal(CommandCenter.describeDeliveryPath({
+    syncTargetCount: 1,
+    syncReadyCount: 0,
+    syncRevokedCount: 0,
+    syncStaleCount: 0,
+    syncTotalCount: 1
+  }), '1 verified device is paired. Open parent and protected devices together, then Send Update.');
 });

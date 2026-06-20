@@ -15,7 +15,7 @@ delivery, no-link, or unavailable send path without opening raw policy state.
 The command center now includes a compact parent-facing protection strip, a
 parent-reauthed Internet Pickup endpoint
 configuration row, plus labeled Delivery/Device/History row details so parents
-can scan Send Update delivery, later pickup readiness, Home Bridge readiness,
+can scan `Send Update ready`, `Later Pickup set up`, same-network bridge setup,
 re-pairing, conflicts, and history without reading raw policy state. Bulk local time-limit
 and viewing-space actions cover all manageable protected profiles, including
 Default/Master-managed independent account profiles. Direct rule bulk writes
@@ -298,8 +298,8 @@ state without exposing plaintext rule values:
   configured. The visible parent workflow is protected profile -> rules/access/
   time -> verified-device Send Update. Internet Pickup and Home Bridge providers
   remain optional advanced delivery hooks, not the default parent path.
-- The Delivery row preview is a redacted status summary only. It can say Send Update, Home Bridge ready, Internet Pickup ready, Send path unavailable, Re-pair
-  before sending, Refresh stale link, Review conflict first, or Pair verified device;
+- The Delivery row preview is a redacted status summary only. It can say Send Update ready, Later Pickup set up, Same-network bridge set up, Send path unavailable, Re-pair
+  trusted device, Refresh trusted device, Review conflict first, or Pair only for another device;
   it does not contain rule text, policy JSON, hashes, keys, ciphertext, or
   mutation authority.
 - The extension includes a browser-side HTTPS mailbox client only when an
