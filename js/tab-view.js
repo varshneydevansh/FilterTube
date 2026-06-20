@@ -13505,7 +13505,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ? 'Create a protected profile before setting up Later Pickup.'
                     : (!hasVerifiedDevice
                         ? 'Pair a verified protected device before setting up Later Pickup.'
-                        : 'Optional: set this up only when a verified protected device must collect an update after opening later.'));
+                        : 'Optional: set this up only when a verified protected device away from this network must collect an update after opening later.'));
             ftNanahCompassLaterBtn.setAttribute('aria-label', `Pick up later. ${ftNanahCompassLaterBtn.title}`);
         }
         if (ftNanahDeliveryMailboxCard) {

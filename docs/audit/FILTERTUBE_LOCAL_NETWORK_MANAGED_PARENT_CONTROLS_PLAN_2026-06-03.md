@@ -740,6 +740,11 @@ parent tool instead of a sync/debug console.
     device-sharing picker. This is visual and copy-only; it adds no automatic
     LAN discovery, no ambient nearby-device trust, and no new transport
     authority.
+  - [x] 2026-06-20 away-device map wording slice: the same Family Device
+    Updates map now explicitly treats `Later Pickup` as the away/internet
+    device path when a trusted online pickup provider is configured. The normal
+    live P2P path still requires both devices open, and online pickup services
+    still carry only signed updates after trusted-link validation.
   - [x] 2026-06-20 saved-device summary slice: saved trusted-device cards now
     show a parent-readable summary band before the detailed policy rows:
     control direction, usual update area/behavior, next step, and whether
