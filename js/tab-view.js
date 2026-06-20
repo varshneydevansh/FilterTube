@@ -13770,6 +13770,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         return normalizeString(trusted.remoteDeviceId) === normalizeString(safeObject(nanahSessionState.remoteDevice).deviceId);
     }
 
+    function isNanahManagedLinkSavedUpdateEnabled(link) {
+        const trusted = normalizeNanahTrustedLink(link);
+        if (!trusted || trusted.linkType !== 'managed_link') return false;
+        const policy = safeObject(trusted.policy);
+        if (trusted.localRole !== 'source' || trusted.remoteRole !== 'replica') return false;
+        if (trusted.revoked === true || policy.revoked === true || trusted.keyRevoked === true || policy.keyRevoked === true) return false;
+        if (trusted.stalePairing === true || policy.stalePairing === true) return false;
+        if (policy.syncOnProfileOpen !== true) return false;
+        return normalizeString(policy.lockedChildMode).toLowerCase() === 'allow_trusted_updates';
+    }
+
     function getNanahSourceManagedLinksForTargetProfile(profileId, scope = 'active', profile = null) {
         const targetId = normalizeString(profileId);
         if (!targetId) return [];
@@ -13829,11 +13840,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         const revokedCount = safeArray(inventory.revokedLinks).length;
         const staleCount = safeArray(inventory.staleLinks).length;
         const totalCount = safeArray(inventory.totalLinks).length;
-        const liveReady = links.some(isNanahManagedLinkLiveConnected);
-        const openCheckCount = links.filter((trusted) => safeObject(trusted.policy).syncOnProfileOpen === true).length;
+        const liveLinks = links.filter(isNanahManagedLinkLiveConnected);
+        const liveReady = liveLinks.length > 0;
+        const savedUpdateLinks = links.filter(isNanahManagedLinkSavedUpdateEnabled);
+        const openCheckCount = savedUpdateLinks.length;
         const mailboxReady = hasNanahManagedMailboxUploadWriter();
         const localReady = hasNanahManagedLocalNetworkDeliveryWriter();
-        const readyCount = (liveReady || mailboxReady || localReady) ? targetCount : 0;
+        const readyCount = links.filter((trusted) => {
+            if (isNanahManagedLinkLiveConnected(trusted)) return true;
+            return (mailboxReady || localReady) && isNanahManagedLinkSavedUpdateEnabled(trusted);
+        }).length;
         const sourceAckLabels = links
             .map(formatNanahManagedSourceAckSyncStatus)
             .map(label => normalizeString(label))
@@ -13888,12 +13904,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const transports = [
             liveReady ? 'Send Update' : '',
-            localReady ? 'Home Bridge' : '',
-            mailboxReady ? 'Internet Pickup' : ''
+            (localReady && openCheckCount > 0) ? 'Home Bridge' : '',
+            (mailboxReady && openCheckCount > 0) ? 'Internet Pickup' : ''
         ].filter(Boolean).join(' + ');
         return {
             label: transports
-                ? `${targetCount} verified device${targetCount === 1 ? '' : 's'} | ${transports} ready`
+                ? `${readyCount}/${targetCount} verified device${targetCount === 1 ? '' : 's'} ready | ${transports}`
                 : `${targetCount} verified device${targetCount === 1 ? '' : 's'} | open both devices`,
             targetCount,
             readyCount,
@@ -14298,8 +14314,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 continue;
             }
             const liveLinks = links.filter(isNanahManagedLinkLiveConnected);
+            const savedUpdateLinks = links.filter(isNanahManagedLinkSavedUpdateEnabled);
             const liveReady = liveLinks.length > 0;
-            if (!liveReady && !mailboxReady && !localReady) {
+            const mailboxCanDeliver = mailboxReady && savedUpdateLinks.length > 0;
+            const localNetworkCanDeliver = localReady && savedUpdateLinks.length > 0;
+            if (!liveReady && !mailboxCanDeliver && !localNetworkCanDeliver) {
                 summary.providerMissingCount += 1;
                 await recordManagedParentPolicyPushHistory(targetId, {
                     scope: normalizedScope,
@@ -14308,7 +14327,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     deliveredCount: 0,
                     failedCount: links.length,
                     providerMissingCount: 1,
-                    reason: 'managed_delivery_provider_unavailable'
+                    reason: (mailboxReady || localReady)
+                        ? 'managed_saved_update_not_enabled_for_link'
+                        : 'managed_delivery_provider_unavailable'
                 });
                 continue;
             }
@@ -14357,10 +14378,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (liveSent > 0) transports.push('live_nanah_session');
                     targetDelivered += liveSent;
                 }
-                if (localReady && typeof nanahManagedLivePolicy.deliverLocalNetworkPolicyBatch === 'function') {
+                if (localNetworkCanDeliver && typeof nanahManagedLivePolicy.deliverLocalNetworkPolicyBatch === 'function') {
                     const localResult = await nanahManagedLivePolicy.deliverLocalNetworkPolicyBatch(
                         policy,
-                        links,
+                        savedUpdateLinks,
                         localNetworkProvider,
                         {
                             reason: 'command_center_parent_push',
@@ -14373,10 +14394,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     targetFailed += normalizeNonNegativeInteger(localResult?.failedCandidateCount) || 0;
                     failureReason = failureReason || normalizeString(localResult?.reason);
                 }
-                if (mailboxReady && typeof nanahManagedLivePolicy.uploadMailboxPolicyBatch === 'function') {
+                if (mailboxCanDeliver && typeof nanahManagedLivePolicy.uploadMailboxPolicyBatch === 'function') {
                     const mailboxResult = await nanahManagedLivePolicy.uploadMailboxPolicyBatch(
                         policy,
-                        links,
+                        savedUpdateLinks,
                         mailboxProvider,
                         {
                             reason: 'command_center_parent_push',

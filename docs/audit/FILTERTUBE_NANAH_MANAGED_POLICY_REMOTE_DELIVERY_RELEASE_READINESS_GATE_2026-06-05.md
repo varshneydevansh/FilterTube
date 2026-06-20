@@ -78,7 +78,8 @@ Allowed release wording:
   plaintext policy fields entering mailbox storage;
 - source-side encrypted-mailbox upload and purge are available only as
   provider-gated handoffs after parent/account re-auth;
-- provider-gated local-network candidate intake exists;
+- provider-gated local-network candidate intake exists for trusted links that
+  explicitly allow protected-device saved-update collection;
 - provider-gated pull-on-open intake exists for already-decrypted mailbox
   items;
 - local-network discovery is not authority.
@@ -213,6 +214,11 @@ release claim for complete remote management: NO-GO
 This gate intentionally favors a staged rollout. The extension can keep using
 the validated provider hooks and live Nanah path while the product waits for
 transport-specific proof before claiming complete remote management.
+Provider configuration alone is not readiness: source-side Home Bridge or
+Internet Pickup fanout is limited to managed links whose saved policy has
+`syncOnProfileOpen=true` and `lockedChildMode=allow_trusted_updates`; other
+verified links remain live-session only and are recorded as not enabled for
+saved updates.
 The companion transport/app parity gate keeps downstream Android/iOS claims on
 the same staged boundary.
 
@@ -223,6 +229,7 @@ Focused proof:
 ```bash
 node --test tests/runtime/managed-policy-sync-remote-delivery-readiness-gate-current-behavior.test.mjs
 node --test tests/runtime/managed-policy-sync-remote-delivery-smoke-artifact-verifier-current-behavior.test.mjs
+node --test tests/runtime/managed-parent-ui-surface-current-behavior.test.mjs
 ```
 
 Settings lane:

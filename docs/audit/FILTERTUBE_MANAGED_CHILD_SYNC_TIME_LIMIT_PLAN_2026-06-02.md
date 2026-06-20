@@ -1061,6 +1061,11 @@ T1 + T2 + T3
     `runNanahManagedOpenSync(...)`; no provider, provider failure, wrong target,
     stale trust, revoked trust, or disabled `syncOnProfileOpen` leaves the last
     valid policy active and performs no YouTube hot-path work.
+  - 2026-06-20: Family Device Updates readiness and parent send fanout now treat
+    Home Bridge / Internet Pickup as available only for trusted managed links
+    that explicitly allow saved-update collection
+    (`syncOnProfileOpen=true`, `lockedChildMode=allow_trusted_updates`). A
+    provider being configured no longer makes every verified device appear ready.
 - **files edited/created**:
   - `js/nanah_managed_open_sync.js`
   - `js/nanah_managed_mailbox_client.js`

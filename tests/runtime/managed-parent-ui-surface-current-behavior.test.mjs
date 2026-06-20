@@ -519,6 +519,17 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /This is not automatic LAN discovery; normal parent control uses live Send Update/);
   assert.match(source, /Bridge set up: \$\{host\}/);
   assert.match(source, /Reachability is checked only when sending or checking saved updates/);
+  assert.match(source, /function isNanahManagedLinkSavedUpdateEnabled\(link\)/);
+  assert.match(source, /policy\.syncOnProfileOpen !== true/);
+  assert.match(source, /lockedChildMode\)\.toLowerCase\(\) === 'allow_trusted_updates'/);
+  assert.match(source, /const savedUpdateLinks = links\.filter\(isNanahManagedLinkSavedUpdateEnabled\)/);
+  assert.match(source, /const readyCount = links\.filter\(\(trusted\) => \{/);
+  assert.match(source, /isNanahManagedLinkLiveConnected\(trusted\)[\s\S]*isNanahManagedLinkSavedUpdateEnabled\(trusted\)/);
+  assert.match(source, /const mailboxCanDeliver = mailboxReady && savedUpdateLinks\.length > 0/);
+  assert.match(source, /const localNetworkCanDeliver = localReady && savedUpdateLinks\.length > 0/);
+  assert.match(source, /managed_saved_update_not_enabled_for_link/);
+  assert.match(source, /deliverLocalNetworkPolicyBatch\([\s\S]*policy,[\s\S]*savedUpdateLinks,/);
+  assert.match(source, /uploadMailboxPolicyBatch\([\s\S]*policy,[\s\S]*savedUpdateLinks,/);
   assert.match(source, /function hasNanahManagedSavedUpdateCheckTarget\(\)/);
   assert.match(source, /collectManagedOpenSyncLinks\(\{[\s\S]*links: nanahTrustedLinks,[\s\S]*activeProfileId: activeId,[\s\S]*profilesV4: root/);
   assert.match(source, /ftNanahDeliveryCheckRow\.hidden = !laterConfigured/);
