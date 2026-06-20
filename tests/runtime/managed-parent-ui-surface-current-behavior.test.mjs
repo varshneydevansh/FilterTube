@@ -645,9 +645,15 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.doesNotMatch(tabViewHtml, /<h3>Device Trust &amp; Sync<\/h3>/);
   assert.doesNotMatch(tabViewHtml, /Completely P2P after handshake/);
   assert.match(source, /function renderManagedChildSyncBoundary\(\)/);
+  assert.match(source, /function ensureNotScopedProtectedEditForGlobalAdmin\(actionLabel = 'global account controls'\)/);
+  assert.match(source, /Finish protected-profile editing before changing \$\{actionLabel\}/);
   assert.match(source, /Global account policy and Master PIN controls are paused until you finish editing/);
   assert.match(source, /Finish protected-profile editing before changing global account policy/);
   assert.match(source, /Finish protected-profile editing before changing global account, Master PIN, or create-profile controls/);
+  assert.match(source, /ensureNotScopedProtectedEditForGlobalAdmin\('global account policy'\)/);
+  assert.match(source, /ensureNotScopedProtectedEditForGlobalAdmin\('account creation'\)/);
+  assert.match(source, /ensureNotScopedProtectedEditForGlobalAdmin\('protected profile creation'\)/);
+  assert.match(source, /ensureNotScopedProtectedEditForGlobalAdmin\('Master PIN controls'\)/);
   assert.match(source, /ft-managed-child-sync-boundary__chips/);
   assert.match(helperSource, /global\.FilterTubeManagedParentCommandCenter = \{/);
   assert.match(tabViewHtml, /managed_parent_command_center\.js[\s\S]*tab-view\.js/);

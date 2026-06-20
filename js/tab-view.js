@@ -6394,6 +6394,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         ftMaxAccounts.value = String(policy.maxAccounts || 0);
     }
 
+    function ensureNotScopedProtectedEditForGlobalAdmin(actionLabel = 'global account controls') {
+        if (!isManagedChildEditActive()) return true;
+        UIComponents.showToast(`Finish protected-profile editing before changing ${actionLabel}.`, 'warning');
+        updateAdminPolicyControls();
+        updateChildProfileCapabilityControls();
+        return false;
+    }
+
     function updateChildProfileCapabilityControls() {
         const isChild = getActiveProfileType() === 'child';
         const scopedProtectedEdit = isManagedChildEditActive();
@@ -19275,6 +19283,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const persistPolicy = async (nextPolicy) => {
             const io = window.FilterTubeIO || {};
             if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') return;
+            if (!ensureNotScopedProtectedEditForGlobalAdmin('global account policy')) return;
             const fresh = await io.loadProfilesV4();
             if (normalizeString(fresh?.activeProfileId) !== 'default') {
                 UIComponents.showToast('Switch to Default to change account policy', 'error');
@@ -19311,6 +19320,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 updateAdminPolicyControls();
                 return;
             }
+            if (!ensureNotScopedProtectedEditForGlobalAdmin('global account policy')) return;
             if (activeProfileId !== 'default') {
                 UIComponents.showToast('Switch to Default to change account policy', 'error');
                 updateAdminPolicyControls();
@@ -19326,6 +19336,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 updateAdminPolicyControls();
                 return;
             }
+            if (!ensureNotScopedProtectedEditForGlobalAdmin('global account policy')) return;
             if (activeProfileId !== 'default') {
                 UIComponents.showToast('Switch to Default to change account policy', 'error');
                 updateAdminPolicyControls();
@@ -19343,6 +19354,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!ensureNonChildAdminAction('Child profiles cannot manage accounts here.')) {
                 return;
             }
+            if (!ensureNotScopedProtectedEditForGlobalAdmin('account creation')) return;
             const io = window.FilterTubeIO || {};
             if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
                 UIComponents.showToast('Profiles unavailable', 'error');
@@ -19464,6 +19476,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!ensureNonChildAdminAction('Child profiles cannot create child profiles here.')) {
                 return;
             }
+            if (!ensureNotScopedProtectedEditForGlobalAdmin('protected profile creation')) return;
             const io = window.FilterTubeIO || {};
             if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
                 UIComponents.showToast('Profiles unavailable', 'error');
@@ -19572,6 +19585,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!ensureNonChildAdminAction('Child profiles cannot manage the Master PIN here.')) {
                 return;
             }
+            if (!ensureNotScopedProtectedEditForGlobalAdmin('Master PIN controls')) return;
             const io = window.FilterTubeIO || {};
             if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
                 UIComponents.showToast('Profiles unavailable', 'error');
@@ -19647,6 +19661,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!ensureNonChildAdminAction('Child profiles cannot manage the Master PIN here.')) {
                 return;
             }
+            if (!ensureNotScopedProtectedEditForGlobalAdmin('Master PIN controls')) return;
             const io = window.FilterTubeIO || {};
             if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
                 UIComponents.showToast('Profiles unavailable', 'error');

@@ -703,6 +703,12 @@ parent tool instead of a sync/debug console.
     parent-facing terms for mode intro, remote target, protected-device steps,
     and Help targeting. Internal child-profile storage and authority guards
     remain unchanged.
+  - [x] 2026-06-20 protected-edit global-admin handler guard slice: while a
+    parent/account profile is editing a protected profile, direct handlers for
+    global account policy, account creation, protected-profile creation, and
+    Master PIN controls now reject the action even if a stale click or script
+    bypasses disabled UI state. Protected-profile rules/time/history/send
+    actions remain available through Family Controls.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.
