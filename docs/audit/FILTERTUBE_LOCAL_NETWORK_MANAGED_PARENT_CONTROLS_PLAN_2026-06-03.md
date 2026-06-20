@@ -719,6 +719,11 @@ parent tool instead of a sync/debug console.
     parent-facing terms for mode intro, remote target, protected-device steps,
     and Help targeting. Internal child-profile storage and authority guards
     remain unchanged.
+  - [x] 2026-06-20 protected-device Help relationship wording slice: Help now
+    describes saved trust as a verified parent/protected-device relationship and
+    says protected profiles, not child-only profiles, are blocked from unsafe
+    send-anyway targeting. Internal child-profile storage, trusted-link target
+    validation, and send/apply authority are unchanged.
   - [x] 2026-06-20 protected-edit global-admin handler guard slice: while a
     parent/account profile is editing a protected profile, direct handlers for
     global account policy, account creation, protected-profile creation, and
