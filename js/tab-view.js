@@ -13665,8 +13665,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const endpoint = await showPromptModal({
-            title: 'Later Pickup Service',
-            message: 'Enter the HTTPS pickup service that will hold unreadable parent-approved updates until the protected device opens. Leave blank to use Send Now only.',
+            title: 'Later Pickup Address',
+            message: 'Enter the trusted HTTPS address that will hold unreadable parent-approved updates until the protected device opens. Leave blank to use Send Now only.',
             placeholder: 'https://your-filtertube-pickup-service',
             inputType: 'url',
             confirmText: currentEndpoint ? 'Save Later Pickup' : 'Enable Later Pickup',
@@ -13686,8 +13686,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const token = await showPromptModal({
             title: 'Later Pickup Key',
-            message: 'Optional service key for that pickup service. This is not the parent PIN. Leave blank to keep the saved key; enter a single dash to clear it.',
-            placeholder: 'Optional service key',
+            message: 'Optional key for that pickup address. This is not the parent PIN. Leave blank to keep the saved key; enter a single dash to clear it.',
+            placeholder: 'Optional pickup key',
             inputType: 'password',
             confirmText: 'Save',
             initialValue: ''
