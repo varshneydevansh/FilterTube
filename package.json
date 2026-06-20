@@ -12,6 +12,7 @@
     "build:firefox": "node build.js firefox",
     "build:opera": "node build.js opera",
     "sync:native-runtime": "node scripts/sync-native-runtime.mjs",
+    "managed:provider": "node scripts/managed-delivery-provider.mjs",
     "test": "node scripts/run-test-lane.mjs smoke",
     "audit:runtime": "node --test tests/runtime/*.test.mjs",
     "test:release": "node scripts/run-test-lane.mjs release",
