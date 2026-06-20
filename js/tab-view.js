@@ -11938,7 +11938,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const openSyncTitle = document.createElement('strong');
                 openSyncTitle.textContent = 'Check when profile opens';
                 const openSyncBody = document.createElement('span');
-                openSyncBody.textContent = 'When this protected profile opens, it can look for newer signed parent updates from the saved parent link. If Internet Pickup or Home Bridge is not set up, current rules stay active.';
+                openSyncBody.textContent = 'When this protected profile opens, it can look for newer signed parent updates from the saved parent link. If Later Pickup or Same-Home Pickup is not set up, current rules stay active.';
                 openSyncCopy.appendChild(openSyncTitle);
                 openSyncCopy.appendChild(openSyncBody);
                 openSyncToggle.appendChild(syncOnOpenInput);
@@ -12618,7 +12618,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (ftNanahManagedTargetsHint) {
-            ftNanahManagedTargetsHint.textContent = `Choose which saved protected profiles on ${getNanahRemoteLabel()} receive this live update. Offline devices still need optional Internet Pickup or Home Bridge setup.`;
+            ftNanahManagedTargetsHint.textContent = `Choose which saved protected profiles on ${getNanahRemoteLabel()} receive this live update. Offline devices still need optional Later Pickup or Same-Home Pickup setup.`;
         }
         return eligibleLinks;
     }
@@ -13388,8 +13388,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!endpoint) {
             return {
                 configured: false,
-                label: 'Opens later off',
-                detail: 'Send Update works when both devices are open. Set this up only when a verified protected device must collect a parent-approved update after opening later.',
+                label: 'Later pickup off',
+                detail: 'Send Now works when both devices are open. Set this up only when a verified protected device must collect a parent-approved update after opening later.',
                 tone: 'warning'
             };
         }
@@ -13404,14 +13404,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!configured) {
             return {
                 configured: false,
-                label: 'Later updates need review',
+                label: 'Later pickup needs review',
                 detail: `${host} is saved but is not ready for protected devices to collect updates.`,
                 tone: 'warning'
             };
         }
         return {
             configured: true,
-            label: `Opens later ready: ${host}`,
+            label: `Later pickup ready: ${host}`,
             detail: 'A verified protected device can check for signed parent updates after opening. It still accepts only trusted parent updates.',
             tone: 'success'
         };
@@ -13455,9 +13455,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (ftNanahDeliveryLiveDetail) {
             ftNanahDeliveryLiveDetail.textContent = liveReady
-                ? 'Use Send Update after reviewing the selected profile and allowed area.'
+                ? 'Use Send Now after reviewing the selected profile and allowed area.'
                 : (hasProtectedProfiles
-                    ? 'Best default for parents: pair, verify, then send while both devices are open.'
+                    ? 'Best default for parents: pair, match the phrase, then send while both devices are open.'
                     : 'Start with one child/user profile, then pair only if another device needs the same rules.');
         }
 
@@ -13473,7 +13473,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 : (!hasProtectedProfiles
                     ? 'Create a protected profile first. Later updates are only for verified protected devices.'
                     : (!hasVerifiedDevice
-                        ? 'Pair a verified device first. Most families can use live Send Update.'
+                        ? 'Pair a verified device first. Most families can use Send Now.'
                         : mailbox.detail));
         }
         if (ftNanahDeliveryMailboxBtn) {
@@ -13497,9 +13497,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahDeliveryLocalDetail.textContent = local.configured
                 ? local.detail
                 : (!hasProtectedProfiles
-                    ? 'Create a protected profile first. Same-network pickup only helps verified protected devices.'
+                    ? 'Create a protected profile first. Same-home pickup only helps verified protected devices.'
                     : (!hasVerifiedDevice
-                        ? 'Pair a verified device first. Same-network reachability is never authority.'
+                        ? 'Pair a verified device first. Being on the same network is never authority.'
                         : local.detail));
         }
         if (ftNanahDeliveryLocalBtn) {
@@ -13507,7 +13507,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahDeliveryLocalBtn.disabled = !localCanConfigure;
             ftNanahDeliveryLocalBtn.title = localCanConfigure
                 ? 'Optional advanced path for a trusted FilterTube bridge on your own network.'
-                : 'Create a protected profile and pair a verified device before setting up same-network delivery.';
+                : 'Create a protected profile and pair a verified device before setting up same-home delivery.';
         }
 
         const hasSavedUpdateReader = hasNanahManagedSavedUpdateReader();
@@ -13517,14 +13517,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (ftNanahDeliveryCheckDetail) {
             ftNanahDeliveryCheckDetail.textContent = canCheckSavedUpdates
-                ? 'Checks Internet Pickup and Home Bridge now. Signed parent-link validation still decides what can apply.'
+                ? 'Checks Later Pickup and Same-Home Pickup now. Signed parent-link validation still decides what can apply.'
                 : 'Use this on the protected device after it saves a trusted parent link and a pickup path is set up.';
         }
         if (ftNanahDeliveryCheckBtn) {
             ftNanahDeliveryCheckBtn.disabled = !canCheckSavedUpdates;
             ftNanahDeliveryCheckBtn.title = canCheckSavedUpdates
                 ? 'Run the saved-update check now for this protected profile.'
-                : 'Available on a protected device with a saved trusted parent link and a set-up Internet Pickup or Home Bridge path.';
+                : 'Available on a protected device with a saved trusted parent link and a set-up Later Pickup or Same-Home Pickup path.';
         }
     }
 
@@ -13565,7 +13565,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             title: title || 'Send Updates Later',
             message: message || 'Choose whether parent-approved updates need an optional waiting path for another device.',
             details: Array.isArray(details) ? details : [
-                'Use live Send Update for normal parent control.',
+                'Use Send Now for normal parent control.',
                 'Add an optional send path only when both devices cannot be open together.',
                 'Protected profiles still cannot change parent rules from their own surface.'
             ],
@@ -13586,16 +13586,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         const current = readNanahManagedMailboxServerConfig();
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
-            title: 'Internet Pickup (device opens later)',
+            title: 'Later Pickup (device opens later)',
             message: 'Use this only when a protected device should collect an approved update after the parent device is no longer open.',
             details: [
-                'For normal family control, open both devices and use Send Update.',
+                'For normal family control, open both devices and use Send Now.',
                 'A pickup service can hold unreadable waiting updates, not PINs or plaintext rules.',
                 'The protected device still applies only newer signed updates from its saved parent link.'
             ],
             configured: !!currentEndpoint,
-            configureLabel: currentEndpoint ? 'Edit Internet Pickup' : 'Set Up Internet Pickup',
-            disableLabel: 'Turn Off Internet Pickup'
+            configureLabel: currentEndpoint ? 'Edit Later Pickup' : 'Set Up Later Pickup',
+            disableLabel: 'Turn Off Later Pickup'
         });
         if (action === null) return;
         if (action === 'disable') {
@@ -13605,15 +13605,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 endpointHost: ''
             });
             await refreshProfilesUI();
-            UIComponents.showToast('Internet Pickup disabled', 'success');
+            UIComponents.showToast('Later Pickup disabled', 'success');
             return;
         }
         const endpoint = await showPromptModal({
-            title: 'Internet Pickup Service',
-            message: 'Enter the HTTPS pickup service that will hold unreadable parent-approved updates until the protected device opens. Leave blank to use live Send Update only.',
+            title: 'Later Pickup Service',
+            message: 'Enter the HTTPS pickup service that will hold unreadable parent-approved updates until the protected device opens. Leave blank to use Send Now only.',
             placeholder: 'https://your-filtertube-pickup-service',
             inputType: 'url',
-            confirmText: currentEndpoint ? 'Save Internet Pickup' : 'Enable Internet Pickup',
+            confirmText: currentEndpoint ? 'Save Later Pickup' : 'Enable Later Pickup',
             initialValue: currentEndpoint
         });
         if (endpoint === null) return;
@@ -13625,11 +13625,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 endpointHost: ''
             });
             await refreshProfilesUI();
-            UIComponents.showToast('Internet Pickup disabled', 'success');
+            UIComponents.showToast('Later Pickup disabled', 'success');
             return;
         }
         const token = await showPromptModal({
-            title: 'Internet Pickup Key',
+            title: 'Later Pickup Key',
             message: 'Optional service key for that pickup service. This is not the parent PIN. Leave blank to keep the saved key; enter a single dash to clear it.',
             placeholder: 'Optional service key',
             inputType: 'password',
@@ -13652,7 +13652,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? client.createProvider(nextConfig)
             : null;
         if (!provider || provider.configured !== true || !hasNanahManagedMailboxUploadWriter(provider)) {
-            UIComponents.showToast('Internet Pickup address must be public HTTPS and supported by FilterTube', 'error');
+            UIComponents.showToast('Later Pickup address must be public HTTPS and supported by FilterTube', 'error');
             return;
         }
         writeNanahManagedMailboxServerConfig(nextConfig);
@@ -13661,7 +13661,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             endpointHost: getManagedMailboxEndpointHostFromConfig(nextConfig)
         });
         await refreshProfilesUI();
-        UIComponents.showToast('Internet Pickup saved', 'success');
+        UIComponents.showToast('Later Pickup saved', 'success');
     }
 
     async function checkNanahManagedLocalNetworkProviderHealth({ reason = 'manual_check', silent = false } = {}) {
@@ -13725,18 +13725,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         const current = readNanahManagedLocalNetworkProviderConfig();
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
-            title: 'Home Bridge (same network)',
+            title: 'Same-Home Pickup',
             message: 'Use this only when you run a FilterTube-compatible bridge on your home, clinic, or school network.',
             details: [
-                'For normal family control, open both devices and use Send Update.',
-                'Home Bridge can help a verified protected device pick up waiting updates on the same network.',
+                'For normal family control, open both devices and use Send Now.',
+                'Same-Home Pickup can help a verified protected device pick up waiting updates on the same network.',
                 'It is not automatic Wi-Fi discovery; being nearby never grants control.',
                 'The protected device still accepts only newer signed updates from its saved parent link.'
             ],
             configured: !!currentEndpoint,
-            configureLabel: currentEndpoint ? 'Edit Home Bridge' : 'Set Up Home Bridge',
-            disableLabel: 'Turn Off Bridge',
-            extraChoices: currentEndpoint ? [{ value: 'check', label: 'Check Bridge', className: 'btn-secondary' }] : []
+            configureLabel: currentEndpoint ? 'Edit Same-Home Pickup' : 'Set Up Same-Home Pickup',
+            disableLabel: 'Turn Off Same-Home Pickup',
+            extraChoices: currentEndpoint ? [{ value: 'check', label: 'Check Pickup', className: 'btn-secondary' }] : []
         });
         if (action === null) return;
         if (action === 'check') {
@@ -13751,25 +13751,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                 endpointHost: ''
             });
             await refreshProfilesUI();
-            UIComponents.showToast('Bridge disabled', 'success');
+            UIComponents.showToast('Same-Home Pickup disabled', 'success');
             return;
         }
         const endpoint = await showPromptModal({
-            title: 'Home Bridge Address',
-            message: 'Enter the local bridge address only if you run a trusted FilterTube-compatible bridge. This is not device scanning; live Send Update remains the normal path.',
+            title: 'Same-Home Pickup Address',
+            message: 'Enter the local bridge address only if you run a trusted FilterTube-compatible bridge. This is not device scanning; Send Now remains the normal path.',
             placeholder: 'http://192.168.1.10:4177/filtertube',
             inputType: 'url',
-            confirmText: currentEndpoint ? 'Save Bridge' : 'Enable Bridge',
+            confirmText: currentEndpoint ? 'Save Same-Home Pickup' : 'Enable Same-Home Pickup',
             initialValue: currentEndpoint
         });
         if (endpoint === null) return;
         const endpointUrl = normalizeString(endpoint);
         if (!endpointUrl) {
-            UIComponents.showToast('Enter a bridge endpoint or turn off Home Bridge', 'error');
+            UIComponents.showToast('Enter a pickup address or turn off Same-Home Pickup', 'error');
             return;
         }
         const token = await showPromptModal({
-            title: 'Home Bridge Key',
+            title: 'Same-Home Pickup Key',
             message: 'Optional bridge key for that local bridge. This is not the parent PIN. Leave blank to keep the saved key; enter a single dash to clear it.',
             placeholder: 'Optional bridge key',
             inputType: 'password',
@@ -13792,7 +13792,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? client.createProvider(nextConfig)
             : null;
         if (!provider || provider.configured !== true || !hasNanahManagedLocalNetworkDeliveryWriter(provider)) {
-            UIComponents.showToast('Bridge address must be HTTPS or private/local HTTP and supported by FilterTube', 'error');
+            UIComponents.showToast('Same-Home Pickup address must be HTTPS or private/local HTTP and supported by FilterTube', 'error');
             return;
         }
         writeNanahManagedLocalNetworkProviderConfig(nextConfig);
@@ -13986,8 +13986,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const transports = [
             liveReady ? 'Send Update' : '',
-            (localReady && openCheckCount > 0) ? 'Home Bridge' : '',
-            (mailboxReady && openCheckCount > 0) ? 'Internet Pickup' : ''
+            (localReady && openCheckCount > 0) ? 'Same-Home Pickup' : '',
+            (mailboxReady && openCheckCount > 0) ? 'Later Pickup' : ''
         ].filter(Boolean).join(' + ');
         return {
             label: transports
@@ -14981,8 +14981,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!endpoint) {
             return {
                 configured: false,
-                label: 'Bridge off',
-                detail: 'Send Update can still work. Set this up only if you run an explicit FilterTube bridge on your home or school network.',
+                label: 'Same-home pickup off',
+                detail: 'Send Now can still work. Set this up only if you run an explicit FilterTube bridge on your home or school network.',
                 tone: 'warning'
             };
         }
@@ -14990,7 +14990,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!configured) {
             return {
                 configured: false,
-                label: 'Bridge needs review',
+                label: 'Same-home pickup needs review',
                 detail: `${host} is saved but is not ready to deliver protected updates.`,
                 tone: 'warning'
             };
@@ -15000,12 +15000,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const sameHost = !normalizeString(health.endpointHost) || normalizeString(health.endpointHost) === host;
         const healthDetail = checkedAge && sameHost
             ? (health.ok === true
-                ? `Last bridge check passed ${checkedAge}.`
-                : `Last bridge check did not pass ${checkedAge}.`)
-            : 'Run Check/Edit if you want to verify the bridge is reachable now.';
+                ? `Last same-home check passed ${checkedAge}.`
+                : `Last same-home check did not pass ${checkedAge}.`)
+            : 'Run Check/Edit if you want to verify the pickup path is reachable now.';
         return {
             configured: true,
-            label: `Bridge set up: ${host}`,
+            label: `Same-home pickup ready: ${host}`,
             detail: `${healthDetail} Reachability is only a send path check; trusted parent policy still decides what can apply.`,
             tone: 'success'
         };
@@ -15108,7 +15108,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return `${label} (${elapsedDays}d ago)`;
         };
         const reasonCode = normalizeString(state.reasonCode);
-        if (reasonCode === 'local_network_provider_unavailable') return appendLocalNetworkCheckedAge('Waiting for Home Bridge');
+        if (reasonCode === 'local_network_provider_unavailable') return appendLocalNetworkCheckedAge('Waiting for Same-Home Pickup');
         if (reasonCode === 'no_eligible_links') return appendLocalNetworkCheckedAge('No matching parent link');
         const row = safeArray(state.linkResults).find(result => normalizeString(result?.linkId) === normalizeString(trusted.linkId || trusted.id));
         if (!row) return state.checkedAt ? appendLocalNetworkCheckedAge('Checked') : 'Ready';
@@ -15118,7 +15118,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const ackFailed = Number(row.ackFailedCount) || 0;
         if (ackFailed > 0) return appendLocalNetworkCheckedAge(`${accepted} accepted, ${rejected} rejected, ${ackFailed} ack failed`);
         if (accepted || rejected) return appendLocalNetworkCheckedAge(`${accepted} accepted, ${rejected} rejected`);
-        if (row.ok === false) return appendLocalNetworkCheckedAge('Home Bridge rejected');
+        if (row.ok === false) return appendLocalNetworkCheckedAge('Same-Home Pickup rejected');
         if (candidates === 0) return appendLocalNetworkCheckedAge('No updates');
         return appendLocalNetworkCheckedAge('Checked');
     }
@@ -15135,12 +15135,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (internetStatus && internetStatus !== 'Off') {
             parts.push(internetStatus.toLowerCase().includes('internet pickup')
                 ? internetStatus
-                : `Internet Pickup: ${internetStatus}`);
+                : `Later Pickup: ${internetStatus}`);
         }
         if (homeStatus && homeStatus !== 'Off') {
             parts.push(homeStatus.toLowerCase().includes('home bridge')
                 ? homeStatus
-                : `Home Bridge: ${homeStatus}`);
+                : `Same-Home Pickup: ${homeStatus}`);
         }
         return parts.length ? parts.join(' | ') : 'Ready';
     }
@@ -15824,11 +15824,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 checkSavedUpdatesBtn.textContent = savedUpdateReaderReady ? 'Check Saved Updates' : 'Set Up Pickup First';
                 checkSavedUpdatesBtn.disabled = !savedUpdateReaderReady;
                 checkSavedUpdatesBtn.title = savedUpdateReaderReady
-                    ? 'Checks optional Internet Pickup and Home Bridge for newer signed parent updates. Trusted-link validation still decides what can apply.'
-                    : 'Set up Internet Pickup or Home Bridge before this protected device can check for waiting parent updates. Live Send Update still works when both devices are open.';
+                    ? 'Checks optional Later Pickup and Same-Home Pickup for newer signed parent updates. Trusted-link validation still decides what can apply.'
+                    : 'Set up Later Pickup or Same-Home Pickup before this protected device can check for waiting parent updates. Send Now still works when both devices are open.';
                 checkSavedUpdatesBtn.addEventListener('click', async () => {
                     if (!hasNanahManagedSavedUpdateReader()) {
-                        UIComponents.showToast('Set up Internet Pickup or Home Bridge before checking waiting parent updates', 'warning');
+                        UIComponents.showToast('Set up Later Pickup or Same-Home Pickup before checking waiting parent updates', 'warning');
                         renderNanahTrustedLinks();
                         return;
                     }
@@ -16806,7 +16806,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const validation = adapter.validateManagedMailboxItem(item, context);
         if (validation.accepted === true && validation.decision === 'idempotent_same_hash') {
             await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
-            UIComponents.showToast('Internet Pickup update already matches the last accepted revision', 'info');
+            UIComponents.showToast('Later Pickup update already matches the last accepted revision', 'info');
             return validation;
         }
         if (validation.accepted === true) {
@@ -16817,25 +16817,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                     mailboxItemId: validation.mailboxItemId
                 };
                 await recordManagedNanahPolicyValidationHistory(envelope, decision, context);
-                UIComponents.showToast('Internet Pickup apply is unavailable', 'error');
+                UIComponents.showToast('Later Pickup apply is unavailable', 'error');
                 return decision;
             }
             const result = await adapter.applyManagedMailboxItem(item, context);
             await recordManagedNanahPolicyValidationHistory(envelope, result.accepted === true ? validation : result, context);
             if (result.accepted === true && result.applied !== false) {
                 await refreshFilterTubeUiAfterNanahImport();
-                UIComponents.showToast(`Applied Internet Pickup ${normalizeString(validation.scope) || 'policy'} update`, 'success');
+                UIComponents.showToast(`Applied Later Pickup ${normalizeString(validation.scope) || 'policy'} update`, 'success');
                 return result;
             }
             if (result.accepted === true && result.decision === 'idempotent_same_hash') {
-                UIComponents.showToast('Internet Pickup update already matches the last accepted revision', 'info');
+                UIComponents.showToast('Later Pickup update already matches the last accepted revision', 'info');
                 return result;
             }
-            UIComponents.showToast(`Internet Pickup update rejected: ${normalizeString(result.reason) || 'apply failed'}`, 'error');
+            UIComponents.showToast(`Later Pickup update rejected: ${normalizeString(result.reason) || 'apply failed'}`, 'error');
             return result;
         }
         await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
-        UIComponents.showToast(`Internet Pickup update rejected: ${normalizeString(validation.reason) || 'validation failed'}`, 'error');
+        UIComponents.showToast(`Later Pickup update rejected: ${normalizeString(validation.reason) || 'validation failed'}`, 'error');
         return validation;
     }
 
@@ -16875,7 +16875,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const validation = adapter.validateManagedLocalNetworkCandidate(sanitizedCandidate, context);
         if (validation.accepted === true && validation.decision === 'idempotent_same_hash') {
             await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
-            UIComponents.showToast('Home Bridge update already matches the last accepted revision', 'info');
+            UIComponents.showToast('Same-Home Pickup update already matches the last accepted revision', 'info');
             return validation;
         }
         if (validation.accepted === true) {
@@ -16886,25 +16886,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                     validationDecision: validation.decision
                 };
                 await recordManagedNanahPolicyValidationHistory(envelope, decision, context);
-                UIComponents.showToast('Home Bridge apply is unavailable', 'error');
+                UIComponents.showToast('Same-Home Pickup apply is unavailable', 'error');
                 return decision;
             }
             const result = await adapter.applyManagedPolicyEnvelope(envelope, context);
             await recordManagedNanahPolicyValidationHistory(envelope, result.accepted === true ? validation : result, context);
             if (result.accepted === true && result.applied !== false) {
                 await refreshFilterTubeUiAfterNanahImport();
-                UIComponents.showToast(`Applied Home Bridge ${normalizeString(validation.scope) || 'policy'} update`, 'success');
+                UIComponents.showToast(`Applied Same-Home Pickup ${normalizeString(validation.scope) || 'policy'} update`, 'success');
                 return result;
             }
             if (result.accepted === true && result.decision === 'idempotent_same_hash') {
-                UIComponents.showToast('Home Bridge update already matches the last accepted revision', 'info');
+                UIComponents.showToast('Same-Home Pickup update already matches the last accepted revision', 'info');
                 return result;
             }
-            UIComponents.showToast(`Home Bridge update rejected: ${normalizeString(result.reason) || 'apply failed'}`, 'error');
+            UIComponents.showToast(`Same-Home Pickup update rejected: ${normalizeString(result.reason) || 'apply failed'}`, 'error');
             return result;
         }
         await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
-        UIComponents.showToast(`Home Bridge update rejected: ${normalizeString(validation.reason) || 'validation failed'}`, 'error');
+        UIComponents.showToast(`Same-Home Pickup update rejected: ${normalizeString(validation.reason) || 'validation failed'}`, 'error');
         return validation;
     }
 

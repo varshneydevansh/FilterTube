@@ -945,33 +945,33 @@
                                     <div class="nanah-sync-intro">
                                         <div class="nanah-sync-intro__copy">
                                             <span class="nanah-sync-intro__eyebrow">Family device updates</span>
-                                            <p class="nanah-sync-intro__title">Send parent-approved updates to another device.</p>
-                                            <p class="nanah-sync-intro__body">Most families only need the live path: open both devices, pair, confirm the same safety phrase, then Send Update. If the other device must pick it up later, set that up in More options; Wi-Fi and servers never become the authority.</p>
+                                            <p class="nanah-sync-intro__title">Choose where a protected device gets parent-approved changes.</p>
+                                            <p class="nanah-sync-intro__body">Start with Send Now: open both devices, pair, match the phrase, and send. Same-home pickup and later pickup are optional paths for families that cannot keep both devices open at the same time.</p>
                                         </div>
                                         <div class="nanah-device-compass" aria-label="Family device connection map">
                                             <div class="nanah-device-compass__center">
-                                                <span>Parent</span>
-                                                <strong>This device</strong>
-                                                <small>Choose rules, time, and access.</small>
+                                                <span>Parent device</span>
+                                                <strong>Controls stay here</strong>
+                                                <small>Choose rules, time, and Main/Kids access.</small>
                                             </div>
                                             <div class="nanah-device-compass__grid">
                                                 <article>
                                                     <span>Open together</span>
-                                                    <strong>Live Send Update</strong>
-                                                    <small>Normal family flow.</small>
+                                                    <strong>Send now</strong>
+                                                    <small>Best default for most families.</small>
                                                 </article>
                                                 <article>
-                                                    <span>Same network</span>
-                                                    <strong>Home Bridge</strong>
-                                                    <small>Only after trusted setup.</small>
+                                                    <span>Same home</span>
+                                                    <strong>Pick up at home</strong>
+                                                    <small>Requires your trusted home bridge.</small>
                                                 </article>
                                                 <article>
                                                     <span>Opens later</span>
-                                                    <strong>Internet Pickup</strong>
-                                                    <small>Signed waiting updates.</small>
+                                                    <strong>Pick up later</strong>
+                                                    <small>Uses your trusted pickup service.</small>
                                                 </article>
                                             </div>
-                                            <div class="nanah-device-compass__rule">Pair and verify first. Network or server access never grants control.</div>
+                                            <div class="nanah-device-compass__rule">Pair and verify first. Nearby devices, Wi-Fi, and servers can only carry signed updates; they never grant control.</div>
                                         </div>
                                         <div class="nanah-sync-simple-path" aria-label="Family device update path">
                                             <article class="nanah-sync-simple-path__item">
@@ -996,31 +996,31 @@
                                                 <div>
                                                     <span class="nanah-delivery-card__eyebrow">Live update</span>
                                                     <strong id="ftNanahDeliveryLiveLabel">Open both devices</strong>
-                                                    <small id="ftNanahDeliveryLiveDetail">Use Send Update when parent and protected devices are open together.</small>
+                                                    <small id="ftNanahDeliveryLiveDetail">Use Send Now when parent and protected devices are open together.</small>
                                                 </div>
                                             </article>
                                             <details id="ftNanahDeliveryAdvanced" class="nanah-delivery-advanced">
                                                 <summary>
                                                     <span>
-                                                        <strong>Optional: device opens later</strong>
-                                                        <small>Use only when a verified device must collect an approved update later.</small>
+                                                        <strong>Optional: device is not open now</strong>
+                                                        <small>Set up only when a verified device must collect an approved update after the parent sends it.</small>
                                                     </span>
                                                     <code>Advanced</code>
                                                 </summary>
                                                 <div class="nanah-delivery-advanced__cards">
                                                     <article class="nanah-delivery-card" id="ftNanahDeliveryMailboxCard">
                                                         <div>
-                                                            <span class="nanah-delivery-card__eyebrow">Internet pickup</span>
-                                                            <strong id="ftNanahDeliveryMailboxLabel">Opens later off</strong>
+                                                            <span class="nanah-delivery-card__eyebrow">Pick up later</span>
+                                                            <strong id="ftNanahDeliveryMailboxLabel">Later pickup off</strong>
                                                             <small id="ftNanahDeliveryMailboxDetail">Optional waiting updates for verified protected devices.</small>
                                                         </div>
                                                         <button id="ftNanahDeliveryMailboxBtn" class="btn-secondary" type="button">Set Up</button>
                                                     </article>
                                                     <article class="nanah-delivery-card" id="ftNanahDeliveryLocalCard">
                                                         <div>
-                                                            <span class="nanah-delivery-card__eyebrow">Home bridge</span>
-                                                            <strong id="ftNanahDeliveryLocalLabel">Bridge off</strong>
-                                                            <small id="ftNanahDeliveryLocalDetail">Optional home/school bridge. Wi-Fi alone never grants control.</small>
+                                                            <span class="nanah-delivery-card__eyebrow">Pick up at home</span>
+                                                            <strong id="ftNanahDeliveryLocalLabel">Same-home pickup off</strong>
+                                                            <small id="ftNanahDeliveryLocalDetail">Optional home/school pickup path. Wi-Fi alone never grants control.</small>
                                                         </div>
                                                         <button id="ftNanahDeliveryLocalBtn" class="btn-secondary" type="button">Set Up</button>
                                                     </article>
@@ -1220,7 +1220,7 @@
                                             <div class="nanah-sync-stack">
                                                 <div class="nanah-sync-privacy-banner">
                                                     <strong>Private after the handshake</strong>
-                                                    <span>For live Send Update, keep both devices open. This meeting step connects them; it does not store rules or PINs.</span>
+                                                    <span>For Send Now, keep both devices open. This meeting step connects them; it does not store rules or PINs.</span>
                                                     <details class="nanah-sync-technical">
                                                         <summary>Meeting service link</summary>
                                                         <span><a href="https://nanah-signaling.varshney-devansh614.workers.dev/" target="_blank" rel="noopener noreferrer">nanah-signaling.varshney-devansh614.workers.dev</a></span>
@@ -1674,7 +1674,7 @@
                                                     <li>A live Nanah session is not meant to survive a page refresh, browser restart, or tab close. Refresh ends the live pairing session.</li>
                                                     <li>Trusted links are saved locally so you do not lose the remembered relationship, but today you still start a fresh live session when reconnecting.</li>
                                                     <li>The trusted-device card now has a <strong>Start New Session</strong> shortcut that starts the next fresh session with the saved role/policy defaults.</li>
-                                                    <li>Saved trust means a faster next live Send Update session. If an advanced Internet Pickup service is separately configured, a protected profile can check for signed parent updates when it opens without adding YouTube page background work.</li>
+                                                    <li>Saved trust means a faster next Send Now session. If Later Pickup is separately configured, a protected profile can check for signed parent updates when it opens without adding YouTube page background work.</li>
                                                     <li>If you try to reuse the same pairing code on the same active device session, FilterTube now blocks that locally instead of silently burning the code.</li>
                                                     <li>If no fixed target is saved on the managed replica link, non-<code>full</code> sync still writes into the receiver's current active profile at receive time.</li>
                                                     <li>If a managed replica link is saved with <strong>Always this local profile</strong>, future managed updates land in that pinned local profile even when some other profile is active on the receiving device.</li>
@@ -1721,11 +1721,11 @@
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">How devices meet</div>
-                                            <div class="help-item-body">Nanah’s meeting service only helps two open devices exchange connection setup data. It does not read parent rules, PINs, or profile data. In the normal parent flow, open both devices, pair, verify the phrase, and use Send Update. Internet Pickup and Home Bridge are separate optional delivery tools for advanced setups; they still cannot apply anything unless the protected device already trusts that parent link. The underlying project is open here: <a href="https://github.com/varshneydevansh/nanah" target="_blank" rel="noopener noreferrer">github.com/varshneydevansh/nanah</a>.</div>
+                                            <div class="help-item-body">Nanah’s meeting service only helps two open devices exchange connection setup data. It does not read parent rules, PINs, or profile data. In the normal parent flow, open both devices, pair, verify the phrase, and use Send Now. Later Pickup and Same-Home Pickup are optional delivery tools for advanced setups; they still cannot apply anything unless the protected device already trusts that parent link. The underlying project is open here: <a href="https://github.com/varshneydevansh/nanah" target="_blank" rel="noopener noreferrer">github.com/varshneydevansh/nanah</a>.</div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">Same-network updates</div>
-                                            <div class="help-item-body">Home Bridge is for homes, clinics, or schools that run their own FilterTube-compatible bridge on the local network. It is not automatic Wi-Fi discovery, and it does not trust every device on the network. The protected device still applies only signed updates from its saved parent/caregiver link.</div>
+                                            <div class="help-item-title">Same-home pickup</div>
+                                            <div class="help-item-body">Same-Home Pickup is for homes, clinics, or schools that run their own FilterTube-compatible bridge on the local network. It is not automatic Wi-Fi discovery, and it does not trust every device on the network. The protected device still applies only signed updates from its saved parent/caregiver link.</div>
                                         </div>
                                     </div>
                                 </div>
@@ -1862,7 +1862,7 @@
                                         <div class="help-item">
                                             <div class="help-item-title">Remote updates in plain words</div>
                                             <div class="help-item-body">
-                                                Normal parent control is live Send Update: open parent and protected devices, pair, verify the phrase, then send the selected profile update. Saved trust remembers the verified parent/protected-device relationship and target profile for the next live session. Internet Pickup and Home Bridge are advanced optional delivery tools only if you run a compatible service; they are not required for ordinary parent control, do not scan Wi-Fi for authority, and never let a protected profile edit its own rules.
+                                                Normal parent control is Send Now: open parent and protected devices, pair, verify the phrase, then send the selected profile update. Saved trust remembers the verified parent/protected-device relationship and target profile for the next live session. Later Pickup and Same-Home Pickup are advanced optional delivery tools only if you run a compatible service; they are not required for ordinary parent control, do not scan Wi-Fi for authority, and never let a protected profile edit its own rules.
                                             </div>
                                         </div>
                                     </div>

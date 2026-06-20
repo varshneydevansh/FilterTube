@@ -798,6 +798,12 @@ parent tool instead of a sync/debug console.
   acknowledging signed local-network candidates through HTTPS or private local
   HTTP endpoints. Discovery remains non-authoritative; local validation still
   gates every apply.
+- [x] 2026-06-20 parent-facing sync vocabulary simplified. The Accounts &
+  Sync first screen now describes the paths as Send Now, Same-Home Pickup, and
+  Later Pickup while keeping Home Bridge/Internet Pickup as internal transport
+  concepts and advanced/provider details. This keeps the parent mental model
+  device-first without changing authority, signatures, target profile checks,
+  or provider validation.
 - [ ] Native Android/iOS settings-lock and timeout UI parity. This belongs in
   the downstream app sync/runtime lane.
 
