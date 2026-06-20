@@ -701,6 +701,14 @@ parent tool instead of a sync/debug console.
     and no new policy authority. Same-network updates still require an explicitly
     configured Home Bridge plus the existing trusted-link, target-profile, scope,
     revision, hash, and signature validation.
+  - [x] 2026-06-20 Family Device Updates device-compass slice: Accounts & Sync
+    now explains same-device, same-network, and opens-later control with a
+    small parent/device compass before the step list. The visual model is
+    intentionally similar to nearby file-sharing flows, but the copy keeps the
+    safety boundary plain: open together for normal Send Update, same-network
+    still requires phrase verification, and later pickup applies only after
+    trusted setup. This adds no LAN peer discovery, no ambient device scanning,
+    and no new policy authority.
   - [x] 2026-06-20 protected-profile setup wording slice: parent-facing setup
     actions now say `Create Protected Profile` instead of `Create Child Profile`
     in Family Controls, Settings, and the creation prompt. This keeps the UI

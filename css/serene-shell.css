@@ -3245,6 +3245,80 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     gap: 0.75rem;
 }
 
+.nanah-device-compass {
+    display: grid;
+    grid-template-columns: minmax(8rem, 0.42fr) minmax(0, 1fr);
+    gap: 0.8rem;
+    align-items: stretch;
+    padding: 0.75rem;
+    border: 1px solid rgba(96, 120, 145, 0.14);
+    border-radius: 1rem;
+    background:
+        radial-gradient(circle at 18% 34%, rgba(171, 68, 56, 0.10), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.68), rgba(248, 244, 238, 0.48));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.nanah-device-compass__center {
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 0.18rem;
+    min-height: 8rem;
+    padding: 0.85rem;
+    border: 1px solid rgba(171, 68, 56, 0.22);
+    border-radius: 999px;
+    background:
+        radial-gradient(circle, rgba(171, 68, 56, 0.11), transparent 68%),
+        rgba(255, 255, 255, 0.74);
+    text-align: center;
+}
+
+.nanah-device-compass__center span,
+.nanah-device-compass__grid article span {
+    color: #9f4a3d;
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.nanah-device-compass__center strong,
+.nanah-device-compass__grid article strong {
+    color: var(--ft-color-text-primary);
+    font-size: 0.86rem;
+    font-weight: 880;
+    line-height: 1.2;
+}
+
+.nanah-device-compass__center small,
+.nanah-device-compass__grid article small {
+    color: var(--ft-color-text-secondary);
+    font-size: 0.74rem;
+    font-weight: 640;
+    line-height: 1.34;
+}
+
+.nanah-device-compass__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.55rem;
+    min-width: 0;
+}
+
+.nanah-device-compass__grid article {
+    display: grid;
+    align-content: center;
+    gap: 0.24rem;
+    min-width: 0;
+    min-height: 5.15rem;
+    padding: 0.68rem 0.72rem;
+    border: 1px solid rgba(96, 120, 145, 0.12);
+    border-radius: 0.82rem;
+    background: rgba(255, 255, 255, 0.66);
+}
+
 .nanah-delivery-advanced {
     min-width: 0;
     overflow: hidden;
@@ -5305,6 +5379,19 @@ body.ft-extension-surface .ft-profile-dropdown.ft-select-dropdown {
 @media (max-width: 980px) {
     .nanah-sync-intro,
     .nanah-sync-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .nanah-device-compass {
+        grid-template-columns: 1fr;
+    }
+
+    .nanah-device-compass__center {
+        min-height: 5.75rem;
+        border-radius: 1rem;
+    }
+
+    .nanah-device-compass__grid {
         grid-template-columns: 1fr;
     }
 
