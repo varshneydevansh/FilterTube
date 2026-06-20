@@ -6,6 +6,7 @@ const appRepo = path.resolve((process.env.FILTERTUBE_APP_REPO || "").trim() || p
 const contractDocPath = "docs/audit/FILTERTUBE_MANAGED_APP_POLICY_CONTRACT_PARITY_2026-06-04.md";
 const contractArtifactPath = "docs/audit/artifacts/managed-app-policy-contract-v1.json";
 const appManifestPath = path.join(appRepo, "tools", "runtime-sync-manifest.json");
+const packageJson = JSON.parse(readText("package.json"));
 
 function readText(relativePath) {
   return fs.readFileSync(path.join(repoRoot, relativePath), "utf8");
@@ -90,6 +91,22 @@ for (const row of [
   ...docContract.uiHelperMirror,
 ]) {
   assertSourceExists(row.sourcePath);
+}
+
+if (docContract.managedDelivery?.referenceProvider?.sourcePath) {
+  assertSourceExists(docContract.managedDelivery.referenceProvider.sourcePath);
+}
+
+if (docContract.managedDelivery?.referenceProvider?.auditPath) {
+  assertSourceExists(docContract.managedDelivery.referenceProvider.auditPath);
+}
+
+if (docContract.managedDelivery?.referenceProvider?.packageScript) {
+  const scriptName = docContract.managedDelivery.referenceProvider.packageScript;
+  if (!packageJson.scripts?.[scriptName]) fail(`package.json missing managed delivery provider script ${scriptName}`);
+  if (!packageJson.scripts[scriptName].includes(docContract.managedDelivery.referenceProvider.sourcePath)) {
+    fail(`package.json script ${scriptName} does not run ${docContract.managedDelivery.referenceProvider.sourcePath}`);
+  }
 }
 
 verifyManifestEntries(docContract);

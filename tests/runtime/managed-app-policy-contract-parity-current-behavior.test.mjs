@@ -137,6 +137,36 @@ test('managed app policy parity doc records extension-owned app contract artifac
       'apps_and_bridge_software_must_not_treat_delivery_labels_as_authority'
     ]
   );
+  assert.equal(contract.managedDelivery.referenceProvider.sourcePath, 'scripts/managed-delivery-provider.mjs');
+  assert.equal(contract.managedDelivery.referenceProvider.packageScript, 'managed:provider');
+  assert.equal(contract.managedDelivery.referenceProvider.auditPath, 'docs/audit/FILTERTUBE_MANAGED_DELIVERY_REFERENCE_PROVIDER_2026-06-20.md');
+  assert.equal(contract.managedDelivery.referenceProvider.runtimeRole, 'self_hosted_transport_reference_only');
+  assert.equal(contract.managedDelivery.referenceProvider.storageMode, 'in_memory');
+  assert.equal(contract.managedDelivery.referenceProvider.requiresExplicitEndpoint, true);
+  assert.equal(contract.managedDelivery.referenceProvider.browserCorsPreflight, true);
+  assert.deepEqual(
+    contract.managedDelivery.referenceProvider.supports,
+    [
+      'ciphertext_mailbox_upload_pull_purge',
+      'mailbox_redacted_ack_write_pull',
+      'signed_home_bridge_candidate_publish_discover',
+      'home_bridge_redacted_ack_write_pull',
+      'optional_bearer_token_for_reference_provider'
+    ]
+  );
+  for (const forbiddenClaim of [
+    'automatic_lan_peer_discovery',
+    'hosted_internet_pickup_service_ownership',
+    'profile_authority',
+    'pin_authority',
+    'trusted_link_authority',
+    'signature_authority',
+    'native_android_ios_parity'
+  ]) {
+    assert.ok(contract.managedDelivery.referenceProvider.doesNotProvide.includes(forbiddenClaim), `reference provider must not claim ${forbiddenClaim}`);
+  }
+  assert.equal(fs.existsSync(path.join(repoRoot, contract.managedDelivery.referenceProvider.sourcePath)), true);
+  assert.equal(fs.existsSync(path.join(repoRoot, contract.managedDelivery.referenceProvider.auditPath)), true);
   assert.equal(contract.networkProductBoundary.sameProductSeparateRuntime, true);
   assert.equal(contract.networkProductBoundary.preciseYouTubeFilteringRequiresEndpointAgent, true);
   assert.ok(contract.networkProductBoundary.endpointAgents.includes('browser_extension'));

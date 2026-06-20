@@ -345,6 +345,32 @@
         "provider_selected_scope",
         "unsigned_candidate"
       ]
+    },
+    "referenceProvider": {
+      "sourcePath": "scripts/managed-delivery-provider.mjs",
+      "packageScript": "managed:provider",
+      "auditPath": "docs/audit/FILTERTUBE_MANAGED_DELIVERY_REFERENCE_PROVIDER_2026-06-20.md",
+      "runtimeRole": "self_hosted_transport_reference_only",
+      "storageMode": "in_memory",
+      "requiresExplicitEndpoint": true,
+      "browserCorsPreflight": true,
+      "supports": [
+        "ciphertext_mailbox_upload_pull_purge",
+        "mailbox_redacted_ack_write_pull",
+        "signed_home_bridge_candidate_publish_discover",
+        "home_bridge_redacted_ack_write_pull",
+        "optional_bearer_token_for_reference_provider"
+      ],
+      "doesNotProvide": [
+        "automatic_lan_peer_discovery",
+        "hosted_internet_pickup_service_ownership",
+        "durable_database",
+        "profile_authority",
+        "pin_authority",
+        "trusted_link_authority",
+        "signature_authority",
+        "native_android_ios_parity"
+      ]
     }
   },
   "networkProductBoundary": {

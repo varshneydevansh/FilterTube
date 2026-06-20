@@ -18,7 +18,11 @@ manifest-owned artifact and mirrored helper sources. Installed iOS parity
 remains pending. The managed list contract now also pins the downstream app UI
 shape for Main/Kids/Both apply targets, manual/imported-list source filters,
 row badges, saved-list summaries, and protected-user boundaries so mobile/tablet
-surfaces do not fork the parent mental model from the extension.
+surfaces do not fork the parent mental model from the extension. A runnable
+self-hosted reference provider now exists for Internet Pickup and Home Bridge
+transport contracts; it is explicit-endpoint, in-memory, and transport-only,
+so it does not prove hosted service ownership, automatic LAN discovery, or
+native app parity.
 **Runtime behavior changed**: extension no; Android app yes.
 **Goal slice**: Implementation order item 12, "Sync shared policy contract to
 apps", and item 13, "Add app viewing-space/time-limit parity tests".
@@ -392,6 +396,32 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
         "provider_selected_scope",
         "unsigned_candidate"
       ]
+    },
+    "referenceProvider": {
+      "sourcePath": "scripts/managed-delivery-provider.mjs",
+      "packageScript": "managed:provider",
+      "auditPath": "docs/audit/FILTERTUBE_MANAGED_DELIVERY_REFERENCE_PROVIDER_2026-06-20.md",
+      "runtimeRole": "self_hosted_transport_reference_only",
+      "storageMode": "in_memory",
+      "requiresExplicitEndpoint": true,
+      "browserCorsPreflight": true,
+      "supports": [
+        "ciphertext_mailbox_upload_pull_purge",
+        "mailbox_redacted_ack_write_pull",
+        "signed_home_bridge_candidate_publish_discover",
+        "home_bridge_redacted_ack_write_pull",
+        "optional_bearer_token_for_reference_provider"
+      ],
+      "doesNotProvide": [
+        "automatic_lan_peer_discovery",
+        "hosted_internet_pickup_service_ownership",
+        "durable_database",
+        "profile_authority",
+        "pin_authority",
+        "trusted_link_authority",
+        "signature_authority",
+        "native_android_ios_parity"
+      ]
     }
   },
   "networkProductBoundary": {
@@ -539,7 +569,11 @@ bridge delivery. These labels are only interaction language. Technical
 transport identifiers such as mailbox, LAN, provider, gateway, candidate, and
 ciphertext item remain valid in advanced details, logs, code, and protocol
 docs, but they must not become the first-run parent model or a policy authority
-shortcut.
+shortcut. The contract now also names the reference provider at
+`scripts/managed-delivery-provider.mjs`; this provider can exercise the
+mailbox/Home Bridge endpoint shapes locally, but it is not a hosted service,
+does not discover peers automatically, and cannot become profile, PIN,
+trusted-link, signature, or native-app authority.
 
 The network product boundary is explicit in the contract: a future
 FilterTube Home/School Bridge can distribute signed policy revisions, relay
