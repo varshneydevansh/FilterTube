@@ -833,6 +833,13 @@ parent tool instead of a sync/debug console.
     edit mode is active. This prevents the confirmation dialog from describing
     the parent/account profile when the outgoing rules, time limits, or viewing
     access are actually sourced from the edited protected profile.
+  - [x] 2026-06-20 unified family-device map slice: the Accounts & Sync compass,
+    Family Controls trust map, and managed release-smoke checklist now use one
+    parent-facing map for devices that are ready now, same-home, or away/later.
+    `Later Pickup` is the away/internet delivery state, `Same-Home Pickup` is the
+    explicit home/school delivery state, and neither provider path becomes
+    authority without local trusted-link, target, revision, device binding, hash,
+    and signature validation.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.

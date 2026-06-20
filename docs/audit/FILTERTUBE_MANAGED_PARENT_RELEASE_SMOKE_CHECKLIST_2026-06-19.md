@@ -5,7 +5,7 @@
 goal. This is a proof handoff, not a claim that complete remote management is
 release-ready across every transport.
 **Scope**: Extension-installed manual smoke plus focused automated proof for
-Family Controls, Family Device Updates, Internet Pickup, Home Bridge,
+Family Controls, Family Device Updates, Later Pickup, Same-Home Pickup,
 rule-list imports, viewing-space gates, time limits, and action history.
 
 ## Why This Exists
@@ -33,13 +33,15 @@ Use these terms in release notes and support replies:
 | Parent wording | Internal transport | What it can safely mean |
 | --- | --- | --- |
 | Send Update | Live Nanah P2P | Parent and protected devices are open, paired, phrase-verified, and a signed update is sent now. |
-| Internet Pickup | Encrypted mailbox provider | A compatible HTTPS pickup service stores unreadable saved updates until the protected profile opens later. |
-| Home Bridge | Local-network provider | A compatible home/school/clinic bridge on the same network can hold or relay signed updates for already trusted protected devices. |
+| Later Pickup | Encrypted pickup provider | A compatible HTTPS pickup service stores unreadable saved updates until the verified protected device opens later or away. |
+| Same-Home Pickup | Local-network pickup provider | A compatible home/school/clinic bridge on the same network can hold or relay signed updates for already trusted protected devices. |
 
-Do not describe Home Bridge as Wi-Fi authority, automatic LAN control, or a
-network scan. Local-network discovery is never authority. The protected device
-still validates trusted link, target profile, scope, revision, device binding,
-policy hash, and signature before applying anything.
+Use the same Family Device Map for devices that are ready now, same-home, or
+away/later. Do not describe Same-Home Pickup as Wi-Fi authority, automatic LAN
+control, or a network scan. Do not describe Later Pickup as hosted authority or
+always-on sync. The protected device still validates trusted link, target
+profile, scope, revision, device binding, policy hash, and signature before
+applying anything.
 
 ## Automated Preflight
 
@@ -93,8 +95,8 @@ Required manual rows:
 | 5. Time limit | Set a daily YouTube limit and a zero/reduced budget. Confirm YouTube is blocked by the FilterTube timeout screen when the budget is exhausted. |
 | 6. Live Send Update | Pair parent and protected devices, verify the same phrase, send the reviewed protected-profile update, and confirm the protected device applies only the newer signed policy. |
 | 7. Offline policy | Disconnect delivery and confirm the protected device keeps the last accepted policy active. |
-| 8. Internet Pickup | If configured, send a saved update through the explicit HTTPS provider and confirm profile-open pickup applies only after local trusted-link validation. |
-| 9. Home Bridge | If configured, send or discover through the explicit local provider and confirm same-network reachability alone does not grant authority. |
+| 8. Later Pickup | If configured, send a saved update through the explicit HTTPS provider and confirm profile-open pickup applies only after local trusted-link validation. |
+| 9. Same-Home Pickup | If configured, send or discover through the explicit local provider and confirm same-network reachability alone does not grant authority. |
 | 10. Rejection path | Try a stale, wrong-target, revoked-link, or wrong-key update and confirm it is rejected without weakening the active policy. |
 | 11. Action history | Confirm parent-visible history records accepted/rejected outcomes without PINs, private keys, plaintext rule values, raw policy JSON, decrypted payloads, or ciphertext blobs. |
 | 12. No-work performance | With no eligible provider or pending policy, open YouTube and confirm there are no provider polling loops, LAN fetch loops, new YouTube observers, or visible lag from managed-control code. |
@@ -140,10 +142,9 @@ untrusted public lists applying without parent review
 ```text
 local protected-profile authority: GO for extension-owned flows
 live Nanah Send Update: GO after installed two-device smoke
-Internet Pickup: GO only with explicit configured-provider smoke
-Home Bridge: GO only with explicit configured-provider smoke
+Later Pickup: GO only with explicit configured-provider smoke
+Same-Home Pickup: GO only with explicit configured-provider smoke
 built-in automatic LAN discovery: NO-GO
 network-wide filtering product: OUT OF THIS EXTENSION RELEASE
 downstream app parity: separate native sync/parity lane
 ```
-

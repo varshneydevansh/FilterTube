@@ -465,7 +465,7 @@
         if (item.syncMailboxReady === true) {
             return {
                 key: 'mailbox',
-                label: 'Later Pickup set up',
+                label: 'Away/later pickup set up',
                 tone: 'success'
             };
         }
@@ -500,7 +500,7 @@
         const paths = [];
         if (item.syncLiveReady === true) paths.push('live Send Update');
         if (item.syncLocalNetworkReady === true) paths.push('Same-Home Pickup');
-        if (item.syncMailboxReady === true) paths.push('Later Pickup');
+        if (item.syncMailboxReady === true) paths.push('away/later pickup');
         return paths.length
             ? `${targetCount} verified ${targetCount === 1 ? 'device can' : 'devices can'} receive by ${paths.join(' + ')}.`
             : `${readyCount} verified ${readyCount === 1 ? 'queue is' : 'queues are'} ready.`;
@@ -786,7 +786,7 @@
         const title = document.createElement('strong');
         title.textContent = 'Family device map';
         const detail = document.createElement('span');
-        detail.textContent = 'Each tile is a protected profile you can manage. Pair and verify before any other device can receive parent-approved updates.';
+        detail.textContent = 'Each tile is a protected profile or device you can manage. The same map covers ready-now, same-home, and away/later updates after pairing.';
         copy.append(title, detail);
 
         const ring = document.createElement('div');
@@ -815,9 +815,9 @@
             route.textContent = item.syncLocalNetworkReady === true
                 ? 'Same-Home Pickup'
                 : item.syncMailboxReady === true
-                    ? 'Later Pickup'
+                    ? 'Away/later pickup'
                     : item.syncLiveReady === true
-                        ? 'Live now'
+                        ? 'Ready now'
                         : syncState.label;
             const target = document.createElement('small');
             target.textContent = item.syncTargetCount > 0
@@ -841,7 +841,7 @@
 
         const note = document.createElement('div');
         note.className = 'ft-managed-command-center__trust-note';
-        note.textContent = 'Same-network control is a delivery path only after Same-Home Pickup setup. Wi-Fi, LAN visibility, and servers never become authority.';
+        note.textContent = 'Ready-now, same-home, and away pickup are delivery states only. Wi-Fi, LAN visibility, online services, and saved device cards never become authority.';
 
         map.append(copy, ring, note);
         return map;
