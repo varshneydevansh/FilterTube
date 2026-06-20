@@ -98,17 +98,31 @@ scope/revision/policy-hash tuple.
 ```text
 js/tab-view.js
   NANAH_MANAGED_LOCAL_NETWORK_SYNC_STATE_KEY = ftNanahManagedLocalNetworkSyncState
+  NANAH_MANAGED_LOCAL_NETWORK_HEALTH_KEY = ftManagedLocalNetworkProviderHealthState
   loadNanahManagedLocalNetworkSyncState()
   persistNanahManagedLocalNetworkSyncState(...)
   getNanahManagedLocalNetworkProvider()
+  checkNanahManagedLocalNetworkProviderHealth(...)
   buildNanahManagedLocalNetworkDiscoveryRequest(...)
   getNanahManagedLocalNetworkEligibleLinks(...)
   pullNanahManagedLocalNetworkCandidates(...)
-  configured provider readiness check during Home Bridge setup
+  configured provider readiness check during Home Bridge setup and manual Check Bridge action
   runNanahManagedLocalNetworkSync(...)
   local-network ack handoff via ackManagedPolicyCandidates(...)
   protected ack-history rows via recordManagedOpenSyncAckHistory(...)
 ```
+
+The Home Bridge setup path stores only a redacted health state:
+
+```text
+schema, version, checkedAt, endpointHost, ok, reason
+```
+
+It never stores PINs, private keys, plaintext rules, channel lists, keywords,
+viewing history, trusted-link secrets, or policy envelopes. The Accounts & Sync
+delivery strip can then tell a parent whether the last bridge check passed or
+failed and how old that check is. This is feedback only; it is not a saved
+permission and does not make a bridge authoritative.
 
 The dashboard trusted-link card now shows a parent-facing `Home Bridge` status
 row for managed replica links. Earlier proof called the same row `Local
@@ -161,6 +175,7 @@ runtime local-network provider failure fail-closed apply guard: present
 runtime local-network provider ack handoff: present
 runtime protected local-network ack-handoff history writer: present
 runtime local-network status persistence: present
+runtime local-network provider health status persistence: present and redacted
 runtime local-network provider client response allowlist sanitizer: present
 runtime local-network provider readiness check: present and non-authoritative
 runtime unconfigured local-network provider network probe: absent

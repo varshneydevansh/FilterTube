@@ -535,7 +535,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /It is not automatic Wi-Fi discovery\. Being on the same network is not enough to change rules/);
   assert.match(source, /This is not automatic LAN discovery; normal parent control uses live Send Update/);
   assert.match(source, /Bridge set up: \$\{host\}/);
-  assert.match(source, /Reachability is checked only when sending or checking saved updates/);
+  assert.match(source, /Reachability is only a send path check; trusted parent policy still decides what can apply/);
+  assert.match(source, /Check Bridge/);
   assert.match(source, /function isNanahManagedLinkSavedUpdateEnabled\(link\)/);
   assert.match(source, /policy\.syncOnProfileOpen !== true/);
   assert.match(source, /lockedChildMode\)\.toLowerCase\(\) === 'allow_trusted_updates'/);

@@ -200,6 +200,7 @@ test('local-network provider hook is docs-backed and linked from managed parent 
   assert.match(doc, /runtime local-network provider ack handoff: present/);
   assert.match(doc, /runtime protected local-network ack-handoff history writer: present/);
   assert.match(doc, /runtime local-network provider readiness check: present and non-authoritative/);
+  assert.match(doc, /runtime local-network provider health status persistence: present and redacted/);
   assert.match(doc, /runtime built-in LAN peer discovery: absent/);
   assert.match(doc, /runtime YouTube page hot-path work from this slice: absent/);
   assert.match(doc, /No matching parent link \(age\)/);
@@ -233,6 +234,12 @@ test('dashboard source wires provider-gated local-network discovery without YouT
   assert.match(source, /discoverManagedPolicyCandidates/);
   assert.match(source, /discoverLocalNetworkCandidates/);
   assert.match(source, /checkManagedLocalNetworkBridge/);
+  assert.match(source, /const NANAH_MANAGED_LOCAL_NETWORK_HEALTH_KEY = 'ftManagedLocalNetworkProviderHealthState'/);
+  assert.match(source, /function writeNanahManagedLocalNetworkProviderHealthState\(state\)/);
+  assert.match(source, /function checkNanahManagedLocalNetworkProviderHealth\(\{ reason = 'manual_check', silent = false \} = \{\}\)/);
+  assert.match(source, /Check Bridge/);
+  assert.match(source, /Last bridge check passed/);
+  assert.match(source, /Last bridge check did not pass/);
   assert.match(source, /Bridge saved and reachable/);
   assert.match(source, /Bridge saved, but it did not answer the readiness check/);
   assert.match(source, /filtertube_managed_local_network_candidate_ack/);

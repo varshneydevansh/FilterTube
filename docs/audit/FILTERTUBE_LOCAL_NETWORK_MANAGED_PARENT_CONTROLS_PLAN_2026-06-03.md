@@ -670,6 +670,15 @@ parent tool instead of a sync/debug console.
     still works when both verified devices are open. This changes only
     availability wording and click gating; trusted-link, target-profile, scope,
     revision, hash, signature, provider, and local apply gates are unchanged.
+  - [x] 2026-06-20 Home Bridge parent-facing health state slice: configured
+    Home Bridge setup now records a redacted last-check state and exposes a
+    `Check Bridge` action from the same setup flow. The saved state contains
+    only endpoint host, timestamp, ok/reason feedback, and schema/version. It
+    stores no PINs, private keys, trusted-link secrets, plaintext rules,
+    channels, keywords, policy envelopes, or history rows. The card can tell a
+    parent whether the bridge was recently reachable, but bridge reachability
+    remains feedback only; signed trusted-link policy validation still decides
+    what can apply.
   - [x] 2026-06-20 Family Device Updates first-read copy slice: the Accounts &
     Sync intro now keeps the normal live path in plain parent language and moves
     later pickup under `More options`. The visible copy says the other device can

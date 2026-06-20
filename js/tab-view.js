@@ -13519,7 +13519,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         details,
         configured = false,
         configureLabel,
-        disableLabel
+        disableLabel,
+        extraChoices = []
     } = {}) {
         const choices = [
             {
@@ -13528,6 +13529,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 className: configured ? 'btn-secondary' : 'btn-primary'
             }
         ];
+        safeArray(extraChoices).forEach((choice) => {
+            const value = normalizeString(choice?.value);
+            const label = normalizeString(choice?.label);
+            if (!value || !label) return;
+            choices.push({
+                value,
+                label,
+                className: normalizeString(choice?.className) || 'btn-secondary'
+            });
+        });
         if (configured) {
             choices.push({
                 value: 'disable',
@@ -13639,6 +13650,55 @@ document.addEventListener('DOMContentLoaded', async () => {
         UIComponents.showToast('Later Pickup saved', 'success');
     }
 
+    async function checkNanahManagedLocalNetworkProviderHealth({ reason = 'manual_check', silent = false } = {}) {
+        const provider = getNanahManagedLocalNetworkProvider();
+        const checkBridge = provider && (
+            provider.checkManagedLocalNetworkBridge
+            || provider.checkBridgeHealth
+            || provider.healthCheck
+        );
+        const endpointHost = normalizeString(provider?.endpointHost) || getManagedLocalNetworkEndpointHostFromConfig(readNanahManagedLocalNetworkProviderConfig());
+        if (typeof checkBridge !== 'function') {
+            writeNanahManagedLocalNetworkProviderHealthState({
+                checkedAt: Date.now(),
+                endpointHost,
+                ok: false,
+                reason: 'health_check_unavailable'
+            });
+            if (!silent) UIComponents.showToast('Bridge saved, but readiness could not be checked', 'warning');
+            return { ok: false, reason: 'health_check_unavailable' };
+        }
+        try {
+            const health = await checkBridge.call(provider, {
+                reason: normalizeString(reason) || 'manual_check',
+                requestedAt: Date.now()
+            });
+            const ok = health?.ok !== false && health?.bridgeReachable !== false;
+            writeNanahManagedLocalNetworkProviderHealthState({
+                checkedAt: Date.now(),
+                endpointHost: normalizeString(health?.endpointHost) || endpointHost,
+                ok,
+                reason: ok ? '' : (normalizeString(health?.reason) || 'bridge_unreachable')
+            });
+            if (!silent) {
+                UIComponents.showToast(
+                    ok ? 'Bridge saved and reachable' : 'Bridge saved, but it did not answer the readiness check',
+                    ok ? 'success' : 'warning'
+                );
+            }
+            return { ok, reason: normalizeString(health?.reason) };
+        } catch (error) {
+            writeNanahManagedLocalNetworkProviderHealthState({
+                checkedAt: Date.now(),
+                endpointHost,
+                ok: false,
+                reason: normalizeString(error?.message) || 'health_check_failed'
+            });
+            if (!silent) UIComponents.showToast('Bridge saved, but readiness could not be checked', 'warning');
+            return { ok: false, reason: normalizeString(error?.message) || 'health_check_failed' };
+        }
+    }
+
     async function configureNanahManagedLocalNetworkProvider() {
         const root = safeObject(profilesV4Cache);
         const currentActiveProfileId = normalizeString(root.activeProfileId) || 'default';
@@ -13661,9 +13721,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             ],
             configured: !!currentEndpoint,
             configureLabel: currentEndpoint ? 'Edit Bridge' : 'Set Up Same-Network Bridge',
-            disableLabel: 'Turn Off Bridge'
+            disableLabel: 'Turn Off Bridge',
+            extraChoices: currentEndpoint ? [{ value: 'check', label: 'Check Bridge', className: 'btn-secondary' }] : []
         });
         if (action === null) return;
+        if (action === 'check') {
+            await checkNanahManagedLocalNetworkProviderHealth({ reason: 'manual_provider_check' });
+            renderNanahDeliveryPathStrip();
+            return;
+        }
         if (action === 'disable') {
             writeNanahManagedLocalNetworkProviderConfig({});
             await recordManagedLocalNetworkProviderConfigHistory({
@@ -13721,30 +13787,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             endpointHost: getManagedLocalNetworkEndpointHostFromConfig(nextConfig)
         });
         await refreshProfilesUI();
-        try {
-            const savedProvider = getNanahManagedLocalNetworkProvider();
-            const checkBridge = savedProvider && (
-                savedProvider.checkManagedLocalNetworkBridge
-                || savedProvider.checkBridgeHealth
-                || savedProvider.healthCheck
-            );
-            if (typeof checkBridge === 'function') {
-                const health = await checkBridge.call(savedProvider, {
-                    reason: 'configure',
-                    requestedAt: Date.now()
-                });
-                if (health?.ok === false) {
-                    UIComponents.showToast('Bridge saved, but it did not answer the readiness check', 'warning');
-                    return;
-                }
-                UIComponents.showToast('Bridge saved and reachable', 'success');
-                return;
-            }
-        } catch (_) {
-            UIComponents.showToast('Bridge saved, but readiness could not be checked', 'warning');
-            return;
-        }
-        UIComponents.showToast('Bridge saved', 'success');
+        await checkNanahManagedLocalNetworkProviderHealth({ reason: 'configure' });
     }
 
     function hasNanahManagedMailboxUploadWriter(provider = getNanahManagedMailboxProvider()) {
@@ -14825,6 +14868,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const NANAH_MANAGED_LOCAL_NETWORK_CONFIG_KEY = 'ftManagedLocalNetworkProviderConfig';
+    const NANAH_MANAGED_LOCAL_NETWORK_HEALTH_KEY = 'ftManagedLocalNetworkProviderHealthState';
 
     function readNanahManagedLocalNetworkProviderConfig() {
         try {
@@ -14832,6 +14876,56 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (_) {
             return {};
         }
+    }
+
+    function readNanahManagedLocalNetworkProviderHealthState() {
+        try {
+            return safeObject(JSON.parse(localStorage.getItem(NANAH_MANAGED_LOCAL_NETWORK_HEALTH_KEY) || '{}'));
+        } catch (_) {
+            return {};
+        }
+    }
+
+    function writeNanahManagedLocalNetworkProviderHealthState(state) {
+        try {
+            const root = safeObject(state);
+            if (!normalizeString(root.endpointHost) && !normalizeNonNegativeInteger(root.checkedAt)) {
+                localStorage.removeItem(NANAH_MANAGED_LOCAL_NETWORK_HEALTH_KEY);
+                return {};
+            }
+            const clean = {
+                schema: 'filtertube_managed_local_network_health_state',
+                version: 1,
+                checkedAt: normalizeNonNegativeInteger(root.checkedAt) || Date.now(),
+                endpointHost: normalizeString(root.endpointHost).slice(0, 160),
+                ok: root.ok === true,
+                reason: normalizeString(root.reason).slice(0, 160)
+            };
+            localStorage.setItem(NANAH_MANAGED_LOCAL_NETWORK_HEALTH_KEY, JSON.stringify(clean));
+            return clean;
+        } catch (_) {
+            return {};
+        }
+    }
+
+    function clearNanahManagedLocalNetworkProviderHealthState() {
+        try {
+            localStorage.removeItem(NANAH_MANAGED_LOCAL_NETWORK_HEALTH_KEY);
+        } catch (_) {
+        }
+    }
+
+    function formatManagedProviderCheckedAge(checkedAt) {
+        const timestamp = normalizeNonNegativeInteger(checkedAt);
+        if (!timestamp) return '';
+        const elapsedMs = Math.max(0, Date.now() - timestamp);
+        const elapsedSeconds = Math.floor(elapsedMs / 1000);
+        if (elapsedSeconds < 60) return 'just now';
+        const elapsedMinutes = Math.floor(elapsedSeconds / 60);
+        if (elapsedMinutes < 60) return `${elapsedMinutes}m ago`;
+        const elapsedHours = Math.floor(elapsedMinutes / 60);
+        if (elapsedHours < 24) return `${elapsedHours}h ago`;
+        return `${Math.floor(elapsedHours / 24)}d ago`;
     }
 
     function getManagedLocalNetworkEndpointHostFromConfig(config) {
@@ -14849,6 +14943,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const root = safeObject(config);
             if (!normalizeString(root.endpointUrl || root.url || root.baseUrl)) {
                 localStorage.removeItem(NANAH_MANAGED_LOCAL_NETWORK_CONFIG_KEY);
+                clearNanahManagedLocalNetworkProviderHealthState();
                 delete window.FilterTubeManagedPolicyLocalNetwork;
                 return null;
             }
@@ -14886,10 +14981,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 tone: 'warning'
             };
         }
+        const health = readNanahManagedLocalNetworkProviderHealthState();
+        const checkedAge = formatManagedProviderCheckedAge(health.checkedAt);
+        const sameHost = !normalizeString(health.endpointHost) || normalizeString(health.endpointHost) === host;
+        const healthDetail = checkedAge && sameHost
+            ? (health.ok === true
+                ? `Last bridge check passed ${checkedAge}.`
+                : `Last bridge check did not pass ${checkedAge}.`)
+            : 'Run Check/Edit if you want to verify the bridge is reachable now.';
         return {
             configured: true,
             label: `Bridge set up: ${host}`,
-            detail: 'Same-network pickup can use your configured bridge. Reachability is checked only when sending or checking saved updates; trust still decides what can apply.',
+            detail: `${healthDetail} Reachability is only a send path check; trusted parent policy still decides what can apply.`,
             tone: 'success'
         };
     }
