@@ -840,13 +840,17 @@
             const name = document.createElement('strong');
             name.textContent = item.profileName || 'Protected profile';
             const route = document.createElement('span');
-            route.textContent = item.syncLocalNetworkReady === true
-                ? 'Same Home - Same-Home Pickup'
-                : item.syncMailboxReady === true
-                    ? 'Away / Next Open - Later Pickup'
-                    : item.syncLiveReady === true
-                        ? 'Ready now'
-                        : syncState.label;
+            let routeLabel = syncState.label;
+            if (item.syncLocalNetworkReady === true && item.syncMailboxReady === true) {
+                routeLabel = 'Multiple send paths';
+            } else if (item.syncLocalNetworkReady === true) {
+                routeLabel = 'Same Home - Same-Home Pickup';
+            } else if (item.syncMailboxReady === true) {
+                routeLabel = 'Away / Next Open - Later Pickup';
+            } else if (item.syncLiveReady === true) {
+                routeLabel = 'Live Now - Send Update';
+            }
+            route.textContent = routeLabel;
             const target = document.createElement('small');
             target.textContent = item.syncTargetCount > 0
                 ? (item.syncTargetLabel || `${item.syncTargetCount} verified device${item.syncTargetCount === 1 ? '' : 's'}`)

@@ -863,6 +863,11 @@ parent tool instead of a sync/debug console.
     and configured internet/later profiles as `Away / Next Open - Later Pickup`.
     The label change keeps both paths in one parent-facing map; transport names
     remain delivery states, not authority.
+  - [x] 2026-06-21 unified map state slice: the command-center map now preserves
+    `Multiple send paths` when both Same-Home Pickup and Later Pickup are
+    available, and live-only devices read as `Live Now - Send Update`. This
+    matches the parent mental model of one map with live, same-home, away/next
+    open, and setup-needed states.
   - [x] 2026-06-21 live session direction slice: trusted parent links now label
     local source roles as `Open Send Session` and local protected replica roles
     as `Open Receive Session`. Protected surfaces can open a receive session for

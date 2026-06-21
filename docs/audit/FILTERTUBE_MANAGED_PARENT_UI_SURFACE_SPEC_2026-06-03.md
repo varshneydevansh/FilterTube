@@ -100,6 +100,10 @@ the same map vocabulary in their compact sync chip. Live paths say
 paths say `Multiple send paths`. This changes only parent-facing labels; the
 trusted-link, target-profile, revision, device-binding, hash, and signature
 checks remain the runtime authority.
+2026-06-21 command-center map-state addendum: the visual family-device map now
+keeps combined Same-Home/Later Pickup devices as `Multiple send paths` instead
+of hiding the internet path behind same-home priority. Live-only devices read
+as `Live Now - Send Update` to match the parent-facing state model.
 2026-06-21 per-profile pickup-readiness addendum: command-center Later Pickup
 and Same-Home Pickup readiness now requires both a configured provider and a
 saved update-enabled trusted link for that protected profile. A configured
