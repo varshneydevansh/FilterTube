@@ -943,7 +943,7 @@
             const setupTitle = document.createElement('strong');
             setupTitle.className = 'ft-managed-command-center__setup-title';
             setupTitle.textContent = 'First setup';
-            setupTitle.title = 'Use this from the parent/master profile. Child profiles do not receive admin controls.';
+            setupTitle.title = 'Use this from the parent/master profile. Protected profiles do not receive admin controls.';
 
             const setupCopy = document.createElement('div');
             setupCopy.className = 'help-item-body';
@@ -962,7 +962,7 @@
                 },
                 {
                     text: 'Add keywords, channels, whitelist, or blocklist rules',
-                    title: 'Rules are edited from the parent/account surface, not from the child surface.'
+                    title: 'Rules are edited from the parent/account surface, not from the protected surface.'
                 },
                 {
                     text: 'Pair another device only when it also needs these rules',
@@ -1061,7 +1061,7 @@
                 label: 'Choose profile',
                 detail: `${summary.profileCount} protected ${summary.profileCount === 1 ? 'profile' : 'profiles'} available`,
                 tone: 'neutral',
-                title: 'Choose the child, family member, or other protected profile you want to manage.'
+                title: 'Choose the family member or other protected profile you want to manage.'
             },
             {
                 step: '2',

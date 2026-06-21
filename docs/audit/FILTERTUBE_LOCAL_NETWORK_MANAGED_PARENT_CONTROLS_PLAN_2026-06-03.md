@@ -1025,6 +1025,11 @@ parent tool instead of a sync/debug console.
   `one_family_device_map_for_live_same_network_and_internet_devices` instead of
   home-only state ids. This keeps downstream app parity aligned with the
   extension's Family Device map wording.
+- [x] 2026-06-21 protected-profile wording cleanup slice: parent-visible
+  toasts, Help copy, and Family Controls setup titles now say protected profile
+  or protected user instead of child-only wording. Internal `child` profile type
+  names remain unchanged to avoid migration churn, but the UI now fits kids,
+  dependents, and independent protected profiles.
 - [ ] Native Android/iOS settings-lock and timeout UI parity. This belongs in
   the downstream app sync/runtime lane.
 

@@ -853,7 +853,7 @@ function initializeFiltersTabs() {
         const previousSignature = lastSavedCategoryFiltersSignatureMain;
         if (signature && (signature === priorSignature || (!managedState && signature === previousSignature))) {
             if (showToast && Date.now() - lastCategoryFiltersToastTs > 900) {
-                UIComponents.showToast(managedState ? 'Child category filters saved' : 'Category filters saved', 'success');
+                UIComponents.showToast(managedState ? 'Protected profile category filters saved' : 'Category filters saved', 'success');
                 lastCategoryFiltersToastTs = Date.now();
             }
             return;
@@ -876,7 +876,7 @@ function initializeFiltersTabs() {
         }
 
         if (showToast) {
-            UIComponents.showToast(managedState ? 'Child category filters saved' : 'Category filters saved', 'success');
+            UIComponents.showToast(managedState ? 'Protected profile category filters saved' : 'Category filters saved', 'success');
             lastCategoryFiltersToastTs = Date.now();
         }
     }
@@ -1197,7 +1197,7 @@ function initializeFiltersTabs() {
                 const ts = Date.now();
                 if (ts - lastVideoFiltersToastTs < 800) return;
                 lastVideoFiltersToastTs = ts;
-                UIComponents.showToast(managedState ? 'Child video filters saved' : 'Video filters saved', 'success');
+                UIComponents.showToast(managedState ? 'Protected profile video filters saved' : 'Video filters saved', 'success');
             })
             .catch((err) => {
                 console.error('Failed to save video filters:', err);
@@ -2086,7 +2086,7 @@ function initializeKidsTabs() {
 
         Promise.resolve(savePromise)
             .then(() => {
-                if (showToast) UIComponents.showToast(managedState ? 'Child Kids category filters saved' : 'Kids category filters saved', 'success');
+                if (showToast) UIComponents.showToast(managedState ? 'Protected profile Kids category filters saved' : 'Kids category filters saved', 'success');
             })
             .catch(() => {
                 if (showToast) UIComponents.showToast('Failed to save kids category filters', 'error');
@@ -2299,7 +2299,7 @@ function initializeKidsTabs() {
                 const ts = Date.now();
                 if (ts - lastKidsVideoFiltersToastTs < 800) return;
                 lastKidsVideoFiltersToastTs = ts;
-                UIComponents.showToast(managedState ? 'Child Kids video filters saved' : 'Kids video filters saved', 'success');
+                UIComponents.showToast(managedState ? 'Protected profile Kids video filters saved' : 'Kids video filters saved', 'success');
             })
             .catch(() => {
                 if (showToast) UIComponents.showToast('Failed to save kids video filters', 'error');
@@ -6559,7 +6559,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function updateChildProfileCapabilityControls() {
         const isChild = getActiveProfileType() === 'child';
         const scopedProtectedEdit = isManagedChildEditActive();
-        const childTitle = 'Child profiles cannot manage backup, import/export, or account-admin actions here.';
+        const childTitle = 'Protected profiles cannot manage backup, import/export, or account-admin actions here.';
         const scopedTitle = 'Finish protected-profile editing before changing global account, Master PIN, or create-profile controls.';
         const syncKidsToMainToggle = document.getElementById('setting_syncKidsToMain');
 
@@ -6641,7 +6641,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return true;
     }
 
-    function ensureNonChildAdminAction(message = 'Child profiles cannot manage this action here.') {
+    function ensureNonChildAdminAction(message = 'Protected profiles cannot manage this action here.') {
         if (!isChildProfileAdminSurface()) return true;
         UIComponents.showToast(message, 'error');
         return false;
@@ -6658,7 +6658,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Child profiles cannot change viewing access', 'error');
+            UIComponents.showToast('Protected profiles cannot change viewing access', 'error');
             return;
         }
         const allowedManager = currentActive === targetId || canActiveProfileManageProfile(fresh, targetId);
@@ -6755,7 +6755,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Child profiles cannot change viewing access', 'error');
+            UIComponents.showToast('Protected profiles cannot change viewing access', 'error');
             return;
         }
 
@@ -6926,7 +6926,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Child profiles cannot change time limits', 'error');
+            UIComponents.showToast('Protected profiles cannot change time limits', 'error');
             return;
         }
         if (!canActiveProfileManageProfile(fresh, targetId)) {
@@ -7007,7 +7007,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Child profiles cannot change time limits', 'error');
+            UIComponents.showToast('Protected profiles cannot change time limits', 'error');
             return;
         }
 
@@ -7160,7 +7160,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Child profiles cannot grant extra time', 'error');
+            UIComponents.showToast('Protected profiles cannot grant extra time', 'error');
             return;
         }
 
@@ -9482,7 +9482,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Child profiles cannot change managed rules', 'error');
+            UIComponents.showToast('Protected profiles cannot change managed rules', 'error');
             return;
         }
 
@@ -9618,7 +9618,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Child profiles cannot import managed lists', 'error');
+            UIComponents.showToast('Protected profiles cannot import managed lists', 'error');
             return;
         }
 
@@ -9933,7 +9933,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Child profiles cannot remove managed lists', 'error');
+            UIComponents.showToast('Protected profiles cannot remove managed lists', 'error');
             return;
         }
 
@@ -10084,7 +10084,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Child profiles cannot change managed lists', 'error');
+            UIComponents.showToast('Protected profiles cannot change managed lists', 'error');
             return;
         }
 
@@ -10240,7 +10240,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Child profiles cannot refresh managed lists', 'error');
+            UIComponents.showToast('Protected profiles cannot refresh managed lists', 'error');
             return;
         }
 
@@ -10440,7 +10440,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Child profiles cannot refresh managed lists', 'error');
+            UIComponents.showToast('Protected profiles cannot refresh managed lists', 'error');
             return;
         }
 
@@ -10662,7 +10662,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Child profiles cannot manage lists', 'error');
+            UIComponents.showToast('Protected profiles cannot manage lists', 'error');
             return;
         }
 
@@ -16119,11 +16119,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 editBtn.textContent = 'Edit Trust';
                 editBtn.disabled = childManagedReplicaLink;
                 editBtn.title = childManagedReplicaLink
-                    ? 'Child profiles cannot edit trusted parent policy from this surface.'
+                    ? 'Protected profiles cannot edit trusted parent policy from this surface.'
                     : '';
                 editBtn.addEventListener('click', async () => {
                     if (childManagedReplicaLink) {
-                        UIComponents.showToast('Child profiles cannot edit trusted parent link policy here', 'error');
+                        UIComponents.showToast('Protected profiles cannot edit trusted parent link policy here', 'error');
                         return;
                     }
                     await configureNanahTrustedLink(entry);
@@ -16182,7 +16182,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 rotateKeyBtn.disabled = childAdminRestricted;
                 rotateKeyBtn.addEventListener('click', async () => {
                     if (childAdminRestricted) {
-                        UIComponents.showToast('Child profiles cannot rotate managed trust keys', 'error');
+                        UIComponents.showToast('Protected profiles cannot rotate managed trust keys', 'error');
                         return;
                     }
                     try {
@@ -16201,11 +16201,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             removeBtn.textContent = 'Remove';
             removeBtn.disabled = childManagedReplicaLink;
             removeBtn.title = childManagedReplicaLink
-                ? 'Child profiles cannot remove a trusted parent link from this surface.'
+                ? 'Protected profiles cannot remove a trusted parent link from this surface.'
                 : '';
             removeBtn.addEventListener('click', async () => {
                 if (childManagedReplicaLink) {
-                    UIComponents.showToast('Child profiles cannot remove trusted parent links here', 'error');
+                    UIComponents.showToast('Protected profiles cannot remove trusted parent links here', 'error');
                     return;
                 }
                 await removeNanahTrustedLink(entry?.linkId);
@@ -18245,7 +18245,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const root = safeObject(profilesV4);
         const profiles = safeObject(root.profiles);
         const childAdminRestricted = isChildProfileAdminSurface();
-        const childAdminTitle = 'Child profiles cannot manage profile names, deletion, PIN rules, viewing spaces, time limits, or profile switching PINs from this surface.';
+        const childAdminTitle = 'Protected profiles cannot manage profile names, deletion, PIN rules, viewing spaces, time limits, or profile switching PINs from this surface.';
 
         ftProfilesManager.innerHTML = '';
 
@@ -18280,7 +18280,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         if (ftCreateChildBtn && !ftCreateChildBtn.disabled) {
                             ftCreateChildBtn.click();
                         } else {
-                            UIComponents.showToast('Switch to a parent/account profile to create a child profile', 'error');
+                            UIComponents.showToast('Switch to a parent/account profile to create a protected profile', 'error');
                         }
                     } else if (action === 'create_account') {
                         if (ftCreateAccountBtn && !ftCreateAccountBtn.disabled) {
@@ -18436,7 +18436,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             renameBtn.title = childAdminRestricted ? childAdminTitle : '';
             renameBtn.addEventListener('click', async () => {
                 if (childAdminRestricted) {
-                    UIComponents.showToast('Child profiles cannot rename profiles here', 'error');
+                    UIComponents.showToast('Protected profiles cannot rename profiles here', 'error');
                     return;
                 }
                 const io = window.FilterTubeIO || {};
@@ -18487,7 +18487,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             deleteBtn.title = childAdminRestricted ? childAdminTitle : '';
             deleteBtn.addEventListener('click', async () => {
                 if (childAdminRestricted) {
-                    UIComponents.showToast('Child profiles cannot delete profiles here', 'error');
+                    UIComponents.showToast('Protected profiles cannot delete profiles here', 'error');
                     return;
                 }
                 if (profileId === 'default') return;
@@ -18540,7 +18540,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             mainAccessBtn.title = childAdminRestricted ? childAdminTitle : 'Toggle whether this profile can open Main YouTube.';
             mainAccessBtn.addEventListener('click', async () => {
                 if (childAdminRestricted) {
-                    UIComponents.showToast('Child profiles cannot change viewing access here', 'error');
+                    UIComponents.showToast('Protected profiles cannot change viewing access here', 'error');
                     return;
                 }
                 await updateProfileViewingAccess(profileId, { main: !access.main });
@@ -18554,7 +18554,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             kidsAccessBtn.title = childAdminRestricted ? childAdminTitle : 'Toggle whether this profile can open YouTube Kids.';
             kidsAccessBtn.addEventListener('click', async () => {
                 if (childAdminRestricted) {
-                    UIComponents.showToast('Child profiles cannot change viewing access here', 'error');
+                    UIComponents.showToast('Protected profiles cannot change viewing access here', 'error');
                     return;
                 }
                 await updateProfileViewingAccess(profileId, { kids: !access.kids });
@@ -18572,7 +18572,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             timeLimitBtn.title = childAdminRestricted ? childAdminTitle : 'Set the daily YouTube time limit for this profile.';
             timeLimitBtn.addEventListener('click', async () => {
                 if (childAdminRestricted) {
-                    UIComponents.showToast('Child profiles cannot change time limits here', 'error');
+                    UIComponents.showToast('Protected profiles cannot change time limits here', 'error');
                     return;
                 }
                 await updateProfileTimeLimitPolicy(profileId, 'set');
@@ -18588,7 +18588,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 disableTimeLimitBtn.title = childAdminRestricted ? childAdminTitle : 'Disable the daily YouTube time limit for this profile.';
                 disableTimeLimitBtn.addEventListener('click', async () => {
                     if (childAdminRestricted) {
-                        UIComponents.showToast('Child profiles cannot change time limits here', 'error');
+                        UIComponents.showToast('Protected profiles cannot change time limits here', 'error');
                         return;
                     }
                     await updateProfileTimeLimitPolicy(profileId, 'disable');
@@ -18631,7 +18631,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     : 'Set the profile switching PIN. This protects entry into this profile; it does not grant parent/admin authority.';
                 pinBtn.addEventListener('click', async () => {
                     if (childAdminRestricted) {
-                        UIComponents.showToast('Child profiles cannot manage profile switching PINs here', 'error');
+                        UIComponents.showToast('Protected profiles cannot manage profile switching PINs here', 'error');
                         return;
                     }
                     const io = window.FilterTubeIO || {};
@@ -18716,7 +18716,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     : 'Remove the profile switching PIN. Parent/admin authority is not changed.';
                 clearPinBtn.addEventListener('click', async () => {
                     if (childAdminRestricted) {
-                        UIComponents.showToast('Child profiles cannot manage profile switching PINs here', 'error');
+                        UIComponents.showToast('Protected profiles cannot manage profile switching PINs here', 'error');
                         return;
                     }
                     const io = window.FilterTubeIO || {};
@@ -19077,7 +19077,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
     async function runExportV3() {
-        if (!ensureNonChildAdminAction('Child profiles cannot export backups from this surface.')) {
+        if (!ensureNonChildAdminAction('Protected profiles cannot export backups from this surface.')) {
             return;
         }
         const io = window.FilterTubeIO;
@@ -19141,7 +19141,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function runExportV3Encrypted() {
-        if (!ensureNonChildAdminAction('Child profiles cannot export encrypted backups from this surface.')) {
+        if (!ensureNonChildAdminAction('Protected profiles cannot export encrypted backups from this surface.')) {
             return;
         }
         const io = window.FilterTubeIO;
@@ -19223,7 +19223,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function runImportV3FromFile(file) {
         if (!file) return;
-        if (!ensureNonChildAdminAction('Child profiles cannot import backups from this surface.')) {
+        if (!ensureNonChildAdminAction('Protected profiles cannot import backups from this surface.')) {
             return;
         }
         const io = window.FilterTubeIO;
@@ -19375,7 +19375,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (ftExportV3Btn) {
         ftExportV3Btn.addEventListener('click', () => {
             if (getActiveProfileType() === 'child') {
-                UIComponents.showToast('Child profiles cannot export backups here', 'error');
+                UIComponents.showToast('Protected profiles cannot export backups here', 'error');
                 return;
             }
             runExportV3();
@@ -19385,7 +19385,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (ftExportV3EncryptedBtn) {
         ftExportV3EncryptedBtn.addEventListener('click', () => {
             if (getActiveProfileType() === 'child') {
-                UIComponents.showToast('Child profiles cannot export encrypted backups here', 'error');
+                UIComponents.showToast('Protected profiles cannot export encrypted backups here', 'error');
                 return;
             }
             runExportV3Encrypted();
@@ -19395,7 +19395,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (ftImportV3Btn && ftImportV3File) {
         ftImportV3Btn.addEventListener('click', () => {
             if (getActiveProfileType() === 'child') {
-                UIComponents.showToast('Child profiles cannot import backups here', 'error');
+                UIComponents.showToast('Protected profiles cannot import backups here', 'error');
                 return;
             }
             ftImportV3File.click();
@@ -19861,7 +19861,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
 
         ftAllowAccountCreation.addEventListener('change', async () => {
-            if (!ensureNonChildAdminAction('Child profiles cannot change account policy here.')) {
+            if (!ensureNonChildAdminAction('Protected profiles cannot change account policy here.')) {
                 updateAdminPolicyControls();
                 return;
             }
@@ -19877,7 +19877,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         ftMaxAccounts.addEventListener('change', async () => {
-            if (!ensureNonChildAdminAction('Child profiles cannot change account policy here.')) {
+            if (!ensureNonChildAdminAction('Protected profiles cannot change account policy here.')) {
                 updateAdminPolicyControls();
                 return;
             }
@@ -19896,7 +19896,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (ftCreateAccountBtn) {
         ftCreateAccountBtn.addEventListener('click', async () => {
-            if (!ensureNonChildAdminAction('Child profiles cannot manage accounts here.')) {
+            if (!ensureNonChildAdminAction('Protected profiles cannot manage accounts here.')) {
                 return;
             }
             if (!ensureNotScopedProtectedEditForGlobalAdmin('account creation')) return;
@@ -20018,7 +20018,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (ftCreateChildBtn) {
         ftCreateChildBtn.addEventListener('click', async () => {
-            if (!ensureNonChildAdminAction('Child profiles cannot create child profiles here.')) {
+            if (!ensureNonChildAdminAction('Protected profiles cannot create protected profiles here.')) {
                 return;
             }
             if (!ensureNotScopedProtectedEditForGlobalAdmin('protected profile creation')) return;
@@ -20032,7 +20032,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const currentActive = normalizeString(profilesV4?.activeProfileId) || 'default';
             const currentType = getProfileType(profilesV4, currentActive);
             if (currentType !== 'account') {
-                UIComponents.showToast('Switch to the parent account to create a child profile', 'error');
+                UIComponents.showToast('Switch to the parent account to create a protected profile', 'error');
                 return;
             }
 
@@ -20127,7 +20127,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (ftSetMasterPinBtn) {
         ftSetMasterPinBtn.addEventListener('click', async () => {
-            if (!ensureNonChildAdminAction('Child profiles cannot manage the Master PIN here.')) {
+            if (!ensureNonChildAdminAction('Protected profiles cannot manage the Master PIN here.')) {
                 return;
             }
             if (!ensureNotScopedProtectedEditForGlobalAdmin('Master PIN controls')) return;
@@ -20203,7 +20203,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (ftClearMasterPinBtn) {
         ftClearMasterPinBtn.addEventListener('click', async () => {
-            if (!ensureNonChildAdminAction('Child profiles cannot manage the Master PIN here.')) {
+            if (!ensureNonChildAdminAction('Protected profiles cannot manage the Master PIN here.')) {
                 return;
             }
             if (!ensureNotScopedProtectedEditForGlobalAdmin('Master PIN controls')) return;
@@ -20255,7 +20255,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (ftLockAdminSessionBtn) {
         ftLockAdminSessionBtn.addEventListener('click', async () => {
-            if (!ensureNonChildAdminAction('Child profiles cannot lock parent/admin sessions here.')) {
+            if (!ensureNonChildAdminAction('Protected profiles cannot lock parent/admin sessions here.')) {
                 return;
             }
             if (!ensureNotScopedProtectedEditForGlobalAdmin('admin session controls')) return;
@@ -21715,7 +21715,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     return true;
                 });
                 if (saved) {
-                    UIComponents.showToast(surface === 'kids' ? 'Child Kids setting saved' : 'Child Main setting saved', 'success');
+                    UIComponents.showToast(surface === 'kids' ? 'Protected profile Kids setting saved' : 'Protected profile Main setting saved', 'success');
                 }
                 updateCheckboxes();
                 return;
