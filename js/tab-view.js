@@ -13500,7 +13500,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return {
                 configured: false,
                 label: 'Later Pickup off',
-                detail: 'Send Now works when both devices are open. Set this up only when a verified protected device must collect a parent-approved update after opening later.',
+                detail: 'Send Now works when both devices are open. Set this up only when a verified protected device must collect a parent-approved update later or away over the internet.',
                 tone: 'warning'
             };
         }
@@ -13523,7 +13523,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return {
             configured: true,
             label: `Later Pickup ready: ${host}`,
-            detail: 'A verified protected device can check for signed parent updates after opening. It still accepts only trusted parent updates.',
+            detail: 'A verified protected device can check for signed parent updates when it opens later or away. It still accepts only trusted parent updates.',
             tone: 'success'
         };
     }
@@ -13591,7 +13591,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ? 'Create a protected profile before setting up Later Pickup.'
                     : (!hasVerifiedDevice
                         ? 'Pair a verified protected device before setting up Later Pickup.'
-                        : 'Optional: set this up only when a verified protected device away from this network must collect an update after opening later.'));
+                        : 'Optional: set this up only when a verified protected device must collect an update later, including away over the internet.'));
             ftNanahCompassLaterBtn.setAttribute('aria-label', `Later Pickup. ${ftNanahCompassLaterBtn.title}`);
         }
         if (ftNanahDeliveryMailboxCard) {
@@ -13731,8 +13731,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const current = readNanahManagedMailboxServerConfig();
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
-            title: 'Later Pickup (device opens later)',
-            message: 'Use this only when a protected device should collect an approved update after the parent device is no longer open.',
+            title: 'Later Pickup (away or opens later)',
+            message: 'Use this only when a protected device on the same family map should collect an approved update later, including away over the internet.',
             details: [
                 'For normal family control, open both devices and use Send Now.',
                 'A pickup service can hold unreadable waiting updates, not PINs or plaintext rules.',
@@ -13755,7 +13755,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const endpoint = await showPromptModal({
             title: 'Later Pickup Address',
-            message: 'Enter the trusted HTTPS address that will hold unreadable parent-approved updates until the protected device opens. Leave blank to use Send Now only.',
+            message: 'Enter the trusted HTTPS address that will hold unreadable parent-approved updates until the protected device opens later or away. Leave blank to use Send Now only.',
             placeholder: 'https://your-filtertube-pickup-service',
             inputType: 'url',
             confirmText: currentEndpoint ? 'Save Later Pickup' : 'Enable Later Pickup',

@@ -84,6 +84,11 @@ Both remain delivery states only, not authority.
 command-center trust map now say the same map covers nearby and internet/away
 devices after pairing. Internet devices are represented by `Later Pickup`
 status on the same map, not by a separate map or separate authority model.
+2026-06-21 Later Pickup setup-copy addendum: the setup disclosure and address
+prompt now describe Later Pickup as the same family-device map path for devices
+that open later or are away over the internet. The prompt still frames the HTTPS
+service as optional unreadable waiting-update storage, not profile, PIN, trust,
+or policy authority.
 2026-06-21 legacy parent-trust edit addendum: when editing an older managed
 Source -> Replica parent link that lacks the newer parent-managed fields, the
 edit modal now proposes the current safe defaults: matching parent updates,

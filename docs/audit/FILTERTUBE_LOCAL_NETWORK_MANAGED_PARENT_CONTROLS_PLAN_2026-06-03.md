@@ -745,6 +745,11 @@ parent tool instead of a sync/debug console.
     device path when a trusted online pickup provider is configured. The normal
     live P2P path still requires both devices open, and online pickup services
     still carry only signed updates after trusted-link validation.
+  - [x] 2026-06-21 Later Pickup setup-copy alignment slice: Later Pickup setup
+    modals now say they belong to the same Family Device Updates map and cover
+    verified devices that open later or are away over the internet. The copy
+    keeps the service optional and limited to unreadable waiting-update storage,
+    not authority over profiles, PINs, trust, rules, or time limits.
   - [x] 2026-06-20 away-device Help/docs slice: Help, README, and Functionality
     now explain that Later Pickup is the away/opens-later device path, while
     Same-Home Pickup is the explicitly configured home/school path and Send Now
