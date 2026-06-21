@@ -1011,6 +1011,11 @@ parent tool instead of a sync/debug console.
   Internet Pickup/Home Pickup setup prompts now say those routes belong to the
   same verified family device map. This keeps parent-facing UI from implying
   that same-network pickup or internet pickup creates a second control model.
+- [x] 2026-06-21 pull-on-open proof wording slice: the Nanah managed
+  pull-on-open audit now uses `Internet Pickup`, `Home Pickup`, and
+  same-network wording for release-facing status rows. Mailbox item names remain
+  protocol details, but the proof no longer describes Home Pickup as a bridge or
+  a separate authority model.
 - [ ] Native Android/iOS settings-lock and timeout UI parity. This belongs in
   the downstream app sync/runtime lane.
 

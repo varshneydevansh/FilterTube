@@ -3,10 +3,11 @@
 **Generated**: 2026-06-04
 **Status**: Provider-gated dashboard/profile-open hook, provider ack handoff,
 protected ack-handoff history writer, and explicitly configured browser HTTPS
-mailbox pull/decrypt client are present. Provider-gated Home Bridge candidate
-discovery is present through the configured local-network client; built-in LAN
-peer discovery, built-in LAN transport, and mailbox server authority are still
-absent. Adapter-level local mailbox seal/open helpers are covered separately.
+Internet Pickup pull/decrypt client are present. Provider-gated Home Pickup
+candidate discovery is present through the configured local-network client;
+built-in same-network peer discovery, built-in same-network transport, and
+Internet Pickup service authority are still absent. Adapter-level local mailbox
+seal/open helpers are covered separately.
 Protected-device managed-link setup now defaults to parent-managed open checks
 and writes an eligible `allow_trusted_updates` policy when profile-open
 checking is enabled, including independent protected account profiles as well
@@ -35,10 +36,11 @@ once per minute and only when an eligible protected-device saved-update target
 or parent/source delivery-receipt target exists. This is not a service-worker
 scheduler and does not add YouTube-page polling.
 
-The hook is intentionally not mailbox server or local-network authority. It
+The hook is intentionally not Internet Pickup service or local-network
+authority. It
 does not poll from YouTube pages, does not add a service-worker scheduler, and
 does not make network discovery authority. Internet Pickup can ask an explicit
-HTTPS pickup client for decrypted mailbox items; Home Bridge can ask an explicit
+HTTPS pickup client for decrypted mailbox items; Home Pickup can ask an explicit
 configured local-network client for signed candidates. If no matching provider
 is installed, the hook records a local unavailable/no-update status and leaves
 the last valid policy active. If a provider reports `ok: false` or throws,
@@ -134,7 +136,7 @@ protected device is locally approved/unlocked.
 The trusted-link card now folds this into a parent-facing `Saved update check`
 row. Earlier proof called the same visible row `Open sync`; that remains the
 technical helper name, not the parent-facing label. The row can show one of
-these states, and may include `Internet Pickup`/`Home Bridge` detail when an
+these states, and may include `Internet Pickup`/`Home Pickup` detail when an
 optional delivery provider is involved:
 
 ```text
@@ -166,13 +168,13 @@ runtime protected mailbox ack-handoff history writer: present
 runtime provider failure fail-closed item apply guard: present
 runtime mailbox item apply reuse: present
 runtime pull status persistence: present
-runtime browser HTTPS mailbox pull/decrypt client: present behind explicit config
+runtime browser HTTPS Internet Pickup pull/decrypt client: present behind explicit config
 runtime dashboard-visible saved-update check: present with 60s throttle and eligible-link gate
-runtime transport-specific saved-update check: present; Later Pickup and Same-Home Pickup are checked independently only when their configured reader is available
-runtime mailbox server authority: absent
-runtime provider-gated Home Bridge candidate discovery: present
-runtime built-in LAN peer discovery: absent
-runtime built-in LAN transport: absent
+runtime transport-specific saved-update check: present; Internet Pickup and Home Pickup are checked independently only when their configured reader is available
+runtime Internet Pickup service authority: absent
+runtime provider-gated Home Pickup candidate discovery: present
+runtime built-in same-network peer discovery: absent
+runtime built-in same-network transport: absent
 runtime background scheduler: absent
 runtime YouTube page hot-path work from this slice: absent
 ```
@@ -195,5 +197,5 @@ runtime YouTube page hot-path work from this slice: absent
   and provider ack counts on the protected profile. They do not contain
   plaintext rule values, and they do not authorize future policy changes.
 - This does not replace manual live Nanah sessions. It only creates the
-  extension-side hook that downstream app/local-network/mailbox providers can
+  extension-side hook that downstream app/Home Pickup/Internet Pickup providers can
   use safely later.
