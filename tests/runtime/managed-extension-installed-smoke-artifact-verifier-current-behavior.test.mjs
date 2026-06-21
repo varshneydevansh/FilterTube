@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 
 import { LANES, classifyPaths } from '../../scripts/run-test-lane.mjs';
 import {
+  MANAGED_EXTENSION_INSTALLED_SMOKE_ARTIFACT_GENERATOR,
   MANAGED_EXTENSION_INSTALLED_SMOKE_ARTIFACT_TEMPLATE,
   MANAGED_EXTENSION_INSTALLED_SMOKE_ARTIFACT_VERIFIER,
   MANAGED_EXTENSION_INSTALLED_SMOKE_REQUIRED_ROWS
@@ -155,6 +156,10 @@ test('managed installed-extension smoke verifier is wired into release settings 
   assert.ok(LANES.settings.tests.includes('tests/runtime/managed-extension-installed-smoke-artifact-verifier-current-behavior.test.mjs'));
   assert.ok(LANES.smoke.tests.includes('tests/runtime/managed-extension-installed-smoke-artifact-verifier-current-behavior.test.mjs'));
   assert.equal(MANAGED_EXTENSION_INSTALLED_SMOKE_ARTIFACT_TEMPLATE, templatePath);
+  assert.equal(
+    MANAGED_EXTENSION_INSTALLED_SMOKE_ARTIFACT_GENERATOR,
+    'npm run managed:extension-smoke -- --input <redacted-observation.json> --confirm-manual-smoke-passed'
+  );
   assert.equal(
     MANAGED_EXTENSION_INSTALLED_SMOKE_ARTIFACT_VERIFIER,
     'node docs/audit/artifacts/managed-extension-installed-smoke/verify-managed-extension-smoke-artifact.mjs docs/audit/artifacts/managed-extension-installed-smoke/<artifact>.json'

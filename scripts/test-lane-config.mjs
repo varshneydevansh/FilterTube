@@ -24,6 +24,8 @@ export const MANAGED_REMOTE_DELIVERY_SMOKE_ARTIFACT_VERIFIER =
   'node docs/audit/artifacts/managed-remote-delivery-smoke/verify-managed-smoke-artifact.mjs docs/audit/artifacts/managed-remote-delivery-smoke/<artifact>.json';
 export const MANAGED_EXTENSION_INSTALLED_SMOKE_ARTIFACT_TEMPLATE =
   'docs/audit/artifacts/managed-extension-installed-smoke/template.json';
+export const MANAGED_EXTENSION_INSTALLED_SMOKE_ARTIFACT_GENERATOR =
+  'npm run managed:extension-smoke -- --input <redacted-observation.json> --confirm-manual-smoke-passed';
 export const MANAGED_EXTENSION_INSTALLED_SMOKE_ARTIFACT_VERIFIER =
   'node docs/audit/artifacts/managed-extension-installed-smoke/verify-managed-extension-smoke-artifact.mjs docs/audit/artifacts/managed-extension-installed-smoke/<artifact>.json';
 export const MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_TEMPLATE =
@@ -36,6 +38,8 @@ export const MANAGED_APP_PARITY_SMOKE_ARTIFACT_VERIFIER =
   'node docs/audit/artifacts/managed-app-parity-smoke/verify-managed-app-parity-smoke-artifact.mjs docs/audit/artifacts/managed-app-parity-smoke/<artifact>.json';
 export const MANAGED_NATIVE_RUNTIME_SYNC_HANDOFF_ARTIFACT_TEMPLATE =
   'docs/audit/artifacts/managed-native-runtime-sync-handoff/template.json';
+export const MANAGED_NATIVE_RUNTIME_SYNC_HANDOFF_ARTIFACT_GENERATOR =
+  'npm run managed:native-handoff -- --confirm-sync-command-passed';
 export const MANAGED_NATIVE_RUNTIME_SYNC_HANDOFF_ARTIFACT_VERIFIER =
   'node docs/audit/artifacts/managed-native-runtime-sync-handoff/verify-native-runtime-sync-handoff-artifact.mjs docs/audit/artifacts/managed-native-runtime-sync-handoff/<artifact>.json';
 export const LIVE_SMOKE_CHANGE_CONTEXT_ENV = Object.freeze([
@@ -173,6 +177,7 @@ export const LANES = Object.freeze({
       'tests/runtime/release-live-youtube-spa-smoke-boundary-current-behavior.test.mjs',
       'tests/runtime/managed-policy-sync-remote-delivery-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/managed-extension-installed-smoke-artifact-verifier-current-behavior.test.mjs',
+      'tests/runtime/managed-extension-installed-smoke-artifact-generator-current-behavior.test.mjs',
       'tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs',
       'tests/runtime/managed-delivery-provider-reference-current-behavior.test.mjs',
       'tests/runtime/managed-native-runtime-sync-handoff-current-behavior.test.mjs',
@@ -417,6 +422,7 @@ export const LANES = Object.freeze({
       'tests/runtime/managed-controls-completion-audit-current-behavior.test.mjs',
       'tests/runtime/managed-policy-sync-remote-delivery-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/managed-extension-installed-smoke-artifact-verifier-current-behavior.test.mjs',
+      'tests/runtime/managed-extension-installed-smoke-artifact-generator-current-behavior.test.mjs',
       'tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs',
       'tests/runtime/managed-delivery-provider-reference-current-behavior.test.mjs',
       'tests/runtime/managed-native-runtime-sync-handoff-current-behavior.test.mjs',
@@ -462,6 +468,7 @@ export const LANES = Object.freeze({
       'tests/runtime/managed-controls-extension-mvp-handoff-current-behavior.test.mjs',
       'tests/runtime/managed-policy-sync-remote-delivery-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/managed-extension-installed-smoke-artifact-verifier-current-behavior.test.mjs',
+      'tests/runtime/managed-extension-installed-smoke-artifact-generator-current-behavior.test.mjs',
       'tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs',
       'tests/runtime/managed-delivery-provider-reference-current-behavior.test.mjs',
       'tests/runtime/managed-native-runtime-sync-handoff-current-behavior.test.mjs',
@@ -647,7 +654,10 @@ export const FILE_LANE_RULES = Object.freeze([
   },
   {
     id: 'managed-extension-installed-smoke-artifact-surface',
-    patterns: [/^docs\/audit\/artifacts\/managed-extension-installed-smoke\/.*\.(?:json|mjs)$/],
+    patterns: [
+      /^docs\/audit\/artifacts\/managed-extension-installed-smoke\/.*\.(?:json|mjs)$/,
+      /^scripts\/create-managed-extension-installed-smoke-artifact\.mjs$/
+    ],
     lanes: ['release', 'settings', 'smoke']
   },
   {

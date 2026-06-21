@@ -13,7 +13,7 @@ const rootMetadataRows = [
   ['LICENSE', 21, 1073, 'd0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d'],
   ['README.md', 411, 23577, 'c7fe9a482e35c40aa6fd986e46d2d23cfc16170f5b11a6573e8f737c5dd7788e'],
   ['channel-identity-watch-mix-collab-recovery-plan.md', 262, 16023, '01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a'],
-  ['package.json', 64, 2656, '708a5667679bf4739356c5fc52b5a8278b7f509e700b9ad2e678b8f2d7ed90bc'],
+  ['package.json', 65, 2757, 'ff086e4d0681c2f14ede26ebc7b62144b198c5fe8bf833c7a15d25cd728712d0'],
   ['package-lock.json', 1461, 49916, 'f52d6482693be9cd4edacdc1f1491b4d2cda796522bfd0e4dcf86e0c879ad974'],
 ];
 
@@ -91,9 +91,9 @@ test('root package metadata script surface doc is audit-only and fingerprint pin
   assert.match(doc, /optimization, release, dependency, JSON-first, or cleanup implementation work/);
   assert.deepEqual(trackedRootMetadata.sort(), rootMetadataRows.map(([file]) => file).sort());
 
-  assert.equal(rootMetadataRows.reduce((sum, [, lines]) => sum + lines, 0), 2963);
-  assert.equal(rootMetadataRows.reduce((sum, [, , bytes]) => sum + bytes, 0), 135566);
-  assert.match(doc, /7 files, 2,963 newline counts, and\s+135,566 bytes/);
+  assert.equal(rootMetadataRows.reduce((sum, [, lines]) => sum + lines, 0), 2964);
+  assert.equal(rootMetadataRows.reduce((sum, [, , bytes]) => sum + bytes, 0), 135667);
+  assert.match(doc, /7 files, 2,964 newline counts, and\s+135,667 bytes/);
 
   for (const [file, lines, bytes, hash] of rootMetadataRows) {
     assert.equal(newlineCount(file), lines, `${file} newline count drifted`);
@@ -122,6 +122,7 @@ test('package scripts and dependency metadata are pinned before release or optim
     'build:firefox',
     'build:opera',
     'sync:native-runtime',
+    'managed:extension-smoke',
     'managed:native-handoff',
     'managed:provider',
     'test',
@@ -145,7 +146,8 @@ test('package scripts and dependency metadata are pinned before release or optim
     'dev:firefox',
     'dev:opera',
   ]);
-  assert.equal(Object.keys(pkg.scripts).length, 30);
+  assert.equal(Object.keys(pkg.scripts).length, 31);
+  assert.equal(pkg.scripts['managed:extension-smoke'], 'node scripts/create-managed-extension-installed-smoke-artifact.mjs');
   assert.equal(pkg.scripts['managed:native-handoff'], 'node scripts/create-managed-native-runtime-sync-handoff.mjs');
   assert.equal(pkg.scripts['managed:provider'], 'node scripts/managed-delivery-provider.mjs');
   assert.equal(pkg.scripts['verify:managed-app-policy'], 'node scripts/verify-managed-app-policy-contract.mjs');
@@ -171,7 +173,8 @@ test('package scripts and dependency metadata are pinned before release or optim
     'fs-extra': '^11.1.1',
   });
 
-  assert.match(doc, /30 scripts/);
+  assert.match(doc, /31 scripts/);
+  assert.match(doc, /managed:extension-smoke -> node scripts\/create-managed-extension-installed-smoke-artifact\.mjs/);
   assert.match(doc, /managed:native-handoff -> node scripts\/create-managed-native-runtime-sync-handoff\.mjs/);
   assert.match(doc, /managed:provider -> node scripts\/managed-delivery-provider\.mjs/);
   assert.match(doc, /test -> node scripts\/run-test-lane\.mjs smoke/);

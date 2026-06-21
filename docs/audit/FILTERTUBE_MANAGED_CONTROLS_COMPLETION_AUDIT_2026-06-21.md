@@ -69,17 +69,24 @@ Manual parent/protected-profile smoke is now a strict artifact instead of loose
 notes:
 
 - Template: `docs/audit/artifacts/managed-extension-installed-smoke/template.json`
+- Generator:
+  `npm run managed:extension-smoke -- --input <redacted-observation.json> --confirm-manual-smoke-passed`
 - Verifier:
   `docs/audit/artifacts/managed-extension-installed-smoke/verify-managed-extension-smoke-artifact.mjs`
 - Test:
   `tests/runtime/managed-extension-installed-smoke-artifact-verifier-current-behavior.test.mjs`
+  and
+  `tests/runtime/managed-extension-installed-smoke-artifact-generator-current-behavior.test.mjs`
 
 This artifact proves only installed extension behavior for one parent/protected
 browser smoke. It requires redacted evidence for protected-profile setup, live
 Nanah Send Update, route gates, timeout overlay, protected history, no-policy
 YouTube SPA responsiveness, quick-block/3-dot menu regression checks, and
-provider-status authority boundaries. It still does not prove hosted Internet
-Pickup, automatic LAN discovery, or native Android/iOS parity.
+provider-status authority boundaries. The generator requires an explicit manual
+pass confirmation, redacted recording fields, visible evidence paths, and a
+policy revision/hash; it refuses sensitive keys and authority overclaims. It
+still does not prove hosted Internet Pickup, automatic LAN discovery, or native
+Android/iOS parity.
 
 ## Pickup Provider Ownership Artifact
 
@@ -122,8 +129,10 @@ reachability still never becomes policy authority.
 ## Next Required Proof
 
 ```text
-1. Execute `docs/audit/artifacts/managed-extension-installed-smoke/template.json`
-   against the installed extension and verify it with
+1. Execute the installed-extension parent/protected-device smoke, record the
+   redacted observation JSON, generate the artifact with
+   `npm run managed:extension-smoke -- --input <redacted-observation.json> --confirm-manual-smoke-passed`,
+   and verify it with
    `docs/audit/artifacts/managed-extension-installed-smoke/verify-managed-extension-smoke-artifact.mjs`.
 2. Manual installed-extension smoke for timeout overlay and Main/Kids route gate
    is covered by the artifact rows `FT-MANAGED-EXT-08-main-kids-route-gate` and

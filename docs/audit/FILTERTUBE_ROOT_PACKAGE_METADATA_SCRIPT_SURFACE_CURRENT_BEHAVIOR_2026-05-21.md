@@ -26,8 +26,8 @@ first-class JSON filter work look safer than the runtime proof actually allows.
 
 ## File Fingerprints
 
-Current tracked root metadata inventory: 7 files, 2,963 newline counts, and
-135,566 bytes.
+Current tracked root metadata inventory: 7 files, 2,964 newline counts, and
+135,667 bytes.
 
 | File | Newline count | Bytes | SHA-256 |
 |---|---:|---:|---|
@@ -36,7 +36,7 @@ Current tracked root metadata inventory: 7 files, 2,963 newline counts, and
 | `LICENSE` | 21 | 1,073 | `d0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d` |
 | `README.md` | 411 | 23,577 | `c7fe9a482e35c40aa6fd986e46d2d23cfc16170f5b11a6573e8f737c5dd7788e` |
 | `channel-identity-watch-mix-collab-recovery-plan.md` | 262 | 16,023 | `01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a` |
-| `package.json` | 64 | 2,656 | `708a5667679bf4739356c5fc52b5a8278b7f509e700b9ad2e678b8f2d7ed90bc` |
+| `package.json` | 65 | 2,757 | `ff086e4d0681c2f14ede26ebc7b62144b198c5fe8bf833c7a15d25cd728712d0` |
 | `package-lock.json` | 1,461 | 49,916 | `f52d6482693be9cd4edacdc1f1491b4d2cda796522bfd0e4dcf86e0c879ad974` |
 
 Any release, package, or optimization claim that uses these files should cite
@@ -47,7 +47,7 @@ the exact current file state or an updated fingerprint.
 `package.json` currently declares package version `3.3.2`, license `MIT`,
 repository `git+https://github.com/varshneydevansh/FilterTube.git`, homepage
 `https://github.com/varshneydevansh/FilterTube`, 2 runtime dependencies, 3
-development dependencies, and 30 scripts.
+development dependencies, and 31 scripts.
 
 Current scripts:
 
@@ -60,6 +60,7 @@ build:chrome -> node build.js chrome
 build:firefox -> node build.js firefox
 build:opera -> node build.js opera
 sync:native-runtime -> node scripts/sync-native-runtime.mjs
+managed:extension-smoke -> node scripts/create-managed-extension-installed-smoke-artifact.mjs
 managed:native-handoff -> node scripts/create-managed-native-runtime-sync-handoff.mjs
 managed:provider -> node scripts/managed-delivery-provider.mjs
 test -> node scripts/run-test-lane.mjs smoke

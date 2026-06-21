@@ -12,6 +12,7 @@
     "build:firefox": "node build.js firefox",
     "build:opera": "node build.js opera",
     "sync:native-runtime": "node scripts/sync-native-runtime.mjs",
+    "managed:extension-smoke": "node scripts/create-managed-extension-installed-smoke-artifact.mjs",
     "managed:native-handoff": "node scripts/create-managed-native-runtime-sync-handoff.mjs",
     "managed:provider": "node scripts/managed-delivery-provider.mjs",
     "test": "node scripts/run-test-lane.mjs smoke",

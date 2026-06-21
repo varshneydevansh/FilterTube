@@ -270,6 +270,30 @@ or local-network surfaces. One passing managed remote-delivery artifact proves
 only one transport slice; complete remote management remains gated until the
 readiness gate is satisfied across the required transport and app-parity rows.
 
+Managed parent/caregiver extension changes also have a dedicated installed
+extension smoke artifact:
+
+```text
+docs/audit/artifacts/managed-extension-installed-smoke/template.json
+docs/audit/artifacts/managed-extension-installed-smoke/verify-managed-extension-smoke-artifact.mjs
+scripts/create-managed-extension-installed-smoke-artifact.mjs
+```
+
+After the real installed-extension parent/protected-device smoke passes, create
+the artifact from a redacted observation JSON instead of hand-editing the
+template:
+
+```bash
+npm run managed:extension-smoke -- --input <redacted-observation.json> --confirm-manual-smoke-passed
+node docs/audit/artifacts/managed-extension-installed-smoke/verify-managed-extension-smoke-artifact.mjs docs/audit/artifacts/managed-extension-installed-smoke/generated/<artifact>.json
+```
+
+The generated artifact proves only the tested installed extension flow. It
+requires parent/protected profile IDs, trusted link/device IDs, visible evidence
+paths, policy revision/hash, and explicit confirmation. It still leaves hosted
+provider ownership, automatic LAN discovery, and Android/iOS app parity
+incomplete.
+
 Managed app parity changes receive their own installed-app smoke handoff:
 
 ```text
@@ -348,6 +372,7 @@ or uncovered required lanes remain `NO-GO`.
 | `js/content_controls_catalog.js` | `test:whitelist`, `test:blocking`, `test:json`, `test:dom`, `test:menu`, `test:performance`, `test:settings` | Covers content-control keys that activate JSON, DOM, menu affordance, settings, and no-work behavior. |
 | `js/popup.js`, `js/tab-view.js`, `js/render_engine.js`, `js/ui_components.js`, `js/managed_parent_command_center.js` | `test:release`, `test:whitelist`, `test:blocking`, `test:menu`, `test:settings`, `test:smoke` | Covers dashboard/popup UI, managed parent command-center summaries, visible list authority, profile/list-mode mutation, content-control toggles, and release-facing UI claims. |
 | `js/nanah_sync_adapter.js`, `js/nanah_managed_open_sync.js`, `js/nanah_managed_mailbox_client.js`, `js/nanah_managed_local_network_client.js`, `js/security_manager.js` | `test:release`, `test:settings`, `test:smoke` | Covers Nanah sync payloads, profile-scoped import/export, provider-gated managed open-sync hooks, configured Internet Pickup and Home Pickup client hooks, PIN/encrypted payload helpers, and package/release parity. |
+| `docs/audit/artifacts/managed-extension-installed-smoke/*.{json,mjs}`, `scripts/create-managed-extension-installed-smoke-artifact.mjs` | `test:release`, `test:settings`, `test:smoke` | Covers installed-extension parent/protected-profile smoke templates, generator, and verifier without claiming provider ownership, automatic LAN discovery, or native app parity. |
 | `scripts/managed-delivery-provider.mjs` | `test:release`, `test:settings`, `test:smoke` | Covers the self-hosted reference provider used to prove Internet Pickup/Home Pickup endpoint shape without packaging it into browser ZIPs or claiming hosted service ownership. |
 | `js/layout.js` | `test:release`, `test:dom`, `test:smoke` | Covers the quarantined legacy layout file, package burden, manifest-inactive status, and DOM/layout selector claims. |
 | `js/shared/identity.js`, `js/content/dom_extractors.js`, `js/content/handle_resolver.js` | `test:whitelist`, `test:blocking`, `test:menu` | Covers identity confidence, collaborators, menu labels, channel matching, and stale identity risk. |

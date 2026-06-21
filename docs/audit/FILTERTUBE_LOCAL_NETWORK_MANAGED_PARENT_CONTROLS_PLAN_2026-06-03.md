@@ -2342,3 +2342,12 @@ follow. I will share progress as this moves from audit/spec into implementation.
   The generator reads the downstream runtime-sync manifest and destination
   hashes after a deliberate sync, fails on stale mirror hashes, writes only a
   local audit artifact, and keeps native enforcement/app parity claims false.
+- [x] 2026-06-22 installed extension smoke artifact generator slice: added
+  `scripts/create-managed-extension-installed-smoke-artifact.mjs`,
+  `npm run managed:extension-smoke -- --input <redacted-observation.json> --confirm-manual-smoke-passed`,
+  and
+  `tests/runtime/managed-extension-installed-smoke-artifact-generator-current-behavior.test.mjs`.
+  The generator records a real parent/protected-device manual smoke pass from a
+  redacted observation JSON, requires policy revision/hash evidence, refuses
+  sensitive fields and authority overclaims, and keeps provider/app parity
+  readiness incomplete.

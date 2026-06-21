@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 
 import { LANES, classifyPaths } from '../../scripts/run-test-lane.mjs';
 import {
+  MANAGED_NATIVE_RUNTIME_SYNC_HANDOFF_ARTIFACT_GENERATOR,
   MANAGED_NATIVE_RUNTIME_SYNC_HANDOFF_ARTIFACT_TEMPLATE,
   MANAGED_NATIVE_RUNTIME_SYNC_HANDOFF_ARTIFACT_VERIFIER,
   MANAGED_NATIVE_RUNTIME_SYNC_HANDOFF_REQUIRED_ROWS
@@ -127,6 +128,10 @@ test('managed native runtime sync handoff is wired into release settings and smo
   assert.ok(LANES.settings.tests.includes('tests/runtime/managed-native-runtime-sync-handoff-current-behavior.test.mjs'));
   assert.ok(LANES.smoke.tests.includes('tests/runtime/managed-native-runtime-sync-handoff-current-behavior.test.mjs'));
   assert.equal(MANAGED_NATIVE_RUNTIME_SYNC_HANDOFF_ARTIFACT_TEMPLATE, templatePath);
+  assert.equal(
+    MANAGED_NATIVE_RUNTIME_SYNC_HANDOFF_ARTIFACT_GENERATOR,
+    'npm run managed:native-handoff -- --confirm-sync-command-passed'
+  );
   assert.equal(
     MANAGED_NATIVE_RUNTIME_SYNC_HANDOFF_ARTIFACT_VERIFIER,
     'node docs/audit/artifacts/managed-native-runtime-sync-handoff/verify-native-runtime-sync-handoff-artifact.mjs docs/audit/artifacts/managed-native-runtime-sync-handoff/<artifact>.json'
