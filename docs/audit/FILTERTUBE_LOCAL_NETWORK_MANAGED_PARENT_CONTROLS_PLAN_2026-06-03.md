@@ -124,7 +124,7 @@ extension authority code.
   target-profile validation, and provider gates are unchanged; only the parent
   mental model and high-visibility labels changed.
 - [x] Advanced delivery copy now treats live `Send Update` as the normal parent flow and
-  explains `Internet Pickup` and `Home Bridge` as optional send paths only. The
+  explains `Internet Pickup` and `Home Pickup` as optional send paths only. The
   Help meeting-service section now separates Nanah's live meeting-place role from
   advanced later/home delivery, without implying those transports can become
   policy authority.
@@ -168,7 +168,7 @@ extension authority code.
   pickup behind `Optional: device opens later`. This is UI/copy and responsive
   density only; trusted-link, target-profile, signature/hash/revision, provider,
   and runtime policy gates are unchanged.
-- [x] Home Bridge readiness slice: configured local-network providers now expose
+- [x] Home Pickup readiness slice: configured local-network providers now expose
   a redacted `managed-local-network/health` check during setup. The check can
   tell a parent whether their bridge answered after saving, but it is explicitly
   non-authoritative: policy apply still depends on the trusted managed link,
@@ -213,7 +213,7 @@ parent tool instead of a sync/debug console.
   name, action buttons, or parent workflow.
 - [x] Managed action history clearly answers whether the latest row came from a
   parent edit, approved list, remote update, Send Update, Internet Pickup,
-  Home Bridge, trusted-device action, admin access, or history action while
+  Home Pickup, trusted-device action, admin access, or history action while
   keeping raw policy JSON and sensitive rule payloads out of protected views.
 - [x] Downstream app UI contract documents the same Main/Kids/Both rule-list
   apply target, manual/imported source filters, Kids list selection, source
@@ -393,7 +393,7 @@ parent tool instead of a sync/debug console.
     opens later or a trusted home/school bridge.
   - [x] 2026-06-19 Family Device Updates optional delivery collapse: the
     Accounts & Sync pairing surface now shows live `Send Update` as the only
-    first-level delivery path, with Internet Pickup and Home Bridge under an
+    first-level delivery path, with Internet Pickup and Home Pickup under an
     `Optional saved updates` disclosure. Configured optional providers force
     the disclosure open so existing families still see their active route. This
     is UI simplification only; provider setup still requires parent/account
@@ -424,7 +424,7 @@ parent tool instead of a sync/debug console.
     first-screen note now starts with live `Send Update` and moves later/offline
     delivery into advanced optional setup language. This changes UI discovery
     and wording only; it does not add trust, alter scopes, or change Nanah,
-    Internet Pickup, Home Bridge, signature, hash, revision, or runtime gate
+    Internet Pickup, Home Pickup, signature, hash, revision, or runtime gate
     behavior.
   - [x] Optional delivery setup modals use parent-facing `address` and `key`
     labels instead of raw provider/password language, and explicitly say
@@ -432,8 +432,8 @@ parent tool instead of a sync/debug console.
     itself.
   - [x] Advanced pickup naming slice: the command center and provider setup
     modal now present the internet waiting path as `Internet Pickup` and keep
-    `Home Bridge` for the same-network bridge. The docs still map these to the
-    underlying mailbox/Home Bridge transports, but the first parent-facing
+    `Home Pickup` for the same-network bridge. The docs still map these to the
+    underlying mailbox/local-network transports, but the first parent-facing
     labels now describe the outcome instead of the implementation.
   - [x] Advanced pickup summary alignment slice: Family Controls status rows,
     Settings handoff summaries, provider setup toasts, and verified-device path
@@ -469,24 +469,24 @@ parent tool instead of a sync/debug console.
     UI/copy only; live Send Update, profile targeting, signature/hash/revision
     validation, and offline last valid policy behavior are unchanged.
   - [x] Automatic-saved-updates visibility slice: Family Controls now shows a
-    single read-only `Check when profile opens` detail for verified
+    single read-only `Check for updates on open` detail for verified
     protected-profile devices instead of separate Internet Pickup and Home
-    Bridge rows. It reports whether saved parent links are set to check for
+    Pickup rows. It reports whether saved parent links are set to check for
     trusted updates when the protected profile opens, while keeping live Send
-    Update, Internet Pickup, Home Bridge, signature/hash/revision validation,
+    Update, Internet Pickup, Home Pickup, signature/hash/revision validation,
     and offline last-policy behavior unchanged.
   - [x] Accounts & Sync wording follow-up: protected-profile command-center
-    rows now use `Automatic saved updates` instead of `Check on open` /
-    `Checks on open`, and the Family Device Updates first screen now says
+    rows now use `Automatic saved updates` instead of `Check for updates on open` /
+    `Checks for updates on open`, and the Family Device Updates first screen now says
     `More options` plus `Meeting service link` instead of making
     parent-facing copy read like a protocol console. Runtime trust, provider
     gates, and source/replica policy validation are unchanged.
   - [x] Empty Family Controls setup wording slice: the first setup note now says
     no device pairing is needed when the protected profile stays on the current
     device, and asks parents to pair only when another verified device should
-    receive the same approved rules. Optional Internet Pickup/Home Bridge
+    receive the same approved rules. Optional Internet Pickup/Home Pickup
     provider hooks remain hidden until a protected profile exists.
-  - [x] Advanced service setup wording slice: Internet Pickup and Home Bridge
+  - [x] Advanced service setup wording slice: Internet Pickup and Home Pickup
     prompts now say `Service` / `Service Key` instead of raw address/key labels,
     and explicitly state that the service key is not the parent PIN. Runtime
     endpoint validation and provider authority gates are unchanged.
@@ -505,7 +505,7 @@ parent tool instead of a sync/debug console.
     behavior changed.
   - [x] Manual saved-update check slice: trusted protected-device cards with
     profile-open checking enabled now expose `Check Saved Updates`. The action
-    explicitly runs the same Internet Pickup and Home Bridge profile-open
+    explicitly runs the same Internet Pickup and Home Pickup profile-open
     receive paths with a manual reason so caregivers can verify/update on
     demand without waiting for another profile open. It does not add authority:
     trusted-link validation, target-profile matching, scope, revision, hash,
@@ -513,16 +513,16 @@ parent tool instead of a sync/debug console.
     apply.
   - [x] 2026-06-20 Family Device Updates waiting-update check slice: the
     Accounts & Sync delivery strip now surfaces `Check waiting parent updates`
-    inside the later-delivery disclosure when Internet Pickup or Home Bridge is
+    inside the later-delivery disclosure when Internet Pickup or Home Pickup is
     configured. The button is enabled only on a protected-device profile with a
     saved trusted parent link, and it calls the same manual
-    `manual_saved_update_check` Internet Pickup/Home Bridge receive paths used
+    `manual_saved_update_check` Internet Pickup/Home Pickup receive paths used
     by trusted-link rows. It does not add provider authority; trusted-link
     validation, target profile, scope, revision, hash, signature, and local
     apply gates still decide whether anything can apply.
   - [x] 2026-06-20 automatic saved-update responsiveness slice: dashboard-open
     and profile-switch saved-update checks now use a gated background helper
-    instead of blocking profile switching while Internet Pickup, Home Bridge,
+    instead of blocking profile switching while Internet Pickup, Home Pickup,
     or source-side delivery receipts are checked. The helper runs only when the
     current state has a matching protected-device saved-update target or a
     parent/source delivery-receipt target. Manual `Check waiting parent updates`
@@ -538,7 +538,7 @@ parent tool instead of a sync/debug console.
     service-worker scheduling, discovery authority, or weaker apply gates.
   - [x] Later-delivery simplification slice: the Accounts & Sync first-read note
     and Family Controls provider prompt now say the normal path is still open
-    both devices, pair, verify, and Send Update. Internet Pickup/Home Bridge are
+    both devices, pair, verify, and Send Update. Internet Pickup/Home Pickup are
     presented only as optional later-delivery setup for families or schools that
     run a compatible pickup service; transport authority and provider gates are
     unchanged.
@@ -562,7 +562,7 @@ parent tool instead of a sync/debug console.
     same explicitly configured pickup service without changing provider authority,
     encryption, target-profile, scope, revision, hash, or signature validation.
   - [x] Built-in delivery receipt pull slice: the configured Internet Pickup and
-    Home Bridge clients now expose source-side redacted delivery receipt pull
+    Home Pickup clients now expose source-side redacted delivery receipt pull
     methods, and the dashboard uses an explicit external receipt provider when
     present or aggregates the built-in configured providers when absent. This
     lets parent/source rows update delivery receipt feedback for previously sent
@@ -570,13 +570,13 @@ parent tool instead of a sync/debug console.
     rule exposure, or YouTube page hot-path work.
   - [x] Family Device Updates delivery-path strip slice: Accounts & Sync now
     exposes a compact parent-facing strip for `Live update`, `Saved updates`,
-    and `Home Bridge` paths. The strip is status-only plus optional setup
-    buttons for Internet Pickup/Home Bridge; it does not create policy
+    and `Home Pickup` paths. The strip is status-only plus optional setup
+    buttons for Internet Pickup/Home Pickup; it does not create policy
     authority, background sync, LAN discovery, or YouTube page hot-path work.
   - [x] 2026-06-19 Family Device Updates parent-language strip slice: the
-    first-read Accounts & Sync strip now says `Saved updates` and `Home Bridge`
+    first-read Accounts & Sync strip now says `Saved updates` and `Home Pickup`
     instead of `Automatic pickup` and `Same network`. The advanced provider
-    names still map to Internet Pickup and Home Bridge where configuration,
+    names still map to Internet Pickup and Home Pickup where configuration,
     history, and protocol boundaries need precision. This is copy/UI state only;
     trusted-link, target-profile, signature/hash/revision, provider, and runtime
     validation gates are unchanged.
@@ -584,17 +584,17 @@ parent tool instead of a sync/debug console.
     first-read strip said `If the other device opens later`, `Later over
     internet`, and `Same network`/`Home/school network` so parents saw the task
     before transport names. The June 20 simplification keeps that intent with
-    shorter `Optional: device opens later`, `Internet pickup`, and `Home bridge`
+    shorter `Optional: device opens later`, `Internet pickup`, and `Home pickup`
     labels. This is copy/UI state only; trusted-link, target-profile,
     signature/hash/revision, provider, and runtime validation gates are unchanged.
   - [x] 2026-06-20 Family Device Updates first-read simplification slice: the
     visible strip now says `Optional: device opens later`, `Internet pickup`,
-    and `Home bridge`; the normal live path remains first, and later pickup is
+    and `Home pickup`; the normal live path remains first, and later pickup is
     framed as optional provider-backed delivery rather than ordinary Wi-Fi or
     server authority.
   - [x] 2026-06-20 Family Device Updates setup-label slice: the setup entry
     points now say `Set Up Internet Pickup`, `Edit Internet Pickup`, `Set Up
-    Home Bridge`, and `Edit Home Bridge` so the optional delivery dialogs match
+    Home Pickup`, and `Edit Home Pickup` so the optional delivery dialogs match
     the first-read Accounts & Sync strip. This is copy/UI state only;
     trusted-link, target-profile, signature/hash/revision, provider, and runtime
     validation gates are unchanged.
@@ -604,10 +604,10 @@ parent tool instead of a sync/debug console.
     receive-only surfaces are still forced back to receive-only behavior, and
     this slice changes only the first-screen parent mental model. It does not
     alter Nanah roles, target-profile validation, allowed scopes, signatures,
-    hashes, revisions, Internet Pickup, Home Bridge, or runtime policy gates.
+    hashes, revisions, Internet Pickup, Home Pickup, or runtime policy gates.
   - [x] Delivery-path readiness gating slice: the same strip now derives a
     parent-scoped protected-profile/verified-device summary before enabling new
-    Internet Pickup or Home Bridge setup. Already configured providers remain
+    Internet Pickup or Home Pickup setup. Already configured providers remain
     editable, but first-time setup waits until a protected profile has a verified
     device link, keeping the parent flow profile -> pair -> optional pickup.
   - [x] Trusted-device card wording slice: saved managed links now show
@@ -629,14 +629,14 @@ parent tool instead of a sync/debug console.
     policy, source/replica roles, and managed-link validation are unchanged.
   - [x] 2026-06-19 managed parent release-smoke checklist slice: release proof
     now has a dedicated installed-extension checklist for Family Controls,
-    Family Device Updates, live Send Update, Internet Pickup, Home Bridge,
+    Family Device Updates, live Send Update, Internet Pickup, Home Pickup,
     rule-list import, viewing-space gates, time limits, protected history, and
-    no-work performance. The checklist keeps local intranet/Home Bridge wording
+    no-work performance. The checklist keeps local intranet/Home Pickup wording
     honest: same-network pickup is delivery only, never authority, and built-in
     automatic LAN peer discovery remains a NO-GO until a compatible provider
     and installed smoke prove it.
-  - [x] 2026-06-19 Home Bridge configured-state wording slice: configured
-    Home Bridge UI now says `set up` instead of `ready`, because a saved
+  - [x] 2026-06-19 Home Pickup configured-state wording slice: configured
+    Home Pickup UI now says `set up` instead of `ready`, because a saved
     provider client only proves an explicit bridge address exists. Actual
     delivery still requires send/check execution plus trusted-link, target,
     scope, revision, hash, and signature validation on the protected device.
@@ -651,44 +651,44 @@ parent tool instead of a sync/debug console.
     opens the same parent-approved stale-list review flow and never silently
     applies rows, sends device updates, runs on YouTube pages, or creates
     background policy sync.
-  - [x] 2026-06-19 Home Bridge intranet clarity slice: Accounts & Sync and Help
+  - [x] 2026-06-19 Home Pickup intranet clarity slice: Accounts & Sync and Help
     now explain that same-network pickup requires an explicit
-    FilterTube-compatible Home Bridge, is not automatic Wi-Fi/LAN discovery, and
+    FilterTube-compatible Home Pickup, is not automatic Wi-Fi/LAN discovery, and
     still applies only signed updates from the saved parent/caregiver link.
     Runtime provider hooks, local candidate validation, and trusted-link
     authority are unchanged.
   - [x] 2026-06-20 Family Device Updates saved-update wording slice: the
     Accounts & Sync first-read copy now says saved updates need a compatible
-    Internet Pickup or Home Bridge service when the other device opens later.
+    Internet Pickup or Home Pickup service when the other device opens later.
     This keeps live Send Update as the normal parent flow and avoids making
     local network setup sound like automatic Wi-Fi control. Runtime provider
     hooks, local candidate validation, trusted-link authority, and signed
     policy apply gates are unchanged.
-  - [x] 2026-06-20 no automatic Home Bridge probing proof: the local-network
+  - [x] 2026-06-20 no automatic Home Pickup probing proof: the local-network
     provider client is pinned to fail closed without an explicit endpoint.
     Dashboard/profile-open discovery and bridge health checks return
     `local_network_endpoint_unconfigured`, install no global provider, and make
-    zero network calls, so Home Bridge cannot silently scan LAN addresses or
+    zero network calls, so Home Pickup cannot silently scan LAN addresses or
     become Wi-Fi authority.
   - [x] 2026-06-20 saved-update reader readiness slice: trusted protected-device
-    cards now separate the `Check when profile opens` policy from actual pickup
-    readiness. If no configured Internet Pickup pull provider or Home Bridge
+    cards now separate the `Check for updates on open` policy from actual pickup
+    readiness. If no configured Internet Pickup pull provider or Home Pickup
     discovery provider is present, the row says `Needs pickup setup` and the
     manual check button is disabled as `Set Up Pickup First`. Live Send Update
     still works when both verified devices are open. This changes only
     availability wording and click gating; trusted-link, target-profile, scope,
     revision, hash, signature, provider, and local apply gates are unchanged.
   - [x] 2026-06-20 profile-open check label slice: the parent-facing trust modal
-    and Family Controls row now describe `syncOnProfileOpen` as `Check when
-    profile opens` / `Checks when opened` instead of `Automatic saved updates`.
+    and Family Controls row now describe `syncOnProfileOpen` as `Check for
+    updates on open` / `Checks when opened` instead of `Automatic saved updates`.
     This keeps the feature understandable: a protected profile may look for
     newer signed parent updates when it opens, but only configured Internet
-    Pickup or Home Bridge delivery can provide waiting updates. Storage fields,
+    Pickup or Home Pickup delivery can provide waiting updates. Storage fields,
     trusted-link validation, target-profile matching, signature/hash/revision
     gates, and live Send Update behavior are unchanged.
-  - [x] 2026-06-20 Home Bridge parent-facing health state slice: configured
-    Home Bridge setup now records a redacted last-check state and exposes a
-    `Check Bridge` action from the same setup flow. The saved state contains
+  - [x] 2026-06-20 Home Pickup parent-facing health state slice: configured
+    Home Pickup setup now records a redacted last-check state and exposes a
+    `Check Pickup` action from the same setup flow. The saved state contains
     only endpoint host, timestamp, ok/reason feedback, and schema/version. It
     stores no PINs, private keys, trusted-link secrets, plaintext rules,
     channels, keywords, policy envelopes, or history rows. The card can tell a
@@ -699,16 +699,16 @@ parent tool instead of a sync/debug console.
     Sync intro now keeps the normal live path in plain parent language and moves
     later pickup under `More options`. The visible copy says the other device can
     pick an approved update up later only after setup, and that Wi-Fi/servers
-    never become authority. Internet Pickup/Home Bridge names remain available
+    never become authority. Internet Pickup/Home Pickup names remain available
     on their optional setup cards and in audit/history wording.
   - [x] 2026-06-20 trusted-device overview slice: Family Controls now shows a
     compact trusted-device map before the profile rows. The parent node stays at
     the center, protected profiles render as device tiles, and each tile uses the
-    existing managed-policy summary to show `Live now`, `Home Bridge`,
+    existing managed-policy summary to show `Live now`, `Home Pickup`,
     `Internet Pickup`, `Open both devices`, or pairing-needed status. This is
     presentation-only: it adds no automatic LAN discovery, no background probe,
     and no new policy authority. Same-network updates still require an explicitly
-    configured Home Bridge plus the existing trusted-link, target-profile, scope,
+    configured Home Pickup plus the existing trusted-link, target-profile, scope,
     revision, hash, and signature validation.
   - [x] 2026-06-20 Family Device Updates device-compass slice: Accounts & Sync
     now explains same-device, same-network, and opens-later control with a
@@ -739,7 +739,7 @@ parent tool instead of a sync/debug console.
   - [x] 2026-06-20 Family Device Updates naming-alignment slice: parent-visible
     command-center, history, status, and compass labels now consistently use
     `Internet Pickup` and `Home Pickup` instead of mixing them with lower-level
-    terms like mailbox or Home Bridge. Protocol variables and provider
+    terms like mailbox or local-network bridge. Protocol variables and provider
     scopes remain unchanged.
   - [x] 2026-06-20 family device-map visual slice: the Accounts & Sync compass
     now uses explicit parent/protected-device markers and endpoint buttons so
@@ -781,15 +781,15 @@ parent tool instead of a sync/debug console.
     uses existing trusted-link policy labels; it does not expose keys, PINs,
     payloads, raw device IDs, or change Nanah authority.
   - [x] 2026-06-20 optional-delivery setup wording slice: Internet Pickup and
-    Home Bridge setup modals now describe the parent intent first: live Send
+    Home Pickup setup modals now describe the parent intent first: live Send
     Update is normal, Internet Pickup is only for a protected device that opens
-    later, and Home Bridge is only for an explicitly run same-network bridge.
+    later, and Home Pickup is only for an explicitly run same-network bridge.
     Endpoint/service-key prompts remain, but the copy says services store or
     route unreadable waiting updates only and never replace trusted-link
     signature validation.
   - [x] 2026-06-20 device-map and timeout clarity slice: the Accounts & Sync
     Family Device Updates compass now reads like a small family device map:
-    parent device, live Send Update, Home Bridge, and Internet Pickup. The
+    parent device, live Send Update, Home Pickup, and Internet Pickup. The
     visible safety line says pair and verify first because network/server
     reachability never grants control. The protected timeout overlay now hides
     `Request more time` when the time policy itself is expired and needs parent
@@ -799,7 +799,7 @@ parent tool instead of a sync/debug console.
     trust-map now says `Family device map`, labels the center as the parent
     device, treats surrounding tiles as protected profiles the parent manages,
     and shows delivery state as a compact route chip. The safety note now says
-    Home Bridge is a delivery path only after setup, while Wi-Fi, LAN
+    Home Pickup is a delivery path only after setup, while Wi-Fi, LAN
     visibility, and servers never become authority.
   - [x] 2026-06-20 protected-profile setup wording slice: parent-facing setup
     actions now say `Create Protected Profile` instead of `Create Child Profile`
@@ -931,9 +931,9 @@ parent tool instead of a sync/debug console.
     profiles appear ready for internet/home delivery.
   - [x] 2026-06-21 transport-specific saved-update check slice: manual,
     dashboard-open, visibility-return, and profile-switch saved-update checks
-    now execute only the configured eligible pickup transports. A Same-Home
-    provider does not force a failed Internet Pickup probe, and a Internet Pickup
-    provider does not force a Same-Home probe. The visible check copy names the
+    now execute only the configured eligible pickup transports. A Home
+    provider does not force a failed Internet Pickup probe, and an Internet Pickup
+    provider does not force a Home probe. The visible check copy names the
     active path or paths while preserving trusted-link validation as authority.
   - [x] 2026-06-20 profile-switch saved-update status slice: profile switching
     was rechecked and already calls the provider-gated managed background sync
@@ -1870,7 +1870,7 @@ the current extension dashboard.
   protected Review Conflict action that opens a parent/account re-authed
   conflict/rejected remote-policy history filter.
   Automatic LAN peer discovery remains pending. The command center now has
-  compact Internet Pickup and Home Bridge setup rows that can configure, edit,
+  compact Internet Pickup and Home Pickup setup rows that can configure, edit,
   or disable the browser-side HTTPS mailbox client and local-network configured
   provider after parent/account re-auth. This does not add mailbox server
   authority, discovery-as-authority, or a standalone offline-send page.
@@ -1879,7 +1879,7 @@ the current extension dashboard.
   when both sides are available. Unconfigured mailbox and local-network provider
   setup is hidden from the normal command center so parents are not asked to
   bring infrastructure. If a provider is already configured, the UI labels it as
-  Internet Pickup or Home Bridge and uses plain parent/user language while audit
+  Internet Pickup or Home Pickup and uses plain parent/user language while audit
   docs retain the trusted-link, target-profile, scope, revision, hash, and
   signature authority proof. The setup modals now ask for an address and an
   optional key, not a vague provider/password, and state that those paths do not
