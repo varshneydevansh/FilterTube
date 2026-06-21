@@ -311,6 +311,12 @@ policy mutation. Dashboard unlock sessions and the background PIN cache now
 expire, sensitive managed gates require fresher re-auth before history,
 rule-edit, viewing-space, or time-limit mutations, and the background PIN cache
 remains memory-only while failed-attempt rate-limit state is profile-persisted.
+Account-level delivery setup now follows the same evidence model. If parent
+re-auth fails while configuring `Later Pickup` or `Same-Home Pickup`, the
+dashboard writes redacted `admin_session.failed_unlock` rows to each protected
+profile currently manageable by the active account. This keeps provider setup
+failures visible in protected history without giving pickup services, networks,
+or provider settings any policy authority.
 
 The current remote writer is still not policy authority by itself. A valid newer
 `filtertube_managed_policy` envelope must first pass the managed envelope

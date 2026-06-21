@@ -5099,6 +5099,63 @@ document.addEventListener('DOMContentLoaded', async () => {
         return true;
     }
 
+    async function recordManagedAdminAuthFailureHistoryForManageableProfiles(reason = 'unlock_failed') {
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') return 0;
+
+        const root = safeObject(await io.loadProfilesV4());
+        const targetIds = getManageableProtectedProfileIds(root);
+        if (!targetIds.length) return 0;
+
+        const now = Date.now();
+        const actorId = normalizeString(root.activeProfileId) || activeProfileId || 'default';
+        const profiles = { ...safeObject(root.profiles) };
+        const safeReason = normalizeString(reason) || 'unlock_failed';
+        let changedCount = 0;
+        targetIds.forEach((targetId) => {
+            const profile = safeObject(profiles[targetId]);
+            if (!profile || Object.keys(profile).length === 0) return;
+            const row = {
+                rowId: `managed-auth-failed-${targetId}-${now}`,
+                schema: MANAGED_ACTION_HISTORY_SCHEMA,
+                version: 1,
+                actorProfileId: actorId,
+                actorDeviceId: normalizeString(nanahStableDeviceId) || 'local-extension-device',
+                targetProfileId: targetId,
+                trustedLinkId: null,
+                actionType: 'admin_session.failed_unlock',
+                scope: 'admin_session',
+                revision: null,
+                policyHash: null,
+                result: 'failed_auth',
+                reason: safeReason,
+                receivedAt: now,
+                issuedAt: now,
+                orderKey: `auth:${now}`,
+                summary: {
+                    redacted: true,
+                    label: 'Parent unlock failed'
+                },
+                sensitive: true
+            };
+            profiles[targetId] = {
+                ...profile,
+                managedActionHistory: appendManagedActionHistoryRow(profile, row)
+            };
+            changedCount += 1;
+        });
+        if (!changedCount) return 0;
+
+        const nextRoot = {
+            ...root,
+            schemaVersion: 4,
+            profiles
+        };
+        await io.saveProfilesV4(nextRoot);
+        profilesV4Cache = nextRoot;
+        return changedCount;
+    }
+
     function getManagedActionHistoryRowTime(row) {
         const item = safeObject(row);
         for (const key of ['receivedAt', 'issuedAt', 'createdAt']) {
@@ -13667,7 +13724,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const okAdmin = await ensureProfileUnlocked(root, activeProfileId, { sensitiveAction: true });
-        if (!okAdmin) return;
+        if (!okAdmin) {
+            await recordManagedAdminAuthFailureHistoryForManageableProfiles('later_pickup_config_unlock_failed');
+            return;
+        }
         const current = readNanahManagedMailboxServerConfig();
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
@@ -13806,7 +13866,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const okAdmin = await ensureProfileUnlocked(root, currentActiveProfileId, { sensitiveAction: true });
-        if (!okAdmin) return;
+        if (!okAdmin) {
+            await recordManagedAdminAuthFailureHistoryForManageableProfiles('same_home_pickup_config_unlock_failed');
+            return;
+        }
         const current = readNanahManagedLocalNetworkProviderConfig();
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
