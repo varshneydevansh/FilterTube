@@ -868,6 +868,10 @@ parent tool instead of a sync/debug console.
     available, and live-only devices read as `Live Now - Send Update`. This
     matches the parent mental model of one map with live, same-home, away/next
     open, and setup-needed states.
+  - [x] 2026-06-21 Accounts & Sync compass-state slice: the first-read family
+    device compass now mirrors the same state model: `Live now` + Send Update,
+    `Same home` + Same-Home Pickup, and `Away / next open` + Later Pickup. The
+    transport remains visible but no longer leads the parent mental model.
   - [x] 2026-06-21 live session direction slice: trusted parent links now label
     local source roles as `Open Send Session` and local protected replica roles
     as `Open Receive Session`. Protected surfaces can open a receive session for

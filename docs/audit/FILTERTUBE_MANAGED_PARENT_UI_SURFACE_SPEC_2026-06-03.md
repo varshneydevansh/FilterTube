@@ -104,6 +104,11 @@ checks remain the runtime authority.
 keeps combined Same-Home/Later Pickup devices as `Multiple send paths` instead
 of hiding the internet path behind same-home priority. Live-only devices read
 as `Live Now - Send Update` to match the parent-facing state model.
+2026-06-21 Accounts & Sync compass-state addendum: the top Family Device
+Updates compass now uses the same first-read state names as the command center:
+`Live now` + `Send Update`, `Same home` + `Same-Home Pickup`, and
+`Away / next open` + `Later Pickup`. Screen-reader labels use the same order,
+so parents see the device situation first and the transport second.
 2026-06-21 per-profile pickup-readiness addendum: command-center Later Pickup
 and Same-Home Pickup readiness now requires both a configured provider and a
 saved update-enabled trusted link for that protected profile. A configured
