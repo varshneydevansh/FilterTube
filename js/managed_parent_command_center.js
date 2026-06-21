@@ -57,8 +57,8 @@
                 ? helpers.getManagedLocalNetworkConfigSummary
                 : () => ({
                     configured: false,
-                    label: 'Same-Home Pickup off',
-                    detail: 'Same-Home Pickup needs a FilterTube-compatible bridge you choose; Wi-Fi discovery is never authority.',
+                    label: 'Home Pickup off',
+                    detail: 'Home Pickup needs a FilterTube-compatible bridge you choose; Wi-Fi discovery is never authority.',
                     tone: 'warning'
                 }),
             onAction: typeof helpers.onAction === 'function' ? helpers.onAction : null
@@ -409,7 +409,7 @@
         if (item.syncLocalNetworkReady === true && item.syncMailboxReady === true) {
             return {
                 key: 'home_and_internet',
-                label: 'Same home + away / internet',
+                label: 'Home + internet',
                 tone: 'success'
             };
         }
@@ -423,14 +423,14 @@
         if (item.syncLocalNetworkReady === true) {
             return {
                 key: 'local_network',
-                label: 'Same-Home Pickup',
+                label: 'Home Pickup',
                 tone: 'success'
             };
         }
         if (item.syncMailboxReady === true) {
             return {
                 key: 'mailbox',
-                label: 'Later Pickup',
+                label: 'Internet Pickup',
                 tone: 'success'
             };
         }
@@ -493,7 +493,7 @@
         if (item.syncLocalNetworkReady === true && item.syncMailboxReady === true) {
             return {
                 key: 'home_and_internet',
-                label: 'Same home + away / internet set up',
+                label: 'Home + internet set up',
                 tone: 'success'
             };
         }
@@ -507,14 +507,14 @@
         if (item.syncLocalNetworkReady === true) {
             return {
                 key: 'local_network',
-                label: 'Same-Home Pickup set up',
+                label: 'Home Pickup set up',
                 tone: 'success'
             };
         }
         if (item.syncMailboxReady === true) {
             return {
                 key: 'mailbox',
-                label: 'Later Pickup set up',
+                label: 'Internet Pickup set up',
                 tone: 'success'
             };
         }
@@ -548,8 +548,8 @@
         }
         const paths = [];
         if (item.syncLiveReady === true) paths.push('live Send Update');
-        if (item.syncLocalNetworkReady === true) paths.push('Same-Home Pickup');
-        if (item.syncMailboxReady === true) paths.push('Later Pickup');
+        if (item.syncLocalNetworkReady === true) paths.push('Home Pickup');
+        if (item.syncMailboxReady === true) paths.push('Internet Pickup');
         return paths.length
             ? `${targetCount} verified ${targetCount === 1 ? 'device can' : 'devices can'} receive by ${paths.join(' + ')}.`
             : `${readyCount} verified ${readyCount === 1 ? 'queue is' : 'queues are'} ready.`;
@@ -835,7 +835,7 @@
         const title = document.createElement('strong');
         title.textContent = 'Family device map';
         const detail = document.createElement('span');
-        detail.textContent = 'Each tile is a protected profile or device you can manage. The same map covers Send Update, Same-Home Pickup, and Later Pickup for nearby or internet devices after pairing.';
+        detail.textContent = 'Each tile is a protected profile or device you can manage. The same map covers Send Update, Home Pickup, and Internet Pickup for nearby or internet devices after pairing.';
         copy.append(title, detail);
 
         const ring = document.createElement('div');
@@ -863,11 +863,11 @@
             const route = document.createElement('span');
             let routeLabel = syncState.label;
             if (item.syncLocalNetworkReady === true && item.syncMailboxReady === true) {
-                routeLabel = 'Same home + away / internet';
+                routeLabel = 'Home + internet';
             } else if (item.syncLocalNetworkReady === true) {
-                routeLabel = 'Same home - Same-Home Pickup';
+                routeLabel = 'Home device - Home Pickup';
             } else if (item.syncMailboxReady === true) {
-                routeLabel = 'Away / internet - Later Pickup';
+                routeLabel = 'Away device - Internet Pickup';
             } else if (item.syncLiveReady === true) {
                 routeLabel = 'Live now - Send Update';
             }
@@ -894,7 +894,7 @@
 
         const note = document.createElement('div');
         note.className = 'ft-managed-command-center__trust-note';
-        note.textContent = 'Send Update, Same-Home Pickup, and Later Pickup are delivery states only. Wi-Fi, LAN visibility, online services, and saved device cards never become authority.';
+        note.textContent = 'Send Update, Home Pickup, and Internet Pickup are delivery states only. Wi-Fi, LAN visibility, online services, and saved device cards never become authority.';
 
         map.append(copy, ring, note);
         return map;
@@ -966,7 +966,7 @@
                 },
                 {
                     text: 'Pair another device only when it also needs these rules',
-                    title: 'Send Update appears after a protected profile exists. Later Pickup and Same-Home Pickup stay optional.'
+                    title: 'Send Update appears after a protected profile exists. Internet Pickup and Home Pickup stay optional.'
                 }
             ].forEach((item) => {
                 const step = document.createElement('li');
@@ -1141,13 +1141,13 @@
             promptBodyText.textContent = 'Normal control is live: open both devices, pair, verify, send. Add one of these only if your family needs approved updates to wait for a device at home, school, or away over the internet.';
             [
                 {
-                    label: 'Set Up Later Pickup',
+                    label: 'Set Up Internet Pickup',
                     title: 'For protected devices that should collect waiting approved updates next time they open.',
                     action: 'configure_mailbox',
                     scope: 'mailbox_provider'
                 },
                 {
-                    label: 'Set Up Same-Home Pickup',
+                    label: 'Set Up Home Pickup',
                     title: 'For a same-home or school pickup path you explicitly set up. Wi-Fi alone never grants control.',
                     action: 'configure_local_network',
                     scope: 'local_network_provider'
@@ -1182,12 +1182,12 @@
             mailboxCopy.className = 'ft-managed-command-center__provider-copy';
             const mailboxTitle = document.createElement('strong');
             mailboxTitle.textContent = mailbox.configured
-                ? (mailbox.label || 'Later Pickup is set up')
-                : 'Later Pickup is off';
+                ? (mailbox.label || 'Internet Pickup is set up')
+                : 'Internet Pickup is off';
             const mailboxDetail = document.createElement('span');
             mailboxDetail.textContent = summary.profileCount > 0
                 ? (mailbox.detail || 'Use this when a parent update should wait until the protected device opens later or away.')
-                : 'Create a protected profile first. Later Pickup is optional and only useful after a protected device is paired.';
+                : 'Create a protected profile first. Internet Pickup is optional and only useful after a protected device is paired.';
             const mailboxRoute = document.createElement('span');
             mailboxRoute.textContent = mailbox.configured
                 ? 'The protected device still accepts only trusted parent updates.'
@@ -1198,7 +1198,7 @@
                 const mailboxButton = document.createElement('button');
                 mailboxButton.className = 'btn-secondary';
                 mailboxButton.type = 'button';
-                mailboxButton.textContent = mailbox.configured ? 'Edit Later Pickup' : 'Set Up Later Pickup';
+                mailboxButton.textContent = mailbox.configured ? 'Edit Internet Pickup' : 'Set Up Internet Pickup';
                 mailboxButton.title = 'Requires parent/account re-auth. Use only when updates must wait for the protected device to open later or away.';
                 mailboxButton.addEventListener('click', (event) => {
                     event.preventDefault();
@@ -1217,17 +1217,17 @@
         if (shouldShowConfiguredProviderSetup && localNetwork.configured === true) {
             const localPanel = document.createElement('div');
             localPanel.className = `ft-managed-command-center__provider is-${localNetwork.tone || (localNetwork.configured ? 'success' : 'warning')}`;
-            localPanel.title = 'Optional: use this only for explicitly configured Same-Home Pickup. Being on the same network is not authority.';
+            localPanel.title = 'Optional: use this only for explicitly configured Home Pickup. Being on the same network is not authority.';
             const localCopy = document.createElement('div');
             localCopy.className = 'ft-managed-command-center__provider-copy';
             const localTitle = document.createElement('strong');
             localTitle.textContent = localNetwork.configured
-                ? (localNetwork.label || 'Same-Home Pickup is set up')
-                : 'Same-Home Pickup is off';
+                ? (localNetwork.label || 'Home Pickup is set up')
+                : 'Home Pickup is off';
             const localDetail = document.createElement('span');
             localDetail.textContent = summary.profileCount > 0
                 ? (localNetwork.detail || 'Use this only with a trusted FilterTube-compatible bridge on your home or school network.')
-                : 'Create a protected profile first. Same-Home Pickup is optional and never replaces parent trust.';
+                : 'Create a protected profile first. Home Pickup is optional and never replaces parent trust.';
             const localRoute = document.createElement('span');
             localRoute.textContent = localNetwork.configured
                 ? 'The protected device still accepts only trusted parent updates.'
@@ -1238,7 +1238,7 @@
                 const localButton = document.createElement('button');
                 localButton.className = 'btn-secondary';
                 localButton.type = 'button';
-                localButton.textContent = localNetwork.configured ? 'Edit Same-Home Pickup' : 'Set Up Same-Home Pickup';
+                localButton.textContent = localNetwork.configured ? 'Edit Home Pickup' : 'Set Up Home Pickup';
                 localButton.title = 'Requires parent/account re-auth. Being on the same network alone cannot change protected rules.';
                 localButton.addEventListener('click', (event) => {
                     event.preventDefault();
@@ -1498,7 +1498,7 @@
                         : 'Off',
                     note: item.syncOpenCheckCount > 0
                         ? 'When optional later delivery is configured, this protected profile checks for newer signed parent updates as it opens.'
-                        : 'Live Send Update still works. Profile-open checks only matter when optional Later Pickup or Same-Home Pickup delivery is configured.'
+                        : 'Live Send Update still works. Profile-open checks only matter when optional Internet Pickup or Home Pickup delivery is configured.'
                 } : null,
                 item.managedChannelListDetail ? { label: 'Lists', value: item.managedChannelListDetail } : null,
                 hasVerifiedDevice ? { label: 'Verified device', value: item.syncTargetLabel } : null,

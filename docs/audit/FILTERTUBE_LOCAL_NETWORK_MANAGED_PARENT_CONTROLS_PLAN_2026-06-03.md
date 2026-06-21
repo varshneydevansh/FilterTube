@@ -104,8 +104,8 @@ extension authority code.
   neutral detail cards no longer look like warning/error states when nothing is
   wrong.
 - [x] 2026-06-20 Family Controls delivery-status wording slice: per-profile
-  device rows now use task-oriented labels: `Send Update ready`, `Later
-  Pickup set up`, `Same-Home Pickup set up`, `Pair only for another device`,
+  device rows now use task-oriented labels: `Send Update ready`,
+  `Internet Pickup set up`, `Home Pickup set up`, `Pair only for another device`,
   `Re-pair trusted device`, and `Refresh trusted device`. This changes only
   redacted status wording/details; trusted-link, signature, revision, provider,
   and parent/account re-auth gates are unchanged.
@@ -720,26 +720,26 @@ parent tool instead of a sync/debug console.
     and no new policy authority.
   - [x] 2026-06-20 Family Device Updates chooser slice: the compass choices are
     now actionable. `Send update` switches to the parent-managed live send path and
-    focuses pairing; `Pick up later` reveals/opens Later Pickup setup; `Pick up
-    at home` reveals/opens Same-Home Pickup setup. Disabled paths explain the
+    focuses pairing; `Pick up later` reveals/opens Internet Pickup setup; `Pick up
+    at home` reveals/opens Home Pickup setup. Disabled paths explain the
     next required setup step instead of suggesting that nearby devices, Wi-Fi,
     or servers grant authority.
   - [x] 2026-06-20 Family Device Updates chooser readiness slice: the three
     compass choices now inherit delivery readiness from the existing strip:
-    live send, Later Pickup, and Same-Home Pickup each expose parent-readable
+    live send, Internet Pickup, and Home Pickup each expose parent-readable
     hover/focus guidance and visual tones for ready, optional, or setup-needed
     states. This is UI feedback only; trusted-link validation, target profile,
     scope, revision, hash, and signature gates still decide what can apply.
   - [x] 2026-06-20 public-docs alignment slice: README, Functionality,
     Technical, and shared release notes now describe the current Family Device
-    Updates model with `Send Update`, optional `Later Pickup`, optional
-    `Same-Home Pickup`, protected-profile time limits, receive-only protected
+    Updates model with `Send Update`, optional `Internet Pickup`, optional
+    `Home Pickup`, protected-profile time limits, receive-only protected
     sync, and the no-overclaim boundary that delivery paths never become
     authority without local trusted-link and policy validation.
   - [x] 2026-06-20 Family Device Updates naming-alignment slice: parent-visible
     command-center, history, status, and compass labels now consistently use
-    `Later Pickup` and `Same-Home Pickup` instead of mixing them with provider
-    terms like Internet Pickup or Home Bridge. Protocol variables and provider
+    `Internet Pickup` and `Home Pickup` instead of mixing them with lower-level
+    terms like mailbox or Home Bridge. Protocol variables and provider
     scopes remain unchanged.
   - [x] 2026-06-20 family device-map visual slice: the Accounts & Sync compass
     now uses explicit parent/protected-device markers and endpoint buttons so
@@ -748,25 +748,25 @@ parent tool instead of a sync/debug console.
     LAN discovery, no ambient nearby-device trust, and no new transport
     authority.
   - [x] 2026-06-20 away-device map wording slice: the same Family Device
-    Updates map now explicitly treats `Later Pickup` as the away/internet
+    Updates map now explicitly treats `Internet Pickup` as the away/internet
     device path when a trusted online pickup provider is configured. The normal
     live P2P path still requires both devices open, and online pickup services
     still carry only signed updates after trusted-link validation.
-  - [x] 2026-06-21 Later Pickup setup-copy alignment slice: Later Pickup setup
+  - [x] 2026-06-21 Internet Pickup setup-copy alignment slice: Internet Pickup setup
     modals now say they belong to the same Family Device Updates map and cover
     verified devices that open later or are away over the internet. The copy
     keeps the service optional and limited to unreadable waiting-update storage,
     not authority over profiles, PINs, trust, rules, or time limits.
   - [x] 2026-06-20 away-device Help/docs slice: Help, README, and Functionality
-    now explain that Later Pickup is the away/opens-later device path, while
-    Same-Home Pickup is the explicitly configured home/school path and Send Update
+    now explain that Internet Pickup is the away/opens-later device path, while
+    Home Pickup is the explicitly configured home/school path and Send Update
     remains the normal live P2P flow. Public wording still avoids claiming a
     hosted provider or automatic remote authority.
   - [x] 2026-06-20 release-note away-device wording slice: shared release notes
-    now describe Later Pickup as the away/opens-later path while avoiding claims
+    now describe Internet Pickup as the away/opens-later path while avoiding claims
     about hosted service ownership or automatic remote authority.
-  - [x] 2026-06-20 Same-Home Pickup health-toast wording slice: local pickup
-    readiness checks now report `Same-Home Pickup` in parent-facing toasts
+  - [x] 2026-06-20 Home Pickup health-toast wording slice: local pickup
+    readiness checks now report `Home Pickup` in parent-facing toasts
     instead of reverting to the lower-level bridge term. Internal provider
     names and authority checks are unchanged.
   - [x] 2026-06-20 admin unlock safety docs slice: Help, README, and
@@ -848,41 +848,41 @@ parent tool instead of a sync/debug console.
   - [x] 2026-06-20 unified family-device map slice: the Accounts & Sync compass,
     Family Controls trust map, and managed release-smoke checklist now use one
     parent-facing map for devices that are ready now, same-home, or away/later.
-    `Later Pickup` is the away/internet delivery state, `Same-Home Pickup` is the
+    `Internet Pickup` is the away/internet delivery state, `Home Pickup` is the
     explicit home/school delivery state, and neither provider path becomes
     authority without local trusted-link, target, revision, device binding, hash,
     and signature validation.
   - [x] 2026-06-21 command-center status-chip alignment slice: Family Controls
-    rows now show `Send Update ready`, `Same-Home Pickup`, `Later Pickup`, or
+    rows now show `Send Update ready`, `Home Pickup`, `Internet Pickup`, or
     `Multiple send paths` in the compact device chip instead of collapsing
     provider-ready paths into a generic `Ready` state. This keeps internet/away
     and same-network devices on the same family-device map while preserving the
     existing provider-gated delivery and local validation model.
   - [x] 2026-06-21 family-device route-label slice: the command-center map now
-    labels configured same-network profiles as `Same home - Same-Home Pickup`
-    and configured internet/later profiles as `Away / internet - Later Pickup`.
+    labels configured same-network profiles as `Home device - Home Pickup`
+    and configured internet/later profiles as `Away device - Internet Pickup`.
     The label change keeps both paths in one parent-facing map; transport names
     remain delivery states, not authority.
   - [x] 2026-06-21 unified map state slice: the command-center map now keeps a
-    distinct combined state when both Same-Home Pickup and Later Pickup are
+    distinct combined state when both Home Pickup and Internet Pickup are
     available, and live-only devices read as `Live now - Send Update`. This
     matches the parent mental model of one map with live, same-home,
     away/internet, and setup-needed states.
   - [x] 2026-06-21 Accounts & Sync compass-state slice: the first-read family
     device compass now mirrors the same state model: `Live now` + Send Update,
-    `Same home` + Same-Home Pickup, and `Away / internet` + Later Pickup. The
+    `Same home` + Home Pickup, and `Away / internet` + Internet Pickup. The
     transport remains visible but no longer leads the parent mental model.
   - [x] 2026-06-21 internet-device map wording slice: the Family Device Updates
-    compass and command-center trusted-device tiles now describe Later Pickup
+    compass and command-center trusted-device tiles now describe Internet Pickup
     as `Away / internet` instead of only `next open`. This keeps internet
     protected devices on the same map as live and same-home devices while still
-    requiring explicit Later Pickup setup and the existing trusted-link,
+    requiring explicit Internet Pickup setup and the existing trusted-link,
     target-profile, revision, hash, device-binding, and signature gates.
   - [x] 2026-06-21 unified map parent-copy alignment slice: the first-read
     Accounts & Sync map now uses `Send Update` consistently and describes
-    Same-Home Pickup as a home/school setup instead of leading with bridge
+    Home Pickup as a home/school setup instead of leading with bridge
     terminology. The command-center optional saved-update prompt now frames
-    Same-Home Pickup and Later Pickup as one family-device map for home, school,
+    Home Pickup and Internet Pickup as one family-device map for home, school,
     or away-over-internet devices. This is copy-only; provider contracts,
     trusted-link validation, target-profile binding, revisions, hashes, and
     signatures remain unchanged.
@@ -890,10 +890,10 @@ parent tool instead of a sync/debug console.
     Technical, and shared release notes now use `Send Update` instead of the
     older `Send Now` label and explicitly state that the Family Device map covers
     nearby, same-home, and away/internet devices after pairing. This is
-    copy-only; live Nanah, Same-Home Pickup, and Later Pickup authority gates are
+    copy-only; live Nanah, Home Pickup, and Internet Pickup authority gates are
     unchanged.
   - [x] 2026-06-21 optional-pickup prompt gate slice: the Family Controls
-    command-center no longer offers first-time Later Pickup or Same-Home Pickup
+    command-center no longer offers first-time Internet Pickup or Home Pickup
     setup until at least one manageable profile has a verified target device.
     Already configured providers remain visible so parents can edit or disable
     them. This keeps optional saved-update setup tied to an actual protected
@@ -905,17 +905,17 @@ parent tool instead of a sync/debug console.
     copy/accessibility alignment only; delivery gates and provider behavior are
     unchanged.
   - [x] 2026-06-21 dual-pickup map label slice: when a protected profile has
-    both Same-Home Pickup and Later Pickup available, the command-center map now
-    labels that device `Same home + away / internet` instead of the generic
-    `Multiple send paths`. This keeps the same map valid for internet devices
-    without implying that the pickup provider is authority.
+    both Home Pickup and Internet Pickup available, the command-center map now
+    labels that device `Home + internet` instead of the generic multiple-path
+    wording. This keeps the same map valid for internet devices without implying
+    that any pickup provider is authority.
   - [x] 2026-06-21 command-center route-chip alignment slice: per-profile
     status and delivery-preview chips now use `Live + pickup ready` or
-    `Same home + away / internet set up` instead of the generic multiple-path
-    wording. The route chip now matches the family-device map for live,
-    same-network, and internet pickup paths.
-  - [x] 2026-06-21 pickup setup label slice: configured Later Pickup and
-    Same-Home Pickup summaries now say `set up` instead of `ready`. This avoids
+    `Home + internet set up` instead of the generic multiple-path wording. The
+    route chip now matches the family-device map for live, home/intranet, and
+    internet pickup paths.
+  - [x] 2026-06-21 pickup setup label slice: configured Internet Pickup and
+    Home Pickup summaries now say `set up` instead of `ready`. This avoids
     implying guaranteed delivery from endpoint configuration alone; protected
     devices still validate trusted link, target profile, revision/hash,
     device-binding, and signature before applying anything.
@@ -925,27 +925,24 @@ parent tool instead of a sync/debug console.
     the saved parent link, but the UI no longer implies they can send or edit
     parent policy.
   - [x] 2026-06-21 per-profile pickup-readiness slice: the managed sync summary
-    now marks `Later Pickup` or `Same-Home Pickup` ready only when the provider
+    now marks `Internet Pickup` or `Home Pickup` ready only when the provider
     exists and that protected profile has a saved update-enabled trusted link.
     Provider configuration by itself no longer makes unrelated protected
-    profiles appear ready for later/same-home delivery.
+    profiles appear ready for internet/home delivery.
   - [x] 2026-06-21 transport-specific saved-update check slice: manual,
     dashboard-open, visibility-return, and profile-switch saved-update checks
     now execute only the configured eligible pickup transports. A Same-Home
-    provider does not force a failed Later Pickup probe, and a Later Pickup
+    provider does not force a failed Internet Pickup probe, and a Internet Pickup
     provider does not force a Same-Home probe. The visible check copy names the
     active path or paths while preserving trusted-link validation as authority.
   - [x] 2026-06-20 profile-switch saved-update status slice: profile switching
     was rechecked and already calls the provider-gated managed background sync
-    after a successful switch. The open-sync helper now reports `Later Pickup
-    not ready` instead of the older `Internet Pickup not ready` label when a
-    protected profile has saved-update checks enabled but no pull provider is
-    available.
+    after a successful switch. The open-sync helper reports the configured
+    pickup path while keeping no-provider checks non-authoritative.
   - [x] 2026-06-20 delivery-receipt wording slice: source-side managed delivery
-    ack history now reports `Later Pickup update delivered/failed` and
-    `Same-Home Pickup update delivered/failed` instead of the older provider
-    labels. Ack schemas, transport IDs, revision/hash records, and authority
-    validation remain unchanged.
+    ack history now reports parent-facing pickup update delivery/receipt labels
+    instead of raw provider labels. Ack schemas, transport IDs, revision/hash
+    records, and authority validation remain unchanged.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.
@@ -964,12 +961,13 @@ parent tool instead of a sync/debug console.
   acknowledging signed local-network candidates through HTTPS or private local
   HTTP endpoints. Discovery remains non-authoritative; local validation still
   gates every apply.
-- [x] 2026-06-20 parent-facing sync vocabulary simplified. The Accounts &
-  Sync first screen now describes the paths as Send Update, Same-Home Pickup, and
-  Later Pickup while keeping Home Bridge/Internet Pickup as internal transport
-  concepts and advanced/provider details. This keeps the parent mental model
-  device-first without changing authority, signatures, target profile checks,
-  or provider validation.
+- [x] 2026-06-21 parent-facing sync vocabulary alignment. The Accounts &
+  Sync first screen, Family Controls map, delivery summaries, provider setup,
+  and protected history labels now use one parent-visible map: `Send Update`
+  for live devices, `Home Pickup` for an explicitly configured home/school
+  bridge, and `Internet Pickup` for verified devices that open later or are away.
+  This keeps the parent mental model device-first without changing authority,
+  signatures, target profile checks, transport IDs, or provider validation.
 - [ ] Native Android/iOS settings-lock and timeout UI parity. This belongs in
   the downstream app sync/runtime lane.
 
@@ -1101,8 +1099,8 @@ Use these labels in normal UI:
 | Parent-facing label | Technical meaning |
 | --- | --- |
 | Send Update / Live send | Live Nanah P2P while both devices are open. |
-| Later Pickup | Encrypted internet pending-update service. |
-| Same-Home Pickup | Trusted same-network bridge/gateway. |
+| Internet Pickup | Encrypted internet pending-update service. |
+| Home Pickup | Trusted same-network bridge/gateway. |
 | Protected device | Child/family/caregiver-managed target profile/device. |
 | Parent-approved list | Reviewed channel/keyword list materialized into profile rules. |
 
