@@ -3348,6 +3348,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
+    async function clearProfileUnlockSessionsExcept(keepProfileId, profiles = {}) {
+        const keepId = normalizeString(keepProfileId);
+        const ids = new Set([
+            ...Array.from(unlockedProfiles),
+            ...Array.from(profileUnlockSessions.keys())
+        ]);
+        Object.keys(safeObject(profiles)).forEach((profileId) => {
+            const id = normalizeString(profileId);
+            if (id) ids.add(id);
+        });
+        for (const id of ids) {
+            if (!id || id === keepId) continue;
+            clearProfileUnlockSession.run(id);
+            await notifyBackgroundLocked(id);
+        }
+    }
+
     function normalizeManagedAdminFailedUnlockState(value, now = Date.now()) {
         if (ManagedAdminAuthority && typeof ManagedAdminAuthority.normalizeFailedUnlockState === 'function') {
             return ManagedAdminAuthority.normalizeFailedUnlockState(value, now);
@@ -18734,6 +18751,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 profiles
             });
             managedChildEdit = null;
+            await clearProfileUnlockSessionsExcept(targetId, profiles);
             await StateManager.loadSettings();
             await refreshProfilesUI();
             void runNanahManagedBackgroundSync({ reason: 'profile_switch' });

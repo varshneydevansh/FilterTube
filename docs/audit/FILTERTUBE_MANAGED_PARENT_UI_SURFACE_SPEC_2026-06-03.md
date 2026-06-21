@@ -109,6 +109,11 @@ Updates compass now uses the same first-read state names as the command center:
 `Live now` + `Send Update`, `Same home` + `Same-Home Pickup`, and
 `Away / next open` + `Later Pickup`. Screen-reader labels use the same order,
 so parents see the device situation first and the transport second.
+2026-06-21 admin-session profile-switch addendum: profile switching now clears
+all non-target unlock sessions in the tab and asks the background session-pin
+cache to forget those profiles. The target profile keeps the fresh switching
+unlock needed to complete entry, but prior parent/admin authority does not
+carry across profile boundaries.
 2026-06-21 per-profile pickup-readiness addendum: command-center Later Pickup
 and Same-Home Pickup readiness now requires both a configured provider and a
 saved update-enabled trusted link for that protected profile. A configured

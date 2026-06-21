@@ -1167,6 +1167,12 @@ Parent/caregiver admin authority needs its own hardening before policy writes:
 - Recovery/reset behavior must not let the protected user silently become
   admin or erase managed policy.
 
+2026-06-21 profile-switch relock slice: after a successful profile switch, the
+extension now clears every non-target foreground unlock session and notifies the
+background session-pin cache to drop those profiles. The just-entered target
+profile keeps its fresh switching unlock so the switch can complete, but a
+previous Default/Master admin session cannot carry into another profile.
+
 ## Action History Requirements
 
 Action history is required user feedback, but it must be protected evidence,
