@@ -48,6 +48,13 @@ configured pickup hooks. It records:
 - redacted receipt proof;
 - release wording boundary.
 
+The reference provider endpoint behavior is lane-owned by
+`tests/runtime/managed-delivery-provider-reference-current-behavior.test.mjs`.
+That test proves bearer-token handling, CORS preflight, ciphertext-only Internet
+Pickup storage/pull/purge, redacted mailbox receipts, Home Pickup signed
+candidate storage/discovery, and redacted Home Pickup receipts. It is proof of
+endpoint shape only, not proof of a hosted FilterTube service.
+
 ## Required Rows
 
 ```text
@@ -101,4 +108,5 @@ Blocked until a passing provider ownership artifact exists:
 
 ```bash
 node --test tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs
+node --test tests/runtime/managed-delivery-provider-reference-current-behavior.test.mjs
 ```

@@ -21,6 +21,7 @@ const repoRoot = process.cwd();
 const docPath = MANAGED_PICKUP_PROVIDER_OWNERSHIP_GATE_DOC;
 const templatePath = 'docs/audit/artifacts/managed-pickup-provider-ownership/template.json';
 const verifierPath = 'docs/audit/artifacts/managed-pickup-provider-ownership/verify-provider-ownership-artifact.mjs';
+const referenceProviderTestPath = 'tests/runtime/managed-delivery-provider-reference-current-behavior.test.mjs';
 
 function read(file) {
   return fs.readFileSync(path.join(repoRoot, file), 'utf8');
@@ -98,6 +99,9 @@ test('provider ownership gate is wired into release settings and smoke lanes', (
   assert.ok(LANES.release.tests.includes('tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs'));
   assert.ok(LANES.settings.tests.includes('tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs'));
   assert.ok(LANES.smoke.tests.includes('tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs'));
+  assert.ok(LANES.release.tests.includes(referenceProviderTestPath));
+  assert.ok(LANES.settings.tests.includes(referenceProviderTestPath));
+  assert.ok(LANES.smoke.tests.includes(referenceProviderTestPath));
   assert.equal(MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_TEMPLATE, templatePath);
   assert.equal(
     MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_VERIFIER,
@@ -120,7 +124,7 @@ test('provider ownership doc keeps parent wording simple and blocks authority ov
 });
 
 test('classifier treats provider ownership gate files as release settings and smoke proof', () => {
-  const result = classifyPaths([docPath, verifierPath, templatePath]);
+  const result = classifyPaths([docPath, verifierPath, templatePath, referenceProviderTestPath]);
 
   assert.deepEqual(result.lanes, ['release', 'settings', 'smoke']);
   assert.deepEqual(result.unmatched, []);
