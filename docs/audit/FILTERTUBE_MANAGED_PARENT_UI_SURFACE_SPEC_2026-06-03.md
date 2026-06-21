@@ -93,6 +93,13 @@ or policy authority.
 and button tooltips now use the same away/opens-later wording as the Family
 Device Updates map. This keeps internet devices on the same parent mental model
 instead of presenting a separate remote-admin feature.
+2026-06-21 command-center status-chip addendum: protected-profile rows now use
+the same map vocabulary in their compact sync chip. Live paths say
+`Send Update ready`, explicitly configured same-network paths say
+`Same-Home Pickup`, away/opens-later paths say `Later Pickup`, and combined
+paths say `Multiple send paths`. This changes only parent-facing labels; the
+trusted-link, target-profile, revision, device-binding, hash, and signature
+checks remain the runtime authority.
 2026-06-21 legacy parent-trust edit addendum: when editing an older managed
 Source -> Replica parent link that lacks the newer parent-managed fields, the
 edit modal now proposes the current safe defaults: matching parent updates,

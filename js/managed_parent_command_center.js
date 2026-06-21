@@ -399,6 +399,34 @@
                 tone: 'warning'
             };
         }
+        if (item.syncLiveReady === true && (item.syncLocalNetworkReady === true || item.syncMailboxReady === true)) {
+            return {
+                key: 'multi_path',
+                label: 'Multiple send paths',
+                tone: 'success'
+            };
+        }
+        if (item.syncLiveReady === true) {
+            return {
+                key: 'live',
+                label: readyCount > 1 ? `Send Update ready (${readyCount})` : 'Send Update ready',
+                tone: 'success'
+            };
+        }
+        if (item.syncLocalNetworkReady === true) {
+            return {
+                key: 'local_network',
+                label: 'Same-Home Pickup',
+                tone: 'success'
+            };
+        }
+        if (item.syncMailboxReady === true) {
+            return {
+                key: 'mailbox',
+                label: 'Later Pickup',
+                tone: 'success'
+            };
+        }
         return {
             key: 'ready',
             label: 'Ready',
@@ -813,9 +841,9 @@
             name.textContent = item.profileName || 'Protected profile';
             const route = document.createElement('span');
             route.textContent = item.syncLocalNetworkReady === true
-                ? 'Same-Home Pickup'
+                ? 'Nearby - Same-Home Pickup'
                 : item.syncMailboxReady === true
-                    ? 'Later Pickup'
+                    ? 'Away - Later Pickup'
                     : item.syncLiveReady === true
                         ? 'Ready now'
                         : syncState.label;

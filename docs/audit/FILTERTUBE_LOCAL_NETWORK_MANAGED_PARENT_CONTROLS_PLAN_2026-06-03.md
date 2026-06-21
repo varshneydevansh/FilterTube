@@ -851,6 +851,12 @@ parent tool instead of a sync/debug console.
     explicit home/school delivery state, and neither provider path becomes
     authority without local trusted-link, target, revision, device binding, hash,
     and signature validation.
+  - [x] 2026-06-21 command-center status-chip alignment slice: Family Controls
+    rows now show `Send Update ready`, `Same-Home Pickup`, `Later Pickup`, or
+    `Multiple send paths` in the compact device chip instead of collapsing
+    provider-ready paths into a generic `Ready` state. This keeps internet/away
+    and same-network devices on the same family-device map while preserving the
+    existing provider-gated delivery and local validation model.
   - [x] 2026-06-20 profile-switch saved-update status slice: profile switching
     was rechecked and already calls the provider-gated managed background sync
     after a successful switch. The open-sync helper now reports `Later Pickup
