@@ -1557,6 +1557,11 @@ const MANAGED_TIME_USAGE_STORAGE_KEY = 'ftManagedTimeUsageV1';
 const MANAGED_TIME_USAGE_SCHEMA = 'filtertube_managed_time_usage';
 const MANAGED_ACTION_HISTORY_SCHEMA = 'filtertube_managed_action_history';
 const MANAGED_ACTION_HISTORY_LIMIT = 500;
+const MANAGED_ACTION_HISTORY_DAY_MS = 24 * 60 * 60 * 1000;
+const MANAGED_ACTION_HISTORY_ACCEPTED_RETENTION_MS = 30 * MANAGED_ACTION_HISTORY_DAY_MS;
+const MANAGED_ACTION_HISTORY_PROTECTED_RETENTION_MS = 90 * MANAGED_ACTION_HISTORY_DAY_MS;
+const MANAGED_ACTION_HISTORY_PROTECTED_RESULTS = new Set(['rejected', 'conflict', 'failed_auth', 'expired_session', 'cleared_by_admin']);
+const MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set(['trust_link.revoke', 'trust_link.key_revoke', 'managed_signing_key.rotate', 'admin_session.failed_unlock', 'admin_session.lock', 'policy.time_limit.update', 'policy.time_limit.request_extra', 'policy.viewing_space.update', 'policy.channel_list.import', 'policy.channel_list.remove', 'policy.channel_list.check', 'policy.channel_list.refresh', 'policy.channel_list.pause', 'policy.channel_list.resume', 'remote_policy.source_push']);
 const MANAGED_TIME_PARENT_REQUEST_COOLDOWN_MS = 5 * 60 * 1000;
 const MANAGED_TIME_HEARTBEAT_STALE_MS = 8000;
 const MANAGED_TIME_MAX_HEARTBEAT_DELTA_SECONDS = 10;
@@ -1632,13 +1637,52 @@ function pruneManagedTimeUsageRows(rows, limit = 240) {
     );
 }
 
+function getManagedActionHistoryRowTimeForBackground(row) {
+    const item = safeObject(row);
+    for (const key of ['receivedAt', 'issuedAt', 'createdAt']) {
+        const value = normalizeNonNegativeInteger(item[key]);
+        if (value != null) return value;
+    }
+    const orderKey = normalizeString(item.orderKey);
+    const match = orderKey.match(/(\d{12,})$/);
+    if (match) {
+        const value = normalizeNonNegativeInteger(match[1]);
+        if (value != null) return value;
+    }
+    return null;
+}
+
+function getManagedActionHistoryRetentionMsForBackground(row) {
+    const item = safeObject(row);
+    const result = normalizeString(item.result);
+    const actionType = normalizeString(item.actionType);
+    if (
+        MANAGED_ACTION_HISTORY_PROTECTED_RESULTS.has(result) ||
+        MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS.has(actionType)
+    ) {
+        return MANAGED_ACTION_HISTORY_PROTECTED_RETENTION_MS;
+    }
+    return MANAGED_ACTION_HISTORY_ACCEPTED_RETENTION_MS;
+}
+
+function pruneManagedActionHistoryRowsForBackground(rows, now = nowTs()) {
+    return safeArray(rows)
+        .filter(row => safeObject(row).schema === MANAGED_ACTION_HISTORY_SCHEMA)
+        .filter((row) => {
+            const timestamp = getManagedActionHistoryRowTimeForBackground(row);
+            if (timestamp == null) return true;
+            return now - timestamp < getManagedActionHistoryRetentionMsForBackground(row);
+        })
+        .slice(-MANAGED_ACTION_HISTORY_LIMIT);
+}
+
 function appendManagedActionHistoryRowsForBackground(profile, rows) {
-    return [
+    return pruneManagedActionHistoryRowsForBackground([
         ...safeArray(profile?.managedActionHistory)
             .filter(row => safeObject(row).schema === MANAGED_ACTION_HISTORY_SCHEMA),
         ...safeArray(rows)
             .filter(row => safeObject(row).schema === MANAGED_ACTION_HISTORY_SCHEMA)
-    ].slice(-MANAGED_ACTION_HISTORY_LIMIT);
+    ]);
 }
 
 function shouldSuppressManagedTimeParentRequest(profile, { now, dateKey, policyRevision, policyHash }) {

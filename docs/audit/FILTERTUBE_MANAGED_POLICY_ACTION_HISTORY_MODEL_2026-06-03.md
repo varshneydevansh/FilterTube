@@ -325,6 +325,14 @@ Manual admin-session locking follows the same protected-history model. The
 retention path even though it is not a failed or rejected policy decision. The
 row is evidence that admin authority was closed, not a source of authority.
 
+The 2026-06-21 background retention alignment slice makes the timeout overlay's
+`FilterTube_ManagedTimeLimitParentRequest` writer use the same 30-day
+accepted-action, 90-day protected-evidence, and 500-row cap as dashboard-side
+history writes. This keeps `policy.time_limit.request_extra` rows protected
+even though they are written from the background service worker after runtime
+budget revalidation, and it does not grant time, unlock YouTube, or alter the
+parent approval flow.
+
 The current remote writer is still not policy authority by itself. A valid newer
 `filtertube_managed_policy` envelope must first pass the managed envelope
 validator and then `applyManagedPolicyEnvelope(...)`, which persists accepted
