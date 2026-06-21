@@ -1177,6 +1177,13 @@ record the trusted dashboard tab that created them, and `tabs.onRemoved` clears
 matching cached PINs when that tab/window closes. TTL and explicit clear
 messages still apply, but a closed dashboard tab no longer leaves its cached
 admin/profile PIN available for later background work.
+2026-06-21 explicit admin-lock slice: the Accounts & Sync Security card now has
+`Lock Admin Session`. It is disabled for protected child/user surfaces and
+protected-profile edit mode, clears all foreground unlock sessions in the
+dashboard tab, asks the background session-pin cache to forget all known
+profiles, refreshes the lock gate, and writes a redacted `admin_session.lock`
+history row to manageable protected profiles. This satisfies explicit logout
+without giving the protected user any policy authority.
 
 ## Action History Requirements
 

@@ -929,6 +929,7 @@
                                         <div style="display:flex;gap:8px;flex-wrap:wrap;">
                                             <button id="ftSetMasterPinBtn" class="btn-secondary" type="button">Set / Change Master PIN</button>
                                             <button id="ftClearMasterPinBtn" class="btn-secondary" type="button">Remove Master PIN</button>
+                                            <button id="ftLockAdminSessionBtn" class="btn-secondary" type="button" title="Immediately lock temporary parent/admin unlocks in this dashboard tab.">Lock Admin Session</button>
                                         </div>
                                     </div>
                                 </div>
@@ -1541,6 +1542,7 @@
                                                     <li>Protected-profile PINs protect switching into that profile and can open receive-only Accounts &amp; Sync; they do not grant parent/admin authority.</li>
                                                     <li>Parent/account or Master PIN controls rule edits, allowed viewing spaces, time limits, backups, trusted-link policy, and settings.</li>
                                                     <li>Parents can set or remove a protected profile’s switching PIN from the parent/account profile row after parent/account unlock.</li>
+                                                    <li>Use <strong>Lock Admin Session</strong> in Security when you want temporary parent/admin unlocks to end immediately on this dashboard.</li>
                                                     <li>Opening receive-only Accounts &amp; Sync with a child PIN does not unlock Dashboard, Filters, Kids Mode, Settings, or parent controls after you return to the viewing surface.</li>
                                                     <li>Unlock is per-session in both Popup and New Tab.</li>
                                                 </ul>
@@ -1838,7 +1840,7 @@
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Admin unlock safety</div>
-                                            <div class="help-item-body">Parent/admin unlock is temporary. Sensitive actions can ask for the PIN again, and repeated wrong PIN attempts are delayed and written to protected history so the parent can notice tampering without exposing the PIN.</div>
+                                            <div class="help-item-body">Parent/admin unlock is temporary. Sensitive actions can ask for the PIN again, Lock Admin Session ends the current dashboard unlock immediately, and repeated wrong PIN attempts are delayed and written to protected history so the parent can notice tampering without exposing the PIN.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Who sets a protected profile PIN</div>

@@ -2875,6 +2875,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftCreateChildBtn = document.getElementById('ftCreateChildBtn');
     const ftSetMasterPinBtn = document.getElementById('ftSetMasterPinBtn');
     const ftClearMasterPinBtn = document.getElementById('ftClearMasterPinBtn');
+    const ftLockAdminSessionBtn = document.getElementById('ftLockAdminSessionBtn');
 
     const ftAllowAccountCreation = document.getElementById('ftAllowAccountCreation');
     const ftMaxAccounts = document.getElementById('ftMaxAccounts');
@@ -3156,6 +3157,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'managed_signing_key.rotate': 'Managed signing key rotated',
         'admin_session.unlock': 'Admin session unlocked',
         'admin_session.failed_unlock': 'Admin unlock failed',
+        'admin_session.lock': 'Admin session locked',
         'local_policy.update': 'Local policy changed',
         'remote_policy.accept': 'Remote policy accepted',
         'remote_policy.reject': 'Remote policy rejected',
@@ -3360,6 +3362,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         for (const id of ids) {
             if (!id || id === keepId) continue;
+            clearProfileUnlockSession.run(id);
+            await notifyBackgroundLocked(id);
+        }
+    }
+
+    async function clearAllProfileUnlockSessions(profiles = {}) {
+        const ids = new Set([
+            ...Array.from(unlockedProfiles),
+            ...Array.from(profileUnlockSessions.keys())
+        ]);
+        Object.keys(safeObject(profiles)).forEach((profileId) => {
+            const id = normalizeString(profileId);
+            if (id) ids.add(id);
+        });
+        for (const id of ids) {
+            if (!id) continue;
             clearProfileUnlockSession.run(id);
             await notifyBackgroundLocked(id);
         }
@@ -5175,6 +5193,63 @@ document.addEventListener('DOMContentLoaded', async () => {
         return changedCount;
     }
 
+    async function recordManagedAdminSessionLockHistoryForManageableProfiles(reason = 'manual_lock') {
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') return 0;
+
+        const root = safeObject(await io.loadProfilesV4());
+        const targetIds = getManageableProtectedProfileIds(root);
+        if (!targetIds.length) return 0;
+
+        const now = Date.now();
+        const actorId = normalizeString(root.activeProfileId) || activeProfileId || 'default';
+        const profiles = { ...safeObject(root.profiles) };
+        const safeReason = normalizeString(reason) || 'manual_lock';
+        let changedCount = 0;
+        targetIds.forEach((targetId) => {
+            const profile = safeObject(profiles[targetId]);
+            if (!profile || Object.keys(profile).length === 0) return;
+            const row = {
+                rowId: `managed-admin-lock-${targetId}-${now}`,
+                schema: MANAGED_ACTION_HISTORY_SCHEMA,
+                version: 1,
+                actorProfileId: actorId,
+                actorDeviceId: normalizeString(nanahStableDeviceId) || 'local-extension-device',
+                targetProfileId: targetId,
+                trustedLinkId: null,
+                actionType: 'admin_session.lock',
+                scope: 'admin_session',
+                revision: null,
+                policyHash: null,
+                result: 'locked',
+                reason: safeReason,
+                receivedAt: now,
+                issuedAt: now,
+                orderKey: `auth-lock:${now}`,
+                summary: {
+                    redacted: true,
+                    label: 'Admin session locked'
+                },
+                sensitive: true
+            };
+            profiles[targetId] = {
+                ...profile,
+                managedActionHistory: appendManagedActionHistoryRow(profile, row)
+            };
+            changedCount += 1;
+        });
+        if (!changedCount) return 0;
+
+        const nextRoot = {
+            ...root,
+            schemaVersion: 4,
+            profiles
+        };
+        await io.saveProfilesV4(nextRoot);
+        profilesV4Cache = nextRoot;
+        return changedCount;
+    }
+
     function getManagedActionHistoryRowTime(row) {
         const item = safeObject(row);
         for (const key of ['receivedAt', 'issuedAt', 'createdAt']) {
@@ -6538,6 +6613,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ftClearMasterPinBtn) {
             ftClearMasterPinBtn.disabled = isChild || scopedProtectedEdit;
             ftClearMasterPinBtn.title = isChild ? childTitle : (scopedProtectedEdit ? scopedTitle : '');
+        }
+        if (ftLockAdminSessionBtn) {
+            ftLockAdminSessionBtn.disabled = isChild || scopedProtectedEdit;
+            ftLockAdminSessionBtn.title = isChild
+                ? childTitle
+                : (scopedProtectedEdit ? scopedTitle : 'Immediately lock temporary parent/admin unlocks in this dashboard tab.');
         }
         if (syncKidsToMainToggle) {
             syncKidsToMainToggle.disabled = isChild;
@@ -20168,6 +20249,25 @@ document.addEventListener('DOMContentLoaded', async () => {
             await notifyBackgroundLocked('default');
             await refreshProfilesUI();
             UIComponents.showToast('Master PIN removed', 'success');
+        });
+    }
+
+    if (ftLockAdminSessionBtn) {
+        ftLockAdminSessionBtn.addEventListener('click', async () => {
+            if (!ensureNonChildAdminAction('Child profiles cannot lock parent/admin sessions here.')) {
+                return;
+            }
+            if (!ensureNotScopedProtectedEditForGlobalAdmin('admin session controls')) return;
+            const io = window.FilterTubeIO || {};
+            const profilesV4 = typeof io.loadProfilesV4 === 'function'
+                ? safeObject(await io.loadProfilesV4())
+                : profilesV4Cache;
+            await recordManagedAdminSessionLockHistoryForManageableProfiles('manual_lock');
+            await clearAllProfileUnlockSessions(safeObject(profilesV4).profiles);
+            sessionMasterPin = '';
+            await refreshProfilesUI();
+            await applyLockGateIfNeeded();
+            UIComponents.showToast('Admin session locked', 'success');
         });
     }
 

@@ -118,6 +118,12 @@ carry across profile boundaries.
 remember the trusted dashboard tab that created them and are cleared when that
 tab/window is removed. The cache still has a short TTL and explicit clear
 messages, but close/reopen no longer depends only on TTL expiry.
+2026-06-21 explicit admin-lock addendum: the Security card now exposes one
+plain-language `Lock Admin Session` button beside Master PIN controls. It clears
+foreground and background session PIN state for known profiles, refreshes the
+dashboard lock gate, and records a redacted `admin_session.lock` row for
+manageable protected profiles. Child/protected surfaces and scoped protected
+editing cannot use it to change admin state.
 2026-06-21 per-profile pickup-readiness addendum: command-center Later Pickup
 and Same-Home Pickup readiness now requires both a configured provider and a
 saved update-enabled trusted link for that protected profile. A configured
