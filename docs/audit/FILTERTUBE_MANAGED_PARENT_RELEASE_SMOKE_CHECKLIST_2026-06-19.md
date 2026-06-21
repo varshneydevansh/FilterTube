@@ -34,7 +34,7 @@ Use these terms in release notes and support replies:
 | --- | --- | --- |
 | Send Update | Live Nanah P2P | Parent and protected devices are open, paired, phrase-verified, and a signed update is sent now. |
 | Internet Pickup | Encrypted pickup provider | A compatible HTTPS pickup service stores unreadable saved updates until the verified protected device opens later or away. |
-| Home Pickup | Local-network pickup provider | A compatible home/school/clinic bridge on the same network can hold or relay signed updates for already trusted protected devices. |
+| Home Pickup | Local-network pickup provider | A compatible home/school/clinic pickup service on the same network can hold or relay signed updates for already trusted protected devices. |
 
 Use the same Family Device Map for devices that are ready now, same-home, or
 away/later. Do not describe Home Pickup as Wi-Fi authority, automatic LAN
