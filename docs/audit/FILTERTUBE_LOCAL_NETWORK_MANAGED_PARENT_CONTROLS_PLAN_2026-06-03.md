@@ -1537,8 +1537,10 @@ revision and action-history entry.
   `js/tab-view.js`. The runtime writes
   `profile.managedPolicyState.localManagedEdits.{main,kids}` and appends a
   redacted protected row to `profile.managedActionHistory[]` on accepted local
-  parent-managed child saves. Failed unlock and remote rejection writers remain
-  separate future work.
+  parent-managed child saves. Failed parent/admin unlocks and rejected remote
+  policy attempts now have separate redacted protected history writers and
+  profile-persisted rate-limit state; they are no longer future work for the
+  extension-side authority path.
 - **Validation**:
   - `npm run test:settings`
   - `npm run test:blocking`
