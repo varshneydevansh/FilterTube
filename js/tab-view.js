@@ -15247,7 +15247,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return {
                 configured: false,
                 label: 'Home Pickup off',
-                detail: 'Send Update can still work. Set this up only if you run an explicit FilterTube bridge on your home or school network.',
+                detail: 'Send Update can still work. Set this up only if you run a FilterTube-compatible pickup service on your home or school network.',
                 tone: 'warning'
             };
         }

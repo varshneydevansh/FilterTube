@@ -78,7 +78,7 @@ run screens or authority labels.
 2026-06-20 runtime-copy addendum: Family Device Updates and the command-center
 trust map now use those same parent-facing labels in visible text, status rows,
 and screen-reader labels. `Internet Pickup` covers internet later-delivery devices;
-`Home Pickup` covers explicitly configured same-network bridge devices.
+`Home Pickup` covers explicitly configured same-network pickup-service devices.
 Both remain delivery states only, not authority.
 2026-06-21 unified map copy addendum: the Family Device Updates map and
 command-center trust map now say the same map covers nearby and internet/away
@@ -422,7 +422,7 @@ state without exposing plaintext rule values:
   Status, history, and provider checks can still identify the precise transport
   as Internet Pickup.
 - `Set Up Home Pickup`/`Edit Home Pickup` save or clear only the explicit
-  same-network bridge endpoint configuration after parent/account re-auth. They
+  same-network pickup-service endpoint configuration after parent/account re-auth. They
   do not create authority from network reachability, expose tokens in the UI, or
   let a LAN gateway choose profiles/rules. Status, history, and provider checks
   can still identify the precise transport as Home Pickup where that precision is
