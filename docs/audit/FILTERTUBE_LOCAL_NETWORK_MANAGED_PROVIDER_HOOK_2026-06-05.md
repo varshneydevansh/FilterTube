@@ -62,6 +62,9 @@ window.FilterTubeManagedPolicyLocalNetwork = {
 };
 ```
 
+The helper name is a compatibility/internal protocol name. Parent-facing UI and
+release copy should call this path `Home Pickup service`.
+
 The configured client posts that check to:
 
 ```text
@@ -70,10 +73,10 @@ managed-local-network/health
 
 The health request contains only schema, version, transport, reason, and
 timestamp. It must not include trusted-link secrets, PINs, plaintext rules, or
-profile policy. A successful health response means only that the bridge endpoint
-answered. It is not authority to apply a policy and does not replace the
-managed-link, target-profile, scope, revision, hash, device-binding, and
-signature checks on each returned candidate.
+profile policy. A successful health response means only that the Home Pickup
+service endpoint answered. It is not authority to apply a policy and does not
+replace the managed-link, target-profile, scope, revision, hash,
+device-binding, and signature checks on each returned candidate.
 
 The ack payload is redacted metadata only:
 
@@ -106,13 +109,13 @@ js/tab-view.js
   buildNanahManagedLocalNetworkDiscoveryRequest(...)
   getNanahManagedLocalNetworkEligibleLinks(...)
   pullNanahManagedLocalNetworkCandidates(...)
-  configured provider readiness check during Home Bridge setup and manual Check Bridge action
+  configured provider readiness check during Home Pickup setup and manual Check Pickup action
   runNanahManagedLocalNetworkSync(...)
   local-network ack handoff via ackManagedPolicyCandidates(...)
   protected ack-history rows via recordManagedOpenSyncAckHistory(...)
 ```
 
-The Home Bridge setup path stores only a redacted health state:
+The Home Pickup setup path stores only a redacted health state:
 
 ```text
 schema, version, checkedAt, endpointHost, ok, reason
@@ -120,13 +123,14 @@ schema, version, checkedAt, endpointHost, ok, reason
 
 It never stores PINs, private keys, plaintext rules, channel lists, keywords,
 viewing history, trusted-link secrets, or policy envelopes. The Accounts & Sync
-delivery strip can then tell a parent whether the last bridge check passed or
+delivery strip can then tell a parent whether the last Home Pickup service check passed or
 failed and how old that check is. This is feedback only; it is not a saved
-permission and does not make a bridge authoritative.
+permission and does not make Home Pickup authoritative.
 
-The dashboard trusted-link card now shows a parent-facing `Home Bridge` status
+The dashboard trusted-link card now shows a parent-facing `Home Pickup` status
 row for managed replica links. Earlier proof called the same row `Local
-network`; that remains a transport/helper term, not the normal parent label.
+network` or an older bridge label; those remain transport/helper terms, not the
+normal parent label.
 Visible states are feedback only:
 
 ```text
@@ -135,16 +139,16 @@ Ready
 Checked
 No updates (age)
 No matching parent link (age)
-Waiting for Home Bridge (age)
-Home Bridge rejected (age)
+Waiting for Home Pickup (age)
+Home Pickup rejected (age)
 N accepted, M rejected (age)
 N accepted, M rejected, K ack failed (age)
 ```
 
 The age suffix uses the last provider-check timestamp and exists only so a
 parent/caregiver can tell whether a protected profile actually checked for
-saved Home Bridge updates after opening. It does not grant authority and does
-not make the bridge a background scheduler.
+saved Home Pickup updates after opening. It does not grant authority and does
+not make Home Pickup a background scheduler.
 
 ## Eligibility Gates
 
@@ -169,7 +173,7 @@ mailbox payloads.
 
 ```text
 runtime provider-gated local-network discovery hook: present
-runtime local-network candidate receive bridge: present
+runtime local-network candidate receive handoff: present
 runtime local-network candidate authority validator: present
 runtime local-network provider failure fail-closed apply guard: present
 runtime local-network provider ack handoff: present
@@ -200,7 +204,7 @@ node --test tests/runtime/managed-local-network-provider-current-behavior.test.m
 node --test tests/runtime/managed-transport-provider-clients-current-behavior.test.mjs
 ```
 
-The transport-provider client test also covers the unconfigured Home Bridge
+The transport-provider client test also covers the unconfigured Home Pickup
 case: loading the local-network client with no explicit endpoint does not
 install `window.FilterTubeManagedPolicyLocalNetwork`, discovery and health
 checks fail closed with `local_network_endpoint_unconfigured`, and no fetch is

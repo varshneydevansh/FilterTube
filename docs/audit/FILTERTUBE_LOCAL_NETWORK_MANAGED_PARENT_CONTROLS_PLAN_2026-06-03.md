@@ -47,7 +47,7 @@ be paired again. The parent command center now distinguishes usable verified
 devices from revoked/stale managed links so rotated devices show as needing
 re-pairing instead of disappearing into a generic missing-device state. The adapter now exposes a
 local-network candidate authority gate for future LAN providers, and the
-dashboard has a sanitized receive bridge that records accepted/rejected
+dashboard has a sanitized receive handoff that records accepted/rejected
 local-network candidate outcomes through protected managed action history. This
 does not add built-in peer discovery or built-in LAN transport. Local-network
 provider acks are feedback only and record redacted scope/revision/hash/result
@@ -997,6 +997,10 @@ parent tool instead of a sync/debug console.
   reference-provider proof doc now uses `Home Pickup service` in parent/release
   facing wording instead of the older bridge label. Endpoint paths and internal
   local-network health-field names remain technical protocol details.
+- [x] 2026-06-21 provider-hook Home Pickup wording slice: the local-network
+  provider-hook proof doc now uses `Home Pickup` for parent-facing status,
+  setup, and saved-update language while preserving internal compatibility names
+  like `checkManagedLocalNetworkBridge`.
 - [ ] Native Android/iOS settings-lock and timeout UI parity. This belongs in
   the downstream app sync/runtime lane.
 
