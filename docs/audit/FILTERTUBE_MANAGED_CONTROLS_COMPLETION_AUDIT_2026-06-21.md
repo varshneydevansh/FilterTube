@@ -95,10 +95,13 @@ Later-delivery provider ownership is now a separate gate:
 - Gate: `docs/audit/FILTERTUBE_MANAGED_PICKUP_PROVIDER_OWNERSHIP_GATE_2026-06-21.md`
 - Template:
   `docs/audit/artifacts/managed-pickup-provider-ownership/template.json`
+- Generator:
+  `npm run managed:provider-ownership -- --input <redacted-provider-ownership.json> --confirm-provider-ownership-reviewed`
 - Verifier:
   `docs/audit/artifacts/managed-pickup-provider-ownership/verify-provider-ownership-artifact.mjs`
 - Test:
   `tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs`
+  `tests/runtime/managed-pickup-provider-ownership-generator-current-behavior.test.mjs`
 
 This artifact records whether pickup is reference-only, user-supplied, or
 FilterTube-hosted. Guaranteed later-delivery wording remains blocked unless a

@@ -34,6 +34,7 @@ change.
 
 ```text
 docs/audit/artifacts/managed-pickup-provider-ownership/template.json
+scripts/create-managed-pickup-provider-ownership-artifact.mjs
 docs/audit/artifacts/managed-pickup-provider-ownership/verify-provider-ownership-artifact.mjs
 ```
 
@@ -108,5 +109,7 @@ Blocked until a passing provider ownership artifact exists:
 
 ```bash
 node --test tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs
+node --test tests/runtime/managed-pickup-provider-ownership-generator-current-behavior.test.mjs
 node --test tests/runtime/managed-delivery-provider-reference-current-behavior.test.mjs
+npm run managed:provider-ownership -- --input <redacted-provider-ownership.json> --confirm-provider-ownership-reviewed
 ```

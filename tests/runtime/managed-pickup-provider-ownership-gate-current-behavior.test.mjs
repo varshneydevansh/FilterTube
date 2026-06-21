@@ -8,6 +8,7 @@ import assert from 'node:assert/strict';
 import { LANES, classifyPaths } from '../../scripts/run-test-lane.mjs';
 import {
   MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_TEMPLATE,
+  MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_GENERATOR,
   MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_VERIFIER,
   MANAGED_PICKUP_PROVIDER_OWNERSHIP_REQUIRED_ROWS
 } from '../../scripts/test-lane-config.mjs';
@@ -103,6 +104,10 @@ test('provider ownership gate is wired into release settings and smoke lanes', (
   assert.ok(LANES.settings.tests.includes(referenceProviderTestPath));
   assert.ok(LANES.smoke.tests.includes(referenceProviderTestPath));
   assert.equal(MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_TEMPLATE, templatePath);
+  assert.equal(
+    MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_GENERATOR,
+    'npm run managed:provider-ownership -- --input <redacted-provider-ownership.json> --confirm-provider-ownership-reviewed'
+  );
   assert.equal(
     MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_VERIFIER,
     'node docs/audit/artifacts/managed-pickup-provider-ownership/verify-provider-ownership-artifact.mjs docs/audit/artifacts/managed-pickup-provider-ownership/<artifact>.json'

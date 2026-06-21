@@ -30,6 +30,8 @@ export const MANAGED_EXTENSION_INSTALLED_SMOKE_ARTIFACT_VERIFIER =
   'node docs/audit/artifacts/managed-extension-installed-smoke/verify-managed-extension-smoke-artifact.mjs docs/audit/artifacts/managed-extension-installed-smoke/<artifact>.json';
 export const MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_TEMPLATE =
   'docs/audit/artifacts/managed-pickup-provider-ownership/template.json';
+export const MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_GENERATOR =
+  'npm run managed:provider-ownership -- --input <redacted-provider-ownership.json> --confirm-provider-ownership-reviewed';
 export const MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_VERIFIER =
   'node docs/audit/artifacts/managed-pickup-provider-ownership/verify-provider-ownership-artifact.mjs docs/audit/artifacts/managed-pickup-provider-ownership/<artifact>.json';
 export const MANAGED_APP_PARITY_SMOKE_ARTIFACT_TEMPLATE =
@@ -179,6 +181,7 @@ export const LANES = Object.freeze({
       'tests/runtime/managed-extension-installed-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/managed-extension-installed-smoke-artifact-generator-current-behavior.test.mjs',
       'tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs',
+      'tests/runtime/managed-pickup-provider-ownership-generator-current-behavior.test.mjs',
       'tests/runtime/managed-delivery-provider-reference-current-behavior.test.mjs',
       'tests/runtime/managed-native-runtime-sync-handoff-current-behavior.test.mjs',
       'tests/runtime/managed-native-runtime-sync-handoff-generator-current-behavior.test.mjs',
@@ -424,6 +427,7 @@ export const LANES = Object.freeze({
       'tests/runtime/managed-extension-installed-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/managed-extension-installed-smoke-artifact-generator-current-behavior.test.mjs',
       'tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs',
+      'tests/runtime/managed-pickup-provider-ownership-generator-current-behavior.test.mjs',
       'tests/runtime/managed-delivery-provider-reference-current-behavior.test.mjs',
       'tests/runtime/managed-native-runtime-sync-handoff-current-behavior.test.mjs',
       'tests/runtime/managed-native-runtime-sync-handoff-generator-current-behavior.test.mjs',
@@ -470,6 +474,7 @@ export const LANES = Object.freeze({
       'tests/runtime/managed-extension-installed-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/managed-extension-installed-smoke-artifact-generator-current-behavior.test.mjs',
       'tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs',
+      'tests/runtime/managed-pickup-provider-ownership-generator-current-behavior.test.mjs',
       'tests/runtime/managed-delivery-provider-reference-current-behavior.test.mjs',
       'tests/runtime/managed-native-runtime-sync-handoff-current-behavior.test.mjs',
       'tests/runtime/managed-native-runtime-sync-handoff-generator-current-behavior.test.mjs',
@@ -664,7 +669,8 @@ export const FILE_LANE_RULES = Object.freeze([
     id: 'managed-pickup-provider-ownership-surface',
     patterns: [
       /^docs\/audit\/FILTERTUBE_MANAGED_PICKUP_PROVIDER_OWNERSHIP_GATE_2026-06-21\.md$/,
-      /^docs\/audit\/artifacts\/managed-pickup-provider-ownership\/.*\.(?:json|mjs)$/
+      /^docs\/audit\/artifacts\/managed-pickup-provider-ownership\/.*\.(?:json|mjs)$/,
+      /^scripts\/create-managed-pickup-provider-ownership-artifact\.mjs$/
     ],
     lanes: ['release', 'settings', 'smoke']
   },

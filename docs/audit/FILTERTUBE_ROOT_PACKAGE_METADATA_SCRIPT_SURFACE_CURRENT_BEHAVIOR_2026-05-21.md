@@ -26,8 +26,8 @@ first-class JSON filter work look safer than the runtime proof actually allows.
 
 ## File Fingerprints
 
-Current tracked root metadata inventory: 7 files, 2,964 newline counts, and
-135,667 bytes.
+Current tracked root metadata inventory: 7 files, 2,965 newline counts, and
+135,771 bytes.
 
 | File | Newline count | Bytes | SHA-256 |
 |---|---:|---:|---|
@@ -36,7 +36,7 @@ Current tracked root metadata inventory: 7 files, 2,964 newline counts, and
 | `LICENSE` | 21 | 1,073 | `d0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d` |
 | `README.md` | 411 | 23,577 | `c7fe9a482e35c40aa6fd986e46d2d23cfc16170f5b11a6573e8f737c5dd7788e` |
 | `channel-identity-watch-mix-collab-recovery-plan.md` | 262 | 16,023 | `01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a` |
-| `package.json` | 65 | 2,757 | `ff086e4d0681c2f14ede26ebc7b62144b198c5fe8bf833c7a15d25cd728712d0` |
+| `package.json` | 66 | 2,861 | `c40d67f303c32b5fe292d65f32695ea750e4e1e051b91f19b54fa0ba7fb9dfba` |
 | `package-lock.json` | 1,461 | 49,916 | `f52d6482693be9cd4edacdc1f1491b4d2cda796522bfd0e4dcf86e0c879ad974` |
 
 Any release, package, or optimization claim that uses these files should cite
@@ -47,7 +47,7 @@ the exact current file state or an updated fingerprint.
 `package.json` currently declares package version `3.3.2`, license `MIT`,
 repository `git+https://github.com/varshneydevansh/FilterTube.git`, homepage
 `https://github.com/varshneydevansh/FilterTube`, 2 runtime dependencies, 3
-development dependencies, and 31 scripts.
+development dependencies, and 32 scripts.
 
 Current scripts:
 
@@ -62,6 +62,7 @@ build:opera -> node build.js opera
 sync:native-runtime -> node scripts/sync-native-runtime.mjs
 managed:extension-smoke -> node scripts/create-managed-extension-installed-smoke-artifact.mjs
 managed:native-handoff -> node scripts/create-managed-native-runtime-sync-handoff.mjs
+managed:provider-ownership -> node scripts/create-managed-pickup-provider-ownership-artifact.mjs
 managed:provider -> node scripts/managed-delivery-provider.mjs
 test -> node scripts/run-test-lane.mjs smoke
 audit:runtime -> node --test tests/runtime/*.test.mjs

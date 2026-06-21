@@ -25,6 +25,7 @@ import {
   MANAGED_EXTENSION_INSTALLED_SMOKE_ARTIFACT_VERIFIER,
   MANAGED_EXTENSION_INSTALLED_SMOKE_REQUIRED_ROWS,
   MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_TEMPLATE,
+  MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_GENERATOR,
   MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_VERIFIER,
   MANAGED_PICKUP_PROVIDER_OWNERSHIP_REQUIRED_ROWS,
   MANAGED_NATIVE_RUNTIME_SYNC_HANDOFF_ARTIFACT_TEMPLATE,
@@ -364,6 +365,7 @@ function printClassification(result) {
       console.log('    readiness: proves installed extension parent/protected-profile behavior only; provider and app parity remain gated.');
       console.log('  Managed pickup provider ownership artifact handoff:');
       console.log(`    template: ${MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_TEMPLATE}`);
+      console.log(`    generate: ${MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_GENERATOR}`);
       console.log(`    verifier: ${MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_VERIFIER}`);
       console.log(`    required rows: ${MANAGED_PICKUP_PROVIDER_OWNERSHIP_REQUIRED_ROWS.join(', ')}`);
       console.log('    readiness: hosted later-delivery wording remains blocked unless an owned provider artifact passes.');
