@@ -441,13 +441,13 @@ state without exposing plaintext rule values:
   rather than a child profile; the policy stores `allow_trusted_updates` only
   when the profile-open check is enabled.
 - When there are zero manageable protected profiles, provider rows are hidden
-  so mailbox or LAN setup cannot look like the first step.
-- Accepted mailbox provider configure/disable actions write redacted history
+  so Internet Pickup or Home Pickup setup cannot look like the first step.
+- Accepted Internet Pickup provider configure/disable actions write redacted history
   rows to every currently manageable protected profile. Those rows include only
   configured/disabled state, target count, and endpoint host when configured;
   they never include bearer tokens, full URLs, ciphertext, decrypted mailbox
   items, or policy payloads. When no protected profiles exist yet, there is no
-  protected target history to write and the mailbox status row remains the
+  protected target history to write and the Internet Pickup status row remains the
   feedback surface.
 - Provider configure/disable history covers child profiles under the active
   parent/account and independent account profiles that Default/Master can
@@ -500,7 +500,7 @@ runtime managed command-center encrypted mailbox provider configuration: present
 runtime managed command-center mailbox provider config history: present as redacted per-protected-profile rows, including Master-managed independent account profiles
 runtime managed command-center local-network provider configuration: present via parent re-auth and explicit configure/disable choice
 runtime managed command-center local-network provider config history: present as redacted per-protected-profile rows, including Master-managed independent account profiles
-runtime managed command-center parent-facing provider route guidance: present for Send Update, encrypted later mailbox delivery, and same-network gateway delivery
+runtime managed command-center parent-facing provider route guidance: present for Send Update, Internet Pickup, and Home Pickup
 runtime managed command-center focused conflict review: present as parent-reauthed redacted history filter
 runtime managed command-center blank mailbox endpoint disables provider config: present after parent re-auth
 runtime managed command-center post-rule-write granular verified-device push: present with selected surface binding

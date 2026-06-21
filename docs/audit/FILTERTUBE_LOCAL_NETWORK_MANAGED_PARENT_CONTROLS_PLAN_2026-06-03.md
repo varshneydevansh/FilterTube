@@ -924,6 +924,12 @@ parent tool instead of a sync/debug console.
     implying guaranteed delivery from endpoint configuration alone; protected
     devices still validate trusted link, target profile, revision/hash,
     device-binding, and signature before applying anything.
+  - [x] 2026-06-21 parent-facing authority-note cleanup slice: the command-center
+    family-device map now says same-network presence, online pickup services,
+    and saved device cards never become authority instead of exposing `LAN`
+    vocabulary. The UI proof doc now describes route guidance as Send Update,
+    Internet Pickup, and Home Pickup while retaining lower-level transport
+    terms only for protocol evidence.
   - [x] 2026-06-21 live session direction slice: trusted parent links now label
     local source roles as `Open Send Session` and local protected replica roles
     as `Open Receive Session`. Protected surfaces can open a receive session for

@@ -894,7 +894,7 @@
 
         const note = document.createElement('div');
         note.className = 'ft-managed-command-center__trust-note';
-        note.textContent = 'Send Update, Home Pickup, and Internet Pickup are delivery states only. Wi-Fi, LAN visibility, online services, and saved device cards never become authority.';
+        note.textContent = 'Send Update, Home Pickup, and Internet Pickup are delivery states only. Being on the same network, using an online pickup service, or saving a device card never becomes authority.';
 
         map.append(copy, ring, note);
         return map;
