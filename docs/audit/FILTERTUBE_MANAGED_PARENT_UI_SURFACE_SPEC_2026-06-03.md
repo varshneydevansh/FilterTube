@@ -80,6 +80,10 @@ trust map now use those same parent-facing labels in visible text, status rows,
 and screen-reader labels. `Later Pickup` covers internet later-delivery devices;
 `Same-Home Pickup` covers explicitly configured same-network bridge devices.
 Both remain delivery states only, not authority.
+2026-06-21 unified map copy addendum: the Family Device Updates map and
+command-center trust map now say the same map covers nearby and internet/away
+devices after pairing. Internet devices are represented by `Later Pickup`
+status on the same map, not by a separate map or separate authority model.
 2026-06-21 legacy parent-trust edit addendum: when editing an older managed
 Source -> Replica parent link that lacks the newer parent-managed fields, the
 edit modal now proposes the current safe defaults: matching parent updates,

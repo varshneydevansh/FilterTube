@@ -786,7 +786,7 @@
         const title = document.createElement('strong');
         title.textContent = 'Family device map';
         const detail = document.createElement('span');
-        detail.textContent = 'Each tile is a protected profile or device you can manage. The same map covers Send Update, Same-Home Pickup, and Later Pickup after pairing.';
+        detail.textContent = 'Each tile is a protected profile or device you can manage. The same map covers Send Update, Same-Home Pickup, and Later Pickup for nearby or internet devices after pairing.';
         copy.append(title, detail);
 
         const ring = document.createElement('div');
