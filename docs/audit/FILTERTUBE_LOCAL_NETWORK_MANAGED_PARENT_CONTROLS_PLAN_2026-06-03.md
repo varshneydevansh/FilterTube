@@ -947,10 +947,10 @@ parent tool instead of a sync/debug console.
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.
 - [x] 2026-06-20 reference managed-delivery provider exists as a runnable
-  self-hosted proof for Internet Pickup and Home Bridge contracts. It is
+  self-hosted proof for Internet Pickup and Home Pickup contracts. It is
   dependency-free, in-memory, explicit-endpoint only, and transport-only:
   Internet Pickup accepts ciphertext mailbox rows and redacted receipts, while
-  Home Bridge accepts signed local-network candidates and redacted receipts.
+  Home Pickup accepts signed local-network candidates and redacted receipts.
   It does not add automatic LAN peer discovery, hosted service ownership,
   profile authority, PIN authority, trusted-link authority, or native app
   parity.
@@ -1112,9 +1112,9 @@ LAN
 provider
 gateway
 candidate
-Internet Pickup
-Home Bridge
 ciphertext item
+encrypted mailbox
+local-network candidate
 local-network discovery
 ```
 
