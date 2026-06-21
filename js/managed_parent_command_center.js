@@ -842,7 +842,7 @@
             const route = document.createElement('span');
             let routeLabel = syncState.label;
             if (item.syncLocalNetworkReady === true && item.syncMailboxReady === true) {
-                routeLabel = 'Multiple send paths';
+                routeLabel = 'Same home + away / internet';
             } else if (item.syncLocalNetworkReady === true) {
                 routeLabel = 'Same home - Same-Home Pickup';
             } else if (item.syncMailboxReady === true) {

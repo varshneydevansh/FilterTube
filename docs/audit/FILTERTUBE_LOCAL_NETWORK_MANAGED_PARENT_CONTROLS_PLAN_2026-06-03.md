@@ -863,8 +863,8 @@ parent tool instead of a sync/debug console.
     and configured internet/later profiles as `Away / internet - Later Pickup`.
     The label change keeps both paths in one parent-facing map; transport names
     remain delivery states, not authority.
-  - [x] 2026-06-21 unified map state slice: the command-center map now preserves
-    `Multiple send paths` when both Same-Home Pickup and Later Pickup are
+  - [x] 2026-06-21 unified map state slice: the command-center map now keeps a
+    distinct combined state when both Same-Home Pickup and Later Pickup are
     available, and live-only devices read as `Live now - Send Update`. This
     matches the parent mental model of one map with live, same-home,
     away/internet, and setup-needed states.
@@ -904,6 +904,11 @@ parent tool instead of a sync/debug console.
     `Away / internet` wording as the visible Accounts & Sync compass. This is a
     copy/accessibility alignment only; delivery gates and provider behavior are
     unchanged.
+  - [x] 2026-06-21 dual-pickup map label slice: when a protected profile has
+    both Same-Home Pickup and Later Pickup available, the command-center map now
+    labels that device `Same home + away / internet` instead of the generic
+    `Multiple send paths`. This keeps the same map valid for internet devices
+    without implying that the pickup provider is authority.
   - [x] 2026-06-21 pickup setup label slice: configured Later Pickup and
     Same-Home Pickup summaries now say `set up` instead of `ready`. This avoids
     implying guaranteed delivery from endpoint configuration alone; protected
