@@ -97,11 +97,11 @@ instead of presenting a separate remote-admin feature.
 the same map vocabulary in their compact sync chip. Live paths say
 `Send Update ready`, explicitly configured same-network paths say
 `Home Pickup`, away/opens-later paths say `Internet Pickup`, and combined
-paths say `Multiple send paths`. This changes only parent-facing labels; the
+paths say `Home + internet`. This changes only parent-facing labels; the
 trusted-link, target-profile, revision, device-binding, hash, and signature
 checks remain the runtime authority.
 2026-06-21 command-center map-state addendum: the visual family-device map now
-keeps combined Home Pickup and Internet Pickup devices as `Multiple send paths`
+keeps combined Home Pickup and Internet Pickup devices as `Home + internet`
 instead of hiding the internet path behind home-device priority. Live-only devices read
 as `Live Now - Send Update` to match the parent-facing state model.
 2026-06-21 Accounts & Sync compass-state addendum: the top Family Device

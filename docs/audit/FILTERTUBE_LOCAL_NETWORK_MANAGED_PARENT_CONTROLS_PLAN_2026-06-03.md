@@ -854,7 +854,7 @@ parent tool instead of a sync/debug console.
     and signature validation.
   - [x] 2026-06-21 command-center status-chip alignment slice: Family Controls
     rows now show `Send Update ready`, `Home Pickup`, `Internet Pickup`, or
-    `Multiple send paths` in the compact device chip instead of collapsing
+    `Home + internet` in the compact device chip instead of collapsing
     provider-ready paths into a generic `Ready` state. This keeps internet/away
     and same-network devices on the same family-device map while preserving the
     existing provider-gated delivery and local validation model.
