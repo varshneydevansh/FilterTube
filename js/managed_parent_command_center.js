@@ -841,9 +841,9 @@
             name.textContent = item.profileName || 'Protected profile';
             const route = document.createElement('span');
             route.textContent = item.syncLocalNetworkReady === true
-                ? 'Nearby - Same-Home Pickup'
+                ? 'Same Home - Same-Home Pickup'
                 : item.syncMailboxReady === true
-                    ? 'Away - Later Pickup'
+                    ? 'Away / Next Open - Later Pickup'
                     : item.syncLiveReady === true
                         ? 'Ready now'
                         : syncState.label;

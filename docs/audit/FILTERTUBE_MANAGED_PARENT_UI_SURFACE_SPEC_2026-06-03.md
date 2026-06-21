@@ -111,6 +111,11 @@ configured eligible pickup path. A Same-Home-only setup no longer writes or
 shows a spurious `Later Pickup not ready` state, and a Later-only setup no
 longer probes Same-Home Pickup. Both paths still use the same trusted-link
 validation before anything applies.
+2026-06-21 trusted-link direction addendum: saved parent-trust links now label
+live sessions by local authority direction. Parent/source links still show
+`Open Send Session`; protected receiver links show `Open Receive Session` and
+explain that the parent sends changes. This keeps child/protected surfaces
+receive-oriented without removing the live Nanah reconnect path.
 2026-06-21 legacy parent-trust edit addendum: when editing an older managed
 Source -> Replica parent link that lacks the newer parent-managed fields, the
 edit modal now proposes the current safe defaults: matching parent updates,

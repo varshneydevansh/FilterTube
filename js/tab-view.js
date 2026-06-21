@@ -15840,21 +15840,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         const trusted = normalizeNanahTrustedLink(link);
         if (!trusted) return;
 
-        if (isNanahChildReplicaOnly() && trusted.localRole !== 'replica') {
+        const trustedLocalRole = normalizeString(trusted.localRole);
+        const trustedRemoteRole = normalizeString(trusted.remoteRole);
+        const trustedPolicy = safeObject(trusted.policy);
+        const isManagedReplicaReceiver = trusted.linkType === 'managed_link'
+            && trustedLocalRole === 'replica'
+            && trustedRemoteRole === 'source';
+
+        if (isNanahChildReplicaOnly() && trustedLocalRole !== 'replica') {
             UIComponents.showToast('Locked child profiles can only reconnect as protected receivers. Unlock the child profile first to reconnect as a sender.', 'error');
             return;
         }
 
         if (ftNanahRole && !ftNanahRole.disabled) {
-            ftNanahRole.value = trusted.localRole || 'peer';
+            ftNanahRole.value = trustedLocalRole || 'peer';
             ftNanahRole.dispatchEvent(new Event('change', { bubbles: true }));
         }
-        if (ftNanahScope && safeObject(trusted.policy).defaultScope) {
-            ftNanahScope.value = safeObject(trusted.policy).defaultScope;
+        if (ftNanahScope && trustedPolicy.defaultScope) {
+            ftNanahScope.value = trustedPolicy.defaultScope;
             ftNanahScope.dispatchEvent(new Event('change', { bubbles: true }));
         }
-        if (ftNanahStrategy && safeObject(trusted.policy).applyMode) {
-            ftNanahStrategy.value = safeObject(trusted.policy).applyMode === 'replace' ? 'replace' : 'merge';
+        if (ftNanahStrategy && trustedPolicy.applyMode) {
+            ftNanahStrategy.value = trustedPolicy.applyMode === 'replace' ? 'replace' : 'merge';
             ftNanahStrategy.dispatchEvent(new Event('change', { bubbles: true }));
         }
 
@@ -15867,7 +15874,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         nanahSessionState.remoteDevice = null;
         nanahSessionState.remoteProfile = null;
         nanahSessionState.remoteTargetProfile = null;
-        nanahSessionState.remoteRole = normalizeString(trusted.remoteRole) || 'peer';
+        nanahSessionState.remoteRole = trustedRemoteRole || 'peer';
         nanahSessionState.helloSent = false;
         nanahSessionState.trustedReconnectApproved = false;
         nanahSessionState.trustedReconnectDeviceId = '';
@@ -15878,9 +15885,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         nanahSessionState.pairUri = buildNanahPairUri(nanahSessionState.code);
         updateNanahUi();
 
-        const reconnectMode = getNanahReconnectMode(safeObject(trusted.policy).reconnectMode, trusted.linkType === 'managed_link' ? 'approval_needed' : 'fast');
+        const reconnectMode = getNanahReconnectMode(trustedPolicy.reconnectMode, trusted.linkType === 'managed_link' ? 'approval_needed' : 'fast');
         UIComponents.showToast(
-            reconnectMode === 'approval_needed'
+            isManagedReplicaReceiver
+                ? `Receive session code ${nanahSessionState.code} is ready. Open Accounts & Sync on the parent device and send the approved update.`
+                : reconnectMode === 'approval_needed'
                 ? `Session code ${nanahSessionState.code} is ready. Open Accounts & Sync on the other device and approve the reconnect there.`
                 : `Session code ${nanahSessionState.code} is ready. Open Accounts & Sync on ${normalizeString(trusted.deviceLabel) || 'the trusted device'} and join this fresh session.`,
             'success'
@@ -15965,13 +15974,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const actions = document.createElement('div');
             actions.className = 'nanah-trusted-link__actions';
+            const linkPolicy = safeObject(entry?.policy);
+            const managedLink = linkPolicy.linkType === 'managed_link';
+            const managedReplicaReceiver = managedLink
+                && normalizeString(entry?.localRole) === 'replica'
+                && normalizeString(entry?.remoteRole) === 'source';
+            const managedSourceSender = managedLink
+                && normalizeString(entry?.localRole) === 'source'
+                && normalizeString(entry?.remoteRole) === 'replica';
 
             const reconnectBtn = document.createElement('button');
             reconnectBtn.type = 'button';
             reconnectBtn.className = 'btn-secondary';
-            reconnectBtn.textContent = safeObject(entry?.policy).linkType === 'managed_link'
-                ? 'Open Send Session'
-                : 'Start New Session';
+            reconnectBtn.textContent = managedReplicaReceiver
+                ? 'Open Receive Session'
+                : managedSourceSender
+                    ? 'Open Send Session'
+                    : 'Start New Session';
+            reconnectBtn.title = managedReplicaReceiver
+                ? 'Open a live receive session for the saved parent device. This profile still cannot send or change parent policy.'
+                : '';
             reconnectBtn.addEventListener('click', async () => {
                 try {
                     await startNanahTrustedReconnect(entry);
@@ -15984,12 +16006,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const reconnectHint = document.createElement('small');
             reconnectHint.className = 'nanah-trusted-link__reconnect-hint';
-            reconnectHint.textContent = safeObject(entry?.policy).linkType === 'managed_link'
-                ? 'Use when both devices are open'
+            reconnectHint.textContent = managedReplicaReceiver
+                ? 'Receive-only; parent sends changes'
+                : managedSourceSender
+                    ? 'Use when both devices are open'
                 : 'Uses saved trust and policy';
             actions.appendChild(reconnectHint);
 
-            if (safeObject(entry?.policy).linkType === 'managed_link') {
+            if (managedLink) {
                 const editBtn = document.createElement('button');
                 editBtn.type = 'button';
                 editBtn.className = 'btn-secondary';

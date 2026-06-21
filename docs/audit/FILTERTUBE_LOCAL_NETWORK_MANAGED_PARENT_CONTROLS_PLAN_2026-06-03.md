@@ -144,9 +144,10 @@ extension authority code.
 - [x] Trusted-device row wording slice: saved Nanah links now show plain pills
   such as `Parent link`, `Sends approved updates`, and `Receives parent
   updates` instead of leading with source/replica vocabulary. Managed link
-  actions read as `Open Send Session`, `Edit Trust`, and `Reset Trust Key`,
-  preserving the same policy gates while making verified-device maintenance
-  easier to scan.
+  actions read as `Open Send Session` on parent/source links,
+  `Open Receive Session` on protected receiver links, `Edit Trust`, and
+  `Reset Trust Key`, preserving the same policy gates while making
+  verified-device maintenance easier to scan.
 - [x] Family Device Updates wording slice: the visible Accounts & Sync card and
   Help section now use parent-facing `Family Device Updates` language instead
   of leading with the Nanah implementation name. The raw service URL is tucked
@@ -857,6 +858,16 @@ parent tool instead of a sync/debug console.
     provider-ready paths into a generic `Ready` state. This keeps internet/away
     and same-network devices on the same family-device map while preserving the
     existing provider-gated delivery and local validation model.
+  - [x] 2026-06-21 family-device route-label slice: the command-center map now
+    labels configured same-network profiles as `Same Home - Same-Home Pickup`
+    and configured internet/later profiles as `Away / Next Open - Later Pickup`.
+    The label change keeps both paths in one parent-facing map; transport names
+    remain delivery states, not authority.
+  - [x] 2026-06-21 live session direction slice: trusted parent links now label
+    local source roles as `Open Send Session` and local protected replica roles
+    as `Open Receive Session`. Protected surfaces can open a receive session for
+    the saved parent link, but the UI no longer implies they can send or edit
+    parent policy.
   - [x] 2026-06-21 per-profile pickup-readiness slice: the managed sync summary
     now marks `Later Pickup` or `Same-Home Pickup` ready only when the provider
     exists and that protected profile has a saved update-enabled trusted link.
