@@ -1055,6 +1055,11 @@ parent tool instead of a sync/debug console.
   evidence for one family device map with Send Update, Home Pickup, Internet
   Pickup, and offline last-valid-policy states. Protected users still cannot
   configure delivery, and delivery labels are not authority.
+- [x] 2026-06-21 completion-audit slice: the active goal is now mapped
+  requirement-by-requirement in
+  `docs/audit/FILTERTUBE_MANAGED_CONTROLS_COMPLETION_AUDIT_2026-06-21.md`.
+  The audit keeps extension-owned present work separate from manual smoke,
+  provider/service ownership, automatic discovery, and downstream native parity.
 - [ ] Native Android/iOS settings-lock and timeout UI parity. This belongs in
   the downstream app sync/runtime lane.
 

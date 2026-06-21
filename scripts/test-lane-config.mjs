@@ -365,6 +365,7 @@ export const LANES = Object.freeze({
       'tests/runtime/managed-policy-sync-remote-delivery-readiness-gate-current-behavior.test.mjs',
       'tests/runtime/managed-remote-transport-app-parity-gate-current-behavior.test.mjs',
       'tests/runtime/managed-controls-extension-mvp-handoff-current-behavior.test.mjs',
+      'tests/runtime/managed-controls-completion-audit-current-behavior.test.mjs',
       'tests/runtime/managed-policy-sync-remote-delivery-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/managed-viewing-space-route-gate-current-behavior.test.mjs',

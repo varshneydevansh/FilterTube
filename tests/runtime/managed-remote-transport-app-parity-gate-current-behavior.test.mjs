@@ -34,9 +34,9 @@ test('managed transport app parity gate is linked to current remote delivery pro
   assert.match(doc, new RegExp(discoveryBoundaryDocPath));
   assert.match(readiness, new RegExp(docPath));
   assert.match(readiness, /companion transport\/app parity gate/);
-  assert.match(localNetwork, /runtime built-in LAN peer discovery: absent/);
-  assert.match(openSync, /runtime browser HTTPS mailbox pull\/decrypt client: present behind explicit config/);
-  assert.match(openSync, /runtime mailbox server authority: absent/);
+  assert.match(localNetwork, /runtime built-in same-network peer discovery: absent/);
+  assert.match(openSync, /runtime browser HTTPS Internet Pickup pull\/decrypt client: present behind explicit config/);
+  assert.match(openSync, /runtime Internet Pickup service authority: absent/);
   assert.match(appParity, /installed iOS parity\s+remains pending/i);
   assert.match(discoveryBoundary, /Local-network discovery is convenience only/);
   assert.match(discoveryBoundary, /provider handoff is not authority/);
@@ -105,7 +105,7 @@ test('transport app parity matrix preserves extension app ownership split', () =
   assert.match(doc, /Native app\/provider may own LAN discovery, but discovery must never grant authority/);
   assert.match(doc, /App shell must gate Main and Kids before opening web\/native content/);
   assert.match(doc, /App shell must enforce startup, resume, heartbeat, pause, and reduced-budget behavior/);
-  assert.match(doc, /list-derived rows remain ordinary channel rules/);
+  assert.match(doc, /list-derived rows remain ordinary channel\s+rules/);
 });
 
 test('settings lane owns managed transport app parity gate', () => {
