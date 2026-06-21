@@ -136,15 +136,17 @@ test('classifier treats provider ownership gate files as release settings and sm
   assert.equal(result.classifications[0].matched[0].id, 'managed-pickup-provider-ownership-surface');
 });
 
-test('verifier rejects template and authority-default placeholders', () => {
+test('verifier rejects unexecuted template while template keeps authority defaults false', () => {
   const template = readJson(templatePath);
   const errors = validateManagedPickupProviderOwnershipArtifact(template);
 
+  assert.equal(template.ownershipDecision.discoveryIsAuthority, false);
+  assert.equal(template.ownershipDecision.providerIsPolicyAuthority, false);
   assert.ok(errors.includes('status must be executed'));
   assert.ok(errors.includes('changeContext.logicalChangeType is required'));
   assert.ok(errors.includes('ownershipDecision.decision must be reference_provider_only, user_supplied_provider_only, or filtertube_hosted_provider'));
-  assert.ok(errors.includes('ownershipDecision.discoveryIsAuthority must be false'));
-  assert.ok(errors.includes('ownershipDecision.providerIsPolicyAuthority must be false'));
+  assert.ok(!errors.includes('ownershipDecision.discoveryIsAuthority must be false'));
+  assert.ok(!errors.includes('ownershipDecision.providerIsPolicyAuthority must be false'));
   assert.ok(errors.includes('FT-PICKUP-PROVIDER-00-owner-decision.status must be passed'));
 });
 

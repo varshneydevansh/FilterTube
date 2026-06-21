@@ -19,8 +19,8 @@
     "abuseRateLimitPolicy": "",
     "privacyBoundary": "",
     "releaseClaim": "",
-    "discoveryIsAuthority": true,
-    "providerIsPolicyAuthority": true
+    "discoveryIsAuthority": false,
+    "providerIsPolicyAuthority": false
   },
   "providerEvidence": {
     "internetPickupStatus": "",
