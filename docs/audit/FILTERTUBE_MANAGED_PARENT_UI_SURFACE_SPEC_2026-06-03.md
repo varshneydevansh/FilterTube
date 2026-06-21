@@ -107,7 +107,7 @@ as `Live Now - Send Update` to match the parent-facing state model.
 2026-06-21 Accounts & Sync compass-state addendum: the top Family Device
 Updates compass now uses the same first-read state names as the command center:
 `Live now` + `Send Update`, `Same home` + `Same-Home Pickup`, and
-`Away / next open` + `Later Pickup`. Screen-reader labels use the same order,
+`Away / internet` + `Later Pickup`. Screen-reader labels use the same order,
 so parents see the device situation first and the transport second.
 2026-06-21 admin-session profile-switch addendum: profile switching now clears
 all non-target unlock sessions in the tab and asks the background session-pin
@@ -131,6 +131,10 @@ internet devices in the same family-device map as live and same-home devices.
 It changes copy only; Later Pickup still requires an explicit configured path
 and the same trusted-link, target-profile, revision, device-binding, hash, and
 signature validation before any policy applies.
+2026-06-21 pickup setup label addendum: configured Later Pickup and Same-Home
+Pickup summaries now say `set up` instead of `ready`. Live Send Update can be
+ready; saved pickup paths are configured delivery options whose reachability and
+local policy acceptance are still checked later by the protected device.
 2026-06-21 per-profile pickup-readiness addendum: command-center Later Pickup
 and Same-Home Pickup readiness now requires both a configured provider and a
 saved update-enabled trusted link for that protected profile. A configured

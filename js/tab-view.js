@@ -13622,8 +13622,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         return {
             configured: true,
-            label: `Later Pickup ready: ${host}`,
-            detail: 'A verified protected device can check for signed parent updates when it opens later or away. It still accepts only trusted parent updates.',
+            label: `Later Pickup set up: ${host}`,
+            detail: 'A verified protected device can try this path for signed parent updates when it opens later or away. It still accepts only trusted parent updates.',
             tone: 'success'
         };
     }
@@ -15270,7 +15270,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             : 'Run Check/Edit if you want to verify the pickup path is reachable now.';
         return {
             configured: true,
-            label: `Same-Home Pickup ready: ${host}`,
+            label: `Same-Home Pickup set up: ${host}`,
             detail: `${healthDetail} Reachability is only a send path check; trusted parent policy still decides what can apply.`,
             tone: 'success'
         };

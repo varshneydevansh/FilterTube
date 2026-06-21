@@ -104,8 +104,8 @@ extension authority code.
   neutral detail cards no longer look like warning/error states when nothing is
   wrong.
 - [x] 2026-06-20 Family Controls delivery-status wording slice: per-profile
-  device rows now use task-oriented labels: `Send Update ready`, `Internet
-  Pickup set up`, `Home Bridge set up`, `Pair only for another device`,
+  device rows now use task-oriented labels: `Send Update ready`, `Later
+  Pickup set up`, `Same-Home Pickup set up`, `Pair only for another device`,
   `Re-pair trusted device`, and `Refresh trusted device`. This changes only
   redacted status wording/details; trusted-link, signature, revision, provider,
   and parent/account re-auth gates are unchanged.
@@ -860,7 +860,7 @@ parent tool instead of a sync/debug console.
     existing provider-gated delivery and local validation model.
   - [x] 2026-06-21 family-device route-label slice: the command-center map now
     labels configured same-network profiles as `Same Home - Same-Home Pickup`
-    and configured internet/later profiles as `Away / Next Open - Later Pickup`.
+    and configured internet/later profiles as `Away / Internet - Later Pickup`.
     The label change keeps both paths in one parent-facing map; transport names
     remain delivery states, not authority.
   - [x] 2026-06-21 unified map state slice: the command-center map now preserves
@@ -878,6 +878,11 @@ parent tool instead of a sync/debug console.
     protected devices on the same map as live and same-home devices while still
     requiring explicit Later Pickup setup and the existing trusted-link,
     target-profile, revision, hash, device-binding, and signature gates.
+  - [x] 2026-06-21 pickup setup label slice: configured Later Pickup and
+    Same-Home Pickup summaries now say `set up` instead of `ready`. This avoids
+    implying guaranteed delivery from endpoint configuration alone; protected
+    devices still validate trusted link, target profile, revision/hash,
+    device-binding, and signature before applying anything.
   - [x] 2026-06-21 live session direction slice: trusted parent links now label
     local source roles as `Open Send Session` and local protected replica roles
     as `Open Receive Session`. Protected surfaces can open a receive session for
