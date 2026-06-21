@@ -1122,7 +1122,7 @@
         if (shouldShowConfiguredProviderSetup && mailbox.configured === true) {
             const mailboxPanel = document.createElement('div');
             mailboxPanel.className = `ft-managed-command-center__provider is-${mailbox.tone || (mailbox.configured ? 'success' : 'warning')}`;
-            mailboxPanel.title = 'Optional: use this only when parent updates must wait for an offline protected device to open later.';
+            mailboxPanel.title = 'Optional: use this only when parent updates must wait for an offline or away protected device to open later.';
             const mailboxCopy = document.createElement('div');
             mailboxCopy.className = 'ft-managed-command-center__provider-copy';
             const mailboxTitle = document.createElement('strong');
@@ -1131,7 +1131,7 @@
                 : 'Later Pickup is off';
             const mailboxDetail = document.createElement('span');
             mailboxDetail.textContent = summary.profileCount > 0
-                ? (mailbox.detail || 'Use this when a parent update should wait until the protected device opens.')
+                ? (mailbox.detail || 'Use this when a parent update should wait until the protected device opens later or away.')
                 : 'Create a protected profile first. Later Pickup is optional and only useful after a protected device is paired.';
             const mailboxRoute = document.createElement('span');
             mailboxRoute.textContent = mailbox.configured
@@ -1144,7 +1144,7 @@
                 mailboxButton.className = 'btn-secondary';
                 mailboxButton.type = 'button';
                 mailboxButton.textContent = mailbox.configured ? 'Edit Later Pickup' : 'Set Up Later Pickup';
-                mailboxButton.title = 'Requires parent/account re-auth. Use only when updates must wait for the protected device to open later.';
+                mailboxButton.title = 'Requires parent/account re-auth. Use only when updates must wait for the protected device to open later or away.';
                 mailboxButton.addEventListener('click', (event) => {
                     event.preventDefault();
                     Promise.resolve(h.onAction({

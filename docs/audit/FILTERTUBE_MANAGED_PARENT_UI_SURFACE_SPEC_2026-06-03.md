@@ -89,6 +89,10 @@ prompt now describe Later Pickup as the same family-device map path for devices
 that open later or are away over the internet. The prompt still frames the HTTPS
 service as optional unreadable waiting-update storage, not profile, PIN, trust,
 or policy authority.
+2026-06-21 command-center Later Pickup addendum: configured Later Pickup panels
+and button tooltips now use the same away/opens-later wording as the Family
+Device Updates map. This keeps internet devices on the same parent mental model
+instead of presenting a separate remote-admin feature.
 2026-06-21 legacy parent-trust edit addendum: when editing an older managed
 Source -> Replica parent link that lacks the newer parent-managed fields, the
 edit modal now proposes the current safe defaults: matching parent updates,
