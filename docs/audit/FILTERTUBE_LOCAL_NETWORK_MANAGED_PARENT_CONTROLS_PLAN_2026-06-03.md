@@ -914,6 +914,11 @@ parent tool instead of a sync/debug console.
     `Home + internet set up` instead of the generic multiple-path wording. The
     route chip now matches the family-device map for live, home/intranet, and
     internet pickup paths.
+  - [x] 2026-06-21 Home Pickup service wording slice: visible Accounts & Sync,
+    command-center, and Help copy now says `Home Pickup service` instead of
+    asking parents to understand a bridge. Internal local-network provider and
+    health-check names remain transport/protocol details; the UI still says
+    Wi-Fi or network visibility never grants control.
   - [x] 2026-06-21 pickup setup label slice: configured Internet Pickup and
     Home Pickup summaries now say `set up` instead of `ready`. This avoids
     implying guaranteed delivery from endpoint configuration alone; protected

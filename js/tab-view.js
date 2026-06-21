@@ -13725,7 +13725,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ? 'Create a protected profile before setting up Home Pickup.'
                     : (!hasVerifiedDevice
                         ? 'Pair a verified protected device before setting up Home Pickup.'
-                        : 'Optional: set this up only if you run a trusted FilterTube bridge on your own network.'));
+                        : 'Optional: set this up only if you run a trusted Home Pickup service on your own network.'));
             ftNanahCompassHomeBtn.setAttribute('aria-label', `Home - Home Pickup. ${ftNanahCompassHomeBtn.title}`);
         }
         if (ftNanahDeliveryAdvanced && (mailbox.configured === true || local.configured === true)) {
@@ -13748,7 +13748,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahDeliveryLocalBtn.textContent = local.configured ? 'Edit' : 'Set Up';
             ftNanahDeliveryLocalBtn.disabled = !localCanConfigure;
             ftNanahDeliveryLocalBtn.title = localCanConfigure
-                ? 'Optional advanced path for a trusted FilterTube bridge on your own network.'
+                ? 'Optional advanced path for a trusted Home Pickup service on your own network.'
                 : 'Create a protected profile and pair a verified device before setting up Home Pickup.';
         }
 
@@ -13975,7 +13975,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
             title: 'Home Pickup',
-            message: 'Use this only when you run a FilterTube-compatible bridge on your home, clinic, or school network.',
+            message: 'Use this only when you run a FilterTube-compatible Home Pickup service on your home, clinic, or school network.',
             details: [
                 'For normal family control, open both devices and use Send Update.',
                 'Home Pickup can help a verified protected device pick up waiting updates on the same network.',
@@ -14005,7 +14005,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const endpoint = await showPromptModal({
             title: 'Home Pickup Address',
-            message: 'Enter the local bridge address only if you run a trusted FilterTube-compatible bridge. This is not device scanning; Send Update remains the normal path.',
+            message: 'Enter the Home Pickup service address only if you run one. This is not device scanning; Send Update remains the normal path.',
             placeholder: 'http://192.168.1.10:4177/filtertube',
             inputType: 'url',
             confirmText: currentEndpoint ? 'Save Home Pickup' : 'Enable Home Pickup',
@@ -14019,8 +14019,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const token = await showPromptModal({
             title: 'Home Pickup Key',
-            message: 'Optional bridge key for that local bridge. This is not the parent PIN. Leave blank to keep the saved key; enter a single dash to clear it.',
-            placeholder: 'Optional bridge key',
+            message: 'Optional service key for that Home Pickup service. This is not the parent PIN. Leave blank to keep the saved key; enter a single dash to clear it.',
+            placeholder: 'Optional service key',
             inputType: 'password',
             confirmText: 'Save',
             initialValue: ''

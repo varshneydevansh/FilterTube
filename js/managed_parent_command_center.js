@@ -58,7 +58,7 @@
                 : () => ({
                     configured: false,
                     label: 'Home Pickup off',
-                    detail: 'Home Pickup needs a FilterTube-compatible bridge you choose; Wi-Fi discovery is never authority.',
+                    detail: 'Home Pickup needs a FilterTube-compatible pickup service you choose; Wi-Fi discovery is never authority.',
                     tone: 'warning'
                 }),
             onAction: typeof helpers.onAction === 'function' ? helpers.onAction : null
@@ -1226,12 +1226,12 @@
                 : 'Home Pickup is off';
             const localDetail = document.createElement('span');
             localDetail.textContent = summary.profileCount > 0
-                ? (localNetwork.detail || 'Use this only with a trusted FilterTube-compatible bridge on your home or school network.')
+                ? (localNetwork.detail || 'Use this only with a trusted FilterTube-compatible pickup service on your home or school network.')
                 : 'Create a protected profile first. Home Pickup is optional and never replaces parent trust.';
             const localRoute = document.createElement('span');
             localRoute.textContent = localNetwork.configured
                 ? 'The protected device still accepts only trusted parent updates.'
-                : 'Leave this off unless you run a trusted FilterTube bridge; Wi-Fi alone never grants control.';
+                : 'Leave this off unless you run a trusted Home Pickup service; Wi-Fi alone never grants control.';
             localCopy.append(localTitle, localDetail, localRoute);
             localPanel.appendChild(localCopy);
             if (h.onAction) {
