@@ -1,7 +1,7 @@
 # FilterTube Managed Delivery Reference Provider
 
 **Date**: 2026-06-20
-**Scope**: Internet Pickup and Home Bridge provider proof for managed
+**Scope**: Internet Pickup and Home Pickup service proof for managed
 parent/caregiver controls.
 
 ## Summary
@@ -17,11 +17,11 @@ an in-memory queue for:
 
 - Internet Pickup ciphertext mailbox items.
 - Internet Pickup redacted delivery receipts.
-- Home Bridge signed local-network candidates.
-- Home Bridge redacted delivery receipts.
+- Home Pickup signed local-network candidates.
+- Home Pickup redacted delivery receipts.
 
 It exists so the browser extension's configured provider hooks can be exercised
-against a real endpoint shape before a hosted service or native app bridge is
+against a real endpoint shape before a hosted service or native app provider is
 owned.
 
 ## Authority Boundary
@@ -46,12 +46,12 @@ target-profile, scope, revision, policy-hash, signature, and local apply gates.
 flowchart LR
   Parent["Parent profile"] -->|Signed policy envelope| Extension["FilterTube extension"]
   Extension -->|Ciphertext mailbox row| InternetPickup["Internet Pickup provider"]
-  Extension -->|Signed local candidate| HomeBridge["Home Bridge provider"]
+  Extension -->|Signed local candidate| HomePickup["Home Pickup service"]
   InternetPickup -->|Ciphertext row| Child["Protected device opens"]
-  HomeBridge -->|Signed candidate| Child
+  HomePickup -->|Signed candidate| Child
   Child -->|Validate link, target, scope, revision, hash, signature| Apply["Apply or reject locally"]
   Child -->|Redacted receipt| InternetPickup
-  Child -->|Redacted receipt| HomeBridge
+  Child -->|Redacted receipt| HomePickup
 ```
 
 ## Internet Pickup Endpoints
@@ -70,17 +70,17 @@ The reference provider accepts paths under any prefix, so
 Mailbox upload rejects plaintext policy keys such as `payload`, `keywords`,
 `channels`, `videoIds`, `policy`, `pin`, `password`, and private keys.
 
-## Home Bridge Endpoints
+## Home Pickup Endpoints
 
 | Endpoint | Purpose | Stored data |
 | --- | --- | --- |
-| `POST */managed-local-network/health` | Check an explicitly configured bridge. | Health metadata only. |
+| `POST */managed-local-network/health` | Check an explicitly configured Home Pickup service. | Health metadata only. |
 | `POST */managed-local-network/publish` | Store signed same-network candidates. | Signed managed envelope candidates. |
 | `POST */managed-local-network/discover` | Protected device pulls matching candidates. | Signed candidates. |
 | `POST */managed-local-network/ack` | Protected device posts delivery/apply result. | Redacted receipt metadata. |
 | `POST */managed-local-network/ack/pull` | Parent/source checks delivery status. | Redacted receipt metadata. |
 
-Home Bridge rejects private secrets and credentials. It may carry the signed
+Home Pickup rejects private secrets and credentials. It may carry the signed
 managed-policy envelope because this path is same-network signed delivery, not
 ciphertext mailbox storage. The receiving protected device still validates the
 signature/hash/target locally before applying anything.

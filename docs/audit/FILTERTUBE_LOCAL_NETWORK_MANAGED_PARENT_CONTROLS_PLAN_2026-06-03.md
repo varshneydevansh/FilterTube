@@ -993,6 +993,10 @@ parent tool instead of a sync/debug console.
   one Family Device map model for live, same-home, away/internet, and offline
   devices. This makes downstream app/runtime sync fail early if the shared
   contract drifts into separate home/internet authority models.
+- [x] 2026-06-21 reference-provider wording slice: the managed delivery
+  reference-provider proof doc now uses `Home Pickup service` in parent/release
+  facing wording instead of the older bridge label. Endpoint paths and internal
+  local-network health-field names remain technical protocol details.
 - [ ] Native Android/iOS settings-lock and timeout UI parity. This belongs in
   the downstream app sync/runtime lane.
 
