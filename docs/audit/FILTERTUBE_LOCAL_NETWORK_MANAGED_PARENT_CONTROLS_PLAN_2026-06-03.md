@@ -491,7 +491,7 @@ parent tool instead of a sync/debug console.
     UI/copy only; live Send Update, profile targeting, signature/hash/revision
     validation, and offline last valid policy behavior are unchanged.
   - [x] Automatic-saved-updates visibility slice: Family Controls now shows a
-    single read-only `Check for updates on open` detail for verified
+    single read-only `Automatic saved updates` detail for verified
     protected-profile devices instead of separate Internet Pickup and Home
     Pickup rows. It reports whether saved parent links are set to check for
     trusted updates when the protected profile opens, while keeping live Send
@@ -693,7 +693,7 @@ parent tool instead of a sync/debug console.
     zero network calls, so Home Pickup cannot silently scan LAN addresses or
     become Wi-Fi authority.
   - [x] 2026-06-20 saved-update reader readiness slice: trusted protected-device
-    cards now separate the `Check for updates on open` policy from actual pickup
+    cards now separate the `Automatic saved updates` policy from actual pickup
     readiness. If no configured Internet Pickup pull provider or Home Pickup
     discovery provider is present, the row says `Needs pickup setup` and the
     manual check button is disabled as `Set Up Pickup First`. Live Send Update
@@ -701,8 +701,8 @@ parent tool instead of a sync/debug console.
     availability wording and click gating; trusted-link, target-profile, scope,
     revision, hash, signature, provider, and local apply gates are unchanged.
   - [x] 2026-06-20 profile-open check label slice: the parent-facing trust modal
-    and Family Controls row now describe `syncOnProfileOpen` as `Check for
-    updates on open` / `Checks when opened` instead of `Automatic saved updates`.
+    and Family Controls row now describe `syncOnProfileOpen` as
+    `Automatic saved updates` instead of older check-on-open wording.
     This keeps the feature understandable: a protected profile may look for
     newer signed parent updates when it opens, but only configured Internet
     Pickup or Home Pickup delivery can provide waiting updates. Storage fields,
@@ -881,8 +881,8 @@ parent tool instead of a sync/debug console.
     and same-network devices on the same family-device map while preserving the
     existing provider-gated delivery and local validation model.
   - [x] 2026-06-21 family-device route-label slice: the command-center map now
-    labels configured same-network profiles as `Same-network device - Home Pickup`
-    and configured internet/later profiles as `Away device - Internet Pickup`.
+    labels configured same-network profiles as `Home Pickup - same network`
+    and configured internet/later profiles as `Internet Pickup - away/internet`.
     The label change keeps both paths in one parent-facing map; transport names
     remain delivery states, not authority.
   - [x] 2026-06-21 unified map state slice: the command-center map now keeps a
@@ -1038,10 +1038,12 @@ parent tool instead of a sync/debug console.
   same-network wording for release-facing status rows. Mailbox item names remain
   protocol details, but the proof no longer describes Home Pickup as a bridge or
   a separate authority model.
-- [x] 2026-06-21 command-center same-network route wording slice: the Family
-  Controls device map now uses `Same-network device - Home Pickup` and
-  `Same-network + internet` instead of home-only labels. This keeps clinics,
-  schools, and other caregiver networks in the same verified-device map model.
+- [x] 2026-06-22 command-center route wording slice: the Family Controls device
+  map now uses `Home Pickup - same network`, `Internet Pickup - away/internet`,
+  and `Same-network + internet`; the workflow reads `Set guardrails` and
+  `Sync if needed`; and trusted-link rows use `Automatic saved updates`. This
+  keeps clinics, schools, internet devices, and caregiver networks in one
+  verified-device map without turning network reachability into authority.
 - [x] 2026-06-21 app-contract same-network map slice: the managed app policy
   contract and verifier now use `same_network_home_pickup` and
   `one_family_device_map_for_live_same_network_and_internet_devices` instead of

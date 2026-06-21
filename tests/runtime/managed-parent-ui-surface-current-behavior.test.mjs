@@ -434,8 +434,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /Pick a profile, set what it can watch, set daily time, and send the update only when another verified device needs it/);
   assert.match(helperSource, /Family Controls workflow/);
   assert.match(helperSource, /Choose profile/);
-  assert.match(helperSource, /Set rules & time/);
-  assert.match(helperSource, /Send to device/);
+  assert.match(helperSource, /Set guardrails/);
+  assert.match(helperSource, /Sync if needed/);
   assert.match(helperSource, /actionIntents: buildManagedCommandCenterActionIntents\(profileId, timePolicy, \{/);
   assert.match(helperSource, /bulk_set_time_limit/);
   assert.match(helperSource, /bulk_edit_rules/);
@@ -459,10 +459,10 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /ft-managed-command-center__provider-prompt/);
   assert.match(helperSource, /Set Up Internet Pickup/);
   assert.match(helperSource, /Edit Internet Pickup/);
-  assert.match(doc, /visible card says `Control`, `Check for updates on open`, and `Delivery receipts`/);
+  assert.match(doc, /visible card says `Control`, `Automatic saved updates`, and `Delivery receipts`/);
   assert.match(source, /function getNanahTrustedLinkDirectionSummary\(entry\)/);
   assert.match(source, /function formatNanahProtectedUpdateCheckStatus\(link\)/);
-  assert.match(source, /Check for updates on open/);
+  assert.match(source, /Automatic saved updates/);
   assert.match(source, /Check Saved Updates/);
   assert.match(source, /manual_saved_update_check/);
   assert.match(source, /await runNanahManagedOpenSync\(\{ reason: 'manual_saved_update_check' \}\)/);

@@ -865,9 +865,9 @@
             if (item.syncLocalNetworkReady === true && item.syncMailboxReady === true) {
                 routeLabel = 'Same-network + internet';
             } else if (item.syncLocalNetworkReady === true) {
-                routeLabel = 'Same-network device - Home Pickup';
+                routeLabel = 'Home Pickup - same network';
             } else if (item.syncMailboxReady === true) {
-                routeLabel = 'Away device - Internet Pickup';
+                routeLabel = 'Internet Pickup - away/internet';
             } else if (item.syncLiveReady === true) {
                 routeLabel = 'Live now - Send Update';
             }
@@ -894,7 +894,7 @@
 
         const note = document.createElement('div');
         note.className = 'ft-managed-command-center__trust-note';
-        note.textContent = 'Send Update, Home Pickup, and Internet Pickup are delivery states only. Being on the same network, using an online pickup service, or saving a device card never becomes authority.';
+        note.textContent = 'Network or server reachability is never permission. Only a verified parent link plus a signed newer update can apply.';
 
         map.append(copy, ring, note);
         return map;
@@ -1065,7 +1065,7 @@
             },
             {
                 step: '2',
-                label: 'Set rules & time',
+                label: 'Set guardrails',
                 detail: summary.managedChannelListProfileCount > 0
                     ? 'Rules, lists, access, and time are ready to review'
                     : 'Use Rules, Lists, Set Time, and Main/Kids controls',
@@ -1074,7 +1074,7 @@
             },
             {
                 step: '3',
-                label: 'Send to device',
+                label: 'Sync if needed',
                 detail: summary.syncReadyProfileCount > 0
                     ? `${summary.syncReadyProfileCount} ${summary.syncReadyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path`
                     : 'Pair only when this profile also lives on another device',
@@ -1128,7 +1128,7 @@
             const promptCopy = document.createElement('div');
             promptCopy.className = 'ft-managed-command-center__provider-copy';
             const promptTitle = document.createElement('strong');
-            promptTitle.textContent = 'Need a device to pick up changes later?';
+            promptTitle.textContent = 'Need updates when the other device opens later?';
             const promptDetail = document.createElement('span');
             promptDetail.textContent = 'Optional. Use Send Update when both devices can be open together.';
             promptCopy.append(promptTitle, promptDetail);
@@ -1470,7 +1470,7 @@
                 { label: item.timeLimit, tone: item.timeLimited ? 'warning' : 'neutral', title: 'Daily YouTube time for this protected profile.' },
                 item.managedChannelListLabel ? { label: item.managedChannelListLabel, tone: 'success', title: item.managedChannelListDetail || 'Parent-approved lists attached to this profile.' } : null,
                 { label: syncState.label, tone: syncState.tone, title: item.deliveryPathDetail || 'Device delivery status.' },
-                item.syncTargetCount > 0 && item.syncOpenCheckCount > 0 ? { label: 'Checks for updates', tone: 'success', title: 'This verified device can check for newer signed parent updates when the protected profile opens.' } : null,
+                item.syncTargetCount > 0 && item.syncOpenCheckCount > 0 ? { label: 'Automatic saved updates', tone: 'success', title: 'This verified device can check for newer signed parent updates when the protected profile opens.' } : null,
                 item.remoteScopeCount ? { label: item.syncLabel, tone: 'success', title: 'Latest accepted protected-profile policy revision.' } : null,
                 item.pendingExtraTimeRequestLabel ? { label: item.pendingExtraTimeRequestLabel, tone: 'warning', title: item.pendingExtraTimeRequestDetail || 'This profile asked for more time.' } : null,
                 item.syncTargetCount > 0 && item.latestDeliveryLabel ? { label: item.latestDeliveryLabel, tone: item.latestDeliveryTone || 'neutral', title: 'Latest protected delivery attempt.' } : null,
@@ -1492,7 +1492,7 @@
                     ? { label: 'Device sync', value: item.deliveryPreview?.label || 'Send when ready', note: item.deliveryPathDetail }
                     : { label: 'Device sync', value: 'Not paired', note: 'Local rules and time limits work here. Pair only when this profile must also update another device.' },
                 hasVerifiedDevice ? {
-                    label: 'Check for updates on open',
+                    label: 'Automatic saved updates',
                     value: item.syncOpenCheckCount > 0
                         ? (item.syncOpenCheckCount >= item.syncTargetCount ? 'On' : `On for ${item.syncOpenCheckCount}/${item.syncTargetCount}`)
                         : 'Off',

@@ -240,7 +240,7 @@ keeps the parent model direct and prevents mailbox/LAN/provider language from
 becoming the first mental model. The change does not add authority; it only
 reduces copy and layout pressure in the Accounts & Sync surface.
 The trusted-device status wording now follows that same parent model: the
-visible card says `Control`, `Check for updates on open`, and `Delivery receipts`
+visible card says `Control`, `Automatic saved updates`, and `Delivery receipts`
 instead of `Direction`, separate `Open sync`/`Local network` rows, and raw
 remote delivery wording. The profile-open check can still report `Internet Pickup`
 and `Home Pickup` details when those optional providers are involved.
@@ -264,7 +264,7 @@ saved a trusted parent link. That button only runs the existing manual
 not let the service, network, or UI bypass trusted-link validation, target
 profile matching, scope, revision, hash, signature, or local apply gates.
 Trusted-device cards also keep policy and transport readiness separate:
-`Check for updates on open` can be enabled on a saved parent link, but the manual
+`Automatic saved updates` can be enabled on a saved parent link, but the manual
 check stays disabled as `Set Up Pickup First` and reports `Needs pickup setup`
 until a configured Internet Pickup reader or Home Pickup discovery provider is
 available. Live Send Update remains the normal path when both devices are open.
