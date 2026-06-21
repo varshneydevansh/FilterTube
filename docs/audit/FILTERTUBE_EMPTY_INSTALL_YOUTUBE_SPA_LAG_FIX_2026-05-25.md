@@ -75,6 +75,10 @@ with recent whitelist changes making the performance problem more visible.
   `__filtertubeDebug`/`data-filtertube-debug` switch. This does not change the
   import protocol or warnings/errors; it keeps production YouTube pages quieter
   while preserving debug visibility when explicitly enabled.
+- 2026-06-21 addendum: installed the same production console gate at the start
+  of the isolated-world bridge. Content-script `console.log`, `console.info`,
+  and `console.debug` calls now print only when FilterTube debug mode is
+  explicitly enabled; `console.warn` and `console.error` still surface failures.
 
 ## Behavior Boundary
 

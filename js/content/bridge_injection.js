@@ -22,6 +22,31 @@
     globalThis.IS_FIREFOX_BRIDGE = isFirefox;
     globalThis.browserAPI_BRIDGE = api;
 
+    function isFilterTubeContentDebugEnabled() {
+        try {
+            return globalThis.__filtertubeDebug === true
+                || document.documentElement?.getAttribute('data-filtertube-debug') === 'true';
+        } catch (e) {
+            return globalThis.__filtertubeDebug === true;
+        }
+    }
+
+    function installFilterTubeContentConsoleGate() {
+        try {
+            if (globalThis.__filterTubeContentConsoleGateInstalled) return;
+            const originalLog = typeof console?.log === 'function' ? console.log.bind(console) : null;
+            const originalInfo = typeof console?.info === 'function' ? console.info.bind(console) : null;
+            const originalDebug = typeof console?.debug === 'function' ? console.debug.bind(console) : null;
+            if (originalLog) console.log = (...args) => { if (isFilterTubeContentDebugEnabled()) originalLog(...args); };
+            if (originalInfo) console.info = (...args) => { if (isFilterTubeContentDebugEnabled()) originalInfo(...args); };
+            if (originalDebug) console.debug = (...args) => { if (isFilterTubeContentDebugEnabled()) originalDebug(...args); };
+            globalThis.__filterTubeContentConsoleGateInstalled = true;
+        } catch (e) {
+        }
+    }
+
+    installFilterTubeContentConsoleGate();
+
     if (typeof globalThis.currentSettings === 'undefined') {
         globalThis.currentSettings = null;
     }
