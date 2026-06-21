@@ -20,6 +20,9 @@ import {
   MANAGED_REMOTE_DELIVERY_SMOKE_ARTIFACT_TEMPLATE,
   MANAGED_REMOTE_DELIVERY_SMOKE_ARTIFACT_VERIFIER,
   MANAGED_REMOTE_DELIVERY_SMOKE_REQUIRED_ROWS,
+  MANAGED_EXTENSION_INSTALLED_SMOKE_ARTIFACT_TEMPLATE,
+  MANAGED_EXTENSION_INSTALLED_SMOKE_ARTIFACT_VERIFIER,
+  MANAGED_EXTENSION_INSTALLED_SMOKE_REQUIRED_ROWS,
   MANAGED_APP_PARITY_SMOKE_ARTIFACT_TEMPLATE,
   MANAGED_APP_PARITY_SMOKE_ARTIFACT_VERIFIER,
   MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS,
@@ -267,6 +270,7 @@ function requiresManagedRemoteDeliveryHandoff(result) {
     /(?:^|\/)(?:js\/)?nanah/i.test(entry.file)
     || /managed|parent|caregiver|time-limit|time_limit|local-network|local_network|mailbox/i.test(entry.file)
     || entry.file.startsWith('docs/audit/artifacts/managed-remote-delivery-smoke/')
+    || entry.file.startsWith('docs/audit/artifacts/managed-extension-installed-smoke/')
   ));
 }
 
@@ -341,6 +345,11 @@ function printClassification(result) {
     console.log(`    required rows: ${LIVE_SMOKE_REQUIRED_ROWS.join(', ')}`);
     console.log(`    managed-control rows: ${LIVE_SMOKE_MANAGED_CONTROL_ROWS.join(', ')}`);
     if (requiresManagedRemoteDeliveryHandoff(result)) {
+      console.log('  Managed installed-extension smoke artifact handoff:');
+      console.log(`    template: ${MANAGED_EXTENSION_INSTALLED_SMOKE_ARTIFACT_TEMPLATE}`);
+      console.log(`    verifier: ${MANAGED_EXTENSION_INSTALLED_SMOKE_ARTIFACT_VERIFIER}`);
+      console.log(`    required rows: ${MANAGED_EXTENSION_INSTALLED_SMOKE_REQUIRED_ROWS.join(', ')}`);
+      console.log('    readiness: proves installed extension parent/protected-profile behavior only; provider and app parity remain gated.');
       console.log('  Managed remote delivery smoke artifact handoff:');
       console.log(`    template: ${MANAGED_REMOTE_DELIVERY_SMOKE_ARTIFACT_TEMPLATE}`);
       console.log(`    verifier: ${MANAGED_REMOTE_DELIVERY_SMOKE_ARTIFACT_VERIFIER}`);

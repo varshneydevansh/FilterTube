@@ -180,6 +180,13 @@ extension authority code.
   now show a direct `Check` action in the Family Device Updates map. This is
   only a readiness check for the explicitly configured pickup service; it does
   not scan the network, discover devices, create trust, or apply policy.
+- [x] 2026-06-21 installed extension smoke artifact slice: manual
+  parent/protected-profile verification now has a strict artifact template and
+  verifier at `docs/audit/artifacts/managed-extension-installed-smoke/`. It
+  records protected-profile setup, live Nanah Send Update, Main/Kids gates,
+  timeout overlay, redacted history, no-policy/no-work YouTube SPA behavior,
+  3-dot/quick-block regression checks, and provider-status authority boundaries
+  without recording plaintext rules, PINs, private keys, or watched titles.
 
 ### Parent/Caregiver Simplification Tracker
 

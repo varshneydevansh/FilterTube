@@ -75,6 +75,7 @@ test('managed controls completion audit links to current proof families and rema
     'tests/runtime/managed-time-budget-enforcement-current-behavior.test.mjs',
     'tests/runtime/managed-policy-action-history-model-current-behavior.test.mjs',
     'tests/runtime/managed-app-policy-contract-parity-current-behavior.test.mjs',
+    'tests/runtime/managed-extension-installed-smoke-artifact-verifier-current-behavior.test.mjs',
     'tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs'
   ]) {
     assert.ok(doc.includes(proof), `missing linked proof ${proof}`);
@@ -85,6 +86,8 @@ test('managed controls completion audit links to current proof families and rema
   assert.match(appContract, /installed iOS parity\s+remains pending/i);
   assert.match(remoteReadiness, /hosted service deployment and automatic same-network\s+discovery design work/);
   assert.match(localProvider, /runtime built-in same-network peer discovery: absent/);
+  assert.match(doc, /docs\/audit\/artifacts\/managed-extension-installed-smoke\/template\.json/);
+  assert.match(doc, /verify-managed-extension-smoke-artifact\.mjs/);
 });
 
 test('managed controls completion audit blocks overclaim wording while preserving safe wording', () => {

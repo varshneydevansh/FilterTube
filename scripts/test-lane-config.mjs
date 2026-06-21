@@ -22,6 +22,10 @@ export const MANAGED_REMOTE_DELIVERY_SMOKE_ARTIFACT_TEMPLATE =
   'docs/audit/artifacts/managed-remote-delivery-smoke/template.json';
 export const MANAGED_REMOTE_DELIVERY_SMOKE_ARTIFACT_VERIFIER =
   'node docs/audit/artifacts/managed-remote-delivery-smoke/verify-managed-smoke-artifact.mjs docs/audit/artifacts/managed-remote-delivery-smoke/<artifact>.json';
+export const MANAGED_EXTENSION_INSTALLED_SMOKE_ARTIFACT_TEMPLATE =
+  'docs/audit/artifacts/managed-extension-installed-smoke/template.json';
+export const MANAGED_EXTENSION_INSTALLED_SMOKE_ARTIFACT_VERIFIER =
+  'node docs/audit/artifacts/managed-extension-installed-smoke/verify-managed-extension-smoke-artifact.mjs docs/audit/artifacts/managed-extension-installed-smoke/<artifact>.json';
 export const MANAGED_APP_PARITY_SMOKE_ARTIFACT_TEMPLATE =
   'docs/audit/artifacts/managed-app-parity-smoke/template.json';
 export const MANAGED_APP_PARITY_SMOKE_ARTIFACT_VERIFIER =
@@ -67,6 +71,22 @@ export const MANAGED_REMOTE_DELIVERY_SMOKE_REQUIRED_ROWS = Object.freeze([
   'FT-MANAGED-REMOTE-12-encrypted-history-summary-boundary',
   'FT-MANAGED-REMOTE-13-command-center-delivery-path-detail',
   'FT-MANAGED-REMOTE-14-managed-list-policy-apply'
+]);
+export const MANAGED_EXTENSION_INSTALLED_SMOKE_REQUIRED_ROWS = Object.freeze([
+  'FT-MANAGED-EXT-00-install-preflight',
+  'FT-MANAGED-EXT-01-parent-admin-unlock',
+  'FT-MANAGED-EXT-02-create-protected-profile',
+  'FT-MANAGED-EXT-03-set-main-kids-access',
+  'FT-MANAGED-EXT-04-set-time-limit',
+  'FT-MANAGED-EXT-05-edit-rules-keyword-channel-video',
+  'FT-MANAGED-EXT-06-send-update-live-nanah',
+  'FT-MANAGED-EXT-07-protected-device-apply-and-history',
+  'FT-MANAGED-EXT-08-main-kids-route-gate',
+  'FT-MANAGED-EXT-09-timeout-overlay',
+  'FT-MANAGED-EXT-10-protected-user-cannot-admin',
+  'FT-MANAGED-EXT-11-no-policy-no-work-spa',
+  'FT-MANAGED-EXT-12-three-dot-and-quick-block-regression',
+  'FT-MANAGED-EXT-13-pickup-provider-status-boundary'
 ]);
 export const MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS = Object.freeze([
   'FT-MANAGED-APP-00-contract-sync',
@@ -129,6 +149,7 @@ export const LANES = Object.freeze({
       'tests/runtime/release-live-youtube-spa-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/release-live-youtube-spa-smoke-boundary-current-behavior.test.mjs',
       'tests/runtime/managed-policy-sync-remote-delivery-smoke-artifact-verifier-current-behavior.test.mjs',
+      'tests/runtime/managed-extension-installed-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/release-notes-json-version-gate-boundary-current-behavior.test.mjs',
       'tests/runtime/release-package-parity-current-behavior.test.mjs',
@@ -367,6 +388,7 @@ export const LANES = Object.freeze({
       'tests/runtime/managed-controls-extension-mvp-handoff-current-behavior.test.mjs',
       'tests/runtime/managed-controls-completion-audit-current-behavior.test.mjs',
       'tests/runtime/managed-policy-sync-remote-delivery-smoke-artifact-verifier-current-behavior.test.mjs',
+      'tests/runtime/managed-extension-installed-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/managed-viewing-space-route-gate-current-behavior.test.mjs',
       'tests/runtime/managed-child-time-limit-schema-current-behavior.test.mjs',
@@ -407,6 +429,7 @@ export const LANES = Object.freeze({
       'tests/runtime/release-live-youtube-spa-smoke-boundary-current-behavior.test.mjs',
       'tests/runtime/managed-controls-extension-mvp-handoff-current-behavior.test.mjs',
       'tests/runtime/managed-policy-sync-remote-delivery-smoke-artifact-verifier-current-behavior.test.mjs',
+      'tests/runtime/managed-extension-installed-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/all-callable-index-current-behavior.test.mjs',
       'tests/runtime/audit-runtime-backlog-current-behavior.test.mjs',
@@ -584,6 +607,11 @@ export const FILE_LANE_RULES = Object.freeze([
   {
     id: 'managed-remote-delivery-smoke-artifact-surface',
     patterns: [/^docs\/audit\/artifacts\/managed-remote-delivery-smoke\/.*\.(?:json|mjs)$/],
+    lanes: ['release', 'settings', 'smoke']
+  },
+  {
+    id: 'managed-extension-installed-smoke-artifact-surface',
+    patterns: [/^docs\/audit\/artifacts\/managed-extension-installed-smoke\/.*\.(?:json|mjs)$/],
     lanes: ['release', 'settings', 'smoke']
   },
   {

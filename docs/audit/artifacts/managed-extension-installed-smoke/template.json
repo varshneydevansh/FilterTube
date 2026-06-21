@@ -1,0 +1,147 @@
+{
+  "artifactType": "filtertube-managed-extension-installed-smoke",
+  "schemaVersion": 1,
+  "status": "template-not-executed",
+  "extensionInstalledSmokeReadiness": "NO-GO",
+  "wholeGoalReleaseReadiness": "NO-GO-PROVIDER-APP-MANUAL-REMAINS",
+  "runtimeBehaviorChanged": false,
+  "boundaryDoc": "docs/audit/FILTERTUBE_MANAGED_CONTROLS_COMPLETION_AUDIT_2026-06-21.md",
+  "changeContext": {
+    "logicalChangeType": "",
+    "requiredLanes": [],
+    "automatedLaneEvidence": []
+  },
+  "recordingFields": {
+    "manualTimestamp": "",
+    "testerInitials": "",
+    "browserId": "",
+    "browserNameVersion": "",
+    "extensionId": "",
+    "extensionVersion": "",
+    "workspaceRevisionOrHash": "",
+    "parentProfileId": "",
+    "protectedProfileId": "",
+    "trustedLinkId": "",
+    "sourceDeviceId": "",
+    "targetDeviceId": "",
+    "sourcePublicKeyId": "",
+    "keyVersion": "",
+    "installedExtensionPath": "",
+    "dashboardUrl": "",
+    "parentYouTubeUrl": "",
+    "protectedYouTubeUrl": "",
+    "observedHistorySummary": "",
+    "observedNoWorkState": "",
+    "observedRegressionSummary": ""
+  },
+  "visibleEvidence": {
+    "parentDashboardArtifact": "",
+    "familyDeviceUpdatesArtifact": "",
+    "protectedProfileArtifact": "",
+    "protectedYouTubeArtifact": "",
+    "timeoutOverlayArtifact": "",
+    "managedHistoryArtifact": "",
+    "notes": ""
+  },
+  "assertions": {
+    "parentAdminUnlockObserved": false,
+    "protectedProfileCreated": false,
+    "protectedUserCannotConfigureDelivery": false,
+    "childPinIsNotAdmin": false,
+    "mainRouteGateObserved": false,
+    "kidsRouteGateObserved": false,
+    "timeLimitOverlayObserved": false,
+    "liveNanahSendObserved": false,
+    "signedPolicyRevisionObserved": false,
+    "historyRedactedObserved": false,
+    "noPolicyNoWorkObserved": false,
+    "youtubeSnappyAfterSpaObserved": false,
+    "blockingWhitelistingUnaffectedObserved": false,
+    "quickBlockAndThreeDotMenuObserved": false,
+    "pickupProviderAuthorityGranted": true,
+    "automaticLanDiscoveryObserved": true,
+    "hostedInternetPickupClaimed": true
+  },
+  "requiredRows": [
+    {
+      "id": "FT-MANAGED-EXT-00-install-preflight",
+      "requiredObservation": "Installed extension source/version/hash are recorded for the parent browser before any manual managed-control smoke begins.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-EXT-01-parent-admin-unlock",
+      "requiredObservation": "Parent/account authority unlocks admin controls; protected-user PIN does not unlock admin actions.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-EXT-02-create-protected-profile",
+      "requiredObservation": "Parent creates or selects one protected profile and confirms it appears in Family Controls with parent-owned actions.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-EXT-03-set-main-kids-access",
+      "requiredObservation": "Parent sets Main/Kids viewing-space policy and the protected profile records a newer managed revision.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-EXT-04-set-time-limit",
+      "requiredObservation": "Parent sets or reduces daily YouTube time and the protected profile records a newer managed time-limit revision.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-EXT-05-edit-rules-keyword-channel-video",
+      "requiredObservation": "Parent edits keyword, channel, and video rules for the protected profile through parent-owned UI paths.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-EXT-06-send-update-live-nanah",
+      "requiredObservation": "Parent sends an approved update over live Nanah to a verified protected device and both sides show redacted accepted state.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-EXT-07-protected-device-apply-and-history",
+      "requiredObservation": "Protected device applies the newer signed policy and protected history records accepted/rejected rows without plaintext values.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-EXT-08-main-kids-route-gate",
+      "requiredObservation": "Protected profile enforces Main YouTube and YouTube Kids route gates according to the current policy.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-EXT-09-timeout-overlay",
+      "requiredObservation": "Protected profile reaches zero/reduced budget and sees the calm FilterTube timeout surface instead of usable YouTube.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-EXT-10-protected-user-cannot-admin",
+      "requiredObservation": "Protected user cannot edit delivery targets, trusted devices, parent history, account policy, or parent/admin settings.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-EXT-11-no-policy-no-work-spa",
+      "requiredObservation": "With no active managed work/provider/rules, YouTube SPA navigation remains snappy and does not add sync polling or broad runtime scans.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-EXT-12-three-dot-and-quick-block-regression",
+      "requiredObservation": "Native YouTube 3-dot menu, collaborator menu rows, quick-block affordance, and outside-click close behavior still work.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-MANAGED-EXT-13-pickup-provider-status-boundary",
+      "requiredObservation": "Internet Pickup/Home Pickup statuses are shown only as optional delivery readiness; they do not create authority, discover devices, or claim hosted service completion.",
+      "status": "missing"
+    }
+  ],
+  "completionRules": {
+    "allRecordingFieldsRequired": true,
+    "allVisibleEvidenceFieldsRequired": true,
+    "allRowsMustPass": true,
+    "automatedLaneEvidenceMustPass": true,
+    "automatedLaneEvidenceMustCoverRequiredLanes": true,
+    "assertionsMustMatchExpectedValues": true,
+    "noPlaintextSensitiveFields": true,
+    "wholeGoalReleaseReadinessWhenTemplate": "NO-GO-PROVIDER-APP-MANUAL-REMAINS"
+  }
+}
