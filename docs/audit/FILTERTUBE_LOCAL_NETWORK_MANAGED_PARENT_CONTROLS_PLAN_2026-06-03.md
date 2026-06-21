@@ -390,7 +390,7 @@ parent tool instead of a sync/debug console.
     compact advanced pickup prompt. First setup still leads with live Send
     Update and local controls; the prompt is only a discoverable path for
     families/caregivers who need internet pickup after the protected device
-    opens later or a trusted home/school bridge.
+    opens later or a trusted home/school pickup service.
   - [x] 2026-06-19 Family Device Updates optional delivery collapse: the
     Accounts & Sync pairing surface now shows live `Send Update` as the only
     first-level delivery path, with Internet Pickup and Home Pickup under an
@@ -432,7 +432,7 @@ parent tool instead of a sync/debug console.
     itself.
   - [x] Advanced pickup naming slice: the command center and provider setup
     modal now present the internet waiting path as `Internet Pickup` and keep
-    `Home Pickup` for the same-network bridge. The docs still map these to the
+    `Home Pickup` for the same-network pickup service. The docs still map these to the
     underlying mailbox/local-network transports, but the first parent-facing
     labels now describe the outcome instead of the implementation.
   - [x] Advanced pickup summary alignment slice: Family Controls status rows,
@@ -783,7 +783,7 @@ parent tool instead of a sync/debug console.
   - [x] 2026-06-20 optional-delivery setup wording slice: Internet Pickup and
     Home Pickup setup modals now describe the parent intent first: live Send
     Update is normal, Internet Pickup is only for a protected device that opens
-    later, and Home Pickup is only for an explicitly run same-network bridge.
+    later, and Home Pickup is only for an explicitly run same-network pickup service.
     Endpoint/service-key prompts remain, but the copy says services store or
     route unreadable waiting updates only and never replace trusted-link
     signature validation.
@@ -880,7 +880,7 @@ parent tool instead of a sync/debug console.
     target-profile, revision, hash, device-binding, and signature gates.
   - [x] 2026-06-21 unified map parent-copy alignment slice: the first-read
     Accounts & Sync map now uses `Send Update` consistently and describes
-    Home Pickup as a home/school setup instead of leading with bridge
+    Home Pickup as a home/school pickup setup instead of leading with service-internal
     terminology. The command-center optional saved-update prompt now frames
     Home Pickup and Internet Pickup as one family-device map for home, school,
     or away-over-internet devices. This is copy-only; provider contracts,
@@ -970,7 +970,7 @@ parent tool instead of a sync/debug console.
   Sync first screen, Family Controls map, delivery summaries, provider setup,
   and protected history labels now use one parent-visible map: `Send Update`
   for live devices, `Home Pickup` for an explicitly configured home/school
-  bridge, and `Internet Pickup` for verified devices that open later or are away.
+  pickup service, and `Internet Pickup` for verified devices that open later or are away.
   This keeps the parent mental model device-first without changing authority,
   signatures, target profile checks, transport IDs, or provider validation.
 - [x] 2026-06-21 profile-open update copy slice: `syncOnProfileOpen` remains
@@ -1109,7 +1109,7 @@ Use these labels in normal UI:
 | --- | --- |
 | Send Update / Live send | Live Nanah P2P while both devices are open. |
 | Internet Pickup | Encrypted internet pending-update service. |
-| Home Pickup | Trusted same-network bridge/gateway. |
+| Home Pickup | Trusted same-network pickup service. |
 | Protected device | Child/family/caregiver-managed target profile/device. |
 | Parent-approved list | Reviewed channel/keyword list materialized into profile rules. |
 
