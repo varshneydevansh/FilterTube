@@ -4729,6 +4729,11 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             }
 
             const activeId = typeof profilesV4.activeProfileId === 'string' ? profilesV4.activeProfileId : DEFAULT_PROFILE_ID;
+            if (!isProfileSessionAuthorized(profilesV4, activeId)) {
+                sendResponse?.({ ok: false, error: 'Profile is locked', errorCode: 'profile_locked' });
+                return;
+            }
+
             const profiles = safeObject(profilesV4.profiles);
             const activeProfile = safeObject(profiles[activeId]);
             const activeMain = safeObject(activeProfile.main);
@@ -5144,6 +5149,28 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                     FT_PROFILES_V4_KEY
                 ], resolve));
                 let channels = data.filterChannels || [];
+
+                let profilesV4ForMutation = data?.[FT_PROFILES_V4_KEY];
+                if (!isValidProfilesV4(profilesV4ForMutation)) {
+                    try {
+                        profilesV4ForMutation = buildProfilesV4FromLegacyState(data, {});
+                    } catch (e) {
+                        profilesV4ForMutation = null;
+                    }
+                }
+
+                if (!profilesV4ForMutation || !isValidProfilesV4(profilesV4ForMutation)) {
+                    sendResponse({ success: false, error: 'profiles_unavailable', errorCode: 'profiles_unavailable' });
+                    return;
+                }
+
+                const activeProfileIdForMutation = typeof profilesV4ForMutation.activeProfileId === 'string'
+                    ? profilesV4ForMutation.activeProfileId
+                    : DEFAULT_PROFILE_ID;
+                if (!isProfileSessionAuthorized(profilesV4ForMutation, activeProfileIdForMutation)) {
+                    sendResponse({ success: false, error: 'Profile is locked', errorCode: 'profile_locked' });
+                    return;
+                }
 
                 // Normalize legacy string arrays to objects if necessary
                 if (Array.isArray(channels) && typeof channels[0] === 'string') {
@@ -6394,6 +6421,42 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             }
         }
 
+        const storage = await storageGet([
+            FT_PROFILES_V4_KEY,
+            'filterChannels',
+            'uiKeywords',
+            'filterKeywords',
+            'ftProfilesV3'
+        ]);
+
+        let profilesV4 = storage?.[FT_PROFILES_V4_KEY];
+        let profilesV3 = storage.ftProfilesV3 || {};
+        let activeProfileId = DEFAULT_PROFILE_ID;
+        let activeProfile = {};
+        let activeMain = {};
+        let activeKids = {};
+
+        if (!isValidProfilesV4(profilesV4)) {
+            try {
+                profilesV4 = buildProfilesV4FromLegacyState(storage, {});
+            } catch (e) {
+                profilesV4 = null;
+            }
+        }
+
+        if (!profilesV4 || !isValidProfilesV4(profilesV4)) {
+            return { success: false, error: 'profiles_unavailable', errorCode: 'profiles_unavailable' };
+        }
+
+        activeProfileId = typeof profilesV4.activeProfileId === 'string' ? profilesV4.activeProfileId : DEFAULT_PROFILE_ID;
+        if (!isProfileSessionAuthorized(profilesV4, activeProfileId)) {
+            return { success: false, error: 'Profile is locked', errorCode: 'profile_locked' };
+        }
+
+        activeProfile = safeObject(safeObject(profilesV4.profiles)[activeProfileId]);
+        activeMain = safeObject(activeProfile.main);
+        activeKids = safeObject(activeProfile.kids);
+
         // Prefer canonical UC IDs via channelMap when available, especially for @handles
         let lookupValue = normalizedValue;
         let mappedId = null;
@@ -6667,35 +6730,6 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         // Get existing channels from the correct profile
         const isKids = profile === 'kids';
         const targetListType = listType === 'whitelist' ? 'whitelist' : 'blocklist';
-        const storage = await storageGet([
-            FT_PROFILES_V4_KEY,
-            'filterChannels',
-            'uiKeywords',
-            'filterKeywords',
-            'ftProfilesV3'
-        ]);
-
-        let profilesV4 = storage?.[FT_PROFILES_V4_KEY];
-        let profilesV3 = storage.ftProfilesV3 || {};
-        let activeProfileId = DEFAULT_PROFILE_ID;
-        let activeProfile = {};
-        let activeMain = {};
-        let activeKids = {};
-
-        if (!isValidProfilesV4(profilesV4)) {
-            try {
-                profilesV4 = buildProfilesV4FromLegacyState(storage, {});
-            } catch (e) {
-                profilesV4 = null;
-            }
-        }
-
-        if (profilesV4 && isValidProfilesV4(profilesV4)) {
-            activeProfileId = typeof profilesV4.activeProfileId === 'string' ? profilesV4.activeProfileId : DEFAULT_PROFILE_ID;
-            activeProfile = safeObject(safeObject(profilesV4.profiles)[activeProfileId]);
-            activeMain = safeObject(activeProfile.main);
-            activeKids = safeObject(activeProfile.kids);
-        }
 
         let channels = [];
         if (isKids) {
@@ -7150,6 +7184,26 @@ async function handleToggleChannelFilterAll(channelId, value) {
         });
 
         const channels = Array.isArray(storage.filterChannels) ? storage.filterChannels : [];
+
+        let profilesV4ForMutation = storage?.[FT_PROFILES_V4_KEY];
+        if (!isValidProfilesV4(profilesV4ForMutation)) {
+            try {
+                profilesV4ForMutation = buildProfilesV4FromLegacyState(storage, {});
+            } catch (e) {
+                profilesV4ForMutation = null;
+            }
+        }
+
+        if (!profilesV4ForMutation || !isValidProfilesV4(profilesV4ForMutation)) {
+            return { success: false, error: 'profiles_unavailable', errorCode: 'profiles_unavailable' };
+        }
+
+        const activeProfileIdForMutation = typeof profilesV4ForMutation.activeProfileId === 'string'
+            ? profilesV4ForMutation.activeProfileId
+            : DEFAULT_PROFILE_ID;
+        if (!isProfileSessionAuthorized(profilesV4ForMutation, activeProfileIdForMutation)) {
+            return { success: false, error: 'Profile is locked', errorCode: 'profile_locked' };
+        }
 
         // Find channel by ID or handle
         const channelIndex = channels.findIndex(ch =>

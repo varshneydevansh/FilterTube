@@ -106,6 +106,7 @@ runtime local managed edit failed-attempt rate limit durability: present for tab
 runtime managed-admin authority helper: present for local dashboard actor/target decisions, including Default/Master managing non-Default protected profiles, admin-session TTL, sensitive reauth, and dashboard failed-unlock window normalization
 runtime local managed edit fresh protected target gate: present for saveManagedChildSurface before target surface mutation
 runtime background list-mode mutation session gate: present for FilterTube_SetListMode so locked profiles cannot flip blocklist/whitelist mode without a fresh profile session
+runtime background channel/list mutation session gate: present for 3-dot channel adds, quick-block/persistent adds, Kids channel adds, whitelist transfer, and Filter All toggles so locked active profiles cannot rewrite rule lists without a fresh profile session
 runtime behavior changed by this contract: yes
 ```
 

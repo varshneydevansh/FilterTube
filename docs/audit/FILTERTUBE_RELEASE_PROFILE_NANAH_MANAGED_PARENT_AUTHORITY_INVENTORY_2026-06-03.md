@@ -332,6 +332,10 @@ Authority meaning:
 - PIN values are not written as part of session auth.
 - Background import/mutation paths can use `isProfileSessionAuthorized(...)` to
   reject writes to locked profiles.
+- Background rule-list mutation coverage now includes list-mode changes, batch
+  whitelist import, whitelist-to-blocklist transfer, common 3-dot/quick-block
+  channel add/update helpers, the older persistent channel add path, and Filter
+  All toggles.
 
 Current gap:
 
