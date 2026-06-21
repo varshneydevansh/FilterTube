@@ -60,6 +60,8 @@ metadata, not plaintext rules or authority.
 `docs/audit/FILTERTUBE_NANAH_MANAGED_MULTI_TARGET_FANOUT_BOUNDARY_2026-06-04.md`
 **Current local-network provider hook proof**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PROVIDER_HOOK_2026-06-05.md`
+**Current extension MVP handoff**:
+`docs/audit/FILTERTUBE_MANAGED_CONTROLS_EXTENSION_MVP_HANDOFF_2026-06-21.md`
 
 ## Extension MVP Checklist
 
