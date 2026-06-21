@@ -4254,6 +4254,10 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
 
             const activeId = typeof profilesV4.activeProfileId === 'string' ? profilesV4.activeProfileId : DEFAULT_PROFILE_ID;
             const profiles = safeObject(profilesV4.profiles);
+            if (!isProfileSessionAuthorized(profilesV4, activeId)) {
+                sendResponse?.({ ok: false, error: 'Profile is locked', errorCode: 'profile_locked' });
+                return;
+            }
             const activeProfile = safeObject(profiles[activeId]);
             const activeMain = safeObject(activeProfile.main);
             const activeKids = safeObject(activeProfile.kids);

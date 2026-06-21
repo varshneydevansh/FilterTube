@@ -105,6 +105,7 @@ runtime local managed edit failed-attempt rate limit: present for tab-view unloc
 runtime local managed edit failed-attempt rate limit durability: present for tab-view managed unlock prompts and background session PIN auth through profile.managedPolicyState.adminFailedUnlockRateLimit
 runtime managed-admin authority helper: present for local dashboard actor/target decisions, including Default/Master managing non-Default protected profiles, admin-session TTL, sensitive reauth, and dashboard failed-unlock window normalization
 runtime local managed edit fresh protected target gate: present for saveManagedChildSurface before target surface mutation
+runtime background list-mode mutation session gate: present for FilterTube_SetListMode so locked profiles cannot flip blocklist/whitelist mode without a fresh profile session
 runtime behavior changed by this contract: yes
 ```
 
