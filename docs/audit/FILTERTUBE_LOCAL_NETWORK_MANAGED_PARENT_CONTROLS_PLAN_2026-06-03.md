@@ -719,7 +719,7 @@ parent tool instead of a sync/debug console.
     trusted setup. This adds no LAN peer discovery, no ambient device scanning,
     and no new policy authority.
   - [x] 2026-06-20 Family Device Updates chooser slice: the compass choices are
-    now actionable. `Send now` switches to the parent-managed live send path and
+    now actionable. `Send update` switches to the parent-managed live send path and
     focuses pairing; `Pick up later` reveals/opens Later Pickup setup; `Pick up
     at home` reveals/opens Same-Home Pickup setup. Disabled paths explain the
     next required setup step instead of suggesting that nearby devices, Wi-Fi,
@@ -732,7 +732,7 @@ parent tool instead of a sync/debug console.
     scope, revision, hash, and signature gates still decide what can apply.
   - [x] 2026-06-20 public-docs alignment slice: README, Functionality,
     Technical, and shared release notes now describe the current Family Device
-    Updates model with `Send Now`, optional `Later Pickup`, optional
+    Updates model with `Send Update`, optional `Later Pickup`, optional
     `Same-Home Pickup`, protected-profile time limits, receive-only protected
     sync, and the no-overclaim boundary that delivery paths never become
     authority without local trusted-link and policy validation.
@@ -759,7 +759,7 @@ parent tool instead of a sync/debug console.
     not authority over profiles, PINs, trust, rules, or time limits.
   - [x] 2026-06-20 away-device Help/docs slice: Help, README, and Functionality
     now explain that Later Pickup is the away/opens-later device path, while
-    Same-Home Pickup is the explicitly configured home/school path and Send Now
+    Same-Home Pickup is the explicitly configured home/school path and Send Update
     remains the normal live P2P flow. Public wording still avoids claiming a
     hosted provider or automatic remote authority.
   - [x] 2026-06-20 release-note away-device wording slice: shared release notes
@@ -878,6 +878,14 @@ parent tool instead of a sync/debug console.
     protected devices on the same map as live and same-home devices while still
     requiring explicit Later Pickup setup and the existing trusted-link,
     target-profile, revision, hash, device-binding, and signature gates.
+  - [x] 2026-06-21 unified map parent-copy alignment slice: the first-read
+    Accounts & Sync map now uses `Send Update` consistently and describes
+    Same-Home Pickup as a home/school setup instead of leading with bridge
+    terminology. The command-center optional saved-update prompt now frames
+    Same-Home Pickup and Later Pickup as one family-device map for home, school,
+    or away-over-internet devices. This is copy-only; provider contracts,
+    trusted-link validation, target-profile binding, revisions, hashes, and
+    signatures remain unchanged.
   - [x] 2026-06-21 pickup setup label slice: configured Later Pickup and
     Same-Home Pickup summaries now say `set up` instead of `ready`. This avoids
     implying guaranteed delivery from endpoint configuration alone; protected
@@ -929,7 +937,7 @@ parent tool instead of a sync/debug console.
   HTTP endpoints. Discovery remains non-authoritative; local validation still
   gates every apply.
 - [x] 2026-06-20 parent-facing sync vocabulary simplified. The Accounts &
-  Sync first screen now describes the paths as Send Now, Same-Home Pickup, and
+  Sync first screen now describes the paths as Send Update, Same-Home Pickup, and
   Later Pickup while keeping Home Bridge/Internet Pickup as internal transport
   concepts and advanced/provider details. This keeps the parent mental model
   device-first without changing authority, signatures, target profile checks,
@@ -1064,7 +1072,7 @@ Use these labels in normal UI:
 
 | Parent-facing label | Technical meaning |
 | --- | --- |
-| Send Now / Live send | Live Nanah P2P while both devices are open. |
+| Send Update / Live send | Live Nanah P2P while both devices are open. |
 | Later Pickup | Encrypted internet pending-update service. |
 | Same-Home Pickup | Trusted same-network bridge/gateway. |
 | Protected device | Child/family/caregiver-managed target profile/device. |

@@ -13600,7 +13600,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return {
                 configured: false,
                 label: 'Later Pickup off',
-                detail: 'Send Now works when both devices are open. Set this up only when a verified protected device must collect a parent-approved update later or away over the internet.',
+                detail: 'Send Update works when both devices are open. Set this up only when a verified protected device must collect a parent-approved update later or away over the internet.',
                 tone: 'warning'
             };
         }
@@ -13675,7 +13675,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (ftNanahDeliveryLiveDetail) {
             ftNanahDeliveryLiveDetail.textContent = liveReady
-                ? 'Use Send Now after reviewing the selected profile and allowed area.'
+                ? 'Use Send Update after reviewing the selected profile and allowed area.'
                 : (hasProtectedProfiles
                     ? 'Best default for parents: pair, match the phrase, then send while both devices are open.'
                     : 'Start with one child/user profile, then pair only if another device needs the same rules.');
@@ -13704,7 +13704,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 : (!hasProtectedProfiles
                     ? 'Create a protected profile first. Later updates are only for verified protected devices.'
                     : (!hasVerifiedDevice
-                        ? 'Pair a verified device first. Most families can use Send Now.'
+                        ? 'Pair a verified device first. Most families can use Send Update.'
                         : mailbox.detail));
         }
         if (ftNanahDeliveryMailboxBtn) {
@@ -13808,7 +13808,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             title: title || 'Send Updates Later',
             message: message || 'Choose whether parent-approved updates need an optional waiting path for another device.',
             details: Array.isArray(details) ? details : [
-                'Use Send Now for normal parent control.',
+                'Use Send Update for normal parent control.',
                 'Add an optional send path only when both devices cannot be open together.',
                 'Protected profiles still cannot change parent rules from their own surface.'
             ],
@@ -13835,7 +13835,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             title: 'Later Pickup (away or opens later)',
             message: 'Use this only when a protected device on the same family map should collect an approved update later, including away over the internet.',
             details: [
-                'For normal family control, open both devices and use Send Now.',
+                'For normal family control, open both devices and use Send Update.',
                 'A pickup service can hold unreadable waiting updates, not PINs or plaintext rules.',
                 'The protected device still applies only newer signed updates from its saved parent link.'
             ],
@@ -13856,7 +13856,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const endpoint = await showPromptModal({
             title: 'Later Pickup Address',
-            message: 'Enter the trusted HTTPS address that will hold unreadable parent-approved updates until the protected device opens later or away. Leave blank to use Send Now only.',
+            message: 'Enter the trusted HTTPS address that will hold unreadable parent-approved updates until the protected device opens later or away. Leave blank to use Send Update only.',
             placeholder: 'https://your-filtertube-pickup-service',
             inputType: 'url',
             confirmText: currentEndpoint ? 'Save Later Pickup' : 'Enable Later Pickup',
@@ -13977,7 +13977,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             title: 'Same-Home Pickup',
             message: 'Use this only when you run a FilterTube-compatible bridge on your home, clinic, or school network.',
             details: [
-                'For normal family control, open both devices and use Send Now.',
+                'For normal family control, open both devices and use Send Update.',
                 'Same-Home Pickup can help a verified protected device pick up waiting updates on the same network.',
                 'It is not automatic Wi-Fi discovery; being nearby never grants control.',
                 'The protected device still accepts only newer signed updates from its saved parent link.'
@@ -14005,7 +14005,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const endpoint = await showPromptModal({
             title: 'Same-Home Pickup Address',
-            message: 'Enter the local bridge address only if you run a trusted FilterTube-compatible bridge. This is not device scanning; Send Now remains the normal path.',
+            message: 'Enter the local bridge address only if you run a trusted FilterTube-compatible bridge. This is not device scanning; Send Update remains the normal path.',
             placeholder: 'http://192.168.1.10:4177/filtertube',
             inputType: 'url',
             confirmText: currentEndpoint ? 'Save Same-Home Pickup' : 'Enable Same-Home Pickup',
@@ -15247,7 +15247,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return {
                 configured: false,
                 label: 'Same-Home Pickup off',
-                detail: 'Send Now can still work. Set this up only if you run an explicit FilterTube bridge on your home or school network.',
+                detail: 'Send Update can still work. Set this up only if you run an explicit FilterTube bridge on your home or school network.',
                 tone: 'warning'
             };
         }
@@ -16144,7 +16144,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 checkSavedUpdatesBtn.disabled = !savedUpdateReaderReady;
                 checkSavedUpdatesBtn.title = savedUpdateReaderReady
                     ? `Checks ${getNanahManagedSavedUpdateReaderLabel()} for newer signed parent updates. Trusted-link validation still decides what can apply.`
-                    : 'Set up Later Pickup or Same-Home Pickup before this protected device can check for waiting parent updates. Send Now still works when both devices are open.';
+                    : 'Set up Later Pickup or Same-Home Pickup before this protected device can check for waiting parent updates. Send Update still works when both devices are open.';
                 checkSavedUpdatesBtn.addEventListener('click', async () => {
                     if (!hasNanahManagedSavedUpdateReader()) {
                         UIComponents.showToast('Set up Later Pickup or Same-Home Pickup before checking waiting parent updates', 'warning');
@@ -16440,7 +16440,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     : [
                         'Choose the protected profile you manage.',
                         'Pair the other device and match the safety phrase.',
-                        'Send now; save trust only for devices that should keep receiving approved updates.'
+                        'Send update; save trust only for devices that should keep receiving approved updates.'
                     ],
                 hostLabel: 'Pair Protected Device',
                 sendLabel: 'Send Protected Update',

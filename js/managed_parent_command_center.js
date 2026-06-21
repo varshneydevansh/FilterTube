@@ -1115,7 +1115,7 @@
             const promptBody = document.createElement('div');
             promptBody.className = 'ft-managed-command-center__provider-prompt-body';
             const promptBodyText = document.createElement('span');
-            promptBodyText.textContent = 'Normal control is live: open both devices, pair, verify, send. Add one of these only if your family or school runs a compatible pickup service.';
+            promptBodyText.textContent = 'Normal control is live: open both devices, pair, verify, send. Add one of these only if your family needs approved updates to wait for a device at home, school, or away over the internet.';
             [
                 {
                     label: 'Set Up Later Pickup',
@@ -1125,7 +1125,7 @@
                 },
                 {
                     label: 'Set Up Same-Home Pickup',
-                    title: 'For an explicit FilterTube bridge you run on your home or school network. Wi-Fi alone never grants control.',
+                    title: 'For a same-home or school pickup path you explicitly set up. Wi-Fi alone never grants control.',
                     action: 'configure_local_network',
                     scope: 'local_network_provider'
                 }

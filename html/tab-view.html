@@ -946,9 +946,9 @@
                                         <div class="nanah-sync-intro__copy">
                                             <span class="nanah-sync-intro__eyebrow">Family device updates</span>
                                             <p class="nanah-sync-intro__title">Choose where each family device gets parent-approved changes.</p>
-                                            <p class="nanah-sync-intro__body">Use one map for devices that are ready now, nearby, or away over the internet. Start with Send Now: open both devices, pair, match the phrase, and send. Same-Home Pickup and Later Pickup are optional paths for families that cannot keep both devices open at the same time.</p>
+                                            <p class="nanah-sync-intro__body">Use one map for devices that are ready now, nearby, or away over the internet. Start with Send Update: open both devices, pair, match the phrase, and send. Same-Home Pickup and Later Pickup are optional paths for families that cannot keep both devices open at the same time.</p>
                                         </div>
-                                        <div class="nanah-device-compass" aria-label="Family device map for Send Now, Same-Home Pickup, and Later Pickup devices">
+                                        <div class="nanah-device-compass" aria-label="Family device map for Send Update, Same-Home Pickup, and Later Pickup devices">
                                             <div class="nanah-device-compass__center">
                                                 <div class="nanah-device-compass__hub-mark" aria-hidden="true"><i></i></div>
                                                 <span>Parent device</span>
@@ -966,7 +966,7 @@
                                                     <div class="nanah-device-compass__device" aria-hidden="true"><i></i></div>
                                                     <span>Same home</span>
                                                     <strong>Same-Home Pickup</strong>
-                                                    <small>For a trusted bridge you run.</small>
+                                                    <small>For home or school devices you set up.</small>
                                                 </button>
                                                 <button id="ftNanahCompassLaterBtn" class="nanah-device-compass__choice" type="button">
                                                     <div class="nanah-device-compass__device" aria-hidden="true"><i></i></div>
@@ -975,7 +975,7 @@
                                                     <small>For verified devices away or opened later.</small>
                                                 </button>
                                             </div>
-                                            <div class="nanah-device-compass__rule">Pair and verify first. Send Now, Same-Home Pickup, and Later Pickup can only carry signed updates; they never grant control.</div>
+                                            <div class="nanah-device-compass__rule">Pair and verify first. Send Update, Same-Home Pickup, and Later Pickup can only carry signed updates; they never grant control.</div>
                                         </div>
                                         <div class="nanah-sync-simple-path" aria-label="Family device update path">
                                             <article class="nanah-sync-simple-path__item">
@@ -993,14 +993,14 @@
                                                 <strong>Send update</strong>
                                                 <small>Only reviewed rules, access, or time limits apply.</small>
                                             </article>
-                                            <div class="nanah-sync-simple-path__note">Files, saved links, and pickup services cannot change PINs, trust, profiles, or time limits on their own.</div>
+                                            <div class="nanah-sync-simple-path__note">Files, saved links, and pickup paths cannot change PINs, trust, profiles, or time limits on their own.</div>
                                         </div>
                                         <div class="nanah-delivery-strip" aria-label="How parent updates can reach verified devices">
                                             <article class="nanah-delivery-card nanah-delivery-card--live" id="ftNanahDeliveryLiveCard">
                                                 <div>
                                                     <span class="nanah-delivery-card__eyebrow">Live update</span>
                                                     <strong id="ftNanahDeliveryLiveLabel">Open both devices</strong>
-                                                    <small id="ftNanahDeliveryLiveDetail">Use Send Now when parent and protected devices are open together.</small>
+                                                    <small id="ftNanahDeliveryLiveDetail">Use Send Update when parent and protected devices are open together.</small>
                                                 </div>
                                             </article>
                                             <details id="ftNanahDeliveryAdvanced" class="nanah-delivery-advanced">
@@ -1086,7 +1086,7 @@
                                                         <ol id="ftNanahModeSteps" class="nanah-sync-guide__list">
                                                             <li>Choose or create the protected profile you manage.</li>
                                                             <li>Connect to the other device and confirm the safety phrase.</li>
-                                                            <li>Send now. Save parent trust only for devices that should keep receiving approved updates.</li>
+                                                            <li>Send update. Save parent trust only for devices that should keep receiving approved updates.</li>
                                                         </ol>
                                                     </div>
 
@@ -1224,7 +1224,7 @@
                                             <div class="nanah-sync-stack">
                                                 <div class="nanah-sync-privacy-banner">
                                                     <strong>Private after the handshake</strong>
-                                                    <span>For Send Now, keep both devices open. This meeting step connects them; it does not store rules or PINs.</span>
+                                                    <span>For Send Update, keep both devices open. This meeting step connects them; it does not store rules or PINs.</span>
                                                     <details class="nanah-sync-technical">
                                                         <summary>Meeting service link</summary>
                                                         <span><a href="https://nanah-signaling.varshney-devansh614.workers.dev/" target="_blank" rel="noopener noreferrer">nanah-signaling.varshney-devansh614.workers.dev</a></span>
@@ -1679,7 +1679,7 @@
                                                     <li>A live Nanah session is not meant to survive a page refresh, browser restart, or tab close. Refresh ends the live pairing session.</li>
                                                     <li>Trusted links are saved locally so you do not lose the remembered relationship, but today you still start a fresh live session when reconnecting.</li>
                                                     <li>The trusted-device card now has a <strong>Start New Session</strong> shortcut that starts the next fresh session with the saved role/policy defaults.</li>
-                                                    <li>Saved trust means a faster next Send Now session. If Later Pickup is separately configured, a protected profile can check for signed parent updates when it opens without adding YouTube page background work.</li>
+                                                    <li>Saved trust means a faster next Send Update session. If Later Pickup is separately configured, a protected profile can check for signed parent updates when it opens without adding YouTube page background work.</li>
                                                     <li>If you try to reuse the same pairing code on the same active device session, FilterTube now blocks that locally instead of silently burning the code.</li>
                                                     <li>If no fixed target is saved on the managed replica link, non-<code>full</code> sync still writes into the receiver's current active profile at receive time.</li>
                                                     <li>If a managed replica link is saved with <strong>Always this local profile</strong>, future managed updates land in that pinned local profile even when some other profile is active on the receiving device.</li>
@@ -1726,7 +1726,7 @@
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">How devices meet</div>
-                                            <div class="help-item-body">Nanah’s meeting service only helps two open devices exchange connection setup data. It does not read parent rules, PINs, or profile data. In the normal parent flow, open both devices, pair, verify the phrase, and use Send Now. Later Pickup and Same-Home Pickup are optional delivery tools for advanced setups; they still cannot apply anything unless the protected device already trusts that parent link. The underlying project is open here: <a href="https://github.com/varshneydevansh/nanah" target="_blank" rel="noopener noreferrer">github.com/varshneydevansh/nanah</a>.</div>
+                                            <div class="help-item-body">Nanah’s meeting service only helps two open devices exchange connection setup data. It does not read parent rules, PINs, or profile data. In the normal parent flow, open both devices, pair, verify the phrase, and use Send Update. Later Pickup and Same-Home Pickup are optional delivery tools for advanced setups; they still cannot apply anything unless the protected device already trusts that parent link. The underlying project is open here: <a href="https://github.com/varshneydevansh/nanah" target="_blank" rel="noopener noreferrer">github.com/varshneydevansh/nanah</a>.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Same-Home Pickup</div>
@@ -1875,7 +1875,7 @@
                                         <div class="help-item">
                                             <div class="help-item-title">Remote updates in plain words</div>
                                             <div class="help-item-body">
-                                                Normal parent control is Send Now: open parent and protected devices, pair, verify the phrase, then send the selected profile update. Saved trust remembers the verified parent/protected-device relationship and target profile for the next live session. Same-Home Pickup covers explicitly configured home/school pickup, and Later Pickup covers away or opens-later devices through a trusted online pickup setup. These paths are optional, are not required for ordinary parent control, do not scan Wi-Fi for authority, and never let a protected profile edit its own rules.
+                                                Normal parent control is Send Update: open parent and protected devices, pair, verify the phrase, then send the selected profile update. Saved trust remembers the verified parent/protected-device relationship and target profile for the next live session. Same-Home Pickup covers explicitly configured home/school pickup, and Later Pickup covers away or opens-later devices through a trusted online pickup setup. These paths are optional, are not required for ordinary parent control, do not scan Wi-Fi for authority, and never let a protected profile edit its own rules.
                                             </div>
                                         </div>
                                     </div>
