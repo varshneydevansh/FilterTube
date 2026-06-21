@@ -16,7 +16,7 @@ Parent/caregiver history clearing now records its own protected
 `history.clear` evidence row instead of silently removing accepted rows.
 History display now adds a safe source-category label derived from action type
 and sanitized transport metadata: Parent edit, Approved list, Remote update,
-Send Update, Internet Pickup, Home Bridge, trusted-device, admin-access, time
+Send Update, Internet Pickup, Home Pickup, trusted-device, admin-access, time
 request, delivery setting, or history. These labels help parents understand
 manual/list-derived/remote/sent changes but remain display context only, not
 policy authority.
@@ -313,7 +313,7 @@ expire, sensitive managed gates require fresher re-auth before history,
 rule-edit, viewing-space, or time-limit mutations, and the background PIN cache
 remains memory-only while failed-attempt rate-limit state is profile-persisted.
 Account-level delivery setup now follows the same evidence model. If parent
-re-auth fails while configuring `Later Pickup` or `Same-Home Pickup`, the
+re-auth fails while configuring `Internet Pickup` or `Home Pickup`, the
 dashboard writes redacted `admin_session.failed_unlock` rows to each protected
 profile currently manageable by the active account. This keeps provider setup
 failures visible in protected history without giving pickup services, networks,

@@ -2,7 +2,7 @@
 
 **Generated**: 2026-06-04
 **Status**: Runtime descriptor persistence slice. Later same-day keypair,
-signed-send, mailbox provider, Home Bridge provider, and key-rotation slices now
+signed-send, mailbox provider, Home Pickup provider, and key-rotation slices now
 exist, but this document remains the public descriptor binding boundary.
 **Related plan**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`
@@ -15,7 +15,7 @@ exist, but this document remains the public descriptor binding boundary.
 
 Managed parent or caregiver policy envelopes require trusted source device,
 source profile, target profile, scope, revision, hash, and signature evidence
-before apply. Live P2P, Internet Pickup, and Home Bridge delivery all depend on
+before apply. Live P2P, Internet Pickup, and Home Pickup delivery all depend on
 one stable rule: the protected replica must remember the source public key that
 belongs to its trusted managed link.
 
@@ -30,7 +30,7 @@ This slice adds the first public-key descriptor plumbing:
   `sourcePublicKeyJwk` verifier path.
 
 It intentionally does not make reachability into authority. Keypair
-provisioning, signed live sends, provider-gated mailbox/Home Bridge delivery,
+provisioning, signed live sends, provider-gated Internet Pickup/Home Pickup delivery,
 and key rotation are covered by later linked proofs. This descriptor slice only
 records how public-key identity is advertised and persisted for trusted links.
 

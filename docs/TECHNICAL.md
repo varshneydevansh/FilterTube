@@ -99,8 +99,8 @@ sequenceDiagram
 - Android/app packed channel keyword source strings are normalized back into canonical `source:"channel"` plus `channelRef` before import or Nanah apply
 - `Send Update` is the live WebRTC path: both devices must be open, paired, and phrase-verified before a payload is applied
 - the Family Device map is shared for live, same-home, and away/internet devices; transport reachability is separate from authority
-- `Later Pickup` is an optional configured pickup provider for unreadable signed pending updates; provider reachability never grants authority
-- `Same-Home Pickup` is an optional configured local/home bridge; local-network presence and discovery never grant authority
+- `Internet Pickup` is an optional configured pickup provider for unreadable signed pending updates; provider reachability never grants authority
+- `Home Pickup` is an optional configured local/home bridge; local-network presence and discovery never grant authority
 - protected-profile time limits are runtime policy gates; reaching the limit blocks YouTube with the FilterTube timeout surface and records extra-time requests as protected history
 
 ## Runtime stabilization checkpoint

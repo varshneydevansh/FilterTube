@@ -944,10 +944,10 @@
 
         function ackLabelForTransport(transport, result) {
             if (transport === 'mailbox') {
-                return result === 'accepted' ? 'Later Pickup update delivered' : 'Later Pickup delivery failed';
+                return result === 'accepted' ? 'Internet Pickup update delivered' : 'Internet Pickup delivery failed';
             }
             if (transport === 'local_network') {
-                return result === 'accepted' ? 'Same-Home Pickup update delivered' : 'Same-Home Pickup delivery failed';
+                return result === 'accepted' ? 'Home Pickup update delivered' : 'Home Pickup delivery failed';
             }
             return result === 'accepted' ? 'Replica applied managed policy' : 'Replica rejected managed policy';
         }
