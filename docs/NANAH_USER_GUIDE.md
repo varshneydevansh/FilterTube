@@ -33,22 +33,22 @@ Flow:
 4. Send once.
 5. The other device reviews and applies it.
 
-### 2. Parent controls child
+### 2. Parent controls protected profile
 
-Use this when a parent device should update a child profile on another device.
+Use this when a parent/caregiver device should update a protected profile on another verified device.
 
 Flow:
 
-1. Choose `Parent controls child` on the sender.
+1. Choose `Parent controls protected profile` on the sender.
 2. Connect both devices.
 3. Confirm the same safety phrase.
-4. Pick the child profile in `Remote target profile`.
+4. Pick the protected profile in `Remote target profile`.
 5. Send once.
 6. Save the parent control link so later sessions stay simpler.
 
 Important:
 
-- the first managed connection may still need one local parent approval on the child device
+- the first managed connection may still need one local parent/caregiver approval on the protected device
 - after that, later updates can be easier depending on the saved policy
 
 ### 3. Move full account
@@ -133,15 +133,15 @@ No.
 
 Current rule:
 
-- first managed parent -> child connection may need one local parent approval on the child device
-- after that, the child does **not** always need to press allow
+- first managed parent -> protected-profile connection may need one local parent/caregiver approval on the protected device
+- after that, the protected user does **not** always need to press allow
 
-Whether the child device stops for approval later depends on the saved managed-link policy:
+Whether the protected device stops for approval later depends on the saved managed-link policy:
 
 - `standard parent control`
   - easier later updates
 - `strict child protection`
-  - more approval steps on the child device
+  - more approval steps on the protected device
 
 ## Do PINs get sent?
 
@@ -151,17 +151,17 @@ PINs stay local.
 
 Nanah may require a local unlock on the sending or receiving device, but the PIN itself is not sent across Nanah.
 
-## Child profile rules
+## Protected profile rules
 
 Current rule is profile-based, not whole-device based.
 
 That means:
 
-- if the active profile in the Nanah UI is a child profile, that surface is receive-only
-- the child PIN can open receive-only Accounts & Sync for that child profile
-- the child PIN does not unlock Dashboard, Filters, Kids Mode editing, Settings, backups, trusted-link policy, or profile management
+- if the active profile in the Nanah UI is a protected profile, that surface is receive-only
+- the protected-profile PIN can open receive-only Accounts & Sync for that protected profile
+- the protected-profile PIN does not unlock Dashboard, Filters, Kids Mode editing, Settings, backups, trusted-link policy, or profile management
 - parent/account PIN controls rule edits, sync policy, backups, and viewing-space policy
-- child profiles are not full admin surfaces
+- protected profiles are not full admin surfaces
 
 ## Remote target profile
 
@@ -178,20 +178,20 @@ During a live session, FilterTube shows each side as profile plus device.
 Example:
 
 - `pushkal (account profile, locked) • Pixel Tablet`
-- `pussy (child profile) • Family iPad`
+- `pussy (protected profile) • Family iPad`
 
 This is only display context. The editable device label remains just the device name, but the status area shows the active profile too so you can verify the target before sending or applying settings.
 
-## Parent-managed child rules
+## Parent-managed protected-profile rules
 
-Parents should edit child rules from the parent/account surface.
+Parents and caregivers should edit protected-profile rules from the parent/account surface.
 
-Use the child profile row in Accounts & Sync:
+Use the protected profile row in Accounts & Sync:
 
-- `Edit Main Rules` changes that child profile's Main YouTube rules
-- `Edit Kids Rules` changes that child profile's YouTube Kids rules
+- `Edit Main Rules` changes that protected profile's Main YouTube rules
+- `Edit Kids Rules` changes that protected profile's YouTube Kids rules
 
-This lets teenagers or younger kids keep their own profile identity while the parent keeps control over the rule list and policy.
+This lets teenagers, younger kids, or other protected users keep their own profile identity while the parent/caregiver keeps control over the rule list and policy.
 
 ## Backups and trusted links
 

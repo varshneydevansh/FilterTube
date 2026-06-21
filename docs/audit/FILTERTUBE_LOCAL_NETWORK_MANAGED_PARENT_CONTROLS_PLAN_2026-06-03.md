@@ -41,7 +41,7 @@ Built-in local-network peer discovery, LAN transport, app native enforcement
 proofs, and built-in app/server later-delivery providers remain gated.
 Source-side managed signing-key rotation is now an explicit
 parent/admin action: it regenerates the local source keypair, key-revokes active
-managed child-device links, purges pending provider/open-sync/LAN/source-ack
+managed protected-device links, purges pending provider/open-sync/LAN/source-ack
 state for those links, and writes protected history so the affected devices must
 be paired again. The parent command center now distinguishes usable verified
 devices from revoked/stale managed links so rotated devices show as needing
@@ -69,10 +69,10 @@ open-sync, mailbox-provider, and local-network-provider hook slices. Remaining
 unchecked rows below are intentionally provider/app lanes, not missing
 extension authority code.
 
-- [x] Parent/account profiles can manage protected child profiles locally.
+- [x] Parent/account profiles can manage protected profiles locally.
 - [x] Default/Master can manage independent protected account profiles without
   switching into them.
-- [x] Protected profiles cannot use child authority to edit admin settings,
+- [x] Protected profiles cannot use protected-user authority to edit admin settings,
   viewing-space policy, time limits, trusted-link policy, or protected history.
 - [x] Local Main/Kids viewing-space changes write protected revision/history
   rows for managed protected-profile edits.
@@ -225,7 +225,7 @@ parent tool instead of a sync/debug console.
   to optional trusted providers when those provider hooks are installed.
 - [x] Parent-side push attempts write redacted protected history rows for sent,
   missing-link, provider-pending, and failed cases.
-- [x] Parent-side managed signing-key rotation can revoke active child-device
+- [x] Parent-side managed signing-key rotation can revoke active protected-device
   managed links, purge queued provider/status state, and force re-pairing.
 - [x] Manual managed remote-delivery smoke now includes key-rotation,
   re-pairing status, and redacted `trust_link.key_revoke` history proof.
@@ -1237,13 +1237,13 @@ multi-device administration.
 
 | Requirement | Product meaning | Release safety meaning |
 | --- | --- | --- |
-| Local-network or P2P management | A trusted parent/caregiver device can manage a child or protected profile on the same network when reachable. | Remote writes cannot be accepted from page messages, untrusted peers, sibling profiles, or stale links. |
-| Password/PIN protected admin mode | The protected end user cannot change managed rules or disable controls. | Child PIN never becomes admin authority; parent/account PIN gates writes. |
+| Local-network or P2P management | A trusted parent/caregiver device can manage a protected profile on the same network when reachable. | Remote writes cannot be accepted from page messages, untrusted peers, sibling profiles, or stale links. |
+| Password/PIN protected admin mode | The protected end user cannot change managed rules or disable controls. | Protected-profile PIN never becomes admin authority; parent/account PIN gates writes. |
 | Remote video, keyword, and channel rules | Parent can block specific videos, keywords, and channels just like local app controls. | All remote writes must reuse the same validated rule mutation paths as local writes. |
 | Managed channel filter lists | Parent/caregiver can import or subscribe to channel lists, enable/disable each list, and apply selected lists to protected profiles instead of adding channels one at a time. | A URL or list file is data, not authority. Imports need preview, source label, revision/hash, per-profile enablement, parent/admin approval, and the same validated channel-rule mutation path. |
 | List source metadata | Parent/caregiver can see compact upstream title/version/last-modified metadata when a list provides it. | Metadata is display/audit context only. It cannot grant authority, change target profiles, hide rule contents from admin history, or bypass preview/re-auth. |
 | Action history/logs | Parent/caregiver can see what changed, when, and from which trusted device. | Logs must not leak sensitive plaintext unnecessarily and must not become the policy authority. |
-| Offline safety | Child device keeps the last valid parent policy when the parent device is not reachable. | Stale, replayed, revoked, mismatched, or downgraded policy revisions are rejected. |
+| Offline safety | Protected device keeps the last valid parent policy when the parent device is not reachable. | Stale, replayed, revoked, mismatched, or downgraded policy revisions are rejected. |
 | Future app parity | Mobile/tablet apps consume the same policy model as the extension. | Extension and apps must not fork authority semantics. |
 
 ## Security Requirements Before Runtime Writes
@@ -1317,19 +1317,19 @@ not policy authority.
 Before accepting remote policy updates, fixtures must cover:
 
 - Local parent edit racing an incoming remote policy.
-- Two trusted parent devices editing the same child profile.
+- Two trusted parent devices editing the same protected profile.
 - Equal revision with a different policy hash.
 - Accepted update followed by trust revocation.
 - Queued mailbox update delivered after trust revocation.
 - Reduced time budget or stricter viewing-space update delivered while the
-  child profile is active.
+  protected profile is active.
 
 ## Non-Goals For The First Slice
 
 - No cloud plaintext rule storage.
 - No server-side parental dashboard before local/P2P authority is proven.
 - No telemetry upload of viewing history.
-- No child-device override that can weaken parent policy.
+- No protected-device override that can weaken parent policy.
 - No remote route/time-limit policy apply before schema, fixtures, signature
   evidence, and trusted delivery gates exist.
 - No automatic trust of arbitrary public filter-list URLs. List subscriptions
@@ -1462,7 +1462,7 @@ without changing runtime behavior.
 - **Dependencies**: Existing authority inventory.
 - **Acceptance Criteria**:
   - The doc states this work has already begun in the extension authority audit.
-  - The doc distinguishes parent/caregiver admin authority from child PIN.
+  - The doc distinguishes parent/caregiver admin authority from protected-profile PIN.
   - The doc lists action history as a required future proof surface.
 - **Validation**:
   - `git diff --check`
@@ -1482,7 +1482,7 @@ without changing runtime behavior.
 - **Status**: Contract fixture added. Product runtime behavior remains
   unchanged.
 - **Acceptance Criteria**:
-  - Valid parent-to-child policy fixture passes.
+  - Valid parent-to-protected-profile policy fixture passes.
   - Missing target, source, scope, revision, key identity, or integrity fixture
     fails.
   - Sibling-to-sibling and child-to-parent policy fixtures fail.
@@ -1506,7 +1506,7 @@ without changing runtime behavior.
   policy active.
 - **Acceptance Criteria**:
   - Every revision decision has a fixture name.
-  - Offline child behavior is explicit: last valid policy remains active.
+  - Offline protected-profile behavior is explicit: last valid policy remains active.
   - Reduced or downgraded budgets are handled as normal valid newer policy only
     when signed by trusted parent authority.
   - Equal revision with different hash is rejected and logged as a conflict.
@@ -1516,13 +1516,13 @@ without changing runtime behavior.
 
 ## Sprint 2: Local Parent/Caregiver Managed Editing
 
-**Goal**: Make same-device parent-managed child edits produce a durable policy
+**Goal**: Make same-device parent-managed protected-profile edits produce a durable policy
 revision and action-history entry.
 
 **Demo/Validation**:
 
-- Parent/account profile edits a child profile.
-- Child profile cannot mutate itself as admin.
+- Parent/account profile edits a protected profile.
+- Protected profile cannot mutate itself as admin.
 - Action history records the parent-side edit.
 
 ### Task 2.1: Add local managed edit authority tests
@@ -1531,18 +1531,18 @@ revision and action-history entry.
   - `docs/audit/FILTERTUBE_MANAGED_CHILD_LOCAL_AUTHORITY_CONTRACT_2026-06-03.md`
   - `tests/runtime/managed-child-local-authority-current-behavior.test.mjs`
 - **Description**: Pin current authority and future expected behavior around
-  default/account/child profiles, parentProfileId, locked parent sessions, and
-  virtual child editing.
+  default/account/protected profiles, parentProfileId, locked parent sessions,
+  and virtual protected-profile editing.
 - **Complexity**: 5/10
 - **Dependencies**: Sprint 1.
-- **Status**: Local managed child authority contract and fixture updated with
+- **Status**: Local managed protected-profile authority contract and fixture updated with
   accepted-save revision/history runtime behavior, protected failed-unlock
   logging, dashboard/background admin TTL, sensitive re-auth, profile-persisted
   failed-attempt rate limiting for dashboard and background session PIN auth,
   while the actual background PIN/session cache remains memory-only.
 - **Acceptance Criteria**:
-  - Parent/account can target owned child.
-  - Child cannot manage itself as admin.
+  - Parent/account can target an owned protected profile.
+  - Protected profile cannot manage itself as admin.
   - Sibling cannot manage sibling.
   - Locked parent cannot write until authorized.
   - Parent/admin session expires and relocks on profile switch.
@@ -1563,7 +1563,7 @@ revision and action-history entry.
 - **Complexity**: 4/10
 - **Dependencies**: Task 2.1.
 - **Status**: Action-history model and access-control fixture updated. Product
-  runtime now writes accepted local managed child save rows, exposes
+  runtime now writes accepted local managed protected-profile save rows, exposes
   parent/account-only protected history access, clears accepted rows while
   preserving protected evidence, records dashboard local failed-attempt
   rate-limit state on the managing profile, and records Nanah managed-policy
@@ -1597,13 +1597,13 @@ revision and action-history entry.
 - **Dependencies**: Tasks 2.1 and 2.2.
 - **Acceptance Criteria**:
   - Existing blocklist/whitelist writes remain intact.
-  - Policy revision increments atomically with the child profile write.
+  - Policy revision increments atomically with the protected profile write.
   - Failed writes do not create successful action-history rows.
 - **Status**: Implemented for `saveManagedChildSurface(...)` in
   `js/tab-view.js`. The runtime writes
   `profile.managedPolicyState.localManagedEdits.{main,kids}` and appends a
   redacted protected row to `profile.managedActionHistory[]` on accepted local
-  parent-managed child saves. Failed parent/admin unlocks and rejected remote
+  parent-managed protected-profile saves. Failed parent/admin unlocks and rejected remote
   policy attempts now have separate redacted protected history writers and
   profile-persisted rate-limit state; they are no longer future work for the
   extension-side authority path.
@@ -1614,8 +1614,8 @@ revision and action-history entry.
 
 ## Sprint 3: Local-Network/P2P Managed Update Flow
 
-**Goal**: Allow a trusted source device to deliver a managed child policy to a
-replica child device over Nanah/P2P or same-network transport.
+**Goal**: Allow a trusted source device to deliver a managed protected-profile policy to a
+replica protected device over Nanah/P2P or same-network transport.
 
 **Demo/Validation**:
 
@@ -1635,15 +1635,15 @@ replica child device over Nanah/P2P or same-network transport.
 - **Dependencies**: Sprint 1.
 - **Status**: Runtime validation helper, receive-side validation
   context/history plumbing, adapter WebCrypto signature verifier helper,
-  validated apply wrapper, target child profile writes, and persisted accepted
+  validated apply wrapper, target protected-profile writes, and persisted accepted
   revision/hash state are present. Pairing-time public-key storage, source
   signing-key provisioning, and live Nanah P2P signed sends are present; built-in
   local-network transport remains provider/server work.
 - **Acceptance Criteria**:
-  - Trusted source to fixed child target passes.
+  - Trusted source to fixed protected-profile target passes.
   - Peer mode, sibling target, missing fixed target, stale revision, wrong
     scope, and revoked link fail.
-  - Locked child bypass works only for `allow_trusted_updates`.
+  - Locked protected-profile bypass works only for `allow_trusted_updates`.
   - Hostile-LAN fixtures cover spoofed peer announcement, duplicate device id,
     stale pairing record, NAT/reconnect identity drift, and MITM-like wrong key.
 - **Validation**:
@@ -1669,7 +1669,7 @@ replica child device over Nanah/P2P or same-network transport.
   from trusted-link `sourcePublicKeyJwk` material, the dashboard records
   protected validation history, invokes
   `applyManagedPolicyEnvelope(...)` for accepted envelopes, persists accepted
-  revision/hash state on the target child profile, and records
+  revision/hash state on the target protected profile, and records
   accepted/rejected apply history. Trusted-link removal cleanup: present for
   target-local accepted managed-policy revision state and matching open-sync
   status rows. Pairing-time public-key descriptor persistence, source-side
@@ -1776,7 +1776,7 @@ replica child device over Nanah/P2P or same-network transport.
   are now present under
   `docs/audit/FILTERTUBE_MANAGED_SOURCE_DELIVERY_ACK_STATUS_2026-06-05.md`.
   Source-side parent/admin key rotation can now force-generate a new local
-  managed signing keypair, mark active Source -> Replica child-device links as
+  managed signing keypair, mark active Source -> Replica protected-device links as
   `keyRevoked`, purge provider/open-sync/LAN/source-ack state for those old
   links, and add protected target-profile history rows. Offline
   mailbox/local-network delivery, cross-device fanout, and compromise-recovery
@@ -1791,7 +1791,7 @@ replica child device over Nanah/P2P or same-network transport.
   - The private JWK is not placed in the Nanah hello descriptor or trusted link
     policy.
   - The signing helper refuses malformed signed-field bindings.
-  - Source-side rotation is parent/admin gated and old child-device links cannot
+  - Source-side rotation is parent/admin gated and old protected-device links cannot
     be reused for future managed sends.
   - Docs do not claim encrypted-at-rest private key storage, mailbox runtime,
     or broad active/full managed-policy transport.
@@ -1809,14 +1809,14 @@ replica child device over Nanah/P2P or same-network transport.
   - `tests/runtime/managed-nanah-live-signed-send-current-behavior.test.mjs`
 - **Description**: Convert saved Source -> Replica managed Main/Kids and
   granular rule/viewing/time-limit sends to signed `filtertube_managed_policy`
-  envelopes once the replica has a fixed child target profile and the source
+  envelopes once the replica has a fixed protected-profile target and the source
   has a complete signing keypair.
 - **Complexity**: 6/10
 - **Dependencies**: Task 3.5.
 - **Status**: Implemented for live Main/Kids, keyword, channel, video,
   viewing-space, and time-limit scope. Granular rule scopes expose an explicit
   Main/Kids rule-source picker, default from the active dashboard surface, and
-  can source payloads from parent-managed child edit mode. Rule bundle expands
+  can source payloads from parent-managed protected-profile edit mode. Rule bundle expands
   into separate signed keyword/channel/video envelopes. Connected-replica
   multi-target sends can choose eligible fixed targets before signing, and each
   successful live send appends redacted outbound history to the trusted link.
@@ -1903,7 +1903,7 @@ the current extension dashboard.
 
 - Parent can see managed profile status, last sync, last policy revision, and
   recent actions.
-- Protected child surface does not expose restricted editing controls.
+- Protected profile surface does not expose restricted editing controls.
 
 ### Task 4.1: Add managed profile status panel spec
 
@@ -1918,7 +1918,7 @@ the current extension dashboard.
   Parent/account-authorized protected rows can now show compact local revision,
   remote accepted-policy scope/link count, verified-device readiness, and
   protected history count status. Default/Master can include independent
-  protected account profiles; parent accounts can include their child profiles.
+  protected account profiles; parent accounts can include their protected profiles.
   Parent/account-authorized profile manager views now also show a command-center
   overview for protected profiles, viewing spaces, time limits, sync status,
   and protected history. Command-center row buttons are delegated action intents
@@ -1993,7 +1993,7 @@ the current extension dashboard.
 - **Dependencies**: Task 4.1 and action-history model.
 - **Acceptance Criteria**:
   - No admin action is available in locked state.
-  - No child profile can reach protected settings as child authority.
+  - No protected profile can reach protected settings as protected-user authority.
   - Text fits and remains navigable on extension popup/dashboard sizes.
 - **Validation**:
   - `npm run test:settings`
@@ -2006,7 +2006,7 @@ YouTube budgets, then document app parity.
 
 **Demo/Validation**:
 
-- Child profile can be set to Main only, Kids only, both, or neither.
+- Protected profile can be set to Main only, Kids only, both, or neither.
 - Daily YouTube budget is enforced across SPA navigation and active tabs.
 - Timeout overlay appears only when policy says access is exhausted.
 
@@ -2039,7 +2039,7 @@ YouTube budgets, then document app parity.
 - **Description**: Pin allowed and denied behavior for `youtube.com` and
   `youtubekids.com` per profile policy.
 - **Status**: Contract/proof fixture, runtime route blocking, denied-route
-  overlay, and SPA/open-tab revalidation are present for active child profiles.
+  overlay, and SPA/open-tab revalidation are present for active protected profiles.
   Viewing-space policy can be included in signed managed-policy sends; installed
   two-device smoke and native app parity remain pending.
 - **Complexity**: 5/10
@@ -2130,7 +2130,7 @@ contract before wiring more native app runtime behavior.
     viewing-space, time-limit, and history contracts.
   - Apps do not treat extension background/session cache, content-script DOM
     state, YouTube selectors, or page-message state as native authority.
-  - Main/Kids remain viewing spaces, not separate child profiles.
+  - Main/Kids remain viewing spaces, not separate protected profiles.
   - Remote keyword/channel/video app parity reuses the same validated mutation
     paths as local controls.
   - Native app shell owns app-open lock, Main/Kids route gate, and time budget
@@ -2146,7 +2146,7 @@ contract before wiring more native app runtime behavior.
 ## Sprint 7: Offline Mailbox Specification
 
 **Goal**: Specify but do not rush an encrypted pending-update mailbox for cases
-where parent and child devices are not reachable at the same time.
+where parent and protected devices are not reachable at the same time.
 
 **Demo/Validation**:
 
@@ -2224,7 +2224,7 @@ Minimum lane mapping:
 
 - Local network discovery is not authority. A discovered device must still be
   paired and trusted.
-- A child PIN is not an admin PIN. Do not let child unlock state permit policy
+- A protected-profile PIN is not an admin PIN. Do not let protected-profile unlock state permit policy
   edits, sync trust changes, import/export, or time-limit overrides.
 - Action history can become sensitive. Keep summaries local, redacted where
   needed, and separate from policy authority.
@@ -2259,7 +2259,7 @@ protected user.
 
 We have already started the extension-side work for this. The first step is an
 authority audit of profiles, PIN/session gates, Nanah P2P trusted devices, and
-managed child-profile policy, because remote management must be secure before
+managed protected-profile policy, because remote management must be secure before
 it becomes automatic.
 
 The scope I am now tracking includes:
@@ -2272,7 +2272,7 @@ The scope I am now tracking includes:
 - later mobile/tablet parity using the same policy model
 
 I do not want to rush this with a weak security model. The protected user must
-not be able to become admin by entering a child PIN, sibling profiles must not
+not be able to become admin by entering a protected-profile PIN, sibling profiles must not
 be able to change each other, and remote updates need trusted pairing plus
 revision/integrity checks so stale or untrusted policies are rejected.
 
@@ -2280,3 +2280,10 @@ So the implementation has begun from the extension first, because the extension
 is the upstream policy/settings model that the mobile and tablet apps will
 follow. I will share progress as this moves from audit/spec into implementation.
 ```
+
+## Progress Notes
+
+- [x] 2026-06-21 public protected-profile wording slice: README and public
+  Nanah/profile/app docs now use protected profile/device/user as the
+  parent-facing term while preserving internal `type: "child"` references where
+  they describe the current storage/runtime contract.

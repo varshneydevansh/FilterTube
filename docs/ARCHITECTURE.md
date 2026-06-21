@@ -85,22 +85,22 @@ LIVE SESSION
   -> does not need to switch active profile just to receive
 ```
 
-### Child safety boundary
+### Protected profile safety boundary
 
 ```text
-LOCKED CHILD PROFILE
+LOCKED PROTECTED PROFILE
   -> receive-only sync surface
 
-UNLOCKED CHILD PROFILE
-  -> child PIN proves profile access only
+UNLOCKED PROTECTED PROFILE
+  -> protected-profile PIN proves profile access only
   -> still not an admin or sender surface
 
 TRUSTED PARENT LINK
-  -> may update child profile under saved local child-side policy
+  -> may update protected profile under saved local protected-device policy
   -> PIN stays local
 
 PARENT / ACCOUNT PROFILE
-  -> edits child Main/Kids rules by explicit child profile ID
+  -> edits protected Main/Kids rules by explicit protected profile ID
   -> owns policy, backups, trusted links, and viewing-space access
 ```
 

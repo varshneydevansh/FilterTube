@@ -13,7 +13,7 @@
 - **Profile**: An entry inside `ftProfilesV4.profiles[profileId]`.
 - **Default (Master)**: The `profileId === "default"` profile.
 - **Account profile**: `type: "account"` (or inferred account when no `type` and no `parentProfileId`).
-- **Child profile**: `type: "child"` (or inferred child when `parentProfileId` is present).
+- **Protected profile**: stored as `type: "child"` today (or inferred protected profile when `parentProfileId` is present).
 - **Locked profile**: A profile is considered locked if it has a PIN verifier.
   - Master: `profiles.default.security.masterPinVerifier` 
   - Non-default: `profiles[profileId].security.profilePinVerifier` 
@@ -99,29 +99,29 @@ Key points:
 - If **active profile has no PIN**:
   - All views are accessible.
 
-### 1a) Child profile authority rules
+### 1a) Protected profile authority rules
 
-- A child profile is a private viewing profile, not an admin profile.
-- A child profile can have its own Main and Kids rules, viewing-space policy, and optional child PIN.
-- A child PIN is for switching into that child profile and, when allowed, opening receive-only Accounts & Sync for that child profile.
-- A child PIN does **not** unlock Dashboard, Filters, Kids Mode editing, Settings, backups, account policy, trusted-link policy, or profile management.
-- Parent/account authority is separate from child-profile unlock state:
+- A protected profile is a private viewing profile, not an admin profile. The current storage/runtime type remains `child`.
+- A protected profile can have its own Main and Kids rules, viewing-space policy, and optional protected-profile PIN.
+- A protected-profile PIN is for switching into that protected profile and, when allowed, opening receive-only Accounts & Sync for that protected profile.
+- A protected-profile PIN does **not** unlock Dashboard, Filters, Kids Mode editing, Settings, backups, account policy, trusted-link policy, or profile management.
+- Parent/account authority is separate from protected-profile unlock state:
   - the parent/account PIN unlocks rule editing, settings, sync policy, backups, and profile policy
-  - the child PIN only proves access to that child profile
+  - the protected-profile PIN only proves access to that protected profile
 - When a FilterTube settings surface is closed or the app/extension returns to the viewing surface, protected controls must be treated as locked again.
 
-### 1b) Parent-managed child editing
+### 1b) Parent-managed protected-profile editing
 
-- A parent/account profile can edit a child profile without switching the active profile to the child.
-- Parent-managed edit mode targets the child profile explicitly:
-  - Dashboard stats read from the child profile
-  - Filters edit the child profile's Main YouTube rules
-  - Kids Mode edits the child profile's YouTube Kids rules
-  - Settings/Semantic ML stay visually marked as child-editing surfaces and only child-scoped controls should mutate the child profile
-- Dashboard, Filters, Kids Mode, Settings, and Semantic ML must show the parent-managed child banner while this mode is active.
-- The banner's done action exits the virtual child editor and returns to Accounts & Sync.
+- A parent/account profile can edit a protected profile without switching the active profile to the protected user.
+- Parent-managed edit mode targets the protected profile explicitly:
+  - Dashboard stats read from the protected profile
+  - Filters edit the protected profile's Main YouTube rules
+  - Kids Mode edits the protected profile's YouTube Kids rules
+  - Settings/Semantic ML stay visually marked as protected-profile editing surfaces and only protected-profile-scoped controls should mutate the protected profile
+- Dashboard, Filters, Kids Mode, Settings, and Semantic ML must show the parent-managed protected-profile banner while this mode is active.
+- The banner's done action exits the virtual protected-profile editor and returns to Accounts & Sync.
 - This is the intended path for parents managing younger kids or teenagers:
-  - the child keeps private viewing state and profile identity
+  - the protected user keeps private viewing state and profile identity
   - the parent keeps authority over rule changes and policy
   - sibling profiles cannot mutate one another unless their parent/account profile has authority
 
@@ -217,30 +217,30 @@ Note: This does not affect a parallel account’s ability to access its own Filt
 
 ## Nanah / Accounts & Sync rules (Current)
 
-- If the active profile is a **child** profile, Accounts & Sync behaves as a **receive-only replica** surface.
-- If the child profile has its own PIN, that child PIN can open receive-only Accounts & Sync for that child profile only.
-- A child PIN unlock does **not** unlock broader FilterTube settings or parent controls after returning from Accounts & Sync.
-- Child profiles cannot send settings, save arbitrary peer/source trust, move backups, or manage trusted-link policy from the child surface.
-- Child profiles can join a parent/source pairing code and receive allowed updates for their own profile.
-- Core backup/import/export/account-admin controls are disabled for child profiles in the desktop UI.
-- Child surfaces also block profile rename/delete/PIN mutation and trusted parent-link edit/remove from Accounts & Sync.
+- If the active profile is a **protected** profile, Accounts & Sync behaves as a **receive-only replica** surface.
+- If the protected profile has its own PIN, that protected-profile PIN can open receive-only Accounts & Sync for that protected profile only.
+- A protected-profile PIN unlock does **not** unlock broader FilterTube settings or parent controls after returning from Accounts & Sync.
+- Protected profiles cannot send settings, save arbitrary peer/source trust, move backups, or manage trusted-link policy from the protected surface.
+- Protected profiles can join a parent/source pairing code and receive allowed updates for their own profile.
+- Core backup/import/export/account-admin controls are disabled for protected profiles in the desktop UI.
+- Protected surfaces also block profile rename/delete/PIN mutation and trusted parent-link edit/remove from Accounts & Sync.
 - Saved Nanah trust is still **per device link**, not per entire machine.
-- Managed reconnect can require **local approval per session** on the child/replica side through the link's `reconnectMode`.
+- Managed reconnect can require **local approval per session** on the protected/replica side through the link's `reconnectMode`.
 - Live sessions now exchange the receiver's profile inventory, and the sender can choose a specific **Remote target profile** during the session.
 - Managed links can also pin the receiver-side target to one fixed local profile for later sessions.
 - Sync status labels should identify both ends as `profile + device` so users can see which profile on which device is active before sending or applying settings.
 
-### Plain-language child approval rule
+### Plain-language protected-device approval rule
 
-- First managed parent -> child connection may require one local parent approval on the child device.
-- After that, the child does **not** always need to press allow.
+- First managed parent -> protected-profile connection may require one local parent/caregiver approval on the protected device.
+- After that, the protected user does **not** always need to press allow.
 - If the saved link uses easier parent-control settings, later matching updates can apply more directly.
-- If the saved link uses stricter child protection, the child device must stop for approval more often.
+- If the saved link uses stricter protection, the protected device must stop for approval more often.
 
 Short version:
 
 - `standard parent control` = easier later updates
-- `strict child protection` = more approval steps on the child device
+- `strict protection` = more approval steps on the protected device
 
 ## Data portability / backup rules (Current)
 
@@ -341,7 +341,7 @@ LOCAL RULE
 The active profile and its lock state in the current UI session decide what Nanah is allowed to do.
 
 [Active = account] -> peer or source or replica allowed
-[Active = child]   -> receive-only replica for Nanah
+[Active = protected profile] -> receive-only replica for Nanah
 ```
 
 ### Default / Master
@@ -349,39 +349,40 @@ The active profile and its lock state in the current UI session decide what Nana
 - Owns full import/export and restore
 - Owns account policy
 - Can create independent accounts
-- Can still own its own child profiles
+- Can still own its own protected profiles
 - Is the only place where broad system-level recovery and migration should happen
 
 ### Independent account
 
 - Owns its own settings, filters, and optional PIN
-- Can create and manage its own child profiles
+- Can create and manage its own protected profiles
 - Does not automatically gain authority over sibling accounts
-- Can become a Nanah `source` for its own managed child devices
+- Can become a Nanah `source` for its own managed protected devices
 
-### Child profile
+### Protected profile
 
+- Stored internally as `type: "child"` today, but described to users as a protected profile.
 - Should be treated as a managed surface, not a free admin surface
-- Should not be a Nanah sender from the child surface
+- Should not be a Nanah sender from the protected surface
 - Should not own full import/export or account-management actions
 - Should be the profile type most likely to receive parent/source updates through trusted managed links
 
-### Replica-only rule for child profiles
+### Replica-only rule for protected profiles
 
-For Nanah, child profiles use replica behavior from the child surface:
+For Nanah, protected profiles use replica behavior from the protected surface:
 
-- a child profile may receive managed updates from a trusted parent/source
-- a child profile should not behave like a normal `source`
-- a child profile should not be used as an equal `peer` authority surface for persistent trust
-- child PIN access may open receive-only sync, but parent/account PIN is still needed for rule edits, backups, and trusted-link policy
+- a protected profile may receive managed updates from a trusted parent/source
+- a protected profile should not behave like a normal `source`
+- a protected profile should not be used as an equal `peer` authority surface for persistent trust
+- protected-profile PIN access may open receive-only sync, but parent/account PIN is still needed for rule edits, backups, and trusted-link policy
 
-That keeps the child device useful for parent control without turning it into its own admin endpoint.
+That keeps the protected device useful for parent/caregiver control without turning it into its own admin endpoint.
 
 Important scope note:
 
 - this rule is based on the **active profile type** in the Accounts & Sync UI session
-- if the active profile is a child profile, Nanah behaves receive-only for that session
-- this is not yet a broader device-wide “child mode” outside explicit profile context
+- if the active profile is a protected profile, Nanah behaves receive-only for that session
+- this is not yet a broader device-wide protected mode outside explicit profile context
 
 ### Permission matrix
 
@@ -391,7 +392,7 @@ Important scope note:
 +----------------------+---------------------------+-------------------------------+
 | Default / Master     | yes                       | peer or managed               |
 | Independent account  | yes                       | peer or managed               |
-| Child                | no                        | receive-only managed replica  |
+| Protected profile    | no                        | receive-only managed replica  |
 +----------------------+---------------------------+-------------------------------+
 ```
 
@@ -400,8 +401,8 @@ Important scope note:
 | Active profile type  | Settings/admin actions                        |
 +----------------------+-----------------------------------------------+
 | Default / Master     | full backup/import/export + account policy    |
-| Independent account  | local settings + child management             |
-| Child                | no broad backup/import/export/admin actions   |
+| Independent account  | local settings + protected-profile management |
+| Protected profile    | no broad backup/import/export/admin actions   |
 +----------------------+-----------------------------------------------+
 ```
 
@@ -409,53 +410,53 @@ Important scope note:
 
 Two rules must stay true at the same time:
 
-1. Kids must not learn or enter the parent PIN for ordinary managed updates.
-2. The parent must still be able to keep the child device aligned.
+1. Protected users must not learn or enter the parent PIN for ordinary managed updates.
+2. The parent/caregiver must still be able to keep the protected device aligned.
 
 ### Current implemented safety
 
 - PIN values stay local
 - locked profiles block restricted views and mutations
 - Nanah send/apply paths can require local unlock
-- trusted managed child links may optionally save a local `Allow trusted updates while locked` rule on the child device
+- trusted managed protected-profile links may optionally save a local `Allow trusted updates while locked` rule on the protected device
 
-### Current locked-child rule
+### Current locked-protected-profile rule
 
-Trusted managed `source -> replica` links can now save one extra local child-side rule:
+Trusted managed `source -> replica` links can now save one extra local protected-device rule:
 
 - `Require local unlock`
 - `Allow trusted updates while locked`
 
 That rule is:
 
-- local to the child device
-- created only after local approval on the child device
+- local to the protected device
+- created only after local approval on the protected device
 - limited to trusted `source -> replica` managed links
 - limited to the saved managed scopes/policy
-- limited to child-safe scopes (`active`, `main`, `kids`), not `full`
-- not equivalent to sharing the child PIN with the parent device
+- limited to protected-profile-safe scopes (`active`, `main`, `kids`), not `full`
+- not equivalent to sharing the protected-profile PIN with the parent device
 
 Default remains conservative:
 
-- child profile stays locked
-- parent update still requires the child profile to be locally unlocked
+- protected profile stays locked
+- parent update still requires the protected profile to be locally unlocked
 
-Only if the child device explicitly saves `Allow trusted updates while locked` may matching managed updates apply without unlocking that child profile each time.
+Only if the protected device explicitly saves `Allow trusted updates while locked` may matching managed updates apply without unlocking that protected profile each time.
 
 ### Parent update authorization diagram
 
 ```text
 CURRENT SAFE RULE
 
-[Parent / Source] ---> [Child / Replica]
+[Parent / Source] ---> [Protected Profile / Replica]
         |
         +-- PIN never sent
         +-- allowed scope only
-        +-- policy must be saved locally on child device
+        +-- policy must be saved locally on protected device
 
-CURRENT CHILD-LINK RULE
+CURRENT PROTECTED-LINK RULE
 
-[Child locked]
+[Protected profile locked]
       |
       +-- default: require local unlock
       |
@@ -525,16 +526,16 @@ Trusted managed `source -> replica` links can now pin one receiver-side local pr
 [Parent / Source]
       |
       +-- managed link policy -->
-              target on child device:
+              target on protected device:
               - current active profile
               - OR fixed local profile
 
 Example:
     Parent sends from profile B
-    Child device currently has A active
+    Protected device currently has A active
     Managed link target is fixed to local profile B
-    -> incoming update lands in child-device profile B
-    -> child-device active profile does not need to switch to B
+    -> incoming update lands in protected-device profile B
+    -> protected-device active profile does not need to switch to B
 ```
 
 Rules:
@@ -558,12 +559,12 @@ Rules:
 
 ### B) What “Child” should mean (policy)
 
-Currently: child is mostly UI grouping.
+Currently: the internal `child` type is mostly UI grouping.
 
 Possible future policies (not implemented):
 
-- Disable export / disable backup in child profiles.
-- Always restrict certain tabs in child profiles unless a parent/admin action occurs.
+- Disable export / disable backup in protected profiles.
+- Always restrict certain tabs in protected profiles unless a parent/admin action occurs.
 
 ### C) UI/UX alignment
 

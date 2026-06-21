@@ -117,7 +117,7 @@ Docs:
 
 ### Channel & Data Management
 
-- **Multi-Profile with PIN Locks**: Account + child profiles, each with independent filters/settings; optional PIN lock gates UI until unlocked.
+- **Multi-Profile with PIN Locks**: Account + protected profiles, each with independent filters/settings; optional PIN lock gates UI until unlocked.
 - **Profile-Scoped Backups**: Auto-backup and manual export respect the active profile. Default (Master) can export full; non-default exports active-only.
 - **Encrypted Backups**: PBKDF2-SHA256 (150k) + AES-GCM. Encryption auto-enables when the active profile has a PIN (or you pick “Encrypted” format); background verifies PIN before encrypting.
 - **Firefox-Safe Export (v3.3.1)**: Manual plain and encrypted JSON export now use a Firefox-safe fallback instead of relying on the extension downloads API subfolder path.
