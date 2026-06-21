@@ -1083,8 +1083,10 @@
         const mailbox = h.safeObject(summary.mailboxConfig);
         const localNetwork = h.safeObject(summary.localNetworkConfig);
         const hasProviderAction = typeof h.onAction === 'function';
+        const hasVerifiedTarget = rows.some((row) => (Number(row.syncTargetCount) || 0) > 0);
         const shouldShowConfiguredProviderSetup = mailbox.configured === true || localNetwork.configured === true;
         const shouldShowProviderPrompt = summary.profileCount > 0
+            && hasVerifiedTarget
             && hasProviderAction
             && mailbox.configured !== true
             && localNetwork.configured !== true;

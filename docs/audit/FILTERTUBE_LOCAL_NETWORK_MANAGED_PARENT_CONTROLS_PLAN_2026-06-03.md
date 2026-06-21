@@ -892,6 +892,13 @@ parent tool instead of a sync/debug console.
     nearby, same-home, and away/internet devices after pairing. This is
     copy-only; live Nanah, Same-Home Pickup, and Later Pickup authority gates are
     unchanged.
+  - [x] 2026-06-21 optional-pickup prompt gate slice: the Family Controls
+    command-center no longer offers first-time Later Pickup or Same-Home Pickup
+    setup until at least one manageable profile has a verified target device.
+    Already configured providers remain visible so parents can edit or disable
+    them. This keeps optional saved-update setup tied to an actual protected
+    device relationship instead of asking parents to configure transport before
+    pairing.
   - [x] 2026-06-21 pickup setup label slice: configured Later Pickup and
     Same-Home Pickup summaries now say `set up` instead of `ready`. This avoids
     implying guaranteed delivery from endpoint configuration alone; protected
