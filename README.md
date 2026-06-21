@@ -71,13 +71,14 @@ FAMILY DEVICE UPDATES
 
 [Parent / Caregiver] -> choose protected profile
         |
-        +-- Send Now --------> pair, verify phrase, send while both devices are open
+        +-- Send Update -----> pair, verify phrase, send while both devices are open
         +-- Later Pickup ----> optional encrypted pickup service for a device that opens later or away
         +-- Same-Home Pickup -> optional explicit home/school bridge
 ```
 
 Important protected-profile rules:
 
+- one Family Device map covers nearby, same-home, and away/internet devices after pairing
 - delivery paths are not authority; trusted link, target profile, scope, revision, and local validation still decide what applies
 - `Later Pickup` can hold unreadable signed updates for away/opens-later devices, but it cannot edit profiles, PINs, trusted links, viewing access, or time limits by itself
 - `Same-Home Pickup` is an explicitly configured bridge, not automatic Wi-Fi scanning
