@@ -123,7 +123,17 @@ assertIncludes(
 assertIncludes(
   "managed delivery UI boundaries",
   docContract.managedDelivery?.requiredUiBoundaries,
+  "installed_app_smoke_records_family_device_map_delivery_states",
+);
+assertIncludes(
+  "managed delivery UI boundaries",
+  docContract.managedDelivery?.requiredUiBoundaries,
   "apps_and_pickup_provider_software_must_not_treat_delivery_labels_as_authority",
+);
+assertIncludes(
+  "app native owned responsibilities",
+  docContract.appBoundary?.nativeOwnedResponsibilities,
+  "native_family_device_map_delivery_state_ui",
 );
 
 for (const row of [

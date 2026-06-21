@@ -385,6 +385,7 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
     ],
     "requiredUiBoundaries": [
       "one_family_device_map_represents_live_same_network_and_internet_devices",
+      "installed_app_smoke_records_family_device_map_delivery_states",
       "normal_parent_ui_uses_family_devices_send_update_internet_pickup_home_pickup_labels",
       "advanced_details_may_show_encrypted_mailbox_lan_provider_terms",
       "protected_user_ui_never_exposes_delivery_setup_controls",
@@ -500,6 +501,7 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
       "native_managed_channel_list_metadata_preservation",
       "native_managed_channel_list_source_filter_ui",
       "native_managed_channel_list_pause_enforcement",
+      "native_family_device_map_delivery_state_ui",
       "native_video_rule_apply",
       "native_time_budget_gate_before_web_content",
       "native_settings_sync_lock"

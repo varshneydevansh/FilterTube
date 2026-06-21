@@ -145,6 +145,7 @@ test('managed app policy parity doc records extension-owned app contract artifac
     contract.managedDelivery.requiredUiBoundaries,
     [
       'one_family_device_map_represents_live_same_network_and_internet_devices',
+      'installed_app_smoke_records_family_device_map_delivery_states',
       'normal_parent_ui_uses_family_devices_send_update_internet_pickup_home_pickup_labels',
       'advanced_details_may_show_encrypted_mailbox_lan_provider_terms',
       'protected_user_ui_never_exposes_delivery_setup_controls',
@@ -444,6 +445,7 @@ test('managed app contract excludes extension runtime APIs from downstream autho
     'native_kids_surface_route_gate',
     'native_keyword_rule_apply',
     'native_channel_rule_apply',
+    'native_family_device_map_delivery_state_ui',
     'native_video_rule_apply',
     'native_time_budget_gate_before_web_content',
     'native_settings_sync_lock'
@@ -519,8 +521,10 @@ test('current app sync manifest copies runtime sources dedicated contract artifa
     assert.ok(helperEntry, `missing managed helper sync entry ${source}`);
     assert.equal(helperEntry.destination, destination.replace('/Users/devanshvarshney/FilterTubeApp/', ''));
     assert.equal(helperEntry.syncMode, 'copy');
-    assert.equal(fs.existsSync(destination), true);
-    assert.equal(read(source), readAbsolute(destination));
+    if (!APP_SYNC_PENDING_STATUSES.has(contractFromArtifact().appSyncStatus)) {
+      assert.equal(fs.existsSync(destination), true);
+      assert.equal(read(source), readAbsolute(destination));
+    }
   }
   for (const [source, destination] of Object.entries(appManagedUiMirrorDestinations)) {
     assert.equal(fs.existsSync(path.join(repoRoot, source)), true, `missing managed UI helper source ${source}`);

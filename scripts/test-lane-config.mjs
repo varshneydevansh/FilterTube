@@ -84,7 +84,8 @@ export const MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS = Object.freeze([
   'FT-MANAGED-APP-12-keyword-rule-apply',
   'FT-MANAGED-APP-13-channel-rule-apply',
   'FT-MANAGED-APP-14-video-rule-apply',
-  'FT-MANAGED-APP-15-managed-list-policy-apply'
+  'FT-MANAGED-APP-15-managed-list-policy-apply',
+  'FT-MANAGED-APP-16-family-device-map-delivery'
 ]);
 
 export const RUNTIME_FIXTURE_LANE_REASONS = Object.freeze({

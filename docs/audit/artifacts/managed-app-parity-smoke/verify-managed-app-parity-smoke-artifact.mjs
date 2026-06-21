@@ -40,6 +40,7 @@ const REQUIRED_RECORDING_FIELDS = Object.freeze([
   'mainViewingSpaceObservation',
   'kidsViewingSpaceObservation',
   'timeBudgetObservation',
+  'familyDeviceMapObservation',
   'historyAccessObservation',
   'noPolicyNoWorkObservation'
 ]);
@@ -74,6 +75,19 @@ const FORBIDDEN_SENSITIVE_KEYS = new Set([
 ]);
 
 const KNOWN_TEST_LANES = new Set(Object.keys(LANES).map(lane => `test:${lane}`));
+
+const REQUIRED_FAMILY_DEVICE_MAP_LABELS = Object.freeze([
+  'Send Update',
+  'Home Pickup',
+  'Internet Pickup'
+]);
+
+const REQUIRED_FAMILY_DEVICE_MAP_STATES = Object.freeze([
+  'live_now_send_update',
+  'same_network_home_pickup',
+  'away_or_internet_internet_pickup',
+  'offline_last_valid_policy'
+]);
 
 function isBlank(value) {
   if (value === null || value === undefined) return true;
@@ -208,8 +222,13 @@ function validateRecordingFields(errors, recordingFields) {
 function rowRequiresPolicyEvidence(rowId) {
   return ![
     'FT-MANAGED-APP-00-contract-sync',
-    'FT-MANAGED-APP-10-no-policy-no-work'
+    'FT-MANAGED-APP-10-no-policy-no-work',
+    'FT-MANAGED-APP-16-family-device-map-delivery'
   ].includes(rowId);
+}
+
+function hasAllItems(actual, expected) {
+  return Array.isArray(actual) && expected.every(item => actual.includes(item));
 }
 
 function validateRows(errors, rows, platform) {
@@ -246,6 +265,21 @@ function validateRows(errors, rows, platform) {
 
     if (rowId === 'FT-MANAGED-APP-10-no-policy-no-work' && row.evidence.noPolicyNoWork !== true) {
       errors.push(`${rowId}.evidence.noPolicyNoWork must be true`);
+    }
+
+    if (rowId === 'FT-MANAGED-APP-16-family-device-map-delivery') {
+      if (!hasAllItems(row.evidence.parentFacingLabels, REQUIRED_FAMILY_DEVICE_MAP_LABELS)) {
+        errors.push(`${rowId}.evidence.parentFacingLabels must include Send Update, Home Pickup, and Internet Pickup`);
+      }
+      if (!hasAllItems(row.evidence.familyDeviceMapStates, REQUIRED_FAMILY_DEVICE_MAP_STATES)) {
+        errors.push(`${rowId}.evidence.familyDeviceMapStates must include live, same-network, internet, and offline states`);
+      }
+      if (row.evidence.deliveryStateIsAuthority !== false) {
+        errors.push(`${rowId}.evidence.deliveryStateIsAuthority must be false`);
+      }
+      if (row.evidence.protectedUserCanConfigureDelivery !== false) {
+        errors.push(`${rowId}.evidence.protectedUserCanConfigureDelivery must be false`);
+      }
     }
 
     if (rowRequiresPolicyEvidence(rowId)) {

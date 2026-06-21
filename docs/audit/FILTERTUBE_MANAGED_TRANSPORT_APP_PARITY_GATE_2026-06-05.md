@@ -63,6 +63,7 @@ flowchart TD
 | Time limits | Extension active-tab budget and timeout overlay exist. | App shell must enforce startup, resume, heartbeat, pause, and reduced-budget behavior. | Android partial, iOS pending. |
 | Managed rules | Extension can send/apply signed keyword, channel, video, and managed channel-list policy scopes through validated managed paths. | Apps must preserve those rule scopes and apply them through the same local rule semantics as extension-owned keyword/channel/video controls. | Pending installed app smoke. |
 | Managed channel lists | Extension can import, check, pause/resume, refresh, and remove list-derived channel rules with source metadata, revision/hash evidence, manual-rule separation, and protected history. | Apps must treat list rows as channel-rule source metadata, not as URL authority or executable list code, and must preserve pause/source/version semantics when applying synced policy. | Pending installed app smoke. |
+| Family device map | Extension presents Send Update, Home Pickup, Internet Pickup, and offline last-valid-policy as one family-device model. | Apps must show the same parent-facing delivery states, prevent protected users from configuring delivery, and keep delivery labels separate from authority. | Pending installed app smoke. |
 | Action history | Protected redacted local, remote, mailbox, ack, and failure rows exist. | Apps may display history only to parent/account authority and must not expose plaintext values. | Partial. |
 
 ## Required Proof Before Claiming Complete Remote Management
@@ -85,11 +86,12 @@ A valid managed app parity artifact proves one installed app platform smoke,
 not complete cross-platform remote-management readiness. Android and iOS must
 each provide platform-specific adapter proof, settings-lock proof, Main/Kids
 route-gate proof, time-limit proof, managed keyword/channel/video rule proof,
-protected history proof, and no-policy no-work proof before public release copy
-can claim cross-platform managed parent/caregiver control. Issue 62 style
-channel-list subscriptions/imports also need installed app proof that
-list-derived rows remain ordinary channel rules with source/version metadata,
-manual-rule separation, pause enforcement, and no URL-based authority.
+family-device-map delivery-state proof, protected history proof, and no-policy
+no-work proof before public release copy can claim cross-platform managed
+parent/caregiver control. Issue 62 style channel-list subscriptions/imports
+also need installed app proof that list-derived rows remain ordinary channel
+rules with source/version metadata, manual-rule separation, pause enforcement,
+and no URL-based authority.
 
 ## Allowed Wording
 

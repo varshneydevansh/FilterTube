@@ -53,6 +53,17 @@ function baseEvidence(rowId, platform) {
     } : {}),
     ...(rowId === 'FT-MANAGED-APP-10-no-policy-no-work' ? {
       noPolicyNoWork: true
+    } : {}),
+    ...(rowId === 'FT-MANAGED-APP-16-family-device-map-delivery' ? {
+      parentFacingLabels: ['Send Update', 'Home Pickup', 'Internet Pickup'],
+      familyDeviceMapStates: [
+        'live_now_send_update',
+        'same_network_home_pickup',
+        'away_or_internet_internet_pickup',
+        'offline_last_valid_policy'
+      ],
+      deliveryStateIsAuthority: false,
+      protectedUserCanConfigureDelivery: false
     } : {})
   };
 }
@@ -116,6 +127,7 @@ function validArtifact({ platform = 'android' } = {}) {
       mainViewingSpaceObservation: 'Main surface followed allowMainViewing before content opened',
       kidsViewingSpaceObservation: 'Kids surface followed allowKidsViewing before content opened',
       timeBudgetObservation: 'startup, resume, heartbeat, pause, reduced-budget, and timeout behavior matched policy',
+      familyDeviceMapObservation: 'one family device map showed Send Update, Home Pickup, Internet Pickup, and offline last-policy states without making delivery state authority',
       historyAccessObservation: 'history was admin-only and redacted',
       noPolicyNoWorkObservation: 'no managed policy did not add route timers or sync polling'
     },
@@ -161,7 +173,9 @@ test('managed app parity smoke verifier is wired into release settings and smoke
   assert.ok(MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS.includes('FT-MANAGED-APP-13-channel-rule-apply'));
   assert.ok(MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS.includes('FT-MANAGED-APP-14-video-rule-apply'));
   assert.ok(MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS.includes('FT-MANAGED-APP-15-managed-list-policy-apply'));
+  assert.ok(MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS.includes('FT-MANAGED-APP-16-family-device-map-delivery'));
   assert.match(boundaryDoc, /Issue 62 style\s+channel-list subscriptions\/imports/);
+  assert.match(boundaryDoc, /family[- ]device[- ]map/);
   assert.match(boundaryDoc, /A valid managed app parity artifact proves one\s+installed app platform smoke/);
 });
 
@@ -188,6 +202,7 @@ test('verifier rejects the non-executed template and missing contract parity', (
   assert.ok(errors.includes('contractParity.contractSynced must be true'));
   assert.ok(errors.includes('contractParity.nativeRuntimeSynced must be true'));
   assert.ok(errors.includes('contractParity.nativeAdapterProof.status must be passed'));
+  assert.ok(errors.includes('recordingFields.familyDeviceMapObservation is required'));
   assert.ok(errors.includes('FT-MANAGED-APP-00-contract-sync.status must be passed'));
 });
 
@@ -243,6 +258,21 @@ test('verifier rejects unknown lanes and uncovered required lanes', () => {
   assert.ok(unknownErrors.includes('changeContext.requiredLanes[0] must be a known test lane'));
   assert.ok(uncoveredErrors.includes('changeContext.requiredLanes must be covered by automatedLaneEvidence.lanes: test:release'));
   assert.ok(uncoveredErrors.includes('changeContext.requiredLanes must be covered by automatedLaneEvidence.lanes: test:smoke'));
+});
+
+test('verifier rejects incomplete app family device map delivery evidence', () => {
+  const artifact = validArtifact();
+  const mapRow = artifact.requiredRows.find(row => row.id === 'FT-MANAGED-APP-16-family-device-map-delivery');
+  mapRow.evidence.parentFacingLabels = ['Send Update'];
+  mapRow.evidence.familyDeviceMapStates = ['live_now_send_update'];
+  mapRow.evidence.deliveryStateIsAuthority = true;
+  mapRow.evidence.protectedUserCanConfigureDelivery = true;
+
+  const errors = validateManagedAppParitySmokeArtifact(artifact);
+  assert.ok(errors.includes('FT-MANAGED-APP-16-family-device-map-delivery.evidence.parentFacingLabels must include Send Update, Home Pickup, and Internet Pickup'));
+  assert.ok(errors.includes('FT-MANAGED-APP-16-family-device-map-delivery.evidence.familyDeviceMapStates must include live, same-network, internet, and offline states'));
+  assert.ok(errors.includes('FT-MANAGED-APP-16-family-device-map-delivery.evidence.deliveryStateIsAuthority must be false'));
+  assert.ok(errors.includes('FT-MANAGED-APP-16-family-device-map-delivery.evidence.protectedUserCanConfigureDelivery must be false'));
 });
 
 test('verifier rejects sensitive plaintext and secret keys anywhere in the artifact', () => {

@@ -1050,6 +1050,11 @@ parent tool instead of a sync/debug console.
   visible Check action, redacted readiness result, and
   `authorityGrantedByNetwork` as false. This keeps same-network pickup proof
   tied to explicit parent action, not ambient LAN reachability.
+- [x] 2026-06-21 app family-device-map parity slice: the managed app policy
+  contract and app parity smoke artifact now require installed Android/iOS
+  evidence for one family device map with Send Update, Home Pickup, Internet
+  Pickup, and offline last-valid-policy states. Protected users still cannot
+  configure delivery, and delivery labels are not authority.
 - [ ] Native Android/iOS settings-lock and timeout UI parity. This belongs in
   the downstream app sync/runtime lane.
 
