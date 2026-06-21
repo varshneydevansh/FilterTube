@@ -13821,7 +13821,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const root = safeObject(profilesV4Cache);
         const activeProfileId = normalizeString(root.activeProfileId) || 'default';
         if (getProfileType(root, activeProfileId) === 'child') {
-            UIComponents.showToast('Child profiles cannot configure update delivery', 'error');
+            UIComponents.showToast('Protected profiles cannot configure update delivery', 'error');
             return;
         }
         const okAdmin = await ensureProfileUnlocked(root, activeProfileId, { sensitiveAction: true });
@@ -13963,7 +13963,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const root = safeObject(profilesV4Cache);
         const currentActiveProfileId = normalizeString(root.activeProfileId) || 'default';
         if (getProfileType(root, currentActiveProfileId) === 'child') {
-            UIComponents.showToast('Child profiles cannot configure update delivery', 'error');
+            UIComponents.showToast('Protected profiles cannot configure update delivery', 'error');
             return;
         }
         const okAdmin = await ensureProfileUnlocked(root, currentActiveProfileId, { sensitiveAction: true });

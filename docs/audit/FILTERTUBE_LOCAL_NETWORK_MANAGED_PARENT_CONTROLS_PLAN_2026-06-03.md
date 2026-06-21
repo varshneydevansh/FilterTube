@@ -983,6 +983,11 @@ parent tool instead of a sync/debug console.
   the same trusted-link policy, but the visible copy now says `Check for updates
   on open` and `Updates when apart`. This explains the parent intent without
   implying always-on sync, automatic LAN discovery, or provider authority.
+- [x] 2026-06-21 delivery-config protected wording slice: Internet Pickup and
+  Home Pickup configuration guards now tell protected-profile users that
+  protected profiles cannot configure update delivery. The underlying `child`
+  profile type guard is unchanged; parent/account profiles remain the authority
+  for delivery setup.
 - [ ] Native Android/iOS settings-lock and timeout UI parity. This belongs in
   the downstream app sync/runtime lane.
 
