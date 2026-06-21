@@ -176,6 +176,7 @@ export const LANES = Object.freeze({
       'tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs',
       'tests/runtime/managed-delivery-provider-reference-current-behavior.test.mjs',
       'tests/runtime/managed-native-runtime-sync-handoff-current-behavior.test.mjs',
+      'tests/runtime/managed-native-runtime-sync-handoff-generator-current-behavior.test.mjs',
       'tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/release-notes-json-version-gate-boundary-current-behavior.test.mjs',
       'tests/runtime/release-package-parity-current-behavior.test.mjs',
@@ -419,6 +420,7 @@ export const LANES = Object.freeze({
       'tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs',
       'tests/runtime/managed-delivery-provider-reference-current-behavior.test.mjs',
       'tests/runtime/managed-native-runtime-sync-handoff-current-behavior.test.mjs',
+      'tests/runtime/managed-native-runtime-sync-handoff-generator-current-behavior.test.mjs',
       'tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/managed-viewing-space-route-gate-current-behavior.test.mjs',
       'tests/runtime/managed-child-time-limit-schema-current-behavior.test.mjs',
@@ -463,6 +465,7 @@ export const LANES = Object.freeze({
       'tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs',
       'tests/runtime/managed-delivery-provider-reference-current-behavior.test.mjs',
       'tests/runtime/managed-native-runtime-sync-handoff-current-behavior.test.mjs',
+      'tests/runtime/managed-native-runtime-sync-handoff-generator-current-behavior.test.mjs',
       'tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/all-callable-index-current-behavior.test.mjs',
       'tests/runtime/audit-runtime-backlog-current-behavior.test.mjs',
@@ -662,7 +665,10 @@ export const FILE_LANE_RULES = Object.freeze([
   },
   {
     id: 'managed-native-runtime-sync-handoff-surface',
-    patterns: [/^docs\/audit\/artifacts\/managed-native-runtime-sync-handoff\/.*\.(?:json|mjs)$/],
+    patterns: [
+      /^docs\/audit\/artifacts\/managed-native-runtime-sync-handoff\/.*\.(?:json|mjs)$/,
+      /^scripts\/create-managed-native-runtime-sync-handoff\.mjs$/
+    ],
     lanes: ['release', 'settings', 'smoke']
   },
   {

@@ -26,17 +26,17 @@ first-class JSON filter work look safer than the runtime proof actually allows.
 
 ## File Fingerprints
 
-Current tracked root metadata inventory: 7 files, 2,950 newline counts, and
-134,214 bytes.
+Current tracked root metadata inventory: 7 files, 2,963 newline counts, and
+135,566 bytes.
 
 | File | Newline count | Bytes | SHA-256 |
 |---|---:|---:|---|
 | `.gitignore` | 153 | 2,197 | `c90a7834297cf0a7b65493f41a21947fd5d85d1e14740b902cb3a3664028e3ca` |
 | `CHANGELOG.md` | 591 | 40,124 | `e22a87ce7eeb88d171587d4b0f4676881a2c3081a7fbf15978d7e8d8582cdfdd` |
 | `LICENSE` | 21 | 1,073 | `d0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d` |
-| `README.md` | 401 | 22,476 | `8c83ce40603453d2ac9824980da81631ea8970e4f3e9442c4d9f6602e1ca520d` |
+| `README.md` | 411 | 23,577 | `c7fe9a482e35c40aa6fd986e46d2d23cfc16170f5b11a6573e8f737c5dd7788e` |
 | `channel-identity-watch-mix-collab-recovery-plan.md` | 262 | 16,023 | `01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a` |
-| `package.json` | 61 | 2,405 | `36053d322780ce787de403be574cc400936ef2a994b4c8eca62561154fe81aec` |
+| `package.json` | 64 | 2,656 | `708a5667679bf4739356c5fc52b5a8278b7f509e700b9ad2e678b8f2d7ed90bc` |
 | `package-lock.json` | 1,461 | 49,916 | `f52d6482693be9cd4edacdc1f1491b4d2cda796522bfd0e4dcf86e0c879ad974` |
 
 Any release, package, or optimization claim that uses these files should cite
@@ -47,7 +47,7 @@ the exact current file state or an updated fingerprint.
 `package.json` currently declares package version `3.3.2`, license `MIT`,
 repository `git+https://github.com/varshneydevansh/FilterTube.git`, homepage
 `https://github.com/varshneydevansh/FilterTube`, 2 runtime dependencies, 3
-development dependencies, and 27 scripts.
+development dependencies, and 30 scripts.
 
 Current scripts:
 
@@ -60,6 +60,8 @@ build:chrome -> node build.js chrome
 build:firefox -> node build.js firefox
 build:opera -> node build.js opera
 sync:native-runtime -> node scripts/sync-native-runtime.mjs
+managed:native-handoff -> node scripts/create-managed-native-runtime-sync-handoff.mjs
+managed:provider -> node scripts/managed-delivery-provider.mjs
 test -> node scripts/run-test-lane.mjs smoke
 audit:runtime -> node --test tests/runtime/*.test.mjs
 test:release -> node scripts/run-test-lane.mjs release
@@ -74,6 +76,7 @@ test:smoke -> node scripts/run-test-lane.mjs smoke
 lanes:changed -> node scripts/run-test-lane.mjs --changed
 test:changed -> node scripts/run-test-lane.mjs --run-changed
 test:audit-drift -> node scripts/audit-proof-drift.mjs --lane-owned
+verify:managed-app-policy -> node scripts/verify-managed-app-policy-contract.mjs
 smoke:youtube -> node docs/audit/artifacts/release-live-youtube-spa-smoke/run-live-smoke.mjs
 smoke:youtube:verify -> node docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs
 dev:chrome -> cp manifest.chrome.json manifest.json

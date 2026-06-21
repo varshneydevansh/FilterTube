@@ -43,7 +43,7 @@ manual installed-extension smoke: still required before release claim
 | Daily YouTube time limits | Background-owned time budget, protected timeout overlay, parent extra-time grants, and signed time-limit sends exist. | Extension implemented; needs installed smoke. |
 | Protected action history | Local edits, remote apply/reject, provider setup, send attempts, failed unlocks, and receipt rows are redacted and parent-accessible. | Extension implemented; needs installed smoke. |
 | App parity contract | Managed app policy contract and verifier define fields apps must preserve. | Contract implemented; native app execution remains downstream. |
-| Native runtime sync handoff | `npm run sync:native-runtime` can mirror extension runtime into the downstream app repo, but a handoff artifact must record the contract hash and generated file manifest without claiming native enforcement. | Extension handoff gate implemented; app repo commit and installed app smoke remain downstream. |
+| Native runtime sync handoff | `npm run sync:native-runtime` can mirror extension runtime into the downstream app repo, then `npm run managed:native-handoff -- --confirm-sync-command-passed` records the contract hash and generated file manifest without claiming native enforcement. | Extension handoff generator/gate implemented; app repo commit and installed app smoke remain downstream. |
 | No-policy/no-work performance | Optional pickup checks are dashboard/profile/open visibility gated, not YouTube-page hot-path polling. | Extension implemented; keep release no-work smoke. |
 
 ## What Can Be Claimed Now

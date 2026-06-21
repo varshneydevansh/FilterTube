@@ -11,9 +11,9 @@ const rootMetadataRows = [
   ['.gitignore', 153, 2197, 'c90a7834297cf0a7b65493f41a21947fd5d85d1e14740b902cb3a3664028e3ca'],
   ['CHANGELOG.md', 591, 40124, 'e22a87ce7eeb88d171587d4b0f4676881a2c3081a7fbf15978d7e8d8582cdfdd'],
   ['LICENSE', 21, 1073, 'd0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d'],
-  ['README.md', 401, 22476, '8c83ce40603453d2ac9824980da81631ea8970e4f3e9442c4d9f6602e1ca520d'],
+  ['README.md', 411, 23577, 'c7fe9a482e35c40aa6fd986e46d2d23cfc16170f5b11a6573e8f737c5dd7788e'],
   ['channel-identity-watch-mix-collab-recovery-plan.md', 262, 16023, '01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a'],
-  ['package.json', 61, 2405, '36053d322780ce787de403be574cc400936ef2a994b4c8eca62561154fe81aec'],
+  ['package.json', 64, 2656, '708a5667679bf4739356c5fc52b5a8278b7f509e700b9ad2e678b8f2d7ed90bc'],
   ['package-lock.json', 1461, 49916, 'f52d6482693be9cd4edacdc1f1491b4d2cda796522bfd0e4dcf86e0c879ad974'],
 ];
 
@@ -91,9 +91,9 @@ test('root package metadata script surface doc is audit-only and fingerprint pin
   assert.match(doc, /optimization, release, dependency, JSON-first, or cleanup implementation work/);
   assert.deepEqual(trackedRootMetadata.sort(), rootMetadataRows.map(([file]) => file).sort());
 
-  assert.equal(rootMetadataRows.reduce((sum, [, lines]) => sum + lines, 0), 2950);
-  assert.equal(rootMetadataRows.reduce((sum, [, , bytes]) => sum + bytes, 0), 134214);
-  assert.match(doc, /7 files, 2,950 newline counts, and\s+134,214 bytes/);
+  assert.equal(rootMetadataRows.reduce((sum, [, lines]) => sum + lines, 0), 2963);
+  assert.equal(rootMetadataRows.reduce((sum, [, , bytes]) => sum + bytes, 0), 135566);
+  assert.match(doc, /7 files, 2,963 newline counts, and\s+135,566 bytes/);
 
   for (const [file, lines, bytes, hash] of rootMetadataRows) {
     assert.equal(newlineCount(file), lines, `${file} newline count drifted`);
@@ -122,6 +122,8 @@ test('package scripts and dependency metadata are pinned before release or optim
     'build:firefox',
     'build:opera',
     'sync:native-runtime',
+    'managed:native-handoff',
+    'managed:provider',
     'test',
     'audit:runtime',
     'test:release',
@@ -136,13 +138,17 @@ test('package scripts and dependency metadata are pinned before release or optim
     'lanes:changed',
     'test:changed',
     'test:audit-drift',
+    'verify:managed-app-policy',
     'smoke:youtube',
     'smoke:youtube:verify',
     'dev:chrome',
     'dev:firefox',
     'dev:opera',
   ]);
-  assert.equal(Object.keys(pkg.scripts).length, 27);
+  assert.equal(Object.keys(pkg.scripts).length, 30);
+  assert.equal(pkg.scripts['managed:native-handoff'], 'node scripts/create-managed-native-runtime-sync-handoff.mjs');
+  assert.equal(pkg.scripts['managed:provider'], 'node scripts/managed-delivery-provider.mjs');
+  assert.equal(pkg.scripts['verify:managed-app-policy'], 'node scripts/verify-managed-app-policy-contract.mjs');
   assert.equal(pkg.scripts.test, 'node scripts/run-test-lane.mjs smoke');
   assert.equal(pkg.scripts['audit:runtime'], 'node --test tests/runtime/*.test.mjs');
   assert.equal(pkg.scripts['test:release'], 'node scripts/run-test-lane.mjs release');
@@ -165,13 +171,16 @@ test('package scripts and dependency metadata are pinned before release or optim
     'fs-extra': '^11.1.1',
   });
 
-  assert.match(doc, /27 scripts/);
+  assert.match(doc, /30 scripts/);
+  assert.match(doc, /managed:native-handoff -> node scripts\/create-managed-native-runtime-sync-handoff\.mjs/);
+  assert.match(doc, /managed:provider -> node scripts\/managed-delivery-provider\.mjs/);
   assert.match(doc, /test -> node scripts\/run-test-lane\.mjs smoke/);
   assert.match(doc, /test:release -> node scripts\/run-test-lane\.mjs release/);
   assert.match(doc, /test:smoke -> node scripts\/run-test-lane\.mjs smoke/);
   assert.match(doc, /lanes:changed -> node scripts\/run-test-lane\.mjs --changed/);
   assert.match(doc, /test:changed -> node scripts\/run-test-lane\.mjs --run-changed/);
   assert.match(doc, /test:audit-drift -> node scripts\/audit-proof-drift\.mjs --lane-owned/);
+  assert.match(doc, /verify:managed-app-policy -> node scripts\/verify-managed-app-policy-contract\.mjs/);
   assert.match(doc, /smoke:youtube -> node docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/run-live-smoke\.mjs/);
   assert.match(doc, /smoke:youtube:verify -> node docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/verify-live-smoke-artifact\.mjs/);
   assert.match(doc, /`test:changed`\s+runs those classified lanes sequentially/);
@@ -236,8 +245,8 @@ test('root public docs expose release and JSON-first claims that still need pari
 
   assert.match(readme, /version-3\.3\.2-blue\.svg/);
   assert.match(readme, /license-MIT-green\.svg/);
-  assert.match(readme, /total%20lines-535\.2k-brightgreen\.svg/);
-  assert.match(readme, /javascript-82\.2k%20lines-yellow\.svg/);
+  assert.match(readme, /total%20lines-553\.9k-brightgreen\.svg/);
+  assert.match(readme, /javascript-92\.2k%20lines-yellow\.svg/);
   assert.match(readme, /filtertube\.in\/downloads/);
   assert.match(readme, /Large Blocklist Matching \(v3\.3\.1\)/);
   assert.match(readme, /200\+ saved channels do not create renderer-by-renderer scan costs/);

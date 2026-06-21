@@ -102,6 +102,21 @@ It must leave `nativeEnforcementExecuted` and `downstreamAppParityClaim` false.
 It is the review bridge before the app repo commit, not proof that Android or
 iOS route gates, time limits, settings locks, or rule application passed.
 
+The artifact generator is intentionally a recorder, not a cross-repo mutator:
+
+```bash
+npm run sync:native-runtime
+npm run managed:native-handoff -- --confirm-sync-command-passed
+```
+
+`managed:native-handoff` reads the app runtime-sync manifest and destination
+file hashes, verifies the mirror still matches the extension sources, writes a
+handoff artifact under
+`docs/audit/artifacts/managed-native-runtime-sync-handoff/generated/`, and
+keeps `nativeEnforcementExecuted` and `downstreamAppParityClaim` false. It does
+not write to `/Users/devanshvarshney/FilterTubeApp`, start app builds, or
+replace Android/iOS installed smoke proof.
+
 ## Allowed Wording
 
 - Managed local child/protected-profile edits are supported.
@@ -128,6 +143,7 @@ Focused proof:
 ```bash
 node --test tests/runtime/managed-remote-transport-app-parity-gate-current-behavior.test.mjs
 node --test tests/runtime/managed-native-runtime-sync-handoff-current-behavior.test.mjs
+node --test tests/runtime/managed-native-runtime-sync-handoff-generator-current-behavior.test.mjs
 node --test tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs
 ```
 

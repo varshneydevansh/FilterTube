@@ -2335,3 +2335,10 @@ follow. I will share progress as this moves from audit/spec into implementation.
   sync:native-runtime`: contract hash, sync command, generated file manifest,
   and explicit `no native enforcement claim` state. It does not touch the app
   repo and does not replace Android/iOS installed app parity smoke.
+- [x] 2026-06-22 native runtime sync handoff generator slice: added
+  `scripts/create-managed-native-runtime-sync-handoff.mjs`,
+  `npm run managed:native-handoff -- --confirm-sync-command-passed`, and
+  `tests/runtime/managed-native-runtime-sync-handoff-generator-current-behavior.test.mjs`.
+  The generator reads the downstream runtime-sync manifest and destination
+  hashes after a deliberate sync, fails on stale mirror hashes, writes only a
+  local audit artifact, and keeps native enforcement/app parity claims false.
