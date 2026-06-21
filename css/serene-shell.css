@@ -3008,8 +3008,18 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
         flex-direction: column;
     }
 
+    .nanah-delivery-card__actions,
     .nanah-delivery-card > button,
     .nanah-delivery-check > button {
+        width: 100%;
+    }
+
+    .nanah-delivery-card__actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .nanah-delivery-card__actions > button {
         width: 100%;
     }
 }
@@ -3609,6 +3619,13 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     min-width: 0;
 }
 
+.nanah-delivery-card__actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.42rem;
+}
+
 .nanah-delivery-card__eyebrow {
     color: #9f4a3d;
     font-size: 0.68rem;
@@ -3634,14 +3651,16 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     line-height: 1.42;
 }
 
-.nanah-delivery-card > button {
+.nanah-delivery-card > button,
+.nanah-delivery-card__actions > button {
     flex: 0 0 auto;
     min-height: 2.25rem;
     padding-inline: 0.9rem;
     white-space: nowrap;
 }
 
-.nanah-delivery-card > button:disabled {
+.nanah-delivery-card > button:disabled,
+.nanah-delivery-card__actions > button:disabled {
     cursor: not-allowed;
     opacity: 0.52;
 }

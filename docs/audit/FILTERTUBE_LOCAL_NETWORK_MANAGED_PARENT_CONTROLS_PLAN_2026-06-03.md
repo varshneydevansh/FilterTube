@@ -176,6 +176,10 @@ extension authority code.
   non-authoritative: policy apply still depends on the trusted managed link,
   target profile, scope, revision, policy hash, device binding, and signature
   checks on each returned candidate.
+- [x] 2026-06-21 Home Pickup visible check slice: configured Home Pickup rows
+  now show a direct `Check` action in the Family Device Updates map. This is
+  only a readiness check for the explicitly configured pickup service; it does
+  not scan the network, discover devices, create trust, or apply policy.
 
 ### Parent/Caregiver Simplification Tracker
 

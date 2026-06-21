@@ -2946,6 +2946,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftNanahDeliveryLocalLabel = document.getElementById('ftNanahDeliveryLocalLabel');
     const ftNanahDeliveryLocalDetail = document.getElementById('ftNanahDeliveryLocalDetail');
     const ftNanahDeliveryLocalBtn = document.getElementById('ftNanahDeliveryLocalBtn');
+    const ftNanahDeliveryLocalCheckBtn = document.getElementById('ftNanahDeliveryLocalCheckBtn');
     const ftNanahDeliveryCheckRow = document.getElementById('ftNanahDeliveryCheckRow');
     const ftNanahDeliveryCheckDetail = document.getElementById('ftNanahDeliveryCheckDetail');
     const ftNanahDeliveryCheckBtn = document.getElementById('ftNanahDeliveryCheckBtn');
@@ -13751,6 +13752,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ? 'Optional advanced path for a trusted Home Pickup service used by verified devices on the same family map.'
                 : 'Create a protected profile and pair a verified device before setting up Home Pickup.';
         }
+        if (ftNanahDeliveryLocalCheckBtn) {
+            ftNanahDeliveryLocalCheckBtn.hidden = local.configured !== true;
+            ftNanahDeliveryLocalCheckBtn.disabled = local.configured !== true;
+            ftNanahDeliveryLocalCheckBtn.title = local.configured
+                ? 'Check whether the configured Home Pickup service answers now. This does not discover or trust devices.'
+                : 'Set up Home Pickup before checking readiness.';
+        }
 
         const hasSavedUpdateReader = hasNanahManagedSavedUpdateReader();
         const canCheckSavedUpdates = hasSavedUpdateReader && hasNanahManagedSavedUpdateCheckTarget();
@@ -19483,6 +19491,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         ftNanahDeliveryLocalBtn.addEventListener('click', async () => {
             await configureNanahManagedLocalNetworkProvider();
             renderNanahDeliveryPathStrip();
+        });
+    }
+
+    if (ftNanahDeliveryLocalCheckBtn) {
+        ftNanahDeliveryLocalCheckBtn.addEventListener('click', async () => {
+            if (ftNanahDeliveryLocalCheckBtn.disabled) return;
+            ftNanahDeliveryLocalCheckBtn.disabled = true;
+            try {
+                await checkNanahManagedLocalNetworkProviderHealth({ reason: 'delivery_card_check' });
+            } finally {
+                renderNanahDeliveryPathStrip();
+            }
         });
     }
 

@@ -515,6 +515,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /Home Pickup/);
   assert.match(tabViewHtml, /Home Pickup off/);
   assert.match(tabViewHtml, /Wi-Fi alone never grants control/);
+  assert.match(tabViewHtml, /id="ftNanahDeliveryLocalCheckBtn"[\s\S]*>Check<\/button>/);
   assert.match(tabViewHtml, /Home Pickup is for homes, clinics, or schools that run their own FilterTube-compatible pickup service on the local network/);
   assert.match(tabViewHtml, /id="ftNanahDeliveryAdvanced"/);
   assert.match(tabViewHtml, /Set up only when a verified device must collect an approved update later/);
@@ -536,6 +537,9 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /This is not device scanning; Send Update remains the normal path/);
   assert.match(source, /Home Pickup set up: \$\{host\}/);
   assert.match(source, /Home Pickup saved and reachable/);
+  assert.match(source, /ftNanahDeliveryLocalCheckBtn\.hidden = local\.configured !== true/);
+  assert.match(source, /delivery_card_check/);
+  assert.match(source, /This does not discover or trust devices/);
   assert.match(source, /Check Pickup/);
   assert.match(source, /function isNanahManagedLinkSavedUpdateEnabled\(link\)/);
   assert.match(source, /policy\.syncOnProfileOpen !== true/);
