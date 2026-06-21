@@ -36,6 +36,7 @@ test('managed controls handoff keeps implemented extension scope separate from r
     'parent/caregiver Family Controls UI: implemented',
     'live Nanah Send Update: implemented for eligible connected verified devices',
     'Internet Pickup/Home Pickup hooks: implemented behind explicit provider setup',
+    'Home Pickup visible readiness Check: required by release smoke artifact',
     'reference provider: implemented as self-hosted proof only'
   ]) {
     assert.ok(handoff.includes(implemented), `missing implemented status ${implemented}`);
@@ -80,6 +81,7 @@ test('managed controls handoff names the required final smoke and downstream lan
     'Import a small rule list and apply to Main, Kids, and both in separate passes.',
     'Pair a second verified device/profile.',
     'Send keyword/channel/video/viewing-space/time-limit updates over live Nanah.',
+    'If Home Pickup is configured, click the visible Check action and record the',
     'Confirm accepted/rejected protected history rows.',
     'Confirm denied Main/Kids surface shows the route gate.',
     'Confirm exhausted time shows the timeout overlay and records a request.',
@@ -89,7 +91,7 @@ test('managed controls handoff names the required final smoke and downstream lan
   }
 
   assert.match(handoff, /Internet Pickup service\s+-> HTTPS endpoint\s+-> durable encrypted item queue/s);
-  assert.match(handoff, /Home Pickup service\s+-> explicit same-network endpoint\s+-> health check/s);
+  assert.match(handoff, /Home Pickup service\s+-> explicit same-network endpoint\s+-> visible parent Check action and redacted health result/s);
   assert.match(handoff, /Android\s+-> settings locks\s+-> Main\/Kids route gate/s);
   assert.match(handoff, /iOS\s+-> same parity set as Android/s);
 });
