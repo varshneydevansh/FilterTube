@@ -13692,7 +13692,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     : (!hasVerifiedDevice
                         ? 'Pair a verified protected device before setting up Later Pickup.'
                         : 'Optional: set this up only when a verified protected device must collect an update later, including away over the internet.'));
-            ftNanahCompassLaterBtn.setAttribute('aria-label', `Away / Next Open - Later Pickup. ${ftNanahCompassLaterBtn.title}`);
+            ftNanahCompassLaterBtn.setAttribute('aria-label', `Away / Internet - Later Pickup. ${ftNanahCompassLaterBtn.title}`);
         }
         if (ftNanahDeliveryMailboxCard) {
             ftNanahDeliveryMailboxCard.dataset.tone = mailbox.configured ? 'success' : (mailboxCanConfigure ? 'optional' : 'neutral');

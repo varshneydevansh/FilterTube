@@ -866,12 +866,18 @@ parent tool instead of a sync/debug console.
   - [x] 2026-06-21 unified map state slice: the command-center map now preserves
     `Multiple send paths` when both Same-Home Pickup and Later Pickup are
     available, and live-only devices read as `Live Now - Send Update`. This
-    matches the parent mental model of one map with live, same-home, away/next
-    open, and setup-needed states.
+    matches the parent mental model of one map with live, same-home,
+    away/internet, and setup-needed states.
   - [x] 2026-06-21 Accounts & Sync compass-state slice: the first-read family
     device compass now mirrors the same state model: `Live now` + Send Update,
-    `Same home` + Same-Home Pickup, and `Away / next open` + Later Pickup. The
+    `Same home` + Same-Home Pickup, and `Away / internet` + Later Pickup. The
     transport remains visible but no longer leads the parent mental model.
+  - [x] 2026-06-21 internet-device map wording slice: the Family Device Updates
+    compass and command-center trusted-device tiles now describe Later Pickup
+    as `Away / internet` instead of only `next open`. This keeps internet
+    protected devices on the same map as live and same-home devices while still
+    requiring explicit Later Pickup setup and the existing trusted-link,
+    target-profile, revision, hash, device-binding, and signature gates.
   - [x] 2026-06-21 live session direction slice: trusted parent links now label
     local source roles as `Open Send Session` and local protected replica roles
     as `Open Receive Session`. Protected surfaces can open a receive session for

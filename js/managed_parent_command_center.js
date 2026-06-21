@@ -846,7 +846,7 @@
             } else if (item.syncLocalNetworkReady === true) {
                 routeLabel = 'Same Home - Same-Home Pickup';
             } else if (item.syncMailboxReady === true) {
-                routeLabel = 'Away / Next Open - Later Pickup';
+                routeLabel = 'Away / Internet - Later Pickup';
             } else if (item.syncLiveReady === true) {
                 routeLabel = 'Live Now - Send Update';
             }

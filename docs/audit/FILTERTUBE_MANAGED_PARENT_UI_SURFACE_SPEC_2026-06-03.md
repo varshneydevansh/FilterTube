@@ -124,6 +124,13 @@ foreground and background session PIN state for known profiles, refreshes the
 dashboard lock gate, and records a redacted `admin_session.lock` row for
 manageable protected profiles. Child/protected surfaces and scoped protected
 editing cannot use it to change admin state.
+2026-06-21 internet-device map wording addendum: the Family Device Updates
+compass and command-center map now say `Away / internet` / `Away / Internet -
+Later Pickup` for internet or opens-later protected devices. This keeps
+internet devices in the same family-device map as live and same-home devices.
+It changes copy only; Later Pickup still requires an explicit configured path
+and the same trusted-link, target-profile, revision, device-binding, hash, and
+signature validation before any policy applies.
 2026-06-21 per-profile pickup-readiness addendum: command-center Later Pickup
 and Same-Home Pickup readiness now requires both a configured provider and a
 saved update-enabled trusted link for that protected profile. A configured
