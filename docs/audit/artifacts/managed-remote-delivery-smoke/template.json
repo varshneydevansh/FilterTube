@@ -22,6 +22,14 @@
       "referenceProviderAuditDoc": "",
       "explicitEndpointConfigured": false,
       "providerHealthOrRoundTrip": "",
+      "visibleReadinessCheck": {
+        "actionLabel": "",
+        "invokedFrom": "",
+        "resultSummary": "",
+        "resultRecordedAt": "",
+        "redactedOnly": false,
+        "authorityGrantedByNetwork": true
+      },
       "corsPreflightVerified": false,
       "automaticDiscoveryObserved": false,
       "hostedServiceClaimed": false,

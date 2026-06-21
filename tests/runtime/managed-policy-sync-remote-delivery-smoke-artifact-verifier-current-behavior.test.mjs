@@ -169,7 +169,7 @@ function providerProofForTransport(transportMode) {
     };
   }
   const endpointClass = transportMode === 'encrypted_mailbox' ? 'public_https' : 'private_or_local_http';
-  return {
+  const proof = {
     providerKind: 'reference_provider',
     endpointClass,
     referenceProviderScript: 'scripts/managed-delivery-provider.mjs',
@@ -183,6 +183,19 @@ function providerProofForTransport(transportMode) {
     hostedServiceClaimed: false,
     notes: 'Reference provider proves endpoint shape only; local runtime validation remains authority.'
   };
+
+  if (transportMode === 'local_network_provider') {
+    proof.visibleReadinessCheck = {
+      actionLabel: 'Check',
+      invokedFrom: 'Family Device Updates Home Pickup row',
+      resultSummary: 'configured Home Pickup service health was checked and redacted status was recorded',
+      resultRecordedAt: '2026-06-05T00:00:00.000Z',
+      redactedOnly: true,
+      authorityGrantedByNetwork: false
+    };
+  }
+
+  return proof;
 }
 
 test('managed remote delivery smoke verifier is wired into release settings and smoke lanes', () => {
@@ -250,6 +263,14 @@ test('verifier rejects provider transport artifacts that imply discovery or host
   artifact.transport.providerProof.explicitEndpointConfigured = false;
   artifact.transport.providerProof.referenceProviderScript = 'scripts/other-provider.mjs';
   artifact.transport.providerProof.referenceProviderAuditDoc = 'docs/audit/OTHER.md';
+  artifact.transport.providerProof.visibleReadinessCheck = {
+    actionLabel: 'Discover devices',
+    invokedFrom: '',
+    resultSummary: '',
+    resultRecordedAt: '',
+    redactedOnly: false,
+    authorityGrantedByNetwork: true
+  };
 
   const errors = validateManagedRemoteDeliverySmokeArtifact(artifact);
   assert.ok(errors.includes('transport.providerProof.automaticDiscoveryObserved must be false'));
@@ -257,6 +278,12 @@ test('verifier rejects provider transport artifacts that imply discovery or host
   assert.ok(errors.includes('transport.providerProof.explicitEndpointConfigured must be true for provider transports'));
   assert.ok(errors.includes('transport.providerProof.referenceProviderScript must be scripts/managed-delivery-provider.mjs'));
   assert.ok(errors.includes('transport.providerProof.referenceProviderAuditDoc must be docs/audit/FILTERTUBE_MANAGED_DELIVERY_REFERENCE_PROVIDER_2026-06-20.md'));
+  assert.ok(errors.includes('transport.providerProof.visibleReadinessCheck.invokedFrom is required'));
+  assert.ok(errors.includes('transport.providerProof.visibleReadinessCheck.resultSummary is required'));
+  assert.ok(errors.includes('transport.providerProof.visibleReadinessCheck.resultRecordedAt is required'));
+  assert.ok(errors.includes('transport.providerProof.visibleReadinessCheck.actionLabel must record the visible Check action'));
+  assert.ok(errors.includes('transport.providerProof.visibleReadinessCheck.redactedOnly must be true'));
+  assert.ok(errors.includes('transport.providerProof.visibleReadinessCheck.authorityGrantedByNetwork must be false'));
 });
 
 test('verifier rejects mailbox provider smoke without public HTTPS and CORS preflight proof', () => {

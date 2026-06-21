@@ -98,7 +98,7 @@ Required manual rows:
 | 7. Live Send Update | Pair parent and protected devices, verify the same phrase, send the reviewed protected-profile update, and confirm the protected device applies only the newer signed policy. |
 | 8. Offline policy | Disconnect delivery and confirm the protected device keeps the last accepted policy active. |
 | 9. Internet Pickup | If configured, send a saved update through the explicit HTTPS provider and confirm profile-open pickup applies only after local trusted-link validation. |
-| 10. Home Pickup | If configured, send or discover through the explicit local provider and confirm same-network reachability alone does not grant authority. |
+| 10. Home Pickup | If configured, use the visible Home Pickup Check action, record the redacted readiness result, then send through the explicit local provider and confirm same-network reachability alone does not grant authority. |
 | 11. Rejection path | Try a stale, wrong-target, revoked-link, or wrong-key update and confirm it is rejected without weakening the active policy. |
 | 12. Action history | Confirm parent-visible history records accepted/rejected outcomes without PINs, private keys, plaintext rule values, raw policy JSON, decrypted payloads, or ciphertext blobs. |
 | 13. No-work performance | With no eligible provider or pending policy, open YouTube and confirm there are no provider polling loops, LAN fetch loops, new YouTube observers, or visible lag from managed-control code. |
@@ -148,7 +148,7 @@ local protected-profile authority: GO for extension-owned flows
 Family Device Map model: GO as one shared UI model
 live Nanah Send Update: GO after installed two-device smoke
 Internet Pickup: GO only with explicit configured-provider smoke
-Home Pickup: GO only with explicit configured-provider smoke
+Home Pickup: GO only with explicit configured-provider smoke plus visible Check evidence
 built-in automatic LAN discovery: NO-GO
 network-wide filtering product: OUT OF THIS EXTENSION RELEASE
 downstream app parity: separate native sync/parity lane

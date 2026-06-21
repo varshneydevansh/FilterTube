@@ -1045,6 +1045,11 @@ parent tool instead of a sync/debug console.
   and protected-device wording in human-readable rows. Existing JSON field names
   such as `childDeviceLabel` remain stable schema keys for verifier/backward
   compatibility.
+- [x] 2026-06-21 Home Pickup smoke evidence slice: the managed remote-delivery
+  smoke verifier now requires local-network/Home Pickup artifacts to record the
+  visible Check action, redacted readiness result, and
+  `authorityGrantedByNetwork` as false. This keeps same-network pickup proof
+  tied to explicit parent action, not ambient LAN reachability.
 - [ ] Native Android/iOS settings-lock and timeout UI parity. This belongs in
   the downstream app sync/runtime lane.
 

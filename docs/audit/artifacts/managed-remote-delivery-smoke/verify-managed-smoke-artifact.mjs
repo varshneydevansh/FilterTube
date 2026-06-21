@@ -63,6 +63,13 @@ const REQUIRED_LANE_EVIDENCE_FIELDS = Object.freeze([
   'summary'
 ]);
 
+const REQUIRED_HOME_PICKUP_READINESS_CHECK_FIELDS = Object.freeze([
+  'actionLabel',
+  'invokedFrom',
+  'resultSummary',
+  'resultRecordedAt'
+]);
+
 const REQUIRED_MANUAL_INSTALLED_EVIDENCE_FIELDS = Object.freeze([
   'parentDashboardArtifact',
   'childYouTubeArtifact',
@@ -244,6 +251,25 @@ function validateProviderProof(errors, providerProof, transportMode) {
     }
     if (providerProof.referenceProviderAuditDoc !== REFERENCE_PROVIDER_AUDIT_DOC) {
       errors.push(`${prefix}.referenceProviderAuditDoc must be ${REFERENCE_PROVIDER_AUDIT_DOC}`);
+    }
+  }
+
+  if (transportMode === 'local_network_provider') {
+    const readinessCheck = providerProof.visibleReadinessCheck;
+    const readinessPrefix = `${prefix}.visibleReadinessCheck`;
+    if (!isPlainObject(readinessCheck)) {
+      errors.push(`${readinessPrefix} must be an object for local_network_provider`);
+      return;
+    }
+    addMissingFieldErrors(errors, readinessCheck, REQUIRED_HOME_PICKUP_READINESS_CHECK_FIELDS, readinessPrefix);
+    if (!String(readinessCheck.actionLabel || '').toLowerCase().includes('check')) {
+      errors.push(`${readinessPrefix}.actionLabel must record the visible Check action`);
+    }
+    if (readinessCheck.redactedOnly !== true) {
+      errors.push(`${readinessPrefix}.redactedOnly must be true`);
+    }
+    if (readinessCheck.authorityGrantedByNetwork !== false) {
+      errors.push(`${readinessPrefix}.authorityGrantedByNetwork must be false`);
     }
   }
 }

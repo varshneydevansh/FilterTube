@@ -154,6 +154,9 @@ configured public HTTPS Internet Pickup endpoint plus CORS/preflight proof; and
 endpoint using HTTPS or private/local HTTP. Those internal provider IDs remain
 stable test/protocol names; the parent-facing family map presents them as
 Internet Pickup and Home Pickup delivery paths under the same verified device.
+For Home Pickup, the provider proof must also include the visible readiness
+check evidence: the parent clicked the Check action, a redacted result was
+recorded, and network reachability did not become authority.
 If the reference provider is used, the artifact must name
 `scripts/managed-delivery-provider.mjs` and
 `docs/audit/FILTERTUBE_MANAGED_DELIVERY_REFERENCE_PROVIDER_2026-06-20.md`.
