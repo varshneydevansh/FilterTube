@@ -1073,6 +1073,12 @@ parent tool instead of a sync/debug console.
   `providerIsPolicyAuthority` to false. The template still fails until real
   owner/operator/evidence rows are completed, but it no longer teaches the wrong
   authority model before a maintainer fills it out.
+- [x] 2026-06-22 remote-delivery smoke template safety slice: the managed
+  remote-delivery smoke template now defaults
+  `visibleReadinessCheck.authorityGrantedByNetwork` to false. The verifier
+  already required this; the template now matches the rule that Home Pickup,
+  Internet Pickup, provider reachability, and same-network presence never become
+  policy authority.
 - [x] 2026-06-21 app family-device-map parity slice: the managed app policy
   contract and app parity smoke artifact now require installed Android/iOS
   evidence for one family device map with Send Update, Home Pickup, Internet

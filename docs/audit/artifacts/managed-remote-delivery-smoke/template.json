@@ -28,7 +28,7 @@
         "resultSummary": "",
         "resultRecordedAt": "",
         "redactedOnly": false,
-        "authorityGrantedByNetwork": true
+        "authorityGrantedByNetwork": false
       },
       "corsPreflightVerified": false,
       "automaticDiscoveryObserved": false,
