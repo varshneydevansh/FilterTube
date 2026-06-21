@@ -1172,6 +1172,11 @@ extension now clears every non-target foreground unlock session and notifies the
 background session-pin cache to drop those profiles. The just-entered target
 profile keeps its fresh switching unlock so the switch can complete, but a
 previous Default/Master admin session cannot carry into another profile.
+2026-06-21 tab-close relock slice: background session PIN cache entries now
+record the trusted dashboard tab that created them, and `tabs.onRemoved` clears
+matching cached PINs when that tab/window closes. TTL and explicit clear
+messages still apply, but a closed dashboard tab no longer leaves its cached
+admin/profile PIN available for later background work.
 
 ## Action History Requirements
 

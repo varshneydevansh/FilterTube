@@ -733,6 +733,25 @@ const SESSION_PIN_FAILED_ATTEMPT_WINDOW_MS = 10 * 60 * 1000;
 const sessionPinCache = new Map();
 const sessionPinFailedAttempts = new Map();
 
+function getTrustedUiSenderTabId(sender) {
+    const tabId = Number(sender?.tab?.id);
+    return Number.isInteger(tabId) && tabId >= 0 ? tabId : null;
+}
+
+function clearSessionPinCacheForTab(tabId) {
+    const normalizedTabId = Number(tabId);
+    if (!Number.isInteger(normalizedTabId) || normalizedTabId < 0) return 0;
+    let cleared = 0;
+    sessionPinCache.forEach((entry, profileId) => {
+        const entryTabId = safeObject(entry).tabId;
+        if (Number.isInteger(entryTabId) && entryTabId === normalizedTabId) {
+            sessionPinCache.delete(profileId);
+            cleared += 1;
+        }
+    });
+    return cleared;
+}
+
 function isSessionPinCacheEntryFresh(entry) {
     return !!entry.pin && Number.isFinite(entry.expiresAt) && Date.now() < entry.expiresAt;
 }
@@ -845,7 +864,7 @@ async function persistSessionPinFailedAttemptState(profileId, state, profilesV4 
     return true;
 }
 
-async function verifyAndCacheSessionPin(profileId, pin) {
+async function verifyAndCacheSessionPin(profileId, pin, sender = null) {
     const Security = globalThis.FilterTubeSecurity || null;
     if (!Security || typeof Security.verifyPin !== 'function') {
         throw new Error('Security manager unavailable');
@@ -884,6 +903,7 @@ async function verifyAndCacheSessionPin(profileId, pin) {
     await persistSessionPinFailedAttemptState(id, null, stored);
     sessionPinCache.set(id, {
         pin,
+        tabId: getTrustedUiSenderTabId(sender),
         expiresAt: Date.now() + SESSION_PIN_CACHE_TTL_MS
     });
     return { ok: true, stored: true };
@@ -1156,6 +1176,15 @@ const DEFAULT_PROFILE_ID = 'default';
 const QUICK_BLOCK_DEFAULT_MIGRATION_KEY = 'quickBlockDefaultV327Applied';
 const QUICK_BLOCK_DEFAULT_TARGET_VERSION = '3.2.9';
 const KEYWORD_COMMENTS_SCOPE_MIGRATION_KEY = 'keywordCommentsScopeMigrationV332Applied';
+
+try {
+    if (browserAPI.tabs?.onRemoved && typeof browserAPI.tabs.onRemoved.addListener === 'function') {
+        browserAPI.tabs.onRemoved.addListener((tabId) => {
+            clearSessionPinCacheForTab(tabId);
+        });
+    }
+} catch (e) {
+}
 
 function compareSemver(a = '', b = '') {
     const toParts = (value) => String(value || '')
@@ -3936,7 +3965,7 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         }
         const profileId = normalizeString(request?.profileId) || DEFAULT_PROFILE_ID;
         const pin = normalizeString(request?.pin);
-        verifyAndCacheSessionPin(profileId, pin).then((result) => {
+        verifyAndCacheSessionPin(profileId, pin, sender).then((result) => {
             sendResponse?.(result);
         }).catch((e) => {
             sendResponse?.({ ok: false, error: e?.message || 'failed' });

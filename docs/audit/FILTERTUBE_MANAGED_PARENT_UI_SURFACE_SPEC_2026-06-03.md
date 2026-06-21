@@ -114,6 +114,10 @@ all non-target unlock sessions in the tab and asks the background session-pin
 cache to forget those profiles. The target profile keeps the fresh switching
 unlock needed to complete entry, but prior parent/admin authority does not
 carry across profile boundaries.
+2026-06-21 admin-session tab-close addendum: background cached session PINs now
+remember the trusted dashboard tab that created them and are cleared when that
+tab/window is removed. The cache still has a short TTL and explicit clear
+messages, but close/reopen no longer depends only on TTL expiry.
 2026-06-21 per-profile pickup-readiness addendum: command-center Later Pickup
 and Same-Home Pickup readiness now requires both a configured provider and a
 saved update-enabled trusted link for that protected profile. A configured
