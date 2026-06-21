@@ -34,6 +34,12 @@ function assertDeepEqual(name, left, right) {
   if (leftJson !== rightJson) fail(`${name} drifted`);
 }
 
+function assertIncludes(name, collection, expectedValue) {
+  if (!Array.isArray(collection) || !collection.includes(expectedValue)) {
+    fail(`${name} missing ${expectedValue}`);
+  }
+}
+
 function assertSourceExists(sourcePath) {
   const absolutePath = path.join(repoRoot, sourcePath);
   if (!fs.existsSync(absolutePath)) fail(`missing source ${sourcePath}`);
@@ -84,6 +90,41 @@ if (docContract.version !== 1) fail("unexpected contract version");
 if (docContract.artifact?.sourcePath !== contractArtifactPath) fail("artifact sourcePath mismatch");
 
 assertDeepEqual("Markdown contract JSON and artifact JSON", docContract, artifactContract);
+
+assertDeepEqual(
+  "managed delivery parent labels",
+  docContract.managedDelivery?.parentFacingTransports?.map((row) => row.label),
+  ["Send Update", "Internet Pickup", "Home Pickup"],
+);
+assertDeepEqual(
+  "managed delivery transport mapping",
+  docContract.managedDelivery?.parentFacingTransports?.map((row) => row.transport),
+  ["live_nanah", "encrypted_mailbox", "configured_local_network_gateway"],
+);
+assertDeepEqual(
+  "managed delivery family device map UI model",
+  docContract.managedDelivery?.familyDeviceMapUiModel,
+  {
+    identity: "one_family_device_map_for_live_home_and_internet_devices",
+    states: [
+      "live_now_send_update",
+      "same_home_home_pickup",
+      "away_or_internet_internet_pickup",
+      "offline_last_valid_policy",
+    ],
+    boundary: "delivery state is not authority; every applied update still requires trusted link target profile scope revision device binding policy hash and signature validation",
+  },
+);
+assertIncludes(
+  "managed delivery UI boundaries",
+  docContract.managedDelivery?.requiredUiBoundaries,
+  "one_family_device_map_represents_live_home_and_internet_devices",
+);
+assertIncludes(
+  "managed delivery UI boundaries",
+  docContract.managedDelivery?.requiredUiBoundaries,
+  "apps_and_pickup_provider_software_must_not_treat_delivery_labels_as_authority",
+);
 
 for (const row of [
   docContract.artifact,

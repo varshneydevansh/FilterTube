@@ -988,6 +988,11 @@ parent tool instead of a sync/debug console.
   protected profiles cannot configure update delivery. The underlying `child`
   profile type guard is unchanged; parent/account profiles remain the authority
   for delivery setup.
+- [x] 2026-06-21 app-contract verifier slice: the managed app policy contract
+  verifier now checks the parent-facing delivery labels, transport mapping, and
+  one Family Device map model for live, same-home, away/internet, and offline
+  devices. This makes downstream app/runtime sync fail early if the shared
+  contract drifts into separate home/internet authority models.
 - [ ] Native Android/iOS settings-lock and timeout UI parity. This belongs in
   the downstream app sync/runtime lane.
 
