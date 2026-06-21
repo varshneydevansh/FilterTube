@@ -854,12 +854,12 @@ parent tool instead of a sync/debug console.
     and signature validation.
   - [x] 2026-06-21 command-center status-chip alignment slice: Family Controls
     rows now show `Send Update ready`, `Home Pickup`, `Internet Pickup`, or
-    `Home + internet` in the compact device chip instead of collapsing
+    `Same-network + internet` in the compact device chip instead of collapsing
     provider-ready paths into a generic `Ready` state. This keeps internet/away
     and same-network devices on the same family-device map while preserving the
     existing provider-gated delivery and local validation model.
   - [x] 2026-06-21 family-device route-label slice: the command-center map now
-    labels configured same-network profiles as `Home device - Home Pickup`
+    labels configured same-network profiles as `Same-network device - Home Pickup`
     and configured internet/later profiles as `Away device - Internet Pickup`.
     The label change keeps both paths in one parent-facing map; transport names
     remain delivery states, not authority.
@@ -906,12 +906,12 @@ parent tool instead of a sync/debug console.
     unchanged.
   - [x] 2026-06-21 dual-pickup map label slice: when a protected profile has
     both Home Pickup and Internet Pickup available, the command-center map now
-    labels that device `Home + internet` instead of the generic multiple-path
+    labels that device `Same-network + internet` instead of the generic multiple-path
     wording. This keeps the same map valid for internet devices without implying
     that any pickup provider is authority.
   - [x] 2026-06-21 command-center route-chip alignment slice: per-profile
     status and delivery-preview chips now use `Live + pickup ready` or
-    `Home + internet set up` instead of the generic multiple-path wording. The
+    `Same-network + internet set up` instead of the generic multiple-path wording. The
     route chip now matches the family-device map for live, home/intranet, and
     internet pickup paths.
   - [x] 2026-06-21 Home Pickup service wording slice: visible Accounts & Sync,
@@ -1016,6 +1016,10 @@ parent tool instead of a sync/debug console.
   same-network wording for release-facing status rows. Mailbox item names remain
   protocol details, but the proof no longer describes Home Pickup as a bridge or
   a separate authority model.
+- [x] 2026-06-21 command-center same-network route wording slice: the Family
+  Controls device map now uses `Same-network device - Home Pickup` and
+  `Same-network + internet` instead of home-only labels. This keeps clinics,
+  schools, and other caregiver networks in the same verified-device map model.
 - [ ] Native Android/iOS settings-lock and timeout UI parity. This belongs in
   the downstream app sync/runtime lane.
 

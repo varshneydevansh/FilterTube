@@ -409,7 +409,7 @@
         if (item.syncLocalNetworkReady === true && item.syncMailboxReady === true) {
             return {
                 key: 'home_and_internet',
-                label: 'Home + internet',
+                label: 'Same-network + internet',
                 tone: 'success'
             };
         }
@@ -493,7 +493,7 @@
         if (item.syncLocalNetworkReady === true && item.syncMailboxReady === true) {
             return {
                 key: 'home_and_internet',
-                label: 'Home + internet set up',
+                label: 'Same-network + internet set up',
                 tone: 'success'
             };
         }
@@ -835,7 +835,7 @@
         const title = document.createElement('strong');
         title.textContent = 'Family device map';
         const detail = document.createElement('span');
-        detail.textContent = 'Each tile is a protected profile or device you can manage. Internet devices stay on the same family map as live and home devices after pairing; pickup paths only carry signed updates.';
+        detail.textContent = 'Each tile is a protected profile or device you can manage. Internet devices stay on the same family map as live and same-network devices after pairing; pickup paths only carry signed updates.';
         copy.append(title, detail);
 
         const ring = document.createElement('div');
@@ -863,9 +863,9 @@
             const route = document.createElement('span');
             let routeLabel = syncState.label;
             if (item.syncLocalNetworkReady === true && item.syncMailboxReady === true) {
-                routeLabel = 'Home + internet';
+                routeLabel = 'Same-network + internet';
             } else if (item.syncLocalNetworkReady === true) {
-                routeLabel = 'Home device - Home Pickup';
+                routeLabel = 'Same-network device - Home Pickup';
             } else if (item.syncMailboxReady === true) {
                 routeLabel = 'Away device - Internet Pickup';
             } else if (item.syncLiveReady === true) {
@@ -1148,7 +1148,7 @@
                 },
                 {
                     label: 'Set Up Home Pickup',
-                    title: 'For a same-home or school pickup path you explicitly set up. Wi-Fi alone never grants control.',
+                    title: 'For a same-network home, clinic, or school pickup path you explicitly set up. Wi-Fi alone never grants control.',
                     action: 'configure_local_network',
                     scope: 'local_network_provider'
                 }
