@@ -13600,7 +13600,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return {
                 configured: false,
                 label: 'Internet Pickup off',
-                detail: 'Send Update works when both devices are open. Set this up only when a verified protected device must collect a parent-approved update later or away over the internet.',
+                detail: 'Send Update works when both devices are open. Set this up only when the same verified device map needs later or away-over-internet pickup.',
                 tone: 'warning'
             };
         }
@@ -13623,7 +13623,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return {
             configured: true,
             label: `Internet Pickup set up: ${host}`,
-            detail: 'A verified protected device can try this path for signed parent updates when it opens later or away. It still accepts only trusted parent updates.',
+            detail: 'A verified protected device can use this route on the same family map when it opens later or away. It still accepts only trusted parent updates.',
             tone: 'success'
         };
     }
@@ -13691,7 +13691,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ? 'Create a protected profile before setting up Internet Pickup.'
                     : (!hasVerifiedDevice
                         ? 'Pair a verified protected device before setting up Internet Pickup.'
-                        : 'Optional: set this up only when a verified protected device must collect an update later, including away over the internet.'));
+                        : 'Optional: set this up only when a verified device on the same family map must collect an update later, including away over the internet.'));
             ftNanahCompassLaterBtn.setAttribute('aria-label', `Internet - Internet Pickup. ${ftNanahCompassLaterBtn.title}`);
         }
         if (ftNanahDeliveryMailboxCard) {
@@ -13725,7 +13725,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ? 'Create a protected profile before setting up Home Pickup.'
                     : (!hasVerifiedDevice
                         ? 'Pair a verified protected device before setting up Home Pickup.'
-                        : 'Optional: set this up only if you run a trusted Home Pickup service on your own network.'));
+                        : 'Optional: set this up only if a verified device on the same family map should use a trusted Home Pickup service on your own network.'));
             ftNanahCompassHomeBtn.setAttribute('aria-label', `Home - Home Pickup. ${ftNanahCompassHomeBtn.title}`);
         }
         if (ftNanahDeliveryAdvanced && (mailbox.configured === true || local.configured === true)) {
@@ -13748,7 +13748,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahDeliveryLocalBtn.textContent = local.configured ? 'Edit' : 'Set Up';
             ftNanahDeliveryLocalBtn.disabled = !localCanConfigure;
             ftNanahDeliveryLocalBtn.title = localCanConfigure
-                ? 'Optional advanced path for a trusted Home Pickup service on your own network.'
+                ? 'Optional advanced path for a trusted Home Pickup service used by verified devices on the same family map.'
                 : 'Create a protected profile and pair a verified device before setting up Home Pickup.';
         }
 
@@ -13833,7 +13833,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
             title: 'Internet Pickup (away or opens later)',
-            message: 'Use this only when a protected device on the same family map should collect an approved update later, including away over the internet.',
+            message: 'Use this only when a verified device on the same family map should collect an approved update later, including away over the internet.',
             details: [
                 'For normal family control, open both devices and use Send Update.',
                 'A pickup service can hold unreadable waiting updates, not PINs or plaintext rules.',
@@ -13856,7 +13856,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const endpoint = await showPromptModal({
             title: 'Internet Pickup Address',
-            message: 'Enter the trusted HTTPS address that will hold unreadable parent-approved updates until the protected device opens later or away. Leave blank to use Send Update only.',
+            message: 'Enter the trusted HTTPS address that will hold unreadable parent-approved updates until the verified protected device opens later or away. Leave blank to use Send Update only.',
             placeholder: 'https://your-filtertube-pickup-service',
             inputType: 'url',
             confirmText: currentEndpoint ? 'Save Internet Pickup' : 'Enable Internet Pickup',
@@ -13975,7 +13975,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
             title: 'Home Pickup',
-            message: 'Use this only when you run a FilterTube-compatible Home Pickup service on your home, clinic, or school network.',
+            message: 'Use this only when a verified device on the same family map should collect updates from a FilterTube-compatible Home Pickup service on your home, clinic, or school network.',
             details: [
                 'For normal family control, open both devices and use Send Update.',
                 'Home Pickup can help a verified protected device pick up waiting updates on the same network.',
@@ -14005,7 +14005,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const endpoint = await showPromptModal({
             title: 'Home Pickup Address',
-            message: 'Enter the Home Pickup service address only if you run one. This is not device scanning; Send Update remains the normal path.',
+            message: 'Enter the Home Pickup service address only if you run one for verified devices on this family map. This is not device scanning; Send Update remains the normal path.',
             placeholder: 'http://192.168.1.10:4177/filtertube',
             inputType: 'url',
             confirmText: currentEndpoint ? 'Save Home Pickup' : 'Enable Home Pickup',
@@ -15409,7 +15409,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 : `Internet Pickup: ${internetStatus}`);
         }
         if (homeStatus && homeStatus !== 'Off') {
-            parts.push(homeStatus.toLowerCase().includes('same-home pickup')
+            const normalizedHomeStatus = homeStatus.toLowerCase();
+            parts.push(normalizedHomeStatus.includes('same-network pickup') || normalizedHomeStatus.includes('same-home pickup')
                 ? homeStatus
                 : `Home Pickup: ${homeStatus}`);
         }

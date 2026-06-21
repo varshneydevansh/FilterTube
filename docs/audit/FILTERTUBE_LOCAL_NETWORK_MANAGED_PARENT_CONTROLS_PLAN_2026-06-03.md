@@ -743,7 +743,7 @@ parent tool instead of a sync/debug console.
     scopes remain unchanged.
   - [x] 2026-06-20 family device-map visual slice: the Accounts & Sync compass
     now uses explicit parent/protected-device markers and endpoint buttons so
-    same-device, same-home, and opens-later paths read more like a familiar
+    same-device, same-network, and opens-later paths read more like a familiar
     device-sharing picker. This is visual and copy-only; it adds no automatic
     LAN discovery, no ambient nearby-device trust, and no new transport
     authority.
@@ -847,7 +847,7 @@ parent tool instead of a sync/debug console.
     access are actually sourced from the edited protected profile.
   - [x] 2026-06-20 unified family-device map slice: the Accounts & Sync compass,
     Family Controls trust map, and managed release-smoke checklist now use one
-    parent-facing map for devices that are ready now, same-home, or away/later.
+    parent-facing map for devices that are ready now, same-network, or away/later.
     `Internet Pickup` is the away/internet delivery state, `Home Pickup` is the
     explicit home/school delivery state, and neither provider path becomes
     authority without local trusted-link, target, revision, device binding, hash,
@@ -866,16 +866,16 @@ parent tool instead of a sync/debug console.
   - [x] 2026-06-21 unified map state slice: the command-center map now keeps a
     distinct combined state when both Home Pickup and Internet Pickup are
     available, and live-only devices read as `Live now - Send Update`. This
-    matches the parent mental model of one map with live, same-home,
+    matches the parent mental model of one map with live, same-network,
     away/internet, and setup-needed states.
   - [x] 2026-06-21 Accounts & Sync compass-state slice: the first-read family
     device compass now mirrors the same state model: `Live now` + Send Update,
-    `Same home` + Home Pickup, and `Away / internet` + Internet Pickup. The
+    `Same network` + Home Pickup, and `Away / internet` + Internet Pickup. The
     transport remains visible but no longer leads the parent mental model.
   - [x] 2026-06-21 internet-device map wording slice: the Family Device Updates
     compass and command-center trusted-device tiles now describe Internet Pickup
     as `Away / internet` instead of only `next open`. This keeps internet
-    protected devices on the same map as live and same-home devices while still
+    protected devices on the same map as live and same-network devices while still
     requiring explicit Internet Pickup setup and the existing trusted-link,
     target-profile, revision, hash, device-binding, and signature gates.
   - [x] 2026-06-21 unified map parent-copy alignment slice: the first-read
@@ -889,7 +889,7 @@ parent tool instead of a sync/debug console.
   - [x] 2026-06-21 public docs/release-copy map slice: README, Functionality,
     Technical, and shared release notes now use `Send Update` instead of the
     older `Send Now` label and explicitly state that the Family Device map covers
-    nearby, same-home, and away/internet devices after pairing. This is
+    nearby, same-network, and away/internet devices after pairing. This is
     copy-only; live Nanah, Home Pickup, and Internet Pickup authority gates are
     unchanged.
   - [x] 2026-06-21 optional-pickup prompt gate slice: the Family Controls
@@ -900,7 +900,7 @@ parent tool instead of a sync/debug console.
     device relationship instead of asking parents to configure transport before
     pairing.
   - [x] 2026-06-21 family-device label casing slice: command-center device tiles
-    and compass ARIA labels now use the same `Live now`, `Same home`, and
+    and compass ARIA labels now use the same `Live now`, `Same network`, and
     `Away / internet` wording as the visible Accounts & Sync compass. This is a
     copy/accessibility alignment only; delivery gates and provider behavior are
     unchanged.
@@ -990,7 +990,7 @@ parent tool instead of a sync/debug console.
   for delivery setup.
 - [x] 2026-06-21 app-contract verifier slice: the managed app policy contract
   verifier now checks the parent-facing delivery labels, transport mapping, and
-  one Family Device map model for live, same-home, away/internet, and offline
+  one Family Device map model for live, same-network, away/internet, and offline
   devices. This makes downstream app/runtime sync fail early if the shared
   contract drifts into separate home/internet authority models.
 - [x] 2026-06-21 reference-provider wording slice: the managed delivery
@@ -1007,6 +1007,10 @@ parent tool instead of a sync/debug console.
   The gate keeps internal proof ids such as `encrypted_mailbox` and
   `local_network_provider`, but release-facing wording no longer treats
   mailbox/LAN/provider terms as parent authority or separate device systems.
+- [x] 2026-06-21 family-map setup-copy slice: the Accounts & Sync compass and
+  Internet Pickup/Home Pickup setup prompts now say those routes belong to the
+  same verified family device map. This keeps parent-facing UI from implying
+  that same-network pickup or internet pickup creates a second control model.
 - [ ] Native Android/iOS settings-lock and timeout UI parity. This belongs in
   the downstream app sync/runtime lane.
 
