@@ -38,7 +38,7 @@ NOT-CLAIMED              deliberately blocked from public/release wording
 | Trusted parent/caregiver devices can send protected-device policy through Nanah live P2P. | EXTENSION-PRESENT plus MANUAL-SMOKE-PENDING | `docs/audit/FILTERTUBE_NANAH_MANAGED_SIGNING_KEYPAIR_2026-06-04.md`; `docs/audit/FILTERTUBE_NANAH_MANAGED_LIVE_SIGNED_SEND_2026-06-04.md`; `tests/runtime/managed-nanah-live-signed-send-current-behavior.test.mjs`; `docs/audit/artifacts/managed-extension-installed-smoke/template.json`; `docs/audit/artifacts/managed-extension-installed-smoke/verify-managed-extension-smoke-artifact.mjs`. | Execute the installed-extension smoke artifact with real parent/protected browser evidence. |
 | Remote management can update keywords, channels, videos, viewing space, and time limits through the same validated rule paths as local controls. | EXTENSION-PRESENT plus MANUAL-SMOKE-PENDING | `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`; `tests/runtime/managed-nanah-live-signed-send-current-behavior.test.mjs`; `tests/runtime/managed-policy-schema-revision-contract-current-behavior.test.mjs`. | Installed remote delivery smoke and app parity artifact. |
 | Protected devices keep the last valid parent/caregiver policy while offline. | EXTENSION-PRESENT plus MANUAL-SMOKE-PENDING | `docs/audit/FILTERTUBE_NANAH_MANAGED_PULL_ON_OPEN_2026-06-04.md`; `docs/audit/artifacts/managed-remote-delivery-smoke/template.json`; `tests/runtime/managed-policy-sync-remote-delivery-smoke-artifact-verifier-current-behavior.test.mjs`. | Executed managed remote-delivery smoke artifact. |
-| Optional encrypted Internet Pickup can deliver later updates without plaintext rules. | PARTIAL-PROVIDER | `docs/audit/FILTERTUBE_MANAGED_POLICY_ENCRYPTED_MAILBOX_PROTOCOL_2026-06-03.md`; `docs/audit/FILTERTUBE_MANAGED_MAILBOX_SOURCE_UPLOAD_HANDOFF_2026-06-05.md`; `docs/audit/FILTERTUBE_NANAH_MANAGED_POLICY_REMOTE_DELIVERY_RELEASE_READINESS_GATE_2026-06-05.md`; `scripts/managed-delivery-provider.mjs`. | Hosted/owned Internet Pickup service decision, endpoint deployment, provider smoke, and release wording review. |
+| Optional encrypted Internet Pickup can deliver later updates without plaintext rules. | PARTIAL-PROVIDER | `docs/audit/FILTERTUBE_MANAGED_POLICY_ENCRYPTED_MAILBOX_PROTOCOL_2026-06-03.md`; `docs/audit/FILTERTUBE_MANAGED_MAILBOX_SOURCE_UPLOAD_HANDOFF_2026-06-05.md`; `docs/audit/FILTERTUBE_NANAH_MANAGED_POLICY_REMOTE_DELIVERY_RELEASE_READINESS_GATE_2026-06-05.md`; `docs/audit/FILTERTUBE_MANAGED_PICKUP_PROVIDER_OWNERSHIP_GATE_2026-06-21.md`; `scripts/managed-delivery-provider.mjs`. | Execute provider ownership artifact with endpoint deployment, provider smoke, and release wording review before hosted/guaranteed later-delivery claims. |
 | Home Pickup can support explicitly configured same-network delivery without making LAN discovery authority. | PARTIAL-PROVIDER | `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PROVIDER_HOOK_2026-06-05.md`; `docs/audit/FILTERTUBE_LOCAL_NETWORK_DISCOVERY_AUTHORITY_BOUNDARY_2026-06-03.md`; `tests/runtime/managed-local-network-provider-current-behavior.test.mjs`; `tests/runtime/managed-transport-provider-clients-current-behavior.test.mjs`. | Explicit provider smoke. Automatic LAN peer discovery remains app/provider work and NOT-CLAIMED. |
 | Local-network discovery is not authority; stale, replayed, revoked, mismatched, spoofed, or untrusted policies are rejected. | EXTENSION-PRESENT | `docs/audit/FILTERTUBE_LOCAL_NETWORK_DISCOVERY_AUTHORITY_BOUNDARY_2026-06-03.md`; `tests/runtime/local-network-discovery-authority-boundary-current-behavior.test.mjs`; `tests/runtime/managed-policy-schema-revision-contract-current-behavior.test.mjs`; `tests/runtime/managed-nanah-open-sync-current-behavior.test.mjs`. | Provider hostile-LAN smoke before any automatic discovery claim. |
 | Main YouTube and YouTube Kids access are enforced per protected profile. | EXTENSION-PRESENT plus DOWNSTREAM-PENDING | `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`; `tests/runtime/managed-viewing-space-route-gate-current-behavior.test.mjs`; `docs/audit/artifacts/managed-extension-installed-smoke/template.json`; `docs/audit/FILTERTUBE_MANAGED_APP_POLICY_CONTRACT_PARITY_2026-06-04.md`. | Execute installed extension smoke and native Android/iOS route-gate smoke. |
@@ -81,6 +81,24 @@ YouTube SPA responsiveness, quick-block/3-dot menu regression checks, and
 provider-status authority boundaries. It still does not prove hosted Internet
 Pickup, automatic LAN discovery, or native Android/iOS parity.
 
+## Pickup Provider Ownership Artifact
+
+Later-delivery provider ownership is now a separate gate:
+
+- Gate: `docs/audit/FILTERTUBE_MANAGED_PICKUP_PROVIDER_OWNERSHIP_GATE_2026-06-21.md`
+- Template:
+  `docs/audit/artifacts/managed-pickup-provider-ownership/template.json`
+- Verifier:
+  `docs/audit/artifacts/managed-pickup-provider-ownership/verify-provider-ownership-artifact.mjs`
+- Test:
+  `tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs`
+
+This artifact records whether pickup is reference-only, user-supplied, or
+FilterTube-hosted. Guaranteed later-delivery wording remains blocked unless a
+FilterTube-hosted provider has endpoint, deployment, health, CORS, retention,
+purge/revocation, redacted ack, and round-trip smoke proof. Provider
+reachability still never becomes policy authority.
+
 ## Safe Release Wording
 
 - FilterTube extension has protected-profile management, time limits, viewing
@@ -111,7 +129,8 @@ Pickup, automatic LAN discovery, or native Android/iOS parity.
    is covered by the artifact rows `FT-MANAGED-EXT-08-main-kids-route-gate` and
    `FT-MANAGED-EXT-09-timeout-overlay`.
 3. Managed remote-delivery smoke artifact using live Send Update and one configured provider path.
-4. Hosted/provider ownership decision for Internet Pickup.
+4. Execute the provider ownership artifact before any hosted Internet Pickup or
+   guaranteed later-delivery claim.
 5. Native Android/iOS runtime sync and app parity smoke.
 6. Future provider/app design for automatic same-network discovery, if still desired.
 ```

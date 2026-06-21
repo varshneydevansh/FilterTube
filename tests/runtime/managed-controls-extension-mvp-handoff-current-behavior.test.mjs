@@ -10,6 +10,7 @@ const handoffPath = 'docs/audit/FILTERTUBE_MANAGED_CONTROLS_EXTENSION_MVP_HANDOF
 const planPath = 'docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md';
 const transportGatePath = 'docs/audit/FILTERTUBE_MANAGED_TRANSPORT_APP_PARITY_GATE_2026-06-05.md';
 const referenceProviderPath = 'docs/audit/FILTERTUBE_MANAGED_DELIVERY_REFERENCE_PROVIDER_2026-06-20.md';
+const providerOwnershipPath = 'docs/audit/FILTERTUBE_MANAGED_PICKUP_PROVIDER_OWNERSHIP_GATE_2026-06-21.md';
 
 function read(relativePath) {
   return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
@@ -20,12 +21,14 @@ test('managed controls extension MVP handoff is linked from the main plan', () =
   const plan = read(planPath);
   const transportGate = read(transportGatePath);
   const referenceProvider = read(referenceProviderPath);
+  const providerOwnership = read(providerOwnershipPath);
 
   assert.match(handoff, /FilterTube Managed Controls Extension MVP Handoff/);
   assert.match(plan, new RegExp(handoffPath));
   assert.match(transportGate, /Extension policy authority and provider-gated intake hooks are\s+present/);
   assert.match(referenceProvider, /transport proof, not policy authority/i);
   assert.match(referenceProvider, /No automatic LAN peer discovery/);
+  assert.match(providerOwnership, /Provider ownership and release-claim gate/);
 });
 
 test('managed controls handoff keeps implemented extension scope separate from release blockers', () => {
@@ -92,6 +95,7 @@ test('managed controls handoff names the required final smoke and downstream lan
 
   assert.match(handoff, /Internet Pickup service\s+-> HTTPS endpoint\s+-> durable encrypted item queue/s);
   assert.match(handoff, /Home Pickup service\s+-> explicit same-network endpoint\s+-> visible parent Check action and redacted health result/s);
+  assert.match(handoff, /Provider ownership gate\s+-> docs\/audit\/FILTERTUBE_MANAGED_PICKUP_PROVIDER_OWNERSHIP_GATE_2026-06-21\.md/s);
   assert.match(handoff, /Android\s+-> settings locks\s+-> Main\/Kids route gate/s);
   assert.match(handoff, /iOS\s+-> same parity set as Android/s);
 });

@@ -1,0 +1,77 @@
+{
+  "artifactType": "filtertube-managed-pickup-provider-ownership",
+  "schemaVersion": 1,
+  "status": "template-not-executed",
+  "runtimeBehaviorChanged": false,
+  "boundaryDoc": "docs/audit/FILTERTUBE_MANAGED_PICKUP_PROVIDER_OWNERSHIP_GATE_2026-06-21.md",
+  "changeContext": {
+    "logicalChangeType": "",
+    "requiredLanes": [],
+    "automatedLaneEvidence": []
+  },
+  "ownershipDecision": {
+    "decision": "",
+    "owner": "",
+    "operator": "",
+    "supportContact": "",
+    "retentionPolicy": "",
+    "purgeRevocationPolicy": "",
+    "abuseRateLimitPolicy": "",
+    "privacyBoundary": "",
+    "releaseClaim": "",
+    "discoveryIsAuthority": true,
+    "providerIsPolicyAuthority": true
+  },
+  "providerEvidence": {
+    "internetPickupStatus": "",
+    "homePickupStatus": "",
+    "providerScript": "scripts/managed-delivery-provider.mjs",
+    "providerDocs": "docs/audit/FILTERTUBE_MANAGED_DELIVERY_REFERENCE_PROVIDER_2026-06-20.md",
+    "hostedEndpoint": "N/A",
+    "deploymentProof": "",
+    "corsPreflightProof": "",
+    "healthCheckProof": "",
+    "roundTripSmokeArtifact": "",
+    "redactedAckProof": ""
+  },
+  "requiredRows": [
+    {
+      "id": "FT-PICKUP-PROVIDER-00-owner-decision",
+      "requiredObservation": "The project records whether pickup is reference-only, user-supplied, or FilterTube-hosted, with owner/operator/support named.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-PICKUP-PROVIDER-01-endpoint-deployment",
+      "requiredObservation": "Hosted claims have endpoint, deployment, health, CORS, and round-trip proof; reference/user-supplied claims explicitly do not.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-PICKUP-PROVIDER-02-retention-purge-revocation",
+      "requiredObservation": "Pickup rows have retention, purge, and revocation behavior documented before later-delivery claims.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-PICKUP-PROVIDER-03-redacted-ack-history",
+      "requiredObservation": "Provider receipts carry only redacted ack metadata and do not record plaintext policy, PINs, private keys, or raw ciphertext.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-PICKUP-PROVIDER-04-authority-boundary",
+      "requiredObservation": "Provider reachability, LAN discovery, mailbox presence, or URL list presence never become policy authority.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-PICKUP-PROVIDER-05-release-wording",
+      "requiredObservation": "Release wording matches the decision: optional configured pickup, self-hosted provider, or hosted guaranteed later delivery only when deployed and smoked.",
+      "status": "missing"
+    }
+  ],
+  "completionRules": {
+    "allRowsMustPass": true,
+    "automatedLaneEvidenceMustPass": true,
+    "automatedLaneEvidenceMustCoverRequiredLanes": true,
+    "hostedClaimsRequireOwnedDeployedSmokedProvider": true,
+    "discoveryAndProviderAreNeverPolicyAuthority": true,
+    "noPlaintextSensitiveFields": true
+  }
+}

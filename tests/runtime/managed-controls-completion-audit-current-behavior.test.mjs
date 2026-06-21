@@ -12,6 +12,7 @@ const transportGatePath = 'docs/audit/FILTERTUBE_MANAGED_TRANSPORT_APP_PARITY_GA
 const appContractPath = 'docs/audit/FILTERTUBE_MANAGED_APP_POLICY_CONTRACT_PARITY_2026-06-04.md';
 const remoteReadinessPath = 'docs/audit/FILTERTUBE_NANAH_MANAGED_POLICY_REMOTE_DELIVERY_RELEASE_READINESS_GATE_2026-06-05.md';
 const localProviderPath = 'docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PROVIDER_HOOK_2026-06-05.md';
+const pickupProviderOwnershipPath = 'docs/audit/FILTERTUBE_MANAGED_PICKUP_PROVIDER_OWNERSHIP_GATE_2026-06-21.md';
 
 function read(relativePath) {
   return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
@@ -64,6 +65,7 @@ test('managed controls completion audit links to current proof families and rema
   const appContract = read(appContractPath);
   const remoteReadiness = read(remoteReadinessPath);
   const localProvider = read(localProviderPath);
+  const pickupProviderOwnership = read(pickupProviderOwnershipPath);
 
   for (const proof of [
     'tests/runtime/managed-child-local-authority-current-behavior.test.mjs',
@@ -76,6 +78,7 @@ test('managed controls completion audit links to current proof families and rema
     'tests/runtime/managed-policy-action-history-model-current-behavior.test.mjs',
     'tests/runtime/managed-app-policy-contract-parity-current-behavior.test.mjs',
     'tests/runtime/managed-extension-installed-smoke-artifact-verifier-current-behavior.test.mjs',
+    'tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs',
     'tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs'
   ]) {
     assert.ok(doc.includes(proof), `missing linked proof ${proof}`);
@@ -88,6 +91,9 @@ test('managed controls completion audit links to current proof families and rema
   assert.match(localProvider, /runtime built-in same-network peer discovery: absent/);
   assert.match(doc, /docs\/audit\/artifacts\/managed-extension-installed-smoke\/template\.json/);
   assert.match(doc, /verify-managed-extension-smoke-artifact\.mjs/);
+  assert.match(doc, /docs\/audit\/artifacts\/managed-pickup-provider-ownership\/template\.json/);
+  assert.match(pickupProviderOwnership, /That service is only delivery\. It never decides policy/);
+  assert.match(pickupProviderOwnership, /Guaranteed later parent-to-child delivery/);
 });
 
 test('managed controls completion audit blocks overclaim wording while preserving safe wording', () => {

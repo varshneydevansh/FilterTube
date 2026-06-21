@@ -187,6 +187,13 @@ extension authority code.
   timeout overlay, redacted history, no-policy/no-work YouTube SPA behavior,
   3-dot/quick-block regression checks, and provider-status authority boundaries
   without recording plaintext rules, PINs, private keys, or watched titles.
+- [x] 2026-06-21 pickup provider ownership gate slice: hosted/later-delivery
+  claims now require a separate provider ownership artifact at
+  `docs/audit/artifacts/managed-pickup-provider-ownership/`. Reference-only or
+  user-supplied pickup can be documented without claiming guaranteed delivery;
+  a FilterTube-hosted claim requires endpoint/deployment/health/CORS/retention/
+  purge/redacted-ack/round-trip proof and still cannot make provider
+  reachability policy authority.
 
 ### Parent/Caregiver Simplification Tracker
 

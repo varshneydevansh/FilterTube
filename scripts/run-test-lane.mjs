@@ -23,6 +23,9 @@ import {
   MANAGED_EXTENSION_INSTALLED_SMOKE_ARTIFACT_TEMPLATE,
   MANAGED_EXTENSION_INSTALLED_SMOKE_ARTIFACT_VERIFIER,
   MANAGED_EXTENSION_INSTALLED_SMOKE_REQUIRED_ROWS,
+  MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_TEMPLATE,
+  MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_VERIFIER,
+  MANAGED_PICKUP_PROVIDER_OWNERSHIP_REQUIRED_ROWS,
   MANAGED_APP_PARITY_SMOKE_ARTIFACT_TEMPLATE,
   MANAGED_APP_PARITY_SMOKE_ARTIFACT_VERIFIER,
   MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS,
@@ -271,6 +274,8 @@ function requiresManagedRemoteDeliveryHandoff(result) {
     || /managed|parent|caregiver|time-limit|time_limit|local-network|local_network|mailbox/i.test(entry.file)
     || entry.file.startsWith('docs/audit/artifacts/managed-remote-delivery-smoke/')
     || entry.file.startsWith('docs/audit/artifacts/managed-extension-installed-smoke/')
+    || entry.file.startsWith('docs/audit/artifacts/managed-pickup-provider-ownership/')
+    || entry.file === 'docs/audit/FILTERTUBE_MANAGED_PICKUP_PROVIDER_OWNERSHIP_GATE_2026-06-21.md'
   ));
 }
 
@@ -350,6 +355,11 @@ function printClassification(result) {
       console.log(`    verifier: ${MANAGED_EXTENSION_INSTALLED_SMOKE_ARTIFACT_VERIFIER}`);
       console.log(`    required rows: ${MANAGED_EXTENSION_INSTALLED_SMOKE_REQUIRED_ROWS.join(', ')}`);
       console.log('    readiness: proves installed extension parent/protected-profile behavior only; provider and app parity remain gated.');
+      console.log('  Managed pickup provider ownership artifact handoff:');
+      console.log(`    template: ${MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_TEMPLATE}`);
+      console.log(`    verifier: ${MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_VERIFIER}`);
+      console.log(`    required rows: ${MANAGED_PICKUP_PROVIDER_OWNERSHIP_REQUIRED_ROWS.join(', ')}`);
+      console.log('    readiness: hosted later-delivery wording remains blocked unless an owned provider artifact passes.');
       console.log('  Managed remote delivery smoke artifact handoff:');
       console.log(`    template: ${MANAGED_REMOTE_DELIVERY_SMOKE_ARTIFACT_TEMPLATE}`);
       console.log(`    verifier: ${MANAGED_REMOTE_DELIVERY_SMOKE_ARTIFACT_VERIFIER}`);

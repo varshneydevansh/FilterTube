@@ -26,6 +26,10 @@ export const MANAGED_EXTENSION_INSTALLED_SMOKE_ARTIFACT_TEMPLATE =
   'docs/audit/artifacts/managed-extension-installed-smoke/template.json';
 export const MANAGED_EXTENSION_INSTALLED_SMOKE_ARTIFACT_VERIFIER =
   'node docs/audit/artifacts/managed-extension-installed-smoke/verify-managed-extension-smoke-artifact.mjs docs/audit/artifacts/managed-extension-installed-smoke/<artifact>.json';
+export const MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_TEMPLATE =
+  'docs/audit/artifacts/managed-pickup-provider-ownership/template.json';
+export const MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_VERIFIER =
+  'node docs/audit/artifacts/managed-pickup-provider-ownership/verify-provider-ownership-artifact.mjs docs/audit/artifacts/managed-pickup-provider-ownership/<artifact>.json';
 export const MANAGED_APP_PARITY_SMOKE_ARTIFACT_TEMPLATE =
   'docs/audit/artifacts/managed-app-parity-smoke/template.json';
 export const MANAGED_APP_PARITY_SMOKE_ARTIFACT_VERIFIER =
@@ -87,6 +91,14 @@ export const MANAGED_EXTENSION_INSTALLED_SMOKE_REQUIRED_ROWS = Object.freeze([
   'FT-MANAGED-EXT-11-no-policy-no-work-spa',
   'FT-MANAGED-EXT-12-three-dot-and-quick-block-regression',
   'FT-MANAGED-EXT-13-pickup-provider-status-boundary'
+]);
+export const MANAGED_PICKUP_PROVIDER_OWNERSHIP_REQUIRED_ROWS = Object.freeze([
+  'FT-PICKUP-PROVIDER-00-owner-decision',
+  'FT-PICKUP-PROVIDER-01-endpoint-deployment',
+  'FT-PICKUP-PROVIDER-02-retention-purge-revocation',
+  'FT-PICKUP-PROVIDER-03-redacted-ack-history',
+  'FT-PICKUP-PROVIDER-04-authority-boundary',
+  'FT-PICKUP-PROVIDER-05-release-wording'
 ]);
 export const MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS = Object.freeze([
   'FT-MANAGED-APP-00-contract-sync',
@@ -150,6 +162,7 @@ export const LANES = Object.freeze({
       'tests/runtime/release-live-youtube-spa-smoke-boundary-current-behavior.test.mjs',
       'tests/runtime/managed-policy-sync-remote-delivery-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/managed-extension-installed-smoke-artifact-verifier-current-behavior.test.mjs',
+      'tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs',
       'tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/release-notes-json-version-gate-boundary-current-behavior.test.mjs',
       'tests/runtime/release-package-parity-current-behavior.test.mjs',
@@ -389,6 +402,7 @@ export const LANES = Object.freeze({
       'tests/runtime/managed-controls-completion-audit-current-behavior.test.mjs',
       'tests/runtime/managed-policy-sync-remote-delivery-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/managed-extension-installed-smoke-artifact-verifier-current-behavior.test.mjs',
+      'tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs',
       'tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/managed-viewing-space-route-gate-current-behavior.test.mjs',
       'tests/runtime/managed-child-time-limit-schema-current-behavior.test.mjs',
@@ -430,6 +444,7 @@ export const LANES = Object.freeze({
       'tests/runtime/managed-controls-extension-mvp-handoff-current-behavior.test.mjs',
       'tests/runtime/managed-policy-sync-remote-delivery-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/managed-extension-installed-smoke-artifact-verifier-current-behavior.test.mjs',
+      'tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs',
       'tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/all-callable-index-current-behavior.test.mjs',
       'tests/runtime/audit-runtime-backlog-current-behavior.test.mjs',
@@ -612,6 +627,14 @@ export const FILE_LANE_RULES = Object.freeze([
   {
     id: 'managed-extension-installed-smoke-artifact-surface',
     patterns: [/^docs\/audit\/artifacts\/managed-extension-installed-smoke\/.*\.(?:json|mjs)$/],
+    lanes: ['release', 'settings', 'smoke']
+  },
+  {
+    id: 'managed-pickup-provider-ownership-surface',
+    patterns: [
+      /^docs\/audit\/FILTERTUBE_MANAGED_PICKUP_PROVIDER_OWNERSHIP_GATE_2026-06-21\.md$/,
+      /^docs\/audit\/artifacts\/managed-pickup-provider-ownership\/.*\.(?:json|mjs)$/
+    ],
     lanes: ['release', 'settings', 'smoke']
   },
   {
