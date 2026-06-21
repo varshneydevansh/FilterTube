@@ -29,6 +29,12 @@ protected redacted ack-handoff history row on the target profile so the parent
 or caregiver can later see whether the protected device reported the mailbox
 outcome back to the provider.
 
+2026-06-21 visibility addendum: the dashboard also runs the same provider-gated
+saved-update helper when the extension page becomes visible again, throttled to
+once per minute and only when an eligible protected-device saved-update target
+or parent/source delivery-receipt target exists. This is not a service-worker
+scheduler and does not add YouTube-page polling.
+
 The hook is intentionally not mailbox server or local-network authority. It
 does not poll from YouTube pages, does not add a service-worker scheduler, and
 does not make network discovery authority. Internet Pickup can ask an explicit
@@ -161,6 +167,7 @@ runtime provider failure fail-closed item apply guard: present
 runtime mailbox item apply reuse: present
 runtime pull status persistence: present
 runtime browser HTTPS mailbox pull/decrypt client: present behind explicit config
+runtime dashboard-visible saved-update check: present with 60s throttle and eligible-link gate
 runtime mailbox server authority: absent
 runtime provider-gated Home Bridge candidate discovery: present
 runtime built-in LAN peer discovery: absent

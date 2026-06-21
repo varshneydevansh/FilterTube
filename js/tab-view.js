@@ -3089,6 +3089,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const NANAH_MANAGED_OPEN_SYNC_STATE_KEY = 'ftNanahManagedOpenSyncState';
     const NANAH_MANAGED_LOCAL_NETWORK_SYNC_STATE_KEY = 'ftNanahManagedLocalNetworkSyncState';
     const NANAH_MANAGED_SOURCE_ACK_SYNC_STATE_KEY = 'ftNanahManagedSourceAckSyncState';
+    const NANAH_MANAGED_VISIBLE_SYNC_MIN_INTERVAL_MS = 60 * 1000;
     let nanahClient = null;
     let nanahTrustedLinks = [];
     let nanahStableDeviceId = '';
@@ -3097,6 +3098,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let nanahManagedLocalNetworkSyncState = null;
     let nanahManagedSourceAckSyncState = null;
     let nanahManagedBackgroundSyncPromise = null;
+    let nanahManagedVisibleSyncLastRunMs = 0;
     let nanahUiMode = 'parent_control';
     let isApplyingNanahModePreset = false;
     let nanahTrustedReconnectApprovalPromise = null;
@@ -15741,6 +15743,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         return nanahManagedBackgroundSyncPromise;
     }
 
+    function runNanahManagedVisibleSync({ reason = 'dashboard_visible' } = {}) {
+        if (document.visibilityState && document.visibilityState !== 'visible') {
+            return Promise.resolve(null);
+        }
+        if (!hasNanahManagedSavedUpdateCheckTarget() && !hasNanahManagedSourceAckSyncTarget()) {
+            return Promise.resolve(null);
+        }
+        const now = Date.now();
+        if (nanahManagedVisibleSyncLastRunMs && now - nanahManagedVisibleSyncLastRunMs < NANAH_MANAGED_VISIBLE_SYNC_MIN_INTERVAL_MS) {
+            return Promise.resolve(null);
+        }
+        nanahManagedVisibleSyncLastRunMs = now;
+        return runNanahManagedBackgroundSync({ reason });
+    }
+
     async function configureNanahTrustedLink(link) {
         const trusted = normalizeNanahTrustedLink(link);
         if (!trusted) return;
@@ -19356,6 +19373,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     setNanahMode(nanahUiMode, { persist: false, applyPreset: true });
     updateNanahUi();
     void runNanahManagedBackgroundSync({ reason: 'dashboard_open' });
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            void runNanahManagedVisibleSync({ reason: 'dashboard_visible' });
+        }
+    });
 
     [ftNanahRole, ftNanahScope, ftNanahGranularSurface, ftNanahStrategy, ftNanahRemoteTarget].forEach((element) => {
         if (!element) return;

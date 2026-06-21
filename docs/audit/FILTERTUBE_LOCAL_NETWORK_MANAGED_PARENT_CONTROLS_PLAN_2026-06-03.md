@@ -529,6 +529,12 @@ parent tool instead of a sync/debug console.
     feedback. This changes scheduling only; trusted-link validation, target
     profile, scope, revision, hash, signature, provider availability, and local
     apply gates remain the authority.
+  - [x] 2026-06-21 dashboard-visible saved-update slice: when the extension
+    dashboard becomes visible again, the same gated saved-update helper runs at
+    most once per minute and only if a protected-device saved-update target or
+    parent/source receipt target exists. This keeps parent updates easier to
+    pick up after returning to FilterTube without adding YouTube-page polling,
+    service-worker scheduling, discovery authority, or weaker apply gates.
   - [x] Later-delivery simplification slice: the Accounts & Sync first-read note
     and Family Controls provider prompt now say the normal path is still open
     both devices, pair, verify, and Send Update. Internet Pickup/Home Bridge are
