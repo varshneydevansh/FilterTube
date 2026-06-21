@@ -1079,6 +1079,12 @@ parent tool instead of a sync/debug console.
   already required this; the template now matches the rule that Home Pickup,
   Internet Pickup, provider reachability, and same-network presence never become
   policy authority.
+- [x] 2026-06-22 installed-smoke template safety slice: the installed-extension
+  smoke template now defaults `pickupProviderAuthorityGranted`,
+  `automaticLanDiscoveryObserved`, and `hostedInternetPickupClaimed` to false.
+  The verifier and generator already required those values; the template now
+  starts from the same non-overclaiming release boundary before manual evidence
+  is filled in.
 - [x] 2026-06-21 app family-device-map parity slice: the managed app policy
   contract and app parity smoke artifact now require installed Android/iOS
   evidence for one family device map with Send Update, Home Pickup, Internet

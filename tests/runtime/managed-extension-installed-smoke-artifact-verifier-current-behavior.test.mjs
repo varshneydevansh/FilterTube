@@ -186,7 +186,9 @@ test('verifier rejects the non-executed template and missing installed extension
   assert.ok(errors.includes('recordingFields.browserId must be one of chrome, firefox, brave, edge'));
   assert.ok(errors.includes('visibleEvidence.timeoutOverlayArtifact is required'));
   assert.ok(errors.includes('assertions.parentAdminUnlockObserved must be true'));
-  assert.ok(errors.includes('assertions.pickupProviderAuthorityGranted must be false'));
+  assert.equal(template.assertions.pickupProviderAuthorityGranted, false);
+  assert.equal(template.assertions.automaticLanDiscoveryObserved, false);
+  assert.equal(template.assertions.hostedInternetPickupClaimed, false);
   assert.ok(errors.includes('FT-MANAGED-EXT-00-install-preflight.status must be passed'));
 });
 

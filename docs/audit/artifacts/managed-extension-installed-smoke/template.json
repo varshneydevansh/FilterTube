@@ -58,9 +58,9 @@
     "youtubeSnappyAfterSpaObserved": false,
     "blockingWhitelistingUnaffectedObserved": false,
     "quickBlockAndThreeDotMenuObserved": false,
-    "pickupProviderAuthorityGranted": true,
-    "automaticLanDiscoveryObserved": true,
-    "hostedInternetPickupClaimed": true
+    "pickupProviderAuthorityGranted": false,
+    "automaticLanDiscoveryObserved": false,
+    "hostedInternetPickupClaimed": false
   },
   "requiredRows": [
     {
