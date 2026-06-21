@@ -7,15 +7,15 @@ handoff, delegated same-budget bulk time-limit controls, delegated local
 bulk viewing-space controls, delegated parent extra-time grants, command-center
 verified-device send actions,
 live P2P signed managed-policy push for connected verified replica devices,
-provider-gated Later Pickup/Same-Home Pickup delivery handoff, and protected redacted push
+provider-gated Internet Pickup/Home Pickup delivery handoff, and protected redacted push
 history rows are present. The command center now also surfaces the latest
 redacted delivery attempt in each protected profile row so parents can see
-whether the last send went by Send Update, Same-Home Pickup, Later Pickup, partial
+whether the last send went by Send Update, Home Pickup, Internet Pickup, partial
 delivery, no-link, or unavailable send path without opening raw policy state.
 The command center now includes a compact parent-facing protection strip, a
-parent-reauthed Later Pickup endpoint
+parent-reauthed Internet Pickup endpoint
 configuration row, plus labeled Delivery/Device/History row details so parents
-can scan `Send Update ready`, `Later Pickup set up`, `Same-Home Pickup` setup,
+can scan `Send Update ready`, `Internet Pickup set up`, `Home Pickup` setup,
 re-pairing, conflicts, and history without reading raw policy state. Bulk local time-limit
 and viewing-space actions cover all manageable protected profiles, including
 Default/Master-managed independent account profiles. Direct rule bulk writes
@@ -39,7 +39,7 @@ handoffs for creating a child profile and, for Default/Master, creating an
 independent account profile through the existing gated profile-creation flows.
 The zero-profile state now hides optional delivery-provider rows and shows a
 short parent setup checklist first. The normal one-profile state hides bulk
-controls, hides unconfigured Later Pickup/Same-Home Pickup setup, and uses row-level actions so
+controls, hides unconfigured Internet Pickup/Home Pickup setup, and uses row-level actions so
 parents are not forced through advanced transport choices. Provider modals use
 parent-facing wording only when an existing provider is being edited. The Help
 page now includes plain-language Managed Parent Controls, time-finished, and
@@ -59,7 +59,7 @@ The first protected-device managed-link setup now defaults to a parent-facing
 `Parent managed` behavior instead of a strict ask-every-time behavior: a saved
 parent/caregiver source link uses fast reconnect, fixed protected-profile
 targeting where required, matching signed updates while locked, and
-profile-open update checks when a later-update provider exists. The stricter
+profile-open update checks when a pickup provider exists. The stricter
 `Ask on this device first` behavior remains available for families or
 caregivers who want each later update to require local approval/unlock.
 Issue 62 is now part of the managed-parent plan as a parent rule-library
@@ -70,44 +70,44 @@ devices through the existing managed-policy path. The normal dashboard wording
 should say `Import List`, not expose provider/subscription authority language.
 
 2026-06-20 naming addendum: the parent-facing device UI uses one Family Device
-Map for Send Update, Same-Home Pickup, and Later Pickup devices. The visible delivery
-states are `Send Update`, `Same-Home Pickup`, and `Later Pickup`. Older
-historical references to `Home Bridge`, `Internet Pickup`, `mailbox`, `LAN`, or
+Map for Send Update, Home Pickup, and Internet Pickup devices. The visible delivery
+states are `Send Update`, `Home Pickup`, and `Internet Pickup`. Older
+historical transport words such as `mailbox`, `LAN`, bridge, gateway, or
 provider setup map to those delivery states and must not become separate first
 run screens or authority labels.
 2026-06-20 runtime-copy addendum: Family Device Updates and the command-center
 trust map now use those same parent-facing labels in visible text, status rows,
-and screen-reader labels. `Later Pickup` covers internet later-delivery devices;
-`Same-Home Pickup` covers explicitly configured same-network bridge devices.
+and screen-reader labels. `Internet Pickup` covers internet later-delivery devices;
+`Home Pickup` covers explicitly configured same-network bridge devices.
 Both remain delivery states only, not authority.
 2026-06-21 unified map copy addendum: the Family Device Updates map and
 command-center trust map now say the same map covers nearby and internet/away
-devices after pairing. Internet devices are represented by `Later Pickup`
+devices after pairing. Internet devices are represented by `Internet Pickup`
 status on the same map, not by a separate map or separate authority model.
-2026-06-21 Later Pickup setup-copy addendum: the setup disclosure and address
-prompt now describe Later Pickup as the same family-device map path for devices
+2026-06-21 Internet Pickup setup-copy addendum: the setup disclosure and address
+prompt now describe Internet Pickup as the same family-device map path for devices
 that open later or are away over the internet. The prompt still frames the HTTPS
 service as optional unreadable waiting-update storage, not profile, PIN, trust,
 or policy authority.
-2026-06-21 command-center Later Pickup addendum: configured Later Pickup panels
+2026-06-21 command-center Internet Pickup addendum: configured Internet Pickup panels
 and button tooltips now use the same away/opens-later wording as the Family
 Device Updates map. This keeps internet devices on the same parent mental model
 instead of presenting a separate remote-admin feature.
 2026-06-21 command-center status-chip addendum: protected-profile rows now use
 the same map vocabulary in their compact sync chip. Live paths say
 `Send Update ready`, explicitly configured same-network paths say
-`Same-Home Pickup`, away/opens-later paths say `Later Pickup`, and combined
+`Home Pickup`, away/opens-later paths say `Internet Pickup`, and combined
 paths say `Multiple send paths`. This changes only parent-facing labels; the
 trusted-link, target-profile, revision, device-binding, hash, and signature
 checks remain the runtime authority.
 2026-06-21 command-center map-state addendum: the visual family-device map now
-keeps combined Same-Home/Later Pickup devices as `Multiple send paths` instead
-of hiding the internet path behind same-home priority. Live-only devices read
+keeps combined Home Pickup and Internet Pickup devices as `Multiple send paths`
+instead of hiding the internet path behind home-device priority. Live-only devices read
 as `Live Now - Send Update` to match the parent-facing state model.
 2026-06-21 Accounts & Sync compass-state addendum: the top Family Device
 Updates compass now uses the same first-read state names as the command center:
-`Live now` + `Send Update`, `Same home` + `Same-Home Pickup`, and
-`Away / internet` + `Later Pickup`. Screen-reader labels use the same order,
+`Live now` + `Send Update`, `Same home` + `Home Pickup`, and
+`Away / internet` + `Internet Pickup`. Screen-reader labels use the same order,
 so parents see the device situation first and the transport second.
 2026-06-21 admin-session profile-switch addendum: profile switching now clears
 all non-target unlock sessions in the tab and asks the background session-pin
@@ -130,26 +130,26 @@ locking and failed admin re-auth evidence use the protected retention path
 instead of ordinary accepted-row retention. The rows remain evidence only; they
 do not reopen, extend, or authorize an admin session.
 2026-06-21 internet-device map wording addendum: the Family Device Updates
-compass and command-center map now say `Away / internet` / `Away / Internet -
-Later Pickup` for internet or opens-later protected devices. This keeps
-internet devices in the same family-device map as live and same-home devices.
-It changes copy only; Later Pickup still requires an explicit configured path
+compass and command-center map now say `Away / internet` and `Internet Pickup`
+for internet or opens-later protected devices. This keeps internet devices in
+the same family-device map as live and home devices.
+It changes copy only; Internet Pickup still requires an explicit configured path
 and the same trusted-link, target-profile, revision, device-binding, hash, and
 signature validation before any policy applies.
-2026-06-21 pickup setup label addendum: configured Later Pickup and Same-Home
+2026-06-21 pickup setup label addendum: configured Internet Pickup and Home
 Pickup summaries now say `set up` instead of `ready`. Live Send Update can be
 ready; saved pickup paths are configured delivery options whose reachability and
 local policy acceptance are still checked later by the protected device.
-2026-06-21 per-profile pickup-readiness addendum: command-center Later Pickup
-and Same-Home Pickup readiness now requires both a configured provider and a
+2026-06-21 per-profile pickup-readiness addendum: command-center Internet Pickup
+and Home Pickup readiness now requires both a configured provider and a
 saved update-enabled trusted link for that protected profile. A configured
 provider alone no longer makes every protected profile look ready to receive
-later/same-home updates.
+home or internet pickup updates.
 2026-06-21 transport-specific saved-check addendum: the protected-device
 `Check Saved Updates` action and dashboard/profile-open check now run only the
-configured eligible pickup path. A Same-Home-only setup no longer writes or
-shows a spurious `Later Pickup not ready` state, and a Later-only setup no
-longer probes Same-Home Pickup. Both paths still use the same trusted-link
+configured eligible pickup path. A Home-only setup no longer writes or
+shows a spurious `Internet Pickup not ready` state, and an Internet-only setup no
+longer probes Home Pickup. Both paths still use the same trusted-link
 validation before anything applies.
 2026-06-21 trusted-link direction addendum: saved parent-trust links now label
 live sessions by local authority direction. Parent/source links still show
@@ -240,33 +240,33 @@ keeps the parent model direct and prevents mailbox/LAN/provider language from
 becoming the first mental model. The change does not add authority; it only
 reduces copy and layout pressure in the Accounts & Sync surface.
 The trusted-device status wording now follows that same parent model: the
-visible card says `Control`, `Check when profile opens`, and `Delivery receipts`
+visible card says `Control`, `Check for updates on open`, and `Delivery receipts`
 instead of `Direction`, separate `Open sync`/`Local network` rows, and raw
-remote delivery wording. The profile-open check can still report `Later Pickup`
-and `Same-Home Pickup` details when those optional providers are involved.
+remote delivery wording. The profile-open check can still report `Internet Pickup`
+and `Home Pickup` details when those optional providers are involved.
 Protocol names such as mailbox, local-network, provider, candidate, and ack
 remain in code, advanced docs, and tests where they describe exact transport
 boundaries; they are no longer the first label a parent has to understand.
 The Family Device Updates delivery-path strip now keeps the same parent model on
 the pairing surface itself: `Live update` is the default path when both devices
-are open. The first screen now says `If the other device opens later`, `Later
-over internet`, and `Same network` instead of leading with provider names. Setup
-buttons now use `Set Up Later Pickup` and `Set Up Same-Home Pickup` so the
-parent sees the task before the transport name. If Later Pickup or Same-Home
+are open. The first screen now says `If the other device opens later`, `Away or
+opens later`, and `Same network` instead of leading with provider names. Setup
+buttons now use `Set Up Internet Pickup` and `Set Up Home Pickup` so the
+parent sees the task before the transport name. If Internet Pickup or Home
 Pickup is already configured, the disclosure opens automatically to keep that
 existing send path visible. The strip is status and setup navigation only; it
 does not create hidden background sync, LAN discovery authority, or YouTube
 runtime work.
-When Later Pickup or Same-Home Pickup is configured, the same disclosure can show
+When Internet Pickup or Home Pickup is configured, the same disclosure can show
 `Check waiting parent updates` for a protected-device profile that has already
 saved a trusted parent link. That button only runs the existing manual
-`manual_saved_update_check` Later Pickup/Same-Home Pickup receive paths; it does
+`manual_saved_update_check` Internet Pickup/Home Pickup receive paths; it does
 not let the service, network, or UI bypass trusted-link validation, target
 profile matching, scope, revision, hash, signature, or local apply gates.
 Trusted-device cards also keep policy and transport readiness separate:
-`Check when profile opens` can be enabled on a saved parent link, but the manual
+`Check for updates on open` can be enabled on a saved parent link, but the manual
 check stays disabled as `Set Up Pickup First` and reports `Needs pickup setup`
-until a configured Later Pickup reader or Same-Home Pickup discovery provider is
+until a configured Internet Pickup reader or Home Pickup discovery provider is
 available. Live Send Update remains the normal path when both devices are open.
 The subscription-check slice changes URL-backed list refresh semantics from
 blind replacement to hash-aware checking. When a checked URL returns the same
@@ -308,7 +308,7 @@ state without exposing plaintext rule values:
 - latest redacted delivery attempt status/counts;
 - viewing-space and time-limit status.
 - verified child/protected-device link readiness for Send Update,
-  Same-Home Pickup, or Later Pickup delivery.
+  Home Pickup, or Internet Pickup delivery.
 
 ## Parent-Facing States
 
@@ -321,7 +321,7 @@ state without exposing plaintext rule values:
 | Locked parent/account | Status may render, but edits/history still require re-auth. | No admin controls. |
 | Offline or unreachable peer | Future transport UI should show stale/offline status without weakening policy. | No override. |
 | Verified device connected | Show the live/send-ready state; parent can push signed policy immediately after re-auth. | Receiving device still validates trusted link, signature, scope, revision, and target profile before apply. |
-| Send path unavailable | Show the verified device but explain that the send path is unavailable when no built-in Later Pickup/Same-Home Pickup provider is available. | Last accepted policy remains active; no weaker fallback applies. |
+| Send path unavailable | Show the verified device but explain that the send path is unavailable when no built-in Internet Pickup/Home Pickup provider is available. | Last accepted policy remains active; no weaker fallback applies. |
 | Sync conflict | Future transport UI should show conflict/rejected state from protected history. | No clear-history control. |
 
 ## UI Boundaries
@@ -395,14 +395,14 @@ state without exposing plaintext rule values:
   verified-device push when the changed protected profiles have delivery ready.
 - `Send Update` and `Send selected updates` use saved managed Source -> Replica
   links only. A live connected verified replica receives signed envelopes over
-  Nanah immediately. Optional Later Pickup/Same-Home Pickup providers receive ciphertext items or
+  Nanah immediately. Optional Internet Pickup/Home Pickup providers receive ciphertext items or
   signed local-network candidates only when those provider hooks exist.
-- Later Pickup and Same-Home Pickup setup rows are explanatory transport controls only and remain
+- Internet Pickup and Home Pickup setup rows are explanatory transport controls only and remain
   hidden from the normal parent command center unless a provider is already
   configured. The visible parent workflow is protected profile -> rules/access/
-  time -> verified-device Send Update. Later Pickup and Same-Home Pickup providers
+  time -> verified-device Send Update. Internet Pickup and Home Pickup providers
   remain optional advanced delivery hooks, not the default parent path.
-- The Delivery row preview is a redacted status summary only. It can say Send Update ready, Later Pickup set up, Same-Home Pickup set up, Send path unavailable, Re-pair
+- The Delivery row preview is a redacted status summary only. It can say Send Update ready, Internet Pickup set up, Home Pickup set up, Send path unavailable, Re-pair
   trusted device, Refresh trusted device, Review conflict first, or Pair only for another device;
   it does not contain rule text, policy JSON, hashes, keys, ciphertext, or
   mutation authority.
@@ -415,17 +415,17 @@ state without exposing plaintext rule values:
   local HTTP gateways, but discovery remains transport only; target trust,
   source key, scope, revision, hash, and signature validation still happen in
   the local managed-policy apply path.
-- `Set Up Later Pickup`/`Edit Later Pickup`
+- `Set Up Internet Pickup`/`Edit Internet Pickup`
   save or clear only the encrypted pick-up-later endpoint configuration after
   parent/account re-auth. They do not create a sync account, publish rules,
   expose tokens in the UI, or turn the mailbox server into policy authority.
   Status, history, and provider checks can still identify the precise transport
-  as Later Pickup.
-- `Set Up Same-Home Pickup`/`Edit Same-Home Pickup` save or clear only the explicit
+  as Internet Pickup.
+- `Set Up Home Pickup`/`Edit Home Pickup` save or clear only the explicit
   same-network bridge endpoint configuration after parent/account re-auth. They
   do not create authority from network reachability, expose tokens in the UI, or
   let a LAN gateway choose profiles/rules. Status, history, and provider checks
-  can still identify the precise transport as Same-Home Pickup where that precision is
+  can still identify the precise transport as Home Pickup where that precision is
   useful.
 - Send-path setup copy uses parent/user language and avoids presenting revision,
   hash, or signature details in the decision modal. Audit docs retain those
@@ -485,7 +485,7 @@ runtime managed command-center labeled delivery/device/history details: present
 runtime managed command-center delegated action intents: present
 runtime managed command-center redacted delivery preview: present
 runtime managed command-center latest delivery attempt summary: present as protected redacted history feedback
-runtime managed command-center latest history source labels: present for Parent edit, Approved list, Remote update, Send Update, Later Pickup, Same-Home Pickup, trusted-device, admin-access, and history rows
+runtime managed command-center latest history source labels: present for Parent edit, Approved list, Remote update, Send Update, Internet Pickup, Home Pickup, trusted-device, admin-access, and history rows
 runtime managed command-center redacted delivery-ack status: present
 runtime managed command-center selected-profile rule editor handoff: present via delegated runtime gate
 runtime managed command-center bulk time-limit controls: present via delegated runtime gate
@@ -506,8 +506,8 @@ runtime managed command-center blank mailbox endpoint disables provider config: 
 runtime managed command-center post-rule-write granular verified-device push: present with selected surface binding
 runtime managed command-center post-viewing/time-limit verified-device push: present
 runtime connected verified-device live P2P managed policy send: present
-runtime provider-gated Later Pickup/Same-Home Pickup delivery handoff from command center: present
-runtime Family Device Updates later-delivery disclosure: present and auto-opens only for configured Later Pickup/Same-Home Pickup providers
+runtime provider-gated Internet Pickup/Home Pickup delivery handoff from command center: present
+runtime Family Device Updates later-delivery disclosure: present and auto-opens only for configured Internet Pickup/Home Pickup providers
 runtime Family Device Updates manual waiting-update check: present through existing manual_saved_update_check receive helpers and saved trusted parent-link eligibility
 runtime automatic saved-update checks on dashboard/profile open: present through a non-blocking gated helper for matching protected-device receive targets or source-side delivery receipts
 runtime protected redacted push-attempt history rows: present
@@ -535,13 +535,13 @@ weakening the authority model:
 | Protection scan strip | Quickly see protected profile count, sync-ready profiles, profiles needing setup, time requests, and remote conflicts before acting. Copy avoids provider-first language: local control works now, and pairing is only needed when updates must reach another device. | Strip values are aggregate status only; they do not include rule text, policy payloads, keys, or mutation authority. |
 | Rule editing | Command-center row actions still enter the existing managed protected-profile editor, selected-profile bulk controls can hand off one selected protected profile to the same editor, and selected-profile bulk keyword/channel/video-ID additions can apply one reviewed rule to selected protected profiles. Parent/caregiver bulk rule writes choose YouTube Main or YouTube Kids with explicit buttons before value entry. Changed profiles with verified delivery can then push the matching rule scope immediately. | Writes must use the same validated local/remote managed-policy paths as current FilterTube controls; bulk rule writes require review confirmation, parent/account re-auth, per-target revision/history rows, selected Main/Kids surface binding for granular sends, and no child authority. |
 | Managed filter lists | Parent can use one `Lists` action to view imported-list summaries with title/version/last-checked/hash/source-format metadata, import pasted/file/public-HTTPS channel lists, import simple JSON lists with channel arrays, preview valid rows, apply them to selected protected profiles and Main/Kids surfaces, see compact list status, filter Main and Kids channel pages by `Manual`, `Imported lists`, or one saved list, pause/resume saved lists, see stale URL-backed list hints, use the row-level `Check Lists` action when a protected profile has stale URL-backed lists, check one/stale/all saved URL-backed lists manually, refresh changed source hashes, send checked freshness/status metadata to verified devices even when rule rows are unchanged, remove list-derived rows without touching manual rules, and push resulting channel policy changes to verified devices. Future UI should add scheduled subscription refresh. | A list URL/file/JSON document is only a rule source. It must not become authority, executable code, or an invisible global block. Parent/admin approval, source labeling, source-format labeling, display-only source metadata, revision/hash metadata, hash-aware no-row-churn checks, disable/revert behavior, and protected action history are required. |
-| Remote send | Parent can send one protected profile or selected protected profiles to saved verified devices and see whether the next attempt is live, later via Same-Home Pickup/Later Pickup, blocked by conflict, blocked by stale/revoked pairing, missing a verified device, or has redacted source-side delivery receipt feedback. Row copy now says `Pair to sync` / `Pair only for another device` so parents do not read Later Pickup/Same-Home Pickup as required setup. The row also shows the latest redacted send attempt from protected history so parents can see success, partial delivery, no-link, and unavailable-send-path outcomes without opening the detailed history modal. | Delivery links, preview labels, latest-attempt labels, and ack labels are not authority; each envelope still requires Source -> Replica trust, fixed target profile, allowed scope, signature/integrity proof, and newer revision/hash. |
+| Remote send | Parent can send one protected profile or selected protected profiles to saved verified devices and see whether the next attempt is live, later via Home Pickup/Internet Pickup, blocked by conflict, blocked by stale/revoked pairing, missing a verified device, or has redacted source-side delivery receipt feedback. Row copy now says `Pair to sync` / `Pair only for another device` so parents do not read Internet Pickup/Home Pickup as required setup. The row also shows the latest redacted send attempt from protected history so parents can see success, partial delivery, no-link, and unavailable-send-path outcomes without opening the detailed history modal. | Delivery links, preview labels, latest-attempt labels, and ack labels are not authority; each envelope still requires Source -> Replica trust, fixed target profile, allowed scope, signature/integrity proof, and newer revision/hash. |
 | Conflict review | `Review Conflict` opens a parent/account re-authed conflict review modal that filters history to conflict and rejected remote-policy rows first. | This is read-only redacted history triage; it does not resolve, clear, merge, retry, or accept policy. |
-| Later Pickup | Parent can configure, edit, or clear the HTTPS pick-up-later endpoint from the command center after parent/account re-auth. | The endpoint stores only encrypted pending-update rows and metadata; it cannot read policy, choose targets, bypass trust, or become authority. |
+| Internet Pickup | Parent can configure, edit, or clear the HTTPS pick-up-later endpoint from the command center after parent/account re-auth. | The endpoint stores only encrypted pending-update rows and metadata; it cannot read policy, choose targets, bypass trust, or become authority. |
 | Viewing spaces | Show Main, Kids, both, or neither per protected profile; row actions still change policy and selected-profile bulk actions can apply Main + Kids, Kids only, or Main only locally, then offer a scoped verified-device push when delivery exists. | UI choice is not authority; runtime route gate remains the enforcement layer; every selected target gets its own redacted revision/history row after parent re-auth. |
 | Time limits | Show daily YouTube budget state; command-center row actions still set/disable one profile, can add temporary extra time to one active limit, and bulk selected-profile actions can apply the same daily budget, disable existing limits, or add temporary extra time to selected active limits, then offer a scoped verified-device push when delivery exists. Daily limits now use preset choices for 30 minutes, 1 hour, 2 hours, parent-approval/0 minutes, or custom minutes; extra-time grants use 15 minute, 30 minute, 1 hour, or custom choices. | Runtime budget accounting remains background-owned; every target gets its own revision/history row after parent re-auth, zero-minute daily limits remain valid immediate-timeout policies, and extra-time grants are bounded by expiry. |
-| Sync status | Show trusted device, delivery preview, Same-Home Pickup, Nanah open-sync, and Later Pickup status. | Reachability is never authorization; offline state keeps the last valid policy active. |
-| Action history | Show accepted, rejected, conflict, failed-auth, and expired-session counts/latest labels. Latest labels include the safe source category, such as Parent edit, Approved list, Remote update, Send Update, Later Pickup, Same-Home Pickup, trusted-device, admin-access, or history, so parents can tell whether a change was manual/list-derived/remote/sent without opening raw policy data. Detailed history remains gated by the History action. Time-limit updates and protected extra-time requests show redacted daily budget, used/remaining time, Main/Kids surface, date, parent-grant counts, and whether a parent grant answered a pending request. | History stays redacted, protected by parent/account re-auth, and never becomes policy authority. Source labels are display context only and cannot grant delivery, rule, profile, or trust authority. |
+| Sync status | Show trusted device, delivery preview, Home Pickup, Nanah open-sync, and Internet Pickup status. | Reachability is never authorization; offline state keeps the last valid policy active. |
+| Action history | Show accepted, rejected, conflict, failed-auth, and expired-session counts/latest labels. Latest labels include the safe source category, such as Parent edit, Approved list, Remote update, Send Update, Internet Pickup, Home Pickup, trusted-device, admin-access, or history, so parents can tell whether a change was manual/list-derived/remote/sent without opening raw policy data. Detailed history remains gated by the History action. Time-limit updates and protected extra-time requests show redacted daily budget, used/remaining time, Main/Kids surface, date, parent-grant counts, and whether a parent grant answered a pending request. | History stays redacted, protected by parent/account re-auth, and never becomes policy authority. Source labels are display context only and cannot grant delivery, rule, profile, or trust authority. |
 | Multi-profile apply | Present for selected-profile rule editor handoff, same-budget local time-limit changes, same-access local viewing-space changes, selected-profile keyword/channel/video-ID rule additions, and selected-profile signed-policy sends on selected protected profiles. The command center groups selected-profile actions into Rules, Send, Time, and Access so parent/caregiver bulk work stays scannable without adding a separate page. | Local bulk rule writes are one reviewed rule at a time and every local or remote target still needs its own target profile, revision/history row, and authority gate; remote sends additionally require trusted link, scope, revision, hash, and signature/integrity proof. Group labels are navigation aids only and do not create authority. |
 
 Required UI states for that slice:
@@ -551,9 +551,9 @@ Required UI states for that slice:
 - successful local save status through row summaries/history;
 - pending P2P/local-network delivery;
 - connected verified-device send success;
-- redacted latest delivery attempt feedback for Send Update/Same-Home Pickup/Later Pickup/partial/no-link/unavailable-send-path;
+- redacted latest delivery attempt feedback for Send Update/Home Pickup/Internet Pickup/partial/no-link/unavailable-send-path;
 - redacted source-side delivery ack status;
-- unavailable send path when the extension has no Later Pickup/Same-Home Pickup provider hook;
+- unavailable send path when the extension has no Internet Pickup/Home Pickup provider hook;
 - configured, invalid, and disabled mailbox endpoint states;
 - offline trusted device;
 - rejected or conflicted remote update;
