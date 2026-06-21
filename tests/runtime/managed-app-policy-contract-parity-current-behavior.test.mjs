@@ -131,10 +131,10 @@ test('managed app policy parity doc records extension-owned app contract artifac
   assert.deepEqual(
     contract.managedDelivery.familyDeviceMapUiModel,
     {
-      identity: 'one_family_device_map_for_live_home_and_internet_devices',
+      identity: 'one_family_device_map_for_live_same_network_and_internet_devices',
       states: [
         'live_now_send_update',
-        'same_home_home_pickup',
+        'same_network_home_pickup',
         'away_or_internet_internet_pickup',
         'offline_last_valid_policy'
       ],
@@ -144,7 +144,7 @@ test('managed app policy parity doc records extension-owned app contract artifac
   assert.deepEqual(
     contract.managedDelivery.requiredUiBoundaries,
     [
-      'one_family_device_map_represents_live_home_and_internet_devices',
+      'one_family_device_map_represents_live_same_network_and_internet_devices',
       'normal_parent_ui_uses_family_devices_send_update_internet_pickup_home_pickup_labels',
       'advanced_details_may_show_encrypted_mailbox_lan_provider_terms',
       'protected_user_ui_never_exposes_delivery_setup_controls',

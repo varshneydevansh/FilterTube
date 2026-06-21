@@ -1020,6 +1020,11 @@ parent tool instead of a sync/debug console.
   Controls device map now uses `Same-network device - Home Pickup` and
   `Same-network + internet` instead of home-only labels. This keeps clinics,
   schools, and other caregiver networks in the same verified-device map model.
+- [x] 2026-06-21 app-contract same-network map slice: the managed app policy
+  contract and verifier now use `same_network_home_pickup` and
+  `one_family_device_map_for_live_same_network_and_internet_devices` instead of
+  home-only state ids. This keeps downstream app parity aligned with the
+  extension's Family Device map wording.
 - [ ] Native Android/iOS settings-lock and timeout UI parity. This belongs in
   the downstream app sync/runtime lane.
 

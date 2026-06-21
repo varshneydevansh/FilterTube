@@ -13968,7 +13968,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const okAdmin = await ensureProfileUnlocked(root, currentActiveProfileId, { sensitiveAction: true });
         if (!okAdmin) {
-            await recordManagedAdminAuthFailureHistoryForManageableProfiles('same_home_pickup_config_unlock_failed');
+            await recordManagedAdminAuthFailureHistoryForManageableProfiles('same_network_pickup_config_unlock_failed');
             return;
         }
         const current = readNanahManagedLocalNetworkProviderConfig();

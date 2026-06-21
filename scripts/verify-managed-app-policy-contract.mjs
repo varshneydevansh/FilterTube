@@ -105,10 +105,10 @@ assertDeepEqual(
   "managed delivery family device map UI model",
   docContract.managedDelivery?.familyDeviceMapUiModel,
   {
-    identity: "one_family_device_map_for_live_home_and_internet_devices",
+    identity: "one_family_device_map_for_live_same_network_and_internet_devices",
     states: [
       "live_now_send_update",
-      "same_home_home_pickup",
+      "same_network_home_pickup",
       "away_or_internet_internet_pickup",
       "offline_last_valid_policy",
     ],
@@ -118,7 +118,7 @@ assertDeepEqual(
 assertIncludes(
   "managed delivery UI boundaries",
   docContract.managedDelivery?.requiredUiBoundaries,
-  "one_family_device_map_represents_live_home_and_internet_devices",
+  "one_family_device_map_represents_live_same_network_and_internet_devices",
 );
 assertIncludes(
   "managed delivery UI boundaries",
