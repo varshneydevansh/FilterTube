@@ -37,11 +37,12 @@ Use these terms in release notes and support replies:
 | Home Pickup | Local-network pickup provider | A compatible home/school/clinic pickup service on the same network can hold or relay signed updates for already trusted protected devices. |
 
 Use the same Family Device Map for devices that are ready now, same-home, or
-away/later. Do not describe Home Pickup as Wi-Fi authority, automatic LAN
-control, or a network scan. Do not describe Internet Pickup as hosted authority or
-always-on sync. The protected device still validates trusted link, target
-profile, scope, revision, device binding, policy hash, and signature before
-applying anything.
+away/later. Internet/away devices stay on that same map after pairing; they do
+not get a separate remote-admin screen or weaker authority model. Do not
+describe Home Pickup as Wi-Fi authority, automatic LAN control, or a network
+scan. Do not describe Internet Pickup as hosted authority or always-on sync. The
+protected device still validates trusted link, target profile, scope, revision,
+device binding, policy hash, and signature before applying anything.
 
 ## Automated Preflight
 
@@ -93,13 +94,14 @@ Required manual rows:
 | 3. Rule-list import | Import or refresh CSV/TXT/JSON/URL list data, preview accepted and skipped rows, apply to Main, Kids, or both, and confirm imported rows show source metadata. |
 | 4. Viewing space | Set Main-only, Kids-only, or Main + Kids. Confirm the blocked viewing space is route-gated before the protected user can use YouTube there. |
 | 5. Time limit | Set a daily YouTube limit and a zero/reduced budget. Confirm YouTube is blocked by the FilterTube timeout screen when the budget is exhausted. |
-| 6. Live Send Update | Pair parent and protected devices, verify the same phrase, send the reviewed protected-profile update, and confirm the protected device applies only the newer signed policy. |
-| 7. Offline policy | Disconnect delivery and confirm the protected device keeps the last accepted policy active. |
-| 8. Internet Pickup | If configured, send a saved update through the explicit HTTPS provider and confirm profile-open pickup applies only after local trusted-link validation. |
-| 9. Home Pickup | If configured, send or discover through the explicit local provider and confirm same-network reachability alone does not grant authority. |
-| 10. Rejection path | Try a stale, wrong-target, revoked-link, or wrong-key update and confirm it is rejected without weakening the active policy. |
-| 11. Action history | Confirm parent-visible history records accepted/rejected outcomes without PINs, private keys, plaintext rule values, raw policy JSON, decrypted payloads, or ciphertext blobs. |
-| 12. No-work performance | With no eligible provider or pending policy, open YouTube and confirm there are no provider polling loops, LAN fetch loops, new YouTube observers, or visible lag from managed-control code. |
+| 6. Family Device Map | Confirm live, same-home, and away/internet devices appear as states on the same map after pairing, not as separate authority models. |
+| 7. Live Send Update | Pair parent and protected devices, verify the same phrase, send the reviewed protected-profile update, and confirm the protected device applies only the newer signed policy. |
+| 8. Offline policy | Disconnect delivery and confirm the protected device keeps the last accepted policy active. |
+| 9. Internet Pickup | If configured, send a saved update through the explicit HTTPS provider and confirm profile-open pickup applies only after local trusted-link validation. |
+| 10. Home Pickup | If configured, send or discover through the explicit local provider and confirm same-network reachability alone does not grant authority. |
+| 11. Rejection path | Try a stale, wrong-target, revoked-link, or wrong-key update and confirm it is rejected without weakening the active policy. |
+| 12. Action history | Confirm parent-visible history records accepted/rejected outcomes without PINs, private keys, plaintext rule values, raw policy JSON, decrypted payloads, or ciphertext blobs. |
+| 13. No-work performance | With no eligible provider or pending policy, open YouTube and confirm there are no provider polling loops, LAN fetch loops, new YouTube observers, or visible lag from managed-control code. |
 
 ## Timeout Screen Expectation
 
@@ -122,7 +124,9 @@ Allowed after this smoke passes for one transport:
 ```text
 Managed parent/caregiver controls support local protected-profile rules,
 viewing-space gates, daily YouTube time limits, protected action history, and
-verified-device Send Update for the tested transport.
+verified-device delivery through the tested path. The Family Device Map can be
+described as one shared UI model across live, home, and internet devices, but
+each delivery path still needs its own smoke proof before release claims.
 ```
 
 Still not allowed unless separately proven:
@@ -141,6 +145,7 @@ untrusted public lists applying without parent review
 
 ```text
 local protected-profile authority: GO for extension-owned flows
+Family Device Map model: GO as one shared UI model
 live Nanah Send Update: GO after installed two-device smoke
 Internet Pickup: GO only with explicit configured-provider smoke
 Home Pickup: GO only with explicit configured-provider smoke

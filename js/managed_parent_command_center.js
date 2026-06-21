@@ -835,7 +835,7 @@
         const title = document.createElement('strong');
         title.textContent = 'Family device map';
         const detail = document.createElement('span');
-        detail.textContent = 'Each tile is a protected profile or device you can manage. The same map covers Send Update, Home Pickup, and Internet Pickup for nearby or internet devices after pairing.';
+        detail.textContent = 'Each tile is a protected profile or device you can manage. Internet devices stay on the same family map as live and home devices after pairing; pickup paths only carry signed updates.';
         copy.append(title, detail);
 
         const ring = document.createElement('div');
