@@ -1001,6 +1001,12 @@ parent tool instead of a sync/debug console.
   provider-hook proof doc now uses `Home Pickup` for parent-facing status,
   setup, and saved-update language while preserving internal compatibility names
   like `checkManagedLocalNetworkBridge`.
+- [x] 2026-06-21 remote-delivery readiness wording slice: the remote-delivery
+  release gate now describes one Family Device map that can show live devices,
+  same-network Home Pickup devices, and away/internet Internet Pickup devices.
+  The gate keeps internal proof ids such as `encrypted_mailbox` and
+  `local_network_provider`, but release-facing wording no longer treats
+  mailbox/LAN/provider terms as parent authority or separate device systems.
 - [ ] Native Android/iOS settings-lock and timeout UI parity. This belongs in
   the downstream app sync/runtime lane.
 
