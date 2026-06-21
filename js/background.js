@@ -1562,6 +1562,94 @@ const MANAGED_ACTION_HISTORY_ACCEPTED_RETENTION_MS = 30 * MANAGED_ACTION_HISTORY
 const MANAGED_ACTION_HISTORY_PROTECTED_RETENTION_MS = 90 * MANAGED_ACTION_HISTORY_DAY_MS;
 const MANAGED_ACTION_HISTORY_PROTECTED_RESULTS = new Set(['rejected', 'conflict', 'failed_auth', 'expired_session', 'cleared_by_admin']);
 const MANAGED_ACTION_HISTORY_PROTECTED_ACTIONS = new Set(['trust_link.revoke', 'trust_link.key_revoke', 'managed_signing_key.rotate', 'admin_session.failed_unlock', 'admin_session.lock', 'policy.time_limit.update', 'policy.time_limit.request_extra', 'policy.viewing_space.update', 'policy.channel_list.import', 'policy.channel_list.remove', 'policy.channel_list.check', 'policy.channel_list.refresh', 'policy.channel_list.pause', 'policy.channel_list.resume', 'remote_policy.source_push']);
+const MANAGED_ACTION_HISTORY_SUMMARY_PRIVACY_SCHEMA = 'filtertube_managed_action_history_summary_privacy';
+const MANAGED_ACTION_HISTORY_ENCRYPTED_SUMMARY_SCHEMA = 'filtertube_managed_action_history_encrypted_summary';
+const MANAGED_ACTION_HISTORY_SAFE_LABELS = Object.freeze({
+    'policy.time_limit.request_extra': 'Extra time requested',
+    'policy.time_limit.update': 'Time limit policy changed',
+    'policy.viewing_space.update': 'Viewing space policy changed',
+    'admin_session.failed_unlock': 'Admin unlock failed',
+    'admin_session.lock': 'Admin session locked',
+    'trust_link.revoke': 'Trusted link removed',
+    'trust_link.key_revoke': 'Trusted link key revoked',
+    'managed_signing_key.rotate': 'Managed signing key rotated',
+    'remote_policy.source_push': 'Parent policy push'
+});
+const MANAGED_ACTION_HISTORY_SUMMARY_SAFE_NUMBER_KEYS = new Set([
+    'clearedAcceptedRows',
+    'consumedSeconds',
+    'dailyBudgetSeconds',
+    'deliveredCount',
+    'failedCount',
+    'changedCount',
+    'addedCount',
+    'duplicateCount',
+    'kidsRuleCount',
+    'listEntryCount',
+    'linkCount',
+    'liveSentCount',
+    'localNetworkDeliveredCount',
+    'mainRuleCount',
+    'mailboxUploadedCount',
+    'mailboxPurgedCount',
+    'noLinkCount',
+    'nextKeyVersion',
+    'parentGrantSeconds',
+    'providerMissingCount',
+    'previousKeyVersion',
+    'protectedRows',
+    'removedCount',
+    'remoteFailedAttemptLimit',
+    'remoteFailedAttempts',
+    'removedScopeCount',
+    'revokedLinkCount',
+    'retainedProtectedRows',
+    'retryAt',
+    'remainingSeconds',
+    'ruleCount',
+    'selectedProfileCount',
+    'sentCount',
+    'skippedCount',
+    'targetCount',
+    'totalCount'
+]);
+const MANAGED_ACTION_HISTORY_SUMMARY_SAFE_BOOLEAN_KEYS = new Set([
+    'hasPolicy',
+    'hasTimeLimit',
+    'kidsEnabled',
+    'localNetworkConfigured',
+    'mainEnabled',
+    'mailboxConfigured',
+    'rateLimited',
+    'redacted'
+]);
+const MANAGED_ACTION_HISTORY_SUMMARY_SAFE_STRING_KEYS = new Set([
+    'endpointHost',
+    'label',
+    'scope',
+    'deliveryStatus',
+    'dateKey',
+    'profileName',
+    'surface',
+    'timezone',
+    'transport'
+]);
+const MANAGED_ACTION_HISTORY_SUMMARY_SAFE_STRING_ARRAY_KEYS = new Set([
+    'removedScopes',
+    'transports'
+]);
+const MANAGED_ACTION_HISTORY_ENCRYPTED_SUMMARY_FORBIDDEN_KEYS = new Set([
+    'channels',
+    'keywords',
+    'label',
+    'operations',
+    'payload',
+    'plaintext',
+    'plaintextValue',
+    'ruleValue',
+    'summary',
+    'videoIds'
+]);
 const MANAGED_TIME_PARENT_REQUEST_COOLDOWN_MS = 5 * 60 * 1000;
 const MANAGED_TIME_HEARTBEAT_STALE_MS = 8000;
 const MANAGED_TIME_MAX_HEARTBEAT_DELTA_SECONDS = 10;
@@ -1665,9 +1753,111 @@ function getManagedActionHistoryRetentionMsForBackground(row) {
     return MANAGED_ACTION_HISTORY_ACCEPTED_RETENTION_MS;
 }
 
+function sanitizeManagedActionHistorySummaryValueForBackground(key, value) {
+    if (MANAGED_ACTION_HISTORY_SUMMARY_SAFE_NUMBER_KEYS.has(key)) {
+        const numeric = Number(value);
+        return Number.isFinite(numeric) ? Math.max(0, Math.floor(numeric)) : null;
+    }
+    if (MANAGED_ACTION_HISTORY_SUMMARY_SAFE_BOOLEAN_KEYS.has(key)) {
+        return value === true;
+    }
+    if (MANAGED_ACTION_HISTORY_SUMMARY_SAFE_STRING_KEYS.has(key)) {
+        const normalized = normalizeString(value);
+        return normalized ? normalized.slice(0, 160) : null;
+    }
+    if (MANAGED_ACTION_HISTORY_SUMMARY_SAFE_STRING_ARRAY_KEYS.has(key)) {
+        const items = safeArray(value)
+            .map(item => normalizeString(item))
+            .filter(Boolean)
+            .map(item => item.replace(/[^a-zA-Z0-9_.:-]+/g, '_').slice(0, 64))
+            .filter(Boolean)
+            .slice(0, 12);
+        return items.length ? items : null;
+    }
+    return null;
+}
+
+function sanitizeManagedEncryptedSummaryTokenForBackground(value, maxLength) {
+    const normalized = normalizeString(value);
+    if (!normalized || normalized.length > maxLength) return '';
+    return /^[a-zA-Z0-9_.:+/=-]+$/.test(normalized) ? normalized : '';
+}
+
+function sanitizeManagedActionHistoryEncryptedSummaryForBackground(value) {
+    const root = safeObject(value);
+    if (root.schema !== MANAGED_ACTION_HISTORY_ENCRYPTED_SUMMARY_SCHEMA) return null;
+    for (const key of Object.keys(root)) {
+        if (MANAGED_ACTION_HISTORY_ENCRYPTED_SUMMARY_FORBIDDEN_KEYS.has(key)) return null;
+    }
+    const cipherSuite = sanitizeManagedEncryptedSummaryTokenForBackground(root.cipherSuite || root.algorithm, 80);
+    const keyId = sanitizeManagedEncryptedSummaryTokenForBackground(root.keyId || root.wrappingKeyId, 128);
+    const nonce = sanitizeManagedEncryptedSummaryTokenForBackground(root.nonce || root.iv, 256);
+    const ciphertext = sanitizeManagedEncryptedSummaryTokenForBackground(root.ciphertext, 4096);
+    const ciphertextHash = sanitizeManagedEncryptedSummaryTokenForBackground(root.ciphertextHash || root.hash, 160);
+    if (!cipherSuite || !keyId || !nonce || !ciphertext || !ciphertextHash) return null;
+    const createdAt = normalizeNonNegativeInteger(root.createdAt);
+    return {
+        schema: MANAGED_ACTION_HISTORY_ENCRYPTED_SUMMARY_SCHEMA,
+        version: 1,
+        cipherSuite,
+        keyId,
+        nonce,
+        ciphertext,
+        ciphertextHash,
+        ...(createdAt ? { createdAt } : {})
+    };
+}
+
+function sanitizeManagedActionHistorySummaryForBackground(summary, actionType, sensitive) {
+    const root = safeObject(summary);
+    const safeLabel = MANAGED_ACTION_HISTORY_SAFE_LABELS[actionType] || actionType || 'Managed action';
+    const next = {
+        redacted: true,
+        label: sensitive === true ? safeLabel : (normalizeString(root.label) || safeLabel).slice(0, 160)
+    };
+    Object.entries(root).forEach(([key, value]) => {
+        if (key === 'label' || key === 'redacted' || key === 'summaryPrivacy' || key === 'encryptedSummary') return;
+        const sanitized = sanitizeManagedActionHistorySummaryValueForBackground(key, value);
+        if (sanitized == null) return;
+        next[key] = sanitized;
+    });
+    const encryptedSummary = sanitizeManagedActionHistoryEncryptedSummaryForBackground(root.encryptedSummary);
+    if (encryptedSummary) {
+        next.encryptedSummary = encryptedSummary;
+    }
+    next.summaryPrivacy = {
+        schema: MANAGED_ACTION_HISTORY_SUMMARY_PRIVACY_SCHEMA,
+        version: 1,
+        redacted: true,
+        encrypted: !!encryptedSummary,
+        plaintextPolicy: encryptedSummary
+            ? 'safe_counts_status_transport_and_ciphertext_only'
+            : 'safe_counts_status_and_transport_only'
+    };
+    return next;
+}
+
+function sanitizeManagedActionHistoryRowForBackground(row) {
+    const root = safeObject(row);
+    const actionType = normalizeString(root.actionType);
+    const sensitive = root.sensitive !== false;
+    return {
+        ...root,
+        schema: MANAGED_ACTION_HISTORY_SCHEMA,
+        version: 1,
+        actionType,
+        scope: normalizeString(root.scope) || 'policy',
+        result: normalizeString(root.result) || 'unknown',
+        reason: normalizeString(root.reason) || null,
+        sensitive,
+        summary: sanitizeManagedActionHistorySummaryForBackground(root.summary, actionType, sensitive)
+    };
+}
+
 function pruneManagedActionHistoryRowsForBackground(rows, now = nowTs()) {
     return safeArray(rows)
         .filter(row => safeObject(row).schema === MANAGED_ACTION_HISTORY_SCHEMA)
+        .map(sanitizeManagedActionHistoryRowForBackground)
         .filter((row) => {
             const timestamp = getManagedActionHistoryRowTimeForBackground(row);
             if (timestamp == null) return true;
