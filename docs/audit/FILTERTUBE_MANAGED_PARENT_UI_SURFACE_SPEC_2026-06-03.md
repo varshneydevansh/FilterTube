@@ -80,6 +80,12 @@ trust map now use those same parent-facing labels in visible text, status rows,
 and screen-reader labels. `Later Pickup` covers internet later-delivery devices;
 `Same-Home Pickup` covers explicitly configured same-network bridge devices.
 Both remain delivery states only, not authority.
+2026-06-21 legacy parent-trust edit addendum: when editing an older managed
+Source -> Replica parent link that lacks the newer parent-managed fields, the
+edit modal now proposes the current safe defaults: matching parent updates,
+fast reconnect, locked-profile trusted updates, profile-open checks, and
+standard parent-managed protection. Explicit saved values remain authoritative,
+so a parent's existing off/strict choices are not silently changed.
 The first implementation slice now supports local pasted/text-file channel list
 imports from the command center. It skips name-only rows for safety, applies
 valid channel identifiers through the existing profile channel-rule arrays,

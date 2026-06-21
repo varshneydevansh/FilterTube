@@ -12585,6 +12585,35 @@ document.addEventListener('DOMContentLoaded', async () => {
             || 'Protected profile';
     }
 
+    function hasOwnNanahPolicyField(policy, field) {
+        return Object.prototype.hasOwnProperty.call(safeObject(policy), field);
+    }
+
+    function applyNanahManagedReplicaPolicyEditDefaults(normalizedPolicy, originalPolicy, originalRoot) {
+        const next = {
+            ...safeObject(normalizedPolicy)
+        };
+        const original = safeObject(originalPolicy);
+        const root = safeObject(originalRoot);
+        const hasExplicitField = (field) => hasOwnNanahPolicyField(original, field) || hasOwnNanahPolicyField(root, field);
+        if (!hasExplicitField('autoApplyControlProposals')) {
+            next.autoApplyControlProposals = true;
+        }
+        if (!hasExplicitField('reconnectMode')) {
+            next.reconnectMode = 'fast';
+        }
+        if (!hasExplicitField('lockedChildMode')) {
+            next.lockedChildMode = 'allow_trusted_updates';
+        }
+        if (!hasExplicitField('syncOnProfileOpen')) {
+            next.syncOnProfileOpen = true;
+        }
+        if (!hasExplicitField('childProtectionLevel')) {
+            next.childProtectionLevel = 'standard';
+        }
+        return next;
+    }
+
     function syncNanahManagedTargetOptions(scope = getNanahScope()) {
         if (!ftNanahManagedTargetsField || !ftNanahManagedTargets) return [];
         const selectedBefore = new Set(getNanahSelectedManagedTargetLinkIds());
@@ -15659,11 +15688,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const currentPolicy = safeObject(trusted.policy);
+        const originalRoot = safeObject(link);
+        const originalPolicy = safeObject(originalRoot.policy);
+        const initialPolicy = trusted.localRole === 'replica' && trusted.remoteRole === 'source'
+            ? applyNanahManagedReplicaPolicyEditDefaults(currentPolicy, originalPolicy, originalRoot)
+            : currentPolicy;
         const nextPolicyDecision = await showNanahManagedLinkModal({
             title: 'Edit Parent Trust',
             message: `Adjust what ${normalizeString(trusted.deviceLabel) || 'this device'} may receive through this parent trust link.`,
             intro: `Current link: ${getNanahStrategyLabel(currentPolicy.applyMode || 'merge')} on ${describeNanahScopeList(currentPolicy.allowedScopes || currentPolicy.defaultScope || 'active')}.`,
-            initialPolicy: currentPolicy,
+            initialPolicy,
             allowApplyOnce: false,
             allowSave: true,
             saveLabel: 'Save Policy',
