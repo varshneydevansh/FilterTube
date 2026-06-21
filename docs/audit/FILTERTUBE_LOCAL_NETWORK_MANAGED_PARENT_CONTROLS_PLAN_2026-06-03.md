@@ -886,6 +886,12 @@ parent tool instead of a sync/debug console.
     or away-over-internet devices. This is copy-only; provider contracts,
     trusted-link validation, target-profile binding, revisions, hashes, and
     signatures remain unchanged.
+  - [x] 2026-06-21 public docs/release-copy map slice: README, Functionality,
+    Technical, and shared release notes now use `Send Update` instead of the
+    older `Send Now` label and explicitly state that the Family Device map covers
+    nearby, same-home, and away/internet devices after pairing. This is
+    copy-only; live Nanah, Same-Home Pickup, and Later Pickup authority gates are
+    unchanged.
   - [x] 2026-06-21 pickup setup label slice: configured Later Pickup and
     Same-Home Pickup summaries now say `set up` instead of `ready`. This avoids
     implying guaranteed delivery from endpoint configuration alone; protected
