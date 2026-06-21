@@ -61,6 +61,7 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(runner, /MANAGED_REMOTE_DELIVERY_SMOKE_REQUIRED_ROWS/);
   assert.match(runner, /Managed remote delivery smoke artifact handoff/);
   assert.match(runner, /MANAGED_APP_PARITY_SMOKE_ARTIFACT_TEMPLATE/);
+  assert.match(runner, /MANAGED_APP_PARITY_SMOKE_ARTIFACT_GENERATOR/);
   assert.match(runner, /MANAGED_APP_PARITY_SMOKE_ARTIFACT_VERIFIER/);
   assert.match(runner, /MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS/);
   assert.match(runner, /Managed app parity smoke artifact handoff/);
@@ -106,7 +107,8 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(matrix, /[Oo]ne passing managed remote-delivery artifact proves\s+only one transport slice/);
   assert.match(matrix, /Managed app parity changes receive their own installed-app smoke handoff/);
   assert.match(matrix, /docs\/audit\/artifacts\/managed-app-parity-smoke\/template\.json/);
-  assert.match(matrix, /[Oo]ne passing managed app parity artifact proves\s+only one installed app platform/);
+  assert.match(matrix, /scripts\/create-managed-app-parity-smoke-artifact\.mjs/);
+  assert.match(matrix, /[Oo]ne passing managed\s+app parity artifact proves\s+only one installed app platform/);
   assert.match(matrix, /reports whether a changed\s+`docs\/audit\/` proof file is present/);
   assert.match(matrix, /fails\s+when source, release, asset, or product-doc paths changed without a matching\s+`docs\/audit\/` proof file/);
   assert.match(matrix, /fails when changed\s+`docs\/audit\/` proof does not share\s+at least one non-smoke lane/);
@@ -286,6 +288,7 @@ test('classifier output surfaces managed app parity smoke handoff for native par
     assert.equal(result.status, 0, result.stderr);
     assert.match(result.stdout, /Managed app parity smoke artifact handoff:/);
     assert.match(result.stdout, /template: docs\/audit\/artifacts\/managed-app-parity-smoke\/template\.json/);
+    assert.match(result.stdout, /generate: npm run managed:app-parity-smoke -- --input <redacted-app-smoke\.json> --confirm-installed-app-smoke-passed/);
     assert.match(result.stdout, /verifier: node docs\/audit\/artifacts\/managed-app-parity-smoke\/verify-managed-app-parity-smoke-artifact\.mjs docs\/audit\/artifacts\/managed-app-parity-smoke\/<artifact>\.json/);
     assert.match(result.stdout, /FT-MANAGED-APP-00-contract-sync/);
     assert.match(result.stdout, /FT-MANAGED-APP-11-native-settings-lock/);

@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 
 import { LANES, classifyPaths } from '../../scripts/run-test-lane.mjs';
 import {
+  MANAGED_APP_PARITY_SMOKE_ARTIFACT_GENERATOR,
   MANAGED_APP_PARITY_SMOKE_ARTIFACT_TEMPLATE,
   MANAGED_APP_PARITY_SMOKE_ARTIFACT_VERIFIER,
   MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS
@@ -161,6 +162,10 @@ test('managed app parity smoke verifier is wired into release settings and smoke
   assert.ok(LANES.settings.tests.includes('tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs'));
   assert.ok(LANES.smoke.tests.includes('tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs'));
   assert.equal(MANAGED_APP_PARITY_SMOKE_ARTIFACT_TEMPLATE, templatePath);
+  assert.equal(
+    MANAGED_APP_PARITY_SMOKE_ARTIFACT_GENERATOR,
+    'npm run managed:app-parity-smoke -- --input <redacted-app-smoke.json> --confirm-installed-app-smoke-passed'
+  );
   assert.equal(
     MANAGED_APP_PARITY_SMOKE_ARTIFACT_VERIFIER,
     'node docs/audit/artifacts/managed-app-parity-smoke/verify-managed-app-parity-smoke-artifact.mjs docs/audit/artifacts/managed-app-parity-smoke/<artifact>.json'

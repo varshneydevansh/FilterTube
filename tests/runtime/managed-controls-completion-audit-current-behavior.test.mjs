@@ -80,7 +80,8 @@ test('managed controls completion audit links to current proof families and rema
     'tests/runtime/managed-extension-installed-smoke-artifact-verifier-current-behavior.test.mjs',
     'tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs',
     'tests/runtime/managed-native-runtime-sync-handoff-current-behavior.test.mjs',
-    'tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs'
+    'tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs',
+    'tests/runtime/managed-app-parity-smoke-artifact-generator-current-behavior.test.mjs'
   ]) {
     assert.ok(doc.includes(proof), `missing linked proof ${proof}`);
   }

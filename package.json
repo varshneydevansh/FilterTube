@@ -15,6 +15,7 @@
     "managed:extension-smoke": "node scripts/create-managed-extension-installed-smoke-artifact.mjs",
     "managed:native-handoff": "node scripts/create-managed-native-runtime-sync-handoff.mjs",
     "managed:provider-ownership": "node scripts/create-managed-pickup-provider-ownership-artifact.mjs",
+    "managed:app-parity-smoke": "node scripts/create-managed-app-parity-smoke-artifact.mjs",
     "managed:provider": "node scripts/managed-delivery-provider.mjs",
     "test": "node scripts/run-test-lane.mjs smoke",
     "audit:runtime": "node --test tests/runtime/*.test.mjs",

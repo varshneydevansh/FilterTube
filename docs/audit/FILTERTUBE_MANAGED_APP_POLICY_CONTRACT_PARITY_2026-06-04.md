@@ -654,6 +654,11 @@ adapter proof.
 Installed app smoke is now pinned as a separate release handoff at
 `docs/audit/artifacts/managed-app-parity-smoke/template.json`, with verifier
 `docs/audit/artifacts/managed-app-parity-smoke/verify-managed-app-parity-smoke-artifact.mjs`.
+Create the executed smoke artifact with `npm run managed:app-parity-smoke --
+--input <redacted-app-smoke.json> --confirm-installed-app-smoke-passed` after
+the installed Android or iOS app smoke has actually passed. The input must keep
+redacted parent profile id, managed profile id, and managed device id separate
+so a profile can never stand in for device-binding evidence.
 That artifact must pass before an installed Android or iOS app parity claim is
 used as release evidence; one passing artifact proves only that one installed
 platform.
@@ -680,6 +685,7 @@ Focused test:
 node scripts/verify-managed-app-policy-contract.mjs
 node --test tests/runtime/managed-app-policy-contract-parity-current-behavior.test.mjs
 node --test tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs
+node --test tests/runtime/managed-app-parity-smoke-artifact-generator-current-behavior.test.mjs
 node --test tests/runtime/native-runtime-sync-authority-current-behavior.test.mjs \
   tests/runtime/native-runtime-sync-manifest-freshness-boundary-current-behavior.test.mjs
 ```

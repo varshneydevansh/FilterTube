@@ -33,6 +33,7 @@ import {
   MANAGED_NATIVE_RUNTIME_SYNC_HANDOFF_ARTIFACT_VERIFIER,
   MANAGED_NATIVE_RUNTIME_SYNC_HANDOFF_REQUIRED_ROWS,
   MANAGED_APP_PARITY_SMOKE_ARTIFACT_TEMPLATE,
+  MANAGED_APP_PARITY_SMOKE_ARTIFACT_GENERATOR,
   MANAGED_APP_PARITY_SMOKE_ARTIFACT_VERIFIER,
   MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS,
   MANUAL_YOUTUBE_SMOKE_LANE_REASONS,
@@ -384,6 +385,7 @@ function printClassification(result) {
       console.log('    readiness: proves extension-to-native sync output only; native enforcement still needs app smoke.');
       console.log('  Managed app parity smoke artifact handoff:');
       console.log(`    template: ${MANAGED_APP_PARITY_SMOKE_ARTIFACT_TEMPLATE}`);
+      console.log(`    generate: ${MANAGED_APP_PARITY_SMOKE_ARTIFACT_GENERATOR}`);
       console.log(`    verifier: ${MANAGED_APP_PARITY_SMOKE_ARTIFACT_VERIFIER}`);
       console.log(`    required rows: ${MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS.join(', ')}`);
       console.log('    readiness: one passing app artifact proves only one installed app platform; cross-platform remote management remains gated.');

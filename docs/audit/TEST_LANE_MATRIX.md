@@ -301,6 +301,7 @@ docs/audit/artifacts/managed-native-runtime-sync-handoff/template.json
 docs/audit/artifacts/managed-native-runtime-sync-handoff/verify-native-runtime-sync-handoff-artifact.mjs
 scripts/create-managed-native-runtime-sync-handoff.mjs
 docs/audit/artifacts/managed-app-parity-smoke/template.json
+scripts/create-managed-app-parity-smoke-artifact.mjs
 docs/audit/artifacts/managed-app-parity-smoke/verify-managed-app-parity-smoke-artifact.mjs
 ```
 
@@ -397,7 +398,7 @@ or uncovered required lanes remain `NO-GO`.
 | `docs/audit/artifacts/release-live-youtube-spa-smoke/*.{json,mjs}` | `test:release`, `test:smoke` | Covers live-smoke templates, runners, verifiers, and future dated smoke artifacts. |
 | `docs/audit/artifacts/managed-remote-delivery-smoke/*.{json,mjs}` | `test:release`, `test:settings`, `test:smoke` | Covers managed parent/caregiver remote-delivery smoke templates, verifiers, and future dated transport-slice artifacts. |
 | `docs/audit/artifacts/managed-native-runtime-sync-handoff/*.{json,mjs}`, `scripts/create-managed-native-runtime-sync-handoff.mjs` | `test:release`, `test:settings`, `test:smoke` | Covers extension-to-native runtime sync handoff templates, verifiers, generator, and future dated generated-manifest artifacts without claiming installed app enforcement. |
-| `docs/audit/artifacts/managed-app-parity-smoke/*.{json,mjs}` | `test:release`, `test:settings`, `test:smoke` | Covers managed app parity smoke templates, verifiers, and future dated installed Android/iOS app parity artifacts. |
+| `docs/audit/artifacts/managed-app-parity-smoke/*.{json,mjs}`, `scripts/create-managed-app-parity-smoke-artifact.mjs` | `test:release`, `test:settings`, `test:smoke` | Covers managed app parity smoke templates, generators, verifiers, and future dated installed Android/iOS app parity artifacts. |
 | `docs/audit/artifacts/empty-install-idle-probe.mjs` | `test:performance`, `test:smoke` | Covers the no-rule/no-work idle observer probe used as performance evidence. |
 | diagnostic, logging, console, no-work, cache, SPA, lag, active-work, active-rule, disabled-runtime, master-switch, or performance audit docs under `docs/audit/` | `test:performance`, `test:smoke` | Covers audit proof for production console gates, diagnostic logging budgets, empty-rule/no-work behavior, cache/SPA lag, active-rule gates, disabled-mode gates, and performance-risk boundaries even when only the proof doc changes. Match these as filename tokens only, so `SPA` does not accidentally classify unrelated words such as `DISPATCH`. |
 | code-burden, declutter, structural-burden, large-file, or large-source audit docs/tests under `docs/audit/` or `tests/runtime/` | `test:performance`, `test:smoke` | Covers maintainability pressure that can turn into runtime lag or risky optimizations, including the large-file guard for product-owned source files and workflow-owned lane files crossing 1000 lines. |

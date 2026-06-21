@@ -2353,3 +2353,12 @@ follow. I will share progress as this moves from audit/spec into implementation.
   redacted observation JSON, requires policy revision/hash evidence, refuses
   sensitive fields and authority overclaims, and keeps provider/app parity
   readiness incomplete.
+- [x] 2026-06-22 installed app parity smoke artifact generator slice: added
+  `scripts/create-managed-app-parity-smoke-artifact.mjs`,
+  `npm run managed:app-parity-smoke -- --input <redacted-app-smoke.json> --confirm-installed-app-smoke-passed`,
+  and
+  `tests/runtime/managed-app-parity-smoke-artifact-generator-current-behavior.test.mjs`.
+  The generator records one installed Android or iOS managed app smoke pass
+  from redacted observations, requires synced contract/runtime proof, preserves
+  platform-specific adapter proof, refuses sensitive fields, and still proves
+  only the platform named in the artifact.

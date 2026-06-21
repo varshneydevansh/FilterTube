@@ -19,6 +19,9 @@ and
 `docs/audit/artifacts/managed-native-runtime-sync-handoff/verify-native-runtime-sync-handoff-artifact.mjs`,
 `docs/audit/artifacts/managed-app-parity-smoke/template.json` and
 `docs/audit/artifacts/managed-app-parity-smoke/verify-managed-app-parity-smoke-artifact.mjs`.
+Use `npm run managed:app-parity-smoke -- --input <redacted-app-smoke.json>
+--confirm-installed-app-smoke-passed` after the installed Android or iOS smoke
+has actually passed.
 
 ## Purpose
 
