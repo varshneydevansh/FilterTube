@@ -859,13 +859,13 @@ parent tool instead of a sync/debug console.
     and same-network devices on the same family-device map while preserving the
     existing provider-gated delivery and local validation model.
   - [x] 2026-06-21 family-device route-label slice: the command-center map now
-    labels configured same-network profiles as `Same Home - Same-Home Pickup`
-    and configured internet/later profiles as `Away / Internet - Later Pickup`.
+    labels configured same-network profiles as `Same home - Same-Home Pickup`
+    and configured internet/later profiles as `Away / internet - Later Pickup`.
     The label change keeps both paths in one parent-facing map; transport names
     remain delivery states, not authority.
   - [x] 2026-06-21 unified map state slice: the command-center map now preserves
     `Multiple send paths` when both Same-Home Pickup and Later Pickup are
-    available, and live-only devices read as `Live Now - Send Update`. This
+    available, and live-only devices read as `Live now - Send Update`. This
     matches the parent mental model of one map with live, same-home,
     away/internet, and setup-needed states.
   - [x] 2026-06-21 Accounts & Sync compass-state slice: the first-read family
@@ -899,6 +899,11 @@ parent tool instead of a sync/debug console.
     them. This keeps optional saved-update setup tied to an actual protected
     device relationship instead of asking parents to configure transport before
     pairing.
+  - [x] 2026-06-21 family-device label casing slice: command-center device tiles
+    and compass ARIA labels now use the same `Live now`, `Same home`, and
+    `Away / internet` wording as the visible Accounts & Sync compass. This is a
+    copy/accessibility alignment only; delivery gates and provider behavior are
+    unchanged.
   - [x] 2026-06-21 pickup setup label slice: configured Later Pickup and
     Same-Home Pickup summaries now say `set up` instead of `ready`. This avoids
     implying guaranteed delivery from endpoint configuration alone; protected

@@ -13666,7 +13666,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 : (hasProtectedProfiles
                     ? 'Open both devices, pair, verify the phrase, then send the update.'
                     : 'Create one protected profile before pairing another device.');
-            ftNanahCompassLiveBtn.setAttribute('aria-label', `Live Now - Send Update. ${ftNanahCompassLiveBtn.title}`);
+            ftNanahCompassLiveBtn.setAttribute('aria-label', `Live now - Send Update. ${ftNanahCompassLiveBtn.title}`);
         }
         if (ftNanahDeliveryLiveLabel) {
             ftNanahDeliveryLiveLabel.textContent = liveReady
@@ -13692,7 +13692,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     : (!hasVerifiedDevice
                         ? 'Pair a verified protected device before setting up Later Pickup.'
                         : 'Optional: set this up only when a verified protected device must collect an update later, including away over the internet.'));
-            ftNanahCompassLaterBtn.setAttribute('aria-label', `Away / Internet - Later Pickup. ${ftNanahCompassLaterBtn.title}`);
+            ftNanahCompassLaterBtn.setAttribute('aria-label', `Away / internet - Later Pickup. ${ftNanahCompassLaterBtn.title}`);
         }
         if (ftNanahDeliveryMailboxCard) {
             ftNanahDeliveryMailboxCard.dataset.tone = mailbox.configured ? 'success' : (mailboxCanConfigure ? 'optional' : 'neutral');
@@ -13726,7 +13726,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     : (!hasVerifiedDevice
                         ? 'Pair a verified protected device before setting up Same-Home Pickup.'
                         : 'Optional: set this up only if you run a trusted FilterTube bridge on your own network.'));
-            ftNanahCompassHomeBtn.setAttribute('aria-label', `Same Home - Same-Home Pickup. ${ftNanahCompassHomeBtn.title}`);
+            ftNanahCompassHomeBtn.setAttribute('aria-label', `Same home - Same-Home Pickup. ${ftNanahCompassHomeBtn.title}`);
         }
         if (ftNanahDeliveryAdvanced && (mailbox.configured === true || local.configured === true)) {
             ftNanahDeliveryAdvanced.open = true;

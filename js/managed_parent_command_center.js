@@ -844,11 +844,11 @@
             if (item.syncLocalNetworkReady === true && item.syncMailboxReady === true) {
                 routeLabel = 'Multiple send paths';
             } else if (item.syncLocalNetworkReady === true) {
-                routeLabel = 'Same Home - Same-Home Pickup';
+                routeLabel = 'Same home - Same-Home Pickup';
             } else if (item.syncMailboxReady === true) {
-                routeLabel = 'Away / Internet - Later Pickup';
+                routeLabel = 'Away / internet - Later Pickup';
             } else if (item.syncLiveReady === true) {
-                routeLabel = 'Live Now - Send Update';
+                routeLabel = 'Live now - Send Update';
             }
             route.textContent = routeLabel;
             const target = document.createElement('small');
