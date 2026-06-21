@@ -15,6 +15,8 @@ sync, and downstream app parity.
 and
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_DISCOVERY_AUTHORITY_BOUNDARY_2026-06-03.md`.
 **Manual app parity smoke handoff**:
+`docs/audit/artifacts/managed-native-runtime-sync-handoff/template.json`,
+`docs/audit/artifacts/managed-native-runtime-sync-handoff/verify-native-runtime-sync-handoff-artifact.mjs`,
 `docs/audit/artifacts/managed-app-parity-smoke/template.json` and
 `docs/audit/artifacts/managed-app-parity-smoke/verify-managed-app-parity-smoke-artifact.mjs`.
 
@@ -93,6 +95,13 @@ also need installed app proof that list-derived rows remain ordinary channel
 rules with source/version metadata, manual-rule separation, pause enforcement,
 and no URL-based authority.
 
+A valid native runtime sync handoff artifact proves only the extension-to-app
+mirror handoff: the managed app policy contract hash, `npm run
+sync:native-runtime` execution, and generated native mirror/runtime file hashes.
+It must leave `nativeEnforcementExecuted` and `downstreamAppParityClaim` false.
+It is the review bridge before the app repo commit, not proof that Android or
+iOS route gates, time limits, settings locks, or rule application passed.
+
 ## Allowed Wording
 
 - Managed local child/protected-profile edits are supported.
@@ -118,6 +127,7 @@ Focused proof:
 
 ```bash
 node --test tests/runtime/managed-remote-transport-app-parity-gate-current-behavior.test.mjs
+node --test tests/runtime/managed-native-runtime-sync-handoff-current-behavior.test.mjs
 node --test tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs
 ```
 

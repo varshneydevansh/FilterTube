@@ -79,6 +79,7 @@ test('managed controls completion audit links to current proof families and rema
     'tests/runtime/managed-app-policy-contract-parity-current-behavior.test.mjs',
     'tests/runtime/managed-extension-installed-smoke-artifact-verifier-current-behavior.test.mjs',
     'tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs',
+    'tests/runtime/managed-native-runtime-sync-handoff-current-behavior.test.mjs',
     'tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs'
   ]) {
     assert.ok(doc.includes(proof), `missing linked proof ${proof}`);
@@ -92,6 +93,7 @@ test('managed controls completion audit links to current proof families and rema
   assert.match(doc, /docs\/audit\/artifacts\/managed-extension-installed-smoke\/template\.json/);
   assert.match(doc, /verify-managed-extension-smoke-artifact\.mjs/);
   assert.match(doc, /docs\/audit\/artifacts\/managed-pickup-provider-ownership\/template\.json/);
+  assert.match(doc, /docs\/audit\/artifacts\/managed-native-runtime-sync-handoff\/template\.json/);
   assert.match(pickupProviderOwnership, /That service is only delivery\. It never decides policy/);
   assert.match(pickupProviderOwnership, /Guaranteed later parent-to-child delivery/);
 });

@@ -1,0 +1,87 @@
+{
+  "artifactType": "filtertube-managed-native-runtime-sync-handoff",
+  "schemaVersion": 1,
+  "status": "template",
+  "runtimeBehaviorChanged": false,
+  "boundaryDoc": "docs/audit/FILTERTUBE_MANAGED_TRANSPORT_APP_PARITY_GATE_2026-06-05.md",
+  "changeContext": {
+    "logicalChangeType": "",
+    "requiredLanes": [],
+    "automatedLaneEvidence": []
+  },
+  "syncHandoff": {
+    "extensionRepoRevisionOrHash": "",
+    "syncCommand": "npm run sync:native-runtime",
+    "syncCommandStatus": "",
+    "contractArtifactPath": "docs/audit/artifacts/managed-app-policy-contract-v1.json",
+    "contractHash": "",
+    "targetRepoLabel": "FilterTubeApp",
+    "targetRepoPath": "",
+    "generatedFileManifest": [],
+    "nativeRuntimeSynced": false,
+    "nativeEnforcementExecuted": false,
+    "downstreamAppParityClaim": false,
+    "appSmokeArtifactPath": ""
+  },
+  "requiredRows": [
+    {
+      "id": "FT-NATIVE-SYNC-00-contract-hash",
+      "requiredObservation": "The extension-owned managed app policy contract artifact hash is recorded before syncing native runtime output.",
+      "status": "pending",
+      "observation": {
+        "pass": false,
+        "summary": ""
+      },
+      "evidence": {}
+    },
+    {
+      "id": "FT-NATIVE-SYNC-01-sync-command",
+      "requiredObservation": "The handoff was produced by npm run sync:native-runtime or the exact wrapper command it resolves to.",
+      "status": "pending",
+      "observation": {
+        "pass": false,
+        "summary": ""
+      },
+      "evidence": {}
+    },
+    {
+      "id": "FT-NATIVE-SYNC-02-generated-manifest",
+      "requiredObservation": "Generated native mirror/runtime files are listed with hashes so the app-side commit can be reviewed separately.",
+      "status": "pending",
+      "observation": {
+        "pass": false,
+        "summary": ""
+      },
+      "evidence": {}
+    },
+    {
+      "id": "FT-NATIVE-SYNC-03-no-native-claim",
+      "requiredObservation": "The handoff does not claim Android/iOS route, time-limit, settings-lock, or rule enforcement unless separate app smoke proof exists.",
+      "status": "pending",
+      "observation": {
+        "pass": false,
+        "summary": ""
+      },
+      "evidence": {}
+    },
+    {
+      "id": "FT-NATIVE-SYNC-04-app-smoke-pending",
+      "requiredObservation": "Downstream Android/iOS app parity remains pending until a managed app parity smoke artifact is executed.",
+      "status": "pending",
+      "observation": {
+        "pass": false,
+        "summary": ""
+      },
+      "evidence": {}
+    }
+  ],
+  "completionRules": {
+    "syncCommandMustPass": true,
+    "contractHashRequired": true,
+    "generatedManifestRequired": true,
+    "nativeRuntimeSyncedMustBeTrue": true,
+    "nativeEnforcementMustNotBeClaimedWithoutAppSmoke": true,
+    "downstreamAppParityClaimMustBeFalseUntilAppSmoke": true,
+    "noPlaintextSensitiveFields": true
+  }
+}

@@ -26,6 +26,9 @@ import {
   MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_TEMPLATE,
   MANAGED_PICKUP_PROVIDER_OWNERSHIP_ARTIFACT_VERIFIER,
   MANAGED_PICKUP_PROVIDER_OWNERSHIP_REQUIRED_ROWS,
+  MANAGED_NATIVE_RUNTIME_SYNC_HANDOFF_ARTIFACT_TEMPLATE,
+  MANAGED_NATIVE_RUNTIME_SYNC_HANDOFF_ARTIFACT_VERIFIER,
+  MANAGED_NATIVE_RUNTIME_SYNC_HANDOFF_REQUIRED_ROWS,
   MANAGED_APP_PARITY_SMOKE_ARTIFACT_TEMPLATE,
   MANAGED_APP_PARITY_SMOKE_ARTIFACT_VERIFIER,
   MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS,
@@ -285,6 +288,7 @@ function requiresManagedAppParityHandoff(result) {
 
   return result.classifications.some(entry => (
     /managed-app-policy-contract|managed-app-parity|app-parity|native-runtime|android|ios/i.test(entry.file)
+    || entry.file.startsWith('docs/audit/artifacts/managed-native-runtime-sync-handoff/')
     || entry.file.startsWith('docs/audit/artifacts/managed-app-parity-smoke/')
   ));
 }
@@ -367,6 +371,11 @@ function printClassification(result) {
       console.log('    readiness: one passing transport artifact proves only that transport slice; complete remote management remains gated.');
     }
     if (requiresManagedAppParityHandoff(result)) {
+      console.log('  Managed native runtime sync handoff:');
+      console.log(`    template: ${MANAGED_NATIVE_RUNTIME_SYNC_HANDOFF_ARTIFACT_TEMPLATE}`);
+      console.log(`    verifier: ${MANAGED_NATIVE_RUNTIME_SYNC_HANDOFF_ARTIFACT_VERIFIER}`);
+      console.log(`    required rows: ${MANAGED_NATIVE_RUNTIME_SYNC_HANDOFF_REQUIRED_ROWS.join(', ')}`);
+      console.log('    readiness: proves extension-to-native sync output only; native enforcement still needs app smoke.');
       console.log('  Managed app parity smoke artifact handoff:');
       console.log(`    template: ${MANAGED_APP_PARITY_SMOKE_ARTIFACT_TEMPLATE}`);
       console.log(`    verifier: ${MANAGED_APP_PARITY_SMOKE_ARTIFACT_VERIFIER}`);

@@ -49,6 +49,7 @@ test('managed controls handoff keeps implemented extension scope separate from r
     'automatic LAN peer discovery: not implemented',
     'hosted Internet Pickup service: not owned/deployed in this repo',
     'native Android/iOS parity: downstream lane',
+    'native runtime sync handoff: extension-side artifact required before app-side sync commit',
     'manual installed-extension smoke: still required before release claim'
   ]) {
     assert.ok(handoff.includes(remaining), `missing remaining status ${remaining}`);
@@ -96,6 +97,7 @@ test('managed controls handoff names the required final smoke and downstream lan
   assert.match(handoff, /Internet Pickup service\s+-> HTTPS endpoint\s+-> durable encrypted item queue/s);
   assert.match(handoff, /Home Pickup service\s+-> explicit same-network endpoint\s+-> visible parent Check action and redacted health result/s);
   assert.match(handoff, /Provider ownership gate\s+-> docs\/audit\/FILTERTUBE_MANAGED_PICKUP_PROVIDER_OWNERSHIP_GATE_2026-06-21\.md/s);
+  assert.match(handoff, /Extension handoff first\s+-> docs\/audit\/artifacts\/managed-native-runtime-sync-handoff\/template\.json/s);
   assert.match(handoff, /Android\s+-> settings locks\s+-> Main\/Kids route gate/s);
   assert.match(handoff, /iOS\s+-> same parity set as Android/s);
 });

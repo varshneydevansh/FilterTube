@@ -34,6 +34,10 @@ export const MANAGED_APP_PARITY_SMOKE_ARTIFACT_TEMPLATE =
   'docs/audit/artifacts/managed-app-parity-smoke/template.json';
 export const MANAGED_APP_PARITY_SMOKE_ARTIFACT_VERIFIER =
   'node docs/audit/artifacts/managed-app-parity-smoke/verify-managed-app-parity-smoke-artifact.mjs docs/audit/artifacts/managed-app-parity-smoke/<artifact>.json';
+export const MANAGED_NATIVE_RUNTIME_SYNC_HANDOFF_ARTIFACT_TEMPLATE =
+  'docs/audit/artifacts/managed-native-runtime-sync-handoff/template.json';
+export const MANAGED_NATIVE_RUNTIME_SYNC_HANDOFF_ARTIFACT_VERIFIER =
+  'node docs/audit/artifacts/managed-native-runtime-sync-handoff/verify-native-runtime-sync-handoff-artifact.mjs docs/audit/artifacts/managed-native-runtime-sync-handoff/<artifact>.json';
 export const LIVE_SMOKE_CHANGE_CONTEXT_ENV = Object.freeze([
   'FILTERTUBE_LOGICAL_CHANGE_TYPE',
   'FILTERTUBE_REQUIRED_LANES',
@@ -119,6 +123,13 @@ export const MANAGED_APP_PARITY_SMOKE_REQUIRED_ROWS = Object.freeze([
   'FT-MANAGED-APP-15-managed-list-policy-apply',
   'FT-MANAGED-APP-16-family-device-map-delivery'
 ]);
+export const MANAGED_NATIVE_RUNTIME_SYNC_HANDOFF_REQUIRED_ROWS = Object.freeze([
+  'FT-NATIVE-SYNC-00-contract-hash',
+  'FT-NATIVE-SYNC-01-sync-command',
+  'FT-NATIVE-SYNC-02-generated-manifest',
+  'FT-NATIVE-SYNC-03-no-native-claim',
+  'FT-NATIVE-SYNC-04-app-smoke-pending'
+]);
 
 export const RUNTIME_FIXTURE_LANE_REASONS = Object.freeze({
   whitelist: 'whitelist allow/leak fixtures for touched YouTube surfaces',
@@ -164,6 +175,7 @@ export const LANES = Object.freeze({
       'tests/runtime/managed-extension-installed-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs',
       'tests/runtime/managed-delivery-provider-reference-current-behavior.test.mjs',
+      'tests/runtime/managed-native-runtime-sync-handoff-current-behavior.test.mjs',
       'tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/release-notes-json-version-gate-boundary-current-behavior.test.mjs',
       'tests/runtime/release-package-parity-current-behavior.test.mjs',
@@ -406,6 +418,7 @@ export const LANES = Object.freeze({
       'tests/runtime/managed-extension-installed-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs',
       'tests/runtime/managed-delivery-provider-reference-current-behavior.test.mjs',
+      'tests/runtime/managed-native-runtime-sync-handoff-current-behavior.test.mjs',
       'tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/managed-viewing-space-route-gate-current-behavior.test.mjs',
       'tests/runtime/managed-child-time-limit-schema-current-behavior.test.mjs',
@@ -449,6 +462,7 @@ export const LANES = Object.freeze({
       'tests/runtime/managed-extension-installed-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs',
       'tests/runtime/managed-delivery-provider-reference-current-behavior.test.mjs',
+      'tests/runtime/managed-native-runtime-sync-handoff-current-behavior.test.mjs',
       'tests/runtime/managed-app-parity-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/all-callable-index-current-behavior.test.mjs',
       'tests/runtime/audit-runtime-backlog-current-behavior.test.mjs',
@@ -644,6 +658,11 @@ export const FILE_LANE_RULES = Object.freeze([
   {
     id: 'managed-app-parity-smoke-artifact-surface',
     patterns: [/^docs\/audit\/artifacts\/managed-app-parity-smoke\/.*\.(?:json|mjs)$/],
+    lanes: ['release', 'settings', 'smoke']
+  },
+  {
+    id: 'managed-native-runtime-sync-handoff-surface',
+    patterns: [/^docs\/audit\/artifacts\/managed-native-runtime-sync-handoff\/.*\.(?:json|mjs)$/],
     lanes: ['release', 'settings', 'smoke']
   },
   {

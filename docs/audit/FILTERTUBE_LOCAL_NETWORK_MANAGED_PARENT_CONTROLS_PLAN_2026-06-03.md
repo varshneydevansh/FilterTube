@@ -2327,3 +2327,11 @@ follow. I will share progress as this moves from audit/spec into implementation.
   Nanah/profile/app docs now use protected profile/device/user as the
   parent-facing term while preserving internal `type: "child"` references where
   they describe the current storage/runtime contract.
+- [x] 2026-06-21 native runtime sync handoff gate slice: added
+  `docs/audit/artifacts/managed-native-runtime-sync-handoff/template.json`,
+  `docs/audit/artifacts/managed-native-runtime-sync-handoff/verify-native-runtime-sync-handoff-artifact.mjs`,
+  and `tests/runtime/managed-native-runtime-sync-handoff-current-behavior.test.mjs`.
+  This records the extension-to-native handoff after `npm run
+  sync:native-runtime`: contract hash, sync command, generated file manifest,
+  and explicit `no native enforcement claim` state. It does not touch the app
+  repo and does not replace Android/iOS installed app parity smoke.

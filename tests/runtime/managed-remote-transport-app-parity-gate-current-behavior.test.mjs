@@ -106,6 +106,8 @@ test('transport app parity matrix preserves extension app ownership split', () =
   assert.match(doc, /App shell must gate Main and Kids before opening web\/native content/);
   assert.match(doc, /App shell must enforce startup, resume, heartbeat, pause, and reduced-budget behavior/);
   assert.match(doc, /list-derived rows remain ordinary channel\s+rules/);
+  assert.match(doc, /A valid native runtime sync handoff artifact proves only the extension-to-app\s+mirror handoff/);
+  assert.match(doc, /It must leave `nativeEnforcementExecuted` and `downstreamAppParityClaim` false/);
 });
 
 test('settings lane owns managed transport app parity gate', () => {
