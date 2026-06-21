@@ -968,6 +968,10 @@ parent tool instead of a sync/debug console.
   bridge, and `Internet Pickup` for verified devices that open later or are away.
   This keeps the parent mental model device-first without changing authority,
   signatures, target profile checks, transport IDs, or provider validation.
+- [x] 2026-06-21 profile-open update copy slice: `syncOnProfileOpen` remains
+  the same trusted-link policy, but the visible copy now says `Check for updates
+  on open` and `Updates when apart`. This explains the parent intent without
+  implying always-on sync, automatic LAN discovery, or provider authority.
 - [ ] Native Android/iOS settings-lock and timeout UI parity. This belongs in
   the downstream app sync/runtime lane.
 

@@ -1114,7 +1114,7 @@
         if (shouldShowConfiguredProviderSetup || shouldShowProviderPrompt) {
             const providerIntro = document.createElement('div');
             providerIntro.className = 'ft-managed-command-center__provider-intro';
-            providerIntro.textContent = 'Optional saved updates';
+            providerIntro.textContent = 'Updates when apart';
             providerIntro.title = 'Send Update is the normal path. Add this only when the other device cannot be open at the same time.';
             panel.appendChild(providerIntro);
         }
@@ -1128,7 +1128,7 @@
             const promptCopy = document.createElement('div');
             promptCopy.className = 'ft-managed-command-center__provider-copy';
             const promptTitle = document.createElement('strong');
-            promptTitle.textContent = 'Need updates to arrive later?';
+            promptTitle.textContent = 'Need a device to pick up changes later?';
             const promptDetail = document.createElement('span');
             promptDetail.textContent = 'Optional. Use Send Update when both devices can be open together.';
             promptCopy.append(promptTitle, promptDetail);
@@ -1470,7 +1470,7 @@
                 { label: item.timeLimit, tone: item.timeLimited ? 'warning' : 'neutral', title: 'Daily YouTube time for this protected profile.' },
                 item.managedChannelListLabel ? { label: item.managedChannelListLabel, tone: 'success', title: item.managedChannelListDetail || 'Parent-approved lists attached to this profile.' } : null,
                 { label: syncState.label, tone: syncState.tone, title: item.deliveryPathDetail || 'Device delivery status.' },
-                item.syncTargetCount > 0 && item.syncOpenCheckCount > 0 ? { label: 'Checks when opened', tone: 'success', title: 'This verified device can check for newer signed parent updates when the protected profile opens.' } : null,
+                item.syncTargetCount > 0 && item.syncOpenCheckCount > 0 ? { label: 'Checks for updates', tone: 'success', title: 'This verified device can check for newer signed parent updates when the protected profile opens.' } : null,
                 item.remoteScopeCount ? { label: item.syncLabel, tone: 'success', title: 'Latest accepted protected-profile policy revision.' } : null,
                 item.pendingExtraTimeRequestLabel ? { label: item.pendingExtraTimeRequestLabel, tone: 'warning', title: item.pendingExtraTimeRequestDetail || 'This profile asked for more time.' } : null,
                 item.syncTargetCount > 0 && item.latestDeliveryLabel ? { label: item.latestDeliveryLabel, tone: item.latestDeliveryTone || 'neutral', title: 'Latest protected delivery attempt.' } : null,
@@ -1492,13 +1492,13 @@
                     ? { label: 'Device sync', value: item.deliveryPreview?.label || 'Send when ready', note: item.deliveryPathDetail }
                     : { label: 'Device sync', value: 'Not paired', note: 'Local rules and time limits work here. Pair only when this profile must also update another device.' },
                 hasVerifiedDevice ? {
-                    label: 'Check when profile opens',
+                    label: 'Check for updates on open',
                     value: item.syncOpenCheckCount > 0
-                        ? (item.syncOpenCheckCount >= item.syncTargetCount ? 'On when opened' : `On for ${item.syncOpenCheckCount}/${item.syncTargetCount}`)
+                        ? (item.syncOpenCheckCount >= item.syncTargetCount ? 'On' : `On for ${item.syncOpenCheckCount}/${item.syncTargetCount}`)
                         : 'Off',
                     note: item.syncOpenCheckCount > 0
-                        ? 'When optional later delivery is configured, this protected profile checks for newer signed parent updates as it opens.'
-                        : 'Live Send Update still works. Profile-open checks only matter when optional Internet Pickup or Home Pickup delivery is configured.'
+                        ? 'When Internet Pickup or Home Pickup is set up, this protected profile checks for newer signed parent updates as it opens.'
+                        : 'Live Send Update still works. Turn this on only when this profile should collect Internet Pickup or Home Pickup updates later.'
                 } : null,
                 item.managedChannelListDetail ? { label: 'Lists', value: item.managedChannelListDetail } : null,
                 hasVerifiedDevice ? { label: 'Verified device', value: item.syncTargetLabel } : null,
