@@ -204,7 +204,7 @@ test('managed remote delivery smoke verifier is wired into release settings and 
   assert.ok(boundaryDoc.includes('FT-MANAGED-REMOTE-13-command-center-delivery-path-detail'));
   assert.ok(boundaryDoc.includes('FT-MANAGED-REMOTE-14-managed-list-policy-apply'));
   assert.match(boundaryDoc, /Issue 62 style\s+managed channel filter lists/);
-  assert.match(boundaryDoc, /Delivery detail separates live P2P, LAN provider/);
+  assert.match(boundaryDoc, /Delivery detail separates live P2P, Home Pickup/);
   assert.match(
     boundaryDoc,
     /valid artifact proves one\s+transport slice, not complete remote-management\s+release readiness/

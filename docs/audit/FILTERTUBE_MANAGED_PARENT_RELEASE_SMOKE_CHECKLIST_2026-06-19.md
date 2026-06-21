@@ -36,7 +36,7 @@ Use these terms in release notes and support replies:
 | Internet Pickup | Encrypted pickup provider | A compatible HTTPS pickup service stores unreadable saved updates until the verified protected device opens later or away. |
 | Home Pickup | Local-network pickup provider | A compatible home/school/clinic pickup service on the same network can hold or relay signed updates for already trusted protected devices. |
 
-Use the same Family Device Map for devices that are ready now, same-home, or
+Use the same Family Device Map for devices that are ready now, same-network, or
 away/later. Internet/away devices stay on that same map after pairing; they do
 not get a separate remote-admin screen or weaker authority model. Do not
 describe Home Pickup as Wi-Fi authority, automatic LAN control, or a network
@@ -89,12 +89,12 @@ Required manual rows:
 
 | Row | Manual proof |
 | --- | --- |
-| 1. Protected profile setup | Create or use a protected profile from a parent/account profile. Confirm child/protected PIN does not unlock parent/admin controls. |
+| 1. Protected profile setup | Create or use a protected profile from a parent/account profile. Confirm protected-profile PIN does not unlock parent/admin controls. |
 | 2. Local rules | Add keyword, channel, and video rules while editing the protected profile. Confirm local Main/Kids/Both target choice is clear. |
 | 3. Rule-list import | Import or refresh CSV/TXT/JSON/URL list data, preview accepted and skipped rows, apply to Main, Kids, or both, and confirm imported rows show source metadata. |
 | 4. Viewing space | Set Main-only, Kids-only, or Main + Kids. Confirm the blocked viewing space is route-gated before the protected user can use YouTube there. |
 | 5. Time limit | Set a daily YouTube limit and a zero/reduced budget. Confirm YouTube is blocked by the FilterTube timeout screen when the budget is exhausted. |
-| 6. Family Device Map | Confirm live, same-home, and away/internet devices appear as states on the same map after pairing, not as separate authority models. |
+| 6. Family Device Map | Confirm live, same-network, and away/internet devices appear as states on the same map after pairing, not as separate authority models. |
 | 7. Live Send Update | Pair parent and protected devices, verify the same phrase, send the reviewed protected-profile update, and confirm the protected device applies only the newer signed policy. |
 | 8. Offline policy | Disconnect delivery and confirm the protected device keeps the last accepted policy active. |
 | 9. Internet Pickup | If configured, send a saved update through the explicit HTTPS provider and confirm profile-open pickup applies only after local trusted-link validation. |

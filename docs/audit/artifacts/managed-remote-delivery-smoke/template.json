@@ -82,37 +82,37 @@
   "requiredRows": [
     {
       "id": "FT-MANAGED-REMOTE-00-trust-link-preflight",
-      "requiredObservation": "Parent and child devices show the same trusted managed link, source key id, target child profile, allowed scopes, and locked trusted-update mode.",
+      "requiredObservation": "Parent and protected devices show the same trusted managed link, source key id, target protected profile, allowed scopes, and locked trusted-update mode.",
       "status": "missing"
     },
     {
       "id": "FT-MANAGED-REMOTE-01-keyword-policy-apply",
-      "requiredObservation": "Parent sends a signed keyword policy and the child applies the newer revision through managed validation, with blocked keyword behavior visible after refresh.",
+      "requiredObservation": "Parent sends a signed keyword policy and the protected device applies the newer revision through managed validation, with blocked keyword behavior visible after refresh.",
       "status": "missing"
     },
     {
       "id": "FT-MANAGED-REMOTE-02-channel-policy-apply",
-      "requiredObservation": "Parent sends a signed channel policy and the child applies it through the same managed channel blocking path as local controls.",
+      "requiredObservation": "Parent sends a signed channel policy and the protected device applies it through the same managed channel blocking path as local controls.",
       "status": "missing"
     },
     {
       "id": "FT-MANAGED-REMOTE-03-video-policy-apply",
-      "requiredObservation": "Parent sends a signed video policy and the child applies it through the managed video blocking path.",
+      "requiredObservation": "Parent sends a signed video policy and the protected device applies it through the managed video blocking path.",
       "status": "missing"
     },
     {
       "id": "FT-MANAGED-REMOTE-04-viewing-space-gate",
-      "requiredObservation": "Parent changes Main/Kids viewing-space policy and the child route gate enforces the new policy before managed YouTube content remains usable.",
+      "requiredObservation": "Parent changes Main/Kids viewing-space policy and the protected device route gate enforces the new policy before managed YouTube content remains usable.",
       "status": "missing"
     },
     {
       "id": "FT-MANAGED-REMOTE-05-time-limit-policy",
-      "requiredObservation": "Parent sends a signed time-limit policy and the child compiles/enforces it, including reduced-budget or zero-budget timeout behavior.",
+      "requiredObservation": "Parent sends a signed time-limit policy and the protected device compiles/enforces it, including reduced-budget or zero-budget timeout behavior.",
       "status": "missing"
     },
     {
       "id": "FT-MANAGED-REMOTE-06-offline-last-policy",
-      "requiredObservation": "When transport becomes unavailable, the child keeps the last accepted parent policy active and records a safe unavailable state.",
+      "requiredObservation": "When transport becomes unavailable, the protected device keeps the last accepted parent policy active and records a safe unavailable state.",
       "status": "missing"
     },
     {
@@ -132,7 +132,7 @@
     },
     {
       "id": "FT-MANAGED-REMOTE-10-key-rotation-repair-status",
-      "requiredObservation": "Parent rotates the managed source signing key, old child-device links are marked key-revoked, the command center shows affected profiles as needing re-pairing, and protected history records trust_link.key_revoke without plaintext rules or private key material.",
+      "requiredObservation": "Parent rotates the managed source signing key, old protected-device links are marked key-revoked, the command center shows affected profiles as needing re-pairing, and protected history records trust_link.key_revoke without plaintext rules or private key material.",
       "status": "missing"
     },
     {
