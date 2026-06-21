@@ -1030,6 +1030,10 @@ parent tool instead of a sync/debug console.
   or protected user instead of child-only wording. Internal `child` profile type
   names remain unchanged to avoid migration churn, but the UI now fits kids,
   dependents, and independent protected profiles.
+- [x] 2026-06-21 popup protected-profile wording slice: the popup lock gate now
+  uses `Protected Profile` and `Managed Protected Profile` instead of
+  child-only titles. This keeps quick-access UI consistent with the Family
+  Controls model while preserving the internal `child` profile type.
 - [ ] Native Android/iOS settings-lock and timeout UI parity. This belongs in
   the downstream app sync/runtime lane.
 

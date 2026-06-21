@@ -1010,11 +1010,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
         }
         return {
-            eyebrow: 'Protected child profile',
+            eyebrow: 'Protected profile',
             title: `Unlock ${name}`,
-            message: `${name} is a locked child profile. Enter its profile PIN to continue.`,
+            message: `${name} is a locked protected profile. Enter its profile PIN to continue.`,
             placeholder: 'Profile PIN',
-            gateTitle: 'Protected Child Profile',
+            gateTitle: 'Protected Profile',
             gateMessage: `Unlock ${name} to view management controls.`
         };
     }
@@ -1323,7 +1323,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const copy = getProfileAccessCopy(profilesV4, activeProfileId);
         const activeIsChild = getProfileType(profilesV4, activeProfileId) === 'child';
         const h3 = document.createElement('h3');
-        h3.textContent = activeIsChild ? 'Managed Child Profile' : copy.gateTitle;
+        h3.textContent = activeIsChild ? 'Managed Protected Profile' : copy.gateTitle;
         cardHeader.appendChild(h3);
 
         const body = document.createElement('div');
@@ -1331,7 +1331,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const hint = document.createElement('div');
         hint.className = 'import-export-hint';
         hint.textContent = activeIsChild
-            ? 'This child profile can use its own viewing rules, but FilterTube settings and rule editing stay parent-managed. Switch to the parent profile to make changes.'
+            ? 'This protected profile can use its own viewing rules, but FilterTube settings and rule editing stay parent-managed. Switch to the parent profile to make changes.'
             : copy.gateMessage;
 
         const actions = document.createElement('div');
