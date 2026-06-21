@@ -909,6 +909,11 @@ parent tool instead of a sync/debug console.
     labels that device `Same home + away / internet` instead of the generic
     `Multiple send paths`. This keeps the same map valid for internet devices
     without implying that the pickup provider is authority.
+  - [x] 2026-06-21 command-center route-chip alignment slice: per-profile
+    status and delivery-preview chips now use `Live + pickup ready` or
+    `Same home + away / internet set up` instead of the generic multiple-path
+    wording. The route chip now matches the family-device map for live,
+    same-network, and internet pickup paths.
   - [x] 2026-06-21 pickup setup label slice: configured Later Pickup and
     Same-Home Pickup summaries now say `set up` instead of `ready`. This avoids
     implying guaranteed delivery from endpoint configuration alone; protected

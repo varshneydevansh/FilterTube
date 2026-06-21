@@ -402,7 +402,14 @@
         if (item.syncLiveReady === true && (item.syncLocalNetworkReady === true || item.syncMailboxReady === true)) {
             return {
                 key: 'multi_path',
-                label: 'Multiple send paths',
+                label: 'Live + pickup ready',
+                tone: 'success'
+            };
+        }
+        if (item.syncLocalNetworkReady === true && item.syncMailboxReady === true) {
+            return {
+                key: 'home_and_internet',
+                label: 'Same home + away / internet',
                 tone: 'success'
             };
         }
@@ -474,6 +481,20 @@
                 key: 'provider_needed',
                 label: 'Open both devices',
                 tone: 'warning'
+            };
+        }
+        if (item.syncLiveReady === true && (item.syncLocalNetworkReady === true || item.syncMailboxReady === true)) {
+            return {
+                key: 'multi_path',
+                label: 'Live + pickup ready',
+                tone: 'success'
+            };
+        }
+        if (item.syncLocalNetworkReady === true && item.syncMailboxReady === true) {
+            return {
+                key: 'home_and_internet',
+                label: 'Same home + away / internet set up',
+                tone: 'success'
             };
         }
         if (item.syncLiveReady === true) {
