@@ -323,10 +323,10 @@
       "trusted_link_target_scope_revision_hash_signature_validation_required_before_apply"
     ],
     "requiredUiBoundaries": [
-      "normal_parent_ui_uses_send_now_pick_up_later_home_bridge_labels",
-      "advanced_details_may_show_mailbox_lan_provider_gateway_terms",
+      "normal_parent_ui_uses_family_devices_send_update_internet_pickup_home_pickup_labels",
+      "advanced_details_may_show_encrypted_mailbox_lan_provider_terms",
       "protected_user_ui_never_exposes_delivery_setup_controls",
-      "apps_and_bridge_software_must_not_treat_delivery_labels_as_authority"
+      "apps_and_pickup_provider_software_must_not_treat_delivery_labels_as_authority"
     ],
     "configuredLocalNetworkProvider": {
       "sourcePath": "js/nanah_managed_local_network_client.js",

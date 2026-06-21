@@ -95,7 +95,7 @@ test('managed app policy parity doc records extension-owned app contract artifac
   for (const helper of contract.runtimeHelperSync) {
     assert.equal(helper.manifestSyncMode, 'copy');
     assert.equal(helper.appDestination, appManagedHelperDestinations[helper.sourcePath].replace('/Users/devanshvarshney/FilterTubeApp/', ''));
-    assert.match(helper.boundary, /native|Internet Pickup|Home Bridge|same-network|transport|ciphertext/);
+    assert.match(helper.boundary, /native|Internet Pickup|Home Pickup|same-network|transport|ciphertext/);
   }
   assert.deepEqual(
     contract.uiHelperMirror.map(row => row.sourcePath),
@@ -122,7 +122,7 @@ test('managed app policy parity doc records extension-owned app contract artifac
   assert.match(doc, /Installed\s+app parity still cannot be claimed current until platform smoke evidence is\s+attached/);
   assert.deepEqual(
     contract.managedDelivery.parentFacingTransports.map(row => row.label),
-    ['Send Update', 'Internet Pickup', 'Home Bridge']
+    ['Send Update', 'Internet Pickup', 'Home Pickup']
   );
   assert.deepEqual(
     contract.managedDelivery.parentFacingTransports.map(row => row.transport),
@@ -131,10 +131,10 @@ test('managed app policy parity doc records extension-owned app contract artifac
   assert.deepEqual(
     contract.managedDelivery.requiredUiBoundaries,
     [
-      'normal_parent_ui_uses_send_now_pick_up_later_home_bridge_labels',
-      'advanced_details_may_show_mailbox_lan_provider_gateway_terms',
+      'normal_parent_ui_uses_family_devices_send_update_internet_pickup_home_pickup_labels',
+      'advanced_details_may_show_encrypted_mailbox_lan_provider_terms',
       'protected_user_ui_never_exposes_delivery_setup_controls',
-      'apps_and_bridge_software_must_not_treat_delivery_labels_as_authority'
+      'apps_and_pickup_provider_software_must_not_treat_delivery_labels_as_authority'
     ]
   );
   assert.equal(contract.managedDelivery.referenceProvider.sourcePath, 'scripts/managed-delivery-provider.mjs');
