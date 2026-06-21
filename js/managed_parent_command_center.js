@@ -1114,7 +1114,7 @@
         if (shouldShowConfiguredProviderSetup || shouldShowProviderPrompt) {
             const providerIntro = document.createElement('div');
             providerIntro.className = 'ft-managed-command-center__provider-intro';
-            providerIntro.textContent = 'Updates when apart';
+            providerIntro.textContent = 'Automatic saved updates';
             providerIntro.title = 'Send Update is the normal path. Add this only when the other device cannot be open at the same time.';
             panel.appendChild(providerIntro);
         }

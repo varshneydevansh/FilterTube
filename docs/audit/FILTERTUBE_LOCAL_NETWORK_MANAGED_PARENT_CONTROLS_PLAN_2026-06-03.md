@@ -1002,9 +1002,9 @@ parent tool instead of a sync/debug console.
   This keeps the parent mental model device-first without changing authority,
   signatures, target profile checks, transport IDs, or provider validation.
 - [x] 2026-06-21 profile-open update copy slice: `syncOnProfileOpen` remains
-  the same trusted-link policy, but the visible copy now says `Check for updates
-  on open` and `Updates when apart`. This explains the parent intent without
-  implying always-on sync, automatic LAN discovery, or provider authority.
+  the same trusted-link policy, but the visible copy now says `Automatic saved
+  updates`. This explains the parent intent without implying always-on sync,
+  automatic LAN discovery, or provider authority.
 - [x] 2026-06-21 delivery-config protected wording slice: Internet Pickup and
   Home Pickup configuration guards now tell protected-profile users that
   protected profiles cannot configure update delivery. The underlying `child`
