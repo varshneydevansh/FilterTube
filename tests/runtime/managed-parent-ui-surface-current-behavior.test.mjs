@@ -75,9 +75,9 @@ function resolveManagedActionHistorySourceLabel(row, summary = null) {
   if (actionType.startsWith('policy.channel_list.')) return 'Approved list';
   if (actionType === 'remote_policy.source_push') return 'Send Update';
   if (actionType.startsWith('remote_policy.mailbox.')) return 'Internet Pickup';
-  if (actionType.startsWith('remote_policy.local_network.')) return 'Home Bridge';
+  if (actionType.startsWith('remote_policy.local_network.')) return 'Home Pickup';
   if (actionType.startsWith('remote_policy.')) {
-    if (transport === 'local_network') return 'Home Bridge';
+    if (transport === 'local_network') return 'Home Pickup';
     if (transport === 'mailbox') return 'Internet Pickup';
     return 'Remote update';
   }
@@ -459,10 +459,10 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /ft-managed-command-center__provider-prompt/);
   assert.match(helperSource, /Set Up Internet Pickup/);
   assert.match(helperSource, /Edit Internet Pickup/);
-  assert.match(doc, /visible card says `Control`, `Check when profile opens`, and `Delivery receipts`/);
+  assert.match(doc, /visible card says `Control`, `Check for updates on open`, and `Delivery receipts`/);
   assert.match(source, /function getNanahTrustedLinkDirectionSummary\(entry\)/);
   assert.match(source, /function formatNanahProtectedUpdateCheckStatus\(link\)/);
-  assert.match(source, /Check when profile opens/);
+  assert.match(source, /Check for updates on open/);
   assert.match(source, /Check Saved Updates/);
   assert.match(source, /manual_saved_update_check/);
   assert.match(source, /await runNanahManagedOpenSync\(\{ reason: 'manual_saved_update_check' \}\)/);
@@ -509,15 +509,15 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /parent updates stay tied to that protected or family profile/);
   assert.match(tabViewHtml, /How parent updates can reach verified devices/);
   assert.match(tabViewHtml, /Live update/);
-  assert.match(tabViewHtml, /Optional: device opens later/);
-  assert.match(tabViewHtml, /Internet pickup/);
-  assert.match(tabViewHtml, /If the other device must pick it up later, set that up in More options; Wi-Fi and servers never become the authority/);
-  assert.match(tabViewHtml, /Home bridge/);
-  assert.match(tabViewHtml, /Bridge off/);
+  assert.match(tabViewHtml, /Optional home\/school pickup path/);
+  assert.match(tabViewHtml, /Internet Pickup/);
+  assert.match(tabViewHtml, /These paths are optional, are not required for ordinary parent control, do not scan Wi-Fi for authority/);
+  assert.match(tabViewHtml, /Home Pickup/);
+  assert.match(tabViewHtml, /Home Pickup off/);
   assert.match(tabViewHtml, /Wi-Fi alone never grants control/);
-  assert.match(tabViewHtml, /Home Bridge is for homes, clinics, or schools that run their own FilterTube-compatible bridge on the local network/);
+  assert.match(tabViewHtml, /Home Pickup is for homes, clinics, or schools that run their own FilterTube-compatible pickup service on the local network/);
   assert.match(tabViewHtml, /id="ftNanahDeliveryAdvanced"/);
-  assert.match(tabViewHtml, /Use only when a verified device must collect an approved update later/);
+  assert.match(tabViewHtml, /Set up only when a verified device must collect an approved update later/);
   assert.match(tabViewHtml, /id="ftNanahDeliveryCheckRow"/);
   assert.match(tabViewHtml, /Check waiting parent updates/);
   assert.match(tabViewHtml, /Available after this protected profile saves a trusted parent link/);
@@ -532,11 +532,11 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /Master, account, and protected behavior/);
   assert.match(tabViewHtml, /New protected profiles start as Kids only/);
   assert.match(tabViewHtml, /parents do not need to share the parent PIN/);
-  assert.match(source, /It is not automatic Wi-Fi discovery\. Being on the same network is not enough to change rules/);
-  assert.match(source, /This is not automatic LAN discovery; normal parent control uses live Send Update/);
-  assert.match(source, /Bridge set up: \$\{host\}/);
-  assert.match(source, /Reachability is only a send path check; trusted parent policy still decides what can apply/);
-  assert.match(source, /Check Bridge/);
+  assert.match(source, /It is not automatic Wi-Fi discovery; being nearby never grants control/);
+  assert.match(source, /This is not device scanning; Send Update remains the normal path/);
+  assert.match(source, /Home Pickup set up: \$\{host\}/);
+  assert.match(source, /Home Pickup saved and reachable/);
+  assert.match(source, /Check Pickup/);
   assert.match(source, /function isNanahManagedLinkSavedUpdateEnabled\(link\)/);
   assert.match(source, /policy\.syncOnProfileOpen !== true/);
   assert.match(source, /lockedChildMode\)\.toLowerCase\(\) === 'allow_trusted_updates'/);
@@ -554,14 +554,14 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /This protected profile can join a parent pairing code and receive updates for its own rules/);
   assert.match(source, /After pairing, choose the protected profile on the other device that should receive this update/);
   assert.match(source, /ftNanahDeliveryCheckRow\.hidden = !hasSavedUpdateReader/);
-  assert.match(source, /Checks Internet Pickup and Home Bridge now\. Signed parent-link validation still decides what can apply/);
+  assert.match(source, /Set up Internet Pickup or Home Pickup before this protected device can check for waiting parent updates/);
   assert.match(source, /Needs pickup setup/);
   assert.match(source, /Set Up Pickup First/);
   assert.match(source, /ftNanahDeliveryCheckBtn\.addEventListener\('click'/);
   assert.match(source, /Checked waiting parent updates/);
-  assert.match(helperSource, /Home Bridge needs a FilterTube-compatible bridge you choose; Wi-Fi discovery is never authority/);
+  assert.match(helperSource, /Home Pickup needs a FilterTube-compatible pickup service you choose; Wi-Fi discovery is never authority/);
   assert.match(helperSource, /Wi-Fi alone never grants control/);
-  assert.match(plan, /Home Bridge intranet clarity slice/);
+  assert.match(plan, /Home Pickup intranet clarity slice/);
   assert.match(plan, /not automatic Wi-Fi\/LAN discovery/);
   assert.match(plan, /Family Device Updates waiting-update check slice/);
   assert.match(doc, /runtime Family Device Updates manual waiting-update check: present through existing manual_saved_update_check receive helpers/);
@@ -602,7 +602,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /channel_id, keyword, notes/);
   assert.match(tabViewHtml, /JSON rule-list preview/);
   assert.match(tabViewHtml, /Rule-list JSON/);
-  assert.match(tabViewHtml, /channels \+ keywords/);
+  assert.match(tabViewHtml, /Channels \+ keywords/);
   assert.match(tabViewHtml, /rule-list-preview-json__body/);
   assert.match(tabViewHtml, /rule-list-preview-json__map/);
   assert.match(tabViewHtml, /TXT row preview/);
@@ -669,7 +669,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /function renderNanahDeliveryPathStrip\(\)/);
   assert.match(source, /function getNanahFamilyDeliveryReadinessSummary\(/);
   assert.match(source, /ftNanahDeliveryAdvanced && \(mailbox\.configured === true \|\| local\.configured === true\)/);
-  assert.match(doc, /runtime Family Device Updates later-delivery disclosure: present and auto-opens only for configured Internet Pickup\/Home Bridge providers/);
+  assert.match(doc, /runtime Family Device Updates later-delivery disclosure: present and auto-opens only for configured Internet Pickup\/Home Pickup providers/);
   assert.match(plan, /Family Device Updates optional delivery collapse/);
   assert.match(plan, /Family Device Updates later-delivery wording slice/);
   assert.match(source, /ftNanahDeliveryMailboxBtn\.disabled = !mailboxCanConfigure/);
@@ -1396,7 +1396,7 @@ test('managed command center delivery preview uses parent-facing setup labels', 
     syncLocalNetworkReady: true
   })), {
     key: 'local_network',
-    label: 'Home Bridge set up',
+    label: 'Home Pickup set up',
     tone: 'success'
   });
   assert.deepEqual(plain(CommandCenter.resolveDeliveryPreview({

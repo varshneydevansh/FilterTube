@@ -37,7 +37,7 @@ signed managed-policy envelopes over live Nanah P2P, and optional mailbox/LAN
 providers can receive ciphertext mailbox rows or signed local-network
 candidates when those provider hooks are installed. A browser-side HTTPS mailbox
 client is now available behind explicit configuration and encrypted-item gates.
-Built-in local-network peer discovery, LAN transport, app native enforcement
+Built-in local-network peer discovery, same-network transport, app native enforcement
 proofs, and built-in app/server later-delivery providers remain gated.
 Source-side managed signing-key rotation is now an explicit
 parent/admin action: it regenerates the local source keypair, key-revokes active
@@ -46,10 +46,10 @@ state for those links, and writes protected history so the affected devices must
 be paired again. The parent command center now distinguishes usable verified
 devices from revoked/stale managed links so rotated devices show as needing
 re-pairing instead of disappearing into a generic missing-device state. The adapter now exposes a
-local-network candidate authority gate for future LAN providers, and the
+local-network candidate authority gate for future Home Pickup providers, and the
 dashboard has a sanitized receive handoff that records accepted/rejected
 local-network candidate outcomes through protected managed action history. This
-does not add built-in peer discovery or built-in LAN transport. Local-network
+does not add built-in peer discovery or built-in same-network transport. Local-network
 provider acks are feedback only and record redacted scope/revision/hash/result
 metadata, not plaintext rules or authority.
 **Primary audit input**:
@@ -182,7 +182,7 @@ parent tool instead of a sync/debug console.
 
 - [x] Family Controls uses a plain parent workflow: choose profile, set rules
   and time, then pair/send only when another device needs the update.
-- [x] Optional mailbox/LAN provider rows are not shown as first-run required
+- [x] Optional Internet Pickup/Home Pickup provider rows are not shown as first-run required
   setup when no protected profile exists or when providers are not configured.
 - [x] Imported rule lists are treated as parent-approved rule sources, not as
   transport authority or executable filter code.
@@ -1788,7 +1788,7 @@ replica protected device over Nanah/P2P or same-network transport.
   proof remain later slices. Redacted per-target delivery preview controls are
   now present in the command center so parents can see live/later/re-pair/no-target
   status before sending, and the Delivery detail line now distinguishes live
-  P2P, LAN provider, mailbox-later, paired-but-provider-pending, revoked, stale,
+  P2P, Home Pickup, Internet Pickup, paired-but-provider-pending, revoked, stale,
   and no-device cases. Local selected-profile time-limit and viewing-space bulk
   writes are already dashboard-gated.
 - **Acceptance Criteria**:

@@ -133,7 +133,7 @@ authority, and no built-in LAN peer discovery or LAN transport runtime exists in
 the extension.
 
 2026-06-20 proof update: the local-network provider client now has a focused
-unconfigured-provider regression. With no explicit Home Bridge endpoint, the
+unconfigured-provider regression. With no explicit Home Pickup endpoint, the
 client installs no global provider, `discoverManagedPolicyCandidates(...)` and
 `checkManagedLocalNetworkBridge(...)` fail closed, and the injected fetch spy is
 never called. That keeps ordinary dashboard/profile-open flows from becoming

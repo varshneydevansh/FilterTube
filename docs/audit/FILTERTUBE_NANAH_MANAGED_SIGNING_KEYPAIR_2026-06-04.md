@@ -127,7 +127,7 @@ into the existing concrete `main`, `kids`, `viewing_space`, and optional
 Main/Kids surface, Rule bundle fans out to keyword/channel/video envelopes from
 that same selected surface, and parent-managed child edit mode can provide the
 payload source while the parent/source profile remains envelope authority.
-Later slices added configured-provider Internet Pickup and Home Bridge handoff
+Later slices added configured-provider Internet Pickup and Home Pickup handoff
 around the same signed envelopes. Provider reachability is still transport only;
 trusted-link, scope, revision, hash, and signature validation remain local
 authority.

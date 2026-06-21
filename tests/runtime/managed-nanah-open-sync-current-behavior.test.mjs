@@ -93,11 +93,11 @@ test('managed open-sync audit is docs-backed and linked from plan inventory and 
   const plan = read(planPath);
   const inventory = read(inventoryPath);
 
-  assert.match(doc, /Provider-gated dashboard\/profile-open hook, provider ack handoff,\s+protected ack-handoff history writer, and explicitly configured browser HTTPS\s+mailbox pull\/decrypt client are present/);
-  assert.match(doc, /Provider-gated Home Bridge candidate\s+discovery is present through the configured local-network client/);
-  assert.match(doc, /built-in LAN\s+peer discovery, built-in LAN transport, and mailbox server authority are still\s+absent/);
-  assert.match(doc, /runtime provider-gated Home Bridge candidate discovery: present/);
-  assert.match(doc, /runtime built-in LAN peer discovery: absent/);
+  assert.match(doc, /Provider-gated dashboard\/profile-open hook, provider ack handoff,\s+protected ack-handoff history writer, and explicitly configured browser HTTPS\s+Internet Pickup pull\/decrypt client are present/);
+  assert.match(doc, /Provider-gated Home Pickup\s+candidate discovery is present through the configured local-network client/);
+  assert.match(doc, /built-in same-network\s+peer discovery, built-in same-network transport, and\s+Internet Pickup service authority are still absent/);
+  assert.match(doc, /runtime provider-gated Home Pickup candidate discovery: present/);
+  assert.match(doc, /runtime built-in same-network peer discovery: absent/);
   assert.match(doc, /runtime pull-on-open candidate gate: present/);
   assert.match(doc, /runtime provider-gated decrypted item pull: present/);
   assert.match(doc, /runtime provider-gated mailbox ack handoff: present/);
@@ -132,7 +132,7 @@ test('dashboard loads open-sync helper and wires policy toggle status and open/p
   assert.match(tabView, /recordAckHistory: \(details\) => recordManagedOpenSyncAckHistory\(details\)/);
   assert.match(tabView, /window\.FilterTubeNanahManagedOpenSync\?\.create/);
   assert.match(tabView, /syncOnProfileOpen: linkType === 'managed_link' && syncOnProfileOpen/);
-  assert.match(tabView, /Check when profile opens/);
+  assert.match(tabView, /Check for updates on open/);
   assert.match(tabView, /window\.FilterTubeManagedPolicyOpenSync = window\.FilterTubeManagedPolicyMailbox/);
   assert.match(mailboxClient, /global\.FilterTubeManagedPolicyOpenSync = provider/);
   assert.match(tabView, /Internet Pickup/);

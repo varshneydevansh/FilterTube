@@ -31,7 +31,7 @@ It also now includes `Accounts & Sync`, powered by Nanah, for device-to-device s
   - receiver reviews
 - **Family Device Updates**
   - choose a protected child/user profile
-  - use one Family Device map for nearby, same-home, and away/internet devices after pairing
+  - use one Family Device map for nearby, same-network, and away/internet devices after pairing
   - use `Send Update` when both devices are open
   - use optional `Internet Pickup` only when a verified protected device should collect an unreadable pending update later or away from the parent device
   - use optional `Home Pickup` only when a home/school pickup service has been explicitly configured

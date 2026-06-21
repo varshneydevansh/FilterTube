@@ -2,10 +2,10 @@
 
 **Generated**: 2026-06-05
 **Status**: Dashboard/profile-open provider hook and redacted provider ack
-handoff are present for local-network managed-policy candidates. Built-in LAN
-peer discovery and LAN transport remain absent. Browser HTTPS mailbox
-pull/decrypt is handled by the separate configured mailbox client and does not
-grant local-network authority.
+handoff are present for local-network managed-policy candidates. Built-in
+same-network peer discovery and same-network transport remain absent. Browser
+HTTPS Internet Pickup pull/decrypt is handled by the separate configured
+Internet Pickup client and does not grant local-network authority.
 **Related plan**:
 `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`
 **Related authority boundary**:
@@ -183,8 +183,8 @@ runtime local-network provider health status persistence: present and redacted
 runtime local-network provider client response allowlist sanitizer: present
 runtime local-network provider readiness check: present and non-authoritative
 runtime unconfigured local-network provider network probe: absent
-runtime built-in LAN peer discovery: absent
-runtime built-in LAN delivery: absent
+runtime built-in same-network peer discovery: absent
+runtime built-in same-network delivery: absent
 runtime background local-network scheduler: absent
 runtime YouTube page hot-path work from this slice: absent
 ```
@@ -209,7 +209,7 @@ case: loading the local-network client with no explicit endpoint does not
 install `window.FilterTubeManagedPolicyLocalNetwork`, discovery and health
 checks fail closed with `local_network_endpoint_unconfigured`, and no fetch is
 made. This is the executable proof that the extension does not silently probe
-LAN addresses or turn same-network reachability into policy authority.
+same-network addresses or turn same-network reachability into policy authority.
 
 Settings lane:
 

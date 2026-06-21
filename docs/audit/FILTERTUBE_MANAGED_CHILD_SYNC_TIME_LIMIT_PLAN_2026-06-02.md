@@ -5,7 +5,7 @@
 **Status**: Extension implementation in progress. Local protected-profile
 authority, Main/Kids route gates, time-limit UI/enforcement, signed managed
 Nanah envelopes, provider-gated open-sync, encrypted mailbox hooks, and
-provider-gated Home Bridge hooks now exist. Remaining proof is concentrated in
+provider-gated Home Pickup hooks now exist. Remaining proof is concentrated in
 installed two-device smoke, deployed optional delivery services, downstream app
 parity, and release-smoke evidence.
 **Owner repo**: `/Users/devanshvarshney/FilterTube`
@@ -1062,7 +1062,7 @@ T1 + T2 + T3
     stale trust, revoked trust, or disabled `syncOnProfileOpen` leaves the last
     valid policy active and performs no YouTube hot-path work.
   - 2026-06-20: Family Device Updates readiness and parent send fanout now treat
-    Home Bridge / Internet Pickup as available only for trusted managed links
+    Home Pickup / Internet Pickup as available only for trusted managed links
     that explicitly allow saved-update collection
     (`syncOnProfileOpen=true`, `lockedChildMode=allow_trusted_updates`). A
     provider being configured no longer makes every verified device appear ready.

@@ -41,7 +41,7 @@ test('managed pairing key descriptor audit is linked from plan and authority inv
   const inventory = read(inventoryPath);
 
   assert.match(doc, /Status\*\*: Runtime descriptor persistence slice/);
-  assert.match(doc, /Later same-day keypair,\s+signed-send, mailbox provider, Home Bridge provider, and key-rotation slices now\s+exist/);
+  assert.match(doc, /Later same-day keypair,\s+signed-send, mailbox provider, Home Pickup provider, and key-rotation slices now\s+exist/);
   assert.match(doc, /ftNanahManagedSigningPublicKey/);
   assert.match(doc, /managedPublicKeyId/);
   assert.match(doc, /sourcePublicKeyJwk/);

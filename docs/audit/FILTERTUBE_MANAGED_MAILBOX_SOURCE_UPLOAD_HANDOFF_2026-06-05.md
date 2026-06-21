@@ -181,7 +181,7 @@ js/tab-view.js
 
 tests/runtime/managed-transport-provider-clients-current-behavior.test.mjs
   configured HTTPS mailbox client upload/pull/purge boundary
-  configured Home Bridge client publish/discover/ack boundary
+  configured Home Pickup client publish/discover/ack boundary
   provider response sanitization and outbound secret refusal
 ```
 

@@ -78,7 +78,7 @@ FAMILY DEVICE UPDATES
 
 Important protected-profile rules:
 
-- one Family Device map covers nearby, same-home, and away/internet devices after pairing
+- one Family Device map covers nearby, same-network, and away/internet devices after pairing
 - delivery paths are not authority; trusted link, target profile, scope, revision, and local validation still decide what applies
 - `Internet Pickup` can hold unreadable signed updates for away/opens-later devices, but it cannot edit profiles, PINs, trusted links, viewing access, or time limits by itself
 - `Home Pickup` is an explicitly configured same-network pickup service, not automatic Wi-Fi scanning

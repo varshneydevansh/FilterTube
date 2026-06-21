@@ -43,7 +43,7 @@ This is easy to understand but it is not a complete parity proof.
 | Top-level docs | README, changelog, and license are copied after README badge mutation. | Build is not a pure package operation; it mutates a tracked file before packaging. |
 | Browser manifest | Selected `manifest.<browser>.json` is written as package `manifest.json`; build only repairs collaborator script order. | Browser parity is not validated beyond that one ordering repair. |
 | Android artifacts | Optional APK/AAB files are copied from a release-artifact directory and `.sha256` files are generated. | This is release-side staging, not proof that a public website/download claim is valid. |
-| Reference managed-delivery provider | `scripts/managed-delivery-provider.mjs` is runnable through `npm run managed:provider`, but `scripts/` is not a browser package root. | The reference provider proves Internet Pickup/Home Bridge endpoint shape only; it is not shipped as browser runtime and is not a hosted service claim. |
+| Reference managed-delivery provider | `scripts/managed-delivery-provider.mjs` is runnable through `npm run managed:provider`, but `scripts/` is not a browser package root. | The reference provider proves Internet Pickup/Home Pickup endpoint shape only; it is not shipped as browser runtime and is not a hosted service claim. |
 
 ## High-Confidence Findings
 
@@ -88,7 +88,7 @@ This is easy to understand but it is not a complete parity proof.
    and is exposed by the `managed:provider` package script. The browser build
    does not copy `scripts/`, so the extension package cannot accidentally imply
    that FilterTube ships a hosted Internet Pickup service or built-in Home
-   Bridge daemon. Internet Pickup and Home Bridge remain explicit provider
+   Pickup daemon. Internet Pickup and Home Pickup remain explicit provider
    endpoints configured by the user/admin and validated by local policy gates.
 
 ## Missing Future Authority

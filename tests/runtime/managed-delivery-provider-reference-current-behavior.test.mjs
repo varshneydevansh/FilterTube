@@ -179,7 +179,7 @@ test('reference provider stores and returns redacted Internet Pickup delivery re
   });
 });
 
-test('reference provider stores signed Home Bridge candidates while rejecting private secrets', async () => {
+test('reference provider stores signed Home Pickup candidates while rejecting private secrets', async () => {
   await withProvider({}, async ({ server, baseUrl }) => {
     const refused = await postJson(`${baseUrl}/managed-local-network/publish`, {
       candidates: [signedCandidate({
@@ -210,7 +210,7 @@ test('reference provider stores signed Home Bridge candidates while rejecting pr
   });
 });
 
-test('reference provider stores and returns redacted Home Bridge delivery receipts', async () => {
+test('reference provider stores and returns redacted Home Pickup delivery receipts', async () => {
   await withProvider({}, async ({ baseUrl }) => {
     const ack = await postJson(`${baseUrl}/managed-local-network/ack`, {
       records: [{

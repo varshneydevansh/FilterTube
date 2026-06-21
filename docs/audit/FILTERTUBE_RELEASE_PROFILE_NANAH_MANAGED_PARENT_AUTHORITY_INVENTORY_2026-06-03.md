@@ -41,7 +41,7 @@ mailbox/LAN delivery handoff, and protected redacted parent-side push history
 rows are now delegated through the existing runtime gates. Direct local
 video/keyword/channel rule additions for selected profiles now use the same
 parent/account re-auth path. Browser-side configured-provider clients now cover
-HTTPS Internet Pickup mailbox upload/pull/ack/purge and Home Bridge
+HTTPS Internet Pickup mailbox upload/pull/ack/purge and Home Pickup
 publish/discover/ack handoff after parent/account re-auth. A FilterTube-hosted
 mailbox service, automatic LAN peer discovery, and app native settings/iOS
 enforcement proofs remain pending.
@@ -114,7 +114,7 @@ apply and already-decrypted mailbox item apply now also reject revoked trusted
 links before any profile save, and mailbox apply marks that local decision as
 `ackState: revoked`. Command-center `Send Update` and `Send selected updates`
 now show redacted per-target delivery preview state before the parent acts:
-live, LAN provider, mailbox later, provider setup needed, re-pair/stale,
+live, Home Pickup, Internet Pickup, provider setup needed, re-pair/stale,
 conflict review, or missing verified device. They can send signed
 managed-policy envelopes to a currently connected verified replica over Nanah
 P2P, can hand ciphertext mailbox rows or signed local-network candidates to
@@ -131,14 +131,14 @@ verified-device `time_limits` push. Local viewing-space and normal time-limit
 edits now use the same scoped post-save push offer for changed profiles when a
 verified delivery path exists.
 The extension now ships configured-provider clients for HTTPS Internet Pickup
-mailbox upload/pull/ack/purge and Home Bridge publish/discover/ack delivery
+mailbox upload/pull/ack/purge and Home Pickup publish/discover/ack delivery
 handoff. Those clients are transport helpers only: provider reachability never
 grants authority, and every received candidate still has to pass trusted-link,
 target, scope, revision, hash, and signature validation locally. A
 FilterTube-hosted mailbox service, automatic LAN peer discovery authority, app
 parity, and remote admin session semantics remain separate required slices.
 The built-in local-network peer discovery/LAN delivery runtime remains absent;
-Home Bridge is an explicit provider handoff, not automatic Wi-Fi authority.
+Home Pickup is an explicit provider handoff, not automatic Wi-Fi authority.
 
 ## Issue 60 Local-Network Caregiver Addendum
 
