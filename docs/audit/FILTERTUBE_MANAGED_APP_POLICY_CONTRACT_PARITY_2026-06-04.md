@@ -10,7 +10,7 @@ configured local-network gateway helper are now part of the extension-owned
 runtime contract, with downstream app manifest/runtime sync expected to copy
 both as transport inputs. The shared contract now separates parent-facing
 delivery labels (`Send Update`, `Internet Pickup`, `Home Pickup`) from technical
-transport identifiers so apps and future bridge software can stay simple
+transport identifiers so apps and future pickup-provider software can stay simple
 without weakening local signature/target/revision validation. The app sync
 manifest/runtime copy now includes the parent delivery and managed list UI
 contract revision, so extension/app contract byte parity is current for the
@@ -408,8 +408,8 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
       "supports": [
         "ciphertext_mailbox_upload_pull_purge",
         "mailbox_redacted_ack_write_pull",
-        "signed_home_bridge_candidate_publish_discover",
-        "home_bridge_redacted_ack_write_pull",
+        "signed_home_pickup_candidate_publish_discover",
+        "home_pickup_redacted_ack_write_pull",
         "optional_bearer_token_for_reference_provider"
       ],
       "doesNotProvide": [
@@ -433,14 +433,14 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
       "managed_webview",
       "managed_device_profile"
     ],
-    "bridgeSoftwareResponsibilities": [
+    "pickupProviderResponsibilities": [
       "distribute_signed_policy_revisions",
-      "host_or_relay_encrypted_pick_up_later_items",
-      "support_same_network_home_bridge_delivery",
+      "host_or_relay_encrypted_internet_pickup_items",
+      "support_same_network_home_pickup_delivery",
       "record_parent_visible_delivery_health_and_redacted_history",
       "publish_parent_approved_list_catalogs"
     ],
-    "bridgeSoftwareMustNotClaim": [
+    "pickupProviderMustNotClaim": [
       "per_video_youtube_filtering_without_endpoint_agent",
       "server_plaintext_rule_authority",
       "automatic_trust_from_same_wifi_or_lan",
@@ -563,9 +563,9 @@ plain text, CSV-like rows, simple JSON arrays/objects, and public HTTPS
 text/JSON URLs are accepted inputs only after preview and parent approval, and
 apps must preserve list metadata, pause state, and manual-rule separation.
 The contract now also names the parent-facing delivery vocabulary that apps and
-future bridge software should mirror: `Send Update` for live Nanah delivery,
+future pickup-provider software should mirror: `Send Update` for live Nanah delivery,
 `Internet Pickup` for encrypted internet pickup, and `Home Pickup` for
-same-network bridge delivery. These labels are only interaction language. Technical
+same-network Home Pickup delivery. These labels are only interaction language. Technical
 transport identifiers such as mailbox, LAN, provider, gateway, candidate, and
 ciphertext item remain valid in advanced details, logs, code, and protocol
 docs, but they must not become the first-run parent model or a policy authority
@@ -576,7 +576,7 @@ does not discover peers automatically, and cannot become profile, PIN,
 trusted-link, signature, or native-app authority.
 
 The network product boundary is explicit in the contract: a future
-FilterTube Home/School Bridge can distribute signed policy revisions, relay
+FilterTube Home/School Pickup service can distribute signed policy revisions, relay
 encrypted pickup items, report delivery health, and publish parent-approved
 list catalogs. It still cannot claim precise per-video, per-channel, or
 per-keyword YouTube filtering without an endpoint agent such as the extension,

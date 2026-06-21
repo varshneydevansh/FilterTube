@@ -357,8 +357,8 @@
       "supports": [
         "ciphertext_mailbox_upload_pull_purge",
         "mailbox_redacted_ack_write_pull",
-        "signed_home_bridge_candidate_publish_discover",
-        "home_bridge_redacted_ack_write_pull",
+        "signed_home_pickup_candidate_publish_discover",
+        "home_pickup_redacted_ack_write_pull",
         "optional_bearer_token_for_reference_provider"
       ],
       "doesNotProvide": [
@@ -382,14 +382,14 @@
       "managed_webview",
       "managed_device_profile"
     ],
-    "bridgeSoftwareResponsibilities": [
+    "pickupProviderResponsibilities": [
       "distribute_signed_policy_revisions",
-      "host_or_relay_encrypted_pick_up_later_items",
-      "support_same_network_home_bridge_delivery",
+      "host_or_relay_encrypted_internet_pickup_items",
+      "support_same_network_home_pickup_delivery",
       "record_parent_visible_delivery_health_and_redacted_history",
       "publish_parent_approved_list_catalogs"
     ],
-    "bridgeSoftwareMustNotClaim": [
+    "pickupProviderMustNotClaim": [
       "per_video_youtube_filtering_without_endpoint_agent",
       "server_plaintext_rule_authority",
       "automatic_trust_from_same_wifi_or_lan",

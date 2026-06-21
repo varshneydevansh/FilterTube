@@ -51,7 +51,7 @@ That means:
 - the relay is the meeting place
 - FilterTube does not need a central sync account to read your settings
 - saved trust is not hidden background sync
-- pickup and bridge paths do not become authority; the receiving profile still validates trusted link, target profile, scope, revision, and payload integrity
+- pickup paths do not become authority; the receiving profile still validates trusted link, target profile, scope, revision, and payload integrity
 
 ### Parent / caregiver behavior
 

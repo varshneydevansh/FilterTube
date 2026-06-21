@@ -149,8 +149,8 @@ test('managed app policy parity doc records extension-owned app contract artifac
     [
       'ciphertext_mailbox_upload_pull_purge',
       'mailbox_redacted_ack_write_pull',
-      'signed_home_bridge_candidate_publish_discover',
-      'home_bridge_redacted_ack_write_pull',
+      'signed_home_pickup_candidate_publish_discover',
+      'home_pickup_redacted_ack_write_pull',
       'optional_bearer_token_for_reference_provider'
     ]
   );
@@ -170,7 +170,7 @@ test('managed app policy parity doc records extension-owned app contract artifac
   assert.equal(contract.networkProductBoundary.sameProductSeparateRuntime, true);
   assert.equal(contract.networkProductBoundary.preciseYouTubeFilteringRequiresEndpointAgent, true);
   assert.ok(contract.networkProductBoundary.endpointAgents.includes('browser_extension'));
-  assert.ok(contract.networkProductBoundary.bridgeSoftwareMustNotClaim.includes('per_video_youtube_filtering_without_endpoint_agent'));
+  assert.ok(contract.networkProductBoundary.pickupProviderMustNotClaim.includes('per_video_youtube_filtering_without_endpoint_agent'));
   assert.match(plan, new RegExp(docPath));
   assert.match(inventory, new RegExp(docPath));
 });
