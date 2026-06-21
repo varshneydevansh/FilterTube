@@ -14078,6 +14078,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const openCheckCount = savedUpdateLinks.length;
         const mailboxReady = hasNanahManagedMailboxUploadWriter();
         const localReady = hasNanahManagedLocalNetworkDeliveryWriter();
+        const mailboxLinkReady = mailboxReady && openCheckCount > 0;
+        const localNetworkLinkReady = localReady && openCheckCount > 0;
         const readyCount = links.filter((trusted) => {
             if (isNanahManagedLinkLiveConnected(trusted)) return true;
             return (mailboxReady || localReady) && isNanahManagedLinkSavedUpdateEnabled(trusted);
@@ -14136,8 +14138,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const transports = [
             liveReady ? 'Send Update' : '',
-            (localReady && openCheckCount > 0) ? 'Same-Home Pickup' : '',
-            (mailboxReady && openCheckCount > 0) ? 'Later Pickup' : ''
+            localNetworkLinkReady ? 'Same-Home Pickup' : '',
+            mailboxLinkReady ? 'Later Pickup' : ''
         ].filter(Boolean).join(' + ');
         return {
             label: transports
@@ -14151,8 +14153,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             openCheckCount,
             sourceAckLabel,
             liveReady,
-            mailboxReady,
-            localNetworkReady: localReady
+            mailboxReady: mailboxLinkReady,
+            localNetworkReady: localNetworkLinkReady
         };
     }
 

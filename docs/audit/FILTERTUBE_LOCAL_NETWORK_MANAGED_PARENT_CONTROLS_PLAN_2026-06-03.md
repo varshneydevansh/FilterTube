@@ -857,6 +857,11 @@ parent tool instead of a sync/debug console.
     provider-ready paths into a generic `Ready` state. This keeps internet/away
     and same-network devices on the same family-device map while preserving the
     existing provider-gated delivery and local validation model.
+  - [x] 2026-06-21 per-profile pickup-readiness slice: the managed sync summary
+    now marks `Later Pickup` or `Same-Home Pickup` ready only when the provider
+    exists and that protected profile has a saved update-enabled trusted link.
+    Provider configuration by itself no longer makes unrelated protected
+    profiles appear ready for later/same-home delivery.
   - [x] 2026-06-20 profile-switch saved-update status slice: profile switching
     was rechecked and already calls the provider-gated managed background sync
     after a successful switch. The open-sync helper now reports `Later Pickup

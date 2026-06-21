@@ -100,6 +100,11 @@ the same map vocabulary in their compact sync chip. Live paths say
 paths say `Multiple send paths`. This changes only parent-facing labels; the
 trusted-link, target-profile, revision, device-binding, hash, and signature
 checks remain the runtime authority.
+2026-06-21 per-profile pickup-readiness addendum: command-center Later Pickup
+and Same-Home Pickup readiness now requires both a configured provider and a
+saved update-enabled trusted link for that protected profile. A configured
+provider alone no longer makes every protected profile look ready to receive
+later/same-home updates.
 2026-06-21 legacy parent-trust edit addendum: when editing an older managed
 Source -> Replica parent link that lacks the newer parent-managed fields, the
 edit modal now proposes the current safe defaults: matching parent updates,
