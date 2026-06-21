@@ -862,6 +862,12 @@ parent tool instead of a sync/debug console.
     exists and that protected profile has a saved update-enabled trusted link.
     Provider configuration by itself no longer makes unrelated protected
     profiles appear ready for later/same-home delivery.
+  - [x] 2026-06-21 transport-specific saved-update check slice: manual,
+    dashboard-open, visibility-return, and profile-switch saved-update checks
+    now execute only the configured eligible pickup transports. A Same-Home
+    provider does not force a failed Later Pickup probe, and a Later Pickup
+    provider does not force a Same-Home probe. The visible check copy names the
+    active path or paths while preserving trusted-link validation as authority.
   - [x] 2026-06-20 profile-switch saved-update status slice: profile switching
     was rechecked and already calls the provider-gated managed background sync
     after a successful switch. The open-sync helper now reports `Later Pickup

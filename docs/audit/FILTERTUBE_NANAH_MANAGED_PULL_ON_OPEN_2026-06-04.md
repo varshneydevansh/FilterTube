@@ -168,6 +168,7 @@ runtime mailbox item apply reuse: present
 runtime pull status persistence: present
 runtime browser HTTPS mailbox pull/decrypt client: present behind explicit config
 runtime dashboard-visible saved-update check: present with 60s throttle and eligible-link gate
+runtime transport-specific saved-update check: present; Later Pickup and Same-Home Pickup are checked independently only when their configured reader is available
 runtime mailbox server authority: absent
 runtime provider-gated Home Bridge candidate discovery: present
 runtime built-in LAN peer discovery: absent

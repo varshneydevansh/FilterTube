@@ -105,6 +105,12 @@ and Same-Home Pickup readiness now requires both a configured provider and a
 saved update-enabled trusted link for that protected profile. A configured
 provider alone no longer makes every protected profile look ready to receive
 later/same-home updates.
+2026-06-21 transport-specific saved-check addendum: the protected-device
+`Check Saved Updates` action and dashboard/profile-open check now run only the
+configured eligible pickup path. A Same-Home-only setup no longer writes or
+shows a spurious `Later Pickup not ready` state, and a Later-only setup no
+longer probes Same-Home Pickup. Both paths still use the same trusted-link
+validation before anything applies.
 2026-06-21 legacy parent-trust edit addendum: when editing an older managed
 Source -> Replica parent link that lacks the newer parent-managed fields, the
 edit modal now proposes the current safe defaults: matching parent updates,

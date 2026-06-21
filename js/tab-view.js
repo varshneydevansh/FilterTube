@@ -13660,8 +13660,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahDeliveryCheckRow.hidden = !hasSavedUpdateReader;
         }
         if (ftNanahDeliveryCheckDetail) {
+            const readerLabel = getNanahManagedSavedUpdateReaderLabel();
             ftNanahDeliveryCheckDetail.textContent = canCheckSavedUpdates
-                ? 'Checks Later Pickup and Same-Home Pickup now. Signed parent-link validation still decides what can apply.'
+                ? `Checks ${readerLabel} now. Signed parent-link validation still decides what can apply.`
                 : 'Use this on the protected device after it saves a trusted parent link and a pickup path is set up.';
         }
         if (ftNanahDeliveryCheckBtn) {
@@ -13985,6 +13986,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function hasNanahManagedSavedUpdateReader() {
         return hasNanahManagedMailboxOpenSyncReader() || hasNanahManagedLocalNetworkDiscoveryReader();
+    }
+
+    function getNanahManagedSavedUpdateReaderLabels() {
+        const labels = [];
+        if (hasNanahManagedMailboxOpenSyncReader()) labels.push('Later Pickup');
+        if (hasNanahManagedLocalNetworkDiscoveryReader()) labels.push('Same-Home Pickup');
+        return labels;
+    }
+
+    function getNanahManagedSavedUpdateReaderLabel() {
+        const labels = getNanahManagedSavedUpdateReaderLabels();
+        if (labels.length === 0) return 'pickup path';
+        if (labels.length === 1) return labels[0];
+        return labels.join(' and ');
     }
 
     function getConcreteManagedPolicyScopesForProfile(scope, profile) {
@@ -15280,9 +15295,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const policy = safeObject(trusted.policy);
         if (trusted.linkType !== 'managed_link' || trusted.localRole !== 'replica' || trusted.remoteRole !== 'source') return '';
         if (policy.syncOnProfileOpen !== true) return 'Off';
-        if (!hasNanahManagedSavedUpdateReader()) return 'Needs pickup setup';
-        const internetStatus = normalizeString(formatNanahManagedOpenSyncStatus(trusted));
-        const homeStatus = normalizeString(formatNanahManagedLocalNetworkSyncStatus(trusted));
+        const mailboxReaderReady = hasNanahManagedMailboxOpenSyncReader();
+        const localNetworkReaderReady = hasNanahManagedLocalNetworkDiscoveryReader();
+        if (!mailboxReaderReady && !localNetworkReaderReady) return 'Needs pickup setup';
+        const internetStatus = mailboxReaderReady
+            ? normalizeString(formatNanahManagedOpenSyncStatus(trusted))
+            : '';
+        const homeStatus = localNetworkReaderReady
+            ? normalizeString(formatNanahManagedLocalNetworkSyncStatus(trusted))
+            : '';
         const parts = [];
         if (internetStatus && internetStatus !== 'Off') {
             parts.push(internetStatus.toLowerCase().includes('later pickup')
@@ -15727,8 +15748,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         nanahManagedBackgroundSyncPromise = (async () => {
             if (hasReplicaUpdateTarget) {
-                await runNanahManagedOpenSync({ reason: normalizedReason });
-                await runNanahManagedLocalNetworkSync({ reason: normalizedReason });
+                if (hasNanahManagedMailboxOpenSyncReader()) {
+                    await runNanahManagedOpenSync({ reason: normalizedReason });
+                }
+                if (hasNanahManagedLocalNetworkDiscoveryReader()) {
+                    await runNanahManagedLocalNetworkSync({ reason: normalizedReason });
+                }
             }
             if (hasSourceAckTarget) {
                 await runNanahManagedSourceAckSync({ reason: normalizedReason });
@@ -15996,7 +16021,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 checkSavedUpdatesBtn.textContent = savedUpdateReaderReady ? 'Check Saved Updates' : 'Set Up Pickup First';
                 checkSavedUpdatesBtn.disabled = !savedUpdateReaderReady;
                 checkSavedUpdatesBtn.title = savedUpdateReaderReady
-                    ? 'Checks optional Later Pickup and Same-Home Pickup for newer signed parent updates. Trusted-link validation still decides what can apply.'
+                    ? `Checks ${getNanahManagedSavedUpdateReaderLabel()} for newer signed parent updates. Trusted-link validation still decides what can apply.`
                     : 'Set up Later Pickup or Same-Home Pickup before this protected device can check for waiting parent updates. Send Now still works when both devices are open.';
                 checkSavedUpdatesBtn.addEventListener('click', async () => {
                     if (!hasNanahManagedSavedUpdateReader()) {
@@ -16005,8 +16030,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                         return;
                     }
                     try {
-                        await runNanahManagedOpenSync({ reason: 'manual_saved_update_check' });
-                        await runNanahManagedLocalNetworkSync({ reason: 'manual_saved_update_check' });
+                        if (hasNanahManagedMailboxOpenSyncReader()) {
+                            await runNanahManagedOpenSync({ reason: 'manual_saved_update_check' });
+                        }
+                        if (hasNanahManagedLocalNetworkDiscoveryReader()) {
+                            await runNanahManagedLocalNetworkSync({ reason: 'manual_saved_update_check' });
+                        }
                         UIComponents.showToast('Checked saved parent updates', 'info');
                     } catch (error) {
                         console.error('FilterTube: saved parent update check failed', error);
@@ -19338,8 +19367,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (ftNanahDeliveryCheckBtn.disabled) return;
             ftNanahDeliveryCheckBtn.disabled = true;
             try {
-                await runNanahManagedOpenSync({ reason: 'manual_saved_update_check' });
-                await runNanahManagedLocalNetworkSync({ reason: 'manual_saved_update_check' });
+                if (hasNanahManagedMailboxOpenSyncReader()) {
+                    await runNanahManagedOpenSync({ reason: 'manual_saved_update_check' });
+                }
+                if (hasNanahManagedLocalNetworkDiscoveryReader()) {
+                    await runNanahManagedLocalNetworkSync({ reason: 'manual_saved_update_check' });
+                }
                 renderNanahDeliveryPathStrip();
                 UIComponents.showToast('Checked waiting parent updates', 'info');
             } catch (error) {
