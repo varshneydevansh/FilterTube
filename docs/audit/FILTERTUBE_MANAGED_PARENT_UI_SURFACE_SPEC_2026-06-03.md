@@ -124,6 +124,11 @@ foreground and background session PIN state for known profiles, refreshes the
 dashboard lock gate, and records a redacted `admin_session.lock` row for
 manageable protected profiles. Child/protected surfaces and scoped protected
 editing cannot use it to change admin state.
+2026-06-21 admin-lock retention addendum: `admin_session.lock` and
+`admin_session.failed_unlock` are protected action-history rows, so manual admin
+locking and failed admin re-auth evidence use the protected retention path
+instead of ordinary accepted-row retention. The rows remain evidence only; they
+do not reopen, extend, or authorize an admin session.
 2026-06-21 internet-device map wording addendum: the Family Device Updates
 compass and command-center map now say `Away / internet` / `Away / Internet -
 Later Pickup` for internet or opens-later protected devices. This keeps

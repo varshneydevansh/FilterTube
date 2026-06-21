@@ -146,6 +146,7 @@ trust_link.key_revoke
 managed_signing_key.rotate
 admin_session.unlock
 admin_session.failed_unlock
+admin_session.lock
 local_policy.update
 remote_policy.accept
 remote_policy.reject
@@ -317,6 +318,12 @@ dashboard writes redacted `admin_session.failed_unlock` rows to each protected
 profile currently manageable by the active account. This keeps provider setup
 failures visible in protected history without giving pickup services, networks,
 or provider settings any policy authority.
+
+Manual admin-session locking follows the same protected-history model. The
+`Lock Admin Session` button writes a redacted `admin_session.lock` row with
+`scope: admin_session`; that row is retained through the protected-action
+retention path even though it is not a failed or rejected policy decision. The
+row is evidence that admin authority was closed, not a source of authority.
 
 The current remote writer is still not policy authority by itself. A valid newer
 `filtertube_managed_policy` envelope must first pass the managed envelope
