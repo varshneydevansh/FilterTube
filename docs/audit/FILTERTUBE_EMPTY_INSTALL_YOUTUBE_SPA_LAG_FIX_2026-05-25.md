@@ -70,6 +70,11 @@ with recent whitelist changes making the performance problem more visible.
 - 2026-05-26 addendum: changed the DOM fallback mutation lifecycle from
   observe-then-return to active-settings-only observation; empty blocklist pages
   disconnect the body observer until a relevant setting is added.
+- 2026-06-21 addendum: gated the content-side subscription import bridge's
+  request-sent and timeout `console.log` calls behind the existing
+  `__filtertubeDebug`/`data-filtertube-debug` switch. This does not change the
+  import protocol or warnings/errors; it keeps production YouTube pages quieter
+  while preserving debug visibility when explicitly enabled.
 
 ## Behavior Boundary
 

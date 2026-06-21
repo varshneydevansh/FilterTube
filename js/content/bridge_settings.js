@@ -102,6 +102,15 @@ function waitForMainWorldSubscriptionsImportReady(timeoutMs = 4000) {
 }
 
 if (typeof globalThis.FilterTubeRequestSubscribedChannelsFromMainWorld !== 'function') {
+    const logSubscriptionImportDebug = (...args) => {
+        try {
+            const debugEnabled = !!window.__filtertubeDebug || document.documentElement?.getAttribute('data-filtertube-debug') === 'true';
+            if (debugEnabled) console.log(...args);
+        } catch (e) {
+            if (window.__filtertubeDebug) console.log(...args);
+        }
+    };
+
     globalThis.FilterTubeRequestSubscribedChannelsFromMainWorld = function requestSubscribedChannelsFromMainWorld(options = {}, onProgress = null) {
         return new Promise((resolve) => {
             const requestId = ++window.subscriptionImportRequestId;
@@ -113,7 +122,7 @@ if (typeof globalThis.FilterTubeRequestSubscribedChannelsFromMainWorld !== 'func
                 const pending = window.pendingSubscriptionImportRequests.get(requestId);
                 if (pending) {
                     window.pendingSubscriptionImportRequests.delete(requestId);
-                    console.log('FilterTube: Subscription import request timed out');
+                    logSubscriptionImportDebug('FilterTube: Subscription import request timed out');
                     resolve({ success: false, error: 'Subscription import timed out', errorCode: 'timeout', channels: [], stats: null });
                 }
             }, timeoutMs);
@@ -138,7 +147,7 @@ if (typeof globalThis.FilterTubeRequestSubscribedChannelsFromMainWorld !== 'func
                 source: 'content_bridge'
             }, '*');
 
-            console.log('FilterTube: Sent subscriptions import request to Main World');
+            logSubscriptionImportDebug('FilterTube: Sent subscriptions import request to Main World');
         });
     };
 }
