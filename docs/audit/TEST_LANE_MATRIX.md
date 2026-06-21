@@ -151,7 +151,7 @@ the audit system itself.
 
 | Guard | Command | Purpose |
 |---|---|---|
-| lane-owned audit proof drift | `npm run test:audit-drift` | Fails when a lane-owned test or proof doc still cites a stale whole-file source fingerprint. Its lane-owned scope includes `scripts/test-lane-config.mjs` directly, and this guard also runs inside `npm run test:changed` before focused lanes. |
+| lane-owned audit proof drift | `npm run test:audit-drift` | Fails when workflow-owned lane scripts, matrix docs, or lane-workflow sentinel tests cite a stale whole-file source fingerprint. Its blocking scope includes `scripts/test-lane-config.mjs` directly, and this guard also runs inside `npm run test:changed` before focused lanes. |
 | lane workflow file-size guard | `npm run test:release`, `npm run test:performance`, `npm run test:smoke` | Keeps workflow-owned lane files below 1000 lines. Matrix proof and changed-lane runner proof are split; if either file approaches the boundary, split the matrix or runner proof before adding more assertions. |
 | full audit proof drift inventory | `node scripts/audit-proof-drift.mjs --all --report-only` | Reports stale whole-file fingerprints in older audit files/tests that are not yet lane-owned. This is a backlog inventory, not a release blocker. |
 | full historical runtime audit | `npm run audit:runtime` | Runs every historical runtime/current-boundary audit test. This is the broad backlog suite, not the default per-change release lane. |
@@ -445,7 +445,7 @@ cross-feature hub, but it must include at least these lanes.
 A change is not release-ready until:
 
 - the relevant lane command passes;
-- `npm run test:audit-drift` passes when lane-owned source fingerprints changed;
+- `npm run test:audit-drift` passes when lane-workflow source fingerprints changed;
 - a fixture or runtime test proves any behavior change;
 - the relevant proof doc under `docs/audit/` is updated;
 - visible YouTube behavior gets a manual smoke pass when user-facing;
@@ -471,7 +471,8 @@ callable/source-locus indexes, goal ledgers, generated/package artifacts,
 settings source/effect and claim registers, DOM selector/lifecycle inventories,
 JSON comment/provenance registers, JSON content-control hide boundaries,
 JSON-first metric/reference/video-meta docs, and remaining YTM parity slices outside the
-focused lane set. The all-scope source fingerprint drift inventory is clean, so
-the focused lanes and `test:audit-drift` remain the change-safety gates while
-`audit:runtime` stays the inventory to retire or refresh in smaller proof
-batches.
+focused lane set. The lane-workflow source fingerprint drift inventory is clean,
+while the all-scope source fingerprint drift inventory remains backlog evidence
+for older current-boundary tests. Focused lanes and `test:audit-drift` remain
+the change-safety gates while `audit:runtime` stays the inventory to retire or
+refresh in smaller proof batches.

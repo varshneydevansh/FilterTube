@@ -116,7 +116,9 @@ test('test lane matrix defines every required lane and npm script', () => {
     'node docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs'
   );
   assert.match(runner, /from '\.\/test-lane-config\.mjs'/);
-  assert.match(driftScript, /from '\.\/test-lane-config\.mjs'/);
+  assert.doesNotMatch(driftScript, /from '\.\/test-lane-config\.mjs'/);
+  assert.match(driftScript, /function laneOwnedProofFiles\(\)/);
+  assert.match(driftScript, /test-lane-classifier-workflow-current-behavior\.test\.mjs/);
   assert.match(config, /export const LANES = Object\.freeze/);
   assert.match(config, /export const FILE_LANE_RULES = Object\.freeze/);
   assert.match(matrix, /npm run test:audit-drift/);

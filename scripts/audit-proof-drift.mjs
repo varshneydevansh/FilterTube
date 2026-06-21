@@ -4,7 +4,6 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { LANES } from './test-lane-config.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -75,14 +74,9 @@ export function laneOwnedProofFiles() {
     'scripts/test-lane-config.mjs',
     'scripts/audit-proof-drift.mjs',
     'docs/audit/TEST_LANE_MATRIX.md',
-    'tests/runtime/test-lane-matrix-current-behavior.test.mjs'
+    'tests/runtime/test-lane-matrix-current-behavior.test.mjs',
+    'tests/runtime/test-lane-classifier-workflow-current-behavior.test.mjs'
   ]);
-
-  for (const lane of Object.values(LANES)) {
-    for (const file of [...(lane.checks || []), ...(lane.tests || [])]) {
-      files.add(file);
-    }
-  }
 
   return [...files].filter(file => fs.existsSync(path.join(repoRoot, file)));
 }

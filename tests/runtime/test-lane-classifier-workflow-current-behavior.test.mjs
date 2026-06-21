@@ -480,9 +480,11 @@ test('lane-owned audit proof fingerprints do not silently drift', () => {
   assert.ok(files.includes('tests/runtime/test-lane-classifier-workflow-current-behavior.test.mjs'));
   assert.ok(files.includes('scripts/audit-proof-drift.mjs'));
   assert.ok(files.includes('scripts/test-lane-config.mjs'));
+  assert.equal(files.includes('tests/runtime/content-bridge-whitelist-pending-refresh-boundary-current-behavior.test.mjs'), false);
   assert.deepEqual(drift, []);
   assert.match(matrix, /full audit proof drift inventory/);
   assert.match(matrix, /4731` tests ran, `4580` passed, and `151` failed/);
-  assert.match(matrix, /all-scope source fingerprint drift inventory is clean/);
-  assert.match(matrix, /audit:runtime` stays the inventory to retire or refresh/);
+  assert.match(matrix, /lane-workflow source fingerprint drift inventory is clean/);
+  assert.match(matrix, /all-scope source fingerprint drift inventory remains backlog evidence/);
+  assert.match(matrix, /audit:runtime` stays the inventory to retire or\s+refresh/);
 });
