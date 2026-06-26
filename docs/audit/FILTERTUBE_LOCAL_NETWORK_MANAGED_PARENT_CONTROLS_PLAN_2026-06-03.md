@@ -2558,3 +2558,11 @@ follow. I will share progress as this moves from audit/spec into implementation.
   rows now clamp caller-supplied expiry values to the provider's default
   maximum retention window. A provider row can expire earlier, but it cannot
   request indefinite or over-long local/home storage.
+- [x] 2026-06-26 extension-owned local/internet sync close-out slice: live
+  Send Update, configured Internet Pickup, configured Home Pickup, protected
+  profile-open receive checks, parent/source receipt checks, provider
+  status/queue counts, purge, token access, expiry, and browser-safe provider
+  confirmation are implemented for the extension-owned release boundary.
+  Hosted FilterTube Internet Pickup, automatic LAN peer discovery, installed
+  two-device smoke, and downstream native parity remain separate proof/provider
+  lanes rather than missing extension code in this slice.

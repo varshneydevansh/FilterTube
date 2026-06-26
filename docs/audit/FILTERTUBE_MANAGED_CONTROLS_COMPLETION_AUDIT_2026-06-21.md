@@ -101,6 +101,31 @@ remaining local queue behavior expected for later managed updates:
 This still does not prove or claim a hosted FilterTube Internet Pickup service,
 automatic LAN peer discovery, or downstream Android/iOS parity.
 
+## 2026-06-26 Extension-Owned Local/Internet Sync Close-Out
+
+The extension-owned device-sync feature work for local intranet and
+user-owned internet pickup is now closed for the current release boundary:
+
+- live `Send Update` remains the default parent/caregiver path when both
+  verified devices are open together
+- `Internet Pickup` can use an explicitly configured trusted HTTPS pickup
+  address for verified protected devices that open later or away
+- `Home Pickup` can use an explicitly configured same-network pickup address
+  for verified protected devices on a home, clinic, or school network
+- protected profiles with `syncOnProfileOpen` check configured pickup paths
+  when Accounts & Sync opens, when the dashboard becomes visible again, and
+  after profile switch
+- parent/source devices can check redacted delivery receipts from configured
+  pickup paths
+- provider health/status, waiting-update counts, receipt counts, purge, expiry,
+  token access, and browser-safe status confirmation are implemented in the
+  self-hosted reference provider path
+
+This close-out does not turn Wi-Fi/network reachability into authority. It also
+does not claim a FilterTube-hosted Internet Pickup service, automatic LAN peer
+discovery, or downstream native app parity. Those remain deployment/manual/app
+lanes, not missing extension implementation in this slice.
+
 ## 2026-06-26 Provider Setup Status Update
 
 The self-hosted reference provider now has enough operator-facing setup surface
