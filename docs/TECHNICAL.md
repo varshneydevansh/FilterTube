@@ -101,6 +101,13 @@ sequenceDiagram
 - the Family Device map is shared for live, same-network, and away/internet devices; transport reachability is separate from authority
 - `Internet Pickup` is an optional configured pickup provider for unreadable signed pending updates; provider reachability never grants authority
 - `Home Pickup` is an optional configured same-network pickup service; local-network presence and discovery never grant authority
+- the reference pickup provider runs through `npm run managed:provider`; use
+  `FILTERTUBE_PROVIDER_HOST=0.0.0.0` for Home Pickup and
+  `FILTERTUBE_PROVIDER_STORE=.filtertube/managed-delivery-store.json` when
+  waiting updates and redacted receipts should survive provider restart
+- a browser `GET /filtertube` status response is safe to inspect because it
+  exposes service/readiness metadata only, never plaintext rules, PINs, private
+  keys, or policy authority
 - protected-profile time limits are runtime policy gates; reaching the limit blocks YouTube with the FilterTube timeout surface and records extra-time requests as protected history
 
 ## Runtime stabilization checkpoint

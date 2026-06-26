@@ -86,6 +86,18 @@ Important protected-profile rules:
 - a protected-profile PIN can open receive-only sync, but it cannot unlock parent/admin controls
 - parent/admin unlock is temporary; sensitive actions can re-check the PIN, repeated wrong PIN attempts are delayed, and failed-unlock evidence stays in protected local history
 
+Self-hosted pickup provider:
+
+```bash
+FILTERTUBE_PROVIDER_HOST=0.0.0.0 \
+FILTERTUBE_PROVIDER_STORE=.filtertube/managed-delivery-store.json \
+npm run managed:provider
+```
+
+- Home Pickup uses `http://<this-computer-lan-ip>:8787/filtertube` on the trusted home/school network
+- Internet Pickup uses the same provider only after you expose it through your own trusted HTTPS address
+- opening `/filtertube` returns a safe status JSON; rule contents, PINs, private keys, and profile policy are never shown there
+
 Protected profile time limits:
 
 - parent/account profiles can set daily YouTube time for protected profiles
