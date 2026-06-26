@@ -266,6 +266,9 @@ Input JSON shape:
   "automatedLaneEvidence": [{ "command": "npm run test:settings", "status": "passed", "summary": "...", "lanes": ["test:settings"] }]
 }
 
+Start from:
+  docs/audit/artifacts/managed-extension-installed-smoke/observation-template.json
+
 The generator creates an executed installed-extension smoke artifact only after
 explicit confirmation. It never records plaintext rules, PINs, passwords, or
 private keys, and it leaves provider/app parity readiness as not complete.

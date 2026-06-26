@@ -111,6 +111,13 @@ Before release, run the installed extension against a real Chrome profile:
 11. Confirm empty/no-policy YouTube remains snappy after SPA navigation.
 ```
 
+Use `docs/audit/artifacts/managed-extension-installed-smoke/observation-template.json`
+as the fillable redacted input, then generate the executed artifact with:
+
+```bash
+npm run managed:extension-smoke -- --input <redacted-observation.json> --confirm-manual-smoke-passed
+```
+
 ### Provider Lane
 
 The extension has explicit provider clients and a reference provider, but a real

@@ -10,11 +10,13 @@ import {
   writeManagedExtensionInstalledSmokeArtifact
 } from '../../scripts/create-managed-extension-installed-smoke-artifact.mjs';
 import {
+  REQUIRED_MANAGED_EXTENSION_INSTALLED_ROWS,
   validateManagedExtensionInstalledSmokeArtifact
 } from '../../docs/audit/artifacts/managed-extension-installed-smoke/verify-managed-extension-smoke-artifact.mjs';
 
 const repoRoot = process.cwd();
 const generatorPath = 'scripts/create-managed-extension-installed-smoke-artifact.mjs';
+const observationTemplatePath = 'docs/audit/artifacts/managed-extension-installed-smoke/observation-template.json';
 
 function readJson(file) {
   return JSON.parse(fs.readFileSync(path.join(repoRoot, file), 'utf8'));
@@ -74,6 +76,26 @@ test('managed installed-extension smoke generator is exposed as release settings
   assert.deepEqual(result.lanes, ['release', 'settings', 'smoke']);
   assert.deepEqual(result.unmatched, []);
   assert.equal(result.classifications[0].matched[0].id, 'managed-extension-installed-smoke-artifact-surface');
+});
+
+test('managed installed-extension smoke observation template covers required rows without pretending execution', () => {
+  const template = readJson(observationTemplatePath);
+  const result = classifyPaths([observationTemplatePath]);
+
+  assert.deepEqual(result.lanes, ['release', 'settings', 'smoke']);
+  assert.deepEqual(result.unmatched, []);
+  assert.equal(result.classifications[0].matched[0].id, 'managed-extension-installed-smoke-artifact-surface');
+  assert.deepEqual(Object.keys(template.rowEvidence), REQUIRED_MANAGED_EXTENSION_INSTALLED_ROWS);
+  assert.deepEqual(Object.keys(template.observationSummaries), REQUIRED_MANAGED_EXTENSION_INSTALLED_ROWS);
+  assert.equal(template.policyEvidence.revision, 0);
+  assert.equal(template.assertions.parentAdminUnlockObserved, false);
+  assert.equal(template.assertions.pickupProviderAuthorityGranted, false);
+  assert.equal(template.assertions.automaticLanDiscoveryObserved, false);
+  assert.equal(template.assertions.hostedInternetPickupClaimed, false);
+  assert.throws(
+    () => createManagedExtensionInstalledSmokeArtifact({ repoRoot, input: template, confirmed: true }),
+    /is required|must be a positive integer/
+  );
 });
 
 test('managed installed-extension smoke generator creates a verifier-compatible artifact', () => {

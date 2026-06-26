@@ -1,0 +1,140 @@
+{
+  "_instructions": [
+    "Fill this file after the installed-extension parent/protected-device smoke is actually complete.",
+    "Use redacted identifiers only. Do not include PINs, passwords, plaintext rule values, private keys, cookies, raw policy JSON, video titles, watched titles, mailbox ciphertext, or decrypted payloads.",
+    "Then run: npm run managed:extension-smoke -- --input <this-file> --confirm-manual-smoke-passed"
+  ],
+  "logicalChangeType": "managed extension installed smoke",
+  "requiredLanes": [
+    "test:release",
+    "test:settings",
+    "test:smoke"
+  ],
+  "recordingFields": {
+    "manualTimestamp": "",
+    "testerInitials": "",
+    "browserId": "",
+    "browserNameVersion": "",
+    "extensionId": "",
+    "extensionVersion": "",
+    "workspaceRevisionOrHash": "",
+    "parentProfileId": "",
+    "protectedProfileId": "",
+    "trustedLinkId": "",
+    "sourceDeviceId": "",
+    "targetDeviceId": "",
+    "sourcePublicKeyId": "",
+    "keyVersion": "",
+    "installedExtensionPath": "",
+    "dashboardUrl": "",
+    "parentYouTubeUrl": "",
+    "protectedYouTubeUrl": "",
+    "observedHistorySummary": "",
+    "observedNoWorkState": "",
+    "observedRegressionSummary": ""
+  },
+  "visibleEvidence": {
+    "parentDashboardArtifact": "",
+    "familyDeviceUpdatesArtifact": "",
+    "protectedProfileArtifact": "",
+    "protectedYouTubeArtifact": "",
+    "timeoutOverlayArtifact": "",
+    "managedHistoryArtifact": "",
+    "notes": ""
+  },
+  "policyEvidence": {
+    "revision": 0,
+    "policyHash": ""
+  },
+  "automatedLaneEvidence": [
+    {
+      "command": "",
+      "status": "passed",
+      "summary": "",
+      "lanes": [
+        "test:release",
+        "test:settings",
+        "test:smoke"
+      ]
+    }
+  ],
+  "assertions": {
+    "parentAdminUnlockObserved": false,
+    "protectedProfileCreated": false,
+    "protectedUserCannotConfigureDelivery": false,
+    "childPinIsNotAdmin": false,
+    "mainRouteGateObserved": false,
+    "kidsRouteGateObserved": false,
+    "timeLimitOverlayObserved": false,
+    "liveNanahSendObserved": false,
+    "signedPolicyRevisionObserved": false,
+    "historyRedactedObserved": false,
+    "noPolicyNoWorkObserved": false,
+    "youtubeSnappyAfterSpaObserved": false,
+    "blockingWhitelistingUnaffectedObserved": false,
+    "quickBlockAndThreeDotMenuObserved": false,
+    "pickupProviderAuthorityGranted": false,
+    "automaticLanDiscoveryObserved": false,
+    "hostedInternetPickupClaimed": false
+  },
+  "rowEvidence": {
+    "FT-MANAGED-EXT-00-install-preflight": {
+      "artifact": ""
+    },
+    "FT-MANAGED-EXT-01-parent-admin-unlock": {
+      "artifact": ""
+    },
+    "FT-MANAGED-EXT-02-create-protected-profile": {
+      "artifact": ""
+    },
+    "FT-MANAGED-EXT-03-set-main-kids-access": {
+      "artifact": ""
+    },
+    "FT-MANAGED-EXT-04-set-time-limit": {
+      "artifact": ""
+    },
+    "FT-MANAGED-EXT-05-edit-rules-keyword-channel-video": {
+      "artifact": ""
+    },
+    "FT-MANAGED-EXT-06-send-update-live-nanah": {
+      "artifact": ""
+    },
+    "FT-MANAGED-EXT-07-protected-device-apply-and-history": {
+      "artifact": ""
+    },
+    "FT-MANAGED-EXT-08-main-kids-route-gate": {
+      "artifact": ""
+    },
+    "FT-MANAGED-EXT-09-timeout-overlay": {
+      "artifact": ""
+    },
+    "FT-MANAGED-EXT-10-protected-user-cannot-admin": {
+      "artifact": ""
+    },
+    "FT-MANAGED-EXT-11-no-policy-no-work-spa": {
+      "artifact": ""
+    },
+    "FT-MANAGED-EXT-12-three-dot-and-quick-block-regression": {
+      "artifact": ""
+    },
+    "FT-MANAGED-EXT-13-pickup-provider-status-boundary": {
+      "artifact": ""
+    }
+  },
+  "observationSummaries": {
+    "FT-MANAGED-EXT-00-install-preflight": "",
+    "FT-MANAGED-EXT-01-parent-admin-unlock": "",
+    "FT-MANAGED-EXT-02-create-protected-profile": "",
+    "FT-MANAGED-EXT-03-set-main-kids-access": "",
+    "FT-MANAGED-EXT-04-set-time-limit": "",
+    "FT-MANAGED-EXT-05-edit-rules-keyword-channel-video": "",
+    "FT-MANAGED-EXT-06-send-update-live-nanah": "",
+    "FT-MANAGED-EXT-07-protected-device-apply-and-history": "",
+    "FT-MANAGED-EXT-08-main-kids-route-gate": "",
+    "FT-MANAGED-EXT-09-timeout-overlay": "",
+    "FT-MANAGED-EXT-10-protected-user-cannot-admin": "",
+    "FT-MANAGED-EXT-11-no-policy-no-work-spa": "",
+    "FT-MANAGED-EXT-12-three-dot-and-quick-block-regression": "",
+    "FT-MANAGED-EXT-13-pickup-provider-status-boundary": ""
+  }
+}

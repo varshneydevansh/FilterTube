@@ -87,6 +87,8 @@ Manual parent/protected-profile smoke is now a strict artifact instead of loose
 notes:
 
 - Template: `docs/audit/artifacts/managed-extension-installed-smoke/template.json`
+- Fillable observation input:
+  `docs/audit/artifacts/managed-extension-installed-smoke/observation-template.json`
 - Generator:
   `npm run managed:extension-smoke -- --input <redacted-observation.json> --confirm-manual-smoke-passed`
 - Verifier:
