@@ -205,6 +205,13 @@ extension authority code.
   not prove pickup by a specific device, create a hosted-service claim, scan the
   network, or change trusted-link, target-profile, scope, revision, hash, or
   signature authority.
+- [x] 2026-06-26 pickup check UI refresh slice: Internet Pickup and Home Pickup
+  readiness checks now refresh both the Family Device Updates strip and the
+  Family Controls command-center summary immediately after the redacted health
+  result is recorded. This keeps reachable/durable-store feedback visible without
+  waiting for a later page refresh. It does not change provider authority,
+  network discovery, trusted-link validation, target-profile matching, scope,
+  revision, hash, or signature checks.
 - [x] 2026-06-21 Home Pickup visible check slice: configured Home Pickup rows
   now show a direct `Check` action in the Family Device Updates map. This is
   only a readiness check for the explicitly configured pickup service; it does

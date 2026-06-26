@@ -13873,6 +13873,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    async function refreshNanahDeliveryFeedbackUi() {
+        renderNanahDeliveryPathStrip();
+        await refreshProfilesUI();
+        renderNanahDeliveryPathStrip();
+    }
+
     async function promptManagedProviderSetupAction({
         title,
         message,
@@ -14007,7 +14013,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (action === 'check') {
             await checkNanahManagedMailboxServerHealth({ reason: 'manual_provider_check' });
-            renderNanahDeliveryPathStrip();
+            await refreshNanahDeliveryFeedbackUi();
             return;
         }
         if (action === 'disable') {
@@ -14216,7 +14222,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (action === 'check') {
             await checkNanahManagedLocalNetworkProviderHealth({ reason: 'manual_provider_check' });
-            renderNanahDeliveryPathStrip();
+            await refreshNanahDeliveryFeedbackUi();
             return;
         }
         if (action === 'disable') {
@@ -19789,7 +19795,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             try {
                 await checkNanahManagedMailboxServerHealth({ reason: 'delivery_card_check' });
             } finally {
-                renderNanahDeliveryPathStrip();
+                await refreshNanahDeliveryFeedbackUi();
             }
         });
     }
@@ -19808,7 +19814,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             try {
                 await checkNanahManagedLocalNetworkProviderHealth({ reason: 'delivery_card_check' });
             } finally {
-                renderNanahDeliveryPathStrip();
+                await refreshNanahDeliveryFeedbackUi();
             }
         });
     }
