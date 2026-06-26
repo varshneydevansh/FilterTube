@@ -14101,8 +14101,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         await refreshNanahDeliveryFeedbackUi();
     }
 
-    function buildManagedPickupProviderSetupCommand() {
+    function generateManagedPickupSetupKey() {
+        try {
+            const bytes = new Uint8Array(18);
+            window.crypto?.getRandomValues(bytes);
+            const raw = Array.from(bytes, byte => String.fromCharCode(byte)).join('');
+            return `ft-${btoa(raw).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')}`;
+        } catch (_) {
+            return 'ft-change-this-private-pickup-key';
+        }
+    }
+
+    function buildManagedPickupProviderSetupCommand(token = '') {
+        const safeToken = normalizeString(token);
         return [
+            ...(safeToken ? [`FILTERTUBE_PROVIDER_TOKEN=${safeToken}`] : []),
             'FILTERTUBE_PROVIDER_HOST=0.0.0.0',
             'FILTERTUBE_PROVIDER_STORE=.filtertube/managed-delivery-store.json',
             'npm run managed:provider'
@@ -14110,7 +14123,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function copyManagedInternetPickupSetupCommand() {
-        const command = buildManagedPickupProviderSetupCommand();
+        const pickupKey = generateManagedPickupSetupKey();
+        const command = buildManagedPickupProviderSetupCommand(pickupKey);
         const endpointHint = 'https://<your-trusted-domain>/filtertube';
         const text = [
             '# Run this from the FilterTube project on the pickup provider computer/server.',
@@ -14118,6 +14132,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             '',
             '# Internet Pickup must be entered as a trusted HTTPS address in FilterTube:',
             endpointHint,
+            '',
+            '# Paste this same pickup key into the optional Internet Pickup key prompt:',
+            pickupKey,
             '',
             '# The included provider listens over HTTP by default; put it behind your own HTTPS reverse proxy/tunnel before using it as Internet Pickup.',
             '# The provider stores only unreadable waiting updates and redacted receipts. Protected devices still validate saved parent link, target profile, scope, revision, hash, and signature.'
@@ -14132,7 +14149,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function copyManagedHomePickupSetupCommand() {
-        const command = buildManagedPickupProviderSetupCommand();
+        const pickupKey = generateManagedPickupSetupKey();
+        const command = buildManagedPickupProviderSetupCommand(pickupKey);
         const endpointHint = 'http://<this-computer-lan-ip>:8787/filtertube';
         const text = [
             '# Run this from the FilterTube project on the home/school pickup computer.',
@@ -14140,6 +14158,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             '',
             '# Then enter this Home Pickup address in FilterTube on parent/protected devices:',
             endpointHint,
+            '',
+            '# Paste this same pickup key into the optional Home Pickup key prompt:',
+            pickupKey,
             '',
             '# Being on the same network is not authority. Protected devices still validate the saved parent link, target profile, scope, revision, hash, and signature.'
         ].join('\n');

@@ -2480,3 +2480,8 @@ follow. I will share progress as this moves from audit/spec into implementation.
   counts and shows parent-facing status such as `No waiting updates` or
   `2 waiting updates`; it still never exposes plaintext rules, PINs, profiles,
   or channel/keyword contents through health checks.
+- [x] 2026-06-26 pickup setup key slice: Copy Setup Command now generates a
+  one-time local pickup key and includes it in the provider command plus the
+  matching Home/Internet Pickup key prompt instruction. This key only protects
+  provider transport access; the protected device still validates trusted link,
+  target profile, scope, revision, hash, and signature before applying anything.

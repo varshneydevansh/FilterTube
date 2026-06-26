@@ -32,6 +32,17 @@ sanitized rows to a local JSON store:
 FILTERTUBE_PROVIDER_STORE=.filtertube/managed-delivery-store.json npm run managed:provider
 ```
 
+On shared home/school networks, add a provider key and paste the same key into
+the FilterTube Home Pickup or Internet Pickup key prompt:
+
+```bash
+FILTERTUBE_PROVIDER_TOKEN=<private-pickup-key> FILTERTUBE_PROVIDER_HOST=0.0.0.0 FILTERTUBE_PROVIDER_STORE=.filtertube/managed-delivery-store.json npm run managed:provider
+```
+
+The Accounts & Sync setup-copy action generates a local key for this purpose.
+This key only gates provider transport access; it is not a parent PIN and it
+does not grant policy authority.
+
 For Internet Pickup trials, the same provider shape can be used only after it is
 served through a trusted HTTPS address that the family/school controls:
 
