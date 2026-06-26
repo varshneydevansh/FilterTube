@@ -10,11 +10,13 @@ import {
   writeManagedAppParitySmokeArtifact
 } from '../../scripts/create-managed-app-parity-smoke-artifact.mjs';
 import {
+  REQUIRED_MANAGED_APP_PARITY_ROWS,
   validateManagedAppParitySmokeArtifact
 } from '../../docs/audit/artifacts/managed-app-parity-smoke/verify-managed-app-parity-smoke-artifact.mjs';
 
 const repoRoot = process.cwd();
 const generatorPath = 'scripts/create-managed-app-parity-smoke-artifact.mjs';
+const observationTemplatePath = 'docs/audit/artifacts/managed-app-parity-smoke/observation-template.json';
 
 function readJson(file) {
   return JSON.parse(fs.readFileSync(path.join(repoRoot, file), 'utf8'));
@@ -98,6 +100,25 @@ test('managed app parity smoke generator is exposed as release settings smoke sc
   assert.deepEqual(result.lanes, ['release', 'settings', 'smoke']);
   assert.deepEqual(result.unmatched, []);
   assert.equal(result.classifications[0].matched[0].id, 'managed-app-parity-smoke-artifact-surface');
+});
+
+test('managed app parity smoke observation template covers required rows without pretending execution', () => {
+  const template = readJson(observationTemplatePath);
+  const result = classifyPaths([observationTemplatePath]);
+
+  assert.deepEqual(result.lanes, ['release', 'settings', 'smoke']);
+  assert.deepEqual(result.unmatched, []);
+  assert.equal(result.classifications[0].matched[0].id, 'managed-app-parity-smoke-artifact-surface');
+  assert.deepEqual(Object.keys(template.observationSummaries), REQUIRED_MANAGED_APP_PARITY_ROWS);
+  assert.equal(template.contractParity.contractSynced, false);
+  assert.equal(template.contractParity.nativeRuntimeSynced, false);
+  assert.equal(template.policyEvidence.policyRevision, 0);
+  assert.equal(template.rowEvidence['FT-MANAGED-APP-16-family-device-map-delivery'].deliveryStateIsAuthority, false);
+  assert.equal(template.rowEvidence['FT-MANAGED-APP-16-family-device-map-delivery'].protectedUserCanConfigureDelivery, false);
+  assert.throws(
+    () => createManagedAppParitySmokeArtifact({ repoRoot, input: template, confirmed: true }),
+    /is required|must be android or ios|must be a positive integer/
+  );
 });
 
 test('managed app parity smoke generator creates verifier-compatible android and ios artifacts', () => {

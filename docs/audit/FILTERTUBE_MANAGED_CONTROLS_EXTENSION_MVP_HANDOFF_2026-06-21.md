@@ -173,6 +173,10 @@ iOS
   -> same parity set as Android
 ```
 
+Use `docs/audit/artifacts/managed-app-parity-smoke/observation-template.json`
+as the fillable redacted input for each installed Android or iOS app parity
+smoke. One executed artifact proves one platform only.
+
 ## Release Decision
 
 Treat the extension repo as ready for a final installed-extension smoke pass, not

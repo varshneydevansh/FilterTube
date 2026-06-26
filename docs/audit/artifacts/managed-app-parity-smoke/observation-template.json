@@ -1,0 +1,103 @@
+{
+  "_instructions": [
+    "Fill this file only after one installed Android or iOS managed app parity smoke actually passes.",
+    "This artifact proves one app platform only. Android and iOS each need their own executed artifact.",
+    "Use redacted identifiers only. Do not include PINs, passwords, tokens, plaintext rules, private keys, cookies, raw policy JSON, mailbox payloads, video titles, watched titles, or ciphertext.",
+    "Then run: npm run managed:app-parity-smoke -- --input <this-file> --confirm-installed-app-smoke-passed"
+  ],
+  "logicalChangeType": "managed app parity installed smoke",
+  "requiredLanes": [
+    "test:release",
+    "test:settings",
+    "test:smoke"
+  ],
+  "automatedLaneEvidence": [
+    {
+      "command": "",
+      "status": "passed",
+      "summary": "",
+      "lanes": [
+        "test:release",
+        "test:settings",
+        "test:smoke"
+      ]
+    }
+  ],
+  "appPlatform": {
+    "platform": "",
+    "appName": "",
+    "appVersion": "",
+    "buildIdentifier": "",
+    "installedArtifactType": "",
+    "installedArtifactLabel": "",
+    "deviceLabel": "",
+    "deviceModel": "",
+    "osVersion": "",
+    "upstreamRevisionOrHash": ""
+  },
+  "contractParity": {
+    "contractHash": "",
+    "contractSynced": false,
+    "nativeRuntimeSynced": false,
+    "nativeAdapterProof": {
+      "sourcePath": "",
+      "status": ""
+    }
+  },
+  "recordingFields": {
+    "manualTimestamp": "",
+    "testerInitials": "",
+    "parentProfileId": "",
+    "managedProfileId": "",
+    "deviceId": "",
+    "managedProfileRole": "",
+    "parentAuthorityObservation": "",
+    "childAuthorityObservation": "",
+    "mainViewingSpaceObservation": "",
+    "kidsViewingSpaceObservation": "",
+    "timeBudgetObservation": "",
+    "familyDeviceMapObservation": "",
+    "historyAccessObservation": "",
+    "noPolicyNoWorkObservation": ""
+  },
+  "policyEvidence": {
+    "policyRevision": 0,
+    "policyHash": ""
+  },
+  "observationSummaries": {
+    "FT-MANAGED-APP-00-contract-sync": "",
+    "FT-MANAGED-APP-01-parent-admin-lock": "",
+    "FT-MANAGED-APP-02-child-pin-not-admin": "",
+    "FT-MANAGED-APP-03-main-route-gate": "",
+    "FT-MANAGED-APP-04-kids-route-gate": "",
+    "FT-MANAGED-APP-05-time-budget-startup": "",
+    "FT-MANAGED-APP-06-time-budget-resume-heartbeat-pause": "",
+    "FT-MANAGED-APP-07-reduced-budget-clamp": "",
+    "FT-MANAGED-APP-08-timeout-surface": "",
+    "FT-MANAGED-APP-09-history-redaction": "",
+    "FT-MANAGED-APP-10-no-policy-no-work": "",
+    "FT-MANAGED-APP-11-native-settings-lock": "",
+    "FT-MANAGED-APP-12-keyword-rule-apply": "",
+    "FT-MANAGED-APP-13-channel-rule-apply": "",
+    "FT-MANAGED-APP-14-video-rule-apply": "",
+    "FT-MANAGED-APP-15-managed-list-policy-apply": "",
+    "FT-MANAGED-APP-16-family-device-map-delivery": ""
+  },
+  "rowEvidence": {
+    "FT-MANAGED-APP-16-family-device-map-delivery": {
+      "parentFacingLabels": [
+        "Send Update",
+        "Home Pickup",
+        "Internet Pickup"
+      ],
+      "familyDeviceMapStates": [
+        "live_now_send_update",
+        "same_network_home_pickup",
+        "away_or_internet_internet_pickup",
+        "offline_last_valid_policy"
+      ],
+      "deliveryStateIsAuthority": false,
+      "protectedUserCanConfigureDelivery": false
+    }
+  }
+}

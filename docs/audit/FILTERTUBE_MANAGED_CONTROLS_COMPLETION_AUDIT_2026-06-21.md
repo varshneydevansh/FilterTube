@@ -169,6 +169,14 @@ reachability still never becomes policy authority.
 6. Future provider/app design for automatic same-network discovery, if still desired.
 ```
 
+Installed app parity smoke starts from the fillable redacted input
+`docs/audit/artifacts/managed-app-parity-smoke/observation-template.json` and
+generates one platform-specific artifact through:
+
+```bash
+npm run managed:app-parity-smoke -- --input <redacted-app-smoke.json> --confirm-installed-app-smoke-passed
+```
+
 ## Verification
 
 ```bash

@@ -394,6 +394,9 @@ Input JSON shape:
   "automatedLaneEvidence": [{ "command": "npm run test:settings", "status": "passed", "summary": "...", "lanes": ["test:settings"] }]
 }
 
+Start from:
+  docs/audit/artifacts/managed-app-parity-smoke/observation-template.json
+
 This generator creates one installed Android or iOS app parity smoke artifact.
 It does not sync the app repo, does not prove the other platform, and never
 records plaintext rules, PINs, passwords, private keys, watched titles, tokens,
