@@ -30,10 +30,16 @@ function readJson(relativePath) {
 function manifestHostPermissions() {
   return manifests.flatMap((file) => {
     const manifest = readJson(file);
-    return [
-      ...Array.isArray(manifest.host_permissions) ? manifest.host_permissions : [],
-      ...Array.isArray(manifest.optional_host_permissions) ? manifest.optional_host_permissions : []
-    ].map((permission) => ({ file, permission }));
+    return (Array.isArray(manifest.host_permissions) ? manifest.host_permissions : [])
+      .map((permission) => ({ file, permission }));
+  });
+}
+
+function manifestOptionalHostPermissions() {
+  return manifests.flatMap((file) => {
+    const manifest = readJson(file);
+    return (Array.isArray(manifest.optional_host_permissions) ? manifest.optional_host_permissions : [])
+      .map((permission) => ({ file, permission }));
   });
 }
 
@@ -45,45 +51,47 @@ test('managed remote delivery readiness gate is docs-backed and linked to curren
   const boundaryDoc = read(boundaryDocPath);
   const inventory = read(inventoryDocPath);
 
-  assert.match(doc, /Remote policy authority, validation, local apply, action history,\s+source-side mailbox seal\/open encryption helpers, source-side server-safe\s+mailbox storage preparation, source-side mailbox upload\/purge provider\s+handoffs, explicitly configured browser HTTPS mailbox upload\/pull\/purge client,\s+provider-gated mailbox intake, and provider-gated local-network candidate intake\s+are present/);
-  assert.match(doc, /Complete remote delivery is still blocked on server deployment,\s+LAN transport proof, native parity, and installed two-device smoke/);
+  assert.match(doc, /Remote policy authority, validation, local apply, action history,\s+source-side Internet Pickup seal\/open encryption helpers, source-side server-safe\s+pickup storage preparation, source-side pickup upload\/purge provider handoffs,\s+explicitly configured browser HTTPS Internet Pickup upload\/pull\/purge client,\s+provider-gated Internet Pickup intake, and provider-gated Home Pickup candidate\s+intake are present/);
+  assert.match(doc, /Complete remote delivery is still blocked on server deployment,\s+Home Pickup transport proof, native parity, and installed two-device smoke/);
   assert.match(doc, new RegExp(providerDocPath));
   assert.match(doc, new RegExp(openSyncDocPath));
   assert.match(doc, new RegExp(mailboxDocPath));
   assert.match(doc, new RegExp(boundaryDocPath));
   assert.match(doc, new RegExp(inventoryDocPath));
   assert.match(doc, /release claim for complete remote management: NO-GO/);
-  assert.match(doc, /built-in LAN peer discovery: NO-GO/);
-  assert.match(doc, /mailbox encryption client: READY local helper and configured HTTPS upload/);
-  assert.match(doc, /source-side mailbox upload-provider handoff: PARTIAL/);
-  assert.match(doc, /source-side mailbox purge-provider handoff: PARTIAL/);
-  assert.match(doc, /built-in browser HTTPS mailbox upload client: READY explicit config only/);
-  assert.match(doc, /built-in browser HTTPS mailbox purge client: READY explicit config only/);
-  assert.match(doc, /built-in browser HTTPS mailbox pull client: READY explicit config only/);
-  assert.match(doc, /mailbox decryption client: READY local helper and configured HTTPS pull/);
+  assert.match(doc, /built-in same-network peer discovery: NO-GO/);
+  assert.match(doc, /Internet Pickup encryption client: READY local helper and configured HTTPS upload/);
+  assert.match(doc, /source-side Internet Pickup upload-provider handoff: PARTIAL/);
+  assert.match(doc, /source-side Internet Pickup purge-provider handoff: PARTIAL/);
+  assert.match(doc, /built-in browser HTTPS Internet Pickup upload client: READY explicit config only/);
+  assert.match(doc, /built-in browser HTTPS Internet Pickup purge client: READY explicit config only/);
+  assert.match(doc, /built-in browser HTTPS Internet Pickup pull client: READY explicit config only/);
+  assert.match(doc, /Internet Pickup decryption client: READY local helper and configured HTTPS pull/);
   assert.match(doc, /flowchart TD/);
   assert.match(doc, /node --test tests\/runtime\/managed-policy-sync-remote-delivery-readiness-gate-current-behavior\.test\.mjs/);
 
-  assert.match(providerDoc, /runtime built-in LAN peer discovery: absent/);
-  assert.match(providerDoc, /runtime built-in LAN delivery: absent/);
-  assert.match(openSyncDoc, /runtime browser HTTPS mailbox pull\/decrypt client: present behind explicit config/);
-  assert.match(openSyncDoc, /runtime mailbox server authority: absent/);
+  assert.match(providerDoc, /runtime built-in same-network peer discovery: absent/);
+  assert.match(providerDoc, /runtime built-in same-network delivery: absent/);
+  assert.match(openSyncDoc, /runtime browser HTTPS (?:mailbox|Internet Pickup) pull\/decrypt client: present behind explicit config/);
+  assert.match(openSyncDoc, /runtime (?:mailbox server|Internet Pickup service) authority: absent/);
   assert.match(mailboxDoc, /runtime mailbox seal\/open encryption helper: present/);
   assert.match(mailboxDoc, /runtime source-side server-safe mailbox storage item builder: present/);
-  assert.match(mailboxDoc, /runtime mailbox encryption client: present for local seal helper and configured HTTPS mailbox upload/);
+  assert.match(mailboxDoc, /runtime (?:mailbox|Internet Pickup) encryption client: present for local seal helper and configured HTTPS (?:mailbox|Internet Pickup) upload/);
   assert.match(mailboxDoc, /runtime source-side mailbox upload-provider handoff: present/);
   assert.match(mailboxDoc, /runtime source-side mailbox purge-provider handoff: present/);
-  assert.match(mailboxDoc, /runtime browser HTTPS mailbox upload client: present behind explicit config/);
-  assert.match(mailboxDoc, /runtime browser HTTPS mailbox purge client: present behind explicit config/);
-  assert.match(mailboxDoc, /runtime browser HTTPS mailbox pull client: present behind explicit config/);
-  assert.match(mailboxDoc, /runtime mailbox decryption client: present for local open helper and configured HTTPS mailbox pull/);
-  assert.match(boundaryDoc, /runtime built-in local-network peer discovery: absent/);
+  assert.match(mailboxDoc, /runtime browser HTTPS (?:mailbox|Internet Pickup) upload client: present behind explicit config/);
+  assert.match(mailboxDoc, /runtime browser HTTPS (?:mailbox|Internet Pickup) purge client: present behind explicit config/);
+  assert.match(mailboxDoc, /runtime browser HTTPS (?:mailbox|Internet Pickup) pull client: present behind explicit config/);
+  assert.match(mailboxDoc, /runtime (?:mailbox|Internet Pickup) decryption client: present for local open helper and configured HTTPS (?:mailbox|Internet Pickup) pull/);
+  assert.match(boundaryDoc, /runtime built-in (?:local-network|same-network) peer discovery: absent/);
   assert.match(inventory, /built-in local-network peer discovery\/LAN delivery runtime/);
 });
 
-test('extension manifests do not request broad LAN all-url or localhost host permissions', () => {
+test('extension manifests keep broad pickup endpoint access optional', () => {
   const hosts = manifestHostPermissions();
   const hostValues = hosts.map(row => row.permission);
+  const optionalHosts = manifestOptionalHostPermissions();
+  const optionalValues = optionalHosts.map(row => row.permission);
 
   assert.ok(hostValues.length > 0, 'manifest host permissions should be explicit');
   assert.deepEqual(
@@ -94,6 +102,7 @@ test('extension manifests do not request broad LAN all-url or localhost host per
       '*://*.youtubekids.com/*'
     ]
   );
+  assert.deepEqual([...new Set(optionalValues)].toSorted(), ['http://*/*', 'https://*/*']);
 
   for (const { file, permission } of hosts) {
     assert.doesNotMatch(permission, /<all_urls>/, `${file} should not request all urls`);
@@ -102,6 +111,9 @@ test('extension manifests do not request broad LAN all-url or localhost host per
     assert.doesNotMatch(permission, /^https?:\/\/127\.0\.0\.1\//, `${file} should not request loopback host access`);
     assert.doesNotMatch(permission, /^https?:\/\/\*\.local\//, `${file} should not request .local host access`);
     assert.doesNotMatch(permission, /^https?:\/\/(?:10|172|192)\./, `${file} should not request private LAN host access`);
+  }
+  for (const { file, permission } of optionalHosts) {
+    assert.ok(['http://*/*', 'https://*/*'].includes(permission), `${file} optional pickup host pattern drifted`);
   }
 });
 
@@ -141,18 +153,18 @@ test('readiness gate keeps allowed and blocked product claims separate', () => {
     'local parent-managed child/protected-profile edits are supported',
     'managed policy validation and apply are signature/revision gated',
     'live Nanah managed-policy sends are available only for eligible connected',
-    'provider-gated local-network candidate intake exists',
-    'provider-gated pull-on-open intake exists for already-decrypted mailbox',
-    'local-network discovery is not authority'
+    'provider-gated Home Pickup candidate intake exists',
+    'provider-gated pull-on-open intake exists for already-decrypted pickup',
+    'same-network discovery is not authority'
   ]) {
     assert.ok(doc.includes(allowed), `missing allowed claim ${allowed}`);
   }
 
   for (const blocked of [
-    'complete remote local-network management',
+    'complete same-network remote management',
     'always-on parent-to-child sync',
-    'mailbox server delivery without explicit endpoint configuration',
-    'automatic LAN peer discovery',
+    'Internet Pickup delivery without explicit endpoint configuration',
+    'automatic same-network peer discovery',
     'guaranteed later delivery after the parent device goes offline',
     'remote management across desktop and apps without installed two-device smoke',
     'managed list subscriptions/imports without parent approval'

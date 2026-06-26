@@ -13993,6 +13993,65 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    function getManagedPickupEndpointPermissionPattern(endpointUrl) {
+        const raw = normalizeString(endpointUrl);
+        if (!raw) return '';
+        try {
+            const url = new URL(raw);
+            if (url.protocol !== 'http:' && url.protocol !== 'https:') return '';
+            return `${url.protocol}//${url.host}/*`;
+        } catch (_) {
+            return '';
+        }
+    }
+
+    function getBrowserPermissionsApi() {
+        const api = globalThis.chrome?.permissions || globalThis.browser?.permissions;
+        return api && typeof api === 'object' ? api : null;
+    }
+
+    function callBrowserPermissionMethod(method, payload) {
+        return new Promise((resolve, reject) => {
+            try {
+                const maybePromise = method(payload, (result) => {
+                    const lastError = globalThis.chrome?.runtime?.lastError;
+                    if (lastError) {
+                        reject(new Error(lastError.message || 'permission_request_failed'));
+                        return;
+                    }
+                    resolve(result === true);
+                });
+                if (maybePromise && typeof maybePromise.then === 'function') {
+                    maybePromise.then(result => resolve(result === true)).catch(reject);
+                }
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    async function ensureManagedPickupEndpointPermission(endpointUrl, label) {
+        const pattern = getManagedPickupEndpointPermissionPattern(endpointUrl);
+        if (!pattern) return false;
+        const permissions = getBrowserPermissionsApi();
+        if (!permissions || typeof permissions.request !== 'function') return true;
+        try {
+            if (typeof permissions.contains === 'function') {
+                const alreadyGranted = await callBrowserPermissionMethod(permissions.contains.bind(permissions), { origins: [pattern] });
+                if (alreadyGranted) return true;
+            }
+            const granted = await callBrowserPermissionMethod(permissions.request.bind(permissions), { origins: [pattern] });
+            if (!granted) {
+                UIComponents.showToast(`${label} was not enabled because endpoint permission was not granted`, 'warning');
+            }
+            return granted === true;
+        } catch (error) {
+            console.error(`FilterTube: failed to request ${label} endpoint permission`, error);
+            UIComponents.showToast(`${label} needs browser permission for that pickup address`, 'error');
+            return false;
+        }
+    }
+
     async function configureNanahManagedMailboxServer() {
         const root = safeObject(profilesV4Cache);
         const activeProfileId = normalizeString(root.activeProfileId) || 'default';
@@ -14091,6 +14150,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             UIComponents.showToast('Internet Pickup address must be public HTTPS and supported by FilterTube', 'error');
             return;
         }
+        const permissionGranted = await ensureManagedPickupEndpointPermission(endpointUrl, 'Internet Pickup');
+        if (!permissionGranted) return;
         writeNanahManagedMailboxServerConfig(nextConfig);
         await recordManagedMailboxProviderConfigHistory({
             configured: true,
@@ -14326,6 +14387,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             UIComponents.showToast('Home Pickup address must be HTTPS or private/local HTTP and supported by FilterTube', 'error');
             return;
         }
+        const permissionGranted = await ensureManagedPickupEndpointPermission(endpointUrl, 'Home Pickup');
+        if (!permissionGranted) return;
         writeNanahManagedLocalNetworkProviderConfig(nextConfig);
         await recordManagedLocalNetworkProviderConfigHistory({
             configured: true,

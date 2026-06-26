@@ -2518,6 +2518,14 @@ follow. I will share progress as this moves from audit/spec into implementation.
   and signing-key rotation can purge pending rows plus receipts, while
   source-side receipt cleanup sends `ack` only so it cannot accidentally delete
   a pending update row that shares an explicit row id.
+- [x] 2026-06-26 pickup endpoint permission slice: browser manifests now keep
+  YouTube as the only install-time host permission surface while declaring
+  optional HTTP/HTTPS endpoint access for parent-configured pickup providers.
+  Internet Pickup and Home Pickup setup request browser permission for only the
+  entered provider origin before saving the endpoint, and denial leaves that
+  pickup path disabled. This makes configured intranet/internet pickup usable
+  without adding automatic LAN discovery, YouTube hot-path fetches, or provider
+  authority.
 - [x] 2026-06-26 provider receipt-retention slice: redacted Internet Pickup and
   Home Pickup receipt rows now get an expiry based on `ackedAt` and are pruned
   with the same bounded route-time cleanup as pending rows. This keeps

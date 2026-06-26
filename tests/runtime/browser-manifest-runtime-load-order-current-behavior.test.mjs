@@ -50,6 +50,11 @@ const commonHostPermissions = [
   '*://*.youtubekids.com/*',
 ];
 
+const optionalPickupHostPermissions = [
+  'http://*/*',
+  'https://*/*',
+];
+
 function filePath(file) {
   return path.join(repoRoot, file);
 }
@@ -102,17 +107,17 @@ function trackedFiles() {
 test('browser manifest runtime load-order doc is audit-only and manifest fingerprints are pinned', () => {
   const doc = read(docPath);
   const expected = [
-    ['manifest.json', 88, 2513, '282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734'],
-    ['manifest.chrome.json', 88, 2513, '282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734'],
-    ['manifest.firefox.json', 75, 2029, 'c84368c9db6a4900bb6ff055b66a645a88176d3533e307eee0dcb8d230fae2bb'],
-    ['manifest.opera.json', 89, 2518, '0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b'],
+    ['manifest.json', 93, 2654, '95496eac74d72fd90491302211b7dc07f492ed405d4eb1a001b8b600a02bc16b'],
+    ['manifest.chrome.json', 93, 2654, '95496eac74d72fd90491302211b7dc07f492ed405d4eb1a001b8b600a02bc16b'],
+    ['manifest.firefox.json', 80, 2150, '8368c4b520a07d1e5d9647f6c141f06f8fbd24a92c8b053d722488859f201c32'],
+    ['manifest.opera.json', 94, 2659, 'f9a3b4182521d8b1594d7975c327daf772e418e4869e8e3d33d286bfb25b486e'],
   ];
 
   assert.match(doc, /Status: audit-only proof/);
   assert.match(doc, /Runtime behavior is unchanged/);
   assert.match(doc, /This is not an\s+implementation patch/);
   assert.match(doc, /manifest change, package release gate, browser parity\s+claim, or JSON-first promotion/);
-  assert.match(doc, /4 files, 340 newline counts, and 9,573 bytes/);
+  assert.match(doc, /4 files, 360 newline counts, and 10,117 bytes/);
 
   for (const [file, lines, byteCount, hash] of expected) {
     assert.equal(lineCount(file), lines, `${file} line count drifted`);
@@ -136,6 +141,7 @@ test('common manifest permissions hosts action icons and active matches stay ali
     assert.equal(manifest.version, '3.3.2', `${file} version drifted`);
     assert.deepEqual(manifest.permissions, commonPermissions, `${file} permissions drifted`);
     assert.deepEqual(manifest.host_permissions, commonHostPermissions, `${file} host permissions drifted`);
+    assert.deepEqual(manifest.optional_host_permissions, optionalPickupHostPermissions, `${file} optional pickup host permissions drifted`);
     assert.deepEqual([...new Set(contentScriptMatches(manifest))], commonMatches, `${file} content matches drifted`);
     assert.deepEqual([...new Set(webAccessibleMatches(manifest))], commonMatches, `${file} WAR matches drifted`);
     assert.deepEqual(manifest.action.default_icon, {
@@ -226,6 +232,7 @@ test('web accessible resources differ only by Opera file icon omission today', (
     'js/filter_logic.js',
     'js/seed.js',
     'js/shared/identity.js',
+    'assets/images/homepage_hero_day.mp4',
     'icons/file.svg',
   ];
   const expectedOpera = [
@@ -233,6 +240,7 @@ test('web accessible resources differ only by Opera file icon omission today', (
     'js/filter_logic.js',
     'js/seed.js',
     'js/shared/identity.js',
+    'assets/images/homepage_hero_day.mp4',
   ];
 
   for (const file of ['manifest.json', 'manifest.chrome.json', 'manifest.firefox.json']) {

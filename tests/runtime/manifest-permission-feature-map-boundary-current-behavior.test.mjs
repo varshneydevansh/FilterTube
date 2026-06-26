@@ -53,22 +53,26 @@ const expectedHostPermissions = [
   '*://*.youtube-nocookie.com/*',
   '*://*.youtubekids.com/*',
 ];
+const expectedOptionalHostPermissions = [
+  'http://*/*',
+  'https://*/*',
+];
 const activeMatches = ['*://*.youtube.com/*', '*://*.youtubekids.com/*'];
 
 const expectedFingerprints = new Map([
-  ['manifest.json', [88, 2513, '282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734']],
-  ['manifest.chrome.json', [88, 2513, '282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734']],
-  ['manifest.firefox.json', [75, 2029, 'c84368c9db6a4900bb6ff055b66a645a88176d3533e307eee0dcb8d230fae2bb']],
-  ['manifest.opera.json', [89, 2518, '0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b']],
-  ['js/background.js', [6803, 306710, '57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7']],
-  ['js/io_manager.js', [2030, 96914, 'd04bfd75d061ee405c1dfa4cab8c9d0fa6a2f072d046add33e4b6782b1f58a21']],
-  ['js/tab-view.js', [14926, 695872, '5cdae945aca165b11af3c3f9fc246e89da3ce6780939013081e5d035b4163323']],
-  ['js/popup.js', [1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a']],
+  ['manifest.json', [93, 2654, '95496eac74d72fd90491302211b7dc07f492ed405d4eb1a001b8b600a02bc16b']],
+  ['manifest.chrome.json', [93, 2654, '95496eac74d72fd90491302211b7dc07f492ed405d4eb1a001b8b600a02bc16b']],
+  ['manifest.firefox.json', [80, 2150, '8368c4b520a07d1e5d9647f6c141f06f8fbd24a92c8b053d722488859f201c32']],
+  ['manifest.opera.json', [94, 2659, 'f9a3b4182521d8b1594d7975c327daf772e418e4869e8e3d33d286bfb25b486e']],
+  ['js/background.js', [7305, 328748, '80170fd6e70156fd26a047cd97dc6463850849c9c40c71c44096cc3c26ab367a']],
+  ['js/io_manager.js', [2119, 102123, 'd457bdcc4f7fc3acef401b48437fc707e2b9f2791e18ff4cafc1209f810bcc3c']],
+  ['js/tab-view.js', [22700, 1081906, '5c088e40d3507cbdd0ad1fdf2a601f5e346fb87e527188192b86b9c598223f7f']],
+  ['js/popup.js', [1841, 75587, 'e04d512726b38b012d3866b829570b632dd784419db014447b6645a7a6f7fd1d']],
   ['js/state_manager.js', [2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6']],
-  ['js/content/bridge_injection.js', [127, 4741, 'd1b84cf4c43ec5ff5cdc3bd607d8f3d3bf448c12829780b0d05fb9fc14fb5d3e']],
-  ['js/content/bridge_settings.js', [651, 26462, 'c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b']],
-  ['js/content_bridge.js', [13623, 603362, 'c651b34aad0ded2668a5cde55bfd4f499fab098f2f04e9ee0f50c5ede5d47b0c']],
-  ['js/settings_shared.js', [1181, 57535, '9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c']],
+  ['js/content/bridge_injection.js', [152, 6043, 'dcb84ff6f373b24951f9c1488c502987a599d70a54d14ac5f6e14d38b5bf7d9c']],
+  ['js/content/bridge_settings.js', [1473, 58402, 'bbee898990fd890385bcd723b2295611c20c23fee9642e8029489f756fbe73d2']],
+  ['js/content_bridge.js', [13803, 610592, 'cc838f9f12fc6941bba04b7a0244a14ef60581461bcc24dbb8ba7a9bce8e287b']],
+  ['js/settings_shared.js', [1196, 59725, '2d4458a87dce945bf560123e54534854c52fe1de20ac5dae3e3b019bf7a37311']],
   ['js/content/handle_resolver.js', [282, 9785, '67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff']],
   ['build.js', [740, 26978, 'c8485cb2600aad89f44015cd7e49ebe4746ebcc35c91c1ff2bf29aec2f087a04']],
 ]);
@@ -214,6 +218,7 @@ test('all manifests keep the current permission and host declaration map', () =>
     const manifest = readJson(file);
     assert.deepEqual(manifest.permissions, expectedPermissions, `${file} permissions drifted`);
     assert.deepEqual(manifest.host_permissions, expectedHostPermissions, `${file} host permissions drifted`);
+    assert.deepEqual(manifest.optional_host_permissions, expectedOptionalHostPermissions, `${file} optional pickup host permissions drifted`);
     assert.deepEqual([...new Set(contentScriptMatches(manifest))], activeMatches, `${file} content matches drifted`);
     assert.deepEqual([...new Set(webAccessibleMatches(manifest))], activeMatches, `${file} web resource matches drifted`);
   }
@@ -230,7 +235,7 @@ test('runtime permission API consumers stay spread across current files', () => 
 
   assert.deepEqual([...perFileBroadTokens.keys()], sourceFiles);
   assert.deepEqual(Object.fromEntries(perFileBroadTokens), {
-    'js/background.js': 65,
+    'js/background.js': 73,
     'js/io_manager.js': 8,
     'js/tab-view.js': 8,
     'js/popup.js': 38,
@@ -242,23 +247,23 @@ test('runtime permission API consumers stay spread across current files', () => 
     'js/content/handle_resolver.js': 1,
   });
 
-  assert.equal([...perFileBroadTokens.values()].reduce((sum, value) => sum + value, 0), 145);
+  assert.equal([...perFileBroadTokens.values()].reduce((sum, value) => sum + value, 0), 153);
   assert.match(read(docPath), /Runtime permission consumer source files: 10/);
-  assert.match(read(docPath), /Broad runtime permission API tokens in those files: 145/);
+  assert.match(read(docPath), /Broad runtime permission API tokens in those files: 153/);
 });
 
 test('storage tabs scripting and downloads callsite counts are pinned', () => {
   const { totals } = runtimePermissionCounts();
 
   assert.deepEqual(totals, {
-    storageApi: 56,
-    storageLocalGet: 18,
-    storageLocalSet: 28,
+    storageApi: 60,
+    storageLocalGet: 19,
+    storageLocalSet: 31,
     storageOnChanged: 4,
-    tabsApi: 61,
+    tabsApi: 65,
     tabsQuery: 17,
     tabsSendMessage: 5,
-    tabsCreate: 10,
+    tabsCreate: 11,
     tabsUpdate: 1,
     scriptingExecute: 9,
     downloadsApi: 17,
@@ -270,8 +275,8 @@ test('storage tabs scripting and downloads callsite counts are pinned', () => {
 
   const doc = read(docPath);
   for (const marker of [
-    'Runtime `storage` API tokens: 56',
-    'Runtime `tabs` API tokens: 61',
+    'Runtime `storage` API tokens: 60',
+    'Runtime `tabs` API tokens: 65',
     'Runtime `scripting.executeScript` tokens: 9',
     'Runtime `downloads` API tokens: 17',
     'Product runtime `activeTab` tokens in scanned source files: 0',

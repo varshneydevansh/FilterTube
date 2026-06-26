@@ -103,15 +103,17 @@ Blocked release wording until this gate turns green:
 
 ## Manifest And Permission Boundary
 
-The extension manifests currently keep host access scoped to YouTube-owned
-surfaces. They do not request `<all_urls>`, `http://*/*`, `https://*/*`,
-`http://localhost/*`, `http://127.0.0.1/*`, `http://*.local/*`, or broad
-local-network origin access.
+The extension manifests keep install-time host access scoped to YouTube-owned
+surfaces. Pickup endpoint access is declared only as optional
+`http://*/*` / `https://*/*` host access, and the dashboard requests the exact
+configured pickup origin only when a parent/admin enables Internet Pickup or
+Home Pickup. Denying that browser prompt leaves the pickup path disabled.
 
-That is intentional. Adding built-in local-network HTTP/WebSocket fetch from an extension
-page would require a separate permission review and likely optional host
-permission design. A native app or trusted local provider can own automatic
-same-network discovery without broadening the extension's YouTube hot path.
+That is intentional. Optional endpoint access lets the configured provider
+client actually reach a parent-chosen Home Pickup or Internet Pickup service
+without broadening the default YouTube hot path or treating network reachability
+as authority. Automatic LAN scanning, multicast/mDNS, WebSocket discovery, and
+hosted service ownership remain separate provider/app lanes.
 
 ## Green Criteria
 

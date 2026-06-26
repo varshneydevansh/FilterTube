@@ -350,9 +350,9 @@ Default/Secure Preferences extension settings object present: yes
 stored extension/service-worker version: 3.3.2
 Default Local Extension Settings directory exists: yes
 Default packed Extensions directory for this id exists: no
-workspace manifest.json sha256: 282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734
-workspace package.json sha256: 36053d322780ce787de403be574cc400936ef2a994b4c8eca62561154fe81aec
-workspace js/content_bridge.js sha256: 8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d
+workspace manifest.json sha256: 95496eac74d72fd90491302211b7dc07f492ed405d4eb1a001b8b600a02bc16b
+workspace package.json sha256: 6f0b5dc130399998ad5435ef3b273573234e80561ceba32e0da078b91851e229
+workspace js/content_bridge.js sha256: cc838f9f12fc6941bba04b7a0244a14ef60581461bcc24dbb8ba7a9bce8e287b
 workspace content_bridge ampersand Topic fix token present: yes
 ```
 
@@ -522,7 +522,7 @@ that `build.js` validates those references before writing `dist/*/manifest.json`
 ```text
 package copied directory roots: js, css, html, icons, data, assets
 browser manifests checked: 4
-combined unique referenced paths across browser manifests: 24
+combined unique referenced paths across browser manifests: 25
 unresolved manifest file references: 0
 manifest referenced roots outside COMMON_DIRS: 0
 manifest content-script CSS references: 0
@@ -532,15 +532,16 @@ runtime behavior changed by this addendum: no
 
 | Manifest | File references | Unique referenced paths | Missing paths | Current package closure |
 | --- | ---: | ---: | ---: | --- |
-| `manifest.json` | 29 | 24 | 0 | All referenced files exist under copied package roots. |
-| `manifest.chrome.json` | 29 | 24 | 0 | Same as default Chrome manifest. |
-| `manifest.firefox.json` | 29 | 24 | 0 | Background script shape differs, but referenced files exist under copied package roots. |
-| `manifest.opera.json` | 28 | 23 | 0 | Omits `icons/file.svg` from web-accessible resources, but all referenced files exist under copied package roots. |
+| `manifest.json` | 30 | 25 | 0 | All referenced files exist under copied package roots. |
+| `manifest.chrome.json` | 30 | 25 | 0 | Same as default Chrome manifest. |
+| `manifest.firefox.json` | 30 | 25 | 0 | Background script shape differs, but referenced files exist under copied package roots. |
+| `manifest.opera.json` | 29 | 24 | 0 | Omits `icons/file.svg` from web-accessible resources, but all referenced files exist under copied package roots. |
 
 Current referenced package roots:
 
 ```text
 js/
+assets/
 html/
 icons/
 ```
@@ -602,10 +603,10 @@ runtime behavior changed by this addendum: no
 
 | Manifest | Content script entries | Content script JS refs | Explicit worlds | WAR resource refs | Host-only `youtube-nocookie.com` gap |
 | --- | ---: | ---: | --- | ---: | --- |
-| `manifest.json` | 2 | 15 | `MAIN`, `ISOLATED` | 5 | yes |
-| `manifest.chrome.json` | 2 | 15 | `MAIN`, `ISOLATED` | 5 | yes |
-| `manifest.firefox.json` | 1 | 14 | none | 5 | yes |
-| `manifest.opera.json` | 2 | 15 | none | 4 | yes |
+| `manifest.json` | 2 | 15 | `MAIN`, `ISOLATED` | 6 | yes |
+| `manifest.chrome.json` | 2 | 15 | `MAIN`, `ISOLATED` | 6 | yes |
+| `manifest.firefox.json` | 1 | 14 | none | 6 | yes |
+| `manifest.opera.json` | 2 | 15 | none | 5 | yes |
 
 Current policy snapshot:
 
@@ -669,11 +670,11 @@ created.
 ```text
 dist snapshot source: existing ignored local dist tree
 browser staged directories: 3
-browser staged files per directory: 63
+browser staged files per directory: 65
 dist zip artifacts: 3
-total dist files including zips: 192
-source-backed staged files per browser excluding manifest: 62
-byte-identical source-backed staged files per browser excluding manifest: 61
+total dist files including zips: 198
+source-backed staged files per browser excluding manifest: 64
+byte-identical source-backed staged files per browser excluding manifest: 50
 committed package manifest: absent
 zip checksum manifest: absent
 reproducible build proof: absent
@@ -691,15 +692,15 @@ Per-browser staged group counts are currently identical:
 | `data` | 1 |
 | `html` | 3 |
 | `icons` | 7 |
-| `js` | 37 |
+| `js` | 39 |
 
 Current local package artifact rows:
 
 | Target | Staged files | Manifest bytes | Manifest sha256 | Version | Content script entries | Content script JS refs | WAR refs | ZIP bytes | ZIP sha256 |
 | --- | ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | --- |
-| `chrome` | 63 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | `3.3.2` | 2 | 15 | 5 | 8755565 | `8b24a3271769a46310d3489833aca7da5d33b910ef72a96fb0114ed5e7b057e4` |
-| `firefox` | 63 | 2603 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` | `3.3.2` | 1 | 14 | 5 | 8755624 | `66ad6a91e6909d31f1cb24bde444118daed75dc99416ceff5814ecf9f3f3fd2a` |
-| `opera` | 63 | 2518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | `3.3.2` | 2 | 15 | 4 | 8755567 | `d9725d48d3ff02c4b57bb66edfe339b62decb564716a94c1fe14a0f1ff67716b` |
+| `chrome` | 65 | 2568 | `a46f25890de6ee568bb9cd62b22c466fda2f3d1570b3b0480cd453a65515e94d` | `3.3.2` | 2 | 15 | 6 | 8849225 | `ddc8fa42468afa68281138a0fe9b9f8ce5e69c6dce3a7888e7847c92d9d74990` |
+| `firefox` | 65 | 2658 | `5e6ec80ba9aad98f47758ab8d5f7b9be304262c95f6d1000162a40df6961e227` | `3.3.2` | 1 | 14 | 6 | 8849283 | `4b7c2648abce0b220f41b08ec4cb7bd8f1f074578df670e81b69d06aafa8f4fa` |
+| `opera` | 65 | 2573 | `4bdaa0eb26fae91ff31a754645ae872d93119d8162a8231d5be312874f61f8d8` | `3.3.2` | 2 | 15 | 5 | 8849225 | `4223939d73f5f69ef50033b3ecb20d6cf2e7fcbb1b03a5dd8ddb098d280db838` |
 
 ASCII boundary:
 
@@ -716,7 +717,7 @@ workspace source paths
 ```mermaid
 flowchart TD
   A["Workspace source paths"] --> B["Existing ignored dist browser directories"]
-  B --> C["61 of 62 source-backed staged files match source per browser"]
+  B --> C["50 of 64 source-backed staged files match source per browser"]
   B --> D["dist browser manifest.json files"]
   B --> E["Existing local ZIP files"]
   C --> F["Local snapshot proof only"]
@@ -731,7 +732,7 @@ flowchart TD
 ```
 
 This closes a local-artifact inventory gap, not the release gate. The staged
-browser directories currently match workspace source bytes for 61 of 62 source-backed
+browser directories currently match workspace source bytes for 50 of 64 source-backed
 non-manifest files, and the three local ZIPs have recorded hashes. The package
 still lacks a committed per-file manifest, a clean rebuild record, ZIP content
 attestation tied to source revision, upload proof, public-claim proof, and

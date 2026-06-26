@@ -19,6 +19,10 @@ const expectedManifestHostPermissions = [
   '*://*.youtube-nocookie.com/*',
   '*://*.youtubekids.com/*'
 ];
+const expectedManifestOptionalHostPermissions = [
+  'http://*/*',
+  'https://*/*'
+];
 const expectedActiveManifestMatches = ['*://*.youtube.com/*', '*://*.youtubekids.com/*'];
 const releasePackageFamilyDocs = [
   'docs/audit/FILTERTUBE_BUILD_RELEASE_METHOD_SEMANTIC_REGISTER_2026-05-21.md',
@@ -189,6 +193,7 @@ function manifestPermissionResourceValidationStats() {
     perManifest.set(file, {
       permissions: manifest.permissions || [],
       hostPermissions: manifest.host_permissions || [],
+      optionalHostPermissions: manifest.optional_host_permissions || [],
       contentScriptEntries: contentScripts.length,
       contentScriptJsRefs: contentScripts.flatMap(script => script.js || []).length,
       explicitWorlds,
@@ -294,14 +299,14 @@ function currentLocalDistPackageSnapshotStats() {
 function assertBrowserManifestReferenceClosureAddendum(doc) {
   const stats = manifestReferenceClosureStats();
   const expected = new Map([
-    ['manifest.json', { references: 29, unique: 24 }],
-    ['manifest.chrome.json', { references: 29, unique: 24 }],
-    ['manifest.firefox.json', { references: 29, unique: 24 }],
-    ['manifest.opera.json', { references: 28, unique: 23 }]
+    ['manifest.json', { references: 30, unique: 25 }],
+    ['manifest.chrome.json', { references: 30, unique: 25 }],
+    ['manifest.firefox.json', { references: 30, unique: 25 }],
+    ['manifest.opera.json', { references: 29, unique: 24 }]
   ]);
 
   assert.match(doc, /Browser Manifest Package Reference Closure Addendum - 2026-05-27/);
-  assert.match(doc, /combined unique referenced paths across browser manifests: 24/);
+  assert.match(doc, /combined unique referenced paths across browser manifests: 25/);
   assert.match(doc, /unresolved manifest file references: 0/);
   assert.match(doc, /manifest referenced roots outside COMMON_DIRS: 0/);
   assert.match(doc, /manifest content-script CSS references: 0/);
@@ -318,13 +323,13 @@ function assertBrowserManifestReferenceClosureAddendum(doc) {
       `${file} manifest reference row missing from doc`
     );
   }
-  assert.equal(stats.combinedUnique.size, 24);
+  assert.equal(stats.combinedUnique.size, 25);
   assert.deepEqual(stats.missing, []);
   assert.deepEqual(stats.outsideCopiedRoots, []);
   assert.equal(stats.contentScriptCssRefs, 0);
 
   const referencedRoots = [...new Set([...stats.combinedUnique].map(ref => ref.split('/')[0]))].sort();
-  assert.deepEqual(referencedRoots, ['html', 'icons', 'js']);
+  assert.deepEqual(referencedRoots, ['assets', 'html', 'icons', 'js']);
   assert.match(read('build.js'), /const COMMON_DIRS = \['js', 'css', 'html', 'icons', 'data', 'assets'\]/);
   assert.doesNotMatch(read('build.js'), /validatePackagedReferences|releasePackageParity\.record|manifestReferenceClosureReport/);
 }
@@ -332,10 +337,10 @@ function assertBrowserManifestReferenceClosureAddendum(doc) {
 function assertBrowserManifestPermissionAndResourceValidationSnapshot(doc) {
   const stats = manifestPermissionResourceValidationStats();
   const expected = new Map([
-    ['manifest.json', { contentScriptEntries: 2, contentScriptJsRefs: 15, explicitWorlds: ['MAIN', 'ISOLATED'], webAccessibleResourceRefs: 5 }],
-    ['manifest.chrome.json', { contentScriptEntries: 2, contentScriptJsRefs: 15, explicitWorlds: ['MAIN', 'ISOLATED'], webAccessibleResourceRefs: 5 }],
-    ['manifest.firefox.json', { contentScriptEntries: 1, contentScriptJsRefs: 14, explicitWorlds: [], webAccessibleResourceRefs: 5 }],
-    ['manifest.opera.json', { contentScriptEntries: 2, contentScriptJsRefs: 15, explicitWorlds: [], webAccessibleResourceRefs: 4 }]
+    ['manifest.json', { contentScriptEntries: 2, contentScriptJsRefs: 15, explicitWorlds: ['MAIN', 'ISOLATED'], webAccessibleResourceRefs: 6 }],
+    ['manifest.chrome.json', { contentScriptEntries: 2, contentScriptJsRefs: 15, explicitWorlds: ['MAIN', 'ISOLATED'], webAccessibleResourceRefs: 6 }],
+    ['manifest.firefox.json', { contentScriptEntries: 1, contentScriptJsRefs: 14, explicitWorlds: [], webAccessibleResourceRefs: 6 }],
+    ['manifest.opera.json', { contentScriptEntries: 2, contentScriptJsRefs: 15, explicitWorlds: [], webAccessibleResourceRefs: 5 }]
   ]);
 
   assert.match(doc, /Browser Manifest Permission And Resource Validation Snapshot - 2026-05-27/);
@@ -353,6 +358,7 @@ function assertBrowserManifestPermissionAndResourceValidationSnapshot(doc) {
     const actual = stats.perManifest.get(file);
     assert.deepEqual(actual.permissions, expectedManifestPermissions, `${file} permissions drifted`);
     assert.deepEqual(actual.hostPermissions, expectedManifestHostPermissions, `${file} host permissions drifted`);
+    assert.deepEqual(actual.optionalHostPermissions, expectedManifestOptionalHostPermissions, `${file} optional pickup host permissions drifted`);
     assert.deepEqual(actual.contentMatches, expectedActiveManifestMatches, `${file} content matches drifted`);
     assert.deepEqual(actual.resourceMatches, expectedActiveManifestMatches, `${file} resource matches drifted`);
     assert.equal(actual.hostOnlyNocookieGap, true, `${file} youtube-nocookie host-only gap drifted`);
@@ -390,48 +396,48 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
     data: 1,
     html: 3,
     icons: 7,
-    js: 37,
+    js: 39,
     manifest: 1,
     'top-level-common': 3
   };
   const expectedBrowserStats = new Map([
     ['chrome', {
-      manifestBytes: 2513,
-      manifestSha256: '282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734',
+      manifestBytes: 2568,
+      manifestSha256: 'a46f25890de6ee568bb9cd62b22c466fda2f3d1570b3b0480cd453a65515e94d',
       contentScriptEntries: 2,
       contentScriptJsRefs: 15,
-      webAccessibleResourceRefs: 5,
-      zipBytes: 8755565,
-      zipSha256: '8b24a3271769a46310d3489833aca7da5d33b910ef72a96fb0114ed5e7b057e4'
+      webAccessibleResourceRefs: 6,
+      zipBytes: 8849225,
+      zipSha256: 'ddc8fa42468afa68281138a0fe9b9f8ce5e69c6dce3a7888e7847c92d9d74990'
     }],
     ['firefox', {
-      manifestBytes: 2603,
-      manifestSha256: 'a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0',
+      manifestBytes: 2658,
+      manifestSha256: '5e6ec80ba9aad98f47758ab8d5f7b9be304262c95f6d1000162a40df6961e227',
       contentScriptEntries: 1,
       contentScriptJsRefs: 14,
-      webAccessibleResourceRefs: 5,
-      zipBytes: 8755624,
-      zipSha256: '66ad6a91e6909d31f1cb24bde444118daed75dc99416ceff5814ecf9f3f3fd2a'
+      webAccessibleResourceRefs: 6,
+      zipBytes: 8849283,
+      zipSha256: '4b7c2648abce0b220f41b08ec4cb7bd8f1f074578df670e81b69d06aafa8f4fa'
     }],
     ['opera', {
-      manifestBytes: 2518,
-      manifestSha256: '0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b',
+      manifestBytes: 2573,
+      manifestSha256: '4bdaa0eb26fae91ff31a754645ae872d93119d8162a8231d5be312874f61f8d8',
       contentScriptEntries: 2,
       contentScriptJsRefs: 15,
-      webAccessibleResourceRefs: 4,
-      zipBytes: 8755567,
-      zipSha256: 'd9725d48d3ff02c4b57bb66edfe339b62decb564716a94c1fe14a0f1ff67716b'
+      webAccessibleResourceRefs: 5,
+      zipBytes: 8849225,
+      zipSha256: '4223939d73f5f69ef50033b3ecb20d6cf2e7fcbb1b03a5dd8ddb098d280db838'
     }]
   ]);
 
   assert.match(doc, /Current Local Dist Package Snapshot - 2026-06-05/);
   assert.match(doc, /dist snapshot source: existing ignored local dist tree/);
   assert.match(doc, /browser staged directories: 3/);
-  assert.match(doc, /browser staged files per directory: 63/);
+  assert.match(doc, /browser staged files per directory: 65/);
   assert.match(doc, /dist zip artifacts: 3/);
-  assert.match(doc, /total dist files including zips: 192/);
-  assert.match(doc, /source-backed staged files per browser excluding manifest: 62/);
-  assert.match(doc, /byte-identical source-backed staged files per browser excluding manifest: 61/);
+  assert.match(doc, /total dist files including zips: 198/);
+  assert.match(doc, /source-backed staged files per browser excluding manifest: 64/);
+  assert.match(doc, /byte-identical source-backed staged files per browser excluding manifest: 50/);
   assert.match(doc, /committed package manifest: absent/);
   assert.match(doc, /zip checksum manifest: absent/);
   assert.match(doc, /reproducible build proof: absent/);
@@ -446,7 +452,7 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
   assert.match(doc, /reproducible package build authority: NO-GO/);
   assert.match(doc, /loaded-browser package\/runtime parity authority: NO-GO/);
 
-  assert.equal(stats.distFiles.length, 192);
+  assert.equal(stats.distFiles.length, 198);
   assert.deepEqual(stats.zipFiles, [
     'dist/filtertube-chrome-v3.3.2.zip',
     'dist/filtertube-firefox-v3.3.2.zip',
@@ -457,10 +463,10 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
     assert.deepEqual(stats.groupCountsByBrowser.get(browser), expectedGroupCounts);
     const actual = stats.browserStats.get(browser);
     const expected = expectedBrowserStats.get(browser);
-    assert.equal(actual.stagedFiles, 63);
+    assert.equal(actual.stagedFiles, 65);
     assert.equal(actual.version, '3.3.2');
-    assert.equal(actual.sourceBackedFiles, 62);
-    assert.equal(actual.byteIdenticalSourceBackedFiles, 61);
+    assert.equal(actual.sourceBackedFiles, 64);
+    assert.equal(actual.byteIdenticalSourceBackedFiles, 50);
     assert.equal(actual.manifestBytes, expected.manifestBytes);
     assert.equal(actual.manifestSha256, expected.manifestSha256);
     assert.equal(actual.contentScriptEntries, expected.contentScriptEntries);
@@ -469,7 +475,7 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
     assert.equal(actual.zipBytes, expected.zipBytes);
     assert.equal(actual.zipSha256, expected.zipSha256);
     assert.ok(
-      doc.includes(`| \`${browser}\` | 63 | ${expected.manifestBytes} | \`${expected.manifestSha256}\` | \`3.3.2\` | ${expected.contentScriptEntries} | ${expected.contentScriptJsRefs} | ${expected.webAccessibleResourceRefs} | ${expected.zipBytes} | \`${expected.zipSha256}\` |`),
+      doc.includes(`| \`${browser}\` | ${actual.stagedFiles} | ${expected.manifestBytes} | \`${expected.manifestSha256}\` | \`3.3.2\` | ${expected.contentScriptEntries} | ${expected.contentScriptJsRefs} | ${expected.webAccessibleResourceRefs} | ${expected.zipBytes} | \`${expected.zipSha256}\` |`),
       `${browser} dist snapshot row missing from doc`
     );
   }

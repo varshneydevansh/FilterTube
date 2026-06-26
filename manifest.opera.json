@@ -86,5 +86,9 @@
         "*://*.youtube.com/*",
         "*://*.youtube-nocookie.com/*",
         "*://*.youtubekids.com/*"
+    ],
+    "optional_host_permissions": [
+        "http://*/*",
+        "https://*/*"
     ]
 }

@@ -70,11 +70,16 @@ test('all browser manifests share the current core permission and host permissio
     '*://*.youtube-nocookie.com/*',
     '*://*.youtubekids.com/*',
   ];
+  const expectedOptionalHosts = [
+    'http://*/*',
+    'https://*/*',
+  ];
 
   for (const file of manifestFiles) {
     const manifest = readJson(file);
     assert.deepEqual(manifest.permissions, expectedPermissions, `${file} permissions drifted`);
     assert.deepEqual(manifest.host_permissions, expectedHosts, `${file} host permissions drifted`);
+    assert.deepEqual(manifest.optional_host_permissions, expectedOptionalHosts, `${file} optional pickup host permissions drifted`);
     assert.equal(manifest.manifest_version, 3, `${file} should remain MV3`);
     assert.equal(manifest.version, '3.3.2', `${file} version should match current extension baseline`);
   }

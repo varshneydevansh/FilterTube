@@ -33,14 +33,14 @@ changes, or whitelist behavior changes.
 
 ## Manifest File Fingerprints
 
-The tracked manifest surface has 4 files, 340 newline counts, and 9,573 bytes:
+The tracked manifest surface has 4 files, 360 newline counts, and 10,117 bytes:
 
 | Path | Lines | Bytes | SHA-256 | Current package role |
 | --- | ---: | ---: | --- | --- |
-| `manifest.json` | 88 | 2,513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | Default/unpacked Chromium-style manifest |
-| `manifest.chrome.json` | 88 | 2,513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | Build input for Chrome/Edge/Brave ZIP |
-| `manifest.firefox.json` | 75 | 2,029 | `c84368c9db6a4900bb6ff055b66a645a88176d3533e307eee0dcb8d230fae2bb` | Build input for Firefox ZIP |
-| `manifest.opera.json` | 89 | 2,518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | Build input for Opera ZIP |
+| `manifest.json` | 93 | 2,654 | `95496eac74d72fd90491302211b7dc07f492ed405d4eb1a001b8b600a02bc16b` | Default/unpacked Chromium-style manifest |
+| `manifest.chrome.json` | 93 | 2,654 | `95496eac74d72fd90491302211b7dc07f492ed405d4eb1a001b8b600a02bc16b` | Build input for Chrome/Edge/Brave ZIP |
+| `manifest.firefox.json` | 80 | 2,150 | `8368c4b520a07d1e5d9647f6c141f06f8fbd24a92c8b053d722488859f201c32` | Build input for Firefox ZIP |
+| `manifest.opera.json` | 94 | 2,659 | `f9a3b4182521d8b1594d7975c327daf772e418e4869e8e3d33d286bfb25b486e` | Build input for Opera ZIP |
 
 `manifest.json` and `manifest.chrome.json` are byte-identical today. The build
 script does not read `manifest.json` for browser ZIP creation; it reads
@@ -55,6 +55,9 @@ All four manifests currently share:
 - permissions: `storage`, `activeTab`, `scripting`, `tabs`, `downloads`
 - host permissions: `*://*.youtube.com/*`,
   `*://*.youtube-nocookie.com/*`, `*://*.youtubekids.com/*`
+- optional host permissions: `http://*/*`, `https://*/*` for parent-configured
+  Internet Pickup/Home Pickup endpoints only; these are not install-time host
+  grants and are requested for the exact pickup origin during setup
 - action popup: `html/popup.html`
 - action icons: `icons/icon-16.png`, `icons/icon-48.png`,
   `icons/icon-128.png`
@@ -74,7 +77,7 @@ not active filtering coverage proof.
 
 | Manifest | Background owner | Content-script entries | Page-runtime seed path | Isolated/helper stack | Web-accessible resources |
 | --- | --- | ---: | --- | --- | --- |
-| `manifest.json` | MV3 `service_worker: js/background.js` | 2 | first entry: `js/seed.js`, `world: MAIN`, `document_start` | second entry: 14 scripts, `world: ISOLATED`, `document_start` | `js/injector.js`, `js/filter_logic.js`, `js/seed.js`, `js/shared/identity.js`, `icons/file.svg` |
+| `manifest.json` | MV3 `service_worker: js/background.js` | 2 | first entry: `js/seed.js`, `world: MAIN`, `document_start` | second entry: 14 scripts, `world: ISOLATED`, `document_start` | `js/injector.js`, `js/filter_logic.js`, `js/seed.js`, `js/shared/identity.js`, `assets/images/homepage_hero_day.mp4`, `icons/file.svg` |
 | `manifest.chrome.json` | MV3 `service_worker: js/background.js` | 2 | first entry: `js/seed.js`, `world: MAIN`, `document_start` | second entry: 14 scripts, `world: ISOLATED`, `document_start` | same as default |
 | `manifest.firefox.json` | `background.scripts`: `js/shared/identity.js`, `js/background.js` | 1 | no manifest MAIN-world seed; fallback injection pushes `seed` in `js/content/bridge_injection.js` | one 14-script stack with no `world` field, `document_start` | same as default |
 | `manifest.opera.json` | MV3 `service_worker: js/background.js` | 2 | first entry: `js/seed.js`, no explicit `world`, `document_start` | second entry: 14 scripts, no explicit `world`, `document_start` | runtime JS resources only; no `icons/file.svg` |

@@ -10,14 +10,14 @@ const docPath = 'docs/audit/FILTERTUBE_RELEASE_BUILD_ARTIFACT_CLAIM_BOUNDARY_CUR
 
 const sourceRows = [
   ['build.js', 740, 26978, 'c8485cb2600aad89f44015cd7e49ebe4746ebcc35c91c1ff2bf29aec2f087a04'],
-  ['package.json', 61, 2405, '36053d322780ce787de403be574cc400936ef2a994b4c8eca62561154fe81aec'],
-  ['README.md', 401, 22476, '8c83ce40603453d2ac9824980da81631ea8970e4f3e9442c4d9f6602e1ca520d'],
+  ['package.json', 67, 2954, '6f0b5dc130399998ad5435ef3b273573234e80561ceba32e0da078b91851e229'],
+  ['README.md', 423, 24084, '07e93a903e334c456b3e315c61a4124f799e7a3ceb6b17f1554b85ed6d3d1854'],
   ['CHANGELOG.md', 591, 40124, 'e22a87ce7eeb88d171587d4b0f4676881a2c3081a7fbf15978d7e8d8582cdfdd'],
-  ['manifest.json', 88, 2513, '282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734'],
-  ['manifest.chrome.json', 88, 2513, '282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734'],
-  ['manifest.firefox.json', 75, 2029, 'c84368c9db6a4900bb6ff055b66a645a88176d3533e307eee0dcb8d230fae2bb'],
-  ['manifest.opera.json', 89, 2518, '0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b'],
-  ['data/release_notes.json', 317, 23020, 'a8d59b18e9bffd1c828538ee58b3b8e9be7c641fea3ff064220311485a3b1c6b'],
+  ['manifest.json', 93, 2654, '95496eac74d72fd90491302211b7dc07f492ed405d4eb1a001b8b600a02bc16b'],
+  ['manifest.chrome.json', 93, 2654, '95496eac74d72fd90491302211b7dc07f492ed405d4eb1a001b8b600a02bc16b'],
+  ['manifest.firefox.json', 80, 2150, '8368c4b520a07d1e5d9647f6c141f06f8fbd24a92c8b053d722488859f201c32'],
+  ['manifest.opera.json', 94, 2659, 'f9a3b4182521d8b1594d7975c327daf772e418e4869e8e3d33d286bfb25b486e'],
+  ['data/release_notes.json', 319, 23455, '7a2fdb97743c695a7167a151ec0bcef419ca9973e1a66db6a48ab1c228c4220f'],
 ];
 
 const blockRows = [
