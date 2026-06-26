@@ -31,6 +31,23 @@ sanitized rows to a local JSON store:
 FILTERTUBE_PROVIDER_STORE=.filtertube/managed-delivery-store.json npm run managed:provider
 ```
 
+For Internet Pickup trials, the same provider shape can be used only after it is
+served through a trusted HTTPS address that the family/school controls:
+
+```bash
+FILTERTUBE_PROVIDER_HOST=0.0.0.0 FILTERTUBE_PROVIDER_STORE=.filtertube/managed-delivery-store.json npm run managed:provider
+```
+
+Then configure Internet Pickup with the HTTPS address you own:
+
+```text
+https://<your-trusted-domain>/filtertube
+```
+
+The extension setup modal can copy this command, but it does not create the
+HTTPS endpoint, own a hosted service, or make provider reachability policy
+authority.
+
 For a same-network Home Pickup trial where another device needs to reach this
 computer, bind the provider to the local network and enter this computer's LAN
 address in FilterTube:

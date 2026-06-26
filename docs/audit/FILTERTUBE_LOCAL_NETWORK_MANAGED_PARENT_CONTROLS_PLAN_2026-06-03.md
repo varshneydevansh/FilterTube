@@ -191,6 +191,13 @@ extension authority code.
   `http://<this-computer-lan-ip>:8787/filtertube` address explicitly. This is
   a setup helper only; it does not scan the network, create trust, or apply
   policy without the saved parent link and signature/revision gates.
+- [x] 2026-06-26 Internet Pickup setup command slice: the Internet Pickup setup
+  modal can copy the same self-hosted provider command, with explicit guidance
+  that Internet Pickup must be exposed through the family's/school's trusted
+  HTTPS address before it can be configured. This is a setup helper only; it
+  does not create or own a hosted service, bypass HTTPS endpoint validation,
+  store plaintext rules, or change trusted-link, target-profile, revision,
+  hash, or signature authority.
 - [x] 2026-06-26 pickup durability status slice: Internet Pickup and Home Pickup
   health checks now carry the provider's redacted durable-store status into the
   dashboard summary. Parents can see whether waiting updates are saved by that

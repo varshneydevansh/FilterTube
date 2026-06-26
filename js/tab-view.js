@@ -13989,14 +13989,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             details: [
                 'Default path: open both devices and use Send Update.',
                 'Internet Pickup needs a compatible pickup address. It can hold unreadable waiting updates, not PINs or plaintext rules.',
-                'The protected device still applies only newer signed updates from its saved parent link.'
+                'The protected device still applies only newer signed updates from its saved parent link.',
+                'Use Copy Setup Command if you want to run the included provider behind your own trusted HTTPS address.'
             ],
             configured: !!currentEndpoint,
             configureLabel: currentEndpoint ? 'Edit Internet Pickup' : 'Set Up Internet Pickup',
             disableLabel: 'Turn Off Internet Pickup',
-            extraChoices: currentEndpoint ? [{ value: 'check', label: 'Check Pickup', className: 'btn-secondary' }] : []
+            extraChoices: [
+                { value: 'copy_setup', label: 'Copy Setup Command', className: 'btn-secondary' },
+                ...(currentEndpoint ? [{ value: 'check', label: 'Check Pickup', className: 'btn-secondary' }] : [])
+            ]
         });
         if (action === null) return;
+        if (action === 'copy_setup') {
+            await copyManagedInternetPickupSetupCommand();
+            return;
+        }
         if (action === 'check') {
             await checkNanahManagedMailboxServerHealth({ reason: 'manual_provider_check' });
             renderNanahDeliveryPathStrip();
@@ -14068,7 +14076,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         await checkNanahManagedMailboxServerHealth({ reason: 'configure' });
     }
 
-    function buildManagedHomePickupSetupCommand() {
+    function buildManagedPickupProviderSetupCommand() {
         return [
             'FILTERTUBE_PROVIDER_HOST=0.0.0.0',
             'FILTERTUBE_PROVIDER_STORE=.filtertube/managed-delivery-store.json',
@@ -14076,8 +14084,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         ].join(' ');
     }
 
+    async function copyManagedInternetPickupSetupCommand() {
+        const command = buildManagedPickupProviderSetupCommand();
+        const endpointHint = 'https://<your-trusted-domain>/filtertube';
+        const text = [
+            '# Run this from the FilterTube project on the pickup provider computer/server.',
+            command,
+            '',
+            '# Internet Pickup must be entered as a trusted HTTPS address in FilterTube:',
+            endpointHint,
+            '',
+            '# The included provider listens over HTTP by default; put it behind your own HTTPS reverse proxy/tunnel before using it as Internet Pickup.',
+            '# The provider stores only unreadable waiting updates and redacted receipts. Protected devices still validate saved parent link, target profile, scope, revision, hash, and signature.'
+        ].join('\n');
+        try {
+            await navigator.clipboard.writeText(text);
+            UIComponents.showToast('Internet Pickup setup command copied', 'success');
+        } catch (error) {
+            console.error('FilterTube: failed to copy Internet Pickup setup command', error);
+            UIComponents.showToast('Could not copy setup command', 'error');
+        }
+    }
+
     async function copyManagedHomePickupSetupCommand() {
-        const command = buildManagedHomePickupSetupCommand();
+        const command = buildManagedPickupProviderSetupCommand();
         const endpointHint = 'http://<this-computer-lan-ip>:8787/filtertube';
         const text = [
             '# Run this from the FilterTube project on the home/school pickup computer.',
