@@ -63,6 +63,24 @@ installed two-device extension smoke: MANUAL-SMOKE-PENDING
 whole goal complete: NO
 ```
 
+## 2026-06-26 Remaining Work Check
+
+The remaining work is no longer a vague feature backlog. Current evidence shows
+the extension-side managed-control implementation is mostly present, but the
+whole goal still cannot be closed because these proof gaps remain:
+
+| Gap | Why it remains open | Required close-out evidence |
+| --- | --- | --- |
+| Installed extension parent/protected-device smoke | Runtime tests prove contracts, but not a real Chrome parent/protected profile flow. | Generated `managed-extension-installed-smoke` artifact with redacted screenshots/observations and verifier pass. |
+| Real Internet Pickup ownership/deployment | The extension has provider hooks and a reference provider, but no hosted FilterTube provider claim is proven. | `managed-pickup-provider-ownership` artifact with endpoint, operator, retention, purge/revocation, redacted receipt, and round-trip proof. |
+| Automatic LAN peer discovery | Explicit Home Pickup provider hooks exist; automatic same-network discovery remains intentionally absent so Wi-Fi presence never becomes authority. | Future provider/app design and hostile-LAN smoke before any discovery claim. |
+| Native Android/iOS parity | The extension policy contract and handoff generator exist, but downstream runtime/app enforcement is not proven here. | Native runtime sync handoff artifact plus installed Android/iOS parity smoke artifacts. |
+| Final public release wording | Public claims must follow the evidence after smoke/provider/app artifacts. | Release wording review that avoids hosted-service, automatic-discovery, and complete-app-parity claims until proven. |
+
+This checkpoint does not change runtime behavior. It narrows the remaining
+release decision to manual smoke, provider ownership, downstream app parity, and
+claim review.
+
 ## Installed Extension Smoke Artifact
 
 Manual parent/protected-profile smoke is now a strict artifact instead of loose

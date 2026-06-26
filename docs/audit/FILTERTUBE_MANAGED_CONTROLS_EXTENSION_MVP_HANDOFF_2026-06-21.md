@@ -28,6 +28,29 @@ native runtime sync handoff: extension-side artifact required before app-side sy
 manual installed-extension smoke: still required before release claim
 ```
 
+## 2026-06-26 Checkpoint
+
+The extension work is now in final verification territory rather than large
+feature construction. The parent-facing copy has been cleaned up to use
+`protected profile`/`protected device` consistently while internal `child`
+profile type keys remain unchanged for storage and migration compatibility.
+
+Remaining release blockers are concrete:
+
+```text
+installed-extension parent/protected-device smoke: still required
+real Internet Pickup provider ownership/deployment: not proven
+automatic LAN peer discovery: intentionally absent
+native Android/iOS parity: downstream app lane
+liquid-glass/device-map visual polish: optional future UI lane
+```
+
+The extension can be described as having local protected-profile controls,
+signed live Send Update, explicit optional pickup-provider hooks, rule-list
+imports, time limits, route gates, timeout overlay, and protected redacted
+history. It still must not be described as a fully hosted remote-management
+service, an automatic LAN discovery system, or complete mobile/tablet parity.
+
 ## Requirement Matrix
 
 | Requirement | Current extension evidence | Release status |
