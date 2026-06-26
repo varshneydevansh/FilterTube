@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 import http from 'node:http';
+import https from 'node:https';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 
 const DEFAULT_HOST = '127.0.0.1';
@@ -366,6 +368,49 @@ function writePersistedState(storePath, state) {
   }
 }
 
+function readOptionalFile(value) {
+  const filePath = normalizeString(value);
+  if (!filePath) return '';
+  return fs.readFileSync(filePath);
+}
+
+function getTlsServerOptions(options = {}) {
+  const key = options.tlsKey || readOptionalFile(options.tlsKeyPath || process.env.FILTERTUBE_PROVIDER_TLS_KEY_PATH);
+  const cert = options.tlsCert || readOptionalFile(options.tlsCertPath || process.env.FILTERTUBE_PROVIDER_TLS_CERT_PATH);
+  if (!key && !cert) return null;
+  if (!key || !cert) {
+    throw new Error('FILTERTUBE_PROVIDER_TLS_KEY_PATH and FILTERTUBE_PROVIDER_TLS_CERT_PATH must be provided together');
+  }
+  return { key, cert };
+}
+
+function formatHostForUrl(host) {
+  const normalized = normalizeString(host);
+  if (!normalized) return '';
+  return normalized.includes(':') && !normalized.startsWith('[') ? `[${normalized}]` : normalized;
+}
+
+export function getManagedDeliveryProviderHomePickupUrls(options = {}) {
+  const host = normalizeString(options.host) || DEFAULT_HOST;
+  const port = Number(options.port) || DEFAULT_PORT;
+  const protocol = normalizeString(options.protocol) === 'https' ? 'https' : 'http';
+  const wildcard = host === '0.0.0.0' || host === '::' || host === '[::]';
+  const hosts = [];
+  if (wildcard) {
+    for (const entries of Object.values(os.networkInterfaces())) {
+      for (const entry of safeArray(entries)) {
+        if (!entry || entry.internal || entry.family !== 'IPv4') continue;
+        const address = normalizeString(entry.address);
+        if (address) hosts.push(address);
+      }
+    }
+  } else {
+    hosts.push(host);
+  }
+  const uniqueHosts = Array.from(new Set(hosts.length ? hosts : ['127.0.0.1']));
+  return uniqueHosts.map(address => `${protocol}://${formatHostForUrl(address)}:${port}/filtertube`);
+}
+
 async function readBody(req) {
   const chunks = [];
   let total = 0;
@@ -420,6 +465,7 @@ function isAuthorized(req, token) {
 export function createManagedDeliveryProviderServer(options = {}) {
   const token = normalizeString(options.authToken || process.env.FILTERTUBE_PROVIDER_TOKEN);
   const storePath = normalizeString(options.storePath || process.env.FILTERTUBE_PROVIDER_STORE);
+  const tlsOptions = getTlsServerOptions(options);
   const persisted = loadPersistedState(storePath);
   const mailboxItems = persisted.mailboxItems || new Map();
   const mailboxAcks = persisted.mailboxAcks || new Map();
@@ -436,6 +482,7 @@ export function createManagedDeliveryProviderServer(options = {}) {
       schema: 'filtertube_managed_delivery_provider_status',
       version: 1,
       service: SERVICE_NAME,
+      protocol: tlsOptions ? 'https' : 'http',
       persistentStore: !!storePath,
       authRequired: !!token,
       supportedPaths: [
@@ -687,14 +734,18 @@ export function createManagedDeliveryProviderServer(options = {}) {
     writeJson(res, 404, { ok: false, reason: 'not_found' });
   }
 
-  const server = http.createServer((req, res) => {
+  const requestHandler = (req, res) => {
     route(req, res).catch((error) => {
       writeJson(res, Number(error.statusCode) || 500, {
         ok: false,
         reason: normalizeString(error.message) || 'provider_error'
       });
     });
-  });
+  };
+
+  const server = tlsOptions
+    ? https.createServer(tlsOptions, requestHandler)
+    : http.createServer(requestHandler);
 
   server.getProviderState = () => ({
     mailboxItemCount: mailboxItems.size,
@@ -711,6 +762,7 @@ export function createManagedDeliveryProviderServer(options = {}) {
     persist();
   };
   server.providerId = crypto.randomUUID();
+  server.providerProtocol = tlsOptions ? 'https' : 'http';
   return server;
 }
 
@@ -727,10 +779,13 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       '  FILTERTUBE_PROVIDER_PORT    Port to bind. Default: 8787.',
       '  FILTERTUBE_PROVIDER_TOKEN   Optional bearer key entered in FilterTube pickup setup.',
       '  FILTERTUBE_PROVIDER_STORE   Optional JSON store for waiting updates and redacted receipts.',
+      '  FILTERTUBE_PROVIDER_TLS_KEY_PATH   Optional HTTPS private-key path.',
+      '  FILTERTUBE_PROVIDER_TLS_CERT_PATH  Optional HTTPS certificate path. Use with the key path.',
       '',
       'Addresses:',
       '  Home Pickup:     http://<this-computer-lan-ip>:8787/filtertube',
-      '  Internet Pickup: expose the same service through your trusted HTTPS address.',
+      '  Internet Pickup: expose the same service through your trusted HTTPS address,',
+      '                   or run this provider with trusted TLS key/cert paths.',
       '',
       'This provider is transport only. It stores unreadable waiting updates and redacted receipts;',
       'protected devices still validate saved parent link, target profile, scope, revision, hash, and signature.',
@@ -742,12 +797,18 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const port = Number(process.env.FILTERTUBE_PROVIDER_PORT) || DEFAULT_PORT;
   const server = createManagedDeliveryProviderServer();
   server.listen(port, host, () => {
+    const protocol = server.providerProtocol || 'http';
+    const homeUrls = getManagedDeliveryProviderHomePickupUrls({ host, port, protocol });
     const tokenNote = process.env.FILTERTUBE_PROVIDER_TOKEN ? 'Bearer token required' : 'no bearer token set';
     const storeNote = process.env.FILTERTUBE_PROVIDER_STORE
       ? `persistent store ${process.env.FILTERTUBE_PROVIDER_STORE}`
       : 'memory store only';
-    console.log(`FilterTube managed delivery provider listening on http://${host}:${port}/filtertube (${tokenNote}, ${storeNote})`);
-    console.log('Home Pickup: enter http://<this-computer-lan-ip>:8787/filtertube on both verified devices.');
-    console.log('Internet Pickup: expose this provider through your trusted HTTPS address, then enter that HTTPS address in FilterTube.');
+    const tlsNote = protocol === 'https' ? 'HTTPS enabled' : 'HTTP only';
+    console.log(`FilterTube managed delivery provider listening on ${protocol}://${host}:${port}/filtertube (${tokenNote}, ${storeNote}, ${tlsNote})`);
+    console.log('Home Pickup: enter one of these addresses on both verified devices:');
+    for (const url of homeUrls) console.log(`  ${url}`);
+    console.log(protocol === 'https'
+      ? 'Internet Pickup: enter the trusted HTTPS address for this provider in FilterTube.'
+      : 'Internet Pickup: put this provider behind your trusted HTTPS reverse proxy/tunnel, then enter that HTTPS address in FilterTube.');
   });
 }

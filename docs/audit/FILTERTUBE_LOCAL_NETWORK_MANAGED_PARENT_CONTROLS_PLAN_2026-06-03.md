@@ -1070,6 +1070,13 @@ parent tool instead of a sync/debug console.
   local/home trials. It does not add automatic LAN peer discovery, hosted
   service ownership, profile authority, PIN authority, trusted-link authority,
   or native app parity.
+- [x] 2026-06-26 provider setup usability slice: the self-hosted provider now
+  prints concrete Home Pickup URLs for the bound machine instead of asking a
+  parent to infer the LAN address, and it can run directly over HTTPS when
+  `FILTERTUBE_PROVIDER_TLS_KEY_PATH` and `FILTERTUBE_PROVIDER_TLS_CERT_PATH`
+  point to a trusted key/certificate pair. This improves explicit intranet and
+  internet pickup setup only; it does not add automatic LAN discovery, hosted
+  provider ownership, profile authority, or provider-side policy authority.
 - [ ] Automatic LAN peer discovery authority. This remains app/provider work,
   with extension authority hooks already gated.
 - [x] Configured local-network gateway transport. The extension can install an

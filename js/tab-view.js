@@ -14201,6 +14201,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             pickupKey,
             '',
             '# The included provider listens over HTTP by default; put it behind your own HTTPS reverse proxy/tunnel before using it as Internet Pickup.',
+            '# Advanced: run the provider directly over HTTPS with FILTERTUBE_PROVIDER_TLS_KEY_PATH and FILTERTUBE_PROVIDER_TLS_CERT_PATH if you have a trusted certificate.',
             '# The provider stores only unreadable waiting updates and redacted receipts. Protected devices still validate saved parent link, target profile, scope, revision, hash, and signature.'
         ].join('\n');
         try {

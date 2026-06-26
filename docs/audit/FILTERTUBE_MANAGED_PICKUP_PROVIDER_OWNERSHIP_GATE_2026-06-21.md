@@ -55,8 +55,10 @@ The reference provider endpoint behavior is lane-owned by
 That test proves safe read-only status, bearer-token handling, CORS preflight,
 ciphertext-only Internet Pickup storage/pull/purge, redacted mailbox receipts,
 Home Pickup signed candidate storage/discovery, and redacted Home Pickup
-receipts. It is proof of endpoint shape only, not proof of a hosted FilterTube
-service.
+receipts. It also proves setup hints only: wildcard binds are converted into
+parent-usable Home Pickup URLs, and direct HTTPS serving is available only when
+a trusted key/certificate pair is explicitly supplied. It is proof of endpoint
+shape and setup ergonomics only, not proof of a hosted FilterTube service.
 
 ## Required Rows
 

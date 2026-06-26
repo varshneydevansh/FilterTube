@@ -1,7 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { createManagedDeliveryProviderServer } from '../../scripts/managed-delivery-provider.mjs';
+import {
+  createManagedDeliveryProviderServer,
+  getManagedDeliveryProviderHomePickupUrls
+} from '../../scripts/managed-delivery-provider.mjs';
 
 async function withProvider(options, run) {
   const server = createManagedDeliveryProviderServer(options);
@@ -90,6 +93,7 @@ test('reference provider requires bearer token when configured', async () => {
     assert.equal(status.status, 200);
     assert.equal(statusBody.ok, true);
     assert.equal(statusBody.service, 'filtertube-managed-delivery-provider');
+    assert.equal(statusBody.protocol, 'http');
     assert.equal(statusBody.authRequired, true);
     assert.equal(statusBody.authority, 'transport_only_signed_parent_policy_validation_required');
     assert.ok(statusBody.supportedPaths.includes('managed-mailbox/upload'));
@@ -121,6 +125,22 @@ test('reference provider requires bearer token when configured', async () => {
     assert.equal(authorized.body.bridgeReachable, true);
     assert.equal(authorized.body.service, 'filtertube-managed-delivery-provider');
   });
+});
+
+test('reference provider exposes parent-usable Home Pickup URL hints without granting authority', () => {
+  assert.deepEqual(
+    getManagedDeliveryProviderHomePickupUrls({ host: '192.168.1.44', port: 8787, protocol: 'http' }),
+    ['http://192.168.1.44:8787/filtertube']
+  );
+  assert.deepEqual(
+    getManagedDeliveryProviderHomePickupUrls({ host: 'pickup.local', port: 9443, protocol: 'https' }),
+    ['https://pickup.local:9443/filtertube']
+  );
+
+  const wildcardHints = getManagedDeliveryProviderHomePickupUrls({ host: '0.0.0.0', port: 8787, protocol: 'http' });
+  assert.ok(wildcardHints.length >= 1);
+  assert.ok(wildcardHints.every(url => url.endsWith(':8787/filtertube')));
+  assert.ok(wildcardHints.every(url => !url.includes('0.0.0.0')));
 });
 
 test('reference provider stores, pulls, and purges ciphertext-only Internet Pickup items', async () => {
