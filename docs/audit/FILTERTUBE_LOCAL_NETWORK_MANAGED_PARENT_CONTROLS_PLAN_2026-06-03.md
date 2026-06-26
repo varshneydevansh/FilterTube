@@ -187,10 +187,11 @@ extension authority code.
 - [x] 2026-06-26 Home Pickup setup command slice: the Home Pickup setup modal can
   copy a self-hosted provider command using `FILTERTUBE_PROVIDER_HOST=0.0.0.0`
   and `FILTERTUBE_PROVIDER_STORE=.filtertube/managed-delivery-store.json`.
-  Parents/admins still have to run that service and enter the reachable
-  `http://<this-computer-lan-ip>:8787/filtertube` address explicitly. This is
-  a setup helper only; it does not scan the network, create trust, or apply
-  policy without the saved parent link and signature/revision gates.
+  Parents/admins still have to run that service, use one of the Home Pickup
+  addresses printed by the provider, and confirm the read-only status JSON from
+  another same-network device before entering it in FilterTube. This is a setup
+  helper only; it does not scan the network, create trust, or apply policy
+  without the saved parent link and signature/revision gates.
 - [x] 2026-06-26 Internet Pickup setup command slice: the Internet Pickup setup
   modal can copy the same self-hosted provider command, with explicit guidance
   that Internet Pickup must be exposed through the family's/school's trusted

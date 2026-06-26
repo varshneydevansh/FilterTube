@@ -82,17 +82,19 @@ HTTPS endpoint, own a hosted service, or make provider reachability policy
 authority.
 
 For a same-network Home Pickup trial where another device needs to reach this
-computer, bind the provider to the local network and enter this computer's LAN
-address in FilterTube:
+computer, bind the provider to the local network:
 
 ```bash
 FILTERTUBE_PROVIDER_HOST=0.0.0.0 FILTERTUBE_PROVIDER_STORE=.filtertube/managed-delivery-store.json npm run managed:provider
 ```
 
-Then configure Home Pickup with:
+The provider prints one or more concrete Home Pickup addresses when it starts.
+Open one printed address from another device on the same network first; it
+should return the read-only FilterTube status JSON. Then configure Home Pickup
+with that same printed address.
 
 ```text
-http://<this-computer-lan-ip>:8787/filtertube
+http://<printed-home-pickup-address>:8787/filtertube
 ```
 
 The store is still only transport storage. It contains ciphertext mailbox rows,

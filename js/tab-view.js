@@ -14216,16 +14216,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function copyManagedHomePickupSetupCommand() {
         const pickupKey = generateManagedPickupSetupKey();
         const command = buildManagedPickupProviderSetupCommand(pickupKey);
-        const endpointHint = 'http://<this-computer-lan-ip>:8787/filtertube';
         const text = [
             '# Run this from the FilterTube project on the home/school pickup computer.',
             command,
             '',
-            '# Open this address from another device on the same network first; it should return a FilterTube status JSON.',
+            '# The provider will print one or more Home Pickup addresses when it starts.',
+            '# Open one printed address from another device on the same network first; it should return a FilterTube status JSON.',
             '# The status page is read-only and never shows rules, PINs, or private keys.',
             '',
-            '# Then enter this Home Pickup address in FilterTube on parent/protected devices:',
-            endpointHint,
+            '# Then enter that same printed Home Pickup address in FilterTube on parent/protected devices.',
             '',
             '# Paste this same pickup key into the optional Home Pickup key prompt:',
             pickupKey,
