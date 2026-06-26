@@ -866,6 +866,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       '  Home Pickup:     http://<this-computer-lan-ip>:8787/filtertube',
       '  Internet Pickup: expose the same service through your trusted HTTPS address,',
       '                   or run this provider with trusted TLS key/cert paths.',
+      '  Open one printed address in a browser first to confirm the safe status page.',
       '',
       'This provider is transport only. It stores unreadable waiting updates and redacted receipts;',
       'protected devices still validate saved parent link, target profile, scope, revision, hash, and signature.',

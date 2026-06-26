@@ -96,7 +96,7 @@ npm run managed:provider
 
 - Home Pickup uses `http://<this-computer-lan-ip>:8787/filtertube` on the trusted home/school network
 - Internet Pickup uses the same provider only after you expose it through your own trusted HTTPS address
-- opening `/filtertube` returns a safe status JSON; rule contents, PINs, private keys, and profile policy are never shown there
+- opening `/filtertube` in a browser shows a safe FilterTube Pickup Provider status page; API callers can request the JSON status payload; rule contents, PINs, private keys, and profile policy are never shown there
 
 Protected profile time limits:
 

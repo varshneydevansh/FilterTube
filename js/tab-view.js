@@ -14352,7 +14352,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const endpoint = await showPromptModal({
             title: 'Home Pickup Address',
             message: 'Enter the Home Pickup service address only if you run one for verified devices on this family map. This is not device scanning; Send Update remains the normal path.',
-            placeholder: 'http://192.168.1.10:4177/filtertube',
+            placeholder: 'http://192.168.1.10:8787/filtertube',
             inputType: 'url',
             confirmText: currentEndpoint ? 'Save Home Pickup' : 'Enable Home Pickup',
             initialValue: currentEndpoint

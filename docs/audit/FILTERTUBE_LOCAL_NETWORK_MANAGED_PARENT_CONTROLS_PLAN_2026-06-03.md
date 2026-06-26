@@ -188,10 +188,11 @@ extension authority code.
   copy a self-hosted provider command using `FILTERTUBE_PROVIDER_HOST=0.0.0.0`
   and `FILTERTUBE_PROVIDER_STORE=.filtertube/managed-delivery-store.json`.
   Parents/admins still have to run that service, use one of the Home Pickup
-  addresses printed by the provider, and confirm the read-only status JSON from
-  another same-network device before entering it in FilterTube. This is a setup
-  helper only; it does not scan the network, create trust, or apply policy
-  without the saved parent link and signature/revision gates.
+  addresses printed by the provider, and confirm the browser-safe status page
+  or read-only JSON status payload from another same-network device before
+  entering it in FilterTube. This is a setup helper only; it does not scan the
+  network, create trust, or apply policy without the saved parent link and
+  signature/revision gates.
 - [x] 2026-06-26 Internet Pickup setup command slice: the Internet Pickup setup
   modal can copy the same self-hosted provider command, with explicit guidance
   that Internet Pickup must be exposed through the family's/school's trusted
@@ -214,6 +215,12 @@ extension authority code.
   and provider proof. The provider CORS metadata includes `GET` for status
   checks. This is status accuracy only; it adds no discovery, hosted-service
   claim, or policy authority.
+- [x] 2026-06-26 Home Pickup address guidance alignment slice: the Home Pickup
+  setup prompt now uses the reference provider's default `8787` port instead of
+  the stale `4177` placeholder, README describes the browser status page plus
+  API JSON split, and provider `--help` tells operators to open a printed
+  address before configuration. This keeps same-network setup deterministic for
+  parents without adding scanning or network-derived authority.
 - [x] 2026-06-26 pickup provider status proof slice: the provider ownership
   artifact template, generator, and verifier now require non-placeholder
   `providerStatusProof` for self-hosted, user-supplied, and hosted pickup

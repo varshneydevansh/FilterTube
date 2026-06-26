@@ -11,7 +11,7 @@ const rootMetadataRows = [
   ['.gitignore', 153, 2197, 'c90a7834297cf0a7b65493f41a21947fd5d85d1e14740b902cb3a3664028e3ca'],
   ['CHANGELOG.md', 591, 40124, 'e22a87ce7eeb88d171587d4b0f4676881a2c3081a7fbf15978d7e8d8582cdfdd'],
   ['LICENSE', 21, 1073, 'd0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d'],
-  ['README.md', 411, 23577, 'c7fe9a482e35c40aa6fd986e46d2d23cfc16170f5b11a6573e8f737c5dd7788e'],
+  ['README.md', 423, 24171, '222883578482b2d594d43f29bbe4778b7404a640bb5f2ca9e9a67a1858bf49cb'],
   ['channel-identity-watch-mix-collab-recovery-plan.md', 262, 16023, '01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a'],
   ['package.json', 67, 2954, '6f0b5dc130399998ad5435ef3b273573234e80561ceba32e0da078b91851e229'],
   ['package-lock.json', 1461, 49916, 'f52d6482693be9cd4edacdc1f1491b4d2cda796522bfd0e4dcf86e0c879ad974'],
@@ -91,9 +91,9 @@ test('root package metadata script surface doc is audit-only and fingerprint pin
   assert.match(doc, /optimization, release, dependency, JSON-first, or cleanup implementation work/);
   assert.deepEqual(trackedRootMetadata.sort(), rootMetadataRows.map(([file]) => file).sort());
 
-  assert.equal(rootMetadataRows.reduce((sum, [, lines]) => sum + lines, 0), 2966);
-  assert.equal(rootMetadataRows.reduce((sum, [, , bytes]) => sum + bytes, 0), 135864);
-  assert.match(doc, /7 files, 2,966 newline counts, and\s+135,864 bytes/);
+  assert.equal(rootMetadataRows.reduce((sum, [, lines]) => sum + lines, 0), 2978);
+  assert.equal(rootMetadataRows.reduce((sum, [, , bytes]) => sum + bytes, 0), 136458);
+  assert.match(doc, /7 files, 2,978 newline counts, and\s+136,458 bytes/);
 
   for (const [file, lines, bytes, hash] of rootMetadataRows) {
     assert.equal(newlineCount(file), lines, `${file} newline count drifted`);

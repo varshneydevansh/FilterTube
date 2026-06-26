@@ -108,8 +108,9 @@ for local intranet and user-owned internet pickup trials:
 
 - `npm run managed:provider -- --help` prints the Home Pickup and Internet
   Pickup setup model, supported environment variables, and authority boundary
-- `GET /filtertube` returns a safe read-only status JSON so a parent/admin can
-  confirm the pickup service address before entering it into FilterTube
+- `GET /filtertube` shows a safe browser status page and still returns a
+  read-only JSON status payload to API callers, so a parent/admin can confirm
+  the pickup service address before entering it into FilterTube
 - the copied setup instructions in Accounts & Sync tell parents/admins to open
   the provider address first and confirm the status response
 - README and technical docs now include the self-hosted provider command,

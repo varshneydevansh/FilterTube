@@ -26,15 +26,15 @@ first-class JSON filter work look safer than the runtime proof actually allows.
 
 ## File Fingerprints
 
-Current tracked root metadata inventory: 7 files, 2,966 newline counts, and
-135,864 bytes.
+Current tracked root metadata inventory: 7 files, 2,978 newline counts, and
+136,458 bytes.
 
 | File | Newline count | Bytes | SHA-256 |
 |---|---:|---:|---|
 | `.gitignore` | 153 | 2,197 | `c90a7834297cf0a7b65493f41a21947fd5d85d1e14740b902cb3a3664028e3ca` |
 | `CHANGELOG.md` | 591 | 40,124 | `e22a87ce7eeb88d171587d4b0f4676881a2c3081a7fbf15978d7e8d8582cdfdd` |
 | `LICENSE` | 21 | 1,073 | `d0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d` |
-| `README.md` | 411 | 23,577 | `c7fe9a482e35c40aa6fd986e46d2d23cfc16170f5b11a6573e8f737c5dd7788e` |
+| `README.md` | 423 | 24,171 | `222883578482b2d594d43f29bbe4778b7404a640bb5f2ca9e9a67a1858bf49cb` |
 | `channel-identity-watch-mix-collab-recovery-plan.md` | 262 | 16,023 | `01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a` |
 | `package.json` | 67 | 2,954 | `6f0b5dc130399998ad5435ef3b273573234e80561ceba32e0da078b91851e229` |
 | `package-lock.json` | 1,461 | 49,916 | `f52d6482693be9cd4edacdc1f1491b4d2cda796522bfd0e4dcf86e0c879ad974` |
