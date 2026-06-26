@@ -14080,6 +14080,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         await refreshProfilesUI();
         await checkNanahManagedMailboxServerHealth({ reason: 'configure' });
+        await refreshNanahDeliveryFeedbackUi();
     }
 
     function buildManagedPickupProviderSetupCommand() {
@@ -14283,6 +14284,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         await refreshProfilesUI();
         await checkNanahManagedLocalNetworkProviderHealth({ reason: 'configure' });
+        await refreshNanahDeliveryFeedbackUi();
     }
 
     function hasNanahManagedMailboxUploadWriter(provider = getNanahManagedMailboxProvider()) {

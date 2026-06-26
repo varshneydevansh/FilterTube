@@ -212,6 +212,13 @@ extension authority code.
   waiting for a later page refresh. It does not change provider authority,
   network discovery, trusted-link validation, target-profile matching, scope,
   revision, hash, or signature checks.
+- [x] 2026-06-26 pickup configure UI refresh slice: saving Internet Pickup or
+  Home Pickup now performs the same post-check feedback refresh after the
+  readiness/durable-store result is recorded. Parents see the configured
+  provider's current status immediately after setup instead of waiting for a
+  later page refresh. This is UI feedback only; it does not change provider
+  authority, discovery, trusted-link validation, target-profile matching, scope,
+  revision, hash, or signature checks.
 - [x] 2026-06-21 Home Pickup visible check slice: configured Home Pickup rows
   now show a direct `Check` action in the Family Device Updates map. This is
   only a readiness check for the explicitly configured pickup service; it does
