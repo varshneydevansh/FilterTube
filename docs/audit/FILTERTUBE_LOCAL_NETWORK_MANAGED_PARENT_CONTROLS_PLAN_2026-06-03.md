@@ -983,6 +983,12 @@ parent tool instead of a sync/debug console.
     ack history now reports parent-facing pickup update delivery/receipt labels
     instead of raw provider labels. Ack schemas, transport IDs, revision/hash
     records, and authority validation remain unchanged.
+  - [x] 2026-06-26 parent delivery receipt row slice: the Family Device Updates
+    advanced delivery panel now exposes a parent-side `Check protected-device
+    delivery` row when a source device has sent managed policies and a configured
+    Internet Pickup/Home Pickup provider can return redacted receipts. The row
+    reuses the existing source-ack sync path; it does not add automatic discovery,
+    hosted provider ownership, plaintext rule exposure, or any new authority.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.

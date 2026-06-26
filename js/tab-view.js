@@ -2952,6 +2952,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftNanahDeliveryCheckRow = document.getElementById('ftNanahDeliveryCheckRow');
     const ftNanahDeliveryCheckDetail = document.getElementById('ftNanahDeliveryCheckDetail');
     const ftNanahDeliveryCheckBtn = document.getElementById('ftNanahDeliveryCheckBtn');
+    const ftNanahDeliveryReceiptRow = document.getElementById('ftNanahDeliveryReceiptRow');
+    const ftNanahDeliveryReceiptDetail = document.getElementById('ftNanahDeliveryReceiptDetail');
+    const ftNanahDeliveryReceiptBtn = document.getElementById('ftNanahDeliveryReceiptBtn');
 
     const openKofiBtn = document.getElementById('openKofiBtn');
     const dashboardDonateBtn = document.getElementById('dashboardDonateBtn');
@@ -13787,6 +13790,28 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ? 'Run the saved-update check now for this protected profile.'
                 : 'Available on a protected device with a saved trusted parent link and a set-up Internet Pickup or Home Pickup path.';
         }
+
+        const hasReceiptTarget = hasNanahManagedSourceAckSyncTarget();
+        const hasReceiptReader = hasNanahManagedSourceAckReader();
+        if (ftNanahDeliveryReceiptRow) {
+            ftNanahDeliveryReceiptRow.hidden = !hasReceiptTarget && !hasReceiptReader;
+        }
+        if (ftNanahDeliveryReceiptDetail) {
+            ftNanahDeliveryReceiptDetail.textContent = hasReceiptTarget
+                ? (hasReceiptReader
+                    ? 'Refresh whether a protected device accepted, rejected, or has not yet picked up the latest saved parent update.'
+                    : 'Set up Internet Pickup or Home Pickup receipt support before checking later-delivery status.')
+                : 'Send a protected update first. Receipts only summarize already-sent parent updates.';
+        }
+        if (ftNanahDeliveryReceiptBtn) {
+            ftNanahDeliveryReceiptBtn.textContent = hasReceiptReader ? 'Check Delivery' : 'Delivery Check Off';
+            ftNanahDeliveryReceiptBtn.disabled = !hasReceiptTarget || !hasReceiptReader;
+            ftNanahDeliveryReceiptBtn.title = hasReceiptTarget
+                ? (hasReceiptReader
+                    ? 'Check redacted accepted/rejected delivery receipts for protected devices.'
+                    : 'Set up Internet Pickup or Home Pickup receipt support before checking saved-update delivery.')
+                : 'Send a protected update before checking whether a protected device picked it up.';
+        }
     }
 
     async function promptManagedProviderSetupAction({
@@ -19597,6 +19622,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             } catch (error) {
                 console.error('FilterTube: waiting parent update check failed', error);
                 UIComponents.showToast(error?.message || 'Waiting update check failed', 'error');
+            } finally {
+                renderNanahDeliveryPathStrip();
+            }
+        });
+    }
+
+    if (ftNanahDeliveryReceiptBtn) {
+        ftNanahDeliveryReceiptBtn.addEventListener('click', async () => {
+            if (ftNanahDeliveryReceiptBtn.disabled) return;
+            ftNanahDeliveryReceiptBtn.disabled = true;
+            try {
+                await runNanahManagedSourceAckSync({ reason: 'manual_parent_receipt_check' });
+                renderNanahDeliveryPathStrip();
+                renderNanahTrustedLinks();
+                UIComponents.showToast('Checked protected-device delivery', 'info');
+            } catch (error) {
+                console.error('FilterTube: protected-device delivery check failed', error);
+                UIComponents.showToast(error?.message || 'Delivery check failed', 'error');
             } finally {
                 renderNanahDeliveryPathStrip();
             }
