@@ -440,7 +440,7 @@ function writeJson(res, status, payload) {
     'cache-control': 'no-store',
     'x-content-type-options': 'nosniff',
     'access-control-allow-origin': '*',
-    'access-control-allow-methods': 'POST, OPTIONS',
+    'access-control-allow-methods': 'GET, POST, OPTIONS',
     'access-control-allow-headers': 'content-type, authorization'
   });
   res.end(body);

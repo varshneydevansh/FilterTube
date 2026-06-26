@@ -208,6 +208,12 @@ extension authority code.
   FilterTube. Both status surfaces expose service/readiness metadata only; they
   do not expose plaintext rules, PINs, private keys, target authority, or
   automatic LAN discovery.
+- [x] 2026-06-26 pickup setup-copy status alignment slice: the Internet Pickup
+  and Home Pickup copied setup commands now tell parents/admins to expect the
+  browser status page, while preserving the JSON status payload for API callers
+  and provider proof. The provider CORS metadata includes `GET` for status
+  checks. This is status accuracy only; it adds no discovery, hosted-service
+  claim, or policy authority.
 - [x] 2026-06-26 pickup provider status proof slice: the provider ownership
   artifact template, generator, and verifier now require non-placeholder
   `providerStatusProof` for self-hosted, user-supplied, and hosted pickup
