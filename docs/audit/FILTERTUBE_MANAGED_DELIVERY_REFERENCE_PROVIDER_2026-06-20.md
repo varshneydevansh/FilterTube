@@ -89,19 +89,21 @@ FILTERTUBE_PROVIDER_HOST=0.0.0.0 FILTERTUBE_PROVIDER_STORE=.filtertube/managed-d
 ```
 
 The provider prints one or more concrete Home Pickup addresses when it starts.
-Open one printed address from another device on the same network first; it
-should return the read-only FilterTube status JSON. Then configure Home Pickup
+Open one printed address from another device on the same network first. A normal
+browser opens a safe FilterTube Pickup Provider status page; API callers that
+request JSON receive the read-only status payload. Then configure Home Pickup
 with that same printed address.
 
 ```text
 http://<printed-home-pickup-address>:8787/filtertube
 ```
 
-The store is still only transport storage. It contains ciphertext mailbox rows,
-signed Home Pickup candidates, and redacted receipts. It does not store PINs,
-plaintext rules, private keys, or policy authority. The protected device still
-has to validate the saved parent link, target profile, scope, revision, hash,
-and signature before anything applies.
+The status page and store are still transport-only. The page shows protocol,
+provider-key, and storage-mode status only. The store contains ciphertext
+mailbox rows, signed Home Pickup candidates, and redacted receipts. It does not
+store PINs, plaintext rules, private keys, or policy authority. The protected
+device still has to validate the saved parent link, target profile, scope,
+revision, hash, and signature before anything applies.
 
 ## Authority Boundary
 

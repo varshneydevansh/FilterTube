@@ -446,6 +446,30 @@ function writeJson(res, status, payload) {
   res.end(body);
 }
 
+function escapeHtml(value) {
+  return normalizeString(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function wantsHtml(req) {
+  const accept = normalizeString(req.headers.accept).toLowerCase();
+  return accept.includes('text/html') && !accept.includes('application/json');
+}
+
+function writeHtml(res, status, html) {
+  res.writeHead(status, {
+    'content-type': 'text/html; charset=utf-8',
+    'cache-control': 'no-store',
+    'x-content-type-options': 'nosniff',
+    'content-security-policy': "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'"
+  });
+  res.end(html);
+}
+
 function writeOptions(res) {
   res.writeHead(204, {
     'cache-control': 'no-store',
@@ -503,6 +527,60 @@ export function createManagedDeliveryProviderServer(options = {}) {
     };
   }
 
+  function providerStatusHtml(status) {
+    const protocol = escapeHtml(status.protocol);
+    const auth = status.authRequired ? 'Provider key required' : 'No provider key set';
+    const store = status.persistentStore ? 'Persistent local store enabled' : 'Memory-only store';
+    return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FilterTube Pickup Provider</title>
+<style>
+body{margin:0;font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#eef6f8;color:#17212b}
+main{max-width:760px;margin:40px auto;padding:0 18px}
+.card{background:rgba(255,255,255,.86);border:1px solid rgba(70,83,95,.16);border-radius:18px;box-shadow:0 18px 55px rgba(26,42,58,.12);overflow:hidden}
+header{padding:28px 30px;border-bottom:1px solid rgba(70,83,95,.13)}
+h1{font-size:24px;margin:0 0 8px}
+p{margin:0;color:#51606f}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:22px 30px}
+.tile{border:1px solid rgba(70,83,95,.13);border-radius:14px;padding:14px;background:#fff}
+.label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#9b4b43;font-weight:700}
+.value{margin-top:4px;font-weight:700}
+.notice{margin:0 30px 24px;padding:16px;border-radius:14px;background:#f5fbf7;border:1px solid #bedcc9;color:#244537}
+ul{margin:10px 0 0 18px;padding:0}
+li{margin:6px 0}
+code{background:#f3efe9;border:1px solid rgba(70,83,95,.12);border-radius:8px;padding:2px 6px}
+@media (max-width:680px){main{margin:18px auto}.grid{grid-template-columns:1fr;padding:18px}header{padding:22px}.notice{margin:0 18px 18px}}
+</style>
+</head>
+<body>
+<main>
+<section class="card">
+<header>
+<h1>FilterTube Pickup Provider</h1>
+<p>This service can hold unreadable Internet Pickup updates and signed Home Pickup candidates for verified FilterTube devices.</p>
+</header>
+<div class="grid" aria-label="Provider status">
+<div class="tile"><div class="label">Protocol</div><div class="value">${protocol.toUpperCase()}</div></div>
+<div class="tile"><div class="label">Access key</div><div class="value">${escapeHtml(auth)}</div></div>
+<div class="tile"><div class="label">Storage</div><div class="value">${escapeHtml(store)}</div></div>
+</div>
+<div class="notice">
+<strong>Transport only.</strong>
+<ul>
+<li>For Home Pickup, enter this provider address only on devices that already have a verified parent/protected-device link.</li>
+<li>For Internet Pickup, expose this service through a trusted HTTPS address before using it away from home.</li>
+<li>The provider cannot choose profiles, read rules, approve PINs, or bypass signature/revision validation.</li>
+</ul>
+</div>
+</section>
+</main>
+</body>
+</html>`;
+  }
+
   async function route(req, res) {
     if (req.method === 'OPTIONS') {
       writeOptions(res);
@@ -511,7 +589,9 @@ export function createManagedDeliveryProviderServer(options = {}) {
     const pathName = new URL(req.url || '/', 'http://127.0.0.1').pathname.replace(/\/+$/, '');
     if (req.method === 'GET') {
       if (!pathName || pathName === '/filtertube' || pathName.endsWith('/filtertube') || pathName.endsWith('/status')) {
-        writeJson(res, 200, publicStatusPayload());
+        const status = publicStatusPayload();
+        if (wantsHtml(req)) writeHtml(res, 200, providerStatusHtml(status));
+        else writeJson(res, 200, status);
         return;
       }
       writeJson(res, 404, { ok: false, reason: 'not_found' });

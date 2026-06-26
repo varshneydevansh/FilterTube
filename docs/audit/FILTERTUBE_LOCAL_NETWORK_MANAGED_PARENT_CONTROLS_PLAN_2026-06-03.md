@@ -201,10 +201,12 @@ extension authority code.
   hash, or signature authority.
 - [x] 2026-06-26 pickup provider status page slice: the self-hosted provider now
   answers a safe read-only `GET /filtertube` status request and `--help` prints
-  the Home Pickup and Internet Pickup setup model. The copied setup instructions
+  the Home Pickup and Internet Pickup setup model. Browser navigation receives
+  a parent-readable FilterTube Pickup Provider status page; API callers that
+  request JSON still receive the status payload. The copied setup instructions
   tell parents/admins to open the provider address before pasting it into
-  FilterTube. The status payload exposes service/readiness metadata only; it
-  does not expose plaintext rules, PINs, private keys, target authority, or
+  FilterTube. Both status surfaces expose service/readiness metadata only; they
+  do not expose plaintext rules, PINs, private keys, target authority, or
   automatic LAN discovery.
 - [x] 2026-06-26 pickup provider status proof slice: the provider ownership
   artifact template, generator, and verifier now require non-placeholder

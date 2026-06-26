@@ -127,6 +127,22 @@ test('reference provider requires bearer token when configured', async () => {
   });
 });
 
+test('reference provider serves a browser-safe status page without exposing rule data', async () => {
+  await withProvider({ authToken: 'provider-token' }, async ({ baseUrl }) => {
+    const status = await fetch(baseUrl, { headers: { accept: 'text/html' } });
+    const body = await status.text();
+
+    assert.equal(status.status, 200);
+    assert.match(status.headers.get('content-type') || '', /text\/html/);
+    assert.match(body, /FilterTube Pickup Provider/);
+    assert.match(body, /Home Pickup/);
+    assert.match(body, /Internet Pickup/);
+    assert.match(body, /Transport only/);
+    assert.doesNotMatch(body, /must-not-cross/);
+    assert.doesNotMatch(body, /<script/i);
+  });
+});
+
 test('reference provider exposes parent-usable Home Pickup URL hints without granting authority', () => {
   assert.deepEqual(
     getManagedDeliveryProviderHomePickupUrls({ host: '192.168.1.44', port: 8787, protocol: 'http' }),
