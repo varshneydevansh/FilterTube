@@ -174,6 +174,16 @@ test('managed pickup provider ownership generator refuses provider authority ove
   );
 });
 
+test('managed pickup provider ownership generator refuses placeholder provider status proof', () => {
+  const input = validInput();
+  input.providerEvidence.providerStatusProof = 'N/A';
+
+  assert.throws(
+    () => createManagedPickupProviderOwnershipArtifact({ repoRoot, input, confirmed: true }),
+    /providerStatusProof must identify the safe provider status proof/
+  );
+});
+
 test('managed pickup provider ownership generator refuses sensitive input keys', () => {
   const input = validInput();
   input.providerEvidence.rawPolicyJson = '{}';

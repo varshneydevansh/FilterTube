@@ -226,6 +226,9 @@ function buildOwnershipDecision(input) {
 function buildProviderEvidence(input, decision) {
   const source = requiredObject(input, 'providerEvidence');
   for (const field of REQUIRED_PROVIDER_FIELDS) requiredString(source, field, 'input.providerEvidence');
+  if (source.providerStatusProof.trim().toUpperCase() === 'N/A') {
+    throw new Error('input.providerEvidence.providerStatusProof must identify the safe provider status proof');
+  }
 
   return {
     internetPickupStatus: source.internetPickupStatus.trim(),
@@ -339,7 +342,7 @@ Input JSON shape:
     "hostedEndpoint": "N/A",
     "deploymentProof": "N/A",
     "corsPreflightProof": "N/A",
-    "providerStatusProof": "N/A",
+    "providerStatusProof": "docs/audit/FILTERTUBE_MANAGED_DELIVERY_REFERENCE_PROVIDER_2026-06-20.md",
     "healthCheckProof": "N/A",
     "roundTripSmokeArtifact": "N/A",
     "redactedAckProof": "N/A"

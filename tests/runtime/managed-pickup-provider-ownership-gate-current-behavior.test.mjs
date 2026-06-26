@@ -173,6 +173,14 @@ test('verifier rejects guaranteed later-delivery claims without hosted proof', (
   assert.ok(errors.includes('providerEvidence.internetPickupStatus cannot be owned_deployed_smoked without filtertube_hosted_provider'));
 });
 
+test('verifier rejects placeholder provider status proof for non-hosted pickup', () => {
+  const artifact = validArtifact();
+  artifact.providerEvidence.providerStatusProof = 'N/A';
+
+  const errors = validateManagedPickupProviderOwnershipArtifact(artifact);
+  assert.ok(errors.includes('providerEvidence.providerStatusProof must identify the safe provider status proof'));
+});
+
 test('verifier rejects hosted-provider artifacts missing deployment proof', () => {
   const artifact = validArtifact({ decision: 'filtertube_hosted_provider' });
   artifact.providerEvidence.deploymentProof = 'N/A';
@@ -183,6 +191,7 @@ test('verifier rejects hosted-provider artifacts missing deployment proof', () =
   const errors = validateManagedPickupProviderOwnershipArtifact(artifact);
   assert.ok(errors.includes('providerEvidence.deploymentProof is required for filtertube_hosted_provider'));
   assert.ok(errors.includes('providerEvidence.corsPreflightProof is required for filtertube_hosted_provider'));
+  assert.ok(errors.includes('providerEvidence.providerStatusProof must identify the safe provider status proof'));
   assert.ok(errors.includes('providerEvidence.providerStatusProof is required'));
   assert.ok(errors.includes('providerEvidence.redactedAckProof is required for filtertube_hosted_provider'));
 });

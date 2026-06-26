@@ -195,6 +195,9 @@ function validateProviderEvidence(errors, providerEvidence, decision) {
   if (providerEvidence.providerDocs !== 'docs/audit/FILTERTUBE_MANAGED_DELIVERY_REFERENCE_PROVIDER_2026-06-20.md') {
     errors.push('providerEvidence.providerDocs must be docs/audit/FILTERTUBE_MANAGED_DELIVERY_REFERENCE_PROVIDER_2026-06-20.md');
   }
+  if (isBlank(providerEvidence.providerStatusProof) || String(providerEvidence.providerStatusProof).toUpperCase() === 'N/A') {
+    errors.push('providerEvidence.providerStatusProof must identify the safe provider status proof');
+  }
 
   if (decision === 'filtertube_hosted_provider') {
     for (const field of [
