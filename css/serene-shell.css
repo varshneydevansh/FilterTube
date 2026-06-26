@@ -3140,6 +3140,21 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     gap: 0.68rem;
 }
 
+.nanah-sync-intro__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.62rem;
+    flex-wrap: wrap;
+}
+
+.nanah-sync-intro__actions .btn-primary,
+.nanah-sync-intro__actions .btn-secondary {
+    min-height: 42px;
+    border-radius: 999px;
+    padding-inline: 1.02rem;
+    white-space: nowrap;
+}
+
 .nanah-sync-principles {
     display: grid;
     gap: 0.8rem;

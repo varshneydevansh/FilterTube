@@ -945,8 +945,12 @@
                                     <div class="nanah-sync-intro">
                                         <div class="nanah-sync-intro__copy">
                                             <span class="nanah-sync-intro__eyebrow">Family device updates</span>
-                                            <p class="nanah-sync-intro__title">Choose where each family device gets parent-approved changes.</p>
-                                            <p class="nanah-sync-intro__body">Use one map for devices that are ready now, nearby, or away over the internet. Start with Send Update: open both devices, pair, match the phrase, and send. Home Pickup and Internet Pickup are optional paths for families that cannot keep both devices open at the same time.</p>
+                                            <p class="nanah-sync-intro__title">Send parent-approved changes to a protected device.</p>
+                                            <p class="nanah-sync-intro__body">For most families: create a protected profile, open both devices, match the phrase, then send rules, time limits, and Main/Kids access. Home Pickup and Internet Pickup stay hidden until a family needs later delivery.</p>
+                                            <div class="nanah-sync-intro__actions" aria-label="Family device update quick actions">
+                                                <button id="ftNanahQuickCreateProtectedBtn" class="btn-secondary" type="button">Create Protected Profile</button>
+                                                <button id="ftNanahQuickSendUpdateBtn" class="btn-primary" type="button">Start Send Update</button>
+                                            </div>
                                         </div>
                                         <div class="nanah-device-compass" aria-label="Family device map for Send Update, Home Pickup, and Internet Pickup devices">
                                             <div class="nanah-device-compass__center">
@@ -966,16 +970,16 @@
                                                     <div class="nanah-device-compass__device" aria-hidden="true"><i></i></div>
                                                     <span>Same network</span>
                                                     <strong>Home Pickup</strong>
-                                                    <small>For home or school devices you set up.</small>
+                                                    <small>Optional setup for a home or school pickup service.</small>
                                                 </button>
                                                 <button id="ftNanahCompassLaterBtn" class="nanah-device-compass__choice" type="button">
                                                     <div class="nanah-device-compass__device" aria-hidden="true"><i></i></div>
                                                     <span>Away / internet</span>
                                                     <strong>Internet Pickup</strong>
-                                                    <small>For verified devices away or opened later.</small>
+                                                    <small>Optional setup for devices that open later.</small>
                                                 </button>
                                             </div>
-                                            <div class="nanah-device-compass__rule">One family map covers live, same-network, and internet devices after pairing. Send Update, Home Pickup, and Internet Pickup only carry signed updates; they never grant control.</div>
+                                            <div class="nanah-device-compass__rule">Send Update is the default. Pickup paths only help verified devices collect signed updates later; they never create authority.</div>
                                         </div>
                                         <div class="nanah-sync-simple-path" aria-label="Family device update path">
                                             <article class="nanah-sync-simple-path__item">
@@ -1006,8 +1010,8 @@
                                             <details id="ftNanahDeliveryAdvanced" class="nanah-delivery-advanced">
                                                 <summary>
                                                     <span>
-                                                        <strong>Optional: device is not open now</strong>
-                                                        <small>Set up only when a verified device must collect an approved update later, including away over the internet.</small>
+                                                        <strong>Need later delivery?</strong>
+                                                        <small>Use only if the protected device cannot stay open for Send Update.</small>
                                                     </span>
                                                     <code>Advanced</code>
                                                 </summary>

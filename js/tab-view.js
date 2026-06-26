@@ -2931,6 +2931,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftNanahQrCanvas = document.getElementById('ftNanahQrCanvas');
     const ftNanahQrCaption = document.getElementById('ftNanahQrCaption');
     const ftNanahTrustedLinks = document.getElementById('ftNanahTrustedLinks');
+    const ftNanahQuickCreateProtectedBtn = document.getElementById('ftNanahQuickCreateProtectedBtn');
+    const ftNanahQuickSendUpdateBtn = document.getElementById('ftNanahQuickSendUpdateBtn');
     const ftNanahCompassLiveBtn = document.getElementById('ftNanahCompassLiveBtn');
     const ftNanahCompassHomeBtn = document.getElementById('ftNanahCompassHomeBtn');
     const ftNanahCompassLaterBtn = document.getElementById('ftNanahCompassLaterBtn');
@@ -6606,6 +6608,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ftCreateChildBtn) {
             ftCreateChildBtn.disabled = isChild || scopedProtectedEdit;
             ftCreateChildBtn.title = isChild ? childTitle : (scopedProtectedEdit ? scopedTitle : '');
+        }
+        if (ftNanahQuickCreateProtectedBtn) {
+            ftNanahQuickCreateProtectedBtn.disabled = isChild || scopedProtectedEdit;
+            ftNanahQuickCreateProtectedBtn.title = isChild ? childTitle : (scopedProtectedEdit ? scopedTitle : 'Create a protected profile before sending rules to another device.');
+        }
+        if (ftNanahQuickSendUpdateBtn) {
+            ftNanahQuickSendUpdateBtn.disabled = isChild;
+            ftNanahQuickSendUpdateBtn.title = isChild ? childTitle : 'Open both devices, pair, match the phrase, and send the selected protected-profile update.';
         }
         if (ftSetMasterPinBtn) {
             ftSetMasterPinBtn.disabled = isChild || scopedProtectedEdit;
@@ -13841,10 +13851,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
             title: 'Internet Pickup (away or opens later)',
-            message: 'Use this only when a verified device on the same family map should collect an approved update later, including away over the internet.',
+            message: 'Use this only when Send Update is not practical because the verified protected device will open later or away from this parent device.',
             details: [
-                'For normal family control, open both devices and use Send Update.',
-                'A pickup service can hold unreadable waiting updates, not PINs or plaintext rules.',
+                'Default path: open both devices and use Send Update.',
+                'Internet Pickup needs a compatible pickup address. It can hold unreadable waiting updates, not PINs or plaintext rules.',
                 'The protected device still applies only newer signed updates from its saved parent link.'
             ],
             configured: !!currentEndpoint,
@@ -13983,9 +13993,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
             title: 'Home Pickup',
-            message: 'Use this only when a verified device on the same family map should collect updates from a FilterTube-compatible Home Pickup service on your home, clinic, or school network.',
+            message: 'Use this only when Send Update is not practical and you run a FilterTube-compatible Home Pickup service for verified devices on your home, clinic, or school network.',
             details: [
-                'For normal family control, open both devices and use Send Update.',
+                'Default path: open both devices and use Send Update.',
                 'Home Pickup can help a verified protected device pick up waiting updates on the same network.',
                 'It is not automatic Wi-Fi discovery; being nearby never grants control.',
                 'The protected device still accepts only newer signed updates from its saved parent link.'
@@ -19451,6 +19461,33 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateNanahUi();
             focusNanahElement(ftNanahHostBtn || ftNanahStatusCard || ftNanahDeliveryLiveCard);
             UIComponents.showToast('Open the protected device, pair, verify, then Send Update', 'info');
+        });
+    }
+
+    if (ftNanahQuickCreateProtectedBtn) {
+        ftNanahQuickCreateProtectedBtn.addEventListener('click', () => {
+            if (ftNanahQuickCreateProtectedBtn.disabled) {
+                UIComponents.showToast(ftNanahQuickCreateProtectedBtn.title || 'Protected profile creation is unavailable here', 'warning');
+                return;
+            }
+            if (ftCreateChildBtn && !ftCreateChildBtn.disabled) {
+                ftCreateChildBtn.click();
+                return;
+            }
+            UIComponents.showToast(ftCreateChildBtn?.title || 'Create a protected profile from the Profiles section first', 'warning');
+        });
+    }
+
+    if (ftNanahQuickSendUpdateBtn) {
+        ftNanahQuickSendUpdateBtn.addEventListener('click', () => {
+            if (ftNanahQuickSendUpdateBtn.disabled) {
+                UIComponents.showToast(ftNanahQuickSendUpdateBtn.title || 'Send Update is unavailable here', 'warning');
+                return;
+            }
+            setNanahMode('parent', { persist: true, applyPreset: true });
+            updateNanahUi();
+            focusNanahElement(ftNanahHostBtn || ftNanahStatusCard || ftNanahDeliveryLiveCard);
+            UIComponents.showToast('Start pairing, then match the phrase on both devices', 'info');
         });
     }
 
