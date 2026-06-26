@@ -94,6 +94,9 @@ remaining local queue behavior expected for later managed updates:
   current waiting-update counts after saving an update
 - protected-device receives silently refresh provider health so Accounts & Sync
   does not keep stale waiting-update counts after pickup
+- source-side receipt checks normalize provider receipt rows into the managed
+  ack-envelope shape before recording them, then purge only successfully
+  recorded receipt rows from the provider
 
 This still does not prove or claim a hosted FilterTube Internet Pickup service,
 automatic LAN peer discovery, or downstream Android/iOS parity.

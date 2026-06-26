@@ -28,6 +28,10 @@ the same already-handled update each time the protected profile opens.
 The extension refreshes provider health after parent sends and protected-device
 receives so queue counts shown in Accounts & Sync track those changes without
 requiring a manual check.
+When the parent/source later pulls delivery receipts, the provider returns
+redacted receipt rows. The extension wraps those rows into the same managed ack
+envelope used by live Nanah before recording them locally, then purges only the
+successfully recorded receipt rows from the provider.
 
 It exists so the browser extension's configured provider hooks can be exercised
 against a real endpoint shape before a hosted service or native app provider is

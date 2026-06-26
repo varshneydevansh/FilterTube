@@ -2495,3 +2495,8 @@ follow. I will share progress as this moves from audit/spec into implementation.
   health state silently after queue-changing work. This keeps Accounts & Sync
   status aligned with the actual provider queue without adding background LAN
   discovery, scheduled sync, or provider authority.
+- [x] 2026-06-26 receipt pull normalization slice: source-side receipt checks
+  now normalize provider `ack/pull` rows into the managed ack-envelope shape
+  expected by the trusted-link recorder, then clear only successfully recorded
+  redacted receipts from the provider. This prevents repeated receipt replay
+  without deleting receipts before the parent/source has stored them locally.

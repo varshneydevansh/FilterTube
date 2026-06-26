@@ -16253,6 +16253,65 @@ document.addEventListener('DOMContentLoaded', async () => {
         return '';
     }
 
+    function normalizeNanahManagedRemoteDeliveryAckPayload(payload) {
+        const root = safeObject(payload);
+        const transport = normalizeNanahManagedDeliveryAckSchema(root);
+        if (!transport) return root;
+        if (safeArray(root.records).length > 0) return root;
+        return {
+            ...root,
+            version: Number(root.version) || 1,
+            ackedAt: normalizeNonNegativeInteger(root.ackedAt) || Date.now(),
+            records: [root]
+        };
+    }
+
+    async function purgeNanahManagedRemoteDeliveryAckPayload(payload, transport) {
+        const root = normalizeNanahManagedRemoteDeliveryAckPayload(payload);
+        const records = safeArray(root.records);
+        if (!records.length) return { ok: false, reason: 'no_ack_records_to_purge' };
+        if (transport === 'mailbox') {
+            const provider = getNanahManagedMailboxProvider();
+            const writer = provider && (provider.purgeManagedMailboxItems || provider.purgeMailboxItems);
+            if (typeof writer !== 'function') return { ok: false, reason: 'mailbox_ack_purge_unavailable' };
+            const ids = records.map(row => normalizeString(row?.mailboxItemId)).filter(Boolean);
+            if (!ids.length) return { ok: false, reason: 'missing_mailbox_ack_ids' };
+            return writer.call(provider, {
+                schema: 'filtertube_managed_mailbox_ack_purge_request',
+                version: 1,
+                reason: 'source_receipt_recorded',
+                requestedAt: Date.now(),
+                linkId: normalizeString(root.linkId),
+                sourceDeviceId: normalizeString(root.sourceDeviceId),
+                sourceProfileId: normalizeString(root.sourceProfileId),
+                targetProfileId: normalizeString(root.targetProfileId),
+                mailboxItemIds: ids,
+                purgeStates: ['ack']
+            });
+        }
+        if (transport === 'local_network') {
+            const provider = getNanahManagedLocalNetworkProvider();
+            const writer = getNanahManagedLocalNetworkPurgeWriter(provider);
+            if (typeof writer !== 'function') return { ok: false, reason: 'local_network_ack_purge_unavailable' };
+            const ids = records.map(row => normalizeString(row?.candidateId || row?.localNetworkCandidateId)).filter(Boolean);
+            if (!ids.length) return { ok: false, reason: 'missing_local_network_ack_ids' };
+            return writer.call(provider, {
+                schema: 'filtertube_managed_local_network_ack_purge_request',
+                version: 1,
+                reason: 'source_receipt_recorded',
+                requestedAt: Date.now(),
+                linkId: normalizeString(root.linkId),
+                sourceDeviceId: normalizeString(root.sourceDeviceId),
+                sourceProfileId: normalizeString(root.sourceProfileId),
+                targetProfileId: normalizeString(root.targetProfileId),
+                candidateIds: ids,
+                localNetworkCandidateIds: ids,
+                purgeStates: ['ack']
+            });
+        }
+        return { ok: false, reason: 'unknown_ack_transport' };
+    }
+
     function formatNanahManagedSourceAckSyncStatus(link) {
         const trusted = safeObject(link);
         if (trusted.linkType !== 'managed_link' || trusted.localRole !== 'source' || trusted.remoteRole !== 'replica') return '';
@@ -16275,7 +16334,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!nanahManagedLivePolicy || typeof nanahManagedLivePolicy.recordRemoteDeliveryAckPayload !== 'function') {
             return { ok: false, reason: 'managed_delivery_ack_recorder_unavailable', recordedCount: 0 };
         }
-        const result = await nanahManagedLivePolicy.recordRemoteDeliveryAckPayload(ackPayload);
+        const result = await nanahManagedLivePolicy.recordRemoteDeliveryAckPayload(
+            normalizeNanahManagedRemoteDeliveryAckPayload(ackPayload)
+        );
         if (safeObject(options).silent !== true && safeObject(result).ok === true) {
             const latest = safeObject(result.latest);
             UIComponents.showToast(
@@ -16302,6 +16363,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             ackPayloadCount: 0,
             recordedAckCount: 0,
             rejectedAckCount: 0,
+            purgedAckCount: 0,
+            failedAckPurgeCount: 0,
             linkResults: []
         };
         if (!state.providerAvailable || eligibleLinks.length === 0) {
@@ -16321,7 +16384,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 reason: result.reason || null,
                 ackPayloadCount: result.acks.length,
                 recordedAckCount: 0,
-                rejectedAckCount: 0
+                rejectedAckCount: 0,
+                purgedAckCount: 0,
+                failedAckPurgeCount: 0
             };
             state.ackPayloadCount += result.acks.length;
             if (result.ok === true) {
@@ -16337,6 +16402,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (safeObject(ackResult).ok === true && recorded > 0) {
                         linkRow.recordedAckCount += recorded;
                         state.recordedAckCount += recorded;
+                        try {
+                            const purgeResult = safeObject(await purgeNanahManagedRemoteDeliveryAckPayload(ackPayload, transport));
+                            const purged = transport === 'local_network'
+                                ? normalizeNonNegativeInteger(purgeResult.purgedCandidateAckCount ?? purgeResult.purgedCandidateCount)
+                                : normalizeNonNegativeInteger(purgeResult.purgedMailboxAckCount ?? purgeResult.purgedMailboxItemCount);
+                            if (purgeResult.ok !== false && purged > 0) {
+                                linkRow.purgedAckCount += purged;
+                                state.purgedAckCount += purged;
+                            } else {
+                                linkRow.failedAckPurgeCount += 1;
+                                state.failedAckPurgeCount += 1;
+                            }
+                        } catch (_) {
+                            linkRow.failedAckPurgeCount += 1;
+                            state.failedAckPurgeCount += 1;
+                        }
                     } else {
                         linkRow.rejectedAckCount += 1;
                         state.rejectedAckCount += 1;
@@ -16346,6 +16427,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             state.linkResults.push(linkRow);
         }
         await persistNanahManagedSourceAckSyncState(state);
+        if ((normalizeNonNegativeInteger(state.recordedAckCount) || 0) > 0) {
+            if (hasNanahManagedMailboxUploadWriter()) {
+                await checkNanahManagedMailboxServerHealth({ reason: 'post_receipt_record', silent: true });
+            }
+            if (hasNanahManagedLocalNetworkDeliveryWriter()) {
+                await checkNanahManagedLocalNetworkProviderHealth({ reason: 'post_receipt_record', silent: true });
+            }
+        }
         renderNanahTrustedLinks();
         return state;
     }
