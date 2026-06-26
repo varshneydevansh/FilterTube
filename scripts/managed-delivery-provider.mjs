@@ -286,6 +286,14 @@ function purgeRowsByAckRecords(map, records, idName) {
   return purged;
 }
 
+function getPurgeStateSet(request) {
+  const states = safeArray(safeObject(request).purgeStates)
+    .map(state => normalizeString(state).toLowerCase())
+    .filter(Boolean);
+  if (states.length === 0) return new Set(['pending', 'ack']);
+  return new Set(states);
+}
+
 function mapFromRows(rows, keyName, normalizer) {
   const map = new Map();
   for (const row of safeArray(rows)) {
@@ -494,8 +502,13 @@ export function createManagedDeliveryProviderServer(options = {}) {
         return;
       }
       const explicitIds = safeArray(body.mailboxItemIds || body.mailboxIds || body.ids).map(normalizeString).filter(Boolean);
-      const purged = purgeRowsByRequest(mailboxItems, body, 'mailboxItemId', explicitIds);
-      const purgedAcks = purgeRowsByRequest(mailboxAcks, body, 'mailboxItemId', explicitIds);
+      const purgeStates = getPurgeStateSet(body);
+      const purged = purgeStates.has('pending')
+        ? purgeRowsByRequest(mailboxItems, body, 'mailboxItemId', explicitIds)
+        : 0;
+      const purgedAcks = purgeStates.has('ack') || purgeStates.has('receipt')
+        ? purgeRowsByRequest(mailboxAcks, body, 'mailboxItemId', explicitIds)
+        : 0;
       if (purged > 0 || purgedAcks > 0) persist();
       writeJson(res, 200, {
         ok: true,
@@ -608,8 +621,13 @@ export function createManagedDeliveryProviderServer(options = {}) {
         return;
       }
       const explicitIds = safeArray(body.candidateIds || body.localNetworkCandidateIds || body.ids).map(normalizeString).filter(Boolean);
-      const purged = purgeRowsByRequest(localCandidates, body, 'candidateId', explicitIds);
-      const purgedAcks = purgeRowsByRequest(localAcks, body, 'candidateId', explicitIds);
+      const purgeStates = getPurgeStateSet(body);
+      const purged = purgeStates.has('pending')
+        ? purgeRowsByRequest(localCandidates, body, 'candidateId', explicitIds)
+        : 0;
+      const purgedAcks = purgeStates.has('ack') || purgeStates.has('receipt')
+        ? purgeRowsByRequest(localAcks, body, 'candidateId', explicitIds)
+        : 0;
       if (purged > 0 || purgedAcks > 0) persist();
       writeJson(res, 200, {
         ok: true,

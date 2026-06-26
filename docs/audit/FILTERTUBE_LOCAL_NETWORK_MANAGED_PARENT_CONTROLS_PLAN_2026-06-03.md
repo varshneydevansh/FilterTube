@@ -2500,3 +2500,8 @@ follow. I will share progress as this moves from audit/spec into implementation.
   expected by the trusted-link recorder, then clear only successfully recorded
   redacted receipts from the provider. This prevents repeated receipt replay
   without deleting receipts before the parent/source has stored them locally.
+- [x] 2026-06-26 provider purge-state slice: the reference provider now honors
+  `purgeStates` for Internet Pickup and Home Pickup purge requests. Revocation
+  and signing-key rotation can purge pending rows plus receipts, while
+  source-side receipt cleanup sends `ack` only so it cannot accidentally delete
+  a pending update row that shares an explicit row id.
