@@ -13605,6 +13605,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 checkedAt: normalizeNonNegativeInteger(root.checkedAt) || Date.now(),
                 endpointHost: normalizeString(root.endpointHost).slice(0, 160),
                 ok: root.ok === true,
+                persistentStore: root.persistentStore === true,
                 reason: normalizeString(root.reason).slice(0, 160)
             };
             localStorage.setItem(NANAH_MANAGED_MAILBOX_HEALTH_KEY, JSON.stringify(clean));
@@ -13682,10 +13683,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ? `Last Internet Pickup check passed ${checkedAge}.`
                 : `Last Internet Pickup check did not pass ${checkedAge}.`)
             : 'Run Check/Edit if you want to verify the pickup path is reachable now.';
+        const durabilityDetail = checkedAge && sameHost && health.ok === true
+            ? formatManagedPickupDurabilityDetail(health)
+            : '';
         return {
             configured: true,
             label: `Internet Pickup set up: ${host}`,
-            detail: `${healthDetail} A verified protected device can use this route on the same family map when it opens later or away. It still accepts only trusted parent updates.`,
+            detail: `${healthDetail} ${durabilityDetail} A verified protected device can use this route on the same family map when it opens later or away. It still accepts only trusted parent updates.`.replace(/\s+/g, ' ').trim(),
             tone: 'success'
         };
     }
@@ -13943,6 +13947,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 checkedAt: Date.now(),
                 endpointHost: normalizeString(health?.endpointHost) || endpointHost,
                 ok,
+                persistentStore: health?.persistentStore === true,
                 reason: ok ? '' : (normalizeString(health?.reason) || 'mailbox_unreachable')
             });
             if (!silent) {
@@ -14120,6 +14125,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 checkedAt: Date.now(),
                 endpointHost: normalizeString(health?.endpointHost) || endpointHost,
                 ok,
+                persistentStore: health?.persistentStore === true,
                 reason: ok ? '' : (normalizeString(health?.reason) || 'bridge_unreachable')
             });
             if (!silent) {
@@ -15368,6 +15374,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 checkedAt: normalizeNonNegativeInteger(root.checkedAt) || Date.now(),
                 endpointHost: normalizeString(root.endpointHost).slice(0, 160),
                 ok: root.ok === true,
+                persistentStore: root.persistentStore === true,
                 reason: normalizeString(root.reason).slice(0, 160)
             };
             localStorage.setItem(NANAH_MANAGED_LOCAL_NETWORK_HEALTH_KEY, JSON.stringify(clean));
@@ -15395,6 +15402,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const elapsedHours = Math.floor(elapsedMinutes / 60);
         if (elapsedHours < 24) return `${elapsedHours}h ago`;
         return `${Math.floor(elapsedHours / 24)}d ago`;
+    }
+
+    function formatManagedPickupDurabilityDetail(health) {
+        const root = safeObject(health);
+        if (root.persistentStore === true) {
+            return 'Waiting updates are saved by that service.';
+        }
+        return 'Waiting updates are memory-only there, so a service restart can clear them.';
     }
 
     function getManagedLocalNetworkEndpointHostFromConfig(config) {
@@ -15458,10 +15473,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ? `Last Home Pickup check passed ${checkedAge}.`
                 : `Last Home Pickup check did not pass ${checkedAge}.`)
             : 'Run Check/Edit if you want to verify the pickup path is reachable now.';
+        const durabilityDetail = checkedAge && sameHost && health.ok === true
+            ? formatManagedPickupDurabilityDetail(health)
+            : '';
         return {
             configured: true,
             label: `Home Pickup set up: ${host}`,
-            detail: `${healthDetail} Reachability is only a send path check; trusted parent policy still decides what can apply.`,
+            detail: `${healthDetail} ${durabilityDetail} Reachability is only a send path check; trusted parent policy still decides what can apply.`.replace(/\s+/g, ' ').trim(),
             tone: 'success'
         };
     }

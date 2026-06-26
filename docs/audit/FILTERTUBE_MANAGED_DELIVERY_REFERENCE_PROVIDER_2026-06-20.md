@@ -93,7 +93,7 @@ The reference provider accepts paths under any prefix, so
 | `POST */managed-mailbox/ack` | Protected device posts delivery/apply result. | Redacted receipt metadata. |
 | `POST */managed-mailbox/ack/pull` | Parent/source checks delivery status. | Redacted receipt metadata. |
 | `POST */managed-mailbox/purge` | Delete pending rows after revocation or cleanup. | No plaintext. |
-| `POST */managed-mailbox/health` | Check whether the configured pickup is reachable. | Health metadata only. |
+| `POST */managed-mailbox/health` | Check whether the configured pickup is reachable and whether a local durable store is enabled. | Health metadata only. |
 
 Mailbox upload rejects plaintext policy keys such as `payload`, `keywords`,
 `channels`, `videoIds`, `policy`, `pin`, `password`, and private keys.
@@ -102,7 +102,7 @@ Mailbox upload rejects plaintext policy keys such as `payload`, `keywords`,
 
 | Endpoint | Purpose | Stored data |
 | --- | --- | --- |
-| `POST */managed-local-network/health` | Check an explicitly configured Home Pickup service. | Health metadata only. |
+| `POST */managed-local-network/health` | Check an explicitly configured Home Pickup service and whether a local durable store is enabled. | Health metadata only. |
 | `POST */managed-local-network/publish` | Store signed same-network candidates. | Signed managed envelope candidates. |
 | `POST */managed-local-network/discover` | Protected device pulls matching candidates. | Signed candidates. |
 | `POST */managed-local-network/ack` | Protected device posts delivery/apply result. | Redacted receipt metadata. |
@@ -112,6 +112,19 @@ Home Pickup rejects private secrets and credentials. It may carry the signed
 managed-policy envelope because this path is same-network signed delivery, not
 ciphertext mailbox storage. The receiving protected device still validates the
 signature/hash/target locally before applying anything.
+
+## Parent-Facing Durability Status
+
+The health responses include `persistentStore: true` only when the provider was
+started with `FILTERTUBE_PROVIDER_STORE`. The dashboard uses that as redacted
+feedback:
+
+- saved store enabled: waiting updates can survive a provider process restart
+- memory-only provider: waiting updates can be lost if the provider restarts
+
+This is status only. It does not prove that a specific child device has picked up
+an update, and it does not grant profile, PIN, trusted-device, rule, or time-limit
+authority.
 
 ## Non-Goals
 

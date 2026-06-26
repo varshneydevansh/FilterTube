@@ -191,6 +191,13 @@ extension authority code.
   `http://<this-computer-lan-ip>:8787/filtertube` address explicitly. This is
   a setup helper only; it does not scan the network, create trust, or apply
   policy without the saved parent link and signature/revision gates.
+- [x] 2026-06-26 pickup durability status slice: Internet Pickup and Home Pickup
+  health checks now carry the provider's redacted durable-store status into the
+  dashboard summary. Parents can see whether waiting updates are saved by that
+  service or memory-only if the service restarts. This is feedback only; it does
+  not prove pickup by a specific device, create a hosted-service claim, scan the
+  network, or change trusted-link, target-profile, scope, revision, hash, or
+  signature authority.
 - [x] 2026-06-21 Home Pickup visible check slice: configured Home Pickup rows
   now show a direct `Check` action in the Family Device Updates map. This is
   only a readiness check for the explicitly configured pickup service; it does
