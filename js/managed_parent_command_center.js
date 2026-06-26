@@ -73,6 +73,9 @@
         const hasStaleManagedChannelList = policySummary.hasStaleManagedChannelList === true;
         const deviceAction = getManagedCommandCenterDeviceAction(targetId, policySummary);
         const hasReadyDeliveryPath = hasManagedCommandCenterReadyDeliveryPath(policySummary);
+        const syncTargetCount = Number(policySummary.syncTargetCount) || 0;
+        const syncOpenCheckCount = Number(policySummary.syncOpenCheckCount) || 0;
+        const hasSavedUpdateAction = syncTargetCount > 0;
         const intents = [
             {
                 action: 'edit_rules',
@@ -114,6 +117,17 @@
                 scope: 'active',
                 authority: 'managed_policy_provider_delivery',
                 sensitiveAction: true
+            }] : []),
+            ...(hasSavedUpdateAction ? [{
+                action: syncOpenCheckCount > 0 ? 'disable_saved_updates' : 'enable_saved_updates',
+                label: syncOpenCheckCount > 0 ? 'Saved Updates Off' : 'Saved Updates On',
+                profileId: targetId,
+                scope: 'trusted_link',
+                authority: 'managed_policy_provider_delivery',
+                sensitiveAction: true,
+                title: syncOpenCheckCount > 0
+                    ? 'Stop this verified device from checking Internet Pickup or Home Pickup when the protected profile opens.'
+                    : 'Allow this verified device to check Internet Pickup or Home Pickup when the protected profile opens.'
             }] : []),
             {
                 action: timeLimitActive ? 'change_time_limit' : 'set_time_limit',

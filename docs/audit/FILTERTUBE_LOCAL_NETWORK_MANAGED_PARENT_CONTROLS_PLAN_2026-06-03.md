@@ -2467,3 +2467,10 @@ follow. I will share progress as this moves from audit/spec into implementation.
   parent/source signing key is rotated. This closes stale same-network candidate
   cleanup for explicit Home Pickup services without adding automatic LAN
   discovery or treating the network service as policy authority.
+- [x] 2026-06-26 saved-updates row action slice: Family Controls now exposes a
+  direct parent/account action to turn `Automatic saved updates` on or off for a
+  protected profile's existing verified managed links. The action requires
+  parent/account unlock, updates only Source -> Replica managed links for that
+  protected profile, aligns locked protected-device behavior with trusted update
+  pickup, and writes a redacted protected-history row. It does not create a
+  pickup provider, scan the LAN, or let protected profiles change trust.

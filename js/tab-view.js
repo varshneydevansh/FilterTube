@@ -3178,6 +3178,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'remote_policy.local_network.ack': 'Home Pickup receipt recorded',
         'delivery.mailbox.configure': 'Internet Pickup setting changed',
         'delivery.local_network.configure': 'Home Pickup setting changed',
+        'trust_link.saved_updates': 'Saved update setting changed',
         'remote_policy.source_push': 'Parent policy push',
         'history.clear': 'History cleared'
     });
@@ -3228,7 +3229,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         'mainEnabled',
         'mailboxConfigured',
         'rateLimited',
-        'redacted'
+        'redacted',
+        'savedUpdatesEnabled'
     ]);
     const MANAGED_ACTION_HISTORY_SUMMARY_SAFE_STRING_KEYS = new Set([
         'endpointHost',
@@ -14835,6 +14837,120 @@ document.addEventListener('DOMContentLoaded', async () => {
         return targetIds.length;
     }
 
+    async function recordManagedSavedUpdatesPolicyHistory(profileId, details = {}) {
+        const targetId = normalizeString(profileId);
+        const rootDetails = safeObject(details);
+        if (!targetId) return false;
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') return false;
+        const fresh = await io.loadProfilesV4();
+        if (!canActiveProfileManageProfile(fresh, targetId)) return false;
+        const profiles = { ...safeObject(fresh.profiles) };
+        const profile = safeObject(profiles[targetId]);
+        if (!profile || Object.keys(profile).length === 0) return false;
+        const enabled = rootDetails.enabled === true;
+        const changedCount = normalizeNonNegativeInteger(rootDetails.changedCount) || 0;
+        const now = Date.now();
+        const row = {
+            rowId: `managed-saved-updates-${targetId}-${now}`,
+            schema: MANAGED_ACTION_HISTORY_SCHEMA,
+            version: 1,
+            actorProfileId: normalizeString(fresh.activeProfileId) || activeProfileId || 'default',
+            actorDeviceId: normalizeString(nanahStableDeviceId) || 'local-extension-device',
+            targetProfileId: targetId,
+            trustedLinkId: changedCount === 1 ? normalizeString(rootDetails.firstLinkId) : null,
+            actionType: 'trust_link.saved_updates',
+            scope: 'trusted_link',
+            revision: null,
+            policyHash: null,
+            result: 'accepted',
+            reason: enabled ? 'saved_updates_enabled' : 'saved_updates_disabled',
+            receivedAt: now,
+            issuedAt: now,
+            orderKey: `saved-updates:${now}`,
+            summary: {
+                redacted: true,
+                label: enabled ? 'Automatic saved updates enabled' : 'Automatic saved updates disabled',
+                savedUpdatesEnabled: enabled,
+                changedCount,
+                targetCount: changedCount
+            },
+            sensitive: true
+        };
+        profiles[targetId] = {
+            ...profile,
+            managedActionHistory: appendManagedActionHistoryRow(profile, row)
+        };
+        const nextRoot = {
+            ...fresh,
+            schemaVersion: 4,
+            profiles
+        };
+        await io.saveProfilesV4(nextRoot);
+        profilesV4Cache = nextRoot;
+        return true;
+    }
+
+    async function setManagedSavedUpdatesForVerifiedDevices(profileId, enabled) {
+        const targetId = normalizeString(profileId);
+        if (!targetId) return false;
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function') {
+            UIComponents.showToast('Profiles unavailable', 'error');
+            return false;
+        }
+        const fresh = await io.loadProfilesV4();
+        const actorId = normalizeString(fresh.activeProfileId) || activeProfileId || 'default';
+        if (getProfileType(fresh, actorId) === 'child') {
+            UIComponents.showToast('Switch to a parent/account profile to change saved updates', 'error');
+            return false;
+        }
+        if (!canActiveProfileManageProfile(fresh, targetId)) {
+            UIComponents.showToast('This account cannot manage that protected profile', 'error');
+            return false;
+        }
+        const okAdmin = await ensureProfileUnlocked(fresh, actorId, { sensitiveAction: true });
+        if (!okAdmin) {
+            await recordManagedAdminAuthFailureHistory(fresh, targetId, enabled ? 'saved_updates_enable_unlock_failed' : 'saved_updates_disable_unlock_failed');
+            return false;
+        }
+        const inventory = getNanahSourceManagedLinkInventoryForTargetProfile(targetId);
+        const activeLinks = safeArray(inventory.activeLinks);
+        if (!activeLinks.length) {
+            UIComponents.showToast('Pair a verified protected device before changing saved updates', 'warning');
+            return false;
+        }
+        let changedCount = 0;
+        let firstLinkId = '';
+        for (const link of activeLinks) {
+            const linkId = normalizeString(link.linkId);
+            if (!linkId) continue;
+            const updated = await updateNanahTrustedLinkPolicy(linkId, {
+                policy: {
+                    syncOnProfileOpen: enabled === true,
+                    lockedChildMode: enabled === true ? 'allow_trusted_updates' : 'require_unlock'
+                }
+            });
+            if (!updated) continue;
+            changedCount += 1;
+            if (!firstLinkId) firstLinkId = linkId;
+        }
+        if (changedCount <= 0) {
+            UIComponents.showToast('No verified device link was changed', 'warning');
+            return false;
+        }
+        await recordManagedSavedUpdatesPolicyHistory(targetId, { enabled: enabled === true, changedCount, firstLinkId });
+        await refreshProfilesUI();
+        renderNanahTrustedLinks();
+        UIComponents.showToast(
+            enabled
+                ? `Saved updates enabled for ${changedCount} verified ${pluralize(changedCount, 'device')}`
+                : `Saved updates disabled for ${changedCount} verified ${pluralize(changedCount, 'device')}`,
+            'success'
+        );
+        return true;
+    }
+
     async function recordManagedSigningKeyRotationHistoryForLink(link, details = {}) {
         const trusted = normalizeNanahTrustedLink(link);
         const rootDetails = safeObject(details);
@@ -18677,6 +18793,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                             [targetId],
                             { scope: normalizeString(intent?.scope) || 'active' }
                         );
+                    } else if (action === 'enable_saved_updates' || action === 'disable_saved_updates') {
+                        await setManagedSavedUpdatesForVerifiedDevices(targetId, action === 'enable_saved_updates');
                     } else if (action === 'bulk_edit_rules') {
                         const profileIds = safeArray(intent?.profileIds)
                             .map(id => normalizeString(id))
