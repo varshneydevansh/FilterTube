@@ -8967,7 +8967,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             return false;
         }
         const profiles = safeObject(root?.profiles);
-        const summaries = collectManagedChannelListSummaries(profiles, [currentProfileId]);
+        const targetProfileIds = [
+            currentProfileId,
+            ...getManageableProtectedProfileIds(root)
+        ].filter((id, index, list) => id && list.indexOf(id) === index);
+        const summaries = collectManagedChannelListSummaries(profiles, targetProfileIds);
         const staleCount = summaries.filter(summary => isManagedChannelListSummaryStale(summary, now)).length;
         if (!staleCount) {
             setRuleListAutoCheckLastRun(now);
@@ -8976,7 +8980,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const shouldReview = await showChoiceModal({
             title: 'Review Stale URL Lists?',
-            message: `${staleCount} URL-backed ${pluralize(staleCount, 'rule list')} for this profile ${staleCount === 1 ? 'is' : 'are'} old enough to check.`,
+            message: `${staleCount} URL-backed ${pluralize(staleCount, 'rule list')} across ${targetProfileIds.length} managed ${pluralize(targetProfileIds.length, 'profile')} ${staleCount === 1 ? 'is' : 'are'} old enough to check.`,
             details: [
                 'FilterTube will load the selected parent-approved URLs and preview the result.',
                 'Changed rows still require parent/account approval before anything applies.',
@@ -8993,7 +8997,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return false;
         }
         setRuleListAutoCheckLastRun(now);
-        await refreshAllManagedChannelListsForProfiles([currentProfileId], {
+        await refreshAllManagedChannelListsForProfiles(targetProfileIds, {
             staleOnly: true,
             scheduledCheck: true,
             reason

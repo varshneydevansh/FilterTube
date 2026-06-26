@@ -371,6 +371,12 @@ Current completion rule:
 - Rule-list JSON is intentionally narrower than a full FilterTube backup JSON. It may add channels and keywords only; it does not change profile structure, PINs, trusted devices, viewing spaces, or sync targets.
 - The Settings card and import modal expose both CSV and JSON rule-list templates. The CSV template is the spreadsheet path; the JSON template is the lightweight rule-list shape, not the full FilterTube backup/export structure.
 - Import backup remains the full restore lane for FilterTube backup JSON. Channel/keyword-only JSON, including BlockTube channel/title arrays, belongs in Rule list imports so users get a preview before rows are added.
+- Dashboard-open URL auto-check scans the active parent/account profile plus
+  every protected profile that account can manage. This keeps stale public
+  lists visible for multi-child/caregiver setups where the imported list lives
+  on the protected profile rather than the parent profile. It still opens the
+  existing review/refresh path; changed URL content cannot apply without
+  parent/account approval.
 - Help text should stay short and point to the UI path; this audit file owns the detailed format contract.
 
 Supported source shapes in this slice:

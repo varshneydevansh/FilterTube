@@ -1547,10 +1547,14 @@ Add list -> Preview -> Choose profiles -> Apply -> Send Update
 14. Refresh all URL-backed lists in one parent-approved pass [done]
 15. Document managed channel-list parity in the shared app policy contract [done]
 16. Show stale URL-backed list status and refresh only stale lists [done]
+17. Dashboard-open stale URL checks cover the active parent/account profile plus
+    all protected profiles that account can manage [done]
 ```
 
-Scheduled subscriptions and automatic background refresh remain future work. A
-URL is treated as a way to fetch data, not as a remote admin.
+Silent scheduled subscriptions and automatic background apply remain future
+work. Dashboard-open auto-check is review-first: a URL is treated as a way to
+fetch data, not as a remote admin, and changed rows still require
+parent/account approval.
 
 **Safety boundaries**:
 
