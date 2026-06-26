@@ -63,6 +63,9 @@ function validInput({ decision = 'reference_provider_only' } = {}) {
       hostedEndpoint: hosted ? 'https://pickup.filtertube.in' : 'N/A',
       deploymentProof: hosted ? 'docs/audit/artifacts/provider/deployment-proof.json' : 'N/A',
       corsPreflightProof: hosted ? 'docs/audit/artifacts/provider/cors-proof.json' : 'N/A',
+      providerStatusProof: hosted
+        ? 'docs/audit/artifacts/provider/status-proof.json'
+        : 'docs/audit/FILTERTUBE_MANAGED_DELIVERY_REFERENCE_PROVIDER_2026-06-20.md',
       healthCheckProof: hosted ? 'docs/audit/artifacts/provider/health-proof.json' : 'N/A',
       roundTripSmokeArtifact: hosted
         ? 'docs/audit/artifacts/managed-remote-delivery-smoke/provider-round-trip.json'
@@ -112,6 +115,7 @@ test('managed pickup provider ownership generator creates verifier-compatible re
   assert.equal(artifact.ownershipDecision.discoveryIsAuthority, false);
   assert.equal(artifact.ownershipDecision.providerIsPolicyAuthority, false);
   assert.equal(artifact.providerEvidence.hostedEndpoint, 'N/A');
+  assert.match(artifact.providerEvidence.providerStatusProof, /REFERENCE_PROVIDER/);
   assert.equal(artifact.requiredRows.length, 6);
 });
 

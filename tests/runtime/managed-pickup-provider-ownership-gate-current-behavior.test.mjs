@@ -72,6 +72,9 @@ function validArtifact({ decision = 'reference_provider_only' } = {}) {
       hostedEndpoint: decision === 'filtertube_hosted_provider' ? 'https://pickup.filtertube.in' : 'N/A',
       deploymentProof: decision === 'filtertube_hosted_provider' ? 'docs/audit/artifacts/provider/deployment-proof.json' : 'N/A',
       corsPreflightProof: decision === 'filtertube_hosted_provider' ? 'docs/audit/artifacts/provider/cors-proof.json' : 'N/A',
+      providerStatusProof: decision === 'filtertube_hosted_provider'
+        ? 'docs/audit/artifacts/provider/status-proof.json'
+        : 'docs/audit/FILTERTUBE_MANAGED_DELIVERY_REFERENCE_PROVIDER_2026-06-20.md',
       healthCheckProof: decision === 'filtertube_hosted_provider' ? 'docs/audit/artifacts/provider/health-proof.json' : 'N/A',
       roundTripSmokeArtifact: decision === 'filtertube_hosted_provider'
         ? 'docs/audit/artifacts/managed-remote-delivery-smoke/provider-round-trip.json'
@@ -174,11 +177,13 @@ test('verifier rejects hosted-provider artifacts missing deployment proof', () =
   const artifact = validArtifact({ decision: 'filtertube_hosted_provider' });
   artifact.providerEvidence.deploymentProof = 'N/A';
   artifact.providerEvidence.corsPreflightProof = '';
+  artifact.providerEvidence.providerStatusProof = '';
   artifact.providerEvidence.redactedAckProof = '';
 
   const errors = validateManagedPickupProviderOwnershipArtifact(artifact);
   assert.ok(errors.includes('providerEvidence.deploymentProof is required for filtertube_hosted_provider'));
   assert.ok(errors.includes('providerEvidence.corsPreflightProof is required for filtertube_hosted_provider'));
+  assert.ok(errors.includes('providerEvidence.providerStatusProof is required'));
   assert.ok(errors.includes('providerEvidence.redactedAckProof is required for filtertube_hosted_provider'));
 });
 

@@ -30,6 +30,7 @@
     "hostedEndpoint": "N/A",
     "deploymentProof": "",
     "corsPreflightProof": "",
+    "providerStatusProof": "",
     "healthCheckProof": "",
     "roundTripSmokeArtifact": "",
     "redactedAckProof": ""

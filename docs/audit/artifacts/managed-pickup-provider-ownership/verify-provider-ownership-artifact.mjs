@@ -46,6 +46,7 @@ const REQUIRED_PROVIDER_FIELDS = Object.freeze([
   'hostedEndpoint',
   'deploymentProof',
   'corsPreflightProof',
+  'providerStatusProof',
   'healthCheckProof',
   'roundTripSmokeArtifact',
   'redactedAckProof'
@@ -200,6 +201,7 @@ function validateProviderEvidence(errors, providerEvidence, decision) {
       'hostedEndpoint',
       'deploymentProof',
       'corsPreflightProof',
+      'providerStatusProof',
       'healthCheckProof',
       'roundTripSmokeArtifact',
       'redactedAckProof'

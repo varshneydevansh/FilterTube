@@ -115,6 +115,9 @@ for local intranet and user-owned internet pickup trials:
 - README and technical docs now include the self-hosted provider command,
   Home Pickup address shape, Internet HTTPS boundary, persistent-store option,
   and status-page privacy rule
+- provider ownership artifacts now require `providerStatusProof`, so
+  self-hosted, user-supplied, or hosted pickup claims must show the safe
+  status endpoint before release wording can rely on that provider path
 
 This closes the extension-owned self-hosted provider usability gap. It still
 does not create hosted FilterTube Internet Pickup, automatic LAN peer discovery,

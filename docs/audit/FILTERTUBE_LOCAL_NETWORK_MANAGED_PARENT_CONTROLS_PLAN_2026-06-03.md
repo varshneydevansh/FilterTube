@@ -205,6 +205,12 @@ extension authority code.
   FilterTube. The status payload exposes service/readiness metadata only; it
   does not expose plaintext rules, PINs, private keys, target authority, or
   automatic LAN discovery.
+- [x] 2026-06-26 pickup provider status proof slice: the provider ownership
+  artifact template, generator, and verifier now require `providerStatusProof`
+  for self-hosted, user-supplied, and hosted pickup decisions. The reference
+  provider test verifies that `GET /filtertube` returns a transport-only status
+  response without obvious rule or PIN fields, so release proof cannot skip the
+  address parents/admins are told to inspect.
 - [x] 2026-06-26 pickup durability status slice: Internet Pickup and Home Pickup
   health checks now carry the provider's redacted durable-store status into the
   dashboard summary. Parents can see whether waiting updates are saved by that

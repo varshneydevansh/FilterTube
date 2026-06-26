@@ -44,6 +44,7 @@ const REQUIRED_PROVIDER_FIELDS = Object.freeze([
   'homePickupStatus',
   'deploymentProof',
   'corsPreflightProof',
+  'providerStatusProof',
   'healthCheckProof',
   'roundTripSmokeArtifact',
   'redactedAckProof'
@@ -234,6 +235,7 @@ function buildProviderEvidence(input, decision) {
     hostedEndpoint: optionalString(source, 'hostedEndpoint', decision === 'filtertube_hosted_provider' ? '' : 'N/A'),
     deploymentProof: source.deploymentProof.trim(),
     corsPreflightProof: source.corsPreflightProof.trim(),
+    providerStatusProof: source.providerStatusProof.trim(),
     healthCheckProof: source.healthCheckProof.trim(),
     roundTripSmokeArtifact: source.roundTripSmokeArtifact.trim(),
     redactedAckProof: source.redactedAckProof.trim()
@@ -337,6 +339,7 @@ Input JSON shape:
     "hostedEndpoint": "N/A",
     "deploymentProof": "N/A",
     "corsPreflightProof": "N/A",
+    "providerStatusProof": "N/A",
     "healthCheckProof": "N/A",
     "roundTripSmokeArtifact": "N/A",
     "redactedAckProof": "N/A"

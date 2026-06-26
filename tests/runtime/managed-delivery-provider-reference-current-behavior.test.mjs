@@ -85,6 +85,19 @@ function signedCandidate(overrides = {}) {
 
 test('reference provider requires bearer token when configured', async () => {
   await withProvider({ authToken: 'provider-token' }, async ({ baseUrl }) => {
+    const status = await fetch(baseUrl);
+    const statusBody = await status.json();
+    assert.equal(status.status, 200);
+    assert.equal(statusBody.ok, true);
+    assert.equal(statusBody.service, 'filtertube-managed-delivery-provider');
+    assert.equal(statusBody.authRequired, true);
+    assert.equal(statusBody.authority, 'transport_only_signed_parent_policy_validation_required');
+    assert.ok(statusBody.supportedPaths.includes('managed-mailbox/upload'));
+    assert.ok(statusBody.supportedPaths.includes('managed-local-network/discover'));
+    assert.equal('keywords' in statusBody, false);
+    assert.equal('channels' in statusBody, false);
+    assert.equal('pin' in statusBody, false);
+
     const preflight = await fetch(`${baseUrl}/managed-local-network/health`, {
       method: 'OPTIONS',
       headers: {
