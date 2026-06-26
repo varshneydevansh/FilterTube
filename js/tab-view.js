@@ -4447,11 +4447,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
         }
         return {
-            eyebrow: 'Protected child profile',
+            eyebrow: 'Protected profile',
             title: `Unlock ${name}`,
-            message: `${name} is a locked child profile. Enter its profile PIN to continue.`,
+            message: `${name} is a locked protected profile. Enter its profile PIN to continue.`,
             placeholder: 'Profile PIN',
-            gateTitle: 'Protected Child Profile',
+            gateTitle: 'Protected Profile',
             gateMessage: `Unlock ${name} to view management controls.`
         };
     }
@@ -9830,7 +9830,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || activeProfileId || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Open the parent/account profile to import rules for a child profile', 'error');
+            UIComponents.showToast('Open the parent/account profile to import rules for a protected profile', 'error');
             return;
         }
 
@@ -10747,7 +10747,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function getNanahProfileTypeLabel(profileType, profileId = '') {
         if (normalizeString(profileId) === 'default') return 'master account';
-        return normalizeString(profileType).toLowerCase() === 'child' ? 'child profile' : 'account profile';
+        return normalizeString(profileType).toLowerCase() === 'child' ? 'protected profile' : 'account profile';
     }
 
     function getNanahLocalProfileContext() {
@@ -11830,7 +11830,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const parentId = getParentAccountId(profilesV4, childId) || 'default';
         const ok = await ensureProfileUnlocked(profilesV4, parentId);
         if (!ok) {
-            UIComponents.showToast('Parent approval is required before this child profile can trust or apply a new sync source.', 'error');
+            UIComponents.showToast('Parent approval is required before this protected profile can trust or apply a new sync source.', 'error');
             return false;
         }
         return true;
@@ -12853,7 +12853,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const activeId = normalizeString(profilesV4?.activeProfileId) || activeProfileId || 'default';
         const unlocked = await ensureProfileUnlocked(profilesV4, activeId);
         if (!unlocked) {
-            UIComponents.showToast('Unlock this child profile to allow trusted parent updates while it is locked later.', 'error');
+            UIComponents.showToast('Unlock this protected profile to allow trusted parent updates while it is locked later.', 'error');
             return false;
         }
         return true;
@@ -12982,7 +12982,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
         if (localProfile.profileType === 'child' && normalizeString(remoteProfile.profileName)) {
-            return `This child profile will not safely target ${remoteProfile.profileName} on ${getNanahRemoteLabel()} unless that device saves a fixed protected-profile target for this child first.`;
+            return `This protected profile will not safely target ${remoteProfile.profileName} on ${getNanahRemoteLabel()} unless that device saves a fixed protected-profile target for it first.`;
         }
         if (normalizeString(remoteProfile.profileName)) {
             return `${getNanahScopeLabel(normalizedScope)} will write into ${remoteProfile.profileName} on ${getNanahRemoteLabel()}. Inactive remote profiles are only targeted when you choose an explicit remote target or save a fixed protected-profile target there.`;
@@ -13201,11 +13201,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (localProfile.profileType === 'child') {
             await showChoiceModal({
-                title: 'Managed child target required',
+                title: 'Managed protected target required',
                 message: `You are sending ${getNanahScopeLabel(normalizedScope).toLowerCase()} from ${formatNanahProfileContext(localProfile)}, but ${getNanahRemoteLabel()} currently has ${formatNanahProfileContext(remoteProfile)} active.`,
                 details: [
-                    'For child profiles, FilterTube now blocks "send anyway" in this situation so the update does not land in the wrong remote profile.',
-                    'To manage that child profile reliably, save parent trust on the other device while its child profile is active once.',
+                    'For protected profiles, FilterTube blocks "send anyway" in this situation so the update does not land in the wrong remote profile.',
+                    'To manage that protected profile reliably, save parent trust on the other device while that protected profile is active once.',
                     'After that, choose "Always this local profile" on the receiving device so future parent updates can land there without switching profiles each time.'
                 ],
                 choices: [
@@ -13679,7 +13679,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ? 'Use Send Update after reviewing the selected profile and allowed area.'
                 : (hasProtectedProfiles
                     ? 'Best default for parents: pair, match the phrase, then send while both devices are open.'
-                    : 'Start with one child/user profile, then pair only if another device needs the same rules.');
+                    : 'Start with one protected profile, then pair only if another device needs the same rules.');
         }
 
         const mailbox = summarizeManagedMailboxServerConfig();
@@ -15955,7 +15955,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             && trustedRemoteRole === 'source';
 
         if (isNanahChildReplicaOnly() && trustedLocalRole !== 'replica') {
-            UIComponents.showToast('Locked child profiles can only reconnect as protected receivers. Unlock the child profile first to reconnect as a sender.', 'error');
+            UIComponents.showToast('Locked protected profiles can only reconnect as protected receivers. Unlock the protected profile first to reconnect as a sender.', 'error');
             return;
         }
 
@@ -16459,7 +16459,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 eyebrow: 'Move account',
                 title: 'Full account',
                 body: getActiveProfileType() === 'child'
-                    ? 'Full account migration is not available from a child profile. FilterTube will keep this scoped to the active child profile instead.'
+                    ? 'Full account migration is not available from a protected profile. FilterTube will keep this scoped to the active protected profile instead.'
                     : 'Use only for reinstall, recovery, or moving the full account tree.',
                 steps: [
                     'Use this only for reinstall, migration, or full recovery.',
@@ -16467,7 +16467,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     'Send the wider snapshot only when you mean to move the account.'
                 ],
                 hostLabel: 'Start Migration Pairing',
-                sendLabel: getActiveProfileType() === 'child' ? 'Send This Child Profile' : 'Send Full Backup',
+                sendLabel: getActiveProfileType() === 'child' ? 'Send This Protected Profile' : 'Send Full Backup',
                 trustLabel: 'Save Device Trust'
             }
         };
@@ -16720,8 +16720,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const trustedPolicy = safeObject(trusted?.policy);
                 ftNanahStatusHint.textContent = isNanahChildReplicaOnly()
                     ? (trusted
-                        ? 'Protected profile connected as a receiver. Saved parent links can keep this device aligned without turning the child into a sender.'
-                        : 'Locked protected profile connected. This device stays receive-only until the local child profile is unlocked.')
+                        ? 'Protected profile connected as a receiver. Saved parent links can keep this device aligned without turning the protected profile into a sender.'
+                        : 'Locked protected profile connected. This device stays receive-only until the local protected profile is unlocked.')
                     : trusted
                     ? (trustedPolicy.linkType === 'managed_link'
                         ? 'Parent trust connected. Protected-device updates now follow the saved trusted behavior for allowed areas.'
@@ -17242,10 +17242,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function buildNanahOutgoingProposalPolicy(scope, strategy) {
         if (isNanahChildReceiveOnly()) {
-            throw new Error('Child profiles are receive-only in Accounts & Sync. Use a parent profile to send updates.');
+            throw new Error('Protected profiles are receive-only in Accounts & Sync. Use a parent profile to send updates.');
         }
         if (isNanahChildReplicaOnly()) {
-            throw new Error('Unlock this child profile first if you want to send its settings to another device.');
+            throw new Error('Unlock this protected profile first if you want to send its settings to another device.');
         }
         const localRole = getNanahRole();
         const remoteRole = normalizeString(nanahSessionState.remoteRole) || 'peer';
@@ -17663,7 +17663,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (managedApproval.action === 'save' && remoteId) {
                 if (!(await ensureNanahManagedChildLinkPermission(managedApproval.policy))) {
-                    await sendNanahDecision(envelope.id, false, 'local child authorization required');
+                    await sendNanahDecision(envelope.id, false, 'local protected-profile authorization required');
                     return;
                 }
                 const remoteDevice = safeObject(nanahSessionState.remoteDevice);
@@ -17962,7 +17962,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function trustConnectedNanahDevice() {
         if (isNanahChildReceiveOnly()) {
-            UIComponents.showToast('Child profiles can receive parent updates, but trusted-link policy is parent-controlled.', 'error');
+            UIComponents.showToast('Protected profiles can receive parent updates, but trusted-link policy is parent-controlled.', 'error');
             return;
         }
         const remote = safeObject(nanahSessionState.remoteDevice);
@@ -17983,7 +17983,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         if (isNanahChildReplicaOnly() && (localRole !== 'replica' || remoteRole !== 'source' || linkType !== 'managed_link')) {
-            UIComponents.showToast('Locked child profiles can only save parent trust links. Unlock the child profile first to send from it.', 'error');
+            UIComponents.showToast('Locked protected profiles can only save parent trust links. Unlock the protected profile first to send from it.', 'error');
             return;
         }
         if (linkType === 'managed_link' && localRole === 'source') {
@@ -19748,7 +19748,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ftNanahSendBtn) {
             ftNanahSendBtn.addEventListener('click', async () => {
                 if (isNanahChildReceiveOnly()) {
-                    UIComponents.showToast('Child profiles are receive-only in Accounts & Sync.', 'error');
+                    UIComponents.showToast('Protected profiles are receive-only in Accounts & Sync.', 'error');
                     return;
                 }
                 if (!nanahClient || !nanahSessionState.connected || !nanahSessionState.sasConfirmed) {
@@ -19824,7 +19824,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ftNanahTrustBtn) {
             ftNanahTrustBtn.addEventListener('click', async () => {
                 if (isNanahChildReceiveOnly()) {
-                    UIComponents.showToast('Trusted-link policy is parent-controlled for child profiles.', 'error');
+                    UIComponents.showToast('Trusted-link policy is parent-controlled for protected profiles.', 'error');
                     return;
                 }
                 try {

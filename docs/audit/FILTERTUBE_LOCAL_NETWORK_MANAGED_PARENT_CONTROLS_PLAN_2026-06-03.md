@@ -1058,6 +1058,10 @@ parent tool instead of a sync/debug console.
   uses `Protected Profile` and `Managed Protected Profile` instead of
   child-only titles. This keeps quick-access UI consistent with the Family
   Controls model while preserving the internal `child` profile type.
+- [x] 2026-06-26 Nanah protected-profile wording cleanup slice: remaining
+  Accounts & Sync, Nanah pairing, import, and trusted-link visible copy now says
+  protected profile/protected user instead of child-only wording. Internal
+  `child` profile type keys remain unchanged for migration compatibility.
 - [x] 2026-06-21 managed-smoke protected-device wording slice: the release-smoke
   checklist and managed remote delivery smoke template now use protected-profile
   and protected-device wording in human-readable rows. Existing JSON field names

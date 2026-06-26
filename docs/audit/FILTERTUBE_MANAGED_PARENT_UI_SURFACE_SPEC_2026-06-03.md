@@ -312,7 +312,7 @@ state without exposing plaintext rule values:
 
 ## Parent-Facing States
 
-| State | Parent/account surface | Protected child surface |
+| State | Parent/account surface | Protected profile surface |
 | --- | --- | --- |
 | Empty | Show `Managed status: no parent-managed policy revisions yet.` and, when the command center has no protected rows, setup handoffs for creating the first child/protected profile through existing gated flows. | No detailed status line. |
 | Local edit present | Show local Main/Kids revision and date. | No detailed status line. |
