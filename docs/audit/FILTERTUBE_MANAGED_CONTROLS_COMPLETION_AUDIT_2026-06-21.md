@@ -81,6 +81,23 @@ This checkpoint does not change runtime behavior. It narrows the remaining
 release decision to manual smoke, provider ownership, downstream app parity, and
 claim review.
 
+## 2026-06-26 Pickup Runtime Update
+
+The extension-owned Home Pickup and Internet Pickup provider path now has the
+remaining local queue behavior expected for later managed updates:
+
+- acknowledged Internet Pickup mailbox items are removed from the waiting queue
+  while their redacted receipts remain available to the parent/source device
+- acknowledged Home Pickup candidates are removed from the waiting queue while
+  their redacted receipts remain available to the parent/source device
+- parent/source sends silently refresh provider health so Accounts & Sync shows
+  current waiting-update counts after saving an update
+- protected-device receives silently refresh provider health so Accounts & Sync
+  does not keep stale waiting-update counts after pickup
+
+This still does not prove or claim a hosted FilterTube Internet Pickup service,
+automatic LAN peer discovery, or downstream Android/iOS parity.
+
 ## Installed Extension Smoke Artifact
 
 Manual parent/protected-profile smoke is now a strict artifact instead of loose
