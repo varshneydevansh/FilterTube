@@ -127,6 +127,7 @@ family/school deployment still needs ownership:
 Provider ownership gate
   -> docs/audit/FILTERTUBE_MANAGED_PICKUP_PROVIDER_OWNERSHIP_GATE_2026-06-21.md
   -> docs/audit/artifacts/managed-pickup-provider-ownership/template.json
+  -> docs/audit/artifacts/managed-pickup-provider-ownership/observation-template.json
   -> docs/audit/artifacts/managed-pickup-provider-ownership/verify-provider-ownership-artifact.mjs
 ```
 

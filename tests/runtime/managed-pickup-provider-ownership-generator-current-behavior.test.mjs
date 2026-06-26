@@ -16,6 +16,7 @@ import {
 
 const repoRoot = process.cwd();
 const generatorPath = 'scripts/create-managed-pickup-provider-ownership-artifact.mjs';
+const observationTemplatePath = 'docs/audit/artifacts/managed-pickup-provider-ownership/observation-template.json';
 const gateDoc = 'docs/audit/FILTERTUBE_MANAGED_PICKUP_PROVIDER_OWNERSHIP_GATE_2026-06-21.md';
 
 function readJson(file) {
@@ -80,6 +81,23 @@ test('managed pickup provider ownership generator is exposed as release settings
   assert.deepEqual(result.lanes, ['release', 'settings', 'smoke']);
   assert.deepEqual(result.unmatched, []);
   assert.equal(result.classifications[0].matched[0].id, 'managed-pickup-provider-ownership-surface');
+});
+
+test('managed pickup provider ownership observation template covers required rows without pretending execution', () => {
+  const template = readJson(observationTemplatePath);
+  const result = classifyPaths([observationTemplatePath]);
+
+  assert.deepEqual(result.lanes, ['release', 'settings', 'smoke']);
+  assert.deepEqual(result.unmatched, []);
+  assert.equal(result.classifications[0].matched[0].id, 'managed-pickup-provider-ownership-surface');
+  assert.deepEqual(Object.keys(template.rowEvidence), REQUIRED_MANAGED_PICKUP_PROVIDER_OWNERSHIP_ROWS);
+  assert.equal(template.ownershipDecision.discoveryIsAuthority, false);
+  assert.equal(template.ownershipDecision.providerIsPolicyAuthority, false);
+  assert.equal(template.providerEvidence.hostedEndpoint, 'N/A');
+  assert.throws(
+    () => createManagedPickupProviderOwnershipArtifact({ repoRoot, input: template, confirmed: true }),
+    /is required|must be reference_provider_only/
+  );
 });
 
 test('managed pickup provider ownership generator creates verifier-compatible reference-only artifact', () => {

@@ -1,0 +1,75 @@
+{
+  "_instructions": [
+    "Fill this file only after the Internet Pickup/Home Pickup provider ownership review is actually complete.",
+    "Use redacted identifiers only. Do not include PINs, passwords, tokens, plaintext rules, private keys, cookies, raw policy JSON, mailbox payloads, video titles, or watched titles.",
+    "Choose decision=reference_provider_only for the current self-hosted proof, user_supplied_provider_only for an external operator, or filtertube_hosted_provider only after a real FilterTube-hosted endpoint is deployed and smoked.",
+    "Then run: npm run managed:provider-ownership -- --input <this-file> --confirm-provider-ownership-reviewed"
+  ],
+  "logicalChangeType": "managed pickup provider ownership review",
+  "requiredLanes": [
+    "test:release",
+    "test:settings",
+    "test:smoke"
+  ],
+  "automatedLaneEvidence": [
+    {
+      "command": "",
+      "status": "passed",
+      "summary": "",
+      "lanes": [
+        "test:release",
+        "test:settings",
+        "test:smoke"
+      ]
+    }
+  ],
+  "ownershipDecision": {
+    "decision": "",
+    "owner": "",
+    "operator": "",
+    "supportContact": "",
+    "retentionPolicy": "",
+    "purgeRevocationPolicy": "",
+    "abuseRateLimitPolicy": "",
+    "privacyBoundary": "",
+    "releaseClaim": "optional_configured_pickup_only",
+    "discoveryIsAuthority": false,
+    "providerIsPolicyAuthority": false
+  },
+  "providerEvidence": {
+    "internetPickupStatus": "",
+    "homePickupStatus": "",
+    "hostedEndpoint": "N/A",
+    "deploymentProof": "",
+    "corsPreflightProof": "",
+    "healthCheckProof": "",
+    "roundTripSmokeArtifact": "",
+    "redactedAckProof": ""
+  },
+  "rowEvidence": {
+    "FT-PICKUP-PROVIDER-00-owner-decision": {
+      "summary": "",
+      "artifactOrDoc": ""
+    },
+    "FT-PICKUP-PROVIDER-01-endpoint-deployment": {
+      "summary": "",
+      "artifactOrDoc": ""
+    },
+    "FT-PICKUP-PROVIDER-02-retention-purge-revocation": {
+      "summary": "",
+      "artifactOrDoc": ""
+    },
+    "FT-PICKUP-PROVIDER-03-redacted-ack-history": {
+      "summary": "",
+      "artifactOrDoc": ""
+    },
+    "FT-PICKUP-PROVIDER-04-authority-boundary": {
+      "summary": "",
+      "artifactOrDoc": ""
+    },
+    "FT-PICKUP-PROVIDER-05-release-wording": {
+      "summary": "",
+      "artifactOrDoc": ""
+    }
+  }
+}

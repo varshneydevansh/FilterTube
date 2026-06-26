@@ -115,6 +115,8 @@ Later-delivery provider ownership is now a separate gate:
 - Gate: `docs/audit/FILTERTUBE_MANAGED_PICKUP_PROVIDER_OWNERSHIP_GATE_2026-06-21.md`
 - Template:
   `docs/audit/artifacts/managed-pickup-provider-ownership/template.json`
+- Fillable observation input:
+  `docs/audit/artifacts/managed-pickup-provider-ownership/observation-template.json`
 - Generator:
   `npm run managed:provider-ownership -- --input <redacted-provider-ownership.json> --confirm-provider-ownership-reviewed`
 - Verifier:

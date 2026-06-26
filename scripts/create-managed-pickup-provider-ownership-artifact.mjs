@@ -349,6 +349,9 @@ Input JSON shape:
   }
 }
 
+Start from:
+  docs/audit/artifacts/managed-pickup-provider-ownership/observation-template.json
+
 This generator records provider ownership proof only. It never grants policy
 authority to network discovery or the pickup provider, and it rejects plaintext
 rules, PINs, tokens, secrets, private keys, raw policy JSON, and ciphertext.
