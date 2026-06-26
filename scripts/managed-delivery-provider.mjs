@@ -398,6 +398,21 @@ export function createManagedDeliveryProviderServer(options = {}) {
       return;
     }
 
+    if (pathName.endsWith('/managed-mailbox/health')) {
+      if (containsForbiddenKey(body, FORBIDDEN_PLAINTEXT_KEYS)) {
+        writeJson(res, 400, { ok: false, reason: 'plaintext_or_secret_refused' });
+        return;
+      }
+      writeJson(res, 200, {
+        ok: true,
+        schema: 'filtertube_managed_mailbox_server_provider',
+        version: 1,
+        mailboxReachable: true,
+        service: 'filtertube-managed-delivery-provider'
+      });
+      return;
+    }
+
     if (pathName.endsWith('/managed-local-network/health')) {
       if (containsForbiddenKey(body, FORBIDDEN_SECRET_KEYS)) {
         writeJson(res, 400, { ok: false, reason: 'secret_refused' });

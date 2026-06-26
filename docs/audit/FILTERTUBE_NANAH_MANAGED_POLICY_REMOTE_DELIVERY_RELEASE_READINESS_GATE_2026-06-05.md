@@ -7,7 +7,7 @@ pickup storage preparation, source-side pickup upload/purge provider handoffs,
 explicitly configured browser HTTPS Internet Pickup upload/pull/purge client,
 provider-gated Internet Pickup intake, and provider-gated Home Pickup candidate
 intake are present. Configured Internet Pickup/Home Pickup clients now have
-executable request/response sanitization proof. A self-hosted in-memory
+explicit readiness checks and executable request/response sanitization proof. A self-hosted in-memory
 reference provider now exists to prove the explicit Internet Pickup/Home Pickup
 endpoint contract.
 Complete remote delivery is still blocked on server deployment,
@@ -229,6 +229,7 @@ Internet Pickup encryption client: READY local helper and configured HTTPS uploa
 built-in browser HTTPS Internet Pickup upload client: READY explicit config only
 built-in browser HTTPS Internet Pickup purge client: READY explicit config only
 built-in browser HTTPS Internet Pickup pull client: READY explicit config only
+built-in browser HTTPS Internet Pickup health check: READY explicit config only
 Internet Pickup decryption client: READY local helper and configured HTTPS pull
 release claim for complete remote management: NO-GO
 ```

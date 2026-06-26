@@ -989,6 +989,12 @@ parent tool instead of a sync/debug console.
     Internet Pickup/Home Pickup provider can return redacted receipts. The row
     reuses the existing source-ack sync path; it does not add automatic discovery,
     hosted provider ownership, plaintext rule exposure, or any new authority.
+  - [x] 2026-06-26 Internet Pickup readiness check slice: Internet Pickup now
+    mirrors Home Pickup with an explicit `Check Pickup` action, redacted
+    endpoint health state, and reference-provider `/managed-mailbox/health`
+    support. This checks whether the configured pickup address responds; it does
+    not prove hosted service ownership, delivery guarantees, plaintext access, or
+    policy authority.
 - [x] Built-in browser HTTPS mailbox upload/pull/purge client is present behind
   explicit dashboard configuration and encrypted-item gates. Server deployment,
   provider endpoint ownership, and native app parity remain separate lanes.

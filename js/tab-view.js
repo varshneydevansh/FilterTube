@@ -2944,6 +2944,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftNanahDeliveryMailboxLabel = document.getElementById('ftNanahDeliveryMailboxLabel');
     const ftNanahDeliveryMailboxDetail = document.getElementById('ftNanahDeliveryMailboxDetail');
     const ftNanahDeliveryMailboxBtn = document.getElementById('ftNanahDeliveryMailboxBtn');
+    const ftNanahDeliveryMailboxCheckBtn = document.getElementById('ftNanahDeliveryMailboxCheckBtn');
     const ftNanahDeliveryLocalCard = document.getElementById('ftNanahDeliveryLocalCard');
     const ftNanahDeliveryLocalLabel = document.getElementById('ftNanahDeliveryLocalLabel');
     const ftNanahDeliveryLocalDetail = document.getElementById('ftNanahDeliveryLocalDetail');
@@ -13573,6 +13574,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const NANAH_MANAGED_MAILBOX_CONFIG_KEY = 'ftManagedMailboxServerConfig';
+    const NANAH_MANAGED_MAILBOX_HEALTH_KEY = 'ftManagedMailboxServerHealthState';
 
     function readNanahManagedMailboxServerConfig() {
         try {
@@ -13582,11 +13584,49 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    function readNanahManagedMailboxServerHealthState() {
+        try {
+            return safeObject(JSON.parse(localStorage.getItem(NANAH_MANAGED_MAILBOX_HEALTH_KEY) || '{}'));
+        } catch (_) {
+            return {};
+        }
+    }
+
+    function writeNanahManagedMailboxServerHealthState(state) {
+        try {
+            const root = safeObject(state);
+            if (!normalizeString(root.endpointHost) && !normalizeNonNegativeInteger(root.checkedAt)) {
+                localStorage.removeItem(NANAH_MANAGED_MAILBOX_HEALTH_KEY);
+                return {};
+            }
+            const clean = {
+                schema: 'filtertube_managed_mailbox_health_state',
+                version: 1,
+                checkedAt: normalizeNonNegativeInteger(root.checkedAt) || Date.now(),
+                endpointHost: normalizeString(root.endpointHost).slice(0, 160),
+                ok: root.ok === true,
+                reason: normalizeString(root.reason).slice(0, 160)
+            };
+            localStorage.setItem(NANAH_MANAGED_MAILBOX_HEALTH_KEY, JSON.stringify(clean));
+            return clean;
+        } catch (_) {
+            return {};
+        }
+    }
+
+    function clearNanahManagedMailboxServerHealthState() {
+        try {
+            localStorage.removeItem(NANAH_MANAGED_MAILBOX_HEALTH_KEY);
+        } catch (_) {
+        }
+    }
+
     function writeNanahManagedMailboxServerConfig(config) {
         try {
             const root = safeObject(config);
             if (!normalizeString(root.endpointUrl || root.url || root.baseUrl)) {
                 localStorage.removeItem(NANAH_MANAGED_MAILBOX_CONFIG_KEY);
+                clearNanahManagedMailboxServerHealthState();
                 delete window.FilterTubeManagedPolicyMailbox;
                 delete window.FilterTubeManagedPolicyOpenSync;
                 return null;
@@ -13634,10 +13674,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 tone: 'warning'
             };
         }
+        const health = readNanahManagedMailboxServerHealthState();
+        const checkedAge = formatManagedProviderCheckedAge(health.checkedAt);
+        const sameHost = !normalizeString(health.endpointHost) || normalizeString(health.endpointHost) === host;
+        const healthDetail = checkedAge && sameHost
+            ? (health.ok === true
+                ? `Last Internet Pickup check passed ${checkedAge}.`
+                : `Last Internet Pickup check did not pass ${checkedAge}.`)
+            : 'Run Check/Edit if you want to verify the pickup path is reachable now.';
         return {
             configured: true,
             label: `Internet Pickup set up: ${host}`,
-            detail: 'A verified protected device can use this route on the same family map when it opens later or away. It still accepts only trusted parent updates.',
+            detail: `${healthDetail} A verified protected device can use this route on the same family map when it opens later or away. It still accepts only trusted parent updates.`,
             tone: 'success'
         };
     }
@@ -13727,6 +13775,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahDeliveryMailboxBtn.title = mailboxCanConfigure
                 ? 'Optional advanced path for signed parent updates that protected devices collect after opening later.'
                 : 'Create a protected profile and pair a verified device before setting up later updates.';
+        }
+        if (ftNanahDeliveryMailboxCheckBtn) {
+            ftNanahDeliveryMailboxCheckBtn.hidden = mailbox.configured !== true;
+            ftNanahDeliveryMailboxCheckBtn.disabled = mailbox.configured !== true;
+            ftNanahDeliveryMailboxCheckBtn.title = mailbox.configured
+                ? 'Check whether the configured Internet Pickup service answers now. This does not grant authority.'
+                : 'Set up Internet Pickup before checking readiness.';
         }
 
         const local = summarizeManagedLocalNetworkProviderConfig();
@@ -13860,6 +13915,55 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    async function checkNanahManagedMailboxServerHealth({ reason = 'manual_check', silent = false } = {}) {
+        const provider = getNanahManagedMailboxProvider();
+        const checkMailbox = provider && (
+            provider.checkManagedMailboxServer
+            || provider.checkMailboxHealth
+            || provider.healthCheck
+        );
+        const endpointHost = normalizeString(provider?.endpointHost) || getManagedMailboxEndpointHostFromConfig(readNanahManagedMailboxServerConfig());
+        if (typeof checkMailbox !== 'function') {
+            writeNanahManagedMailboxServerHealthState({
+                checkedAt: Date.now(),
+                endpointHost,
+                ok: false,
+                reason: 'health_check_unavailable'
+            });
+            if (!silent) UIComponents.showToast('Internet Pickup saved, but readiness could not be checked', 'warning');
+            return { ok: false, reason: 'health_check_unavailable' };
+        }
+        try {
+            const health = await checkMailbox.call(provider, {
+                reason: normalizeString(reason) || 'manual_check',
+                requestedAt: Date.now()
+            });
+            const ok = health?.ok !== false && health?.mailboxReachable !== false;
+            writeNanahManagedMailboxServerHealthState({
+                checkedAt: Date.now(),
+                endpointHost: normalizeString(health?.endpointHost) || endpointHost,
+                ok,
+                reason: ok ? '' : (normalizeString(health?.reason) || 'mailbox_unreachable')
+            });
+            if (!silent) {
+                UIComponents.showToast(
+                    ok ? 'Internet Pickup saved and reachable' : 'Internet Pickup saved, but it did not answer the readiness check',
+                    ok ? 'success' : 'warning'
+                );
+            }
+            return { ok, reason: normalizeString(health?.reason) };
+        } catch (error) {
+            writeNanahManagedMailboxServerHealthState({
+                checkedAt: Date.now(),
+                endpointHost,
+                ok: false,
+                reason: normalizeString(error?.message) || 'health_check_failed'
+            });
+            if (!silent) UIComponents.showToast('Internet Pickup saved, but readiness could not be checked', 'warning');
+            return { ok: false, reason: normalizeString(error?.message) || 'health_check_failed' };
+        }
+    }
+
     async function configureNanahManagedMailboxServer() {
         const root = safeObject(profilesV4Cache);
         const activeProfileId = normalizeString(root.activeProfileId) || 'default';
@@ -13884,9 +13988,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             ],
             configured: !!currentEndpoint,
             configureLabel: currentEndpoint ? 'Edit Internet Pickup' : 'Set Up Internet Pickup',
-            disableLabel: 'Turn Off Internet Pickup'
+            disableLabel: 'Turn Off Internet Pickup',
+            extraChoices: currentEndpoint ? [{ value: 'check', label: 'Check Pickup', className: 'btn-secondary' }] : []
         });
         if (action === null) return;
+        if (action === 'check') {
+            await checkNanahManagedMailboxServerHealth({ reason: 'manual_provider_check' });
+            renderNanahDeliveryPathStrip();
+            return;
+        }
         if (action === 'disable') {
             writeNanahManagedMailboxServerConfig({});
             await recordManagedMailboxProviderConfigHistory({
@@ -13950,7 +14060,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             endpointHost: getManagedMailboxEndpointHostFromConfig(nextConfig)
         });
         await refreshProfilesUI();
-        UIComponents.showToast('Internet Pickup saved', 'success');
+        await checkNanahManagedMailboxServerHealth({ reason: 'configure' });
     }
 
     async function checkNanahManagedLocalNetworkProviderHealth({ reason = 'manual_check', silent = false } = {}) {
@@ -19584,6 +19694,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         ftNanahDeliveryMailboxBtn.addEventListener('click', async () => {
             await configureNanahManagedMailboxServer();
             renderNanahDeliveryPathStrip();
+        });
+    }
+
+    if (ftNanahDeliveryMailboxCheckBtn) {
+        ftNanahDeliveryMailboxCheckBtn.addEventListener('click', async () => {
+            if (ftNanahDeliveryMailboxCheckBtn.disabled) return;
+            ftNanahDeliveryMailboxCheckBtn.disabled = true;
+            try {
+                await checkNanahManagedMailboxServerHealth({ reason: 'delivery_card_check' });
+            } finally {
+                renderNanahDeliveryPathStrip();
+            }
         });
     }
 

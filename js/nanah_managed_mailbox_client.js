@@ -198,6 +198,17 @@
         };
     }
 
+    function sanitizeHealthRequest(request) {
+        const root = safeObject(request);
+        return {
+            schema: normalizeString(root.schema) || 'filtertube_managed_mailbox_health_request',
+            version: Number(root.version) || 1,
+            transport: 'encrypted_mailbox',
+            reason: normalizeString(root.reason) || 'manual_check',
+            requestedAt: Number(root.requestedAt) || Date.now()
+        };
+    }
+
     function sanitizeDeliveryAckPayload(payload) {
         const root = safeObject(payload);
         if (hasForbiddenPlaintextKey(root)) return {};
@@ -237,6 +248,7 @@
         const ackPath = parsed.ackPath || 'managed-mailbox/ack';
         const ackPullPath = parsed.ackPullPath || parsed.deliveryAckPath || 'managed-mailbox/ack/pull';
         const purgePath = parsed.purgePath || 'managed-mailbox/purge';
+        const healthPath = parsed.healthPath || parsed.statusPath || 'managed-mailbox/health';
 
         function unavailable(reason) {
             return { schema: PROVIDER_SCHEMA, version: 1, ok: false, reason };
@@ -317,6 +329,15 @@
             return { ...result, items };
         }
 
+        async function checkManagedMailboxServer(request = {}) {
+            const result = await postJson(healthPath, sanitizeHealthRequest(request));
+            return {
+                ...result,
+                mailboxReachable: result.ok !== false,
+                endpointHost: endpointUrl?.host || ''
+            };
+        }
+
         return {
             schema: PROVIDER_SCHEMA,
             version: 1,
@@ -334,7 +355,10 @@
             pullManagedDeliveryAcks,
             pullRemoteDeliveryAcks: pullManagedDeliveryAcks,
             getManagedDeliveryAcks: pullManagedDeliveryAcks,
-            purgeManagedMailboxItems
+            purgeManagedMailboxItems,
+            checkManagedMailboxServer,
+            checkMailboxHealth: checkManagedMailboxServer,
+            healthCheck: checkManagedMailboxServer
         };
     }
 
