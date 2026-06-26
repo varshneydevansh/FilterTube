@@ -21,6 +21,11 @@ default it keeps an in-memory queue for:
 - Home Pickup redacted delivery receipts.
 - Revocation cleanup for pending Internet Pickup and Home Pickup rows.
 
+When a protected device acknowledges a waiting Internet Pickup item or Home
+Pickup candidate, the provider keeps the redacted receipt for the parent/source
+but clears the acknowledged waiting row from the queue. This prevents replaying
+the same already-handled update each time the protected profile opens.
+
 It exists so the browser extension's configured provider hooks can be exercised
 against a real endpoint shape before a hosted service or native app provider is
 owned.
@@ -119,7 +124,7 @@ The reference provider accepts paths under any prefix, so
 | --- | --- | --- |
 | `POST */managed-mailbox/upload` | Store pending sealed updates. | Ciphertext item metadata only. |
 | `POST */managed-mailbox/pull` | Protected device pulls matching pending rows. | Ciphertext rows. |
-| `POST */managed-mailbox/ack` | Protected device posts delivery/apply result. | Redacted receipt metadata. |
+| `POST */managed-mailbox/ack` | Protected device posts delivery/apply result and clears the acknowledged waiting item. | Redacted receipt metadata. |
 | `POST */managed-mailbox/ack/pull` | Parent/source checks delivery status. | Redacted receipt metadata. |
 | `POST */managed-mailbox/purge` | Delete pending rows and matching redacted receipts after revocation or cleanup. | No plaintext. |
 | `POST */managed-mailbox/health` | Check whether the configured pickup is reachable and whether a local durable store is enabled. | Health metadata only. |
@@ -134,7 +139,7 @@ Mailbox upload rejects plaintext policy keys such as `payload`, `keywords`,
 | `POST */managed-local-network/health` | Check an explicitly configured Home Pickup service and whether a local durable store is enabled. | Health metadata only. |
 | `POST */managed-local-network/publish` | Store signed same-network candidates. | Signed managed envelope candidates. |
 | `POST */managed-local-network/discover` | Protected device pulls matching candidates. | Signed candidates. |
-| `POST */managed-local-network/ack` | Protected device posts delivery/apply result. | Redacted receipt metadata. |
+| `POST */managed-local-network/ack` | Protected device posts delivery/apply result and clears the acknowledged waiting candidate. | Redacted receipt metadata. |
 | `POST */managed-local-network/ack/pull` | Parent/source checks delivery status. | Redacted receipt metadata. |
 | `POST */managed-local-network/purge` | Delete matching pending candidates and redacted receipts after trusted-link removal or signing-key rotation. | No plaintext rules or private secrets. |
 

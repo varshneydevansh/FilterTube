@@ -2485,3 +2485,8 @@ follow. I will share progress as this moves from audit/spec into implementation.
   matching Home/Internet Pickup key prompt instruction. This key only protects
   provider transport access; the protected device still validates trusted link,
   target profile, scope, revision, hash, and signature before applying anything.
+- [x] 2026-06-26 pickup ack cleanup slice: the reference Internet Pickup and
+  Home Pickup provider now treats a protected-device ack as a terminal handoff
+  for the waiting queue. It keeps the redacted receipt so the parent/source can
+  check delivery, but removes the acknowledged mailbox item or local candidate
+  so protected profiles do not repeatedly pull the same already-handled update.

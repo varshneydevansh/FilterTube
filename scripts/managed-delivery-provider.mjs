@@ -274,6 +274,18 @@ function purgeRowsByRequest(map, request, idName, explicitIds = []) {
   return purged;
 }
 
+function purgeRowsByAckRecords(map, records, idName) {
+  const ids = new Set(safeArray(records).map(row => normalizeString(row?.[idName])).filter(Boolean));
+  if (ids.size === 0) return 0;
+  let purged = 0;
+  for (const [key, row] of map) {
+    if (!ids.has(normalizeString(row?.[idName]))) continue;
+    map.delete(key);
+    purged += 1;
+  }
+  return purged;
+}
+
 function mapFromRows(rows, keyName, normalizer) {
   const map = new Map();
   for (const row of safeArray(rows)) {
@@ -454,11 +466,14 @@ export function createManagedDeliveryProviderServer(options = {}) {
       }
       const rows = safeArray(body.records).map(row => normalizeAck(row, 'mailbox', now)).filter(Boolean);
       for (const row of rows) mailboxAcks.set(`${row.mailboxItemId}:${row.scope}:${row.revision}`, row);
+      const cleared = purgeRowsByAckRecords(mailboxItems, rows, 'mailboxItemId');
       persist();
       writeJson(res, 200, {
         ok: true,
         ackedMailboxItemIds: rows.map(row => row.mailboxItemId),
-        ackCount: rows.length
+        ackCount: rows.length,
+        clearedMailboxItemCount: cleared,
+        purgedMailboxItemCount: cleared
       });
       return;
     }
@@ -565,11 +580,14 @@ export function createManagedDeliveryProviderServer(options = {}) {
       }
       const rows = safeArray(body.records).map(row => normalizeAck(row, 'local', now)).filter(Boolean);
       for (const row of rows) localAcks.set(`${row.candidateId}:${row.scope}:${row.revision}`, row);
+      const cleared = purgeRowsByAckRecords(localCandidates, rows, 'candidateId');
       persist();
       writeJson(res, 200, {
         ok: true,
         ackedCandidateIds: rows.map(row => row.candidateId),
-        ackCount: rows.length
+        ackCount: rows.length,
+        clearedCandidateCount: cleared,
+        purgedCandidateCount: cleared
       });
       return;
     }
