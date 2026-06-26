@@ -198,6 +198,7 @@ function normalizeAck(record, kind, now = Date.now()) {
     : 'filtertube_nanah_managed_open_sync_ack');
   clean.version = Number(clean.version) || 1;
   clean.ackedAt = Number(clean.ackedAt) || now;
+  clean.expiresAtMs = Number(root.expiresAtMs || root.expiresAt) || (clean.ackedAt + DEFAULT_TTL_MS);
   clean.linkId = normalizeString(clean.linkId);
   clean.mailboxItemId = normalizeString(clean.mailboxItemId);
   clean.candidateId = normalizeString(clean.candidateId || clean.localNetworkCandidateId);
@@ -435,7 +436,10 @@ export function createManagedDeliveryProviderServer(options = {}) {
     }
 
     const now = Date.now();
-    const pruned = pruneExpired(mailboxItems, now) + pruneExpired(localCandidates, now);
+    const pruned = pruneExpired(mailboxItems, now)
+      + pruneExpired(mailboxAcks, now)
+      + pruneExpired(localCandidates, now)
+      + pruneExpired(localAcks, now);
     if (pruned > 0) persist();
     const pathName = new URL(req.url || '/', 'http://127.0.0.1').pathname.replace(/\/+$/, '');
     const body = await readBody(req);

@@ -2505,3 +2505,8 @@ follow. I will share progress as this moves from audit/spec into implementation.
   and signing-key rotation can purge pending rows plus receipts, while
   source-side receipt cleanup sends `ack` only so it cannot accidentally delete
   a pending update row that shares an explicit row id.
+- [x] 2026-06-26 provider receipt-retention slice: redacted Internet Pickup and
+  Home Pickup receipt rows now get an expiry based on `ackedAt` and are pruned
+  with the same bounded route-time cleanup as pending rows. This keeps
+  long-running local/home providers from retaining stale receipt metadata
+  forever while preserving the parent/source receipt window.
