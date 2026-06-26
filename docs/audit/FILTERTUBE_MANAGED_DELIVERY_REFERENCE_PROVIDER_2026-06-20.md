@@ -140,8 +140,19 @@ network service.
 ## Parent-Facing Durability Status
 
 The health responses include `persistentStore: true` only when the provider was
-started with `FILTERTUBE_PROVIDER_STORE`. The dashboard uses that as redacted
-feedback:
+started with `FILTERTUBE_PROVIDER_STORE`. The same health responses also include
+redacted queue counts only:
+
+- `pendingMailboxItemCount`
+- `mailboxAckCount`
+- `pendingLocalCandidateCount`
+- `localAckCount`
+
+The dashboard uses those values as parent-facing status, such as `No waiting
+updates`, `2 waiting updates`, or `1 delivery receipt`, without exposing channel,
+keyword, video, profile, PIN, or plaintext policy data.
+
+The dashboard uses `persistentStore` as redacted durability feedback:
 
 - saved store enabled: waiting updates can survive a provider process restart
 - memory-only provider: waiting updates can be lost if the provider restarts

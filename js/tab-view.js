@@ -13613,6 +13613,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 endpointHost: normalizeString(root.endpointHost).slice(0, 160),
                 ok: root.ok === true,
                 persistentStore: root.persistentStore === true,
+                pendingMailboxItemCount: normalizeNonNegativeInteger(root.pendingMailboxItemCount),
+                mailboxAckCount: normalizeNonNegativeInteger(root.mailboxAckCount),
+                pendingLocalCandidateCount: normalizeNonNegativeInteger(root.pendingLocalCandidateCount),
+                localAckCount: normalizeNonNegativeInteger(root.localAckCount),
                 reason: normalizeString(root.reason).slice(0, 160)
             };
             localStorage.setItem(NANAH_MANAGED_MAILBOX_HEALTH_KEY, JSON.stringify(clean));
@@ -13693,10 +13697,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const durabilityDetail = checkedAge && sameHost && health.ok === true
             ? formatManagedPickupDurabilityDetail(health)
             : '';
+        const queueDetail = checkedAge && sameHost && health.ok === true
+            ? formatManagedPickupQueueDetail(health, 'internet')
+            : '';
         return {
             configured: true,
             label: `Internet Pickup set up: ${host}`,
-            detail: `${healthDetail} ${durabilityDetail} A verified protected device can use this route on the same family map when it opens later or away. It still accepts only trusted parent updates.`.replace(/\s+/g, ' ').trim(),
+            detail: `${healthDetail} ${durabilityDetail} ${queueDetail} A verified protected device can use this route on the same family map when it opens later or away. It still accepts only trusted parent updates.`.replace(/\s+/g, ' ').trim(),
             tone: 'success'
         };
     }
@@ -13961,6 +13968,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 endpointHost: normalizeString(health?.endpointHost) || endpointHost,
                 ok,
                 persistentStore: health?.persistentStore === true,
+                pendingMailboxItemCount: normalizeNonNegativeInteger(health?.pendingMailboxItemCount),
+                mailboxAckCount: normalizeNonNegativeInteger(health?.mailboxAckCount),
+                pendingLocalCandidateCount: normalizeNonNegativeInteger(health?.pendingLocalCandidateCount),
+                localAckCount: normalizeNonNegativeInteger(health?.localAckCount),
                 reason: ok ? '' : (normalizeString(health?.reason) || 'mailbox_unreachable')
             });
             if (!silent) {
@@ -14170,6 +14181,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 endpointHost: normalizeString(health?.endpointHost) || endpointHost,
                 ok,
                 persistentStore: health?.persistentStore === true,
+                pendingMailboxItemCount: normalizeNonNegativeInteger(health?.pendingMailboxItemCount),
+                mailboxAckCount: normalizeNonNegativeInteger(health?.mailboxAckCount),
+                pendingLocalCandidateCount: normalizeNonNegativeInteger(health?.pendingLocalCandidateCount),
+                localAckCount: normalizeNonNegativeInteger(health?.localAckCount),
                 reason: ok ? '' : (normalizeString(health?.reason) || 'bridge_unreachable')
             });
             if (!silent) {
@@ -15610,6 +15625,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 endpointHost: normalizeString(root.endpointHost).slice(0, 160),
                 ok: root.ok === true,
                 persistentStore: root.persistentStore === true,
+                pendingMailboxItemCount: normalizeNonNegativeInteger(root.pendingMailboxItemCount),
+                mailboxAckCount: normalizeNonNegativeInteger(root.mailboxAckCount),
+                pendingLocalCandidateCount: normalizeNonNegativeInteger(root.pendingLocalCandidateCount),
+                localAckCount: normalizeNonNegativeInteger(root.localAckCount),
                 reason: normalizeString(root.reason).slice(0, 160)
             };
             localStorage.setItem(NANAH_MANAGED_LOCAL_NETWORK_HEALTH_KEY, JSON.stringify(clean));
@@ -15645,6 +15664,26 @@ document.addEventListener('DOMContentLoaded', async () => {
             return 'Waiting updates are saved by that service.';
         }
         return 'Waiting updates are memory-only there, so a service restart can clear them.';
+    }
+
+    function formatManagedPickupQueueDetail(health, kind) {
+        const root = safeObject(health);
+        const pendingCount = kind === 'home'
+            ? normalizeNonNegativeInteger(root.pendingLocalCandidateCount)
+            : normalizeNonNegativeInteger(root.pendingMailboxItemCount);
+        const receiptCount = kind === 'home'
+            ? normalizeNonNegativeInteger(root.localAckCount)
+            : normalizeNonNegativeInteger(root.mailboxAckCount);
+        const pieces = [];
+        if (pendingCount > 0) {
+            pieces.push(`${pendingCount} waiting update${pendingCount === 1 ? '' : 's'}`);
+        } else if (root.ok === true) {
+            pieces.push('No waiting updates');
+        }
+        if (receiptCount > 0) {
+            pieces.push(`${receiptCount} delivery receipt${receiptCount === 1 ? '' : 's'}`);
+        }
+        return pieces.join(', ');
     }
 
     function getManagedLocalNetworkEndpointHostFromConfig(config) {
@@ -15711,10 +15750,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const durabilityDetail = checkedAge && sameHost && health.ok === true
             ? formatManagedPickupDurabilityDetail(health)
             : '';
+        const queueDetail = checkedAge && sameHost && health.ok === true
+            ? formatManagedPickupQueueDetail(health, 'home')
+            : '';
         return {
             configured: true,
             label: `Home Pickup set up: ${host}`,
-            detail: `${healthDetail} ${durabilityDetail} Reachability is only a send path check; trusted parent policy still decides what can apply.`.replace(/\s+/g, ' ').trim(),
+            detail: `${healthDetail} ${durabilityDetail} ${queueDetail} Reachability is only a send path check; trusted parent policy still decides what can apply.`.replace(/\s+/g, ' ').trim(),
             tone: 'success'
         };
     }

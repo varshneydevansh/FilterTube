@@ -501,7 +501,11 @@ export function createManagedDeliveryProviderServer(options = {}) {
         version: 1,
         mailboxReachable: true,
         service: 'filtertube-managed-delivery-provider',
-        persistentStore: !!storePath
+        persistentStore: !!storePath,
+        pendingMailboxItemCount: mailboxItems.size,
+        mailboxAckCount: mailboxAcks.size,
+        pendingLocalCandidateCount: localCandidates.size,
+        localAckCount: localAcks.size
       });
       return;
     }
@@ -517,7 +521,11 @@ export function createManagedDeliveryProviderServer(options = {}) {
         version: 1,
         bridgeReachable: true,
         service: 'filtertube-managed-delivery-provider',
-        persistentStore: !!storePath
+        persistentStore: !!storePath,
+        pendingLocalCandidateCount: localCandidates.size,
+        localAckCount: localAcks.size,
+        pendingMailboxItemCount: mailboxItems.size,
+        mailboxAckCount: mailboxAcks.size
       });
       return;
     }

@@ -2474,3 +2474,9 @@ follow. I will share progress as this moves from audit/spec into implementation.
   protected profile, aligns locked protected-device behavior with trusted update
   pickup, and writes a redacted protected-history row. It does not create a
   pickup provider, scan the LAN, or let protected profiles change trust.
+- [x] 2026-06-26 pickup queue status slice: the reference pickup provider now
+  returns redacted health counts for waiting Internet Pickup items, Home Pickup
+  candidates, and delivery receipts. Accounts & Sync stores only sanitized
+  counts and shows parent-facing status such as `No waiting updates` or
+  `2 waiting updates`; it still never exposes plaintext rules, PINs, profiles,
+  or channel/keyword contents through health checks.
