@@ -15244,6 +15244,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         await loadNanahTrustedLinks();
+        if (summary.mailboxUploadedCount > 0) {
+            await checkNanahManagedMailboxServerHealth({ reason: 'post_parent_push', silent: true });
+        }
+        if (summary.localNetworkDeliveredCount > 0) {
+            await checkNanahManagedLocalNetworkProviderHealth({ reason: 'post_parent_push', silent: true });
+        }
         await refreshProfilesUI();
         if (summary.deliveredCount > 0) {
             UIComponents.showToast(`Sent managed updates to ${summary.deliveredCount} verified policy queue${summary.deliveredCount === 1 ? '' : 's'}`, 'success');
@@ -15596,6 +15602,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             recordAckHistory: (details) => recordManagedOpenSyncAckHistory(details),
             writeState: persistNanahManagedOpenSyncState
         });
+        if ((normalizeNonNegativeInteger(state?.pulledItemCount) || 0) > 0
+            || (normalizeNonNegativeInteger(state?.ackAttemptedCount) || 0) > 0) {
+            await checkNanahManagedMailboxServerHealth({ reason: 'post_receive', silent: true });
+        }
         renderNanahTrustedLinks();
         return state;
     }
@@ -16085,6 +16095,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             state.linkResults.push(linkRow);
         }
         await persistNanahManagedLocalNetworkSyncState(state);
+        if ((normalizeNonNegativeInteger(state.candidateCount) || 0) > 0
+            || (normalizeNonNegativeInteger(state.ackAttemptedCount) || 0) > 0) {
+            await checkNanahManagedLocalNetworkProviderHealth({ reason: 'post_receive', silent: true });
+        }
         renderNanahTrustedLinks();
         return state;
     }

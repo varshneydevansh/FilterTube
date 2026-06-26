@@ -25,6 +25,9 @@ When a protected device acknowledges a waiting Internet Pickup item or Home
 Pickup candidate, the provider keeps the redacted receipt for the parent/source
 but clears the acknowledged waiting row from the queue. This prevents replaying
 the same already-handled update each time the protected profile opens.
+The extension refreshes provider health after parent sends and protected-device
+receives so queue counts shown in Accounts & Sync track those changes without
+requiring a manual check.
 
 It exists so the browser extension's configured provider hooks can be exercised
 against a real endpoint shape before a hosted service or native app provider is

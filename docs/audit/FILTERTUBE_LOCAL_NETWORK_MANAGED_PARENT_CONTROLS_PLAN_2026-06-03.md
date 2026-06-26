@@ -2490,3 +2490,8 @@ follow. I will share progress as this moves from audit/spec into implementation.
   for the waiting queue. It keeps the redacted receipt so the parent/source can
   check delivery, but removes the acknowledged mailbox item or local candidate
   so protected profiles do not repeatedly pull the same already-handled update.
+- [x] 2026-06-26 pickup health refresh slice: parent/source sends and protected
+  profile receives now refresh the relevant Internet Pickup or Home Pickup
+  health state silently after queue-changing work. This keeps Accounts & Sync
+  status aligned with the actual provider queue without adding background LAN
+  discovery, scheduled sync, or provider authority.
