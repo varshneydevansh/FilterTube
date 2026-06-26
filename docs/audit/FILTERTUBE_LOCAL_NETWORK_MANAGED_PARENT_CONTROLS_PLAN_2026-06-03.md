@@ -2510,3 +2510,7 @@ follow. I will share progress as this moves from audit/spec into implementation.
   with the same bounded route-time cleanup as pending rows. This keeps
   long-running local/home providers from retaining stale receipt metadata
   forever while preserving the parent/source receipt window.
+- [x] 2026-06-26 provider expiry-cap slice: pending rows and redacted receipt
+  rows now clamp caller-supplied expiry values to the provider's default
+  maximum retention window. A provider row can expire earlier, but it cannot
+  request indefinite or over-long local/home storage.

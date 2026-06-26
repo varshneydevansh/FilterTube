@@ -143,6 +143,14 @@ function normalizeScope(value) {
   return normalizeString(value).toLowerCase();
 }
 
+function normalizeExpiryMs(value, baseMs, now = Date.now()) {
+  const base = Number(baseMs) || now;
+  const max = base + DEFAULT_TTL_MS;
+  const requested = Number(value);
+  if (!Number.isFinite(requested) || requested <= 0) return max;
+  return Math.min(requested, max);
+}
+
 function normalizeMailboxItem(item, now = Date.now()) {
   const root = safeObject(item);
   if (containsForbiddenKey(root, FORBIDDEN_PLAINTEXT_KEYS)) return null;
@@ -158,7 +166,7 @@ function normalizeMailboxItem(item, now = Date.now()) {
   clean.revision = Number(clean.revision) || null;
   clean.policyHash = normalizeString(clean.policyHash);
   clean.createdAtMs = Number(clean.createdAtMs) || now;
-  clean.expiresAtMs = Number(clean.expiresAtMs) || (clean.createdAtMs + DEFAULT_TTL_MS);
+  clean.expiresAtMs = normalizeExpiryMs(clean.expiresAtMs, clean.createdAtMs, now);
   if (!clean.mailboxItemId || !clean.linkId || !clean.targetProfileId || !clean.scope || !clean.revision || !clean.policyHash) return null;
   if (!normalizeString(clean.ciphertext) || !normalizeString(clean.ciphertextHash)) return null;
   return clean;
@@ -183,7 +191,7 @@ function normalizeCandidate(candidate, now = Date.now()) {
   clean.sourcePublicKeyId = normalizeString(clean.sourcePublicKeyId);
   clean.keyVersion = Number(clean.keyVersion) || 0;
   clean.createdAtMs = Number(clean.createdAtMs) || now;
-  clean.expiresAtMs = Number(clean.expiresAtMs || clean.expiresAt) || (clean.createdAtMs + DEFAULT_TTL_MS);
+  clean.expiresAtMs = normalizeExpiryMs(clean.expiresAtMs || clean.expiresAt, clean.createdAtMs, now);
   if (!clean.candidateId || !clean.linkId || !clean.targetProfileId || !clean.scope || !clean.revision || !clean.policyHash) return null;
   if (!safeObject(clean.envelope).type && !safeObject(clean.envelope).schema) return null;
   return clean;
@@ -198,7 +206,7 @@ function normalizeAck(record, kind, now = Date.now()) {
     : 'filtertube_nanah_managed_open_sync_ack');
   clean.version = Number(clean.version) || 1;
   clean.ackedAt = Number(clean.ackedAt) || now;
-  clean.expiresAtMs = Number(root.expiresAtMs || root.expiresAt) || (clean.ackedAt + DEFAULT_TTL_MS);
+  clean.expiresAtMs = normalizeExpiryMs(root.expiresAtMs || root.expiresAt, clean.ackedAt, now);
   clean.linkId = normalizeString(clean.linkId);
   clean.mailboxItemId = normalizeString(clean.mailboxItemId);
   clean.candidateId = normalizeString(clean.candidateId || clean.localNetworkCandidateId);

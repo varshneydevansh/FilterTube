@@ -22,9 +22,10 @@ default it keeps an in-memory queue for:
 - Revocation cleanup for pending Internet Pickup and Home Pickup rows.
 
 Pending rows and redacted receipts use the same default seven-day retention
-window unless the row supplies a shorter expiry, and all row maps are capped by
-the provider row limit. This keeps long-running local/home trials bounded even
-when a parent does not manually clear old receipts.
+window. A row can supply a shorter expiry, but the provider clamps longer
+expiries back to the default maximum, and all row maps are capped by the
+provider row limit. This keeps long-running local/home trials bounded even when
+a parent does not manually clear old receipts.
 
 When a protected device acknowledges a waiting Internet Pickup item or Home
 Pickup candidate, the provider keeps the redacted receipt for the parent/source
