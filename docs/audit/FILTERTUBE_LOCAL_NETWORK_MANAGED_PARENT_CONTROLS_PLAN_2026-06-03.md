@@ -198,6 +198,13 @@ extension authority code.
   does not create or own a hosted service, bypass HTTPS endpoint validation,
   store plaintext rules, or change trusted-link, target-profile, revision,
   hash, or signature authority.
+- [x] 2026-06-26 pickup provider status page slice: the self-hosted provider now
+  answers a safe read-only `GET /filtertube` status request and `--help` prints
+  the Home Pickup and Internet Pickup setup model. The copied setup instructions
+  tell parents/admins to open the provider address before pasting it into
+  FilterTube. The status payload exposes service/readiness metadata only; it
+  does not expose plaintext rules, PINs, private keys, target authority, or
+  automatic LAN discovery.
 - [x] 2026-06-26 pickup durability status slice: Internet Pickup and Home Pickup
   health checks now carry the provider's redacted durable-store status into the
   dashboard summary. Parents can see whether waiting updates are saved by that

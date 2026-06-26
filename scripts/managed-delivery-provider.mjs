@@ -9,6 +9,7 @@ const DEFAULT_PORT = 8787;
 const MAX_BODY_BYTES = 1024 * 1024;
 const MAX_ROWS = 5000;
 const DEFAULT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const SERVICE_NAME = 'filtertube-managed-delivery-provider';
 
 const FORBIDDEN_PLAINTEXT_KEYS = new Set([
   'payload',
@@ -404,7 +405,7 @@ function writeOptions(res) {
   res.writeHead(204, {
     'cache-control': 'no-store',
     'access-control-allow-origin': '*',
-    'access-control-allow-methods': 'POST, OPTIONS',
+    'access-control-allow-methods': 'GET, POST, OPTIONS',
     'access-control-allow-headers': 'content-type, authorization',
     'access-control-max-age': '600'
   });
@@ -429,9 +430,44 @@ export function createManagedDeliveryProviderServer(options = {}) {
     writePersistedState(storePath, { mailboxItems, mailboxAcks, localCandidates, localAcks });
   }
 
+  function publicStatusPayload() {
+    return {
+      ok: true,
+      schema: 'filtertube_managed_delivery_provider_status',
+      version: 1,
+      service: SERVICE_NAME,
+      persistentStore: !!storePath,
+      authRequired: !!token,
+      supportedPaths: [
+        'managed-mailbox/upload',
+        'managed-mailbox/pull',
+        'managed-mailbox/ack',
+        'managed-mailbox/ack/pull',
+        'managed-mailbox/purge',
+        'managed-mailbox/health',
+        'managed-local-network/publish',
+        'managed-local-network/discover',
+        'managed-local-network/ack',
+        'managed-local-network/ack/pull',
+        'managed-local-network/purge',
+        'managed-local-network/health'
+      ],
+      authority: 'transport_only_signed_parent_policy_validation_required'
+    };
+  }
+
   async function route(req, res) {
     if (req.method === 'OPTIONS') {
       writeOptions(res);
+      return;
+    }
+    const pathName = new URL(req.url || '/', 'http://127.0.0.1').pathname.replace(/\/+$/, '');
+    if (req.method === 'GET') {
+      if (!pathName || pathName === '/filtertube' || pathName.endsWith('/filtertube') || pathName.endsWith('/status')) {
+        writeJson(res, 200, publicStatusPayload());
+        return;
+      }
+      writeJson(res, 404, { ok: false, reason: 'not_found' });
       return;
     }
     if (req.method !== 'POST') {
@@ -449,7 +485,6 @@ export function createManagedDeliveryProviderServer(options = {}) {
       + pruneExpired(localCandidates, now)
       + pruneExpired(localAcks, now);
     if (pruned > 0) persist();
-    const pathName = new URL(req.url || '/', 'http://127.0.0.1').pathname.replace(/\/+$/, '');
     const body = await readBody(req);
     if (pathName.endsWith('/managed-mailbox/upload')) {
       if (containsForbiddenKey(body, FORBIDDEN_PLAINTEXT_KEYS)) {
@@ -540,7 +575,7 @@ export function createManagedDeliveryProviderServer(options = {}) {
         schema: 'filtertube_managed_mailbox_server_provider',
         version: 1,
         mailboxReachable: true,
-        service: 'filtertube-managed-delivery-provider',
+        service: SERVICE_NAME,
         persistentStore: !!storePath,
         pendingMailboxItemCount: mailboxItems.size,
         mailboxAckCount: mailboxAcks.size,
@@ -560,7 +595,7 @@ export function createManagedDeliveryProviderServer(options = {}) {
         schema: 'filtertube_managed_local_network_provider',
         version: 1,
         bridgeReachable: true,
-        service: 'filtertube-managed-delivery-provider',
+        service: SERVICE_NAME,
         persistentStore: !!storePath,
         pendingLocalCandidateCount: localCandidates.size,
         localAckCount: localAcks.size,
@@ -680,6 +715,29 @@ export function createManagedDeliveryProviderServer(options = {}) {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
+  if (process.argv.includes('--help') || process.argv.includes('-h')) {
+    console.log([
+      'FilterTube managed delivery provider',
+      '',
+      'Usage:',
+      '  FILTERTUBE_PROVIDER_HOST=0.0.0.0 FILTERTUBE_PROVIDER_STORE=.filtertube/managed-delivery-store.json npm run managed:provider',
+      '',
+      'Optional environment:',
+      '  FILTERTUBE_PROVIDER_HOST    Host to bind. Use 0.0.0.0 for Home Pickup on your network.',
+      '  FILTERTUBE_PROVIDER_PORT    Port to bind. Default: 8787.',
+      '  FILTERTUBE_PROVIDER_TOKEN   Optional bearer key entered in FilterTube pickup setup.',
+      '  FILTERTUBE_PROVIDER_STORE   Optional JSON store for waiting updates and redacted receipts.',
+      '',
+      'Addresses:',
+      '  Home Pickup:     http://<this-computer-lan-ip>:8787/filtertube',
+      '  Internet Pickup: expose the same service through your trusted HTTPS address.',
+      '',
+      'This provider is transport only. It stores unreadable waiting updates and redacted receipts;',
+      'protected devices still validate saved parent link, target profile, scope, revision, hash, and signature.',
+      ''
+    ].join('\n'));
+    process.exit(0);
+  }
   const host = normalizeString(process.env.FILTERTUBE_PROVIDER_HOST) || DEFAULT_HOST;
   const port = Number(process.env.FILTERTUBE_PROVIDER_PORT) || DEFAULT_PORT;
   const server = createManagedDeliveryProviderServer();
@@ -689,5 +747,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       ? `persistent store ${process.env.FILTERTUBE_PROVIDER_STORE}`
       : 'memory store only';
     console.log(`FilterTube managed delivery provider listening on http://${host}:${port}/filtertube (${tokenNote}, ${storeNote})`);
+    console.log('Home Pickup: enter http://<this-computer-lan-ip>:8787/filtertube on both verified devices.');
+    console.log('Internet Pickup: expose this provider through your trusted HTTPS address, then enter that HTTPS address in FilterTube.');
   });
 }
