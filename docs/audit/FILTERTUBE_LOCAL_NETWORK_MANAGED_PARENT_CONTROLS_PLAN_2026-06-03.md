@@ -196,6 +196,13 @@ extension authority code.
   guaranteed delivery; a FilterTube-hosted claim requires endpoint/deployment/
   health/CORS/retention/purge/redacted-ack/round-trip proof and still cannot
   make provider reachability policy authority.
+- [x] 2026-06-26 Family Device Updates feedback slice: quick Send Update and
+  the live device-map action now enter the canonical `parent_control` flow
+  explicitly, and parent/source trusted-device rows expose `Check Delivery`
+  when Internet Pickup or Home Pickup receipt readers are available. This lets
+  a parent refresh redacted accepted/rejected delivery status for previously
+  sent protected-device policies without changing trusted-link, signature,
+  scope, target-profile, revision, or provider authority.
 
 ### Parent/Caregiver Simplification Tracker
 

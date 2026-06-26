@@ -15856,6 +15856,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    function hasNanahManagedSourceAckReader() {
+        const provider = getNanahManagedSourceAckProvider();
+        return !!provider && (
+            typeof provider.pullManagedDeliveryAcks === 'function'
+            || typeof provider.pullRemoteDeliveryAcks === 'function'
+            || typeof provider.getManagedDeliveryAcks === 'function'
+        );
+    }
+
     function runNanahManagedBackgroundSync({ reason = 'dashboard_open' } = {}) {
         const normalizedReason = normalizeString(reason) || 'dashboard_open';
         const hasReplicaUpdateTarget = hasNanahManagedSavedUpdateCheckTarget();
@@ -16184,6 +16193,35 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                 });
                 actions.appendChild(checkSavedUpdatesBtn);
+            }
+
+            if (managedSourceSender) {
+                const sentPolicyCount = getNanahOutgoingManagedPolicyStateByScope(linkPolicy).length;
+                const ackReaderReady = hasNanahManagedSourceAckReader();
+                const checkReceiptsBtn = document.createElement('button');
+                checkReceiptsBtn.type = 'button';
+                checkReceiptsBtn.className = 'btn-secondary';
+                checkReceiptsBtn.textContent = ackReaderReady ? 'Check Delivery' : 'Delivery Check Off';
+                checkReceiptsBtn.disabled = sentPolicyCount === 0 || !ackReaderReady;
+                checkReceiptsBtn.title = sentPolicyCount === 0
+                    ? 'Send a protected update before checking whether this device picked it up.'
+                    : (ackReaderReady
+                        ? 'Refresh whether this protected device reported accepting or rejecting saved parent updates.'
+                        : 'Set up Internet Pickup or Home Pickup receipt support before checking later-delivery receipts.');
+                checkReceiptsBtn.addEventListener('click', async () => {
+                    if (checkReceiptsBtn.disabled) return;
+                    checkReceiptsBtn.disabled = true;
+                    try {
+                        await runNanahManagedSourceAckSync({ reason: 'manual_parent_receipt_check' });
+                        renderNanahDeliveryPathStrip();
+                        renderNanahTrustedLinks();
+                        UIComponents.showToast('Checked protected-device receipts', 'info');
+                    } catch (error) {
+                        console.error('FilterTube: protected-device receipt check failed', error);
+                        UIComponents.showToast(error?.message || 'Receipt check failed', 'error');
+                    }
+                });
+                actions.appendChild(checkReceiptsBtn);
             }
 
             if (
@@ -19457,7 +19495,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (ftNanahCompassLiveBtn) {
         ftNanahCompassLiveBtn.addEventListener('click', () => {
-            setNanahMode('parent', { persist: true, applyPreset: true });
+            setNanahMode('parent_control', { persist: true, applyPreset: true });
             updateNanahUi();
             focusNanahElement(ftNanahHostBtn || ftNanahStatusCard || ftNanahDeliveryLiveCard);
             UIComponents.showToast('Open the protected device, pair, verify, then Send Update', 'info');
@@ -19484,7 +19522,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 UIComponents.showToast(ftNanahQuickSendUpdateBtn.title || 'Send Update is unavailable here', 'warning');
                 return;
             }
-            setNanahMode('parent', { persist: true, applyPreset: true });
+            setNanahMode('parent_control', { persist: true, applyPreset: true });
             updateNanahUi();
             focusNanahElement(ftNanahHostBtn || ftNanahStatusCard || ftNanahDeliveryLiveCard);
             UIComponents.showToast('Start pairing, then match the phrase on both devices', 'info');
