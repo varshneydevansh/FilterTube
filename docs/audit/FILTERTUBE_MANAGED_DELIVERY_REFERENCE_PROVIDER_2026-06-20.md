@@ -19,6 +19,7 @@ default it keeps an in-memory queue for:
 - Internet Pickup redacted delivery receipts.
 - Home Pickup signed local-network candidates.
 - Home Pickup redacted delivery receipts.
+- Revocation cleanup for pending Internet Pickup and Home Pickup rows.
 
 It exists so the browser extension's configured provider hooks can be exercised
 against a real endpoint shape before a hosted service or native app provider is
@@ -109,7 +110,7 @@ The reference provider accepts paths under any prefix, so
 | `POST */managed-mailbox/pull` | Protected device pulls matching pending rows. | Ciphertext rows. |
 | `POST */managed-mailbox/ack` | Protected device posts delivery/apply result. | Redacted receipt metadata. |
 | `POST */managed-mailbox/ack/pull` | Parent/source checks delivery status. | Redacted receipt metadata. |
-| `POST */managed-mailbox/purge` | Delete pending rows after revocation or cleanup. | No plaintext. |
+| `POST */managed-mailbox/purge` | Delete pending rows and matching redacted receipts after revocation or cleanup. | No plaintext. |
 | `POST */managed-mailbox/health` | Check whether the configured pickup is reachable and whether a local durable store is enabled. | Health metadata only. |
 
 Mailbox upload rejects plaintext policy keys such as `payload`, `keywords`,
@@ -124,11 +125,17 @@ Mailbox upload rejects plaintext policy keys such as `payload`, `keywords`,
 | `POST */managed-local-network/discover` | Protected device pulls matching candidates. | Signed candidates. |
 | `POST */managed-local-network/ack` | Protected device posts delivery/apply result. | Redacted receipt metadata. |
 | `POST */managed-local-network/ack/pull` | Parent/source checks delivery status. | Redacted receipt metadata. |
+| `POST */managed-local-network/purge` | Delete matching pending candidates and redacted receipts after trusted-link removal or signing-key rotation. | No plaintext rules or private secrets. |
 
 Home Pickup rejects private secrets and credentials. It may carry the signed
 managed-policy envelope because this path is same-network signed delivery, not
 ciphertext mailbox storage. The receiving protected device still validates the
 signature/hash/target locally before applying anything.
+
+The purge endpoint is cleanup only. It is called by the extension when a managed
+trusted link is removed or the parent/source signing key is rotated. The request
+is scoped by link/profile/device/scope metadata and never grants authority to a
+network service.
 
 ## Parent-Facing Durability Status
 

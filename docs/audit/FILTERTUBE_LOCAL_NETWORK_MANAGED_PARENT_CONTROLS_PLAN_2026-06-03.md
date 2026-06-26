@@ -2461,3 +2461,9 @@ follow. I will share progress as this moves from audit/spec into implementation.
   from redacted observations, requires synced contract/runtime proof, preserves
   platform-specific adapter proof, refuses sensitive fields, and still proves
   only the platform named in the artifact.
+- [x] 2026-06-26 Home Pickup cleanup slice: the reference provider now exposes
+  `POST */managed-local-network/purge`, the browser Home Pickup client can call
+  it, and Accounts & Sync invokes it when a managed trusted link is removed or a
+  parent/source signing key is rotated. This closes stale same-network candidate
+  cleanup for explicit Home Pickup services without adding automatic LAN
+  discovery or treating the network service as policy authority.

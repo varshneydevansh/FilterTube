@@ -267,6 +267,27 @@
         };
     }
 
+    function sanitizePurgeRequest(request) {
+        const root = safeObject(request);
+        return {
+            schema: normalizeString(root.schema) || 'filtertube_managed_local_network_purge_request',
+            version: Number(root.version) || 1,
+            transport: 'local_network',
+            reason: normalizeString(root.reason) || 'trusted_link_removed',
+            requestedAt: Number(root.requestedAt) || Date.now(),
+            revokedAt: Number(root.revokedAt) || null,
+            linkId: normalizeString(root.linkId),
+            remoteDeviceId: normalizeString(root.remoteDeviceId),
+            sourceDeviceId: normalizeString(root.sourceDeviceId),
+            sourceProfileId: normalizeString(root.sourceProfileId),
+            targetProfileId: normalizeString(root.targetProfileId),
+            targetProfileName: normalizeString(root.targetProfileName),
+            scopes: safeArray(root.scopes || root.allowedScopes).map(item => normalizeString(item).toLowerCase()).filter(Boolean),
+            allowedScopes: safeArray(root.allowedScopes || root.scopes).map(item => normalizeString(item).toLowerCase()).filter(Boolean),
+            candidateIds: safeArray(root.candidateIds || root.localNetworkCandidateIds || root.ids).map(normalizeString).filter(Boolean)
+        };
+    }
+
     function sanitizeHealthRequest(request) {
         const root = safeObject(request);
         return {
@@ -311,6 +332,7 @@
         const discoverPath = parsed.discoverPath || 'managed-local-network/discover';
         const ackPath = parsed.ackPath || 'managed-local-network/ack';
         const ackPullPath = parsed.ackPullPath || parsed.deliveryAckPath || 'managed-local-network/ack/pull';
+        const purgePath = parsed.purgePath || 'managed-local-network/purge';
 
         function unavailable(reason) {
             return { schema: PROVIDER_SCHEMA, version: 1, ok: false, reason };
@@ -365,6 +387,10 @@
             return postJson(ackPath, sanitizeAckRequest(request));
         }
 
+        async function purgeLocalNetworkCandidates(request) {
+            return postJson(purgePath, sanitizePurgeRequest(request));
+        }
+
         async function pullManagedDeliveryAcks(request) {
             const result = await postJson(ackPullPath, sanitizeDeliveryAckPullRequest(request));
             if (result.ok === false) return { ...result, acks: [] };
@@ -403,6 +429,9 @@
             pullManagedDeliveryAcks,
             pullRemoteDeliveryAcks: pullManagedDeliveryAcks,
             getManagedDeliveryAcks: pullManagedDeliveryAcks,
+            purgeLocalNetworkCandidates,
+            purgeManagedPolicyCandidates: purgeLocalNetworkCandidates,
+            purgeManagedLocalNetworkCandidates: purgeLocalNetworkCandidates,
             checkManagedLocalNetworkBridge,
             checkBridgeHealth: checkManagedLocalNetworkBridge,
             healthCheck: checkManagedLocalNetworkBridge

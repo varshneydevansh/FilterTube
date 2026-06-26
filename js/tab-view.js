@@ -3195,6 +3195,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'linkCount',
         'liveSentCount',
         'localNetworkDeliveredCount',
+        'localNetworkPurgedCount',
         'mainRuleCount',
         'mailboxUploadedCount',
         'mailboxPurgedCount',
@@ -14570,6 +14571,75 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    function buildNanahManagedLocalNetworkPurgeRequestForTrustedLink(link, { reason = 'trusted_link_removed' } = {}) {
+        const trusted = normalizeNanahTrustedLink(link);
+        if (!trusted || trusted.linkType !== 'managed_link' || trusted.localRole !== 'source' || trusted.remoteRole !== 'replica') return null;
+        const policy = safeObject(trusted.policy);
+        const linkId = normalizeString(trusted.linkId || trusted.id);
+        if (!linkId) return null;
+        const now = Date.now();
+        const scopes = getNanahManagedPolicyScopeList(policy.allowedScopes || policy.defaultScope);
+        return {
+            schema: 'filtertube_managed_local_network_purge_request',
+            version: 1,
+            transport: 'local_network',
+            reason: normalizeString(reason) || 'trusted_link_removed',
+            requestedAt: now,
+            revokedAt: now,
+            linkId,
+            remoteDeviceId: normalizeString(trusted.remoteDeviceId),
+            sourceDeviceId: normalizeString(trusted.sourceDeviceId || policy.sourceDeviceId),
+            sourceProfileId: normalizeString(trusted.sourceProfileId || policy.sourceProfileId),
+            targetProfileId: normalizeString(policy.targetProfileId),
+            targetProfileName: normalizeString(policy.targetProfileName),
+            scopes,
+            allowedScopes: scopes,
+            purgeStates: ['pending', 'ack']
+        };
+    }
+
+    function getNanahManagedLocalNetworkPurgeWriter(provider = getNanahManagedLocalNetworkProvider()) {
+        const root = safeObject(provider);
+        return root.purgeLocalNetworkCandidates
+            || root.purgeManagedPolicyCandidates
+            || root.purgeManagedLocalNetworkCandidates
+            || null;
+    }
+
+    function normalizePurgedLocalNetworkCandidateCount(result, ok) {
+        const root = safeObject(result);
+        const count = Number(root.purgedCandidateCount ?? root.deletedCandidateCount ?? root.revokedCandidateCount ?? root.candidateCount);
+        return Number.isFinite(count) ? Math.max(0, Math.floor(count)) : (ok ? 0 : 0);
+    }
+
+    async function purgeNanahManagedLocalNetworkQueueForTrustedLink(link, { reason = 'trusted_link_removed' } = {}) {
+        const request = buildNanahManagedLocalNetworkPurgeRequestForTrustedLink(link, { reason });
+        if (!request) return { ok: false, reason: 'not_source_managed_link', purgedCandidateCount: 0 };
+        const provider = getNanahManagedLocalNetworkProvider();
+        const writer = getNanahManagedLocalNetworkPurgeWriter(provider);
+        if (provider.configured !== true || typeof writer !== 'function') {
+            return { ok: false, reason: 'managed_local_network_purge_unavailable', purgedCandidateCount: 0, request };
+        }
+        try {
+            const rawResult = safeObject(await writer.call(provider, request));
+            const ok = rawResult.ok !== false;
+            return {
+                ok,
+                reason: normalizeString(rawResult.reason),
+                purgedCandidateCount: normalizePurgedLocalNetworkCandidateCount(rawResult, ok),
+                purgedCandidateAckCount: normalizeNonNegativeInteger(rawResult.purgedCandidateAckCount) || 0,
+                request
+            };
+        } catch (error) {
+            return {
+                ok: false,
+                reason: normalizeString(error?.message) || 'local_network_purge_provider_failed',
+                purgedCandidateCount: 0,
+                request
+            };
+        }
+    }
+
     async function recordManagedParentPolicyPushHistory(profileId, details = {}) {
         const targetId = normalizeString(profileId);
         const rootDetails = safeObject(details);
@@ -14801,6 +14871,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 label: 'Managed signing key rotated',
                 revokedLinkCount: 1,
                 mailboxPurgedCount: normalizeNonNegativeInteger(rootDetails.mailboxPurgedCount) || 0,
+                localNetworkPurgedCount: normalizeNonNegativeInteger(rootDetails.localNetworkPurgedCount) || 0,
                 previousKeyVersion: normalizeNonNegativeInteger(rootDetails.previousKeyVersion) || 0,
                 nextKeyVersion: normalizeNonNegativeInteger(rootDetails.nextKeyVersion) || 0
             },
@@ -15073,13 +15144,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             nanahTrustedLinks.find((entry) => normalizeString(entry?.linkId) === normalized)
         );
         const mailboxPurgeResult = await purgeNanahManagedMailboxQueueForTrustedLink(removedLink);
+        const localNetworkPurgeResult = await purgeNanahManagedLocalNetworkQueueForTrustedLink(removedLink);
         nanahTrustedLinks = nanahTrustedLinks.filter((entry) => normalizeString(entry?.linkId) !== normalized);
         await purgeNanahManagedPolicyStateForTrustedLink(normalized);
         await purgeNanahManagedOpenSyncStateForTrustedLink(normalized);
         await purgeNanahManagedLocalNetworkSyncStateForTrustedLink(normalized);
         await persistNanahTrustedLinks();
         renderNanahTrustedLinks();
-        return { mailboxPurgeResult };
+        return { mailboxPurgeResult, localNetworkPurgeResult };
     }
 
     function isActiveNanahSourceManagedLink(link) {
@@ -15159,10 +15231,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         let mailboxPurgedCount = 0;
+        let localNetworkPurgedCount = 0;
         for (const link of sourceLinks) {
             const purge = await purgeNanahManagedMailboxQueueForTrustedLink(link, { reason: 'source_signing_key_rotated' });
             const linkMailboxPurgedCount = normalizeNonNegativeInteger(purge?.purgedMailboxItemCount) || 0;
             mailboxPurgedCount += linkMailboxPurgedCount;
+            const localPurge = await purgeNanahManagedLocalNetworkQueueForTrustedLink(link, { reason: 'source_signing_key_rotated' });
+            localNetworkPurgedCount += normalizeNonNegativeInteger(localPurge?.purgedCandidateCount) || 0;
             const linkId = normalizeString(link.linkId);
             const policyPurge = await purgeNanahManagedPolicyStateForTrustedLink(linkId, {
                 reason: 'source_signing_key_rotated',
@@ -15174,7 +15249,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await recordManagedSigningKeyRotationHistoryForLink(link, {
                     previousKeyVersion,
                     nextKeyVersion,
-                    mailboxPurgedCount: linkMailboxPurgedCount
+                    mailboxPurgedCount: linkMailboxPurgedCount,
+                    localNetworkPurgedCount: normalizeNonNegativeInteger(localPurge?.purgedCandidateCount) || 0
                 });
             }
             await purgeNanahManagedOpenSyncStateForTrustedLink(linkId);
@@ -15195,7 +15271,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             previousKeyVersion,
             nextKeyVersion,
             revokedLinkCount: sourceLinks.length,
-            mailboxPurgedCount
+            mailboxPurgedCount,
+            localNetworkPurgedCount
         };
     }
 

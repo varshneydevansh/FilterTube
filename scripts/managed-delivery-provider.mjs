@@ -259,6 +259,21 @@ function pruneExpired(map, now = Date.now()) {
   return removed;
 }
 
+function purgeRowsByRequest(map, request, idName, explicitIds = []) {
+  const ids = new Set(safeArray(explicitIds).map(normalizeString).filter(Boolean));
+  let purged = 0;
+  for (const [key, row] of map) {
+    const rowId = normalizeString(row?.[idName]);
+    const shouldDelete = ids.size > 0
+      ? ids.has(rowId)
+      : matchesRequest(row, request);
+    if (!shouldDelete) continue;
+    map.delete(key);
+    purged += 1;
+  }
+  return purged;
+}
+
 function mapFromRows(rows, keyName, normalizer) {
   const map = new Map();
   for (const row of safeArray(rows)) {
@@ -464,16 +479,14 @@ export function createManagedDeliveryProviderServer(options = {}) {
         return;
       }
       const explicitIds = safeArray(body.mailboxItemIds || body.mailboxIds || body.ids).map(normalizeString).filter(Boolean);
-      let purged = 0;
-      for (const [id, row] of mailboxItems) {
-        const shouldDelete = explicitIds.length > 0 ? explicitIds.includes(id) : matchesRequest(row, body);
-        if (shouldDelete) {
-          mailboxItems.delete(id);
-          purged += 1;
-        }
-      }
-      if (purged > 0) persist();
-      writeJson(res, 200, { ok: true, purgedMailboxItemCount: purged });
+      const purged = purgeRowsByRequest(mailboxItems, body, 'mailboxItemId', explicitIds);
+      const purgedAcks = purgeRowsByRequest(mailboxAcks, body, 'mailboxItemId', explicitIds);
+      if (purged > 0 || purgedAcks > 0) persist();
+      writeJson(res, 200, {
+        ok: true,
+        purgedMailboxItemCount: purged,
+        purgedMailboxAckCount: purgedAcks
+      });
       return;
     }
 
@@ -560,6 +573,23 @@ export function createManagedDeliveryProviderServer(options = {}) {
       }
       const rows = Array.from(localAcks.values()).filter(row => matchesRequest(row, body) && matchesSentPolicy(row, body));
       writeJson(res, 200, { ok: true, acks: rows, ackCount: rows.length });
+      return;
+    }
+
+    if (pathName.endsWith('/managed-local-network/purge')) {
+      if (containsForbiddenKey(body, FORBIDDEN_PLAINTEXT_KEYS)) {
+        writeJson(res, 400, { ok: false, reason: 'plaintext_or_secret_refused' });
+        return;
+      }
+      const explicitIds = safeArray(body.candidateIds || body.localNetworkCandidateIds || body.ids).map(normalizeString).filter(Boolean);
+      const purged = purgeRowsByRequest(localCandidates, body, 'candidateId', explicitIds);
+      const purgedAcks = purgeRowsByRequest(localAcks, body, 'candidateId', explicitIds);
+      if (purged > 0 || purgedAcks > 0) persist();
+      writeJson(res, 200, {
+        ok: true,
+        purgedCandidateCount: purged,
+        purgedCandidateAckCount: purgedAcks
+      });
       return;
     }
 
