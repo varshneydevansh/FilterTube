@@ -130,6 +130,94 @@ assertIncludes(
   docContract.managedDelivery?.requiredUiBoundaries,
   "apps_and_pickup_provider_software_must_not_treat_delivery_labels_as_authority",
 );
+assertDeepEqual(
+  "managed delivery Internet Pickup provider methods",
+  docContract.managedDelivery?.configuredInternetPickupProvider?.requiredMethods,
+  [
+    "uploadManagedMailboxItems",
+    "pullDecryptedMailboxItems",
+    "ackMailboxItems",
+    "pullManagedDeliveryAcks",
+    "purgeManagedMailboxItems",
+    "checkManagedMailboxServer",
+  ],
+);
+assertDeepEqual(
+  "managed delivery Home Pickup provider methods",
+  docContract.managedDelivery?.configuredLocalNetworkProvider?.requiredMethods,
+  [
+    "publishManagedPolicyCandidates",
+    "discoverManagedPolicyCandidates",
+    "ackLocalNetworkCandidates",
+    "pullManagedDeliveryAcks",
+    "purgeLocalNetworkCandidates",
+    "checkManagedLocalNetworkBridge",
+  ],
+);
+assertDeepEqual(
+  "managed delivery Internet Pickup endpoint classes",
+  docContract.managedDelivery?.configuredInternetPickupProvider?.allowedEndpointClasses,
+  ["https"],
+);
+assertIncludes(
+  "managed delivery Internet Pickup forbidden authority",
+  docContract.managedDelivery?.configuredInternetPickupProvider?.forbiddenAuthority,
+  "plaintext_rule_storage",
+);
+assertIncludes(
+  "managed delivery Home Pickup forbidden authority",
+  docContract.managedDelivery?.configuredLocalNetworkProvider?.forbiddenAuthority,
+  "lan_reachability",
+);
+assertDeepEqual(
+  "managed delivery reference provider status and storage contract",
+  {
+    storageMode: docContract.managedDelivery?.referenceProvider?.storageMode,
+    defaultPort: docContract.managedDelivery?.referenceProvider?.defaultPort,
+    browserStatusPage: docContract.managedDelivery?.referenceProvider?.browserStatusPage,
+    apiStatusPayload: docContract.managedDelivery?.referenceProvider?.apiStatusPayload,
+    browserCorsPreflight: docContract.managedDelivery?.referenceProvider?.browserCorsPreflight,
+  },
+  {
+    storageMode: "in_memory_or_optional_json_file_store",
+    defaultPort: 8787,
+    browserStatusPage: true,
+    apiStatusPayload: true,
+    browserCorsPreflight: true,
+  },
+);
+for (const requiredProviderSupport of [
+  "browser_safe_status_page",
+  "read_only_api_status_payload",
+  "redacted_queue_and_receipt_counts",
+  "optional_json_file_persistent_store",
+  "terminal_ack_queue_cleanup",
+  "receipt_retention_expiry",
+  "retention_expiry_cap",
+  "purge_by_state",
+]) {
+  assertIncludes(
+    "managed delivery reference provider supports",
+    docContract.managedDelivery?.referenceProvider?.supports,
+    requiredProviderSupport,
+  );
+}
+for (const forbiddenProviderClaim of [
+  "automatic_lan_peer_discovery",
+  "hosted_internet_pickup_service_ownership",
+  "managed_database_service",
+  "profile_authority",
+  "pin_authority",
+  "trusted_link_authority",
+  "signature_authority",
+  "native_android_ios_parity",
+]) {
+  assertIncludes(
+    "managed delivery reference provider doesNotProvide",
+    docContract.managedDelivery?.referenceProvider?.doesNotProvide,
+    forbiddenProviderClaim,
+  );
+}
 assertIncludes(
   "app native owned responsibilities",
   docContract.appBoundary?.nativeOwnedResponsibilities,

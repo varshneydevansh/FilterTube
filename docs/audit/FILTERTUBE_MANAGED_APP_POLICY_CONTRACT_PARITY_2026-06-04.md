@@ -20,9 +20,10 @@ shape for Main/Kids/Both apply targets, manual/imported-list source filters,
 row badges, saved-list summaries, and protected-user boundaries so mobile/tablet
 surfaces do not fork the parent mental model from the extension. A runnable
 self-hosted reference provider now exists for Internet Pickup and Home Pickup
-transport contracts; it is explicit-endpoint, in-memory, and transport-only,
-so it does not prove hosted service ownership, automatic LAN discovery, or
-native app parity.
+transport contracts; it is explicit-endpoint, transport-only, and can use
+memory or an optional JSON file store, so it does not prove hosted service
+ownership, automatic LAN discovery, managed database operation, or native app
+parity.
 **Runtime behavior changed**: extension no; Android app yes.
 **Goal slice**: Implementation order item 12, "Sync shared policy contract to
 apps", and item 13, "Add app viewing-space/time-limit parity tests".
@@ -391,12 +392,35 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
       "protected_user_ui_never_exposes_delivery_setup_controls",
       "apps_and_pickup_provider_software_must_not_treat_delivery_labels_as_authority"
     ],
+    "configuredInternetPickupProvider": {
+      "sourcePath": "js/nanah_managed_mailbox_client.js",
+      "requiredMethods": [
+        "uploadManagedMailboxItems",
+        "pullDecryptedMailboxItems",
+        "ackMailboxItems",
+        "pullManagedDeliveryAcks",
+        "purgeManagedMailboxItems",
+        "checkManagedMailboxServer"
+      ],
+      "allowedEndpointClasses": [
+        "https"
+      ],
+      "forbiddenAuthority": [
+        "provider_selected_profile",
+        "provider_selected_scope",
+        "plaintext_rule_storage",
+        "unsigned_mailbox_item"
+      ]
+    },
     "configuredLocalNetworkProvider": {
       "sourcePath": "js/nanah_managed_local_network_client.js",
       "requiredMethods": [
         "publishManagedPolicyCandidates",
         "discoverManagedPolicyCandidates",
-        "ackLocalNetworkCandidates"
+        "ackLocalNetworkCandidates",
+        "pullManagedDeliveryAcks",
+        "purgeLocalNetworkCandidates",
+        "checkManagedLocalNetworkBridge"
       ],
       "allowedEndpointClasses": [
         "https",
@@ -414,20 +438,31 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
       "packageScript": "managed:provider",
       "auditPath": "docs/audit/FILTERTUBE_MANAGED_DELIVERY_REFERENCE_PROVIDER_2026-06-20.md",
       "runtimeRole": "self_hosted_transport_reference_only",
-      "storageMode": "in_memory",
+      "storageMode": "in_memory_or_optional_json_file_store",
+      "defaultPort": 8787,
       "requiresExplicitEndpoint": true,
+      "browserStatusPage": true,
+      "apiStatusPayload": true,
       "browserCorsPreflight": true,
       "supports": [
         "ciphertext_mailbox_upload_pull_purge",
         "mailbox_redacted_ack_write_pull",
         "signed_home_pickup_candidate_publish_discover",
         "home_pickup_redacted_ack_write_pull",
-        "optional_bearer_token_for_reference_provider"
+        "optional_bearer_token_for_reference_provider",
+        "browser_safe_status_page",
+        "read_only_api_status_payload",
+        "redacted_queue_and_receipt_counts",
+        "optional_json_file_persistent_store",
+        "terminal_ack_queue_cleanup",
+        "receipt_retention_expiry",
+        "retention_expiry_cap",
+        "purge_by_state"
       ],
       "doesNotProvide": [
         "automatic_lan_peer_discovery",
         "hosted_internet_pickup_service_ownership",
-        "durable_database",
+        "managed_database_service",
         "profile_authority",
         "pin_authority",
         "trusted_link_authority",

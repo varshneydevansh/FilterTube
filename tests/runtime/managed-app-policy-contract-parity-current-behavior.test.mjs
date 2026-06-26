@@ -152,12 +152,40 @@ test('managed app policy parity doc records extension-owned app contract artifac
       'apps_and_pickup_provider_software_must_not_treat_delivery_labels_as_authority'
     ]
   );
+  assert.deepEqual(
+    contract.managedDelivery.configuredInternetPickupProvider.requiredMethods,
+    [
+      'uploadManagedMailboxItems',
+      'pullDecryptedMailboxItems',
+      'ackMailboxItems',
+      'pullManagedDeliveryAcks',
+      'purgeManagedMailboxItems',
+      'checkManagedMailboxServer'
+    ]
+  );
+  assert.deepEqual(contract.managedDelivery.configuredInternetPickupProvider.allowedEndpointClasses, ['https']);
+  assert.ok(contract.managedDelivery.configuredInternetPickupProvider.forbiddenAuthority.includes('plaintext_rule_storage'));
+  assert.deepEqual(
+    contract.managedDelivery.configuredLocalNetworkProvider.requiredMethods,
+    [
+      'publishManagedPolicyCandidates',
+      'discoverManagedPolicyCandidates',
+      'ackLocalNetworkCandidates',
+      'pullManagedDeliveryAcks',
+      'purgeLocalNetworkCandidates',
+      'checkManagedLocalNetworkBridge'
+    ]
+  );
+  assert.ok(contract.managedDelivery.configuredLocalNetworkProvider.forbiddenAuthority.includes('lan_reachability'));
   assert.equal(contract.managedDelivery.referenceProvider.sourcePath, 'scripts/managed-delivery-provider.mjs');
   assert.equal(contract.managedDelivery.referenceProvider.packageScript, 'managed:provider');
   assert.equal(contract.managedDelivery.referenceProvider.auditPath, 'docs/audit/FILTERTUBE_MANAGED_DELIVERY_REFERENCE_PROVIDER_2026-06-20.md');
   assert.equal(contract.managedDelivery.referenceProvider.runtimeRole, 'self_hosted_transport_reference_only');
-  assert.equal(contract.managedDelivery.referenceProvider.storageMode, 'in_memory');
+  assert.equal(contract.managedDelivery.referenceProvider.storageMode, 'in_memory_or_optional_json_file_store');
+  assert.equal(contract.managedDelivery.referenceProvider.defaultPort, 8787);
   assert.equal(contract.managedDelivery.referenceProvider.requiresExplicitEndpoint, true);
+  assert.equal(contract.managedDelivery.referenceProvider.browserStatusPage, true);
+  assert.equal(contract.managedDelivery.referenceProvider.apiStatusPayload, true);
   assert.equal(contract.managedDelivery.referenceProvider.browserCorsPreflight, true);
   assert.deepEqual(
     contract.managedDelivery.referenceProvider.supports,
@@ -166,12 +194,21 @@ test('managed app policy parity doc records extension-owned app contract artifac
       'mailbox_redacted_ack_write_pull',
       'signed_home_pickup_candidate_publish_discover',
       'home_pickup_redacted_ack_write_pull',
-      'optional_bearer_token_for_reference_provider'
+      'optional_bearer_token_for_reference_provider',
+      'browser_safe_status_page',
+      'read_only_api_status_payload',
+      'redacted_queue_and_receipt_counts',
+      'optional_json_file_persistent_store',
+      'terminal_ack_queue_cleanup',
+      'receipt_retention_expiry',
+      'retention_expiry_cap',
+      'purge_by_state'
     ]
   );
   for (const forbiddenClaim of [
     'automatic_lan_peer_discovery',
     'hosted_internet_pickup_service_ownership',
+    'managed_database_service',
     'profile_authority',
     'pin_authority',
     'trusted_link_authority',

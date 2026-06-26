@@ -340,12 +340,35 @@
       "protected_user_ui_never_exposes_delivery_setup_controls",
       "apps_and_pickup_provider_software_must_not_treat_delivery_labels_as_authority"
     ],
+    "configuredInternetPickupProvider": {
+      "sourcePath": "js/nanah_managed_mailbox_client.js",
+      "requiredMethods": [
+        "uploadManagedMailboxItems",
+        "pullDecryptedMailboxItems",
+        "ackMailboxItems",
+        "pullManagedDeliveryAcks",
+        "purgeManagedMailboxItems",
+        "checkManagedMailboxServer"
+      ],
+      "allowedEndpointClasses": [
+        "https"
+      ],
+      "forbiddenAuthority": [
+        "provider_selected_profile",
+        "provider_selected_scope",
+        "plaintext_rule_storage",
+        "unsigned_mailbox_item"
+      ]
+    },
     "configuredLocalNetworkProvider": {
       "sourcePath": "js/nanah_managed_local_network_client.js",
       "requiredMethods": [
         "publishManagedPolicyCandidates",
         "discoverManagedPolicyCandidates",
-        "ackLocalNetworkCandidates"
+        "ackLocalNetworkCandidates",
+        "pullManagedDeliveryAcks",
+        "purgeLocalNetworkCandidates",
+        "checkManagedLocalNetworkBridge"
       ],
       "allowedEndpointClasses": [
         "https",
@@ -363,20 +386,31 @@
       "packageScript": "managed:provider",
       "auditPath": "docs/audit/FILTERTUBE_MANAGED_DELIVERY_REFERENCE_PROVIDER_2026-06-20.md",
       "runtimeRole": "self_hosted_transport_reference_only",
-      "storageMode": "in_memory",
+      "storageMode": "in_memory_or_optional_json_file_store",
+      "defaultPort": 8787,
       "requiresExplicitEndpoint": true,
+      "browserStatusPage": true,
+      "apiStatusPayload": true,
       "browserCorsPreflight": true,
       "supports": [
         "ciphertext_mailbox_upload_pull_purge",
         "mailbox_redacted_ack_write_pull",
         "signed_home_pickup_candidate_publish_discover",
         "home_pickup_redacted_ack_write_pull",
-        "optional_bearer_token_for_reference_provider"
+        "optional_bearer_token_for_reference_provider",
+        "browser_safe_status_page",
+        "read_only_api_status_payload",
+        "redacted_queue_and_receipt_counts",
+        "optional_json_file_persistent_store",
+        "terminal_ack_queue_cleanup",
+        "receipt_retention_expiry",
+        "retention_expiry_cap",
+        "purge_by_state"
       ],
       "doesNotProvide": [
         "automatic_lan_peer_discovery",
         "hosted_internet_pickup_service_ownership",
-        "durable_database",
+        "managed_database_service",
         "profile_authority",
         "pin_authority",
         "trusted_link_authority",
