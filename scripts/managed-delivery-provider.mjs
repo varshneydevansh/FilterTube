@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import http from 'node:http';
 import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
 
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8787;
@@ -240,14 +242,82 @@ function matchesSentPolicy(row, request) {
 }
 
 function pruneExpired(map, now = Date.now()) {
+  let removed = 0;
   for (const [key, row] of map) {
     const expiresAtMs = Number(row.expiresAtMs || row.expiresAt) || 0;
-    if (expiresAtMs && expiresAtMs <= now) map.delete(key);
+    if (expiresAtMs && expiresAtMs <= now) {
+      map.delete(key);
+      removed += 1;
+    }
   }
   while (map.size > MAX_ROWS) {
     const firstKey = map.keys().next().value;
     if (!firstKey) break;
     map.delete(firstKey);
+    removed += 1;
+  }
+  return removed;
+}
+
+function mapFromRows(rows, keyName, normalizer) {
+  const map = new Map();
+  for (const row of safeArray(rows)) {
+    const normalized = normalizer(row);
+    const key = normalizeString(normalized?.[keyName]);
+    if (key) map.set(key, normalized);
+  }
+  return map;
+}
+
+function ackMapFromRows(rows, kind, normalizer) {
+  const map = new Map();
+  for (const row of safeArray(rows)) {
+    const normalized = normalizer(row, kind);
+    if (!normalized) continue;
+    const rowId = kind === 'local'
+      ? normalizeString(normalized.candidateId)
+      : normalizeString(normalized.mailboxItemId);
+    if (!rowId) continue;
+    map.set(`${rowId}:${normalized.scope}:${normalized.revision}`, normalized);
+  }
+  return map;
+}
+
+function loadPersistedState(storePath, now = Date.now()) {
+  if (!storePath) return {};
+  try {
+    if (!fs.existsSync(storePath)) return {};
+    const raw = JSON.parse(fs.readFileSync(storePath, 'utf8'));
+    const root = safeObject(raw);
+    return {
+      mailboxItems: mapFromRows(root.mailboxItems, 'mailboxItemId', row => normalizeMailboxItem(row, now)),
+      mailboxAcks: ackMapFromRows(root.mailboxAcks, 'mailbox', row => normalizeAck(row, 'mailbox', now)),
+      localCandidates: mapFromRows(root.localCandidates, 'candidateId', row => normalizeCandidate(row, now)),
+      localAcks: ackMapFromRows(root.localAcks, 'local', row => normalizeAck(row, 'local', now))
+    };
+  } catch (error) {
+    console.warn(`FilterTube managed delivery provider: could not read store ${storePath}: ${error.message}`);
+    return {};
+  }
+}
+
+function writePersistedState(storePath, state) {
+  if (!storePath) return;
+  try {
+    fs.mkdirSync(path.dirname(storePath), { recursive: true });
+    const tmpPath = `${storePath}.${process.pid}.tmp`;
+    fs.writeFileSync(tmpPath, JSON.stringify({
+      schema: 'filtertube_managed_delivery_provider_store',
+      version: 1,
+      savedAt: Date.now(),
+      mailboxItems: Array.from(state.mailboxItems.values()),
+      mailboxAcks: Array.from(state.mailboxAcks.values()),
+      localCandidates: Array.from(state.localCandidates.values()),
+      localAcks: Array.from(state.localAcks.values())
+    }, null, 2));
+    fs.renameSync(tmpPath, storePath);
+  } catch (error) {
+    console.warn(`FilterTube managed delivery provider: could not write store ${storePath}: ${error.message}`);
   }
 }
 
@@ -304,10 +374,16 @@ function isAuthorized(req, token) {
 
 export function createManagedDeliveryProviderServer(options = {}) {
   const token = normalizeString(options.authToken || process.env.FILTERTUBE_PROVIDER_TOKEN);
-  const mailboxItems = new Map();
-  const mailboxAcks = new Map();
-  const localCandidates = new Map();
-  const localAcks = new Map();
+  const storePath = normalizeString(options.storePath || process.env.FILTERTUBE_PROVIDER_STORE);
+  const persisted = loadPersistedState(storePath);
+  const mailboxItems = persisted.mailboxItems || new Map();
+  const mailboxAcks = persisted.mailboxAcks || new Map();
+  const localCandidates = persisted.localCandidates || new Map();
+  const localAcks = persisted.localAcks || new Map();
+
+  function persist() {
+    writePersistedState(storePath, { mailboxItems, mailboxAcks, localCandidates, localAcks });
+  }
 
   async function route(req, res) {
     if (req.method === 'OPTIONS') {
@@ -324,8 +400,8 @@ export function createManagedDeliveryProviderServer(options = {}) {
     }
 
     const now = Date.now();
-    pruneExpired(mailboxItems, now);
-    pruneExpired(localCandidates, now);
+    const pruned = pruneExpired(mailboxItems, now) + pruneExpired(localCandidates, now);
+    if (pruned > 0) persist();
     const pathName = new URL(req.url || '/', 'http://127.0.0.1').pathname.replace(/\/+$/, '');
     const body = await readBody(req);
     if (pathName.endsWith('/managed-mailbox/upload')) {
@@ -335,6 +411,7 @@ export function createManagedDeliveryProviderServer(options = {}) {
       }
       const rows = safeArray(body.items).map(item => normalizeMailboxItem(item, now)).filter(Boolean);
       for (const row of rows) mailboxItems.set(row.mailboxItemId, row);
+      persist();
       writeJson(res, 200, {
         ok: true,
         schema: 'filtertube_managed_mailbox_server_provider',
@@ -362,6 +439,7 @@ export function createManagedDeliveryProviderServer(options = {}) {
       }
       const rows = safeArray(body.records).map(row => normalizeAck(row, 'mailbox', now)).filter(Boolean);
       for (const row of rows) mailboxAcks.set(`${row.mailboxItemId}:${row.scope}:${row.revision}`, row);
+      persist();
       writeJson(res, 200, {
         ok: true,
         ackedMailboxItemIds: rows.map(row => row.mailboxItemId),
@@ -394,6 +472,7 @@ export function createManagedDeliveryProviderServer(options = {}) {
           purged += 1;
         }
       }
+      if (purged > 0) persist();
       writeJson(res, 200, { ok: true, purgedMailboxItemCount: purged });
       return;
     }
@@ -408,7 +487,8 @@ export function createManagedDeliveryProviderServer(options = {}) {
         schema: 'filtertube_managed_mailbox_server_provider',
         version: 1,
         mailboxReachable: true,
-        service: 'filtertube-managed-delivery-provider'
+        service: 'filtertube-managed-delivery-provider',
+        persistentStore: !!storePath
       });
       return;
     }
@@ -423,7 +503,8 @@ export function createManagedDeliveryProviderServer(options = {}) {
         schema: 'filtertube_managed_local_network_provider',
         version: 1,
         bridgeReachable: true,
-        service: 'filtertube-managed-delivery-provider'
+        service: 'filtertube-managed-delivery-provider',
+        persistentStore: !!storePath
       });
       return;
     }
@@ -435,6 +516,7 @@ export function createManagedDeliveryProviderServer(options = {}) {
       }
       const rows = safeArray(body.candidates).map(row => normalizeCandidate(row, now)).filter(Boolean);
       for (const row of rows) localCandidates.set(row.candidateId, row);
+      persist();
       writeJson(res, 200, {
         ok: true,
         schema: 'filtertube_managed_local_network_provider',
@@ -462,6 +544,7 @@ export function createManagedDeliveryProviderServer(options = {}) {
       }
       const rows = safeArray(body.records).map(row => normalizeAck(row, 'local', now)).filter(Boolean);
       for (const row of rows) localAcks.set(`${row.candidateId}:${row.scope}:${row.revision}`, row);
+      persist();
       writeJson(res, 200, {
         ok: true,
         ackedCandidateIds: rows.map(row => row.candidateId),
@@ -496,13 +579,15 @@ export function createManagedDeliveryProviderServer(options = {}) {
     mailboxItemCount: mailboxItems.size,
     mailboxAckCount: mailboxAcks.size,
     localCandidateCount: localCandidates.size,
-    localAckCount: localAcks.size
+    localAckCount: localAcks.size,
+    persistentStore: !!storePath
   });
   server.resetProviderState = () => {
     mailboxItems.clear();
     mailboxAcks.clear();
     localCandidates.clear();
     localAcks.clear();
+    persist();
   };
   server.providerId = crypto.randomUUID();
   return server;
@@ -514,6 +599,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const server = createManagedDeliveryProviderServer();
   server.listen(port, host, () => {
     const tokenNote = process.env.FILTERTUBE_PROVIDER_TOKEN ? 'Bearer token required' : 'no bearer token set';
-    console.log(`FilterTube managed delivery provider listening on http://${host}:${port}/filtertube (${tokenNote})`);
+    const storeNote = process.env.FILTERTUBE_PROVIDER_STORE
+      ? `persistent store ${process.env.FILTERTUBE_PROVIDER_STORE}`
+      : 'memory store only';
+    console.log(`FilterTube managed delivery provider listening on http://${host}:${port}/filtertube (${tokenNote}, ${storeNote})`);
   });
 }

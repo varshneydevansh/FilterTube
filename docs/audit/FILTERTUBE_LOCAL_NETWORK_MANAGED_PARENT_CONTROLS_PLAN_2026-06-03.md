@@ -176,6 +176,12 @@ extension authority code.
   non-authoritative: policy apply still depends on the trusted managed link,
   target profile, scope, revision, policy hash, device binding, and signature
   checks on each returned candidate.
+- [x] 2026-06-26 reference pickup persistence slice: the self-hosted reference
+  provider can persist sanitized Internet Pickup rows, Home Pickup candidates,
+  and redacted receipts to an operator-chosen JSON file through
+  `FILTERTUBE_PROVIDER_STORE`. This helps real local/home trials survive a
+  provider process restart without adding hosted-service ownership, automatic
+  LAN discovery, plaintext rule storage, or policy authority.
 - [x] 2026-06-21 Home Pickup visible check slice: configured Home Pickup rows
   now show a direct `Check` action in the Family Device Updates map. This is
   only a readiness check for the explicitly configured pickup service; it does

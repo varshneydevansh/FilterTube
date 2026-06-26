@@ -12,8 +12,8 @@ FilterTube now has a dependency-free Node reference provider at:
 npm run managed:provider
 ```
 
-The provider is intentionally a transport proof, not policy authority. It keeps
-an in-memory queue for:
+The provider is intentionally a transport proof, not policy authority. By
+default it keeps an in-memory queue for:
 
 - Internet Pickup ciphertext mailbox items.
 - Internet Pickup redacted delivery receipts.
@@ -23,6 +23,19 @@ an in-memory queue for:
 It exists so the browser extension's configured provider hooks can be exercised
 against a real endpoint shape before a hosted service or native app provider is
 owned.
+
+For real local/home trials, the provider can optionally persist those same
+sanitized rows to a local JSON store:
+
+```bash
+FILTERTUBE_PROVIDER_STORE=.filtertube/managed-delivery-store.json npm run managed:provider
+```
+
+The store is still only transport storage. It contains ciphertext mailbox rows,
+signed Home Pickup candidates, and redacted receipts. It does not store PINs,
+plaintext rules, private keys, or policy authority. The protected device still
+has to validate the saved parent link, target profile, scope, revision, hash,
+and signature before anything applies.
 
 ## Authority Boundary
 
@@ -66,6 +79,7 @@ The reference provider accepts paths under any prefix, so
 | `POST */managed-mailbox/ack` | Protected device posts delivery/apply result. | Redacted receipt metadata. |
 | `POST */managed-mailbox/ack/pull` | Parent/source checks delivery status. | Redacted receipt metadata. |
 | `POST */managed-mailbox/purge` | Delete pending rows after revocation or cleanup. | No plaintext. |
+| `POST */managed-mailbox/health` | Check whether the configured pickup is reachable. | Health metadata only. |
 
 Mailbox upload rejects plaintext policy keys such as `payload`, `keywords`,
 `channels`, `videoIds`, `policy`, `pin`, `password`, and private keys.
@@ -90,7 +104,8 @@ signature/hash/target locally before applying anything.
 - No automatic LAN peer discovery.
 - No multicast, mDNS, WebRTC, or browser network scanning.
 - No hosted FilterTube Internet Pickup deployment.
-- No durable database.
+- No built-in hosted durable database. Optional local JSON persistence is
+  available for self-hosted trials through `FILTERTUBE_PROVIDER_STORE`.
 - No native Android/iOS parity claim.
 - No replacement for live Nanah pairing.
 
