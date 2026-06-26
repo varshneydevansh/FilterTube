@@ -219,6 +219,13 @@ extension authority code.
   later page refresh. This is UI feedback only; it does not change provider
   authority, discovery, trusted-link validation, target-profile matching, scope,
   revision, hash, or signature checks.
+- [x] 2026-06-26 family device map copy slice: the Family Controls command
+  center now describes device control in parent-language: the parent device
+  chooses rules/time/access, protected devices receive signed updates, Send
+  Update is the normal live path, and Home/Internet Pickup are optional waiting
+  paths. This is copy/UX simplification only; it does not change policy schema,
+  provider behavior, discovery, trusted-link validation, revision, hash, or
+  signature checks.
 - [x] 2026-06-21 Home Pickup visible check slice: configured Home Pickup rows
   now show a direct `Check` action in the Family Device Updates map. This is
   only a readiness check for the explicitly configured pickup service; it does

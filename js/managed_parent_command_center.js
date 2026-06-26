@@ -833,9 +833,9 @@
         const copy = document.createElement('div');
         copy.className = 'ft-managed-command-center__trust-map-copy';
         const title = document.createElement('strong');
-        title.textContent = 'Family device map';
+        title.textContent = 'Devices you control';
         const detail = document.createElement('span');
-        detail.textContent = 'Each tile is a protected profile or device you can manage. Internet devices stay on the same family map as live and same-network devices after pairing; pickup paths only carry signed updates.';
+        detail.textContent = 'After pairing, every trusted protected device stays on one family map. Send now when both devices are open; use pickup only when an approved update needs to wait.';
         copy.append(title, detail);
 
         const ring = document.createElement('div');
@@ -844,9 +844,9 @@
         const parentNode = document.createElement('div');
         parentNode.className = 'ft-managed-command-center__trust-parent';
         const parentLabel = document.createElement('strong');
-        parentLabel.textContent = 'Parent device';
+        parentLabel.textContent = 'This parent device';
         const parentDetail = document.createElement('span');
-        parentDetail.textContent = `${summary.profileCount} managed ${summary.profileCount === 1 ? 'profile' : 'profiles'}`;
+        parentDetail.textContent = 'Rules, time, and access are chosen here';
         parentNode.append(parentLabel, parentDetail);
         ring.appendChild(parentNode);
 
@@ -863,19 +863,19 @@
             const route = document.createElement('span');
             let routeLabel = syncState.label;
             if (item.syncLocalNetworkReady === true && item.syncMailboxReady === true) {
-                routeLabel = 'Same-network + internet';
+                routeLabel = 'Home + Internet pickup';
             } else if (item.syncLocalNetworkReady === true) {
-                routeLabel = 'Home Pickup - same network';
+                routeLabel = 'Home pickup';
             } else if (item.syncMailboxReady === true) {
-                routeLabel = 'Internet Pickup - away/internet';
+                routeLabel = 'Internet pickup';
             } else if (item.syncLiveReady === true) {
-                routeLabel = 'Live now - Send Update';
+                routeLabel = 'Open now';
             }
             route.textContent = routeLabel;
             const target = document.createElement('small');
             target.textContent = item.syncTargetCount > 0
                 ? (item.syncTargetLabel || `${item.syncTargetCount} verified device${item.syncTargetCount === 1 ? '' : 's'}`)
-                : 'Pair only if this profile lives on another device';
+                : 'Pair only if this profile also lives on another device';
 
             device.append(name, route, target);
             devices.appendChild(device);
@@ -894,7 +894,7 @@
 
         const note = document.createElement('div');
         note.className = 'ft-managed-command-center__trust-note';
-        note.textContent = 'Network or server reachability is never permission. Only a verified parent link plus a signed newer update can apply.';
+        note.textContent = 'Pickup does not grant control. A protected device accepts only a signed newer update from its saved parent link.';
 
         map.append(copy, ring, note);
         return map;
@@ -918,8 +918,8 @@
         const body = document.createElement('div');
         body.className = 'help-item-body';
         body.textContent = summary.profileCount > 0
-            ? 'Pick a profile, set what it can watch, set daily time, and send the update only when another verified device needs it.'
-            : 'Create one protected profile first. Then set rules, daily time, Main/Kids access, and optional device updates.';
+            ? 'Pick a profile, set rules, daily time, and Main/Kids access. Send to another device only when that profile lives there too.'
+            : 'Create one protected profile first. Then set rules, daily time, Main/Kids access, and pair another device only if needed.';
         const meta = document.createElement('div');
         meta.className = 'ft-managed-command-center__meta';
         const setupNeeds = summary.noDeviceProfileCount
@@ -1128,7 +1128,7 @@
             const promptCopy = document.createElement('div');
             promptCopy.className = 'ft-managed-command-center__provider-copy';
             const promptTitle = document.createElement('strong');
-            promptTitle.textContent = 'Need updates when the other device opens later?';
+            promptTitle.textContent = 'Need a device to pick up changes later?';
             const promptDetail = document.createElement('span');
             promptDetail.textContent = 'Optional. Use Send Update when both devices can be open together.';
             promptCopy.append(promptTitle, promptDetail);
@@ -1138,16 +1138,16 @@
             const promptBody = document.createElement('div');
             promptBody.className = 'ft-managed-command-center__provider-prompt-body';
             const promptBodyText = document.createElement('span');
-            promptBodyText.textContent = 'Normal control is live: open both devices, pair, verify, send. Add one of these only if your family needs approved updates to wait for a device at home, school, or away over the internet.';
+            promptBodyText.textContent = 'Normal control is live: open both devices, pair, verify, send. Add pickup only if approved updates must wait for a protected device at home, school, or away.';
             [
                 {
-                    label: 'Set Up Internet Pickup',
+                    label: 'Internet Pickup',
                     title: 'For protected devices that should collect waiting approved updates next time they open.',
                     action: 'configure_mailbox',
                     scope: 'mailbox_provider'
                 },
                 {
-                    label: 'Set Up Home Pickup',
+                    label: 'Home Pickup',
                     title: 'For a same-network home, clinic, or school pickup path you explicitly set up. Wi-Fi alone never grants control.',
                     action: 'configure_local_network',
                     scope: 'local_network_provider'
