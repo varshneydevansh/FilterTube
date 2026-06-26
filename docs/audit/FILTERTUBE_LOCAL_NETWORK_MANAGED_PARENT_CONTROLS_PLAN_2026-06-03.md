@@ -184,6 +184,13 @@ extension authority code.
   `FILTERTUBE_PROVIDER_STORE`. This helps real local/home trials survive a
   provider process restart without adding hosted-service ownership, automatic
   LAN discovery, plaintext rule storage, or policy authority.
+- [x] 2026-06-26 Home Pickup setup command slice: the Home Pickup setup modal can
+  copy a self-hosted provider command using `FILTERTUBE_PROVIDER_HOST=0.0.0.0`
+  and `FILTERTUBE_PROVIDER_STORE=.filtertube/managed-delivery-store.json`.
+  Parents/admins still have to run that service and enter the reachable
+  `http://<this-computer-lan-ip>:8787/filtertube` address explicitly. This is
+  a setup helper only; it does not scan the network, create trust, or apply
+  policy without the saved parent link and signature/revision gates.
 - [x] 2026-06-21 Home Pickup visible check slice: configured Home Pickup rows
   now show a direct `Check` action in the Family Device Updates map. This is
   only a readiness check for the explicitly configured pickup service; it does

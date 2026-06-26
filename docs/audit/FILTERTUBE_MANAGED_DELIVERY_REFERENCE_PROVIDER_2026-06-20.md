@@ -31,6 +31,20 @@ sanitized rows to a local JSON store:
 FILTERTUBE_PROVIDER_STORE=.filtertube/managed-delivery-store.json npm run managed:provider
 ```
 
+For a same-network Home Pickup trial where another device needs to reach this
+computer, bind the provider to the local network and enter this computer's LAN
+address in FilterTube:
+
+```bash
+FILTERTUBE_PROVIDER_HOST=0.0.0.0 FILTERTUBE_PROVIDER_STORE=.filtertube/managed-delivery-store.json npm run managed:provider
+```
+
+Then configure Home Pickup with:
+
+```text
+http://<this-computer-lan-ip>:8787/filtertube
+```
+
 The store is still only transport storage. It contains ciphertext mailbox rows,
 signed Home Pickup candidates, and redacted receipts. It does not store PINs,
 plaintext rules, private keys, or policy authority. The protected device still

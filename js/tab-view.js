@@ -14063,6 +14063,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         await checkNanahManagedMailboxServerHealth({ reason: 'configure' });
     }
 
+    function buildManagedHomePickupSetupCommand() {
+        return [
+            'FILTERTUBE_PROVIDER_HOST=0.0.0.0',
+            'FILTERTUBE_PROVIDER_STORE=.filtertube/managed-delivery-store.json',
+            'npm run managed:provider'
+        ].join(' ');
+    }
+
+    async function copyManagedHomePickupSetupCommand() {
+        const command = buildManagedHomePickupSetupCommand();
+        const endpointHint = 'http://<this-computer-lan-ip>:8787/filtertube';
+        const text = [
+            '# Run this from the FilterTube project on the home/school pickup computer.',
+            command,
+            '',
+            '# Then enter this Home Pickup address in FilterTube on parent/protected devices:',
+            endpointHint,
+            '',
+            '# Being on the same network is not authority. Protected devices still validate the saved parent link, target profile, scope, revision, hash, and signature.'
+        ].join('\n');
+        try {
+            await navigator.clipboard.writeText(text);
+            UIComponents.showToast('Home Pickup setup command copied', 'success');
+        } catch (error) {
+            console.error('FilterTube: failed to copy Home Pickup setup command', error);
+            UIComponents.showToast('Could not copy setup command', 'error');
+        }
+    }
+
     async function checkNanahManagedLocalNetworkProviderHealth({ reason = 'manual_check', silent = false } = {}) {
         const provider = getNanahManagedLocalNetworkProvider();
         const checkBridge = provider && (
@@ -14133,14 +14162,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                 'Default path: open both devices and use Send Update.',
                 'Home Pickup can help a verified protected device pick up waiting updates on the same network.',
                 'It is not automatic Wi-Fi discovery; being nearby never grants control.',
-                'The protected device still accepts only newer signed updates from its saved parent link.'
+                'The protected device still accepts only newer signed updates from its saved parent link.',
+                'Use Copy Setup Command if you want to run the included self-hosted pickup provider.'
             ],
             configured: !!currentEndpoint,
             configureLabel: currentEndpoint ? 'Edit Home Pickup' : 'Set Up Home Pickup',
             disableLabel: 'Turn Off Home Pickup',
-            extraChoices: currentEndpoint ? [{ value: 'check', label: 'Check Pickup', className: 'btn-secondary' }] : []
+            extraChoices: [
+                { value: 'copy_setup', label: 'Copy Setup Command', className: 'btn-secondary' },
+                ...(currentEndpoint ? [{ value: 'check', label: 'Check Pickup', className: 'btn-secondary' }] : [])
+            ]
         });
         if (action === null) return;
+        if (action === 'copy_setup') {
+            await copyManagedHomePickupSetupCommand();
+            return;
+        }
         if (action === 'check') {
             await checkNanahManagedLocalNetworkProviderHealth({ reason: 'manual_provider_check' });
             renderNanahDeliveryPathStrip();
