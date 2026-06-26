@@ -37,8 +37,10 @@ signed managed-policy envelopes over live Nanah P2P, and optional mailbox/LAN
 providers can receive ciphertext mailbox rows or signed local-network
 candidates when those provider hooks are installed. A browser-side HTTPS mailbox
 client is now available behind explicit configuration and encrypted-item gates.
-Built-in local-network peer discovery, same-network transport, app native enforcement
-proofs, and built-in app/server later-delivery providers remain gated.
+The self-hosted reference pickup provider can now keep sanitized pickup rows
+across process restarts through `FILTERTUBE_PROVIDER_STORE`. Built-in
+local-network peer discovery, automatic same-network transport, hosted provider
+ownership, and app native enforcement proofs remain gated.
 Source-side managed signing-key rotation is now an explicit
 parent/admin action: it regenerates the local source keypair, key-revokes active
 managed protected-device links, purges pending provider/open-sync/LAN/source-ack
@@ -1006,12 +1008,13 @@ parent tool instead of a sync/debug console.
   provider endpoint ownership, and native app parity remain separate lanes.
 - [x] 2026-06-20 reference managed-delivery provider exists as a runnable
   self-hosted proof for Internet Pickup and Home Pickup contracts. It is
-  dependency-free, in-memory, explicit-endpoint only, and transport-only:
-  Internet Pickup accepts ciphertext mailbox rows and redacted receipts, while
-  Home Pickup accepts signed local-network candidates and redacted receipts.
-  It does not add automatic LAN peer discovery, hosted service ownership,
-  profile authority, PIN authority, trusted-link authority, or native app
-  parity.
+  dependency-free, explicit-endpoint only, and transport-only: Internet Pickup
+  accepts ciphertext mailbox rows and redacted receipts, while Home Pickup
+  accepts signed local-network candidates and redacted receipts. By default it
+  is memory-only; `FILTERTUBE_PROVIDER_STORE` can persist sanitized rows for
+  local/home trials. It does not add automatic LAN peer discovery, hosted
+  service ownership, profile authority, PIN authority, trusted-link authority,
+  or native app parity.
 - [ ] Automatic LAN peer discovery authority. This remains app/provider work,
   with extension authority hooks already gated.
 - [x] Configured local-network gateway transport. The extension can install an
@@ -1920,10 +1923,12 @@ replica protected device over Nanah/P2P or same-network transport.
   `docs/audit/FILTERTUBE_MANAGED_SOURCE_DELIVERY_ACK_STATUS_2026-06-05.md`.
   Source-side local-network provider delivery handoff can now publish signed
   local-network candidates and mark sent revision/hash state only for
-  provider-accepted candidate ids. Built-in local-network peer discovery, LAN
-  transport, server mailbox upload/pull, app native enforcement proofs,
-  offline later delivery UI, and built-in multi-device fanout remain gated.
-  Local selected-profile time-limit and viewing-space bulk writes are already
+  provider-accepted candidate ids. The command center can fan out selected
+  protected-profile updates through live P2P, Internet Pickup, or Home Pickup
+  when matching saved links and configured providers exist. Built-in local-network
+  peer discovery, automatic LAN transport, hosted provider ownership, app native
+  enforcement proofs, and native multi-device fanout remain gated. Local
+  selected-profile time-limit and viewing-space bulk writes are already
   dashboard-gated.
 - **Acceptance Criteria**:
   - Existing proposal sends still work for non-managed peer scopes.
