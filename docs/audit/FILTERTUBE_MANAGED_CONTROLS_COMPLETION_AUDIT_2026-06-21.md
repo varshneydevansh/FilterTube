@@ -101,6 +101,25 @@ remaining local queue behavior expected for later managed updates:
 This still does not prove or claim a hosted FilterTube Internet Pickup service,
 automatic LAN peer discovery, or downstream Android/iOS parity.
 
+## 2026-06-26 Provider Setup Status Update
+
+The self-hosted reference provider now has enough operator-facing setup surface
+for local intranet and user-owned internet pickup trials:
+
+- `npm run managed:provider -- --help` prints the Home Pickup and Internet
+  Pickup setup model, supported environment variables, and authority boundary
+- `GET /filtertube` returns a safe read-only status JSON so a parent/admin can
+  confirm the pickup service address before entering it into FilterTube
+- the copied setup instructions in Accounts & Sync tell parents/admins to open
+  the provider address first and confirm the status response
+- README and technical docs now include the self-hosted provider command,
+  Home Pickup address shape, Internet HTTPS boundary, persistent-store option,
+  and status-page privacy rule
+
+This closes the extension-owned self-hosted provider usability gap. It still
+does not create hosted FilterTube Internet Pickup, automatic LAN peer discovery,
+or native app parity.
+
 ## Installed Extension Smoke Artifact
 
 Manual parent/protected-profile smoke is now a strict artifact instead of loose
