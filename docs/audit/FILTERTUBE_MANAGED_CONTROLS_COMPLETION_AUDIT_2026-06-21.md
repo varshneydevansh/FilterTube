@@ -126,6 +126,25 @@ does not claim a FilterTube-hosted Internet Pickup service, automatic LAN peer
 discovery, or downstream native app parity. Those remain deployment/manual/app
 lanes, not missing extension implementation in this slice.
 
+## 2026-07-02 Release-Boundary Refresh
+
+The current release boundary is now recorded in
+`docs/audit/FILTERTUBE_MANAGED_SYNC_RELEASE_CLOSEOUT_2026-07-02.md`.
+
+This refresh changes no runtime behavior. It clarifies that the extension
+release path is complete for explicit configured delivery:
+
+- live `Send Update` when both verified devices are open
+- `Internet Pickup` through a parent/admin configured trusted HTTPS pickup
+  service
+- `Home Pickup` through a parent/admin configured same-network pickup service
+- lazy profile-open saved-update checks when `syncOnProfileOpen` is enabled
+- source-side receipt checks and redacted provider status feedback
+
+Automatic LAN peer discovery is not a missing extension release item. It remains
+future app/provider research because ambient network presence must never become
+policy authority. Native Android/iOS parity also remains downstream app work.
+
 ## 2026-06-26 Provider Setup Status Update
 
 The self-hosted reference provider now has enough operator-facing setup surface

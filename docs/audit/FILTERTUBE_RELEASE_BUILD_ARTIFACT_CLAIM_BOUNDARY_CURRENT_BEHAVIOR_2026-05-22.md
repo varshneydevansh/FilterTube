@@ -86,6 +86,29 @@ that public download links, ZIP contents, Android artifacts, checksums, signing
 identity, browser manifest parity, generated UI freshness, and JSON-first
 runtime claims all match the exact release output.
 
+## 2026-07-02 Managed Sync Release Claim Addendum
+
+`docs/audit/FILTERTUBE_MANAGED_SYNC_RELEASE_CLOSEOUT_2026-07-02.md` is the
+current claim boundary for Family Device Updates and managed pickup delivery.
+
+For release packaging and public wording:
+
+- OK: claim live `Send Update` for verified devices open together.
+- OK: claim optional `Internet Pickup` for a parent/admin configured HTTPS
+  pickup service.
+- OK: claim optional `Home Pickup` for a parent/admin configured same-network
+  pickup service.
+- OK: claim protected devices keep the last accepted policy if no newer valid
+  signed update is reachable.
+- NO-GO: claim automatic LAN peer discovery.
+- NO-GO: claim hosted FilterTube Internet Pickup ownership without a provider
+  ownership artifact.
+- NO-GO: claim native Android/iOS parity until native runtime sync and installed
+  app smoke artifacts are complete.
+
+This addendum changes release wording authority only. Runtime and build behavior
+are unchanged.
+
 ## Current Risk Notes
 
 Reliability risk is concentrated in publication ordering. The script creates a

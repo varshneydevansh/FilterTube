@@ -108,6 +108,24 @@ Risk classification:
 | Dev manifest mutation | `dev:chrome`, `dev:firefox`, and `dev:opera` overwrite tracked `manifest.json`. | Dirty-worktree and manifest-parity gate before release or implementation review. |
 | Native parity | `sync:native-runtime` delegates to a sibling app repo; normal `npm run build` does not invoke it. | Runtime sync freshness and app-boundary proof before claiming extension/app parity. |
 
+## 2026-07-02 Managed Sync Release Close-Out Addendum
+
+`docs/audit/FILTERTUBE_MANAGED_SYNC_RELEASE_CLOSEOUT_2026-07-02.md` is now the
+current release-boundary reference for Family Device Updates, explicit Home
+Pickup, explicit Internet Pickup, and lazy saved-update checks.
+
+Root metadata remains consistent at version `3.3.2` across `package.json`,
+browser manifests, README badges, changelog, and release-note data. The root
+package scripts expose the managed provider, native-runtime sync, provider
+ownership artifact, app parity artifact, and installed-extension smoke artifact
+lanes, but those scripts do not by themselves prove hosted Internet Pickup,
+automatic LAN discovery, or native app parity.
+
+Release copy should say the extension supports live Send Update and optional
+configured pickup paths for verified devices. It should not say FilterTube
+auto-discovers LAN devices, owns a hosted pickup provider, or has complete
+native parity until separate provider/app evidence exists.
+
 ## Lockfile Surface
 
 `package-lock.json` is lockfile version 3 with 112 `packages` entries, including

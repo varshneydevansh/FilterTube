@@ -1093,8 +1093,15 @@ parent tool instead of a sync/debug console.
   point to a trusted key/certificate pair. This improves explicit intranet and
   internet pickup setup only; it does not add automatic LAN discovery, hosted
   provider ownership, profile authority, or provider-side policy authority.
-- [ ] Automatic LAN peer discovery authority. This remains app/provider work,
-  with extension authority hooks already gated.
+- [x] 2026-07-02 automatic LAN peer discovery release boundary. Automatic LAN
+  peer discovery is deliberately not shipped in the extension release path.
+  Extension-side local/intranet sync is complete through explicit Home Pickup:
+  a parent/admin enters a compatible pickup service address, grants that exact
+  endpoint permission, and the protected device still validates trusted link,
+  target profile, scope, revision, hash, and signature before applying anything.
+  Ambient Wi-Fi/LAN presence never becomes authority. Future automatic discovery
+  remains app/provider research and must pass hostile-network proof before any
+  public claim.
 - [x] Configured local-network gateway transport. The extension can install an
   explicit parent-configured provider for publishing, discovering, and
   acknowledging signed local-network candidates through HTTPS or private local
