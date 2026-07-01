@@ -2455,10 +2455,18 @@ function getFilterTubeChannelHrefFromCard(card) {
             '.subhead a[href^="/@"], .subhead a[href^="/channel/"], .subhead a[href^="/c/"], .subhead a[href^="/user/"], ' +
             'ytm-badge-and-byline-renderer a[href^="/@"], ytm-badge-and-byline-renderer a[href^="/channel/"], ' +
             'ytm-badge-and-byline-renderer a[href^="/c/"], ytm-badge-and-byline-renderer a[href^="/user/"], ' +
+            '.ytContentMetadataViewModelMetadataRow a[href^="/@"], ' +
+            '.ytContentMetadataViewModelMetadataRow a[href^="/channel/"], ' +
+            '.ytContentMetadataViewModelMetadataRow a[href^="/c/"], ' +
+            '.ytContentMetadataViewModelMetadataRow a[href^="/user/"], ' +
             '.yt-content-metadata-view-model__metadata-row a[href^="/@"], ' +
             '.yt-content-metadata-view-model__metadata-row a[href^="/channel/"], ' +
             '.yt-content-metadata-view-model__metadata-row a[href^="/c/"], ' +
             '.yt-content-metadata-view-model__metadata-row a[href^="/user/"], ' +
+            '.ytLockupMetadataViewModelMetadata a[href^="/@"], ' +
+            '.ytLockupMetadataViewModelMetadata a[href^="/channel/"], ' +
+            '.ytLockupMetadataViewModelMetadata a[href^="/c/"], ' +
+            '.ytLockupMetadataViewModelMetadata a[href^="/user/"], ' +
             '.yt-lockup-metadata-view-model__metadata a[href^="/@"], ' +
             '.yt-lockup-metadata-view-model__metadata a[href^="/channel/"], ' +
             '.yt-lockup-metadata-view-model__metadata a[href^="/c/"], ' +
@@ -2478,7 +2486,9 @@ function getFilterTubeHomeChannelRow(card) {
             '.YtmCompactMediaItemByline:first-child, ' +
             '.compact-media-item-byline:first-child, ' +
             'ytm-badge-and-byline-renderer, ' +
+            '.ytContentMetadataViewModelMetadataRow:first-child, ' +
             '.yt-content-metadata-view-model__metadata-row:first-child, ' +
+            '.ytLockupMetadataViewModelMetadata .ytAttributedStringHost:first-child, ' +
             '.yt-lockup-metadata-view-model__metadata .yt-core-attributed-string:first-child'
         ) || null;
     } catch (e) {
@@ -2494,8 +2504,11 @@ function getFilterTubeHomeBylineRows(card) {
             '.compact-media-item-byline, ' +
             '.subhead, ' +
             'ytm-badge-and-byline-renderer, ' +
+            '.ytContentMetadataViewModelMetadataRow, ' +
             '.yt-content-metadata-view-model__metadata-row, ' +
             'yt-content-metadata-view-model, ' +
+            '.ytLockupMetadataViewModelMetadata, ' +
+            '.ytLockupMetadataViewModelMetadata .ytAttributedStringHost, ' +
             '.yt-lockup-metadata-view-model__metadata, ' +
             '.yt-lockup-metadata-view-model__metadata .yt-core-attributed-string'
         ) || []);
@@ -2509,6 +2522,7 @@ function getFilterTubeHomeTitleNode(card) {
         return card?.querySelector?.(
             'h3 a, h3, ' +
             '.compact-media-item-headline, .media-item-headline, ' +
+            '.ytLockupMetadataViewModelTitle, .ytLockupMetadataViewModelHeadingReset, ' +
             '.yt-lockup-metadata-view-model__title, ' +
             '.yt-lockup-metadata-view-model-wiz__title'
         ) || null;
@@ -3622,6 +3636,7 @@ async function applyDOMFallback(settings, options = {}) {
             const titleElement = element.querySelector(
                 '#video-title, .ytd-video-meta-block #video-title, h3 a, .metadata-snippet-container #video-title, ' +
                 '#video-title-link, .yt-lockup-metadata-view-model-wiz__title, .yt-lockup-metadata-view-model__title, ' +
+                '.ytLockupMetadataViewModelTitle, .ytLockupMetadataViewModelHeadingReset, ' +
                 '.yt-lockup-metadata-view-model__heading-reset, yt-formatted-string#title, span#title, ' +
                 '.media-item-headline, .compact-media-item-headline, .large-media-item-headline, ' +
                 '.YtmCompactMediaItemHeadline, .YtmVideoWithContextRendererHeadline, ' +
@@ -3747,10 +3762,18 @@ async function applyDOMFallback(settings, options = {}) {
             }
             if (!channelElement) {
                 channelElement = element.querySelector(
+                    '.ytContentMetadataViewModelMetadataRow a[href^="/@"], ' +
+                    '.ytContentMetadataViewModelMetadataRow a[href^="/channel/"], ' +
+                    '.ytContentMetadataViewModelMetadataRow a[href^="/c/"], ' +
+                    '.ytContentMetadataViewModelMetadataRow a[href^="/user/"], ' +
                     '.yt-content-metadata-view-model__metadata-row a[href^="/@"], ' +
                     '.yt-content-metadata-view-model__metadata-row a[href^="/channel/"], ' +
                     '.yt-content-metadata-view-model__metadata-row a[href^="/c/"], ' +
                     '.yt-content-metadata-view-model__metadata-row a[href^="/user/"], ' +
+                    '.ytLockupMetadataViewModelMetadata a[href^="/@"], ' +
+                    '.ytLockupMetadataViewModelMetadata a[href^="/channel/"], ' +
+                    '.ytLockupMetadataViewModelMetadata a[href^="/c/"], ' +
+                    '.ytLockupMetadataViewModelMetadata a[href^="/user/"], ' +
                     '.yt-lockup-metadata-view-model__metadata a[href^="/@"], ' +
                     '.yt-lockup-metadata-view-model__metadata a[href^="/channel/"], ' +
                     '.yt-lockup-metadata-view-model__metadata a[href^="/c/"], ' +
@@ -3766,6 +3789,7 @@ async function applyDOMFallback(settings, options = {}) {
                     '#text, ' +
                     '.ytd-video-owner-renderer a, ' +
                     '.yt-lockup-metadata-view-model-wiz__metadata, ' +
+                    '.ytContentMetadataViewModelMetadataText, ' +
                     '.yt-content-metadata-view-model__metadata-text, ' +
                     'yt-formatted-string[slot="subtitle"], ' +
                     '.watch-card-tertiary-text a'
@@ -3862,6 +3886,28 @@ async function applyDOMFallback(settings, options = {}) {
             const channelPrimaryText = channelElement?.textContent?.trim() || '';
             const channelSubtitleText = channelSubtitleElement?.textContent?.trim() || '';
             let channel = [channelPrimaryText, channelSubtitleText].filter(Boolean).join(' | ');
+            if (!channel) {
+                try {
+                    const avatarChannelLabel = element.querySelector(
+                        'yt-avatar-shape [aria-label*="Go to channel" i], ' +
+                        '.ytSpecAvatarShapeHost[aria-label*="Go to channel" i], ' +
+                        '[aria-label*="Go to channel" i][role="button"]'
+                    )?.getAttribute?.('aria-label') || '';
+                    const avatarChannelName = avatarChannelLabel
+                        .replace(/\s+/g, ' ')
+                        .replace(/^Go to channel\s+/i, '')
+                        .trim();
+                    if (
+                        avatarChannelName &&
+                        !avatarChannelName.startsWith('@') &&
+                        !/^UC[\w-]{22}$/i.test(avatarChannelName) &&
+                        !/\b(views?|subscribers?|watching|ago)\b/i.test(avatarChannelName)
+                    ) {
+                        channel = avatarChannelName;
+                    }
+                } catch (e) {
+                }
+            }
             if (!channel && (
                 elementTag === 'ytm-channel-renderer' ||
                 elementTag === 'ytm-compact-channel-renderer' ||
@@ -5246,10 +5292,18 @@ async function applyDOMFallback(settings, options = {}) {
             '#channel-info ytd-channel-name a, ' +
             'ytd-video-meta-block ytd-channel-name a, ' +
             '#byline-container ytd-channel-name a, ' +
+            '.ytContentMetadataViewModelMetadataRow a[href^="/@"], ' +
+            '.ytContentMetadataViewModelMetadataRow a[href^="/channel/"], ' +
+            '.ytContentMetadataViewModelMetadataRow a[href^="/c/"], ' +
+            '.ytContentMetadataViewModelMetadataRow a[href^="/user/"], ' +
             '.yt-content-metadata-view-model__metadata-row a[href^="/@"], ' +
             '.yt-content-metadata-view-model__metadata-row a[href^="/channel/"], ' +
             '.yt-content-metadata-view-model__metadata-row a[href^="/c/"], ' +
             '.yt-content-metadata-view-model__metadata-row a[href^="/user/"], ' +
+            '.ytLockupMetadataViewModelMetadata a[href^="/@"], ' +
+            '.ytLockupMetadataViewModelMetadata a[href^="/channel/"], ' +
+            '.ytLockupMetadataViewModelMetadata a[href^="/c/"], ' +
+            '.ytLockupMetadataViewModelMetadata a[href^="/user/"], ' +
             '.yt-lockup-metadata-view-model__metadata a[href^="/@"], ' +
             '.yt-lockup-metadata-view-model__metadata a[href^="/channel/"], ' +
             '.yt-lockup-metadata-view-model__metadata a[href^="/c/"], ' +

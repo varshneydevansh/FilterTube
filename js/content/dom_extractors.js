@@ -251,7 +251,7 @@ function ensureVideoIdForCard(card) {
 
 function getCardTitle(card) {
     if (!card || typeof card.querySelector !== 'function') return '';
-    const titleElement = card.querySelector('#video-title, .yt-lockup-metadata-view-model__title, .yt-lockup-metadata-view-model__heading-reset, h3 a, yt-formatted-string#title, span#title');
+    const titleElement = card.querySelector('#video-title, .ytLockupMetadataViewModelTitle, .ytLockupMetadataViewModelHeadingReset, .yt-lockup-metadata-view-model__title, .yt-lockup-metadata-view-model__heading-reset, h3 a, yt-formatted-string#title, span#title');
     if (titleElement?.textContent?.trim()) {
         return cleanVideoTitleText(titleElement.textContent);
     }
@@ -1014,6 +1014,8 @@ function extractVideoIdFromCard(card) {
         };
 
         const primaryHrefSelectors = [
+            'a.ytLockupViewModelContentImage[href*="watch?v="]',
+            'a.ytLockupMetadataViewModelTitle[href*="watch?v="]',
             'a.yt-lockup-view-model__content-image[href*="watch?v="]',
             'a.yt-lockup-metadata-view-model__title[href*="watch?v="]',
             'a#thumbnail[href*="watch?v="]',
@@ -1070,7 +1072,7 @@ function extractVideoIdFromCard(card) {
         }
 
         // Method 2: From video-title link
-        const titleLink = card.querySelector('a#video-title[href*="watch?v="], a.yt-lockup-metadata-view-model__title[href*="watch?v="], a[href*="/watch?v="]');
+        const titleLink = card.querySelector('a#video-title[href*="watch?v="], a.ytLockupMetadataViewModelTitle[href*="watch?v="], a.yt-lockup-metadata-view-model__title[href*="watch?v="], a[href*="/watch?v="]');
         if (titleLink) {
             const href = titleLink.getAttribute('href');
             if (href) {

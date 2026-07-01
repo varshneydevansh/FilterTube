@@ -171,6 +171,97 @@ function isTopicChannel(channel) {
 | `<yt-thumbnail-overlay-badge-view-model>` (Mix badge) | Badge text like “Mix” | ⚠️ Not parsed; consider adding to keyword scan if badges become relevant |
 | `yt-chip-cloud-chip-renderer` (Home/Search filter chips) | DOM-only | ✅ Route-scoped | Mixes/topic chip hiding is intentionally limited to Home (`/`) and Search (`/results`) so Watch related chips do not wake fallback work or move scroll |
 
+### Desktop lockup DOM refresh (2026-07-01)
+
+The current YouTube desktop DOM now uses the lockup view model shape broadly on
+Home, Watch related rows, and search-adjacent result lists:
+
+Historical transition:
+
+| Surface / identity field | Older DOM expectation | Current DOM seen 2026-07-01/02 | Runtime implication |
+| --- | --- | --- | --- |
+| Home normal card host | `ytd-rich-grid-media` or lockup nodes with older dashed helper classes | `ytd-rich-item-renderer[lockup]` wrapping `yt-lockup-view-model.ytLockupViewModelWrapper` | Card discovery must include the host and the nested lockup wrapper. |
+| Lockup title | `.yt-lockup-metadata-view-model__title` / heading reset variants | `a.ytLockupMetadataViewModelTitle` inside `.ytLockupMetadataViewModelTextContainer` | Title and video-id extraction must support camelCase classes. |
+| Thumbnail/video id | `a#thumbnail[href*="watch?v="]` or dashed lockup content image | `a.ytLockupViewModelContentImage[href*="watch?v="]` | Video id extraction must not rely on `#thumbnail` being present. |
+| Byline channel link | Channel anchor inside `ytd-channel-name` or dashed metadata rows | First `.ytContentMetadataViewModelMetadataRow` may have a channel anchor, but can be plain text only | Channel blocking must support text fallback and JSON/video map enrichment. |
+| Channel display name | Anchor text or avatar image `alt` | `.ytSpecAvatarShapeHost[aria-label="Go to channel ..."]` while avatar image `alt` is often empty | DOM fallback and menu extraction now use the avatar aria label as a narrow display-name fallback. |
+| Native menu host | `ytd-menu-renderer` / dashed lockup menu button | `.ytLockupMetadataViewModelMenuButton` with optional `.ytLockupMetadataViewModelBottomRight` | Fallback menu anchoring must include the camelCase menu host. |
+| Collaboration signal | `#attributed-channel-name`, dialog roster, or multiple channel links | `yt-avatar-stack-view-model[aria-label="Collaboration channels"]` plus text like `Name ... and Name` | Collaboration remains enrichment-dependent; bare `and` text is not enough authority by itself. |
+
+| DOM tag / class | Field | FilterTube handling |
+| --- | --- | --- |
+| `<yt-lockup-view-model class="ytLockupViewModelWrapper">` | Card shell | Treat as a normal video card; do not depend only on old dashed class names |
+| `a.ytLockupViewModelContentImage[href*="watch?v="]` | Video URL / video id | Used as a primary video-id source |
+| `a.ytLockupMetadataViewModelTitle` | Title and video URL | Used by title extraction and href fallback |
+| `.ytLockupMetadataViewModelMetadata` | Metadata container | Holds byline rows, sometimes without channel links |
+| `.ytContentMetadataViewModelMetadataRow` | Byline/view rows | First row usually contains channel text or channel anchor |
+| `.ytContentMetadataViewModelMetadataText` | Channel or metadata text | Used as fallback text when no anchor is available |
+| `.ytSpecAvatarShapeHost[aria-label="Go to channel ..."]` | Channel display name | Used as a narrow fallback when the byline is text-only and avatar images have empty `alt` |
+| `.ytLockupMetadataViewModelMenuButton` | Native three-dot menu host | Used for menu/fallback anchoring |
+
+Observed examples:
+
+- Home page shell: `<ytd-two-column-browse-results-renderer page-subtype="home">`
+  -> `<ytd-rich-grid-renderer>` with `<div id="frosted-glass"
+  class="with-chipbar">` and a `ytd-feed-filter-chip-bar-renderer
+  frosted-glass-mode="with-chipbar"`.
+- Home cards: `<ytd-rich-item-renderer lockup>` ->
+  `<yt-lockup-view-model>` -> `<yt-lockup-metadata-view-model>`.
+- Watch related rows: compact/horizontal `<yt-lockup-view-model>` entries with
+  `.ytLockupMetadataViewModelBottomRight` menu placement.
+- Some rows expose `a[href^="/@"]` in the first metadata row; others expose only
+  text plus avatar `aria-label="Go to channel ..."` until JSON/enrichment fills
+  identity.
+- Collaboration rows can expose `yt-avatar-stack-view-model
+  aria-label="Collaboration channels"` and text such as `Pinkpantheress ... and
+  Zara Larsson` without direct channel links for every collaborator. That remains
+  an enrichment-dependent path.
+
+The new DOM still leaves existing `data-filtertube-*` markers visible in sampled
+pages, so there is no proof that YouTube is stripping those attributes. Issue
+#59 remains valid code-burden/privacy debt: long-term state should move toward
+scoped maps where possible, but this DOM refresh is mainly selector and stale
+settings compatibility work.
+
+2026-07-02 repair notes:
+
+- `js/content_bridge.js` refreshed current lockup title/menu/channel selectors,
+  forces settings refresh after block actions, and extracts display names from
+  `Go to channel ...` avatar labels when byline links are absent.
+- `js/content/dom_fallback.js` mirrors the camelCase selector aliases and avatar
+  label fallback for actual hide decisions.
+- `js/content/dom_extractors.js` accepts current lockup title/content-image
+  links as first-class video-id/title sources.
+- `js/background.js` clears compiled settings cache after the older persistent
+  add path writes channel/profile updates, preventing blocklist UI changes from
+  compiling against stale background state.
+
+### Home Shorts shelf refresh (2026-07-01)
+
+The current Home Shorts shelf sample uses a desktop shelf wrapper with mobile
+lockup elements inside:
+
+```html
+<ytd-rich-shelf-renderer>
+  <ytd-rich-item-renderer lockup is-shelf-item is-slim-media>
+    <ytm-shorts-lockup-view-model-v2>
+      <ytm-shorts-lockup-view-model>
+        <a class="shortsLockupViewModelHostEndpoint reel-item-endpoint"
+           href="/shorts/{videoId}">
+        <h3 class="shortsLockupViewModelHostMetadataTitle">
+```
+
+FilterTube coverage:
+
+- `ytm-shorts-lockup-view-model` and `ytm-shorts-lockup-view-model-v2` remain
+  registered video card selectors.
+- Shorts video ids are extracted from `/shorts/{id}` links.
+- DOM hiding targets the outer `ytd-rich-item-renderer` when present so the
+  shelf does not keep an empty slot.
+- Channel blocking still depends on JSON/video-channel enrichment because the
+  visible Shorts shelf DOM usually exposes title and view count, not a channel
+  id.
+
 ### Route-specific chip clouds (2026-06-18)
 
 YouTube reuses the same chip tags on multiple surfaces, but FilterTube should not treat all chip clouds as filterable content.
@@ -568,6 +659,25 @@ On **search page** (`ytd-video-renderer`):
 | `<ytd-playlist-panel-renderer>` | `playlistPanelRenderer` | ⚠️ **NEW** – missing metadata parsing | Header exposes playlist title/channel; confirm JSON paths for keyword scan and consider DOM fallback |
 | `<ytd-playlist-panel-video-renderer>` | `playlistPanelVideoRenderer` | ✅ Covered — **NEW** | Titles/bylines map to existing renderer rules; ensure resume-progress DOM doesn’t hide filtered items |
 | Playlist action controls (`ytd-playlist-loop-button-renderer`, shuffle toggle) | DOM-only | ℹ️ **NEW** | UI buttons only; no filtering required |
+
+### Desktop playlist lockup refresh (2026-07-01)
+
+Recent Watch playlist samples show:
+
+```html
+<ytd-playlist-panel-video-renderer
+  lockup="true"
+  id="playlist-items"
+  use-color-palette>
+  <span id="video-title">...</span>
+  <span id="byline">...</span>
+</ytd-playlist-panel-video-renderer>
+```
+
+Some rows can also carry `data-filtertube-hidden-by-playlist-enrichment="true"`
+after FilterTube hides them. That proves YouTube is not generally removing
+FilterTube DOM attributes in the sampled surface, but these markers should be
+treated as implementation state rather than a public contract.
 
 ### Custom fallback 3-dot support on weak watch rows
 

@@ -2068,7 +2068,7 @@ let filteringTracker = {
 
     recordHide(element, reason) {
         if (!this.isActive || !window.__filtertubeDebug) return;
-        const title = element.querySelector('#video-title, h3 a, .yt-lockup-metadata-view-model__title')?.textContent?.trim() ||
+        const title = element.querySelector('#video-title, h3 a, .ytLockupMetadataViewModelTitle, .yt-lockup-metadata-view-model__title')?.textContent?.trim() ||
             element.getAttribute('aria-label')?.substring(0, 50) ||
             'Unknown';
         const channel = element.getAttribute('data-filtertube-channel-handle') ||
@@ -2080,7 +2080,7 @@ let filteringTracker = {
 
     recordRestore(element) {
         if (!this.isActive || !window.__filtertubeDebug) return;
-        const title = element.querySelector('#video-title, h3 a, .yt-lockup-metadata-view-model__title')?.textContent?.trim() ||
+        const title = element.querySelector('#video-title, h3 a, .ytLockupMetadataViewModelTitle, .yt-lockup-metadata-view-model__title')?.textContent?.trim() ||
             element.getAttribute('aria-label')?.substring(0, 50) ||
             'Unknown';
         const channel = element.getAttribute('data-filtertube-channel-handle') ||
@@ -3329,6 +3329,8 @@ function isMixCardElement(element) {
             'h3 a, ' +
             '.compact-media-item-headline, ' +
             '.media-item-headline, ' +
+            '.ytLockupMetadataViewModelTitle, ' +
+            '.ytLockupViewModelTitle, ' +
             '.yt-lockup-metadata-view-model__title, ' +
             '.yt-lockup-view-model__title, ' +
             '.yt-lockup-metadata-view-model-wiz__title, ' +
@@ -6990,7 +6992,7 @@ function ensureFallbackMenuButtons() {
             if (!metadata) return null;
             let menuHost = null;
             try {
-                menuHost = metadata.querySelector('.yt-lockup-metadata-view-model__menu-button');
+                menuHost = metadata.querySelector('.ytLockupMetadataViewModelMenuButton, .yt-lockup-metadata-view-model__menu-button');
             } catch (e) {
                 menuHost = null;
             }
@@ -7705,7 +7707,7 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
                 if (successCount > 0) {
                     hideRowImmediately(channelInfo.allCollaborators[0] || channelInfo);
                     try {
-                        const refreshed = await requestSettingsFromBackground();
+                        const refreshed = await requestSettingsFromBackground({ forceRefresh: true });
                         if (refreshed?.success && refreshed.settings) {
                             currentSettings = refreshed.settings;
                         }
@@ -7845,7 +7847,7 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
             if (res && res.success) {
                 hideRowImmediately((res && res.channelData) || info || channelInfo);
                 try {
-                    const refreshed = await requestSettingsFromBackground();
+                    const refreshed = await requestSettingsFromBackground({ forceRefresh: true });
                     if (refreshed?.success && refreshed.settings) {
                         currentSettings = refreshed.settings;
                     }
@@ -8665,7 +8667,7 @@ async function enrichVisibleShortsWithChannelInfo(blockedChannelId, settings) {
     if (anyMatchesFound) {
         console.log('FilterTube: Found Shorts from blocked channel, refreshing settings and re-running DOM fallback');
         try {
-            const refreshed = await requestSettingsFromBackground();
+            const refreshed = await requestSettingsFromBackground({ forceRefresh: true });
             if (refreshed?.success && refreshed.settings) {
                 currentSettings = refreshed.settings;
                 applyDOMFallback(refreshed.settings, { forceReprocess: true, preserveScroll: true });
@@ -8841,7 +8843,7 @@ async function enrichVisiblePlaylistRowsWithChannelInfo(blockedChannelId, settin
 
     if (didLearnMapping || didHideRow) {
         try {
-            const refreshed = await requestSettingsFromBackground();
+            const refreshed = await requestSettingsFromBackground({ forceRefresh: true });
             if (refreshed?.success && refreshed.settings) {
                 currentSettings = refreshed.settings;
                 applyDOMFallback(refreshed.settings, { forceReprocess: true, preserveScroll: true });
@@ -9458,6 +9460,19 @@ function extractChannelFromCard(card) {
             if (/\bwatching\b/i.test(normalized)) return '';
             if (/\bago\b/i.test(normalized)) return '';
             return normalized;
+        };
+
+        const extractLockupAvatarLabelName = (root = card) => {
+            try {
+                const label = root?.querySelector?.(
+                    'yt-avatar-shape [aria-label*="Go to channel" i], ' +
+                    '.ytSpecAvatarShapeHost[aria-label*="Go to channel" i], ' +
+                    '[aria-label*="Go to channel" i][role="button"]'
+                )?.getAttribute?.('aria-label') || '';
+                return normalizeChannelNameFromRendererData(label);
+            } catch (e) {
+                return '';
+            }
         };
 
         const extractMobileChannelSurfaceInfo = () => {
@@ -10287,10 +10302,18 @@ function extractChannelFromCard(card) {
                 'ytd-video-meta-block ytd-channel-name a, ' +
                 '#byline-container ytd-channel-name a, ' +
                 'ytd-channel-name #text a, ' +
+                '.ytContentMetadataViewModelMetadataRow a[href^="/@"], ' +
+                '.ytContentMetadataViewModelMetadataRow a[href^="/channel/"], ' +
+                '.ytContentMetadataViewModelMetadataRow a[href^="/c/"], ' +
+                '.ytContentMetadataViewModelMetadataRow a[href^="/user/"], ' +
                 '.yt-content-metadata-view-model__metadata-row a[href^="/@"], ' +
                 '.yt-content-metadata-view-model__metadata-row a[href^="/channel/"], ' +
                 '.yt-content-metadata-view-model__metadata-row a[href^="/c/"], ' +
                 '.yt-content-metadata-view-model__metadata-row a[href^="/user/"], ' +
+                '.ytLockupMetadataViewModelMetadata a[href^="/@"], ' +
+                '.ytLockupMetadataViewModelMetadata a[href^="/channel/"], ' +
+                '.ytLockupMetadataViewModelMetadata a[href^="/c/"], ' +
+                '.ytLockupMetadataViewModelMetadata a[href^="/user/"], ' +
                 '.yt-lockup-metadata-view-model__metadata a[href^="/@"], ' +
                 '.yt-lockup-metadata-view-model__metadata a[href^="/channel/"], ' +
                 '.yt-lockup-metadata-view-model__metadata a[href^="/c/"], ' +
@@ -10349,6 +10372,7 @@ function extractChannelFromCard(card) {
 
             if (!name) {
                 const lockupName = card.querySelector(
+                    '.ytLockupMetadataViewModelMetadata .ytContentMetadataViewModelMetadataRow:first-child .ytContentMetadataViewModelMetadataText, ' +
                     '.yt-lockup-metadata-view-model__metadata .yt-content-metadata-view-model__metadata-row:first-child .yt-content-metadata-view-model__metadata-text'
                 )?.textContent?.trim() || '';
                 const lockupChannelName = normalizeChannelNameFromRendererData(lockupName);
@@ -10360,7 +10384,7 @@ function extractChannelFromCard(card) {
             if (!name) {
                 const avatarImg = card.querySelector('yt-avatar-shape img, img.yt-avatar-shape__image');
                 const avatarAlt = avatarImg?.getAttribute('alt')?.trim() || '';
-                const avatarName = normalizeChannelNameFromRendererData(avatarAlt);
+                const avatarName = normalizeChannelNameFromRendererData(avatarAlt) || extractLockupAvatarLabelName(card);
                 if (avatarName) {
                     name = avatarName;
                 }
@@ -10444,6 +10468,10 @@ function extractChannelFromCard(card) {
             'ytd-channel-name #text a[href*="/channel/"], ' +
             'ytd-channel-name #text a[href*="/c/"], ' +
             'ytd-channel-name #text a[href*="/user/"], ' +
+            '.ytLockupMetadataViewModelMetadata a[href*="/@"], ' +
+            '.ytLockupMetadataViewModelMetadata a[href*="/channel/"], ' +
+            '.ytLockupMetadataViewModelMetadata a[href*="/c/"], ' +
+            '.ytLockupMetadataViewModelMetadata a[href*="/user/"], ' +
             '.yt-lockup-metadata-view-model__metadata a[href*="/@"], ' +
             '.yt-lockup-metadata-view-model__metadata a[href*="/channel/"], ' +
             '.yt-lockup-metadata-view-model__metadata a[href*="/c/"], ' +
@@ -10633,19 +10661,21 @@ function extractChannelFromCard(card) {
 
                 const avatarImg = lockupMetadata.querySelector('yt-avatar-shape img, img.yt-avatar-shape__image');
                 const avatarAlt = avatarImg?.getAttribute('alt')?.trim();
-                if (avatarAlt && !/go to channel/i.test(avatarAlt)) {
+                const avatarLabelName = extractLockupAvatarLabelName(lockupMetadata);
+                const avatarDisplayName = normalizeChannelNameFromRendererData(avatarAlt || '') || avatarLabelName;
+                if (avatarDisplayName) {
                     // Try to find handle link first
-                    const nearbyHandle = lockupMetadata.querySelector('.yt-core-attributed-string__link[href*="/@"]');
+                    const nearbyHandle = lockupMetadata.querySelector('.yt-core-attributed-string__link[href*="/@"], .ytAttributedStringLink[href*="/@"], a[href*="/@"]');
                     if (nearbyHandle) {
                         const href = nearbyHandle.getAttribute('href');
                         const extracted = extractRawHandle(href);
                         if (extracted) {
-                            console.log('FilterTube: Extracted from lockup avatar/link:', { handle: extracted, name: avatarAlt });
-                            return { handle: extracted, name: avatarAlt, logo: extractAvatarUrl() || '' };
+                            console.log('FilterTube: Extracted from lockup avatar/link:', { handle: extracted, name: avatarDisplayName });
+                            return { handle: extracted, name: avatarDisplayName, logo: extractAvatarUrl() || '' };
                         }
                     }
                     // Try /c/ or /user/ links for custom URL channels
-                    const customUrlLink = lockupMetadata.querySelector('.yt-core-attributed-string__link[href*="/c/"], .yt-core-attributed-string__link[href*="/user/"]');
+                    const customUrlLink = lockupMetadata.querySelector('.yt-core-attributed-string__link[href*="/c/"], .yt-core-attributed-string__link[href*="/user/"], .ytAttributedStringLink[href*="/c/"], .ytAttributedStringLink[href*="/user/"], a[href*="/c/"], a[href*="/user/"]');
                     if (customUrlLink) {
                         const href = customUrlLink.getAttribute('href');
                         let path = href;
@@ -10661,26 +10691,26 @@ function extractChannelFromCard(card) {
                             const slug = path.split('/')[2];
                             if (slug) {
                                 const customUrl = `c/${slug}`;
-                                console.log('FilterTube: Extracted from lockup avatar/custom URL (C):', { customUrl, name: avatarAlt });
-                                return { customUrl, name: avatarAlt, logo: extractAvatarUrl() || '' };
+                                console.log('FilterTube: Extracted from lockup avatar/custom URL (C):', { customUrl, name: avatarDisplayName });
+                                return { customUrl, name: avatarDisplayName, logo: extractAvatarUrl() || '' };
                             }
                         }
                         if (path.startsWith('/user/')) {
                             const slug = path.split('/')[2];
                             if (slug) {
                                 const customUrl = `user/${slug}`;
-                                console.log('FilterTube: Extracted from lockup avatar/custom URL (USER):', { customUrl, name: avatarAlt });
-                                return { customUrl, name: avatarAlt, logo: extractAvatarUrl() || '' };
+                                console.log('FilterTube: Extracted from lockup avatar/custom URL (USER):', { customUrl, name: avatarDisplayName });
+                                return { customUrl, name: avatarDisplayName, logo: extractAvatarUrl() || '' };
                             }
                         }
                     }
-                    console.log('FilterTube: Extracted channel name from lockup avatar alt:', { name: avatarAlt });
+                    console.log('FilterTube: Extracted channel name from lockup avatar label:', { name: avatarDisplayName });
 
                     // If the lockup provides a channel name but no clickable link, still return the
                     // name (menu can display it; block flow can resolve via videoId).
                     const videoId = extractVideoIdFromCard(card) || ensureVideoIdForCard(card) || '';
                     if (videoId) {
-                        return { name: avatarAlt, videoId, needsFetch: true };
+                        return { name: avatarDisplayName, videoId, needsFetch: true };
                     }
                 }
 
@@ -10688,6 +10718,14 @@ function extractChannelFromCard(card) {
                     '.yt-core-attributed-string__link[href*="/@"], ' +
                     '.yt-core-attributed-string__link[href*="/c/"], ' +
                     '.yt-core-attributed-string__link[href*="/user/"], ' +
+                    '.ytAttributedStringLink[href*="/@"], ' +
+                    '.ytAttributedStringLink[href*="/channel/"], ' +
+                    '.ytAttributedStringLink[href*="/c/"], ' +
+                    '.ytAttributedStringLink[href*="/user/"], ' +
+                    '.ytContentMetadataViewModelMetadataText a[href*="/@"], ' +
+                    '.ytContentMetadataViewModelMetadataText a[href*="/channel/"], ' +
+                    '.ytContentMetadataViewModelMetadataText a[href*="/c/"], ' +
+                    '.ytContentMetadataViewModelMetadataText a[href*="/user/"], ' +
                     '.yt-content-metadata-view-model__metadata-text a[href*="/@"], ' +
                     '.yt-content-metadata-view-model__metadata-text a[href*="/channel/"], ' +
                     '.yt-content-metadata-view-model__metadata-text a[href*="/c/"], ' +
@@ -10744,12 +10782,12 @@ function extractChannelFromCard(card) {
         }
 
         // Additional extraction for rich-grid lockup view models (new YouTube markup)
-        const lockup = card.querySelector('.yt-lockup-view-model');
+        const lockup = card.querySelector('yt-lockup-view-model, .ytLockupViewModelWrapper, .yt-lockup-view-model');
         if (lockup) {
             const dataHandle = lockup.getAttribute('data-filtertube-channel-handle');
             const dataId = lockup.getAttribute('data-filtertube-channel-id');
-            const metaHandleLink = lockup.querySelector('.yt-lockup-metadata-view-model__metadata a[href*="/@"]');
-            const metaIdLink = lockup.querySelector('.yt-lockup-metadata-view-model__metadata a[href*="/channel/UC"]');
+            const metaHandleLink = lockup.querySelector('.ytLockupMetadataViewModelMetadata a[href*="/@"], .yt-lockup-metadata-view-model__metadata a[href*="/@"]');
+            const metaIdLink = lockup.querySelector('.ytLockupMetadataViewModelMetadata a[href*="/channel/UC"], .yt-lockup-metadata-view-model__metadata a[href*="/channel/UC"]');
 
             if (metaIdLink) {
                 const href = metaIdLink.getAttribute('href') || '';
@@ -10774,6 +10812,10 @@ function extractChannelFromCard(card) {
             if (dataHandle || dataId) {
                 let name = '';
                 const channelLink = lockup.querySelector(
+                    '.ytLockupMetadataViewModelMetadata a[href*="/@"], ' +
+                    '.ytLockupMetadataViewModelMetadata a[href*="/channel/UC"], ' +
+                    '.ytLockupMetadataViewModelMetadata a[href*="/c/"], ' +
+                    '.ytLockupMetadataViewModelMetadata a[href*="/user/"], ' +
                     '.yt-lockup-metadata-view-model__metadata a[href*="/@"], ' +
                     '.yt-lockup-metadata-view-model__metadata a[href*="/channel/UC"], ' +
                     '.yt-lockup-metadata-view-model__metadata a[href*="/c/"], ' +
@@ -10786,8 +10828,9 @@ function extractChannelFromCard(card) {
                 if (!name) {
                     const avatarImg = lockup.querySelector('yt-avatar-shape img, img.yt-avatar-shape__image');
                     const avatarAlt = avatarImg?.getAttribute('alt')?.trim() || '';
-                    if (avatarAlt && !/go to channel/i.test(avatarAlt)) {
-                        name = avatarAlt;
+                    const avatarName = normalizeChannelNameFromRendererData(avatarAlt) || extractLockupAvatarLabelName(lockup);
+                    if (avatarName) {
+                        name = avatarName;
                     }
                 }
 
@@ -10811,6 +10854,7 @@ function extractChannelFromCard(card) {
             const fallbackNameRaw = card.querySelector(
                 '#channel-info ytd-channel-name a, ' +
                 '#channel-info #channel-name a, ' +
+                '.ytLockupMetadataViewModelMetadata a[href*="/@"], ' +
                 '.yt-lockup-metadata-view-model__metadata a[href*="/@"], ' +
                 'ytm-channel-thumbnail-with-link-renderer a[href*="/@"], ' +
                 'ytm-channel-thumbnail-with-link-renderer a[href*="/channel/UC"], ' +
@@ -10826,7 +10870,7 @@ function extractChannelFromCard(card) {
                 'a.media-item-subtitle[href*="/user/"], ' +
                 '.YtmBadgeAndBylineRendererItemByline .yt-core-attributed-string, ' +
                 '.YtmCompactMediaItemByline .yt-core-attributed-string'
-            )?.textContent?.trim() || '';
+            )?.textContent?.trim() || extractLockupAvatarLabelName(card) || '';
             const fallbackNameNormalized = normalizeYtmChannelName(fallbackNameRaw);
             const fallbackName = fallbackNameNormalized
                 ? fallbackNameNormalized
@@ -13542,7 +13586,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         // After storage is updated, pull fresh settings (to include the new channel) and re-run DOM pass
         let refreshedSettings = null;
         try {
-            const refreshed = await requestSettingsFromBackground();
+            const refreshed = await requestSettingsFromBackground({ forceRefresh: true });
             if (refreshed?.success && refreshed.settings) {
                 refreshedSettings = refreshed.settings;
                 currentSettings = refreshed.settings;

@@ -5335,6 +5335,8 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                     writePayload[FT_PROFILES_V4_KEY] = nextProfilesV4;
                 }
                 await new Promise(resolve => browserAPI.storage.local.set(writePayload, resolve));
+                compiledSettingsCache.main = null;
+                compiledSettingsCache.kids = null;
 
                 console.log("FilterTube Background: Persistent add success", newEntry);
                 try {
