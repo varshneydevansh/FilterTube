@@ -128,14 +128,18 @@ const UIComponents = (() => {
      * @param {boolean} options.active - Initial active state
      * @param {Function} options.onToggle - Toggle handler
      * @param {string} options.className - Additional classes
+     * @param {string} options.title - Optional hover/focus help text
+     * @param {string} options.ariaLabel - Optional accessible label
      * @returns {HTMLElement}
      */
-    function createToggleButton({ text, active = false, onToggle, className = '' }) {
+    function createToggleButton({ text, active = false, onToggle, className = '', title = '', ariaLabel = '' }) {
         const toggle = document.createElement('div');
         toggle.className = `exact-toggle ${active ? 'active' : ''} ${className}`.trim();
         toggle.textContent = text;
+        if (title) toggle.title = title;
         toggle.setAttribute('role', 'button');
         toggle.setAttribute('aria-pressed', active);
+        if (ariaLabel || title) toggle.setAttribute('aria-label', ariaLabel || `${text}: ${title}`);
         toggle.setAttribute('tabindex', '0');
 
         toggle.addEventListener('click', () => {
@@ -344,7 +348,10 @@ const UIComponents = (() => {
             const exactToggle = createToggleButton({
                 text: 'Exact',
                 active: exact || false,
-                onToggle: onToggleExact
+                onToggle: onToggleExact,
+                title: exact
+                    ? 'Exact is on: this keyword matches as its own word.'
+                    : 'Exact is off: broader matching can catch plurals and longer forms.'
             });
             controls.appendChild(exactToggle);
         }

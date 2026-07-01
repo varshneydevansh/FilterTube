@@ -412,9 +412,9 @@
                     <div class="view-shell view-shell--settings settings-shell">
                         <section class="view-hero settings-hero">
                             <div class="view-hero__copy">
-                                <p class="view-hero__eyebrow">Backup, restore, and local controls</p>
-                                <h2 class="view-hero__title">Keep every FilterTube setup recoverable, explicit, and easy to manage without losing local control.</h2>
-                                <p class="view-hero__body">Use this page for import/export, automatic backups, and the connection between YouTube Kids and main YouTube. Profiles, security, and cross-device trust now live together in Accounts &amp; Sync.</p>
+                                <p class="view-hero__eyebrow">Backups and imports</p>
+                                <h2 class="view-hero__title">Save your setup, restore it, or bring in a rule list safely.</h2>
+                                <p class="view-hero__body">Use this page for full backups, safe rule-list imports, and automatic backup settings. Profiles, PINs, and device updates live in Accounts &amp; Sync.</p>
                             </div>
                             <div class="view-hero__meta">
                                 <span class="view-meta-pill">Local backups</span>
@@ -870,9 +870,9 @@
                     <div class="view-shell view-shell--settings sync-shell">
                         <section class="view-hero settings-hero sync-hero">
                             <div class="view-hero__copy">
-                                <p class="view-hero__eyebrow">Accounts, security, and device trust</p>
-                                <h2 class="view-hero__title">Manage profiles, PINs, trusted devices, and family updates from one parent-controlled place.</h2>
-                                <p class="view-hero__body">Create protected profiles, set what each profile can watch, then send approved changes to another device only when that profile needs to stay aligned there.</p>
+                                <p class="view-hero__eyebrow">Profiles, PINs, and family devices</p>
+                                <h2 class="view-hero__title">Set who can watch what, then send changes to another device.</h2>
+                                <p class="view-hero__body">Create protected profiles, choose Main or Kids access, set daily time, and update a verified device without giving away the parent PIN.</p>
                             </div>
                             <div class="view-hero__meta">
                                 <span class="view-meta-pill">Profiles</span>
@@ -945,8 +945,8 @@
                                     <div class="nanah-sync-intro">
                                         <div class="nanah-sync-intro__copy">
                                             <span class="nanah-sync-intro__eyebrow">Family device updates</span>
-                                            <p class="nanah-sync-intro__title">Send parent-approved changes to a protected device.</p>
-                                            <p class="nanah-sync-intro__body">For most families: create a protected profile, open both devices, match the phrase, then send rules, time limits, and Main/Kids access. Home Pickup and Internet Pickup stay hidden until a family needs later delivery.</p>
+                                            <p class="nanah-sync-intro__title">Update a protected device.</p>
+                                            <p class="nanah-sync-intro__body">Most families only need two steps: create a protected profile, then start Send Update while both devices are open. Pickup options are optional and stay under Advanced.</p>
                                             <div class="nanah-sync-intro__actions" aria-label="Family device update quick actions">
                                                 <button id="ftNanahQuickCreateProtectedBtn" class="btn-secondary" type="button">Create Protected Profile</button>
                                                 <button id="ftNanahQuickSendUpdateBtn" class="btn-primary" type="button">Start Send Update</button>
@@ -979,7 +979,7 @@
                                                     <small>Optional setup for devices that open later.</small>
                                                 </button>
                                             </div>
-                                            <div class="nanah-device-compass__rule">Send Update is the default. Pickup paths only help verified devices collect signed updates later; they never create authority.</div>
+                                            <div class="nanah-device-compass__rule">Use Send Update first. Pickup paths are only for verified devices that need to collect a signed update later.</div>
                                         </div>
                                         <div class="nanah-sync-simple-path" aria-label="Family device update path">
                                             <article class="nanah-sync-simple-path__item">
@@ -1070,7 +1070,7 @@
                                                 <div>
                                                     <span class="nanah-sync-panel__eyebrow">Profile update</span>
                                                     <h4 class="nanah-sync-panel__title">Choose the update</h4>
-                                                    <p class="nanah-sync-panel__body">Start with Family control. Open More options only for repair, one-time copies, or account moves.</p>
+                                                    <p class="nanah-sync-panel__body">Start with Family control. Most families can leave More options closed.</p>
                                                 </div>
                                                 <span class="nanah-sync-panel__badge">Parent reviewed</span>
                                             </div>
@@ -1311,9 +1311,9 @@
                     <div class="view-shell view-shell--help help-shell">
                         <section class="view-hero help-hero">
                             <div class="view-hero__copy">
-                                <p class="view-hero__eyebrow">Help and reference</p>
-                                <h2 class="view-hero__title">Learn the product quickly without losing the thread of what already ships.</h2>
-                                <p class="view-hero__body">Search the basics, understand how rules behave, and check profile or Kids behavior without leaving the app-style flow.</p>
+                                <p class="view-hero__eyebrow">Help for parents and everyday users</p>
+                                <h2 class="view-hero__title">Start simple, then open the advanced parts only when you need them.</h2>
+                                <p class="view-hero__body">Use this page to decide what to click first, how keyword matching works, and where profiles, backups, imports, and device updates belong.</p>
                             </div>
                         </section>
 
@@ -1324,10 +1324,81 @@
                             </div>
                         </div>
 
+                        <div class="help-start-guide" aria-label="FilterTube parent quick start">
+                            <div class="help-start-guide__intro">
+                                <span>Start here</span>
+                                <strong>Parent setup in plain words</strong>
+                                <p>Do these first. You can ignore advanced sync, imports, and backup settings until the basic rules feel right.</p>
+                            </div>
+                            <div class="help-start-guide__grid">
+                                <article class="help-start-card">
+                                    <span>1</span>
+                                    <strong>Add what you never want to see</strong>
+                                    <p>Use Filters for keywords and channels. Start with a few obvious rules, then test YouTube.</p>
+                                </article>
+                                <article class="help-start-card">
+                                    <span>2</span>
+                                    <strong>Use Exact only for short words</strong>
+                                    <p>Exact off is broader. Exact on is stricter and helps avoid false matches for small words.</p>
+                                </article>
+                                <article class="help-start-card">
+                                    <span>3</span>
+                                    <strong>Create a protected profile</strong>
+                                    <p>Use Accounts &amp; Sync when a child or family member needs their own Main/Kids access, rules, PIN, or time limit.</p>
+                                </article>
+                                <article class="help-start-card">
+                                    <span>4</span>
+                                    <strong>Send updates only after rules look right</strong>
+                                    <p>Use Send Update when both devices are open. Use Pickup only if the other verified device must collect the update later.</p>
+                                </article>
+                            </div>
+                        </div>
+
                         <div class="help-cluster help-cluster--basics">
                             <div class="card">
                                 <div class="card-header">
-                                    <h3>UI Legend (Badges & Pills)</h3>
+                                    <h3>Common Parent Questions</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="help-list">
+                                        <div class="help-item">
+                                            <div class="help-item-title">Where do I add a blocked word?</div>
+                                            <div class="help-item-body">Open <strong>Filters</strong>, add the word under Keywords, then reload or navigate YouTube once. Use the Comment pill only if that word should also filter comments.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">What does Exact mean?</div>
+                                            <div class="help-item-body"><strong>Exact off:</strong> broader matching, so <code>poop</code> can also catch text like <code>poops</code> or <code>pooping</code> when YouTube exposes that text. <strong>Exact on:</strong> stricter matching, so <code>poop</code> matches as its own word and is less likely to catch unrelated longer words.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Where do I block a channel?</div>
+                                            <div class="help-item-body">Use the YouTube 3-dot menu or add the channel in <strong>Filters &gt; Channels</strong>. A stable <code>UC...</code> channel ID is best, but handles and YouTube channel URLs are supported.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">What should I avoid touching at first?</div>
+                                            <div class="help-item-body">Leave device Pickup, full-account sync, import/export, and advanced profile policy alone until basic blocking works. They are useful, but not required for day-one setup.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Which Page Do I Use?</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="help-page-map" aria-label="FilterTube page map">
+                                        <div><strong>Dashboard</strong><span>See quick stats and jump to common actions.</span></div>
+                                        <div><strong>Filters</strong><span>Add keywords, channels, comments, Shorts, and content controls.</span></div>
+                                        <div><strong>Kids Mode</strong><span>Manage YouTube Kids rules separately.</span></div>
+                                        <div><strong>Settings</strong><span>Back up, restore, and import rule lists safely.</span></div>
+                                        <div><strong>Accounts &amp; Sync</strong><span>Create protected profiles, set PINs, time, Main/Kids access, and device updates.</span></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>UI Legend</h3>
                                 </div>
                                 <div class="card-body">
                                     <div class="help-list">
@@ -1378,7 +1449,28 @@
                                 </div>
                             </div>
 
-                            <div class="card">
+                            <details class="card help-technical-card">
+                                <summary class="card-header help-technical-card__summary">
+                                    <h3>How FilterTube Works</h3>
+                                    <span>Technical overview</span>
+                                </summary>
+                                <div class="card-body">
+                                    <p>FilterTube uses two hiding paths so rules keep working as YouTube changes pages.</p>
+                                    <div class="help-list">
+                                        <div class="help-item">
+                                            <div class="help-item-title">Before YouTube draws a card</div>
+                                            <div class="help-item-body">When YouTube loads video data through JSON, FilterTube tries to remove blocked items before they appear.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">After YouTube changes the page</div>
+                                            <div class="help-item-body">YouTube reuses page pieces while you scroll and navigate. FilterTube checks visible cards again and hides anything that matches your rules.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </details>
+
+                            <!-- Legacy technical explanation kept collapsed above for parent-first help flow. -->
+                            <div class="card help-legacy-technical" hidden>
                                 <div class="card-header">
                                     <h3>How FilterTube Works</h3>
                                 </div>
@@ -1433,7 +1525,7 @@
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Exact</div>
-                                            <div class="help-item-body">When enabled, keyword matching is stricter (useful for short words that cause false matches).</div>
+                                            <div class="help-item-body"><strong>Exact off:</strong> broader matching, so <code>poop</code> can catch <code>poops</code> or <code>pooping</code> when that text is visible to FilterTube. <strong>Exact on:</strong> stricter whole-word matching, so <code>poop</code> must appear as its own word. Use Exact for short words that cause false matches.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Channels</div>

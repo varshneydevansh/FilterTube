@@ -478,10 +478,13 @@ const RenderEngine = (() => {
 
             // Exact toggle
             const exactToggleText = minimal ? 'E' : 'Exact';
+            const exactToggleTitle = getExactKeywordHelpText(entry);
             const exactToggle = UIComponents?.createToggleButton ?
                 UIComponents.createToggleButton({
                     text: exactToggleText,
                     active: entry.exact,
+                    title: exactToggleTitle,
+                    ariaLabel: `${exactToggleText}: ${exactToggleTitle}`,
                     onToggle: async () => {
                         if (typeof onToggleExact === 'function') {
                             await onToggleExact(entry);
@@ -1359,7 +1362,8 @@ const RenderEngine = (() => {
         const toggle = document.createElement('div');
         toggle.className = `exact-toggle ${entry.exact ? 'active' : ''}`;
         toggle.textContent = minimal ? 'E' : 'Exact';
-        toggle.title = 'Exact word matching';
+        toggle.title = getExactKeywordHelpText(entry);
+        toggle.setAttribute('aria-label', `${minimal ? 'E' : 'Exact'}: ${toggle.title}`);
         toggle.addEventListener('click', async () => {
             if (profile === 'kids') {
                 await StateManager?.toggleKidsKeywordExact?.(entry.word);
@@ -1381,6 +1385,14 @@ const RenderEngine = (() => {
         toggle.setAttribute('tabindex', '0');
         toggle.setAttribute('aria-pressed', entry.exact ? 'true' : 'false');
         return toggle;
+    }
+
+    function getExactKeywordHelpText(entry = {}) {
+        const word = String(entry.word || 'this keyword').trim() || 'this keyword';
+        if (entry.exact) {
+            return `Exact is on: "${word}" must appear as its own word.`;
+        }
+        return `Exact is off: "${word}" can also match plurals or longer forms when YouTube exposes that text.`;
     }
 
     /**

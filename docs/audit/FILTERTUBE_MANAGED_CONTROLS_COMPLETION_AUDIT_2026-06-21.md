@@ -81,6 +81,18 @@ This checkpoint does not change runtime behavior. It narrows the remaining
 release decision to manual smoke, provider ownership, downstream app parity, and
 claim review.
 
+## 2026-07-02 Parent-First UX Check
+
+Parent-facing copy and Help onboarding were simplified after user feedback that
+FilterTube worked, but the dashboard/docs felt too technical for parents. The
+focused evidence is now tracked in:
+
+- `docs/audit/FILTERTUBE_PARENT_FIRST_HELP_AND_CONTROL_SURFACE_SIMPLIFICATION_2026-07-02.md`
+
+This changes copy, Help structure, and shared keyword-toggle help text only. It
+does not close hosted Internet Pickup ownership, automatic LAN discovery, native
+Android/iOS parity, or installed two-device smoke gaps.
+
 ## 2026-06-26 Pickup Runtime Update
 
 The extension-owned Home Pickup and Internet Pickup provider path now has the
