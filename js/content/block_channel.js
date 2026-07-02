@@ -471,6 +471,7 @@ const isMobileWatchNextQuickBlockHost = (hostCard) => {
             hostCard.matches?.(
                 'ytm-media-item, ' +
                 'ytm-video-with-context-renderer, ' +
+                'ytm-video-card-renderer, ' +
                 'ytm-compact-video-renderer, ' +
                 'ytm-watch-card-hero-video-renderer, ' +
                 'ytm-watch-card-rich-header-renderer, ' +
@@ -479,6 +480,7 @@ const isMobileWatchNextQuickBlockHost = (hostCard) => {
                 'ytm-radio-renderer, ' +
                 'ytm-compact-radio-renderer, ' +
                 '.YtmCompactMediaItemHost, ' +
+                '.YtmCompactVideoRendererHost, ' +
                 '.YtmCompactRadioRendererHost, ' +
                 '.ytmPlaylistPanelVideoRendererV2Host, ' +
                 'ytm-shorts-lockup-view-model, ' +
@@ -554,7 +556,7 @@ function resolveQuickBlockHost(node) {
         tag === 'ytm-watch-card-rich-header-renderer'
     ) {
         return node.closest(
-            'ytd-rich-item-renderer, ytd-video-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-playlist-panel-video-renderer, ytd-playlist-panel-video-wrapper-renderer, ytm-rich-item-renderer, ytm-media-item, ytm-video-with-context-renderer, ytm-watch-card-hero-video-renderer, ytm-watch-card-rich-header-renderer, .YtmCompactMediaItemHost, .YtmCompactRadioRendererHost, .YtmCompactChannelRendererHost, .ytmPlaylistPanelVideoRendererV2Host, .ytLockupViewModelWrapper, .ytLockupViewModelHost, .ytGridShelfViewModelGridShelfItem'
+            'ytd-rich-item-renderer, ytd-video-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-playlist-panel-video-renderer, ytd-playlist-panel-video-wrapper-renderer, ytm-rich-item-renderer, ytm-media-item, ytm-video-with-context-renderer, ytm-video-card-renderer, ytm-watch-card-hero-video-renderer, ytm-watch-card-rich-header-renderer, .YtmCompactMediaItemHost, .YtmCompactVideoRendererHost, .YtmCompactRadioRendererHost, .YtmCompactChannelRendererHost, .ytmPlaylistPanelVideoRendererV2Host, .ytLockupViewModelWrapper, .ytLockupViewModelHost, .ytGridShelfViewModelGridShelfItem'
         ) || node;
     }
     if (tag === 'ytd-rich-grid-media') {
@@ -654,6 +656,7 @@ function resolveQuickBlockAnchor(hostCard) {
         '.ytLockupViewModelWrapper',
         '.ytLockupViewModelHost',
         '.YtmCompactMediaItemHost',
+        '.YtmCompactVideoRendererHost',
         '.YtmCompactRadioRendererHost',
         '.YtmCompactChannelRendererHost',
         'ytm-post-renderer',
@@ -1150,7 +1153,9 @@ const QUICK_BLOCK_CARD_SELECTORS = [
     'ytm-rich-item-renderer',
     'ytm-media-item',
     '.YtmCompactMediaItemHost',
+    '.YtmCompactVideoRendererHost',
     'ytm-compact-video-renderer',
+    'ytm-video-card-renderer',
     'ytm-video-with-context-renderer',
     'ytm-watch-card-hero-video-renderer',
     'ytm-watch-card-rich-header-renderer',
@@ -1230,6 +1235,7 @@ const QUICK_BLOCK_CARD_CLASS_NAMES = [
     'ytLockupViewModelWrapper',
     'ytLockupViewModelHost',
     'YtmCompactMediaItemHost',
+    'YtmCompactVideoRendererHost',
     'YtmCompactRadioRendererHost',
     'YtmCompactChannelRendererHost',
     'ytmPlaylistPanelVideoRendererV2Host',
@@ -3013,6 +3019,7 @@ async function handleDropdownAppearedInternal(dropdown) {
         'ytd-compact-promoted-video-renderer, ' +
         'ytm-media-item, ' +
         'ytm-compact-video-renderer, ' +
+        'ytm-video-card-renderer, ' +
         'ytm-video-with-context-renderer, ' +
         'ytm-watch-card-hero-video-renderer, ' +
         'ytm-watch-card-rich-header-renderer, ' +
@@ -3027,6 +3034,7 @@ async function handleDropdownAppearedInternal(dropdown) {
         'ytm-compact-radio-renderer, ' +
         'ytm-lockup-view-model, ' +
         '.YtmCompactMediaItemHost, ' +
+        '.YtmCompactVideoRendererHost, ' +
         '.YtmCompactRadioRendererHost, ' +
         '.YtmCompactChannelRendererHost, ' +
         '.ytmPlaylistPanelVideoRendererV2Host, ' +

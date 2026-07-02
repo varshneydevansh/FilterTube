@@ -2890,9 +2890,11 @@ function applyFilterTubeHomeChannelTapTargets() {
     try {
         const cards = document.querySelectorAll(
             'html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-video-with-context-renderer, ' +
+            'html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-video-card-renderer, ' +
             'html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-compact-video-renderer, ' +
             'html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item, ' +
             'html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .YtmCompactMediaItemHost, ' +
+            'html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .YtmCompactVideoRendererHost, ' +
             'html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .YtmCompactChannelRendererHost, ' +
             'html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .ytLockupViewModelWrapper, ' +
             'html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .ytLockupViewModelHost, ' +
@@ -3631,13 +3633,14 @@ async function applyDOMFallback(settings, options = {}) {
         for (let elementIndex = 0; elementIndex < videoElements.length; elementIndex++) {
             const element = videoElements[elementIndex];
             try {
-            const elementTag = (element.tagName || '').toLowerCase();
-            const isYtmCompactMediaClassHost = Boolean(element.classList?.contains('YtmCompactMediaItemHost'));
-            const isYtmCompactRadioClassHost = Boolean(element.classList?.contains('YtmCompactRadioRendererHost'));
-            const isYtmCompactChannelClassHost = Boolean(element.classList?.contains('YtmCompactChannelRendererHost'));
-            const isYtmPlaylistPanelV2ClassHost = Boolean(element.classList?.contains('ytmPlaylistPanelVideoRendererV2Host'));
-            const isYtmLockupClassHost = Boolean(element.classList?.contains('ytLockupViewModelWrapper') || element.classList?.contains('ytLockupViewModelHost'));
-            const isYtmClassContentHost = isYtmCompactMediaClassHost || isYtmCompactRadioClassHost || isYtmCompactChannelClassHost || isYtmPlaylistPanelV2ClassHost || isYtmLockupClassHost;
+                const elementTag = (element.tagName || '').toLowerCase();
+                const isYtmCompactMediaClassHost = Boolean(element.classList?.contains('YtmCompactMediaItemHost'));
+                const isYtmCompactVideoClassHost = Boolean(element.classList?.contains('YtmCompactVideoRendererHost'));
+                const isYtmCompactRadioClassHost = Boolean(element.classList?.contains('YtmCompactRadioRendererHost'));
+                const isYtmCompactChannelClassHost = Boolean(element.classList?.contains('YtmCompactChannelRendererHost'));
+                const isYtmPlaylistPanelV2ClassHost = Boolean(element.classList?.contains('ytmPlaylistPanelVideoRendererV2Host'));
+                const isYtmLockupClassHost = Boolean(element.classList?.contains('ytLockupViewModelWrapper') || element.classList?.contains('ytLockupViewModelHost'));
+                const isYtmClassContentHost = isYtmCompactMediaClassHost || isYtmCompactVideoClassHost || isYtmCompactRadioClassHost || isYtmCompactChannelClassHost || isYtmPlaylistPanelV2ClassHost || isYtmLockupClassHost;
 
             try {
                 const path = document.location?.pathname || '';
@@ -3934,6 +3937,7 @@ async function applyDOMFallback(settings, options = {}) {
                 elementTag === 'ytm-rich-item-renderer' ||
                 elementTag === 'ytm-media-item' ||
                 elementTag === 'ytm-video-with-context-renderer' ||
+                elementTag === 'ytm-video-card-renderer' ||
                 elementTag === 'ytm-compact-video-renderer' ||
                 elementTag === 'ytm-watch-card-hero-video-renderer' ||
                 elementTag === 'ytm-watch-card-rich-header-renderer' ||
@@ -4078,10 +4082,12 @@ async function applyDOMFallback(settings, options = {}) {
                 elementTag === 'ytm-rich-item-renderer' ||
                 elementTag === 'ytm-media-item' ||
                 elementTag === 'ytm-video-with-context-renderer' ||
+                elementTag === 'ytm-video-card-renderer' ||
                 elementTag === 'ytm-compact-video-renderer' ||
                 elementTag === 'ytm-watch-card-hero-video-renderer' ||
                 elementTag === 'ytm-watch-card-rich-header-renderer' ||
                 isYtmCompactMediaClassHost ||
+                isYtmCompactVideoClassHost ||
                 isYtmCompactRadioClassHost ||
                 isYtmLockupClassHost
             )) {

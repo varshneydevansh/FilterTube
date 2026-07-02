@@ -285,8 +285,9 @@ Runtime boundary:
 The current mobile YouTube (`m.youtube.com`) DOM uses `ytm-*` custom elements
 with camelCase host classes. This mirrors the desktop camelCase lockup shift,
 but the filtering boundary is still card-first: chip bars are UI controls,
-while `ytm-video-with-context-renderer`, `ytm-media-item`, Shorts lockups, and
-compact channel/video rows remain the content-bearing nodes. Runtime support
+while `ytm-video-with-context-renderer`, `ytm-video-card-renderer`,
+`ytm-media-item`, Shorts lockups, and compact channel/video rows remain the
+content-bearing nodes. Runtime support
 was updated after this sample so the new YTM content hosts participate in the
 same card discovery, channel extraction, quick-block, fallback-menu, and stale
 identity clearing paths as desktop camelCase lockups.
@@ -319,6 +320,7 @@ Observed Watch shell:
         <ytm-chip-cloud-chip-renderer role="tab">
       <ytm-video-with-context-renderer class="item adaptive-feed-item">
         <ytm-media-item>
+      <ytm-video-card-renderer>
       <ytm-playlist-panel-video-renderer
         class="ytmPlaylistPanelVideoRendererV2Host">
       <ytm-channel-thumbnail-with-link-renderer
@@ -338,6 +340,7 @@ Observed channel/search-like YTM shells:
 <ytm-call-to-action-button-renderer class="YtmCallToActionButtonRendererHost">
 <ytm-compact-channel-renderer class="YtmCompactChannelRendererHost item">
 <div class="YtmCompactMediaItemHost">
+<div class="YtmCompactVideoRendererHost">
 <div class="YtmCompactMediaItemMetadata">
 <div class="YtmCompactMediaItemByline">
 <ytm-thumbnail-overlay-resume-playback-renderer
@@ -352,7 +355,7 @@ YTM camelCase support matrix:
 | Mobile app shell | `ytm-browse`, `ytm-watch`, old dashed layout classes | `ytm-browse.YtmBrowseHost`, `ytm-watch.ambient-topbar.rounded-edges` | Inventory only. These are route/page wrappers, not hide targets. |
 | Home feed chip bar | `ytm-feed-filter-chip-bar-renderer` with `ytm-chip-cloud-chip-renderer` | same tag plus camelCase support classes such as `YtmChipDividerRendererHost` | Route-gated chip filtering stays allowed on Home. |
 | Watch chip bar | older related chip cloud shapes | `ytm-chip-cloud-renderer.YtmChipCloudRendererHost.chip-bar` with `chips-fixed-positioning chips-visible` | Inventory only on `/watch`; filter actual recommendation rows below it, not the chip labels. |
-| Home/watch video cards | `ytm-video-with-context-renderer`, `ytm-compact-video-renderer` | `ytm-video-with-context-renderer.item.adaptive-feed-item` -> `ytm-media-item`; class-only card body `.YtmCompactMediaItemHost`; also `yt-lockup-view-model.ytLockupViewModelWrapper` / `.ytLockupViewModelHost` inside `ytm-rich-item-renderer` | Supported as first-class card hosts for keyword/channel hide, quick-block, fallback menu, identity extraction, and stale identity clearing. |
+| Home/watch video cards | `ytm-video-with-context-renderer`, `ytm-compact-video-renderer` | `ytm-video-with-context-renderer.item.adaptive-feed-item` -> `ytm-media-item`; horizontal-list cards as `ytm-video-card-renderer`; class-only card bodies `.YtmCompactMediaItemHost` and `.YtmCompactVideoRendererHost`; also `yt-lockup-view-model.ytLockupViewModelWrapper` / `.ytLockupViewModelHost` inside `ytm-rich-item-renderer` | Supported as first-class card hosts for keyword/channel hide, quick-block, fallback menu, identity extraction, and stale identity clearing. |
 | Lockup thumbnail/video id | `a.media-item-thumbnail-container[href*="watch?v="]` | `a.ytLockupViewModelContentImage[href*="watch?v="]` under `yt-lockup-view-model` | Supported as video-id source; not itself a hide target. |
 | Channel/byline metadata | `.media-channel`, `.subhead`, `.media-item-subtitle` | `ytm-channel-thumbnail-with-link-renderer.YtmChannelThumbnailWithLinkRendererHost`, `ytm-badge-and-byline-renderer.YtmBadgeAndBylineRendererHost`, `.YtmBadgeAndBylineRendererItemByline` | Supported as metadata sources for channel name, handle, UC id, and avatar/link hints. |
 | Channel search cards | `ytm-channel-renderer`, `ytm-compact-channel-renderer` | `ytm-compact-channel-renderer.YtmCompactChannelRendererHost` containing `.YtmCompactMediaItemHost`, `.YtmCompactChannelRendererHostMediaItemSubhead`, and `YtmChannelThumbnailWithLinkRendererHost` | Supported as channel/card host and metadata source. |
@@ -375,7 +378,9 @@ New nodes/classes to inventory:
 | --- | --- | --- | --- |
 | `<ytm-browse class="YtmBrowseHost">` | Mobile Home/Browse page wrapper | ℹ️ Wrapper only | Route detection only; not a card selector |
 | `<ytm-media-item>` | Current mobile media card body | ✅ Supported | `js/content/dom_extractors.js`, `js/content/dom_fallback.js`, `js/content_bridge.js`, `js/content/block_channel.js` |
+| `<ytm-video-card-renderer>` | Current mobile horizontal video card | ✅ Supported | Shared card selectors, quick-block, fallback menu, channel extraction, and DOM fallback |
 | `.YtmCompactMediaItemHost` | Current class-only mobile media card body | ✅ Supported | Shared card selectors, quick-block, fallback menu, and channel extraction |
+| `.YtmCompactVideoRendererHost` | Current class-only mobile compact video card host | ✅ Supported | Shared card selectors, quick-block, fallback menu, and channel extraction |
 | `.ytmPlaylistPanelVideoRendererV2Host` | Current mobile Watch/Mix playlist row | ✅ Supported | Shared playlist row detection, quick-block, fallback menu, and channel extraction |
 | `.YtmCompactRadioRendererHost` | Current class-only mobile radio/Mix card | ✅ Supported | Shared card selectors, quick-block, fallback menu, and YTM watch-like collaborator checks |
 | `<ytm-compact-channel-renderer class="YtmCompactChannelRendererHost">` | Mobile channel/search result card | ✅ Supported | Shared card selectors, quick-block, DOM fallback channel/title extraction |
@@ -406,8 +411,9 @@ Implementation notes after runtime patch:
 
 - `js/content/dom_extractors.js`: shared `VIDEO_CARD_SELECTORS` now includes
   YTM camelCase content host classes, including compact media/radio/channel,
-  lockup wrapper/inner host, grid shelf item, Shorts host, and post host
-  classes, in addition to the existing YTM tags.
+  compact video host, lockup wrapper/inner host, grid shelf item, Shorts host,
+  post host classes, and `ytm-video-card-renderer`, in addition to the
+  existing YTM tags.
 - `js/content/dom_fallback.js`: mobile Home post styling and keyword fallback
   now include `ytm-backstage-post-thread-renderer`,
   `ytmBackstagePostRendererHost`, `ytmBackstagePostThreadRendererHost`, and
@@ -415,9 +421,9 @@ Implementation notes after runtime patch:
   channel/lockup hosts are also treated as YTM content hosts where tag checks
   used to be required.
 - `js/content/block_channel.js`: quick-block card discovery now recognizes YTM
-  compact media/radio/channel classes, lockup classes, and post tags/classes
-  so the quick block/menu code can climb from new inner nodes back to the real
-  card.
+  compact media/video/radio/channel classes, lockup classes,
+  `ytm-video-card-renderer`, and post tags/classes so the quick block/menu code
+  can climb from new inner nodes back to the real card.
 - `js/content_bridge.js`: fallback-menu/card handling and YTM identity
   extraction recognize class-only YTM cards alongside the newer YTM
   media/watch-card tags.
@@ -432,6 +438,10 @@ Caveats:
   overlay host classes are documented but intentionally not treated as cards.
   They are wrappers, controls, or visual subcomponents, and using them as hide
   targets would cause false hides.
+- Full parsed evidence from `ytm_new_CamelCase.html` is kept in
+  `docs/audit/FILTERTUBE_YTM_CAMELCASE_DOM_INDEX_2026-07-02.md`. That audit
+  separates real content-card targets from metadata, child media, controls, and
+  page wrappers.
 - The sampled YTM DOM still preserves FilterTube state attributes on filtered
   rows, so this sample does not prove YouTube is stripping extension
   attributes. Issue #59 remains a privacy/code-burden cleanup direction, not
