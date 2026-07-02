@@ -52,6 +52,8 @@ const VIDEO_CARD_SELECTORS = [
     'ytm-post-renderer',
     'ytm-backstage-post-renderer',
     'ytm-backstage-post-thread-renderer',
+    '.ytmBackstagePostRendererHost',
+    '.ytmBackstagePostThreadRendererHost',
     'ytm-channel-renderer',
     'ytm-compact-channel-renderer',
     'ytm-universal-watch-card-renderer',

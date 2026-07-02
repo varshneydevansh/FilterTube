@@ -7016,6 +7016,9 @@ function ensureFallbackMenuButtons() {
             tagName === 'ytm-compact-video-renderer' ||
             tagName === 'ytm-watch-card-hero-video-renderer' ||
             tagName === 'ytm-watch-card-rich-header-renderer' ||
+            tagName === 'ytm-post-renderer' ||
+            tagName === 'ytm-backstage-post-renderer' ||
+            tagName === 'ytm-backstage-post-thread-renderer' ||
             tagName === 'ytm-playlist-video-renderer' ||
             tagName === 'ytm-compact-playlist-renderer' ||
             tagName === 'ytm-shorts-lockup-view-model' ||
@@ -7143,6 +7146,9 @@ function ensureFallbackMenuButtons() {
             tagName === 'ytm-compact-video-renderer' ||
             tagName === 'ytm-watch-card-hero-video-renderer' ||
             tagName === 'ytm-watch-card-rich-header-renderer' ||
+            tagName === 'ytm-post-renderer' ||
+            tagName === 'ytm-backstage-post-renderer' ||
+            tagName === 'ytm-backstage-post-thread-renderer' ||
             tagName === 'ytm-playlist-video-renderer' ||
             tagName === 'ytm-compact-playlist-renderer'
         ) {
@@ -7171,6 +7177,9 @@ function ensureFallbackMenuButtons() {
         'ytm-compact-video-renderer',
         'ytm-watch-card-hero-video-renderer',
         'ytm-watch-card-rich-header-renderer',
+        'ytm-post-renderer',
+        'ytm-backstage-post-renderer',
+        'ytm-backstage-post-thread-renderer',
         'ytm-playlist-video-renderer',
         'ytm-compact-playlist-renderer',
         'ytm-shorts-lockup-view-model',

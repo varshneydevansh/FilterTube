@@ -340,32 +340,63 @@ Observed channel/search-like YTM shells:
 <ytm-shorts-lockup-view-model class="shortsLockupViewModelHost">
 ```
 
-Runtime implications:
+YTM camelCase support matrix:
 
-- Existing YTM card selectors remain first-class:
-  `ytm-video-with-context-renderer`, `ytm-compact-video-renderer`,
-  `ytm-rich-item-renderer`, `ytm-media-item`,
-  `ytm-watch-card-hero-video-renderer`,
-  `ytm-watch-card-rich-header-renderer`,
-  `ytm-channel-thumbnail-with-link-renderer`,
-  `ytm-shorts-lockup-view-model`, and `ytm-shorts-lockup-view-model-v2`.
-- `ytm-media-item`, `ytm-watch-card-hero-video-renderer`, and
-  `ytm-watch-card-rich-header-renderer` are now included in shared card
-  discovery, YTM identity extraction, fallback-menu placement, quick-block
-  anchoring, and recycled-card video-id revalidation.
-- `YtmBadgeAndBylineRendererHost`, `YtmBadgeAndBylineRendererItemByline`, and
-  `YtmChannelThumbnailWithLinkRendererHost` stay metadata sources for channel
-  text/avatar/link extraction.
-- `ytm-chip-cloud-chip-renderer` should only wake fallback processing on Home
-  and Search routes, matching the desktop chip boundary.
-- Mobile Watch recommendation cards under
-  `ytm-chip-cloud-renderer.YtmChipCloudRendererHost.chip-bar` remain filterable
-  because the rows below it are actual video cards; the chip labels themselves
-  are not hide targets on `/watch`.
+| Surface / extraction point | Previous / older YTM shape | Current YTM shape observed | Runtime requirement |
+| --- | --- | --- | --- |
+| Mobile app shell | `ytm-browse`, `ytm-watch`, old dashed layout classes | `ytm-browse.YtmBrowseHost`, `ytm-watch.ambient-topbar.rounded-edges` | Inventory only. These are route/page wrappers, not hide targets. |
+| Home feed chip bar | `ytm-feed-filter-chip-bar-renderer` with `ytm-chip-cloud-chip-renderer` | same tag plus camelCase support classes such as `YtmChipDividerRendererHost` | Route-gated chip filtering stays allowed on Home. |
+| Watch chip bar | older related chip cloud shapes | `ytm-chip-cloud-renderer.YtmChipCloudRendererHost.chip-bar` with `chips-fixed-positioning chips-visible` | Inventory only on `/watch`; filter actual recommendation rows below it, not the chip labels. |
+| Home/watch video cards | `ytm-video-with-context-renderer`, `ytm-compact-video-renderer` | `ytm-video-with-context-renderer.item.adaptive-feed-item` -> `ytm-media-item`; also `yt-lockup-view-model.ytLockupViewModelWrapper` inside `ytm-rich-item-renderer` | Supported as first-class card hosts for keyword/channel hide, quick-block, fallback menu, and stale identity clearing. |
+| Lockup thumbnail/video id | `a.media-item-thumbnail-container[href*="watch?v="]` | `a.ytLockupViewModelContentImage[href*="watch?v="]` under `yt-lockup-view-model` | Supported as video-id source; not itself a hide target. |
+| Channel/byline metadata | `.media-channel`, `.subhead`, `.media-item-subtitle` | `ytm-channel-thumbnail-with-link-renderer.YtmChannelThumbnailWithLinkRendererHost`, `ytm-badge-and-byline-renderer.YtmBadgeAndBylineRendererHost`, `.YtmBadgeAndBylineRendererItemByline` | Supported as metadata sources for channel name, handle, UC id, and avatar/link hints. |
+| Community posts | `ytm-post-renderer` / older post text ids | `ytm-backstage-post-thread-renderer.ytmBackstagePostThreadRendererHost` -> `ytm-backstage-post-renderer.ytmBackstagePostRendererHost`; post body in `.ytmBackstagePostRendererHostContentText`; author in `yt-post-header.ytPostHeaderHost` | Supported as post/card hosts and post text sources for keyword/channel fallback. |
+| Post action buttons | older post button rows | `yt-comment-action-buttons-renderer.ytCommentActionButtonsRendererHost` | Inventory only. It is a control row, not a card, so hiding it would be a false-hide risk. |
+| Touch feedback / thumbnail overlay | older ripple/overlay classes | `yt-touch-feedback-shape.ytSpecTouchFeedbackShapeHost...`, `ytm-thumbnail-overlay-resume-playback-renderer.YtmThumbnailOverlayResumePlaybackRendererHost` | Inventory only. These are control/overlay nodes and should not drive card identity. |
+| Shorts shelf | `ytm-shorts-lockup-view-model` | `ytm-shorts-lockup-view-model.shortsLockupViewModelHost` and grid shelf wrappers | Supported; existing Shorts lockup and grid item selectors remain first-class. |
+
+New nodes/classes to inventory:
+
+| DOM node/class | Meaning | Status | Runtime path |
+| --- | --- | --- | --- |
+| `<ytm-browse class="YtmBrowseHost">` | Mobile Home/Browse page wrapper | ℹ️ Wrapper only | Route detection only; not a card selector |
+| `<ytm-media-item>` | Current mobile media card body | ✅ Supported | `js/content/dom_extractors.js`, `js/content/dom_fallback.js`, `js/content_bridge.js`, `js/content/block_channel.js` |
+| `<yt-lockup-view-model class="ytLockupViewModelWrapper">` inside YTM | New lockup card shape reused by mobile Home | ✅ Supported | Shared lockup card/video-id extraction |
+| `<a class="ytLockupViewModelContentImage">` | Lockup thumbnail/video URL | ✅ Metadata source | `extractVideoIdFromCard()` |
+| `<ytm-backstage-post-renderer class="ytmBackstagePostRendererHost">` | Mobile community post card | ✅ Supported | Shared card selectors, quick-block card discovery, post channel extraction |
+| `<ytm-backstage-post-thread-renderer class="ytmBackstagePostThreadRendererHost">` | Mobile community post thread/container | ✅ Supported | Shared card selectors and quick-block card discovery |
+| `.ytmBackstagePostRendererHostContentText` | Mobile community post body text | ✅ Supported | DOM fallback keyword/post text extraction |
+| `<yt-post-header class="ytPostHeaderHost">` | Community post author/header | ✅ Metadata source | Post author channel extraction |
+| `<ytm-channel-thumbnail-with-link-renderer class="YtmChannelThumbnailWithLinkRendererHost">` | Mobile channel avatar/link host | ✅ Metadata source | YTM channel identity extraction |
+| `<ytm-badge-and-byline-renderer class="YtmBadgeAndBylineRendererHost">` | Mobile byline/view/badge row | ✅ Metadata source | YTM channel/byline extraction |
+| `<yt-comment-action-buttons-renderer class="ytCommentActionButtonsRendererHost">` | Like/comment/share action row for posts | 🚫 Control only | Do not hide as content card |
+| `<yt-touch-feedback-shape class="ytSpecTouchFeedbackShapeHost ...">` | YouTube touch/ripple target | 🚫 Control only | Do not use as identity or hide target |
+| `<ytm-chip-cloud-renderer class="YtmChipCloudRendererHost chip-bar">` | Mobile Watch chip UI | 🚫 Watch chips only | Route-gated chip boundary |
+
+Implementation notes after runtime patch:
+
+- `js/content/dom_extractors.js`: shared `VIDEO_CARD_SELECTORS` now includes
+  YTM camelCase post host classes, in addition to the existing YTM post tags.
+- `js/content/dom_fallback.js`: mobile Home post styling and keyword fallback
+  now include `ytm-backstage-post-thread-renderer`,
+  `ytmBackstagePostRendererHost`, `ytmBackstagePostThreadRendererHost`, and
+  `.ytmBackstagePostRendererHostContentText`.
+- `js/content/block_channel.js`: quick-block card discovery now recognizes YTM
+  post tags/classes so the quick block/menu code can climb from new post
+  control nodes back to the real post card.
+- `js/content_bridge.js`: fallback-menu/card handling recognizes YTM post tags
+  alongside the newer YTM media/watch-card hosts.
+
+Caveats:
+
+- `YtmBrowseHost`, `ytCommentActionButtonsRendererHost`,
+  `ytSpecTouchFeedbackShapeHost`, and thumbnail overlay host classes are
+  documented but intentionally not treated as cards. They are wrappers or
+  controls, and using them as hide targets would cause false hides.
 - The sampled YTM DOM still preserves FilterTube state attributes on filtered
-  rows, so this sample does not prove YouTube is stripping extension attributes.
-  Issue #59 remains a privacy/code-burden cleanup direction, not the proven
-  cause of this DOM shift.
+  rows, so this sample does not prove YouTube is stripping extension
+  attributes. Issue #59 remains a privacy/code-burden cleanup direction, not
+  the proven cause of this DOM shift.
 
 ### Home shelf: “Latest YouTube posts” (2025-11-18 sample, NEW)
 | DOM tag / component | Underlying renderer / data source | Status | Notes |

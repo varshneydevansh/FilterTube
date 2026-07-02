@@ -501,7 +501,8 @@ function isPostLikeQuickBlockCard(card) {
         const tag = String(card.tagName || '').toLowerCase();
         if (tag.includes('post')) return true;
         if (card.getAttribute?.('is-post') === '' || card.getAttribute?.('is-post') === 'true') return true;
-        if (card.querySelector?.('ytd-post-renderer, ytm-post-renderer, ytm-backstage-post-renderer, ytm-backstage-post-thread-renderer')) return true;
+        if (card.classList?.contains('ytmBackstagePostRendererHost') || card.classList?.contains('ytmBackstagePostThreadRendererHost')) return true;
+        if (card.querySelector?.('ytd-post-renderer, ytm-post-renderer, ytm-backstage-post-renderer, ytm-backstage-post-thread-renderer, .ytmBackstagePostRendererHost, .ytmBackstagePostThreadRendererHost')) return true;
     } catch (e) {
     }
     return false;
@@ -647,6 +648,11 @@ function resolveQuickBlockAnchor(hostCard) {
         'ytd-rich-grid-media',
         '.shortsLockupViewModelHost',
         '.ytGridShelfViewModelGridShelfItem',
+        'ytm-post-renderer',
+        'ytm-backstage-post-renderer',
+        'ytm-backstage-post-thread-renderer',
+        '.ytmBackstagePostRendererHost',
+        '.ytmBackstagePostThreadRendererHost',
         'ytd-shorts-lockup-view-model',
         'ytm-shorts-lockup-view-model',
         'ytm-shorts-lockup-view-model-v2',
@@ -1126,6 +1132,11 @@ const QUICK_BLOCK_CARD_SELECTORS = [
     '.ytGridShelfViewModelGridShelfItem',
     'yt-lockup-view-model',
     'yt-lockup-metadata-view-model',
+    'ytm-post-renderer',
+    'ytm-backstage-post-renderer',
+    'ytm-backstage-post-thread-renderer',
+    '.ytmBackstagePostRendererHost',
+    '.ytmBackstagePostThreadRendererHost',
     'ytm-rich-item-renderer',
     'ytm-media-item',
     'ytm-compact-video-renderer',
@@ -1173,6 +1184,9 @@ const QUICK_BLOCK_CARD_TAGS = new Set([
     'ytd-shorts-lockup-view-model',
     'yt-lockup-view-model',
     'yt-lockup-metadata-view-model',
+    'ytm-post-renderer',
+    'ytm-backstage-post-renderer',
+    'ytm-backstage-post-thread-renderer',
     'ytm-rich-item-renderer',
     'ytm-media-item',
     'ytm-compact-video-renderer',
@@ -1199,7 +1213,9 @@ const QUICK_BLOCK_CARD_TAGS = new Set([
 const QUICK_BLOCK_CARD_CLASS_NAMES = [
     'shortsLockupViewModelHost',
     'ytGridShelfViewModelGridShelfItem',
-    'YtmCompactMediaItemHost'
+    'YtmCompactMediaItemHost',
+    'ytmBackstagePostRendererHost',
+    'ytmBackstagePostThreadRendererHost'
 ];
 
 function findQuickBlockCardFromTarget(target, maxDepth = 18) {

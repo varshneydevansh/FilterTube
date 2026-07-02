@@ -2557,6 +2557,9 @@ function installFilterTubeHomeFeedPolish() {
 
         html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-post-renderer,
         html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-backstage-post-renderer,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-backstage-post-thread-renderer,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .ytmBackstagePostRendererHost,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .ytmBackstagePostThreadRendererHost,
         html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytd-post-renderer {
             display: block !important;
             padding: 10px 12px 12px !important;
@@ -2571,6 +2574,11 @@ function installFilterTubeHomeFeedPolish() {
         html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-post-renderer #content-text,
         html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-backstage-post-renderer #home-content-text,
         html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-backstage-post-renderer #content-text,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-backstage-post-renderer .ytmBackstagePostRendererHostContentText,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-backstage-post-thread-renderer .ytmBackstagePostRendererHostContentText,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .ytmBackstagePostRendererHost .ytmBackstagePostRendererHostContentText,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .ytmBackstagePostThreadRendererHost .ytmBackstagePostRendererHostContentText,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .ytmBackstagePostRendererHostContentText,
         html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytd-post-renderer #home-content-text,
         html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytd-post-renderer #content-text {
             font-size: 13px !important;
@@ -2582,6 +2590,9 @@ function installFilterTubeHomeFeedPolish() {
 
         html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-post-renderer img,
         html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-backstage-post-renderer img,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-backstage-post-thread-renderer img,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .ytmBackstagePostRendererHost img,
+        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .ytmBackstagePostThreadRendererHost img,
         html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytd-post-renderer img {
             border-radius: 12px !important;
         }
@@ -3831,6 +3842,7 @@ async function applyDOMFallback(settings, options = {}) {
                 'ytm-watch-card-hero-video-renderer h3, ytm-watch-card-rich-header-renderer h3, ' +
                 'yt-dynamic-text-view-model h1, .yt-page-header-view-model__page-header-title, .dynamicTextViewModelH1, ' +
                 '#home-content-text, #content-text, #contentText, ytd-expander#expander, ytm-expander'
+                + ', .ytmBackstagePostRendererHostContentText, .ytPostHeaderHostAuthorText'
             );
             const isPlaylistPanelRow = isPlaylistPanelRowElement(element);
             let channelElement = null;
