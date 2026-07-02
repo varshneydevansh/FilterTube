@@ -478,6 +478,9 @@ const isMobileWatchNextQuickBlockHost = (hostCard) => {
                 'ytm-playlist-video-renderer, ' +
                 'ytm-radio-renderer, ' +
                 'ytm-compact-radio-renderer, ' +
+                '.YtmCompactMediaItemHost, ' +
+                '.YtmCompactRadioRendererHost, ' +
+                '.ytmPlaylistPanelVideoRendererV2Host, ' +
                 'ytm-shorts-lockup-view-model, ' +
                 'ytm-shorts-lockup-view-model-v2'
             )
@@ -551,7 +554,7 @@ function resolveQuickBlockHost(node) {
         tag === 'ytm-watch-card-rich-header-renderer'
     ) {
         return node.closest(
-            'ytd-rich-item-renderer, ytd-video-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-playlist-panel-video-renderer, ytd-playlist-panel-video-wrapper-renderer, ytm-rich-item-renderer, ytm-media-item, ytm-video-with-context-renderer, ytm-watch-card-hero-video-renderer, ytm-watch-card-rich-header-renderer, .ytGridShelfViewModelGridShelfItem'
+            'ytd-rich-item-renderer, ytd-video-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-playlist-panel-video-renderer, ytd-playlist-panel-video-wrapper-renderer, ytm-rich-item-renderer, ytm-media-item, ytm-video-with-context-renderer, ytm-watch-card-hero-video-renderer, ytm-watch-card-rich-header-renderer, .YtmCompactMediaItemHost, .YtmCompactRadioRendererHost, .YtmCompactChannelRendererHost, .ytmPlaylistPanelVideoRendererV2Host, .ytLockupViewModelWrapper, .ytLockupViewModelHost, .ytGridShelfViewModelGridShelfItem'
         ) || node;
     }
     if (tag === 'ytd-rich-grid-media') {
@@ -648,6 +651,11 @@ function resolveQuickBlockAnchor(hostCard) {
         'ytd-rich-grid-media',
         '.shortsLockupViewModelHost',
         '.ytGridShelfViewModelGridShelfItem',
+        '.ytLockupViewModelWrapper',
+        '.ytLockupViewModelHost',
+        '.YtmCompactMediaItemHost',
+        '.YtmCompactRadioRendererHost',
+        '.YtmCompactChannelRendererHost',
         'ytm-post-renderer',
         'ytm-backstage-post-renderer',
         'ytm-backstage-post-thread-renderer',
@@ -1132,6 +1140,8 @@ const QUICK_BLOCK_CARD_SELECTORS = [
     '.ytGridShelfViewModelGridShelfItem',
     'yt-lockup-view-model',
     'yt-lockup-metadata-view-model',
+    '.ytLockupViewModelWrapper',
+    '.ytLockupViewModelHost',
     'ytm-post-renderer',
     'ytm-backstage-post-renderer',
     'ytm-backstage-post-thread-renderer',
@@ -1139,6 +1149,7 @@ const QUICK_BLOCK_CARD_SELECTORS = [
     '.ytmBackstagePostThreadRendererHost',
     'ytm-rich-item-renderer',
     'ytm-media-item',
+    '.YtmCompactMediaItemHost',
     'ytm-compact-video-renderer',
     'ytm-video-with-context-renderer',
     'ytm-watch-card-hero-video-renderer',
@@ -1146,12 +1157,15 @@ const QUICK_BLOCK_CARD_SELECTORS = [
     'ytm-compact-playlist-renderer',
     'ytm-playlist-video-renderer',
     'ytm-playlist-panel-video-renderer',
+    '.ytmPlaylistPanelVideoRendererV2Host',
     'ytm-channel-renderer',
     'ytm-compact-channel-renderer',
+    '.YtmCompactChannelRendererHost',
     'ytm-universal-watch-card-renderer',
     'ytm-reel-item-renderer',
     'ytm-radio-renderer',
     'ytm-compact-radio-renderer',
+    '.YtmCompactRadioRendererHost',
     'ytm-lockup-view-model',
     'ytm-shorts-lockup-view-model',
     'ytm-shorts-lockup-view-model-v2',
@@ -1213,7 +1227,12 @@ const QUICK_BLOCK_CARD_TAGS = new Set([
 const QUICK_BLOCK_CARD_CLASS_NAMES = [
     'shortsLockupViewModelHost',
     'ytGridShelfViewModelGridShelfItem',
+    'ytLockupViewModelWrapper',
+    'ytLockupViewModelHost',
     'YtmCompactMediaItemHost',
+    'YtmCompactRadioRendererHost',
+    'YtmCompactChannelRendererHost',
+    'ytmPlaylistPanelVideoRendererV2Host',
     'ytmBackstagePostRendererHost',
     'ytmBackstagePostThreadRendererHost'
 ];
@@ -3007,6 +3026,12 @@ async function handleDropdownAppearedInternal(dropdown) {
         'ytm-radio-renderer, ' +
         'ytm-compact-radio-renderer, ' +
         'ytm-lockup-view-model, ' +
+        '.YtmCompactMediaItemHost, ' +
+        '.YtmCompactRadioRendererHost, ' +
+        '.YtmCompactChannelRendererHost, ' +
+        '.ytmPlaylistPanelVideoRendererV2Host, ' +
+        '.ytLockupViewModelWrapper, ' +
+        '.ytLockupViewModelHost, ' +
         'ytd-post-renderer, ' +                          // YouTube Posts
         'ytm-post-renderer, ' +                          // Mobile posts
         'ytm-backstage-post-renderer, ' +                // Mobile community post

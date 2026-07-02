@@ -165,7 +165,8 @@ function isPlaylistPanelRowElement(elementOrTag) {
         tag === 'ytd-playlist-panel-video-wrapper-renderer' ||
         tag === 'ytm-playlist-panel-video-renderer' ||
         tag === 'ytm-playlist-panel-video-wrapper-renderer' ||
-        tag === 'ytm-playlist-video-renderer';
+        tag === 'ytm-playlist-video-renderer' ||
+        Boolean(typeof elementOrTag !== 'string' && elementOrTag?.classList?.contains('ytmPlaylistPanelVideoRendererV2Host'));
 }
 
 function getPlaylistPanelRow(element) {
@@ -177,7 +178,8 @@ function getPlaylistPanelRow(element) {
             'ytd-playlist-panel-video-wrapper-renderer, ' +
             'ytm-playlist-panel-video-renderer, ' +
             'ytm-playlist-panel-video-wrapper-renderer, ' +
-            'ytm-playlist-video-renderer'
+            'ytm-playlist-video-renderer, ' +
+            '.ytmPlaylistPanelVideoRendererV2Host'
         );
     } catch (e) {
         return null;
@@ -1204,6 +1206,12 @@ function ensureContentControlStyles(settings) {
             ytd-display-ad-renderer,
             ytd-companion-slot-renderer,
             ytd-action-companion-ad-renderer,
+            ytm-companion-slot,
+            ytm-companion-ad-renderer,
+            ytm-visit-site-cta-renderer,
+            .ytmCompanionSlotRendererHost,
+            .YtmCompanionAdRendererHost,
+            .ytmVisitSiteCtaRendererHost,
             ytd-engagement-panel-section-list-renderer[target-id="engagement-panel-ads"] {
                 display: none !important;
             }
@@ -2884,6 +2892,10 @@ function applyFilterTubeHomeChannelTapTargets() {
             'html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-video-with-context-renderer, ' +
             'html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-compact-video-renderer, ' +
             'html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item, ' +
+            'html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .YtmCompactMediaItemHost, ' +
+            'html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .YtmCompactChannelRendererHost, ' +
+            'html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .ytLockupViewModelWrapper, ' +
+            'html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .ytLockupViewModelHost, ' +
             'html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-rich-item-renderer'
         );
         cards.forEach(card => {
@@ -3620,6 +3632,12 @@ async function applyDOMFallback(settings, options = {}) {
             const element = videoElements[elementIndex];
             try {
             const elementTag = (element.tagName || '').toLowerCase();
+            const isYtmCompactMediaClassHost = Boolean(element.classList?.contains('YtmCompactMediaItemHost'));
+            const isYtmCompactRadioClassHost = Boolean(element.classList?.contains('YtmCompactRadioRendererHost'));
+            const isYtmCompactChannelClassHost = Boolean(element.classList?.contains('YtmCompactChannelRendererHost'));
+            const isYtmPlaylistPanelV2ClassHost = Boolean(element.classList?.contains('ytmPlaylistPanelVideoRendererV2Host'));
+            const isYtmLockupClassHost = Boolean(element.classList?.contains('ytLockupViewModelWrapper') || element.classList?.contains('ytLockupViewModelHost'));
+            const isYtmClassContentHost = isYtmCompactMediaClassHost || isYtmCompactRadioClassHost || isYtmCompactChannelClassHost || isYtmPlaylistPanelV2ClassHost || isYtmLockupClassHost;
 
             try {
                 const path = document.location?.pathname || '';
@@ -3926,7 +3944,8 @@ async function applyDOMFallback(settings, options = {}) {
                 elementTag === 'ytm-compact-playlist-renderer' ||
                 elementTag === 'ytm-channel-renderer' ||
                 elementTag === 'ytm-compact-channel-renderer' ||
-                elementTag === 'ytm-universal-watch-card-renderer'
+                elementTag === 'ytm-universal-watch-card-renderer' ||
+                isYtmClassContentHost
             )) {
                 channelElement = element.querySelector(
                     '#author-text a[href^="/@"], ' +
@@ -4061,7 +4080,10 @@ async function applyDOMFallback(settings, options = {}) {
                 elementTag === 'ytm-video-with-context-renderer' ||
                 elementTag === 'ytm-compact-video-renderer' ||
                 elementTag === 'ytm-watch-card-hero-video-renderer' ||
-                elementTag === 'ytm-watch-card-rich-header-renderer'
+                elementTag === 'ytm-watch-card-rich-header-renderer' ||
+                isYtmCompactMediaClassHost ||
+                isYtmCompactRadioClassHost ||
+                isYtmLockupClassHost
             )) {
                 const mobileTitleAria = element.querySelector(
                     '.YtmCompactMediaItemHeadline .yt-core-attributed-string[aria-label], ' +
@@ -4079,7 +4101,8 @@ async function applyDOMFallback(settings, options = {}) {
                 elementTag === 'ytm-channel-renderer' ||
                 elementTag === 'ytm-compact-channel-renderer' ||
                 elementTag === 'ytm-universal-watch-card-renderer' ||
-                elementTag === 'ytm-watch-card-rich-header-renderer'
+                elementTag === 'ytm-watch-card-rich-header-renderer' ||
+                isYtmCompactChannelClassHost
             )) {
                 const mobileChannelTitle = element.querySelector(
                     'h3, h2, .channel-title, .ytm-channel-name, .yt-core-attributed-string, [role="heading"]'
@@ -4116,7 +4139,8 @@ async function applyDOMFallback(settings, options = {}) {
             if (!channel && (
                 elementTag === 'ytm-channel-renderer' ||
                 elementTag === 'ytm-compact-channel-renderer' ||
-                elementTag === 'ytm-universal-watch-card-renderer'
+                elementTag === 'ytm-universal-watch-card-renderer' ||
+                isYtmCompactChannelClassHost
             )) {
                 const mobileHandleText = element.querySelector(
                     'a[href^="/@"], a[href^="/channel/"], a[href^="/c/"], a[href^="/user/"], ' +
@@ -4902,7 +4926,7 @@ async function applyDOMFallback(settings, options = {}) {
             } else if (isPlaylistPanelRow) {
                 const wrapper = element.closest('ytd-playlist-panel-video-wrapper-renderer');
                 if (wrapper) targetToHide = wrapper;
-            } else if (elementTag === 'ytm-radio-renderer' || elementTag === 'ytm-compact-radio-renderer') {
+            } else if (elementTag === 'ytm-radio-renderer' || elementTag === 'ytm-compact-radio-renderer' || isYtmCompactRadioClassHost) {
                 const wrapper = element.closest('ytm-rich-item-renderer');
                 if (wrapper) targetToHide = wrapper;
             }

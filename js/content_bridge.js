@@ -4934,10 +4934,17 @@ function extractCollaboratorMetadataFromElement(element) {
 function isYtmWatchLikeCollaboratorCard(videoCard) {
     try {
         const tag = String(videoCard?.tagName || '').toLowerCase();
-        if (!tag.startsWith('ytm-')) return false;
+        const isYtmClassHost = Boolean(
+            videoCard?.classList?.contains('YtmCompactMediaItemHost') ||
+            videoCard?.classList?.contains('YtmCompactRadioRendererHost') ||
+            videoCard?.classList?.contains('ytmPlaylistPanelVideoRendererV2Host') ||
+            videoCard?.classList?.contains('ytLockupViewModelWrapper') ||
+            videoCard?.classList?.contains('ytLockupViewModelHost')
+        );
+        if (!tag.startsWith('ytm-') && !isYtmClassHost) return false;
         if (isMixCardElement(videoCard)) return false;
         return (
-            videoCard.matches?.('ytm-playlist-panel-video-renderer, ytm-media-item, ytm-video-with-context-renderer, ytm-compact-video-renderer, ytm-watch-card-hero-video-renderer, ytm-watch-card-rich-header-renderer, ytm-playlist-video-renderer') ||
+            videoCard.matches?.('ytm-playlist-panel-video-renderer, ytm-media-item, ytm-video-with-context-renderer, ytm-compact-video-renderer, ytm-watch-card-hero-video-renderer, ytm-watch-card-rich-header-renderer, ytm-playlist-video-renderer, .YtmCompactMediaItemHost, .YtmCompactRadioRendererHost, .ytmPlaylistPanelVideoRendererV2Host, .ytLockupViewModelWrapper, .ytLockupViewModelHost') ||
             Boolean(videoCard.closest?.('ytm-single-column-watch-next-results-renderer, ytm-playlist-panel-renderer, ytm-item-section-renderer'))
         );
     } catch (e) {
@@ -7016,6 +7023,12 @@ function ensureFallbackMenuButtons() {
             tagName === 'ytm-compact-video-renderer' ||
             tagName === 'ytm-watch-card-hero-video-renderer' ||
             tagName === 'ytm-watch-card-rich-header-renderer' ||
+            card.classList?.contains('YtmCompactMediaItemHost') ||
+            card.classList?.contains('YtmCompactRadioRendererHost') ||
+            card.classList?.contains('YtmCompactChannelRendererHost') ||
+            card.classList?.contains('ytmPlaylistPanelVideoRendererV2Host') ||
+            card.classList?.contains('ytLockupViewModelWrapper') ||
+            card.classList?.contains('ytLockupViewModelHost') ||
             tagName === 'ytm-post-renderer' ||
             tagName === 'ytm-backstage-post-renderer' ||
             tagName === 'ytm-backstage-post-thread-renderer' ||
@@ -7029,6 +7042,8 @@ function ensureFallbackMenuButtons() {
                 card.querySelector('.shortsLockupViewModelHostOutsideMetadata') ||
                 card.querySelector('.ShortsLockupViewModelHostMetadata') ||
                 card.querySelector('.YtmCompactMediaItemHost') ||
+                card.querySelector('.YtmCompactChannelRendererHost') ||
+                card.querySelector('.ytmPlaylistPanelVideoRendererV2Host') ||
                 card.querySelector('ytm-media-item') ||
                 card.querySelector('.details.stacked')?.parentElement ||
                 card.querySelector('.YtmCompactMediaItemMetadata')?.parentElement ||
@@ -7146,6 +7161,12 @@ function ensureFallbackMenuButtons() {
             tagName === 'ytm-compact-video-renderer' ||
             tagName === 'ytm-watch-card-hero-video-renderer' ||
             tagName === 'ytm-watch-card-rich-header-renderer' ||
+            card.classList?.contains('YtmCompactMediaItemHost') ||
+            card.classList?.contains('YtmCompactRadioRendererHost') ||
+            card.classList?.contains('YtmCompactChannelRendererHost') ||
+            card.classList?.contains('ytmPlaylistPanelVideoRendererV2Host') ||
+            card.classList?.contains('ytLockupViewModelWrapper') ||
+            card.classList?.contains('ytLockupViewModelHost') ||
             tagName === 'ytm-post-renderer' ||
             tagName === 'ytm-backstage-post-renderer' ||
             tagName === 'ytm-backstage-post-thread-renderer' ||
@@ -7173,10 +7194,16 @@ function ensureFallbackMenuButtons() {
         'yt-lockup-view-model',
         'ytm-playlist-panel-video-renderer',
         'ytm-media-item',
+        '.YtmCompactMediaItemHost',
         'ytm-video-with-context-renderer',
         'ytm-compact-video-renderer',
+        '.YtmCompactRadioRendererHost',
+        '.YtmCompactChannelRendererHost',
+        '.ytmPlaylistPanelVideoRendererV2Host',
         'ytm-watch-card-hero-video-renderer',
         'ytm-watch-card-rich-header-renderer',
+        '.ytLockupViewModelWrapper',
+        '.ytLockupViewModelHost',
         'ytm-post-renderer',
         'ytm-backstage-post-renderer',
         'ytm-backstage-post-thread-renderer',
@@ -10023,6 +10050,11 @@ function extractChannelFromCard(card) {
             cardTag === 'ytm-watch-card-rich-header-renderer' ||
             cardTag === 'ytm-playlist-video-renderer' ||
             cardTag === 'ytm-playlist-panel-video-renderer' ||
+            card.classList?.contains('YtmCompactMediaItemHost') ||
+            card.classList?.contains('YtmCompactRadioRendererHost') ||
+            card.classList?.contains('ytmPlaylistPanelVideoRendererV2Host') ||
+            card.classList?.contains('ytLockupViewModelWrapper') ||
+            card.classList?.contains('ytLockupViewModelHost') ||
             (cardTag === 'ytm-rich-item-renderer' && Boolean(card.querySelector(
                 'ytm-media-item, ' +
                 'ytm-video-with-context-renderer, ' +
@@ -10030,15 +10062,20 @@ function extractChannelFromCard(card) {
                 'ytm-watch-card-hero-video-renderer, ' +
                 'ytm-watch-card-rich-header-renderer, ' +
                 'ytm-playlist-video-renderer, ' +
-                'ytm-playlist-panel-video-renderer'
+                'ytm-playlist-panel-video-renderer, ' +
+                '.YtmCompactMediaItemHost, ' +
+                '.YtmCompactRadioRendererHost, ' +
+                '.ytmPlaylistPanelVideoRendererV2Host, ' +
+                '.ytLockupViewModelWrapper, ' +
+                '.ytLockupViewModelHost'
             )))
         );
 
         if (isYtmVideoLikeCard) {
             const ytmIdentityRoot = (
-                card.matches('ytm-media-item, ytm-video-with-context-renderer, ytm-compact-video-renderer, ytm-watch-card-hero-video-renderer, ytm-watch-card-rich-header-renderer, ytm-playlist-video-renderer, ytm-playlist-panel-video-renderer')
+                card.matches('ytm-media-item, ytm-video-with-context-renderer, ytm-compact-video-renderer, ytm-watch-card-hero-video-renderer, ytm-watch-card-rich-header-renderer, ytm-playlist-video-renderer, ytm-playlist-panel-video-renderer, .YtmCompactMediaItemHost, .YtmCompactRadioRendererHost, .ytmPlaylistPanelVideoRendererV2Host, .ytLockupViewModelWrapper, .ytLockupViewModelHost')
                     ? card
-                    : card.querySelector('ytm-media-item, ytm-video-with-context-renderer, ytm-compact-video-renderer, ytm-watch-card-hero-video-renderer, ytm-watch-card-rich-header-renderer, ytm-playlist-video-renderer, ytm-playlist-panel-video-renderer')
+                    : card.querySelector('ytm-media-item, ytm-video-with-context-renderer, ytm-compact-video-renderer, ytm-watch-card-hero-video-renderer, ytm-watch-card-rich-header-renderer, ytm-playlist-video-renderer, ytm-playlist-panel-video-renderer, .YtmCompactMediaItemHost, .YtmCompactRadioRendererHost, .ytmPlaylistPanelVideoRendererV2Host, .ytLockupViewModelWrapper, .ytLockupViewModelHost')
             ) || card;
 
             const ytmBylineHint = extractYtmBylineText(ytmIdentityRoot);
@@ -11136,7 +11173,13 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
         const hasVideoId = typeof initialChannelInfo.videoId === 'string' && initialChannelInfo.videoId.trim();
         const isMobileYtmCard = Boolean(
             /^ytm-/.test(videoCardTagName) ||
-            videoCard?.querySelector?.('ytm-media-item, ytm-video-with-context-renderer, ytm-compact-video-renderer, ytm-watch-card-hero-video-renderer, ytm-watch-card-rich-header-renderer, ytm-playlist-video-renderer, ytm-playlist-panel-video-renderer, ytm-compact-radio-renderer, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2')
+            videoCard?.classList?.contains('YtmCompactMediaItemHost') ||
+            videoCard?.classList?.contains('YtmCompactRadioRendererHost') ||
+            videoCard?.classList?.contains('YtmCompactChannelRendererHost') ||
+            videoCard?.classList?.contains('ytmPlaylistPanelVideoRendererV2Host') ||
+            videoCard?.classList?.contains('ytLockupViewModelWrapper') ||
+            videoCard?.classList?.contains('ytLockupViewModelHost') ||
+            videoCard?.querySelector?.('ytm-media-item, ytm-video-with-context-renderer, ytm-compact-video-renderer, ytm-watch-card-hero-video-renderer, ytm-watch-card-rich-header-renderer, ytm-playlist-video-renderer, ytm-playlist-panel-video-renderer, ytm-compact-radio-renderer, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, .YtmCompactMediaItemHost, .YtmCompactRadioRendererHost, .YtmCompactChannelRendererHost, .ytmPlaylistPanelVideoRendererV2Host, .ytLockupViewModelWrapper, .ytLockupViewModelHost')
         );
         const nameLooksBad = !initialChannelInfo.name ||
             isUcIdLike(initialChannelInfo.name) ||
