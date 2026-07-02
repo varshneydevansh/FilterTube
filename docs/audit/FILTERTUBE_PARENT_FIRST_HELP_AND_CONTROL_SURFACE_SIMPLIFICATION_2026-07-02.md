@@ -117,6 +117,10 @@ Changes made:
   parents can virtually edit a protected profile from the parent device, the
   child profile PIN is not parent authority, and the verified child device can
   receive the signed update through live Send Update or later Pickup.
+- Clarified the two-PIN model in parent-facing Help: parent/account or Master
+  unlock is the control PIN, while the child/protected profile PIN is only a
+  switching guard so siblings or any other user cannot casually open that
+  profile.
 - Updated Accounts & Sync trusted-device copy to match current Pickup behavior:
   saved links are not a live connection, but Pickup can let a verified protected
   device collect a signed parent update when it opens later.
