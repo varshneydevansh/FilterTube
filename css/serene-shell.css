@@ -2454,26 +2454,26 @@ html[data-theme="dark"] .btn-secondary:hover {
     margin: 0;
     font-size: 0.7rem;
     font-weight: 700;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--ft-color-brand-primary);
 }
 
 .view-hero__title {
     margin: 0;
-    max-width: 16ch;
+    max-width: 20ch;
     font-family: var(--ft-font-family-display);
-    font-size: clamp(1.75rem, 3vw, 2.55rem);
-    line-height: 0.94;
-    letter-spacing: -0.06em;
+    font-size: clamp(1.8rem, 2.7vw, 2.45rem);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
     color: var(--ft-color-text-primary);
 }
 
 .view-hero__body {
     margin: 0;
-    max-width: 58ch;
-    font-size: 0.98rem;
-    line-height: 1.7;
+    max-width: 68ch;
+    font-size: 1rem;
+    line-height: 1.75;
     color: var(--ft-color-text-secondary);
 }
 
@@ -2543,19 +2543,19 @@ html[data-theme="dark"] .btn-secondary:hover {
 
 .dashboard-app-release__title {
     margin: 0;
-    max-width: 16ch;
+    max-width: 18ch;
     font-family: var(--ft-font-family-display);
     font-size: clamp(1.35rem, 2.1vw, 2rem);
-    line-height: 1;
-    letter-spacing: -0.045em;
+    line-height: 1.08;
+    letter-spacing: -0.025em;
     color: var(--ft-color-text-primary);
 }
 
 .dashboard-app-release__body {
     margin: 0;
     max-width: 58ch;
-    font-size: 0.88rem;
-    line-height: 1.65;
+    font-size: 0.95rem;
+    line-height: 1.72;
     color: var(--ft-color-text-secondary);
 }
 
@@ -2657,18 +2657,18 @@ html[data-theme="dark"] .btn-secondary:hover {
     margin-bottom: 0.45rem;
     font-size: 0.66rem;
     font-weight: 800;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--dashboard-app-accent);
 }
 
 .dashboard-app-card strong {
     display: block;
-    max-width: 13.5ch;
+    max-width: 15ch;
     font-family: var(--ft-font-family-display);
-    font-size: clamp(1.55rem, 2.2vw, 2.15rem);
-    line-height: 0.95;
-    letter-spacing: -0.055em;
+    font-size: clamp(1.35rem, 2vw, 1.95rem);
+    line-height: 1.06;
+    letter-spacing: -0.025em;
     color: var(--ft-color-text-primary);
 }
 
@@ -2676,8 +2676,8 @@ html[data-theme="dark"] .btn-secondary:hover {
     display: block;
     max-width: 34ch;
     margin-top: 0.78rem;
-    font-size: 0.88rem;
-    line-height: 1.62;
+    font-size: 0.93rem;
+    line-height: 1.68;
     color: var(--ft-color-text-secondary);
 }
 
@@ -3153,6 +3153,58 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     border-radius: 999px;
     padding-inline: 1.02rem;
     white-space: nowrap;
+}
+
+.nanah-parent-edit-model {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.62rem;
+}
+
+.nanah-parent-edit-model article {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+        "badge title"
+        "badge body";
+    gap: 0.14rem 0.62rem;
+    min-width: 0;
+    padding: 0.76rem 0.84rem;
+    border: 1px solid rgba(60, 118, 92, 0.15);
+    border-radius: 1rem;
+    background:
+        linear-gradient(180deg, rgba(244, 252, 247, 0.88), rgba(255, 255, 255, 0.66));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+}
+
+.nanah-parent-edit-model article > span {
+    grid-area: badge;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 999px;
+    background: rgba(60, 118, 92, 0.13);
+    color: #2f6f48;
+    font-size: 0.7rem;
+    font-weight: 900;
+}
+
+.nanah-parent-edit-model article > strong {
+    grid-area: title;
+    color: var(--ft-color-text-primary);
+    font-size: 0.88rem;
+    font-weight: 860;
+    line-height: 1.25;
+}
+
+.nanah-parent-edit-model article > small {
+    grid-area: body;
+    color: var(--ft-color-text-secondary);
+    font-size: 0.76rem;
+    font-weight: 620;
+    line-height: 1.45;
 }
 
 .nanah-sync-principles {
@@ -5006,18 +5058,22 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
 }
 
 .help-cluster {
-    align-items: stretch;
+    align-items: start;
 }
 
 .help-shell .help-cluster > .card {
-    height: 100%;
+    height: auto;
 }
 
 .help-shell .help-cluster > .card > .card-body {
     display: grid;
     align-content: start;
     gap: 1rem;
-    height: 100%;
+    height: auto;
+}
+
+.help-shell .help-cluster > .help-technical-card {
+    grid-column: 1 / -1;
 }
 
 .whatsnew-feed,
@@ -5703,6 +5759,7 @@ body.ft-extension-surface .ft-profile-dropdown.ft-select-dropdown {
         grid-template-columns: 1fr;
     }
 
+    .nanah-parent-edit-model,
     .nanah-sync-flow,
     .nanah-sync-simple-path,
     .nanah-sync-principles {

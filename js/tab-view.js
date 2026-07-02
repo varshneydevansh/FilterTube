@@ -13008,7 +13008,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (normalizeString(remoteProfile.profileName)) {
             return `${getNanahScopeLabel(normalizedScope)} will write into ${remoteProfile.profileName} on ${getNanahRemoteLabel()}. Inactive remote profiles are only targeted when you choose an explicit remote target or save a fixed protected-profile target there.`;
         }
-        return 'Updates write into the receiver\'s active profile by default, or a fixed profile if one was chosen. Saved links remember trust and policy, not a live background connection.';
+        return 'Updates write into the receiver\'s active profile by default, or a fixed profile if one was chosen. Saved links remember trust and policy. They are not a live connection, but Pickup can let a verified device collect a signed parent update when it opens later.';
     }
 
     async function ensureNanahStableDeviceId() {

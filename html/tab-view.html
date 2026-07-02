@@ -178,8 +178,8 @@
                         <section class="view-hero dashboard-hero">
                             <div class="view-hero__copy">
                                 <p class="view-hero__eyebrow">FilterTube control center</p>
-                                <h2 class="view-hero__title">Keep every YouTube surface calmer before it turns noisy.</h2>
-                                <p class="view-hero__body">Switch between desktop and Kids surfaces, and jump straight into the rules that matter most for your household.</p>
+                                <h2 class="view-hero__title">Keep YouTube calmer for your household.</h2>
+                                <p class="view-hero__body">See what FilterTube is doing, switch between Main and Kids rules, and open the controls parents use most.</p>
                             </div>
                             <div class="dashboard-stats-source dashboard-hero__surface">
                                 <div id="dashboardStatsSourceLabel" class="dashboard-stats-source__label"></div>
@@ -193,8 +193,8 @@
                         <section class="dashboard-app-release" aria-labelledby="dashboardAppsTitle">
                             <div class="dashboard-app-release__copy">
                                 <p class="view-hero__eyebrow">FilterTube apps</p>
-                                <h2 id="dashboardAppsTitle" class="dashboard-app-release__title">Phone and tablet apps are in final release testing.</h2>
-                                <p class="dashboard-app-release__body">Android and iOS builds keep the same local-first rule model, profile controls, and calmer viewing direction. Store links will replace this hub as each review path opens.</p>
+                                <h2 id="dashboardAppsTitle" class="dashboard-app-release__title">Mobile and tablet builds are almost ready.</h2>
+                                <p class="dashboard-app-release__body">The app keeps the same local rules and profile controls, with a calmer native viewing surface for phones and tablets.</p>
                             </div>
                             <div class="dashboard-app-release__grid">
                                 <a class="dashboard-app-card dashboard-app-card--android" href="https://www.filtertube.in/downloads" target="_blank" rel="noreferrer">
@@ -952,6 +952,23 @@
                                                 <button id="ftNanahQuickSendUpdateBtn" class="btn-primary" type="button">Start Send Update</button>
                                             </div>
                                         </div>
+                                        <div class="nanah-parent-edit-model" aria-label="How parent editing reaches a protected device">
+                                            <article>
+                                                <span>1</span>
+                                                <strong>Edit here</strong>
+                                                <small>Open the child/protected row and choose Edit Rules. You are editing that profile from the parent side.</small>
+                                            </article>
+                                            <article>
+                                                <span>2</span>
+                                                <strong>Child PIN is different</strong>
+                                                <small>The child PIN only protects switching into that profile. It does not unlock parent controls.</small>
+                                            </article>
+                                            <article>
+                                                <span>3</span>
+                                                <strong>Deliver when ready</strong>
+                                                <small>Send now when both devices are open, or let Pickup deliver the signed update when the verified device opens later.</small>
+                                            </article>
+                                        </div>
                                         <div class="nanah-device-compass" aria-label="Family device map for Send Update, Home Pickup, and Internet Pickup devices">
                                             <div class="nanah-device-compass__center">
                                                 <div class="nanah-device-compass__hub-mark" aria-hidden="true"><i></i></div>
@@ -1219,7 +1236,7 @@
                                                             Start pairing on one device, then join from the other device using the same short code.
                                                         </div>
                                                         <div class="nanah-sync-status__hint" id="ftNanahTargetHint">
-                                                            Updates write into the receiver's active profile by default, or a fixed protected profile if one was chosen. Saved links remember trust and allowed policy, not a live background connection.
+                                                            Updates write into the receiver's active profile by default, or a fixed protected profile if one was chosen. Saved links remember trust and allowed policy. They are not a live connection, but Pickup can let a verified device collect a signed parent update when it opens later.
                                                         </div>
                                                         <div class="nanah-sync-sas-actions">
                                                             <button id="ftNanahConfirmSasBtn" class="btn-primary" type="button" disabled>Confirm Matching Phrase</button>
@@ -1270,7 +1287,7 @@
                                             <div class="nanah-sync-trusted">
                                                 <div class="nanah-sync-trusted__header">
                                                     <div class="help-item-title">Trusted devices</div>
-                                                    <div class="nanah-sync-note">Saved links remember which parent can send which profile update. They are not hidden background sync.</div>
+                                                    <div class="nanah-sync-note">Saved links remember which parent can send which profile update. They are not a live connection, but Pickup can let a verified protected device collect a signed parent update when it opens later.</div>
                                                 </div>
                                                 <div id="ftNanahTrustedLinks" class="nanah-trusted-links">
                                                     <div class="nanah-trusted-links__empty">No trusted devices yet.</div>
@@ -1344,7 +1361,7 @@
                                 <article class="help-start-card">
                                     <span>3</span>
                                     <strong>Create a protected profile</strong>
-                                    <p>Use Accounts &amp; Sync when a child or family member needs their own Main/Kids access, rules, PIN, or time limit.</p>
+                                    <p>Use Accounts &amp; Sync when a child or family member needs their own rules, viewing space, PIN, or time limit.</p>
                                 </article>
                                 <article class="help-start-card">
                                     <span>4</span>
@@ -1374,6 +1391,30 @@
                                             <div class="help-item-body">Use the YouTube 3-dot menu or add the channel in <strong>Filters &gt; Channels</strong>. A stable <code>UC...</code> channel ID is best, but handles and YouTube channel URLs are supported.</div>
                                         </div>
                                         <div class="help-item">
+                                            <div class="help-item-title">How do I limit YouTube time?</div>
+                                            <div class="help-item-body">Open <strong>Accounts &amp; Sync</strong>, create or choose a protected profile, then use <strong>Set limit</strong>. When time is finished, YouTube shows a calm FilterTube screen until the next reset or parent approval.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Can my child change these settings?</div>
+                                            <div class="help-item-body">Not from a protected profile. A protected profile can watch within its rules, but it cannot change rules, PINs, trusted devices, viewing spaces, backups, or time limits without parent/account authority.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">What is the child profile PIN for?</div>
+                                            <div class="help-item-body">It protects switching into that child/protected profile, so siblings or other users cannot casually open it. It is not the parent PIN and does not allow rule edits, device trust changes, backups, or time-limit changes.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Can I edit child rules without touching the child device?</div>
+                                            <div class="help-item-body">Yes. From the parent/account profile, open <strong>Accounts &amp; Sync</strong>, choose the protected profile row, then select <strong>Edit Rules</strong>. FilterTube opens that child profile in parent-managed edit mode on your device. When the rules look right, send them to the verified child device.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">How do I update their other device?</div>
+                                            <div class="help-item-body">Start with <strong>Send Update</strong> while both devices are open. After the protected device saves the parent link, Pickup can let that verified device collect a signed parent update when it opens later. The device still checks the saved parent link before applying anything.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Where do imported lists go?</div>
+                                            <div class="help-item-body">Use <strong>Settings &gt; Rule list imports</strong>. Choose Main YouTube, YouTube Kids, or Both before applying. Import files can add channel and keyword rules only; they cannot change PINs, devices, profiles, time limits, or access.</div>
+                                        </div>
+                                        <div class="help-item">
                                             <div class="help-item-title">What should I avoid touching at first?</div>
                                             <div class="help-item-body">Leave device Pickup, full-account sync, import/export, and advanced profile policy alone until basic blocking works. They are useful, but not required for day-one setup.</div>
                                         </div>
@@ -1387,19 +1428,20 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="help-page-map" aria-label="FilterTube page map">
-                                        <div><strong>Dashboard</strong><span>See quick stats and jump to common actions.</span></div>
-                                        <div><strong>Filters</strong><span>Add keywords, channels, comments, Shorts, and content controls.</span></div>
+                                        <div><strong>Dashboard</strong><span>See status and the buttons parents use most.</span></div>
+                                        <div><strong>Filters</strong><span>Block words, channels, comments, Shorts, and other YouTube surfaces.</span></div>
                                         <div><strong>Kids Mode</strong><span>Manage YouTube Kids rules separately.</span></div>
                                         <div><strong>Settings</strong><span>Back up, restore, and import rule lists safely.</span></div>
-                                        <div><strong>Accounts &amp; Sync</strong><span>Create protected profiles, set PINs, time, Main/Kids access, and device updates.</span></div>
+                                        <div><strong>Accounts &amp; Sync</strong><span>Create protected profiles, set PINs, time limits, Main/Kids access, and device updates.</span></div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3>UI Legend</h3>
-                                </div>
+                            <details class="card help-technical-card" open>
+                                <summary class="card-header help-technical-card__summary">
+                                    <h3>Button And Badge Glossary</h3>
+                                    <span>Optional</span>
+                                </summary>
                                 <div class="card-body">
                                     <div class="help-list">
                                         <div class="help-item">
@@ -1447,12 +1489,12 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </details>
 
-                            <details class="card help-technical-card">
+                            <details class="card help-technical-card" open>
                                 <summary class="card-header help-technical-card__summary">
                                     <h3>How FilterTube Works</h3>
-                                    <span>Technical overview</span>
+                                    <span>Optional</span>
                                 </summary>
                                 <div class="card-body">
                                     <p>FilterTube uses two hiding paths so rules keep working as YouTube changes pages.</p>
@@ -1491,10 +1533,11 @@
                         </div>
 
                         <div class="help-cluster help-cluster--filters">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3>Channel Identifiers</h3>
-                                </div>
+                            <details class="card help-technical-card" open>
+                                <summary class="card-header help-technical-card__summary">
+                                    <h3>Channel ID Details</h3>
+                                    <span>Optional</span>
+                                </summary>
                                 <div class="card-body">
                                     <div class="help-list">
                                         <div class="help-item">
@@ -1511,7 +1554,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </details>
 
                             <div class="card">
                                 <div class="card-header">
@@ -1585,10 +1628,11 @@
                         </div>
 
                         <div class="help-cluster help-cluster--accounts">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3>Import &amp; Export backups</h3>
-                                </div>
+                            <details class="card help-technical-card" open>
+                                <summary class="card-header help-technical-card__summary">
+                                    <h3>Backup And Restore Details</h3>
+                                    <span>Optional</span>
+                                </summary>
                                 <div class="card-body">
                                     <div class="help-list">
                                         <div class="help-item">
@@ -1624,7 +1668,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </details>
 
                             <div class="card">
                                 <div class="card-header">
@@ -1685,7 +1729,79 @@
                         <div class="help-cluster help-cluster--support">
                             <div class="card">
                                 <div class="card-header">
-                                    <h3>Family Device Updates</h3>
+                                    <h3>Family Controls In Plain Words</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="help-list">
+                                        <div class="help-item">
+                                            <div class="help-item-title">For this device only</div>
+                                            <div class="help-item-body">Add keywords and channels in Filters. No pairing or Pickup setup is needed when the child uses this same browser profile.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">For a protected profile</div>
+                                            <div class="help-item-body">Use Accounts &amp; Sync to create the profile, choose Main/Kids access, set a daily time limit, then edit the profile's rules from the parent side.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">For another device</div>
+                                            <div class="help-item-body">Open both devices, pair with the short code, confirm the same safety phrase, then send the update. Save the parent link only on devices you trust.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">For later updates</div>
+                                            <div class="help-item-body">If Pickup is configured, a verified protected device can collect signed parent updates when it opens later. Without Pickup, open both devices and send again.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">What protected users cannot change</div>
+                                            <div class="help-item-body">They cannot change rules, parent PINs, trusted devices, backups, viewing-space access, sync targets, or time limits from the protected surface.</div>
+                                        </div>
+                                    </div>
+                                    <div class="help-flow-card" aria-label="Parent managed profile update flow">
+                                        <div class="help-flow-card__copy">
+                                            <span>Hard part made simple</span>
+                                            <strong>Parent edits here. Child device receives later.</strong>
+                                            <p>The parent device can open a protected profile in edit mode without becoming that child. The child device only receives the signed update after it has been paired and trusted.</p>
+                                        </div>
+                                        <div class="help-flow">
+                                            <article>
+                                                <span>Parent device</span>
+                                                <strong>Edit protected profile</strong>
+                                                <small>Use the protected row's Edit Rules button.</small>
+                                            </article>
+                                            <article>
+                                                <span>Parent authority</span>
+                                                <strong>Save rules, time, access</strong>
+                                                <small>Parent/account unlock controls the edit.</small>
+                                            </article>
+                                            <article>
+                                                <span>Verified device</span>
+                                                <strong>Send now or Pickup later</strong>
+                                                <small>The child device applies only newer signed parent updates.</small>
+                                            </article>
+                                        </div>
+                                        <div class="help-flow-card__note">The child profile PIN is only for opening that profile. It is not the parent PIN and cannot grant rule-editing power.</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <details class="card help-technical-card" open>
+                                <summary class="card-header help-technical-card__summary">
+                                    <h3>Device Update Details</h3>
+                                    <span>Advanced</span>
+                                </summary>
+                                <div class="card-body">
+                                    <div class="help-list">
+                                        <div class="help-item">
+                                            <div class="help-item-title">When to read this</div>
+                                            <div class="help-item-body">Most families only need the plain-word steps above. Read this section when you want to understand scopes, trusted links, encrypted backups, Home Pickup, or Internet Pickup.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="help-list">
+                                        <div class="help-item">
+                                            <div class="help-item-title">Family Device Updates</div>
+                                            <div class="help-item-body">The detailed device-update model below keeps the exact terms used by the implementation and audit docs.</div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="card-body">
                                     <div class="help-list">
@@ -1848,7 +1964,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </details>
 
                             <div class="card">
                                 <div class="card-header">
@@ -1892,43 +2008,43 @@
                                     <div class="help-list">
                                         <div class="help-item">
                                             <div class="help-item-title">What is Whitelist Mode?</div>
-                                            <div class="help-item-body">Whitelist Mode flips traditional filtering: instead of hiding blocked content, it hides <strong>everything except</strong> content from whitelisted channels and keywords. Perfect for creating an "allow-only" feed.</div>
+                                            <div class="help-item-body">Whitelist Mode is an allow-only feed. FilterTube hides everything unless it matches a channel or keyword you chose to allow.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">How to Build Your Whitelist</div>
                                             <div class="help-item-body">
-                                                <p>FilterTube reuses the same workflow as blocklist building:</p>
+                                                <p>The easiest setup is:</p>
                                                 <ol style="margin: 8px 0; padding-left: 20px;">
-                                                    <li><strong>Switch to Blocklist Mode:</strong> Start in blocklist mode to browse freely</li>
-                                                    <li><strong>Add Channels via 3-dot Menu:</strong> Use YouTube's "Block Channel" menu on videos you <em>want</em> to allow</li>
-                                                    <li><strong>Switch to Whitelist Mode:</strong> Toggle the mode switch - your blocked channels become your allowed channels</li>
-                                                    <li><strong>Enjoy Clean Feed:</strong> Only whitelisted channels and keywords will appear</li>
+                                                    <li>Start in Blocklist Mode while you choose safe channels.</li>
+                                                    <li>Use the YouTube 3-dot menu on channels you want to allow.</li>
+                                                    <li>Switch to Whitelist Mode when the allow-list looks right.</li>
+                                                    <li>Only allowed channels and keyword matches should remain visible.</li>
                                                 </ol>
                                             </div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">Whitelist Mode Logic</div>
+                                            <div class="help-item-title">What stays visible?</div>
                                             <div class="help-item-body">
-                                                <p>When in whitelist mode, FilterTube:</p>
+                                                <p>In Whitelist Mode, FilterTube:</p>
                                                 <ul style="margin: 8px 0; padding-left: 20px;">
-                                                    <li><strong>Hides by default:</strong> All content is hidden unless it matches whitelist rules</li>
-                                                    <li><strong>Checks channels:</strong> Shows content from channels in <code>whitelistChannels</code> list</li>
-                                                    <li><strong>Checks keywords:</strong> Shows content with titles matching <code>whitelistKeywords</code> patterns</li>
-                                                    <li><strong>Preserves functionality:</strong> Watch pages and playlists work normally for allowed content</li>
+                                                    <li>hides by default,</li>
+                                                    <li>shows videos from allowed channels,</li>
+                                                    <li>shows videos that match allowed keyword rules,</li>
+                                                    <li>keeps normal watch pages and playlists usable for allowed content.</li>
                                                 </ul>
                                             </div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">All subscriptions management page</div>
-                                            <div class="help-item-body"><code>/feed/channels</code> stays visible even in whitelist mode so you can still see and manage all subscribed channels instead of locking yourself out of that management surface.</div>
+                                            <div class="help-item-title">Subscriptions page stays reachable</div>
+                                            <div class="help-item-body">Your subscriptions management page stays visible so you can still review and manage channels without locking yourself out.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Creator and channel pages</div>
-                                            <div class="help-item-body">Whitelist mode is stricter on creator/channel pages now. FilterTube avoids generic “fail open” behavior there and makes a safer decision when YouTube recycles or delays card identity data.</div>
+                                            <div class="help-item-body">Creator and channel pages follow the same allow-only idea. If FilterTube cannot confirm a card is allowed, it chooses the safer hidden state.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Mode Switching</div>
-                                            <div class="help-item-body">Toggle between Blocklist and Whitelist modes using the top bar controls. FilterTube provides confirmation dialogs when switching to prevent accidental data loss, and automatically migrates your current blocklist to become your whitelist.</div>
+                                            <div class="help-item-body">Use the top bar to switch modes. FilterTube asks for confirmation so you do not accidentally change how the list is used.</div>
                                         </div>
                                     </div>
                                 </div>
@@ -1941,12 +2057,12 @@
                                 <div class="card-body">
                                     <div class="help-list">
                                         <div class="help-item">
-                                            <div class="help-item-title">Protected profile authority</div>
-                                            <div class="help-item-body">Protected profiles are private viewing spaces with their own Main and Kids rules. They can be used for children, dependents, or any user who should not edit policy. They cannot change FilterTube settings, backups, profile policy, trusted-link policy, or rule lists from the protected surface. Their Accounts &amp; Sync path is receive-only.</div>
+                                            <div class="help-item-title">What is a protected profile?</div>
+                                            <div class="help-item-body">A protected profile is a viewing space for a child, family member, or anyone who should watch within rules but not change those rules. It can have its own Main YouTube rules, Kids rules, PIN, and time limit.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Profile PIN vs parent PIN</div>
-                                            <div class="help-item-body">A protected profile PIN protects switching into that profile, so siblings or other users cannot casually open it. It can open receive-only Accounts &amp; Sync, but it does not grant parent/admin authority. Parent, account, or Master PIN controls rule editing, allowed viewing spaces, time limits, profile management, sync policy, trusted links, and backups.</div>
+                                            <div class="help-item-body">A profile PIN stops other people from casually opening that protected profile. It is not the parent/admin PIN. Parent, account, or Master unlock is still required to edit rules, time limits, backups, trusted devices, and viewing access.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Admin unlock safety</div>
@@ -1954,11 +2070,11 @@
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Who sets a protected profile PIN</div>
-                                            <div class="help-item-body">A parent/account profile can set, change, or remove a protected profile’s switching PIN from the protected profile row after parent/account unlock. The protected surface cannot use that PIN to change policy, pair trusted devices, send updates, or remove parent controls.</div>
+                                            <div class="help-item-body">A parent/account profile can set, change, or remove a protected profile's switching PIN from the protected profile row after parent/account unlock. The protected user cannot use that PIN to remove parent controls.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Where parents edit protected rules</div>
-                                            <div class="help-item-body">Open Accounts &amp; Sync from the parent/account profile and use the protected profile row’s Edit Rules button. The protected-profile editor banner stays visible across the editable surfaces and Accounts &amp; Sync. Accounts &amp; Sync remains a parent/admin surface for pairing, history, and sending parent-approved updates.</div>
+                                            <div class="help-item-body">Open Accounts &amp; Sync from the parent/account profile and use the protected profile row's Edit Rules button. A banner stays visible while you edit that protected profile's Dashboard, Filters, Kids Mode, Settings, and Accounts &amp; Sync surfaces.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Allowed viewing spaces</div>
@@ -1994,46 +2110,45 @@
 
                             <div class="card">
                                 <div class="card-header">
-                                    <h3>YouTube Kids Integration</h3>
+                                    <h3>YouTube Kids</h3>
                                 </div>
                                 <div class="card-body">
                                     <div class="help-list">
                                         <div class="help-item">
-                                            <div class="help-item-title">Passive Listening on YouTube Kids</div>
-                                            <div class="help-item-body">FilterTube keeps YouTube Kids passive by default. It listens for YouTube Kids native parent actions such as "Block this video" and "Block this channel" when YouTube exposes them, then mirrors useful state into FilterTube Kids Mode.</div>
+                                            <div class="help-item-title">Keep Kids rules separate</div>
+                                            <div class="help-item-body">YouTube Kids has its own rules in FilterTube. Use Kids Mode when you want a different list for younger children.</div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">No Protected-User Quick Buttons</div>
-                                            <div class="help-item-body">FilterTube does not add always-on quick cross buttons or custom rule-changing 3-dot entries inside YouTube Kids. A protected user could tap those controls, so parent rule changes belong in YouTube Kids' native parent flow or in FilterTube's protected Kids Mode controls.</div>
+                                            <div class="help-item-title">Parent changes stay parent-side</div>
+                                            <div class="help-item-body">FilterTube avoids adding rule-changing shortcut buttons inside YouTube Kids because a protected user could tap them. Change Kids rules from FilterTube or YouTube Kids parent controls instead.</div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">YouTube's Native Blocking vs FilterTube</div>
-                                            <div class="help-item-body">When parents block channels using YouTube Kids' native 3-dot menu, those blocks are managed by YouTube's system. FilterTube maintains its own separate blocklist for Kids Mode, giving you additional control and backup options.</div>
+                                            <div class="help-item-title">YouTube blocks and FilterTube blocks are separate</div>
+                                            <div class="help-item-body">If you block something inside YouTube Kids itself, YouTube manages that block. FilterTube keeps its own Kids list so you can back it up, edit it, and sync it separately.</div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">Understanding Channel Blocking Behavior</div>
+                                            <div class="help-item-title">If a Kids channel still looks blocked</div>
                                             <div class="help-item-body">
-                                                <p>Parents should understand YouTube's complex channel blocking system:</p>
+                                                <p>There may be two lists involved:</p>
                                                 <ul style="margin: 8px 0; padding-left: 20px;">
-                                                    <li>Channels blocked via YouTube Kids' native UI are managed by YouTube's system</li>
-                                                    <li>FilterTube's passive listener creates entries in its own Kids Mode blocklist</li>
-                                                    <li>If a channel doesn't appear after removing from FilterTube's list, it may still be blocked by YouTube's native system</li>
-                                                    <li>Use YouTube's official unblocking process for native blocks: <a href="https://support.google.com/youtubekids/answer/7178746?hl=en#zippy=%2Cunblock-individual-channels-from-youtube-using-your-linked-parent-account" target="_blank" rel="noopener noreferrer">Unblock channels from YouTube using your linked parent account</a></li>
+                                                    <li>FilterTube's Kids list.</li>
+                                                    <li>YouTube Kids' own parent-account block list.</li>
+                                                    <li>If removing a rule from FilterTube does not bring the channel back, check YouTube's official unblock steps: <a href="https://support.google.com/youtubekids/answer/7178746?hl=en#zippy=%2Cunblock-individual-channels-from-youtube-using-your-linked-parent-account" target="_blank" rel="noopener noreferrer">Unblock channels from YouTube using your linked parent account</a>.</li>
                                                 </ul>
                                             </div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">Parent Account Integration</div>
-                                            <div class="help-item-body">YouTube Kids blocking requires a verified parent account. Parents can block content from their child's YouTube Kids profile and share content from YouTube to their child's profile. See <a href="https://support.google.com/youtubekids/answer/7178746?hl=en" target="_blank" rel="noopener noreferrer">YouTube Kids Help Center</a> for complete details.</div>
+                                            <div class="help-item-title">YouTube Kids parent account</div>
+                                            <div class="help-item-body">Some YouTube Kids actions still require YouTube's linked parent account. FilterTube adds extra local rules; it does not replace YouTube's parent-account controls. See <a href="https://support.google.com/youtubekids/answer/7178746?hl=en" target="_blank" rel="noopener noreferrer">YouTube Kids Help Center</a> for YouTube-owned controls.</div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">Kids to Main sync is mode-aware</div>
+                                            <div class="help-item-title">Using Kids rules on Main YouTube</div>
                                             <div class="help-item-body">
                                                 <ul style="margin: 8px 0; padding-left: 20px;">
-                                                    <li>Kids blocklist rules apply on main YouTube only when Main is also in blocklist mode.</li>
-                                                    <li>Kids whitelist rules apply on main YouTube only when Main is also in whitelist mode.</li>
-                                                    <li>Mismatched modes do not invert rules: Kids whitelist never becomes a Main blocklist, and Kids blocklist never becomes a Main whitelist.</li>
-                                                    <li>Kids <strong>Filter All</strong> derived keywords stay green in Kids Mode and appear as channel-derived plus <code>From Kids</code> rows in Main when the modes match.</li>
+                                                    <li>Kids block rules can apply on Main YouTube when Main is also in Blocklist mode.</li>
+                                                    <li>Kids allow rules can apply on Main YouTube when Main is also in Whitelist mode.</li>
+                                                    <li>FilterTube does not flip a Kids allow-list into a Main blocklist, or a Kids blocklist into a Main allow-list.</li>
+                                                    <li>Rows copied from Kids Mode are labeled so parents can see where they came from.</li>
                                                 </ul>
                                             </div>
                                         </div>

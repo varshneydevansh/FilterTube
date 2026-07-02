@@ -90,6 +90,47 @@ the first-run copy now says most families can skip them.
 - No public claim was added for hosted FilterTube pickup service, automatic LAN
   discovery, or native Android/iOS parity.
 
+## 2026-07-02 Second Pass
+
+Parent feedback and local UI review showed two remaining problems:
+
+1. Help still exposed too much protocol language before explaining the parent
+   workflow.
+2. The Dashboard display typography used tight line-height and negative
+   tracking that made hero/app text harder to read.
+
+Changes made:
+
+- Added parent-facing questions near the top of Help for time limits,
+  protected-profile tamper boundaries, other-device updates, and rule-list
+  import targets.
+- Added a plain-language Family Controls card before the detailed device-sync
+  explanation.
+- Moved the long device-update/protocol explanation into an `Advanced`
+  disclosure and then opened optional/advanced Help sections by default after
+  local review showed parents still need to see the available topics without
+  hunting through collapsed cards.
+- Changed Help card layout so optional/advanced sections span the page and use
+  natural height, reducing the awkward empty grid space caused by mixed-height
+  cards.
+- Added a parent-managed editing explainer for the most confusing flow:
+  parents can virtually edit a protected profile from the parent device, the
+  child profile PIN is not parent authority, and the verified child device can
+  receive the signed update through live Send Update or later Pickup.
+- Updated Accounts & Sync trusted-device copy to match current Pickup behavior:
+  saved links are not a live connection, but Pickup can let a verified protected
+  device collect a signed parent update when it opens later.
+- Simplified Dashboard headline/app copy and relaxed heading letter-spacing and
+  line-height for readability.
+
+Runtime boundary:
+
+```text
+UI/copy/CSS only.
+No authority, storage, sync validation, policy apply, filtering, or YouTube DOM
+runtime behavior changed.
+```
+
 ## Remaining UX Work
 
 ```text
@@ -101,4 +142,3 @@ the first-run copy now says most families can skip them.
 4. Future advanced delivery labels can be softened further, but implementation
    docs should keep exact transport names for auditability.
 ```
-
