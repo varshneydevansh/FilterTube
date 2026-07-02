@@ -16828,6 +16828,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const empty = document.createElement('div');
             empty.className = 'nanah-trusted-links__empty';
             empty.textContent = 'No trusted devices yet.';
+            empty.dataset.filtertubeHelp = 'After you save parent trust, trusted devices appear here with reconnect, delivery-check, and policy controls.';
             ftNanahTrustedLinks.appendChild(empty);
             syncNanahManagedTargetOptions();
             return;
@@ -17271,6 +17272,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 eyebrow: 'Copy once',
                 title: 'This profile',
                 body: 'Copy the current profile to your own device once. Pair, verify the phrase, then send.',
+                help: 'Copy this profile to your own second device. This does not create parent authority or background control.',
                 steps: [
                     'Use this for your own second device.',
                     'Pair with the short code or QR and match the phrase.',
@@ -17278,7 +17280,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ],
                 hostLabel: 'Start Pairing',
                 sendLabel: getNanahScope() === 'full' ? 'Send Full Backup' : 'Send Once',
-                trustLabel: 'Trust Device'
+                trustLabel: 'Trust Device',
+                hostHelp: 'Start a normal pairing session for your own device. The other device must join and verify the same phrase.',
+                sendHelp: 'Send this profile once after the safety phrase is confirmed. The receiver still reviews before applying.',
+                trustHelp: 'Remember this trusted personal device for easier future sends. This is not family control.'
             },
             parent_control: {
                 eyebrow: 'Family control',
@@ -17286,6 +17291,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 body: childReplicaOnly
                     ? 'This protected profile can receive approved parent updates here, but it cannot send settings or change parent trust while locked.'
                     : 'Send parent-approved rules, time limits, and viewing access to a protected profile or family device.',
+                help: childReplicaOnly
+                    ? 'This protected profile can receive parent-approved updates, but it cannot send settings or change trust policy here.'
+                    : 'Best for parents and caregivers. Send reviewed rules, time limits, and viewing access to a protected profile or family device.',
                 steps: childReplicaOnly
                     ? [
                         'Start from the parent or main profile on the managing device.',
@@ -17299,7 +17307,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ],
                 hostLabel: 'Pair Protected Device',
                 sendLabel: 'Send Protected Update',
-                trustLabel: 'Save Parent Trust'
+                trustLabel: 'Save Parent Trust',
+                hostHelp: 'Create a pairing code for the protected device. Confirm the same phrase before trusting anything.',
+                sendHelp: 'Send the parent-approved protected-profile update after pairing and phrase confirmation.',
+                trustHelp: 'Save trust only when this parent should keep sending approved updates to that protected device.'
             },
             full_account: {
                 eyebrow: 'Move account',
@@ -17307,6 +17318,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 body: getActiveProfileType() === 'child'
                     ? 'Full account migration is not available from a protected profile. FilterTube will keep this scoped to the active protected profile instead.'
                     : 'Use only for reinstall, recovery, or moving the full account tree.',
+                help: 'Advanced recovery path. Use this only when moving or restoring the full FilterTube account tree.',
                 steps: [
                     'Use this only for reinstall, migration, or full recovery.',
                     'Pair and verify the phrase like any other Nanah session.',
@@ -17314,7 +17326,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ],
                 hostLabel: 'Start Migration Pairing',
                 sendLabel: getActiveProfileType() === 'child' ? 'Send This Protected Profile' : 'Send Full Backup',
-                trustLabel: 'Save Device Trust'
+                trustLabel: 'Save Device Trust',
+                hostHelp: 'Start a migration/recovery pairing session. Use this only when you mean to move a wider account snapshot.',
+                sendHelp: 'Send the selected full-account or protected-profile backup after the safety phrase is confirmed.',
+                trustHelp: 'Remember this device for account recovery or migration flows. Do not use this for ordinary family controls.'
             }
         };
 
@@ -17330,13 +17345,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ],
                 hostLabel: 'Parent Starts Pairing',
                 sendLabel: 'Receive Only',
-                trustLabel: 'Parent Managed'
+                trustLabel: 'Parent Managed',
+                help: 'Receive-only protected profile. The parent device starts the update; this profile cannot change parent policy.',
+                hostHelp: 'A protected profile cannot start this parent-control pairing. Start from the parent device.',
+                sendHelp: 'Receive-only mode: this protected profile cannot send settings from here.',
+                trustHelp: 'Parent-managed trust is controlled from the parent/admin profile, not from this protected surface.'
             }
             : (configs[mode] || configs.send_once);
 
         if (ftNanahModeEyebrow) ftNanahModeEyebrow.textContent = config.eyebrow;
         if (ftNanahModeTitle) ftNanahModeTitle.textContent = config.title;
         if (ftNanahModeBody) ftNanahModeBody.textContent = config.body;
+        if (ftNanahModeSpotlight) {
+            ftNanahModeSpotlight.dataset.filtertubeHelp = config.help || config.body || '';
+        }
         if (ftNanahModeSteps) {
             ftNanahModeSteps.innerHTML = '';
             config.steps.forEach((step) => {
@@ -17354,12 +17376,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         refreshNanahAdvancedSummary();
         if (ftNanahHostBtn) {
             ftNanahHostBtn.textContent = config.hostLabel;
+            ftNanahHostBtn.dataset.filtertubeHelp = config.hostHelp || 'Start pairing on this device.';
         }
         if (ftNanahSendBtn) {
             ftNanahSendBtn.textContent = config.sendLabel;
+            ftNanahSendBtn.dataset.filtertubeHelp = config.sendHelp || 'Send the selected update after pairing and phrase confirmation.';
         }
         if (ftNanahTrustBtn) {
             ftNanahTrustBtn.textContent = config.trustLabel;
+            ftNanahTrustBtn.dataset.filtertubeHelp = config.trustHelp || 'Save trust only for devices you control.';
         }
         if (ftNanahActions) {
             ftNanahActions.dataset.mode = mode;

@@ -43,7 +43,20 @@ including:
 - channel-management selectors and imported-list filters
 - Settings import/export buttons and helper rows
 - Account & Sync security and family-device controls
+- Family Device Updates controls for Send Update, Home Pickup, Internet Pickup,
+  pairing, safety phrase confirmation, More options, trusted devices, and
+  mode-specific actions
 - Content Controls toggle rows that already carry explanatory text
+
+2026-07-02 follow-up: the first delegated pass exposed the helper only where
+existing elements already had `title` or `data-filtertube-help`. The Nanah
+Profile Update surface had several plain labels and dynamic button labels, so
+the parent-facing explanations did not appear on important controls such as
+Family control, Protected device, Pair Protected Device, Send Protected Update,
+Save Parent Trust, Meeting service link, and Trusted devices. The follow-up adds
+explicit help copy to those static controls and updates the dynamic mode labels
+from `js/tab-view.js` whenever the user switches between Copy once, Family
+control, Move account, or receive-only protected mode.
 
 ## Parent-Facing Intent
 
@@ -59,4 +72,3 @@ Short clicks still perform the original action. Long-press is only for help.
 - Controls without `title` or `data-filtertube-help` do not get a bubble until
 their copy is added.
 - This does not change filtering behavior, sync behavior, or profile authority.
-
