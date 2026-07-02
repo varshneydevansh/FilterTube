@@ -606,10 +606,18 @@ button.select-input.ft-select-trigger:disabled,
     font-weight: 700;
 }
 
+.keyword-date-filter-modal__field[hidden] {
+    display: none !important;
+}
+
 .keyword-date-filter-modal__dates {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.75rem;
+}
+
+.keyword-date-filter-modal__dates--single {
+    grid-template-columns: 1fr;
 }
 
 @media (max-width: 640px) {

@@ -21468,6 +21468,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const mode = conditionSelect.value;
                 fromLabel.hidden = mode === 'before';
                 toLabel.hidden = mode === 'after';
+                dateGrid.classList.toggle('keyword-date-filter-modal__dates--single', mode !== 'between');
                 hint.textContent = mode === 'after'
                     ? 'Example: Deltarune after 2025-06-10 blocks newer Deltarune videos only.'
                     : (mode === 'before'
