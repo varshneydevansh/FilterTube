@@ -431,7 +431,7 @@ Current UI wording boundary:
 - Sending those changes to another device still uses the verified-device
   managed-policy path, not the file/list parser.
 
-Not shipped in this CSV PR:
+Not shipped in this release boundary:
 
 - Built-in global/public list catalog.
 - Automatic subscriptions to third-party lists.

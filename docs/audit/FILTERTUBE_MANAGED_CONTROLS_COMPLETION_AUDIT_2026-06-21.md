@@ -1,11 +1,13 @@
 # Audit: Managed Parent/Caregiver Controls Completion State
 
 **Generated**: 2026-06-21
-**Status**: Extension-owned managed-control runtime, policy, UI, and proof
-lanes are mostly implemented. Whole-goal completion is not proven because
-installed two-device smoke, hosted Internet Pickup ownership, automatic
-same-network peer discovery, and native Android/iOS parity remain separate
-provider/app/manual lanes.
+**Status**: Extension-owned managed-control runtime, policy, UI, rule-list
+imports, live Send Update, explicit Home Pickup, explicit Internet Pickup, and
+lazy saved-update checks are implemented for the current extension release
+boundary. Whole-product completion is not claimed because hosted Internet
+Pickup ownership, automatic same-network peer discovery, native Android/iOS
+parity, and user-installed two-device smoke remain separate provider/app/manual
+lanes.
 **Runtime behavior changed**: no.
 **Goal slice**: Managed parent/caregiver controls, local P2P/local-network
 sync, time-limit safety, and downstream app policy parity.
@@ -22,7 +24,7 @@ apps.
 
 ```text
 EXTENSION-PRESENT        current extension runtime/UI/proof exists
-PARTIAL-PROVIDER         extension hook/client exists; real provider/deployment or smoke remains
+PROVIDER-GATED           extension hook/client/reference provider exists; user/hosted deployment or smoke remains
 DOWNSTREAM-PENDING       downstream Android/iOS app parity remains
 MANUAL-SMOKE-PENDING     requires installed real-device/manual proof
 NOT-CLAIMED              deliberately blocked from public/release wording
@@ -38,8 +40,8 @@ NOT-CLAIMED              deliberately blocked from public/release wording
 | Trusted parent/caregiver devices can send protected-device policy through Nanah live P2P. | EXTENSION-PRESENT plus MANUAL-SMOKE-PENDING | `docs/audit/FILTERTUBE_NANAH_MANAGED_SIGNING_KEYPAIR_2026-06-04.md`; `docs/audit/FILTERTUBE_NANAH_MANAGED_LIVE_SIGNED_SEND_2026-06-04.md`; `tests/runtime/managed-nanah-live-signed-send-current-behavior.test.mjs`; `docs/audit/artifacts/managed-extension-installed-smoke/template.json`; `docs/audit/artifacts/managed-extension-installed-smoke/verify-managed-extension-smoke-artifact.mjs`. | Execute the installed-extension smoke artifact with real parent/protected browser evidence. |
 | Remote management can update keywords, channels, videos, viewing space, and time limits through the same validated rule paths as local controls. | EXTENSION-PRESENT plus MANUAL-SMOKE-PENDING | `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`; `tests/runtime/managed-nanah-live-signed-send-current-behavior.test.mjs`; `tests/runtime/managed-policy-schema-revision-contract-current-behavior.test.mjs`. | Installed remote delivery smoke and app parity artifact. |
 | Protected devices keep the last valid parent/caregiver policy while offline. | EXTENSION-PRESENT plus MANUAL-SMOKE-PENDING | `docs/audit/FILTERTUBE_NANAH_MANAGED_PULL_ON_OPEN_2026-06-04.md`; `docs/audit/artifacts/managed-remote-delivery-smoke/template.json`; `tests/runtime/managed-policy-sync-remote-delivery-smoke-artifact-verifier-current-behavior.test.mjs`. | Executed managed remote-delivery smoke artifact. |
-| Optional encrypted Internet Pickup can deliver later updates without plaintext rules. | PARTIAL-PROVIDER | `docs/audit/FILTERTUBE_MANAGED_POLICY_ENCRYPTED_MAILBOX_PROTOCOL_2026-06-03.md`; `docs/audit/FILTERTUBE_MANAGED_MAILBOX_SOURCE_UPLOAD_HANDOFF_2026-06-05.md`; `docs/audit/FILTERTUBE_NANAH_MANAGED_POLICY_REMOTE_DELIVERY_RELEASE_READINESS_GATE_2026-06-05.md`; `docs/audit/FILTERTUBE_MANAGED_PICKUP_PROVIDER_OWNERSHIP_GATE_2026-06-21.md`; `scripts/managed-delivery-provider.mjs`. | Execute provider ownership artifact with endpoint deployment, provider smoke, and release wording review before hosted/guaranteed later-delivery claims. |
-| Home Pickup can support explicitly configured same-network delivery without making LAN discovery authority. | PARTIAL-PROVIDER | `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PROVIDER_HOOK_2026-06-05.md`; `docs/audit/FILTERTUBE_LOCAL_NETWORK_DISCOVERY_AUTHORITY_BOUNDARY_2026-06-03.md`; `tests/runtime/managed-local-network-provider-current-behavior.test.mjs`; `tests/runtime/managed-transport-provider-clients-current-behavior.test.mjs`. | Explicit provider smoke. Automatic LAN peer discovery remains app/provider work and NOT-CLAIMED. |
+| Optional encrypted Internet Pickup can deliver later updates without plaintext rules. | PROVIDER-GATED | `docs/audit/FILTERTUBE_MANAGED_POLICY_ENCRYPTED_MAILBOX_PROTOCOL_2026-06-03.md`; `docs/audit/FILTERTUBE_MANAGED_MAILBOX_SOURCE_UPLOAD_HANDOFF_2026-06-05.md`; `docs/audit/FILTERTUBE_NANAH_MANAGED_POLICY_REMOTE_DELIVERY_RELEASE_READINESS_GATE_2026-06-05.md`; `docs/audit/FILTERTUBE_MANAGED_PICKUP_PROVIDER_OWNERSHIP_GATE_2026-06-21.md`; `scripts/managed-delivery-provider.mjs`; `js/tab-view.js`. | Execute provider ownership artifact with endpoint deployment, provider smoke, and release wording review before hosted/guaranteed later-delivery claims. |
+| Home Pickup can support explicitly configured same-network delivery without making LAN discovery authority. | PROVIDER-GATED | `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PROVIDER_HOOK_2026-06-05.md`; `docs/audit/FILTERTUBE_LOCAL_NETWORK_DISCOVERY_AUTHORITY_BOUNDARY_2026-06-03.md`; `scripts/managed-delivery-provider.mjs`; `js/tab-view.js`; `js/managed_parent_command_center.js`. | Explicit provider smoke. Automatic LAN peer discovery remains app/provider work and NOT-CLAIMED. |
 | Local-network discovery is not authority; stale, replayed, revoked, mismatched, spoofed, or untrusted policies are rejected. | EXTENSION-PRESENT | `docs/audit/FILTERTUBE_LOCAL_NETWORK_DISCOVERY_AUTHORITY_BOUNDARY_2026-06-03.md`; `tests/runtime/local-network-discovery-authority-boundary-current-behavior.test.mjs`; `tests/runtime/managed-policy-schema-revision-contract-current-behavior.test.mjs`; `tests/runtime/managed-nanah-open-sync-current-behavior.test.mjs`. | Provider hostile-LAN smoke before any automatic discovery claim. |
 | Main YouTube and YouTube Kids access are enforced per protected profile. | EXTENSION-PRESENT plus DOWNSTREAM-PENDING | `docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PARENT_CONTROLS_PLAN_2026-06-03.md`; `tests/runtime/managed-viewing-space-route-gate-current-behavior.test.mjs`; `docs/audit/artifacts/managed-extension-installed-smoke/template.json`; `docs/audit/FILTERTUBE_MANAGED_APP_POLICY_CONTRACT_PARITY_2026-06-04.md`. | Execute installed extension smoke and native Android/iOS route-gate smoke. |
 | YouTube time limits are enforced per protected profile. | EXTENSION-PRESENT plus DOWNSTREAM-PENDING | `docs/audit/FILTERTUBE_MANAGED_CHILD_TIME_LIMIT_SCHEMA_CONTRACT_2026-06-03.md`; `tests/runtime/managed-child-time-limit-schema-current-behavior.test.mjs`; `tests/runtime/managed-time-budget-enforcement-current-behavior.test.mjs`; `docs/audit/artifacts/managed-extension-installed-smoke/template.json`. | Execute installed extension timeout smoke and native Android/iOS startup/resume/heartbeat/pause smoke. |
@@ -55,13 +57,53 @@ NOT-CLAIMED              deliberately blocked from public/release wording
 ```text
 extension local protected-profile controls: EXTENSION-PRESENT
 extension live Nanah signed send: EXTENSION-PRESENT, MANUAL-SMOKE-PENDING
-extension provider-gated Internet Pickup/Home Pickup clients: PARTIAL-PROVIDER
+extension provider-gated Internet Pickup/Home Pickup clients: EXTENSION-PRESENT, PROVIDER-GATED
 hosted Internet Pickup service ownership/deployment: NOT-CLAIMED
 automatic same-network peer discovery: NOT-CLAIMED, DOWNSTREAM-PENDING
 native Android/iOS settings lock and time-limit parity: DOWNSTREAM-PENDING
 installed two-device extension smoke: MANUAL-SMOKE-PENDING
 whole goal complete: NO
 ```
+
+## 2026-07-02 Extension Release Boundary Close-Out
+
+This close-out separates what is complete in the extension from the broader
+provider/app work that should not be claimed as shipped.
+
+Complete for the extension release boundary:
+
+- Issue #62 reviewed rule-list foundation: CSV, TXT, simple JSON,
+  BlockTube-style JSON, and raw HTTPS URL rule lists go through preview,
+  skipped-row review, Main/Kids/Both targeting, normal profile apply, list
+  management, pause/resume/remove, URL check, stale check, and parent-reviewed
+  refresh.
+- Live `Send Update`: parent/account profiles can send protected-profile rules,
+  viewing access, time limits, and supported policy scopes to verified devices
+  when both devices are open and the trusted Nanah session is verified.
+- Explicit `Internet Pickup`: configured trusted HTTPS pickup providers can
+  receive signed/encrypted waiting updates for verified protected devices that
+  open later or away from the parent device.
+- Explicit `Home Pickup`: configured same-network pickup providers can receive
+  signed waiting updates for already verified protected devices on a home,
+  school, or clinic network.
+- Lazy saved-update checks: protected devices with `syncOnProfileOpen` enabled
+  check configured pickup readers on Accounts & Sync open, dashboard visibility
+  return, profile switch, and manual `Check Saved Updates`.
+- Parent/source receipt checks: parent devices can pull redacted delivery
+  receipts from configured pickup providers after a saved update was handed off.
+
+Still not claimed in this extension close-out:
+
+- A FilterTube-hosted Internet Pickup service.
+- Automatic LAN peer discovery or Xender-style ambient device scanning.
+- Silent public auto-subscribe catalogs for third-party rule lists.
+- Native Android/iOS UI and runtime parity.
+- The user's installed two-device smoke result.
+
+Public/release wording should therefore say that FilterTube supports live Send
+Update and optional configured pickup paths. It should not say that FilterTube
+automatically finds devices on the network, owns a hosted pickup service, or
+silently subscribes users to public lists.
 
 ## 2026-06-26 Remaining Work Check
 

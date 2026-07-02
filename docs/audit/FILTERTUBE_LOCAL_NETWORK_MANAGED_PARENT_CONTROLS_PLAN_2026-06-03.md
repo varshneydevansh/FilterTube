@@ -1102,6 +1102,19 @@ parent tool instead of a sync/debug console.
   Ambient Wi-Fi/LAN presence never becomes authority. Future automatic discovery
   remains app/provider research and must pass hostile-network proof before any
   public claim.
+- [x] 2026-07-02 extension release close-out for Issue #62 and managed sync.
+  The extension-owned release slice is complete for reviewed rule-list imports
+  and configured device-update delivery: CSV, TXT, simple JSON, BlockTube-style
+  JSON, and raw HTTPS URL lists use preview-first Main/Kids/Both targeting plus
+  pause/resume/remove/check/refresh list management; live `Send Update` handles
+  open verified devices; `Internet Pickup` handles verified devices that open
+  later through an explicitly configured trusted HTTPS pickup provider; `Home
+  Pickup` handles verified same-network devices through an explicitly
+  configured home/school/clinic pickup provider; and protected profiles with
+  `syncOnProfileOpen` perform lazy saved-update checks on dashboard open,
+  visibility return, profile switch, and manual check. This does not ship or
+  claim silent public auto-subscribe catalogs, automatic LAN peer discovery,
+  hosted FilterTube Internet Pickup, or native Android/iOS parity.
 - [x] Configured local-network gateway transport. The extension can install an
   explicit parent-configured provider for publishing, discovering, and
   acknowledging signed local-network candidates through HTTPS or private local

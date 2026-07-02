@@ -2,15 +2,16 @@
 
 **Date**: 2026-06-21
 **Scope**: Extension-owned managed parent/caregiver controls, local P2P,
-optional pickup-provider hooks, rule-list imports, time limits, and release
+optional configured pickup-provider clients, rule-list imports, time limits, and release
 handoff boundaries.
 **Runtime behavior changed**: no.
 
 ## Status
 
-The extension-side MVP is implemented far enough for installed-extension smoke
-and release-readiness review, but the full goal is not complete until the
-manual/provided transport and downstream app lanes below are proven.
+The extension-side MVP is implemented for the current extension release
+boundary and is ready for installed-extension smoke and release-readiness
+review. The full product goal is not complete until the manual/provider
+transport and downstream app lanes below are proven.
 
 Current state:
 
@@ -18,7 +19,7 @@ Current state:
 extension policy authority: implemented
 parent/caregiver Family Controls UI: implemented
 live Nanah Send Update: implemented for eligible connected verified devices
-Internet Pickup/Home Pickup hooks: implemented behind explicit provider setup
+Internet Pickup/Home Pickup clients: implemented behind explicit provider setup
 Home Pickup visible readiness Check: required by release smoke artifact
 reference provider: implemented as self-hosted proof only
 automatic LAN peer discovery: not implemented
@@ -46,7 +47,7 @@ liquid-glass/device-map visual polish: optional future UI lane
 ```
 
 The extension can be described as having local protected-profile controls,
-signed live Send Update, explicit optional pickup-provider hooks, rule-list
+signed live Send Update, explicit optional pickup-provider clients, rule-list
 imports, time limits, route gates, timeout overlay, and protected redacted
 history. It still must not be described as a fully hosted remote-management
 service, an automatic LAN discovery system, or complete mobile/tablet parity.
