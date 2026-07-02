@@ -89,6 +89,10 @@ whitelist rules and other whitelist rules are evaluated separately.
 Keyword rows now expose a `Date` pill beside `Exact`. The editor explains that
 the rule uses video release/upload date, not the date the keyword was added.
 
+The `Date` pill is not an optimistic toggle. Clicking it opens the editor, but
+the row only stays active after a valid date rule is saved. Canceling the modal
+or trying to save without the required date boundary leaves the pill inactive.
+
 Managed child-profile editing uses the same row control, so a parent can set a
 date-limited keyword while virtually editing a protected profile and then send
 that managed policy to a verified device through the existing device-update

@@ -536,45 +536,29 @@ const RenderEngine = (() => {
             const dateToggleTitle = dateFilter.enabled
                 ? `This keyword only applies to videos ${formatKeywordDateFilterLabel(dateFilter).toLowerCase()}`
                 : 'Set a release-date limit for this keyword';
-            const dateToggle = UIComponents?.createToggleButton
-                ? UIComponents.createToggleButton({
-                    text: dateToggleText,
-                    active: dateFilter.enabled,
-                    title: dateToggleTitle,
-                    ariaLabel: `${dateToggleText}: ${dateToggleTitle}`,
-                    onToggle: async () => {
-                        if (typeof onUpdateDateFilter === 'function') {
-                            await onUpdateDateFilter(entry);
-                            return;
-                        }
-                        if (profile === 'kids') {
-                            await StateManager?.updateKidsKeywordDateFilter?.(entry.word, dateFilter.enabled ? { enabled: false } : { enabled: true, condition: 'after', fromDate: '', toDate: '' });
-                            return;
-                        }
-                        await StateManager?.updateKeywordDateFilter?.(entry.word, dateFilter.enabled ? { enabled: false } : { enabled: true, condition: 'after', fromDate: '', toDate: '' });
-                    },
-                    className: 'toggle-variant-amber'
-                })
-                : (() => {
-                    const toggle = document.createElement('div');
-                    toggle.className = `exact-toggle toggle-variant-amber ${dateFilter.enabled ? 'active' : ''}`.trim();
-                    toggle.textContent = dateToggleText;
-                    toggle.title = dateToggleTitle;
-                    toggle.setAttribute('role', 'button');
-                    toggle.setAttribute('aria-pressed', dateFilter.enabled ? 'true' : 'false');
-                    toggle.setAttribute('tabindex', '0');
-                    const activate = async () => {
-                        if (typeof onUpdateDateFilter === 'function') await onUpdateDateFilter(entry);
-                    };
-                    toggle.addEventListener('click', activate);
-                    toggle.addEventListener('keydown', async (e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            await activate();
-                        }
-                    });
-                    return toggle;
-                })();
+            const dateToggle = (() => {
+                const toggle = document.createElement('div');
+                toggle.className = `exact-toggle toggle-variant-amber ${dateFilter.enabled ? 'active' : ''}`.trim();
+                toggle.textContent = dateToggleText;
+                toggle.title = dateToggleTitle;
+                toggle.setAttribute('role', 'button');
+                toggle.setAttribute('aria-pressed', dateFilter.enabled ? 'true' : 'false');
+                toggle.setAttribute('aria-label', `${dateToggleText}: ${dateToggleTitle}`);
+                toggle.setAttribute('tabindex', '0');
+                const activate = async () => {
+                    if (typeof onUpdateDateFilter === 'function') {
+                        await onUpdateDateFilter(entry);
+                    }
+                };
+                toggle.addEventListener('click', activate);
+                toggle.addEventListener('keydown', async (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        await activate();
+                    }
+                });
+                return toggle;
+            })();
 
             // Delete button
             const deleteHandler = async () => {
