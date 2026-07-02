@@ -379,6 +379,32 @@ Current completion rule:
   parent/account approval.
 - Help text should stay short and point to the UI path; this audit file owns the detailed format contract.
 
+## Issue 62 Status: Import And Subscribe To Lists
+
+GitHub issue #62 asks for content-blocker-like channel filter lists that can be
+enabled/disabled, imported, and kept in sync instead of adding channels one at
+a time.
+
+Current extension behavior covers the safe parent-approved foundation:
+
+- import CSV, TXT, simple rule-list JSON, BlockTube-style JSON, or a raw HTTPS
+  URL into the same preview-first flow
+- apply the reviewed list to Main YouTube, YouTube Kids, or both
+- store list-derived rows with list id, name, source label, source URL, source
+  format, checked timestamp, content hash, and optional source metadata
+- view imported lists in `Manage Lists`
+- pause/resume a list without deleting manual rules
+- remove list-derived rows without touching manual rules
+- check one URL-backed list, all URL-backed lists, or stale URL-backed lists
+- refresh changed URL content only after parent/account unlock and preview
+- send changed protected-profile policy to verified devices after local apply
+
+This is deliberately not a silent global subscription ecosystem yet. Public
+list catalogs, automatic unattended application, reputation/governance, and
+hosted default lists need a separate trust model. A raw URL is a source of rule
+rows only; it is never authority over profiles, PINs, trusted devices, Main/Kids
+access, time limits, or sync targets.
+
 Supported source shapes in this slice:
 
 - CSV: `channel_id,keyword,notes`, `channel,keyword,notes`, or typed rows such as `type,value,notes`.
