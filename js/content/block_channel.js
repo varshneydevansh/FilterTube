@@ -469,8 +469,11 @@ const isMobileWatchNextQuickBlockHost = (hostCard) => {
 
         if (
             hostCard.matches?.(
+                'ytm-media-item, ' +
                 'ytm-video-with-context-renderer, ' +
                 'ytm-compact-video-renderer, ' +
+                'ytm-watch-card-hero-video-renderer, ' +
+                'ytm-watch-card-rich-header-renderer, ' +
                 'ytm-playlist-panel-video-renderer, ' +
                 'ytm-playlist-video-renderer, ' +
                 'ytm-radio-renderer, ' +
@@ -542,10 +545,12 @@ function resolveQuickBlockHost(node) {
         tag === 'yt-lockup-metadata-view-model' ||
         tag === 'ytm-channel-renderer' ||
         tag === 'ytm-compact-channel-renderer' ||
-        tag === 'ytm-universal-watch-card-renderer'
+        tag === 'ytm-universal-watch-card-renderer' ||
+        tag === 'ytm-watch-card-hero-video-renderer' ||
+        tag === 'ytm-watch-card-rich-header-renderer'
     ) {
         return node.closest(
-            'ytd-rich-item-renderer, ytd-video-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-playlist-panel-video-renderer, ytd-playlist-panel-video-wrapper-renderer, ytm-rich-item-renderer, ytm-video-with-context-renderer, .ytGridShelfViewModelGridShelfItem'
+            'ytd-rich-item-renderer, ytd-video-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-playlist-panel-video-renderer, ytd-playlist-panel-video-wrapper-renderer, ytm-rich-item-renderer, ytm-media-item, ytm-video-with-context-renderer, ytm-watch-card-hero-video-renderer, ytm-watch-card-rich-header-renderer, .ytGridShelfViewModelGridShelfItem'
         ) || node;
     }
     if (tag === 'ytd-rich-grid-media') {
@@ -647,9 +652,12 @@ function resolveQuickBlockAnchor(hostCard) {
         'ytm-shorts-lockup-view-model-v2',
         'yt-lockup-view-model',
         'yt-lockup-metadata-view-model',
+        'ytm-media-item',
         'ytm-channel-renderer',
         'ytm-compact-channel-renderer',
         'ytm-universal-watch-card-renderer',
+        'ytm-watch-card-hero-video-renderer',
+        'ytm-watch-card-rich-header-renderer',
         'ytm-channel-thumbnail-with-link-renderer',
         'ytd-playlist-panel-video-wrapper-renderer',
         'ytd-playlist-panel-video-renderer',
@@ -1119,8 +1127,11 @@ const QUICK_BLOCK_CARD_SELECTORS = [
     'yt-lockup-view-model',
     'yt-lockup-metadata-view-model',
     'ytm-rich-item-renderer',
+    'ytm-media-item',
     'ytm-compact-video-renderer',
     'ytm-video-with-context-renderer',
+    'ytm-watch-card-hero-video-renderer',
+    'ytm-watch-card-rich-header-renderer',
     'ytm-compact-playlist-renderer',
     'ytm-playlist-video-renderer',
     'ytm-playlist-panel-video-renderer',
@@ -1163,8 +1174,11 @@ const QUICK_BLOCK_CARD_TAGS = new Set([
     'yt-lockup-view-model',
     'yt-lockup-metadata-view-model',
     'ytm-rich-item-renderer',
+    'ytm-media-item',
     'ytm-compact-video-renderer',
     'ytm-video-with-context-renderer',
+    'ytm-watch-card-hero-video-renderer',
+    'ytm-watch-card-rich-header-renderer',
     'ytm-compact-playlist-renderer',
     'ytm-playlist-video-renderer',
     'ytm-playlist-panel-video-renderer',
@@ -1184,7 +1198,8 @@ const QUICK_BLOCK_CARD_TAGS = new Set([
 ]);
 const QUICK_BLOCK_CARD_CLASS_NAMES = [
     'shortsLockupViewModelHost',
-    'ytGridShelfViewModelGridShelfItem'
+    'ytGridShelfViewModelGridShelfItem',
+    'YtmCompactMediaItemHost'
 ];
 
 function findQuickBlockCardFromTarget(target, maxDepth = 18) {
@@ -2961,8 +2976,11 @@ async function handleDropdownAppearedInternal(dropdown) {
         'ytd-reel-video-renderer, ' +
         'reel-item-endpoint, ' +
         'ytd-compact-promoted-video-renderer, ' +
+        'ytm-media-item, ' +
         'ytm-compact-video-renderer, ' +
         'ytm-video-with-context-renderer, ' +
+        'ytm-watch-card-hero-video-renderer, ' +
+        'ytm-watch-card-rich-header-renderer, ' +
         'ytm-compact-playlist-renderer, ' +
         'ytm-playlist-video-renderer, ' +
         'ytm-playlist-panel-video-renderer, ' +

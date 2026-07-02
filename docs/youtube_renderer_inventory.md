@@ -286,7 +286,10 @@ The current mobile YouTube (`m.youtube.com`) DOM uses `ytm-*` custom elements
 with camelCase host classes. This mirrors the desktop camelCase lockup shift,
 but the filtering boundary is still card-first: chip bars are UI controls,
 while `ytm-video-with-context-renderer`, `ytm-media-item`, Shorts lockups, and
-compact channel/video rows remain the content-bearing nodes.
+compact channel/video rows remain the content-bearing nodes. Runtime support
+was updated after this sample so the new YTM content hosts participate in the
+same card discovery, channel extraction, quick-block, fallback-menu, and stale
+identity clearing paths as desktop camelCase lockups.
 
 Observed Home shell:
 
@@ -320,6 +323,8 @@ Observed Watch shell:
           class="YtmChannelThumbnailWithLinkRendererHost">
         <ytm-badge-and-byline-renderer
           class="YtmBadgeAndBylineRendererHost">
+      <ytm-watch-card-hero-video-renderer>
+      <ytm-watch-card-rich-header-renderer>
 ```
 
 Observed channel/search-like YTM shells:
@@ -340,12 +345,23 @@ Runtime implications:
 - Existing YTM card selectors remain first-class:
   `ytm-video-with-context-renderer`, `ytm-compact-video-renderer`,
   `ytm-rich-item-renderer`, `ytm-media-item`,
+  `ytm-watch-card-hero-video-renderer`,
+  `ytm-watch-card-rich-header-renderer`,
   `ytm-channel-thumbnail-with-link-renderer`,
   `ytm-shorts-lockup-view-model`, and `ytm-shorts-lockup-view-model-v2`.
+- `ytm-media-item`, `ytm-watch-card-hero-video-renderer`, and
+  `ytm-watch-card-rich-header-renderer` are now included in shared card
+  discovery, YTM identity extraction, fallback-menu placement, quick-block
+  anchoring, and recycled-card video-id revalidation.
+- `YtmBadgeAndBylineRendererHost`, `YtmBadgeAndBylineRendererItemByline`, and
+  `YtmChannelThumbnailWithLinkRendererHost` stay metadata sources for channel
+  text/avatar/link extraction.
 - `ytm-chip-cloud-chip-renderer` should only wake fallback processing on Home
   and Search routes, matching the desktop chip boundary.
-- Mobile Watch recommendation cards under the chip bar remain filterable because
-  they are actual video rows, not because the chip labels are processed.
+- Mobile Watch recommendation cards under
+  `ytm-chip-cloud-renderer.YtmChipCloudRendererHost.chip-bar` remain filterable
+  because the rows below it are actual video cards; the chip labels themselves
+  are not hide targets on `/watch`.
 - The sampled YTM DOM still preserves FilterTube state attributes on filtered
   rows, so this sample does not prove YouTube is stripping extension attributes.
   Issue #59 remains a privacy/code-burden cleanup direction, not the proven
@@ -828,7 +844,7 @@ Fallback contract:
 | `<ytd-feed-filter-chip-bar-renderer>` | Horizontal chip bar | ✅ Route-scoped DOM support | Home/feed chip bars can be processed on `/` |
 | `<ytd-search-header-renderer has-chip-bar>` | Search results chip bar | ✅ Route-scoped DOM support | Search chips can be processed on `/results` |
 | `<ytm-feed-filter-chip-bar-renderer>` | Mobile Home horizontal chip bar | ✅ Route-scoped DOM support | Mobile Home chips can be processed on `/` |
-| `<ytm-chip-cloud-renderer class="YtmChipCloudRendererHost chip-bar">` | Mobile Watch related chip bar | 🚫 Watch route only | Inventoried only; do not wake DOM fallback on `/watch` |
+| `<ytm-chip-cloud-renderer class="chips-fixed-positioning chips-visible YtmChipCloudRendererHost chip-bar">` | Mobile Watch related chip bar | 🚫 Watch route only | Inventoried only; do not wake DOM fallback on `/watch`; filter the actual video rows under it instead |
 | `<yt-chip-cloud-chip-renderer>` | Individual chips (`Music`, `Mixes`, `Shorts`, `Unwatched`, etc.) | ✅ Route-scoped | DOM fallback may hide matching chips on Home/Search only |
 | `<ytm-chip-cloud-chip-renderer>` | Mobile individual chips | ✅ Route-scoped | Same Home/Search-only boundary as desktop chips |
 | `<chip-shape>` button text | Visible chip label | ⚠️ Label source only | Use the containing `yt-chip-cloud-chip-renderer` for DOM fallback; do not target Watch related chips |

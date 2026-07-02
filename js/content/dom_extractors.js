@@ -39,8 +39,11 @@ const VIDEO_CARD_SELECTORS = [
     'ytd-channel-featured-content-renderer',
     'yt-official-card-view-model',
     'ytm-rich-item-renderer',
+    'ytm-media-item',
     'ytm-video-with-context-renderer',
     'ytm-compact-video-renderer',
+    'ytm-watch-card-hero-video-renderer',
+    'ytm-watch-card-rich-header-renderer',
     'ytm-playlist-panel-video-renderer',
     'ytm-playlist-video-renderer',
     'ytm-radio-renderer',
@@ -119,8 +122,11 @@ function ensureVideoIdForCard(card) {
             tag === 'ytd-video-renderer' ||
             tag === 'ytd-grid-video-renderer' ||
             tag === 'ytd-compact-video-renderer' ||
+            tag === 'ytm-media-item' ||
             tag === 'ytm-video-with-context-renderer' ||
             tag === 'ytm-compact-video-renderer' ||
+            tag === 'ytm-watch-card-hero-video-renderer' ||
+            tag === 'ytm-watch-card-rich-header-renderer' ||
             tag === 'ytd-playlist-panel-video-renderer' ||
             tag === 'ytd-playlist-panel-video-wrapper-renderer');
     if (canFastReturnStamp) {
@@ -142,8 +148,11 @@ function ensureVideoIdForCard(card) {
             tag === 'ytd-video-renderer' ||
             tag === 'ytd-grid-video-renderer' ||
             tag === 'ytd-compact-video-renderer' ||
+            tag === 'ytm-media-item' ||
             tag === 'ytm-video-with-context-renderer' ||
             tag === 'ytm-compact-video-renderer' ||
+            tag === 'ytm-watch-card-hero-video-renderer' ||
+            tag === 'ytm-watch-card-rich-header-renderer' ||
             tag === 'ytd-playlist-panel-video-renderer' ||
             tag === 'ytd-playlist-panel-video-wrapper-renderer');
 

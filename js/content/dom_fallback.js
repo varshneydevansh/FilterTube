@@ -3828,6 +3828,7 @@ async function applyDOMFallback(settings, options = {}) {
                 '.media-item-headline .yt-core-attributed-string, .compact-media-item-headline .yt-core-attributed-string, ' +
                 '.large-media-item-headline .yt-core-attributed-string, .YtmCompactMediaItemHeadline .yt-core-attributed-string, ' +
                 'ytm-media-item h3, ytm-compact-video-renderer h3, ytm-video-with-context-renderer h3, ' +
+                'ytm-watch-card-hero-video-renderer h3, ytm-watch-card-rich-header-renderer h3, ' +
                 'yt-dynamic-text-view-model h1, .yt-page-header-view-model__page-header-title, .dynamicTextViewModelH1, ' +
                 '#home-content-text, #content-text, #contentText, ytd-expander#expander, ytm-expander'
             );
@@ -3901,8 +3902,11 @@ async function applyDOMFallback(settings, options = {}) {
                 elementTag === 'ytm-backstage-post-renderer' ||
                 elementTag === 'ytm-backstage-post-thread-renderer' ||
                 elementTag === 'ytm-rich-item-renderer' ||
+                elementTag === 'ytm-media-item' ||
                 elementTag === 'ytm-video-with-context-renderer' ||
                 elementTag === 'ytm-compact-video-renderer' ||
+                elementTag === 'ytm-watch-card-hero-video-renderer' ||
+                elementTag === 'ytm-watch-card-rich-header-renderer' ||
                 elementTag === 'ytm-playlist-panel-video-renderer' ||
                 elementTag === 'ytm-playlist-video-renderer' ||
                 elementTag === 'ytm-radio-renderer' ||
@@ -4041,8 +4045,11 @@ async function applyDOMFallback(settings, options = {}) {
                 elementTag === 'ytm-backstage-post-renderer' ||
                 elementTag === 'ytm-backstage-post-thread-renderer' ||
                 elementTag === 'ytm-rich-item-renderer' ||
+                elementTag === 'ytm-media-item' ||
                 elementTag === 'ytm-video-with-context-renderer' ||
-                elementTag === 'ytm-compact-video-renderer'
+                elementTag === 'ytm-compact-video-renderer' ||
+                elementTag === 'ytm-watch-card-hero-video-renderer' ||
+                elementTag === 'ytm-watch-card-rich-header-renderer'
             )) {
                 const mobileTitleAria = element.querySelector(
                     '.YtmCompactMediaItemHeadline .yt-core-attributed-string[aria-label], ' +
@@ -4059,7 +4066,8 @@ async function applyDOMFallback(settings, options = {}) {
             if (!title && (
                 elementTag === 'ytm-channel-renderer' ||
                 elementTag === 'ytm-compact-channel-renderer' ||
-                elementTag === 'ytm-universal-watch-card-renderer'
+                elementTag === 'ytm-universal-watch-card-renderer' ||
+                elementTag === 'ytm-watch-card-rich-header-renderer'
             )) {
                 const mobileChannelTitle = element.querySelector(
                     'h3, h2, .channel-title, .ytm-channel-name, .yt-core-attributed-string, [role="heading"]'
