@@ -3,7 +3,7 @@
   <h1>FilterTube</h1>
   <p>Peace of Mind for your Digital Space</p>
   
-  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.2-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-553.9k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-92.2k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
+  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.3-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-553.9k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-92.2k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
   
 </div>
 
@@ -15,15 +15,15 @@ The public website now also acts as the download hub for browser releases, Andro
 
 👉 **[filtertube.in/downloads](https://filtertube.in/downloads)**
 
-## What's New in v3.3.2
+## What's New in v3.3.3
 
-- **Mobile/tablet app MVP release surfaces are now wired into the public product path**: the website downloads hub and extension dashboard cards point users toward Android phone/tablet testing and iOS/iPad status without mixing TV into the same release.
-- **Android phone/tablet is in final release testing and release setup** with the shared FilterTube runtime, YouTube Main, public YouTube Kids access, profiles, PIN rules, and Nanah sync as the MVP contract.
-- **iOS and iPad remain in final release testing** through the separate TestFlight/App Store path; Android TV and Fire TV are documented as future separate app packages.
-- **YouTube SPA lag was reduced by doing less work when there is no active rule work**: JSON clone/parse/replay, DOM fallback scans, quick-block observers, whitelist pending passes, and fallback menu warmups now have stricter route/mode/rule gates.
-- **Production console output is quiet by default** so routine `console.log`, `console.info`, and `console.debug` calls do not add overhead to YouTube hot paths unless explicit debug mode is enabled.
-- **Whitelist release blockers were tightened**: Shorts creator fallback, watch autoplay endpoint filtering, list-target forwarding, and DOM state hardening are documented for the post-v3.3.1 release candidate.
-- **Post-April-12 documentation validation now lives under `docs/audit/`** so the release proof stays separate from core product docs.
+- **Family Device Updates are now release-facing**: parent/caregiver profiles can manage protected profiles, send approved rules/time/access to verified devices, and use explicit Home Pickup or Internet Pickup when a protected device opens later.
+- **Protected profiles now have clearer daily YouTube limits**: old and new YouTube tabs are checked, timeout pages explain the limit calmly, and extra-time requests are recorded for parent review instead of silently granting access.
+- **Rule list imports now support reviewed CSV, TXT, simple JSON, BlockTube-style JSON, and raw HTTPS list URLs** with preview-before-apply, Main/Kids/Both targeting, templates, list management, pause/resume/remove, stale checks, and refresh.
+- **Date-based keyword filtering was added** so a keyword can apply only to videos uploaded on/after, on/before, or between chosen dates. Comment filtering uses the parent video upload date when YouTube exposes it.
+- **Help and dashboard wording are more parent-first**: key controls now use faster help bubbles, the Help page explains the two PIN types, and Accounts & Sync describes live send, saved updates, Home Pickup, and Internet Pickup in plainer language.
+- **YouTube DOM handling was refreshed for the current desktop and mobile markup**: camelCase lockup classes, current playlist rows, YTM mobile chips, and Watch-page chip boundaries are documented so real video cards keep filtering without causing Watch scroll jumps.
+- **Still intentionally separate**: automatic LAN device discovery, a hosted FilterTube Internet Pickup service, silent public auto-subscribe catalogs, and native Android/iOS parity are not claimed as complete in this extension release.
 
 ## Nanah Device Trust & Sync
 

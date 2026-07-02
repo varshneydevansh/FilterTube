@@ -271,12 +271,85 @@ YouTube reuses the same chip tags on multiple surfaces, but FilterTube should no
 | Home feed | Home feed chip cloud / feed filter chip bar | `<yt-chip-cloud-renderer>` -> `<yt-chip-cloud-chip-renderer>` / `<chip-shape>` | ✅ DOM chip filtering and `hideMixPlaylists` are allowed | Home chips can expose feed topics and the Mixes chip the user asked us to hide |
 | Search results | `<ytd-search-header-renderer has-chip-bar>` with `#chip-bar` | `<yt-chip-cloud-renderer>` -> `<yt-chip-cloud-chip-renderer>` / `<chip-shape>` | ✅ DOM chip filtering and `hideMixPlaylists` are allowed on `/results` | Search chips are user-facing refinements and can be filtered without disturbing Watch scroll |
 | Watch related rail | `<yt-related-chip-cloud-renderer>` inside the Watch item section | `<yt-chip-cloud-renderer>` -> `<yt-chip-cloud-chip-renderer>` / `<chip-shape>` | 🚫 DOM fallback chip filtering and chip mutation wake-ups are disabled on `/watch` | These chips are navigation refinements for recommendations; processing them caused unnecessary fallback runs and could fight Watch page scroll |
+| YTM mobile Home | `<ytm-feed-filter-chip-bar-renderer id="filter-chip-bar" class="chip-bar frosted-glass">` | `<ytm-chip-cloud-chip-renderer>` | ✅ DOM chip filtering is allowed on `/` | Mobile Home chips are the same type of feed refinements as desktop Home chips |
+| YTM mobile Watch | `<ytm-single-column-watch-next-results-renderer>` -> `<ytm-chip-cloud-renderer class="YtmChipCloudRendererHost chip-bar">` | `<ytm-chip-cloud-chip-renderer>` | 🚫 DOM fallback chip filtering and chip mutation wake-ups are disabled on `/watch` | Mobile Watch chips sit above recommendations and should not be treated as video cards |
 
 Runtime boundary:
 
 - `js/content/dom_fallback.js` gates DOM chip filtering to `/` and `/results`.
 - `js/content_bridge.js` treats chip mutations as fallback-relevant only on `/` and `/results`.
 - Keyword/channel/video filtering still applies to actual video cards, comments, shelves, playlist rows, and JSON renderer payloads. Chip route gating does not disable normal content filtering.
+
+### Mobile YTM camelCase DOM refresh (2026-07-02)
+
+The current mobile YouTube (`m.youtube.com`) DOM uses `ytm-*` custom elements
+with camelCase host classes. This mirrors the desktop camelCase lockup shift,
+but the filtering boundary is still card-first: chip bars are UI controls,
+while `ytm-video-with-context-renderer`, `ytm-media-item`, Shorts lockups, and
+compact channel/video rows remain the content-bearing nodes.
+
+Observed Home shell:
+
+```html
+<body has-pivot-bar="true" has-safe-area-in-max="true">
+  <ytm-app id="app" class="sticky-player">
+    <ytm-mobile-topbar-renderer id="header-bar" class="sticky-player">
+    <ytm-pivot-bar-renderer role="tablist" class="frosted-glass">
+    <ytm-single-column-browse-results-renderer class="modern-tabs">
+      <ytm-rich-grid-renderer class="rich-grid-single-column">
+      <ytm-feed-filter-chip-bar-renderer id="filter-chip-bar"
+        class="chip-bar frosted-glass">
+        <ytm-chip-cloud-chip-renderer role="tab">
+      <ytm-rich-item-renderer>
+        <ytm-media-item>
+        <yt-lockup-view-model class="ytLockupViewModelWrapper">
+```
+
+Observed Watch shell:
+
+```html
+<ytm-watch class="ambient-topbar rounded-edges">
+  <ytm-single-column-watch-next-results-renderer
+    class="watch-content full-bleed-wn-thumbs">
+    <ytm-item-section-renderer section-identifier="related-items">
+      <ytm-chip-cloud-renderer class="YtmChipCloudRendererHost chip-bar">
+        <ytm-chip-cloud-chip-renderer role="tab">
+      <ytm-video-with-context-renderer class="item adaptive-feed-item">
+        <ytm-media-item>
+        <ytm-channel-thumbnail-with-link-renderer
+          class="YtmChannelThumbnailWithLinkRendererHost">
+        <ytm-badge-and-byline-renderer
+          class="YtmBadgeAndBylineRendererHost">
+```
+
+Observed channel/search-like YTM shells:
+
+```html
+<ytm-watch-card-rich-header-renderer class="rounded-container">
+<ytm-compact-channel-renderer class="YtmCompactChannelRendererHost item">
+<div class="YtmCompactMediaItemHost">
+<div class="YtmCompactMediaItemMetadata">
+<div class="YtmCompactMediaItemByline">
+<ytm-thumbnail-overlay-resume-playback-renderer
+  class="YtmThumbnailOverlayResumePlaybackRendererHost">
+<ytm-shorts-lockup-view-model class="shortsLockupViewModelHost">
+```
+
+Runtime implications:
+
+- Existing YTM card selectors remain first-class:
+  `ytm-video-with-context-renderer`, `ytm-compact-video-renderer`,
+  `ytm-rich-item-renderer`, `ytm-media-item`,
+  `ytm-channel-thumbnail-with-link-renderer`,
+  `ytm-shorts-lockup-view-model`, and `ytm-shorts-lockup-view-model-v2`.
+- `ytm-chip-cloud-chip-renderer` should only wake fallback processing on Home
+  and Search routes, matching the desktop chip boundary.
+- Mobile Watch recommendation cards under the chip bar remain filterable because
+  they are actual video rows, not because the chip labels are processed.
+- The sampled YTM DOM still preserves FilterTube state attributes on filtered
+  rows, so this sample does not prove YouTube is stripping extension attributes.
+  Issue #59 remains a privacy/code-burden cleanup direction, not the proven
+  cause of this DOM shift.
 
 ### Home shelf: “Latest YouTube posts” (2025-11-18 sample, NEW)
 | DOM tag / component | Underlying renderer / data source | Status | Notes |
@@ -754,7 +827,10 @@ Fallback contract:
 | --- | --- | --- | --- |
 | `<ytd-feed-filter-chip-bar-renderer>` | Horizontal chip bar | ✅ Route-scoped DOM support | Home/feed chip bars can be processed on `/` |
 | `<ytd-search-header-renderer has-chip-bar>` | Search results chip bar | ✅ Route-scoped DOM support | Search chips can be processed on `/results` |
+| `<ytm-feed-filter-chip-bar-renderer>` | Mobile Home horizontal chip bar | ✅ Route-scoped DOM support | Mobile Home chips can be processed on `/` |
+| `<ytm-chip-cloud-renderer class="YtmChipCloudRendererHost chip-bar">` | Mobile Watch related chip bar | 🚫 Watch route only | Inventoried only; do not wake DOM fallback on `/watch` |
 | `<yt-chip-cloud-chip-renderer>` | Individual chips (`Music`, `Mixes`, `Shorts`, `Unwatched`, etc.) | ✅ Route-scoped | DOM fallback may hide matching chips on Home/Search only |
+| `<ytm-chip-cloud-chip-renderer>` | Mobile individual chips | ✅ Route-scoped | Same Home/Search-only boundary as desktop chips |
 | `<chip-shape>` button text | Visible chip label | ⚠️ Label source only | Use the containing `yt-chip-cloud-chip-renderer` for DOM fallback; do not target Watch related chips |
 
 These chips originate from the YouTube UI rather than content cards. FilterTube may filter Home/Search chip labels, but actual keyword/channel blocking still depends on video/card/comment/playlist renderers and JSON-first payload filtering.

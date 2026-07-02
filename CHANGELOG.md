@@ -1,5 +1,51 @@
 # Changelog
 
+## Version 3.3.3
+
+### Family Device Updates And Protected Profiles
+
+- **Managed parent/caregiver controls**: parent/account profiles can create and manage protected profiles, edit their rules from the parent dashboard, and send approved policy updates to a verified protected device.
+- **Family Device Updates**: Accounts & Sync now presents the live send path, explicit Home Pickup, and explicit Internet Pickup as one protected-device update model instead of separate technical concepts.
+- **Saved-update checks**: protected profiles check for approved saved updates when the dashboard opens, profile visibility returns, or the profile switches, while still validating trusted link, target profile, scope, revision, and local policy before applying.
+- **Home Pickup and Internet Pickup hooks**: the extension can talk to explicitly configured pickup providers for same-home/school/clinic or away/opens-later delivery. Automatic LAN peer discovery and a hosted FilterTube pickup service are not claimed in this release.
+- **Two-PIN model clarified**: the child/protected profile PIN is for switching into that profile or opening receive-only sync. Parent/account/Master unlock remains the authority for rules, trusted devices, viewing access, time limits, and backups.
+
+### Time Limits, Help, And Parent-First UI
+
+- **Protected profile time limits**: daily YouTube access can be set per protected profile, old and newly opened YouTube tabs are checked, and the timeout screen explains the limit calmly.
+- **Extra-time request history**: protected users can request more time, but that request is recorded for parent review instead of granting authority by itself.
+- **Parent-first Help refresh**: the Help page now starts with plain-language parent flows, explains child profile control, receive-only sync, managed updates, exact keyword matching, date-limited keywords, and rule-list imports.
+- **Fast help bubbles**: key controls across Dashboard, Filters, Settings, Accounts & Sync, profile rows, rule import, time limits, Family Device Updates, and pickup setup now expose short hover/focus/touch help text.
+- **Accounts & Sync simplification**: Family control, Copy once, and Move account flows are described in user terms, with advanced transport and fixed-target options kept behind disclosure.
+
+### Rule Lists, Import, And Issue #62 Foundation
+
+- **Reviewed rule-list imports**: CSV, TXT, simple JSON, BlockTube-style JSON, and raw HTTPS list URLs can be previewed before they add channels or keywords.
+- **Main/Kids/Both targeting**: imported rules can be applied to Main YouTube, YouTube Kids, or both for the current profile/protected profile.
+- **List management**: imported lists can be labeled, paused, resumed, removed, checked for stale URLs, refreshed, and reviewed before refresh changes apply.
+- **Templates and examples**: the import UI exposes CSV and JSON templates plus plain examples so parents can see what a supported file looks like before uploading.
+- **Catalog boundary**: silent public auto-subscribe catalogs are still future governance work. A random public list URL never becomes authority without local review.
+
+### Keyword Rules And Comments
+
+- **Date-based keyword rules**: a keyword can apply only to videos released on/after a date, on/before a date, or between dates.
+- **Comment date behavior**: when a date-limited keyword also filters comments, FilterTube uses the parent video upload/publish date from YouTube metadata rather than pretending each comment has an upload date.
+- **Date UI validation**: date-limited keyword controls no longer activate without the required date for the chosen mode, and single-bound modes only require one date.
+
+### YouTube And YTM DOM Compatibility
+
+- **Current desktop lockup DOM**: title, thumbnail/video id, byline, avatar label, and menu extraction were refreshed for YouTube's camelCase lockup classes such as `ytLockupMetadataViewModelTitle` and `ytLockupViewModelContentImage`.
+- **Current playlist rows**: playlist panel rows with `ytd-playlist-panel-video-renderer[lockup]` and current byline/title structure are inventoried and documented for hide behavior.
+- **YTM mobile DOM inventory**: mobile YouTube now shows camelCase classes such as `YtmChipCloudRendererHost`, `YtmBadgeAndBylineRendererHost`, and `YtmChannelThumbnailWithLinkRendererHost`; the inventory records how these map to existing YTM card filtering.
+- **Watch chip boundary**: Home/Search chip labels can still be filtered where appropriate, but Watch-page related chips on desktop and YTM are treated as navigation refinements, not video cards, so chip changes do not wake DOM fallback or cause Watch scroll jumps.
+- **Open-tab time-limit enforcement**: installed or updated extensions now send managed time-limit checks into already-open YouTube tabs instead of only affecting future tabs.
+
+### Release Notes And Boundaries
+
+- **Post-3.3.2 audit trail**: `docs/audit/FILTERTUBE_POST_3_3_2_RELEASE_CHANGELOG_AUDIT_2026-07-02.md` records the release lanes from the May 31 v3.3.2 tag to this release prep.
+- **Native app parity boundary**: shared policy contracts and runtime sync expectations are documented, but Android/iOS native UI parity remains a downstream app release lane.
+- **Known unclaimed work**: hosted Internet Pickup deployment, automatic LAN discovery, public list catalog governance, and installed two-device manual smoke evidence remain outside this changelog's completion claim.
+
 ## Version 3.3.2
 
 ### Mobile / Tablet App MVP Release Surface

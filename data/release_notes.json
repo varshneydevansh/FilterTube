@@ -3,6 +3,23 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.3.3",
+    "headline": "Family device updates, rule lists, date keywords, and YouTube DOM refresh",
+    "summary": "This release makes parent/caregiver control easier to understand, adds reviewed rule-list imports, adds date-limited keyword rules, documents the Home/Internet Pickup model, and refreshes filtering for current YouTube/YTM markup.",
+    "bannerSummary": "Family Device Updates, reviewed rule-list imports, date-limited keywords, parent-first Help, and current YouTube/YTM DOM compatibility are included in this release.",
+    "highlights": [
+      "Parent/caregiver profiles can manage protected profiles, edit child/protected rules from the parent dashboard, and send approved updates to verified protected devices.",
+      "Family Device Updates now explain live Send Update, explicit Home Pickup, and explicit Internet Pickup without treating pickup services as authority.",
+      "Protected profile time limits now check old and new YouTube tabs, show a calm timeout screen, and record extra-time requests for parent review.",
+      "Rule list imports support CSV, TXT, simple JSON, BlockTube-style JSON, and raw HTTPS URLs with preview-before-apply, Main/Kids/Both targeting, templates, list management, pause/resume/remove, stale checks, and refresh.",
+      "Date-based keyword filtering can apply a keyword only on/after, on/before, or between upload dates. Comment filtering uses the parent video upload date when YouTube exposes it.",
+      "Help and dashboard controls now use plainer parent-first wording, faster help bubbles, and clearer explanations for Exact, Comment, Date, PINs, rule lists, and device updates.",
+      "YouTube desktop lockup selectors and YTM mobile camelCase DOM are documented so real video cards keep filtering while Watch-page chip bars do not wake fallback work or cause scroll jumps.",
+      "Still separate: automatic LAN peer discovery, a hosted FilterTube Internet Pickup service, silent public auto-subscribe catalogs, native Android/iOS parity, and installed two-device manual smoke evidence."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.3"
+  },
+  {
     "version": "3.3.2",
     "headline": "Mobile/tablet app MVP, smoother YouTube, and safer whitelist",
     "summary": "The public app release surface is ready for Android phone/tablet final testing and iOS/iPad status, the extension dashboard now points to those app paths, YouTube SPA work is quieter when there are no active rules, and whitelist/end-screen correctness fixes are included in this release.",
