@@ -182,6 +182,7 @@ const RenderEngine = (() => {
             stateOverride = null,
             onDelete = null,
             onToggleExact = null,
+            onUpdateDateFilter = null,
             onToggleComments = null
         } = options;
 
@@ -295,11 +296,39 @@ const RenderEngine = (() => {
         // Render each keyword
         displayKeywords.forEach(entry => {
             const effectiveProfile = (profile !== 'kids' && entry?.__ftFromKids) ? 'kids' : profile;
-            const item = createKeywordListItem(entry, { minimal, profile: effectiveProfile, includeToggles, onDelete, onToggleExact, onToggleComments });
+            const item = createKeywordListItem(entry, { minimal, profile: effectiveProfile, includeToggles, onDelete, onToggleExact, onUpdateDateFilter, onToggleComments });
             if (item instanceof Node) {
                 container.appendChild(item);
             }
         });
+    }
+
+    function normalizeKeywordDateFilterForUi(value) {
+        const raw = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+        const condition = raw.condition === 'before' || raw.condition === 'between'
+            ? raw.condition
+            : 'after';
+        const fromDate = typeof raw.fromDate === 'string' ? raw.fromDate.trim() : '';
+        const toDate = typeof raw.toDate === 'string' ? raw.toDate.trim() : '';
+        const enabled = raw.enabled === true && (
+            (condition === 'after' && !!fromDate) ||
+            (condition === 'before' && !!toDate) ||
+            (condition === 'between' && (!!fromDate || !!toDate))
+        );
+        return { enabled, condition, fromDate, toDate };
+    }
+
+    function formatKeywordDateFilterLabel(value) {
+        const filter = normalizeKeywordDateFilterForUi(value);
+        if (!filter.enabled) return 'Date';
+        if (filter.condition === 'before') return filter.toDate ? `Before ${filter.toDate}` : 'Date on';
+        if (filter.condition === 'between') {
+            if (filter.fromDate && filter.toDate) return `${filter.fromDate} - ${filter.toDate}`;
+            if (filter.fromDate) return `After ${filter.fromDate}`;
+            if (filter.toDate) return `Before ${filter.toDate}`;
+            return 'Date on';
+        }
+        return filter.fromDate ? `After ${filter.fromDate}` : 'Date on';
     }
 
     /**
@@ -316,6 +345,7 @@ const RenderEngine = (() => {
             includeToggles = true,
             onDelete = null,
             onToggleExact = null,
+            onUpdateDateFilter = null,
             onToggleComments = null
         } = config;
         const StateManager = getStateManager();
@@ -501,6 +531,51 @@ const RenderEngine = (() => {
                 }) :
                 createFallbackExactToggle(entry, minimal, profile);
 
+            const dateFilter = normalizeKeywordDateFilterForUi(entry.dateFilter);
+            const dateToggleText = minimal ? 'D' : 'Date';
+            const dateToggleTitle = dateFilter.enabled
+                ? `This keyword only applies to videos ${formatKeywordDateFilterLabel(dateFilter).toLowerCase()}`
+                : 'Set a release-date limit for this keyword';
+            const dateToggle = UIComponents?.createToggleButton
+                ? UIComponents.createToggleButton({
+                    text: dateToggleText,
+                    active: dateFilter.enabled,
+                    title: dateToggleTitle,
+                    ariaLabel: `${dateToggleText}: ${dateToggleTitle}`,
+                    onToggle: async () => {
+                        if (typeof onUpdateDateFilter === 'function') {
+                            await onUpdateDateFilter(entry);
+                            return;
+                        }
+                        if (profile === 'kids') {
+                            await StateManager?.updateKidsKeywordDateFilter?.(entry.word, dateFilter.enabled ? { enabled: false } : { enabled: true, condition: 'after', fromDate: '', toDate: '' });
+                            return;
+                        }
+                        await StateManager?.updateKeywordDateFilter?.(entry.word, dateFilter.enabled ? { enabled: false } : { enabled: true, condition: 'after', fromDate: '', toDate: '' });
+                    },
+                    className: 'toggle-variant-amber'
+                })
+                : (() => {
+                    const toggle = document.createElement('div');
+                    toggle.className = `exact-toggle toggle-variant-amber ${dateFilter.enabled ? 'active' : ''}`.trim();
+                    toggle.textContent = dateToggleText;
+                    toggle.title = dateToggleTitle;
+                    toggle.setAttribute('role', 'button');
+                    toggle.setAttribute('aria-pressed', dateFilter.enabled ? 'true' : 'false');
+                    toggle.setAttribute('tabindex', '0');
+                    const activate = async () => {
+                        if (typeof onUpdateDateFilter === 'function') await onUpdateDateFilter(entry);
+                    };
+                    toggle.addEventListener('click', activate);
+                    toggle.addEventListener('keydown', async (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            await activate();
+                        }
+                    });
+                    return toggle;
+                })();
+
             // Delete button
             const deleteHandler = async () => {
                 if (typeof onDelete === 'function') {
@@ -519,6 +594,7 @@ const RenderEngine = (() => {
 
             if (commentsToggle) controls.appendChild(commentsToggle);
             if (exactToggle instanceof Node) controls.appendChild(exactToggle);
+            if (!minimal && dateToggle instanceof Node) controls.appendChild(dateToggle);
 
             // In full UI, show semantic release-gate state without presenting it as active filtering.
             if (!minimal && profile !== 'kids') {

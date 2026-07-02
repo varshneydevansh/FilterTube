@@ -42,6 +42,21 @@ const StateManager = (() => {
         }
     }
 
+    function normalizeKeywordDateFilter(value) {
+        const raw = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+        const condition = raw.condition === 'before' || raw.condition === 'between'
+            ? raw.condition
+            : 'after';
+        const fromDate = typeof raw.fromDate === 'string' ? raw.fromDate.trim() : '';
+        const toDate = typeof raw.toDate === 'string' ? raw.toDate.trim() : '';
+        const enabled = raw.enabled === true && (
+            (condition === 'after' && !!fromDate) ||
+            (condition === 'before' && !!toDate) ||
+            (condition === 'between' && (!!fromDate || !!toDate))
+        );
+        return { enabled, condition, fromDate, toDate };
+    }
+
     // ============================================================================
     // STATE
     // ============================================================================
@@ -835,6 +850,32 @@ const StateManager = (() => {
         return !!entry.exact;
     }
 
+    async function updateKidsKeywordDateFilter(word, dateFilter) {
+        await ensureLoaded();
+
+        if (isUiLocked()) {
+            await loadSettings();
+            return false;
+        }
+
+        const kids = getKidsState();
+        const listKey = kids.mode === 'whitelist' ? 'whitelistKeywords' : 'blockedKeywords';
+        const list = Array.isArray(kids[listKey]) ? kids[listKey] : [];
+        const index = list.findIndex(k => (k?.word || '') === word && k?.source !== 'channel');
+        if (index < 0) return false;
+
+        const normalized = normalizeKeywordDateFilter(dateFilter);
+        list[index] = { ...list[index], dateFilter: normalized };
+        kids[listKey] = list;
+        state.kids = { ...kids };
+        await persistKidsProfiles(state.kids);
+        await requestRefresh('kids');
+        notifyListeners('kidsKeywordUpdated', { word, dateFilter: normalized });
+        scheduleAutoBackup('kids_keyword_date_filter_updated');
+
+        return true;
+    }
+
     function normalizeKidsChannelInput(input) {
         const raw = (input || '').trim();
         if (!raw) return null;
@@ -1569,6 +1610,44 @@ const StateManager = (() => {
         scheduleAutoBackup('keyword_exact_toggled');
         
         return state.userKeywords[index].exact;
+    }
+
+    async function updateKeywordDateFilter(word, dateFilter) {
+        await ensureLoaded();
+
+        if (isUiLocked()) {
+            await loadSettings();
+            return false;
+        }
+
+        const normalized = normalizeKeywordDateFilter(dateFilter);
+        if (state.mode === 'whitelist') {
+            const list = Array.isArray(state.userWhitelistKeywords) ? state.userWhitelistKeywords : [];
+            const index = list.findIndex(k => (k?.word || '') === word && k?.source !== 'channel');
+            if (index === -1) return false;
+            list[index] = { ...list[index], dateFilter: normalized };
+            state.userWhitelistKeywords = [...list];
+            state.whitelistKeywords = [...state.userWhitelistKeywords];
+            await persistMainProfiles({
+                mode: 'whitelist',
+                whitelistChannels: Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [],
+                whitelistKeywords: state.whitelistKeywords
+            });
+            await requestRefresh('main');
+            notifyListeners('keywordUpdated', { word, dateFilter: normalized });
+            scheduleAutoBackup('keyword_date_filter_updated');
+            return true;
+        }
+
+        const index = state.userKeywords.findIndex(k => k.word === word && k.source !== 'channel');
+        if (index === -1) return false;
+
+        state.userKeywords[index] = { ...state.userKeywords[index], dateFilter: normalized };
+        recomputeKeywords();
+        await saveSettings();
+        notifyListeners('keywordUpdated', { word, dateFilter: normalized });
+        scheduleAutoBackup('keyword_date_filter_updated');
+        return true;
     }
 
     /**
@@ -2453,10 +2532,12 @@ const StateManager = (() => {
         addKeyword,
         removeKeyword,
         toggleKeywordExact,
+        updateKeywordDateFilter,
         toggleKeywordComments,
         addKidsKeyword,
         removeKidsKeyword,
         toggleKidsKeywordExact,
+        updateKidsKeywordDateFilter,
         toggleKidsKeywordComments,
 
         // Channels

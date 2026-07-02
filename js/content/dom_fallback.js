@@ -278,7 +278,12 @@ function getCompiledKeywordRegexes(rawList) {
                 continue;
             }
             if (keywordData && keywordData.pattern) {
-                compiled.push(new RegExp(keywordData.pattern, keywordData.flags || 'i'));
+                const regex = new RegExp(keywordData.pattern, keywordData.flags || 'i');
+                const dateFilter = sanitizeKeywordDateFilter(keywordData.dateFilter);
+                if (dateFilter.enabled) {
+                    regex.__filtertubeDateFilter = dateFilter;
+                }
+                compiled.push(regex);
                 continue;
             }
             if (typeof keywordData === 'string' && keywordData.trim()) {
@@ -1645,6 +1650,157 @@ function extractPlainKeyword(keywordData) {
     }
 
     return '';
+}
+
+function sanitizeKeywordDateFilter(value) {
+    const raw = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+    const condition = raw.condition === 'before' || raw.condition === 'between'
+        ? raw.condition
+        : 'after';
+    const fromDate = typeof raw.fromDate === 'string' ? raw.fromDate.trim() : '';
+    const toDate = typeof raw.toDate === 'string' ? raw.toDate.trim() : '';
+    const enabled = raw.enabled === true && (
+        (condition === 'after' && !!fromDate) ||
+        (condition === 'before' && !!toDate) ||
+        (condition === 'between' && (!!fromDate || !!toDate))
+    );
+    return { enabled, condition, fromDate, toDate };
+}
+
+function parseKeywordDateBoundary(value, endOfDay = false) {
+    if (!value || typeof value !== 'string') return null;
+    const trimmed = value.trim();
+    const dateOnly = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (dateOnly) {
+        const year = Number(dateOnly[1]);
+        const month = Number(dateOnly[2]) - 1;
+        const day = Number(dateOnly[3]);
+        const date = endOfDay
+            ? new Date(year, month, day, 23, 59, 59, 999)
+            : new Date(year, month, day, 0, 0, 0, 0);
+        const ms = date.getTime();
+        return Number.isFinite(ms) ? ms : null;
+    }
+    const ms = new Date(trimmed).getTime();
+    return Number.isFinite(ms) ? ms : null;
+}
+
+function keywordDateFilterAllows(regex, publishTimestamp) {
+    const dateFilter = regex?.__filtertubeDateFilter;
+    if (!dateFilter?.enabled) return true;
+    if (typeof publishTimestamp !== 'number' || !Number.isFinite(publishTimestamp)) return false;
+
+    const fromMs = parseKeywordDateBoundary(dateFilter.fromDate, false);
+    const toMs = parseKeywordDateBoundary(dateFilter.toDate, true);
+    if (dateFilter.condition === 'before') {
+        return toMs !== null && publishTimestamp <= toMs;
+    }
+    if (dateFilter.condition === 'between') {
+        const lower = fromMs !== null ? fromMs : Number.NEGATIVE_INFINITY;
+        const upper = toMs !== null ? toMs : Number.POSITIVE_INFINITY;
+        return publishTimestamp >= lower && publishTimestamp <= upper;
+    }
+    return fromMs !== null && publishTimestamp >= fromMs;
+}
+
+function hasDateGatedKeywords(rawList) {
+    return Array.isArray(rawList) && rawList.some(entry => {
+        if (entry?.__filtertubeDateFilter?.enabled) return true;
+        return sanitizeKeywordDateFilter(entry?.dateFilter).enabled;
+    });
+}
+
+function parseRelativeTimeToTimestampForKeywords(timeText) {
+    if (!timeText || typeof timeText !== 'string') return null;
+    const text = timeText.toLowerCase().trim();
+    const now = Date.now();
+    const msPerDay = 24 * 60 * 60 * 1000;
+    const patterns = [
+        { regex: /(\d+)\s*(?:year|years|anno|anni|año|años|jahr|jahre|an|ans)\b/, multiplier: 365 * msPerDay },
+        { regex: /(\d+)\s*(?:month|months|mese|mesi|mes|meses|monat|monate|mois)\b/, multiplier: 30 * msPerDay },
+        { regex: /(\d+)\s*(?:week|weeks|settimana|settimane|semana|semanas|woche|wochen|semaine|semaines)\b/, multiplier: 7 * msPerDay },
+        { regex: /(\d+)\s*(?:day|days|giorno|giorni|día|días|tag|tage|jour|jours)\b/, multiplier: msPerDay },
+        { regex: /(\d+)\s*(?:hour|hours|ora|ore|hora|horas|stunde|stunden|heure|heures)\b/, multiplier: 60 * 60 * 1000 },
+        { regex: /(\d+)\s*(?:minute|minutes|minuto|minuti|minuto|minutos|min\.?|minute|minuten)\b/, multiplier: 60 * 1000 },
+        { regex: /(\d+)\s*(?:second|seconds|secondo|secondi|segundo|segundos|sekunde|sekunden|seconde|secondes)\b/, multiplier: 1000 }
+    ];
+    for (const { regex, multiplier } of patterns) {
+        const match = text.match(regex);
+        if (match) {
+            const count = parseInt(match[1], 10);
+            if (!isNaN(count)) return now - (count * multiplier);
+        }
+    }
+    if (
+        text.includes('just now') ||
+        text.includes('moments ago') ||
+        text.includes('proprio ora') ||
+        text.includes('ahora mismo') ||
+        text.includes('gerade eben') ||
+        text.includes("à l'instant")
+    ) {
+        return now - (60 * 1000);
+    }
+    if (text.includes('yesterday') || text.includes('ieri') || text.includes('ayer') || text.includes('gestern') || text.includes('hier')) {
+        return now - msPerDay;
+    }
+    return null;
+}
+
+function resolveElementPublishTimestampForKeywords(element, settings) {
+    if (!element || !settings || typeof settings !== 'object') return null;
+    const videoId = ensureVideoIdForCard(element);
+    if (videoId && settings.videoMetaMap && typeof settings.videoMetaMap === 'object') {
+        const meta = settings.videoMetaMap[videoId];
+        const candidates = [meta?.uploadDate, meta?.publishDate];
+        for (const raw of candidates) {
+            const ms = parseKeywordDateBoundary(raw, false);
+            if (ms !== null) return ms;
+        }
+    }
+
+    const possibleTextNodes = [
+        element.querySelector('#metadata-line'),
+        element.querySelector('.ytd-video-meta-block'),
+        element.querySelector('.yt-lockup-metadata-view-model__metadata'),
+        element.querySelector('.yt-content-metadata-view-model__metadata-row'),
+        element.querySelector('#video-info')
+    ].filter(Boolean);
+
+    const rawCandidates = [];
+    for (const node of possibleTextNodes) {
+        try {
+            const text = node?.textContent?.trim() || '';
+            if (text) rawCandidates.push(text);
+        } catch (e) {
+        }
+    }
+    try {
+        const aria = element.getAttribute('aria-label') || '';
+        if (aria) rawCandidates.push(aria);
+    } catch (e) {
+    }
+
+    for (const raw of rawCandidates) {
+        const parts = String(raw || '')
+            .split('•')
+            .map(part => part.trim())
+            .filter(Boolean);
+        const relativeCandidate = parts.find(part => /ago|yesterday|just now|moments ago/i.test(part)) ||
+            parts.find(part => /(year|month|week|day|hour|minute|second)/i.test(part)) ||
+            '';
+        const ms = parseRelativeTimeToTimestampForKeywords(relativeCandidate) ?? parseKeywordDateBoundary(relativeCandidate, false);
+        if (ms !== null) return ms;
+    }
+
+    if (videoId && typeof scheduleVideoMetaFetch === 'function') {
+        try {
+            scheduleVideoMetaFetch(videoId, { needDuration: false, needDates: true });
+        } catch (e) {
+        }
+    }
+
+    return null;
 }
 
 function isAlphanumeric(char) {
@@ -4646,12 +4802,25 @@ async function applyDOMFallback(settings, options = {}) {
                 }
             })();
 
+            const keywordPublishTimestamp = (() => {
+                try {
+                    const keywordRules = listMode === 'whitelist'
+                        ? effectiveSettings.whitelistKeywords
+                        : effectiveSettings.filterKeywords;
+                    if (!hasDateGatedKeywords(keywordRules)) return null;
+                    return resolveElementPublishTimestampForKeywords(element, effectiveSettings);
+                } catch (e) {
+                    return null;
+                }
+            })();
+
             const matchesFilters = shouldHideContent(keywordTarget, channel, effectiveSettings, {
                 skipKeywords: skipKeywordFiltering,
                 channelHref,
                 channelMeta,
                 collaborators: collaboratorMetas,
-                contentTag: isShortVideoRenderer ? 'ytd-video-renderer-short' : elementTag
+                contentTag: isShortVideoRenderer ? 'ytd-video-renderer-short' : elementTag,
+                publishTimestamp: keywordPublishTimestamp
             });
 
             // Handle Container Logic (e.g., rich-grid-media inside rich-item)
@@ -5592,7 +5761,8 @@ function shouldHideContent(title, channel, settings, options = {}) {
         channelHref = '',
         channelMeta: providedChannelMeta = null,
         collaborators = [],
-        contentTag = ''
+        contentTag = '',
+        publishTimestamp = null
     } = options;
     const channelMeta = providedChannelMeta || buildChannelMetadata(channel, channelHref);
     const hasChannelIdentity = Boolean(channelMeta.handle || channelMeta.id || channelMeta.customUrl);
@@ -5658,7 +5828,7 @@ function shouldHideContent(title, channel, settings, options = {}) {
         if (hasKeywordRules) {
             const compiled = getCompiledKeywordRegexes(whitelistKeywords);
             for (const regex of compiled) {
-                if (matchesKeyword(regex, title)) {
+                if (matchesKeyword(regex, title) && keywordDateFilterAllows(regex, publishTimestamp)) {
                     logWhitelistDecision('allow:matched_keyword', { keyword: regex.source });
                     return false;
                 }
@@ -5769,7 +5939,7 @@ function shouldHideContent(title, channel, settings, options = {}) {
     if (!skipKeywords && settings.filterKeywords && settings.filterKeywords.length > 0) {
         const compiled = getCompiledKeywordRegexes(settings.filterKeywords);
         for (const regex of compiled) {
-            if (matchesKeyword(regex, title) || matchesKeyword(regex, channel)) {
+            if ((matchesKeyword(regex, title) || matchesKeyword(regex, channel)) && keywordDateFilterAllows(regex, publishTimestamp)) {
                 return true;
             }
         }

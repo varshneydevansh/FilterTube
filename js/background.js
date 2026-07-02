@@ -2721,6 +2721,25 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                     flags: exact ? 'iu' : 'i'
                 };
             };
+            const sanitizeKeywordDateFilter = (value) => {
+                const raw = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+                const condition = raw.condition === 'before' || raw.condition === 'between'
+                    ? raw.condition
+                    : 'after';
+                const fromDate = typeof raw.fromDate === 'string' ? raw.fromDate.trim() : '';
+                const toDate = typeof raw.toDate === 'string' ? raw.toDate.trim() : '';
+                const enabled = raw.enabled === true && (
+                    (condition === 'after' && !!fromDate) ||
+                    (condition === 'before' && !!toDate) ||
+                    (condition === 'between' && (!!fromDate || !!toDate))
+                );
+                return {
+                    enabled,
+                    condition,
+                    fromDate,
+                    toDate
+                };
+            };
             const parseCompiledKeywordPattern = (pattern) => {
                 const unicodeExactPrefix = '(^|[^\\p{L}\\p{N}_])';
                 const unicodeExactSuffix = '(?=$|[^\\p{L}\\p{N}_])';
@@ -2752,6 +2771,12 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
 
                     const exact = (typeof entry === 'object' && entry) ? entry.exact === true : false;
                     const compiledEntry = compileKeywordPattern(word, exact);
+                    const dateFilter = (typeof entry === 'object' && entry)
+                        ? sanitizeKeywordDateFilter(entry.dateFilter)
+                        : null;
+                    if (dateFilter?.enabled) {
+                        compiledEntry.dateFilter = dateFilter;
+                    }
                     const key = `${compiledEntry.pattern.toLowerCase()}::${compiledEntry.flags}`;
                     if (seen.has(key)) continue;
                     seen.add(key);

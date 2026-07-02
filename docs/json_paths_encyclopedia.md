@@ -4959,6 +4959,12 @@ From docs/json_paths_encyclopedia.md, these are the JSON field definitions curre
 
   - videoDetails: videoId, title, channelId, author, viewCount, keywords[], shortDescription
   - microformat.playerMicroformatRenderer: ownerProfileUrl, externalChannelId, isFamilySafe
+  - microformat.playerMicroformatRenderer.publishDate and uploadDate feed learned videoMetaMap date metadata.
+  - 2026-07-02: per-keyword date filters reuse the same date evidence as upload-date content filters:
+      1. learned videoMetaMap uploadDate/publishDate from /player microformat,
+      2. renderer publishedTimeText relative strings, and
+      3. DOM metadata fallback text when JSON date evidence is not present.
+    Old keyword rows without dateFilter metadata keep the previous behavior.
 
   15. backstagePostRenderer (community posts)
 

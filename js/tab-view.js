@@ -21293,6 +21293,222 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    function normalizeKeywordDateFilterForEditor(value) {
+        const raw = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+        const condition = raw.condition === 'before' || raw.condition === 'between'
+            ? raw.condition
+            : 'after';
+        const fromDate = typeof raw.fromDate === 'string' ? raw.fromDate.trim() : '';
+        const toDate = typeof raw.toDate === 'string' ? raw.toDate.trim() : '';
+        const enabled = raw.enabled === true && (
+            (condition === 'after' && !!fromDate) ||
+            (condition === 'before' && !!toDate) ||
+            (condition === 'between' && (!!fromDate || !!toDate))
+        );
+        return { enabled, condition, fromDate, toDate };
+    }
+
+    function keywordDateFilterLabel(value) {
+        const filter = normalizeKeywordDateFilterForEditor(value);
+        if (!filter.enabled) return 'No date limit';
+        if (filter.condition === 'before') return `On or before ${filter.toDate}`;
+        if (filter.condition === 'between') {
+            if (filter.fromDate && filter.toDate) return `${filter.fromDate} to ${filter.toDate}`;
+            if (filter.fromDate) return `On or after ${filter.fromDate}`;
+            if (filter.toDate) return `On or before ${filter.toDate}`;
+        }
+        return `On or after ${filter.fromDate}`;
+    }
+
+    async function updateManagedKeywordDateFilter(surface, entry, dateFilter) {
+        return saveManagedChildSurface(surface, async (target) => {
+            const listKey = surface === 'kids'
+                ? (target.mode === 'whitelist' ? 'whitelistKeywords' : 'blockedKeywords')
+                : (target.mode === 'whitelist' ? 'whitelistKeywords' : 'keywords');
+            const list = Array.isArray(target[listKey]) ? target[listKey] : [];
+            const word = normalizeString(entry?.word);
+            const index = list.findIndex(item => normalizeString(item?.word) === word && item?.source !== 'channel');
+            if (index < 0) return false;
+            list[index] = {
+                ...safeObject(list[index]),
+                word,
+                dateFilter: normalizeKeywordDateFilterForEditor(dateFilter)
+            };
+            target[listKey] = list;
+            return true;
+        });
+    }
+
+    async function saveKeywordDateFilter(surface, entry, dateFilter) {
+        const word = normalizeString(entry?.word);
+        if (!word) return false;
+
+        const normalized = normalizeKeywordDateFilterForEditor(dateFilter);
+        const ok = isManagedChildEditFor(surface)
+            ? await updateManagedKeywordDateFilter(surface, entry, normalized)
+            : (surface === 'kids'
+                ? await StateManager.updateKidsKeywordDateFilter(word, normalized)
+                : await StateManager.updateKeywordDateFilter(word, normalized));
+
+        if (ok) {
+            UIComponents.showToast(normalized.enabled
+                ? `Date limit saved: ${keywordDateFilterLabel(normalized)}`
+                : 'Keyword date limit turned off', 'success');
+            if (surface === 'kids') renderKidsKeywords();
+            else renderKeywords();
+            renderManagedChildEditorBanner();
+        } else {
+            UIComponents.showToast('Could not update this keyword date limit', 'error');
+        }
+        return ok;
+    }
+
+    async function showKeywordDateFilterModal(surface, entry) {
+        if (!entry || entry.source === 'channel') return false;
+
+        return new Promise((resolve) => {
+            const current = normalizeKeywordDateFilterForEditor(entry.dateFilter);
+            const overlay = document.createElement('div');
+            overlay.className = 'ft-modal-overlay keyword-date-filter-modal-overlay';
+
+            const card = document.createElement('div');
+            card.className = 'card ft-modal keyword-date-filter-modal';
+
+            const header = document.createElement('div');
+            header.className = 'card-header';
+            const title = document.createElement('h3');
+            title.className = 'ft-modal-title';
+            title.textContent = `Date limit for "${normalizeString(entry.word)}"`;
+            header.appendChild(title);
+
+            const body = document.createElement('div');
+            body.className = 'card-body ft-modal-body keyword-date-filter-modal__body';
+
+            const intro = document.createElement('p');
+            intro.className = 'keyword-date-filter-modal__intro';
+            intro.textContent = 'Use this only when a word should affect videos from a certain upload date. If YouTube does not show a date for a video, this date-limited keyword will not hide it by itself.';
+            body.appendChild(intro);
+
+            const conditionLabel = document.createElement('label');
+            conditionLabel.className = 'keyword-date-filter-modal__field';
+            const conditionText = document.createElement('span');
+            conditionText.textContent = 'When should this keyword apply?';
+            const conditionSelect = document.createElement('select');
+            conditionSelect.className = 'select-input';
+            [
+                ['after', 'Released on or after'],
+                ['before', 'Released on or before'],
+                ['between', 'Released between']
+            ].forEach(([value, label]) => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = label;
+                conditionSelect.appendChild(option);
+            });
+            conditionSelect.value = current.condition;
+            conditionLabel.appendChild(conditionText);
+            conditionLabel.appendChild(conditionSelect);
+            body.appendChild(conditionLabel);
+
+            const dateGrid = document.createElement('div');
+            dateGrid.className = 'keyword-date-filter-modal__dates';
+            const fromLabel = document.createElement('label');
+            fromLabel.className = 'keyword-date-filter-modal__field';
+            const fromText = document.createElement('span');
+            fromText.textContent = 'Start date';
+            const fromInput = document.createElement('input');
+            fromInput.type = 'date';
+            fromInput.className = 'input-field';
+            fromInput.value = current.fromDate;
+            fromLabel.appendChild(fromText);
+            fromLabel.appendChild(fromInput);
+
+            const toLabel = document.createElement('label');
+            toLabel.className = 'keyword-date-filter-modal__field';
+            const toText = document.createElement('span');
+            toText.textContent = 'End date';
+            const toInput = document.createElement('input');
+            toInput.type = 'date';
+            toInput.className = 'input-field';
+            toInput.value = current.toDate;
+            toLabel.appendChild(toText);
+            toLabel.appendChild(toInput);
+            dateGrid.appendChild(fromLabel);
+            dateGrid.appendChild(toLabel);
+            body.appendChild(dateGrid);
+
+            const hint = document.createElement('div');
+            hint.className = 'keyword-date-filter-modal__hint';
+            body.appendChild(hint);
+
+            const actions = document.createElement('div');
+            actions.className = 'ft-modal-actions';
+            const offBtn = document.createElement('button');
+            offBtn.type = 'button';
+            offBtn.className = 'btn-secondary';
+            offBtn.textContent = 'Turn off';
+            const cancelBtn = document.createElement('button');
+            cancelBtn.type = 'button';
+            cancelBtn.className = 'btn-secondary';
+            cancelBtn.textContent = 'Cancel';
+            const saveBtn = document.createElement('button');
+            saveBtn.type = 'button';
+            saveBtn.className = 'btn-primary';
+            saveBtn.textContent = 'Save Date Limit';
+            actions.appendChild(offBtn);
+            actions.appendChild(cancelBtn);
+            actions.appendChild(saveBtn);
+
+            const cleanup = (value) => {
+                overlay.remove();
+                resolve(value);
+            };
+
+            const updateVisibility = () => {
+                const mode = conditionSelect.value;
+                fromLabel.hidden = mode === 'before';
+                toLabel.hidden = mode === 'after';
+                hint.textContent = mode === 'after'
+                    ? 'Example: Deltarune after 2025-06-10 blocks newer Deltarune videos only.'
+                    : (mode === 'before'
+                        ? 'Use this when only older videos should be affected by this keyword.'
+                        : 'Use this when only videos inside one release window should be affected.');
+            };
+
+            conditionSelect.addEventListener('change', updateVisibility);
+            cancelBtn.addEventListener('click', () => cleanup(false));
+            overlay.addEventListener('click', (event) => {
+                if (event.target === overlay) cleanup(false);
+            });
+            offBtn.addEventListener('click', async () => {
+                const ok = await saveKeywordDateFilter(surface, entry, { enabled: false });
+                cleanup(ok);
+            });
+            saveBtn.addEventListener('click', async () => {
+                const next = normalizeKeywordDateFilterForEditor({
+                    enabled: true,
+                    condition: conditionSelect.value,
+                    fromDate: fromInput.value,
+                    toDate: toInput.value
+                });
+                if (!next.enabled) {
+                    UIComponents.showToast('Pick the date needed for this keyword limit', 'error');
+                    return;
+                }
+                const ok = await saveKeywordDateFilter(surface, entry, next);
+                cleanup(ok);
+            });
+
+            card.appendChild(header);
+            card.appendChild(body);
+            card.appendChild(actions);
+            overlay.appendChild(card);
+            document.body.appendChild(overlay);
+            updateVisibility();
+            conditionSelect.focus();
+        });
+    }
+
     async function addManagedChannel(surface, input) {
         const ok = await saveManagedChildSurface(surface, async (target) => {
             const listKey = surface === 'kids'
@@ -21356,6 +21572,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             stateOverride: isManagedChildEditFor('main') ? buildManagedChildState('main') : null,
             onDelete: isManagedChildEditFor('main') ? (entry) => removeManagedKeyword('main', entry) : null,
             onToggleExact: isManagedChildEditFor('main') ? (entry) => toggleManagedKeywordExact('main', entry) : null,
+            onUpdateDateFilter: (entry) => showKeywordDateFilterModal('main', entry),
             onToggleComments: isManagedChildEditFor('main') ? (entry) => toggleManagedKeywordComments('main', entry) : null
         });
         renderManagedChildEditorBanner();
@@ -21466,7 +21683,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             includeToggles: true,
             stateOverride: isManagedChildEditFor('kids') ? buildManagedChildState('kids') : null,
             onDelete: isManagedChildEditFor('kids') ? (entry) => removeManagedKeyword('kids', entry) : null,
-            onToggleExact: isManagedChildEditFor('kids') ? (entry) => toggleManagedKeywordExact('kids', entry) : null
+            onToggleExact: isManagedChildEditFor('kids') ? (entry) => toggleManagedKeywordExact('kids', entry) : null,
+            onUpdateDateFilter: (entry) => showKeywordDateFilterModal('kids', entry)
         });
         renderManagedChildEditorBanner();
     }

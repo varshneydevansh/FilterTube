@@ -574,6 +574,55 @@ button.select-input.ft-select-trigger:disabled,
     margin-top: var(--ft-space-md);
  }
 
+.keyword-date-filter-modal {
+    width: min(560px, calc(100vw - 2rem));
+}
+
+.keyword-date-filter-modal__body {
+    gap: 0.9rem;
+}
+
+.keyword-date-filter-modal__intro,
+.keyword-date-filter-modal__hint {
+    margin: 0;
+    color: var(--ft-color-text-secondary);
+    font-size: 0.94rem;
+    line-height: 1.45;
+}
+
+.keyword-date-filter-modal__hint {
+    border: 1px solid rgba(214, 169, 88, 0.28);
+    border-radius: 0.9rem;
+    padding: 0.7rem 0.85rem;
+    background: rgba(255, 248, 232, 0.78);
+}
+
+.keyword-date-filter-modal__field {
+    display: grid;
+    gap: 0.38rem;
+    min-width: 0;
+    color: var(--ft-color-text-primary);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.keyword-date-filter-modal__dates {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+@media (max-width: 640px) {
+    .keyword-date-filter-modal__dates {
+        grid-template-columns: 1fr;
+    }
+}
+
+html[data-theme="dark"] .keyword-date-filter-modal__hint {
+    border-color: rgba(242, 200, 121, 0.22);
+    background: rgba(80, 58, 20, 0.26);
+}
+
 /* --- Buttons --- */
 .btn-primary {
     position: relative;
@@ -1405,6 +1454,51 @@ html[data-theme="dark"] .exact-toggle.toggle-variant-blue.active:hover {
     background: linear-gradient(135deg, rgba(56, 189, 248, 0.38), rgba(33, 125, 176, 0.22)) !important;
     color: #e3f7ff !important;
     border-color: #b5eaff !important;
+}
+
+/* Amber variant (per-keyword upload date limit) */
+.exact-toggle.toggle-variant-amber {
+    color: #8a5b12;
+    border-color: rgba(214, 169, 88, 0.42);
+    background-color: rgba(255, 248, 232, 0.92);
+}
+
+.exact-toggle.toggle-variant-amber:hover {
+    border-color: rgba(196, 132, 35, 0.62);
+    color: #9a6415;
+    background-color: rgba(255, 242, 207, 0.98);
+    box-shadow: 0 0 0 3px rgba(214, 169, 88, 0.14);
+}
+
+.exact-toggle.toggle-variant-amber.active {
+    border-color: rgba(196, 132, 35, 0.72);
+    color: #fff;
+    background: linear-gradient(135deg, #b97825, #d09337);
+}
+
+.exact-toggle.toggle-variant-amber.active:hover {
+    border-color: rgba(196, 132, 35, 0.82);
+    color: #fff;
+    background: linear-gradient(135deg, #a9681e, #c6842f);
+    box-shadow: 0 0 0 3px rgba(214, 169, 88, 0.18);
+}
+
+html[data-theme="dark"] .exact-toggle.toggle-variant-amber {
+    color: #f2c879;
+    border-color: rgba(214, 169, 88, 0.38);
+    background: rgba(80, 58, 20, 0.42);
+}
+
+html[data-theme="dark"] .exact-toggle.toggle-variant-amber:hover {
+    border-color: rgba(242, 200, 121, 0.58);
+    color: #ffd992;
+    background: rgba(104, 72, 20, 0.62);
+}
+
+html[data-theme="dark"] .exact-toggle.toggle-variant-amber.active {
+    border-color: rgba(242, 200, 121, 0.7);
+    color: #1b1308;
+    background: linear-gradient(135deg, #d69a3d, #f0c46e);
 }
 
 /* --- Channel Derived Badge --- */

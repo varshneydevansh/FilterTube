@@ -99,6 +99,27 @@
         );
     }
 
+    function sanitizeKeywordDateFilter(value) {
+        const raw = safeObject(value);
+        const condition = raw.condition === 'before' || raw.condition === 'between'
+            ? raw.condition
+            : 'after';
+        const fromDate = typeof raw.fromDate === 'string' ? raw.fromDate.trim() : '';
+        const toDate = typeof raw.toDate === 'string' ? raw.toDate.trim() : '';
+        const enabled = raw.enabled === true && (
+            (condition === 'after' && !!fromDate) ||
+            (condition === 'before' && !!toDate) ||
+            (condition === 'between' && (!!fromDate || !!toDate))
+        );
+
+        return {
+            enabled,
+            condition,
+            fromDate,
+            toDate
+        };
+    }
+
     function buildProfilesV4FromLegacyState(storage, mainChannels, mainKeywords) {
         const profilesV3 = safeObject(storage?.[FT_PROFILES_V3_KEY]);
         const kidsV3 = safeObject(profilesV3.kids);
@@ -197,6 +218,7 @@
             source,
             channelRef: explicitChannelRef,
             comments,
+            dateFilter: sanitizeKeywordDateFilter(entry.dateFilter),
             addedAt // Track insertion time
         };
     }
@@ -399,7 +421,8 @@
                 const exactPattern = `(^|[^\\p{L}\\p{N}_])${escaped}(?=$|[^\\p{L}\\p{N}_])`;
                 return {
                     pattern: entry.exact ? exactPattern : escaped,
-                    flags: entry.exact ? 'iu' : 'i'
+                    flags: entry.exact ? 'iu' : 'i',
+                    dateFilter: entry.dateFilter?.enabled ? entry.dateFilter : undefined
                 };
             });
     }

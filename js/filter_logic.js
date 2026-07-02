@@ -1003,32 +1003,40 @@
             };
 
             // Reconstruct RegExp objects from serialized patterns
-            if (settings.filterKeywords && Array.isArray(settings.filterKeywords)) {
-                processed.filterKeywords = settings.filterKeywords.map(item => {
-                    if (item && typeof item === 'object' && item.pattern && item.flags) {
-                        try {
-                            return new RegExp(item.pattern, item.flags);
-                        } catch (e) {
-                            console.error('FilterTube: Failed to reconstruct RegExp:', item, e);
-                            return null;
-                        }
+            const sanitizeKeywordDateFilter = (value) => {
+                const raw = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+                const condition = raw.condition === 'before' || raw.condition === 'between'
+                    ? raw.condition
+                    : 'after';
+                const fromDate = typeof raw.fromDate === 'string' ? raw.fromDate.trim() : '';
+                const toDate = typeof raw.toDate === 'string' ? raw.toDate.trim() : '';
+                const enabled = raw.enabled === true && (
+                    (condition === 'after' && !!fromDate) ||
+                    (condition === 'before' && !!toDate) ||
+                    (condition === 'between' && (!!fromDate || !!toDate))
+                );
+                return { enabled, condition, fromDate, toDate };
+            };
+            const buildKeywordRegex = (item) => {
+                if (!(item && typeof item === 'object' && item.pattern && item.flags)) return null;
+                try {
+                    const regex = new RegExp(item.pattern, item.flags);
+                    const dateFilter = sanitizeKeywordDateFilter(item.dateFilter);
+                    if (dateFilter.enabled) {
+                        regex.__filtertubeDateFilter = dateFilter;
                     }
+                    return regex;
+                } catch (e) {
+                    console.error('FilterTube: Failed to reconstruct RegExp:', item, e);
                     return null;
-                }).filter(regex => regex !== null);
+                }
+            };
+            if (settings.filterKeywords && Array.isArray(settings.filterKeywords)) {
+                processed.filterKeywords = settings.filterKeywords.map(buildKeywordRegex).filter(regex => regex !== null);
             }
 
             if (settings.whitelistKeywords && Array.isArray(settings.whitelistKeywords)) {
-                processed.whitelistKeywords = settings.whitelistKeywords.map(item => {
-                    if (item && typeof item === 'object' && item.pattern && item.flags) {
-                        try {
-                            return new RegExp(item.pattern, item.flags);
-                        } catch (e) {
-                            console.error('FilterTube: Failed to reconstruct RegExp:', item, e);
-                            return null;
-                        }
-                    }
-                    return null;
-                }).filter(regex => regex !== null);
+                processed.whitelistKeywords = settings.whitelistKeywords.map(buildKeywordRegex).filter(regex => regex !== null);
             }
 
             // Ensure filterChannels are objects with all properties, and can be matched case-insensitively
@@ -1897,7 +1905,7 @@
                 if (hasKeywordRules) {
                     const textToSearch = this._candidateSearchText(candidate);
                     for (const keywordRegex of whitelistKeywords) {
-                        if (this._regexMatches(keywordRegex, textToSearch)) {
+                        if (this._regexMatches(keywordRegex, textToSearch) && this._keywordDateFilterAllows(keywordRegex, candidate, null, null, 'autoplayEndpoint')) {
                             this._logWhitelistDecision('allow:autoplay_endpoint_matched_keyword', {
                                 endpointKey,
                                 videoId,
@@ -1949,6 +1957,70 @@
                 } catch (e) {
                 }
             }
+        }
+
+        _parseKeywordDateBoundary(value, endOfDay = false) {
+            if (!value || typeof value !== 'string') return null;
+            const trimmed = value.trim();
+            const dateOnly = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            if (dateOnly) {
+                const year = Number(dateOnly[1]);
+                const month = Number(dateOnly[2]) - 1;
+                const day = Number(dateOnly[3]);
+                const date = endOfDay
+                    ? new Date(year, month, day, 23, 59, 59, 999)
+                    : new Date(year, month, day, 0, 0, 0, 0);
+                const ms = date.getTime();
+                return Number.isFinite(ms) ? ms : null;
+            }
+            const ms = new Date(trimmed).getTime();
+            return Number.isFinite(ms) ? ms : null;
+        }
+
+        _extractKeywordPublishTimestamp(keywordRegex, candidate, item, rules, rendererType) {
+            if (!keywordRegex?.__filtertubeDateFilter?.enabled) return null;
+
+            const videoId = typeof candidate?.videoId === 'string' ? candidate.videoId : '';
+            if (videoId && this.settings.videoMetaMap && this.settings.videoMetaMap[videoId]) {
+                const meta = this.settings.videoMetaMap[videoId];
+                const candidates = [meta?.uploadDate, meta?.publishDate];
+                for (const raw of candidates) {
+                    const ms = this._parseKeywordDateBoundary(raw, false);
+                    if (ms !== null) return ms;
+                }
+            }
+
+            const relativeText = typeof candidate?.publishedTimeText === 'string' ? candidate.publishedTimeText : '';
+            if (relativeText) {
+                const timestamp = this._parseRelativeTimeToTimestamp(relativeText);
+                if (timestamp !== null) return timestamp;
+            }
+
+            if (item && rules) {
+                return this._extractPublishedTime(item, rules, rendererType);
+            }
+
+            return null;
+        }
+
+        _keywordDateFilterAllows(keywordRegex, candidate, item, rules, rendererType) {
+            const dateFilter = keywordRegex?.__filtertubeDateFilter;
+            if (!dateFilter?.enabled) return true;
+
+            const timestamp = this._extractKeywordPublishTimestamp(keywordRegex, candidate, item, rules, rendererType);
+            if (timestamp === null) return false;
+
+            const fromMs = this._parseKeywordDateBoundary(dateFilter.fromDate, false);
+            const toMs = this._parseKeywordDateBoundary(dateFilter.toDate, true);
+            if (dateFilter.condition === 'before') {
+                return toMs !== null && timestamp <= toMs;
+            }
+            if (dateFilter.condition === 'between') {
+                const lower = fromMs !== null ? fromMs : Number.NEGATIVE_INFINITY;
+                const upper = toMs !== null ? toMs : Number.POSITIVE_INFINITY;
+                return timestamp >= lower && timestamp <= upper;
+            }
+            return fromMs !== null && timestamp >= fromMs;
         }
 
         /**
@@ -2118,7 +2190,7 @@
                 if (hasKeywordRules) {
                     const textToSearch = this._candidateSearchText(candidate);
                     for (const keywordRegex of whitelistKeywords) {
-                        if (this._regexMatches(keywordRegex, textToSearch)) {
+                        if (this._regexMatches(keywordRegex, textToSearch) && this._keywordDateFilterAllows(keywordRegex, candidate, item, rules, rendererType)) {
                             this._logWhitelistDecision('allow:matched_keyword', {
                                 rendererType,
                                 originalRendererType,
@@ -2194,7 +2266,7 @@
                 const textToSearch = this._candidateSearchText(candidate);
 
                 for (const keywordRegex of this.settings.filterKeywords) {
-                    if (this._regexMatches(keywordRegex, textToSearch)) {
+                    if (this._regexMatches(keywordRegex, textToSearch) && this._keywordDateFilterAllows(keywordRegex, candidate, item, rules, rendererType)) {
                         let matchLocation = '';
                         if (this._regexMatches(keywordRegex, title)) matchLocation += 'title';
                         if (this._regexMatches(keywordRegex, description)) {
@@ -2226,7 +2298,7 @@
                 // Apply keyword filters to comments
                 if (commentText && commentKeywords.length > 0) {
                     for (const keywordRegex of commentKeywords) {
-                        if (this._regexMatches(keywordRegex, commentText)) {
+                        if (this._regexMatches(keywordRegex, commentText) && this._keywordDateFilterAllows(keywordRegex, candidate, item, rules, rendererType)) {
                             this._log(`🚫 Blocking comment by keyword: ${commentText.substring(0, 50)}...`);
                             return true;
                         }
