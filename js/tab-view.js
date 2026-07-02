@@ -43,6 +43,140 @@ function initializeResponsiveNav() {
     navToggle.dataset.ftNavBound = 'true';
 }
 
+function initializeDashboardHelpBubbles() {
+    if (document.documentElement.dataset.ftHelpBubblesBound === 'true') return;
+
+    let activeTarget = null;
+    let activeBubble = null;
+    let touchTimer = null;
+    let hideTimer = null;
+
+    const HELP_SELECTOR = '[data-filtertube-help], [title]';
+
+    const getHelpTarget = (eventTarget) => {
+        if (!(eventTarget instanceof Element)) return null;
+        const target = eventTarget.closest(HELP_SELECTOR);
+        if (!target || !document.body.contains(target)) return null;
+        if (target.closest('[aria-hidden="true"], [hidden]')) return null;
+        const message = getHelpText(target);
+        return message ? target : null;
+    };
+
+    const getHelpText = (target) => {
+        const explicit = target.getAttribute('data-filtertube-help') || '';
+        const nativeTitle = target.getAttribute('title') || '';
+        const storedTitle = target.getAttribute('data-filtertube-title') || '';
+        return (explicit || nativeTitle || storedTitle).trim();
+    };
+
+    const suppressNativeTitle = (target) => {
+        const nativeTitle = target.getAttribute('title') || '';
+        if (nativeTitle) {
+            target.setAttribute('data-filtertube-title', nativeTitle);
+            target.removeAttribute('title');
+        }
+    };
+
+    const clearTimers = () => {
+        if (touchTimer) {
+            clearTimeout(touchTimer);
+            touchTimer = null;
+        }
+        if (hideTimer) {
+            clearTimeout(hideTimer);
+            hideTimer = null;
+        }
+    };
+
+    const hideBubble = () => {
+        clearTimers();
+        if (activeBubble?.parentNode) {
+            activeBubble.parentNode.removeChild(activeBubble);
+        }
+        activeBubble = null;
+        activeTarget = null;
+    };
+
+    const showBubble = (target) => {
+        const message = getHelpText(target);
+        if (!message) return;
+        suppressNativeTitle(target);
+        if (activeTarget === target && activeBubble) return;
+        hideBubble();
+        activeTarget = target;
+
+        try {
+            const rect = target.getBoundingClientRect();
+            const bubble = document.createElement('div');
+            bubble.className = 'filtertube-help-bubble';
+            bubble.textContent = message;
+            bubble.setAttribute('role', 'tooltip');
+            document.body.appendChild(bubble);
+
+            const bubbleRect = bubble.getBoundingClientRect();
+            const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
+            const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+            const margin = 12;
+            const centerX = rect.left + rect.width / 2;
+            const left = Math.min(
+                Math.max(centerX, bubbleRect.width / 2 + margin),
+                Math.max(bubbleRect.width / 2 + margin, viewportWidth - bubbleRect.width / 2 - margin)
+            );
+            const aboveTop = rect.top - margin;
+            const belowTop = rect.bottom + margin + bubbleRect.height;
+            const useBelow = aboveTop - bubbleRect.height < margin && belowTop < viewportHeight - margin;
+
+            bubble.style.left = `${left}px`;
+            bubble.style.top = useBelow ? `${rect.bottom + margin}px` : `${Math.max(rect.top - margin, margin)}px`;
+            bubble.classList.toggle('filtertube-help-bubble--below', useBelow);
+            activeBubble = bubble;
+        } catch (e) {
+            activeTarget = null;
+        }
+    };
+
+    document.addEventListener('mouseover', (event) => {
+        const target = getHelpTarget(event.target);
+        if (target) showBubble(target);
+    });
+    document.addEventListener('mouseout', (event) => {
+        if (activeTarget && event.target instanceof Element && activeTarget.contains(event.target)) {
+            const related = event.relatedTarget;
+            if (!(related instanceof Node) || !activeTarget.contains(related)) hideBubble();
+        }
+    });
+    document.addEventListener('focusin', (event) => {
+        const target = getHelpTarget(event.target);
+        if (target) showBubble(target);
+    });
+    document.addEventListener('focusout', (event) => {
+        if (activeTarget && event.target instanceof Element && activeTarget.contains(event.target)) {
+            hideBubble();
+        }
+    });
+    document.addEventListener('touchstart', (event) => {
+        const target = getHelpTarget(event.target);
+        if (!target) return;
+        clearTimers();
+        suppressNativeTitle(target);
+        touchTimer = setTimeout(() => showBubble(target), 420);
+    }, { passive: true });
+    document.addEventListener('touchend', () => {
+        if (touchTimer) {
+            clearTimeout(touchTimer);
+            touchTimer = null;
+        }
+        hideTimer = setTimeout(hideBubble, 1400);
+    }, { passive: true });
+    document.addEventListener('touchcancel', hideBubble, { passive: true });
+    document.addEventListener('scroll', hideBubble, true);
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') hideBubble();
+    });
+
+    document.documentElement.dataset.ftHelpBubblesBound = 'true';
+}
+
 function initializeFiltersTabs() {
     // Helper function to create compact inline condition rows
     function createCompactCondition({ name, value, labelText, fields }) {
@@ -2803,6 +2937,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {
     }
     // Initialize UI
+    initializeDashboardHelpBubbles();
     initializeResponsiveNav();
     initializeFiltersTabs();
     initializeKidsTabs();

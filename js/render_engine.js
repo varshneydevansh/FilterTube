@@ -336,59 +336,6 @@ const RenderEngine = (() => {
         element.setAttribute('title', message);
         element.setAttribute('aria-label', message);
         element.setAttribute('data-filtertube-help', message);
-
-        let bubble = null;
-        let longPressTimer = null;
-
-        const hideBubble = () => {
-            if (bubble?.parentNode) {
-                bubble.parentNode.removeChild(bubble);
-            }
-            bubble = null;
-        };
-
-        const showBubble = () => {
-            hideBubble();
-            try {
-                const rect = element.getBoundingClientRect();
-                bubble = document.createElement('div');
-                bubble.className = 'filtertube-help-bubble';
-                bubble.textContent = message;
-                bubble.setAttribute('role', 'tooltip');
-                bubble.style.left = `${Math.min(Math.max(rect.left + rect.width / 2, 140), window.innerWidth - 140)}px`;
-                bubble.style.top = `${Math.max(rect.top - 12, 12)}px`;
-                document.body.appendChild(bubble);
-            } catch (e) {
-            }
-        };
-
-        const clearLongPress = () => {
-            if (longPressTimer) {
-                clearTimeout(longPressTimer);
-                longPressTimer = null;
-            }
-        };
-
-        element.addEventListener('mouseenter', showBubble);
-        element.addEventListener('focus', showBubble);
-        element.addEventListener('mouseleave', hideBubble);
-        element.addEventListener('blur', hideBubble);
-        element.addEventListener('touchstart', () => {
-            clearLongPress();
-            longPressTimer = setTimeout(showBubble, 520);
-        }, { passive: true });
-        element.addEventListener('touchend', () => {
-            clearLongPress();
-            setTimeout(hideBubble, 1200);
-        }, { passive: true });
-        element.addEventListener('touchcancel', () => {
-            clearLongPress();
-            hideBubble();
-        }, { passive: true });
-        element.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') hideBubble();
-        });
-
         return element;
     }
 

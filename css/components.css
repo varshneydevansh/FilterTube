@@ -1224,6 +1224,10 @@ html[data-theme="dark"] .list-item {
     pointer-events: none;
 }
 
+.filtertube-help-bubble--below {
+    transform: translate(-50%, 0);
+}
+
 html[data-theme="dark"] .filtertube-help-bubble {
     border-color: rgba(255, 255, 255, 0.14);
     background: rgba(17, 24, 39, 0.96);
