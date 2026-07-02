@@ -231,9 +231,10 @@ if (window.__filtertubeRuntimeBridgeListenerAttached !== true) {
             return true;
         } else if (request.action === 'FilterTube_RefreshNow') {
             debugLog('🔄 Refresh requested via runtime messaging');
-            requestSettingsFromBackground().then(result => {
+            requestSettingsFromBackground({ forceRefresh: true }).then(result => {
                 if (result?.success) {
                     applyDOMFallback(result.settings, { forceReprocess: true });
+                    refreshRuntimeObserversAfterSettingsUpdate();
                 }
             });
             sendResponse?.({ acknowledged: true });

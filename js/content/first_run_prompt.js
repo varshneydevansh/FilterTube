@@ -74,7 +74,7 @@
         title.style.fontWeight = '700';
         title.style.fontSize = '16px';
         title.style.letterSpacing = '-0.01em';
-        title.textContent = 'Refresh to activate FilterTube';
+        title.textContent = 'FilterTube is active';
         title.style.marginBottom = '8px';
         container.appendChild(title);
 
@@ -82,7 +82,7 @@
         desc.style.marginBottom = '16px';
         desc.style.color = palette.subtext;
         desc.style.fontSize = '14px';
-        desc.textContent = 'FilterTube is ready. Reload this YouTube tab once so your filters take effect everywhere.';
+        desc.textContent = 'This tab can now use FilterTube controls. Reload once if you want the earliest YouTube data on this already-open tab covered too.';
         container.appendChild(desc);
 
         const actions = document.createElement('div');

@@ -75,7 +75,9 @@ That means:
 - the extension counts active YouTube use for that profile and blocks YouTube with a FilterTube timeout screen when the daily limit is reached
 - a protected user can request more time from the timeout screen
 - request-more-time does not grant access by itself; a parent/caregiver approval is required
-- reducing a time limit takes effect on the next runtime policy refresh and must not bypass blocklist, whitelist, Shorts, end-screen, quick-block, or menu behavior
+- reducing a time limit invalidates compiled profile policy, forces a fresh settings pull in active YouTube tabs, and should block already-open and newly-open YouTube/YouTube Kids tabs when the active protected profile is out of time
+- already-open tabs from before install/update are now activated by a guarded runtime injection path; a reload is still best for earliest document-start JSON interception, but basic DOM filtering and timeout enforcement should not require a manual refresh
+- time-limit refresh must not bypass blocklist, whitelist, Shorts, end-screen, quick-block, or menu behavior
 
 ## v3.3.0 Release Highlights
 
@@ -363,7 +365,7 @@ Current behavior notes:
 - source account is the active YouTube account in the selected tab
 - import is limited to the main YouTube profile path, not Kids
 - if the browser session is signed out, Tab View brings the sign-in tab forward and shows a retryable warning
-- on a fresh extension install/update, an already-open YouTube tab may need a one-time refresh before the bridge is available
+- on a fresh extension install/update, FilterTube tries to activate already-open YouTube tabs by injecting the runtime bridge and forcing a settings refresh; a one-time page reload is still recommended for earliest document-start JSON interception
 
 ### **Advanced Settings**
 - **Detailed Configuration**: Access to all filtering options

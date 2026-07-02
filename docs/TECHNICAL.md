@@ -108,7 +108,12 @@ sequenceDiagram
 - a browser `GET /filtertube` status response is safe to inspect because it
   exposes service/readiness metadata only, never plaintext rules, PINs, private
   keys, or policy authority
-- protected-profile time limits are runtime policy gates; reaching the limit blocks YouTube with the FilterTube timeout surface and records extra-time requests as protected history
+- protected-profile time limits are runtime policy gates; reaching the limit
+  blocks YouTube with the FilterTube timeout surface and records extra-time
+  requests as protected history. Profile-policy writes invalidate compiled
+  settings, wake open YouTube/YouTube Kids tabs, force a fresh compiled-settings
+  pull, and guarded-inject the content runtime into already-open tabs that do
+  not yet have a live FilterTube receiver.
 
 ## Runtime stabilization checkpoint
 

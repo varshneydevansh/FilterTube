@@ -3505,6 +3505,123 @@ function shouldSuppressFirstRunPromptInjectionError(error) {
         || /No tab with id/i.test(message);
 }
 
+const FILTERTUBE_YOUTUBE_TAB_URLS = ['*://*.youtube.com/*', '*://*.youtubekids.com/*'];
+const FILTERTUBE_ISOLATED_RUNTIME_FILES = [
+    'js/shared/identity.js',
+    'js/content/dom_state.js',
+    'js/content/menu.js',
+    'js/content/dom_helpers.js',
+    'js/content/dom_extractors.js',
+    'js/content/dom_fallback.js',
+    'js/content/block_channel.js',
+    'js/content/bridge_injection.js',
+    'js/content/bridge_settings.js',
+    'js/content/handle_resolver.js',
+    'js/content/collab_dialog.js',
+    'js/content/release_notes_prompt.js',
+    'js/content/first_run_prompt.js',
+    'js/content_bridge.js'
+];
+
+function executeScriptFilesInTab(tabId, files, world = 'ISOLATED') {
+    return new Promise((resolve) => {
+        if (!tabId || !browserAPI?.scripting?.executeScript || !Array.isArray(files) || files.length === 0) {
+            resolve({ ok: false, error: 'scripting_unavailable' });
+            return;
+        }
+
+        let settled = false;
+        const finish = (result) => {
+            if (settled) return;
+            settled = true;
+            resolve(result || { ok: true });
+        };
+
+        try {
+            const maybePromise = browserAPI.scripting.executeScript({
+                target: { tabId },
+                world,
+                files
+            }, () => {
+                const error = browserAPI.runtime?.lastError;
+                finish(error ? { ok: false, error: error.message || String(error) } : { ok: true });
+            });
+
+            if (maybePromise && typeof maybePromise.then === 'function') {
+                maybePromise
+                    .then(() => finish({ ok: true }))
+                    .catch(error => finish({ ok: false, error: error?.message || String(error || 'failed') }));
+            }
+        } catch (error) {
+            finish({ ok: false, error: error?.message || String(error || 'failed') });
+        }
+    });
+}
+
+function pingFilterTubeRuntime(tabId) {
+    return new Promise((resolve) => {
+        try {
+            if (!tabId || !browserAPI?.tabs?.sendMessage) {
+                resolve(false);
+                return;
+            }
+            browserAPI.tabs.sendMessage(tabId, { action: 'FilterTube_Ping' }, response => {
+                const error = browserAPI.runtime?.lastError;
+                resolve(!error && !!response);
+            });
+        } catch (e) {
+            resolve(false);
+        }
+    });
+}
+
+async function ensureFilterTubeRuntimeInTab(tabId) {
+    if (await pingFilterTubeRuntime(tabId)) return true;
+
+    const mainResult = await executeScriptFilesInTab(tabId, ['js/seed.js'], 'MAIN');
+    if (!mainResult.ok && !shouldSuppressFirstRunPromptInjectionError(mainResult.error)) {
+        console.warn('FilterTube: failed to inject seed into existing YouTube tab', mainResult.error);
+    }
+
+    const isolatedResult = await executeScriptFilesInTab(tabId, FILTERTUBE_ISOLATED_RUNTIME_FILES, 'ISOLATED');
+    if (!isolatedResult.ok) {
+        if (!shouldSuppressFirstRunPromptInjectionError(isolatedResult.error)) {
+            console.warn('FilterTube: failed to inject runtime into existing YouTube tab', isolatedResult.error);
+        }
+        return false;
+    }
+
+    return true;
+}
+
+async function refreshOrInjectFilterTubeTab(tabId) {
+    const ready = await ensureFilterTubeRuntimeInTab(tabId);
+    if (!ready) return;
+    setTimeout(() => {
+        sendMessageToTabQuietly(tabId, { action: 'FilterTube_RefreshNow' });
+    }, 150);
+}
+
+function refreshYouTubeTabs({ injectIfMissing = false } = {}) {
+    try {
+        browserAPI.tabs.query({ url: FILTERTUBE_YOUTUBE_TAB_URLS }, (tabs) => {
+            if (browserAPI.runtime.lastError) {
+                console.warn('FilterTube: tabs.query failed', browserAPI.runtime.lastError);
+                return;
+            }
+            (tabs || []).forEach(tab => {
+                if (!tab?.id) return;
+                if (injectIfMissing) {
+                    refreshOrInjectFilterTubeTab(tab.id);
+                } else {
+                    sendMessageToTabQuietly(tab.id, { action: 'FilterTube_RefreshNow' });
+                }
+            });
+        });
+    } catch (e) {
+    }
+}
+
 // Extension installed or updated handler
 browserAPI.runtime.onInstalled.addListener(function (details) {
     if (details.reason === 'install') {
@@ -3528,32 +3645,10 @@ browserAPI.runtime.onInstalled.addListener(function (details) {
         applyKeywordCommentsScopeMigrationOnce().catch(() => {
         });
 
-        // Proactively inject the first-run prompt into already-open YouTube tabs
-        try {
-            browserAPI.tabs.query({ url: ['*://*.youtube.com/*', '*://*.youtubekids.com/*'] }, (tabs) => {
-                if (browserAPI.runtime.lastError) {
-                    console.warn('FilterTube: tabs.query failed', browserAPI.runtime.lastError);
-                    return;
-                }
-                tabs?.forEach(tab => {
-                    if (!tab?.id || !browserAPI.scripting?.executeScript) return;
-                    browserAPI.scripting.executeScript({
-                        target: { tabId: tab.id },
-                        world: 'ISOLATED',
-                        files: ['js/content/first_run_prompt.js']
-                    }, () => {
-                        if (browserAPI.runtime.lastError) {
-                            const error = browserAPI.runtime.lastError;
-                            if (!shouldSuppressFirstRunPromptInjectionError(error)) {
-                                console.warn('FilterTube: failed to inject first_run_prompt', error);
-                            }
-                        }
-                    });
-                });
-            });
-        } catch (e) {
-            console.warn('FilterTube: failed to inject first-run prompt on install', e);
-        }
+        // Activate already-open YouTube tabs so basic DOM/time-limit controls work
+        // without requiring a manual refresh. A refresh is still best for earliest
+        // document-start JSON interception.
+        refreshYouTubeTabs({ injectIfMissing: true });
     } else if (details.reason === 'update') {
         console.log('FilterTube extension updated from version ' + details.previousVersion);
         applyQuickBlockDefaultMigrationOnce({ previousVersion: details.previousVersion || '' }).catch(() => {
@@ -3569,32 +3664,7 @@ browserAPI.runtime.onInstalled.addListener(function (details) {
             console.warn('FilterTube Background: unable to prepare release notes payload', error);
         });
 
-        // Show refresh prompt in already-open YouTube tabs after update.
-        try {
-            browserAPI.tabs.query({ url: ['*://*.youtube.com/*', '*://*.youtubekids.com/*'] }, (tabs) => {
-                if (browserAPI.runtime.lastError) {
-                    console.warn('FilterTube: tabs.query failed', browserAPI.runtime.lastError);
-                    return;
-                }
-                tabs?.forEach(tab => {
-                    if (!tab?.id || !browserAPI.scripting?.executeScript) return;
-                    browserAPI.scripting.executeScript({
-                        target: { tabId: tab.id },
-                        world: 'ISOLATED',
-                        files: ['js/content/first_run_prompt.js']
-                    }, () => {
-                        if (browserAPI.runtime.lastError) {
-                            const error = browserAPI.runtime.lastError;
-                            if (!shouldSuppressFirstRunPromptInjectionError(error)) {
-                                console.warn('FilterTube: failed to inject first_run_prompt', error);
-                            }
-                        }
-                    });
-                });
-            });
-        } catch (e) {
-            console.warn('FilterTube: failed to inject first-run prompt on update', e);
-        }
+        refreshYouTubeTabs({ injectIfMissing: true });
         // You could handle migration of settings between versions here if needed
     }
 });
@@ -5503,6 +5573,7 @@ browserAPI.storage.onChanged.addListener((changes, area) => {
             // Content scripts will re-request via their own onChanged listeners.
             getCompiledSettings({ url: 'https://www.youtube.com/' });
             getCompiledSettings({ url: 'https://www.youtubekids.com/' });
+            refreshYouTubeTabs({ injectIfMissing: !!changes[FT_PROFILES_V4_KEY] });
         }
     }
 });
