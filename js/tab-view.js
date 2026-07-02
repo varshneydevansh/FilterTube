@@ -6,6 +6,7 @@
  */
 
 const FILTERTUBE_SEMANTIC_ML_ENABLED = false;
+const ANDROID_CLOSED_TESTING_INVITE_DISMISSED_KEY = 'filtertube_android_closed_testing_invite_dismissed_v1';
 
 // ============================================================================
 // FILTERS TAB INITIALIZATION
@@ -175,6 +176,160 @@ function initializeDashboardHelpBubbles() {
     });
 
     document.documentElement.dataset.ftHelpBubblesBound = 'true';
+}
+
+async function initializeAndroidClosedTestingInvite() {
+    const getFromChromeStorage = (key) => new Promise((resolve) => {
+        try {
+            chrome.storage.local.get(key, (result) => {
+                try {
+                    if (chrome.runtime?.lastError) {
+                        resolve(null);
+                        return;
+                    }
+                } catch (e) {
+                }
+                resolve(result || {});
+            });
+        } catch (e) {
+            resolve(null);
+        }
+    });
+
+    const setInChromeStorage = (payload) => new Promise((resolve) => {
+        try {
+            chrome.storage.local.set(payload, () => resolve());
+        } catch (e) {
+            resolve();
+        }
+    });
+
+    const getDismissed = async () => {
+        try {
+            if (typeof chrome !== 'undefined' && chrome?.storage?.local?.get) {
+                const result = await getFromChromeStorage(ANDROID_CLOSED_TESTING_INVITE_DISMISSED_KEY);
+                return result?.[ANDROID_CLOSED_TESTING_INVITE_DISMISSED_KEY] === true;
+            }
+        } catch (e) {
+        }
+        try {
+            return localStorage.getItem(ANDROID_CLOSED_TESTING_INVITE_DISMISSED_KEY) === 'true';
+        } catch (e) {
+            return false;
+        }
+    };
+
+    const setDismissed = async () => {
+        try {
+            if (typeof chrome !== 'undefined' && chrome?.storage?.local?.set) {
+                await setInChromeStorage({ [ANDROID_CLOSED_TESTING_INVITE_DISMISSED_KEY]: true });
+                return;
+            }
+        } catch (e) {
+        }
+        try {
+            localStorage.setItem(ANDROID_CLOSED_TESTING_INVITE_DISMISSED_KEY, 'true');
+        } catch (e) {
+        }
+    };
+
+    if (await getDismissed()) return;
+    if (document.querySelector('.android-closed-testing-invite')) return;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'ft-modal-overlay android-closed-testing-invite';
+    overlay.setAttribute('role', 'presentation');
+
+    const card = document.createElement('div');
+    card.className = 'card ft-modal android-closed-testing-invite__sheet';
+    card.setAttribute('role', 'dialog');
+    card.setAttribute('aria-modal', 'true');
+    card.setAttribute('aria-labelledby', 'androidClosedTestingInviteTitle');
+
+    const header = document.createElement('div');
+    header.className = 'card-header android-closed-testing-invite__header';
+
+    const eyebrow = document.createElement('div');
+    eyebrow.className = 'ft-modal-eyebrow';
+    eyebrow.textContent = 'Android closed testing';
+
+    const title = document.createElement('h3');
+    title.id = 'androidClosedTestingInviteTitle';
+    title.className = 'ft-modal-title';
+    title.textContent = 'Help test the Android Play Store build';
+
+    header.append(eyebrow, title);
+
+    const body = document.createElement('div');
+    body.className = 'card-body ft-modal-body android-closed-testing-invite__body';
+
+    const message = document.createElement('p');
+    message.className = 'android-closed-testing-invite__message';
+    message.textContent = 'If you can actively test FilterTube on Android phone or tablet, send a mail to hello@filtertube.in. I will add you as a Play Store closed tester and use your feedback to catch YouTube changes faster.';
+
+    const address = document.createElement('div');
+    address.className = 'android-closed-testing-invite__address';
+    address.textContent = 'hello@filtertube.in';
+
+    const note = document.createElement('p');
+    note.className = 'android-closed-testing-invite__note';
+    note.textContent = 'You can close this once. It will not keep appearing after you dismiss it.';
+
+    const actions = document.createElement('div');
+    actions.className = 'ft-modal-actions android-closed-testing-invite__actions';
+
+    const dismissBtn = document.createElement('button');
+    dismissBtn.className = 'btn-secondary';
+    dismissBtn.type = 'button';
+    dismissBtn.textContent = 'Got it';
+
+    const mailBtn = document.createElement('a');
+    mailBtn.className = 'btn-primary android-closed-testing-invite__mail';
+    const mailHref = 'mailto:hello@filtertube.in?subject=Android%20closed%20testing%20request&body=Hi%20FilterTube%2C%0A%0AI%20would%20like%20to%20join%20the%20Android%20Play%20Store%20closed%20testing.%0A%0AGoogle%20Play%20email%3A%20%0ADevice%3A%20%0AWhat%20I%20can%20test%3A%20%0A';
+    mailBtn.href = mailHref;
+    mailBtn.textContent = 'Email to join';
+
+    const cleanup = async () => {
+        await setDismissed();
+        try {
+            overlay.remove();
+        } catch (e) {
+        }
+        document.removeEventListener('keydown', onKeyDown);
+    };
+
+    const onKeyDown = (event) => {
+        if (event.key === 'Escape') {
+            cleanup();
+        }
+    };
+
+    dismissBtn.addEventListener('click', cleanup);
+    mailBtn.addEventListener('click', async (event) => {
+        event.preventDefault();
+        await cleanup();
+        try {
+            window.location.href = mailHref;
+        } catch (e) {
+        }
+    });
+    overlay.addEventListener('click', (event) => {
+        if (event.target === overlay) cleanup();
+    });
+    document.addEventListener('keydown', onKeyDown);
+
+    actions.append(dismissBtn, mailBtn);
+    body.append(message, address, note, actions);
+    card.append(header, body);
+    overlay.appendChild(card);
+    document.body.appendChild(overlay);
+
+    requestAnimationFrame(() => {
+        try {
+            mailBtn.focus();
+        } catch (e) {
+        }
+    });
 }
 
 function initializeFiltersTabs() {
@@ -2938,6 +3093,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     // Initialize UI
     initializeDashboardHelpBubbles();
+    initializeAndroidClosedTestingInvite();
     initializeResponsiveNav();
     initializeFiltersTabs();
     initializeKidsTabs();

@@ -14,6 +14,7 @@
       "Rule list imports support CSV, TXT, simple JSON, BlockTube-style JSON, and raw HTTPS URLs with preview-before-apply, Main/Kids/Both targeting, templates, list management, pause/resume/remove, stale checks, and refresh.",
       "Date-based keyword filtering can apply a keyword only on/after, on/before, or between upload dates. Comment filtering uses the parent video upload date when YouTube exposes it.",
       "Help and dashboard controls now use plainer parent-first wording, faster help bubbles, and clearer explanations for Exact, Comment, Date, PINs, rule lists, and device updates.",
+      "The dashboard now invites active Android closed-testing users to email hello@filtertube.in and keeps a visible reminder to report filtering breaks when YouTube changes page structure.",
       "YouTube desktop lockup selectors and YTM mobile camelCase DOM are documented so real video cards keep filtering while Watch-page chip bars do not wake fallback work or cause scroll jumps.",
       "Still separate: automatic LAN peer discovery, a hosted FilterTube Internet Pickup service, silent public auto-subscribe catalogs, native Android/iOS parity, and installed two-device manual smoke evidence."
     ],
