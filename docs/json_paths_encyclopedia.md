@@ -4964,6 +4964,8 @@ From docs/json_paths_encyclopedia.md, these are the JSON field definitions curre
       1. learned videoMetaMap uploadDate/publishDate from /player microformat,
       2. renderer publishedTimeText relative strings, and
       3. DOM metadata fallback text when JSON date evidence is not present.
+    Comment keyword date filters use the current/linked video's uploadDate/publishDate,
+    not the commentRenderer/commentThreadRenderer posted-time label.
     Old keyword rows without dateFilter metadata keep the previous behavior.
 
   15. backstagePostRenderer (community posts)

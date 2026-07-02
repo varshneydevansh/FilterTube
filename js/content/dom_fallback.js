@@ -1710,6 +1710,17 @@ function hasDateGatedKeywords(rawList) {
     });
 }
 
+function resolveVideoMetaPublishTimestampForKeywords(videoId, settings) {
+    if (!videoId || !settings?.videoMetaMap || typeof settings.videoMetaMap !== 'object') return null;
+    const meta = settings.videoMetaMap[videoId];
+    const candidates = [meta?.uploadDate, meta?.publishDate];
+    for (const raw of candidates) {
+        const ms = parseKeywordDateBoundary(raw, false);
+        if (ms !== null) return ms;
+    }
+    return null;
+}
+
 function parseRelativeTimeToTimestampForKeywords(timeText) {
     if (!timeText || typeof timeText !== 'string') return null;
     const text = timeText.toLowerCase().trim();
@@ -1749,14 +1760,32 @@ function parseRelativeTimeToTimestampForKeywords(timeText) {
 
 function resolveElementPublishTimestampForKeywords(element, settings) {
     if (!element || !settings || typeof settings !== 'object') return null;
-    const videoId = ensureVideoIdForCard(element);
-    if (videoId && settings.videoMetaMap && typeof settings.videoMetaMap === 'object') {
-        const meta = settings.videoMetaMap[videoId];
-        const candidates = [meta?.uploadDate, meta?.publishDate];
-        for (const raw of candidates) {
-            const ms = parseKeywordDateBoundary(raw, false);
-            if (ms !== null) return ms;
+    const tagName = String(element.tagName || '').toLowerCase();
+    const isCommentElement = tagName.includes('comment') || Boolean(element.closest?.(
+        'ytd-comment-thread-renderer, ' +
+        'ytm-comment-thread-renderer, ' +
+        'ytd-comment-renderer, ' +
+        'ytm-comment-renderer, ' +
+        'ytd-comment-view-model, ' +
+        'ytm-comment-view-model'
+    ));
+    if (isCommentElement) {
+        const currentVideoId = getCurrentWatchVideoId();
+        const timestamp = resolveVideoMetaPublishTimestampForKeywords(currentVideoId, settings);
+        if (timestamp !== null) return timestamp;
+        if (currentVideoId && typeof scheduleVideoMetaFetch === 'function') {
+            try {
+                scheduleVideoMetaFetch(currentVideoId, { needDuration: false, needDates: true });
+            } catch (e) {
+            }
         }
+        return null;
+    }
+
+    const videoId = ensureVideoIdForCard(element);
+    const videoMetaTimestamp = resolveVideoMetaPublishTimestampForKeywords(videoId, settings);
+    if (videoMetaTimestamp !== null) {
+        return videoMetaTimestamp;
     }
 
     const possibleTextNodes = [

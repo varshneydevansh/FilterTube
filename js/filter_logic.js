@@ -1977,17 +1977,48 @@
             return Number.isFinite(ms) ? ms : null;
         }
 
+        _getCurrentWatchVideoId() {
+            try {
+                const location = globalThis?.location;
+                const path = String(location?.pathname || '');
+                if (!path.startsWith('/watch')) return '';
+                const params = new URLSearchParams(location?.search || '');
+                const videoId = params.get('v') || '';
+                return /^[a-zA-Z0-9_-]{11}$/.test(videoId) ? videoId : '';
+            } catch (e) {
+                return '';
+            }
+        }
+
+        _extractKeywordTimestampFromVideoMeta(videoId) {
+            if (!videoId || !this.settings.videoMetaMap || !this.settings.videoMetaMap[videoId]) {
+                return null;
+            }
+
+            const meta = this.settings.videoMetaMap[videoId];
+            const candidates = [meta?.uploadDate, meta?.publishDate];
+            for (const raw of candidates) {
+                const ms = this._parseKeywordDateBoundary(raw, false);
+                if (ms !== null) return ms;
+            }
+            return null;
+        }
+
         _extractKeywordPublishTimestamp(keywordRegex, candidate, item, rules, rendererType) {
             if (!keywordRegex?.__filtertubeDateFilter?.enabled) return null;
 
             const videoId = typeof candidate?.videoId === 'string' ? candidate.videoId : '';
-            if (videoId && this.settings.videoMetaMap && this.settings.videoMetaMap[videoId]) {
-                const meta = this.settings.videoMetaMap[videoId];
-                const candidates = [meta?.uploadDate, meta?.publishDate];
-                for (const raw of candidates) {
-                    const ms = this._parseKeywordDateBoundary(raw, false);
-                    if (ms !== null) return ms;
-                }
+            const isComment = candidate?.isComment === true || String(rendererType || '').toLowerCase().includes('comment');
+            if (isComment) {
+                const currentWatchVideoId = this._getCurrentWatchVideoId();
+                const timestamp = this._extractKeywordTimestampFromVideoMeta(currentWatchVideoId) ??
+                    this._extractKeywordTimestampFromVideoMeta(videoId);
+                return timestamp;
+            }
+
+            const videoMetaTimestamp = this._extractKeywordTimestampFromVideoMeta(videoId);
+            if (videoMetaTimestamp !== null) {
+                return videoMetaTimestamp;
             }
 
             const relativeText = typeof candidate?.publishedTimeText === 'string' ? candidate.publishedTimeText : '';

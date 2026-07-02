@@ -73,6 +73,14 @@ publishedTimeText.simpleText
 publishedTimeText.runs[0].text
 ```
 
+Comment keyword filtering is anchored to the parent video date, not the
+comment posted date. For comment JSON and DOM fallback paths, a date-limited
+comment keyword first checks the current/linked watch video in `videoMetaMap`.
+If that video date is unknown, the date-limited comment keyword does not match
+by itself and DOM fallback may request `/player` metadata for the current watch
+video. This avoids treating comment labels such as "2 days ago" as the release
+date of the video.
+
 ## Safety Policy
 
 If a keyword has no date filter, behavior is unchanged.
@@ -102,7 +110,15 @@ flow.
 
 - Existing string keywords remain accepted.
 - Existing object keywords without `dateFilter` remain accepted.
-- Export/import/profile sync preserve `dateFilter` only as optional metadata.
+- FilterTube backup JSON preserves `dateFilter` inside keyword entries during
+export/import because it is part of profile rule data.
+- Device update / managed profile sync preserves `dateFilter` when the parent
+sends a protected profile policy to a verified device.
+- Rule-list imports from CSV, TXT, raw URLs, and simple public JSON currently
+create plain keyword/channel rows. They do not silently attach date windows;
+parents can add a Date rule after preview/import.
+- BlockTube migration JSON remains a channel/title list migration path and does
+not infer FilterTube keyword date windows.
 - Main and Kids profiles both support the metadata.
 - Channel-derived keywords do not expose this editor because their source of
 truth remains the channel `Filter All` toggle.
