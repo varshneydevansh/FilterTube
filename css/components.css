@@ -1204,6 +1204,33 @@ html[data-theme="dark"] .list-item {
     border-color: rgba(15, 118, 86, 0.92);
 }
 
+.filtertube-help-bubble {
+    position: fixed;
+    z-index: 2147483647;
+    max-width: min(320px, calc(100vw - 32px));
+    transform: translate(-50%, -100%);
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    background: rgba(255, 255, 255, 0.96);
+    color: var(--ft-color-text-primary);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+    font-family: var(--ft-font-family-base);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.45;
+    text-transform: none;
+    letter-spacing: 0;
+    pointer-events: none;
+}
+
+html[data-theme="dark"] .filtertube-help-bubble {
+    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(17, 24, 39, 0.96);
+    color: var(--ft-color-text-primary);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.32);
+}
+
 .exact-toggle.is-disabled,
 .exact-toggle[aria-disabled="true"] {
     opacity: 0.56;

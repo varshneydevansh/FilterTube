@@ -331,6 +331,67 @@ const RenderEngine = (() => {
         return filter.fromDate ? `After ${filter.fromDate}` : 'Date on';
     }
 
+    function attachKeywordHelpBubble(element, message) {
+        if (!element || !message) return element;
+        element.setAttribute('title', message);
+        element.setAttribute('aria-label', message);
+        element.setAttribute('data-filtertube-help', message);
+
+        let bubble = null;
+        let longPressTimer = null;
+
+        const hideBubble = () => {
+            if (bubble?.parentNode) {
+                bubble.parentNode.removeChild(bubble);
+            }
+            bubble = null;
+        };
+
+        const showBubble = () => {
+            hideBubble();
+            try {
+                const rect = element.getBoundingClientRect();
+                bubble = document.createElement('div');
+                bubble.className = 'filtertube-help-bubble';
+                bubble.textContent = message;
+                bubble.setAttribute('role', 'tooltip');
+                bubble.style.left = `${Math.min(Math.max(rect.left + rect.width / 2, 140), window.innerWidth - 140)}px`;
+                bubble.style.top = `${Math.max(rect.top - 12, 12)}px`;
+                document.body.appendChild(bubble);
+            } catch (e) {
+            }
+        };
+
+        const clearLongPress = () => {
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+        };
+
+        element.addEventListener('mouseenter', showBubble);
+        element.addEventListener('focus', showBubble);
+        element.addEventListener('mouseleave', hideBubble);
+        element.addEventListener('blur', hideBubble);
+        element.addEventListener('touchstart', () => {
+            clearLongPress();
+            longPressTimer = setTimeout(showBubble, 520);
+        }, { passive: true });
+        element.addEventListener('touchend', () => {
+            clearLongPress();
+            setTimeout(hideBubble, 1200);
+        }, { passive: true });
+        element.addEventListener('touchcancel', () => {
+            clearLongPress();
+            hideBubble();
+        }, { passive: true });
+        element.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') hideBubble();
+        });
+
+        return element;
+    }
+
     /**
      * Create a single keyword list item
      * @param {Object} entry - Keyword entry
@@ -404,10 +465,15 @@ const RenderEngine = (() => {
         let commentsToggle = null;
         if (shouldShowCommentsToggle) {
             const commentsToggleText = minimal ? 'C' : 'Comment';
+            const commentsToggleTitle = commentsEnabled
+                ? 'Comment is on: this keyword also checks matching comment text.'
+                : 'Comment is off: this keyword checks video titles and metadata only.';
             commentsToggle = UIComponents?.createToggleButton
                 ? UIComponents.createToggleButton({
                     text: commentsToggleText,
                     active: commentsEnabled,
+                    title: commentsToggleTitle,
+                    ariaLabel: commentsToggleTitle,
                     onToggle: async () => {
                         if (typeof onToggleComments === 'function') {
                             await onToggleComments(entry);
@@ -428,6 +494,8 @@ const RenderEngine = (() => {
                     toggle.setAttribute('role', 'button');
                     toggle.setAttribute('aria-pressed', commentsEnabled);
                     toggle.setAttribute('tabindex', '0');
+                    toggle.setAttribute('title', commentsToggleTitle);
+                    toggle.setAttribute('aria-label', commentsToggleTitle);
                     toggle.addEventListener('click', async () => {
                         if (typeof onToggleComments === 'function') {
                             await onToggleComments(entry);
@@ -456,9 +524,7 @@ const RenderEngine = (() => {
                     return toggle;
                 })();
 
-            commentsToggle.title = commentsEnabled
-                ? 'Keyword also applies to comment text'
-                : 'Keyword only applies to video title and metadata';
+            attachKeywordHelpBubble(commentsToggle, commentsToggleTitle);
         }
 
         if (isChannelDerived && shouldShowToggles && profile === 'kids') {
@@ -530,12 +596,13 @@ const RenderEngine = (() => {
                     className: minimal ? '' : ''
                 }) :
                 createFallbackExactToggle(entry, minimal, profile);
+            attachKeywordHelpBubble(exactToggle, exactToggleTitle);
 
             const dateFilter = normalizeKeywordDateFilterForUi(entry.dateFilter);
             const dateToggleText = minimal ? 'D' : 'Date';
             const dateToggleTitle = dateFilter.enabled
-                ? `This keyword only applies to videos ${formatKeywordDateFilterLabel(dateFilter).toLowerCase()}`
-                : 'Set a release-date limit for this keyword';
+                ? `Date is on: this keyword only applies to videos ${formatKeywordDateFilterLabel(dateFilter).toLowerCase()}. If Comment is also on, comments use the parent video's upload date.`
+                : 'Date is off: set this only when the keyword should apply to newer, older, or date-range videos.';
             const dateToggle = (() => {
                 const toggle = document.createElement('div');
                 toggle.className = `exact-toggle toggle-variant-amber ${dateFilter.enabled ? 'active' : ''}`.trim();
@@ -559,6 +626,7 @@ const RenderEngine = (() => {
                 });
                 return toggle;
             })();
+            attachKeywordHelpBubble(dateToggle, dateToggleTitle);
 
             // Delete button
             const deleteHandler = async () => {

@@ -96,6 +96,9 @@ whitelist rules and other whitelist rules are evaluated separately.
 
 Keyword rows now expose a `Date` pill beside `Exact`. The editor explains that
 the rule uses video release/upload date, not the date the keyword was added.
+The keyword row also exposes touch/keyboard-friendly help bubbles for `Exact`,
+`Comment`, and `Date` so parents can hover, focus, or long-press without
+opening the Help page first.
 
 The `Date` pill is not an optimistic toggle. Clicking it opens the editor, but
 the row only stays active after a valid date rule is saved. Canceling the modal
