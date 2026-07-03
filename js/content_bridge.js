@@ -1152,6 +1152,36 @@ function schedulePrefetchScan() {
     });
 }
 
+function isFilterTubeCommentSurfaceElement(element) {
+    if (!element || typeof element.closest !== 'function') return false;
+    try {
+        return Boolean(element.closest([
+            '#comments',
+            'ytd-comments',
+            'ytd-item-section-renderer[section-identifier="comment-item-section"]',
+            'ytd-comment-thread-renderer',
+            'ytd-comment-renderer',
+            'ytd-comment-view-model',
+            'yt-comment-thread-renderer',
+            'yt-comment-renderer',
+            'yt-comment-view-model',
+            'ytd-engagement-panel-section-list-renderer[target-id*="comment"]',
+            'ytd-engagement-panel-section-list-renderer[target-id*="comments"]',
+            'ytm-comment-section-renderer',
+            'ytm-comments-entry-point-header-renderer',
+            'ytm-comments-entry-point-renderer',
+            'ytm-comments-entry-point-teaser-renderer',
+            'ytm-comments-header-renderer',
+            'ytm-item-section-renderer[section-identifier*="comment"]',
+            'ytm-comment-thread-renderer',
+            'ytm-comment-renderer',
+            'ytm-comment-view-model'
+        ].join(', ')));
+    } catch (e) {
+        return false;
+    }
+}
+
 function attachPrefetchObservers() {
     if (!prefetchObserver || typeof document.querySelectorAll !== 'function') return;
     if (!needsAnyPrefetchObserverWork(currentSettings)) return;
@@ -1169,7 +1199,8 @@ function attachPrefetchObservers() {
         // ignore
     }
 
-    list.push(...document.querySelectorAll(typeof VIDEO_CARD_SELECTORS === 'string' ? VIDEO_CARD_SELECTORS : 'ytd-rich-item-renderer'));
+    list.push(...Array.from(document.querySelectorAll(typeof VIDEO_CARD_SELECTORS === 'string' ? VIDEO_CARD_SELECTORS : 'ytd-rich-item-renderer'))
+        .filter(card => !isFilterTubeCommentSurfaceElement(card)));
 
     let attached = 0;
     const maxAttach = 120;
@@ -6410,6 +6441,7 @@ async function initializeDOMFallback(settings) {
                 if (whitelistPendingRefreshState.pendingHideCandidates.length >= WHITELIST_PENDING_HIDE_CANDIDATE_LIMIT) return;
                 const queueCandidate = (candidate) => {
                     if (!(candidate instanceof Element)) return;
+                    if (isFilterTubeCommentSurfaceElement(candidate)) return;
                     if (whitelistPendingRefreshState.pendingHideCandidates.includes(candidate)) return;
                     if (whitelistPendingRefreshState.pendingHideCandidates.length >= WHITELIST_PENDING_HIDE_CANDIDATE_LIMIT) return;
                     whitelistPendingRefreshState.pendingHideCandidates.push(candidate);

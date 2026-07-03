@@ -1894,6 +1894,36 @@ function matchesKeyword(regex, rawText, keywordData) {
 // FALLBACK FILTERING LOGIC
 // ============================================================================
 
+function isFilterTubeCommentSurfaceElement(element) {
+    if (!element || typeof element.closest !== 'function') return false;
+    try {
+        return Boolean(element.closest([
+            '#comments',
+            'ytd-comments',
+            'ytd-item-section-renderer[section-identifier="comment-item-section"]',
+            'ytd-comment-thread-renderer',
+            'ytd-comment-renderer',
+            'ytd-comment-view-model',
+            'yt-comment-thread-renderer',
+            'yt-comment-renderer',
+            'yt-comment-view-model',
+            'ytd-engagement-panel-section-list-renderer[target-id*="comment"]',
+            'ytd-engagement-panel-section-list-renderer[target-id*="comments"]',
+            'ytm-comment-section-renderer',
+            'ytm-comments-entry-point-header-renderer',
+            'ytm-comments-entry-point-renderer',
+            'ytm-comments-entry-point-teaser-renderer',
+            'ytm-comments-header-renderer',
+            'ytm-item-section-renderer[section-identifier*="comment"]',
+            'ytm-comment-thread-renderer',
+            'ytm-comment-renderer',
+            'ytm-comment-view-model'
+        ].join(', ')));
+    } catch (e) {
+        return false;
+    }
+}
+
 function collectMobileCommentEntryCards() {
     const path = document.location?.pathname || '';
     if (path !== '/watch') return [];
@@ -3633,6 +3663,10 @@ async function applyDOMFallback(settings, options = {}) {
         for (let elementIndex = 0; elementIndex < videoElements.length; elementIndex++) {
             const element = videoElements[elementIndex];
             try {
+                if (isFilterTubeCommentSurfaceElement(element)) {
+                    continue;
+                }
+
                 const elementTag = (element.tagName || '').toLowerCase();
                 const isYtmCompactMediaClassHost = Boolean(element.classList?.contains('YtmCompactMediaItemHost'));
                 const isYtmCompactVideoClassHost = Boolean(element.classList?.contains('YtmCompactVideoRendererHost'));

@@ -917,6 +917,22 @@ Fallback contract:
 | `<ytd-comment-engagement-bar>` | DOM-only | ℹ️ **NEW** | Buttons only; no filterable text |
 | `<ytd-continuation-item-renderer>` | `continuationItemRenderer` | ⚠️ **NEW** | Ensure continuation tokens filtered so hidden threads stay hidden |
 
+### Current desktop comment sheet boundary (2026-07-03)
+| DOM tag / component | Purpose | Status | Notes |
+| --- | --- | --- | --- |
+| `<ytd-comments id="comments">` | Watch-page inline comments host | ✅ Comment path only | Current desktop samples still use this classic host under `<ytd-watch-flexy response-has-comments>`. Generic video-card fallback must not process nested lockup/view-model nodes inside it. |
+| `<ytd-item-section-renderer section-identifier="comment-item-section">` | Comment section wrapper | ✅ Comment path only | Hosts header, composer, continuation, and thread rows. Do not hide or classify as a video card. |
+| `<ytd-engagement-panel-section-list-renderer target-id*="comment">` | Comments engagement panel/sheet variant | ✅ Comment path only | Treated as a comment surface guard. Do not let generic YTD/YTM camelCase lockup support attach prefetch, whitelist-pending, or card-hide work inside this panel. |
+| `<yt-ghost-comments class="ytGhostCommentsHost">` | YouTube comments loading skeleton | ℹ️ Layout only | Inventory only. It is not user content and should not be keyword/channel filtered. |
+| `ytComment*` / `ytComments*` camelCase comment classes | Modern comment controls, teasers, and action rows | 🚫 Control/comment-only | Inventory-only unless explicitly inside comment filtering. These are not video-card hosts. |
+
+The 2026-07 YTD/YTM camelCase work added broad content-card selectors such as
+`yt-lockup-view-model`, `.ytLockupViewModelHost`, and
+`.ytLockupViewModelWrapper`. Comment surfaces are now an explicit boundary:
+generic video-card filtering, prefetch observation, and whitelist pending-hide
+queues should skip nodes under comment containers/panels. Actual comment hiding
+continues through the dedicated comment renderer/path.
+
 ## Feed/Search Filter Chips
 
 | DOM tag / component | Associated data | Coverage | Notes |
