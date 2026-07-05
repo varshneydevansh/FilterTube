@@ -3,7 +3,7 @@
   <h1>FilterTube</h1>
   <p>Peace of Mind for your Digital Space</p>
   
-  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.3-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-569.2k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-95.6k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
+  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.5-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-569.6k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-95.7k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
   
 </div>
 
@@ -15,14 +15,13 @@ The public website now also acts as the download hub for browser releases, Andro
 
 👉 **[filtertube.in/downloads](https://filtertube.in/downloads)**
 
-## What's New in v3.3.3
+## What's New in v3.3.5
 
-- **Family Device Updates are now release-facing**: parent/caregiver profiles can manage protected profiles, send approved rules/time/access to verified devices, and use explicit Home Pickup or Internet Pickup when a protected device opens later.
-- **Protected profiles now have clearer daily YouTube limits**: old and new YouTube tabs are checked, timeout pages explain the limit calmly, and extra-time requests are recorded for parent review instead of silently granting access.
-- **Rule list imports now support reviewed CSV, TXT, simple JSON, BlockTube-style JSON, and raw HTTPS list URLs** with preview-before-apply, Main/Kids/Both targeting, templates, list management, pause/resume/remove, stale checks, and refresh.
-- **Date-based keyword filtering was added** so a keyword can apply only to videos uploaded on/after, on/before, or between chosen dates. Comment filtering uses the parent video upload date when YouTube exposes it.
-- **Help and dashboard wording are more parent-first**: key controls now use faster help bubbles, the Help page explains the two PIN types, and Accounts & Sync describes live send, saved updates, Home Pickup, and Internet Pickup in plainer language.
-- **YouTube DOM handling was refreshed for the current desktop and mobile markup**: camelCase lockup classes, current playlist rows, YTM mobile chips, and Watch-page chip boundaries are documented so real video cards keep filtering without causing Watch scroll jumps.
+- **Duplicate content-runtime injection is fixed**: install/update/profile refresh no longer reinjects manifest content scripts into already-open YouTube tabs, preventing repeated `Identifier ... has already been declared` failures.
+- **Blocked-channel Shorts resolve earlier**: visible and near-visible Shorts now use the existing bounded `/shorts/<videoId>` identity resolver when channel rules or whitelist mode are active, so known blocked-channel Shorts hide without waiting for hover/menu interaction.
+- **New desktop Shorts hosts are covered in fallback**: `.shortsLockupViewModelHost` and `.ytGridShelfViewModelGridShelfItem` now participate in the dedicated Shorts fallback/enrichment path.
+- **Rollback history is documented**: v3.3.4 was a store rollback to the v3.3.2 package while the YouTube breakage report was investigated; v3.3.5 moves forward with the runtime-injection and Shorts identity fixes.
+- **No-rule performance stays gated**: Shorts identity fetching remains off when there are no channel/whitelist rules, and blocklist mode does not hide unknown Shorts before identity is resolved.
 - **Still intentionally separate**: automatic LAN device discovery, a hosted FilterTube Internet Pickup service, silent public auto-subscribe catalogs, and native Android/iOS parity are not claimed as complete in this extension release.
 
 ## Nanah Device Trust & Sync

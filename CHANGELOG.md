@@ -1,5 +1,34 @@
 # Changelog
 
+## Version 3.3.5
+
+### YouTube Breakage Recovery
+
+- **Duplicate content-runtime injection fixed**: install/update/profile refresh now relies on manifest content scripts and ping/bridge checks instead of reinjecting isolated runtime files into already-open YouTube tabs. This prevents repeated `Identifier ... has already been declared` syntax failures such as `filterTubeMenuStylesInjected`, `VIDEO_CARD_SELECTORS`, `CHANNEL_ONLY_TAGS`, `pendingSeedSettings`, and `statsCountToday`.
+- **Already-open tab behavior preserved**: managed time-limit checks and runtime refreshes can still reach open YouTube tabs without forcing duplicate content-script declarations.
+- **Issue #64 investigation ledger**: `docs/audit/FILTERTUBE_POST_3_3_2_YOUTUBE_BREAKAGE_COMMIT_LEDGER_2026-07-05.md` records the post-v3.3.2 commits and the runtime-injection failure mode.
+
+### Shorts Channel Blocking
+
+- **Visible Shorts identity prefetch**: when channel rules or whitelist mode are active, visible/near-visible Shorts without channel identity now use the existing bounded background `/shorts/<videoId>` resolver.
+- **Blocked-channel Shorts hide earlier**: learned `shortVideoId -> channelId` mappings are persisted to `videoChannelMap`, then DOM fallback reprocesses the card without waiting for hover, quick-block, or 3-dot menu interaction.
+- **Current desktop Shorts hosts covered**: `.shortsLockupViewModelHost` and `.ytGridShelfViewModelGridShelfItem` are now included in the dedicated Shorts fallback/enrichment selector set.
+- **Safety boundary**: blocklist mode does not hide unknown Shorts until identity resolves, whitelist mode remains stricter through the existing pending path, and no-rule/no-channel-rule sessions do not start Shorts identity work.
+- **Audit trail**: `docs/audit/FILTERTUBE_SHORTS_CHANNEL_IDENTITY_PREFETCH_2026-07-05.md` records the implemented behavior and release boundary.
+
+### Release Notes
+
+- **v3.3.4 store rollback documented**: v3.3.4 was a store rollback to the v3.3.2 package while YouTube breakage reports were being investigated. It is documented for release history, not as a normal source-forward feature release.
+
+## Version 3.3.4
+
+### Store Rollback
+
+- **Rollback package**: v3.3.4 was published through browser-store rollback controls as the earlier v3.3.2 package after a YouTube breakage report against v3.3.3.
+- **Reason**: the rollback kept users off the suspected v3.3.3 package while the cause was investigated.
+- **Follow-up**: user reports showed the rollback alone was not enough for every case, so v3.3.5 carries the source-forward duplicate-runtime-injection and Shorts identity fixes.
+- **Source note**: this repository does not treat v3.3.4 as a feature-development source checkpoint. It is recorded here to keep store history understandable.
+
 ## Version 3.3.3
 
 ### Family Device Updates And Protected Profiles

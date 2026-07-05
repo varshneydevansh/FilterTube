@@ -3,6 +3,34 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.3.5",
+    "headline": "YouTube breakage recovery and earlier Shorts channel blocking",
+    "summary": "This release fixes duplicate content-runtime injection in already-open YouTube tabs and resolves visible Shorts channel identity earlier when channel rules or whitelist mode are active.",
+    "bannerSummary": "Fixes duplicate runtime injection, improves blocked-channel Shorts identity resolution, and documents the v3.3.4 rollback boundary.",
+    "highlights": [
+      "Install/update/profile refresh no longer reinjects manifest content scripts into already-open YouTube tabs, preventing repeated `Identifier ... has already been declared` syntax failures.",
+      "Already-open YouTube tabs can still receive managed time-limit/runtime checks without duplicate script declarations.",
+      "Visible and near-visible Shorts now use the existing bounded background `/shorts/<videoId>` owner resolver when channel blocklist rules or whitelist mode are active.",
+      "Learned Shorts video-to-channel mappings are persisted and immediately reprocessed so blocked-channel Shorts do not need hover or menu interaction before hiding.",
+      "Desktop Shorts hosts such as `.shortsLockupViewModelHost` and `.ytGridShelfViewModelGridShelfItem` are included in dedicated Shorts fallback/enrichment paths.",
+      "Blocklist mode does not hide unknown Shorts until identity resolves; whitelist mode remains stricter through the existing pending path.",
+      "v3.3.4 is documented as a store rollback to the v3.3.2 package while the YouTube breakage report was investigated."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.5"
+  },
+  {
+    "version": "3.3.4",
+    "headline": "Store rollback to the v3.3.2 package",
+    "summary": "v3.3.4 was a browser-store rollback version that used the earlier v3.3.2 package while the YouTube breakage report against v3.3.3 was investigated.",
+    "bannerSummary": "Rollback release: v3.3.4 used the v3.3.2 package while YouTube breakage reports were investigated.",
+    "highlights": [
+      "No new source-forward feature work is claimed for v3.3.4.",
+      "The rollback was used to move stores away from the suspected v3.3.3 package while investigating issue #64.",
+      "v3.3.5 is the follow-up source release carrying the duplicate-runtime-injection and Shorts identity fixes."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.4"
+  },
+  {
     "version": "3.3.3",
     "headline": "Family device updates, rule lists, date keywords, and YouTube DOM refresh",
     "summary": "This release makes parent/caregiver control easier to understand, adds reviewed rule-list imports, adds date-limited keyword rules, documents the Home/Internet Pickup model, and refreshes filtering for current YouTube/YTM markup.",

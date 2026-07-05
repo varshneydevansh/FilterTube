@@ -5434,6 +5434,8 @@ async function applyDOMFallback(settings, options = {}) {
         'ytd-reel-item-renderer',
         'ytm-shorts-lockup-view-model',
         'ytm-shorts-lockup-view-model-v2',
+        '.shortsLockupViewModelHost',
+        '.ytGridShelfViewModelGridShelfItem',
         'ytd-video-renderer[data-filtertube-short]',
         'ytd-grid-video-renderer[data-filtertube-short]',
         'ytd-compact-video-renderer[data-filtertube-short]',

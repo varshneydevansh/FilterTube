@@ -1182,6 +1182,74 @@ function isFilterTubeCommentSurfaceElement(element) {
     }
 }
 
+function resolvePrefetchObserverCard(node) {
+    if (!node || !(node instanceof Element)) return null;
+    const baseSelector = typeof VIDEO_CARD_SELECTORS === 'string' ? VIDEO_CARD_SELECTORS : 'ytd-rich-item-renderer';
+    const shortsSelector = [
+        'ytd-reel-item-renderer',
+        'ytm-shorts-lockup-view-model',
+        'ytm-shorts-lockup-view-model-v2',
+        '.shortsLockupViewModelHost',
+        '.ytGridShelfViewModelGridShelfItem',
+        '[data-filtertube-short="true"]'
+    ].join(', ');
+
+    let card = null;
+    try {
+        if (node.matches(baseSelector) || node.matches(shortsSelector)) {
+            card = node;
+        } else {
+            card = node.closest(`${baseSelector}, ${shortsSelector}`);
+        }
+    } catch (e) {
+        card = null;
+    }
+
+    if (!card && node.matches?.('a[href*="/shorts/"]')) {
+        card = node.closest?.('ytd-rich-item-renderer, ytd-reel-item-renderer, .ytGridShelfViewModelGridShelfItem, .shortsLockupViewModelHost') || node;
+    }
+
+    return card && !isFilterTubeCommentSurfaceElement(card) ? card : null;
+}
+
+function addPrefetchObserverCandidates(list, selector, root = document) {
+    if (!selector || !root?.querySelectorAll) return;
+    try {
+        for (const node of root.querySelectorAll(selector)) {
+            const card = resolvePrefetchObserverCard(node);
+            if (card) list.push(card);
+        }
+    } catch (e) {
+    }
+}
+
+function isShortsPrefetchCard(card) {
+    if (!card || !(card instanceof Element)) return false;
+    try {
+        if (card.getAttribute?.('data-filtertube-short') === 'true') return true;
+        const tag = String(card.tagName || '').toLowerCase();
+        if (tag.includes('shorts') || tag.includes('reel')) return true;
+        const className = typeof card.className === 'string' ? card.className : '';
+        if (/\bshortsLockupViewModelHost\b|\breel-item-endpoint\b|\bytGridShelfViewModelGridShelfItem\b/.test(className)
+            && card.querySelector?.('a[href*="/shorts/"]')) {
+            return true;
+        }
+        const href = card.getAttribute?.('href') || '';
+        if (href.includes('/shorts/')) return true;
+        return Boolean(card.querySelector?.('a[href*="/shorts/"]'));
+    } catch (e) {
+        return false;
+    }
+}
+
+function shouldFetchShortsIdentityInPrefetch(card, videoId) {
+    if (!videoId || !card) return false;
+    if (typeof location !== 'undefined' && String(location.hostname || '').includes('youtubekids.com')) return false;
+    if (!needsIdentityPrefetchWork(currentSettings)) return false;
+    if (currentSettings?.videoChannelMap?.[videoId]) return false;
+    return isShortsPrefetchCard(card);
+}
+
 function attachPrefetchObservers() {
     if (!prefetchObserver || typeof document.querySelectorAll !== 'function') return;
     if (!needsAnyPrefetchObserverWork(currentSettings)) return;
@@ -1193,18 +1261,29 @@ function attachPrefetchObservers() {
         const isPlaylistWatch = params.has('list');
         const playlistPanel = isWatch && isPlaylistWatch ? document.querySelector('ytd-playlist-panel-renderer') : null;
         if (playlistPanel) {
-            list.push(...playlistPanel.querySelectorAll('ytd-playlist-panel-video-wrapper-renderer, ytd-playlist-panel-video-renderer'));
+            addPrefetchObserverCandidates(list, 'ytd-playlist-panel-video-wrapper-renderer, ytd-playlist-panel-video-renderer', playlistPanel);
         }
     } catch (e) {
         // ignore
     }
 
-    list.push(...Array.from(document.querySelectorAll(typeof VIDEO_CARD_SELECTORS === 'string' ? VIDEO_CARD_SELECTORS : 'ytd-rich-item-renderer'))
-        .filter(card => !isFilterTubeCommentSurfaceElement(card)));
+    addPrefetchObserverCandidates(list, typeof VIDEO_CARD_SELECTORS === 'string' ? VIDEO_CARD_SELECTORS : 'ytd-rich-item-renderer');
+    addPrefetchObserverCandidates(list, [
+        'ytd-reel-item-renderer',
+        'ytm-shorts-lockup-view-model',
+        'ytm-shorts-lockup-view-model-v2',
+        '.shortsLockupViewModelHost',
+        '.ytGridShelfViewModelGridShelfItem',
+        '[data-filtertube-short="true"]',
+        'a[href*="/shorts/"]'
+    ].join(', '));
 
     let attached = 0;
     const maxAttach = 120;
+    const seen = new Set();
     for (const card of list) {
+        if (seen.has(card)) continue;
+        seen.add(card);
         if (observedPrefetchCards.has(card)) continue;
         observedPrefetchCards.add(card);
         prefetchObserver.observe(card);
@@ -1572,6 +1651,32 @@ async function prefetchIdentityForCard({ videoId, card, collabOnly = false }) {
             stampChannelIdentity(card, ytInfo);
             if (ytInfo.id) {
                 persistVideoChannelMapping(videoId, ytInfo.id);
+            }
+            return;
+        }
+
+        if (shouldFetchShortsIdentityInPrefetch(card, videoId)) {
+            const shortsInfo = await withTimeout(
+                fetchChannelFromShortsUrl(videoId, null, { allowDirectFetch: false }),
+                PREFETCH_TIMEOUT_MS
+            );
+            if (shortsInfo && (shortsInfo.id || shortsInfo.handle || shortsInfo.customUrl)) {
+                if (!shortsInfo.id && shortsInfo.handle) {
+                    const resolvedId = resolveIdFromHandle(shortsInfo.handle);
+                    if (resolvedId) {
+                        shortsInfo.id = resolvedId;
+                    }
+                }
+                stampChannelIdentity(card, shortsInfo);
+                if (shortsInfo.id) {
+                    persistVideoChannelMapping(videoId, shortsInfo.id);
+                    try {
+                        if (typeof applyDOMFallback === 'function') {
+                            applyDOMFallback(null, { forceReprocess: true, preserveScroll: true });
+                        }
+                    } catch (e) {
+                    }
+                }
             }
         }
     } catch (e) {
@@ -8624,6 +8729,8 @@ async function enrichVisibleShortsWithChannelInfo(blockedChannelId, settings) {
         'ytm-shorts-lockup-view-model',
         'ytm-shorts-lockup-view-model-v2',
         'ytd-reel-item-renderer',
+        '.shortsLockupViewModelHost',
+        '.ytGridShelfViewModelGridShelfItem',
         '[data-filtertube-short="true"]'
     ].join(', ');
 
