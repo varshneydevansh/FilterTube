@@ -3498,111 +3498,9 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
     });
 }
 
-function shouldSuppressFirstRunPromptInjectionError(error) {
-    const message = String(error?.message || error || '');
-    return /Cannot access contents of the page/i.test(message)
-        || /Frame with ID 0 was removed/i.test(message)
-        || /No tab with id/i.test(message);
-}
-
 const FILTERTUBE_YOUTUBE_TAB_URLS = ['*://*.youtube.com/*', '*://*.youtubekids.com/*'];
-const FILTERTUBE_ISOLATED_RUNTIME_FILES = [
-    'js/shared/identity.js',
-    'js/content/dom_state.js',
-    'js/content/menu.js',
-    'js/content/dom_helpers.js',
-    'js/content/dom_extractors.js',
-    'js/content/dom_fallback.js',
-    'js/content/block_channel.js',
-    'js/content/bridge_injection.js',
-    'js/content/bridge_settings.js',
-    'js/content/handle_resolver.js',
-    'js/content/collab_dialog.js',
-    'js/content/release_notes_prompt.js',
-    'js/content/first_run_prompt.js',
-    'js/content_bridge.js'
-];
 
-function executeScriptFilesInTab(tabId, files, world = 'ISOLATED') {
-    return new Promise((resolve) => {
-        if (!tabId || !browserAPI?.scripting?.executeScript || !Array.isArray(files) || files.length === 0) {
-            resolve({ ok: false, error: 'scripting_unavailable' });
-            return;
-        }
-
-        let settled = false;
-        const finish = (result) => {
-            if (settled) return;
-            settled = true;
-            resolve(result || { ok: true });
-        };
-
-        try {
-            const maybePromise = browserAPI.scripting.executeScript({
-                target: { tabId },
-                world,
-                files
-            }, () => {
-                const error = browserAPI.runtime?.lastError;
-                finish(error ? { ok: false, error: error.message || String(error) } : { ok: true });
-            });
-
-            if (maybePromise && typeof maybePromise.then === 'function') {
-                maybePromise
-                    .then(() => finish({ ok: true }))
-                    .catch(error => finish({ ok: false, error: error?.message || String(error || 'failed') }));
-            }
-        } catch (error) {
-            finish({ ok: false, error: error?.message || String(error || 'failed') });
-        }
-    });
-}
-
-function pingFilterTubeRuntime(tabId) {
-    return new Promise((resolve) => {
-        try {
-            if (!tabId || !browserAPI?.tabs?.sendMessage) {
-                resolve(false);
-                return;
-            }
-            browserAPI.tabs.sendMessage(tabId, { action: 'FilterTube_Ping' }, response => {
-                const error = browserAPI.runtime?.lastError;
-                resolve(!error && !!response);
-            });
-        } catch (e) {
-            resolve(false);
-        }
-    });
-}
-
-async function ensureFilterTubeRuntimeInTab(tabId) {
-    if (await pingFilterTubeRuntime(tabId)) return true;
-
-    const mainResult = await executeScriptFilesInTab(tabId, ['js/seed.js'], 'MAIN');
-    if (!mainResult.ok && !shouldSuppressFirstRunPromptInjectionError(mainResult.error)) {
-        console.warn('FilterTube: failed to inject seed into existing YouTube tab', mainResult.error);
-    }
-
-    const isolatedResult = await executeScriptFilesInTab(tabId, FILTERTUBE_ISOLATED_RUNTIME_FILES, 'ISOLATED');
-    if (!isolatedResult.ok) {
-        if (!shouldSuppressFirstRunPromptInjectionError(isolatedResult.error)) {
-            console.warn('FilterTube: failed to inject runtime into existing YouTube tab', isolatedResult.error);
-        }
-        return false;
-    }
-
-    return true;
-}
-
-async function refreshOrInjectFilterTubeTab(tabId) {
-    const ready = await ensureFilterTubeRuntimeInTab(tabId);
-    if (!ready) return;
-    setTimeout(() => {
-        sendMessageToTabQuietly(tabId, { action: 'FilterTube_RefreshNow' });
-    }, 150);
-}
-
-function refreshYouTubeTabs({ injectIfMissing = false } = {}) {
+function refreshYouTubeTabs() {
     try {
         browserAPI.tabs.query({ url: FILTERTUBE_YOUTUBE_TAB_URLS }, (tabs) => {
             if (browserAPI.runtime.lastError) {
@@ -3611,11 +3509,7 @@ function refreshYouTubeTabs({ injectIfMissing = false } = {}) {
             }
             (tabs || []).forEach(tab => {
                 if (!tab?.id) return;
-                if (injectIfMissing) {
-                    refreshOrInjectFilterTubeTab(tab.id);
-                } else {
-                    sendMessageToTabQuietly(tab.id, { action: 'FilterTube_RefreshNow' });
-                }
+                sendMessageToTabQuietly(tab.id, { action: 'FilterTube_RefreshNow' });
             });
         });
     } catch (e) {
@@ -3645,10 +3539,11 @@ browserAPI.runtime.onInstalled.addListener(function (details) {
         applyKeywordCommentsScopeMigrationOnce().catch(() => {
         });
 
-        // Activate already-open YouTube tabs so basic DOM/time-limit controls work
-        // without requiring a manual refresh. A refresh is still best for earliest
-        // document-start JSON interception.
-        refreshYouTubeTabs({ injectIfMissing: true });
+        // Ask already-loaded YouTube tabs to refresh if FilterTube is already
+        // present there. Do not replay manifest content scripts into an open
+        // tab: they are not re-entrant and duplicate injection can crash the
+        // runtime with top-level declaration errors.
+        refreshYouTubeTabs();
     } else if (details.reason === 'update') {
         console.log('FilterTube extension updated from version ' + details.previousVersion);
         applyQuickBlockDefaultMigrationOnce({ previousVersion: details.previousVersion || '' }).catch(() => {
@@ -3664,7 +3559,7 @@ browserAPI.runtime.onInstalled.addListener(function (details) {
             console.warn('FilterTube Background: unable to prepare release notes payload', error);
         });
 
-        refreshYouTubeTabs({ injectIfMissing: true });
+        refreshYouTubeTabs();
         // You could handle migration of settings between versions here if needed
     }
 });
@@ -5105,28 +5000,35 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             return false;
         }
 
-        if (!browserAPI?.scripting?.executeScript) {
-            sendResponse({ success: false, error: 'Scripting API unavailable' });
+        if (!browserAPI?.tabs?.sendMessage) {
+            sendResponse({ success: false, error: 'Tabs messaging unavailable', errorCode: 'receiver_unavailable' });
             return false;
         }
 
-        browserAPI.scripting.executeScript({
-            target: { tabId },
-            world: 'ISOLATED',
-            files: [
-                'js/shared/identity.js',
-                'js/content/dom_helpers.js',
-                'js/content/dom_extractors.js',
-                'js/content/dom_fallback.js',
-                'js/content/bridge_injection.js',
-                'js/content/bridge_settings.js'
-            ]
-        }).then(() => {
-            sendResponse({ success: true });
-        }).catch((error) => {
-            console.warn('FilterTube Background: ensure subscriptions bridge failed', error);
-            sendResponse({ success: false, error: error?.message || 'Failed to inject subscriptions bridge' });
-        });
+        try {
+            browserAPI.tabs.sendMessage(tabId, {
+                action: 'FilterTube_Ping',
+                feature: 'subscriptions_import'
+            }, response => {
+                const error = browserAPI.runtime?.lastError;
+                if (!error && response) {
+                    sendResponse({ success: true, ready: response?.ok === true });
+                    return;
+                }
+
+                sendResponse({
+                    success: false,
+                    errorCode: 'receiver_unavailable',
+                    error: 'FilterTube is not ready in that YouTube tab. Reload the YouTube tab, then retry.'
+                });
+            });
+        } catch (error) {
+            sendResponse({
+                success: false,
+                errorCode: 'receiver_unavailable',
+                error: error?.message || 'FilterTube is not ready in that YouTube tab. Reload the YouTube tab, then retry.'
+            });
+        }
 
         return true;
     } else if (request.action === "processFetchData") {
@@ -5573,7 +5475,7 @@ browserAPI.storage.onChanged.addListener((changes, area) => {
             // Content scripts will re-request via their own onChanged listeners.
             getCompiledSettings({ url: 'https://www.youtube.com/' });
             getCompiledSettings({ url: 'https://www.youtubekids.com/' });
-            refreshYouTubeTabs({ injectIfMissing: !!changes[FT_PROFILES_V4_KEY] });
+            refreshYouTubeTabs();
         }
     }
 });
