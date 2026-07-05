@@ -1476,17 +1476,7 @@ function queuePrefetchForCard(card) {
     getValidatedCachedCollaborators(card);
 
     if (!needsIdentity && needsCollaboratorWarmup) {
-        const key = `collab:${videoId}`;
-        const lastSeen = prefetchSeenAt.get(key) || 0;
-        if (prefetchSeen.has(key) && (Date.now() - lastSeen) < 12 * 1000) return;
-        prefetchSeen.add(key);
-        prefetchSeenAt.set(key, Date.now());
-
-        prefetchQueue.push({ videoId, card, collabOnly: true });
-        if (prefetchQueue.length > PREFETCH_MAX_QUEUE) {
-            prefetchQueue.shift();
-        }
-        drainPrefetchQueue();
+        enqueuePrefetchItem(`collab:${videoId}`, { videoId, card, collabOnly: true }, 12 * 1000);
         return;
     }
 
@@ -1509,6 +1499,9 @@ function queuePrefetchForCard(card) {
     // persist and skip. Otherwise, let the normal resolver path restamp.
     if (existingId && priorCachedVideoId && priorCachedVideoId === videoId) {
         persistVideoChannelMapping(videoId, existingId);
+        if (needsCollaboratorWarmup) {
+            enqueuePrefetchItem(`collab:${videoId}`, { videoId, card, collabOnly: true }, 12 * 1000);
+        }
         return;
     }
 
@@ -1518,21 +1511,29 @@ function queuePrefetchForCard(card) {
         if (resolvedId) {
             stampChannelIdentity(card, { id: resolvedId, handle: existingHandle });
             persistVideoChannelMapping(videoId, resolvedId);
+            if (needsCollaboratorWarmup) {
+                enqueuePrefetchItem(`collab:${videoId}`, { videoId, card, collabOnly: true }, 12 * 1000);
+            }
             return;
         }
     }
 
-    const key = videoId;
+    const key = needsCollaboratorWarmup ? `identity-collab:${videoId}` : videoId;
+    enqueuePrefetchItem(key, { videoId, card, warmCollaborators: needsCollaboratorWarmup }, 30 * 1000);
+}
+
+function enqueuePrefetchItem(key, item, ttlMs) {
     const lastSeen = prefetchSeenAt.get(key) || 0;
-    if (prefetchSeen.has(key) && (Date.now() - lastSeen) < 30 * 1000) return;
+    if (prefetchSeen.has(key) && (Date.now() - lastSeen) < ttlMs) return false;
     prefetchSeen.add(key);
     prefetchSeenAt.set(key, Date.now());
 
-    prefetchQueue.push({ videoId, card });
+    prefetchQueue.push(item);
     if (prefetchQueue.length > PREFETCH_MAX_QUEUE) {
         prefetchQueue.shift();
     }
     drainPrefetchQueue();
+    return true;
 }
 
 function drainPrefetchQueue() {
@@ -1554,24 +1555,36 @@ function withTimeout(promise, ms) {
     ]);
 }
 
-async function prefetchIdentityForCard({ videoId, card, collabOnly = false }) {
+async function prefetchIdentityForCard({ videoId, card, collabOnly = false, warmCollaborators = false }) {
     try {
         if (!card || !card.isConnected) return;
 
-        if (collabOnly) {
-            try {
-                await prefetchCollaboratorsForCard(card, {
-                    timeoutMs: 1200,
-                    reason: 'visible-collaborator-card'
-                });
-            } catch (e) {
+        const shouldWarmCollaborators = Boolean(
+            (collabOnly || warmCollaborators)
+            && needsCollaboratorWarmupWork(currentSettings)
+            && hasCollaboratorWarmupSignal(card)
+        );
+        let collaboratorWarmupPromise = null;
+        const warmCollaboratorsNow = async () => {
+            if (!shouldWarmCollaborators) return [];
+            if (!collaboratorWarmupPromise) {
+                collaboratorWarmupPromise = prefetchCollaboratorsForCard(card, {
+                    timeoutMs: collabOnly ? 1200 : 1800,
+                    reason: collabOnly ? 'visible-collaborator-card' : 'identity-prefetch-collaborator-card'
+                }).catch(() => []);
             }
+            return collaboratorWarmupPromise;
+        };
+
+        if (collabOnly) {
+            await warmCollaboratorsNow();
             return;
         }
 
         if (typeof location !== 'undefined' && String(location.hostname || '').includes('youtubekids.com')) {
             if (currentSettings?.videoChannelMap && currentSettings.videoChannelMap[videoId]) {
                 stampChannelIdentity(card, { id: currentSettings.videoChannelMap[videoId] });
+                await warmCollaboratorsNow();
                 return;
             }
 
@@ -1609,12 +1622,14 @@ async function prefetchIdentityForCard({ videoId, card, collabOnly = false }) {
                 } catch (e) {
                 }
             }
+            await warmCollaboratorsNow();
             return;
         }
 
         // If settings already know this mapping, bail early
         if (currentSettings?.videoChannelMap && currentSettings.videoChannelMap[videoId]) {
             stampChannelIdentity(card, { id: currentSettings.videoChannelMap[videoId] });
+            await warmCollaboratorsNow();
             return;
         }
 
@@ -1633,6 +1648,7 @@ async function prefetchIdentityForCard({ videoId, card, collabOnly = false }) {
                         channelId: info.id
                     });
                 }
+                await warmCollaboratorsNow();
                 return;
             }
         } catch (e) {
@@ -1652,6 +1668,7 @@ async function prefetchIdentityForCard({ videoId, card, collabOnly = false }) {
             if (ytInfo.id) {
                 persistVideoChannelMapping(videoId, ytInfo.id);
             }
+            await warmCollaboratorsNow();
             return;
         }
 
@@ -1679,6 +1696,7 @@ async function prefetchIdentityForCard({ videoId, card, collabOnly = false }) {
                 }
             }
         }
+        await warmCollaboratorsNow();
     } catch (e) {
         // keep silent in prefetch
     }

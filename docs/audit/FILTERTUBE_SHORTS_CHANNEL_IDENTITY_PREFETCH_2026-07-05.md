@@ -54,6 +54,29 @@ wait for hover/menu work before identity was learned.
 - The resolver uses the existing bounded queue/concurrency and background fetch
   path instead of broad page-wide fetching.
 
+## 2026-07-05 Collaborator Warm-Up Repair
+
+The Shorts identity prefetch widened the visible-card observer path. That exposed
+a collaborator regression on watch/right-rail lockups: when channel identity work
+was active, a collaborator card entered the identity prefetch lane instead of the
+collaborator-only warm-up lane. If the identity lane found a cached channel ID,
+DOM channel, or `ytInitialData` owner, it returned before requesting the full
+collaborator roster. The 3-dot menu could then render rows such as
+`Block - All Collaborators (resolving...)` until the active menu retry exhausted.
+
+The repair keeps the new Shorts identity behavior but preserves collaborator
+intent as a separate queue flag:
+
+- cards with collaborator byline/avatar-stack evidence enqueue collaborator
+  warm-up even when channel identity is already known;
+- identity-prefetch items carry `warmCollaborators: true` and run collaborator
+  warm-up before every early return;
+- the collaborator-only queue keeps its shorter retry window, while identity
+  prefetch keeps the existing bounded queue/concurrency;
+- this does not broaden the detector: Mix guardrails, expected-count checks, and
+  existing collaborator false-positive guards still decide whether a card is a
+  real collaboration.
+
 ## Validation
 
 Static validation completed:
@@ -69,4 +92,3 @@ Manual installed-extension validation is still needed on:
 - desktop YouTube Search Shorts
 - desktop YouTube Watch right-rail Shorts
 - Firefox with a known blocked channel such as the reported Welch Labs case
-
