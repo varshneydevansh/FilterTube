@@ -58,9 +58,15 @@ const mobileArtifactsArg = cliArgs.find(arg => arg.startsWith('--mobile-artifact
 const mobileArtifactsDirFromArg = mobileArtifactsArg
     ? mobileArtifactsArg.slice('--mobile-artifacts='.length).trim()
     : '';
+const mobileArtifactVersionArg = cliArgs.find(arg => arg.startsWith('--mobile-artifact-version='));
+const mobileArtifactVersionFromArg = mobileArtifactVersionArg
+    ? mobileArtifactVersionArg.slice('--mobile-artifact-version='.length).trim()
+    : '';
 const mobileArtifactsDirFromEnv = (process.env.FILTERTUBE_MOBILE_ARTIFACTS_DIR || '').trim();
+const mobileArtifactVersionFromEnv = (process.env.FILTERTUBE_MOBILE_ARTIFACT_VERSION || '').trim();
 const mobileArtifactsRequested = cliArgs.includes('--mobile-artifacts') || Boolean(mobileArtifactsDirFromArg || mobileArtifactsDirFromEnv);
 const includeAllMobileArtifacts = cliArgs.includes('--all-mobile-artifacts');
+const mobileArtifactVersionOverride = mobileArtifactVersionFromArg || mobileArtifactVersionFromEnv;
 const BROWSER_TARGETS = targetBrowser && ALL_BROWSER_TARGETS.includes(targetBrowser)
     ? [targetBrowser]
     : ALL_BROWSER_TARGETS;
@@ -215,6 +221,7 @@ function createZip(browser, sourceDir, version) {
 
 async function maybeCollectMobileArtifacts(version) {
     const defaultDir = resolveDefaultMobileArtifactsDir();
+    let requestedArtifactVersion = mobileArtifactVersionOverride || version;
     let sourceDir = mobileArtifactsDirFromArg || mobileArtifactsDirFromEnv;
 
     if (!sourceDir && mobileArtifactsRequested) {
@@ -236,13 +243,35 @@ async function maybeCollectMobileArtifacts(version) {
         return [];
     }
 
-    const matchedSourceFiles = fs.readdirSync(resolvedSourceDir)
+    const availableSourceFiles = fs.readdirSync(resolvedSourceDir)
         .filter(name => MOBILE_ARTIFACT_FILE_RE.test(name))
-        .filter(name => parseMobileArtifactName(name)?.version === version)
         .sort();
+    let matchedSourceFiles = availableSourceFiles
+        .filter(name => parseMobileArtifactName(name)?.version === requestedArtifactVersion);
 
     if (!matchedSourceFiles.length) {
-        console.warn(`⚠️  No mobile artifacts matched FilterTube mobile/tablet v${version} in ${resolvedSourceDir}`);
+        const availableVersions = describeAvailableMobileArtifacts(availableSourceFiles);
+        const latestAvailable = availableVersions[0];
+        if (!mobileArtifactVersionOverride && latestAvailable && process.stdout.isTTY) {
+            console.warn(`⚠️  No mobile artifacts matched FilterTube mobile/tablet v${requestedArtifactVersion} in ${resolvedSourceDir}`);
+            const availableLabel = availableVersions
+                .map(item => `v${item.version} code${item.latestCode}`)
+                .join(', ');
+            const useExisting = await promptYesNo(`   Existing mobile artifacts found (${availableLabel}). Reuse latest v${latestAvailable.version} code${latestAvailable.latestCode} for extension release v${version}? (y/N): `);
+            if (useExisting) {
+                requestedArtifactVersion = latestAvailable.version;
+                matchedSourceFiles = availableSourceFiles
+                    .filter(name => parseMobileArtifactName(name)?.version === requestedArtifactVersion);
+            }
+        }
+    }
+
+    if (requestedArtifactVersion !== version) {
+        console.warn(`⚠️  Attaching Android mobile/tablet artifacts v${requestedArtifactVersion} to extension release v${version}. Use this only when intentionally reusing an existing MVP app build.`);
+    }
+
+    if (!matchedSourceFiles.length) {
+        console.warn(`⚠️  No mobile artifacts matched FilterTube mobile/tablet v${requestedArtifactVersion} in ${resolvedSourceDir}`);
         return [];
     }
 
@@ -252,12 +281,12 @@ async function maybeCollectMobileArtifacts(version) {
 
     if (sourceFiles.length !== matchedSourceFiles.length) {
         const latestCode = extractAndroidVersionCode(sourceFiles[0]);
-        console.log(`ℹ️  Mobile artifacts: selected v${version} latest versionCode ${latestCode}. Use --all-mobile-artifacts to attach every matching file for this version.`);
+        console.log(`ℹ️  Mobile artifacts: selected v${requestedArtifactVersion} latest versionCode ${latestCode}. Use --all-mobile-artifacts to attach every matching file for this version.`);
     }
 
     const selectedArtifactSummary = summarizeMobileArtifacts(sourceFiles);
     if (!selectedArtifactSummary.hasApk || !selectedArtifactSummary.hasAab) {
-        console.warn(`⚠️  Mobile artifacts for v${version} code${selectedArtifactSummary.latestCode || 'unknown'} do not include both APK and AAB files.`);
+        console.warn(`⚠️  Mobile artifacts for v${requestedArtifactVersion} code${selectedArtifactSummary.latestCode || 'unknown'} do not include both APK and AAB files.`);
     }
 
     const targetDir = path.join('dist', 'mobile');
@@ -321,6 +350,30 @@ function summarizeMobileArtifacts(fileNames) {
         hasApk: parsed.some(item => item.extension === 'apk'),
         hasAab: parsed.some(item => item.extension === 'aab')
     };
+}
+
+function describeAvailableMobileArtifacts(fileNames) {
+    const byVersion = new Map();
+    for (const fileName of fileNames) {
+        const parsed = parseMobileArtifactName(fileName);
+        if (!parsed) continue;
+        if (!byVersion.has(parsed.version)) {
+            byVersion.set(parsed.version, []);
+        }
+        byVersion.get(parsed.version).push(fileName);
+    }
+
+    return Array.from(byVersion.entries())
+        .map(([version, files]) => ({
+            version,
+            files,
+            ...summarizeMobileArtifacts(files)
+        }))
+        .filter(item => Number.isFinite(item.latestCode))
+        .sort((a, b) => {
+            if (b.latestCode !== a.latestCode) return b.latestCode - a.latestCode;
+            return b.version.localeCompare(a.version);
+        });
 }
 
 function selectLatestMobileArtifacts(fileNames) {
@@ -459,6 +512,14 @@ function buildReleaseBody({ version, section, previousVersion, mobileArtifactPat
     const androidAab = mobileArtifactPaths
         .map(assetPath => path.basename(assetPath))
         .find(name => name.endsWith('.aab'));
+    const mobileArtifactSummaries = mobileArtifactPaths
+        .map(assetPath => parseMobileArtifactName(path.basename(assetPath)))
+        .filter(Boolean);
+    const mobileArtifactVersions = Array.from(new Set(mobileArtifactSummaries.map(item => item.version))).filter(Boolean);
+    const mobileArtifactCodes = Array.from(new Set(mobileArtifactSummaries.map(item => item.code).filter(Number.isFinite))).sort((a, b) => a - b);
+    const mobileArtifactVersionNote = mobileArtifactPaths.length && mobileArtifactVersions.some(item => item !== version)
+        ? `Attached Android mobile/tablet artifacts are existing app build ${mobileArtifactVersions.map(item => `v${item}`).join(', ')}${mobileArtifactCodes.length ? ` code${mobileArtifactCodes.join('/code')}` : ''}; they are reused for this extension release so users can keep testing the current MVP app while the next native app work continues.`
+        : '';
     const androidInstallNote = androidApkIsDebug
         ? 'The debug APK is attached for QA/direct device validation and must stay clearly marked as QA-only. The AAB is for store upload workflows, not normal sideloading.'
         : 'The APK is for direct installs on Android devices, including GrapheneOS and other non-Play setups. The AAB is for store upload workflows, not normal sideloading.';
@@ -476,6 +537,8 @@ function buildReleaseBody({ version, section, previousVersion, mobileArtifactPat
             androidAab
                 ? `**Play/App bundle artifact:** [${androidAab}](${releaseAssetLink(androidAab)})`
                 : '',
+            '',
+            mobileArtifactVersionNote,
             '',
             androidInstallNote,
         ].filter(Boolean)

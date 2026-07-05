@@ -132,6 +132,34 @@ FilterTube-mobile-tablet-v3.3.2-code30312-release.aab
 
 The release script filters by the current package version and then selects the highest `codeNNNN` artifacts, so older `code30310`/`code30311` files in the app artifact directory are not attached to the v3.3.2 release. There is no signed release APK in the current app artifact directory; if the debug APK is attached, it must be described as QA-only/direct-device validation.
 
+If the extension release needs to attach the current MVP app while the app is
+not being rebuilt at the same version, keep that mismatch explicit:
+
+```bash
+cd /Users/devanshvarshney/FilterTube
+FILTERTUBE_MOBILE_ARTIFACTS_DIR=/Users/devanshvarshney/FilterTubeApp/release-artifacts/android-mobile-tablet \
+FILTERTUBE_MOBILE_ARTIFACT_VERSION=3.3.2 \
+node build.js
+```
+
+Interactive release builds now support the same safe reuse path. If you run
+`npm run build`, answer `y` to Android artifacts, accept the default artifact
+directory, and no Android files match the extension version, the script shows
+the existing app artifact versions and asks whether to reuse the latest one.
+For the current MVP app lane, choose that only when you intentionally want to
+attach the existing app build to a newer extension release.
+
+For example, a `v3.3.5` extension release can intentionally attach:
+
+```text
+FilterTube-mobile-tablet-v3.3.2-code30312-debug.apk
+FilterTube-mobile-tablet-v3.3.2-code30312-release.aab
+```
+
+The generated release body will state that these are existing MVP app artifacts
+reused for the extension release. Do not rename those files to `v3.3.5`; their
+embedded app version/versionCode remains `v3.3.2-code30312`.
+
 If the release is extension-only, do not provide `FILTERTUBE_MOBILE_ARTIFACTS_DIR` and decline the mobile artifact prompt.
 
 ## Changelog rule for major cross-platform releases

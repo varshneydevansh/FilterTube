@@ -103,6 +103,28 @@ For release packaging and public wording:
 - NO-GO: claim automatic LAN peer discovery.
 - NO-GO: claim hosted FilterTube Internet Pickup ownership without a provider
   ownership artifact.
+
+## 2026-07-05 MVP App Artifact Reuse Addendum
+
+`build.js` now keeps version-matched Android attachment as the default, but
+supports an explicit `FILTERTUBE_MOBILE_ARTIFACT_VERSION` or
+`--mobile-artifact-version=` override for intentional MVP app reuse. In
+interactive release builds, if no Android app artifact matches the extension
+version, the script can also show the existing app artifact versions and ask
+whether to reuse the latest one.
+
+Release-safe meaning:
+
+- default release packaging still looks for Android artifacts matching the
+  extension package version
+- mismatched mobile artifacts require explicit operator input through env/CLI
+  override or the interactive reuse prompt
+- generated release copy names the exact APK/AAB files and states when an
+  existing app build is reused for a newer extension release
+- MVP app files must keep their real filename/version, for example
+  `FilterTube-mobile-tablet-v3.3.2-code30312-debug.apk`
+- no release may claim that a `v3.3.2-code30312` mobile artifact is a rebuilt
+  `v3.3.5` app artifact
 - NO-GO: claim native Android/iOS parity until native runtime sync and installed
   app smoke artifacts are complete.
 
