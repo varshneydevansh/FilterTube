@@ -6087,8 +6087,9 @@ body.ft-extension-surface[data-surface="tab-view"] .dashboard-structure-note {
 body.ft-extension-surface[data-surface="tab-view"] .dashboard-hero__actions {
     display: grid;
     align-self: center;
+    justify-self: end;
     gap: 0.7rem;
-    width: min(100%, 27rem);
+    width: min(100%, 24rem);
 }
 
 body.ft-extension-surface[data-surface="tab-view"] .dashboard-android-testing-cta {
@@ -6105,6 +6106,11 @@ body.ft-extension-surface[data-surface="tab-view"] .dashboard-android-testing-ct
 }
 
 body.ft-extension-surface[data-surface="tab-view"] .dashboard-stats-source {
+    width: 100%;
+}
+
+body.ft-extension-surface[data-surface="tab-view"] .dashboard-hero__actions .dashboard-hero__surface {
+    justify-self: stretch;
     width: 100%;
 }
 
