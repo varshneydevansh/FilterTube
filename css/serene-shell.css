@@ -6084,6 +6084,13 @@ body.ft-extension-surface[data-surface="tab-view"] .dashboard-structure-note {
         0 14px 26px -24px rgba(92, 49, 34, 0.2);
 }
 
+body.ft-extension-surface[data-surface="tab-view"] .dashboard-hero__actions {
+    display: grid;
+    align-self: center;
+    gap: 0.7rem;
+    width: min(100%, 27rem);
+}
+
 body.ft-extension-surface[data-surface="tab-view"] .dashboard-android-testing-cta {
     width: 100%;
     min-height: 2.85rem;
@@ -6095,6 +6102,10 @@ body.ft-extension-surface[data-surface="tab-view"] .dashboard-android-testing-ct
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.16),
         0 18px 36px -28px rgba(171, 68, 56, 0.74);
+}
+
+body.ft-extension-surface[data-surface="tab-view"] .dashboard-stats-source {
+    width: 100%;
 }
 
 body.ft-extension-surface[data-surface="tab-view"] .card,
