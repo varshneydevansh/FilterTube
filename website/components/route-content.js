@@ -19,12 +19,13 @@ export { extensionInstallHref, navigationLinks };
 
 export const heroVideoUrl = "/videos/homepage/day/homepage_hero_day.mp4";
 
-export const demoVideoHref = "https://m.youtube.com/watch?v=dmLUu3lm7dE";
+export const demoVideoHref = "https://www.youtube.com/watch?v=dmLUu3lm7dE";
 
 export const docsHref =
   "https://github.com/varshneydevansh/FilterTube/tree/master/docs";
 
 export const githubHref = "https://github.com/varshneydevansh/FilterTube";
+export const redditHref = "https://www.reddit.com/r/FilterTube/";
 export const downloadsHref = "/downloads";
 
 export const browserLinks = [
@@ -78,6 +79,7 @@ export const footerLinks = {
     { label: "ML & AI", href: "/ml-ai" },
   ],
   resources: [
+    { label: "Reddit community", href: redditHref, external: true },
     { label: "Documentation", href: docsHref, external: true },
     { label: "GitHub", href: githubHref, external: true },
     {
@@ -91,181 +93,218 @@ export const footerLinks = {
 };
 
 export const homeStoryNotes = [
-  "Built because a parent asked for keyword blocking on YouTube Kids and never got a real answer.",
-  "Designed to keep filtering local, explainable, and calm instead of turning safety into another opaque cloud product.",
-  "Available now on desktop browsers, with Android phone/tablet testing active and iOS, iPad, TV, and local intelligence paths moving separately.",
+  "Install the browser extension, open FilterTube, and add the words or channels you do not want YouTube to show.",
+  "FilterTube is built by a neurodivergent developer who needed calmer YouTube for ADHD focus, then shaped further by parents and caregivers.",
+  "Families with autistic children and other neurodivergent users are part of the reason the controls are becoming simpler, clearer, and easier to trust.",
+  "Use profiles when different people need different rules. Use a PIN when those rules should not be changed casually.",
+  "Desktop extensions work today. The MVP Android phone/tablet app is available through internal testing by emailing hello@filtertube.in.",
+  "The current app validates the WebView-based control model, while a more native custom control app is being built in parallel.",
+  "iPhone, iPad, and TV builds follow separate TestFlight, App Store, and TV store paths.",
 ];
 
 export const homeCapabilityCards = [
   {
-    label: "Pre-render control",
-    title: "Most blocked content can disappear before the page fully builds.",
+    label: "Block what you name",
+    title: "Hide channels, keywords, Shorts, comments, and noisy surfaces.",
     description:
-      "FilterTube intercepts YouTube data as early as it can, then falls back to DOM cleanup only where YouTube still leaves edge cases.",
+      "Start with the simple lists: add a channel, add a word, or turn off an entire surface like Shorts or comments.",
     points: [
-      "Home, search, watch, playlist, and related surfaces can be filtered before visual clutter lands.",
-      "Fallback cleanup stays selective so the experience does not feel flickery or unstable.",
+      "Blocklist mode hides what you add.",
+      "Whitelist mode is stricter: only approved channels or rules should remain visible.",
     ],
     icon: Compass,
     span: "xl:col-span-7",
   },
   {
-    label: "Family safety",
+    label: "Profiles and PINs",
     title:
-      "Kids mode, profile separation, and PIN locks stay part of the product core.",
+      "Give each person their own rules without turning setup into an IT job.",
     description:
-      "Family controls were not added later. Separate profiles, whitelist behavior, and locked settings are part of why the product exists.",
+      "A parent can keep the main profile open, create protected child profiles, and use PINs so settings are not changed by accident.",
     points: [
-      "Kids-safe setups can stay meaningfully stricter than the main profile.",
-      "PIN-protected areas help adults keep household rules from being casually edited.",
+      "Child profile PINs help stop casual profile switching.",
+      "Parent or master unlock controls rule editing, device trust, and backups.",
     ],
     icon: ShieldCheck,
     span: "xl:col-span-5",
   },
   {
-    label: "Noise removal",
+    label: "Daily calm",
     title:
-      "Shorts, comments, mixes, and recommendation clutter can all be reduced.",
+      "Reduce the parts of YouTube that usually pull people off track.",
     description:
-      "Users can shape YouTube into something calmer, whether the goal is family safety, better focus, or simply fewer rabbit holes.",
+      "FilterTube is useful for parents, students, ADHD focus, and anyone who wants YouTube to stop pushing the same distractions.",
     points: [
-      "Hide Shorts entirely or keep watch pages quieter by removing comments and noisy rails.",
-      "Keyword, channel, and surface-level controls work together instead of living in separate silos.",
+      "Hide Shorts when short-form scrolling is the problem.",
+      "Hide comments when the watch page needs to stay quieter.",
     ],
     icon: EyeSlash,
     span: "xl:col-span-5",
   },
   {
-    label: "Next platforms",
+    label: "Devices and apps",
     title:
-      "The product is expanding into dedicated apps without losing the calm system already live today.",
+      "The same rule model is moving from desktop into phone, tablet, and TV.",
     description:
-      "Android phone/tablet, iOS, iPad, TV, and local ML plans belong to one serene system instead of feeling like disconnected product experiments.",
+      "The extension is the live base. The apps are being shaped around the same family controls, profile rules, and local-first direction.",
     points: [
-      "Phone and tablet apps become the trusted control layer for rules, profiles, and activity.",
-      "TV builds prioritize shared-screen confidence, while local intelligence stays privacy-first and explicit.",
+      "Ask hello@filtertube.in for Android MVP internal testing access.",
+      "The MVP app is WebView-based; the custom control app is being built alongside it.",
+      "Remote family updates use verified device trust, not a public account full of private viewing data.",
     ],
     icon: Stack,
     span: "xl:col-span-7",
   },
 ];
 
+export const homeUserVoices = [
+  {
+    source: "Parent feedback on Reddit",
+    title: "Parents want calmer words, not developer language.",
+    body: "A parent using FilterTube on a child’s PC said the product is exactly what YouTube has been missing, then asked for a simpler guide and clearer explanations.",
+    href: "https://www.reddit.com/r/FilterTube/comments/1uhtqo7/some_feedback/",
+  },
+  {
+    source: "Caregiver request on GitHub",
+    title: "Neurodivergent families need calmer control.",
+    body: "A caregiver described using FilterTube to show an autistic family member the good side of the internet while shielding sensitive learning from harmful content.",
+    href: "https://github.com/varshneydevansh/FilterTube/issues/60#issuecomment-4612147210",
+  },
+  {
+    source: "YouTube parent comment",
+    title: "Allow-only setups matter for study computers.",
+    body: "A parent said FilterTube solved nearly everything for a child’s study PC and asked for stronger protection around turning filtering off.",
+    href: "https://www.youtube.com/watch?v=dmLUu3lm7dE&t=26s",
+  },
+];
+
 export const systemSteps = [
   {
-    title: "Intercept",
+    title: "Add rules",
     description:
-      "Capture the YouTube response or page state that matters before recommendation surfaces fully settle.",
+      "Choose words, channels, videos, comments, Shorts, or whitelist rules from the dashboard.",
     icon: Compass,
   },
   {
-    title: "Normalize",
+    title: "Pick the profile",
     description:
-      "Resolve channel identity, URL variants, and content references into a consistent rule model.",
+      "Keep the adult profile, child profiles, and YouTube Kids rules separate when they need different limits.",
     icon: Stack,
   },
   {
-    title: "Filter",
+    title: "Open YouTube",
     description:
-      "Apply keyword, channel, whitelist, Shorts, comments, and profile-specific rules with clear precedence.",
+      "FilterTube removes matching videos and surfaces as YouTube loads, then cleans up anything YouTube adds later.",
     icon: EyeSlash,
   },
   {
-    title: "Stabilize",
+    title: "Adjust when needed",
     description:
-      "Use a targeted DOM fallback only when needed so the page still feels calm and readable.",
+      "If YouTube changes its layout, tell the developer. That is usually the reason filtering suddenly misses a surface.",
     icon: ShieldCheck,
   },
 ];
 
 export const homeFaqItems = [
   {
+    question: "What should I do first after installing?",
+    answer:
+      "Open FilterTube, add one word or one channel you want hidden, then refresh YouTube. Add profiles, PINs, Kids rules, or imports later only if you need them.",
+  },
+  {
+    question: "What does Exact mean?",
+    answer:
+      "Exact off is wider. For example, poop can also catch poops or pooping. Exact on is stricter, so poop only matches the word poop.",
+  },
+  {
+    question: "Can a child or sibling change the rules?",
+    answer:
+      "Not if you lock the profile. A child PIN helps stop casual profile switching. The parent or master unlock is still needed to change rules, devices, and backups.",
+  },
+  {
     question: "Does FilterTube send browsing data to your servers?",
     answer:
-      "No. Filtering stays local to the browser or device using local storage and product-controlled settings.",
+      "No. Filtering is local-first. Device sync can help two trusted devices connect or pick up an update, but it is designed so the helper service cannot read your rules.",
   },
   {
-    question: "Will mobile and TV replace FilterTube on desktop?",
+    question: "How do I join Android app testing?",
     answer:
-      "No. FilterTube already works today on desktop browsers. The app releases extend that same control system across more screens.",
-  },
-  {
-    question: "Why is Shorts filtering highlighted so often?",
-    answer:
-      "Because for many households and students, reducing Shorts is one of the fastest ways to make YouTube feel calmer again.",
-  },
-  {
-    question: "How should the ML and AI direction be understood today?",
-    answer:
-      "As a future local layer that could make the current rule system smarter. It is not built around cloud behavior tracking, and thumbnail analysis remains a research track.",
+      "Email hello@filtertube.in and ask for Android MVP testing access. The current app lets families test the control flow now while the more custom native app is being built.",
   },
 ];
 
 export const homeTechnicalFeatures = [
   {
-    title: "Exact Word Matching",
+    title: "Keyword rules",
     description:
-      "Keyword rules can use exact word boundaries when users want stricter matching instead of loose partial matches.",
-    detail: "Optional exact-match toggle for keyword rules.",
+      "Add words or phrases you do not want appearing in titles, descriptions, or supported comment text.",
+    detail: "Use Exact when a short word causes false matches.",
   },
   {
-    title: "Channel Whitelist",
+    title: "Channel rules",
     description:
-      "Whitelist mode can leave only approved channels and keywords visible for stricter setups.",
-    detail: "Useful for trusted-creators-only households and study profiles.",
+      "Block a channel, allow only trusted channels, or use channel IDs and handles without memorizing YouTube URL formats.",
+    detail: "Best for creators you always want hidden or always want allowed.",
   },
   {
-    title: "Comment Blocker",
+    title: "Comment controls",
     description:
-      "Comment sections can be removed entirely or specific based on the commenter or keywords too when the goal is a quieter watch page.",
-    detail: "Supports full comment-section hiding.",
+      "Hide comment sections entirely, or use keyword/commenter rules when comments are the part causing the problem.",
+    detail: "Useful for calmer watch pages.",
   },
   {
-    title: "Shorts Blocker",
+    title: "Shorts controls",
     description:
-      "Shorts shelves, cards, and related entry points can be hidden to reduce doom-scrolling pressure.",
-    detail: "One of the fastest ways to calm the feed.",
+      "Remove Shorts shelves, cards, and entry points when short-form scrolling is the habit you want to reduce.",
+    detail: "A common first step for families and focus setups.",
   },
   {
-    title: "Pre-Render Filtering",
+    title: "Profiles",
     description:
-      "When YouTube data can be intercepted early, blocked items are removed before they visibly land on screen.",
-    detail: "DOM fallback still covers recycled or delayed surfaces.",
+      "Keep different rule sets for adults, children, study time, or stricter YouTube Kids setups.",
+    detail: "Rules stay scoped to the profile you choose.",
   },
   {
-    title: "Performance Optimizations",
+    title: "PIN protection",
     description:
-      "FilterTube uses selective processing and bridge-level optimizations so filtering stays lightweight.",
-    detail: "Built around interception first, fallback only where needed.",
+      "Use PINs so protected profiles and parent settings are not casually opened or changed.",
+    detail: "Parent unlock is separate from child profile switching.",
   },
   {
-    title: "Auto Backup",
+    title: "Backups",
     description:
-      "Automatic backups can be written into `Downloads/FilterTube Backup/` with profile-aware folders and backup rotation.",
-    detail: "Supports history/latest modes and encrypted backup flows.",
+      "Export your FilterTube setup before a big change, or keep local backup files for recovery.",
+    detail: "Designed to keep control in your hands.",
   },
   {
-    title: "Import / Export",
+    title: "Rule-list imports",
     description:
-      "Manual export and restore flows exist for FilterTube data portability, including native exports and compatible import paths.",
-    detail: "Handled through the advanced dashboard settings flow.",
+      "Bring in CSV, TXT, JSON, BlockTube-style JSON, or a raw HTTPS list, then review what FilterTube understood before applying it.",
+    detail: "Files add rules only; they do not change PINs or profiles.",
   },
   {
-    title: "Members-Only Control",
+    title: "Subscribed-channel whitelist",
     description:
-      "Members-only videos and shelves can be hidden across watch, sidebar, playlist, and compact video layouts.",
-    detail: "Covers common watch-page and shelf surfaces.",
+      "Import channels from the signed-in YouTube account into the current profile whitelist, then choose whether to only store them or turn whitelist mode on.",
+    detail: "Useful when a child should only see channels already subscribed.",
   },
   {
-    title: "Mix / Radio Handling",
+    title: "Date-limited keywords",
     description:
-      "Playlist hiding logic distinguishes Mix and Radio items so they are not incorrectly treated like standard playlists.",
-    detail: "Protects playlist controls from over-hiding.",
+      "Make a keyword apply only to videos uploaded before, after, or inside a date range.",
+    detail: "Useful for multi-part topics or newer content only.",
   },
   {
-    title: "What's New Dashboard",
+    title: "Device updates",
     description:
-      "Release notes are surfaced inside the product through a dedicated What's New flow and dashboard data source.",
-    detail: "Keeps feature updates visible inside FilterTube.",
+      "A parent device can send approved rules, time, and access to a verified protected device, with optional pickup when the other device opens later.",
+    detail: "Live P2P, same-network pickup, and lazy checks are separate paths.",
+  },
+  {
+    title: "Local-first design",
+    description:
+      "FilterTube is built around local rules and public source code, so users can inspect what the product is doing.",
+    detail: "Open source and privacy-first by design.",
   },
 ];
 
@@ -276,15 +315,15 @@ export const detailPages = {
     slug: "mobile",
     icon: DeviceMobile,
     tone: "sage",
-    status: "In testing",
+    status: "Testing by request",
     eyebrow: "Dedicated apps",
     navTitle: "Mobile overview",
     routeSummary:
-      "A calm overview of the iPhone, iPad, and Android app family.",
+      "A calm overview of the Android MVP, iPhone, iPad, and future TV app family.",
     titleLead: "A calm FilterTube companion for",
     titleDisplay: "phones and tablets",
     description:
-      "The mobile family starts as a protected control center: fast rule changes, profile switching, recent interventions, and clear status without turning the experience into a dense settings wall.",
+      "The mobile family starts with an MVP WebView-based control app for Android internal testing, while a more native custom control app is being built in parallel for a calmer long-term experience.",
     chips: ["Signal Rail", "One-thumb controls", "Local-first trust"],
     primaryCta: {
       label: "Open downloads",
@@ -317,6 +356,10 @@ export const detailPages = {
     ],
     featureCards: [
       {
+        title: "Android MVP access by email",
+        body: "People who want to test the current Android phone/tablet build can email hello@filtertube.in and ask to be added to internal testing.",
+      },
+      {
         title: "Home that reassures first",
         body: "The first screen shows whether protection is on, which profile is active, and what changed recently.",
       },
@@ -333,6 +376,7 @@ export const detailPages = {
     milestoneIntro:
       "Mobile is the control center for status, rule changes, and profile switching, not a stretched copy of the browser popup.",
     milestones: [
+      "Android MVP testers can join through a simple email request.",
       "Protection status is understandable in one glance.",
       "Profiles and PIN gates feel native and trustworthy.",
       "The visual tone stays calm enough for family use.",
@@ -485,20 +529,20 @@ export const detailPages = {
     slug: "android",
     icon: DeviceMobile,
     tone: "forest",
-    status: "Final release testing",
+    status: "Internal testing",
     eyebrow: "Android app",
     navTitle: "Android",
     routeSummary:
-      "A flexible Android app for rules, profiles, protected browsing, YouTube Main, and public YouTube Kids access.",
+      "The current Android MVP is available through internal testing by request.",
     titleLead: "A flexible FilterTube companion for",
     titleDisplay: "Android devices",
     description:
-      "The Android app balances direct control, profile switching, recent interventions, YouTube Main filtering, public YouTube Kids access, and Nanah sync without feeling chaotic.",
+      "The current Android MVP uses a WebView-based control model so families can test filtering, profiles, YouTube Main, and public YouTube Kids access now. A more native custom control app is being built in parallel.",
     chips: ["Flexible layout", "Quick rules", "Protected sessions"],
     primaryCta: {
-      label: "Open downloads",
-      href: downloadsHref,
-      external: false,
+      label: "Ask for testing access",
+      href: "mailto:hello@filtertube.in?subject=Android%20MVP%20testing%20access",
+      external: true,
     },
     secondaryCta: {
       label: "See the mobile overview",
@@ -506,12 +550,12 @@ export const detailPages = {
       external: false,
     },
     previewLabel: "Android intent",
-    previewTitle: "Utility and calm can coexist on Android.",
+    previewTitle: "MVP testing now, custom control app next.",
     previewRows: [
       {
-        label: "Control",
-        value: "Direct",
-        detail: "Rule editing should be fast without losing readability.",
+        label: "Access",
+        value: "Email",
+        detail: "Ask hello@filtertube.in for internal testing access.",
       },
       {
         label: "Profiles",
@@ -519,16 +563,15 @@ export const detailPages = {
         detail: "Main and Kids contexts should remain clearly separated.",
       },
       {
-        label: "Future path",
-        value: "Protected browse",
-        detail:
-          "Protected browsing stays modular until implementation is locked.",
+        label: "Current build",
+        value: "MVP",
+        detail: "WebView-based control validation while the custom app is built.",
       },
     ],
     featureCards: [
       {
-        title: "Fast rule control",
-        body: "Android is for people who edit filters often and expect direct access to the system.",
+        title: "MVP WebView control app",
+        body: "The current Android testing app validates the working FilterTube model on phone and tablet before the fully custom frontend replaces it.",
       },
       {
         title: "Readable under motion",
@@ -543,7 +586,8 @@ export const detailPages = {
     milestoneIntro:
       "Android balances flexibility with the same calm trust posture used elsewhere.",
     milestones: [
-      "Avoid technical bragging that makes the experience feel harsh.",
+      "Android MVP testers can be added by email.",
+      "The MVP stays useful while the custom frontend is developed.",
       "Keep product-control language clear and direct.",
       "Use serene visuals without losing Android’s practical character.",
     ],

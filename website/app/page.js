@@ -17,6 +17,7 @@ import {
   homeFaqItems,
   homeStoryNotes,
   homeTechnicalFeatures,
+  homeUserVoices,
   platformOrder,
   systemSteps,
 } from "@/components/route-content";
@@ -40,6 +41,7 @@ const technicalFeatureSpans = [
   "xl:col-span-5",
   "xl:col-span-6",
   "xl:col-span-6",
+  "xl:col-span-12",
   "xl:col-span-12",
 ];
 
@@ -173,6 +175,220 @@ function ShortcutCard({ page }) {
   );
 }
 
+function QuickGuideSection() {
+  return (
+    <section className="px-4 py-20 md:px-6 md:py-28 lg:py-32">
+      <div className="mx-auto max-w-[1400px]">
+        <Reveal>
+          <SectionHeading
+            eyebrow="Quick guide"
+            title="Start small, then add family controls only when needed."
+            description="This is the parent-friendly path the website now leads with: one block, one refresh, then profiles, imports, or device updates if your setup needs them."
+          />
+        </Reveal>
+
+        <div className="mt-12 grid gap-5 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+          <Reveal>
+            <Panel innerClassName="h-full p-6 md:p-7">
+              <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
+                Three-minute setup
+              </p>
+              <div className="mt-7 grid gap-4">
+                {[
+                  [
+                    "1",
+                    "Install and open FilterTube",
+                    "Use the browser extension first. Android MVP testers can email hello@filtertube.in.",
+                  ],
+                  [
+                    "2",
+                    "Block one thing",
+                    "Add one channel or one keyword, then refresh YouTube and confirm it hides.",
+                  ],
+                  [
+                    "3",
+                    "Add only what you need",
+                    "Profiles, PINs, whitelist mode, CSV/TXT/JSON imports, and device updates can wait until the basic rule works.",
+                  ],
+                ].map(([number, title, body]) => (
+                  <div
+                    className="grid gap-4 rounded-[1.4rem] border border-[color:var(--color-line)] bg-[color:var(--color-tile)] p-4 sm:grid-cols-[auto_minmax(0,1fr)]"
+                    key={number}
+                  >
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-accent)] font-mono text-sm font-bold text-[#fff8f1]">
+                      {number}
+                    </span>
+                    <div>
+                      <h3 className="font-display text-2xl tracking-[-0.045em] text-[var(--color-ink)]">
+                        {title}
+                      </h3>
+                      <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
+                        {body}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Panel>
+          </Reveal>
+
+          <Reveal delay={100}>
+            <Panel innerClassName="relative h-full overflow-hidden p-6 md:p-7">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_16%,rgba(171,68,56,0.12),transparent_28%),radial-gradient(circle_at_84%_22%,rgba(158,190,177,0.18),transparent_28%)]" />
+              <div className="relative z-10">
+                <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
+                  Family device updates
+                </p>
+                <h3 className="mt-4 max-w-[16ch] font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)]">
+                  Send rules privately to a verified device.
+                </h3>
+                <p className="mt-4 max-w-[62ch] text-sm leading-7 text-[var(--color-muted)]">
+                  A parent device can pair with a protected device, confirm the
+                  safety phrase, then send rules, time, and access. Live P2P
+                  works when both devices are open. Optional Home Pickup helps
+                  on the same network, and Internet Pickup can let a verified
+                  device collect a signed update later.
+                </p>
+
+                <div className="mt-7 grid gap-4 md:grid-cols-3">
+                  {[
+                    ["Live P2P", "Both devices open now"],
+                    ["Home Pickup", "Same network, explicit setup"],
+                    ["Internet Pickup", "Verified device opens later"],
+                  ].map(([title, body]) => (
+                    <div
+                      className="rounded-[1.25rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)] p-4"
+                      key={title}
+                    >
+                      <p className="font-display text-xl tracking-[-0.045em] text-[var(--color-ink)]">
+                        {title}
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-[var(--color-muted)]">
+                        {body}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-6 rounded-[1.4rem] border border-[color:var(--color-line)] bg-[rgba(255,255,255,0.62)] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <p className="font-mono text-xs uppercase tracking-[0.2em] text-[var(--color-muted)]">
+                      Account & Sync model
+                    </p>
+                    <span className="rounded-full border border-[color:var(--color-line)] px-3 py-1 text-xs font-semibold text-[var(--color-accent)]">
+                      parent reviewed
+                    </span>
+                  </div>
+                  <div className="mt-4 grid gap-3 md:grid-cols-3">
+                    <span className="rounded-full bg-[var(--color-accent)] px-4 py-3 text-center text-sm font-semibold text-[#fff8f1]">
+                      Pair protected device
+                    </span>
+                    <span className="rounded-full border border-[color:var(--color-line)] px-4 py-3 text-center text-sm font-semibold text-[var(--color-ink)]">
+                      Send protected update
+                    </span>
+                    <span className="rounded-full border border-[color:var(--color-line)] px-4 py-3 text-center text-sm font-semibold text-[var(--color-ink)]">
+                      Check saved updates
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </Panel>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HowItWorksSection() {
+  return (
+    <section id="system" className="px-4 py-20 md:px-6 md:py-28 lg:py-32">
+      <div className="mx-auto max-w-[1400px]">
+        <Reveal>
+          <SectionHeading
+            eyebrow="How it works"
+            title="A simple setup path for non-technical users."
+            description="You do not need to understand YouTube internals. Add rules, choose the profile, open YouTube, then adjust when something changes."
+          />
+        </Reveal>
+
+        <div className="mt-12 grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+          <div className="grid gap-5 md:grid-cols-2">
+            {systemSteps.map((step, index) => (
+              <Reveal delay={index * 90} key={step.title}>
+                <Panel innerClassName="h-full p-6">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs uppercase tracking-[0.22em] text-[var(--color-muted)]">
+                      0{index + 1}
+                    </span>
+                    <span className="rounded-full bg-[rgba(171,68,56,0.08)] p-2 text-[var(--color-accent)]">
+                      <step.icon aria-hidden="true" size={18} weight="light" />
+                    </span>
+                  </div>
+                  <h3 className="mt-6 font-display text-3xl tracking-[-0.05em] text-[var(--color-ink)]">
+                    {step.title}
+                  </h3>
+                  <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">
+                    {step.description}
+                  </p>
+                </Panel>
+              </Reveal>
+            ))}
+          </div>
+
+          <Reveal delay={120}>
+            <Panel innerClassName="relative overflow-hidden p-7 md:p-8">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(191,214,202,0.24),transparent_28%),radial-gradient(circle_at_82%_16%,rgba(239,204,189,0.26),transparent_24%)]" />
+              <div className="relative z-10">
+                <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
+                  If filtering misses something
+                </p>
+                <h3 className="mt-5 max-w-[14ch] font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)]">
+                  Tell the developer when YouTube changes.
+                </h3>
+                <p className="mt-5 text-sm leading-7 text-[var(--color-muted)]">
+                  YouTube changes its page structure often. If a rule stops
+                  hiding something, that usually means FilterTube needs a small
+                  update for the new layout.
+                </p>
+                <div className="mt-8 space-y-4">
+                  <div className="ft-tile rounded-[1.4rem] border border-[color:var(--color-line)] px-4 py-4">
+                    <p className="text-[0.7rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
+                      What to send
+                    </p>
+                    <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
+                      A screenshot, the page type, and the blocked word or
+                      channel is usually enough to start debugging.
+                    </p>
+                  </div>
+                  <div className="ft-tile rounded-[1.4rem] border border-[color:var(--color-line)] px-4 py-4">
+                    <p className="text-[0.7rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
+                      Where to send it
+                    </p>
+                    <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
+                      Email hello@filtertube.in, open a GitHub issue, or comment
+                      wherever you already found FilterTube.
+                    </p>
+                  </div>
+                  <div className="ft-tile rounded-[1.4rem] border border-[color:var(--color-line)] px-4 py-4">
+                    <p className="text-[0.7rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
+                      What stays private
+                    </p>
+                    <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
+                      Do not send private family rules unless you choose to. A
+                      small example is usually enough.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </Panel>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function HomePage() {
   return (
     <>
@@ -189,8 +405,8 @@ export default function HomePage() {
                   Live now
                 </span>
                 <span className="text-pretty">
-                  Extensions are available today. Android phone/tablet is in
-                  testing, with iOS and TV following as separate store paths.
+                  Desktop extensions are live. The MVP Android phone/tablet
+                  app is open for internal testing by request.
                 </span>
               </div>
 
@@ -205,13 +421,14 @@ export default function HomePage() {
 
               <p className="ft-hero-support-copy relative mx-auto mt-6 max-w-[800px] text-pretty px-4 text-[17px] font-medium leading-8 md:text-[18px]">
                 <span className="font-semibold text-white">
-                  Local-first YouTube filtering
+                  A calmer YouTube for families and focused users
                 </span>{" "}
-                for families, students, and focused households. Block{" "}
+                without needing a technical setup. Block{" "}
                 <span className="ft-hero-support-emphasis">
                   channels, keywords, Shorts, and comments
                 </span>{" "}
-                before noisy surfaces render.
+                from one dashboard, then help test the MVP app while the fully
+                custom control app is being built.
               </p>
 
               <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -225,10 +442,22 @@ export default function HomePage() {
                     <Play aria-hidden="true" size={14} weight="fill" />
                   </span>
                   <span className="pr-0.5 leading-[1.05]">
-                    See how FilterTube works
+                    Watch the quick demo
                   </span>
                 </a>
+                <a
+                  className="group inline-flex min-h-11 items-center gap-3 overflow-visible whitespace-nowrap rounded-full border border-white/30 bg-[rgba(255,255,255,0.12)] px-6 py-3 text-sm font-semibold text-[#fffaf4] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-xl transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 hover:bg-[rgba(255,255,255,0.18)] active:translate-y-px active:scale-[0.98]"
+                  href="mailto:hello@filtertube.in?subject=Android%20MVP%20testing%20access"
+                >
+                  Ask for Android testing access
+                </a>
               </div>
+              <p className="mt-4 max-w-[680px] px-4 text-sm font-medium leading-7 text-white/86">
+                Email hello@filtertube.in to join Android internal testing. The
+                current MVP is WebView-based for control validation; a more
+                native custom frontend is being built in parallel. iPhone and
+                iPad follow the App Store/TestFlight path separately.
+              </p>
             </div>
 
             <div className="mx-auto w-full max-w-[1080px] pt-14 md:pt-20 lg:pt-24">
@@ -252,13 +481,17 @@ export default function HomePage() {
         </div>
       </section>
 
+      <QuickGuideSection />
+
+      <HowItWorksSection />
+
       <section id="story" className="px-4 py-20 md:px-6 md:py-28 lg:py-32">
         <div className="mx-auto grid max-w-[1400px] gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16">
           <Reveal>
             <SectionHeading
-              eyebrow="Why FilterTube exists"
-              title="It started with a parent asking for a basic safety control that never arrived."
-              description="The origin story matters because it explains the product tone. FilterTube was built to answer a real family request, not to turn attention safety into generic AI marketing."
+              eyebrow="Start here"
+              title="Block the YouTube content you do not want to keep seeing."
+              description="FilterTube is for parents, students, and everyday users who need clear controls: add words, block channels, hide Shorts, set stricter profiles, and keep the setup local."
             />
             <div className="mt-8 space-y-4">
               {homeStoryNotes.map((note) => (
@@ -279,7 +512,7 @@ export default function HomePage() {
               <div className="relative z-10">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <p className="text-[0.72rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">
-                    Origin thread
+                    Why this exists
                   </p>
                   <a
                     className="ft-shell-strong inline-flex min-h-11 items-center gap-2 rounded-full border border-[color:var(--color-line)] px-4 py-2 text-sm text-[var(--color-ink)] transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 hover:border-[color:var(--color-accent)] hover:text-[var(--color-accent)] active:translate-y-px active:scale-[0.99]"
@@ -287,14 +520,14 @@ export default function HomePage() {
                     rel="noreferrer"
                     target="_blank"
                   >
-                    View the locked support thread
+                    View the parent request
                     <ArrowUpRight aria-hidden="true" size={16} weight="light" />
                   </a>
                 </div>
 
                 <blockquote className="mt-8 max-w-[17ch] font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-6xl md:leading-[0.96]">
-                  Parents needed a way to protect attention and safety without
-                  waiting for the platform to care first.
+                  Start with one blocked word or channel. Add stricter family
+                  controls only when you need them.
                 </blockquote>
 
                 <div className="mt-10 grid gap-4 md:grid-cols-3">
@@ -303,36 +536,35 @@ export default function HomePage() {
                       Live today
                     </p>
                     <p className="mt-3 font-display text-3xl tracking-[-0.05em] text-[var(--color-ink)]">
-                      Desktop release
+                      Browser extension
                     </p>
                     <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                      Chrome, Firefox, Edge, Brave, and Opera-friendly release
-                      paths are already part of the public product.
+                      Chrome, Firefox, Edge, Brave, and Opera-friendly paths
+                      are ready for daily use.
                     </p>
                   </div>
                   <div className="ft-tile rounded-[1.5rem] p-5 ring-1 ring-[color:var(--color-line)]">
                     <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                      Strongest controls
+                      Common first steps
                     </p>
                     <p className="mt-3 font-display text-3xl tracking-[-0.05em] text-[var(--color-ink)]">
                       Kids + Shorts
                     </p>
                     <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                      Whitelist mode, profile separation, and Shorts filtering
-                      remain some of the clearest reasons to trust the system.
+                      Use whitelist mode for trusted channels only, or hide
+                      Shorts when scrolling is the main problem.
                     </p>
                   </div>
                   <div className="rounded-[1.5rem] border border-white/8 bg-[linear-gradient(180deg,#18202a,#10161d)] p-5 text-[#f8f6f2] shadow-[0_24px_48px_-34px_rgba(4,8,14,0.7)]">
                     <p className="text-[0.72rem] uppercase tracking-[0.22em] text-white/72">
-                      Coming next
+                      Apps next
                     </p>
                     <p className="mt-3 font-display text-3xl tracking-[-0.05em] text-[#fffaf4]">
-                      Mobile, iPad, TV
+                      Phone, tablet, TV
                     </p>
                     <p className="mt-3 text-sm leading-7 text-white/84">
-                      Dedicated apps extend FilterTube into calmer control
-                      surfaces without breaking the system people can already
-                      use today.
+                      Dedicated apps will carry the same rules and profiles to
+                      more screens.
                     </p>
                   </div>
                 </div>
@@ -349,9 +581,9 @@ export default function HomePage() {
         <div className="mx-auto max-w-[1400px]">
           <Reveal>
             <SectionHeading
-              eyebrow="What already works"
-              title="FilterTube already does more than most people expect."
-              description="The current product already covers pre-render filtering, family-safe rule control, Shorts reduction, and a local-first foundation built to stay readable."
+              eyebrow="Controls"
+              title="The main controls are simple: block, allow, hide, or protect."
+              description="Most people can start with a blocklist. Families can add profiles, PINs, whitelist mode, and device updates as the setup grows."
             />
           </Reveal>
           <div className="mt-12 grid auto-rows-fr gap-5 xl:grid-cols-12">
@@ -393,9 +625,9 @@ export default function HomePage() {
         <div className="mx-auto max-w-[1400px]">
           <Reveal>
             <SectionHeading
-              eyebrow="Platform map"
-              title="One serene brand, adapted to different screens and reading distances."
-              description="FilterTube is growing from today’s desktop release into dedicated mobile, iPad, TV, Kids, and local intelligence experiences."
+              eyebrow="Apps"
+              title="Desktop works today. Phone and tablet control is next."
+              description="The browser extension is the live product. The app work extends the same rules, profiles, and parent controls to more places."
             />
           </Reveal>
 
@@ -417,12 +649,11 @@ export default function HomePage() {
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
                     <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                      Choose a device
+                      Choose a screen
                     </p>
                     <p className="mt-3 max-w-[30ch] text-sm leading-7 text-[var(--color-muted)]">
-                      Pick the device that matters most and see what is
-                      available today, what is planned next, and how it fits the
-                      broader FilterTube system.
+                      Pick the screen that matters most and see what works now,
+                      what is in testing, and what is planned next.
                     </p>
                   </div>
                   <Link
@@ -430,7 +661,7 @@ export default function HomePage() {
                     href="/mobile"
                     prefetch
                   >
-                    Start with the mobile overview
+                    Start with phone and tablet
                     <ArrowUpRight aria-hidden="true" size={16} weight="light" />
                   </Link>
                 </div>
@@ -446,104 +677,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="system" className="px-4 py-20 md:px-6 md:py-28 lg:py-32">
-        <div className="mx-auto max-w-[1400px]">
-          <Reveal>
-            <SectionHeading
-              eyebrow="System language"
-              title="A calm experience still needs a clear system underneath it."
-              description="FilterTube works because the filtering system is deliberate. The site can stay serene while still showing how interception, rules, and fallback cleanup fit together."
-            />
-          </Reveal>
-
-          <div className="mt-12 grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-            <div className="grid gap-5 md:grid-cols-2">
-              {systemSteps.map((step, index) => (
-                <Reveal delay={index * 90} key={step.title}>
-                  <Panel innerClassName="h-full p-6">
-                    <div className="flex items-center justify-between">
-                      <span className="font-mono text-xs uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                        0{index + 1}
-                      </span>
-                      <span className="rounded-full bg-[rgba(171,68,56,0.08)] p-2 text-[var(--color-accent)]">
-                        <step.icon
-                          aria-hidden="true"
-                          size={18}
-                          weight="light"
-                        />
-                      </span>
-                    </div>
-                    <h3 className="mt-6 font-display text-3xl tracking-[-0.05em] text-[var(--color-ink)]">
-                      {step.title}
-                    </h3>
-                    <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">
-                      {step.description}
-                    </p>
-                  </Panel>
-                </Reveal>
-              ))}
-            </div>
-
-            <Reveal delay={120}>
-              <Panel innerClassName="relative overflow-hidden p-7 md:p-8">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(191,214,202,0.24),transparent_28%),radial-gradient(circle_at_82%_16%,rgba(239,204,189,0.26),transparent_24%)]" />
-                <div className="relative z-10">
-                  <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                    Readability
-                  </p>
-                  <h3 className="mt-5 max-w-[14ch] font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)]">
-                    Calm design should still feel clear.
-                  </h3>
-                  <p className="mt-5 text-sm leading-7 text-[var(--color-muted)]">
-                    FilterTube keeps key controls, family-safe signals, and
-                    product direction easy to scan across desktop, tablet,
-                    phone, and TV.
-                  </p>
-                  <div className="mt-8 space-y-4">
-                    <div className="ft-tile rounded-[1.4rem] border border-[color:var(--color-line)] px-4 py-4">
-                      <p className="text-[0.7rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                        Clear emphasis
-                      </p>
-                      <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                        Important details like Shorts, Kids mode, and active
-                        protection can stand out without making the whole
-                        product feel loud.
-                      </p>
-                    </div>
-                    <div className="ft-tile rounded-[1.4rem] border border-[color:var(--color-line)] px-4 py-4">
-                      <p className="text-[0.7rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                        Readable at every distance
-                      </p>
-                      <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                        Whether someone is checking a phone in one hand or
-                        reading from the sofa, key details stay easy to read.
-                      </p>
-                    </div>
-                    <div className="ft-tile rounded-[1.4rem] border border-[color:var(--color-line)] px-4 py-4">
-                      <p className="text-[0.7rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                        Clear about what is live
-                      </p>
-                      <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                        Current features stay distinct from upcoming apps and
-                        the local ML track, so people can tell what works today
-                        and what still belongs to the roadmap.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </Panel>
-            </Reveal>
-          </div>
-        </div>
-      </section>
-
       <section className="px-4 py-20 md:px-6 md:py-28">
         <div className="mx-auto max-w-[1400px]">
           <Reveal>
             <SectionHeading
-              eyebrow="Technical features"
-              title="Verified product capabilities available today."
-              description="A clear view of what FilterTube already provides now, before the app family expands further."
+              eyebrow="Everyday controls"
+              title="A plain-language map of the controls inside FilterTube."
+              description="These are the settings people use most: rules, profiles, backups, imports, dates, and device updates."
             />
           </Reveal>
           <div className="mt-12 grid auto-rows-fr gap-5 xl:grid-cols-12">
@@ -580,9 +720,9 @@ export default function HomePage() {
         <div className="mx-auto max-w-[1400px]">
           <Reveal>
             <SectionHeading
-              eyebrow="Questions people actually ask"
-              title="Plain answers for what families and focused users actually need to know."
-              description="What ships now, what stays local, and what still belongs to the roadmap."
+              eyebrow="Common questions"
+              title="Simple answers before you open FilterTube."
+              description="Start with the basics. The advanced controls can wait until you need them."
             />
           </Reveal>
           <div className="mt-12 grid auto-rows-fr gap-5 md:grid-cols-2">
@@ -608,6 +748,52 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section className="px-4 py-20 md:px-6 md:py-28">
+        <div className="mx-auto max-w-[1400px]">
+          <Reveal>
+            <SectionHeading
+              eyebrow="User feedback"
+              title="The roadmap is being shaped by parents and caregivers."
+              description="The strongest feedback has been simple: make the product easier to understand, stronger for family setups, and clearer about what works today."
+            />
+          </Reveal>
+
+          <div className="mt-12 grid auto-rows-fr gap-5 lg:grid-cols-3">
+            {homeUserVoices.map((item, index) => (
+              <Reveal className="h-full" delay={index * 80} key={item.title}>
+                <a
+                  className="group ft-shell block h-full rounded-[2rem] p-2 ring-1 ring-[color:var(--color-line)] shadow-[var(--shadow-diffuse)] transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5"
+                  href={item.href}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  <div className="ft-inset flex h-full flex-col rounded-[calc(2rem-0.5rem)] bg-[var(--color-surface)] p-6 md:p-7">
+                    <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
+                      {item.source}
+                    </p>
+                    <h3 className="mt-4 max-w-[18ch] font-display text-3xl tracking-[-0.05em] text-[var(--color-ink)]">
+                      {item.title}
+                    </h3>
+                    <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">
+                      {item.body}
+                    </p>
+                    <span className="mt-auto inline-flex items-center gap-2 pt-8 text-sm font-semibold text-[var(--color-accent)]">
+                      Read source
+                      <ArrowUpRight
+                        aria-hidden="true"
+                        className="transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                        size={15}
+                        weight="light"
+                      />
+                    </span>
+                  </div>
+                </a>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section id="download" className="px-4 pb-20 pt-4 md:px-6 md:pb-28">
         <div className="ft-shell mx-auto max-w-[1400px] rounded-[2.2rem] p-2 ring-1 ring-[color:var(--color-line)] shadow-[var(--shadow-diffuse)]">
           <div className="ft-inset ft-shell-strong relative overflow-hidden rounded-[calc(2.2rem-0.5rem)] px-6 py-8 md:px-8 md:py-10 lg:px-10 lg:py-12">
@@ -616,22 +802,24 @@ export default function HomePage() {
               <Reveal>
                 <div>
                   <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                    Download and watch
+                    Get started
                   </p>
                   <h2 className="mt-5 max-w-[12ch] font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-6xl md:leading-[0.98]">
-                    Desktop today. Android testing next to it.
+                    Install the extension, then block one thing first.
                   </h2>
                   <p className="mt-5 max-w-[58ch] text-base leading-8 text-[var(--color-muted)]">
-                    Use FilterTube today on desktop browsers, follow Android
-                    phone/tablet release builds, or read the public docs while
-                    iOS, iPad, and TV stay on their own store tracks.
+                    The safest first step is small: add one keyword or channel,
+                    refresh YouTube, and confirm it works. Then build profiles,
+                    PINs, imports, or family device updates around that.
+                    Android users can also email hello@filtertube.in for MVP
+                    internal testing access.
                   </p>
                   <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                     <ActionLink external href={demoVideoHref}>
-                      Watch the current demo
+                      Watch the demo
                     </ActionLink>
                     <ActionLink external href={docsHref} variant="secondary">
-                      Read the documentation
+                      Read the docs
                     </ActionLink>
                   </div>
                   <div className="mt-4 flex flex-wrap gap-3">

@@ -2,9 +2,9 @@ export const extensionInstallHref =
   "https://chromewebstore.google.com/detail/filtertube/cjmdggnnpmpchholgnkfokibidbbnfgc";
 
 export const navigationLinks = [
-  { label: "Why", href: "/#story" },
-  { label: "Platforms", href: "/#platforms" },
-  { label: "System", href: "/#system" },
+  { label: "Start here", href: "/#story" },
+  { label: "Controls", href: "/#capabilities" },
+  { label: "Apps", href: "/#platforms" },
   { label: "Downloads", href: "/downloads" },
 ];
 

@@ -8,10 +8,10 @@ import {
 } from "@phosphor-icons/react/ssr";
 
 export const navigationLinks = [
-  { label: "Why", href: "/#story" },
-  { label: "Platforms", href: "/#platforms" },
-  { label: "System", href: "/#system" },
-  { label: "Download", href: "/#download" },
+  { label: "Start here", href: "/#story" },
+  { label: "Controls", href: "/#capabilities" },
+  { label: "Apps", href: "/#platforms" },
+  { label: "Downloads", href: "/downloads" },
 ];
 
 export const footerLinks = {

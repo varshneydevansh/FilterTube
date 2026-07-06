@@ -3,14 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { startTransition, useEffect, useState } from "react";
-import { GithubLogo, List, X } from "@phosphor-icons/react";
+import { GithubLogo, List, RedditLogo, X } from "@phosphor-icons/react";
 import { usePathname } from "next/navigation";
 
 import {
   navigationLinks,
   platformSlugs,
 } from "@/components/site-shell-data";
-import { githubHref } from "@/components/route-content";
+import { githubHref, redditHref } from "@/components/route-content";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 function NavLink({
@@ -102,6 +102,17 @@ export function SiteHeader() {
               <ThemeToggle />
             </div>
             <a
+              className="group hidden min-h-11 items-center gap-3 whitespace-nowrap rounded-[0.95rem] border border-[color:var(--color-line)] bg-[color:var(--color-tile)] px-4 py-2.5 text-sm font-medium text-[var(--color-ink)] shadow-[0_18px_38px_-32px_rgba(8,10,16,0.26)] transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 hover:border-[color:var(--color-accent)] hover:text-[var(--color-accent)] active:translate-y-px active:scale-[0.98] lg:inline-flex"
+              href={redditHref}
+              rel="noreferrer"
+              target="_blank"
+            >
+              <span>Reddit</span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-full border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)] shadow-[inset_0_1px_0_var(--color-inset-line)] transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-1 group-hover:-translate-y-px">
+                <RedditLogo aria-hidden="true" size={15} weight="fill" />
+              </span>
+            </a>
+            <a
               className="group hidden min-h-11 items-center gap-3 whitespace-nowrap rounded-[0.95rem] bg-[#222] px-4 py-2.5 text-sm font-medium text-[#fffdf9] shadow-[0_18px_38px_-28px_rgba(8,10,16,0.42)] transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 hover:bg-[#171717] active:translate-y-px active:scale-[0.98] md:inline-flex"
               href={githubHref}
               rel="noreferrer"
@@ -168,6 +179,15 @@ export function SiteHeader() {
                   />
                 </div>
               ))}
+              <a
+                className="inline-flex min-h-11 items-center justify-center gap-3 whitespace-nowrap rounded-[0.95rem] border border-[color:var(--color-line)] bg-[color:var(--color-tile)] px-5 py-3 text-sm font-medium text-[var(--color-ink)] transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:border-[color:var(--color-accent)] hover:text-[var(--color-accent)] active:translate-y-px active:scale-[0.98]"
+                href={redditHref}
+                rel="noreferrer"
+                target="_blank"
+              >
+                <RedditLogo aria-hidden="true" size={15} weight="fill" />
+                Reddit community
+              </a>
               <a
                 className="inline-flex min-h-11 items-center justify-center gap-3 whitespace-nowrap rounded-[0.95rem] bg-[#222] px-5 py-3 text-sm font-medium text-[#fffdf9] shadow-[0_18px_38px_-28px_rgba(8,10,16,0.42)] transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-[#171717] active:translate-y-px active:scale-[0.98]"
                 href={githubHref}
