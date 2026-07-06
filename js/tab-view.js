@@ -3420,7 +3420,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let lockGateEl = null;
 
-    const LOCK_ALLOWED_VIEWS = new Set(['help', 'whatsnew', 'donate']);
+    const LOCK_ALLOWED_VIEWS = new Set(['help', 'whatsnew', 'about', 'donate']);
     const CHILD_ALLOWED_VIEWS = new Set([...LOCK_ALLOWED_VIEWS, 'sync']);
     const MANAGED_TIME_LIMIT_SCHEMA = 'filtertube_managed_time_limit';
     const MANAGED_LOCAL_EDIT_POLICY_SCHEMA = 'filtertube_managed_local_edit_policy';
