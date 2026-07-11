@@ -332,6 +332,8 @@
                     const collabHandle = typeof collab.handle === 'string' ? collab.handle : null;
                     const collabName = collab.name || collabHandle || collab.id || null;
                     const collabId = typeof collab.id === 'string' ? collab.id : null;
+                    const collabCustomUrl = typeof collab.customUrl === 'string' ? collab.customUrl : null;
+                    const collabLogo = typeof collab.logo === 'string' ? collab.logo : null;
                     const collabAlternateIds = Array.from(new Set(
                         (Array.isArray(collab.alternateIds) ? collab.alternateIds : [])
                             .map(value => typeof value === 'string' && /^UC[\w-]{22}$/i.test(value.trim()) ? value.trim() : '')
@@ -343,6 +345,8 @@
                         handle: collabHandle,
                         name: collabName,
                         id: collabId,
+                        customUrl: collabCustomUrl,
+                        logo: collabLogo,
                         ...(collabAlternateIds.length > 0 ? { alternateIds: collabAlternateIds } : {})
                     };
                 })

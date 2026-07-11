@@ -2756,6 +2756,7 @@ function sanitizeCollaboratorListWithMeta(collaborators = []) {
             handle: normalizeHandleValue(collab.handle),
             id: (typeof collab.id === 'string' && /^UC[\w-]{22}$/i.test(collab.id.trim())) ? collab.id.trim() : '',
             customUrl: typeof collab.customUrl === 'string' ? collab.customUrl.trim() : '',
+            logo: typeof collab.logo === 'string' ? collab.logo.trim() : '',
             ...(alternateIds.length > 0 ? { alternateIds } : {})
         };
 
@@ -2896,6 +2897,7 @@ function mergeCollaboratorLists(primary = [], supplemental = []) {
         if (!match.handle && extra.handle) match.handle = extra.handle;
         if (!match.id && extra.id) match.id = extra.id;
         if (!match.name && extra.name) match.name = extra.name;
+        if (!match.logo && extra.logo) match.logo = extra.logo;
         match.alternateIds = Array.from(new Set([
             ...(Array.isArray(match.alternateIds) ? match.alternateIds : []),
             ...(Array.isArray(extra.alternateIds) ? extra.alternateIds : [])

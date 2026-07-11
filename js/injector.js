@@ -323,6 +323,7 @@
                 id: (typeof collab.id === 'string' && /^UC[\w-]{22}$/i.test(collab.id.trim())) ? collab.id.trim() : '',
                 handle: typeof collab.handle === 'string' ? (extractRawHandle(collab.handle) || collab.handle.trim()) : '',
                 customUrl: typeof collab.customUrl === 'string' ? collab.customUrl.trim() : '',
+                logo: typeof collab.logo === 'string' ? collab.logo.trim() : '',
                 ...(alternateIds.length > 0 ? { alternateIds } : {})
             };
             if (!normalized.name && !normalized.id && !normalized.handle && !normalized.customUrl) continue;
@@ -2160,7 +2161,13 @@
                 const endpointUrl = pickEndpointUrl(endpoint) || pickEndpointUrl(vm) || pickEndpointUrl(entry) || '';
                 const canonicalBaseUrl = endpoint?.canonicalBaseUrl || endpointUrl || '';
 
-                const collab = { name: '', id: '', handle: '', customUrl: '' };
+                const collab = {
+                    name: '',
+                    id: '',
+                    handle: '',
+                    customUrl: '',
+                    logo: extractChannelLogoFromObject(vm) || extractChannelLogoFromObject(entry)
+                };
                 const inferredId = (browseId && typeof browseId === 'string') ? browseId : '';
                 const urlId = parseBrowseIdFromUrl(canonicalBaseUrl);
                 const finalId = (inferredId && inferredId.toUpperCase().startsWith('UC')) ? inferredId : (urlId ? urlId : '');
@@ -2326,7 +2333,8 @@
                         name: title || '',
                         id: normalizeUcId(browseEndpoint?.browseId || ''),
                         handle: '',
-                        customUrl: ''
+                        customUrl: '',
+                        logo: extractChannelLogoFromObject(viewModel)
                     };
 
                     if (commandUrl) {

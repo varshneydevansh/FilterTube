@@ -458,6 +458,8 @@
                     const collabHandle = typeof collab.handle === 'string' ? collab.handle.trim() : '';
                     const collabId = typeof collab.id === 'string' ? collab.id.trim() : '';
                     const collabName = normalizeString(collab.name) || collabHandle || collabId || '';
+                    const collabCustomUrl = normalizeString(collab.customUrl);
+                    const collabLogo = normalizeString(collab.logo);
                     const collabAlternateIds = Array.from(new Set(
                         (Array.isArray(collab.alternateIds) ? collab.alternateIds : [])
                             .map(value => normalizeString(value))
@@ -469,6 +471,8 @@
                         handle: collabHandle || null,
                         name: collabName || null,
                         id: collabId || null,
+                        customUrl: collabCustomUrl,
+                        logo: collabLogo,
                         ...(collabAlternateIds.length > 0 ? { alternateIds: collabAlternateIds } : {})
                     };
                 })

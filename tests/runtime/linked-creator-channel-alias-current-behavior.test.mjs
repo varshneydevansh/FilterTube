@@ -91,7 +91,8 @@ function authoritativeRoster() {
       name: 'shakiraVEVO',
       handle: '@shakiraVEVO',
       id: 'UCGnjeahCJW1AF34HBmQTJ-Q',
-      customUrl: '/@shakiraVEVO'
+      customUrl: '/@shakiraVEVO',
+      logo: 'https://yt3.googleusercontent.com/shakira-avatar'
     },
     {
       name: 'Spotify',
@@ -129,6 +130,7 @@ test('one authoritative Shakira roster member retains both video-scoped UC ids w
     handle: '@shakiraVEVO',
     id: 'UCGnjeahCJW1AF34HBmQTJ-Q',
     customUrl: '/@shakiraVEVO',
+    logo: 'https://yt3.googleusercontent.com/shakira-avatar',
     alternateIds: ['UCYLNGLIzMhRTi6ZOLjAPSmw']
   });
   assert.equal(result[1].alternateIds, undefined);
@@ -193,6 +195,8 @@ test('bridge, persistence and imports retain linked ids as metadata rather than 
   const io = read('js/io_manager.js');
 
   assert.match(bridge, /alternateIds: Array\.isArray\(metadata\.alternateIds\) \? metadata\.alternateIds : \[\]/);
+  assert.match(bridge, /if \(!match\.logo && extra\.logo\) match\.logo = extra\.logo/);
+  assert.match(read('js/injector.js'), /logo: extractChannelLogoFromObject\(viewModel\)/);
   assert.match(background, /channelInfo\.alternateIds = incomingAlternateIds/);
   assert.match(background, /for \(const alternateId of normalizeAlternateChannelIds\(finalChannelData\.alternateIds/);
   assert.match(settings, /const alternateIds = Array\.from\(new Set\(/);

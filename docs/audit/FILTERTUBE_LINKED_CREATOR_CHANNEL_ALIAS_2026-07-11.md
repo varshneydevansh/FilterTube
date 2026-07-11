@@ -20,6 +20,11 @@ The stored model is one creator rule:
 
 This is not a third collaborator and not a second visible settings row.
 
+The authoritative roster thumbnail is retained on that same visible row. A
+missing avatar must be repaired by carrying the sheet `leadingAccessory` image
+through collaborator sanitization and persistence; it is not a reason to split
+the creator into two entries.
+
 ## Captured authority
 
 For video `_Wcf2rKEB8E`, the retained Search XHR renderer supplies:
@@ -77,6 +82,7 @@ roster size or UI labels.
 | Different creators with different labels | Separate | Still separate |
 | Generated MIX | Descriptive metadata only | Still excluded from alias and collaborator inference |
 | Stored filter | Matched one UC ID | One visible rule matches either linked UC ID |
+| Settings avatar | Sheet image could be discarded before persistence | The one creator row retains its authoritative roster thumbnail |
 
 ## CamelCase boundary
 
