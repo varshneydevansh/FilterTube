@@ -71,6 +71,9 @@ This separation is the reason we have explicit cross-world message passing (via 
 ### 2.2 Stored representations
 In storage (background-managed `filterChannels`) channel entries can contain:
 - `id`: UC ID
+- `alternateIds`: additional UC IDs that YouTube explicitly associated with the
+  same visible creator identity on one video (for example a current creator
+  channel plus a legacy VEVO channel)
 - `handle`: normalized handle used for matching
 - `customUrl`: normalized legacy URL slug
 - `handleDisplay`: UI/display handle
@@ -78,6 +81,19 @@ In storage (background-managed `filterChannels`) channel entries can contain:
 - `originalInput`: what the user actually typed or clicked
 - `filterAll`: boolean
 - collaboration metadata
+
+`alternateIds` does not create more channels in the UI. A creator with one
+primary `id` and one verified alternate remains one stored rule and one menu or
+settings row. Matching treats every ID in that rule as canonical for the rule,
+so content attributed to either linked ID receives the same block/allow
+decision.
+
+The link is evidence-gated. A second ID is retained only when the exact
+video-scoped JSON supplies both IDs and their normalized name, handle, or custom
+URL identifies exactly one creator. A collaborator sheet can provide one ID
+while that renderer's channel thumbnail supplies another; a solo renderer can
+likewise pair card, owner, and player signals. Loose name similarity, an
+ambiguous roster label, and MIX/radio participant prose are not sufficient.
 
 ### 2.3 Persistence Maps
 The system maintains two bidirectional lookup maps in local storage:
@@ -175,6 +191,18 @@ When XHR snapshots are unavailable, we fall back to:
 - `videoId` → `browseEndpoint.browseId` (UC ID)
 - `videoId` → `canonicalBaseUrl` (handle/customUrl)
 - Collaboration lists via `avatarStackViewModel`/`showDialogCommand`
+
+When one exact video exposes two corroborated UC IDs for the same visible
+creator, `injector.js` preserves the second as `alternateIds`. For a header-backed
+collaborator roster, this enrichment happens on the matching roster member and
+does not append another collaborator. For solo content, candidate merging keeps
+both IDs only when the candidate labels corroborate; otherwise the identities
+remain separate.
+
+Current camelCase YouTube Music DOM bylines such as `A and B` are only lookup
+triggers. They provide the `videoId` and expected names used to locate a retained
+XHR response. The header-backed JSON sheet and its browse endpoints remain the
+identity authority; the DOM phrase is never split and persisted as truth.
 
 ### 3.3 DOM extraction (Isolated World) – Best-effort
 

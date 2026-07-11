@@ -306,6 +306,12 @@
         const handleDisplay = typeof entry.handleDisplay === 'string' ? entry.handleDisplay : null;
         const canonicalHandle = typeof entry.canonicalHandle === 'string' ? entry.canonicalHandle : null;
         const customUrl = typeof entry.customUrl === 'string' ? entry.customUrl : null;
+        const alternateIds = Array.from(new Set(
+            (Array.isArray(entry.alternateIds) ? entry.alternateIds : [])
+                .map(value => typeof value === 'string' && /^UC[\w-]{22}$/i.test(value.trim()) ? value.trim() : '')
+                .filter(Boolean)
+                .filter(value => value.toLowerCase() !== String(id || '').toLowerCase())
+        ));
         const source = overrides.source || (typeof entry.source === 'string' ? entry.source : null);
         const filterAllCommentsCandidate = Object.prototype.hasOwnProperty.call(overrides, 'filterAllComments')
             ? overrides.filterAllComments
@@ -326,11 +332,18 @@
                     const collabHandle = typeof collab.handle === 'string' ? collab.handle : null;
                     const collabName = collab.name || collabHandle || collab.id || null;
                     const collabId = typeof collab.id === 'string' ? collab.id : null;
+                    const collabAlternateIds = Array.from(new Set(
+                        (Array.isArray(collab.alternateIds) ? collab.alternateIds : [])
+                            .map(value => typeof value === 'string' && /^UC[\w-]{22}$/i.test(value.trim()) ? value.trim() : '')
+                            .filter(Boolean)
+                            .filter(value => value.toLowerCase() !== String(collabId || '').toLowerCase())
+                    ));
                     if (!collabHandle && !collabName && !collabId) return null;
                     return {
                         handle: collabHandle,
                         name: collabName,
-                        id: collabId
+                        id: collabId,
+                        ...(collabAlternateIds.length > 0 ? { alternateIds: collabAlternateIds } : {})
                     };
                 })
                 .filter(Boolean)
@@ -351,6 +364,7 @@
             canonicalHandle,
             logo: entry.logo || null,
             customUrl,
+            ...(alternateIds.length > 0 ? { alternateIds } : {}),
             filterAll: !!entry.filterAll,
             filterAllComments,
             source,

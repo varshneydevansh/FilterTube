@@ -6217,6 +6217,7 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 expectedChannelName: message.expectedChannelName,
                 lowConfidenceExpectedName: message.lowConfidenceExpectedName === true,
                 customUrl: message.customUrl,
+                alternateIds: Array.isArray(message.alternateIds) ? message.alternateIds : [],
                 source: message.source || null
             },
             targetProfile,
@@ -6794,7 +6795,18 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             if (!trimmed || !trimmed.startsWith('@')) return '';
             return trimmed.toLowerCase();
         };
+        const normalizeAlternateChannelIds = (values, primaryId = '') => Array.from(new Set(
+            (Array.isArray(values) ? values : [])
+                .map(value => typeof value === 'string' && /^UC[\w-]{22}$/i.test(value.trim()) ? value.trim() : '')
+                .filter(Boolean)
+                .filter(value => value.toLowerCase() !== String(primaryId || '').toLowerCase())
+        ));
         const incomingIdForMatch = (typeof channelInfo.id === 'string' ? channelInfo.id.trim() : '');
+        const incomingAlternateIds = normalizeAlternateChannelIds(metadata.alternateIds, incomingIdForMatch);
+        channelInfo.alternateIds = incomingAlternateIds;
+        const incomingIdsForMatch = new Set(
+            [incomingIdForMatch, ...incomingAlternateIds].filter(Boolean).map(value => value.toLowerCase())
+        );
         const incomingHandleForMatch = normalizeHandleForMatch(
             channelInfo.handle || channelInfo.canonicalHandle || channelInfo.handleDisplay || ''
         );
@@ -6802,7 +6814,11 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             if (!ch) return false;
 
             const existingIdForMatch = (typeof ch.id === 'string' ? ch.id.trim() : '');
-            if (incomingIdForMatch && existingIdForMatch && existingIdForMatch === incomingIdForMatch) {
+            const existingIdsForMatch = [
+                existingIdForMatch,
+                ...normalizeAlternateChannelIds(ch.alternateIds, existingIdForMatch)
+            ].filter(Boolean).map(value => value.toLowerCase());
+            if (existingIdsForMatch.some(id => incomingIdsForMatch.has(id))) {
                 return true;
             }
 
@@ -6827,6 +6843,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             const sortedCollaborators = (value) => Array.isArray(value)
                 ? value.map(item => ({
                     id: typeof item?.id === 'string' ? item.id.trim() : null,
+                    alternateIds: normalizeAlternateChannelIds(item?.alternateIds, item?.id).sort(),
                     handle: typeof item?.handle === 'string' ? item.handle.trim() : null,
                     name: typeof item?.name === 'string' ? item.name.trim() : null,
                     customUrl: typeof item?.customUrl === 'string' ? item.customUrl.trim() : null
@@ -6840,6 +6857,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 name: typeof channel?.name === 'string' ? channel.name.trim() : null,
                 logo: typeof channel?.logo === 'string' ? channel.logo.trim() : null,
                 customUrl: typeof channel?.customUrl === 'string' ? channel.customUrl.trim() : null,
+                alternateIds: normalizeAlternateChannelIds(channel?.alternateIds, channel?.id).sort(),
                 filterAll: channel?.filterAll === true,
                 filterAllComments: typeof channel?.filterAllComments === 'boolean' ? channel.filterAllComments : null,
                 collaborationWith: sortedStrings(channel?.collaborationWith),
@@ -6914,6 +6932,10 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 return existingName;
             })();
 
+            const mergedAlternateIds = normalizeAlternateChannelIds(
+                [...(Array.isArray(existing.alternateIds) ? existing.alternateIds : []), ...incomingAlternateIds],
+                existing.id || channelInfo.id
+            );
             const updated = {
                 ...existing,
                 id: existing.id || channelInfo.id,
@@ -6923,6 +6945,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 name: mergedName,
                 logo: existing.logo || channelInfo.logo,
                 customUrl: existing.customUrl || customUrl,
+                ...(mergedAlternateIds.length > 0 ? { alternateIds: mergedAlternateIds } : {}),
                 topicChannel: existing.topicChannel === true || channelInfo.topicChannel === true,
                 source: existing.source || metadata.source || null,
                 originalInput: existing.originalInput || customUrl || channelInfo.handle || channelInfo.id || rawValue,
@@ -6976,6 +6999,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 collaborationGroupId: collaborationGroupId || null,
                 allCollaborators: allCollaborators,
                 customUrl: customUrl || null,
+                ...(incomingAlternateIds.length > 0 ? { alternateIds: incomingAlternateIds } : {}),
                 topicChannel: channelInfo.topicChannel === true,
                 source: metadata.source || (isKids ? 'user' : null),
                 originalInput: customUrl || channelInfo.handle || channelInfo.id || rawValue,
@@ -7026,6 +7050,13 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                     if (channelMap[keyId] !== handleToMap) {
                         channelMap[keyId] = handleToMap;
                         hasChange = true;
+                    }
+                    for (const alternateId of normalizeAlternateChannelIds(finalChannelData.alternateIds, finalChannelData.id)) {
+                        const alternateKey = alternateId.toLowerCase();
+                        if (channelMap[alternateKey] !== handleToMap) {
+                            channelMap[alternateKey] = handleToMap;
+                            hasChange = true;
+                        }
                     }
                     if (hasChange) {
                         await browserAPI.storage.local.set({ channelMap });

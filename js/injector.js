@@ -312,11 +312,18 @@
 
         for (const collab of collaborators) {
             if (!collab || typeof collab !== 'object') continue;
+            const alternateIds = Array.from(new Set(
+                (Array.isArray(collab.alternateIds) ? collab.alternateIds : [])
+                    .map(value => typeof value === 'string' && /^UC[\w-]{22}$/i.test(value.trim()) ? value.trim() : '')
+                    .filter(Boolean)
+                    .filter(id => id.toLowerCase() !== String(collab.id || '').toLowerCase())
+            ));
             const normalized = {
                 name: typeof collab.name === 'string' ? collab.name.trim() : '',
                 id: (typeof collab.id === 'string' && /^UC[\w-]{22}$/i.test(collab.id.trim())) ? collab.id.trim() : '',
                 handle: typeof collab.handle === 'string' ? (extractRawHandle(collab.handle) || collab.handle.trim()) : '',
-                customUrl: typeof collab.customUrl === 'string' ? collab.customUrl.trim() : ''
+                customUrl: typeof collab.customUrl === 'string' ? collab.customUrl.trim() : '',
+                ...(alternateIds.length > 0 ? { alternateIds } : {})
             };
             if (!normalized.name && !normalized.id && !normalized.handle && !normalized.customUrl) continue;
             if (isPlaceholderCollaboratorEntry(normalized)) continue;
@@ -350,6 +357,48 @@
         return Array.isArray(list) ? (list.__filterTubeCollaboratorSource || '') : '';
     }
 
+    function attachCardChannelAliasToCollaboratorRoster(renderer, collaborators) {
+        if (!Array.isArray(collaborators) || getCollaboratorListSource(collaborators) !== 'collaborators-sheet') {
+            return collaborators;
+        }
+        const channelRenderer =
+            renderer?.channelThumbnail?.channelThumbnailWithLinkRenderer ||
+            renderer?.channelThumbnailWithLinkRenderer ||
+            renderer?.channelThumbnailSupportedRenderers?.channelThumbnailWithLinkRenderer ||
+            null;
+        const cardId = channelRenderer?.navigationEndpoint?.browseEndpoint?.browseId || '';
+        if (!/^UC[\w-]{22}$/i.test(cardId)) return collaborators;
+
+        const rawLabel =
+            channelRenderer?.accessibility?.accessibilityData?.label ||
+            channelRenderer?.accessibilityText ||
+            '';
+        const normalizeLabel = (value) => String(value || '')
+            .replace(/^go to channel\s+/i, '')
+            .replace(/^@+/, '')
+            .replace(/\s*-\s*topic$/i, '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '');
+        const cardLabel = normalizeLabel(rawLabel);
+        if (!cardLabel) return collaborators;
+
+        const matches = collaborators.filter(collaborator => {
+            const labels = [collaborator?.name, collaborator?.handle, collaborator?.customUrl]
+                .map(normalizeLabel)
+                .filter(Boolean);
+            return labels.includes(cardLabel);
+        });
+        if (matches.length !== 1) return collaborators;
+
+        const matched = matches[0];
+        if (String(matched.id || '').toLowerCase() === cardId.toLowerCase()) return collaborators;
+        const alternateIds = Array.from(new Set([...(matched.alternateIds || []), cardId]));
+        const enriched = collaborators.map(collaborator => collaborator === matched
+            ? { ...collaborator, alternateIds }
+            : { ...collaborator });
+        return markCollaboratorListSource(sanitizeCollaboratorList(enriched), 'collaborators-sheet');
+    }
+
     function getCollaboratorListQuality(list) {
         const sanitized = sanitizeCollaboratorList(list);
         if (!Array.isArray(sanitized) || sanitized.length === 0) return 0;
@@ -359,6 +408,7 @@
             if (collaborator.name) entryScore += 1;
             if (collaborator.handle) entryScore += 3;
             if (collaborator.id) entryScore += 5;
+            if (Array.isArray(collaborator.alternateIds)) entryScore += collaborator.alternateIds.length * 2;
             return score + entryScore;
         }, 0);
     }
@@ -2379,7 +2429,7 @@
                 if (!command) continue;
 
                 const collaborators = extractFromSheetLikeCommand(command);
-                if (collaborators) return collaborators;
+                if (collaborators) return attachCardChannelAliasToCollaboratorRoster(renderer, collaborators);
             }
         }
 
@@ -2458,7 +2508,7 @@
         }
 
         const deepScanned = deepScanForShowDialog(renderer);
-        if (deepScanned) return deepScanned;
+        if (deepScanned) return attachCardChannelAliasToCollaboratorRoster(renderer, deepScanned);
 
         const ownerRuns = renderer.ownerText?.runs || bylineText?.runs;
         if (ownerRuns) {
@@ -2471,7 +2521,7 @@
                     null;
                 if (ownerCommand) {
                     const collaborators = extractFromSheetLikeCommand(ownerCommand);
-                    if (collaborators) return collaborators;
+                    if (collaborators) return attachCardChannelAliasToCollaboratorRoster(renderer, collaborators);
                 }
                 const browseEndpoint = run.navigationEndpoint?.browseEndpoint;
                 if (!browseEndpoint) continue;
@@ -2561,15 +2611,47 @@
     }
 
     function mergeChannelCandidates(...candidates) {
-        const merged = { id: null, handle: null, name: null, logo: null, customUrl: null };
+        const merged = { id: null, alternateIds: [], handle: null, name: null, logo: null, customUrl: null };
+        const normalizeIdentityLabel = (value) => String(value || '')
+            .replace(/^go to channel\s+/i, '')
+            .replace(/^@+/, '')
+            .replace(/\s*-\s*topic$/i, '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '');
+        const candidatesCorroborate = (left, right) => {
+            const leftLabels = [left?.handle, left?.name, left?.customUrl].map(normalizeIdentityLabel).filter(Boolean);
+            const rightLabels = [right?.handle, right?.name, right?.customUrl].map(normalizeIdentityLabel).filter(Boolean);
+            return leftLabels.some(label => rightLabels.includes(label));
+        };
+        let identityAnchor = null;
         for (const candidate of candidates) {
             if (!candidate || typeof candidate !== 'object') continue;
-            if (!merged.id && typeof candidate.id === 'string' && candidate.id.trim()) merged.id = candidate.id.trim();
+            const candidateId = typeof candidate.id === 'string' && /^UC[\w-]{22}$/i.test(candidate.id.trim())
+                ? candidate.id.trim()
+                : '';
+            if (!merged.id && candidateId) {
+                merged.id = candidateId;
+                identityAnchor = candidate;
+            } else if (
+                candidateId &&
+                candidateId.toLowerCase() !== String(merged.id || '').toLowerCase() &&
+                identityAnchor &&
+                candidatesCorroborate(identityAnchor, candidate)
+            ) {
+                merged.alternateIds.push(candidateId);
+            }
+            if (identityAnchor && candidatesCorroborate(identityAnchor, candidate) && Array.isArray(candidate.alternateIds)) {
+                merged.alternateIds.push(...candidate.alternateIds);
+            }
             if (!merged.handle && typeof candidate.handle === 'string' && candidate.handle.trim()) merged.handle = candidate.handle.trim();
             if (!merged.name && typeof candidate.name === 'string' && candidate.name.trim()) merged.name = candidate.name.trim();
             if (!merged.logo && typeof candidate.logo === 'string' && candidate.logo.trim()) merged.logo = candidate.logo.trim();
             if (!merged.customUrl && typeof candidate.customUrl === 'string' && candidate.customUrl.trim()) merged.customUrl = candidate.customUrl.trim();
         }
+        merged.alternateIds = Array.from(new Set(merged.alternateIds
+            .filter(value => typeof value === 'string' && /^UC[\w-]{22}$/i.test(value.trim()))
+            .map(value => value.trim())
+            .filter(value => value.toLowerCase() !== String(merged.id || '').toLowerCase())));
         const hasAny = Boolean(merged.id || merged.handle || merged.name || merged.logo || merged.customUrl);
         return hasAny ? merged : null;
     }

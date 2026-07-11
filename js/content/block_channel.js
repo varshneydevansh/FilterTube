@@ -1708,6 +1708,7 @@ function buildQuickBlockFallbackMetadata(source, context, collaborator) {
         channelName: collaborator?.name || context?.base?.name || null,
         channelLogo: collaborator?.channelLogo || collaborator?.logo || context?.base?.channelLogo || context?.base?.logo || null,
         customUrl: collaborator?.customUrl || null,
+        alternateIds: Array.isArray(collaborator?.alternateIds) ? collaborator.alternateIds : [],
         videoId: collaborator?.videoId || context?.videoId || context?.base?.videoId || null,
         source: source || 'quickBlock'
     };
@@ -1770,6 +1771,7 @@ async function runQuickBlockFallback(context, info, source = 'quickBlock') {
                         channelName: metadata.channelName,
                         channelLogo: metadata.channelLogo,
                         customUrl: metadata.customUrl,
+                        alternateIds: metadata.alternateIds,
                         videoId: metadata.videoId,
                         source: metadata.source,
                         profile: isKidsSite ? 'kids' : 'main'

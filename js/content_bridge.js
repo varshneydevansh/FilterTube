@@ -186,6 +186,13 @@ function buildChannelMetadataPayload(channelInfo = {}) {
     const display = (isHandleLike(handleDisplayCandidate) && !isProbablyNotDisplayHandle(handleDisplayCandidate))
         ? handleDisplayCandidate
         : (isHandleLike(canonical) ? canonical : '');
+    const primaryId = typeof channelInfo.id === 'string' ? channelInfo.id.trim().toLowerCase() : '';
+    const alternateIds = Array.from(new Set(
+        (Array.isArray(channelInfo.alternateIds) ? channelInfo.alternateIds : [])
+            .map(value => typeof value === 'string' && /^UC[a-zA-Z0-9_-]{22}$/.test(value.trim()) ? value.trim() : '')
+            .filter(Boolean)
+            .filter(value => value.toLowerCase() !== primaryId)
+    ));
     return {
         canonicalHandle: canonical || null,
         handleDisplay: display || null,
@@ -196,6 +203,7 @@ function buildChannelMetadataPayload(channelInfo = {}) {
         expectedChannelName: typeof channelInfo.expectedChannelName === 'string' ? channelInfo.expectedChannelName.trim() || null : null,
         lowConfidenceExpectedName: isLowConfidenceExpectedChannelLabel(channelInfo) === true,
         customUrl: channelInfo.customUrl || null,  // c/Name or user/Name for legacy channels
+        alternateIds,
         source: channelInfo.source || null
     };
 }
@@ -2320,6 +2328,11 @@ const dropdownCleanupTimers = new WeakMap();
 function findStoredChannelEntry(channelInfo) {
     if (!channelInfo || !currentSettings?.filterChannels) return null;
     const channels = currentSettings.filterChannels;
+    const sharedChannelMatchesFilter = window.FilterTubeIdentity?.channelMatchesFilter;
+    if (typeof sharedChannelMatchesFilter === 'function') {
+        const channelMap = currentSettings?.channelMap || {};
+        return channels.find(entry => entry && sharedChannelMatchesFilter(channelInfo, entry, channelMap)) || null;
+    }
     const handle = channelInfo.handle?.toLowerCase();
     const id = channelInfo.id?.toLowerCase();
     for (const entry of channels) {
@@ -2732,11 +2745,18 @@ function sanitizeCollaboratorListWithMeta(collaborators = []) {
 
     collaborators.forEach(collab => {
         if (!collab || typeof collab !== 'object') return;
+        const alternateIds = Array.from(new Set(
+            (Array.isArray(collab.alternateIds) ? collab.alternateIds : [])
+                .map(value => typeof value === 'string' && /^UC[\w-]{22}$/i.test(value.trim()) ? value.trim() : '')
+                .filter(Boolean)
+                .filter(id => id.toLowerCase() !== String(collab.id || '').toLowerCase())
+        ));
         const normalized = {
             name: (collab.name || '').trim(),
             handle: normalizeHandleValue(collab.handle),
             id: (typeof collab.id === 'string' && /^UC[\w-]{22}$/i.test(collab.id.trim())) ? collab.id.trim() : '',
-            customUrl: typeof collab.customUrl === 'string' ? collab.customUrl.trim() : ''
+            customUrl: typeof collab.customUrl === 'string' ? collab.customUrl.trim() : '',
+            ...(alternateIds.length > 0 ? { alternateIds } : {})
         };
 
         if (!normalized.name && !normalized.handle && !normalized.id && !normalized.customUrl) return;
@@ -2876,6 +2896,10 @@ function mergeCollaboratorLists(primary = [], supplemental = []) {
         if (!match.handle && extra.handle) match.handle = extra.handle;
         if (!match.id && extra.id) match.id = extra.id;
         if (!match.name && extra.name) match.name = extra.name;
+        match.alternateIds = Array.from(new Set([
+            ...(Array.isArray(match.alternateIds) ? match.alternateIds : []),
+            ...(Array.isArray(extra.alternateIds) ? extra.alternateIds : [])
+        ])).filter(id => id && String(id).toLowerCase() !== String(match.id || '').toLowerCase());
     });
 
     return sanitizeCollaboratorList(baseList);
@@ -13946,6 +13970,7 @@ async function addChannelDirectly(input, filterAll = false, collaborationWith = 
                 lowConfidenceExpectedName: metadata.lowConfidenceExpectedName === true,
                 profile,
                 customUrl: metadata.customUrl || null,  // c/Name or user/Name for legacy channels
+                alternateIds: Array.isArray(metadata.alternateIds) ? metadata.alternateIds : [],
                 source: metadata.source || null
             }, (response) => {
                 resolve(response || { success: false, error: 'No response from background' });

@@ -389,6 +389,11 @@
             }
         }
 
+        merged.alternateIds = Array.from(new Set([
+            ...(Array.isArray(existing.alternateIds) ? existing.alternateIds : []),
+            ...(Array.isArray(incoming.alternateIds) ? incoming.alternateIds : [])
+        ].filter(value => typeof value === 'string' && /^UC[\w-]{22}$/i.test(value.trim()))));
+
         return merged;
     }
 
@@ -422,6 +427,12 @@
         const handle = normalizeString(entry.handle);
         const customUrl = normalizeString(entry.customUrl);
         const name = normalizeString(entry.name);
+        const alternateIds = Array.from(new Set(
+            (Array.isArray(entry.alternateIds) ? entry.alternateIds : [])
+                .map(value => normalizeString(value))
+                .filter(value => /^UC[\w-]{22}$/i.test(value))
+                .filter(value => value.toLowerCase() !== String(id || '').toLowerCase())
+        ));
         const originalInput = normalizeString(entry.originalInput) || id || handle || customUrl || name || null;
         const source = overrides.source || (typeof entry.source === 'string' ? entry.source : 'import');
 
@@ -447,11 +458,18 @@
                     const collabHandle = typeof collab.handle === 'string' ? collab.handle.trim() : '';
                     const collabId = typeof collab.id === 'string' ? collab.id.trim() : '';
                     const collabName = normalizeString(collab.name) || collabHandle || collabId || '';
+                    const collabAlternateIds = Array.from(new Set(
+                        (Array.isArray(collab.alternateIds) ? collab.alternateIds : [])
+                            .map(value => normalizeString(value))
+                            .filter(value => /^UC[\w-]{22}$/i.test(value))
+                            .filter(value => value.toLowerCase() !== collabId.toLowerCase())
+                    ));
                     if (!collabHandle && !collabId && !collabName) return null;
                     return {
                         handle: collabHandle || null,
                         name: collabName || null,
-                        id: collabId || null
+                        id: collabId || null,
+                        ...(collabAlternateIds.length > 0 ? { alternateIds: collabAlternateIds } : {})
                     };
                 })
                 .filter(Boolean)
@@ -472,6 +490,7 @@
             canonicalHandle: normalizeString(entry.canonicalHandle) || (handle || null),
             logo: normalizeString(entry.logo) || null,
             customUrl: customUrl || null,
+            ...(alternateIds.length > 0 ? { alternateIds } : {}),
             filterAll: !!entry.filterAll,
             filterAllComments,
             source,

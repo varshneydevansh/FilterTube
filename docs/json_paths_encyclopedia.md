@@ -219,9 +219,21 @@ THE JSON STRUCTURE CAN BE FIND IN @collab.json file
 
 **Interpretation rule**:
 - Row `0` means “first roster entry,” not “uploader.” The sheet does not include an `uploader`, `owner`, or `primaryChannelId` field.
-- Preserve the current creator channel (`UCYLNGLIzMhRTi6ZOLjAPSmw` / `@shakira`) separately from the VEVO channel (`UCGnjeahCJW1AF34HBmQTJ-Q` / `@shakiraVEVO`). The card accessibility label alone must not collapse those IDs.
-- If the card-channel label matches exactly one normalized roster member, attach that creator-channel ID as an alternate matching alias of the existing member. Never render it as an additional collaborator row.
+- Preserve the current creator channel (`UCYLNGLIzMhRTi6ZOLjAPSmw` / `@shakira`) and the VEVO channel (`UCGnjeahCJW1AF34HBmQTJ-Q` / `@shakiraVEVO`) as two UC-ID aliases on one visible creator rule. Do not overwrite either ID.
+- The accessibility label is not global proof that two arbitrary channels are equivalent. Here the exact video-scoped renderer supplies both the header-backed roster and the card channel, and `Go to channel shakiraVEVO` matches exactly one normalized roster member. That bounded association is sufficient to attach the card ID to the existing Shakira member as `alternateIds`.
+- Blocking that one Shakira member must match content attributed to either linked UC ID. Persist one channel rule and one visible settings/menu row; never render the alternate ID as an additional collaborator.
+- If the label matches zero or multiple roster members, retain no alias relationship. Do not infer one from similar names.
 - Spotify remains an independent collaborator/company channel. Its presence does not turn the Mix byline into a collaborator roster.
+
+**SOLO video rule**:
+- The same mismatch can occur without a collaborator sheet: a search/watch card can route to the current creator channel while player/owner metadata names a legacy VEVO channel for the same `videoId`.
+- Merge the two UC IDs only when the exact video's card/owner/player candidates share an exact normalized handle, name, or custom URL. Store the later corroborated ID in `alternateIds` on the one creator identity.
+- If the labels disagree, keep the first resolved identity and do not manufacture an alias. A later authoritative payload may promote it in place.
+
+**Why camelCase is mentioned**:
+- CamelCase selectors are only needed because current YTM Search DOM uses elements such as `ytm-video-with-context-renderer` and `.YtmBadgeAndBylineRendererItemByline`.
+- The DOM byline `Shakira and Spotify` is a lookup hint for `_Wcf2rKEB8E`; it is not collaborator or alias truth.
+- The retained `/youtubei/v1/search` JSON, its header-backed `Collaborators` sheet, and its exact browse endpoints are the authority. The adjacent `compactRadioRenderer` remains MIX metadata and is excluded.
 
 **Reduced identity excerpt** (the complete renderer is in ignored local fixture `collab.json`):
 

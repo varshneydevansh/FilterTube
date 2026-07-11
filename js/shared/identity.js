@@ -127,6 +127,23 @@
         return directMatch[1].toLowerCase();
     }
 
+    function collectChannelUcIds(value) {
+        if (!value || typeof value !== 'object') return [];
+        const ids = [];
+        const seen = new Set();
+        const add = (candidate) => {
+            const normalized = normalizeUcIdForComparison(candidate);
+            if (!normalized || seen.has(normalized)) return;
+            seen.add(normalized);
+            ids.push(normalized);
+        };
+        add(value.id);
+        if (Array.isArray(value.alternateIds)) {
+            value.alternateIds.forEach(add);
+        }
+        return ids;
+    }
+
     /**
      * Returns true if `value` contains a valid YouTube UC channel id.
      */
@@ -342,6 +359,7 @@
                     normalizeCustomUrlForComparison(entry.originalInput || '')
                 );
                 addId(entry.id);
+                if (Array.isArray(entry.alternateIds)) entry.alternateIds.forEach(addId);
                 addId(entry.originalInput);
 
                 addHandle(entry.handle);
@@ -373,8 +391,9 @@
         if (!meta || !index) return false;
         const lookupChannelMap = getChannelMapLookup(channelMap);
 
-        const metaId = normalizeUcIdForComparison(meta.id || '');
-        if (metaId && index.ids?.has(metaId)) return true;
+        const metaIds = collectChannelUcIds(meta);
+        const metaId = metaIds[0] || '';
+        if (metaIds.some(id => index.ids?.has(id))) return true;
 
         const metaHandles = collectHandleVariants(meta);
         for (const metaHandle of metaHandles) {
@@ -399,8 +418,8 @@
             return true;
         }
 
-        if (metaId) {
-            const mappedHandle = normalizeHandleForComparison(lookupChannelMap(metaId));
+        for (const candidateId of metaIds) {
+            const mappedHandle = normalizeHandleForComparison(lookupChannelMap(candidateId));
             if (mappedHandle && index.handles?.has(mappedHandle)) return true;
         }
 
@@ -424,21 +443,23 @@
     function channelMatchesFilter(meta, filterChannel, channelMap = {}) {
         if (!filterChannel) return false;
 
-        const metaId = normalizeUcIdForComparison(meta?.id);
+        const metaIds = collectChannelUcIds(meta);
+        const metaId = metaIds[0] || '';
         const metaName = normalizeChannelNameForComparison(meta?.name);
         const metaHandles = collectHandleVariants(meta);
         const metaCustomUrl = normalizeCustomUrlForComparison(meta?.customUrl);
         const lookupChannelMap = getChannelMapLookup(channelMap);
 
         if (typeof filterChannel === 'object') {
-            const filterId = normalizeUcIdForComparison(filterChannel.id || '');
+            const filterIds = collectChannelUcIds(filterChannel);
+            const filterId = filterIds[0] || '';
             const filterName = normalizeChannelNameForComparison(filterChannel.name || '');
             const filterHandles = collectHandleVariants(filterChannel);
             const filterCustomUrl = normalizeCustomUrlForComparison(filterChannel.customUrl);
 
             if (!filterId && !filterName && filterHandles.length === 0 && !filterCustomUrl) return false;
 
-            if (filterId && metaId && filterId === metaId) {
+            if (filterIds.some(id => metaIds.includes(id))) {
                 return true;
             }
 
@@ -468,8 +489,8 @@
                 }
             }
 
-            if (filterId && metaHandles.length > 0) {
-                const mappedHandle = lookupChannelMap(filterId);
+            if (filterIds.length > 0 && metaHandles.length > 0) {
+                const mappedHandle = filterIds.map(lookupChannelMap).find(Boolean) || '';
                 const normalizedMappedHandle = normalizeHandleForComparison(mappedHandle);
                 if (normalizedMappedHandle) {
                     for (const mh of metaHandles) {
@@ -478,11 +499,11 @@
                 }
             }
 
-            if (metaId && filterHandles.length > 0) {
+            if (metaIds.length > 0 && filterHandles.length > 0) {
                 for (const fh of filterHandles) {
                     const mappedId = lookupChannelMap(fh);
                     const normalizedMappedId = normalizeUcIdForComparison(mappedId);
-                    if (normalizedMappedId && normalizedMappedId === metaId) {
+                    if (normalizedMappedId && metaIds.includes(normalizedMappedId)) {
                         return true;
                     }
                 }
@@ -787,6 +808,7 @@
         normalizeCustomUrlForComparison,
         isUcId,
         canonicalizeChannelInput,
+        collectChannelUcIds,
         buildChannelFilterIndex,
         channelMetaMatchesIndex,
         channelMatchesFilter,
