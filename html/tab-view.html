@@ -498,7 +498,7 @@
                                                         <button id="ftImportV3Btn" class="btn-secondary btn-import" type="button" title="Import a full FilterTube backup JSON. Use Rule list imports for channel/keyword-only JSON.">
                                                             Choose JSON
                                                         </button>
-                                                        <button id="ftImportSyncDeviceBtn" class="btn-secondary" type="button" title="Open Accounts &amp; Sync > Family Device Updates to pair a verified device or send reviewed profile updates.">
+                                                        <button id="ftImportSyncDeviceBtn" class="btn-secondary" type="button" title="Open Accounts &amp; Sync > Family Devices to pair a verified device or send reviewed profile updates.">
                                                             Device Updates
                                                         </button>
                                                     </div>
@@ -889,9 +889,9 @@
                     <div class="view-shell view-shell--settings sync-shell">
                         <section class="view-hero settings-hero sync-hero">
                             <div class="view-hero__copy">
-                                <p class="view-hero__eyebrow">Profiles, PINs, and family devices</p>
-                                <h2 class="view-hero__title">Set who can watch what, then send changes to another device.</h2>
-                                <p class="view-hero__body">Create protected profiles, choose Main or Kids access, set daily time, and update a verified device without giving away the parent PIN.</p>
+                                <p class="view-hero__eyebrow">Profiles, PINs, and device sync</p>
+                                <h2 class="view-hero__title">Sync your devices or manage family access.</h2>
+                                <p class="view-hero__body">Copy the profile open here to your own device, or create protected profiles with Main/Kids access, daily time, and parent-approved updates.</p>
                             </div>
                             <div class="view-hero__meta">
                                 <span class="view-meta-pill">Profiles</span>
@@ -957,18 +957,85 @@
 
                         <div id="familyDeviceUpdatesCard" class="card settings-card settings-card--featured nanah-sync-card" tabindex="-1">
                             <div class="card-header">
-                                <h3>Family Device Updates</h3>
+                                <h3>My Devices &amp; Family</h3>
                             </div>
                             <div class="card-body settings-card__body">
                                 <div class="nanah-sync-shell">
                                     <div class="nanah-sync-intro">
                                         <div class="nanah-sync-intro__copy">
-                                            <span class="nanah-sync-intro__eyebrow">Family device updates</span>
-                                            <p class="nanah-sync-intro__title">Update a protected device.</p>
-                                            <p class="nanah-sync-intro__body">Most families only need two steps: create a protected profile, then start Send Update while both devices are open. Pickup options are optional and stay under Advanced.</p>
-                                            <div class="nanah-sync-intro__actions" aria-label="Family device update quick actions">
-                                                <button id="ftNanahQuickCreateProtectedBtn" class="btn-secondary" type="button" data-filtertube-help="Create a protected child/user profile first. Parents can edit its rules later without opening YouTube as that child.">Create Protected Profile</button>
-                                                <button id="ftNanahQuickSendUpdateBtn" class="btn-primary" type="button" data-filtertube-help="Start the parent-approved device update flow. Use this when both devices are open together.">Start Send Update</button>
+                                            <span class="nanah-sync-intro__eyebrow">Device sync and family control</span>
+                                            <p class="nanah-sync-intro__title">Choose what you want to move.</p>
+                                            <p class="nanah-sync-intro__body">Copy the profile open here to your own device without creating a PIN. Create a protected profile only when you want parent-managed rules, time, or Main/Kids access.</p>
+                                            <div class="nanah-sync-intro__actions" aria-label="Personal device sync and family control actions">
+                                                <button id="ftNanahQuickSyncDevicesBtn" class="btn-primary" type="button" data-filtertube-help="Copy the profile currently open to your own second device. No protected profile or PIN is required. Switch profiles first if you want to copy a different profile.">Sync My Devices</button>
+                                                <button id="ftNanahQuickCreateProtectedBtn" class="btn-secondary" type="button" data-filtertube-help="Create a protected child/user profile only when you want parent-managed rules, time limits, or viewing access.">Set Up Family Control</button>
+                                                <button id="ftNanahQuickSendUpdateBtn" class="btn-secondary" type="button" data-filtertube-help="Send parent-approved rules, time, and viewing access to an existing protected profile. Use this when both devices are open together.">Send Protected Update</button>
+                                            </div>
+                                        </div>
+                                        <div class="nanah-device-compass-stage" aria-label="Choose how this parent device reaches another device">
+                                            <div class="nanah-device-compass-stage__heading">
+                                                <span id="ftNanahMapEyebrow">Family device map</span>
+                                                <strong id="ftNanahMapTitle">Choose how to reach the protected device</strong>
+                                                <small id="ftNanahMapDetail">Tap a path. FilterTube will show the next safe step and what it will not do.</small>
+                                            </div>
+                                            <div class="nanah-device-compass-stage__steps" aria-label="Family device safety path">
+                                                <span><strong>Find</strong><small>Choose path</small></span>
+                                                <span><strong>Pair</strong><small>Code or QR</small></span>
+                                                <span><strong>Trust</strong><small>Match phrase</small></span>
+                                                <span><strong>Send</strong><small>Reviewed update</small></span>
+                                            </div>
+                                            <div class="nanah-device-compass-stage__plain-rule">
+                                                <strong id="ftNanahMapRuleTitle">Open now is the normal setup.</strong>
+                                                <span id="ftNanahMapRuleDetail">Same-place and open-later delivery only work after the protected device is already paired and trusted.</span>
+                                            </div>
+                                            <div class="nanah-device-compass" aria-label="Family Devices map for pairing and verified updates">
+                                                <div class="nanah-device-compass__center" data-filtertube-help="The parent device chooses the rules, time limits, and Main/Kids access. The protected device only receives approved updates.">
+                                                    <div class="nanah-device-compass__hub-mark" aria-hidden="true"><i></i></div>
+                                                    <span id="ftNanahMapCenterEyebrow">Parent device</span>
+                                                    <strong id="ftNanahMapCenterTitle">Controls stay here</strong>
+                                                    <small id="ftNanahMapCenterDetail">Pick rules, time, and Main/Kids access.</small>
+                                                </div>
+                                                <div class="nanah-device-compass__grid">
+                                                    <button id="ftNanahCompassLiveBtn" class="nanah-device-compass__choice" type="button" data-filtertube-help="Best default. Keep both devices open, pair with the code or QR, verify the phrase, then send the update.">
+                                                        <div class="nanah-device-compass__device" aria-hidden="true"><i></i></div>
+                                                        <span>Start here</span>
+                                                        <strong>Open now</strong>
+                                                        <small>Use code or QR while both devices are open.</small>
+                                                    </button>
+                                                    <button id="ftNanahCompassHomeBtn" class="nanah-device-compass__choice" type="button" data-filtertube-help="Optional advanced path for a trusted home, school, or clinic pickup service. Wi-Fi discovery alone never grants control.">
+                                                        <div class="nanah-device-compass__device" aria-hidden="true"><i></i></div>
+                                                        <span>Same place</span>
+                                                        <strong>Home or school</strong>
+                                                        <small>Only after the device is paired and trusted.</small>
+                                                    </button>
+                                                    <button id="ftNanahCompassLaterBtn" class="nanah-device-compass__choice" type="button" data-filtertube-help="Optional advanced path for a verified device that opens later or is away. The device still validates signed parent updates locally.">
+                                                        <div class="nanah-device-compass__device" aria-hidden="true"><i></i></div>
+                                                        <span>Away or later</span>
+                                                        <strong>Open later</strong>
+                                                        <small>For a verified device that checks in later.</small>
+                                                    </button>
+                                                </div>
+                                                <div id="ftNanahTrustedDeviceStrip" class="nanah-device-compass__trusted-strip" aria-label="Saved trusted devices" hidden></div>
+                                                <div id="ftNanahHomeBridgePresenceRow" class="nanah-device-compass__presence-row" aria-live="polite" hidden></div>
+                                                <div id="ftNanahDeviceCompassRule" class="nanah-device-compass__rule">Finding a device is not permission. A device can receive updates only after pairing and phrase verification.</div>
+                                                <div id="ftNanahDeviceSelectionPreview" class="nanah-device-compass__selection-preview" aria-live="polite">
+                                                    <span>Next step</span>
+                                                    <strong>Create a protected profile</strong>
+                                                    <small>After that, pair the protected device and send reviewed rules.</small>
+                                                    <div class="nanah-device-compass__selection-buttons">
+                                                        <button id="ftNanahDeviceSelectionActionBtn" class="btn-secondary nanah-device-compass__selection-button" type="button" hidden>Continue</button>
+                                                    </div>
+                                                </div>
+                                                <div class="nanah-device-compass__evidence-row" aria-label="Family Devices evidence tools">
+                                                    <div>
+                                                        <span>Need support?</span>
+                                                        <small>Share a redacted Family Devices snapshot without rules, PINs, profile IDs, or device names.</small>
+                                                    </div>
+                                                    <div class="nanah-device-compass__evidence-actions">
+                                                        <button id="ftNanahCopyMapEvidenceBtn" class="btn-secondary nanah-device-compass__evidence-button" type="button" data-filtertube-help="Copies a redacted Family Devices map snapshot for a bug report or manual check. It does not include device names, profile IDs, rules, PINs, or update payloads.">Copy evidence</button>
+                                                        <button id="ftNanahDownloadMapEvidenceBtn" class="btn-secondary nanah-device-compass__evidence-button" type="button" data-filtertube-help="Downloads the same redacted Family Devices evidence JSON. Use this when clipboard access is blocked or you want to attach a file to an audit row.">Download evidence</button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="nanah-parent-edit-model" aria-label="How parent editing reaches a protected device">
@@ -985,37 +1052,8 @@
                                             <article>
                                                 <span>3</span>
                                                 <strong>Deliver when ready</strong>
-                                                <small>Send now when both devices are open, or let Pickup deliver the signed update when the verified device opens later.</small>
+                                                <small>Send now when both devices are open, or let the verified device pick up the signed update later.</small>
                                             </article>
-                                        </div>
-                                        <div class="nanah-device-compass" aria-label="Family device map for Send Update, Home Pickup, and Internet Pickup devices">
-                                            <div class="nanah-device-compass__center" data-filtertube-help="The parent device chooses the rules, time limits, and Main/Kids access. The protected device only receives approved updates.">
-                                                <div class="nanah-device-compass__hub-mark" aria-hidden="true"><i></i></div>
-                                                <span>Parent device</span>
-                                                <strong>Controls stay here</strong>
-                                                <small>Choose rules, time, and Main/Kids access.</small>
-                                            </div>
-                                            <div class="nanah-device-compass__grid">
-                                                <button id="ftNanahCompassLiveBtn" class="nanah-device-compass__choice" type="button" data-filtertube-help="Best default. Keep both devices open, pair with the code or QR, verify the phrase, then send the update.">
-                                                    <div class="nanah-device-compass__device" aria-hidden="true"><i></i></div>
-                                                    <span>Live now</span>
-                                                    <strong>Send Update</strong>
-                                                    <small>Best default for most families.</small>
-                                                </button>
-                                                <button id="ftNanahCompassHomeBtn" class="nanah-device-compass__choice" type="button" data-filtertube-help="Optional advanced path for a trusted home, school, or clinic pickup service. Wi-Fi discovery alone never grants control.">
-                                                    <div class="nanah-device-compass__device" aria-hidden="true"><i></i></div>
-                                                    <span>Same network</span>
-                                                    <strong>Home Pickup</strong>
-                                                    <small>Optional setup for a home or school pickup service.</small>
-                                                </button>
-                                                <button id="ftNanahCompassLaterBtn" class="nanah-device-compass__choice" type="button" data-filtertube-help="Optional advanced path for a verified device that opens later or is away. The device still validates signed parent updates locally.">
-                                                    <div class="nanah-device-compass__device" aria-hidden="true"><i></i></div>
-                                                    <span>Away / internet</span>
-                                                    <strong>Internet Pickup</strong>
-                                                    <small>Optional setup for devices that open later.</small>
-                                                </button>
-                                            </div>
-                                            <div class="nanah-device-compass__rule">Use Send Update first. Pickup paths are only for verified devices that need to collect a signed update later.</div>
                                         </div>
                                         <div class="nanah-sync-simple-path" aria-label="Family device update path">
                                             <article class="nanah-sync-simple-path__item">
@@ -1100,15 +1138,23 @@
                                         <span id="ftNanahChildBannerBody"></span>
                                     </div>
 
+                                    <details id="ftNanahPairingDetails" class="nanah-pairing-details">
+                                        <summary class="nanah-pairing-details__summary" data-filtertube-help="Open this when you are ready to pair a device, type a code, scan a QR, send the reviewed update, or inspect trusted-device details.">
+                                            <span>
+                                                <strong>Pairing details</strong>
+                                                <small>Open only when you are pairing, sending, or checking a trusted device.</small>
+                                            </span>
+                                            <code>Open controls</code>
+                                        </summary>
                                     <div class="nanah-sync-grid nanah-sync-grid--featured">
                                         <div class="nanah-sync-panel nanah-sync-panel--setup">
                                             <div class="nanah-sync-panel__header">
                                                 <div>
                                                     <span class="nanah-sync-panel__eyebrow" data-filtertube-help="Choose what kind of update you want to send: family controls, this profile once, or a full account move.">Profile update</span>
-                                                    <h4 class="nanah-sync-panel__title" data-filtertube-help="Start with Family control unless you are copying your own profile or moving a full account.">Choose the update</h4>
-                                                    <p class="nanah-sync-panel__body" data-filtertube-help="Most parents do not need More options. FilterTube chooses the safer family-control defaults for protected devices.">Start with Family control. Most families can leave More options closed.</p>
+                                                    <h4 id="ftNanahSetupTitle" class="nanah-sync-panel__title" data-filtertube-help="Choose whether to copy this profile, manage a protected profile, or move a full account.">Choose the update</h4>
+                                                    <p id="ftNanahSetupBody" class="nanah-sync-panel__body" data-filtertube-help="The wording and controls below follow the update type you select.">Choose the option that matches what you are doing.</p>
                                                 </div>
-                                                <span class="nanah-sync-panel__badge" data-filtertube-help="Parent-reviewed means the sending side chooses what applies. Files and pickup services do not decide policy by themselves.">Parent reviewed</span>
+                                                <span id="ftNanahSetupBadge" class="nanah-sync-panel__badge" data-filtertube-help="The sending device chooses what is offered. Nothing applies before pairing and phrase verification.">Review first</span>
                                             </div>
 
                                             <div class="nanah-sync-panel__content nanah-sync-panel__content--setup">
@@ -1139,7 +1185,8 @@
                                                         <p id="ftNanahModeBody" class="nanah-sync-mode-spotlight__body">Use this to send parent-approved rules, time limits, and viewing access to a protected profile or family device.</p>
                                                         <ol id="ftNanahModeSteps" class="nanah-sync-guide__list">
                                                             <li>Choose or create the protected profile you manage.</li>
-                                                            <li>Connect to the other device and confirm the safety phrase.</li>
+                                                            <li>Open FilterTube on the other device, then use the code or QR.</li>
+                                                            <li>Match the safety phrase before sending anything.</li>
                                                             <li>Send update. Save parent trust only for devices that should keep receiving approved updates.</li>
                                                         </ol>
                                                     </div>
@@ -1149,8 +1196,8 @@
                                                             <span>This device name</span>
                                                             <input id="ftNanahDeviceLabel" class="text-input" type="text" placeholder="My laptop" />
                                                         </label>
-                                                        <label class="nanah-sync-field" id="ftNanahRemoteTargetField" data-filtertube-help="Choose the protected profile on the other device. If left blank, the update follows the profile currently open there.">
-                                                            <span>Profile to update</span>
+                                                        <label class="nanah-sync-field" id="ftNanahRemoteTargetField" data-filtertube-help="Choose where this update should land. If left blank, it follows the profile currently open on the other device.">
+                                                            <span id="ftNanahRemoteTargetLabel">Profile to update</span>
                                                             <select id="ftNanahRemoteTarget" class="select-input">
                                                                 <option value="">Use the profile open there</option>
                                                             </select>
@@ -1229,7 +1276,7 @@
                                                                 <span class="nanah-sync-status__eyebrow" data-filtertube-help="Shows whether this device is idle, hosting, joining, connected, verified, or ready to send.">Session state</span>
                                                                 <strong class="nanah-sync-status__stage" id="ftNanahStage">Idle</strong>
                                                             </div>
-                                                            <div class="nanah-sync-status__signal" data-filtertube-help="Both devices must show the same safety phrase before anything is trusted.">Secure handshake</div>
+                                                            <div id="ftNanahStatusSignal" class="nanah-sync-status__signal" data-filtertube-help="Both devices must show the same safety phrase before anything is trusted.">Secure handshake</div>
                                                         </div>
                                                         <div class="nanah-sync-status__row">
                                                             <span class="nanah-sync-status__label">This profile + device</span>
@@ -1253,6 +1300,11 @@
                                                         </div>
                                                         <div class="nanah-sync-status__hint" id="ftNanahStatusHint">
                                                             Start pairing on one device, then join from the other device using the same short code.
+                                                        </div>
+                                                        <div class="nanah-sync-status__intent" id="ftNanahSelectedIntent" hidden>
+                                                            <span>Selected intent</span>
+                                                            <strong>Pairing still needs code or QR</strong>
+                                                            <small>Nothing is trusted until both devices show the same safety phrase.</small>
                                                         </div>
                                                         <div class="nanah-sync-status__hint" id="ftNanahTargetHint">
                                                             Updates write into the receiver's active profile by default, or a fixed protected profile if one was chosen. Saved links remember trust and allowed policy. They are not a live connection, but Pickup can let a verified device collect a signed parent update when it opens later.
@@ -1305,8 +1357,8 @@
 
                                             <div class="nanah-sync-trusted">
                                                 <div class="nanah-sync-trusted__header">
-                                                    <div class="help-item-title" data-filtertube-help="Trusted devices are saved parent/protected-device links. They remember allowed update scope and target profile.">Trusted devices</div>
-                                                    <div class="nanah-sync-note" data-filtertube-help="Saved links are not a live connection. Pickup can let a verified protected device collect a signed parent update later.">Saved links remember which parent can send which profile update. They are not a live connection, but Pickup can let a verified protected device collect a signed parent update when it opens later.</div>
+                                                    <div id="ftNanahTrustedTitle" class="help-item-title" data-filtertube-help="Trusted devices remember a verified relationship so future sends are easier.">Trusted devices</div>
+                                                    <div id="ftNanahTrustedNote" class="nanah-sync-note" data-filtertube-help="Saved trust is not a live connection and never skips local validation.">Saved links remember verified devices. They are not a live connection.</div>
                                                 </div>
                                                 <div id="ftNanahTrustedLinks" class="nanah-trusted-links">
                                                     <div class="nanah-trusted-links__empty">No trusted devices yet.</div>
@@ -1314,6 +1366,7 @@
                                             </div>
                                         </div>
                                     </div>
+                                    </details>
                                 </div>
                             </div>
                         </div>
@@ -1387,6 +1440,45 @@
                                     <strong>Send updates only after rules look right</strong>
                                     <p>Use Send Update when both devices are open. Use Pickup only if the other verified device must collect the update later.</p>
                                 </article>
+                            </div>
+                        </div>
+
+                        <div class="card help-family-devices-card">
+                            <div class="card-header">
+                                <h3>Control Another Device In Plain Words</h3>
+                            </div>
+                            <div class="card-body">
+                                <p class="help-family-devices-card__intro"><strong>Your own device:</strong> choose <strong>Sync My Devices</strong> to copy the profile currently open. No protected profile or PIN is required. Switch profiles first when you want to copy a different independent profile.</p>
+                                <p class="help-family-devices-card__intro"><strong>Choose a device:</strong> code or QR works from the same room or across the internet while both devices are open. For a nearby picker, run the optional FilterTube helper on both computers, then use <strong>Find nearby</strong> and <strong>Let this device appear</strong>.</p>
+                                <p class="help-family-devices-card__intro"><strong>Family control:</strong> use the steps below when a child, family member, or protected device should receive rules managed from the parent side.</p>
+                                <div class="help-family-devices-steps" aria-label="Family device control steps">
+                                    <article>
+                                        <span>1</span>
+                                        <strong>Make a protected profile</strong>
+                                        <p>Set its Main/Kids access, blocked words, blocked channels, whitelist rules, and time limit here first.</p>
+                                    </article>
+                                    <article>
+                                        <span>2</span>
+                                        <strong>Pair once with code or QR</strong>
+                                        <p>Both devices must show the same safety phrase. Being nearby or on the same network is not enough.</p>
+                                    </article>
+                                    <article>
+                                        <span>3</span>
+                                        <strong>Send update</strong>
+                                        <p>Use Send Update while both devices are open. The protected device checks the saved parent link before applying anything.</p>
+                                    </article>
+                                    <article>
+                                        <span>4</span>
+                                        <strong>Pickup later is optional</strong>
+                                        <p>Same-network or away pickup only helps a verified device collect a signed update later. It does not grant control by itself.</p>
+                                    </article>
+                                </div>
+                                <div class="help-family-devices-notes" aria-label="Family device safety notes">
+                                    <div><strong>Parent or Master PIN</strong><span>Unlocks rules, time limits, trusted devices, backups, and profile policy.</span></div>
+                                    <div><strong>Child profile PIN</strong><span>Only protects switching into that profile, so siblings or other users cannot casually open it.</span></div>
+                                    <div><strong>Nearby vs verified</strong><span>Nearby means reachable. Verified means this device is allowed to receive signed parent updates.</span></div>
+                                    <div><strong>Nearby helper</strong><span>Shows opted-in FilterTube devices on the same network. It never sends rules or creates trust; pairing still needs the matching safety phrase.</span></div>
+                                </div>
                             </div>
                         </div>
 
@@ -1806,10 +1898,23 @@
                                         </div>
                                         <div class="help-flow-card__note">The child/profile PIN is only a switching guard for that profile. It helps stop siblings or any other user from opening it, but it is not the parent PIN and cannot grant rule-editing power.</div>
                                     </div>
+                                    <div class="help-device-map-legend" aria-label="Family Devices map labels">
+                                        <div>
+                                            <span>Device map words</span>
+                                            <strong>What the Family Devices map means</strong>
+                                            <p>Start with <b>Open now</b>. The other paths are only for devices that were already paired and trusted.</p>
+                                        </div>
+                                        <ul>
+                                            <li><b>Open now</b><span>Both devices are open. Pair, match the phrase, then send.</span></li>
+                                            <li><b>Home or school</b><span>A verified device can collect from a trusted local pickup setup.</span></li>
+                                            <li><b>Open later</b><span>A verified device can collect a signed parent update after it opens later.</span></li>
+                                            <li><b>Waiting</b><span>The parent sent an update, but the protected device has not collected it yet.</span></li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
 
-                            <details class="card help-technical-card" open>
+                            <details class="card help-technical-card">
                                 <summary class="card-header help-technical-card__summary">
                                     <h3>Device Update Details</h3>
                                     <span>Advanced</span>
@@ -1817,8 +1922,12 @@
                                 <div class="card-body">
                                     <div class="help-list">
                                         <div class="help-item">
-                                            <div class="help-item-title">Family Device Updates</div>
-                                            <div class="help-item-body">The detailed device-update model below keeps the exact terms used by the implementation and audit docs.</div>
+                                            <div class="help-item-title">Family Devices</div>
+                                            <div class="help-item-body">Open this only when you want the detailed device-update model used by implementation and audit docs.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Advanced delivery</div>
+                                            <div class="help-item-body">Home Pickup and Internet Pickup are optional setup paths for verified devices that cannot stay open for Send Update. They are not required for normal parent control.</div>
                                         </div>
                                     </div>
                                 </div>
@@ -1974,8 +2083,8 @@
                                             <div class="help-item-body">Nanah’s meeting service only helps two open devices exchange connection setup data. It does not read parent rules, PINs, or profile data. In the normal parent flow, open both devices, pair, verify the phrase, and use Send Update. Internet Pickup and Home Pickup are optional delivery tools for advanced setups; they still cannot apply anything unless the protected device already trusts that parent link. The underlying project is open here: <a href="https://github.com/varshneydevansh/nanah" target="_blank" rel="noopener noreferrer">github.com/varshneydevansh/nanah</a>.</div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">Home Pickup</div>
-                                            <div class="help-item-body">Home Pickup is for homes, clinics, or schools that run their own FilterTube-compatible pickup service on the local network. It is not automatic Wi-Fi discovery, and it does not trust every device on the network. The protected device still applies only signed updates from its saved parent/caregiver link.</div>
+                                            <div class="help-item-title">Nearby helper and Home Pickup</div>
+                                            <div class="help-item-body">The optional nearby helper lets you select an opted-in FilterTube device on the same network, then returns to normal code/phrase verification. Home Pickup is different: it is an advanced waiting-update service for already verified protected devices. Neither path trusts every device on the network.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Internet Pickup</div>

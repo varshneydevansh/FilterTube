@@ -98,6 +98,7 @@ test('reference provider requires bearer token when configured', async () => {
     assert.equal(statusBody.authority, 'transport_only_signed_parent_policy_validation_required');
     assert.ok(statusBody.supportedPaths.includes('managed-mailbox/upload'));
     assert.ok(statusBody.supportedPaths.includes('managed-local-network/discover'));
+    assert.ok(statusBody.supportedPaths.includes('managed-local-network/presence/discover'));
     assert.equal('keywords' in statusBody, false);
     assert.equal('channels' in statusBody, false);
     assert.equal('pin' in statusBody, false);
@@ -256,6 +257,67 @@ test('reference provider stores signed Home Pickup candidates while rejecting pr
     assert.equal(discover.body.candidates[0].candidateId, 'cand-1');
     assert.equal(discover.body.candidates[0].envelope.payload.operations.length, 1);
     assert.equal(JSON.stringify(discover.body).includes('must-not-cross'), false);
+  });
+});
+
+test('reference provider supports short-lived nearby pairing without exposing the receive token', async () => {
+  await withProvider({}, async ({ server, baseUrl }) => {
+    const announce = await postJson(`${baseUrl}/managed-local-network/presence/announce`, {
+      candidateId: 'nearby-child-1',
+      receiveToken: 'ephemeral-receive-token',
+      label: 'Study laptop',
+      platform: 'extension',
+      role: 'protected'
+    });
+    assert.equal(announce.body.ok, true);
+    assert.equal(server.getProviderState().nearbyPresenceCount, 1);
+    assert.equal(Object.hasOwn(announce.body.candidate, 'receiveToken'), false);
+    assert.equal(Object.hasOwn(announce.body.candidate, 'receiveTokenHash'), false);
+
+    const discovered = await postJson(`${baseUrl}/managed-local-network/presence/discover`, {});
+    assert.equal(discovered.body.ok, true);
+    assert.equal(discovered.body.candidates.length, 1);
+    assert.equal(discovered.body.candidates[0].candidateId, 'nearby-child-1');
+    assert.equal(discovered.body.candidates[0].state, 'nearby-unpaired');
+    assert.equal(Object.hasOwn(discovered.body.candidates[0], 'receiveToken'), false);
+
+    await postJson(`${baseUrl}/managed-local-network/presence/invite`, {
+      candidateId: 'nearby-child-1',
+      invitationId: 'invite-old',
+      pairingCode: 'ABCD',
+      inviterLabel: 'Parent laptop'
+    });
+    const latestInvite = await postJson(`${baseUrl}/managed-local-network/presence/invite`, {
+      candidateId: 'nearby-child-1',
+      invitationId: 'invite-latest',
+      pairingCode: 'WXYZ',
+      inviterLabel: 'Parent laptop'
+    });
+    assert.equal(latestInvite.body.ok, true);
+    assert.equal(server.getProviderState().nearbyInvitationCount, 1);
+
+    const refused = await postJson(`${baseUrl}/managed-local-network/presence/invitations/pull`, {
+      candidateId: 'nearby-child-1',
+      receiveToken: 'wrong-token'
+    });
+    assert.equal(refused.response.status, 403);
+    assert.equal(refused.body.reason, 'nearby_receive_token_mismatch');
+
+    const pulled = await postJson(`${baseUrl}/managed-local-network/presence/invitations/pull`, {
+      candidateId: 'nearby-child-1',
+      receiveToken: 'ephemeral-receive-token'
+    });
+    assert.equal(pulled.body.ok, true);
+    assert.equal(pulled.body.invitations.length, 1);
+    assert.equal(pulled.body.invitations[0].pairingCode, 'WXYZ');
+    assert.equal(server.getProviderState().nearbyInvitationCount, 0);
+
+    const withdraw = await postJson(`${baseUrl}/managed-local-network/presence/withdraw`, {
+      candidateId: 'nearby-child-1',
+      receiveToken: 'ephemeral-receive-token'
+    });
+    assert.equal(withdraw.body.ok, true);
+    assert.equal(server.getProviderState().nearbyPresenceCount, 0);
   });
 });
 

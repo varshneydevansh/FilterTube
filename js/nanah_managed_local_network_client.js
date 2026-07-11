@@ -119,6 +119,18 @@
         return { ...fallback, ...safeObject(result), ok: safeObject(result).ok !== false };
     }
 
+    function sanitizeLanDiscoveryHealth(value) {
+        const root = safeObject(value);
+        return {
+            enabled: root.enabled === true,
+            started: root.started === true,
+            remoteCandidateCount: Math.max(0, Number(root.remoteCandidateCount) || 0),
+            lastBroadcastAtMs: Math.max(0, Number(root.lastBroadcastAtMs) || 0),
+            lastReceivedAtMs: Math.max(0, Number(root.lastReceivedAtMs) || 0),
+            lastError: normalizeString(root.lastError).slice(0, 160)
+        };
+    }
+
     function sanitizePeer(value) {
         const root = safeObject(value);
         const clean = {};
@@ -299,6 +311,78 @@
         };
     }
 
+    function sanitizeNearbyPresenceCandidate(value) {
+        const root = safeObject(value);
+        const role = ['parent', 'protected', 'personal'].includes(normalizeString(root.role).toLowerCase())
+            ? normalizeString(root.role).toLowerCase()
+            : 'personal';
+        return {
+            schema: 'filtertube_family_device_candidate',
+            version: 1,
+            candidateId: normalizeString(root.candidateId).slice(0, 128),
+            label: normalizeString(root.label).slice(0, 64),
+            platform: normalizeString(root.platform).slice(0, 32) || 'filtertube',
+            role,
+            route: 'home',
+            state: 'nearby-unpaired',
+            pairingMethod: 'code-or-qr',
+            lastSeenAtMs: Number(root.lastSeenAtMs) || Date.now(),
+            expiresAtMs: Number(root.expiresAtMs) || null
+        };
+    }
+
+    function sanitizeNearbyPresenceAnnouncement(request) {
+        const root = safeObject(request);
+        const role = ['parent', 'protected', 'personal'].includes(normalizeString(root.role).toLowerCase())
+            ? normalizeString(root.role).toLowerCase()
+            : 'personal';
+        return {
+            schema: 'filtertube_nearby_presence_announcement',
+            version: 1,
+            candidateId: normalizeString(root.candidateId).slice(0, 128),
+            receiveToken: normalizeString(root.receiveToken).slice(0, 256),
+            label: normalizeString(root.label).slice(0, 64),
+            platform: normalizeString(root.platform).slice(0, 32) || 'filtertube',
+            role,
+            announcedAtMs: Number(root.announcedAtMs) || Date.now()
+        };
+    }
+
+    function sanitizeNearbyDiscoveryRequest(request) {
+        const root = safeObject(request);
+        return {
+            schema: 'filtertube_nearby_presence_discovery_request',
+            version: 1,
+            excludeCandidateId: normalizeString(root.excludeCandidateId).slice(0, 128),
+            requestedAt: Number(root.requestedAt) || Date.now()
+        };
+    }
+
+    function sanitizeNearbyPairingInvitation(request) {
+        const root = safeObject(request);
+        return {
+            schema: 'filtertube_nearby_pairing_invitation',
+            version: 1,
+            invitationId: normalizeString(root.invitationId).slice(0, 128),
+            candidateId: normalizeString(root.candidateId).slice(0, 128),
+            pairingCode: normalizeString(root.pairingCode).toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4),
+            inviterLabel: normalizeString(root.inviterLabel).slice(0, 64) || 'Parent device',
+            createdAtMs: Number(root.createdAtMs) || Date.now(),
+            expiresAtMs: Number(root.expiresAtMs) || null
+        };
+    }
+
+    function sanitizeNearbyInvitationPullRequest(request) {
+        const root = safeObject(request);
+        return {
+            schema: 'filtertube_nearby_pairing_invitation_pull_request',
+            version: 1,
+            candidateId: normalizeString(root.candidateId).slice(0, 128),
+            receiveToken: normalizeString(root.receiveToken).slice(0, 256),
+            requestedAt: Number(root.requestedAt) || Date.now()
+        };
+    }
+
     function sanitizeDeliveryAckPayload(payload) {
         const root = safeObject(payload);
         if (containsPrivateKey(root) || containsDeliveryAckPlaintext(root)) return {};
@@ -333,6 +417,11 @@
         const ackPath = parsed.ackPath || 'managed-local-network/ack';
         const ackPullPath = parsed.ackPullPath || parsed.deliveryAckPath || 'managed-local-network/ack/pull';
         const purgePath = parsed.purgePath || 'managed-local-network/purge';
+        const nearbyAnnouncePath = parsed.nearbyAnnouncePath || 'managed-local-network/presence/announce';
+        const nearbyDiscoverPath = parsed.nearbyDiscoverPath || 'managed-local-network/presence/discover';
+        const nearbyInvitePath = parsed.nearbyInvitePath || 'managed-local-network/presence/invite';
+        const nearbyInvitationPullPath = parsed.nearbyInvitationPullPath || 'managed-local-network/presence/invitations/pull';
+        const nearbyWithdrawPath = parsed.nearbyWithdrawPath || 'managed-local-network/presence/withdraw';
 
         function unavailable(reason) {
             return { schema: PROVIDER_SCHEMA, version: 1, ok: false, reason };
@@ -407,15 +496,55 @@
             const result = await postJson(healthPath, sanitizeHealthRequest(request));
             return {
                 ...result,
+                lanDiscovery: sanitizeLanDiscoveryHealth(result.lanDiscovery),
                 bridgeReachable: result.ok !== false,
                 endpointHost: endpointUrl?.host || ''
             };
+        }
+
+        async function announceNearbyDevice(request) {
+            const body = sanitizeNearbyPresenceAnnouncement(request);
+            if (!body.candidateId || !body.receiveToken || !body.label) return unavailable('invalid_nearby_presence');
+            return postJson(nearbyAnnouncePath, body);
+        }
+
+        async function discoverNearbyDevices(request = {}) {
+            const result = await postJson(nearbyDiscoverPath, sanitizeNearbyDiscoveryRequest(request));
+            if (result.ok === false) return { ...result, candidates: [] };
+            return {
+                ...result,
+                candidates: safeArray(result.candidates || result.items)
+                    .map(sanitizeNearbyPresenceCandidate)
+                    .filter(row => row.candidateId && row.label)
+            };
+        }
+
+        async function inviteNearbyDevice(request) {
+            const body = sanitizeNearbyPairingInvitation(request);
+            if (!body.candidateId || body.pairingCode.length !== 4) return unavailable('invalid_pairing_invitation');
+            return postJson(nearbyInvitePath, body);
+        }
+
+        async function pullNearbyPairingInvitations(request) {
+            const result = await postJson(nearbyInvitationPullPath, sanitizeNearbyInvitationPullRequest(request));
+            if (result.ok === false) return { ...result, invitations: [] };
+            return {
+                ...result,
+                invitations: safeArray(result.invitations || result.items)
+                    .map(sanitizeNearbyPairingInvitation)
+                    .filter(row => row.candidateId && row.pairingCode.length === 4)
+            };
+        }
+
+        async function withdrawNearbyDevice(request) {
+            return postJson(nearbyWithdrawPath, sanitizeNearbyInvitationPullRequest(request));
         }
 
         return {
             schema: PROVIDER_SCHEMA,
             version: 1,
             configured: !!endpointUrl,
+            nearbyDiscoveryOnly: parsed.nearbyDiscoveryOnly === true,
             transport: 'local_network',
             endpointHost: endpointUrl?.host || '',
             publishManagedPolicyCandidates,
@@ -434,7 +563,17 @@
             purgeManagedLocalNetworkCandidates: purgeLocalNetworkCandidates,
             checkManagedLocalNetworkBridge,
             checkBridgeHealth: checkManagedLocalNetworkBridge,
-            healthCheck: checkManagedLocalNetworkBridge
+            healthCheck: checkManagedLocalNetworkBridge,
+            announceNearbyDevice,
+            publishNearbyPresence: announceNearbyDevice,
+            discoverNearbyDevices,
+            discoverNearbyPresence: discoverNearbyDevices,
+            inviteNearbyDevice,
+            sendNearbyPairingInvitation: inviteNearbyDevice,
+            pullNearbyPairingInvitations,
+            pullNearbyInvitations: pullNearbyPairingInvitations,
+            withdrawNearbyDevice,
+            withdrawNearbyPresence: withdrawNearbyDevice
         };
     }
 

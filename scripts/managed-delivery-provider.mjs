@@ -5,12 +5,16 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { createManagedDeliveryLanDiscoveryMesh } from './managed-delivery-lan-discovery.mjs';
 
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8787;
 const MAX_BODY_BYTES = 1024 * 1024;
 const MAX_ROWS = 5000;
 const DEFAULT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const NEARBY_PRESENCE_TTL_MS = 75 * 1000;
+const NEARBY_INVITATION_TTL_MS = 2 * 60 * 1000;
+const MAX_NEARBY_PRESENCE = 64;
 const SERVICE_NAME = 'filtertube-managed-delivery-provider';
 
 const FORBIDDEN_PLAINTEXT_KEYS = new Set([
@@ -108,6 +112,20 @@ const ACK_KEYS = [
   'applied',
   'decision',
   'reason'
+];
+
+const NEARBY_PRESENCE_PUBLIC_KEYS = [
+  'schema',
+  'version',
+  'candidateId',
+  'label',
+  'platform',
+  'role',
+  'route',
+  'state',
+  'pairingMethod',
+  'lastSeenAtMs',
+  'expiresAtMs'
 ];
 
 function normalizeString(value) {
@@ -229,6 +247,72 @@ function normalizeAck(record, kind, now = Date.now()) {
   if (kind === 'mailbox' && !clean.mailboxItemId) return null;
   if (kind === 'local' && !clean.candidateId) return null;
   return clean;
+}
+
+function hashNearbyReceiveToken(value) {
+  const token = normalizeString(value);
+  return token ? crypto.createHash('sha256').update(token).digest('base64url') : '';
+}
+
+function normalizeNearbyPresence(candidate, now = Date.now()) {
+  const root = safeObject(candidate);
+  if (containsForbiddenKey(root, FORBIDDEN_SECRET_KEYS)) return null;
+  const candidateId = normalizeString(root.candidateId).slice(0, 128);
+  const receiveTokenHash = hashNearbyReceiveToken(root.receiveToken);
+  const label = normalizeString(root.label).slice(0, 64);
+  const requestedRole = normalizeString(root.role).toLowerCase();
+  const role = ['parent', 'protected', 'personal'].includes(requestedRole) ? requestedRole : 'personal';
+  if (!candidateId || !receiveTokenHash || !label) return null;
+  return {
+    schema: 'filtertube_family_device_candidate',
+    version: 1,
+    candidateId,
+    label,
+    platform: normalizeString(root.platform).slice(0, 32) || 'filtertube',
+    role,
+    route: 'home',
+    state: 'nearby-unpaired',
+    pairingMethod: 'code-or-qr',
+    lastSeenAtMs: now,
+    expiresAtMs: now + NEARBY_PRESENCE_TTL_MS,
+    receiveTokenHash
+  };
+}
+
+function publicNearbyPresence(row) {
+  return pickAllowed(safeObject(row), NEARBY_PRESENCE_PUBLIC_KEYS);
+}
+
+function normalizeNearbyInvitation(invitation, presence, now = Date.now()) {
+  const root = safeObject(invitation);
+  if (containsForbiddenKey(root, FORBIDDEN_SECRET_KEYS)) return null;
+  const candidateId = normalizeString(root.candidateId).slice(0, 128);
+  const invitationId = normalizeString(root.invitationId).slice(0, 128) || crypto.randomUUID();
+  const pairingCode = normalizeString(root.pairingCode).toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
+  if (!candidateId || !invitationId || pairingCode.length !== 4 || !presence) return null;
+  return {
+    schema: 'filtertube_nearby_pairing_invitation',
+    version: 1,
+    invitationId,
+    candidateId,
+    pairingCode,
+    inviterLabel: normalizeString(root.inviterLabel).slice(0, 64) || 'Parent device',
+    createdAtMs: now,
+    expiresAtMs: Math.min(
+      Number(root.expiresAtMs) || now + NEARBY_INVITATION_TTL_MS,
+      now + NEARBY_INVITATION_TTL_MS
+    )
+  };
+}
+
+function nearbyReceiveTokenMatches(presence, receiveToken) {
+  const expected = normalizeString(safeObject(presence).receiveTokenHash);
+  const actual = hashNearbyReceiveToken(receiveToken);
+  if (!expected || !actual) return false;
+  const expectedBuffer = Buffer.from(expected);
+  const actualBuffer = Buffer.from(actual);
+  return expectedBuffer.length === actualBuffer.length
+    && crypto.timingSafeEqual(expectedBuffer, actualBuffer);
 }
 
 function matchesRequest(row, request) {
@@ -487,6 +571,7 @@ function isAuthorized(req, token) {
 }
 
 export function createManagedDeliveryProviderServer(options = {}) {
+  const providerId = normalizeString(options.providerId) || crypto.randomUUID();
   const token = normalizeString(options.authToken || process.env.FILTERTUBE_PROVIDER_TOKEN);
   const storePath = normalizeString(options.storePath || process.env.FILTERTUBE_PROVIDER_STORE);
   const tlsOptions = getTlsServerOptions(options);
@@ -495,6 +580,30 @@ export function createManagedDeliveryProviderServer(options = {}) {
   const mailboxAcks = persisted.mailboxAcks || new Map();
   const localCandidates = persisted.localCandidates || new Map();
   const localAcks = persisted.localAcks || new Map();
+  const nearbyPresence = new Map();
+  const nearbyInvitations = new Map();
+  let lanDiscoveryMesh = null;
+
+  function queueLanDiscoveryInvitation(rawInvitation) {
+    const root = safeObject(rawInvitation);
+    const candidateId = normalizeString(root.candidateId);
+    const presence = nearbyPresence.get(candidateId);
+    const invitation = normalizeNearbyInvitation(root, presence, Date.now());
+    if (!invitation) return false;
+    for (const [key, queued] of nearbyInvitations) {
+      if (normalizeString(queued.candidateId) === candidateId) nearbyInvitations.delete(key);
+    }
+    nearbyInvitations.set(`${candidateId}:${invitation.invitationId}`, invitation);
+    return true;
+  }
+
+  function getLanDiscoveryState() {
+    return lanDiscoveryMesh?.getState?.() || {
+      enabled: false,
+      started: false,
+      remoteCandidateCount: 0
+    };
+  }
 
   function persist() {
     writePersistedState(storePath, { mailboxItems, mailboxAcks, localCandidates, localAcks });
@@ -506,6 +615,7 @@ export function createManagedDeliveryProviderServer(options = {}) {
       schema: 'filtertube_managed_delivery_provider_status',
       version: 1,
       service: SERVICE_NAME,
+      providerId,
       protocol: tlsOptions ? 'https' : 'http',
       persistentStore: !!storePath,
       authRequired: !!token,
@@ -521,8 +631,14 @@ export function createManagedDeliveryProviderServer(options = {}) {
         'managed-local-network/ack',
         'managed-local-network/ack/pull',
         'managed-local-network/purge',
-        'managed-local-network/health'
+        'managed-local-network/health',
+        'managed-local-network/presence/announce',
+        'managed-local-network/presence/discover',
+        'managed-local-network/presence/invite',
+        'managed-local-network/presence/invitations/pull',
+        'managed-local-network/presence/withdraw'
       ],
+      lanDiscovery: getLanDiscoveryState(),
       authority: 'transport_only_signed_parent_policy_validation_required'
     };
   }
@@ -610,7 +726,9 @@ code{background:#f3efe9;border:1px solid rgba(70,83,95,.12);border-radius:8px;pa
     const pruned = pruneExpired(mailboxItems, now)
       + pruneExpired(mailboxAcks, now)
       + pruneExpired(localCandidates, now)
-      + pruneExpired(localAcks, now);
+      + pruneExpired(localAcks, now)
+      + pruneExpired(nearbyPresence, now)
+      + pruneExpired(nearbyInvitations, now);
     if (pruned > 0) persist();
     const body = await readBody(req);
     if (pathName.endsWith('/managed-mailbox/upload')) {
@@ -726,9 +844,148 @@ code{background:#f3efe9;border:1px solid rgba(70,83,95,.12);border-radius:8px;pa
         persistentStore: !!storePath,
         pendingLocalCandidateCount: localCandidates.size,
         localAckCount: localAcks.size,
+        nearbyDeviceCount: nearbyPresence.size,
+        nearbyInvitationCount: nearbyInvitations.size,
+        lanDiscovery: getLanDiscoveryState(),
         pendingMailboxItemCount: mailboxItems.size,
         mailboxAckCount: mailboxAcks.size
       });
+      return;
+    }
+
+    if (pathName.endsWith('/managed-local-network/presence/announce')) {
+      if (containsForbiddenKey(body, FORBIDDEN_SECRET_KEYS)) {
+        writeJson(res, 400, { ok: false, reason: 'secret_refused' });
+        return;
+      }
+      const presence = normalizeNearbyPresence(body, now);
+      if (!presence) {
+        writeJson(res, 400, { ok: false, reason: 'invalid_nearby_presence' });
+        return;
+      }
+      if (!nearbyPresence.has(presence.candidateId) && nearbyPresence.size >= MAX_NEARBY_PRESENCE) {
+        const oldest = Array.from(nearbyPresence.values())
+          .sort((a, b) => Number(a.lastSeenAtMs) - Number(b.lastSeenAtMs))[0];
+        if (oldest) nearbyPresence.delete(oldest.candidateId);
+      }
+      nearbyPresence.set(presence.candidateId, presence);
+      lanDiscoveryMesh?.broadcastPresence?.();
+      writeJson(res, 200, {
+        ok: true,
+        schema: 'filtertube_nearby_presence_provider',
+        version: 1,
+        candidate: publicNearbyPresence(presence)
+      });
+      return;
+    }
+
+    if (pathName.endsWith('/managed-local-network/presence/discover')) {
+      if (containsForbiddenKey(body, FORBIDDEN_SECRET_KEYS)) {
+        writeJson(res, 400, { ok: false, reason: 'secret_refused' });
+        return;
+      }
+      const excludeCandidateId = normalizeString(body.excludeCandidateId);
+      const localPresenceCandidates = Array.from(nearbyPresence.values())
+        .filter(row => normalizeString(row.candidateId) !== excludeCandidateId)
+        .sort((a, b) => Number(b.lastSeenAtMs) - Number(a.lastSeenAtMs))
+        .slice(0, 24)
+        .map(publicNearbyPresence);
+      const meshCandidates = lanDiscoveryMesh?.discoverCandidates?.({ excludeCandidateId }) || [];
+      const candidatesById = new Map();
+      [...localPresenceCandidates, ...meshCandidates].forEach((candidate) => {
+        const candidateId = normalizeString(candidate?.candidateId);
+        if (candidateId && !candidatesById.has(candidateId)) candidatesById.set(candidateId, candidate);
+      });
+      const candidates = Array.from(candidatesById.values()).slice(0, 24);
+      writeJson(res, 200, {
+        ok: true,
+        schema: 'filtertube_nearby_presence_provider',
+        version: 1,
+        candidates,
+        candidateCount: candidates.length
+      });
+      return;
+    }
+
+    if (pathName.endsWith('/managed-local-network/presence/invite')) {
+      if (containsForbiddenKey(body, FORBIDDEN_SECRET_KEYS)) {
+        writeJson(res, 400, { ok: false, reason: 'secret_refused' });
+        return;
+      }
+      const candidateId = normalizeString(body.candidateId);
+      const presence = nearbyPresence.get(candidateId);
+      if (!presence && lanDiscoveryMesh) {
+        const routed = lanDiscoveryMesh.inviteCandidate(body);
+        writeJson(res, routed.ok === true ? 200 : 404, {
+          ...routed,
+          schema: 'filtertube_nearby_pairing_invitation_provider',
+          version: 1
+        });
+        return;
+      }
+      const invitation = normalizeNearbyInvitation(body, presence, now);
+      if (!invitation) {
+        writeJson(res, 404, { ok: false, reason: presence ? 'invalid_pairing_invitation' : 'nearby_device_expired' });
+        return;
+      }
+      for (const [key, queuedInvitation] of nearbyInvitations) {
+        if (normalizeString(queuedInvitation.candidateId) === candidateId) nearbyInvitations.delete(key);
+      }
+      nearbyInvitations.set(`${candidateId}:${invitation.invitationId}`, invitation);
+      writeJson(res, 200, {
+        ok: true,
+        schema: 'filtertube_nearby_pairing_invitation_provider',
+        version: 1,
+        invitationId: invitation.invitationId,
+        expiresAtMs: invitation.expiresAtMs
+      });
+      return;
+    }
+
+    if (pathName.endsWith('/managed-local-network/presence/invitations/pull')) {
+      if (containsForbiddenKey(body, FORBIDDEN_SECRET_KEYS)) {
+        writeJson(res, 400, { ok: false, reason: 'secret_refused' });
+        return;
+      }
+      const candidateId = normalizeString(body.candidateId);
+      const presence = nearbyPresence.get(candidateId);
+      if (!presence || !nearbyReceiveTokenMatches(presence, body.receiveToken)) {
+        writeJson(res, 403, { ok: false, reason: presence ? 'nearby_receive_token_mismatch' : 'nearby_device_expired' });
+        return;
+      }
+      const invitations = [];
+      for (const [key, invitation] of nearbyInvitations) {
+        if (normalizeString(invitation.candidateId) !== candidateId) continue;
+        invitations.push(invitation);
+        nearbyInvitations.delete(key);
+      }
+      writeJson(res, 200, {
+        ok: true,
+        schema: 'filtertube_nearby_pairing_invitation_provider',
+        version: 1,
+        invitations,
+        invitationCount: invitations.length
+      });
+      return;
+    }
+
+    if (pathName.endsWith('/managed-local-network/presence/withdraw')) {
+      if (containsForbiddenKey(body, FORBIDDEN_SECRET_KEYS)) {
+        writeJson(res, 400, { ok: false, reason: 'secret_refused' });
+        return;
+      }
+      const candidateId = normalizeString(body.candidateId);
+      const presence = nearbyPresence.get(candidateId);
+      if (!presence || !nearbyReceiveTokenMatches(presence, body.receiveToken)) {
+        writeJson(res, 403, { ok: false, reason: presence ? 'nearby_receive_token_mismatch' : 'nearby_device_expired' });
+        return;
+      }
+      nearbyPresence.delete(candidateId);
+      lanDiscoveryMesh?.broadcastWithdraw?.(candidateId);
+      for (const [key, invitation] of nearbyInvitations) {
+        if (normalizeString(invitation.candidateId) === candidateId) nearbyInvitations.delete(key);
+      }
+      writeJson(res, 200, { ok: true, withdrawnCandidateId: candidateId });
       return;
     }
 
@@ -832,6 +1089,9 @@ code{background:#f3efe9;border:1px solid rgba(70,83,95,.12);border-radius:8px;pa
     mailboxAckCount: mailboxAcks.size,
     localCandidateCount: localCandidates.size,
     localAckCount: localAcks.size,
+    nearbyPresenceCount: nearbyPresence.size,
+    nearbyInvitationCount: nearbyInvitations.size,
+    lanDiscovery: getLanDiscoveryState(),
     persistentStore: !!storePath
   });
   server.resetProviderState = () => {
@@ -839,9 +1099,27 @@ code{background:#f3efe9;border:1px solid rgba(70,83,95,.12);border-radius:8px;pa
     mailboxAcks.clear();
     localCandidates.clear();
     localAcks.clear();
+    nearbyPresence.clear();
+    nearbyInvitations.clear();
     persist();
   };
-  server.providerId = crypto.randomUUID();
+  server.startLanDiscovery = async (meshOptions = {}) => {
+    if (!lanDiscoveryMesh) {
+      lanDiscoveryMesh = createManagedDeliveryLanDiscoveryMesh({
+        ...safeObject(meshOptions),
+        providerId,
+        getLocalCandidates: () => Array.from(nearbyPresence.values()).map(publicNearbyPresence),
+        queueInvitation: queueLanDiscoveryInvitation
+      });
+    }
+    return lanDiscoveryMesh.start();
+  };
+  server.stopLanDiscovery = () => {
+    lanDiscoveryMesh?.stop?.();
+    lanDiscoveryMesh = null;
+  };
+  server.on('close', () => server.stopLanDiscovery());
+  server.providerId = providerId;
   server.providerProtocol = tlsOptions ? 'https' : 'http';
   return server;
 }
@@ -853,6 +1131,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       '',
       'Usage:',
       '  FILTERTUBE_PROVIDER_HOST=0.0.0.0 FILTERTUBE_PROVIDER_STORE=.filtertube/managed-delivery-store.json npm run managed:provider',
+      '  npm run managed:nearby',
       '',
       'Optional environment:',
       '  FILTERTUBE_PROVIDER_HOST    Host to bind. Use 0.0.0.0 for Home Pickup on your network.',
@@ -861,6 +1140,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       '  FILTERTUBE_PROVIDER_STORE   Optional JSON store for waiting updates and redacted receipts.',
       '  FILTERTUBE_PROVIDER_TLS_KEY_PATH   Optional HTTPS private-key path.',
       '  FILTERTUBE_PROVIDER_TLS_CERT_PATH  Optional HTTPS certificate path. Use with the key path.',
+      '  FILTERTUBE_PROVIDER_LAN_DISCOVERY  Set to 1 to discover other local companions over multicast.',
       '',
       'Addresses:',
       '  Home Pickup:     http://<this-computer-lan-ip>:8787/filtertube',
@@ -876,8 +1156,10 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   }
   const host = normalizeString(process.env.FILTERTUBE_PROVIDER_HOST) || DEFAULT_HOST;
   const port = Number(process.env.FILTERTUBE_PROVIDER_PORT) || DEFAULT_PORT;
+  const lanDiscoveryEnabled = process.argv.includes('--lan-discovery')
+    || normalizeString(process.env.FILTERTUBE_PROVIDER_LAN_DISCOVERY) === '1';
   const server = createManagedDeliveryProviderServer();
-  server.listen(port, host, () => {
+  server.listen(port, host, async () => {
     const protocol = server.providerProtocol || 'http';
     const homeUrls = getManagedDeliveryProviderHomePickupUrls({ host, port, protocol });
     const tokenNote = process.env.FILTERTUBE_PROVIDER_TOKEN ? 'Bearer token required' : 'no bearer token set';
@@ -886,6 +1168,12 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       : 'memory store only';
     const tlsNote = protocol === 'https' ? 'HTTPS enabled' : 'HTTP only';
     console.log(`FilterTube managed delivery provider listening on ${protocol}://${host}:${port}/filtertube (${tokenNote}, ${storeNote}, ${tlsNote})`);
+    if (lanDiscoveryEnabled) {
+      const started = await server.startLanDiscovery();
+      console.log(started
+        ? 'Nearby companion discovery is active on the local network.'
+        : 'Nearby companion discovery could not start; code/QR and configured Home Pickup remain available.');
+    }
     console.log('Home Pickup: enter one of these addresses on both verified devices:');
     for (const url of homeUrls) console.log(`  ${url}`);
     console.log(protocol === 'https'

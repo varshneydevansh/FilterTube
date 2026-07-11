@@ -2410,6 +2410,19 @@ html[data-theme="dark"] .btn-secondary:hover {
     width: min(100%, 124rem);
 }
 
+.sync-shell .settings-hero {
+    order: 0;
+}
+
+.sync-shell #familyDeviceUpdatesCard {
+    order: 2;
+    margin-top: 0;
+}
+
+.sync-shell .settings-grid {
+    order: 1;
+}
+
 .view-hero {
     position: relative;
     display: grid;
@@ -3139,8 +3152,9 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     position: relative;
     display: grid;
     grid-template-columns: 1fr;
-    gap: 0.92rem;
-    padding: clamp(1.15rem, 1.8vw, 1.5rem);
+    align-items: start;
+    gap: 0.78rem;
+    padding: clamp(1rem, 1.55vw, 1.32rem);
     border-radius: 1.5rem;
     border: 1px solid rgba(171, 68, 56, 0.12);
     background:
@@ -3158,7 +3172,29 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     gap: 0.68rem;
 }
 
+.nanah-sync-intro__copy {
+    grid-template-areas:
+        "eyebrow"
+        "title"
+        "body"
+        "actions";
+    max-width: none;
+}
+
+.nanah-sync-intro__eyebrow {
+    grid-area: eyebrow;
+}
+
+.nanah-sync-intro__title {
+    grid-area: title;
+}
+
+.nanah-sync-intro__body {
+    grid-area: body;
+}
+
 .nanah-sync-intro__actions {
+    grid-area: actions;
     display: flex;
     align-items: center;
     gap: 0.62rem;
@@ -3175,8 +3211,11 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
 
 .nanah-parent-edit-model {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.62rem;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: 0.58rem;
+    width: 100%;
+    min-width: 0;
 }
 
 .nanah-parent-edit-model article {
@@ -3187,7 +3226,7 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
         "badge body";
     gap: 0.14rem 0.62rem;
     min-width: 0;
-    padding: 0.76rem 0.84rem;
+    padding: 0.64rem 0.72rem;
     border: 1px solid rgba(60, 118, 92, 0.15);
     border-radius: 1rem;
     background:
@@ -3211,18 +3250,24 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
 
 .nanah-parent-edit-model article > strong {
     grid-area: title;
+    min-width: 0;
     color: var(--ft-color-text-primary);
-    font-size: 0.88rem;
+    font-size: 0.84rem;
     font-weight: 860;
     line-height: 1.25;
+    overflow-wrap: normal;
+    word-break: normal;
 }
 
 .nanah-parent-edit-model article > small {
     grid-area: body;
+    min-width: 0;
     color: var(--ft-color-text-secondary);
-    font-size: 0.76rem;
+    font-size: 0.74rem;
     font-weight: 620;
     line-height: 1.45;
+    overflow-wrap: normal;
+    word-break: normal;
 }
 
 .nanah-sync-principles {
@@ -3266,8 +3311,11 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
 }
 
 .nanah-sync-simple-path {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
     align-items: stretch;
+    width: 100%;
+    min-width: 0;
 }
 
 .nanah-sync-simple-path__item {
@@ -3280,7 +3328,7 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     row-gap: 0.14rem;
     align-content: start;
     min-width: 0;
-    padding: 0.76rem 0.84rem;
+    padding: 0.64rem 0.72rem;
     border: 1px solid rgba(171, 68, 56, 0.12);
     border-radius: 1rem;
     background: rgba(255, 255, 255, 0.72);
@@ -3307,7 +3355,7 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     grid-area: title;
     min-width: 0;
     color: var(--ft-color-text-primary);
-    font-size: 0.9rem;
+    font-size: 0.84rem;
     font-weight: 850;
     line-height: 1.25;
 }
@@ -3316,7 +3364,7 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     grid-area: body;
     min-width: 0;
     color: var(--ft-color-text-secondary);
-    font-size: 0.76rem;
+    font-size: 0.74rem;
     font-weight: 600;
     line-height: 1.42;
 }
@@ -3324,7 +3372,7 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
 .nanah-sync-simple-path__note {
     grid-column: 1 / -1;
     min-width: 0;
-    padding: 0.64rem 0.78rem;
+    padding: 0.58rem 0.72rem;
     border: 1px solid rgba(60, 118, 92, 0.16);
     border-radius: 0.95rem;
     background: rgba(242, 250, 245, 0.78);
@@ -3340,55 +3388,508 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     gap: 0.75rem;
 }
 
-.nanah-device-compass {
+.nanah-pairing-details {
+    display: grid;
+    min-width: 0;
+    border: 1px solid rgba(96, 120, 145, 0.14);
+    border-radius: 1.25rem;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(248, 244, 238, 0.48));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.72),
+        0 18px 34px -34px rgba(20, 33, 45, 0.3);
+    overflow: hidden;
+}
+
+.nanah-pairing-details__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 4.3rem;
+    padding: 0.88rem 1rem;
+    cursor: pointer;
+    list-style: none;
+}
+
+.nanah-pairing-details__summary::-webkit-details-marker {
+    display: none;
+}
+
+.nanah-pairing-details__summary::after {
+    content: '+';
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid rgba(171, 68, 56, 0.16);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.74);
+    color: var(--ft-color-brand-primary);
+    font-size: 1.05rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.nanah-pairing-details[open] > .nanah-pairing-details__summary::after {
+    content: '-';
+}
+
+.nanah-pairing-details__summary span {
+    display: grid;
+    gap: 0.18rem;
+    min-width: 0;
+}
+
+.nanah-pairing-details__summary strong {
+    color: var(--ft-color-text-primary);
+    font-size: 0.95rem;
+    font-weight: 880;
+    line-height: 1.18;
+}
+
+.nanah-pairing-details__summary small {
+    color: var(--ft-color-text-secondary);
+    font-size: 0.78rem;
+    font-weight: 640;
+    line-height: 1.36;
+}
+
+.nanah-pairing-details__summary code {
+    flex: 0 0 auto;
+    padding: 0.22rem 0.56rem;
+    border: 1px solid rgba(171, 68, 56, 0.14);
+    border-radius: 999px;
+    background: rgba(171, 68, 56, 0.06);
+    color: var(--ft-color-brand-primary);
+    font-size: 0.64rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    line-height: 1.1;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.nanah-pairing-details[open] {
+    background:
+        radial-gradient(circle at top left, rgba(196, 95, 79, 0.08), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(248, 244, 238, 0.54));
+}
+
+.nanah-pairing-details[open] > .nanah-sync-grid {
+    padding: 0 0.9rem 0.9rem;
+}
+
+.nanah-device-compass-stage {
+    display: grid;
+    gap: 0.72rem;
+    padding: clamp(0.78rem, 1.3vw, 1rem);
+    border: 1px solid rgba(96, 120, 145, 0.12);
+    border-radius: 1.28rem;
+    background:
+        radial-gradient(circle at 12% 0%, rgba(255, 255, 255, 0.86), transparent 38%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.54), rgba(248, 244, 238, 0.34));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.72),
+        0 18px 36px -34px rgba(20, 33, 45, 0.24);
+}
+
+.nanah-device-compass-stage__heading {
+    display: grid;
+    gap: 0.16rem;
+    padding: 0.12rem 0.22rem 0;
+}
+
+.nanah-device-compass-stage__heading span {
+    color: #9f4a3d;
+    font-size: 0.66rem;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.nanah-device-compass-stage__heading strong {
+    color: var(--ft-color-text-primary);
+    font-size: clamp(1.02rem, 1.5vw, 1.28rem);
+    font-weight: 880;
+    line-height: 1.15;
+}
+
+.nanah-device-compass-stage__heading small {
+    max-width: 58ch;
+    color: var(--ft-color-text-secondary);
+    font-size: 0.8rem;
+    font-weight: 640;
+    line-height: 1.45;
+}
+
+.nanah-device-compass-stage__steps {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.42rem;
+    min-width: 0;
+}
+
+.nanah-device-compass-stage__steps span {
     position: relative;
     display: grid;
-    grid-template-columns: minmax(8.75rem, 0.46fr) minmax(0, 1fr);
-    gap: 0.95rem;
+    gap: 0.08rem;
+    min-width: 0;
+    min-height: 3rem;
+    padding: 0.56rem 0.62rem;
+    border: 1px solid rgba(96, 120, 145, 0.11);
+    border-radius: 0.78rem;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(248, 244, 238, 0.48));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.nanah-device-compass-stage__steps span::before {
+    content: "";
+    position: absolute;
+    top: 0.72rem;
+    right: 0.66rem;
+    width: 0.42rem;
+    height: 0.42rem;
+    border-radius: 999px;
+    background: rgba(183, 83, 69, 0.82);
+    box-shadow: 0 0 0 0.22rem rgba(183, 83, 69, 0.1);
+}
+
+.nanah-device-compass-stage__steps span:nth-child(2)::before {
+    background: rgba(60, 118, 92, 0.82);
+    box-shadow: 0 0 0 0.22rem rgba(60, 118, 92, 0.1);
+}
+
+.nanah-device-compass-stage__steps span:nth-child(3)::before {
+    background: rgba(79, 120, 184, 0.82);
+    box-shadow: 0 0 0 0.22rem rgba(79, 120, 184, 0.1);
+}
+
+.nanah-device-compass-stage__steps span:nth-child(4)::before {
+    background: rgba(171, 68, 56, 0.82);
+    box-shadow: 0 0 0 0.22rem rgba(171, 68, 56, 0.1);
+}
+
+.nanah-device-compass-stage__steps strong {
+    min-width: 0;
+    padding-right: 0.8rem;
+    color: var(--ft-color-text-primary);
+    font-size: 0.78rem;
+    font-weight: 880;
+    line-height: 1.16;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nanah-device-compass-stage__steps small {
+    min-width: 0;
+    color: var(--ft-color-text-secondary);
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1.22;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nanah-device-compass-stage__plain-rule {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    min-width: 0;
+    padding: 0.58rem 0.68rem;
+    border: 1px solid rgba(60, 118, 92, 0.14);
+    border-radius: 0.82rem;
+    background:
+        linear-gradient(180deg, rgba(248, 254, 250, 0.82), rgba(255, 255, 255, 0.54));
+    color: #365f4c;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.nanah-device-compass-stage__plain-rule strong,
+.nanah-device-compass-stage__plain-rule span {
+    min-width: 0;
+    font-size: 0.74rem;
+    line-height: 1.35;
+}
+
+.nanah-device-compass-stage__plain-rule strong {
+    flex: 0 0 auto;
+    font-weight: 850;
+}
+
+.nanah-device-compass-stage__plain-rule span {
+    color: var(--ft-color-text-secondary);
+    font-weight: 680;
+    overflow-wrap: anywhere;
+}
+
+.nanah-device-compass {
+    position: relative;
+    box-sizing: border-box;
+    --nanah-map-accent: 171, 68, 56;
+    --nanah-map-secondary: 60, 118, 92;
+    --nanah-map-tertiary: 79, 120, 184;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-rows: auto auto auto auto auto auto auto;
+    gap: clamp(0.62rem, 1.2vw, 0.82rem);
     align-items: stretch;
-    padding: 0.85rem;
+    padding: clamp(0.82rem, 1.35vw, 1rem);
+    overflow: hidden;
+    isolation: isolate;
     border: 1px solid rgba(96, 120, 145, 0.14);
     border-radius: 1.1rem;
     background:
-        radial-gradient(circle at 18% 50%, rgba(171, 68, 56, 0.12), transparent 32%),
-        radial-gradient(circle at 64% 20%, rgba(60, 118, 92, 0.12), transparent 26%),
-        radial-gradient(circle at 88% 72%, rgba(79, 120, 184, 0.10), transparent 28%),
+        radial-gradient(circle at 50% 46%, rgba(var(--nanah-map-accent), 0.14), transparent 24%),
+        radial-gradient(circle at 21% 76%, rgba(var(--nanah-map-secondary), 0.12), transparent 25%),
+        radial-gradient(circle at 80% 76%, rgba(var(--nanah-map-tertiary), 0.11), transparent 25%),
         linear-gradient(180deg, rgba(255, 255, 255, 0.68), rgba(248, 244, 238, 0.48));
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+    transition:
+        border-color 160ms ease,
+        background 160ms ease,
+        box-shadow 160ms ease;
+}
+
+.nanah-device-compass[data-selected-route="live"] {
+    --nanah-map-accent: 171, 68, 56;
+    --nanah-map-secondary: 60, 118, 92;
+    --nanah-map-tertiary: 79, 120, 184;
+    border-color: rgba(171, 68, 56, 0.22);
+}
+
+.nanah-device-compass[data-selected-route="home"],
+.nanah-device-compass[data-selected-route="same-network"] {
+    --nanah-map-accent: 60, 118, 92;
+    --nanah-map-secondary: 171, 68, 56;
+    --nanah-map-tertiary: 79, 120, 184;
+    border-color: rgba(60, 118, 92, 0.24);
+}
+
+.nanah-device-compass[data-selected-route="away"] {
+    --nanah-map-accent: 79, 120, 184;
+    --nanah-map-secondary: 171, 68, 56;
+    --nanah-map-tertiary: 60, 118, 92;
+    border-color: rgba(79, 120, 184, 0.24);
+}
+
+.nanah-device-compass[data-selected-route="verified"] {
+    --nanah-map-accent: 96, 120, 145;
+    --nanah-map-secondary: 171, 68, 56;
+    --nanah-map-tertiary: 60, 118, 92;
+    border-color: rgba(96, 120, 145, 0.24);
+}
+
+.nanah-device-compass[data-protected-count="0"] {
+    --nanah-map-secondary: 118, 132, 120;
+    --nanah-map-tertiary: 118, 132, 120;
+    background:
+        radial-gradient(circle at 50% 44%, rgba(var(--nanah-map-accent), 0.11), transparent 24%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(248, 244, 238, 0.46));
+}
+
+.nanah-device-compass-stage:has(.nanah-device-compass[data-protected-count="0"]) .nanah-device-compass-stage__steps,
+.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__center,
+.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(2),
+.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(3),
+.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__trusted-strip,
+.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__presence-row,
+.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__selection-preview,
+.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__evidence-row {
+    display: none;
+}
+
+#familyDeviceUpdatesCard:has(.nanah-device-compass[data-protected-count="0"]) .nanah-parent-edit-model,
+#familyDeviceUpdatesCard:has(.nanah-device-compass[data-protected-count="0"]) .nanah-sync-simple-path,
+#familyDeviceUpdatesCard:has(.nanah-device-compass[data-protected-count="0"]) .nanah-delivery-strip,
+#familyDeviceUpdatesCard:has(.nanah-device-compass[data-protected-count="0"]) .nanah-pairing-details {
+    display: none;
+}
+
+#familyDeviceUpdatesCard:has(.nanah-device-compass[data-protected-count="0"]) .nanah-device-compass-stage,
+#familyDeviceUpdatesCard:has(.nanah-device-compass[data-protected-count="0"]) #ftNanahQuickSendUpdateBtn {
+    display: none;
+}
+
+#familyDeviceUpdatesCard:has(.nanah-device-compass[data-protected-count="0"]) .nanah-sync-shell[data-personal-sync-open="true"] .nanah-pairing-details {
+    display: block;
+}
+
+#familyDeviceUpdatesCard:has(.nanah-device-compass[data-protected-count="0"]) .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass-stage {
+    display: grid;
+}
+
+#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] {
+    grid-template-columns: minmax(10rem, 0.72fr) repeat(2, minmax(13rem, 1fr));
+    grid-template-rows: auto auto auto;
+    gap: clamp(0.62rem, 1.2vw, 0.82rem);
+    padding: clamp(0.82rem, 1.35vw, 1rem);
+}
+
+#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__grid {
+    display: contents;
+}
+
+#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__center,
+#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(2),
+#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__selection-preview {
+    display: grid;
+}
+
+#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(1) {
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%;
+    max-width: none;
+    min-height: 8.4rem;
+}
+
+#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(2) {
+    grid-column: 3;
+    grid-row: 1;
+    opacity: 1;
+    border-style: solid;
+    background: rgba(255, 255, 255, 0.66);
+    box-shadow: 0 16px 34px -32px rgba(20, 33, 45, 0.55);
+}
+
+#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(3) {
+    display: none;
+}
+
+#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__trusted-strip:not([hidden]),
+#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__presence-row:not([hidden]) {
+    display: grid;
+}
+
+#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__rule {
+    grid-column: 1 / -1;
+    grid-row: 2;
+}
+
+#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__center {
+    grid-column: 1;
+    grid-row: 1;
+    width: min(8.4rem, 100%);
+}
+
+#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__selection-preview {
+    grid-column: 1 / -1;
+    grid-row: 3;
+}
+
+#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"]::before,
+#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"]::after {
+    display: none;
+}
+
+#familyDeviceUpdatesCard:has(.nanah-device-compass[data-protected-count="0"]) .nanah-sync-intro {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+}
+
+#familyDeviceUpdatesCard:has(.nanah-device-compass[data-protected-count="0"]) .nanah-sync-intro__copy {
+    max-width: 48rem;
+}
+
+.nanah-device-compass[data-protected-count="0"] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    min-height: 0;
+    padding: 0.82rem;
+}
+
+.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__grid {
+    display: block;
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(1) {
+    width: 100%;
+    max-width: none;
+    min-height: 5.5rem;
+}
+
+.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__rule {
+    grid-column: 1;
+    grid-row: 2;
 }
 
 .nanah-device-compass::before {
     content: "";
     position: absolute;
-    inset: 0.72rem;
-    border-radius: 0.88rem;
+    top: 2.4rem;
+    left: 50%;
+    width: min(28rem, 88%);
+    aspect-ratio: 1;
+    border-radius: 999px;
     pointer-events: none;
+    transform: translateX(-50%);
     background:
-        linear-gradient(90deg, transparent 0 21.5%, rgba(171, 68, 56, 0.12) 21.7%, transparent 22.2%),
-        radial-gradient(circle at 22% 50%, transparent 0 3.65rem, rgba(171, 68, 56, 0.15) 3.7rem, transparent 3.82rem),
-        radial-gradient(circle at 22% 50%, transparent 0 5.45rem, rgba(60, 118, 92, 0.10) 5.5rem, transparent 5.62rem),
-        radial-gradient(circle at 69% 50%, transparent 0 0.42rem, rgba(96, 120, 145, 0.16) 0.46rem, transparent 0.52rem);
-    opacity: 0.82;
+        radial-gradient(circle, transparent 0 17%, rgba(var(--nanah-map-accent), 0.14) 17.4% 17.9%, transparent 18.3% 34%, rgba(var(--nanah-map-secondary), 0.11) 34.3% 34.8%, transparent 35.2% 49%, rgba(var(--nanah-map-tertiary), 0.10) 49.3% 49.8%, transparent 50.2%),
+        conic-gradient(from 210deg, transparent 0 11%, rgba(var(--nanah-map-secondary), 0.11) 12% 16%, transparent 17% 45%, rgba(var(--nanah-map-accent), 0.13) 46% 50%, transparent 51% 79%, rgba(var(--nanah-map-tertiary), 0.11) 80% 84%, transparent 85%);
+    opacity: 0.84;
+    transition: opacity 160ms ease;
+}
+
+.nanah-device-compass[data-protected-count="0"]::before {
+    opacity: 0.34;
+}
+
+.nanah-device-compass::after {
+    content: "";
+    position: absolute;
+    top: 12.4rem;
+    left: 50%;
+    width: min(10.5rem, 36%);
+    height: 1px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(var(--nanah-map-secondary), 0.16), rgba(var(--nanah-map-accent), 0.2), rgba(var(--nanah-map-tertiary), 0.16));
+    pointer-events: none;
+    transform: translateX(-50%);
+    opacity: 0.75;
+}
+
+.nanah-device-compass[data-protected-count="0"]::after {
+    opacity: 0.28;
 }
 
 .nanah-device-compass__center {
     position: relative;
-    z-index: 1;
+    box-sizing: border-box;
+    z-index: 3;
     display: grid;
+    grid-column: 2 / 5;
+    grid-row: 2;
     place-items: center;
     align-content: center;
     gap: 0.22rem;
-    min-height: 8.7rem;
+    align-self: center;
+    justify-self: center;
+    width: min(10.6rem, 100%);
+    min-height: auto;
+    aspect-ratio: 1;
     padding: 0.95rem;
     border: 1px solid rgba(171, 68, 56, 0.22);
     border-radius: 999px;
     background:
-        radial-gradient(circle, rgba(171, 68, 56, 0.11), transparent 68%),
+        radial-gradient(circle, rgba(var(--nanah-map-accent), 0.13), transparent 68%),
         rgba(255, 255, 255, 0.74);
     text-align: center;
     box-shadow:
-        0 18px 42px -34px rgba(133, 46, 34, 0.7),
+        0 18px 42px -34px rgba(var(--nanah-map-accent), 0.68),
         0 0 0 8px rgba(255, 255, 255, 0.38);
+    transition:
+        border-color 160ms ease,
+        box-shadow 160ms ease,
+        background 160ms ease;
 }
 
 .nanah-device-compass__hub-mark,
@@ -3478,21 +3979,19 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
 
 .nanah-device-compass__grid {
     position: relative;
-    z-index: 1;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.62rem;
-    min-width: 0;
+    z-index: 2;
+    display: contents;
 }
 
 .nanah-device-compass__choice {
     position: relative;
+    box-sizing: border-box;
     display: grid;
     align-content: start;
     justify-items: start;
-    gap: 0.22rem;
+    gap: 0.28rem;
     min-width: 0;
-    min-height: 7rem;
+    min-height: 7.25rem;
     padding: 0.78rem 0.76rem;
     border: 1px solid rgba(96, 120, 145, 0.12);
     border-radius: 0.82rem;
@@ -3509,6 +4008,127 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
         box-shadow 140ms ease;
 }
 
+.nanah-device-compass__action-row {
+    display: flex;
+    align-items: center;
+    align-self: end;
+    gap: 0.28rem;
+    flex-wrap: wrap;
+    width: 100%;
+    margin-top: 0.24rem;
+}
+
+.nanah-device-compass__status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.42rem;
+    max-width: 100%;
+    margin-top: 0.14rem;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid rgba(96, 120, 145, 0.12);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.72);
+    color: rgba(45, 54, 62, 0.78);
+    font-size: 0.62rem;
+    font-weight: 850;
+    letter-spacing: 0.01em;
+    line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nanah-device-compass__status-pill[data-tone="success"] {
+    border-color: rgba(60, 118, 92, 0.18);
+    background: rgba(240, 250, 244, 0.86);
+    color: #2f6f48;
+}
+
+.nanah-device-compass__status-pill[data-tone="attention"],
+.nanah-device-compass__status-pill[data-tone="warning"] {
+    border-color: rgba(183, 83, 69, 0.18);
+    background: rgba(255, 246, 242, 0.86);
+    color: #a14b3e;
+}
+
+.nanah-device-compass__status-pill[data-tone="home"] {
+    border-color: rgba(60, 118, 92, 0.16);
+    background: rgba(244, 251, 247, 0.82);
+    color: #3c765c;
+}
+
+.nanah-device-compass__status-pill[data-tone="away"] {
+    border-color: rgba(79, 120, 184, 0.16);
+    background: rgba(244, 248, 255, 0.84);
+    color: #426ca8;
+}
+
+.nanah-device-compass__action {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    min-height: 1.38rem;
+    padding: 0.18rem 0.42rem;
+    border-radius: 999px;
+    font-size: 0.62rem;
+    font-weight: 850;
+    letter-spacing: 0.01em;
+    line-height: 1.15;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nanah-device-compass__action--primary {
+    border: 1px solid rgba(60, 118, 92, 0.15);
+    background: rgba(242, 250, 245, 0.84);
+    color: #2f6f48;
+}
+
+.nanah-device-compass__action--blocked {
+    border: 1px solid rgba(171, 68, 56, 0.14);
+    background: rgba(255, 246, 242, 0.78);
+    color: #9f4a3d;
+}
+
+.nanah-device-compass__choice:nth-child(1) {
+    grid-column: 2 / 5;
+    grid-row: 1;
+    align-self: start;
+    justify-self: center;
+    width: min(100%, 17rem);
+}
+
+.nanah-device-compass__choice:nth-child(2) {
+    grid-column: 1 / 3;
+    grid-row: 3;
+    align-self: start;
+    justify-self: stretch;
+}
+
+.nanah-device-compass__choice:nth-child(3) {
+    grid-column: 4 / 6;
+    grid-row: 3;
+    align-self: start;
+    justify-self: stretch;
+}
+
+.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(2),
+.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(3) {
+    opacity: 0.68;
+    border-style: dashed;
+    background: rgba(255, 255, 255, 0.46);
+    box-shadow: none;
+}
+
+.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(2) .nanah-device-compass__device,
+.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(3) .nanah-device-compass__device,
+.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(2)::before,
+.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(3)::before {
+    opacity: 0.56;
+}
+
 .nanah-device-compass__choice:hover,
 .nanah-device-compass__choice:focus-visible {
     transform: translateY(-1px);
@@ -3516,6 +4136,20 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     background: rgba(255, 255, 255, 0.84);
     box-shadow: 0 18px 36px -30px rgba(20, 33, 45, 0.72);
     outline: none;
+}
+
+.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(2):hover,
+.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(2):focus-visible,
+.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(3):hover,
+.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(3):focus-visible {
+    opacity: 0.86;
+    background: rgba(255, 255, 255, 0.72);
+    box-shadow: 0 12px 28px -28px rgba(20, 33, 45, 0.55);
+}
+
+.nanah-device-compass__choice:active {
+    transform: translateY(0) scale(0.992);
+    box-shadow: 0 12px 24px -26px rgba(20, 33, 45, 0.7);
 }
 
 .nanah-device-compass__choice:focus-visible {
@@ -3544,6 +4178,32 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     color: #8a4f12;
 }
 
+.nanah-device-compass__choice[data-selected="true"] {
+    transform: translateY(-2px);
+    border-color: rgba(183, 83, 69, 0.34);
+    background:
+        linear-gradient(180deg, rgba(255, 248, 244, 0.95), rgba(255, 255, 255, 0.72));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.72),
+        0 20px 42px -34px rgba(133, 46, 34, 0.76);
+}
+
+.nanah-device-compass__choice[data-selected="true"]::before {
+    width: 0.52rem;
+    height: 0.52rem;
+    background: #b75345;
+    box-shadow: 0 0 0 0.36rem rgba(183, 83, 69, 0.13);
+}
+
+.nanah-device-compass__choice[data-selected="true"]::after {
+    content: "";
+    position: absolute;
+    inset: 0.44rem;
+    border: 1px solid rgba(183, 83, 69, 0.16);
+    border-radius: 0.62rem;
+    pointer-events: none;
+}
+
 .nanah-device-compass__choice::before {
     content: "";
     position: absolute;
@@ -3566,10 +4226,419 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     box-shadow: 0 0 0 0.34rem rgba(79, 120, 184, 0.1);
 }
 
-.nanah-device-compass__rule {
+.nanah-device-compass__trusted-strip {
     position: relative;
     z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+    gap: 0.52rem;
+    align-items: stretch;
     grid-column: 1 / -1;
+    grid-row: 4;
+    min-width: 0;
+}
+
+.nanah-device-compass__trusted-device,
+.nanah-device-compass__trusted-overflow {
+    box-sizing: border-box;
+    min-width: 0;
+    min-height: 2.75rem;
+    border: 1px solid rgba(96, 120, 145, 0.12);
+    border-radius: 0.82rem;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(248, 244, 238, 0.58));
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition:
+        transform 140ms ease,
+        border-color 140ms ease,
+        background 140ms ease,
+        box-shadow 140ms ease;
+}
+
+.nanah-device-compass__trusted-device {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.58rem;
+    align-items: center;
+    padding: 0.58rem 0.62rem;
+}
+
+.nanah-device-compass__trusted-device:hover,
+.nanah-device-compass__trusted-device:focus-visible,
+.nanah-device-compass__trusted-overflow:hover,
+.nanah-device-compass__trusted-overflow:focus-visible {
+    transform: translateY(-1px);
+    border-color: rgba(171, 68, 56, 0.24);
+    background: rgba(255, 255, 255, 0.88);
+    box-shadow: 0 16px 34px -32px rgba(20, 33, 45, 0.62);
+    outline: none;
+}
+
+.nanah-device-compass__trusted-device:focus-visible,
+.nanah-device-compass__trusted-overflow:focus-visible {
+    box-shadow:
+        0 0 0 3px rgba(183, 83, 69, 0.14),
+        0 16px 34px -32px rgba(20, 33, 45, 0.62);
+}
+
+.nanah-device-compass__trusted-device:active,
+.nanah-device-compass__trusted-overflow:active {
+    transform: translateY(0) scale(0.992);
+}
+
+.nanah-device-compass__trusted-device[data-selected="true"] {
+    border-color: rgba(183, 83, 69, 0.34);
+    background:
+        linear-gradient(180deg, rgba(255, 248, 244, 0.95), rgba(255, 255, 255, 0.72));
+}
+
+.nanah-device-compass__trusted-device[data-route="same-network"] {
+    border-color: rgba(60, 118, 92, 0.26);
+    background:
+        linear-gradient(180deg, rgba(245, 253, 246, 0.94), rgba(255, 255, 255, 0.7));
+}
+
+.nanah-device-compass__trusted-device[data-source="home-bridge-preview"] {
+    border-style: dashed;
+    border-color: rgba(60, 118, 92, 0.34);
+    background:
+        linear-gradient(180deg, rgba(244, 252, 246, 0.96), rgba(255, 255, 255, 0.74));
+}
+
+.nanah-device-compass__trusted-device[data-route="away"] {
+    border-color: rgba(79, 120, 184, 0.26);
+    background:
+        linear-gradient(180deg, rgba(244, 248, 255, 0.94), rgba(255, 255, 255, 0.7));
+}
+
+.nanah-device-compass__trusted-device[data-trust-state="revoked"] {
+    border-color: rgba(151, 63, 55, 0.32);
+    background:
+        linear-gradient(180deg, rgba(255, 246, 244, 0.94), rgba(255, 255, 255, 0.72));
+}
+
+.nanah-device-compass__trusted-device[data-delivery-state*="check"],
+.nanah-device-compass__trusted-device[data-delivery-state*="failed"],
+.nanah-device-compass__trusted-device[data-delivery-state*="rejected"] {
+    border-color: rgba(171, 68, 56, 0.28);
+    background:
+        linear-gradient(180deg, rgba(255, 250, 244, 0.94), rgba(255, 255, 255, 0.72));
+}
+
+.nanah-device-compass__trusted-mark {
+    width: 0.9rem;
+    height: 0.9rem;
+    border-radius: 999px;
+    background: rgba(183, 83, 69, 0.16);
+    box-shadow: inset 0 0 0 0.28rem #b75345;
+}
+
+.nanah-device-compass__trusted-device[data-role="protected"] .nanah-device-compass__trusted-mark {
+    background: rgba(60, 118, 92, 0.16);
+    box-shadow: inset 0 0 0 0.28rem #3c765c;
+}
+
+.nanah-device-compass__trusted-device[data-route="same-network"] .nanah-device-compass__trusted-mark {
+    background: rgba(60, 118, 92, 0.18);
+    box-shadow:
+        inset 0 0 0 0.24rem #3c765c,
+        0 0 0 0.2rem rgba(60, 118, 92, 0.12);
+}
+
+.nanah-device-compass__trusted-device[data-source="home-bridge-preview"] .nanah-device-compass__trusted-mark {
+    background: rgba(60, 118, 92, 0.2);
+    box-shadow:
+        inset 0 0 0 0.18rem #3c765c,
+        0 0 0 0.22rem rgba(60, 118, 92, 0.12);
+}
+
+.nanah-device-compass__trusted-device[data-route="away"] .nanah-device-compass__trusted-mark {
+    background: rgba(79, 120, 184, 0.18);
+    box-shadow:
+        inset 0 0 0 0.24rem #4f78b8,
+        0 0 0 0.2rem rgba(79, 120, 184, 0.12);
+}
+
+.nanah-device-compass__trusted-device[data-role="parent"] .nanah-device-compass__trusted-mark {
+    background: rgba(79, 120, 184, 0.16);
+    box-shadow: inset 0 0 0 0.28rem #4f78b8;
+}
+
+.nanah-device-compass__trusted-device[data-trust-state="revoked"] .nanah-device-compass__trusted-mark,
+.nanah-device-compass__trusted-device[data-delivery-state*="failed"] .nanah-device-compass__trusted-mark,
+.nanah-device-compass__trusted-device[data-delivery-state*="rejected"] .nanah-device-compass__trusted-mark {
+    background: rgba(171, 68, 56, 0.18);
+    box-shadow:
+        inset 0 0 0 0.18rem #ab4438,
+        0 0 0 0.2rem rgba(171, 68, 56, 0.1);
+}
+
+.nanah-device-compass__trusted-copy {
+    display: grid;
+    gap: 0.12rem;
+    min-width: 0;
+}
+
+.nanah-device-compass__trusted-copy strong {
+    min-width: 0;
+    color: var(--ft-color-text-primary);
+    font-size: 0.78rem;
+    font-weight: 850;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nanah-device-compass__trusted-copy small {
+    min-width: 0;
+    color: var(--ft-color-text-secondary);
+    font-size: 0.68rem;
+    font-weight: 640;
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nanah-device-compass__trusted-device[data-source="home-bridge-preview"] .nanah-device-compass__trusted-copy strong::after,
+.nanah-device-compass__trusted-device[data-route="same-network"] .nanah-device-compass__trusted-copy strong::after,
+.nanah-device-compass__trusted-device[data-route="away"] .nanah-device-compass__trusted-copy strong::after {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.38rem;
+    padding: 0.1rem 0.34rem;
+    border-radius: 999px;
+    font-size: 0.56rem;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+
+.nanah-device-compass__trusted-device[data-route="same-network"] .nanah-device-compass__trusted-copy strong::after {
+    content: "home";
+    background: rgba(60, 118, 92, 0.12);
+    color: #2f6f48;
+}
+
+.nanah-device-compass__trusted-device[data-route="away"] .nanah-device-compass__trusted-copy strong::after {
+    content: "later";
+    background: rgba(79, 120, 184, 0.12);
+    color: #315f9d;
+}
+
+.nanah-device-compass__trusted-device[data-source="home-bridge-preview"] .nanah-device-compass__trusted-copy strong::after {
+    content: "found";
+    background: rgba(60, 118, 92, 0.13);
+    color: #2f6f48;
+}
+
+.nanah-device-compass__trusted-overflow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    padding: 0.54rem 0.72rem;
+    color: var(--ft-color-accent);
+    font-size: 0.74rem;
+    font-weight: 850;
+    white-space: nowrap;
+}
+
+.nanah-device-compass__presence-row {
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 0.62rem;
+    align-items: center;
+    grid-column: 1 / -1;
+    grid-row: 5;
+    min-width: 0;
+    min-height: 3.05rem;
+    padding: 0.62rem 0.74rem;
+    border: 1px dashed rgba(60, 118, 92, 0.22);
+    border-radius: 0.82rem;
+    background:
+        linear-gradient(180deg, rgba(245, 252, 247, 0.78), rgba(255, 255, 255, 0.62));
+    color: #365f4c;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.nanah-device-compass__presence-row[hidden] {
+    display: none;
+}
+
+.nanah-device-compass__presence-row[data-tone="warning"] {
+    border-color: rgba(171, 68, 56, 0.24);
+    background:
+        linear-gradient(180deg, rgba(255, 248, 244, 0.86), rgba(255, 255, 255, 0.64));
+    color: #8f493f;
+}
+
+.nanah-device-compass__presence-row[data-tone="success"] {
+    border-color: rgba(60, 118, 92, 0.32);
+    background:
+        linear-gradient(180deg, rgba(241, 252, 245, 0.92), rgba(255, 255, 255, 0.68));
+}
+
+.nanah-device-compass__presence-mark {
+    width: 0.95rem;
+    height: 0.95rem;
+    border-radius: 999px;
+    background: rgba(60, 118, 92, 0.18);
+    box-shadow:
+        inset 0 0 0 0.2rem #3c765c,
+        0 0 0 0.22rem rgba(60, 118, 92, 0.1);
+}
+
+.nanah-device-compass__presence-row[data-tone="warning"] .nanah-device-compass__presence-mark {
+    background: rgba(171, 68, 56, 0.16);
+    box-shadow:
+        inset 0 0 0 0.2rem #ab4438,
+        0 0 0 0.22rem rgba(171, 68, 56, 0.1);
+}
+
+.nanah-device-compass__presence-copy {
+    display: grid;
+    gap: 0.08rem;
+    min-width: 0;
+}
+
+.nanah-device-compass__presence-copy span {
+    color: inherit;
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.075em;
+    line-height: 1.15;
+    text-transform: uppercase;
+}
+
+.nanah-device-compass__presence-copy strong {
+    min-width: 0;
+    color: var(--ft-color-text-primary);
+    font-size: 0.8rem;
+    font-weight: 880;
+    line-height: 1.22;
+    overflow-wrap: anywhere;
+}
+
+.nanah-device-compass__presence-copy small {
+    min-width: 0;
+    color: var(--ft-color-text-secondary);
+    font-size: 0.72rem;
+    font-weight: 650;
+    line-height: 1.32;
+    overflow-wrap: anywhere;
+}
+
+.nanah-device-compass__presence-controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.42rem;
+    min-width: 0;
+}
+
+.nanah-device-compass__presence-button {
+    min-width: 7.5rem;
+    min-height: 2.75rem;
+    padding-inline: 0.72rem;
+    white-space: normal;
+}
+
+.nanah-device-compass__nearby-list {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(auto-fit, minmax(min(13rem, 100%), 1fr));
+    gap: 0.48rem;
+    width: 100%;
+    min-width: 0;
+    padding-top: 0.1rem;
+}
+
+.nanah-device-compass__nearby-device {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+        "mark label"
+        "mark state";
+    gap: 0.12rem 0.56rem;
+    align-items: center;
+    min-width: 0;
+    min-height: 3.25rem;
+    padding: 0.58rem 0.68rem;
+    border: 1px dashed rgba(60, 118, 92, 0.32);
+    border-radius: 0.76rem;
+    background: #f8fcf9;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
+}
+
+.nanah-device-compass__nearby-device i {
+    grid-area: mark;
+    width: 0.82rem;
+    height: 0.82rem;
+    border-radius: 999px;
+    background: #3c765c;
+    box-shadow: 0 0 0 0.22rem rgba(60, 118, 92, 0.12);
+}
+
+.nanah-device-compass__nearby-device strong {
+    grid-area: label;
+    min-width: 0;
+    color: var(--ft-color-text-primary);
+    font-size: 0.78rem;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nanah-device-compass__nearby-device small {
+    grid-area: state;
+    color: var(--ft-color-text-secondary);
+    font-size: 0.7rem;
+    line-height: 1.25;
+}
+
+.nanah-device-compass__nearby-device:hover,
+.nanah-device-compass__nearby-device:focus-visible {
+    transform: translateY(-1px);
+    border-color: rgba(60, 118, 92, 0.52);
+    background: #f1faf4;
+    outline: none;
+}
+
+.nanah-device-compass__nearby-device:focus-visible {
+    box-shadow: 0 0 0 3px rgba(60, 118, 92, 0.14);
+}
+
+.nanah-device-compass__nearby-device[data-selected="true"] {
+    border-style: solid;
+    border-color: rgba(60, 118, 92, 0.58);
+    background: #ebf7ef;
+}
+
+.nanah-device-compass__nearby-device:active {
+    transform: translateY(0) scale(0.992);
+}
+
+.nanah-device-compass__rule {
+    position: relative;
+    box-sizing: border-box;
+    z-index: 1;
+    grid-column: 1 / -1;
+    grid-row: 6;
     min-width: 0;
     padding: 0.58rem 0.72rem;
     border: 1px solid rgba(60, 118, 92, 0.15);
@@ -3579,6 +4648,183 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     font-size: 0.75rem;
     font-weight: 760;
     line-height: 1.35;
+}
+
+.nanah-device-compass__selection-preview {
+    position: relative;
+    box-sizing: border-box;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(6.5rem, 0.28fr) minmax(0, 0.42fr) minmax(0, 1fr);
+    gap: 0.45rem 0.7rem;
+    align-items: center;
+    grid-column: 1 / -1;
+    grid-row: 7;
+    min-width: 0;
+    padding: 0.68rem 0.76rem;
+    border: 1px solid rgba(171, 68, 56, 0.16);
+    border-radius: 0.9rem;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(248, 244, 238, 0.62));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.nanah-device-compass__selection-preview[data-has-primary-action="true"] {
+    border-color: rgba(60, 118, 92, 0.18);
+    background:
+        linear-gradient(180deg, rgba(250, 255, 252, 0.82), rgba(248, 244, 238, 0.62));
+}
+
+.nanah-device-compass__selection-preview span {
+    color: var(--ft-color-accent);
+    font-size: 0.68rem;
+    font-weight: 850;
+    letter-spacing: 0.075em;
+    text-transform: uppercase;
+}
+
+.nanah-device-compass__selection-preview strong {
+    min-width: 0;
+    color: var(--ft-color-text);
+    font-size: 0.84rem;
+    font-weight: 850;
+    line-height: 1.24;
+    overflow-wrap: anywhere;
+}
+
+.nanah-device-compass__selection-preview small {
+    min-width: 0;
+    color: var(--ft-color-text-secondary);
+    font-size: 0.76rem;
+    font-weight: 650;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.nanah-device-compass__selection-actions {
+    display: flex;
+    grid-column: 1 / -1;
+    gap: 0.36rem;
+    flex-wrap: wrap;
+    align-items: center;
+    min-width: 0;
+    padding-top: 0.24rem;
+    border-top: 1px solid rgba(96, 120, 145, 0.1);
+}
+
+.nanah-device-compass__selection-action {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.48rem;
+    max-width: 100%;
+    padding: 0.22rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.66rem;
+    font-weight: 850;
+    line-height: 1.15;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nanah-device-compass__selection-action--primary {
+    border: 1px solid rgba(60, 118, 92, 0.16);
+    background: rgba(242, 250, 245, 0.88);
+    color: #2f6f48;
+}
+
+.nanah-device-compass__selection-action--blocked {
+    border: 1px solid rgba(171, 68, 56, 0.14);
+    background: rgba(255, 246, 242, 0.82);
+    color: #9f4a3d;
+}
+
+.nanah-device-compass__selection-buttons {
+    grid-column: 3;
+    justify-self: end;
+    align-self: center;
+    display: flex;
+    gap: 0.42rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    min-width: 0;
+}
+
+.nanah-device-compass__selection-button {
+    min-height: 2.75rem;
+    max-width: min(100%, 14rem);
+    padding: 0.5rem 0.82rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nanah-device-compass__selection-button:active {
+    transform: scale(0.992);
+}
+
+.nanah-device-compass__evidence-row {
+    position: relative;
+    box-sizing: border-box;
+    z-index: 1;
+    grid-column: 1 / -1;
+    grid-row: 8;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    align-items: center;
+    min-width: 0;
+    padding: 0.62rem 0.72rem;
+    border: 1px solid rgba(96, 120, 145, 0.12);
+    border-radius: 0.82rem;
+    background: rgba(255, 255, 255, 0.58);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.nanah-device-compass__evidence-row span {
+    display: block;
+    color: var(--ft-color-text);
+    font-size: 0.72rem;
+    font-weight: 860;
+    line-height: 1.25;
+}
+
+.nanah-device-compass__evidence-row small {
+    display: block;
+    margin-top: 0.14rem;
+    color: var(--ft-color-text-secondary);
+    font-size: 0.68rem;
+    font-weight: 650;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.nanah-device-compass__evidence-actions {
+    display: flex;
+    gap: 0.42rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    min-width: 0;
+}
+
+.nanah-device-compass__evidence-button {
+    min-height: 2.75rem;
+    max-width: min(100%, 10.5rem);
+    padding: 0.5rem 0.78rem;
+    border-color: rgba(96, 120, 145, 0.16);
+    color: var(--ft-color-text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nanah-device-compass__evidence-button:hover {
+    border-color: rgba(171, 68, 56, 0.18);
+    color: var(--ft-color-text);
+}
+
+.nanah-device-compass__evidence-button:active {
+    transform: scale(0.992);
 }
 
 .nanah-delivery-advanced {
@@ -4635,6 +5881,44 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
     color: var(--ft-color-text-secondary);
 }
 
+.nanah-sync-status__intent {
+    display: grid;
+    gap: 0.22rem;
+    padding: 0.72rem 0.82rem;
+    border: 1px solid rgba(171, 68, 56, 0.16);
+    border-radius: 0.86rem;
+    background:
+        linear-gradient(180deg, rgba(255, 250, 246, 0.92), rgba(255, 255, 255, 0.68));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.68);
+}
+
+.nanah-sync-status__intent[hidden] {
+    display: none;
+}
+
+.nanah-sync-status__intent span {
+    color: var(--ft-color-accent);
+    font-size: 0.68rem;
+    font-weight: 850;
+    letter-spacing: 0.075em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.nanah-sync-status__intent strong {
+    color: var(--ft-color-text-primary);
+    font-size: 0.88rem;
+    font-weight: 850;
+    line-height: 1.28;
+}
+
+.nanah-sync-status__intent small {
+    color: var(--ft-color-text-secondary);
+    font-size: 0.78rem;
+    font-weight: 650;
+    line-height: 1.42;
+}
+
 .nanah-sync-qr-wrap {
     display: grid;
     justify-items: center;
@@ -5036,6 +6320,13 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
         linear-gradient(180deg, rgba(255, 249, 238, 0.95), rgba(249, 243, 229, 0.84));
 }
 
+.nanah-sync-status[data-tone="retry"] {
+    border-color: rgba(193, 143, 58, 0.2);
+    background:
+        radial-gradient(circle at top right, rgba(220, 184, 112, 0.14), transparent 28%),
+        linear-gradient(180deg, rgba(255, 251, 242, 0.94), rgba(249, 245, 234, 0.82));
+}
+
 .nanah-sync-status[data-tone="connected"] {
     border-color: rgba(57, 127, 103, 0.22);
     background:
@@ -5092,6 +6383,75 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
 
 .help-shell .help-cluster > .help-technical-card {
     grid-column: 1 / -1;
+}
+
+.help-family-devices-card .card-body {
+    display: grid;
+    gap: 1rem;
+}
+
+.help-family-devices-card__intro {
+    max-width: 58rem;
+    margin: 0;
+    color: var(--ft-color-text-secondary);
+    font-size: 0.92rem;
+    font-weight: 650;
+    line-height: 1.55;
+}
+
+.help-family-devices-steps,
+.help-family-devices-notes {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.8rem;
+}
+
+.help-family-devices-steps article,
+.help-family-devices-notes div {
+    min-width: 0;
+    padding: 0.92rem;
+    border: 1px solid rgba(171, 68, 56, 0.12);
+    border-radius: 1rem;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(250, 246, 240, 0.62));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.help-family-devices-steps span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.55rem;
+    height: 1.55rem;
+    margin-bottom: 0.58rem;
+    border-radius: 999px;
+    background: rgba(183, 83, 69, 0.12);
+    color: var(--ft-color-accent);
+    font-size: 0.78rem;
+    font-weight: 880;
+}
+
+.help-family-devices-steps strong,
+.help-family-devices-notes strong {
+    display: block;
+    color: var(--ft-color-text-primary);
+    font-size: 0.92rem;
+    font-weight: 850;
+    line-height: 1.26;
+}
+
+.help-family-devices-steps p,
+.help-family-devices-notes span {
+    display: block;
+    margin: 0.42rem 0 0;
+    color: var(--ft-color-text-secondary);
+    font-size: 0.82rem;
+    font-weight: 640;
+    line-height: 1.45;
+}
+
+.help-family-devices-notes {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .whatsnew-feed,
@@ -5198,6 +6558,25 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
+    .nanah-sync-intro__copy {
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas:
+            "eyebrow actions"
+            "title actions"
+            "body actions";
+        align-items: center;
+        column-gap: 1rem;
+    }
+
+    .nanah-sync-intro__body {
+        max-width: 64ch;
+    }
+
+    .nanah-sync-intro__actions {
+        justify-self: end;
+        justify-content: flex-end;
+    }
+
     .help-cluster--filters {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
@@ -5205,8 +6584,12 @@ html[data-theme="dark"] .dashboard-app-card__cta-icon {
 
 @media (min-width: 1360px) {
     .nanah-sync-intro {
-        grid-template-columns: minmax(16rem, 0.72fr) minmax(0, 1.28fr);
-        align-items: start;
+        grid-template-columns: 1fr;
+    }
+
+    .nanah-parent-edit-model,
+    .nanah-sync-simple-path {
+        grid-column: 1 / -1;
     }
 
     .nanah-delivery-strip {
@@ -5762,20 +7145,106 @@ body.ft-extension-surface .ft-profile-dropdown.ft-select-dropdown {
         grid-template-columns: 1fr;
     }
 
-    .nanah-device-compass {
-        grid-template-columns: 1fr;
+    .nanah-device-compass-stage__steps {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .nanah-device-compass::before {
+    .nanah-device-compass-stage__plain-rule {
+        display: grid;
+        gap: 0.16rem;
+    }
+
+    .nanah-device-compass {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto auto auto;
+        overflow: visible;
+    }
+
+    .nanah-device-compass::before,
+    .nanah-device-compass::after {
         display: none;
     }
 
     .nanah-device-compass__center {
+        grid-column: 1 / -1;
+        grid-row: auto;
         min-height: 5.75rem;
+        width: 100%;
+        aspect-ratio: auto;
         border-radius: 1rem;
     }
 
     .nanah-device-compass__grid {
+        display: grid;
+        grid-column: 1 / -1;
+        grid-row: auto;
+        grid-template-columns: 1fr;
+        grid-template-rows: none;
+        gap: 0.58rem;
+        min-height: auto;
+    }
+
+    .nanah-device-compass__choice:nth-child(1),
+    .nanah-device-compass__choice:nth-child(2),
+    .nanah-device-compass__choice:nth-child(3) {
+        grid-column: auto;
+        grid-row: auto;
+        width: 100%;
+        justify-self: stretch;
+        align-self: stretch;
+    }
+
+    .nanah-device-compass__presence-row,
+    .nanah-device-compass__rule,
+    .nanah-device-compass__evidence-row,
+    .nanah-device-compass__selection-preview {
+        grid-column: 1 / -1;
+        grid-template-columns: 1fr;
+    }
+
+    .nanah-device-compass__evidence-actions {
+        justify-content: stretch;
+    }
+
+    .nanah-device-compass__evidence-actions > button {
+        flex: 1 1 10rem;
+    }
+
+    .nanah-device-compass__selection-buttons {
+        grid-column: 1 / -1;
+        justify-self: stretch;
+        justify-content: stretch;
+    }
+
+    .nanah-device-compass__selection-buttons > button {
+        flex: 1 1 10rem;
+    }
+
+    .nanah-device-compass__selection-button {
+        grid-column: 1 / -1;
+        justify-self: stretch;
+        width: 100%;
+        max-width: none;
+    }
+
+    .nanah-device-compass__evidence-button {
+        width: 100%;
+        max-width: none;
+    }
+
+    .nanah-device-compass__trusted-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .nanah-device-compass__trusted-overflow {
+        justify-content: flex-start;
+    }
+
+    .help-family-devices-steps {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .help-family-devices-notes {
         grid-template-columns: 1fr;
     }
 
@@ -5798,6 +7267,12 @@ body.ft-extension-surface .ft-profile-dropdown.ft-select-dropdown {
         flex-direction: column;
     }
 
+}
+
+@media (max-width: 1180px) and (min-width: 981px) {
+    .nanah-sync-intro {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 768px) and (max-height: 760px) {
@@ -5836,13 +7311,24 @@ body.ft-extension-surface .ft-profile-dropdown.ft-select-dropdown {
     }
 
     .nanah-sync-intro,
+    .nanah-device-compass-stage,
     .nanah-sync-panel,
     .nanah-sync-card .card-body.settings-card__body,
     .nanah-sync-card .card-header {
         padding: 0.92rem;
     }
 
+    .nanah-sync-intro__copy {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "eyebrow"
+            "title"
+            "body"
+            "actions";
+    }
+
     .nanah-sync-intro,
+    .nanah-device-compass-stage,
     .nanah-sync-panel,
     .nanah-sync-card {
         border-radius: 1.1rem;
@@ -5853,6 +7339,15 @@ body.ft-extension-surface .ft-profile-dropdown.ft-select-dropdown {
     }
 
     .nanah-sync-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .help-family-devices-steps,
+    .help-family-devices-notes {
+        grid-template-columns: 1fr;
+    }
+
+    .nanah-device-compass__trusted-strip {
         grid-template-columns: 1fr;
     }
 
@@ -5888,6 +7383,75 @@ body.ft-extension-surface .ft-profile-dropdown.ft-select-dropdown {
     .nanah-sync-status__row {
         flex-direction: column;
         align-items: flex-start;
+    }
+}
+
+@media (max-width: 640px) {
+    .nanah-pairing-details__summary {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.7rem;
+    }
+
+    .nanah-pairing-details__summary code {
+        align-self: flex-start;
+    }
+
+    .nanah-pairing-details[open] > .nanah-sync-grid {
+        padding: 0 0.7rem 0.7rem;
+    }
+
+    .nanah-device-compass-stage {
+        padding: 0.74rem;
+    }
+
+    .nanah-device-compass {
+        gap: 0.58rem;
+        padding: 0.68rem;
+        border-radius: 0.96rem;
+    }
+
+    .nanah-device-compass__center,
+    .nanah-device-compass__choice,
+    .nanah-device-compass__presence-row,
+    .nanah-device-compass__rule,
+    .nanah-device-compass__evidence-row,
+    .nanah-device-compass__selection-preview {
+        border-radius: 0.8rem;
+    }
+
+    .nanah-device-compass__choice {
+        min-height: 5.75rem;
+        padding: 0.68rem;
+    }
+
+    .nanah-device-compass__status-pill,
+    .nanah-device-compass__action,
+    .nanah-device-compass__selection-action {
+        min-height: 1.75rem;
+        white-space: normal;
+    }
+
+    .nanah-device-compass__status-pill {
+        justify-self: start;
+        max-width: calc(100% - 2.4rem);
+    }
+
+    .nanah-device-compass__action-row,
+    .nanah-device-compass__selection-actions {
+        gap: 0.42rem;
+    }
+
+    .nanah-device-compass__selection-preview[data-has-primary-action="true"] {
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.72),
+            0 14px 28px -28px rgba(60, 118, 92, 0.68);
+    }
+
+    .nanah-device-compass__hub-mark,
+    .nanah-device-compass__device {
+        width: 2.1rem;
+        height: 2.1rem;
     }
 }
 
@@ -6162,6 +7726,10 @@ body.ft-extension-surface[data-surface="tab-view"] .settings-grid {
 
 body.ft-extension-surface[data-surface="tab-view"] .settings-card--featured {
     margin-top: clamp(1rem, 1.35vw, 1.35rem);
+}
+
+body.ft-extension-surface[data-surface="tab-view"] .sync-shell #familyDeviceUpdatesCard {
+    margin-top: 0;
 }
 
 body.ft-extension-surface[data-surface="tab-view"] .import-export-row,

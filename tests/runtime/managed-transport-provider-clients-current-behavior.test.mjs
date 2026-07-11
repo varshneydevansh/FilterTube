@@ -326,6 +326,86 @@ test('local-network client does not auto-discover or probe LAN without explicit 
   assert.equal(calls.length, 0);
 });
 
+test('configured local-network client exposes opt-in nearby presence and pairing methods', async () => {
+  const calls = [];
+  const fetchImpl = async (url, options) => {
+    const body = JSON.parse(options.body);
+    calls.push({ url, body });
+    if (url.endsWith('/presence/discover')) {
+      return jsonResponse({
+        ok: true,
+        candidates: [{
+          candidateId: 'nearby-child-1',
+          label: 'Study laptop',
+          platform: 'extension',
+          role: 'protected',
+          receiveToken: 'must-not-be-exposed'
+        }]
+      });
+    }
+    if (url.endsWith('/presence/invitations/pull')) {
+      return jsonResponse({
+        ok: true,
+        invitations: [{
+          invitationId: 'invite-1',
+          candidateId: 'nearby-child-1',
+          pairingCode: 'ABCD',
+          inviterLabel: 'Parent laptop'
+        }]
+      });
+    }
+    return jsonResponse({ ok: true });
+  };
+  const window = loadClient('js/nanah_managed_local_network_client.js');
+  const provider = window.FilterTubeManagedLocalNetworkClient.createProvider({
+    endpointUrl: 'http://192.168.1.10:8787/filtertube'
+  }, { fetch: fetchImpl });
+
+  assert.equal(typeof provider.announceNearbyDevice, 'function');
+  assert.equal(typeof provider.discoverNearbyDevices, 'function');
+  assert.equal(typeof provider.inviteNearbyDevice, 'function');
+  assert.equal(typeof provider.pullNearbyPairingInvitations, 'function');
+  assert.equal(typeof provider.withdrawNearbyDevice, 'function');
+
+  await provider.announceNearbyDevice({
+    candidateId: 'nearby-child-1',
+    receiveToken: 'ephemeral-token',
+    label: 'Study laptop',
+    privateKey: 'must-not-cross'
+  });
+  const discovered = await provider.discoverNearbyDevices({
+    excludeCandidateId: 'this-device',
+    privateKey: 'must-not-cross'
+  });
+  await provider.inviteNearbyDevice({
+    invitationId: 'invite-1',
+    candidateId: 'nearby-child-1',
+    pairingCode: 'ABCD',
+    inviterLabel: 'Parent laptop',
+    privateKey: 'must-not-cross'
+  });
+  const pulled = await provider.pullNearbyPairingInvitations({
+    candidateId: 'nearby-child-1',
+    receiveToken: 'ephemeral-token',
+    privateKey: 'must-not-cross'
+  });
+  await provider.withdrawNearbyDevice({
+    candidateId: 'nearby-child-1',
+    receiveToken: 'ephemeral-token',
+    privateKey: 'must-not-cross'
+  });
+
+  assert.equal(discovered.candidates.length, 1);
+  assert.equal(discovered.candidates[0].state, 'nearby-unpaired');
+  assert.equal(Object.hasOwn(discovered.candidates[0], 'receiveToken'), false);
+  assert.equal(pulled.invitations[0].pairingCode, 'ABCD');
+  assert.equal(calls.length, 5);
+  assert.ok(calls.every(call => !Object.hasOwn(call.body, 'privateKey')));
+  assert.equal(calls[0].body.receiveToken, 'ephemeral-token');
+  assert.equal(calls[3].body.receiveToken, 'ephemeral-token');
+  assert.equal(calls[4].body.receiveToken, 'ephemeral-token');
+});
+
 test('configured local-network client pulls redacted delivery receipts for source status', async () => {
   const calls = [];
   const fetchImpl = async (url, options) => {
