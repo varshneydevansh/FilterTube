@@ -144,10 +144,11 @@ When scrolling or loading sidebar recommendations via AJAX/Fetch, YouTube append
 - **"Not interested" Feedback Token**: *Found in `menuServiceItemRenderer` where `iconType` is `"NOT_INTERESTED"`* -> `...serviceEndpoint.feedbackEndpoint.feedbackToken`
 - **"Don't recommend channel" Feedback Token**: *Found in `menuServiceItemRenderer` where `iconType` is `"REMOVE"`* -> `...serviceEndpoint.feedbackEndpoint.feedbackToken`
 
-**Main Uploader Details (Outside the Sheet)**:
-- **Main Uploader Name**: `...shortBylineText.runs[0].text` -> Value: `"Shakira and 2 more"` (Note: requires regex to strip 'and N more')
-- **Main Uploader ID (Fallback 1 - Avatar)**: `...channelThumbnail.channelThumbnailWithLinkRenderer.navigationEndpoint.browseEndpoint.browseId` -> Value: `"UCYLNGLIzMhRTi6ZOLjAPSmw"`
-- **Main Uploader ID (Fallback 2 - Byline)**: `...shortBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId` (Sometimes missing if replaced by `showSheetCommand`)
+**Card-Level Channel / Byline Signals (Outside the Sheet)**:
+- **Collapsed Byline Text**: `...shortBylineText.runs[0].text` -> Example: `"Shakira and 2 more"` (Note: this is display text, not proof that the first name is the uploader.)
+- **Card Channel ID (Avatar/Thumbnail Link)**: `...channelThumbnail.channelThumbnailWithLinkRenderer.navigationEndpoint.browseEndpoint.browseId` -> Example: `"UCYLNGLIzMhRTi6ZOLjAPSmw"`
+- **Direct Byline Channel ID Fallback**: `...shortBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId` (Sometimes missing because the navigation endpoint is replaced by `showSheetCommand`.)
+- The card-level channel endpoint and collaborator-sheet entries are independent signals. Do not assume that collaborator index `0` is the uploader, and do not overwrite one channel ID with the other when YouTube exposes merged or aliased channel identities.
 
 **Header/Trigger Check (The Roster)**:
 - Path: `...shortBylineText.runs[0].navigationEndpoint.showSheetCommand.panelLoadingStrategy.inlineContent.sheetViewModel.header.panelHeaderViewModel.title.content`
@@ -160,7 +161,7 @@ When scrolling or loading sidebar recommendations via AJAX/Fetch, YouTube append
 - Weak name-only composite entries must be pruned before caching or menu rendering. Example: if a fallback returns `Bizarrap`, `Daddy Yankee Bizarrap`, and `Daddy Yankee`, the middle entry is a composite label, not a third channel.
 - Expected collaborator count must collapse with that pruned list when the inflated count came from the fallback candidate.
 
-**Uploader / Collaborator 1 (Index 0 - e.g., shakiraVEVO)**:
+**Collaborator 1 (Index 0 - e.g., shakiraVEVO)**:
 - **Channel ID**: `...shortBylineText.runs[0].navigationEndpoint.showSheetCommand.panelLoadingStrategy.inlineContent.sheetViewModel.content.listViewModel.listItems[0].listItemViewModel.rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.browseId` -> Value: `"UCYLNGLIzMhRTi6ZOLjAPSmw"`
 - **Channel Name**: `...shortBylineText.runs[0].navigationEndpoint.showSheetCommand.panelLoadingStrategy.inlineContent.sheetViewModel.content.listViewModel.listItems[0].listItemViewModel.title.content` -> Value: `"shakiraVEVO"`
 - **Channel Handle (Alternate ID)**: `...shortBylineText.runs[0].navigationEndpoint.showSheetCommand.panelLoadingStrategy.inlineContent.sheetViewModel.content.listViewModel.listItems[0].listItemViewModel.title.commandRuns[0].onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl` -> Value: `"/@shakiraVEVO"`
@@ -183,10 +184,130 @@ When scrolling or loading sidebar recommendations via AJAX/Fetch, YouTube append
 
 THE JSON STRUCTURE CAN BE FIND IN @collab.json file
 
+## Search Result Fixture: Shakira / VEVO Merged-Identity Case (2026-07-11)
+
+*Local ignored fixture: `collab.json`*
+
+**Search query**: `shakira la pared (anniversery version)` (YouTube suggested the corrected spelling `anniversary`.)
+
+**Search Base Path**:
+`contents.sectionListRenderer.contents[i].itemSectionRenderer.contents[j].videoWithContextRenderer`
+
+**Video and visible byline**:
+- **Video ID**: `...videoId` -> `"_Wcf2rKEB8E"`
+- **Title**: `...headline.runs[0].text` -> `"Shakira - La Pared (Anniversary Version)"`
+- **Collapsed collaboration byline**: `...shortBylineText.runs[0].text` -> `"Shakira and Spotify"`
+- **Roster trigger**: `...shortBylineText.runs[0].navigationEndpoint.showSheetCommand.panelLoadingStrategy.inlineContent.sheetViewModel.header.panelHeaderViewModel.title.content` -> `"Collaborators"`
+
+**Collaborator sheet row 0 - Shakira/VEVO identity**:
+- **Name**: `...listItems[0].listItemViewModel.title.content` -> `"shakiraVEVO"`
+- **Handle URL**: `...listItems[0].listItemViewModel.title.commandRuns[0].onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl` -> `"/@shakiraVEVO"`
+- **Sheet browse ID**: `...listItems[0].listItemViewModel.rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.browseId` -> `"UCGnjeahCJW1AF34HBmQTJ-Q"`
+
+**Collaborator sheet row 1 - Spotify**:
+- **Name**: `...listItems[1].listItemViewModel.title.content` -> `"Spotify"`
+- **Handle shown in subtitle**: `...listItems[1].listItemViewModel.subtitle.content` contains `"@Spotify"`
+- **Sheet browse ID**: `...listItems[1].listItemViewModel.rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.browseId` -> `"UCRMqQWxCWE0VMvtUElm-rEA"`
+
+**Separate card-level Shakira/VEVO channel signal**:
+- **Path**: `...channelThumbnail.channelThumbnailWithLinkRenderer.navigationEndpoint.browseEndpoint.browseId`
+- **Value**: `"UCYLNGLIzMhRTi6ZOLjAPSmw"`
+- **Accessibility label**: `...channelThumbnail.channelThumbnailWithLinkRenderer.accessibility.accessibilityData.label` -> `"Go to channel shakiraVEVO"`
+- `UCYLNGLIzMhRTi6ZOLjAPSmw` is the merged/current Shakira creator channel (`@shakira`). This card still carries the stale/legacy accessibility label `Go to channel shakiraVEVO` while routing to that creator-channel ID.
+- `UCGnjeahCJW1AF34HBmQTJ-Q` is the separate VEVO channel identity exposed by the collaborator sheet as `/@shakiraVEVO`.
+- This is therefore not evidence for a third collaborator. It is a creator-channel plus legacy VEVO-channel identity relationship attached to the one visible Shakira roster member.
+
+**Interpretation rule**:
+- Row `0` means “first roster entry,” not “uploader.” The sheet does not include an `uploader`, `owner`, or `primaryChannelId` field.
+- Preserve the current creator channel (`UCYLNGLIzMhRTi6ZOLjAPSmw` / `@shakira`) separately from the VEVO channel (`UCGnjeahCJW1AF34HBmQTJ-Q` / `@shakiraVEVO`). The card accessibility label alone must not collapse those IDs.
+- If the card-channel label matches exactly one normalized roster member, attach that creator-channel ID as an alternate matching alias of the existing member. Never render it as an additional collaborator row.
+- Spotify remains an independent collaborator/company channel. Its presence does not turn the Mix byline into a collaborator roster.
+
+**Reduced identity excerpt** (the complete renderer is in ignored local fixture `collab.json`):
+
+```json
+{
+  "videoId": "_Wcf2rKEB8E",
+  "shortBylineText": {
+    "runs": [{
+      "text": "Shakira and Spotify",
+      "navigationEndpoint": {
+        "showSheetCommand": {
+          "panelLoadingStrategy": {
+            "inlineContent": {
+              "sheetViewModel": {
+                "header": {
+                  "panelHeaderViewModel": {
+                    "title": { "content": "Collaborators" }
+                  }
+                },
+                "content": {
+                  "listViewModel": {
+                    "listItems": [
+                      {
+                        "listItemViewModel": {
+                          "title": {
+                            "content": "shakiraVEVO",
+                            "commandRuns": [{
+                              "onTap": {
+                                "innertubeCommand": {
+                                  "browseEndpoint": {
+                                    "browseId": "UCGnjeahCJW1AF34HBmQTJ-Q",
+                                    "canonicalBaseUrl": "/@shakiraVEVO"
+                                  }
+                                }
+                              }
+                            }]
+                          }
+                        }
+                      },
+                      {
+                        "listItemViewModel": {
+                          "title": { "content": "Spotify" },
+                          "rendererContext": {
+                            "commandContext": {
+                              "onTap": {
+                                "innertubeCommand": {
+                                  "browseEndpoint": {
+                                    "browseId": "UCRMqQWxCWE0VMvtUElm-rEA"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }]
+  },
+  "channelThumbnail": {
+    "channelThumbnailWithLinkRenderer": {
+      "navigationEndpoint": {
+        "browseEndpoint": {
+          "browseId": "UCYLNGLIzMhRTi6ZOLjAPSmw"
+        }
+      },
+      "accessibility": {
+        "accessibilityData": {
+          "label": "Go to channel shakiraVEVO"
+        }
+      }
+    }
+  }
+}
+```
+
 ---
 
 # Absolute JSON Trace: YouTube Generated MIX (`compactRadioRenderer` & `radioRenderer`)
-*File: `YTM-XHR.json`, `YT_MAIN_UPNEXT_FEED_WATCHPAGE.json`, `Home Page Context`*
+*File: `YTM-XHR.json`, `YT_MAIN_UPNEXT_FEED_WATCHPAGE.json`, `mix.json`, `Home Page Context`*
 
 MIX cards appear in two variants based on their location. `radioRenderer` is found on the main Home feed (`richItemRenderer`), while `compactRadioRenderer` is found in the Up Next sidebar.
 
@@ -241,6 +362,65 @@ MIX cards appear in two variants based on their location. `radioRenderer` is fou
 - Titles beginning with `Mix -`, `Mix –`, or `Mix —` are Mix title signals, not collaborator labels.
 - Seed artist text in a Mix title/byline can contain commas, `and`, `&`, or `more`; that text must not create collaborator menu rows.
 - A Mix card can still link to a seed video that is itself a collaboration. In that case collaborator recovery must happen from the seed video's watch/search JSON, not from the Mix container text.
+
+## Search Result Fixture: Shakira Generated Mix (2026-07-11)
+
+*Local ignored fixture: `mix.json`*
+
+**Search Base Path**:
+`contents.sectionListRenderer.contents[i].itemSectionRenderer.contents[j].compactRadioRenderer`
+
+**Identifiers**:
+- **Playlist ID**: `...playlistId` -> `"RD_Wcf2rKEB8E"`
+- **Seed video ID**: `...navigationEndpoint.watchEndpoint.videoId` -> `"_Wcf2rKEB8E"`
+- **Secondary/alternate video ID**: `...secondaryNavigationEndpoint.watchEndpoint.videoId` -> `"OOqhtWs_6qI"`
+- **Title**: `...title.runs[0].text` -> `"Mix - Shakira - La Pared (Anniversary Version)"`
+- **Mix description/byline**: `...longBylineText.runs[0].text` -> `"Shakira, KAROL G, and more"`
+- **Mix marker**: `...thumbnailOverlays[0].thumbnailOverlayBottomPanelRenderer.icon.iconType` -> `"MIX"`
+
+**Channel identity result**:
+- This `compactRadioRenderer` contains no `browseEndpoint.browseId`, canonical channel URL, collaborator sheet, or UC channel ID for Shakira, KAROL G, or the other Mix participants.
+- `"Shakira, KAROL G, and more"` is generated playlist description text. It must not be split into collaborator identities.
+- If channel filtering needs the identities behind this Mix, resolve the seed video (`_Wcf2rKEB8E`) through its own video/search/watch identity data. In this fixture, that seed video is the adjacent collaboration card documented above.
+- The deterministic Mix identity is `playlistId = RD_Wcf2rKEB8E`; the seed video is a recovery key, not proof that every name in the Mix byline owns or collaborated on the Mix card.
+
+**Reduced Mix excerpt** (the complete renderer is in ignored local fixture `mix.json`):
+
+```json
+{
+  "compactRadioRenderer": {
+    "playlistId": "RD_Wcf2rKEB8E",
+    "title": {
+      "runs": [{
+        "text": "Mix - Shakira - La Pared (Anniversary Version)"
+      }]
+    },
+    "navigationEndpoint": {
+      "watchEndpoint": {
+        "videoId": "_Wcf2rKEB8E",
+        "playlistId": "RD_Wcf2rKEB8E"
+      }
+    },
+    "secondaryNavigationEndpoint": {
+      "watchEndpoint": {
+        "videoId": "OOqhtWs_6qI",
+        "playlistId": "RD_Wcf2rKEB8E"
+      }
+    },
+    "longBylineText": {
+      "runs": [{
+        "text": "Shakira, KAROL G, and more"
+      }]
+    },
+    "thumbnailOverlays": [{
+      "thumbnailOverlayBottomPanelRenderer": {
+        "text": { "runs": [{ "text": "Mix" }] },
+        "icon": { "iconType": "MIX" }
+      }
+    }]
+  }
+}
+```
 
 MIX card JSON -
 {

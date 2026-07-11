@@ -1043,6 +1043,17 @@ function hasCollaboratorWarmupSignal(card) {
         }
         const attributed = card.querySelector('#attributed-channel-name, [id="attributed-channel-name"]');
         if (hasAttributedCollaboratorSignal(attributed)) return true;
+        const cardTag = String(card.tagName || '').toLowerCase();
+        const currentYtmVideoCard = cardTag === 'ytm-video-with-context-renderer'
+            ? card
+            : card.querySelector('ytm-video-with-context-renderer');
+        if (currentYtmVideoCard && !isMixCardElement(currentYtmVideoCard)) {
+            const ytmByline = extractYtmBylineText(currentYtmVideoCard);
+            // A plain "A and B" byline is only a reason to ask main world for the
+            // exact videoId. It is not collaborator proof; only a header-backed
+            // Collaborators sheet may promote the complete roster.
+            if (/\S(?:.*\S)?\s+(?:and|&)\s+\S/i.test(ytmByline)) return true;
+        }
         const metadataText = card.querySelector(
             '.ytContentMetadataViewModelMetadataText, ' +
             '#text.ytd-channel-name, ' +
@@ -3087,14 +3098,18 @@ function extractYtmBylineText(root) {
     const directText = (
         root.querySelector('a.media-item-subtitle')?.textContent?.trim() ||
         root.querySelector('.media-item-subtitle')?.textContent?.trim() ||
+        root.querySelector('.YtmBadgeAndBylineRendererItemByline .ytAttributedStringHost')?.textContent?.trim() ||
         root.querySelector('.YtmBadgeAndBylineRendererItemByline .yt-core-attributed-string')?.textContent?.trim() ||
+        root.querySelector('.YtmCompactMediaItemByline .ytAttributedStringHost')?.textContent?.trim() ||
         root.querySelector('.YtmCompactMediaItemByline .yt-core-attributed-string')?.textContent?.trim() ||
         root.querySelector('.subhead')?.textContent?.trim() ||
         ''
     );
     if (directText) return directText;
     const ariaLabel = (
+        root.querySelector('.YtmCompactMediaItemHeadline .ytAttributedStringHost[aria-label]')?.getAttribute('aria-label') ||
         root.querySelector('.YtmCompactMediaItemHeadline .yt-core-attributed-string[aria-label]')?.getAttribute('aria-label') ||
+        root.querySelector('.ytAttributedStringHost[aria-label]')?.getAttribute('aria-label') ||
         root.querySelector('.yt-core-attributed-string[aria-label]')?.getAttribute('aria-label') ||
         ''
     );
@@ -3621,6 +3636,7 @@ function buildCollaboratorLookupRequestOptions({ card = null, element = null, pa
         parseInt(channelInfo?.expectedCollaboratorCount || '0', 10) ||
         0;
     let allowRosterFallbackForCollabMarkup = false;
+    const requireCollaboratorsSheet = Boolean(channelInfo?.requireCollaboratorsSheet);
 
     const pushExpectedNameHints = (value) => {
         if (!value || typeof value !== 'string') return;
@@ -3661,6 +3677,7 @@ function buildCollaboratorLookupRequestOptions({ card = null, element = null, pa
         expectedHandles: Array.from(new Set(expectedHandles.filter(Boolean))),
         expectedCollaboratorCount,
         allowRosterFallbackForCollabMarkup,
+        requireCollaboratorsSheet,
         cachedCollaborators: cachedCollabs
     };
 }
@@ -5818,6 +5835,7 @@ function requestCollaboratorInfoFromMainWorld(videoId, options = {}) {
         const expectedHandles = Array.isArray(options.expectedHandles) ? options.expectedHandles : [];
         const expectedCollaboratorCount = parseInt(options.expectedCollaboratorCount || '0', 10) || 0;
         const allowRosterFallbackForCollabMarkup = Boolean(options.allowRosterFallbackForCollabMarkup);
+        const requireCollaboratorsSheet = Boolean(options.requireCollaboratorsSheet);
         const lookupToken = typeof options.lookupToken === 'string' ? options.lookupToken.trim() : '';
         const requestId = ++window.collaboratorRequestId;
         const timeoutMs = 2000; // 2 second timeout
@@ -5844,6 +5862,7 @@ function requestCollaboratorInfoFromMainWorld(videoId, options = {}) {
                     expectedHandles,
                     expectedCollaboratorCount,
                     allowRosterFallbackForCollabMarkup,
+                    requireCollaboratorsSheet,
                     lookupToken
                 },
                 source: 'content_bridge'
@@ -6193,24 +6212,37 @@ async function prefetchCollaboratorsForCard(videoCard, options = {}) {
         collaborators = sanitizeCollaboratorList(warmup.collaborators);
     }
 
+    const ytmBylineLookupNames = (() => {
+        if (collaborators.length > 0 || isMixCardElement(card)) return [];
+        const tag = String(card.tagName || '').toLowerCase();
+        if (tag !== 'ytm-video-with-context-renderer') return [];
+        const rawText = extractYtmBylineText(card);
+        if (!/\S(?:.*\S)?\s+(?:and|&)\s+\S/i.test(rawText)) return [];
+        return parseCollaboratorNames(rawText, { allowSeparatorSplit: true }).names;
+    })();
+    const lookupCollaborators = collaborators.length > 0
+        ? collaborators
+        : ytmBylineLookupNames.map(name => ({ name, handle: '', id: '', customUrl: '' }));
+
     const expectedCount = Math.max(
         parseInt(baseInfo.expectedCollaboratorCount || '0', 10) || 0,
         parseInt(card.getAttribute('data-filtertube-expected-collaborators') || '0', 10) || 0,
-        collaborators.length,
+        lookupCollaborators.length,
         warmup.expectedCount || 0
     );
 
-    if (collaborators.length === 0 || expectedCount < 2) {
+    if (lookupCollaborators.length < 2 || expectedCount < 2) {
         return collaborators;
     }
 
     const provisionalInfo = {
         ...baseInfo,
-        ...collaborators[0],
+        ...lookupCollaborators[0],
         isCollaboration: true,
-        allCollaborators: collaborators,
+        allCollaborators: lookupCollaborators,
         needsEnrichment: true,
         expectedCollaboratorCount: expectedCount,
+        requireCollaboratorsSheet: collaborators.length === 0,
         videoId
     };
 

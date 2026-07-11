@@ -1782,6 +1782,7 @@
             expectedCollaboratorCount > 2 ||
             expectedNames.some((value) => /\band\s+(?:\d+\s+)?more\b/i.test(value || ''))
         );
+        const requireCollaboratorsSheet = Boolean(payload?.requireCollaboratorsSheet);
 
         const tokenizedNames = tokenizeExpectedCollaboratorNames(expectedNames);
         const nameSet = tokenizedNames.normalized;
@@ -1794,6 +1795,7 @@
         return {
             hasAny,
             allowRosterFallbackForCollabMarkup,
+            requireCollaboratorsSheet,
             expectedCollaboratorCount,
             handleCount: handleSet.size,
             lookupToken: typeof payload?.lookupToken === 'string' ? payload.lookupToken.trim() : '',
@@ -1823,6 +1825,9 @@
     function isValidCollaboratorResponse(list, matcher) {
         const sanitized = sanitizeCollaboratorList(list);
         if (!Array.isArray(sanitized) || sanitized.length < 2) return false;
+        if (matcher?.requireCollaboratorsSheet && getCollaboratorListSource(list) !== 'collaborators-sheet') {
+            return false;
+        }
 
         // Prevent obvious garbage: all entries empty/placeholder-ish.
         const hasAnyIdentity = sanitized.some(c => {
@@ -1866,7 +1871,7 @@
     function scoreCollaboratorCandidate(list, matcher, depth = 0) {
         const sanitized = sanitizeCollaboratorList(list);
         if (!Array.isArray(sanitized) || sanitized.length < 2) return -1;
-        if (!isValidCollaboratorResponse(sanitized, matcher)) return -1;
+        if (!isValidCollaboratorResponse(list, matcher)) return -1;
         const source = getCollaboratorListSource(list);
 
         const matchCount = matcher?.hasAny
@@ -1899,14 +1904,18 @@
         if (!videoId || !Array.isArray(collaborators) || collaborators.length === 0) {
             return collaboratorCache.get(videoId) || null;
         }
-        const sanitized = sanitizeCollaboratorList(collaborators);
+        const source = getCollaboratorListSource(collaborators);
+        const sanitized = markCollaboratorListSource(sanitizeCollaboratorList(collaborators), source);
         if (sanitized.length === 0) {
             return collaboratorCache.get(videoId) || null;
         }
         const incomingScore = getCollaboratorListQuality(sanitized);
         const existing = collaboratorCache.get(videoId);
         const existingScore = getCollaboratorListQuality(existing);
-        if (!existing || incomingScore >= existingScore) {
+        const existingSource = getCollaboratorListSource(existing);
+        const incomingIsSheet = source === 'collaborators-sheet';
+        const existingIsSheet = existingSource === 'collaborators-sheet';
+        if (!existing || (incomingIsSheet && !existingIsSheet) || (incomingIsSheet === existingIsSheet && incomingScore >= existingScore)) {
             collaboratorCache.set(videoId, sanitized);
             return sanitized;
         }
@@ -3204,7 +3213,8 @@
         if (bestCandidate?.list) {
             postLog('log', `✅ Found collaborators via ${bestCandidate.source} (best-ranked candidate)`);
             const sanitizedBest = sanitizeCollaboratorList(bestCandidate.list);
-            return sanitizedBest.length > 0 ? sanitizedBest : null;
+            const source = getCollaboratorListSource(bestCandidate.list);
+            return sanitizedBest.length > 0 ? markCollaboratorListSource(sanitizedBest, source) : null;
         }
 
         postLog('log', '⚠️ Global search failed. Attempting DOM hydration…');
