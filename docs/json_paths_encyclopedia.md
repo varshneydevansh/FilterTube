@@ -124,6 +124,2764 @@ When scrolling or loading sidebar recommendations via AJAX/Fetch, YouTube append
 
 ---
 
+# Absolute JSON Trace: YTM Channel Page Tabs and Chips
+*Files: `YTM Channel Page JSON/YTM_ChannelPageTabs_HOME.json`, `YTM_ChannelPageTabs_VIDEOS.json`, `YTM_ChannelPageTabs_SHORTS.json`, `YTM_ChannelPageTabs_LIVE.json`, `YTM_ChannelPageTabs_RELEASES.json`, `YTM_ChannelPageTabs_PODCASTS.json`, `YTM_ChannelPageTabs_PLAYLISTS.json`, `YTM_ChannelPageTabs_POSTS.json`, `YTM_ChannelPageTabs_SEARCH.json`*
+
+*Captured: 2026-07-12 from the mobile YouTube channel surface (`MWEB`).*
+
+These captures document the channel-page `browse` family, not the global
+YouTube Search API. With the exception of the Home capture noted below, the
+full tab responses are JSON bodies returned by:
+
+```text
+POST /youtubei/v1/browse?prettyPrint=false
+```
+
+The channel used by most captures is `UC1NF71EwP41VdjAU1iXdLkw`
+(`/@NarendraModi`). The Releases example uses `UCv8nzwVPQDRjkPCkEsOdEwA`
+(`/@Pitbull`). IDs and `params` are evidence from these captures, not constants
+that FilterTube should hardcode.
+
+The evidence files are capture bundles rather than directly parseable single
+JSON documents: human-readable `====== ... ======` lines separate response
+bodies. Videos, Shorts, and Live each contain the initial response plus Popular
+and Oldest chip reload responses. Playlists contains two full browse responses.
+The other tab files contain one full response, while Home contains the wrapper
+exception documented below. Extract one balanced top-level object at a time
+before calling `JSON.parse()`.
+
+## Common tab navigation structure
+
+**Tab array**:
+
+```text
+contents.singleColumnBrowseResultsRenderer.tabs[i].tabRenderer
+```
+
+**Fields**:
+
+- Tab label: `...tabRenderer.title`
+- Active tab: `...tabRenderer.selected == true`
+- Channel ID: `...tabRenderer.endpoint.browseEndpoint.browseId`
+- Tab-specific opaque selector: `...tabRenderer.endpoint.browseEndpoint.params`
+- Canonical channel URL: `...tabRenderer.endpoint.browseEndpoint.canonicalBaseUrl`
+- API endpoint: `...tabRenderer.endpoint.commandMetadata.webCommandMetadata.apiUrl`
+  -> `/youtubei/v1/browse`
+- Initial/reload token for an inactive tab:
+  `...tabRenderer.content.sectionListRenderer.continuations[0].reloadContinuationData.continuation`
+
+The `params` and continuation tokens select a tab or sort order, but they are
+opaque server values. FilterTube may carry them back to YouTube; it must not
+decode them into policy or infer channel identity from them.
+
+## Common channel identity and header data
+
+The full browse response repeats channel identity outside individual cards.
+The strongest page-level channel ID is:
+
+```text
+metadata.channelMetadataRenderer.externalId
+```
+
+Related fields:
+
+- Channel name: `metadata.channelMetadataRenderer.title`
+- Description: `metadata.channelMetadataRenderer.description`
+- Handle/owner URLs: `metadata.channelMetadataRenderer.ownerUrls[]`
+- Canonical channel URL: `metadata.channelMetadataRenderer.channelUrl`
+- Avatar: `metadata.channelMetadataRenderer.avatar.thumbnails[n].url`
+- RSS feed: `metadata.channelMetadataRenderer.rssUrl`
+- Page title:
+  `header.pageHeaderRenderer.content.pageHeaderViewModel.title.dynamicTextViewModel.text.content`
+- Header avatar:
+  `header.pageHeaderRenderer.content.pageHeaderViewModel.image.decoratedAvatarViewModel.avatar.avatarViewModel.image.sources[n].url`
+- Canonical metadata fallback: `microformat.microformatDataRenderer.urlCanonical`
+
+This page-level identity describes the channel surface being viewed. It is a
+safe fallback for channel-owned cards that omit their own byline endpoint, but
+it must not erase a different exact identity carried by a video, release,
+collaborator sheet, post author, or playlist byline.
+
+## Captured tab matrix
+
+| File | Selected tab | Main content path | Main renderer | Tab-local choices |
+| --- | --- | --- | --- | --- |
+| `YTM_ChannelPageTabs_HOME.json` | Home | `...tabs[i].tabRenderer.content.sectionListRenderer.contents[]` | `channelFeaturedVideoRenderer`, `shelfRenderer`, `compactVideoRenderer`, `reelShelfRenderer`, `shortsLockupViewModel` | Shelf endpoints are independent browse/playlist links |
+| `YTM_ChannelPageTabs_VIDEOS.json` | Videos | `...tabRenderer.content.richGridRenderer.contents[i].richItemRenderer.content.compactVideoRenderer` | `compactVideoRenderer` | Latest, Popular, Oldest |
+| `YTM_ChannelPageTabs_SHORTS.json` | Shorts | `...tabRenderer.content.richGridRenderer.contents[i].richItemRenderer.content.shortsLockupViewModel` | `shortsLockupViewModel` | Latest, Popular, Oldest |
+| `YTM_ChannelPageTabs_LIVE.json` | Live | `...tabRenderer.content.richGridRenderer.contents[i].richItemRenderer.content.compactVideoRenderer` | `compactVideoRenderer` | Latest, Popular, Oldest |
+| `YTM_ChannelPageTabs_RELEASES.json` | Releases | `...tabRenderer.content.richGridRenderer.contents[i].richItemRenderer.content.compactPlaylistRenderer` | `compactPlaylistRenderer` | No sort chip in this capture |
+| `YTM_ChannelPageTabs_PODCASTS.json` | Podcasts | `...tabRenderer.content.richGridRenderer.contents[i].richItemRenderer.content.lockupViewModel` | `lockupViewModel` with `LOCKUP_CONTENT_TYPE_PODCAST` | No sort chip in this capture |
+| `YTM_ChannelPageTabs_PLAYLISTS.json` | Playlists | `...tabRenderer.content.sectionListRenderer.contents[i].itemSectionRenderer.contents[j].compactPlaylistRenderer` | `compactPlaylistRenderer` | Date added (newest), Last video added; represented by separate full browse responses |
+| `YTM_ChannelPageTabs_POSTS.json` | Posts | `...tabRenderer.content.sectionListRenderer.contents[i].itemSectionRenderer.contents[j].backstagePostThreadRenderer` | `backstagePostThreadRenderer` -> `backstagePostRenderer` | No sort chip in this capture |
+| `YTM_ChannelPageTabs_SEARCH.json` | Search | `...tabRenderer.content.sectionListRenderer.contents[i].itemSectionRenderer.contents[j].channelSearchBoxRenderer` | `channelSearchBoxRenderer` | Query results are loaded after submitting the channel-local search |
+
+The LIVE file's human prefix incorrectly says `SHORTS TAB`. Its JSON has
+`tabs[3].tabRenderer.title == "Live"` and `selected == true`, so the response
+body, filename, and renderer evidence identify it as the Live tab.
+
+The Releases tab is conditional. Channels without release/catalog data may
+omit it, which changes later tab indexes. Code must locate tabs by
+`tabRenderer.title`, selected state, endpoint URL, or renderer shape rather
+than relying on a fixed numeric index.
+
+## Videos, Shorts, and Live chip selection
+
+The initial selected tab embeds its chip bar at:
+
+```text
+contents.singleColumnBrowseResultsRenderer.tabs[i].tabRenderer
+  .content.richGridRenderer.header.chipBarViewModel.chips[j].chipViewModel
+```
+
+**Chip fields**:
+
+- Label: `...chipViewModel.text`
+- Active choice: `...chipViewModel.selected == true`
+- Browse API: `...chipViewModel.tapCommand.innertubeCommand.commandMetadata.webCommandMetadata.apiUrl`
+- Sort reload token: `...chipViewModel.tapCommand.innertubeCommand.continuationCommand.token`
+- Request kind: `...continuationCommand.request`
+  -> `CONTINUATION_REQUEST_TYPE_BROWSE`
+
+The captures prove these chip sets for Videos, Shorts, and Live:
+
+```text
+Latest | Popular | Oldest
+```
+
+The evidence bundles preserve the sort chronology explicitly:
+
+| File | Initial/first section | Second section | Third section | Returned card family |
+| --- | --- | --- | --- | --- |
+| `YTM_ChannelPageTabs_VIDEOS.json` | Videos tab, Latest selected | Popular reload | Oldest reload | `compactVideoRenderer` |
+| `YTM_ChannelPageTabs_SHORTS.json` | Shorts tab, Latest selected | Popular reload | Oldest reload | `shortsLockupViewModel` |
+| `YTM_ChannelPageTabs_LIVE.json` | Live tab, Latest selected despite the stale `SHORTS TAB` marker | Popular reload | Oldest reload | `compactVideoRenderer` |
+
+The first section is a complete selected-tab browse response. Popular and
+Oldest are continuation responses that contain replacement actions. This is
+why the extension/app must process both the initial tab tree and every
+`reloadContinuationItemsCommand`; handling only appended continuations would
+leave a newly sorted grid unfiltered.
+
+Selecting another chip does not return another complete tab tree. It returns
+reload actions:
+
+```text
+onResponseReceivedActions[0].reloadContinuationItemsCommand
+  .continuationItems[0].chipBarViewModel.chips[j].chipViewModel
+
+onResponseReceivedActions[1].reloadContinuationItemsCommand
+  .continuationItems[i].richItemRenderer.content.compactVideoRenderer
+```
+
+For Shorts, the second action ends in:
+
+```text
+...continuationItems[i].richItemRenderer.content.shortsLockupViewModel
+```
+
+Consequences for filtering:
+
+- Re-run filtering for every `reloadContinuationItemsCommand`; chip changes
+  replace the visible collection instead of performing a normal append.
+- Read the currently selected chip from the response. Do not infer it from a
+  previous DOM state.
+- A selected sort chip changes ordering only. It does not change the owning
+  channel or turn the returned cards into global Search results.
+
+## Video and Live card fields
+
+For `compactVideoRenderer` under Videos or Live:
+
+- Video ID: `...compactVideoRenderer.videoId`
+- Title: `...compactVideoRenderer.title.runs[0].text`
+- Thumbnail: `...compactVideoRenderer.thumbnail.thumbnails[n].url`
+- Watch endpoint: `...compactVideoRenderer.navigationEndpoint.watchEndpoint.videoId`
+- Byline text: `...compactVideoRenderer.shortBylineText.runs[0].text`
+- Channel ID when present:
+  `...compactVideoRenderer.shortBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId`
+- Menu actions: `...compactVideoRenderer.menu.menuRenderer.items[]`
+- Duration: locate `thumbnailOverlayTimeStatusRenderer.text`
+- Continuation card:
+  `...richGridRenderer.contents[last].continuationItemRenderer.continuationEndpoint.continuationCommand.token`
+
+The enclosing selected channel tab remains a strong owner context, but a card
+may still expose a different byline for collaborations or catalog identities.
+Preserve exact card identity when supplied; do not overwrite it merely because
+the card appeared on a particular channel page.
+
+## Shorts fields
+
+For `shortsLockupViewModel`:
+
+- Video ID: `...shortsLockupViewModel.onTap.innertubeCommand.reelWatchEndpoint.videoId`
+- Shorts URL: `...onTap.innertubeCommand.commandMetadata.webCommandMetadata.url`
+- Title: `...shortsLockupViewModel.overlayMetadata.primaryText.content`
+- View text: `...shortsLockupViewModel.overlayMetadata.secondaryText.content`
+- Thumbnail: `...shortsLockupViewModel.thumbnailViewModel.thumbnailViewModel.image.sources[n].url`
+- Menu sheet: `...shortsLockupViewModel.menuOnTap.innertubeCommand.showSheetCommand`
+
+Current channel-page Shorts cards may omit a direct channel browse endpoint.
+In that case the selected channel tab supplies bounded channel-page context,
+while the exact `videoId` remains the key for stronger JSON/player identity
+enrichment. A missing per-card channel ID must not be treated as a different
+or unknown global creator without checking this enclosing context.
+
+## Releases, Podcasts, and Playlists
+
+Releases use album/release playlists rather than video cards:
+
+- Release playlist ID: `...compactPlaylistRenderer.playlistId`
+  -> examples begin with `OLAK5uy_`
+- Title: `...compactPlaylistRenderer.title.runs[0].text`
+- Playlist endpoint:
+  `...compactPlaylistRenderer.navigationEndpoint.browseEndpoint.browseId`
+  -> commonly `VL` + playlist ID
+- Artist/channel identities may appear in byline runs:
+  `...compactPlaylistRenderer.longBylineText.runs[k].navigationEndpoint.browseEndpoint.browseId`
+
+A release can expose more than one UC ID in its metadata. As with the
+Shakira/VEVO collaborator example, retain those as distinct evidence. Do not
+collapse them solely because they appear on one artist channel page.
+
+Playlists use the same `compactPlaylistRenderer` family. The two captured
+playlist orderings are separate full `/youtubei/v1/browse` responses, not the
+Videos/Shorts `chipBarViewModel` reload shape.
+
+### Channel-page Playlist sort menu
+
+Channel-page Playlists exposes a submenu, not the Latest/Popular/Oldest chip
+bar:
+
+```text
+contents.singleColumnBrowseResultsRenderer.tabs[i].tabRenderer.content
+  .sectionListRenderer.subMenu.channelSubMenuRenderer
+  .sortFilterSubMenuItems[j]
+```
+
+For each choice:
+
+- Label: `sortFilterSubMenuItems[j].title`
+- Selected state: `sortFilterSubMenuItems[j].selected`
+- Browse URL:
+  `sortFilterSubMenuItems[j].endpoint.commandMetadata.webCommandMetadata.url`
+- Channel ID: `sortFilterSubMenuItems[j].endpoint.browseEndpoint.browseId`
+- Opaque sort selector: `sortFilterSubMenuItems[j].endpoint.browseEndpoint.params`
+
+The supplied channel-page capture proves exactly these two choices:
+
+```text
+Date added (newest) | Last video added
+```
+
+They are stored as two complete browse responses in
+`YTM_ChannelPageTabs_PLAYLISTS.json`. The first has `Date added (newest)`
+selected; the second has `Last video added` selected.
+
+**Reduced channel Playlist sort excerpt**:
+
+```json
+{
+  "channelSubMenuRenderer": {
+    "sortFilterSubMenuItems": [
+      {
+        "endpoint": {
+          "commandMetadata": {
+            "webCommandMetadata": {
+              "url": "/@NarendraModi/playlists?view=1&sort=dd&flow=list",
+              "apiUrl": "/youtubei/v1/browse"
+            }
+          },
+          "browseEndpoint": {
+            "browseId": "UC1NF71EwP41VdjAU1iXdLkw",
+            "params": "EglwbGF5bGlzdHMYAyABMALyBgQKAkIA"
+          }
+        },
+        "title": "Date added (newest)",
+        "selected": true
+      },
+      {
+        "endpoint": {
+          "commandMetadata": {
+            "webCommandMetadata": {
+              "url": "/@NarendraModi/playlists?view=1&sort=lad&flow=list",
+              "apiUrl": "/youtubei/v1/browse"
+            }
+          },
+          "browseEndpoint": {
+            "browseId": "UC1NF71EwP41VdjAU1iXdLkw",
+            "params": "EglwbGF5bGlzdHMYBCABMALyBgQKAkIA"
+          }
+        },
+        "title": "Last video added",
+        "selected": false
+      }
+    ]
+  }
+}
+```
+
+Do not conflate this menu with the separate signed-in **You page** Playlists
+sort documented later. That surface proves `Recently added | A-Z`; the current
+channel-page capture does not contain an A-Z choice.
+
+Podcasts use the newer lockup model in this capture:
+
+- Item: `...richItemRenderer.content.lockupViewModel`
+- Playlist/content ID: `...lockupViewModel.contentId`
+- Type discriminator: `...lockupViewModel.contentType`
+  -> `LOCKUP_CONTENT_TYPE_PODCAST`
+- Title: `...lockupViewModel.metadata.lockupMetadataViewModel.title.content`
+- Episode-count badge:
+  `...collectionThumbnailViewModel.primaryThumbnail.thumbnailViewModel.overlays[].thumbnailOverlayBadgeViewModel.thumbnailBadges[].thumbnailBadgeViewModel.text`
+- Playlist endpoint:
+  `...lockupViewModel.rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.browseId`
+
+Podcast grids remain channel-dependent and can still be empty. Filtering must
+therefore support both `lockupViewModel` items and a valid empty grid.
+
+## Posts and channel-local Search
+
+Posts:
+
+```text
+...backstagePostThreadRenderer.post.backstagePostRenderer
+```
+
+Relevant fields include `postId`, author text/endpoint, `contentText`, image or
+attachment renderers, published-time text, action buttons, and the post menu.
+Post author identity must come from its endpoint when present, not from the
+selected channel tab alone (for example, reposted/shared content can carry
+other identities).
+
+The Search tab initially supplies:
+
+```text
+...channelSearchBoxRenderer
+```
+
+This is the input surface for searching within the selected channel. It is not
+the same as `/youtubei/v1/search`, and the initial capture does not itself
+contain submitted-query result cards. Subsequent result/continuation payloads
+must be classified from their returned renderer type before filtering.
+
+## Reduced captured JSON structures
+
+The complete responses remain in `YTM Channel Page JSON/`. These reduced
+excerpts preserve the identity, selection, renderer, and continuation shapes
+without copying tracking parameters, thumbnails, menus, or every returned
+item into this encyclopedia.
+
+### Common selected-tab wrapper
+
+```json
+{
+  "contents": {
+    "singleColumnBrowseResultsRenderer": {
+      "tabs": [{
+        "tabRenderer": {
+          "endpoint": {
+            "commandMetadata": {
+              "webCommandMetadata": {
+                "url": "/@NarendraModi/videos",
+                "apiUrl": "/youtubei/v1/browse"
+              }
+            },
+            "browseEndpoint": {
+              "browseId": "UC1NF71EwP41VdjAU1iXdLkw",
+              "params": "EgZ2aWRlb3PyBgQKAjoA",
+              "canonicalBaseUrl": "/@NarendraModi"
+            }
+          },
+          "title": "Videos",
+          "selected": true,
+          "content": {
+            "richGridRenderer": {
+              "contents": []
+            }
+          }
+        }
+      }]
+    }
+  },
+  "metadata": {
+    "channelMetadataRenderer": {
+      "title": "Narendra Modi",
+      "externalId": "UC1NF71EwP41VdjAU1iXdLkw",
+      "ownerUrls": ["http://www.youtube.com/@NarendraModi"],
+      "channelUrl": "https://www.youtube.com/channel/UC1NF71EwP41VdjAU1iXdLkw"
+    }
+  }
+}
+```
+
+### Videos and Live cards
+
+Videos and Live share the same item renderer; the selected tab and endpoint
+distinguish the surfaces.
+
+```json
+{
+  "richItemRenderer": {
+    "content": {
+      "compactVideoRenderer": {
+        "videoId": "CMSf79xfRfY",
+        "title": {
+          "runs": [{
+            "text": "PM Christopher Luxon's speech during community programme in Auckland, New Zealand"
+          }]
+        },
+        "navigationEndpoint": {
+          "watchEndpoint": {
+            "videoId": "CMSf79xfRfY"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+The Live capture has the equivalent shape with, for example,
+`videoId: "HenpnhlFFsg"` and tab endpoint `"/@NarendraModi/streams"`.
+
+### Videos, Shorts, and Live chip reload
+
+```json
+{
+  "onResponseReceivedActions": [
+    {
+      "reloadContinuationItemsCommand": {
+        "continuationItems": [{
+          "chipBarViewModel": {
+            "chips": [
+              { "chipViewModel": { "text": "Latest", "selected": false } },
+              { "chipViewModel": { "text": "Popular", "selected": true } },
+              { "chipViewModel": { "text": "Oldest", "selected": false } }
+            ]
+          }
+        }]
+      }
+    },
+    {
+      "reloadContinuationItemsCommand": {
+        "continuationItems": [{
+          "richItemRenderer": {
+            "content": {
+              "compactVideoRenderer": {
+                "videoId": "returned-video-id"
+              }
+            }
+          }
+        }]
+      }
+    }
+  ]
+}
+```
+
+Each real `chipViewModel` also includes:
+
+```json
+{
+  "tapCommand": {
+    "innertubeCommand": {
+      "commandMetadata": {
+        "webCommandMetadata": {
+          "sendPost": true,
+          "apiUrl": "/youtubei/v1/browse"
+        }
+      },
+      "continuationCommand": {
+        "token": "opaque-sort-token",
+        "request": "CONTINUATION_REQUEST_TYPE_BROWSE"
+      }
+    }
+  }
+}
+```
+
+### Shorts card
+
+```json
+{
+  "richItemRenderer": {
+    "content": {
+      "shortsLockupViewModel": {
+        "onTap": {
+          "innertubeCommand": {
+            "commandMetadata": {
+              "webCommandMetadata": {
+                "url": "/shorts/Oy0JrfRUpR8",
+                "webPageType": "WEB_PAGE_TYPE_SHORTS"
+              }
+            },
+            "reelWatchEndpoint": {
+              "videoId": "Oy0JrfRUpR8"
+            }
+          }
+        },
+        "overlayMetadata": {
+          "primaryText": { "content": "Short title" },
+          "secondaryText": { "content": "View count" }
+        }
+      }
+    }
+  }
+}
+```
+
+For a Shorts chip reload, replace `compactVideoRenderer` in the preceding
+reload example with this `shortsLockupViewModel` shape.
+
+### Releases
+
+```json
+{
+  "tabRenderer": {
+    "endpoint": {
+      "browseEndpoint": {
+        "browseId": "UCv8nzwVPQDRjkPCkEsOdEwA",
+        "canonicalBaseUrl": "/@Pitbull"
+      }
+    },
+    "title": "Releases",
+    "selected": true,
+    "content": {
+      "richGridRenderer": {
+        "contents": [{
+          "richItemRenderer": {
+            "content": {
+              "compactPlaylistRenderer": {
+                "playlistId": "OLAK5uy_k7IB6X1KI0yleCwrVVC-FS6BuulJcBrV8",
+                "title": {
+                  "runs": [{ "text": "Satalanaaa" }]
+                },
+                "shortBylineText": {
+                  "runs": [
+                    {
+                      "text": "Pitbull",
+                      "navigationEndpoint": {
+                        "browseEndpoint": {
+                          "browseId": "UCv8nzwVPQDRjkPCkEsOdEwA"
+                        }
+                      }
+                    },
+                    { "text": ", " },
+                    {
+                      "text": "Lil Jon",
+                      "navigationEndpoint": {
+                        "browseEndpoint": {
+                          "browseId": "UCak_T_U_EWN49_aTdl7FCqw"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "navigationEndpoint": {
+                  "browseEndpoint": {
+                    "browseId": "VLOLAK5uy_k7IB6X1KI0yleCwrVVC-FS6BuulJcBrV8"
+                  }
+                }
+              }
+            }
+          }
+        }]
+      }
+    }
+  }
+}
+```
+
+This excerpt is important identity evidence: the selected channel is Pitbull,
+while one release byline supplies both Pitbull and Lil Jon UC IDs. The release
+is one playlist entry with multiple attributed artists, not proof that the two
+channel IDs are aliases of one creator.
+
+### Playlists
+
+```json
+{
+  "itemSectionRenderer": {
+    "contents": [{
+      "compactPlaylistRenderer": {
+        "playlistId": "PLY6-jURUlWtc",
+        "title": {
+          "runs": [{
+            "text": "Listen Mann Ki Baat in your language, in PM Modi's own voice | June 2026"
+          }]
+        },
+        "shortBylineText": {
+          "runs": [{
+            "text": "Narendra Modi",
+            "navigationEndpoint": {
+              "browseEndpoint": {
+                "browseId": "UC1NF71EwP41VdjAU1iXdLkw",
+                "canonicalBaseUrl": "/@NarendraModi"
+              }
+            }
+          }]
+        },
+        "navigationEndpoint": {
+          "browseEndpoint": {
+            "browseId": "VLPLY6-jURUlWtc"
+          }
+        }
+      }
+    }]
+  }
+}
+```
+
+### Podcasts
+
+```json
+{
+  "richItemRenderer": {
+    "content": {
+      "lockupViewModel": {
+        "contentImage": {
+          "collectionThumbnailViewModel": {
+            "primaryThumbnail": {
+              "thumbnailViewModel": {
+                "overlays": [{
+                  "thumbnailOverlayBadgeViewModel": {
+                    "thumbnailBadges": [{
+                      "thumbnailBadgeViewModel": {
+                        "text": "41 episodes"
+                      }
+                    }]
+                  }
+                }]
+              }
+            }
+          }
+        },
+        "metadata": {
+          "lockupMetadataViewModel": {
+            "title": {
+              "content": "PM Modi's interviews during 2024 Lok Sabha Elections campaign"
+            }
+          }
+        },
+        "contentId": "PLBG6UuYpOcTvjoTaWl9y0Vc_PW9JAZ_17",
+        "contentType": "LOCKUP_CONTENT_TYPE_PODCAST",
+        "rendererContext": {
+          "commandContext": {
+            "onTap": {
+              "innertubeCommand": {
+                "browseEndpoint": {
+                  "browseId": "VLPLBG6UuYpOcTvjoTaWl9y0Vc_PW9JAZ_17"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+An empty Podcasts grid is also valid and must not cause a page-level
+pending-hide state to persist forever.
+
+### Posts
+
+```json
+{
+  "itemSectionRenderer": {
+    "contents": [{
+      "backstagePostThreadRenderer": {
+        "post": {
+          "backstagePostRenderer": {
+            "postId": "Ugkx3xdaUyWKsqq9dwiHoUOqkpzU6uVzqOAw",
+            "authorText": {
+              "runs": [{
+                "text": "Narendra Modi",
+                "navigationEndpoint": {
+                  "browseEndpoint": {
+                    "browseId": "UC1NF71EwP41VdjAU1iXdLkw",
+                    "canonicalBaseUrl": "/@NarendraModi"
+                  }
+                }
+              }]
+            },
+            "contentText": {
+              "runs": [{ "text": "Post body" }]
+            },
+            "publishedTimeText": {
+              "runs": [{
+                "text": "15 hours ago",
+                "navigationEndpoint": {
+                  "browseEndpoint": {
+                    "browseId": "FEpost_detail",
+                    "canonicalBaseUrl": "/post/Ugkx3xdaUyWKsqq9dwiHoUOqkpzU6uVzqOAw"
+                  }
+                }
+              }]
+            }
+          }
+        }
+      }
+    }]
+  }
+}
+```
+
+### Channel-local Search input
+
+```json
+{
+  "itemSectionRenderer": {
+    "contents": [{
+      "channelSearchBoxRenderer": {
+        "text": "",
+        "endpoint": {
+          "commandMetadata": {
+            "webCommandMetadata": {
+              "url": "/@NarendraModi/search",
+              "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+              "apiUrl": "/youtubei/v1/browse"
+            }
+          },
+          "browseEndpoint": {
+            "browseId": "UC1NF71EwP41VdjAU1iXdLkw",
+            "params": "EgZzZWFyY2g%3D",
+            "canonicalBaseUrl": "/@NarendraModi"
+          }
+        }
+      }
+    }]
+  }
+}
+```
+
+### Home heterogeneous content
+
+After decoding the embedded `ytInitialData`, the selected Home tab begins like:
+
+```json
+{
+  "tabRenderer": {
+    "title": "Home",
+    "selected": true,
+    "content": {
+      "sectionListRenderer": {
+        "contents": [
+          {
+            "itemSectionRenderer": {
+              "contents": [{
+                "channelFeaturedVideoRenderer": {
+                  "videoId": "35vdFvHDsOc"
+                }
+              }]
+            }
+          },
+          {
+            "shelfRenderer": {
+              "title": {
+                "runs": [{ "text": "Videos" }]
+              },
+              "content": {
+                "verticalListRenderer": {
+                  "items": [{
+                    "compactVideoRenderer": {
+                      "videoId": "CMSf79xfRfY"
+                    }
+                  }]
+                }
+              }
+            }
+          },
+          {
+            "reelShelfRenderer": {
+              "items": [{ "shortsLockupViewModel": {} }]
+            }
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
+## Home capture wrapper exception
+
+`YTM_ChannelPageTabs_HOME.json` now contains four captured resources:
+
+1. a `/youtubei/v1/guide?prettyPrint=false` JSON response; and
+2. the full channel Home HTML document, whose channel payload is stored as a
+   hex-escaped JavaScript string in `var ytInitialData = '\\x7b\\x22...'`;
+3. a second mobile Pitbull channel Home HTML document; and
+4. a desktop YTD Pitbull channel Home browse JSON response under
+   `====== MORE PITBULL JSON FOR CHANNLE HOME PAGE ======`.
+
+After decoding the `\\xNN` escapes and parsing JSON, the Home data uses the
+same tab base path documented above. Its selected Home content contains a
+featured video and heterogeneous shelves, so code must recursively handle
+`channelFeaturedVideoRenderer`, `shelfRenderer`/`verticalListRenderer`,
+`compactVideoRenderer`, `reelShelfRenderer`, and `shortsLockupViewModel`.
+The preceding `guide` response is navigation chrome and is not channel-content
+authority.
+
+## Added Pitbull Home, Live, and Posts captures
+
+The later Pitbull captures are important because they prove that channel-page
+content does not use one platform-independent tree. Preserve the renderer root
+before traversing it:
+
+| Capture marker | Client surface | Selected-content root |
+| --- | --- | --- |
+| `MORE PITBULL JSON FOR CHANNLE HOME PAGE` | Desktop YTD Home browse JSON | `contents.twoColumnBrowseResultsRenderer.tabs[i].tabRenderer.content` |
+| `PITBULL LIVE PAGE ... /youtubei/v1/browse` | Mobile YTM Live browse JSON | `contents.singleColumnBrowseResultsRenderer.tabs[i].tabRenderer.content` |
+| `PITBULL POSTS ... /youtubei/v1/browse` | Desktop YTD Posts browse JSON | `contents.twoColumnBrowseResultsRenderer.tabs[i].tabRenderer.content` |
+
+The mobile Pitbull Home HTML remains a wrapper capture. Extract and parse its
+`ytInitialData`; do not treat the surrounding page source as an API body. The
+desktop Home, mobile Live, and desktop Posts additions are direct browse JSON.
+
+### Desktop channel Home: featured lockups, Posts, and Collaborations
+
+The desktop Home response uses heterogeneous `itemSectionRenderer` entries:
+
+```text
+contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer
+  .content.sectionListRenderer.contents[i].itemSectionRenderer.contents[0]
+```
+
+Observed children include:
+
+- Featured content:
+  `channelFeaturedContentRenderer.items[i].lockupViewModel`
+- Horizontal shelves:
+  `shelfRenderer.content.horizontalListRenderer.items[i].lockupViewModel`
+- Posts shelf:
+  `shelfRenderer.title.runs[0].text == "Posts"`, then
+  `...horizontalListRenderer.items[i].postRenderer`
+- Collaborations shelf:
+  `shelfRenderer.title.simpleText == "Collaborations"`, then
+  `...horizontalListRenderer.items[i].lockupViewModel`
+
+The Home Collaborations shelf is not merely a byline heuristic. Its lockups
+carry an avatar stack whose action opens a header-backed collaborator dialog:
+
+```text
+lockupViewModel.metadata.lockupMetadataViewModel.image.avatarStackViewModel
+  .rendererContext.commandContext.onTap.innertubeCommand.showDialogCommand
+  .panelLoadingStrategy.inlineContent.dialogViewModel
+```
+
+Authority discriminator:
+
+```text
+...dialogViewModel.header.dialogHeaderViewModel.headline.content
+  == "Collaborators"
+```
+
+Roster:
+
+```text
+...dialogViewModel.customContent.listViewModel.listItems[i].listItemViewModel
+```
+
+For each row:
+
+- Name: `title.content`
+- Handle endpoint:
+  `title.commandRuns[0].onTap.innertubeCommand.browseEndpoint`
+- Canonical UC ID:
+  `rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.browseId`
+- Avatar: `leadingAccessory.avatarViewModel.image.sources[n].url`
+
+This is the desktop dialog equivalent of the mobile `sheetViewModel`
+Collaborators roster. Both are authoritative only when their exact header says
+`Collaborators`. An avatar stack alone is a lookup signal, not roster proof.
+
+**Reduced Home Collaborations excerpt**:
+
+```json
+{
+  "shelfRenderer": {
+    "title": { "simpleText": "Collaborations" },
+    "content": {
+      "horizontalListRenderer": {
+        "items": [{
+          "lockupViewModel": {
+            "contentId": "ftBAyfV2Gf8",
+            "metadata": {
+              "lockupMetadataViewModel": {
+                "image": {
+                  "avatarStackViewModel": {
+                    "rendererContext": {
+                      "commandContext": {
+                        "onTap": {
+                          "innertubeCommand": {
+                            "showDialogCommand": {
+                              "panelLoadingStrategy": {
+                                "inlineContent": {
+                                  "dialogViewModel": {
+                                    "header": {
+                                      "dialogHeaderViewModel": {
+                                        "headline": {
+                                          "content": "Collaborators"
+                                        }
+                                      }
+                                    },
+                                    "customContent": {
+                                      "listViewModel": {
+                                        "listItems": [{
+                                          "listItemViewModel": {
+                                            "title": {
+                                              "content": "Pitbull",
+                                              "commandRuns": [{
+                                                "onTap": {
+                                                  "innertubeCommand": {
+                                                    "browseEndpoint": {
+                                                      "browseId": "UCv8nzwVPQDRjkPCkEsOdEwA",
+                                                      "canonicalBaseUrl": "/@Pitbull"
+                                                    }
+                                                  }
+                                                }
+                                              }]
+                                            }
+                                          }
+                                        }]
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }]
+      }
+    }
+  }
+}
+```
+
+The desktop Home Posts shelf uses the newer top-level `postRenderer`, rather
+than the Posts-tab `backstagePostThreadRenderer` wrapper:
+
+```text
+...shelfRenderer.content.horizontalListRenderer.items[i].postRenderer
+```
+
+Relevant paths remain author-driven:
+
+- Post ID: `postRenderer.postId`
+- Author name: `postRenderer.authorText.runs[0].text`
+- Author UC ID: `postRenderer.authorEndpoint.browseEndpoint.browseId`
+- Author handle: `postRenderer.authorEndpoint.browseEndpoint.canonicalBaseUrl`
+- Text: `postRenderer.contentText.runs[].text`
+- Published time: `postRenderer.publishedTimeText.runs[0].text`
+- Attachment: `postRenderer.backstageAttachment.*`
+
+Mentioned channels inside `contentText.runs[]` are text/link entities, not the
+post owner. Do not replace `authorEndpoint` with a mentioned channel endpoint.
+
+### Mobile Live browse response
+
+The added Pitbull Live response selects the Live tab under the mobile root:
+
+```text
+contents.singleColumnBrowseResultsRenderer.tabs[i].tabRenderer
+```
+
+where `title == "Live"` and `selected == true`. Cards are:
+
+```text
+...content.richGridRenderer.contents[i]
+  .richItemRenderer.content.compactVideoRenderer
+```
+
+**Reduced Live excerpt**:
+
+```json
+{
+  "tabRenderer": {
+    "title": "Live",
+    "selected": true,
+    "content": {
+      "richGridRenderer": {
+        "contents": [{
+          "richItemRenderer": {
+            "content": {
+              "compactVideoRenderer": {
+                "videoId": "I9qyqbD2hFY",
+                "title": {
+                  "runs": [{
+                    "text": "Live from BST Hyde Park: Pitbull Attempts To Break His First Guinness World Records Title"
+                  }]
+                },
+                "publishedTimeText": {
+                  "runs": [{ "text": "Streamed 1 day ago" }]
+                },
+                "lengthText": {
+                  "runs": [{ "text": "3:01:56" }]
+                }
+              }
+            }
+          }
+        }]
+      }
+    }
+  }
+}
+```
+
+The capture confirms the old file prefixes saying `SHORTS TAB` are labels only;
+the actual selected JSON tab and `compactVideoRenderer` content define Live.
+
+### Mobile YTM Posts browse response
+
+The first section of `YTM_ChannelPageTabs_POSTS.json`, marked
+`Channel Page POSTS TAB`, is the mobile `MWEB` response. It selects:
+
+```text
+contents.singleColumnBrowseResultsRenderer.tabs[i].tabRenderer
+```
+
+with `title == "Posts"` and `selected == true`. Its rows use the same semantic
+post chain as desktop, but under the mobile single-column root:
+
+```text
+...content.sectionListRenderer.contents[i].itemSectionRenderer.contents[j]
+  .backstagePostThreadRenderer.post.backstagePostRenderer
+```
+
+**Reduced mobile YTM Posts excerpt**:
+
+```json
+{
+  "tabRenderer": {
+    "title": "Posts",
+    "selected": true,
+    "content": {
+      "sectionListRenderer": {
+        "contents": [{
+          "itemSectionRenderer": {
+            "contents": [{
+              "backstagePostThreadRenderer": {
+                "post": {
+                  "backstagePostRenderer": {
+                    "postId": "Ugkx3xdaUyWKsqq9dwiHoUOqkpzU6uVzqOAw",
+                    "authorText": {
+                      "runs": [{
+                        "text": "Narendra Modi",
+                        "navigationEndpoint": {
+                          "browseEndpoint": {
+                            "browseId": "UC1NF71EwP41VdjAU1iXdLkw",
+                            "canonicalBaseUrl": "/@NarendraModi"
+                          }
+                        }
+                      }]
+                    },
+                    "authorEndpoint": {
+                      "browseEndpoint": {
+                        "browseId": "UC1NF71EwP41VdjAU1iXdLkw",
+                        "canonicalBaseUrl": "/@NarendraModi"
+                      }
+                    },
+                    "contentText": {
+                      "runs": [{
+                        "text": "Extremely saddened to learn about the tragic news of a boat accident involving Indian nationals near Phu Quoc, Vietnam."
+                      }]
+                    },
+                    "publishedTimeText": {
+                      "runs": [{ "text": "15 hours ago" }]
+                    }
+                  }
+                }
+              }
+            }]
+          }
+        }]
+      }
+    }
+  }
+}
+```
+
+The mobile JSON renderer names remain `backstagePostThreadRenderer` and
+`backstagePostRenderer`; the corresponding rendered DOM uses the
+`ytm-backstage-*` tags and camelCase host classes documented in the renderer
+inventory. JSON renderer keys and DOM tag names must not be conflated.
+
+### Desktop YTD Posts browse response
+
+The added desktop Posts payload selects:
+
+```text
+contents.twoColumnBrowseResultsRenderer.tabs[i].tabRenderer
+```
+
+with `title == "Posts"` and `selected == true`. Each feed row is:
+
+```text
+...content.sectionListRenderer.contents[0].itemSectionRenderer.contents[i]
+  .backstagePostThreadRenderer.post.backstagePostRenderer
+```
+
+**Reduced Posts excerpt**:
+
+```json
+{
+  "backstagePostThreadRenderer": {
+    "post": {
+      "backstagePostRenderer": {
+        "postId": "Ugkx-zFt06jpu0gycE9kFwOkDTFZMP-VPQZA",
+        "authorText": {
+          "runs": [{
+            "text": "Pitbull",
+            "navigationEndpoint": {
+              "browseEndpoint": {
+                "browseId": "UCv8nzwVPQDRjkPCkEsOdEwA",
+                "canonicalBaseUrl": "/@Pitbull"
+              }
+            }
+          }]
+        },
+        "contentText": {
+          "runs": [
+            { "text": "Tomorrow's the day. Join me LIVE from " },
+            {
+              "text": "@BSTHydePark",
+              "navigationEndpoint": {
+                "browseEndpoint": {
+                  "browseId": "UCr2hOkpuCoE739MafsT3wYg"
+                }
+              }
+            }
+          ]
+        },
+        "publishedTimeText": {
+          "runs": [{ "text": "2 days ago" }]
+        },
+        "backstageAttachment": {
+          "backstageImageRenderer": {}
+        }
+      }
+    }
+  }
+}
+```
+
+Again, the linked `@BSTHydePark` identity belongs to a mention in the body. The
+post owner remains the exact Pitbull `authorEndpoint`.
+
+---
+
+# Absolute JSON Trace: YTM Subscriptions Page (`FEsubscriptions`)
+*Files: `YTM Channel Page JSON/YTM_SubscriberPage.json`, `YTM_SubscriberPage.html`*
+
+*Captured: 2026-07-13 from the signed-in mobile YouTube Subscriptions surface.*
+
+## Capture order and parsing boundary
+
+The JSON evidence bundle contains these markers in order:
+
+```text
+1. /youtubei/v1/guide?prettyPrint=false
+2. /youtubei/v1/browse?prettyPrint=false
+3. FEED SUBSCRIBER PAGE SHEET /youtubei/v1/guide?prettyPrint=false
+4. /getDatasyncIdsEndpoint
+```
+
+The first and third responses are guide/navigation chrome. They contain pivot
+items, topbar/account menu data, and application links; they are not
+subscription-feed card authority.
+
+The browse marker contains **two concatenated top-level JSON objects**. Both
+are continuation responses. Extract balanced objects individually before
+calling `JSON.parse()`; parsing the whole marker body as one object will fail.
+The capture does not contain the initial full `FEsubscriptions` browse tree.
+Its rendered initial state is preserved in `YTM_SubscriberPage.html`.
+
+The final datasync response uses an XSSI prefix and contains account-routing
+identifiers. Treat those values as sensitive transport state, never as channel
+IDs, profile IDs, or filtering authority.
+
+## Subscription continuation response
+
+Both captured browse objects use:
+
+```text
+onResponseReceivedActions[i].appendContinuationItemsAction
+```
+
+Fields:
+
+- Feed target: `...appendContinuationItemsAction.targetId`
+  -> `browse-feedFEsubscriptions`
+- Appended rows:
+  `...appendContinuationItemsAction.continuationItems[i]`
+- Video card:
+  `...continuationItems[i].richItemRenderer.content.videoWithContextRenderer`
+- Next page:
+  `...continuationItems[last].continuationItemRenderer.continuationEndpoint.continuationCommand`
+
+Each captured response appends five video cards plus one continuation row.
+This is append behavior, unlike Videos/Shorts channel sort chips, which use
+`reloadContinuationItemsCommand` to replace a collection.
+
+## Subscription video identity
+
+For each `videoWithContextRenderer`:
+
+- Video ID: `videoId`
+- Title: `headline.runs[0].text`
+- Watch endpoint: `navigationEndpoint.watchEndpoint.videoId`
+- Channel name: `shortBylineText.runs[0].text`
+- Channel UC ID:
+  `shortBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId`
+- Channel handle:
+  `shortBylineText.runs[0].navigationEndpoint.browseEndpoint.canonicalBaseUrl`
+- Corroborating channel endpoint:
+  `channelThumbnail.channelThumbnailWithLinkRenderer.navigationEndpoint.browseEndpoint`
+- Published/streamed age: `publishedTimeText.runs[0].text`
+- Views: `shortViewCountText.runs[0].text`
+- Duration: `lengthText.runs[0].text`
+- Menu: `menu.menuRenderer.items[]`
+
+Prefer exact byline and thumbnail endpoints over visible text. If both
+endpoints exist and disagree, preserve both observations for exact-video
+identity resolution rather than silently choosing the enclosing feed.
+
+**Reduced continuation excerpt**:
+
+```json
+{
+  "onResponseReceivedActions": [{
+    "appendContinuationItemsAction": {
+      "targetId": "browse-feedFEsubscriptions",
+      "continuationItems": [
+        {
+          "richItemRenderer": {
+            "content": {
+              "videoWithContextRenderer": {
+                "videoId": "fW7GPoDxD_8",
+                "headline": {
+                  "runs": [{
+                    "text": "Scarlett Johansson Doesn't Like Jump Scares"
+                  }]
+                },
+                "shortBylineText": {
+                  "runs": [{
+                    "text": "TheEllenShow",
+                    "navigationEndpoint": {
+                      "browseEndpoint": {
+                        "browseId": "UCp0hYYBW6IMayGgR-WeoCvQ",
+                        "canonicalBaseUrl": "/@TheEllenShow"
+                      }
+                    }
+                  }]
+                },
+                "navigationEndpoint": {
+                  "watchEndpoint": {
+                    "videoId": "fW7GPoDxD_8"
+                  }
+                },
+                "publishedTimeText": {
+                  "runs": [{ "text": "25 minutes ago" }]
+                }
+              }
+            }
+          }
+        },
+        {
+          "continuationItemRenderer": {
+            "continuationEndpoint": {
+              "continuationCommand": {
+                "request": "CONTINUATION_REQUEST_TYPE_BROWSE"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }]
+}
+```
+
+The menu can contain YouTube feedback tokens for Hide/Undo actions. Those
+tokens are ephemeral private page state and must not be logged, exported,
+synced, or treated as FilterTube rule identifiers.
+
+## Subscription-channel avatar strip and rendered feed
+
+The rendered DOM begins with a channel-selector strip:
+
+```html
+<ytm-channel-list-sub-menu-renderer
+  class="YtmChannelListSubMenuRendererHost">
+  <div class="YtmChannelListSubMenuRendererAvatars">
+    <ytm-channel-list-sub-menu-avatar-renderer
+      class="YtmChannelListSubMenuAvatarRendererHost">
+```
+
+The capture contains 60 avatar rows. Each can expose a handle URL through
+`a[href]`, display name through `a[aria-label]`, optional `status="unread"`,
+and an avatar under `ytm-profile-icon.ytProfileIconHost`.
+
+This strip is navigation/filter UI for subscribed channels. It is not a video
+list, and selecting one channel must not create a block/allow rule. Its handles
+may feed the explicit user-approved "Import Subscribed Channels" workflow.
+
+The initial rendered feed proves:
+
+| Content | DOM path | Correct hide target |
+| --- | --- | --- |
+| Normal/live videos | `ytm-rich-item-renderer -> ytm-video-with-context-renderer -> ytm-media-item` | Video-with-context card / owning rich item |
+| Shorts shelf | `ytm-rich-section-renderer -> ytm-reel-shelf-renderer -> ytm-shorts-lockup-view-model` | Individual Shorts lockup, not the shelf |
+| Next page | `ytm-continuation-item-renderer.YtmContinuationItemRendererHost` | Loading only; never content |
+
+The DOM contains 18 normal video cards and 15 Shorts lockups. Normal card
+identity is exposed through `YtmChannelThumbnailWithLinkRendererHost` and
+`YtmBadgeAndBylineRendererHost`; Shorts may still need exact-video enrichment.
+
+## All subscriptions directory (`FEchannels`)
+
+The later `====== https://m.youtube.com/feed/channels ======` marker is a full
+mobile HTML response, not a bare InnerTube JSON response. Its server script
+stores a hex-escaped JSON string in `var ytInitialData`; decode the JavaScript
+string and then parse the resulting JSON. The page contract identifies:
+
+```text
+ytPageType: browse
+ytCommand.browseEndpoint.browseId: FEchannels
+ytCommand.commandMetadata.webCommandMetadata.apiUrl: /youtubei/v1/browse
+header.feedTabbedHeaderRenderer.title.runs[0].text: All subscriptions
+```
+
+The channel rows use this absolute path:
+
+```text
+contents
+  .singleColumnBrowseResultsRenderer
+  .tabs[0].tabRenderer
+  .content.sectionListRenderer
+  .contents[0].shelfRenderer
+  .content.verticalListRenderer
+  .items[i].channelListItemRenderer
+```
+
+Per row:
+
+- display name: `title.runs[0].text`;
+- canonical UC ID: `channelId`;
+- corroborating UC ID: `navigationEndpoint.browseEndpoint.browseId`;
+- channel handle/path:
+  `navigationEndpoint.browseEndpoint.canonicalBaseUrl`;
+- navigable URL:
+  `navigationEndpoint.commandMetadata.webCommandMetadata.url`;
+- avatar: `thumbnail.thumbnails[]`;
+- row state: `presentationStyle` and, when present, new/live metadata; and
+- pagination: the final
+  `verticalListRenderer.items[].continuationItemRenderer`.
+
+The captured initial page contains **984 channel rows** and one continuation
+row. The direct `channelId` and browse endpoint make this stronger identity
+evidence than the 60-item avatar selector on the Subscriptions feed.
+
+**Reduced initial-data excerpt**:
+
+```json
+{
+  "header": {
+    "feedTabbedHeaderRenderer": {
+      "title": {
+        "runs": [{ "text": "All subscriptions" }]
+      }
+    }
+  },
+  "contents": {
+    "singleColumnBrowseResultsRenderer": {
+      "tabs": [{
+        "tabRenderer": {
+          "tabIdentifier": "FEchannels",
+          "content": {
+            "sectionListRenderer": {
+              "contents": [{
+                "shelfRenderer": {
+                  "content": {
+                    "verticalListRenderer": {
+                      "items": [{
+                        "channelListItemRenderer": {
+                          "title": {
+                            "runs": [{ "text": "*NSYNC" }]
+                          },
+                          "channelId": "UCjkyfFH-MWZhasolgds05EA",
+                          "navigationEndpoint": {
+                            "browseEndpoint": {
+                              "browseId": "UCjkyfFH-MWZhasolgds05EA",
+                              "canonicalBaseUrl": "/@OfficialNSYNC"
+                            }
+                          },
+                          "presentationStyle": { "style": "NONE" }
+                        }
+                      }, {
+                        "continuationItemRenderer": {
+                          "continuationEndpoint": {
+                            "continuationCommand": {
+                              "token": "<opaque continuation>"
+                            }
+                          }
+                        }
+                      }]
+                    }
+                  }
+                }
+              }]
+            }
+          }
+        }
+      }]
+    }
+  }
+}
+```
+
+This directory is an explicit navigation/import source. FilterTube may use it
+when the user chooses **Import Subscribed Channels**, but merely loading,
+continuing, or selecting a row must never add, remove, block, or allow a
+channel automatically. Opaque continuation and tracking values must not be
+persisted as rule identity.
+
+---
+
+# Absolute JSON Trace: YTM You Page (`FElibrary`)
+*Files: `YTM Channel Page JSON/YTM_You_Page/YTM_YOU_Page.json`, `YTM_YOU_PAGE.html`*
+
+*Captured: 2026-07-12 from the signed-in mobile YouTube You/Library surface.*
+
+## Evidence-file and response order
+
+Each `====== ... ======` marker starts a new captured resource. The files are
+documented below one at a time, and resources within each file retain capture
+order:
+
+| Evidence file | Captured resources in order |
+| --- | --- |
+| `YTM_YOU_Page.json` | Player JSON -> `FElibrary` Browse JSON -> `/feed/library` HTML |
+| `YTM_YOU_Page_AccountSwitcher.json` | Settings-origin `/getAccountSwitcherEndpoint` response |
+| `YTM_YOU_Page_History.json` | Initial `FEhistory` Browse -> next continuation Browse -> `/feed/history` HTML |
+| `YTM_YOU_Page_Playlists.json` | Recently added Browse -> A-Z reload Browse |
+| `YTM_YOU_Page_Settings.json` | `account/get_setting` -> `guide` -> `getDatasyncIdsEndpoint` -> `/select_site` HTML |
+
+Exact literal marker lines in the current evidence files:
+
+| File | Marker lines |
+| --- | --- |
+| `YTM_YOU_Page.json` | 1 Player; 1349 `FElibrary` Browse; 29713 Library HTML |
+| `YTM_YOU_PAGE.html` | 1 You; 11606 Settings; 12009 History; 44993 Playlists |
+| `YTM_YOU_Page_AccountSwitcher.json` | 1 account switcher |
+| `YTM_YOU_Page_History.json` | 1 initial History; 72063 continuation; 144668 History HTML |
+| `YTM_YOU_Page_Playlists.json` | 1 Recently added; 31422 A-Z |
+| `YTM_YOU_Page_Settings.json` | 1 settings; 6945 Guide; 7800 datasync; 7883 select-site HTML |
+
+These line numbers are evidence boundaries for the current captured files, not
+runtime API constants. Recompute them if a fixture is appended.
+
+Capture bundles are not necessarily valid as one JSON document. Strip the
+human marker and any endpoint-specific XSSI prefix, then parse one balanced
+top-level object at a time.
+
+**Literal capture markers, in file order**:
+
+```text
+YTM_YOU_Page.json
+  YTM You Page player?prettyPrint=false
+  YTM You Page browse?prettyPrint=false
+  https: //m.youtube.com/feed/library?ra=m
+
+YTM_YOU_Page_AccountSwitcher.json
+  https: //m.youtube.com/getAccountSwitcherEndpoint
+
+YTM_YOU_Page_History.json
+  YTM You Page HISTORY browse?prettyPrint=false
+  YTM You Page HISTORY browse?prettyPrint=false  NEXT CHUNK JSON
+  https: //m.youtube.com/feed/history?ra=m
+
+YTM_YOU_Page_Playlists.json
+  YTM You Page PLAYLISTS browse?prettyPrint=false SORTED BY RECENTLY
+  YTM You Page PLAYLISTS browse?prettyPrint=false SORTED BY A-Z
+
+YTM_YOU_Page_Settings.json
+  https: //m.youtube.com/youtubei/v1/account/get_setting?prettyPrint=false
+  https: //m.youtube.com/youtubei/v1/guide?prettyPrint=false
+  https: //m.youtube.com/getDatasyncIdsEndpoint
+  https://m.youtube.com/select_site?ra=m
+```
+
+The spaces after `https:` occur in the human capture labels; normalize them
+only when interpreting the URL, not while locating evidence boundaries.
+
+This capture bundle contains three resources separated by `======` markers:
+
+1. `/youtubei/v1/player?prettyPrint=false` for `_Wcf2rKEB8E`;
+2. `/youtubei/v1/browse?prettyPrint=false` for `browseId: "FElibrary"`; and
+3. the complete `https://m.youtube.com/feed/library?ra=m` HTML document.
+
+The Player response is playback/identity evidence for one video that happened
+to be loaded during capture. It is not the You-page feed. The Browse response
+is the authoritative structured You-page payload.
+
+The separate `YTM_YOU_PAGE.html` bundle preserves four rendered surfaces in
+chronological order: the You overview, Settings, History, and Playlists with
+the Recently added/A-Z sorting control. Its DOM is companion evidence for the
+JSON paths below; DOM classes do not replace structured browse identity.
+
+## Player response bundled with the capture
+
+**Root fields**:
+
+- Playability: `playabilityStatus.status`
+- Video ID: `videoDetails.videoId`
+- Title: `videoDetails.title`
+- Duration: `videoDetails.lengthSeconds`
+- Owner channel ID: `videoDetails.channelId`
+- Owner name: `videoDetails.author`
+- Publish/upload dates:
+  `microformat.playerMicroformatRenderer.publishDate` and `.uploadDate`
+- Corroborating owner ID:
+  `microformat.playerMicroformatRenderer.externalChannelId`
+
+This response provides another exact-video identity observation for the
+Shakira/VEVO case documented later: `_Wcf2rKEB8E` reports
+`UCGnjeahCJW1AF34HBmQTJ-Q` / `shakiraVEVO`. It does not replace the separate
+current creator/card alias `UCYLNGLIzMhRTi6ZOLjAPSmw`.
+
+```json
+{
+  "playabilityStatus": { "status": "OK" },
+  "videoDetails": {
+    "videoId": "_Wcf2rKEB8E",
+    "title": "Shakira - La Pared (Anniversary Version)",
+    "lengthSeconds": "177",
+    "channelId": "UCGnjeahCJW1AF34HBmQTJ-Q",
+    "author": "shakiraVEVO"
+  },
+  "microformat": {
+    "playerMicroformatRenderer": {
+      "publishDate": "2025-10-22T06:01:18-07:00",
+      "uploadDate": "2025-10-22T06:01:18-07:00",
+      "ownerChannelName": "shakiraVEVO",
+      "externalChannelId": "UCGnjeahCJW1AF34HBmQTJ-Q"
+    }
+  }
+}
+```
+
+## You-page browse root and signed-in profile header
+
+**Tab base**:
+
+```text
+contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer
+```
+
+**You-page discriminator**:
+
+- `...tabRenderer.endpoint.browseEndpoint.browseId == "FElibrary"`
+- `...tabRenderer.tabIdentifier == "FElibrary"`
+- `...tabRenderer.selected == true`
+
+**Signed-in profile header**:
+
+- Display name:
+  `header.pageHeaderRenderer.content.pageHeaderViewModel.title.dynamicTextViewModel.text.content`
+- Profile channel ID:
+  `...title.dynamicTextViewModel.rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.browseId`
+- Avatar:
+  `...pageHeaderViewModel.image.decoratedAvatarViewModel.avatar.avatarViewModel.image.sources[n].url`
+- Handle:
+  `...pageHeaderViewModel.metadata.contentMetadataViewModel.metadataRows[0].metadataParts[0].text.content`
+
+The captured profile is `Devansh Varshney`, `@varshneydevansh`, channel
+`UCCNAxDIG4VWcXBL3wCt76UQ`. These are private capture values and must never be
+hardcoded or treated as the owner of cards displayed in History or Playlists.
+
+```json
+{
+  "contents": {
+    "singleColumnBrowseResultsRenderer": {
+      "tabs": [{
+        "tabRenderer": {
+          "endpoint": {
+            "browseEndpoint": { "browseId": "FElibrary" }
+          },
+          "selected": true,
+          "tabIdentifier": "FElibrary",
+          "content": {
+            "sectionListRenderer": { "contents": [] }
+          }
+        }
+      }]
+    }
+  },
+  "header": {
+    "pageHeaderRenderer": {
+      "content": {
+        "pageHeaderViewModel": {
+          "title": {
+            "dynamicTextViewModel": {
+              "text": { "content": "Devansh Varshney" },
+              "rendererContext": {
+                "commandContext": {
+                  "onTap": {
+                    "innertubeCommand": {
+                      "browseEndpoint": {
+                        "browseId": "UCCNAxDIG4VWcXBL3wCt76UQ"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "metadata": {
+            "contentMetadataViewModel": {
+              "metadataRows": [{
+                "metadataParts": [{
+                  "text": { "content": "@varshneydevansh" }
+                }]
+              }]
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+## History shelf
+
+**Shelf**:
+
+```text
+...tabRenderer.content.sectionListRenderer.contents[0]
+  .itemSectionRenderer.contents[0].horizontalCardListRenderer
+```
+
+- Shelf title: `...header.richListHeaderRenderer.title.runs[0].text`
+  -> `History`
+- Full-history browse ID: `...header.richListHeaderRenderer.endpoint.browseEndpoint.browseId`
+  -> `FEhistory`
+- Cards: `...horizontalCardListRenderer.cards[i].videoCardRenderer`
+
+**Video card fields**:
+
+- Video ID: `...videoCardRenderer.videoId`
+- Title: `...videoCardRenderer.title.runs[0].text`
+- Channel name: `...videoCardRenderer.bylineText.runs[0].text`
+- Channel ID:
+  `...videoCardRenderer.bylineText.runs[0].navigationEndpoint.browseEndpoint.browseId`
+- Watch target: `...videoCardRenderer.navigationEndpoint.watchEndpoint.videoId`
+- Thumbnail: `...videoCardRenderer.thumbnail.thumbnails[n].url`
+- Duration: locate `thumbnailOverlayTimeStatusRenderer.text`
+- Watched progress: locate `thumbnailOverlayResumePlaybackRenderer.percentDurationWatched`
+- Remove-history action: find the menu item whose text is
+  `Remove from watch history`; its service endpoint uses `/youtubei/v1/feedback`
+
+```json
+{
+  "horizontalCardListRenderer": {
+    "header": {
+      "richListHeaderRenderer": {
+        "title": { "runs": [{ "text": "History" }] },
+        "endpoint": {
+          "browseEndpoint": { "browseId": "FEhistory" }
+        }
+      }
+    },
+    "cards": [{
+      "videoCardRenderer": {
+        "videoId": "hHUbLv4ThOo",
+        "title": {
+          "runs": [{
+            "text": "Pitbull, Ke$ha - Timber (featuring Ke$ha - Official Video)"
+          }]
+        },
+        "bylineText": {
+          "runs": [{
+            "text": "Pitbull",
+            "navigationEndpoint": {
+              "browseEndpoint": {
+                "browseId": "UCv8nzwVPQDRjkPCkEsOdEwA"
+              }
+            }
+          }]
+        },
+        "navigationEndpoint": {
+          "watchEndpoint": { "videoId": "hHUbLv4ThOo" }
+        }
+      }
+    }]
+  }
+}
+```
+
+## Playlists shelf
+
+**Shelf**:
+
+```text
+...tabRenderer.content.sectionListRenderer.contents[1]
+  .itemSectionRenderer.contents[0].horizontalCardListRenderer
+```
+
+- Shelf title: `...header.richListHeaderRenderer.title.runs[0].text`
+  -> `Playlists`
+- Aggregation browse ID:
+  `...header.richListHeaderRenderer.endpoint.browseEndpoint.browseId`
+  -> `FEplaylist_aggregation`
+- Cards: `...horizontalCardListRenderer.cards[i].playlistCardRenderer`
+- Playlist title: `...playlistCardRenderer.title.runs[0].text`
+- Privacy/type byline: `...playlistCardRenderer.bylineText.runs[].text`
+- Playlist browse ID:
+  `...playlistCardRenderer.navigationEndpoint.browseEndpoint.browseId`
+- Playlist ID for destructive/edit actions:
+  `...deletePlaylistEndpoint.playlistId` or `...playlistEditorEndpoint.playlistId`
+
+```json
+{
+  "horizontalCardListRenderer": {
+    "header": {
+      "richListHeaderRenderer": {
+        "title": { "runs": [{ "text": "Playlists" }] },
+        "endpoint": {
+          "browseEndpoint": { "browseId": "FEplaylist_aggregation" }
+        }
+      }
+    },
+    "cards": [{
+      "playlistCardRenderer": {
+        "title": { "runs": [{ "text": "Liked videos" }] },
+        "bylineText": {
+          "runs": [
+            { "text": "Private" },
+            { "text": " · " },
+            { "text": "Playlist" }
+          ]
+        },
+        "navigationEndpoint": {
+          "browseEndpoint": { "browseId": "VLLL" }
+        }
+      }
+    }]
+  }
+}
+```
+
+`Liked videos` uses the special playlist target `VLLL`; user-created playlists
+use `VL` plus their playlist ID. A title such as `Liked videos` is display text,
+not the stable identity.
+The parallel account-maintained `Watch Later` preview uses `VLWL`.
+
+## Library shortcut links
+
+The final item section contains `compactLinkRenderer` entries rather than
+filterable video cards. Captured destinations include:
+
+| Label | Stable destination |
+| --- | --- |
+| Your videos | Profile channel browse ID and `/channel/{UCID}/videos` |
+| Films | `FEstorefront` |
+| Courses | `FEcourses` |
+| Help | External Support URL |
+| Feedback | `userFeedbackEndpoint` |
+| Get YouTube Premium | `SPunlimited` |
+
+These are navigation controls. Channel/keyword filtering must not hide them as
+if they were content cards.
+
+## Full HTML wrapper
+
+The `/feed/library?ra=m` capture contains configuration objects and the page's
+serialized initial data. When extracting from HTML, locate and decode the
+`ytInitialData` assignment, then apply the same `FElibrary` paths above.
+Do not scan unrelated `ytcfg`, localization strings, or player configuration
+objects as if they were Library feed renderers.
+
+## Settings-origin account switcher endpoint
+
+*File: `YTM Channel Page JSON/YTM_You_Page/YTM_YOU_Page_AccountSwitcher.json`*
+
+**Endpoint**: `GET /getAccountSwitcherEndpoint`
+
+**Invocation surface**: YouTube Settings/account switching. This is not a
+child payload of `FElibrary`; it is documented beside the You page because its
+selected identity determines the profile header and private Library data that
+subsequent You-page requests return.
+
+The response begins with an XSSI guard (`)]}'`) before the JSON object. Strip
+that guard and parse from the first object whose root contains
+`code: "SUCCESS"` and `data`.
+
+**Popup root**:
+
+```text
+data.actions[0].openPopupAction.popup.multiPageMenuRenderer
+```
+
+**Account sections**:
+
+```text
+...multiPageMenuRenderer.sections[i].accountSectionListRenderer
+  .contents[j].accountItemSectionRenderer.contents[k].accountItem
+```
+
+**Account/channel fields**:
+
+- Display name: `...accountItem.accountName.runs[0].text`
+- Avatar: `...accountItem.accountPhoto.thumbnails[n].url`
+- Selected identity: `...accountItem.isSelected`
+- Disabled identity: `...accountItem.isDisabled`
+- Has a YouTube channel: `...accountItem.hasChannel`
+- Subscriber/no-channel byline: `...accountItem.accountByline.runs[].text`
+- Channel handle: `...accountItem.channelHandle.runs[0].text` (optional)
+- Switch command: `...accountItem.serviceEndpoint.selectActiveIdentityEndpoint`
+- Post-switch destination:
+  `...selectActiveIdentityEndpoint.nextNavigationEndpoint.urlEndpoint.url`
+- Google-account grouping header:
+  `...accountSectionListRenderer.header.googleAccountHeaderRenderer`
+- Other-account group label:
+  `...accountSectionListRenderer.header.accountsDialogHeaderRenderer`
+- Per-account email/group label:
+  `...accountItemSectionRenderer.header.accountItemSectionHeaderRenderer.title.runs[0].text`
+
+The permanent fixture contains three account-section groups, seven rows, one
+selected row, one `hasChannel: false` row, and four rows with an optional
+`pageIdToken`. Those are capture counts, not fixed product limits. Primary or
+no-channel rows can omit `pageIdToken`; all row arrays must be traversed rather
+than addressed by a fixed index.
+
+**Sensitive switch tokens**:
+
+```text
+...selectActiveIdentityEndpoint.supportedTokens[].pageIdToken
+...selectActiveIdentityEndpoint.supportedTokens[].accountStateToken
+...supportedTokens[].offlineCacheKeyToken
+...supportedTokens[].accountSigninToken
+...supportedTokens[].datasyncIdToken
+```
+
+These values are authentication/session routing material, not channel IDs and
+not FilterTube profile identities. Never log, export, synchronize, persist in
+FilterTube settings, or place their real values in public documentation.
+FilterTube should observe the resulting active YouTube identity after the
+switch rather than replaying these private tokens itself.
+
+**Reduced redacted structure**:
+
+```json
+{
+  "code": "SUCCESS",
+  "data": {
+    "actions": [{
+      "openPopupAction": {
+        "popup": {
+          "multiPageMenuRenderer": {
+            "header": {
+              "simpleMenuHeaderRenderer": {
+                "title": { "runs": [{ "text": "Accounts" }] }
+              }
+            },
+            "sections": [{
+              "accountSectionListRenderer": {
+                "contents": [{
+                  "accountItemSectionRenderer": {
+                    "contents": [{
+                      "accountItem": {
+                        "accountName": {
+                          "runs": [{ "text": "Account display name" }]
+                        },
+                        "isSelected": true,
+                        "isDisabled": false,
+                        "hasChannel": true,
+                        "channelHandle": {
+                          "runs": [{ "text": "@channelHandle" }]
+                        },
+                        "serviceEndpoint": {
+                          "selectActiveIdentityEndpoint": {
+                            "supportedTokens": [
+                              { "accountStateToken": { "hasChannel": true } },
+                              { "offlineCacheKeyToken": { "clientCacheKey": "REDACTED" } },
+                              { "accountSigninToken": { "signinUrl": "REDACTED" } },
+                              { "datasyncIdToken": { "datasyncIdToken": "REDACTED" } }
+                            ],
+                            "nextNavigationEndpoint": {
+                              "urlEndpoint": {
+                                "url": "https://m.youtube.com/feed/library?ra=m"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }]
+                  }
+                }]
+              }
+            }]
+          }
+        }
+      }
+    }]
+  }
+}
+```
+
+An `accountItem` with `hasChannel: false` is a Google identity without a
+YouTube channel. It must not be synthesized into a blockable channel. The
+footer `compactLinkRenderer` entries such as `Add account` and `Sign out` are
+account actions, not content cards.
+
+### Correlated before/after channel-profile switch evidence
+
+The following three preserved responses form one bounded switch trace. They
+must be interpreted in capture order rather than merged into one JSON object:
+
+| Evidence | Response role | Proven identity state |
+| --- | --- | --- |
+| `/Users/devanshvarshney/.codex/attachments/1a2a4453-7685-469d-87dd-82ea52cea889/pasted-text.txt` | `getAccountSwitcherEndpoint` chooser response | `@varshneydevansh` channel row selected; `@ttv_tej` row available but unselected |
+| `/Users/devanshvarshney/.codex/attachments/586f94a5-d7cf-4cf0-a6af-3883f035e2df/pasted-text.txt` | Wrapped `FElibrary` Browse response | Pre-switch You header remains `@varshneydevansh`; 16 History cards, 130 Playlist cards, two horizontal shelves, six compact links, and no continuation row |
+| `/Users/devanshvarshney/.codex/attachments/f303874c-2a5c-459d-826a-705b2036a4d3/pasted-text.txt` | Post-selection `guide` response | Active account header is Tej / `@ttv_tej`; the `Your channel` menu endpoint carries Tej's canonical UC browse ID |
+
+A fourth attachment is a later, independent chooser epoch rather than part of
+that three-response chronology:
+
+```text
+/Users/devanshvarshney/.codex/attachments/
+  a27394fc-aa80-4edf-8b8e-35bfc030ace8/pasted-text.txt
+```
+
+After stripping its XSSI prefix, it contains only one
+`getAccountSwitcherEndpoint` response body. It has three account sections and
+seven rows; its selected row reports `hasChannel: false`, has no handle, and
+has no `pageIdToken`. All seven rows omit `channelHandle`. This does not
+contradict the earlier selected channel-backed row: it proves that chooser
+fields are response-epoch-dependent and that the same display name can occur
+on distinct channel-backed and no-channel identities.
+
+Traverse all `sections[]`, section `contents[]`, and row `contents[]`. A fixed
+index such as `sections[0]...contents[1]` is invalid: in this later response,
+the first group exposes only one account row.
+
+**Pre-switch chooser root**:
+
+```text
+data.actions[0].openPopupAction.popup.multiPageMenuRenderer
+  .sections[i].accountSectionListRenderer
+  .contents[j].accountItemSectionRenderer
+  .contents[k].accountItem
+```
+
+The selected-row fields and response-owned switch command are:
+
+```text
+...accountItem.isSelected
+...accountItem.hasChannel
+...accountItem.serviceEndpoint.selectActiveIdentityEndpoint
+...selectActiveIdentityEndpoint.supportedTokens[]
+...selectActiveIdentityEndpoint.nextNavigationEndpoint
+```
+
+**Pre-switch You header**:
+
+```text
+response.header.pageHeaderRenderer.content.pageHeaderViewModel
+  .title.dynamicTextViewModel.text.content
+response.header.pageHeaderRenderer.content.pageHeaderViewModel
+  .title.dynamicTextViewModel.rendererContext.commandContext.onTap
+  .innertubeCommand.browseEndpoint.browseId
+response.header.pageHeaderRenderer.content.pageHeaderViewModel
+  .metadata.contentMetadataViewModel.metadataRows[0]
+  .metadataParts[0].text.content
+```
+
+**Post-switch Guide owner**:
+
+```text
+items[1].mobileTopbarRenderer.buttons[0].topbarMenuButtonRenderer
+  .menuRenderer.multiPageMenuRenderer.header.activeAccountHeaderRenderer
+
+...activeAccountHeaderRenderer.accountName.runs[0].text
+...activeAccountHeaderRenderer.channelHandle.runs[0].text
+
+items[1].mobileTopbarRenderer.buttons[0].topbarMenuButtonRenderer
+  .menuRenderer.multiPageMenuRenderer.sections[0]
+  .multiPageMenuSectionRenderer.items[0].compactLinkRenderer
+  .navigationEndpoint.browseEndpoint.browseId
+```
+
+Additional response-context evidence:
+
+```text
+responseContext.maxAgeSeconds
+responseContext.serviceTrackingParams[].params[]
+  [key == "encrypted_pageid"].value
+```
+
+The captured pre- and post-switch Guides use `maxAgeSeconds: 3600`. That is a
+provider response-cache hint, not permission to reuse a pre-switch owner after
+selection; explicitly switching accounts requires a fresh Guide verification.
+`encrypted_pageid` is opaque session decoration and must not be decoded,
+persisted, logged, or used as the durable account key.
+
+This proves that YouTube accepted the
+`@varshneydevansh -> @ttv_tej` channel-profile change at the post-switch Guide
+identity layer. It does **not** prove that a Tej-owned Home, `FElibrary`,
+History, Subscriptions, continuation, Like, or comment response was fetched
+after that switch: the supplied Library response is explicitly the pre-switch
+Devansh snapshot.
+
+The switcher response describes a provider-owned
+`selectActiveIdentityEndpoint`, but the captures do not contain the exact
+network request by which MWEB commits that command. Do not invent a generic
+`/browse` or `/next` POST containing copied token values. The safe existing
+boundary is to let the authenticated MWEB client execute the response-owned
+command, then verify the resulting canonical UC browse ID from a new Guide or
+equivalent strong account response before committing native account state.
+
+The permanent account-switcher fixture and the chronological attachment are
+different response epochs. Across them, the same display name can identify a
+channel-backed row and a separate `hasChannel: false` Google identity. Display
+name, email-group header, `authuser`, page ID, Gaia ID, datasync value, handle,
+and avatar are therefore not interchangeable account keys. Only the verified
+canonical YouTube UC browse ID may become FilterTube's durable linked identity;
+the other fields remain presentation aliases or opaque provider session data.
+
+### Switch-support calls: exact authority limits
+
+| Call/object | What the capture proves | What it does not prove |
+| --- | --- | --- |
+| `GET /getAccountSwitcherEndpoint` | Grouped account/channel rows plus exact selection commands | That reading the menu performs a switch |
+| `selectActiveIdentityEndpoint` | Provider semantic command with session-owned supported tokens and next navigation | Which private token MWEB consumes internally or a stable public POST schema |
+| `POST /youtubei/v1/guide` | Current pivot/topbar/menu state and a strongly correlated active channel endpoint | Account page content or successful engagement writes |
+| `GET /getDatasyncIdsEndpoint` | Opaque session relationships available to the current cookie jar | Selected order, canonical UC mapping, or FilterTube permission |
+| `POST /youtubei/v1/browse` | Account-owned content consumed from the already active provider session | The identity mutation mechanism itself |
+| `/api/jnn/v1/GenerateIT` | Mentioned in a user-supplied DevTools analysis, but not present in the preserved raw fixtures above | Its purpose, expiry contract, downstream header, or required account-switch usage |
+
+`datasyncIds[]` has no `isSelected` field and no canonical channel
+`browseEndpoint`. Array position must not be interpreted as the active owner.
+Likewise, `encrypted_pageid` in response tracking is opaque account-context
+evidence; it does not replace a canonical UC observation.
+
+All supported switch tokens, datasync values, sign-in URLs, Google account
+group labels, authorization material, integrity responses, cookies, and
+tracking/feedback tokens are private session state. Documentation and runtime
+diagnostics may retain only field presence, row counts, response status,
+duration buckets, safe handle/name aliases when appropriate, and whether a
+canonical UC verification succeeded. Never copy the real opaque values into
+logs, backups, FilterTube profiles, or reduced examples.
+
+## Watch History browse and continuation
+
+*File: `YTM Channel Page JSON/YTM_You_Page/YTM_YOU_Page_History.json`*
+
+The capture contains three resources:
+
+1. initial `POST /youtubei/v1/browse?prettyPrint=false` for `FEhistory`;
+2. a subsequent Browse continuation response; and
+3. the complete `/feed/history?ra=m` HTML page.
+
+Observed renderer counts are capture diagnostics, not fixed API limits:
+
+| Capture segment | Normal videos | Shorts | Continuation behavior |
+| --- | ---: | ---: | --- |
+| Initial History JSON | 146 `compactVideoRenderer` | 54 `shortsLockupViewModel` across two shelves | One next-page row |
+| Next History JSON | 174 `compactVideoRenderer` | 25 `shortsLockupViewModel` across three shelves | `appendContinuationItemsAction`, target `browse-feedFEhistory`, then one next-page row |
+| Rendered History DOM | 324 `ytm-compact-video-renderer` | 75 `ytm-shorts-lockup-view-model` across five shelves | One continuation host |
+
+The two JSON responses total 320 normal videos plus 79 Shorts; the DOM totals
+324 plus 75. Both contain 399 content cards. The family split differs because
+the responses and DOM were captured/materialized at different moments. Code
+must dispatch by the renderer actually returned; it must not assert these
+individual family counts as a permanent equality.
+
+**Initial item base**:
+
+```text
+contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer
+  .content.sectionListRenderer.contents[i].itemSectionRenderer
+```
+
+**Continuation base**:
+
+```text
+onResponseReceivedActions[0].appendContinuationItemsAction
+  .continuationItems[i].itemSectionRenderer
+```
+
+History is grouped into date sections. The capture includes labels such as
+`Today`, `Yesterday`, weekday names, and localized day/month strings.
+
+- Date header: `...itemSectionRenderer.header.itemSectionHeaderRenderer.title`
+- Normal videos: `...itemSectionRenderer.contents[i].compactVideoRenderer`
+- Shorts group: `...itemSectionRenderer.contents[i].reelShelfRenderer.items[j].shortsLockupViewModel`
+- Next-page token:
+  `...continuationItemRenderer.continuationEndpoint.continuationCommand.token`
+- Initial reload token:
+  `...sectionListRenderer.continuations[0].reloadContinuationData.continuation`
+
+### Normal history video
+
+- Video ID: `...compactVideoRenderer.videoId`
+- Title: `...compactVideoRenderer.title.runs[0].text`
+- Channel/byline text: `...compactVideoRenderer.longBylineText.runs[0].text`
+- Direct channel ID when present:
+  `...longBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId`
+- Collaborator sheet when present:
+  `...longBylineText.runs[0].navigationEndpoint.showSheetCommand`
+- View count: `...compactVideoRenderer.viewCountText.runs[0].text`
+- Watch target: `...compactVideoRenderer.navigationEndpoint.watchEndpoint.videoId`
+- Watched progress: locate `thumbnailOverlayResumePlaybackRenderer.percentDurationWatched`
+- Duration: locate `thumbnailOverlayTimeStatusRenderer.text`
+
+A History card can contain the same header-backed Collaborators sheet as
+Search or Watch recommendations. Preserve that exact-video roster; do not
+flatten text such as `HBO Max and 2 more` into guessed names.
+
+```json
+{
+  "itemSectionRenderer": {
+    "header": {
+      "itemSectionHeaderRenderer": {
+        "title": { "runs": [{ "text": "Today" }] }
+      }
+    },
+    "contents": [{
+      "compactVideoRenderer": {
+        "videoId": "hHUbLv4ThOo",
+        "title": {
+          "runs": [{
+            "text": "Pitbull, Ke$ha - Timber (featuring Ke$ha - Official Video)"
+          }]
+        },
+        "longBylineText": {
+          "runs": [{
+            "text": "Pitbull",
+            "navigationEndpoint": {
+              "browseEndpoint": {
+                "browseId": "UCv8nzwVPQDRjkPCkEsOdEwA"
+              }
+            }
+          }]
+        },
+        "navigationEndpoint": {
+          "watchEndpoint": { "videoId": "hHUbLv4ThOo" }
+        }
+      }
+    }]
+  }
+}
+```
+
+### History Shorts group
+
+```json
+{
+  "itemSectionRenderer": {
+    "contents": [{
+      "reelShelfRenderer": {
+        "items": [{
+          "shortsLockupViewModel": {
+            "onTap": {
+              "innertubeCommand": {
+                "commandMetadata": {
+                  "webCommandMetadata": {
+                    "url": "/shorts/2CGCoTuMX8U"
+                  }
+                },
+                "reelWatchEndpoint": {
+                  "videoId": "2CGCoTuMX8U"
+                }
+              }
+            },
+            "overlayMetadata": {
+              "primaryText": { "content": "My Back Hurts..." },
+              "secondaryText": { "content": "3.7 lakh views" }
+            }
+          }
+        }]
+      }
+    }]
+  }
+}
+```
+
+### Continuation response
+
+```json
+{
+  "onResponseReceivedActions": [{
+    "appendContinuationItemsAction": {
+      "continuationItems": [
+        { "itemSectionRenderer": { "contents": [] } },
+        {
+          "continuationItemRenderer": {
+            "continuationEndpoint": {
+              "continuationCommand": {
+                "token": "opaque-history-token",
+                "request": "CONTINUATION_REQUEST_TYPE_BROWSE"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }]
+}
+```
+
+History continuations append date sections; unlike a sort-chip response, they
+do not use `reloadContinuationItemsCommand` in this capture.
+
+### History mutation controls
+
+Per-card removal is exposed through a menu item whose text is
+`Remove from watch history` and whose service command posts to
+`/youtubei/v1/feedback`. The response may include a toast such as
+`All views of this video removed from history`.
+
+Page-level controls are under:
+
+```text
+toolbarMenu.menuRenderer.items[]
+```
+
+Captured actions include:
+
+- `Pause watch history` -> confirmation dialog -> `/youtubei/v1/feedback`
+- `Clear all watch history` -> confirmation dialog -> `/youtubei/v1/feedback`
+- `Manage all history` -> external `myactivity.google.com` URL
+
+Feedback tokens and confirmation text can contain private account details.
+They are transient mutation authority and must never be logged, exported, or
+used as filtering identity. FilterTube should filter rendered History cards,
+not invoke destructive YouTube-history actions automatically.
+
+The full HTML capture again embeds initial page data among configuration and
+localized strings. Decode only the `ytInitialData` payload before applying the
+paths above.
+
+## Playlist aggregation and sorting
+
+*File: `YTM Channel Page JSON/YTM_You_Page/YTM_YOU_Page_Playlists.json`*
+
+This file contains two Browse responses in chronological interaction order:
+
+1. full `FEplaylist_aggregation` page sorted by `Recently added`; and
+2. an `A-Z` sort response that reloads the existing grid target.
+
+The Recently added response contains 129 playlist `lockupViewModel` rows. The
+A-Z replacement contains 131 rows. The separately captured rendered DOM
+contains 130 `yt-lockup-view-model` rows. These are chronological account/page
+snapshots, not a contradiction and not a fixed playlist-total contract. Sort
+selection must apply the returned `reloadContinuationItemsCommand` atomically
+to its target grid and re-run filtering on exactly those replacement rows.
+
+### Initial Recently added response
+
+**Item base**:
+
+```text
+contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer
+  .content.richGridRenderer.contents[i].richItemRenderer.content.lockupViewModel
+```
+
+**Playlist fields**:
+
+- Stable playlist ID: `...lockupViewModel.contentId`
+- Type: `...lockupViewModel.contentType`
+  -> `LOCKUP_CONTENT_TYPE_PLAYLIST`
+- Title: `...metadata.lockupMetadataViewModel.title.content`
+- Metadata rows:
+  `...metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows[]`
+- Owner/channel ID when supplied:
+  `...metadataParts[].text.commandRuns[].onTap.innertubeCommand.browseEndpoint.browseId`
+- Playlist target:
+  `...rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.browseId`
+- Video-count badge:
+  `...collectionThumbnailViewModel.primaryThumbnail.thumbnailViewModel.overlays[].thumbnailOverlayBadgeViewModel.thumbnailBadges[].thumbnailBadgeViewModel.text`
+
+Special playlists use special IDs. In the capture, `Liked videos` has
+`contentId: "LL"` and browse target `VLLL`; ordinary playlists use `PL...` and
+`VLPL...` forms.
+`Watch Later` has `contentId: "WL"` and browse target `VLWL`.
+
+```json
+{
+  "richItemRenderer": {
+    "content": {
+      "lockupViewModel": {
+        "contentImage": {
+          "collectionThumbnailViewModel": {
+            "primaryThumbnail": {
+              "thumbnailViewModel": {
+                "overlays": [{
+                  "thumbnailOverlayBadgeViewModel": {
+                    "thumbnailBadges": [{
+                      "thumbnailBadgeViewModel": {
+                        "text": "5,000 videos"
+                      }
+                    }]
+                  }
+                }]
+              }
+            }
+          }
+        },
+        "metadata": {
+          "lockupMetadataViewModel": {
+            "title": { "content": "Liked videos" },
+            "metadata": {
+              "contentMetadataViewModel": {
+                "metadataRows": [
+                  {
+                    "metadataParts": [
+                      { "text": { "content": "Private" } },
+                      { "text": { "content": "Playlist" } }
+                    ]
+                  },
+                  {
+                    "metadataParts": [{
+                      "text": { "content": "Updated today" }
+                    }]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "contentId": "LL",
+        "contentType": "LOCKUP_CONTENT_TYPE_PLAYLIST",
+        "rendererContext": {
+          "commandContext": {
+            "onTap": {
+              "innertubeCommand": {
+                "browseEndpoint": { "browseId": "VLLL" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### Sort dropdown
+
+The visible sort control is one dropdown chip:
+
+```text
+...richGridRenderer.header.chipBarViewModel.chips[0].chipViewModel
+```
+
+- Current label: `...chipViewModel.text`
+- Accessibility label: `...chipViewModel.accessibilityLabel`
+- Dropdown marker:
+  `...displayType == "CHIP_VIEW_MODEL_DISPLAY_TYPE_DROP_DOWN"`
+- Choices:
+  `...tapCommand.innertubeCommand.showSheetCommand...listViewModel.listItems[]`
+- Choice label: `...listItemViewModel.title.content`
+- Choice state update: locate `entityUpdateCommand.entityBatchUpdate`
+- Choice Browse token: locate `continuationCommand.token`
+
+Captured choices are `Recently added` and `A-Z`. They are sort modes, not
+filtering categories or playlist ownership.
+
+```json
+{
+  "chipViewModel": {
+    "text": "Recently added",
+    "displayType": "CHIP_VIEW_MODEL_DISPLAY_TYPE_DROP_DOWN",
+    "tapCommand": {
+      "innertubeCommand": {
+        "showSheetCommand": {
+          "panelLoadingStrategy": {
+            "inlineContent": {
+              "sheetViewModel": {
+                "content": {
+                  "listViewModel": {
+                    "listItems": [
+                      {
+                        "listItemViewModel": {
+                          "title": { "content": "A-Z" },
+                          "rendererContext": {
+                            "commandContext": {
+                              "onTap": {
+                                "innertubeCommand": {
+                                  "commandExecutorCommand": {
+                                    "commands": [
+                                      { "entityUpdateCommand": {} },
+                                      {
+                                        "continuationCommand": {
+                                          "token": "opaque-a-z-token",
+                                          "request": "CONTINUATION_REQUEST_TYPE_BROWSE"
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "listItemViewModel": {
+                          "title": { "content": "Recently added" }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### A-Z reload response
+
+The second response keeps a skeletal selected tab and replaces the existing
+grid by target ID:
+
+```text
+onResponseReceivedActions[0].reloadContinuationItemsCommand
+```
+
+- Target: `...reloadContinuationItemsCommand.targetId`
+- Replacement items: `...continuationItems[i].richItemRenderer.content.lockupViewModel`
+
+```json
+{
+  "contents": {
+    "singleColumnBrowseResultsRenderer": {
+      "tabs": [{
+        "tabRenderer": {
+          "selected": true,
+          "targetId": "playlist-grid-target"
+        }
+      }]
+    }
+  },
+  "onResponseReceivedActions": [{
+    "reloadContinuationItemsCommand": {
+      "targetId": "playlist-grid-target",
+      "continuationItems": [{
+        "richItemRenderer": {
+          "content": {
+            "lockupViewModel": {
+              "metadata": {
+                "lockupMetadataViewModel": {
+                  "title": {
+                    "content": "15: Twitter Bot Tutorial - Node.js and Processing"
+                  }
+                }
+              },
+              "contentId": "PLRqwX-V7Uu6atTSxoRiVnSuOn6JHnq2yV",
+              "contentType": "LOCKUP_CONTENT_TYPE_PLAYLIST",
+              "rendererContext": {
+                "commandContext": {
+                  "onTap": {
+                    "innertubeCommand": {
+                      "browseEndpoint": {
+                        "browseId": "VLPLRqwX-V7Uu6atTSxoRiVnSuOn6JHnq2yV"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }]
+    }
+  }]
+}
+```
+
+Filtering must reprocess the replacement items and must not mistake the
+skeletal selected tab for an empty playlist page.
+
+## YTM Settings and identity-support resources
+
+*File: `YTM Channel Page JSON/YTM_You_Page/YTM_YOU_Page_Settings.json`*
+
+The file captures four resources in this exact order:
+
+1. `/youtubei/v1/account/get_setting?prettyPrint=false`;
+2. `/youtubei/v1/guide?prettyPrint=false`;
+3. `/getDatasyncIdsEndpoint`; and
+4. the full `/select_site?ra=m` HTML page.
+
+Observed API versus DOM materialization:
+
+- the Settings API contains four category collections, ten boolean renderers,
+  four single-option menus, three read-only rows, and 280 option rows;
+- the rendered Settings DOM capture materializes four category collections,
+  two boolean hosts, and three single-option-menu hosts;
+- the Guide response contains one pivot bar and one mobile topbar/account menu;
+  the accompanying datasync response contains seven opaque entries and no
+  selected-row or canonical channel-browse field.
+
+The API remains command/data authority. A currently collapsed or unmounted DOM
+control is not evidence that the corresponding setting is absent.
+
+### 1. Account settings response
+
+**Root list**: `items[]`
+
+The response mixes several renderer families:
+
+- Direct category link: `settingCategoryEntryRenderer`
+- Category with controls: `settingCategoryCollectionRenderer`
+- Boolean control: `settingBooleanRenderer`
+- Single-choice control: `settingSingleOptionMenuRenderer`
+- Choice: `settingMenuItemRenderer`
+- Read-only row: `settingReadOnlyItemRenderer`
+- Nested section: `settingCategorySectionRenderer`
+- Connected-account row: `connectedAccountsSettingCategoryEntryRenderer`
+- Product/billing row: `subscriptionProductsSettingCategoryEntryRenderer`
+
+Captured top-level areas include Switch account, General, History and privacy,
+Your data in YouTube, Notifications, Billing and payments, connected accounts,
+subscription products, and About/Google-company links.
+
+**Boolean fields**:
+
+- Label: `...settingBooleanRenderer.title.runs[0].text`
+- Explanation: `...settingBooleanRenderer.summary.runs[].text`
+- Stable item ID: `...settingBooleanRenderer.itemId`
+- Enable mutation:
+  `...enableServiceEndpoint.setClientSettingEndpoint.settingDatas[]`
+- Disable mutation:
+  `...disableServiceEndpoint.setClientSettingEndpoint.settingDatas[]`
+- Setting enum: `...clientSettingEnum.item`
+- Boolean value: `...boolValue`
+
+Examples include `SAFETY_MODE` (Restricted Mode) and `INLINE_MUTED` (Video
+previews). These are YouTube settings, not FilterTube rules. Reading them may
+help explain the host surface, but FilterTube must not silently mutate them.
+
+```json
+{
+  "items": [
+    {
+      "settingCategoryEntryRenderer": {
+        "title": { "runs": [{ "text": "Switch account" }] },
+        "categoryId": "SETTING_CAT_ACCOUNT_SWITCHER_MWEB",
+        "serviceEndpoint": {
+          "getAccountSwitcherEndpoint": { "popup": true }
+        }
+      }
+    },
+    {
+      "settingCategoryCollectionRenderer": {
+        "title": { "runs": [{ "text": "General" }] },
+        "items": [{
+          "settingBooleanRenderer": {
+            "title": { "runs": [{ "text": "Restricted Mode" }] },
+            "summary": {
+              "runs": [{
+                "text": "This helps hide potentially mature videos. No filter is 100% accurate. This setting only applies to this browser."
+              }]
+            },
+            "enableServiceEndpoint": {
+              "setClientSettingEndpoint": {
+                "settingDatas": [{
+                  "clientSettingEnum": { "item": "SAFETY_MODE" },
+                  "boolValue": true
+                }]
+              }
+            },
+            "disableServiceEndpoint": {
+              "setClientSettingEndpoint": {
+                "settingDatas": [{
+                  "clientSettingEnum": { "item": "SAFETY_MODE" },
+                  "boolValue": false
+                }]
+              }
+            },
+            "itemId": "SAFETY_MODE"
+          }
+        }]
+      }
+    }
+  ]
+}
+```
+
+**Single-option fields**:
+
+- Label: `...settingSingleOptionMenuRenderer.title.runs[0].text`
+- Choices: `...settingSingleOptionMenuRenderer.items[]`
+- Choice name/value: `...settingMenuItemRenderer.name` and `.value`
+- Mutation:
+  `...settingMenuItemRenderer.updateServiceEndpoint.setClientSettingEndpoint.settingDatas[]`
+
+Captured option menus include Language (`I18N_LANGUAGE`), Location
+(`I18N_REGION`), Appearance (`APP_THEME`), and Email language.
+
+```json
+{
+  "settingSingleOptionMenuRenderer": {
+    "title": { "runs": [{ "text": "Language" }] },
+    "items": [{
+      "settingMenuItemRenderer": {
+        "name": "Afrikaans",
+        "value": "af",
+        "updateServiceEndpoint": {
+          "setClientSettingEndpoint": {
+            "settingDatas": [{
+              "clientSettingEnum": { "item": "I18N_LANGUAGE" },
+              "stringValue": "af"
+            }]
+          }
+        }
+      }
+    }]
+  }
+}
+```
+
+The actual mutation API advertised by these endpoints is
+`/youtubei/v1/account/set_setting`. Mutation commands and account settings are
+host authority; they must not be imported into FilterTube profile backups as
+if they were FilterTube preferences.
+
+### 2. Guide response
+
+The Guide response supplies shared mobile navigation and account-menu chrome.
+
+**Bottom/pivot navigation**:
+
+```text
+items[0].pivotBarRenderer.items[i].pivotBarItemRenderer
+```
+
+- Stable pivot ID: `...pivotIdentifier`
+- Label: `...title.runs[0].text`
+- Browse ID: `...navigationEndpoint.browseEndpoint.browseId`
+- URL: `...navigationEndpoint.commandMetadata.webCommandMetadata.url`
+
+Captured pivots include `FEwhat_to_watch`, `FEshorts`, `FEsubscriptions`, and
+`FElibrary`.
+
+**Account menu**:
+
+```text
+items[1].mobileTopbarRenderer.buttons[0].topbarMenuButtonRenderer
+  .menuRenderer.multiPageMenuRenderer
+```
+
+Its `activeAccountHeaderRenderer` displays the current account and exposes
+`getAccountSwitcherEndpoint`. Settings navigation is exposed through an
+`applicationSettingsEndpoint` in a `compactLinkRenderer`.
+
+```json
+{
+  "items": [
+    {
+      "pivotBarRenderer": {
+        "items": [{
+          "pivotBarItemRenderer": {
+            "pivotIdentifier": "FElibrary",
+            "navigationEndpoint": {
+              "commandMetadata": {
+                "webCommandMetadata": {
+                  "url": "/feed/library",
+                  "apiUrl": "/youtubei/v1/browse"
+                }
+              },
+              "browseEndpoint": { "browseId": "FElibrary" }
+            },
+            "title": { "runs": [{ "text": "You" }] }
+          }
+        }]
+      }
+    },
+    {
+      "mobileTopbarRenderer": {
+        "buttons": [{
+          "topbarMenuButtonRenderer": {
+            "menuRenderer": {
+              "multiPageMenuRenderer": {
+                "header": {
+                  "activeAccountHeaderRenderer": {
+                    "accountName": {
+                      "runs": [{ "text": "Active account" }]
+                    },
+                    "serviceEndpoint": {
+                      "getAccountSwitcherEndpoint": { "hack": true }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }]
+      }
+    }
+  ]
+}
+```
+
+Guide links and pivots are navigation, not filterable content cards.
+
+### 3. Datasync ID endpoint
+
+**Endpoint**: `GET /getDatasyncIdsEndpoint`
+
+**Root field**: `datasyncIds[]`
+
+```json
+{
+  "datasyncIds": [
+    "REDACTED_ACCOUNT_DATASYNC_ID",
+    "REDACTED_CHANNEL_AND_ACCOUNT_DATASYNC_ID"
+  ],
+  "responseContext": {}
+}
+```
+
+Datasync IDs bind YouTube account/channel state across requests. They are not
+public channel browse IDs, FilterTube device IDs, Nanah peer IDs, or permission
+proof. Treat them as sensitive session/account-routing material: never log,
+export, sync, or display their real values.
+
+### 4. Select-site HTML page
+
+`/select_site?ra=m` is a complete HTML/configuration surface rather than a
+single JSON API body. It contains `ytcfg`, localized strings, player context,
+and account/session configuration including `DATASYNC_ID` references.
+
+Relevant configuration may describe host language, theme, MWEB capabilities,
+and the account switcher experiment, but it is not content data. If a JSON
+payload is needed, extract only the intended serialized object. Do not
+recursively interpret every page configuration object as a renderer response,
+and never persist the embedded account/session values.
+
+---
+
 # Absolute JSON Trace: Collaborator Roster (`videoWithContextRenderer`)
 *File: `YTM-XHR.json`, `YT_MAIN_UPNEXT_FEED_WATCHPAGE2.json`, `collab.json`*
 

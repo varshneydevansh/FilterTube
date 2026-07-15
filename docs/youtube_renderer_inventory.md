@@ -447,6 +447,386 @@ Caveats:
   attributes. Issue #59 remains a privacy/code-burden cleanup direction, not
   the proven cause of this DOM shift.
 
+### Channel Home, Posts, and Shorts DOM refresh (2026-07-12)
+
+Fixture:
+`YTM Channel Page JSON/YTM_You_Page/Channel_POSTS_DOM.html`
+
+The fixture is a capture bundle. Every `++++++ ... ++++++` marker starts a
+different DOM surface; do not parse the complete file as one document. It
+contains, in order:
+
+1. desktop YTD Posts DOM;
+2. mobile YTM channel Posts DOM;
+3. mobile YTM channel Shorts DOM; and
+4. mobile YTM Pitbull channel Home DOM.
+
+| Captured surface | Outer content hosts | Metadata/content hosts | Correct hide target |
+| --- | --- | --- | --- |
+| Desktop YTD Posts | `ytd-backstage-post-thread-renderer` -> `ytd-backstage-post-renderer` | `ytd-expander`, `yt-attributed-string`, image/poll/quiz/uploaded-video renderers | Post/thread renderer, never action buttons |
+| Mobile YTM Posts | `ytm-backstage-post-thread-renderer.ytmBackstagePostThreadRendererHost` -> `ytm-backstage-post-renderer.ytmBackstagePostRendererHost` | `yt-post-header.ytPostHeaderHost`, `.ytmBackstagePostRendererHostContentText`, `ytm-backstage-image-renderer.ytmBackstageImageRendererHost` | YTM post/thread host, never `ytCommentActionButtonsRendererHost` |
+| Mobile YTM channel Shorts | `ytm-rich-item-renderer` -> `ytm-shorts-lockup-view-model.shortsLockupViewModelHost` | `.shortsLockupViewModelHostMetadataTitle`, `.shortsLockupViewModelHostMetadataSubhead`, `yt-thumbnail-view-model` | `ytm-shorts-lockup-view-model` / `.shortsLockupViewModelHost` |
+| Mobile YTM channel Home | `ytm-channel-featured-video-renderer`, `ytm-shelf-renderer`, `ytm-compact-video-renderer.YtmCompactVideoRendererHost` | `.YtmCompactMediaItemHeadline`, `.YtmCompactMediaItemByline`, `.YtmCompactMediaItemStats` | Featured-video or compact-video card, not shelf/overlay children |
+
+The Shorts sample contains 48 `ytm-rich-item-renderer` rows and 48
+`ytm-shorts-lockup-view-model` cards. Each lockup carries the current camelCase
+metadata children and its `/shorts/{videoId}` endpoint. Channel identity may
+still be absent from the visible lockup, so the existing bounded Shorts
+identity resolver remains necessary when channel rules are active.
+
+The mobile Home sample confirms these current host classes on a channel Home
+surface:
+
+```html
+<ytm-channel-featured-video-renderer
+  class="YtmChannelFeaturedVideoRendererHost">
+<ytm-compact-video-renderer class="YtmCompactVideoRendererHost">
+  <div class="YtmCompactMediaItemHost">
+    <div class="YtmCompactMediaItemHeadline">
+    <div class="YtmCompactMediaItemByline">
+```
+
+`YtmThumbnailOverlayResumePlaybackRendererHost`, touch-feedback classes, badge
+classes, and thumbnail-group classes are children only. They must not become
+card identity roots or standalone hide targets.
+
+The desktop post capture also includes poll, quiz, and uploaded-video elements
+under every repeated post fixture. Their presence confirms recursive post
+content coverage; it does not mean those controls or attachments own the post
+channel identity.
+
+#### Mobile channel Home Collaborations shelf
+
+Fixture:
+`YTM Channel Page JSON/YTM_You_Page/Channel_HOME_COLLABORATIONS_DOM.html`
+
+The captured DOM is a `ytm-shelf-renderer` headed `Collaborations`, containing
+`ytm-vertical-list-renderer` and ten compact video cards:
+
+```html
+<ytm-shelf-renderer class="vertical-shelf-separators">
+  <h2 class="shelf-title">Collaborations</h2>
+  <ytm-vertical-list-renderer>
+    <ytm-compact-video-renderer class="YtmCompactVideoRendererHost item">
+      <div class="YtmCompactMediaItemHost">
+        <h4 class="YtmCompactMediaItemHeadline">...</h4>
+        <div class="YtmCompactMediaItemByline">Pitbull and 2 more</div>
+```
+
+Observed roles:
+
+| Node/class | Role | Filtering boundary |
+| --- | --- | --- |
+| `ytm-shelf-renderer` / `ytm-vertical-list-renderer` | Collaborations layout and list | Structural only; never hide the whole shelf for one blocked video |
+| `ytm-compact-video-renderer.YtmCompactVideoRendererHost` | Individual collaboration video card | Card/hide target |
+| `.YtmCompactMediaItemHeadline` | Visible title and accessible combined label | Keyword/title source |
+| `.YtmCompactMediaItemByline` | Visible candidate byline such as `Pitbull and 2 more` | Collaborator lookup trigger only |
+| `.YtmCompactMediaItemStats` | Views and age | Metadata only unless a specific rule consumes it |
+| `.YtmCompactMediaItemMenu` | Three-dot action button | Control/anchor only |
+| `videoThumbnailGroup*`, badge, touch-feedback classes | Thumbnail overlays and controls | Child-only; never identity or hide roots |
+
+The visible DOM does not contain a complete collaborator roster or all UC IDs.
+Text such as `Pitbull and 2 more`, `Pitbull and LIL JON`, or `IAMCHINO and 2
+more` is sufficient to request exact-video enrichment, but it is not authority
+for splitting names. The corresponding Home browse JSON carries
+`avatarStackViewModel -> showDialogCommand` with a header-backed
+`Collaborators` list. Promote the existing card/menu from that exact-video
+roster; do not invent collaborators from `and` text.
+
+#### Mobile channel Description sheet
+
+Marker:
+`++++++ Chanenl Page Description SHeet ++++++` in
+`YTM Channel Page JSON/YTM_You_Page/Channel_POSTS_DOM.html`.
+
+This is an engagement-panel sheet, not a feed card:
+
+```html
+<panel-container>
+  <ytm-engagement-panel class="engagement-panel-use-visibility">
+    <ytm-engagement-panel-section-list-renderer>
+      <ytm-about-channel-renderer class="YtmAboutChannelRendererHost">
+```
+
+Current camelCase host inventory:
+
+| Node/class | Meaning | Runtime treatment |
+| --- | --- | --- |
+| `panel-container`, `ytm-engagement-panel`, `ytm-engagement-panel-section-list-renderer` | Modal/sheet shell | Wrapper only; not a content-card hide target |
+| `ytw-scrim.ytWebScrimHost.ytWebScrimHostModernOverlay` | Background scrim and close affordance | Control only |
+| `ytm-about-channel-renderer.YtmAboutChannelRendererHost` | Channel About/Description payload | Description-sheet content root; not a feed card |
+| `.YtmAboutChannelRendererAboutChannelDescription` | Channel description text | Channel metadata/text source where explicitly needed |
+| `.YtmAboutChannelRendererAboutChannelNewLinksContainer` | External links group | Metadata container |
+| `yt-channel-external-link-view-model.ytChannelExternalLinkViewModelHost` | One external link row | External metadata; never channel identity authority |
+| `.ytChannelExternalLinkViewModelTitle` / `.ytChannelExternalLinkViewModelLink` | Link label and redirected URL | Display/link metadata only |
+| `.YtmAboutChannelRendererChannelDetail` | One About detail row | Metadata row |
+| `.YtmAboutChannelRendererChannelDetailValue` | Handle, country, join date, subscribers, videos, or views | Metadata value; parse by adjacent meaning/icon rather than row position |
+| `.YtmAboutChannelRendererAboutChannelActionButton` | `Report user` action | Control only |
+| `yt-light-shape` and `contribYtLightShape*` classes | Decorative button lighting | Decoration only |
+
+Observed text groups are Description, Links, and More info. The More info rows
+include channel URL/handle, country, join date, subscriber count, video count,
+and total views. External redirects to Spotify, a website, social profiles, or
+other services do not prove another YouTube channel identity and must never be
+added to a block/allow list automatically.
+
+The sheet title (`Pitbull`) and visible handle are useful consistency checks,
+but exact channel authority should still come from a YouTube channel endpoint
+or page-level JSON `channelMetadataRenderer.externalId`. The sheet wrapper,
+scrim, buttons, light shapes, and external links must remain outside generic
+video-card scanning so opening the Description sheet cannot trigger false
+hides or collaborator prefetch.
+
+### Mobile Subscriptions and You-page DOM refresh (2026-07-13)
+
+Fixtures:
+
+- `YTM Channel Page JSON/YTM_SubscriberPage.html`
+- `YTM Channel Page JSON/YTM_You_Page/YTM_YOU_PAGE.html`
+
+The You HTML bundle is four concatenated DOM captures, not one simultaneously
+mounted page. Its literal section boundaries are:
+
+| Line | Marker | Surface |
+| ---: | --- | --- |
+| 1 | `++++++ YOU PAGE ++++++` | You overview |
+| 11606 | `++++++ YOU PAGE SETTINGS ++++++` | Settings |
+| 12009 | `++++++ YOU PAGE HISTORY SHEET ++++++` | Full History |
+| 44993 | `++++++ YOU PAGE PLAYLISTS with A-Z and Recently Added sorting filter ++++++` | Full Playlists |
+
+Split on those markers before counting or classifying hosts. Counts across the
+whole file otherwise mix four different route snapshots.
+
+#### Subscriptions page
+
+| Zone | Main hosts | Runtime boundary |
+| --- | --- | --- |
+| Subscribed-channel selector | `ytm-channel-list-sub-menu-renderer.YtmChannelListSubMenuRendererHost` -> `ytm-channel-list-sub-menu-avatar-renderer.YtmChannelListSubMenuAvatarRendererHost` | Navigation/import source only; never a video hide target |
+| Video feed | `ytm-rich-item-renderer` -> `ytm-video-with-context-renderer` -> `ytm-media-item` | Individual video card hide/filter target |
+| Shorts shelf | `ytm-rich-section-renderer` -> `ytm-reel-shelf-renderer` -> `ytm-shorts-lockup-view-model.shortsLockupViewModelHost` | Individual Shorts lockup target; shelf stays structural |
+
+Current metadata/control classes:
+
+- `YtmChannelThumbnailWithLinkRendererHost`: channel endpoint/avatar source;
+- `YtmBadgeAndBylineRendererHost` and
+  `YtmBadgeAndBylineRendererItemByline`: visible byline source;
+- `YtmChannelListSubMenuAvatarRendererProfileIcon`: subscribed-channel avatar;
+- `YtmContinuationItemRendererHost`: loading/next-page row;
+- `videoThumbnailGroup*`, badge, touch-feedback, and menu classes: child or
+  control-only.
+
+The avatar strip contains 60 handles/display names but generally no visible UC
+IDs. It supports explicit user-approved subscription import; rendering or
+tapping an avatar must never mutate FilterTube rules automatically. The feed
+contains 18 normal video cards and 15 Shorts lockups.
+
+#### All subscriptions directory
+
+The `++++++ All Subscriptions ++++++` section captures the separate
+`/feed/channels` directory, not the Subscriptions video feed:
+
+```html
+<ytm-shelf-renderer>
+  <ytm-vertical-list-renderer>
+    <ytm-channel-list-item-renderer
+      class="YtmChannelListItemRendererHost">
+      <a class="YtmChannelListItemRendererLink" href="/@handle">
+        <div class="YtmChannelListItemRendererThumbnail">
+          <ytm-profile-icon>...</ytm-profile-icon>
+        </div>
+        <h3 class="YtmChannelListItemRendererTitle">Channel</h3>
+      </a>
+    </ytm-channel-list-item-renderer>
+    <ytm-continuation-item-renderer
+      class="YtmContinuationItemRendererHost">
+  </ytm-vertical-list-renderer>
+</ytm-shelf-renderer>
+```
+
+Observed counts and states:
+
+- 984 `ytm-channel-list-item-renderer` rows;
+- 984 `ytm-profile-icon` avatars;
+- 984 each of `YtmChannelListItemRendererHost`, `Link`, `Thumbnail`, and
+  `Title`;
+- seven `YtmChannelListItemRendererLiveStatus` occurrences; and
+- one continuation row.
+
+The row link and title are channel identity/navigation sources. New-content
+presentation state and live-status children are status metadata only. These
+rows are not video cards, Shorts cards, quick-block hosts, or ordinary content
+hide targets. Use them only for explicit channel selection or the reviewed
+**Import Subscribed Channels** flow; page rendering must never mutate rules.
+
+#### You overview
+
+The `++++++ YOU PAGE ++++++` section contains:
+
+| Surface | Hosts | Treatment |
+| --- | --- | --- |
+| Page/profile header | `yt-page-header-renderer`, `yt-page-header-view-model`, avatar and metadata view models | Page/profile metadata only |
+| Video shelf | `ytm-horizontal-card-list-renderer` -> `ytm-video-card-renderer` | Individual video card target |
+| Playlist shelf | `ytm-horizontal-card-list-renderer` -> `ytm-playlist-card-renderer` -> `yt-collections-stack` | Individual playlist card target |
+| Library shortcuts | `ytm-compact-link-renderer.YtmCompactLinkRendererHost` | Navigation control only |
+
+The capture contains 16 video cards, 130 playlist cards, and six compact-link
+shortcuts. `radioBottomOverlayHost` and collection-stack classes are playlist
+children, not standalone cards or channel identities.
+
+The playlist shelf header navigates to `FEplaylist_aggregation`, while each
+`ytm-playlist-card-renderer` keeps its own playlist endpoint. The captured
+`Liked videos` preview is an account-maintained playlist card whose stable
+target is `VLLL`; it is not a generic label, a Mix, or the aggregation page
+itself. Tapping that card opens the Liked-videos playlist. Tapping the shelf's
+View all control opens the full account Playlist aggregation route.
+`Watch Later` is the parallel special card with stable target `VLWL`.
+
+#### Account switcher menu
+
+Companion DOM capture:
+
+- `/Users/devanshvarshney/.codex/attachments/24448c57-c509-4e45-baa8-43a52eb90534/pasted-text.txt`
+
+```html
+<ytm-multi-page-menu-renderer
+  data-menu-style="multi-page-menu-style-type-switcher">
+  <ytm-simple-menu-header-renderer>Accounts</ytm-simple-menu-header-renderer>
+  <ytm-account-section-list-renderer>
+    <ytm-google-account-header-renderer>...</ytm-google-account-header-renderer>
+    <ytm-account-item-section-renderer>
+      <div role="listbox">
+        <button role="option" aria-selected="true|false">
+          <ytm-account-item-renderer>...</ytm-account-item-renderer>
+        </button>
+      </div>
+    </ytm-account-item-section-renderer>
+  </ytm-account-section-list-renderer>
+  <ytm-multi-page-menu-section-renderer>
+    <ytm-compact-link-renderer>Add account</ytm-compact-link-renderer>
+    <ytm-compact-link-renderer>Sign out</ytm-compact-link-renderer>
+  </ytm-multi-page-menu-section-renderer>
+</ytm-multi-page-menu-renderer>
+```
+
+The capture materializes three account-section groups, seven selectable
+`ytm-account-item-renderer` rows, one `aria-selected="true"` row, and two footer
+actions. `ytm-accounts-dialog-header-renderer` labels the other-account group;
+`ytm-account-item-section-header-renderer` labels a Google-login container.
+
+| Host/state | Meaning | Treatment |
+| --- | --- | --- |
+| `ytm-account-section-list-renderer` | Google-login/channel-profile grouping | Structural/private grouping; never a FilterTube profile key |
+| `ytm-google-account-header-renderer` / `ytm-accounts-dialog-header-renderer` | Account-container heading | Presentation only; never content identity |
+| `button[role=option][aria-selected]` | Current chooser selection projection | Control state for this DOM epoch, not durable account proof |
+| `ytm-account-item-renderer` | Selectable YouTube/Google identity row | Account-switch control; never a filterable channel card |
+| `ytm-profile-icon`, visible name, handle, byline | Avatar/display aliases | Renderable aliases only; the DOM supplies no canonical UC authority |
+| footer `ytm-compact-link-renderer` | Add-account and sign-out actions | Session controls, not content/filter targets |
+
+The DOM is presentation evidence. The corresponding JSON
+`accountItem.serviceEndpoint.selectActiveIdentityEndpoint` is command
+authority, and a fresh Guide `Your channel` browse endpoint is canonical-UC
+verification after selection. Email/group text, `aria-selected`, avatar,
+display name, or an optional handle must never be persisted as the FilterTube
+account key. Account rows also stay outside quick-block, keyword filtering,
+collaborator lookup, and pre-insertion content quarantine.
+
+#### You Settings
+
+The `++++++ YOU PAGE SETTINGS ++++++` section is control-only:
+
+| Host | Meaning | Treatment |
+| --- | --- | --- |
+| `ytm-settings.YtmSettingsHost` | Settings page root | Wrapper only |
+| `ytm-setting-category-collection-renderer.ytmSettingCategoryCollectionRendererHost` | Expandable category | Control group |
+| `ytm-setting-boolean-renderer` with `ytSwitchShapeHost` | Boolean setting | Toggle control |
+| `ytm-setting-single-option-menu-renderer` | Language/location/theme-style choice | Menu control |
+| `ytm-connected-accounts-setting-category-entry-renderer` | Connected apps | Navigation control |
+| `ytm-subscription-products-setting-category-entry-renderer` | Purchases/memberships | Navigation control |
+
+These nodes stay outside content filtering, quick-block injection,
+collaborator lookup, and whitelist pending-hide work.
+
+#### You History
+
+The `++++++ YOU PAGE HISTORY SHEET ++++++` capture contains:
+
+- 324 `ytm-compact-video-renderer.YtmCompactVideoRendererHost` cards;
+- 75 `ytm-shorts-lockup-view-model.shortsLockupViewModelHost` cards;
+- dated groups under `ytm-item-section-renderer` and
+  `ytm-item-section-header-renderer`;
+- Shorts shelves under `ytm-reel-shelf-renderer`; and
+- a `ytm-continuation-item-renderer` next-page row.
+
+Filter normal videos and Shorts per item. Date headers, shelves, topbar
+controls, and continuation rows remain structural/control-only. History card
+bylines own channel identity; the signed-in You profile header does not.
+
+#### You Playlists and sorting
+
+The `++++++ YOU PAGE PLAYLISTS with A-Z and Recently Added sorting filter
+++++++` section contains 130 modern playlist rows:
+
+```html
+<ytm-rich-item-renderer>
+  <yt-lockup-view-model class="ytLockupViewModelWrapper">
+    <yt-collection-thumbnail-view-model>
+    <yt-lockup-metadata-view-model>
+```
+
+| Class | Meaning | Treatment |
+| --- | --- | --- |
+| `ytLockupViewModelWrapper` / `ytLockupViewModelHost` | Playlist row | Card root |
+| `ytLockupViewModelContentImage` | Playlist endpoint/thumbnail | Metadata child |
+| `ytCollectionThumbnailViewModelHost` / `ytCollectionsStackHost` | Collection artwork | Visual child |
+| `ytLockupMetadataViewModelTitle` | Playlist title | Title source |
+| `ytContentMetadataViewModelMetadataRow` | Owner/count metadata | Metadata source |
+| `ytLockupMetadataViewModelMenuButton` | Overflow action | Control anchor only |
+
+This You-page control offers `Recently added` and `A-Z`. It is distinct from
+channel-page Playlists, whose capture offers `Date added (newest)` and `Last
+video added`. Sort changes replace the grid, so playlist filtering must run on
+the reload response.
+
+The full aggregation capture also contains the account-maintained `Liked
+videos` row as a modern `lockupViewModel`, with `contentId: "LL"` and browse
+target `VLLL`. Its presence in both the overview preview and the full page is
+expected route parity, not a duplicate playlist. The overview and aggregation
+remain separate response owners and must not share continuation or sort state.
+`Watch Later` is represented by `contentId: "WL"` and target `VLWL`.
+
+### Mixed mobile channel Home shelves (2026-07-13)
+
+Fixture: `YTM Channel Page JSON/YTM_DEVANSH_CHANNELPAGE.html`
+
+The channel Home `ytm-horizontal-card-list-renderer` titled `For you` mixes
+renderer families in one list:
+
+```html
+<ytm-horizontal-card-list-renderer>
+  <ytm-rich-list-header-renderer>For you</ytm-rich-list-header-renderer>
+  <ytm-shorts-lockup-view-model class="shortsLockupViewModelHost">...</ytm-shorts-lockup-view-model>
+  <ytm-video-card-renderer>...</ytm-video-card-renderer>
+</ytm-horizontal-card-list-renderer>
+```
+
+The complete fixture contains 40 Shorts lockups and four video-card renderers;
+the `For you` shelf contains both. It also contains compact videos, compact
+channel rows, a featured video, and a separate Shorts shelf.
+
+Filtering contract:
+
+1. Treat the horizontal list as a structural mixed-list host.
+2. Dispatch each child by its own renderer family.
+3. Hide a matching Shorts item at its Shorts lockup.
+4. Hide a matching video at its video-card renderer.
+5. Never hide the entire `For you` shelf because one child matches.
+6. Never inherit identity from an adjacent child or the shelf title.
+7. Use enclosing channel-page identity only as bounded fallback context when
+   an individual child omits stronger identity.
+
+This proves renderer dispatch must happen below the shelf level. Assuming all
+horizontal-list children share one family will leak or false-hide siblings.
+
 ### Home shelf: “Latest YouTube posts” (2025-11-18 sample, NEW)
 | DOM tag / component | Underlying renderer / data source | Status | Notes |
 | --- | --- | --- | --- |
@@ -814,7 +1194,9 @@ On **search page** (`ytd-video-renderer`):
 | `reelItemRenderer`, `shortsLockupViewModel`, `shortsLockupViewModelV2` | Shorts feeds | ✅ Covered @js/filter_logic.js#179-193 |
 
 ### Observed gaps
-- No new Shorts DOM included. Continue validating for `yt-reel-player-overlay` variants.
+- The 2026-07-12 fixture now covers mobile channel-page Shorts lockups and their
+  current camelCase metadata children. Continue validating the full-screen
+  Shorts player for `yt-reel-player-overlay` variants separately.
 
 ## Watch Playlist Panel
 
@@ -891,6 +1273,12 @@ Fallback contract:
 - Evaluate playlist overlays (`thumbnailOverlayPlaybackStatusRenderer`, resume progress, “Now playing”) in case watched-state strings become filter signals.
 
 ### Library playlists: Watch Later & Liked videos (2025-11-18 sample)
+
+Scope: this older section inventories desktop playlist-detail **entries**
+(`ytd-playlist-video-renderer`). It is not the mobile You overview
+`playlistCardRenderer` shelf or the mobile `FEplaylist_aggregation`
+`lockupViewModel` grid documented above.
+
 | DOM tag / component | Underlying renderer / data source | Status | Notes |
 | --- | --- | --- | --- |
 | `<ytd-playlist-video-renderer>` | `playlistVideoRenderer` | ✅ Covered — **NEW** | Watch Later / Liked entries expose title, channel, description via existing playlist renderer rules |
