@@ -6218,6 +6218,220 @@ When a video starts playing (or hovering in a preview), YouTube issues a request
 
 ---
 
+# Absolute JSON Trace: MWEB Age-Gated Watch (`get_watch` and `verify_age`)
+*Captured: 2026-07-18 from signed-in mobile web (`MWEB`, client version `2.20260717.00.00`).*
+
+This is a two-endpoint provider flow. The initial `get_watch` stream reports
+that playback requires an age acknowledgement and carries the exact command
+for the proceed button. The later `verify_age` response returns the navigation
+that YouTube permits after that acknowledgement.
+
+These responses are playback-gate authority owned by YouTube. They are not
+FilterTube family policy, a whitelist decision, or proof that the video is
+appropriate for a protected profile.
+
+## Initial watch response: `get_watch`
+
+**Endpoint**: `POST https://m.youtube.com/youtubei/v1/get_watch?prettyPrint=false`
+
+The captured response is a streamed JSON array with two independently typed
+subresponses:
+
+```json
+[
+  {
+    "playerResponse": {
+      "playabilityStatus": {
+        "status": "AGE_CHECK_REQUIRED"
+      }
+    },
+    "responseType": "STREAMING_WATCH_RESPONSE_TYPE_PLAYER_RESPONSE",
+    "subStreamResponseCompleted": true
+  },
+  {
+    "watchNextResponse": {},
+    "responseType": "STREAMING_WATCH_RESPONSE_TYPE_WATCH_NEXT_RESPONSE",
+    "subStreamResponseCompleted": true
+  }
+]
+```
+
+Do not treat the array as one ordinary player object. Select each item by its
+`responseType` before reading `playerResponse` or `watchNextResponse`.
+
+**Player subresponse base**: `[i].playerResponse` where
+`[i].responseType == STREAMING_WATCH_RESPONSE_TYPE_PLAYER_RESPONSE`
+
+- Gate state: `.playabilityStatus.status` -> `AGE_CHECK_REQUIRED`
+- User-facing reason: `.playabilityStatus.reason`
+- Legacy reason discriminator: `.playabilityStatus.desktopLegacyAgeGateReason`
+  -> observed value `4`
+- Opaque provider context: `.playabilityStatus.contextParams`
+- Error UI base:
+  `.playabilityStatus.errorScreen.playerErrorMessageRenderer`
+- Proceed label:
+  `...proceedButton.buttonRenderer.text.runs[].text`
+- Proceed request endpoint:
+  `...proceedButton.buttonRenderer.serviceEndpoint.commandMetadata.webCommandMetadata.apiUrl`
+  -> `/youtubei/v1/verify_age`
+- POST requirement:
+  `...serviceEndpoint.commandMetadata.webCommandMetadata.sendPost` -> `true`
+- Verification command:
+  `...proceedButton.buttonRenderer.serviceEndpoint.verifyAgeEndpoint`
+- Provider acknowledgement flag:
+  `...verifyAgeEndpoint.setRacy` -> `true`
+- Post-verification destination:
+  `...verifyAgeEndpoint.nextEndpoint.watchEndpoint`
+- Target video ID: `...nextEndpoint.watchEndpoint.videoId`
+- Destination URL:
+  `...nextEndpoint.commandMetadata.webCommandMetadata.url`
+
+Reduced age-gate excerpt:
+
+```json
+{
+  "playabilityStatus": {
+    "status": "AGE_CHECK_REQUIRED",
+    "reason": "This video may be inappropriate for some users.",
+    "errorScreen": {
+      "playerErrorMessageRenderer": {
+        "proceedButton": {
+          "buttonRenderer": {
+            "text": {
+              "runs": [{ "text": "I understand and wish to proceed" }]
+            },
+            "serviceEndpoint": {
+              "commandMetadata": {
+                "webCommandMetadata": {
+                  "sendPost": true,
+                  "apiUrl": "/youtubei/v1/verify_age"
+                }
+              },
+              "verifyAgeEndpoint": {
+                "nextEndpoint": {
+                  "watchEndpoint": {
+                    "videoId": "RWBFvQJQZn4",
+                    "racyCheckOk": true,
+                    "contentCheckOk": true
+                  }
+                },
+                "setRacy": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "desktopLegacyAgeGateReason": 4,
+    "contextParams": "OPAQUE_PROVIDER_CONTEXT"
+  }
+}
+```
+
+The age-gated player response can still contain useful metadata:
+
+- Video identity: `.videoDetails.videoId`
+- Title: `.videoDetails.title`
+- Channel UC ID: `.videoDetails.channelId`
+- Author name: `.videoDetails.author`
+- Duration: `.videoDetails.lengthSeconds`
+- Tags: `.videoDetails.keywords[]`
+- Description: `.videoDetails.shortDescription`
+- Owner handle URL: `.microformat.playerMicroformatRenderer.ownerProfileUrl`
+- External channel ID:
+  `.microformat.playerMicroformatRenderer.externalChannelId`
+- Upload and publish dates:
+  `.microformat.playerMicroformatRenderer.uploadDate` and `.publishDate`
+- Provider family-safe declaration:
+  `.microformat.playerMicroformatRenderer.isFamilySafe`
+
+The captured second subresponse remains a normal watch-next surface under
+`[i].watchNextResponse`, including `contents`, `engagementPanels`,
+`playerOverlays`, and `frameworkUpdates`. Its presence does not change the
+player subresponse from `AGE_CHECK_REQUIRED` to playable.
+
+## Verification response: `verify_age`
+
+**Endpoint**: `POST https://m.youtube.com/youtubei/v1/verify_age?prettyPrint=false`
+
+The captured response does not return a new player object. It returns an action
+that navigates back to the watch route with the provider acknowledgement flags
+set on the destination `watchEndpoint`.
+
+**Navigation base**: `actions[i].navigateAction.endpoint`
+
+- Destination URL: `.commandMetadata.webCommandMetadata.url`
+- Destination page type: `.commandMetadata.webCommandMetadata.webPageType`
+  -> `WEB_PAGE_TYPE_WATCH`
+- Video ID: `.watchEndpoint.videoId`
+- Player parameters: `.watchEndpoint.playerParams`
+- Age/racy acknowledgement: `.watchEndpoint.racyCheckOk` -> `true`
+- Content-check acknowledgement: `.watchEndpoint.contentCheckOk` -> `true`
+- MWEB request evidence:
+  `responseContext.serviceTrackingParams[].params[]`, including observed
+  `c == MWEB`, `cver == 2.20260717.00.00`, and `yt_li == 1`
+
+Reduced verification response:
+
+```json
+{
+  "actions": [
+    {
+      "navigateAction": {
+        "endpoint": {
+          "commandMetadata": {
+            "webCommandMetadata": {
+              "url": "/watch?v=RWBFvQJQZn4&...&rco=1",
+              "webPageType": "WEB_PAGE_TYPE_WATCH"
+            }
+          },
+          "watchEndpoint": {
+            "videoId": "RWBFvQJQZn4",
+            "playerParams": "OPAQUE_PLAYER_PARAMS",
+            "racyCheckOk": true,
+            "contentCheckOk": true
+          }
+        }
+      }
+    }
+  ]
+}
+```
+
+## Runtime and filtering boundaries
+
+1. `AGE_CHECK_REQUIRED` is a playability state, not a missing video and not a
+   FilterTube block decision. Preserve its distinct state in any app/runtime
+   model.
+2. Never auto-submit `verify_age`. The proceed action is an explicit signed-in
+   user acknowledgement owned by YouTube.
+3. Treat `contextParams`, `playerParams`, tracking values, response IDs, and
+   encrypted page IDs as opaque and short-lived. Do not persist them as content
+   identity or synthesize replacement values.
+4. `racyCheckOk` and `contentCheckOk` acknowledge YouTube's playback checks.
+   They do not grant FilterTube parent/admin authority and do not override a
+   blocked channel, blocked keyword, viewing-space restriction, or time limit.
+5. After the returned watch navigation, run the ordinary FilterTube rule path
+   again using the stable video/channel metadata. Do not assume the previous
+   age-gate response is the final player state.
+6. The supplied capture documents the responses, not the complete request
+   bodies. Keep the authenticated MWEB client responsible for constructing and
+   submitting provider verification requests unless the request contract is
+   captured separately.
+
+```text
+get_watch
+  -> PLAYER_RESPONSE: AGE_CHECK_REQUIRED
+  -> WATCH_NEXT_RESPONSE: surrounding watch UI data
+  -> user selects YouTube's proceed action
+  -> verify_age
+  -> navigateAction to the same video with provider check flags
+  -> fetch/re-enter normal watch state
+  -> reapply FilterTube profile, rule, and time-limit enforcement
+```
+
+---
+
 # Absolute JSON Trace: Posts / Community Cards
 *File: `YTM-XHR.json`, `YT_MAIN_NEXT.json`, `Channel Page Context`*
 
@@ -7594,6 +7808,252 @@ COMMENT DOM -
                 <path fill="currentColor" d="M12 4a2 2 0 1 0 0 4a2 2 0 0 0 0-4Zm0 6a2 2 0 1 0 0 4a2 2 0 0 0 0-4Zm0 6a2 2 0 1 0 0 4a2 2 0 0 0 0-4Z"></path>
             </svg>
         </button></ytm-comment-thread-renderer>
+
+---
+
+# Absolute JSON Trace: Signed-in Comment Mutations
+*Files: captured `create_comment`, `update_comment`, `perform_comment_action`, and post-create `att/log` responses (2026-07-15 samples)*
+
+These responses are mutation authority. They are not interchangeable with the
+later comments continuation response, and the endpoint URL alone is not enough
+to identify a Like, Dislike, or Delete performed through
+`perform_comment_action`.
+
+## Create comment
+
+**Endpoint**: `/youtubei/v1/comment/create_comment`
+
+**Acceptance**:
+
+- `actions[i].createCommentAction.actionResult.status`
+- `actions[i].createCommentAction.actionResult.feedbackText`
+
+**Authoritative returned row**:
+
+- Base: `actions[i].createCommentAction.contents.commentThreadRenderer.comment.commentRenderer`
+- Comment ID: `.commentId`
+- Body: `.contentText.runs[].text`
+- Published label: `.publishedTimeText.runs[].text`
+- Viewer ownership: `.viewerIsAuthor`
+- Visible author alias: `.authorText.runs[].text`
+- Canonical author UC ID: `.authorEndpoint.browseEndpoint.browseId`
+- Canonical handle URL: `.authorEndpoint.browseEndpoint.canonicalBaseUrl`
+- Author avatar: `.authorThumbnail.thumbnails[].url`
+- Exact returned Reply/Like/Dislike/Delete commands remain nested in the
+  returned renderer.
+
+**Attestation instruction returned with creation**:
+
+- `actions[i].runAttestationCommand.ids[].commentId`
+- `actions[i].runAttestationCommand.ids[].encryptedVideoId`
+- `actions[i].runAttestationCommand.ids[].externalChannelId`
+- `actions[i].runAttestationCommand.engagementType == ENGAGEMENT_TYPE_COMMENT_POST`
+
+The same handle can appear in `authorText`, accessibility labels, and avatar
+labels. These are aliases for one author. Do not create multiple identities;
+retain the UC ID as the stable identity and the handle/name as aliases.
+
+Reduced valid response shape:
+
+```json
+{
+  "actions": [
+    {
+      "runAttestationCommand": {
+        "ids": [
+          { "commentId": "COMMENT_ID" },
+          { "encryptedVideoId": "VIDEO_ID" },
+          { "externalChannelId": "VIDEO_OWNER_UC_ID" }
+        ],
+        "engagementType": "ENGAGEMENT_TYPE_COMMENT_POST"
+      }
+    },
+    {
+      "createCommentAction": {
+        "actionResult": {
+          "status": "STATUS_SUCCEEDED",
+          "feedbackText": { "runs": [{ "text": "Comment added" }] }
+        },
+        "contents": {
+          "commentThreadRenderer": {
+            "comment": {
+              "commentRenderer": {
+                "commentId": "COMMENT_ID",
+                "authorText": { "runs": [{ "text": "@handle" }] },
+                "authorEndpoint": {
+                  "browseEndpoint": {
+                    "browseId": "AUTHOR_UC_ID",
+                    "canonicalBaseUrl": "/@handle"
+                  }
+                },
+                "contentText": { "runs": [{ "text": "Comment body" }] },
+                "publishedTimeText": { "runs": [{ "text": "0 seconds ago" }] },
+                "viewerIsAuthor": true
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
+```
+
+## Update comment
+
+**Endpoint**: `/youtubei/v1/comment/update_comment`
+
+The receipt and replacement entity are separate structures in one response.
+
+**Receipt**:
+
+- Comment ID: `actions[i].updateCommentAction.commentId`
+- Acceptance: `actions[i].updateCommentAction.actionResult.status`
+
+**Replacement entity**:
+
+- Base: `frameworkUpdates.entityBatchUpdate.mutations[i]`
+- Select the mutation where
+  `.type == ENTITY_MUTATION_TYPE_REPLACE` and
+  `.payload.commentEntityPayload.properties.commentId` matches the receipt.
+- Edited body: `.payload.commentEntityPayload.properties.content.content`
+- Edited time: `.payload.commentEntityPayload.properties.publishedTime`
+- Reply level: `.payload.commentEntityPayload.properties.replyLevel`
+- Author UC ID: `.payload.commentEntityPayload.author.channelId`
+- Author alias: `.payload.commentEntityPayload.author.displayName`
+- Author avatar: `.payload.commentEntityPayload.author.avatarThumbnailUrl`
+- Viewer ownership: `.payload.commentEntityPayload.author.isCurrentUser`
+- Canonical channel route:
+  `.payload.commentEntityPayload.author.channelPageEndpoint.innertubeCommand.browseEndpoint`
+- Toolbar labels/state: `.payload.commentEntityPayload.toolbar`
+- Refreshed Like/Unlike/Dislike/Undislike commands can be supplied by companion
+  `engagementToolbarSurfaceEntityPayload` replacement mutations.
+
+Reduced valid response shape:
+
+```json
+{
+  "actions": [
+    {
+      "updateCommentAction": {
+        "commentId": "COMMENT_ID",
+        "actionResult": { "status": "STATUS_SUCCEEDED" }
+      }
+    }
+  ],
+  "frameworkUpdates": {
+    "entityBatchUpdate": {
+      "mutations": [
+        {
+          "type": "ENTITY_MUTATION_TYPE_REPLACE",
+          "payload": {
+            "commentEntityPayload": {
+              "properties": {
+                "commentId": "COMMENT_ID",
+                "content": { "content": "Edited body" },
+                "publishedTime": "58 seconds ago (edited)",
+                "replyLevel": 0
+              },
+              "author": {
+                "channelId": "AUTHOR_UC_ID",
+                "displayName": "@handle",
+                "isCurrentUser": true
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+## Delete, Like, and Dislike comment
+
+**Endpoint**: `/youtubei/v1/comment/perform_comment_action`
+
+Delete response paths:
+
+- Comment ID: `actions[i].removeCommentAction.commentId`
+- Acceptance: `actions[i].removeCommentAction.actionResult.status`
+- Result kind: `actions[i].removeCommentAction.actionResult.feedback == FEEDBACK_REMOVE`
+- User feedback:
+  `actions[i].openPopupAction.popup.notificationActionRenderer.responseText.runs[].text`
+
+Like/Dislike response paths:
+
+- Acceptance: `actionResults[i].status`
+- Result kind: `actionResults[i].feedback`, observed values
+  `FEEDBACK_LIKE` and `FEEDBACK_DISLIKE`
+- Attestation IDs and engagement type:
+  `actions[i].runAttestationCommand`
+- A short-lived `consistencyTokenJar` may also be returned. Treat it as opaque
+  provider session state, never as durable identity or filtering metadata.
+
+Reduced valid delete response:
+
+```json
+{
+  "actions": [
+    {
+      "removeCommentAction": {
+        "commentId": "COMMENT_ID",
+        "actionResult": {
+          "status": "STATUS_SUCCEEDED",
+          "feedback": "FEEDBACK_REMOVE"
+        }
+      }
+    },
+    {
+      "openPopupAction": {
+        "popup": {
+          "notificationActionRenderer": {
+            "responseText": { "runs": [{ "text": "Comment deleted" }] }
+          }
+        },
+        "popupType": "TOAST"
+      }
+    }
+  ]
+}
+```
+
+Reduced valid Like response (Dislike changes the two enum values):
+
+```json
+{
+  "actionResults": [
+    {
+      "status": "STATUS_SUCCEEDED",
+      "feedback": "FEEDBACK_LIKE"
+    }
+  ],
+  "actions": [
+    {
+      "runAttestationCommand": {
+        "ids": [
+          { "commentId": "COMMENT_ID" },
+          { "encryptedVideoId": "VIDEO_ID" },
+          { "externalChannelId": "VIDEO_OWNER_UC_ID" }
+        ],
+        "engagementType": "ENGAGEMENT_TYPE_COMMENT_LIKE"
+      }
+    }
+  ]
+}
+```
+
+## Post-mutation attestation log
+
+**Observed endpoint**: `/youtubei/v1/att/log`
+
+The provider issued this immediately after `create_comment` returned a
+`runAttestationCommand`. Its response proves a signed-in provider context via
+`responseContext.mainAppWebResponseContext.datasyncId` and `loggedOut`, but it
+contains no comment renderer and is not content authority. The captured
+response is insufficient to reconstruct the request payload. Do not invent or
+replay attestation requests; keep the live provider client responsible for the
+integrity protocol unless the exact request contract is separately captured.
 
 ---
 
