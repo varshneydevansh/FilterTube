@@ -292,6 +292,30 @@ test('native managed policy apply records redacted accepted and rejected evidenc
   assert.equal(JSON.stringify(rows[1]).includes('spiders'), false);
 });
 
+test('native managed policy apply records history for keyed profiles without an inline id', async () => {
+  const profiles = createProfilesFixture();
+  delete profiles.profiles['parent-profile-1'].id;
+  delete profiles.profiles['child-profile-1'].id;
+  const harness = createAdapterHarness(profiles);
+  const envelope = signedEnvelope();
+
+  const accepted = await harness.adapter.applyManagedPolicyEnvelope(
+    envelope,
+    validationContext(harness.profiles, {
+      recordHistory: true,
+      transport: 'nanah',
+      historyReceivedAt: 1779300000789
+    })
+  );
+
+  assert.equal(accepted.accepted, true);
+  const rows = harness.profiles.profiles['child-profile-1'].managedActionHistory;
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].targetProfileId, 'child-profile-1');
+  assert.equal(rows[0].actionType, 'remote_policy.accept');
+  assert.equal(rows[0].result, 'accepted');
+});
+
 test('managed policy apply rejects malformed or empty remote rule payloads before revision state changes', async () => {
   const harness = createAdapterHarness();
   const malformed = await harness.adapter.applyManagedPolicyEnvelope(

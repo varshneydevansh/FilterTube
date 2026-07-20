@@ -1570,7 +1570,8 @@
         if (context.recordHistory !== true) return profile;
         const root = safeObject(envelope);
         const targetProfileId = managedPolicyHistoryTargetProfileId(context);
-        if (!targetProfileId || normalizeString(profile?.id) !== targetProfileId) return profile;
+        const declaredProfileId = normalizeString(profile?.id);
+        if (!targetProfileId || (declaredProfileId && declaredProfileId !== targetProfileId)) return profile;
         const reason = normalizeString(decision?.reason);
         const accepted = decision?.accepted === true && !reason;
         const conflict = reason === 'equal_revision_hash_conflict';
