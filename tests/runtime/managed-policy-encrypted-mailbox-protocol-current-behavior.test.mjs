@@ -50,6 +50,7 @@ function trustedLink(overrides = {}) {
     localRole: 'replica',
     remoteRole: 'source',
     sourceDeviceId: 'parent-device-1',
+    targetDeviceId: 'child-device-1',
     sourceProfileId: 'parent-profile-1',
     targetProfileId: 'child-profile-1',
     allowedScopes: ['main', 'kids', 'videos', 'keywords', 'channels', 'viewing_space', 'time_limits'],
@@ -67,6 +68,7 @@ function managedEnvelope(overrides = {}) {
     linkId: 'link-parent-child-1',
     scope: 'keywords',
     sourceDeviceId: 'parent-device-1',
+    targetDeviceId: 'child-device-1',
     sourceProfileId: 'parent-profile-1',
     targetProfileId: 'child-profile-1',
     revision: 7,
@@ -99,6 +101,7 @@ function adapterValidManagedEnvelope(adapter, overrides = {}) {
       scope: envelope.scope,
       targetProfileId: envelope.targetProfileId,
       sourceDeviceId: envelope.sourceDeviceId,
+      targetDeviceId: envelope.targetDeviceId,
       revision: envelope.revision,
       policyHash: envelope.policyHash,
       payloadScope: 'keywords'
@@ -121,6 +124,7 @@ function sealedMailboxPayload(overrides = {}) {
 
 function adapterMailboxContext() {
   return {
+    targetDeviceId: 'child-device-1',
     trustedLink: trustedLink(),
     nowMs: 1770100000000,
     signatureVerified: true,
@@ -144,6 +148,7 @@ function mailboxItem(overrides = {}) {
     linkId: 'link-parent-child-1',
     targetProfileId: 'child-profile-1',
     sourceDeviceId: 'parent-device-1',
+    targetDeviceId: 'child-device-1',
     sourceProfileId: 'parent-profile-1',
     scope: 'keywords',
     revision: 7,
@@ -182,6 +187,7 @@ function compareMailboxBinding(item, envelope) {
     'linkId',
     'targetProfileId',
     'sourceDeviceId',
+    'targetDeviceId',
     'sourceProfileId',
     'scope',
     'revision',
@@ -209,6 +215,7 @@ function evaluateMailboxDelivery({
   if (item.linkId !== link.id) return reject('wrong_link_id');
   if (item.targetProfileId !== link.targetProfileId) return reject('wrong_target_profile');
   if (item.sourceDeviceId !== link.sourceDeviceId) return reject('wrong_source_device');
+  if (item.targetDeviceId !== 'child-device-1') return reject('wrong_target_device');
   if (item.sourceProfileId !== link.sourceProfileId) return reject('wrong_source_profile');
   if (!link.allowedScopes.includes(item.scope)) return reject('scope_not_allowed');
   if (item.sourcePublicKeyId !== link.sourcePublicKeyId) return reject('wrong_public_key');
@@ -418,6 +425,7 @@ test('managed mailbox storage builder emits server-safe ciphertext metadata only
   assert.equal(item.linkId, envelope.linkId);
   assert.equal(item.targetProfileId, envelope.targetProfileId);
   assert.equal(item.sourceDeviceId, envelope.sourceDeviceId);
+  assert.equal(item.targetDeviceId, envelope.targetDeviceId);
   assert.equal(item.sourceProfileId, envelope.sourceProfileId);
   assert.equal(item.scope, envelope.scope);
   assert.equal(item.revision, envelope.revision);
@@ -533,6 +541,10 @@ test('managed mailbox rejects revoked expired wrong-target wrong-source wrong-ke
   }), reject('wrong_source_device'));
 
   assert.deepEqual(evaluateMailboxDelivery({
+    item: mailboxItem({ targetDeviceId: 'sibling-device-1' })
+  }), reject('wrong_target_device'));
+
+  assert.deepEqual(evaluateMailboxDelivery({
     item: mailboxItem({ sourceProfileId: 'sibling-parent-profile' })
   }), reject('wrong_source_profile'));
 
@@ -565,6 +577,10 @@ test('managed mailbox binding rejects ciphertext metadata mismatches after decry
   assert.deepEqual(evaluateMailboxDelivery({
     item: mailboxItem({ envelopeOverrides: { targetProfileId: 'sibling-profile-1' } })
   }), reject('ciphertext_binding_targetProfileId_mismatch'));
+
+  assert.deepEqual(evaluateMailboxDelivery({
+    item: mailboxItem({ envelopeOverrides: { targetDeviceId: 'sibling-device-1' } })
+  }), reject('ciphertext_binding_targetDeviceId_mismatch'));
 
   assert.deepEqual(evaluateMailboxDelivery({
     item: mailboxItem({ envelopeOverrides: { policyHash: 'sha256:tampered-policy' } })

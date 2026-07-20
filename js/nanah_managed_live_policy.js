@@ -279,6 +279,10 @@
             if (!normalizeString(targetProfile?.profileId)) {
                 throw new Error('Signed managed sends require the replica to save a fixed child target profile.');
             }
+            const targetDeviceId = normalizeString(trustedLink.remoteDeviceId || safeObject(trustedLink.policy).targetDeviceId);
+            if (!targetDeviceId) {
+                throw new Error('Signed managed sends require a fixed target device.');
+            }
 
             const keyPair = await deps.ensureSigningKeyPair({ required: true });
             const sourcePublicKeyId = normalizeString(keyPair?.managedPublicKeyId || keyPair?.sourcePublicKeyId || keyPair?.publicKeyId);
@@ -295,6 +299,7 @@
                 targetProfileId: targetProfile.profileId,
                 sourceProfileId: sourceProfile.profileId,
                 sourceDeviceId: normalizeString(deps.getStableDeviceId()),
+                targetDeviceId,
                 payload
             });
             const prior = getOutgoingPolicyState(trustedLink, normalizedScope);
@@ -310,6 +315,7 @@
                 targetProfileName: normalizeString(targetProfile.profileName),
                 sourceProfileId: normalizeString(sourceProfile.profileId),
                 sourceDeviceId: normalizeString(deps.getStableDeviceId()),
+                targetDeviceId,
                 revision,
                 policyHash,
                 sourcePublicKeyId,
@@ -437,6 +443,7 @@
                 transport: 'local_network',
                 linkId,
                 sourceDeviceId: normalizeString(root.sourceDeviceId),
+                targetDeviceId: normalizeString(root.targetDeviceId),
                 sourceProfileId: normalizeString(root.sourceProfileId),
                 targetProfileId: normalizeString(root.targetProfileId),
                 targetProfileName: normalizeString(root.targetProfileName),
@@ -479,6 +486,7 @@
                 reason: normalizeString(optionRoot.reason) || 'manual_send',
                 requestedAt: normalizeNonNegativeInteger(optionRoot.requestedAt) || deps.now(),
                 candidateCount: rows.length,
+                targetDeviceIds: Array.from(new Set(rows.map(row => normalizeString(row.targetDeviceId)).filter(Boolean))),
                 targetProfileIds: Array.from(new Set(rows.map(row => normalizeString(row.targetProfileId)).filter(Boolean))),
                 scopes: Array.from(new Set(rows.map(row => normalizeScope(row.scope)).filter(Boolean))),
                 candidates: rows
@@ -631,7 +639,7 @@
                     expiresAtMs: root.expiresAtMs === null ? null : normalizeNonNegativeInteger(root.expiresAtMs),
                     ackState: normalizeString(root.ackState) || 'pending'
                 };
-                for (const field of ['linkId', 'targetProfileId', 'sourceDeviceId', 'sourceProfileId', 'policyHash', 'sourcePublicKeyId', 'cipherSuite', 'keyAgreementId', 'encryptedDek', 'nonce', 'ciphertext', 'ciphertextHash']) {
+                for (const field of ['linkId', 'targetProfileId', 'sourceDeviceId', 'targetDeviceId', 'sourceProfileId', 'policyHash', 'sourcePublicKeyId', 'cipherSuite', 'keyAgreementId', 'encryptedDek', 'nonce', 'ciphertext', 'ciphertextHash']) {
                     clean[field] = normalizeString(root[field]);
                 }
                 clean.scope = normalizeScope(root.scope);
@@ -644,6 +652,7 @@
                 reason: normalizeString(optionRoot.reason) || 'manual_send',
                 requestedAt: normalizeNonNegativeInteger(optionRoot.requestedAt) || deps.now(),
                 mailboxItemCount: rows.length,
+                targetDeviceIds: Array.from(new Set(rows.map(row => normalizeString(row.targetDeviceId)).filter(Boolean))),
                 targetProfileIds: Array.from(new Set(rows.map(row => normalizeString(row.targetProfileId)).filter(Boolean))),
                 scopes: Array.from(new Set(rows.map(row => normalizeScope(row.scope)).filter(Boolean))),
                 items: rows

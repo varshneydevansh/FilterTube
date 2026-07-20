@@ -40,6 +40,7 @@ Required top-level fields:
 | `targetProfileId` | Protected profile receiving the policy. | Missing, wrong target, sibling target, parent target, or unfixed target. |
 | `sourceProfileId` | Parent/caregiver profile issuing the policy. | Missing, child profile, sibling profile, or profile not bound to target. |
 | `sourceDeviceId` | Trusted source device identity. | Missing, wrong device, duplicate LAN device id, or untrusted device. |
+| `targetDeviceId` | Exact protected device allowed to receive the policy. | Missing, no local-device validation context, or different local device. |
 | `revision` | Monotonic policy revision for the target/link/scope. | Missing, non-integer, stale, or equal revision with different policy hash. |
 | `policyHash` | Hash of canonical policy payload. | Missing, mismatched against the canonical payload, or mismatched for equal-revision idempotency. |
 | `sourcePublicKeyId` | Public-key identity bound to pairing. | Missing or not bound to the trusted link. |
@@ -70,6 +71,7 @@ linkId
 scope
 targetProfileId
 sourceDeviceId
+targetDeviceId
 revision
 policyHash
 payloadScope
@@ -85,7 +87,7 @@ stored public key material,
 managed envelopes fail closed with `missing_public_key_material` instead of
 being treated as valid. Future pairing/key-store plumbing must preserve the
 same binding rejection: even a valid-looking signature is rejected if any signed
-field points at a different link, scope, target profile, source device,
+field points at a different link, scope, target profile, source device, target device,
 revision, policy hash, or payload family than the envelope being applied.
 
 After the binding tuple passes, the runtime recomputes the canonical
@@ -97,6 +99,7 @@ scope
 targetProfileId
 sourceProfileId
 sourceDeviceId
+targetDeviceId
 payload
 ```
 

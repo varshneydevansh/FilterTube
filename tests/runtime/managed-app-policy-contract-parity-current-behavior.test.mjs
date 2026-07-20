@@ -352,6 +352,12 @@ test('managed app contract preserves profile viewing time envelope and history f
   for (const scope of ['main', 'kids', 'keywords', 'channels', 'videos', 'viewing_space', 'time_limits']) {
     assert.ok(contract.managedEnvelope.scopes.includes(scope), `missing managed scope ${scope}`);
   }
+  for (const field of ['sourceDeviceId', 'targetDeviceId', 'sourceProfileId', 'targetProfileId', 'revision', 'policyHash', 'integrity']) {
+    assert.ok(contract.managedEnvelope.requiredFields.includes(field), `missing managed envelope field ${field}`);
+  }
+  for (const reject of ['wrong_source_device', 'wrong_target_device', 'wrong_target_profile', 'stale_revision', 'signature_invalid']) {
+    assert.ok(contract.managedEnvelope.requiredRejects.includes(reject), `missing managed envelope reject ${reject}`);
+  }
 
   assert.equal(contract.managedRules.schema, 'filtertube_managed_rule_policy');
   for (const scope of ['keywords', 'channels', 'videos']) {

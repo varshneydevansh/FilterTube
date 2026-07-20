@@ -90,7 +90,7 @@
             return '';
         }
 
-        function collectManagedOpenSyncLinks({ links = [], activeProfileId = '', profilesV4 = {} } = {}) {
+        function collectManagedOpenSyncLinks({ links = [], activeProfileId = '', profilesV4 = {}, targetDeviceId = '' } = {}) {
             const profiles = safeObject(safeObject(profilesV4).profiles);
             return safeArray(links)
                 .map((link) => {
@@ -107,6 +107,7 @@
                         linkId: normalizeString(root.linkId || root.id),
                         remoteDeviceId: normalizeString(root.remoteDeviceId),
                         sourceDeviceId,
+                        targetDeviceId: normalizeString(targetDeviceId),
                         sourceProfileId,
                         targetProfileId,
                         targetProfileName: normalizeString(policy.targetProfileName),
@@ -129,6 +130,7 @@
                 linkId: candidate.linkId,
                 remoteDeviceId: candidate.remoteDeviceId,
                 sourceDeviceId: candidate.sourceDeviceId,
+                targetDeviceId: candidate.targetDeviceId,
                 sourceProfileId: candidate.sourceProfileId,
                 targetProfileId: candidate.targetProfileId,
                 allowedScopes: candidate.allowedScopes,
@@ -244,6 +246,7 @@
                 linkId: request.linkId,
                 remoteDeviceId: request.remoteDeviceId,
                 sourceDeviceId: request.sourceDeviceId,
+                targetDeviceId: request.targetDeviceId,
                 sourceProfileId: request.sourceProfileId,
                 targetProfileId: request.targetProfileId,
                 records: ackRecords
@@ -282,13 +285,14 @@
             links = [],
             activeProfileId = '',
             profilesV4 = {},
+            targetDeviceId = '',
             reason = 'dashboard_open',
             applyMailboxItem = null,
             recordAckHistory = null,
             writeState = null
         } = {}) {
             const startedAt = now();
-            const candidates = collectManagedOpenSyncLinks({ links, activeProfileId, profilesV4 });
+            const candidates = collectManagedOpenSyncLinks({ links, activeProfileId, profilesV4, targetDeviceId });
             const state = {
                 schema: STATE_SCHEMA,
                 version: 1,

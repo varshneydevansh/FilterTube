@@ -6345,6 +6345,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             profiles,
             trustedLink,
             accepted,
+            targetDeviceId: normalizeString(nanahStableDeviceId),
             duplicateDeviceIds: getNanahManagedDuplicateDeviceIds(
                 root.sourceDeviceId,
                 root.linkId || trustedLink.linkId,
@@ -18096,6 +18097,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             links: nanahTrustedLinks,
             activeProfileId: activeId,
             profilesV4: localProfilesV4,
+            targetDeviceId: normalizeString(nanahStableDeviceId),
             reason,
             applyMailboxItem: (item) => handleNanahIncomingManagedMailboxItem(item),
             recordAckHistory: (details) => recordManagedOpenSyncAckHistory(details),

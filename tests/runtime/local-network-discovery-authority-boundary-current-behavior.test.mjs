@@ -46,6 +46,7 @@ function trustedLink(overrides = {}) {
     localRole: 'replica',
     remoteRole: 'source',
     sourceDeviceId: 'parent-device-1',
+    targetDeviceId: 'child-device-1',
     sourceProfileId: 'parent-profile-1',
     targetProfileId: 'child-profile-1',
     allowedScopes: ['main', 'kids', 'videos', 'keywords', 'channels', 'viewing_space', 'time_limits'],
@@ -79,6 +80,7 @@ function managedEnvelope(overrides = {}) {
     linkId: 'link-parent-child-1',
     scope: 'keywords',
     sourceDeviceId: 'parent-device-1',
+    targetDeviceId: 'child-device-1',
     sourceProfileId: 'parent-profile-1',
     targetProfileId: 'child-profile-1',
     revision: 5,
@@ -101,6 +103,7 @@ function managedEnvelope(overrides = {}) {
       scope: envelope.scope,
       targetProfileId: envelope.targetProfileId,
       sourceDeviceId: envelope.sourceDeviceId,
+      targetDeviceId: envelope.targetDeviceId,
       revision: envelope.revision,
       policyHash: envelope.policyHash,
       payloadScope: 'keywords'
@@ -112,6 +115,7 @@ function managedEnvelope(overrides = {}) {
 function context(overrides = {}) {
   const acceptedEnvelope = managedEnvelope({ revision: 4 });
   return {
+    targetDeviceId: 'child-device-1',
     trustedLink: trustedLink(),
     profiles: {
       'parent-profile-1': { id: 'parent-profile-1', type: 'account' },
@@ -305,6 +309,10 @@ test('local-network policy authority still rejects wrong target scope replay and
   assert.deepEqual(evaluateLocalNetworkPolicy({
     envelope: managedEnvelope({ targetProfileId: 'sibling-profile-1' })
   }), reject('wrong_target_profile'));
+
+  assert.deepEqual(evaluateLocalNetworkPolicy({
+    envelope: managedEnvelope({ targetDeviceId: 'sibling-device-1' })
+  }), reject('wrong_target_device'));
 
   assert.deepEqual(evaluateLocalNetworkPolicy({
     envelope: managedEnvelope({ scope: 'telemetry' })

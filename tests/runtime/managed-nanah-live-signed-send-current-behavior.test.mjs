@@ -104,6 +104,7 @@ function createManagedLivePolicyHarness({
     localRole: 'source',
     remoteRole: 'replica',
     linkId: 'link-parent-child-1',
+    remoteDeviceId: 'child-device-1',
     policy: {
       allowedScopes,
       targetProfileBehavior: 'fixed_profile',
@@ -173,6 +174,7 @@ function createManagedLivePolicyHarness({
               scope: envelope.scope,
               targetProfileId: envelope.targetProfileId,
               sourceDeviceId: envelope.sourceDeviceId,
+              targetDeviceId: envelope.targetDeviceId,
               revision: envelope.revision,
               policyHash: envelope.policyHash,
               payloadScope: envelope.payload.scope
@@ -188,6 +190,7 @@ function createManagedLivePolicyHarness({
           linkId: envelope.linkId,
           targetProfileId: envelope.targetProfileId,
           sourceDeviceId: envelope.sourceDeviceId,
+          targetDeviceId: envelope.targetDeviceId,
           sourceProfileId: envelope.sourceProfileId,
           scope: envelope.scope,
           revision: envelope.revision,
@@ -342,6 +345,8 @@ test('dashboard builds signed managed envelopes only after source link scope tar
   assert.match(source, /MANAGED_LIVE_BUNDLE_SCOPES/);
   assert.match(source, /if \(!allowedScopes\.includes\(normalizedScope\)\)/);
   assert.match(source, /if \(!normalizeString\(targetProfile\?\.profileId\)\)/);
+  assert.match(source, /Signed managed sends require a fixed target device/);
+  assert.match(source, /targetDeviceId/);
   assert.match(source, /deps\.ensureSigningKeyPair\(\{ required: true \}\)/);
   assert.match(source, /privateKeyJwk: keyPair\.privateKeyJwk/);
   assert.match(source, /adapter\.signManagedPolicyEnvelope/);
@@ -433,6 +438,8 @@ test('managed live signed-send helper can build connected per-target envelope ba
   ]);
   assert.ok(envelopes.every((envelope) => envelope.type === 'filtertube_managed_policy'));
   assert.ok(envelopes.every((envelope) => envelope.integrity?.signedFields?.linkId === envelope.linkId));
+  assert.ok(envelopes.every((envelope) => envelope.targetDeviceId === 'child-device-1'));
+  assert.ok(envelopes.every((envelope) => envelope.integrity?.signedFields?.targetDeviceId === envelope.targetDeviceId));
 
   await assert.rejects(
     () => helper.buildEnvelopeBatchForTrustedLinks(
@@ -702,6 +709,7 @@ test('managed live signed-send helper uploads mailbox ciphertext items and marks
     'sourceDeviceId',
     'sourceProfileId',
     'sourcePublicKeyId',
+    'targetDeviceId',
     'targetProfileId',
     'version'
   ]);

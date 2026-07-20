@@ -45,6 +45,7 @@ function canonicalPolicyHashForEnvelope(envelope) {
     targetProfileId: String(envelope.targetProfileId || '').trim(),
     sourceProfileId: String(envelope.sourceProfileId || '').trim(),
     sourceDeviceId: String(envelope.sourceDeviceId || '').trim(),
+    targetDeviceId: String(envelope.targetDeviceId || '').trim(),
     payload: safeObject(envelope.payload)
   }));
 }
@@ -132,6 +133,7 @@ function signedEnvelope(overrides = {}) {
     targetProfileId: 'child-profile-1',
     sourceProfileId: 'parent-profile-1',
     sourceDeviceId: 'parent-device-1',
+    targetDeviceId: 'child-device-1',
     revision: 5,
     sourcePublicKeyId: 'parent-key-3',
     keyVersion: 3,
@@ -153,6 +155,7 @@ function signedEnvelope(overrides = {}) {
       scope: envelope.scope,
       targetProfileId: envelope.targetProfileId,
       sourceDeviceId: envelope.sourceDeviceId,
+      targetDeviceId: envelope.targetDeviceId,
       revision: envelope.revision,
       policyHash: envelope.policyHash,
       payloadScope: envelope.payload.scope
@@ -163,6 +166,7 @@ function signedEnvelope(overrides = {}) {
 
 function validationContext(profiles, overrides = {}) {
   return {
+    targetDeviceId: 'child-device-1',
     trustedLink: {
       id: 'link-parent-child-1',
       type: 'managed_link',

@@ -184,7 +184,7 @@
     function validateManagedIntegrityBinding(envelope) {
         const signed = safeObject(safeObject(envelope.integrity).signedFields);
         if (Object.keys(signed).length === 0) return validationResult('missing_integrity_binding');
-        for (const field of ['linkId', 'scope', 'targetProfileId', 'sourceDeviceId', 'revision', 'policyHash']) {
+        for (const field of ['linkId', 'scope', 'targetProfileId', 'sourceDeviceId', 'targetDeviceId', 'revision', 'policyHash']) {
             if (signed[field] !== envelope[field]) return validationResult(`integrity_${field}_mismatch`);
         }
         if (signed.payloadScope !== getManagedPayloadScopeFamily(envelope.payload)) {
@@ -220,6 +220,7 @@
             targetProfileId: normalizeString(root.targetProfileId),
             sourceProfileId: normalizeString(root.sourceProfileId),
             sourceDeviceId: normalizeString(root.sourceDeviceId),
+            targetDeviceId: normalizeString(root.targetDeviceId),
             payload: safeObject(root.payload)
         };
         return buildManagedPolicyHash('remote-managed-policy', stableManagedNanahJson(seed));
@@ -269,6 +270,7 @@
             scope: normalizeManagedPolicyScope(root.scope),
             targetProfileId: normalizeString(root.targetProfileId),
             sourceDeviceId: normalizeString(root.sourceDeviceId),
+            targetDeviceId: normalizeString(root.targetDeviceId),
             revision: normalizeNonNegativeInteger(root.revision) || 0,
             policyHash: normalizeString(root.policyHash),
             payloadScope: getManagedPayloadScopeFamily(root.payload)
@@ -434,6 +436,7 @@
             linkId: normalizeString(root.linkId),
             targetProfileId: normalizeString(root.targetProfileId),
             sourceDeviceId: normalizeString(root.sourceDeviceId),
+            targetDeviceId: normalizeString(root.targetDeviceId),
             sourceProfileId: normalizeString(root.sourceProfileId),
             scope: normalizeManagedPolicyScope(root.scope),
             revision: normalizeNonNegativeInteger(root.revision) || 0,
@@ -487,6 +490,7 @@
             'targetProfileId',
             'sourceProfileId',
             'sourceDeviceId',
+            'targetDeviceId',
             'revision',
             'policyHash',
             'sourcePublicKeyId',
@@ -521,6 +525,9 @@
         if (root.linkId !== trustedLink.id && root.linkId !== trustedLink.linkId) return validationResult('wrong_link_id');
         if (root.sourceDeviceId !== trustedLink.sourceDeviceId) return validationResult('wrong_source_device');
         if (safeArray(context.duplicateDeviceIds).includes(root.sourceDeviceId)) return validationResult('duplicate_source_device_id');
+        const localDeviceId = normalizeString(context.targetDeviceId || context.localDeviceId || context.deviceId);
+        if (!localDeviceId) return validationResult('missing_target_device_context');
+        if (root.targetDeviceId !== localDeviceId) return validationResult('wrong_target_device');
         if (root.sourceProfileId !== trustedLink.sourceProfileId) return validationResult('wrong_source_profile');
         if (root.targetProfileId !== trustedLink.targetProfileId) return validationResult('wrong_target_profile');
         if (!safeArray(trustedLink.allowedScopes).includes(scope) && !safeArray(safeObject(trustedLink.policy).allowedScopes).includes(scope)) {
@@ -602,6 +609,7 @@
             'linkId',
             'targetProfileId',
             'sourceDeviceId',
+            'targetDeviceId',
             'sourceProfileId',
             'scope',
             'revision',
@@ -653,7 +661,7 @@
         if (!keyVersion) {
             throw new Error('Managed mailbox storage item requires a key version.');
         }
-        for (const field of ['linkId', 'targetProfileId', 'sourceDeviceId', 'sourceProfileId', 'policyHash', 'sourcePublicKeyId']) {
+        for (const field of ['linkId', 'targetProfileId', 'sourceDeviceId', 'targetDeviceId', 'sourceProfileId', 'policyHash', 'sourcePublicKeyId']) {
             if (!normalizeString(root[field])) {
                 throw new Error(`Managed mailbox storage item requires ${field}.`);
             }
@@ -685,6 +693,7 @@
             linkId: normalizeString(root.linkId),
             targetProfileId: normalizeString(root.targetProfileId),
             sourceDeviceId: normalizeString(root.sourceDeviceId),
+            targetDeviceId: normalizeString(root.targetDeviceId),
             sourceProfileId: normalizeString(root.sourceProfileId),
             scope,
             revision,
@@ -810,7 +819,7 @@
         if (expiresAtMs !== null && expiresAtMs <= nowMs) {
             return validationResult('mailbox_item_expired', { ackState: 'expired' });
         }
-        for (const field of ['mailboxItemId', 'linkId', 'targetProfileId', 'sourceDeviceId', 'sourceProfileId', 'scope', 'revision', 'policyHash', 'sourcePublicKeyId', 'keyVersion']) {
+        for (const field of ['mailboxItemId', 'linkId', 'targetProfileId', 'sourceDeviceId', 'targetDeviceId', 'sourceProfileId', 'scope', 'revision', 'policyHash', 'sourcePublicKeyId', 'keyVersion']) {
             if (root[field] === undefined || root[field] === null || root[field] === '') {
                 return validationResult(`missing_${field}`, { ackState: 'rejected' });
             }

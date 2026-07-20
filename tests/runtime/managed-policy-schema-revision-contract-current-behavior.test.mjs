@@ -13,6 +13,7 @@ function read(relativePath) {
 
 function baseContext(overrides = {}) {
   return {
+    targetDeviceId: 'child-device-1',
     trustedLink: {
       id: 'link-parent-child-1',
       type: 'managed_link',
@@ -57,6 +58,7 @@ function baseEnvelope(overrides = {}) {
     targetProfileId: 'child-profile-1',
     sourceProfileId: 'parent-profile-1',
     sourceDeviceId: 'parent-device-1',
+    targetDeviceId: 'child-device-1',
     revision: 5,
     sourcePublicKeyId: 'parent-key-3',
     keyVersion: 3,
@@ -78,6 +80,7 @@ function baseEnvelope(overrides = {}) {
       scope: envelope.scope,
       targetProfileId: envelope.targetProfileId,
       sourceDeviceId: envelope.sourceDeviceId,
+      targetDeviceId: envelope.targetDeviceId,
       revision: envelope.revision,
       policyHash: envelope.policyHash,
       payloadScope: getPayloadScopeFamily(envelope.payload)
@@ -120,6 +123,7 @@ function canonicalPolicyHashForEnvelope(envelope) {
     targetProfileId: String(envelope.targetProfileId || '').trim(),
     sourceProfileId: String(envelope.sourceProfileId || '').trim(),
     sourceDeviceId: String(envelope.sourceDeviceId || '').trim(),
+    targetDeviceId: String(envelope.targetDeviceId || '').trim(),
     payload: safeObject(envelope.payload)
   }));
 }
@@ -131,6 +135,7 @@ function canonicalKeywordPolicyHash(overrides = {}) {
     targetProfileId: 'child-profile-1',
     sourceProfileId: 'parent-profile-1',
     sourceDeviceId: 'parent-device-1',
+    targetDeviceId: 'child-device-1',
     payload: {
       scope: 'keywords',
       operations: [{ op: 'add_keyword', value: 'spiders' }]
@@ -235,7 +240,7 @@ function hasVideoRuleValue(value) {
 function validateIntegrityBinding(envelope) {
   const signed = safeObject(safeObject(envelope.integrity).signedFields);
   if (Object.keys(signed).length === 0) return validationResult('missing_integrity_binding');
-  for (const field of ['linkId', 'scope', 'targetProfileId', 'sourceDeviceId', 'revision', 'policyHash']) {
+  for (const field of ['linkId', 'scope', 'targetProfileId', 'sourceDeviceId', 'targetDeviceId', 'revision', 'policyHash']) {
     if (signed[field] !== envelope[field]) return validationResult(`integrity_${field}_mismatch`);
   }
   if (signed.payloadScope !== getPayloadScopeFamily(envelope.payload)) {
@@ -248,7 +253,7 @@ function validateManagedPolicyEnvelope(envelope, context = baseContext()) {
   const link = context.trustedLink || {};
   if (!envelope || typeof envelope !== 'object') return validationResult('missing_envelope');
   if (envelope.type !== 'filtertube_managed_policy') return validationResult('wrong_type');
-  for (const field of ['linkId', 'scope', 'targetProfileId', 'sourceProfileId', 'sourceDeviceId', 'revision', 'policyHash', 'sourcePublicKeyId', 'keyVersion', 'integrity', 'payload']) {
+  for (const field of ['linkId', 'scope', 'targetProfileId', 'sourceProfileId', 'sourceDeviceId', 'targetDeviceId', 'revision', 'policyHash', 'sourcePublicKeyId', 'keyVersion', 'integrity', 'payload']) {
     if (envelope[field] === undefined || envelope[field] === null || envelope[field] === '') {
       return validationResult(`missing_${field}`);
     }
@@ -271,6 +276,8 @@ function validateManagedPolicyEnvelope(envelope, context = baseContext()) {
   if (envelope.linkId !== link.id) return validationResult('wrong_link_id');
   if (envelope.sourceDeviceId !== link.sourceDeviceId) return validationResult('wrong_source_device');
   if ((context.duplicateDeviceIds || []).includes(envelope.sourceDeviceId)) return validationResult('duplicate_source_device_id');
+  if (!context.targetDeviceId) return validationResult('missing_target_device_context');
+  if (envelope.targetDeviceId !== context.targetDeviceId) return validationResult('wrong_target_device');
   if (envelope.sourceProfileId !== link.sourceProfileId) return validationResult('wrong_source_profile');
   if (envelope.targetProfileId !== link.targetProfileId) return validationResult('wrong_target_profile');
   if (!link.allowedScopes?.includes(envelope.scope)) return validationResult('scope_not_allowed');
@@ -369,6 +376,7 @@ test('managed policy schema rejects missing required envelope fields', () => {
   const requiredFields = [
     ['targetProfileId', 'missing_targetProfileId'],
     ['sourceDeviceId', 'missing_sourceDeviceId'],
+    ['targetDeviceId', 'missing_targetDeviceId'],
     ['scope', 'missing_scope'],
     ['revision', 'missing_revision'],
     ['sourcePublicKeyId', 'missing_sourcePublicKeyId'],
@@ -407,6 +415,8 @@ test('managed policy schema rejects local-network discovery and trusted-link spo
 
   assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope({ linkId: 'link-other' }), baseContext()), { accepted: false, reason: 'wrong_link_id' });
   assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope({ sourceDeviceId: 'attacker-device' }), baseContext()), { accepted: false, reason: 'wrong_source_device' });
+  assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope({ targetDeviceId: 'sibling-device' }), baseContext()), { accepted: false, reason: 'wrong_target_device' });
+  assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope(), baseContext({ targetDeviceId: '' })), { accepted: false, reason: 'missing_target_device_context' });
   assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope(), baseContext({ duplicateDeviceIds: ['parent-device-1'] })), { accepted: false, reason: 'duplicate_source_device_id' });
   assert.deepEqual(validateManagedPolicyEnvelope(baseEnvelope(), baseContext({
     trustedLink: { ...baseContext().trustedLink, stalePairing: true }
