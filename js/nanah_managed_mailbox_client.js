@@ -111,6 +111,7 @@
             'linkId',
             'targetProfileId',
             'sourceDeviceId',
+            'targetDeviceId',
             'sourceProfileId',
             'scope',
             'revision',

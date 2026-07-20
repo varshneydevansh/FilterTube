@@ -50,6 +50,7 @@ test('configured mailbox client posts sealed items only and refuses plaintext po
       linkId: 'link-1',
       targetProfileId: 'child-1',
       sourceDeviceId: 'parent-device',
+      targetDeviceId: 'child-device',
       sourceProfileId: 'parent-profile',
       scope: 'keywords',
       revision: 4,
@@ -72,6 +73,7 @@ test('configured mailbox client posts sealed items only and refuses plaintext po
   assert.equal(calls[0].options.headers.authorization, 'Bearer token-redacted');
   assert.equal(calls[0].body.mailboxItemCount, 1);
   assert.equal(calls[0].body.items[0].mailboxItemId, 'mbx-1');
+  assert.equal(calls[0].body.items[0].targetDeviceId, 'child-device');
   assert.equal(JSON.stringify(calls[0].body).includes('must-not-cross'), false);
   assert.equal(Object.hasOwn(calls[0].body.items[0], 'payload'), false);
 

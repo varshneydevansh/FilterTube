@@ -380,6 +380,28 @@ test('managed mailbox seal and open use WebCrypto without storing plaintext poli
   );
 });
 
+test('managed mailbox seal and open accept a paired raw wrapping key', async () => {
+  const adapter = loadNanahAdapter();
+  const rawWrappingKey = webcrypto.getRandomValues(new Uint8Array(32));
+  const mailboxWrappingKeyBase64Url = Buffer.from(rawWrappingKey)
+    .toString('base64url');
+  const envelope = adapterValidManagedEnvelope(adapter);
+  const storageItem = await adapter.sealManagedMailboxEnvelope(envelope, {
+    mailboxWrappingKeyBase64Url,
+    createdAtMs: 1770000000000,
+    expiresAtMs: 1770604800000
+  });
+
+  const opened = await adapter.openManagedMailboxStorageItem(storageItem, {
+    trustedLink: {
+      policy: {
+        mailboxWrappingKeyBase64Url
+      }
+    }
+  });
+  assert.deepEqual(plain(opened.decryptedEnvelope), envelope);
+});
+
 test('managed mailbox open fails closed on tamper wrong key and missing crypto', async () => {
   const adapter = loadNanahAdapter();
   const wrappingKey = await webcrypto.subtle.generateKey({ name: 'AES-KW', length: 256 }, true, ['wrapKey', 'unwrapKey']);
