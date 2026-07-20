@@ -116,6 +116,7 @@ test('Nanah adapter signs canonical managed-policy fields and strips private key
     targetProfileId: 'child-profile-1',
     sourceProfileId: 'parent-profile-1',
     sourceDeviceId: 'parent-device-1',
+    targetDeviceId: 'child-device-1',
     revision: 4,
     sourcePublicKeyId: 'parent-key-1',
     keyVersion: 2,
@@ -143,6 +144,7 @@ test('Nanah adapter signs canonical managed-policy fields and strips private key
     scope: 'keywords',
     targetProfileId: 'child-profile-1',
     sourceDeviceId: 'parent-device-1',
+    targetDeviceId: 'child-device-1',
     revision: 4,
     policyHash: envelope.policyHash,
     payloadScope: 'keywords'
@@ -156,6 +158,7 @@ test('Nanah adapter signs canonical managed-policy fields and strips private key
       localRole: 'replica',
       remoteRole: 'source',
       sourceDeviceId: 'parent-device-1',
+      remoteDeviceId: 'child-device-1',
       sourceProfileId: 'parent-profile-1',
       sourcePublicKeyId: 'parent-key-1',
       keyVersion: 2,
@@ -166,7 +169,8 @@ test('Nanah adapter signs canonical managed-policy fields and strips private key
       'parent-profile-1': { type: 'account' },
       'child-profile-1': { type: 'child', parentProfileId: 'parent-profile-1' }
     },
-    signatureVerified: true
+    signatureVerified: true,
+    localDeviceId: 'child-device-1'
   });
 
   assert.equal(decision.accepted, true);

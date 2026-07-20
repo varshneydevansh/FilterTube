@@ -80,7 +80,8 @@ test('managed app policy parity doc records extension-owned app contract artifac
       'app_manifest_contract_helpers_and_android_time_entry_wiring_present_ios_pending',
       'app_manifest_contract_helpers_and_parent_delivery_terms_synced_ios_pending',
       'app_manifest_contract_helpers_parent_delivery_and_list_ui_synced_ios_pending',
-      'extension_contract_updated_native_sync_pending'
+      'extension_contract_updated_native_sync_pending',
+      'native_contract_and_managed_live_engine_synced_installed_proof_pending'
     ].includes(contract.appSyncStatus),
     `unexpected app sync status ${contract.appSyncStatus}`
   );

@@ -44,8 +44,9 @@ YouTube DOM assumptions as native app authority.
 
 This proof defines the shared profile, viewing-space, time-limit, managed
 envelope, managed keyword/channel/video rule, and action-history contract that
-apps must preserve when syncing from the extension. It does not claim full
-Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
+apps must preserve when syncing from the extension. The native contract and
+managed live engine sources are synchronized; this does not claim installed
+device-to-device proof or hosted-provider availability.
 
 ## Contract Snapshot JSON
 
@@ -56,7 +57,7 @@ Android settings-lock, rich timeout UI, or iOS enforcement is complete yet.
   "generated": "2026-06-18",
   "owner": "extension_upstream_policy_contract",
   "runtimeBehaviorChanged": false,
-  "appSyncStatus": "extension_contract_updated_native_sync_pending",
+  "appSyncStatus": "native_contract_and_managed_live_engine_synced_installed_proof_pending",
   "artifact": {
     "sourcePath": "docs/audit/artifacts/managed-app-policy-contract-v1.json",
     "appDestination": "packages/managed-policy-contract/src/upstream/managed-app-policy-contract-v1.json",

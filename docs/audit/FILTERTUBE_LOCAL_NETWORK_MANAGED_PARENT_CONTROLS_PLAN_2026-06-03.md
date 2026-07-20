@@ -40,7 +40,7 @@ client is now available behind explicit configuration and encrypted-item gates.
 The self-hosted reference pickup provider can now keep sanitized pickup rows
 across process restarts through `FILTERTUBE_PROVIDER_STORE`. Built-in
 local-network peer discovery, automatic same-network transport, hosted provider
-ownership, and app native enforcement proofs remain gated.
+ownership, and installed app-to-app native enforcement proofs remain gated.
 Source-side managed signing-key rotation is now an explicit
 parent/admin action: it regenerates the local source keypair, key-revokes active
 managed protected-device links, purges pending provider/open-sync/LAN/source-ack
