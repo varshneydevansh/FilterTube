@@ -6,6 +6,8 @@
     const MANAGED_POLICY_ENVELOPE_TYPE = 'filtertube_managed_policy';
     const MANAGED_MAILBOX_ITEM_SCHEMA = 'filtertube_managed_mailbox_item';
     const MANAGED_MAILBOX_CIPHER_SUITE = 'aes-kw+a256gcm';
+    const MANAGED_ACTION_HISTORY_SCHEMA = 'filtertube_managed_action_history';
+    const MANAGED_ACTION_HISTORY_LIMIT = 500;
     const MANAGED_POLICY_ALLOWED_SCOPES = [
         'main',
         'kids',
@@ -1538,15 +1540,105 @@
         };
     }
 
+    function managedPolicyHistoryActionType(decision, transport) {
+        const reason = normalizeString(decision?.reason);
+        const accepted = decision?.accepted === true && !reason;
+        const conflict = reason === 'equal_revision_hash_conflict';
+        const channel = normalizeString(transport).toLowerCase();
+        if (channel === 'mailbox') {
+            if (accepted) return 'remote_policy.mailbox.accept';
+            if (conflict) return 'remote_policy.mailbox.conflict';
+            if (reason === 'mailbox_item_expired') return 'remote_policy.mailbox.expire';
+            if (reason === 'link_revoked' || reason === 'key_revoked') return 'remote_policy.mailbox.revoke';
+            return 'remote_policy.mailbox.reject';
+        }
+        if (channel === 'local_network') {
+            if (accepted) return 'remote_policy.accept';
+            return conflict ? 'remote_policy.conflict' : 'remote_policy.reject';
+        }
+        if (accepted) return 'remote_policy.accept';
+        return conflict ? 'remote_policy.conflict' : 'remote_policy.reject';
+    }
+
+    function managedPolicyHistoryTargetProfileId(context = {}) {
+        const trustedLink = safeObject(context.trustedLink);
+        const policy = safeObject(trustedLink.policy);
+        return normalizeString(trustedLink.targetProfileId || policy.targetProfileId || context.historyTargetProfileId);
+    }
+
+    function withManagedPolicyDecisionHistory(profile, envelope, decision, context = {}) {
+        if (context.recordHistory !== true) return profile;
+        const root = safeObject(envelope);
+        const targetProfileId = managedPolicyHistoryTargetProfileId(context);
+        if (!targetProfileId || normalizeString(profile?.id) !== targetProfileId) return profile;
+        const reason = normalizeString(decision?.reason);
+        const accepted = decision?.accepted === true && !reason;
+        const conflict = reason === 'equal_revision_hash_conflict';
+        const now = normalizeNonNegativeInteger(context.historyReceivedAt) || Date.now();
+        const scope = normalizeManagedPolicyScope(root.scope) || 'sync_policy';
+        const transport = normalizeString(context.transport) || 'nanah';
+        const revision = normalizeNonNegativeInteger(root.revision);
+        const row = {
+            rowId: `remote-managed-${transport}-${scope}-${revision || 'none'}-${now}`,
+            schema: MANAGED_ACTION_HISTORY_SCHEMA,
+            version: 1,
+            actorProfileId: normalizeString(root.sourceProfileId) || null,
+            actorDeviceId: normalizeString(root.sourceDeviceId) || null,
+            targetProfileId,
+            trustedLinkId: normalizeString(root.linkId || safeObject(context.trustedLink).linkId || safeObject(context.trustedLink).id) || null,
+            actionType: managedPolicyHistoryActionType(decision, transport),
+            scope,
+            revision: revision || null,
+            policyHash: normalizeString(root.policyHash) || null,
+            result: accepted ? 'accepted' : (conflict ? 'conflict' : 'rejected'),
+            reason: accepted ? null : (reason || 'validation_failed'),
+            receivedAt: now,
+            issuedAt: normalizeNonNegativeInteger(root.issuedAt) || null,
+            orderKey: `${String(revision || 0).padStart(6, '0')}:${now}`,
+            summary: {
+                redacted: true,
+                label: accepted ? `Received remote ${scope} policy` : `Rejected remote ${scope} policy`,
+                transport,
+                mailboxItemId: normalizeString(context.mailboxItemId || decision?.mailboxItemId) || null,
+                applied: decision?.applied === true
+            },
+            sensitive: true
+        };
+        const rows = safeArray(profile?.managedActionHistory)
+            .filter(item => safeObject(item).schema === MANAGED_ACTION_HISTORY_SCHEMA);
+        return {
+            ...profile,
+            managedActionHistory: [...rows, row].slice(-MANAGED_ACTION_HISTORY_LIMIT)
+        };
+    }
+
+    async function recordManagedPolicyDecisionHistory(envelope, decision, context = {}) {
+        if (context.recordHistory !== true) return false;
+        const targetProfileId = managedPolicyHistoryTargetProfileId(context);
+        if (!targetProfileId) return false;
+        const io = await getIO();
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') return false;
+        const profilesV4 = safeObject(await io.loadProfilesV4());
+        const profiles = { ...safeObject(profilesV4.profiles) };
+        const profile = safeObject(profiles[targetProfileId]);
+        if (!profile || Object.keys(profile).length === 0 || profile.type !== 'child') return false;
+        profiles[targetProfileId] = withManagedPolicyDecisionHistory(profile, envelope, decision, context);
+        await io.saveProfilesV4({ ...profilesV4, schemaVersion: 4, profiles });
+        return true;
+    }
+
     async function applyManagedPolicyEnvelope(envelope, context = {}) {
         const root = safeObject(envelope);
         if (!context || Object.keys(safeObject(context)).length === 0) {
             return validationResult('missing_managed_validation_context');
         }
         const validation = validateManagedPolicyEnvelope(root, context);
-        if (validation.accepted !== true) return validation;
+        if (validation.accepted !== true) {
+            await recordManagedPolicyDecisionHistory(root, validation, context);
+            return validation;
+        }
         if (validation.decision === 'idempotent_same_hash') {
-            return {
+            const result = {
                 ok: true,
                 accepted: true,
                 decision: 'idempotent_same_hash',
@@ -1556,6 +1648,8 @@
                 policyHash: validation.policyHash,
                 applied: false
             };
+            await recordManagedPolicyDecisionHistory(root, result, context);
+            return result;
         }
 
         const io = await getIO();
@@ -1567,24 +1661,36 @@
         const targetProfile = safeObject(profiles[root.targetProfileId]);
         const sourceProfile = safeObject(profiles[root.sourceProfileId]);
         if (!targetProfile || Object.keys(targetProfile).length === 0 || targetProfile.type !== 'child') {
-            return validationResult('target_not_protected_child');
+            const result = validationResult('target_not_protected_child');
+            await recordManagedPolicyDecisionHistory(root, result, context);
+            return result;
         }
         if (!sourceProfile || Object.keys(sourceProfile).length === 0 || sourceProfile.type === 'child') {
-            return validationResult('source_not_parent_authority');
+            const result = validationResult('source_not_parent_authority');
+            await recordManagedPolicyDecisionHistory(root, result, context);
+            return result;
         }
         if (normalizeString(targetProfile.parentProfileId) !== root.sourceProfileId) {
-            return validationResult('source_not_bound_to_target');
+            const result = validationResult('source_not_bound_to_target');
+            await recordManagedPolicyDecisionHistory(root, result, context);
+            return result;
         }
         const latestAccepted = safeObject(safeObject(safeObject(targetProfile.managedPolicyState).remoteManagedPolicies)[root.linkId])[
             normalizeManagedPolicyScope(root.scope)
         ];
         if (Number.isInteger(latestAccepted?.revision)) {
-            if (root.revision < latestAccepted.revision) return validationResult('stale_revision');
+            if (root.revision < latestAccepted.revision) {
+                const result = validationResult('stale_revision');
+                await recordManagedPolicyDecisionHistory(root, result, context);
+                return result;
+            }
             if (root.revision === latestAccepted.revision && root.policyHash !== latestAccepted.policyHash) {
-                return validationResult('equal_revision_hash_conflict');
+                const result = validationResult('equal_revision_hash_conflict');
+                await recordManagedPolicyDecisionHistory(root, result, context);
+                return result;
             }
             if (root.revision === latestAccepted.revision && root.policyHash === latestAccepted.policyHash) {
-                return {
+                const result = {
                     ok: true,
                     accepted: true,
                     decision: 'idempotent_same_hash',
@@ -1594,20 +1700,12 @@
                     policyHash: root.policyHash,
                     applied: false
                 };
+                await recordManagedPolicyDecisionHistory(root, result, context);
+                return result;
             }
         }
 
-        const updatedProfile = withAcceptedManagedPolicyState(
-            applyManagedPolicyPayloadToProfile(targetProfile, root),
-            root
-        );
-        profiles[root.targetProfileId] = updatedProfile;
-        await io.saveProfilesV4({
-            ...profilesV4,
-            schemaVersion: 4,
-            profiles
-        });
-        return {
+        const applyResult = {
             ok: true,
             accepted: true,
             decision: validation.decision,
@@ -1617,13 +1715,34 @@
             policyHash: validation.policyHash,
             applied: true
         };
+        let policyAppliedProfile;
+        try {
+            policyAppliedProfile = applyManagedPolicyPayloadToProfile(targetProfile, root);
+        } catch (error) {
+            await recordManagedPolicyDecisionHistory(root, validationResult('managed_payload_apply_failed'), context);
+            throw error;
+        }
+        const updatedProfile = withManagedPolicyDecisionHistory(withAcceptedManagedPolicyState(
+            policyAppliedProfile,
+            root
+        ), root, applyResult, context);
+        profiles[root.targetProfileId] = updatedProfile;
+        await io.saveProfilesV4({
+            ...profilesV4,
+            schemaVersion: 4,
+            profiles
+        });
+        return applyResult;
     }
 
     async function applyManagedMailboxItem(item, context = {}) {
         const mailboxDecision = validateManagedMailboxItem(item, context);
-        if (mailboxDecision.accepted !== true) return mailboxDecision;
+        if (mailboxDecision.accepted !== true) {
+            await recordManagedPolicyDecisionHistory(getManagedMailboxEnvelope(item), mailboxDecision, context);
+            return mailboxDecision;
+        }
         if (mailboxDecision.decision === 'idempotent_same_hash') {
-            return {
+            const result = {
                 ok: true,
                 accepted: true,
                 decision: 'idempotent_same_hash',
@@ -1635,6 +1754,8 @@
                 ackState: 'delivered',
                 mailboxItemId: mailboxDecision.mailboxItemId
             };
+            await recordManagedPolicyDecisionHistory(getManagedMailboxEnvelope(item), result, context);
+            return result;
         }
         const result = await applyManagedPolicyEnvelope(mailboxDecision.envelope, context);
         return {
@@ -1820,6 +1941,7 @@
         verifyManagedNanahPolicyIntegritySignature,
         createManagedNanahSigningKeyPair,
         signManagedPolicyEnvelope,
+        recordManagedPolicyDecisionHistory,
         applyManagedPolicyEnvelope,
         applyManagedMailboxItem,
         applyIncomingEnvelope,

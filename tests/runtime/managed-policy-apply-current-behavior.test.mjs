@@ -227,6 +227,71 @@ test('managed policy apply writes keyword policy only to fixed child profile and
   );
 });
 
+test('native managed policy apply records redacted accepted and rejected evidence on the trusted child target', async () => {
+  const harness = createAdapterHarness();
+  const acceptedEnvelope = signedEnvelope();
+  const nativeContext = validationContext(harness.profiles, {
+    recordHistory: true,
+    transport: 'local_network',
+    historyReceivedAt: 1779300000123
+  });
+  const accepted = await harness.adapter.applyManagedPolicyEnvelope(acceptedEnvelope, nativeContext);
+
+  assert.equal(accepted.accepted, true);
+  let rows = harness.profiles.profiles['child-profile-1'].managedActionHistory;
+  assert.equal(rows.length, 1);
+  assert.deepEqual(plain(rows[0]), {
+    rowId: 'remote-managed-local_network-keywords-5-1779300000123',
+    schema: 'filtertube_managed_action_history',
+    version: 1,
+    actorProfileId: 'parent-profile-1',
+    actorDeviceId: 'parent-device-1',
+    targetProfileId: 'child-profile-1',
+    trustedLinkId: 'link-parent-child-1',
+    actionType: 'remote_policy.accept',
+    scope: 'keywords',
+    revision: 5,
+    policyHash: acceptedEnvelope.policyHash,
+    result: 'accepted',
+    reason: null,
+    receivedAt: 1779300000123,
+    issuedAt: null,
+    orderKey: '000005:1779300000123',
+    summary: {
+      redacted: true,
+      label: 'Received remote keywords policy',
+      transport: 'local_network',
+      mailboxItemId: null,
+      applied: true
+    },
+    sensitive: true
+  });
+  assert.equal(JSON.stringify(rows[0]).includes('spiders'), false);
+
+  const rejectedEnvelope = signedEnvelope({
+    revision: 6,
+    policyHash: 'tampered-policy-hash'
+  });
+  const rejected = await harness.adapter.applyManagedPolicyEnvelope(
+    rejectedEnvelope,
+    validationContext(harness.profiles, {
+      recordHistory: true,
+      transport: 'mailbox',
+      mailboxItemId: 'mailbox-17',
+      historyReceivedAt: 1779300000456
+    })
+  );
+
+  assert.deepEqual(plain(rejected), { accepted: false, reason: 'policy_hash_mismatch' });
+  rows = harness.profiles.profiles['child-profile-1'].managedActionHistory;
+  assert.equal(rows.length, 2);
+  assert.equal(rows[1].actionType, 'remote_policy.mailbox.reject');
+  assert.equal(rows[1].result, 'rejected');
+  assert.equal(rows[1].reason, 'policy_hash_mismatch');
+  assert.equal(rows[1].summary.mailboxItemId, 'mailbox-17');
+  assert.equal(JSON.stringify(rows[1]).includes('spiders'), false);
+});
+
 test('managed policy apply rejects malformed or empty remote rule payloads before revision state changes', async () => {
   const harness = createAdapterHarness();
   const malformed = await harness.adapter.applyManagedPolicyEnvelope(
