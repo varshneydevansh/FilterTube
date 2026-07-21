@@ -2,6 +2,10 @@
 
 ## Version 3.3.5
 
+### Extension Update Reminders
+
+- **Refresh reminders can be disabled**: Settings now includes a device-wide control for the reminder shown on YouTube tabs that were already open when FilterTube updates. The reminder remains enabled by default, and a disabled preference is preserved across later updates.
+
 ### YouTube Breakage Recovery
 
 - **Duplicate content-runtime injection fixed**: install/update/profile refresh now relies on manifest content scripts and ping/bridge checks instead of reinjecting isolated runtime files into already-open YouTube tabs. This prevents repeated `Identifier ... has already been declared` syntax failures such as `filterTubeMenuStylesInjected`, `VIDEO_CARD_SELECTORS`, `CHANNEL_ONLY_TAGS`, `pendingSeedSettings`, and `statsCountToday`.

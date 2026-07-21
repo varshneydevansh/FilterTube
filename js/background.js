@@ -3499,6 +3499,12 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
 }
 
 const FILTERTUBE_YOUTUBE_TAB_URLS = ['*://*.youtube.com/*', '*://*.youtubekids.com/*'];
+const SHOW_UPDATE_REFRESH_PROMPT_KEY = 'showUpdateRefreshPrompt';
+
+function shouldShowUpdateRefreshPrompt(settings = {}) {
+    return settings?.[SHOW_UPDATE_REFRESH_PROMPT_KEY] !== false
+        && settings?.firstRunRefreshNeeded !== false;
+}
 
 function refreshYouTubeTabs() {
     try {
@@ -3530,6 +3536,7 @@ browserAPI.runtime.onInstalled.addListener(function (details) {
             hideAllShorts: false,
             showQuickBlockButton: true,
             showBlockMenuItem: true,
+            [SHOW_UPDATE_REFRESH_PROMPT_KEY]: true,
             firstRunRefreshNeeded: true,
             releaseNotesSeenVersion: CURRENT_VERSION,
             releaseNotesPayload: null
@@ -4109,8 +4116,10 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         });
         return true;
     } else if (action === 'FilterTube_FirstRunCheck') {
-        storageGet(['firstRunRefreshNeeded']).then((data) => {
-            sendResponse?.({ needed: data?.firstRunRefreshNeeded !== false });
+        storageGet(['firstRunRefreshNeeded', SHOW_UPDATE_REFRESH_PROMPT_KEY]).then((data) => {
+            sendResponse?.({
+                needed: shouldShowUpdateRefreshPrompt(data)
+            });
         }).catch(() => sendResponse?.({ needed: false }));
         return true;
     } else if (action === 'FilterTube_FirstRunComplete') {

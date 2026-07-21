@@ -8,6 +8,7 @@
     "summary": "This release fixes duplicate content-runtime injection in already-open YouTube tabs and resolves visible Shorts channel identity earlier when channel rules or whitelist mode are active.",
     "bannerSummary": "Fixes duplicate runtime injection, improves blocked-channel Shorts identity resolution, and documents the v3.3.4 rollback boundary.",
     "highlights": [
+      "Settings now includes a device-wide control for post-update refresh reminders; it remains enabled by default and a disabled preference is preserved across later updates.",
       "Install/update/profile refresh no longer reinjects manifest content scripts into already-open YouTube tabs, preventing repeated `Identifier ... has already been declared` syntax failures.",
       "Already-open YouTube tabs can still receive managed time-limit/runtime checks without duplicate script declarations.",
       "Visible and near-visible Shorts now use the existing bounded background `/shorts/<videoId>` owner resolver when channel blocklist rules or whitelist mode are active.",
