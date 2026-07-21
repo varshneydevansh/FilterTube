@@ -855,6 +855,12 @@ Source capture:
 - `FilterTubeApp/docs/app/native-owned-main/hashtag.html` contains the complete
   signed-in mobile document for `/hashtag/apexpredator?ra=m`, the explicit
   `youtubei/v1/browse` continuation response, and the hydrated DOM.
+- `FilterTubeApp/docs/app/native-owned-main/FEhashtag.JSON` supplements that
+  document with an explicit selected-Shorts Browse response after the
+  `YT SHORTS JSON` marker, an explicit selected-All Browse response after the
+  `YT NORMAL VIDEO JSON` marker, and a hydrated selected-Shorts DOM after the
+  `DOM HASHTAG PAGE` marker. The earlier `get_watch` payload in the same capture
+  is description/Watch authority, not the hashtag page response.
 
 This surface is visually search-like, but its provider contract is a dedicated
 Browse page. The initial command, both tabs, and continuation all use
@@ -899,6 +905,27 @@ The hydrated DOM confirms the same composition:
         <yt-lockup-view-model class="ytLockupViewModelWrapper">
 ```
 
+The supplemental selected-Shorts DOM changes the active grid shape rather than
+the route family:
+
+```html
+<yt-tab-shape tab-title="All" aria-selected="false">
+<yt-tab-shape tab-title="Shorts" aria-selected="true">
+<div class="tab-content" tab-title="All" hidden>
+<div class="tab-content" tab-title="Shorts">
+  <ytm-rich-grid-renderer
+    class="is-shorts is-shorts-gallery is-hashtag rich-grid-single-column">
+    <ytm-rich-item-renderer class="is-shorts">
+      <ytm-shorts-lockup-view-model>
+```
+
+The selected-Shorts JSON has `Shorts.selected == true` and places its cards in
+`Shorts.content.richGridRenderer`; the selected-All response has
+`All.selected == true`, uses `All.content.richGridRenderer`, and leaves the
+unselected Shorts placeholder in `Shorts.content.sectionListRenderer`.
+Therefore consumers must select the active `tabRenderer` semantically and must
+not assume that Shorts always uses one fixed container shape.
+
 Per-card identity and filtering reuse the modern lockup contract already
 inventoried for Home/Search:
 
@@ -910,6 +937,16 @@ inventoried for Home/Search:
 | Channel/name/views/age | `contentMetadataViewModel.metadataRows[].metadataParts[]` | Keep the parts paired with their card. Do not promote `views`/`days ago` into header counts. |
 | Thumbnail/duration | `contentImage.thumbnailViewModel.image.sources[]` and overlay badge view models | Ordinary card presentation/readiness evidence. LIVE/Shorts badges still override duration semantics where present. |
 | Card action menu | `lockupMetadataViewModel.menuButton.buttonViewModel.onTap...showSheetCommand` | User-gesture action surface; it is not extra card metadata or a continuation. |
+
+The selected Shorts grid uses a separate compact contract:
+
+| Evidence | JSON path | Ownership rule |
+| --- | --- | --- |
+| Short identity | `shortsLockupViewModel.onTap.innertubeCommand.reelWatchEndpoint.videoId` | Authoritative selected Short id; it must agree with the `/shorts/<id>` command URL and the `shorts-shelf-item-<id>` entity suffix. |
+| Visible title/a11y | `shortsLockupViewModel.accessibilityText` | Combined title/view accessibility evidence; parse view text separately when `overlayMetadata.secondaryText.content` is present. |
+| Thumbnail | `shortsLockupViewModel.thumbnailViewModel.thumbnailViewModel.image.sources[]` | Portrait card artwork only; the separate reel endpoint frame thumbnail belongs to playback handoff. |
+| Views | `shortsLockupViewModel.overlayMetadata.secondaryText.content` | Localized display metric such as `1.7M views`; it is not page/cardinality metadata. |
+| Playback command | `shortsLockupViewModel.onTap.innertubeCommand.reelWatchEndpoint` | User-selected Shorts route/session input. Sequence/player/tracking values are not permission to preload the entire sequence. |
 
 Initial pagination is owned by the terminal
 `richGridRenderer.contents[].continuationItemRenderer`. It posts its opaque
@@ -930,12 +967,40 @@ Runtime boundary:
   admission. The page title itself is navigation/query context and must not
   whitelist matching cards or bypass channel/keyword/time rules;
 - keep `All` and `Shorts` as separate tab/continuation scopes; and
-- never persist or synthesize the observed `params`, tracking values,
-  continuation tokens, visitor data, or response IDs.
+- never persist or replay captured per-session `params`, tracking values,
+  continuation tokens, visitor data, or response IDs. A bare-text hashtag may
+  construct only the stable initial All envelope documented in the JSON paths
+  encyclopedia; the returned endpoint remains authoritative.
 
-Status: **The supplied initial JSON, continuation JSON, and hydrated DOM are
-inventoried. This does not claim that the extension or native apps already
-implement an `FEhashtag` route.**
+#### FilterTubeApp Android implementation boundary (2026-07-22)
+
+The native Android frontend now implements an explicit `FEhashtag` owner rather
+than routing hashtag taps through generic Search:
+
+- exact description-sheet hashtag endpoints are retained from
+  `clickableMetadataButtons`, attributed-body `commandRuns`, and the under-title
+  badge when present;
+- description chips/body text and comment/reply text are clickable;
+- a matching exact endpoint wins. Bare hashtag text constructs only the
+  deterministic initial All request envelope; the response remains authority
+  for its canonical tabs, cards, tracking, and continuation;
+- `MAIN_HASHTAG` posts to `/youtubei/v1/browse`, normalizes the header, modern
+  video/Short lockups, tab endpoints, and continuation, then applies FilterTube
+  decisions before card admission; and
+- visible/near-visible cards reuse the shared bounded Main readiness path.
+
+YouTube's All/Shorts endpoints are parsed and retained as separate scopes, but
+the accepted FilterTubeApp presentation intentionally omits the hashtag tab
+rail and shows the mixed All feed as a simple search-like page. This does not
+change its provider family to Search, does not merge tab continuations, and does
+not remove the upstream renderer inventory above. Channel pages independently
+retain already visited tab pages so revisiting a channel tab does not reload it.
+
+Status: **Initial, selected-All, selected-Shorts, continuation, and hydrated DOM
+contracts are inventoried. FilterTubeApp Android has an installed native
+`FEhashtag` route with working description/comment navigation and a deliberately
+simple no-tab presentation. No extension-runtime implementation is claimed by
+this status.**
 
 New nodes/classes to inventory:
 

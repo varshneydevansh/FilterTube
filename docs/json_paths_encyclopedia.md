@@ -9309,6 +9309,19 @@ Source capture:
 initial document, a later `youtubei/v1/browse?prettyPrint=false` continuation
 response, and the hydrated page DOM.
 
+Supplemental capture:
+`FilterTubeApp/docs/app/native-owned-main/FEhashtag.JSON` contains three distinct
+hashtag-page authorities separated by literal markers:
+
+- `-- YT SHORTS JSON ... --`: selected-Shorts `/youtubei/v1/browse` response;
+- `-- YT NORMAL VIDEO JSON ... --`: selected-All `/youtubei/v1/browse`
+  response; and
+- `-- DOM HASHTAG PAGE --`: hydrated DOM with Shorts selected.
+
+The `get_watch` response before those markers belongs to Watch/description
+parsing. It can supply hashtag navigation endpoints but is not the destination
+page JSON.
+
 The hashtag surface is a dedicated Browse family. Its stable route identity is
 `browseId == "FEhashtag"`; it is not a generic Search response even though the
 result grid is visually similar.
@@ -9326,8 +9339,29 @@ The first-load document embeds `ytInitialData` and exposes this initial command:
 - Hashtag/tab selection: `ytCommand.browseEndpoint.params` -> opaque provider
   state
 
-Do not decode, persist, or synthesize the captured `params`. Retain the exact
-endpoint supplied for the current route/session.
+Do not persist or replay captured per-session `params`. When a renderer supplies
+an exact matching hashtag endpoint, retain it for the current route/session.
+For bare hashtag text that has no command (for example a plain comment body),
+FilterTubeApp Android uses the stable initial-request encoding documented below;
+the returned response then becomes authoritative.
+
+### Initial bare-text request encoding
+
+Comparing captured All/Shorts endpoints shows a small protobuf envelope inside
+standard Base64:
+
+```text
+field 93 (length-delimited)
+  field 1 = UTF-8 hashtag text without '#'
+  field 3 = 1 for All, 3 for Shorts
+```
+
+Observed examples include `#mande` All -> `6gUJCgVtYW5kZRgB` and
+`#apexpredator` All -> `6gUSCgxhcGV4cHJlZGF0b3IQABgB`; the latter's Shorts
+endpoint ends in the semantic field-3 value `3` and is captured as
+`6gUSCgxhcGV4cHJlZGF0b3IQABgD`. This encoding may bootstrap the initial All
+request for plain text, but it must not be used to invent continuation tokens,
+tracking parameters, visitor data, response IDs, or a later canonical endpoint.
 
 ## Header
 
@@ -9380,6 +9414,20 @@ Observed `Shorts` tab:
 
 All and Shorts are independent tab scopes even though they share
 `browseId == FEhashtag`. Do not append one tab's continuation into the other.
+
+The supplemental responses prove that container shape depends on selected
+state:
+
+- selected All: `All.selected == true` and
+  `All.content.richGridRenderer.contents[]`; the unselected Shorts tab may be a
+  `sectionListRenderer` placeholder;
+- selected Shorts: `Shorts.selected == true` and
+  `Shorts.content.richGridRenderer.contents[]`; each card is normally a
+  `shortsLockupViewModel`; and
+- both responses repeat the same semantic tab endpoints under `FEhashtag`.
+
+Select by tab title/endpoint and `selected`; do not bind All/Shorts behavior to
+array index or to a permanently fixed content renderer.
 
 ## Modern video lockups in the All grid
 
@@ -9442,6 +9490,48 @@ The action sheet is a user-gesture boundary. Save/share commands, serialized
 entities, tracking values, and playlist mutation parameters are not card
 identity and must not be replayed by filtering/preloading.
 
+## Shorts lockups in the selected Shorts grid
+
+**Base**:
+`contents.singleColumnBrowseResultsRenderer.tabs[]`
+`.tabRenderer[selected=true].content.richGridRenderer.contents[]`
+`.richItemRenderer.content.shortsLockupViewModel`
+
+Identity and route:
+
+- Stable entity: `.entityId` -> observed `shorts-shelf-item-<videoId>`
+- Short id: `.onTap.innertubeCommand.reelWatchEndpoint.videoId`
+- Command URL: `.onTap.innertubeCommand.commandMetadata.webCommandMetadata.url`
+  -> `/shorts/<videoId>`
+- Page type:
+  `.onTap.innertubeCommand.commandMetadata.webCommandMetadata.webPageType` ->
+  `WEB_PAGE_TYPE_SHORTS`
+
+The endpoint video id and command URL are the primary identity pair. The entity
+suffix is corroborating stable-row evidence, not a replacement when those two
+commands disagree.
+
+Presentation:
+
+- Combined title/view accessibility text: `.accessibilityText`
+- Localized view label: `.overlayMetadata.secondaryText.content`
+- Portrait card images:
+  `.thumbnailViewModel.thumbnailViewModel.image.sources[]`
+- Playback handoff frame:
+  `.onTap.innertubeCommand.reelWatchEndpoint.thumbnail.thumbnails[]`
+- Lockup style: `.style` -> observed `SHORTS_LOCKUP_STYLE_SLIM`
+
+The portrait card source belongs to browse presentation; the reel endpoint
+frame belongs to selected playback continuity. Do not let one overwrite the
+other's cache key merely because both share a video id.
+
+Playback/session fields under `reelWatchEndpoint`, including `playerParams`,
+`params`, `sequenceProvider`, `sequenceParams`, logging contexts, and overlay
+renderers, remain user-selection/session authority. They do not authorize
+preparing every item represented by the sequence. Native readiness stays
+bounded to the visible/near-visible card and the selected Shorts neighbor
+window.
+
 ## Initial and appended continuation
 
 Initial continuation base:
@@ -9485,11 +9575,47 @@ The supplied DOM correlates these JSON paths to:
 - `ytm-rich-item-renderer > yt-lockup-view-model`
 - terminal `ytm-continuation-item-renderer`
 
+The supplemental selected-Shorts DOM additionally correlates:
+
+- `yt-tab-shape[tab-title="All"][aria-selected="false"]`;
+- `yt-tab-shape[tab-title="Shorts"][aria-selected="true"]`;
+- hidden All `.tab-content` and visible Shorts `.tab-content` with the same
+  `tab-identifier="FEhashtag"`; and
+- `ytm-rich-grid-renderer.is-shorts.is-shorts-gallery.is-hashtag` containing
+  `ytm-shorts-lockup-view-model` cards.
+
 Filtering and readiness are per normalized card. The hashtag header is
 navigation/query context; it does not authorize cards, bypass keyword/channel
 rules, or make far-away grid items preload candidates. Native apps may reuse
 their ordinary page insertion, visible/near-visible readiness, and card-tap
 paths after adding an explicit `FEhashtag` route owner.
 
-Status: **Capture/documentation only. No extension or native runtime support is
-claimed by this entry.**
+## FilterTubeApp Android mapping (2026-07-22)
+
+```text
+exact description endpoint or bare hashtag text
+  -> FilterTubeRoute.Hashtag(label, FEhashtag, params, tab)
+  -> NativeOwnedSurfaceRequestKind.MAIN_HASHTAG
+  -> youtubei/v1/browse
+  -> NativeOwnedMainPublicRendererNormalizer
+  -> FilterTube decision gate
+  -> bounded page cards + continuation
+```
+
+The normalizer retains `pageHeaderRenderer` title/metric, both tab endpoints,
+modern video/Short lockups, and continuation. The provider publishes bounded
+local chunks (24 All or 12 Shorts), keeps hashtag/tab in source and continuation
+identity, and rejects a response that has neither cards nor continuation.
+Description chips and attributed body use exact retained endpoints when
+available; comments/replies use the initial bare-text constructor.
+
+The app intentionally renders the mixed All result as a simple no-tab page for
+now. The upstream All/Shorts contracts remain parsed and independently owned;
+the tab rail is a presentation omission, not a Search request and not a merged
+continuation scope. Normal cards enter the shared visible/near-visible readiness
+window only after current FilterTube policy admits them.
+
+Status: **Capture paths are correlated through selected-All, selected-Shorts,
+continuation, and hydrated DOM. FilterTubeApp Android native support is installed
+and its hashtag links work from description and comment surfaces. Extension
+runtime support is not claimed here.**
