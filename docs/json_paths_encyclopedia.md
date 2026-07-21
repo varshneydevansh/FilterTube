@@ -32,6 +32,238 @@ For subscribed-channels import, the important payload family is `browseId: "FEch
 These paths are used for whitelist import normalization, not for normal feed filtering.
 
 
+# Absolute JSON Trace: Signed-in Subscribe and Unsubscribe Mutations
+*Captured: 2026-07-19 from signed-in mobile web (`MWEB`, client version `2.20260717.00.00`).*
+
+These endpoints mutate the signed-in YouTube account's subscription state.
+They are distinct from the `FEchannels` browse response above, which reads the
+current subscription list for FilterTube's reviewed whitelist-import flow.
+
+The channel UC ID is the stable mutation target. Button state, entity state,
+notification state, consistency tokens, and attestation commands are provider
+receipts or session state; none of them should be treated as a FilterTube rule.
+
+## Subscribe
+
+**Endpoint**:
+`POST https://m.youtube.com/youtubei/v1/subscription/subscribe?prettyPrint=false`
+
+**Primary action receipt**:
+
+- Base: `actions[i].updateSubscribeButtonAction`
+- Channel UC ID: `.channelId`
+- New state: `.subscribed` -> `true`
+
+**Attestation instruction observed in the same response**:
+
+- Base: `actions[i].runAttestationCommand`
+- Channel UC ID: `.ids[j].externalChannelId`
+- Engagement type: `.engagementType` -> `ENGAGEMENT_TYPE_SUBSCRIBE`
+
+**Entity-state replacements**:
+
+- Base: `frameworkUpdates.entityBatchUpdate.mutations[i]`
+- Select mutations where `.type == ENTITY_MUTATION_TYPE_REPLACE`.
+- Subscription state:
+  `.payload.subscriptionStateEntity.subscribed` -> `true`
+- Notification state:
+  `.payload.subscriptionNotificationStateEntity.state` -> observed default
+  `SUBSCRIPTION_NOTIFICATION_STATE_OCCASIONAL`
+- Mutation time: `frameworkUpdates.entityBatchUpdate.timestamp`
+
+**Short-lived consistency state**:
+
+- Token: `responseContext.consistencyTokenJar.encryptedTokenJarContents`
+- Lifetime: `responseContext.consistencyTokenJar.expirationSeconds` -> observed
+  `600`
+
+Reduced subscribe response:
+
+```json
+{
+  "responseContext": {
+    "consistencyTokenJar": {
+      "encryptedTokenJarContents": "OPAQUE_TOKEN",
+      "expirationSeconds": "600"
+    }
+  },
+  "actions": [
+    {
+      "runAttestationCommand": {
+        "ids": [
+          { "externalChannelId": "UCc605luB7EcVs6X9ZvTXwKw" }
+        ],
+        "engagementType": "ENGAGEMENT_TYPE_SUBSCRIBE"
+      }
+    },
+    {
+      "updateSubscribeButtonAction": {
+        "subscribed": true,
+        "channelId": "UCc605luB7EcVs6X9ZvTXwKw"
+      }
+    }
+  ],
+  "frameworkUpdates": {
+    "entityBatchUpdate": {
+      "mutations": [
+        {
+          "type": "ENTITY_MUTATION_TYPE_REPLACE",
+          "payload": {
+            "subscriptionStateEntity": {
+              "key": "OPAQUE_ENTITY_KEY",
+              "subscribed": true
+            }
+          }
+        },
+        {
+          "type": "ENTITY_MUTATION_TYPE_REPLACE",
+          "payload": {
+            "subscriptionNotificationStateEntity": {
+              "key": "OPAQUE_ENTITY_KEY",
+              "state": "SUBSCRIPTION_NOTIFICATION_STATE_OCCASIONAL"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+## Subscribe attestation follow-up
+
+**Observed endpoint**:
+`POST https://m.youtube.com/youtubei/v1/att/log?prettyPrint=false`
+
+The provider issued this after the subscribe response returned a
+`runAttestationCommand`. The captured response contains only
+`responseContext`, including MWEB client tracking and a response ID. It does
+not repeat the channel ID, subscription state, or mutation receipt.
+
+Reduced response:
+
+```json
+{
+  "responseContext": {
+    "serviceTrackingParams": [
+      {
+        "service": "CSI",
+        "params": [
+          { "key": "c", "value": "MWEB" },
+          { "key": "cver", "value": "2.20260717.00.00" },
+          { "key": "LogAttestation_rid", "value": "OPAQUE_REQUEST_ID" }
+        ]
+      }
+    ],
+    "responseId": "OPAQUE_RESPONSE_ID"
+  }
+}
+```
+
+The response alone is not subscription-state authority. Keep the provider
+client responsible for constructing and submitting the attestation request;
+the supplied capture does not document its complete request body.
+
+## Unsubscribe
+
+**Endpoint**:
+`POST https://m.youtube.com/youtubei/v1/subscription/unsubscribe?prettyPrint=false`
+
+**Primary action receipt**:
+
+- Base: `actions[i].updateSubscribeButtonAction`
+- Channel UC ID: `.channelId`
+- New state: `.subscribed` -> `false`
+
+**Entity-state replacement**:
+
+- Base: `frameworkUpdates.entityBatchUpdate.mutations[i]`
+- Mutation type: `.type` -> `ENTITY_MUTATION_TYPE_REPLACE`
+- New state: `.payload.subscriptionStateEntity.subscribed` -> `false`
+- Mutation time: `frameworkUpdates.entityBatchUpdate.timestamp`
+
+The captured unsubscribe response contains a new short-lived
+`consistencyTokenJar`, but no `runAttestationCommand` and no
+`subscriptionNotificationStateEntity` replacement. This is an observed
+response-shape difference, not a guarantee that those fields can never appear.
+
+Reduced unsubscribe response:
+
+```json
+{
+  "responseContext": {
+    "consistencyTokenJar": {
+      "encryptedTokenJarContents": "OPAQUE_TOKEN",
+      "expirationSeconds": "600"
+    }
+  },
+  "actions": [
+    {
+      "updateSubscribeButtonAction": {
+        "subscribed": false,
+        "channelId": "UCc605luB7EcVs6X9ZvTXwKw"
+      }
+    }
+  ],
+  "frameworkUpdates": {
+    "entityBatchUpdate": {
+      "mutations": [
+        {
+          "type": "ENTITY_MUTATION_TYPE_REPLACE",
+          "payload": {
+            "subscriptionStateEntity": {
+              "key": "OPAQUE_ENTITY_KEY",
+              "subscribed": false
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+## Identity, state, and FilterTube boundaries
+
+1. Cross-check the UC ID in `updateSubscribeButtonAction.channelId`,
+   `runAttestationCommand.ids[].externalChannelId` when present, and the
+   originating channel command. Do not derive channel identity from opaque
+   entity keys.
+2. Treat `consistencyTokenJar`, entity keys, response IDs, request IDs, and
+   tracking parameters as opaque, short-lived provider state. Do not persist
+   or synthesize them.
+3. A successful subscribe mutation changes the YouTube account. It does not
+   automatically add that channel to a FilterTube whitelist. The user must
+   explicitly run and approve the subscribed-channels import.
+4. Unsubscribing on YouTube does not silently remove a previously imported
+   FilterTube whitelist rule. Imported rules remain ordinary profile rules
+   until the user reviews and changes them.
+5. Do not optimistically claim success from the button click alone. Reconcile
+   the action receipt and entity replacement; use a later `FEchannels` refresh
+   when a full account-level subscription-list confirmation is required.
+6. These are authenticated account mutations. Do not replay them from captured
+   JSON or construct requests from response-only evidence; preserve the live
+   YouTube client's authentication and integrity flow.
+
+```text
+Channel subscribe command
+  -> subscription/subscribe
+  -> subscribed=true action + entity replacements
+  -> optional provider attestation follow-up
+  -> later FEchannels read confirms account-list membership
+
+Channel unsubscribe command
+  -> subscription/unsubscribe
+  -> subscribed=false action + entity replacement
+  -> later FEchannels read confirms removal from the account list
+
+FilterTube subscribed-channel import
+  -> reads FEchannels
+  -> previews normalized channels
+  -> changes FilterTube rules only after explicit user approval
+```
+
+
 SUBSCRIBER list JSON
 
 "collapsedItemCount": 983,
@@ -6428,6 +6660,653 @@ get_watch
   -> navigateAction to the same video with provider check flags
   -> fetch/re-enter normal watch state
   -> reapply FilterTube profile, rule, and time-limit enforcement
+```
+
+---
+
+# Absolute JSON Trace: MWEB Upcoming Premiere (`get_watch`)
+*Captured: 2026-07-21 from mobile YouTube (`MWEB`) for video `rpPpyanUiPo`.*
+
+Source capture:
+`008dda47-c965-4ae3-91d0-893e16c9da65/pasted-text.txt` (local Codex
+attachment). The matching rendered mobile Watch DOM is inventoried in
+`docs/youtube_renderer_inventory.md`.
+
+**Endpoint**:
+`POST https://m.youtube.com/youtubei/v1/get_watch?prettyPrint=false`
+
+This response uses the same streamed two-item envelope documented for the
+age-gated capture above, but the player subresponse reports a scheduled
+premiere rather than an age gate:
+
+```json
+[
+  {
+    "playerResponse": {
+      "playabilityStatus": {
+        "status": "LIVE_STREAM_OFFLINE",
+        "reason": "Premieres in 3 days"
+      }
+    },
+    "responseType": "STREAMING_WATCH_RESPONSE_TYPE_PLAYER_RESPONSE",
+    "subStreamResponseCompleted": true
+  },
+  {
+    "watchNextResponse": {},
+    "responseType": "STREAMING_WATCH_RESPONSE_TYPE_WATCH_NEXT_RESPONSE",
+    "subStreamResponseCompleted": true
+  }
+]
+```
+
+Select each streamed item by `responseType`. The player subresponse owns
+playability and schedule authority. The Watch-next subresponse owns the
+surrounding Watch UI and contains unrelated recommendation renderers that
+must not be used as fallbacks for the current video's metadata.
+
+## Player subresponse: upcoming and offline
+
+**Player base**: `[i].playerResponse` where
+`[i].responseType == STREAMING_WATCH_RESPONSE_TYPE_PLAYER_RESPONSE`
+
+- Playability state: `.playabilityStatus.status` ->
+  `LIVE_STREAM_OFFLINE`
+- Relative user-facing status: `.playabilityStatus.reason` ->
+  `Premieres in 3 days`
+- Upcoming slate base:
+  `.playabilityStatus.liveStreamability.liveStreamabilityRenderer`
+- Slate video identity: `...videoId` -> `rpPpyanUiPo`
+- Suggested playability poll interval: `...pollDelayMs` -> `15000`
+- Offline slate base:
+  `...offlineSlate.liveStreamOfflineSlateRenderer`
+- Scheduled epoch seconds: `...scheduledStartTime` -> `1784912400`
+- Relative slate text: `...mainText.runs[].text` ->
+  `Premieres in ` + `3 days`
+- Localized slate schedule: `...subtitleText.runs[].text` ->
+  `July 24 at 10:30 PM`
+- Slate style: `...offlineSlateStyle` ->
+  `OFFLINE_SLATE_STYLE_ABSTRACT`
+
+The independently encoded canonical schedule is:
+
+- Base: `.microformat.playerMicroformatRenderer.liveBroadcastDetails`
+- Live now: `.isLiveNow` -> `false`
+- Start timestamp: `.startTimestamp` ->
+  `2026-07-24T17:00:00+00:00` (July 24 at 10:30 PM IST)
+
+Do not persist the relative `Premieres in 3 days` text as schedule authority.
+It ages immediately. Prefer `startTimestamp`, with `scheduledStartTime` as the
+matching epoch representation, and format the remaining time in the user's
+current locale.
+
+## Video identity and the absence of playable media
+
+**Identity base**: `[i].playerResponse.videoDetails`
+
+- Video ID: `.videoId` -> `rpPpyanUiPo`
+- Title: `.title` ->
+  `Day 22/365 Understand Russian in 365 Days | Russian Listening Practice | Everyday Dialogues`
+- Channel UC ID: `.channelId` -> `UCXRt-HjEaTF6J6regWoopjw`
+- Author: `.author` -> `Russian with Nastya`
+- Upcoming flag: `.isUpcoming` -> `true`
+- Live-content flag before the premiere starts: `.isLiveContent` -> `false`
+- Duration: `.lengthSeconds` -> `0`
+- View count: `.viewCount` -> `0`
+
+**Microformat identity base**:
+`[i].playerResponse.microformat.playerMicroformatRenderer`
+
+- Owner name: `.ownerChannelName` -> `Russian with Nastya`
+- External channel UC ID: `.externalChannelId` ->
+  `UCXRt-HjEaTF6J6regWoopjw`
+- Category: `.category` -> `Education`
+- Upload and publish timestamps: `.uploadDate` and `.publishDate`
+
+In this capture, `playerResponse.streamingData` and
+`playerResponse.captions` are absent. There are no `formats`,
+`adaptiveFormats`, or HLS manifest to prepare. `lengthSeconds == "0"` is
+therefore unknown/not-yet-published duration for this upcoming premiere, not
+a playable zero-second video and not evidence for an ending-time label.
+
+A readiness or playback system should stop at semantic schedule readiness:
+thumbnail, title, channel identity, status, and start time may be retained,
+but source resolution, Media3 source construction, and byte warming have no
+playable target yet. Polling, if the waiting room remains active, must stay
+bounded and should respect the provider's `pollDelayMs` rather than retrying
+as a generic playback failure.
+
+## Notify-me action
+
+The offline slate exposes a toggle action:
+
+- Toggle base: `...liveStreamOfflineSlateRenderer.actionButtons[i].toggleButtonRenderer`
+- Default label: `.defaultText.runs[].text` -> `Notify me`
+- Add-reminder API:
+  `.defaultServiceEndpoint.commandMetadata.webCommandMetadata.apiUrl` ->
+  `/youtubei/v1/notification/add_upcoming_event_reminder`
+- Remove-reminder API:
+  `.toggledServiceEndpoint.commandMetadata.webCommandMetadata.apiUrl` ->
+  `/youtubei/v1/notification/remove_upcoming_event_reminder`
+- Toggled label: `.toggledText.runs[].text` -> `Notification on`
+
+The corresponding endpoint parameters and tracking values are opaque,
+session-bound provider state. Do not replay them from this capture or infer a
+FilterTube notification/subscription rule from the toggle state.
+
+## Watch-next subresponse: current-video UI versus recommendations
+
+**Watch-next base**: `[i].watchNextResponse` where
+`[i].responseType == STREAMING_WATCH_RESPONSE_TYPE_WATCH_NEXT_RESPONSE`
+
+Current-video evidence observed in the capture:
+
+- Current route identity:
+  `.currentVideoEndpoint.watchEndpoint.videoId` -> `rpPpyanUiPo`
+- Current title:
+  `...slimVideoInformationRenderer.title.runs[].text`
+- Waiting count:
+  `...slimVideoInformationRenderer.collapsedSubtitle.runs[].text` ->
+  `1 waiting`
+- Owner label:
+  `...slimOwnerRenderer.title.runs[].text` -> `Russian with Nastya`
+- Owner UC ID:
+  `...slimOwnerRenderer.navigationEndpoint.browseEndpoint.browseId` ->
+  `UCXRt-HjEaTF6J6regWoopjw`
+- Owner handle:
+  `...slimOwnerRenderer.navigationEndpoint.browseEndpoint.canonicalBaseUrl`
+  -> `/@Russianlanguage`
+- Structured waiting factoid:
+  `...viewCountFactoidRenderer.viewCountType` ->
+  `VIEW_COUNT_FACTOID_TYPE_CONCURRENT_VIEWERS`
+- Structured premiere date:
+  `...videoDescriptionHeaderRenderer.factoid[].factoidRenderer.accessibilityText`
+  -> `Premieres Jul 24, 2026`
+
+The same Watch-next response also contains many
+`videoWithContextRenderer` recommendations with different `videoId`, title,
+channel, duration, view-count, accessibility, and action values. Those nested
+strings are rail-card evidence only. A parser must not search the complete
+Watch-next tree for the first text containing `views`, `ago`, a duration, or a
+description and then attach it to `currentVideoEndpoint.videoId`.
+
+Current-video metadata must come from the player response or a renderer that
+is structurally scoped to the current Watch metadata/description panels.
+Recommendation metadata remains owned by each recommendation's exact
+`videoId`.
+
+## State and filtering boundaries
+
+1. `LIVE_STREAM_OFFLINE` plus `videoDetails.isUpcoming == true` is a scheduled
+   premiere state, not a network error, deleted video, or FilterTube block.
+2. Show the offline slate/status and scheduled local time. Disable ordinary
+   playback and seeking until the provider exposes playable formats.
+3. Do not show `0:00` as a real duration and do not borrow a recommendation's
+   duration. An ending time is unknown in this capture.
+4. Continue applying FilterTube title/channel/category policy using the stable
+   current-video fields. Playability state does not bypass filtering.
+5. Keep the player, Watch metadata, recommendations, comments, and reminder
+   action as separately owned surfaces. Failure or absence in one must not
+   populate another from arbitrary deep text.
+6. Opaque tracking values, entity keys, player parameters, reminder params,
+   response IDs, and visitor/session context must remain opaque.
+
+```text
+get_watch streamed array
+  -> PLAYER_RESPONSE
+       -> LIVE_STREAM_OFFLINE + isUpcoming=true
+       -> exact schedule + offline slate + optional Notify me action
+       -> no playable formats, duration, captions, or media byte warm
+  -> WATCH_NEXT_RESPONSE
+       -> current Watch metadata/owner/waiting count
+       -> independently scoped recommendations and engagement panels
+  -> when the scheduled time approaches
+       -> bounded provider-directed playability refresh
+       -> prepare playback only after playable formats appear
+```
+
+---
+
+# Absolute JSON Trace: MWEB Active LIVE (`get_watch`)
+*Captured: 2026-07-21 from mobile YouTube (`MWEB`) for video `a0gQvm4DEms`.*
+
+Source captures:
+
+- `fd4dc846-32dd-4798-8d49-faa073339089/pasted-text.txt` contains the streamed
+  `get_watch` JSON.
+- `86561eac-9768-4905-ba3b-790f76728c79/pasted-text.txt` contains the rendered
+  mobile description engagement panel for the same current video.
+
+**Endpoint**:
+`POST https://m.youtube.com/youtubei/v1/get_watch?prettyPrint=false`
+
+The response again uses two independently completed streamed items:
+
+```json
+[
+  {
+    "playerResponse": {
+      "playabilityStatus": { "status": "OK" },
+      "videoDetails": {
+        "videoId": "a0gQvm4DEms",
+        "isLive": true,
+        "isLiveContent": true,
+        "isLiveDvrEnabled": true,
+        "lengthSeconds": "0"
+      }
+    },
+    "responseType": "STREAMING_WATCH_RESPONSE_TYPE_PLAYER_RESPONSE",
+    "subStreamResponseCompleted": true
+  },
+  {
+    "watchNextResponse": {
+      "currentVideoEndpoint": {
+        "watchEndpoint": { "videoId": "a0gQvm4DEms" }
+      }
+    },
+    "responseType": "STREAMING_WATCH_RESPONSE_TYPE_WATCH_NEXT_RESPONSE",
+    "subStreamResponseCompleted": true
+  }
+]
+```
+
+As with the upcoming capture, select by `responseType`; do not rely on array
+position or recursively mix current-video and recommendation fields.
+
+## Player subresponse: actively playable live broadcast
+
+**Player base**: `[i].playerResponse` where
+`[i].responseType == STREAMING_WATCH_RESPONSE_TYPE_PLAYER_RESPONSE`
+
+- Playability: `.playabilityStatus.status` -> `OK`
+- Live-streamability base:
+  `.playabilityStatus.liveStreamability.liveStreamabilityRenderer`
+- Video ID: `...videoId` -> `a0gQvm4DEms`
+- Broadcast ID: `...broadcastId` -> `1`
+- Suggested provider refresh interval: `...pollDelayMs` -> `15000`
+- Offline slate: `...offlineSlate` -> absent
+
+The missing `offlineSlate` is meaningful only in combination with `OK`, live
+flags, and playable media. It distinguishes this active broadcast from the
+scheduled-premiere capture; it is not sufficient as a standalone LIVE test.
+
+**Video details base**: `[i].playerResponse.videoDetails`
+
+- Title: `.title` -> `Career Updates and Coding`
+- Channel UC ID: `.channelId` -> `UCfvJirlbRTN-bU9sMWMb_ZQ`
+- Author: `.author` -> `Fritz's Tech Tips and Chatter`
+- Active-live flags: `.isLive` -> `true`; `.isLiveContent` -> `true`
+- DVR availability: `.isLiveDvrEnabled` -> `true`
+- Live chunk readahead hint: `.liveChunkReadahead` -> `3`
+- Latency class: `.latencyClass` ->
+  `MDE_STREAM_OPTIMIZATIONS_RENDERER_LATENCY_NORMAL`
+- Duration: `.lengthSeconds` -> `0`
+- Captured view count: `.viewCount` -> `136`
+
+**Live player configuration**:
+`[i].playerResponse.playerConfig.livePlayerConfig`
+
+- Desired live readahead: `.liveReadaheadSeconds` -> `12`
+- Live head playable: `.isLiveHeadPlayable` -> `true`
+
+**Canonical live-state base**:
+`[i].playerResponse.microformat.playerMicroformatRenderer.liveBroadcastDetails`
+
+- Live now: `.isLiveNow` -> `true`
+- Actual start timestamp: `.startTimestamp` ->
+  `2026-07-21T13:07:58+00:00`
+
+For an active broadcast, `lengthSeconds == "0"` means open-ended live media,
+not a zero-second video. It must not produce a fixed end time or disable
+playback. Because this capture has DVR enabled, seeking can still be offered
+inside the provider's current seekable window even though the broadcast has
+no fixed total duration.
+
+## Live media, signed-source lifetime, and DVR
+
+**Streaming base**: `[i].playerResponse.streamingData`
+
+- Adaptive streams: `.adaptiveFormats` -> 16 entries in this capture
+- HLS manifest: `.hlsManifestUrl` -> present
+- Server-driven ABR endpoint: `.serverAbrStreamingUrl` -> present
+- Progressive `.formats` -> absent
+- Signed response lifetime: `.expiresInSeconds` -> `21540`
+
+The adaptive set contains separate video variants from 144p through 1080p,
+one MP4 audio entry (`itag 140`), and three `text/mp4` entries. Every captured
+adaptive entry reports:
+
+- `.targetDurationSec` -> `5`
+- `.maxDvrDurationSec` -> `43200` (12 hours)
+
+The top-level `playerResponse.captions` object is absent. The `text/mp4`
+entries prove text-bearing adaptive tracks, but without the semantic captions
+mapping they must not be presented as named/selectable caption tracks solely
+from MIME type or itag.
+
+Media URLs and manifests are signed, session-sensitive playback material. A
+source-plan/readiness cache must retain their expiry and live-state epoch. Do
+not reuse an active-LIVE manifest after its signed lifetime, after the
+broadcast changes state, or as the source for an archived VOD. A nominal
+video-ID cache hit is not sufficient when the cached media contract is stale.
+
+Preloading remains bounded: prepare the exact live source and a useful live
+head/buffer window for a probable tap; never attempt to download the open-ended
+broadcast or fill the DVR window. Once selected, live playback and an
+unbuffered seek own network/buffer priority over speculative card warming.
+
+### Active-LIVE quality is an adaptive-manifest constraint
+
+The captured active-LIVE media ladder tops out at 1080p. A consumer may retain
+a broader user preference such as 1440p or 2160p from another video/device, but
+that persisted value is not proof that the current manifest contains or is
+decoding that resolution.
+
+For active LIVE, Auto and fixed quality should remain on the HLS/adaptive media
+contract. A fixed value is a preferred maximum rendition height: Media3 may
+select a lower available variant when the manifest or measured throughput
+requires it and move upward again without replacing the live source. Resolving
+fixed 1080p as separate progressive video/audio URLs is not equivalent: an
+observed FilterTubeApp trace exposed the absolute LIVE timestamp as more than
+3,287 seconds buffered at player position zero and never entered PLAYING.
+Switching the same selected item to Auto mounted HLS and played immediately.
+
+Accepted downstream device evidence later recorded a persisted 1440p ceiling
+with `sourceKind=adaptive_hls`, first frame in 881 ms, and READY in 1.386 s.
+The resolver log could not report the currently selected HLS height, so this is
+evidence for the requested ceiling and working adaptive source, not evidence
+that 1440p was delivered. Settings UI must intersect persisted preference with
+the current mounted track groups and expose the actual selected rendition when
+available.
+
+## Watch-next and description-panel current-video metadata
+
+**Watch-next base**: `[i].watchNextResponse` where
+`[i].responseType == STREAMING_WATCH_RESPONSE_TYPE_WATCH_NEXT_RESPONSE`
+
+Captured slim-metadata bases beneath that object:
+
+- Current information:
+  `.contents.singleColumnWatchNextResults.results.results.contents[1].slimVideoMetadataSectionRenderer.contents[0].slimVideoInformationRenderer`
+- Current owner:
+  `.contents.singleColumnWatchNextResults.results.results.contents[1].slimVideoMetadataSectionRenderer.contents[1].slimOwnerRenderer`
+- Current description header:
+  `.engagementPanels[1].engagementPanelSectionListRenderer.content.structuredDescriptionContentRenderer.items[0].videoDescriptionHeaderRenderer`
+
+The numeric positions describe this capture. A resilient parser should select
+the keyed renderer object within the structurally scoped current-video area,
+not assume those positions remain permanent.
+
+- Current route identity:
+  `.currentVideoEndpoint.watchEndpoint.videoId` -> `a0gQvm4DEms`
+- Current title:
+  current-information base + `.title.runs[].text`
+- Current concurrent label:
+  current-information base + `.collapsedSubtitle.accessibility.accessibilityData.label`
+  ->
+  `19 watching now`
+- Owner handle:
+  current-owner base +
+  `.navigationEndpoint.browseEndpoint.canonicalBaseUrl`
+  -> `/@csharpfritz`
+- Structured current concurrency:
+  current-description-header base +
+  `.factoid[1].viewCountFactoidRenderer.viewCountType` ->
+  `VIEW_COUNT_FACTOID_TYPE_CONCURRENT_VIEWERS`
+- Start-age accessibility text:
+  current-description-header base +
+  `.factoid[2].factoidRenderer.accessibilityText`
+  -> `Started streaming 2 hours ago`
+
+The matching description engagement panel renders the same current title,
+channel, `19 watching now`, start date, likes, description, and authoritative
+channel links. Its DOM is inventoried separately. It is a current-video UI
+surface and a useful display fallback, but the player response remains the
+authority for playability, live/DVR flags, exact start timestamp, manifests,
+and source expiry.
+
+`videoDetails.viewCount == "136"` and the Watch/description label
+`19 watching now` represent different or differently refreshed metrics. The
+structured concurrent-viewer renderer/accessible label owns the current
+concurrency display; do not relabel the player-level count as “watching now.”
+
+### Description creator infocard and newer Video details rows
+
+The supplied active-LIVE fragments
+`b6c99789-4255-4420-94b7-13bfbc1ec37d/pasted-text.txt` and
+`0e8eb834-4039-4b5e-98d9-4be023e02976/pasted-text.txt` are adjoining portions
+of the Watch-next description panel. Select the engagement panel by
+`panelIdentifier == "video-description-ep-identifier"`, then use this base:
+
+`[i].watchNextResponse.engagementPanels[].engagementPanelSectionListRenderer.content.structuredDescriptionContentRenderer.items[]`
+
+Creator-infocard paths, where the selected item contains
+`videoDescriptionInfocardsSectionRenderer`:
+
+- `.sectionTitle.runs[].text` -> `Francesco Ciulla`;
+- `.sectionSubtitle.runs[].text` -> `343K subscribers`;
+- `.sectionSubtitle.accessibility.accessibilityData.label` ->
+  `343 thousand subscribers`;
+- `.channelAvatar.thumbnails[]` -> channel avatar candidates;
+- `.channelEndpoint.browseEndpoint` -> exact channel identity/navigation;
+- `.creatorVideosButton.buttonRenderer.command.browseEndpoint` and
+  `.creatorAboutButton.buttonRenderer.command.browseEndpoint` -> Videos/About
+  channel actions; and
+- `.creatorCustomUrlButtons[].buttonViewModel` -> titled creator link action,
+  icon, and `.onTap.innertubeCommand` endpoint.
+
+Custom URL buttons are actions. Their titles must not become description body
+text, statistics, filtering keywords, or cards. External links can remain
+YouTube redirect URLs until a user gesture hands them to the navigation layer;
+do not resolve or preload them as media.
+
+The newer Video details block is an item containing
+`linearLayoutViewModel.items[].listItemViewModel`:
+
+- `.title.content == "Date"` -> `.trailingLabel.content` (`Jul 21, 2026`);
+- `.title.content == "Viewers"` -> `.trailingLabel.content` (`20`), semantically
+  the current concurrent-viewer metric for this active LIVE response; and
+- `.title.content == "Likes"` ->
+  `.trailingAccessoriesList.trailingAccessories[]`
+  `.listItemLikeCountViewModel`.
+
+For the Likes row, select `.valueIfLiked`, `.valueIfDisliked`, or
+`.valueIfIndifferent` using the `likeStatusEntity.likeStatus` whose key equals
+`.statusEntityKey`. Header factoids remain first display authority when both
+schemas are present; these rows supply compatible structured fallbacks rather
+than duplicate labels. The values are response data and can change between
+captures.
+
+## Correlated mobile Home LIVE card DOM
+
+The supplied Home DOM capture
+`344f990e-eb01-4891-af2a-d7492a633763/pasted-text.txt` carries the same video
+ID, `a0gQvm4DEms`, in the outer lockup class and both preview/static Watch
+links. It renders:
+
+- `badge-shape.ytBadgeShapeThumbnailLive` -> `LIVE`;
+- title accessibility text ending in `21 watching`;
+- a metadata-row `21 watching` label;
+- an active `ytm-video-preview`/HTML5 player child; and
+- no duration badge.
+
+That DOM is display and tap-probability evidence, not a substitute for the
+player subresponse. Correlate it to this JSON trace by exact video ID:
+
+| Home DOM signal | `get_watch` authority | Result |
+| --- | --- | --- |
+| `LIVE` badge | `playabilityStatus.status == OK`, `videoDetails.isLive == true`, `liveBroadcastDetails.isLiveNow == true` | Active-LIVE presentation only while the fresh player tuple remains true. |
+| `21 watching` | Watch-current concurrent renderer/accessibility text | Localized concurrent-viewer display; it may refresh independently of captured `videoDetails.viewCount`. |
+| Missing duration | `videoDetails.lengthSeconds == "0"` with active-LIVE tuple | Open-ended LIVE, not a zero-second VOD. |
+| Inline preview progress near `100%` | current HLS live edge and optional DVR window | Near live edge, not media completion. Do not run VOD near-end/ended logic. |
+| Inline preview child | playable streaming data and HLS manifest | One transient preview owned by the Home card; never a second card/readiness owner. |
+
+The Home badge may make this card a high-probability readiness candidate, but
+the app must refresh manifests/playability at Watch selection and keep live
+playlist requests out of stale persistent-manifest reuse. Bounded media bytes
+may still be reused under the current signed-source/live epoch.
+
+This capture contains no `liveChatRenderer`. That documents only this response
+and must not become a rule that active LIVE videos never expose chat. The
+Watch-next response also contains independently scoped recommendation cards;
+their dates, durations, titles, channels, and view counts must never fill
+missing current-live fields.
+
+## First-load document versus same-tab `get_watch`
+
+Mobile Watch has two delivery shapes that must normalize into the same owned
+model:
+
+1. A full navigation to `GET https://m.youtube.com/watch?...&ra=m` returns an
+   HTML document. The supplied `FilterTubeApp/docs/app/native-owned-main/Description_sheet.html`
+   embeds escaped `ytInitialData` (Watch UI, current metadata, description and
+   engagement panels) and a separate `ytInitialPlayerResponse` (playability,
+   media, duration, live state).
+2. A same-tab mobile Watch navigation issues
+   `POST /youtubei/v1/get_watch?prettyPrint=false` and returns the streamed
+   two-item array documented above.
+
+The observed `get_watch` request does not use the flat `/next` body. Its stable
+top-level contract is:
+
+```json
+{
+  "context": { "client": { "clientName": "MWEB" } },
+  "playerRequest": {
+    "videoId": "VIDEO_ID",
+    "playbackContext": {
+      "contentPlaybackContext": {
+        "currentUrl": "/watch?v=VIDEO_ID",
+        "vis": 0,
+        "splay": false,
+        "autoCaptionsDefaultOn": false,
+        "autonavState": "STATE_NONE",
+        "html5Preference": "HTML5_PREF_WANTS",
+        "lactMilliseconds": "-1"
+      },
+      "devicePlaybackCapabilities": {
+        "supportsVp9Encoding": true,
+        "supportXhr": true
+      }
+    },
+    "racyCheckOk": false,
+    "contentCheckOk": false
+  },
+  "watchNextRequest": {
+    "videoId": "VIDEO_ID",
+    "racyCheckOk": false,
+    "contentCheckOk": false,
+    "autonavState": "STATE_NONE",
+    "playbackContext": { "vis": 0, "lactMilliseconds": "-1" },
+    "captionsRequested": false
+  }
+}
+```
+
+Treat client/session fields, signature timestamps, tracking, visitor data, and
+experiment configuration as captured provider context, not constants to
+synthesize. The important structural rule is the paired `playerRequest` and
+`watchNextRequest`; a flat `videoId` request produces `INVALID_ARGUMENT` in
+the observed MWEB contract.
+
+## Ended-LIVE replay (`OAzAu0PbpqM`)
+
+Source capture:
+`04125704-0cb0-493f-a32d-86efd22237b2/pasted-text.txt`.
+
+The streamed array contains two items selected by `responseType`:
+
+- `STREAMING_WATCH_RESPONSE_TYPE_PLAYER_RESPONSE`
+- `STREAMING_WATCH_RESPONSE_TYPE_WATCH_NEXT_RESPONSE`
+
+Player fields proving an archived replay:
+
+| Path under `[i].playerResponse` | Captured value | Meaning |
+| --- | --- | --- |
+| `playabilityStatus.status` | `OK` | Playable replay. |
+| `videoDetails.videoId` | `OAzAu0PbpqM` | Current-video identity. |
+| `videoDetails.lengthSeconds` | `35216` | Finite `9:46:56` replay duration in this capture. |
+| `videoDetails.isLiveContent` | `true` | Historical live origin only; not sufficient for active-LIVE classification. |
+| `videoDetails.isLive` | absent | Does not satisfy the active-LIVE tuple. |
+| `microformat.playerMicroformatRenderer.liveBroadcastDetails.isLiveNow` | `false` | Broadcast is no longer active. |
+| `...liveBroadcastDetails.startTimestamp` | `2026-07-20T09:39:42+00:00` | Actual broadcast start. |
+| `...liveBroadcastDetails.endTimestamp` | `2026-07-20T19:26:40+00:00` | Actual broadcast end. |
+
+The exact creator body is available in both player and Watch-next authorities:
+
+- `playerResponse.videoDetails.shortDescription`
+- `playerResponse.microformat.playerMicroformatRenderer.description.runs[].text`
+- `watchNextResponse.engagementPanels[].engagementPanelSectionListRenderer`
+  selected where `.panelIdentifier == "video-description-ep-identifier"`, then
+  `.content.structuredDescriptionContentRenderer.items[]`
+  `.expandableVideoDescriptionBodyRenderer.attributedDescriptionBodyText.content`
+
+The description header in that same exact panel exposes:
+
+- `.videoDescriptionHeaderRenderer.title`
+- `.videoDescriptionHeaderRenderer.views` -> `20,007 views`
+- `.videoDescriptionHeaderRenderer.publishDate` ->
+  `Streamed live on Jul 20, 2026`
+- `.videoDescriptionHeaderRenderer.factoid[0].sentimentFactoidRenderer`
+  selects `factoidIfLiked`, `factoidIfDisliked`, or
+  `factoidIfIndifferent` from `.likeStatusEntity.likeStatus`; the selected
+  `.factoidRenderer.accessibilityText` is `225 likes` in the supplied
+  first-load document;
+- `.videoDescriptionHeaderRenderer.factoid[1].factoidRenderer.accessibilityText`
+  -> `20,009 views` in the first-load document;
+- `.videoDescriptionHeaderRenderer.factoid[2].factoidRenderer.accessibilityText`
+  -> `Streamed live on Jul 20, 2026`;
+- `.videoDescriptionHeaderRenderer.clickableMetadataButtons[]`
+  `.buttonViewModel.title` -> `#mande`, `#apexpredator`, and
+  `#apexseason28`; and
+- `.structuredDescriptionContentRenderer.items[]`
+  `.videoAttributesSectionViewModel` -> `headerTitle == "Games"`,
+  `.videoAttributeViewModels[].videoAttributeViewModel.title == "Apex Legends"`,
+  `.subtitle == "2019"`, and `.footerButton.buttonViewModel.title == "Gaming"`.
+
+The description-sheet payload is therefore a structured current-video unit:
+header identity + selected factoids + metadata buttons + full attributed body
++ optional attributes. Consumers should retain these fields with the selected
+video id and render them from the same Watch state; recursively collecting all
+`factoidRenderer` or description nodes from the response can import
+recommendation/ad metadata and is not safe.
+
+Classification rule:
+
+```text
+isLiveContent=true
+  + isLive absent/false
+  + liveBroadcastDetails.isLiveNow=false
+  + positive lengthSeconds
+  = finite ended-LIVE replay, not active LIVE
+```
+
+Do not suppress its duration, label it `LIVE`, retain a live-head seek window,
+or continue polling an active manifest. It follows ordinary bounded VOD
+readiness while retaining the useful `Streamed live on ...` presentation.
+
+## Upcoming -> active LIVE -> ended/archived transition
+
+| State | Required authority | Player presentation | Readiness/cache rule |
+| --- | --- | --- | --- |
+| Scheduled upcoming | `LIVE_STREAM_OFFLINE`, `isUpcoming == true`, schedule fields, no playable streaming data | Offline slate, local start time, optional reminder; no `0:00` duration | Retain semantic schedule readiness only. A no-media result is temporary and may be refreshed at a bounded provider-directed interval. |
+| Active LIVE | `OK`, `isLive == true`, `isLiveNow == true`, playable HLS/adaptive source | Active player, LIVE status, concurrent viewers; no fixed end time; optional DVR seek | Replace upcoming negative/source state. Cache signed media only within its live-state epoch and expiry; warm a bounded live window. |
+| Ended or archived | A fresh response no longer satisfying the active-LIVE tuple; archived playback may expose ordinary VOD duration/formats | Ended status or normal VOD controls and fixed duration when supplied | Invalidate live manifests, live-head positions, and upcoming state. Build a new archived/ended source contract rather than reusing the live one. |
+
+Transition handling must be keyed by video ID **and** semantic playback epoch,
+not video ID alone. Title, channel identity, thumbnail, and policy decisions may
+survive when unchanged; incompatible playability, source plans, prepared media,
+byte readiness, duration semantics, and seek windows must be replaced.
+
+```text
+scheduled premiere
+  -> semantic waiting-room readiness; no media warm
+  -> provider refresh exposes OK + active-live fields + streamingData
+active LIVE
+  -> exact live source + bounded live-head/DVR readiness
+  -> signed source expires or provider state changes
+ended / archived
+  -> discard live media contract
+  -> resolve the new ended or VOD contract before playback
 ```
 
 ---

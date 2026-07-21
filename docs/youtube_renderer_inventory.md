@@ -372,6 +372,480 @@ YTM camelCase support matrix:
 | Mobile ads/promos | desktop ad slot tags only | `ytm-companion-slot.ytmCompanionSlotRendererHost`, `ytm-companion-ad-renderer.YtmCompanionAdRendererHost`, `ytm-visit-site-cta-renderer.ytmVisitSiteCtaRendererHost` | Hidden only when `hideSponsoredCards` is enabled. |
 | Watch/player controls | older player controls | `ytm-custom-control.ytmCustomControlHost`, `ytm-watch-player-controls.ytmWatchPlayerControlsHost`, `ytm-crawler-description.ytmCrawlerDescriptionHost` | Inventory only. These are player/description controls, not feed cards. |
 
+### Mobile Breaking News rich shelf (2026-07-20)
+
+Source capture:
+`a981f773-c881-4924-82a4-8ef54a7a1fe8/pasted-text.txt` (local Codex
+attachment). YouTube mobile web inserted this as a special Home/feed rich
+section. The capture contains eight video lockups from WION, CNN-News18,
+NDTV, Times Now, India Today, ET Now, moneycontrol, and DNAIndiaNews.
+
+The shelf mixes legacy mobile custom-element names with current camelCase
+view-model classes:
+
+```html
+<ytm-rich-section-renderer class="rich-section-single-column">
+  <div class="rich-section-content">
+    <ytm-rich-shelf-renderer
+      class="scrollable-shelf rich-shelf-single-column">
+      <div class="rich-shelf-header">
+        <h2 class="rich-shelf-title">
+          <span class="ytAttributedStringHost">Breaking news</span>
+          <h3 class="rich-shelf-subtitle">
+            <span class="ytAttributedStringHost">Current news topic</span>
+          </h3>
+        </h2>
+        <ytm-menu-renderer class="rich-shelf-menu">
+          <ytm-button-renderer class="icon-dismissal">
+            <button aria-label="Not interested">
+```
+
+The nested `h3` observed inside `h2` means heading level alone is not a safe
+selector. Use the explicit `.rich-shelf-title` and `.rich-shelf-subtitle`
+classes when the shelf heading or topic is needed.
+
+The horizontal card lane is:
+
+```html
+<div class="rich-shelf-content scrollable">
+  <ytm-rich-item-renderer>
+    <yt-lockup-view-model class="ytLockupViewModelWrapper">
+      <div class="ytLockupViewModelHost ytLockupViewModelVertical
+                  content-id-bTbKtUf8Qo4
+                  ytLockupViewModelCompact ytLockupViewModelFlexNone">
+```
+
+Eight `content-id-*` values were observed:
+
+```text
+bTbKtUf8Qo4  or891C3u2U4  Stz_SvAzB_s  to65k6IsJqY
+iy9y4rfgS4U  OgTS2ZQgwZM  R2ieQStJHWQ  XW1ZpAi07D0
+```
+
+| Evidence | Current DOM path | Interpretation |
+| --- | --- | --- |
+| Card boundary | `ytm-rich-item-renderer` -> `yt-lockup-view-model.ytLockupViewModelWrapper` -> `.ytLockupViewModelHost.ytLockupViewModelVertical` | The lockup is the individual video hide/menu target. The outer rich shelf remains structural. |
+| Video ID | `.content-id-{videoId}` and nested `a[href*="/watch?v="]` | Either source can identify the same card. Do not create a second card identity from the preview subtree. |
+| Title | `a.ytLockupMetadataViewModelTitle` -> `.ytAttributedStringHost` | Keyword evidence. Its `aria-label` may also contain channel, views, age, and duration. |
+| Channel display name | first `.ytContentMetadataViewModelMetadataRow .ytAttributedStringHost` | Display-name evidence only. It is not an authoritative UC ID. |
+| Channel avatar label | `.ytSpecAvatarShapeHost[aria-label^="Go to channel "]` | Semantic channel-name hint. The captured static DOM does not expose a stable channel link or UC ID here. Resolve identity from captured JSON/cache or a bounded lookup when channel rules require it. |
+| Views and relative time | later `.ytContentMetadataViewModelMetadataRow` spans separated by `.ytContentMetadataViewModelDelimiter` | Metadata only; do not concatenate it into channel identity. |
+| Duration | `yt-thumbnail-badge-view-model .ytBadgeShapeText` | Video-duration evidence. |
+| Per-card menu | `.ytLockupMetadataViewModelMenuButton button[aria-label="More actions"]` | Native card menu anchor. It is separate from the shelf-level Not interested control. |
+| Shelf dismiss | `ytm-menu-renderer.rich-shelf-menu ytm-button-renderer.icon-dismissal button[aria-label="Not interested"]` | YouTube feedback for the whole shelf, not a FilterTube channel-block command. |
+
+One card in the capture had an active inline-preview subtree:
+
+```html
+<div id="video-preview-portal">
+  <ytm-video-preview class="ytmVideoPreviewHost ytmVideoPreviewHostShow">
+    <a class="ytmVideoPreviewNavigationEndpoint" href="/watch?v=bTbKtUf8Qo4">
+    <yt-inline-player-controls class="ytInlinePlayerControlsHost">
+```
+
+`#video-preview-portal`, `ytm-video-preview`, its player controls, storyboard,
+progress controls, and mute/closed-caption buttons are transient children of
+the existing lockup. They must not become independent filtering targets or
+cause duplicate identity/menu enrichment.
+
+Filtering boundaries for this shelf:
+
+1. Filter each `yt-lockup-view-model` independently using its video/title and
+   resolved channel evidence.
+2. Do not hide `ytm-rich-section-renderer` merely because one child matches.
+   The shelf may be collapsed only after every real card is hidden, or through
+   an explicit shelf-level content control.
+3. `Breaking news` and the subtitle are shelf/topic text, not channel names.
+4. Anchor quick-block and fallback menus to the individual lockup, never the
+   rich-section, rich-shelf, preview player, or shelf dismissal control.
+5. Do not infer a UC ID from WION/CNN-News18-style display labels. This DOM
+   snapshot proves names, while authoritative channel identity must come from
+   JSON, an existing identity map, or a bounded resolver.
+
+Status: **DOM inventoried; existing generic lockup support is applicable, but
+this entry does not by itself claim a new runtime implementation.**
+
+### Mobile upcoming-premiere Watch DOM (2026-07-21)
+
+Source captures:
+
+- `b18a9163-5394-40c8-817f-e5260fcbbca1/pasted-text.txt` contains the rendered
+  mobile Watch metadata/action area.
+- The matching player-placeholder fragment and the streamed `get_watch`
+  response for video `rpPpyanUiPo` were supplied with the capture. Exact JSON
+  authority paths are documented in `docs/json_paths_encyclopedia.md` under
+  `MWEB Upcoming Premiere (get_watch)`.
+
+The upcoming premiere uses a player error-overlay container to render a
+semantic waiting-room slate:
+
+```html
+<div class="player-size player-placeholder">
+  <div class="player-error-overlay">
+    <ytm-live-streamability-renderer
+      class="ytmLiveStreamabilityRendererHost">
+      <ytm-live-stream-offline-slate-renderer>
+        <img class="slate-thumbnail ...">
+        <div class="slate-overlay"></div>
+        <div class="slate-bar">
+          <div class="slate-bar-text slate-bar-main-text">
+            <span class="ytAttributedStringHost">Premieres in 3 days</span>
+          </div>
+          <div class="slate-bar-text slate-bar-subtitle-text">
+            <span class="ytAttributedStringHost">July 24 at 10:30 PM</span>
+          </div>
+        </div>
+      </ytm-live-stream-offline-slate-renderer>
+    </ytm-live-streamability-renderer>
+  </div>
+</div>
+```
+
+`player-error-overlay` is a presentation container in this state. Its presence
+does not by itself mean a transport failure or unavailable/deleted video. The
+nested `ytm-live-streamability-renderer` and
+`ytm-live-stream-offline-slate-renderer`, correlated with JSON
+`playabilityStatus.status == LIVE_STREAM_OFFLINE` and
+`videoDetails.isUpcoming == true`, identify the upcoming-premiere state.
+
+The separate metadata subtree is:
+
+```html
+<ytm-slim-video-metadata-section-renderer>
+  <ytm-slim-video-information-renderer>
+    <div class="slim-video-information-content
+                slim-video-information-empty-badge simplified">
+      <h2 class="slim-video-information-title ...">
+        <span class="ytAttributedStringHost">Day 22/365 ...</span>
+      </h2>
+      <span class="slim-video-information-subtitle simplified">
+        <span class="slim-video-information-channel-name">@Russianlanguage</span>
+        <span class="slim-video-information-like-count">No likes</span>
+        <span class="slim-video-information-upload-info">1 waiting</span>
+      </span>
+      <button class="slim-video-information-show-more">more</button>
+    </div>
+  </ytm-slim-video-information-renderer>
+  <ytm-slim-video-action-bar-renderer>
+    <a class="slim-video-owner-icon" href="/@Russianlanguage">
+    <ytm-subscribe-button-renderer class="is-subscribed">
+  </ytm-slim-video-action-bar-renderer>
+</ytm-slim-video-metadata-section-renderer>
+```
+
+The owner link's accessibility label includes `Russian with Nastya` and the
+subscriber count, while the visual subtitle uses `@Russianlanguage`. The
+correlated JSON UC ID `UCXRt-HjEaTF6J6regWoopjw` remains the authoritative
+channel identity. The DOM label `1 waiting` is current waiting-room metadata;
+despite its placement under `.slim-video-information-upload-info`, it is not an
+upload-age label.
+
+The capture ends with the modern comments preview surface:
+
+```html
+<ytm-item-section-renderer class="scwnr-content single-column-watch-next-modern-panels">
+  <lazy-list>
+    <yt-video-metadata-carousel-view-model
+      class="ytVideoMetadataCarouselViewModelHost">
+      <yt-carousel-title-view-model>Comments</yt-carousel-title-view-model>
+      <yt-comment-input-box-carousel-item-view-model>
+```
+
+DOM and ownership rules:
+
+| Evidence | Current DOM path | Interpretation |
+| --- | --- | --- |
+| Upcoming player state | `.player-placeholder .player-error-overlay` -> `ytm-live-streamability-renderer.ytmLiveStreamabilityRendererHost` -> `ytm-live-stream-offline-slate-renderer` | Waiting-room/slate surface. Correlate with JSON playability state; do not classify from `player-error-overlay` alone. |
+| Relative premiere label | `.slate-bar-main-text .ytAttributedStringHost` | User-facing relative status only. It becomes stale and is not schedule authority. |
+| Localized schedule | `.slate-bar-subtitle-text .ytAttributedStringHost` | Display fallback. Prefer the JSON start timestamp for calculations and locale formatting. |
+| Slate thumbnail | `ytm-live-stream-offline-slate-renderer img.slate-thumbnail` | Current-video placeholder artwork, not a playable frame or a separate card. |
+| Current title | `ytm-slim-video-information-renderer .slim-video-information-title .ytAttributedStringHost` | Current-video keyword evidence. |
+| Channel display/handle | `.slim-video-information-channel-name`, `a.slim-video-owner-icon[href^="/@"]` | Display/handle evidence. Use correlated JSON for authoritative UC identity. |
+| Waiting count | `.slim-video-information-upload-info .ytAttributedStringHost[aria-label$=" waiting"]` | Concurrent waiting-room count. Do not parse as published/upload age. |
+| Missing duration | No duration/end-time node in the player slate or slim metadata capture | Expected for this upcoming premiere. Do not borrow duration from Watch recommendations or display `0:00` as real media length. |
+| Subscribe state | `ytm-subscribe-button-renderer.is-subscribed` | Signed-in YouTube account UI state, not a FilterTube channel-rule state. |
+| Comments preview | `yt-video-metadata-carousel-view-model.ytVideoMetadataCarouselViewModelHost` | Engagement surface, not a recommendation/content-card filtering target. |
+
+The slate, current metadata, action bar, comments carousel, and recommendation
+list are separate surfaces. Current-video metadata must not be recovered by
+searching arbitrary descendant text in the recommendation list. This capture
+contains no playable-duration DOM and must not cause source warming or a
+generic retry loop until provider playability exposes media formats.
+
+Status: **Upcoming-premiere DOM and its JSON correlation are inventoried. This
+entry documents parsing/ownership boundaries; it does not claim a runtime
+implementation.**
+
+### Mobile active-LIVE Watch and description panel (2026-07-21)
+
+Source captures:
+
+- `fd4dc846-32dd-4798-8d49-faa073339089/pasted-text.txt` contains the active
+  LIVE `get_watch` response for video `a0gQvm4DEms` (`Career Updates and
+  Coding`).
+- `86561eac-9768-4905-ba3b-790f76728c79/pasted-text.txt` contains its hydrated
+  mobile description engagement panel.
+- Exact JSON fields and live-state transitions are documented in
+  `docs/json_paths_encyclopedia.md` under `MWEB Active LIVE (get_watch)`.
+
+The supplied DOM capture starts at the description sheet, not at the active
+player. Therefore this entry does not invent a current-capture player selector
+tree. The generic mobile player/control host
+`ytm-watch-player-controls.ytmWatchPlayerControlsHost` is already known from
+separate DOM inventory, while this capture proves the description-panel shape
+below. Player state must still come from the correlated JSON.
+
+The sheet root and current-video header are:
+
+```html
+<ytm-engagement-panel class="engagement-panel-use-visibility">
+  <ytm-engagement-panel-section-list-renderer
+    class="video-description-ep-identifier">
+    <div class="engagement-panel-container">
+      <h2 class="engagement-panel-section-list-header-title">Description</h2>
+      <ytm-structured-description-content-renderer>
+        <ytm-video-description-header-renderer>
+          <h2 class="header-title">Career Updates and Coding</h2>
+          <a class="reel-player-header-channel-endpoint"
+             href="/@csharpfritz"
+             aria-label="Fritz's Tech Tips and Chatter">
+```
+
+The live-specific factoids are rendered as separate semantic objects:
+
+```html
+<ytm-view-count-factoid-renderer class="... factoid">
+  <factoid-renderer>
+    <div role="text" aria-label="19 watching now">
+      <span class="ytwFactoidRendererValue">19</span>
+      <span class="ytwFactoidRendererLabel">Viewers</span>
+    </div>
+  </factoid-renderer>
+</ytm-view-count-factoid-renderer>
+
+<factoid-renderer class="... factoid">
+  <div role="text" aria-label="Started streaming 2 hours ago">
+    <span class="ytwFactoidRendererValue">Jul 21</span>
+    <span class="ytwFactoidRendererLabel">2026</span>
+  </div>
+</factoid-renderer>
+```
+
+The expanded body contains the creator description, channel information, and
+a modern `Video details` list:
+
+```html
+<ytm-expandable-video-description-body-renderer>
+  <span class="ytAttributedStringHost ...">
+    Fritz has some updates to share and let's keep coding
+  </span>
+</ytm-expandable-video-description-body-renderer>
+<ytm-video-description-infocards-section-renderer>
+  <a href="/@csharpfritz" class="ytm-video-description-infocards-section-header">
+  <a href="/channel/UCfvJirlbRTN-bU9sMWMb_ZQ/videos">Videos</a>
+  <a href="/channel/UCfvJirlbRTN-bU9sMWMb_ZQ/about">About</a>
+</ytm-video-description-infocards-section-renderer>
+<yt-linear-layout-view-model>
+  <!-- list items render Date = Jul 21, 2026; Viewers = 19; Likes = 13 -->
+</yt-linear-layout-view-model>
+```
+
+DOM and ownership rules:
+
+| Evidence | Current DOM path | Interpretation |
+| --- | --- | --- |
+| Description sheet identity | `ytm-engagement-panel-section-list-renderer.video-description-ep-identifier` | Identifies this engagement panel as the current-video description surface. It is not a content card or recommendation rail. |
+| Current title | `ytm-video-description-header-renderer h2.header-title .ytAttributedStringHost` | Current-video title/keyword evidence, correlated to the active Watch video. |
+| Channel handle/name | `a.reel-player-header-channel-endpoint[href^="/@"]`, its `aria-label`, and `.reel-player-header-channel-title` | Handle/display-name evidence. The `/channel/UC.../videos` and `/about` links provide the stable UC ID in this capture. |
+| Concurrent viewers | `ytm-view-count-factoid-renderer factoid-renderer [role="text"][aria-label$=" watching now"]` | Current concurrent-viewer label. Prefer its semantic accessibility text over positional span scraping. |
+| Stream start | `.factoids > factoid-renderer [role="text"][aria-label^="Started streaming "]` | Human-readable start-age/date display. Exact time authority remains JSON `liveBroadcastDetails.startTimestamp`. |
+| Description text | `ytm-expandable-video-description-body-renderer collapsible-string .ytAttributedStringHost` | Current creator-provided description text; apply ordinary current-video keyword policy without treating nested links as recommendations. |
+| Video details | `yt-linear-layout-view-model yt-list-item-view-model` with semantic title/trailing-label pairs | Localized display facts such as Date, Viewers, and Likes. Pair label and value within the same list item; do not depend on item order. |
+| Duration/end time | No duration or fixed ending-time node in this active-LIVE description capture | Expected for open-ended LIVE. Do not display `0:00` or borrow a recommendation duration. DVR availability and seek window come from player state. |
+
+The engagement panel can be opened, closed, or refreshed independently of the
+selected player. Its loading must not delay/restart playback, and closing it
+must not clear the selected live source. Conversely, its display strings do
+not authorize playback, seeking, or source reuse.
+
+State alignment across the two captures:
+
+| Watch state | DOM presentation | JSON correlation | Duration/seek behavior |
+| --- | --- | --- | --- |
+| Upcoming premiere | `ytm-live-streamability-renderer` -> `ytm-live-stream-offline-slate-renderer` inside the placeholder overlay | `LIVE_STREAM_OFFLINE`, `isUpcoming`, schedule, no streaming data | No real duration and no ordinary seek/play until formats appear. |
+| Active LIVE | No active-player DOM fragment was supplied; the description sheet shows `watching now` and `Started streaming ...` while JSON supplies playable HLS/adaptive media | `OK`, `isLive`, `isLiveNow`, streaming data; optional DVR | No fixed end time. Play immediately; seek only inside the current DVR window when enabled. |
+| Archived VOD | Normal player/metadata shape when supplied by a fresh response | Ordinary playable VOD state with fixed duration/formats | Show the provider duration/end time and use ordinary bounded VOD readiness. |
+
+Quality selection is media authority, not description DOM authority. For an
+active LIVE item, Auto and a manual ceiling such as 1080p/1440p/2160p should
+remain attached to the adaptive HLS source. A persisted ceiling can exceed the
+current manifest ladder; it must not be displayed as the currently decoded
+height unless Media3's mounted track groups and selected format support that
+claim. The supplied active-LIVE JSON ladder tops out at 1080p. Downstream Pixel
+evidence showed that fixed 1080p progressive playback could freeze on an
+absolute LIVE timestamp, while HLS started immediately and remained continuous.
+The accepted implementation therefore constrains HLS by the requested maximum
+height and permits temporary adaptive step-down rather than rebuilding LIVE as
+progressive media.
+
+Status: **Active-LIVE description DOM and its JSON correlation are
+inventoried. Exact active-player DOM remains uncaptured here; no selector or
+runtime implementation is claimed from absent evidence.**
+
+### Mobile Home active-LIVE card and inline preview (2026-07-21)
+
+Source capture:
+
+- `344f990e-eb01-4891-af2a-d7492a633763/pasted-text.txt` contains the mobile
+  Home rich item for the same active broadcast, video `a0gQvm4DEms`.
+
+The stable content-card ownership tree is:
+
+```html
+<ytm-rich-item-renderer class="rich-item-single-standard-column is-in-first-column">
+  <yt-lockup-view-model class="ytLockupViewModelWrapper">
+    <div class="ytLockupViewModelHost ... content-id-a0gQvm4DEms">
+      <a class="ytmVideoPreviewNavigationEndpoint" href="/watch?v=a0gQvm4DEms">
+      <a class="ytLockupViewModelContentImage" href="/watch?v=a0gQvm4DEms&amp;pp=...">
+```
+
+The active inline preview is a transient child of that card:
+
+```html
+<div id="video-preview-portal">
+  <ytm-video-preview class="ytmVideoPreviewHostShow">
+    <div class="html5-video-player ytp-livebadge-color playing-mode">
+```
+
+Both the inline preview layer and the static thumbnail expose the same live
+badge shape:
+
+```html
+<yt-thumbnail-overlay-badge-view-model>
+  <yt-thumbnail-badge-view-model>
+    <badge-shape class="ytBadgeShapeThumbnailLive">
+      <div class="ytBadgeShapeText">LIVE</div>
+```
+
+The card title link accessibility label includes the identity and concurrent
+count: `Career Updates and Coding by Fritz's Tech Tips and Chatter 21
+watching`. The metadata row separately renders the channel and `21 watching`.
+There is no duration badge; the semantic `LIVE` badge owns that overlay slot.
+
+| Evidence | DOM path | Ownership/parsing rule |
+| --- | --- | --- |
+| Stable video identity | `.content-id-a0gQvm4DEms`, `.ytmVideoPreviewNavigationEndpoint[href*="v=a0gQvm4DEms"]`, `.ytLockupViewModelContentImage[href*="v=a0gQvm4DEms"]` | Correlate all preview/static layers to one Home card and one video ID. |
+| Active LIVE badge | `badge-shape.ytBadgeShapeThumbnailLive .ytBadgeShapeText` -> `LIVE` | Mark the card active LIVE and suppress ordinary duration parsing. Duplicate preview/static badges are one semantic state, not two cards. |
+| Concurrent viewers | title-link `aria-label` suffix and the card metadata row -> `21 watching` | Display/concurrency metadata; do not parse as upload age or fixed views. |
+| Inline preview | `#video-preview-portal > ytm-video-preview.ytmVideoPreviewHostShow` | Transient media child owned by the outer lockup. Never make it an independent filter/preload/card target. |
+| Preview progress | `.ytp-play-progress`/ARIA reports approximately `99%` to `100%` | This is proximity to the current live edge, not VOD completion and not evidence of a fixed end time. |
+| Missing duration | No duration badge in either thumbnail layer | Expected for LIVE. Do not synthesize `0:00` or borrow a nearby card duration. |
+
+This Home DOM correlates to the active `get_watch` JSON documented below by
+video ID. The Home card provides a probable-tap hint and display state; fresh
+Watch/player authority still decides whether the broadcast is upcoming,
+active, ended, DVR-seekable, and currently playable.
+
+Status: **Mobile Home active-LIVE card/preview ownership is inventoried from
+the supplied DOM.**
+
+### Mobile ended-LIVE replay across Search, Watch, and description (2026-07-21)
+
+Correlated captures for video `OAzAu0PbpqM`, `🔴PRACTICING FOR ENC TEAM
+DENMARK🔴`:
+
+- `7a5069c5-b250-47d8-80be-2fe51086a4cd/pasted-text.txt`: hydrated mobile
+  Search result with an inline preview;
+- `c41a5a39-0b2a-4660-8e22-2032b6a449bd/pasted-text.txt`: the server-rendered
+  mobile Search document (`/results?...`), whose `ytInitialData` owns the
+  result card;
+- `04125704-0cb0-493f-a32d-86efd22237b2/pasted-text.txt`: streamed
+  `get_watch` response after the replay was opened;
+- `565fbd7b-3aff-4e83-881d-52c057ab744d/pasted-text.txt`: hydrated mobile
+  Watch DOM;
+- `FilterTubeApp/docs/app/native-owned-main/Description_sheet.html`: complete
+  first-load Watch document and hydrated description panel; and
+- `db40dbee-08bf-47fb-b0cd-0b98035c7fa9/pasted-text.txt`: comments engagement
+  panel. This last capture is comments evidence, not description evidence.
+
+The Search result is an ordinary finite replay card even though the title
+retains the creator's red-circle glyph and the preview player still carries a
+generic `ytp-livebadge-color` class:
+
+```html
+<ytm-video-with-context-renderer class="item adaptive-feed-item">
+  <ytm-video-preview class="ytmVideoPreviewHostShow">
+    <video title="🔴PRACTICING FOR ENC TEAM DENMARK🔴">
+  <a href="/watch?v=OAzAu0PbpqM&amp;pp=...">
+  <span aria-label="... 20,005 views Streamed 20 hours ago 9 hours, 46 minutes">
+  <span>20K views</span>
+  <span>Streamed 20 hours ago</span>
+```
+
+No `ytBadgeShapeThumbnailLive` badge or `watching now` label exists on this
+card. The title glyph and a player CSS class are therefore insufficient LIVE
+signals. The semantic tuple is finite duration + `Streamed ... ago` + ordinary
+views, correlated to the ended player response.
+
+The Watch DOM confirms the archived presentation:
+
+```html
+<ytm-single-column-watch-next-results-renderer class="watch-content ...">
+  <ytm-slim-video-information-renderer>
+    <h2>🔴PRACTICING FOR ENC TEAM DENMARK🔴</h2>
+    <span aria-label="20,007 views">20K views</span>
+    <span aria-label="Streamed 1 day ago">Streamed 1 day ago</span>
+```
+
+The first-load Watch document embeds both `ytInitialData` and
+`ytInitialPlayerResponse`. Its description panel is keyed by
+`video-description-ep-identifier` and contains:
+
+```html
+<ytm-structured-description-content-renderer>
+  <ytm-video-description-header-renderer>
+    <!-- title, Mande, 20,009 views, Streamed live on Jul 20, 2026 -->
+    <sentiment-factoid-renderer><!-- 225 Likes for INDIFFERENT --></sentiment-factoid-renderer>
+    <factoid-renderer aria-label="20,009 views"></factoid-renderer>
+    <factoid-renderer aria-label="Streamed live on Jul 20, 2026"></factoid-renderer>
+    <!-- clickableMetadataButtons: #mande, #apexpredator, #apexseason28 -->
+  <ytm-expandable-video-description-body-renderer>
+    <!-- attributedDescriptionBodyText creator body -->
+  <ytm-video-attributes-section-view-model>
+    <!-- Games: Apex Legends (2019), footer category Gaming -->
+```
+
+| Evidence | Ownership/parsing rule |
+| --- | --- |
+| `ytInitialData` in first-load `/watch` document | Server-rendered Watch UI authority. Parse the exact current-video renderers; do not wait for a navigation-only XHR before exposing already embedded description data. |
+| `ytInitialPlayerResponse` in first-load `/watch` document | Initial playability/media authority for a full document navigation. It is distinct from `ytInitialData`. |
+| Streamed `get_watch` array on same-tab navigation | Split by `responseType` into player and Watch-next authorities; never assume array order or recursively mix recommendations into current metadata. |
+| Search/Watch `Streamed ... ago` | Archived-broadcast display state, not active LIVE. |
+| Fixed `9:46:56` duration in the supplied archived capture | Ordinary finite replay duration. A separate stream that ends while selected may finalize to a different event duration; use that video's fresh player/timeline authority. |
+| Ended-LIVE quality/source selection | The fresh archived response owns a finite media contract. Do not retain the active HLS live-head source or its adaptive ceiling solely because the video ID and `isLiveContent` origin remain the same. |
+| `video-description-ep-identifier` + `attributedDescriptionBodyText` | Exact current-video description. It should populate the native description sheet instead of a perpetual loading placeholder. |
+| `videoDescriptionHeaderRenderer.factoid[]` | Structured current-video statistics. `sentimentFactoidRenderer` selects the factoid matching `likeStatusEntity.likeStatus`; ordinary `factoidRenderer.accessibilityText` carries exact views and stream/publish date. Do not flatten these into the creator body. |
+| `videoDescriptionHeaderRenderer.clickableMetadataButtons[].buttonViewModel.title` | Description hashtags such as `#mande`; present them as metadata chips and keep their browse endpoints separate from body links. |
+| `videoAttributesSectionViewModel` | Optional structured attributes, here the game `Apex Legends`, year `2019`, and footer category `Gaming`. These are description-sheet enrichment, not recommendation cards. |
+| `videoDescriptionInfocardsSectionRenderer` | Creator description-sheet card. `sectionTitle`, `sectionSubtitle`, `channelAvatar`, and `channelEndpoint` own the displayed channel identity/subscriber count; `creatorVideosButton` and `creatorAboutButton` are channel navigation actions. |
+| `videoDescriptionInfocardsSectionRenderer.creatorCustomUrlButtons[]` | Creator-defined link actions. Preserve each `buttonViewModel.title`, icon, and exact `onTap.innertubeCommand`; do not flatten these link labels into the creator body, statistics, keywords, or recommendation cards. |
+| `linearLayoutViewModel.items[].listItemViewModel` under the exact description panel | Newer structured “Video details” rows. `title.content` identifies Date/Viewers/Likes; Date/Viewers use `trailingLabel.content`, while Likes uses the state-aware `listItemLikeCountViewModel` values. Treat these as schema-compatible fallbacks when equivalent header factoids are absent. |
+| Comments panel attachment | Independently owned comments surface; it must not be mistaken for or required by description loading. |
+
+Status: **Ended-LIVE replay Search/Watch/description ownership is inventoried
+and correlated to the streamed player response.**
+
+The 2026-07-21 active-LIVE description fragments
+`b6c99789-4255-4420-94b7-13bfbc1ec37d/pasted-text.txt` (panel header through
+body) and `0e8eb834-4039-4b5e-98d9-4be023e02976/pasted-text.txt` (creator
+infocard through response tail) confirm that these rows coexist in one
+`video-description-ep-identifier` panel. For `RUST WEB FRAMEWORKS`, the
+creator card reports `Francesco Ciulla`, `343K subscribers`, channel
+Videos/About endpoints, and creator-defined YouTube/external links. Its Video
+details rows report `Jul 21, 2026`, `20` viewers, and an entity-backed `20`
+likes. These are general renderer contracts, not values to hard-code for that
+video.
+
 New nodes/classes to inventory:
 
 | DOM node/class | Meaning | Status | Runtime path |
