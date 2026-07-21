@@ -7090,7 +7090,8 @@ Creator-infocard paths, where the selected item contains
   `343 thousand subscribers`;
 - `.channelAvatar.thumbnails[]` -> channel avatar candidates;
 - `.channelEndpoint.browseEndpoint` -> exact channel identity/navigation;
-- `.creatorVideoButton.buttonRenderer.command.browseEndpoint` and
+- `.creatorVideosButton.buttonRenderer.command.browseEndpoint` (current),
+  `.creatorVideoButton.buttonRenderer.command.browseEndpoint` (legacy), and
   `.creatorAboutButton.buttonRenderer.command.browseEndpoint` -> Videos/About
   channel actions; and
 - `.creatorCustomUrlButtons[].buttonViewModel` -> titled creator link action,
@@ -7100,6 +7101,44 @@ Custom URL buttons are actions. Their titles must not become description body
 text, statistics, filtering keywords, or cards. External links can remain
 YouTube redirect URLs until a user gesture hands them to the navigation layer;
 do not resolve or preload them as media.
+
+### Current-video chapter engagement panel
+
+The supplied `FilterTubeApp/docs/app/native-owned-main/chapters.html` capture
+contains the exact `get_watch` chapter panel. Under a streamed
+`watchNextResponse`, select:
+
+`engagementPanels[].engagementPanelSectionListRenderer`
+
+where:
+
+`.panelIdentifier == "engagement-panel-macro-markers-description-chapters"`
+
+Then use:
+
+`.content.macroMarkersListRenderer.contents[].macroMarkersListItemRenderer`
+
+Per chapter:
+
+- `.title.runs[].text` -> visible chapter title;
+- `.timeDescription.simpleText` -> exact displayed timestamp;
+- `.timeDescription.accessibility.accessibilityData.label` -> accessible time;
+- `.thumbnail.thumbnails[]` -> chapter-frame image candidates;
+- `.onTap.watchEndpoint.videoId` or
+  `.onTap.commandMetadata.webCommandMetadata.url` -> selected-video
+  correlation; and
+- `.onTap.watchEndpoint.startTimeSeconds` when supplied -> direct seek target.
+
+If `startTimeSeconds` is absent, parse the complete `HH:MM:SS` or `MM:SS`
+`timeDescription.simpleText` value. Do not infer the seek time from list index,
+thumbnail URL, accessibility prose, or current playback position. Merge a
+description-text chapter fallback and a renderer chapter only when their exact
+start time matches; retain the renderer thumbnail and command authority.
+
+The description shelf and active-player button are presentation entry points
+to this same list. The player DOM selector is
+`.ytwPlayerTimeDisplayPlayerBarActionContainer button[aria-label="View Chapters"]`;
+it does not define an additional API, player, queue, or media-preload owner.
 
 The newer Video details block is an item containing
 `linearLayoutViewModel.items[].listItemViewModel`:

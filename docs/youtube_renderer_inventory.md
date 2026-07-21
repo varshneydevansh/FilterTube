@@ -829,13 +829,64 @@ The first-load Watch document embeds both `ytInitialData` and
 | `videoDescriptionHeaderRenderer.factoid[]` | Structured current-video statistics. `sentimentFactoidRenderer` selects the factoid matching `likeStatusEntity.likeStatus`; ordinary `factoidRenderer.accessibilityText` carries exact views and stream/publish date. Do not flatten these into the creator body. |
 | `videoDescriptionHeaderRenderer.clickableMetadataButtons[].buttonViewModel.title` | Description hashtags such as `#mande`; present them as metadata chips and keep their browse endpoints separate from body links. |
 | `videoAttributesSectionViewModel` | Optional structured attributes, here the game `Apex Legends`, year `2019`, and footer category `Gaming`. These are description-sheet enrichment, not recommendation cards. |
-| `videoDescriptionInfocardsSectionRenderer` | Creator description-sheet card. `sectionTitle`, `sectionSubtitle`, `channelAvatar`, and `channelEndpoint` own the displayed channel identity/subscriber count; `creatorVideoButton` and `creatorAboutButton` are channel navigation actions. |
+| `videoDescriptionInfocardsSectionRenderer` | Creator description-sheet card. `sectionTitle`, `sectionSubtitle`, `channelAvatar`, and `channelEndpoint` own the displayed channel identity/subscriber count; current `creatorVideosButton` (plural), legacy `creatorVideoButton`, and `creatorAboutButton` are channel navigation actions. |
 | `videoDescriptionInfocardsSectionRenderer.creatorCustomUrlButtons[]` | Creator-defined link actions. Preserve each `buttonViewModel.title`, icon, and exact `onTap.innertubeCommand`; do not flatten these link labels into the creator body, statistics, keywords, or recommendation cards. |
 | `linearLayoutViewModel.items[].listItemViewModel` under the exact description panel | Newer structured “Video details” rows. `title.content` identifies Date/Viewers/Likes; Date/Viewers use `trailingLabel.content`, while Likes uses the state-aware `listItemLikeCountViewModel` values. Treat these as schema-compatible fallbacks when equivalent header factoids are absent. |
 | Comments panel attachment | Independently owned comments surface; it must not be mistaken for or required by description loading. |
 
 Status: **Ended-LIVE replay Search/Watch/description ownership is inventoried
 and correlated to the streamed player response.**
+
+### Mobile Watch chapters across description and player (2026-07-22)
+
+Source captures:
+
+- `FilterTubeApp/docs/app/native-owned-main/chapters.html` contains the
+  description-sheet horizontal shelf, the exact `get_watch` chapter engagement
+  panel, and the hydrated full Chapters panel; and
+- `FilterTubeApp/docs/app/native-owned-main/player.html` contains the active
+  mobile player DOM and its `View Chapters` control.
+
+The description sheet exposes a summary shelf rather than a second chapter
+model:
+
+```html
+<div class="horizontal-card-list-container macromarker">
+  <ytm-rich-list-header-renderer>
+    <button aria-label="View all">...</button>
+  </ytm-rich-list-header-renderer>
+  <ytm-macro-markers-list-item-renderer>...</ytm-macro-markers-list-item-renderer>
+</div>
+```
+
+`View all` targets the dedicated current-video panel:
+
+```html
+<ytm-engagement-panel-section-list-renderer
+  class="engagement-panel-macro-markers-description-chapters">
+  <ytm-macro-markers-list-renderer>
+    <ytm-macro-markers-list-item-renderer>...</ytm-macro-markers-list-item-renderer>
+  </ytm-macro-markers-list-renderer>
+</ytm-engagement-panel-section-list-renderer>
+```
+
+The player exposes the same model through
+`.ytwPlayerTimeDisplayPlayerBarActionContainer button[aria-label="View Chapters"]`.
+This is a player-control entry point, not evidence for a separate player or
+media source.
+
+| Evidence | Ownership/parsing rule |
+| --- | --- |
+| `panelIdentifier == "engagement-panel-macro-markers-description-chapters"` | Exact current-video Chapters panel. Do not collect marker renderers from unrelated engagement panels. |
+| `macroMarkersListRenderer.contents[].macroMarkersListItemRenderer` | Ordered chapter list. Preserve server order while treating the exact start time as identity. |
+| `.title` + `.timeDescription.simpleText` | Visible chapter title and timestamp. The accessibility time is presentation support, not a different seek target. |
+| `.thumbnail.thumbnails[]` | Chapter-frame candidates. Select a bounded suitable image; do not download video ranges to synthesize chapter art. |
+| `.onTap.watchEndpoint.videoId` or Watch URL | Correlates the action to the selected video. Reject a chapter action after the Watch owner changes. |
+| Description `View all` and player `View Chapters` | Two entry points to one owned chapter list/panel. Neither may mutate recommendation, queue, or History ownership. |
+| `.ytm-macro-markers-list-item-endpoint.selected` | Presentation of the chapter containing the current player time. It is derived from playback position and chapter boundaries. |
+
+Status: **Mobile description/player chapter DOM and the exact chapter-panel
+renderer contract are inventoried from the supplied captures.**
 
 The 2026-07-21 active-LIVE description fragments
 `b6c99789-4255-4420-94b7-13bfbc1ec37d/pasted-text.txt` (panel header through
