@@ -38,6 +38,7 @@ function mailboxItem(overrides = {}) {
     mailboxItemId: 'mbx-1',
     linkId: 'link-1',
     targetProfileId: 'child-1',
+    targetDeviceId: 'child-device-1',
     sourceDeviceId: 'parent-device',
     sourceProfileId: 'parent-profile',
     scope: 'keywords',
@@ -177,12 +178,23 @@ test('reference provider stores, pulls, and purges ciphertext-only Internet Pick
     const pull = await postJson(`${baseUrl}/managed-mailbox/pull`, {
       linkId: 'link-1',
       targetProfileId: 'child-1',
+      targetDeviceId: 'child-device-1',
       allowedScopes: ['keywords']
     });
     assert.equal(pull.body.ok, true);
     assert.equal(pull.body.items.length, 1);
+    assert.equal(pull.body.items[0].targetDeviceId, 'child-device-1');
     assert.equal(pull.body.items[0].ciphertext, 'ciphertext');
     assert.equal(JSON.stringify(pull.body).includes('must-not-cross'), false);
+
+    const wrongDevicePull = await postJson(`${baseUrl}/managed-mailbox/pull`, {
+      linkId: 'link-1',
+      targetProfileId: 'child-1',
+      targetDeviceId: 'sibling-device-1',
+      allowedScopes: ['keywords']
+    });
+    assert.equal(wrongDevicePull.body.ok, true);
+    assert.equal(wrongDevicePull.body.items.length, 0);
 
     const purge = await postJson(`${baseUrl}/managed-mailbox/purge`, {
       mailboxItemIds: ['mbx-1']

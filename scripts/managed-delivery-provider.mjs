@@ -51,6 +51,7 @@ const MAILBOX_ITEM_KEYS = [
   'mailboxItemId',
   'linkId',
   'targetProfileId',
+  'targetDeviceId',
   'sourceDeviceId',
   'sourceProfileId',
   'scope',
@@ -181,6 +182,7 @@ function normalizeMailboxItem(item, now = Date.now()) {
   clean.mailboxItemId = normalizeString(clean.mailboxItemId);
   clean.linkId = normalizeString(clean.linkId);
   clean.targetProfileId = normalizeString(clean.targetProfileId);
+  clean.targetDeviceId = normalizeString(clean.targetDeviceId);
   clean.sourceDeviceId = normalizeString(clean.sourceDeviceId);
   clean.sourceProfileId = normalizeString(clean.sourceProfileId);
   clean.scope = normalizeScope(clean.scope);
@@ -188,7 +190,7 @@ function normalizeMailboxItem(item, now = Date.now()) {
   clean.policyHash = normalizeString(clean.policyHash);
   clean.createdAtMs = Number(clean.createdAtMs) || now;
   clean.expiresAtMs = normalizeExpiryMs(clean.expiresAtMs, clean.createdAtMs, now);
-  if (!clean.mailboxItemId || !clean.linkId || !clean.targetProfileId || !clean.scope || !clean.revision || !clean.policyHash) return null;
+  if (!clean.mailboxItemId || !clean.linkId || !clean.targetProfileId || !clean.targetDeviceId || !clean.scope || !clean.revision || !clean.policyHash) return null;
   if (!normalizeString(clean.ciphertext) || !normalizeString(clean.ciphertextHash)) return null;
   return clean;
 }
@@ -320,6 +322,7 @@ function matchesRequest(row, request) {
   const allowedScopes = new Set(safeArray(root.allowedScopes || root.scopes).map(normalizeScope).filter(Boolean));
   if (normalizeString(root.linkId) && normalizeString(row.linkId) !== normalizeString(root.linkId)) return false;
   if (normalizeString(root.targetProfileId) && normalizeString(row.targetProfileId) !== normalizeString(root.targetProfileId)) return false;
+  if (normalizeString(root.targetDeviceId) && normalizeString(row.targetDeviceId) !== normalizeString(root.targetDeviceId)) return false;
   if (normalizeString(root.sourceProfileId) && normalizeString(row.sourceProfileId) !== normalizeString(root.sourceProfileId)) return false;
   if (normalizeString(root.sourceDeviceId) && normalizeString(row.sourceDeviceId) !== normalizeString(root.sourceDeviceId)) return false;
   if (allowedScopes.size > 0 && !allowedScopes.has(normalizeScope(row.scope))) return false;
