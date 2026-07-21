@@ -7,6 +7,35 @@
 
 const FILTERTUBE_SEMANTIC_ML_ENABLED = false;
 const ANDROID_CLOSED_TESTING_INVITE_DISMISSED_KEY = 'filtertube_android_closed_testing_invite_dismissed_v1';
+const SHOW_UPDATE_REFRESH_PROMPT_KEY = 'showUpdateRefreshPrompt';
+
+async function initializeUpdateRefreshPromptSetting(setting) {
+    if (!setting) return;
+
+    try {
+        const stored = await runtimeAPI?.storage?.local?.get([SHOW_UPDATE_REFRESH_PROMPT_KEY]);
+        setting.checked = stored?.[SHOW_UPDATE_REFRESH_PROMPT_KEY] !== false;
+    } catch (e) {
+        setting.checked = true;
+    }
+
+    setting.addEventListener('change', async () => {
+        try {
+            await runtimeAPI?.storage?.local?.set({
+                [SHOW_UPDATE_REFRESH_PROMPT_KEY]: setting.checked
+            });
+            UIComponents.showToast(
+                setting.checked
+                    ? 'Update refresh reminders enabled'
+                    : 'Update refresh reminders disabled',
+                setting.checked ? 'success' : 'info'
+            );
+        } catch (e) {
+            setting.checked = !setting.checked;
+            UIComponents.showToast('Could not update refresh reminders', 'error');
+        }
+    });
+}
 
 function organizeHelpReadingOrder(helpView) {
     const shell = helpView?.querySelector('.help-shell');
@@ -3594,6 +3623,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftAutoBackupMode = document.getElementById('ftAutoBackupMode');
     const ftAutoBackupFormat = document.getElementById('ftAutoBackupFormat');
     const settingAutoBackupEnabled = document.getElementById('setting_autoBackupEnabled');
+    const settingShowUpdateRefreshPrompt = document.getElementById('setting_showUpdateRefreshPrompt');
     const ftSelfControlStateBadge = document.getElementById('ftSelfControlStateBadge');
     const ftSelfControlReady = document.getElementById('ftSelfControlReady');
     const ftSelfControlActive = document.getElementById('ftSelfControlActive');
@@ -3846,6 +3876,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Load initial settings
     await StateManager.loadSettings();
+
+    await initializeUpdateRefreshPromptSetting(settingShowUpdateRefreshPrompt);
 
     // Apply theme immediately
     const state = StateManager.getState();
