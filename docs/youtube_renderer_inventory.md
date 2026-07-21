@@ -829,7 +829,7 @@ The first-load Watch document embeds both `ytInitialData` and
 | `videoDescriptionHeaderRenderer.factoid[]` | Structured current-video statistics. `sentimentFactoidRenderer` selects the factoid matching `likeStatusEntity.likeStatus`; ordinary `factoidRenderer.accessibilityText` carries exact views and stream/publish date. Do not flatten these into the creator body. |
 | `videoDescriptionHeaderRenderer.clickableMetadataButtons[].buttonViewModel.title` | Description hashtags such as `#mande`; present them as metadata chips and keep their browse endpoints separate from body links. |
 | `videoAttributesSectionViewModel` | Optional structured attributes, here the game `Apex Legends`, year `2019`, and footer category `Gaming`. These are description-sheet enrichment, not recommendation cards. |
-| `videoDescriptionInfocardsSectionRenderer` | Creator description-sheet card. `sectionTitle`, `sectionSubtitle`, `channelAvatar`, and `channelEndpoint` own the displayed channel identity/subscriber count; `creatorVideosButton` and `creatorAboutButton` are channel navigation actions. |
+| `videoDescriptionInfocardsSectionRenderer` | Creator description-sheet card. `sectionTitle`, `sectionSubtitle`, `channelAvatar`, and `channelEndpoint` own the displayed channel identity/subscriber count; `creatorVideoButton` and `creatorAboutButton` are channel navigation actions. |
 | `videoDescriptionInfocardsSectionRenderer.creatorCustomUrlButtons[]` | Creator-defined link actions. Preserve each `buttonViewModel.title`, icon, and exact `onTap.innertubeCommand`; do not flatten these link labels into the creator body, statistics, keywords, or recommendation cards. |
 | `linearLayoutViewModel.items[].listItemViewModel` under the exact description panel | Newer structured “Video details” rows. `title.content` identifies Date/Viewers/Likes; Date/Viewers use `trailingLabel.content`, while Likes uses the state-aware `listItemLikeCountViewModel` values. Treat these as schema-compatible fallbacks when equivalent header factoids are absent. |
 | Comments panel attachment | Independently owned comments surface; it must not be mistaken for or required by description loading. |
@@ -847,6 +847,95 @@ Videos/About endpoints, and creator-defined YouTube/external links. Its Video
 details rows report `Jul 21, 2026`, `20` viewers, and an entity-backed `20`
 likes. These are general renderer contracts, not values to hard-code for that
 video.
+
+### Mobile hashtag browse page (2026-07-21)
+
+Source capture:
+
+- `FilterTubeApp/docs/app/native-owned-main/hashtag.html` contains the complete
+  signed-in mobile document for `/hashtag/apexpredator?ra=m`, the explicit
+  `youtubei/v1/browse` continuation response, and the hydrated DOM.
+
+This surface is visually search-like, but its provider contract is a dedicated
+Browse page. The initial command, both tabs, and continuation all use
+`browseId == "FEhashtag"`; this must not be normalized as an ordinary
+`/results?search_query=...` request.
+
+The initial JSON ownership tree is:
+
+```text
+header.pageHeaderRenderer
+contents.singleColumnBrowseResultsRenderer.tabs[]
+  -> tabRenderer(title = "All", selected = true)
+     -> content.richGridRenderer.contents[]
+        -> richItemRenderer.content.lockupViewModel
+        -> continuationItemRenderer
+  -> tabRenderer(title = "Shorts")
+     -> content.sectionListRenderer
+```
+
+The header exposes `#apexpredator` plus the localized summary `67K videos •
+20K channels`. Those counts are display metadata, not exact filtering totals
+or continuation bounds. `All` uses `/hashtag/apexpredator`; `Shorts` uses
+`/hashtag/apexpredator/shorts`. Both endpoints retain `FEhashtag` with distinct
+opaque `params` values.
+
+The hydrated DOM confirms the same composition:
+
+```html
+<ytm-browse class="YtmBrowseHost">
+  <yt-page-header-renderer>
+    <yt-page-header-view-model>
+      <yt-dynamic-text-view-model>
+        <h1 aria-label="#apexpredator">#apexpredator</h1>
+      </yt-dynamic-text-view-model>
+      <yt-content-metadata-view-model>
+        <!-- 67K videos • 20K channels -->
+  <ytm-single-column-browse-results-renderer class="modern-tabs">
+    <yt-tab-shape tab-title="All" aria-selected="true">
+    <yt-tab-shape tab-title="Shorts" aria-selected="false">
+    <ytm-rich-grid-renderer class="is-hashtag rich-grid-single-column">
+      <ytm-rich-item-renderer>
+        <yt-lockup-view-model class="ytLockupViewModelWrapper">
+```
+
+Per-card identity and filtering reuse the modern lockup contract already
+inventoried for Home/Search:
+
+| Evidence | Path / DOM | Ownership rule |
+| --- | --- | --- |
+| Video identity | `lockupViewModel.contentId`, `...onTap.innertubeCommand.watchEndpoint.videoId`, `.content-id-*`, and the `/watch?v=...` anchor | These must agree on one card. Do not treat thumbnail, avatar, or inline-preview descendants as separate items. |
+| Title | `metadata.lockupMetadataViewModel.title.content` | Current card keyword evidence. A hashtag inside a title remains title text; it is not page identity. |
+| Channel identity | decorated-avatar `...onTap.innertubeCommand.browseEndpoint.browseId` | Authoritative UC identity when present. The visible name and avatar accessibility label are display fallbacks. |
+| Channel/name/views/age | `contentMetadataViewModel.metadataRows[].metadataParts[]` | Keep the parts paired with their card. Do not promote `views`/`days ago` into header counts. |
+| Thumbnail/duration | `contentImage.thumbnailViewModel.image.sources[]` and overlay badge view models | Ordinary card presentation/readiness evidence. LIVE/Shorts badges still override duration semantics where present. |
+| Card action menu | `lockupMetadataViewModel.menuButton.buttonViewModel.onTap...showSheetCommand` | User-gesture action surface; it is not extra card metadata or a continuation. |
+
+Initial pagination is owned by the terminal
+`richGridRenderer.contents[].continuationItemRenderer`. It posts its opaque
+`continuationCommand.token` to `/youtubei/v1/browse`. The captured response
+uses
+`onResponseReceivedActions[].appendContinuationItemsAction.continuationItems`
+and targets `browse-feedFEhashtag`; its returned terminal continuation repeats
+`CONTINUATION_TRIGGER_ON_ITEM_SHOWN`. Append only to the same hashtag/tab
+scope. A refreshed hashtag, switched tab, changed profile/account/session, or
+incompatible route epoch must invalidate outstanding continuation ownership.
+
+Runtime boundary:
+
+- treat the page as a dedicated `FEhashtag` Browse scope even if its card grid
+  can reuse Search/Home normalization and bounded visible/near-visible
+  readiness;
+- apply FilterTube rules to each normalized video/Short/channel card before
+  admission. The page title itself is navigation/query context and must not
+  whitelist matching cards or bypass channel/keyword/time rules;
+- keep `All` and `Shorts` as separate tab/continuation scopes; and
+- never persist or synthesize the observed `params`, tracking values,
+  continuation tokens, visitor data, or response IDs.
+
+Status: **The supplied initial JSON, continuation JSON, and hydrated DOM are
+inventoried. This does not claim that the extension or native apps already
+implement an `FEhashtag` route.**
 
 New nodes/classes to inventory:
 

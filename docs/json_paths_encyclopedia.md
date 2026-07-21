@@ -7090,7 +7090,7 @@ Creator-infocard paths, where the selected item contains
   `343 thousand subscribers`;
 - `.channelAvatar.thumbnails[]` -> channel avatar candidates;
 - `.channelEndpoint.browseEndpoint` -> exact channel identity/navigation;
-- `.creatorVideosButton.buttonRenderer.command.browseEndpoint` and
+- `.creatorVideoButton.buttonRenderer.command.browseEndpoint` and
   `.creatorAboutButton.buttonRenderer.command.browseEndpoint` -> Videos/About
   channel actions; and
 - `.creatorCustomUrlButtons[].buttonViewModel` -> titled creator link action,
@@ -9300,3 +9300,196 @@ From docs/json_paths_encyclopedia.md, these are the JSON field definitions curre
   - yt-avatar-stack-view-model (collab signal)
   - yt-badge-view-model (status badges like 4K/Subtitles)
   - ytm-bottom-sheet-renderer and yt-list-view-model for injected fallback menu entry placement
+
+# Absolute JSON Trace: Mobile Hashtag Browse (`FEhashtag`)
+*Captured: 2026-07-21 from signed-in mobile web (`MWEB`) for `/hashtag/apexpredator?ra=m`.*
+
+Source capture:
+`FilterTubeApp/docs/app/native-owned-main/hashtag.html` contains the complete
+initial document, a later `youtubei/v1/browse?prettyPrint=false` continuation
+response, and the hydrated page DOM.
+
+The hashtag surface is a dedicated Browse family. Its stable route identity is
+`browseId == "FEhashtag"`; it is not a generic Search response even though the
+result grid is visually similar.
+
+## Initial document and command
+
+The first-load document embeds `ytInitialData` and exposes this initial command:
+
+- Page type: `browse`
+- Command API: `ytCommand.commandMetadata.webCommandMetadata.apiUrl` ->
+  `/youtubei/v1/browse`
+- Browse family: `ytCommand.browseEndpoint.browseId` -> `FEhashtag`
+- Route: `ytCommand.commandMetadata.webCommandMetadata.url` ->
+  `/hashtag/apexpredator`
+- Hashtag/tab selection: `ytCommand.browseEndpoint.params` -> opaque provider
+  state
+
+Do not decode, persist, or synthesize the captured `params`. Retain the exact
+endpoint supplied for the current route/session.
+
+## Header
+
+**Base**: `header.pageHeaderRenderer`
+
+- Page title: `.pageTitle` -> `#apexpredator`
+- Rendered title:
+  `.content.pageHeaderViewModel.title.dynamicTextViewModel.text.content`
+- Accessible title:
+  `.content.pageHeaderViewModel.title.dynamicTextViewModel.rendererContext.accessibilityContext.label`
+- Summary base:
+  `.content.pageHeaderViewModel.metadata.contentMetadataViewModel.metadataRows[]`
+- Summary text:
+  `.metadataParts[].text.content` -> observed `67K videos • 20K channels`
+
+The summary is localized display text. It is not an exact cardinality, a
+pagination limit, or evidence that every returned card is allowed by
+FilterTube policy.
+
+## Tabs and root content
+
+**Base**: `contents.singleColumnBrowseResultsRenderer.tabs[]`
+
+Select each `.tabRenderer` by its semantic title/endpoint rather than array
+position.
+
+Observed `All` tab:
+
+- `.title` -> `All`
+- `.selected` -> `true`
+- `.endpoint.commandMetadata.webCommandMetadata.url` ->
+  `/hashtag/apexpredator`
+- `.endpoint.commandMetadata.webCommandMetadata.apiUrl` ->
+  `/youtubei/v1/browse`
+- `.endpoint.browseEndpoint.browseId` -> `FEhashtag`
+- `.endpoint.browseEndpoint.params` -> opaque All-tab state
+- Content: `.content.richGridRenderer.contents[]`
+
+Observed `Shorts` tab:
+
+- `.title` -> `Shorts`
+- `.endpoint.commandMetadata.webCommandMetadata.url` ->
+  `/hashtag/apexpredator/shorts`
+- `.endpoint.commandMetadata.webCommandMetadata.apiUrl` ->
+  `/youtubei/v1/browse`
+- `.endpoint.browseEndpoint.browseId` -> `FEhashtag`
+- `.endpoint.browseEndpoint.params` -> opaque Shorts-tab state, distinct from
+  the All tab
+- Initial content container: `.content.sectionListRenderer`
+
+All and Shorts are independent tab scopes even though they share
+`browseId == FEhashtag`. Do not append one tab's continuation into the other.
+
+## Modern video lockups in the All grid
+
+**Base**:
+`contents.singleColumnBrowseResultsRenderer.tabs[]`
+`.tabRenderer.content.richGridRenderer.contents[]`
+`.richItemRenderer.content.lockupViewModel`
+
+Core card identity:
+
+- Video id: `.contentId`
+- Content kind: `.contentType` -> observed `LOCKUP_CONTENT_TYPE_VIDEO`
+- Tap video id:
+  `.rendererContext.commandContext.onTap.innertubeCommand.watchEndpoint.videoId`
+- Tap URL:
+  `.rendererContext.commandContext.onTap.innertubeCommand.commandMetadata.webCommandMetadata.url`
+- Title: `.metadata.lockupMetadataViewModel.title.content`
+
+Thumbnail and badge:
+
+- Candidate images: `.contentImage.thumbnailViewModel.image.sources[]`
+- Duration/status overlays:
+  `.contentImage.thumbnailViewModel.overlays[]`
+  `.thumbnailOverlayBadgeViewModel.thumbnailBadges[]`
+  `.thumbnailBadgeViewModel`
+- Resume overlay, when present:
+  `.thumbnailBottomOverlayViewModel.progressBar.thumbnailOverlayProgressBarViewModel.startPercent`
+
+Channel identity:
+
+- Channel UC id:
+  `.metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel`
+  `.rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.browseId`
+- Channel route/handle, when present: the same command's
+  `.commandMetadata.webCommandMetadata.url` and
+  `.browseEndpoint.canonicalBaseUrl`
+- Avatar candidates:
+  `.metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.avatar`
+  `.avatarViewModel.image.sources[]`
+- Display/a11y channel label:
+  `.metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.a11yLabel`
+
+Visible metadata:
+
+- Base:
+  `.metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel`
+- Rows: `.metadataRows[]`
+- Parts: `.metadataParts[].text.content`
+- Part accessibility: `.metadataParts[].text.accessibilityLabel`
+- Delimiter: `.delimiter`
+
+Per-card action menu:
+
+- Base: `.metadata.lockupMetadataViewModel.menuButton.buttonViewModel`
+- Open command: `.onTap.innertubeCommand.showSheetCommand`
+- Inline rows:
+  `.panelLoadingStrategy.inlineContent.sheetViewModel.content.listViewModel.listItems[]`
+
+The action sheet is a user-gesture boundary. Save/share commands, serialized
+entities, tracking values, and playlist mutation parameters are not card
+identity and must not be replayed by filtering/preloading.
+
+## Initial and appended continuation
+
+Initial continuation base:
+
+`...tabRenderer.content.richGridRenderer.contents[]`
+`.continuationItemRenderer`
+
+- Trigger: `.trigger` -> `CONTINUATION_TRIGGER_ON_ITEM_SHOWN`
+- API: `.continuationEndpoint.commandMetadata.webCommandMetadata.apiUrl` ->
+  `/youtubei/v1/browse`
+- Token: `.continuationEndpoint.continuationCommand.token`
+- Request family: `.continuationEndpoint.continuationCommand.request` ->
+  `CONTINUATION_REQUEST_TYPE_BROWSE`
+
+Continuation response base:
+
+`onResponseReceivedActions[]`
+`.appendContinuationItemsAction`
+
+- Appended rows: `.continuationItems[]`
+- Feed target: `.targetId` -> `browse-feedFEhashtag`
+- Terminal next cursor:
+  `.continuationItems[].continuationItemRenderer.continuationEndpoint`
+
+The returned items reuse the same
+`richItemRenderer.content.lockupViewModel` contract. Append only when the
+response still belongs to the current hashtag, tab, account/profile/session,
+and route epoch. Cancel or discard an obsolete response after tab switch,
+refresh, page death, or epoch invalidation.
+
+## DOM correlation and policy boundary
+
+The supplied DOM correlates these JSON paths to:
+
+- `ytm-browse.YtmBrowseHost`
+- `yt-page-header-renderer` / `yt-page-header-view-model`
+- `h1[aria-label="#apexpredator"]`
+- `ytm-single-column-browse-results-renderer.modern-tabs`
+- `yt-tab-shape[tab-title="All"]` and `[tab-title="Shorts"]`
+- `ytm-rich-grid-renderer.is-hashtag.rich-grid-single-column`
+- `ytm-rich-item-renderer > yt-lockup-view-model`
+- terminal `ytm-continuation-item-renderer`
+
+Filtering and readiness are per normalized card. The hashtag header is
+navigation/query context; it does not authorize cards, bypass keyword/channel
+rules, or make far-away grid items preload candidates. Native apps may reuse
+their ordinary page insertion, visible/near-visible readiness, and card-tap
+paths after adding an explicit `FEhashtag` route owner.
+
+Status: **Capture/documentation only. No extension or native runtime support is
+claimed by this entry.**
