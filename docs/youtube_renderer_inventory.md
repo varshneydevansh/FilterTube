@@ -679,9 +679,11 @@ State alignment across the two captures:
 Quality selection is media authority, not description DOM authority. For an
 active LIVE item, Auto and a manual ceiling such as 1080p/1440p/2160p should
 remain attached to the adaptive HLS source. A persisted ceiling can exceed the
-current manifest ladder; it must not be displayed as the currently decoded
-height unless Media3's mounted track groups and selected format support that
-claim. The supplied active-LIVE JSON ladder tops out at 1080p. Downstream Pixel
+current manifest ladder. The existing native settings sheet already lists
+qualities per video: a captured non-LIVE source exposed 2160p60 and 1440p60,
+whereas the tested LIVE sheet correctly stopped at 1080p. The unresolved state
+is the effective selected rendition, which must not be inferred from a hidden
+persisted ceiling. The supplied active-LIVE JSON ladder tops out at 1080p. Downstream Pixel
 evidence showed that fixed 1080p progressive playback could freeze on an
 absolute LIVE timestamp, while HLS started immediately and remained continuous.
 The accepted implementation therefore constrains HLS by the requested maximum

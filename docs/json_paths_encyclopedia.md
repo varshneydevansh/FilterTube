@@ -7014,9 +7014,11 @@ Accepted downstream device evidence later recorded a persisted 1440p ceiling
 with `sourceKind=adaptive_hls`, first frame in 881 ms, and READY in 1.386 s.
 The resolver log could not report the currently selected HLS height, so this is
 evidence for the requested ceiling and working adaptive source, not evidence
-that 1440p was delivered. Settings UI must intersect persisted preference with
-the current mounted track groups and expose the actual selected rendition when
-available.
+that 1440p was delivered. The existing settings UI already exposes the
+per-video ladder: a non-LIVE capture listed 2160p60 and 1440p60, while this
+LIVE ladder stopped at 1080p. Remaining work is to reconcile an unavailable
+persisted ceiling with a truthful effective selection and expose Media3's
+actual selected adaptive rendition when available.
 
 ## Watch-next and description-panel current-video metadata
 
