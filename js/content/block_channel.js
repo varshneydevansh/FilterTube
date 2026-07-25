@@ -1307,6 +1307,7 @@ function hasActiveQuickBlockRuleContext(settings) {
             'filterComments',
             'hideHomeFeed',
             'hideSponsoredCards',
+            'hidePlayables',
             'hideWatchPlaylistPanel',
             'hidePlaylistCards',
             'hideMembersOnly',

@@ -35,6 +35,11 @@
                     description: ''
                 },
                 {
+                    key: 'hidePlayables',
+                    title: 'Hide YouTube Playables',
+                    description: 'Hide Playables shelves, game cards, and navigation entries'
+                },
+                {
                     key: 'hidePlaylistCards',
                     title: 'Hide Playlist cards',
                     description: 'Remove playlist cards across YouTube'

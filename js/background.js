@@ -232,6 +232,7 @@ function buildAutoBackupPayload({ settings, profilesV3, theme }) {
                 hideComments: !!s.hideComments,
                 hideHomeFeed: !!s.hideHomeFeed,
                 hideSponsoredCards: !!s.hideSponsoredCards,
+                hidePlayables: !!s.hidePlayables,
                 hideWatchPlaylistPanel: !!s.hideWatchPlaylistPanel,
                 hidePlaylistCards: !!s.hidePlaylistCards,
                 hideMembersOnly: !!s.hideMembersOnly,
@@ -313,6 +314,7 @@ function readAutoBackupState() {
             'filterComments',
             'hideHomeFeed',
             'hideSponsoredCards',
+            'hidePlayables',
             'hideWatchPlaylistPanel',
             'hidePlaylistCards',
             'hideMembersOnly',
@@ -415,6 +417,7 @@ function readAutoBackupState() {
                 hideComments: hideCommentsFromV4,
                 hideHomeFeed: boolFromV4('hideHomeFeed', !!items?.hideHomeFeed),
                 hideSponsoredCards: boolFromV4('hideSponsoredCards', !!items?.hideSponsoredCards),
+                hidePlayables: boolFromV4('hidePlayables', !!items?.hidePlayables),
                 hideWatchPlaylistPanel: boolFromV4('hideWatchPlaylistPanel', !!items?.hideWatchPlaylistPanel),
                 hidePlaylistCards: boolFromV4('hidePlaylistCards', !!items?.hidePlaylistCards),
                 hideMembersOnly: boolFromV4('hideMembersOnly', !!items?.hideMembersOnly),
@@ -2281,6 +2284,7 @@ function buildProfilesV4FromLegacyState(items, storageUpdates = {}) {
                     hideComments,
                     hideHomeFeed: !!items?.hideHomeFeed,
                     hideSponsoredCards: !!items?.hideSponsoredCards,
+                    hidePlayables: !!items?.hidePlayables,
                     hideWatchPlaylistPanel: !!items?.hideWatchPlaylistPanel,
                     hidePlaylistCards: !!items?.hidePlaylistCards,
                     hideMembersOnly: !!items?.hideMembersOnly,
@@ -2672,6 +2676,7 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             'filterComments',
             'hideHomeFeed',
             'hideSponsoredCards',
+            'hidePlayables',
             'hideWatchPlaylistPanel',
             'hidePlaylistCards',
             'hideMembersOnly',
@@ -3417,6 +3422,7 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             compiledSettings.hideAllShorts = boolFromV4('hideShorts', items.hideAllShorts || false);
             compiledSettings.hideHomeFeed = boolFromV4('hideHomeFeed', items.hideHomeFeed || false);
             compiledSettings.hideSponsoredCards = boolFromV4('hideSponsoredCards', items.hideSponsoredCards || false);
+            compiledSettings.hidePlayables = boolFromV4('hidePlayables', items.hidePlayables || false);
             compiledSettings.hideWatchPlaylistPanel = boolFromV4('hideWatchPlaylistPanel', items.hideWatchPlaylistPanel || false);
             compiledSettings.hidePlaylistCards = boolFromV4('hidePlaylistCards', items.hidePlaylistCards || false);
             compiledSettings.hideMembersOnly = boolFromV4('hideMembersOnly', items.hideMembersOnly || false);
@@ -5454,6 +5460,7 @@ browserAPI.storage.onChanged.addListener((changes, area) => {
             'filterComments',
             'hideHomeFeed',
             'hideSponsoredCards',
+            'hidePlayables',
             'ftProfilesV3',
             FT_PROFILES_V4_KEY
         ];

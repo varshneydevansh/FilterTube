@@ -1437,6 +1437,7 @@ function handleStorageChanges(changes, area) {
         'hideAllShorts',
         'hideHomeFeed',
         'hideSponsoredCards',
+        'hidePlayables',
         'hideWatchPlaylistPanel',
         'hidePlaylistCards',
         'hideMembersOnly',

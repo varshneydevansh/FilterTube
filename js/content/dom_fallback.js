@@ -1218,6 +1218,23 @@ function ensureContentControlStyles(settings) {
         `);
     }
 
+    if (settings.hidePlayables) {
+        rules.push(`
+            ytd-rich-section-renderer:has(a[href^="/playables"]),
+            ytd-rich-shelf-renderer:has(a[href^="/playables"]),
+            ytd-shelf-renderer:has(a[href^="/playables"]),
+            ytm-rich-section-renderer:has(a[href^="/playables"]),
+            ytm-rich-shelf-renderer:has(a[href^="/playables"]),
+            ytd-guide-entry-renderer:has(a[href^="/playables"]),
+            ytd-mini-guide-entry-renderer:has(a[href^="/playables"]),
+            ytm-pivot-bar-item-renderer:has(a[href^="/playables"]),
+            mini-game-card-view-model,
+            yt-playables-game-card-view-model {
+                display: none !important;
+            }
+        `);
+    }
+
     if (settings.hideWatchPlaylistPanel) {
         rules.push(`
             ytd-playlist-panel-renderer,
@@ -2361,6 +2378,7 @@ function hasActiveDOMFallbackWork(settings) {
             'filterComments',
             'hideHomeFeed',
             'hideSponsoredCards',
+            'hidePlayables',
             'hideWatchPlaylistPanel',
             'hidePlaylistCards',
             'hideMembersOnly',
