@@ -9720,6 +9720,13 @@ Select the enabled top-level `buttonRenderer` whose
   .buttonRenderer
 ```
 
+This command is optional even when the shelf is present. A 2026-07-25
+signed-out Android MWEB Home continuation retained the horizontal
+`richShelfRenderer` but omitted an enabled shelf-level `DISMISSAL` command.
+That absence means “no server feedback authority,” not “this is a different
+card family.” A native client may remove the current retained shelf locally,
+but it must not invent or POST a feedback token.
+
 Fields:
 
 - Accessible action label:

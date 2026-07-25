@@ -469,6 +469,13 @@ onResponseReceivedActions[]
   `.serviceEndpoint.feedbackEndpoint.uiActions.hideEnclosingContainer` ->
   `true`
 
+The shelf container and its server-feedback command have different
+availability. A 2026-07-25 signed-out Android MWEB Home continuation rendered
+the same horizontal `richShelfRenderer` without an enabled shelf-level
+`DISMISSAL` command. Consumers may still expose a local close affordance for
+the current retained page, but they must not fabricate a feedback token or
+claim that YouTube recorded `Not interested` when the command is absent.
+
 The feedback request posts that token to
 `https://m.youtube.com/youtubei/v1/feedback?prettyPrint=false`. A successful
 captured response reported
