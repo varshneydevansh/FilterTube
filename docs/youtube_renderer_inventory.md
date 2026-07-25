@@ -372,13 +372,22 @@ YTM camelCase support matrix:
 | Mobile ads/promos | desktop ad slot tags only | `ytm-companion-slot.ytmCompanionSlotRendererHost`, `ytm-companion-ad-renderer.YtmCompanionAdRendererHost`, `ytm-visit-site-cta-renderer.ytmVisitSiteCtaRendererHost` | Hidden only when `hideSponsoredCards` is enabled. |
 | Watch/player controls | older player controls | `ytm-custom-control.ytmCustomControlHost`, `ytm-watch-player-controls.ytmWatchPlayerControlsHost`, `ytm-crawler-description.ytmCrawlerDescriptionHost` | Inventory only. These are player/description controls, not feed cards. |
 
-### Mobile Breaking News rich shelf (2026-07-20)
+### Mobile dismissible injected rich shelves (2026-07-20, updated 2026-07-25)
 
 Source capture:
 `a981f773-c881-4924-82a4-8ef54a7a1fe8/pasted-text.txt` (local Codex
-attachment). YouTube mobile web inserted this as a special Home/feed rich
-section. The capture contains eight video lockups from WION, CNN-News18,
-NDTV, Times Now, India Today, ET Now, moneycontrol, and DNAIndiaNews.
+attachment). YouTube mobile web inserted this as a Home/feed rich section. The
+capture contains eight video lockups from WION, CNN-News18, NDTV, Times Now,
+India Today, ET Now, moneycontrol, and DNAIndiaNews.
+
+The 2026-07-25 continuation JSON and matching DOM prove this is a renderer
+family, not a title-specific `Breaking news` case. The same outer
+`ytm-rich-section-renderer -> ytm-rich-shelf-renderer` contract can carry
+algorithmic topics, localized subtitles such as
+`धर्मेंद्र प्रधान के बारे में खबरें`, and non-news shelves such as
+`Watch it again`. Consumers must classify the container from its renderer,
+horizontal contents, and shelf menu command. They must not whitelist or reject
+it by English title text.
 
 The shelf mixes legacy mobile custom-element names with current camelCase
 view-model classes:
@@ -434,6 +443,39 @@ iy9y4rfgS4U  OgTS2ZQgwZM  R2ieQStJHWQ  XW1ZpAi07D0
 | Per-card menu | `.ytLockupMetadataViewModelMenuButton button[aria-label="More actions"]` | Native card menu anchor. It is separate from the shelf-level Not interested control. |
 | Shelf dismiss | `ytm-menu-renderer.rich-shelf-menu ytm-button-renderer.icon-dismissal button[aria-label="Not interested"]` | YouTube feedback for the whole shelf, not a FilterTube channel-block command. |
 
+The matching JSON shelf contract is:
+
+```text
+onResponseReceivedActions[]
+  .appendContinuationItemsAction.continuationItems[]
+  .richSectionRenderer.content.richShelfRenderer
+```
+
+- Title: `.title.runs[].text`
+- Optional topic/subtitle: `.subtitle.runs[].text`
+- Ordered horizontal cards:
+  `.contents[].richItemRenderer.content.lockupViewModel`
+- Shelf dismissal button:
+  `.menu.menuRenderer.topLevelButtons[].buttonRenderer`
+- Dismissal identity: `.icon.iconType == "DISMISSAL"`
+- Accessible label: `.accessibilityData.accessibilityData.label`, falling back
+  to `.tooltip`
+- Write URL:
+  `.serviceEndpoint.commandMetadata.webCommandMetadata.apiUrl` -> observed
+  `/youtubei/v1/feedback`
+- Feedback token:
+  `.serviceEndpoint.feedbackEndpoint.feedbackToken`
+- Immediate presentation instruction:
+  `.serviceEndpoint.feedbackEndpoint.uiActions.hideEnclosingContainer` ->
+  `true`
+
+The feedback request posts that token to
+`https://m.youtube.com/youtubei/v1/feedback?prettyPrint=false`. A successful
+captured response reported
+`feedbackResponses[].isProcessed == true`. This is the authoritative
+shelf-level `Not interested` mutation. It is not interchangeable with any
+per-card `menuServiceItemRenderer` feedback token.
+
 One card in the capture had an active inline-preview subtree:
 
 ```html
@@ -462,8 +504,10 @@ Filtering boundaries for this shelf:
    snapshot proves names, while authoritative channel identity must come from
    JSON, an existing identity map, or a bounded resolver.
 
-Status: **DOM inventoried; existing generic lockup support is applicable, but
-this entry does not by itself claim a new runtime implementation.**
+Status: **DOM and JSON renderer/action family inventoried. FilterTubeApp
+Android now retains these shelves as titled horizontal lanes and executes the
+captured shelf-level dismissal contract; extension runtime support is not
+claimed here.**
 
 ### Mobile upcoming-premiere Watch DOM (2026-07-21)
 

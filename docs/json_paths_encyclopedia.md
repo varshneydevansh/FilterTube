@@ -9658,3 +9658,141 @@ Status: **Capture paths are correlated through selected-All, selected-Shorts,
 continuation, and hydrated DOM. FilterTubeApp Android native support is installed
 and its hashtag links work from description and comment surfaces. Extension
 runtime support is not claimed here.**
+
+# Absolute JSON Trace: Dismissible Home Rich Shelf
+*Captured: 2026-07-25 from signed-in mobile web (`MWEB`, Home browse
+continuation and `youtubei/v1/feedback`).*
+
+This is the generic contract behind injected horizontal groups such as
+`Breaking news`, localized algorithmic topic shelves, and `Watch it again`.
+The visible title is content, not the renderer type. Do not branch on English
+title strings such as `Breaking news`, `Top news`, or `Latest news`.
+
+## Container paths
+
+Initial Home data:
+
+```text
+contents.singleColumnBrowseResultsRenderer.tabs[]
+  .tabRenderer.content.richGridRenderer.contents[]
+  .richSectionRenderer.content.richShelfRenderer
+```
+
+Home continuation response observed in the supplied capture:
+
+```text
+onResponseReceivedActions[]
+  .appendContinuationItemsAction.continuationItems[]
+  .richSectionRenderer.content.richShelfRenderer
+```
+
+Equivalent responses may use `onResponseReceivedEndpoints[]` or
+`reloadContinuationItemsCommand`; the authority begins at the
+`richSectionRenderer.content.richShelfRenderer` pair.
+
+## Shelf presentation
+
+- Shelf title: `.title.runs[].text` or `.title.simpleText`
+- Optional subtitle/topic:
+  `.subtitle.runs[].text` or `.subtitle.simpleText`
+- Ordered cards:
+  `.contents[].richItemRenderer.content.lockupViewModel`
+- Card video ID: `...lockupViewModel.contentId`
+- Card watch fallback:
+  `...lockupViewModel.rendererContext.commandContext.onTap.innertubeCommand.watchEndpoint.videoId`
+- Card title:
+  `...lockupViewModel.metadata.lockupMetadataViewModel.title.content`
+- Card thumbnail:
+  `...lockupViewModel.contentImage.thumbnailViewModel.image.sources[].url`
+
+The shelf is one horizontally scrollable presentation group. Its cards retain
+their ordinary independent FilterTube policy decisions and Watch/Shorts
+routes. Flattening the card array into unrelated vertical feed cards loses
+upstream grouping, title/subtitle context, and shelf-level controls.
+
+## Shelf-level dismissal command
+
+Select the enabled top-level `buttonRenderer` whose
+`.icon.iconType == "DISMISSAL"`:
+
+```text
+.menu.menuRenderer.topLevelButtons[]
+  .buttonRenderer
+```
+
+Fields:
+
+- Accessible action label:
+  `.accessibilityData.accessibilityData.label`
+- Tooltip fallback: `.tooltip`
+- Click tracking:
+  `.serviceEndpoint.clickTrackingParams`
+- Write API:
+  `.serviceEndpoint.commandMetadata.webCommandMetadata.apiUrl`
+  -> observed `/youtubei/v1/feedback`
+- Feedback token:
+  `.serviceEndpoint.feedbackEndpoint.feedbackToken`
+- Local hide instruction:
+  `.serviceEndpoint.feedbackEndpoint.uiActions.hideEnclosingContainer`
+  -> `true`
+- Corroborating action:
+  `.serviceEndpoint.feedbackEndpoint.actions[].hideEnclosingAction`
+
+The `showMoreButton` in the same shelf is not a dismissal and may have no
+navigation endpoint:
+
+```text
+.showMoreButton.buttonRenderer.icon.iconType == "EXPAND"
+```
+
+Do not promote that presentation control into a route unless an actual
+endpoint is present.
+
+## Feedback mutation
+
+Endpoint:
+
+```text
+POST https://m.youtube.com/youtubei/v1/feedback?prettyPrint=false
+```
+
+Request body authority:
+
+```json
+{
+  "context": {
+    "client": { "clientName": "MWEB" },
+    "clickTracking": {
+      "clickTrackingParams": "<serviceEndpoint.clickTrackingParams>"
+    }
+  },
+  "feedbackTokens": ["<feedbackEndpoint.feedbackToken>"]
+}
+```
+
+Successful response authority:
+
+```text
+feedbackResponses[].isProcessed == true
+```
+
+The captured response also reported `GFEEDBACK.logged_in == 1`; that is session
+telemetry, while `isProcessed` is the mutation receipt used to confirm the
+command.
+
+## Ownership boundary
+
+- This command dismisses the whole rich shelf. It is not the per-card
+  `Not interested` command found inside a card menu.
+- It is YouTube recommendation feedback, not a FilterTube keyword/channel
+  rule, and must not add a durable FilterTube block.
+- Hide the enclosing native shelf immediately after the explicit tap, retain
+  account/profile/session ownership for the POST, and report a failed receipt
+  without resurrecting the shelf underneath the user's finger.
+- Preserve the shelf on initial and continuation pages regardless of title.
+  Let the explicit dismissal command—not a hard-coded news-title blacklist—
+  decide when the group disappears.
+
+Status: **Request, response, renderer, horizontal presentation, and
+shelf-dismissal authority are captured. FilterTubeApp Android consumes this
+contract; extension runtime support is not claimed here.**
