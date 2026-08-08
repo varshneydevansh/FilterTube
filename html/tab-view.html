@@ -1443,6 +1443,37 @@
                             </div>
                         </div>
 
+                        <div class="card help-category-filters-card">
+                            <div class="card-header">
+                                <h3>Category Filters Are Working</h3>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Category Filters use the official category supplied by YouTube for each video.</strong> Open <strong>Content Controls</strong>, find the Category Filters card directly below Core, choose categories, select a mode, and turn the filter on. The same controls are also available in the extension popup.</p>
+                                <div class="help-list">
+                                    <div class="help-item">
+                                        <div class="help-item-title">Block selected</div>
+                                        <div class="help-item-body">Selected categories are hidden. Videos in every other resolved category remain visible.</div>
+                                    </div>
+                                    <div class="help-item">
+                                        <div class="help-item-title">Allow only selected</div>
+                                        <div class="help-item-body">Only videos whose resolved YouTube category is selected are shown. Unknown cards stay covered while FilterTube checks their category, so unrelated videos should not flash briefly and disappear later.</div>
+                                    </div>
+                                    <div class="help-item">
+                                        <div class="help-item-title">This mode is independent</div>
+                                        <div class="help-item-body">The category mode does not change the profile's normal Blocklist or Whitelist mode. For example, a Blocklist profile can still use <strong>Allow only Education and Gaming</strong> for categories.</div>
+                                    </div>
+                                    <div class="help-item">
+                                        <div class="help-item-title">Where it applies</div>
+                                        <div class="help-item-body">FilterTube applies resolved categories to ordinary video cards, the current Watch video, and Watch recommendations. A Mix discovery card may use its seed video's category, but playlist and Mix queue rows are not treated as separate category-owned videos. Comments are never category-filter targets.</div>
+                                    </div>
+                                    <div class="help-item">
+                                        <div class="help-item-title">Why a card may load briefly</div>
+                                        <div class="help-item-body">Home and Search responses often omit category. FilterTube checks only nearby cards through YouTube's structured Player response, reuses saved results, and limits requests to small batches. A short loading veil is expected on uncached cards; repeated “Category unavailable” cards are not normal.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="card help-family-devices-card">
                             <div class="card-header">
                                 <h3>Control Another Device In Plain Words</h3>

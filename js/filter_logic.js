@@ -1087,6 +1087,16 @@
             // Player/watch responses (ytInitialPlayerResponse, /player fetch) expose direct owner metadata
             this._harvestPlayerOwnerData(data);
 
+            // MWEB get_watch responses are streamed as an array whose player item
+            // owns the current video metadata under [i].playerResponse.
+            const streamedItems = Array.isArray(data) ? data : [data];
+            for (const item of streamedItems) {
+                const playerResponse = item && typeof item === 'object' ? item.playerResponse : null;
+                if (playerResponse && typeof playerResponse === 'object' && playerResponse !== data) {
+                    this._harvestPlayerOwnerData(playerResponse);
+                }
+            }
+
             // 1. Check Channel Metadata (appears on channel pages)
             const meta = data?.metadata?.channelMetadataRenderer;
             if (meta?.externalId) {
@@ -1410,23 +1420,29 @@
                 this.settings.videoMetaMap = {};
             }
             const current = this.settings.videoMetaMap;
-            if (current && current[videoId]) {
-                const existing = current[videoId];
-                const nextLength = meta.lengthSeconds;
-                const nextPublish = meta.publishDate;
-                const nextUpload = meta.uploadDate;
-                const same =
-                    (existing?.lengthSeconds === nextLength)
-                    && (existing?.publishDate === nextPublish)
-                    && (existing?.uploadDate === nextUpload);
-                if (same) return;
+            const existing = current[videoId] && typeof current[videoId] === 'object'
+                ? current[videoId]
+                : {};
+            const merged = { ...existing };
+            const incomingLengthSeconds = meta.lengthSeconds;
+            const incomingPublishDate = typeof meta.publishDate === 'string' ? meta.publishDate.trim() : '';
+            const incomingUploadDate = typeof meta.uploadDate === 'string' ? meta.uploadDate.trim() : '';
+            const incomingCategory = typeof meta.category === 'string' ? meta.category.trim() : '';
+            if (incomingLengthSeconds !== null && incomingLengthSeconds !== undefined && incomingLengthSeconds !== '') {
+                merged.lengthSeconds = incomingLengthSeconds;
             }
+            if (incomingPublishDate) merged.publishDate = incomingPublishDate;
+            if (incomingUploadDate) merged.uploadDate = incomingUploadDate;
+            if (incomingCategory) merged.category = incomingCategory;
+            const same =
+                (existing.lengthSeconds === merged.lengthSeconds)
+                && (existing.publishDate === merged.publishDate)
+                && (existing.uploadDate === merged.uploadDate)
+                && (existing.category === merged.category);
+            if (same) return;
 
-            current[videoId] = {
-                ...(current[videoId] && typeof current[videoId] === 'object' ? current[videoId] : {}),
-                ...meta
-            };
-            queueVideoMetaMapping(videoId, meta);
+            current[videoId] = merged;
+            queueVideoMetaMapping(videoId, merged);
         }
 
         /**
@@ -2379,9 +2395,16 @@
                 'endScreenVideoRenderer', 'richItemRenderer', 'lockupViewModel',
                 'shortsLockupViewModel', 'shortsLockupViewModelV2', 'reelItemRenderer',
                 'richGridMedia', 'channelVideoPlayerRenderer', 'playlistPanelVideoRenderer',
-                'playlistRenderer', 'gridPlaylistRenderer', 'radioRenderer', 'compactRadioRenderer'
             ].includes(rendererType);
             if (!isVideoRenderer) return false;
+
+            if (rendererType === 'lockupViewModel') {
+                const isCollectionLockup = Boolean(
+                    getByPath(item, 'contentImage.collectionThumbnailViewModel') ||
+                    getByPath(item, 'rendererContext.commandContext.onTap.innertubeCommand.watchEndpoint.playlistId')
+                );
+                if (isCollectionLockup) return false;
+            }
 
             const tryResolveVideoId = () => {
                 const videoIdPaths = rules && rules.videoId
@@ -2403,12 +2426,9 @@
             const categoryRaw = (meta && typeof meta.category === 'string') ? meta.category.trim() : '';
 
             if (!categoryRaw) {
-                try {
-                    if (typeof scheduleVideoMetaFetch === 'function') {
-                        scheduleVideoMetaFetch(videoId, { needDuration: false, needDates: false, needCategory: true });
-                    }
-                } catch (e) {
-                }
+                // Browse/Search JSON usually omits the official category. Do not
+                // fan out Player requests for every renderer in the response;
+                // the DOM viewport observer hydrates only cards the user is near.
                 return false;
             }
 

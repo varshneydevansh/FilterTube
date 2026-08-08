@@ -1268,3 +1268,43 @@ test('harvestOnly currently emits video-meta map writes from player metadata', (
     source: 'filter_logic'
   }]);
 });
+
+test('harvestOnly reads category from a streamed MWEB get_watch playerResponse', () => {
+  const runtime = loadFilterTubeEngine();
+  const input = [{
+    playerResponse: {
+      videoDetails: {
+        videoId: 'rpPpyanUiPo',
+        channelId: 'UCXRt-HjEaTF6J6regWoopjw',
+        lengthSeconds: '0'
+      },
+      microformat: {
+        playerMicroformatRenderer: {
+          ownerProfileUrl: 'https://www.youtube.com/@RussianwithNastya',
+          publishDate: '2026-07-21',
+          uploadDate: '2026-07-21',
+          category: 'Education'
+        }
+      }
+    },
+    responseType: 'STREAMING_WATCH_RESPONSE_TYPE_PLAYER_RESPONSE'
+  }, {
+    watchNextResponse: {},
+    responseType: 'STREAMING_WATCH_RESPONSE_TYPE_WATCH_NEXT_RESPONSE'
+  }];
+
+  runtime.engine.harvestOnly(input, baseSettings());
+  runtime.flushTimers();
+
+  assert.deepEqual(plain(runtime.messages.filter(message => message?.type === 'FilterTube_UpdateVideoMetaMap')), [{
+    type: 'FilterTube_UpdateVideoMetaMap',
+    payload: [{
+      videoId: 'rpPpyanUiPo',
+      lengthSeconds: '0',
+      publishDate: '2026-07-21',
+      uploadDate: '2026-07-21',
+      category: 'Education'
+    }],
+    source: 'filter_logic'
+  }]);
+});

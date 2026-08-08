@@ -1492,6 +1492,42 @@ html[data-theme="dark"] .exact-toggle.toggle-variant-red.active:hover {
     background: var(--ft-control-row-hover);
 }
 
+.ft-category-selection-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 0 10px;
+}
+
+.ft-category-selection-count {
+    color: var(--ft-color-text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.ft-category-clear {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: var(--ft-color-primary);
+    cursor: pointer;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 0;
+}
+
+.ft-category-clear:hover:not(:disabled) {
+    text-decoration: underline;
+}
+
+.ft-category-clear:disabled {
+    color: var(--ft-color-text-tertiary, var(--ft-color-text-secondary));
+    cursor: default;
+    opacity: 0.55;
+}
+
 html[data-theme="dark"] .content-control-group {
     background: linear-gradient(180deg, rgba(22, 28, 36, 0.96), rgba(16, 22, 30, 0.92));
     border-color: rgba(255, 255, 255, 0.12);

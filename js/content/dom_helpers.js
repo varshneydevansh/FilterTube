@@ -17,7 +17,8 @@ function ensureStyles() {
             .filtertube-hidden-shelf { display: none !important; }
             .filtertube-pending-meta,
             [data-filtertube-pending-category],
-            [data-filtertube-pending-upload-date] {
+            [data-filtertube-pending-upload-date],
+            [data-filtertube-category-unavailable] {
                 position: relative !important;
                 pointer-events: none !important;
                 overflow: hidden !important;
@@ -25,7 +26,8 @@ function ensureStyles() {
 
             .filtertube-pending-meta > *,
             [data-filtertube-pending-category] > *,
-            [data-filtertube-pending-upload-date] > * {
+            [data-filtertube-pending-upload-date] > *,
+            [data-filtertube-category-unavailable] > * {
                 visibility: hidden !important;
             }
 
@@ -45,6 +47,95 @@ function ensureStyles() {
                 animation: filtertube-pending-shimmer 1.1s ease-in-out infinite;
             }
 
+            [data-filtertube-category-unavailable] {
+                display: none !important;
+            }
+
+            html[data-filtertube-watch-category-allow-only="true"] #secondary
+                ytd-compact-video-renderer:not([data-filtertube-watch-category-state="allowed"]):not([data-filtertube-watch-category-state="blocked"]) > *,
+            html[data-filtertube-watch-category-allow-only="true"] #secondary
+                ytd-compact-radio-renderer:not([data-filtertube-watch-category-state="allowed"]):not([data-filtertube-watch-category-state="blocked"]) > *,
+            html[data-filtertube-watch-category-allow-only="true"] #secondary
+                yt-lockup-view-model:not([data-filtertube-watch-category-state="allowed"]):not([data-filtertube-watch-category-state="blocked"]) > * {
+                visibility: hidden !important;
+            }
+
+            [data-filtertube-watch-category-state="pending"],
+            [data-filtertube-watch-category-state="unavailable"] {
+                position: relative !important;
+                overflow: hidden !important;
+                pointer-events: none !important;
+            }
+
+            [data-filtertube-watch-category-state="pending"] > *,
+            [data-filtertube-watch-category-state="unavailable"] > * {
+                visibility: hidden !important;
+            }
+
+            [data-filtertube-watch-category-state="pending"]::after {
+                content: attr(data-filtertube-watch-category-message);
+                position: absolute;
+                inset: 0;
+                z-index: 2;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-sizing: border-box;
+                padding: 12px;
+                border-radius: 10px;
+                color: var(--yt-spec-text-secondary, #606060);
+                background: var(--yt-spec-general-background-a, #f2f2f2);
+                font: 500 12px/1.35 Roboto, Arial, sans-serif;
+                text-align: center;
+            }
+
+            [data-filtertube-watch-category-state="blocked"],
+            [data-filtertube-watch-category-state="unavailable"] {
+                display: none !important;
+            }
+
+            [data-filtertube-watch-category-state="blocked"]::after,
+            [data-filtertube-watch-category-state="unavailable"]::after {
+                content: none !important;
+            }
+
+            [data-filtertube-watch-category-state="pending"]::after {
+                color: transparent;
+                background: linear-gradient(90deg,
+                    rgba(148, 163, 184, 0.18) 0%,
+                    rgba(148, 163, 184, 0.28) 40%,
+                    rgba(148, 163, 184, 0.18) 80%
+                );
+                background-size: 220% 100%;
+                animation: filtertube-pending-shimmer 1.1s ease-in-out infinite;
+            }
+
+            [data-filtertube-current-category-overlay-host="true"] {
+                position: relative !important;
+            }
+
+            #filtertube-current-watch-category-overlay {
+                position: absolute;
+                inset: 0;
+                z-index: 2147483646;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-sizing: border-box;
+                padding: 24px;
+                border-radius: 12px;
+                color: #fff;
+                background: rgba(15, 23, 42, 0.96);
+                font: 600 16px/1.45 Roboto, Arial, sans-serif;
+                text-align: center;
+                white-space: pre-line;
+                pointer-events: auto;
+            }
+
+            #filtertube-current-watch-category-overlay[data-state="pending"] {
+                background: rgba(15, 23, 42, 0.88);
+            }
+
             @keyframes filtertube-pending-shimmer {
                 0% { background-position: 200% 0; }
                 100% { background-position: -200% 0; }
@@ -52,7 +143,7 @@ function ensureStyles() {
             /* Debugging aid (optional, can be toggled) */
             /* .filtertube-hidden { display: block !important; opacity: 0.1 !important; border: 2px solid red !important; } */
         `;
-        document.head.appendChild(style);
+        (document.head || document.documentElement)?.appendChild(style);
     }
 }
 

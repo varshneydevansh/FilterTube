@@ -376,7 +376,9 @@ function readAutoBackupState() {
                 return items?.enabled !== false;
             })();
 
-            const hideCommentsFromV4 = boolFromV4('hideComments', !!items?.hideAllComments);
+            const hideCommentsFromV4 = hasProfilesV4
+                ? activeSettings.hideComments === true
+                : items?.hideAllComments === true;
             const channelsFromV4 = (hasProfilesV4 && Array.isArray(activeMain.channels))
                 ? activeMain.channels
                 : safeArray(items?.filterChannels);
@@ -2199,7 +2201,7 @@ function buildProfilesV4FromLegacyState(items, storageUpdates = {}) {
     const now = nowTs();
 
     const enabled = items?.enabled !== false;
-    const hideComments = !!items?.hideAllComments;
+    const hideComments = items?.hideAllComments === true;
 
     const rawChannels = Object.prototype.hasOwnProperty.call(storageUpdates, 'filterChannels')
         ? storageUpdates.filterChannels
@@ -2493,13 +2495,20 @@ function flushVideoMetaMapUpdates() {
         const map = await ensureVideoMetaMapCache();
         for (const [videoId, meta] of pendingVideoMetaMapUpdates.entries()) {
             if (!videoId || !meta) continue;
+            const existing = map[videoId] && typeof map[videoId] === 'object' ? map[videoId] : {};
+            const merged = {
+                lengthSeconds: meta.lengthSeconds ?? existing.lengthSeconds ?? null,
+                publishDate: meta.publishDate || existing.publishDate || '',
+                uploadDate: meta.uploadDate || existing.uploadDate || '',
+                category: meta.category || existing.category || ''
+            };
             try {
                 if (Object.prototype.hasOwnProperty.call(map, videoId)) {
                     delete map[videoId];
                 }
             } catch (e) {
             }
-            map[videoId] = meta;
+            map[videoId] = merged;
         }
         pendingVideoMetaMapUpdates.clear();
         enforceVideoMetaMapCap(map);
@@ -2559,14 +2568,21 @@ function enqueueVideoMetaMapUpdate(videoId, meta) {
     const publishDateRaw = meta.publishDate;
     const uploadDateRaw = meta.uploadDate;
     const categoryRaw = meta.category;
+    const existing = pendingVideoMetaMapUpdates.get(v)
+        || (videoMetaMapCache && typeof videoMetaMapCache[v] === 'object' ? videoMetaMapCache[v] : {});
+
+    const incomingLengthSeconds = (typeof lengthSecondsRaw === 'number' && Number.isFinite(lengthSecondsRaw))
+        ? lengthSecondsRaw
+        : (typeof lengthSecondsRaw === 'string' && lengthSecondsRaw.trim() ? lengthSecondsRaw.trim() : null);
+    const incomingPublishDate = typeof publishDateRaw === 'string' ? publishDateRaw.trim() : '';
+    const incomingUploadDate = typeof uploadDateRaw === 'string' ? uploadDateRaw.trim() : '';
+    const incomingCategory = typeof categoryRaw === 'string' ? categoryRaw.trim() : '';
 
     const clean = {
-        lengthSeconds: (typeof lengthSecondsRaw === 'number' && Number.isFinite(lengthSecondsRaw))
-            ? lengthSecondsRaw
-            : (typeof lengthSecondsRaw === 'string' ? lengthSecondsRaw.trim() : null),
-        publishDate: (typeof publishDateRaw === 'string' ? publishDateRaw.trim() : ''),
-        uploadDate: (typeof uploadDateRaw === 'string' ? uploadDateRaw.trim() : ''),
-        category: (typeof categoryRaw === 'string' ? categoryRaw.trim() : '')
+        lengthSeconds: incomingLengthSeconds !== null ? incomingLengthSeconds : (existing.lengthSeconds ?? null),
+        publishDate: incomingPublishDate || existing.publishDate || '',
+        uploadDate: incomingUploadDate || existing.uploadDate || '',
+        category: incomingCategory || existing.category || ''
     };
 
     if (!clean.lengthSeconds && !clean.publishDate && !clean.uploadDate && !clean.category) return;
@@ -2992,7 +3008,12 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                 return items.enabled !== false;
             })();
 
-            const hideCommentsFromV4 = boolFromV4('hideComments', items.hideAllComments || false);
+            // Once V4 exists, only the active profile may enable Hide All Comments.
+            // Root hideAllComments remains a legacy migration source, not a
+            // perpetual fallback that can override a profile during refresh.
+            const hideCommentsFromV4 = hasProfilesV4
+                ? activeSettings.hideComments === true
+                : items.hideAllComments === true;
             const v4KeywordEntries = shouldUseKidsProfile
                 ? (Array.isArray(activeKids.blockedKeywords) ? activeKids.blockedKeywords : null)
                 : (() => {
@@ -5400,7 +5421,8 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                 videoId: request.videoId,
                 lengthSeconds: request.lengthSeconds,
                 publishDate: request.publishDate,
-                uploadDate: request.uploadDate
+                uploadDate: request.uploadDate,
+                category: request.category
             }] : []);
 
         for (const entry of entries) {
@@ -5456,6 +5478,7 @@ browserAPI.storage.onChanged.addListener((changes, area) => {
             'contentFilters',
             'hideMembersOnly',
             'hideAllShorts',
+            'hideAllComments',
             'hideComments',
             'filterComments',
             'hideHomeFeed',

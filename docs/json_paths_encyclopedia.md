@@ -6412,7 +6412,7 @@ If `shortBylineText.runs[0].navigationEndpoint.showSheetCommand` exists (Common 
 
 ### `compactVideoRenderer` (Kids / Sidebars)
 **Base Path (Sidebar/XHR)**: `onResponseReceivedEndpoints[0].appendContinuationItemsAction.continuationItems[i].compactVideoRenderer`
-**Base Path (YT Kids Initial Data)**: `contents.kidsHomeScreenRenderer.anchors[0].anchoredSectionRenderer.content.sectionListRenderer.contents[0].itemSectionRenderer.contents[i].compactVideoRenderer`
+**Base Path (YT Kids Initial Data)**: `contents.kidsHomeScreenRenderer.anchors[a].anchoredSectionRenderer.content.sectionListRenderer.contents[s].itemSectionRenderer.contents[i].compactVideoRenderer`
 *File: `YT_KIDS.json`, `YTM-XHR.json`*
 
 - **Video ID**: `...videoId` -> Value: `"6m25h6hvEGw"`
@@ -6425,6 +6425,1314 @@ If `shortBylineText.runs[0].navigationEndpoint.showSheetCommand` exists (Common 
 
 **Action Menu / Feedback**:
 - **"Block this video" Endpoint**: `...menu.menuRenderer.items[0].menuServiceItemRenderer.serviceEndpoint.updateKidsBlacklistEndpoint.items[0].action` -> Value: `"BLOCKLIST_ACTION_BLOCK"`
+
+### YouTube Kids onboarding, parent identity, and child persona APIs (2026-07-26)
+
+#### Onboarding catalog: `kids/get_kids_flow_data`
+
+```text
+POST https://www.youtubekids.com/youtubei/v1/kids/get_kids_flow_data?alt=json
+```
+
+DevTools request-payload observation (the response ledger does not retain this
+request body):
+
+```text
+context.client.clientName == "WEB_KIDS"
+flowTypes[] contains "KIDS_FLOW_TYPE_ONBOARDING"
+```
+
+Top-level response contract:
+
+```text
+responseContext
+onboardingV2
+trackingParams
+flowLabel
+```
+
+The response is a reusable localized page catalog, not a statement that every
+renderer is active. Important paths are:
+
+```text
+onboardingV2.newWelcomePage.kidsWelcomePageRenderer
+onboardingV2.parentWelcomePage.kidsOnboardingWelcomePageRenderer
+onboardingV2.ageGate.kidsOnboardingAgeGateRenderer
+onboardingV2.kidsSignInInfoPage.kidsSignInInfoRenderer
+onboardingV2.selectAccountPage.kidsSelectAccountPageRenderer
+onboardingV2.signInConsentPage.kidsSignInConsentPageRenderer
+onboardingV2.profileCreationPage.kidsProfileCreationPageRenderer
+onboardingV2.kidsCorpusSelectionPage.kidsCorpusSelectionRenderer
+onboardingV2.searchPage.kidsOnboardingSearchPageRenderer
+onboardingV2.profileResultPage.kidsProfileResultPageRenderer
+onboardingV2.kidsParentFeatureTourPage.kidsParentFeatureTourRenderer
+onboardingV2.profileAllSetPage.kidsProfileAllSetPageRenderer
+onboardingV2.invalidReauthPage.kidsInvalidReauthPageRenderer
+```
+
+`profileResultPage` (`Profile created!`, optional secret-code setup, `Next`) is
+distinct from `profileAllSetPage` (profile-ready copy and `Let's go`). The
+invalid-reauth renderer contains `title.runs[]`, `bodyText.runs[]`, and
+`tryAgainButtonText.runs[]`; email placeholders resolve at runtime and are not
+safe fixture data.
+
+#### Account bootstrap, list, and identity classes
+
+```text
+GET  https://www.youtubekids.com/get_access_token
+POST /youtubei/v1/account/accounts_list?alt=json
+POST https://youtubetoken-pa.googleapis.com/v1:getkidstoken
+```
+
+`get_access_token` is the authenticated parent-session bridge and
+`v1:getkidstoken` returns Kids-scoped credential material after the account is
+eligible. Neither response is renderer data; keep both entirely inside the
+provider-auth boundary. `accounts_list` is the identity/profile projection.
+
+Account items:
+
+```text
+contents[].accountSectionListRenderer
+  .contents[].accountItemSectionRenderer
+  .contents[].accountItem
+```
+
+Selection authority:
+
+```text
+accountItem.serviceEndpoint.selectActiveIdentityEndpoint.supportedTokens[]
+```
+
+Two different row classes were observed:
+
+- Parent identity: `hasChannel=true`, selected parent state, and (after Kids
+  consent/profile setup) `kidsSigninToken`.
+- Delegated Kids persona: `hasChannel=false`, `personaIdToken`, parent owner ID,
+  and `REGISTERED_GAIA_SERVICES_IS_YOUTUBE_PERSONA`.
+
+The invariant is one active parent Google identity with zero or more delegated
+Kids personas. Persona rows are not YouTube channels. A different Google
+identity cannot satisfy reauthentication for a mutation owned by the current
+parent; parent switching is a separate sign-out/account-switch operation.
+
+Never retain values from `get_access_token`, `getkidstoken`, account photos or
+bylines, Gaia/persona/data-sync IDs, visitor data, onboarding nonces, OAuth or
+reauth parameters, or tracking material in tracked fixtures.
+
+#### Persona creation and refresh
+
+```text
+POST /youtubei/v1/account/create_kids_persona?alt=json
+```
+
+DevTools request-payload observation (not retained in the raw response ledger):
+
+```text
+givenName
+approximateAge.age
+approximateAge.isMonthSpecified
+approximateAge.month                         (optional)
+avatar.kidsStockAvatar.type
+kidsSettings.corpusPreference
+kidsSettings.noSearchMode
+```
+
+Response fields include the new persona's `obfuscatedGaiaId` and optional
+`personaVersion`. Refresh `accounts_list` after a successful mutation; the
+new delegated persona then appears under the same parent owner.
+
+#### Persona reads and settings
+
+Endpoint markers and response shapes are captured. The request fields below
+are DevTools payload observations and are not retained in the raw ledgers:
+
+```text
+POST /youtubei/v1/account/get_persona?alt=json
+  request:  obfuscatedPersonaId, personaVersion
+  response: persona
+
+POST /youtubei/v1/account/get_setting_values?alt=json
+  request:  settingItemIds[]
+  response: settingValues[].key,
+            settingValues[].value.intValue?,
+            settingValues[].value.stringValue?
+
+POST /youtubei/v1/account/set_setting?alt=json
+  request:  settingItemId, newValue.intValue
+```
+
+The observed client maps opaque setting item `302` to corpus preference and
+`188` to no-search mode. Treat these as provider-owned opaque IDs and retain
+the returned value encoding rather than inventing local enum ordinals.
+
+#### Parent consent / reauthentication boundary
+
+```text
+onLoadCommand.sendKidsRedVerificationCodeEndpoint
+  -> /youtubei/v1/kids_red/send_verification_code?alt=json
+     (catalog-embedded command; no isolated response in these ledgers)
+
+/youtubei/v1/kids_red/process_red_consent?alt=json
+  (captured endpoint marker and response in the zero-persona ledger)
+```
+
+These endpoints lead into or complete Google-owned parent reauthentication.
+Credential entry, passkeys/password challenges, access tokens, reauth state,
+and callback query values are provider-owned secrets and must remain inside
+the trusted WebView/browser boundary.
+
+#### Custom-frontend handoff
+
+The intended product handoff branches are:
+
+```text
+signed-out onboarding Skip                    (runtime-observed control)
+  -> signed-out Kids Home                     (target; response/DOM missing)
+
+returning multi-persona chooser
+  -> tap delegated persona
+  -> settings/token refresh and persona Home /browse    (captured)
+
+new-profile onboarding profileAllSetPage
+  -> Let's go                                           (runtime-observed)
+  -> persona Home                                       (exact click transition missing)
+```
+
+The first native implementation uses signed-out Kids Home as the default. Its
+managed provider bootstrap activates the runtime-observed provider Skip
+control on `selectAccountPage`; the current JSON capture proves the localized
+`skipButtonText`, not a serialized selector or skip API. A clean state may
+then use `kidsSignedOutCorpusSelectionPage`, `parentalNoticePage`, or
+`kidsSignedOutParentFeatureTourPage`, so Home authority—not the click—is the
+completion signal.
+
+Parent and supervised-child sign-in remain reachable behind locked Settings.
+The catalog exposes the supervised-child branches (`childWelcomePage`,
+`unicornSignInPage`, `unicornSignInErrorPage`, and `unicornGetAParentPage`).
+Keep the provider WebView through authentication, consent, persona
+creation/editing, secret-code setup, and parent switching; return to native
+Home only after the signed-out or selected-persona authority exists.
+
+The native Main account-switcher component may be reused visually, but a Kids
+row is a delegated persona, not a channel. A FilterTube profile binding must
+store parent ownership plus the selected persona identity/version; the
+provider reports these persona rows with `hasChannel=false`. Signed-out mode
+has no persona binding and retains only local FilterTube policy plus provider
+signed-out browse/session state.
+
+Current capture boundary: the selected-persona Home response and DOM were
+recaptured on 2026-07-26. The signed-out post-Skip Home response, its DOM, and
+its first continuation were not. Do not assume the signed-out and signed-in
+sections, category counts, continuations, or identity headers are identical.
+
+### YouTube Kids chronological browse, playback, and settings API record (2026-07-26)
+
+This section follows the provider flow in the order a frontend encounters it.
+It consolidates the raw ledgers in `FilterTubeApp/docs/app/native-owned-main/`
+and `YT_Kids_Pages/`. Those ledgers concatenate request annotations, responses,
+and sometimes DOM dumps; most are not single valid JSON documents.
+
+Evidence labels used below:
+
+- **Captured**: the endpoint marker and response shape occur in the ledger.
+- **Runtime-observed**: the visible transition was observed, but its complete
+  request contract was not captured.
+- **Catalog-only**: the renderer is present in `get_kids_flow_data`; that does
+  not prove it was the active page.
+- **Gap**: the native implementation must not synthesize the missing call.
+
+All access tokens, Kids tokens, OAuth/reauth query values, visitor/tracking
+values, signed media URLs, account bylines, names, birthdays, and raw identity
+IDs are volatile or private and are deliberately omitted here.
+
+Endpoint methods shown in the earlier API summaries are browser-network
+observations. The concatenated ledgers usually preserve the URL and response,
+but not every request header or body; absence of those details is not evidence
+that an endpoint is bodyless or safe to reproduce natively.
+
+Capture provenance map:
+
+| Source ledger | Chronological evidence retained |
+| --- | --- |
+| `YT_Kids_nonlogin.json` | signed-out `get_kids_flow_data` catalog and localized Skip labels; no post-Skip Home |
+| `YT_Kids.JSON` | access/account/Kids-token bootstrap, flow catalog, duplicate account refreshes, and optional Lottie assets |
+| `YT_kids_new_profile_714.json` | zero-persona parent state, consent processing, and account refresh; no creation mutation |
+| `YT_kids_already_profile_614.json` | existing persona, add-profile reads, `create_kids_persona`, and post-create account refresh |
+| `YT_Kids_Pages/kids_browse.json` | multi-persona chooser, selected-persona bootstrap, Home `/browse`, and Home DOM |
+| `YT_Kids_Pages/kids_shows.json` | Shows category browse plus playlist/channel/video DOM samples |
+| `YT_Kids_Pages/kids_music.json` | Music category browse plus playlist/video DOM samples |
+| `YT_Kids_Pages/kids_explore.json` | Explore category browse plus playlist/channel/video DOM samples |
+| `YT_Kids_Pages/kids_learning.json` | Learning category browse JSON; no DOM dump |
+| `YT_Kids_Pages/kids_search_bar_and_page.json` | suggestion calls, Search response/continuation token, and result DOM samples |
+| `YT_Kids_Pages/kids_watchpage_normalvideo.json` | normal `/player`, `/next`, second Watch transition, metadata DOM, and related rail DOM |
+| `YT_Kids_Pages/kids_watchpage_playlist.json` | playlist `/next`, `/player`, queue authority, attestation traffic, and Watch DOM |
+| `YT_Kids_Pages/kids_channelpage.json` | Channel `/browse`, header/videos/continuation, and full app-root DOM |
+| `YT_Kids_Pages/kids_subscribebutton.json` | Watch and Channel subscribe/unsubscribe calls plus browse refreshes |
+| `YT_Kids_Pages/kids_settingspage_multi_profile.json` | parent/persona reads, flow/settings reads, and multi-profile Settings DOM |
+| `YT_Kids_Pages/kids_settings_specific_profile.json` | persona/settings reads, captured setting mutations, and specific-profile Settings DOM |
+| `YT_Kids_Pages/kids_parent_gate_flows.json` | sanitized wrong-answer, correct-answer, and custom-passcode gate states plus post-authority Settings request shapes; valid evidence JSON, not a provider response |
+
+#### 1. Signed-out entry, parent setup, and optional sign-in
+
+The chronological UI starts from the reusable catalog already inventoried
+above:
+
+```text
+newWelcomePage
+  -> parentWelcomePage
+  -> ageGate
+  -> kidsSignInInfoPage
+  -> selectAccountPage / addAccountPage
+```
+
+`YT_Kids_nonlogin.json` captures `get_kids_flow_data` with
+`responseContext.serviceTrackingParams[].params[logged_in] == 0`. Both account
+pages expose localized `skipButtonText`; neither embeds a Skip
+`navigationEndpoint` or `serviceEndpoint`.
+
+The signed-out branch is therefore:
+
+```text
+provider-owned Skip handler
+  -> parentalNoticePage                    (possible)
+  -> kidsSignedOutCorpusSelectionPage      (possible)
+  -> searchPage                            (possible)
+  -> kidsSignedOutParentFeatureTourPage    (possible)
+  -> signed-out Home                       (not yet captured)
+```
+
+**Gap:** the post-Skip network sequence, selected-corpus mutation, Search
+choice mutation, persisted completion state, signed-out `/browse` response,
+DOM, and first continuation remain uncaptured. The presence of all page
+definitions in one response does not establish their runtime order.
+
+The root signed-in capture also stores two `gstatic` Lottie JSON documents for
+the parent feature tour. They describe animation frames/layers only. They are
+not Innertube responses, navigation commands, or account state and are
+optional presentation assets for any native implementation.
+
+When the parent signs in, the observed provider sequence is:
+
+```text
+get_access_token
+  -> account/accounts_list
+  -> v1:getkidstoken
+  -> kids/get_kids_flow_data
+  -> consent / reauth as required
+  -> refreshed account/accounts_list
+```
+
+The zero-persona capture additionally records
+`kids_red/process_red_consent`, but not `create_kids_persona`. The
+existing-persona/add-profile capture records the later creation mutation and
+the account-list cardinality change from one child persona to two under the
+same parent.
+
+#### 2. Profile discovery, creation, and selection
+
+Account discovery path:
+
+```text
+contents[]
+  .accountSectionListRenderer.contents[]
+  .accountItemSectionRenderer.contents[]
+  .accountItem
+```
+
+Interpret rows structurally:
+
+```text
+parent row
+  accountItem.hasChannel == true
+  serviceEndpoint.selectActiveIdentityEndpoint.supportedTokens[]
+    includes kidsSigninToken after consent/setup
+
+child persona row
+  accountItem.hasChannel == false
+  serviceEndpoint.selectActiveIdentityEndpoint.supportedTokens[]
+    includes personaIdToken and parent-owner relationship
+```
+
+The literal add-profile marker sequence captured in the existing-persona
+ledger is:
+
+```text
+get_access_token
+  -> v1:getkidstoken
+  -> get_access_token
+  -> accounts_list
+  -> accounts_list
+  -> get_persona
+  -> get_setting_values
+  -> get_kids_flow_data
+  -> accounts_list
+  -> get_setting_values
+  -> create_kids_persona
+  -> accounts_list
+```
+
+The last refresh is the authority that the new persona exists. Never use a
+locally optimistic row as proof of creation.
+
+Profile-read shape:
+
+```text
+persona
+  .name.givenName
+  .birthday
+  .avatar.kidsStockAvatar.type
+  .avatarThumbnail.thumbnails[]
+  .approximateAge
+```
+
+The multi-profile chooser and selection are captured at the start of
+`kids_browse.json`. After a profile tap, the ledger records refreshed token,
+account, settings, and `/browse` traffic. The precise activation request body
+and cookie/session mutation are not isolated.
+
+**Runtime-observed:** one-persona accounts may proceed directly to Home, while
+multi-persona accounts show `Choose a profile`. The account-list cardinality
+supports that behavior, but no captured redirect response defines the rule.
+
+**Gap:** do not reconstruct a persona-selection call solely from
+`selectActiveIdentityEndpoint.supportedTokens[]` until the complete request
+and resulting session state are captured.
+
+#### 3. Selected-persona Home: `/youtubei/v1/browse`
+
+After selection, `kids_browse.json` captures a signed-in, persona-scoped Home
+response. Its top-level authorities are:
+
+```text
+contents.kidsHomeScreenRenderer
+header.kidsCategoriesHeaderRenderer
+```
+
+Category navigation:
+
+```text
+header.kidsCategoriesHeaderRenderer.categoryTabs[]
+  .kidsCategoryTabRenderer
+    .title.runs[]
+    .endpoint.browseEndpoint.browseId
+    .endpoint.browseEndpoint.params
+```
+
+No captured tab carries a `selected` field. The populated Recommended anchor
+and runtime UI identify the active category; do not parse a nonexistent
+`selected=true` flag.
+
+Home sections:
+
+```text
+contents.kidsHomeScreenRenderer.anchors[]
+  .anchoredSectionRenderer
+    .content.sectionListRenderer.contents[]
+      .itemSectionRenderer.contents[]
+```
+
+The selected-persona capture exposes five provider categories:
+`Recommended`, `Shows`, `Music`, `Explore`, and `Learning`. Only Recommended is
+populated in the initial Home response. Tabs and anchors use embedded
+`browseEndpoint` objects containing both `browseId` and opaque `params`;
+preserve the entire endpoint rather than inventing category IDs from localized
+labels.
+
+The populated Home response contains:
+
+```text
+itemSectionRenderer.contents[].compactVideoRenderer
+```
+
+Across Home plus the separately captured category responses, the section item
+union expands to:
+
+```text
+itemSectionRenderer.contents[].compactVideoRenderer
+itemSectionRenderer.contents[].compactPlaylistRenderer
+itemSectionRenderer.contents[].compactChannelRenderer
+```
+
+For `compactVideoRenderer`, retain these stable content fields when present:
+
+```text
+videoId
+title.runs[]
+shortBylineText.runs[]
+lengthText.runs[]
+thumbnail.thumbnails[]
+navigationEndpoint.watchEndpoint
+kidsVideoOwnerExtension.externalChannelId
+menu.menuRenderer.items[].menuServiceItemRenderer
+```
+
+The captured Home response has no continuation. That is a property of this
+sample, not a guarantee that Kids Home never paginates.
+
+Locked parent/Settings entry is carried by:
+
+```text
+header.kidsCategoriesHeaderRenderer
+  .privacyButtonRenderer.buttonRenderer.command
+  .kidsFlowEndpoint.flowType
+```
+
+Preserve that provider command as the authority for entering the Kids parent
+flow; do not route from the lock icon's visible label alone.
+
+#### 4. Category browse responses
+
+Each category selection issues another `/youtubei/v1/browse` using its opaque
+tab endpoint. Captured renderer composition:
+
+| Category capture | Content union observed | Continuation |
+| --- | --- | --- |
+| Shows | playlists, channel, videos | none captured |
+| Music | playlist, videos | none captured |
+| Explore | playlists, channel, videos | none captured |
+| Learning | playlists, videos | none captured |
+
+Each response projects through the same section path:
+
+```text
+contents.kidsHomeScreenRenderer.anchors[]
+  .anchoredSectionRenderer.content.sectionListRenderer.contents[]
+  .itemSectionRenderer.contents[]
+```
+
+Do not flatten playlist or channel promos into video rows. Preserve the
+renderer union so native filtering, routing, and accessibility retain the
+provider content type.
+
+#### 5. Search suggestions and results
+
+Suggestion traffic is separate from Innertube Search:
+
+```text
+https://suggestqueries.google.com/complete/search
+```
+
+The capture records a JSONP suggestion response. Treat it as untrusted text
+input and do not assume it shares the `/youtubei/v1/search` response schema.
+
+Search results are captured from:
+
+```text
+/youtubei/v1/search?alt=json
+```
+
+Result path:
+
+```text
+contents.sectionListRenderer.contents[]
+  .itemSectionRenderer.contents[]
+    .compactVideoRenderer
+    .compactChannelRenderer
+```
+
+Continuation authority:
+
+```text
+contents.sectionListRenderer.contents[]
+  .itemSectionRenderer.continuations[]
+  .nextContinuationData.continuation
+```
+
+The sample proves video and channel results. A short-duration item still uses
+ordinary `compactVideoRenderer`; duration alone must not relabel it as a Main
+YouTube Short.
+
+**Gaps:** request body, debounce/cancellation rules, empty/error states, and
+the continuation response were not captured.
+
+#### 6. Normal Watch: `/player` plus `/next`
+
+Normal playback is a two-authority flow:
+
+```text
+/youtubei/v1/player
+  -> media/playability authority
+
+/youtubei/v1/next
+  -> metadata, owner, autoplay, reporting, and related-rail authority
+```
+
+Player response paths:
+
+```text
+playabilityStatus
+streamingData
+videoDetails
+microformat.playerMicroformatRenderer
+playbackTracking
+captions
+storyboards
+```
+
+Signed media URLs and tracking endpoints are ephemeral playback material; do
+not persist them in fixtures or application state.
+
+Watch metadata:
+
+```text
+contents.twoColumnWatchNextResults.results.results.contents[]
+  .itemSectionRenderer.contents[]
+  .slimVideoMetadataRenderer
+```
+
+Owner projection:
+
+```text
+slimVideoMetadataRenderer.owner.slimOwnerRenderer
+```
+
+Related rail and its continuation:
+
+```text
+contents.twoColumnWatchNextResults.secondaryResults.secondaryResults
+  .results[].compactVideoRenderer
+  .results[].continuationItemRenderer
+    .continuationEndpoint.continuationCommand.token
+```
+
+Watch uses `continuationItemRenderer`; `nextContinuationData` belongs to the
+captured Search and Channel shapes and must not be reused for this rail.
+
+Autoplay and Kids reporting:
+
+```text
+contents.twoColumnWatchNextResults.autoplay.autoplay
+videoReporting.kidsReportingRenderer
+```
+
+Keep `/player` and `/next` independently retryable. A successful media response
+does not prove metadata/rail readiness, and a successful `/next` response does
+not prove playable media.
+
+#### 7. Playlist Watch and queue
+
+Playlist Watch retains the same player/metadata/related authorities and adds a
+separate playlist panel:
+
+```text
+contents.twoColumnWatchNextResults.playlist.playlist
+  .playlistId
+  .title
+  .currentIndex
+  .localCurrentIndex
+  .totalVideos
+  .contents[].playlistPanelVideoRenderer
+```
+
+Queue row fields:
+
+```text
+playlistPanelVideoRenderer.videoId
+playlistPanelVideoRenderer.title.runs[]
+playlistPanelVideoRenderer.shortBylineText.runs[]
+playlistPanelVideoRenderer.lengthText.runs[]
+playlistPanelVideoRenderer.navigationEndpoint.watchEndpoint
+playlistPanelVideoRenderer.selected
+```
+
+The captured response declares more total videos than serialized rows. No
+playlist-panel continuation was captured, so `totalVideos` must not be used as
+an array bound.
+
+The ordinary related rail remains independently available at:
+
+```text
+contents.twoColumnWatchNextResults.secondaryResults.secondaryResults
+```
+
+Never merge playlist queue rows into recommendations; they have different
+ordering and navigation authority.
+
+The playlist ledger also includes three playback-support resources:
+
+```text
+https://jnn-pa.googleapis.com/$rpc/google.internal.waa.v1.Waa/Create
+/youtubei/v1/att/get?alt=json
+/s/player/<BUILD>/player_es6.vflset/<LOCALE>/kids.js
+```
+
+The first two carry opaque attestation/platform material; the last is the
+versioned Kids player program. None is playlist renderer data. Do not parse
+their payloads to construct queue state, and never commit the opaque
+attestation body. Keep acquisition, versioning, retries, and expiry with the
+provider/media implementation.
+
+#### 8. Channel browse
+
+The channel page is captured from `/youtubei/v1/browse` with:
+
+```text
+header.c4TabbedHeaderRenderer
+
+contents.sectionListRenderer.contents[]
+  .itemSectionRenderer.contents[]
+  .compactVideoRenderer
+
+contents.sectionListRenderer.contents[]
+  .itemSectionRenderer.continuations[]
+  .nextContinuationData.continuation
+```
+
+The sample contains a populated video grid and a continuation token. Header
+identity/subscription state and video pagination must be projected separately;
+do not treat the first page as the complete channel catalog.
+
+#### 9. Subscribe and unsubscribe mutations
+
+Two entry surfaces were captured—Watch owner and Channel header—but both
+resolve actions from provider endpoints embedded in `subscribeButtonRenderer`:
+
+```text
+/youtubei/v1/subscription/subscribe?alt=json
+/youtubei/v1/subscription/unsubscribe?alt=json
+```
+
+```text
+subscribeButtonRenderer.serviceEndpoints[].subscribeEndpoint
+subscribeButtonRenderer.serviceEndpoints[].unsubscribeEndpoint
+```
+
+The subscribe response updates entity state through:
+
+```text
+frameworkUpdates.entityBatchUpdate.mutations[]
+  .payload.subscriptionNotificationStateEntity
+```
+
+The captured unsubscribe response does not expose an equivalent explicit
+boolean. A subsequent browse refresh is therefore required to establish the
+active owner/header state.
+
+The captured follow-up browse payloads contain the category header and do not,
+by themselves, prove the final subscription state. One mixed ledger also
+contains an older JSON state alongside a later DOM label. Treat the latest
+provider response for the active surface as authoritative and never reconcile
+state by capture order across unrelated sessions.
+
+#### 10. Multi-profile parental settings
+
+The provider settings page uses the familiar bootstrap calls:
+
+```text
+account/accounts_list
+kids/get_kids_flow_data
+account/get_setting_values
+```
+
+The account list supplies one parent row and the available delegated persona
+rows. `get_kids_flow_data` again supplies the entire reusable page catalog;
+its consent, reauth, PIN, and invalid-reauth pages are not all visible at once.
+
+The multi-profile settings capture proves reads and presentation, but not the
+request sent by tapping a child row. It also does not capture sign-out,
+passcode creation, feedback, or add-profile mutations.
+
+#### 10a. Parents-only gate state and post-authority Settings bootstrap (2026-07-28)
+
+The gate capture is a valid local evidence JSON document, not a response from a
+new provider endpoint:
+
+```text
+YT_Kids_Pages/kids_parent_gate_flows.json
+  .routeContract
+  .domContract
+  .flows[]
+  .settingsBootstrapRequestShapes
+  .implementationContract
+  .remainingEvidenceGaps
+```
+
+The reusable provider host is `ytk-parental-gate#parental-gate`. Runtime state
+is exposed through `gateStatus`, `mathProblemToDisplay`, `hideMathProblem`, and
+`hidePasscodeInput`. The observed state ledger is:
+
+```text
+flows[id == "wrong_arithmetic_answer"]
+  result.gateOpen == true
+  result.settingsVisible == false
+  result.authorityGranted == false
+
+flows[id == "correct_arithmetic_answer"]
+  result.authorityGranted == true
+  result.settingsInitializationObserved == true
+
+flows[id == "set_own_passcode"].states[0]
+  gateStatus == 4
+  title == "Enter a 4-digit Passcode"
+
+flows[id == "set_own_passcode"].states[1]
+  gateStatus == 5
+  title == "Confirm your passcode"
+
+flows[id == "set_own_passcode"].states[2]
+  gateOpen == false
+  settingsVisible == true
+  routePath == "/settings"
+```
+
+No answer, passcode digit, token, cookie, request value, or identity ID is
+retained. No dedicated gate-verification or passcode-mutation endpoint was
+observed. In particular, `log_event` is telemetry and is not a passcode API.
+The passcode persistence mechanism remains unresolved.
+
+After the provider closes the gate, the captured Settings bootstrap is:
+
+```text
+POST /youtubei/v1/account/accounts_list?alt=json
+  request top level: context
+  response status: 200
+
+POST /youtubei/v1/kids/get_kids_flow_data?alt=json
+  request top level: context, flowTypes
+  response status: 200
+
+POST /youtubei/v1/account/get_setting_values?alt=json
+  request top level: context, settingItemIds
+  observed count: 2
+  response status: 200
+```
+
+These calls initialize Settings; they do not prove passcode storage or grant
+native authority to validate credentials. The native handoff requires both an
+authoritative closed-gate state and Settings readiness. The provider gate must
+run in a dedicated isolated parent boundary: the general YouTube Kids Home,
+categories, Search, Watch, and arbitrary provider navigation are never exposed.
+If the expected gate cannot be verified or isolated, fail closed to a native
+retry/cancel state.
+
+#### 11. Specific-profile settings and mutations
+
+The selected-persona settings capture can be summarized by this deduplicated
+phase sequence; the source ledger retains repeated account/setting refreshes
+and their literal marker order:
+
+```text
+get_access_token
+  -> accounts_list
+  -> v1:getkidstoken
+  -> get_persona
+  -> get_setting_values
+  -> get_kids_flow_data
+  -> browse/header refreshes
+```
+
+Observed mutation endpoint/response plus a DevTools request-payload
+observation (the raw ledger does not retain the request body):
+
+```text
+/youtubei/v1/account/set_setting?alt=json
+  settingItemId
+  newValue.intValue
+```
+
+The provider has been observed mapping opaque item `302` to corpus preference.
+Another settings read associates item `188` with no-search mode. The ledgers
+also contain reads for opaque IDs `36`, `38`, and `206`, whose meanings remain
+unresolved. A `set_setting` response echoing item `93` is adjacent to the
+clear-history annotation, but the missing isolated request body prevents a
+general mapping claim. These numbers are provider-owned protocol keys, not
+local enum values; the frontend should preserve typed response values and
+tolerate unknown IDs.
+
+The capture includes a clear-history annotation adjacent to a `set_setting`
+response, but the ledger does not provide enough isolated request evidence to
+generalize every privacy control to the same mutation contract.
+
+**Still missing:** complete requests/responses for Search toggle, pause watch
+history, pause search history, unblock all videos, edit/delete persona,
+passcode management, sign-out, add profile from Settings, and sibling-profile
+selection. Keep those actions in the provider WebView until separately
+captured and verified.
+
+#### 12. State and ownership rules derived from the complete trace
+
+```text
+parent Google identity
+  -> zero or more delegated Kids personas
+       -> persona-scoped corpus, Search, history, recommendations, settings
+
+FilterTube profile
+  -> optional validated Kids persona binding
+```
+
+- Parent identity owns authentication, consent, reauth, and persona mutation.
+- Selected child persona owns signed-in browse/history/recommendation context.
+- Signed-out Kids owns provider cookies/session plus local FilterTube policy,
+  but no persona binding.
+- A stale/missing persona binding must fall back to provider selection or
+  signed-out mode; never silently bind to the parent row.
+- Native pages may project captured renderer data, but Google credentials,
+  tokens, consent, passkeys/passwords, reauth, and incomplete mutations stay
+  inside the provider-owned WebView.
+
+### YouTube Kids block-by-block JSON structure ledger (2026-07-26)
+
+This is the structural companion to the chronological record above. It audits
+all **133** lines beginning with `---` or `----` in the 16 supplied Kids
+ledgers. A marker is classified as one of:
+
+- an API response or a repeated response from the same API;
+- JSONP (JavaScript callback syntax around a JSON-like value);
+- a static JSON presentation asset;
+- an opaque platform/attestation transport;
+- a non-JSON program or image asset;
+- a capture annotation; or
+- a DOM sample.
+
+Repeated markers remain listed in the per-file index even when their response
+contract is identical. This prevents a repeated refresh from disappearing
+from the chronology without copying volatile account or token values into this
+tracked document.
+
+#### API response structure catalog
+
+##### Parent access bridge: `/get_access_token`
+
+The capture has an XSSI-framed response followed by this JSON object:
+
+```text
+{
+  loginHint
+  accessToken
+  expiresIn
+  authuser
+}
+```
+
+All four fields are provider-auth state. They are documented as field names
+only and must not be logged, persisted in fixtures, or projected into native
+UI state.
+
+##### Parent/persona list: `/youtubei/v1/account/accounts_list`
+
+```text
+{
+  responseContext
+  contents[]
+    .accountSectionListRenderer
+      .contents[]
+        .accountItemSectionRenderer
+          .contents[]
+            .accountItem
+              .accountName.runs[]
+              .accountPhoto.thumbnails[]
+              .isSelected
+              .isDisabled
+              .hasChannel
+              .mobileBanner.thumbnails[]?            (parent row, optional)
+              .accountByline.runs[]?                  (parent row, optional)
+              .serviceEndpoint
+                .selectActiveIdentityEndpoint
+                  .supportedTokens[]
+                    .accountStateToken?
+                    .personaIdToken?                  (delegated child row)
+                    .kidsSigninToken?                 (eligible parent row)
+                    .datasyncIdToken?
+                    .offlineCacheKeyToken?
+                    .offlineOauthConsentStateToken?
+              .identity
+              .unlimitedStatus[]?
+              .accountLogDirectiveInts[]?
+  selectText.runs[]
+}
+```
+
+The renderer distinguishes the parent and child-persona row classes through
+`hasChannel` and the supported token types. Raw names, emails, photos, IDs,
+tokens, and visitor/tracking values are intentionally omitted here.
+
+##### Kids-scoped token: `youtubetoken-pa.googleapis.com/v1:getkidstoken`
+
+```text
+{
+  accessToken
+  expiresIn
+}
+```
+
+This is credential material, not a renderer response. Keep the entire object
+inside the provider-owned authentication/session boundary.
+
+##### Reusable page catalog: `/youtubei/v1/kids/get_kids_flow_data`
+
+```text
+{
+  responseContext
+  onboardingV2
+    .kidsCorpusSelectionPage.kidsCorpusSelectionRenderer
+    .kidsParentFeatureTourPage.kidsParentFeatureTourRenderer
+    .profileResultPage.kidsProfileResultPageRenderer
+    .kidsSignInInfoPage.kidsSignInInfoRenderer
+    .addAccountPage.kidsAddAccountPageRenderer
+    .selectAccountPage.kidsSelectAccountPageRenderer
+    .signInConsentPage.kidsSignInConsentPageRenderer
+    .reauthPage.kidsReauthPageRenderer
+    .newWelcomePage.kidsWelcomePageRenderer
+    .childWelcomePage.kidsChildWelcomePageRenderer
+    .parentWelcomePage.kidsOnboardingWelcomePageRenderer
+    .ageGate.kidsOnboardingAgeGateRenderer
+    .pinGate.kidsOnboardingPinGateRenderer
+    .profileCreationPage.kidsProfileCreationPageRenderer
+    .profileAllSetPage.kidsProfileAllSetPageRenderer
+    .parentalNoticePage.kidsOnboardingParentalNoticePageRenderer
+    .kidsSignedOutParentFeatureTourPage.kidsParentFeatureTourRenderer
+    .kidsSignedOutCorpusSelectionPage.kidsCorpusSelectionRenderer
+    .searchPage.kidsOnboardingSearchPageRenderer
+    .accountUnderagePage.kidsAccountUnderagePageRenderer
+    .invalidReauthPage.kidsInvalidReauthPageRenderer
+    .unicornSignInPage.kidsSignInPageRenderer
+    .unicornSignInErrorPage.kidsChildSignInErrorPageRenderer
+    .unicornGetAParentPage.kidsChildTransitionPageRenderer
+  trackingParams
+  flowLabel
+}
+```
+
+Some less-used branches vary in their nested renderer name across captures;
+the stable authority for those branches is the page key under `onboardingV2`.
+This object is a catalog. Presence of a page does not prove that the page was
+shown or establish its runtime order.
+
+##### Parent-consent completion: `/youtubei/v1/kids_red/process_red_consent`
+
+```text
+{
+  responseContext
+}
+```
+
+The response proves successful processing for the captured call but contains
+no child persona and no renderer. The earlier catalog embeds a separate
+`send_verification_code` command; that command has no isolated response block
+in these ledgers.
+
+##### Persona read: `/youtubei/v1/account/get_persona`
+
+```text
+{
+  responseContext
+  persona
+    .name.givenName
+    .birthday
+    .avatar.kidsStockAvatar.type
+    .avatarThumbnail.thumbnails[]
+    .obfuscatedGaiaId
+    .approximateAge
+}
+```
+
+Names, birthdays, thumbnails, and identifiers are private persona data. The
+paths are retained for parsing; captured values are not repeated.
+
+##### Settings read: `/youtubei/v1/account/get_setting_values`
+
+```text
+{
+  responseContext
+  settingValues[]
+    .key
+    .value.intValue?
+    .value.stringValue?
+}
+```
+
+The key is an opaque provider setting-item ID. Preserve unknown keys and typed
+values: the capture includes both integer and string variants. Captures
+associate `302` with corpus selection and `188` with no-search mode; IDs
+`36`, `38`, and `206` remain unresolved.
+
+##### Persona creation: `/youtubei/v1/account/create_kids_persona`
+
+```text
+{
+  responseContext
+  obfuscatedGaiaId
+  personaVersion?
+}
+```
+
+The request fields described earlier came from DevTools, not from this raw
+response block. A following `accounts_list` refresh is the authority that the
+new persona became available.
+
+##### Setting mutation: `/youtubei/v1/account/set_setting`
+
+```text
+{
+  responseContext
+  settingItemId
+}
+```
+
+The response echoes the affected item, not the entire settings state. Refresh
+the relevant settings/browse authority after mutation. The two captured calls
+are adjacent to clear-history and content-corpus annotations respectively;
+only the latter has enough surrounding evidence to map item `302` generally.
+
+##### Home and category browse: `/youtubei/v1/browse`
+
+Home/category response variant:
+
+```text
+{
+  responseContext
+  contents.kidsHomeScreenRenderer
+    .anchors[]
+      .anchoredSectionRenderer
+        .endpoint.browseEndpoint?
+        .content.sectionListRenderer.contents[]
+          .itemSectionRenderer.contents[]
+            .compactVideoRenderer?
+            .compactPlaylistRenderer?
+            .compactChannelRenderer?
+  header.kidsCategoriesHeaderRenderer
+    .categoryTabs[].kidsCategoryTabRenderer
+      .title.runs[]
+      .endpoint.browseEndpoint
+        .browseId
+        .params
+    .privacyButtonRenderer.buttonRenderer.command?
+}
+```
+
+Channel-page response variant:
+
+```text
+{
+  responseContext
+  contents.sectionListRenderer.contents[]
+    .itemSectionRenderer
+      .contents[].compactVideoRenderer
+      .continuations[].nextContinuationData.continuation?
+  header.c4TabbedHeaderRenderer
+}
+```
+
+Some browse refresh blocks after subscription or Settings mutations contain
+only `responseContext` plus `header.kidsCategoriesHeaderRenderer`. Therefore
+`contents` is variant-dependent, not mandatory.
+
+##### Search: `/youtubei/v1/search`
+
+```text
+{
+  responseContext
+  estimatedResults?
+  contents.sectionListRenderer.contents[]
+    .itemSectionRenderer
+      .contents[]
+        .compactVideoRenderer?
+        .compactChannelRenderer?
+      .continuations[]
+        .nextContinuationData.continuation?
+}
+```
+
+The capture proves video and channel results plus a continuation token. It
+does not capture the continuation response.
+
+##### Search suggestions: `suggestqueries.google.com/complete/search`
+
+These six blocks are JSONP, not JSON documents:
+
+```text
+callback && callback([
+  query,
+  [
+    [suggestionText, score, [typeCode, ...]],
+    ...
+  ],
+  metadataObject
+])
+```
+
+The callback name and query string are per-request values. Parse the callback
+wrapper as untrusted JavaScript transport rather than feeding the whole block
+to a JSON parser.
+
+##### Subscription create: `/youtubei/v1/subscription/subscribe`
+
+```text
+{
+  responseContext
+  trackingParams
+  frameworkUpdates.entityBatchUpdate
+    .mutations[]
+      .entityKey
+      .type
+      .payload.subscriptionNotificationStateEntity
+    .timestamp
+}
+```
+
+##### Subscription delete: `/youtubei/v1/subscription/unsubscribe`
+
+```text
+{
+  responseContext
+  trackingParams
+}
+```
+
+Because the unsubscribe response does not project the complete active header,
+the subsequent browse refresh remains the UI authority.
+
+##### Playback authority: `/youtubei/v1/player`
+
+```text
+{
+  responseContext
+  playabilityStatus
+  streamingData
+    .expiresInSeconds
+    .formats[]?
+    .adaptiveFormats[]?
+  playbackTracking
+  videoDetails
+  annotations?
+  playerConfig?
+  storyboards?
+  captions?
+  microformat.playerMicroformatRenderer
+  cards?
+  trackingParams?
+  attestation?
+}
+```
+
+Optionality reflects the two supplied player captures. Signed playback URLs,
+tracking URLs, signatures, attestation values, and expiry-bound data must not
+be retained as durable application metadata.
+
+##### Watch metadata, rail, autoplay, and playlist queue: `/youtubei/v1/next`
+
+```text
+{
+  responseContext
+  contents.twoColumnWatchNextResults
+    .results.results.contents[]
+      .itemSectionRenderer.contents[]
+        .slimVideoMetadataRenderer
+    .secondaryResults.secondaryResults.results[]
+      .compactVideoRenderer?
+      .continuationItemRenderer?
+        .continuationEndpoint.continuationCommand.token
+    .playlist.playlist?
+      .playlistId
+      .title
+      .currentIndex
+      .localCurrentIndex
+      .totalVideos
+      .contents[].playlistPanelVideoRenderer
+    .autoplay.autoplay?
+  currentVideoEndpoint?
+  trackingParams?
+  videoReporting.kidsReportingRenderer?
+}
+```
+
+Normal Watch and playlist Watch share `/next`, but only the playlist variant
+contains `playlist.playlist`. The related rail uses
+`continuationItemRenderer`, not Search/Channel `nextContinuationData`.
+
+##### Playback attestation bootstrap: `/youtubei/v1/att/get`
+
+```text
+{
+  responseContext
+  challenge
+  bgChallenge
+    .interpreterUrl.privateDoNotAccessOrElseTrustedResourceUrlWrappedValue
+    .interpreterHash
+    .program
+    .globalName
+    .clientExperimentsStateBlob
+}
+```
+
+This is opaque playback-platform authority. The fields are documented only to
+classify the response; do not execute, persist, or reinterpret them as page
+renderer data.
+
+#### Static, opaque, and non-JSON marker structures
+
+##### Parent-tour Lottie JSON
+
+Both `settings_menu_1.json` and `3dot_signed_in_1.json` use the Lottie asset
+shape:
+
+```text
+{
+  v
+  fr
+  ip
+  op
+  w
+  h
+  nm
+  ddd
+  assets[]
+  layers[]
+}
+```
+
+They are optional animation resources, not Innertube responses or navigation
+state.
+
+##### WAA create transport
+
+`jnn-pa.googleapis.com/$rpc/google.internal.waa.v1.Waa/Create` is captured as
+an opaque array resembling:
+
+```text
+[null, opaqueEncodedPayload]
+```
+
+The payload is not a YouTube renderer tree and must remain owned by the
+provider playback/attestation path.
+
+##### Player program and avatar image
+
+- `/s/player/<BUILD>/player_es6.vflset/<LOCALE>/kids.js` is JavaScript, not
+  JSON.
+- `gstatic.com/ytkids/avatars/...png` is a PNG image, not JSON.
+
+Their marker presence records resource acquisition only.
+
+#### Per-file coverage of every `---` / `----` block
+
+Line numbers refer to the supplied raw ledgers. API ranges list repeated calls
+literally; annotation, DOM, and asset ranges are classified separately.
+
+| Source ledger | API / transport / asset marker lines | Annotation / DOM marker lines | Total |
+| --- | --- | --- | ---: |
+| `YT_Kids.JSON` | `1` access; `8,5975,35502,35745,35988,36230` accounts; `250` Kids token; `259` flow catalog; `6217,21356` Lottie assets | `35501` post-login profile-selection annotation | 12 |
+| `YT_Kids_nonlogin.json` | `1` flow catalog | none | 1 |
+| `YT_kids_new_profile_714.json` | `18,5904,6031` accounts; `168` flow catalog; `5883` consent processing | none | 5 |
+| `YT_kids_already_profile_614.json` | `32,6015,6258,6500,6748,6996,7273,7516,13566,13864` accounts; `277,7247` Kids token; `285,7852` flow catalog; `7239,7265` access; `7758` persona; `7823,13811` settings reads; `13841` persona creation | `7261` post-profile-creation phase annotation | 21 |
+| `YT_Kids_Pages/kids_browse.json` | `16` access; `25,356,678,1001` accounts; `347,1328` Kids token; `1336,1366,1394` settings reads; `1423` Home browse | `1326` post-profile-tap annotation; `12718` Home DOM | 13 |
+| `YT_Kids_Pages/kids_shows.json` | `1` category browse | `6471` Shows DOM; `6473` playlist card; `6477` channel card; `6483` video card | 5 |
+| `YT_Kids_Pages/kids_music.json` | `1` category browse | `6233` playlist card; `6237` video card | 3 |
+| `YT_Kids_Pages/kids_explore.json` | `1` category browse | `5810` playlist card; `5815` channel card; `5822` video card | 4 |
+| `YT_Kids_Pages/kids_learning.json` | `1` category browse | none | 1 |
+| `YT_Kids_Pages/kids_search_bar_and_page.json` | `1,9,16,24,32,39` suggestion JSONP; `56` Search | `51` search-sample annotation; `3604` Search DOM; `3606` video card; `3612` channel card; `3620` short-like normal-video annotation | 12 |
+| `YT_Kids_Pages/kids_watchpage_normalvideo.json` | `1` player; `961` next | `6353` second-Watch transition annotation; `11987` details DOM; `11997` related-rail DOM | 5 |
+| `YT_Kids_Pages/kids_watchpage_playlist.json` | `3` next; `9174` player; `10092` WAA opaque transport; `10099` player JavaScript; `10560` attestation | `10596` Watch DOM; `10598` details DOM; `10610` playlist-rail DOM | 8 |
+| `YT_Kids_Pages/kids_channelpage.json` | `1` Channel browse | `7629` Channel DOM | 2 |
+| `YT_Kids_Pages/kids_subscribebutton.json` | `3,537` subscribe; `301,786` unsubscribe; `57,323,583,809` browse refresh | `298` unsubscribe phase; `535` Channel-page phase | 10 |
+| `YT_Kids_Pages/kids_settingspage_multi_profile.json` | `1` accounts; `335` flow catalog; `6052,6082` settings reads | `6176` multi-profile Settings DOM | 5 |
+| `YT_Kids_Pages/kids_settings_specific_profile.json` | `1` access; `9,343,733,1056,13804` accounts; `334` Kids token; `667,7413` persona reads; `1380,1409,7153,7182,7802,14128` settings reads; `1439,8063` flow catalog; `7212,7859` browse refresh; `7479` avatar PNG; `7837,13781` setting mutations | `7833` clear-history phase; `8060` content-settings phase; `13778` post-content-selection phase; `14158` profile Settings DOM | 26 |
+
+The normal-Watch ledger's `6353` annotation introduces a second Watch
+selection whose response content follows in the concatenated file, but it does
+not contain another endpoint marker. It is therefore counted as an annotation,
+not invented as a second API block. Likewise, the four-dash marker at playlist
+line `10092` is included in the 133-marker audit.
 
 # Absolute JSON Trace: Player Response / Video Meta (`/player` Endpoint)
 *File: `Player?prettyPrint=false`, Inline Player Hover / Active Watch Page*

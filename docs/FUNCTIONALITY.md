@@ -729,23 +729,23 @@ Video E: "@TechChannel" | "AI tutorial" | 12 min | 2024-02-01
 → SHOWN ✓ (passes all filters)
 ```
 
-### Category Filtering (v3.2.7)
+### Category Filtering (current behavior, 2026-08-08)
 
 **Purpose:** Filter videos based on YouTube's video category metadata to curate your feed by content type.
 
+**Status:** Working in the extension UI and runtime. The category control has its own mode and does not inherit or change the profile's normal Blocklist/Whitelist mode.
+
 **Modes:**
-- `blocklist` - Hide videos from specified categories (default: show everything except selected)
-- `whitelist` - Only show videos from specified categories (default: hide everything except selected)
+- `block` / **Block selected** - hide videos whose resolved category is selected.
+- `allow` / **Allow only selected** - show only videos whose resolved category is selected. Unresolved visible cards remain covered until their category resolves; a genuinely unavailable category remains hidden.
 
 **Configuration:**
 
 ```javascript
-contentFilters: {
-    category: {
-        enabled: true,
-        mode: 'blocklist',     // 'blocklist' | 'whitelist'
-        categories: ['Gaming', 'Music']  // Categories to block or allow
-    }
+categoryFilters: {
+    enabled: true,
+    mode: 'allow',                    // 'block' | 'allow'
+    selected: ['Gaming', 'Education']
 }
 ```
 
@@ -776,20 +776,25 @@ contentFilters: {
    videoMetaMap['dQw4w9WgXcQ'].category // "Music"
    ```
 
-2. **Player Microformat** - From `ytInitialPlayerResponse`
+2. **Player Microformat** - From `ytInitialPlayerResponse`, captured `/player`, or the bounded same-origin Player bridge
    ```javascript
    microformat.playerMicroformatRenderer.category // "Music"
    ```
 
-3. **Video Details** - Fallback from player response
-   ```javascript
-   videoDetails.category // "Music"
-   ```
+3. **MWEB streamed player response** - From a `get_watch` item containing `playerResponse.microformat.playerMicroformatRenderer.category`.
+
+Browse, Search, Home, and Watch-next card renderers frequently do not contain the official category. FilterTube therefore resolves only visible/near-visible uncached video IDs through structured Player JSON, with cache reuse, request deduplication, three-request micro-batches, scroll-idle pacing, negative caching, and a rolling request ceiling. It does not issue one redirected `/watch` HTML request per card.
+
+**Ownership boundaries:**
+- Ordinary video cards, the current Watch video, and non-queue Watch recommendations can be category targets.
+- A Mix discovery lockup can use its seed video's category, but playlist and Mix queue rows never inherit that seed category.
+- Chips, shelves, channels, posts, comments, and comment sheets are not category-owned video cards.
+- Nested `yt-lockup-view-model` metadata/host nodes resolve to one outer visual owner so a card is not processed twice.
 
 **Example Scenarios:**
 
 ```ascii
-Mode: "blocklist" (blocking Gaming, Entertainment)
+Mode: "block" / Block selected (Gaming, Entertainment)
 ┌─────────────────────────────────────────────────────┐
 │ Video A: Category "Gaming"        → HIDDEN          │
 │ Video B: Category "Education"     → SHOWN ✓         │
@@ -797,7 +802,7 @@ Mode: "blocklist" (blocking Gaming, Entertainment)
 │ Video D: Category "Music"         → SHOWN ✓         │
 └─────────────────────────────────────────────────────┘
 
-Mode: "whitelist" (allowing only Education, Science & Technology)
+Mode: "allow" / Allow only selected (Education, Science & Technology)
 ┌─────────────────────────────────────────────────────┐
 │ Video A: Category "Gaming"              → HIDDEN    │
 │ Video B: Category "Education"           → SHOWN ✓   │
@@ -811,7 +816,7 @@ Mode: "whitelist" (allowing only Education, Science & Technology)
 Category filtering works alongside other content filters in the decision tree:
 
 ```ascii
-Video Filtering Decision Tree (v3.2.7)
+Video Filtering Decision Tree
 ┌─────────────────────────────────────────┐
 │ Video Card Detected                     │
 └──────────────┬──────────────────────────┘

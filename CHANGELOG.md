@@ -1,5 +1,35 @@
 # Changelog
 
+## Unreleased — Category Filtering Reliability And UI
+
+### Official YouTube category filtering
+
+- **Category filtering is working end to end**: FilterTube reads the official category from `microformat.playerMicroformatRenderer.category`, preserves it in `videoMetaMap`, and applies the user's selected category mode to ordinary video cards, the current Watch video, and Watch recommendations.
+- **Independent mode selection**: Category Filters now use their own `Block selected` or `Allow only selected` mode independently of the profile's normal Blocklist/Whitelist mode.
+- **Full-page and popup controls**: the Category Filters card appears directly below Core and before Feeds in Content Controls, while the popup exposes the same enable switch, mode, selected-category summary, clear action, searchable category chips, and link to the full controls.
+- **Clear selection state**: selected category chips use explicit checked styling and accessible pressed state; the UI states whether categories are Allowed or Blocked and names the current selection.
+
+### Reliable viewport hydration
+
+- **Structured Player bridge**: uncached visible cards request category, duration/date, and video-owner identity through the page's same-origin `/youtubei/v1/player` JSON endpoint. FilterTube no longer fetches redirected `/watch` HTML for category hydration.
+- **Bounded request scheduler**: visible metadata work uses priority, deduplication, cache-satisfaction checks, negative caching, scroll-idle pacing, batches of at most three active requests, and a hard 24-start rolling-minute ceiling.
+- **Next-chunk reliability**: each paced drain fills the next bounded three-card batch. A queued card remains pending instead of aging into an unavailable state before its lookup can run.
+- **No disallowed-content flash in allow-only mode**: newly appended cards receive a synchronous pending veil before the debounced DOM pass. The Watch shell gate is installed before initial fallback delay, resolved blocked cards collapse, and genuinely unavailable cards remain hidden without repeated sentinel text.
+- **Metadata preservation**: category-only updates merge with existing duration and publish/upload dates instead of erasing them; later partial Player responses cannot erase a known category.
+
+### Watch, Mix, comments, and renderer ownership
+
+- **Current Watch enforcement**: a disallowed current video is paused and covered with a stable category explanation without clicking YouTube controls, mutating a playlist, or starting navigation loops.
+- **Watch rail ownership**: current compact and camelCase lockup hosts are canonicalized to one visual card, preventing nested duplicate processing. Playlist/Mix queue rows remain outside category ownership.
+- **Mix seed behavior**: a Mix discovery lockup can resolve the category and channel identity of its seed video. That identity also improves the FilterTube three-dot menu, but it is not copied onto every queue item.
+- **Comment safety**: comment sheets explicitly reject category ownership. V4 profile settings remain authoritative for `Hide All Comments`, preventing a stale legacy root value from silently re-enabling comment hiding during category saves.
+
+### Documentation and proof
+
+- **Current behavior record**: `docs/CATEGORY_FILTER_CURRENT_BEHAVIOR_2026-08-08.md` documents settings, sources, enforcement, scheduling, UI, ownership boundaries, and validation.
+- **YouTube renderer inventory**: documentation now includes the global Home chip bar and the separate “Explore more topics” horizontal chip/video shelf, whose chips are navigation refinements rather than official video categories.
+- **YouTube Kids capture ledger**: the JSON encyclopedia and renderer inventory record the available onboarding, persona, browse, Search, Watch, subscription, settings, parent-gate, and DOM capture files and their evidence boundaries.
+
 ## Version 3.3.5
 
 ### YouTube Breakage Recovery

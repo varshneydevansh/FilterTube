@@ -156,6 +156,204 @@ function isFilterTubeMixOrRadioElement(element) {
     }
 }
 
+function isCategoryPolicyEligibleVideoElement(element, videoId) {
+    if (!element || !(element instanceof Element) || !/^[a-zA-Z0-9_-]{11}$/.test(videoId || '')) {
+        return false;
+    }
+
+    try {
+        if (isFilterTubeCommentSurfaceElement(element)) return false;
+        const path = document.location?.pathname || '';
+        // Active playback surfaces continuously recycle and refill their rows.
+        // They are never category-owned by the generic card pass.
+        if (
+            path.startsWith('/watch') ||
+            path.startsWith('/shorts/') ||
+            path === '/playlist'
+        ) {
+            return false;
+        }
+        const isPlaylistQueue = Boolean(element.closest(
+            'ytd-playlist-panel-renderer, ytd-playlist-panel-video-renderer, ' +
+            'ytd-playlist-panel-video-wrapper-renderer, ' +
+            'ytm-playlist-panel-video-renderer, ytm-playlist-panel-video-wrapper-renderer'
+        ));
+        const isWatchRail = Boolean(element.closest(
+            'ytd-watch-next-secondary-results-renderer, #secondary'
+        ));
+        if (isPlaylistQueue || isWatchRail) {
+            return false;
+        }
+        const tag = (element.tagName || '').toLowerCase();
+        const nonVideoContainerTags = new Set([
+            'ytd-playlist-panel-video-renderer',
+            'ytd-playlist-panel-video-wrapper-renderer',
+            'ytm-playlist-panel-video-renderer',
+            'ytm-playlist-panel-video-wrapper-renderer',
+            'ytm-playlist-video-renderer',
+            'ytd-playlist-renderer',
+            'ytd-grid-playlist-renderer',
+            'ytd-compact-playlist-renderer',
+            'ytd-radio-renderer',
+            'ytd-compact-radio-renderer',
+            'ytm-radio-renderer',
+            'ytm-compact-radio-renderer',
+            'ytm-compact-playlist-renderer',
+            'ytk-compact-playlist-renderer',
+            'ytd-channel-renderer',
+            'ytd-grid-channel-renderer',
+            'ytm-channel-renderer',
+            'ytm-compact-channel-renderer',
+            'ytd-post-renderer',
+            'ytd-backstage-post-renderer',
+            'ytd-backstage-post-thread-renderer',
+            'ytm-post-renderer',
+            'ytm-backstage-post-renderer',
+            'ytm-backstage-post-thread-renderer'
+        ]);
+        if (nonVideoContainerTags.has(tag)) return false;
+
+        // Lockup metadata and host nodes are also matched by VIDEO_CARD_SELECTORS.
+        // Let their outer card own category resolution so one visual card is never
+        // queued or marked multiple times.
+        if (tag === 'yt-lockup-metadata-view-model') return false;
+        const parentDesktopLockup = element.closest('yt-lockup-view-model');
+        if (parentDesktopLockup && parentDesktopLockup !== element) return false;
+        const parentRichItem = element.closest('ytd-rich-item-renderer, ytm-rich-item-renderer');
+        if (parentRichItem && parentRichItem !== element) return false;
+
+        const isMixSeedCard = isFilterTubeMixOrRadioElement(element);
+        if (!isMixSeedCard && element.querySelector(
+            'yt-collection-thumbnail-view-model, yt-collections-stack, ' +
+            'a[href*="start_radio=1"]'
+        )) {
+            return false;
+        }
+
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
+function getFilterTubeVisualCardOwner(element) {
+    if (!element || !(element instanceof Element)) return element || null;
+    try {
+        // Modern desktop Home/Search cards expose the same video through the
+        // outer rich item, a lockup host, a wrapper div, and lockup metadata.
+        // Only the outer visual card may own visibility; otherwise a later
+        // nested pass can restore a card hidden by an earlier outer pass.
+        const richItemOwner = element.closest('ytd-rich-item-renderer, ytm-rich-item-renderer');
+        if (richItemOwner) return richItemOwner;
+
+        if ((element.tagName || '').toLowerCase() === 'ytd-rich-grid-media') {
+            return element.closest('ytd-rich-item-renderer, ytd-item-section-renderer') || element;
+        }
+    } catch (e) {
+    }
+    return element;
+}
+
+function collectFilterTubeVisualCardOwners(selector) {
+    const owners = [];
+    const seen = new Set();
+    let candidates = [];
+    try {
+        candidates = Array.from(document.querySelectorAll(selector));
+    } catch (e) {
+        return owners;
+    }
+
+    for (const candidate of candidates) {
+        const owner = getFilterTubeVisualCardOwner(candidate);
+        if (!owner || seen.has(owner)) continue;
+        seen.add(owner);
+        owners.push(owner);
+    }
+    return owners;
+}
+
+function getCategoryPolicySignature(settings) {
+    const categoryFilters = settings && typeof settings === 'object'
+        ? settings.categoryFilters
+        : null;
+    const enabled = categoryFilters?.enabled === true;
+    const mode = categoryFilters?.mode === 'allow' ? 'allow' : 'block';
+    const selected = Array.isArray(categoryFilters?.selected)
+        ? categoryFilters.selected
+            .map(value => String(value || '').trim().toLowerCase())
+            .filter(Boolean)
+            .sort()
+        : [];
+    return `${enabled ? '1' : '0'}:${mode}:${selected.join(',')}`;
+}
+
+function getActiveCategoryPolicy(settings) {
+    if (settings?.enabled === false) return null;
+    const filters = settings && typeof settings === 'object'
+        ? settings.categoryFilters
+        : null;
+    if (filters?.enabled !== true || !Array.isArray(filters.selected)) return null;
+
+    const selected = filters.selected
+        .map(value => String(value || '').trim().toLowerCase())
+        .filter(Boolean);
+    if (selected.length === 0) return null;
+
+    return {
+        mode: filters.mode === 'allow' ? 'allow' : 'block',
+        selected: new Set(selected),
+        labels: filters.selected.map(value => String(value || '').trim()).filter(Boolean)
+    };
+}
+
+function syncCategoryPolicyShellState(settings) {
+    try {
+        const root = document.documentElement;
+        if (!root) return;
+        const policy = getActiveCategoryPolicy(settings);
+        const isWatchAllowOnly = Boolean(
+            policy?.mode === 'allow' &&
+            String(document.location?.pathname || '').startsWith('/watch')
+        );
+        if (isWatchAllowOnly) {
+            root.setAttribute('data-filtertube-watch-category-allow-only', 'true');
+            if (typeof ensureStyles === 'function') ensureStyles();
+        } else {
+            root.removeAttribute('data-filtertube-watch-category-allow-only');
+        }
+    } catch (e) {
+    }
+}
+
+function getCategoryPolicyDecision(settings, category) {
+    const policy = getActiveCategoryPolicy(settings);
+    if (!policy) return 'inactive';
+
+    const normalizedCategory = String(category || '').trim().toLowerCase();
+    if (!normalizedCategory) return 'unknown';
+
+    const isSelected = policy.selected.has(normalizedCategory);
+    const isBlocked = policy.mode === 'allow' ? !isSelected : isSelected;
+    return isBlocked ? 'blocked' : 'allowed';
+}
+
+function reconcileFilterTubeCardVisibility(element, shouldHide, reason = '', pendingMetaOnly = false) {
+    if (!element) return;
+    if (shouldHide) {
+        toggleVisibility(element, true, reason, pendingMetaOnly);
+        return;
+    }
+
+    // A rule pass may remove only the marker it owns. Never restore a card
+    // while another active FilterTube rule still owns a hide decision.
+    if (hasExplicitHideReasonMarker(element)) {
+        toggleVisibility(element, true, reason || 'FilterTube policy', true);
+        return;
+    }
+    toggleVisibility(element, false, reason, pendingMetaOnly);
+}
+
 function isPlaylistPanelRowElement(elementOrTag) {
     const tag = (typeof elementOrTag === 'string'
         ? elementOrTag
@@ -937,6 +1135,357 @@ function enforceCurrentWatchOwnerBlock(settings) {
     }
 }
 
+const FILTERTUBE_CATEGORY_PENDING_TTL_MS = 8000;
+
+function scheduleWatchCategoryPendingRecheck() {
+    const state = window.__filtertubeWatchCategoryPendingRecheck || (window.__filtertubeWatchCategoryPendingRecheck = {
+        timer: 0
+    });
+    if (state.timer) return;
+    state.timer = setTimeout(() => {
+        state.timer = 0;
+        try {
+            if (typeof applyDOMFallback === 'function') {
+                applyDOMFallback(null, { preserveScroll: true, forceReprocess: true });
+            }
+        } catch (e) {
+        }
+    }, FILTERTUBE_CATEGORY_PENDING_TTL_MS + 120);
+}
+
+function getCurrentWatchVideoId() {
+    try {
+        if (!String(document.location?.pathname || '').startsWith('/watch')) return '';
+        const videoId = new URLSearchParams(document.location?.search || '').get('v') || '';
+        return /^[a-zA-Z0-9_-]{11}$/.test(videoId) ? videoId : '';
+    } catch (e) {
+        return '';
+    }
+}
+
+function getCurrentWatchCategoryOverlayHost() {
+    try {
+        return document.querySelector(
+            'ytd-watch-flexy #player-container-outer, ' +
+            'ytd-watch-flexy #player, ' +
+            'ytm-watch #player-container-outer, ' +
+            'ytm-watch #player'
+        );
+    } catch (e) {
+        return null;
+    }
+}
+
+function setCurrentWatchCategoryOverlay(state, message) {
+    const host = getCurrentWatchCategoryOverlayHost();
+    if (!host) return false;
+
+    let overlay = document.getElementById('filtertube-current-watch-category-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'filtertube-current-watch-category-overlay';
+        overlay.setAttribute('role', 'status');
+        overlay.setAttribute('aria-live', 'polite');
+    }
+    if (overlay.parentElement !== host) {
+        host.appendChild(overlay);
+    }
+    host.setAttribute('data-filtertube-current-category-overlay-host', 'true');
+    const normalizedState = state === 'blocked'
+        ? 'blocked'
+        : (state === 'unavailable' ? 'unavailable' : 'pending');
+    overlay.setAttribute('data-state', normalizedState);
+    overlay.textContent = message || (state === 'blocked' ? 'Blocked by Category Filter' : 'Checking category…');
+    return true;
+}
+
+function clearCurrentWatchCategoryOverlay() {
+    try {
+        const overlay = document.getElementById('filtertube-current-watch-category-overlay');
+        const host = overlay?.parentElement || document.querySelector('[data-filtertube-current-category-overlay-host="true"]');
+        overlay?.remove();
+        host?.removeAttribute?.('data-filtertube-current-category-overlay-host');
+    } catch (e) {
+    }
+}
+
+function pauseCurrentWatchForCategory(videoId) {
+    const state = window.__filtertubeCurrentWatchCategoryState || (window.__filtertubeCurrentWatchCategoryState = {
+        videoId: '',
+        pendingStartedAt: 0,
+        pausedByGuard: false,
+        wasPlaying: false
+    });
+    const video = document.querySelector('video.html5-main-video');
+    if (state.videoId !== videoId) {
+        state.videoId = videoId;
+        state.pendingStartedAt = 0;
+        state.pausedByGuard = false;
+        state.wasPlaying = false;
+    }
+    if (!state.pausedByGuard) {
+        state.wasPlaying = Boolean(video && !video.paused && !video.ended);
+    }
+    state.pausedByGuard = true;
+    try {
+        video?.pause?.();
+    } catch (e) {
+    }
+    return state;
+}
+
+function releaseCurrentWatchCategoryGuard(videoId, resumePlayback = true) {
+    const state = window.__filtertubeCurrentWatchCategoryState;
+    clearCurrentWatchCategoryOverlay();
+    if (!state) return;
+
+    const shouldResume = Boolean(
+        resumePlayback &&
+        state.videoId === videoId &&
+        state.pausedByGuard &&
+        state.wasPlaying &&
+        !document.querySelector('[data-filtertube-current-watch-blocked="true"]')
+    );
+    state.videoId = videoId || '';
+    state.pendingStartedAt = 0;
+    state.pausedByGuard = false;
+    state.wasPlaying = false;
+    if (!shouldResume) return;
+
+    try {
+        const playPromise = document.querySelector('video.html5-main-video')?.play?.();
+        playPromise?.catch?.(() => {});
+    } catch (e) {
+    }
+}
+
+function enforceCurrentWatchCategoryPolicy(settings) {
+    try {
+        const videoId = getCurrentWatchVideoId();
+        const policy = getActiveCategoryPolicy(settings);
+        if (!videoId || !policy || String(document.location?.hostname || '').includes('youtubekids.com')) {
+            releaseCurrentWatchCategoryGuard(videoId, true);
+            return;
+        }
+
+        const state = window.__filtertubeCurrentWatchCategoryState || (window.__filtertubeCurrentWatchCategoryState = {
+            videoId: '',
+            pendingStartedAt: 0,
+            pausedByGuard: false,
+            wasPlaying: false
+        });
+        if (state.videoId && state.videoId !== videoId) {
+            releaseCurrentWatchCategoryGuard(state.videoId, false);
+        }
+        state.videoId = videoId;
+
+        const category = String(settings?.videoMetaMap?.[videoId]?.category || '').trim();
+        const decision = getCategoryPolicyDecision(settings, category);
+        if (decision === 'allowed') {
+            releaseCurrentWatchCategoryGuard(videoId, true);
+            return;
+        }
+
+        if (decision === 'blocked') {
+            pauseCurrentWatchForCategory(videoId);
+            const allowedCopy = policy.mode === 'allow' && policy.labels.length > 0
+                ? `\nAllowed: ${policy.labels.join(', ')}`
+                : '';
+            setCurrentWatchCategoryOverlay(
+                'blocked',
+                `Blocked by Category Filter\nCategory: ${category || 'Unknown'}${allowedCopy}`
+            );
+            return;
+        }
+
+        if (typeof scheduleVideoMetaFetch === 'function') {
+            scheduleVideoMetaFetch(videoId, {
+                needDuration: false,
+                needDates: false,
+                needCategory: true,
+                priority: 'high'
+            });
+        }
+
+        if (policy.mode !== 'allow') {
+            releaseCurrentWatchCategoryGuard(videoId, false);
+            return;
+        }
+
+        const now = Date.now();
+        if (!state.pendingStartedAt) state.pendingStartedAt = now;
+        if (now - state.pendingStartedAt > FILTERTUBE_CATEGORY_PENDING_TTL_MS) {
+            pauseCurrentWatchForCategory(videoId);
+            setCurrentWatchCategoryOverlay(
+                'unavailable',
+                `Category unavailable\nAllowed: ${policy.labels.join(', ')}`
+            );
+            return;
+        }
+
+        pauseCurrentWatchForCategory(videoId);
+        setCurrentWatchCategoryOverlay('pending', 'Checking official YouTube category…');
+        scheduleWatchCategoryPendingRecheck();
+    } catch (e) {
+    }
+}
+
+const FILTERTUBE_WATCH_RAIL_CATEGORY_SELECTOR = [
+    '#secondary ytd-compact-video-renderer',
+    '#secondary yt-lockup-view-model',
+    '#secondary ytd-compact-radio-renderer',
+    'ytd-watch-next-secondary-results-renderer ytd-compact-video-renderer',
+    'ytd-watch-next-secondary-results-renderer yt-lockup-view-model',
+    'ytd-watch-next-secondary-results-renderer ytd-compact-radio-renderer'
+].join(',');
+
+function getWatchRailCategoryStateTargets(card) {
+    const targets = new Set();
+    if (!card) return targets;
+    targets.add(card);
+    try {
+        for (const selector of ['ytd-compact-video-renderer', 'ytd-compact-radio-renderer', 'yt-lockup-view-model']) {
+            const owner = card.closest?.(selector);
+            if (owner) targets.add(owner);
+        }
+        card.querySelectorAll?.('ytd-compact-video-renderer, ytd-compact-radio-renderer, yt-lockup-view-model').forEach(node => {
+            targets.add(node);
+        });
+    } catch (e) {
+    }
+    return targets;
+}
+
+function getWatchRailCategoryCardOwner(candidate) {
+    if (!candidate) return null;
+    try {
+        return candidate.closest?.('ytd-compact-video-renderer, ytd-compact-radio-renderer')
+            || candidate.closest?.('yt-lockup-view-model')
+            || candidate;
+    } catch (e) {
+        return candidate;
+    }
+}
+
+function clearWatchRailCategoryState(root = document) {
+    try {
+        root.querySelectorAll?.('[data-filtertube-watch-category-state]').forEach(card => {
+            card.removeAttribute('data-filtertube-watch-category-state');
+            card.removeAttribute('data-filtertube-watch-category-message');
+            card.removeAttribute('data-filtertube-watch-category-ts');
+            card.removeAttribute('data-filtertube-pending-category');
+            card.removeAttribute('data-filtertube-pending-category-ts');
+        });
+    } catch (e) {
+    }
+}
+
+function setWatchRailCategoryState(card, state, message) {
+    if (!card) return;
+    getWatchRailCategoryStateTargets(card).forEach(target => {
+        target.setAttribute('data-filtertube-watch-category-state', state);
+        target.removeAttribute('data-filtertube-pending-category');
+        target.removeAttribute('data-filtertube-pending-category-ts');
+        if (state === 'pending') {
+            target.setAttribute('data-filtertube-watch-category-message', message || 'Checking category…');
+            if (!target.hasAttribute('data-filtertube-watch-category-ts')) {
+                target.setAttribute('data-filtertube-watch-category-ts', String(Date.now()));
+            }
+        } else {
+            target.removeAttribute('data-filtertube-watch-category-message');
+            target.removeAttribute('data-filtertube-watch-category-ts');
+        }
+    });
+}
+
+function clearWatchRailCategoryCard(card) {
+    if (!card) return;
+    getWatchRailCategoryStateTargets(card).forEach(target => {
+        target.removeAttribute('data-filtertube-watch-category-state');
+        target.removeAttribute('data-filtertube-watch-category-message');
+        target.removeAttribute('data-filtertube-watch-category-ts');
+        target.removeAttribute('data-filtertube-pending-category');
+        target.removeAttribute('data-filtertube-pending-category-ts');
+    });
+}
+
+function isWatchRailCardInCategoryViewport(card) {
+    try {
+        const rect = card.getBoundingClientRect();
+        const viewportHeight = window.innerHeight || document.documentElement?.clientHeight || 800;
+        return rect.bottom > 0 && rect.top < viewportHeight + 160;
+    } catch (e) {
+        return false;
+    }
+}
+
+function enforceWatchRailCategoryPolicy(settings) {
+    try {
+        const path = String(document.location?.pathname || '');
+        const policy = getActiveCategoryPolicy(settings);
+        if (!path.startsWith('/watch') || !policy) {
+            clearWatchRailCategoryState();
+            return;
+        }
+
+        const seen = new Set();
+        const cards = Array.from(document.querySelectorAll(FILTERTUBE_WATCH_RAIL_CATEGORY_SELECTOR));
+        for (const candidate of cards) {
+            const card = getWatchRailCategoryCardOwner(candidate);
+            if (!card || seen.has(card)) continue;
+            seen.add(card);
+            if (card.closest?.('ytd-playlist-panel-renderer, ytd-playlist-panel-video-renderer')) {
+                clearWatchRailCategoryCard(card);
+                continue;
+            }
+
+            const videoId = ensureVideoIdForCard(card);
+            if (!/^[a-zA-Z0-9_-]{11}$/.test(videoId || '')) {
+                clearWatchRailCategoryCard(card);
+                continue;
+            }
+
+            const category = String(settings?.videoMetaMap?.[videoId]?.category || '').trim();
+            const decision = getCategoryPolicyDecision(settings, category);
+            if (decision === 'blocked') {
+                setWatchRailCategoryState(card, 'blocked', '');
+                continue;
+            }
+            if (decision === 'allowed') {
+                setWatchRailCategoryState(card, 'allowed', '');
+                continue;
+            }
+
+            if (!isWatchRailCardInCategoryViewport(card)) {
+                clearWatchRailCategoryCard(card);
+                continue;
+            }
+
+            const scheduled = typeof scheduleVideoMetaFetch === 'function'
+                ? scheduleVideoMetaFetch(videoId, {
+                    needDuration: false,
+                    needDates: false,
+                    needCategory: true,
+                    priority: 'high'
+                })
+                : false;
+
+            if (policy.mode === 'allow') {
+                const previousTs = Number(card.getAttribute('data-filtertube-watch-category-ts') || 0);
+                if (!scheduled && previousTs && Date.now() - previousTs > FILTERTUBE_CATEGORY_PENDING_TTL_MS) {
+                    setWatchRailCategoryState(card, 'unavailable', '');
+                } else {
+                    setWatchRailCategoryState(card, 'pending', 'Checking category…');
+                    scheduleWatchCategoryPendingRecheck();
+                }
+            } else if (!scheduled) {
+                clearWatchRailCategoryCard(card);
+            }
+        }
+    } catch (e) {
+    }
+}
+
 function markedChannelIsStillBlocked(settings, blockedChannelId, blockedChannelHandle, blockedChannelCustom) {
     if (!settings || typeof settings !== 'object') return false;
     if (!Array.isArray(settings.filterChannels) || settings.filterChannels.length === 0) return false;
@@ -1038,6 +1587,8 @@ function isExplicitlyHiddenByFilterTube(element) {
         element.removeAttribute('data-filtertube-hidden-by-duration');
         element.removeAttribute('data-filtertube-hidden-by-upload-date');
         element.removeAttribute('data-filtertube-hidden-by-category');
+        element.removeAttribute('data-filtertube-category-unavailable');
+        element.removeAttribute('data-filtertube-category-unavailable-message');
         element.removeAttribute('data-filtertube-hidden-by-hide-all-shorts');
         try {
             element.style.removeProperty('display');
@@ -1353,7 +1904,7 @@ function ensureContentControlStyles(settings) {
         `);
     }
 
-    if (settings.hideAllComments) {
+    if (settings.hideAllComments === true) {
         rules.push(`
             #comments,
             ytd-comments,
@@ -1921,6 +2472,10 @@ function isFilterTubeCommentSurfaceElement(element) {
             'ytd-comment-thread-renderer',
             'ytd-comment-renderer',
             'ytd-comment-view-model',
+            '.ytwCommentViewModelHost',
+            '.ytCommentViewModelHost',
+            '.ytGhostCommentsHost',
+            '.ytwPinnedCommentBadgeRendererHost',
             'yt-comment-thread-renderer',
             'yt-comment-renderer',
             'yt-comment-view-model',
@@ -2024,7 +2579,7 @@ function handleCommentsFallback(settings) {
     }
 
     // 1. Global Hide
-    if (settings.hideAllComments) {
+    if (settings.hideAllComments === true) {
         commentContainers.forEach(container => {
             toggleVisibility(container, true, 'Hide All Comments');
         });
@@ -2040,6 +2595,27 @@ function handleCommentsFallback(settings) {
 
     // 2. Ensure containers are visible when not globally hidden
     commentContainers.forEach(container => {
+        // Comment sheets are not video cards. Older broad DOM passes could leave
+        // video/category metadata or shelf visibility on these hosts, especially
+        // while YouTube upgrades comment renderers in place. Clear only that
+        // non-comment ownership before restoring the sheet; per-comment keyword
+        // and channel filtering remains handled below.
+        container.removeAttribute('data-filtertube-duration');
+        container.removeAttribute('data-filtertube-video-id');
+        container.removeAttribute('data-filtertube-unique-id');
+        container.removeAttribute('data-filtertube-last-processed-id');
+        container.removeAttribute('data-filtertube-last-processed-mode');
+        container.removeAttribute('data-filtertube-processed');
+        container.removeAttribute('data-filtertube-pending-category');
+        container.removeAttribute('data-filtertube-pending-category-ts');
+        container.removeAttribute('data-filtertube-category-unavailable');
+        container.removeAttribute('data-filtertube-category-unavailable-message');
+        container.removeAttribute('data-filtertube-pending-upload-date');
+        container.removeAttribute('data-filtertube-pending-upload-date-ts');
+        container.removeAttribute('data-filtertube-hidden-by-category');
+        container.removeAttribute('data-filtertube-hidden-by-duration');
+        container.removeAttribute('data-filtertube-hidden-by-upload-date');
+        container.classList.remove('filtertube-hidden-shelf');
         toggleVisibility(container, false, '', true);
     });
     mobileCommentCards.forEach(card => {
@@ -2431,6 +3007,7 @@ function clearStaleDOMFallbackVisibility() {
             '.filtertube-hidden-shelf',
             '[data-filtertube-whitelist-pending="true"]',
             '[data-filtertube-pending-category]',
+            '[data-filtertube-category-unavailable]',
             '[data-filtertube-pending-upload-date]',
             '[data-filtertube-hidden-by-hide-all-shorts]'
         ].join(', ');
@@ -2440,6 +3017,8 @@ function clearStaleDOMFallbackVisibility() {
                 toggleVisibility(el, false, '', true);
                 el.removeAttribute('data-filtertube-whitelist-pending');
                 el.removeAttribute('data-filtertube-pending-category');
+                el.removeAttribute('data-filtertube-category-unavailable');
+                el.removeAttribute('data-filtertube-category-unavailable-message');
                 el.removeAttribute('data-filtertube-pending-upload-date');
                 el.removeAttribute('data-filtertube-pending-category-ts');
                 el.removeAttribute('data-filtertube-pending-upload-date-ts');
@@ -2452,6 +3031,8 @@ function clearStaleDOMFallbackVisibility() {
         if (contentControlStyle) {
             contentControlStyle.textContent = '';
         }
+        clearWatchRailCategoryState();
+        releaseCurrentWatchCategoryGuard(getCurrentWatchVideoId(), true);
     } catch (e) {
     }
 }
@@ -3273,6 +3854,8 @@ async function applyDOMFallback(settings, options = {}) {
     const effectiveSettings = settings || currentSettings;
     if (!effectiveSettings || typeof effectiveSettings !== 'object') return;
 
+    syncCategoryPolicyShellState(effectiveSettings);
+
     const listMode = (effectiveSettings && effectiveSettings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
 
     const runState = window.__filtertubeDomFallbackRunState || (window.__filtertubeDomFallbackRunState = {
@@ -3541,10 +4124,12 @@ async function applyDOMFallback(settings, options = {}) {
     if (effectiveSettings.enabled === false) {
         try {
             clearContentControlStyles();
-            document.querySelectorAll('[data-filtertube-hidden], .filtertube-hidden, [data-filtertube-pending-category], [data-filtertube-pending-upload-date]').forEach(el => {
+            document.querySelectorAll('[data-filtertube-hidden], .filtertube-hidden, [data-filtertube-pending-category], [data-filtertube-category-unavailable], [data-filtertube-pending-upload-date]').forEach(el => {
                 toggleVisibility(el, false, '', true);
                 try {
                     el.removeAttribute('data-filtertube-pending-category');
+                    el.removeAttribute('data-filtertube-category-unavailable');
+                    el.removeAttribute('data-filtertube-category-unavailable-message');
                     el.removeAttribute('data-filtertube-pending-upload-date');
                     el.removeAttribute('data-filtertube-pending-category-ts');
                     el.removeAttribute('data-filtertube-pending-upload-date-ts');
@@ -3557,9 +4142,12 @@ async function applyDOMFallback(settings, options = {}) {
     }
 
     // 1. Video/Content Filtering
-    const videoElements = (onlyWhitelistPending && listMode === 'whitelist')
-        ? document.querySelectorAll(`${VIDEO_CARD_SELECTORS}[data-filtertube-whitelist-pending="true"]`)
-        : document.querySelectorAll(VIDEO_CARD_SELECTORS);
+    const videoElements = collectFilterTubeVisualCardOwners(
+        (onlyWhitelistPending && listMode === 'whitelist')
+            ? `${VIDEO_CARD_SELECTORS}[data-filtertube-whitelist-pending="true"]`
+            : VIDEO_CARD_SELECTORS
+    );
+    const categoryPolicySignature = getCategoryPolicySignature(effectiveSettings);
     const isWatchPage = (() => {
         try {
             return (document.location?.pathname || '').startsWith('/watch');
@@ -3682,6 +4270,22 @@ async function applyDOMFallback(settings, options = {}) {
             const element = videoElements[elementIndex];
             try {
                 if (isFilterTubeCommentSurfaceElement(element)) {
+                    // Category/content-card filtering does not own comment sheets.
+                    // Clear only stale card-category residue; comment author/keyword
+                    // visibility remains owned by handleCommentsFallback below.
+                    const hadCategoryVisibilityState = Boolean(
+                        element.hasAttribute('data-filtertube-pending-category') ||
+                        element.hasAttribute('data-filtertube-hidden-by-category')
+                    );
+                    element.removeAttribute('data-filtertube-pending-category');
+                    element.removeAttribute('data-filtertube-pending-category-ts');
+                    element.removeAttribute('data-filtertube-category-unavailable');
+                    element.removeAttribute('data-filtertube-category-unavailable-message');
+                    element.removeAttribute('data-filtertube-hidden-by-category');
+                    element.removeAttribute('data-filtertube-duration');
+                    if (hadCategoryVisibilityState) {
+                        toggleVisibility(element, false, '', true);
+                    }
                     continue;
                 }
 
@@ -3711,34 +4315,54 @@ async function applyDOMFallback(settings, options = {}) {
 
             let hideByCategory = false;
             let pendingCategoryMeta = false;
+            let categoryAllowOnlyUnknown = false;
+            let categoryFetchScheduled = false;
+            let categoryVideoId = '';
+            let resolvedCategoryForState = '';
             try {
                 const catFilters = effectiveSettings && typeof effectiveSettings === 'object' ? effectiveSettings.categoryFilters : null;
                 const enabled = !!catFilters?.enabled;
                 const selected = Array.isArray(catFilters?.selected) ? catFilters.selected : [];
                 if (enabled && selected.length > 0) {
                     const mode = catFilters?.mode === 'allow' ? 'allow' : 'block';
-                    const isHomeOrSearch = (() => {
-                        try {
-                            const path = document.location?.pathname || '';
-                            return path === '/' || path === '/results';
-                        } catch (e) {
-                            return false;
-                        }
-                    })();
                     const videoId = ensureVideoIdForCard(element);
+                    categoryVideoId = videoId;
+                    const isCategoryEligible = (typeof isCategoryPolicyEligibleVideoElement === 'function')
+                        ? isCategoryPolicyEligibleVideoElement(element, videoId)
+                        : Boolean(videoId);
                     let categoryRaw = '';
-                    if (videoId && effectiveSettings.videoMetaMap && typeof effectiveSettings.videoMetaMap === 'object') {
+                    if (isCategoryEligible && effectiveSettings.videoMetaMap && typeof effectiveSettings.videoMetaMap === 'object') {
                         categoryRaw = (effectiveSettings.videoMetaMap[videoId]?.category || '').trim();
                     }
 
-                    if (!categoryRaw && videoId && typeof scheduleVideoMetaFetch === 'function') {
-                        scheduleVideoMetaFetch(videoId, { needDuration: false, needDates: false, needCategory: true });
-                        if (mode === 'allow' || isHomeOrSearch) {
-                            pendingCategoryMeta = true;
+                    if (isCategoryEligible && !categoryRaw && typeof scheduleVideoMetaFetch === 'function') {
+                        let isVisibleOrNear = false;
+                        try {
+                            const rect = element.getBoundingClientRect();
+                            const viewportHeight = window.innerHeight || document.documentElement?.clientHeight || 800;
+                            isVisibleOrNear = rect.bottom > 0 && rect.top < viewportHeight;
+                        } catch (e) {
+                        }
+                        if (isVisibleOrNear) {
+                            categoryFetchScheduled = scheduleVideoMetaFetch(videoId, {
+                                needDuration: false,
+                                needDates: false,
+                                needCategory: true,
+                                priority: 'high'
+                            });
+                            // A scheduled unresolved card must not flash on screen
+                            // and disappear after its official category resolves.
+                            // Allow-only remains fail-closed even when a lookup is
+                            // temporarily suppressed; block-selected veils only
+                            // cards that are genuinely queued or already running.
+                            pendingCategoryMeta = mode === 'allow' || categoryFetchScheduled === true;
                         }
                     }
 
+                    categoryAllowOnlyUnknown = isCategoryEligible && mode === 'allow' && !categoryRaw;
+
                     if (categoryRaw) {
+                        resolvedCategoryForState = categoryRaw;
                         const selectedSet = new Set(selected.map(v => String(v || '').trim().toLowerCase()).filter(Boolean));
                         const categoryKey = categoryRaw.toLowerCase();
                         hideByCategory = (mode === 'allow')
@@ -3753,6 +4377,16 @@ async function applyDOMFallback(settings, options = {}) {
             const uniqueId = element.getAttribute('data-filtertube-unique-id') || (elementTag.startsWith('ytk-') ? ensureVideoIdForCard(element) : extractVideoIdFromCard(element)) || '';
             const lastProcessedId = element.getAttribute('data-filtertube-last-processed-id') || '';
             const lastProcessedMode = element.getAttribute('data-filtertube-last-processed-mode') || '';
+            if (!categoryVideoId) {
+                categoryVideoId = ensureVideoIdForCard(element);
+            }
+            if (!resolvedCategoryForState && categoryVideoId) {
+                resolvedCategoryForState = String(
+                    effectiveSettings.videoMetaMap?.[categoryVideoId]?.category || ''
+                ).trim();
+            }
+            const categoryStateSignature = `${categoryPolicySignature}:${resolvedCategoryForState.toLowerCase()}`;
+            const lastCategoryStateSignature = element.getAttribute('data-filtertube-last-category-state') || '';
             const contentChanged = alreadyProcessed && uniqueId && lastProcessedId && uniqueId !== lastProcessedId;
             const currentPageMetaForState = getCurrentPageChannelMeta();
             const hasCurrentPageIdentity = Boolean(
@@ -3802,6 +4436,12 @@ async function applyDOMFallback(settings, options = {}) {
                 clearCachedChannelMetadata(element);
             }
 
+            if (alreadyProcessed && lastCategoryStateSignature !== categoryStateSignature) {
+                element.removeAttribute('data-filtertube-processed');
+                element.removeAttribute('data-filtertube-last-processed-id');
+                clearCachedChannelMetadata(element);
+            }
+
             const cachedVideoId = element.getAttribute('data-filtertube-video-id') || '';
             if (cachedVideoId) {
                 try {
@@ -3819,6 +4459,8 @@ async function applyDOMFallback(settings, options = {}) {
                         element.removeAttribute('data-filtertube-hidden-by-duration');
                         element.removeAttribute('data-filtertube-hidden-by-upload-date');
                         element.removeAttribute('data-filtertube-hidden-by-category');
+                        element.removeAttribute('data-filtertube-category-unavailable');
+                        element.removeAttribute('data-filtertube-category-unavailable-message');
                         element.removeAttribute('data-filtertube-hidden-by-hide-all-shorts');
                         try {
                             toggleVisibility(element, false, '', true);
@@ -5031,12 +5673,14 @@ async function applyDOMFallback(settings, options = {}) {
 
             const pendingMetaTtlMs = 8000;
             const nowMetaTs = Date.now();
+            let categoryUnavailableMeta = false;
             try {
                 if (pendingCategoryMeta) {
                     const raw = targetToHide.getAttribute('data-filtertube-pending-category-ts') || '';
                     const prev = raw && /^\d+$/.test(raw) ? parseInt(raw, 10) : 0;
-                    if (prev && (nowMetaTs - prev > pendingMetaTtlMs)) {
+                    if (!categoryFetchScheduled && prev && (nowMetaTs - prev > pendingMetaTtlMs)) {
                         pendingCategoryMeta = false;
+                        categoryUnavailableMeta = categoryAllowOnlyUnknown;
                     }
                 }
             } catch (e) {
@@ -5053,6 +5697,7 @@ async function applyDOMFallback(settings, options = {}) {
             }
 
             const pendingMetaOnly = (pendingCategoryMeta || pendingUploadDateMeta) && !shouldHide;
+            const categoryUnavailableOnly = categoryUnavailableMeta && !shouldHide;
             try {
                 if (pendingMetaOnly && pendingCategoryMeta) {
                     targetToHide.setAttribute('data-filtertube-pending-category', 'true');
@@ -5075,6 +5720,13 @@ async function applyDOMFallback(settings, options = {}) {
                 } else {
                     targetToHide.removeAttribute('data-filtertube-pending-category');
                     targetToHide.removeAttribute('data-filtertube-pending-category-ts');
+                }
+                if (categoryUnavailableOnly) {
+                    targetToHide.setAttribute('data-filtertube-category-unavailable', 'true');
+                    targetToHide.removeAttribute('data-filtertube-category-unavailable-message');
+                } else {
+                    targetToHide.removeAttribute('data-filtertube-category-unavailable');
+                    targetToHide.removeAttribute('data-filtertube-category-unavailable-message');
                 }
                 if (pendingMetaOnly && pendingUploadDateMeta) {
                     targetToHide.setAttribute('data-filtertube-pending-upload-date', 'true');
@@ -5103,6 +5755,8 @@ async function applyDOMFallback(settings, options = {}) {
 
             if (pendingMetaOnly) {
                 hideReason = pendingCategoryMeta ? 'Pending category metadata' : 'Pending upload date metadata';
+            } else if (categoryUnavailableOnly) {
+                hideReason = 'Category unavailable in Allow only selected mode';
             }
 
             if (isKidsHost && listMode === 'blocklist' && !hasActiveBlockRules && !hasEnabledContentFilters && shouldHide) {
@@ -5262,12 +5916,18 @@ async function applyDOMFallback(settings, options = {}) {
             } catch (e) {
             }
 
-            toggleVisibility(targetToHide, shouldHide, hideReason, pendingMetaOnly);
+            reconcileFilterTubeCardVisibility(
+                targetToHide,
+                shouldHide,
+                hideReason,
+                pendingMetaOnly || categoryUnavailableOnly
+            );
             if (shouldHide) {
                 filterTubeHiddenRowsThisRun += 1;
             }
             element.setAttribute('data-filtertube-processed', 'true');
             element.setAttribute('data-filtertube-last-processed-mode', listMode);
+            element.setAttribute('data-filtertube-last-category-state', categoryStateSignature);
             if (uniqueId) {
                 element.setAttribute('data-filtertube-last-processed-id', uniqueId);
             } else {
@@ -5666,6 +6326,13 @@ async function applyDOMFallback(settings, options = {}) {
         const shelves = document.querySelectorAll('ytd-shelf-renderer, ytd-rich-shelf-renderer, ytd-reel-shelf-renderer, ytd-item-section-renderer, ytd-horizontal-card-list-renderer, grid-shelf-view-model, yt-section-header-view-model');
         for (let i = 0; i < shelves.length; i++) {
             const shelf = shelves[i];
+            if (isFilterTubeCommentSurfaceElement(shelf)) {
+                // Comments have their own visibility owner above. Never let the
+                // generic empty/all-hidden shelf heuristic collapse the sheet.
+                shelf.classList.remove('filtertube-hidden-shelf');
+                shelf.removeAttribute('data-filtertube-container-had-children');
+                continue;
+            }
             const shelfTitle = extractShelfTitle(shelf);
             const path = document.location?.pathname || '';
             const isWatchRailShelf = Boolean(path.startsWith('/watch') && shelf.closest('#secondary, ytd-watch-next-secondary-results-renderer'));
@@ -5811,6 +6478,16 @@ async function applyDOMFallback(settings, options = {}) {
 
     try {
         enforceCurrentWatchOwnerBlock(effectiveSettings);
+    } catch (e) {
+    }
+
+    try {
+        enforceCurrentWatchCategoryPolicy(effectiveSettings);
+    } catch (e) {
+    }
+
+    try {
+        enforceWatchRailCategoryPolicy(effectiveSettings);
     } catch (e) {
     }
 

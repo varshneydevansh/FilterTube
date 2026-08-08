@@ -875,23 +875,7 @@ function initializeFiltersTabs() {
     uppercaseRow.appendChild(uppercaseControls);
     videoFiltersRows.appendChild(uppercaseRow);
 
-    const categoryOptions = [
-        { label: 'Film & Animation', color: '#ef4444' },
-        { label: 'Autos & Vehicles', color: '#f97316' },
-        { label: 'Music', color: '#f59e0b' },
-        { label: 'Pets & Animals', color: '#84cc16' },
-        { label: 'Sports', color: '#22c55e' },
-        { label: 'Travel & Events', color: '#14b8a6' },
-        { label: 'Gaming', color: '#0ea5e9' },
-        { label: 'People & Blogs', color: '#3b82f6' },
-        { label: 'Comedy', color: '#6366f1' },
-        { label: 'Entertainment', color: '#8b5cf6' },
-        { label: 'News & Politics', color: '#a855f7' },
-        { label: 'Howto & Style', color: '#ec4899' },
-        { label: 'Education', color: '#f43f5e' },
-        { label: 'Science & Technology', color: '#64748b' },
-        { label: 'Nonprofits & Activism', color: '#10b981' }
-    ];
+    const categoryOptions = window.FilterTubeContentControlsCatalog?.getCategoryOptions?.() || [];
 
     const categoryFiltersSection = document.createElement('div');
     categoryFiltersSection.className = 'content-control-group category-filters-section';
@@ -933,7 +917,7 @@ function initializeFiltersTabs() {
 
     const categoryMainDesc = document.createElement('div');
     categoryMainDesc.className = 'toggle-description';
-    categoryMainDesc.textContent = '';
+    categoryMainDesc.textContent = 'Uses the official YouTube category independently of the profile Blocklist or Whitelist mode.';
 
     categoryMainInfo.appendChild(categoryMainTitle);
     categoryMainInfo.appendChild(categoryMainDesc);
@@ -979,6 +963,23 @@ function initializeFiltersTabs() {
     categoryMainSearch.placeholder = 'Search categories...';
     categoryMainPanel.appendChild(categoryMainSearch);
 
+    const categoryMainSelectionBar = document.createElement('div');
+    categoryMainSelectionBar.className = 'ft-category-selection-bar';
+
+    const categoryMainSelectionCount = document.createElement('span');
+    categoryMainSelectionCount.className = 'ft-category-selection-count';
+    categoryMainSelectionCount.id = 'categoryFilter_selectionCount';
+    categoryMainSelectionCount.setAttribute('aria-live', 'polite');
+
+    const categoryMainClear = document.createElement('button');
+    categoryMainClear.type = 'button';
+    categoryMainClear.className = 'ft-category-clear';
+    categoryMainClear.textContent = 'Clear selection';
+
+    categoryMainSelectionBar.appendChild(categoryMainSelectionCount);
+    categoryMainSelectionBar.appendChild(categoryMainClear);
+    categoryMainPanel.appendChild(categoryMainSelectionBar);
+
     const categoryMainList = document.createElement('div');
     categoryMainList.className = 'ft-category-options';
     categoryMainList.id = 'categoryFilter_list';
@@ -986,7 +987,12 @@ function initializeFiltersTabs() {
     categoryFiltersRows.appendChild(categoryMainPanel);
 
     categoryFiltersSection.appendChild(categoryFiltersRows);
-    contentTab.appendChild(categoryFiltersSection);
+    const feedControlsSection = contentTab.querySelector('#feedControlsSection');
+    if (feedControlsSection) {
+        contentTab.insertBefore(categoryFiltersSection, feedControlsSection);
+    } else {
+        contentTab.appendChild(categoryFiltersSection);
+    }
 
     let isApplyingCategoryFiltersUI = false;
     let pendingCategoryFiltersSaveTimerMain = 0;
@@ -1040,6 +1046,18 @@ function initializeFiltersTabs() {
         }
         const deduped = normalizeSelectedArray(next);
         categorySelectedMain = deduped;
+        updateCategorySelectionSummary();
+    }
+
+    function updateCategorySelectionSummary() {
+        const count = categorySelectedMain.length;
+        if (categoryMainSelectionCount) {
+            const mode = document.getElementById('categoryFilter_mode')?.value === 'allow' ? 'Allowed' : 'Blocked';
+            categoryMainSelectionCount.textContent = count === 0
+                ? 'No categories selected — filter is inactive'
+                : `${mode}: ${categorySelectedMain.join(', ')}`;
+        }
+        if (categoryMainClear) categoryMainClear.disabled = count === 0;
     }
 
     function renderCategoryList(listEl, selected = [], searchValue = '', profileType = 'main') {
@@ -1067,12 +1085,15 @@ function initializeFiltersTabs() {
             pill.className = 'ft-category-pill';
             if (isActive) pill.classList.add('active');
             pill.style.setProperty('--ft-category-color', opt?.color || '');
+            pill.style.setProperty('--ft-category-color-bg-active', hexToRgba(opt?.color || '', 0.18));
             pill.setAttribute('data-ft-category', 'true');
             pill.setAttribute('data-ft-category-label', label);
             pill.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            pill.setAttribute('aria-label', `${label}, ${isActive ? 'selected' : 'not selected'}`);
             pill.addEventListener('click', () => {
                 const nextActive = pill.getAttribute('aria-pressed') !== 'true';
                 pill.setAttribute('aria-pressed', nextActive ? 'true' : 'false');
+                pill.setAttribute('aria-label', `${label}, ${nextActive ? 'selected' : 'not selected'}`);
                 pill.classList.toggle('active', nextActive);
                 updateCategorySelection(profileType, label, nextActive);
                 scheduleSaveCategoryFilters(profileType, { showToast: false });
@@ -1085,8 +1106,14 @@ function initializeFiltersTabs() {
             text.className = 'ft-category-label';
             text.textContent = label;
 
+            const selectionMark = document.createElement('span');
+            selectionMark.className = 'ft-category-selection-mark';
+            selectionMark.setAttribute('aria-hidden', 'true');
+            selectionMark.textContent = '✓';
+
             pill.appendChild(swatch);
             pill.appendChild(text);
+            pill.appendChild(selectionMark);
             listEl.appendChild(pill);
         });
     }
@@ -1115,6 +1142,7 @@ function initializeFiltersTabs() {
         }
         categorySelectedMain = normalizeSelectedArray(categoryFilters.selected || []);
         renderCategoryList(list, categorySelectedMain, search?.value || '', 'main');
+        updateCategorySelectionSummary();
         updateCategoryFilterUI();
         isApplyingCategoryFiltersUI = false;
     }
@@ -1183,6 +1211,13 @@ function initializeFiltersTabs() {
         }, 250);
         pendingCategoryFiltersSaveTimerMain = timer;
     }
+
+    categoryMainClear.addEventListener('click', () => {
+        categorySelectedMain = [];
+        renderCategoryList(categoryMainList, categorySelectedMain, categoryMainSearch?.value || '', 'main');
+        updateCategorySelectionSummary();
+        scheduleSaveCategoryFilters('main', { showToast: true });
+    });
 
     function updateVideoFilterUI() {
         const durationEnabled = document.getElementById('videoFilter_duration_enabled');
@@ -1521,10 +1556,12 @@ function initializeFiltersTabs() {
 
         categoryMainEnabled?.addEventListener('change', () => {
             updateCategoryFilterUI();
+            updateCategorySelectionSummary();
             scheduleSaveCategoryFilters('main', { showToast: true });
         });
         categoryMainMode?.addEventListener('change', () => {
             updateCategoryFilterUI();
+            updateCategorySelectionSummary();
             scheduleSaveCategoryFilters('main', { showToast: true });
         });
         categoryMainSearch?.addEventListener('input', () => {
@@ -2112,23 +2149,7 @@ function initializeKidsTabs() {
     kidsVideoFiltersSection.appendChild(kidsVideoFiltersRows);
     kidsContentTab.appendChild(kidsVideoFiltersSection);
 
-    const categoryOptions = [
-        { label: 'Film & Animation', color: '#ef4444' },
-        { label: 'Autos & Vehicles', color: '#f97316' },
-        { label: 'Music', color: '#f59e0b' },
-        { label: 'Pets & Animals', color: '#84cc16' },
-        { label: 'Sports', color: '#22c55e' },
-        { label: 'Travel & Events', color: '#14b8a6' },
-        { label: 'Gaming', color: '#0ea5e9' },
-        { label: 'People & Blogs', color: '#3b82f6' },
-        { label: 'Comedy', color: '#6366f1' },
-        { label: 'Entertainment', color: '#8b5cf6' },
-        { label: 'News & Politics', color: '#a855f7' },
-        { label: 'Howto & Style', color: '#ec4899' },
-        { label: 'Education', color: '#f43f5e' },
-        { label: 'Science & Technology', color: '#64748b' },
-        { label: 'Nonprofits & Activism', color: '#10b981' }
-    ];
+    const categoryOptions = window.FilterTubeContentControlsCatalog?.getCategoryOptions?.() || [];
 
     function hexToRgba(hex, alpha) {
         if (!hex || typeof hex !== 'string') return '';
@@ -2222,6 +2243,22 @@ function initializeKidsTabs() {
     kidsCategorySearch.placeholder = 'Search categories...';
     kidsCategoryPanel.appendChild(kidsCategorySearch);
 
+    const kidsCategorySelectionBar = document.createElement('div');
+    kidsCategorySelectionBar.className = 'ft-category-selection-bar';
+
+    const kidsCategorySelectionCount = document.createElement('span');
+    kidsCategorySelectionCount.className = 'ft-category-selection-count';
+    kidsCategorySelectionCount.setAttribute('aria-live', 'polite');
+
+    const kidsCategoryClear = document.createElement('button');
+    kidsCategoryClear.type = 'button';
+    kidsCategoryClear.className = 'ft-category-clear';
+    kidsCategoryClear.textContent = 'Clear selection';
+
+    kidsCategorySelectionBar.appendChild(kidsCategorySelectionCount);
+    kidsCategorySelectionBar.appendChild(kidsCategoryClear);
+    kidsCategoryPanel.appendChild(kidsCategorySelectionBar);
+
     const kidsCategoryList = document.createElement('div');
     kidsCategoryList.className = 'ft-category-options';
     kidsCategoryList.id = 'kidsCategoryFilter_list';
@@ -2271,6 +2308,16 @@ function initializeKidsTabs() {
             next.push(normalized);
         }
         kidsCategorySelected = normalizeSelectedArray(next);
+        updateKidsCategorySelectionSummary();
+    }
+
+    function updateKidsCategorySelectionSummary() {
+        const count = kidsCategorySelected.length;
+        const mode = kidsCategoryMode?.value === 'allow' ? 'Allowed' : 'Blocked';
+        kidsCategorySelectionCount.textContent = count === 0
+            ? 'No categories selected — filter is inactive'
+            : `${mode}: ${kidsCategorySelected.join(', ')}`;
+        kidsCategoryClear.disabled = count === 0;
     }
 
     function renderKidsCategoryList(listEl, selected = [], searchValue = '') {
@@ -2302,11 +2349,13 @@ function initializeKidsTabs() {
             pill.setAttribute('data-ft-category', 'true');
             pill.setAttribute('data-ft-category-label', label);
             pill.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            pill.setAttribute('aria-label', `${label}, ${isActive ? 'selected' : 'not selected'}`);
             pill.classList.toggle('active', isActive);
 
             pill.addEventListener('click', () => {
                 const nextActive = pill.getAttribute('aria-pressed') !== 'true';
                 pill.setAttribute('aria-pressed', nextActive ? 'true' : 'false');
+                pill.setAttribute('aria-label', `${label}, ${nextActive ? 'selected' : 'not selected'}`);
                 pill.classList.toggle('active', nextActive);
                 updateKidsCategorySelection(label, nextActive);
                 scheduleSaveKidsCategoryFilters({ showToast: false });
@@ -2319,8 +2368,14 @@ function initializeKidsTabs() {
             text.className = 'ft-category-label';
             text.textContent = label;
 
+            const selectionMark = document.createElement('span');
+            selectionMark.className = 'ft-category-selection-mark';
+            selectionMark.setAttribute('aria-hidden', 'true');
+            selectionMark.textContent = '✓';
+
             pill.appendChild(swatch);
             pill.appendChild(text);
+            pill.appendChild(selectionMark);
             listEl.appendChild(pill);
         });
     }
@@ -2339,6 +2394,7 @@ function initializeKidsTabs() {
         }
         kidsCategorySelected = normalizeSelectedArray(categoryFilters.selected || []);
         renderKidsCategoryList(kidsCategoryList, kidsCategorySelected, kidsCategorySearch?.value || '');
+        updateKidsCategorySelectionSummary();
         updateKidsCategoryUi();
         isApplyingKidsUi = false;
     }
@@ -2381,6 +2437,13 @@ function initializeKidsTabs() {
                 if (showToast) UIComponents.showToast('Failed to save kids category filters', 'error');
             });
     }
+
+    kidsCategoryClear.addEventListener('click', () => {
+        kidsCategorySelected = [];
+        renderKidsCategoryList(kidsCategoryList, kidsCategorySelected, kidsCategorySearch?.value || '');
+        updateKidsCategorySelectionSummary();
+        scheduleSaveKidsCategoryFilters({ showToast: true });
+    });
 
     function updateKidsVideoFilterUI() {
         const showDurationControls = !!kidsDurationCheckbox?.checked;
@@ -2698,10 +2761,12 @@ function initializeKidsTabs() {
 
     kidsCategoryEnabled.addEventListener('change', () => {
         updateKidsCategoryUi();
+        updateKidsCategorySelectionSummary();
         scheduleSaveKidsCategoryFilters({ showToast: true });
     });
     kidsCategoryMode.addEventListener('change', () => {
         updateKidsCategoryUi();
+        updateKidsCategorySelectionSummary();
         scheduleSaveKidsCategoryFilters({ showToast: true });
     });
     kidsCategorySearch.addEventListener('input', () => {

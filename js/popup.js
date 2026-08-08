@@ -64,7 +64,9 @@ function initializePopupFiltersTabs() {
     contentTab.appendChild(contentSearchRow);
 
     const catalog = window.FilterTubeContentControlsCatalog?.getCatalog?.() || [];
+    const categoryOptions = window.FilterTubeContentControlsCatalog?.getCategoryOptions?.() || [];
     let feedRowsContainer = null;
+    let feedGroupElement = null;
 
     function hexToRgba(hex, alpha) {
         if (!hex || typeof hex !== 'string') return '';
@@ -112,6 +114,7 @@ function initializePopupFiltersTabs() {
 
         if (group?.id === 'feed') {
             feedRowsContainer = rowsContainer;
+            feedGroupElement = groupEl;
         }
 
         (group.controls || []).forEach(control => {
@@ -150,6 +153,223 @@ function initializePopupFiltersTabs() {
         groupEl.appendChild(rowsContainer);
         contentTab.appendChild(groupEl);
     });
+
+    const categoryGroup = document.createElement('div');
+    categoryGroup.className = 'content-control-group category-filters-section popup-category-filters-section';
+    categoryGroup.setAttribute('data-ft-control-group', 'true');
+    categoryGroup.setAttribute('data-ft-group-title', 'Category Filters');
+    categoryGroup.setAttribute('data-ft-group-id', 'category');
+    applyControlGroupTheme(categoryGroup, '#E879F9');
+
+    const categoryHeader = document.createElement('div');
+    categoryHeader.className = 'content-control-group__header';
+
+    const categoryHeaderTitle = document.createElement('div');
+    categoryHeaderTitle.className = 'content-control-group__title';
+    categoryHeaderTitle.textContent = 'Category Filters';
+    categoryHeader.appendChild(categoryHeaderTitle);
+    categoryGroup.appendChild(categoryHeader);
+
+    const categoryRows = document.createElement('div');
+    categoryRows.className = 'content-control-group__rows';
+
+    const categoryRow = document.createElement('div');
+    categoryRow.className = 'toggle-row popup-category-row';
+    categoryRow.setAttribute('data-ft-control-row', 'true');
+    categoryRow.setAttribute('data-ft-search', 'category filter official youtube categories');
+
+    const categoryInfo = document.createElement('div');
+    categoryInfo.className = 'toggle-info';
+
+    const categoryTitle = document.createElement('div');
+    categoryTitle.className = 'toggle-title';
+    categoryTitle.textContent = 'Category Filter';
+
+    const categoryDescription = document.createElement('div');
+    categoryDescription.className = 'toggle-desc';
+    categoryDescription.textContent = 'Uses official categories independently of Blocklist or Whitelist mode.';
+
+    categoryInfo.appendChild(categoryTitle);
+    categoryInfo.appendChild(categoryDescription);
+
+    const categoryControls = document.createElement('div');
+    categoryControls.className = 'ft-category-controls popup-category-controls';
+
+    const categoryMode = document.createElement('select');
+    categoryMode.id = 'popupCategoryFilter_mode';
+    categoryMode.className = 'select-input';
+    categoryMode.innerHTML = `
+        <option value="block">Block selected</option>
+        <option value="allow">Allow only selected</option>
+    `;
+
+    const categoryToggle = document.createElement('label');
+    categoryToggle.className = 'switch';
+
+    const categoryEnabled = document.createElement('input');
+    categoryEnabled.type = 'checkbox';
+    categoryEnabled.id = 'popupCategoryFilter_enabled';
+
+    const categorySlider = document.createElement('span');
+    categorySlider.className = 'slider round';
+
+    categoryToggle.appendChild(categoryEnabled);
+    categoryToggle.appendChild(categorySlider);
+    categoryControls.appendChild(categoryMode);
+    categoryControls.appendChild(categoryToggle);
+    categoryRow.appendChild(categoryInfo);
+    categoryRow.appendChild(categoryControls);
+    categoryRows.appendChild(categoryRow);
+
+    const categoryPanel = document.createElement('div');
+    categoryPanel.className = 'ft-category-panel popup-category-panel';
+
+    const categorySearch = document.createElement('input');
+    categorySearch.type = 'text';
+    categorySearch.id = 'popupCategoryFilter_search';
+    categorySearch.className = 'text-input search-input ft-category-search';
+    categorySearch.placeholder = 'Search categories...';
+    categoryPanel.appendChild(categorySearch);
+
+    const categorySelectionBar = document.createElement('div');
+    categorySelectionBar.className = 'ft-category-selection-bar';
+
+    const categorySelectionCount = document.createElement('span');
+    categorySelectionCount.className = 'ft-category-selection-count';
+    categorySelectionCount.setAttribute('aria-live', 'polite');
+
+    const categoryClear = document.createElement('button');
+    categoryClear.type = 'button';
+    categoryClear.className = 'ft-category-clear';
+    categoryClear.textContent = 'Clear';
+
+    categorySelectionBar.appendChild(categorySelectionCount);
+    categorySelectionBar.appendChild(categoryClear);
+    categoryPanel.appendChild(categorySelectionBar);
+
+    const categoryList = document.createElement('div');
+    categoryList.id = 'popupCategoryFilter_list';
+    categoryList.className = 'ft-category-options';
+    categoryPanel.appendChild(categoryList);
+
+    const categoryManage = document.createElement('button');
+    categoryManage.type = 'button';
+    categoryManage.className = 'video-filters-manage';
+    categoryManage.textContent = 'Open full Category Filters';
+    categoryPanel.appendChild(categoryManage);
+
+    categoryRows.appendChild(categoryPanel);
+    categoryGroup.appendChild(categoryRows);
+    if (feedGroupElement) {
+        contentTab.insertBefore(categoryGroup, feedGroupElement);
+    } else {
+        contentTab.appendChild(categoryGroup);
+    }
+
+    let popupCategorySelected = [];
+    let popupCategoryProfileType = 'main';
+    let isApplyingPopupCategory = false;
+    let popupCategorySaveTimer = 0;
+
+    function normalizePopupCategorySelection(values) {
+        const seen = new Set();
+        return (Array.isArray(values) ? values : []).map(value => String(value || '').trim()).filter(value => {
+            const key = value.toLowerCase();
+            if (!key || seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
+    }
+
+    function updatePopupCategorySummary() {
+        const count = popupCategorySelected.length;
+        const mode = categoryMode.value === 'allow' ? 'Allowed' : 'Blocked';
+        categorySelectionCount.textContent = count === 0
+            ? 'No categories selected — filter is inactive'
+            : `${mode}: ${popupCategorySelected.join(', ')}`;
+        categoryClear.disabled = count === 0;
+        categoryMode.disabled = !categoryEnabled.checked;
+        categoryPanel.style.display = categoryEnabled.checked ? 'block' : 'none';
+    }
+
+    function renderPopupCategoryList() {
+        const needle = categorySearch.value.trim().toLowerCase();
+        const selectedKeys = new Set(popupCategorySelected.map(value => value.toLowerCase()));
+        categoryList.innerHTML = '';
+
+        categoryOptions.filter(option => !needle || option.label.toLowerCase().includes(needle)).forEach(option => {
+            const active = selectedKeys.has(option.label.toLowerCase());
+            const pill = document.createElement('button');
+            pill.type = 'button';
+            pill.className = 'ft-category-pill';
+            pill.classList.toggle('active', active);
+            pill.setAttribute('aria-pressed', active ? 'true' : 'false');
+            pill.setAttribute('aria-label', `${option.label}, ${active ? 'selected' : 'not selected'}`);
+            pill.style.setProperty('--ft-category-color', option.color);
+            pill.style.setProperty('--ft-category-color-bg', hexToRgba(option.color, 0.10));
+            pill.style.setProperty('--ft-category-color-border', hexToRgba(option.color, 0.45));
+            pill.style.setProperty('--ft-category-color-bg-active', hexToRgba(option.color, 0.18));
+
+            const swatch = document.createElement('span');
+            swatch.className = 'ft-category-swatch';
+            const label = document.createElement('span');
+            label.className = 'ft-category-label';
+            label.textContent = option.label;
+            const selectionMark = document.createElement('span');
+            selectionMark.className = 'ft-category-selection-mark';
+            selectionMark.setAttribute('aria-hidden', 'true');
+            selectionMark.textContent = '✓';
+            pill.appendChild(swatch);
+            pill.appendChild(label);
+            pill.appendChild(selectionMark);
+
+            pill.addEventListener('click', () => {
+                const key = option.label.toLowerCase();
+                const nextKeys = new Set(popupCategorySelected.map(value => value.toLowerCase()));
+                if (nextKeys.has(key)) {
+                    popupCategorySelected = popupCategorySelected.filter(value => value.toLowerCase() !== key);
+                } else {
+                    popupCategorySelected = [...popupCategorySelected, option.label];
+                }
+                renderPopupCategoryList();
+                updatePopupCategorySummary();
+                schedulePopupCategorySave();
+            });
+            categoryList.appendChild(pill);
+        });
+    }
+
+    function applyPopupCategoryFilters(categoryFilters = {}, profileType = 'main') {
+        isApplyingPopupCategory = true;
+        popupCategoryProfileType = profileType === 'kids' ? 'kids' : 'main';
+        categoryEnabled.checked = !!categoryFilters.enabled;
+        categoryMode.value = categoryFilters.mode === 'allow' ? 'allow' : 'block';
+        popupCategorySelected = normalizePopupCategorySelection(categoryFilters.selected || []);
+        renderPopupCategoryList();
+        updatePopupCategorySummary();
+        isApplyingPopupCategory = false;
+    }
+
+    function savePopupCategoryFilters() {
+        if (isApplyingPopupCategory) return;
+        const next = {
+            enabled: categoryEnabled.checked,
+            mode: categoryMode.value === 'allow' ? 'allow' : 'block',
+            selected: normalizePopupCategorySelection(popupCategorySelected)
+        };
+        return popupCategoryProfileType === 'kids'
+            ? StateManager.updateKidsCategoryFilters(next)
+            : StateManager.updateCategoryFilters(next);
+    }
+
+    function schedulePopupCategorySave() {
+        if (isApplyingPopupCategory) return;
+        if (popupCategorySaveTimer) clearTimeout(popupCategorySaveTimer);
+        popupCategorySaveTimer = setTimeout(() => {
+            popupCategorySaveTimer = 0;
+            savePopupCategoryFilters();
+        }, 180);
+    }
 
     const videoFiltersRows = feedRowsContainer || (() => {
         const videoFiltersSection = document.createElement('div');
@@ -464,8 +684,10 @@ function initializePopupFiltersTabs() {
             const state = StateManager.getState();
             if (profileType === 'kids') {
                 applyPopupKidsContentFilters(state?.kids?.contentFilters || {});
+                applyPopupCategoryFilters(state?.kids?.categoryFilters || {}, 'kids');
             } else {
                 applyPopupContentFilters(state?.contentFilters || {});
+                applyPopupCategoryFilters(state?.categoryFilters || {}, 'main');
             }
         } catch (e) {
         }
@@ -542,6 +764,40 @@ function initializePopupFiltersTabs() {
             }
         });
 
+        categoryEnabled.addEventListener('change', () => {
+            updatePopupCategorySummary();
+            schedulePopupCategorySave();
+        });
+        categoryMode.addEventListener('change', () => {
+            updatePopupCategorySummary();
+            schedulePopupCategorySave();
+        });
+        categorySearch.addEventListener('input', renderPopupCategoryList);
+        categoryClear.addEventListener('click', () => {
+            popupCategorySelected = [];
+            renderPopupCategoryList();
+            updatePopupCategorySummary();
+            schedulePopupCategorySave();
+        });
+
+        categoryManage.addEventListener('click', () => {
+            const runtimeApi = (typeof chrome !== 'undefined' && chrome.runtime)
+                ? chrome
+                : ((typeof browser !== 'undefined' && browser.runtime) ? browser : null);
+            const tabsApi = (typeof chrome !== 'undefined' && chrome.tabs && typeof chrome.tabs.create === 'function')
+                ? chrome.tabs
+                : ((typeof browser !== 'undefined' && browser.tabs && typeof browser.tabs.create === 'function') ? browser.tabs : null);
+            const relativeUrl = popupCategoryProfileType === 'kids'
+                ? 'html/tab-view.html?view=kids&section=content'
+                : 'html/tab-view.html?view=filters&section=categories';
+            const url = runtimeApi?.runtime?.getURL ? runtimeApi.runtime.getURL(relativeUrl) : relativeUrl;
+            if (tabsApi?.create) {
+                tabsApi.create({ url });
+            } else {
+                window.open(url, '_blank', 'noopener,noreferrer');
+            }
+        });
+
         manageInTab.addEventListener('click', () => {
             try {
                 resolveProfileTypeFromTabs().then((profileType) => {
@@ -584,6 +840,9 @@ function initializePopupFiltersTabs() {
             applyPopupVideoFiltersForActiveProfile();
         }
         if (eventType === 'kidsContentFiltersUpdated') {
+            applyPopupVideoFiltersForActiveProfile();
+        }
+        if (eventType === 'categoryFiltersUpdated' || eventType === 'kidsCategoryFiltersUpdated') {
             applyPopupVideoFiltersForActiveProfile();
         }
     });
@@ -637,7 +896,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!contentControlsContainer) return;
         const type = profileType === 'kids' ? 'kids' : 'main';
         const groups = contentControlsContainer.querySelectorAll('[data-ft-control-group]');
-        const allowedKidsGroups = new Set(['feed']);
+        const allowedKidsGroups = new Set(['category', 'feed']);
         groups.forEach(groupEl => {
             const id = (groupEl.getAttribute('data-ft-group-id') || '').trim();
             if (type === 'kids') {

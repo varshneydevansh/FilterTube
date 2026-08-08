@@ -127,7 +127,7 @@
         const mainV3 = safeObject(profilesV3.main);
 
         const enabled = storage?.enabled !== false;
-        const hideComments = !!storage?.hideAllComments;
+        const hideComments = storage?.hideAllComments === true;
 
         return {
             schemaVersion: 4,
@@ -663,7 +663,12 @@
                     ? profileSettings.enabled !== false
                     : (result.enabled !== false);
 
-                const hideComments = readBool('hideComments', !!result.hideAllComments);
+                // A valid V4 profile is the settings authority. Do not resurrect a
+                // stale legacy root hideAllComments value when this profile never
+                // explicitly selected Hide All Comments.
+                const hideComments = hasProfilesV4
+                    ? profileSettings.hideComments === true
+                    : result.hideAllComments === true;
                 const hasExplicitTheme = isStoredThemePreference(result?.[THEME_KEY]);
                 const theme = resolveThemePreference(result?.[THEME_KEY]);
                 const autoBackupEnabled = Object.prototype.hasOwnProperty.call(profileSettings, 'autoBackupEnabled')

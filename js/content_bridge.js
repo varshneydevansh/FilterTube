@@ -276,11 +276,9 @@ function pickMenuChannelDisplayName(channelInfo, injectionOptions = {}) {
         }
     })();
 
-    if (isLowConfidenceExpectedChannelLabel(channelInfo)) {
-        return mappedHandle || safeDisplay || safeName || channelInfo?.id || 'Channel';
-    }
-
-    return (
+    const resolvedDisplay = isLowConfidenceExpectedChannelLabel(channelInfo)
+        ? (mappedHandle || safeDisplay || safeName || channelInfo?.id || 'Channel')
+        : (
         mappedHandle ||
         channelInfo?.handleDisplay ||
         channelInfo?.handle ||
@@ -291,6 +289,9 @@ function pickMenuChannelDisplayName(channelInfo, injectionOptions = {}) {
         channelInfo?.id ||
         'Channel'
     );
+    return channelInfo?.isMixSeedOwner === true && resolvedDisplay !== 'Channel'
+        ? `${resolvedDisplay} (Mix seed)`
+        : resolvedDisplay;
 }
 
 function hydrateChannelInfoFromCurrentMappings(channelInfo, videoCard = null) {
@@ -1076,7 +1077,8 @@ function hasCollaboratorWarmupSignal(card) {
 }
 
 function needsAnyPrefetchObserverWork(settings) {
-    return needsIdentityPrefetchWork(settings) || needsCollaboratorWarmupWork(settings);
+    return needsIdentityPrefetchWork(settings)
+        || needsCollaboratorWarmupWork(settings);
 }
 
 function hasBridgeEnabledContentFilters(settings) {
@@ -1329,7 +1331,10 @@ function startCardPrefetchObserver() {
 
     document.addEventListener('visibilitychange', () => {
         prefetchPaused = document.hidden;
-        if (!prefetchPaused) drainPrefetchQueue();
+        if (!prefetchPaused) {
+            drainPrefetchQueue();
+            processWatchMetaFetchQueue();
+        }
     });
 
     attachPrefetchObservers();
@@ -1498,6 +1503,8 @@ function queuePrefetchForCard(card) {
         enqueuePrefetchItem(`collab:${videoId}`, { videoId, card, collabOnly: true }, 12 * 1000);
         return;
     }
+
+    if (!needsIdentity) return;
 
     // If YouTube recycled a DOM node without our video-id attribute, any existing channel
     // attrs on it are untrusted. Clear them to avoid persisting a wrong mapping.
@@ -1903,18 +1910,25 @@ function persistVideoMetaMapping(entries = []) {
         const publishDateRaw = entry?.publishDate;
         const uploadDateRaw = entry?.uploadDate;
         const categoryRaw = entry?.category;
+        const existing = currentSettings.videoMetaMap[videoId] && typeof currentSettings.videoMetaMap[videoId] === 'object'
+            ? currentSettings.videoMetaMap[videoId]
+            : {};
+
+        const incomingLengthSeconds = (typeof lengthSecondsRaw === 'number' && Number.isFinite(lengthSecondsRaw))
+            ? lengthSecondsRaw
+            : (typeof lengthSecondsRaw === 'string' && lengthSecondsRaw.trim() ? lengthSecondsRaw.trim() : null);
+        const incomingPublishDate = typeof publishDateRaw === 'string' ? publishDateRaw.trim() : '';
+        const incomingUploadDate = typeof uploadDateRaw === 'string' ? uploadDateRaw.trim() : '';
+        const incomingCategory = typeof categoryRaw === 'string' ? categoryRaw.trim() : '';
 
         const meta = {
-            lengthSeconds: (typeof lengthSecondsRaw === 'number' && Number.isFinite(lengthSecondsRaw))
-                ? lengthSecondsRaw
-                : (typeof lengthSecondsRaw === 'string' ? lengthSecondsRaw.trim() : null),
-            publishDate: (typeof publishDateRaw === 'string' ? publishDateRaw.trim() : ''),
-            uploadDate: (typeof uploadDateRaw === 'string' ? uploadDateRaw.trim() : ''),
-            category: (typeof categoryRaw === 'string' ? categoryRaw.trim() : '')
+            lengthSeconds: incomingLengthSeconds !== null ? incomingLengthSeconds : (existing.lengthSeconds ?? null),
+            publishDate: incomingPublishDate || (typeof existing.publishDate === 'string' ? existing.publishDate.trim() : ''),
+            uploadDate: incomingUploadDate || (typeof existing.uploadDate === 'string' ? existing.uploadDate.trim() : ''),
+            category: incomingCategory || (typeof existing.category === 'string' ? existing.category.trim() : '')
         };
 
         if (!meta.lengthSeconds && !meta.publishDate && !meta.uploadDate && !meta.category) continue;
-        const existing = currentSettings.videoMetaMap[videoId];
         if (existing && typeof existing === 'object' && String(existing.lengthSeconds ?? '').trim() === String(meta.lengthSeconds ?? '').trim() && String(existing.publishDate ?? '').trim() === String(meta.publishDate ?? '').trim() && String(existing.uploadDate ?? '').trim() === String(meta.uploadDate ?? '').trim() && String(existing.category ?? '').trim() === String(meta.category ?? '').trim()) continue;
         try {
             if (Object.prototype.hasOwnProperty.call(currentSettings.videoMetaMap, videoId)) {
@@ -1950,7 +1964,10 @@ function persistVideoMetaMapping(entries = []) {
 }
 
 let pendingVideoMetaDomRerunTimer = 0;
-const VIDEO_META_DOM_RERUN_DEBOUNCE_MS = 550;
+// Category results for a cold viewport arrive as a short, serialized burst.
+// Commit those decisions together so cards do not disappear one-by-one after
+// every response and make the grid feel as if it is continually refreshing.
+const VIDEO_META_DOM_RERUN_DEBOUNCE_MS = 1200;
 function scheduleVideoMetaDomRerun() {
     if (pendingVideoMetaDomRerunTimer) {
         clearTimeout(pendingVideoMetaDomRerunTimer);
@@ -1959,7 +1976,10 @@ function scheduleVideoMetaDomRerun() {
         pendingVideoMetaDomRerunTimer = 0;
         try {
             if (typeof applyDOMFallback === 'function') {
-                applyDOMFallback(null);
+                applyDOMFallback(currentSettings, {
+                    forceReprocess: true,
+                    preserveScroll: true
+                });
             }
         } catch (e) {
         }
@@ -1973,17 +1993,25 @@ function touchDomForVideoMetaUpdate(videoId) {
     const touched = new Set();
     const register = (node) => {
         if (!node || !node.getAttribute) return;
-        if (touched.has(node)) return;
-        touched.add(node);
+        const categoryOwner = (() => {
+            try {
+                return node.closest?.('ytd-rich-item-renderer, ytm-rich-item-renderer') || node;
+            } catch (e) {
+                return node;
+            }
+        })();
+        if (touched.has(categoryOwner)) return;
+        touched.add(categoryOwner);
         try {
-            node.removeAttribute('data-filtertube-duration');
-            node.removeAttribute('data-filtertube-processed');
-            node.removeAttribute('data-filtertube-last-processed-id');
+            categoryOwner.removeAttribute('data-filtertube-duration');
+            categoryOwner.removeAttribute('data-filtertube-processed');
+            categoryOwner.removeAttribute('data-filtertube-last-processed-id');
+            categoryOwner.removeAttribute('data-filtertube-last-category-state');
         } catch (e) {
         }
         try {
             if (typeof clearCachedChannelMetadata === 'function') {
-                clearCachedChannelMetadata(node);
+                clearCachedChannelMetadata(categoryOwner);
             }
         } catch (e) {
         }
@@ -2027,92 +2055,303 @@ function touchDomForVideoMetaUpdate(videoId) {
 const pendingWatchMetaFetches = new Map();
 const queuedWatchMetaFetches = new Set();
 const watchMetaFetchQueue = [];
+const watchMetaFetchPriorities = new Map();
+const watchMetaFetchNeeds = new Map();
 const lastWatchMetaFetchAttempt = new Map();
+const categoryMetaFetchMisses = new Map();
+const watchMetaFetchStartTimes = [];
 let activeWatchMetaFetches = 0;
+let watchMetaFetchDrainTimer = 0;
+let lastWatchMetaFetchStartedAt = 0;
 const WATCH_META_FETCH_CONCURRENCY = 3;
+const WATCH_META_FETCH_QUEUE_LIMIT = 180;
+// Resolve one visible row as a small micro-batch. Three is enough to keep the
+// rail stable without recreating the old per-card /watch request storm.
+const WATCH_META_FETCH_PARALLEL_JOIN_WINDOW_MS = 100;
+const WATCH_META_FETCH_BURST_INTERVAL_MS = 1200;
+const WATCH_META_FETCH_SUSTAINED_INTERVAL_MS = 3500;
+const WATCH_META_FETCH_BURST_SIZE = 9;
+const WATCH_META_FETCH_BURST_WINDOW_MS = 10 * 1000;
+const WATCH_META_FETCH_SCROLL_IDLE_MS = 500;
+const WATCH_META_FETCH_WINDOW_MS = 60 * 1000;
+const WATCH_META_FETCH_MAX_PER_WINDOW = 24;
+const CATEGORY_META_NEGATIVE_CACHE_TTL_MS = 15 * 60 * 1000;
+
+function watchMetaFetchPriorityValue(priority) {
+    if (priority === 'high') return 2;
+    if (priority === 'low') return 0;
+    return 1;
+}
+
+function enqueueWatchMetaFetch(videoId, priority) {
+    const priorityValue = watchMetaFetchPriorityValue(priority);
+
+    if (watchMetaFetchQueue.length >= WATCH_META_FETCH_QUEUE_LIMIT) {
+        let evictionIndex = -1;
+        for (let i = watchMetaFetchQueue.length - 1; i >= 0; i--) {
+            const queuedId = watchMetaFetchQueue[i];
+            if (watchMetaFetchPriorityValue(watchMetaFetchPriorities.get(queuedId)) < priorityValue) {
+                evictionIndex = i;
+                break;
+            }
+        }
+        if (evictionIndex === -1) return false;
+        const [evictedId] = watchMetaFetchQueue.splice(evictionIndex, 1);
+        queuedWatchMetaFetches.delete(evictedId);
+        watchMetaFetchPriorities.delete(evictedId);
+        watchMetaFetchNeeds.delete(evictedId);
+    }
+
+    let insertionIndex = watchMetaFetchQueue.findIndex(queuedId => {
+        return watchMetaFetchPriorityValue(watchMetaFetchPriorities.get(queuedId)) < priorityValue;
+    });
+    if (insertionIndex === -1) insertionIndex = watchMetaFetchQueue.length;
+
+    queuedWatchMetaFetches.add(videoId);
+    watchMetaFetchPriorities.set(videoId, priority);
+    watchMetaFetchQueue.splice(insertionIndex, 0, videoId);
+    return true;
+}
+
+function mergeWatchMetaFetchNeeds(existing, incoming) {
+    const left = existing && typeof existing === 'object' ? existing : {};
+    const right = incoming && typeof incoming === 'object' ? incoming : {};
+    return {
+        needDuration: Boolean(left.needDuration || right.needDuration),
+        needDates: Boolean(left.needDates || right.needDates),
+        needCategory: Boolean(left.needCategory || right.needCategory)
+    };
+}
+
+function isCategoryOnlyMetaFetch(needs) {
+    return Boolean(needs?.needCategory && !needs?.needDuration && !needs?.needDates);
+}
+
+function areWatchMetaFetchNeedsSatisfied(videoId, needs) {
+    const existing = currentSettings?.videoMetaMap?.[videoId] || null;
+    const wants = needs && typeof needs === 'object' ? needs : {};
+
+    const rawDuration = existing?.lengthSeconds;
+    const hasDuration = (
+        (typeof rawDuration === 'number' && Number.isFinite(rawDuration) && rawDuration > 0) ||
+        (typeof rawDuration === 'string' && /^\d+$/.test(rawDuration.trim()) && parseInt(rawDuration.trim(), 10) > 0)
+    );
+    const hasDates = [existing?.uploadDate, existing?.publishDate].some(value => {
+        if (!value || typeof value !== 'string') return false;
+        return Number.isFinite(new Date(value).getTime());
+    });
+    const hasCategory = typeof existing?.category === 'string' && Boolean(existing.category.trim());
+
+    return (!wants.needDuration || hasDuration)
+        && (!wants.needDates || hasDates)
+        && (!wants.needCategory || hasCategory);
+}
+
+function isVideoNearCategoryViewport(videoId) {
+    if (typeof document === 'undefined' || !document.querySelectorAll) return true;
+    try {
+        const path = document.location?.pathname || '';
+        if (
+            path.startsWith('/shorts/') ||
+            path === '/playlist'
+        ) {
+            return false;
+        }
+        const isWatchPage = path.startsWith('/watch');
+        const currentWatchVideoId = isWatchPage
+            ? (new URLSearchParams(document.location?.search || '').get('v') || '')
+            : '';
+        if (currentWatchVideoId === videoId) return true;
+        const selectors = [
+            `[data-filtertube-video-id="${videoId}"]`,
+            `a[href*="watch?v=${videoId}"]`,
+            `a[href*="/shorts/${videoId}"]`,
+            `a[href*="/watch/${videoId}"]`
+        ];
+        const candidates = document.querySelectorAll(selectors.join(','));
+        const viewportHeight = window.innerHeight || document.documentElement?.clientHeight || 800;
+        for (const candidate of candidates) {
+            const nearestCard = typeof findVideoCardElement === 'function'
+                ? findVideoCardElement(candidate)
+                : candidate;
+            const card = nearestCard?.closest?.('ytd-rich-item-renderer, ytm-rich-item-renderer') || nearestCard;
+            if (!card || typeof card.getBoundingClientRect !== 'function') continue;
+            if (isWatchPage) {
+                if (card.closest?.(
+                    'ytd-playlist-panel-renderer, ytd-playlist-panel-video-renderer, ' +
+                    'ytd-playlist-panel-video-wrapper-renderer, ' +
+                    'ytm-playlist-panel-renderer, ytm-playlist-panel-video-renderer, ' +
+                    'ytm-playlist-panel-video-wrapper-renderer'
+                )) {
+                    continue;
+                }
+                if (!card.closest?.('ytd-watch-next-secondary-results-renderer, #secondary')) {
+                    continue;
+                }
+            }
+            const rect = card.getBoundingClientRect();
+            if (rect.bottom <= 0 || rect.top >= viewportHeight) continue;
+            try {
+                const style = window.getComputedStyle?.(card);
+                if (style?.display === 'none' || style?.visibility === 'hidden') continue;
+            } catch (e) {
+            }
+            return true;
+        }
+        return false;
+    } catch (e) {
+        return false;
+    }
+}
+
+function pruneWatchMetaFetchStartTimes(now) {
+    while (watchMetaFetchStartTimes.length > 0 && now - watchMetaFetchStartTimes[0] >= WATCH_META_FETCH_WINDOW_MS) {
+        watchMetaFetchStartTimes.shift();
+    }
+}
+
+function getWatchMetaFetchRequiredInterval(now) {
+    const recentBurstStarts = watchMetaFetchStartTimes.filter(startedAt => {
+        return now - startedAt < WATCH_META_FETCH_BURST_WINDOW_MS;
+    }).length;
+    return recentBurstStarts < WATCH_META_FETCH_BURST_SIZE
+        ? WATCH_META_FETCH_BURST_INTERVAL_MS
+        : WATCH_META_FETCH_SUSTAINED_INTERVAL_MS;
+}
+
+function scheduleWatchMetaFetchDrain(delayMs) {
+    if (watchMetaFetchDrainTimer || typeof setTimeout !== 'function') return;
+    const delay = Math.max(0, Number(delayMs) || 0);
+    watchMetaFetchDrainTimer = setTimeout(() => {
+        watchMetaFetchDrainTimer = 0;
+        processWatchMetaFetchQueue();
+    }, delay);
+}
 
 function scheduleVideoMetaFetch(videoId, options = null) {
     const v = typeof videoId === 'string' ? videoId.trim() : '';
-    if (!v || !/^[a-zA-Z0-9_-]{11}$/.test(v)) return;
+    if (!v || !/^[a-zA-Z0-9_-]{11}$/.test(v)) return false;
 
     const wants = (() => {
         const needDurationDefault = true;
         const needDatesDefault = false;
         const needCategoryDefault = false;
         if (!options || typeof options !== 'object') {
-            return { needDuration: needDurationDefault, needDates: needDatesDefault, needCategory: needCategoryDefault };
+            return {
+                needDuration: needDurationDefault,
+                needDates: needDatesDefault,
+                needCategory: needCategoryDefault,
+                priority: 'normal'
+            };
         }
         return {
             needDuration: ('needDuration' in options) ? Boolean(options.needDuration) : needDurationDefault,
             needDates: ('needDates' in options) ? Boolean(options.needDates) : needDatesDefault,
-            needCategory: ('needCategory' in options) ? Boolean(options.needCategory) : needCategoryDefault
+            needCategory: ('needCategory' in options) ? Boolean(options.needCategory) : needCategoryDefault,
+            priority: options.priority === 'high' || options.priority === 'low' ? options.priority : 'normal'
         };
     })();
 
-    try {
-        const existing = currentSettings?.videoMetaMap?.[v] || null;
+    if (areWatchMetaFetchNeedsSatisfied(v, wants)) return false;
 
-        let hasDuration = false;
-        const raw = existing?.lengthSeconds;
-        if (typeof raw === 'number' && Number.isFinite(raw) && raw > 0) {
-            hasDuration = true;
-        } else if (typeof raw === 'string' && /^\d+$/.test(raw.trim())) {
-            const parsed = parseInt(raw.trim(), 10);
-            if (Number.isFinite(parsed) && parsed > 0) {
-                hasDuration = true;
-            }
+    if (pendingWatchMetaFetches.has(v)) return true;
+    if (queuedWatchMetaFetches.has(v)) {
+        watchMetaFetchNeeds.set(v, mergeWatchMetaFetchNeeds(watchMetaFetchNeeds.get(v), wants));
+        const currentPriority = watchMetaFetchPriorities.get(v) || 'normal';
+        if (watchMetaFetchPriorityValue(wants.priority) > watchMetaFetchPriorityValue(currentPriority)) {
+            const index = watchMetaFetchQueue.indexOf(v);
+            if (index !== -1) watchMetaFetchQueue.splice(index, 1);
+            queuedWatchMetaFetches.delete(v);
+            watchMetaFetchPriorities.delete(v);
+            enqueueWatchMetaFetch(v, wants.priority);
         }
-
-        let hasDates = false;
-        const candidates = [existing?.uploadDate, existing?.publishDate];
-        for (const candidate of candidates) {
-            if (!candidate || typeof candidate !== 'string') continue;
-            const ms = new Date(candidate).getTime();
-            if (Number.isFinite(ms)) {
-                hasDates = true;
-                break;
-            }
-        }
-
-        let hasCategory = false;
-        const categoryRaw = existing?.category;
-        if (typeof categoryRaw === 'string' && categoryRaw.trim()) {
-            hasCategory = true;
-        }
-
-        const satisfiedDuration = wants.needDuration ? hasDuration : true;
-        const satisfiedDates = wants.needDates ? hasDates : true;
-        const satisfiedCategory = wants.needCategory ? hasCategory : true;
-        if (satisfiedDuration && satisfiedDates && satisfiedCategory) return;
-    } catch (e) {
+        return true;
     }
 
     const now = Date.now();
-    const last = lastWatchMetaFetchAttempt.get(v) || 0;
-    if (now - last < 60 * 1000) return;
-    lastWatchMetaFetchAttempt.set(v, now);
-    if (lastWatchMetaFetchAttempt.size > 3000) {
-        const keysToDelete = Array.from(lastWatchMetaFetchAttempt.keys()).slice(0, 800);
-        keysToDelete.forEach(key => {
-            try {
-                lastWatchMetaFetchAttempt.delete(key);
-            } catch (e) {
-            }
-        });
+    if (wants.needCategory && !wants.needDuration && !wants.needDates) {
+        const categoryMissAt = categoryMetaFetchMisses.get(v) || 0;
+        if (categoryMissAt && now - categoryMissAt < CATEGORY_META_NEGATIVE_CACHE_TTL_MS) return false;
+        if (categoryMissAt) categoryMetaFetchMisses.delete(v);
     }
 
-    if (pendingWatchMetaFetches.has(v)) return;
-    if (queuedWatchMetaFetches.has(v)) return;
-    queuedWatchMetaFetches.add(v);
-    watchMetaFetchQueue.push(v);
+    const last = lastWatchMetaFetchAttempt.get(v) || 0;
+    if (now - last < 60 * 1000) return false;
+
+    if (!enqueueWatchMetaFetch(v, wants.priority)) return false;
+    watchMetaFetchNeeds.set(v, mergeWatchMetaFetchNeeds(null, wants));
+
     processWatchMetaFetchQueue();
+    return true;
 }
 
 function processWatchMetaFetchQueue() {
-    while (activeWatchMetaFetches < WATCH_META_FETCH_CONCURRENCY && watchMetaFetchQueue.length > 0) {
+    if (typeof document !== 'undefined' && document.hidden) return;
+    if (activeWatchMetaFetches >= WATCH_META_FETCH_CONCURRENCY || watchMetaFetchQueue.length === 0) return;
+
+    const now = Date.now();
+    const sharedScrollAt = typeof window !== 'undefined'
+        ? Number(window.__filtertubeScrollState?.lastScrollTs || 0)
+        : 0;
+    if (sharedScrollAt && now - sharedScrollAt < WATCH_META_FETCH_SCROLL_IDLE_MS) {
+        scheduleWatchMetaFetchDrain(WATCH_META_FETCH_SCROLL_IDLE_MS - (now - sharedScrollAt));
+        return;
+    }
+
+    pruneWatchMetaFetchStartTimes(now);
+    if (watchMetaFetchStartTimes.length >= WATCH_META_FETCH_MAX_PER_WINDOW) {
+        scheduleWatchMetaFetchDrain(WATCH_META_FETCH_WINDOW_MS - (now - watchMetaFetchStartTimes[0]));
+        return;
+    }
+
+    const requiredInterval = getWatchMetaFetchRequiredInterval(now);
+    const canJoinActiveBatch = Boolean(
+        activeWatchMetaFetches > 0 &&
+        activeWatchMetaFetches < WATCH_META_FETCH_CONCURRENCY &&
+        lastWatchMetaFetchStartedAt &&
+        now - lastWatchMetaFetchStartedAt <= WATCH_META_FETCH_PARALLEL_JOIN_WINDOW_MS
+    );
+    if (!canJoinActiveBatch && lastWatchMetaFetchStartedAt && now - lastWatchMetaFetchStartedAt < requiredInterval) {
+        scheduleWatchMetaFetchDrain(requiredInterval - (now - lastWatchMetaFetchStartedAt));
+        return;
+    }
+
+    while (
+        watchMetaFetchQueue.length > 0 &&
+        activeWatchMetaFetches < WATCH_META_FETCH_CONCURRENCY
+    ) {
         const nextVideoId = watchMetaFetchQueue.shift();
         queuedWatchMetaFetches.delete(nextVideoId);
+        watchMetaFetchPriorities.delete(nextVideoId);
+        const needs = watchMetaFetchNeeds.get(nextVideoId) || null;
+        watchMetaFetchNeeds.delete(nextVideoId);
         if (!nextVideoId) continue;
+        // Settings/cache hydration may complete after a video entered the queue.
+        // Revalidate at dispatch so already-known categories never cause a
+        // redundant Player request.
+        if (areWatchMetaFetchNeedsSatisfied(nextVideoId, needs)) continue;
+        if (isCategoryOnlyMetaFetch(needs) && !isVideoNearCategoryViewport(nextVideoId)) continue;
+
+        // A paced drain may fill one micro-batch, but it may never cross the
+        // shared one-minute start budget while doing so.
+        if (watchMetaFetchStartTimes.length >= WATCH_META_FETCH_MAX_PER_WINDOW) {
+            scheduleWatchMetaFetchDrain(WATCH_META_FETCH_WINDOW_MS - (Date.now() - watchMetaFetchStartTimes[0]));
+            break;
+        }
+
+        const dispatchAt = Date.now();
+        lastWatchMetaFetchStartedAt = dispatchAt;
+        watchMetaFetchStartTimes.push(dispatchAt);
+        lastWatchMetaFetchAttempt.set(nextVideoId, dispatchAt);
+        if (lastWatchMetaFetchAttempt.size > 3000) {
+            const keysToDelete = Array.from(lastWatchMetaFetchAttempt.keys()).slice(0, 800);
+            keysToDelete.forEach(key => {
+                try {
+                    lastWatchMetaFetchAttempt.delete(key);
+                } catch (e) {
+                }
+            });
+        }
 
         activeWatchMetaFetches++;
         const fetchPromise = fetchVideoMetaFromWatchUrl(nextVideoId)
@@ -2120,7 +2359,7 @@ function processWatchMetaFetchQueue() {
             .finally(() => {
                 pendingWatchMetaFetches.delete(nextVideoId);
                 activeWatchMetaFetches = Math.max(0, activeWatchMetaFetches - 1);
-                processWatchMetaFetchQueue();
+                scheduleWatchMetaFetchDrain(WATCH_META_FETCH_BURST_INTERVAL_MS);
             });
         pendingWatchMetaFetches.set(nextVideoId, fetchPromise);
     }
@@ -2132,80 +2371,35 @@ async function fetchVideoMetaFromWatchUrl(videoId) {
         return null;
     }
 
-    const extractJsonObjectFromHtml = (html, marker) => {
-        try {
-            if (!html || !marker) return '';
-            const start = html.indexOf(marker);
-            if (start === -1) return '';
-            const braceStart = html.indexOf('{', start + marker.length);
-            if (braceStart === -1) return '';
-
-            let depth = 0;
-            let inString = false;
-            let stringChar = '';
-            let escaped = false;
-            for (let i = braceStart; i < html.length; i++) {
-                const ch = html[i];
-                if (inString) {
-                    if (escaped) {
-                        escaped = false;
-                    } else if (ch === '\\') {
-                        escaped = true;
-                    } else if (ch === stringChar) {
-                        inString = false;
-                        stringChar = '';
-                    }
-                    continue;
-                }
-
-                if (ch === '"' || ch === '\'') {
-                    inString = true;
-                    stringChar = ch;
-                    continue;
-                }
-
-                if (ch === '{') {
-                    depth++;
-                } else if (ch === '}') {
-                    depth--;
-                    if (depth === 0) {
-                        return html.slice(braceStart, i + 1);
-                    }
-                }
-            }
-            return '';
-        } catch (e) {
-            return '';
-        }
-    };
-
     try {
-        const response = await fetch(`https://www.youtube.com/watch?v=${videoId}`, {
-            credentials: 'same-origin',
-            headers: {
-                'Accept': 'text/html'
+        // The browse/search card JSON normally has no official category. Ask the
+        // MAIN-world bridge for the same structured Player response used by the
+        // native app instead of scraping /watch HTML (which YouTube redirects).
+        const metadata = await requestVideoMetaFromMainWorld(videoId);
+        const lengthSeconds = metadata?.lengthSeconds || null;
+        const publishDate = typeof metadata?.publishDate === 'string' ? metadata.publishDate : '';
+        const uploadDate = typeof metadata?.uploadDate === 'string' ? metadata.uploadDate : '';
+        const category = typeof metadata?.category === 'string' ? metadata.category.trim() : '';
+        const channelId = typeof metadata?.channelId === 'string' ? metadata.channelId.trim() : '';
+        const channelName = typeof metadata?.channelName === 'string' ? metadata.channelName.trim() : '';
+        const channelHandle = typeof metadata?.channelHandle === 'string' ? metadata.channelHandle.trim() : '';
+
+        if (typeof categoryMetaFetchMisses !== 'undefined') {
+            if (category) {
+                categoryMetaFetchMisses.delete(videoId);
+            } else {
+                categoryMetaFetchMisses.set(videoId, Date.now());
+                if (categoryMetaFetchMisses.size > 1000) {
+                    const staleKeys = Array.from(categoryMetaFetchMisses.keys()).slice(0, 250);
+                    staleKeys.forEach(key => categoryMetaFetchMisses.delete(key));
+                }
             }
-        });
+        }
 
-        if (!response.ok) return null;
-        const html = await response.text();
-
-        const rawJson =
-            extractJsonObjectFromHtml(html, 'var ytInitialPlayerResponse =') ||
-            extractJsonObjectFromHtml(html, 'ytInitialPlayerResponse =') ||
-            '';
-        if (!rawJson) return null;
-
-        const playerResponse = JSON.parse(rawJson);
-        const videoDetails = playerResponse?.videoDetails || null;
-        const micro = playerResponse?.microformat?.playerMicroformatRenderer || null;
-
-        const lengthSeconds = (micro && micro.lengthSeconds) || (videoDetails && videoDetails.lengthSeconds) || null;
-        const publishDate = (micro && micro.publishDate) ? String(micro.publishDate) : '';
-        const uploadDate = (micro && micro.uploadDate) ? String(micro.uploadDate) : '';
-        const category = (micro && (micro.category || micro.genre)) ? String(micro.category || micro.genre) : '';
-
-        if (!lengthSeconds && !publishDate && !uploadDate && !category) return null;
+        if (
+            !lengthSeconds && !publishDate && !uploadDate && !category &&
+            !channelId && !channelName && !channelHandle
+        ) return null;
 
         persistVideoMetaMapping([{
             videoId,
@@ -2215,11 +2409,48 @@ async function fetchVideoMetaFromWatchUrl(videoId) {
             category
         }]);
 
+        if (/^UC[a-zA-Z0-9_-]{22}$/.test(channelId)) {
+            persistVideoChannelMapping(videoId, channelId);
+        }
+
+        if (channelId || channelName || channelHandle) {
+            try {
+                const matchingCards = typeof findVideoCardsByVideoId === 'function'
+                    ? findVideoCardsByVideoId(videoId)
+                    : [];
+                matchingCards.forEach(card => {
+                    const isMixSeedOwner = typeof isMixCardElement === 'function' && isMixCardElement(card);
+                    if (isMixSeedOwner) {
+                        card.setAttribute('data-filtertube-mix-seed-owner', 'true');
+                    }
+                    if (typeof stampChannelIdentity === 'function') {
+                        stampChannelIdentity(card, {
+                            id: channelId || null,
+                            handle: channelHandle || null,
+                            name: channelName || null,
+                            videoId,
+                            isMixSeedOwner
+                        }, { scheduleFallback: false });
+                    }
+                });
+            } catch (e) {
+            }
+        }
+
         if (touchDomForVideoMetaUpdate(videoId)) {
             scheduleVideoMetaDomRerun();
         }
 
-        return { videoId, lengthSeconds, publishDate, uploadDate, category };
+        return {
+            videoId,
+            lengthSeconds,
+            publishDate,
+            uploadDate,
+            category,
+            channelId,
+            channelName,
+            channelHandle
+        };
     } catch (e) {
         return null;
     }
@@ -5849,6 +6080,50 @@ if (typeof window.subscriptionImportRequestId !== 'number' || !isFinite(window.s
     window.subscriptionImportRequestId = 0;
 }
 
+// Pending structured Player metadata requests (category/duration/dates).
+if (!(window.pendingVideoMetaRequests instanceof Map)) {
+    window.pendingVideoMetaRequests = new Map();
+}
+if (typeof window.videoMetaRequestId !== 'number' || !isFinite(window.videoMetaRequestId)) {
+    window.videoMetaRequestId = 0;
+}
+
+function requestVideoMetaFromMainWorld(videoId) {
+    return new Promise((resolve) => {
+        const normalizedVideoId = typeof videoId === 'string' ? videoId.trim() : '';
+        if (!/^[A-Za-z0-9_-]{11}$/.test(normalizedVideoId)) {
+            resolve(null);
+            return;
+        }
+
+        const requestId = ++window.videoMetaRequestId;
+        const timeoutId = setTimeout(() => {
+            const pending = window.pendingVideoMetaRequests.get(requestId);
+            if (!pending) return;
+            window.pendingVideoMetaRequests.delete(requestId);
+            pending.resolve(null);
+        }, 10000);
+
+        window.pendingVideoMetaRequests.set(requestId, {
+            resolve,
+            timeoutId,
+            videoId: normalizedVideoId
+        });
+
+        Promise.resolve()
+            .then(() => ensureMainWorldRuntimeForBridgeRequest())
+            .catch(() => false)
+            .then(() => {
+                if (!window.pendingVideoMetaRequests.has(requestId)) return;
+                window.postMessage({
+                    type: 'FilterTube_RequestVideoMeta',
+                    payload: { requestId, videoId: normalizedVideoId },
+                    source: 'content_bridge'
+                }, '*');
+            });
+    });
+}
+
 /**
  * Request collaborator info from Main World (injector.js) via message passing
  * This is needed because content_bridge.js runs in Isolated World and cannot access window.ytInitialData
@@ -6376,7 +6651,19 @@ function handleMainWorldMessages(event) {
             }
         }
 
-        if (didTouchDom) {
+        const currentWatchVideoId = (() => {
+            try {
+                if (!String(document.location?.pathname || '').startsWith('/watch')) return '';
+                return new URLSearchParams(document.location?.search || '').get('v') || '';
+            } catch (e) {
+                return '';
+            }
+        })();
+        const updatedCurrentWatch = Boolean(
+            currentWatchVideoId && updates.some(entry => entry?.videoId === currentWatchVideoId)
+        );
+
+        if (didTouchDom || updatedCurrentWatch) {
             try {
                 scheduleVideoMetaDomRerun();
             } catch (e) {
@@ -6449,6 +6736,14 @@ function handleMainWorldMessages(event) {
             window.pendingSubscriptionImportRequests.delete(requestId);
             pending.resolve(payload || { success: false, error: 'Unknown subscriptions import response', channels: [] });
         }
+    } else if (type === 'FilterTube_VideoMetaResponse') {
+        const { requestId, videoId, metadata } = payload || {};
+        const pending = window.pendingVideoMetaRequests.get(requestId);
+        if (pending && pending.videoId === videoId) {
+            clearTimeout(pending.timeoutId);
+            window.pendingVideoMetaRequests.delete(requestId);
+            pending.resolve(metadata && typeof metadata === 'object' ? metadata : null);
+        }
     } else if (type === 'FilterTube_CacheCollaboratorInfo') {
         const videoId = payload?.videoId;
         const collaborators = payload?.collaborators;
@@ -6516,6 +6811,9 @@ async function initialize() {
     try {
         initializeStats(); // Initialize statistics tracking
         const response = await requestSettingsFromBackground();
+        if (response?.success && typeof syncCategoryPolicyShellState === 'function') {
+            syncCategoryPolicyShellState(response.settings);
+        }
         if (response?.success) {
             await ensureMainWorldRuntimeForSettings(response.settings);
         }
@@ -6528,13 +6826,121 @@ async function initialize() {
 }
 
 async function initializeDOMFallback(settings) {
+    if (settings && typeof syncCategoryPolicyShellState === 'function') {
+        syncCategoryPolicyShellState(settings);
+    }
     await new Promise(resolve => setTimeout(resolve, 1000));
     if (!settings) {
         const response = await requestSettingsFromBackground();
         settings = response?.settings;
     }
     if (settings) {
+        if (typeof syncCategoryPolicyShellState === 'function') {
+            syncCategoryPolicyShellState(settings);
+        }
         if (isFilterTubeManagedViewingRouteDenied()) return;
+
+        function primeAllowOnlyCategoryCards(mutations, settingsOverride = null) {
+            try {
+                const activeSettings = settingsOverride || currentSettings;
+                const categoryFilters = activeSettings?.categoryFilters;
+                const selected = Array.isArray(categoryFilters?.selected) ? categoryFilters.selected : [];
+                if (categoryFilters?.enabled !== true || categoryFilters?.mode !== 'allow' || selected.length === 0) return;
+                if (typeof VIDEO_CARD_SELECTORS !== 'string') return;
+
+                const candidates = new Set();
+                const collect = (node) => {
+                    if (!(node instanceof Element) || candidates.size >= 160) return;
+                    try {
+                        const closest = node.closest?.(VIDEO_CARD_SELECTORS);
+                        if (closest) candidates.add(closest);
+                        if (node.matches?.(VIDEO_CARD_SELECTORS)) candidates.add(node);
+                        for (const nested of node.querySelectorAll?.(VIDEO_CARD_SELECTORS) || []) {
+                            candidates.add(nested);
+                            if (candidates.size >= 160) break;
+                        }
+                    } catch (e) {
+                    }
+                };
+
+                for (const mutation of mutations || []) {
+                    for (const node of mutation?.addedNodes || []) {
+                        collect(node);
+                        if (candidates.size >= 160) break;
+                    }
+                }
+
+                const path = String(document.location?.pathname || '');
+                for (const candidate of candidates) {
+                    if (isFilterTubeCommentSurfaceElement(candidate)) continue;
+
+                    const isWatchRail = path.startsWith('/watch') && Boolean(
+                        candidate.closest?.('#secondary, ytd-watch-next-secondary-results-renderer')
+                    );
+                    if (isWatchRail && candidate.closest?.('ytd-playlist-panel-renderer, ytd-playlist-panel-video-renderer')) {
+                        continue;
+                    }
+
+                    const card = isWatchRail
+                        ? (
+                            typeof getWatchRailCategoryCardOwner === 'function'
+                                ? getWatchRailCategoryCardOwner(candidate)
+                                : (candidate.closest?.('ytd-compact-video-renderer, ytd-compact-radio-renderer')
+                                    || candidate.closest?.('yt-lockup-view-model')
+                                    || candidate)
+                        )
+                        : (
+                            candidate.closest?.(
+                                'ytd-rich-item-renderer, ytd-video-renderer, ytd-grid-video-renderer, ' +
+                                'ytm-rich-item-renderer, ytm-video-with-context-renderer, ytm-compact-video-renderer'
+                            ) || candidate
+                        );
+                    const videoId = ensureVideoIdForCard(card);
+                    if (!/^[a-zA-Z0-9_-]{11}$/.test(videoId || '')) continue;
+
+                    const eligible = isWatchRail || (
+                        typeof isCategoryPolicyEligibleVideoElement === 'function' &&
+                        isCategoryPolicyEligibleVideoElement(card, videoId)
+                    );
+                    if (!eligible) continue;
+
+                    const category = String(activeSettings?.videoMetaMap?.[videoId]?.category || '').trim();
+                    if (category) continue;
+
+                    let isVisibleOrNear = false;
+                    try {
+                        const rect = card.getBoundingClientRect();
+                        const viewportHeight = window.innerHeight || document.documentElement?.clientHeight || 800;
+                        isVisibleOrNear = rect.bottom > 0 && rect.top < viewportHeight + 160;
+                    } catch (e) {
+                    }
+
+                    if (isWatchRail) {
+                        if (!isVisibleOrNear) continue;
+                        if (typeof setWatchRailCategoryState === 'function') {
+                            setWatchRailCategoryState(card, 'pending', 'Checking category…');
+                        }
+                    } else {
+                        card.setAttribute('data-filtertube-pending-category', 'true');
+                        if (isVisibleOrNear && !card.hasAttribute('data-filtertube-pending-category-ts')) {
+                            card.setAttribute('data-filtertube-pending-category-ts', String(Date.now()));
+                        }
+                    }
+
+                    if (isVisibleOrNear && typeof scheduleVideoMetaFetch === 'function') {
+                        scheduleVideoMetaFetch(videoId, {
+                            needDuration: false,
+                            needDates: false,
+                            needCategory: true,
+                            priority: 'high'
+                        });
+                    }
+                }
+            } catch (e) {
+            }
+        }
+
+        primeAllowOnlyCategoryCards([{ addedNodes: [document.body || document.documentElement] }], settings);
         applyDOMFallback(settings);
         try {
             ensureFallbackMenuButtons();
@@ -6873,6 +7279,7 @@ async function initializeDOMFallback(settings) {
             const mutationSummary = fallbackMutationSummary(mutations);
 
             if (mutationSummary.hasAddedNodes) {
+                primeAllowOnlyCategoryCards(mutations);
                 queueWhitelistPendingHide(mutations);
                 if (mutationSummary.hasFallbackRelevantContent) {
                     scheduleImmediateFallback();
@@ -10246,7 +10653,16 @@ function extractChannelFromCard(card) {
                     }
                 }
                 console.log('FilterTube: Extracted from Mix card:', { id, handle, customUrl, name });
-                return { id: id || '', handle: handle || '', customUrl: customUrl || '', name: name || '', logo: extractAvatarUrl() || '', videoId: videoIdHint || undefined };
+                return {
+                    id: id || '',
+                    handle: handle || '',
+                    customUrl: customUrl || '',
+                    name: name || '',
+                    logo: extractAvatarUrl() || '',
+                    videoId: videoIdHint || undefined,
+                    isMixSeedOwner: true,
+                    source: 'mixSeed'
+                };
             }
 
             if (videoIdHint) {
@@ -10257,7 +10673,9 @@ function extractChannelFromCard(card) {
                     needsFetch: true,
                     fetchStrategy: 'mainworld',
                     expectedChannelName: fallbackName || null,
-                    name: fallbackName || ''
+                    name: fallbackName || '',
+                    isMixSeedOwner: true,
+                    source: 'mixSeed'
                 };
             }
 

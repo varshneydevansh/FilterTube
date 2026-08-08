@@ -4,6 +4,7 @@
     'use strict';
 
     const SUBSCRIPTIONS_IMPORT_BRIDGE_VERSION = '2026-04-09-1';
+    const VIDEO_META_BRIDGE_VERSION = '2026-08-07-1';
 
     function announceSubscriptionsImportBridgeReady() {
         try {
@@ -75,7 +76,75 @@
         announceSubscriptionsImportBridgeReady();
     }
 
+    function announceVideoMetaBridgeReady() {
+        try {
+            window.filterTubeVideoMetaBridgeReady = true;
+            window.filterTubeVideoMetaBridgeVersion = VIDEO_META_BRIDGE_VERSION;
+            window.postMessage({
+                type: 'FilterTube_VideoMetaBridgeReady',
+                payload: {
+                    version: VIDEO_META_BRIDGE_VERSION
+                },
+                source: 'injector'
+            }, '*');
+        } catch (e) {
+        }
+    }
+
+    function handleVideoMetaBridgeMessage(event) {
+        if (event.source !== window || !event.data) return;
+
+        const { type, payload, source } = event.data;
+        if (source === 'injector') return;
+        if (type !== 'FilterTube_RequestVideoMeta' || source !== 'content_bridge') return;
+
+        const requestId = payload?.requestId;
+        const videoId = typeof payload?.videoId === 'string' ? payload.videoId.trim() : '';
+        if (!/^[A-Za-z0-9_-]{11}$/.test(videoId)) {
+            window.postMessage({
+                type: 'FilterTube_VideoMetaResponse',
+                payload: { requestId, videoId, success: false, metadata: null, errorCode: 'invalid_video_id' },
+                source: 'injector'
+            }, '*');
+            return;
+        }
+
+        (async () => {
+            let result = null;
+            try {
+                result = await fetchVideoMetaFromYoutubeiPlayer(videoId);
+            } catch (error) {
+                result = {
+                    success: false,
+                    metadata: null,
+                    errorCode: error?.name === 'AbortError' ? 'timeout' : 'fetch_failed'
+                };
+            }
+
+            window.postMessage({
+                type: 'FilterTube_VideoMetaResponse',
+                payload: {
+                    requestId,
+                    videoId,
+                    success: result?.success === true,
+                    metadata: result?.metadata || null,
+                    errorCode: result?.errorCode || ''
+                },
+                source: 'injector'
+            }, '*');
+        })();
+    }
+
+    function installVideoMetaBridge() {
+        if (window.__filtertubeVideoMetaListenerInstalled !== true) {
+            window.addEventListener('message', handleVideoMetaBridgeMessage);
+            window.__filtertubeVideoMetaListenerInstalled = true;
+        }
+        announceVideoMetaBridgeReady();
+    }
+
     installSubscriptionsImportBridge();
+    installVideoMetaBridge();
 
     // Idempotency guard - prevent multiple executions
     if (window.filterTubeInjectorHasRun) {
@@ -607,6 +676,94 @@
             apiKey: String(getYtcfgValue('INNERTUBE_API_KEY') || '').trim(),
             profiles
         };
+    }
+
+    async function fetchVideoMetaFromYoutubeiPlayer(videoId) {
+        if (!/^[A-Za-z0-9_-]{11}$/.test(videoId || '')) {
+            return { success: false, metadata: null, errorCode: 'invalid_video_id' };
+        }
+
+        const requestContext = buildSubscriptionImportRequestProfiles();
+        const profiles = Array.isArray(requestContext?.profiles) ? requestContext.profiles : [];
+        if (profiles.length === 0) {
+            return { success: false, metadata: null, errorCode: 'context_unavailable' };
+        }
+
+        let lastErrorCode = 'metadata_unavailable';
+        for (const profile of profiles) {
+            if (!profile?.context) continue;
+
+            const endpointUrl = requestContext.apiKey
+                ? `/youtubei/v1/player?prettyPrint=false&key=${encodeURIComponent(requestContext.apiKey)}`
+                : '/youtubei/v1/player?prettyPrint=false';
+            const abortController = typeof AbortController === 'function' ? new AbortController() : null;
+            const abortTimer = abortController
+                ? setTimeout(() => {
+                    try {
+                        abortController.abort();
+                    } catch (e) {
+                    }
+                }, 8000)
+                : null;
+
+            try {
+                const playerHttpResponse = await fetch(endpointUrl, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: buildSubscriptionImportHeaders(profile),
+                    body: JSON.stringify({
+                        context: profile.context,
+                        videoId,
+                        contentCheckOk: false,
+                        racyCheckOk: false
+                    }),
+                    ...(abortController ? { signal: abortController.signal } : {})
+                });
+
+                if (!playerHttpResponse.ok) {
+                    lastErrorCode = `http_${playerHttpResponse.status || 0}`;
+                    continue;
+                }
+
+                const playerResponse = await playerHttpResponse.json();
+                const details = playerResponse?.videoDetails || null;
+                const microformat = playerResponse?.microformat?.playerMicroformatRenderer || null;
+                const ownerProfileUrl = typeof microformat?.ownerProfileUrl === 'string'
+                    ? microformat.ownerProfileUrl.trim()
+                    : '';
+                const ownerHandleMatch = ownerProfileUrl.match(/\/@([^/?#]+)/);
+                const metadata = {
+                    videoId,
+                    lengthSeconds: microformat?.lengthSeconds || details?.lengthSeconds || null,
+                    publishDate: typeof microformat?.publishDate === 'string' ? microformat.publishDate : '',
+                    uploadDate: typeof microformat?.uploadDate === 'string' ? microformat.uploadDate : '',
+                    category: typeof (microformat?.category || microformat?.genre) === 'string'
+                        ? String(microformat.category || microformat.genre).trim()
+                        : '',
+                    channelId: typeof (details?.channelId || microformat?.externalChannelId) === 'string'
+                        ? String(details.channelId || microformat.externalChannelId).trim()
+                        : '',
+                    channelName: typeof (details?.author || microformat?.ownerChannelName) === 'string'
+                        ? String(details.author || microformat.ownerChannelName).trim()
+                        : '',
+                    channelHandle: ownerHandleMatch?.[1] ? `@${ownerHandleMatch[1]}` : ''
+                };
+
+                if (
+                    metadata.lengthSeconds || metadata.publishDate || metadata.uploadDate || metadata.category ||
+                    metadata.channelId || metadata.channelName || metadata.channelHandle
+                ) {
+                    return { success: true, metadata, errorCode: '' };
+                }
+                lastErrorCode = 'metadata_unavailable';
+            } catch (error) {
+                lastErrorCode = error?.name === 'AbortError' ? 'timeout' : 'fetch_failed';
+            } finally {
+                if (abortTimer) clearTimeout(abortTimer);
+            }
+        }
+
+        return { success: false, metadata: null, errorCode: lastErrorCode };
     }
 
     function isYoutubeChannelsFeedPath() {

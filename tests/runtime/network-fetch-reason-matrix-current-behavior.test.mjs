@@ -99,7 +99,9 @@ test('content bridge has metadata, background identity, direct identity, and men
   const watchDirect = sliceBetween(bridge, 'async function fetchChannelFromWatchUrl(videoId, requestedHandle = null) {', 'async function injectFilterTubeMenuItem');
   const menuOpen = sliceBetween(bridge, 'const stillNeedsNameEnrichment = !enrichedInfo?.name', 'updateInjectedMenuChannelName(dropdown, enrichedInfo);');
 
-  assert.match(metadata, /fetch\(`https:\/\/www\.youtube\.com\/watch\?v=\$\{videoId\}`/);
+  assert.match(metadata, /requestVideoMetaFromMainWorld\(videoId\)/);
+  assert.doesNotMatch(metadata, /fetch\s*\(/);
+  assert.doesNotMatch(metadata, /\/watch\?v=/);
   assert.match(metadata, /persistVideoMetaMapping/);
   assert.match(metadata, /scheduleVideoMetaDomRerun/);
   assert.match(backgroundWatch, /action: 'fetchWatchIdentity'/);

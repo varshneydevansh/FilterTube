@@ -1,6 +1,24 @@
 (function (global) {
     'use strict';
 
+    const categoryOptions = [
+        { label: 'Film & Animation', color: '#ef4444' },
+        { label: 'Autos & Vehicles', color: '#f97316' },
+        { label: 'Music', color: '#f59e0b' },
+        { label: 'Pets & Animals', color: '#84cc16' },
+        { label: 'Sports', color: '#22c55e' },
+        { label: 'Travel & Events', color: '#14b8a6' },
+        { label: 'Gaming', color: '#0ea5e9' },
+        { label: 'People & Blogs', color: '#3b82f6' },
+        { label: 'Comedy', color: '#6366f1' },
+        { label: 'Entertainment', color: '#8b5cf6' },
+        { label: 'News & Politics', color: '#a855f7' },
+        { label: 'Howto & Style', color: '#ec4899' },
+        { label: 'Education', color: '#f43f5e' },
+        { label: 'Science & Technology', color: '#64748b' },
+        { label: 'Nonprofits & Activism', color: '#10b981' }
+    ];
+
     const groups = [
         {
             id: 'core',
@@ -219,9 +237,14 @@
         return getAllControls().find(control => control.key === key) || null;
     }
 
+    function getCategoryOptions() {
+        return categoryOptions.map(option => ({ ...option }));
+    }
+
     global.FilterTubeContentControlsCatalog = {
         getCatalog,
         getAllControls,
-        getControlByKey
+        getControlByKey,
+        getCategoryOptions
     };
 })(typeof window !== 'undefined' ? window : this);

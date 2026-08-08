@@ -2057,6 +2057,77 @@ continues through the dedicated comment renderer/path.
 
 ## Feed/Search Filter Chips
 
+### Global desktop Home chip bar (2026-08-07 capture)
+
+The Home grid header owns a global horizontally scrollable refinement bar:
+
+```text
+ytd-rich-grid-renderer #header
+  -> ytd-feed-filter-chip-bar-renderer[component-style="FEED_FILTER_CHIP_BAR_STYLE_TYPE_DEFAULT"]
+     -> #chips-wrapper -> #chips-content
+     -> #left-arrow button[aria-label="Previous"]
+     -> #filter -> #scroll-container[touch-action="pan-y"]
+     -> iron-selector#chips[role="tablist"]
+        -> yt-chip-cloud-chip-renderer[chip-style="STYLE_HOME_FILTER"]
+           -> chip-shape -> button[role="tab"]
+     -> #right-arrow button[aria-label="Next"]
+```
+
+The capture includes `All`, `Gaming`, `News`, `Music`, `Titanfall`, `Mixes`,
+`Podcasts`, `Live`, `Media theories`, `Variable (math)`, `AI`, artist/genre
+labels, `Recently uploaded`, `Watched`, and `New to you`; `Music` is selected
+through both the renderer's `selected` / `iron-selected` state and the button's
+`aria-selected="true"`.
+
+This bar refines the entire Home feed and is already a route-scoped chip UI
+boundary. Its arrows and tabs are navigation controls, not content-card hide
+targets. A selected `Music`, `Gaming`, or `News` chip is a useful UI context but
+is not equivalent to `microformat.playerMicroformatRenderer.category`: do not
+stamp that label onto every returned card. Feed reloads and continuations must
+re-run card discovery, then each video keeps or resolves its own cached official
+category.
+
+### Desktop Home “Explore more topics” chips + video shelf (2026-08-07 capture)
+
+The desktop Home feed can place a second, shelf-local chip rail inside a
+`ytd-rich-section-renderer`. This is not the top Home feed chip bar and it is
+not an official video-category source:
+
+```text
+ytd-rich-section-renderer
+  -> ytd-chips-shelf-with-video-shelf-renderer
+     -> yt-section-header-view-model ("Explore more topics")
+     -> chips-shelf-view-model
+        -> .ytChipsShelfViewModelChipsScrollContainer
+        -> [role="tablist"]
+        -> chip-view-model -> chip-shape -> button[role="tab"]
+     -> ytd-rich-shelf-renderer[is-inner-shelf]
+        -> #contents
+        -> ytd-rich-item-renderer[is-shelf-item]
+           -> yt-lockup-view-model
+```
+
+| DOM tag / component | Purpose | Filtering boundary |
+| --- | --- | --- |
+| `<ytd-chips-shelf-with-video-shelf-renderer class="ytdChipsShelfWithVideoShelfRendererHost">` | Owns the local topic rail and its video shelf | Structural only; never assign one chip/category to the whole shelf. |
+| `<chips-shelf-view-model class="ytChipsShelfViewModelHost">` | Horizontally scrollable topic controls with `Previous` / `Next` buttons | Navigation UI only; do not process as content cards. |
+| `<chip-view-model>` -> `<chip-shape>` -> `button[role="tab"]` | Topic labels such as `Apex Legends`, `Tokyo food scene`, and `Math Olympiad puzzles` | Shelf refinement labels, not `playerMicroformatRenderer.category`. `aria-selected="true"` identifies only the current shelf topic. |
+| `<ytd-rich-shelf-renderer is-inner-shelf>` | Structural lane whose contents change when a local chip is selected | Preserve the shelf and its horizontal geometry. Re-run filtering for newly rendered/recycled child cards. |
+| `<ytd-rich-item-renderer is-shelf-item>` -> `<yt-lockup-view-model>` | Individual video result | The child card is the category/channel/keyword/menu target; resolve category by its own video ID. |
+
+The capture proves that shelf-local chips can mix very different topics. A
+selected `Apex Legends` chip must not cause adjacent or subsequently loaded
+cards to inherit Gaming. Likewise, a Math-labelled chip is not proof of the
+YouTube `Education` category. Category filtering continues to use each child
+video's official Player microformat metadata. While that metadata is unknown,
+Allow-only mode must veil the child card without collapsing the shelf; after a
+bounded lookup timeout it keeps a static unavailable placeholder rather than
+flashing unverified content.
+
+The shelf header's `More actions` control is shelf feedback. Each lockup's own
+`More actions` button remains the per-video three-dot menu and may use that
+video's resolved channel identity (including a generated Mix seed owner).
+
 | DOM tag / component | Associated data | Coverage | Notes |
 | --- | --- | --- | --- |
 | `<ytd-feed-filter-chip-bar-renderer>` | Horizontal chip bar | ✅ Route-scoped DOM support | Home/feed chip bars can be processed on `/` |
@@ -2093,6 +2164,500 @@ These chips originate from the YouTube UI rather than content cards. FilterTube 
 | `<ytk-compact-channel-renderer>` | Channel tiles (home/search/music) | ❌ DOM-only | Channel title + thumbnail; 3-dot menu present. Must capture channelId from href `/channel/UC...`. |
 | `<ytk-two-column-watch-next-results-renderer>` | Watch-page right rail container | ℹ️ Layout | Contains `ytk-compact-video-renderer` items; observer hook needed to filter next-up rows. |
 | `<ytk-slim-video-metadata-renderer>` | Watch-page header (title + owner) | ❌ DOM-only | Title in `#video-title`; channel name in `#video-owner`. Use to seed channel and video title when JSON unavailable. |
+
+### YouTube Kids onboarding and profile DOM (2026-07-26)
+
+The Android WebView is the app-flow authority. Chrome Incognito is a clean
+browser comparison, while authenticated Chrome is used only for signed-in
+profile/account branches. The onboarding screens below are client-side states
+selected from one `kids/get_kids_flow_data` response; a different visible page
+does not imply a fresh functional API call.
+
+| Projected DOM host | `onboardingV2` catalog path | Purpose / observed transition |
+| --- | --- | --- |
+| `<ytk-kids-welcome-page-renderer>` | `newWelcomePage.kidsWelcomePageRenderer` | Initial `I'm a kid` / `I'm a parent` choice |
+| `<ytk-kids-onboarding-welcome-page-renderer>` | `parentWelcomePage.kidsOnboardingWelcomePageRenderer` | Parent safety-controls introduction |
+| `<ytk-kids-onboarding-age-gate-renderer>` | `ageGate.kidsOnboardingAgeGateRenderer` | Four-digit parent birth-year check; entered value is not provider UI data |
+| `<ytk-kids-sign-in-info-renderer>` | `kidsSignInInfoPage.kidsSignInInfoRenderer` | Parent-sign-in explanation and optional explainer video |
+| `<ytk-kids-select-account-page-renderer>` | `selectAccountPage.kidsSelectAccountPageRenderer` | Parent account row, `Back`, signed-out `Skip`, and `Sign in` |
+| `<ytk-kids-profile-creation-page-renderer>` | `profileCreationPage.kidsProfileCreationPageRenderer` | Child persona name, age/month, and avatar setup |
+| `<ytk-kids-corpus-selection-renderer>` | `kidsCorpusSelectionPage.kidsCorpusSelectionRenderer` | Age/content corpus selection |
+| `<ytk-kids-onboarding-search-page-renderer>` | `searchPage.kidsOnboardingSearchPageRenderer` | Search on/off choice for the persona |
+| `<ytk-kids-profile-result-page-renderer>` | `profileResultPage.kidsProfileResultPageRenderer` | Distinct `Profile created!` result; offers secret-code `Edit`, `Add another profile`, and `Next` |
+| `<ytk-kids-parent-feature-tour-renderer>` | `kidsParentFeatureTourPage.kidsParentFeatureTourRenderer` | Optional presentation tour; its Lottie JSON files are visual assets, not account APIs |
+| `<ytk-kids-profile-all-set-page-renderer>` | `profileAllSetPage.kidsProfileAllSetPageRenderer` | Later profile-ready state with `Let's go` and `Add another profile` |
+
+`profileResultPage` and `profileAllSetPage` are not aliases. `Next` leaves the
+profile-created result/secret-code screen; runtime observation shows `Let's
+go` handing off to selected-persona Kids Home, while the exact activation
+request remains unidentified.
+
+If a different Google identity is used during a mutation owned by the current
+parent, the catalog branch is:
+
+```text
+onboardingV2.invalidReauthPage.kidsInvalidReauthPageRenderer
+```
+
+It supplies `title`, `bodyText`, and `tryAgainButtonText`. Resolved email text
+is private runtime state and must not be retained in fixtures or documentation.
+
+Identity rule: one active parent Google identity owns zero or more delegated
+YouTube Kids personas. Those personas have `hasChannel=false` and are not
+YouTube channel accounts. Switching to a different parent is an explicit
+provider-owned sign-out/account-switch flow; it must not add another parent to
+the current child-profile row.
+
+Native-frontend boundary: signed-out Kids Home is the default product entry.
+The managed bootstrap activates the provider's actual `#skip-button` on
+`selectAccountPage` and takes over only after signed-out Kids Home authority is
+observed. Parent/supervised-child sign-in, Google credentials, consent, reauth,
+first/additional persona creation, secret-code setup, and parent switching stay
+reachable from locked Settings. Signed-in takeover begins after `Let's go` has
+established a selected persona for Kids Home.
+
+Do not equate the Skip tap with successful Home readiness: a clean provider
+state may next activate `kidsSignedOutCorpusSelectionPage`,
+`parentalNoticePage`, or `kidsSignedOutParentFeatureTourPage`. The bootstrap
+state machine must observe and complete the returned signed-out branch.
+
+### YouTube Kids parental/profile settings DOM (2026-07-26)
+
+| DOM host / owning scope | Settings responsibility | Evidence / boundary |
+| --- | --- | --- |
+| `<ytk-settings-page>` | Inferred multi-profile parental settings owner | The literal host is not serialized; `div#content.style-scope.ytk-settings-page` is the captured inner fragment |
+| `<ytk-parent-profile-settings-page>` | Inferred active-persona settings owner | The literal host is not serialized; child sections carry its style scope. Route pattern `/parentprofilesettings/<PERSONA_ID>` uses private runtime state |
+| `<ytk-content-level-settings-section>` | Corpus/age band and Search toggle | Persona-scoped in the specific-profile fragment; the copy in the multi-profile fragment is explicitly hidden |
+| `<ytk-privacy-settings-section>` | Clear history, pause watch/search history, unblock videos | Mutation endpoints still require request/response capture; do not infer them from labels |
+| `<ytk-profile-list-settings-section>` | Sibling personas and Add another profile | Selecting a sibling changes the active settings subject and moves the old active persona into this list |
+| `<ytk-kids-corpus-selection-modal-renderer>` | Content-level edit modal projection | Flow-catalog/expected provider branch; not serialized in either steady Settings DOM fragment |
+| `<ytk-kids-profile-creation-page-renderer>` | Add-another-profile projection | Flow-catalog branch reusing first-setup UI; not serialized in either steady Settings DOM fragment |
+| `<ytk-parental-gate>` | Locked parent boundary | Must gate native settings entry before exposing parent/profile controls |
+
+The exact sibling-profile selection request was not captured in this pass.
+Keep it as an explicit API gap; `accounts_list`, `get_persona`, and the presence
+of `selectActiveIdentityEndpoint` are not by themselves proof of which request
+the live settings tap sends.
+
+### YouTube Kids chronological DOM and renderer record (2026-07-26)
+
+This is the DOM companion to the chronological API record in
+`json_paths_encyclopedia.md`. It separates live serialized DOM from renderer
+definitions carried only in JSON.
+
+Evidence labels:
+
+- **Live DOM**: the host/element occurs in a captured DOM dump.
+- **JSON projection**: the response contains the renderer, but a matching DOM
+  host was not serialized in that capture.
+- **Catalog-only**: the host is inferred from a `get_kids_flow_data` page
+  definition and must not be treated as currently visible.
+- **Mixed-root caution**: a full Polymer app-root dump can contain hidden or
+  inactive components; host presence alone is not proof of visible state.
+
+The root onboarding files contain API ledgers, escaped rich text, and Lottie
+animation assets, but no complete live DOM. Actual browse, Search, Watch,
+Channel, and Settings DOM evidence comes from `YT_Kids_Pages/`.
+
+#### 1. Onboarding, sign-in, and profile creation
+
+The provider selects one visible page from a reusable `onboardingV2` catalog.
+The important hosts, in user-flow order, are:
+
+```text
+<ytk-kids-welcome-page-renderer>
+  -> <ytk-kids-onboarding-welcome-page-renderer>
+  -> <ytk-kids-onboarding-age-gate-renderer>
+  -> <ytk-kids-sign-in-info-renderer>
+  -> <ytk-kids-select-account-page-renderer>
+  -> <ytk-kids-sign-in-consent-page-renderer>       (when required)
+  -> provider Google reauth                         (when required)
+  -> <ytk-kids-profile-creation-page-renderer>
+  -> <ytk-kids-corpus-selection-renderer>
+  -> <ytk-kids-onboarding-search-page-renderer>
+  -> <ytk-kids-profile-result-page-renderer>
+  -> <ytk-kids-parent-feature-tour-renderer>        (optional)
+  -> <ytk-kids-profile-all-set-page-renderer>
+```
+
+These hosts are catalog/projection names unless a page-specific DOM capture is
+also present. A page definition in JSON is not evidence that Polymer attached
+or displayed it.
+
+The signed-out account page exposes a provider Skip control at runtime. Native
+bootstrap may activate that control, but the JSON capture proves only its
+localized `skipButtonText`, not a serialized selector. The tap itself is not
+Home readiness; the provider can still show signed-out corpus,
+parental-notice, Search, or tour screens.
+
+Profile-result and all-set screens remain distinct:
+
+```text
+<ytk-kids-profile-result-page-renderer>
+  Profile created / secret-code guidance / Next
+
+<ytk-kids-profile-all-set-page-renderer>
+  ready persona / Add another profile / Let's go
+```
+
+Do not merge them into a single native state.
+
+#### 2. Profile chooser and selected-persona handoff
+
+Profile-switcher hosts serialized in the full app-root dump:
+
+| DOM host | Role | Evidence note |
+| --- | --- | --- |
+| `<ytk-profile-switcher-page>` | Full `Choose a profile` page | Serialized with `hidden`; the visible chooser is runtime/screenshot-observed, not a visible DOM state in this dump |
+| `<ytk-profile-switcher>` | Persona-card collection | Serialized under the hidden switcher page; visible card behavior is runtime-observed |
+| persona image/button content inside the switcher | Selectable profile row | Names, images, and IDs are private runtime data and are not fixture-safe |
+
+The ledger places pre-selection APIs before a later active Home DOM dump; it
+does not serialize the exact chooser-to-Home DOM transition. The exact
+activation request is not isolated, so a native clone must not manufacture
+selection by scraping a persona card.
+
+#### 3. Home shell and category navigation
+
+The signed-in selected-persona Home capture establishes this shell:
+
+```text
+<ytk-masthead>
+  <ytk-search-box>
+  <ytk-kids-category-tab-renderer>...
+
+<ytk-kids-home-screen-renderer>
+  <ytk-anchored-section-renderer>
+    <ytk-section-list-renderer>
+      <ytk-item-section-renderer>
+        content cards...
+```
+
+Category tabs captured for the selected profile are Recommended, Shows,
+Music, Explore, and Learning. Labels are localized presentation; route using
+the JSON endpoint/params carried by each tab.
+
+Home/category card union:
+
+| DOM host | JSON renderer | Native meaning |
+| --- | --- | --- |
+| `<ytk-compact-video-renderer>` | `compactVideoRenderer` | Playable video card; may contain moving thumbnail, duration, owner, and menu |
+| `<ytk-compact-playlist-renderer>` | `compactPlaylistRenderer` | Playlist promo; route to playlist authority rather than treating it as one video |
+| `<ytk-compact-channel-renderer>` | `compactChannelRenderer` | Channel promo; preserve channel browse identity |
+| `<ytk-moving-thumbnail-renderer>` | moving-thumbnail data nested in a video card | Optional preview presentation, never content identity |
+| `<ytk-menu-renderer>` | `menuRenderer` | Per-card overflow actions, including provider Kids block actions where supplied |
+
+Captured card landmarks:
+
+| Card | DOM landmark | Meaning / safe use |
+| --- | --- | --- |
+| Video | `a.yt-simple-endpoint[href^="/watch"]` | Watch route; prefer JSON `watchEndpoint` when available |
+| Video | `.thumbnail > yt-img-shadow > img#img` | Static thumbnail presentation |
+| Video | `.thumbnail > span.overlay` | Visible duration text; presentation fallback only |
+| Video | `#mouseover-overlay > ytk-moving-thumbnail-renderer > img#thumbnail` | Optional animated preview; never video identity |
+| Video | `.details .primary-text > span[dir="auto"]` | Visible title; `aria-label` can combine owner/views/duration and must not be parsed as a stable schema |
+| Video/channel | `ytk-menu-renderer > tp-yt-paper-icon-button#menu-button` | Three-dot action trigger |
+| Playlist | `a#playlist-link[href*="list="]` | Playlist/seed Watch route |
+| Playlist | `.card-behind`, `.thumbnail`, `.overlay` | Stacked-card treatment and video-count presentation |
+| Playlist | `.details .primary-text > span` | Visible playlist title |
+| Channel | `a.yt-simple-endpoint[href^="/channel/"]` | Channel browse route |
+| Channel | `.channel-thumbnail img#img` | Channel avatar presentation |
+| Channel | `#channel-title`, `#channel-label` | Visible channel title and localized type label |
+
+`aria-label` strings are accessibility presentation and can be localized or
+reformatted. Use embedded JSON IDs/endpoints for routing and filtering, then
+use DOM labels only as a fallback.
+
+The Shows, Music, and Explore ledgers include both JSON and DOM. Learning has
+a JSON response but no serialized DOM; its card layout is a **JSON projection**
+through the same renderer union, not independently proven DOM parity.
+
+Captured response composition (sample counts, not product limits):
+
+| Category | Videos | Playlists | Channels | DOM status |
+| --- | ---: | ---: | ---: | --- |
+| Shows | 33 | 2 | 1 | card samples captured |
+| Music | 35 | 1 | 0 | card samples captured |
+| Explore | 24 | 11 | 1 | card samples captured |
+| Learning | 34 | 2 | 0 | JSON only |
+
+No Home/category continuation host or appended-page DOM was captured. Do not
+infer infinite scrolling merely because other YouTube surfaces use it.
+
+#### 4. Search input, suggestions, and result DOM
+
+The capture proves the result body, not a complete standalone Search shell.
+
+```text
+<ytk-section-list-renderer>
+  <ytk-item-section-renderer>
+    <ytk-compact-video-renderer>
+    <ytk-compact-channel-renderer>
+```
+
+The provider search box is represented elsewhere by `<ytk-search-box>`, but
+the Search ledger does not serialize a complete input/debounce/error-state
+tree. Suggestion responses come from a separate Google JSONP endpoint and are
+not DOM renderers.
+
+Observed result rules:
+
+- Video results use `<ytk-compact-video-renderer>`.
+- Channel results use `<ytk-compact-channel-renderer>`.
+- A short-duration video still uses the ordinary video renderer; do not assign
+  Shorts/Reels semantics from duration or aspect ratio alone.
+- JSON contains a continuation token, but the continuation response and its
+  appended DOM were not captured.
+
+#### 5. Normal Watch DOM
+
+Captured metadata/rail fragments (the outer owning host is inferred from
+their style scope):
+
+```text
+<ytk-two-column-watch-next-results-renderer>     (inferred owner, not serialized here)
+  results column
+    <ytk-slim-video-metadata-renderer>
+      #video-title
+      owner projection
+      <ytk-subscribe-button-renderer>
+
+  secondary column
+    <ytk-compact-video-renderer>...
+      <ytk-menu-renderer>
+```
+
+The capture proves serialized slim-metadata, subscription-control, and
+related-card DOM fragments. A literal two-column outer host occurs only in a
+different full app-root dump where the Watch page is hidden. The dedicated
+Watch capture does not contain a complete player-host DOM dump, so playback
+controls must be derived from `/player` and the actual media owner, not
+reconstructed from the metadata tree.
+
+Useful DOM fallback fields when JSON is unavailable:
+
+| Element | Fallback value | Limitation |
+| --- | --- | --- |
+| `<ytk-slim-video-metadata-renderer> #video-title` | visible video title | Localized/truncated presentation may differ from JSON title |
+| owner text/link under metadata | channel name/route | Prefer JSON channel ID or browse endpoint |
+| `<ytk-subscribe-button-renderer>` | visible subscribe state/action | Refresh from provider response after mutation |
+| `<ytk-compact-video-renderer>` in secondary results | related-video card | Keep separate from playlist queue |
+
+The normal-Watch sample serializes 20 related
+`<ytk-compact-video-renderer>` hosts and 20 corresponding menu hosts, plus JSON
+continuation authority. Those counts describe only the capture; the DOM does
+not prove continuation loading behavior.
+
+The continuation itself is a JSON-only transport renderer in this capture:
+
+```text
+secondaryResults.secondaryResults.results[].continuationItemRenderer
+  .continuationEndpoint.continuationCommand.token
+```
+
+No appended continuation DOM was captured, and this Watch shape must not be
+parsed as Search/Channel `nextContinuationData`.
+
+#### 6. Playlist Watch and queue DOM
+
+Playlist JSON uses `playlistPanelVideoRenderer`, while the captured Kids DOM
+projects queue rows through `<ytk-compact-video-renderer>`. This is an
+intentional JSON-to-DOM adapter boundary, not evidence that the JSON renderer
+changed type.
+
+```text
+JSON playlist authority
+  twoColumnWatchNextResults.playlist.playlist
+    contents[].playlistPanelVideoRenderer
+
+DOM queue projection
+  <ytk-compact-video-renderer>...
+```
+
+Keep three collections separate:
+
+1. selected player/media;
+2. ordered playlist queue;
+3. ordinary related recommendations.
+
+The playlist capture declares `totalVideos == 26`, serializes 25 queue rows,
+and marks one row selected. It separately carries 20 related-video rows plus a
+related-results continuation. No queue continuation DOM was captured. Render
+the queue rows actually received; do not create placeholders from
+`totalVideos`.
+
+#### 7. Channel DOM
+
+The channel ledger contains a full Polymer app-root dump. Its data authority is
+the `c4TabbedHeaderRenderer` plus an item section of compact videos. Relevant
+live/projection hosts are:
+
+```text
+<ytk-browse-response role="main">
+  <ytk-c4-tabbed-header-renderer>
+  <ytk-section-list-renderer>
+    <ytk-item-section-renderer>
+      <ytk-compact-video-renderer>...
+```
+
+Because this is a full app-root dump, unrelated hidden templates and inactive
+hosts may also occur. Only the header and item-section subtree associated with
+the captured browse response should drive native projection.
+
+The captured first page contains 40 compact-video rows plus a continuation
+token; appended channel DOM was not captured. Forty is a sample page size, not
+a complete-channel or fixed-pagination guarantee.
+
+#### 8. Subscribe/unsubscribe DOM state
+
+Subscription controls appear on both Watch metadata and Channel presentation.
+The actionable renderer is `<ytk-subscribe-button-renderer>` backed by JSON
+`subscribeButtonRenderer.serviceEndpoints[]`.
+
+One combined ledger contains an older JSON state and a later DOM label from
+different moments. Therefore:
+
+- do not choose state by last text occurrence in a concatenated file;
+- do not treat button copy alone as mutation success;
+- apply the mutation response, then refresh the active owner/header renderer;
+- keep Watch and Channel projections consistent through shared state, without
+  scraping one surface to update the other.
+
+#### 9. Multi-profile parental settings DOM
+
+Captured inner fragment and inferred owner:
+
+```text
+<ytk-settings-page>                             (inferred, not serialized)
+  div#content.style-scope.ytk-settings-page     (serialized fragment)
+```
+
+Visible sections in the multi-profile capture:
+
+| Section | Captured responsibility |
+| --- | --- |
+| Account | parent identity presentation and Sign out entry |
+| My children / profile list | delegated persona rows and Add another profile |
+| Parent verification | custom passcode entry/configuration |
+| Privacy | provider privacy-policy link |
+| Feedback | provider feedback entry |
+
+The same full document can contain catalog or modal hosts that are not active.
+Child-row navigation, Sign out, passcode creation, Add profile, and feedback
+requests were not captured; their visible DOM is not an API contract.
+
+#### 9a. Parents-only arithmetic and custom-passcode gate DOM (2026-07-28)
+
+The complete sanitized runtime record is
+`FilterTubeApp/docs/app/native-owned-main/YT_Kids_Pages/kids_parent_gate_flows.json`.
+It records provider DOM state and sanitized network shapes, not three invented
+YouTube response payloads.
+
+The live gate host and stable observed controls are:
+
+```text
+<ytk-parental-gate id="parental-gate">
+  #digits-first-input-field          arithmetic digit, maxlength=1
+  #digits-second-input-field         arithmetic digit, maxlength=1
+  four password inputs               passcode digits, maxlength=1 each
+  #submit-button
+  #footer-button                     SET MY OWN PASSCODE / Back
+```
+
+Observed state properties include `gateStatus`, `mathProblemToDisplay`,
+`hideMathProblem`, and `hidePasscodeInput`. The three confirmed paths are:
+
+```text
+wrong arithmetic answer
+  -> gate remains open
+  -> Settings remains inaccessible
+
+correct arithmetic answer
+  -> provider grants the parent transition
+  -> Settings initialization begins
+
+SET MY OWN PASSCODE
+  -> gateStatus=4, "Enter a 4-digit Passcode"
+  -> gateStatus=5, "Confirm your passcode"
+  -> gate remains in DOM but open=false
+  -> /settings becomes visible
+```
+
+Answers and passcode digits were deliberately not retained. No dedicated
+verification or passcode-mutation endpoint was observed; the isolated request
+between passcode entry and confirmation was telemetry (`log_event`). Do not
+infer persistence, validation, or reset APIs from these DOM labels.
+
+The gate is provider-rendered and provider-owned, but it is not permission to
+show the general YouTube Kids Web UI. FilterTube must use a dedicated locked
+boundary, keep the provider page hidden until the expected open gate is
+verified, expose only that gate while locked, and hide it before presenting
+native Parent Settings after authoritative completion. Home, category, Search,
+Watch, and arbitrary provider navigation must never become reachable through
+this boundary. Isolation failure produces a native retry/cancel state, not a
+fallback provider Home page.
+
+#### 10. Specific-profile settings DOM
+
+Captured scoped fragments and inferred owner:
+
+```text
+<ytk-parent-profile-settings-page>              (inferred, not serialized)
+  profile presentation / Edit
+  <ytk-content-level-settings-section>
+    corpus/age band
+    Search toggle
+  <ytk-privacy-settings-section>
+    Clear history
+    Pause watch history
+    Pause search history
+    Unblock videos
+  Delete profile
+  <ytk-profile-list-settings-section>
+    sibling personas
+    Add another profile
+```
+
+`<ytk-kids-corpus-selection-modal-renderer>` and the reused
+`<ytk-kids-profile-creation-page-renderer>` are flow-catalog projections for
+content editing and Add profile. Neither literal host is serialized in these
+steady Settings DOM fragments.
+
+The capture proves rendering and selected settings reads. Only a subset of
+mutations was isolated at the API layer. Do not wire Search, pause histories,
+unblock, delete/edit persona, passcode, sign-out, or sibling selection merely
+from their DOM labels.
+
+#### 11. Cross-surface renderer and filtering rules
+
+`<ytk-compact-video-renderer>` is deliberately reused across Home, categories,
+Search, Watch related results, playlist queue projection, and Channel video
+lists. Reuse the same card visual component, but retain a context enum and the
+original JSON authority:
+
+```text
+HOME | CATEGORY | SEARCH | WATCH_RELATED | PLAYLIST_QUEUE | CHANNEL
+```
+
+That context prevents incorrect behavior such as applying recommendation
+continuation to a playlist queue, treating a playlist row as an ordinary
+video, or navigating a Channel card as a Watch item.
+
+Filtering should prefer JSON identity (`videoId`, browse/channel endpoint,
+owner extension) and use DOM text only as a fallback. Moving-thumbnail hosts,
+localized labels, duration badges, and visible truncation are presentation
+details, not stable identity.
+
+#### 12. Remaining DOM capture gaps
+
+- Signed-out post-Skip Home shell, cards, and first continuation.
+- Complete Search input, loading, empty, error, and continuation DOM.
+- Complete player-host and controls DOM for normal and playlist Watch.
+- Appended playlist-queue and Channel continuation DOM.
+- Live DOM/request pairs for persona selection, Search toggle, history pause,
+  unblock, edit/delete persona, passcode, Sign out, and Add profile.
+- Visibility-state snapshots that distinguish active modals from hidden
+  Polymer templates in full app-root captures.
 
 ## Action Items
 1. Add renderer support for `compactAutoplayRenderer`, `watchCardHeroVideoRenderer`, and `watchCardSectionSequenceRenderer`.
