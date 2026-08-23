@@ -94,12 +94,12 @@ extension into a version-specific product surface.
   boundaries, import guidance, experimental labels, and profile-neutral time
   copy are covered in [User Feedback Rules and Guidance](USER_FEEDBACK_RULES_AND_GUIDANCE_SPEC_2026-08-08.md)
   and the Help page.
-- **Update refresh reminder preference**: Settings includes a device-wide
-  opt-out control, **Disable refresh reminders after updates**, for the small
+- **Open-tab reload reminder preference**: Settings includes a device-wide
+  opt-out control, **Disable reload reminders on open tabs**, for the small
   reminder that asks already-open YouTube or YouTube Kids tabs to reload after
   an extension update. The control is unchecked by default; checking it gates
-  only the first-run refresh prompt. The separate What’s New/release-notes
-  banner remains available. See [Update Refresh Reminder Current Behavior](audit/FILTERTUBE_UPDATE_REFRESH_NOTIFICATION_RELEASE_SETTING_2026-08-23.md).
+  only the open-tab reload prompt. The separate What’s New/release-notes
+  notification and dashboard page remain available. See [Update Refresh Reminder Current Behavior](audit/FILTERTUBE_UPDATE_REFRESH_NOTIFICATION_RELEASE_SETTING_2026-08-23.md).
 
 Proof boundary: the focused extension source-contract/runtime tests and package
 builds are recorded in the release checkpoint. Installed-browser, Android,

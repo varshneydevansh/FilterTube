@@ -1,11 +1,11 @@
-# Update Refresh Reminder Setting — Current Behavior
+# Open-Tab Reload Reminder Setting — Current Behavior
 
 **Status:** reviewed integration of upstream PR #66; implemented in the
 unreleased local release train. This is not a version or store-release claim.
 
 ## What this setting controls
 
-The **Disable refresh reminders after updates** checkbox controls the small
+The **Disable reload reminders on open tabs** checkbox controls the small
 FilterTube reminder that asks already-open YouTube or YouTube Kids tabs to
 reload after the extension is installed or updated. It controls the
 `FilterTube_FirstRunCheck` / `first_run_prompt.js` path only.
@@ -14,11 +14,11 @@ The checkbox is an opt-out and is unchecked by default. An unchecked control
 preserves the existing reminder behavior; checking it stores
 `showUpdateRefreshPrompt: false`.
 
-It does **not** disable the separate What’s New/release-notes surface. That
+It does **not** disable the separate one-time What’s New/release-notes notification. That
 surface remains governed by `FilterTube_ReleaseNotesCheck`,
 `release_notes_seen_version`, and the `release_notes_prompt.js` content script.
-Users can therefore hide the reload reminder without losing access to release
-notes.
+Users can therefore hide repetitive reload reminders without losing the release
+announcement or manual access to the dashboard’s What’s New page.
 
 ## Storage and default contract
 
@@ -50,7 +50,7 @@ release-note acknowledgement.
 
 ## PR #66 integration boundary
 
-PR #66 (`92175c1a`, “Add setting for update refresh reminders”) was reviewed
+PR #66 (contributor commit `828c19b0`, “Add setting for update refresh reminders”) was reviewed
 against the current tree instead of being cherry-picked wholesale. Its
 behavioral contract is retained, while its older HTML placement was not
 copied because the Settings page has since been reorganized. The integration

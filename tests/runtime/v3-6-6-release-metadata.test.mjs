@@ -23,7 +23,7 @@ test('v3.6.6 is the newest What’s New entry and is visible in the dashboard sh
         .filter((entry) => entry && typeof entry.version === 'string');
     assert.equal(releases[0].version, '3.6.6');
     assert.equal(releases[0].detailsUrl, 'https://github.com/varshneydevansh/FilterTube/releases/tag/v3.6.6');
-    assert.ok(releases[0].highlights.some((item) => item.includes('update refresh reminders')));
+    assert.ok(releases[0].highlights.some((item) => item.includes('reload reminders')));
 
     const dashboard = read('html/tab-view.html');
     assert.match(dashboard, /<div class="version-info">v3\.6\.6<\/div>/);

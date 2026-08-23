@@ -36,13 +36,13 @@ async function initializeUpdateRefreshPromptSetting(setting) {
             });
             UIComponents.showToast(
                 disableReminders
-                    ? 'Update refresh reminders disabled'
-                    : 'Update refresh reminders enabled',
+                    ? 'Reload reminders disabled'
+                    : 'Reload reminders enabled',
                 disableReminders ? 'info' : 'success'
             );
         } catch (e) {
             setting.checked = !disableReminders;
-            UIComponents.showToast('Could not update refresh reminders', 'error');
+            UIComponents.showToast('Could not update reload reminders', 'error');
         }
     });
     setting.dataset.ftUpdateRefreshPromptBound = 'true';

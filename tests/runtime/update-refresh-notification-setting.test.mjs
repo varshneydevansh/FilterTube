@@ -92,11 +92,11 @@ function loadSettingRuntime({ stored = {}, getError = null, setError = null } = 
     return { context, writes, toasts };
 }
 
-test('Settings exposes a device-wide update refresh reminder control', () => {
+test('Settings exposes a device-wide open-tab reload reminder control', () => {
     assert.match(dashboardHtml, /id="setting_showUpdateRefreshPrompt" type="checkbox"/);
-    assert.match(dashboardHtml, /Disable refresh reminders after updates/);
+    assert.match(dashboardHtml, /Disable reload reminders on open tabs/);
     assert.match(dashboardHtml, /Device-wide opt-out/);
-    assert.match(dashboardHtml, /Can I hide the update refresh reminder\?/);
+    assert.match(dashboardHtml, /Can I hide reload reminders after updates\?/);
     assert.match(dashboard, /const settingShowUpdateRefreshPrompt = document\.getElementById\('setting_showUpdateRefreshPrompt'\)/);
     assert.match(dashboard, /await initializeUpdateRefreshPromptSetting\(settingShowUpdateRefreshPrompt\)/);
 });
@@ -127,7 +127,7 @@ test('setting uses an unchecked opt-out, persists both choices, and rolls back f
     await checkbox.listeners.get('change')();
     assert.equal(checkbox.checked, true);
     assert.deepEqual(plain(runtime.toasts), [{
-        message: 'Could not update refresh reminders',
+        message: 'Could not update reload reminders',
         type: 'error'
     }]);
 });
