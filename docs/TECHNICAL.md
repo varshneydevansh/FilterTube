@@ -12,6 +12,22 @@
 
 FilterTube builds on the earlier performance and whitelist-mode work with watch-page SPA recovery hardening, Mix/watch fallback-menu fixes, stronger collaboration roster recovery, cross-browser subscribed-channels import hardening, app-release surface preparation, and smaller UX controls around backups and menu injection. This technical documentation covers the filtering logic, identity recovery behavior, mode switching, release-candidate runtime gates, and user experience enhancements.
 
+## Update refresh reminder preference
+
+The device-wide `showUpdateRefreshPrompt` preference is deliberately scoped to
+the first-run reload reminder. `FilterTube_FirstRunCheck` reads it together
+with `firstRunRefreshNeeded` and returns `needed: false` when either value
+explicitly suppresses the reminder. The Settings checkbox is an opt-out named
+**Disable refresh reminders after updates**: it is unchecked by default and
+stores `false` for `showUpdateRefreshPrompt` only when the user checks it. A
+missing preference is treated as enabled, fresh installs write `true`, and the
+update migration leaves an explicit `false` untouched.
+
+This preference does not gate `FilterTube_ReleaseNotesCheck` or
+`js/content/release_notes_prompt.js`; What’s New is an independent release-note
+surface. The full source/setting table and verification boundary are recorded
+in [Update Refresh Reminder Current Behavior](audit/FILTERTUBE_UPDATE_REFRESH_NOTIFICATION_RELEASE_SETTING_2026-08-23.md).
+
 ## Advert Void playback contract
 
 The default-on, user-disableable `hideSponsoredCards` setting now has one behavior boundary for both

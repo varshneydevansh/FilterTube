@@ -3976,6 +3976,11 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
 const FILTERTUBE_YOUTUBE_TAB_URLS = ['*://*.youtube.com/*', '*://*.youtubekids.com/*'];
 const SHOW_UPDATE_REFRESH_PROMPT_KEY = 'showUpdateRefreshPrompt';
 
+/**
+ * The refresh reminder is a device-wide preference. A missing value is
+ * intentionally treated as enabled so existing installations receive the
+ * same behavior as fresh installs until they opt out.
+ */
 function shouldShowUpdateRefreshPrompt(settings = {}) {
     return settings?.[SHOW_UPDATE_REFRESH_PROMPT_KEY] !== false
         && settings?.firstRunRefreshNeeded !== false;
@@ -4590,9 +4595,7 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         return true;
     } else if (action === 'FilterTube_FirstRunCheck') {
         storageGet(['firstRunRefreshNeeded', SHOW_UPDATE_REFRESH_PROMPT_KEY]).then((data) => {
-            sendResponse?.({
-                needed: shouldShowUpdateRefreshPrompt(data)
-            });
+            sendResponse?.({ needed: shouldShowUpdateRefreshPrompt(data) });
         }).catch(() => sendResponse?.({ needed: false }));
         return true;
     } else if (action === 'FilterTube_FirstRunComplete') {
