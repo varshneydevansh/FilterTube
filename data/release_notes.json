@@ -3,6 +3,24 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.6.6",
+    "headline": "Stronger filtering, protected time, and calmer ad-free playback",
+    "summary": "FilterTube 3.6.6 brings direct-access enforcement, per-profile protected time and Self-Control sessions, reliable blocked and allowed rule collections, official category filtering, default-on Advert Void, and extensive current-YouTube compatibility work.",
+    "bannerSummary": "Direct-access filtering, protected time, rule-list and BlockTube imports, official categories, Advert Void, and current YouTube compatibility are included in 3.6.6.",
+    "highlights": [
+      "Direct YouTube visits, playlist transitions, autoplay, and supported embeds now pass through the same video and channel admission rules instead of bypassing feed filtering.",
+      "Daily YouTube limits now apply per active profile, show remaining time, survive restarts, and use a full-page timeout with PIN-aware profile switching; voluntary Self-Control sessions lock their selected rules until the countdown ends.",
+      "Blocked rules and Allowed rules remain independent collections for Main and Kids, while the top Blocklist or Whitelist policy chooses which collection controls viewing.",
+      "Large BlockTube and managed rule-list imports use preview, capacity checks, transactional rollback, read-back verification, and clearer added, duplicate, skipped, channel, keyword, regex, and video-ID counts.",
+      "Category filtering uses YouTube's official `microformat.playerMicroformatRenderer.category`, bounded same-origin Player metadata hydration, clear Block selected or Allow only selected intent, and safer Watch, rail, Mix, comment, and renderer ownership.",
+      "Advert Void is enabled by default for new and upgraded profiles on YouTube Main and Kids, removes the observed Player ad plan without extra requests, and keeps a guarded no-banner fallback for escaped pre-roll, mid-roll, and post-roll interruptions.",
+      "Experimental spoken-language filtering and original-audio preference use YouTube Player evidence when available and fail open when recommendation metadata is unavailable.",
+      "Hide YouTube Playables, current camelCase renderer and collaboration handling, improved Help readability and search, clearer popup and dashboard controls, and Android closed-testing and iOS status surfaces are included.",
+      "Settings includes an unchecked-by-default device-wide opt-out for post-update refresh reminders. Disabling it does not hide the separate What's New page or release notes."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.6.6"
+  },
+  {
     "version": "3.3.5",
     "headline": "YouTube breakage recovery and earlier Shorts channel blocking",
     "summary": "This release fixes duplicate content-runtime injection in already-open YouTube tabs and resolves visible Shorts channel identity earlier when channel rules or whitelist mode are active.",

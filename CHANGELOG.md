@@ -1,6 +1,6 @@
 # Changelog
 
-## Post-v3.3.5 source-history index (28 commits)
+## Post-v3.3.5 source-history index
 
 The following index records every commit after the v3.3.5 stability baseline
 (`2fd04d3`) through the current unreleased checkpoint. The detailed contracts
@@ -37,14 +37,19 @@ chronological index, not a replacement for those documents.
 | 2026-07-25 | `c550c04e` | Record optional rich-shelf feedback boundaries | [Renderer inventory](docs/youtube_renderer_inventory.md) |
 | 2026-08-08 | `0f2f7349` | Improve JSON-first category filtering and document its scheduler/ownership contract | [Category behavior](docs/CATEGORY_FILTER_CURRENT_BEHAVIOR_2026-08-08.md) |
 | 2026-08-23 | `0920969b` | Checkpoint direct access, time/self-control, rule collections, BlockTube migration, Advert Void, experimental language/audio, UI/help, and focused proof | [Functionality](docs/FUNCTIONALITY.md) |
+| 2026-08-23 | `8c73613a` | Distribute the post-v3.3.5 work across canonical product, runtime, website, renderer, sync, and audit documentation | [Documentation index](docs/README.md) |
+| 2026-08-23 | `73d4386c` | Add the reviewed device-wide update-refresh-reminder opt-out | [Update reminder audit](docs/audit/FILTERTUBE_UPDATE_REFRESH_NOTIFICATION_RELEASE_SETTING_2026-08-23.md) |
+| 2026-08-23 | `828c19b0` | Preserve Aysajan Eziz's original PR #66 contribution in the integrated history | [PR #66](https://github.com/varshneydevansh/FilterTube/pull/66) |
+| 2026-08-23 | `e72ea70c` | Apply maintainer-reviewed opt-out semantics, Help copy, rollback behavior, and focused proof to PR #66 | [Update reminder audit](docs/audit/FILTERTUBE_UPDATE_REFRESH_NOTIFICATION_RELEASE_SETTING_2026-08-23.md) |
+| 2026-08-23 | `2f4612ea` | Merge the reviewed two-commit PR #66 history into master | [PR #66](https://github.com/varshneydevansh/FilterTube/pull/66) |
 
-The current `0920969b` checkpoint is unreleased. Its website edits are tracked
-separately as committed versus uncommitted in the [website surface
-changelog](docs/WEBSITE_APP_RELEASE_SURFACE_CHANGELOG.md), and the temporary
-[post-v3.3.5 ledger](docs/POST_3_3_5_CHANGE_LEDGER_2026-08-23.md) retains the
-file-level audit until this documentation pass is reviewed.
+The `0920969b` checkpoint and its subsequent documentation and PR #66 review
+commits form the v3.6.6 source train. Website edits are tracked in the
+[website surface changelog](docs/WEBSITE_APP_RELEASE_SURFACE_CHANGELOG.md), and
+the [post-v3.3.5 ledger](docs/POST_3_3_5_CHANGE_LEDGER_2026-08-23.md) retains the
+file-level cross-check behind the canonical topic documentation.
 
-## Unreleased — Category Filtering Reliability And UI
+## Version 3.6.6 — Filtering, Protected Time, Advert Void, And UI Reliability
 
 ### Direct access and protected time
 
@@ -134,7 +139,7 @@ file-level audit until this documentation pass is reviewed.
 
 ### Release Notes
 
-- **Update refresh reminder setting (reviewed, unreleased)**: a device-wide
+- **Update refresh reminder setting**: a device-wide
   **Disable refresh reminders after updates** opt-out can suppress the small
   reload reminder for already-open YouTube/YouTube Kids tabs after an
   extension update. It is unchecked by default and does not suppress the
