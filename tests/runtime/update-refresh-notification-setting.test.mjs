@@ -92,11 +92,11 @@ function loadSettingRuntime({ stored = {}, getError = null, setError = null } = 
     return { context, writes, toasts };
 }
 
-test('Settings exposes a device-wide open-tab reload reminder control', () => {
+test('Settings exposes a device-wide automatic update notification control', () => {
     assert.match(dashboardHtml, /id="setting_showUpdateRefreshPrompt" type="checkbox"/);
-    assert.match(dashboardHtml, /Disable reload reminders on open tabs/);
+    assert.match(dashboardHtml, /Disable update notifications/);
     assert.match(dashboardHtml, /Device-wide opt-out/);
-    assert.match(dashboardHtml, /Can I hide reload reminders after updates\?/);
+    assert.match(dashboardHtml, /Can I hide update notifications\?/);
     assert.match(dashboard, /const settingShowUpdateRefreshPrompt = document\.getElementById\('setting_showUpdateRefreshPrompt'\)/);
     assert.match(dashboard, /await initializeUpdateRefreshPromptSetting\(settingShowUpdateRefreshPrompt\)/);
 });
@@ -127,7 +127,7 @@ test('setting uses an unchecked opt-out, persists both choices, and rolls back f
     await checkbox.listeners.get('change')();
     assert.equal(checkbox.checked, true);
     assert.deepEqual(plain(runtime.toasts), [{
-        message: 'Could not update reload reminders',
+        message: 'Could not update notification preference',
         type: 'error'
     }]);
 });
@@ -141,7 +141,7 @@ test('background reminder decision requires both enabled preference and pending 
     assert.equal(shouldShow({ showUpdateRefreshPrompt: false, firstRunRefreshNeeded: false }), false);
 });
 
-test('background wiring keeps update refresh and What’s New paths independent', () => {
+test('background wiring applies the opt-out to both automatic update prompts', () => {
     const installBlock = sectionBetween(
         background,
         "if (details.reason === 'install') {",
@@ -171,5 +171,14 @@ test('background wiring keeps update refresh and What’s New paths independent'
         "if (action === 'FilterTube_ReleaseNotesCheck') {",
         "} else if (action === 'FilterTube_ReleaseNotesAck') {"
     );
-    assert.doesNotMatch(releaseBlock, /showUpdateRefreshPrompt|SHOW_UPDATE_REFRESH_PROMPT_KEY/);
+    assert.match(releaseBlock, /storageGet\(\[SHOW_UPDATE_REFRESH_PROMPT_KEY, 'releaseNotesSeenVersion', 'releaseNotesPayload'\]\)/);
+    assert.match(releaseBlock, /data\?\.\[SHOW_UPDATE_REFRESH_PROMPT_KEY\] === false/);
+    assert.match(releaseBlock, /sendResponse\(\{ needed: false \}\)/);
+
+    const manualWhatsNewBlock = sectionBetween(
+        background,
+        "} else if (action === 'FilterTube_OpenWhatsNew') {",
+        "} else if (action === 'FilterTube_OpenDashboard') {"
+    );
+    assert.doesNotMatch(manualWhatsNewBlock, /showUpdateRefreshPrompt|SHOW_UPDATE_REFRESH_PROMPT_KEY/);
 });

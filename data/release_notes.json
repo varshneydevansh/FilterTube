@@ -16,7 +16,7 @@
       "Advert Void is enabled by default for new and upgraded profiles on YouTube Main and Kids, removes the observed Player ad plan without extra requests, and keeps a guarded no-banner fallback for escaped pre-roll, mid-roll, and post-roll interruptions.",
       "Experimental spoken-language filtering and original-audio preference use YouTube Player evidence when available and fail open when recommendation metadata is unavailable.",
       "Hide YouTube Playables, current camelCase renderer and collaboration handling, improved Help readability and search, clearer popup and dashboard controls, and Android closed-testing and iOS status surfaces are included.",
-      "Settings includes an unchecked-by-default device-wide opt-out for reload reminders on already-open YouTube tabs. It does not hide the separate What's New notification or dashboard page."
+      "Settings includes an unchecked-by-default device-wide opt-out for automatic reload reminders and What's New banners on YouTube and YouTube Kids. The dashboard's What's New page remains available manually."
     ],
     "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.6.6"
   },

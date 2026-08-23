@@ -11,8 +11,8 @@ const SHOW_UPDATE_REFRESH_PROMPT_KEY = 'showUpdateRefreshPrompt';
 
 /**
  * The refresh reminder is intentionally kept outside profile settings. It is
- * a device-wide preference for the small prompt that asks already-open
- * YouTube tabs to reload after an extension update. Missing values are
+ * a device-wide preference for automatic update prompts on YouTube and
+ * YouTube Kids, including reload reminders and What's New banners. Missing values are
  * enabled for backwards compatibility with existing installations.
  */
 async function initializeUpdateRefreshPromptSetting(setting) {
@@ -36,13 +36,13 @@ async function initializeUpdateRefreshPromptSetting(setting) {
             });
             UIComponents.showToast(
                 disableReminders
-                    ? 'Reload reminders disabled'
-                    : 'Reload reminders enabled',
+                    ? 'Update notifications disabled'
+                    : 'Update notifications enabled',
                 disableReminders ? 'info' : 'success'
             );
         } catch (e) {
             setting.checked = !disableReminders;
-            UIComponents.showToast('Could not update reload reminders', 'error');
+            UIComponents.showToast('Could not update notification preference', 'error');
         }
     });
     setting.dataset.ftUpdateRefreshPromptBound = 'true';

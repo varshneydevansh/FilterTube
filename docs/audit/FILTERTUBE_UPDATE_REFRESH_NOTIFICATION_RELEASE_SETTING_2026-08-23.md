@@ -1,24 +1,22 @@
-# Open-Tab Reload Reminder Setting — Current Behavior
+# Update Notification Setting — Current Behavior
 
 **Status:** reviewed integration of upstream PR #66; implemented in the
 unreleased local release train. This is not a version or store-release claim.
 
 ## What this setting controls
 
-The **Disable reload reminders on open tabs** checkbox controls the small
-FilterTube reminder that asks already-open YouTube or YouTube Kids tabs to
-reload after the extension is installed or updated. It controls the
-`FilterTube_FirstRunCheck` / `first_run_prompt.js` path only.
+The **Disable update notifications** checkbox controls automatic FilterTube
+update prompts on YouTube and YouTube Kids. It gates the reload reminder owned
+by `FilterTube_FirstRunCheck` / `first_run_prompt.js` and the release banner
+owned by `FilterTube_ReleaseNotesCheck` / `release_notes_prompt.js`.
 
 The checkbox is an opt-out and is unchecked by default. An unchecked control
 preserves the existing reminder behavior; checking it stores
 `showUpdateRefreshPrompt: false`.
 
-It does **not** disable the separate one-time What’s New/release-notes notification. That
-surface remains governed by `FilterTube_ReleaseNotesCheck`,
-`release_notes_seen_version`, and the `release_notes_prompt.js` content script.
-Users can therefore hide repetitive reload reminders without losing the release
-announcement or manual access to the dashboard’s What’s New page.
+The dashboard’s manually opened What’s New page is not gated by this preference.
+Users can therefore keep FilterTube quiet on provider pages while reading release
+notes on demand.
 
 ## Storage and default contract
 
@@ -29,7 +27,8 @@ announcement or manual access to the dashboard’s What’s New page.
 | Decision | `js/background.js:shouldShowUpdateRefreshPrompt` | Both the preference and pending flag must permit the reminder. Missing preference values are treated as enabled for existing installations. |
 | Settings UI | `html/tab-view.html#setting_showUpdateRefreshPrompt`, `js/tab-view.js` | The opt-out checkbox is unchecked unless storage contains `showUpdateRefreshPrompt: false`; it persists both choices, defaults to unchecked after read failure, and rolls back a failed write. |
 | Prompt renderer | `js/content/first_run_prompt.js` | Renders the reload reminder only after the background decision returns `needed: true`. |
-| Separate release notes | `js/content/release_notes_prompt.js` and `FilterTube_ReleaseNotesCheck` | Not gated by `showUpdateRefreshPrompt`. |
+| Automatic release banner | `js/content/release_notes_prompt.js` and `FilterTube_ReleaseNotesCheck` | Returns `needed: false` when `showUpdateRefreshPrompt` is explicitly `false`. |
+| Manual What’s New page | `html/tab-view.html?view=whatsnew` | Remains available regardless of the automatic-notification preference. |
 
 Fresh installs initialize the preference to `true`. The update handler does
 not overwrite the preference, so an existing user's explicit opt-out survives
@@ -46,7 +45,7 @@ surface can re-enable it later.
 
 This setting does not change YouTube filtering, category/language decisions,
 Advert Void, time limits, direct-access admission, profile switching, or
-release-note acknowledgement.
+manual release-note access.
 
 ## PR #66 integration boundary
 
@@ -61,8 +60,8 @@ current Settings layout.
 
 `tests/runtime/update-refresh-notification-setting.test.mjs` covers the
 default-on runtime decision, the unchecked opt-out control, explicit enable/disable,
-read-failure fallback, failed-write rollback, background decision gating, the
-install default, the FirstRun message path, and independence from the update
-handler. `node --check` is run for the two edited JavaScript files. Browser
+read-failure fallback, failed-write rollback, background gating for both automatic
+prompt paths, the install default, the FirstRun message path, and independence
+from the update handler. `node --check` is run for the two edited JavaScript files. Browser
 installed-state and cross-browser visual proof remain release-test work; this
 document does not claim that proof.

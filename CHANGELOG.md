@@ -139,11 +139,10 @@ file-level cross-check behind the canonical topic documentation.
 
 ### Release Notes
 
-- **Open-tab reload reminder setting**: a device-wide
-  **Disable reload reminders on open tabs** opt-out can suppress the small
-  reload reminder for already-open YouTube/YouTube Kids tabs after an
-  extension update. It is unchecked by default and does not suppress the
-  separate What’s New/release-notes notification or dashboard page; see the [current behavior audit](docs/audit/FILTERTUBE_UPDATE_REFRESH_NOTIFICATION_RELEASE_SETTING_2026-08-23.md).
+- **Update notification setting**: a device-wide **Disable update notifications**
+  opt-out suppresses reload reminders and What’s New banners on YouTube and
+  YouTube Kids after an extension update. It is unchecked by default, and the
+  dashboard’s manually opened What’s New page remains available; see the [current behavior audit](docs/audit/FILTERTUBE_UPDATE_REFRESH_NOTIFICATION_RELEASE_SETTING_2026-08-23.md).
 - **v3.3.4 store rollback documented**: v3.3.4 was a store rollback to the v3.3.2 package while YouTube breakage reports were being investigated. It is documented for release history, not as a normal source-forward feature release.
 
 ## Version 3.3.4

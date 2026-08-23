@@ -4555,7 +4555,12 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
     const action = request?.action || request?.type;
 
     if (action === 'FilterTube_ReleaseNotesCheck') {
-        storageGet(['releaseNotesSeenVersion', 'releaseNotesPayload']).then(async (data) => {
+        storageGet([SHOW_UPDATE_REFRESH_PROMPT_KEY, 'releaseNotesSeenVersion', 'releaseNotesPayload']).then(async (data) => {
+            if (data?.[SHOW_UPDATE_REFRESH_PROMPT_KEY] === false) {
+                sendResponse({ needed: false });
+                return;
+            }
+
             const seenVersion = typeof data?.releaseNotesSeenVersion === 'string'
                 ? data.releaseNotesSeenVersion
                 : '';
