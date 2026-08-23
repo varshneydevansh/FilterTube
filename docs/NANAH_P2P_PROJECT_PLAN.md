@@ -454,3 +454,23 @@ Recommended first model:
 This is safer than full two-way mutation at first.
 
 Later we can add trusted peer mode for symmetric device sync.
+
+---
+
+## 13) Verified-device delivery checkpoint (2026-08-12)
+
+The extension now has the parent-facing recipient flow that was missing from the original transport-first plan:
+
+- saved verified devices appear as horizontally scrollable recipient tiles
+- choosing a device shows its bound protected profile before sending
+- `Send update` offers only delivery paths that are currently configured for that saved link
+- an explicit send targets one trusted link and one chosen transport, rather than broadcasting through every provider
+- live transfer, Home Pickup, and encrypted Internet Pickup continue to share the same signature, target-profile, revision, revocation, and receipt boundaries
+
+The product model is deliberately file-sharing-like, not torrent-like. Network presence never grants trust, devices do not form an open swarm, and an offline browser cannot seed data. Internet delivery therefore remains encrypted store-and-forward through an explicitly configured HTTPS pickup provider.
+
+Source/build completion does not prove a deployed service or two-device installation. Release evidence still needs:
+
+- an installed parent -> protected-device live transfer
+- an installed same-network Home Pickup delivery and receipt
+- an installed Internet Pickup send while the protected device is offline, followed by collect/apply and receipt after it opens

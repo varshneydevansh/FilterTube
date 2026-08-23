@@ -8,6 +8,7 @@ FilterTube implements a **hybrid filtering system** with dual filtering modes:
 - A secondary **DOM fallback layer** hides/restores already-rendered elements for SPA navigation, DOM recycling, and edge cases.
 - **Whitelist Mode**: Hide all content except explicitly allowed channels and keywords.
 - **Category Filtering**: Filter videos by YouTube category (e.g., Music, Gaming, Education) (v3.2.7).
+- **Spoken-Language Filtering**: Independently block or allow Main YouTube videos using YouTube's default-audio evidence, with a strong creator-metadata script fallback for captionless videos. Unknown language does not blank or pause a page. Category and language metadata share the paced Player-response cache; see [Language Filter: Current Behavior](LANGUAGE_FILTER_CURRENT_BEHAVIOR_2026-08-18.md).
 
 It also now includes `Accounts & Sync`, powered by Nanah, for device-to-device settings transfer.
 
@@ -108,11 +109,12 @@ The next release-facing checkpoint is staged in `data/release_notes.json` instea
 - **Channel Filtering**: Blocks/allows content from specific channels using @handles, channel IDs, or channel names
 - **Comments Filtering**: Removes comment sections entirely when hideAllComments is enabled
 - **Shorts Filtering**: Blocks YouTube Shorts content when hideAllShorts is enabled
+- **Advert Void**: The default-on `hideSponsoredCards` control applies to YouTube Main and YouTube Kids in both Blocklist and Whitelist modes. It removes the observed Player ad plan before YouTube schedules playback and hides sponsored DOM cards. If an advert still escapes into the player, the live `ad-showing`/`ad-interrupting` fallback quarantines and advances only confirmed advert media. No FilterTube transition banner is shown. Recommendation and inline-preview players are excluded, and the feature creates no additional YouTube requests.
 
 ### **Whitelist Mode Features (v3.2.5)**
 
-- **Two Ways To Build Whitelist**: FilterTube can populate whitelist directly through whitelist-specific adds/imports, or indirectly by flipping the current blocklist into whitelist when whitelist mode is activated.
-- **Intelligent Mode Switching**: Confirmation dialogs prevent accidental data loss when switching modes
+- **Two Ways To Build Whitelist**: FilterTube can populate Allowed rules directly through allow-specific adds/imports, or copy the current Blocked rules into an empty Allowed list when Whitelist mode is activated from the top policy pill.
+- **Non-Destructive Mode Switching**: A confirmed bootstrap copy deduplicates into Allowed rules without removing Blocked rules. Switching back changes only the active policy; bootstrap copies do not override their retained source blocks, while manually added Allowed exceptions remain active.
 - **Enhanced Channel Identity**: Multi-source channel extraction with improved reliability
 - **Search Page Optimizations**: Right-rail watch cards handled intelligently
 - **Creator Channel-Page Whitelist Fixes (v3.3.0)**: Creator/channel pages now use page identity more safely in whitelist mode so unresolved cards do not leak incorrectly, while legitimate creator-page content still stays visible.
@@ -123,7 +125,7 @@ The next release-facing checkpoint is staged in `data/release_notes.json` instea
 - **State Tracking**: Seamless switching between blocklist and whitelist modes
 - **Subscribed Channels Import (v3.3.0 state)**: Tab-view can import the active YouTube account's subscriptions straight into whitelist with inline progress, retry states, and profile-aware persistence
 - **Cross-Browser `/feed/channels` Capture (v3.3.0)**: Import now retains recent page browse responses and waits for active page growth before finalizing, improving Edge/Chrome behavior even when synthetic continuation replay is incomplete.
-- **Explicit Import Semantics**: `Import Only` keeps the current blocklist untouched; `Import + Turn On Whitelist` uses the existing mode-switch pipeline, which merges the current blocklist into whitelist
+- **Explicit Import Semantics**: `Import Only` keeps the current Blocked rules untouched; `Import + Turn On Whitelist` adds subscriptions to Allowed rules and changes the active policy without copying or clearing Blocked rules.
 
 ### **Stats Tracking**
 
@@ -338,7 +340,7 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **Subscribed Channels Import**: `Filters -> Channel Management` includes `Import Subscribed Channels`, which reuses an open signed-in YouTube tab, routes it to `/feed/channels`, waits for the FilterTube bridge, then imports subscribed channels into whitelist.
 - **Subscriptions Feed Exemption**: `/feed/channels` is treated as a management surface rather than a filter target, so blocked channels can still appear in `All subscriptions`.
 - **Inline Import Feedback**: The dashboard shows loading, page-wait, bridge-wait, importing, empty, success, and retryable error states inline rather than burying the flow in toasts.
-- **Mode-Aware Completion**: After an import, Tab View can either leave the imported whitelist stored but inactive, or immediately activate whitelist mode and merge the current blocklist into that whitelist.
+- **Mode-Aware Completion**: After an import, Tab View can either leave the imported Allowed rules stored but inactive, or immediately activate Allow only selected while keeping Blocked rules unchanged.
 - **Shared Full-Row Layout Stabilization**: Main/Kids channel and keyword lists share a corrected row shell so long scrolling lists keep natural row height without overlap or metadata clipping.
 - **Locked Profile Switching**: Even while the active profile is locked, the top-bar profile selector remains available so the user can switch to another profile; denied/cancelled PIN prompts refresh the tab UI back to the real active profile state instead of leaving the selector/badge stale.
 
@@ -360,8 +362,8 @@ Tab View button
 Current behavior notes:
 
 - FilterTube currently has two whitelist-construction paths:
-  - direct whitelist population such as subscribed-channels import
-  - blocklist-to-whitelist migration when whitelist mode is activated
+  - direct Allowed-rule population such as subscribed-channels import
+  - an optional, non-destructive copy from Blocked rules when an empty Allowed list is activated from the top policy pill
 - source account is the active YouTube account in the selected tab
 - import is limited to the main YouTube profile path, not Kids
 - if the browser session is signed out, Tab View brings the sign-in tab forward and shows a retryable warning

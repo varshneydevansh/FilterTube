@@ -3,7 +3,7 @@
   <h1>FilterTube</h1>
   <p>Peace of Mind for your Digital Space</p>
   
-  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.5-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-569.9k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-95.8k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
+  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.5-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-601.0k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-103.7k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
   
 </div>
 
@@ -78,6 +78,7 @@ FAMILY DEVICE UPDATES
 Important protected-profile rules:
 
 - one Family Device map covers nearby, same-network, and away/internet devices after pairing
+- verified devices appear as recipient tiles; choose one, press `Send update`, then choose exactly one available path: live, Home Pickup, or encrypted Internet Pickup
 - delivery paths are not authority; trusted link, target profile, scope, revision, and local validation still decide what applies
 - `Internet Pickup` can hold unreadable signed updates for away/opens-later devices, but it cannot edit profiles, PINs, trusted links, viewing access, or time limits by itself
 - `Home Pickup` is an explicitly configured same-network pickup service, not automatic Wi-Fi scanning
@@ -97,11 +98,13 @@ npm run managed:provider
 - Internet Pickup uses the same provider only after you expose it through your own trusted HTTPS address
 - opening `/filtertube` in a browser shows a safe FilterTube Pickup Provider status page; API callers can request the JSON status payload; rule contents, PINs, private keys, and profile policy are never shown there
 
-Protected profile time limits:
+Per-profile time limits:
 
-- parent/account profiles can set daily YouTube time for protected profiles
-- the extension blocks YouTube with a calm FilterTube screen after the daily limit is reached
-- protected users can request more time, but the request is only a history row until a parent/caregiver approves it
+- Daily budgets and usage are stored under the active profile, including account and protected profiles; profiles do not consume one shared household/browser timer.
+- The YouTube page and FilterTube popup show the active profile's remaining allowance; active playback continues consuming time even when another window temporarily has focus.
+- When daily time is exhausted, a full-page serene FilterTube screen covers YouTube and keeps underlying playback paused.
+- The exhausted profile cannot dismiss the screen. A different profile can use the in-page **Switch profile** picker and complete its normal PIN check; parent-managed protected profiles still require parent/account authority for grants or policy changes.
+- Protected users can request more time, but the request is only a history row until a parent or caregiver approves it.
 
 Docs:
 
@@ -191,6 +194,7 @@ Learn more in [Proactive Channel Identity](docs/PROACTIVE_CHANNEL_IDENTITY.md).
   - [YouTube Kids Integration](docs/YOUTUBE_KIDS_INTEGRATION.md) – Kids-specific optimizations
   - [3-Dot Menu Improvements](docs/THREE_DOT_MENU_IMPROVEMENTS.md) – collaborator-aware menu recovery and Mix/watch handling
   - [Subscribed Channels Import](docs/SUBSCRIBED_CHANNELS_IMPORT.md) – whitelist import flow and cross-browser page capture details
+  - [User Feedback Rules and Guidance Spec](docs/USER_FEEDBACK_RULES_AND_GUIDANCE_SPEC_2026-08-08.md) – addressed parent guidance plus blocklist exceptions, complete BlockTube migration, maintained filter-list subscriptions, and Firefox mobile Shorts reliability
   - [Android Public Distribution](docs/ANDROID_PUBLIC_DISTRIBUTION.md) – APK/AAB, GrapheneOS, F-Droid, and release-channel plan
   - [App Release and Runtime Sync Workflow](docs/APP_RELEASE_AND_RUNTIME_SYNC_WORKFLOW.md) – extension-to-native runtime sync and cross-platform release order
 

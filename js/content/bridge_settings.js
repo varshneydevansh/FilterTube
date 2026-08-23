@@ -363,6 +363,7 @@ function normalizeSettingsForHost(settings) {
 const MANAGED_VIEWING_ROUTE_GATE_OVERLAY_ID = 'filtertube-managed-viewing-route-gate';
 const MANAGED_TIME_LIMIT_OVERLAY_ID = 'filtertube-managed-timeout-overlay';
 const MANAGED_TIME_LIMIT_STATUS_ID = 'filtertube-managed-time-status';
+const MANAGED_OVERLAY_STYLE_ID = 'filtertube-managed-overlay-styles';
 const MANAGED_TIME_LIMIT_HEARTBEAT_MS = 5000;
 const MANAGED_TIME_LIMIT_REVALIDATION_EVENTS = [
     'yt-navigate-finish',
@@ -426,7 +427,7 @@ function removeManagedViewingBlockedOverlay() {
     }
 }
 
-function openFilterTubeDashboardFromManagedOverlay(source) {
+function openFilterTubeDashboardFromManagedOverlay(source, view = '') {
     try {
         pauseManagedTimeoutVideos();
     } catch (e) {
@@ -434,7 +435,8 @@ function openFilterTubeDashboardFromManagedOverlay(source) {
     try {
         browserAPI_BRIDGE.runtime.sendMessage({
             action: 'FilterTube_OpenDashboard',
-            source: source || 'managed_overlay'
+            source: source || 'managed_overlay',
+            view: view === 'sync' ? 'sync' : ''
         }, () => {
             try {
                 pauseManagedTimeoutVideos();
@@ -456,8 +458,301 @@ function getFilterTubeManagedOverlayHeroUrl() {
     return '';
 }
 
+function ensureManagedOverlayStyles() {
+    try {
+        if (document.getElementById(MANAGED_OVERLAY_STYLE_ID)) return;
+        const style = document.createElement('style');
+        style.id = MANAGED_OVERLAY_STYLE_ID;
+        style.textContent = `
+            #${MANAGED_TIME_LIMIT_OVERLAY_ID},
+            #${MANAGED_VIEWING_ROUTE_GATE_OVERLAY_ID} {
+                position: fixed !important;
+                inset: 0 !important;
+                z-index: 2147483647 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                box-sizing: border-box !important;
+                padding: clamp(14px, 3vw, 42px) !important;
+                overflow: hidden !important;
+                isolation: isolate !important;
+                color: #1b1a18 !important;
+                font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+                pointer-events: auto !important;
+                background: linear-gradient(180deg, #dcebf4 0%, #edf5f1 52%, #f7f4ec 100%) !important;
+            }
+            #${MANAGED_TIME_LIMIT_OVERLAY_ID} *,
+            #${MANAGED_VIEWING_ROUTE_GATE_OVERLAY_ID} * { box-sizing: border-box !important; }
+            .filtertube-managed-overlay__media {
+                position: absolute !important;
+                inset: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                object-fit: cover !important;
+                transform: scale(1.035) !important;
+                filter: saturate(.82) contrast(.94) brightness(1.04) !important;
+                pointer-events: none !important;
+            }
+            .filtertube-managed-overlay__scrim {
+                position: absolute !important;
+                inset: 0 !important;
+                pointer-events: none !important;
+                background:
+                    radial-gradient(circle at 16% 10%, rgba(197, 222, 241, .52), transparent 34%),
+                    radial-gradient(circle at 86% 12%, rgba(244, 217, 193, .42), transparent 30%),
+                    linear-gradient(180deg, rgba(247, 250, 251, .2), rgba(239, 237, 229, .44)) !important;
+                backdrop-filter: blur(2px) !important;
+            }
+            .filtertube-managed-overlay__panel {
+                position: relative !important;
+                z-index: 1 !important;
+                width: min(460px, 100%) !important;
+                max-height: calc(100dvh - clamp(28px, 6vw, 84px)) !important;
+                overflow: auto !important;
+            }
+            .filtertube-managed-overlay__panel--time {
+                display: grid !important;
+                grid-template-columns: minmax(0, 1.18fr) minmax(300px, .82fr) !important;
+                width: min(1120px, 100%) !important;
+                padding: 0 !important;
+                border: 1px solid rgba(70, 60, 48, .14) !important;
+                border-radius: clamp(24px, 3vw, 42px) !important;
+                background: rgba(249, 248, 244, .9) !important;
+                color: #1b1a18 !important;
+                box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 40px 110px -45px rgba(50, 39, 31, .5) !important;
+                backdrop-filter: blur(24px) saturate(.92) !important;
+            }
+            .filtertube-managed-overlay__story {
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                min-height: min(620px, 72dvh) !important;
+                padding: clamp(30px, 6vw, 78px) !important;
+                background:
+                    radial-gradient(circle at 8% 8%, rgba(173,207,234,.22), transparent 34%),
+                    radial-gradient(circle at 92% 94%, rgba(182,206,193,.2), transparent 34%) !important;
+            }
+            .filtertube-managed-overlay__aside {
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                padding: clamp(26px, 4vw, 54px) !important;
+                border-left: 1px solid rgba(70, 60, 48, .1) !important;
+                background: rgba(255,255,255,.46) !important;
+            }
+            .filtertube-managed-overlay__brand {
+                display: inline-flex !important;
+                align-items: center !important;
+                align-self: flex-start !important;
+                gap: 10px !important;
+                margin-bottom: clamp(34px, 7vh, 70px) !important;
+                color: #24211d !important;
+                font-size: 13px !important;
+                font-weight: 850 !important;
+                letter-spacing: .08em !important;
+                text-transform: uppercase !important;
+            }
+            .filtertube-managed-overlay__mark {
+                display: grid !important;
+                place-items: center !important;
+                width: 30px !important;
+                height: 30px !important;
+                border: 1px solid rgba(171,68,56,.35) !important;
+                border-radius: 50% !important;
+                background: rgba(255,255,255,.72) !important;
+                color: #ab4438 !important;
+                font-family: Georgia, serif !important;
+                font-size: 16px !important;
+                font-style: italic !important;
+                box-shadow: inset 0 1px 0 rgba(255,255,255,.9) !important;
+                object-fit: contain !important;
+                padding: 5px !important;
+                box-sizing: border-box !important;
+            }
+            .filtertube-managed-overlay__eyebrow {
+                margin: 0 0 16px !important;
+                color: #ab4438 !important;
+                font-family: "SFMono-Regular", Consolas, monospace !important;
+                font-size: 11px !important;
+                font-weight: 800 !important;
+                letter-spacing: .2em !important;
+                line-height: 1.4 !important;
+                text-transform: uppercase !important;
+            }
+            .filtertube-managed-overlay__title {
+                max-width: 11ch !important;
+                margin: 0 !important;
+                color: #1b1a18 !important;
+                font-family: "Outfit", "Avenir Next", "Segoe UI", sans-serif !important;
+                font-size: clamp(44px, 6vw, 78px) !important;
+                font-weight: 650 !important;
+                letter-spacing: -.07em !important;
+                line-height: .93 !important;
+            }
+            .filtertube-managed-overlay__title-emphasis {
+                display: block !important;
+                color: #ab4438 !important;
+                font-family: "Cormorant Garamond", Georgia, serif !important;
+                font-style: italic !important;
+                font-weight: 500 !important;
+                letter-spacing: -.04em !important;
+            }
+            .filtertube-managed-overlay__lede {
+                max-width: 610px !important;
+                margin: 26px 0 0 !important;
+                color: #5b5750 !important;
+                font-size: clamp(15px, 1.5vw, 18px) !important;
+                font-weight: 600 !important;
+                line-height: 1.7 !important;
+            }
+            .filtertube-managed-overlay__profile {
+                display: inline-flex !important;
+                align-items: center !important;
+                align-self: flex-start !important;
+                gap: 8px !important;
+                margin-top: 28px !important;
+                padding: 9px 13px !important;
+                border: 1px solid rgba(70,60,48,.12) !important;
+                border-radius: 999px !important;
+                background: rgba(255,255,255,.66) !important;
+                color: #45413b !important;
+                font-size: 12px !important;
+                font-weight: 800 !important;
+            }
+            .filtertube-managed-overlay__facts {
+                display: grid !important;
+                gap: 10px !important;
+                margin: 0 !important;
+            }
+            .filtertube-managed-overlay__fact {
+                display: grid !important;
+                grid-template-columns: 1fr auto !important;
+                align-items: baseline !important;
+                gap: 18px !important;
+                margin: 0 !important;
+                padding: 15px 16px !important;
+                border: 1px solid rgba(70,60,48,.1) !important;
+                border-radius: 16px !important;
+                background: rgba(255,255,255,.62) !important;
+                box-shadow: inset 0 1px 0 rgba(255,255,255,.84) !important;
+            }
+            .filtertube-managed-overlay__fact dt {
+                margin: 0 !important;
+                color: #7a746b !important;
+                font-size: 12px !important;
+                font-weight: 750 !important;
+            }
+            .filtertube-managed-overlay__fact dd {
+                margin: 0 !important;
+                color: #292622 !important;
+                font-size: 13px !important;
+                font-weight: 850 !important;
+                text-align: right !important;
+            }
+            .filtertube-managed-overlay__guidance {
+                margin-top: 18px !important;
+                padding: 14px 15px !important;
+                border-left: 3px solid #ab4438 !important;
+                border-radius: 4px 14px 14px 4px !important;
+                background: rgba(171,68,56,.07) !important;
+                color: #5b514a !important;
+                font-size: 13px !important;
+                font-weight: 650 !important;
+                line-height: 1.55 !important;
+            }
+            .filtertube-managed-overlay__actions {
+                display: grid !important;
+                gap: 10px !important;
+                margin-top: 22px !important;
+            }
+            .filtertube-managed-overlay__button {
+                min-height: 48px !important;
+                width: 100% !important;
+                padding: 10px 18px !important;
+                border: 1px solid rgba(70,60,48,.14) !important;
+                border-radius: 999px !important;
+                background: rgba(255,255,255,.72) !important;
+                color: #24211d !important;
+                font: 800 14px/1.2 "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+                cursor: pointer !important;
+                box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 16px 34px -28px rgba(17,18,24,.4) !important;
+                transition: transform 180ms ease, border-color 180ms ease, background 180ms ease !important;
+            }
+            .filtertube-managed-overlay__button:hover { transform: translateY(-1px) !important; border-color: rgba(171,68,56,.42) !important; }
+            .filtertube-managed-overlay__button:focus-visible { outline: 3px solid rgba(171,68,56,.24) !important; outline-offset: 3px !important; }
+            .filtertube-managed-overlay__button--primary { border-color: #ab4438 !important; background: #ab4438 !important; color: #fffaf4 !important; }
+            .filtertube-managed-overlay__button:disabled { cursor: default !important; opacity: .7 !important; transform: none !important; }
+            .filtertube-managed-overlay__instruction {
+                display: none !important;
+                margin: 0 !important;
+                padding: 12px 14px !important;
+                border: 1px solid rgba(70,60,48,.1) !important;
+                border-radius: 14px !important;
+                background: rgba(255,255,255,.58) !important;
+                color: #625f58 !important;
+                font-size: 12px !important;
+                font-weight: 650 !important;
+                line-height: 1.55 !important;
+            }
+            .filtertube-managed-overlay__instruction[data-visible="true"] { display: block !important; }
+            .filtertube-managed-overlay__profiles {
+                display: grid !important;
+                gap: 8px !important;
+                margin-top: 14px !important;
+            }
+            .filtertube-managed-overlay__profiles[hidden] { display: none !important; }
+            .filtertube-managed-overlay__profile-option {
+                display: grid !important;
+                grid-template-columns: 34px minmax(0,1fr) auto !important;
+                align-items: center !important;
+                gap: 10px !important;
+                width: 100% !important;
+                min-height: 52px !important;
+                padding: 8px 12px !important;
+                border: 1px solid rgba(70,60,48,.12) !important;
+                border-radius: 16px !important;
+                background: rgba(255,255,255,.68) !important;
+                color: #292622 !important;
+                cursor: pointer !important;
+                text-align: left !important;
+            }
+            .filtertube-managed-overlay__profile-option:hover { border-color: rgba(171,68,56,.38) !important; }
+            .filtertube-managed-overlay__profile-avatar {
+                display: grid !important;
+                place-items: center !important;
+                width: 34px !important;
+                height: 34px !important;
+                border-radius: 50% !important;
+                background: rgba(171,68,56,.12) !important;
+                color: #8e352d !important;
+                font-size: 12px !important;
+                font-weight: 850 !important;
+            }
+            .filtertube-managed-overlay__profile-meta { min-width: 0 !important; }
+            .filtertube-managed-overlay__profile-name { display: block !important; font-size: 13px !important; font-weight: 850 !important; }
+            .filtertube-managed-overlay__profile-type { display: block !important; margin-top: 2px !important; color: #777067 !important; font-size: 11px !important; font-weight: 650 !important; }
+            .filtertube-managed-overlay__profile-lock { color: #8e352d !important; font-size: 11px !important; font-weight: 800 !important; }
+            @media (max-width: 760px) {
+                .filtertube-managed-overlay__panel--time { grid-template-columns: 1fr !important; }
+                .filtertube-managed-overlay__story { min-height: auto !important; padding: 30px 24px !important; }
+                .filtertube-managed-overlay__aside { padding: 24px !important; border-left: 0 !important; border-top: 1px solid rgba(70,60,48,.1) !important; }
+                .filtertube-managed-overlay__brand { margin-bottom: 34px !important; }
+                .filtertube-managed-overlay__title { font-size: clamp(40px, 13vw, 58px) !important; }
+            }
+            @media (prefers-reduced-motion: reduce) {
+                .filtertube-managed-overlay__media { display: none !important; }
+                .filtertube-managed-overlay__button { transition: none !important; }
+            }
+        `;
+        (document.head || document.documentElement)?.appendChild(style);
+    } catch (e) {
+    }
+}
+
 function applyManagedOverlayShell(overlay) {
     if (!overlay) return;
+    ensureManagedOverlayStyles();
+    overlay.classList.add('filtertube-managed-overlay');
     overlay.style.cssText = [
         'position:fixed',
         'inset:0',
@@ -480,6 +775,8 @@ function appendManagedOverlayBackground(overlay) {
     if (heroUrl) {
         const video = document.createElement('video');
         video.setAttribute('aria-hidden', 'true');
+        video.setAttribute('data-filtertube-managed-overlay-background', 'true');
+        video.className = 'filtertube-managed-overlay__media';
         video.muted = true;
         video.autoplay = true;
         video.loop = true;
@@ -499,6 +796,7 @@ function appendManagedOverlayBackground(overlay) {
     }
     const scrim = document.createElement('div');
     scrim.setAttribute('aria-hidden', 'true');
+    scrim.className = 'filtertube-managed-overlay__scrim';
     scrim.style.cssText = [
         'position:absolute',
         'inset:0',
@@ -508,8 +806,9 @@ function appendManagedOverlayBackground(overlay) {
     overlay.appendChild(scrim);
 }
 
-function createManagedOverlayPanel() {
+function createManagedOverlayPanel(kind = '') {
     const panel = document.createElement('section');
+    panel.className = `filtertube-managed-overlay__panel${kind ? ` filtertube-managed-overlay__panel--${kind}` : ''}`;
     panel.style.cssText = [
         'position:relative',
         'width:min(460px,100%)',
@@ -689,7 +988,6 @@ function isValidManagedTimeLimitTimezone(timezone) {
 function getManagedTimeLimitPolicy(settings) {
     try {
         if (!settings || typeof settings !== 'object') return null;
-        if (settings.activeProfileKind !== 'child') return null;
         const policy = settings.managedTimeLimitPolicy;
         if (!policy || typeof policy !== 'object' || Array.isArray(policy)) return null;
         if (policy.schema !== 'filtertube_managed_time_limit') return null;
@@ -718,9 +1016,27 @@ function removeManagedTimeoutOverlay() {
     }
 }
 
+function ensureManagedTimeoutPlayGuard() {
+    if (globalThis.__filtertubeManagedTimeLimitPlayGuardInstalled === true) return;
+    globalThis.__filtertubeManagedTimeLimitPlayGuardInstalled = true;
+    try {
+        document.addEventListener('play', event => {
+            if (globalThis.__filtertubeManagedTimeLimitTimedOut !== true) return;
+            const media = event?.target;
+            if (String(media?.tagName || '').toLowerCase() !== 'video') return;
+            if (media?.hasAttribute?.('data-filtertube-managed-overlay-background')) return;
+            try {
+                media.pause?.();
+            } catch (e) {
+            }
+        }, true);
+    } catch (e) {
+    }
+}
+
 function pauseManagedTimeoutVideos() {
     try {
-        document.querySelectorAll('video').forEach(video => {
+        document.querySelectorAll('video:not([data-filtertube-managed-overlay-background="true"])').forEach(video => {
             try {
                 if (!video.paused) video.pause();
             } catch (e) {
@@ -738,6 +1054,17 @@ function formatManagedTimeoutDuration(seconds) {
     if (hours && minutes) return `${hours}h ${minutes}m`;
     if (hours) return `${hours}h`;
     return `${Math.max(1, minutes)}m`;
+}
+
+function formatManagedTimeRemaining(seconds) {
+    const total = Math.max(0, Math.floor(Number(seconds) || 0));
+    if (!total) return '0s';
+    const hours = Math.floor(total / 3600);
+    const minutes = Math.floor((total % 3600) / 60);
+    const remainder = total % 60;
+    if (hours) return `${hours}h ${minutes}m`;
+    if (minutes) return `${minutes}m ${remainder}s`;
+    return `${remainder}s`;
 }
 
 function removeManagedTimeLimitStatus() {
@@ -797,7 +1124,7 @@ function showManagedTimeLimitStatus(state) {
 
         const profileName = String(state.profileName || 'Protected profile').trim() || 'Protected profile';
         const surfaceLabel = state.surface === 'kids' ? 'YouTube Kids' : 'YouTube';
-        const timeLeft = formatManagedTimeoutDuration(remainingSeconds);
+        const timeLeft = formatManagedTimeRemaining(remainingSeconds);
         status.textContent = `${surfaceLabel} time left: ${timeLeft}`;
         status.title = `${profileName} has ${timeLeft} left today.`;
     } catch (e) {
@@ -807,6 +1134,7 @@ function showManagedTimeLimitStatus(state) {
 function showManagedTimeoutOverlay(state) {
     try {
         globalThis.__filtertubeManagedTimeLimitTimedOut = true;
+        ensureManagedTimeoutPlayGuard();
         removeManagedTimeLimitStatus();
         pauseManagedTimeoutVideos();
 
@@ -819,6 +1147,8 @@ function showManagedTimeoutOverlay(state) {
             overlay.id = MANAGED_TIME_LIMIT_OVERLAY_ID;
             overlay.setAttribute('role', 'alertdialog');
             overlay.setAttribute('aria-modal', 'true');
+            overlay.setAttribute('aria-labelledby', 'filtertube-managed-timeout-title');
+            overlay.tabIndex = -1;
             overlay.style.cssText = [
                 'position:fixed',
                 'inset:0',
@@ -846,130 +1176,192 @@ function showManagedTimeoutOverlay(state) {
         const totalBudgetCopy = formatManagedTimeoutDuration(state?.totalBudgetSeconds);
         const usedCopy = formatManagedTimeoutDuration(state?.consumedSeconds);
         const policyExpired = state?.reason === 'expired_policy_requires_parent_revalidation';
+        const stateKey = [
+            String(state?.profileId || ''),
+            String(state?.surface || ''),
+            String(state?.reason || ''),
+            String(state?.dateKey || ''),
+            String(state?.policyRevision || ''),
+            String(state?.policyHash || ''),
+            String(state?.totalBudgetSeconds || 0),
+            String(state?.consumedSeconds || 0)
+        ].join(':');
+        if (overlay.getAttribute('data-filtertube-managed-state-key') === stateKey && overlay.childElementCount > 0) {
+            return;
+        }
+        overlay.setAttribute('data-filtertube-managed-state-key', stateKey);
         overlay.innerHTML = '';
         appendManagedOverlayBackground(overlay);
 
-        const panel = createManagedOverlayPanel();
+        const panel = createManagedOverlayPanel('time');
+
+        const story = document.createElement('div');
+        story.className = 'filtertube-managed-overlay__story';
+
+        const brand = document.createElement('div');
+        brand.className = 'filtertube-managed-overlay__brand';
+        const brandMark = document.createElement('img');
+        brandMark.className = 'filtertube-managed-overlay__mark';
+        brandMark.alt = 'FilterTube';
+        brandMark.src = browserAPI_BRIDGE.runtime.getURL('icons/icon-48.png');
+        const brandText = document.createElement('span');
+        brandText.textContent = 'FilterTube · profile time';
+        brand.append(brandMark, brandText);
 
         const eyebrow = document.createElement('div');
-        eyebrow.textContent = 'FilterTube parent-managed time';
-        eyebrow.style.cssText = 'color:#fecaca;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px';
+        eyebrow.className = 'filtertube-managed-overlay__eyebrow';
+        eyebrow.textContent = policyExpired ? 'Parent review needed' : 'Daily pause reached';
 
         const title = document.createElement('h1');
-        title.textContent = policyExpired ? `${surfaceLabel} needs parent approval` : `${surfaceLabel} is paused for today`;
-        title.style.cssText = 'font-size:25px;line-height:1.18;margin:0 0 10px;font-weight:850;color:#fff;letter-spacing:0';
+        title.id = 'filtertube-managed-timeout-title';
+        title.className = 'filtertube-managed-overlay__title';
+        title.append(document.createTextNode(policyExpired ? `${surfaceLabel} needs ` : `Today's watching time is `));
+        const titleEmphasis = document.createElement('span');
+        titleEmphasis.className = 'filtertube-managed-overlay__title-emphasis';
+        titleEmphasis.textContent = policyExpired ? 'parent approval.' : 'complete.';
+        title.appendChild(titleEmphasis);
 
         const copy = document.createElement('p');
+        copy.className = 'filtertube-managed-overlay__lede';
         copy.textContent = policyExpired
             ? `${profileName} needs a parent or caregiver to review this time rule before ${surfaceLabel} can continue.`
-            : `${profileName} has used today's parent-managed YouTube time. YouTube stays paused until the daily reset or until a parent approves more time.`;
-        copy.style.cssText = 'font-size:14px;line-height:1.5;margin:0;color:#cbd5e1';
+            : `${profileName} has used today's YouTube time allowance. ${surfaceLabel} stays paused until the daily reset or until more time is approved.`;
+
+        const profilePill = document.createElement('div');
+        profilePill.className = 'filtertube-managed-overlay__profile';
+        profilePill.textContent = `${profileName} · ${surfaceLabel}`;
+
+        story.append(brand, eyebrow, title, copy, profilePill);
+
+        const aside = document.createElement('aside');
+        aside.className = 'filtertube-managed-overlay__aside';
 
         const facts = document.createElement('dl');
-        facts.style.cssText = [
-            'display:grid',
-            'grid-template-columns:auto 1fr',
-            'gap:8px 14px',
-            'margin:18px 0 0',
-            'font-size:13px',
-            'line-height:1.35'
-        ].join(';');
+        facts.className = 'filtertube-managed-overlay__facts';
         [
             ['Daily limit', totalBudgetCopy],
             ['Used today', usedCopy],
             ['Reset', resetCopy]
         ].forEach(([label, value]) => {
+            const fact = document.createElement('div');
+            fact.className = 'filtertube-managed-overlay__fact';
             const dt = document.createElement('dt');
             dt.textContent = label;
-            dt.style.cssText = 'margin:0;color:#94a3b8;font-weight:700';
             const dd = document.createElement('dd');
             dd.textContent = value;
-            dd.style.cssText = 'margin:0;color:#e2e8f0';
-            facts.append(dt, dd);
+            fact.append(dt, dd);
+            facts.appendChild(fact);
         });
 
         const guidance = document.createElement('div');
+        guidance.className = 'filtertube-managed-overlay__guidance';
         guidance.textContent = policyExpired
-            ? 'Open FilterTube from a parent or caregiver profile to review this rule. This screen cannot be dismissed by the protected profile.'
-            : 'You can ask for more time from here. The request is saved for the parent profile to review, but it does not unlock YouTube by itself.';
-        guidance.style.cssText = [
-            'margin-top:18px',
-            'padding:11px 12px',
-            'border:1px solid rgba(148,163,184,.22)',
-            'border-radius:8px',
-            'background:rgba(15,23,42,.58)',
-            'color:#dbeafe',
-            'font-size:13px',
-            'font-weight:700',
-            'line-height:1.45'
-        ].join(';');
+            ? 'Switch to a parent, caregiver, or another authorized profile. The exhausted profile cannot dismiss this screen or approve its own access.'
+            : 'Switching profiles follows the normal PIN check. A request for more time is saved for parent review, but never unlocks this profile by itself.';
 
         const actionArea = document.createElement('div');
-        actionArea.style.cssText = [
-            'display:flex',
-            'flex-direction:column',
-            'gap:10px',
-            'margin-top:20px'
-        ].join(';');
+        actionArea.className = 'filtertube-managed-overlay__actions';
 
-        const buttonRow = document.createElement('div');
-        buttonRow.style.cssText = [
-            'display:grid',
-            'grid-template-columns:repeat(auto-fit,minmax(160px,1fr))',
-            'gap:10px'
-        ].join(';');
+        const profileSwitcher = document.createElement('div');
+        profileSwitcher.className = 'filtertube-managed-overlay__profiles';
+        profileSwitcher.hidden = true;
+
+        const switchButton = document.createElement('button');
+        switchButton.type = 'button';
+        switchButton.className = 'filtertube-managed-overlay__button filtertube-managed-overlay__button--primary';
+        switchButton.textContent = 'Switch profile';
+        switchButton.addEventListener('click', () => {
+            if (!profileSwitcher.hidden) {
+                profileSwitcher.hidden = true;
+                profileSwitcher.innerHTML = '';
+                switchButton.textContent = 'Switch profile';
+                return;
+            }
+            switchButton.disabled = true;
+            switchButton.textContent = 'Loading profiles…';
+            browserAPI_BRIDGE.runtime.sendMessage({
+                action: 'FilterTube_GetManagedProfileSwitchOptions'
+            }, response => {
+                switchButton.disabled = false;
+                switchButton.textContent = 'Cancel profile switch';
+                profileSwitcher.hidden = false;
+                profileSwitcher.innerHTML = '';
+                const options = Array.isArray(response?.options) ? response.options : [];
+                if (!response?.ok || !options.length) {
+                    const empty = document.createElement('p');
+                    empty.className = 'filtertube-managed-overlay__instruction';
+                    empty.setAttribute('data-visible', 'true');
+                    empty.textContent = response?.ok
+                        ? 'No other profile is available on this device.'
+                        : 'Profiles could not be loaded. Keep this page open and try again.';
+                    profileSwitcher.appendChild(empty);
+                    return;
+                }
+                options.forEach(option => {
+                    const optionButton = document.createElement('button');
+                    optionButton.type = 'button';
+                    optionButton.className = 'filtertube-managed-overlay__profile-option';
+                    const avatar = document.createElement('span');
+                    avatar.className = 'filtertube-managed-overlay__profile-avatar';
+                    avatar.textContent = String(option.profileName || 'P').trim().charAt(0).toUpperCase() || 'P';
+                    const meta = document.createElement('span');
+                    meta.className = 'filtertube-managed-overlay__profile-meta';
+                    const name = document.createElement('span');
+                    name.className = 'filtertube-managed-overlay__profile-name';
+                    name.textContent = option.profileName || 'Profile';
+                    const type = document.createElement('span');
+                    type.className = 'filtertube-managed-overlay__profile-type';
+                    type.textContent = option.type === 'child' ? 'Protected profile' : 'Account profile';
+                    meta.append(name, type);
+                    const lock = document.createElement('span');
+                    lock.className = 'filtertube-managed-overlay__profile-lock';
+                    lock.textContent = option.requiresPin ? 'PIN' : 'Open';
+                    optionButton.append(avatar, meta, lock);
+                    optionButton.addEventListener('click', () => {
+                        let pin = '';
+                        if (option.requiresPin) {
+                            pin = String(window.prompt(`Enter the PIN for ${option.profileName || 'this profile'}`) || '').trim();
+                            if (!pin) return;
+                        }
+                        optionButton.disabled = true;
+                        lock.textContent = 'Switching…';
+                        browserAPI_BRIDGE.runtime.sendMessage({
+                            action: 'FilterTube_SwitchManagedProfile',
+                            targetProfileId: option.profileId,
+                            pin
+                        }, result => {
+                            if (result?.ok) {
+                                instruction.textContent = `Switching to ${result.profileName || option.profileName || 'profile'}…`;
+                                instruction.setAttribute('data-visible', 'true');
+                                profileSwitcher.querySelectorAll('button').forEach(button => { button.disabled = true; });
+                                return;
+                            }
+                            optionButton.disabled = false;
+                            lock.textContent = option.requiresPin ? 'PIN' : 'Open';
+                            instruction.textContent = result?.reason === 'rate_limited'
+                                ? 'Too many incorrect PIN attempts. Wait before trying again.'
+                                : (result?.reason === 'incorrect_pin' ? 'That PIN was not correct.' : 'Profile switch failed. Try again.');
+                            instruction.setAttribute('data-visible', 'true');
+                        });
+                    });
+                    profileSwitcher.appendChild(optionButton);
+                });
+            });
+        });
 
         const askButton = document.createElement('button');
         askButton.type = 'button';
+        askButton.className = 'filtertube-managed-overlay__button';
         askButton.textContent = 'Request more time';
-        askButton.style.cssText = [
-            'min-height:44px',
-            'border:0',
-            'border-radius:8px',
-            'background:#b44339',
-            'color:#fff',
-            'font-weight:800',
-            'font-size:14px',
-            'cursor:pointer'
-        ].join(';');
-
-        const dashboardButton = document.createElement('button');
-        dashboardButton.type = 'button';
-        dashboardButton.textContent = 'Open FilterTube';
-        dashboardButton.style.cssText = [
-            'min-height:44px',
-            'border:1px solid rgba(255,255,255,.22)',
-            'border-radius:8px',
-            'background:rgba(18,27,38,.82)',
-            'color:#e2e8f0',
-            'font-weight:800',
-            'font-size:14px',
-            'cursor:pointer'
-        ].join(';');
-        dashboardButton.addEventListener('click', () => {
-            openFilterTubeDashboardFromManagedOverlay('managed_time_limit_overlay');
-        });
 
         const instruction = document.createElement('p');
+        instruction.className = 'filtertube-managed-overlay__instruction';
         instruction.textContent = 'Request saved here only tells the parent profile that more time is needed. It does not unlock YouTube by itself.';
-        instruction.style.cssText = [
-            'display:none',
-            'margin:0',
-            'padding:10px 12px',
-            'border:1px solid rgba(148,163,184,.24)',
-            'border-radius:8px',
-            'background:rgba(15,23,42,.72)',
-            'color:#cbd5e1',
-            'font-size:13px',
-            'line-height:1.45'
-        ].join(';');
 
         askButton.addEventListener('click', () => {
-            instruction.style.display = 'block';
+            instruction.setAttribute('data-visible', 'true');
             askButton.textContent = 'Request sent';
-            askButton.style.background = '#475569';
             askButton.disabled = true;
-            askButton.style.cursor = 'default';
             pauseManagedTimeoutVideos();
             const requestKey = [
                 String(state?.profileId || ''),
@@ -1003,21 +1395,16 @@ function showManagedTimeoutOverlay(state) {
                 }
             }
         });
-        if (!policyExpired) {
-            buttonRow.append(askButton, dashboardButton);
-            actionArea.append(buttonRow, instruction);
-        } else {
-            buttonRow.append(dashboardButton);
-            actionArea.append(buttonRow);
-        }
+        actionArea.appendChild(switchButton);
+        if (!policyExpired) actionArea.appendChild(askButton);
 
-        panel.appendChild(eyebrow);
-        panel.appendChild(title);
-        panel.appendChild(copy);
-        panel.appendChild(facts);
-        panel.appendChild(guidance);
-        panel.appendChild(actionArea);
+        aside.append(facts, guidance, profileSwitcher, actionArea, instruction);
+        panel.append(story, aside);
         overlay.appendChild(panel);
+        try {
+            overlay.focus({ preventScroll: true });
+        } catch (e) {
+        }
     } catch (e) {
     }
 }
@@ -1025,6 +1412,15 @@ function showManagedTimeoutOverlay(state) {
 function isManagedTimeLimitTabActive() {
     try {
         return document.visibilityState === 'visible' && document.hasFocus();
+    } catch (e) {
+        return false;
+    }
+}
+
+function isManagedTimeLimitPlaybackActive() {
+    try {
+        return Array.from(document.querySelectorAll('video:not([data-filtertube-managed-overlay-background="true"])'))
+            .some(video => video.paused !== true && video.ended !== true && Number(video.readyState) >= 2);
     } catch (e) {
         return false;
     }
@@ -1113,7 +1509,8 @@ function sendManagedTimeLimitHeartbeat() {
             policy,
             href: location.href,
             visible: document.visibilityState === 'visible',
-            focused: isManagedTimeLimitTabActive()
+            focused: isManagedTimeLimitTabActive(),
+            playing: isManagedTimeLimitPlaybackActive()
         }, response => {
             managedTimeLimitHeartbeatInFlight = false;
             if (heartbeatGeneration !== managedTimeLimitRuntimeGeneration) return;
@@ -1454,6 +1851,7 @@ function handleStorageChanges(changes, area) {
         'hideEndscreenVideowall',
         'hideEndscreenCards',
         'disableAutoplay',
+        'alwaysUseOriginalAudio',
         'disableAnnotations',
         'hideTopHeader',
         'hideNotificationBell',

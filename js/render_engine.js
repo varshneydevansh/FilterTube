@@ -181,6 +181,9 @@ const RenderEngine = (() => {
             includeToggles = true,
             stateOverride = null,
             onDelete = null,
+            ruleTarget = '',
+            allowKidsRuleTarget = false,
+            onMove = null,
             onToggleExact = null,
             onUpdateDateFilter = null,
             onToggleComments = null
@@ -296,7 +299,17 @@ const RenderEngine = (() => {
         // Render each keyword
         displayKeywords.forEach(entry => {
             const effectiveProfile = (profile !== 'kids' && entry?.__ftFromKids) ? 'kids' : profile;
-            const item = createKeywordListItem(entry, { minimal, profile: effectiveProfile, includeToggles, onDelete, onToggleExact, onUpdateDateFilter, onToggleComments });
+            const item = createKeywordListItem(entry, {
+                minimal,
+                profile: effectiveProfile,
+                includeToggles,
+                onDelete,
+                ruleTarget: effectiveProfile === 'kids' && !allowKidsRuleTarget ? '' : ruleTarget,
+                onMove: effectiveProfile === 'kids' && !allowKidsRuleTarget ? null : onMove,
+                onToggleExact,
+                onUpdateDateFilter,
+                onToggleComments
+            });
             if (item instanceof Node) {
                 container.appendChild(item);
             }
@@ -339,6 +352,29 @@ const RenderEngine = (() => {
         return element;
     }
 
+    function createRuleTargetBadge(target) {
+        if (target !== 'allow' && target !== 'block') return null;
+        const badge = document.createElement('span');
+        badge.className = `ft-rule-entry-badge ft-rule-entry-badge--${target}`;
+        badge.textContent = target === 'allow' ? 'Always allowed' : 'Blocked';
+        badge.title = target === 'allow'
+            ? 'This individual rule keeps matching content visible.'
+            : 'This individual rule hides matching content.';
+        return badge;
+    }
+
+    function createMoveRuleButton(target, activate) {
+        if ((target !== 'allow' && target !== 'block') || typeof activate !== 'function') return null;
+        const destination = target === 'allow' ? 'Block matches' : 'Always allow';
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'ft-rule-entry-move';
+        button.textContent = `Move to ${destination}`;
+        button.title = `Move this individual rule to ${destination}`;
+        button.addEventListener('click', activate);
+        return button;
+    }
+
     /**
      * Create a single keyword list item
      * @param {Object} entry - Keyword entry
@@ -352,6 +388,8 @@ const RenderEngine = (() => {
             profile = 'main',
             includeToggles = true,
             onDelete = null,
+            ruleTarget = '',
+            onMove = null,
             onToggleExact = null,
             onUpdateDateFilter = null,
             onToggleComments = null
@@ -393,6 +431,8 @@ const RenderEngine = (() => {
             left.textContent = entry.word;
         } else {
             left.appendChild(word);
+            const ruleBadge = createRuleTargetBadge(ruleTarget);
+            if (ruleBadge instanceof Node) left.appendChild(ruleBadge);
             if (entry?.__ftFromKids) {
                 const kidsBadge = createKidsSyncBadge();
                 if (kidsBadge instanceof Node) {
@@ -605,6 +645,11 @@ const RenderEngine = (() => {
                 controls.appendChild(semanticToggle);
             }
 
+            const moveButton = !minimal
+                ? createMoveRuleButton(ruleTarget, async () => { await onMove?.(entry); })
+                : null;
+            if (moveButton instanceof Node) controls.appendChild(moveButton);
+
             if (deleteBtn instanceof Node) controls.appendChild(deleteBtn);
         }
 
@@ -644,6 +689,9 @@ const RenderEngine = (() => {
             profile = 'main',
             stateOverride = null,
             onDelete = null,
+            ruleTarget = '',
+            allowKidsRuleTarget = false,
+            onMove = null,
             onToggleFilterAll = null
         } = options;
 
@@ -805,6 +853,8 @@ const RenderEngine = (() => {
                 collaborationMeta,
                 profile: effectiveProfile,
                 onDelete,
+                ruleTarget: effectiveProfile === 'kids' && !allowKidsRuleTarget ? '' : ruleTarget,
+                onMove: effectiveProfile === 'kids' && !allowKidsRuleTarget ? null : onMove,
                 onToggleFilterAll,
                 modeOverride: effectiveProfile === 'kids' ? kidsMode : mainMode
             });
@@ -965,6 +1015,8 @@ const RenderEngine = (() => {
             collaborationMeta = null,
             profile = 'main',
             onDelete = null,
+            ruleTarget = '',
+            onMove = null,
             onToggleFilterAll = null,
             modeOverride = null
         } = config;
@@ -974,7 +1026,7 @@ const RenderEngine = (() => {
         if (minimal) {
             return createMinimalChannelItem(channel, index, collaborationMeta, profile, { onDelete });
         } else {
-            return createFullChannelItem(channel, index, showNodeMapping, collaborationMeta, profile, { onDelete, onToggleFilterAll, modeOverride });
+            return createFullChannelItem(channel, index, showNodeMapping, collaborationMeta, profile, { onDelete, ruleTarget, onMove, onToggleFilterAll, modeOverride });
         }
     }
 
@@ -1048,7 +1100,7 @@ const RenderEngine = (() => {
     function createFullChannelItem(channel, index, showNodeMapping, collaborationMeta, profile, handlers = {}) {
         const StateManager = getStateManager();
         const Settings = getSettings();
-        const { onDelete = null, onToggleFilterAll = null, modeOverride = null } = handlers;
+        const { onDelete = null, ruleTarget = '', onMove = null, onToggleFilterAll = null, modeOverride = null } = handlers;
 
         const item = document.createElement('div');
         item.className = 'list-item channel-item';
@@ -1098,6 +1150,8 @@ const RenderEngine = (() => {
 
         infoGroup.appendChild(logoImg);
         infoGroup.appendChild(nameSpan);
+        const ruleBadge = createRuleTargetBadge(ruleTarget);
+        if (ruleBadge instanceof Node) infoGroup.appendChild(ruleBadge);
 
         if (channel?.__ftFromKids) {
             const badge = createKidsSyncBadge();
@@ -1146,8 +1200,14 @@ const RenderEngine = (() => {
             await StateManager?.removeChannel(index);
         });
 
+        const headerActions = document.createElement('div');
+        headerActions.className = 'ft-rule-entry-actions';
+        const moveButton = createMoveRuleButton(ruleTarget, async () => { await onMove?.(channel, index); });
+        if (moveButton instanceof Node) headerActions.appendChild(moveButton);
+        headerActions.appendChild(deleteBtn);
+
         headerRow.appendChild(infoGroup);
-        headerRow.appendChild(deleteBtn);
+        headerRow.appendChild(headerActions);
         item.appendChild(headerRow);
 
         // Body row: Node mapping + Filter All toggle

@@ -1100,6 +1100,13 @@ function hasBridgeSelectedCategoryFilters(settings) {
     );
 }
 
+function hasBridgeSelectedLanguageFilters(settings) {
+    return Boolean(
+        settings?.languageFilters?.enabled === true
+        && bridgeHasList(settings.languageFilters.selected)
+    );
+}
+
 function hasBridgeActiveJsonFilterRules(settings) {
     return Boolean(
         settings
@@ -1110,6 +1117,7 @@ function hasBridgeActiveJsonFilterRules(settings) {
             || settings.hideAllComments === true
             || settings.hideAllShorts === true
             || hasBridgeSelectedCategoryFilters(settings)
+            || hasBridgeSelectedLanguageFilters(settings)
         )
     );
 }
@@ -1910,6 +1918,11 @@ function persistVideoMetaMapping(entries = []) {
         const publishDateRaw = entry?.publishDate;
         const uploadDateRaw = entry?.uploadDate;
         const categoryRaw = entry?.category;
+        const languageCodeRaw = entry?.languageCode;
+        const languageSourceRaw = entry?.languageSource;
+        const languageConfidenceRaw = entry?.languageConfidence;
+        const shortDescriptionRaw = entry?.shortDescription;
+        const keywordsRaw = entry?.keywords;
         const existing = currentSettings.videoMetaMap[videoId] && typeof currentSettings.videoMetaMap[videoId] === 'object'
             ? currentSettings.videoMetaMap[videoId]
             : {};
@@ -1920,16 +1933,34 @@ function persistVideoMetaMapping(entries = []) {
         const incomingPublishDate = typeof publishDateRaw === 'string' ? publishDateRaw.trim() : '';
         const incomingUploadDate = typeof uploadDateRaw === 'string' ? uploadDateRaw.trim() : '';
         const incomingCategory = typeof categoryRaw === 'string' ? categoryRaw.trim() : '';
+        const incomingLanguageCode = typeof languageCodeRaw === 'string' ? languageCodeRaw.trim() : '';
+        const incomingLanguageSource = typeof languageSourceRaw === 'string' ? languageSourceRaw.trim() : '';
+        const incomingLanguageConfidence = ['high', 'medium', 'unknown'].includes(languageConfidenceRaw)
+            ? languageConfidenceRaw
+            : '';
+        const incomingShortDescription = typeof shortDescriptionRaw === 'string' ? shortDescriptionRaw.trim() : '';
+        const incomingKeywords = Array.isArray(keywordsRaw)
+            ? keywordsRaw.map(value => typeof value === 'string' ? value.trim() : '').filter(Boolean)
+            : [];
 
         const meta = {
             lengthSeconds: incomingLengthSeconds !== null ? incomingLengthSeconds : (existing.lengthSeconds ?? null),
             publishDate: incomingPublishDate || (typeof existing.publishDate === 'string' ? existing.publishDate.trim() : ''),
             uploadDate: incomingUploadDate || (typeof existing.uploadDate === 'string' ? existing.uploadDate.trim() : ''),
-            category: incomingCategory || (typeof existing.category === 'string' ? existing.category.trim() : '')
+            category: incomingCategory || (typeof existing.category === 'string' ? existing.category.trim() : ''),
+            languageCode: incomingLanguageCode || (typeof existing.languageCode === 'string' ? existing.languageCode.trim() : ''),
+            languageSource: incomingLanguageSource || (typeof existing.languageSource === 'string' ? existing.languageSource.trim() : ''),
+            languageConfidence: incomingLanguageConfidence || (typeof existing.languageConfidence === 'string' ? existing.languageConfidence.trim() : ''),
+            // Keep creator text in the page session so keyword matching can reuse
+            // Player responses without expanding persistent extension storage.
+            shortDescription: incomingShortDescription || (typeof existing.shortDescription === 'string' ? existing.shortDescription : ''),
+            keywords: incomingKeywords.length > 0
+                ? incomingKeywords
+                : (Array.isArray(existing.keywords) ? existing.keywords : [])
         };
 
-        if (!meta.lengthSeconds && !meta.publishDate && !meta.uploadDate && !meta.category) continue;
-        if (existing && typeof existing === 'object' && String(existing.lengthSeconds ?? '').trim() === String(meta.lengthSeconds ?? '').trim() && String(existing.publishDate ?? '').trim() === String(meta.publishDate ?? '').trim() && String(existing.uploadDate ?? '').trim() === String(meta.uploadDate ?? '').trim() && String(existing.category ?? '').trim() === String(meta.category ?? '').trim()) continue;
+        if (!meta.lengthSeconds && !meta.publishDate && !meta.uploadDate && !meta.category && !meta.languageCode && !meta.shortDescription && meta.keywords.length === 0) continue;
+        if (existing && typeof existing === 'object' && String(existing.lengthSeconds ?? '').trim() === String(meta.lengthSeconds ?? '').trim() && String(existing.publishDate ?? '').trim() === String(meta.publishDate ?? '').trim() && String(existing.uploadDate ?? '').trim() === String(meta.uploadDate ?? '').trim() && String(existing.category ?? '').trim() === String(meta.category ?? '').trim() && String(existing.languageCode ?? '').trim() === String(meta.languageCode ?? '').trim() && String(existing.languageSource ?? '').trim() === String(meta.languageSource ?? '').trim() && String(existing.languageConfidence ?? '').trim() === String(meta.languageConfidence ?? '').trim() && String(existing.shortDescription ?? '').trim() === String(meta.shortDescription ?? '').trim() && JSON.stringify(existing.keywords || []) === JSON.stringify(meta.keywords || [])) continue;
         try {
             if (Object.prototype.hasOwnProperty.call(currentSettings.videoMetaMap, videoId)) {
                 delete currentSettings.videoMetaMap[videoId];
@@ -1959,7 +1990,7 @@ function persistVideoMetaMapping(entries = []) {
 
     browserAPI_BRIDGE.runtime.sendMessage({
         action: 'updateVideoMetaMap',
-        entries: cleaned
+        entries: cleaned.map(({ shortDescription, keywords, ...entry }) => entry)
     }); return cleaned.map(entry => entry.videoId);
 }
 
@@ -2119,12 +2150,21 @@ function mergeWatchMetaFetchNeeds(existing, incoming) {
     return {
         needDuration: Boolean(left.needDuration || right.needDuration),
         needDates: Boolean(left.needDates || right.needDates),
-        needCategory: Boolean(left.needCategory || right.needCategory)
+        needCategory: Boolean(left.needCategory || right.needCategory),
+        needLanguage: Boolean(left.needLanguage || right.needLanguage),
+        needIdentity: Boolean(left.needIdentity || right.needIdentity),
+        needText: Boolean(left.needText || right.needText)
     };
 }
 
-function isCategoryOnlyMetaFetch(needs) {
-    return Boolean(needs?.needCategory && !needs?.needDuration && !needs?.needDates);
+function isCategoryOrLanguageOnlyMetaFetch(needs) {
+    return Boolean(
+        (needs?.needCategory || needs?.needLanguage) &&
+        !needs?.needDuration &&
+        !needs?.needDates &&
+        !needs?.needIdentity &&
+        !needs?.needText
+    );
 }
 
 function areWatchMetaFetchNeedsSatisfied(videoId, needs) {
@@ -2141,10 +2181,26 @@ function areWatchMetaFetchNeedsSatisfied(videoId, needs) {
         return Number.isFinite(new Date(value).getTime());
     });
     const hasCategory = typeof existing?.category === 'string' && Boolean(existing.category.trim());
+    const languageCode = typeof existing?.languageCode === 'string' ? existing.languageCode.trim() : '';
+    const languageSource = typeof existing?.languageSource === 'string' ? existing.languageSource.trim() : '';
+    // Retry the pre-script-fallback negative cache once. New genuinely unknown
+    // results use player-unavailable-v2 and remain negatively cached.
+    const hasLanguage = Boolean(languageCode) && !(
+        languageCode.toLowerCase() === 'und' && languageSource === 'player-unavailable'
+    );
+    const mappedChannelId = currentSettings?.videoChannelMap?.[videoId];
+    const hasIdentity = typeof mappedChannelId === 'string' && /^UC[a-zA-Z0-9_-]{22}$/.test(mappedChannelId.trim());
+    const hasText = Boolean(
+        (typeof existing?.shortDescription === 'string' && existing.shortDescription.trim()) ||
+        (Array.isArray(existing?.keywords) && existing.keywords.some(value => typeof value === 'string' && value.trim()))
+    );
 
     return (!wants.needDuration || hasDuration)
         && (!wants.needDates || hasDates)
-        && (!wants.needCategory || hasCategory);
+        && (!wants.needCategory || hasCategory)
+        && (!wants.needLanguage || hasLanguage)
+        && (!wants.needIdentity || hasIdentity)
+        && (!wants.needText || hasText);
 }
 
 function isVideoNearCategoryViewport(videoId) {
@@ -2236,11 +2292,17 @@ function scheduleVideoMetaFetch(videoId, options = null) {
         const needDurationDefault = true;
         const needDatesDefault = false;
         const needCategoryDefault = false;
+        const needLanguageDefault = false;
+        const needIdentityDefault = false;
+        const needTextDefault = false;
         if (!options || typeof options !== 'object') {
             return {
                 needDuration: needDurationDefault,
                 needDates: needDatesDefault,
                 needCategory: needCategoryDefault,
+                needLanguage: needLanguageDefault,
+                needIdentity: needIdentityDefault,
+                needText: needTextDefault,
                 priority: 'normal'
             };
         }
@@ -2248,6 +2310,9 @@ function scheduleVideoMetaFetch(videoId, options = null) {
             needDuration: ('needDuration' in options) ? Boolean(options.needDuration) : needDurationDefault,
             needDates: ('needDates' in options) ? Boolean(options.needDates) : needDatesDefault,
             needCategory: ('needCategory' in options) ? Boolean(options.needCategory) : needCategoryDefault,
+            needLanguage: ('needLanguage' in options) ? Boolean(options.needLanguage) : needLanguageDefault,
+            needIdentity: ('needIdentity' in options) ? Boolean(options.needIdentity) : needIdentityDefault,
+            needText: ('needText' in options) ? Boolean(options.needText) : needTextDefault,
             priority: options.priority === 'high' || options.priority === 'low' ? options.priority : 'normal'
         };
     })();
@@ -2269,7 +2334,7 @@ function scheduleVideoMetaFetch(videoId, options = null) {
     }
 
     const now = Date.now();
-    if (wants.needCategory && !wants.needDuration && !wants.needDates) {
+    if (wants.needCategory && !wants.needLanguage && !wants.needDuration && !wants.needDates) {
         const categoryMissAt = categoryMetaFetchMisses.get(v) || 0;
         if (categoryMissAt && now - categoryMissAt < CATEGORY_META_NEGATIVE_CACHE_TTL_MS) return false;
         if (categoryMissAt) categoryMetaFetchMisses.delete(v);
@@ -2330,7 +2395,7 @@ function processWatchMetaFetchQueue() {
         // Revalidate at dispatch so already-known categories never cause a
         // redundant Player request.
         if (areWatchMetaFetchNeedsSatisfied(nextVideoId, needs)) continue;
-        if (isCategoryOnlyMetaFetch(needs) && !isVideoNearCategoryViewport(nextVideoId)) continue;
+        if (isCategoryOrLanguageOnlyMetaFetch(needs) && !isVideoNearCategoryViewport(nextVideoId)) continue;
 
         // A paced drain may fill one micro-batch, but it may never cross the
         // shared one-minute start budget while doing so.
@@ -2354,7 +2419,7 @@ function processWatchMetaFetchQueue() {
         }
 
         activeWatchMetaFetches++;
-        const fetchPromise = fetchVideoMetaFromWatchUrl(nextVideoId)
+        const fetchPromise = fetchVideoMetaFromWatchUrl(nextVideoId, needs)
             .catch(() => null)
             .finally(() => {
                 pendingWatchMetaFetches.delete(nextVideoId);
@@ -2365,7 +2430,7 @@ function processWatchMetaFetchQueue() {
     }
 }
 
-async function fetchVideoMetaFromWatchUrl(videoId) {
+async function fetchVideoMetaFromWatchUrl(videoId, needs = null) {
     if (!videoId || typeof videoId !== 'string') return null;
     if (typeof location !== 'undefined' && String(location.hostname || '').includes('youtubekids.com')) {
         return null;
@@ -2375,16 +2440,23 @@ async function fetchVideoMetaFromWatchUrl(videoId) {
         // The browse/search card JSON normally has no official category. Ask the
         // MAIN-world bridge for the same structured Player response used by the
         // native app instead of scraping /watch HTML (which YouTube redirects).
-        const metadata = await requestVideoMetaFromMainWorld(videoId);
+        const metadata = await requestVideoMetaFromMainWorld(videoId, needs);
         const lengthSeconds = metadata?.lengthSeconds || null;
         const publishDate = typeof metadata?.publishDate === 'string' ? metadata.publishDate : '';
         const uploadDate = typeof metadata?.uploadDate === 'string' ? metadata.uploadDate : '';
         const category = typeof metadata?.category === 'string' ? metadata.category.trim() : '';
+        const languageCode = typeof metadata?.languageCode === 'string' ? metadata.languageCode.trim() : '';
+        const languageSource = typeof metadata?.languageSource === 'string' ? metadata.languageSource.trim() : '';
+        const languageConfidence = typeof metadata?.languageConfidence === 'string' ? metadata.languageConfidence.trim() : '';
         const channelId = typeof metadata?.channelId === 'string' ? metadata.channelId.trim() : '';
         const channelName = typeof metadata?.channelName === 'string' ? metadata.channelName.trim() : '';
         const channelHandle = typeof metadata?.channelHandle === 'string' ? metadata.channelHandle.trim() : '';
+        const shortDescription = typeof metadata?.shortDescription === 'string' ? metadata.shortDescription.trim() : '';
+        const keywords = Array.isArray(metadata?.keywords)
+            ? metadata.keywords.map(value => typeof value === 'string' ? value.trim() : '').filter(Boolean)
+            : [];
 
-        if (typeof categoryMetaFetchMisses !== 'undefined') {
+        if (needs?.needCategory && typeof categoryMetaFetchMisses !== 'undefined') {
             if (category) {
                 categoryMetaFetchMisses.delete(videoId);
             } else {
@@ -2397,8 +2469,8 @@ async function fetchVideoMetaFromWatchUrl(videoId) {
         }
 
         if (
-            !lengthSeconds && !publishDate && !uploadDate && !category &&
-            !channelId && !channelName && !channelHandle
+            !lengthSeconds && !publishDate && !uploadDate && !category && !languageCode &&
+            !channelId && !channelName && !channelHandle && !shortDescription && keywords.length === 0
         ) return null;
 
         persistVideoMetaMapping([{
@@ -2406,7 +2478,12 @@ async function fetchVideoMetaFromWatchUrl(videoId) {
             lengthSeconds,
             publishDate,
             uploadDate,
-            category
+            category,
+            languageCode,
+            languageSource,
+            languageConfidence,
+            shortDescription,
+            keywords
         }]);
 
         if (/^UC[a-zA-Z0-9_-]{22}$/.test(channelId)) {
@@ -2447,9 +2524,14 @@ async function fetchVideoMetaFromWatchUrl(videoId) {
             publishDate,
             uploadDate,
             category,
+            languageCode,
+            languageSource,
+            languageConfidence,
             channelId,
             channelName,
-            channelHandle
+            channelHandle,
+            shortDescription,
+            keywords
         };
     } catch (e) {
         return null;
@@ -6088,7 +6170,7 @@ if (typeof window.videoMetaRequestId !== 'number' || !isFinite(window.videoMetaR
     window.videoMetaRequestId = 0;
 }
 
-function requestVideoMetaFromMainWorld(videoId) {
+function requestVideoMetaFromMainWorld(videoId, needs = null) {
     return new Promise((resolve) => {
         const normalizedVideoId = typeof videoId === 'string' ? videoId.trim() : '';
         if (!/^[A-Za-z0-9_-]{11}$/.test(normalizedVideoId)) {
@@ -6117,7 +6199,7 @@ function requestVideoMetaFromMainWorld(videoId) {
                 if (!window.pendingVideoMetaRequests.has(requestId)) return;
                 window.postMessage({
                     type: 'FilterTube_RequestVideoMeta',
-                    payload: { requestId, videoId: normalizedVideoId },
+                    payload: { requestId, videoId: normalizedVideoId, needs: needs && typeof needs === 'object' ? needs : {} },
                     source: 'content_bridge'
                 }, '*');
             });
@@ -6844,8 +6926,12 @@ async function initializeDOMFallback(settings) {
             try {
                 const activeSettings = settingsOverride || currentSettings;
                 const categoryFilters = activeSettings?.categoryFilters;
+                const languageFilters = activeSettings?.languageFilters;
                 const selected = Array.isArray(categoryFilters?.selected) ? categoryFilters.selected : [];
-                if (categoryFilters?.enabled !== true || categoryFilters?.mode !== 'allow' || selected.length === 0) return;
+                const selectedLanguages = Array.isArray(languageFilters?.selected) ? languageFilters.selected : [];
+                const needsCategory = categoryFilters?.enabled === true && categoryFilters?.mode === 'allow' && selected.length > 0;
+                const needsLanguage = languageFilters?.enabled === true && languageFilters?.mode === 'allow' && selectedLanguages.length > 0;
+                if (!needsCategory && !needsLanguage) return;
                 if (typeof VIDEO_CARD_SELECTORS !== 'string') return;
 
                 const candidates = new Set();
@@ -6905,7 +6991,14 @@ async function initializeDOMFallback(settings) {
                     if (!eligible) continue;
 
                     const category = String(activeSettings?.videoMetaMap?.[videoId]?.category || '').trim();
-                    if (category) continue;
+                    const languageMeta = activeSettings?.videoMetaMap?.[videoId] || null;
+                    const languageCode = String(languageMeta?.languageCode || '').trim();
+                    const languageSource = String(languageMeta?.languageSource || '').trim();
+                    const missingCategory = needsCategory && !category;
+                    const staleUnavailableLanguage = languageCode.toLowerCase() === 'und'
+                        && languageSource === 'player-unavailable';
+                    const missingLanguage = needsLanguage && (!languageCode || staleUnavailableLanguage);
+                    if (!missingCategory && !missingLanguage) continue;
 
                     let isVisibleOrNear = false;
                     try {
@@ -6915,15 +7008,17 @@ async function initializeDOMFallback(settings) {
                     } catch (e) {
                     }
 
-                    if (isWatchRail) {
+                    if (isWatchRail && missingCategory) {
                         if (!isVisibleOrNear) continue;
                         if (typeof setWatchRailCategoryState === 'function') {
-                            setWatchRailCategoryState(card, 'pending', 'Checking category…');
+                            setWatchRailCategoryState(card, 'pending', 'Checking video metadata…');
                         }
-                    } else {
-                        card.setAttribute('data-filtertube-pending-category', 'true');
-                        if (isVisibleOrNear && !card.hasAttribute('data-filtertube-pending-category-ts')) {
-                            card.setAttribute('data-filtertube-pending-category-ts', String(Date.now()));
+                    } else if (!isWatchRail && missingCategory) {
+                        const pendingAttr = 'data-filtertube-pending-category';
+                        const pendingTsAttr = 'data-filtertube-pending-category-ts';
+                        card.setAttribute(pendingAttr, 'true');
+                        if (isVisibleOrNear && !card.hasAttribute(pendingTsAttr)) {
+                            card.setAttribute(pendingTsAttr, String(Date.now()));
                         }
                     }
 
@@ -6931,7 +7026,8 @@ async function initializeDOMFallback(settings) {
                         scheduleVideoMetaFetch(videoId, {
                             needDuration: false,
                             needDates: false,
-                            needCategory: true,
+                            needCategory: missingCategory,
+                            needLanguage: missingLanguage,
                             priority: 'high'
                         });
                     }

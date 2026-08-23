@@ -19,6 +19,45 @@
         { label: 'Nonprofits & Activism', color: '#10b981' }
     ];
 
+    // Store stable base BCP-47 codes. A selected base language matches regional
+    // variants from YouTube (for example `pt` matches `pt-BR`, and `zh` matches
+    // `zh-Hans`). These labels describe spoken/default audio evidence, not UI or
+    // subtitle translation availability.
+    const languageOptions = [
+        { code: 'en', label: 'English', color: '#0ea5e9' },
+        { code: 'hi', label: 'Hindi', color: '#f97316' },
+        { code: 'es', label: 'Spanish', color: '#ef4444' },
+        { code: 'pt', label: 'Portuguese', color: '#22c55e' },
+        { code: 'ar', label: 'Arabic', color: '#14b8a6' },
+        { code: 'ru', label: 'Russian', color: '#6366f1' },
+        { code: 'fr', label: 'French', color: '#3b82f6' },
+        { code: 'de', label: 'German', color: '#64748b' },
+        { code: 'ja', label: 'Japanese', color: '#ec4899' },
+        { code: 'ko', label: 'Korean', color: '#8b5cf6' },
+        { code: 'zh', label: 'Chinese', color: '#f43f5e' },
+        { code: 'id', label: 'Indonesian', color: '#10b981' },
+        { code: 'tr', label: 'Turkish', color: '#f59e0b' },
+        { code: 'vi', label: 'Vietnamese', color: '#84cc16' },
+        { code: 'th', label: 'Thai', color: '#a855f7' },
+        { code: 'fil', label: 'Filipino', color: '#06b6d4' },
+        { code: 'it', label: 'Italian', color: '#fb7185' },
+        { code: 'pl', label: 'Polish', color: '#60a5fa' },
+        { code: 'nl', label: 'Dutch', color: '#2dd4bf' },
+        { code: 'uk', label: 'Ukrainian', color: '#fbbf24' },
+        { code: 'bn', label: 'Bengali', color: '#c084fc' },
+        { code: 'pa', label: 'Punjabi', color: '#fb923c' },
+        { code: 'ta', label: 'Tamil', color: '#34d399' },
+        { code: 'te', label: 'Telugu', color: '#818cf8' },
+        { code: 'mr', label: 'Marathi', color: '#f472b6' },
+        { code: 'gu', label: 'Gujarati', color: '#a3e635' },
+        { code: 'ml', label: 'Malayalam', color: '#38bdf8' },
+        { code: 'kn', label: 'Kannada', color: '#f87171' },
+        { code: 'ur', label: 'Urdu', color: '#4ade80' },
+        { code: 'fa', label: 'Persian', color: '#a78bfa' },
+        { code: 'he', label: 'Hebrew', color: '#22d3ee' },
+        { code: 'sw', label: 'Swahili', color: '#eab308' }
+    ];
+
     const groups = [
         {
             id: 'core',
@@ -49,8 +88,8 @@
             controls: [
                 {
                     key: 'hideSponsoredCards',
-                    title: 'Hide Sponsored cards',
-                    description: ''
+                    title: 'Send adverts to The Void',
+                    description: 'On by default. Remove YouTube ad plans before playback and quietly suppress any advert that still reaches the player on YouTube and YouTube Kids'
                 },
                 {
                     key: 'hidePlayables',
@@ -169,6 +208,11 @@
                     description: 'Disable or suppress autoplay UI'
                 },
                 {
+                    key: 'alwaysUseOriginalAudio',
+                    title: 'Always Use Original Audio (Experimental)',
+                    description: 'Prefer the creator\'s original audio track instead of an automatic dub'
+                },
+                {
                     key: 'disableAnnotations',
                     title: 'Disable Annotations',
                     description: 'Hide legacy annotation overlays'
@@ -241,10 +285,15 @@
         return categoryOptions.map(option => ({ ...option }));
     }
 
+    function getLanguageOptions() {
+        return languageOptions.map(option => ({ ...option }));
+    }
+
     global.FilterTubeContentControlsCatalog = {
         getCatalog,
         getAllControls,
         getControlByKey,
-        getCategoryOptions
+        getCategoryOptions,
+        getLanguageOptions
     };
 })(typeof window !== 'undefined' ? window : this);

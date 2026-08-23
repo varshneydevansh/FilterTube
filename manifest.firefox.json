@@ -26,10 +26,11 @@
       "128": "icons/icon-128.png"
     }
   },
-  "permissions": ["storage", "activeTab", "scripting", "tabs", "downloads"],
+  "permissions": ["storage", "unlimitedStorage", "activeTab", "scripting", "tabs", "downloads"],
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/*", "*://*.youtubekids.com/*"],
+      "exclude_matches": ["*://*.youtube.com/embed/*"],
       "js": [
         "js/shared/identity.js",
         "js/content/dom_state.js",
@@ -47,6 +48,27 @@
         "js/content_bridge.js"
       ],
       "run_at": "document_start"
+    },
+    {
+      "matches": ["*://*.youtube.com/embed/*", "*://*.youtube-nocookie.com/embed/*"],
+      "js": [
+        "js/shared/identity.js",
+        "js/content/dom_state.js",
+        "js/content/menu.js",
+        "js/content/dom_helpers.js",
+        "js/content/dom_extractors.js",
+        "js/content/dom_fallback.js",
+        "js/content/block_channel.js",
+        "js/content/bridge_injection.js",
+        "js/content/bridge_settings.js",
+        "js/content/handle_resolver.js",
+        "js/content/collab_dialog.js",
+        "js/content/release_notes_prompt.js",
+        "js/content/first_run_prompt.js",
+        "js/content_bridge.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true
     }
   ],
   "web_accessible_resources": [
@@ -57,9 +79,10 @@
         "js/seed.js",
         "js/shared/identity.js",
         "assets/images/homepage_hero_day.mp4",
+        "icons/icon-48.png",
         "icons/file.svg"
       ],
-      "matches": ["*://*.youtube.com/*", "*://*.youtubekids.com/*"]
+      "matches": ["*://*.youtube.com/*", "*://*.youtube-nocookie.com/*", "*://*.youtubekids.com/*"]
     }
   ],
   "icons": {

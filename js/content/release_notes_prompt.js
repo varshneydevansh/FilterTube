@@ -7,6 +7,7 @@
  * handles presentation + UX.
  */
 (function releaseNotesPrompt() {
+    if (window.top !== window) return;
     const api = (typeof browserAPI_BRIDGE !== 'undefined' && browserAPI_BRIDGE.runtime)
         ? browserAPI_BRIDGE
         : (typeof browser !== 'undefined' ? browser : (typeof chrome !== 'undefined' ? chrome : null));

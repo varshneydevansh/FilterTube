@@ -91,9 +91,9 @@ test('managed trust revocation cleanup is runtime-backed with provider-gated mai
   const plan = read(planPath);
   const history = read(historyPath);
 
-  assert.match(tabView, /async function purgeNanahManagedPolicyStateForTrustedLink\(linkId, \{ reason = 'trusted_link_removed' \} = \{\}\)/);
+  assert.match(tabView, /async function purgeNanahManagedPolicyStateForTrustedLink\(linkId, \{ reason = 'trusted_link_removed', actionType = 'trust_link\.revoke', label = 'Trusted parent link removed' \} = \{\}\)/);
   assert.match(tabView, /delete nextRemotePolicies\[normalized\]/);
-  assert.match(tabView, /actionType: 'trust_link\.revoke'/);
+  assert.match(tabView, /reason,\s*now,\s*actionType,\s*label\s*\}\)/);
   assert.match(tabView, /removedScopeCount: removedScopes\.length/);
   assert.match(tabView, /async function purgeNanahManagedOpenSyncStateForTrustedLink\(linkId\)/);
   assert.match(tabView, /reasonCode: 'trusted_link_removed'/);
@@ -106,7 +106,7 @@ test('managed trust revocation cleanup is runtime-backed with provider-gated mai
 
   assert.match(inventory, /trusted-link removal now purges\s+target-local accepted managed-policy revision state/i);
   assert.match(inventory, /provider-gated source-side mailbox purge request/i);
-  assert.match(inventory, /built-in server\s+mailbox purge client remains absent/i);
+  assert.match(inventory, /configured-provider purge is available only for explicit endpoints/i);
   assert.match(plan, /trusted-link removal cleanup: present/i);
   assert.match(history, /trusted-link removal history writer\s+now records protected `trust_link\.revoke`\s+rows/i);
 });

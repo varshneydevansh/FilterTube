@@ -4592,6 +4592,23 @@ html[data-theme="dark"] .video-filter-conditions-row {
     color: var(--ft-color-text-primary);
 }
 
+.ft-experimental-badge {
+    display: inline-flex;
+    align-items: center;
+    margin-inline-start: 8px;
+    padding: 2px 7px;
+    border: 1px solid color-mix(in srgb, var(--ft-color-accent-primary) 45%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ft-color-accent-primary) 10%, transparent);
+    color: var(--ft-color-accent-primary);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+
 .ft-category-controls {
     display: flex;
     align-items: center;
@@ -4611,6 +4628,17 @@ html[data-theme="dark"] .video-filter-conditions-row {
 .ft-category-panel {
     display: none;
     padding: 12px 16px 16px;
+}
+
+/* Language selection must remain available while the policy is off so users
+   can prepare the allow/block list before enabling enforcement. This is a
+   dedicated row rather than a collapsible category panel. */
+.language-filter-picker {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    padding: 0.75rem 1rem 1rem;
+    border-bottom: 0;
 }
 
 .ft-category-search {

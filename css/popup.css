@@ -988,6 +988,23 @@ html[data-theme="dark"] .stat-card {
     color: var(--ft-color-text-primary);
 }
 
+.ft-experimental-badge {
+    display: inline-flex;
+    align-items: center;
+    margin-inline-start: 6px;
+    padding: 2px 6px;
+    border: 1px solid color-mix(in srgb, var(--ft-color-accent-primary) 45%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ft-color-accent-primary) 10%, transparent);
+    color: var(--ft-color-accent-primary);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    line-height: 1.35;
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+
 .ft-topbar-list-mode .exact-toggle {
     font-size: 11px;
     line-height: 1;
@@ -1075,21 +1092,32 @@ html[data-theme="dark"] .stat-card {
     padding: 10px 12px 12px;
 }
 
-.popup-category-panel .ft-category-search {
+.popup-language-filter-picker {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    padding: 0.625rem 0.75rem 0.75rem;
+}
+
+.popup-category-panel .ft-category-search,
+.popup-language-filter-picker .ft-category-search {
     margin-bottom: 8px;
 }
 
-.popup-category-panel .ft-category-options {
+.popup-category-panel .ft-category-options,
+.popup-language-filter-picker .ft-category-options {
     gap: 6px;
     max-height: 180px;
 }
 
-.popup-category-panel .ft-category-pill {
+.popup-category-panel .ft-category-pill,
+.popup-language-filter-picker .ft-category-pill {
     min-height: 28px;
     padding: 4px 8px;
 }
 
-.popup-category-panel .ft-category-label {
+.popup-category-panel .ft-category-label,
+.popup-language-filter-picker .ft-category-label {
     font-size: 9px;
 }
 

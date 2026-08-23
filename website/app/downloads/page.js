@@ -15,7 +15,7 @@ import { docsHref, githubHref, heroVideoUrl } from "@/components/route-content";
 export const metadata = {
   title: "Downloads",
   description:
-    "Download FilterTube for browsers, Android phone/tablet, GrapheneOS and other Android setups, with final release testing for Play Store and App Store.",
+    "Download FilterTube for browsers, join Android Google Play closed testing, or follow final iPhone and iPad testing progress.",
 };
 
 const releaseHref = `${githubHref}/releases`;
@@ -46,13 +46,13 @@ const primaryDownloads = [
   },
   {
     title: "Android phone/tablet",
-    label: "Final release testing",
+    label: "Closed testing needs testers",
     icon: AndroidLogo,
     description:
-      "The Android phone and tablet app is complete for the current release scope and is in final testing for Play Store, direct APK, and trusted Android distribution paths.",
+      "The feature-rich Android custom viewing app is available through Google Play closed testing. The direct APK is a separate, simpler build and does not include the complete custom frontend.",
     actions: [
       {
-        label: "Direct APK releases",
+        label: "Simpler direct APK",
         href: latestReleaseHref,
       },
       {
@@ -64,10 +64,10 @@ const primaryDownloads = [
   },
   {
     title: "iPhone and iPad",
-    label: "Final release testing",
+    label: "Final testing alignment",
     icon: AppleLogo,
     description:
-      "The iPhone and iPad app follows the same local-first model and is being prepared for TestFlight and App Store review. Public IPA downloads are not the normal install path.",
+      "The iPhone and iPad build is in final build and testing alignment. Apple Developer account access is delaying TestFlight availability and will be resolved as soon as possible.",
     actions: [
       {
         label: "iOS status",
@@ -81,15 +81,15 @@ const primaryDownloads = [
 const androidMarkets = [
   {
     title: "Google Play",
-    status: "Primary phone/tablet store",
+    status: "Complete custom viewing app",
     detail:
-      "Use the signed AAB for Play tracks. This stays the broadest consumer install path.",
+      "The closed-test build is FilterTube's feature-rich, complete custom viewing experience for YouTube Main and Kids. Active testers are needed before public release.",
   },
   {
     title: "Direct APK",
-    status: "GrapheneOS and de-Googled Android",
+    status: "Separate simpler build",
     detail:
-      "A signed release APK can be attached to GitHub Releases with a SHA-256 checksum and signing fingerprint, then linked from this page.",
+      "The direct-install APK is not the complete custom frontend available through Google Play closed testing. Keep this distinction clear before downloading or sideloading it.",
   },
   {
     title: "IzzyOnDroid",
@@ -199,8 +199,9 @@ export default function DownloadsPage() {
             <p className="mt-6 max-w-[68ch] text-pretty text-base leading-8 text-[var(--color-muted)] md:text-lg">
               Browser releases stay public on GitHub and store listings. Android
               phone/tablet builds can be attached to the same release stream for
-              Play testing, GrapheneOS, and other direct-install users. iPhone and
-              iPad builds are prepared for TestFlight and App Store paths.
+              Google Play closed testing, GrapheneOS, and other direct-install
+              users. iPhone and iPad are in final build and testing alignment,
+              with Apple Developer account access currently delaying TestFlight.
             </p>
           </div>
 
@@ -221,13 +222,13 @@ export default function DownloadsPage() {
                   App release state
                 </p>
                 <h2 className="mt-5 font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
-                  Phone and tablet apps are complete and in final store testing.
+                  Android closed testing is open; Apple testing is being finalized.
                 </h2>
                 <p className="mt-5 text-sm leading-7 text-[var(--color-muted)]">
-                  The current release target is browser plus Android phone/tablet,
-                  with iPhone and iPad following the same store-review path. TV is
-                  separate platform work and should not be bundled into the mobile
-                  release.
+                  Android needs active Google Play closed testers before public
+                  release. The iPhone and iPad build is in final alignment, while
+                  Apple Developer account access is the current TestFlight delay.
+                  TV remains separate platform work.
                 </p>
               </div>
               <div id="ios-status" className="grid gap-3 sm:grid-cols-2">
@@ -237,9 +238,9 @@ export default function DownloadsPage() {
                     Android
                   </h3>
                   <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                    Play internal testing is active. Direct APK distribution will
-                    use GitHub release assets and checksums when the signed release
-                    APK is attached.
+                    Google Play closed testing is active and needs regular testers.
+                    Email hello@filtertube.in with your Play email and device to
+                    join and help move the app toward public release.
                   </p>
                 </div>
                 <div className="rounded-[1.2rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)] p-5">
@@ -248,8 +249,9 @@ export default function DownloadsPage() {
                     iOS and iPadOS
                   </h3>
                   <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                    Prepared for TestFlight and App Store review. Users should
-                    install from Apple channels once those links are approved.
+                    Final build and testing alignment is underway. Apple Developer
+                    account access is delaying TestFlight; Apple-channel testing
+                    will open as soon as that access is resolved.
                   </p>
                 </div>
               </div>

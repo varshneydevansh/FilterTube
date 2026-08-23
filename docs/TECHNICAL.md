@@ -12,6 +12,59 @@
 
 FilterTube builds on the earlier performance and whitelist-mode work with watch-page SPA recovery hardening, Mix/watch fallback-menu fixes, stronger collaboration roster recovery, cross-browser subscribed-channels import hardening, app-release surface preparation, and smaller UX controls around backups and menu injection. This technical documentation covers the filtering logic, identity recovery behavior, mode switching, release-candidate runtime gates, and user experience enhancements.
 
+## Advert Void playback contract
+
+The default-on, user-disableable `hideSponsoredCards` setting now has one behavior boundary for both
+sponsored renderer cleanup and in-player advert handling. The extension mirrors
+the Android app's ad-free outcome through a browser-appropriate sequence:
+
+1. Before YouTube schedules playback, sanitize observed Player payloads by
+   removing `playerAds`, `adPlacements`, `adSlots`, and
+   `adBreakHeartbeatParams`. This applies to initial Player data plus intercepted
+   `/youtubei/v1/player` and `/youtubei/v1/get_watch` JSON responses.
+2. As a fallback, inspect YouTube's active player for `ad-showing`/`ad-interrupting`, a visible
+   ad renderer with a real internal signal, or visible Skip/advertiser text.
+3. A setting-scoped style tied directly to `ad-showing`/`ad-interrupting` hides
+   an escaped advert frame without displaying an intermediate FilterTube banner.
+   Snapshot the viewer's current mute and volume state, then quarantine the advert's audio.
+4. Identify the requested content element by matching its duration to the
+   content Player response. Keep the advert playing silently, promote that
+   content element above it, and immediately resume it. Use YouTube's official
+   Skip control when it becomes available.
+5. If no separate Watch content media exists, mirror the Android bridge fallback
+   by advancing only the confirmed advert element. The element must belong to
+   the active Watch player, the player must still expose advert state, its
+   duration must not match the expected requested content, and the identity is
+   rechecked immediately before the write. When both interruption classes and
+   the duration mismatch provide immediate identity, FilterTube does not wait
+   several seconds for YouTube to render a Skip button. It also sends Android's
+   player-level completion seek only when the player API reports the same
+   duration as the confirmed advert. Inline previews and recommendation players
+   are never candidates.
+6. When YouTube clears the ad interruption, remove the promotion marker and
+   leave requested content under normal YouTube ownership.
+
+The MAIN-world runtime writes transition-only diagnostics to the console with
+the `[FilterTube][Advert Void]` prefix and retains the latest 100 structured
+entries in `window.__filtertubeAdVoidLog`. `waiting-for-requested-content`
+means YouTube has not exposed a separate ready content media element;
+`content-play-rejected` records a browser/player refusal; and repeated
+`content-paused-during-ad` entries mean YouTube is actively pausing the promoted
+element. Every interruption creates a new numbered session with a best-effort
+`pre-roll`, `mid-roll`, or `post-roll` placement. `ad-ended` measures when
+YouTube clears its advert state; `requested-content-ready` separately reports
+the following content initialization time. Media summaries intentionally omit
+signed playback URLs.
+
+This runs in the existing MAIN-world seed on player/navigation events plus one
+900 ms safety poll. It wraps YouTube's existing Player fetch/XHR responses but
+does not create additional YouTube requests, register request-blocking rules,
+or add per-video metadata requests.
+The manifest installs that seed on both YouTube Main and YouTube Kids, and the
+Kids compiled settings carry the active profile's same default-on, user-disableable flag. This matches
+the Android Kids player, which invokes the same suppression bridge as Main. The
+DOM fallback continues to remove sponsored cards and companion renderers.
+
 ## 2026-05-31 Release Candidate Runtime Snapshot
 
 - No-rule and inactive-rule states now skip more JSON clone/parse/replay, DOM fallback, quick-block, fallback-menu, and whitelist-pending work before YouTube SPA navigation can accumulate cost.
@@ -108,9 +161,16 @@ sequenceDiagram
 - a browser `GET /filtertube` status response is safe to inspect because it
   exposes service/readiness metadata only, never plaintext rules, PINs, private
   keys, or policy authority
-- protected-profile time limits are runtime policy gates; reaching the limit
-  blocks YouTube with the FilterTube timeout surface and records extra-time
-  requests as protected history. Profile-policy writes invalidate compiled
+- protected-profile time limits are runtime policy gates keyed by protected
+  profile and policy-timezone day; usage and grants are not shared between
+  profiles. A matched YouTube embed frame reports its own YouTube URL before
+  the external parent-tab URL, so embeds cannot bypass the active profile's
+  allowance. Reaching the active profile's limit
+  blocks the entire YouTube surface, keeps page media paused, and presents the
+  FilterTube serene timeout surface. The exhausted profile cannot dismiss the
+  lock; a separate profile can enter only through the normal PIN-backed profile
+  switch, while extra-time requests are recorded as protected history and do
+  not unlock access themselves. Profile-policy writes invalidate compiled
   settings, wake open YouTube/YouTube Kids tabs, force a fresh compiled-settings
   pull, and guarded-inject the content runtime into already-open tabs that do
   not yet have a live FilterTube receiver.
@@ -120,6 +180,8 @@ sequenceDiagram
 The latest runtime notes that were previously tracked in dated checkpoint files now live here and in `data/release_notes.json`.
 
 - Watch/player playlist blocking keeps stored `videoId -> UC...` mappings authoritative when later watch identity fetches are weak or conflicting.
+- Direct-access admission keeps a blocked Watch/playlist item paused and advances to the next allowed queue item when available. It also guards matching YouTube embed frames; ordinary links on external search or website pages remain outside extension page access until navigation reaches YouTube.
+- Direct-access text admission first reuses the matching current `ytInitialPlayerResponse`/captured Player response and the rendered Watch description. Metadata requests carry their exact needs, so text admission does not wait for unrelated category fields. In blocklist mode, known title/channel rules are applied synchronously and missing description metadata resolves without pausing playback; a per-video fail-open marker prevents the bounded identity timeout from restarting on every DOM pass. Whitelist mode remains fail-closed. The paced `/youtubei/v1/player` scheduler remains the final fallback.
 - UC-first enrichment can retry public/no-credentials channel HTML before accepting a row without `@handle` or custom URL metadata.
 - First-save block rows require a real channel name before using the skip-fetch path; a known handle alone is kept as identity, not as the display name.
 - Auto-backup waits briefly for post-block enrichment on channel-added writes so backup snapshots are less likely to capture incomplete first-save rows.
@@ -455,8 +517,9 @@ After a successful import:
 
 Current implementation note:
 
-- the existing whitelist activation path merges current blocklist channels and keywords into whitelist and clears the blocklist
-- the subscriptions import modal documents this explicitly so the behavior is not surprising
+- subscription import appends channels to Allowed rules and can activate Allow only selected without mutating Blocked rules
+- the top policy pill may separately request a bootstrap copy when Allowed rules are empty; that copy is deduplicated, marked with `modeBootstrapCopy`, and never clears Blocked rules
+- compilation omits `modeBootstrapCopy` rows from Block-selected allow-exception inputs, preventing copied duplicates from neutralizing the retained block entries
 
 ## Whitelist Mode Logic Improvements (v3.3.0 state)
 
@@ -702,9 +765,9 @@ async function handleSetListMode(request) {
     // Load current profiles
     const profilesV4 = await storageGet(FT_PROFILES_V4_KEY);
     
-    // Apply mode switch with optional merge
+    // Apply mode switch with an optional non-destructive bootstrap copy
     if (mode === 'whitelist' && copyBlocklist) {
-        mergeBlocklistIntoWhitelist(profilesV4, profileType);
+        copyBlocklistIntoWhitelist(profilesV4, profileType);
     }
     
     // Update profile mode

@@ -109,6 +109,7 @@ export function ScenicDetailPage({ page, relatedPages }) {
     : "";
   const relatedSummary = formatRelatedTitles(relatedPages);
   const hasHeroVideo = Boolean(page.heroVideo?.src);
+  const heroArtworks = page.heroArtworks || (page.heroArtwork ? [page.heroArtwork] : []);
 
   return (
     <>
@@ -143,7 +144,11 @@ export function ScenicDetailPage({ page, relatedPages }) {
         <div className="absolute inset-x-0 bottom-0 h-[34vh] bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.82),transparent_72%)]" />
 
         <div className="relative z-10 mx-auto max-w-[1400px]">
-          <div>
+          <div className={`grid items-center gap-10 lg:gap-14 ${
+            heroArtworks.length > 0
+              ? "lg:grid-cols-[minmax(0,0.98fr)_minmax(22rem,0.72fr)]"
+              : ""
+          }`}>
             <Reveal>
               <div className="max-w-[58rem]">
                 <Link
@@ -208,6 +213,34 @@ export function ScenicDetailPage({ page, relatedPages }) {
                 </div>
               </div>
             </Reveal>
+            {heroArtworks.length > 0 ? (
+              <Reveal delay={120}>
+                <div
+                  className={`relative mx-auto flex w-full max-w-[34rem] items-center justify-center ${
+                    heroArtworks.length > 1
+                      ? "min-h-[15rem] sm:min-h-[19rem] lg:min-h-[30rem]"
+                      : "min-h-[13rem] sm:min-h-[18rem] lg:min-h-[32rem]"
+                  }`}
+                  aria-label="Platform artwork"
+                >
+                  <div className={`absolute inset-[12%] rounded-full blur-[70px] ${tone.primaryOrb} opacity-55`} />
+                  {heroArtworks.map((artwork, index) => (
+                    <img
+                      alt={artwork.alt}
+                      className={`relative z-10 object-contain drop-shadow-[0_32px_42px_rgba(30,38,44,0.24)] ${
+                        heroArtworks.length > 1
+                          ? index === 0
+                            ? "mr-[-8%] h-auto w-[58%] -rotate-3"
+                            : "ml-[-8%] h-auto w-[58%] rotate-3"
+                          : "h-auto w-[min(88%,31rem)]"
+                      }`}
+                      key={artwork.src}
+                      src={artwork.src}
+                    />
+                  ))}
+                </div>
+              </Reveal>
+            ) : null}
           </div>
         </div>
       </section>

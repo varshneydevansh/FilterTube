@@ -33,17 +33,18 @@ Examples:
 
 In this path, the current blocklist stays as-is.
 
-### 2. Mode-switch migration
+### 2. Optional Blocked-to-Allowed bootstrap copy
 
-This happens when the user turns whitelist mode on through the existing mode-switch pipeline.
+This is offered by the top policy pill when the user turns on Whitelist mode and the Allowed list is empty.
 
 In this path:
 
-- current blocklist channels are merged into whitelist
-- current blocklist keywords are merged into whitelist
-- the blocklist is then cleared for that scope
+- current blocked channels are copied and deduplicated into Allowed rules
+- current blocked keywords are copied and deduplicated into Allowed rules
+- the Blocked rules remain intact for switching back
+- copied rows are marked as bootstrap entries and do not act as exceptions after returning to Blocklist mode
 
-Subscribed-channels import can optionally end by entering this second path when the user chooses **Import + Turn On Whitelist**.
+Subscribed-channels import does not enter this copy path. Its enable option only changes the active policy after storing imported Allowed rules.
 
 ## User Contract
 
@@ -57,9 +58,9 @@ Subscribed-channels import can optionally end by entering this second path when 
 
 - First appends the imported subscriptions into `whitelistChannels`
 - Then activates the existing `FilterTube_SetListMode('whitelist')` flow
-- That current mode-switch path merges the profile's present blocklist channels and keywords into whitelist and clears the blocklist
+- Sends `copyBlocklist: false`, so the profile's Blocked rules remain unchanged
 
-This is why the confirmation modal explicitly warns that turning whitelist mode on is broader than a plain import.
+The confirmation modal distinguishes storing Allowed rules from also activating Whitelist mode; neither choice moves or clears Blocked rules.
 
 ## End-to-End Flow
 

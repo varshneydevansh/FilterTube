@@ -17,6 +17,7 @@ function ensureStyles() {
             .filtertube-hidden-shelf { display: none !important; }
             .filtertube-pending-meta,
             [data-filtertube-pending-category],
+            [data-filtertube-pending-language],
             [data-filtertube-pending-upload-date],
             [data-filtertube-category-unavailable] {
                 position: relative !important;
@@ -26,6 +27,7 @@ function ensureStyles() {
 
             .filtertube-pending-meta > *,
             [data-filtertube-pending-category] > *,
+            [data-filtertube-pending-language] > *,
             [data-filtertube-pending-upload-date] > *,
             [data-filtertube-category-unavailable] > * {
                 visibility: hidden !important;
@@ -33,6 +35,7 @@ function ensureStyles() {
 
             .filtertube-pending-meta::after,
             [data-filtertube-pending-category]::after,
+            [data-filtertube-pending-language]::after,
             [data-filtertube-pending-upload-date]::after {
                 content: "";
                 position: absolute;
@@ -110,11 +113,15 @@ function ensureStyles() {
                 animation: filtertube-pending-shimmer 1.1s ease-in-out infinite;
             }
 
-            [data-filtertube-current-category-overlay-host="true"] {
+            [data-filtertube-current-category-overlay-host="true"],
+            [data-filtertube-current-short-admission-host="true"],
+            [data-filtertube-direct-access-overlay-host="true"] {
                 position: relative !important;
             }
 
-            #filtertube-current-watch-category-overlay {
+            #filtertube-current-watch-category-overlay,
+            #filtertube-current-short-admission-overlay,
+            #filtertube-direct-access-overlay {
                 position: absolute;
                 inset: 0;
                 z-index: 2147483646;
@@ -132,7 +139,9 @@ function ensureStyles() {
                 pointer-events: auto;
             }
 
-            #filtertube-current-watch-category-overlay[data-state="pending"] {
+            #filtertube-current-watch-category-overlay[data-state="pending"],
+            #filtertube-current-short-admission-overlay[data-state="pending"],
+            #filtertube-direct-access-overlay[data-state="pending"] {
                 background: rgba(15, 23, 42, 0.88);
             }
 

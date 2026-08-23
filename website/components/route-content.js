@@ -20,6 +20,7 @@ export { extensionInstallHref, navigationLinks };
 export const heroVideoUrl = "/videos/homepage/day/homepage_hero_day.mp4";
 
 export const demoVideoHref = "https://www.youtube.com/watch?v=dmLUu3lm7dE";
+export const appDemoVideoHref = "https://www.youtube.com/watch?v=SHvSICSMHL4";
 
 export const docsHref =
   "https://github.com/varshneydevansh/FilterTube/tree/master/docs";
@@ -83,6 +84,11 @@ export const footerLinks = {
     { label: "Documentation", href: docsHref, external: true },
     { label: "GitHub", href: githubHref, external: true },
     {
+      label: "Support independent development",
+      href: "https://ko-fi.com/filtertube",
+      external: true,
+    },
+    {
       label: "Issue tracker",
       href: "https://github.com/varshneydevansh/FilterTube/issues",
       external: true,
@@ -97,12 +103,24 @@ export const homeStoryNotes = [
   "FilterTube is built by a neurodivergent developer who needed calmer YouTube for ADHD focus, then shaped further by parents and caregivers.",
   "Families with autistic children and other neurodivergent users are part of the reason the controls are becoming simpler, clearer, and easier to trust.",
   "Use profiles when different people need different rules. Use a PIN when those rules should not be changed casually.",
-  "Desktop extensions work today. The MVP Android phone/tablet app is available through internal testing by emailing hello@filtertube.in.",
-  "The current app validates the WebView-based control model, while a more native custom control app is being built in parallel.",
-  "iPhone, iPad, and TV builds follow separate TestFlight, App Store, and TV store paths.",
+  "Desktop extensions work today. Android Google Play closed testing is open and needs active phone/tablet testers; email hello@filtertube.in to join.",
+  "The working Android release build includes Main, Kids, profiles, protected time, and content-first playback; active Google Play closed testers are the next public-release step.",
+  "The iPhone and iPad build is in final testing alignment. Apple Developer account access is delaying TestFlight for now and will be resolved as soon as possible.",
 ];
 
 export const homeCapabilityCards = [
+  {
+    label: "Ad-free viewing",
+    title: "Keep YouTube adverts out of the video you asked to watch.",
+    description:
+      "The extension removes observed YouTube advert plans before playback and keeps a guarded fallback for adverts that escape. The native app uses its content-first player path instead of YouTube's browser advert path.",
+    points: [
+      "Advert removal is enabled by default and works in both Blocklist and Whitelist modes.",
+      "Built for YouTube Main and YouTube Kids, with compatibility checked as YouTube changes its player.",
+    ],
+    icon: EyeSlash,
+    span: "xl:col-span-12",
+  },
   {
     label: "Block what you name",
     title: "Hide channels, keywords, Shorts, comments, and noisy surfaces.",
@@ -146,10 +164,10 @@ export const homeCapabilityCards = [
     title:
       "The same rule model is moving from desktop into phone, tablet, and TV.",
     description:
-      "The extension is the live base. The apps are being shaped around the same family controls, profile rules, and local-first direction.",
+      "The extension is live, the working Android build is in Google Play closed testing, and the native Apple build is in final testing alignment.",
     points: [
-      "Ask hello@filtertube.in for Android MVP internal testing access.",
-      "The MVP app is WebView-based; the custom control app is being built alongside it.",
+      "Email hello@filtertube.in to join the active Google Play closed test and help the Android app reach public release.",
+      "Apple Developer account access is currently delaying TestFlight and will be resolved as soon as possible.",
       "Remote family updates use verified device trust, not a public account full of private viewing data.",
     ],
     icon: Stack,
@@ -229,11 +247,18 @@ export const homeFaqItems = [
   {
     question: "How do I join Android app testing?",
     answer:
-      "Email hello@filtertube.in and ask for Android MVP testing access. The current app lets families test the control flow now while the more custom native app is being built.",
+      "Email hello@filtertube.in and ask to join Google Play closed testing. Active Android testers help satisfy the Play release path and catch real-device issues before public release.",
   },
 ];
 
 export const homeTechnicalFeatures = [
+  {
+    title: "Ad-free playback",
+    description:
+      "Remove YouTube adverts without changing whether the active profile uses Blocklist or Whitelist rules.",
+    detail:
+      "Enabled by default; the extension and native app use platform-specific playback paths.",
+  },
   {
     title: "Keyword rules",
     description:
@@ -315,15 +340,25 @@ export const detailPages = {
     slug: "mobile",
     icon: DeviceMobile,
     tone: "sage",
-    status: "Testing by request",
+    status: "Store testing",
     eyebrow: "Dedicated apps",
     navTitle: "Mobile overview",
     routeSummary:
-      "A calm overview of the Android MVP, iPhone, iPad, and future TV app family.",
+      "A calm overview of the working Android release build, finalizing Apple builds, and the future TV app family.",
     titleLead: "A calm FilterTube companion for",
     titleDisplay: "phones and tablets",
     description:
-      "The mobile family starts with an MVP WebView-based control app for Android internal testing, while a more native custom control app is being built in parallel for a calmer long-term experience.",
+      "The working Android phone and tablet build is in Google Play closed testing and needs active testers before public release. The native iPhone and iPad build is in final alignment, with Apple Developer account access currently delaying TestFlight.",
+    heroArtworks: [
+      {
+        src: "/apps/android.png",
+        alt: "FilterTube Android app artwork",
+      },
+      {
+        src: "/apps/app-store-transparent.png",
+        alt: "FilterTube iPhone and iPad App Store artwork",
+      },
+    ],
     chips: ["Signal Rail", "One-thumb controls", "Local-first trust"],
     primaryCta: {
       label: "Open downloads",
@@ -356,8 +391,8 @@ export const detailPages = {
     ],
     featureCards: [
       {
-        title: "Android MVP access by email",
-        body: "People who want to test the current Android phone/tablet build can email hello@filtertube.in and ask to be added to internal testing.",
+        title: "Android closed testing needs active users",
+        body: "Email hello@filtertube.in with your Google Play email and Android device to join the working phone/tablet build before public release.",
       },
       {
         title: "Home that reassures first",
@@ -376,7 +411,7 @@ export const detailPages = {
     milestoneIntro:
       "Mobile is the control center for status, rule changes, and profile switching, not a stretched copy of the browser popup.",
     milestones: [
-      "Android MVP testers can join through a simple email request.",
+      "Active Android testers can join the Google Play closed test by email.",
       "Protection status is understandable in one glance.",
       "Profiles and PIN gates feel native and trustworthy.",
       "The visual tone stays calm enough for family use.",
@@ -387,7 +422,7 @@ export const detailPages = {
     slug: "ios",
     icon: DeviceMobile,
     tone: "pearl",
-    status: "Final release testing",
+    status: "Finalizing for TestFlight",
     eyebrow: "iPhone app",
     navTitle: "iPhone",
     routeSummary:
@@ -395,7 +430,11 @@ export const detailPages = {
     titleLead: "A native FilterTube app for",
     titleDisplay: "iPhone control",
     description:
-      "The iPhone app centers on immediate status, fast rule edits, and setup guidance that never feels technical.",
+      "The native iPhone app is in final build and testing alignment. An Apple Developer account issue on Apple's side is delaying TestFlight access, and we are working to resolve it as soon as possible.",
+    heroArtwork: {
+      src: "/apps/app-store-transparent.png",
+      alt: "FilterTube iPhone app artwork",
+    },
     chips: ["Protected now", "Profile switching", "Quick toggles"],
     primaryCta: {
       label: "See the mobile direction",
@@ -460,7 +499,7 @@ export const detailPages = {
     slug: "ipados",
     icon: MonitorPlay,
     tone: "sky",
-    status: "Final release testing",
+    status: "Finalizing for TestFlight",
     eyebrow: "iPad app",
     navTitle: "iPadOS",
     routeSummary:
@@ -468,7 +507,11 @@ export const detailPages = {
     titleLead: "A wider FilterTube workspace for",
     titleDisplay: "iPad and home setup",
     description:
-      "The iPad app becomes a spacious household workspace: profile-aware dashboards, cleaner rule management, and room for family oversight without noise.",
+      "The native iPad build is in final build and testing alignment alongside iPhone. An Apple Developer account issue on Apple's side is delaying TestFlight access for now.",
+    heroArtwork: {
+      src: "/apps/app-store-transparent.png",
+      alt: "FilterTube iPad app artwork",
+    },
     chips: ["Two-column calm", "Household setup", "Readable dashboards"],
     primaryCta: {
       label: "See the mobile overview",
@@ -529,19 +572,23 @@ export const detailPages = {
     slug: "android",
     icon: DeviceMobile,
     tone: "forest",
-    status: "Internal testing",
+    status: "Google Play closed testing",
     eyebrow: "Android app",
     navTitle: "Android",
     routeSummary:
-      "The current Android MVP is available through internal testing by request.",
+      "The feature-rich Android custom viewing app needs active Google Play closed testers before public release.",
     titleLead: "A flexible FilterTube companion for",
     titleDisplay: "Android devices",
     description:
-      "The current Android MVP uses a WebView-based control model so families can test filtering, profiles, YouTube Main, and public YouTube Kids access now. A more native custom control app is being built in parallel.",
-    chips: ["Flexible layout", "Quick rules", "Protected sessions"],
+      "Google Play closed testing contains FilterTube's complete custom viewing experience, including rules, profiles, protected time, YouTube Main, YouTube Kids, and content-first ad-free playback. The direct APK is a separate, simpler build without this complete custom frontend.",
+    heroArtwork: {
+      src: "/apps/android.png",
+      alt: "FilterTube Android app artwork",
+    },
+    chips: ["Complete custom frontend", "Ad-free playback", "Closed testing"],
     primaryCta: {
-      label: "Ask for testing access",
-      href: "mailto:hello@filtertube.in?subject=Android%20MVP%20testing%20access",
+      label: "Join Play closed testing",
+      href: "mailto:hello@filtertube.in?subject=Android%20closed%20testing%20request&body=Hi%20FilterTube%2C%0A%0AI%20would%20like%20to%20join%20the%20Android%20Play%20Store%20closed%20testing.%0A%0AGoogle%20Play%20email%3A%20%0ADevice%3A%20%0A",
       external: true,
     },
     secondaryCta: {
@@ -550,12 +597,12 @@ export const detailPages = {
       external: false,
     },
     previewLabel: "Android intent",
-    previewTitle: "MVP testing now, custom control app next.",
+    previewTitle: "The complete custom app works now; active testers unlock the public path.",
     previewRows: [
       {
         label: "Access",
-        value: "Email",
-        detail: "Ask hello@filtertube.in for internal testing access.",
+        value: "Closed test",
+        detail: "Email hello@filtertube.in with your Google Play email and Android device.",
       },
       {
         label: "Profiles",
@@ -564,30 +611,30 @@ export const detailPages = {
       },
       {
         label: "Current build",
-        value: "MVP",
-        detail: "WebView-based control validation while the custom app is built.",
+        value: "Custom frontend",
+        detail: "The feature-rich Main and Kids viewing experience is ready for real-device closed testing.",
       },
     ],
     featureCards: [
       {
-        title: "MVP WebView control app",
-        body: "The current Android testing app validates the working FilterTube model on phone and tablet before the fully custom frontend replaces it.",
+        title: "Complete custom viewing app",
+        body: "The Google Play build brings FilterTube rules, profiles, protected time, Main, Kids, and content-first playback into one feature-rich experience.",
       },
       {
         title: "Readable under motion",
         body: "The product stays legible even while scenic theming and motion are active.",
       },
       {
-        title: "Honest roadmap language",
-        body: "Protected browsing and advanced integrations stay clearly marked until they ship.",
+        title: "Active testing before public release",
+        body: "Google Play closed testers help prove the app on real devices and move it toward the public store track.",
       },
     ],
     milestoneTitle: "Android priorities",
     milestoneIntro:
       "Android balances flexibility with the same calm trust posture used elsewhere.",
     milestones: [
-      "Android MVP testers can be added by email.",
-      "The MVP stays useful while the custom frontend is developed.",
+      "Recruit active Google Play closed testers by email.",
+      "Keep the working release build stable across real phones and tablets.",
       "Keep product-control language clear and direct.",
       "Use serene visuals without losing Android’s practical character.",
     ],

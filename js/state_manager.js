@@ -75,7 +75,7 @@ const StateManager = (() => {
         hideShorts: false,
         hideComments: false,
         hideHomeFeed: false,
-        hideSponsoredCards: false,
+        hideSponsoredCards: true,
         hidePlayables: false,
         hideWatchPlaylistPanel: false,
         hidePlaylistCards: false,
@@ -93,6 +93,7 @@ const StateManager = (() => {
         hideEndscreenVideowall: false,
         hideEndscreenCards: false,
         disableAutoplay: false,
+        alwaysUseOriginalAudio: false,
         disableAnnotations: false,
         hideTopHeader: false,
         hideNotificationBell: false,
@@ -169,6 +170,11 @@ const StateManager = (() => {
             enabled: false,
             mode: 'block',
             selected: []
+        },
+        languageFilters: {
+            enabled: false,
+            mode: 'block',
+            selected: []
         }
     };
 
@@ -229,7 +235,7 @@ const StateManager = (() => {
         state.hideShorts = data.hideShorts || false;
         state.hideComments = data.hideComments || false;
         state.hideHomeFeed = data.hideHomeFeed || false;
-        state.hideSponsoredCards = data.hideSponsoredCards || false;
+        state.hideSponsoredCards = data.hideSponsoredCards !== false;
         state.hidePlayables = data.hidePlayables || false;
         state.hideWatchPlaylistPanel = data.hideWatchPlaylistPanel || false;
         state.hidePlaylistCards = data.hidePlaylistCards || false;
@@ -247,6 +253,7 @@ const StateManager = (() => {
         state.hideEndscreenVideowall = data.hideEndscreenVideowall || false;
         state.hideEndscreenCards = data.hideEndscreenCards || false;
         state.disableAutoplay = data.disableAutoplay || false;
+        state.alwaysUseOriginalAudio = data.alwaysUseOriginalAudio || false;
         state.disableAnnotations = data.disableAnnotations || false;
         state.hideTopHeader = data.hideTopHeader || false;
         state.hideNotificationBell = data.hideNotificationBell || false;
@@ -276,9 +283,25 @@ const StateManager = (() => {
             selected: []
         };
 
+        state.languageFilters = data.languageFilters ? JSON.parse(JSON.stringify(data.languageFilters)) : {
+            enabled: false,
+            mode: 'block',
+            selected: []
+        };
+
         try {
             const loaded = state.categoryFilters && typeof state.categoryFilters === 'object' ? state.categoryFilters : {};
             state.categoryFilters = {
+                enabled: loaded.enabled === true,
+                mode: loaded.mode === 'allow' ? 'allow' : 'block',
+                selected: Array.isArray(loaded.selected) ? [...loaded.selected] : []
+            };
+        } catch (e) {
+        }
+
+        try {
+            const loaded = state.languageFilters && typeof state.languageFilters === 'object' ? state.languageFilters : {};
+            state.languageFilters = {
                 enabled: loaded.enabled === true,
                 mode: loaded.mode === 'allow' ? 'allow' : 'block',
                 selected: Array.isArray(loaded.selected) ? [...loaded.selected] : []
@@ -715,7 +738,15 @@ const StateManager = (() => {
     // KIDS PROFILE MANAGEMENT (Keywords + Channels)
     // ============================================================================
 
+    function getKidsRuleListKey(options = {}, blockedKey, allowedKey) {
+        const kids = getKidsState();
+        const useAllowList = options?.targetList === 'allow'
+            || (options?.targetList !== 'block' && kids.mode === 'whitelist');
+        return useAllowList ? allowedKey : blockedKey;
+    }
+
     async function addKidsKeyword(word) {
+        const options = arguments[1] || {};
         await ensureLoaded();
 
         if (isUiLocked()) {
@@ -728,7 +759,7 @@ const StateManager = (() => {
 
         const lower = trimmed.toLowerCase();
         const kids = getKidsState();
-        const listKey = kids.mode === 'whitelist' ? 'whitelistKeywords' : 'blockedKeywords';
+        const listKey = getKidsRuleListKey(options, 'blockedKeywords', 'whitelistKeywords');
         const list = Array.isArray(kids[listKey]) ? kids[listKey] : [];
         if (list.some(entry => (entry.word || '').toLowerCase() === lower)) {
             return false;
@@ -756,6 +787,7 @@ const StateManager = (() => {
     }
 
     async function removeKidsKeyword(word) {
+        const options = arguments[1] || {};
         await ensureLoaded();
 
         if (isUiLocked()) {
@@ -763,7 +795,7 @@ const StateManager = (() => {
             return false;
         }
         const kids = getKidsState();
-        const listKey = kids.mode === 'whitelist' ? 'whitelistKeywords' : 'blockedKeywords';
+        const listKey = getKidsRuleListKey(options, 'blockedKeywords', 'whitelistKeywords');
         const list = Array.isArray(kids[listKey]) ? kids[listKey] : [];
         const before = list.length;
         kids[listKey] = list.filter(entry => (entry.word || '') !== word);
@@ -784,6 +816,7 @@ const StateManager = (() => {
      * Mirrors main behavior, but persists inside ftProfilesV3.kids.blockedKeywords.
      */
     async function toggleKidsKeywordComments(word) {
+        const options = arguments[1] || {};
         await ensureLoaded();
 
         if (isUiLocked()) {
@@ -791,7 +824,7 @@ const StateManager = (() => {
             return null;
         }
         const kids = getKidsState();
-        const listKey = kids.mode === 'whitelist' ? 'whitelistKeywords' : 'blockedKeywords';
+        const listKey = getKidsRuleListKey(options, 'blockedKeywords', 'whitelistKeywords');
         const list = Array.isArray(kids[listKey]) ? kids[listKey] : [];
         const index = list.findIndex(k => (k?.word || '') === word);
         if (index < 0) return null;
@@ -821,6 +854,7 @@ const StateManager = (() => {
      * Mirrors main behavior, but persists inside ftProfilesV3.kids.blockedKeywords.
      */
     async function toggleKidsKeywordExact(word) {
+        const options = arguments[1] || {};
         await ensureLoaded();
 
         if (isUiLocked()) {
@@ -828,7 +862,7 @@ const StateManager = (() => {
             return null;
         }
         const kids = getKidsState();
-        const listKey = kids.mode === 'whitelist' ? 'whitelistKeywords' : 'blockedKeywords';
+        const listKey = getKidsRuleListKey(options, 'blockedKeywords', 'whitelistKeywords');
         const list = Array.isArray(kids[listKey]) ? kids[listKey] : [];
         const index = list.findIndex(k => (k?.word || '') === word);
         if (index < 0) return null;
@@ -853,6 +887,7 @@ const StateManager = (() => {
     }
 
     async function updateKidsKeywordDateFilter(word, dateFilter) {
+        const options = arguments[2] || {};
         await ensureLoaded();
 
         if (isUiLocked()) {
@@ -861,7 +896,7 @@ const StateManager = (() => {
         }
 
         const kids = getKidsState();
-        const listKey = kids.mode === 'whitelist' ? 'whitelistKeywords' : 'blockedKeywords';
+        const listKey = getKidsRuleListKey(options, 'blockedKeywords', 'whitelistKeywords');
         const list = Array.isArray(kids[listKey]) ? kids[listKey] : [];
         const index = list.findIndex(k => (k?.word || '') === word && k?.source !== 'channel');
         if (index < 0) return false;
@@ -875,6 +910,37 @@ const StateManager = (() => {
         notifyListeners('kidsKeywordUpdated', { word, dateFilter: normalized });
         scheduleAutoBackup('kids_keyword_date_filter_updated');
 
+        return true;
+    }
+
+    async function moveKidsKeyword(word, options = {}) {
+        await ensureLoaded();
+        if (isUiLocked()) {
+            await loadSettings();
+            return false;
+        }
+        const fromList = options?.fromList === 'allow' ? 'allow' : 'block';
+        const toList = options?.toList === 'block' ? 'block' : 'allow';
+        if (fromList === toList) return false;
+        const kids = getKidsState();
+        const fromKey = fromList === 'allow' ? 'whitelistKeywords' : 'blockedKeywords';
+        const toKey = toList === 'allow' ? 'whitelistKeywords' : 'blockedKeywords';
+        const source = Array.isArray(kids[fromKey]) ? [...kids[fromKey]] : [];
+        const destination = Array.isArray(kids[toKey]) ? [...kids[toKey]] : [];
+        const lower = String(word || '').trim().toLowerCase();
+        const index = source.findIndex(entry => entry?.source !== 'channel' && String(entry?.word || '').toLowerCase() === lower);
+        if (index < 0) return false;
+        const [moved] = source.splice(index, 1);
+        if (!destination.some(entry => entry?.source !== 'channel' && String(entry?.word || '').toLowerCase() === lower)) {
+            destination.unshift({ ...moved });
+        }
+        kids[fromKey] = source;
+        kids[toKey] = destination;
+        state.kids = { ...kids };
+        await persistKidsProfiles(state.kids);
+        await requestRefresh('kids');
+        notifyListeners('kidsKeywordMoved', { word, fromList, toList });
+        scheduleAutoBackup('kids_keyword_moved');
         return true;
     }
 
@@ -902,6 +968,7 @@ const StateManager = (() => {
     }
 
     async function addKidsChannel(input) {
+        const options = arguments[1] || {};
         await ensureLoaded();
 
         if (isUiLocked()) {
@@ -929,7 +996,7 @@ const StateManager = (() => {
         }
 
         const channelMap = state.channelMap && typeof state.channelMap === 'object' ? state.channelMap : {};
-        const listKey = kids.mode === 'whitelist' ? 'whitelistChannels' : 'blockedChannels';
+        const listKey = getKidsRuleListKey(options, 'blockedChannels', 'whitelistChannels');
         const list = Array.isArray(kids[listKey]) ? kids[listKey] : [];
 
         // Helper to normalize UC ID
@@ -953,7 +1020,7 @@ const StateManager = (() => {
         }
 
         try {
-            const action = kids.mode === 'whitelist' ? 'FilterTube_KidsWhitelistChannel' : 'FilterTube_KidsBlockChannel';
+            const action = listKey === 'whitelistChannels' ? 'FilterTube_KidsWhitelistChannel' : 'FilterTube_KidsBlockChannel';
             const response = await chrome.runtime.sendMessage({
                 action,
                 channel: {
@@ -980,6 +1047,7 @@ const StateManager = (() => {
     }
 
     async function removeKidsChannel(index) {
+        const options = arguments[1] || {};
         await ensureLoaded();
 
         if (isUiLocked()) {
@@ -987,7 +1055,7 @@ const StateManager = (() => {
             return false;
         }
         const kids = getKidsState();
-        const listKey = kids.mode === 'whitelist' ? 'whitelistChannels' : 'blockedChannels';
+        const listKey = getKidsRuleListKey(options, 'blockedChannels', 'whitelistChannels');
         const list = Array.isArray(kids[listKey]) ? kids[listKey] : [];
         if (index < 0 || index >= list.length) return false;
         const channel = list[index];
@@ -1004,11 +1072,42 @@ const StateManager = (() => {
         return true;
     }
 
+    async function moveKidsChannel(index, options = {}) {
+        await ensureLoaded();
+        if (isUiLocked()) {
+            await loadSettings();
+            return false;
+        }
+        const fromList = options?.fromList === 'allow' ? 'allow' : 'block';
+        const toList = options?.toList === 'block' ? 'block' : 'allow';
+        if (fromList === toList) return false;
+        const kids = getKidsState();
+        const fromKey = fromList === 'allow' ? 'whitelistChannels' : 'blockedChannels';
+        const toKey = toList === 'allow' ? 'whitelistChannels' : 'blockedChannels';
+        const source = Array.isArray(kids[fromKey]) ? [...kids[fromKey]] : [];
+        const destination = Array.isArray(kids[toKey]) ? [...kids[toKey]] : [];
+        if (index < 0 || index >= source.length) return false;
+        const [moved] = source.splice(index, 1);
+        const identity = (channel) => String(channel?.id || channel?.handle || channel?.customUrl || channel?.name || '').toLowerCase();
+        if (!destination.some(channel => identity(channel) === identity(moved))) {
+            destination.unshift({ ...moved });
+        }
+        kids[fromKey] = source;
+        kids[toKey] = destination;
+        state.kids = { ...kids };
+        await persistKidsProfiles(state.kids);
+        await requestRefresh('kids');
+        notifyListeners('kidsChannelMoved', { channel: moved, fromList, toList });
+        scheduleAutoBackup('kids_channel_moved');
+        return true;
+    }
+
     /**
      * Toggle "Filter All Content" for a Kids channel.
      * This mirrors main behavior, but persists inside ftProfilesV3.kids.blockedChannels.
      */
     async function toggleKidsChannelFilterAll(index) {
+        const options = arguments[1] || {};
         await ensureLoaded();
 
         if (isUiLocked()) {
@@ -1016,7 +1115,10 @@ const StateManager = (() => {
             return false;
         }
         const kids = getKidsState();
-        if (kids.mode === 'whitelist') {
+        const targetList = options?.targetList === 'block'
+            ? 'block'
+            : (options?.targetList === 'allow' ? 'allow' : (kids.mode === 'whitelist' ? 'allow' : 'block'));
+        if (targetList !== 'block') {
             return false;
         }
         if (index < 0 || index >= kids.blockedChannels.length) return false;
@@ -1085,6 +1187,7 @@ const StateManager = (() => {
                 hideEndscreenVideowall: state.hideEndscreenVideowall,
                 hideEndscreenCards: state.hideEndscreenCards,
                 disableAutoplay: state.disableAutoplay,
+                alwaysUseOriginalAudio: state.alwaysUseOriginalAudio,
                 disableAnnotations: state.disableAnnotations,
                 hideTopHeader: state.hideTopHeader,
                 hideNotificationBell: state.hideNotificationBell,
@@ -1095,7 +1198,8 @@ const StateManager = (() => {
                 showBlockMenuItem: state.showBlockMenuItem,
                 hideSearchShelves: state.hideSearchShelves,
                 contentFilters: state.contentFilters,
-                categoryFilters: state.categoryFilters
+                categoryFilters: state.categoryFilters,
+                languageFilters: state.languageFilters
             });
 
             if (broadcast && result.compiledSettings) {
@@ -1409,7 +1513,8 @@ const StateManager = (() => {
             return false;
         }
 
-        if (state.mode === 'whitelist') {
+        const useAllowList = options.targetList === 'allow' || (options.targetList !== 'block' && state.mode === 'whitelist');
+        if (useAllowList) {
             const trimmed = (word || '').trim();
             if (!trimmed) return false;
             const lowerWord = trimmed.toLowerCase();
@@ -1432,7 +1537,7 @@ const StateManager = (() => {
             state.userWhitelistKeywords = [entry, ...list];
             state.whitelistKeywords = [...state.userWhitelistKeywords];
             await persistMainProfiles({
-                mode: 'whitelist',
+                mode: state.mode,
                 whitelistChannels: Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [],
                 whitelistKeywords: state.whitelistKeywords
             });
@@ -1475,7 +1580,7 @@ const StateManager = (() => {
      * @param {string} word - Keyword to toggle
      * @returns {Promise<boolean>} New comments state
      */
-    async function toggleKeywordComments(word) {
+    async function toggleKeywordComments(word, options = {}) {
         await ensureLoaded();
 
         if (isUiLocked()) {
@@ -1483,7 +1588,8 @@ const StateManager = (() => {
             return false;
         }
 
-        if (state.mode === 'whitelist') {
+        const useAllowList = options.targetList === 'allow' || (options.targetList !== 'block' && state.mode === 'whitelist');
+        if (useAllowList) {
             const list = Array.isArray(state.userWhitelistKeywords) ? state.userWhitelistKeywords : [];
             const index = list.findIndex(k => (k?.word || '') === word);
             if (index === -1) return false;
@@ -1495,7 +1601,7 @@ const StateManager = (() => {
             state.whitelistKeywords = [...state.userWhitelistKeywords];
 
             await persistMainProfiles({
-                mode: 'whitelist',
+                mode: state.mode,
                 whitelistChannels: Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [],
                 whitelistKeywords: state.whitelistKeywords
             });
@@ -1529,7 +1635,7 @@ const StateManager = (() => {
      * @param {string} word - Keyword to remove
      * @returns {Promise<boolean>} Success status
      */
-    async function removeKeyword(word) {
+    async function removeKeyword(word, options = {}) {
         await ensureLoaded();
 
         if (isUiLocked()) {
@@ -1537,7 +1643,8 @@ const StateManager = (() => {
             return false;
         }
 
-        if (state.mode === 'whitelist') {
+        const useAllowList = options.targetList === 'allow' || (options.targetList !== 'block' && state.mode === 'whitelist');
+        if (useAllowList) {
             const list = Array.isArray(state.userWhitelistKeywords) ? state.userWhitelistKeywords : [];
             const index = list.findIndex(k => (k?.word || '') === word && k?.source !== 'channel');
             if (index === -1) return false;
@@ -1545,7 +1652,7 @@ const StateManager = (() => {
             state.userWhitelistKeywords = [...list];
             state.whitelistKeywords = [...state.userWhitelistKeywords];
             await persistMainProfiles({
-                mode: 'whitelist',
+                mode: state.mode,
                 whitelistChannels: Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [],
                 whitelistKeywords: state.whitelistKeywords
             });
@@ -1574,7 +1681,7 @@ const StateManager = (() => {
      * @param {string} word - Keyword to toggle
      * @returns {Promise<boolean>} New exact state
      */
-    async function toggleKeywordExact(word) {
+    async function toggleKeywordExact(word, options = {}) {
         await ensureLoaded();
 
         if (isUiLocked()) {
@@ -1582,7 +1689,8 @@ const StateManager = (() => {
             return false;
         }
 
-        if (state.mode === 'whitelist') {
+        const useAllowList = options.targetList === 'allow' || (options.targetList !== 'block' && state.mode === 'whitelist');
+        if (useAllowList) {
             const list = Array.isArray(state.userWhitelistKeywords) ? state.userWhitelistKeywords : [];
             const index = list.findIndex(k => (k?.word || '') === word && k?.source !== 'channel');
             if (index === -1) return false;
@@ -1591,7 +1699,7 @@ const StateManager = (() => {
             state.userWhitelistKeywords = [...list];
             state.whitelistKeywords = [...state.userWhitelistKeywords];
             await persistMainProfiles({
-                mode: 'whitelist',
+                mode: state.mode,
                 whitelistChannels: Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [],
                 whitelistKeywords: state.whitelistKeywords
             });
@@ -1615,7 +1723,48 @@ const StateManager = (() => {
         return state.userKeywords[index].exact;
     }
 
-    async function updateKeywordDateFilter(word, dateFilter) {
+    async function moveKeyword(word, options = {}) {
+        await ensureLoaded();
+        if (isUiLocked()) {
+            await loadSettings();
+            return false;
+        }
+
+        const fromAllow = options.fromList === 'allow';
+        const toAllow = options.toList === 'allow';
+        if (fromAllow === toAllow) return false;
+        const source = fromAllow
+            ? (Array.isArray(state.userWhitelistKeywords) ? [...state.userWhitelistKeywords] : [])
+            : (Array.isArray(state.userKeywords) ? [...state.userKeywords] : []);
+        const target = toAllow
+            ? (Array.isArray(state.userWhitelistKeywords) ? [...state.userWhitelistKeywords] : [])
+            : (Array.isArray(state.userKeywords) ? [...state.userKeywords] : []);
+        const normalizedWord = (word || '').trim().toLowerCase();
+        const index = source.findIndex(entry => entry?.source !== 'channel' && (entry?.word || '').trim().toLowerCase() === normalizedWord);
+        if (index < 0) return false;
+        const [entry] = source.splice(index, 1);
+        delete entry.modeBootstrapCopy;
+        const alreadyInTarget = target.some(item => item?.source !== 'channel' && (item?.word || '').trim().toLowerCase() === normalizedWord);
+        if (!alreadyInTarget) target.unshift({ ...entry });
+
+        state.userKeywords = fromAllow ? target : source;
+        state.userWhitelistKeywords = fromAllow ? source : target;
+        state.whitelistKeywords = [...state.userWhitelistKeywords];
+        recomputeKeywords();
+        await persistMainProfiles({
+            mode: state.mode,
+            channels: Array.isArray(state.channels) ? state.channels : [],
+            keywords: Array.isArray(state.keywords) ? state.keywords : [],
+            whitelistChannels: Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [],
+            whitelistKeywords: state.whitelistKeywords
+        });
+        await requestRefresh('main');
+        notifyListeners('keywordMoved', { word: entry.word, fromList: fromAllow ? 'allow' : 'block', toList: toAllow ? 'allow' : 'block' });
+        scheduleAutoBackup('keyword_moved');
+        return true;
+    }
+
+    async function updateKeywordDateFilter(word, dateFilter, options = {}) {
         await ensureLoaded();
 
         if (isUiLocked()) {
@@ -1624,7 +1773,8 @@ const StateManager = (() => {
         }
 
         const normalized = normalizeKeywordDateFilter(dateFilter);
-        if (state.mode === 'whitelist') {
+        const useAllowList = options.targetList === 'allow' || (options.targetList !== 'block' && state.mode === 'whitelist');
+        if (useAllowList) {
             const list = Array.isArray(state.userWhitelistKeywords) ? state.userWhitelistKeywords : [];
             const index = list.findIndex(k => (k?.word || '') === word && k?.source !== 'channel');
             if (index === -1) return false;
@@ -1632,7 +1782,7 @@ const StateManager = (() => {
             state.userWhitelistKeywords = [...list];
             state.whitelistKeywords = [...state.userWhitelistKeywords];
             await persistMainProfiles({
-                mode: 'whitelist',
+                mode: state.mode,
                 whitelistChannels: Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [],
                 whitelistKeywords: state.whitelistKeywords
             });
@@ -1683,7 +1833,7 @@ const StateManager = (() => {
      * @param {string} input - Channel identifier (@handle or UC ID)
      * @returns {Promise<Object>} Result with success status and channel data
      */
-    async function addChannel(input) {
+    async function addChannel(input, options = {}) {
         await ensureLoaded();
 
         if (isUiLocked()) {
@@ -1714,14 +1864,15 @@ const StateManager = (() => {
         // DELEGATE TO BACKGROUND SCRIPT
         // This ensures the fetch+save completes even if the popup is closed immediately
         try {
-            const action = state.mode === 'whitelist' ? 'addWhitelistChannelPersistent' : 'addChannelPersistent';
+            const useAllowList = options.targetList === 'allow' || (options.targetList !== 'block' && state.mode === 'whitelist');
+            const action = useAllowList ? 'addWhitelistChannelPersistent' : 'addChannelPersistent';
             const response = await chrome.runtime.sendMessage({
                 action,
                 input: rawValue
             });
 
             if (response && response.success) {
-                if (state.mode === 'whitelist') {
+                if (useAllowList) {
                     const whitelistChannels = Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [];
                     const incoming = response.channel;
                     const alreadyExists = whitelistChannels.some(ch => ch?.id && incoming?.id && ch.id === incoming.id);
@@ -1927,7 +2078,7 @@ const StateManager = (() => {
      * @param {number} index - Index of channel to remove
      * @returns {Promise<boolean>} Success status
      */
-    async function removeChannel(index) {
+    async function removeChannel(index, options = {}) {
         await ensureLoaded();
 
         if (isUiLocked()) {
@@ -1935,14 +2086,15 @@ const StateManager = (() => {
             return false;
         }
 
-        if (state.mode === 'whitelist') {
+        const useAllowList = options.targetList === 'allow' || (options.targetList !== 'block' && state.mode === 'whitelist');
+        if (useAllowList) {
             const list = Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [];
             if (index < 0 || index >= list.length) return false;
             const channel = list[index];
             list.splice(index, 1);
             state.whitelistChannels = [...list];
             await persistMainProfiles({
-                mode: 'whitelist',
+                mode: state.mode,
                 whitelistChannels: state.whitelistChannels,
                 whitelistKeywords: Array.isArray(state.whitelistKeywords) ? state.whitelistKeywords : []
             });
@@ -1963,6 +2115,45 @@ const StateManager = (() => {
         // Trigger auto-backup after successful channel removal
         scheduleAutoBackup('channel_removed');
         
+        return true;
+    }
+
+    async function moveChannel(index, options = {}) {
+        await ensureLoaded();
+        if (isUiLocked()) {
+            await loadSettings();
+            return false;
+        }
+
+        const fromAllow = options.fromList === 'allow';
+        const toAllow = options.toList === 'allow';
+        if (fromAllow === toAllow) return false;
+        const source = fromAllow
+            ? (Array.isArray(state.whitelistChannels) ? [...state.whitelistChannels] : [])
+            : (Array.isArray(state.channels) ? [...state.channels] : []);
+        const target = toAllow
+            ? (Array.isArray(state.whitelistChannels) ? [...state.whitelistChannels] : [])
+            : (Array.isArray(state.channels) ? [...state.channels] : []);
+        if (index < 0 || index >= source.length) return false;
+        const [channel] = source.splice(index, 1);
+        delete channel.modeBootstrapCopy;
+        const channelKey = (channel?.id || channel?.handle || channel?.customUrl || channel?.name || '').trim().toLowerCase();
+        const alreadyInTarget = target.some(item => (item?.id || item?.handle || item?.customUrl || item?.name || '').trim().toLowerCase() === channelKey);
+        if (!alreadyInTarget) target.unshift({ ...channel });
+
+        state.channels = fromAllow ? target : source;
+        state.whitelistChannels = fromAllow ? source : target;
+        recomputeKeywords();
+        await persistMainProfiles({
+            mode: state.mode,
+            channels: state.channels,
+            keywords: Array.isArray(state.keywords) ? state.keywords : [],
+            whitelistChannels: state.whitelistChannels,
+            whitelistKeywords: Array.isArray(state.whitelistKeywords) ? state.whitelistKeywords : []
+        });
+        await requestRefresh('main');
+        notifyListeners('channelMoved', { channel, fromList: fromAllow ? 'allow' : 'block', toList: toAllow ? 'allow' : 'block' });
+        scheduleAutoBackup('channel_moved');
         return true;
     }
 
@@ -2132,6 +2323,7 @@ const StateManager = (() => {
             'hideEndscreenVideowall',
             'hideEndscreenCards',
             'disableAutoplay',
+            'alwaysUseOriginalAudio',
             'disableAnnotations',
             'hideTopHeader',
             'hideNotificationBell',
@@ -2290,6 +2482,32 @@ const StateManager = (() => {
         await requestRefresh('main');
         notifyListeners('categoryFiltersUpdated', { categoryFilters: state.categoryFilters });
         scheduleAutoBackup('category_filters_updated');
+    }
+
+    async function updateLanguageFilters(nextLanguageFilters) {
+        await ensureLoaded();
+
+        if (isUiLocked()) {
+            await loadSettings();
+            return;
+        }
+        if (!nextLanguageFilters || typeof nextLanguageFilters !== 'object') return;
+
+        const current = state.languageFilters && typeof state.languageFilters === 'object' ? state.languageFilters : {};
+        state.languageFilters = {
+            enabled: nextLanguageFilters.enabled === true,
+            mode: Object.prototype.hasOwnProperty.call(nextLanguageFilters, 'mode')
+                ? (nextLanguageFilters.mode === 'allow' ? 'allow' : 'block')
+                : (current.mode === 'allow' ? 'allow' : 'block'),
+            selected: Object.prototype.hasOwnProperty.call(nextLanguageFilters, 'selected')
+                ? (Array.isArray(nextLanguageFilters.selected) ? [...nextLanguageFilters.selected] : [])
+                : (Array.isArray(current.selected) ? [...current.selected] : [])
+        };
+
+        await saveSettings();
+        await requestRefresh('main');
+        notifyListeners('languageFiltersUpdated', { languageFilters: state.languageFilters });
+        scheduleAutoBackup('language_filters_updated');
     }
 
     async function updateKidsCategoryFilters(nextCategoryFilters) {
@@ -2488,6 +2706,7 @@ const StateManager = (() => {
                     'hideEndscreenVideowall',
                     'hideEndscreenCards',
                     'disableAutoplay',
+                    'alwaysUseOriginalAudio',
                     'disableAnnotations',
                     'hideTopHeader',
                     'hideNotificationBell',
@@ -2497,6 +2716,9 @@ const StateManager = (() => {
                     'showQuickBlockButton',
                     'showBlockMenuItem',
                     'hideSearchShelves',
+                    'contentFilters',
+                    'categoryFilters',
+                    'languageFilters',
                     'stats',
                     'channelMap',
                     'ftProfilesV3',
@@ -2536,11 +2758,13 @@ const StateManager = (() => {
         // Keywords
         addKeyword,
         removeKeyword,
+        moveKeyword,
         toggleKeywordExact,
         updateKeywordDateFilter,
         toggleKeywordComments,
         addKidsKeyword,
         removeKidsKeyword,
+        moveKidsKeyword,
         toggleKidsKeywordExact,
         updateKidsKeywordDateFilter,
         toggleKidsKeywordComments,
@@ -2549,10 +2773,12 @@ const StateManager = (() => {
         addChannel,
         importSubscribedChannelsToWhitelist,
         removeChannel,
+        moveChannel,
         toggleChannelFilterAll,
         toggleChannelFilterAllCommentsByRef,
         addKidsChannel,
         removeKidsChannel,
+        moveKidsChannel,
         toggleKidsChannelFilterAll,
 
         // Settings
@@ -2560,6 +2786,7 @@ const StateManager = (() => {
         updateContentFilters,
         updateKidsContentFilters,
         updateCategoryFilters,
+        updateLanguageFilters,
         updateKidsCategoryFilters,
 
         // Theme

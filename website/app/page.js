@@ -1,11 +1,17 @@
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, Play } from "@phosphor-icons/react/ssr";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  DeviceMobile,
+  Play,
+} from "@phosphor-icons/react/ssr";
 
 import { BrowserLogoRail } from "@/components/browser-logo-rail";
 import { HeroVideo } from "@/components/hero-video";
 import { ActionLink, Panel, SectionHeading } from "@/components/marketing-ui";
 import { Reveal } from "@/components/reveal";
 import {
+  appDemoVideoHref,
   demoVideoHref,
   detailPages,
   docsHref,
@@ -31,6 +37,7 @@ const featuredSpans = [
 ];
 
 const technicalFeatureSpans = [
+  "xl:col-span-12",
   "xl:col-span-5",
   "xl:col-span-7",
   "xl:col-span-6",
@@ -175,6 +182,97 @@ function ShortcutCard({ page }) {
   );
 }
 
+function AppReleaseStatusSection() {
+  const appCards = [
+    {
+      eyebrow: "Android phone + tablet",
+      title: "The complete custom app needs Play testers.",
+      body: "Google Play closed testing contains FilterTube's feature-rich custom viewing experience for YouTube Main and Kids. It is different from the simpler direct APK available on GitHub; regular testers help move this full app toward public release.",
+      image: "/apps/android.png",
+      imageAlt: "FilterTube Android app artwork",
+      action: "Join the closed test",
+      href: "mailto:hello@filtertube.in?subject=Android%20closed%20testing%20request&body=Hi%20FilterTube%2C%0A%0AI%20would%20like%20to%20join%20the%20Android%20Play%20Store%20closed%20testing.%0A%0AGoogle%20Play%20email%3A%20%0ADevice%3A%20%0A",
+      tone: "border-[#b9d8c5] bg-[linear-gradient(145deg,rgba(235,247,238,0.96),rgba(255,255,255,0.8))]",
+    },
+    {
+      eyebrow: "iPhone + iPad",
+      title: "The Apple build is being finalized.",
+      body: "Final build and testing alignment is underway. An Apple Developer account issue on Apple's side is delaying TestFlight access, and we are working to resolve it as soon as possible.",
+      image: "/apps/app-store-transparent.png",
+      imageAlt: "FilterTube iPhone and iPad app artwork",
+      action: "Follow iOS status",
+      href: "/ios",
+      tone: "border-[#bad0eb] bg-[linear-gradient(145deg,rgba(235,244,255,0.96),rgba(255,255,255,0.8))]",
+    },
+  ];
+
+  return (
+    <section className="px-4 py-10 md:px-6 md:py-14">
+      <div className="mx-auto max-w-[1400px]">
+        <Reveal>
+          <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-[1fr_1fr_0.9fr]">
+            {appCards.map((card) => (
+              <article
+                className={`relative isolate min-h-[22rem] overflow-hidden rounded-[2rem] border p-6 shadow-[var(--shadow-diffuse)] md:p-7 ${card.tone}`}
+                key={card.title}
+              >
+                <div className="relative z-10 flex h-full max-w-[58%] flex-col sm:max-w-[62%]">
+                  <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[var(--color-muted)]">
+                    {card.eyebrow}
+                  </p>
+                  <h2 className="mt-4 text-balance font-display text-3xl tracking-[-0.055em] text-[var(--color-ink)] md:text-4xl">
+                    {card.title}
+                  </h2>
+                  <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">
+                    {card.body}
+                  </p>
+                  <a
+                    className="mt-auto inline-flex min-h-11 w-fit items-center gap-2 rounded-full border border-[color:var(--color-line)] bg-white/76 px-4 py-2 text-sm font-semibold text-[var(--color-ink)] transition hover:-translate-y-0.5 hover:border-[color:var(--color-accent)] hover:text-[var(--color-accent)]"
+                    href={card.href}
+                  >
+                    {card.action}
+                    <ArrowUpRight aria-hidden="true" size={16} weight="light" />
+                  </a>
+                </div>
+                <img
+                  alt={card.imageAlt}
+                  className={`absolute -bottom-2 -right-8 h-[62%] w-[54%] object-contain object-bottom drop-shadow-[0_24px_30px_rgba(39,48,48,0.22)] sm:-right-5 sm:h-[72%] ${card.imageClass || ""}`}
+                  src={card.image}
+                />
+              </article>
+            ))}
+
+            <article className="ft-shell flex min-h-[22rem] flex-col rounded-[2rem] border border-[color:var(--color-line)] p-6 shadow-[var(--shadow-diffuse)] md:p-7 lg:col-span-2 xl:col-span-1">
+              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
+                Independent open source
+              </p>
+              <h2 className="mt-4 text-balance font-display text-3xl tracking-[-0.055em] text-[var(--color-ink)] md:text-4xl">
+                Help keep FilterTube independent.
+              </h2>
+              <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">
+                FilterTube is built by an independent open-source developer,
+                currently without a salaried role or outside funding. My family
+                is funding the project today. If FilterTube helps your household,
+                a contribution supports app accounts, testing, and continued
+                compatibility work.
+              </p>
+              <a
+                className="mt-auto inline-flex min-h-11 w-fit items-center gap-2 rounded-full bg-[var(--color-accent)] px-5 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5"
+                href="https://ko-fi.com/filtertube"
+                rel="noreferrer"
+                target="_blank"
+              >
+                Support on Ko-fi
+                <ArrowUpRight aria-hidden="true" size={16} weight="light" />
+              </a>
+            </article>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 function QuickGuideSection() {
   return (
     <section className="px-4 py-20 md:px-6 md:py-28 lg:py-32">
@@ -198,7 +296,7 @@ function QuickGuideSection() {
                   [
                     "1",
                     "Install and open FilterTube",
-                    "Use the browser extension first. Android MVP testers can email hello@filtertube.in.",
+                    "Use the browser extension first. Android users can also email hello@filtertube.in to join Google Play closed testing.",
                   ],
                   [
                     "2",
@@ -405,17 +503,17 @@ export default function HomePage() {
                   Live now
                 </span>
                 <span className="text-pretty">
-                  Desktop extensions are live. The MVP Android phone/tablet
-                  app is open for internal testing by request.
+                  Desktop extensions are live. Android Google Play closed
+                  testing is open now and needs active testers.
                 </span>
               </div>
 
               <div className="mx-auto mt-10 max-w-[1180px]">
                 <p className="text-balance font-display text-[clamp(3rem,6.8vw,5.8rem)] font-medium tracking-[-0.09em] text-[#fffdf8] drop-shadow-[0_16px_36px_rgba(0,0,0,0.3)]">
-                  Filtering that keeps your
+                  A calmer, ad-free
                 </p>
                 <h1 className="mt-3 text-balance font-editorial text-[clamp(5rem,11vw,9.1rem)] leading-[0.88] text-[#fffdf8] drop-shadow-[0_18px_40px_rgba(0,0,0,0.3)]">
-                  feed calm by default
+                  YouTube by default
                 </h1>
               </div>
 
@@ -423,12 +521,13 @@ export default function HomePage() {
                 <span className="font-semibold text-white">
                   A calmer YouTube for families and focused users
                 </span>{" "}
-                without needing a technical setup. Block{" "}
+                without needing a technical setup. Remove adverts and
+                block{" "}
                 <span className="ft-hero-support-emphasis">
                   channels, keywords, Shorts, and comments
                 </span>{" "}
-                from one dashboard, then help test the MVP app while the fully
-                custom control app is being built.
+                from one dashboard. Android's complete custom viewing app is
+                open to Google Play closed testers.
               </p>
 
               <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -447,22 +546,33 @@ export default function HomePage() {
                 </a>
                 <a
                   className="group inline-flex min-h-11 items-center gap-3 overflow-visible whitespace-nowrap rounded-full border border-white/30 bg-[rgba(255,255,255,0.12)] px-6 py-3 text-sm font-semibold text-[#fffaf4] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-xl transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 hover:bg-[rgba(255,255,255,0.18)] active:translate-y-px active:scale-[0.98]"
-                  href="mailto:hello@filtertube.in?subject=Android%20MVP%20testing%20access"
+                  href={appDemoVideoHref}
+                  rel="noreferrer"
+                  target="_blank"
                 >
-                  Ask for Android testing access
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/16 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.16)]">
+                    <DeviceMobile aria-hidden="true" size={15} weight="light" />
+                  </span>
+                  Watch app demo
                 </a>
               </div>
               <p className="mt-4 max-w-[680px] px-4 text-sm font-medium leading-7 text-white/86">
-                Email hello@filtertube.in to join Android internal testing. The
-                current MVP is WebView-based for control validation; a more
-                native custom frontend is being built in parallel. iPhone and
-                iPad follow the App Store/TestFlight path separately.
+                Email hello@filtertube.in to become an active Android closed
+                tester and help move the feature-rich custom app toward public
+                Play Store release. The direct APK is a separate, simpler
+                build and does not include this complete custom frontend.
+                The iPhone and iPad build is in final testing alignment;
+                Apple Developer account access is delaying TestFlight and will
+                be resolved as soon as possible.
               </p>
             </div>
 
             <div className="mx-auto w-full max-w-[1080px] pt-14 md:pt-20 lg:pt-24">
               <BrowserLogoRail muted />
               <div className="mx-auto mt-6 flex max-w-[920px] flex-wrap items-center justify-center gap-3 text-sm text-white/88">
+                <span className="rounded-full border border-white/24 bg-[rgba(255,255,255,0.08)] px-4 py-2 text-[#fffaf4] shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-xl">
+                  Ad-free playback
+                </span>
                 <span className="rounded-full border border-white/24 bg-[rgba(255,255,255,0.08)] px-4 py-2 text-[#fffaf4] shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-xl">
                   Kids Mode
                 </span>
@@ -480,6 +590,8 @@ export default function HomePage() {
           </Reveal>
         </div>
       </section>
+
+      <AppReleaseStatusSection />
 
       <QuickGuideSection />
 
@@ -811,8 +923,8 @@ export default function HomePage() {
                     The safest first step is small: add one keyword or channel,
                     refresh YouTube, and confirm it works. Then build profiles,
                     PINs, imports, or family device updates around that.
-                    Android users can also email hello@filtertube.in for MVP
-                    internal testing access.
+                    Android users can also email hello@filtertube.in to join
+                    Google Play closed testing.
                   </p>
                   <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                     <ActionLink external href={demoVideoHref}>

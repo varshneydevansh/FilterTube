@@ -78,6 +78,51 @@ test('empty whitelist mode currently removes a simple videoRenderer', () => {
   assert.deepEqual(plain(output), { contents: [] });
 });
 
+test('blocklist mode applies an always-allow channel exception before a blocked keyword', () => {
+  const input = { contents: [{ videoRenderer: videoRenderer({
+    title: { runs: [{ text: 'Blocked topic from a favorite creator' }] }
+  }) }] };
+  const output = runEngine(input, baseSettings({
+    filterKeywords: [keyword('Blocked topic')],
+    whitelistChannels: [{ id: 'UC1234567890123456789012' }]
+  }));
+
+  assert.deepEqual(plain(output), plain(input));
+});
+
+test('whitelist mode applies a blocked channel exclusion over an allowed keyword', () => {
+  const input = { contents: [{ videoRenderer: videoRenderer({
+    title: { runs: [{ text: 'Allowed lesson from an excluded creator' }] }
+  }) }] };
+  const output = runEngine(input, baseSettings({
+    listMode: 'whitelist',
+    whitelistKeywords: [keyword('Allowed lesson')],
+    filterChannels: [{ id: 'UC1234567890123456789012' }]
+  }));
+
+  assert.deepEqual(plain(output), { contents: [] });
+});
+
+test('equal-specificity allow rule wins over a block rule', () => {
+  const input = { contents: [{ videoRenderer: videoRenderer() }] };
+  const output = runEngine(input, baseSettings({
+    filterChannels: [{ id: 'UC1234567890123456789012' }],
+    whitelistChannels: [{ id: 'UC1234567890123456789012' }]
+  }));
+
+  assert.deepEqual(plain(output), plain(input));
+});
+
+test('an explicit blocked video outranks an allowed channel', () => {
+  const input = { contents: [{ videoRenderer: videoRenderer() }] };
+  const output = runEngine(input, baseSettings({
+    blockedVideoIds: ['abcdefghijk'],
+    whitelistChannels: [{ id: 'UC1234567890123456789012' }]
+  }));
+
+  assert.deepEqual(plain(output), { contents: [] });
+});
+
 test('category filter enabled with empty selected currently leaves videoRenderer intact at engine layer', () => {
   const input = { contents: [{ videoRenderer: videoRenderer() }] };
   const output = runEngine(input, baseSettings({
@@ -163,7 +208,7 @@ test('upload-date filter enabled with blank date fields currently leaves videoRe
   assert.deepEqual(plain(output), plain(input));
 });
 
-test('duplicate gridVideoRenderer rule currently ignores descriptionSnippet text', () => {
+test('gridVideoRenderer keyword filtering includes descriptionSnippet text', () => {
   const input = {
     contents: [{
       gridVideoRenderer: videoRenderer({
@@ -176,7 +221,34 @@ test('duplicate gridVideoRenderer rule currently ignores descriptionSnippet text
     filterKeywords: [keyword('spider')]
   }));
 
-  assert.deepEqual(plain(output), plain(input));
+  assert.deepEqual(plain(output), { contents: [] });
+});
+
+test('a supplied player shortDescription and tags can classify a matching card without another request', () => {
+  const input = [{
+    playerResponse: {
+      videoDetails: {
+        videoId: 'descMeta001',
+        channelId: 'UCdescriptionmetadata1',
+        shortDescription: 'A cyberpunk hacker enters the matrix',
+        keywords: ['science fiction', 'teaser']
+      }
+    }
+  }, {
+    contents: [{
+      videoRenderer: videoRenderer({
+        videoId: 'descMeta001',
+        title: { simpleText: 'Neutral title' }
+      })
+    }]
+  }];
+
+  const output = runEngine(input, baseSettings({
+    filterKeywords: [keyword('cyberpunk')]
+  }));
+
+  assert.equal(output.length, 2);
+  assert.deepEqual(plain(output[1]), { contents: [] });
 });
 
 test('duplicate gridVideoRenderer rule currently still supports common lengthText duration filtering', () => {

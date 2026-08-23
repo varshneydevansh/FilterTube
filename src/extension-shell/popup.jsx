@@ -87,6 +87,17 @@ function PopupShell() {
           </div>
         </header>
 
+        <div
+          id="ftManagedTimeStatusPopup"
+          className="ft-popup-time-status"
+          role="status"
+          aria-live="polite"
+          hidden
+        >
+          <span className="ft-popup-time-status__label">YouTube time</span>
+          <strong id="ftManagedTimeStatusValuePopup" className="ft-popup-time-status__value" />
+        </div>
+
         <main className="app-content ft-popup-content">
           <section className="ft-popup-filter-card">
             <div className="ft-popup-filter-card__header">

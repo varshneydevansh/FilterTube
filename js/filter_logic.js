@@ -91,6 +91,125 @@
     const pendingVideoMetaUpdates = [];
     const seenVideoMetaUpdates = new Map();
     let pendingVideoMetaFlush = null;
+
+    function normalizeVideoLanguageCode(value) {
+        const raw = typeof value === 'string' ? value.trim().replace(/_/g, '-') : '';
+        if (!raw) return '';
+        const parts = raw.split('-').filter(Boolean);
+        if (parts.length === 0 || !/^[A-Za-z]{2,3}$/.test(parts[0])) return '';
+        const legacyBaseMap = { iw: 'he', in: 'id', ji: 'yi' };
+        const base = legacyBaseMap[parts[0].toLowerCase()] || parts[0].toLowerCase();
+        return [base, ...parts.slice(1)].join('-');
+    }
+
+    function inferVideoLanguageFromPlayerMetadata(playerResponse) {
+        const details = playerResponse?.videoDetails || {};
+        const microformat = playerResponse?.microformat?.playerMicroformatRenderer || {};
+        const text = [
+            details.title,
+            details.shortDescription,
+            ...(Array.isArray(details.keywords) ? details.keywords : []),
+            microformat?.title?.simpleText,
+            microformat?.description?.simpleText
+        ].filter(value => typeof value === 'string' && value.trim()).join('\n');
+        if (!text) return null;
+
+        const count = regex => (text.match(regex) || []).length;
+        const letters = count(/\p{L}/gu);
+        if (letters < 4) return null;
+        const dominant = (regex, minimum = 4) => {
+            const matches = count(regex);
+            return matches >= minimum && matches / letters >= 0.2;
+        };
+
+        if (dominant(/\p{Script=Hiragana}|\p{Script=Katakana}/gu)) return { code: 'ja', source: 'player-metadata-script' };
+        if (dominant(/\p{Script=Hangul}/gu)) return { code: 'ko', source: 'player-metadata-script' };
+        if (dominant(/\p{Script=Han}/gu)) return { code: 'zh', source: 'player-metadata-script' };
+        if (dominant(/\p{Script=Thai}/gu)) return { code: 'th', source: 'player-metadata-script' };
+        if (dominant(/\p{Script=Hebrew}/gu)) return { code: 'he', source: 'player-metadata-script' };
+        if (dominant(/\p{Script=Bengali}/gu)) return { code: 'bn', source: 'player-metadata-script' };
+        if (dominant(/\p{Script=Gurmukhi}/gu)) return { code: 'pa', source: 'player-metadata-script' };
+        if (dominant(/\p{Script=Tamil}/gu)) return { code: 'ta', source: 'player-metadata-script' };
+        if (dominant(/\p{Script=Telugu}/gu)) return { code: 'te', source: 'player-metadata-script' };
+        if (dominant(/\p{Script=Malayalam}/gu)) return { code: 'ml', source: 'player-metadata-script' };
+        if (dominant(/\p{Script=Kannada}/gu)) return { code: 'kn', source: 'player-metadata-script' };
+        if (dominant(/\p{Script=Cyrillic}/gu)) {
+            if (/[іїєґ]/iu.test(text)) return { code: 'uk', source: 'player-metadata-script' };
+            if (/[ыэёъ]/iu.test(text) || /\b(?:русск(?:ая|ий|ое|ую)|между|нами|музык[аи])\b/iu.test(text)) {
+                return { code: 'ru', source: 'player-metadata-script' };
+            }
+        }
+        return null;
+    }
+
+    function extractDefaultAudioFormatLanguage(playerResponse) {
+        const formats = [
+            ...(Array.isArray(playerResponse?.streamingData?.formats) ? playerResponse.streamingData.formats : []),
+            ...(Array.isArray(playerResponse?.streamingData?.adaptiveFormats) ? playerResponse.streamingData.adaptiveFormats : [])
+        ];
+        const tracks = formats
+            .map(format => format?.audioTrack)
+            .filter(track => track && typeof track === 'object');
+        const original = tracks.find(track => track.audioIsDefault === true && track.isAutoDubbed !== true)
+            || tracks.find(track => track.isAutoDubbed !== true && /\boriginal\b/i.test(String(track.displayName || '')))
+            || tracks.find(track => track.audioIsDefault === true);
+        const rawId = typeof original?.id === 'string' ? original.id.trim().replace(/\.\d+$/, '') : '';
+        return normalizeVideoLanguageCode(rawId);
+    }
+
+    function extractVideoLanguageFromPlayerResponse(playerResponse) {
+        const defaultAudioCode = extractDefaultAudioFormatLanguage(playerResponse);
+        if (defaultAudioCode) {
+            return {
+                languageCode: defaultAudioCode,
+                languageSource: 'default-audio-format',
+                languageConfidence: 'high'
+            };
+        }
+        const renderer = playerResponse?.captions?.playerCaptionsTracklistRenderer;
+        const captionTracks = Array.isArray(renderer?.captionTracks) ? renderer.captionTracks : [];
+        const audioTracks = Array.isArray(renderer?.audioTracks) ? renderer.audioTracks : [];
+        if (captionTracks.length === 0) {
+            const inferred = inferVideoLanguageFromPlayerMetadata(playerResponse);
+            if (inferred) {
+                return { languageCode: inferred.code, languageSource: inferred.source, languageConfidence: 'medium' };
+            }
+            return { languageCode: 'und', languageSource: 'player-unavailable-v2', languageConfidence: 'unknown' };
+        }
+        const defaultAudioIndex = Number.isInteger(renderer?.defaultAudioTrackIndex) ? renderer.defaultAudioTrackIndex : 0;
+        const audioTrack = audioTracks[defaultAudioIndex] || audioTracks[0] || null;
+        const defaultCaptionIndex = Number.isInteger(audioTrack?.defaultCaptionTrackIndex)
+            ? audioTrack.defaultCaptionTrackIndex
+            : -1;
+        const defaultCaption = defaultCaptionIndex >= 0 ? captionTracks[defaultCaptionIndex] : null;
+        const defaultCode = normalizeVideoLanguageCode(defaultCaption?.languageCode);
+        if (defaultCode) {
+            return {
+                languageCode: defaultCode,
+                languageSource: defaultCaption?.kind === 'asr' ? 'default-asr-track' : 'default-caption-track',
+                languageConfidence: 'high'
+            };
+        }
+        const linkedIndices = Array.isArray(audioTrack?.captionTrackIndices)
+            ? audioTrack.captionTrackIndices.filter(index => Number.isInteger(index))
+            : captionTracks.map((_, index) => index);
+        const linkedTracks = linkedIndices.map(index => captionTracks[index]).filter(Boolean);
+        const asrCodes = Array.from(new Set(linkedTracks
+            .filter(track => track?.kind === 'asr')
+            .map(track => normalizeVideoLanguageCode(track?.languageCode))
+            .filter(Boolean)));
+        if (asrCodes.length === 1) {
+            return { languageCode: asrCodes[0], languageSource: 'unique-asr-track', languageConfidence: 'high' };
+        }
+        const linkedCodes = Array.from(new Set(linkedTracks
+            .map(track => normalizeVideoLanguageCode(track?.languageCode))
+            .filter(Boolean)));
+        if (linkedCodes.length === 1) {
+            return { languageCode: linkedCodes[0], languageSource: 'single-caption-track', languageConfidence: 'medium' };
+        }
+        return { languageCode: 'und', languageSource: 'ambiguous-caption-tracks', languageConfidence: 'unknown' };
+    }
+
     function queueVideoMetaMapping(videoId, meta) {
         if (!videoId || typeof videoId !== 'string' || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) return;
         if (!meta || typeof meta !== 'object') return;
@@ -99,12 +218,24 @@
         const publishDate = meta.publishDate;
         const uploadDate = meta.uploadDate;
         const category = meta.category;
+        const languageCode = normalizeVideoLanguageCode(meta.languageCode) || (meta.languageCode === 'und' ? 'und' : '');
+        const languageSource = typeof meta.languageSource === 'string' ? meta.languageSource.trim() : '';
+        const languageConfidence = ['high', 'medium', 'unknown'].includes(meta.languageConfidence)
+            ? meta.languageConfidence
+            : '';
+        const shortDescription = typeof meta.shortDescription === 'string' ? meta.shortDescription.trim() : '';
+        const keywords = Array.isArray(meta.keywords)
+            ? meta.keywords.map(value => typeof value === 'string' ? value.trim() : '').filter(Boolean)
+            : [];
         const hasAny = Boolean(
             (typeof lengthSeconds === 'number' && Number.isFinite(lengthSeconds) && lengthSeconds > 0)
             || (typeof lengthSeconds === 'string' && /^\d+$/.test(lengthSeconds.trim()))
             || (typeof publishDate === 'string' && publishDate.trim())
             || (typeof uploadDate === 'string' && uploadDate.trim())
             || (typeof category === 'string' && category.trim())
+            || languageCode
+            || shortDescription
+            || keywords.length > 0
         );
         if (!hasAny) return;
 
@@ -113,7 +244,12 @@
             (typeof lengthSeconds === 'number' ? String(lengthSeconds) : (typeof lengthSeconds === 'string' ? lengthSeconds.trim() : '')),
             (typeof publishDate === 'string' ? publishDate.trim() : ''),
             (typeof uploadDate === 'string' ? uploadDate.trim() : ''),
-            (typeof category === 'string' ? category.trim() : '')
+            (typeof category === 'string' ? category.trim() : ''),
+            languageCode,
+            languageSource,
+            languageConfidence,
+            shortDescription,
+            keywords.join('\u0001')
         ].join('|');
         if (seenVideoMetaUpdates.has(signature)) return;
         seenVideoMetaUpdates.set(signature, Date.now());
@@ -128,7 +264,12 @@
             lengthSeconds,
             publishDate,
             uploadDate,
-            category
+            category,
+            languageCode,
+            languageSource,
+            languageConfidence,
+            ...(shortDescription ? { shortDescription } : {}),
+            ...(keywords.length > 0 ? { keywords } : {})
         });
 
         if (pendingVideoMetaFlush) return;
@@ -614,6 +755,12 @@
             videoId: 'videoId',
             title: ['title.simpleText', 'title.runs'],
             channelName: ['shortBylineText.runs', 'longBylineText.runs'],
+            description: [
+                'descriptionSnippet.simpleText',
+                'descriptionSnippet.runs',
+                'detailedMetadataSnippets.0.snippetText.simpleText',
+                'detailedMetadataSnippets.0.snippetText.runs'
+            ],
             channelId: ['shortBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId']
         },
 
@@ -962,6 +1109,8 @@
                 filterChannels: [],
                 whitelistKeywords: [],
                 whitelistChannels: [],
+                blockedVideoIds: [],
+                allowedVideoIds: [],
                 listMode: 'blocklist',
                 hideAllComments: false,
                 hideAllShorts: false,
@@ -1258,9 +1407,25 @@
                 const category = (playerMicroformat && (playerMicroformat.category || playerMicroformat.genre))
                     ? String(playerMicroformat.category || playerMicroformat.genre)
                     : '';
+                const language = extractVideoLanguageFromPlayerResponse(data?.playerResponse || data);
 
-                if (lengthSeconds || publishDate || uploadDate || category) {
-                    this._registerVideoMetaMapping(videoId, { lengthSeconds, publishDate, uploadDate, category });
+                const shortDescription = typeof videoDetails?.shortDescription === 'string'
+                    ? videoDetails.shortDescription.trim()
+                    : '';
+                const keywords = Array.isArray(videoDetails?.keywords)
+                    ? videoDetails.keywords.map(value => typeof value === 'string' ? value.trim() : '').filter(Boolean)
+                    : [];
+
+                if (lengthSeconds || publishDate || uploadDate || category || language.languageCode || shortDescription || keywords.length > 0) {
+                    this._registerVideoMetaMapping(videoId, {
+                        lengthSeconds,
+                        publishDate,
+                        uploadDate,
+                        category,
+                        ...language,
+                        shortDescription,
+                        keywords
+                    });
                 }
             }
 
@@ -1428,17 +1593,36 @@
             const incomingPublishDate = typeof meta.publishDate === 'string' ? meta.publishDate.trim() : '';
             const incomingUploadDate = typeof meta.uploadDate === 'string' ? meta.uploadDate.trim() : '';
             const incomingCategory = typeof meta.category === 'string' ? meta.category.trim() : '';
+            const incomingLanguageCode = normalizeVideoLanguageCode(meta.languageCode) || (meta.languageCode === 'und' ? 'und' : '');
+            const incomingLanguageSource = typeof meta.languageSource === 'string' ? meta.languageSource.trim() : '';
+            const incomingLanguageConfidence = ['high', 'medium', 'unknown'].includes(meta.languageConfidence)
+                ? meta.languageConfidence
+                : '';
+            const incomingShortDescription = typeof meta.shortDescription === 'string' ? meta.shortDescription.trim() : '';
+            const incomingKeywords = Array.isArray(meta.keywords)
+                ? meta.keywords.map(value => typeof value === 'string' ? value.trim() : '').filter(Boolean)
+                : [];
             if (incomingLengthSeconds !== null && incomingLengthSeconds !== undefined && incomingLengthSeconds !== '') {
                 merged.lengthSeconds = incomingLengthSeconds;
             }
             if (incomingPublishDate) merged.publishDate = incomingPublishDate;
             if (incomingUploadDate) merged.uploadDate = incomingUploadDate;
             if (incomingCategory) merged.category = incomingCategory;
+            if (incomingLanguageCode) merged.languageCode = incomingLanguageCode;
+            if (incomingLanguageSource) merged.languageSource = incomingLanguageSource;
+            if (incomingLanguageConfidence) merged.languageConfidence = incomingLanguageConfidence;
+            if (incomingShortDescription) merged.shortDescription = incomingShortDescription;
+            if (incomingKeywords.length > 0) merged.keywords = incomingKeywords;
             const same =
                 (existing.lengthSeconds === merged.lengthSeconds)
                 && (existing.publishDate === merged.publishDate)
                 && (existing.uploadDate === merged.uploadDate)
-                && (existing.category === merged.category);
+                && (existing.category === merged.category)
+                && (existing.languageCode === merged.languageCode)
+                && (existing.languageSource === merged.languageSource)
+                && (existing.languageConfidence === merged.languageConfidence)
+                && (existing.shortDescription === merged.shortDescription)
+                && JSON.stringify(existing.keywords || []) === JSON.stringify(merged.keywords || []);
             if (same) return;
 
             current[videoId] = merged;
@@ -1745,13 +1929,19 @@
         _buildCandidate(item, rendererType, wrapperRendererType = null, options = {}) {
             const rules = FILTER_RULES[rendererType] || {};
             const title = this._extractTitle(item, rules);
-            const description = this._extractDescription(item, rules);
+            let description = this._extractDescription(item, rules);
             const shouldExtractChannelIdentity = options && options.extractChannelIdentity === true;
             const channelInfo = shouldExtractChannelIdentity
                 ? this._extractChannelInfo(item, rules)
                 : this._emptyChannelInfo();
             const collaborators = Array.isArray(channelInfo) ? channelInfo : [channelInfo].filter(Boolean);
             const videoId = this._extractVideoId(item, rules);
+            const cachedVideoMeta = videoId && this.settings?.videoMetaMap?.[videoId] && typeof this.settings.videoMetaMap[videoId] === 'object'
+                ? this.settings.videoMetaMap[videoId]
+                : null;
+            if (!description && typeof cachedVideoMeta?.shortDescription === 'string') {
+                description = cachedVideoMeta.shortDescription.trim();
+            }
             const playlistId = this._extractPlaylistId(item);
             const metadataParts = [
                 ...this._collectTextFromPaths(item, rules.channelName),
@@ -1807,7 +1997,10 @@
                 playlistId,
                 title,
                 description,
-                tags: this._collectTextFromPaths(item, ['videoDetails.keywords', 'playerResponse.videoDetails.keywords']),
+                tags: [
+                    ...this._collectTextFromPaths(item, ['videoDetails.keywords', 'playerResponse.videoDetails.keywords']),
+                    ...(Array.isArray(cachedVideoMeta?.keywords) ? cachedVideoMeta.keywords : [])
+                ],
                 metadataText: metadataParts.join(' ').trim(),
                 durationText: this._collectTextFromPaths(item, rules.duration).join(' '),
                 publishedTimeText: this._collectTextFromPaths(item, rules.publishedTime).join(' '),
@@ -2181,6 +2374,65 @@
             } catch (e) {
             }
 
+            // Block and allow rules stay active together. The profile mode only
+            // supplies the fallback decision when neither side matches.
+            if (!isCommentRenderer) {
+                const matchSpecificity = (channels, channelIndex, keywords) => {
+                    for (const collaborator of collaborators) {
+                        if (
+                            collaborator &&
+                            (collaborator.name || collaborator.id || collaborator.handle || collaborator.customUrl) &&
+                            this._matchesAnyChannel(collaborator, channels, channelIndex)
+                        ) {
+                            return 2;
+                        }
+                    }
+                    if (!skipKeywordFiltering && Array.isArray(keywords) && keywords.length > 0) {
+                        const textToSearch = this._candidateSearchText(candidate);
+                        for (const keywordRegex of keywords) {
+                            if (
+                                this._regexMatches(keywordRegex, textToSearch) &&
+                                this._keywordDateFilterAllows(keywordRegex, candidate, item, rules, rendererType)
+                            ) {
+                                return 1;
+                            }
+                        }
+                    }
+                    return 0;
+                };
+
+                const blockSpecificity = videoId && Array.isArray(this.settings.blockedVideoIds) && this.settings.blockedVideoIds.includes(videoId)
+                    ? 3
+                    : matchSpecificity(
+                        Array.isArray(this.settings.filterChannels) ? this.settings.filterChannels : [],
+                        this.filterChannelIndex,
+                        Array.isArray(this.settings.filterKeywords) ? this.settings.filterKeywords : []
+                    );
+                const allowSpecificity = videoId && Array.isArray(this.settings.allowedVideoIds) && this.settings.allowedVideoIds.includes(videoId)
+                    ? 3
+                    : matchSpecificity(
+                        Array.isArray(this.settings.whitelistChannels) ? this.settings.whitelistChannels : [],
+                        this.whitelistChannelIndex,
+                        Array.isArray(this.settings.whitelistKeywords) ? this.settings.whitelistKeywords : []
+                    );
+
+                if (blockSpecificity > 0 || allowSpecificity > 0) {
+                    // Higher target specificity wins; allow wins an equal-specificity tie.
+                    if (allowSpecificity >= blockSpecificity && allowSpecificity > 0) {
+                        this._logWhitelistDecision('allow:dual_rule_precedence', {
+                            rendererType,
+                            originalRendererType,
+                            title,
+                            allowSpecificity,
+                            blockSpecificity
+                        });
+                        return false;
+                    }
+                    this._log(`🚫 Blocking by dual-rule precedence: "${title || rendererType}"`);
+                    return true;
+                }
+            }
+
             if (listMode === 'whitelist' && !isCommentRenderer) {
                 if (WHITELIST_CONTAINER_RENDERERS.has(rendererType)) {
                     return false;
@@ -2374,6 +2626,11 @@
                 if (shouldBlockByCategory) {
                     return true;
                 }
+
+                const shouldBlockByLanguage = this._checkLanguageFilters(item, rules, rendererType);
+                if (shouldBlockByLanguage) {
+                    return true;
+                }
             }
 
             return false;
@@ -2439,6 +2696,62 @@
                 return !selectedSet.has(categoryKey);
             }
             return selectedSet.has(categoryKey);
+        }
+
+        _checkLanguageFilters(item, rules, rendererType) {
+            const filters = this.settings.languageFilters;
+            if (!filters || filters.enabled !== true) return false;
+
+            const selected = Array.isArray(filters.selected)
+                ? filters.selected.map(value => normalizeVideoLanguageCode(value).split('-')[0]).filter(Boolean)
+                : [];
+            if (selected.length === 0) return false;
+            const selectedSet = new Set(selected);
+
+            const isVideoRenderer = [
+                'videoRenderer', 'compactVideoRenderer', 'gridVideoRenderer',
+                'playlistVideoRenderer', 'watchCardCompactVideoRenderer', 'videoWithContextRenderer',
+                'endScreenVideoRenderer', 'richItemRenderer', 'lockupViewModel',
+                'shortsLockupViewModel', 'shortsLockupViewModelV2', 'reelItemRenderer',
+                'richGridMedia', 'channelVideoPlayerRenderer', 'playlistPanelVideoRenderer'
+            ].includes(rendererType);
+            if (!isVideoRenderer) return false;
+
+            if (rendererType === 'lockupViewModel') {
+                const isCollectionLockup = Boolean(
+                    getByPath(item, 'contentImage.collectionThumbnailViewModel') ||
+                    getByPath(item, 'rendererContext.commandContext.onTap.innertubeCommand.watchEndpoint.playlistId')
+                );
+                if (isCollectionLockup) return false;
+            }
+
+            const videoIdPaths = rules && rules.videoId
+                ? (Array.isArray(rules.videoId) ? rules.videoId : [rules.videoId])
+                : [];
+            let videoId = '';
+            for (const path of videoIdPaths) {
+                const candidate = getByPath(item, path);
+                if (typeof candidate === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(candidate)) {
+                    videoId = candidate;
+                    break;
+                }
+            }
+            if (!videoId) return false;
+
+            const rawCode = this.settings.videoMetaMap?.[videoId]?.languageCode;
+            if (typeof rawCode !== 'string' || !rawCode.trim()) return false;
+            const code = rawCode.trim().toLowerCase() === 'und'
+                ? 'und'
+                : normalizeVideoLanguageCode(rawCode).split('-')[0];
+            if (!code) return false;
+            // Unknown is not evidence of a mismatch. In allow-only mode the
+            // DOM metadata queue may resolve this renderer later; removing it
+            // from a /next continuation here would make the rail permanently
+            // blank and gives the later resolver nothing to update.
+            if (code === 'und') return false;
+
+            const matches = selectedSet.has(code);
+            return filters.mode === 'allow' ? !matches : matches;
         }
 
         /**

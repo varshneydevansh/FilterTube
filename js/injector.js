@@ -112,7 +112,7 @@
         (async () => {
             let result = null;
             try {
-                result = await fetchVideoMetaFromYoutubeiPlayer(videoId);
+                result = await fetchVideoMetaFromYoutubeiPlayer(videoId, payload?.needs || {});
             } catch (error) {
                 result = {
                     success: false,
@@ -678,9 +678,202 @@
         };
     }
 
-    async function fetchVideoMetaFromYoutubeiPlayer(videoId) {
+    function normalizeVideoLanguageCode(value) {
+        const raw = typeof value === 'string' ? value.trim().replace(/_/g, '-') : '';
+        if (!raw) return '';
+        const parts = raw.split('-').filter(Boolean);
+        if (parts.length === 0 || !/^[A-Za-z]{2,3}$/.test(parts[0])) return '';
+        const legacyBaseMap = { iw: 'he', in: 'id', ji: 'yi' };
+        const base = legacyBaseMap[parts[0].toLowerCase()] || parts[0].toLowerCase();
+        return [base, ...parts.slice(1)].join('-');
+    }
+
+    function inferVideoLanguageFromPlayerMetadata(playerResponse) {
+        const details = playerResponse?.videoDetails || {};
+        const microformat = playerResponse?.microformat?.playerMicroformatRenderer || {};
+        const text = [
+            details.title,
+            details.shortDescription,
+            ...(Array.isArray(details.keywords) ? details.keywords : []),
+            microformat?.title?.simpleText,
+            microformat?.description?.simpleText
+        ].filter(value => typeof value === 'string' && value.trim()).join('\n');
+        if (!text) return null;
+
+        const count = regex => (text.match(regex) || []).length;
+        const letters = count(/\p{L}/gu);
+        if (letters < 4) return null;
+        const dominant = (regex, minimum = 4) => {
+            const matches = count(regex);
+            return matches >= minimum && matches / letters >= 0.2;
+        };
+
+        if (dominant(/\p{Script=Hiragana}|\p{Script=Katakana}/gu)) return { code: 'ja', source: 'player-metadata-script' };
+        if (dominant(/\p{Script=Hangul}/gu)) return { code: 'ko', source: 'player-metadata-script' };
+        if (dominant(/\p{Script=Han}/gu)) return { code: 'zh', source: 'player-metadata-script' };
+        if (dominant(/\p{Script=Thai}/gu)) return { code: 'th', source: 'player-metadata-script' };
+        if (dominant(/\p{Script=Hebrew}/gu)) return { code: 'he', source: 'player-metadata-script' };
+        if (dominant(/\p{Script=Bengali}/gu)) return { code: 'bn', source: 'player-metadata-script' };
+        if (dominant(/\p{Script=Gurmukhi}/gu)) return { code: 'pa', source: 'player-metadata-script' };
+        if (dominant(/\p{Script=Tamil}/gu)) return { code: 'ta', source: 'player-metadata-script' };
+        if (dominant(/\p{Script=Telugu}/gu)) return { code: 'te', source: 'player-metadata-script' };
+        if (dominant(/\p{Script=Malayalam}/gu)) return { code: 'ml', source: 'player-metadata-script' };
+        if (dominant(/\p{Script=Kannada}/gu)) return { code: 'kn', source: 'player-metadata-script' };
+        if (dominant(/\p{Script=Cyrillic}/gu)) {
+            if (/[іїєґ]/iu.test(text)) return { code: 'uk', source: 'player-metadata-script' };
+            if (/[ыэёъ]/iu.test(text) || /\b(?:русск(?:ая|ий|ое|ую)|между|нами|музык[аи])\b/iu.test(text)) {
+                return { code: 'ru', source: 'player-metadata-script' };
+            }
+        }
+        return null;
+    }
+
+    function extractDefaultAudioFormatLanguage(playerResponse) {
+        const formats = [
+            ...(Array.isArray(playerResponse?.streamingData?.formats) ? playerResponse.streamingData.formats : []),
+            ...(Array.isArray(playerResponse?.streamingData?.adaptiveFormats) ? playerResponse.streamingData.adaptiveFormats : [])
+        ];
+        const tracks = formats
+            .map(format => format?.audioTrack)
+            .filter(track => track && typeof track === 'object');
+        const original = tracks.find(track => track.audioIsDefault === true && track.isAutoDubbed !== true)
+            || tracks.find(track => track.isAutoDubbed !== true && /\boriginal\b/i.test(String(track.displayName || '')))
+            || tracks.find(track => track.audioIsDefault === true);
+        const rawId = typeof original?.id === 'string' ? original.id.trim().replace(/\.\d+$/, '') : '';
+        return normalizeVideoLanguageCode(rawId);
+    }
+
+    function extractVideoLanguageFromPlayerResponse(playerResponse) {
+        const defaultAudioCode = extractDefaultAudioFormatLanguage(playerResponse);
+        if (defaultAudioCode) {
+            return {
+                languageCode: defaultAudioCode,
+                languageSource: 'default-audio-format',
+                languageConfidence: 'high'
+            };
+        }
+        const renderer = playerResponse?.captions?.playerCaptionsTracklistRenderer;
+        const captionTracks = Array.isArray(renderer?.captionTracks) ? renderer.captionTracks : [];
+        const audioTracks = Array.isArray(renderer?.audioTracks) ? renderer.audioTracks : [];
+        if (captionTracks.length === 0) {
+            const inferred = inferVideoLanguageFromPlayerMetadata(playerResponse);
+            if (inferred) {
+                return { languageCode: inferred.code, languageSource: inferred.source, languageConfidence: 'medium' };
+            }
+            return { languageCode: 'und', languageSource: 'player-unavailable-v2', languageConfidence: 'unknown' };
+        }
+
+        const defaultAudioIndex = Number.isInteger(renderer?.defaultAudioTrackIndex)
+            ? renderer.defaultAudioTrackIndex
+            : 0;
+        const audioTrack = audioTracks[defaultAudioIndex] || audioTracks[0] || null;
+        const defaultCaptionIndex = Number.isInteger(audioTrack?.defaultCaptionTrackIndex)
+            ? audioTrack.defaultCaptionTrackIndex
+            : -1;
+        const defaultCaption = defaultCaptionIndex >= 0 ? captionTracks[defaultCaptionIndex] : null;
+        const defaultCode = normalizeVideoLanguageCode(defaultCaption?.languageCode);
+        if (defaultCode) {
+            return {
+                languageCode: defaultCode,
+                languageSource: defaultCaption?.kind === 'asr' ? 'default-asr-track' : 'default-caption-track',
+                languageConfidence: 'high'
+            };
+        }
+
+        const linkedIndices = Array.isArray(audioTrack?.captionTrackIndices)
+            ? audioTrack.captionTrackIndices.filter(index => Number.isInteger(index))
+            : captionTracks.map((_, index) => index);
+        const linkedTracks = linkedIndices.map(index => captionTracks[index]).filter(Boolean);
+        const asrTracks = linkedTracks.filter(track => track?.kind === 'asr' && normalizeVideoLanguageCode(track?.languageCode));
+        const asrCodes = Array.from(new Set(asrTracks.map(track => normalizeVideoLanguageCode(track.languageCode))));
+        if (asrCodes.length === 1) {
+            return { languageCode: asrCodes[0], languageSource: 'unique-asr-track', languageConfidence: 'high' };
+        }
+
+        const linkedCodes = Array.from(new Set(linkedTracks.map(track => normalizeVideoLanguageCode(track?.languageCode)).filter(Boolean)));
+        if (linkedCodes.length === 1) {
+            return { languageCode: linkedCodes[0], languageSource: 'single-caption-track', languageConfidence: 'medium' };
+        }
+
+        return { languageCode: 'und', languageSource: 'ambiguous-caption-tracks', languageConfidence: 'unknown' };
+    }
+
+    function extractVideoMetaFromPlayerResponse(candidate, expectedVideoId) {
+        const playerResponse = candidate?.playerResponse || candidate?.response || candidate;
+        if (!playerResponse || typeof playerResponse !== 'object') return null;
+        const details = playerResponse?.videoDetails || null;
+        const microformat = playerResponse?.microformat?.playerMicroformatRenderer || null;
+        const responseVideoId = String(details?.videoId || microformat?.externalVideoId || '').trim();
+        if (!responseVideoId || responseVideoId !== expectedVideoId) return null;
+
+        const ownerProfileUrl = typeof microformat?.ownerProfileUrl === 'string'
+            ? microformat.ownerProfileUrl.trim()
+            : '';
+        const ownerHandleMatch = ownerProfileUrl.match(/\/@([^/?#]+)/);
+        const language = extractVideoLanguageFromPlayerResponse(playerResponse);
+        const metadata = {
+            videoId: expectedVideoId,
+            lengthSeconds: microformat?.lengthSeconds || details?.lengthSeconds || null,
+            publishDate: typeof microformat?.publishDate === 'string' ? microformat.publishDate : '',
+            uploadDate: typeof microformat?.uploadDate === 'string' ? microformat.uploadDate : '',
+            category: typeof (microformat?.category || microformat?.genre) === 'string'
+                ? String(microformat.category || microformat.genre).trim()
+                : '',
+            channelId: typeof (details?.channelId || microformat?.externalChannelId) === 'string'
+                ? String(details.channelId || microformat.externalChannelId).trim()
+                : '',
+            channelName: typeof (details?.author || microformat?.ownerChannelName) === 'string'
+                ? String(details.author || microformat.ownerChannelName).trim()
+                : '',
+            channelHandle: ownerHandleMatch?.[1] ? `@${ownerHandleMatch[1]}` : '',
+            shortDescription: typeof details?.shortDescription === 'string'
+                ? details.shortDescription.trim()
+                : '',
+            keywords: Array.isArray(details?.keywords)
+                ? details.keywords.map(value => typeof value === 'string' ? value.trim() : '').filter(Boolean)
+                : [],
+            ...language
+        };
+        return metadata;
+    }
+
+    function loadedVideoMetaSatisfies(metadata, needs = {}) {
+        if (!metadata) return false;
+        const hasText = Boolean(metadata.shortDescription || metadata.keywords?.length);
+        const hasIdentity = Boolean(metadata.channelId || metadata.channelHandle || metadata.channelName);
+        const hasDuration = Boolean(Number(metadata.lengthSeconds) > 0);
+        const hasDates = Boolean(metadata.publishDate || metadata.uploadDate);
+        const hasLanguage = Boolean(metadata.languageCode);
+        return (!needs.needText || hasText)
+            && (!needs.needIdentity || hasIdentity)
+            && (!needs.needCategory || Boolean(metadata.category))
+            && (!needs.needLanguage || hasLanguage)
+            && (!needs.needDuration || hasDuration)
+            && (!needs.needDates || hasDates);
+    }
+
+    function getLoadedVideoMeta(videoId, needs = {}) {
+        const candidates = [
+            window.filterTube?.rawYtInitialPlayerResponse,
+            window.ytInitialPlayerResponse,
+            window.filterTube?.lastYtInitialPlayerResponse,
+            window.filterTube?.lastYtPlayerResponse
+        ];
+        for (const candidate of candidates) {
+            const metadata = extractVideoMetaFromPlayerResponse(candidate, videoId);
+            if (loadedVideoMetaSatisfies(metadata, needs)) return metadata;
+        }
+        return null;
+    }
+
+    async function fetchVideoMetaFromYoutubeiPlayer(videoId, needs = {}) {
         if (!/^[A-Za-z0-9_-]{11}$/.test(videoId || '')) {
             return { success: false, metadata: null, errorCode: 'invalid_video_id' };
+        }
+
+        const loadedMetadata = getLoadedVideoMeta(videoId, needs);
+        if (loadedMetadata) {
+            return { success: true, metadata: loadedMetadata, errorCode: '', source: 'loaded_player_response' };
         }
 
         const requestContext = buildSubscriptionImportRequestProfiles();
@@ -726,32 +919,16 @@
                 }
 
                 const playerResponse = await playerHttpResponse.json();
-                const details = playerResponse?.videoDetails || null;
-                const microformat = playerResponse?.microformat?.playerMicroformatRenderer || null;
-                const ownerProfileUrl = typeof microformat?.ownerProfileUrl === 'string'
-                    ? microformat.ownerProfileUrl.trim()
-                    : '';
-                const ownerHandleMatch = ownerProfileUrl.match(/\/@([^/?#]+)/);
-                const metadata = {
-                    videoId,
-                    lengthSeconds: microformat?.lengthSeconds || details?.lengthSeconds || null,
-                    publishDate: typeof microformat?.publishDate === 'string' ? microformat.publishDate : '',
-                    uploadDate: typeof microformat?.uploadDate === 'string' ? microformat.uploadDate : '',
-                    category: typeof (microformat?.category || microformat?.genre) === 'string'
-                        ? String(microformat.category || microformat.genre).trim()
-                        : '',
-                    channelId: typeof (details?.channelId || microformat?.externalChannelId) === 'string'
-                        ? String(details.channelId || microformat.externalChannelId).trim()
-                        : '',
-                    channelName: typeof (details?.author || microformat?.ownerChannelName) === 'string'
-                        ? String(details.author || microformat.ownerChannelName).trim()
-                        : '',
-                    channelHandle: ownerHandleMatch?.[1] ? `@${ownerHandleMatch[1]}` : ''
-                };
+                const metadata = extractVideoMetaFromPlayerResponse(playerResponse, videoId);
+                if (!metadata) {
+                    lastErrorCode = 'metadata_unavailable';
+                    continue;
+                }
 
                 if (
                     metadata.lengthSeconds || metadata.publishDate || metadata.uploadDate || metadata.category ||
-                    metadata.channelId || metadata.channelName || metadata.channelHandle
+                    metadata.channelId || metadata.channelName || metadata.channelHandle ||
+                    metadata.shortDescription || metadata.keywords.length > 0 || metadata.languageCode
                 ) {
                     return { success: true, metadata, errorCode: '' };
                 }

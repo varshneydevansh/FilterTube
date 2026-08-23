@@ -49,7 +49,6 @@ function basePolicy(overrides = {}) {
 }
 
 function activePolicy(settings) {
-  if (settings.activeProfileKind !== 'child') return null;
   const policy = settings.managedTimeLimitPolicy;
   if (!policy || policy.enabled !== true) return null;
   if (policy.schema !== 'filtertube_managed_time_limit') return null;
@@ -77,11 +76,10 @@ function heartbeatStep(state, request) {
   let countedSeconds = 0;
   let countDecision = 'inactive_heartbeat_no_count';
 
-  if (request.visible && request.focused && remainingBefore > 0) {
+  if (((request.visible && request.focused) || request.playing) && remainingBefore > 0) {
     const prior = active[key];
     if (prior && prior.tabId !== request.tabId && request.now - prior.lastHeartbeatAt < 8000) {
       countDecision = 'another_active_tab_recently_counted';
-      active[key] = { ...prior, lastHeartbeatAt: request.now };
     } else if (prior && prior.tabId === request.tabId) {
       countedSeconds = Math.min(10, Math.floor((request.now - prior.lastCountedAt) / 1000), remainingBefore);
       row.consumedSeconds += Math.max(0, countedSeconds);
@@ -116,9 +114,13 @@ test('managed time-budget runtime is compiled background-owned and documented as
 
   assert.match(background, /const MANAGED_TIME_USAGE_STORAGE_KEY = 'ftManagedTimeUsageV1'/);
   assert.match(background, /function handleManagedTimeLimitHeartbeat\(request, sender, sendResponse\)/);
+  assert.match(background, /function handleManagedTimeLimitStateQuery\(request, sender, sendResponse\)/);
+  assert.match(background, /function handleManagedProfileSwitchOptions\(request, sender, sendResponse\)/);
+  assert.match(background, /function handleManagedProfileSwitch\(request, sender, sendResponse\)/);
   assert.match(background, /action === 'FilterTube_ManagedTimeLimitHeartbeat'/);
   assert.match(background, /normalizeManagedTimeLimitPolicy\(activeSettings\.timeLimitPolicy\)/);
   assert.match(background, /compiledSettings\.managedTimeLimitPolicy/);
+  assert.match(background, /Daily time belongs to the active profile/);
   assert.match(background, /function isValidManagedTimeLimitTimezone\(timezone\)/);
   assert.match(background, /if \(!isValidManagedTimeLimitTimezone\(timezone\)/);
   assert.match(background, /MANAGED_TIME_MAX_HEARTBEAT_DELTA_SECONDS/);
@@ -130,10 +132,13 @@ test('managed time-budget runtime is compiled background-owned and documented as
   assert.match(bridge, /function isValidManagedTimeLimitTimezone\(timezone\)/);
   assert.match(bridge, /isValidManagedTimeLimitTimezone\(policy\.timezone\)/);
   assert.match(bridge, /function sendManagedTimeLimitHeartbeat\(\)/);
+  assert.match(bridge, /function isManagedTimeLimitPlaybackActive\(\)/);
   assert.match(bridge, /function showManagedTimeLimitStatus\(state\)/);
   assert.match(bridge, /function showManagedTimeoutOverlay\(state\)/);
   assert.match(bridge, /FilterTube_ManagedTimeLimitHeartbeat/);
   assert.match(bridge, /applyManagedTimeLimitRuntime\(settings\)/);
+  const activePolicyBlock = block(bridge, 'function getManagedTimeLimitPolicy(settings)', 'function removeManagedTimeoutOverlay()');
+  assert.doesNotMatch(activePolicyBlock, /activeProfileKind !== 'child'/);
 
   assert.match(contract, /runtime managed time-limit policy compiler: present/);
   assert.match(contract, /runtime managed active-tab budget counter: present/);
@@ -171,20 +176,34 @@ test('managed child sync roadmap no longer reports completed schema and time-lim
   assert.match(t6, /single_active_tab_no_double_count/);
 });
 
-test('managed time-budget background heartbeats use compiled active child policy authority', () => {
+test('managed time-budget background heartbeats use compiled active profile policy authority', () => {
   const background = read('js/background.js');
   const heartbeatBlock = block(background, 'async function handleManagedTimeLimitHeartbeat(request, sender, sendResponse)', 'function isKidsUrl(url)');
 
   assert.match(heartbeatBlock, /const requestPolicy = normalizeManagedTimeLimitPolicy\(request\?\.policy\)/);
   assert.match(heartbeatBlock, /const compiledSettings = await getCompiledSettings\(sender, route\.surface, false\)/);
   assert.match(heartbeatBlock, /const compiledPolicy = normalizeManagedTimeLimitPolicy\(compiledSettings\?\.managedTimeLimitPolicy\)/);
-  assert.match(heartbeatBlock, /compiledSettings\?\.activeProfileKind !== 'child'/);
-  assert.match(heartbeatBlock, /active_child_policy_absent_no_work/);
+  assert.doesNotMatch(heartbeatBlock, /compiledSettings\?\.activeProfileKind !== 'child'/);
+  assert.match(heartbeatBlock, /active_profile_policy_absent_no_work/);
   assert.match(heartbeatBlock, /const profileId = normalizeString\(compiledSettings\.activeProfileId\)/);
   assert.match(heartbeatBlock, /const policy = compiledPolicy/);
+  assert.match(heartbeatBlock, /\(\(visible && focused\) \|\| playing\)/);
+  assert.match(heartbeatBlock, /sender\?\.url \|\| request\?\.href \|\| sender\?\.tab\?\.url/);
   assert.match(heartbeatBlock, /policySource: 'compiled_active_profile'/);
   assert.match(heartbeatBlock, /requestPolicyMatched/);
   assert.doesNotMatch(heartbeatBlock, /const profileId = normalizeString\(request\?\.profileId\)/);
+});
+
+test('managed daily usage and grants remain scoped to the active profile', () => {
+  const background = read('js/background.js');
+  const keyBlock = block(background, 'function managedTimeLimitUsageKey(profileId, dateKey)', 'function managedTimeLimitTotalBudgetSeconds(policy, now)');
+  const heartbeatBlock = block(background, 'async function handleManagedTimeLimitHeartbeat(request, sender, sendResponse)', 'function isKidsUrl(url)');
+
+  assert.match(keyBlock, /profileId/);
+  assert.match(keyBlock, /dateKey/);
+  assert.match(heartbeatBlock, /const profileId = normalizeString\(compiledSettings\.activeProfileId\)/);
+  assert.match(heartbeatBlock, /managedTimeLimitUsageKey\(profileId, dateKey\)/);
+  assert.match(background, /const grant = safeObject\(policy\?\.parentGrant\)/);
 });
 
 test('managed time-budget overlay is a lock surface and not a content-hide writer', () => {
@@ -194,11 +213,37 @@ test('managed time-budget overlay is a lock surface and not a content-hide write
   assert.match(overlayBlock, /role', 'alertdialog'/);
   assert.match(overlayBlock, /pointer-events:auto/);
   assert.match(overlayBlock, /pauseManagedTimeoutVideos\(\)/);
-  assert.match(overlayBlock, /today's parent-managed YouTube time/);
+  assert.match(overlayBlock, /today's YouTube time allowance/);
+  assert.match(overlayBlock, /FilterTube · profile time/);
   assert.match(overlayBlock, /Request more time/);
   assert.match(overlayBlock, /does not unlock YouTube by itself/);
   assert.match(overlayBlock, /YouTube stays paused until/);
   assert.doesNotMatch(overlayBlock, /recordTimeSaved|hidden-content|filtertube-hidden|data-filtertube-processed/);
+});
+
+test('managed timeout uses a stable full-page serene surface with PIN-backed profile switching', () => {
+  const bridge = read('js/content/bridge_settings.js');
+  const background = read('js/background.js');
+  const overlayBlock = block(bridge, 'function showManagedTimeoutOverlay(state)', 'function isManagedTimeLimitTabActive()');
+  const pauseBlock = block(bridge, 'function pauseManagedTimeoutVideos()', 'function formatManagedTimeoutDuration(seconds)');
+  const dashboardBlock = block(background, "} else if (action === 'FilterTube_OpenDashboard')", "} else if (action === 'FilterTube_SubscriptionsImportProgress')");
+
+  assert.match(bridge, /assets\/images\/homepage_hero_day\.mp4/);
+  assert.match(bridge, /filtertube-managed-overlay__panel--time/);
+  assert.match(bridge, /filtertube-managed-overlay__title-emphasis/);
+  assert.match(bridge, /@media \(prefers-reduced-motion: reduce\)/);
+  assert.match(overlayBlock, /data-filtertube-managed-state-key/);
+  assert.match(overlayBlock, /Switch profile/);
+  assert.match(overlayBlock, /FilterTube_GetManagedProfileSwitchOptions/);
+  assert.match(overlayBlock, /FilterTube_SwitchManagedProfile/);
+  assert.match(overlayBlock, /Enter the PIN for/);
+  assert.match(overlayBlock, /icons\/icon-48\.png/);
+  assert.match(overlayBlock, /normal PIN check/);
+  assert.match(pauseBlock, /video:not\(\[data-filtertube-managed-overlay-background="true"\]\)/);
+  assert.match(bridge, /__filtertubeManagedTimeLimitPlayGuardInstalled/);
+  assert.match(dashboardBlock, /requestedView === 'sync'/);
+  assert.match(dashboardBlock, /\?view=sync&flow=switch-profile/);
+  assert.match(read('js/tab-view.js'), /flow === 'switch-profile'/);
 });
 
 test('managed time-budget status is passive and appears only for active governed time', () => {
@@ -210,6 +255,7 @@ test('managed time-budget status is passive and appears only for active governed
   assert.match(statusBlock, /aria-live', 'polite'/);
   assert.match(statusBlock, /pointer-events:none/);
   assert.match(statusBlock, /time left/);
+  assert.match(statusBlock, /formatManagedTimeRemaining\(remainingSeconds\)/);
   assert.match(statusBlock, /remainingSeconds <= 0/);
   assert.match(statusBlock, /removeManagedTimeLimitStatus\(\)/);
   assert.match(heartbeatBlock, /response\?\.enforced === true && response\?\.timedOut !== true/);
@@ -217,8 +263,22 @@ test('managed time-budget status is passive and appears only for active governed
   assert.doesNotMatch(statusBlock, /recordTimeSaved|hidden-content|filtertube-hidden|data-filtertube-processed/);
 });
 
+test('popup exposes the active profile exact remaining time', () => {
+  const popup = read('js/popup.js');
+  const popupShell = read('src/extension-shell/popup.jsx');
+  const popupCss = read('css/serene-shell.css');
+
+  assert.match(popupShell, /ftManagedTimeStatusPopup/);
+  assert.match(popupShell, /ftManagedTimeStatusValuePopup/);
+  assert.match(popup, /FilterTube_GetManagedTimeLimitState/);
+  assert.match(popup, /formatPopupManagedTimeRemaining/);
+  assert.match(popup, /\$\{minutes\}m \$\{remainder\}s left/);
+  assert.match(popup, /setInterval\(\(\) => \{[\s\S]*refreshPopupManagedTimeStatus/);
+  assert.match(popupCss, /\.ft-popup-time-status/);
+});
+
 test('managed time-budget no-policy states do not arm runtime work', () => {
-  assert.equal(activePolicy({ activeProfileKind: 'account', managedTimeLimitPolicy: basePolicy() }), null);
+  assert.deepEqual(activePolicy({ activeProfileKind: 'account', managedTimeLimitPolicy: basePolicy() }), basePolicy());
   assert.equal(activePolicy({ activeProfileKind: 'child', managedTimeLimitPolicy: basePolicy({ enabled: false }) }), null);
   assert.equal(activePolicy({ activeProfileKind: 'child', managedTimeLimitPolicy: null }), null);
   assert.deepEqual(
@@ -287,4 +347,59 @@ test('managed time-budget heartbeats count one active focused tab and cap sleep 
   assert.equal(sleepCapped.countedSeconds, 5);
   assert.equal(sleepCapped.timedOut, true);
   assert.equal(sleepCapped.remainingSeconds, 0);
+});
+
+test('managed time-budget counts active playback without window focus', () => {
+  const policy = basePolicy({ dailyBudgetSeconds: 10 });
+  let state = heartbeatStep({ rows: {}, active: {} }, {
+    policy,
+    surface: 'main',
+    dateKey: '2026-06-04',
+    tabId: 9,
+    visible: false,
+    focused: false,
+    playing: true,
+    now: 100000
+  });
+  assert.equal(state.countDecision, 'first_active_heartbeat');
+  state = heartbeatStep(state.state, {
+    policy,
+    surface: 'main',
+    dateKey: '2026-06-04',
+    tabId: 9,
+    visible: false,
+    focused: false,
+    playing: true,
+    now: 105000
+  });
+  assert.equal(state.countedSeconds, 5);
+  assert.equal(state.remainingSeconds, 5);
+});
+
+test('competing heartbeat cannot keep a stale owner alive forever', () => {
+  const policy = basePolicy({ dailyBudgetSeconds: 20 });
+  const state = {
+    rows: { 'child-1:2026-06-04': { consumedSeconds: 0 } },
+    active: { 'child-1:2026-06-04': { tabId: 1, lastHeartbeatAt: 100000, lastCountedAt: 100000 } }
+  };
+  const blocked = heartbeatStep(state, {
+    policy,
+    surface: 'main',
+    dateKey: '2026-06-04',
+    tabId: 2,
+    playing: true,
+    now: 105000
+  });
+  assert.equal(blocked.countDecision, 'another_active_tab_recently_counted');
+  assert.equal(blocked.state.active['child-1:2026-06-04'].lastHeartbeatAt, 100000);
+  const takeover = heartbeatStep(blocked.state, {
+    policy,
+    surface: 'main',
+    dateKey: '2026-06-04',
+    tabId: 2,
+    playing: true,
+    now: 109000
+  });
+  assert.equal(takeover.countDecision, 'first_active_heartbeat');
+  assert.equal(takeover.state.active['child-1:2026-06-04'].tabId, 2);
 });

@@ -40,6 +40,7 @@
         'hideEndscreenVideowall',
         'hideEndscreenCards',
         'disableAutoplay',
+        'alwaysUseOriginalAudio',
         'disableAnnotations',
         'hideTopHeader',
         'hideNotificationBell',
@@ -49,6 +50,9 @@
         'showQuickBlockButton',
         'showBlockMenuItem',
         'hideSearchShelves',
+        'contentFilters',
+        'categoryFilters',
+        'languageFilters',
         'stats',
         'statsBySurface',
         'channelMap'
@@ -143,7 +147,7 @@
                         hideShorts: !!storage?.hideAllShorts,
                         hideComments,
                         hideHomeFeed: !!storage?.hideHomeFeed,
-                        hideSponsoredCards: !!storage?.hideSponsoredCards,
+                        hideSponsoredCards: storage?.hideSponsoredCards !== false,
                         hidePlayables: !!storage?.hidePlayables,
                         hideWatchPlaylistPanel: !!storage?.hideWatchPlaylistPanel,
                         hidePlaylistCards: !!storage?.hidePlaylistCards,
@@ -161,6 +165,7 @@
                         hideEndscreenVideowall: !!storage?.hideEndscreenVideowall,
                         hideEndscreenCards: !!storage?.hideEndscreenCards,
                         disableAutoplay: !!storage?.disableAutoplay,
+                        alwaysUseOriginalAudio: !!storage?.alwaysUseOriginalAudio,
                         disableAnnotations: !!storage?.disableAnnotations,
                         hideTopHeader: !!storage?.hideTopHeader,
                         hideNotificationBell: !!storage?.hideNotificationBell,
@@ -169,7 +174,10 @@
                         hideSubscriptions: !!storage?.hideSubscriptions,
                         showQuickBlockButton: storage?.showQuickBlockButton !== false,
                         showBlockMenuItem: storage?.showBlockMenuItem !== false,
-                        hideSearchShelves: !!storage?.hideSearchShelves
+                        hideSearchShelves: !!storage?.hideSearchShelves,
+                        contentFilters: safeObject(storage?.contentFilters),
+                        categoryFilters: safeObject(storage?.categoryFilters),
+                        languageFilters: safeObject(storage?.languageFilters)
                     },
                     main: {
                         mode: 'blocklist',
@@ -220,7 +228,13 @@
             source,
             channelRef: explicitChannelRef,
             comments,
+            matchMode: entry.matchMode === 'regex' ? 'regex' : 'literal',
+            regexFlags: entry.matchMode === 'regex' && /^[gimsuy]*$/.test(String(entry.regexFlags || ''))
+                ? String(entry.regexFlags || '')
+                : '',
+            scope: ['title', 'channel_name', 'comment'].includes(entry.scope) ? entry.scope : null,
             dateFilter: sanitizeKeywordDateFilter(entry.dateFilter),
+            ...(entry.modeBootstrapCopy === true ? { modeBootstrapCopy: true } : {}),
             addedAt // Track insertion time
         };
     }
@@ -388,6 +402,7 @@
             ...(typeof entry.managedListLastCheckedAt === 'number' && Number.isFinite(entry.managedListLastCheckedAt) ? { managedListLastCheckedAt: entry.managedListLastCheckedAt } : {}),
             ...(typeof entry.managedListContentHash === 'string' && entry.managedListContentHash.trim() ? { managedListContentHash: entry.managedListContentHash.trim() } : {}),
             ...(entry.managedListPaused === true ? { managedListPaused: true } : {}),
+            ...(entry.modeBootstrapCopy === true ? { modeBootstrapCopy: true } : {}),
             collaborationGroupId,
             collaborationWith,
             allCollaborators
@@ -437,11 +452,14 @@
             .filter(Boolean)
             .filter(entry => (typeof predicate === 'function' ? predicate(entry) : true))
             .map(entry => {
-                const escaped = entry.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const rawRegex = entry.matchMode === 'regex';
+                const escaped = rawRegex
+                    ? entry.word
+                    : entry.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 const exactPattern = `(^|[^\\p{L}\\p{N}_])${escaped}(?=$|[^\\p{L}\\p{N}_])`;
                 return {
-                    pattern: entry.exact ? exactPattern : escaped,
-                    flags: entry.exact ? 'iu' : 'i',
+                    pattern: rawRegex ? escaped : (entry.exact ? exactPattern : escaped),
+                    flags: rawRegex ? (entry.regexFlags || 'i') : (entry.exact ? 'iu' : 'i'),
                     dateFilter: entry.dateFilter?.enabled ? entry.dateFilter : undefined
                 };
             });
@@ -564,6 +582,7 @@
         hideEndscreenVideowall,
         hideEndscreenCards,
         disableAutoplay,
+        alwaysUseOriginalAudio,
         disableAnnotations,
         hideTopHeader,
         hideNotificationBell,
@@ -574,15 +593,17 @@
         showBlockMenuItem,
         hideSearchShelves,
         contentFilters,
-        categoryFilters
+        categoryFilters,
+        languageFilters
     }) {
         const sanitizedChannels = sanitizeChannelsList(channels);
         const sanitizedKeywords = syncFilterAllKeywords(keywords, sanitizedChannels);
         const sanitizedContentFilters = safeObject(contentFilters);
         const sanitizedCategoryFilters = safeObject(categoryFilters);
+        const sanitizedLanguageFilters = safeObject(languageFilters);
         return {
             enabled: enabled !== false,
-            filterKeywords: compileKeywords(sanitizedKeywords),
+            filterKeywords: compileKeywords(sanitizedKeywords, entry => entry.scope !== 'comment'),
             filterKeywordsComments: compileKeywords(sanitizedKeywords, entry => entry.comments === true),
             filterChannels: sanitizedChannels,
             hideAllShorts: !!hideShorts,
@@ -607,6 +628,7 @@
             hideEndscreenVideowall: !!hideEndscreenVideowall,
             hideEndscreenCards: !!hideEndscreenCards,
             disableAutoplay: !!disableAutoplay,
+            alwaysUseOriginalAudio: !!alwaysUseOriginalAudio,
             disableAnnotations: !!disableAnnotations,
             hideTopHeader: !!hideTopHeader,
             hideNotificationBell: !!hideNotificationBell,
@@ -617,7 +639,8 @@
             showBlockMenuItem: showBlockMenuItem !== false,
             hideSearchShelves: !!hideSearchShelves,
             contentFilters: sanitizedContentFilters,
-            categoryFilters: sanitizedCategoryFilters
+            categoryFilters: sanitizedCategoryFilters,
+            languageFilters: sanitizedLanguageFilters
         };
     }
 
@@ -681,7 +704,7 @@
                     hideShorts: readBool('hideShorts', !!result.hideAllShorts),
                     hideComments,
                     hideHomeFeed: readBool('hideHomeFeed', !!result.hideHomeFeed),
-                    hideSponsoredCards: readBool('hideSponsoredCards', !!result.hideSponsoredCards),
+                    hideSponsoredCards: readBool('hideSponsoredCards', result.hideSponsoredCards !== false),
                     hidePlayables: readBool('hidePlayables', !!result.hidePlayables),
                     hideWatchPlaylistPanel: readBool('hideWatchPlaylistPanel', !!result.hideWatchPlaylistPanel),
                     hidePlaylistCards: readBool('hidePlaylistCards', !!result.hidePlaylistCards),
@@ -699,6 +722,7 @@
                     hideEndscreenVideowall: readBool('hideEndscreenVideowall', !!result.hideEndscreenVideowall),
                     hideEndscreenCards: readBool('hideEndscreenCards', !!result.hideEndscreenCards),
                     disableAutoplay: readBool('disableAutoplay', !!result.disableAutoplay),
+                    alwaysUseOriginalAudio: readBool('alwaysUseOriginalAudio', !!result.alwaysUseOriginalAudio),
                     disableAnnotations: readBool('disableAnnotations', !!result.disableAnnotations),
                     hideTopHeader: readBool('hideTopHeader', !!result.hideTopHeader),
                     hideNotificationBell: readBool('hideNotificationBell', !!result.hideNotificationBell),
@@ -756,6 +780,7 @@
 
                 const contentFilters = safeObject(profileSettings.contentFilters);
                 const categoryFilters = safeObject(profileSettings.categoryFilters);
+                const languageFilters = safeObject(profileSettings.languageFilters);
 
                 resolve({
                     enabled,
@@ -784,6 +809,7 @@
                     hideEndscreenVideowall: effectiveSettings.hideEndscreenVideowall,
                     hideEndscreenCards: effectiveSettings.hideEndscreenCards,
                     disableAutoplay: effectiveSettings.disableAutoplay,
+                    alwaysUseOriginalAudio: effectiveSettings.alwaysUseOriginalAudio,
                     disableAnnotations: effectiveSettings.disableAnnotations,
                     hideTopHeader: effectiveSettings.hideTopHeader,
                     hideNotificationBell: effectiveSettings.hideNotificationBell,
@@ -800,7 +826,8 @@
                     themeSource: hasExplicitTheme ? 'user' : 'system',
                     autoBackupEnabled,
                     contentFilters,
-                    categoryFilters
+                    categoryFilters,
+                    languageFilters
                 });
             });
         });
@@ -809,6 +836,7 @@
     function saveSettings(options = {}) {
         const opts = options && typeof options === 'object' ? options : {};
         const hasCategoryFiltersInput = Object.prototype.hasOwnProperty.call(opts, 'categoryFilters');
+        const hasLanguageFiltersInput = Object.prototype.hasOwnProperty.call(opts, 'languageFilters');
 
         const {
             keywords,
@@ -835,6 +863,7 @@
             hideEndscreenVideowall,
             hideEndscreenCards,
             disableAutoplay,
+            alwaysUseOriginalAudio,
             disableAnnotations,
             hideTopHeader,
             hideNotificationBell,
@@ -846,7 +875,8 @@
             hideSearchShelves,
             autoBackupEnabled,
             contentFilters,
-            categoryFilters
+            categoryFilters,
+            languageFilters
         } = opts;
 
         const sanitizedChannels = sanitizeChannelsList(channels);
@@ -857,6 +887,7 @@
             STORAGE_NAMESPACE?.get([FT_PROFILES_V4_KEY, FT_PROFILES_V3_KEY], (existing) => {
                 let nextProfilesV4 = null;
                 let effectiveCategoryFilters = null;
+                let effectiveLanguageFilters = null;
                 try {
                     const existingV4 = existing?.[FT_PROFILES_V4_KEY];
                     if (isValidProfilesV4(existingV4)) {
@@ -870,6 +901,10 @@
                         effectiveCategoryFilters = hasCategoryFiltersInput
                             ? safeObject(categoryFilters)
                             : existingCategoryFilters;
+                        const existingLanguageFilters = safeObject(existingSettings.languageFilters);
+                        effectiveLanguageFilters = hasLanguageFiltersInput
+                            ? safeObject(languageFilters)
+                            : existingLanguageFilters;
 
                         const compiledSettings = buildCompiledSettings({
                             keywords: sanitizedKeywords,
@@ -896,6 +931,7 @@
                             hideEndscreenVideowall,
                             hideEndscreenCards,
                             disableAutoplay,
+                            alwaysUseOriginalAudio,
                             disableAnnotations,
                             hideTopHeader,
                             hideNotificationBell,
@@ -906,7 +942,8 @@
                             showBlockMenuItem,
                             hideSearchShelves,
                             contentFilters: sanitizedContentFilters,
-                            categoryFilters: effectiveCategoryFilters
+                            categoryFilters: effectiveCategoryFilters,
+                            languageFilters: effectiveLanguageFilters
                         });
 
                         const payload = {
@@ -936,6 +973,7 @@
                             hideEndscreenVideowall: compiledSettings.hideEndscreenVideowall,
                             hideEndscreenCards: compiledSettings.hideEndscreenCards,
                             disableAutoplay: compiledSettings.disableAutoplay,
+                            alwaysUseOriginalAudio: compiledSettings.alwaysUseOriginalAudio,
                             disableAnnotations: compiledSettings.disableAnnotations,
                             hideTopHeader: compiledSettings.hideTopHeader,
                             hideNotificationBell: compiledSettings.hideNotificationBell,
@@ -973,6 +1011,7 @@
                             hideEndscreenVideowall: compiledSettings.hideEndscreenVideowall,
                             hideEndscreenCards: compiledSettings.hideEndscreenCards,
                             disableAutoplay: compiledSettings.disableAutoplay,
+                            alwaysUseOriginalAudio: compiledSettings.alwaysUseOriginalAudio,
                             disableAnnotations: compiledSettings.disableAnnotations,
                             hideTopHeader: compiledSettings.hideTopHeader,
                             hideNotificationBell: compiledSettings.hideNotificationBell,
@@ -983,7 +1022,8 @@
                             showBlockMenuItem: compiledSettings.showBlockMenuItem,
                             hideSearchShelves: compiledSettings.hideSearchShelves,
                             contentFilters: sanitizedContentFilters,
-                            categoryFilters: effectiveCategoryFilters
+                            categoryFilters: effectiveCategoryFilters,
+                            languageFilters: effectiveLanguageFilters
                         };
 
                         const existingMain = safeObject(activeProfile.main);
@@ -1053,6 +1093,7 @@
                         hideEndscreenVideowall,
                         hideEndscreenCards,
                         disableAutoplay,
+                        alwaysUseOriginalAudio,
                         disableAnnotations,
                         hideTopHeader,
                         hideNotificationBell,
@@ -1063,7 +1104,8 @@
                         showBlockMenuItem,
                         hideSearchShelves,
                         contentFilters: sanitizedContentFilters,
-                        categoryFilters: safeObject(categoryFilters)
+                        categoryFilters: safeObject(categoryFilters),
+                        languageFilters: safeObject(languageFilters)
                     });
 
                     const payload = {
@@ -1093,6 +1135,7 @@
                         hideEndscreenVideowall: compiledSettings.hideEndscreenVideowall,
                         hideEndscreenCards: compiledSettings.hideEndscreenCards,
                         disableAutoplay: compiledSettings.disableAutoplay,
+                        alwaysUseOriginalAudio: compiledSettings.alwaysUseOriginalAudio,
                         disableAnnotations: compiledSettings.disableAnnotations,
                         hideTopHeader: compiledSettings.hideTopHeader,
                         hideNotificationBell: compiledSettings.hideNotificationBell,
@@ -1102,6 +1145,9 @@
                         showQuickBlockButton: compiledSettings.showQuickBlockButton,
                         showBlockMenuItem: compiledSettings.showBlockMenuItem,
                         hideSearchShelves: compiledSettings.hideSearchShelves,
+                        contentFilters: compiledSettings.contentFilters,
+                        categoryFilters: compiledSettings.categoryFilters,
+                        languageFilters: compiledSettings.languageFilters,
                         [AUTO_BACKUP_KEY]: autoBackupEnabled === true
                     };
 
@@ -1130,6 +1176,7 @@
                             hideEndscreenVideowall: compiledSettings.hideEndscreenVideowall,
                             hideEndscreenCards: compiledSettings.hideEndscreenCards,
                             disableAutoplay: compiledSettings.disableAutoplay,
+                            alwaysUseOriginalAudio: compiledSettings.alwaysUseOriginalAudio,
                             disableAnnotations: compiledSettings.disableAnnotations,
                             hideTopHeader: compiledSettings.hideTopHeader,
                             hideNotificationBell: compiledSettings.hideNotificationBell,
@@ -1175,6 +1222,7 @@
                         hideEndscreenVideowall,
                         hideEndscreenCards,
                         disableAutoplay,
+                        alwaysUseOriginalAudio,
                         disableAnnotations,
                         hideTopHeader,
                         hideNotificationBell,
@@ -1185,7 +1233,8 @@
                         showBlockMenuItem,
                         hideSearchShelves,
                         contentFilters: sanitizedContentFilters,
-                        categoryFilters: safeObject(categoryFilters)
+                        categoryFilters: safeObject(categoryFilters),
+                        languageFilters: safeObject(languageFilters)
                     });
                     resolve({ compiledSettings, error: e });
                 }

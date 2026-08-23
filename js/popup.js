@@ -65,6 +65,7 @@ function initializePopupFiltersTabs() {
 
     const catalog = window.FilterTubeContentControlsCatalog?.getCatalog?.() || [];
     const categoryOptions = window.FilterTubeContentControlsCatalog?.getCategoryOptions?.() || [];
+    const languageOptions = window.FilterTubeContentControlsCatalog?.getLanguageOptions?.() || [];
     let feedRowsContainer = null;
     let feedGroupElement = null;
 
@@ -370,6 +371,117 @@ function initializePopupFiltersTabs() {
             savePopupCategoryFilters();
         }, 180);
     }
+
+    const languageGroup = document.createElement('div');
+    languageGroup.className = 'content-control-group category-filters-section popup-category-filters-section popup-language-filters-section';
+    languageGroup.setAttribute('data-ft-control-group', 'true');
+    languageGroup.setAttribute('data-ft-group-title', 'Language Filters');
+    languageGroup.innerHTML = `
+        <div class="content-control-group__header"><div class="content-control-group__title">Language Filters <span class="ft-experimental-badge">Experimental</span></div></div>
+        <div class="content-control-group__rows">
+            <div class="toggle-row popup-category-row">
+                <div class="toggle-info"><div class="toggle-title">Spoken Language</div><div class="toggle-desc">Uses original/default audio evidence; auto-dubbed alternatives do not change the source language.</div></div>
+                <div class="ft-category-controls popup-category-controls"><select id="popupLanguageFilter_mode" class="select-input"><option value="block">Block selected</option><option value="allow">Allow only selected</option></select><label class="switch"><input id="popupLanguageFilter_enabled" type="checkbox"><span class="slider round"></span></label></div>
+            </div>
+            <div id="popupLanguageFilter_panel" class="language-filter-picker popup-language-filter-picker" style="display: none;">
+                <input id="popupLanguageFilter_search" type="text" class="text-input search-input ft-category-search" placeholder="Search languages...">
+                <div class="ft-category-selection-bar"><span id="popupLanguageFilter_count" class="ft-category-selection-count" aria-live="polite"></span><button id="popupLanguageFilter_clear" type="button" class="ft-category-clear">Clear</button></div>
+                <div id="popupLanguageFilter_list" class="ft-category-options"></div>
+                <button id="popupLanguageFilter_manage" type="button" class="video-filters-manage">Open full Language Filters</button>
+            </div>
+        </div>`;
+    // Keep the experimental language picker at the end of Content Controls.
+    contentTab.appendChild(languageGroup);
+
+    const languageEnabled = languageGroup.querySelector('#popupLanguageFilter_enabled');
+    const languageMode = languageGroup.querySelector('#popupLanguageFilter_mode');
+    const languagePanel = languageGroup.querySelector('#popupLanguageFilter_panel');
+    const languageSearch = languageGroup.querySelector('#popupLanguageFilter_search');
+    const languageList = languageGroup.querySelector('#popupLanguageFilter_list');
+    const languageCount = languageGroup.querySelector('#popupLanguageFilter_count');
+    const languageClear = languageGroup.querySelector('#popupLanguageFilter_clear');
+    let popupLanguageSelected = [];
+    let isApplyingPopupLanguage = false;
+    let popupLanguageSaveTimer = 0;
+    const normalizePopupLanguageSelection = values => normalizePopupCategorySelection(values)
+        .map(value => value.toLowerCase().replace(/_/g, '-').split('-')[0]);
+
+    function updatePopupLanguageSummary() {
+        const modeLabel = languageMode.value === 'allow' ? 'Allowed' : 'Blocked';
+        languageCount.textContent = popupLanguageSelected.length
+            ? `${modeLabel}: ${popupLanguageSelected.map(code => languageOptions.find(option => option.code === code)?.label || code.toUpperCase()).join(', ')}`
+            : 'No languages selected — filter is inactive';
+        languageClear.disabled = popupLanguageSelected.length === 0;
+        languageMode.disabled = !languageEnabled.checked;
+        languagePanel.style.display = languageEnabled.checked ? 'block' : 'none';
+        languageGroup.setAttribute('data-filtertube-filter-enabled', languageEnabled.checked ? 'true' : 'false');
+    }
+
+    function renderPopupLanguageList() {
+        const needle = languageSearch.value.trim().toLowerCase();
+        const selected = new Set(popupLanguageSelected);
+        languageList.innerHTML = '';
+        languageOptions.filter(option => !needle || option.label.toLowerCase().includes(needle) || option.code.includes(needle)).forEach(option => {
+            const active = selected.has(option.code);
+            const pill = document.createElement('button');
+            pill.type = 'button';
+            pill.className = `ft-category-pill${active ? ' active' : ''}`;
+            pill.setAttribute('aria-pressed', active ? 'true' : 'false');
+            pill.style.setProperty('--ft-category-color', option.color || '#3b82f6');
+            const swatch = document.createElement('span');
+            swatch.className = 'ft-category-swatch';
+            const label = document.createElement('span');
+            label.className = 'ft-category-label';
+            label.textContent = `${option.label} · ${option.code.toUpperCase()}`;
+            const mark = document.createElement('span');
+            mark.className = 'ft-category-selection-mark';
+            mark.textContent = '✓';
+            pill.append(swatch, label, mark);
+            pill.addEventListener('click', () => {
+                popupLanguageSelected = active ? popupLanguageSelected.filter(code => code !== option.code) : [...popupLanguageSelected, option.code];
+                renderPopupLanguageList();
+                updatePopupLanguageSummary();
+                schedulePopupLanguageSave();
+            });
+            languageList.appendChild(pill);
+        });
+    }
+
+    function applyPopupLanguageFilters(filters = {}, profileType = 'main') {
+        languageGroup.style.display = profileType === 'kids' ? 'none' : '';
+        if (profileType === 'kids') return;
+        isApplyingPopupLanguage = true;
+        languageEnabled.checked = filters.enabled === true;
+        languageMode.value = filters.mode === 'allow' ? 'allow' : 'block';
+        popupLanguageSelected = normalizePopupLanguageSelection(filters.selected || []);
+        renderPopupLanguageList();
+        updatePopupLanguageSummary();
+        isApplyingPopupLanguage = false;
+    }
+
+    function schedulePopupLanguageSave() {
+        if (isApplyingPopupLanguage) return;
+        if (popupLanguageSaveTimer) clearTimeout(popupLanguageSaveTimer);
+        popupLanguageSaveTimer = setTimeout(() => {
+            popupLanguageSaveTimer = 0;
+            StateManager.updateLanguageFilters({
+                enabled: languageEnabled.checked,
+                mode: languageMode.value === 'allow' ? 'allow' : 'block',
+                selected: normalizePopupLanguageSelection(popupLanguageSelected)
+            });
+        }, 180);
+    }
+
+    languageEnabled.addEventListener('change', () => { updatePopupLanguageSummary(); schedulePopupLanguageSave(); });
+    languageMode.addEventListener('change', () => { updatePopupLanguageSummary(); schedulePopupLanguageSave(); });
+    languageSearch.addEventListener('input', renderPopupLanguageList);
+    languageClear.addEventListener('click', () => { popupLanguageSelected = []; renderPopupLanguageList(); updatePopupLanguageSummary(); schedulePopupLanguageSave(); });
+    languageGroup.querySelector('#popupLanguageFilter_manage')?.addEventListener('click', () => {
+        const api = typeof chrome !== 'undefined' ? chrome : browser;
+        const url = api.runtime.getURL('html/tab-view.html?view=filters&section=languages');
+        if (api.tabs?.create) api.tabs.create({ url });
+        else window.open(url, '_blank', 'noopener,noreferrer');
+    });
 
     const videoFiltersRows = feedRowsContainer || (() => {
         const videoFiltersSection = document.createElement('div');
@@ -685,9 +797,11 @@ function initializePopupFiltersTabs() {
             if (profileType === 'kids') {
                 applyPopupKidsContentFilters(state?.kids?.contentFilters || {});
                 applyPopupCategoryFilters(state?.kids?.categoryFilters || {}, 'kids');
+                applyPopupLanguageFilters({}, 'kids');
             } else {
                 applyPopupContentFilters(state?.contentFilters || {});
                 applyPopupCategoryFilters(state?.categoryFilters || {}, 'main');
+                applyPopupLanguageFilters(state?.languageFilters || {}, 'main');
             }
         } catch (e) {
         }
@@ -845,6 +959,9 @@ function initializePopupFiltersTabs() {
         if (eventType === 'categoryFiltersUpdated' || eventType === 'kidsCategoryFiltersUpdated') {
             applyPopupVideoFiltersForActiveProfile();
         }
+        if (eventType === 'languageFiltersUpdated') {
+            applyPopupVideoFiltersForActiveProfile();
+        }
     });
 
     // Create tabs using UIComponents
@@ -938,9 +1055,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftProfileMenuPopup = document.getElementById('ftProfileMenuPopup');
     const ftProfileBadgeBtnPopup = document.getElementById('ftProfileBadgeBtnPopup');
     const ftProfileDropdownPopup = document.getElementById('ftProfileDropdownPopup');
+    const ftManagedTimeStatusPopup = document.getElementById('ftManagedTimeStatusPopup');
+    const ftManagedTimeStatusValuePopup = document.getElementById('ftManagedTimeStatusValuePopup');
 
     let profilesV4Cache = null;
     let isHandlingProfileSwitch = false;
+    let popupSelfControlSessionState = null;
     let popupActiveProfileType = 'main';
     const unlockedProfiles = new Set();
 
@@ -971,6 +1091,62 @@ document.addEventListener('DOMContentLoaded', async () => {
                 resolve(null);
             }
         });
+    }
+
+    function formatPopupManagedTimeRemaining(seconds) {
+        const safeSeconds = Math.max(0, Math.floor(Number(seconds) || 0));
+        if (safeSeconds <= 0) return 'Limit reached';
+        const hours = Math.floor(safeSeconds / 3600);
+        const minutes = Math.floor((safeSeconds % 3600) / 60);
+        const remainder = safeSeconds % 60;
+        if (hours > 0) return `${hours}h ${minutes}m left`;
+        if (minutes > 0) return `${minutes}m ${remainder}s left`;
+        return `${remainder}s left`;
+    }
+
+    async function refreshPopupManagedTimeStatus() {
+        if (!ftManagedTimeStatusPopup || !ftManagedTimeStatusValuePopup) return;
+        const selfControlWasActive = popupSelfControlSessionState?.active === true;
+        const selfControl = await sendRuntimeMessage({ action: 'FilterTube_GetSelfControlSession' });
+        popupSelfControlSessionState = selfControl?.ok && selfControl?.active ? selfControl : null;
+        if ((popupSelfControlSessionState?.active === true) !== selfControlWasActive && profilesV4Cache) {
+            renderProfileSelector(profilesV4Cache);
+        }
+        const statusLabel = ftManagedTimeStatusPopup.querySelector('.ft-popup-time-status__label');
+        if (popupSelfControlSessionState) {
+            const remaining = formatPopupManagedTimeRemaining(popupSelfControlSessionState.remainingSeconds)
+                .replace(' left', '');
+            ftManagedTimeStatusPopup.hidden = false;
+            ftManagedTimeStatusPopup.classList.remove('is-exhausted');
+            ftManagedTimeStatusPopup.classList.add('is-self-control');
+            if (statusLabel) statusLabel.textContent = 'Strict session';
+            ftManagedTimeStatusValuePopup.textContent = remaining;
+            ftManagedTimeStatusPopup.title = `${popupSelfControlSessionState.profileName || 'Active profile'} is pinned until the session ends`;
+            applyLockGateIfNeeded();
+            return;
+        }
+        if (selfControlWasActive && lockGateEl) {
+            try { lockGateEl.remove(); } catch (e) { }
+            lockGateEl = null;
+            applyLockGateIfNeeded();
+        }
+        ftManagedTimeStatusPopup.classList.remove('is-self-control');
+        if (statusLabel) statusLabel.textContent = 'YouTube time';
+        const response = await sendRuntimeMessage({
+            action: 'FilterTube_GetManagedTimeLimitState',
+            profileType: popupActiveProfileType === 'kids' ? 'kids' : 'main'
+        });
+        if (!response?.ok || response?.enforced !== true) {
+            ftManagedTimeStatusPopup.hidden = true;
+            ftManagedTimeStatusPopup.classList.remove('is-exhausted');
+            ftManagedTimeStatusValuePopup.textContent = '';
+            return;
+        }
+        const timedOut = response.timedOut === true || Number(response.remainingSeconds) <= 0;
+        ftManagedTimeStatusPopup.hidden = false;
+        ftManagedTimeStatusPopup.classList.toggle('is-exhausted', timedOut);
+        ftManagedTimeStatusValuePopup.textContent = formatPopupManagedTimeRemaining(response.remainingSeconds);
+        ftManagedTimeStatusPopup.title = `${response.profileName || 'Active profile'} · ${ftManagedTimeStatusValuePopup.textContent}`;
     }
 
     async function syncSessionUnlockStateFromBackground() {
@@ -1047,9 +1223,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             'ft-list-mode-pill',
             effectiveMode === 'blocklist' ? 'toggle-variant-red' : ''
         ].filter(Boolean).join(' ');
-        toggle.textContent = effectiveMode === 'whitelist'
-            ? (uiProfileType === 'kids' ? 'Whitelist Kids' : 'Whitelist')
-            : 'Blocklist';
+        toggle.textContent = effectiveMode === 'whitelist' ? 'Whitelist' : 'Blocklist';
+        toggle.title = effectiveMode === 'whitelist'
+            ? 'Whitelist mode: show content matching Allowed rules'
+            : 'Blocklist mode: hide content matching Blocked rules';
+        toggle.setAttribute('aria-label', toggle.title);
         toggle.setAttribute('role', 'button');
         toggle.setAttribute('aria-pressed', 'true');
         toggle.setAttribute('tabindex', isUiLocked() ? '-1' : '0');
@@ -1072,57 +1250,44 @@ document.addEventListener('DOMContentLoaded', async () => {
                     : (state?.mode === 'whitelist' ? 'whitelist' : 'blocklist');
                 const nextState = currentMode !== 'whitelist';
 
-                const enablingWhitelist = nextState === true;
-                const disablingWhitelist = nextState !== true && currentMode === 'whitelist';
                 const whitelistEmpty = profileType === 'kids'
                     ? ((state?.kids?.whitelistChannels?.length || 0) === 0 && (state?.kids?.whitelistKeywords?.length || 0) === 0)
                     : ((state?.whitelistChannels?.length || 0) === 0 && (state?.whitelistKeywords?.length || 0) === 0);
+                const blocklistHasRules = profileType === 'kids'
+                    ? ((state?.kids?.blockedChannels?.length || 0) > 0 || (state?.kids?.blockedKeywords?.length || 0) > 0)
+                    : ((state?.channels?.length || 0) > 0 || (state?.keywords?.length || 0) > 0);
                 let copyBlocklist = false;
-                if (enablingWhitelist && whitelistEmpty) {
-                    const msg = profileType === 'kids'
-                        ? 'Copy your current YT Kids blocklist into whitelist to get started?'
-                        : 'Copy your current blocklist into whitelist to get started?';
-                    copyBlocklist = window.confirm(msg);
+                if (nextState && whitelistEmpty && blocklistHasRules) {
+                    copyBlocklist = window.confirm(profileType === 'kids'
+                        ? 'Copy your current YT Kids blocked rules into Allowed rules? Your blocked rules will be kept.'
+                        : 'Copy your current blocked rules into Allowed rules? Your blocked rules will be kept.');
                     if (!copyBlocklist) {
-                        const toastMsg = profileType === 'kids'
-                            ? 'YT Kids whitelist is empty — videos will stay hidden until you add allow rules.'
-                            : 'Whitelist is empty — videos will stay hidden until you add allow rules.';
-                        UIComponents.showToast(toastMsg, 'info');
+                        UIComponents.showToast(profileType === 'kids'
+                            ? 'YT Kids Allowed rules are empty — videos will stay hidden until you add allow rules.'
+                            : 'Allowed rules are empty — videos will stay hidden until you add allow rules.', 'info');
                     }
+                } else if (nextState && whitelistEmpty) {
+                    UIComponents.showToast(profileType === 'kids'
+                        ? 'YT Kids Allowed rules are empty — videos will stay hidden until you add allow rules.'
+                        : 'Allowed rules are empty — videos will stay hidden until you add allow rules.', 'info');
                 }
 
-                let resp = null;
-                if (disablingWhitelist && !whitelistEmpty) {
-                    const confirmMsg = profileType === 'kids'
-                        ? 'Move your YT Kids whitelist back into blocklist? This will clear the YT Kids whitelist.'
-                        : 'Move your whitelist back into blocklist? This will clear whitelist.';
-                    const shouldTransfer = window.confirm(confirmMsg);
-                    if (shouldTransfer) {
-                        resp = await sendRuntimeMessage({
-                            action: 'FilterTube_TransferWhitelistToBlocklist',
-                            profileType
-                        });
-                    }
-                    // If user clicked Cancel and we're disabling whitelist, don't proceed with mode change
-                    if (!shouldTransfer) {
-                        renderListModeControls();
-                        return;
-                    }
-                }
-
-                if (!resp) {
-                    resp = await sendRuntimeMessage({
-                        action: 'FilterTube_SetListMode',
-                        profileType,
-                        mode: nextState ? 'whitelist' : 'blocklist',
-                        copyBlocklist
-                    });
-                }
+                const resp = await sendRuntimeMessage({
+                    action: 'FilterTube_SetListMode',
+                    profileType,
+                    mode: nextState ? 'whitelist' : 'blocklist',
+                    copyBlocklist
+                });
 
                 if (!resp || resp.ok !== true) {
                     UIComponents.showToast('Failed to update list mode', 'error');
                     renderListModeControls();
                     return;
+                }
+
+                if (resp.copiedBlocklist) {
+                    const copiedCount = (Number(resp.copiedChannels) || 0) + (Number(resp.copiedKeywords) || 0);
+                    UIComponents.showToast(`Copied ${copiedCount} blocked ${copiedCount === 1 ? 'rule' : 'rules'} into Allowed rules. Blocked rules were kept.`, 'success');
                 }
 
                 await StateManager.loadSettings();
@@ -1525,7 +1690,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const profilesV4 = profilesV4Cache;
             const activeProfileId = normalizeString(profilesV4?.activeProfileId) || 'default';
-            return getProfileType(profilesV4, activeProfileId) === 'child' ||
+            return popupSelfControlSessionState?.active === true || getProfileType(profilesV4, activeProfileId) === 'child' ||
                 !!(profilesV4 && isProfileLocked(profilesV4, activeProfileId) && !unlockedProfiles.has(activeProfileId));
         } catch (e) {
         }
@@ -1535,10 +1700,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     function applyLockGateIfNeeded() {
         const profilesV4 = profilesV4Cache;
         const activeProfileId = normalizeString(profilesV4?.activeProfileId) || 'default';
-        const isLocked = profilesV4 && (
+        const selfControlLocked = popupSelfControlSessionState?.active === true;
+        const isLocked = selfControlLocked || (profilesV4 && (
             getProfileType(profilesV4, activeProfileId) === 'child' ||
             (isProfileLocked(profilesV4, activeProfileId) && !unlockedProfiles.has(activeProfileId))
-        );
+        ));
 
         document.body.classList.toggle('ft-popup-locked', !!isLocked);
         try {
@@ -1582,14 +1748,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         const copy = getProfileAccessCopy(profilesV4, activeProfileId);
         const activeIsChild = getProfileType(profilesV4, activeProfileId) === 'child';
         const h3 = document.createElement('h3');
-        h3.textContent = activeIsChild ? 'Managed Protected Profile' : copy.gateTitle;
+        h3.textContent = selfControlLocked ? 'Self-Control Session Active' : (activeIsChild ? 'Managed Protected Profile' : copy.gateTitle);
         cardHeader.appendChild(h3);
 
         const body = document.createElement('div');
         body.className = 'card-body';
         const hint = document.createElement('div');
         hint.className = 'import-export-hint';
-        hint.textContent = activeIsChild
+        hint.textContent = selfControlLocked
+            ? `This profile and its filters are pinned. ${formatPopupManagedTimeRemaining(popupSelfControlSessionState.remainingSeconds)}.`
+            : activeIsChild
             ? 'This protected profile can use its own viewing rules, but FilterTube settings and rule editing stay parent-managed. Switch to the parent profile to make changes.'
             : copy.gateMessage;
 
@@ -1599,27 +1767,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         actions.style.flexWrap = 'wrap';
         actions.style.marginTop = '12px';
 
-        const unlockBtn = document.createElement('button');
-        unlockBtn.className = 'btn-primary';
-        unlockBtn.type = 'button';
-        unlockBtn.textContent = activeIsChild ? 'Switch Profile' : 'Unlock';
-        unlockBtn.addEventListener('click', async () => {
-            if (activeIsChild) {
-                toggleProfileDropdown();
-                return;
-            }
-            try {
-                const ok = await ensureProfileUnlocked(profilesV4Cache, activeProfileId);
-                if (!ok) return;
-                await refreshProfilesUI();
-                UIComponents.showToast('Unlocked', 'success');
-            } catch (e) {
-                UIComponents.showToast('Failed to unlock', 'error');
-            }
-        });
-
         body.appendChild(hint);
-        actions.appendChild(unlockBtn);
+        if (!selfControlLocked) {
+            const unlockBtn = document.createElement('button');
+            unlockBtn.className = 'btn-primary';
+            unlockBtn.type = 'button';
+            unlockBtn.textContent = activeIsChild ? 'Switch Profile' : 'Unlock';
+            unlockBtn.addEventListener('click', async () => {
+                if (activeIsChild) {
+                    toggleProfileDropdown();
+                    return;
+                }
+                try {
+                    const ok = await ensureProfileUnlocked(profilesV4Cache, activeProfileId);
+                    if (!ok) return;
+                    await refreshProfilesUI();
+                    UIComponents.showToast('Unlocked', 'success');
+                } catch (e) {
+                    UIComponents.showToast('Failed to unlock', 'error');
+                }
+            });
+            actions.appendChild(unlockBtn);
+        }
         body.appendChild(actions);
         card.appendChild(cardHeader);
         card.appendChild(body);
@@ -1651,6 +1820,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const locked = isProfileLocked(profilesV4, id);
             const type = getProfileType(profilesV4, id);
             const isChild = type === 'child';
+            btn.disabled = popupSelfControlSessionState?.active === true;
+            btn.title = btn.disabled ? 'Profile switching is locked until the Self-Control Session ends' : '';
             btn.className = `ft-profile-dropdown-item${id === current ? ' is-active' : ''}${locked ? ' is-locked' : ''}${isChild ? ' is-child' : ''}`;
             btn.setAttribute('role', 'option');
             btn.setAttribute('aria-selected', id === current ? 'true' : 'false');
@@ -1734,6 +1905,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function switchToProfile(nextProfileId) {
         if (isHandlingProfileSwitch) return;
+        if (popupSelfControlSessionState?.active === true) {
+            UIComponents.showToast('Profile switching is locked until the Self-Control Session ends', 'error');
+            return;
+        }
         const targetId = normalizeString(nextProfileId);
         if (!targetId) return;
 
@@ -1788,6 +1963,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Load initial settings
     await StateManager.loadSettings();
+    await refreshPopupManagedTimeStatus();
+    setInterval(() => {
+        refreshPopupManagedTimeStatus().catch(() => {});
+    }, 1000);
 
     // Apply theme immediately after loading
     const state = StateManager.getState();
@@ -1829,20 +2008,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     // RENDERING (using RenderEngine)
     // ============================================================================
 
+    function getPopupRuleTarget() {
+        return StateManager.getState()?.mode === 'whitelist' ? 'allow' : 'block';
+    }
+
+    function buildPopupMainRuleTargetState(target) {
+        return {
+            ...StateManager.getState(),
+            mode: target === 'allow' ? 'whitelist' : 'blocklist'
+        };
+    }
+
     function renderKeywords() {
         if (!keywordList) return;
+        const targetList = getPopupRuleTarget();
         RenderEngine.renderKeywordList(keywordList, {
             minimal: true,
             showSearch: true,
             showSort: false,
             searchValue: keywordSearchValue,
             sortValue: 'newest',
-            profile: popupActiveProfileType === 'kids' ? 'kids' : 'main'
+            profile: popupActiveProfileType === 'kids' ? 'kids' : 'main',
+            stateOverride: popupActiveProfileType === 'kids'
+                ? null
+                : buildPopupMainRuleTargetState(targetList),
+            onDelete: popupActiveProfileType === 'kids'
+                ? null
+                : (entry) => StateManager.removeKeyword(entry.word, { targetList }),
+            onToggleExact: popupActiveProfileType === 'kids'
+                ? null
+                : (entry) => StateManager.toggleKeywordExact(entry.word, { targetList }),
+            onToggleComments: popupActiveProfileType === 'kids'
+                ? null
+                : (entry) => StateManager.toggleKeywordComments(entry.word, { targetList })
         });
     }
 
     function renderChannels() {
         if (!channelListEl) return;
+        const targetList = getPopupRuleTarget();
         RenderEngine.renderChannelList(channelListEl, {
             minimal: true,
             showSearch: true,
@@ -1850,7 +2054,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             showNodeMapping: false,
             searchValue: channelSearchValue,
             sortValue: 'newest',
-            profile: popupActiveProfileType === 'kids' ? 'kids' : 'main'
+            profile: popupActiveProfileType === 'kids' ? 'kids' : 'main',
+            stateOverride: popupActiveProfileType === 'kids'
+                ? null
+                : buildPopupMainRuleTargetState(targetList),
+            onDelete: popupActiveProfileType === 'kids'
+                ? null
+                : (channel, index) => StateManager.removeChannel(index, { targetList })
         });
     }
 
@@ -1976,7 +2186,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const success = popupActiveProfileType === 'kids'
                 ? await StateManager.addKidsKeyword(word)
-                : await StateManager.addKeyword(word);
+                : await StateManager.addKeyword(word, {
+                    targetList: getPopupRuleTarget()
+                });
             if (success) {
                 if (newKeywordInput) newKeywordInput.value = '';
                 UIComponents.flashButtonSuccess(addKeywordBtn, 'Added!', 1200);
@@ -2005,7 +2217,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             try {
                 const result = popupActiveProfileType === 'kids'
                     ? await StateManager.addKidsChannel(input)
-                    : await StateManager.addChannel(input);
+                    : await StateManager.addChannel(input, {
+                        targetList: getPopupRuleTarget()
+                    });
 
                 if (result.success) {
                     if (channelInput) channelInput.value = '';

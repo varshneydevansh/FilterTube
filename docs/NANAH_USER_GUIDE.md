@@ -14,7 +14,7 @@ FilterTube does **not** need a central sync account to read your settings.
 
 ## The easiest way to think about it
 
-There are only three normal ways to use Nanah:
+There are three things you can move, and three safe delivery paths.
 
 ### 1. Send this profile once
 
@@ -76,6 +76,24 @@ It is **not** meant to be where your FilterTube settings live.
 
 After the secure handshake, the real settings payload is meant to move directly between your devices.
 
+## Send to a saved device
+
+After the first pairing and safety-phrase check, Accounts & Sync shows the verified devices as a simple horizontal device picker:
+
+1. Choose the protected device.
+2. Review its bound profile and delivery status.
+3. Press `Send update`.
+
+An explicit device send uses one path only. FilterTube shows only the paths currently available for that verified device:
+
+1. **Send Now** — direct live transfer when both verified devices are connected.
+2. **Home Pickup** — the configured same-network service.
+3. **Send for Later** — an encrypted Internet Pickup update when the device is away or opens later.
+
+This is similar to choosing a recipient in a file-sharing app, but it is not an open torrent swarm. FilterTube never treats network visibility as permission, and it never sends one device's update to unrelated peers.
+
+The browser cannot deliver directly to a device that is offline. Internet Pickup therefore stores only an encrypted, signed envelope until the already-verified device checks in. The provider cannot read the rules, choose a profile, grant itself trust, or apply the update.
+
 If you want to inspect the public relay endpoint yourself, open:
 
 - [https://nanah-signaling.varshney-devansh614.workers.dev/](https://nanah-signaling.varshney-devansh614.workers.dev/)
@@ -83,13 +101,13 @@ If you want to inspect the public relay endpoint yourself, open:
 
 ## What FilterTube does not need
 
-FilterTube does not need:
+For live device-to-device transfer, FilterTube does not need:
 
 - a central sync account
-- a cloud copy of your Nanah settings
+- a readable cloud copy of your Nanah settings
 - a server in the middle reading your lists
 
-The goal is device-to-device transfer, not account-based data collection.
+The goal is device-to-device transfer, with encrypted store-and-forward only when a verified device must collect an update later.
 
 ## What trust means
 

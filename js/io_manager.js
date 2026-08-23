@@ -204,7 +204,9 @@
         const exact = entry?.exact === true ? '1' : '0';
         const comments = entry?.comments === false ? '0' : '1';
         const semantic = entry?.semantic === true ? '1' : '0';
-        return `${word}|${exact}|${comments}|${semantic}`;
+        const matchMode = entry?.matchMode === 'regex' ? 'regex' : 'literal';
+        const regexFlags = matchMode === 'regex' ? normalizeString(entry?.regexFlags) : '';
+        return `${word}|${exact}|${comments}|${semantic}|${matchMode}|${regexFlags}`;
     }
 
     /**
@@ -253,6 +255,12 @@
             source,
             channelRef,
             comments,
+            matchMode: entry?.matchMode === 'regex' ? 'regex' : 'literal',
+            regexFlags: entry?.matchMode === 'regex' && /^[gimsuy]*$/.test(normalizeString(entry?.regexFlags))
+                ? normalizeString(entry.regexFlags)
+                : '',
+            scope: ['title', 'channel_name', 'comment'].includes(entry?.scope) ? entry.scope : null,
+            ...(entry?.modeBootstrapCopy === true ? { modeBootstrapCopy: true } : {}),
             addedAt
         };
     }
@@ -508,6 +516,7 @@
             ...(typeof entry.managedListLastCheckedAt === 'number' && Number.isFinite(entry.managedListLastCheckedAt) ? { managedListLastCheckedAt: entry.managedListLastCheckedAt } : {}),
             ...(normalizeString(entry.managedListContentHash) ? { managedListContentHash: normalizeString(entry.managedListContentHash) } : {}),
             ...(entry.managedListPaused === true ? { managedListPaused: true } : {}),
+            ...(entry.modeBootstrapCopy === true ? { modeBootstrapCopy: true } : {}),
             ...(collaborationGroupId ? { collaborationGroupId } : {}),
             ...(Array.isArray(collaborationWith) ? { collaborationWith } : {}),
             ...(Array.isArray(allCollaborators) ? { allCollaborators } : {})
@@ -532,13 +541,135 @@
             if (!STORAGE_NAMESPACE) return resolve({ ok: false });
             try {
                 STORAGE_NAMESPACE.set(payload, () => {
-                    const err = chrome?.runtime?.lastError || null;
+                    const err = runtimeAPI?.runtime?.lastError || null;
                     resolve({ ok: !err, error: err });
                 });
             } catch (e) {
                 resolve({ ok: false, error: e });
             }
         });
+    }
+
+    async function removeStorage(keys) {
+        const normalizedKeys = safeArray(keys).filter(key => typeof key === 'string' && key);
+        if (!normalizedKeys.length) return { ok: true };
+        return new Promise((resolve) => {
+            if (!STORAGE_NAMESPACE || typeof STORAGE_NAMESPACE.remove !== 'function') {
+                return resolve({ ok: false, error: new Error('Extension storage remove is unavailable') });
+            }
+            try {
+                STORAGE_NAMESPACE.remove(normalizedKeys, () => {
+                    const err = runtimeAPI?.runtime?.lastError || null;
+                    resolve({ ok: !err, error: err });
+                });
+            } catch (e) {
+                resolve({ ok: false, error: e });
+            }
+        });
+    }
+
+    function storageErrorMessage(result, label = 'Storage write') {
+        const message = normalizeString(result?.error?.message)
+            || normalizeString(result?.error)
+            || 'the browser rejected the update';
+        return `${label} failed: ${message}`;
+    }
+
+    function requireStorageSuccess(result, label) {
+        if (!result || result.ok !== true) {
+            throw new Error(storageErrorMessage(result, label));
+        }
+        return result;
+    }
+
+    async function getStorageBytesInUse() {
+        if (!STORAGE_NAMESPACE || typeof STORAGE_NAMESPACE.getBytesInUse !== 'function') return null;
+        return new Promise((resolve) => {
+            try {
+                const maybePromise = STORAGE_NAMESPACE.getBytesInUse(null, (bytes) => {
+                    const err = runtimeAPI?.runtime?.lastError || null;
+                    resolve(err ? null : (Number.isFinite(Number(bytes)) ? Number(bytes) : null));
+                });
+                if (maybePromise && typeof maybePromise.then === 'function') {
+                    maybePromise
+                        .then(bytes => resolve(Number.isFinite(Number(bytes)) ? Number(bytes) : null))
+                        .catch(() => resolve(null));
+                }
+            } catch (e) {
+                resolve(null);
+            }
+        });
+    }
+
+    function jsonByteLength(value) {
+        const serialized = JSON.stringify(value == null ? null : value);
+        if (typeof TextEncoder !== 'undefined') {
+            return new TextEncoder().encode(serialized).length;
+        }
+        try {
+            return unescape(encodeURIComponent(serialized)).length;
+        } catch (e) {
+            return serialized.length;
+        }
+    }
+
+    function hasUnlimitedStoragePermission() {
+        try {
+            const permissions = safeArray(runtimeAPI?.runtime?.getManifest?.()?.permissions);
+            return permissions.includes('unlimitedStorage');
+        } catch (e) {
+            return false;
+        }
+    }
+
+    async function buildImportStoragePreflight(json, parsed) {
+        const storageBytesBefore = await getStorageBytesInUse();
+        const normalizedRuleBytes = jsonByteLength({
+            channels: parsed.mainChannels,
+            keywords: parsed.mainKeywords,
+            videoIds: parsed.profilesV3?.main?.videoIds,
+            kids: parsed.profilesV3?.kids
+        });
+        const sourceBytes = jsonByteLength(json);
+        // The current runtime keeps canonical profile data plus compatibility
+        // and compiled indexes. Use a conservative estimate before mutating so
+        // browsers with the default quota fail clearly instead of half-importing.
+        const estimatedAdditionalBytes = Math.max(sourceBytes, normalizedRuleBytes * 4) + (256 * 1024);
+        const quotaBytes = Number(STORAGE_NAMESPACE?.QUOTA_BYTES) || null;
+        const unlimitedStorage = hasUnlimitedStoragePermission();
+
+        if (
+            !unlimitedStorage
+            && quotaBytes
+            && storageBytesBefore != null
+            && storageBytesBefore + estimatedAdditionalBytes > quotaBytes
+        ) {
+            throw new Error(
+                `Import needs about ${Math.ceil(estimatedAdditionalBytes / 1024)} KB of working storage, `
+                + `but only ${Math.max(0, Math.floor((quotaBytes - storageBytesBefore) / 1024))} KB remains`
+            );
+        }
+
+        return {
+            sourceBytes,
+            normalizedRuleBytes,
+            estimatedAdditionalBytes,
+            storageBytesBefore,
+            quotaBytes,
+            unlimitedStorage
+        };
+    }
+
+    async function restoreStorageSnapshot(snapshot) {
+        const safeSnapshot = safeObject(snapshot);
+        const current = await readStorage(null);
+        const extraKeys = Object.keys(safeObject(current)).filter(
+            key => !Object.prototype.hasOwnProperty.call(safeSnapshot, key)
+        );
+        if (extraKeys.length) {
+            requireStorageSuccess(await removeStorage(extraKeys), 'Import rollback cleanup');
+        }
+        requireStorageSuccess(await writeStorage(safeSnapshot), 'Import rollback restore');
     }
 
     /**
@@ -898,13 +1029,11 @@
         out.keywords = safeArray(out.keywords);
         out.whitelistChannels = safeArray(out.whitelistChannels);
         out.whitelistKeywords = safeArray(out.whitelistKeywords);
-        if (mode === 'blocklist') {
-            out.blockedChannels = out.channels;
-            out.blockedKeywords = out.keywords;
-        } else {
-            out.blockedChannels = [];
-            out.blockedKeywords = [];
-        }
+        // Block rules remain active exclusions in allow-only mode and allow
+        // rules remain active exceptions in block mode. Aliases therefore
+        // always describe the same preserved block arrays.
+        out.blockedChannels = out.channels;
+        out.blockedKeywords = out.keywords;
         return out;
     }
 
@@ -945,7 +1074,90 @@
      */
     function parseBlockTube(data) {
         const filterData = safeObject(data.filterData);
+        const options = safeObject(data.options);
         const now = nowTs();
+        const migrationReport = {
+            format: 'blocktube',
+            recognized: [],
+            translated: [],
+            inactive: [],
+            unsupported: [],
+            invalid: [],
+            unknown: []
+        };
+
+        const knownFilterFields = new Set([
+            'title', 'channelName', 'channelId', 'videoId', 'comment',
+            'vidLength', 'javascript', 'percentWatchedHide'
+        ]);
+        const knownOptionFields = new Set([
+            'trending', 'mixes', 'shorts', 'movies', 'suggestions_only',
+            'autoplay', 'enable_javascript', 'block_message', 'block_feedback',
+            'disable_db_normalize', 'disable_you_there', 'disable_on_history',
+            'vidLength_type', 'percent_watched_hide'
+        ]);
+        Object.keys(filterData).forEach(key => {
+            if (!knownFilterFields.has(key)) migrationReport.unknown.push(`filterData.${key}`);
+        });
+        Object.keys(options).forEach(key => {
+            if (!knownOptionFields.has(key)) migrationReport.unknown.push(`options.${key}`);
+        });
+        Object.keys(safeObject(data)).forEach(key => {
+            if (!['filterData', 'options', 'uiTheme', 'uiPass'].includes(key)) {
+                migrationReport.unknown.push(key);
+            }
+        });
+
+        const parseRegexRow = (raw, field) => {
+            const value = normalizeString(raw);
+            const match = value.match(/^\/((?:\\.|[^/])+)\/([gimsuy]*)$/);
+            if (!match) return null;
+            const pattern = match[1];
+            const flags = match[2] || 'i';
+            if (pattern.length > 512 || /(\([^)]*[+*][^)]*\))[+*{]/.test(pattern)) {
+                migrationReport.invalid.push({ field, value, reason: 'regex_too_complex' });
+                return { invalid: true };
+            }
+            try {
+                new RegExp(pattern, flags);
+            } catch (e) {
+                migrationReport.invalid.push({ field, value, reason: 'invalid_regex' });
+                return { invalid: true };
+            }
+            return { pattern, flags };
+        };
+
+        const buildBlockTubeKeyword = (raw, scope, comments) => {
+            const value = normalizeString(raw);
+            if (!value || value.startsWith('//')) return null;
+            const parsedRegex = parseRegexRow(value, `filterData.${scope === 'comment' ? 'comment' : 'title'}`);
+            if (parsedRegex?.invalid) return null;
+            if (parsedRegex) {
+                migrationReport.translated.push({ field: `filterData.${scope === 'comment' ? 'comment' : 'title'}`, treatment: 'validated_regex' });
+                return {
+                    word: parsedRegex.pattern,
+                    exact: false,
+                    comments,
+                    semantic: false,
+                    matchMode: 'regex',
+                    regexFlags: parsedRegex.flags,
+                    scope,
+                    source: 'import',
+                    addedAt: now
+                };
+            }
+            return {
+                word: value,
+                exact: true,
+                comments,
+                semantic: false,
+                matchMode: 'literal',
+                regexFlags: '',
+                scope,
+                source: 'import',
+                addedAt: now
+            };
+        };
 
         const channels = [];
         let pendingName = null;
@@ -974,6 +1186,13 @@
         for (const raw of safeArray(filterData.channelName)) {
             const name = normalizeString(raw);
             if (!name || name.startsWith('//')) continue;
+            const parsedRegex = parseRegexRow(name, 'filterData.channelName');
+            if (parsedRegex) {
+                if (!parsedRegex.invalid) {
+                    migrationReport.inactive.push({ field: 'filterData.channelName', value: name, reason: 'channel_name_regex_has_no_safe_channel_identity_equivalent' });
+                }
+                continue;
+            }
             channels.push({
                 id: '',
                 name,
@@ -987,16 +1206,12 @@
 
         const keywords = [];
         for (const raw of safeArray(filterData.title)) {
-            const word = normalizeString(raw);
-            if (!word || word.startsWith('//')) continue;
-            keywords.push({
-                word,
-                exact: false,
-                comments: false,
-                semantic: false,
-                source: 'import',
-                addedAt: now
-            });
+            const entry = buildBlockTubeKeyword(raw, 'title', false);
+            if (entry) keywords.push(entry);
+        }
+        for (const raw of safeArray(filterData.comment)) {
+            const entry = buildBlockTubeKeyword(raw, 'comment', true);
+            if (entry) keywords.push(entry);
         }
 
         const videoIds = [];
@@ -1006,13 +1221,75 @@
             videoIds.push(vid);
         }
 
+        const durationValues = safeArray(filterData.vidLength);
+        const minSeconds = Number.isFinite(Number(durationValues[0])) ? Number(durationValues[0]) : null;
+        const maxSeconds = Number.isFinite(Number(durationValues[1])) ? Number(durationValues[1]) : null;
+        let durationFilter = null;
+        if (minSeconds !== null || maxSeconds !== null) {
+            if (options.vidLength_type === 'block' && minSeconds !== null && maxSeconds !== null) {
+                durationFilter = {
+                    enabled: true,
+                    condition: 'between',
+                    minMinutes: minSeconds / 60,
+                    maxMinutes: maxSeconds / 60,
+                    value: ''
+                };
+                migrationReport.translated.push({ field: 'filterData.vidLength', treatment: 'seconds_to_minutes_block_between' });
+            } else {
+                migrationReport.unsupported.push({ field: 'filterData.vidLength', reason: 'allow_between_or_open_bound_has_no_exact_duration_equivalent' });
+            }
+        }
+
+        const directOptionMappings = [
+            ['trending', 'hideExploreTrending'],
+            ['mixes', 'hideMixPlaylists'],
+            ['shorts', 'hideShorts']
+        ];
+        const mainSettings = {};
+        for (const [sourceKey, targetKey] of directOptionMappings) {
+            if (Object.prototype.hasOwnProperty.call(options, sourceKey)) {
+                mainSettings[targetKey] = options[sourceKey] === true;
+                migrationReport.recognized.push({ field: `options.${sourceKey}`, destination: targetKey });
+            }
+        }
+        if (durationFilter) {
+            mainSettings.contentFilters = { duration: durationFilter };
+        }
+
+        for (const key of ['movies', 'suggestions_only', 'autoplay', 'block_feedback', 'disable_db_normalize', 'disable_you_there', 'disable_on_history', 'percent_watched_hide']) {
+            if (Object.prototype.hasOwnProperty.call(options, key)) {
+                migrationReport.unsupported.push({ field: `options.${key}`, reason: 'no_safe_exact_equivalent' });
+            }
+        }
+        if (Object.prototype.hasOwnProperty.call(filterData, 'percentWatchedHide')) {
+            migrationReport.unsupported.push({ field: 'filterData.percentWatchedHide', reason: 'no_watched_percentage_filter' });
+        }
+        const importedJavascript = Array.isArray(filterData.javascript)
+            ? filterData.javascript.map(value => normalizeString(value)).filter(Boolean).join('\n')
+            : normalizeString(filterData.javascript);
+        if (importedJavascript || options.enable_javascript === true) {
+            migrationReport.inactive.push({ field: 'filterData.javascript', reason: 'arbitrary_javascript_quarantined_and_never_executed' });
+        }
+        if (Object.prototype.hasOwnProperty.call(data, 'uiPass')) {
+            migrationReport.inactive.push({ field: 'uiPass', reason: 'never_imported_as_filtertube_pin' });
+        }
+        if (Object.prototype.hasOwnProperty.call(data, 'uiTheme')) {
+            migrationReport.inactive.push({ field: 'uiTheme', reason: 'optional_preference_not_applied_by_rule_import' });
+        }
+        if (Object.prototype.hasOwnProperty.call(options, 'block_message')) {
+            migrationReport.inactive.push({ field: 'options.block_message', reason: 'custom_overlay_copy_not_enabled' });
+        }
+
         return {
             ok: true,
             version: 0,
-            theme: 'light',
-            mainSettings: {},
+            // BlockTube theme migration is review-only. Do not overwrite the
+            // user's current FilterTube theme as a side effect of importing rules.
+            theme: null,
+            mainSettings,
             mainChannels: channels,
             mainKeywords: keywords,
+            migrationReport,
             channelMap: {},
             profilesV3: {
                 main: {
@@ -1034,6 +1311,25 @@
                     subscriptions: []
                 }
             }
+        };
+    }
+
+    function previewBlockTubeMigration(data) {
+        if (detectFormat(data) !== 'blocktube') {
+            return { ok: false, error: 'Not a BlockTube backup' };
+        }
+        const parsed = parseBlockTube(data);
+        return {
+            ok: parsed.ok === true,
+            counts: {
+                channels: safeArray(parsed.mainChannels).length,
+                keywords: safeArray(parsed.mainKeywords).filter(entry => entry?.scope !== 'comment').length,
+                comments: safeArray(parsed.mainKeywords).filter(entry => entry?.scope === 'comment').length,
+                regex: safeArray(parsed.mainKeywords).filter(entry => entry?.matchMode === 'regex').length,
+                videoIds: safeArray(parsed.profilesV3?.main?.videoIds).length,
+                mappedOptions: Object.keys(safeObject(parsed.mainSettings)).length
+            },
+            report: parsed.migrationReport
         };
     }
 
@@ -1087,6 +1383,7 @@
                     hideEndscreenVideowall: !!mainSettings?.hideEndscreenVideowall,
                     hideEndscreenCards: !!mainSettings?.hideEndscreenCards,
                     disableAutoplay: !!mainSettings?.disableAutoplay,
+                    alwaysUseOriginalAudio: !!mainSettings?.alwaysUseOriginalAudio,
                     disableAnnotations: !!mainSettings?.disableAnnotations,
                     hideTopHeader: !!mainSettings?.hideTopHeader,
                     hideNotificationBell: !!mainSettings?.hideNotificationBell,
@@ -1370,6 +1667,7 @@
         } catch (e) {
             localProfilesV4 = null;
         }
+        const localProfilesV4BeforeImport = JSON.parse(JSON.stringify(localProfilesV4 || {}));
         const localActiveId = normalizeString(localProfilesV4?.activeProfileId) || DEFAULT_PROFILE_ID;
         const effectiveScope = resolveProfileScope(scope, localActiveId);
         const requestedTargetProfileId = normalizeString(targetProfileId);
@@ -1530,18 +1828,37 @@
             hideEndscreenVideowall: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'hideEndscreenVideowall') ? !!mainSettingsOverrides.hideEndscreenVideowall : current.hideEndscreenVideowall,
             hideEndscreenCards: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'hideEndscreenCards') ? !!mainSettingsOverrides.hideEndscreenCards : current.hideEndscreenCards,
             disableAutoplay: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'disableAutoplay') ? !!mainSettingsOverrides.disableAutoplay : current.disableAutoplay,
+            alwaysUseOriginalAudio: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'alwaysUseOriginalAudio') ? !!mainSettingsOverrides.alwaysUseOriginalAudio : current.alwaysUseOriginalAudio,
             disableAnnotations: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'disableAnnotations') ? !!mainSettingsOverrides.disableAnnotations : current.disableAnnotations,
             hideTopHeader: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'hideTopHeader') ? !!mainSettingsOverrides.hideTopHeader : current.hideTopHeader,
             hideNotificationBell: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'hideNotificationBell') ? !!mainSettingsOverrides.hideNotificationBell : current.hideNotificationBell,
             hideExploreTrending: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'hideExploreTrending') ? !!mainSettingsOverrides.hideExploreTrending : current.hideExploreTrending,
             hideMoreFromYouTube: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'hideMoreFromYouTube') ? !!mainSettingsOverrides.hideMoreFromYouTube : current.hideMoreFromYouTube,
             hideSubscriptions: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'hideSubscriptions') ? !!mainSettingsOverrides.hideSubscriptions : current.hideSubscriptions,
-            hideSearchShelves: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'hideSearchShelves') ? !!mainSettingsOverrides.hideSearchShelves : current.hideSearchShelves
+            hideSearchShelves: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'hideSearchShelves') ? !!mainSettingsOverrides.hideSearchShelves : current.hideSearchShelves,
+            contentFilters: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'contentFilters')
+                ? {
+                    ...safeObject(current.contentFilters),
+                    ...safeObject(mainSettingsOverrides.contentFilters)
+                }
+                : current.contentFilters
         };
 
-        const result = shouldImportIntoSeparateProfile
-            ? { compiledSettings: null, error: null, skipped: true }
-            : await SettingsAPI.saveSettings(payload);
+        const storageSnapshot = JSON.parse(JSON.stringify(await readStorage(null)));
+        const storagePreflight = await buildImportStoragePreflight(json, parsed);
+        let importMutationStarted = false;
+        let importedTargetProfileId = effectiveLocalTargetId;
+        let result = null;
+        let restoredNanahState = false;
+
+        try {
+            importMutationStarted = true;
+            result = shouldImportIntoSeparateProfile
+                ? { compiledSettings: null, error: null, skipped: true }
+                : await SettingsAPI.saveSettings(payload);
+            if (result?.error) {
+                throw new Error(storageErrorMessage({ ok: false, error: result.error }, 'Compiled settings write'));
+            }
 
         const incomingApplyKidsRulesOnMain = incomingV4Settings
             ? !!incomingV4Settings.syncKidsToMain
@@ -1611,14 +1928,14 @@
                 }
             };
 
-            await saveProfilesV3(nextProfiles);
+            requireStorageSuccess(await saveProfilesV3(nextProfiles), 'Legacy profile compatibility write');
 
             nextKidsBlockedChannelsForV4 = safeArray(nextProfiles.kids.blockedChannels);
             nextKidsBlockedKeywordsForV4 = safeArray(nextProfiles.kids.blockedKeywords);
             nextKidsStrictModeForV4 = nextProfiles.kids.strictMode !== false;
         }
 
-        try {
+        {
             let profilesV4 = localProfilesV4 || await loadProfilesV4();
             let nextV4 = profilesV4;
 
@@ -1699,6 +2016,7 @@
                 || (shouldImportIntoSeparateProfile
                 ? importingProfileId
                 : activeId);
+            importedTargetProfileId = targetProfileId;
 
             const targetProfile = (profiles[targetProfileId] && typeof profiles[targetProfileId] === 'object')
                 ? profiles[targetProfileId]
@@ -1738,6 +2056,11 @@
                 ? v4MainWhitelistKeywords
                 : mergeKeywordLists(safeArray(targetMain.whitelistKeywords), v4MainWhitelistKeywords);
 
+            const incomingMainVideoIds = safeArray(parsed.profilesV3?.main?.videoIds);
+            const desiredMainVideoIds = strategy === 'replace'
+                ? mergeStringList([], incomingMainVideoIds)
+                : mergeStringList(safeArray(targetMain.videoIds || targetMain.blockedVideoIds), incomingMainVideoIds);
+
             const desiredKidsWhitelistChannels = strategy === 'replace'
                 ? v4KidsWhitelistChannels
                 : mergeChannelLists(safeArray(targetKids.whitelistChannels), v4KidsWhitelistChannels);
@@ -1768,7 +2091,10 @@
                     channels: targetNextChannels,
                     keywords: targetNextKeywords,
                     whitelistChannels: safeArray(desiredMainWhitelistChannels),
-                    whitelistKeywords: safeArray(desiredMainWhitelistKeywords)
+                    whitelistKeywords: safeArray(desiredMainWhitelistKeywords),
+                    videoIds: desiredMainVideoIds,
+                    blockedVideoIds: desiredMainVideoIds,
+                    allowedVideoIds: safeArray(targetMain.allowedVideoIds)
                 }),
                 kids: {
                     ...targetKids,
@@ -1777,18 +2103,19 @@
                     blockedChannels: safeArray(desiredKidsBlockedChannels),
                     blockedKeywords: safeArray(desiredKidsBlockedKeywords),
                     whitelistChannels: safeArray(desiredKidsWhitelistChannels),
-                    whitelistKeywords: safeArray(desiredKidsWhitelistKeywords)
+                    whitelistKeywords: safeArray(desiredKidsWhitelistKeywords),
+                    videoIds: strategy === 'replace'
+                        ? mergeStringList([], safeArray(parsed.profilesV3?.kids?.videoIds))
+                        : mergeStringList(safeArray(targetKids.videoIds), safeArray(parsed.profilesV3?.kids?.videoIds))
                 }
             };
 
-            await saveProfilesV4({
+            requireStorageSuccess(await saveProfilesV4({
                 ...nextV4,
                 schemaVersion: 4,
                 activeProfileId: writeActiveId,
                 profiles
-            });
-        } catch (e) {
-            console.warn('FilterTube: importV3 failed to sync ftProfilesV4', e);
+            }), 'Active profile write');
         }
 
         if (shouldTouchLegacyV3 && parsed.theme && SettingsAPI.setThemePreference) {
@@ -1799,10 +2126,9 @@
         }
 
         if (Object.keys(nextChannelMap).length > 0) {
-            await writeStorage({ channelMap: nextChannelMap });
+            requireStorageSuccess(await writeStorage({ channelMap: nextChannelMap }), 'Channel identity map write');
         }
 
-        let restoredNanahState = false;
         if (
             incomingNanahState
             && auth?.restoreTrustedNanahState === true
@@ -1833,11 +2159,83 @@
             if (incomingNanahState.deviceId) {
                 nanahPayload[NANAH_DEVICE_ID_KEY] = incomingNanahState.deviceId;
             }
-            await writeStorage(nanahPayload);
+            requireStorageSuccess(await writeStorage(nanahPayload), 'Trusted-device recovery write');
             restoredNanahState = true;
         }
 
-        return { ok: true, result, restoredNanahState };
+        const persistedProfilesV4 = await loadProfilesV4();
+        const persistedTarget = safeObject(safeObject(persistedProfilesV4?.profiles)[importedTargetProfileId]);
+        const persistedMain = safeObject(persistedTarget.main);
+        const persistedChannelKeys = new Set(safeArray(persistedMain.channels).map(channelKey));
+        const persistedKeywordKeys = new Set(safeArray(persistedMain.keywords).map(keywordKey));
+        const persistedVideoIds = new Set(safeArray(persistedMain.videoIds || persistedMain.blockedVideoIds).map(normalizeString));
+        const missingChannels = safeArray(parsedMainChannels).filter(entry => !persistedChannelKeys.has(channelKey(entry)));
+        const missingKeywords = safeArray(parsedMainKeywords).filter(entry => !persistedKeywordKeys.has(keywordKey(entry)));
+        const missingVideoIds = safeArray(parsed.profilesV3?.main?.videoIds)
+            .map(normalizeString)
+            .filter(videoId => videoId && !persistedVideoIds.has(videoId));
+
+        if (missingChannels.length || missingKeywords.length || missingVideoIds.length) {
+            throw new Error(
+                `Import verification failed: ${missingChannels.length} channels, `
+                + `${missingKeywords.length} keywords, and ${missingVideoIds.length} video IDs were not persisted`
+            );
+        }
+
+        const beforeTarget = safeObject(safeObject(localProfilesV4BeforeImport?.profiles)[importedTargetProfileId]);
+        const beforeMain = safeObject(beforeTarget.main);
+        const beforeChannelKeys = new Set(safeArray(beforeMain.channels).map(channelKey));
+        const beforeKeywordKeys = new Set(safeArray(beforeMain.keywords).map(keywordKey));
+        const beforeVideoIds = new Set(safeArray(beforeMain.videoIds || beforeMain.blockedVideoIds).map(normalizeString));
+        const incomingUniqueChannelKeys = new Set(safeArray(parsedMainChannels).map(channelKey));
+        const incomingUniqueKeywordKeys = new Set(safeArray(parsedMainKeywords).map(keywordKey));
+        const incomingUniqueVideoIds = new Set(safeArray(parsed.profilesV3?.main?.videoIds).map(normalizeString).filter(Boolean));
+        const addedChannels = Array.from(incomingUniqueChannelKeys).filter(key => !beforeChannelKeys.has(key)).length;
+        const addedKeywords = Array.from(incomingUniqueKeywordKeys).filter(key => !beforeKeywordKeys.has(key)).length;
+        const addedVideoIds = Array.from(incomingUniqueVideoIds).filter(videoId => !beforeVideoIds.has(videoId)).length;
+        const migrationReport = safeObject(parsed.migrationReport);
+        const skippedRows = safeArray(migrationReport.invalid).length
+            + safeArray(migrationReport.unsupported).length
+            + safeArray(migrationReport.unknown).length;
+        const storageBytesAfter = await getStorageBytesInUse();
+        const receipt = {
+            targetProfileId: importedTargetProfileId,
+            channels: safeArray(parsedMainChannels).length,
+            keywords: safeArray(parsedMainKeywords).filter(entry => entry?.scope !== 'comment').length,
+            comments: safeArray(parsedMainKeywords).filter(entry => entry?.scope === 'comment').length,
+            regex: safeArray(parsedMainKeywords).filter(entry => entry?.matchMode === 'regex').length,
+            videoIds: safeArray(parsed.profilesV3?.main?.videoIds).length,
+            addedChannels,
+            addedKeywords,
+            addedVideoIds,
+            duplicateChannels: Math.max(0, incomingUniqueChannelKeys.size - addedChannels),
+            duplicateKeywords: Math.max(0, incomingUniqueKeywordKeys.size - addedKeywords),
+            duplicateVideoIds: Math.max(0, incomingUniqueVideoIds.size - addedVideoIds),
+            skippedRows,
+            storageBytesBefore: storagePreflight.storageBytesBefore,
+            storageBytesAfter,
+            sourceBytes: storagePreflight.sourceBytes,
+            verified: true
+        };
+
+        return {
+            ok: true,
+            result,
+            restoredNanahState,
+            migrationReport: parsed.migrationReport || null,
+            receipt
+        };
+        } catch (error) {
+            if (importMutationStarted) {
+                try {
+                    await restoreStorageSnapshot(storageSnapshot);
+                } catch (rollbackError) {
+                    const rollbackMessage = normalizeString(rollbackError?.message) || 'unknown rollback failure';
+                    throw new Error(`${normalizeString(error?.message) || 'Import failed'}; rollback also failed: ${rollbackMessage}`);
+                }
+            }
+            throw error;
+        }
     }
 
     async function exportV3Encrypted({ scope = 'auto', password = '', auth = null, includeTrustedNanahState = false } = {}) {
@@ -2132,6 +2530,7 @@
         exportV3Encrypted,
         importV3,
         importV3Encrypted,
+        previewBlockTubeMigration,
         loadProfilesV3,
         saveProfilesV3,
         loadProfilesV4,

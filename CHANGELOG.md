@@ -2,12 +2,54 @@
 
 ## Unreleased — Category Filtering Reliability And UI
 
+### Direct access and protected time
+
+- **Self-Control Session**: any active profile can start a voluntary 30/60/120-minute or custom commitment session that enables and snapshots its current filters, pins that profile, blocks rule/mode/import/settings changes, and exposes no early-cancel action until the persisted deadline expires.
+- **Background-owned strict enforcement**: popup and dashboard disabling are presentation only; the background restores the pinned profile snapshot if a stale page, import, sync path, or other extension mutation attempts to change it. The popup and dashboard show the same countdown after browser restarts.
+- **Honest browser boundary**: unmanaged browser owners can still disable/uninstall an extension or clear its data. FilterTube documents this limitation instead of describing the voluntary session as an operating-system-level lock.
+- **Account-profile timer activation**: a valid daily limit now follows whichever profile is active, including `Default (Master)` and other account profiles. Previously the dashboard could save `2m/day` on an account profile while runtime silently discarded it as non-child.
+- **Playlist direct-access behavior**: when the selected Watch/playlist item is blocked, FilterTube keeps it paused and advances to the next allowed queue item when one exists. With no allowed successor, the blocked state remains.
+- **External-site boundary**: ordinary YouTube links on Google or other websites remain visible. The direct-access gate applies after navigation reaches YouTube, while matching `youtube.com/embed/` and `youtube-nocookie.com/embed/` frames are guarded in place. Removing external-page links remains a separate opt-in permission surface.
+- **Full-page serene timeout**: any exhausted active profile now sees a stable, responsive full-page pause surface using FilterTube's serene landscape, real FilterTube mark, and About-page editorial typography instead of a small utility card.
+- **Profile-safe escape path**: the timeout surface offers an in-page **Switch profile** picker and retains the destination profile's normal PIN check. The exhausted profile cannot dismiss the lock, approve itself, or resume underlying playback.
+- **Profile-neutral language**: the timeout explains that the active profile used its own YouTube allowance; it no longer incorrectly describes every account or protected-profile limit as parent-managed time.
+- **Visible remaining time**: the popup shows the active profile's exact remaining daily YouTube time and updates it while the popup stays open.
+- **Playback-aware accounting**: actively playing YouTube video consumes the daily allowance even when DevTools, FilterTube settings, or another window temporarily has focus. Competing tabs cannot keep a stale usage owner alive.
+- **Per-profile accounting preserved**: each profile with a configured limit keeps its own daily policy, timezone day, usage, and parent grant. Switching profiles re-evaluates the destination profile instead of carrying over the exhausted profile's timer.
+- **Stable enforcement presentation**: the timeout background is excluded from content-video pausing, page video play events are rejected while timed out, repeated heartbeats reuse the existing screen instead of rebuilding it, and reduced-motion users receive a static scenic treatment.
+
+### Clear keyword and channel rule editing
+
+- **Full-tab rule collection browser**: Main and YouTube Kids now present `Blocked rules` and `Allowed rules` as views of two independent saved collections. Switching the view never switches the active filtering mode, and Kids rules remain separate from Main.
+- **Non-destructive mode flip**: when an empty Allowed list is enabled from the top policy pill, FilterTube can copy the current blocked channels and keywords into Allowed rules as a starting point. The Blocked rules remain intact, and switching back never transfers or clears either collection. Bootstrap copies are ignored as exceptions in Block-selected mode so they cannot neutralize their retained source blocks.
+- **Individual rule ownership**: every full-tab rule row shows a `Blocked` or `Always allowed` badge and provides a `Move to…` action that transfers only that entry while preserving its saved metadata.
+- **Focused popup**: the popup no longer exposes advanced exception-list selection. The top pill uses the distinct `Blocklist` or `Whitelist` mode labels, while `Blocked rules` and `Allowed rules` remain collection views in the full Filters page.
+- **Advert Void**: the existing sponsored-content control now removes the observed YouTube Player ad plan before scheduling on Main and Kids, without creating extra requests. The guarded player-state suppression remains as a fallback for escaped adverts, but no intermediate FilterTube banner is displayed. Pre-roll, mid-roll, and post-roll fallback interruptions each receive a diagnostic session, while advert cleanup and requested-content readiness are timed separately. Inline previews and recommendation players are excluded.
+- **Advert Void on by default**: new installs enable advert removal immediately, and a one-time upgrade migration enables it for every existing profile. It remains independently user-disableable and works in both Blocklist and Whitelist modes.
+- **Faster direct Watch admission**: direct-access checks reuse the current loaded Player response and rendered Watch description before another Player API request. `Block selected` now evaluates known title/channel text immediately and lets playback continue while missing description metadata resolves in the background, without repeatedly re-pausing the same video; `Allow only selected` remains fail-closed.
+- **Responsive and accessible controls**: the segmented rule editor uses touch-sized targets, mobile stacking, visible focus treatment, and keyboard arrow navigation.
+
+### Reliable large BlockTube migration
+
+- **No false-success imports**: BlockTube and FilterTube backup imports now fail with the browser's real storage error instead of reporting completion after a rejected profile or compiled-settings write.
+- **Transactional rollback**: imports snapshot extension-local state before mutation and restore it if any compatibility, active-profile, identity-map, or trusted-device recovery write fails.
+- **Verified apply receipt**: successful BlockTube imports are read back from the selected profile and report added, duplicate, skipped, channel, keyword/comment, regex, and video-ID counts.
+- **Large local rule capacity**: browser manifests grant `unlimitedStorage` for explicitly reviewed local imports; the importer still measures current/estimated storage before mutation and performs no per-channel network fan-out.
+- **Theme isolation**: importing BlockTube rules does not silently replace the user's FilterTube theme.
+
 ### Official YouTube category filtering
 
 - **Category filtering is working end to end**: FilterTube reads the official category from `microformat.playerMicroformatRenderer.category`, preserves it in `videoMetaMap`, and applies the user's selected category mode to ordinary video cards, the current Watch video, and Watch recommendations.
 - **Independent mode selection**: Category Filters now use their own `Block selected` or `Allow only selected` mode independently of the profile's normal Blocklist/Whitelist mode.
 - **Full-page and popup controls**: the Category Filters card appears directly below Core and before Feeds in Content Controls, while the popup exposes the same enable switch, mode, selected-category summary, clear action, searchable category chips, and link to the full controls.
 - **Clear selection state**: selected category chips use explicit checked styling and accessible pressed state; the UI states whether categories are Allowed or Blocked and names the current selection.
+
+### Experimental spoken-language filtering
+
+- **Deliberately experimental**: the Language Filters card and Help entry are visibly marked Experimental because YouTube does not provide dependable spoken-language evidence for every recommendation.
+- **Lower-priority placement**: Language Filters now sits at the bottom of Main Content Controls in both the full Filters view and popup, after the stable controls.
+- **Fail-open unknowns**: a resolved language follows the selected Block/Allow-only policy, while unavailable language stays visible instead of blanking feeds, Watch, or the recommendation rail.
+- **YouTube Kids boundary**: no Kids language picker is exposed. The inspected `WEB_KIDS` Player captures contain playable audio streams but no defensible original/default-language field; the Kids Polymer bundle exposes caption-selection UI, not per-video spoken-language metadata.
 
 ### Reliable viewport hydration
 
