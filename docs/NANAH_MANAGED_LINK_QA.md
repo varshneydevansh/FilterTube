@@ -145,3 +145,29 @@ Treat Nanah managed-link changes as ready only if:
 2. no stale trusted-link data causes contradictory UI
 3. no send/apply path bypasses local unlock requirements
 4. no managed link can be saved without the currently approved incoming scope remaining allowed
+
+## Post-v3.3.5 target-binding regression (2026-08-23)
+
+The managed-policy hardening commits add a target check that must be exercised
+in addition to the original link tests:
+
+1. Create two protected profiles on the receiver and save a managed link for
+   only the first profile/device target.
+2. Send a live update, then queue a mailbox/Home/Internet Pickup update while
+   the receiver is offline.
+3. Open the receiver with the second profile active and attempt to collect or
+   apply the pending update.
+
+Expected:
+
+- the pending envelope is not offered to the wrong target device or profile;
+- the receiver records a rejected target mismatch rather than silently
+  applying it;
+- a valid newer revision for the original target records native runtime
+  synchronization and a receipt;
+- nearby discovery alone cannot make the mismatched update eligible.
+
+This covers the target-device, keyed-profile, mailbox, and Pickup bindings from
+the July 21 managed-policy commits. It still requires two installed devices;
+source tests or a provider status response are not a substitute for this
+smoke test.

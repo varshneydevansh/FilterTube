@@ -219,6 +219,29 @@ Trusted-link recovery is only part of the encrypted full-account recovery path.
 
 That is intentional.
 
+## What nearby and verified mean (current behavior)
+
+The device map may show a nearby FilterTube device, but nearby only means that
+the device can be discovered or invited. It does not authorize a settings
+transfer.
+
+For a parent-managed update, FilterTube also checks:
+
+- the saved trusted device link;
+- the intended protected profile on that device;
+- the signed revision and revocation state; and
+- the delivery receipt from the native/runtime owner.
+
+The same target binding is retained for an update collected later through Home
+Pickup or Internet Pickup. The pickup provider stores an unreadable signed
+envelope; it cannot choose a profile or grant itself trust. This is deliberately
+file-sharing-like, not an open torrent swarm.
+
+If a source/build note says that managed delivery is synchronized, that means
+the policy was accepted by the intended runtime boundary. It does not by itself
+prove that two installed devices completed a live transfer; that still needs a
+device-level smoke test.
+
 ## Open project
 
 Nanah is open here:

@@ -66,6 +66,20 @@ export const browserLinks = [
     href: "https://github.com/varshneydevansh/FilterTube/releases",
     logo: "https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/opera/opera_48x48.png",
   },
+  {
+    name: "Android",
+    note: "Play testing",
+    href: "/android",
+    logo: "/apps/android.png",
+    internal: true,
+  },
+  {
+    name: "iOS",
+    note: "App status",
+    href: "/ios",
+    logo: "/apps/app-store-transparent.png",
+    internal: true,
+  },
 ];
 
 export const featuredRouteSlugs = ["mobile", "tv", "kids", "ml-ai"];
@@ -369,6 +383,13 @@ export const detailPages = {
       label: "Watch FilterTube working",
       href: demoVideoHref,
       external: true,
+    },
+    appPreview: {
+      eyebrow: "App preview video",
+      title: "See FilterTube’s custom mobile experience.",
+      body: "Watch the working phone and tablet experience, including the calmer custom interface built for YouTube Main and Kids.",
+      embedHref: "https://www.youtube-nocookie.com/embed/SHvSICSMHL4?rel=0",
+      watchHref: appDemoVideoHref,
     },
     previewLabel: "Mobile direction",
     previewTitle: "Protected now stays visible in under five seconds.",

@@ -474,3 +474,29 @@ Source/build completion does not prove a deployed service or two-device installa
 - an installed parent -> protected-device live transfer
 - an installed same-network Home Pickup delivery and receipt
 - an installed Internet Pickup send while the protected device is offline, followed by collect/apply and receipt after it opens
+
+## 14) Post-v3.3.5 managed-delivery alignment (2026-08-23)
+
+The July 21 managed-policy commits close the target ambiguity that the earlier
+transport-first plan left open:
+
+- `876d5a4c` binds a managed policy to the intended target device.
+- `7953a9fd` records the native managed-policy decision rather than treating a
+  transport acknowledgement as policy application.
+- `c03ef03c` records that the native managed runtime actually synchronized.
+- `762b6580` binds mailbox/pending-delivery state to the target device.
+- `d90a92f9` keys managed decisions to the protected profile and device.
+- `3e063a35` preserves the same target binding when a verified device performs
+  later Pickup.
+
+Together these make `Send Update`, Home Pickup, and Internet Pickup delivery
+paths—not authority paths. Nearby discovery from `fdd98db8` only advertises a
+short-lived presence/invitation candidate. A device must still have the saved
+trust relationship, the matching safety phrase/cryptographic link, the target
+profile, and a newer valid signed revision. The provider cannot select a
+profile, grant trust, read rules, or turn an offline browser into a torrent
+seed.
+
+This is the Nanah boundary consumed by the extension's Accounts & Sync surface;
+native app parity still requires the normal extension-runtime sync and an
+installed two-device proof for each transport.

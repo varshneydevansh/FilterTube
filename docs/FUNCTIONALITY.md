@@ -21,6 +21,85 @@ It also now includes `Accounts & Sync`, powered by Nanah, for device-to-device s
 - Whitelist correctness fixes cover Shorts creator context, watch autoplay/end-screen endpoint filtering, and list-target forwarding across background channel-add paths.
 - Production console output is quiet by default outside explicit debug mode.
 
+## 2026-08-23 Post-v3.3.5 functionality checkpoint
+
+This checkpoint consolidates the behavior delivered after the v3.3.5 YouTube
+stability baseline. It is intentionally distributed across the existing
+functionality sections and the dated contracts below; it does not turn the
+extension into a version-specific product surface.
+
+### Access, profiles, and time
+
+- Direct Watch, Shorts, playlist/autoplay, channel-page, and matching YouTube
+  embed routes use an early playback-admission gate. A blocked queue item stays
+  paused and advances only to a known allowed successor. Ordinary Google or
+  other external search results remain visible; removing those links is a
+  separate permission-gated feature.
+- Self-Control Sessions are available to any active profile. A session snapshots
+  the active policy, pins that profile, blocks settings/rule/import/mode changes,
+  and ends only at its persisted deadline. Browser owners can still disable or
+  uninstall the extension, which remains an explicit product boundary.
+- Daily YouTube limits are per profile, playback-aware, visible in the popup,
+  and enforced by a full-page timeout surface. A different profile can be
+  selected only through the normal PIN/protected-profile path.
+
+### Rule collections and imports
+
+- Blocked and Allowed keyword/channel collections are independent views. The
+  collection view does not change the active top-level Blocklist/Whitelist
+  policy, and Main and Kids collections remain separate.
+- Switching policy is non-destructive. An empty Allowed collection may receive
+  a deliberate bootstrap copy of Blocked rules, but the source list remains
+  intact; individual rows can be moved or copied later with their metadata.
+- Complete BlockTube backups are reviewed and applied transactionally. Imported
+  JavaScript is never executed, unsupported fields receive an explicit outcome,
+  storage failure rolls back, and a verified apply receipt reports the result.
+  Large local imports use reviewed `unlimitedStorage` capacity without
+  per-channel network fan-out. See [Subscribed Channels Import](SUBSCRIBED_CHANNELS_IMPORT.md)
+  for the separate subscription-list flow.
+
+### Category, language, and audio policy
+
+- Category filtering uses YouTube's official
+  `microformat.playerMicroformatRenderer.category` through the bounded,
+  same-origin Player bridge. It is independent of the profile's rule mode and
+  applies to ordinary cards, the current Watch video, and eligible Watch rails.
+  Mix/playlist containers and comments are not category owners; a Mix seed is
+  not copied to every queue item.
+- Spoken-language filtering and original-audio preference remain explicitly
+  experimental, Main-only controls. Resolved metadata follows the user's
+  Block/Allow-only selection; unknown evidence fails open so feeds and Watch do
+  not become blank while YouTube is still loading. YouTube Kids does not expose
+  the same defensible spoken-language authority.
+
+### Playback, shelves, and renderer ownership
+
+- Advert Void is default-on and user-disableable for Main and Kids in either
+  profile mode. The runtime removes the observed YouTube Player ad plan before
+  scheduling playback, sanitizes escaped ad media as a fallback, and keeps
+  recommendation/preview players outside the control. It creates no extra
+  metadata requests; diagnostics are opt-in and bounded.
+- Hide YouTube Playables is an independent Core control. Rich Home shelves may
+  be dismissed only through YouTube's explicit feedback contract, while Home
+  chip rails remain navigation/refinement UI rather than categories.
+- YTM collaborator rosters now recognize camelCase models, preserve merged
+  creator aliases and avatars, and keep Mix/Radio false-positive guards.
+
+### Managed-device and documentation surfaces
+
+- Nearby discovery is presence only. Managed policy, mailbox, keyed-profile,
+  and Pickup deliveries are bound to the intended target device/profile and
+  retain signature, revision, revocation, and receipt checks.
+- The parent-facing Quick Start, Exact keyword explanation, direct-access
+  boundaries, import guidance, experimental labels, and profile-neutral time
+  copy are covered in [User Feedback Rules and Guidance](USER_FEEDBACK_RULES_AND_GUIDANCE_SPEC_2026-08-08.md)
+  and the Help page.
+
+Proof boundary: the focused extension source-contract/runtime tests and package
+builds are recorded in the release checkpoint. Installed-browser, Android,
+iOS, and TV smoke testing remain separate evidence gates and are not implied by
+this source-history entry.
+
 ## Nanah / Accounts & Sync functionality
 
 ### Three simple sync paths

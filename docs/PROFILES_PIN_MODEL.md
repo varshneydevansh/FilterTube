@@ -82,6 +82,21 @@ Key points:
 
 ## Current Implemented Rules
 
+### 2026-08-23 time and self-control alignment
+
+- Daily YouTube time is stored and enforced per active profile, including the
+  Default/account profile; usage is not silently discarded because a profile is
+  not internally typed as `child`.
+- A Self-Control Session is a persisted policy snapshot and deadline for the
+  active profile. While it is active, the profile cannot switch, edit rules,
+  import/export, or disable the session through popup/dashboard presentation
+  paths. The background state remains authoritative after reloads.
+- An exhausted profile receives the full-page timeout surface. Switching to a
+  different profile is allowed only through the normal target-profile PIN
+  check; the exhausted profile cannot approve itself or dismiss the gate.
+- This is browser-extension policy, not an operating-system lock: the browser
+  owner can still disable/uninstall the extension or clear its data.
+
 ### 1) View access rules (New Tab UI)
 
 - If **active profile is locked and not unlocked in this UI session**:

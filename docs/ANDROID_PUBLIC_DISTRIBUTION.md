@@ -4,6 +4,21 @@ Last updated: May 31, 2026.
 
 This document tracks the public Android distribution plan for FilterTube phone/tablet builds while the native app repository remains private.
 
+## Post-v3.3.5 release-boundary note (2026-08-23)
+
+The feature-rich Android phone/tablet app in Google Play closed testing is a
+separate custom viewing experience from the simpler direct APK path. The direct
+APK may be reused or attached only with its actual embedded version and
+versionCode; it must never be renamed to imply a native rebuild. See the
+[app/runtime sync workflow](APP_RELEASE_AND_RUNTIME_SYNC_WORKFLOW.md).
+
+The extension checkpoint adds direct access, profile-aware time/Self-Control,
+Advert Void, category hydration, and experimental language/audio controls. A
+native app announcement may claim those only after the synced Android runtime
+and native player surface have their own installed-device evidence. Android TV
+still needs its own 10-foot/remote shell and is not implied by the phone/tablet
+package.
+
 ## Current boundary
 
 - Public website and release hub: `filtertube.in/downloads`

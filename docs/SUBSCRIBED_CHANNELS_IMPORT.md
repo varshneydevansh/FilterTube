@@ -290,3 +290,20 @@ The same contract can be reused in a future mobile webview-based app:
 - avoid sticky app-mode hacks such as `persist_app`
 
 That keeps the future mobile importer aligned with the extension rather than creating a separate subscriptions ingestion path.
+
+## Post-v3.3.5 integration boundary (2026-08-23)
+
+This importer remains an explicit, reviewed whitelist-acquisition action. It is
+not part of category hydration, direct-access admission, or the passive card
+filtering scheduler.
+
+- `Import Only` adds or updates the Allowed collection without changing the
+  active Blocklist/Whitelist policy and without clearing Blocked rules.
+- `Import + Turn On Whitelist` changes the active policy only after the user
+  confirms; it still does not delete the Blocked collection.
+- Imported subscription rows are local profile data. The importer does not
+  issue one network request per channel and does not silently subscribe to a
+  remote third-party list.
+- Complete BlockTube backup migration is a separate transactional import path;
+  its storage receipt and rollback rules do not get mixed into this signed-in
+  YouTube subscription flow.

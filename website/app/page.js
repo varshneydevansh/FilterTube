@@ -192,7 +192,7 @@ function AppReleaseStatusSection() {
       imageAlt: "FilterTube Android app artwork",
       action: "Join the closed test",
       href: "mailto:hello@filtertube.in?subject=Android%20closed%20testing%20request&body=Hi%20FilterTube%2C%0A%0AI%20would%20like%20to%20join%20the%20Android%20Play%20Store%20closed%20testing.%0A%0AGoogle%20Play%20email%3A%20%0ADevice%3A%20%0A",
-      tone: "border-[#b9d8c5] bg-[linear-gradient(145deg,rgba(235,247,238,0.96),rgba(255,255,255,0.8))]",
+      themeClass: "ft-app-release-card--android",
     },
     {
       eyebrow: "iPhone + iPad",
@@ -202,7 +202,7 @@ function AppReleaseStatusSection() {
       imageAlt: "FilterTube iPhone and iPad app artwork",
       action: "Follow iOS status",
       href: "/ios",
-      tone: "border-[#bad0eb] bg-[linear-gradient(145deg,rgba(235,244,255,0.96),rgba(255,255,255,0.8))]",
+      themeClass: "ft-app-release-card--ios",
     },
   ];
 
@@ -213,7 +213,7 @@ function AppReleaseStatusSection() {
           <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-[1fr_1fr_0.9fr]">
             {appCards.map((card) => (
               <article
-                className={`relative isolate min-h-[22rem] overflow-hidden rounded-[2rem] border p-6 shadow-[var(--shadow-diffuse)] md:p-7 ${card.tone}`}
+                className={`ft-app-release-card relative isolate min-h-[22rem] overflow-hidden rounded-[2rem] border p-6 shadow-[var(--shadow-diffuse)] md:p-7 ${card.themeClass}`}
                 key={card.title}
               >
                 <div className="relative z-10 flex h-full max-w-[58%] flex-col sm:max-w-[62%]">
@@ -227,7 +227,7 @@ function AppReleaseStatusSection() {
                     {card.body}
                   </p>
                   <a
-                    className="mt-auto inline-flex min-h-11 w-fit items-center gap-2 rounded-full border border-[color:var(--color-line)] bg-white/76 px-4 py-2 text-sm font-semibold text-[var(--color-ink)] transition hover:-translate-y-0.5 hover:border-[color:var(--color-accent)] hover:text-[var(--color-accent)]"
+                    className="ft-app-release-action mt-auto inline-flex min-h-11 w-fit items-center gap-2 rounded-full border border-[color:var(--color-line)] bg-white/76 px-4 py-2 text-sm font-semibold text-[var(--color-ink)] transition hover:-translate-y-0.5 hover:border-[color:var(--color-accent)] hover:text-[var(--color-accent)]"
                     href={card.href}
                   >
                     {card.action}
@@ -510,24 +510,22 @@ export default function HomePage() {
 
               <div className="mx-auto mt-10 max-w-[1180px]">
                 <p className="text-balance font-display text-[clamp(3rem,6.8vw,5.8rem)] font-medium tracking-[-0.09em] text-[#fffdf8] drop-shadow-[0_16px_36px_rgba(0,0,0,0.3)]">
-                  A calmer, ad-free
+                  Calmer, ad-free viewing
                 </p>
                 <h1 className="mt-3 text-balance font-editorial text-[clamp(5rem,11vw,9.1rem)] leading-[0.88] text-[#fffdf8] drop-shadow-[0_18px_40px_rgba(0,0,0,0.3)]">
-                  YouTube by default
+                  Your feed, your rules
                 </h1>
               </div>
 
-              <p className="ft-hero-support-copy relative mx-auto mt-6 max-w-[800px] text-pretty px-4 text-[17px] font-medium leading-8 md:text-[18px]">
+              <p className="ft-hero-support-copy relative mx-auto mt-7 max-w-[760px] text-pretty rounded-[1.6rem] px-6 py-4 text-[16px] font-medium leading-7 md:px-8 md:text-[18px] md:leading-8">
                 <span className="font-semibold text-white">
-                  A calmer YouTube for families and focused users
+                  Block what you don&apos;t want—or allow only what you trust.
                 </span>{" "}
-                without needing a technical setup. Remove adverts and
-                block{" "}
+                Control{" "}
                 <span className="ft-hero-support-emphasis">
-                  channels, keywords, Shorts, and comments
-                </span>{" "}
-                from one dashboard. Android's complete custom viewing app is
-                open to Google Play closed testers.
+                  channels, keywords, Shorts, comments, categories, languages,
+                  and more.
+                </span>
               </p>
 
               <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -545,7 +543,7 @@ export default function HomePage() {
                   </span>
                 </a>
                 <a
-                  className="group inline-flex min-h-11 items-center gap-3 overflow-visible whitespace-nowrap rounded-full border border-white/30 bg-[rgba(255,255,255,0.12)] px-6 py-3 text-sm font-semibold text-[#fffaf4] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-xl transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 hover:bg-[rgba(255,255,255,0.18)] active:translate-y-px active:scale-[0.98]"
+                  className="group inline-flex min-h-11 items-center gap-3 overflow-visible whitespace-nowrap rounded-full border border-white/40 bg-[rgba(14,20,30,0.38)] px-6 py-3 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.26),0_18px_44px_-26px_rgba(4,8,14,0.72)] backdrop-blur-2xl transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 hover:border-white/55 hover:bg-[rgba(14,20,30,0.52)] active:translate-y-px active:scale-[0.98]"
                   href={appDemoVideoHref}
                   rel="noreferrer"
                   target="_blank"
@@ -556,14 +554,10 @@ export default function HomePage() {
                   Watch app demo
                 </a>
               </div>
-              <p className="mt-4 max-w-[680px] px-4 text-sm font-medium leading-7 text-white/86">
-                Email hello@filtertube.in to become an active Android closed
-                tester and help move the feature-rich custom app toward public
-                Play Store release. The direct APK is a separate, simpler
-                build and does not include this complete custom frontend.
-                The iPhone and iPad build is in final testing alignment;
-                Apple Developer account access is delaying TestFlight and will
-                be resolved as soon as possible.
+              <p className="ft-hero-status mt-5 max-w-[720px] rounded-2xl px-5 py-3 text-sm font-medium leading-6 text-white md:px-6">
+                Desktop extensions are available now. The complete Android app
+                is in Google Play closed testing; iPhone and iPad are being
+                finalized for TestFlight.
               </p>
             </div>
 

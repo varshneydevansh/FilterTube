@@ -12,6 +12,29 @@ This document tracks which YouTube renderers/selectors FilterTube currently targ
 - **Performance Optimizations**: Async DOM processing with main-thread yielding and batched writes were added to reduce lag, CPU pressure, and I/O. Earlier notes used 60-80% CPU and 70-90% I/O reduction language; those are historical estimates, not current measured proof.
 - **2026-05-31 release candidate**: no-rule work gates, compact autoplay/watch-next filtering, whitelist Shorts creator fallback, production console gating, and DOM state hardening are tracked in `docs/audit/FILTERTUBE_POST_APRIL_12_RELEASE_DOC_VALIDATION_2026-05-31.md`.
 
+## Post-v3.3.5 renderer/source index (2026-07-05—2026-08-08)
+
+The renderer inventory now also covers the newer provider contracts documented
+by the post-v3.3.5 commits:
+
+- `6f7d7b46`, `eb14f105`, `bd1cd6d4`, and `31033f7c`: bounded collaborator
+  warmup, camelCase YouTube Music rosters, merged creator aliases, and avatar
+  preservation. Mix/Radio false-positive guards remain explicit.
+- `3ba76a33`: age-verification-on-video evidence and its gate ownership.
+- `5e8a1fbb` and `9466f9e0`: native hashtag browse mapping and mobile Watch
+  chapter ownership.
+- `77fc9ed4` and `c550c04e`: dismissible Home rich shelves, optional feedback,
+  and the separate horizontal chip/refinement surfaces.
+- `9b5168c0`: the independent Hide YouTube Playables control and its renderer
+  scope; it is not folded into generic ad or game filtering.
+- `0f2f7349`: category ownership now uses official Player microformat data;
+  comments, chips, shelf containers, and Mix/playlist queue rows are excluded.
+
+The companion [JSON path encyclopedia](json_paths_encyclopedia.md) names the
+capture files and response paths for each provider contract. Neither inventory
+should be read as a promise that an undocumented/camelCase provider field is
+present on every route.
+
 ## Home Feed
 
 ### Existing coverage

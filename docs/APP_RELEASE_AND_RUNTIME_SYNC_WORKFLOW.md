@@ -4,6 +4,38 @@ Last updated: May 31, 2026.
 
 This document is the release-order checklist for shipping FilterTube extension and native app updates together without losing the extension as the source of truth.
 
+## Post-v3.3.5 source endpoint (2026-08-23)
+
+The post-v3.3.5 extension checkpoint contains direct-access admission,
+per-profile time and Self-Control policy, independent Blocked/Allowed rule
+collections, large BlockTube migration, Advert Void, category hydration, and
+experimental language/original-audio controls. Those behaviors are extension
+source contracts first. They must be synced deliberately before claiming native
+parity.
+
+The 28-commit history from the v3.3.5 baseline is indexed in the public
+[changelog](../CHANGELOG.md), while the dated runtime contracts remain in
+[Functionality](FUNCTIONALITY.md), [Technical Documentation](TECHNICAL.md),
+[Category behavior](CATEGORY_FILTER_CURRENT_BEHAVIOR_2026-08-08.md),
+[Language behavior](LANGUAGE_FILTER_CURRENT_BEHAVIOR_2026-08-18.md), and the
+[Self-Control audit](SELF_CONTROL_SESSION_SPEC_2026-08-17.md).
+
+### Native synchronization boundary
+
+- Run the sync command only after the extension source and focused tests are
+  complete.
+- Inspect the generated Android and iOS resource diff; do not hand-edit a
+  generated runtime to create a second behavior path.
+- Keep the Android custom Play/closed-testing app distinct from the simpler
+  direct APK artifact. Direct artifact reuse (`4a658584`) is allowed only when
+  the embedded version and versionCode are recorded honestly.
+- Treat category/language/audio and Advert Void as evidence-gated on each native
+  provider surface. An extension source test is not Android/iOS/TV playback
+  proof.
+- Keep native provider login, cookies, parent verification, and WebView/WKWebView
+  ownership in the app repository; the sync step supplies runtime resources,
+  not credentials or a replacement player/router.
+
 ## Why this exists
 
 The Android and iOS apps bundle JavaScript runtime code copied from the public extension repository. That means extension filtering fixes must land here first, then be synced into the private app repository before the native apps are packaged.

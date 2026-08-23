@@ -15,6 +15,12 @@ The public website now also acts as the download hub for browser releases, Andro
 
 👉 **[filtertube.in/downloads](https://filtertube.in/downloads)**
 
+The current unreleased post-v3.3.5 source checkpoint is documented in the
+[changelog history index](CHANGELOG.md), with the runtime, category, language,
+Nanah, app-sync, and website contracts kept in the existing [documentation
+map](docs/CODEMAP.md). Native Android/iOS parity and installed-device behavior
+remain evidence-gated; the extension is still the runtime source of truth.
+
 ## What's New in v3.3.5
 
 - **Duplicate content-runtime injection is fixed**: install/update/profile refresh no longer reinjects manifest content scripts into already-open YouTube tabs, preventing repeated `Identifier ... has already been declared` failures.

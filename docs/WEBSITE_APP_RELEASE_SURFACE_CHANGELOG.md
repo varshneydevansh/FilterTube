@@ -4,6 +4,47 @@ Last updated: May 31, 2026.
 
 This document records the public website, extension dashboard, and release-script changes made while preparing the Android phone/tablet, iOS, and iPad release surfaces. It is intentionally limited to the public `FilterTube` repository; native app implementation details remain in the private app repository.
 
+## July-August 2026 release-surface updates
+
+The post-v3.3.5 public-surface commits are now recorded here as a separate
+checkpoint from the older May validation notes.
+
+### Committed website and dashboard work
+
+- `54c35a22` simplified the public navigation and split everyday setup copy
+  from developer-facing project detail while making the Android closed-testing
+  request explicit.
+- `c0b3584c` added the extension's website-style About surface, including the
+  independent-project explanation and direct project links.
+- `d73bd68c` and `9ac63173` placed and aligned the Android testing call-to-action
+  above dashboard statistics.
+- `0920969b` records the current unreleased app-surface direction: a calmer
+  product message, app preview entry points, Android/iOS availability wording,
+  and platform-specific artwork. The Android Play closed-testing app is the
+  feature-rich custom frontend; the direct APK remains a simpler separate
+  artifact.
+
+### Current local website work (not yet committed)
+
+The 2026-08-23 worktree still contains intentional website edits and must not
+be described as deployed until committed and built:
+
+- `website/app/page.js` updates the hero to “Calmer, ad-free viewing / Your
+  feed, your rules”, keeps both the quick demo and app demo actions, and adds
+  Android/iOS status messaging.
+- `website/components/route-content.js` adds Android/iOS items to the browser
+  rail and the `/mobile` app preview data.
+- `website/components/scenic-detail-page.js` renders the responsive privacy
+  embed for `SHvSICSMHL4` with a direct YouTube fallback link.
+- `website/components/browser-logo-rail.js` uses a less-cramped four-column
+  responsive desktop rail and keeps platform navigation same-tab.
+- `website/app/globals.css` supplies readable translucent surfaces plus opaque
+  themed Android-green and iOS-blue cards in both light and dark themes.
+
+These edits were checked with the website production build and
+`git diff --check` in the current worktree; deployment, DNS, and store status
+remain separate release evidence.
+
 ## May 31, 2026 validation checkpoint
 
 ### Release positioning

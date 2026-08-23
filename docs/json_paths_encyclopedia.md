@@ -1,5 +1,30 @@
 # Root Response Wrappers (XHR vs Initial Data)
 
+## Post-v3.3.5 capture index (2026-07-15—2026-07-25)
+
+The recent documentation commits extend this encyclopedia with named capture
+families and their ownership boundaries. They are source ledgers, not claims
+that every provider field is stable or available on every client:
+
+- `7906a77c` records YouTube Music You/account/channel pages and tab payloads.
+- `3ba76a33` records the age-verification-on-video contract.
+- `21b71571` records mobile LIVE and ended-LIVE responses.
+- `86c4802e` separates an adaptive-quality preference from the effective stream
+  quality returned by the provider.
+- `a5b78c09` and `5e8a1fbb` record mobile hashtag browse and native mapping.
+- `9466f9e0` records mobile Watch chapter payloads.
+- `77fc9ed4` and `c550c04e` record dismissible Home rich shelves and optional
+  feedback receipts.
+
+For the extension's current category and language authority, use the dated
+[category behavior](CATEGORY_FILTER_CURRENT_BEHAVIOR_2026-08-08.md) and
+[language behavior](LANGUAGE_FILTER_CURRENT_BEHAVIOR_2026-08-18.md) contracts:
+the official category lives in
+`microformat.playerMicroformatRenderer.category`, while spoken-language
+evidence is experimental and must not be inferred from subtitle translation
+choices. The capture files named in this encyclopedia remain the evidence
+source for future native-runtime alignment.
+
 ---
 
 # Absolute JSON Trace: Subscribed Channels Import (`FEchannels`)

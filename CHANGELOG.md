@@ -1,5 +1,49 @@
 # Changelog
 
+## Post-v3.3.5 source-history index (28 commits)
+
+The following index records every commit after the v3.3.5 stability baseline
+(`2fd04d3`) through the current unreleased checkpoint. The detailed contracts
+remain in the existing topic documents linked below; this table is the
+chronological index, not a replacement for those documents.
+
+| Date | Commit | Recorded change | Canonical detail |
+| --- | --- | --- | --- |
+| 2026-07-05 | `4a658584` | Explicit MVP Android artifact reuse and honest version/code claims | [App release workflow](docs/APP_RELEASE_AND_RUNTIME_SYNC_WORKFLOW.md) |
+| 2026-07-05 | `6f7d7b46` | Restore bounded collaborator warmup on identity fast paths | [Renderer inventory](docs/youtube_renderer_inventory.md) |
+| 2026-07-06 | `54c35a22` | Simplify website language and add the internal Android testing ask | [Website surface changelog](docs/WEBSITE_APP_RELEASE_SURFACE_CHANGELOG.md) |
+| 2026-07-06 | `c0b3584c` | Add the website-style extension About surface | [Website surface changelog](docs/WEBSITE_APP_RELEASE_SURFACE_CHANGELOG.md) |
+| 2026-07-06 | `d73bd68c` | Move the Android testing CTA above dashboard statistics | [Website surface changelog](docs/WEBSITE_APP_RELEASE_SURFACE_CHANGELOG.md) |
+| 2026-07-06 | `9ac63173` | Align the dashboard Android CTA and stats panel | [Website surface changelog](docs/WEBSITE_APP_RELEASE_SURFACE_CHANGELOG.md) |
+| 2026-07-11 | `fdd98db8` | Add nearby-device discovery and simplify family controls | [Nanah plan](docs/NANAH_P2P_PROJECT_PLAN.md) |
+| 2026-07-11 | `eb14f105` | Resolve camelCase YouTube Music collaborator rosters | [Renderer inventory](docs/youtube_renderer_inventory.md) |
+| 2026-07-11 | `bd1cd6d4` | Link merged creator aliases for collaborator actions | [Functionality](docs/FUNCTIONALITY.md) |
+| 2026-07-11 | `31033f7c` | Preserve collaborator avatars through alias merging | [Renderer inventory](docs/youtube_renderer_inventory.md) |
+| 2026-07-15 | `7906a77c` | Document You/channel/account and channel-tab contracts | [JSON encyclopedia](docs/json_paths_encyclopedia.md) |
+| 2026-07-18 | `3ba76a33` | Document age-verification-on-video evidence | [Renderer inventory](docs/youtube_renderer_inventory.md) |
+| 2026-07-21 | `876d5a4c` | Bind managed policies to target devices | [Nanah plan](docs/NANAH_P2P_PROJECT_PLAN.md) |
+| 2026-07-21 | `7953a9fd` | Record native managed-policy decisions | [Technical docs](docs/TECHNICAL.md) |
+| 2026-07-21 | `c03ef03c` | Record native managed runtime synchronization | [Technical docs](docs/TECHNICAL.md) |
+| 2026-07-21 | `762b6580` | Preserve managed mailbox target binding | [Nanah plan](docs/NANAH_P2P_PROJECT_PLAN.md) |
+| 2026-07-21 | `d90a92f9` | Preserve keyed-profile managed decisions | [Technical docs](docs/TECHNICAL.md) |
+| 2026-07-21 | `3e063a35` | Preserve managed Pickup target-device binding | [Nanah plan](docs/NANAH_P2P_PROJECT_PLAN.md) |
+| 2026-07-21 | `21b71571` | Document mobile LIVE and ended-LIVE contracts | [JSON encyclopedia](docs/json_paths_encyclopedia.md) |
+| 2026-07-21 | `86c4802e` | Clarify adaptive-quality preference versus effective quality | [JSON encyclopedia](docs/json_paths_encyclopedia.md) |
+| 2026-07-22 | `a5b78c09` | Document mobile hashtag-browse contracts | [JSON encyclopedia](docs/json_paths_encyclopedia.md) |
+| 2026-07-22 | `5e8a1fbb` | Map native hashtag-browse fields | [Renderer inventory](docs/youtube_renderer_inventory.md) |
+| 2026-07-22 | `9466f9e0` | Document mobile Watch chapter contracts | [JSON encyclopedia](docs/json_paths_encyclopedia.md) |
+| 2026-07-25 | `77fc9ed4` | Map dismissible Home rich-shelf feedback | [Renderer inventory](docs/youtube_renderer_inventory.md) |
+| 2026-07-25 | `9b5168c0` | Add the independent Hide YouTube Playables control | [Playables audit](docs/audit/FILTERTUBE_HIDE_YOUTUBE_PLAYABLES_CONTROL_2026-07-25.md) |
+| 2026-07-25 | `c550c04e` | Record optional rich-shelf feedback boundaries | [Renderer inventory](docs/youtube_renderer_inventory.md) |
+| 2026-08-08 | `0f2f7349` | Improve JSON-first category filtering and document its scheduler/ownership contract | [Category behavior](docs/CATEGORY_FILTER_CURRENT_BEHAVIOR_2026-08-08.md) |
+| 2026-08-23 | `0920969b` | Checkpoint direct access, time/self-control, rule collections, BlockTube migration, Advert Void, experimental language/audio, UI/help, and focused proof | [Functionality](docs/FUNCTIONALITY.md) |
+
+The current `0920969b` checkpoint is unreleased. Its website edits are tracked
+separately as committed versus uncommitted in the [website surface
+changelog](docs/WEBSITE_APP_RELEASE_SURFACE_CHANGELOG.md), and the temporary
+[post-v3.3.5 ledger](docs/POST_3_3_5_CHANGE_LEDGER_2026-08-23.md) retains the
+file-level audit until this documentation pass is reviewed.
+
 ## Unreleased — Category Filtering Reliability And UI
 
 ### Direct access and protected time

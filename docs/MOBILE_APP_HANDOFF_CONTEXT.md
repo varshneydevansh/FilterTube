@@ -4,6 +4,21 @@
 
 This file is the compact handoff baseline for starting a new chat or app-focused implementation thread without replaying the full extension, Nanah, and YouTube APK research history.
 
+## Current upstream checkpoint (2026-08-23)
+
+The extension's post-v3.3.5 source history is indexed in
+[`CHANGELOG.md`](../CHANGELOG.md). Before changing Android, iOS, or TV code,
+sync from the extension and read the existing runtime contracts for direct
+admission, profile-aware time/Self-Control, independent rule collections,
+Advert Void, category metadata, experimental language/audio, and Nanah target
+binding. Generated app resources are downstream outputs; an app-side behavior
+must not become a second filtering engine or a substitute provider credential
+path.
+
+The feature-rich Android Play closed-testing app and the simpler direct APK are
+separate release surfaces. Android TV remains a separate 10-foot UI package;
+phone/tablet parity does not prove remote/focus behavior on TV.
+
 ## Current product direction
 
 FilterTube mobile, tablet, and TV should be:

@@ -345,26 +345,31 @@ html[data-theme="dark"] .ft-hero-accent {
 }
 
 .ft-hero-support-copy {
-  color: rgba(255, 247, 239, 0.92);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.18), transparent 42%),
+    rgba(9, 14, 22, 0.26);
+  color: rgba(255, 250, 245, 0.94);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.06),
+    0 24px 60px -34px rgba(4, 8, 14, 0.9);
   text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.16),
-    0 12px 28px rgba(8, 12, 18, 0.34),
-    0 4px 14px rgba(8, 12, 18, 0.18);
+    0 1px 0 rgba(255, 255, 255, 0.1),
+    0 2px 12px rgba(4, 8, 14, 0.52);
+  -webkit-backdrop-filter: blur(32px) saturate(150%) contrast(92%);
+  backdrop-filter: blur(32px) saturate(150%) contrast(92%);
 }
 
 .ft-hero-support-copy::before {
   content: "";
   position: absolute;
-  inset: -1rem -1.4rem;
-  z-index: -1;
-  background: radial-gradient(
-    circle at 50% 42%,
-    rgba(255, 248, 241, 0.18) 0%,
-    rgba(255, 248, 241, 0.08) 34%,
-    transparent 74%
-  );
-  filter: blur(18px);
-  opacity: 0.95;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.2), transparent 34%),
+    linear-gradient(105deg, transparent 25%, rgba(255, 255, 255, 0.07) 48%, transparent 68%);
 }
 
 .ft-hero-support-emphasis {
@@ -377,19 +382,15 @@ html[data-theme="dark"] .ft-hero-accent {
 
 html[data-theme="dark"] .ft-hero-support-copy {
   color: rgba(247, 240, 232, 0.94);
-  text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.08),
-    0 14px 32px rgba(4, 6, 10, 0.48),
-    0 4px 14px rgba(4, 6, 10, 0.26);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.12), transparent 42%),
+    rgba(6, 10, 16, 0.34);
 }
 
 html[data-theme="dark"] .ft-hero-support-copy::before {
-  background: radial-gradient(
-    circle at 50% 42%,
-    rgba(28, 38, 50, 0.32) 0%,
-    rgba(18, 25, 34, 0.16) 34%,
-    transparent 76%
-  );
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.12), transparent 34%),
+    linear-gradient(105deg, transparent 25%, rgba(255, 255, 255, 0.04) 48%, transparent 68%);
 }
 
 html[data-theme="dark"] .ft-hero-support-emphasis {
@@ -397,6 +398,60 @@ html[data-theme="dark"] .ft-hero-support-emphasis {
   text-shadow:
     0 1px 0 rgba(255, 255, 255, 0.1),
     0 16px 34px rgba(8, 10, 14, 0.52);
+}
+
+.ft-hero-status {
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.12), transparent 48%),
+    rgba(9, 14, 22, 0.24);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 18px 46px -32px rgba(4, 8, 14, 0.86);
+  text-shadow: 0 2px 10px rgba(4, 8, 14, 0.58);
+  -webkit-backdrop-filter: blur(26px) saturate(145%) contrast(94%);
+  backdrop-filter: blur(26px) saturate(145%) contrast(94%);
+}
+
+.ft-app-release-card--android {
+  border-color: #a3c9ac;
+  background:
+    radial-gradient(circle at 88% 86%, rgba(105, 178, 132, 0.32), transparent 38%),
+    linear-gradient(145deg, #e9f5eb 0%, #d8ebdd 100%);
+}
+
+.ft-app-release-card--ios {
+  border-color: #a5c3e8;
+  background:
+    radial-gradient(circle at 88% 86%, rgba(82, 143, 221, 0.3), transparent 38%),
+    linear-gradient(145deg, #e9f2ff 0%, #d7e7fa 100%);
+}
+
+html[data-theme="dark"] article.ft-app-release-card--android {
+  border-color: rgba(111, 178, 139, 0.36);
+  background:
+    radial-gradient(circle at 88% 86%, rgba(87, 161, 117, 0.2), transparent 36%),
+    linear-gradient(145deg, rgba(24, 42, 35, 0.98), rgba(14, 23, 23, 0.98));
+}
+
+html[data-theme="dark"] article.ft-app-release-card--ios {
+  border-color: rgba(105, 154, 214, 0.4);
+  background:
+    radial-gradient(circle at 88% 86%, rgba(66, 136, 224, 0.2), transparent 36%),
+    linear-gradient(145deg, rgba(24, 36, 52, 0.98), rgba(14, 21, 31, 0.98));
+}
+
+html[data-theme="dark"] .ft-app-release-action {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: #f7f9fb;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+html[data-theme="dark"] .ft-app-release-action:hover {
+  border-color: rgba(255, 255, 255, 0.38);
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
 }
 
 .ft-footer-wordmark {

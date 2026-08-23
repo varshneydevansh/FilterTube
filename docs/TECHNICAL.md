@@ -65,6 +65,67 @@ Kids compiled settings carry the active profile's same default-on, user-disablea
 the Android Kids player, which invokes the same suppression bridge as Main. The
 DOM fallback continues to remove sponsored cards and companion renderers.
 
+## 2026-08-23 post-v3.3.5 runtime checkpoint
+
+The post-v3.3.5 runtime changes are split by authority so the extension remains
+the source of truth and generated native resources remain downstream artifacts.
+
+### Admission and policy boundaries
+
+- Direct admission checks the current Watch/Shorts/playlist/embed video before
+  playback. It reuses captured `ytInitialPlayerResponse`/Player metadata and
+  rendered description text before using the bounded same-origin Player
+  scheduler. Blocklist mode can admit known-safe text immediately while missing
+  description data resolves; Whitelist mode remains fail-closed. Playlist and
+  autoplay advancement never turns an external page into a filtering surface.
+- Self-Control Session state is background-owned and persisted. The active
+  profile snapshot and deadline are restored after popup/dashboard changes,
+  profile switching, browser restart, and stale-page mutation attempts. Daily
+  limits use the profile policy timezone and playback heartbeats rather than tab
+  focus, and the timeout surface pauses the full YouTube surface.
+- Rule collections are separate storage projections. `Blocked rules` and
+  `Allowed rules` are views, not mode switches; Main/Kids arrays, imported
+  sources, and managed policy remain distinct. BlockTube migration validates
+  every field before a single transactional apply and reads the target profile
+  back before reporting success.
+
+### Metadata scheduling and renderer ownership
+
+- Category authority is only
+  `microformat.playerMicroformatRenderer.category`. A same-origin `/youtubei/v1/player`
+  bridge returns normalized metadata and never streaming URLs. Visible work is
+  deduplicated, cache-aware, capped at three concurrent requests and 24 starts
+  per rolling minute, with negative caching and synchronous pending veils in
+  allow-only mode.
+- Modern nested lockup hosts collapse to one visual owner. Mix/playlist seed
+  metadata can warm the seed identity but never classifies every queue row;
+  comments, chips, and shelf containers reject category ownership. Partial
+  metadata merges cannot erase an existing category, duration, or date.
+- Spoken-language and original-audio paths are experimental Main-only
+  consumers of the shared Player cache. Unknown language evidence remains
+  visible; Kids does not inherit a language decision without an authoritative
+  Kids field.
+
+### Managed delivery and source synchronization
+
+- Nearby discovery is a short-lived presence/invitation service, not a trust
+  grant. Managed decisions carry target-device, keyed-profile, mailbox/Pickup,
+  revision, revocation, and receipt bindings; a provider cannot choose a target
+  or read policy.
+- YTM identity parsing accepts camelCase collaborator rosters and preserves
+  linked creator aliases and avatars through cache/menu projections.
+- `FilterTubeApp` must consume the selected extension runtime through
+  `npm run sync:native-runtime`; generated Android/iOS resources are not a
+  second implementation. Explicit artifact reuse records the actual app
+  version/code instead of pretending a native rebuild occurred.
+
+### Proof boundary
+
+The focused source-contract tests, package checks, and release audit are the
+available proof for this checkpoint. A source/build pass does not claim an
+installed Chrome/Firefox, Android, iOS, or TV smoke run; those remain release
+gates and must be recorded separately.
+
 ## 2026-05-31 Release Candidate Runtime Snapshot
 
 - No-rule and inactive-rule states now skip more JSON clone/parse/replay, DOM fallback, quick-block, fallback-menu, and whitelist-pending work before YouTube SPA navigation can accumulate cost.

@@ -23,7 +23,7 @@ export function BrowserLogoRail({
         className={`grid auto-rows-fr gap-2 ${
           panel
             ? "sm:grid-cols-2 lg:grid-cols-3"
-            : "sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6"
+            : "sm:grid-cols-2 lg:grid-cols-4"
         }`}
       >
         {browserLinks.map((browser) => (
@@ -31,12 +31,12 @@ export function BrowserLogoRail({
             className={`group flex h-full min-h-[5.5rem] items-start gap-3 rounded-[1.2rem] border px-3 py-3 transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:translate-y-px active:scale-[0.99] ${tileClasses}`}
             href={browser.href}
             key={browser.name}
-            rel="noreferrer"
-            target="_blank"
+            rel={browser.internal ? undefined : "noreferrer"}
+            target={browser.internal ? undefined : "_blank"}
           >
             <img
               alt={`${browser.name} logo`}
-              className="h-8 w-8 rounded-full"
+              className="h-8 w-8 shrink-0 object-contain"
               height="32"
               src={browser.logo}
               width="32"
