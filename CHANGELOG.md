@@ -44,12 +44,12 @@ chronological index, not a replacement for those documents.
 | 2026-08-23 | `2f4612ea` | Merge the reviewed two-commit PR #66 history into master | [PR #66](https://github.com/varshneydevansh/FilterTube/pull/66) |
 
 The `0920969b` checkpoint and its subsequent documentation and PR #66 review
-commits form the v3.6.6 source train. Website edits are tracked in the
+commits form the v3.3.6 source train. Website edits are tracked in the
 [website surface changelog](docs/WEBSITE_APP_RELEASE_SURFACE_CHANGELOG.md), and
 the [post-v3.3.5 ledger](docs/POST_3_3_5_CHANGE_LEDGER_2026-08-23.md) retains the
 file-level cross-check behind the canonical topic documentation.
 
-## Version 3.6.6 — Filtering, Protected Time, Advert Void, And UI Reliability
+## Version 3.3.6 — Filtering, Protected Time, Advert Void, And UI Reliability
 
 ### Direct access and protected time
 

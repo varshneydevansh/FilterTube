@@ -7,8 +7,8 @@ const repoRoot = process.cwd();
 const read = (file) => fs.readFileSync(path.join(repoRoot, file), 'utf8');
 const readJson = (file) => JSON.parse(read(file));
 
-test('v3.6.6 package, lockfile, and browser manifests agree', () => {
-    const expected = '3.6.6';
+test('v3.3.6 package, lockfile, and browser manifests agree', () => {
+    const expected = '3.3.6';
     assert.equal(readJson('package.json').version, expected);
     assert.equal(readJson('package-lock.json').version, expected);
     assert.equal(readJson('package-lock.json').packages[''].version, expected);
@@ -18,15 +18,15 @@ test('v3.6.6 package, lockfile, and browser manifests agree', () => {
     }
 });
 
-test('v3.6.6 is the newest What’s New entry and is visible in the dashboard shell', () => {
+test('v3.3.6 is the newest What’s New entry and is visible in the dashboard shell', () => {
     const releases = readJson('data/release_notes.json')
         .filter((entry) => entry && typeof entry.version === 'string');
-    assert.equal(releases[0].version, '3.6.6');
-    assert.equal(releases[0].detailsUrl, 'https://github.com/varshneydevansh/FilterTube/releases/tag/v3.6.6');
+    assert.equal(releases[0].version, '3.3.6');
+    assert.equal(releases[0].detailsUrl, 'https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.6');
     assert.ok(releases[0].highlights.some((item) => item.includes('automatic reload reminders')));
 
     const dashboard = read('html/tab-view.html');
-    assert.match(dashboard, /<div class="version-info">v3\.6\.6<\/div>/);
-    assert.match(dashboard, /Current version: v3\.6\.6/);
-    assert.match(read('CHANGELOG.md'), /## Version 3\.6\.6/);
+    assert.match(dashboard, /<div class="version-info">v3\.3\.6<\/div>/);
+    assert.match(dashboard, /Current version: v3\.3\.6/);
+    assert.match(read('CHANGELOG.md'), /## Version 3\.3\.6/);
 });

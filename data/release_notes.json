@@ -3,10 +3,10 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
-    "version": "3.6.6",
+    "version": "3.3.6",
     "headline": "Stronger filtering, protected time, and calmer ad-free playback",
-    "summary": "FilterTube 3.6.6 brings direct-access enforcement, per-profile protected time and Self-Control sessions, reliable blocked and allowed rule collections, official category filtering, default-on Advert Void, and extensive current-YouTube compatibility work.",
-    "bannerSummary": "Direct-access filtering, protected time, rule-list and BlockTube imports, official categories, Advert Void, and current YouTube compatibility are included in 3.6.6.",
+    "summary": "FilterTube 3.3.6 brings direct-access enforcement, per-profile protected time and Self-Control sessions, reliable blocked and allowed rule collections, official category filtering, default-on Advert Void, and extensive current-YouTube compatibility work.",
+    "bannerSummary": "Direct-access filtering, protected time, rule-list and BlockTube imports, official categories, Advert Void, and current YouTube compatibility are included in 3.3.6.",
     "highlights": [
       "Direct YouTube visits, playlist transitions, autoplay, and supported embeds now pass through the same video and channel admission rules instead of bypassing feed filtering.",
       "Daily YouTube limits now apply per active profile, show remaining time, survive restarts, and use a full-page timeout with PIN-aware profile switching; voluntary Self-Control sessions lock their selected rules until the countdown ends.",
@@ -18,7 +18,7 @@
       "Hide YouTube Playables, current camelCase renderer and collaboration handling, improved Help readability and search, clearer popup and dashboard controls, and Android closed-testing and iOS status surfaces are included.",
       "Settings includes an unchecked-by-default device-wide opt-out for automatic reload reminders and What's New banners on YouTube and YouTube Kids. The dashboard's What's New page remains available manually."
     ],
-    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.6.6"
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.6"
   },
   {
     "version": "3.3.5",
