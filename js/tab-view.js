@@ -7,6 +7,46 @@
 
 const FILTERTUBE_SEMANTIC_ML_ENABLED = false;
 const ANDROID_CLOSED_TESTING_INVITE_DISMISSED_KEY = 'filtertube_android_closed_testing_invite_dismissed_v1';
+const SHOW_UPDATE_REFRESH_PROMPT_KEY = 'showUpdateRefreshPrompt';
+
+/**
+ * The refresh reminder is intentionally kept outside profile settings. It is
+ * a device-wide preference for the small prompt that asks already-open
+ * YouTube tabs to reload after an extension update. Missing values are
+ * enabled for backwards compatibility with existing installations.
+ */
+async function initializeUpdateRefreshPromptSetting(setting) {
+    if (!setting) return;
+
+    try {
+        const stored = await runtimeAPI?.storage?.local?.get([SHOW_UPDATE_REFRESH_PROMPT_KEY]);
+        // The control is an opt-out: unchecked preserves the historical
+        // default reminder behavior; checking it stores show=false.
+        setting.checked = stored?.[SHOW_UPDATE_REFRESH_PROMPT_KEY] === false;
+    } catch (e) {
+        setting.checked = false;
+    }
+
+    if (setting.dataset.ftUpdateRefreshPromptBound === 'true') return;
+    setting.addEventListener('change', async () => {
+        const disableReminders = setting.checked;
+        try {
+            await runtimeAPI?.storage?.local?.set({
+                [SHOW_UPDATE_REFRESH_PROMPT_KEY]: !disableReminders
+            });
+            UIComponents.showToast(
+                disableReminders
+                    ? 'Update refresh reminders disabled'
+                    : 'Update refresh reminders enabled',
+                disableReminders ? 'info' : 'success'
+            );
+        } catch (e) {
+            setting.checked = !disableReminders;
+            UIComponents.showToast('Could not update refresh reminders', 'error');
+        }
+    });
+    setting.dataset.ftUpdateRefreshPromptBound = 'true';
+}
 
 function organizeHelpReadingOrder(helpView) {
     const shell = helpView?.querySelector('.help-shell');
@@ -3594,6 +3634,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftAutoBackupMode = document.getElementById('ftAutoBackupMode');
     const ftAutoBackupFormat = document.getElementById('ftAutoBackupFormat');
     const settingAutoBackupEnabled = document.getElementById('setting_autoBackupEnabled');
+    const settingShowUpdateRefreshPrompt = document.getElementById('setting_showUpdateRefreshPrompt');
     const ftSelfControlStateBadge = document.getElementById('ftSelfControlStateBadge');
     const ftSelfControlReady = document.getElementById('ftSelfControlReady');
     const ftSelfControlActive = document.getElementById('ftSelfControlActive');
@@ -3846,6 +3887,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Load initial settings
     await StateManager.loadSettings();
+    await initializeUpdateRefreshPromptSetting(settingShowUpdateRefreshPrompt);
 
     // Apply theme immediately
     const state = StateManager.getState();
@@ -7400,6 +7442,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (settingAutoBackupEnabled) {
             settingAutoBackupEnabled.disabled = isChild || isUiLocked();
             settingAutoBackupEnabled.title = isChild ? childTitle : '';
+        }
+        if (settingShowUpdateRefreshPrompt) {
+            settingShowUpdateRefreshPrompt.disabled = isChild || isUiLocked();
+            settingShowUpdateRefreshPrompt.title = isChild
+                ? childTitle
+                : (isUiLocked() ? 'Unlock this profile to change device-wide settings.' : '');
         }
         if (ftAutoBackupMode) {
             const autoBackupEnabled = StateManager.getState()?.autoBackupEnabled === true;
