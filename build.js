@@ -392,6 +392,30 @@ function sha256File(filePath) {
     return hash.digest('hex');
 }
 
+function resolveGitHubToken() {
+    try {
+        const keyringEnv = { ...process.env };
+        delete keyringEnv.GITHUB_TOKEN;
+        delete keyringEnv.GH_TOKEN;
+        const token = execSync('gh auth token --hostname github.com', {
+            encoding: 'utf8',
+            env: keyringEnv,
+            stdio: ['ignore', 'pipe', 'ignore']
+        }).trim();
+        if (token) {
+            return { token, source: 'GitHub CLI keyring' };
+        }
+    } catch (err) {
+    }
+
+    const token = String(process.env.GITHUB_TOKEN || process.env.GH_TOKEN || '').trim();
+    if (token) {
+        return { token, source: process.env.GITHUB_TOKEN ? 'GITHUB_TOKEN' : 'GH_TOKEN' };
+    }
+
+    return null;
+}
+
 async function maybePromptRelease(version, zipPaths, mobileArtifactPaths = []) {
     if (!process.stdout.isTTY) {
         console.log('ℹ️  Non-interactive terminal detected; skipping release prompt.');
@@ -409,11 +433,13 @@ async function maybePromptRelease(version, zipPaths, mobileArtifactPaths = []) {
         return;
     }
 
-    const token = process.env.GITHUB_TOKEN;
-    if (!token) {
-        console.error('❌ GITHUB_TOKEN is not set; cannot publish release.');
+    const githubAuth = resolveGitHubToken();
+    if (!githubAuth) {
+        console.error('❌ GitHub authentication is unavailable. Run `gh auth login` or set GITHUB_TOKEN.');
         return;
     }
+    const { token } = githubAuth;
+    console.log(`🔐 Using ${githubAuth.source} for GitHub release publishing.`);
 
     const changelogInfo = extractLatestChangelogEntry(version);
     const body = buildReleaseBody({
