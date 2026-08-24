@@ -1,12 +1,28 @@
 # Android public distribution
 
-Last updated: May 31, 2026.
+Last updated: August 24, 2026.
+
+## Google Play open testing is live (2026-08-24)
+
+The feature-rich Android phone/tablet app is now active in Google Play open
+testing for unlimited testers across 177 countries and regions. Eligible users
+can join without an invitation at:
+
+<https://play.google.com/apps/testing/com.filtertube.app>
+
+After joining, the Play listing is:
+
+<https://play.google.com/store/apps/details?id=com.filtertube.app>
+
+The testing enrollment URL is the primary public link because the ordinary
+store-details URL can show Not Found before enrollment or while Play rollout
+state propagates.
 
 This document tracks the public Android distribution plan for FilterTube phone/tablet builds while the native app repository remains private.
 
 ## Post-v3.3.5 release-boundary note (2026-08-23)
 
-The feature-rich Android phone/tablet app in Google Play closed testing is a
+The feature-rich Android phone/tablet app in Google Play open testing is a
 separate custom viewing experience from the simpler direct APK path. The direct
 APK may be reused or attached only with its actual embedded version and
 versionCode; it must never be renamed to imply a native rebuild. See the
@@ -33,7 +49,7 @@ Do not ship unfinished Android TV behavior inside the phone/tablet Play or APK r
 
 | Channel | Status | Artifact | Notes |
 | --- | --- | --- | --- |
-| Google Play | Primary phone/tablet channel | Signed AAB | Use Play tracks for internal, closed, and production releases. |
+| Google Play | Open testing live | Signed AAB | Unlimited open testers in 177 countries/regions; use the enrollment URL as the primary CTA. |
 | Direct APK | Next public sideload channel | Signed release APK plus `.sha256` | Good for GrapheneOS, de-Googled Android, and direct testers. Link from `filtertube.in/downloads`. |
 | GitHub Releases | Public artifact host | Extension ZIPs, Android APK/AAB, checksums | Use the public repo release page even if app code stays private. |
 | IzzyOnDroid | Future repository target | Release APK + metadata | Requires public source path and release metadata. Fastlane metadata will help. |

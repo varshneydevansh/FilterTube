@@ -477,8 +477,8 @@ explicitly instead of being summarized as a generic “UI update”.
   serene timeout artwork, profile/time summaries, language/category chips,
   About/help copy, and release prompts were updated. `App_Store_transparent.png`
   and website Android/iOS artwork were added to the release surfaces.
-- The website downloads/home routes were updated to describe Android Play
-  closed testing, iOS/iPad TestFlight status, and the difference between the
+- At the checkpoint date, the website downloads/home routes described Android
+  Play closed testing, iOS/iPad TestFlight status, and the difference between the
   feature-rich custom app and the simpler direct APK. These website files were
   committed in this checkpoint; the additional website edits below are not.
 
@@ -522,8 +522,8 @@ version:
 - **Hero copy and readability:** the homepage hero now says “Calmer, ad-free
   viewing / Your feed, your rules”, uses a translucent readable support panel,
   and states the practical controls (channels, keywords, Shorts, comments,
-  categories, languages, and more). The status line uses a glass treatment and
-  reports desktop availability, Android closed testing, and iPhone/iPad
+  categories, languages, and more). At the checkpoint date, the glass status
+  line reported desktop availability, Android closed testing, and iPhone/iPad
   TestFlight finalization.
 - **Android/iOS browser rail:** the browser-logo rail is four columns at wide
   widths instead of squeezing eight tiles into one row, adds internal Android
@@ -543,6 +543,16 @@ These edits were locally checked with the website production build and
 must be reviewed/committed separately.
 
 ## Cross-cutting documentation map
+
+### Store-status update (2026-08-24)
+
+Google Play approved and activated FilterTube 3.3.6 open testing for unlimited
+testers in 177 countries and regions. The extension dashboard, its one-time
+Android invitation, and the website home, mobile, Android, and downloads
+surfaces now link directly to
+`https://play.google.com/apps/testing/com.filtertube.app`. No email invitation
+is required. The normal Play listing remains secondary because it may report
+Not Found before a user enrolls or while rollout state propagates.
 
 Use the following documents for behavior details rather than treating this
 ledger as a replacement for their contracts:
@@ -573,7 +583,7 @@ ledger:
    profile switches;
 4. physical Android, iOS, and Android TV builds and provider login/parent
    verification;
-5. Google Play closed-test participation and Apple TestFlight availability; and
+5. Google Play open-test real-device feedback and Apple TestFlight availability; and
 6. production website DNS/deployment status after the current local website
    edits are reviewed and committed.
 

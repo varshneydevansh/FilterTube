@@ -472,12 +472,12 @@ async function initializeAndroidClosedTestingInvite() {
 
     const eyebrow = document.createElement('div');
     eyebrow.className = 'ft-modal-eyebrow';
-    eyebrow.textContent = 'Android closed testing';
+    eyebrow.textContent = 'Android open testing';
 
     const title = document.createElement('h3');
     title.id = 'androidClosedTestingInviteTitle';
     title.className = 'ft-modal-title';
-    title.textContent = 'Help test the Android Play Store build';
+    title.textContent = 'FilterTube for Android is open to testers';
 
     header.append(eyebrow, title);
 
@@ -486,11 +486,11 @@ async function initializeAndroidClosedTestingInvite() {
 
     const message = document.createElement('p');
     message.className = 'android-closed-testing-invite__message';
-    message.textContent = 'If you can actively test FilterTube on Android phone or tablet, send a mail to hello@filtertube.in. I will add you as a Play Store closed tester and use your feedback to catch YouTube changes faster.';
+    message.textContent = 'Anyone in a supported country can now join FilterTube\'s Google Play open test. No invitation or email is needed. Install the complete custom Main and Kids viewing app and send feedback when you spot a problem.';
 
     const address = document.createElement('div');
     address.className = 'android-closed-testing-invite__address';
-    address.textContent = 'hello@filtertube.in';
+    address.textContent = 'Available through Google Play open testing in 177 countries and regions';
 
     const note = document.createElement('p');
     note.className = 'android-closed-testing-invite__note';
@@ -506,9 +506,11 @@ async function initializeAndroidClosedTestingInvite() {
 
     const mailBtn = document.createElement('a');
     mailBtn.className = 'btn-primary android-closed-testing-invite__mail';
-    const mailHref = 'mailto:hello@filtertube.in?subject=Android%20closed%20testing%20request&body=Hi%20FilterTube%2C%0A%0AI%20would%20like%20to%20join%20the%20Android%20Play%20Store%20closed%20testing.%0A%0AGoogle%20Play%20email%3A%20%0ADevice%3A%20%0AWhat%20I%20can%20test%3A%20%0A';
-    mailBtn.href = mailHref;
-    mailBtn.textContent = 'Email to join';
+    const testingHref = 'https://play.google.com/apps/testing/com.filtertube.app';
+    mailBtn.href = testingHref;
+    mailBtn.target = '_blank';
+    mailBtn.rel = 'noreferrer';
+    mailBtn.textContent = 'Become a tester';
 
     const cleanup = async () => {
         await setDismissed();
@@ -526,13 +528,8 @@ async function initializeAndroidClosedTestingInvite() {
     };
 
     dismissBtn.addEventListener('click', cleanup);
-    mailBtn.addEventListener('click', async (event) => {
-        event.preventDefault();
-        await cleanup();
-        try {
-            window.location.href = mailHref;
-        } catch (e) {
-        }
+    mailBtn.addEventListener('click', () => {
+        cleanup();
     });
     overlay.addEventListener('click', (event) => {
         if (event.target === overlay) cleanup();
