@@ -19,9 +19,8 @@ const fs = require('fs-extra');
 const path = require('path');
 const archiver = require('archiver');
 const crypto = require('crypto');
-const https = require('https');
 const readline = require('readline');
-const { execSync } = require('child_process');
+const { execFileSync, execSync } = require('child_process');
 const { version: PACKAGE_VERSION } = require('./package.json');
 
 // Configuration
@@ -438,7 +437,6 @@ async function maybePromptRelease(version, zipPaths, mobileArtifactPaths = []) {
         console.error('❌ GitHub authentication is unavailable. Run `gh auth login` or set GITHUB_TOKEN.');
         return;
     }
-    const { token } = githubAuth;
     console.log(`🔐 Using ${githubAuth.source} for GitHub release publishing.`);
 
     const changelogInfo = extractLatestChangelogEntry(version);
@@ -454,22 +452,43 @@ async function maybePromptRelease(version, zipPaths, mobileArtifactPaths = []) {
     });
 
     try {
-        const release = await createGitHubRelease(token, {
-            tagName: `v${version}`,
-            name: releaseTitle,
-            body
-        });
+        const tagName = `v${version}`;
+        let releaseExists = githubReleaseExists(githubAuth, tagName);
+        let createdDraft = false;
 
-        const uploadUrl = release?.upload_url;
-        if (!uploadUrl) {
-            console.error('❌ Could not get upload URL from GitHub release response.');
-            return;
+        if (!releaseExists) {
+            createDraftGitHubRelease(githubAuth, {
+                tagName,
+                name: releaseTitle,
+                body
+            });
+            releaseExists = true;
+            createdDraft = true;
+            console.log(`📝 Draft release ${tagName} created.`);
+        } else {
+            console.log(`↻ Resuming existing GitHub release ${tagName}.`);
         }
 
-        for (const assetPath of releaseAssetPaths) {
-            await uploadReleaseAsset(token, uploadUrl, assetPath);
+        const uploadedNames = new Set(listGitHubReleaseAssetNames(githubAuth, tagName));
+        const missingAssetPaths = releaseAssetPaths.filter(assetPath => !uploadedNames.has(path.basename(assetPath)));
+
+        if (missingAssetPaths.length) {
+            uploadGitHubReleaseAssets(githubAuth, tagName, missingAssetPaths);
+        } else {
+            console.log('ℹ️  All expected release assets are already uploaded.');
         }
 
+        const finalNames = new Set(listGitHubReleaseAssetNames(githubAuth, tagName));
+        const stillMissing = releaseAssetPaths
+            .map(assetPath => path.basename(assetPath))
+            .filter(fileName => !finalNames.has(fileName));
+        if (stillMissing.length) {
+            throw new Error(`Release upload incomplete; missing: ${stillMissing.join(', ')}`);
+        }
+
+        if (createdDraft) {
+            publishDraftGitHubRelease(githubAuth, tagName);
+        }
         console.log('🚀 Release published successfully.');
     } catch (err) {
         console.error('❌ Failed to publish release:', err);
@@ -622,98 +641,77 @@ function buildReleaseBody({ version, section, previousVersion, mobileArtifactPat
     ].join('\n');
 }
 
-function createGitHubRelease(token, { tagName, name, body }) {
-    const payload = JSON.stringify({
-        tag_name: tagName,
-        name,
-        body,
-        draft: false,
-        prerelease: false
-    });
+function githubCliEnv(githubAuth) {
+    const env = { ...process.env };
+    delete env.GITHUB_TOKEN;
+    delete env.GH_TOKEN;
+    if (githubAuth.source !== 'GitHub CLI keyring') {
+        env.GH_TOKEN = githubAuth.token;
+    }
+    return env;
+}
 
-    const options = {
-        method: 'POST',
-        hostname: 'api.github.com',
-        path: `/repos/${REPO_OWNER}/${REPO_NAME}/releases`,
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'User-Agent': `${REPO_NAME}-release-script`,
-            'Accept': 'application/vnd.github+json',
-            'Content-Type': 'application/json',
-            'Content-Length': Buffer.byteLength(payload)
+function runGitHubCli(githubAuth, args, options = {}) {
+    return execFileSync('gh', args, {
+        encoding: 'utf8',
+        env: githubCliEnv(githubAuth),
+        stdio: options.inherit ? 'inherit' : ['ignore', 'pipe', 'pipe']
+    });
+}
+
+function githubReleaseExists(githubAuth, tagName) {
+    try {
+        runGitHubCli(githubAuth, ['release', 'view', tagName, '--repo', `${REPO_OWNER}/${REPO_NAME}`]);
+        return true;
+    } catch (err) {
+        const details = [err?.stderr, err?.stdout, err?.message]
+            .filter(Boolean)
+            .map(value => String(value))
+            .join('\n');
+        if (/release not found/i.test(details)) {
+            return false;
         }
-    };
-
-    return httpRequest(options, payload);
+        throw err;
+    }
 }
 
-function uploadReleaseAsset(token, uploadUrlTemplate, filePath) {
-    return new Promise((resolve, reject) => {
-        const cleanUrl = uploadUrlTemplate.split('{')[0];
-        const fileName = path.basename(filePath);
-        const uploadUrl = `${cleanUrl}?name=${encodeURIComponent(fileName)}`;
-        const stat = fs.statSync(filePath);
-
-        const options = {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'User-Agent': `${REPO_NAME}-release-script`,
-                'Content-Type': contentTypeForAsset(fileName),
-                'Content-Length': stat.size
-            }
-        };
-
-        const req = https.request(uploadUrl, options, res => {
-            const chunks = [];
-            res.on('data', d => chunks.push(d));
-            res.on('end', () => {
-                if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
-                    console.log(`📎 Uploaded ${fileName}`);
-                    resolve(JSON.parse(Buffer.concat(chunks).toString('utf8')));
-                } else {
-                    reject(new Error(`Upload failed for ${fileName}: ${res.statusCode} ${res.statusMessage}`));
-                }
-            });
-        });
-
-        req.on('error', reject);
-        fs.createReadStream(filePath).pipe(req);
-    });
+function createDraftGitHubRelease(githubAuth, { tagName, name, body }) {
+    runGitHubCli(githubAuth, [
+        'release', 'create', tagName,
+        '--repo', `${REPO_OWNER}/${REPO_NAME}`,
+        '--title', name,
+        '--notes', body,
+        '--draft'
+    ]);
 }
 
-function contentTypeForAsset(fileName) {
-    const lower = fileName.toLowerCase();
-    if (lower.endsWith('.zip')) return 'application/zip';
-    if (lower.endsWith('.apk')) return 'application/vnd.android.package-archive';
-    if (lower.endsWith('.sha256') || lower.endsWith('.txt')) return 'text/plain; charset=utf-8';
-    return 'application/octet-stream';
+function listGitHubReleaseAssetNames(githubAuth, tagName) {
+    const output = runGitHubCli(githubAuth, [
+        'release', 'view', tagName,
+        '--repo', `${REPO_OWNER}/${REPO_NAME}`,
+        '--json', 'assets',
+        '--jq', '.assets[].name'
+    ]);
+    return output.split('\n').map(name => name.trim()).filter(Boolean);
 }
 
-function httpRequest(options, payload) {
-    return new Promise((resolve, reject) => {
-        const req = https.request(options, res => {
-            const chunks = [];
-            res.on('data', d => chunks.push(d));
-            res.on('end', () => {
-                const body = Buffer.concat(chunks).toString('utf8');
-                if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
-                    try {
-                        resolve(JSON.parse(body));
-                    } catch (err) {
-                        reject(err);
-                    }
-                } else {
-                    reject(new Error(`GitHub API error: ${res.statusCode} ${res.statusMessage} - ${body}`));
-                }
-            });
-        });
-        req.on('error', reject);
-        if (payload) {
-            req.write(payload);
-        }
-        req.end();
-    });
+function uploadGitHubReleaseAssets(githubAuth, tagName, assetPaths) {
+    runGitHubCli(githubAuth, [
+        'release', 'upload', tagName,
+        ...assetPaths,
+        '--repo', `${REPO_OWNER}/${REPO_NAME}`
+    ], { inherit: true });
+    for (const assetPath of assetPaths) {
+        console.log(`📎 Uploaded ${path.basename(assetPath)}`);
+    }
+}
+
+function publishDraftGitHubRelease(githubAuth, tagName) {
+    runGitHubCli(githubAuth, [
+        'release', 'edit', tagName,
+        '--repo', `${REPO_OWNER}/${REPO_NAME}`,
+        '--draft=false'
+    ]);
 }
 
 function promptYesNo(question) {
